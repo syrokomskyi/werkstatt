@@ -96,6 +96,7 @@
   },
   "dependencies": {
     "@warpgogol/fingerprint": "workspace:*",
+    "@webgogol/forge": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel": "workspace:*",
