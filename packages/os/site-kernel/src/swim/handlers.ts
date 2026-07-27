@@ -32,7 +32,6 @@ import {
   signGenomeEntry,
   getGenomeLogSize,
   isGenomeLogSizeWarning,
-  GENOME_LOG_FILENAME,
 } from "./genome-log.ts";
 import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/passport";
 

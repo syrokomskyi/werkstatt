@@ -23,10 +23,8 @@ export const swimModule: KernelModule = {
   version: "0.1.0",
 
   async register(registry) {
-    const { runSwimJoin } = await import("./handlers.ts");
-    const { runSwimLeave } = await import("./handlers.ts");
-    const { runSwimMembers } = await import("./handlers.ts");
-    const { runSwimStatus } = await import("./handlers.ts");
+    const { runSwimJoin, runSwimLeave, runSwimMembers, runSwimStatus } =
+      await import("./handlers.ts");
 
     registry.registerCommand({
       name: "swim.join",
