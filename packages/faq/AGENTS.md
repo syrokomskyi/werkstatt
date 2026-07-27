@@ -17,7 +17,7 @@ Pluggable FAQ content collection package (RFC-0475).
 | `@warpgogol/faq` | `faqSchema`, `FaqEntry`, `FaqGovernance` | Zod schema and types |
 | `@warpgogol/faq/astro` | `createFaqCollection` | Astro collection factory — spread into `collections` |
 | `@warpgogol/faq/astro` | `getFaqEntries(lang)` | Load FAQ entries for a language, sorted by `order` |
-| `@warpgogol/faq/astro` | `getFaqEntriesByTags(lang, tags)` | Filter entries by tags |
+| `@warpgogol/faq/astro` | `getFaqEntriesByTags(lang, tags)` | Filter entries by tags, sorted by `orderTags[tags[0]]` with fallback to `order` |
 | `@warpgogol/faq/astro` | `toSemanticFaqEntries(entries)` | Map `FaqEntry[]` → `SemanticFaqEntry[]` (slug → id) |
 
 ## Content location
@@ -31,7 +31,7 @@ FAQ content files live under `src/content/faq/{lang}/`:
 `faq.validate` in `@warpgogol/site-kernel-checks` enforces:
 
 - Required fields: `slug`, `question`, `answer`
-- Optional field types: `order` (number), `tags` (string[])
+- Optional field types: `order` (number), `orderTags` (record<string, number>), `tags` (string[])
 - Governance block structure: `governance.fieldClaims` object
 - Duplicate slug detection per language
 - No-op pass when `src/content/faq/` is absent
