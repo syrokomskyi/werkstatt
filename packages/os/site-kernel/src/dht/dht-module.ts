@@ -23,6 +23,7 @@ export const dhtModule: KernelModule = {
 
   async register(registry) {
     const { runDhtNodeInit } = await import("./init.ts");
+    const { runDhtLookup } = await import("./lookup.ts");
 
     registry.registerCommand({
       name: "dht.node.init",
@@ -36,6 +37,26 @@ export const dhtModule: KernelModule = {
       reads: ["werkstatt.identity.json"],
       writes: ["werkstatt.dht.json"],
       execute: runDhtNodeInit,
+    });
+
+    registry.registerCommand({
+      name: "dht.lookup",
+      description:
+        "RFC-0565: resolve a site id to its DHT entry. Queries the DHT (or local " +
+        "cache if fresh) and validates the entry signature. Routes around dead " +
+        "workshops detected by SWIM. Use --site-id <id> to specify the site. " +
+        "Use --force to bypass cache. Use --json for machine-readable output.",
+      scope: "workspace",
+      cacheable: false,
+      reads: [
+        "werkstatt.dht.json",
+        "werkstatt.dht.cache.json",
+        "werkstatt.identity.json",
+        "werkstatt.swim.json",
+        "werkstatt.genome.log",
+      ],
+      writes: ["werkstatt.dht.cache.json"],
+      execute: runDhtLookup,
     });
   },
 };

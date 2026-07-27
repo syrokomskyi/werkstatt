@@ -29,21 +29,15 @@ export const dhtSiteEntrySchema = z.object({
     .string()
     .regex(didWebRe, "owner must be a did:web identifier (did:web:<domain>#<key-version>)")
     .describe("VC subject id of the site owner (RFC-0558, RFC-0561)"),
-  workshopEndpoint: z
-    .string()
-    .regex(endpointRe, "workshopEndpoint must be host:port format"),
+  workshopEndpoint: z.string().regex(endpointRe, "workshopEndpoint must be host:port format"),
   mirrors: z.array(z.string().url()).default([]),
   registeredAt: z.string().datetime(),
   lastUpdated: z.string().datetime(),
-  signature: z
-    .string()
-    .min(1, "signature must be a non-empty Ed25519 multibase signature"),
+  signature: z.string().min(1, "signature must be a non-empty Ed25519 multibase signature"),
 });
 
 export const dhtConfigSchema = z.object({
-  bindAddr: z
-    .string()
-    .regex(endpointRe, "bindAddr must be host:port format"),
+  bindAddr: z.string().regex(endpointRe, "bindAddr must be host:port format"),
   bootstrapNodes: z
     .array(z.string().regex(endpointRe, "each bootstrapNode must be host:port format"))
     .default([]),
@@ -59,6 +53,7 @@ export const dhtLookupResultSchema = z.object({
   latencyMs: z.number().int().min(0),
   cached: z.boolean().default(false),
   signatureValid: z.boolean().default(true),
+  diagnostics: z.array(z.string()).optional(),
 });
 
 export const dhtPlacementReasonSchema = z.enum([
