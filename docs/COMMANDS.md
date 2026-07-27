@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 654. Raw manifest entries: 1196.
+Generated command rows: 657. Raw manifest entries: 1199.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -282,6 +282,9 @@ Generated command rows: 654. Raw manifest entries: 1196.
 | `gitattributes.generate` | site:warpgogol-com, workspace | workspace | yes | no | Rewrite the machine-managed generated-artifacts block in root .gitattributes from docs/command-manifest.generated.yaml writes globs + GENERATOR_OWNERSHIP_MAP, marking every pattern linguist-generated=true (RFC-0336). Never hand-edit the managed block. |
 | `gitattributes.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate the managed .gitattributes block is present and fresh (GITATTR-01), sorted/normalized (GITATTR-02), and warn when a tracked marker-carrying file has no covering pattern (GITATTR-03) (RFC-0336). |
 | `github.branch-protection.validate` | site:warpgogol-com, workspace | workspace | no | no | RFC-0476: validate the authored GitHub branch-protection policy against the stable CI workflow job name and required RFC validation step. Offline — never calls the GitHub API. |
+| `gitmesh.status` | workspace | workspace | no | no | RFC-0563: check sync status (am I up-to-date?). Local-only query — no network I/O. Reports local SHA, remote SHA, behind/ahead counts, and last sync time. Use --json for machine-readable output. |
+| `gitmesh.sync` | workspace | workspace | no | yes | RFC-0563: sync platform code from all configured remotes. Fetches from each remote in werkstatt.gitmesh.json, converges on the latest signed commit by committer timestamp, and advances HEAD via git merge --ff-only. Pull-only — never pushes. Use --json for machine-readable output. |
+| `gitmesh.verify` | workspace | workspace | no | no | RFC-0563: verify all commit signatures in the local clone against the operator's public key from werkstatt.identity.json. Incremental — only new commits since last verification are checked. Reports unsigned commits, invalid signatures, and total verified. Use --json for machine-readable output. |
 | `growth.adapter.contract` | site:warpgogol-com, workspace | workspace | no | no | Validate all packages/growth-adapter-*/ exports satisfy the GrowthAdapter interface contract: id, init(), track() (DNA-30, RFC-0027). |
 | `growth.events.validate` | site:warpgogol-com, workspace | app | no | no | Validate emit() call sites use only closed EventName catalog values, and validate ontology event YAML files for structural completeness (DNA-27, RFC-0027). |
 | `growth.experiment.archive` | site:warpgogol-com, workspace | app | no | no | Validate archival hygiene: concluded/archived experiments not referenced in system.yaml, concluded experiments have concludedAt date (DNA-29, RFC-0027). |

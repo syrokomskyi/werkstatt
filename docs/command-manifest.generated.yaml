@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: ad7540d5da019a119979bf96995f6a4b38e2413f8e8db01a46f713a8ba4b91f1
+  contentHash: d02ebdec065c06f5a9ff5071526a868009fa4c5865636ac0b4e264fa105d3a02
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -8689,6 +8689,61 @@ commands:
     flags: *a443
     reads: *a444
     writes: []
+    pipelines: []
+  - name: gitmesh.status
+    description: "RFC-0563: check sync status (am I up-to-date?). Local-only query —
+      no network I/O. Reports local SHA, remote SHA, behind/ahead counts, and
+      last sync time. Use --json for machine-readable output."
+    scope: workspace
+    provider: workspace
+    module: gitmesh
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - werkstatt.gitmesh.json
+      - .git/gitmesh.last-sync
+    writes: []
+    pipelines: []
+  - name: gitmesh.sync
+    description: "RFC-0563: sync platform code from all configured remotes. Fetches
+      from each remote in werkstatt.gitmesh.json, converges on the latest signed
+      commit by committer timestamp, and advances HEAD via git merge --ff-only.
+      Pull-only — never pushes. Use --json for machine-readable output."
+    scope: workspace
+    provider: workspace
+    module: gitmesh
+    mutatesState: false
+    requiresNetwork: true
+    timeoutMs: null
+    flags: {}
+    reads:
+      - werkstatt.gitmesh.json
+      - werkstatt.identity.json
+    writes:
+      - .git/gitmesh.lock
+      - .git/gitmesh.last-sync
+    pipelines: []
+  - name: gitmesh.verify
+    description: "RFC-0563: verify all commit signatures in the local clone against
+      the operator's public key from werkstatt.identity.json. Incremental — only
+      new commits since last verification are checked. Reports unsigned commits,
+      invalid signatures, and total verified. Use --json for machine-readable
+      output."
+    scope: workspace
+    provider: workspace
+    module: gitmesh
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags: {}
+    reads:
+      - werkstatt.gitmesh.json
+      - werkstatt.identity.json
+      - .git/gitmesh.last-verified
+    writes:
+      - .git/gitmesh.last-verified
     pipelines: []
   - name: growth.adapter.contract
     description: "Validate all packages/growth-adapter-*/ exports satisfy the
