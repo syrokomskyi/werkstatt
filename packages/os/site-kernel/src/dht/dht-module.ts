@@ -24,6 +24,7 @@ export const dhtModule: KernelModule = {
   async register(registry) {
     const { runDhtNodeInit } = await import("./init.ts");
     const { runDhtLookup } = await import("./lookup.ts");
+    const { runDhtRegister } = await import("./register.ts");
 
     registry.registerCommand({
       name: "dht.node.init",
@@ -57,6 +58,20 @@ export const dhtModule: KernelModule = {
       ],
       writes: ["werkstatt.dht.cache.json"],
       execute: runDhtLookup,
+    });
+
+    registry.registerCommand({
+      name: "dht.register",
+      description:
+        "RFC-0565: publish a local registry entry to the DHT. Signs the entry with " +
+        "the operator's Ed25519 keypair. Uses LWW on lastUpdated for conflict resolution. " +
+        "Required flags: --site-id <id>, --owner <did:web>, --endpoint <host:port>. " +
+        "Optional: --mirrors <host:port> (can be repeated). Use --json for output.",
+      scope: "workspace",
+      cacheable: false,
+      reads: ["werkstatt.dht.json", "werkstatt.identity.json"],
+      writes: [],
+      execute: runDhtRegister,
     });
   },
 };
