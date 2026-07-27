@@ -56,3 +56,6 @@ export {
   verifyIdentityCredential,
 } from "./identity-sign.ts";
 export type { IdentityCredentialSubject } from "./identity-sign.ts";
+
+export { dhtEntryBytes, signDhtEntry, verifyDhtEntry } from "./dht-sign.ts";
+export type { DHTEntryData } from "./dht-sign.ts";

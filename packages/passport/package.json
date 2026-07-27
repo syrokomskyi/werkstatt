@@ -38,6 +38,10 @@
     "./identity-sign": {
       "types": "./src/identity-sign.ts",
       "default": "./src/identity-sign.ts"
+    },
+    "./dht-sign": {
+      "types": "./src/dht-sign.ts",
+      "default": "./src/dht-sign.ts"
     }
   },
   "files": ["src"],
