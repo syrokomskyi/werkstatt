@@ -287,19 +287,19 @@ Both commands produce `Diagnostic[]` output in `--json` mode, consistent with ot
 
 ## Acceptance criteria
 
-- [ ] `template.imports.validate` command registered in `@warpgogol/site-kernel-checks` module with `scope: workspace`
-- [ ] `template.imports.validate` auto-discovers `**/src/templates/**/*.template.*` files across all workspace packages
-- [ ] `template.imports.validate` extracts `@warpgogol/*` and `@webgogol/*` import specifiers from both static (`from "..."`) and dynamic (`import("...")`) import patterns, and checks each against root `package.json` devDependencies
-- [ ] `template.imports.validate` runs `pnpm install --frozen-lockfile` and fails on lockfile drift or unsatisfied peer deps
-- [ ] `template.imports.validate` added to `PACKAGES_CHECK_PIPELINE` after `workspace.discovery.validate`
-- [ ] `workpiece.imports.validate` command registered in `@warpgogol/site-kernel-checks` module with `scope: workspace`
-- [ ] `workpiece.imports.validate` scans generated workpiece files in `tools/` and `src/` for `@warpgogol/*` / `@webgogol/*` imports
-- [ ] `workpiece.imports.validate` verifies each import resolves from root `node_modules` (symlink existence check)
-- [ ] `workpiece.imports.validate` added as first step in `SITES_BUILD_PREPARE_PIPELINE`
-- [ ] Both commands produce `Diagnostic[]` output in `--json` mode with rule IDs `TEMPLATE-IMPORTS-01/02` and `WORKPIECE-IMPORTS-01`
-- [ ] Both commands exit non-zero on violations, zero on pass
-- [ ] `PACKAGES_CHECK_PIPELINE` passes with current root `package.json` (no false positives)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `template.imports.validate` command registered in `@warpgogol/site-kernel-checks` module with `scope: workspace` (evidence: `packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts:120-132`, commit `6d8ea90`)
+- [x] `template.imports.validate` auto-discovers `**/src/templates/**/*.template.*` files across all workspace packages (evidence: `packages/os/site-kernel-checks/src/template-imports-validate.ts:105-119`, commit `6d8ea90`)
+- [x] `template.imports.validate` extracts `@warpgogol/*` and `@webgogol/*` import specifiers from both static (`from "..."`) and dynamic (`import("...")`) import patterns, and checks each against root `package.json` devDependencies (evidence: `packages/os/site-kernel-checks/src/template-imports-validate.ts:77-94` — `extractWorkspaceImports` with `STATIC_IMPORT_RE` + `DYNAMIC_IMPORT_RE`; commit `6d8ea90`)
+- [x] `template.imports.validate` runs `pnpm install --frozen-lockfile` and fails on lockfile drift or unsatisfied peer deps (evidence: `packages/os/site-kernel-checks/src/template-imports-validate.ts:155-175` — `execFileAsync("pnpm", ["install", "--frozen-lockfile"])` emits `TEMPLATE-IMPORTS-02`; commit `6d8ea90`)
+- [x] `template.imports.validate` added to `PACKAGES_CHECK_PIPELINE` after `workspace.discovery.validate` (evidence: `packages/os/site-kernel-checks/src/pipelines/packages-check.ts:87-88`, commit `6d8ea90`)
+- [x] `workpiece.imports.validate` command registered in `@warpgogol/site-kernel-checks` module with `scope: workspace` (evidence: `packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts:133-146`, commit `6d8ea90`)
+- [x] `workpiece.imports.validate` scans generated workpiece files in `tools/` and `src/` for `@warpgogol/*` / `@webgogol/*` imports (evidence: `packages/os/site-kernel-checks/src/workpiece-imports-validate.ts:118-140` — scans `tools/**/*.ts` and `src/**/*.{ts,mjs,astro}`; commit `6d8ea90`)
+- [x] `workpiece.imports.validate` verifies each import resolves from root `node_modules` (symlink existence check) (evidence: `packages/os/site-kernel-checks/src/workpiece-imports-validate.ts:142-160` — `fileExists(join(workspaceRoot, "node_modules", imp.package))`; commit `6d8ea90`)
+- [x] `workpiece.imports.validate` added as first step in `SITES_BUILD_PREPARE_PIPELINE` (evidence: `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:18-20`, commit `6d8ea90`)
+- [x] Both commands produce `Diagnostic[]` output in `--json` mode with rule IDs `TEMPLATE-IMPORTS-01/02` and `WORKPIECE-IMPORTS-01` (evidence: `packages/os/site-kernel-checks/src/diagnostics/rules/governance.ts:156-170` — rule IDs registered; commit `6d8ea90`)
+- [x] Both commands exit non-zero on violations, zero on pass (evidence: `diagnosticsResult` in `result-helpers.ts:35-42` sets `exitCode: 1` when `summary.error > 0`; 18 unit tests pass; commit `6d8ea90`)
+- [x] `PACKAGES_CHECK_PIPELINE` passes with current root `package.json` (no false positives) (evidence: `pnpm exec site-kernel run packages.check --json` exit 0, commit `748ec9d`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0557 --json` exit 0)
 
 ## Implementation notes for agents
 
