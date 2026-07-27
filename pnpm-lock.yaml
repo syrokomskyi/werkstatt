@@ -1442,6 +1442,9 @@ importers:
       '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../../ontology
+      '@warpgogol/passport':
+        specifier: workspace:*
+        version: link:../../passport
       '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share

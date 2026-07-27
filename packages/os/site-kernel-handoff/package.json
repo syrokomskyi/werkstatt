@@ -85,6 +85,10 @@
     "./platform-module": {
       "types": "./src/platform-module.ts",
       "default": "./src/platform-module.ts"
+    },
+    "./identity-module": {
+      "types": "./src/identity-module.ts",
+      "default": "./src/identity-module.ts"
     }
   },
   "files": ["src"],
@@ -98,6 +102,7 @@
     "@warpgogol/fingerprint": "workspace:*",
     "@webgogol/forge": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
+    "@warpgogol/passport": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel": "workspace:*",
     "@warpgogol/site-kernel-astro": "workspace:*",
