@@ -9,12 +9,13 @@ Append-only log of questions asked and answers given during grilling sessions. U
 - **Answer:** <operator's decision>
 -->
 
-## 2026-07-27 — RFC-0556 compass/werkstatt forge autonomy
-- **Question:** Separate @webgogol/compass-core package vs inline both in forge?
-- **Answer:** Inline both in forge — no separate package needed.
-- **Question:** Conscious duplication vs dependency inversion for kernel-packages?
-- **Answer:** Dependency inversion — forge becomes canonical, kernel-packages delegate to forge.
-- **Question:** How should compass.audit.* behave in external projects without git?
-- **Answer:** Safe-degradation — revision=0, warn not fail.
-- **Question:** versionBump for this RFC?
-- **Answer:** minor — new capability, not breaking change.
+## 2026-07-27 — RFC-0566 plan grilling
+
+- **Question:** How to track previous artifact for rollback?
+- **Answer:** Previous symlink — `.werkstatt/artifacts/platform/previous` symlink, filesystem is the only state source.
+- **Question:** How to build platform artifact — `pnpm build` vs Turborepo?
+- **Answer:** `turbo run build` — use existing Turborepo infrastructure with caching and dependency ordering.
+- **Question:** Include two-phase commit types in pilot plan or defer entirely?
+- **Answer:** Types only, stub logic — define `WorkshopDeployStatus` and `TwoPhaseCommitResult` in types.ts but don't implement logic. Contracts first, implementation in Phase 4 RFC.
+- **Question:** How to sign artifact manifest when `signLatestBuildArtifacts` expects `.integrity/` structure?
+- **Answer:** Export `signPayload` from `@warpgogol/site-kernel-integrity` — it already exists internally, just needs to be added to public API exports.
