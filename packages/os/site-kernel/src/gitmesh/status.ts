@@ -12,16 +12,13 @@ time) without performing any network I/O. Safe to run frequently.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0563: initial implementation — gitmesh.status local-only query handler.</item>
+  <item>RFC-0563 fix: add diagnostics array on error return (RFC-0086).</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type {
-  KernelCommandInput,
-  KernelCommandResult,
-  KernelRuntimeContext,
-} from "../types.ts";
+import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "../types.ts";
 import type { GitMeshStatus } from "./types.ts";
 import { loadGitMeshConfig } from "./config.ts";
 import {
@@ -51,6 +48,7 @@ export async function runGitMeshStatus(
         ahead: 0,
         lastSync: "",
         remotes: [],
+        diagnostics: ["gitmesh.status: no werkstatt.gitmesh.json found — run gitmesh.sync first"],
       },
       exitCode: 1,
       summary: "gitmesh.status: no werkstatt.gitmesh.json found — run gitmesh.sync first",
@@ -103,7 +101,8 @@ export async function runGitMeshStatus(
       remotes: config.remotes,
     },
     exitCode: 0,
-    summary: `gitmesh.status: ${behind} behind, ${ahead} ahead` +
+    summary:
+      `gitmesh.status: ${behind} behind, ${ahead} ahead` +
       (lastSync ? `, last sync: ${lastSync}` : ", never synced"),
   };
 }

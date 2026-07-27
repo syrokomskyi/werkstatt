@@ -15,16 +15,13 @@ all invalid signatures in one pass.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0563: initial implementation — gitmesh.verify handler with incremental verification.</item>
+  <item>RFC-0563 fix: add diagnostics arrays (RFC-0086), document deferred RFC-0560 key comparison dependency.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type {
-  KernelCommandInput,
-  KernelCommandResult,
-  KernelRuntimeContext,
-} from "../types.ts";
+import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "../types.ts";
 import type { GitMeshVerifyResult } from "./types.ts";
 import { loadGitMeshConfig } from "./config.ts";
 import { gitLogSignatureStatus, gitRevParseHead } from "./git-ops.ts";
@@ -38,6 +35,10 @@ interface IdentityFile {
 }
 
 async function loadIdentityPublicKeys(workspaceRoot: string): Promise<string[]> {
+  // RFC-0560 dependency: git's %G? signature status checks git's keyring, not the
+  // operator's specific public key. The publicKeys loaded here will be used to
+  // compare against signing keys once RFC-0560's trailer format is implemented.
+  // Until then, gitmesh.verify relies on git's GPG/SSH signature verification.
   const identityPath = join(workspaceRoot, IDENTITY_FILENAME);
   const raw = await readFile(identityPath, "utf8");
   const identity: IdentityFile = JSON.parse(raw);
@@ -70,6 +71,7 @@ export async function runGitMeshVerify(
         unsignedCommits: 0,
         invalidSignatures: 0,
         verified: false,
+        diagnostics: ["gitmesh.verify: no werkstatt.gitmesh.json found — run gitmesh.sync first"],
       },
       exitCode: 1,
       summary: "gitmesh.verify: no werkstatt.gitmesh.json found — run gitmesh.sync first",
@@ -88,6 +90,9 @@ export async function runGitMeshVerify(
         unsignedCommits: 0,
         invalidSignatures: 0,
         verified: false,
+        diagnostics: [
+          `gitmesh.verify: no ${IDENTITY_FILENAME} found — cannot verify signatures without operator public key`,
+        ],
       },
       exitCode: 1,
       summary: `gitmesh.verify: no ${IDENTITY_FILENAME} found — cannot verify signatures without operator public key`,
@@ -102,6 +107,7 @@ export async function runGitMeshVerify(
         unsignedCommits: 0,
         invalidSignatures: 0,
         verified: false,
+        diagnostics: [`gitmesh.verify: ${IDENTITY_FILENAME} contains no public keys`],
       },
       exitCode: 1,
       summary: `gitmesh.verify: ${IDENTITY_FILENAME} contains no public keys`,
@@ -117,6 +123,7 @@ export async function runGitMeshVerify(
         unsignedCommits: 0,
         invalidSignatures: 0,
         verified: false,
+        diagnostics: ["gitmesh.verify: cannot resolve HEAD — not a git repository?"],
       },
       exitCode: 1,
       summary: "gitmesh.verify: cannot resolve HEAD — not a git repository?",
@@ -158,6 +165,19 @@ export async function runGitMeshVerify(
   // Write last-verified SHA
   await writeFile(join(workspaceRoot, LAST_VERIFIED_FILE), headSha, "utf8");
 
+  const diagnostics: string[] = [];
+  if (unsignedCommits > 0) {
+    diagnostics.push(`gitmesh.verify: ${unsignedCommits} unsigned commit(s) found`);
+  }
+  if (invalidSignatures > 0) {
+    diagnostics.push(`gitmesh.verify: ${invalidSignatures} invalid signature(s) found`);
+  }
+  if (range === "--all") {
+    diagnostics.push(
+      "gitmesh.verify: full verification (first run) — may be slow on large repositories",
+    );
+  }
+
   return {
     data: {
       totalCommits,
@@ -165,9 +185,13 @@ export async function runGitMeshVerify(
       unsignedCommits,
       invalidSignatures,
       verified,
+      diagnostics: diagnostics.length > 0 ? diagnostics : undefined,
     },
     exitCode: verified ? 0 : 1,
-    summary: `gitmesh.verify: ${totalCommits} commit(s) checked, ${signedCommits} signed, ${unsignedCommits} unsigned, ${invalidSignatures} invalid` +
-      (lastVerifiedSha ? ` (incremental from ${lastVerifiedSha.slice(0, 8)})` : " (full verification)"),
+    summary:
+      `gitmesh.verify: ${totalCommits} commit(s) checked, ${signedCommits} signed, ${unsignedCommits} unsigned, ${invalidSignatures} invalid` +
+      (lastVerifiedSha
+        ? ` (incremental from ${lastVerifiedSha.slice(0, 8)})`
+        : " (full verification)"),
   };
 }

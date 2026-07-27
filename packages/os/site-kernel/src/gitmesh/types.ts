@@ -13,6 +13,7 @@ interfaces used by gitmesh.sync, gitmesh.status, and gitmesh.verify commands.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0563: initial implementation — type contracts for git-mesh subsystem.</item>
+  <item>RFC-0563 fix: add optional diagnostics field to result types for RFC-0086 compliance.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -36,6 +37,7 @@ export interface GitMeshSyncResult {
   currentSha: string;
   signaturesVerified: number;
   signaturesFailed: number;
+  diagnostics?: string[];
 }
 
 export interface GitMeshStatus {
@@ -45,6 +47,7 @@ export interface GitMeshStatus {
   ahead: number;
   lastSync: string;
   remotes: GitMeshRemote[];
+  diagnostics?: string[];
 }
 
 export interface GitMeshVerifyResult {
@@ -53,4 +56,5 @@ export interface GitMeshVerifyResult {
   unsignedCommits: number;
   invalidSignatures: number;
   verified: boolean;
+  diagnostics?: string[];
 }

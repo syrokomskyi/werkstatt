@@ -15,16 +15,13 @@ verification when verifySignatures is true.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0563: initial implementation — gitmesh.sync handler with convergence algorithm.</item>
+  <item>RFC-0563 fix: consolidate duplicated gitLogSignatureStatus call, add diagnostics arrays (RFC-0086), add stale lock detection.</item>
 </CHANGE_SUMMARY>
 */
 
-import { open, unlink, writeFile } from "node:fs/promises";
+import { open, readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type {
-  KernelCommandInput,
-  KernelCommandResult,
-  KernelRuntimeContext,
-} from "../types.ts";
+import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "../types.ts";
 import type { GitMeshSyncResult } from "./types.ts";
 import { loadOrCreateConfig } from "./config.ts";
 import {
@@ -42,6 +39,8 @@ import {
 const LOCK_FILE = ".git/gitmesh.lock";
 const LAST_SYNC_FILE = ".git/gitmesh.last-sync";
 
+const STALE_LOCK_THRESHOLD_MS = 360_000; // 6 minutes — matches git operation timeout
+
 async function acquireLock(workspaceRoot: string): Promise<() => Promise<void>> {
   const lockPath = join(workspaceRoot, LOCK_FILE);
   try {
@@ -51,6 +50,21 @@ async function acquireLock(workspaceRoot: string): Promise<() => Promise<void>> 
       await unlink(lockPath).catch(() => {});
     };
   } catch {
+    // Check if lock is stale (older than 6 minutes)
+    try {
+      const lockContent = await readFile(lockPath, "utf8");
+      const lockTime = parseInt(lockContent.trim(), 10);
+      if (!isNaN(lockTime) && Date.now() - lockTime > STALE_LOCK_THRESHOLD_MS) {
+        await unlink(lockPath);
+        const handle = await open(lockPath, "wx");
+        return async () => {
+          await handle.close();
+          await unlink(lockPath).catch(() => {});
+        };
+      }
+    } catch {
+      // Lock file unreadable or not a number — treat as active
+    }
     throw new Error("sync-in-progress: another gitmesh.sync is already running");
   }
 }
@@ -68,6 +82,7 @@ export async function runGitMeshSync(
 ): Promise<KernelCommandResult<GitMeshSyncResult>> {
   const { workspaceRoot } = context;
   const releaseLock = await acquireLock(workspaceRoot);
+  await writeFile(join(workspaceRoot, LOCK_FILE), String(Date.now()), "utf8").catch(() => {});
 
   try {
     const config = await loadOrCreateConfig(workspaceRoot);
@@ -81,6 +96,7 @@ export async function runGitMeshSync(
           currentSha: await gitRevParseHead(workspaceRoot).catch(() => ""),
           signaturesVerified: 0,
           signaturesFailed: 0,
+          diagnostics: ["gitmesh.sync: no remotes configured in werkstatt.gitmesh.json"],
         },
         exitCode: 1,
         summary: "gitmesh.sync: no remotes configured",
@@ -98,6 +114,9 @@ export async function runGitMeshSync(
           currentSha: "",
           signaturesVerified: 0,
           signaturesFailed: 0,
+          diagnostics: [
+            "gitmesh.sync: clone corruption detected (git fsck failed) — re-clone from a trusted remote",
+          ],
         },
         exitCode: 1,
         summary: "gitmesh.sync: clone corruption detected (git fsck failed)",
@@ -115,6 +134,7 @@ export async function runGitMeshSync(
           currentSha: await gitRevParseHead(workspaceRoot),
           signaturesVerified: 0,
           signaturesFailed: 0,
+          diagnostics: ["gitmesh.sync: uncommitted local changes — commit or stash before sync"],
         },
         exitCode: 1,
         summary: "gitmesh.sync: uncommitted local changes — commit or stash before sync",
@@ -147,6 +167,7 @@ export async function runGitMeshSync(
           currentSha: await gitRevParseHead(workspaceRoot),
           signaturesVerified: 0,
           signaturesFailed: 0,
+          diagnostics: warnings.map((w) => `gitmesh.sync: ${w}`),
         },
         exitCode: 1,
         summary: `gitmesh.sync: all remotes unreachable (${warnings.join(", ")})`,
@@ -171,19 +192,27 @@ export async function runGitMeshSync(
           currentSha: currentHead,
           signaturesVerified: 0,
           signaturesFailed: 0,
+          diagnostics: [
+            `gitmesh.sync: non-fast-forward detected (force-push on ${latest.remote}?) — manual reset required`,
+          ],
         },
         exitCode: 1,
         summary: `gitmesh.sync: non-fast-forward detected (force-push on ${latest.remote}?) — manual reset required`,
       };
     }
 
+    // Get commits to receive (used for both signature verification and counting)
+    const commitsToReceive = await gitLogSignatureStatus(
+      `${currentHead}..${latest.sha}`,
+      workspaceRoot,
+    );
+
     // Signature verification
     let signaturesVerified = 0;
     let signaturesFailed = 0;
 
     if (config.verifySignatures) {
-      const commits = await gitLogSignatureStatus(`${currentHead}..${latest.sha}`, workspaceRoot);
-      for (const commit of commits) {
+      for (const commit of commitsToReceive) {
         if (commit.signatureStatus === "G") {
           signaturesVerified++;
         } else if (commit.signatureStatus === "U" || commit.signatureStatus === "N") {
@@ -200,22 +229,19 @@ export async function runGitMeshSync(
           data: {
             synced: false,
             fromRemote: latest.remote,
-            commitsReceived: commits.length,
+            commitsReceived: commitsToReceive.length,
             currentSha: currentHead,
             signaturesVerified,
             signaturesFailed,
+            diagnostics: [
+              `gitmesh.sync: signature verification failed (${signaturesFailed} invalid) — HEAD not advanced`,
+            ],
           },
           exitCode: 1,
           summary: `gitmesh.sync: signature verification failed (${signaturesFailed} invalid) — HEAD not advanced`,
         };
       }
     }
-
-    // Count commits to receive
-    const commitsToReceive = await gitLogSignatureStatus(
-      `${currentHead}..${latest.sha}`,
-      workspaceRoot,
-    );
 
     // Advance HEAD
     await gitMergeFfOnly(latest.sha, workspaceRoot);
@@ -234,7 +260,8 @@ export async function runGitMeshSync(
         signaturesFailed,
       },
       exitCode: 0,
-      summary: `gitmesh.sync: received ${commitsToReceive.length} commit(s) from ${latest.remote}` +
+      summary:
+        `gitmesh.sync: received ${commitsToReceive.length} commit(s) from ${latest.remote}` +
         (warnings.length > 0 ? `, warnings: ${warnings.join(", ")}` : ""),
     };
   } finally {
