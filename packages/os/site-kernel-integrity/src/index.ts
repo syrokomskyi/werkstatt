@@ -41,10 +41,13 @@ export { runBackfillRevisions } from "./run-backfill-revisions.ts";
 
 export {
   generateSigningKeyPairPem,
+  signPayload,
+  signJsonPayload,
   signLatestBuildArtifacts,
   loadSignedManifest,
   loadPublicKeyPem,
   verifyManifestSignature,
+  verifyJsonSignature,
   compareManifestWithLocalArtifacts,
   requireEnv,
   optionalEnv,

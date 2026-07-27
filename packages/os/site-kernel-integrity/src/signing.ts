@@ -186,6 +186,18 @@ export function signPayload(
   signatureHex: string;
   signatureBase64: string;
 } {
+  return signJsonPayload(privateKeyPem, payload as unknown as Record<string, unknown>);
+}
+
+export function signJsonPayload(
+  privateKeyPem: string,
+  payload: Record<string, unknown>,
+): {
+  payloadBytes: Buffer;
+  signatureBuffer: Buffer;
+  signatureHex: string;
+  signatureBase64: string;
+} {
   let privateKey;
   try {
     privateKey = createPrivateKey(normalizePemLikeValue(privateKeyPem, "PRIVATE KEY"));
@@ -332,6 +344,18 @@ export function verifyManifestSignature(args: {
   manifest: SignedManifest;
   publicKeyPem: string;
 }): boolean {
+  return verifyJsonSignature({
+    payload: args.manifest.payload as unknown as Record<string, unknown>,
+    signatureHex: args.manifest.signatureHex,
+    publicKeyPem: args.publicKeyPem,
+  });
+}
+
+export function verifyJsonSignature(args: {
+  payload: Record<string, unknown>;
+  signatureHex: string;
+  publicKeyPem: string;
+}): boolean {
   let publicKey;
   try {
     publicKey = createPublicKey(args.publicKeyPem);
@@ -347,8 +371,8 @@ export function verifyManifestSignature(args: {
     );
   }
 
-  const payloadBytes = Buffer.from(canonicalJson(args.manifest.payload), "utf8");
-  const signatureBuffer = Buffer.from(args.manifest.signatureHex, "hex");
+  const payloadBytes = Buffer.from(canonicalJson(args.payload), "utf8");
+  const signatureBuffer = Buffer.from(args.signatureHex, "hex");
   return cryptoVerify(null, payloadBytes, publicKey, signatureBuffer);
 }
 
