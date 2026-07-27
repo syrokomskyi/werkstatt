@@ -28,8 +28,15 @@ import { join, resolve } from "node:path";
 import { STUDIO_GATE_TOOLS } from "./tools.ts";
 import { executeCommand } from "./executor.ts";
 import { BuildQueue, resolveBuildConcurrency, isBuildTriggeringTool } from "./build-queue.ts";
+import { verifyAuthFromMeta, loadIdentityConfig } from "./auth.ts";
 
-const SKILL_PATH = join("packages", "warpgogol-skills", "skills", "wg-site-content-edit", "SKILL.md");
+const SKILL_PATH = join(
+  "packages",
+  "warpgogol-skills",
+  "skills",
+  "wg-site-content-edit",
+  "SKILL.md",
+);
 
 async function loadSkillInstructions(werkstattRoot: string): Promise<string | undefined> {
   try {
@@ -102,7 +109,29 @@ async function main(): Promise<void> {
       };
     }
 
+    const identityConfig = await loadIdentityConfig(werkstattRoot);
+    const authResult = await verifyAuthFromMeta(
+      (request.params as Record<string, unknown>)["_meta"] as Record<string, unknown> | undefined,
+      werkstattRoot,
+    );
+
+    if (identityConfig?.authMode === "enforced" && !authResult.authenticated) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Authentication required: ${authResult.error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
     const { cliArgs, stdin } = buildCommandArgs(name, (args as Record<string, unknown>) ?? {});
+
+    if (authResult.authenticated && authResult.actorId) {
+      cliArgs.push("--_authActor", authResult.actorId);
+    }
 
     const exec = () =>
       executeCommand("pnpm", ["exec", "site-kernel", "run", name, ...cliArgs, "--json"], {

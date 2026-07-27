@@ -95,7 +95,7 @@ export async function runMissionClose(
 ): Promise<KernelCommandResult<MissionCloseData>> {
   const { workspaceRoot } = context;
   const missionId = flagString(input, "mission");
-  const actor = flagString(input, "actor") ?? "agent";
+  const actor = flagString(input, "_authActor") ?? flagString(input, "actor") ?? "agent";
   const releaseIdFlag = flagString(input, "release");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");

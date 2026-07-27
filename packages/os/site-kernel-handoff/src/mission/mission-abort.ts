@@ -49,7 +49,7 @@ export async function runMissionAbort(
   const { workspaceRoot } = context;
   const missionId = flagString(input, "mission");
   const reason = flagString(input, "reason");
-  const actor = flagString(input, "actor") ?? "agent";
+  const actor = flagString(input, "_authActor") ?? flagString(input, "actor") ?? "agent";
 
   if (!missionId) throw new Error("[mission.abort] --mission is required");
   if (!reason) throw new Error("[mission.abort] --reason is required");

@@ -65,7 +65,8 @@ export default defineKernelConfig({
     icons: async () => (await import("@warpgogol/site-kernel/icons")).iconsModule,
     "forge-core": async () => (await import("@webgogol/forge/os/core")).forgeCoreModule,
     "forge-compass": async () => (await import("@webgogol/forge/os/compass")).forgeCompassModule,
-    "forge-naming": async () => (await import("@webgogol/forge/os/naming-module")).forgeNamingModule,
+    "forge-naming": async () =>
+      (await import("@webgogol/forge/os/naming-module")).forgeNamingModule,
     workflow: async () => (await import("@webgogol/forge/os/workflow-module")).forgeWorkflowModule,
     rfc: async () => (await import("@webgogol/forge/os/rfc-module")).forgeRfcModule,
     adr: async () => (await import("@webgogol/forge/os/adr-module")).forgeAdrModule,
@@ -114,6 +115,8 @@ export default defineKernelConfig({
       (await import("@warpgogol/site-kernel-handoff/notausgang-module")).createNotausgangModule(),
     platform: async () =>
       (await import("@warpgogol/site-kernel-handoff/platform-module")).createPlatformModule(),
+    identity: async () =>
+      (await import("@warpgogol/site-kernel-handoff/identity-module")).createIdentityModule(),
   },
   pipelines: {
     // Workspace-level pipelines

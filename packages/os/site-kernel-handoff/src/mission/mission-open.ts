@@ -51,7 +51,7 @@ export async function runMissionOpen(
   const { workspaceRoot } = context;
   const systemId = flagString(input, "system");
   const brief = flagString(input, "brief");
-  const actor = flagString(input, "actor") ?? "agent";
+  const actor = flagString(input, "_authActor") ?? flagString(input, "actor") ?? "agent";
 
   if (!systemId) throw new Error("[mission.open] --system is required");
   if (!brief) throw new Error("[mission.open] --brief is required");
