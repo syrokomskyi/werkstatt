@@ -11,6 +11,7 @@
   <item>RFC-0480: preserve workpiece/distribution; create git bundle in evidence/ before aborting.</item>
   <item>RFC-0480: add non-blocking dirty workpiece warning to mission.abort.</item>
   <item>Block mission.abort on dirty workpiece and unreconciled operator commits to prevent silent loss of changes.</item>
+  <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./
 import { isWorkpieceDirty, countOperatorCommits } from "./mission-git-commit.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock } from "../werkstatt/index.ts";
+import { resolveActor } from "./actor-identity.ts";
 
 export interface MissionAbortData {
   missionId: string;
@@ -49,7 +51,7 @@ export async function runMissionAbort(
   const { workspaceRoot } = context;
   const missionId = flagString(input, "mission");
   const reason = flagString(input, "reason");
-  const actor = flagString(input, "_authActor") ?? flagString(input, "actor") ?? "agent";
+  const actor = resolveActor(input);
 
   if (!missionId) throw new Error("[mission.abort] --mission is required");
   if (!reason) throw new Error("[mission.abort] --reason is required");

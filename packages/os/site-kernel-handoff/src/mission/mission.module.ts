@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Lazy loading refactor: extracted from mission/index.ts to use dynamic imports inside async register().</item>
+  <item>RFC-0560: add --actor-from-auth flag to mission.open, mission.close, mission.abort, mission.reconcile; change actor default from 'agent' to 'unknown'.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -41,7 +42,16 @@ export function createMissionModule(): KernelModule {
         flags: {
           system: { kind: "string", required: true, description: "Sternsystem id." },
           brief: { kind: "string", required: true, description: "Mission brief." },
-          actor: { kind: "string", default: "agent", description: "Actor identity." },
+          actor: {
+            kind: "string",
+            default: "unknown",
+            description: "Actor identity (VC subject id or free-text).",
+          },
+          "actor-from-auth": {
+            kind: "boolean",
+            description:
+              "Read actor identity from WERKSTATT_ACTOR_ID env var set by Studio Gate auth.",
+          },
         },
         writes: [
           "missions/{mission}/**",
@@ -71,7 +81,16 @@ export function createMissionModule(): KernelModule {
         mutatesState: true,
         flags: {
           mission: { kind: "string", required: true, description: "Mission id." },
-          actor: { kind: "string", default: "agent", description: "Actor identity." },
+          actor: {
+            kind: "string",
+            default: "unknown",
+            description: "Actor identity (VC subject id or free-text).",
+          },
+          "actor-from-auth": {
+            kind: "boolean",
+            description:
+              "Read actor identity from WERKSTATT_ACTOR_ID env var set by Studio Gate auth.",
+          },
           release: { kind: "string", description: "Release id produced by this mission." },
         },
         writes: [
@@ -92,7 +111,16 @@ export function createMissionModule(): KernelModule {
         flags: {
           mission: { kind: "string", required: true, description: "Mission id." },
           reason: { kind: "string", description: "Abort reason." },
-          actor: { kind: "string", default: "agent", description: "Actor identity." },
+          actor: {
+            kind: "string",
+            default: "unknown",
+            description: "Actor identity (VC subject id or free-text).",
+          },
+          "actor-from-auth": {
+            kind: "boolean",
+            description:
+              "Read actor identity from WERKSTATT_ACTOR_ID env var set by Studio Gate auth.",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",
@@ -232,6 +260,16 @@ export function createMissionModule(): KernelModule {
         flags: {
           mission: { kind: "string", required: true, description: "Mission id." },
           message: { kind: "string", description: "Reconciliation message." },
+          actor: {
+            kind: "string",
+            default: "unknown",
+            description: "Actor identity (VC subject id or free-text).",
+          },
+          "actor-from-auth": {
+            kind: "boolean",
+            description:
+              "Read actor identity from WERKSTATT_ACTOR_ID env var set by Studio Gate auth.",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",

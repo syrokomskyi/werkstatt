@@ -15,6 +15,7 @@
   <item>RFC-0522: add git am --3way fallback to patch application loop.</item>
   <item>Add --whitespace=fix to git am calls and auto-resolve add/add conflicts on generated files by taking theirs (workpiece version).</item>
   <item>RFC-0522: add dirty cache clone warning to mission.validate.</item>
+  <item>RFC-0560: use resolveActor(input) in mission.reconcile for actor resolution with --actor-from-auth flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +34,7 @@ import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./
 import { isWorkpieceDirty } from "./mission-git-commit.ts";
 import { acquireLock, releaseLock } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
+import { resolveActor } from "./actor-identity.ts";
 
 const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
 
@@ -428,6 +430,7 @@ export async function runMissionReconcile(
   const { workspaceRoot, logger } = context;
   const missionId = flagString(input, "mission");
   const message = flagString(input, "message") ?? `Reconcile ${missionId}`;
+  const actor = resolveActor(input);
   if (!missionId) throw new Error("[mission.reconcile] --mission is required");
 
   const manifest = await readMissionManifest(workspaceRoot, missionId);
@@ -451,14 +454,14 @@ export async function runMissionReconcile(
     `system:${manifest.systemId}`,
     manifest.operationId,
     "mission.reconcile",
-    "agent",
+    actor,
   );
   await acquireLock(
     workspaceRoot,
     `mission:${missionId}`,
     manifest.operationId,
     "mission.reconcile",
-    "agent",
+    actor,
   );
 
   // RFC-0356 §6: verify validation passed before reconciling.

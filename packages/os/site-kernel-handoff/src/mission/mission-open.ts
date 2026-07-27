@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0355: initial mission.open command handler.</item>
   <item>RFC-0477: commit and push bordbuch after appending mission-open entry.</item>
+  <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ import {
   commitAndPushBordbuch,
 } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
+import { resolveActor } from "./actor-identity.ts";
 
 export interface MissionOpenData {
   missionId: string;
@@ -51,7 +53,7 @@ export async function runMissionOpen(
   const { workspaceRoot } = context;
   const systemId = flagString(input, "system");
   const brief = flagString(input, "brief");
-  const actor = flagString(input, "_authActor") ?? flagString(input, "actor") ?? "agent";
+  const actor = resolveActor(input);
 
   if (!systemId) throw new Error("[mission.open] --system is required");
   if (!brief) throw new Error("[mission.open] --brief is required");

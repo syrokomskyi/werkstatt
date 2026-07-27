@@ -10,6 +10,7 @@
   <item>RFC-0480: initial mission.git.commit command handler.</item>
   <item>RFC-0480: add isWorkpieceDirty() shared helper for dirty workpiece guards.</item>
   <item>RFC-0522: extend WorkpieceDirtyResult with files[] for cache clone guard error messages.</item>
+  <item>RFC-0560: integrate Ed25519 signed commits via createSignedCommit when PASSPORT_SIGNING_KEY is set.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,12 +23,16 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
+import { createSignedCommit } from "./signed-commit.ts";
 
 export interface MissionGitCommitData {
   missionId: string;
   commitSha: string;
   message: string;
   committedAt: string;
+  signed: boolean;
+  actorId: string | null;
+  signature: string | null;
 }
 
 export interface WorkpieceDirtyResult {
@@ -169,12 +174,51 @@ export async function runMissionGitCommit(
       commitSha: git(workpieceDir, "rev-parse HEAD"),
       message: "(no changes — workpiece is clean)",
       committedAt: new Date().toISOString(),
+      signed: false,
+      actorId: null,
+      signature: null,
     };
     return {
       data,
       summary: `[mission.git.commit] ${missionId} no changes to commit`,
     };
   }
+
+  const signingKey = process.env["PASSPORT_SIGNING_KEY"];
+  const actorId = manifest.openedBy ?? "unknown";
+
+  if (signingKey) {
+    const result = await createSignedCommit(workpieceDir, message, actorId, signingKey);
+    if (result.signed) {
+      logger.success(
+        `[mission.git.commit] ${missionId} signed commit: ${result.commitSha.slice(0, 12)}`,
+      );
+    } else {
+      logger.success(
+        `[mission.git.commit] ${missionId} committed: ${result.commitSha.slice(0, 12)}`,
+      );
+    }
+
+    const data: MissionGitCommitData = {
+      missionId,
+      commitSha: result.commitSha,
+      message,
+      committedAt: new Date().toISOString(),
+      signed: result.signed,
+      actorId: result.actorId,
+      signature: result.signature,
+    };
+
+    return {
+      data,
+      summary: result.signed
+        ? `[mission.git.commit] ${missionId} signed commit: ${result.commitSha.slice(0, 12)}`
+        : `[mission.git.commit] ${missionId} committed: ${result.commitSha.slice(0, 12)}`,
+    };
+  }
+
+  // No signing key — produce unsigned commit
+  process.stderr.write(`[warn] PASSPORT_SIGNING_KEY not set — producing unsigned commit.\n`);
 
   const commitSha = git(workpieceDir, `commit -m ${JSON.stringify(message)}`);
 
@@ -185,6 +229,9 @@ export async function runMissionGitCommit(
     commitSha,
     message,
     committedAt: new Date().toISOString(),
+    signed: false,
+    actorId: null,
+    signature: null,
   };
 
   return {

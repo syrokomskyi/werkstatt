@@ -11,6 +11,7 @@
   <item>RFC-0480: create git bundle in evidence/ before closing; preserve workpiece for mission.preview.</item>
   <item>RFC-0480: add dirty workpiece guard to mission.close.</item>
   <item>RFC-0522: resolve releaseId with flag→manifest precedence; add warnings[] to CloseReport.</item>
+  <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,6 +30,7 @@ import { isWorkpieceDirty } from "./mission-git-commit.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
+import { resolveActor } from "./actor-identity.ts";
 
 export interface CloseReportGit {
   commitSha: string | null;
@@ -95,7 +97,7 @@ export async function runMissionClose(
 ): Promise<KernelCommandResult<MissionCloseData>> {
   const { workspaceRoot } = context;
   const missionId = flagString(input, "mission");
-  const actor = flagString(input, "_authActor") ?? flagString(input, "actor") ?? "agent";
+  const actor = resolveActor(input);
   const releaseIdFlag = flagString(input, "release");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");
