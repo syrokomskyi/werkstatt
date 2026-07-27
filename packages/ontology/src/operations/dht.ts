@@ -66,10 +66,15 @@ export const dhtPlacementReasonSchema = z.enum([
 export const workshopCapacitySchema = z.object({
   workshopId: z.string().min(1),
   endpoint: z.string().regex(endpointRe, "endpoint must be host:port format"),
-  activeMissions: z.number().int().min(0),
-  maxMissions: z.number().int().min(1),
-  cpuLoad: z.number().min(0).max(1),
-  diskFree: z.number().int().min(0),
+  availableSlots: z.number().int().min(0),
+  storageLimitMb: z.number().int().min(0).default(0),
+  bandwidthLimitMbps: z.number().int().min(0).default(0),
+  activeMissions: z.number().int().min(0).default(0),
+  maxMissions: z.number().int().min(1).default(1),
+  cpuLoad: z.number().min(0).max(1).default(0),
+  diskFree: z.number().int().min(0).default(0),
+  updatedAt: z.string().datetime(),
+  signature: z.string().min(1),
 });
 
 export const dhtPlacementResultSchema = z.object({

@@ -25,6 +25,7 @@ export const dhtModule: KernelModule = {
     const { runDhtNodeInit } = await import("./init.ts");
     const { runDhtLookup } = await import("./lookup.ts");
     const { runDhtRegister } = await import("./register.ts");
+    const { runDhtCapacityPublish } = await import("./capacity.ts");
 
     registry.registerCommand({
       name: "dht.node.init",
@@ -72,6 +73,20 @@ export const dhtModule: KernelModule = {
       reads: ["werkstatt.dht.json", "werkstatt.identity.json"],
       writes: [],
       execute: runDhtRegister,
+    });
+
+    registry.registerCommand({
+      name: "dht.capacity.publish",
+      description:
+        "RFC-0565: publish workshop capacity to the DHT for placement decisions. " +
+        "Signs the capacity entry with the operator's Ed25519 keypair. " +
+        "Required: --workshop-id <id>, --available-slots <n>, --endpoint <host:port>. " +
+        "Optional: --storage-limit-mb <n>, --bandwidth-limit-mbps <n>. Use --json for output.",
+      scope: "workspace",
+      cacheable: false,
+      reads: ["werkstatt.dht.json", "werkstatt.identity.json"],
+      writes: [],
+      execute: runDhtCapacityPublish,
     });
   },
 };
