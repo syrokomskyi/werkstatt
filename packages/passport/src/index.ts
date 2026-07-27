@@ -20,6 +20,10 @@ export {
   PassportSchema,
   PassportPublicKeyFileSchema,
   PassportPublicKeyEntrySchema,
+  SiteOwnershipCredentialSubjectSchema,
+  ActorDelegationCredentialSubjectSchema,
+  WerkstattCredentialSchema,
+  WerkstattIdentityConfigSchema,
 } from "./schema.ts";
 export type {
   PassportJson,
@@ -27,6 +31,10 @@ export type {
   PassportPublicKeyEntry,
   VCProof,
   VerifiableCredential,
+  SiteOwnershipCredentialSubject,
+  ActorDelegationCredentialSubject,
+  WerkstattCredential,
+  WerkstattIdentityConfig,
 } from "./schema.ts";
 
 export { emitPassport } from "./emit.ts";
@@ -41,3 +49,10 @@ export type { KeyRotateOptions, KeyRotateResult } from "./key-rotate.ts";
 export { loadPassportData } from "./data.ts";
 
 export { signBytes, verifyBytes } from "./sign.ts";
+
+export {
+  identityCredentialBytes,
+  signIdentityCredential,
+  verifyIdentityCredential,
+} from "./identity-sign.ts";
+export type { IdentityCredentialSubject } from "./identity-sign.ts";

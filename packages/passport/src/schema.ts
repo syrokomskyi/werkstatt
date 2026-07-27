@@ -141,6 +141,47 @@ export const PassportPublicKeyFileSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Identity credentials (RFC-0558)
+// ---------------------------------------------------------------------------
+
+export const SiteOwnershipCredentialSubjectSchema = z.object({
+  id: z.string().min(1),
+  siteId: z.string().min(1),
+  role: z.literal("owner"),
+});
+
+export const ActorDelegationCredentialSubjectSchema = z.object({
+  id: z.string().min(1),
+  siteId: z.string().min(1),
+  delegatedBy: z.string().min(1),
+  expiresAt: z.string().datetime(),
+  scopes: z.array(z.string().min(1)),
+});
+
+export const WerkstattCredentialSchema = z.object({
+  credentialId: z.string().min(1),
+  type: z.enum(["SiteOwnershipCredential", "ActorDelegationCredential"]),
+  subject: z.union([SiteOwnershipCredentialSubjectSchema, ActorDelegationCredentialSubjectSchema]),
+  proof: VCProofSchema,
+  issuedAt: z.string().datetime(),
+  issuer: z.string().min(1),
+});
+
+export const WerkstattIdentityConfigSchema = z.object({
+  schemaVersion: z.literal("1.0"),
+  operatorName: z.string().min(1),
+  operatorKeyPair: z.object({
+    publicKeyMultibase: z.string().regex(/^z[1-9A-HJ-NP-Za-km-z]+$/),
+    keyVersion: z.string().min(1),
+    algId: z.literal("Ed25519Signature2020"),
+  }),
+  authMode: z.enum(["permissive", "enforced"]),
+  domain: z.string().min(1),
+  issuedCredentials: z.array(WerkstattCredentialSchema),
+  revokedCredentialIds: z.array(z.string().min(1)),
+});
+
+// ---------------------------------------------------------------------------
 // TypeScript types
 // ---------------------------------------------------------------------------
 
@@ -149,3 +190,9 @@ export type PassportPublicKeyFile = z.infer<typeof PassportPublicKeyFileSchema>;
 export type PassportPublicKeyEntry = z.infer<typeof PassportPublicKeyEntrySchema>;
 export type VCProof = z.infer<typeof VCProofSchema>;
 export type VerifiableCredential = z.infer<typeof VerifiableCredentialSchema>;
+export type SiteOwnershipCredentialSubject = z.infer<typeof SiteOwnershipCredentialSubjectSchema>;
+export type ActorDelegationCredentialSubject = z.infer<
+  typeof ActorDelegationCredentialSubjectSchema
+>;
+export type WerkstattCredential = z.infer<typeof WerkstattCredentialSchema>;
+export type WerkstattIdentityConfig = z.infer<typeof WerkstattIdentityConfigSchema>;

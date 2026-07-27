@@ -34,6 +34,10 @@
     "./data": {
       "types": "./src/data.ts",
       "default": "./src/data.ts"
+    },
+    "./identity-sign": {
+      "types": "./src/identity-sign.ts",
+      "default": "./src/identity-sign.ts"
     }
   },
   "files": ["src"],
