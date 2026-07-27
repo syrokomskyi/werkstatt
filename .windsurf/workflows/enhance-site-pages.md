@@ -12,7 +12,7 @@ This is a thin wrapper around the detailed process in `.agents/workflows/enhance
 /enhance-site-pages <number>
 ```
 
-Where `<number>` is the expert file number (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14.0, 14.1, 14.2, 14.3, 15.0, 15.1, 16.1, 17, 18).
+Where `<number>` is the expert file number (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14.0, 14.1, 14.2, 14.3, 15.0, 15.1, 16.1, 17, 18).
 
 ## Steps
 
@@ -33,4 +33,4 @@ Where `<number>` is the expert file number (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 
 - **New routes** (16.1 /team/ index): creating new routes requires an RFC — pause and ask operator.
 - **Cross-page changes**: if the expert file mentions changes to other pages, defer those to the target page's own session.
 - **Expert saw DE, we edit UK**: the expert analysed deployed DE pages. The codebase uses block-declarative YAML, PBP references, archetype contracts, and cosmic naming the expert doesn't know about. Check if UK already has the fix before applying. Do not replace `{business-profile...}` references with hardcoded values.
-- **Quality gates**: run `fo-review` after file 2 (first-file gate — most important), after file 8 (mid-point), before file 17, and after file 18. Run `fo-fix` only if `fo-review` finds issues. See "Quality gates" section in the detailed workflow.
+- **Quality gates**: run `fo-review` after file 1 (first-file gate — most important), after file 8 (mid-point), before file 17, and after file 18. Run `fo-fix` only if `fo-review` finds issues. See "Quality gates" section in the detailed workflow.

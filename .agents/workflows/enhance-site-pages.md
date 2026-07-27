@@ -145,10 +145,11 @@ If the expert recommends showing a value that is NOT in PBP yet, pause and ask t
 
 ## Processing order
 
-Files are processed by number, sequentially from 2 to 18.
+Files are processed by number, sequentially from 1 to 18.
 
 | # | Expert file | UK target(s) | Notes |
 | --- | --- | --- | --- |
+| 1 | Index plus | `pages/uk/home.md` | Home page commercial flow restructure — **most important file, defines the entire buyer journey** |
 | 2 | preis | `pages/uk/pricing.md` | Price page restructure |
 | 3 | leistungen-digitales-fundament | `pages/uk/digitales-fundament.md` | Product page restructure |
 | 4 | notausgang | `pages/uk/notausgang.md` | Exit page restructure |
@@ -265,7 +266,7 @@ Run quality gates at these checkpoints:
 
 | Checkpoint | When | Skills | Why |
 | --- | --- | --- | --- |
-| **First-file gate** | After file 2 (the very first processed file) | `fo-review` → `fo-fix` if findings | The first file establishes all patterns. Catch systemic mistakes (broken anchors, duplicate IDs, hardcoded values, translation conventions) before they repeat across files 3–16. **This is the most important gate.** |
+| **First-file gate** | After file 1 (the very first processed file) | `fo-review` → `fo-fix` if findings | The first file establishes all patterns. Catch systemic mistakes (broken anchors, duplicate IDs, hardcoded values, translation conventions) before they repeat across files 2–16. **This is the most important gate.** |
 | **Pattern drift check** | After file 8 (mid-point) | `fo-review` → `fo-fix` if findings | Verify corrected patterns from the first-file gate are maintained. Catch any new pattern issues introduced by different page types (legal pages, generated pages). |
 | Pre-audit gate | Before file 17 (after all 2–16.1 done) | `fo-review` → `fo-fix` if findings | Full review of accumulated changes before integration audit. |
 | RFC-trigger response | After any file that triggered an RFC pause | `fo-review` + `fo-fix` | Architectural changes require full review. |
