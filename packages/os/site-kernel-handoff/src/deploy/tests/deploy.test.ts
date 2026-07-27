@@ -22,10 +22,8 @@ import {
   previousSymlinkPath,
   hashArtifactDir,
   listArtifactHashes,
-  manifestPath,
   distPath,
   platformArtifactsBase,
-  readManifest,
   writeManifest,
   readSymlinkBasename,
 } from "../deploy-utils.ts";

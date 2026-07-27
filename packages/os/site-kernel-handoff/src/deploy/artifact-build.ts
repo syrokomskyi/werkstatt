@@ -99,9 +99,7 @@ export async function runDeployArtifactBuild(
         stdio: "pipe",
       });
     } catch (err) {
-      throw new Error(
-        `[deploy.artifact.build] turbo run build failed: ${(err as Error).message}`,
-      );
+      throw new Error(`[deploy.artifact.build] turbo run build failed: ${(err as Error).message}`);
     }
   }
 
@@ -117,7 +115,7 @@ export async function runDeployArtifactBuild(
 
     const gitSha = await getGitSha(workspaceRoot);
     const builtAt = new Date().toISOString();
-    const buildHost = requireEnv("WORKSHOP_ID", workspaceRoot).catch(
+    const buildHost = await requireEnv("WORKSHOP_ID", workspaceRoot).catch(
       () => process.env.HOSTNAME ?? "unknown",
     );
 
@@ -127,7 +125,7 @@ export async function runDeployArtifactBuild(
       totalSize,
       builtAt,
       gitSha,
-      buildHost: typeof buildHost === "string" ? buildHost : "unknown",
+      buildHost,
       signature: "",
       signatureAlgorithm: "Ed25519",
     };
@@ -135,12 +133,13 @@ export async function runDeployArtifactBuild(
     if (!skipSign) {
       try {
         const privateKeyPem = await requireEnv("SIGNING_PRIVATE_KEY", workspaceRoot);
-        const signed = signJsonPayload(privateKeyPem, manifest as unknown as Record<string, unknown>);
+        const signed = signJsonPayload(
+          privateKeyPem,
+          manifest as unknown as Record<string, unknown>,
+        );
         manifest = { ...manifest, signature: signed.signatureHex };
       } catch (err) {
-        logger.info(
-          `[deploy.artifact.build] signing skipped: ${(err as Error).message}`,
-        );
+        logger.info(`[deploy.artifact.build] signing skipped: ${(err as Error).message}`);
       }
     }
 
