@@ -110,7 +110,9 @@
       "default": "./src/workflow/index.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -121,11 +123,13 @@
     "@warpgogol/fingerprint": "workspace:*",
     "@warpgogol/integration-adapter-supabase-crm": "workspace:*",
     "@warpgogol/observability": "workspace:*",
+    "@warpgogol/passport": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",
     "@webgogol/forge": "workspace:*",
     "picomatch": "^4.0.5",
     "tsx": "^4.23.1",
+    "uuid": "^14.0.1",
     "yaml": "^2.9.0"
   },
   "optionalDependencies": {
@@ -134,6 +138,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/picomatch": "^4.0.3",
+    "@types/uuid": "^11.0.0",
     "fast-check": "^4.9.0",
     "vitest": "^4.1.10"
   }
