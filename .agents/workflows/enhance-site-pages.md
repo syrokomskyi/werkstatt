@@ -5,34 +5,38 @@ phase: enhance
 chain: enhance
 reads:
   - obsidian:Tech/Site/!Research/2026-07-20 Страницы сайта - Улучшения/output/enhance-site-pages/
-  - missions/webgogol-com-m000010/workpiece/src/content/pages/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/prose/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/people/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/surface/industries/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/surface/demands/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/surface/topics/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/pages/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/prose/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/people/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/surface/industries/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/surface/demands/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/surface/topics/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/faq/uk/
 writes:
-  - missions/webgogol-com-m000010/workpiece/src/content/pages/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/prose/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/people/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/surface/industries/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/surface/demands/uk/
-  - missions/webgogol-com-m000010/workpiece/src/content/surface/topics/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/pages/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/prose/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/people/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/surface/industries/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/surface/demands/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/surface/topics/uk/
+  - missions/warpgogol-com-m000015/workpiece/src/content/faq/uk/
 scope:
   allowedWriteRoots:
-    - missions/webgogol-com-m000010/workpiece/src/content/pages/uk/
-    - missions/webgogol-com-m000010/workpiece/src/content/prose/uk/
-    - missions/webgogol-com-m000010/workpiece/src/content/people/uk/
-    - missions/webgogol-com-m000010/workpiece/src/content/surface/industries/uk/
-    - missions/webgogol-com-m000010/workpiece/src/content/surface/demands/uk/
-    - missions/webgogol-com-m000010/workpiece/src/content/surface/topics/uk/
+    - missions/warpgogol-com-m000015/workpiece/src/content/pages/uk/
+    - missions/warpgogol-com-m000015/workpiece/src/content/prose/uk/
+    - missions/warpgogol-com-m000015/workpiece/src/content/people/uk/
+    - missions/warpgogol-com-m000015/workpiece/src/content/surface/industries/uk/
+    - missions/warpgogol-com-m000015/workpiece/src/content/surface/demands/uk/
+    - missions/warpgogol-com-m000015/workpiece/src/content/surface/topics/uk/
+    - missions/warpgogol-com-m000015/workpiece/src/content/faq/uk/
   forbiddenWriteRoots:
-    - missions/webgogol-com-m000010/workpiece/src/content/pages/de/
-    - missions/webgogol-com-m000010/workpiece/src/content/prose/de/
-    - missions/webgogol-com-m000010/workpiece/src/content/people/de/
-    - missions/webgogol-com-m000010/workpiece/src/content/surface/industries/de/
-    - missions/webgogol-com-m000010/workpiece/src/content/surface/demands/de/
-    - missions/webgogol-com-m000010/workpiece/src/content/surface/topics/de/
+    - missions/warpgogol-com-m000015/workpiece/src/content/pages/de/
+    - missions/warpgogol-com-m000015/workpiece/src/content/prose/de/
+    - missions/warpgogol-com-m000015/workpiece/src/content/people/de/
+    - missions/warpgogol-com-m000015/workpiece/src/content/surface/industries/de/
+    - missions/warpgol-com-m000015/workpiece/src/content/surface/demands/de/
+    - missions/warpgogol-com-m000015/workpiece/src/content/surface/topics/de/
+    - missions/warpgogol-com-m000015/workpiece/src/content/faq/de/
     - packages/
     - docs/
 runs:
@@ -97,7 +101,7 @@ The expert analysed the **deployed DE pages on webgogol.com**. The codebase has 
 - **Archetype contracts (RFC-0101..0107):** every block follows a discriminated union schema. You cannot add arbitrary props or invent block types.
 - **PBP reference system (RFC-0398):** business data (prices, guarantees, legal terms) lives in `@gogol/pbp` and is referenced via `{business-profile.offerings/<id>.presentation.<path>}`. Do NOT replace these with hardcoded values.
 - **Cosmic naming (DNA-23):** every page has a `cosmicStar` from a closed catalog. Do not change or remove it.
-- **Sternsystem model:** the site lives in `missions/webgogol-com-m000010/workpiece/`, not `apps/`.
+- **Sternsystem model:** the site lives in `missions/warpgogol-com-m000015/workpiece/`, not `apps/`.
 - **Surface collections:** industries, demands, topics are separate content collections with generated routes, not manual pages.
 - **People collection:** team members live in `people/{lang}/`, not `pages/{lang}/team/`.
 - **DE/UK split:** the expert saw DE. We edit UK. The UK pages may already differ from what the expert described.
@@ -207,6 +211,34 @@ Before editing, assess:
 
 If none of the above — proceed with content-only changes.
 
+### 3.5. Audit already-applied changes (MANDATORY before editing)
+
+Before applying any recommendation, produce a gap analysis table comparing the expert file against the current UK page:
+
+| Expert recommendation | Status | Evidence | Action |
+| --- | --- | --- | --- |
+| ... | Done / Partial / Missing / Wrong / N/A | line ref or quote | Apply / Fix / Skip |
+
+**Status values:**
+
+- **Done** — recommendation already fully applied in UK. Skip.
+- **Partial** — some part is missing or incomplete. Fix the gap.
+- **Missing** — no trace in the UK page. Apply.
+- **Wrong** — UK page has the opposite or incorrect implementation. Fix.
+- **N/A** — recommendation does not apply to UK context (e.g. DE-specific legal text). Skip with note.
+
+This audit MUST be presented to the operator before any edits. If the audit reveals no gaps (all Done or N/A), skip editing and report "already fully applied".
+
+### 3.6. Check archetype props (RFC-0567)
+
+The following optional props are now available (RFC-0567 implemented):
+
+- **`header.eyebrow`** — short contextual label above heading in any section composing `section-header`. Use instead of `header.subheading` when the expert asks for eyebrow/over-heading text.
+- **`ctaNote`** — short clarifying string between CTAs and decision card in `hero-decision-card`. Use when the expert recommends a note under the hero CTAs.
+- **`orderTags`** — `Record<string, number>` in FAQ frontmatter for per-tag ordering. Use when FAQ entries need different order on different pages.
+
+Before applying a recommendation that was previously blocked by archetype limitations, check if RFC-0567 props now solve it.
+
 ### 4. Apply changes to UK page(s)
 
 - Translate all German content examples from the expert file to Ukrainian.
@@ -246,14 +278,14 @@ Summarize:
 Commit via the canonical mission command (RFC-0480), **not** direct `git commit`:
 
 ```sh
-pnpm exec site-kernel run mission.git.commit --mission webgogol-com-m000010 --message "enhance-site-pages: <file#> <short description>"
+pnpm exec site-kernel run mission.git.commit --mission warpgogol-com-m000015 --message "enhance-site-pages: <file#> <short description>"
 ```
 
 Run from the **monorepo root**. Before committing, check `git status` and `git diff` in the workpiece to verify only this session's files are staged:
 
 ```sh
-git -C missions/webgogol-com-m000010/workpiece status
-git -C missions/webgogol-com-m000010/workpiece diff
+git -C missions/warpgogol-com-m000015/workpiece status
+git -C missions/warpgogol-com-m000015/workpiece diff
 ```
 
 **Why this matters:** `mission.reconcile` and `mission.close` block if the workpiece is dirty. `mission.validate` warns if dirty after validation. Each session MUST leave the workpiece clean.
