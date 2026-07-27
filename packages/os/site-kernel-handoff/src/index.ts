@@ -113,6 +113,13 @@ export {
 } from "./werkstatt/index.ts";
 
 export { createMissionModule } from "./mission/index.ts";
+export {
+  runWorkpieceRead,
+  runWorkpieceWrite,
+  isClientEditable,
+  type WorkpieceReadResult,
+  type WorkpieceWriteResult,
+} from "./workpiece/index.ts";
 export { createBordbuchModule } from "./bordbuch/index.ts";
 export {
   appendBordbuchEntry,

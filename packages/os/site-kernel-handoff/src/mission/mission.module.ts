@@ -30,6 +30,8 @@ export function createMissionModule(): KernelModule {
       const { runMissionCleanup } = await import("./mission-cleanup.ts");
       const { runMissionValidate, runMissionBuild, runMissionDiff, runMissionReconcile } =
         await import("./mission-materialization-commands.ts");
+      const { runWorkpieceRead } = await import("../workpiece/workpiece-read.ts");
+      const { runWorkpieceWrite } = await import("../workpiece/workpiece-write.ts");
       registry.registerCommand({
         name: "mission.open",
         description: "Open a new mission for a Sternsystem (RFC-0355).",
@@ -272,6 +274,36 @@ export function createMissionModule(): KernelModule {
         reads: ["missions/*/mission.yaml"],
         cacheable: false,
         execute: runMissionCleanup,
+      });
+      registry.registerCommand({
+        name: "workpiece.read",
+        description: "Read a file from a mission workpiece with DNA-22 path validation (RFC-0555).",
+        scope: "workspace",
+        supportsAllSites: false,
+        flags: {
+          mission: { kind: "string", required: true, description: "Mission id." },
+          path: { kind: "string", required: true, description: "Relative path within workpiece." },
+        },
+        reads: ["missions/{mission}/workpiece/**"],
+        cacheable: false,
+        execute: runWorkpieceRead,
+      });
+      registry.registerCommand({
+        name: "workpiece.write",
+        description:
+          "Write a file to a mission workpiece with DNA-22 path validation. Content via stdin. No auto-commit (RFC-0555).",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          mission: { kind: "string", required: true, description: "Mission id." },
+          path: { kind: "string", required: true, description: "Relative path within workpiece." },
+          stdin: { kind: "boolean", required: true, description: "Read content from stdin." },
+        },
+        writes: ["missions/{mission}/workpiece/**"],
+        reads: ["missions/{mission}/workpiece/src/content/system.md"],
+        cacheable: false,
+        execute: runWorkpieceWrite,
       });
     },
   };
