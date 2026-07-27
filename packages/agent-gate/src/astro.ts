@@ -19,9 +19,9 @@ public/ assets (works identically in dev and on Cloudflare Workers).
 
 import type { APIRoute } from "astro";
 import { UPSTASH_QSTASH_TOKEN } from "astro:env/server";
-import { buildQstashPublish } from "@gogol/integration";
-import type { AgentSurfaceManifest } from "@gogol/share/agent";
-import type { CapabilityRecord } from "@gogol/ontology";
+import { buildQstashPublish } from "@warpgogol/integration";
+import type { AgentSurfaceManifest } from "@warpgogol/share/agent";
+import type { CapabilityRecord } from "@warpgogol/ontology";
 import { createAgentGate, type AgentGatePorts } from "./index.ts";
 import { createFixedWindowLimiter } from "./limits.ts";
 

@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-Master barrel for @gogol/ontology — re-exports all public APIs from the
+Master barrel for @warpgogol/ontology — re-exports all public APIs from the
 enums, manifest, and cosmic sub-modules so consumers can import from the
 package root or sub-paths.
 </purpose>

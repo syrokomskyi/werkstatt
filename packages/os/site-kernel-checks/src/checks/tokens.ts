@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   collectFilesByExtensions,
   getFlagValues,
@@ -237,7 +237,7 @@ async function detectBrandedStudioInheritance(
   appDirectory: string,
 ): Promise<string[]> {
   // Load the app's biome via system.md identity.biome.
-  const { loadSystemManifest } = await import("@gogol/site-kernel-content");
+  const { loadSystemManifest } = await import("@warpgogol/site-kernel-content");
   let biomeId: string;
   try {
     const result = await loadSystemManifest(join(appDirectory, "src", "content"));

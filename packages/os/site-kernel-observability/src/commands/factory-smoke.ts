@@ -15,9 +15,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
-import { createMetricsPusher, METRIC_REFS } from "@gogol/observability";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
+import { createMetricsPusher, METRIC_REFS } from "@warpgogol/observability";
 
 export async function runObservabilityFactorySmoke(
   _input: KernelCommandInput,
@@ -36,14 +36,14 @@ export async function runObservabilityFactorySmoke(
         severity: "info",
         file: "",
         message:
-          "WGOGOL_OTLP_ENDPOINT and/or WGOGOL_OTLP_TOKEN are not set — smoke test skipped (no-op).",
+          "WARPGOGOL_OTLP_ENDPOINT and/or WARPGOGOL_OTLP_TOKEN are not set — smoke test skipped (no-op).",
         fixHint:
-          "Set both env vars to enable the smoke test: WGOGOL_OTLP_ENDPOINT=https://ingest.observe.webgogol.com WGOGOL_OTLP_TOKEN=<token>",
+          "Set both env vars to enable the smoke test: WARPGOGOL_OTLP_ENDPOINT=https://ingest.observe.warpgogol.com WARPGOGOL_OTLP_TOKEN=<token>",
       },
     ]);
   }
 
-  METRIC_REFS.wgogol_factory_smoke_total.add(pusher, 1);
+  METRIC_REFS.warpgogol_factory_smoke_total.add(pusher, 1);
 
   const result = await pusher.flush();
 

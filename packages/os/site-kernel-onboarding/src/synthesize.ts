@@ -9,19 +9,19 @@ and hashing for per-system onboarding directories (onboarding/<system-id>/.input
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0532: Extracted hashing and classification logic from phase-contract.ts, adapted for per-system path layout.</item>
-  <item>RFC-0532 review fix: Replace createHash with byteHash from @gogol/fingerprint (DNA-53 compliance).</item>
+  <item>RFC-0532 review fix: Replace createHash with byteHash from @warpgogol/fingerprint (DNA-53 compliance).</item>
 </CHANGE_SUMMARY>
 */
 
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
-import { collectFiles as collectFilesShared, fileExists as pathExists } from "@gogol/share/fs";
+import { byteHash } from "@warpgogol/fingerprint";
+import { collectFiles as collectFilesShared, fileExists as pathExists } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { BriefFrontmatter, parseBriefFrontmatter } from "./brief.ts";
 
 export interface OnboardingSynthesizeManifest {

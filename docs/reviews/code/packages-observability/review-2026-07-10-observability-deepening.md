@@ -19,7 +19,7 @@ filesReviewed:
   - packages/os/site-kernel-observability/src/commands/stack-health.ts
 ---
 
-# Code Review: @gogol/observability deepening — uncommitted working tree
+# Code Review: @warpgogol/observability deepening — uncommitted working tree
 
 ### Verdict: Needs revision
 
@@ -27,11 +27,11 @@ The extraction of `convertAccumulatedToOtlp` and the registry-based dispatch fix
 
 ### Mechanical floor
 
-Pass — `tsc --noEmit` passes for `@gogol/observability`, `@gogol/site-kernel`, `@gogol/site-kernel-observability`, `fleet-probe-runner`, and `cf-analytics-poller`. Vitest passes for `@gogol/observability`.
+Pass — `tsc --noEmit` passes for `@warpgogol/observability`, `@warpgogol/site-kernel`, `@warpgogol/site-kernel-observability`, `fleet-probe-runner`, and `cf-analytics-poller`. Vitest passes for `@warpgogol/observability`.
 
 ### Axis A — Structural correctness
 
-1. **DRY violation in `typed-refs.ts`** — The `METRIC_REFS` object hand-duplicates all 14 metric names and their label key arrays from `WGOGOL_METRIC_REGISTRY` in `metric-registry.ts`. The module's own non-goals state "Do not duplicate metric specs — derive from metric-registry.ts", but the implementation does not import or derive from the registry at all. Adding a new metric to the registry requires a matching manual entry in `typed-refs.ts`; forgetting one means the new metric is silently unavailable through the typed surface with no build-time or validation-time failure. This is the most serious finding in the diff.
+1. **DRY violation in `typed-refs.ts`** — The `METRIC_REFS` object hand-duplicates all 14 metric names and their label key arrays from `WARPGOGOL_METRIC_REGISTRY` in `metric-registry.ts`. The module's own non-goals state "Do not duplicate metric specs — derive from metric-registry.ts", but the implementation does not import or derive from the registry at all. Adding a new metric to the registry requires a matching manual entry in `typed-refs.ts`; forgetting one means the new metric is silently unavailable through the typed surface with no build-time or validation-time failure. This is the most serious finding in the diff.
 
 2. **Unused `labelKeys` parameters** — `defineCounter`, `defineGauge`, and `defineHistogram` each accept a `labelKeys: L` parameter that is never read at runtime. The parameter exists solely for TypeScript literal type inference via `as const` call-site assertions. This is a common TypeScript pattern and acceptable, but the parameter names could be prefixed with `_` to signal intent to linters and agents.
 
@@ -47,7 +47,7 @@ No issues. The diff does not touch any DNA invariant:
 
 ### Axis C — Ecosystem fit
 
-1. **OBS-CONV-01 blind spot** — The `observability.conventions.validate` command (OBS-CONV-01) scans for `wgogol_*` string literals in files containing `pusher.*` calls. Consumer files that migrate to `METRIC_REFS.wgogol_factory_command_runs_total.add(pusher, ...)` no longer contain `wgogol_*` string literals or direct `pusher.*` calls, so the validator skips them entirely. This is safe — TypeScript's type system enforces the same constraint at compile time — but the validator's OBS-CONV-01 check becomes a no-op for files using `METRIC_REFS`. The validator should be updated to also scan for `METRIC_REFS.wgogol_*` property accesses, or the OBS-CONV-01 rule should be documented as "applies to string-literal call sites only; typed-ref consumers are type-checked."
+1. **OBS-CONV-01 blind spot** — The `observability.conventions.validate` command (OBS-CONV-01) scans for `warpgogol_*` string literals in files containing `pusher.*` calls. Consumer files that migrate to `METRIC_REFS.warpgogol_factory_command_runs_total.add(pusher, ...)` no longer contain `warpgogol_*` string literals or direct `pusher.*` calls, so the validator skips them entirely. This is safe — TypeScript's type system enforces the same constraint at compile time — but the validator's OBS-CONV-01 check becomes a no-op for files using `METRIC_REFS`. The validator should be updated to also scan for `METRIC_REFS.warpgogol_*` property accesses, or the OBS-CONV-01 rule should be documented as "applies to string-literal call sites only; typed-ref consumers are type-checked."
 
 2. **No Compass sync needed** — The diff does not change repository-wide requirements, shared package contracts, or app-package relationships. No `docs/*.xml` updates are required.
 
@@ -87,6 +87,6 @@ No spec available — spec compliance skipped. The diff originates from an archi
 
 ### Questions for the author
 
-1. **`typed-refs.ts` drift**: How will you ensure `METRIC_REFS` stays in sync with `WGOGOL_METRIC_REGISTRY`? A compile-time assertion (`keyof typeof METRIC_REFS extends typeof WGOGOL_METRIC_REGISTRY[number]["name"]`) or a validation command would close the gap. What is the plan?
+1. **`typed-refs.ts` drift**: How will you ensure `METRIC_REFS` stays in sync with `WARPGOGOL_METRIC_REGISTRY`? A compile-time assertion (`keyof typeof METRIC_REFS extends typeof WARPGOGOL_METRIC_REGISTRY[number]["name"]`) or a validation command would close the gap. What is the plan?
 2. **Non-goals correction**: The non-goals in `typed-refs.ts` say "derive from metric-registry.ts" but the implementation duplicates. Should the non-goals be corrected to describe the actual design, or should the implementation be changed to derive?
-3. **OBS-CONV-01 coverage**: Now that consumers use `METRIC_REFS` instead of string literals, `observability.conventions.validate` can no longer verify that consumer-side metric names are declared. Should the validator be updated to scan for `METRIC_REFS.wgogol_*` property accesses, or is compile-time type safety considered sufficient?
+3. **OBS-CONV-01 coverage**: Now that consumers use `METRIC_REFS` instead of string literals, `observability.conventions.validate` can no longer verify that consumer-side metric names are declared. Should the validator be updated to scan for `METRIC_REFS.warpgogol_*` property accesses, or is compile-time type safety considered sufficient?

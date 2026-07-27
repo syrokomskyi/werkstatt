@@ -26,8 +26,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
 
 interface TsconfigViolation {
   file: string;
@@ -91,7 +91,7 @@ export async function runTsconfigShapeLint(
         file: nodeLibPath,
         message:
           `compilerOptions.rewriteRelativeImportExtensions must be true so emit-enabled ` +
-          `consumers (e.g. @gogol/site-kernel-content) rewrite .ts source imports to .js ` +
+          `consumers (e.g. @warpgogol/site-kernel-content) rewrite .ts source imports to .js ` +
           `in their dist/ output (RFC-0092).`,
       });
     }

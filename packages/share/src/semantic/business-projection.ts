@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0148: pure projectors that map canonical business-schema data into the semantic model, plus the projection visibility boundary. Framework-agnostic and side-effect-free, so the disk llms path and the Astro JSON-LD path project every business file identically. Lives in @gogol/share (not @gogol/pbp) because @gogol/pbp depends on @gogol/site-kernel-content — placing the projectors here keeps the node disk loader cycle-free.</purpose>
+<purpose>RFC-0148: pure projectors that map canonical business-schema data into the semantic model, plus the projection visibility boundary. Framework-agnostic and side-effect-free, so the disk llms path and the Astro JSON-LD path project every business file identically. Lives in @warpgogol/share (not @warpgogol/pbp) because @warpgogol/pbp depends on @warpgogol/site-kernel-content — placing the projectors here keeps the node disk loader cycle-free.</purpose>
 <non-goals>
   <item>Do not read files — pure mapping over already-loaded data.</item>
   <item>Do not project privacy-sensitive domains (external-services, compliance).</item>

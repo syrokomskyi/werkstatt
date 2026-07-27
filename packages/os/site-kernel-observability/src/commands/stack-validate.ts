@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 
 const STACK_DIR = "services/observability-stack";
 
@@ -36,7 +36,7 @@ const REQUIRED_FILES = [
 const REQUIRED_RUNBOOK_SECTIONS = ["Provision", "Upgrade", "Restore", "Rotate token"] as const;
 
 const REQUIRED_ENV_VARS = [
-  "WGOGOL_OTLP_TOKEN",
+  "WARPGOGOL_OTLP_TOKEN",
   "SIGNOZ_SMTP_HOST",
   "SIGNOZ_SMTP_PORT",
   "SIGNOZ_SMTP_USER",
@@ -95,13 +95,13 @@ export async function runObservabilityStackValidate(
   const caddyPath = join(root, STACK_DIR, "caddy", "Caddyfile");
   if (await context.io.exists(caddyPath)) {
     const caddy = await context.io.readFile(caddyPath);
-    if (!caddy.includes("Bearer {$WGOGOL_OTLP_TOKEN}")) {
+    if (!caddy.includes("Bearer {$WARPGOGOL_OTLP_TOKEN}")) {
       diagnostics.push({
         ruleId: "OBS-STACK-03",
         severity: "error",
         file: `${STACK_DIR}/caddy/Caddyfile`,
         message: "Caddyfile must enforce bearer-token auth on the ingest host.",
-        fixHint: 'Add: @unauthorized not header Authorization "Bearer {$WGOGOL_OTLP_TOKEN}"',
+        fixHint: 'Add: @unauthorized not header Authorization "Bearer {$WARPGOGOL_OTLP_TOKEN}"',
       });
     }
     if (caddy.includes("4317") || caddy.includes("4318 :")) {
@@ -125,22 +125,22 @@ export async function runObservabilityStackValidate(
   const collectorPath = join(root, STACK_DIR, "collector", "collector-patch.yaml");
   if (await context.io.exists(collectorPath)) {
     const collector = await context.io.readFile(collectorPath);
-    if (!collector.includes("transform/wgogol-enrich")) {
+    if (!collector.includes("transform/warpgogol-enrich")) {
       diagnostics.push({
         ruleId: "OBS-STACK-04",
         severity: "error",
         file: `${STACK_DIR}/collector/collector-patch.yaml`,
-        message: "collector-patch.yaml must define transform/wgogol-enrich processor.",
-        fixHint: "Add the transform/wgogol-enrich processor per RFC-0337.",
+        message: "collector-patch.yaml must define transform/warpgogol-enrich processor.",
+        fixHint: "Add the transform/warpgogol-enrich processor per RFC-0337.",
       });
     }
-    if (!collector.includes("transform/wgogol-redact")) {
+    if (!collector.includes("transform/warpgogol-redact")) {
       diagnostics.push({
         ruleId: "OBS-STACK-04",
         severity: "error",
         file: `${STACK_DIR}/collector/collector-patch.yaml`,
-        message: "collector-patch.yaml must define transform/wgogol-redact processor.",
-        fixHint: "Add the transform/wgogol-redact processor per RFC-0337.",
+        message: "collector-patch.yaml must define transform/warpgogol-redact processor.",
+        fixHint: "Add the transform/warpgogol-redact processor per RFC-0337.",
       });
     }
   }

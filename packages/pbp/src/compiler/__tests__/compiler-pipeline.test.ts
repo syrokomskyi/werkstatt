@@ -41,10 +41,10 @@ describe("PBP Compiler Pipeline", () => {
   it("compiles a minimal valid business profile", async () => {
     writeEntity("de", "business.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "Webgogol",
+      name: "Warpgogol",
       summary: "Software development studio",
     });
 
@@ -58,8 +58,8 @@ describe("PBP Compiler Pipeline", () => {
     const result = await compilePbpProfile(input);
 
     expect(result.inventory.recordsDiscovered).toBe(1);
-    expect(result.resolvedGraph.business.id).toBe("https://wgogol.com/business");
-    expect(result.resolvedGraph.business.name).toBe("Webgogol");
+    expect(result.resolvedGraph.business.id).toBe("https://warpgogol.com/business");
+    expect(result.resolvedGraph.business.name).toBe("Warpgogol");
     expect(result.validationErrors).toHaveLength(0);
     expect(result.graphErrors).toHaveLength(0);
     expect(result.context.locale).toBe("de");
@@ -69,17 +69,17 @@ describe("PBP Compiler Pipeline", () => {
   it("detects duplicate entity IDs as fatal errors", async () => {
     writeEntity("de", "business-a.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "Webgogol",
+      name: "Warpgogol",
     });
     writeEntity("de", "business-b.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "Webgogol Duplicate",
+      name: "Warpgogol Duplicate",
     });
 
     const input: PbpCompilerInput = {
@@ -100,7 +100,7 @@ describe("PBP Compiler Pipeline", () => {
   it("detects missing Business singleton", async () => {
     writeEntity("de", "place.md", {
       schema: "pbp/place@1",
-      id: "https://wgogol.com/places/office",
+      id: "https://warpgogol.com/places/office",
       type: "place",
       status: "published",
       name: "Office",
@@ -119,12 +119,12 @@ describe("PBP Compiler Pipeline", () => {
   it("detects dangling references", async () => {
     writeEntity("de", "business.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "Webgogol",
+      name: "Warpgogol",
       legalIdentityRef: {
-        ref: "https://wgogol.com/legal-identity",
+        ref: "https://warpgogol.com/legal-identity",
         expectedType: "legal-identity",
       },
     });
@@ -147,10 +147,10 @@ describe("PBP Compiler Pipeline", () => {
   it("detects HTML in canonical fields", async () => {
     writeEntity("de", "business.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "<b>Webgogol</b>",
+      name: "<b>Warpgogol</b>",
       summary: "Software development studio",
     });
 
@@ -183,10 +183,10 @@ describe("PBP Compiler Pipeline", () => {
   it("produces deterministic results across runs", async () => {
     writeEntity("de", "business.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "Webgogol",
+      name: "Warpgogol",
       summary: "Software development studio",
     });
 
@@ -211,10 +211,10 @@ describe("PBP Compiler Pipeline", () => {
   it("runs cycle detection on the entity graph", async () => {
     writeEntity("de", "business.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "Webgogol",
+      name: "Warpgogol",
     });
 
     const input: PbpCompilerInput = {
@@ -235,10 +235,10 @@ describe("PBP Compiler Pipeline", () => {
   it("generates Schema.org projection with organization data", async () => {
     writeEntity("de", "business.md", {
       schema: "pbp/business@1",
-      id: "https://wgogol.com/business",
+      id: "https://warpgogol.com/business",
       type: "business",
       status: "published",
-      name: "Webgogol",
+      name: "Warpgogol",
     });
 
     const input: PbpCompilerInput = {
@@ -251,6 +251,6 @@ describe("PBP Compiler Pipeline", () => {
     const result = await compilePbpProfile(input);
 
     expect(result.projections.schemaOrg["@type"]).toBe("Organization");
-    expect(result.projections.schemaOrg.name).toBe("Webgogol");
+    expect(result.projections.schemaOrg.name).toBe("Warpgogol");
   });
 });

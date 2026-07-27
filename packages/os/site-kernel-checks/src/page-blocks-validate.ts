@@ -17,15 +17,15 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   collectMarkdownFiles,
   loadSemanticSiteModel,
   loadSystemManifest,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
-import { BLOCK_EXTRACTORS } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel-content";
+import { BLOCK_EXTRACTORS } from "@warpgogol/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { failResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";

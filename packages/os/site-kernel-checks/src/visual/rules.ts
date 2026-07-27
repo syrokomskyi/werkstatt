@@ -17,7 +17,7 @@ validates each section out of page context.
 </CHANGE_SUMMARY>
 */
 
-import type { Diagnostic, DiagnosticSeverity } from "@gogol/site-kernel";
+import type { Diagnostic, DiagnosticSeverity } from "@warpgogol/site-kernel";
 import { DIAGNOSTIC_RULES } from "../diagnostics/rules.ts";
 import type { VisualBackground, VisualBlock, VisualPage } from "./page-context.ts";
 

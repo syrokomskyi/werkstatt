@@ -22,15 +22,15 @@ because there is no cache to diverge from.
 import { spawn } from "node:child_process";
 import { readFile, readdir, rm, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { diagnosticsResult } from "../result-helpers.ts";
 
 export interface CacheParitySnapshot {

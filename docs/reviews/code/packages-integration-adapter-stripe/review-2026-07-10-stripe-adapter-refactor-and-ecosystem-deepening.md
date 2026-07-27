@@ -39,12 +39,12 @@ The diff removes a phantom billing client, adds a deep verify-and-map wrapper wi
 
 Pass — all affected packages pass `tsc --noEmit`:
 
-- `@gogol/integration-adapter-stripe` build:check + test:check
-- `@gogol/ui` build:check
-- `@gogol/integration-adapter-supabase-crm` build:check
-- `@gogol/nebula` build:check
-- `@gogol/passport` build:check
-- `@gogol/share` build:check
+- `@warpgogol/integration-adapter-stripe` build:check + test:check
+- `@warpgogol/ui` build:check
+- `@warpgogol/integration-adapter-supabase-crm` build:check
+- `@warpgogol/nebula` build:check
+- `@warpgogol/passport` build:check
+- `@warpgogol/share` build:check
 
 ### Axis A — Structural correctness
 

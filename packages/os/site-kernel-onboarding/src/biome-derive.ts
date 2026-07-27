@@ -18,19 +18,19 @@ from a biome axes block or a full biome YAML, with optional in-place write.
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import YAML from "yaml";
-import { readYamlFile } from "@gogol/share/fs";
+import { readYamlFile } from "@warpgogol/share/fs";
 import {
   biomeAxesSchema,
   biomeSchema,
   type Biome,
   type BiomeAxes,
   type BiomeSiteBackground,
-} from "@gogol/ontology";
+} from "@warpgogol/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 interface BiomeDeriveData {
   command: "biome.tokens.derive";

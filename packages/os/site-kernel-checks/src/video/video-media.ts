@@ -27,13 +27,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { fileExists } from "../lib/file-exists.ts";
 import { passResult, resultFromViolations } from "../result-helpers.ts";
 import { readDefaultLanguageCode } from "../lib/i18n.ts";
-import type { VideoManifest } from "@gogol/share/schemas/media";
-import { collectFiles } from "@gogol/share/fs";
+import type { VideoManifest } from "@warpgogol/share/schemas/media";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const SOURCE_EXTENSIONS = [".mp4", ".webm"];
 

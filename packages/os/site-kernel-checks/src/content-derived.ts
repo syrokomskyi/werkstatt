@@ -20,22 +20,22 @@ derivative is updated. Part of the Content Knowledge Lifecycle (RFC-0211).
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, parseDocument } from "yaml";
-import { recordClaimsSchema } from "@gogol/share/schemas";
-import { resolveFieldPath } from "@gogol/share/content/resolve-field-path";
+import { recordClaimsSchema } from "@warpgogol/share/schemas";
+import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
 import {
   parseClaimSubject,
   formatClaimSubject,
   type ClaimSubject,
-} from "@gogol/share/knowledge/claim";
-import { hashSourceValue, derivedState } from "@gogol/share/knowledge/derivation";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/share/knowledge/claim";
+import { hashSourceValue, derivedState } from "@warpgogol/share/knowledge/derivation";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult, passResult, failResult } from "./result-helpers.ts";
 import { getContentDisciplinePaths, readMarkdownDocument } from "./content-discipline.ts";
 import { collectClaimSidecars, keyLine, recordPathForSidecar, toPosix } from "./content-claims.ts";

@@ -26,7 +26,7 @@ The diff cleanly implements RFC-0540: forge-CLI-backed binding defaults in `forg
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @wgogol/forge run build:check` (tsc --noEmit) exits 0. `pnpm --filter @wgogol/forge run test` — 210 tests pass (22 files). `rfc.validate RFC-0540` — zero errors.
+Pass — `pnpm --filter @warpgogol/forge run build:check` (tsc --noEmit) exits 0. `pnpm --filter @warpgogol/forge run test` — 210 tests pass (22 files). `rfc.validate RFC-0540` — zero errors.
 
 ### Axis A — Structural correctness
 
@@ -34,7 +34,7 @@ No issues. `resolvePmRunner` is a clean map lookup with fallback. `applyCliBindi
 
 ### Axis B — DNA alignment
 
-No issues. DNA-42 (Compass markup): all new source files carry `MODULE_CONTRACT` and `CHANGE_SUMMARY`. DNA-54 (forge bindings contract): no hardcoded project literals in skill bodies. No `@gogol/*` imports added to `src/`.
+No issues. DNA-42 (Compass markup): all new source files carry `MODULE_CONTRACT` and `CHANGE_SUMMARY`. DNA-54 (forge bindings contract): no hardcoded project literals in skill bodies. No `@warpgogol/*` imports added to `src/`.
 
 ### Axis C — Ecosystem fit
 

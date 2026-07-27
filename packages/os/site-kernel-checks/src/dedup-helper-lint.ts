@@ -8,7 +8,7 @@ imported from its canonical home. Structurally prevents the next agent from
 re-introducing the duplication class this RFC cleaned up.
 </purpose>
 <non-goals>
-  <item>Do not flag mere re-exports (`export { fileExists } from "@gogol/share/fs"`) — only fresh declarations.</item>
+  <item>Do not flag mere re-exports (`export { fileExists } from "@warpgogol/share/fs"`) — only fresh declarations.</item>
   <item>Do not flag a differently-named local wrapper that internally delegates to the canonical helper.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -25,35 +25,35 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const SCAN_ROOT = join("packages");
 
 /**
  * Files that deliberately inline reserved helpers for dependency-free
- * portability (e.g. @webgogol/forge cannot depend on @gogol/share).
+ * portability (e.g. @webgogol/forge cannot depend on @warpgogol/share).
  * Each entry is a repo-relative file path.
  */
 const INLINE_ALLOWLIST = new Set<string>(["packages/forge/src/utils/fs.ts"]);
 
 /** Reserved shared-helper identifiers and the single file allowed to declare each. */
 export const RESERVED_HELPERS: Record<string, { importPath: string; canonicalFile: string }> = {
-  fileExists: { importPath: "@gogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
-  collectFiles: { importPath: "@gogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
-  readJsonFile: { importPath: "@gogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
-  readYamlFile: { importPath: "@gogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
+  fileExists: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
+  collectFiles: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
+  readJsonFile: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
+  readYamlFile: { importPath: "@warpgogol/share/fs", canonicalFile: "packages/share/src/fs/index.ts" },
   getLineColumn: {
-    importPath: "@gogol/share/text-position",
+    importPath: "@warpgogol/share/text-position",
     canonicalFile: "packages/share/src/text-position.ts",
   },
   collectMarkdownFiles: {
-    importPath: "@gogol/site-kernel-content",
+    importPath: "@warpgogol/site-kernel-content",
     canonicalFile: "packages/os/site-kernel-content/src/content-files.ts",
   },
   discoverWorkspacePackages: {
-    importPath: "@gogol/site-kernel",
+    importPath: "@warpgogol/site-kernel",
     canonicalFile: "packages/os/site-kernel/src/workspace-discovery.ts",
   },
 };

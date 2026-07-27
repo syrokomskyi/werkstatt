@@ -1,4 +1,4 @@
-# @gogol/growth-adapter-matomo
+# @warpgogol/growth-adapter-matomo
 
 Matomo implementation of the vendor-agnostic `GrowthAdapter` for RFC-0305 Messkanon over a first-party analytics proxy.
 

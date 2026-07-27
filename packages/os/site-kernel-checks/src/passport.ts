@@ -13,7 +13,7 @@ Cosmic Passport pipeline (DNA-31..34, RFC-0028).
 <CHANGE_SUMMARY>
   <item>Wave 1 (RFC-0028): Initial creation.</item>
   <item>Fix (RFC-0029 review): Wrap return values in canonical { data, exitCode, summary } shape so non-zero exits propagate to CI.</item>
-  <item>Use collectNebulaInputs from @gogol/nebula/collect for full 4-pillar input collection.</item>
+  <item>Use collectNebulaInputs from @warpgogol/nebula/collect for full 4-pillar input collection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,17 +24,17 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { optionalEnv } from "@gogol/site-kernel-integrity";
-import { emitPassport } from "@gogol/passport/emit";
-import { verifyPassport } from "@gogol/passport/verify";
-import { rotateKey } from "@gogol/passport/key-rotate";
-import { manifestToStarMapInput, emitStarMap } from "@gogol/star-map/render";
-import { computeNebulaScore } from "@gogol/nebula/compute";
-import { collectNebulaInputs } from "@gogol/nebula/collect";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import type { SystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { optionalEnv } from "@warpgogol/site-kernel-integrity";
+import { emitPassport } from "@warpgogol/passport/emit";
+import { verifyPassport } from "@warpgogol/passport/verify";
+import { rotateKey } from "@warpgogol/passport/key-rotate";
+import { manifestToStarMapInput, emitStarMap } from "@warpgogol/star-map/render";
+import { computeNebulaScore } from "@warpgogol/nebula/compute";
+import { collectNebulaInputs } from "@warpgogol/nebula/collect";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import type { SystemManifest } from "@warpgogol/site-kernel-content";
 
 // ---------------------------------------------------------------------------
 // Result helpers — all OS check commands MUST return KernelCommandResult shape

@@ -4,16 +4,16 @@
 - **Reviewer:** fo-review (automated)
 - **Diff range:** `a8a9c60a8...5b237c5cb` (10 commits)
 - **RFC:** RFC-0533 — Ecosystem commit command with mandatory version bump and pre-commit hook
-- **Packages touched:** `@gogol/site-kernel-checks`, `@gogol/site-kernel-handoff`
+- **Packages touched:** `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-handoff`
 
 ## Mechanical floor
 
 | Check | Result |
 | --- | --- |
-| `@gogol/site-kernel-checks` build:check | PASS |
-| `@gogol/site-kernel-handoff` build:check | PASS |
-| `@gogol/site-kernel-checks` tests (ecosystem-commit) | 9/9 PASS |
-| `@gogol/site-kernel-handoff` tests (platform-consistency-pc04) | 3/3 PASS |
+| `@warpgogol/site-kernel-checks` build:check | PASS |
+| `@warpgogol/site-kernel-handoff` build:check | PASS |
+| `@warpgogol/site-kernel-checks` tests (ecosystem-commit) | 9/9 PASS |
+| `@warpgogol/site-kernel-handoff` tests (platform-consistency-pc04) | 3/3 PASS |
 | `rfc.validate RFC-0533` | PASS (0 errors) |
 
 ## Axis A — Structural correctness
@@ -105,11 +105,11 @@ The dry-run output always reports `pc02: "pass"` and `pc03: "pass"` without actu
 
 ### B1. DNA-53 (semantic fingerprint governance)
 
-**PASS** — `resolvePlatformSemanticHash` in `bundle-io.ts:114-140` uses `fingerprintTree` from `@gogol/fingerprint` and `byteHash` for combining per-file hashes. No ad hoc `crypto.createHash` calls. The extension to `integrations/` and `services/` maintains the same `@gogol/fingerprint` usage. Compliant.
+**PASS** — `resolvePlatformSemanticHash` in `bundle-io.ts:114-140` uses `fingerprintTree` from `@warpgogol/fingerprint` and `byteHash` for combining per-file hashes. No ad hoc `crypto.createHash` calls. The extension to `integrations/` and `services/` maintains the same `@warpgogol/fingerprint` usage. Compliant.
 
 ### B2. DNA-1 (monorepo boundary)
 
-**PASS** — No `apps/*` imports in any touched package file. `ecosystem-commit.ts` imports from `@gogol/site-kernel` (types) and `@gogol/site-kernel-handoff` (resolvePlatformSemanticHash, parseSemver) — both are legitimate cross-package dependencies within `packages/os/*`. No boundary violations.
+**PASS** — No `apps/*` imports in any touched package file. `ecosystem-commit.ts` imports from `@warpgogol/site-kernel` (types) and `@warpgogol/site-kernel-handoff` (resolvePlatformSemanticHash, parseSemver) — both are legitimate cross-package dependencies within `packages/os/*`. No boundary violations.
 
 ### B3. DNA-6 (kebab-case filenames)
 
@@ -132,7 +132,7 @@ The dry-run output always reports `pc02: "pass"` and `pc03: "pass"` without actu
 ### C4. RFC-0092 (.ts extension on relative imports)
 
 **PASS** — All relative imports in the new/modified files use `.ts` extension:
-- `ecosystem-commit.ts`: imports from `@gogol/site-kernel` and `@gogol/site-kernel-handoff` (package imports, no relative paths)
+- `ecosystem-commit.ts`: imports from `@warpgogol/site-kernel` and `@warpgogol/site-kernel-handoff` (package imports, no relative paths)
 - `platform-consistency.ts`: `import { resolvePlatformSemanticHash } from "./bundle-io.ts"` ✓
 - `ecosystem.ts`: `export { runEcosystemCommit } from "./ecosystem-commit.ts"` ✓
 - `20-ecosystem.ts`: `import { runEcosystemCommit } from "../ecosystem-commit.ts"` (via re-export in `ecosystem.ts`) ✓

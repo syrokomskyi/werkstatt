@@ -14,16 +14,16 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { recordClaimsSchema } from "@gogol/share/schemas";
-import { addDuration } from "@gogol/share/knowledge/freshness";
-import { parseNdjson, type ClaimEvent } from "@gogol/share/knowledge/ledger";
+import { recordClaimsSchema } from "@warpgogol/share/schemas";
+import { addDuration } from "@warpgogol/share/knowledge/freshness";
+import { parseNdjson, type ClaimEvent } from "@warpgogol/share/knowledge/ledger";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { getContentDisciplinePaths, pathExists } from "./content-discipline.ts";
 import { collectClaimSidecars, keyLine, toPosix } from "./content-claims.ts";

@@ -1,6 +1,6 @@
 promptVersion: cultural@1.0.0
 
-You are running the WGogol RFC-0074 cultural audit.
+You are running the Warpgogol RFC-0074 cultural audit.
 
 Task:
 

@@ -7,9 +7,9 @@
   their prefix.
 
   This is a pure module with no `astro:content` (or any Astro) imports, so it is
-  safe to consume from both the Astro build (`@gogol/share/routes`) and
+  safe to consume from both the Astro build (`@warpgogol/share/routes`) and
   framework-agnostic CLI contexts (sitemap generation/validation in
-  `@gogol/site-kernel-checks`). It is the ONLY place allowed to build localized
+  `@warpgogol/site-kernel-checks`). It is the ONLY place allowed to build localized
   URL paths — no inline `/${lang}/${slug}` ternaries elsewhere.
 </purpose>
 <non-goals>

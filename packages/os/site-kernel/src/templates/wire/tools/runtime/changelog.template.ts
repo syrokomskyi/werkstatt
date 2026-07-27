@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Re-export changelog commands from @gogol/site-kernel-changelog.</purpose>
+<purpose>Re-export changelog commands from @warpgogol/site-kernel-changelog.</purpose>
 <non-goals>
   <item>Do not implement logic locally — this file is a thin proxy.</item>
 </non-goals>
@@ -13,4 +13,4 @@ export {
   runChangelogGenerate,
   runChangelogRebuildIndex,
   runChangelogBackfill,
-} from "@gogol/site-kernel-changelog";
+} from "@warpgogol/site-kernel-changelog";

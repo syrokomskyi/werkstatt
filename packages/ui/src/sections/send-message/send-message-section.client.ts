@@ -47,9 +47,9 @@ function setStatus(
 function emitContactSubmit(locale: string, formId: string): void {
   const emit = (
     window as Window & {
-      __webgogol_emit__?: (name: string, payload: Record<string, unknown>) => void;
+      __warpgogol_emit__?: (name: string, payload: Record<string, unknown>) => void;
     }
-  ).__webgogol_emit__;
+  ).__warpgogol_emit__;
 
   if (typeof emit !== "function") return;
   emit("contact-submit", { locale, formId });

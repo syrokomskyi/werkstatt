@@ -2,9 +2,9 @@ import { test, expect } from "vitest";
 import { resolveFieldPath } from "../content/resolve-field-path.ts";
 
 test("resolveFieldPath resolves shallow field", () => {
-  const result = resolveFieldPath({ companyName: "Webgogol" }, ["companyName"]);
+  const result = resolveFieldPath({ companyName: "Warpgogol" }, ["companyName"]);
   expect(result.missingField).toBe(null);
-  expect(result.value).toBe("Webgogol");
+  expect(result.value).toBe("Warpgogol");
 });
 
 test("resolveFieldPath resolves nested field", () => {

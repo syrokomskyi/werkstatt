@@ -23,9 +23,9 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
   KernelFlagValue,
-} from "@gogol/site-kernel";
-import { StarCatalog, type StarName } from "@gogol/ontology/cosmic";
-import { parseBriefFrontmatter } from "@gogol/site-kernel-onboarding";
+} from "@warpgogol/site-kernel";
+import { StarCatalog, type StarName } from "@warpgogol/ontology/cosmic";
+import { parseBriefFrontmatter } from "@warpgogol/site-kernel-onboarding";
 import {
   readRegistry,
   writeRegistry,

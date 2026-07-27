@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { runTestSignalValidate } from "../test-signal.ts";
 
 const logger = {
@@ -39,7 +39,7 @@ describe("test.signal.validate diagnostics", () => {
       await writeFile(join(root, "pnpm-workspace.yaml"), "packages:\n  - packages/*\n", "utf8");
       await mkdir(join(root, "packages", "example"), { recursive: true });
       await writeJson(join(root, "packages", "example", "package.json"), {
-        name: "@gogol/example",
+        name: "@warpgogol/example",
         gogol: {
           testSignal: {
             signal: "skipped",
@@ -53,7 +53,7 @@ describe("test.signal.validate diagnostics", () => {
       const result = await runTestSignalValidate(input, ctx(root));
       expect(result.exitCode).toBe(0);
       expect(result.data?.diagnostics[0]?.message).toBe(
-        "@gogol/example test signal is skipped: Covered by a higher-level fixture.",
+        "@warpgogol/example test signal is skipped: Covered by a higher-level fixture.",
       );
     } finally {
       await rm(root, { recursive: true, force: true });

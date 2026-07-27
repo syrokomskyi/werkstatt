@@ -11,7 +11,7 @@ current ecosystem — the pure core of handoff.absorb, independent of filesystem
 </CHANGE_SUMMARY>
 */
 
-import type { HandoffLock } from "@gogol/ontology/operations";
+import type { HandoffLock } from "@warpgogol/ontology/operations";
 import { diffCapabilities, worstTier } from "./capability-diff.ts";
 import { migratorsToApply } from "./migrators/registry.ts";
 import type { CatchupReport, CatchupTier, RegistryView } from "./types.ts";

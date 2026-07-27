@@ -4,7 +4,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 ## Package role
 
-- `@gogol/site-kernel-astro` is the Astro-specific adapter layer on top of `@gogol/site-kernel`.
+- `@warpgogol/site-kernel-astro` is the Astro-specific adapter layer on top of `@warpgogol/site-kernel`.
 - Keep this package thin and focused on Astro site conventions that are intentionally shared.
 - Do not move app-specific business rules into this adapter.
 
@@ -16,5 +16,5 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 ## Validation
 
-- Run `pnpm --filter @gogol/site-kernel-astro build:check` after type or API changes.
+- Run `pnpm --filter @warpgogol/site-kernel-astro build:check` after type or API changes.
 - If adapter changes affect consuming apps, validate the affected packages first and then the relevant apps.

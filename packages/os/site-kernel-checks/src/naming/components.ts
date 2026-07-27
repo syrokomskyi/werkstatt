@@ -16,9 +16,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { collectFiles } from "@warpgogol/share/fs";
 
 // @ai-invariant COMPONENTS_ALLOWED_EXTENSIONS lists extensions expected inside src/components/.
 // Any other extension found triggers a naming.components.lint violation. CSS belongs in

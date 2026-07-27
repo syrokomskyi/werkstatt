@@ -186,7 +186,7 @@ export const biomeConstraintsSchema = z
   .strict();
 
 // RFC-0114: site-background layer schema mirrored from
-// @gogol/share/schemas/site-background. Defined locally to avoid a
+// @warpgogol/share/schemas/site-background. Defined locally to avoid a
 // cross-package import dependency (ontology must not depend on share).
 const biomeSiteBackgroundLayerSchema = z.discriminatedUnion("kind", [
   z

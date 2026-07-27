@@ -1,4 +1,4 @@
-# @gogol/studio-gate
+# @warpgogol/studio-gate
 
 RFC-0555: stdio MCP server for site owner content editing with mission lifecycle.
 
@@ -22,12 +22,12 @@ RFC-0555: stdio MCP server for site owner content editing with mission lifecycle
 ## Transport contract
 
 - MCP stdio transport (JSON-RPC over stdin/stdout)
-- `serverInfo.instructions` populated from `packages/wgogol-skills/skills/wg-site-content-edit/SKILL.md`
+- `serverInfo.instructions` populated from `packages/warpgogol-skills/skills/wg-site-content-edit/SKILL.md`
 - 12 tools exposed via `tools/list` and `tools/call`
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/studio-gate build:check
-pnpm --filter @gogol/studio-gate test
+pnpm --filter @warpgogol/studio-gate build:check
+pnpm --filter @warpgogol/studio-gate test
 ```

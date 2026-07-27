@@ -1,9 +1,9 @@
 {
-  "name": "@gogol/tokens",
+  "name": "@warpgogol/tokens",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Canonical --ds-* CSS design tokens for the WGogol design system. Single source of truth for colors, typography, spacing, radius, shadows, motion, and z-index (Wave 6, RFC-0023).",
+  "description": "Canonical --ds-* CSS design tokens for the Warpgogol design system. Single source of truth for colors, typography, spacing, radius, shadows, motion, and z-index (Wave 6, RFC-0023).",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {

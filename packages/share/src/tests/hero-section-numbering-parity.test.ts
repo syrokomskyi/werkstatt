@@ -34,7 +34,7 @@ test("buildPage: hero-role blocks (Europa, Phobos) get hideSectionNumber injecte
   const ctx = EMPTY_RUNTIME_CONTEXT("en");
 
   const page = await buildPage(entry, ctx, {
-    resolveImportPath: () => "@gogol/ui/sections/fixture-section.astro",
+    resolveImportPath: () => "@warpgogol/ui/sections/fixture-section.astro",
   });
 
   expect(page.blocks.length).toBe(3);

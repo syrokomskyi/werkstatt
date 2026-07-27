@@ -2,7 +2,7 @@
 
 > **Established by:** RFC-0026 · DNA-26
 
-Block-level `visibility:` fields and feature-graph visibility conditions both use the same closed **`VisibilityExpr`** grammar, defined in `@gogol/share/visibility`. One grammar, two consumers.
+Block-level `visibility:` fields and feature-graph visibility conditions both use the same closed **`VisibilityExpr`** grammar, defined in `@warpgogol/share/visibility`. One grammar, two consumers.
 
 ---
 

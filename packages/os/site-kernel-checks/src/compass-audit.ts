@@ -21,15 +21,15 @@ import {
   createCompassInventoryEntries,
   writeFileAtomic,
   buildGeneratedHeader,
-} from "@gogol/site-kernel";
-import type { CompassInventoryEntry } from "@gogol/site-kernel";
-import { getRevisionByPath } from "@gogol/site-kernel-integrity";
+} from "@warpgogol/site-kernel";
+import type { CompassInventoryEntry } from "@warpgogol/site-kernel";
+import { getRevisionByPath } from "@warpgogol/site-kernel-integrity";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 const execFileAsync = promisify(execFile);
 const LEDGER_PATH = "docs/compass-audit-ledger.generated.yaml";

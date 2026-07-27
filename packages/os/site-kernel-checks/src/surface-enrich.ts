@@ -23,18 +23,18 @@ import { parse as yamlParse } from "yaml";
 import { basename, join, relative } from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { toKebabCase } from "@gogol/share/string-utils";
+import { toKebabCase } from "@warpgogol/share/string-utils";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   collectMarkdownFiles,
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
-import { parseBlueprint, type Blueprint, type SurfaceNarrative } from "@gogol/surface";
+} from "@warpgogol/site-kernel-content";
+import { parseBlueprint, type Blueprint, type SurfaceNarrative } from "@warpgogol/surface";
 import { failResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceModuleContexts } from "./pseo/pseo-module-context.ts";
 

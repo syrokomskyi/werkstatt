@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { findUnsuppressedWalkDeclarations, runFsWalkLint } from "../fs-walk-lint.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 /*
 <MODULE_CONTRACT>
@@ -46,7 +46,7 @@ describe("findUnsuppressedWalkDeclarations (RFC-0303)", () => {
   });
 
   it("green fixture: an import of collectFiles has no walk declaration", () => {
-    const source = 'import { collectFiles } from "@gogol/share/fs";\n';
+    const source = 'import { collectFiles } from "@warpgogol/share/fs";\n';
     expect(findUnsuppressedWalkDeclarations(source)).toEqual([]);
   });
 
@@ -79,7 +79,7 @@ describe("runFsWalkLint (RFC-0303, command-level)", () => {
     const { root, context } = await fixtureWorkspace();
     await writeFile(
       join(root, "packages", "some-pkg", "src", "clean.ts"),
-      'import { collectFiles } from "@gogol/share/fs";\nexport async function run() { return collectFiles("."); }\n',
+      'import { collectFiles } from "@warpgogol/share/fs";\nexport async function run() { return collectFiles("."); }\n',
       "utf8",
     );
     const result = await runFsWalkLint(input(), context);

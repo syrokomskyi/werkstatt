@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { systemPinSchema, type SystemPin } from "@gogol/ontology/operations";
+} from "@warpgogol/site-kernel";
+import { systemPinSchema, type SystemPin } from "@warpgogol/ontology/operations";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";

@@ -30,17 +30,17 @@ import {
   stableEventId,
   type ClaimEvent,
   type ClaimEventKind,
-} from "@gogol/share/knowledge/ledger";
-import type { ClaimProvenanceKind } from "@gogol/share/knowledge/claim";
-import { hashSourceValue } from "@gogol/share/knowledge/derivation";
+} from "@warpgogol/share/knowledge/ledger";
+import type { ClaimProvenanceKind } from "@warpgogol/share/knowledge/claim";
+import { hashSourceValue } from "@warpgogol/share/knowledge/derivation";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { writeFileIfChanged } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { stringify as yamlStringify } from "yaml";
 import { diagnosticsResult, failResult, passResult } from "./result-helpers.ts";
 import { pathExists } from "./content-discipline.ts";

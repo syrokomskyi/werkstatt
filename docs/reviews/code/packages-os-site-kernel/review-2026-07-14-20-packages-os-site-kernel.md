@@ -34,7 +34,7 @@ The implementation is structurally sound, DNA-aligned, and ecosystem-fit. Two mi
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/site-kernel run build:check` passes. `rfc.validate RFC-0382 --json` passes. `command.manifest.validate` passes (0 errors, 5 pre-existing warnings). `kernel.cache.status --json` runs and reports `available: false` with clear reason.
+Pass — `pnpm --filter @warpgogol/site-kernel run build:check` passes. `rfc.validate RFC-0382 --json` passes. `command.manifest.validate` passes (0 errors, 5 pre-existing warnings). `kernel.cache.status --json` runs and reports `available: false` with clear reason.
 
 ### Axis A — Structural correctness
 
@@ -42,11 +42,11 @@ No issues. The cache layer is cleanly separated: `CacheLayer` interface → `Sql
 
 ### Axis B — DNA alignment
 
-No issues. DNA-53 (content hashing) satisfied via `byteHashFile` from `@gogol/fingerprint`. DNA-42 (Compass scaffolding) — all 6 new source files in `src/cache/` have `MODULE_CONTRACT` and `CHANGE_SUMMARY`. Cache DB stored in `.cache/` which is already gitignored.
+No issues. DNA-53 (content hashing) satisfied via `byteHashFile` from `@warpgogol/fingerprint`. DNA-42 (Compass scaffolding) — all 6 new source files in `src/cache/` have `MODULE_CONTRACT` and `CHANGE_SUMMARY`. Cache DB stored in `.cache/` which is already gitignored.
 
 ### Axis C — Ecosystem fit
 
-No issues. Cache module registered in `tools/kernel.config.ts` with `MODULE_MAP` entry. `--force-cache-refresh` flag added to all 7 RFC commands that read frontmatter. `kernel.cache.status` and `kernel.cache.clear` commands registered with proper scope, flags, and `mutatesState` declarations. `@gogol/fingerprint` added to `dependencies` in `package.json`.
+No issues. Cache module registered in `tools/kernel.config.ts` with `MODULE_MAP` entry. `--force-cache-refresh` flag added to all 7 RFC commands that read frontmatter. `kernel.cache.status` and `kernel.cache.clear` commands registered with proper scope, flags, and `mutatesState` declarations. `@warpgogol/fingerprint` added to `dependencies` in `package.json`.
 
 ### Axis D — Forward-only compliance
 
@@ -74,7 +74,7 @@ No issues. The `better-sqlite3` optional dependency approach is pragmatic — co
 | --- | --- | --- |
 | Phase 1: manifest-first lifecycle validation | Done | `lifecycle.ts:33-51` reads from manifest, falls back with warning |
 | Phase 2: CacheLayer interface + SqliteCacheLayer + NoopCacheLayer | Done | `cache-layer.ts`, `sqlite-cache-layer.ts`, `noop-cache-layer.ts` |
-| RFC cache helpers with @gogol/fingerprint | Done | `rfc-cache.ts` uses `byteHashFile` |
+| RFC cache helpers with @warpgogol/fingerprint | Done | `rfc-cache.ts` uses `byteHashFile` |
 | kernel.cache.status and kernel.cache.clear commands | Done | `cache-module.ts`, `cache-handlers.ts` |
 | --force-cache-refresh flag on all RFC commands | Done | `rfc.module.ts` — 7 commands updated |
 | Cache in .cache/kernel-cache.db (gitignored) | Done | `.cache/` already in `.gitignore` |

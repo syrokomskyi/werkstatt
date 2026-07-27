@@ -26,13 +26,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { KNOWN_ADAPTER_IDS } from "@gogol/growth";
+} from "@warpgogol/site-kernel";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { KNOWN_ADAPTER_IDS } from "@warpgogol/growth";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------
-// Known adapter ids — imported from @gogol/growth (single source of truth)
+// Known adapter ids — imported from @warpgogol/growth (single source of truth)
 // ---------------------------------------------------------------------------
 
 const KNOWN_ADAPTER_SET = new Set<string>(KNOWN_ADAPTER_IDS);
@@ -72,7 +72,7 @@ export async function runGrowthAdapterContract(
 
       // Skip directories without a package.json — they are leftover artifacts,
       // not real adapter packages (e.g. growth-adapter-null was inlined into
-      // @gogol/growth, growth-adapter-plausible was never created).
+      // @warpgogol/growth, growth-adapter-plausible was never created).
       const pkgJsonPath = join(pkgDir, "package.json");
       let pkgJson: Record<string, unknown>;
       try {
@@ -82,14 +82,14 @@ export async function runGrowthAdapterContract(
         continue;
       }
 
-      // Must have @gogol/growth as dependency
+      // Must have @warpgogol/growth as dependency
       const deps = {
         ...(pkgJson["dependencies"] as Record<string, string> | undefined),
         ...(pkgJson["peerDependencies"] as Record<string, string> | undefined),
       };
-      if (!deps["@gogol/growth"]) {
+      if (!deps["@warpgogol/growth"]) {
         violations.push(
-          `GAC-02: ${rel}/package.json: adapter must declare "@gogol/growth" as a dependency or peerDependency`,
+          `GAC-02: ${rel}/package.json: adapter must declare "@warpgogol/growth" as a dependency or peerDependency`,
         );
       }
 

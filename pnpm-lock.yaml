@@ -12,30 +12,30 @@ importers:
         specifier: ^3.15.0
         version: 3.15.0
     devDependencies:
-      '@gogol/observability':
-        specifier: workspace:*
-        version: link:packages/observability
-      '@gogol/site-kernel':
-        specifier: workspace:*
-        version: link:packages/os/site-kernel
-      '@gogol/site-kernel-checks':
-        specifier: workspace:*
-        version: link:packages/os/site-kernel-checks
-      '@gogol/site-kernel-handoff':
-        specifier: workspace:*
-        version: link:packages/os/site-kernel-handoff
-      '@gogol/site-kernel-observability':
-        specifier: workspace:*
-        version: link:packages/os/site-kernel-observability
-      '@gogol/site-kernel-onboarding':
-        specifier: workspace:*
-        version: link:packages/os/site-kernel-onboarding
       '@playwright/test':
         specifier: ^1.61.1
         version: 1.61.1
       '@types/node':
         specifier: ^26.1.1
         version: 26.1.1
+      '@warpgogol/observability':
+        specifier: workspace:*
+        version: link:packages/observability
+      '@warpgogol/site-kernel':
+        specifier: workspace:*
+        version: link:packages/os/site-kernel
+      '@warpgogol/site-kernel-checks':
+        specifier: workspace:*
+        version: link:packages/os/site-kernel-checks
+      '@warpgogol/site-kernel-handoff':
+        specifier: workspace:*
+        version: link:packages/os/site-kernel-handoff
+      '@warpgogol/site-kernel-observability':
+        specifier: workspace:*
+        version: link:packages/os/site-kernel-observability
+      '@warpgogol/site-kernel-onboarding':
+        specifier: workspace:*
+        version: link:packages/os/site-kernel-onboarding
       '@webgogol/forge':
         specifier: workspace:*
         version: link:packages/forge
@@ -72,13 +72,13 @@ importers:
 
   packages/agent-gate:
     dependencies:
-      '@gogol/integration':
+      '@warpgogol/integration':
         specifier: workspace:*
         version: link:../integration
-      '@gogol/ontology':
+      '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../ontology
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../share
       astro:
@@ -107,7 +107,7 @@ importers:
 
   packages/chat-adapter-null:
     dependencies:
-      '@gogol/chat':
+      '@warpgogol/chat':
         specifier: workspace:*
         version: link:../chat
     devDependencies:
@@ -117,7 +117,7 @@ importers:
 
   packages/chat-adapter-uchat:
     dependencies:
-      '@gogol/chat':
+      '@warpgogol/chat':
         specifier: workspace:*
         version: link:../chat
     devDependencies:
@@ -130,10 +130,10 @@ importers:
 
   packages/check-core:
     dependencies:
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../fingerprint
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../os/site-kernel
       zod:
@@ -146,10 +146,10 @@ importers:
 
   packages/check-runner-node:
     dependencies:
-      '@gogol/check-core':
+      '@warpgogol/check-core':
         specifier: workspace:*
         version: link:../check-core
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../fingerprint
       playwright:
@@ -178,10 +178,10 @@ importers:
 
   packages/faq:
     dependencies:
-      '@gogol/content-source':
+      '@warpgogol/content-source':
         specifier: workspace:*
         version: link:../content-source
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../share
       astro:
@@ -200,12 +200,12 @@ importers:
       '@astrojs/compiler':
         specifier: ^4.0.0
         version: 4.0.0
-      '@gogol/share':
-        specifier: workspace:*
-        version: link:../share
       '@typescript-eslint/typescript-estree':
         specifier: ^8.65.0
         version: 8.65.0(typescript@6.0.3)
+      '@warpgogol/share':
+        specifier: workspace:*
+        version: link:../share
       jsonc-parser:
         specifier: ^3.3.1
         version: 3.3.1
@@ -284,7 +284,7 @@ importers:
 
   packages/growth:
     dependencies:
-      '@gogol/ontology':
+      '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../ontology
       astro:
@@ -303,7 +303,7 @@ importers:
 
   packages/growth-adapter-matomo:
     dependencies:
-      '@gogol/growth':
+      '@warpgogol/growth':
         specifier: workspace:*
         version: link:../growth
     devDependencies:
@@ -329,10 +329,10 @@ importers:
 
   packages/integration-adapter-stripe:
     dependencies:
-      '@gogol/integration':
+      '@warpgogol/integration':
         specifier: workspace:*
         version: link:../integration
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../share
       zod:
@@ -348,10 +348,10 @@ importers:
 
   packages/integration-adapter-supabase-crm:
     dependencies:
-      '@gogol/integration':
+      '@warpgogol/integration':
         specifier: workspace:*
         version: link:../integration
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../share
     devDependencies:
@@ -401,19 +401,19 @@ importers:
 
   packages/os/site-kernel:
     dependencies:
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../../fingerprint
-      '@gogol/integration-adapter-supabase-crm':
+      '@warpgogol/integration-adapter-supabase-crm':
         specifier: workspace:*
         version: link:../../integration-adapter-supabase-crm
-      '@gogol/observability':
+      '@warpgogol/observability':
         specifier: workspace:*
         version: link:../../observability
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
       '@webgogol/forge':
@@ -448,13 +448,13 @@ importers:
 
   packages/os/site-kernel-astro:
     dependencies:
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
 
   packages/os/site-kernel-audit:
     dependencies:
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
     devDependencies:
@@ -473,7 +473,7 @@ importers:
       '@ai-sdk/openai':
         specifier: ^4.0.16
         version: 4.0.16(zod@4.4.3)
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
       ai:
@@ -505,24 +505,24 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(happy-dom@20.11.0)(vite@8.1.5(@types/node@26.1.1)(esbuild@0.28.1)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
 
-  packages/os/site-kernel-check-webgogol:
+  packages/os/site-kernel-check-warpgogol:
     dependencies:
-      '@gogol/check-core':
+      '@warpgogol/check-core':
         specifier: workspace:*
         version: link:../../check-core
-      '@gogol/check-runner-node':
+      '@warpgogol/check-runner-node':
         specifier: workspace:*
         version: link:../../check-runner-node
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
-      '@gogol/site-kernel-astro':
+      '@warpgogol/site-kernel-astro':
         specifier: workspace:*
         version: link:../site-kernel-astro
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
       yaml:
@@ -540,76 +540,76 @@ importers:
       '@astrojs/compiler':
         specifier: ^4.0.0
         version: 4.0.0
-      '@gogol/agent-gate':
+      '@warpgogol/agent-gate':
         specifier: workspace:*
         version: link:../../agent-gate
-      '@gogol/chat':
+      '@warpgogol/chat':
         specifier: workspace:*
         version: link:../../chat
-      '@gogol/check-core':
+      '@warpgogol/check-core':
         specifier: workspace:*
         version: link:../../check-core
-      '@gogol/check-runner-node':
+      '@warpgogol/check-runner-node':
         specifier: workspace:*
         version: link:../../check-runner-node
-      '@gogol/content-source':
+      '@warpgogol/content-source':
         specifier: workspace:*
         version: link:../../content-source
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../../fingerprint
-      '@gogol/geo':
+      '@warpgogol/geo':
         specifier: workspace:*
         version: link:../../geo
-      '@gogol/growth':
+      '@warpgogol/growth':
         specifier: workspace:*
         version: link:../../growth
-      '@gogol/integration':
+      '@warpgogol/integration':
         specifier: workspace:*
         version: link:../../integration
-      '@gogol/nebula':
+      '@warpgogol/nebula':
         specifier: workspace:*
         version: link:../../nebula
-      '@gogol/ontology':
+      '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../../ontology
-      '@gogol/passport':
+      '@warpgogol/passport':
         specifier: workspace:*
         version: link:../../passport
-      '@gogol/pbp':
+      '@warpgogol/pbp':
         specifier: workspace:*
         version: link:../../pbp
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
-      '@gogol/site-kernel-astro':
+      '@warpgogol/site-kernel-astro':
         specifier: workspace:*
         version: link:../site-kernel-astro
-      '@gogol/site-kernel-audit':
+      '@warpgogol/site-kernel-audit':
         specifier: workspace:*
         version: link:../site-kernel-audit
-      '@gogol/site-kernel-check-webgogol':
+      '@warpgogol/site-kernel-check-warpgogol':
         specifier: workspace:*
-        version: link:../site-kernel-check-webgogol
-      '@gogol/site-kernel-codegen':
+        version: link:../site-kernel-check-warpgogol
+      '@warpgogol/site-kernel-codegen':
         specifier: workspace:*
         version: link:../site-kernel-codegen
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
-      '@gogol/site-kernel-integrity':
+      '@warpgogol/site-kernel-integrity':
         specifier: workspace:*
         version: link:../site-kernel-integrity
-      '@gogol/star-map':
+      '@warpgogol/star-map':
         specifier: workspace:*
         version: link:../../star-map
-      '@gogol/surface':
+      '@warpgogol/surface':
         specifier: workspace:*
         version: link:../../surface
-      '@gogol/tokens':
+      '@warpgogol/tokens':
         specifier: workspace:*
         version: link:../../tokens
       ai:
@@ -649,19 +649,19 @@ importers:
       '@cyclonedx/cyclonedx-library':
         specifier: ^1.0.0
         version: 1.14.0
-      '@gogol/ontology':
+      '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../../ontology
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
-      '@gogol/site-kernel-astro':
+      '@warpgogol/site-kernel-astro':
         specifier: workspace:*
         version: link:../site-kernel-astro
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
       spdx-license-list:
@@ -686,10 +686,10 @@ importers:
 
   packages/os/site-kernel-content:
     dependencies:
-      '@gogol/content-source':
+      '@warpgogol/content-source':
         specifier: workspace:*
         version: link:../../content-source
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
       yaml:
@@ -708,13 +708,13 @@ importers:
 
   packages/os/site-kernel-deploy:
     dependencies:
-      '@gogol/integration':
+      '@warpgogol/integration':
         specifier: workspace:*
         version: link:../../integration
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
       yaml:
@@ -723,34 +723,34 @@ importers:
 
   packages/os/site-kernel-handoff:
     dependencies:
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../../fingerprint
-      '@gogol/ontology':
+      '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../../ontology
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
-      '@gogol/site-kernel-astro':
+      '@warpgogol/site-kernel-astro':
         specifier: workspace:*
         version: link:../site-kernel-astro
-      '@gogol/site-kernel-checks':
+      '@warpgogol/site-kernel-checks':
         specifier: workspace:*
         version: link:../site-kernel-checks
-      '@gogol/site-kernel-codegen':
+      '@warpgogol/site-kernel-codegen':
         specifier: workspace:*
         version: link:../site-kernel-codegen
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
-      '@gogol/site-kernel-onboarding':
+      '@warpgogol/site-kernel-onboarding':
         specifier: workspace:*
         version: link:../site-kernel-onboarding
-      '@gogol/surface':
+      '@warpgogol/surface':
         specifier: workspace:*
         version: link:../../surface
       yaml:
@@ -766,13 +766,13 @@ importers:
 
   packages/os/site-kernel-integrity:
     dependencies:
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../../fingerprint
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
       ajv:
@@ -794,16 +794,16 @@ importers:
 
   packages/os/site-kernel-observability:
     dependencies:
-      '@gogol/observability':
+      '@warpgogol/observability':
         specifier: workspace:*
         version: link:../../observability
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
-      '@gogol/site-kernel-checks':
+      '@warpgogol/site-kernel-checks':
         specifier: workspace:*
         version: link:../site-kernel-checks
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
       yaml:
@@ -819,31 +819,31 @@ importers:
 
   packages/os/site-kernel-onboarding:
     dependencies:
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../../fingerprint
-      '@gogol/ontology':
+      '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../../ontology
-      '@gogol/passport':
+      '@warpgogol/passport':
         specifier: workspace:*
         version: link:../../passport
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../share
-      '@gogol/site-kernel':
+      '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:../site-kernel
-      '@gogol/site-kernel-astro':
+      '@warpgogol/site-kernel-astro':
         specifier: workspace:*
         version: link:../site-kernel-astro
-      '@gogol/site-kernel-checks':
+      '@warpgogol/site-kernel-checks':
         specifier: workspace:*
         version: link:../site-kernel-checks
-      '@gogol/site-kernel-codegen':
+      '@warpgogol/site-kernel-codegen':
         specifier: workspace:*
         version: link:../site-kernel-codegen
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
       gray-matter:
@@ -865,21 +865,21 @@ importers:
 
   packages/passport:
     dependencies:
-      '@gogol/nebula':
-        specifier: workspace:*
-        version: link:../nebula
-      '@gogol/ontology':
-        specifier: workspace:*
-        version: link:../ontology
-      '@gogol/site-kernel-content':
-        specifier: workspace:*
-        version: link:../os/site-kernel-content
-      '@gogol/star-map':
-        specifier: workspace:*
-        version: link:../star-map
       '@noble/ed25519':
         specifier: ^3.1.0
         version: 3.1.0
+      '@warpgogol/nebula':
+        specifier: workspace:*
+        version: link:../nebula
+      '@warpgogol/ontology':
+        specifier: workspace:*
+        version: link:../ontology
+      '@warpgogol/site-kernel-content':
+        specifier: workspace:*
+        version: link:../os/site-kernel-content
+      '@warpgogol/star-map':
+        specifier: workspace:*
+        version: link:../star-map
       yaml:
         specifier: ^2.9.0
         version: 2.9.0
@@ -896,16 +896,16 @@ importers:
 
   packages/pbp:
     dependencies:
-      '@gogol/content-source':
+      '@warpgogol/content-source':
         specifier: workspace:*
         version: link:../content-source
-      '@gogol/fingerprint':
+      '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../fingerprint
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../share
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../os/site-kernel-content
       astro:
@@ -924,15 +924,15 @@ importers:
 
   packages/share:
     dependencies:
-      '@gogol/content-source':
-        specifier: workspace:*
-        version: link:../content-source
-      '@gogol/ontology':
-        specifier: workspace:*
-        version: link:../ontology
       '@lordicon/element':
         specifier: ^2.3.1
         version: 2.3.1
+      '@warpgogol/content-source':
+        specifier: workspace:*
+        version: link:../content-source
+      '@warpgogol/ontology':
+        specifier: workspace:*
+        version: link:../ontology
       ajv:
         specifier: ^8.20.0
         version: 8.20.0
@@ -964,7 +964,7 @@ importers:
 
   packages/star-map:
     dependencies:
-      '@gogol/ontology':
+      '@warpgogol/ontology':
         specifier: workspace:*
         version: link:../ontology
     devDependencies:
@@ -977,15 +977,15 @@ importers:
 
   packages/studio-gate:
     dependencies:
-      '@gogol/site-kernel':
-        specifier: workspace:*
-        version: link:../os/site-kernel
-      '@gogol/site-kernel-handoff':
-        specifier: workspace:*
-        version: link:../os/site-kernel-handoff
       '@modelcontextprotocol/sdk':
         specifier: ^1.0.0
         version: 1.29.0(zod@4.4.3)
+      '@warpgogol/site-kernel':
+        specifier: workspace:*
+        version: link:../os/site-kernel
+      '@warpgogol/site-kernel-handoff':
+        specifier: workspace:*
+        version: link:../os/site-kernel-handoff
     devDependencies:
       fast-check:
         specifier: ^4.9.0
@@ -1002,7 +1002,7 @@ importers:
 
   packages/surface:
     dependencies:
-      '@gogol/site-kernel-content':
+      '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../os/site-kernel-content
       yaml:
@@ -1027,28 +1027,28 @@ importers:
 
   packages/ui:
     dependencies:
-      '@gogol/chat':
+      '@warpgogol/chat':
         specifier: workspace:*
         version: link:../chat
-      '@gogol/chat-adapter-null':
+      '@warpgogol/chat-adapter-null':
         specifier: workspace:*
         version: link:../chat-adapter-null
-      '@gogol/chat-adapter-uchat':
+      '@warpgogol/chat-adapter-uchat':
         specifier: workspace:*
         version: link:../chat-adapter-uchat
-      '@gogol/integration':
+      '@warpgogol/integration':
         specifier: workspace:*
         version: link:../integration
-      '@gogol/integration-adapter-stripe':
+      '@warpgogol/integration-adapter-stripe':
         specifier: workspace:*
         version: link:../integration-adapter-stripe
-      '@gogol/integration-adapter-supabase-crm':
+      '@warpgogol/integration-adapter-supabase-crm':
         specifier: workspace:*
         version: link:../integration-adapter-supabase-crm
-      '@gogol/passport':
+      '@warpgogol/passport':
         specifier: workspace:*
         version: link:../passport
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../share
       micromark:
@@ -1074,7 +1074,7 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.1.1)(happy-dom@20.11.0)(vite@8.1.5(@types/node@26.1.1)(esbuild@0.28.1)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
 
-  packages/wgogol-skills:
+  packages/warpgogol-skills:
     devDependencies:
       '@types/node':
         specifier: ^26.1.1
@@ -1082,7 +1082,7 @@ importers:
 
   services/cf-analytics-poller:
     dependencies:
-      '@gogol/observability':
+      '@warpgogol/observability':
         specifier: workspace:*
         version: link:../../packages/observability
       yaml:
@@ -1093,17 +1093,17 @@ importers:
         specifier: ^4.23.1
         version: 4.23.1
 
-  services/check-webgogol-runner:
+  services/check-warpgogol-runner:
     dependencies:
-      '@gogol/check-core':
+      '@warpgogol/check-core':
         specifier: workspace:*
         version: link:../../packages/check-core
-      '@gogol/check-runner-node':
+      '@warpgogol/check-runner-node':
         specifier: workspace:*
         version: link:../../packages/check-runner-node
-      '@gogol/site-kernel-check-webgogol':
+      '@warpgogol/site-kernel-check-warpgogol':
         specifier: workspace:*
-        version: link:../../packages/os/site-kernel-check-webgogol
+        version: link:../../packages/os/site-kernel-check-warpgogol
     devDependencies:
       tsx:
         specifier: ^4.23.1
@@ -1111,7 +1111,7 @@ importers:
 
   services/fleet-probe-runner:
     dependencies:
-      '@gogol/observability':
+      '@warpgogol/observability':
         specifier: workspace:*
         version: link:../../packages/observability
     devDependencies:
@@ -1121,10 +1121,10 @@ importers:
 
   services/lagebild-sync-worker:
     dependencies:
-      '@gogol/integration-adapter-supabase-crm':
+      '@warpgogol/integration-adapter-supabase-crm':
         specifier: workspace:*
         version: link:../../packages/integration-adapter-supabase-crm
-      '@gogol/share':
+      '@warpgogol/share':
         specifier: workspace:*
         version: link:../../packages/share
     devDependencies:

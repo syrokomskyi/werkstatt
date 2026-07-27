@@ -11,7 +11,7 @@ describe("convertAccumulatedToOtlp", () => {
 
   it("skips points with undeclared metric names", () => {
     const points: AccumulatedPoint[] = [
-      { name: "wgogol_unknown_metric", labels: {}, value: 1, kind: "counter" },
+      { name: "warpgogol_unknown_metric", labels: {}, value: 1, kind: "counter" },
     ];
     const result = convertAccumulatedToOtlp(points, START_TIME);
     expect(result).toEqual([]);
@@ -19,12 +19,12 @@ describe("convertAccumulatedToOtlp", () => {
 
   it("converts a counter point to a sum metric", () => {
     const points: AccumulatedPoint[] = [
-      { name: "wgogol_factory_smoke_total", labels: {}, value: 1, kind: "counter" },
+      { name: "warpgogol_factory_smoke_total", labels: {}, value: 1, kind: "counter" },
     ];
     const result = convertAccumulatedToOtlp(points, START_TIME);
     expect(result).toHaveLength(1);
     expect(result[0]!.kind).toBe("sum");
-    expect(result[0]!.name).toBe("wgogol_factory_smoke_total");
+    expect(result[0]!.name).toBe("warpgogol_factory_smoke_total");
     expect(result[0]!.isMonotonic).toBe(true);
     expect(result[0]!.sumPoints).toHaveLength(1);
     expect(result[0]!.sumPoints![0]!.asDouble).toBe(1);
@@ -34,13 +34,13 @@ describe("convertAccumulatedToOtlp", () => {
   it("groups multiple counter points by name into one sum metric", () => {
     const points: AccumulatedPoint[] = [
       {
-        name: "wgogol_factory_command_runs_total",
+        name: "warpgogol_factory_command_runs_total",
         labels: { command: "build.check", status: "pass" },
         value: 1,
         kind: "counter",
       },
       {
-        name: "wgogol_factory_command_runs_total",
+        name: "warpgogol_factory_command_runs_total",
         labels: { command: "build.check", status: "fail" },
         value: 1,
         kind: "counter",
@@ -54,8 +54,8 @@ describe("convertAccumulatedToOtlp", () => {
   it("converts a gauge point to a gauge metric", () => {
     const points: AccumulatedPoint[] = [
       {
-        name: "wgogol_probe_up",
-        labels: { site_id: "webgogol-com", route: "/" },
+        name: "warpgogol_probe_up",
+        labels: { site_id: "warpgogol-com", route: "/" },
         value: 1,
         kind: "gauge",
       },
@@ -70,19 +70,19 @@ describe("convertAccumulatedToOtlp", () => {
   it("converts histogram points with correct bucket counts", () => {
     const points: AccumulatedPoint[] = [
       {
-        name: "wgogol_factory_command_duration_seconds",
+        name: "warpgogol_factory_command_duration_seconds",
         labels: { command: "build.check" },
         value: 0.3,
         kind: "histogram",
       },
       {
-        name: "wgogol_factory_command_duration_seconds",
+        name: "warpgogol_factory_command_duration_seconds",
         labels: { command: "build.check" },
         value: 1.5,
         kind: "histogram",
       },
       {
-        name: "wgogol_factory_command_duration_seconds",
+        name: "warpgogol_factory_command_duration_seconds",
         labels: { command: "build.check" },
         value: 700,
         kind: "histogram",
@@ -104,7 +104,7 @@ describe("convertAccumulatedToOtlp", () => {
   it("places value exactly on a bucket boundary in the lower bucket", () => {
     const points: AccumulatedPoint[] = [
       {
-        name: "wgogol_factory_command_duration_seconds",
+        name: "warpgogol_factory_command_duration_seconds",
         labels: { command: "build.check" },
         value: 1,
         kind: "histogram",
@@ -118,15 +118,15 @@ describe("convertAccumulatedToOtlp", () => {
 
   it("handles mixed kinds in a single call", () => {
     const points: AccumulatedPoint[] = [
-      { name: "wgogol_factory_smoke_total", labels: {}, value: 1, kind: "counter" },
+      { name: "warpgogol_factory_smoke_total", labels: {}, value: 1, kind: "counter" },
       {
-        name: "wgogol_probe_up",
-        labels: { site_id: "webgogol-com", route: "/" },
+        name: "warpgogol_probe_up",
+        labels: { site_id: "warpgogol-com", route: "/" },
         value: 1,
         kind: "gauge",
       },
       {
-        name: "wgogol_factory_command_duration_seconds",
+        name: "warpgogol_factory_command_duration_seconds",
         labels: { command: "build.check" },
         value: 2,
         kind: "histogram",
@@ -141,8 +141,8 @@ describe("convertAccumulatedToOtlp", () => {
   it("preserves label attributes in output points", () => {
     const points: AccumulatedPoint[] = [
       {
-        name: "wgogol_probe_up",
-        labels: { site_id: "webgogol-com", route: "/" },
+        name: "warpgogol_probe_up",
+        labels: { site_id: "warpgogol-com", route: "/" },
         value: 1,
         kind: "gauge",
       },
@@ -150,7 +150,7 @@ describe("convertAccumulatedToOtlp", () => {
     const result = convertAccumulatedToOtlp(points, START_TIME);
     const attrs = result[0]!.gaugePoints![0]!.attributes!;
     expect(attrs).toEqual([
-      { key: "site_id", value: { stringValue: "webgogol-com" } },
+      { key: "site_id", value: { stringValue: "warpgogol-com" } },
       { key: "route", value: { stringValue: "/" } },
     ]);
   });

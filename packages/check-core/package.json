@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/check-core",
+  "name": "@warpgogol/check-core",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -18,8 +18,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/fingerprint": "workspace:*",
-    "@gogol/site-kernel": "workspace:*",
+    "@warpgogol/fingerprint": "workspace:*",
+    "@warpgogol/site-kernel": "workspace:*",
     "zod": "^4.4.3"
   },
   "devDependencies": {

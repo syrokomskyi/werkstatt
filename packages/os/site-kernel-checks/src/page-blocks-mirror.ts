@@ -23,9 +23,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
 
 interface BlockMirrorViolation {
@@ -65,7 +65,7 @@ interface ParsedPage {
 async function collectPageFiles(pagesDir: string): Promise<string[]> {
   const files: string[] = [];
   // fs.walk.lint: allow — intentionally bounded to 2 levels (pages/<lang>/<file>.md),
-  // not a general recursive collector; @gogol/share/fs collectFiles has no depth limit.
+  // not a general recursive collector; @warpgogol/share/fs collectFiles has no depth limit.
   async function walk(dir: string): Promise<void> {
     let entries: string[];
     try {

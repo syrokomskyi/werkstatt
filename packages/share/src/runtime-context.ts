@@ -56,7 +56,7 @@ export interface RuntimeContext {
  *
  * Usage in page routes:
  * ```ts
- * import { EMPTY_RUNTIME_CONTEXT } from "@gogol/share";
+ * import { EMPTY_RUNTIME_CONTEXT } from "@warpgogol/share";
  * const ctx = EMPTY_RUNTIME_CONTEXT(lang);
  * const page = await buildPage(entry, ctx);
  * ```

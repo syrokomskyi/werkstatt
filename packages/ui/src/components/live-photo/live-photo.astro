@@ -5,13 +5,13 @@
   [RFC-0202] Living-photo primitive. Composes the canonical <ResponsiveImage> (RFC-0152) — always
   rendered as the resting state, poster, fallback, and LCP element — with a strictly additive,
   decorative <video muted loop playsinline aria-hidden> overlay. Playback (trigger/loop/tap) is
-  driven by data-* attributes consumed by the opt-in @gogol/share livePhotos runtime; the
+  driven by data-* attributes consumed by the opt-in @warpgogol/share livePhotos runtime; the
   `autoplay` trigger needs no JavaScript. Degrades to the static photo under reduced-motion,
   load failure, or "not yet triggered".
 </purpose>
 <non-goals>
   <item>Do not resolve the clip — the caller passes an already-resolved videoSrc (validated to exist).</item>
-  <item>Do not implement playback logic — that is @gogol/share/scripts/live-photos.ts.</item>
+  <item>Do not implement playback logic — that is @warpgogol/share/scripts/live-photos.ts.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -19,12 +19,12 @@
 </CHANGE_SUMMARY>
 */
 
-import { buildImageSources } from "@gogol/share";
+import { buildImageSources } from "@warpgogol/share";
 import type {
   ImageDescriptor,
   ImageQualityPreset,
   LivePhoto as LivePhotoConfig,
-} from "@gogol/share";
+} from "@warpgogol/share";
 import ResponsiveImage from "../responsive-image/responsive-image.astro";
 import "./live-photo.css";
 

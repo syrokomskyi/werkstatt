@@ -5,11 +5,11 @@ import { convertAccumulatedToOtlp, type AccumulatedPoint } from "../otlp-convert
 const START_TIME = "1751884500000000000";
 
 const metricNameArb = fc.constantFrom(
-  "wgogol_factory_smoke_total",
-  "wgogol_factory_command_runs_total",
-  "wgogol_probe_up",
-  "wgogol_probe_ttfb_seconds",
-  "wgogol_factory_command_duration_seconds",
+  "warpgogol_factory_smoke_total",
+  "warpgogol_factory_command_runs_total",
+  "warpgogol_probe_up",
+  "warpgogol_probe_ttfb_seconds",
+  "warpgogol_factory_command_duration_seconds",
 );
 
 const kindArb = fc.constantFrom<"counter" | "gauge" | "histogram">("counter", "gauge", "histogram");

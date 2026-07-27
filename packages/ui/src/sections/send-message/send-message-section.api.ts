@@ -22,7 +22,7 @@ form no longer delivers synchronously; the exchange is standardized on the queue
 
 import type { APIRoute } from "astro";
 import { UPSTASH_QSTASH_URL, UPSTASH_QSTASH_TOKEN } from "astro:env/server";
-import { buildQstashPublish, QSTASH_EU_BASE, type IntegrationEvent } from "@gogol/integration";
+import { buildQstashPublish, QSTASH_EU_BASE, type IntegrationEvent } from "@warpgogol/integration";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../../section-api-utils.ts";
 
 const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

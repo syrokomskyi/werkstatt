@@ -49,7 +49,7 @@ Pass — `tsc --noEmit` exits 0 for `packages/ui`.
 
 ## Axis B — DNA alignment
 
-1. **PASS — DNA-1 (monorepo boundary):** No `apps/* → apps/*` imports. All new modules import from `@gogol/share` or sibling files within `packages/ui`.
+1. **PASS — DNA-1 (monorepo boundary):** No `apps/* → apps/*` imports. All new modules import from `@warpgogol/share` or sibling files within `packages/ui`.
 
 2. **PASS — DNA-6 (kebab-case):** All new filenames use kebab-case: `prose-image-resolver.ts`, `prose-pipeline.ts`, `generated-manifest-loader.ts`, `section-api-utils.ts`.
 
@@ -61,7 +61,7 @@ Pass — `tsc --noEmit` exits 0 for `packages/ui`.
 
 ## Axis C — Ecosystem fit
 
-1. **PASS — Package boundaries:** All imports flow correctly within `packages/ui` and from `@gogol/share`.
+1. **PASS — Package boundaries:** All imports flow correctly within `packages/ui` and from `@warpgogol/share`.
 
 2. **PASS — Pipeline placement:** No new commands or pipelines introduced. The changes are internal refactors.
 

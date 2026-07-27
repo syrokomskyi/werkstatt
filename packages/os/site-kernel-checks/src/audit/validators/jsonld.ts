@@ -13,12 +13,12 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { defaultLanguageFromManifest } from "../../lib/i18n.ts";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
 import type { AuditFinding } from "../types.ts";
 import {

@@ -12,12 +12,12 @@ ontology schema plus catalog linkage (every slot cosmicName must be declared by 
 */
 
 import { join, relative } from "node:path";
-import { constellationSchema } from "@gogol/ontology";
+import { constellationSchema } from "@warpgogol/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   collectFilesMatching,
   loadArchetypeFiles,

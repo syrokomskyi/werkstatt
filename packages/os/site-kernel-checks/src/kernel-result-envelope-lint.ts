@@ -31,7 +31,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
-# @gogol/site-kernel-handoff
+# @warpgogol/site-kernel-handoff
 
-RFC-0221 package for internal site handoff between developers who already have the WGogol ecosystem checked out.
+RFC-0221 package for internal site handoff between developers who already have the Warpgogol ecosystem checked out.
 
 This package provides the RFC-0221/RFC-0479 internal handoff surface:
 
@@ -40,7 +40,7 @@ pnpm exec site-kernel run handoff.validate --bundle ../handoff/<app>
 pnpm exec site-kernel run handoff.pack --site <app>
 pnpm exec site-kernel run handoff.absorb --bundle ../handoff/<app> --report-only
 pnpm exec site-kernel run handoff.absorb --bundle ../handoff/<app> --regen
-pnpm --filter @gogol/site-kernel-handoff build:check
+pnpm --filter @warpgogol/site-kernel-handoff build:check
 ```
 
 ## Contract

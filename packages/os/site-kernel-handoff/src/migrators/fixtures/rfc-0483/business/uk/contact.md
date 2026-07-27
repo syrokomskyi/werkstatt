@@ -1,5 +1,5 @@
 ---
 contact:
-  email: "info@webgogol.com"
-  supportEmail: "support@webgogol.com"
+  email: "info@warpgogol.com"
+  supportEmail: "support@warpgogol.com"
 ---

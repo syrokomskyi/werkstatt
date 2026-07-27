@@ -1,4 +1,4 @@
-# @gogol/chat-adapter-uchat
+# @warpgogol/chat-adapter-uchat
 
 UChat implementation of `ChatWidgetAdapter` (RFC-0175).
 
@@ -21,7 +21,7 @@ integrations:
 ## Usage
 
 ```typescript
-import UChatAdapter from "@gogol/chat-adapter-uchat";
+import UChatAdapter from "@warpgogol/chat-adapter-uchat";
 // adapter.id === "uchat"
 // adapter.load(config) — injects UChat popup script
 // adapter.open() — opens widget panel
@@ -30,5 +30,5 @@ import UChatAdapter from "@gogol/chat-adapter-uchat";
 ## Validation
 
 ```sh
-pnpm --filter @gogol/chat-adapter-uchat build:check
+pnpm --filter @warpgogol/chat-adapter-uchat build:check
 ```

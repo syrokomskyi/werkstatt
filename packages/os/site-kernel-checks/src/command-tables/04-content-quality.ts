@@ -242,7 +242,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
     name: "barrel.size.lint",
     description:
-      "Guard the @gogol/share barrel split: BARREL-01 fails when a package's root src/index.ts exceeds the export-line threshold (error for @gogol/share, warning elsewhere); BARREL-02 fails when a symbol is exported from both the root barrel and a declared subpath (RFC-0264).",
+      "Guard the @warpgogol/share barrel split: BARREL-01 fails when a package's root src/index.ts exceeds the export-line threshold (error for @warpgogol/share, warning elsewhere); BARREL-02 fails when a symbol is exported from both the root barrel and a declared subpath (RFC-0264).",
     scope: "workspace",
     supportsAllSites: true,
     flags: {},
@@ -253,7 +253,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
     name: "fs.walk.lint",
     description:
-      "WALK-01: fails when a packages/** source file declares its own nested recursive readdir walker instead of importing collectFiles from @gogol/share/fs (RFC-0303).",
+      "WALK-01: fails when a packages/** source file declares its own nested recursive readdir walker instead of importing collectFiles from @warpgogol/share/fs (RFC-0303).",
     scope: "workspace",
     supportsAllSites: true,
     flags: {},
@@ -345,7 +345,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
     name: "share.i18n.lint",
     description:
-      "Scan registered @gogol/share UI-facing helper targets for unclassified hardcoded public strings (RFC-0230).",
+      "Scan registered @warpgogol/share UI-facing helper targets for unclassified hardcoded public strings (RFC-0230).",
     scope: "workspace",
     flags: {
       path: {

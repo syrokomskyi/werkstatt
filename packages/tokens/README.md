@@ -1,6 +1,6 @@
-# @gogol/tokens
+# @warpgogol/tokens
 
-Canonical `--ds-*` CSS design tokens for the WGogol design system. Single source of truth for colors, typography, spacing, radius, shadows, motion, and z-index (Wave 6, RFC-0023).
+Canonical `--ds-*` CSS design tokens for the Warpgogol design system. Single source of truth for colors, typography, spacing, radius, shadows, motion, and z-index (Wave 6, RFC-0023).
 
 ## Purpose
 
@@ -10,21 +10,21 @@ All `--ds-*` custom properties are defined here. Apps and components must use th
 
 | Import                     | What it provides                                            |
 | -------------------------- | ----------------------------------------------------------- |
-| `@gogol/tokens`            | TypeScript token name constants and type helpers            |
-| `@gogol/tokens/tokens.css` | Raw CSS file with all `--ds-*` custom property declarations |
+| `@warpgogol/tokens`            | TypeScript token name constants and type helpers            |
+| `@warpgogol/tokens/tokens.css` | Raw CSS file with all `--ds-*` custom property declarations |
 
 ## Usage
 
 ### Import the CSS (in app global styles)
 
 ```css
-@import "@gogol/tokens/tokens.css";
+@import "@warpgogol/tokens/tokens.css";
 ```
 
 Or in `astro.config.mjs`:
 
 ```javascript
-import tokens from "@gogol/tokens/tokens.css?url";
+import tokens from "@warpgogol/tokens/tokens.css?url";
 ```
 
 ### Use tokens in component CSS
@@ -42,7 +42,7 @@ import tokens from "@gogol/tokens/tokens.css?url";
 ### TypeScript token constants
 
 ```typescript
-import { DS_COLOR_PRIMARY_500, DS_RADIUS_MD } from "@gogol/tokens";
+import { DS_COLOR_PRIMARY_500, DS_RADIUS_MD } from "@warpgogol/tokens";
 ```
 
 ## Token categories
@@ -63,5 +63,5 @@ import { DS_COLOR_PRIMARY_500, DS_RADIUS_MD } from "@gogol/tokens";
 ## Validation
 
 ```sh
-pnpm --filter @gogol/tokens build:check
+pnpm --filter @warpgogol/tokens build:check
 ```

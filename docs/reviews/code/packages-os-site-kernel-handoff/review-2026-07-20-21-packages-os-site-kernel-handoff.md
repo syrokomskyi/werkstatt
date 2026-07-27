@@ -27,7 +27,7 @@ The implementation is clean, minimal, and follows existing patterns. The new `st
 
 ### Mechanical floor
 
-Pass — `@gogol/ontology` and `@gogol/site-kernel-handoff` `build:check` both pass. `rfc.validate` passes.
+Pass — `@warpgogol/ontology` and `@warpgogol/site-kernel-handoff` `build:check` both pass. `rfc.validate` passes.
 
 ### Axis A — Structural correctness
 
@@ -39,7 +39,7 @@ No issues. DNA-44 (bundle contract): mirror sync operates on git history, not co
 
 ### Axis C — Ecosystem fit
 
-No issues. Package boundaries respected — `@gogol/ontology` owns schemas, `@gogol/site-kernel-handoff` owns command logic. Command registered in the correct module (`sternsystem/index.ts`). `sternsystem.register` updated with `--mirror` flag. `COMMANDS.md` and `AGENTS.md` updated. No pipeline integration — standalone command as specified.
+No issues. Package boundaries respected — `@warpgogol/ontology` owns schemas, `@warpgogol/site-kernel-handoff` owns command logic. Command registered in the correct module (`sternsystem/index.ts`). `sternsystem.register` updated with `--mirror` flag. `COMMANDS.md` and `AGENTS.md` updated. No pipeline integration — standalone command as specified.
 
 ### Axis D — Forward-only compliance
 
@@ -67,7 +67,7 @@ No issues. Empty bare repo is handled (fail-fast with "no commits" error). Crede
 | `sternsystem.validate` mirror warnings | Done | `sternsystem-validate.ts:197-234` |
 | `sternsystem.register --mirror` flag | Done | `sternsystem-register.ts:48`, `index.ts:45` |
 | Bordbuch entry with `mirror-sync` kind | Done | `sternsystem-sync.ts:139-155` |
-| `mirror` in `registry.yaml` for webgogol-com | Done | `registry.yaml:6` |
+| `mirror` in `registry.yaml` for warpgogol-com | Done | `registry.yaml:6` |
 | DNA-45 prose updated | Done | `architecture-dna.md:197` |
 | `COMMANDS.md` updated | Done | `COMMANDS.md:552` |
 | `AGENTS.md` updated | Done | `AGENTS.md:15-20` |

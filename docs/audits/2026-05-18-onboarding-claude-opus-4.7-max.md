@@ -1,6 +1,6 @@
 Сейчас сделаю тщательный аудит — проверю, что реально на диске, как принятые RFC реализованы, что покрыто, что нет. Параллельно соберу ландшафт изменений.
 
-Хороший прогресс: 9 RFC, 7 workflow-файлов, расширенная онтология, реализация ключевых валидаторов. Сайт `webgogol-handwerk` ещё не собран — это ожидаемо: внесена _инфраструктура_. Сейчас проверю содержимое новых RFC, имплементацию ключевых команд, обновления AGENTS.md, и состояние онтологии.
+Хороший прогресс: 9 RFC, 7 workflow-файлов, расширенная онтология, реализация ключевых валидаторов. Сайт `warpgogol-handwerk` ещё не собран — это ожидаемо: внесена _инфраструктура_. Сейчас проверю содержимое новых RFC, имплементацию ключевых команд, обновления AGENTS.md, и состояние онтологии.
 
 Сейчас проверю фактические реализации: пайплайн, workflow-файлы, ключевые валидаторы, AGENTS-файлы, и онтологию.
 
@@ -8,7 +8,7 @@
 
 ---
 
-# Аудит экосистемы WGogol — статус после реализации RFC-0070…0078
+# Аудит экосистемы Warpgogol — статус после реализации RFC-0070…0078
 
 **Дата аудита:** 2026-05-18 · **Объём:** все девять RFC, их имплементации, инфраструктура, AGENTS-файлы, готовность к первому реальному онбордингу.
 
@@ -327,14 +327,14 @@ const PHASE_ARTIFACTS: Record<OnboardingPhase, PhaseArtifactSpec[]> = {
 
 ### 5.10 Один acceptance-тест на сквозной онбординг
 
-Прогнать **полностью** workflow-цепочку на `webgogol-handwerk` (текущий бриф). Шаги:
+Прогнать **полностью** workflow-цепочку на `warpgogol-handwerk` (текущий бриф). Шаги:
 
 1. `pnpm exec site-kernel run workflow.lint` → должен пройти.
 2. `pnpm exec site-kernel run brief.validate` → должен пройти после исправления значений в `00-brief.md` человеком (`client.id`, `client.domain` — placeholder values сейчас).
 3. Пройти 00 → 06 workflow с agent autorun.
-4. На handoff: `pnpm --filter webgogol-handwerk dev` открывается.
-5. `pnpm exec site-kernel run apps-check.run --app webgogol-handwerk` → exit 0.
-6. `pnpm exec site-kernel run app.contract.full --app webgogol-handwerk` → exit 0.
+4. На handoff: `pnpm --filter warpgogol-handwerk dev` открывается.
+5. `pnpm exec site-kernel run apps-check.run --app warpgogol-handwerk` → exit 0.
+6. `pnpm exec site-kernel run app.contract.full --app warpgogol-handwerk` → exit 0.
 
 Любой из шагов, который не доходит до exit 0, — это новый bug-ticket.
 

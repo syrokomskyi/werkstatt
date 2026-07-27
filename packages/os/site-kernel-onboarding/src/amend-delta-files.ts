@@ -19,13 +19,13 @@ shared-context resolution still sees them).</purpose>
 
 import { access, readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readFlag } from "./amend.ts";
 
 interface DeltaChange {

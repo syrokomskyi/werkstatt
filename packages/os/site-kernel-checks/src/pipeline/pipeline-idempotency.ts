@@ -19,16 +19,16 @@ idempotency for the full pipeline, not just the codegen layer).
 
 import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
-import { executeKernelCommand } from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+import { byteHash } from "@warpgogol/fingerprint";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { SITES_BUILD_PREPARE_PIPELINE } from "../module.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const HASH_PREFIX = "sha" + "256:";
 

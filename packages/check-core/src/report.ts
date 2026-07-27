@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Check report, diagnostic, agent action, and action pack schemas for the check-webgogol ecosystem.</purpose>
+<purpose>Check report, diagnostic, agent action, and action pack schemas for the check-warpgogol ecosystem.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -11,7 +11,7 @@
 */
 
 import { z } from "zod";
-import type { Diagnostic } from "@gogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/site-kernel";
 
 export const checkDiagnosticSchema = z.custom<Diagnostic>();
 
@@ -139,9 +139,9 @@ export function renderReportHtml(report: CheckReport): string {
     .join("\n");
   return `<!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>Check Webgogol Report ${escapeHtml(report.runId)}</title></head>
+<head><meta charset="utf-8"><title>Check Warpgogol Report ${escapeHtml(report.runId)}</title></head>
 <body>
-<h1>Check Webgogol Report</h1>
+<h1>Check Warpgogol Report</h1>
 <p>Status: ${escapeHtml(report.status)}. Errors: ${report.summary.error}. Warnings: ${report.summary.warning}.</p>
 <ul>${rows}</ul>
 </body>

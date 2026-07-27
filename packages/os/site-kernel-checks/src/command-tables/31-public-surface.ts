@@ -57,7 +57,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "not-found.validate",
     description:
-      "Validate generated 404 route status handling, shared @gogol/ui import, and absence of app-local styling (RFC-0310).",
+      "Validate generated 404 route status handling, shared @warpgogol/ui import, and absence of app-local styling (RFC-0310).",
     scope: "app",
     flags: {},
     supportsAllSites: true,

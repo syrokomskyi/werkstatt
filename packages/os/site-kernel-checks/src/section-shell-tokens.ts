@@ -24,8 +24,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { TOKEN_NAME_SET } from "@gogol/tokens";
+} from "@warpgogol/site-kernel";
+import { TOKEN_NAME_SET } from "@warpgogol/tokens";
 import {
   collectFilesByExtensions,
   getLineColumn,
@@ -121,7 +121,7 @@ function pushMatches(
 // RFC-0124: tokens.section-shell.contract.validate
 // Cross-check every --ds-* token referenced under the eight section-framework
 // component directories against TOKEN_NAME_SET (the canonical token catalog
-// exported by @gogol/tokens). Catches drift where a section primitive
+// exported by @warpgogol/tokens). Catches drift where a section primitive
 // references a token that no biome defines.
 // ---------------------------------------------------------------------------
 
@@ -174,7 +174,7 @@ export async function runSectionShellTokenContractValidate(
       violations.push({
         file: rel,
         rule: "SHELL-TOK-CONTRACT-01",
-        message: `Section-framework CSS references ${token} but the token is not in @gogol/tokens TOKEN_NAME_SET.`,
+        message: `Section-framework CSS references ${token} but the token is not in @warpgogol/tokens TOKEN_NAME_SET.`,
         fix: "Add the token to packages/tokens/src/tokens.css (so every biome can override it) or change the reference to an existing --ds-* token.",
         line,
         column,

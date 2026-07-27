@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/content-source",
+  "name": "@warpgogol/content-source",
   "version": "0.1.0",
   "private": true,
   "type": "module",

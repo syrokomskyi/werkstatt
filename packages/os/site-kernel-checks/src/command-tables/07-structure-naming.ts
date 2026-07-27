@@ -130,7 +130,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
   {
     name: "kernel.result.envelope.lint",
     description:
-      "Lint every check command file in @gogol/site-kernel-checks for the legacy flat `return { command, status, violations }` shape (DNA-35, RFC-0030).",
+      "Lint every check command file in @warpgogol/site-kernel-checks for the legacy flat `return { command, status, violations }` shape (DNA-35, RFC-0030).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
@@ -141,7 +141,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
   {
     name: "diagnostic.shape.lint",
     description:
-      "Lint @gogol/site-kernel-checks for RFC-0203 diagnostic shape: DSL-02 fails on an unregistered ruleId; DSL-03 on an empty ruleId; DSL-01 on an unreadable source dir; DSL-04 ratchets resultFromViolations/failResult shim usage against a shrink-only baseline (RFC-0261). Pass --write-baseline to regenerate the DSL-04 baseline.",
+      "Lint @warpgogol/site-kernel-checks for RFC-0203 diagnostic shape: DSL-02 fails on an unregistered ruleId; DSL-03 on an empty ruleId; DSL-01 on an unreadable source dir; DSL-04 ratchets resultFromViolations/failResult shim usage against a shrink-only baseline (RFC-0261). Pass --write-baseline to regenerate the DSL-04 baseline.",
     scope: "workspace",
     supportsAllSites: true,
     flags: {
@@ -157,7 +157,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
   {
     name: "warning.diagnostics.lint",
     description:
-      "Lint @gogol/site-kernel-checks for actionable warnings that are emitted only in summary prose instead of canonical Diagnostic[] data.",
+      "Lint @warpgogol/site-kernel-checks for actionable warnings that are emitted only in summary prose instead of canonical Diagnostic[] data.",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
@@ -436,7 +436,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
   {
     name: "share.utility.lint",
     description:
-      "Validate that apps use @gogol/share utilities instead of re-implementing them locally. Per RFC-0037: allows astro:content imports in @gogol/share.",
+      "Validate that apps use @warpgogol/share utilities instead of re-implementing them locally. Per RFC-0037: allows astro:content imports in @warpgogol/share.",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,

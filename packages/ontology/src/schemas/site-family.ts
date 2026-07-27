@@ -11,7 +11,7 @@ candidate constellations, required section archetypes, audit thresholds, and rea
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0071: Add site-family contract to @gogol/ontology.</item>
+  <item>RFC-0071: Add site-family contract to @warpgogol/ontology.</item>
 </CHANGE_SUMMARY>
 */
 

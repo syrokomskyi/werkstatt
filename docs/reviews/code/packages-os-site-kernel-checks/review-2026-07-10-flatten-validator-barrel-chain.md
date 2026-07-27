@@ -10,7 +10,7 @@
 
 | Check | Result |
 | --- | --- |
-| `pnpm --filter @gogol/site-kernel-checks build:check` (tsc --noEmit) | **PASS** |
+| `pnpm --filter @warpgogol/site-kernel-checks build:check` (tsc --noEmit) | **PASS** |
 | Import target existence (65 relative paths + 3 package-level) | **PASS** — all targets exist |
 | Remaining references to deleted files in `*.ts` | **PASS** — zero matches |
 | Remaining references in `docs/*.xml` (compass/grace inventory) | **PASS** — entries removed in same commit |
@@ -31,7 +31,7 @@
 
 | Item | Result | Evidence |
 | --- | --- | --- |
-| DNA-1 (monorepo boundary) | **PASS** | No new `apps/* → apps/*` imports. Package-level imports (`@gogol/site-kernel-codegen`, `@gogol/site-kernel`, `@gogol/site-kernel-audit`) are all in `packages/*`. |
+| DNA-1 (monorepo boundary) | **PASS** | No new `apps/* → apps/*` imports. Package-level imports (`@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel`, `@warpgogol/site-kernel-audit`) are all in `packages/*`. |
 | DNA-4 (canonical content) | **N/A** | No content files touched. |
 | DNA-5 / DNA-17 (mirror quintet) | **N/A** | No `.astro` components touched. |
 | DNA-6 (kebab-case) | **PASS** | All new import paths use kebab-case filenames (`pseo-module-context.ts`, `surface-translation.ts`, etc.). |
@@ -49,7 +49,7 @@
 
 | Item | Result | Evidence |
 | --- | --- | --- |
-| Package boundaries | **PASS** | Import direction unchanged: command tables (in `packages/os/site-kernel-checks`) import from same-package implementation modules and from `@gogol/site-kernel-codegen`, `@gogol/site-kernel`, `@gogol/site-kernel-audit`. No boundary violations. |
+| Package boundaries | **PASS** | Import direction unchanged: command tables (in `packages/os/site-kernel-checks`) import from same-package implementation modules and from `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel`, `@warpgogol/site-kernel-audit`. No boundary violations. |
 | Pipeline placement | **PASS** | No pipeline constants touched. Command registration via `ALL_COMMANDS` in `module.ts` is unchanged. |
 | Compass sync | **PASS** | `compass-inventory.xml` and `grace-inventory.xml` updated in the same commit — 11 entries for deleted files removed. |
 | AGENTS.md updates | **PASS** | `packages/os/site-kernel-checks/AGENTS.md` table rows for `src/checks.ts` and `src/validators/` removed in the same commit. |

@@ -14,7 +14,7 @@ import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, rm, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import {
   includeInLlms,
   includeInTwins,
@@ -25,8 +25,8 @@ import {
   type SurfaceManifest,
   type SurfaceState,
   type VirtualRouteEntry,
-} from "@gogol/surface";
-import { markdownTwinRelPath } from "@gogol/share/semantic";
+} from "@warpgogol/surface";
+import { markdownTwinRelPath } from "@warpgogol/share/semantic";
 
 export const ARTIFACT_FILE = "src/surface.generated.yaml";
 export const MANIFEST_FILE = "public/.well-known/pseo-manifest.json";
@@ -255,7 +255,7 @@ export function pageIdToFile(pageId: string): string {
 export async function readLangs(
   appDir: string,
 ): Promise<{ defaultLang: string; supportedLangs: string[] }> {
-  const { loadSystemManifest } = await import("@gogol/site-kernel-content");
+  const { loadSystemManifest } = await import("@warpgogol/site-kernel-content");
   const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
   const i18n = (
     manifest as unknown as { i18n?: { default?: string; supported?: Record<string, unknown> } }
@@ -274,7 +274,7 @@ export async function loadAuthoredRoutes(
   const pageIds = new Set<string>();
   const slugs = new Set<string>();
   try {
-    const { loadSystemManifest } = await import("@gogol/site-kernel-content");
+    const { loadSystemManifest } = await import("@warpgogol/site-kernel-content");
     const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
     const pages = (
       manifest as unknown as {

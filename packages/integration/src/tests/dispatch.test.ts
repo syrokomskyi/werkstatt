@@ -33,7 +33,7 @@ const EVENT: IntegrationEvent = {
 };
 
 test("executeDispatch skips destinations when the tenant holds no secrets", async () => {
-  const result = await executeDispatch({ siteId: "webgogol-com", event: EVENT }, {});
+  const result = await executeDispatch({ siteId: "warpgogol-com", event: EVENT }, {});
   expect(result.routed.length).toBe(0);
   expect(result.skipped.includes("crm:pipedrive")).toBeTruthy();
 });
@@ -65,7 +65,7 @@ test("dispatchToTenant acks on a routed reply and forwards only the inbound secr
   );
   const outcome = await dispatchToTenant(
     dispatcher,
-    { siteId: "webgogol-com", event: EVENT },
+    { siteId: "warpgogol-com", event: EVENT },
     "inbound-secret",
   );
   expect(outcome.ok).toBe(true);

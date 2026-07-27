@@ -8,12 +8,12 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Added Compass scaffolding to clarify module purpose, responsibilities, and boundaries.</item>
-  <item>Use collectNebulaInputs + toPassportScores from @gogol/nebula instead of manual stub + field mapping.</item>
+  <item>Use collectNebulaInputs + toPassportScores from @warpgogol/nebula instead of manual stub + field mapping.</item>
 </CHANGE_SUMMARY>
 */
 
 /**
- * @gogol/passport — Passport emission pipeline
+ * @warpgogol/passport — Passport emission pipeline
  *
  * DNA-31 / RFC-0028
  *
@@ -33,13 +33,13 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import type { SystemManifest } from "@gogol/ontology/schemas";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { computeNebulaScore, toPassportScores } from "@gogol/nebula/compute";
-import { collectNebulaInputs } from "@gogol/nebula/collect";
-import type { NebulaInputs } from "@gogol/nebula";
-import { manifestToStarMapInput, emitStarMap } from "@gogol/star-map/render";
-import type { UniRegistry } from "@gogol/star-map";
+import type { SystemManifest } from "@warpgogol/ontology/schemas";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { computeNebulaScore, toPassportScores } from "@warpgogol/nebula/compute";
+import { collectNebulaInputs } from "@warpgogol/nebula/collect";
+import type { NebulaInputs } from "@warpgogol/nebula";
+import { manifestToStarMapInput, emitStarMap } from "@warpgogol/star-map/render";
+import type { UniRegistry } from "@warpgogol/star-map";
 import {
   signCredential,
   assembleVerifiableCredential,

@@ -16,7 +16,7 @@ A route file (`*.astro`) inside `src/pages/[lang]/` is an orchestrator. It:
 
 - computes page-level data (lang, slugs, SEO metadata)
 - instantiates `<Layout>`, `<Header>`, `<Footer>`
-- calls `buildPage()` from `@gogol/share/page` (DNA-25)
+- calls `buildPage()` from `@warpgogol/share/page` (DNA-25)
 - renders resolved blocks inside `<main>`
 
 It does **not**:
@@ -34,7 +34,7 @@ Everything rendered inside `<main>` is a sequence of section components dispatch
 
 Breadcrumbs are automatic on every non-home page (RFC-0229):
 
-- breadcrumbs are rendered through the shared breadcrumbs section component from `@gogol/ui`
+- breadcrumbs are rendered through the shared breadcrumbs section component from `@warpgogol/ui`
 - the breadcrumbs section is the first non-shell child of `<main>`, before any content section
 - the shared page route pipeline builds ONE canonical trail (`Home → …ancestors… → current page`) and projects it into both the visible section and the `BreadcrumbList` JSON-LD — they never drift
 - ancestors come from `pages[].parentPageId` (authored), the surface tuple depth (PSEO), or the About page (person profiles); page content does NOT declare a breadcrumbs block
@@ -56,7 +56,7 @@ There is no hard ordering enforcement beyond the navigation section requirement.
 
 ## PC-6 · Block-declarative page composition
 
-Every page is a frontmatter-only `.md` file in `pages/{lang}/` with shape `kind: page`, `cosmicStar`, `title`, `description`, `lang`, `blocks[]`. Each `blocks[].type` resolves to a section component from `@gogol/ui` via `PLANET_IMPORT_PATHS`. No markdown body is permitted — prose lives in `prose/{lang}/` and is referenced via `blocks[].props.contentRef` (DNA-24, RFC-0026).
+Every page is a frontmatter-only `.md` file in `pages/{lang}/` with shape `kind: page`, `cosmicStar`, `title`, `description`, `lang`, `blocks[]`. Each `blocks[].type` resolves to a section component from `@warpgogol/ui` via `PLANET_IMPORT_PATHS`. No markdown body is permitted — prose lives in `prose/{lang}/` and is referenced via `blocks[].props.contentRef` (DNA-24, RFC-0026).
 
 Enforced by `page.block.validate`.
 

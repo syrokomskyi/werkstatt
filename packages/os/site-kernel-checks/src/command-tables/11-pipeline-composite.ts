@@ -18,7 +18,7 @@ import {
   runAmendCheckPostbuild,
   runAmendCheckRun,
 } from "../amend-workflow.ts";
-import { runAuditDeltaRun } from "@gogol/site-kernel-audit";
+import { runAuditDeltaRun } from "@warpgogol/site-kernel-audit";
 import { runPipelineIdempotencySmoke } from "../pipeline/pipeline-idempotency.ts";
 import { runDnaRegistryValidate } from "../dna-registry.ts";
 import { runNeedMarkersValidate } from "../need-markers.ts";

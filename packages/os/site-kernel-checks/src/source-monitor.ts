@@ -21,20 +21,20 @@ explicitly enabled. The monitor never mutates content; it reports.
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
-import { recordClaimsSchema } from "@gogol/share/schemas";
-import { resolveFieldPath } from "@gogol/share/content/resolve-field-path";
+import { recordClaimsSchema } from "@warpgogol/share/schemas";
+import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
 import {
   compareValues,
   extractJsonPath,
   type DivergenceRecord,
   type SourceDescriptor,
-} from "@gogol/share/knowledge/source";
+} from "@warpgogol/share/knowledge/source";
 import type {
   CheckResult,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 import { pathExists, readMarkdownDocument } from "./content-discipline.ts";
 import { collectClaimSidecars, recordPathForSidecar, toPosix } from "./content-claims.ts";

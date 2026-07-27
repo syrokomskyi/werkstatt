@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-page.pipeline.contract — validates that buildPage(entry, ctx) from @gogol/share
+page.pipeline.contract — validates that buildPage(entry, ctx) from @warpgogol/share
 returns a ResolvedPage with the correct shape, and that the contract snapshot is
 byte-stable (DNA-25, RFC-0026).
 </purpose>
@@ -18,10 +18,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { failResult, resultFromViolations } from "../result-helpers.ts";
-import { buildPage, type ResolvedPage, type PageEntry } from "@gogol/share/page";
-import { EMPTY_RUNTIME_CONTEXT } from "@gogol/share/runtime-context";
+import { buildPage, type ResolvedPage, type PageEntry } from "@warpgogol/share/page";
+import { EMPTY_RUNTIME_CONTEXT } from "@warpgogol/share/runtime-context";
 
 // ---------------------------------------------------------------------------
 // Reference entry for contract snapshot test
@@ -110,10 +110,10 @@ export async function runPagePipelineContract(
 
   // Contract check 1: buildPage and EMPTY_RUNTIME_CONTEXT are exported
   if (typeof buildPage !== "function") {
-    violations.push("@gogol/share does not export buildPage as a function");
+    violations.push("@warpgogol/share does not export buildPage as a function");
   }
   if (typeof EMPTY_RUNTIME_CONTEXT !== "function") {
-    violations.push("@gogol/share does not export EMPTY_RUNTIME_CONTEXT as a function");
+    violations.push("@warpgogol/share does not export EMPTY_RUNTIME_CONTEXT as a function");
   }
 
   if (violations.length > 0) {

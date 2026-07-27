@@ -12,9 +12,9 @@ length-preserving strippers used by the token/color lints.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import { collectFiles } from "@gogol/share/fs";
-import { getLineColumn } from "@gogol/share/text-position";
-import type { KernelCommandInput } from "@gogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
+import { getLineColumn } from "@warpgogol/share/text-position";
+import type { KernelCommandInput } from "@warpgogol/site-kernel";
 export { getLineColumn };
 
 const IGNORED_DIRECTORY_NAMES = new Set([

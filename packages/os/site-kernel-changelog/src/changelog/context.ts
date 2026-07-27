@@ -14,7 +14,7 @@
 
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 const _packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 

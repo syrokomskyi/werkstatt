@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Astro content-collection helper for @gogol/pbp. Exports a ready-to-spread
+<purpose>Astro content-collection helper for @warpgogol/pbp. Exports a ready-to-spread
 `pbpCollections` object for use in a site's `src/content/config.ts` (RFC-0466).</purpose>
 <non-goals>
   <item>Does not validate PBP entry schemas here — the loaders handle that via pbpSchemaById.</item>
@@ -15,15 +15,15 @@
 
 import { defineCollection } from "astro:content";
 import { z } from "zod";
-import { toDataEntryId } from "@gogol/share/content";
-import { fsDataCollectionLoader } from "@gogol/content-source";
+import { toDataEntryId } from "@warpgogol/share/content";
+import { fsDataCollectionLoader } from "@warpgogol/content-source";
 
 /**
  * Pre-configured Astro collection definition for the PBP "business-profile" collection.
  *
  * Usage in a site's src/content/config.ts:
  *
- *   import { pbpCollections } from "@gogol/pbp/astro";
+ *   import { pbpCollections } from "@warpgogol/pbp/astro";
  *
  *   export const collections = {
  *     ...pbpCollections,

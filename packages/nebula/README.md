@@ -1,10 +1,10 @@
-# @gogol/nebula
+# @warpgogol/nebula
 
 Nebula Score computation pipeline — composite 0–100 quality metric across four pillars: Performance, Accessibility, Content Health, and Architectural Compliance (DNA-33, RFC-0028).
 
 ## Purpose
 
-The Nebula Score is embedded in the Cosmic Passport (see `@gogol/passport`) and surfaced in the Star Map. It gives a single, versioned quality signal for each app build.
+The Nebula Score is embedded in the Cosmic Passport (see `@warpgogol/passport`) and surfaced in the Star Map. It gives a single, versioned quality signal for each app build.
 
 ## Why Nebula?
 
@@ -33,8 +33,8 @@ import {
   deriveAccessibilityScore,
   deriveContentHealthScore,
   deriveArchitecturalComplianceScore,
-} from "@gogol/nebula";
-import type { NebulaInputs, NebulaScore, PassportScores } from "@gogol/nebula";
+} from "@warpgogol/nebula";
+import type { NebulaInputs, NebulaScore, PassportScores } from "@warpgogol/nebula";
 ```
 
 ### `computeNebulaScore(inputs: NebulaInputs): NebulaScore`
@@ -64,14 +64,14 @@ Creates all-passing stub inputs (performanceScore: 100, accessibilityScore: 100,
 Reads CI artifact files (`.lighthouse-results.json`, `.axe-results.json`, `.content-checks.json`, `.dna-checks.json`) from an app directory and assembles a complete `NebulaInputs` object. Missing or malformed files fall back to stub values with a warning log.
 
 ```typescript
-import { collectNebulaInputs } from "@gogol/nebula/collect";
+import { collectNebulaInputs } from "@warpgogol/nebula/collect";
 
-const inputs = await collectNebulaInputs({ appDirectory: "./apps/webgogol-com" });
+const inputs = await collectNebulaInputs({ appDirectory: "./apps/warpgogol-com" });
 ```
 
 ### `toPassportScores(score: NebulaScore): PassportScores`
 
-Projects a `NebulaScore` into the passport schema's scores shape (strips `contribution`, `weightsVersion`, `computedAt`). Used by `@gogol/passport` emit pipeline.
+Projects a `NebulaScore` into the passport schema's scores shape (strips `contribution`, `weightsVersion`, `computedAt`). Used by `@warpgogol/passport` emit pipeline.
 
 ### Derive functions
 
@@ -85,16 +85,16 @@ Four exported pillar derive functions for direct unit testing:
 ## Sub-path imports
 
 ```typescript
-import { NEBULA_WEIGHTS, NEBULA_WEIGHTS_VERSION } from "@gogol/nebula/weights";
-import { computeNebulaScore, toPassportScores } from "@gogol/nebula/compute";
-import { collectNebulaInputs } from "@gogol/nebula/collect";
-import type { NebulaInputs, NebulaScore } from "@gogol/nebula/types";
+import { NEBULA_WEIGHTS, NEBULA_WEIGHTS_VERSION } from "@warpgogol/nebula/weights";
+import { computeNebulaScore, toPassportScores } from "@warpgogol/nebula/compute";
+import { collectNebulaInputs } from "@warpgogol/nebula/collect";
+import type { NebulaInputs, NebulaScore } from "@warpgogol/nebula/types";
 ```
 
 ## Testing
 
 ```sh
-pnpm --filter @gogol/nebula test
+pnpm --filter @warpgogol/nebula test
 ```
 
 24 vitest tests cover derive functions, composite scoring, stub inputs, passport projection, and weights invariant.
@@ -102,5 +102,5 @@ pnpm --filter @gogol/nebula test
 ## Validation
 
 ```sh
-pnpm --filter @gogol/nebula build:check
+pnpm --filter @warpgogol/nebula build:check
 ```

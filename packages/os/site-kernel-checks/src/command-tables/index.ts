@@ -35,7 +35,7 @@ import { FLEET_BORDBUCH_COMMANDS } from "./fleet-bordbuch.ts";
 import { PSEO_GOVERNANCE_COMMANDS } from "./26-pseo-governance.ts";
 import { PSEO_VISIBILITY_BREAKER_COMMANDS } from "./27-pseo-visibility-breaker.ts";
 import { AGENT_SURFACE_COMMANDS } from "./29-agent-surface.ts";
-import { CHECK_WEBGOGOL_COMMANDS } from "./30-check-webgogol.ts";
+import { CHECK_WEBGOGOL_COMMANDS } from "./30-check-warpgogol.ts";
 import { PUBLIC_SURFACE_COMMANDS } from "./31-public-surface.ts";
 import { ANALYTICS_MATOMO_COMMANDS } from "./32-analytics-matomo.ts";
 import { INFRA_CONTRACTS_COMMANDS } from "./infra-contracts.ts";

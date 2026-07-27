@@ -7,7 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0356: initial mission.materialize command handler.</item>
-  <item>RFC-0389: replace minimal inline stubs with full boilerplate generation using @gogol/site-kernel-codegen generators and @gogol/site-kernel-onboarding templates.</item>
+  <item>RFC-0389: replace minimal inline stubs with full boilerplate generation using @warpgogol/site-kernel-codegen generators and @warpgogol/site-kernel-onboarding templates.</item>
   <item>RFC-0388: generate .env.example via env.example.generate and copy to .env.main/.env.alt (DNA-40 env-and-deploy contract).</item>
   <item>RFC-0480: add paused status guard; init git in workpiece and commit materialized state.</item>
   <item>RFC-0517: add preflight content quality gate between atomicMoveDir and git init.</item>
@@ -25,8 +25,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { runKernelWire, executeKernelCommand, executeKernelPipeline } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { runKernelWire, executeKernelCommand, executeKernelPipeline } from "@warpgogol/site-kernel";
 import { readRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import {
   runGenerateAgentsDocs,
@@ -39,18 +39,18 @@ import {
   runGenerateScriptsOrchestrator,
   runFontsImportsGenerate,
   runBiomeCssGenerate,
-} from "@gogol/site-kernel-codegen";
-import { applyTokens, readTemplate, readRuntimeTemplate } from "@gogol/site-kernel-onboarding";
+} from "@warpgogol/site-kernel-codegen";
+import { applyTokens, readTemplate, readRuntimeTemplate } from "@warpgogol/site-kernel-onboarding";
 import {
   runEnvExampleGenerate,
   MISSION_PREFLIGHT_CRITICAL,
   MISSION_PREFLIGHT_WARNING,
-} from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel-checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
-import type { KernelPipelineStep } from "@gogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 
 export interface MissionMaterializeData {
   missionId: string;
@@ -716,9 +716,9 @@ export async function runMissionMaterialize(
       env: {
         ...process.env,
         GIT_AUTHOR_NAME: "mission.materialize",
-        GIT_AUTHOR_EMAIL: "mission@wgogol.local",
+        GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
         GIT_COMMITTER_NAME: "mission.materialize",
-        GIT_COMMITTER_EMAIL: "mission@wgogol.local",
+        GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
       },
     });
     logger.info(`  Git initialized in workpiece with initial commit`);

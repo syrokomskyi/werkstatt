@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import type { SystemManifest } from "@gogol/site-kernel-content";
+import type { SystemManifest } from "@warpgogol/site-kernel-content";
 import { buildCosmicPageMetadata } from "../app-boilerplate-helpers.ts";
 
 /*
@@ -29,14 +29,14 @@ const TAGLINE = "Website, die gefunden wird und Ihrem Betrieb gehört";
 
 function makeManifest(overrides?: Partial<SystemManifest>): SystemManifest {
   return {
-    app: "webgogol-com",
+    app: "warpgogol-com",
     i18n: {
       default: "de",
       supported: { de: {}, uk: {} },
     },
     identity: {
       tagline: TAGLINE,
-      domain: "webgogol.com",
+      domain: "warpgogol.com",
       biome: "handwerk-material-warm",
     },
     release: {
@@ -60,8 +60,8 @@ test("non-DE cosmic pages use manifest.app as brand", () => {
   const manifest = makeManifest();
   const uk = buildCosmicPageMetadata(manifest, "uk");
 
-  expect(uk.passportTitle).toContain("webgogol-com");
-  expect(uk.starMapTitle).toContain("webgogol-com");
+  expect(uk.passportTitle).toContain("warpgogol-com");
+  expect(uk.starMapTitle).toContain("warpgogol-com");
 });
 
 test("DE cosmic pages retain the tagline-derived brand", () => {
@@ -76,12 +76,12 @@ test("DE cosmic pages retain the tagline-derived brand", () => {
 
 test("falls back to manifest.app when tagline is absent", () => {
   const manifest = makeManifest({
-    identity: { domain: "webgogol.com", biome: "handwerk-material-warm" },
+    identity: { domain: "warpgogol.com", biome: "handwerk-material-warm" },
   } as unknown as Partial<SystemManifest>);
 
   const de = buildCosmicPageMetadata(manifest, "de");
-  expect(de.passportTitle).toContain("webgogol-com");
-  expect(de.starMapTitle).toContain("webgogol-com");
+  expect(de.passportTitle).toContain("warpgogol-com");
+  expect(de.starMapTitle).toContain("warpgogol-com");
 });
 
 test("non-DE and DE metadata differ when tagline is present", () => {

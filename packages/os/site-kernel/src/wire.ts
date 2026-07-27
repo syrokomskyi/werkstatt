@@ -16,7 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "./types.ts";
 import { discoverSiteWorkspaces } from "./discovery.ts";
-import { loadSystemManifestSync } from "@gogol/site-kernel-content";
+import { loadSystemManifestSync } from "@warpgogol/site-kernel-content";
 import { buildGeneratedHeader, hasGeneratedMarker } from "./generated-marker.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -121,19 +121,19 @@ function buildModuleDecisions(
     { key: "deploy", include: true },
     {
       key: "integrity",
-      include: passportEnabled || hasPackage(packageJson, "@gogol/site-kernel-integrity"),
+      include: passportEnabled || hasPackage(packageJson, "@warpgogol/site-kernel-integrity"),
       reason: passportEnabled
         ? undefined
         : "passport disabled and integrity package not required by manifest",
     },
     {
       key: "changelog",
-      include: hasPackage(packageJson, "@gogol/site-kernel-changelog"),
+      include: hasPackage(packageJson, "@warpgogol/site-kernel-changelog"),
       reason: "changelog package not installed",
     },
     {
       key: "onboarding",
-      include: hasPackage(packageJson, "@gogol/site-kernel-onboarding"),
+      include: hasPackage(packageJson, "@warpgogol/site-kernel-onboarding"),
       reason: "onboarding package not installed",
     },
     {
@@ -315,7 +315,7 @@ export async function runKernelWire(
     },
     {
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "service.ts"),
-      content: buildRuntimeReExport(manifest.app, "@gogol/site-kernel-codegen", [
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-codegen", [
         "runGenerateIcons",
         "runCleanIcons",
         "runGenerateOpenSourcePage",
@@ -323,7 +323,7 @@ export async function runKernelWire(
     },
     {
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "client-export.ts"),
-      content: buildRuntimeReExport(manifest.app, "@gogol/site-kernel-deploy", ["runClientExport"]),
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-deploy", ["runClientExport"]),
     },
   ];
 
@@ -334,7 +334,7 @@ export async function runKernelWire(
     });
     files.push({
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "integrity.ts"),
-      content: buildRuntimeReExport(manifest.app, "@gogol/site-kernel-integrity", [
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-integrity", [
         "runIntegrityInit",
         "runIntegrityUpdate",
         "runIntegrityVerify",
@@ -354,7 +354,7 @@ export async function runKernelWire(
     });
     files.push({
       absolutePath: path.join(paths.appDirectory, "tools", "runtime", "changelog.ts"),
-      content: buildRuntimeReExport(manifest.app, "@gogol/site-kernel-changelog", [
+      content: buildRuntimeReExport(manifest.app, "@warpgogol/site-kernel-changelog", [
         "runChangelogGenerate",
         "runChangelogRebuildIndex",
         "runChangelogBackfill",

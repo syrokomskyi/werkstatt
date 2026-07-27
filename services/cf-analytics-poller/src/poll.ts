@@ -68,7 +68,7 @@ export function transformZoneResponse(
 
     if (requests > 0) {
       points.push({
-        metric: "wgogol_delivery_requests_total",
+        metric: "warpgogol_delivery_requests_total",
         labels: { site_id: siteId, cache_status: cacheStatus, status_class: statusClass },
         value: requests,
       });
@@ -76,7 +76,7 @@ export function transformZoneResponse(
 
     if (bytes > 0) {
       points.push({
-        metric: "wgogol_delivery_bytes_total",
+        metric: "warpgogol_delivery_bytes_total",
         labels: { site_id: siteId },
         value: bytes,
       });
@@ -110,7 +110,7 @@ export function transformWorkersResponse(
 
     if (requests > 0) {
       points.push({
-        metric: "wgogol_workers_requests_total",
+        metric: "warpgogol_workers_requests_total",
         labels: { site_id: siteId },
         value: requests,
       });
@@ -118,7 +118,7 @@ export function transformWorkersResponse(
 
     if (errors > 0) {
       points.push({
-        metric: "wgogol_workers_errors_total",
+        metric: "warpgogol_workers_errors_total",
         labels: { site_id: siteId },
         value: errors,
       });

@@ -16,14 +16,14 @@ print.pdf.validate verifies that all expected PDFs exist and are non-empty.
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandResult, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import { writeFile, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { createServer } from "node:http";
-import { loadSystemManifest, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
-import type { PrintPdfGenerateResult } from "@gogol/share/schemas/print";
+import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import type { PrintPdfGenerateResult } from "@warpgogol/share/schemas/print";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
 // ---------------------------------------------------------------------------

@@ -35,10 +35,10 @@ commands:
     - surface.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
-  - "@gogol/surface"
-  - "@gogol/site-kernel-checks"
+  - "@warpgogol/surface"
+  - "@warpgogol/site-kernel-checks"
 successSignals:
   - "Route count, indexable estimate, artifact byte size, and language coverage are visible before Astro SSG starts, not after."
   - "Cardinality warnings fire above 10,000 candidate public pages per site unless a high-cardinality experiment is explicitly declared."
@@ -88,8 +88,8 @@ Additionally, `surface.generate` is changed to call `surface.plan.generate` inte
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.plan.generate --app webgogol-com --json
-pnpm exec site-kernel run surface.plan.generate --app webgogol-com
+pnpm exec site-kernel run surface.plan.generate --app warpgogol-com --json
+pnpm exec site-kernel run surface.plan.generate --app warpgogol-com
 ```
 
 The command is app-scoped. It runs the expansion pipeline (blueprint discovery, dataset loading, eligibility matrix, evidence gates, dedup) but stops before `bakePage`. No artifact is written. No twins are written. No lazy cache is written.
@@ -158,7 +158,7 @@ The `--preview` flag on `surface.generate` skips this check and proceeds with ba
 ```json
 {
   "command": "surface.plan.generate",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "blueprints": [
     {
       "id": "website-local",
@@ -247,7 +247,7 @@ RFC-0275 is superseded by this RFC. Each acceptance criterion of RFC-0275 is res
 
 ## Acceptance criteria
 
-- [ ] `surface.plan.generate` command registered in `@gogol/site-kernel-checks` with correct name and scope.
+- [ ] `surface.plan.generate` command registered in `@warpgogol/site-kernel-checks` with correct name and scope.
 - [ ] Command runs expansion without baking or writing artifacts.
 - [ ] Report includes per-blueprint: candidate prefixes, indexable estimate, languages, estimated artifact bytes, warnings.
 - [ ] Report includes totals: total candidates, total indexable, total estimated bytes.

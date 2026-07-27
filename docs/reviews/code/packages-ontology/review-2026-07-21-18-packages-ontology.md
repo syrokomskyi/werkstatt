@@ -18,7 +18,7 @@ The diff is a minimal, well-documented single-line removal of a noisy `console.d
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/ontology build:check` exit 0; `pnpm --filter @gogol/ontology test` 40/40 passed.
+Pass — `pnpm --filter @warpgogol/ontology build:check` exit 0; `pnpm --filter @warpgogol/ontology test` 40/40 passed.
 
 ### Axis A — Structural correctness
 

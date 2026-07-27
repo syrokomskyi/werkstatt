@@ -4,7 +4,7 @@
   RFC-0375: generated.files.validate — checks that every registry-declared
   generated file in GENERATOR_OWNERSHIP_MAP exists on disk. Covers both
   Category A (embedded) and Category B (registry-only). Expands glob patterns
-  via collectFiles from @gogol/share/fs.
+  via collectFiles from @warpgogol/share/fs.
 </purpose>
 <non-goals>
   <item>Do not check marker presence — use generated.marker.validate for that.</item>
@@ -23,8 +23,8 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
   WorkspaceIO,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 

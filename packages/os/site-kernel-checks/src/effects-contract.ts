@@ -3,24 +3,24 @@
 <purpose>Implements RFC-0156 effects.contract.validate and effects.coverage.audit — the
 discrete, scriptable validators RFC-0134/RFC-0151 specified for the composable effects system.</purpose>
 <non-goals>
-  <item>Do not redefine the effects contract or the target×kind matrix — @gogol/share owns it.</item>
+  <item>Do not redefine the effects contract or the target×kind matrix — @warpgogol/share owns it.</item>
   <item>Do not replace effectAssignmentSchema.superRefine in content.validate; this complements it.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0156: introduce effects.contract.validate + effects.coverage.audit reusing the @gogol/share effect schema.</item>
+  <item>RFC-0156: introduce effects.contract.validate + effects.coverage.audit reusing the @warpgogol/share effect schema.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { effectAssignmentSchema } from "@gogol/share/schemas/effects";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { effectAssignmentSchema } from "@warpgogol/share/schemas/effects";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 import {
   collectMarkdownFilesSafe,

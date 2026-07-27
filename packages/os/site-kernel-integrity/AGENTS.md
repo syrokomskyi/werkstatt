@@ -4,7 +4,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 ## Package role
 
-- `@gogol/site-kernel-integrity` is the framework-free integrity tracking library for the site OS.
+- `@warpgogol/site-kernel-integrity` is the framework-free integrity tracking library for the site OS.
 - It provides file hash tracking, entity registry management, build artifact recording, Ed25519 signing, and release verification.
 - Any app in `apps/*` that needs integrity tracking imports from this package and registers commands via `tools/modules/integrity.module.ts`.
 
@@ -22,7 +22,7 @@ The package exports via `src/index.ts`:
 ## Core boundaries
 
 - Keep this package framework-free and Node.js-only.
-- Do not import from `@gogol/site-kernel` or any Astro package.
+- Do not import from `@warpgogol/site-kernel` or any Astro package.
 - Internal modules are not part of the public API — only `src/index.ts` exports are stable.
 - The `.integrity/` directory layout is defined by `src/paths.ts` — do not scatter path constants across modules.
 
@@ -34,4 +34,4 @@ The package exports via `src/index.ts`:
 
 ## Validation
 
-- Run `pnpm --filter @gogol/site-kernel-integrity build:check` after API or type changes.
+- Run `pnpm --filter @warpgogol/site-kernel-integrity build:check` after API or type changes.

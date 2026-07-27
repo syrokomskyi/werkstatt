@@ -13,7 +13,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
-import type { SystemPin } from "@gogol/ontology/operations";
+import type { SystemPin } from "@warpgogol/ontology/operations";
 
 export async function highestRfcId(workspaceRoot: string): Promise<string> {
   try {

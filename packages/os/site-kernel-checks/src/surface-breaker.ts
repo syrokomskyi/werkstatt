@@ -13,7 +13,7 @@
 import { existsSync } from "node:fs";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { writeFileIfChanged, executeKernelCommand } from "@gogol/site-kernel";
+import { writeFileIfChanged, executeKernelCommand } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   CheckResult,
@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   breakerVerdictSchema,
   surfaceStateSchema,
@@ -30,7 +30,7 @@ import {
   type ClusterOutcome,
   type SurfaceState,
   type Tripwire,
-} from "@gogol/surface";
+} from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { runAutonomyDemote, runEscalationRoute } from "./pseo/pseo-governance.ts";
 import { readVisibilityOutcomes } from "./pseo/pseo-visibility.ts";

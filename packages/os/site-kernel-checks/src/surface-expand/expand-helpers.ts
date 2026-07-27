@@ -20,8 +20,8 @@ import {
   type Blueprint,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@gogol/surface";
-import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+} from "@warpgogol/surface";
+import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 
 export interface DatasetEntry {
   slug: string;

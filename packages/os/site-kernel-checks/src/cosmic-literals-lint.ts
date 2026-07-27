@@ -4,7 +4,7 @@
 cosmic.literals.lint — RFC-0263: fails when any name from the Star/Planet/Moon
 cosmic catalogs appears as a quoted string literal in packages/share/src/**.
 The dispatch layer (buildPage and its neighbors) must derive cosmic-name-keyed
-behavior from the archetype registry (@gogol/ontology/archetypes), never from
+behavior from the archetype registry (@warpgogol/ontology/archetypes), never from
 literals hardcoded in dispatch code — see roleByCosmicName replacing the old
 UNNUMBERED_HERO_PLANETS set.
 </purpose>
@@ -20,16 +20,16 @@ UNNUMBERED_HERO_PLANETS set.
 
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { StarCatalog, PlanetCatalog, MoonCatalog } from "@gogol/ontology/cosmic";
+import { StarCatalog, PlanetCatalog, MoonCatalog } from "@warpgogol/ontology/cosmic";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const IGNORE_MARKER = "cosmic-literals-ignore";
 
@@ -107,7 +107,7 @@ export async function runCosmicLiteralsLint(
         line: hit.line,
         message: `Cosmic-catalog name "${hit.name}" (${hit.catalog}) appears as a string literal — dispatch code must derive cosmic-name-keyed behavior from the archetype registry.`,
         fixHint:
-          `Replace the literal with a lookup against @gogol/ontology/archetypes (e.g. roleByCosmicName["${hit.name}"]), ` +
+          `Replace the literal with a lookup against @warpgogol/ontology/archetypes (e.g. roleByCosmicName["${hit.name}"]), ` +
           `or add a trailing "// ${IGNORE_MARKER}: <reason>" comment if the literal is unavoidable.`,
         data: { name: hit.name, catalog: hit.catalog },
       });

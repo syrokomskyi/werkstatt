@@ -13,12 +13,12 @@
 
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import { parse as yamlParse } from "yaml";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { localizeUrl } from "@gogol/share/url-policy";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { localizeUrl } from "@warpgogol/share/url-policy";
 import { defaultLanguageFromManifest } from "../lib/i18n.ts";
-import type { KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
 import {
   auditLlmCacheEntrySchema,
   auditResultSchema,

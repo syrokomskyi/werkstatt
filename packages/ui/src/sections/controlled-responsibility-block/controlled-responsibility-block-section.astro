@@ -16,11 +16,11 @@
 
 /* RFC-0103: controlled-responsibility-block thin dispatcher — split-list body. */
 
-import type { SectionProps } from "@gogol/share/page";
-import { cast, need, resolveSectionAnchor } from "@gogol/share";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import SectionSplitList from "@gogol/ui/components/section-body/split-list.astro";
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@warpgogol/share";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import SectionSplitList from "@warpgogol/ui/components/section-body/split-list.astro";
 import type { ControlledResponsibilityBlockSectionContent } from "./controlled-responsibility-block-section.types.generated.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;

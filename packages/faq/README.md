@@ -1,4 +1,4 @@
-# @gogol/faq
+# @warpgogol/faq
 
 Pluggable FAQ content collection package (RFC-0475).
 
@@ -13,7 +13,7 @@ Pluggable FAQ content collection package (RFC-0475).
 ## Usage
 
 ```typescript
-import { createFaqCollection } from "@gogol/faq/astro";
+import { createFaqCollection } from "@warpgogol/faq/astro";
 
 const faq = createFaqCollection();
 

@@ -47,7 +47,7 @@ meta:
       hash: d5131cf85f2ddc77a6515a8af60612f93d49ecfbfd1e59aff7ad5665f04feaf0
     - path: packages/os/site-kernel-checks/src/command-tables/29-agent-surface.ts
       hash: 99d3a8e6ae25721aaa5dbab7e969c973ba3cb40fd04833879b7294e0f3fcd24e
-    - path: packages/os/site-kernel-checks/src/command-tables/30-check-webgogol.ts
+    - path: packages/os/site-kernel-checks/src/command-tables/30-check-warpgogol.ts
       hash: 7ee29c8051ddc4e8bde0fc8fac6a670368e2e658054b2d7245755ae4331c9082
     - path: packages/os/site-kernel-checks/src/command-tables/31-public-surface.ts
       hash: 9fa594c0b3fe08d578fa5a79e96e9c1dd4b14989017b7c956e1e9edb24d39f10
@@ -963,7 +963,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: check-webgogol.app.validate
+  - command: check-warpgogol.app.validate
     severity: null
     phase: null
     pipelines: []
@@ -973,7 +973,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: check-webgogol.runner.validate
+  - command: check-warpgogol.runner.validate
     severity: null
     phase: null
     pipelines: []
@@ -6546,7 +6546,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: webgogol.check-hints.generate
+  - command: warpgogol.check-hints.generate
     severity: null
     phase: null
     pipelines: []
@@ -6556,7 +6556,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: webgogol.check-hints.validate
+  - command: warpgogol.check-hints.validate
     severity: null
     phase: null
     pipelines: []

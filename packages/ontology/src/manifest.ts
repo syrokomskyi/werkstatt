@@ -12,7 +12,7 @@ Exports a discriminated union on `layer` so TypeScript narrows the `role` and
         the parsed object to manifestSchema.parse().</item>
   <item>Do not hard-code file paths. The schema is path-agnostic.</item>
   <item>Do not add business-shaped fields (company, services, etc.) — those
-        belong in @gogol/pbp schemas (RFC-0024, RFC-0471).</item>
+        belong in @warpgogol/pbp schemas (RFC-0024, RFC-0471).</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -157,7 +157,7 @@ const manifestBaseSchema = z.object({
 
   /**
    * Key of the Zod content schema this component consumes.
-   * Must match an export of @gogol/share or the app-local content/schemas/.
+   * Must match an export of @warpgogol/share or the app-local content/schemas/.
    * Set to null for structural components that consume no content schema
    * (e.g. breadcrumbs, lang-switcher).
    */
@@ -312,7 +312,7 @@ export const componentManifestSchema = manifestBaseSchema.extend({
  * This is the authoritative runtime validator for any parsed manifest.yaml.
  *
  * Usage:
- *   import { manifestSchema } from "@gogol/ontology/manifest";
+ *   import { manifestSchema } from "@warpgogol/ontology/manifest";
  *   const manifest = manifestSchema.parse(parsedYaml);
  *   // manifest.layer narrows to "page" | "section" | "component"
  *   // manifest.role narrows accordingly

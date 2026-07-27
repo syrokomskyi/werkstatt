@@ -1,4 +1,4 @@
-# `@gogol/chat-adapter-uchat` — Agent Guide
+# `@warpgogol/chat-adapter-uchat` — Agent Guide
 
 UChat implementation of `ChatWidgetAdapter` (RFC-0175).
 
@@ -17,7 +17,7 @@ UChat implementation of `ChatWidgetAdapter` (RFC-0175).
 - Do NOT load anything at import time — all injection happens inside `load()`.
 - The `widgetId` option is a **public client token**, never a secret.
 - Required option: `widgetId` (the public UChat web-widget id). Optional: `scriptUrl` (override for non-default UChat deployments).
-- The adapter id is `"uchat"` and is registered in `CHAT_ADAPTER_IDS` in `@gogol/chat/port`.
+- The adapter id is `"uchat"` and is registered in `CHAT_ADAPTER_IDS` in `@warpgogol/chat/port`.
 
 ## Script URL resolution
 
@@ -28,5 +28,5 @@ Override via `options.scriptUrl` for custom UChat deployments.
 ## Validation
 
 ```sh
-pnpm --filter @gogol/chat-adapter-uchat build:check
+pnpm --filter @warpgogol/chat-adapter-uchat build:check
 ```

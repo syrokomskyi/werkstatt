@@ -1,11 +1,11 @@
 kind: analytics-messkanon
-id: wgogol-messkanon
+id: warpgogol-messkanon
 version: 1.0.0
 rfc: RFC-0305
 
 meta:
-  title: WGogol Messkanon
-  description: Tool-independent analytics vocabulary for thin WGogol sites.
+  title: Warpgogol Messkanon
+  description: Tool-independent analytics vocabulary for thin Warpgogol sites.
   status: active
   changelog:
     - version: 1.0.0

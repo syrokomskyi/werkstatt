@@ -19,7 +19,7 @@ copied verbatim (AGO-04 enforces this).
 */
 
 import type { AgentSurfaceManifest } from "./manifest.ts";
-import type { CapabilityInputOutputSchema } from "@gogol/ontology";
+import type { CapabilityInputOutputSchema } from "@warpgogol/ontology";
 
 export interface OpenApiSchemaObject {
   type: string;

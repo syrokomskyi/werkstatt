@@ -2,9 +2,9 @@
 <MODULE_CONTRACT>
 <purpose>
 [RFC-0100 + RFC-0103] Canonical StandardListItem schema mirrored in
-@gogol/share so body components can validate items without importing from
-@gogol/ui (which would create a cyclic dependency). The same shape is
-re-exported by @gogol/ui/icons/icon-resolver for backwards compatibility.
+@warpgogol/share so body components can validate items without importing from
+@warpgogol/ui (which would create a cyclic dependency). The same shape is
+re-exported by @warpgogol/ui/icons/icon-resolver for backwards compatibility.
 </purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>

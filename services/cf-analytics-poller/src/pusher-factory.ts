@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Encapsulate OTLP pusher resource identity for the CF analytics poller (RFC-0343).</purpose>
 <non-goals>
-  <item>Do not define metric specs, label keys, or flush logic — those live in @gogol/observability.</item>
+  <item>Do not define metric specs, label keys, or flush logic — those live in @warpgogol/observability.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { createMetricsPusher } from "@gogol/observability";
+import { createMetricsPusher } from "@warpgogol/observability";
 
 export function createPollerPusher() {
   return createMetricsPusher({

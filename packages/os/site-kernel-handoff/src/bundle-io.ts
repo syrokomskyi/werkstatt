@@ -21,9 +21,9 @@ import {
   handoffManifestSchema,
   type HandoffLock,
   type HandoffManifest,
-} from "@gogol/ontology/operations";
-import { byteHash } from "@gogol/fingerprint";
-import { fingerprintTree } from "@gogol/fingerprint/semantic";
+} from "@warpgogol/ontology/operations";
+import { byteHash } from "@warpgogol/fingerprint";
+import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
 import type { RegistryView } from "./types.ts";
 import type { ValidationPack } from "./validation-pack.ts";
 
@@ -104,7 +104,7 @@ export async function resolvePackagesHash(workspaceRoot: string): Promise<string
 /**
  * RFC-0364: Semantic fingerprint of the recipient's platform tree.
  *
- * Uses @gogol/fingerprint to produce a parser-backed semantic hash that is
+ * Uses @warpgogol/fingerprint to produce a parser-backed semantic hash that is
  * invariant under formatting-only and comment-only changes. This is the
  * platform drift signal for new Sternsystem/release surfaces.
  *

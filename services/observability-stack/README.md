@@ -27,8 +27,8 @@ services/observability-stack/
 1. Go to Cloudflare Dashboard → Workers & Pages → Observability → Traces → Destinations
 2. Create a new destination named `signoz`:
    - Type: Traces
-   - OTLP endpoint: `https://ingest.observe.webgogol.com/v1/traces`
-   - Custom header: `Authorization: Bearer <WGOGOL_OTLP_TOKEN>`
+   - OTLP endpoint: `https://ingest.observe.warpgogol.com/v1/traces`
+   - Custom header: `Authorization: Bearer <WARPGOGOL_OTLP_TOKEN>`
 3. This is a one-time account-level setup; all Workers reference it by name in their wrangler `observability.traces.destinations`.
 4. After deploying Workers, verify traces appear in SigNoz Services filtered by `service.name`.
 
@@ -39,7 +39,7 @@ services/observability-stack/
 - Hetzner Cloud CPX31 (4 vCPU, 8 GB RAM, 160 GB SSD), location `fsn1` or `nbg1`
 - Ubuntu 24.04 LTS
 - Firewall: inbound 22 (SSH, key-only), 80 (ACME), 443 only
-- DNS: A records for `observe.webgogol.com` and `ingest.observe.webgogol.com` → VPS IP (DNS-only, grey-cloud)
+- DNS: A records for `observe.warpgogol.com` and `ingest.observe.warpgogol.com` → VPS IP (DNS-only, grey-cloud)
 
 ### 2. Install runtime
 
@@ -59,7 +59,7 @@ chmod +x /usr/local/bin/foundryctl
 git clone <repo> /opt/observability
 cd /opt/observability/services/observability-stack
 cp .env.example .env
-# Fill .env: WGOGOL_OTLP_TOKEN (openssl rand -hex 32), SMTP, RESTIC_*
+# Fill .env: WARPGOGOL_OTLP_TOKEN (openssl rand -hex 32), SMTP, RESTIC_*
 
 # Cast SigNoz
 foundryctl cast -f casting.yaml
@@ -75,7 +75,7 @@ docker compose -f compose.extra.yaml up -d
 
 ### 4. Post-install
 
-1. Create SigNoz admin account at `https://observe.webgogol.com`
+1. Create SigNoz admin account at `https://observe.warpgogol.com`
 2. Set retention: traces **15d**, metrics **30d**, logs **7d** (SigNoz settings)
 3. Configure SMTP (SigNoz settings → Notification channels)
 4. Enable nightly backup: `crontab -e` → `0 3 * * * /opt/observability/services/observability-stack/scripts/backup.sh`
@@ -107,7 +107,7 @@ docker compose -f compose.extra.yaml up -d
 ## Rotate token runbook
 
 1. Generate new token: `openssl rand -hex 32`
-2. Update `.env` on the VPS: `WGOGOL_OTLP_TOKEN=<new>`
+2. Update `.env` on the VPS: `WARPGOGOL_OTLP_TOKEN=<new>`
 3. Restart Caddy: `docker compose -f compose.extra.yaml restart caddy`
 4. Update the token in all emitter environments (CI, workers, probe runner, poller)
 5. Run `observability.stack.health` to verify the new token works

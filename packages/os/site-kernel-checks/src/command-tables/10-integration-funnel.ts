@@ -86,7 +86,7 @@ export const INTEGRATION_FUNNEL_COMMANDS: CheckCommandEntry[] = [
   {
     name: "funnel.copy.validate",
     description:
-      "Validate localized funnel copy: required locale coverage (de+uk for webgogol-com), cross-locale file parity, and no retired 39 € tariff copy. No-op pass when no src/content/funnel/ domain exists (RFC-0188).",
+      "Validate localized funnel copy: required locale coverage (de+uk for warpgogol-com), cross-locale file parity, and no retired 39 € tariff copy. No-op pass when no src/content/funnel/ domain exists (RFC-0188).",
     scope: "app",
     flags: {},
     supportsAllSites: true,
@@ -175,7 +175,7 @@ export const INTEGRATION_FUNNEL_COMMANDS: CheckCommandEntry[] = [
   {
     name: "chat.metadata.drift.validate",
     description:
-      "Workspace-scoped drift guard: verify CHAT_ADAPTER_METADATA in @gogol/chat matches the requiredOptions/vendorOrigins declared on each ChatWidgetAdapter in chat-adapter-* packages.",
+      "Workspace-scoped drift guard: verify CHAT_ADAPTER_METADATA in @warpgogol/chat matches the requiredOptions/vendorOrigins declared on each ChatWidgetAdapter in chat-adapter-* packages.",
     scope: "workspace",
     flags: {},
     reads: ["packages/chat/src/**/*.ts", "packages/chat-adapter-*/src/**/*.ts"],

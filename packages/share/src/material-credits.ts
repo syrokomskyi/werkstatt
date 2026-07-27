@@ -7,7 +7,7 @@
 </purpose>
 <non-goals>
   <item>Do not scan the filesystem; callers supply raw sidecar maps.</item>
-  <item>Do not render UI; @gogol/ui owns presentation.</item>
+  <item>Do not render UI; @warpgogol/ui owns presentation.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -33,7 +33,7 @@ import {
   labelForUsageBasis,
 } from "./schemas/material-credit.ts";
 
-// RFC-0488: re-export label mapping helpers for @gogol/share/material-credits consumers.
+// RFC-0488: re-export label mapping helpers for @warpgogol/share/material-credits consumers.
 export {
   labelForSourceType,
   labelForStatus,

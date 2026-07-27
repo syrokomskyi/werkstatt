@@ -19,13 +19,13 @@
 /**
  * PassportProvenance (Bianca) — Build provenance display moon
  *
- * Reads passport.json at build time via @gogol/passport/data and displays:
+ * Reads passport.json at build time via @warpgogol/passport/data and displays:
  * commit SHA, build timestamp, builder identity, and optionally the VC proof.
  *
  * RFC-0028 / DNA-31 / DNA-34 / Bianca (Uranus minor moon)
  */
 
-import { loadPassportData } from "@gogol/passport/data";
+import { loadPassportData } from "@warpgogol/passport/data";
 import "./passport-provenance-component.css";
 
 interface Props {

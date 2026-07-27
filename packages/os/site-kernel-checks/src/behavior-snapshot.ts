@@ -22,8 +22,8 @@ review instead of shipping silently.
 import { createHash } from "node:crypto";
 import { readFile, mkdir } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { fileExists, collectFiles } from "@gogol/share/fs";
-import { markdownTwinRelPath } from "@gogol/share/semantic";
+import { fileExists, collectFiles } from "@warpgogol/share/fs";
+import { markdownTwinRelPath } from "@warpgogol/share/semantic";
 import {
   GENERATED_MARKER,
   hasGeneratedMarker,
@@ -34,9 +34,9 @@ import {
   type KernelCommandResult,
   type KernelRuntimeContext,
   buildGeneratedHeader,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 export interface RouteBehavior {

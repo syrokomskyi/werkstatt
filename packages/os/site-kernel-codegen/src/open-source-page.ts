@@ -2,8 +2,8 @@
 <MODULE_CONTRACT>
 <purpose>Open-source page generator: deployment-specific SBOM registry with i18n, SPDX normalization, CycloneDX SBOM, and downloadable artifacts.</purpose>
 <non-goals>
-  <item>Does not validate the generated output — that lives in @gogol/site-kernel-checks.</item>
-  <item>Does not render UI — the UI section in @gogol/ui handles structured rendering.</item>
+  <item>Does not validate the generated output — that lives in @warpgogol/site-kernel-checks.</item>
+  <item>Does not render UI — the UI section in @warpgogol/ui handles structured rendering.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -24,8 +24,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { GENERATED_MARKER, hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -445,19 +445,19 @@ export function buildCycloneDxSbom(
         metadata.buildTimestamp !== "—" ? metadata.buildTimestamp : new Date().toISOString(),
       tools: [
         {
-          vendor: "Webgogol",
+          vendor: "Warpgogol",
           name: "open-source.generate",
           version: "1.0.0",
         },
       ],
       component: {
         type: "application",
-        name: "webgogol-site",
+        name: "warpgogol-site",
         version: metadata.deploymentId !== "—" ? metadata.deploymentId : "dev",
       },
       properties: [
-        { name: "wgogol:commitSha", value: metadata.commitSha },
-        { name: "wgogol:targetPlatform", value: metadata.targetPlatform },
+        { name: "warpgogol:commitSha", value: metadata.commitSha },
+        { name: "warpgogol:targetPlatform", value: metadata.targetPlatform },
       ],
     },
     components: components.map((c) => ({
@@ -468,8 +468,8 @@ export function buildCycloneDxSbom(
       licenses: c.licenses.map((l) => ({ expression: l })),
       scope: c.scope,
       properties: [
-        { name: "wgogol:relationship", value: c.relationship },
-        { name: "wgogol:distributionScope", value: c.scope },
+        { name: "warpgogol:relationship", value: c.relationship },
+        { name: "warpgogol:distributionScope", value: c.scope },
       ],
     })),
   };
@@ -701,7 +701,7 @@ export async function runGenerateOpenSourcePage(
   const fingerprintCacheFile = path.join(cacheDir, "open-source.fingerprint");
 
   // Load system manifest and guard with hasSystemPage
-  const { loadI18nConfigSync, loadSystemManifestSync } = await import("@gogol/site-kernel-content");
+  const { loadI18nConfigSync, loadSystemManifestSync } = await import("@warpgogol/site-kernel-content");
   const system = loadSystemManifestSync(paths.contentDirectory).manifest;
 
   if (!hasSystemPage(system, "openSource")) {
@@ -771,7 +771,7 @@ export async function runGenerateOpenSourcePage(
   }
 
   // Run pnpm licenses and @quantco/pnpm-licenses
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "webgogol-open-source-"));
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "warpgogol-open-source-"));
   const pnpmLicensesJsonPath = path.join(tmpDir, "pnpm-licenses.json");
   const listJsonPath = path.join(tmpDir, "dependencies.json");
   const disclaimerPath = path.join(tmpDir, "third-party-licenses.txt");

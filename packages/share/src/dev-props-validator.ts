@@ -23,7 +23,7 @@ never crash rendering for a reason unrelated to the author's actual props.
 
 import { stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { getSectionPropsSchema } from "@gogol/ontology/schemas";
+import { getSectionPropsSchema } from "@warpgogol/ontology/schemas";
 import Ajv, { type ValidateFunction } from "ajv";
 
 const ajv = new Ajv({ allErrors: true, strict: false });

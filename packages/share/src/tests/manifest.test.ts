@@ -20,14 +20,14 @@ import {
 } from "../agent/manifest.ts";
 
 const baseInput = {
-  site: "webgogol-com",
-  baseUrl: "https://webgogol.com/",
+  site: "warpgogol-com",
+  baseUrl: "https://warpgogol.com/",
   languages: { default: "de", supported: ["uk", "de"] },
 };
 
 test("buildAgentSurfaceManifest: strips trailing slash and sorts supported languages", () => {
   const m = buildAgentSurfaceManifest(baseInput);
-  expect(m.baseUrl).toBe("https://webgogol.com");
+  expect(m.baseUrl).toBe("https://warpgogol.com");
   expect(m.languages.supported).toEqual(["de", "uk"]);
 });
 

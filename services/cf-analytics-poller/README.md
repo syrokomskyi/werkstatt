@@ -1,6 +1,6 @@
 # cf-analytics-poller
 
-Scheduled Cloudflare analytics poller (RFC-0343). Polls the Cloudflare GraphQL Analytics API every 5 minutes and pushes `wgogol_delivery_*` / `wgogol_workers_*` metrics to the observability backend.
+Scheduled Cloudflare analytics poller (RFC-0343). Polls the Cloudflare GraphQL Analytics API every 5 minutes and pushes `warpgogol_delivery_*` / `warpgogol_workers_*` metrics to the observability backend.
 
 ## How it works
 
@@ -8,7 +8,7 @@ Scheduled Cloudflare analytics poller (RFC-0343). Polls the Cloudflare GraphQL A
 2. Queries the Cloudflare GraphQL Analytics API for the settled window `[now-10m, now-5m)`
 3. Transforms the GraphQL responses into metric points (pure function, unit-tested)
 4. Persists the watermark before flushing to prevent double-push
-5. Pushes metrics through the `@gogol/observability` port
+5. Pushes metrics through the `@warpgogol/observability` port
 
 ## Configuration
 
@@ -19,10 +19,10 @@ See [.env.example](./.env.example) for all required and optional environment var
 Authored in `zones.yaml`:
 
 ```yaml
-- siteId: webgogol-com
+- siteId: warpgogol-com
   zoneId: <cloudflare zone id>
   workerScripts:
-    - webgogol-com
+    - warpgogol-com
 ```
 
 Validated by `observability.delivery.validate` (OBS-DLV-01..04).

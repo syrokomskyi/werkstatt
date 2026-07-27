@@ -1,6 +1,6 @@
-# ONBOARDING_AI.md — WGogol Agent Surface
+# ONBOARDING_AI.md — Warpgogol Agent Surface
 
-> **Purpose.** A one-read, ~5-minute initialization guide for an AI agent connecting to a WGogol site for the **first time**. Focus: resource **discovery** + a minimal **integration checklist**. This file is introductory and disposable — after your first successful session, the authoritative contracts are the site's own manifests and the RFCs referenced below.
+> **Purpose.** A one-read, ~5-minute initialization guide for an AI agent connecting to a Warpgogol site for the **first time**. Focus: resource **discovery** + a minimal **integration checklist**. This file is introductory and disposable — after your first successful session, the authoritative contracts are the site's own manifests and the RFCs referenced below.
 >
 > **Audience router.**
 >
@@ -11,9 +11,9 @@
 
 ## 0. Project context (read once)
 
-- **Project:** WGogol — a Turborepo monorepo of Astro 6 sites that compose themselves from shared packages.
+- **Project:** Warpgogol — a Turborepo monorepo of Astro 6 sites that compose themselves from shared packages.
 - **Essence:** Each site is a thin, self-composing, decades-scale **digital asset** for small businesses. Sites are explicitly designed to interoperate with AI agents, with each other, and with external businesses.
-- **Reference deployment:** `webgogol.com` (`baseUrl = https://webgogol.com`). Substitute `<baseUrl>` with the origin of the site you are connecting to.
+- **Reference deployment:** `warpgogol.com` (`baseUrl = https://warpgogol.com`). Substitute `<baseUrl>` with the origin of the site you are connecting to.
 - **The network you are joining — the "Agent Surface" (RFC-0286..0292).** Every site exposes **one** generated capability manifest with three tiers:
   - **Knowledge** — static JSON facts, free and cacheable (read).
   - **Actions** — a closed catalog of typed verbs executed through the site's Integration Port (write, entitlement-gated).
@@ -80,7 +80,7 @@ Your first MCP call MUST be `initialize`. Carry your identity in `clientInfo`.
   "result": {
     "protocolVersion": "2025-06-18",
     "capabilities": { "tools": {}, "resources": {} },
-    "serverInfo": { "name": "webgogol-com agent surface", "version": "1.0.0" }
+    "serverInfo": { "name": "warpgogol-com agent surface", "version": "1.0.0" }
   }
 }
 ```
@@ -104,8 +104,8 @@ Your first MCP call MUST be `initialize`. Carry your identity in `clientInfo`.
 ```json
 {
   "schema": "gogol.agent.knowledge/offer@1",
-  "site": "webgogol-com",
-  "baseUrl": "https://webgogol.com",
+  "site": "warpgogol-com",
+  "baseUrl": "https://warpgogol.com",
   "languages": { "default": "de", "supported": ["de", "uk"] },
   "contentHash": "<sha256-hex>",
   "freshness": { "lastVerified": "2026-06-18" },
@@ -176,7 +176,7 @@ Execute in order. Do not proceed to the next step until the expected result hold
 - **`503` = misbuilt deploy** (manifest missing at runtime). Abort; do not retry writes; the surface is not ready.
 - **Capture the full error object.** Log the JSON-RPC `error` (`code`, `message`, `data`) or the HTTP status + body for every failed init step, to your **own operator/session log**.
 - **Where to address logs:**
-  - _Surface defects on a live site_ → the site's published human contact (from the `contact` knowledge file; for the reference site, `hi@webgogol.com`). The surface does not accept out-of-band log ingestion.
+  - _Surface defects on a live site_ → the site's published human contact (from the `contact` knowledge file; for the reference site, `hi@warpgogol.com`). The surface does not accept out-of-band log ingestion.
   - _Repository/contract issues_ (if you are a contributor agent) → follow the RFC process in `docs/rfcs/` and the rules in `AGENTS.md`; never hand-edit generated files, and reference the relevant RFC in commit messages.
 
 ---

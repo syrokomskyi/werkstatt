@@ -48,7 +48,7 @@ Pass — `tsc --noEmit` clean, 135 tests pass, `rfc.validate --json` reports 0 v
 
   Verification: `docs/command-manifest.generated.yaml` contains 1125 registered commands. Commands like `rfc.list`, `rfc.create`, `rfc.validate`, `compass.annotate`, `workflow.lint` are all live, yet they were removed from RFC-0374 and 52 other RFCs.
 
-  The `packages/os/site-kernel/AGENTS.md` states: "Manifest-first lifecycle validation: lifecycle handler in `@wgogol/forge/os/rfc` reads command names from `docs/command-manifest.generated.yaml` first, falls back to `listRegisteredKernelCommands` when manifest is stale." **This manifest-based fallback is not implemented in the code.** The lifecycle handler only uses `commandRegistry?.listCommands()`.
+  The `packages/os/site-kernel/AGENTS.md` states: "Manifest-first lifecycle validation: lifecycle handler in `@warpgogol/forge/os/rfc` reads command names from `docs/command-manifest.generated.yaml` first, falls back to `listRegisteredKernelCommands` when manifest is stale." **This manifest-based fallback is not implemented in the code.** The lifecycle handler only uses `commandRegistry?.listCommands()`.
 
 - **Finding C-2**: RFC-0376 acceptance probes were modified (2 probes removed). The `command-registered` probe was removed because it checked forge's registry (not site-kernel's), and the `file-contains` with `not: true` was removed because `not` is not in the `AcceptanceProbe` type. These are legitimate fixes, but the RFC body still references the old probe count (5 probes → now 3 probes). The evidence file correctly reflects 3 probes with `overall: pass`.
 

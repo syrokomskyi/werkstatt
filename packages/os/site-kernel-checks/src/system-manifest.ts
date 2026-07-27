@@ -20,14 +20,14 @@ constellation composition order (DNA-23, RFC-0025, RFC-0077).
 import { readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { systemManifestSchema, constellationSchema } from "@gogol/ontology/schemas";
-import { collectFiles } from "@gogol/share/fs";
+import { systemManifestSchema, constellationSchema } from "@warpgogol/ontology/schemas";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { fileExists } from "./lib/file-exists.ts";
 
 // ---------------------------------------------------------------------------

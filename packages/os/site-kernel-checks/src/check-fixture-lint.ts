@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 check.fixture.lint — RFC-0261: every `*.validate`/`*.lint` command registered
-by @gogol/site-kernel-checks must have a test file that exercises at least one
+by @warpgogol/site-kernel-checks must have a test file that exercises at least one
 failing fixture and one passing fixture. A check without fixtures has its
 specification only in its author's head.
 </purpose>
@@ -24,8 +24,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { GENERATED_MARKER } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { ALL_COMMANDS } from "./command-tables/index.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
@@ -90,7 +90,7 @@ export async function resolveCommandModules(
         .map((s) => s.trim())
         .filter(Boolean);
       const specifier = match[2]!;
-      if (!specifier.startsWith(".")) continue; // skip @gogol/* and node: imports
+      if (!specifier.startsWith(".")) continue; // skip @warpgogol/* and node: imports
       const modulePath = toPosixPath(relative(workspaceRoot, join(commandTablesDir, specifier)));
       for (const name of names) funcToModule.set(name, modulePath);
     }

@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0241: hdri.firewall.validate — forbid HDRI ownership/branding signals on webgogol-com and require every HDRI-derived fact to carry external provenance + a validity window.</purpose>
+<purpose>RFC-0241: hdri.firewall.validate — forbid HDRI ownership/branding signals on warpgogol-com and require every HDRI-derived fact to carry external provenance + a validity window.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 function toPosixPath(value: string): string {
@@ -41,9 +41,9 @@ interface MinimalClaimAnnotation {
 const OWNERSHIP_PATTERNS = [
   /our\s+hdri/i,
   /my\s+index/i,
-  /hdri\s+project\s+of\s+wgogol/i,
-  /wgogol\s+hdri/i,
-  /handwerk\s+digital\s+readiness\s+index\s+by\s+wgogol/i,
+  /hdri\s+project\s+of\s+warpgogol/i,
+  /warpgogol\s+hdri/i,
+  /handwerk\s+digital\s+readiness\s+index\s+by\s+warpgogol/i,
 ];
 
 async function* walkContentFiles(dir: string): AsyncGenerator<string> {

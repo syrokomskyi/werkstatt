@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/star-map",
+  "name": "@warpgogol/star-map",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -24,7 +24,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/ontology": "workspace:*"
+    "@warpgogol/ontology": "workspace:*"
   },
   "devDependencies": {
     "fast-check": "^4.9.0",

@@ -159,7 +159,7 @@ export interface KernelCommandResult<TData = unknown> {
 // The single shape every static check uses to report a finding. Promoted from
 // the RFC-0074 audit finding (`auditFindingSchema`) and graduated into the
 // kernel so the contract lives next to KernelCommandResult and the failure
-// renderer (formatFailureDiagnostics). `@gogol/site-kernel-checks` provides the
+// renderer (formatFailureDiagnostics). `@warpgogol/site-kernel-checks` provides the
 // zod realization (`diagnosticSchema`).
 
 export type DiagnosticSeverity = "error" | "warning" | "info";
@@ -245,7 +245,7 @@ export interface KernelCommandDefinition<TData = unknown> extends KernelCommandM
   /**
    * RFC-0266: workspace-root-relative path globs this command reads.
    * RFC-0390: now the functional cache input declaration. When non-empty,
-   * the pipeline executor hashes matching files via @gogol/fingerprint
+   * the pipeline executor hashes matching files via @warpgogol/fingerprint
    * and skips re-execution on cache hit. The literal token "<app>" stands
    * in for the app-scoped root on app-scope commands.
    */

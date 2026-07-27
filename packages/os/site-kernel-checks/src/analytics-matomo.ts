@@ -14,7 +14,7 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { fileExists } from "@gogol/share/fs";
+import { fileExists } from "@warpgogol/share/fs";
 import { parse as parseYaml } from "yaml";
 import type {
   CheckResult,
@@ -22,7 +22,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const MESSKANON_PATH = join("packages", "ontology", "analytics", "messkanon.yaml");

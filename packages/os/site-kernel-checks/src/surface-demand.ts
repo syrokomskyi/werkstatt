@@ -14,14 +14,14 @@
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   demandSignalSchema,
   werkRecordSchema,
@@ -29,9 +29,9 @@ import {
   type DemandSignal,
   type VirtualRouteEntry,
   type WerkRecord,
-} from "@gogol/surface";
-import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { toKebabCase } from "@gogol/share/string-utils";
+} from "@warpgogol/surface";
+import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { toKebabCase } from "@warpgogol/share/string-utils";
 import { stringify as stringifyYaml, parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type { ZodType } from "zod";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";

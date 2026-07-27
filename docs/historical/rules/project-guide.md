@@ -1,4 +1,4 @@
-# WGogol Project Guide (for AI + contributors)
+# Warpgogol Project Guide (for AI + contributors)
 
 This document is the authoritative reference for project-specific conventions and invariants. It is written as a "map of the project": what calls what, where the risky parts are, and which invariants must not be broken.
 

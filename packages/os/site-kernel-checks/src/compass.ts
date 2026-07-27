@@ -18,13 +18,13 @@ import {
   resolveCompassScanRoot,
   createCompassInventoryEntries,
   writeFileIfChanged,
-} from "@gogol/site-kernel";
-import type { CompassInventoryEntry } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import type { CompassInventoryEntry } from "@warpgogol/site-kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 const INVENTORY_OUTPUT_PATH = "docs/compass-inventory.xml";
 
@@ -90,7 +90,7 @@ function renderInventoryXml(
   lines.push("    <status>generated</status>");
   lines.push("    <scope>repository-root</scope>");
   lines.push(`    <generated-at>null</generated-at>`);
-  lines.push("    <generator>@gogol/site-kernel-checks:compass.inventory</generator>");
+  lines.push("    <generator>@warpgogol/site-kernel-checks:compass.inventory</generator>");
   lines.push("  </meta>");
   lines.push("  <summary>");
   lines.push(`    <scanned-files>${summary.scannedFiles}</scanned-files>`);

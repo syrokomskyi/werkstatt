@@ -15,7 +15,7 @@ has no dependency on PBP entity schemas or loaders.
   <item>Established by RFC-0470 as part of the PBP layer.</item>
   <item>Replaced getBusinessFaqEntries with direct getCollection("faq") call — FAQ now has its own collection (RFC-0475).</item>
   <item>Replaced DEFAULT_LANGUAGE_CODE import with local constant.</item>
-  <item>Replaced buildSiteSemanticProfile import with SemanticSiteProfile type from @gogol/share/semantic.</item>
+  <item>Replaced buildSiteSemanticProfile import with SemanticSiteProfile type from @warpgogol/share/semantic.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,15 +28,15 @@ import {
   type SemanticPageModel,
   type SemanticPageType,
   type SemanticSiteProfile,
-} from "@gogol/share/semantic";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
+} from "@warpgogol/share/semantic";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import {
   getContentRefIndex,
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
-} from "@gogol/share/content-reference";
-import { parseMaterialCreditMap, materialCreditAtId } from "@gogol/share/material-credits";
-import { emitPipelineLogEvent } from "@gogol/site-kernel-content";
+} from "@warpgogol/share/content-reference";
+import { parseMaterialCreditMap, materialCreditAtId } from "@warpgogol/share/material-credits";
+import { emitPipelineLogEvent } from "@warpgogol/site-kernel-content";
 
 const DEFAULT_LANGUAGE_CODE = "de";
 
@@ -56,7 +56,7 @@ async function getProseBody(slug: string, lang: string): Promise<string> {
     emitPipelineLogEvent({
       severity: "notice",
       kind: "expected-fallback",
-      packageName: "@gogol/pbp",
+      packageName: "@warpgogol/pbp",
       module: "semantic-model",
       message: `prose fallback: prose/${lang}/${slug} -> prose/${DEFAULT_LANGUAGE_CODE}/${slug}`,
       dedupeKey: `semantic-prose-fallback:${lang}:${slug}`,
@@ -92,7 +92,7 @@ async function getPageFrontmatter(pageId: string, lang: string) {
     emitPipelineLogEvent({
       severity: "notice",
       kind: "expected-fallback",
-      packageName: "@gogol/pbp",
+      packageName: "@warpgogol/pbp",
       module: "semantic-model",
       message: `page fallback: pages/${lang}/${slug} -> pages/${DEFAULT_LANGUAGE_CODE}/${slug}`,
       dedupeKey: `semantic-page-fallback:${lang}:${slug}`,
@@ -146,7 +146,7 @@ async function getFaqEntries(lang: string): Promise<SemanticFaqEntry[]> {
  * Reproduces the previous Astro-path read behavior exactly — notably the home
  * label resolves from `header.brandLabel` only. Content references ({collection.file.field})
  * are substituted in getPageFrontmatter so JSON-LD/OG output gets resolved values.
- * Construction logic now lives once in @gogol/share's buildSemanticPageModelWith.
+ * Construction logic now lives once in @warpgogol/share's buildSemanticPageModelWith.
  */
 const astroSemanticReader: SemanticContentReader = {
   async getPageFrontmatter(pageId, lang) {

@@ -8,7 +8,7 @@ records with full schemas — YAML cannot be imported directly by Vite, so
 this is the bridge from the ontology catalog into the Astro bundle).
 </purpose>
 <non-goals>
-  <item>Do not implement gate logic here — the files are thin re-exports into @gogol/agent-gate/astro.</item>
+  <item>Do not implement gate logic here — the files are thin re-exports into @warpgogol/agent-gate/astro.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -21,10 +21,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { buildGeneratedHeader } from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { buildGeneratedHeader } from "@warpgogol/site-kernel-codegen";
 import { loadCapabilityCatalog } from "./agent-capability.ts";
 
 const INTERNAL_MANIFEST_FILE = "src/agent-surface.generated.yaml";
@@ -36,12 +36,12 @@ const ACTION_ROUTE_FILE = "src/pages/api/agent/actions/[id].ts";
 
 const MCP_ROUTE_CONTENT = `${buildGeneratedHeader({ ownerCommand: "agent.routes.generate", filePath: MCP_ROUTE_FILE }).trimEnd()}
 // Section-owned Agent Gate route (RFC-0290). Handler logic lives once in
-// @gogol/agent-gate; this file is a thin re-export emitted by
+// @warpgogol/agent-gate; this file is a thin re-export emitted by
 // agent.routes.generate. Do not edit — rerun agent.routes.generate.
 export const prerender = false;
 import agentSurfaceManifest from "../../../agent-surface.generated.json";
 import agentCapabilities from "../../../agent-capabilities.generated.json";
-import { createAgentMcpRoute } from "@gogol/agent-gate/astro";
+import { createAgentMcpRoute } from "@warpgogol/agent-gate/astro";
 
 const route = createAgentMcpRoute(agentSurfaceManifest as never, agentCapabilities as never);
 export const GET = route.GET;
@@ -50,12 +50,12 @@ export const POST = route.POST;
 
 const ACTION_ROUTE_CONTENT = `${buildGeneratedHeader({ ownerCommand: "agent.routes.generate", filePath: ACTION_ROUTE_FILE }).trimEnd()}
 // Section-owned Agent Gate route (RFC-0290). Handler logic lives once in
-// @gogol/agent-gate; this file is a thin re-export emitted by
+// @warpgogol/agent-gate; this file is a thin re-export emitted by
 // agent.routes.generate. Do not edit — rerun agent.routes.generate.
 export const prerender = false;
 import agentSurfaceManifest from "../../../../agent-surface.generated.json";
 import agentCapabilities from "../../../../agent-capabilities.generated.json";
-import { createAgentActionRoute } from "@gogol/agent-gate/astro";
+import { createAgentActionRoute } from "@warpgogol/agent-gate/astro";
 
 const route = createAgentActionRoute(agentSurfaceManifest as never, agentCapabilities as never);
 export const POST = route.POST;

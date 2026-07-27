@@ -27,9 +27,9 @@ A clean, minimal, forward-only rename of `TENANT_ID` to `SUPABASE_BUFFER_TENANT_
 
 Pass — all three impacted packages pass `build:check`:
 
-- `@gogol/integration-adapter-supabase-crm` — pass
-- `@gogol/ui` — pass (after fixing `env.d.ts` ambient shim)
-- `@gogol/site-kernel-checks` — pass
+- `@warpgogol/integration-adapter-supabase-crm` — pass
+- `@warpgogol/ui` — pass (after fixing `env.d.ts` ambient shim)
+- `@warpgogol/site-kernel-checks` — pass
 
 ### Axis A — Structural correctness
 
@@ -45,7 +45,7 @@ No issues.
 
 ### Axis C — Ecosystem fit
 
-No issues. Package boundaries respected — the change flows through `packages/*` only. The `env.d.ts` shim in `@gogol/share` was correctly updated (discovered during implementation as a necessary fix for `@gogol/ui` type checking). Both section manifests that declare the buffer tenant secret were updated.
+No issues. Package boundaries respected — the change flows through `packages/*` only. The `env.d.ts` shim in `@warpgogol/share` was correctly updated (discovered during implementation as a necessary fix for `@warpgogol/ui` type checking). Both section manifests that declare the buffer tenant secret were updated.
 
 ### Axis D — Forward-only compliance
 
@@ -79,4 +79,4 @@ No issues. No new build-time commands. No new validators. No edge cases introduc
 
 ### Questions for the author
 
-1. The `env.d.ts` ambient shim in `@gogol/share` was not listed in the RFC's file system responsibilities table but was necessary for `@gogol/ui` to type-check. Should the RFC be amended to include this file, or is it considered an implementation detail of the rename?
+1. The `env.d.ts` ambient shim in `@warpgogol/share` was not listed in the RFC's file system responsibilities table but was necessary for `@warpgogol/ui` to type-check. Should the RFC be amended to include this file, or is it considered an implementation detail of the rename?

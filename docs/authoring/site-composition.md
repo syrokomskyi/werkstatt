@@ -71,14 +71,14 @@ blocks:
 - Treat `src/content/prose/{lang}/*.md` as appendable narrative companions: the author phase may generate them, but follow-up editorial additions belong there rather than in page markdown bodies.
 - Treat `onboarding/.output/05-audit/audit-report.md` as generated audit output: never hand-edit it; re-run `app.qa.validate` to regenerate.
 - Treat `onboarding/.output/05-audit/llm-cache.jsonl` as content-hash-keyed audit cache: never delete or "reset" it to suppress findings; fix the source inputs and re-run the audit.
-- Never hand-assemble blocks in route files. Every route calls `buildPage(entry.data, ctx)` from `@gogol/share` and passes `ResolvedBlock[]` to `BlocksRenderer`.
+- Never hand-assemble blocks in route files. Every route calls `buildPage(entry.data, ctx)` from `@warpgogol/share` and passes `ResolvedBlock[]` to `BlocksRenderer`.
 - Every `blocks[].type` must be an author-facing archetype name whose cosmicPlanet is pinned in `src/content/system.md pages[pageId].planets[]`.
 - Every `blocks[].props` must match the section's propsSchema (strict — no extra keys).
 - Every page `.md` must carry a stable `pageId` matching an entry in `src/content/system.md pages[]`.
 
 **RuntimeContext no-op contract (DNA-26):**
 
-- `EMPTY_RUNTIME_CONTEXT(locale)` from `@gogol/share` is the only constructor at MVP.
+- `EMPTY_RUNTIME_CONTEXT(locale)` from `@warpgogol/share` is the only constructor at MVP.
 - `ctx.segment` is always `null`; `ctx.flags` is always `{}` at build time. Never construct context with non-null `segment` or non-empty `flags` until RFC-0027 activates Growth.
 - `{ segment }` and `{ flag }` visibility expressions are valid to author today — they always evaluate `false` at MVP and will activate when RFC-0027 ships.
 
@@ -238,7 +238,7 @@ The growth layer provides vendor-agnostic event tracking, content-declared funne
 
 **Agent rules:**
 
-- Never import vendor analytics SDKs directly in site code — always use `emit()` from `@gogol/growth/emit`.
+- Never import vendor analytics SDKs directly in site code — always use `emit()` from `@warpgogol/growth/emit`.
 - Never call `emit()` with a string literal that is not in the closed `EventName` catalog (validated by `growth.events.validate`).
 - Never hard-code funnel logic in TypeScript — funnels are YAML in `packages/ontology/growth/funnels/`.
 - Never instantiate adapters directly — `bootGrowthLayer()` handles adapter loading. Site code only calls `emit()`.
@@ -254,7 +254,7 @@ The growth layer provides vendor-agnostic event tracking, content-declared funne
 
 ## Cosmic-name resolution checklist (when adding a new section/component)
 
-1. Pick a free name from the correct catalog in `@gogol/ontology` (`StarCatalog` for pages, `PlanetCatalog` for sections, `MoonCatalog` for components — minus the five passport-reserved moons).
+1. Pick a free name from the correct catalog in `@warpgogol/ontology` (`StarCatalog` for pages, `PlanetCatalog` for sections, `MoonCatalog` for components — minus the five passport-reserved moons).
 2. Set `cosmicName: <Name>` in the new manifest.yaml.
 3. Register the name in `PLANET_IMPORT_PATHS` (sections + passport pages) or `MOON_IMPORT_PATHS` (shell components) in `packages/share/src/page.ts`.
 4. Add the name to `src/content/system.md` `pages[pageId].planets[]` (or `pages[pageId].shell.<slot>.cosmicMoon`) of every site that uses it. There is no longer a `system.yaml` or `src/content/assets/system.md` to update — `src/content/system.md` is the single canonical manifest (RFC-0047).
@@ -264,19 +264,19 @@ Skipping any of steps 2–4 produces silent mismatches that surface only at runt
 
 ## RFC-0042 content pattern
 
-Section components read from `blocks[].props` via `pageOverride` with explicit `NEED_THIS_*` markers for missing required fields. Use `need()`/`cast()` from `@gogol/share`. Run `semantic.page.validate` to check for markers. See root AGENTS.md §Image resolution (RFC-0053) for the image fallback pattern.
+Section components read from `blocks[].props` via `pageOverride` with explicit `NEED_THIS_*` markers for missing required fields. Use `need()`/`cast()` from `@warpgogol/share`. Run `semantic.page.validate` to check for markers. See root AGENTS.md §Image resolution (RFC-0053) for the image fallback pattern.
 
 ## Shared implementation rules
 
 - Prefer static generation and minimal client JavaScript.
 - Do not hardcode large blocks of visitor-facing copy in `.astro`, `.tsx`, or route files.
 - Do not put project-specific copy in component `.md` files — use `blocks[].props` in the page entry (RFC-0026) instead of `componentOverrides`.
-- Do not make section content full-bleed on wide screens in any site or biome. Use the shared `<SectionShell>` container contract from `@gogol/ui`; only shell/background paint may extend edge-to-edge.
+- Do not make section content full-bleed on wide screens in any site or biome. Use the shared `<SectionShell>` container contract from `@warpgogol/ui`; only shell/background paint may extend edge-to-edge.
 - Keep localization flow explicit; do not add ad hoc language behavior inside components.
 - Be careful when touching middleware, content registration, global layouts, and navigation flow.
 - Preserve stable `data-*`, schema, and content-path contracts used by scripts or semantic outputs.
-- Use shared icon imports from `@gogol/ui` instead of creating or restoring site-local icon asset trees.
-- **Before writing entity-ID normalization, i18n helpers, or base page schemas in any site file, check `@gogol/share` first.** See `packages/share/AGENTS.md` for the full guide and how to wire a new site.
+- Use shared icon imports from `@warpgogol/ui` instead of creating or restoring site-local icon asset trees.
+- **Before writing entity-ID normalization, i18n helpers, or base page schemas in any site file, check `@warpgogol/share` first.** See `packages/share/AGENTS.md` for the full guide and how to wire a new site.
 
 ## Build verification discipline
 
@@ -461,14 +461,14 @@ The canonical build sequence is:
 3. `astro build` — Astro compiles and copies to `dist/`
 4. `build.post` — emit passport, well-known files, etc.
 
-**`SITES_BUILD_PREPARE_PIPELINE`** (defined in `@gogol/site-kernel-checks`) runs in step 1 and produces files that Astro later copies to `dist/`:
+**`SITES_BUILD_PREPARE_PIPELINE`** (defined in `@warpgogol/site-kernel-checks`) runs in step 1 and produces files that Astro later copies to `dist/`:
 
 **Agent rules:**
 
 - When adding a new generated artifact, register its command in `SITES_BUILD_PREPARE_PIPELINE` (in `packages/os/site-kernel-checks/src/module.ts`) if it is cross-site, or append it to the site's `build.prepare` pipeline in `tools/kernel.config.ts` if it is site-specific.
-- **Build-time file generators (sitemap, llms, ai, robots, and any new one) MUST follow the Generator Contract** in `packages/os/site-kernel/docs/generator-contract.md` (RFC-0143): typed config in one of two families (per-page `pages[].output.<id>` or a site-wide top-level block), a pure formatter in `@gogol/share`, a `*.generate`/`*.validate` command pair, and a safe default. Per-page projection config is resolved by `resolvePageOutput` and validated by the closed `output` schema — extend that schema in the same change that adds a per-page generator.
-- **OS packages (`packages/os/site-kernel*`) resolve from `src`, not `dist` (RFC-0145).** A source edit takes effect on the next `site-kernel` command with **no rebuild** — like `@gogol/share`. Their `build` script is `tsc --noEmit` (type-check only); they emit no `dist/`. Do **not** re-add a `prebuild` dist-compilation chain to sites or a `dist` build to these packages. Anything that loads an OS package outside the tsx CLI / Node ≥24 type-strip must add its own build step.
-- **PBP data → AI/JSON-LD projection (RFC-0147/0148):** PBP entity files (`offerings/`, `places/`, `people/`, …) auto-project into `llms-full.txt` + JSON-LD via the shared `buildOrganizationProfile` and the projectors in `@gogol/share/semantic/business-projection.ts`. The `BUSINESS_DOMAIN_VISIBILITY` map is a **hard privacy boundary**: `external-services` and `compliance` are `none` and must never reach public outputs. `agent.knowledge.validate` (no-leak boundary) and `semantic.parity` (llms matches the model) are the gates.
+- **Build-time file generators (sitemap, llms, ai, robots, and any new one) MUST follow the Generator Contract** in `packages/os/site-kernel/docs/generator-contract.md` (RFC-0143): typed config in one of two families (per-page `pages[].output.<id>` or a site-wide top-level block), a pure formatter in `@warpgogol/share`, a `*.generate`/`*.validate` command pair, and a safe default. Per-page projection config is resolved by `resolvePageOutput` and validated by the closed `output` schema — extend that schema in the same change that adds a per-page generator.
+- **OS packages (`packages/os/site-kernel*`) resolve from `src`, not `dist` (RFC-0145).** A source edit takes effect on the next `site-kernel` command with **no rebuild** — like `@warpgogol/share`. Their `build` script is `tsc --noEmit` (type-check only); they emit no `dist/`. Do **not** re-add a `prebuild` dist-compilation chain to sites or a `dist` build to these packages. Anything that loads an OS package outside the tsx CLI / Node ≥24 type-strip must add its own build step.
+- **PBP data → AI/JSON-LD projection (RFC-0147/0148):** PBP entity files (`offerings/`, `places/`, `people/`, …) auto-project into `llms-full.txt` + JSON-LD via the shared `buildOrganizationProfile` and the projectors in `@warpgogol/share/semantic/business-projection.ts`. The `BUSINESS_DOMAIN_VISIBILITY` map is a **hard privacy boundary**: `external-services` and `compliance` are `none` and must never reach public outputs. `agent.knowledge.validate` (no-leak boundary) and `semantic.parity` (llms matches the model) are the gates.
 - Commands that write files must target `public/`, `src/content/`, `src/styles/`, or `src/components/` — **never `dist/`**.
 - Validation commands must read the generated file from its project-tree location (e.g., `public/sitemap.xml`), not from `dist/`.
 - If the generated file should be served as a static asset (robots.txt, sitemap.xml, favicon manifests), place it in `public/` so Astro copies it verbatim.
@@ -513,7 +513,7 @@ A site's `AGENTS.md`, `src/content/AGENTS.md`, and `src/styles/AGENTS.md` are **
 
 ## Site OS
 
-- All sites share a site OS runtime built on `@gogol/site-kernel`.
+- All sites share a site OS runtime built on `@warpgogol/site-kernel`.
 - Full operator and extension guide: `packages/os/site-kernel/docs/site-os.md`.
 - **Check module wiring guide: `packages/os/site-kernel-checks/docs/check-module-guide.md`** — how to onboard `build.check` and avoid duplicate command registration.
 - Each site joins the OS by creating `tools/kernel.config.ts` — see the guide for the step-by-step onboarding procedure.
@@ -562,7 +562,7 @@ Sites with `release.passport.enabled: true` in `src/content/system.md` participa
 **Agent rules:**
 
 - Never commit a `PASSPORT_PRIVATE_KEY` value — only the public key JSON in `public/.well-known/cosmic-passport-key.json` is committed.
-- The passport page uses the Moon Quintet `Methone / Despina / Klarissa / Bianca / Adrastea`. All five moons are data-driven — they read passport artifacts at SSG build time via `@gogol/passport/data`.
+- The passport page uses the Moon Quintet `Methone / Despina / Klarissa / Bianca / Adrastea`. All five moons are data-driven — they read passport artifacts at SSG build time via `@warpgogol/passport/data`.
 - `cosmic-star-map.svg` must be byte-stable — never inject timestamps or random state into the SVG generation path.
 - See `docs/authoring/passport-and-star-map.md` for content authoring guide.
 - See `docs/engineering/passport-signing-and-keys.md` for signing, key rotation, and Nebula Score pillar definitions.

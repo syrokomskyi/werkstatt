@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-deploy",
+  "name": "@warpgogol/site-kernel-deploy",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,9 +17,9 @@
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@gogol/integration": "workspace:*",
-    "@gogol/share": "workspace:*",
-    "@gogol/site-kernel": "workspace:*",
+    "@warpgogol/integration": "workspace:*",
+    "@warpgogol/share": "workspace:*",
+    "@warpgogol/site-kernel": "workspace:*",
     "yaml": "^2.9.0"
   },
   "devDependencies": {},

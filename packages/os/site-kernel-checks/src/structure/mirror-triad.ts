@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   CONTENT_COMPONENTS_SUBPATH,
   SCHEMAS_SUBPATH,
@@ -72,7 +72,7 @@ export async function runMirrorTriadValidation(
     schemaPaths.add(parts.join("/"));
   }
 
-  // Post-RFC-0023: components live in @gogol/ui with colocated *.types.ts.
+  // Post-RFC-0023: components live in @warpgogol/ui with colocated *.types.ts.
   // A component-content file in the app is satisfied by either:
   //   a) a local schemas/components/<name>.ts (legacy app-resident schema), OR
   //   b) a packages/ui/src/components/<name>/<name>-component.types.ts (canonical post-migration).

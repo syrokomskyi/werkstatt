@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-astro",
+  "name": "@warpgogol/site-kernel-astro",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@gogol/site-kernel": "workspace:*"
+    "@warpgogol/site-kernel": "workspace:*"
   },
   "devDependencies": {},
   "gogol": {

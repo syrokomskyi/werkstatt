@@ -13,7 +13,7 @@ keyed by the unique uni.registry entry id (semanticId is not unique across layer
 
 import { test, expect } from "vitest";
 import { diffCapabilities, worstTier } from "../capability-diff.ts";
-import type { HandoffCapability } from "@gogol/ontology/operations";
+import type { HandoffCapability } from "@warpgogol/ontology/operations";
 import type { Migrator } from "../migrators/types.ts";
 import type { RegistryView } from "../types.ts";
 

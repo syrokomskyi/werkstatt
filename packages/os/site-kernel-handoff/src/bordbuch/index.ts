@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 
 export { runBordbuchAppend, type BordbuchAppendData } from "./bordbuch-append.ts";
 export { runBordbuchValidate, type BordbuchValidateData } from "./bordbuch-validate.ts";

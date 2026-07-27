@@ -46,8 +46,8 @@ export interface SurfaceRecordImage {
 }
 
 /**
- * RFC-0192: a block in a baked page. Structurally compatible with `@gogol/share` `BlockEntry`, but
- * declared here so `@gogol/surface` stays the lower-level package with no dependency on share
+ * RFC-0192: a block in a baked page. Structurally compatible with `@warpgogol/share` `BlockEntry`, but
+ * declared here so `@warpgogol/surface` stays the lower-level package with no dependency on share
  * (avoids a workspace cycle — share consumes surface's route types).
  */
 export interface SurfaceBlock {
@@ -60,7 +60,7 @@ export interface SurfaceBlock {
   layer?: "shell" | "section";
 }
 
-/** RFC-0192: a baked block-declarative page. Structurally compatible with `@gogol/share` `PageEntry`. */
+/** RFC-0192: a baked block-declarative page. Structurally compatible with `@warpgogol/share` `PageEntry`. */
 export interface PageEntry {
   kind: "page";
   cosmicStar: string;

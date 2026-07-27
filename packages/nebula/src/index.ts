@@ -13,7 +13,7 @@
 */
 
 /**
- * @gogol/nebula — Nebula Score pipeline
+ * @warpgogol/nebula — Nebula Score pipeline
  * DNA-33 / RFC-0028
  */
 

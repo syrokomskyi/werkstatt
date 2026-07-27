@@ -24,7 +24,7 @@ import {
 export const ANALYTICS_MATOMO_COMMANDS: CheckCommandEntry[] = [
   {
     name: "analytics.messkanon.validate",
-    description: "Validate the tool-independent WGogol Messkanon ontology (RFC-0305).",
+    description: "Validate the tool-independent Warpgogol Messkanon ontology (RFC-0305).",
     scope: "workspace",
     flags: {},
     reads: ["packages/ontology/analytics/messkanon.yaml"],

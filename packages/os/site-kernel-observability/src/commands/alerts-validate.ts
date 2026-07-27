@@ -17,14 +17,14 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
-import { WGOGOL_METRIC_REGISTRY } from "@gogol/observability";
-import { GENERATED_MARKER } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
+import { WARPGOGOL_METRIC_REGISTRY } from "@warpgogol/observability";
+import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { ALERT_RULES, NOTIFICATION_CHANNELS } from "../alert-rules.ts";
 
-const METRIC_NAME_REGEX = /wgogol_[a-z0-9_]+/g;
+const METRIC_NAME_REGEX = /warpgogol_[a-z0-9_]+/g;
 
 export async function runObservabilityAlertsValidate(
   _input: KernelCommandInput,
@@ -91,7 +91,7 @@ export async function runObservabilityAlertsValidate(
 
   // OBS-ALR-02: duplicate rule ids and promql/builder exclusivity
   const seenIds = new Set<string>();
-  const declaredMetricNames = new Set(WGOGOL_METRIC_REGISTRY.map((m) => m.name));
+  const declaredMetricNames = new Set(WARPGOGOL_METRIC_REGISTRY.map((m) => m.name));
   const channelIds = new Set(NOTIFICATION_CHANNELS.map((c) => c.id));
 
   for (const rule of ALERT_RULES) {
@@ -136,7 +136,7 @@ export async function runObservabilityAlertsValidate(
             ruleId: "OBS-ALR-03",
             severity: "error",
             file: "packages/os/site-kernel-observability/src/alert-rules.ts",
-            message: `Rule "${rule.id}" references undeclared metric "${metricName}" — not in WGOGOL_METRIC_REGISTRY.`,
+            message: `Rule "${rule.id}" references undeclared metric "${metricName}" — not in WARPGOGOL_METRIC_REGISTRY.`,
             fixHint: "Add the metric to the registry or fix the promql expression.",
           });
         }

@@ -2,7 +2,7 @@
 
 This document defines the component class taxonomy and structural contracts for Astro components across the monorepo. It is referenced by RFC-0019.
 
-> **RFC-0047 / RFC-0108 update:** Shared sections and components live in `packages/ui/src/{sections,components}/`. Apps consume them via `@gogol/ui` imports. App-local `src/components/` is forbidden (enforced by `app.layout.validate`). The Mirror Quintet (DNA-17) governs the package-side file structure.
+> **RFC-0047 / RFC-0108 update:** Shared sections and components live in `packages/ui/src/{sections,components}/`. Apps consume them via `@warpgogol/ui` imports. App-local `src/components/` is forbidden (enforced by `app.layout.validate`). The Mirror Quintet (DNA-17) governs the package-side file structure.
 
 ---
 
@@ -80,7 +80,7 @@ Cosmic names (`StarCatalog`, `PlanetCatalog`, `MoonCatalog`) are manifest/YAML f
 
 ## `navigation-section` contract (RFC-0019)
 
-The shared breadcrumbs section component from `@gogol/ui`:
+The shared breadcrumbs section component from `@warpgogol/ui`:
 
 - accepts `lang`, `items`, `showPdf?`, `showMd?`, `pageOverride?` props
 - renders breadcrumbs inside a standard `<section>` shell
@@ -93,7 +93,7 @@ Routes that previously imported breadcrumb components directly must migrate to t
 
 ## Image rendering (RFC-0152)
 
-Every **authored image** is rendered through one canonical primitive, `<ResponsiveImage>` (`@gogol/ui`), never a raw `<img>` or Astro `<Image>`. The primitive owns no optimization logic: it passes the resolved image (the output of `resolveImage`) to the active **Image Provider** (`@gogol/share`), which returns `src` + a responsive `srcset`. This is the rendering/optimization analogue of the RFC-0141 content-source port — the optimization backend is swappable without editing any component, so the same primitive serves in-repo assets today and headless-CMS / DAM images later.
+Every **authored image** is rendered through one canonical primitive, `<ResponsiveImage>` (`@warpgogol/ui`), never a raw `<img>` or Astro `<Image>`. The primitive owns no optimization logic: it passes the resolved image (the output of `resolveImage`) to the active **Image Provider** (`@warpgogol/share`), which returns `src` + a responsive `srcset`. This is the rendering/optimization analogue of the RFC-0141 content-source port — the optimization backend is swappable without editing any component, so the same primitive serves in-repo assets today and headless-CMS / DAM images later.
 
 - **Provider (default): `cloudflare-runtime`.** Safe by default it serves the raw in-repo origin asset (max-quality webp, `image.format.validate`) with no resize. Once Cloudflare Image Transformations are enabled on the zone and `PUBLIC_CF_IMAGE_TRANSFORM=on` is set for the build, it emits `/cdn-cgi/image/…/<origin>` URLs with a responsive `srcset` (downscaled per width, no upscaling past the intrinsic width), resized at request time. Note: `/cdn-cgi/image` URLs 404 when the feature is off — there is no `onerror` fallback for that case, which is why the default stays passthrough.
 - **Adapter setting.** Apps run the `@astrojs/cloudflare` adapter with `imageService: "cloudflare"` (RFC-0152 amends RFC-0149). The previous `imageService: "custom"` + build-time sharp is forbidden: sharp reads originals from `dist/_astro` while the adapter emits them to `dist/client/_astro`, which fails the build in the `generating optimized images` phase.
@@ -106,4 +106,4 @@ See RFC-0152 for the full contract, `docs/engineering/image-optimization-and-clo
 
 ## Component location
 
-All shared Astro components live in `packages/ui/src/{sections,components}/`. Apps consume them via `@gogol/ui` imports. App-private component folders under `apps/*/src/components/` are forbidden (enforced by `app.layout.validate`). Icons live in `packages/ui/src/icons/` and are imported via `@gogol/ui/icons`.
+All shared Astro components live in `packages/ui/src/{sections,components}/`. Apps consume them via `@warpgogol/ui` imports. App-private component folders under `apps/*/src/components/` are forbidden (enforced by `app.layout.validate`). Icons live in `packages/ui/src/icons/` and are imported via `@warpgogol/ui/icons`.

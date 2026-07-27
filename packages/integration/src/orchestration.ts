@@ -167,7 +167,7 @@ export const DESTINATION_ADAPTERS: readonly DestinationAdapter[] = [pipedriveDes
  * Externally-implemented destination vendors whose adapters live in separate packages
  * (RFC-0186/0190). These vendors are valid `gogol-adapter` targets but cannot be
  * registered in `DESTINATION_ADAPTERS` because their adapter packages depend on
- * `@gogol/integration` (circular-dep guard). The adapter is injected at runtime via
+ * `@warpgogol/integration` (circular-dep guard). The adapter is injected at runtime via
  * `extraAdapters`; the validator checks vendor + secrets against these catalogs.
  */
 export const EXTERNAL_DESTINATION_VENDORS: Readonly<Record<DestinationKind, readonly string[]>> = {

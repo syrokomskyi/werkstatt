@@ -25,8 +25,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { executeKernelCommand } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
 
 // The closed set of validators that form the "full contract" for an RFC-0023..0028 compliant app.
 // Ordered: structural → naming → content → growth → passport.

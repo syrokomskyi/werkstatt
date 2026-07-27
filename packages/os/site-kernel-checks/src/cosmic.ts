@@ -18,13 +18,13 @@ apps and packages.
 import { readFile } from "node:fs/promises";
 import { join, relative, basename } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { starNameSchema, planetNameSchema, moonNameSchema } from "@gogol/ontology/cosmic";
+import { starNameSchema, planetNameSchema, moonNameSchema } from "@warpgogol/ontology/cosmic";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
 
 // ---------------------------------------------------------------------------
 // Shared helpers

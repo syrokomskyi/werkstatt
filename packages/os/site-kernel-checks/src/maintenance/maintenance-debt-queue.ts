@@ -14,7 +14,7 @@
 
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import {
   GENERATED_MARKER,
   listSiteWorkspaces,
@@ -26,7 +26,7 @@ import {
   type KernelCommandResult,
   type KernelRuntimeContext,
   buildGeneratedHeader,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
 import { z } from "zod";
 import {
@@ -193,7 +193,7 @@ const INITIAL_QUEUE_TEMPLATES: Record<string, string> = {
     "  - material.credits.validate",
     "selectors:",
     "  apps:",
-    "    - webgogol-com",
+    "    - warpgogol-com",
     "    - nicaragua-projekt",
     "  ruleIds:",
     "    - material.credits.missing-prose-credit",
@@ -228,7 +228,7 @@ const INITIAL_QUEUE_TEMPLATES: Record<string, string> = {
     "  - surface.validate",
     "selectors:",
     "  apps:",
-    "    - webgogol-com",
+    "    - warpgogol-com",
     "    - nicaragua-projekt",
     "  ruleIds:",
     "    - surface.validate",
@@ -266,7 +266,7 @@ const INITIAL_QUEUE_TEMPLATES: Record<string, string> = {
     "  - demands.hierarchy.validate",
     "selectors:",
     "  apps:",
-    "    - webgogol-com",
+    "    - warpgogol-com",
     "    - nicaragua-projekt",
     "  ruleIds:",
     "    - demands.hierarchy.validate",

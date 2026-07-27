@@ -1,5 +1,5 @@
 /**
- * PBP Webgogol legacy migration contract.
+ * PBP Warpgogol legacy migration contract.
  *
  * @see pbp-specification-package/migration-plan
  * @see RFC-0461

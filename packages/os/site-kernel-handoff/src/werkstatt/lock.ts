@@ -13,7 +13,7 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { werkstattLockSchema, type WerkstattLock } from "@gogol/ontology/operations";
+import { werkstattLockSchema, type WerkstattLock } from "@warpgogol/ontology/operations";
 
 const LOCKS_DIR = path.join(".werkstatt", "locks");
 const DEFAULT_TIMEOUT_SECONDS = 900;

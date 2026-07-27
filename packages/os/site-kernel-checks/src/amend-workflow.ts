@@ -6,26 +6,26 @@ amend-check.postbuild / amend-check.run). Composites sub-dispatch the RFC-0135
 amend commands and audit.delta.run by name via executeKernelCommand.</purpose>
 <non-goals>
   <item>Do not define the amend batch bundle, provenance, or coverage ledger — those are RFC-0135 (site-kernel-onboarding).</item>
-  <item>Do not own audit.delta.run — that lives in @gogol/site-kernel-audit (RFC-0136 file map).</item>
+  <item>Do not own audit.delta.run — that lives in @warpgogol/site-kernel-audit (RFC-0136 file map).</item>
   <item>Do not own workflow.lint — that is extended in site-kernel/src/workflow.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0136: Add amend phase gate and amend-check composites.</item>
-  <item>RFC-0136: Move audit.delta.run to @gogol/site-kernel-audit.</item>
+  <item>RFC-0136: Move audit.delta.run to @warpgogol/site-kernel-audit.</item>
 </CHANGE_SUMMARY>
 */
 
 import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parseOnboardingArtifactHeader } from "@gogol/share/onboarding-yaml";
-import { executeKernelCommand } from "@gogol/site-kernel";
+import { parseOnboardingArtifactHeader } from "@warpgogol/share/onboarding-yaml";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 const AMEND_PHASES = ["a0-intake", "a2-compose", "a3-author", "a4-audit"] as const;
 type AmendPhase = (typeof AMEND_PHASES)[number];
@@ -217,7 +217,7 @@ export async function runAmendPhaseValidate(
   return result(command, findings, { batch, phase, inputHash: manifestHash });
 }
 
-// audit.delta.run now lives in @gogol/site-kernel-audit (RFC-0136 file map).
+// audit.delta.run now lives in @warpgogol/site-kernel-audit (RFC-0136 file map).
 // amend-check.postbuild dispatches it by name via executeKernelCommand below,
 // so there is no import coupling here.
 

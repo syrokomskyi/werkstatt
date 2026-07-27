@@ -1,4 +1,4 @@
-# @gogol/faq Agent Guide
+# @warpgogol/faq Agent Guide
 
 Pluggable FAQ content collection package (RFC-0475).
 
@@ -14,11 +14,11 @@ Pluggable FAQ content collection package (RFC-0475).
 
 | Entry point | Export | What it does |
 | --- | --- | --- |
-| `@gogol/faq` | `faqSchema`, `FaqEntry`, `FaqGovernance` | Zod schema and types |
-| `@gogol/faq/astro` | `createFaqCollection` | Astro collection factory — spread into `collections` |
-| `@gogol/faq/astro` | `getFaqEntries(lang)` | Load FAQ entries for a language, sorted by `order` |
-| `@gogol/faq/astro` | `getFaqEntriesByTags(lang, tags)` | Filter entries by tags |
-| `@gogol/faq/astro` | `toSemanticFaqEntries(entries)` | Map `FaqEntry[]` → `SemanticFaqEntry[]` (slug → id) |
+| `@warpgogol/faq` | `faqSchema`, `FaqEntry`, `FaqGovernance` | Zod schema and types |
+| `@warpgogol/faq/astro` | `createFaqCollection` | Astro collection factory — spread into `collections` |
+| `@warpgogol/faq/astro` | `getFaqEntries(lang)` | Load FAQ entries for a language, sorted by `order` |
+| `@warpgogol/faq/astro` | `getFaqEntriesByTags(lang, tags)` | Filter entries by tags |
+| `@warpgogol/faq/astro` | `toSemanticFaqEntries(entries)` | Map `FaqEntry[]` → `SemanticFaqEntry[]` (slug → id) |
 
 ## Content location
 
@@ -28,7 +28,7 @@ FAQ content files live under `src/content/faq/{lang}/`:
 
 ## Validation
 
-`faq.validate` in `@gogol/site-kernel-checks` enforces:
+`faq.validate` in `@warpgogol/site-kernel-checks` enforces:
 
 - Required fields: `slug`, `question`, `answer`
 - Optional field types: `order` (number), `tags` (string[])
@@ -39,6 +39,6 @@ FAQ content files live under `src/content/faq/{lang}/`:
 
 ## Non-goals
 
-- Does not define JSON-LD or semantic model logic — that lives in `@gogol/share`
+- Does not define JSON-LD or semantic model logic — that lives in `@warpgogol/share`
 - Does not define route generation or page rendering — that is the site's job
 - Does not define feature flags or entitlements for FAQ collection

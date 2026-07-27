@@ -1,6 +1,6 @@
 # Session composition
 
-This document describes the session documentation domain conventions, metadata format, and shell wrapper instructions for the WGogol platform.
+This document describes the session documentation domain conventions, metadata format, and shell wrapper instructions for the Warpgogol platform.
 
 ## Overview
 

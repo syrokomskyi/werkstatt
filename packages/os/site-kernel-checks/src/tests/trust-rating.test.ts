@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runTrustRatingValidate } from "../trust-rating.ts";
-import type { KernelCommandInput } from "@gogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/site-kernel";
 import { makeTestSiteContext } from "./helpers.ts";
 
 /*

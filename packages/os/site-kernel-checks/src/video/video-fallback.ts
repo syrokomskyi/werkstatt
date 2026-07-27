@@ -37,13 +37,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import type { VideoManifest, LiveVideoManifest } from "@gogol/share/schemas/media";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import type { VideoManifest, LiveVideoManifest } from "@warpgogol/share/schemas/media";
 import { fileExists } from "../lib/file-exists.ts";
 import { passResult, resultFromViolations } from "../result-helpers.ts";
 import { readDefaultLanguageCode } from "../lib/i18n.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 /** Recursively collect every living-photo clip (`.webm`/`.mp4`), skipping RFC-0210 `media/` sources. */
 async function collectClips(dir: string): Promise<string[]> {

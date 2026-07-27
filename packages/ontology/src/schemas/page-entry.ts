@@ -6,7 +6,7 @@ Every page .md file under apps/<app>/src/content/pages/ must conform to PageEntr
 Exports BlockEntrySchema and PageEntrySchema — pure declarative schemas, no I/O.
 </purpose>
 <non-goals>
-  <item>Do not implement the buildPage pipeline here — that lives in @gogol/share/page.</item>
+  <item>Do not implement the buildPage pipeline here — that lives in @warpgogol/share/page.</item>
   <item>Do not parse YAML here; callers provide parsed objects to schema.parse().</item>
   <item>Do not validate cross-system.yaml references — that is page.block.validate's job.</item>
 </non-goals>
@@ -35,8 +35,8 @@ const PRINT_REGIONS = [
 ] as const;
 
 // ---------------------------------------------------------------------------
-// VisibilityExprSchema (re-declared here to avoid cross-package dep on @gogol/share)
-// page.block.validate uses the canonical one from @gogol/share;
+// VisibilityExprSchema (re-declared here to avoid cross-package dep on @warpgogol/share)
+// page.block.validate uses the canonical one from @warpgogol/share;
 // the schema here is for Astro content-collection integration.
 // ---------------------------------------------------------------------------
 

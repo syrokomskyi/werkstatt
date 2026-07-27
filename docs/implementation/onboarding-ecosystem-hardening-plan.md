@@ -77,7 +77,7 @@ Make the modern CMS-friendly app surface the only active app contract.
 ### Validation commands
 
 ```sh
-pnpm --filter @gogol/site-kernel-checks build:check
+pnpm --filter @warpgogol/site-kernel-checks build:check
 pnpm exec site-kernel run apps-check.run --app nicaragua-projekt --json
 pnpm exec site-kernel run app.contract.full --app nicaragua-projekt --json
 ```
@@ -125,7 +125,7 @@ Make `onboarding/.input` and `onboarding/.output/<phase>` a deterministic contra
 ### Validation commands
 
 ```sh
-pnpm --filter @gogol/site-kernel-checks build:check
+pnpm --filter @warpgogol/site-kernel-checks build:check
 pnpm exec site-kernel run onboarding.input.validate --app nicaragua-projekt --json
 pnpm exec site-kernel run onboarding.phase.validate --app nicaragua-projekt --phase=05-audit --json
 ```
@@ -173,7 +173,7 @@ Make `audit.llm.run` schema, cache, and aggregator behavior production-grade.
 ### Validation commands
 
 ```sh
-pnpm --filter @gogol/site-kernel-checks build:check
+pnpm --filter @warpgogol/site-kernel-checks build:check
 pnpm exec site-kernel run audit.llm.run --app nicaragua-projekt --kind=cultural --json
 pnpm exec site-kernel run audit.llm.run --app nicaragua-projekt --kind=linguistic --json
 pnpm exec site-kernel run app.qa.validate --app nicaragua-projekt --json
@@ -227,7 +227,7 @@ Move validators from shallow heuristics to schema-aware checks while preserving 
 ### Validation commands
 
 ```sh
-pnpm --filter @gogol/site-kernel-checks build:check
+pnpm --filter @warpgogol/site-kernel-checks build:check
 pnpm exec site-kernel run seo.technical.validate --app nicaragua-projekt --json
 pnpm exec site-kernel run seo.structured-data.validate --app nicaragua-projekt --json
 pnpm exec site-kernel run seo.internal-linking.validate --app nicaragua-projekt --json
@@ -260,7 +260,7 @@ Ensure the ecosystem is coherent for future AI-agent onboarding sessions.
 ### Validation commands
 
 ```sh
-pnpm --filter @gogol/site-kernel-checks build:check
+pnpm --filter @warpgogol/site-kernel-checks build:check
 pnpm exec site-kernel run apps-check.run --app nicaragua-projekt --json
 pnpm exec site-kernel run app.contract.full --app nicaragua-projekt --json
 pnpm exec site-kernel run rfc.validate RFC-0074 --json

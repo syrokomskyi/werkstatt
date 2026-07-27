@@ -15,7 +15,7 @@ a linkedCardGrid block into each industry page's baked pages (all languages).
 </CHANGE_SUMMARY>
 */
 
-import type { PageEntry, VirtualRouteEntry } from "@gogol/surface";
+import type { PageEntry, VirtualRouteEntry } from "@warpgogol/surface";
 
 const SERVICE_CATALOG_LABELS: Record<string, string> = {
   de: "Leistungen",

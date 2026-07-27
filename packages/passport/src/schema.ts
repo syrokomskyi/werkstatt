@@ -16,7 +16,7 @@
 *******************************************************************************/
 
 /**
- * @gogol/passport — Passport JSON schema (schemaVersion 1.0)
+ * @warpgogol/passport — Passport JSON schema (schemaVersion 1.0)
  *
  * DNA-31 / RFC-0028
  *

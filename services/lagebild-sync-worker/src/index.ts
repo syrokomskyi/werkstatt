@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0186: Shared Lagebild sync worker thin wrapper.
-Re-exports createLagebildSharedSyncWorker from @gogol/integration-adapter-supabase-crm/worker.
+Re-exports createLagebildSharedSyncWorker from @warpgogol/integration-adapter-supabase-crm/worker.
 No business logic here — only the deploy target binding.</purpose>
 <non-goals>
   <item>Do not implement tenant registry access, Pipedrive delivery, or buffer processing logic here.</item>
@@ -12,6 +12,6 @@ No business logic here — only the deploy target binding.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import { createLagebildSharedSyncWorker } from "@gogol/integration-adapter-supabase-crm/worker";
+import { createLagebildSharedSyncWorker } from "@warpgogol/integration-adapter-supabase-crm/worker";
 
 export default createLagebildSharedSyncWorker();

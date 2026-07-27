@@ -8,18 +8,18 @@
 
 ```typescript
 // tools/modules/check.module.ts
-import type { KernelModule } from "@gogol/site-kernel";
-import { createStandardCheckModule } from "@gogol/site-kernel-checks";
+import type { KernelModule } from "@warpgogol/site-kernel";
+import { createStandardCheckModule } from "@warpgogol/site-kernel-checks";
 
 export const checkModule: KernelModule = createStandardCheckModule();
 ```
 
 ```typescript
 // tools/kernel.config.ts
-import { defineKernelConfig } from "@gogol/site-kernel";
+import { defineKernelConfig } from "@warpgogol/site-kernel";
 import { checkModule } from "./modules/check.module";
 import { serviceModule } from "./modules/service.module";
-import { APPS_CHECK_PIPELINE } from "@gogol/site-kernel-checks";
+import { APPS_CHECK_PIPELINE } from "@warpgogol/site-kernel-checks";
 
 export default defineKernelConfig({
   name: "my-app",
@@ -74,8 +74,8 @@ export default defineKernelConfig({
 If an app needs custom checks beyond the standard set, use `extraCommands`:
 
 ```typescript
-import type { KernelModule } from "@gogol/site-kernel";
-import { createStandardCheckModule } from "@gogol/site-kernel-checks";
+import type { KernelModule } from "@warpgogol/site-kernel";
+import { createStandardCheckModule } from "@warpgogol/site-kernel-checks";
 import { runFundingFreshnessValidation } from "../runtime/check";
 
 export const checkModule: KernelModule = createStandardCheckModule({
@@ -316,7 +316,7 @@ Minimal shape:
 
 ```typescript
 // packages/os/site-kernel-checks/src/my-thing.ts
-import type { Diagnostic, KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { Diagnostic, KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 export async function runMyThingValidate(
@@ -345,7 +345,7 @@ Every **new** command module (and every module you migrate) must receive its fil
 
 ## Reuse the shared fs/text helpers — don't write a new `walk()` (RFC-0303)
 
-Before writing a recursive `readdir` walker, an existence check, a JSON reader, or an offset→line/column calculator in a new or migrated check module, see the **Shared helpers catalog** in `packages/AGENTS.md` — every one of those primitives already has a single canonical home in `@gogol/share/fs` / `@gogol/share/text-position`. `fs.walk.lint` (WALK-01) and `dedup.helper.lint` (DEDUP-01) fail the build on a fresh duplicate; `file.size.lint` (SIZE-01, warning) flags the file once it grows past the split threshold.
+Before writing a recursive `readdir` walker, an existence check, a JSON reader, or an offset→line/column calculator in a new or migrated check module, see the **Shared helpers catalog** in `packages/AGENTS.md` — every one of those primitives already has a single canonical home in `@warpgogol/share/fs` / `@warpgogol/share/text-position`. `fs.walk.lint` (WALK-01) and `dedup.helper.lint` (DEDUP-01) fail the build on a fresh duplicate; `file.size.lint` (SIZE-01, warning) flags the file once it grows past the split threshold.
 
 Why this matters:
 
@@ -357,8 +357,8 @@ Minimal shape:
 ```typescript
 // packages/os/site-kernel-checks/src/my-generator.ts
 import { dirname, join } from "node:path"; // path utilities are fine — only fs/child_process are gated
-import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "@gogol/site-kernel";
-import { GENERATED_MARKER, hasGeneratedMarker } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { GENERATED_MARKER, hasGeneratedMarker } from "@warpgogol/site-kernel";
 
 export async function runMyGenerate(
   _input: KernelCommandInput,

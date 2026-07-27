@@ -4,17 +4,17 @@
 - **Reviewer:** fo-review (automated)
 - **Diff range:** `38363ee9a~1...516b63206` (8 commits)
 - **RFC:** RFC-0532 — Modernize onboarding for Sternsystem architecture
-- **Packages touched:** `@gogol/site-kernel-onboarding`, `@gogol/site-kernel-handoff`, `@wgogol/forge`
+- **Packages touched:** `@warpgogol/site-kernel-onboarding`, `@warpgogol/site-kernel-handoff`, `@warpgogol/forge`
 
 ## Mechanical floor
 
 | Check | Result |
 | --- | --- |
-| `@gogol/site-kernel-onboarding` build:check | PASS |
-| `@gogol/site-kernel-handoff` build:check | PASS |
-| `@wgogol/forge` build:check | PASS |
-| `@gogol/site-kernel-onboarding` tests | 17/17 PASS |
-| `@gogol/site-kernel-handoff` tests | 191/193 PASS (2 pre-existing `rfc-0483.snapshot.test.ts` failures, unrelated) |
+| `@warpgogol/site-kernel-onboarding` build:check | PASS |
+| `@warpgogol/site-kernel-handoff` build:check | PASS |
+| `@warpgogol/forge` build:check | PASS |
+| `@warpgogol/site-kernel-onboarding` tests | 17/17 PASS |
+| `@warpgogol/site-kernel-handoff` tests | 191/193 PASS (2 pre-existing `rfc-0483.snapshot.test.ts` failures, unrelated) |
 | `rfc.validate rfc-0532` | PASS |
 | `forge.skill.validate` | PASS (0 violations) |
 
@@ -71,13 +71,13 @@ The atomic rollback correctly handles partial state: mission abort → content r
 
 **FAIL** — `packages/os/site-kernel-onboarding/src/synthesize.ts:15,60,92`
 
-DNA-53 states: "All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@gogol/fingerprint` package. New ad hoc direct hashing helpers are forbidden outside the package."
+DNA-53 states: "All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@warpgogol/fingerprint` package. New ad hoc direct hashing helpers are forbidden outside the package."
 
 `synthesize.ts` uses `import { createHash } from "node:crypto"` and calls `createHash("sha256")` directly at lines 60 and 92. This is a new ad hoc hashing helper introduced by this RFC.
 
 **Mitigating factor:** Pre-existing files `amend.ts:16,153` and `amend-gates.ts:17,99` already use `createHash` directly in the same package, so this is a pre-existing pattern rather than a regression. However, the new code perpetuates the violation.
 
-**Recommendation:** Use `byteHash` from `@gogol/fingerprint` instead. This requires adding `@gogol/fingerprint` as a dependency to `@gogol/site-kernel-onboarding`.
+**Recommendation:** Use `byteHash` from `@warpgogol/fingerprint` instead. This requires adding `@warpgogol/fingerprint` as a dependency to `@warpgogol/site-kernel-onboarding`.
 
 **Evidence:** `synthesize.ts:15` (`import { createHash }`), `synthesize.ts:60` (`hashString`), `synthesize.ts:92` (per-file hash).
 
@@ -127,20 +127,20 @@ The existing tests only cover pre-RFC-0532 behavior (duplicate id, invalid cosmi
 
 ### D2. No tests for `onboarding.synthesize`
 
-**FAIL** — No test file exists for `synthesize.ts`. The 17 passing tests in `@gogol/site-kernel-onboarding` are all in `brief.test.ts` (pre-existing). The new `onboarding.synthesize` command has no unit tests covering:
+**FAIL** — No test file exists for `synthesize.ts`. The 17 passing tests in `@warpgogol/site-kernel-onboarding` are all in `brief.test.ts` (pre-existing). The new `onboarding.synthesize` command has no unit tests covering:
 - Brief validation via `parseBriefFrontmatter`
 - File hashing and manifest generation
 - `classifyInputFile` classification logic
 - Noop case (no `.input/` directory)
 - Fail case (missing brief)
 
-**Evidence:** `pnpm --filter @gogol/site-kernel-onboarding test` shows `Test Files 1 passed (1)` — only `brief.test.ts`.
+**Evidence:** `pnpm --filter @warpgogol/site-kernel-onboarding test` shows `Test Files 1 passed (1)` — only `brief.test.ts`.
 
 ## Axis E — Ecosystem fit
 
 ### E1. Package boundary
 
-**PASS** — `sternsystem-register.ts` imports from `@gogol/site-kernel-onboarding` for `parseBriefFrontmatter`, which is a legitimate cross-package dependency (handoff depends on onboarding). The import is from the public API surface (`index.ts`), not internal modules.
+**PASS** — `sternsystem-register.ts` imports from `@warpgogol/site-kernel-onboarding` for `parseBriefFrontmatter`, which is a legitimate cross-package dependency (handoff depends on onboarding). The import is from the public API surface (`index.ts`), not internal modules.
 
 ### E2. `fo-onboard` skill registration
 
@@ -188,6 +188,6 @@ The existing tests only cover pre-RFC-0532 behavior (duplicate id, invalid cosmi
 
 1. **Delete `runBriefValidate`** from `brief.ts` and remove the old global path fallback at line 124. This is dead code that violates the RFC acceptance criterion.
 2. **Fix flag metadata** in `sternsystem.module.ts`: make `cosmicStar` and `repo` conditionally required (not required when `--amend` is set), and change `amend-id` kind to `number`.
-3. **Replace `createHash` with `@gogol/fingerprint` `byteHash`** in `synthesize.ts` to comply with DNA-53.
+3. **Replace `createHash` with `@warpgogol/fingerprint` `byteHash`** in `synthesize.ts` to comply with DNA-53.
 4. **Add tests** for `onboarding.synthesize` (new test file `synthesize.test.ts`).
 5. **Add tests** for extended `sternsystem.register` (pin, mission, materialize, amend, rollback).

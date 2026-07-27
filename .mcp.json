@@ -2,15 +2,15 @@
   "mcpServers": {
     "signoz": {
       "type": "url",
-      "url": "https://observe.webgogol.com/mcp",
+      "url": "https://observe.warpgogol.com/mcp",
       "headers": {
-        "Authorization": "Bearer ${WGOGOL_SIGNOZ_MCP_TOKEN}"
+        "Authorization": "Bearer ${WARPGOGOL_SIGNOZ_MCP_TOKEN}"
       }
     },
     "studio-gate": {
       "type": "stdio",
-      "command": "pnpm",
-      "args": ["--filter", "@gogol/studio-gate", "start"],
+      "command": "node",
+      "args": ["packages/studio-gate/dist/index.js"],
       "env": {
         "WERKSTATT_ROOT": "${workspaceFolder}",
         "STUDIO_GATE_BUILD_CONCURRENCY": "2"

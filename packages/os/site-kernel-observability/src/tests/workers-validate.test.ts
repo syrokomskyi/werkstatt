@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import type { KernelLogger, KernelRuntimeContext, WorkspaceIO } from "@gogol/site-kernel";
+import type { KernelLogger, KernelRuntimeContext, WorkspaceIO } from "@warpgogol/site-kernel";
 import { runObservabilityWorkersValidate } from "../commands/workers-validate.ts";
 
 /*

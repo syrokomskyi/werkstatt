@@ -6,8 +6,8 @@ regenerateCommand: pnpm exec site-kernel run fleet.status.collect
 _generated: GENERATED. Do not change this line unless the file contains project specific changes.
 collectedAt: null
 sites:
-  - site: webgogol-com
-    path: apps/webgogol-com
+  - site: warpgogol-com
+    path: apps/warpgogol-com
     bordbuchHash: sha256:9f9d191393c19f29ec71e9e1f96f63f51db7ec4569cb28179a0248f94c167ca7
     autonomy:
       pseo/structural/uk: L0
@@ -25,6 +25,6 @@ sites:
     lastOutcomeWindow: 2026-06-28T00:00:00.000Z
     humanMinutesPer1000Pages: 0
 escalations:
-  - site: webgogol-com
+  - site: warpgogol-com
     open: 0
 humanMinutesPer1000Pages: 0

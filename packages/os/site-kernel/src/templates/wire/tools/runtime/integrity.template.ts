@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Re-export integrity commands from @gogol/site-kernel-integrity.</purpose>
+<purpose>Re-export integrity commands from @warpgogol/site-kernel-integrity.</purpose>
 <non-goals>
   <item>Do not implement logic locally — this file is a thin proxy.</item>
 </non-goals>
@@ -18,4 +18,4 @@ export {
   runIntegrityVerifyRelease,
   runIntegrityGenerateSigningKeypair,
   runIntegrityBackfillRevisions,
-} from "@gogol/site-kernel-integrity";
+} from "@warpgogol/site-kernel-integrity";

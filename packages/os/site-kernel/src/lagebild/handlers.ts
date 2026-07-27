@@ -3,7 +3,7 @@
 <purpose>RFC-0186: Lagebild CLI command handlers for tenant lifecycle management.
 Talks to Supabase sync_tenants registry via PostgREST.</purpose>
 <non-goals>
-  <item>Do not validate workspace structure — that is handled by @gogol/site-kernel-checks.</item>
+  <item>Do not validate workspace structure — that is handled by @warpgogol/site-kernel-checks.</item>
   <item>Do not implement the sync worker itself — that lives in services/lagebild-sync-worker.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -28,7 +28,7 @@ import {
   updateTenantSecretRef,
   countOutboxByStatus,
   type SecretKind,
-} from "@gogol/integration-adapter-supabase-crm/tenant-registry";
+} from "@warpgogol/integration-adapter-supabase-crm/tenant-registry";
 import { resolveRegistryClient, extractProjectRef } from "./env.ts";
 
 /** lagebild.tenant.add — create tenant row in sync_tenants and emit secret setup commands. */

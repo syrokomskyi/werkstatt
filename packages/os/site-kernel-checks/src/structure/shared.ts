@@ -13,8 +13,8 @@
 
 import { join, relative } from "node:path";
 import { readdir } from "node:fs/promises";
-import { collectFiles } from "@gogol/share/fs";
-import { collectMarkdownFiles } from "@gogol/site-kernel-content";
+import { collectFiles } from "@warpgogol/share/fs";
+import { collectMarkdownFiles } from "@warpgogol/site-kernel-content";
 
 // @ai-invariant The CONTENT_COMPONENTS_SUBPATH and SCHEMAS_COMPONENTS_SUBPATH constants define
 // the canonical relative paths used by the three-way mirroring convention (ARCHITECTURE_DNA #5).

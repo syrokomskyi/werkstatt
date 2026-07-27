@@ -7,7 +7,7 @@
   </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Migrated sha256StringHex from deleted ./hash.ts to byteHash from @gogol/fingerprint directly.</item>
+  <item>Migrated sha256StringHex from deleted ./hash.ts to byteHash from @warpgogol/fingerprint directly.</item>
 </CHANGE_SUMMARY>
 
 /**
@@ -23,7 +23,7 @@ import {
   verify as cryptoVerify,
 } from "node:crypto";
 import path from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import { ensureDir, pathExists, readBuffer, readText, writeText } from "./fs.ts";
 import { readJsonFile, stableStringify } from "./json.ts";
 import {

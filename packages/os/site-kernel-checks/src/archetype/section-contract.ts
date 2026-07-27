@@ -12,13 +12,13 @@
 */
 
 import { join, relative, basename, dirname } from "node:path";
-import { fileExists as pathExists } from "@gogol/share/fs";
-import { manifestSchema } from "@gogol/ontology";
+import { fileExists as pathExists } from "@warpgogol/share/fs";
+import { manifestSchema } from "@warpgogol/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { collectFilesMatching, readYamlFile } from "./shared.ts";
 
 interface SectionContractResult {

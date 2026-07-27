@@ -12,8 +12,8 @@
 */
 
 import type { KernelExecutionReport } from "../types.ts";
-import type { MetricsPusher } from "@gogol/observability";
-import { createMetricsPusher, METRIC_REFS } from "@gogol/observability";
+import type { MetricsPusher } from "@warpgogol/observability";
+import { createMetricsPusher, METRIC_REFS } from "@warpgogol/observability";
 
 let pusher: MetricsPusher | null | undefined;
 
@@ -60,20 +60,20 @@ export function recordCommandTelemetry(pusher: MetricsPusher, report: KernelExec
     const labels: Record<string, string> = { command, status };
     if (siteId) labels["site_id"] = siteId;
 
-    // wgogol_factory_command_runs_total{command, status, site_id}
-    METRIC_REFS.wgogol_factory_command_runs_total.add(pusher, 1, labels);
+    // warpgogol_factory_command_runs_total{command, status, site_id}
+    METRIC_REFS.warpgogol_factory_command_runs_total.add(pusher, 1, labels);
 
-    // wgogol_factory_command_duration_seconds{command, site_id}
+    // warpgogol_factory_command_duration_seconds{command, site_id}
     const durationSeconds = (report.timing?.durationMs ?? 0) / 1000;
     const histLabels: Record<string, string> = { command };
     if (siteId) histLabels["site_id"] = siteId;
-    METRIC_REFS.wgogol_factory_command_duration_seconds.record(pusher, durationSeconds, histLabels);
+    METRIC_REFS.warpgogol_factory_command_duration_seconds.record(pusher, durationSeconds, histLabels);
 
-    // wgogol_factory_diagnostics_total{command, severity, site_id}
+    // warpgogol_factory_diagnostics_total{command, severity, site_id}
     for (const { severity, count } of countDiagnostics(report)) {
       const diagLabels: Record<string, string> = { command, severity };
       if (siteId) diagLabels["site_id"] = siteId;
-      METRIC_REFS.wgogol_factory_diagnostics_total.add(pusher, count, diagLabels);
+      METRIC_REFS.warpgogol_factory_diagnostics_total.add(pusher, count, diagLabels);
     }
   } catch {
     // Never let telemetry affect command results

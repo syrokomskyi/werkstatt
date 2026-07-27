@@ -16,8 +16,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { hasGeneratedMarker } from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
 import { diagnostics, loadPublicContext, readTextIfExists, workspaceRel } from "./shared.ts";
 import { passResult } from "../result-helpers.ts";
 
@@ -79,11 +79,11 @@ export async function runNotFoundValidate(
           "Regenerate via routes.generate unless the owner intentionally converts it to project-specific ownership.",
       });
     }
-    if (!route.includes("@gogol/ui/components/not-found/not-found-component.astro")) {
+    if (!route.includes("@warpgogol/ui/components/not-found/not-found-component.astro")) {
       messages.push({
         severity: "error",
         file: workspaceRel(context, routePath),
-        message: "src/pages/404.astro must import the shared @gogol/ui not-found component.",
+        message: "src/pages/404.astro must import the shared @warpgogol/ui not-found component.",
         fixHint: "Regenerate via routes.generate.",
       });
     }
@@ -100,7 +100,7 @@ export async function runNotFoundValidate(
         severity: "error",
         file: workspaceRel(context, routePath),
         message: "Generated 404 route must not contain app-local style blocks.",
-        fixHint: "Keep 404 styling inside @gogol/ui.",
+        fixHint: "Keep 404 styling inside @warpgogol/ui.",
       });
     }
   }
@@ -108,7 +108,7 @@ export async function runNotFoundValidate(
     messages.push({
       severity: "error",
       file: workspaceRel(context, componentPath),
-      message: "Shared not-found component and CSS must exist in @gogol/ui.",
+      message: "Shared not-found component and CSS must exist in @warpgogol/ui.",
       fixHint: "Add packages/ui/src/components/not-found/not-found-component.astro and .css.",
     });
   }

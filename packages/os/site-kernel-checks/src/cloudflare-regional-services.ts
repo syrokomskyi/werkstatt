@@ -23,10 +23,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { optionalEnv } from "@gogol/site-kernel-integrity";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { optionalEnv } from "@warpgogol/site-kernel-integrity";
 import { passResult, failResult, resultFromViolations } from "./result-helpers.ts";
 
 /** Cloudflare Regional Services API response shape (tolerant). */

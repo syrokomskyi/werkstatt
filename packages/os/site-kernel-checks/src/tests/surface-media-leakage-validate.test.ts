@@ -121,7 +121,7 @@ describe("surface.media-leakage.validate", () => {
       const distDir = join(appDir, "dist", "client");
       const html = CLEAN_HTML.replace(
         "</body>",
-        "<div>Copyright © 2026 Webgogol. Alle Rechte vorbehalten.</div></body>",
+        "<div>Copyright © 2026 Warpgogol. Alle Rechte vorbehalten.</div></body>",
       );
       await writeHtmlFile(distDir, "website/friseur/stuttgart", html);
       const result = await runSurfaceMediaLeakageValidate(testInput(), context);
@@ -141,7 +141,7 @@ describe("surface.media-leakage.validate", () => {
       const html = `<!DOCTYPE html>
 <html><head><title>Friseur Stuttgart</title></head>
 <body><h1>Friseur in Stuttgart</h1>
-<footer><p>Copyright © 2026 Webgogol. Alle Rechte vorbehalten.</p></footer>
+<footer><p>Copyright © 2026 Warpgogol. Alle Rechte vorbehalten.</p></footer>
 </body></html>`;
       await writeHtmlFile(distDir, "website/friseur/stuttgart", html);
       const result = await runSurfaceMediaLeakageValidate(testInput(), context);

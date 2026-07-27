@@ -27,7 +27,7 @@ The fix diff addresses six findings from the prior review (G-1, E-1, E-2, A-1, A
 
 ### Mechanical floor
 
-Pass — `build:check` and `test` pass for `@gogol/fingerprint` and `@gogol/site-kernel-handoff` (49 tests, 11 files).
+Pass — `build:check` and `test` pass for `@warpgogol/fingerprint` and `@warpgogol/site-kernel-handoff` (49 tests, 11 files).
 
 ### Axis A — Structural correctness
 
@@ -39,7 +39,7 @@ No issues. DNA-49 (fleet propagation) is strengthened — the health verdict fix
 
 ### Axis C — Ecosystem fit
 
-No issues. `hashHtml` name avoids collision with the separate `normalizeHtml` in `@gogol/share/text-normalize.ts` (which returns normalized HTML, not a hash). `yaml` package is already a dependency of `@gogol/site-kernel-handoff`.
+No issues. `hashHtml` name avoids collision with the separate `normalizeHtml` in `@warpgogol/share/text-normalize.ts` (which returns normalized HTML, not a hash). `yaml` package is already a dependency of `@warpgogol/site-kernel-handoff`.
 
 ### Axis D — Forward-only compliance
 

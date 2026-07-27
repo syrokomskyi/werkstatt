@@ -370,7 +370,7 @@ entries:
       - RFC-0020
     file: docs\rfcs\archive\implemented\rfc-0021-establish-layouts-content-layer-and-os-validation-contract.md
   - id: RFC-0022
-    title: Unify Semantic and Astro Infrastructure in @gogol/share
+    title: Unify Semantic and Astro Infrastructure in @warpgogol/share
     status: superseded
     kind: architecture
     createdAt: 2026-04-23
@@ -669,7 +669,7 @@ entries:
       - RFC-0030
     file: docs\rfcs\archive\implemented\rfc-0031-canonicalize-colocated-source-assets-and-feature-scoped-client-scripts.md
   - id: RFC-0032
-    title: Enforce app-agnostic utility extraction to @gogol/share
+    title: Enforce app-agnostic utility extraction to @warpgogol/share
     status: implemented
     kind: policy
     createdAt: 2026-04-28
@@ -681,10 +681,10 @@ entries:
     amendedBy: []
     related:
       - RFC-0022
-    file: docs\rfcs\archive\implemented\rfc-0032-enforce-app-agnostic-utility-extraction-to-webgogol-share.md
+    file: docs\rfcs\archive\implemented\rfc-0032-enforce-app-agnostic-utility-extraction-to-warpgogol-share.md
   - id: RFC-0033
     title: Retire app-local content schemas and migrate feature graph schema to
-      @gogol/share
+      @warpgogol/share
     status: superseded
     kind: deprecation
     createdAt: 2026-04-29
@@ -755,7 +755,7 @@ entries:
       - RFC-0028
     file: docs\rfcs\archive\implemented\rfc-0036-extend-blocks-renderer-to-support-shell-level-and-mooncatalog-components.md
   - id: RFC-0037
-    title: "Supersede RFC-0022: Allow astro:content in @gogol/share"
+    title: "Supersede RFC-0022: Allow astro:content in @warpgogol/share"
     status: implemented
     kind: architecture
     createdAt: 2026-05-01
@@ -1576,7 +1576,7 @@ entries:
       - RFC-0091
     file: docs\rfcs\archive\implemented\rfc-0093-section-scaffold-must-emit-content-aware-starter-not-json-dump.md
   - id: RFC-0094
-    title: Shared @gogol/ui components must not carry app-specific default pageIds
+    title: Shared @warpgogol/ui components must not carry app-specific default pageIds
     status: implemented
     kind: contract
     createdAt: 2026-05-24
@@ -2230,7 +2230,7 @@ entries:
     file: docs\rfcs\archive\implemented\rfc-0123-drop-legacy-section-props-schema-files.md
   - id: RFC-0124
     title: Section-framework token contract — every consumed `--ds-*` token must
-      exist in `@gogol/tokens`
+      exist in `@warpgogol/tokens`
     status: implemented
     kind: command
     createdAt: 2026-05-28
@@ -4322,7 +4322,7 @@ entries:
       - RFC-0223
     file: docs\rfcs\archive\implemented\rfc-0224-allow-agents-to-stamp-rfc-implementation-status.md
   - id: RFC-0225
-    title: Reposition webgogol-com around owned digital assets for Handwerk
+    title: Reposition warpgogol-com around owned digital assets for Handwerk
     status: implemented
     kind: architecture
     createdAt: 2026-06-21
@@ -4338,7 +4338,7 @@ entries:
       - RFC-0205
       - RFC-0211
       - RFC-0220
-    file: docs\rfcs\archive\implemented\rfc-0225-reposition-webgogol-com-around-owned-digital-assets-for-handwerk.md
+    file: docs\rfcs\archive\implemented\rfc-0225-reposition-warpgogol-com-around-owned-digital-assets-for-handwerk.md
   - id: RFC-0226
     title: Write embedded content credentials from material credit records
     status: implemented
@@ -4690,7 +4690,7 @@ entries:
       - RFC-0240
     file: docs\rfcs\archive\implemented\rfc-0241-hdri-as-an-external-cited-source-with-an-identity-firewall.md
   - id: RFC-0242
-    title: Bodenstation full dogfooding datasets for webgogol com
+    title: Bodenstation full dogfooding datasets for warpgogol com
     status: implemented
     kind: architecture
     createdAt: 2026-06-24
@@ -4708,7 +4708,7 @@ entries:
       - RFC-0240
       - RFC-0241
       - RFC-0243
-    file: docs\rfcs\archive\implemented\rfc-0242-bodenstation-full-dogfooding-datasets-for-webgogol-com.md
+    file: docs\rfcs\archive\implemented\rfc-0242-bodenstation-full-dogfooding-datasets-for-warpgogol-com.md
   - id: RFC-0243
     title: "Authored Offer Pillar: Replace PSEO-generated /leistungen/ with authored
       listing page"
@@ -5702,7 +5702,7 @@ entries:
       - RFC-0291
     file: docs\rfcs\archive\implemented\rfc-0292-federate-agent-surfaces-across-the-fleet.md
   - id: RFC-0293
-    title: Establish check-webgogol-com as a URL-first quality product
+    title: Establish check-warpgogol-com as a URL-first quality product
     status: implemented
     kind: architecture
     createdAt: 2026-07-05
@@ -5727,7 +5727,7 @@ entries:
       - RFC-0300
       - RFC-0301
       - RFC-0302
-    file: docs\rfcs\archive\implemented\rfc-0293-establish-check-webgogol-com-as-a-url-first-quality-product.md
+    file: docs\rfcs\archive\implemented\rfc-0293-establish-check-warpgogol-com-as-a-url-first-quality-product.md
   - id: RFC-0294
     title: Capture a rendered site evidence graph from URL targets
     status: implemented
@@ -5748,7 +5748,7 @@ entries:
       - RFC-0302
     file: docs\rfcs\archive\implemented\rfc-0294-capture-a-rendered-site-evidence-graph-from-url-targets.md
   - id: RFC-0295
-    title: Publish optional Webgogol check hints in .well-known
+    title: Publish optional Warpgogol check hints in .well-known
     status: implemented
     kind: contract
     createdAt: 2026-07-05
@@ -5765,7 +5765,7 @@ entries:
       - RFC-0293
       - RFC-0294
       - RFC-0297
-    file: docs\rfcs\archive\implemented\rfc-0295-publish-optional-webgogol-check-hints-in-well-known.md
+    file: docs\rfcs\archive\implemented\rfc-0295-publish-optional-warpgogol-check-hints-in-well-known.md
   - id: RFC-0296
     title: Run URL checks through a Node renderer and artifact store
     status: implemented
@@ -5847,7 +5847,7 @@ entries:
       - RFC-0298
     file: docs\rfcs\archive\implemented\rfc-0299-add-a-cached-ai-audience-review-lane-for-rendered-sites.md
   - id: RFC-0300
-    title: Create the check-webgogol-com operator app
+    title: Create the check-warpgogol-com operator app
     status: implemented
     kind: architecture
     createdAt: 2026-07-05
@@ -5866,7 +5866,7 @@ entries:
       - RFC-0297
       - RFC-0299
       - RFC-0301
-    file: docs\rfcs\archive\implemented\rfc-0300-create-the-check-webgogol-com-operator-app.md
+    file: docs\rfcs\archive\implemented\rfc-0300-create-the-check-warpgogol-com-operator-app.md
   - id: RFC-0301
     title: Gate deploy:main on alt URL checks
     status: implemented
@@ -5930,7 +5930,7 @@ entries:
       - RFC-0268
     file: docs\rfcs\archive\implemented\rfc-0303-consolidate-shared-fs-helpers-and-split-oversized-os-files.md
   - id: RFC-0304
-    title: Introduce backs workspaces and the Check Webgogol runner backend
+    title: Introduce backs workspaces and the Check Warpgogol runner backend
     status: implemented
     kind: architecture
     createdAt: 2026-07-05
@@ -5958,7 +5958,7 @@ entries:
       - RFC-0300
       - RFC-0301
       - RFC-0302
-    file: docs\rfcs\archive\implemented\rfc-0304-introduce-backs-workspaces-and-check-webgogol-runner-backend.md
+    file: docs\rfcs\archive\implemented\rfc-0304-introduce-backs-workspaces-and-check-warpgogol-runner-backend.md
   - id: RFC-0305
     title: Connect Matomo through a first-party analytics proxy and Messkanon
     status: accepted
@@ -6268,7 +6268,7 @@ entries:
       - RFC-0317
     file: docs\rfcs\archive\implemented\rfc-0320-add-portable-provenance-frontmatter-to-markdown-twins.md
   - id: RFC-0321
-    title: Close webgogol-com offer content audit decisions
+    title: Close warpgogol-com offer content audit decisions
     status: implemented
     kind: contract
     createdAt: 2026-07-05
@@ -6287,7 +6287,7 @@ entries:
       - RFC-0307
       - RFC-0316
       - RFC-0318
-    file: docs\rfcs\archive\implemented\rfc-0321-close-webgogol-com-offer-content-audit-decisions.md
+    file: docs\rfcs\archive\implemented\rfc-0321-close-warpgogol-com-offer-content-audit-decisions.md
   - id: RFC-0322
     title: Publish offer capacity waves and a live slot counter
     status: implemented
@@ -7388,7 +7388,7 @@ entries:
       - RFC-0239
     file: docs\rfcs\archive\implemented\rfc-0373-extract-services-at-organization-level-from-business-catalog.md
   - id: RFC-0374
-    title: Extract @gogol/forge — portable feature implementation ecosystem
+    title: Extract @warpgogol/forge — portable feature implementation ecosystem
     status: implemented
     kind: architecture
     createdAt: 2026-07-10

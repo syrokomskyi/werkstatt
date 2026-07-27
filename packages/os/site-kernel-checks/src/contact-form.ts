@@ -25,10 +25,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { CheckResult, Diagnostic } from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import type { CheckResult, Diagnostic } from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 
 interface SendMessageBlock {

@@ -18,7 +18,7 @@ breaker. One Worker serves all clients; tenant lifecycle is data-driven.</purpos
 */
 
 import { createSupabaseCrmBufferClient } from "./client.ts";
-import type { CrmBufferReader, SyncOutboxRow } from "@gogol/integration/crm-buffer";
+import type { CrmBufferReader, SyncOutboxRow } from "@warpgogol/integration/crm-buffer";
 import { createSyncTarget, type CrmSyncTarget } from "./pipedrive-sync-target.ts";
 import {
   type SyncTenant,

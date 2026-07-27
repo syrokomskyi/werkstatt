@@ -1,7 +1,7 @@
 # Blueprint: website-local v2 (RFC-0238)
 # Five-axis geo-demand cascade: industry × country × region × city × demand.
 # Datasets live in the app: apps/<app>/src/content/surface/{industries,demands}/<lang>/*.md
-# Geo axes (country, region, city) are resolved from @gogol/geo (RFC-0237).
+# Geo axes (country, region, city) are resolved from @warpgogol/geo (RFC-0237).
 # Gated by the single `pseo` entitlement (RFC-0169 / RFC-0240).
 id: website-local
 entitlement: pseo
@@ -36,8 +36,8 @@ levels:
     geo: twin-only
     semanticType: collection
     titleTemplate:
-      de: "Website für Handwerk und Gewerbe | Branchenübersicht | Webgogol"
-      uk: "Сайт для ремесла та бізнесу | Огляд галузей | Webgogol"
+      de: "Website für Handwerk und Gewerbe | Branchenübersicht | Warpgogol"
+      uk: "Сайт для ремесла та бізнесу | Огляд галузей | Warpgogol"
     descriptionTemplate:
       de: "Wie das Digitale Fundament an Elektriker, Friseure und andere lokale Betriebe angepasst wird: Leistungen, Einsatzgebiet, Kontaktwege und passende Funktionen."
       uk: "Як Цифровий фундамент адаптується до електриків, перукарів та іншого локального бізнесу: послуги, зона роботи, шляхи контакту та відповідні функції."
@@ -107,8 +107,8 @@ levels:
           de: Ihr Gewerbe ist noch nicht aufgeführt?
           uk: Вашої галузі ще немає в списку?
         body:
-          de: "Beschreiben Sie kurz Ihren Betrieb, Ihre Leistungen und Ihr Einsatzgebiet. Webgogol prüft, wie das Digitale Fundament für Ihre Situation aufgebaut werden kann."
-          uk: "Коротко опишіть свій бізнес, послуги та зону роботи. Webgogol перевірить, як Цифровий фундамент можна побудувати для вашої ситуації."
+          de: "Beschreiben Sie kurz Ihren Betrieb, Ihre Leistungen und Ihr Einsatzgebiet. Warpgogol prüft, wie das Digitale Fundament für Ihre Situation aufgebaut werden kann."
+          uk: "Коротко опишіть свій бізнес, послуги та зону роботи. Warpgogol перевірить, як Цифровий фундамент можна побудувати для вашої ситуації."
         primaryCta:
           label:
             de: Unverbindliche Anfrage starten

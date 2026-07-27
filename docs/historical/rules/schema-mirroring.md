@@ -16,25 +16,25 @@ The heavy validation contracts for pages, navigation, and site content have move
 
 - `src/content/schemas/navigation.ts`
   - defines `appNavigationGroups` array for app-specific navigation grouping
-  - imports shared base schemas from `@gogol/share/schemas/navigation`
+  - imports shared base schemas from `@warpgogol/share/schemas/navigation`
 
 ### Entity-ID proxy
 
 - `src/content/schemas/entity-id.ts`
-  - thin proxy re-exporting `@gogol/share/content` utilities
+  - thin proxy re-exporting `@warpgogol/share/content` utilities
   - do not re-implement normalization logic here
 
 ### Page base proxy
 
 - `src/content/schemas/pages/base.ts`
-  - thin proxy re-exporting shared page schemas from `@gogol/share/schemas`
+  - thin proxy re-exporting shared page schemas from `@warpgogol/share/schemas`
 
 ## Rules
 
 - Do not recreate `src/content/schemas/components/` or `src/content/schemas/pages/` deep trees.
 - Do not recreate `src/content/schemas/components-dispatcher.ts` or `src/content/schemas/pages-dispatcher.ts`.
 - App-local schemas should be **overrides**, not duplicate canonical contracts.
-- Keep route files thin: import types from `@gogol/share/schemas` instead of re-declaring local contracts.
+- Keep route files thin: import types from `@warpgogol/share/schemas` instead of re-declaring local contracts.
 - **FORBIDDEN:** Do not hardcode visitor-facing strings in component templates.
 
 ## Validation checklist

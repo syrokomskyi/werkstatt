@@ -116,13 +116,13 @@ mediaLeakagePolicy:
       matchingStrategy: context-aware
       contextSelector: "[data-credit-context], figcaption, details, dl"
       reason: "Internal enum value (CreditPartyKind) — only as media author label"
-    - pattern: "commissioned-webgogol-material"
+    - pattern: "commissioned-warpgogol-material"
       matchingStrategy: whole-word
       reason: "Internal enum value (MaterialSourceType)"
     - pattern: "linked-public-source"
       matchingStrategy: whole-word
       reason: "Internal enum value"
-    - pattern: "Copyright © 2026 Webgogol"
+    - pattern: "Copyright © 2026 Warpgogol"
       matchingStrategy: exact
       contextSelector: ":not(footer):not([data-footer])"
       reason: "Repetitive copyright boilerplate — per-material usage status is on /bildnachweise/"

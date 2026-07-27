@@ -1,0 +1,28 @@
+{
+  "name": "check-warpgogol-runner",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/worker.ts",
+    "run:once": "tsx src/run-once.ts",
+    "build:check": "tsc --noEmit",
+    "check": "site-kernel run check-warpgogol.runner.validate"
+  },
+  "dependencies": {
+    "@warpgogol/check-core": "workspace:*",
+    "@warpgogol/check-runner-node": "workspace:*",
+    "@warpgogol/site-kernel-check-warpgogol": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.1"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "platform",
+      "rationale": "Runner behavior is covered by check-core contracts, check-runner-node type checks, and check-warpgogol runner validation; direct service tests are deferred until browser-capture fixtures exist.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

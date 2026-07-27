@@ -15,7 +15,7 @@ concrete port implementations (fetch-based knowledge reads, QStash dispatch).
 </CHANGE_SUMMARY>
 */
 
-import type { IntegrationEvent } from "@gogol/integration/port";
+import type { IntegrationEvent } from "@warpgogol/integration/port";
 import type { RateLimiter } from "./limits.ts";
 
 export interface AgentGatePorts {

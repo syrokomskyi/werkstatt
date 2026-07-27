@@ -25,7 +25,7 @@ The change is a minimal, additive-only extension of 5 PBP entity Zod schemas wit
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/pbp run build:check` (tsc --noEmit) exit 0; `pnpm --filter @gogol/pbp run test` 174 tests passed; `rfc.validate RFC-0482` status: pass.
+Pass — `pnpm --filter @warpgogol/pbp run build:check` (tsc --noEmit) exit 0; `pnpm --filter @warpgogol/pbp run test` 174 tests passed; `rfc.validate RFC-0482` status: pass.
 
 ### Axis A — Structural correctness
 

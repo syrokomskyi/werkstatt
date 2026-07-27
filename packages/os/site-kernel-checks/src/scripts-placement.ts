@@ -16,13 +16,13 @@ scripts (RFC-0011); (2) src/content/glob.client.ts — bounded feature-scoped en
 
 import { join, relative, dirname, basename } from "node:path";
 import { readFile } from "node:fs/promises";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { fileExists } from "./lib/file-exists.ts";
 type ScriptPlacementRule =
   "SP-01" | "SP-02" | "SP-03" | "SP-04" | "SP-05" | "SP-06" | "SP-07" | "SP-08";

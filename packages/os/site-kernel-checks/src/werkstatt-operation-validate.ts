@@ -12,12 +12,12 @@
 */
 
 import { basename, join, relative } from "node:path";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 const SCAN_DIR = "packages/os/site-kernel-handoff/src";
 const ALLOWLIST_DIR = "packages/os/site-kernel-handoff/src/werkstatt";

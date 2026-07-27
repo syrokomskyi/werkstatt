@@ -19,12 +19,12 @@ fragment catalog. Two commands:
 </CHANGE_SUMMARY>
 */
 
-import { SHARED_SECTION_PROPS, sharedSectionPropsChangelog } from "@gogol/ontology";
+import { SHARED_SECTION_PROPS, sharedSectionPropsChangelog } from "@warpgogol/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 interface CatalogViolation {
   fragment: string;

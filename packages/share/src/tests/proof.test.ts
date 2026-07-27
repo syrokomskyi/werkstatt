@@ -25,17 +25,17 @@ function decodePayload(bytes: Uint8Array): string {
 test("buildAgentSigningPayload: produces domain-separated canonical text", () => {
   const payload = buildAgentSigningPayload(
     "manifest",
-    "https://webgogol.com/.well-known/agent.json",
+    "https://warpgogol.com/.well-known/agent.json",
     "abc123",
   );
   const text = decodePayload(payload);
   expect(text).toBe(
-    `${AGENT_PROOF_DOMAIN}\nmanifest\nhttps://webgogol.com/.well-known/agent.json\nabc123`,
+    `${AGENT_PROOF_DOMAIN}\nmanifest\nhttps://warpgogol.com/.well-known/agent.json\nabc123`,
   );
 });
 
 test("buildAgentSigningPayload: different artifact kinds produce different payloads", () => {
-  const url = "https://webgogol.com/.well-known/agent.json";
+  const url = "https://warpgogol.com/.well-known/agent.json";
   const hash = "abc123";
   const kinds: AgentProofArtifactKind[] = ["manifest", "knowledge", "openapi"];
   const payloads = new Set<string>();
@@ -60,12 +60,12 @@ test("buildAgentSigningPayload: different content hashes produce different paylo
 test("buildAgentSigningPayload: is deterministic for identical inputs", () => {
   const a = buildAgentSigningPayload(
     "knowledge",
-    "https://webgogol.com/api/agent/v1/offer.json",
+    "https://warpgogol.com/api/agent/v1/offer.json",
     "hash",
   );
   const b = buildAgentSigningPayload(
     "knowledge",
-    "https://webgogol.com/api/agent/v1/offer.json",
+    "https://warpgogol.com/api/agent/v1/offer.json",
     "hash",
   );
   expect(a).toEqual(b);

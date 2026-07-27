@@ -30,8 +30,8 @@ import {
   UPSTASH_QSTASH_URL,
   UPSTASH_QSTASH_TOKEN,
 } from "astro:env/server";
-import { buildQstashPublish, QSTASH_EU_BASE } from "@gogol/integration";
-import { verifyAndMapStripeEvent } from "@gogol/integration-adapter-stripe";
+import { buildQstashPublish, QSTASH_EU_BASE } from "@warpgogol/integration";
+import { verifyAndMapStripeEvent } from "@warpgogol/integration-adapter-stripe";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../section-api-utils.ts";
 
 export const POST: APIRoute = async ({ request }) => {

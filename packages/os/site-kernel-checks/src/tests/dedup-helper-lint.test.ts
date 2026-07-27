@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { findLocalReservedDeclarations, runDedupHelperLint } from "../dedup-helper-lint.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 /*
 <MODULE_CONTRACT>
@@ -52,13 +52,13 @@ describe("findLocalReservedDeclarations (RFC-0303)", () => {
   });
 
   it("green fixture: importing the canonical helper is not flagged", () => {
-    const source = 'import { fileExists, collectFiles } from "@gogol/share/fs";\n';
+    const source = 'import { fileExists, collectFiles } from "@warpgogol/share/fs";\n';
     expect(findLocalReservedDeclarations(source)).toEqual([]);
   });
 
   it("green fixture: a differently-named local wrapper is not flagged", () => {
     const source =
-      'import { fileExists as pathExists } from "@gogol/share/fs";\n' +
+      'import { fileExists as pathExists } from "@warpgogol/share/fs";\n' +
       "async function checkPath(p: string) { return pathExists(p); }\n";
     expect(findLocalReservedDeclarations(source)).toEqual([]);
   });
@@ -85,7 +85,7 @@ describe("runDedupHelperLint (RFC-0303, command-level)", () => {
     const { root, context } = await fixtureWorkspace();
     await writeFile(
       join(root, "packages", "some-pkg", "src", "clean.ts"),
-      'import { fileExists } from "@gogol/share/fs";\nexport async function run() { return fileExists("."); }\n',
+      'import { fileExists } from "@warpgogol/share/fs";\nexport async function run() { return fileExists("."); }\n',
       "utf8",
     );
     const result = await runDedupHelperLint(input(), context);

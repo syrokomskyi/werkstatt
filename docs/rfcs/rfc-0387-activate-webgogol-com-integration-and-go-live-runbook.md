@@ -1,6 +1,6 @@
 ---
 id: RFC-0387
-title: "Activate webgogol-com integration and go-live runbook"
+title: "Activate warpgogol-com integration and go-live runbook"
 status: draft
 kind: policy
 scope: workspace
@@ -43,29 +43,29 @@ commands:
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/site-kernel-checks"
+  - "@warpgogol/site-kernel-checks"
 successSignals:
-  - "webgogol-com is taken live end-to-end through a mission: integrations.funnel enabled, the CRM destination switched from direct pipedrive to supabase-buffer, secrets configured, validators green, and the release propagated alt -> main."
+  - "warpgogol-com is taken live end-to-end through a mission: integrations.funnel enabled, the CRM destination switched from direct pipedrive to supabase-buffer, secrets configured, validators green, and the release propagated alt -> main."
   - "A human integrator can follow one ordered runbook — external accounts, Supabase DDL, Upstash, Pipedrive, Lagebild worker deploy, UChat flows, secrets, validators, smoke tests — without inferring steps from historical RFCs."
   - "The visitor-funnel spec references the Werkstatt/Sternsystem topology (missions/systems), not the retired apps/ layout or the lagebild-system branch."
 nonGoals:
   - "Does not change the funnel state machine, buffer contracts, or Stripe adapter (RFC-0188/0190/0191/0385/0386 own those)."
   - "Does not add a new deployable service or command surface — it orchestrates existing Werkstatt and integration commands."
-  - "Does not onboard additional client sites; it is the webgogol-com pilot activation."
+  - "Does not onboard additional client sites; it is the warpgogol-com pilot activation."
   - "Does not automate vendor-console setup (UChat/Pipedrive/Stripe) — those remain human steps documented in the runbook."
 ---
 
-# RFC-0387: Activate webgogol-com integration and go-live runbook
+# RFC-0387: Activate warpgogol-com integration and go-live runbook
 
 ## Context
 
-Every platform capability for the visitor sales funnel is implemented in `packages/*` and `services/*`: the chat port (RFC-0175), the inbound → QStash EU → delivery hub (RFC-0176/0181), the Lagebild buffer + shared sync worker (RFC-0186/0190), the funnel state machine (RFC-0188/0219), and the Stripe/lifecycle contour (RFC-0191, completed by RFC-0386). The site `webgogol-com` has already been extracted to a Sternsystem and released once (`webgogol-com-r000001`) through the Werkstatt pilot (RFC-0381). The `apps/*` layer is retired; sites are data-only bundles in `systems/*` and are changed only through missions.
+Every platform capability for the visitor sales funnel is implemented in `packages/*` and `services/*`: the chat port (RFC-0175), the inbound → QStash EU → delivery hub (RFC-0176/0181), the Lagebild buffer + shared sync worker (RFC-0186/0190), the funnel state machine (RFC-0188/0219), and the Stripe/lifecycle contour (RFC-0191, completed by RFC-0386). The site `warpgogol-com` has already been extracted to a Sternsystem and released once (`warpgogol-com-r000001`) through the Werkstatt pilot (RFC-0381). The `apps/*` layer is retired; sites are data-only bundles in `systems/*` and are changed only through missions.
 
-What is missing is **activation**: the site's `system.md` still routes CRM directly to `pipedrive` and has no `integrations.funnel` block, the external systems (Supabase, Upstash, Pipedrive, UChat, Stripe) are not provisioned, the shared Lagebild worker/tenant is not deployed, and the operator-facing spec (`docs/specs/visitor-funnel/*`) still describes the pre-Werkstatt `apps/webgogol-com` layout and the `lagebild-system` branch.
+What is missing is **activation**: the site's `system.md` still routes CRM directly to `pipedrive` and has no `integrations.funnel` block, the external systems (Supabase, Upstash, Pipedrive, UChat, Stripe) are not provisioned, the shared Lagebild worker/tenant is not deployed, and the operator-facing spec (`docs/specs/visitor-funnel/*`) still describes the pre-Werkstatt `apps/warpgogol-com` layout and the `lagebild-system` branch.
 
 ## Problem
 
-There is no single authoritative, ordered procedure to take `webgogol-com` live under the current Werkstatt model. The knowledge is scattered across nine spec files (written for `apps/`), several RFCs, and command help text. A human integrator cannot execute the launch without reverse-engineering:
+There is no single authoritative, ordered procedure to take `warpgogol-com` live under the current Werkstatt model. The knowledge is scattered across nine spec files (written for `apps/`), several RFCs, and command help text. A human integrator cannot execute the launch without reverse-engineering:
 
 - which `system.md` edits belong in a mission Werkstück (not the retired `apps/` tree);
 - how to switch the CRM destination from `pipedrive` to `supabase-buffer` and enable `integrations.funnel`;
@@ -75,7 +75,7 @@ There is no single authoritative, ordered procedure to take `webgogol-com` live 
 
 ## Decision
 
-This RFC defines the authoritative webgogol-com go-live runbook and activation policy: the funnel is activated by a mission that enables `integrations.funnel` and switches the CRM destination to `crm:supabase-buffer`; the human integrator follows the ordered runbook in this document; the `docs/specs/visitor-funnel/*` spec is realigned to the Werkstatt/Sternsystem topology; and once the pilot is stable the four `funnel.*` validators join the standard site-check pipeline.
+This RFC defines the authoritative warpgogol-com go-live runbook and activation policy: the funnel is activated by a mission that enables `integrations.funnel` and switches the CRM destination to `crm:supabase-buffer`; the human integrator follows the ordered runbook in this document; the `docs/specs/visitor-funnel/*` spec is realigned to the Werkstatt/Sternsystem topology; and once the pilot is stable the four `funnel.*` validators join the standard site-check pipeline.
 
 ## Architectural fit
 
@@ -89,7 +89,7 @@ This RFC defines the authoritative webgogol-com go-live runbook and activation p
 
 ### Activation change set (inside a mission Werkstück)
 
-The `system.md` `integrations` block for `webgogol-com` changes as follows:
+The `system.md` `integrations` block for `warpgogol-com` changes as follows:
 
 ```yaml
 integrations:
@@ -120,7 +120,7 @@ integrations:
 
 ### Secrets (canonical names)
 
-Set in the deploy env and `.werkstatt/secrets/webgogol-com/{alt,main}.env` (gitignored, RFC-0379):
+Set in the deploy env and `.werkstatt/secrets/warpgogol-com/{alt,main}.env` (gitignored, RFC-0379):
 
 ```
 INTEGRATION_INBOUND_SECRET
@@ -147,34 +147,34 @@ Per-tenant Lagebild worker secrets follow the `TENANT_WEBGOGOL_COM_*` pattern in
 
 ### Go-live gate (validators)
 
-The following must pass for `webgogol-com` before propagation:
+The following must pass for `warpgogol-com` before propagation:
 
 ```sh
-pnpm exec site-kernel run funnel.contract.validate    --site webgogol-com --json
-pnpm exec site-kernel run funnel.stage.validate       --site webgogol-com --json
-pnpm exec site-kernel run funnel.copy.validate        --site webgogol-com --json
-pnpm exec site-kernel run funnel.lagebild.validate    --site webgogol-com --json
-pnpm exec site-kernel run funnel.org.validate         --site webgogol-com --json
-pnpm exec site-kernel run integration.config.validate --site webgogol-com --json
-pnpm exec site-kernel run integration.secrets.validate --site webgogol-com --json
-pnpm exec site-kernel run consent.activation.validate --site webgogol-com --json
-pnpm exec site-kernel run legal.processors.validate   --site webgogol-com --json
+pnpm exec site-kernel run funnel.contract.validate    --site warpgogol-com --json
+pnpm exec site-kernel run funnel.stage.validate       --site warpgogol-com --json
+pnpm exec site-kernel run funnel.copy.validate        --site warpgogol-com --json
+pnpm exec site-kernel run funnel.lagebild.validate    --site warpgogol-com --json
+pnpm exec site-kernel run funnel.org.validate         --site warpgogol-com --json
+pnpm exec site-kernel run integration.config.validate --site warpgogol-com --json
+pnpm exec site-kernel run integration.secrets.validate --site warpgogol-com --json
+pnpm exec site-kernel run consent.activation.validate --site warpgogol-com --json
+pnpm exec site-kernel run legal.processors.validate   --site warpgogol-com --json
 # Tier 2:
-pnpm exec site-kernel run billing.config.validate     --site webgogol-com --json
-pnpm exec site-kernel run billing.secrets.validate    --site webgogol-com --json
+pnpm exec site-kernel run billing.config.validate     --site warpgogol-com --json
+pnpm exec site-kernel run billing.secrets.validate    --site warpgogol-com --json
 ```
 
 ### Pipeline promotion (RFC-0188 Phase 9)
 
-Once the pilot is stable, the four `funnel.*` validators are added to `APPS_CHECK_AUTHOR_PIPELINE` in `@gogol/site-kernel-checks` so every mission build runs them.
+Once the pilot is stable, the four `funnel.*` validators are added to `APPS_CHECK_AUTHOR_PIPELINE` in `@warpgogol/site-kernel-checks` so every mission build runs them.
 
 ### Spec realignment
 
-`docs/specs/visitor-funnel/{00,05,09,README}.md` are updated to reference the Werkstatt/Sternsystem topology: `systems/webgogol-com/src/content/system.md` and mission Werkstück paths replace `apps/webgogol-com/*`; the `lagebild-system` branch reference and stale "to-build" rows are updated to reflect implemented RFC-0190/0191 and the existing `systems/webgogol-com/src/content/funnel/{de,uk}` copy domain.
+`docs/specs/visitor-funnel/{00,05,09,README}.md` are updated to reference the Werkstatt/Sternsystem topology: `systems/warpgogol-com/src/content/system.md` and mission Werkstück paths replace `apps/warpgogol-com/*`; the `lagebild-system` branch reference and stale "to-build" rows are updated to reflect implemented RFC-0190/0191 and the existing `systems/warpgogol-com/src/content/funnel/{de,uk}` copy domain.
 
 ## Human integrator runbook (ordered)
 
-> Execute in order. Each phase ends with a verify gate; do not proceed past a red gate. `<SITE>` = `webgogol-com`.
+> Execute in order. Each phase ends with a verify gate; do not proceed past a red gate. `<SITE>` = `warpgogol-com`.
 
 ### Phase 0 — accounts & platform fixes
 
@@ -216,7 +216,7 @@ Once the pilot is stable, the four `funnel.*` validators are added to `APPS_CHEC
 
 19. Build the flows/subflows from `systems/<SITE>/src/content/funnel/{de,uk}` (welcome, create-site, change-site, consent, ask-anything) node-by-node per spec §03.
 20. Set offer variables from `business/{lang}/offer.md` (never hardcode a price); re-sync on any offer change.
-21. Wire the Stage-Tracker External Request → `POST https://webgogol.com/api/integration-inbound` with `Authorization: Bearer {INTEGRATION_INBOUND_SECRET}` and the normalized event body (spec §06). Set `organization.name` from qualification (RFC-0190).
+21. Wire the Stage-Tracker External Request → `POST https://warpgogol.com/api/integration-inbound` with `Authorization: Bearer {INTEGRATION_INBOUND_SECRET}` and the normalized event body (spec §06). Set `organization.name` from qualification (RFC-0190).
 22. Configure the AI free-question KB and operator-handoff triggers. **Tier 1:** payment step routes to manual operator confirmation. **Tier 2:** payment step shows the Stripe Checkout URL.
 23. Confirm the click-to-load launcher loads UChat only after DSGVO acknowledgement (RFC-0175/0177).
 
@@ -248,10 +248,10 @@ Once the pilot is stable, the four `funnel.*` validators are added to `APPS_CHEC
 
 1. Implement RFC-0385 (Tier 1 unblock) and — for Tier 2 — RFC-0386.
 2. Realign `docs/specs/visitor-funnel/{00,05,09,README}.md` to the Werkstatt/Sternsystem topology and link this RFC.
-3. Execute the human integrator runbook (Phases 0–8) once for `webgogol-com`, Tier 1 first.
-4. After the first stable Tier-1 launch, add the four `funnel.*` validators to `APPS_CHECK_AUTHOR_PIPELINE` in `@gogol/site-kernel-checks` (RFC-0188 Phase 9) so every mission build runs them.
+3. Execute the human integrator runbook (Phases 0–8) once for `warpgogol-com`, Tier 1 first.
+4. After the first stable Tier-1 launch, add the four `funnel.*` validators to `APPS_CHECK_AUTHOR_PIPELINE` in `@warpgogol/site-kernel-checks` (RFC-0188 Phase 9) so every mission build runs them.
 5. Enable Tier 2 in a follow-up mission (add `stripe` to `inbound.sources` + `funnel.sources`, set `STRIPE_*` secrets) after RFC-0386 is verified live.
-6. New client sites adopt the same runbook; nothing about this activation is `webgogol-com`-specific except the recorded ids and secrets.
+6. New client sites adopt the same runbook; nothing about this activation is `warpgogol-com`-specific except the recorded ids and secrets.
 
 ## Alternatives considered
 
@@ -268,19 +268,19 @@ Once the pilot is stable, the four `funnel.*` validators are added to `APPS_CHEC
 
 ## Acceptance criteria
 
-- [ ] The webgogol-com `system.md` (via a reconciled mission) has `integrations.funnel.enabled: true` with `version` equal to `FUNNEL_VERSION`, and the CRM destination is `crm:supabase-buffer` (no direct `pipedrive` destination).
-- [ ] The go-live gate validators all pass for `webgogol-com` (Tier 1 set; Tier 2 set when Stripe is enabled).
-- [ ] The shared Lagebild worker is deployed and the `webgogol-com` tenant is enabled (`lagebild.validate` + `lagebild.tenant.status` green).
-- [ ] `docs/specs/visitor-funnel/{00,05,09,README}.md` reference `systems/`/mission paths and this RFC, not `apps/webgogol-com` or the `lagebild-system` branch.
+- [ ] The warpgogol-com `system.md` (via a reconciled mission) has `integrations.funnel.enabled: true` with `version` equal to `FUNNEL_VERSION`, and the CRM destination is `crm:supabase-buffer` (no direct `pipedrive` destination).
+- [ ] The go-live gate validators all pass for `warpgogol-com` (Tier 1 set; Tier 2 set when Stripe is enabled).
+- [ ] The shared Lagebild worker is deployed and the `warpgogol-com` tenant is enabled (`lagebild.validate` + `lagebild.tenant.status` green).
+- [ ] `docs/specs/visitor-funnel/{00,05,09,README}.md` reference `systems/`/mission paths and this RFC, not `apps/warpgogol-com` or the `lagebild-system` branch.
 - [ ] The four `funnel.*` validators are added to `APPS_CHECK_AUTHOR_PIPELINE` (RFC-0188 Phase 9) once the pilot is stable.
-- [ ] A release is propagated alt → main and health-verified for `webgogol-com`.
+- [ ] A release is propagated alt → main and health-verified for `warpgogol-com`.
 - [ ] The Phase 8 smoke tests pass (Tier 1 at minimum).
 - [ ] `rfc.validate RFC-0387` passes on this file before merging.
 
 ## Implementation notes for agents
 
 - Agents MAY perform activation changes ONLY when this RFC has status `accepted` (or `implemented`), and only after RFC-0385 (Tier 1) — plus RFC-0386 for Tier 2 — are implemented.
-- All site data changes MUST go through a mission Werkstück and be reconciled to the Sternsystem repo. Agents MUST NOT edit `systems/webgogol-com/**` in place or add runtime files to the Sternsystem repo (DNA-44).
+- All site data changes MUST go through a mission Werkstück and be reconciled to the Sternsystem repo. Agents MUST NOT edit `systems/warpgogol-com/**` in place or add runtime files to the Sternsystem repo (DNA-44).
 - Do NOT keep the direct `pipedrive` CRM destination alongside `supabase-buffer`; the buffer is the single active CRM executor for this site.
 - Secrets live only in the deploy env / `.werkstatt/secrets/**` (gitignored). Never commit secret values or place them in content or the tenant registry.
 - Vendor-console steps (UChat/Pipedrive/Stripe) are human actions; agents document and verify them but do not fabricate console state.

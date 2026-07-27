@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 
 const ATTRIBUTE_NAMES = ["aria-label", "alt", "title", "placeholder"];
 const IGNORED_ATTRIBUTE_VALUES = new Set([

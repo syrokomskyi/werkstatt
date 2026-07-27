@@ -1,12 +1,12 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Provides a standard orchestration logic for layout-global scripts across all WGogol projects.</purpose>
+<purpose>Provides a standard orchestration logic for layout-global scripts across all Warpgogol projects.</purpose>
 <non-goals>
   <item>Do not handle project-specific feature logic directly.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Created standard layout orchestrator in @gogol/share/scripts to reduce code duplication in apps.</item>
+  <item>Created standard layout orchestrator in @warpgogol/share/scripts to reduce code duplication in apps.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -39,7 +39,7 @@ export interface OrchestrationOptions {
 const has = (selector: string) => document.querySelector(selector) instanceof Element;
 
 /**
- * Runs the standard set of browser initializations required for all WGogol platform sites.
+ * Runs the standard set of browser initializations required for all Warpgogol platform sites.
  */
 export async function runStandardLayoutOrchestration(
   options: OrchestrationOptions = {},

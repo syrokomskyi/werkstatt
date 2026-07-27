@@ -19,10 +19,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifestSync, type SystemManifest } from "@gogol/site-kernel-content";
-import { hasGeneratedMarker } from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifestSync, type SystemManifest } from "@warpgogol/site-kernel-content";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 

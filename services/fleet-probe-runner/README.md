@@ -1,6 +1,6 @@
 # fleet-probe-runner
 
-Scheduled fleet probe runner (RFC-0341). Probes every fleet site every 5 minutes from the EU VPS and pushes `wgogol_probe_*` metrics to the observability backend.
+Scheduled fleet probe runner (RFC-0341). Probes every fleet site every 5 minutes from the EU VPS and pushes `warpgogol_probe_*` metrics to the observability backend.
 
 ## Lane 1 — Pulse (active)
 

@@ -22,17 +22,17 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { writeFileIfChanged } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { parse as yamlParse } from "yaml";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSemanticSiteModel, loadSystemManifest } from "@gogol/site-kernel-content";
-import { buildLlmsIndex, buildLlmsFull } from "@gogol/share/semantic";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@gogol/share/canonical-url";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { buildLlmsIndex, buildLlmsFull } from "@warpgogol/share/semantic";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/share/canonical-url";
 import { failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
-import { includeInLlms, type SurfaceArtifact } from "@gogol/surface";
-import { loadLazySurfacePages } from "@gogol/share/astro/surface-routes";
+import { includeInLlms, type SurfaceArtifact } from "@warpgogol/surface";
+import { loadLazySurfacePages } from "@warpgogol/share/astro/surface-routes";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
 /** RFC-0195: build llms.txt link rows for full-GEO Programmatic Surface pages (fail-open to []). */

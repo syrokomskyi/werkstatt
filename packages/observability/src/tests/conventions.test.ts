@@ -1,19 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { buildResourceAttributes, type WgogolResourceInput } from "../conventions.ts";
+import { buildResourceAttributes, type WarpgogolResourceInput } from "../conventions.ts";
 
 describe("buildResourceAttributes", () => {
   it("builds correct attributes for a site-layer signal", () => {
     const attrs = buildResourceAttributes({
-      serviceName: "webgogol-com",
+      serviceName: "warpgogol-com",
       layer: "site",
       environment: "production",
-      siteId: "webgogol-com",
+      siteId: "warpgogol-com",
     });
     expect(attrs).toEqual([
-      { key: "service.name", value: { stringValue: "webgogol-com" } },
+      { key: "service.name", value: { stringValue: "warpgogol-com" } },
       { key: "deployment.environment", value: { stringValue: "production" } },
-      { key: "wgogol.layer", value: { stringValue: "site" } },
-      { key: "wgogol.site_id", value: { stringValue: "webgogol-com" } },
+      { key: "warpgogol.layer", value: { stringValue: "site" } },
+      { key: "warpgogol.site_id", value: { stringValue: "warpgogol-com" } },
     ]);
   });
 
@@ -22,7 +22,7 @@ describe("buildResourceAttributes", () => {
       serviceName: "fleet-probe-runner",
       layer: "probe",
       environment: "production",
-      siteId: "webgogol-com",
+      siteId: "warpgogol-com",
       serviceVersion: "abc1234",
     });
     expect(attrs.some((a) => a.key === "service.version")).toBe(true);
@@ -32,10 +32,10 @@ describe("buildResourceAttributes", () => {
   it("throws when siteId is missing for site layer", () => {
     expect(() =>
       buildResourceAttributes({
-        serviceName: "webgogol-com",
+        serviceName: "warpgogol-com",
         layer: "site",
         environment: "production",
-      } as WgogolResourceInput),
+      } as WarpgogolResourceInput),
     ).toThrow(/siteId is required/);
   });
 
@@ -45,7 +45,7 @@ describe("buildResourceAttributes", () => {
         serviceName: "fleet-probe-runner",
         layer: "probe",
         environment: "production",
-      } as WgogolResourceInput),
+      } as WarpgogolResourceInput),
     ).toThrow(/siteId is required/);
   });
 
@@ -55,7 +55,7 @@ describe("buildResourceAttributes", () => {
         serviceName: "cf-analytics-poller",
         layer: "delivery",
         environment: "production",
-      } as WgogolResourceInput),
+      } as WarpgogolResourceInput),
     ).toThrow(/siteId is required/);
   });
 
@@ -65,7 +65,7 @@ describe("buildResourceAttributes", () => {
       layer: "factory",
       environment: "ci",
     });
-    expect(attrs.some((a) => a.key === "wgogol.site_id")).toBe(false);
+    expect(attrs.some((a) => a.key === "warpgogol.site_id")).toBe(false);
   });
 
   it("throws for invalid layer", () => {

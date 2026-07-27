@@ -18,9 +18,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { jsonldTypes, type JsonldSurfacePolicyEntry } from "@gogol/ontology/external-surfaces";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import { jsonldTypes, type JsonldSurfacePolicyEntry } from "@warpgogol/ontology/external-surfaces";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
 import { parse as yamlParse } from "yaml";
 import { buildAuditResult, getAuditPageInfo, loadAuditAppContext } from "../helpers.ts";
 import type { AuditFinding } from "../types.ts";
@@ -177,7 +177,7 @@ export async function runSeoStructuredDataValidate(
           }
         }
 
-        // Check Service provider.name is "Webgogol" when Service is emitted.
+        // Check Service provider.name is "Warpgogol" when Service is emitted.
         if (policy.requiredTypes.includes("Service")) {
           for (const node of allNodes) {
             if (jsonLdNodeHasType(node, "Service")) {
@@ -186,13 +186,13 @@ export async function runSeoStructuredDataValidate(
                 typeof provider === "object" && provider !== null
                   ? (provider["name"] as string | undefined)
                   : undefined;
-              if (providerName && providerName !== "Webgogol") {
+              if (providerName && providerName !== "Warpgogol") {
                 findings.push(
                   finding({
                     ruleId: "seo-structured-data.service-provider-mismatch",
                     severity: "error",
                     file: html.file,
-                    message: `Service node has provider.name "${providerName}" — must be "Webgogol" on surface pages.`,
+                    message: `Service node has provider.name "${providerName}" — must be "Warpgogol" on surface pages.`,
                     evidence: [{ kind: "rendered", file: html.file, snippet: providerName }],
                   }),
                 );

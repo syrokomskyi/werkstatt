@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/observability",
+  "name": "@warpgogol/observability",
   "version": "0.1.0",
   "private": true,
   "type": "module",

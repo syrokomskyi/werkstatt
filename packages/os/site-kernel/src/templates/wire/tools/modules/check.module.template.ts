@@ -10,11 +10,11 @@
   <item>RFC-0374: compass.* commands migrated to @webgogol/forge — see packages/forge/os/compass/</item>
 </CHANGE_SUMMARY>
 */
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 import {
   createStandardCheckModule,
   runSemanticMirrorValidate,
-} from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel-checks";
 // compass.* handlers migrated to @webgogol/forge — see packages/forge/os/compass/
 
 export const checkModule: KernelModule = createStandardCheckModule({

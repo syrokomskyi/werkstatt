@@ -22,9 +22,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { collectFiles as collectFilesShared } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
 
 interface ParityDiff {
   domain: string;

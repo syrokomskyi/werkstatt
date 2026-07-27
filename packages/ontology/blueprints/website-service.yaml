@@ -26,7 +26,7 @@ levels:
     constellation: website-service-root
     geo: twin-only
     semanticType: collection
-    titleTemplate: { de: "Website-Services | Webgogol", uk: "Сайт-сервіси | Webgogol" }
+    titleTemplate: { de: "Website-Services | Warpgogol", uk: "Сайт-сервіси | Warpgogol" }
   - depth: 1
     slug: { de: "website/{industry}/service", uk: "sait/{industry}/service" }
     constellation: website-service-industry

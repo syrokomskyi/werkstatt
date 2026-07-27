@@ -23,8 +23,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { parseBlueprint, type Blueprint } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import { parseBlueprint, type Blueprint } from "@warpgogol/surface";
 import { failResult, passResult } from "./result-helpers.ts";
 import { readDeclaredBlueprints } from "./surface-expand.ts";
 

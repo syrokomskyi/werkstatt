@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Cosmic Passport is a publicly-accessible page that displays build provenance, quality metrics (Nebula Score), and an architecture diagram (Star Map) for each app in the webgogol monorepo. It is generated automatically during the CI/CD release pipeline and requires no manual authoring — only configuration.
+The Cosmic Passport is a publicly-accessible page that displays build provenance, quality metrics (Nebula Score), and an architecture diagram (Star Map) for each app in the warpgogol monorepo. It is generated automatically during the CI/CD release pipeline and requires no manual authoring — only configuration.
 
 ---
 
@@ -42,7 +42,7 @@ The passport pages use the following moon quintet via `use:` declarations:
 | `Bianca`     | PassportProvenance | Commit, timestamp, builder |
 | `Adrastea`   | PassportStarMap    | Embedded star map SVG      |
 
-All five moons are data-driven: they read `cosmic-passport.json` at SSG build time via `@gogol/passport/data`. No props need to be set for data display — only layout or display options are exposed as props.
+All five moons are data-driven: they read `cosmic-passport.json` at SSG build time via `@warpgogol/passport/data`. No props need to be set for data display — only layout or display options are exposed as props.
 
 ---
 

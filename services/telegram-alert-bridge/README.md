@@ -23,4 +23,4 @@ wrangler secret put TELEGRAM_CHAT_ID
 wrangler deploy
 ```
 
-The worker URL (e.g. `https://telegram-alert-bridge.<account>.workers.dev/alert?secret=...`) is set as `WGOGOL_TG_BRIDGE_URL` in the SigNoz notification channel configuration.
+The worker URL (e.g. `https://telegram-alert-bridge.<account>.workers.dev/alert?secret=...`) is set as `WARPGOGOL_TG_BRIDGE_URL` in the SigNoz notification channel configuration.

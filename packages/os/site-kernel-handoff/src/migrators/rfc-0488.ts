@@ -22,9 +22,9 @@ import { MigrationError } from "./types.ts";
 
 export const RFC_0488_MIGRATOR_ID = "rfc-0488";
 
-const DEFAULT_COPYRIGHT_NOTICE = "Copyright © Webgogol. All rights reserved.";
+const DEFAULT_COPYRIGHT_NOTICE = "Copyright © Warpgogol. All rights reserved.";
 const DEFAULT_HUMAN_CONTRIBUTION =
-  "Konzeption, Auswahl, Zusammenstellung und Nachbearbeitung durch Webgogol";
+  "Konzeption, Auswahl, Zusammenstellung und Nachbearbeitung durch Warpgogol";
 
 interface CreditParty {
   role: string;

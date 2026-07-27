@@ -18,13 +18,13 @@ Validates actual file format via magic bytes, not just file extensions.
 import { join, relative } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import { fileTypeFromBuffer } from "file-type";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 
 interface ImageFormatViolation {
   file: string;

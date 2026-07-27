@@ -26,7 +26,7 @@ id: andrii-syrokomskyi
 name: "Andrii Syrokomskyi"
 role: "Redakteur"
 bio: "Betreut den Ratgeber seit 2026. Hintergrund in Webentwicklung und digitalem Fundament für kleines Gewerbe."
-contactUrl: "https://webgogol.com/kontakt"
+contactUrl: "https://warpgogol.com/kontakt"
 ---
 `;
 
@@ -35,7 +35,7 @@ id: andrii-syrokomskyi
 name: "Andrii Syrokomskyi"
 role: "Редактор"
 bio: "Відповідає за довідник з 2026 року. Досвід у веброзробці та цифровому фундаменті для малого бізнесу."
-contactUrl: "https://webgogol.com/kontakt"
+contactUrl: "https://warpgogol.com/kontakt"
 ---
 `;
 

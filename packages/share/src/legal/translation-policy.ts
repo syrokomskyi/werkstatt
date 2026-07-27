@@ -9,7 +9,7 @@
 </purpose>
 <non-goals>
   <item>Do not read content or the route registry — the binding URL is injected by the caller.</item>
-  <item>Do not render markup — that is @gogol/ui's translation-notice component.</item>
+  <item>Do not render markup — that is @warpgogol/ui's translation-notice component.</item>
   <item>Do not translate copy — the notice component owns localized microcopy.</item>
 </non-goals>
 </MODULE_CONTRACT>

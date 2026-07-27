@@ -36,7 +36,7 @@ import {
   GrowthConfigSchema,
   GROWTH_CONFIG_SCRIPT_ID,
   type GrowthConfig,
-} from "@gogol/growth/config";
+} from "@warpgogol/growth/config";
 
 interface Props {
   appId: string;
@@ -75,18 +75,18 @@ const configJson = JSON.stringify(config);
   The loader map uses a variable specifier for vendor adapters so the bundler
   does not try to statically resolve packages that may not be a dependency of
   every consuming app. Apps that declare `adapter: "matomo"` must add
-  @gogol/growth-adapter-matomo to their package.json dependencies.
+  @warpgogol/growth-adapter-matomo to their package.json dependencies.
   To add a vendor adapter: add it as a dependency in the app's package.json
   and add a loader entry here.
 -->
 <script id={GROWTH_CONFIG_SCRIPT_ID} type="application/json" set:html={configJson} />
 
 <script>
-  import { bootGrowthLayer } from "@gogol/growth/client";
-  import { NullAdapter } from "@gogol/growth/null-adapter";
+  import { bootGrowthLayer } from "@warpgogol/growth/client";
+  import { NullAdapter } from "@warpgogol/growth/null-adapter";
 
   const _adapterSpecifiers: Record<string, string> = {
-    matomo: "@gogol/growth-adapter-matomo",
+    matomo: "@warpgogol/growth-adapter-matomo",
   };
 
   const growthLoaders = {

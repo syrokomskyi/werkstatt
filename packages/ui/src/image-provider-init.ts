@@ -18,8 +18,8 @@
 </CHANGE_SUMMARY>
 */
 
-import { createBuildPortableProvider, setDefaultImageProvider } from "@gogol/share/image-provider";
-import type { ImageVariantManifest } from "@gogol/share/image-provider";
+import { createBuildPortableProvider, setDefaultImageProvider } from "@warpgogol/share/image-provider";
+import type { ImageVariantManifest } from "@warpgogol/share/image-provider";
 import { loadGeneratedManifest } from "./generated-manifest-loader.ts";
 
 (function initImageProvider() {

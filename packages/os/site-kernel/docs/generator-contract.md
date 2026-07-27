@@ -4,7 +4,7 @@ Build-time **file generators** project content/config from `src/content/system.m
 
 Established generators: `sitemap.generate` (RFC-0049), `llms.generate` (RFC-0050 / RFC-0142), `ai.generate` (RFC-0051), `robots.generate` (RFC-0052).
 
-> This is a **contract / convention, not a runtime registry.** The `STANDARD_BUILD_PREPARE_PIPELINE` (in `@gogol/site-kernel-checks`) plus the kernel command registry are the only registry. Do **not** add a generic `generators:` catalog to the manifest.
+> This is a **contract / convention, not a runtime registry.** The `STANDARD_BUILD_PREPARE_PIPELINE` (in `@warpgogol/site-kernel-checks`) plus the kernel command registry are the only registry. Do **not** add a generic `generators:` catalog to the manifest.
 
 ## Two config families
 
@@ -24,8 +24,8 @@ These two surfaces are kept **separate and both typed**. Never fold a site-wide 
 ## Contract — every file generator MUST
 
 1. **Typed config** in one of the two families above, **formalized in `systemManifestSchema`**. No unvalidated extension fields.
-2. A **pure formatter** in `@gogol/share` — no I/O.
-3. A **command pair** `*.generate` + `*.validate` in `@gogol/site-kernel-checks`; `*.generate` is registered with `mutatesState: true`.
+2. A **pure formatter** in `@warpgogol/share` — no I/O.
+3. A **command pair** `*.generate` + `*.validate` in `@warpgogol/site-kernel-checks`; `*.generate` is registered with `mutatesState: true`.
 4. **Pipeline registration** in `STANDARD_BUILD_PREPARE_PIPELINE`.
 5. A **safe default**: absent config yields valid output and unchanged bytes for pages/sites that do not opt in.
 

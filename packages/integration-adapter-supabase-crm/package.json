@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/integration-adapter-supabase-crm",
+  "name": "@warpgogol/integration-adapter-supabase-crm",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -41,8 +41,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/integration": "workspace:*",
-    "@gogol/share": "workspace:*"
+    "@warpgogol/integration": "workspace:*",
+    "@warpgogol/share": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260721.1",

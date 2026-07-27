@@ -22,7 +22,7 @@ import type {
   ChatWidgetConfig,
   ChatWidgetLoadResult,
   ChatWidgetOpenResult,
-} from "@gogol/chat/port";
+} from "@warpgogol/chat/port";
 
 /** UChat exposes a global once its popup widget script has booted. */
 interface UChatWindow extends Window {

@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Kernel module registration for @gogol/site-kernel-observability — hosts all observability.* and fleet.probe.* commands (RFC-0337).</purpose>
+<purpose>Kernel module registration for @warpgogol/site-kernel-observability — hosts all observability.* and fleet.probe.* commands (RFC-0337).</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 
 export const observabilityModule: KernelModule = {
   name: "observability",
@@ -32,7 +32,7 @@ export const observabilityModule: KernelModule = {
     registry.registerCommand({
       name: "observability.conventions.validate",
       description:
-        "Offline lint: every metric name/label key is declared in WGOGOL_METRIC_REGISTRY, naming grammar is valid, no forbidden label keys, no duplicate names, no direct OTLP env reads outside @gogol/observability (RFC-0337).",
+        "Offline lint: every metric name/label key is declared in WARPGOGOL_METRIC_REGISTRY, naming grammar is valid, no forbidden label keys, no duplicate names, no direct OTLP env reads outside @warpgogol/observability (RFC-0337).",
       scope: "workspace",
       reads: [
         "packages/observability/src/metric-registry.ts",
@@ -78,7 +78,7 @@ export const observabilityModule: KernelModule = {
     registry.registerCommand({
       name: "observability.factory.smoke",
       description:
-        "Send a test metric (wgogol_factory_smoke_total) through the OTLP pipe to verify end-to-end delivery. Network, manual-only — never in pipelines (RFC-0340).",
+        "Send a test metric (warpgogol_factory_smoke_total) through the OTLP pipe to verify end-to-end delivery. Network, manual-only — never in pipelines (RFC-0340).",
       scope: "workspace",
       requiresNetwork: true,
       timeoutMs: 10000,

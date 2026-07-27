@@ -15,12 +15,12 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { parse as parseYaml } from "yaml";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readScopeFiles } from "./scope.ts";
 
 // ---------------------------------------------------------------------------

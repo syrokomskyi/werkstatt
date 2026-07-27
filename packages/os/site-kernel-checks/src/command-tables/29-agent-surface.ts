@@ -89,7 +89,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {
       url: {
         kind: "string",
-        description: "Remote origin URL to verify (e.g. https://webgogol.com)",
+        description: "Remote origin URL to verify (e.g. https://warpgogol.com)",
       },
     },
     cacheable: false,
@@ -171,7 +171,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
   {
     name: "agent.gate.fixtures.run",
     description:
-      "Replay the @gogol/agent-gate MCP + action conformance corpus (RFC-0290). Workspace-scoped regression gate for any protocol work.",
+      "Replay the @warpgogol/agent-gate MCP + action conformance corpus (RFC-0290). Workspace-scoped regression gate for any protocol work.",
     scope: "workspace",
     flags: {},
     reads: ["packages/agent-gate/src/**/*.ts"],

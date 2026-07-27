@@ -33,7 +33,7 @@ The implementation adds an optional `knowledge?: string[]` field to the forge sk
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @wgogol/forge run build:check` (tsc --noEmit), `pnpm --filter @wgogol/forge run test` (164 tests, 18 files), `pnpm exec site-kernel run forge.skill.validate` (0 violations), `pnpm exec site-kernel run rfc.validate RFC-0524` (pass).
+Pass — `pnpm --filter @warpgogol/forge run build:check` (tsc --noEmit), `pnpm --filter @warpgogol/forge run test` (164 tests, 18 files), `pnpm exec site-kernel run forge.skill.validate` (0 violations), `pnpm exec site-kernel run rfc.validate RFC-0524` (pass).
 
 ### Axis A — Structural correctness
 
@@ -58,7 +58,7 @@ No issues.
 
 No issues.
 
-- Package boundaries: `src/` does not import from `@gogol/site-kernel` or any kernel package. Autonomy guard preserved.
+- Package boundaries: `src/` does not import from `@warpgogol/site-kernel` or any kernel package. Autonomy guard preserved.
 - `AGENTS.md` (root) updated with SKILL-13 mention.
 - `packages/forge/AGENTS.md` updated with knowledge field documentation.
 - `docs/verification-plan.xml` updated with vm-09 entry and vm-08 updated to SKILL-13.

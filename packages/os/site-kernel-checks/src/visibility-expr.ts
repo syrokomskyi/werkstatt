@@ -3,7 +3,7 @@
 <purpose>
 visibility.expr.validate — workspace-wide scan for VisibilityExpr usages in
 page content and feature-graph YAML files. Every expression must parse against
-VisibilityExprSchema from @gogol/share (DNA-26, RFC-0026).
+VisibilityExprSchema from @warpgogol/share (DNA-26, RFC-0026).
 </purpose>
 <non-goals>
   <item>Do not evaluate visibility at runtime — only parse/validate the expression structure.</item>
@@ -22,11 +22,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { resultFromViolations, failResult } from "./result-helpers.ts";
-import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { VisibilityExprSchema } from "@gogol/share/visibility";
+import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { VisibilityExprSchema } from "@warpgogol/share/visibility";
 
 // ---------------------------------------------------------------------------
 // Helpers

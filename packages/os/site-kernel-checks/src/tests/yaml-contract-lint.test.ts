@@ -25,8 +25,8 @@ import { describe, it, expect } from "vitest";
 import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createDefaultIO } from "@gogol/site-kernel";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import { createDefaultIO } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { runYamlContractLint } from "../yaml-contract-lint.ts";
 
 const logger = {

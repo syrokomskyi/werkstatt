@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 
 const SIGNOZ_KEY_PATTERN = /[a-f0-9]{32,}/gi;
 
@@ -37,7 +37,7 @@ export async function runObservabilityMcpValidate(
       severity: "error",
       file: ".mcp.json",
       message: ".mcp.json does not exist — the signoz MCP server entry is required (RFC-0344).",
-      fixHint: "Create .mcp.json with a signoz server entry using ${WGOGOL_SIGNOZ_MCP_TOKEN}.",
+      fixHint: "Create .mcp.json with a signoz server entry using ${WARPGOGOL_SIGNOZ_MCP_TOKEN}.",
     });
   } else {
     const raw = await context.io.readFile(mcpPath);
@@ -54,14 +54,14 @@ export async function runObservabilityMcpValidate(
         });
       } else {
         const signozEntry = JSON.stringify(servers["signoz"]);
-        if (!signozEntry.includes("${WGOGOL_SIGNOZ_MCP_TOKEN}")) {
+        if (!signozEntry.includes("${WARPGOGOL_SIGNOZ_MCP_TOKEN}")) {
           diagnostics.push({
             ruleId: "OBS-MCP-01",
             severity: "error",
             file: ".mcp.json",
             message:
-              "signoz MCP entry embeds a literal token instead of the env reference ${WGOGOL_SIGNOZ_MCP_TOKEN}.",
-            fixHint: "Replace any literal token with ${WGOGOL_SIGNOZ_MCP_TOKEN}.",
+              "signoz MCP entry embeds a literal token instead of the env reference ${WARPGOGOL_SIGNOZ_MCP_TOKEN}.",
+            fixHint: "Replace any literal token with ${WARPGOGOL_SIGNOZ_MCP_TOKEN}.",
           });
         }
       }

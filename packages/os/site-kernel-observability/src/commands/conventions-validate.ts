@@ -17,20 +17,20 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import {
   FORBIDDEN_LABEL_KEYS,
   METRIC_NAME_PATTERN,
-  WGOGOL_METRIC_REGISTRY,
-} from "@gogol/observability";
+  WARPGOGOL_METRIC_REGISTRY,
+} from "@warpgogol/observability";
 
 const METRIC_NAME_LITERAL_PATTERN =
-  /["']((?:wgogol_(?:factory|probe|delivery|workers)_[a-z0-9_]+))["']/g;
+  /["']((?:warpgogol_(?:factory|probe|delivery|workers)_[a-z0-9_]+))["']/g;
 const PUSHER_CALL_PATTERN = /(?:counterAdd|gaugeSet|histogramRecord)\s*\(/;
 const METRIC_REFS_ACCESS_PATTERN =
-  /METRIC_REFS\.((?:wgogol_(?:factory|probe|delivery|workers)_[a-z0-9_]+))/g;
-const OTLP_ENV_PATTERN = /(?:WGOGOL_OTLP_ENDPOINT|WGOGOL_OTLP_TOKEN)/;
+  /METRIC_REFS\.((?:warpgogol_(?:factory|probe|delivery|workers)_[a-z0-9_]+))/g;
+const OTLP_ENV_PATTERN = /(?:WARPGOGOL_OTLP_ENDPOINT|WARPGOGOL_OTLP_TOKEN)/;
 
 export async function runObservabilityConventionsValidate(
   _input: KernelCommandInput,
@@ -39,7 +39,7 @@ export async function runObservabilityConventionsValidate(
   const diagnostics: Diagnostic[] = [];
 
   // OBS-CONV-02: registry entry naming grammar
-  for (const spec of WGOGOL_METRIC_REGISTRY) {
+  for (const spec of WARPGOGOL_METRIC_REGISTRY) {
     if (!METRIC_NAME_PATTERN.test(spec.name)) {
       diagnostics.push({
         ruleId: "OBS-CONV-02",
@@ -47,13 +47,13 @@ export async function runObservabilityConventionsValidate(
         file: "packages/observability/src/metric-registry.ts",
         message: `Metric name "${spec.name}" does not match the naming grammar ${METRIC_NAME_PATTERN.source}.`,
         fixHint:
-          "Metric names must match ^wgogol_(factory|probe|delivery|workers)_[a-z0-9_]+$, counters end in _total, durations in _seconds, sizes in _bytes.",
+          "Metric names must match ^warpgogol_(factory|probe|delivery|workers)_[a-z0-9_]+$, counters end in _total, durations in _seconds, sizes in _bytes.",
       });
     }
   }
 
   // OBS-CONV-03: forbidden label keys in registry
-  for (const spec of WGOGOL_METRIC_REGISTRY) {
+  for (const spec of WARPGOGOL_METRIC_REGISTRY) {
     for (const key of spec.labelKeys) {
       if (FORBIDDEN_LABEL_KEYS.includes(key)) {
         diagnostics.push({
@@ -69,7 +69,7 @@ export async function runObservabilityConventionsValidate(
 
   // OBS-CONV-05: duplicate metric names
   const seen = new Map<string, number>();
-  for (const spec of WGOGOL_METRIC_REGISTRY) {
+  for (const spec of WARPGOGOL_METRIC_REGISTRY) {
     seen.set(spec.name, (seen.get(spec.name) ?? 0) + 1);
   }
   for (const [name, count] of seen) {
@@ -78,14 +78,14 @@ export async function runObservabilityConventionsValidate(
         ruleId: "OBS-CONV-05",
         severity: "error",
         file: "packages/observability/src/metric-registry.ts",
-        message: `Duplicate metric name "${name}" appears ${count} times in WGOGOL_METRIC_REGISTRY.`,
+        message: `Duplicate metric name "${name}" appears ${count} times in WARPGOGOL_METRIC_REGISTRY.`,
         fixHint: "Each metric name must be unique in the registry.",
       });
     }
   }
 
   // Build the set of declared metric names for OBS-CONV-01
-  const declaredNames = new Set(WGOGOL_METRIC_REGISTRY.map((s) => s.name));
+  const declaredNames = new Set(WARPGOGOL_METRIC_REGISTRY.map((s) => s.name));
 
   // OBS-CONV-01: scan for undeclared metric name literals used with pusher calls or METRIC_REFS
   const sourceGlobs = ["packages/**/*.ts", "services/**/*.ts"];
@@ -116,7 +116,7 @@ export async function runObservabilityConventionsValidate(
             ruleId: "OBS-CONV-01",
             severity: "error",
             file: normalized,
-            message: `Metric name "${name}" is used with a pusher call or METRIC_REFS but is not declared in WGOGOL_METRIC_REGISTRY.`,
+            message: `Metric name "${name}" is used with a pusher call or METRIC_REFS but is not declared in WARPGOGOL_METRIC_REGISTRY.`,
             fixHint: `Add "${name}" to packages/observability/src/metric-registry.ts or use an existing declared metric.`,
           });
         }
@@ -124,7 +124,7 @@ export async function runObservabilityConventionsValidate(
     }
   }
 
-  // OBS-CONV-04: direct OTLP env reads outside @gogol/observability
+  // OBS-CONV-04: direct OTLP env reads outside @warpgogol/observability
   const envSourceGlobs = ["packages/**/*.ts", "services/**/*.ts"];
   for (const glob of envSourceGlobs) {
     const files = await context.io.glob(glob, { cwd: context.workspaceRoot });
@@ -142,9 +142,9 @@ export async function runObservabilityConventionsValidate(
           severity: "warning",
           file: normalized,
           message:
-            "Direct reference to WGOGOL_OTLP_ENDPOINT/WGOGOL_OTLP_TOKEN outside @gogol/observability. Emitters must go through the port.",
+            "Direct reference to WARPGOGOL_OTLP_ENDPOINT/WARPGOGOL_OTLP_TOKEN outside @warpgogol/observability. Emitters must go through the port.",
           fixHint:
-            "Use createMetricsPusher from @gogol/observability which reads env vars internally.",
+            "Use createMetricsPusher from @warpgogol/observability which reads env vars internally.",
         });
       }
     }

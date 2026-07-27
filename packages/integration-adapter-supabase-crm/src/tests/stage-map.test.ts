@@ -15,8 +15,8 @@ rather than a stage_id. Acts as regression guard against catalog/STAGE_MAP desyn
 */
 
 import { test, expect } from "vitest";
-import { BUFFER_DEAL_STAGES } from "@gogol/integration/crm-buffer";
-import type { BufferDealStage } from "@gogol/integration/crm-buffer";
+import { BUFFER_DEAL_STAGES } from "@warpgogol/integration/crm-buffer";
+import type { BufferDealStage } from "@warpgogol/integration/crm-buffer";
 import { STAGE_MAP, resolvePipedriveStageUpdate } from "../pipedrive-sync-target.ts";
 
 // ---------------------------------------------------------------------------

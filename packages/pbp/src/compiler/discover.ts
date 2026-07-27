@@ -13,8 +13,8 @@
 
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+import { byteHash } from "@warpgogol/fingerprint";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import type { PbpSourceInventoryEntry, PbpSourceInventoryReport } from "../compiler-pipeline.js";
 import type { PbpCompilerInput } from "./types.js";
 

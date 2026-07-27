@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Dispatch metric points to a pusher by metric kind (RFC-0343).</purpose>
 <non-goals>
-  <item>Do not define metric specs or label keys — those live in @gogol/observability.</item>
+  <item>Do not define metric specs or label keys — those live in @warpgogol/observability.</item>
   <item>Do not perform network I/O or watermark management.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { findMetricSpec, type MetricsPusher } from "@gogol/observability";
+import { findMetricSpec, type MetricsPusher } from "@warpgogol/observability";
 import type { MetricPoint } from "./poll.ts";
 
 export function emitPoints(pusher: MetricsPusher, points: MetricPoint[]): void {

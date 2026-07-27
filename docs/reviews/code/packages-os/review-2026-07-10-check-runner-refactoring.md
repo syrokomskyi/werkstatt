@@ -12,12 +12,12 @@ filesReviewed:
   - packages/check-core/src/index.ts
   - packages/check-runner-node/src/dom-extract.ts
   - packages/check-runner-node/src/index.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/artifact-builders.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/deploy.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/evidence-readers.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/evidence.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/helpers.ts
-  - services/check-webgogol-runner/src/run-once.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/artifact-builders.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/deploy.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/evidence-readers.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/evidence.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/helpers.ts
+  - services/check-warpgogol-runner/src/run-once.ts
 ---
 
 # Code Review: bbde28897...e7189d59a (check-runner-node refactoring)
@@ -28,11 +28,11 @@ The refactoring successfully eliminates diagnostic pipeline duplication, extract
 
 ## Mechanical floor
 
-Pass — `tsc --noEmit` succeeds for all four affected packages (`@gogol/check-core`, `@gogol/check-runner-node`, `@gogol/site-kernel-check-webgogol`, `check-webgogol-runner`).
+Pass — `tsc --noEmit` succeeds for all four affected packages (`@warpgogol/check-core`, `@warpgogol/check-runner-node`, `@warpgogol/site-kernel-check-warpgogol`, `check-warpgogol-runner`).
 
 ## Axis A — Structural correctness
 
-- **`as any` in `evidence-readers.ts:126`** — `JSON.parse(...) as Record<string, any>` in `updateRunArtifact`. The repo's `local-rules/no-as-any` ESLint rule flags `as any` as error for `packages/**/*.ts`. This cast bypasses type safety on the run artifact object. Use `Record<string, unknown>` and narrow with runtime checks, or parse via `checkRunArtifactSchema` from `@gogol/check-core`.
+- **`as any` in `evidence-readers.ts:126`** — `JSON.parse(...) as Record<string, any>` in `updateRunArtifact`. The repo's `local-rules/no-as-any` ESLint rule flags `as any` as error for `packages/**/*.ts`. This cast bypasses type safety on the run artifact object. Use `Record<string, unknown>` and narrow with runtime checks, or parse via `checkRunArtifactSchema` from `@warpgogol/check-core`.
 
 - **`as Record<string, any>` in `artifact-builders.ts:114`** — `manifest as Record<string, any>` in `buildHintsFromManifest`. Same ESLint violation. The `manifest` parameter is typed `unknown`; narrow it with a schema or typed guard instead of casting to `any`.
 
@@ -40,7 +40,7 @@ Pass — `tsc --noEmit` succeeds for all four affected packages (`@gogol/check-c
 
 ## Axis B — DNA alignment
 
-- **DNA-1 (monorepo boundary)** — Pass. `@gogol/check-core` imports `Diagnostic` type from `@gogol/site-kernel` (declared in `package.json` dependencies). No `apps/* → apps/*` or `apps/* → services/*` imports. The service imports from `@gogol/check-core` and `@gogol/check-runner-node`, not from `apps/*`.
+- **DNA-1 (monorepo boundary)** — Pass. `@warpgogol/check-core` imports `Diagnostic` type from `@warpgogol/site-kernel` (declared in `package.json` dependencies). No `apps/* → apps/*` or `apps/* → services/*` imports. The service imports from `@warpgogol/check-core` and `@warpgogol/check-runner-node`, not from `apps/*`.
 
 - **DNA-42 (Compass markup)** — Pass. All three new source files carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` blocks: `diagnostics.ts`, `run-paths.ts`, `dom-extract.ts`. The split files `evidence-readers.ts` and `artifact-builders.ts` also carry Compass scaffolding.
 
@@ -48,15 +48,15 @@ Pass — `tsc --noEmit` succeeds for all four affected packages (`@gogol/check-c
 
 ## Axis C — Ecosystem fit
 
-- **Package boundaries** — Pass. Imports flow correctly: `services/* → packages/*`, `packages/os/* → packages/*`. The diagnostic collectors moved from `packages/os/site-kernel-check-webgogol` to `packages/check-core`, which is the right layer for shared schemas and utilities consumed by both the OS command layer and the runner service.
+- **Package boundaries** — Pass. Imports flow correctly: `services/* → packages/*`, `packages/os/* → packages/*`. The diagnostic collectors moved from `packages/os/site-kernel-check-warpgogol` to `packages/check-core`, which is the right layer for shared schemas and utilities consumed by both the OS command layer and the runner service.
 
 - **Compass sync** — The `compass-inventory.xml` is a generated file and does not yet list the new files (`diagnostics.ts`, `run-paths.ts`, `dom-extract.ts`, `evidence-readers.ts`, `artifact-builders.ts`). This is expected — the generator should be re-run to update the inventory snapshot. Not a blocker but should be addressed.
 
-- **AGENTS.md updates** — No `AGENTS.md` exists for `site-kernel-check-webgogol` or `check-core`. The `packages/AGENTS.md` ownership table lists `check-core` implicitly via the `os/site-kernel*` row. No new rules or patterns were introduced that require AGENTS.md updates.
+- **AGENTS.md updates** — No `AGENTS.md` exists for `site-kernel-check-warpgogol` or `check-core`. The `packages/AGENTS.md` ownership table lists `check-core` implicitly via the `os/site-kernel*` row. No new rules or patterns were introduced that require AGENTS.md updates.
 
 ## Axis D — Forward-only compliance
 
-Pass. The refactoring replaces inline code with shared utilities — no compatibility shims, no dual-paths, no legacy bridges. The `helpers.ts` barrel re-exports from the new modules and from `@gogol/check-core`, maintaining the import surface for existing consumers without duplicating logic.
+Pass. The refactoring replaces inline code with shared utilities — no compatibility shims, no dual-paths, no legacy bridges. The `helpers.ts` barrel re-exports from the new modules and from `@warpgogol/check-core`, maintaining the import surface for existing consumers without duplicating logic.
 
 ## Axis E — Agent-facing clarity
 
@@ -72,13 +72,13 @@ Pass. The refactoring replaces inline code with shared utilities — no compatib
 
 - **`helpers.ts` barrel re-export of `makeDiagnostic as diagnostic`** — The alias `makeDiagnostic as diagnostic` preserves the old import name for consumers. This is a reasonable migration aid, but verify that existing import sites actually use the name `diagnostic` — if they already import `makeDiagnostic` directly, the alias is dead weight.
 
-- **`renderReport` duplication** — `run-once.ts:163-168` has its own `renderReport` function, while `artifact-builders.ts:34-51` exports `renderReportHtml`. These produce similar HTML. The runner service could import `renderReportHtml` from `@gogol/check-core` (via the helpers barrel) instead of maintaining a separate implementation. Not a blocker — the runner's version is simpler and intentionally different — but worth noting.
+- **`renderReport` duplication** — `run-once.ts:163-168` has its own `renderReport` function, while `artifact-builders.ts:34-51` exports `renderReportHtml`. These produce similar HTML. The runner service could import `renderReportHtml` from `@warpgogol/check-core` (via the helpers barrel) instead of maintaining a separate implementation. Not a blocker — the runner's version is simpler and intentionally different — but worth noting.
 
 ## Axis G — Blind spots
 
 - **Performance** — The diagnostic collectors iterate `graph.pages` linearly. No performance concern; the graphs are small (typically 1-20 pages).
 
-- **Edge cases** — `runRelDir` handles empty `runId` by producing `.check-webgogol/runs/` which is benign. `extractPageEvidenceFromDOM` handles missing elements gracefully (returns `undefined` for title, lang, canonical, metaDescription).
+- **Edge cases** — `runRelDir` handles empty `runId` by producing `.check-warpgogol/runs/` which is benign. `extractPageEvidenceFromDOM` handles missing elements gracefully (returns `undefined` for title, lang, canonical, metaDescription).
 
 - **Migration path** — Existing consumers importing from `helpers.ts` continue to work via the barrel re-exports. No breaking changes to the public API.
 
@@ -96,7 +96,7 @@ No formal spec available — the refactoring was driven by an ad-hoc analysis se
 
 ## Questions for the author
 
-1. Why does `evidence-readers.ts` still use `posix.join(relRunDir, "report.json")` in `makeRunArtifact` and `updateRunArtifact` instead of `runRelPath` from `@gogol/check-core`? The centralization is incomplete — these functions were extracted from `helpers.ts` but not updated to use the new helpers.
+1. Why does `evidence-readers.ts` still use `posix.join(relRunDir, "report.json")` in `makeRunArtifact` and `updateRunArtifact` instead of `runRelPath` from `@warpgogol/check-core`? The centralization is incomplete — these functions were extracted from `helpers.ts` but not updated to use the new helpers.
 
 2. Can the `as Record<string, any>` casts in `evidence-readers.ts:126` and `artifact-builders.ts:114` be replaced with `Record<string, unknown>` or schema validation? The repo's `no-as-any` ESLint rule should be failing on these.
 

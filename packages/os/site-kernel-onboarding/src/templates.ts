@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Shared template helpers for @gogol/site-kernel-onboarding —
+<purpose>Shared template helpers for @warpgogol/site-kernel-onboarding —
 readTemplate, readRuntimeTemplate, and applyTokens. Used by scaffold.ts,
 config-regenerate.ts, and mission-materialize.ts (via workspace dependency).</purpose>
 <non-goals>

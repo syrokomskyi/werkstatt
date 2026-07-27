@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Check run artifact schema and run-id factory for the check-webgogol ecosystem.</purpose>
+<purpose>Check run artifact schema and run-id factory for the check-warpgogol ecosystem.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>

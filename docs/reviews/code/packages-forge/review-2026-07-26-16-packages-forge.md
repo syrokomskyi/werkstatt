@@ -28,7 +28,7 @@ The implementation is clean, well-tested, and follows existing patterns. The cod
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @wgogol/forge run build:check` (0 errors), `pnpm --filter @wgogol/forge run test` (229/229 passed), `pnpm exec site-kernel run rfc.validate RFC-0543` (0 errors), `node packages/forge/scripts/publish-check.mjs` (all checks passed).
+Pass — `pnpm --filter @warpgogol/forge run build:check` (0 errors), `pnpm --filter @warpgogol/forge run test` (229/229 passed), `pnpm exec site-kernel run rfc.validate RFC-0543` (0 errors), `node packages/forge/scripts/publish-check.mjs` (all checks passed).
 
 ### Axis A — Structural correctness
 
@@ -46,7 +46,7 @@ Pass — `pnpm --filter @wgogol/forge run build:check` (0 errors), `pnpm --filte
 - **Command lifecycle**: Pass. `forge.upgrade` is registered in `forgeCoreModule` with correct metadata (scope, flags, reads, writes, cacheable: false).
 - **AGENTS.md updates**: Pass. `packages/forge/AGENTS.md` OS modules table updated with `forge.upgrade`.
 - **Compass sync**: Pass. Generated artifacts (`docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, `docs/ecosystem.generated.yaml`) regenerated.
-- **Import rules**: Pass. `upgrade.ts` is in `src/` and imports only from `../config/forge-config.ts`, `../registry.ts`, `../types.ts` — no `@gogol/*` imports.
+- **Import rules**: Pass. `upgrade.ts` is in `src/` and imports only from `../config/forge-config.ts`, `../registry.ts`, `../types.ts` — no `@warpgogol/*` imports.
 
 ### Axis D — Forward-only compliance
 
@@ -66,7 +66,7 @@ Pass — `pnpm --filter @wgogol/forge run build:check` (0 errors), `pnpm --filte
 
 ### Axis G — Blind spots
 
-- **Edge cases**: Pass. The handler covers: missing `forge.yaml` (refuses with pointer to `forge.init`), unresolvable forge root (refuses with "install @wgogol/forge first"), version match (noop), null `syncedVersion` (full sync), `--dry-run` (no writes). Tests verify all these paths.
+- **Edge cases**: Pass. The handler covers: missing `forge.yaml` (refuses with pointer to `forge.init`), unresolvable forge root (refuses with "install @warpgogol/forge first"), version match (noop), null `syncedVersion` (full sync), `--dry-run` (no writes). Tests verify all these paths.
 - **Interrupted operations**: The RFC states re-running `forge.upgrade` completes the sync (overwrite semantics are idempotent). The implementation supports this — skills are overwritten, `syncedVersion` is set at the end. Pass.
 - **Performance**: The handler iterates `FORGE_SKILLS` (29 entries) and pack skills — negligible cost. Pass.
 

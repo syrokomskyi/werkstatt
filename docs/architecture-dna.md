@@ -1,6 +1,6 @@
 # Architecture DNA
 
-This document records the stable architectural invariants ("DNA") for the WGogol monorepo. Each item is a machine-readable anchor that RFCs and OS commands reference by id (e.g. `DNA-4`). Agents MUST NOT delete or renumber items; add new entries only at the bottom. This is the **canonical** `DNA-N` registry — the cross-site prose companion at `packages/os/site-kernel/docs/architecture-dna.md` is a derived view. When an RFC establishes a new invariant (its body says "DNA-N established by this RFC"), append the matching `## DNA-N` entry here; `dna.registry.validate` (RFC-0158) enforces that the registry and the establishing RFCs stay in sync.
+This document records the stable architectural invariants ("DNA") for the Warpgogol monorepo. Each item is a machine-readable anchor that RFCs and OS commands reference by id (e.g. `DNA-4`). Agents MUST NOT delete or renumber items; add new entries only at the bottom. This is the **canonical** `DNA-N` registry — the cross-site prose companion at `packages/os/site-kernel/docs/architecture-dna.md` is a derived view. When an RFC establishes a new invariant (its body says "DNA-N established by this RFC"), append the matching `## DNA-N` entry here; `dna.registry.validate` (RFC-0158) enforces that the registry and the establishing RFCs stay in sync.
 
 ---
 
@@ -66,13 +66,13 @@ Client-side JavaScript follows the RFC-0011 placement contract: no large inline 
 
 ## DNA-16 · Semantic layer shares topology with navigation
 
-Semantic outputs (JSON-LD, sitemaps, structured breadcrumb data) must be derived from the same page topology and visibility state used for navigation rendering. Agents must use `getRouteRegistry()` from `@gogol/share` as the single source of route topology — they must not construct parallel page-structure models for semantic output. Established by RFC-0012.
+Semantic outputs (JSON-LD, sitemaps, structured breadcrumb data) must be derived from the same page topology and visibility state used for navigation rendering. Agents must use `getRouteRegistry()` from `@warpgogol/share` as the single source of route topology — they must not construct parallel page-structure models for semantic output. Established by RFC-0012.
 
 ## DNA-17 · Uni manifest contract (Mirror Quintet)
 
 Every page, section, and component file (`.astro` under `packages/ui/sections/**`, `packages/ui/components/**`, `packages/ui/pages/**`) ships a colocated `manifest.yaml` declaring at minimum its `id`, `cosmicName`, `layer` (`"page" | "section" | "component"`), `semanticId`, `role`, `version`, `intent[]`, `industryFit[]`, and `contentSchemaKey`. This extends the Mirror Quartet (DNA-5, RFC-0009, RFC-0020) into a Mirror Quintet.
 
-**Package-side Quintet** (enforced by `manifest.contract.validate` and `mirror.quintet.validate`): `.astro` component + `manifest.yaml` + content schema in `@gogol/ontology` + `.css` + content `.md` template.
+**Package-side Quintet** (enforced by `manifest.contract.validate` and `mirror.quintet.validate`): `.astro` component + `manifest.yaml` + content schema in `@warpgogol/ontology` + `.css` + content `.md` template.
 
 **App-side Quintet** (enforced by `mirror.quintet.validate`, extended by RFC-0025): page route (Astro, thin) + content-collection schema (ontology) + manifest (`packages/ui`) + per-feature content bundle (`src/content/<layer>/<name>/`) + `system.md` composition pin.
 
@@ -84,15 +84,15 @@ Every page, section, and component file (`.astro` under `packages/ui/sections/**
 
 ## DNA-19 · Closed ontology vocabularies
 
-`SemanticRole`, `ComponentRole`, `Industry`, and `Layer` are closed enums exported from `@gogol/ontology`. Adding, removing, or renaming a value requires a superseding RFC; no local code change may extend them. `Intent` is an open vocabulary (typed as `string` with a known-good list) to allow language about user goals to evolve without RFC ceremony (RFC-0023). Established by RFC-0023.
+`SemanticRole`, `ComponentRole`, `Industry`, and `Layer` are closed enums exported from `@warpgogol/ontology`. Adding, removing, or renaming a value requires a superseding RFC; no local code change may extend them. `Intent` is an open vocabulary (typed as `string` with a known-good list) to allow language about user goals to evolve without RFC ceremony (RFC-0023). Established by RFC-0023.
 
 ## DNA-20 · Business layer is the canonical site description (SUPERSEDED by RFC-0471)
 
-**Superseded.** The `@gogol/business` package has been deleted (RFC-0471). All sites now use `@gogol/pbp` (Public Business Profile, `pbp/*@1`) as the canonical business layer. PBP content lives under `src/content/business-profile/{lang}/` with entity-typed schemas. People records live in a standalone `people` content collection (`src/content/people/{lang}/`). Semantic model building (`buildPageSemanticModel`, `buildPbpSemanticProfile`) is exported from `@gogol/pbp/semantic-profile`. Established by RFC-0024; superseded by RFC-0469 (cutover) and RFC-0471 (deletion).
+**Superseded.** The `@warpgogol/business` package has been deleted (RFC-0471). All sites now use `@warpgogol/pbp` (Public Business Profile, `pbp/*@1`) as the canonical business layer. PBP content lives under `src/content/business-profile/{lang}/` with entity-typed schemas. People records live in a standalone `people` content collection (`src/content/people/{lang}/`). Semantic model building (`buildPageSemanticModel`, `buildPbpSemanticProfile`) is exported from `@warpgogol/pbp/semantic-profile`. Established by RFC-0024; superseded by RFC-0469 (cutover) and RFC-0471 (deletion).
 
 ## DNA-21 · Feature-first app layout
 
-Every site workspace follows a feature-first layout: per-feature content, scripts, and assets colocate under `src/content/<layer>/<name>/` (`.md`, optional `.client.ts`, optional `assets/` subdirectory). App-global concerns live in their canonical folders (`src/styles/`, `src/scripts/`, `src/pages/`, `src/middleware/`). Parallel `src/styles/<layer>/`, `src/scripts/<layer>/`, and `src/assets/images/` trees are **forbidden**. Per-feature CSS files under `src/content/` are an **error**, not a warning — all visual customisation flows through `@gogol/tokens` and biome-scoped overrides. `src/content/**/assets/` is the canonical editable source-asset surface (RFC-0031, implemented 2026-04-27); `public/` is reserved for direct-URL passthrough artifacts. Enforced by `app.layout.validate` and `assets.structure.lint` (RFC-0025, amended by RFC-0031). Established by RFC-0025.
+Every site workspace follows a feature-first layout: per-feature content, scripts, and assets colocate under `src/content/<layer>/<name>/` (`.md`, optional `.client.ts`, optional `assets/` subdirectory). App-global concerns live in their canonical folders (`src/styles/`, `src/scripts/`, `src/pages/`, `src/middleware/`). Parallel `src/styles/<layer>/`, `src/scripts/<layer>/`, and `src/assets/images/` trees are **forbidden**. Per-feature CSS files under `src/content/` are an **error**, not a warning — all visual customisation flows through `@warpgogol/tokens` and biome-scoped overrides. `src/content/**/assets/` is the canonical editable source-asset surface (RFC-0031, implemented 2026-04-27); `public/` is reserved for direct-URL passthrough artifacts. Enforced by `app.layout.validate` and `assets.structure.lint` (RFC-0025, amended by RFC-0031). Established by RFC-0025.
 
 ## DNA-22 · Client-editable surface whitelist
 
@@ -100,7 +100,7 @@ Every site workspace has an explicit client-editable surface: `src/content/{busi
 
 ## DNA-23 · Cosmic overlay
 
-`@gogol/ontology` exports three closed name catalogs — `StarCatalog` (pages), `PlanetCatalog` (sections), `MoonCatalog` (components) — sourced from IAU and Solar System registries. Every `manifest.yaml` in `packages/ui/src/{pages,sections,components}/` carries a distinct `cosmicName` drawn from the layer-appropriate catalog. Cosmic names are manifest/YAML fields and UI-facing strings only; import paths, filesystem paths, and directory names remain technical. Three new manifest kinds are introduced: `system.md` (per-app galaxy binding — identity, biome, constellation, version pins), `constellation.yaml` (reusable ordered section composition patterns at `packages/ontology/constellations/`), and `biome.yaml` (industrial/tonal token presets at `packages/ontology/biomes/`). One biome per app is a permanent invariant. Catalogs are DNA-19 closed enums — extension requires a superseding RFC. Enforced by `cosmic.catalog.validate`, `cosmic.name.unique`, `biome.contract.validate`, `system.manifest.validate`, and `constellation.compose.validate` (RFC-0025). Established by RFC-0025.
+`@warpgogol/ontology` exports three closed name catalogs — `StarCatalog` (pages), `PlanetCatalog` (sections), `MoonCatalog` (components) — sourced from IAU and Solar System registries. Every `manifest.yaml` in `packages/ui/src/{pages,sections,components}/` carries a distinct `cosmicName` drawn from the layer-appropriate catalog. Cosmic names are manifest/YAML fields and UI-facing strings only; import paths, filesystem paths, and directory names remain technical. Three new manifest kinds are introduced: `system.md` (per-app galaxy binding — identity, biome, constellation, version pins), `constellation.yaml` (reusable ordered section composition patterns at `packages/ontology/constellations/`), and `biome.yaml` (industrial/tonal token presets at `packages/ontology/biomes/`). One biome per app is a permanent invariant. Catalogs are DNA-19 closed enums — extension requires a superseding RFC. Enforced by `cosmic.catalog.validate`, `cosmic.name.unique`, `biome.contract.validate`, `system.manifest.validate`, and `constellation.compose.validate` (RFC-0025). Established by RFC-0025.
 
 ## DNA-24 · Block-declarative pages
 
@@ -108,11 +108,11 @@ Every page content entry under `apps/*/src/content/pages/**/<slug>.md` (or `<lan
 
 ## DNA-25 · Single `buildPage` pipeline
 
-`@gogol/share` exports a single build-time pipeline: `buildPage(entry: PageEntry, ctx: RuntimeContext, options?) → Promise<ResolvedPage>`. Every page route calls it once per locale; no route hand-assembles block composition. The pipeline evaluates block visibility, resolves component import paths, and returns a typed `ResolvedPage` with `ResolvedBlock[]` in document order. Cross-reference checks (star/route coherence, system.md pin list, propsSchema validation) are the responsibility of `page.block.validate` running in `build.check`. Routes that do not call `buildPage` fail `page.pipeline.contract`. Established by RFC-0026.
+`@warpgogol/share` exports a single build-time pipeline: `buildPage(entry: PageEntry, ctx: RuntimeContext, options?) → Promise<ResolvedPage>`. Every page route calls it once per locale; no route hand-assembles block composition. The pipeline evaluates block visibility, resolves component import paths, and returns a typed `ResolvedPage` with `ResolvedBlock[]` in document order. Cross-reference checks (star/route coherence, system.md pin list, propsSchema validation) are the responsibility of `page.block.validate` running in `build.check`. Routes that do not call `buildPage` fail `page.pipeline.contract`. Established by RFC-0026.
 
 ## DNA-26 · Unified `VisibilityExpr` grammar and `RuntimeContext` shape
 
-One grammar for visibility, one type for runtime context, both in `@gogol/share`. `VisibilityExpr` is a closed discriminated union (`feature | locale | segment | flag | all | any | not`); adding a case requires a superseding RFC. `RuntimeContext` has exactly three fields: `locale` (active), `segment` (reserved, always `null` at MVP), `flags` (reserved, always `{}` at MVP). `EMPTY_RUNTIME_CONTEXT(locale)` is the only constructor at MVP. No workspace code may produce a non-null `segment` or non-empty `flags` without a superseding RFC — enforced by `runtime.context.shape`. Feature-graph visibility and block-level visibility share the same grammar via `VisibilityExprSchema` from `@gogol/share`. Established by RFC-0026.
+One grammar for visibility, one type for runtime context, both in `@warpgogol/share`. `VisibilityExpr` is a closed discriminated union (`feature | locale | segment | flag | all | any | not`); adding a case requires a superseding RFC. `RuntimeContext` has exactly three fields: `locale` (active), `segment` (reserved, always `null` at MVP), `flags` (reserved, always `{}` at MVP). `EMPTY_RUNTIME_CONTEXT(locale)` is the only constructor at MVP. No workspace code may produce a non-null `segment` or non-empty `flags` without a superseding RFC — enforced by `runtime.context.shape`. Feature-graph visibility and block-level visibility share the same grammar via `VisibilityExprSchema` from `@warpgogol/share`. Established by RFC-0026.
 
 ---
 
@@ -134,7 +134,7 @@ One grammar for visibility, one type for runtime context, both in `@gogol/share`
 
 ## DNA-30 · Vendor-agnostic `GrowthAdapter`
 
-Analytics and experiment vendors sit behind a closed `GrowthAdapter` interface in `@gogol/growth`; vendor selection is CMS/content-driven, never hardcoded in app or component source. Established by RFC-0027. **Reclassified to feature (RFC-0161)** — governed as a product feature by RFC-0027, not enforced as binding DNA.
+Analytics and experiment vendors sit behind a closed `GrowthAdapter` interface in `@warpgogol/growth`; vendor selection is CMS/content-driven, never hardcoded in app or component source. Established by RFC-0027. **Reclassified to feature (RFC-0161)** — governed as a product feature by RFC-0027, not enforced as binding DNA.
 
 ## DNA-31 · Cosmic Passport as build output
 
@@ -142,11 +142,11 @@ Every build of every app emits `dist/.well-known/cosmic-passport.json` — one d
 
 ## DNA-32 · Star Map View as SSG-rendered SVG
 
-`@gogol/star-map` compiles `system.yaml` plus the registry of packaged manifests into a deterministic SVG (constellation → stars → planets → moons), emitted as a file and embedded in the `/cosmic/star-map` page. Edges represent composition, not dependency. Established by RFC-0028. **Reclassified to feature (RFC-0161)** — governed as a product feature by RFC-0028, not enforced as binding DNA.
+`@warpgogol/star-map` compiles `system.yaml` plus the registry of packaged manifests into a deterministic SVG (constellation → stars → planets → moons), emitted as a file and embedded in the `/cosmic/star-map` page. Edges represent composition, not dependency. Established by RFC-0028. **Reclassified to feature (RFC-0161)** — governed as a product feature by RFC-0028, not enforced as binding DNA.
 
 ## DNA-33 · Nebula Score as composite quality metric
 
-`@gogol/nebula` computes a 0–100 composite quality score from four weighted pillars, giving each app a single comparable health number. Established by RFC-0028. **Reclassified to feature (RFC-0161)** — governed as a product feature by RFC-0028, not enforced as binding DNA.
+`@warpgogol/nebula` computes a 0–100 composite quality score from four weighted pillars, giving each app a single comparable health number. Established by RFC-0028. **Reclassified to feature (RFC-0161)** — governed as a product feature by RFC-0028, not enforced as binding DNA.
 
 ## DNA-34 · Verifiable Credential signing + `/.well-known/` discovery
 
@@ -156,7 +156,7 @@ Each app has an Ed25519 keypair (private key in CI secrets, public key committed
 
 A single command runs every workspace and per-app validator in dependency order, aggregates results, and exits zero only if all are green — the single source of truth for "is this app ready to deploy." Established by RFC-0029 (carried forward into the RFC-0070 onboarding lifecycle).
 
-## DNA-36 · `@gogol/site-kernel-onboarding` package
+## DNA-36 · `@warpgogol/site-kernel-onboarding` package
 
 The OS package that owns the onboarding lifecycle — input/brief contracts, phase outputs, and app scaffolding. Established by RFC-0029 (extended by RFC-0070 and the RFC-0135/0136 amend lifecycle).
 
@@ -170,7 +170,7 @@ Reusable authored structures (beginning with list-based sections) use canonical,
 
 ## DNA-39 · Route registry is a merge of route sources
 
-The route registry (`@gogol/share` `getRouteRegistry()`) is a merge of route sources, not a 1:1 view of authored pages. Authored `system.md pages[]` are one source; the Programmatic Surface is a second, contributing build-time-materialized virtual routes (`src/surface.generated.json`) behind the `pseo` entitlement. All downstream machinery — `getStaticPaths`, sitemap, hreflang, the page handler — iterates the merged registry. Agents must not add route sources by hand-editing `getStaticPaths` or creating standalone route files — new route sources integrate through the registry with zero per-route code. Generated pages are baked block-declarative `PageEntry` objects served through the same `buildPage` pipeline as authored pages. Established by RFC-0192.
+The route registry (`@warpgogol/share` `getRouteRegistry()`) is a merge of route sources, not a 1:1 view of authored pages. Authored `system.md pages[]` are one source; the Programmatic Surface is a second, contributing build-time-materialized virtual routes (`src/surface.generated.json`) behind the `pseo` entitlement. All downstream machinery — `getStaticPaths`, sitemap, hreflang, the page handler — iterates the merged registry. Agents must not add route sources by hand-editing `getStaticPaths` or creating standalone route files — new route sources integrate through the registry with zero per-route code. Generated pages are baked block-declarative `PageEntry` objects served through the same `buildPage` pipeline as authored pages. Established by RFC-0192.
 
 ## DNA-40 · Env-example and deploy-script contract
 
@@ -210,7 +210,7 @@ A release is a promoted, immutable artifact produced from a validated mission. I
 
 ## DNA-49 · Fleet propagation (Leitstand)
 
-The Leitstand is the fleet operation component that deploys published releases to Sternsystem deployment targets via adapter plugins (cloudflare-workers, null). Propagation uses a channel model (`alt` for staging, `main` for production); promoting to `main` requires a healthy `alt` propagation of the same release. Propagation is gated on the release being `published`, preflight checks passing, and a deployment lock being available. Health checks include per-route content verification via `@gogol/fingerprint` HTML normalization that binds the live site to the behavior snapshot. Rollback redeploys a previous published artifact from the release store. Deployment state and secret references, never secret values, are tracked in the registry's `deployment` block with per-channel `lastPropagated` entries. Enforced by `leitstand.propagate`, `leitstand.status`, `leitstand.rollback`, and `leitstand.health`. Established by RFC-0358, updated by RFC-0379.
+The Leitstand is the fleet operation component that deploys published releases to Sternsystem deployment targets via adapter plugins (cloudflare-workers, null). Propagation uses a channel model (`alt` for staging, `main` for production); promoting to `main` requires a healthy `alt` propagation of the same release. Propagation is gated on the release being `published`, preflight checks passing, and a deployment lock being available. Health checks include per-route content verification via `@warpgogol/fingerprint` HTML normalization that binds the live site to the behavior snapshot. Rollback redeploys a previous published artifact from the release store. Deployment state and secret references, never secret values, are tracked in the registry's `deployment` block with per-channel `lastPropagated` entries. Enforced by `leitstand.propagate`, `leitstand.status`, `leitstand.rollback`, and `leitstand.health`. Established by RFC-0358, updated by RFC-0379.
 
 ## DNA-50 · Notausgang export
 
@@ -226,7 +226,7 @@ Published release artifacts are durable, content-addressed records in the Werkst
 
 ## DNA-53 · Semantic fingerprint governance
 
-All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@gogol/fingerprint` package. The package provides deterministic byte, tree, stable JSON/JSONC/YAML/Markdown, source, Astro, CSS, and package semantic fingerprints. New ad hoc direct hashing helpers are forbidden outside the package and audited by `fingerprint.usage.lint`. Established by RFC-0364.
+All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@warpgogol/fingerprint` package. The package provides deterministic byte, tree, stable JSON/JSONC/YAML/Markdown, source, Astro, CSS, and package semantic fingerprints. New ad hoc direct hashing helpers are forbidden outside the package and audited by `fingerprint.usage.lint`. Established by RFC-0364.
 
 ## DNA-54 · Forge bindings contract
 

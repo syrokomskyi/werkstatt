@@ -24,7 +24,7 @@ The diff implements the RFC-0277 command surface and schema fields correctly, bu
 
 ### Mechanical floor
 
-Pass — `@gogol/surface` and `@gogol/site-kernel-checks` `build:check` (tsc --noEmit) pass. `rfc.validate RFC-0277` passes with 0 violations.
+Pass — `@warpgogol/surface` and `@warpgogol/site-kernel-checks` `build:check` (tsc --noEmit) pass. `rfc.validate RFC-0277` passes with 0 violations.
 
 ### Axis A — Structural correctness
 
@@ -41,7 +41,7 @@ Pass — `@gogol/surface` and `@gogol/site-kernel-checks` `build:check` (tsc --n
 ### Axis C — Ecosystem fit
 
 - **FAIL — Command manifest not regenerated.** The RFC-0277 commit adds two new commands but does not regenerate `docs/command-manifest.generated.yaml`. The manifest was regenerated in a later commit (`4f5367569`), but the RFC-0277 commit itself should have included it. Per root AGENTS.md: "When workspace topology, root pipelines, or command surfaces change, update the generator/registries first, then run `ecosystem.manifest.generate`."
-- **PASS — Package boundaries.** `pseo-product.ts` imports from `@gogol/site-kernel`, `@gogol/site-kernel-content`, and local helpers only.
+- **PASS — Package boundaries.** `pseo-product.ts` imports from `@warpgogol/site-kernel`, `@warpgogol/site-kernel-content`, and local helpers only.
 - **PASS — Command lifecycle.** Both commands registered in `09b-build-artifacts-part2.ts` with correct scope, flags, and descriptions.
 
 ### Axis D — Forward-only compliance

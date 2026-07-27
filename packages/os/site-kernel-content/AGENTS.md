@@ -4,7 +4,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 ## Package role
 
-- `@gogol/site-kernel-content` provides framework-free content utilities shared across all apps in `apps/*`.
+- `@warpgogol/site-kernel-content` provides framework-free content utilities shared across all apps in `apps/*`.
 - Any app that needs to read Markdown files or parse frontmatter imports from this package.
 
 ## Public API
@@ -13,7 +13,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 - **`parseMarkdownFrontmatter(source)`** — parses `--- YAML ---` frontmatter, returns `{ content, data }`.
 - **`stringifyMarkdownFrontmatter(content, data)`** — serializes back to frontmatter + content string.
 - **`ParsedFrontmatter`** — exported type.
-- **`loadSemanticSiteModel`** / **`createFsSemanticReader`** — semantic site model loader; uses the RFC-0527 index-based resolver from `@gogol/share/content-reference` (RFC-0529).
+- **`loadSemanticSiteModel`** / **`createFsSemanticReader`** — semantic site model loader; uses the RFC-0527 index-based resolver from `@warpgogol/share/content-reference` (RFC-0529).
 
 ## Core boundaries
 
@@ -21,4 +21,4 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 ## Validation
 
-- Run `pnpm --filter @gogol/site-kernel-content build:check` after changes.
+- Run `pnpm --filter @warpgogol/site-kernel-content build:check` after changes.

@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runSchemaDriftValidate } from "../schema-drift.ts";
-import type { KernelCommandInput } from "@gogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/site-kernel";
 import { makeTestSiteContext } from "./helpers.ts";
 
 /*
@@ -16,8 +16,8 @@ import { makeTestSiteContext } from "./helpers.ts";
 </MODULE_CONTRACT>
 */
 
-const PROXY_FILE = `export * from "@gogol/share/schemas/page";
-export { pageSchema } from "@gogol/share/schemas/page";
+const PROXY_FILE = `export * from "@warpgogol/share/schemas/page";
+export { pageSchema } from "@warpgogol/share/schemas/page";
 `;
 
 const ZOD_DEFINITION_FILE = `import { z } from "zod";

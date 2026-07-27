@@ -26,19 +26,19 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   loadSystemManifest,
   collectMarkdownFiles,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel-content";
 import {
   buildDecapConfig,
   inferFields,
   mergeSamples,
   type DecapCollection,
-} from "@gogol/content-source/cms-git";
+} from "@warpgogol/content-source/cms-git";
 import { passResult, failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 

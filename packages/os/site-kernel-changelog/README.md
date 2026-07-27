@@ -1,6 +1,6 @@
-# @gogol/site-kernel-changelog
+# @warpgogol/site-kernel-changelog
 
-AI-powered changelog generation for WGogol apps. Detects git commits since the last release, classifies and groups changes with an LLM, writes versioned changelog entries, and maintains a `CHANGELOG.md` index.
+AI-powered changelog generation for Warpgogol apps. Detects git commits since the last release, classifies and groups changes with an LLM, writes versioned changelog entries, and maintains a `CHANGELOG.md` index.
 
 ## Commands
 
@@ -45,6 +45,6 @@ Register the commands in the app's `kernel.config.ts` by importing the runners a
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-changelog build:check
-pnpm --filter @gogol/site-kernel-changelog test
+pnpm --filter @warpgogol/site-kernel-changelog build:check
+pnpm --filter @warpgogol/site-kernel-changelog test
 ```

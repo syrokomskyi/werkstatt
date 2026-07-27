@@ -25,7 +25,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------
@@ -349,12 +349,12 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-checks/src/surface/starmap.ts",
   },
 
-  // RFC-0295: Webgogol check hints.
+  // RFC-0295: Warpgogol check hints.
   {
-    path: "public/.well-known/webgogol-check.json",
-    command: "webgogol.check-hints.generate",
+    path: "public/.well-known/warpgogol-check.json",
+    command: "warpgogol.check-hints.generate",
     markerPolicy: "registry-only",
-    module: "packages/os/site-kernel-check-webgogol/src/commands/hints.ts",
+    module: "packages/os/site-kernel-check-warpgogol/src/commands/hints.ts",
   },
 
   // RFC-0028: Cosmic passport key rotation.

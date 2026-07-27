@@ -10,7 +10,7 @@
 <non-goals>
   <item>Do not resolve the photo asset to a hashed URL — that is the render layer's job.</item>
   <item>Do not read content via the Astro runtime — disk only, like the predecessor people.validate.</item>
-  <item>Do not define the schema — that lives in @gogol/share/schemas/participant.ts.</item>
+  <item>Do not define the schema — that lives in @warpgogol/share/schemas/participant.ts.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -25,15 +25,15 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import {
   PARTICIPANT_TYPES,
   PARTICIPANT_STATUSES,
   PARTICIPANT_RELATIONSHIPS,
   CONSENT_APPROVED_FIELDS,
-} from "@gogol/share/schemas";
+} from "@warpgogol/share/schemas";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 const VALID_TYPES = new Set<string>(PARTICIPANT_TYPES);

@@ -10,7 +10,7 @@ This file is the thin assembly shim that re-exports the merged registry and
 the helper functions; the individual rule descriptors live in:
   rules/types.ts          — shared types + the `rule()` factory
   rules/core-infra.ts     — DSL, KEL, pipeline, kernel, registry, biome, props
-  rules/check-webgogol.ts — CW-*, SERVICES-*, CW-RUNNER-*
+  rules/check-warpgogol.ts — CW-*, SERVICES-*, CW-RUNNER-*
   rules/content-surface.ts — CKL, PSEO, DEM, WERK, VIS, surface
   rules/ops-fleet.ts      — AUTO, REV, ESC, BRK, FLEET, BB, material
   rules/governance.ts     — ecosystem, workspace, test.signal, MDQ, CI
@@ -36,7 +36,7 @@ the helper functions; the individual rule descriptors live in:
   <item>RFC-0262: register PROPS-01/02 for props.contract.validate and PAGE-PROPS-01 for the buildPage dev-time validateProps hook.</item>
   <item>RFC-0263: register COSMIC-LIT-01 for cosmic.literals.lint.</item>
   <item>RFC-0264: register BARREL-01/02 for barrel.size.lint.</item>
-  <item>RFC-0265: register COMMIT-01..04 for commit.message.lint (implemented in @gogol/site-kernel, not scanned by diagnostic.shape.lint's checksDir — registered here for the canonical rule-id catalog only).</item>
+  <item>RFC-0265: register COMMIT-01..04 for commit.message.lint (implemented in @warpgogol/site-kernel, not scanned by diagnostic.shape.lint's checksDir — registered here for the canonical rule-id catalog only).</item>
   <item>RFC-0270: register TIME-01/TIME-02 for pipeline.timeout.validate's telemetry-derived budget comparison.</item>
   <item>RFC-0268: register RFC-ACC-01/RFC-ACC-02 for rfc.acceptance.run.</item>
   <item>RFC-0269: register SNAP-01/SNAP-02 for behavior.snapshot.validate.</item>
@@ -54,7 +54,7 @@ the helper functions; the individual rule descriptors live in:
 export type { RuleDomain, RuleSeverityClass, RuleDescriptor } from "./rules/types.ts";
 
 import { CORE_INFRA_RULES } from "./rules/core-infra.ts";
-import { CHECK_WEBGOGOL_RULES } from "./rules/check-webgogol.ts";
+import { CHECK_WEBGOGOL_RULES } from "./rules/check-warpgogol.ts";
 import { CONTENT_SURFACE_RULES } from "./rules/content-surface.ts";
 import { OPS_FLEET_RULES } from "./rules/ops-fleet.ts";
 import { GOVERNANCE_RULES } from "./rules/governance.ts";

@@ -174,7 +174,7 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     flags: {
       site: {
         kind: "string",
-        description: "Site name (e.g. webgogol-com). Required for site deploys.",
+        description: "Site name (e.g. warpgogol-com). Required for site deploys.",
       },
       service: {
         kind: "string",
@@ -233,7 +233,7 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
   {
     name: "fingerprint.usage.lint",
     description:
-      "Scan authored source for direct hash usage outside @gogol/fingerprint and the allowlist (RFC-0364, DNA-53). " +
+      "Scan authored source for direct hash usage outside @warpgogol/fingerprint and the allowlist (RFC-0364, DNA-53). " +
       "Use --mode warning (default) or --mode fail.",
     scope: "workspace",
     flags: {

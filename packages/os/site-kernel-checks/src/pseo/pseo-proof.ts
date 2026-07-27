@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "../result-helpers.ts";
 
 const DEMAND_MAP_FILE = "src/surface/demand-map.generated.yaml";

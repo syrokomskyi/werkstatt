@@ -20,7 +20,7 @@ filesReviewed:
   - pnpm-lock.yaml
 ---
 
-# Code Review: fc5652fab...HEAD — `@gogol/share` refactoring C1–C5
+# Code Review: fc5652fab...HEAD — `@warpgogol/share` refactoring C1–C5
 
 ### Verdict: Needs revision
 
@@ -28,8 +28,8 @@ The diff successfully deepens five modules (registry dispatch, unified deep-merg
 
 ### Mechanical floor
 
-- `@gogol/share` tsc --noEmit: **pass**
-- `@gogol/site-kernel-checks` tsc --noEmit: **pass**
+- `@warpgogol/share` tsc --noEmit: **pass**
+- `@warpgogol/site-kernel-checks` tsc --noEmit: **pass**
 - Pre-existing `workspace-write-boundary.test.ts` failures (2 tests) are in uncommitted changes from a separate session — not introduced by this diff.
 
 ### Axis A — Structural correctness
@@ -52,13 +52,13 @@ The diff successfully deepens five modules (registry dispatch, unified deep-merg
 
 ### Axis B — DNA alignment
 
-- **DNA-1** (monorepo boundary) — PASS. No `apps/* → apps/*` imports. `site-content-handlers.ts` imports from `@gogol/content-source/astro` (package boundary).
+- **DNA-1** (monorepo boundary) — PASS. No `apps/* → apps/*` imports. `site-content-handlers.ts` imports from `@warpgogol/content-source/astro` (package boundary).
 - **DNA-6** (kebab-case) — PASS. `site-content-handlers.ts`, `orchestration.ts` — all kebab-case.
 - **DNA-42** (Compass markup) — PASS for new files. `site-content-handlers.ts` and `orchestration.ts` both carry `MODULE_CONTRACT` + `CHANGE_SUMMARY`.
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries** — PASS. `@gogol/share` imports from `@gogol/content-source` and `@gogol/ontology` — correct direction.
+- **Package boundaries** — PASS. `@warpgogol/share` imports from `@warpgogol/content-source` and `@warpgogol/ontology` — correct direction.
 - **AGENTS.md updates** — PASS. `packages/share/AGENTS.md` updated: table entries for `content`, `feature-policy`, `dev-props-validator`, `astro`, and Integration hub section now reference `orchestration.ts`.
 - **Compass sync** — N/A. `docs/*.xml` are generated snapshots; regeneration is a separate command (`compass.inventory.generate`). Not a blocker for this diff.
 - **Command lifecycle** — PASS. `deepMerge` added to `CANONICAL_EXPORTS` in `share-utility.ts`.
@@ -120,6 +120,6 @@ No formal spec available — the refactoring candidates C1–C8 were identified 
 
 ### Questions for the author
 
-1. **`@ts-ignore` in `site-content-handlers.ts:39`** — can `getCollection` from `@gogol/content-source/astro` accept a typed `string` collection name without `@ts-ignore`? If the port's type is too narrow, should the port be widened rather than suppressed at the call site?
+1. **`@ts-ignore` in `site-content-handlers.ts:39`** — can `getCollection` from `@warpgogol/content-source/astro` accept a typed `string` collection name without `@ts-ignore`? If the port's type is too narrow, should the port be widened rather than suppressed at the call site?
 2. **`Record<string, any>` in `SiteContentContext.labels`** — why `any` instead of `unknown`? Every handler already narrows with optional chaining and `as` casts; `unknown` would force the same narrowing without leaking `any` into handler return types.
 3. **`ajv.compile` per call** — `createDevPropsValidator` returns a closure that calls `ajv.compile(schema)` on every invocation. The `schemaCache` caches the _resolved_ schema, but `ajv.compile` still runs each time. Should the compiled validator be cached too (keyed by planet name)?

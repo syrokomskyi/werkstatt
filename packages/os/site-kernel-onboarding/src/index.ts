@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Public entrypoint for @gogol/site-kernel-onboarding — exports the
+<purpose>Public entrypoint for @warpgogol/site-kernel-onboarding — exports the
 onboarding module factory and individual command runners (DNA-36, RFC-0029).</purpose>
 <non-goals>
   <item>Do not import from app-specific packages.</item>

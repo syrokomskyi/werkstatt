@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  Shared test helpers for @gogol/site-kernel-checks test files. Eliminates
+  Shared test helpers for @warpgogol/site-kernel-checks test files. Eliminates
   the duplicated logger stub and KernelRuntimeContext construction pattern
   that was copy-pasted across 30+ test files. Import from "./helpers.ts"
   instead of re-declaring the logger and context factory inline.
@@ -19,7 +19,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 /** No-op logger stub for tests — all methods are silent. */
 export const testLogger = {

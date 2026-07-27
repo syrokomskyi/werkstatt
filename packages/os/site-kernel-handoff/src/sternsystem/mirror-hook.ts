@@ -12,7 +12,7 @@ Installs the hook if missing, updates it if stale. Idempotent.</purpose>
 import { writeFileSync, readFileSync, existsSync, chmodSync } from "node:fs";
 import path from "node:path";
 
-const HOOK_MARKER = "# wgogol-mirror-auto-push";
+const HOOK_MARKER = "# warpgogol-mirror-auto-push";
 const HOOK_BRANCH = "master";
 
 const HOOK_CONTENT = `#!/bin/sh

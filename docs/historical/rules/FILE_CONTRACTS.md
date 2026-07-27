@@ -104,7 +104,7 @@ project/
   - long-form prose with default-language fallback (RFC-0008)
 
 - `business/{lang}/\*\*
-  - business data consumed by `@gogol/business`
+  - business data consumed by `@warpgogol/business`
 
 - `navigation/{lang}/\*\*
   - navigation labels, order, groups, semantic targets (not route slugs)

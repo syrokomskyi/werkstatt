@@ -94,7 +94,7 @@ test("projectGraph: one node per subject, newest event wins, history counted", (
     evt({ asOf: "2026-06-18", ts: "2026-06-18T00:00:00Z", value: "39120" }),
     evt({ subject: "business/de/company#foundingYear", value: "2026", ts: "2026-02-01T00:00:00Z" }),
   ];
-  const graph = projectGraph(events, "webgogol-com");
+  const graph = projectGraph(events, "warpgogol-com");
   expect(graph.nodes.length).toBe(2);
   const residents = graph.nodes.find((n) => n.subject === "business/de/location#residents")!;
   expect(residents.currentValue).toBe("39120");

@@ -88,7 +88,7 @@ No issues. Замена выполнена как полный rename — нет
 
 No issues. Все SKILL.md frontmatter прошли `forge.skill.validate` (SKILL-01..SKILL-10). Имена навыков в текстах SKILL.md корректно ссылаются на `fo-*` имена. `_shared/fo-*.md` файлы корректно переименованы и ссылаются на `fo-*` навыки.
 
-**Cosmetic note:** Заголовки `_shared/fo-pipeline-conventions.md` и `_shared/fo-session-summary.md` содержат "WG" (сокращение от WGogol, не префикс навыка) — это не нарушение, но может вызвать путаницу при беглом просмотре.
+**Cosmetic note:** Заголовки `_shared/fo-pipeline-conventions.md` и `_shared/fo-session-summary.md` содержат "WG" (сокращение от Warpgogol, не префикс навыка) — это не нарушение, но может вызвать путаницу при беглом просмотре.
 
 ### Axis F — Pragmatism
 

@@ -18,13 +18,13 @@
 */
 
 import { render } from "astro:content";
-import type { MaterialCreditLabels } from "@gogol/share";
-import { getProseContentEntry, wrapInlineNumbers, type AttributionSiteDefault } from "@gogol/share";
+import type { MaterialCreditLabels } from "@warpgogol/share";
+import { getProseContentEntry, wrapInlineNumbers, type AttributionSiteDefault } from "@warpgogol/share";
 import {
   getContentRefIndex,
   resolveReferencesInString,
   EMPTY_CONTENT_REF_INDEX,
-} from "@gogol/share/content-reference";
+} from "@warpgogol/share/content-reference";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts";

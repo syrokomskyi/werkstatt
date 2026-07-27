@@ -7,7 +7,7 @@
 </purpose>
 <non-goals>
   <item>Do not read content through Astro runtime or astro:content.</item>
-  <item>Do not duplicate formatting logic — delegate to @gogol/share/semantic buildRobotsTxt.</item>
+  <item>Do not duplicate formatting logic — delegate to @warpgogol/share/semantic buildRobotsTxt.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -24,11 +24,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { buildRobotsTxt } from "@gogol/share/semantic";
-import type { RobotsPolicy } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { buildRobotsTxt } from "@warpgogol/share/semantic";
+import type { RobotsPolicy } from "@warpgogol/share/semantic";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 // RFC-0375: robots.txt is a Category B (registry-only) file.

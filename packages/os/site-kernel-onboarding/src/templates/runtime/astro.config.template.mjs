@@ -48,7 +48,7 @@ import { envSchema } from "./src/env.schema.generated.mjs";
 const isAstroDev = process.argv.includes("dev");
 
 // Mission workpieces are nested at missions/<id>/workpiece/ — platform packages
-// are symlinked into node_modules/@gogol/* from ../../../../../packages/*.
+// are symlinked into node_modules/@warpgogol/* from ../../../../../packages/*.
 // Vite's default workspace-root detection doesn't find pnpm-workspace.yaml
 // (3+ levels above), so it blocks serving and stops watching those files.
 // Allow the monorepo root explicitly so HMR works on package source edits.
@@ -117,24 +117,24 @@ export default defineConfig({
     optimizeDeps: {
       include: ["gsap", "gsap/ScrollTrigger"],
       exclude: [
-        "@gogol/share",
-        "@gogol/ui",
-        "@gogol/pbp",
-        "@gogol/fingerprint",
-        "@gogol/content-source",
-        "@gogol/faq",
-        "@gogol/agent-gate",
-        "@gogol/growth",
-        "@gogol/ontology",
-        "@gogol/tokens",
-        "@gogol/site-kernel",
-        "@gogol/site-kernel-astro",
-        "@gogol/site-kernel-changelog",
-        "@gogol/site-kernel-checks",
-        "@gogol/site-kernel-codegen",
-        "@gogol/site-kernel-content",
-        "@gogol/site-kernel-deploy",
-        "@gogol/site-kernel-integrity",
+        "@warpgogol/share",
+        "@warpgogol/ui",
+        "@warpgogol/pbp",
+        "@warpgogol/fingerprint",
+        "@warpgogol/content-source",
+        "@warpgogol/faq",
+        "@warpgogol/agent-gate",
+        "@warpgogol/growth",
+        "@warpgogol/ontology",
+        "@warpgogol/tokens",
+        "@warpgogol/site-kernel",
+        "@warpgogol/site-kernel-astro",
+        "@warpgogol/site-kernel-changelog",
+        "@warpgogol/site-kernel-checks",
+        "@warpgogol/site-kernel-codegen",
+        "@warpgogol/site-kernel-content",
+        "@warpgogol/site-kernel-deploy",
+        "@warpgogol/site-kernel-integrity",
         "@webgogol/forge",
         "@lordicon/element",
       ],
@@ -170,7 +170,7 @@ export default defineConfig({
     },
     ssr: {
       external: ["node:async_hooks"],
-      noExternal: [/^@gogol\//, /^@wgogol\//],
+      noExternal: [/^@warpgogol\//, /^@warpgogol\//],
     },
   },
 });

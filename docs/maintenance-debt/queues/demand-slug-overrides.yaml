@@ -13,7 +13,7 @@ sourceCommands:
   - demands.hierarchy.validate
 selectors:
   apps:
-    - webgogol-com
+    - warpgogol-com
   ruleIds:
     - demands.hierarchy.validate
   severity:

@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-content",
+  "name": "@warpgogol/site-kernel-content",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,8 +19,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/content-source": "workspace:*",
-    "@gogol/share": "workspace:*",
+    "@warpgogol/content-source": "workspace:*",
+    "@warpgogol/share": "workspace:*",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

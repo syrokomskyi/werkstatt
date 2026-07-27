@@ -90,8 +90,8 @@
   </monorepo-topology>
 
   <workspaces>
-    <workspace id="app-webgogol-com">
-      <path>`apps/webgogol-com`</path>
+    <workspace id="app-warpgogol-com">
+      <path>`apps/warpgogol-com`</path>
       <kind>app</kind>
       <role>Primary marketing site with Ukrainian and German localization.</role>
     </workspace>

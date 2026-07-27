@@ -12,7 +12,7 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { runWorkpieceRead } from "../workpiece/workpiece-read.ts";
-import type { KernelCommandInput, KernelRuntimeContext, KernelFlagValue } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext, KernelFlagValue } from "@warpgogol/site-kernel";
 
 let tmpDir: string;
 let workpieceDir: string;

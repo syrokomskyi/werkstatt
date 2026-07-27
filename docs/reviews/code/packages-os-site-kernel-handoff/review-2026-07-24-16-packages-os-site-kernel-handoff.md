@@ -47,7 +47,7 @@ No issues. DNA-42 (Compass markup) satisfied — all 5 new source files carry `M
 
 ### Axis C — Ecosystem fit
 
-No issues. Package boundaries respected — all imports within `@gogol/site-kernel-handoff`. AGENTS.md updated with extracted guard references. No new commands, no pipeline changes.
+No issues. Package boundaries respected — all imports within `@warpgogol/site-kernel-handoff`. AGENTS.md updated with extracted guard references. No new commands, no pipeline changes.
 
 ### Axis D — Forward-only compliance
 
@@ -59,7 +59,7 @@ No issues. All new files have Compass scaffolding. Function names are descriptiv
 
 ### Axis F — Pragmatism
 
-No issues. No new commands. `GuardResult` is minimal. Extraction follows the pattern of `GateResult` from `@gogol/surface` but intentionally simpler. Scope is tight — only the two inline guards were extracted.
+No issues. No new commands. `GuardResult` is minimal. Extraction follows the pattern of `GateResult` from `@warpgogol/surface` but intentionally simpler. Scope is tight — only the two inline guards were extracted.
 
 ### Axis G — Blind spots
 

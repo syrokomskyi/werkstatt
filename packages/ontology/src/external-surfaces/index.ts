@@ -3,11 +3,11 @@
 <purpose>
 RFC-0480: Declarative Layer C external-surface contracts — URL schema,
 JSON-LD types, and sitemap shape. Consumed by `surface.contract.validate`
-in @gogol/site-kernel-handoff and by contract tests in @gogol/share.
+in @warpgogol/site-kernel-handoff and by contract tests in @warpgogol/share.
 </purpose>
 <non-goals>
   <item>Do not generate C-surfaces here — this module only declares the contract.</item>
-  <item>Do not import from @gogol/site-kernel-handoff or any app package.</item>
+  <item>Do not import from @warpgogol/site-kernel-handoff or any app package.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

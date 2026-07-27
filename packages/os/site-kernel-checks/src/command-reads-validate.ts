@@ -22,8 +22,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { listRegisteredKernelCommands } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { listRegisteredKernelCommands } from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 export async function runCommandReadsValidate(

@@ -5,28 +5,28 @@
 # Regenerate:   pnpm exec site-kernel run compass.audit.record
 revisionThreshold: 30
 entries:
-  - path: apps/check-webgogol-com/src/pages/api/check-runs/[runid].ts
+  - path: apps/check-warpgogol-com/src/pages/api/check-runs/[runid].ts
     entityId: ""
     auditedRevision: 5
     auditedHash: sha256-188fed9d99582dd59e4598e510565b8156e0a42f1d296cbba089939eb20ad22c
     auditedAt: 2026-07-08T18:58:17.743Z
     verdict: pass
     agent: codex
-  - path: apps/check-webgogol-com/src/pages/api/check-runs/index.ts
+  - path: apps/check-warpgogol-com/src/pages/api/check-runs/index.ts
     entityId: ""
     auditedRevision: 5
     auditedHash: sha256-f125569bf6959138128f8ad45e8f7ac461f559ad3558cd18dfe691a6f563ef01
     auditedAt: 2026-07-08T18:59:20.808Z
     verdict: pass
     agent: codex
-  - path: apps/check-webgogol-com/src/styles/check-page.css
+  - path: apps/check-warpgogol-com/src/styles/check-page.css
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-9212df7dfcec01538ff620d0f38d5b7eaff4cb82064fe2d37467e625b806a814
     auditedAt: 2026-07-08T19:00:14.565Z
     verdict: pass
     agent: codex
-  - path: apps/check-webgogol-com/src/styles/local.css
+  - path: apps/check-warpgogol-com/src/styles/local.css
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
@@ -40,28 +40,28 @@ entries:
     auditedAt: 2026-07-08T19:17:11.472Z
     verdict: pass
     agent: codex
-  - path: apps/webgogol-com/src/styles/local.css
+  - path: apps/warpgogol-com/src/styles/local.css
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-84183da51bd61a1c7ee6b03333c9227fb5a8772645515e882617f5907ac9926f
     auditedAt: 2026-07-08T19:45:58.327Z
     verdict: pass
     agent: codex
-  - path: missions/webgogol-com-m000005/workpiece/src/styles/local.css
+  - path: missions/warpgogol-com-m000005/workpiece/src/styles/local.css
     entityId: ""
     auditedRevision: 1
     auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
     auditedAt: 2026-07-20T16:23:37.913Z
     verdict: pass
     agent: human:Andrii Syrokomskyi
-  - path: missions/webgogol-com-m000009/workpiece/src/styles/local.css
+  - path: missions/warpgogol-com-m000009/workpiece/src/styles/local.css
     entityId: ""
     auditedRevision: 1
     auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
     auditedAt: 2026-07-22T07:58:36.622Z
     verdict: pass
     agent: human:Andrii Syrokomskyi
-  - path: missions/webgogol-com-m000010/workpiece/src/styles/local.css
+  - path: missions/warpgogol-com-m000010/workpiece/src/styles/local.css
     entityId: ""
     auditedRevision: 1
     auditedHash: sha256-3a41c324027cd722aec21822b0088c0c4f50cce98ecf3a77c98dab11f4046a1d
@@ -1650,112 +1650,112 @@ entries:
     auditedAt: 2026-07-20T16:04:17.588Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands.ts
     entityId: ""
     auditedRevision: 14
     auditedHash: sha256-8956ea2a78417099445b4297bf5787d40b9d4863d4464d8bbe2a72a1c078f5c5
     auditedAt: 2026-07-20T16:04:17.686Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/app.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/app.ts
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-1abd6a63ab3364b3053cd1607fc77e3262196c00ecfba0cb2592ea57fc1e9f01
     auditedAt: 2026-07-20T16:04:17.775Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/artifact-builders.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/artifact-builders.ts
     entityId: ""
     auditedRevision: 5
     auditedHash: sha256-c636f09eaec87121d3c33744e66db4530df6a4a0aab887c5ec936cd7d804837f
     auditedAt: 2026-07-20T16:04:17.890Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/audience.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/audience.ts
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-7b9d5e1a3349f33ceb6849720ff6ac1b390df41aa6faed1adb88770187388f3e
     auditedAt: 2026-07-20T16:04:17.988Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/deploy.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/deploy.ts
     entityId: ""
     auditedRevision: 5
     auditedHash: sha256-839e38a8b6411ad7695e7a4145fe3b436e77e33b7d2d35311515cfe00751ac69
     auditedAt: 2026-07-20T16:04:18.105Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/evidence-readers.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/evidence-readers.ts
     entityId: ""
     auditedRevision: 5
     auditedHash: sha256-28cdf88696bcdf16454a909a4b893d443efc97474ad26a61c426c996b2e4a94d
     auditedAt: 2026-07-20T16:04:18.208Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/evidence.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/evidence.ts
     entityId: ""
     auditedRevision: 5
     auditedHash: sha256-f9c308ff49065ac91c855d43de974a16985237c55522c95e65bf8b6c73138cb8
     auditedAt: 2026-07-20T16:04:18.316Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/helpers.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/helpers.ts
     entityId: ""
     auditedRevision: 6
     auditedHash: sha256-ab1bd560ba4629e692a5ed80e7aa39d2ef3ad0a8a57050342a53ca6eb166542f
     auditedAt: 2026-07-20T16:04:18.442Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/hints.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/hints.ts
     entityId: ""
     auditedRevision: 6
     auditedHash: sha256-b5b7998fb313b411aef22614ea1b4fbb9f42fb1f6d33df6a81c186cdb206864b
     auditedAt: 2026-07-20T16:04:18.537Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/report.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/report.ts
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-b45b701a28c25733f4ede9b059e4ca4607e053d6ef15948046ab51b6021477c0
     auditedAt: 2026-07-20T16:04:18.636Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/services-check.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/services-check.ts
     entityId: ""
     auditedRevision: 6
     auditedHash: sha256-c04c7a81adfd3077942f1c6d2e6203508d87d371b62090742ee0994f7e67cf45
     auditedAt: 2026-07-20T16:04:18.731Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/services.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/services.ts
     entityId: ""
     auditedRevision: 6
     auditedHash: sha256-844c78c768728e3ea6ddf67c8269f99b2accd1a8c070ec5f19e1b043b392940b
     auditedAt: 2026-07-20T16:04:18.901Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/commands/target.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/commands/target.ts
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-d664267d2a5eece9e318663ea1666e257562d3017ee3569b5dde415fd1a99de4
     auditedAt: 2026-07-20T16:04:18.975Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/index.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/index.ts
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-b4aa67e8ebad1ba4a1b8d02a157ce9fa87d1ea8d6cb3098a7e1a9aab46411555
     auditedAt: 2026-07-20T16:04:19.032Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/result.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/result.ts
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-60724b0df98e9b86bc43fabc8e68e61ea52af44a85f30cc12c6dd2690ff7cb73
     auditedAt: 2026-07-20T16:04:19.112Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-check-webgogol/src/target-io.ts
+  - path: packages/os/site-kernel-check-warpgogol/src/target-io.ts
     entityId: ""
     auditedRevision: 4
     auditedHash: sha256-c8cacbbb522bb0782ae9232ed05ef062cabaae1f7f5aa566f59e40f7c0f4b72e
@@ -2469,7 +2469,7 @@ entries:
     auditedAt: 2026-07-20T16:04:29.757Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-checks/src/command-tables/30-check-webgogol.ts
+  - path: packages/os/site-kernel-checks/src/command-tables/30-check-warpgogol.ts
     entityId: ""
     auditedRevision: 16
     auditedHash: sha256-7ee29c8051ddc4e8bde0fc8fac6a670368e2e658054b2d7245755ae4331c9082
@@ -2770,7 +2770,7 @@ entries:
     auditedAt: 2026-07-20T16:04:33.941Z
     verdict: baseline
     agent: system:baseline
-  - path: packages/os/site-kernel-checks/src/diagnostics/rules/check-webgogol.ts
+  - path: packages/os/site-kernel-checks/src/diagnostics/rules/check-warpgogol.ts
     entityId: ""
     auditedRevision: 7
     auditedHash: sha256-495202583159e7c6e49273f16554e602cd26238d2c1969825524f59bd4cd4e77
@@ -9119,28 +9119,28 @@ entries:
     auditedAt: 2026-07-20T16:05:56.353Z
     verdict: baseline
     agent: system:baseline
-  - path: services/check-webgogol-runner/src/config.ts
+  - path: services/check-warpgogol-runner/src/config.ts
     entityId: ""
     auditedRevision: 3
     auditedHash: sha256-6eeb5ae1839c3bfe795da7118c608caf7c68f3f88f2be20f14c7ac0e6436f82e
     auditedAt: 2026-07-20T16:05:56.426Z
     verdict: baseline
     agent: system:baseline
-  - path: services/check-webgogol-runner/src/local-store.ts
+  - path: services/check-warpgogol-runner/src/local-store.ts
     entityId: ""
     auditedRevision: 3
     auditedHash: sha256-4cda95c5e07ae15ab906acd87bca5e913f1ba1202f45c117dda60976829b6b47
     auditedAt: 2026-07-20T16:05:56.500Z
     verdict: baseline
     agent: system:baseline
-  - path: services/check-webgogol-runner/src/run-once.ts
+  - path: services/check-warpgogol-runner/src/run-once.ts
     entityId: ""
     auditedRevision: 6
     auditedHash: sha256-4566596c11dae8744813809f25dc843236ab04886cda55f8183143ab1d68fcf2
     auditedAt: 2026-07-20T16:05:56.602Z
     verdict: baseline
     agent: system:baseline
-  - path: services/check-webgogol-runner/src/worker.ts
+  - path: services/check-warpgogol-runner/src/worker.ts
     entityId: ""
     auditedRevision: 2
     auditedHash: sha256-6df3e34e1914c04db71ae576691da3df6b4b3ccd61f17a0fa8b1523ea1da85fa

@@ -44,7 +44,7 @@ export type TlsImpl = (
   valid_to: string;
 }>;
 
-const USER_AGENT = "WGogol-FleetProbe/1 (+https://webgogol.com)";
+const USER_AGENT = "Warpgogol-FleetProbe/1 (+https://warpgogol.com)";
 
 function classifyStatus(status: number): string {
   if (status >= 200 && status < 300) return "2xx";

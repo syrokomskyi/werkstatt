@@ -26,9 +26,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { collectMarkdownFiles } from "@gogol/site-kernel-content";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { collectMarkdownFiles } from "@warpgogol/site-kernel-content";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 interface ContentSurfaceViolation {

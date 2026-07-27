@@ -29,7 +29,7 @@ queues:
       - material.credits.validate
     selectors:
       apps:
-        - webgogol-com
+        - warpgogol-com
       ruleIds:
         - material.credits.missing-prose-credit
       severity:
@@ -88,7 +88,7 @@ queues:
       - surface.validate
     selectors:
       apps:
-        - webgogol-com
+        - warpgogol-com
       ruleIds:
         - surface.validate
       severity:
@@ -117,7 +117,7 @@ queues:
       - demands.hierarchy.validate
     selectors:
       apps:
-        - webgogol-com
+        - warpgogol-com
       ruleIds:
         - demands.hierarchy.validate
       severity:

@@ -103,7 +103,7 @@ Packages that build to `dist/` MUST use explicit `.js` specifiers...
    - pnpm: `10.33.0` → `11.1.1` (aligns with root package.json)
 
 2. **Fixed workspace topology (11 changes):**
-   - `apps/main` → `apps/webgogol-com` + `apps/nicaragua-projekt`
+   - `apps/main` → `apps/warpgogol-com` + `apps/nicaragua-projekt`
    - `packages/site-kernel` → `packages/os/site-kernel`
    - `packages/site-kernel-astro` → `packages/os/site-kernel-astro`
    - `packages/site-kernel-checks` → `packages/os/site-kernel-checks`
@@ -124,7 +124,7 @@ Packages that build to `dist/` MUST use explicit `.js` specifiers...
 
 - 14 module paths: `packages/site-kernel-changelog/*` → `packages/os/site-kernel-changelog/*`
 - 8 package targets in rollout waves: `packages/site-kernel*` → `packages/os/site-kernel*`
-- 2 app targets: `apps/main` + `apps/<reference-app>` → `apps/webgogol-com` + `apps/nicaragua-projekt`
+- 2 app targets: `apps/main` + `apps/<reference-app>` → `apps/warpgogol-com` + `apps/nicaragua-projekt`
 
 ## Verification Results
 
@@ -150,7 +150,7 @@ Packages that build to `dist/` MUST use explicit `.js` specifiers...
 
 ```
 nicaragua-projekt: OK with 26 warning(s) (expected RFC-0150 preview image warnings)
-webgogol-com: OK with 26 warning(s) (expected RFC-0150 preview image warnings)
+warpgogol-com: OK with 26 warning(s) (expected RFC-0150 preview image warnings)
 ```
 
 **Status:** ✅ Both apps pass validation

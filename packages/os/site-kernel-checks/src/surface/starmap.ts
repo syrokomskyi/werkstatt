@@ -15,13 +15,13 @@ import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir, readFile } from "node:fs/promises";
 import { parse as yamlParse } from "yaml";
-import { writeFileIfChanged } from "@gogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
 import { failResult, passResult } from "../result-helpers.ts";
 import { ARTIFACT_FILE } from "./shared.ts";
 

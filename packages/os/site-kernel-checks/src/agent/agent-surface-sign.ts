@@ -5,7 +5,7 @@ RFC-0308: agent.surface.sign and agent.surface.verify — detached Ed25519
 proof generation and verification for Agent Surface artifacts (manifest,
 knowledge files, OpenAPI). Signing uses the same PASSPORT_SIGNING_KEY env
 secret and cosmic-passport-key.json public key file as the Cosmic Passport
-(RFC-0028), reusing @gogol/passport's Ed25519 primitives.
+(RFC-0028), reusing @warpgogol/passport's Ed25519 primitives.
 </purpose>
 <non-goals>
   <item>Do not generate or regenerate artifacts — sign reads what
@@ -27,19 +27,19 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { optionalEnv } from "@gogol/site-kernel-integrity";
-import { signBytes, verifyBytes } from "@gogol/passport/sign";
-import { PassportPublicKeyFileSchema } from "@gogol/passport/schema";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { optionalEnv } from "@warpgogol/site-kernel-integrity";
+import { signBytes, verifyBytes } from "@warpgogol/passport/sign";
+import { PassportPublicKeyFileSchema } from "@warpgogol/passport/schema";
 import {
   buildAgentSigningPayload,
   type AgentSurfaceProof,
   type AgentSurfaceManifest,
   type AgentKnowledgeEnvelope,
-} from "@gogol/share/agent";
+} from "@warpgogol/share/agent";
 import { readAstroSiteUrl } from "../lib/astro-site-url.ts";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { diagnosticsResult, passResult, failResult } from "../result-helpers.ts";
 
 const INTERNAL_MANIFEST_FILE = "src/agent-surface.generated.yaml";
@@ -104,7 +104,7 @@ function verificationMethod(domain: string, keyVersion: string): string {
   return `did:web:${domain}#key-${keyVersion}`;
 }
 
-/** Extract the domain from a site URL like "https://webgogol.com". */
+/** Extract the domain from a site URL like "https://warpgogol.com". */
 function extractDomain(baseUrl: string): string {
   try {
     return new URL(baseUrl).hostname;

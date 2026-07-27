@@ -1,11 +1,11 @@
-# @gogol/check-core
+# @warpgogol/check-core
 
-Schema-and-logic package for the check-webgogol ecosystem. Provides Zod schemas, deterministic builders, diagnostic collectors, run-path helpers, and safety validation for check runs.
+Schema-and-logic package for the check-warpgogol ecosystem. Provides Zod schemas, deterministic builders, diagnostic collectors, run-path helpers, and safety validation for check runs.
 
 ## Entry point
 
 ```ts
-import { ... } from "@gogol/check-core";
+import { ... } from "@warpgogol/check-core";
 ```
 
 ## Modules
@@ -24,7 +24,7 @@ import { ... } from "@gogol/check-core";
 
 ## Hashing
 
-All hashes use `@gogol/fingerprint` `byteHash` directly (returns `sha256:<hex>` prefixed format). The legacy `hash.ts` wrapper that stripped the `sha256:` prefix has been removed. Evidence graph hashes are stored in prefixed format.
+All hashes use `@warpgogol/fingerprint` `byteHash` directly (returns `sha256:<hex>` prefixed format). The legacy `hash.ts` wrapper that stripped the `sha256:` prefix has been removed. Evidence graph hashes are stored in prefixed format.
 
 ## `findWorkspaceRoot` — Node-only
 
@@ -32,6 +32,6 @@ All hashes use `@gogol/fingerprint` `byteHash` directly (returns `sha256:<hex>` 
 
 ## Dependencies
 
-- `@gogol/fingerprint` — `byteHash`, `stableStringify`
-- `@gogol/site-kernel` — `Diagnostic` type
+- `@warpgogol/fingerprint` — `byteHash`, `stableStringify`
+- `@warpgogol/site-kernel` — `Diagnostic` type
 - `zod` — schema validation

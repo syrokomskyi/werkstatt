@@ -21,7 +21,7 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { stringify as yamlStringify } from "yaml";
 import {
   includeInTwins,
@@ -31,8 +31,8 @@ import {
   type SurfaceCounts,
   type SurfaceManifest,
   type VirtualRouteEntry,
-} from "@gogol/surface";
-import { markdownTwinRelPath } from "@gogol/share/semantic";
+} from "@warpgogol/surface";
+import { markdownTwinRelPath } from "@warpgogol/share/semantic";
 import { failResult } from "../result-helpers.ts";
 import {
   loadSurfaceBlueprints,

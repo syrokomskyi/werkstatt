@@ -87,4 +87,4 @@ export const ChatWidgetConfigSchema = z.object({
 export type ChatWidgetConfig = z.infer<typeof ChatWidgetConfigSchema>;
 
 /** The `id` of the <script type="application/json"> injected by the chat-widget section. */
-export const CHAT_CONFIG_SCRIPT_ID = "__webgogol_chat_config__";
+export const CHAT_CONFIG_SCRIPT_ID = "__warpgogol_chat_config__";

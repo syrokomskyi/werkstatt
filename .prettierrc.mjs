@@ -1,5 +1,5 @@
 /**
- * @file Prettier configuration for WGogol monorepo.
+ * @file Prettier configuration for Warpgogol monorepo.
  * @module_contract
  *   - FORMAT: esm
  *   - PURPOSE: Code formatting rules for apps/* and packages/*

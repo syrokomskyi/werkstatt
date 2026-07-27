@@ -33,7 +33,7 @@ describe("PbpPackageManifest", () => {
   it("accepts a valid manifest", () => {
     const manifest: PbpPackageManifest = {
       schema: "pbp/package@1",
-      id: "https://webgogol.com/id/package/public-business-profile",
+      id: "https://warpgogol.com/id/package/public-business-profile",
       defaultLocale: "de",
       locales: {
         de: { sourceRef: "./de" },

@@ -4,13 +4,13 @@
 RFC-0308: pure, framework-free Ed25519 proof types and domain-separated
 signing payload builder for Agent Surface artifacts. The signing and
 verification primitives (Ed25519 sign/verify, multibase encoding) live in
-@gogol/passport; this module owns only the canonical payload format and
+@warpgogol/passport; this module owns only the canonical payload format and
 the proof shape that generators, agent.surface.sign, and agent.surface.verify
 share.
 </purpose>
 <non-goals>
   <item>Do not import or call Ed25519 signing/verification primitives — that
-        is @gogol/passport's job. This module is pure and dependency-free.</item>
+        is @warpgogol/passport's job. This module is pure and dependency-free.</item>
   <item>Do not read files or perform I/O.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -38,7 +38,7 @@ export interface AgentSurfaceProof {
 }
 
 /** Domain-separation prefix for agent surface signing payloads (RFC-0308). */
-export const AGENT_PROOF_DOMAIN = "WGOGOL_AGENT_SURFACE_V1";
+export const AGENT_PROOF_DOMAIN = "WARPGOGOL_AGENT_SURFACE_V1";
 
 /**
  * Build the domain-separated canonical signing payload for an agent surface
@@ -46,7 +46,7 @@ export const AGENT_PROOF_DOMAIN = "WGOGOL_AGENT_SURFACE_V1";
  *
  * The signed input is:
  * ```
- * WGOGOL_AGENT_SURFACE_V1\n<artifact-kind>\n<absolute-canonical-url>\n<contentHash>
+ * WARPGOGOL_AGENT_SURFACE_V1\n<artifact-kind>\n<absolute-canonical-url>\n<contentHash>
  * ```
  *
  * This prevents signature reuse across artifact kinds or URLs.

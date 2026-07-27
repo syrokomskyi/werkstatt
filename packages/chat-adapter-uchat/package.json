@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/chat-adapter-uchat",
+  "name": "@warpgogol/chat-adapter-uchat",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -20,7 +20,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/chat": "workspace:*"
+    "@warpgogol/chat": "workspace:*"
   },
   "devDependencies": {
     "happy-dom": "^20.11.0",

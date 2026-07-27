@@ -13,7 +13,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { TOKEN_NAME_SET } from "@gogol/tokens";
+import { TOKEN_NAME_SET } from "@warpgogol/tokens";
 import { fileExists } from "../lib/file-exists.ts";
 import { extractCssDefinitions } from "./css-utils.ts";
 import {

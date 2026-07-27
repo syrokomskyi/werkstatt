@@ -28,10 +28,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { loadSystemManifestSync } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { loadSystemManifestSync } from "@warpgogol/site-kernel-content";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 interface PeopleRecord {

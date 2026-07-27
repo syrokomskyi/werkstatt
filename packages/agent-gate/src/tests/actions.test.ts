@@ -14,7 +14,7 @@
 
 import { test, expect } from "vitest";
 import { validateAgainstCapabilitySchema, buildIntegrationEventFromAction } from "../actions.ts";
-import type { CapabilityRecord, CapabilityInputOutputSchema } from "@gogol/ontology";
+import type { CapabilityRecord, CapabilityInputOutputSchema } from "@warpgogol/ontology";
 
 const schema: CapabilityInputOutputSchema = {
   type: "object",

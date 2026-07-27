@@ -14,8 +14,8 @@ domain (read-only) and one per active action.
 </CHANGE_SUMMARY>
 */
 
-import type { AgentSurfaceManifest } from "@gogol/share/agent";
-import type { CapabilityRecord } from "@gogol/ontology";
+import type { AgentSurfaceManifest } from "@warpgogol/share/agent";
+import type { CapabilityRecord } from "@warpgogol/ontology";
 
 export interface McpTool {
   name: string;

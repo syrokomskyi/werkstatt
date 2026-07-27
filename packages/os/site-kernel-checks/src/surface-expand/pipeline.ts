@@ -35,8 +35,8 @@ import {
   type SurfaceNarrative,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@gogol/surface";
-import { toKebabCase } from "@gogol/share/string-utils";
+} from "@warpgogol/surface";
+import { toKebabCase } from "@warpgogol/share/string-utils";
 import { heroSignature } from "./bake.ts";
 import { matchingRecordsForEntry, hasEvidenceValue, ageDays } from "./expand-helpers.ts";
 

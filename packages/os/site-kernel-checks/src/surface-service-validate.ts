@@ -24,8 +24,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { parseMarkdownFrontmatter, collectMarkdownFiles } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { parseMarkdownFrontmatter, collectMarkdownFiles } from "@warpgogol/site-kernel-content";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceBlueprints } from "./surface-expand.ts";
 

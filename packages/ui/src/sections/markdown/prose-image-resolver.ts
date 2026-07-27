@@ -17,7 +17,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { ImageDescriptor, MaterialCreditLabels } from "@gogol/share";
+import type { ImageDescriptor, MaterialCreditLabels } from "@warpgogol/share";
 import {
   buildImageSources,
   creditByTarget,
@@ -25,7 +25,7 @@ import {
   labelForMaterialCreditRole,
   resolveAttributionDisplay,
   type AttributionSiteDefault,
-} from "@gogol/share";
+} from "@warpgogol/share";
 import { contentAssetCredits, contentAssetImages } from "../../content-assets.ts";
 
 function escapeHtml(value: string): string {

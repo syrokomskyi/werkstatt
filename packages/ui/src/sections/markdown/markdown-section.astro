@@ -21,16 +21,16 @@ import type {
   EffectAssignment,
   SectionDensity,
   SectionTone,
-} from "@gogol/share";
-import type { SectionProps } from "@gogol/share/page";
+} from "@warpgogol/share";
+import type { SectionProps } from "@warpgogol/share/page";
 import {
   getSiteLabelsData,
   materialCreditLabelsSchema,
   readCreditsSiteDefault,
-} from "@gogol/share";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
+} from "@warpgogol/share";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import { renderProse } from "./prose-pipeline.ts";
 
 /** RFC-0035: Markdown section specific pageOverride shape */

@@ -19,15 +19,15 @@ stable and would pass even if every run mutated authored content identically.
 
 import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { executeKernelCommand } from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { SITES_BUILD_PREPARE_PIPELINE } from "./module.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const NEED_THIS_RE = /NEED_THIS_[A-Z][A-Z0-9_]*/g;
 

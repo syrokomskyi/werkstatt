@@ -1,6 +1,6 @@
-# @gogol/site-kernel-deploy
+# @warpgogol/site-kernel-deploy
 
-Client workspace export command for the WGogol Site OS. Copies the monorepo workspace to a sibling `clients/<app-name>/` directory, filtered for safe client delivery (RFC-0007).
+Client workspace export command for the Warpgogol Site OS. Copies the monorepo workspace to a sibling `clients/<app-name>/` directory, filtered for safe client delivery (RFC-0007).
 
 ## Commands
 
@@ -35,7 +35,7 @@ pnpm exec site-kernel run client.export --site my-app --dry-run
 
 ```typescript
 // apps/my-app/tools/kernel.config.ts
-import { runClientExport } from "@gogol/site-kernel-deploy";
+import { runClientExport } from "@warpgogol/site-kernel-deploy";
 
 export default defineKernelConfig({
   modules: [
@@ -59,5 +59,5 @@ export default defineKernelConfig({
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-deploy build:check
+pnpm --filter @warpgogol/site-kernel-deploy build:check
 ```

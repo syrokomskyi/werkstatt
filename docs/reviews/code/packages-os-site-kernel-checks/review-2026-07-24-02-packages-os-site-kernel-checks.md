@@ -26,7 +26,7 @@ Three findings require fixes before merge: a schema validation gap allowing `sta
 
 ### Mechanical floor
 
-Pass — all five affected packages (`@gogol/ontology`, `@gogol/site-kernel-checks`, `@gogol/site-kernel-codegen`, `@gogol/site-kernel-content`, `@gogol/ui`) pass `build:check` (tsc --noEmit).
+Pass — all five affected packages (`@warpgogol/ontology`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-content`, `@warpgogol/ui`) pass `build:check` (tsc --noEmit).
 
 ### Axis A — Structural correctness
 
@@ -48,7 +48,7 @@ No issues. The `url-schema.yaml` addition follows the Layer C contract (RFC-0480
 ### Axis C — Ecosystem fit
 
 - **C-1: Hardcoded site-specific slugs in shared-package validator.**
-  `packages/os/site-kernel-checks/src/team-hub.ts:75-86` — the validator hardcodes `slug: "gruender"` and `slug: "zasnovnyk"` to check for the founder redirect. These are webgogol-com-specific DE/UK slugs. `packages/os/site-kernel-checks` is a shared package consumed by all sites. A different site with a team page and a retired founder page using different route slugs (e.g. `founder` in English) would get false negatives. The validator should either (a) check that *all* `founder`-page route slugs from `system.md` appear in `retiredRoutes` with `status: 301`, or (b) accept that this validator is webgogol-com-specific and document it. Similarly, `team-hub.ts:136` hardcodes `["de", "uk"]` for the navigation check — this should derive from the site's supported languages.
+  `packages/os/site-kernel-checks/src/team-hub.ts:75-86` — the validator hardcodes `slug: "gruender"` and `slug: "zasnovnyk"` to check for the founder redirect. These are warpgogol-com-specific DE/UK slugs. `packages/os/site-kernel-checks` is a shared package consumed by all sites. A different site with a team page and a retired founder page using different route slugs (e.g. `founder` in English) would get false negatives. The validator should either (a) check that *all* `founder`-page route slugs from `system.md` appear in `retiredRoutes` with `status: 301`, or (b) accept that this validator is warpgogol-com-specific and document it. Similarly, `team-hub.ts:136` hardcodes `["de", "uk"]` for the navigation check — this should derive from the site's supported languages.
 
 - **Compass sync**: `docs/technology.xml` is updated for `team.hub.validate` and `_redirects` 301 generation. Good.
 

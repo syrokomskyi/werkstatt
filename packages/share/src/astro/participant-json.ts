@@ -213,7 +213,7 @@ export function buildPersonJsonLd(
 
   node.affiliation = {
     "@type": "Organization",
-    name: "Webgogol",
+    name: "Warpgogol",
   };
 
   return node;
@@ -285,7 +285,7 @@ export function buildTeamHubCollectionPageJsonLd(
     "@type": "CollectionPage",
     "@id": `${siteUrl}/team/#collection`,
     name: "Team",
-    description: "Verantwortliche Personen, Teams und KI-Systeme bei Webgogol.",
+    description: "Verantwortliche Personen, Teams und KI-Systeme bei Warpgogol.",
     url: `${siteUrl}/team/`,
     hasPart,
   };

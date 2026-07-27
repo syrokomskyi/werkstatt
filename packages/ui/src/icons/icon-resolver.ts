@@ -1,14 +1,14 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  Vendor-agnostic dynamic icon resolver for @gogol/ui.
+  Vendor-agnostic dynamic icon resolver for @warpgogol/ui.
   Discovers all generated icon components via import.meta.glob and resolves
   them by vendor, collection, and name so any section can use icons without
   hard-coding vendor-specific import logic.
 </purpose>
 <non-goals>
   <item>Do not implement rendering logic — returns the component, caller renders it.</item>
-  <item>Do not manage deferred hydration — that stays in @gogol/share/scripts/lordicon.ts.</item>
+  <item>Do not manage deferred hydration — that stays in @warpgogol/share/scripts/lordicon.ts.</item>
   <item>Do not hard-code vendor names or collection folders.</item>
 </non-goals>
 </MODULE_CONTRACT>

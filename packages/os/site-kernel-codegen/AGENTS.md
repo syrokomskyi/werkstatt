@@ -1,4 +1,4 @@
-# @gogol/site-kernel-codegen
+# @warpgogol/site-kernel-codegen
 
 File generation commands for all Astro sites in `apps/*`.
 
@@ -10,7 +10,7 @@ File generation commands for all Astro sites in `apps/*`.
 | `src/open-source-page.ts` | `runGenerateOpenSourcePage`, `openSourceLabelsSchema`, `loadOpenSourceLabels`, `normalizeLicense`, `detectLicenseConflict`, `classifyPackage`, `deduplicatePackages`, `buildCycloneDxSbom`, `openSourceRegistryDataSchema` (RFC-0489) |
 | `src/compass-backfill.ts` | `runCompassAnchorBackfill` |
 | `src/app-boilerplate.ts` | App boilerplate generators (`runGenerateOverlayPages`, `runGenerateRoutes`, etc.) |
-| `src/generated-marker.ts` | `GENERATED_MARKER`, `hasGeneratedMarker` (re-export from `@gogol/site-kernel`) |
+| `src/generated-marker.ts` | `GENERATED_MARKER`, `hasGeneratedMarker` (re-export from `@warpgogol/site-kernel`) |
 | `src/material-metadata-write.ts` | `runMaterialMetadataWrite` (RFC-0528) |
 
 ## Commands
@@ -36,6 +36,6 @@ File generation commands for all Astro sites in `apps/*`.
 
 Three rules that every generator in this package must satisfy:
 
-1. **Single owner** — every generated file under `apps/<id>/` must be written by exactly one kernel command. The `generator.ownership.lint` check in `@gogol/site-kernel-checks` enforces this via a static ownership map. When adding a new generator, register all its output paths in `GENERATOR_OWNERSHIP_MAP` (in `site-kernel-checks/src/generator-ownership.ts`).
+1. **Single owner** — every generated file under `apps/<id>/` must be written by exactly one kernel command. The `generator.ownership.lint` check in `@warpgogol/site-kernel-checks` enforces this via a static ownership map. When adding a new generator, register all its output paths in `GENERATOR_OWNERSHIP_MAP` (in `site-kernel-checks/src/generator-ownership.ts`).
 2. **Content-driven** — generator output must derive from `src/content/system.md` properties (routes, domain, languages, biome). No hardcoded constants or separate config files. Use `getDomainFromManifest()` for the canonical domain, `getSupportedLanguages()` / `getDefaultLanguage()` for i18n, and `getBiomeDisplayName()` for the biome.
-3. **Idempotent** — re-running any generator must produce identical output. The `writeManagedFile()` function enforces this: identical content returns `"unchanged"` (0 file writes). Files without the `GENERATED_MARKER` are skipped to preserve project-specific edits. Verify with `pnpm --filter @gogol/site-kernel-codegen test`.
+3. **Idempotent** — re-running any generator must produce identical output. The `writeManagedFile()` function enforces this: identical content returns `"unchanged"` (0 file writes). Files without the `GENERATED_MARKER` are skipped to preserve project-specific edits. Verify with `pnpm --filter @warpgogol/site-kernel-codegen test`.

@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/surface",
+  "name": "@warpgogol/surface",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -56,7 +56,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/site-kernel-content": "workspace:*",
+    "@warpgogol/site-kernel-content": "workspace:*",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
   },

@@ -23,7 +23,7 @@ filesReviewed:
 
 ### Verdict: Approved
 
-The diff adds 71 tests across 10 new test files covering previously untested modules in `@gogol/site-kernel-checks`. All tests pass, typecheck is clean, and the tests follow existing repo conventions. Two minor findings are advisory — neither blocks merge.
+The diff adds 71 tests across 10 new test files covering previously untested modules in `@warpgogol/site-kernel-checks`. All tests pass, typecheck is clean, and the tests follow existing repo conventions. Two minor findings are advisory — neither blocks merge.
 
 ### Mechanical floor
 
@@ -41,7 +41,7 @@ No issues. The diff is test-only — no production code changes, no new manifest
 
 - **DNA-6** (kebab-case): All 10 new filenames are kebab-case. ✓
 - **DNA-42** (Compass markup): All 10 new test files carry `MODULE_CONTRACT` blocks. ✓ (Minor: `compass-audit-isauditdue.test.ts` omits `CHANGE_SUMMARY` — inconsistent with the other 9 files, but not a DNA violation for test files.)
-- **DNA-1** (monorepo boundary): No `apps/*` imports. All imports flow from `tests/` → `../<module>.ts` and `@gogol/*` packages. ✓
+- **DNA-1** (monorepo boundary): No `apps/*` imports. All imports flow from `tests/` → `../<module>.ts` and `@warpgogol/*` packages. ✓
 
 ### Axis C — Ecosystem fit
 

@@ -2,19 +2,19 @@
 <MODULE_CONTRACT>
 <purpose>PBP semantic profile adapter — maps PBP compiler output to SemanticSiteProfile (RFC-0469).</purpose>
 <non-goals>
-  <item>Does not define SemanticSiteProfile — that lives in @gogol/share/semantic.</item>
-  <item>Does not implement the compiler — delegates to @gogol/pbp/compiler.</item>
+  <item>Does not define SemanticSiteProfile — that lives in @warpgogol/share/semantic.</item>
+  <item>Does not implement the compiler — delegates to @warpgogol/pbp/compiler.</item>
   <item>Does not handle page-level semantic models — use buildPbpPageSemanticModel instead.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Established by RFC-0469 — PBP semantic profile adapter for webgogol-com cutover.</item>
+  <item>Established by RFC-0469 — PBP semantic profile adapter for warpgogol-com cutover.</item>
 </CHANGE_SUMMARY>
 */
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { buildOrganizationProfile, type SemanticSiteProfile } from "@gogol/share/semantic";
+import { buildOrganizationProfile, type SemanticSiteProfile } from "@warpgogol/share/semantic";
 import { compilePbpProfile } from "./compiler/index.js";
 import type { PbpCompilerResult } from "./compiler/types.js";
 
@@ -25,8 +25,8 @@ function resolveSourceDirectory(sourceDirectory: string): string {
   return sourceDirectory;
 }
 
-// RFC-0470: buildPageSemanticModel is local to @gogol/pbp.
-// Sites import it from @gogol/pbp/semantic-profile.
+// RFC-0470: buildPageSemanticModel is local to @warpgogol/pbp.
+// Sites import it from @warpgogol/pbp/semantic-profile.
 export { buildPageSemanticModel } from "./semantic-model.ts";
 export { buildPageSemanticModel as buildPbpPageSemanticModel } from "./semantic-model.ts";
 

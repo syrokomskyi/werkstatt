@@ -1,4 +1,4 @@
-# PBP Package Review — `@gogol/pbp` vs Specification and RFCs
+# PBP Package Review — `@warpgogol/pbp` vs Specification and RFCs
 
 **Date:** 2026-07-18 **Reviewer:** Cascade (AI) **Scope:** `packages/pbp/` source code, tests, `docs/specs/pbp-specification-package/` (00–07), `docs/rfcs/rfc-0398..0462`
 
@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-The `@gogol/pbp` package is a **type-only contract layer** that faithfully mirrors the PBP specification package and the RFC series 0398–0462. It contains no runtime logic beyond validation utilities (`validatePbpUri`, `validateSchemaId`, `validateDecimal`, `validateMoneyRange`, `containsHtml`, `isEmptyValue`, `validateSchemaCompatibility`) and closed-vocabulary type guards. All 65 RFCs in the PBP roadmap have corresponding types exported from `src/index.ts`.
+The `@warpgogol/pbp` package is a **type-only contract layer** that faithfully mirrors the PBP specification package and the RFC series 0398–0462. It contains no runtime logic beyond validation utilities (`validatePbpUri`, `validateSchemaId`, `validateDecimal`, `validateMoneyRange`, `containsHtml`, `isEmptyValue`, `validateSchemaCompatibility`) and closed-vocabulary type guards. All 65 RFCs in the PBP roadmap have corresponding types exported from `src/index.ts`.
 
 **Overall verdict:** The package is structurally sound, well-organized, and spec-aligned. No spec violations or terminology drift were found. The package is correctly marked as not-yet-consumable by sites (AGENTS.md enforces the RFC-PBP-102 gate).
 
@@ -16,7 +16,7 @@ The `@gogol/pbp` package is a **type-only contract layer** that faithfully mirro
 
 ```
 packages/pbp/
-├── package.json          — @gogol/pbp, private, TypeScript sources consumed directly
+├── package.json          — @warpgogol/pbp, private, TypeScript sources consumed directly
 ├── AGENTS.md             — package-level agent guide (9026 bytes)
 ├── src/
 │   ├── index.ts          — barrel export (525 lines, 65 RFC blocks)
@@ -241,13 +241,13 @@ The spec roadmap (06-PBP-RFC-Roadmap.md) defines 65 RFC nodes across 11 stages (
 - **Stage J (History/signatures):** RFC-0435..0460 → 4 RFCs → ✅ All types implemented
 - **Stage K (Migration):** RFC-0461..0462 → 2 RFCs → ✅ All migration types implemented
 
-**Wave readiness:** The package provides complete type coverage for Wave 1 (Webgogol core) through Wave 4 (Verification). No types are missing for any wave.
+**Wave readiness:** The package provides complete type coverage for Wave 1 (Warpgogol core) through Wave 4 (Verification). No types are missing for any wave.
 
 ---
 
 ## 9. Package Metadata
 
-- **Name:** `@gogol/pbp`
+- **Name:** `@warpgogol/pbp`
 - **Version:** `0.1.0`
 - **Private:** true
 - **Entry:** `./src/index.ts` (TypeScript sources consumed directly, no build step)
@@ -258,7 +258,7 @@ The spec roadmap (06-PBP-RFC-Roadmap.md) defines 65 RFC nodes across 11 stages (
 
 ## 10. Conclusion
 
-The `@gogol/pbp` package is a well-structured, spec-compliant type contract layer. It correctly implements:
+The `@warpgogol/pbp` package is a well-structured, spec-compliant type contract layer. It correctly implements:
 
 - The `pbp/*@1` namespace and schema ID pattern
 - The entity envelope with status vocabulary and governance

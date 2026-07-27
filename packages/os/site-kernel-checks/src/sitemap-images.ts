@@ -20,19 +20,19 @@
 
 import { join, dirname } from "node:path";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   harvestContentImage,
   isHtmlRedirectPage,
   generateImageSitemapXml,
   type SitemapImageEntry,
-} from "@gogol/share/semantic";
+} from "@warpgogol/share/semantic";
 import { passResult, failResult, resultFromViolations } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 

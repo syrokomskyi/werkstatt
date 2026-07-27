@@ -25,15 +25,15 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   loadSystemManifest,
   collectMarkdownFiles,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
-import { capabilityRecordSchema, type CapabilityRecord } from "@gogol/ontology";
-import { resolveActiveCapabilities } from "@gogol/share/agent";
+} from "@warpgogol/site-kernel-content";
+import { capabilityRecordSchema, type CapabilityRecord } from "@warpgogol/ontology";
+import { resolveActiveCapabilities } from "@warpgogol/share/agent";
 import { readEntitledFeatures } from "../lib/entitlements.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 

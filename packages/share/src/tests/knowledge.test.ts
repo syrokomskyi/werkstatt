@@ -37,13 +37,13 @@ test("isAgentKnowledgeDomain: rejects non-public domains", () => {
 test("formatAgentKnowledge: sets the schema tag with @1 version and strips trailing slash", () => {
   const env = formatAgentKnowledge({
     domain: "offer",
-    site: "webgogol-com",
-    baseUrl: "https://webgogol.com/",
+    site: "warpgogol-com",
+    baseUrl: "https://warpgogol.com/",
     languages: { default: "de", supported: ["de", "uk"] },
     data: { de: { prices: [] } },
   });
   expect(env.schema).toBe("gogol.agent.knowledge/offer@1");
-  expect(env.baseUrl).toBe("https://webgogol.com");
+  expect(env.baseUrl).toBe("https://warpgogol.com");
 });
 
 test("formatAgentKnowledge: omits freshness when not supplied, includes it when supplied", () => {

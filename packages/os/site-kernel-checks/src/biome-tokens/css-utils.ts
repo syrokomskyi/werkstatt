@@ -10,8 +10,8 @@
 </CHANGE_SUMMARY>
 */
 
-import { collectFiles } from "@gogol/share/fs";
-import { normalizeCssValue } from "@gogol/share/css-value-normalize";
+import { collectFiles } from "@warpgogol/share/fs";
+import { normalizeCssValue } from "@warpgogol/share/css-value-normalize";
 import type { CssTokenUse } from "./types.ts";
 
 // Collect CSS files recursively

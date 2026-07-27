@@ -5,5 +5,5 @@
 # Regenerate:   pnpm exec site-kernel run fleet.sites.generate
 
 sites:
-  - site: webgogol-com
-    path: missions/webgogol-com-m000010/workpiece
+  - site: warpgogol-com
+    path: missions/warpgogol-com-m000010/workpiece

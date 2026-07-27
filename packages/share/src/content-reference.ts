@@ -3,8 +3,8 @@
 <purpose>Framework-agnostic content reference index resolver — loads a build-time generated index
 and resolves braceless collection.file.field references without astro:content (RFC-0527).</purpose>
 <non-goals>
-  <item>Do not generate the index — that is content.ref-index.generate in @gogol/site-kernel-codegen.</item>
-  <item>Do not validate references — that is content.references.validate in @gogol/site-kernel-checks.</item>
+  <item>Do not generate the index — that is content.ref-index.generate in @warpgogol/site-kernel-codegen.</item>
+  <item>Do not validate references — that is content.references.validate in @warpgogol/site-kernel-checks.</item>
   <item>Do not handle brace-delimited {collection.file.field} syntax — legacy, removed by RFC-0529.</item>
 </non-goals>
 </MODULE_CONTRACT>

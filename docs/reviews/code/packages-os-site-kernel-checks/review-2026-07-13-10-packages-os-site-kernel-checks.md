@@ -30,29 +30,29 @@ RFC-0377 delivers the promised MarkdownTwinSemanticMeta contract, threads `audie
 
 ### Mechanical floor
 
-- `pnpm --filter @gogol/share run build:check` — pass.
-- `pnpm --filter @gogol/ontology run build:check` — pass.
-- `pnpm --filter @gogol/site-kernel-content run build:check` — pass.
-- `pnpm --filter @gogol/site-kernel-checks run build:check` — pass.
+- `pnpm --filter @warpgogol/share run build:check` — pass.
+- `pnpm --filter @warpgogol/ontology run build:check` — pass.
+- `pnpm --filter @warpgogol/site-kernel-content run build:check` — pass.
+- `pnpm --filter @warpgogol/site-kernel-checks run build:check` — pass.
 - `pnpm exec site-kernel run rfc.validate RFC-0377 --json` — pass (0 violations).
-- `pnpm exec site-kernel run page.markdown.validate --site webgogol-com` — could not be re-run because the RFC-0378 app→site migration left `apps/webgogol-com/` empty in this snapshot. Historical evidence in `webgogol-com-build-check2.log` shows `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok`.
+- `pnpm exec site-kernel run page.markdown.validate --site warpgogol-com` — could not be re-run because the RFC-0378 app→site migration left `apps/warpgogol-com/` empty in this snapshot. Historical evidence in `warpgogol-com-build-check2.log` shows `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok`.
 
 ### Axis A — Structural correctness
 
-- **Dead import.** `packages/os/site-kernel-checks/src/page-markdown.ts:348` imports `verifyMarkdownTwinHash` from `@gogol/share/semantic` but never calls it. MDMETA-05 recomputes the hash inline with `computeContentHash(body)`. Remove the unused import.
-- **Duplicated closed vocabulary.** The `validPageTypes` array in `packages/os/site-kernel-checks/src/page-markdown.ts:444-454` manually lists the same values as `SemanticPageType` in `packages/share/src/semantic/models.ts:22-31`. Keeping them in sync is a maintenance risk; consider exporting a readonly array from `@gogol/share/semantic` and consuming it in the validator.
+- **Dead import.** `packages/os/site-kernel-checks/src/page-markdown.ts:348` imports `verifyMarkdownTwinHash` from `@warpgogol/share/semantic` but never calls it. MDMETA-05 recomputes the hash inline with `computeContentHash(body)`. Remove the unused import.
+- **Duplicated closed vocabulary.** The `validPageTypes` array in `packages/os/site-kernel-checks/src/page-markdown.ts:444-454` manually lists the same values as `SemanticPageType` in `packages/share/src/semantic/models.ts:22-31`. Keeping them in sync is a maintenance risk; consider exporting a readonly array from `@warpgogol/share/semantic` and consuming it in the validator.
 - **Hardcoded heuristic tokens are acceptable here.** `classifyBlock` in `packages/share/src/semantic/page-markdown.ts:51-91` uses English/German keyword matching. This is the documented heuristic from the RFC and is flagged in the RFC Risk section; it is not a structural defect.
 
 ### Axis B — DNA alignment
 
 - **DNA-4 (canonical content).** `audience` is authored in `system.md pages[].audience` and flows through the semantic loader; derived fields stay out of content. Good.
 - **DNA-16 (semantic layer shares topology).** `type`, `domain`, `audience`, `tags`, and `priority` are all projected from `SemanticPageModel` or `SemanticPageType`. No parallel model is introduced.
-- **DNA-20 (business layer as canonical site description).** `domain` and `audience` fallback maps live in the semantic/business-aware layer (`@gogol/share/semantic`), not in app code.
+- **DNA-20 (business layer as canonical site description).** `domain` and `audience` fallback maps live in the semantic/business-aware layer (`@warpgogol/share/semantic`), not in app code.
 - **DNA-42 (Compass scaffolding).** Every modified source file carries `MODULE_CONTRACT` and `CHANGE_SUMMARY`; no new file lacks scaffolding.
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries.** All imports flow correctly: `site-kernel-checks` and `site-kernel-content` import from `@gogol/share`; no app→app or app→service leakage.
+- **Package boundaries.** All imports flow correctly: `site-kernel-checks` and `site-kernel-content` import from `@warpgogol/share`; no app→app or app→service leakage.
 - **Pipeline placement.** No new commands were added; `page.markdown.generate` and `page.markdown.validate` already exist in `build.prepare`/`build.post`. The new rules slot naturally into the existing validator.
 - **Compass sync.** `docs/knowledge-graph.xml` gained the `contracts.route-markdown-twins` node and `docs/verification-plan.xml` gained the `route-markdown-twins-rfc-0377` check-set. The RFC and plan frontmatter were stamped `implemented`/`completed`.
 - **Command lifecycle.** No command registration changes were required; the existing command handlers were extended.
@@ -92,7 +92,7 @@ RFC-0377 delivers the promised MarkdownTwinSemanticMeta contract, threads `audie
 | `gogol.markdown-twin@2` schema tag | Done | `packages/share/src/semantic/markdown-twin-provenance.ts:87`, `packages/os/site-kernel-checks/src/page-markdown.ts:482-485` |
 | MDMETA-08..12 and MDBODY-01..05 validation | Done | `packages/os/site-kernel-checks/src/page-markdown.ts:419-506` |
 | Compass docs synced | Done | `docs/knowledge-graph.xml:211-221`, `docs/verification-plan.xml:54-72` |
-| Reference app twins regenerate and validate | Done | `webgogol-com-build-check2.log`: `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok` |
+| Reference app twins regenerate and validate | Done | `warpgogol-com-build-check2.log`: `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok` |
 
 ### Questions for the author
 

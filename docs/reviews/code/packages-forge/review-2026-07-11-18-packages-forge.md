@@ -33,9 +33,9 @@ filesReviewed:
   - packages/os/site-kernel-checks/src/pipelines/packages-check.ts
   - packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts
   - packages/os/site-kernel/src/templates/wire/tools/modules/check.module.template.ts
-  - apps/webgogol-com/tools/kernel.config.ts
+  - apps/warpgogol-com/tools/kernel.config.ts
   - apps/nicaragua-projekt/tools/kernel.config.ts
-  - apps/check-webgogol-com/tools/kernel.config.ts
+  - apps/check-warpgogol-com/tools/kernel.config.ts
   - tools/kernel.config.ts
   - package.json
   - docs/technology.xml
@@ -46,11 +46,11 @@ filesReviewed:
 
 ### Verdict: Needs revision
 
-The migration is architecturally sound and mechanically clean — all four affected packages pass `build:check`, commands register and execute correctly at runtime, and the `src/` vs `os/` separation is well executed. However, two DNA-42 violations (stale MODULE_CONTRACT prose in copied files) and one forward-only issue (old modules still exported from `@gogol/site-kernel`) require revision before merge. Additionally, `forge.skill.validate` was added to the packages-check pipeline but currently fails with 18 violations, which will break the pipeline.
+The migration is architecturally sound and mechanically clean — all four affected packages pass `build:check`, commands register and execute correctly at runtime, and the `src/` vs `os/` separation is well executed. However, two DNA-42 violations (stale MODULE_CONTRACT prose in copied files) and one forward-only issue (old modules still exported from `@warpgogol/site-kernel`) require revision before merge. Additionally, `forge.skill.validate` was added to the packages-check pipeline but currently fails with 18 violations, which will break the pipeline.
 
 ### Mechanical floor
 
-Pass — `@gogol/forge`, `@gogol/site-kernel`, `@gogol/site-kernel-checks`, `@gogol/site-kernel-handoff` all pass `build:check` (tsc --noEmit).
+Pass — `@warpgogol/forge`, `@warpgogol/site-kernel`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-handoff` all pass `build:check` (tsc --noEmit).
 
 ### Axis A — Structural correctness
 
@@ -62,22 +62,22 @@ Pass — `@gogol/forge`, `@gogol/site-kernel`, `@gogol/site-kernel-checks`, `@go
 ### Axis B — DNA alignment
 
 - **FAIL — DNA-42 (Compass markup) in workflow files.** The MODULE_CONTRACT `<purpose>` in `packages/forge/os/workflow/handlers.ts:3` and `packages/forge/os/workflow/workflow.module.ts:3` is semantically false — it claims to maintain files at `packages/os/site-kernel/src/workflow/` while the actual file is at `packages/forge/os/workflow/`. DNA-42 requires MODULE_CONTRACT prose to be true. The CHANGE_SUMMARY also lacks an RFC-0374 entry.
-- **PASS — DNA-1 (monorepo boundary).** No `apps/* → apps/*` imports. Forge `os/` imports from `@gogol/site-kernel`, `@gogol/site-kernel-checks`, `@gogol/site-kernel-codegen`, `@gogol/site-kernel-handoff` — all packages, all correct direction.
+- **PASS — DNA-1 (monorepo boundary).** No `apps/* → apps/*` imports. Forge `os/` imports from `@warpgogol/site-kernel`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-handoff` — all packages, all correct direction.
 - **PASS — DNA-6 (kebab-case).** All new filenames use kebab-case (`core.module.ts`, `compass.module.ts`, `werkstatt.module.ts`, `naming-convention.ts`).
 - **PASS — DNA-51 (Werkstatt primitives).** `forgeWerkstattModule` delegates to the same handlers (`runWerkstattLockStatus`, `runWerkstattLockRecover`, `runWerkstattOperationValidate`) that enforce lock/idempotency/atomic-write helpers. No reimplementation.
 - **N/A — DNA-5/17, DNA-7, DNA-8, DNA-10, DNA-23, DNA-24, DNA-25.** No new UI components, sections, pages, or manifests introduced.
 
 ### Axis C — Ecosystem fit
 
-- **PASS — Package boundaries.** `src/` has no kernel imports; `os/` imports from kernel packages. The `src/index.ts` re-exports all OS modules, which is the correct public API surface for `@gogol/forge`.
+- **PASS — Package boundaries.** `src/` has no kernel imports; `os/` imports from kernel packages. The `src/index.ts` re-exports all OS modules, which is the correct public API surface for `@warpgogol/forge`.
 - **PASS — Pipeline placement.** `forge.skill.validate` added to `PACKAGES_CHECK_PIPELINE` after `workflow.lint` — correct position for a governance validator in the workspace-level check pipeline.
 - **PASS — Compass sync.** `docs/technology.xml` updated with `pkg-forge` workspace entry. `packages/AGENTS.md` updated with forge ownership row. `packages/forge/AGENTS.md` created with architecture and import rules.
-- **PASS — Command lifecycle.** All 12 compass commands, 3 werkstatt commands, 3 workflow commands, 1 naming command, and 15 RFC commands registered in forge modules. Old registrations removed from `site-kernel-checks` command tables and `site-kernel-handoff` werkstatt index. Comment pointers left at old locations (`// compass.* migrated to @gogol/forge`).
-- **PASS — Kernel config updates.** All 4 kernel.config.ts files (workspace + 3 apps) and the codegen template updated to import forge modules. `@gogol/forge` added to root `devDependencies` and all 3 app `dependencies`.
+- **PASS — Command lifecycle.** All 12 compass commands, 3 werkstatt commands, 3 workflow commands, 1 naming command, and 15 RFC commands registered in forge modules. Old registrations removed from `site-kernel-checks` command tables and `site-kernel-handoff` werkstatt index. Comment pointers left at old locations (`// compass.* migrated to @warpgogol/forge`).
+- **PASS — Kernel config updates.** All 4 kernel.config.ts files (workspace + 3 apps) and the codegen template updated to import forge modules. `@warpgogol/forge` added to root `devDependencies` and all 3 app `dependencies`.
 
 ### Axis D — Forward-only compliance
 
-- **FAIL — Old `rfcModule` and `workflowModule` still exported from `@gogol/site-kernel`.** `packages/os/site-kernel/src/index.ts:31` (`export * from "./rfc/index.ts"`) and line 69 (`export * from "./workflow/index.ts"`) still re-export the old `rfcModule` and `workflowModule`. No consumer imports them anymore (verified via grep), but their continued export creates a dual-path: a developer could accidentally `import { rfcModule } from "@gogol/site-kernel"` instead of `import { forgeRfcModule } from "@gogol/forge"`. The old `rfc.module.ts` and `workflow.module.ts` files in `packages/os/site-kernel/src/` should either be deleted or their module exports removed from the barrel.
+- **FAIL — Old `rfcModule` and `workflowModule` still exported from `@warpgogol/site-kernel`.** `packages/os/site-kernel/src/index.ts:31` (`export * from "./rfc/index.ts"`) and line 69 (`export * from "./workflow/index.ts"`) still re-export the old `rfcModule` and `workflowModule`. No consumer imports them anymore (verified via grep), but their continued export creates a dual-path: a developer could accidentally `import { rfcModule } from "@warpgogol/site-kernel"` instead of `import { forgeRfcModule } from "@warpgogol/forge"`. The old `rfc.module.ts` and `workflow.module.ts` files in `packages/os/site-kernel/src/` should either be deleted or their module exports removed from the barrel.
 - **PASS — No compatibility shims.** The forge modules are direct registrations, not wrappers around old modules. The `ForgeModule` interface is a clean port, not a bridge.
 - **PASS — Old command registrations removed.** `createWerkstattModule` removed from `site-kernel-handoff`. `werkstatt.operation.validate` removed from `site-kernel-checks` command table. Compass commands removed from `04-content-quality.ts`. `naming.convention.lint` removed from `07-structure-naming.ts`.
 
@@ -107,17 +107,17 @@ Pass — `@gogol/forge`, `@gogol/site-kernel`, `@gogol/site-kernel-checks`, `@go
 | --- | --- | --- |
 | 17 skills relocated to packages/forge/skills/ | Done | `forge.init` synced 20 skills (17 migrated + 3 meta) |
 | forge.skill.validate passes on all forge skills | Missing | 18 violations reported — SKILL-01, SKILL-09, SKILL-10 |
-| Governance commands register from @gogol/forge | Done | All kernel.config.ts files import forge modules |
+| Governance commands register from @warpgogol/forge | Done | All kernel.config.ts files import forge modules |
 | Project-specific commands remain in packages/os/* | Done | section._, cosmic._, content.surface.* untouched |
 | forge.init deploys into a fresh project | Done | Creates PREFERENCES.md, copies skills, creates docs dirs |
 | skill-create and port-to-forge skills produce compliant output | Partial | Skills exist but `forge.skill.validate` fails on current content |
 | Existing pipelines continue to pass after migration | Partial | `build:check` passes for tsc, but `forge.skill.validate` in pipeline will fail |
 | `src/` portable (no kernel imports) | Done | Verified — `src/` imports only from `../../src/` and external deps |
-| `os/` kernel-dependent | Done | `os/` imports from `@gogol/site-kernel` and kernel packages |
+| `os/` kernel-dependent | Done | `os/` imports from `@warpgogol/site-kernel` and kernel packages |
 | Old modules removed/deprecated | Partial | Old registrations removed, but `rfcModule`/`workflowModule` still exported from site-kernel barrel |
 
 ### Questions for the author
 
 1. **`forge.skill.validate` will break `build:check` — what's the plan?** The command was added to `PACKAGES_CHECK_PIPELINE` but reports 18 violations. Will you fix the skill content (trim descriptions, add PREFERENCES.md references) before merging, or add the command in warning mode first?
-2. **Why are `rfcModule` and `workflowModule` still exported from `@gogol/site-kernel`?** The old module files and barrel re-exports remain. Should they be deleted, or is there a reason to keep them?
+2. **Why are `rfcModule` and `workflowModule` still exported from `@warpgogol/site-kernel`?** The old module files and barrel re-exports remain. Should they be deleted, or is there a reason to keep them?
 3. **Why do `packages/forge/os/workflow/handlers.ts` and `workflow.module.ts` have stale MODULE_CONTRACT paths?** Was the copy done without updating the Compass scaffolding, or was this an oversight?

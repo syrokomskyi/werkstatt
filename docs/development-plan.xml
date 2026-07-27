@@ -143,7 +143,7 @@
         <description>
           Added typed `SurfaceModuleContext` contracts, the `surface.context.validate` command,
           module-owned Blueprint entitlement resolution, module-master-locale enrichment defaults,
-          and `webgogol-com` module declarations with Ukrainian PSEO authoring language.
+          and `warpgogol-com` module declarations with Ukrainian PSEO authoring language.
         </description>
       </deliverable>
       <deliverable id="del-0276">
@@ -152,7 +152,7 @@
         <description>
           Added Bordbuch event/status contracts, append/generate/validate/status commands,
           hash-chain validation, noindex JSON/HTML projections, sensitive-payload guards,
-          and an initial `webgogol-com` Bordbuch event.
+          and an initial `warpgogol-com` Bordbuch event.
         </description>
       </deliverable>
       <deliverable id="del-0274">
@@ -161,7 +161,7 @@
         <description>
           Added per-depth Blueprint evidence policy, deterministic evidence and duplicate validators,
           nested semantic text extraction, invalid freshness noindex handling, lazy-page link checks,
-          path-safe demand modifier linting, and regenerated `webgogol-com` twins so unapproved d5
+          path-safe demand modifier linting, and regenerated `warpgogol-com` twins so unapproved d5
           Bedarfskarten are noindexed until approved narrative evidence exists.
         </description>
       </deliverable>
@@ -178,7 +178,7 @@
         <status>implemented</status>
         <description>
           Added translator note generation/review/validation, glossary validation, approved note/glossary
-          artifacts for `webgogol-com` PSEO and offer modules, and generation prerequisites for translations.
+          artifacts for `warpgogol-com` PSEO and offer modules, and generation prerequisites for translations.
         </description>
       </deliverable>
       <deliverable id="del-0280">
@@ -202,7 +202,7 @@
         <status>implemented</status>
         <description>
           Added typed approvers, autonomy scopes/states, validation/report/promote/demote commands,
-          L0 webgogol-com scope declarations, and typed approval stamps for ready translation artifacts.
+          L0 warpgogol-com scope declarations, and typed approval stamps for ready translation artifacts.
         </description>
       </deliverable>
       <deliverable id="del-0279">
@@ -408,7 +408,7 @@
     <wave id="wave-03">
       <name>app-rollout</name>
       <targets>
-        <target>`apps/webgogol-com`</target>
+        <target>`apps/warpgogol-com`</target>
         <target>`apps/nicaragua-projekt`</target>
       </targets>
     </wave>

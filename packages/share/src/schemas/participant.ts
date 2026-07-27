@@ -7,8 +7,8 @@ Extends the People collection (RFC-0200) with type-specific responsibility/autho
 fields, lifecycle statuses, consent records for humans, and public/private visibility.
 </purpose>
 <non-goals>
-  <item>Do not define route generation or page rendering logic — that lives in @gogol/share/astro.</item>
-  <item>Do not define validation rules — that lives in @gogol/site-kernel-checks/src/participant.ts.</item>
+  <item>Do not define route generation or page rendering logic — that lives in @warpgogol/share/astro.</item>
+  <item>Do not define validation rules — that lives in @warpgogol/site-kernel-checks/src/participant.ts.</item>
   <item>Do not remove PERSON_AFFILIATIONS from person.ts — it is retained for human governance JSON-LD.</item>
 </non-goals>
 </MODULE_CONTRACT>

@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0200: closed affiliation vocabulary for Person records. Used by the People
-section check in @gogol/site-kernel-checks to validate person affiliations.
+section check in @warpgogol/site-kernel-checks to validate person affiliations.
 This is a closed vocabulary used by check infrastructure, not PBP entity code.
 </purpose>
 <non-goals>
@@ -10,8 +10,8 @@ This is a closed vocabulary used by check infrastructure, not PBP entity code.
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0470: moved PERSON_AFFILIATIONS from @gogol/business/schemas/person.ts to @gogol/share/schemas/person.ts.</item>
-  <item>RFC-0471: @gogol/business package deleted. Person records now live in a standalone `people` content collection.</item>
+  <item>RFC-0470: moved PERSON_AFFILIATIONS from @warpgogol/business/schemas/person.ts to @warpgogol/share/schemas/person.ts.</item>
+  <item>RFC-0471: @warpgogol/business package deleted. Person records now live in a standalone `people` content collection.</item>
 </CHANGE_SUMMARY>
 */
 

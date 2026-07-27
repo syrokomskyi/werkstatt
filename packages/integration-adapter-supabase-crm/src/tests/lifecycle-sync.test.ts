@@ -21,7 +21,7 @@ import type {
   BufferSubscription,
   BufferInvoice,
   BufferOrganization,
-} from "@gogol/integration/crm-buffer";
+} from "@warpgogol/integration/crm-buffer";
 import { PipedriveSyncTarget } from "../pipedrive-sync-target.ts";
 
 // ---------------------------------------------------------------------------

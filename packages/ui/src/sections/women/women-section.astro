@@ -14,19 +14,19 @@
 
 /* RFC-0103: women — composite (image + paragraphs body) via SectionShell + SectionHeader + SectionParagraphs. */
 
-import type { SectionParagraphsBody } from "@gogol/share";
-import type { SectionProps } from "@gogol/share/page";
+import type { SectionParagraphsBody } from "@warpgogol/share";
+import type { SectionProps } from "@warpgogol/share/page";
 import {
   cast,
   need,
   resolveImageRequired,
   resolveSectionAnchor,
   creditByTarget,
-} from "@gogol/share";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import ResponsiveImage from "@gogol/ui/components/responsive-image.astro";
-import SectionParagraphs from "@gogol/ui/components/section-body/paragraphs.astro";
+} from "@warpgogol/share";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import ResponsiveImage from "@warpgogol/ui/components/responsive-image.astro";
+import SectionParagraphs from "@warpgogol/ui/components/section-body/paragraphs.astro";
 import type { WomenSectionContent } from "./women-section.types.generated.ts";
 import "./women-section.css";
 

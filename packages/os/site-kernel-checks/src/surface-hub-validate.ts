@@ -26,8 +26,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry, Blueprint } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact, VirtualRouteEntry, Blueprint } from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceBlueprints } from "./surface-expand.ts";
 import { ARTIFACT_FILE, readLangs } from "./surface/shared.ts";

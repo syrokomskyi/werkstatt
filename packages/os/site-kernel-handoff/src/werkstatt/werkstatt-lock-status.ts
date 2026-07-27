@@ -14,7 +14,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readAllLocks } from "./lock.ts";
 
 export interface WerkstattLockStatusData {

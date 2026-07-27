@@ -24,11 +24,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import { readSurfaceArticleTypedEntries } from "./lib/surface-articles.ts";
 
 interface ArticleConfig {

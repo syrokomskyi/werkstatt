@@ -10,6 +10,6 @@
 </CHANGE_SUMMARY>
 */
 
-// Canonical implementation lives in @gogol/site-kernel so both site-kernel-checks
+// Canonical implementation lives in @warpgogol/site-kernel so both site-kernel-checks
 // and site-kernel-codegen can share it without a circular dependency.
-export { resolveCompassScanRoot } from "@gogol/site-kernel";
+export { resolveCompassScanRoot } from "@warpgogol/site-kernel";

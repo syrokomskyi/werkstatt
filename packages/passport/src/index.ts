@@ -12,7 +12,7 @@
 */
 
 /**
- * @gogol/passport — Cosmic Passport
+ * @warpgogol/passport — Cosmic Passport
  * DNA-31, DNA-34 / RFC-0028
  */
 

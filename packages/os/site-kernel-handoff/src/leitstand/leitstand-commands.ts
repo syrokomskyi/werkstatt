@@ -20,14 +20,14 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import type {
   PropagationResult,
   HealthCheck,
   DeploymentConfig,
   DeploymentChannel,
   LastPropagatedChannel,
-} from "@gogol/ontology/operations";
+} from "@warpgogol/ontology/operations";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
@@ -226,7 +226,7 @@ async function checkWranglerAvailable(): Promise<{ available: boolean; detail: s
 async function checkDistSize(distPath: string): Promise<{ withinLimit: boolean; detail: string }> {
   const WORKERS_LIMIT = 25 * 1024 * 1024;
   let totalSize = 0;
-  const { collectFiles } = await import("@gogol/share/fs");
+  const { collectFiles } = await import("@warpgogol/share/fs");
   for (const file of await collectFiles(distPath)) {
     const stat = await fs.stat(file);
     totalSize += stat.size;

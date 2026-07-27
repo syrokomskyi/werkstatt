@@ -104,7 +104,7 @@ Tokens that do not resolve are left as-is (`{{UNKNOWN}}`) in the output. This is
 
 ## Keypair generation
 
-`onboarding.scaffold` calls `generateKeypair()` from `@gogol/passport/sign`. This generates a random Ed25519 keypair using `@noble/ed25519`. The public key is multibase-encoded and written to the key file. The private key hex is printed to stdout exactly once — it is never written to any file.
+`onboarding.scaffold` calls `generateKeypair()` from `@warpgogol/passport/sign`. This generates a random Ed25519 keypair using `@noble/ed25519`. The public key is multibase-encoded and written to the key file. The private key hex is printed to stdout exactly once — it is never written to any file.
 
 The scaffold does NOT call `passport.key.rotate` — that command is for rotating an existing key. Initial generation is scaffold-only.
 
@@ -154,7 +154,7 @@ To run the extraction-parity check manually:
 
 ```bash
 # (when the test suite is wired up — RFC-0030 Phase B)
-pnpm --filter @gogol/site-kernel-onboarding test
+pnpm --filter @warpgogol/site-kernel-onboarding test
 ```
 
 ---
@@ -180,7 +180,7 @@ The root `upgrade-packages` script automatically invokes `config.template.sync` 
 pnpm run upgrade-packages
 ```
 
-This runs `config.template.sync --site webgogol-com` automatically, which blindly overwrites:
+This runs `config.template.sync --site warpgogol-com` automatically, which blindly overwrites:
 
 - `dependencies` and `devDependencies` in `packages/os/site-kernel-onboarding/src/templates/package.template.json`
 - `optimizeDeps` and `ssr` blocks in `packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs`

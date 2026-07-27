@@ -18,7 +18,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: app.layout.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 52
     p95Ms: 798
@@ -32,7 +32,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: asset.reference.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 252
     p95Ms: 2011
@@ -46,7 +46,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: biome.contract.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 119
     p95Ms: 1264
@@ -60,7 +60,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: client.edit.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 1
     p95Ms: 6
@@ -74,7 +74,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: constellation.compose.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 24
     p95Ms: 89
@@ -88,7 +88,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: content.asset.contract.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 258
     p95Ms: 1928
@@ -102,7 +102,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: content.source.parity
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 7
     p95Ms: 81
@@ -116,7 +116,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: content.surface.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 35
     p95Ms: 444
@@ -130,7 +130,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: cosmic.catalog.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 2
     p95Ms: 15
@@ -144,7 +144,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: cosmic.name.unique
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 129
     p95Ms: 1354
@@ -158,7 +158,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: growth.adapter.contract
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 2
     p95Ms: 10
@@ -172,7 +172,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: growth.events.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 35
     p95Ms: 115
@@ -186,7 +186,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: growth.experiment.archive
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 1
     p95Ms: 3
@@ -200,7 +200,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: growth.experiment.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 15
     p95Ms: 58
@@ -214,7 +214,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: growth.funnel.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 16
     p95Ms: 45
@@ -228,7 +228,7 @@ budgets:
     expectedDurationMs: 10000
   - pipeline: build.check
     command: page.block.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 2823
     p95Ms: 18461
@@ -242,7 +242,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: page.blocks.mirror.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 84
     p95Ms: 262
@@ -256,7 +256,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: page.pipeline.contract
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 1
     p95Ms: 3
@@ -270,7 +270,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: page.shell.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 42
     p95Ms: 121
@@ -284,7 +284,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: runtime.context.shape
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 21
     p95Ms: 57
@@ -298,7 +298,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: semantic.targets.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 155
     p95Ms: 1159
@@ -312,7 +312,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: shared.context.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 97
     p95Ms: 245
@@ -326,7 +326,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: system.manifest.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 36
     p95Ms: 358
@@ -340,7 +340,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: uni.registry.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 168
     p95Ms: 4131
@@ -354,7 +354,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.check
     command: visibility.expr.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 83
     p95Ms: 245
@@ -417,7 +417,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: agent.knowledge.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 469
     p95Ms: 1738
@@ -431,7 +431,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: agent.manifest.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 134
     p95Ms: 918
@@ -445,7 +445,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: agent.openapi.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 28
     p95Ms: 117
@@ -459,7 +459,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: agent.routes.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 33
     p95Ms: 322
@@ -473,7 +473,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: agents.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 29
     p95Ms: 36
@@ -487,7 +487,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: ai.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 21
     p95Ms: 972
@@ -501,7 +501,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: ai.policy.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 21
     p95Ms: 789
@@ -515,7 +515,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: api.routes.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 194
     p95Ms: 314
@@ -529,7 +529,7 @@ budgets:
     expectedDurationMs: 3000
   - pipeline: build.prepare
     command: archetype.registry.build
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 169
     p95Ms: 1249
@@ -543,7 +543,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: biome.css.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 41
     p95Ms: 155
@@ -557,7 +557,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: cms.schema.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 20
     p95Ms: 56
@@ -571,7 +571,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: entitlements.resolve
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 24
     p95Ms: 40
@@ -585,7 +585,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: env.example.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 19
     p95Ms: 47
@@ -599,7 +599,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: feed.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 40
     p95Ms: 1880
@@ -613,7 +613,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: fonts.imports.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 26
     p95Ms: 96
@@ -627,7 +627,7 @@ budgets:
     expectedDurationMs: 0
   - pipeline: build.prepare
     command: headers.security.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 0
     p95Ms: 0
@@ -641,7 +641,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: humans.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 51
     p95Ms: 220
@@ -655,7 +655,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: i18n.middleware.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 20
     p95Ms: 211
@@ -669,7 +669,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: icons.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 1
     p95Ms: 2
@@ -683,7 +683,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: image.variants.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 5
     p50Ms: 2
     p95Ms: 14
@@ -697,7 +697,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: indexnow.key.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 51
     p95Ms: 314
@@ -711,7 +711,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: kernel.wire
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 51
     p95Ms: 64
@@ -725,7 +725,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: lagebild.worker.dev.vars.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 1
     p95Ms: 2
@@ -739,7 +739,7 @@ budgets:
     expectedDurationMs: 6000
   - pipeline: build.prepare
     command: live.variants.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 5
     p50Ms: 1262
     p95Ms: 21932
@@ -753,7 +753,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: llms.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 182
     p95Ms: 9463
@@ -767,7 +767,7 @@ budgets:
     expectedDurationMs: 2000
   - pipeline: build.prepare
     command: manifest.contract.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 5
     p50Ms: 484
     p95Ms: 17467
@@ -781,7 +781,7 @@ budgets:
     expectedDurationMs: 2000
   - pipeline: build.prepare
     command: material.credits.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 76
     p95Ms: 596
@@ -795,7 +795,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: material.metadata.write
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 54
     p95Ms: 228
@@ -809,7 +809,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: mirror.quintet.validate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 6
     p50Ms: 128
     p95Ms: 7646
@@ -823,7 +823,7 @@ budgets:
     expectedDurationMs: 0
   - pipeline: build.prepare
     command: not-found.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 0
     p95Ms: 0
@@ -837,7 +837,7 @@ budgets:
     expectedDurationMs: 17000
   - pipeline: build.prepare
     command: open-source.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 5
     p95Ms: 7058
@@ -851,7 +851,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: overlay.pages.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 22
     p95Ms: 42
@@ -865,7 +865,7 @@ budgets:
     expectedDurationMs: 4000
   - pipeline: build.prepare
     command: page.markdown.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 471
     p95Ms: 44361
@@ -879,7 +879,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: preview.images.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 25
     p95Ms: 524
@@ -893,7 +893,7 @@ budgets:
     expectedDurationMs: 0
   - pipeline: build.prepare
     command: public.artifact.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 0
     p95Ms: 1
@@ -907,7 +907,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: public.icons.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 142
     p95Ms: 6137
@@ -921,7 +921,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: public.infrastructure.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 31
     p95Ms: 86
@@ -935,7 +935,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: public.managed.clean
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 74
     p95Ms: 13738
@@ -949,7 +949,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: robots.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 4
     p50Ms: 20
     p95Ms: 724
@@ -963,7 +963,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: routes.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 33
     p95Ms: 46
@@ -977,7 +977,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: scripts.orchestrator.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 16
     p95Ms: 53
@@ -991,7 +991,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: security.txt.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 62
     p95Ms: 307
@@ -1005,7 +1005,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: sitemap.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 40
     p95Ms: 936
@@ -1019,7 +1019,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: styles.global.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 17
     p95Ms: 173
@@ -1033,7 +1033,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: surface.freshness
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 6
     p95Ms: 19
@@ -1047,7 +1047,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: surface.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 1554
     p95Ms: 3983
@@ -1061,7 +1061,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: surface.starmap
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 3
     p50Ms: 9
     p95Ms: 34
@@ -1075,7 +1075,7 @@ budgets:
     expectedDurationMs: 24000
   - pipeline: build.prepare
     command: uni.registry.build
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 6
     p50Ms: 491
     p95Ms: 14816
@@ -1089,7 +1089,7 @@ budgets:
     expectedDurationMs: 1000
   - pipeline: build.prepare
     command: video.variants.generate
-    app: webgogol-com
+    app: warpgogol-com
     sampleCount: 5
     p50Ms: 14444
     p95Ms: 26112

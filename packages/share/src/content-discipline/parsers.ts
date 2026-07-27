@@ -8,7 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0073: Add shared parsers and normalization helpers for content-discipline validators.</item>
-  <item>RFC-0082: Delegate YAML reading to @gogol/share/onboarding-yaml so single-doc and two-doc RFC-0076-headed files both parse correctly.</item>
+  <item>RFC-0082: Delegate YAML reading to @warpgogol/share/onboarding-yaml so single-doc and two-doc RFC-0076-headed files both parse correctly.</item>
 </CHANGE_SUMMARY>
 */
 

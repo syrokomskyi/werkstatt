@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 
 async function* walkContentFiles(dir: string): AsyncGenerator<string> {

@@ -35,21 +35,21 @@ The diff implements the cloudflare-workers adapter, channel model, health verifi
 
 ### Mechanical floor
 
-Pass — `build:check` and `test` pass for `@gogol/ontology`, `@gogol/fingerprint`, and `@gogol/site-kernel-handoff` (49 tests, 15 in fingerprint including 6 new).
+Pass — `build:check` and `test` pass for `@warpgogol/ontology`, `@warpgogol/fingerprint`, and `@warpgogol/site-kernel-handoff` (49 tests, 15 in fingerprint including 6 new).
 
 ### Axis A — Structural correctness
 
 **Finding A-1: Duplicated secrets-resolution logic.** `resolveSecretsFilePath` is defined twice with identical behavior — once in `cloudflare-workers.ts:49-56` and once in `leitstand-commands.ts:112-121`. Both parse `env:VAR_NAME` references and read `process.env`. The adapter copy is unused because `leitstand-commands.ts` resolves the secrets file path before passing it to `adapter.propagate()`. The adapter's `sourceDotenv` then reads the resolved path. The adapter-side `resolveSecretsFilePath` (lines 49-56) is dead code.
 
-**Finding A-2: `readReleaseManifest` uses naive YAML parsing.** `leitstand-commands.ts:85-102` parses YAML by regex-matching `^(\w+):\s*(.*)$` line by line. This fails on nested keys, multi-line values, quoted strings with colons, and arrays. The `release.yaml` format is real YAML and the repo has `yaml` as a dependency of `@gogol/site-kernel-handoff`. Use `yaml.parse()` instead.
+**Finding A-2: `readReleaseManifest` uses naive YAML parsing.** `leitstand-commands.ts:85-102` parses YAML by regex-matching `^(\w+):\s*(.*)$` line by line. This fails on nested keys, multi-line values, quoted strings with colons, and arrays. The `release.yaml` format is real YAML and the repo has `yaml` as a dependency of `@warpgogol/site-kernel-handoff`. Use `yaml.parse()` instead.
 
 ### Axis B — DNA alignment
 
-**DNA-49 (fleet propagation)** — Pass. Channel model (`alt`/`main`), per-channel `lastPropagated`, health verification via `@gogol/fingerprint`, `resolveAdapter` throws for unimplemented adapters. DNA-49 text updated.
+**DNA-49 (fleet propagation)** — Pass. Channel model (`alt`/`main`), per-channel `lastPropagated`, health verification via `@warpgogol/fingerprint`, `resolveAdapter` throws for unimplemented adapters. DNA-49 text updated.
 
 **DNA-42 (Compass markup)** — Pass. All new source files carry `MODULE_CONTRACT` and `CHANGE_SUMMARY`.
 
-**DNA-51 (Werkstatt primitives)** — Pass. `leitstand.propagate` and `leitstand.rollback` use `acquireLock`/`releaseLock`/`generateOperationId` from `@gogol/site-kernel-handoff/werkstatt`.
+**DNA-51 (Werkstatt primitives)** — Pass. `leitstand.propagate` and `leitstand.rollback` use `acquireLock`/`releaseLock`/`generateOperationId` from `@warpgogol/site-kernel-handoff/werkstatt`.
 
 ### Axis C — Ecosystem fit
 

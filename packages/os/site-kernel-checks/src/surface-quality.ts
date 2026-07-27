@@ -24,7 +24,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   buildAxisFieldMap,
   includeInLlms,
@@ -37,13 +37,13 @@ import {
   type SurfaceArtifact,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@gogol/surface";
+} from "@warpgogol/surface";
 import {
   collectMarkdownFiles,
   loadSystemManifest,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
-import { toKebabCase } from "@gogol/share/string-utils";
+} from "@warpgogol/site-kernel-content";
+import { toKebabCase } from "@warpgogol/share/string-utils";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceBlueprints } from "./surface-expand.ts";
 import { loadApprovedNarrativesBulk } from "./surface-enrich.ts";

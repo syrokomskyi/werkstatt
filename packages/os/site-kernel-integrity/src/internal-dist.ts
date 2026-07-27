@@ -18,7 +18,7 @@
  */
 
 import path from "node:path";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 export async function discoverDistFiles(cwd: string, distDir = "dist"): Promise<string[]> {
   const root = path.join(cwd, distDir);

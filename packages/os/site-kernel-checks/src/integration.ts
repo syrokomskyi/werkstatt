@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0168 (part 2): governance for the Integration Port configuration surface in system.md.
 integration.config.validate guards that every configured channel/CRM adapter id resolves to the
-closed adapter catalog in @gogol/share/integration. integration.secrets.validate guards that each
+closed adapter catalog in @warpgogol/share/integration. integration.secrets.validate guards that each
 configured adapter's required secret names are projected into the app's generated env schema
 (src/env.schema.generated.mjs, emitted by api.routes.generate). Both no-op pass when the app
 declares no `integrations:` block (channels self-enable by secret presence — back-compat).</purpose>
@@ -24,9 +24,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import {
   CHANNEL_ADAPTER_IDS,
   CRM_ADAPTER_IDS,
@@ -39,7 +39,7 @@ import {
   INTEGRATION_ADAPTER_SECRETS,
   auditIntegrationReadiness,
   type IntegrationSecrets,
-} from "@gogol/integration";
+} from "@warpgogol/integration";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 interface DestinationEntry {

@@ -4,7 +4,7 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stringify as yamlStringify } from "yaml";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { runVisibilityActionPlan, runVisibilityImport } from "../pseo/pseo-visibility.ts";
 import { runSurfaceRollbackApply } from "../surface-breaker.ts";
 

@@ -48,7 +48,7 @@ The diff successfully implements all four architectural candidates (API split, w
 
 **Pass** — all six affected packages build clean (`tsc --noEmit`):
 
-- `@gogol/fingerprint`, `@gogol/check-core`, `@gogol/check-runner-node`, `@gogol/site-kernel-integrity`, `@gogol/site-kernel-handoff`, `@gogol/site-kernel-checks`.
+- `@warpgogol/fingerprint`, `@warpgogol/check-core`, `@warpgogol/check-runner-node`, `@warpgogol/site-kernel-integrity`, `@warpgogol/site-kernel-handoff`, `@warpgogol/site-kernel-checks`.
 
 ## Axis A — Structural correctness
 
@@ -70,9 +70,9 @@ The diff successfully implements all four architectural candidates (API split, w
   - `packages/os/site-kernel-integrity/src/run-update.ts` — still says "Annotate Compass scaffolding..."
   - `packages/os/site-kernel-integrity/src/move-detection.ts` — still says "Refine Compass scaffolding..."
 
-  Each should gain a `<item>` noting the import migration from `./hash.ts` to `@gogol/fingerprint`.
+  Each should gain a `<item>` noting the import migration from `./hash.ts` to `@warpgogol/fingerprint`.
 
-- **DNA-53 (semantic fingerprint governance)** — the diff strengthens this invariant by deleting shallow wrappers and centralizing all hashing through `@gogol/fingerprint`. No violations introduced. The new `byteHashFile` primitive correctly lives in `primitives.ts`.
+- **DNA-53 (semantic fingerprint governance)** — the diff strengthens this invariant by deleting shallow wrappers and centralizing all hashing through `@warpgogol/fingerprint`. No violations introduced. The new `byteHashFile` primitive correctly lives in `primitives.ts`.
 
 - **DNA-1 (monorepo boundary)** — no `apps/* → apps/*` imports. All consumer packages import from `packages/*`. Pass.
 
@@ -80,15 +80,15 @@ The diff successfully implements all four architectural candidates (API split, w
 
 ## Axis C — Ecosystem fit
 
-- **Package boundaries** — imports flow correctly: `check-core → @gogol/fingerprint`, `check-runner-node → @gogol/fingerprint`, `site-kernel-integrity → @gogol/fingerprint`, `site-kernel-handoff → @gogol/fingerprint/semantic`, `site-kernel-checks → @gogol/fingerprint/semantic`. No boundary violations.
+- **Package boundaries** — imports flow correctly: `check-core → @warpgogol/fingerprint`, `check-runner-node → @warpgogol/fingerprint`, `site-kernel-integrity → @warpgogol/fingerprint`, `site-kernel-handoff → @warpgogol/fingerprint/semantic`, `site-kernel-checks → @warpgogol/fingerprint/semantic`. No boundary violations.
 
 - **Export map** — `packages/fingerprint/package.json` correctly defines `.` (primitives) and `./semantic` (semantic) export paths. Both point to `.ts` source files, consistent with the monorepo's no-build convention.
 
-- **Dependency declaration** — `check-runner-node/package.json` correctly gains `@gogol/fingerprint` as a dependency. All other consumers already declared it.
+- **Dependency declaration** — `check-runner-node/package.json` correctly gains `@warpgogol/fingerprint` as a dependency. All other consumers already declared it.
 
 - **Compass sync** — no `docs/*.xml` updates needed: the diff does not change repository-wide requirements, shared package contracts, or app-package relationships. It refactors an existing package's internal structure and consumer imports.
 
-- **AGENTS.md** — no `AGENTS.md` exists in the fingerprint package. The root `AGENTS.md` does not reference internal module structure of `@gogol/fingerprint`. No update needed.
+- **AGENTS.md** — no `AGENTS.md` exists in the fingerprint package. The root `AGENTS.md` does not reference internal module structure of `@warpgogol/fingerprint`. No update needed.
 
 ## Axis D — Forward-only compliance
 
@@ -102,7 +102,7 @@ The diff successfully implements all four architectural candidates (API split, w
 
 - **Compass scaffolding** — new files `primitives.ts` and `semantic.ts` carry correct `MODULE_CONTRACT` and `CHANGE_SUMMARY` blocks. `fingerprint.ts` and `index.ts` CHANGE_SUMMARYs are updated. Pass.
 
-- **Stale CHANGE_SUMMARY** — the 8 consumer files listed in Axis B have CHANGE_SUMMARY blocks that no longer reflect the code. This is an agent-facing clarity gap: an agent reading `evidence.ts` would not know the import was migrated from a local wrapper to `@gogol/fingerprint`. (Also listed under DNA-42.)
+- **Stale CHANGE_SUMMARY** — the 8 consumer files listed in Axis B have CHANGE_SUMMARY blocks that no longer reflect the code. This is an agent-facing clarity gap: an agent reading `evidence.ts` would not know the import was migrated from a local wrapper to `@warpgogol/fingerprint`. (Also listed under DNA-42.)
 
 - **Ungrounded assertions** — no phantom APIs or invented parameters found. All imports reference real exports. Pass.
 

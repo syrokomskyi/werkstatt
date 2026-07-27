@@ -1,9 +1,9 @@
 {
-  "name": "@gogol/chat",
+  "name": "@warpgogol/chat",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Vendor-agnostic, consent-gated chat widget port for the WGogol platform: ChatWidgetAdapter contract, click-to-load loader, and config schema. Nothing third-party loads before explicit user activation (RFC-0175).",
+  "description": "Vendor-agnostic, consent-gated chat widget port for the Warpgogol platform: ChatWidgetAdapter contract, click-to-load loader, and config schema. Nothing third-party loads before explicit user activation (RFC-0175).",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {

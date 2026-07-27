@@ -16,7 +16,7 @@ declared in system.md clientEditable[] (DNA-22, RFC-0025; amended by RFC-0031).
 */
 
 import path from "node:path";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 
 const CONTENT_PREFIX = "src/content/";
 

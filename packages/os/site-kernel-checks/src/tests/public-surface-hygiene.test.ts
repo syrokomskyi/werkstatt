@@ -21,16 +21,16 @@ import { describe, expect, it } from "vitest";
 import {
   canonicalizeGeneratedMarkdownText,
   formatGeneratedMarkdownListItem,
-} from "@gogol/share/semantic";
+} from "@warpgogol/share/semantic";
 
 describe("RFC-0316 public surface hygiene fixtures", () => {
   it("normalizes default-language same-site URLs, slash dates, and br tags", () => {
     expect(
       canonicalizeGeneratedMarkdownText(
-        "Kontakt: https://webgogol.com/de/kontakt\nStand: 2026/06/01\nPreis<br>pro Monat",
-        { baseUrl: "https://webgogol.com", defaultLanguage: "de" },
+        "Kontakt: https://warpgogol.com/de/kontakt\nStand: 2026/06/01\nPreis<br>pro Monat",
+        { baseUrl: "https://warpgogol.com", defaultLanguage: "de" },
       ),
-    ).toBe("Kontakt: https://webgogol.com/kontakt\nStand: 2026-06-01\nPreis\npro Monat");
+    ).toBe("Kontakt: https://warpgogol.com/kontakt\nStand: 2026-06-01\nPreis\npro Monat");
   });
 
   it("repairs malformed nested Markdown list artifacts", () => {

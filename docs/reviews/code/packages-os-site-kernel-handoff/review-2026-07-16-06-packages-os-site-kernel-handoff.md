@@ -24,7 +24,7 @@ The diff introduces correct .env file generation during materialization and fixe
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/site-kernel-handoff run build:check`, `pnpm --filter @gogol/site-kernel-checks run build:check`, and `pnpm --filter @gogol/site-kernel-onboarding run build:check` all pass. `env.contract.validate --json` reports 0 errors, 0 warnings.
+Pass — `pnpm --filter @warpgogol/site-kernel-handoff run build:check`, `pnpm --filter @warpgogol/site-kernel-checks run build:check`, and `pnpm --filter @warpgogol/site-kernel-onboarding run build:check` all pass. `env.contract.validate --json` reports 0 errors, 0 warnings.
 
 ### Axis A — Structural correctness
 
@@ -46,7 +46,7 @@ Pass — `pnpm --filter @gogol/site-kernel-handoff run build:check`, `pnpm --fil
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries — Pass.** `@gogol/site-kernel-handoff` imports `runEnvExampleGenerate` from `@gogol/site-kernel-checks`, which is a valid `packages/os/* → packages/os/*` dependency. The workspace dependency was correctly added to `package.json`.
+- **Package boundaries — Pass.** `@warpgogol/site-kernel-handoff` imports `runEnvExampleGenerate` from `@warpgogol/site-kernel-checks`, which is a valid `packages/os/* → packages/os/*` dependency. The workspace dependency was correctly added to `package.json`.
 
 - **Pipeline placement — Pass.** `env.example.generate` is placed last in the generator sequence, after `i18n.middleware.generate`. This is correct because `env.example.generate` reads `env.schema.generated.mjs` which is produced by `api.routes.generate` earlier in the sequence.
 

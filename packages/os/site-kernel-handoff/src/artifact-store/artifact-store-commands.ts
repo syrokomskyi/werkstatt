@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 

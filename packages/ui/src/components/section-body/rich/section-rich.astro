@@ -17,13 +17,13 @@
 */
 
 import { render } from "astro:content";
-import type { HorizontalAlign } from "@gogol/share";
-import { getProseContentEntry, wrapInlineNumbers } from "@gogol/share";
+import type { HorizontalAlign } from "@warpgogol/share";
+import { getProseContentEntry, wrapInlineNumbers } from "@warpgogol/share";
 import {
   getContentRefIndex,
   resolveReferencesInString,
   EMPTY_CONTENT_REF_INDEX,
-} from "@gogol/share/content-reference";
+} from "@warpgogol/share/content-reference";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import "./section-rich.css";

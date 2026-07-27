@@ -4,7 +4,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 ## Package role
 
-- `@gogol/site-kernel` is the framework-free core for workspace discovery, runtime context, registry, pipelines, and CLI execution.
+- `@warpgogol/site-kernel` is the framework-free core for workspace discovery, runtime context, registry, pipelines, and CLI execution.
 - Keep this package portable across apps and adapters.
 - Do not couple it to Astro-only concepts unless they are expressed as generic abstractions.
 
@@ -33,7 +33,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 ## Gate metadata (RFC-0518)
 
 - `KernelCommandMetadata` includes an optional `gate?: GateMetadata` field for declarative gate metadata.
-- `GateMetadata` (`GateSeverity`, `GatePhase`, `GateConditional`) is exported from `@gogol/site-kernel` and consumed by `ecosystem.manifest.generate` and `gate.catalog.generate` (RFC-0519).
+- `GateMetadata` (`GateSeverity`, `GatePhase`, `GateConditional`) is exported from `@warpgogol/site-kernel` and consumed by `ecosystem.manifest.generate` and `gate.catalog.generate` (RFC-0519).
 - Gate metadata is purely declarative — it does NOT affect execution, caching, or pipeline order.
 - Agents SHOULD backfill `gate` metadata on commands they touch, reducing GATE-CAT-03 warnings over time.
 
@@ -78,7 +78,7 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - `cache-layer.ts` — `CacheLayer` interface, `createCacheLayer` factory (tries SQLite, falls back to NoopCacheLayer).
 - `sqlite-cache-layer.ts` — `SqliteCacheLayer` using `better-sqlite3` (optional dependency). WAL mode, 5s busy timeout, self-healing on corrupt DB.
 - `noop-cache-layer.ts` — `NoopCacheLayer` fallback when `better-sqlite3` is missing or native binary incompatible.
-- `rfc-cache.ts` — RFC-specific cache helpers (`getCachedRfcEntries`, `getCachedRfcEntry`, `rfcCacheEntryToParsedRfc`). Uses `@gogol/fingerprint` for content hashing (DNA-53).
+- `rfc-cache.ts` — RFC-specific cache helpers (`getCachedRfcEntries`, `getCachedRfcEntry`, `rfcCacheEntryToParsedRfc`). Uses `@warpgogol/fingerprint` for content hashing (DNA-53).
 - `cache-module.ts` — registers `kernel.cache.status` and `kernel.cache.clear` commands.
 - Cache DB stored at `.cache/kernel-cache.db` (gitignored).
 - All RFC commands support `--force-cache-refresh` flag to bypass cache.
@@ -86,13 +86,13 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 
 ## Command-result cache (RFC-0390)
 
-- `src/cache/command-result-cache.ts` — command-result cache helpers: `COMMAND_RESULT_CACHE_NAMESPACE`, `COMMAND_RESULT_CACHE_SCHEMA_VERSION`, `CommandResultCacheKey`, `buildCommandResultCacheKey`, `computeInputsHash`, `computeModuleHash`, `getCachedCommandResult`, `setCachedCommandResult`. All hashing uses `@gogol/fingerprint` (DNA-53).
+- `src/cache/command-result-cache.ts` — command-result cache helpers: `COMMAND_RESULT_CACHE_NAMESPACE`, `COMMAND_RESULT_CACHE_SCHEMA_VERSION`, `CommandResultCacheKey`, `buildCommandResultCacheKey`, `computeInputsHash`, `computeModuleHash`, `getCachedCommandResult`, `setCachedCommandResult`. All hashing uses `@warpgogol/fingerprint` (DNA-53).
 - The `command_results` namespace stores full `KernelExecutionReport` objects keyed by schema version + command name + site name + inputs hash + module hash.
 - Pipeline executors (`executePipelineForSite`, `executePipelineForWorkspace`) check the cache before executing a command. On hit, the cached report is returned with `cached: true` and `durationMs: 0`. On miss, the command executes; only `ok: true` results are stored.
 - `--force` flag bypasses cache reads but still writes successful results (refreshing entries). `dryRun` mode bypasses the cache entirely (no read, no write).
 - `cacheable: false` on a command opts out of caching entirely — the command always executes and is never stored or retrieved from the cache.
 - `computeModuleHash` is cached per-package per-pipeline-run in a `Map<string, string>` to avoid re-hashing the same `src/` directory for every command in a package.
-- `command.reads.validate` (in `@gogol/site-kernel-checks`) enforces that every registered command declares `reads` or `cacheable: false` (CRC-01) and that `reads` patterns are valid picomatch syntax (CRC-02).
+- `command.reads.validate` (in `@warpgogol/site-kernel-checks`) enforces that every registered command declares `reads` or `cacheable: false` (CRC-01) and that `reads` patterns are valid picomatch syntax (CRC-02).
 
 ## Change impact (RFC-0332)
 
@@ -104,12 +104,12 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 
 | Package | Role |
 | --- | --- |
-| `@gogol/site-kernel-astro` | Astro-specific path helpers for site OS commands |
-| `@gogol/site-kernel-content` | Markdown file discovery and frontmatter parsing |
-| `@gogol/site-kernel-integrity` | File hash tracking, build provenance, Ed25519 signing |
-| `@gogol/site-kernel-checks` | Generic kernel command implementations shared by all Astro sites |
+| `@warpgogol/site-kernel-astro` | Astro-specific path helpers for site OS commands |
+| `@warpgogol/site-kernel-content` | Markdown file discovery and frontmatter parsing |
+| `@warpgogol/site-kernel-integrity` | File hash tracking, build provenance, Ed25519 signing |
+| `@warpgogol/site-kernel-checks` | Generic kernel command implementations shared by all Astro sites |
 
 ## Validation
 
-- Run `pnpm --filter @gogol/site-kernel build:check` after API or type changes.
-- Run `pnpm --filter @gogol/site-kernel test` when runtime, discovery, registry, or parsing behavior changes.
+- Run `pnpm --filter @warpgogol/site-kernel build:check` after API or type changes.
+- Run `pnpm --filter @warpgogol/site-kernel test` when runtime, discovery, registry, or parsing behavior changes.

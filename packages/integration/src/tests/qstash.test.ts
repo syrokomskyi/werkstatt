@@ -29,10 +29,10 @@ const EVENT: IntegrationEvent = {
 test("buildQstashPublish targets the EU region and pins dedup to the eventId", async () => {
   const req = buildQstashPublish(EVENT, {
     token: "qstash-secret",
-    callbackUrl: "https://webgogol.com/internal/integration-route",
+    callbackUrl: "https://warpgogol.com/internal/integration-route",
   });
   expect(req.url.startsWith(`${QSTASH_EU_BASE}/v2/publish/`)).toBeTruthy();
-  expect(req.url.includes("https://webgogol.com/internal/integration-route")).toBeTruthy();
+  expect(req.url.includes("https://warpgogol.com/internal/integration-route")).toBeTruthy();
   expect(req.headers.get("upstash-deduplication-id")).toBe("evt-42");
   expect(req.headers.get("upstash-retries")).toBe("3");
 });
@@ -40,7 +40,7 @@ test("buildQstashPublish targets the EU region and pins dedup to the eventId", a
 test("buildQstashPublish puts the event (not the token) in the body", async () => {
   const req = buildQstashPublish(EVENT, {
     token: "qstash-secret",
-    callbackUrl: "https://webgogol.com/internal/integration-route",
+    callbackUrl: "https://warpgogol.com/internal/integration-route",
   });
   const body = await req.text();
   expect(!body.includes("qstash-secret")).toBeTruthy();

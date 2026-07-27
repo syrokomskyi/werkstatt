@@ -16,8 +16,8 @@ filesReviewed:
   - packages/growth/package.json
   - packages/growth-adapter-null/src/index.ts
   - packages/os/site-kernel-checks/src/growth-adapter.ts
-  - apps/webgogol-com/package.json
-  - apps/check-webgogol-com/package.json
+  - apps/warpgogol-com/package.json
+  - apps/check-warpgogol-com/package.json
   - apps/nicaragua-projekt/package.json
 ---
 
@@ -25,7 +25,7 @@ filesReviewed:
 
 ### Verdict: Needs revision
 
-The diff introduces two new source files (`null-adapter.ts`, `registry.ts`) intended to fix four architectural candidates in the growth adapter system, but the implementation is **critically incomplete**: none of the four candidates were actually applied to tracked files. The new files are dead code — nothing imports them — and they contain a type error that breaks `tsc --noEmit` for the entire `@gogol/growth` package. The `growth-adapter-null` package was not deleted, app `package.json` files still reference it, and the duplicated adapter registry in `client.ts` and the validator remains untouched.
+The diff introduces two new source files (`null-adapter.ts`, `registry.ts`) intended to fix four architectural candidates in the growth adapter system, but the implementation is **critically incomplete**: none of the four candidates were actually applied to tracked files. The new files are dead code — nothing imports them — and they contain a type error that breaks `tsc --noEmit` for the entire `@warpgogol/growth` package. The `growth-adapter-null` package was not deleted, app `package.json` files still reference it, and the duplicated adapter registry in `client.ts` and the validator remains untouched.
 
 ### Mechanical floor
 
@@ -37,7 +37,7 @@ src/null-adapter.ts:47:5 - error TS2353: Object literal may only specify known p
        ~~~~~~~
 ```
 
-`pnpm --filter @gogol/growth build:check` exits with code 2. The `GrowthAdapter` interface (`adapter.ts:223-251`) has no `accepts` property — only `id`, `init`, `track`, `identifySegment?`, `destroy?`.
+`pnpm --filter @warpgogol/growth build:check` exits with code 2. The `GrowthAdapter` interface (`adapter.ts:223-251`) has no `accepts` property — only `id`, `init`, `track`, `identifySegment?`, `destroy?`.
 
 ### Axis A — Structural correctness
 
@@ -53,27 +53,27 @@ src/null-adapter.ts:47:5 - error TS2353: Object literal may only specify known p
 
 1. **Pass — DNA-30 (vendor-agnostic GrowthAdapter).** The `null-adapter.ts` implementation correctly implements the closed `GrowthAdapter` interface (modulo the invalid `accepts` property). No vendor-specific methods are exposed.
 
-2. **Fail — DNA-42 (Compass markup).** Both new files carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` blocks — this is correct. However, the `CHANGE_SUMMARY` in `null-adapter.ts` claims "Inlined from the former @gogol/growth-adapter-null package" — but the package was NOT inlined (it still exists). The claim is an ungrounded assertion about a state that was not achieved.
+2. **Fail — DNA-42 (Compass markup).** Both new files carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` blocks — this is correct. However, the `CHANGE_SUMMARY` in `null-adapter.ts` claims "Inlined from the former @warpgogol/growth-adapter-null package" — but the package was NOT inlined (it still exists). The claim is an ungrounded assertion about a state that was not achieved.
 
 3. **Pass — DNA-27 (typed event catalog).** The `null-adapter.ts` imports `EVENT_NAMES` from `adapter.ts`, respecting the closed catalog. No duplication of the event list.
 
 ### Axis C — Ecosystem fit
 
-1. **Fail — package boundaries broken.** `registry.ts:77` creates a static dependency edge from `@gogol/growth` to `@gogol/growth-adapter-matomo` via `_loadExternal("@gogol/growth-adapter-matomo")`. While the `@vite-ignore` comment prevents Vite from creating a build-time edge, the registry module itself imports `createNullAdapter` from `null-adapter.ts` which is a sibling — this is fine. But the `packages/AGENTS.md:46` still lists `growth-adapter-null` as a package, and the `client.ts` still references `@gogol/growth-adapter-null` in its `knownAdapters` map. The ecosystem is in a split state: new files claim the old package is gone, but the old package and all references to it remain.
+1. **Fail — package boundaries broken.** `registry.ts:77` creates a static dependency edge from `@warpgogol/growth` to `@warpgogol/growth-adapter-matomo` via `_loadExternal("@warpgogol/growth-adapter-matomo")`. While the `@vite-ignore` comment prevents Vite from creating a build-time edge, the registry module itself imports `createNullAdapter` from `null-adapter.ts` which is a sibling — this is fine. But the `packages/AGENTS.md:46` still lists `growth-adapter-null` as a package, and the `client.ts` still references `@warpgogol/growth-adapter-null` in its `knownAdapters` map. The ecosystem is in a split state: new files claim the old package is gone, but the old package and all references to it remain.
 
-2. **Fail — Compass sync not done.** If the intent was to collapse `growth-adapter-null` into `@gogol/growth`, the following Compass files needed updates (none were modified):
-   - `docs/PACKAGE_GRAPH.md` — still lists `@gogol/growth-adapter-null`
+2. **Fail — Compass sync not done.** If the intent was to collapse `growth-adapter-null` into `@warpgogol/growth`, the following Compass files needed updates (none were modified):
+   - `docs/PACKAGE_GRAPH.md` — still lists `@warpgogol/growth-adapter-null`
    - `docs/engineering/growth-adapters.md` — still references the old package
    - `docs/compass-inventory.xml` — still has entry for `packages/growth-adapter-null/src/index.ts`
    - `docs/grace-inventory.xml` — same
    - `docs/ecosystem.generated.json` — still references the package
    - `packages/AGENTS.md:46` — still lists `growth-adapter-null` as a package
 
-3. **Fail — app package.json files not updated.** All three apps (`webgogol-com`, `check-webgogol-com`, `nicaragua-projekt`) still list `"@gogol/growth-adapter-null": "workspace:*"` as a dependency. If the package were actually deleted, `pnpm install` would fail.
+3. **Fail — app package.json files not updated.** All three apps (`warpgogol-com`, `check-warpgogol-com`, `nicaragua-projekt`) still list `"@warpgogol/growth-adapter-null": "workspace:*"` as a dependency. If the package were actually deleted, `pnpm install` would fail.
 
-4. **Fail — `package.json` exports not updated.** `packages/growth/package.json` does not export `./registry` or `./null-adapter` subpaths. Even if someone tried to import from `@gogol/growth/registry`, the package exports map would not resolve it.
+4. **Fail — `package.json` exports not updated.** `packages/growth/package.json` does not export `./registry` or `./null-adapter` subpaths. Even if someone tried to import from `@warpgogol/growth/registry`, the package exports map would not resolve it.
 
-5. **Fail — `index.ts` not updated.** The barrel file `packages/growth/src/index.ts` does not re-export anything from `registry.ts` or `null-adapter.ts`. The validator (`site-kernel-checks/src/growth-adapter.ts`) would need to import `KNOWN_ADAPTER_IDS` from `@gogol/growth` — but that export does not exist.
+5. **Fail — `index.ts` not updated.** The barrel file `packages/growth/src/index.ts` does not re-export anything from `registry.ts` or `null-adapter.ts`. The validator (`site-kernel-checks/src/growth-adapter.ts`) would need to import `KNOWN_ADAPTER_IDS` from `@warpgogol/growth` — but that export does not exist.
 
 ### Axis D — Forward-only compliance
 
@@ -83,7 +83,7 @@ src/null-adapter.ts:47:5 - error TS2353: Object literal may only specify known p
 
 ### Axis E — Agent-facing clarity
 
-1. **Fail — ungrounded assertion in `null-adapter.ts` CHANGE_SUMMARY.** Line 14 claims "Inlined from the former @gogol/growth-adapter-null package" — but the package was not removed. An agent reading this would believe the old package no longer exists and fail to find it.
+1. **Fail — ungrounded assertion in `null-adapter.ts` CHANGE_SUMMARY.** Line 14 claims "Inlined from the former @warpgogol/growth-adapter-null package" — but the package was not removed. An agent reading this would believe the old package no longer exists and fail to find it.
 
 2. **Fail — ungrounded assertion in `registry.ts` docstring.** Lines 4-6 claim the registry is "Consumed by both the client-side bootGrowthLayer() ... and the build-time validator growth.vendor.resolve" — but neither consumer imports from this file. An agent would search for the import and find nothing, losing trust in the documentation.
 
@@ -101,7 +101,7 @@ src/null-adapter.ts:47:5 - error TS2353: Object literal may only specify known p
 
 ### Axis G — Blind spots
 
-1. **Fail — no migration path.** If `growth-adapter-null` were actually being collapsed, the diff needs to address: (a) what happens to apps that import from `@gogol/growth-adapter-null` in their `astro.config.mjs` Vite aliases, (b) what happens to the `growth.adapter.contract` validator that scans `packages/growth-adapter-*` directories, (c) what happens to the lockfile entry. None of these are considered.
+1. **Fail — no migration path.** If `growth-adapter-null` were actually being collapsed, the diff needs to address: (a) what happens to apps that import from `@warpgogol/growth-adapter-null` in their `astro.config.mjs` Vite aliases, (b) what happens to the `growth.adapter.contract` validator that scans `packages/growth-adapter-*` directories, (c) what happens to the lockfile entry. None of these are considered.
 
 2. **Pass — edge cases for `null` adapter.** The `NullAdapter` implementation correctly handles all interface methods. The `console.debug` calls are development-appropriate.
 

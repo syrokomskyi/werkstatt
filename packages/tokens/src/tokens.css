@@ -13,7 +13,7 @@
 */
 
 /*
- * @gogol/tokens — canonical --ds-* CSS custom property definitions
+ * @warpgogol/tokens — canonical --ds-* CSS custom property definitions
  *
  * STUDIO DEFAULTS. Every app in apps/. imports this file unchanged. Per-site
  * brand identity is expressed by a biome YAML at packages/ontology/biomes/<id>.yaml
@@ -617,7 +617,7 @@
   /*
    * RFC-0107 flag-day: the legacy `section[class*="--verticalFade"]` overlap
    * utility is superseded by the .section-shell--bg-fade rule in
-   * @gogol/ui/components/section-shell/section-shell.css. Adjacent fade
+   * @warpgogol/ui/components/section-shell/section-shell.css. Adjacent fade
    * sections now overlap through the canonical primitive.
    */
 } /* close @layer tokens */

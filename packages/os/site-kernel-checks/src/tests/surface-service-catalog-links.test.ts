@@ -11,7 +11,7 @@
 
 import { describe, expect, it } from "vitest";
 import { injectServiceCatalogLinks } from "../surface/service-catalog-links.ts";
-import type { PageEntry, VirtualRouteEntry } from "@gogol/surface";
+import type { PageEntry, VirtualRouteEntry } from "@warpgogol/surface";
 
 function makeEntry(
   surfaceId: string,

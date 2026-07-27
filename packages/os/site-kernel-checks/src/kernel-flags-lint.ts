@@ -24,13 +24,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   GENERATED_MARKER,
   KERNEL_UNIVERSAL_FLAGS,
   listRegisteredKernelCommands,
   buildGeneratedHeader,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 
@@ -137,37 +137,37 @@ export const KERNEL_FLAG_SCHEMA_SOURCES: KernelFlagSchemaSourceEntry[] = [
   },
   {
     command: "services.workspace.validate",
-    file: "packages/os/site-kernel-check-webgogol/src/commands/services.ts",
+    file: "packages/os/site-kernel-check-warpgogol/src/commands/services.ts",
     functionName: "runServicesWorkspaceValidate",
   },
   {
     command: "services.check.run",
-    file: "packages/os/site-kernel-check-webgogol/src/commands/services-check.ts",
+    file: "packages/os/site-kernel-check-warpgogol/src/commands/services-check.ts",
     functionName: "runServicesCheckRun",
   },
   {
-    command: "check-webgogol.runner.validate",
-    file: "packages/os/site-kernel-check-webgogol/src/commands/services.ts",
-    functionName: "runCheckWebgogolRunnerValidate",
+    command: "check-warpgogol.runner.validate",
+    file: "packages/os/site-kernel-check-warpgogol/src/commands/services.ts",
+    functionName: "runCheckWarpgogolRunnerValidate",
   },
   {
-    command: "check-webgogol.app.validate",
-    file: "packages/os/site-kernel-check-webgogol/src/commands/app.ts",
-    functionName: "runCheckWebgogolAppValidate",
+    command: "check-warpgogol.app.validate",
+    file: "packages/os/site-kernel-check-warpgogol/src/commands/app.ts",
+    functionName: "runCheckWarpgogolAppValidate",
   },
   {
-    command: "webgogol.check-hints.generate",
-    file: "packages/os/site-kernel-check-webgogol/src/commands/hints.ts",
-    functionName: "runWebgogolCheckHintsGenerate",
+    command: "warpgogol.check-hints.generate",
+    file: "packages/os/site-kernel-check-warpgogol/src/commands/hints.ts",
+    functionName: "runWarpgogolCheckHintsGenerate",
   },
   {
-    command: "webgogol.check-hints.validate",
-    file: "packages/os/site-kernel-check-webgogol/src/commands/hints.ts",
-    functionName: "runWebgogolCheckHintsValidate",
+    command: "warpgogol.check-hints.validate",
+    file: "packages/os/site-kernel-check-warpgogol/src/commands/hints.ts",
+    functionName: "runWarpgogolCheckHintsValidate",
   },
   {
     command: "check.runner.info",
-    file: "packages/os/site-kernel-check-webgogol/src/commands/target.ts",
+    file: "packages/os/site-kernel-check-warpgogol/src/commands/target.ts",
     functionName: "runCheckRunnerInfo",
   },
   {

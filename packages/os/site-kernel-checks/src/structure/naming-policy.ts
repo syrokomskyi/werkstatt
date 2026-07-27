@@ -17,14 +17,14 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   STERNSYSTEM_ID_REGEX,
   MISSION_ID_REGEX,
   RELEASE_ID_REGEX,
   BORDBUCH_EVENT_ID_REGEX,
   isLatinOnly,
-} from "@gogol/ontology/operations";
+} from "@warpgogol/ontology/operations";
 
 interface NamingViolation {
   artifact: string;

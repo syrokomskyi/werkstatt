@@ -1,8 +1,8 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  Centralized run-path construction for the check-webgogol ecosystem.
-  Eliminates hardcoded ".check-webgogol/runs/<runId>" path duplication
+  Centralized run-path construction for the check-warpgogol ecosystem.
+  Eliminates hardcoded ".check-warpgogol/runs/<runId>" path duplication
   across OS commands and the runner service.
 </purpose>
 <non-goals>
@@ -17,7 +17,7 @@
 import { existsSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
 
-const CHECK_WEBGOGOL_ROOT = ".check-webgogol";
+const CHECK_WEBGOGOL_ROOT = ".check-warpgogol";
 const RUNS_SUBDIR = "runs";
 
 export function runRelDir(runId: string): string {

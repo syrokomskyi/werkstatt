@@ -18,11 +18,11 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
-import { markdownCollectionLoader } from "@gogol/share/astro/loaders";
-import { fsDataCollectionLoader } from "@gogol/content-source";
-import { pbpCollections } from "@gogol/pbp/astro";
-import { createFaqCollection } from "@gogol/faq/astro";
-import { toDataEntryId } from "@gogol/share/content";
+import { markdownCollectionLoader } from "@warpgogol/share/astro/loaders";
+import { fsDataCollectionLoader } from "@warpgogol/content-source";
+import { pbpCollections } from "@warpgogol/pbp/astro";
+import { createFaqCollection } from "@warpgogol/faq/astro";
+import { toDataEntryId } from "@warpgogol/share/content";
 
 const system = defineCollection({
   loader: glob({

@@ -12,7 +12,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { discoverWorkspacePackages, writeFileAtomic } from "@gogol/site-kernel";
+import { discoverWorkspacePackages, writeFileAtomic } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   CheckResult,
@@ -20,8 +20,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { WorkspacePackageInfo } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import type { WorkspacePackageInfo } from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "../result-helpers.ts";
 import { validateFleetSitesDrift } from "../fleet-sites-generate.ts";
 import type { EcosystemManifest } from "./types.ts";

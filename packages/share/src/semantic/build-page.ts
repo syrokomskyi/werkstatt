@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0144: the single, framework-agnostic per-page semantic builder. Orchestration that was duplicated between the disk loader (@gogol/site-kernel-content) and the Astro path (formerly @gogol/business, deleted in RFC-0471) lives here once. Where the bytes come from is injected via a small SemanticContentReader seam; the disk path supplies an fs reader, the Astro path an astro:content reader. (A future RFC-0141 node ContentSourceProvider can back both readers — see RFC-0144 staging.)</purpose>
+<purpose>RFC-0144: the single, framework-agnostic per-page semantic builder. Orchestration that was duplicated between the disk loader (@warpgogol/site-kernel-content) and the Astro path (formerly @warpgogol/business, deleted in RFC-0471) lives here once. Where the bytes come from is injected via a small SemanticContentReader seam; the disk path supplies an fs reader, the Astro path an astro:content reader. (A future RFC-0141 node ContentSourceProvider can back both readers — see RFC-0144 staging.)</purpose>
 <non-goals>
   <item>Do not read files or import astro:content — all I/O flows through the injected reader.</item>
   <item>Do not assemble the organization profile or iterate system.md pages — callers own that.</item>

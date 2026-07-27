@@ -24,7 +24,7 @@ The diff replaces stub handlers with real Supabase PostgREST calls — the core 
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/integration-adapter-supabase-crm build:check` and `pnpm --filter @gogol/site-kernel build:check` both pass with exit code 0.
+Pass — `pnpm --filter @warpgogol/integration-adapter-supabase-crm build:check` and `pnpm --filter @warpgogol/site-kernel build:check` both pass with exit code 0.
 
 ### Axis A — Structural correctness
 
@@ -41,7 +41,7 @@ Pass — `pnpm --filter @gogol/integration-adapter-supabase-crm build:check` and
     <item>RFC-0186: Initial env helper for loading registry credentials from .dev.vars.</item>
   </CHANGE_SUMMARY>
   ```
-- **DNA-1** (monorepo boundary) — Pass. `site-kernel` imports from `@gogol/integration-adapter-supabase-crm` (package → package), no `apps/*` or `services/*` imports into packages.
+- **DNA-1** (monorepo boundary) — Pass. `site-kernel` imports from `@warpgogol/integration-adapter-supabase-crm` (package → package), no `apps/*` or `services/*` imports into packages.
 - **DNA-6** (kebab-case) — Pass. `env.ts` is kebab-case.
 - **DNA-40** (env-example) — N/A. No new env vars introduced; the code reads existing `LAGEBILD_REGISTRY_URL` / `LAGEBILD_REGISTRY_API_KEY` already documented in `.dev.vars.example`.
 

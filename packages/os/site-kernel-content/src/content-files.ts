@@ -7,11 +7,11 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0303: refactored to a thin wrapper over the canonical @gogol/share/fs collectFiles walker.</item>
+  <item>RFC-0303: refactored to a thin wrapper over the canonical @warpgogol/share/fs collectFiles walker.</item>
 </CHANGE_SUMMARY>
 */
 
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 /**
  * Recursively collects Markdown (.md) file paths under `directoryPath`,

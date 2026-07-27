@@ -22,7 +22,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty } from "./mission-git-commit.ts";

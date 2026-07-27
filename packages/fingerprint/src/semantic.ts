@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0364: Semantic entry point — file and tree fingerprinting with parser-backed normalizers. Loads all parser dependencies.</purpose>
 <non-goals>
-  <item>Do not export byte-level primitives — those live in the root entry point (@gogol/fingerprint).</item>
+  <item>Do not export byte-level primitives — those live in the root entry point (@warpgogol/fingerprint).</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

@@ -1,4 +1,4 @@
-# `@gogol/chat-adapter-null` — Agent Guide
+# `@warpgogol/chat-adapter-null` — Agent Guide
 
 No-op `ChatWidgetAdapter` for development, testing, and unentitled sites (RFC-0175).
 
@@ -19,10 +19,10 @@ No-op `ChatWidgetAdapter` for development, testing, and unentitled sites (RFC-01
 
 - This is the **safe default**. When `system.md integrations.chat.adapter` is absent or `"null"`, this adapter is selected.
 - Do NOT add any script injection, network request, or storage access here.
-- The adapter id is `"null"` and is registered in `CHAT_ADAPTER_IDS` in `@gogol/chat/port`.
+- The adapter id is `"null"` and is registered in `CHAT_ADAPTER_IDS` in `@warpgogol/chat/port`.
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/chat-adapter-null build:check
+pnpm --filter @warpgogol/chat-adapter-null build:check
 ```

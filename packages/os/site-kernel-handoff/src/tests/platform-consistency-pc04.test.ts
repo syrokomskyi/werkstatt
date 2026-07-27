@@ -15,13 +15,13 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 import { runPlatformConsistencyValidate, PC_04_CUTOFF_SHA } from "../platform-consistency.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 const execFileAsync = promisify(execFile);
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
-    flags: flags as Record<string, import("@gogol/site-kernel").KernelFlagValue>,
+    flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
     args: [],
     argv: [],
   };

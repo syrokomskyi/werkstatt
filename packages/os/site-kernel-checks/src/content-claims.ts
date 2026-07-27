@@ -20,15 +20,15 @@ Content Knowledge Lifecycle (RFC-0211).
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { recordClaimsSchema, type ClaimAnnotation } from "@gogol/share/schemas";
-import { resolveFieldPath } from "@gogol/share/content/resolve-field-path";
+import { recordClaimsSchema, type ClaimAnnotation } from "@warpgogol/share/schemas";
+import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import {
   getContentDisciplinePaths,

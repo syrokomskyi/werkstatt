@@ -21,13 +21,13 @@ import {
   resolveSemanticTarget,
   cast,
   need,
-} from "@gogol/share";
-import type { SectionProps } from "@gogol/share/page";
-import ResponsiveImage from "@gogol/ui/components/responsive-image.astro";
+} from "@warpgogol/share";
+import type { SectionProps } from "@warpgogol/share/page";
+import ResponsiveImage from "@warpgogol/ui/components/responsive-image.astro";
 import type { HeroDecisionCardSectionContent } from "./hero-decision-card-section.types.generated.ts";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import EffectHost from "@gogol/ui/components/effects/effect-host.astro";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import EffectHost from "@warpgogol/ui/components/effects/effect-host.astro";
 import "./hero-decision-card-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;

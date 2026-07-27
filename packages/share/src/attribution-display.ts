@@ -8,7 +8,7 @@
 </purpose>
 <non-goals>
   <item>Do not read content or globs; callers pass the resolved overrides.</item>
-  <item>Do not render UI or emit JSON-LD; @gogol/ui owns presentation.</item>
+  <item>Do not render UI or emit JSON-LD; @warpgogol/ui owns presentation.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

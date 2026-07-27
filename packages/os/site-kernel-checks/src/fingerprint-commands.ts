@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>Maintains packages/os/site-kernel-checks/src/fingerprint-commands.ts as an authored site-kernel-checks authored module so agents can evolve it without rediscovering local boundaries.</purpose>
 <non-goals>
-  <item>Do not implement normalizers — those live in @gogol/fingerprint.</item>
+  <item>Do not implement normalizers — those live in @warpgogol/fingerprint.</item>
   <item>Do not define pipeline placement — that lives in the PACKAGES_CHECK_PIPELINE.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -19,14 +19,14 @@ import type {
   KernelRuntimeContext,
   Diagnostic,
   CheckResult,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
 import {
   fingerprintFile,
   fingerprintTree,
   type FingerprintResult,
   type FingerprintOptions,
-} from "@gogol/fingerprint/semantic";
+} from "@warpgogol/fingerprint/semantic";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 
 // ─── fingerprint.calculate ─────────────────────────────────────────────────
@@ -159,9 +159,9 @@ export async function runFingerprintUsageLint(
           ruleId: "FP-USAGE-01",
           severity: "error",
           file: relPath,
-          message: `Direct hash usage detected (${pattern.source}). Use @gogol/fingerprint instead, or add an allowlist entry with a reason.`,
+          message: `Direct hash usage detected (${pattern.source}). Use @warpgogol/fingerprint instead, or add an allowlist entry with a reason.`,
           fixHint:
-            "Import byteHash/stableJsonHash/fingerprintFile from @gogol/fingerprint, or add an entry to packages/fingerprint/allowlist.json with a reason.",
+            "Import byteHash/stableJsonHash/fingerprintFile from @warpgogol/fingerprint, or add an entry to packages/fingerprint/allowlist.json with a reason.",
         });
         break;
       }

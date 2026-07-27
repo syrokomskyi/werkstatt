@@ -1,4 +1,4 @@
-# @gogol/geo Agent Guide
+# @warpgogol/geo Agent Guide
 
 This package owns the shared geo gazetteer used by Site OS validators and generators.
 

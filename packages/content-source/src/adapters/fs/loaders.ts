@@ -3,7 +3,7 @@
 <purpose>
   [RFC-0141] Filesystem adapter Astro Content Layer loaders. Relocates the glob-based
   collection loaders so the filesystem becomes an explicit adapter. Behavior is identical
-  to the previous @gogol/share/astro/loaders.ts and @gogol/pbp/astro.ts globs.
+  to the previous @warpgogol/share/astro/loaders.ts and @warpgogol/pbp/astro.ts globs.
 </purpose>
 <non-goals>
   <item>Do not define collection schemas — those stay app-specific.</item>

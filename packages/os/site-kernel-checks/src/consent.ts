@@ -12,7 +12,7 @@ processor/recipient disclosure + a DPA reference in the Datenschutz/Privacy Poli
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0177: initial implementation.</item>
-  <item>Architecture review: replaced hardcoded CHAT_VENDOR_ORIGINS map with chatAdapterVendorOrigins from @gogol/chat.</item>
+  <item>Architecture review: replaced hardcoded CHAT_VENDOR_ORIGINS map with chatAdapterVendorOrigins from @warpgogol/chat.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,12 +22,12 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
-import { collectFiles } from "@gogol/share/fs";
-import { chatAdapterVendorOrigins } from "@gogol/chat";
+import { collectFiles } from "@warpgogol/share/fs";
+import { chatAdapterVendorOrigins } from "@warpgogol/chat";
 
 interface IntegrationsConfig {
   chat?: { adapter?: string; options?: Record<string, string> };

@@ -17,13 +17,13 @@ import { runSternsystemRegister } from "../sternsystem/sternsystem-register.ts";
 import { runSternsystemList } from "../sternsystem/sternsystem-list.ts";
 import { runSternsystemValidate } from "../sternsystem/sternsystem-validate.ts";
 import { runSternsystemPin } from "../sternsystem/sternsystem-pin.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 let workspaceRoot: string;
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
-    flags: flags as Record<string, import("@gogol/site-kernel").KernelFlagValue>,
+    flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
     args: [],
     argv: [],
   };

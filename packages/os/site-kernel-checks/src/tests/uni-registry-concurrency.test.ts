@@ -24,8 +24,8 @@ import { describe, it, expect } from "vitest";
 import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
-import { executeKernelCommand } from "@gogol/site-kernel";
+import { byteHash } from "@warpgogol/fingerprint";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 
 interface UniRegistrySnapshot {
@@ -45,7 +45,7 @@ async function makeFixtureWorkspace(): Promise<string> {
   await writeFile(join(root, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n", "utf8");
 
   // Reference the real package sources by absolute file:// URL rather than the
-  // bare specifier "@gogol/site-kernel-checks" — the fixture root lives outside
+  // bare specifier "@warpgogol/site-kernel-checks" — the fixture root lives outside
   // the monorepo's node_modules resolution chain (a real OS temp directory), so
   // bare-specifier resolution from tools/kernel.config.mjs would fail there.
   const checksIndexPath = join(import.meta.dirname, "..", "index.ts").replace(/\\/g, "/");

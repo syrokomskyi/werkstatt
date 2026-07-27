@@ -11,12 +11,12 @@ rationale: >
   credits, and CKL provenance.
 pauseReason: >
   No current debt items match this queue after the nicaragua-projekt app was
-  retired. Reopen when surface.validate warnings reappear for webgogol-com.
+  retired. Reopen when surface.validate warnings reappear for warpgogol-com.
 sourceCommands:
   - surface.validate
 selectors:
   apps:
-    - webgogol-com
+    - warpgogol-com
   ruleIds:
     - surface.validate
   severity:

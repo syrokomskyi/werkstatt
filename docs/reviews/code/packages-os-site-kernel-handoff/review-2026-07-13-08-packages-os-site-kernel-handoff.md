@@ -20,11 +20,11 @@ filesReviewed:
 
 ### Verdict: Needs revision
 
-The diff successfully implements the RFC-0381 pilot migration wave and retires `apps/webgogol-com`. The core fixes — schema-compliant pin generation, bordbuch field name correction, release manifest ecosystem resolution, and dual-representation resolver — are correct and well-grounded. However, two findings on Axis A (duplicated helper functions) and Axis E (swallowed error in debt.ts) require revision before merge.
+The diff successfully implements the RFC-0381 pilot migration wave and retires `apps/warpgogol-com`. The core fixes — schema-compliant pin generation, bordbuch field name correction, release manifest ecosystem resolution, and dual-representation resolver — are correct and well-grounded. However, two findings on Axis A (duplicated helper functions) and Axis E (swallowed error in debt.ts) require revision before merge.
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/site-kernel-handoff build:check` and `pnpm --filter @gogol/site-kernel-checks build:check` both pass. 65/65 handoff tests pass.
+Pass — `pnpm --filter @warpgogol/site-kernel-handoff build:check` and `pnpm --filter @warpgogol/site-kernel-checks build:check` both pass. 65/65 handoff tests pass.
 
 ### Axis A — Structural correctness
 
@@ -54,11 +54,11 @@ No issues. The diff respects DNA-1 (monorepo boundary) — all changes are withi
 
 ### Axis C — Ecosystem fit
 
-No issues. Package boundaries are correct — `site-kernel` exports the resolver, `site-kernel-handoff` consumes it. The `debt.ts` fix correctly handles the zero-sites edge case in `ecosystem.manifest.generate`. CI workflow cleanup is complete — `changelog.yml`, `ci.yml`, and `cache-parity.yml` no longer reference `webgogol-com`.
+No issues. Package boundaries are correct — `site-kernel` exports the resolver, `site-kernel-handoff` consumes it. The `debt.ts` fix correctly handles the zero-sites edge case in `ecosystem.manifest.generate`. CI workflow cleanup is complete — `changelog.yml`, `ci.yml`, and `cache-parity.yml` no longer reference `warpgogol-com`.
 
 ### Axis D — Forward-only compliance
 
-No issues. The `apps/webgogol-com` directory is fully removed via `git rm -r`, not maintained behind a flag. The dual-representation resolver change (`site-workspace-resolver.ts:147-149`) is forward-only — it prefers the mission workpiece during an active mission without keeping a legacy fallback path. The old `sternsystem-extract.ts` pin generation (flat `platformVersion` field) is replaced, not paralleled.
+No issues. The `apps/warpgogol-com` directory is fully removed via `git rm -r`, not maintained behind a flag. The dual-representation resolver change (`site-workspace-resolver.ts:147-149`) is forward-only — it prefers the mission workpiece during an active mission without keeping a legacy fallback path. The old `sternsystem-extract.ts` pin generation (flat `platformVersion` field) is replaced, not paralleled.
 
 ### Axis E — Agent-facing clarity
 
@@ -120,7 +120,7 @@ The `site-workspace-resolver.ts` change (preferring mission workpiece when `curr
 | Optional artifact manifest | Done | `notausgang-commands.ts:710` |
 | Resolve ecosystem in release.prepare | Done | `release-commands.ts:183-184` |
 | Fix dual-representation resolver | Done | `site-workspace-resolver.ts:147-149` |
-| Retire `apps/webgogol-com` | Done | `git rm -r` (commit ce8e6f7ee) |
+| Retire `apps/warpgogol-com` | Done | `git rm -r` (commit ce8e6f7ee) |
 | Clean stale CI references | Done | `changelog.yml`, `ci.yml`, `cache-parity.yml` |
 | Regenerate ecosystem manifest | Done | `ecosystem.generated.yaml` (commit 966d6b18b) |
 | Handle zero-sites in debt collector | Done | `debt.ts:63-70` (with Finding E-1) |

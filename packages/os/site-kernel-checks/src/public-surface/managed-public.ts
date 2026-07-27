@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { hasGeneratedMarker } from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
 import {
   type AppPublicContext,
   appRel,

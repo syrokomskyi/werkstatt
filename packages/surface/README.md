@@ -1,10 +1,10 @@
-# @gogol/surface
+# @warpgogol/surface
 
 Framework-free **Programmatic Surface** route-source port: compile thousands of generated long-tail SEO/GEO pages from `dataset × axes` instead of authoring one markdown file per page.
 
-This package is the **lower-level engine** — pure functions only, no Astro and no Node I/O. All filesystem/content work lives in the `surface.*` kernel commands (`@gogol/site-kernel-checks`); the runtime registry merge lives in `@gogol/share`. See the RFCs in `docs/rfcs/RFC-0192` … `RFC-0199` for the full design.
+This package is the **lower-level engine** — pure functions only, no Astro and no Node I/O. All filesystem/content work lives in the `surface.*` kernel commands (`@warpgogol/site-kernel-checks`); the runtime registry merge lives in `@warpgogol/share`. See the RFCs in `docs/rfcs/RFC-0192` … `RFC-0199` for the full design.
 
-> **Invariant:** `@gogol/surface` must **not** depend on `@gogol/share`. Share consumes surface's route types, so a back-dependency would form a workspace cycle. Surface therefore declares its own `PageEntry`/`SurfaceBlock` (structurally compatible with share's).
+> **Invariant:** `@warpgogol/surface` must **not** depend on `@warpgogol/share`. Share consumes surface's route types, so a back-dependency would form a workspace cycle. Surface therefore declares its own `PageEntry`/`SurfaceBlock` (structurally compatible with share's).
 
 ## Mental model
 

@@ -1,4 +1,4 @@
-# `@gogol/star-map` — Agent Guide
+# `@warpgogol/star-map` — Agent Guide
 
 Deterministic SSG-rendered SVG diagram of an app's cosmic universe (DNA-32, RFC-0028).
 
@@ -6,8 +6,8 @@ Deterministic SSG-rendered SVG diagram of an app's cosmic universe (DNA-32, RFC-
 
 | Entry point | Module | What it provides |
 | --- | --- | --- |
-| `@gogol/star-map` | `src/index.ts` | Barrel: `renderStarMap`, `manifestToStarMapInput`, `emitStarMap`, types (`StarMapInput`, `StarMapOutput`, `StarMapManifestSubset`, ...) |
-| `@gogol/star-map/render` | `src/render.ts` | `renderStarMap(input)` — produces deterministic SVG + SHA-256 hash; `manifestToStarMapInput` adapter (accepts `StarMapManifestSubset`); `emitStarMap` helper |
+| `@warpgogol/star-map` | `src/index.ts` | Barrel: `renderStarMap`, `manifestToStarMapInput`, `emitStarMap`, types (`StarMapInput`, `StarMapOutput`, `StarMapManifestSubset`, ...) |
+| `@warpgogol/star-map/render` | `src/render.ts` | `renderStarMap(input)` — produces deterministic SVG + SHA-256 hash; `manifestToStarMapInput` adapter (accepts `StarMapManifestSubset`); `emitStarMap` helper |
 
 ## Hierarchy depth
 
@@ -28,7 +28,7 @@ Deterministic SSG-rendered SVG diagram of an app's cosmic universe (DNA-32, RFC-
 ## Usage
 
 ```typescript
-import { manifestToStarMapInput, emitStarMap } from "@gogol/star-map/render";
+import { manifestToStarMapInput, emitStarMap } from "@warpgogol/star-map/render";
 const input = manifestToStarMapInput(manifest, registry, 3);
 const { svg, hash } = await emitStarMap(input, "dist/.well-known/cosmic-star-map.svg");
 ```
@@ -36,5 +36,5 @@ const { svg, hash } = await emitStarMap(input, "dist/.well-known/cosmic-star-map
 ## Validation
 
 ```sh
-pnpm --filter @gogol/star-map build:check
+pnpm --filter @warpgogol/star-map build:check
 ```

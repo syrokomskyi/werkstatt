@@ -60,7 +60,7 @@ describe("buildCommandResultCacheKey", () => {
 
   test("site name affects key", () => {
     const key1 = buildCommandResultCacheKey(makeKey({ siteName: null }));
-    const key2 = buildCommandResultCacheKey(makeKey({ siteName: "webgogol-com" }));
+    const key2 = buildCommandResultCacheKey(makeKey({ siteName: "warpgogol-com" }));
     expect(key1).not.toBe(key2);
   });
 });

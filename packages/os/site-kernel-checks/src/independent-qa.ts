@@ -28,8 +28,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { RFC_DIR } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { RFC_DIR } from "@warpgogol/site-kernel";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

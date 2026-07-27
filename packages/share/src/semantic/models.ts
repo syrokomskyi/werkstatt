@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Defines types for semantic data structures used throughout the WGogol ecosystem.</purpose>
+<purpose>Defines types for semantic data structures used throughout the Warpgogol ecosystem.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -16,7 +16,7 @@
 */
 
 // NOTE: This closed union is mirrored by `semanticPageTypeSchema` in
-// `@gogol/ontology/src/schemas/system.ts`. `share` owns the compile-time
+// `@warpgogol/ontology/src/schemas/system.ts`. `share` owns the compile-time
 // contract used by lightweight consumers; `ontology` owns the runtime Zod
 // validator for `system.md`. They are kept in sync manually because deriving
 // one from the other would create a circular dependency between the two

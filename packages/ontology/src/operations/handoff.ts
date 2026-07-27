@@ -6,7 +6,7 @@ lock that makes ingest version-aware, and the authored/derived manifest partitio
 </purpose>
 <non-goals>
   <item>Do not perform file IO, hashing, or version comparison — pure shape only.</item>
-  <item>Do not define migrator logic — that lives in @gogol/site-kernel-handoff.</item>
+  <item>Do not define migrator logic — that lives in @warpgogol/site-kernel-handoff.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

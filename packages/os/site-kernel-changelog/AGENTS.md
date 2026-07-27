@@ -1,4 +1,4 @@
-# @gogol/site-kernel-changelog
+# @warpgogol/site-kernel-changelog
 
 AI-powered changelog generation for all apps.
 

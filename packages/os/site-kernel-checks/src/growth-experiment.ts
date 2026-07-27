@@ -26,8 +26,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // Valid experiment statuses

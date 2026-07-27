@@ -12,13 +12,13 @@ filesReviewed:
   - packages/check-core/src/run-paths.ts
   - packages/check-core/src/evidence.ts
   - packages/check-runner-node/src/index.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/artifact-builders.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/evidence-readers.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/hints.ts
-  - services/check-webgogol-runner/src/config.ts
-  - services/check-webgogol-runner/src/run-once.ts
-  - apps/check-webgogol-com/src/pages/api/check-runs/index.ts
-  - apps/check-webgogol-com/src/pages/api/check-runs/[runid].ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/artifact-builders.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/evidence-readers.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/hints.ts
+  - services/check-warpgogol-runner/src/config.ts
+  - services/check-warpgogol-runner/src/run-once.ts
+  - apps/check-warpgogol-com/src/pages/api/check-runs/index.ts
+  - apps/check-warpgogol-com/src/pages/api/check-runs/[runid].ts
   - packages/fingerprint/AGENTS.md
   - packages/growth/AGENTS.md
   - packages/growth/README.md
@@ -28,20 +28,20 @@ filesReviewed:
 
 ### Verdict: Needs revision
 
-The change successfully deepens `@gogol/check-core` by absorbing deterministic logic and unifying utilities, but carries three findings that require revision: a stale `MODULE_CONTRACT` referencing a removed `escapeHtml`, dead imports in `run-once.ts`, and scope creep from unrelated `fingerprint`/`growth` doc edits bundled into the same commit.
+The change successfully deepens `@warpgogol/check-core` by absorbing deterministic logic and unifying utilities, but carries three findings that require revision: a stale `MODULE_CONTRACT` referencing a removed `escapeHtml`, dead imports in `run-once.ts`, and scope creep from unrelated `fingerprint`/`growth` doc edits bundled into the same commit.
 
 ### Mechanical floor
 
-Pass — `tsc --noEmit` green for `@gogol/check-core`, `@gogol/check-runner-node`, `@gogol/site-kernel-check-webgogol`, and `check-webgogol-runner`. Pre-existing `astro check` errors in `check-webgogol-com` are unrelated to this diff.
+Pass — `tsc --noEmit` green for `@warpgogol/check-core`, `@warpgogol/check-runner-node`, `@warpgogol/site-kernel-check-warpgogol`, and `check-warpgogol-runner`. Pre-existing `astro check` errors in `check-warpgogol-com` are unrelated to this diff.
 
 ### Axis A — Structural correctness
 
-- **Dead imports** — `screenshotsRelDir` and `logsRelDir` are imported in `services/check-webgogol-runner/src/run-once.ts:27-28` but never referenced in the function body. `makeRunArtifact` already constructs these paths internally. Remove both imports.
-- **Stale CHANGE_SUMMARY** — `packages/check-runner-node/src/index.ts:7` says "Migrated sha256Hex import from deleted @gogol/check-core/hash.ts to local wrapper around @gogol/fingerprint byteHash." The local wrapper was removed in this diff; the entry should say "Migrated to byteHash directly" or be appended with a new item.
+- **Dead imports** — `screenshotsRelDir` and `logsRelDir` are imported in `services/check-warpgogol-runner/src/run-once.ts:27-28` but never referenced in the function body. `makeRunArtifact` already constructs these paths internally. Remove both imports.
+- **Stale CHANGE_SUMMARY** — `packages/check-runner-node/src/index.ts:7` says "Migrated sha256Hex import from deleted @warpgogol/check-core/hash.ts to local wrapper around @warpgogol/fingerprint byteHash." The local wrapper was removed in this diff; the entry should say "Migrated to byteHash directly" or be appended with a new item.
 
 ### Axis B — DNA alignment
 
-- **DNA-42 (Compass markup)** — `packages/os/site-kernel-check-webgogol/src/commands/artifact-builders.ts:5` `MODULE_CONTRACT` says "Also provides shared utility helpers (numberFlag, renderReportHtml, escapeHtml)." `escapeHtml` was moved to `check-core/src/report.ts` and is no longer exported from this module. The contract is now false. Update the `<purpose>` to remove `escapeHtml`.
+- **DNA-42 (Compass markup)** — `packages/os/site-kernel-check-warpgogol/src/commands/artifact-builders.ts:5` `MODULE_CONTRACT` says "Also provides shared utility helpers (numberFlag, renderReportHtml, escapeHtml)." `escapeHtml` was moved to `check-core/src/report.ts` and is no longer exported from this module. The contract is now false. Update the `<purpose>` to remove `escapeHtml`.
 - No other DNA violations found. The diff does not touch cosmic naming, content layering, route structure, or design tokens.
 
 ### Axis C — Ecosystem fit
@@ -72,8 +72,8 @@ Pass — `tsc --noEmit` green for `@gogol/check-core`, `@gogol/check-runner-node
 
 ### Axis G — Blind spots
 
-- **Hash format migration** — the change from bare-hex to `sha256:`-prefixed `graphHash` invalidates previously generated evidence graphs. No migration path is documented. If existing `.check-webgogol/runs/*/evidence.graph.json` artifacts exist on disk, `validateEvidenceGraphHash` will return `false` for them. This is acceptable per forward-only discipline but should be noted.
-- **`findWorkspaceRoot` in browser context** — `check-core` is a schema-and-logic package. `findWorkspaceRoot` uses `node:fs` and `process.cwd()`, making it Node-only. The `apps/check-webgogol-com` API routes run in a Cloudflare Workers context (Astro `prerender = false`). `existsSync` from `node:fs` may not be available in that runtime. This is a potential runtime error if the Cloudflare adapter does not polyfill `node:fs`.
+- **Hash format migration** — the change from bare-hex to `sha256:`-prefixed `graphHash` invalidates previously generated evidence graphs. No migration path is documented. If existing `.check-warpgogol/runs/*/evidence.graph.json` artifacts exist on disk, `validateEvidenceGraphHash` will return `false` for them. This is acceptable per forward-only discipline but should be noted.
+- **`findWorkspaceRoot` in browser context** — `check-core` is a schema-and-logic package. `findWorkspaceRoot` uses `node:fs` and `process.cwd()`, making it Node-only. The `apps/check-warpgogol-com` API routes run in a Cloudflare Workers context (Astro `prerender = false`). `existsSync` from `node:fs` may not be available in that runtime. This is a potential runtime error if the Cloudflare adapter does not polyfill `node:fs`.
 
 ### Spec compliance
 
@@ -81,6 +81,6 @@ No spec available — spec compliance skipped. The diff implements the four cand
 
 ### Questions for the author
 
-1. **`findWorkspaceRoot` in Cloudflare Workers** — `apps/check-webgogol-com` API routes use `prerender = false` and deploy to Cloudflare Pages. Does `node:fs.existsSync` work in that runtime? If not, `findWorkspaceRoot` will throw at runtime despite passing typecheck.
+1. **`findWorkspaceRoot` in Cloudflare Workers** — `apps/check-warpgogol-com` API routes use `prerender = false` and deploy to Cloudflare Pages. Does `node:fs.existsSync` work in that runtime? If not, `findWorkspaceRoot` will throw at runtime despite passing typecheck.
 2. **Hash format break** — existing evidence graphs on disk have bare-hex `graphHash` values. Should `validateEvidenceGraphHash` be updated to handle both formats during a transition, or are all existing artifacts disposable?
 3. **Scope creep** — why are `packages/fingerprint/AGENTS.md`, `packages/growth/AGENTS.md`, and `packages/growth/README.md` changes in this commit? Should they be split out?

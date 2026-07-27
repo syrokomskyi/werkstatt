@@ -5,34 +5,34 @@ import type { OtlpKeyValue } from "../conventions.ts";
 const resourceAttrs: OtlpKeyValue[] = [
   { key: "service.name", value: { stringValue: "fleet-probe-runner" } },
   { key: "deployment.environment", value: { stringValue: "production" } },
-  { key: "wgogol.layer", value: { stringValue: "probe" } },
-  { key: "wgogol.site_id", value: { stringValue: "webgogol-com" } },
+  { key: "warpgogol.layer", value: { stringValue: "probe" } },
+  { key: "warpgogol.site_id", value: { stringValue: "warpgogol-com" } },
 ];
 
 describe("encodeOtlpMetrics", () => {
   it("encodes a gauge metric", () => {
     const points: OtlpMetricPoint[] = [
       {
-        name: "wgogol_probe_up",
+        name: "warpgogol_probe_up",
         kind: "gauge",
         gaugePoints: [
           {
             asDouble: 1,
             timeUnixNano: "1751884800000000000",
-            attributes: [{ key: "site_id", value: { stringValue: "webgogol-com" } }],
+            attributes: [{ key: "site_id", value: { stringValue: "warpgogol-com" } }],
           },
         ],
       },
     ];
-    const env = encodeOtlpMetrics(resourceAttrs, points, "@gogol/observability", "1");
+    const env = encodeOtlpMetrics(resourceAttrs, points, "@warpgogol/observability", "1");
     expect(env.resourceMetrics).toHaveLength(1);
     expect(env.resourceMetrics[0]!.resource.attributes).toEqual(resourceAttrs);
     const scope = env.resourceMetrics[0]!.scopeMetrics[0]!;
-    expect(scope.scope.name).toBe("@gogol/observability");
+    expect(scope.scope.name).toBe("@warpgogol/observability");
     expect(scope.scope.version).toBe("1");
     expect(scope.metrics).toHaveLength(1);
     const metric = scope.metrics[0] as Record<string, unknown>;
-    expect(metric["name"]).toBe("wgogol_probe_up");
+    expect(metric["name"]).toBe("warpgogol_probe_up");
     expect(metric["gauge"]).toBeDefined();
     const gauge = metric["gauge"] as { dataPoints: unknown[] };
     expect(gauge.dataPoints).toHaveLength(1);
@@ -44,7 +44,7 @@ describe("encodeOtlpMetrics", () => {
   it("encodes a delta sum (counter) with aggregationTemporality 1", () => {
     const points: OtlpMetricPoint[] = [
       {
-        name: "wgogol_probe_http_status_class_total",
+        name: "warpgogol_probe_http_status_class_total",
         kind: "sum",
         unit: "1",
         isMonotonic: true,
@@ -58,9 +58,9 @@ describe("encodeOtlpMetrics", () => {
         ],
       },
     ];
-    const env = encodeOtlpMetrics(resourceAttrs, points, "@gogol/observability", "1");
+    const env = encodeOtlpMetrics(resourceAttrs, points, "@warpgogol/observability", "1");
     const metric = env.resourceMetrics[0]!.scopeMetrics[0]!.metrics[0] as Record<string, unknown>;
-    expect(metric["name"]).toBe("wgogol_probe_http_status_class_total");
+    expect(metric["name"]).toBe("warpgogol_probe_http_status_class_total");
     expect(metric["unit"]).toBe("1");
     const sum = metric["sum"] as {
       aggregationTemporality: number;
@@ -78,7 +78,7 @@ describe("encodeOtlpMetrics", () => {
   it("encodes a delta histogram with correct bucketCounts and explicitBounds", () => {
     const points: OtlpMetricPoint[] = [
       {
-        name: "wgogol_factory_command_duration_seconds",
+        name: "warpgogol_factory_command_duration_seconds",
         kind: "histogram",
         unit: "s",
         histogramPoints: [
@@ -93,9 +93,9 @@ describe("encodeOtlpMetrics", () => {
         ],
       },
     ];
-    const env = encodeOtlpMetrics(resourceAttrs, points, "@gogol/observability", "1");
+    const env = encodeOtlpMetrics(resourceAttrs, points, "@warpgogol/observability", "1");
     const metric = env.resourceMetrics[0]!.scopeMetrics[0]!.metrics[0] as Record<string, unknown>;
-    expect(metric["name"]).toBe("wgogol_factory_command_duration_seconds");
+    expect(metric["name"]).toBe("warpgogol_factory_command_duration_seconds");
     expect(metric["unit"]).toBe("s");
     const hist = metric["histogram"] as { aggregationTemporality: number; dataPoints: unknown[] };
     expect(hist.aggregationTemporality).toBe(1);

@@ -1,4 +1,4 @@
-# @gogol/site-kernel-deploy
+# @warpgogol/site-kernel-deploy
 
 Deploy commands: export the workspace to client directories.
 

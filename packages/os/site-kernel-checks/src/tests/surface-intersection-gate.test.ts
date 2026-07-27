@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from "vitest";
 import { applyIntersectionGate, type IntersectionRecord } from "../surface-expand/pipeline.ts";
-import type { VirtualRouteEntry } from "@gogol/surface";
+import type { VirtualRouteEntry } from "@warpgogol/surface";
 
 function makeEntry(
   depth: number,

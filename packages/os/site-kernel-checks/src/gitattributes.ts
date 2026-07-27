@@ -29,10 +29,10 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
-import { isGeneratedMarkerTextCandidate } from "@gogol/site-kernel";
+import { isGeneratedMarkerTextCandidate } from "@warpgogol/site-kernel";
 
 const BEGIN_SENTINEL =
   "# BEGIN generated-artifacts (managed by gitattributes.generate — RFC-0336; do not edit by hand)";

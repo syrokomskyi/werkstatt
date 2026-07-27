@@ -16,8 +16,8 @@ with zero matching articles are omitted (field-presence-driven pattern).
 </CHANGE_SUMMARY>
 */
 
-import type { VirtualRouteEntry } from "@gogol/surface";
-import type { PageEntry } from "@gogol/surface";
+import type { VirtualRouteEntry } from "@warpgogol/surface";
+import type { PageEntry } from "@warpgogol/surface";
 import type { Block } from "./bake-blocks.ts";
 import { hero, linkedCardGrid, md, ctaBlock, cardGrid } from "./bake-blocks.ts";
 import type { BakeCtx } from "./bake.ts";

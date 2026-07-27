@@ -1,7 +1,7 @@
 ---
 /*
 <MODULE_CONTRACT>
-  <purpose>Shared base HTML layout shell for all WGogol apps. Owns DOCTYPE, SEO metadata injection,
+  <purpose>Shared base HTML layout shell for all Warpgogol apps. Owns DOCTYPE, SEO metadata injection,
   structured data (JSON-LD), hreflang alternate links, clip-path SVG defs, and slot-based
   content rendering. App-specific data (CSS, content strings, biome) are injected via props.</purpose>
       <non-goals>
@@ -20,12 +20,12 @@
 </CHANGE_SUMMARY>
 */
 
-import StructuredData from "@gogol/ui/components/seo/structured-data";
-import SocialMeta from "@gogol/ui/components/seo/social-meta";
-import { buildJsonLd, markdownTwinUrlPath } from "@gogol/share/semantic";
-import { resolveImage } from "@gogol/share";
-import type { SemanticPageModel } from "@gogol/share/semantic";
-import type { OrchestratorConfig } from "@gogol/share/astro/page-handler";
+import StructuredData from "@warpgogol/ui/components/seo/structured-data";
+import SocialMeta from "@warpgogol/ui/components/seo/social-meta";
+import { buildJsonLd, markdownTwinUrlPath } from "@warpgogol/share/semantic";
+import { resolveImage } from "@warpgogol/share";
+import type { SemanticPageModel } from "@warpgogol/share/semantic";
+import type { OrchestratorConfig } from "@warpgogol/share/astro/page-handler";
 import { contentAssetImages } from "../../content-assets.ts";
 
 interface Props {

@@ -5,7 +5,7 @@
   (`<base>/<slug>`), used whenever the site has no authored About page to derive the base
   segment from. A pure module with no `astro:content` import, so it is consumable from both
   the Astro build (people-routes.ts) and framework-agnostic CLI contexts (sitemap generation in
-  `@gogol/site-kernel-checks`, semantic model building in `@gogol/site-kernel-content`).
+  `@warpgogol/site-kernel-checks`, semantic model building in `@warpgogol/site-kernel-content`).
 </purpose>
 <non-goals>
   <item>Do not import Astro APIs — keep this consumable from Node CLIs.</item>

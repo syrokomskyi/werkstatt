@@ -32,12 +32,12 @@ import { readdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { readFile } from "node:fs/promises";
-import { systemManifestSchema } from "@gogol/ontology/schemas";
+import { systemManifestSchema } from "@warpgogol/ontology/schemas";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { fileExists } from "./lib/file-exists.ts";
 
 // ---------------------------------------------------------------------------

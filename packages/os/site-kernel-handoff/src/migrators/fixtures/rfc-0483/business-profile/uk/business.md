@@ -1,9 +1,9 @@
 ---
 schema: pbp/business@1
-id: https://webgogol.com/id/business
+id: https://warpgogol.com/id/business
 type: business
 status: draft
-name: Webgogol
+name: Warpgogol
 presentation:
   platformComparison:
     display:
@@ -15,5 +15,5 @@ presentation:
   externalServices:
     chatbotPlatform: "uchat"
 governance:
-  authorityRef: https://webgogol.com/id/business
+  authorityRef: https://warpgogol.com/id/business
 ---

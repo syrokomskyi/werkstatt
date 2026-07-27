@@ -11,7 +11,7 @@ budgets:
   reviewMinutes: 120
   ciSeconds: 1800
 jobs:
-  - site: webgogol-com
+  - site: warpgogol-com
     kind: enrich
     priority: 60
     safety: false

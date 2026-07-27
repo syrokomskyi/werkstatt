@@ -286,7 +286,7 @@
 
 ## DEC-18: Visitor sales funnel as platform-owned state machine (RFC-0188)
 
-**Decision:** The visitor sales funnel (UChat ↔ Lagebild ↔ Pipedrive ↔ Stripe) is governed by a platform-owned state machine in `@gogol/share/integration`. UChat renders and requests transitions but never owns the graph, prices, consent of record, or CRM writes.
+**Decision:** The visitor sales funnel (UChat ↔ Lagebild ↔ Pipedrive ↔ Stripe) is governed by a platform-owned state machine in `@warpgogol/share/integration`. UChat renders and requests transitions but never owns the graph, prices, consent of record, or CRM writes.
 
 **Rationale:**
 
@@ -318,7 +318,7 @@
 
 ## DEC-20: Content Source Provider port for headless-CMS readiness (RFC-0141)
 
-**Decision:** All content and asset access goes through the `ContentSourceProvider` interface in `@gogol/content-source`. The filesystem is one replaceable adapter. `import.meta.glob` for content assets is restricted to a single file (`packages/ui/src/content-assets.ts`).
+**Decision:** All content and asset access goes through the `ContentSourceProvider` interface in `@warpgogol/content-source`. The filesystem is one replaceable adapter. `import.meta.glob` for content assets is restricted to a single file (`packages/ui/src/content-assets.ts`).
 
 **Rationale:**
 

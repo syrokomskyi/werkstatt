@@ -29,9 +29,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import {
   buildAgentSurfaceManifest,
   computeAgentManifestContentHash,
@@ -39,11 +39,11 @@ import {
   capabilityToActionRef,
   buildAgentSigningPayload,
   type AgentSurfaceManifest,
-} from "@gogol/share/agent";
-import { BUSINESS_DOMAIN_VISIBILITY } from "@gogol/share/semantic";
-import { PINNED_MCP_PROTOCOL_VERSION } from "@gogol/agent-gate";
-import { verifyBytes } from "@gogol/passport/sign";
-import { PassportPublicKeyFileSchema } from "@gogol/passport/schema";
+} from "@warpgogol/share/agent";
+import { BUSINESS_DOMAIN_VISIBILITY } from "@warpgogol/share/semantic";
+import { PINNED_MCP_PROTOCOL_VERSION } from "@warpgogol/agent-gate";
+import { verifyBytes } from "@warpgogol/passport/sign";
+import { PassportPublicKeyFileSchema } from "@warpgogol/passport/schema";
 import { readAstroSiteUrl } from "../lib/astro-site-url.ts";
 import { readEntitledFeatures } from "../lib/entitlements.ts";
 import { loadCapabilityCatalog, collectRenderedSectionTypes } from "./agent-capability.ts";

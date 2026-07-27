@@ -1,15 +1,15 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-RFC-0266: registers command.manifest.validate. Wraps @gogol/site-kernel's core
+RFC-0266: registers command.manifest.validate. Wraps @warpgogol/site-kernel's core
 validator (CMD-MAN-01 stale manifest, CMD-MAN-02 mutatesState with no writes)
 and adds CMD-MAN-03 — cross-checking that every GENERATOR_OWNERSHIP_MAP
 output appears in its owning command's declared `writes`. Lives in this
-package (not @gogol/site-kernel) specifically so it can reach
+package (not @warpgogol/site-kernel) specifically so it can reach
 GENERATOR_OWNERSHIP_MAP without a reverse package dependency.
 </purpose>
 <non-goals>
-  <item>Do not duplicate the manifest-building or drift-detection logic — that lives in @gogol/site-kernel.</item>
+  <item>Do not duplicate the manifest-building or drift-detection logic — that lives in @warpgogol/site-kernel.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -28,7 +28,7 @@ import {
   type KernelCommandInput,
   type KernelCommandResult,
   type KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 
 interface OwnershipEntryForValidation {

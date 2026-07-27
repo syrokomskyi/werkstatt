@@ -192,13 +192,13 @@ RFC frontmatter is machine-parsed by the `rfc.validate` command. A single YAML s
 ```yaml
 # Wrong — causes YAMLParseError: Plain value cannot start with reserved character
 packagesImpacted:
-  - @gogol/share
+  - @warpgogol/share
 successSignals:
   - `pnpm build` from workspace root succeeds in one pass.
 
 # Correct
 packagesImpacted:
-  - "@gogol/share"
+  - "@warpgogol/share"
 successSignals:
   - "`pnpm build` from workspace root succeeds in one pass."
 ```

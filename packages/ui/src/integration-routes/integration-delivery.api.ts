@@ -1,11 +1,11 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0181: the QStash delivery callback /api/integration-route. Delegates to
-createDeliveryHandler from @gogol/share/integration — the deep module that owns QStash
+createDeliveryHandler from @warpgogol/share/integration — the deep module that owns QStash
 verification, Redis idempotency, channel fan-out, CRM routing, and email notification.
 This file is a thin adapter that injects secrets + the Cloudflare email binding.</purpose>
 <non-goals>
-  <item>Do not implement delivery logic here — it lives in @gogol/share/integration.</item>
+  <item>Do not implement delivery logic here — it lives in @warpgogol/share/integration.</item>
   <item>Do not expose or log secrets.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -40,8 +40,8 @@ import {
   SUPABASE_BUFFER_TENANT_ID,
 } from "astro:env/server";
 import { env as cfEnv } from "cloudflare:workers";
-import { createDeliveryHandler, type IntegrationSecrets } from "@gogol/integration";
-import { supabaseBufferDestinationAdapter } from "@gogol/integration-adapter-supabase-crm";
+import { createDeliveryHandler, type IntegrationSecrets } from "@warpgogol/integration";
+import { supabaseBufferDestinationAdapter } from "@warpgogol/integration-adapter-supabase-crm";
 
 /** RFC-0181: channel + CRM secrets bag from astro:env/server (client tokens). */
 function buildSecrets(): IntegrationSecrets {

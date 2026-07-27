@@ -3,7 +3,7 @@
 <purpose>
 [RFC-0500] bakeRatgeberArticle: builds a depth-1 article page for the ratgeber surface.
 [RFC-0504] 12-section layout: breadcrumbs → article-header → direct-answer → TOC → main analysis
-→ practical tool → limitations → Webgogol connection → sources → authorship/review → changelog
+→ practical tool → limitations → Warpgogol connection → sources → authorship/review → changelog
 → contextual next step (CTA). Emits article-header (Himalia) with metadata, TOC (Metis) auto-generated
 from H2 headings, markdown prose body (single or sectioned via articleSections), FAQ blocks, related
 articles (same category), context-specific closing CTA based on articleType (RFC-0501), changelog
@@ -21,7 +21,7 @@ articles (same category), context-specific closing CTA based on articleType (RFC
 </CHANGE_SUMMARY>
 */
 
-import type { VirtualRouteEntry } from "@gogol/surface";
+import type { VirtualRouteEntry } from "@warpgogol/surface";
 import type { Block } from "./bake-blocks.ts";
 import { md, linkedCardGrid, ctaBlock, articleHeader, changelogBlock } from "./bake-blocks.ts";
 import type { BakeCtx } from "./bake.ts";
@@ -41,7 +41,7 @@ const SLOT_TO_H2_DE: Record<string, string> = {
   checklist: "## Checkliste",
   limitations: "## Kosten und Trade-offs",
   sources: "## Quellen",
-  "webgogol-connection": "## Webgogol-Bezug",
+  "warpgogol-connection": "## Warpgogol-Bezug",
 };
 
 const SLOT_TO_H2_UK: Record<string, string> = {
@@ -52,7 +52,7 @@ const SLOT_TO_H2_UK: Record<string, string> = {
   checklist: "## Контрольний список",
   limitations: "## Витрати і компроміси",
   sources: "## Джерела",
-  "webgogol-connection": "## Зв'язок із Webgogol",
+  "warpgogol-connection": "## Зв'язок із Warpgogol",
 };
 
 function slotToH2(slot: string, lang: string): string | undefined {

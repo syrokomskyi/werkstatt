@@ -22,7 +22,7 @@ The implementation cleanly replaces the minimal forge-bootstrap skill with the r
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @wgogol/forge run build:check` exits 0; `pnpm --filter @wgogol/forge run test` 239/239 pass; `forge.skill.validate` 0 violations; `rfc.validate RFC-0545` 0 violations.
+Pass — `pnpm --filter @warpgogol/forge run build:check` exits 0; `pnpm --filter @warpgogol/forge run test` 239/239 pass; `forge.skill.validate` 0 violations; `rfc.validate RFC-0545` 0 violations.
 
 ### Axis A — Structural correctness
 
@@ -34,7 +34,7 @@ No issues. DNA-54 (Forge bindings contract) is satisfied — the skill body cont
 
 ### Axis C — Ecosystem fit
 
-No issues. The `category: "meta"` and `path: "skills/meta/forge-bootstrap/SKILL.md"` are consistent with the registry test at `packages/forge/src/tests/registry.test.ts:68-72` (path prefix matches category). The `concerns: "content-mutation"` is a valid value per `skillFrontmatterSchema`. The skill is portable (no `@gogol/*` imports, no kernel dependencies). `forge.create`'s `nextSteps` already point to `/forge-bootstrap` — no change needed there.
+No issues. The `category: "meta"` and `path: "skills/meta/forge-bootstrap/SKILL.md"` are consistent with the registry test at `packages/forge/src/tests/registry.test.ts:68-72` (path prefix matches category). The `concerns: "content-mutation"` is a valid value per `skillFrontmatterSchema`. The skill is portable (no `@warpgogol/*` imports, no kernel dependencies). `forge.create`'s `nextSteps` already point to `/forge-bootstrap` — no change needed there.
 
 ### Axis D — Forward-only compliance
 

@@ -13,7 +13,7 @@ migrators/types.ts (RFC-0479).</purpose>
 </CHANGE_SUMMARY>
 */
 
-import type { HandoffCapability } from "@gogol/ontology/operations";
+import type { HandoffCapability } from "@warpgogol/ontology/operations";
 
 /** The authored set a migrator transforms (path -> file contents), kept transport-agnostic. */
 export type AuthoredSet = Map<string, string>;

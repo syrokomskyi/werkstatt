@@ -19,8 +19,8 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
-import { writeFileAtomic, listRegisteredKernelCommands } from "@gogol/site-kernel";
+import { byteHash } from "@warpgogol/fingerprint";
+import { writeFileAtomic, listRegisteredKernelCommands } from "@warpgogol/site-kernel";
 import { stringify as yamlStringify, parse as yamlParse } from "yaml";
 import type {
   CheckResult,
@@ -33,7 +33,7 @@ import type {
   KernelCommandResult,
   KernelPipelineStep,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import {
   SITES_CHECK_AUTHOR_PIPELINE,

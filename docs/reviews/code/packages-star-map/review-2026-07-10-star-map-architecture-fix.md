@@ -25,13 +25,13 @@ The refactor successfully deepens `renderStarMap` behind `StarMapInput`, removes
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/star-map build:check` and `pnpm --filter @gogol/site-kernel-check-webgogol build` both succeed with zero errors.
+Pass — `pnpm --filter @warpgogol/star-map build:check` and `pnpm --filter @warpgogol/site-kernel-check-warpgogol build` both succeed with zero errors.
 
 ### Axis A — Structural correctness
 
-- **Type-unsafe cast in consumer** — `packages/os/site-kernel-checks/src/passport.ts:257` uses `manifest as unknown as Parameters<typeof manifestToStarMapInput>[0]` to bridge `SystemManifest` from `@gogol/site-kernel-content` (structurally different) to `@gogol/ontology/schemas`. This cast silences the compiler but masks potential field incompatibilities (e.g. `sharedContext.requiredPageIds` optionality mismatch that already caused a build failure in this session). The `passport/emit.ts` consumer has the same pattern at line 113. Both casts are pre-existing, but the diff moves and reuses them without fixing the root cause: the two `SystemManifest` types should be unified or the adapter should accept a structural subset.
+- **Type-unsafe cast in consumer** — `packages/os/site-kernel-checks/src/passport.ts:257` uses `manifest as unknown as Parameters<typeof manifestToStarMapInput>[0]` to bridge `SystemManifest` from `@warpgogol/site-kernel-content` (structurally different) to `@warpgogol/ontology/schemas`. This cast silences the compiler but masks potential field incompatibilities (e.g. `sharedContext.requiredPageIds` optionality mismatch that already caused a build failure in this session). The `passport/emit.ts` consumer has the same pattern at line 113. Both casts are pre-existing, but the diff moves and reuses them without fixing the root cause: the two `SystemManifest` types should be unified or the adapter should accept a structural subset.
 
-- **Unused `zod` dependency** — `packages/star-map/package.json:26` lists `"zod": "^4.4.3"` in `dependencies`, but no file in `packages/star-map/src/` imports `zod` directly. `SystemManifest` is imported as a type-only import from `@gogol/ontology/schemas`, which itself depends on `zod`. The dependency is technically transitive and could be removed or moved to `devDependencies`. Pre-existing, not introduced by this diff.
+- **Unused `zod` dependency** — `packages/star-map/package.json:26` lists `"zod": "^4.4.3"` in `dependencies`, but no file in `packages/star-map/src/` imports `zod` directly. `SystemManifest` is imported as a type-only import from `@warpgogol/ontology/schemas`, which itself depends on `zod`. The dependency is technically transitive and could be removed or moved to `devDependencies`. Pre-existing, not introduced by this diff.
 
 - **Hardcoded hex colors in SVG** — `NODE_COLORS` (`#6366f1`, `#f59e0b`, `#10b981`, `#94a3b8`), `svgEdge` (`#334155`), and the background rect (`#0f172a`) use raw hex values. DNA-10 forbids hardcoded tokens in CSS, but this is SVG attribute generation, not CSS — technically not a violation. Still, the colors are magic numbers that could be named constants with a comment explaining the palette choice.
 
@@ -45,7 +45,7 @@ Pass — `pnpm --filter @gogol/star-map build:check` and `pnpm --filter @gogol/s
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries** — Pass. `@gogol/passport` and `@gogol/site-kernel-checks` both import from `@gogol/star-map/render` (package → package).
+- **Package boundaries** — Pass. `@warpgogol/passport` and `@warpgogol/site-kernel-checks` both import from `@warpgogol/star-map/render` (package → package).
 - **AGENTS.md / README.md** — Pass. Both updated with `manifestToStarMapInput` and `emitStarMap` in the entry-point table and usage examples.
 - **Compass sync** — N/A. This is a package-internal refactor; no repository-wide contracts, `docs/*.xml`, or app-package relationships changed.
 - **Export map** — Pass. `package.json` `exports` already maps `./render` → `src/render.ts`; new exports are accessible.
@@ -92,5 +92,5 @@ Pass — `pnpm --filter @gogol/star-map build:check` and `pnpm --filter @gogol/s
 ### Questions for the author
 
 1. The comment at `render.ts:22` says "Verified by snapshot test" but no test exists and `testSignal` is `"skipped"`. Should the comment be corrected to reflect reality, or should a snapshot test be added before merging?
-2. The `as unknown as Parameters<typeof manifestToStarMapInput>[0]` cast in `passport.ts:257` masks a structural mismatch between two `SystemManifest` types. Should the adapter accept a structural subset interface instead of the full `SystemManifest` from `@gogol/ontology/schemas`, eliminating the cast?
+2. The `as unknown as Parameters<typeof manifestToStarMapInput>[0]` cast in `passport.ts:257` masks a structural mismatch between two `SystemManifest` types. Should the adapter accept a structural subset interface instead of the full `SystemManifest` from `@warpgogol/ontology/schemas`, eliminating the cast?
 3. The `--depth=4` flag in `site-kernel-checks/passport.ts` passes `{}` as the registry, making moon resolution a no-op. Should the check command load the real `uni.registry.json`, or should the flag be documented as depth-3-only for the check path?

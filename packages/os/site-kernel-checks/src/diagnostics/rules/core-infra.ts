@@ -121,7 +121,7 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
   ),
 
   // rfc.acceptance.run — machine-checkable RFC acceptance probes (RFC-0268,
-  // implemented in @gogol/site-kernel; registered here for the canonical
+  // implemented in @warpgogol/site-kernel; registered here for the canonical
   // rule-id catalog only, same as COMMIT-01..04).
   "RFC-ACC-01": rule("RFC-ACC-01", "Declared acceptance probe failed", "rfc.acceptance.run"),
   "RFC-ACC-02": rule(
@@ -172,7 +172,7 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
   // RFC-0303: shared fs/text helper dedup + oversized-file guard rails.
   "WALK-01": rule(
     "WALK-01",
-    "Nested recursive readdir walker declared outside the canonical @gogol/share/fs module",
+    "Nested recursive readdir walker declared outside the canonical @warpgogol/share/fs module",
     "fs.walk.lint",
   ),
   "DEDUP-01": rule(

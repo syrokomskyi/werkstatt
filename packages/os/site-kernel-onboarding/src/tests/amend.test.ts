@@ -21,7 +21,7 @@ import { applySitePlanDelta } from "../amend-system-merge.ts";
 import { jaccardSimilarity, isNewerVersion, splitMarkdownParagraphs } from "../amend-gates.ts";
 
 const VALID_BRIEF = {
-  amend: { batch: "amend-001", targetApp: "webgogol-com" },
+  amend: { batch: "amend-001", targetApp: "warpgogol-com" },
   sources: [
     {
       file: "Leistungen_v0.2.md",
@@ -137,7 +137,7 @@ describe("isNewerVersion (coverage-ledger supersession)", () => {
 describe("AmendSource expand-locale intent (amend-001 fix P3)", () => {
   it("accepts expand-locale with a locale", () => {
     const r = AmendBrief.safeParse({
-      amend: { batch: "amend-001", targetApp: "webgogol-com" },
+      amend: { batch: "amend-001", targetApp: "warpgogol-com" },
       sources: [
         {
           file: "x.uk.md",
@@ -153,7 +153,7 @@ describe("AmendSource expand-locale intent (amend-001 fix P3)", () => {
   });
   it("rejects expand-locale without a locale", () => {
     const r = AmendBrief.safeParse({
-      amend: { batch: "amend-001", targetApp: "webgogol-com" },
+      amend: { batch: "amend-001", targetApp: "warpgogol-com" },
       sources: [
         {
           file: "x.uk.md",
@@ -171,7 +171,7 @@ describe("AmendSource expand-locale intent (amend-001 fix P3)", () => {
 describe("applySitePlanDelta (amend-001 fix P1)", () => {
   it("adds a new page, expands a locale, and is idempotent", () => {
     const base = () => ({
-      app: "webgogol-com",
+      app: "warpgogol-com",
       version: "1.0.0",
       identity: { systemStar: "Vega", biome: "b" },
       i18n: { default: "de", supported: { de: {}, uk: {} } },

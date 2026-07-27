@@ -29,14 +29,14 @@ async function createWorkspace(): Promise<string> {
 
   await writeJson(join(root, "apps/site/package.json"), { name: "site" });
   await writeJson(join(root, "services/worker/package.json"), {
-    name: "@gogol/worker",
+    name: "@warpgogol/worker",
   });
-  await writeJson(join(root, "packages/share/package.json"), { name: "@gogol/share" });
+  await writeJson(join(root, "packages/share/package.json"), { name: "@warpgogol/share" });
   await writeJson(join(root, "packages/os/site-kernel/package.json"), {
-    name: "@gogol/site-kernel",
+    name: "@warpgogol/site-kernel",
   });
-  await writeJson(join(root, "packages/ignored/package.json"), { name: "@gogol/ignored" });
-  await writeJson(join(root, "packages/-draft/package.json"), { name: "@gogol/draft" });
+  await writeJson(join(root, "packages/ignored/package.json"), { name: "@warpgogol/ignored" });
+  await writeJson(join(root, "packages/-draft/package.json"), { name: "@warpgogol/draft" });
   return root;
 }
 

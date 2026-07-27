@@ -8,14 +8,14 @@ import {
   SUBSCRIPTION_TRANSITIONS,
   VISITOR_FUNNEL_STAGES,
   isValidFunnelStage,
-} from "@gogol/integration";
-import { SUBSCRIPTION_STATUSES } from "@gogol/integration";
+} from "@warpgogol/integration";
+import { SUBSCRIPTION_STATUSES } from "@warpgogol/integration";
 import {
   checkFunnelTriggerBijection,
   checkSubscriptionTriggerBijection,
   generateFunnelStatechartDocument,
 } from "../funnel-statechart.ts";
-import { hasGeneratedMarker } from "@gogol/site-kernel";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel";
 
 /**
  * RFC-0219: prove the trigger overlay bijection invariants and that the generator

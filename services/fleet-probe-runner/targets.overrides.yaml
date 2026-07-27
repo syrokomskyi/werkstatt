@@ -1,4 +1,4 @@
-- siteId: webgogol-com
+- siteId: warpgogol-com
   routes:
     - /
     - /de/
@@ -17,7 +17,7 @@
   sentinels:
     - "<title>[^<]+</title>"
     - </html>
-- siteId: check-webgogol-com
+- siteId: check-warpgogol-com
   routes:
     - /
     - /de/

@@ -28,19 +28,19 @@ filesReviewed:
 
 ### Verdict: Needs revision
 
-The diff implements three architectural deepening candidates for the `@gogol/chat` package and the integration delivery path. The design direction is sound — single source of truth for `ChatWidgetConfig`, self-describing adapters, and a delivery callback factory. However, the mechanical floor fails for two affected packages (`@gogol/chat` and `@gogol/chat-adapter-uchat`), and there is a metadata drift risk with no guard.
+The diff implements three architectural deepening candidates for the `@warpgogol/chat` package and the integration delivery path. The design direction is sound — single source of truth for `ChatWidgetConfig`, self-describing adapters, and a delivery callback factory. However, the mechanical floor fails for two affected packages (`@warpgogol/chat` and `@warpgogol/chat-adapter-uchat`), and there is a metadata drift risk with no guard.
 
 ### Mechanical floor
 
 **Fail** — two packages fail `build:check`:
 
-1. `@gogol/chat/src/client.ts:116` — `ChatAdapterLoaders` was tightened to `Record<ChatAdapterId, ...>` but `_loadAdapter` accepts `adapterId: string`. A `string` cannot index `Record<ChatAdapterId, ...>` — TS7053.
-2. `@gogol/chat-adapter-uchat/src/index.ts:17` — imports `ChatWidgetConfig` from `@gogol/chat/port`, but Candidate 3 moved the type to `@gogol/chat/config` and removed the re-export from `port.ts` — TS2459.
+1. `@warpgogol/chat/src/client.ts:116` — `ChatAdapterLoaders` was tightened to `Record<ChatAdapterId, ...>` but `_loadAdapter` accepts `adapterId: string`. A `string` cannot index `Record<ChatAdapterId, ...>` — TS7053.
+2. `@warpgogol/chat-adapter-uchat/src/index.ts:17` — imports `ChatWidgetConfig` from `@warpgogol/chat/port`, but Candidate 3 moved the type to `@warpgogol/chat/config` and removed the re-export from `port.ts` — TS2459.
 
 ### Axis A — Structural correctness
 
 - **FAIL (A-1):** `_loadAdapter` in `@/packages/chat/src/client.ts:112-116` takes `adapterId: string` but `ChatAdapterLoaders` is now `Record<ChatAdapterId, ...>`. The index access `loaders[adapterId]` is a type error. Fix: change the parameter to `ChatAdapterId`, or add a type assertion at the call site in `_loadAndInit` where `config.adapter` is already typed as `ChatAdapterId` by the Zod schema.
-- **FAIL (A-2):** `@/packages/chat-adapter-uchat/src/index.ts:17` imports `ChatWidgetConfig` from `@gogol/chat/port` — but Candidate 3 moved it to `@gogol/chat/config`. The import should be `from "@gogol/chat/config"` or `from "@gogol/chat"` (barrel re-exports it).
+- **FAIL (A-2):** `@/packages/chat-adapter-uchat/src/index.ts:17` imports `ChatWidgetConfig` from `@warpgogol/chat/port` — but Candidate 3 moved it to `@warpgogol/chat/config`. The import should be `from "@warpgogol/chat/config"` or `from "@warpgogol/chat"` (barrel re-exports it).
 - **Dead code (A-3):** `EmailRoutingEnv` interface in `@/packages/share/src/integration/delivery-handler.ts:60-62` is declared but never used in that file. The old `delivery.api.ts` used it to cast `cfEnv`; the new handler receives the binding via `config.email.sendBinding`. The interface remains used in `delivery.api.ts` but is dead in `delivery-handler.ts`.
 
 ### Axis B — DNA alignment
@@ -80,17 +80,17 @@ The diff implements three architectural deepening candidates for the `@gogol/cha
 | Requirement | Status | Evidence |
 | --- | --- | --- |
 | Candidate 3: Delete hand-written `ChatWidgetConfig`, use `z.infer` | Done | `config.ts:26` — `export type ChatWidgetConfig = z.infer<typeof ChatWidgetConfigSchema>` |
-| Candidate 3: Update all imports | Partial | `chat-adapter-uchat/src/index.ts:17` still imports from `@gogol/chat/port` — broken |
+| Candidate 3: Update all imports | Partial | `chat-adapter-uchat/src/index.ts:17` still imports from `@warpgogol/chat/port` — broken |
 | Candidate 2: Add `requiredOptions` + `vendorOrigins` to `ChatWidgetAdapter` | Done | `port.ts:46-48` |
 | Candidate 2: UChatAdapter declares metadata | Done | `chat-adapter-uchat/src/index.ts:50-51` |
 | Candidate 2: Validators read from adapter metadata | Done | `chat.ts:65` uses `getChatAdapterMetadata`; `consent.ts:91` uses `chatAdapterVendorOrigins` |
 | Candidate 2: Eliminate hardcoded maps | Partial | `REQUIRED_OPTIONS` and `CHAT_VENDOR_ORIGINS` deleted, but `CHAT_ADAPTER_METADATA` is a new hardcoded map with drift risk |
 | Candidate 1: Extract delivery callback into integration port | Done | `delivery-handler.ts` — `createDeliveryHandler` factory |
 | Candidate 1: Section route is a thin adapter | Done | `delivery.api.ts` — 30 lines, delegates to `createDeliveryHandler` |
-| Green root build | Partial | Root `pnpm build` passes (41/41), but per-package `build:check` fails for `@gogol/chat` and `@gogol/chat-adapter-uchat` |
+| Green root build | Partial | Root `pnpm build` passes (41/41), but per-package `build:check` fails for `@warpgogol/chat` and `@warpgogol/chat-adapter-uchat` |
 
 ### Questions for the author
 
 1. `ChatAdapterLoaders` was tightened to `Record<ChatAdapterId, ...>` but `_loadAdapter` still takes `string`. Should `_loadAdapter` accept `ChatAdapterId`, or should the `ChatAdapterLoaders` type stay as `Record<string, ...>` for the enum-dispatch pattern?
-2. `chat-adapter-uchat` imports `ChatWidgetConfig` from `@gogol/chat/port` — should it import from `@gogol/chat/config` or from the barrel `@gogol/chat`?
+2. `chat-adapter-uchat` imports `ChatWidgetConfig` from `@warpgogol/chat/port` — should it import from `@warpgogol/chat/config` or from the barrel `@warpgogol/chat`?
 3. `CHAT_ADAPTER_METADATA` duplicates `UChatAdapter.requiredOptions` and `UChatAdapter.vendorOrigins`. What prevents these from drifting? Should a build-time check assert consistency between the runtime adapter and the metadata catalog?

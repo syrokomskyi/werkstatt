@@ -21,11 +21,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { diagnosticsResult } from "./result-helpers.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const APP_SPECIFIC_DEFAULTS = [
   {

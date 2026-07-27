@@ -14,7 +14,7 @@ for CLI commands that need to talk to Supabase sync_tenants.</purpose>
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { RegistryClient } from "@gogol/integration-adapter-supabase-crm/tenant-registry";
+import type { RegistryClient } from "@warpgogol/integration-adapter-supabase-crm/tenant-registry";
 
 /** Parse a .env file (KEY=VALUE lines, # comments) into a record. */
 function parseEnvFile(raw: string): Record<string, string> {

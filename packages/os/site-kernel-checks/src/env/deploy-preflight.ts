@@ -22,8 +22,8 @@ import type {
   KernelRuntimeContext,
   Diagnostic,
   CheckResult,
-} from "@gogol/site-kernel";
-import { discoverSiteWorkspaces } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { discoverSiteWorkspaces } from "@warpgogol/site-kernel";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";

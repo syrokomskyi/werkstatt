@@ -1,12 +1,12 @@
 import { test, expect } from "vitest";
-import { roleByCosmicName } from "@gogol/ontology/archetypes";
+import { roleByCosmicName } from "@warpgogol/ontology/archetypes";
 
 /*
 <MODULE_CONTRACT>
 <purpose>
   RFC-0263: unit test for the roleByCosmicName re-export — the manifest-
   authored `role` field, keyed by cosmicName, derived by
-  archetype.registry.build and re-exported from @gogol/ontology/archetypes.
+  archetype.registry.build and re-exported from @warpgogol/ontology/archetypes.
   Guards the two concrete hero-role entries buildPage's hideSectionNumber
   injection depends on (see hero-section-numbering-parity.test.ts).
 </purpose>

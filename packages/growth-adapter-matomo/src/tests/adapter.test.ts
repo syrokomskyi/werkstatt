@@ -2,7 +2,7 @@ import { test, expect, describe, vi } from "vitest";
 import { createMatomoAdapter } from "../adapter.ts";
 import { StubMatomoTransport } from "../transport.ts";
 import { DEFAULT_MATOMO_BINDING } from "../binding.ts";
-import type { GrowthAdapterConfig } from "@gogol/growth/adapter";
+import type { GrowthAdapterConfig } from "@warpgogol/growth/adapter";
 
 function makeConfig(vendor: Record<string, string> = {}): GrowthAdapterConfig {
   return {

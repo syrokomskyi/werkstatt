@@ -20,7 +20,7 @@ import {
   SHARED_WRITE_ALLOWLIST,
 } from "../workspace-write-boundary.ts";
 import type { OwnershipEntry } from "../generator-ownership.ts";
-import type { KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 describe("workspace.write.boundary.lint (RFC-0258)", () => {
   it("WS-WRITE-01: flags an undeclared workspace-shared write reachable from an APPS_* pipeline", () => {
@@ -85,7 +85,7 @@ describe("workspace.write.boundary.lint (RFC-0258)", () => {
       await mkdir(join(root, "src"), { recursive: true });
       await writeFile(
         join(root, modulePath),
-        `import { writeFileAtomic } from "@gogol/site-kernel";\nexport async function run() { await writeFileAtomic("x", "y"); }\n`,
+        `import { writeFileAtomic } from "@warpgogol/site-kernel";\nexport async function run() { await writeFileAtomic("x", "y"); }\n`,
         "utf8",
       );
 
@@ -102,7 +102,7 @@ describe("workspace.write.boundary.lint (RFC-0258)", () => {
       await mkdir(join(root, "src"), { recursive: true });
       await writeFile(
         join(root, modulePath),
-        `import { writeFileIfChanged } from "@gogol/site-kernel";\nexport async function run() { await writeFileIfChanged("x", "y"); }\n`,
+        `import { writeFileIfChanged } from "@warpgogol/site-kernel";\nexport async function run() { await writeFileIfChanged("x", "y"); }\n`,
         "utf8",
       );
 
@@ -113,7 +113,7 @@ describe("workspace.write.boundary.lint (RFC-0258)", () => {
       expect(diagnostics).toHaveLength(0);
     });
 
-    it("RFC-0270: passes for a module inside @gogol/site-kernel itself importing writeFileAtomic via a relative ./fs-atomic.ts specifier", async () => {
+    it("RFC-0270: passes for a module inside @warpgogol/site-kernel itself importing writeFileAtomic via a relative ./fs-atomic.ts specifier", async () => {
       root = await mkdtemp(join(tmpdir(), "ws-write-02-self-"));
       const modulePath = "packages/os/site-kernel/src/self-writer.ts";
       await mkdir(join(root, "packages/os/site-kernel/src"), { recursive: true });

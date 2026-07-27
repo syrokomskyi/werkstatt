@@ -7,7 +7,7 @@ enums (for runtime validation) and TypeScript types (for static typing).
 </purpose>
 <non-goals>
   <item>Do not export business-shaped schemas or loader logic — those live in
-        @gogol/pbp (RFC-0024, RFC-0471).</item>
+        @warpgogol/pbp (RFC-0024, RFC-0471).</item>
   <item>Do not add new enum values without a superseding RFC (DNA-19).</item>
   <item>Intent is intentionally NOT a closed enum; it lives in manifest.ts as
         z.string() with a known-good list comment.</item>
@@ -114,7 +114,7 @@ export type ComponentRole = z.infer<typeof componentRoleSchema>;
 // ---------------------------------------------------------------------------
 
 /**
- * Target industry verticals for the WGogol German market (RFC-0023).
+ * Target industry verticals for the Warpgogol German market (RFC-0023).
  *
  * CLOSED — adding a value requires a superseding RFC (DNA-19).
  *

@@ -16,13 +16,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { GENERATED_MARKER, buildGeneratedHeader } from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel";
+import { GENERATED_MARKER, buildGeneratedHeader } from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
-import { readAstroSiteUrl } from "@gogol/site-kernel-checks/lib/astro-site-url";
-import { readDefaultLanguageCode } from "@gogol/site-kernel-checks/lib/i18n";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { readAstroSiteUrl } from "@warpgogol/site-kernel-checks/lib/astro-site-url";
+import { readDefaultLanguageCode } from "@warpgogol/site-kernel-checks/lib/i18n";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 
 interface ProbeTarget {
   siteId: string;

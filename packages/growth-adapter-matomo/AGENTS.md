@@ -1,4 +1,4 @@
-# `@gogol/growth-adapter-matomo` — Agent Guide
+# `@warpgogol/growth-adapter-matomo` — Agent Guide
 
 Matomo implementation of `GrowthAdapter` for the RFC-0305 Messkanon baseline (RFC-0027 / DNA-30).
 
@@ -50,5 +50,5 @@ The `MatomoTransport` seam abstracts browser delivery (`_paq` queue, script inje
 ## Validation
 
 ```sh
-pnpm --filter @gogol/growth-adapter-matomo build:check
+pnpm --filter @warpgogol/growth-adapter-matomo build:check
 ```

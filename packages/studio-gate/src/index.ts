@@ -29,7 +29,7 @@ import { STUDIO_GATE_TOOLS } from "./tools.ts";
 import { executeCommand } from "./executor.ts";
 import { BuildQueue, resolveBuildConcurrency, isBuildTriggeringTool } from "./build-queue.ts";
 
-const SKILL_PATH = join("packages", "wgogol-skills", "skills", "wg-site-content-edit", "SKILL.md");
+const SKILL_PATH = join("packages", "warpgogol-skills", "skills", "wg-site-content-edit", "SKILL.md");
 
 async function loadSkillInstructions(werkstattRoot: string): Promise<string | undefined> {
   try {

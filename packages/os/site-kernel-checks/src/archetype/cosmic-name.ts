@@ -13,14 +13,14 @@ an archetype, and safely rename a cosmic name across the catalog-managed surface
 
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { collectFiles as collectFilesShared } from "@gogol/share/fs";
-import { PlanetCatalog, MoonCatalog } from "@gogol/ontology";
-import { hasGeneratedMarker } from "@gogol/site-kernel";
+import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
+import { PlanetCatalog, MoonCatalog } from "@warpgogol/ontology";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { loadArchetypeFiles, loadUiManifestFiles, type ArchetypeLayer } from "./shared.ts";
 
 interface CosmicPickResult {

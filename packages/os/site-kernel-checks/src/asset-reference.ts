@@ -14,7 +14,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0248: delegate candidate generation and token syntax checks to @gogol/content-source.</item>
+  <item>RFC-0248: delegate candidate generation and token syntax checks to @warpgogol/content-source.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,20 +22,20 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import {
   describeContentAssetResolution,
   type ContentAssetDomain,
   type ContentAssetResolutionContract,
-} from "@gogol/content-source";
+} from "@warpgogol/content-source";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 

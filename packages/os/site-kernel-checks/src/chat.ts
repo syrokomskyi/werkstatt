@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0175: governance for the chat widget configuration surface in system.md.
 chat.config.validate guards that a configured `integrations.chat.adapter` resolves to the closed
-chat adapter catalog (@gogol/chat) and that the adapter's required public options are present
+chat adapter catalog (@warpgogol/chat) and that the adapter's required public options are present
 (e.g. uchat needs widgetId or scriptUrl). No-op pass when the app declares no chat block.</purpose>
 <non-goals>
   <item>Do not import a chat vendor SDK — read disk only (Node-safe).</item>
@@ -11,7 +11,7 @@ chat adapter catalog (@gogol/chat) and that the adapter's required public option
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0175: initial implementation.</item>
-  <item>Architecture review: replaced hardcoded REQUIRED_OPTIONS map with getChatAdapterMetadata from @gogol/chat.</item>
+  <item>Architecture review: replaced hardcoded REQUIRED_OPTIONS map with getChatAdapterMetadata from @warpgogol/chat.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,10 +20,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { CHAT_ADAPTER_IDS, isChatAdapterId, getChatAdapterMetadata } from "@gogol/chat";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { CHAT_ADAPTER_IDS, isChatAdapterId, getChatAdapterMetadata } from "@warpgogol/chat";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 interface ChatConfig {

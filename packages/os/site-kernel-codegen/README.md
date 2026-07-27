@@ -1,6 +1,6 @@
-# @gogol/site-kernel-codegen
+# @warpgogol/site-kernel-codegen
 
-Code generation commands for all WGogol Astro apps: LordIcon wrappers, open-source page, biome CSS, and content reference tooling.
+Code generation commands for all Warpgogol Astro apps: LordIcon wrappers, open-source page, biome CSS, and content reference tooling.
 
 ## Commands
 
@@ -27,5 +27,5 @@ Compass header management (generate, update, audit, cleanup) is handled by the `
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-codegen build:check
+pnpm --filter @warpgogol/site-kernel-codegen build:check
 ```

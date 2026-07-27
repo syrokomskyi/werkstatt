@@ -41,7 +41,7 @@
         <link rel="informs" target="root.docs.plan" />
         <link rel="constrains" target="packages.kernel" />
         <link rel="constrains" target="packages.ui" />
-        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="constrains" target="apps.warpgogol-com" />
         <link rel="constrains" target="apps.reference" />
       </links>
     </node>
@@ -66,7 +66,7 @@
       <links>
         <link rel="constrains" target="packages.kernel" />
         <link rel="constrains" target="packages.kernel-checks" />
-        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="constrains" target="apps.warpgogol-com" />
         <link rel="constrains" target="apps.reference" />
       </links>
     </node>
@@ -78,7 +78,7 @@
       <links>
         <link rel="verifies" target="packages.kernel" />
         <link rel="verifies" target="packages.ui" />
-        <link rel="verifies" target="apps.webgogol-com" />
+        <link rel="verifies" target="apps.warpgogol-com" />
         <link rel="verifies" target="apps.reference" />
       </links>
     </node>
@@ -122,7 +122,7 @@
       <path>`docs/styling.xml`</path>
       <role>Layer architecture, biome role, Component CSS Custom Properties API, validation commands, exclusion rules.</role>
       <links>
-        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="constrains" target="apps.warpgogol-com" />
         <link rel="constrains" target="apps.reference" />
         <link rel="constrains" target="packages.ontology.biomes" />
         <link rel="constrains" target="packages.tokens.contract" />
@@ -135,7 +135,7 @@
       <path>`docs/authoring/site-composition.md`</path>
       <role>Shared rules for deployable sites (Sternsystemen).</role>
       <links>
-        <link rel="scopes" target="apps.webgogol-com" />
+        <link rel="scopes" target="apps.warpgogol-com" />
         <link rel="scopes" target="apps.reference" />
       </links>
     </node>
@@ -155,9 +155,9 @@
       </links>
     </node>
 
-    <node id="apps.webgogol-com" type="workspace">
-      <name>apps/webgogol-com</name>
-      <path>`apps/webgogol-com`</path>
+    <node id="apps.warpgogol-com" type="workspace">
+      <name>apps/warpgogol-com</name>
+      <path>`apps/warpgogol-com`</path>
       <role>Primary marketing site with UA/DE localization.</role>
       <links>
         <link rel="depends-on" target="packages.kernel" />
@@ -345,7 +345,7 @@
       <role>RFC-0186: Shared multi-tenant CRM buffer adapter. Tenant registry, sync worker factory, and Pipedrive destination handlers.</role>
       <links>
         <link rel="depends-on" target="packages.kernel" />
-        <link rel="used-by" target="apps.webgogol-com" />
+        <link rel="used-by" target="apps.warpgogol-com" />
         <link rel="governed-by" target="packages.rules" />
       </links>
     </node>
@@ -353,7 +353,7 @@
     <node id="changelog.system" type="subsystem">
       <name>Changelog OS</name>
       <path>`packages/os/site-kernel-changelog/src/changelog/` + `packages/os/site-kernel-changelog/src/changelog-command.ts`</path>
-      <role>AI-powered changelog generation pipeline. Lives in @gogol/site-kernel-changelog. Each app wires it up via its own changelog.module.ts.</role>
+      <role>AI-powered changelog generation pipeline. Lives in @warpgogol/site-kernel-changelog. Each app wires it up via its own changelog.module.ts.</role>
       <links>
         <link rel="owned-by" target="root.rules" />
         <link rel="reads-from" target="changelog.prompts" />
@@ -531,7 +531,7 @@
       <path>`docs/rfcs/rfc-0243-authored-offer-pillar-replace-pseo-leistungen-with-authored-listing-page.md`</path>
       <role>Replaces PSEO-generated /leistungen/ depth-0 pillar with authored listing pages (pageId: services), moves offer detail pages into /leistungen/ namespace, and preserves legacy URLs via 301 redirects.</role>
       <links>
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
         <link rel="constrains" target="packages.ontology.blueprints" />
         <link rel="informs" target="root.docs.plan" />
       </links>
@@ -543,7 +543,7 @@
       <role>Hierarchical folder tree (1/2/3 segments) for demand records with path-derived slugs and optional frontmatter override. Validates via demands.hierarchy.validate.</role>
       <links>
         <link rel="informs" target="packages.kernel-checks" />
-        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="constrains" target="apps.warpgogol-com" />
         <link rel="informs" target="root.docs.plan" />
       </links>
     </node>
@@ -605,7 +605,7 @@
         <link rel="informs" target="packages.share.semantic" />
         <link rel="informs" target="packages.ontology.blueprints" />
         <link rel="informs" target="surface.hub.validate" />
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
 
@@ -654,7 +654,7 @@
         <link rel="informs" target="surface.industry.validate" />
         <link rel="informs" target="surface.doorway-risk.report" />
         <link rel="informs" target="surface.duplicate-content.report" />
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
 
@@ -690,7 +690,7 @@
         <link rel="informs" target="packages.kernel-handoff" />
         <link rel="informs" target="ratgeber.provenance.validate" />
         <link rel="amended-by" target="docs.rfcs.rfc-0505" />
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
 
@@ -714,7 +714,7 @@
         <link rel="informs" target="packages.kernel-checks" />
         <link rel="informs" target="packages.ontology" />
         <link rel="informs" target="ratgeber.policy.validate" />
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
 
@@ -744,7 +744,7 @@
         <link rel="informs" target="packages.kernel-handoff" />
         <link rel="informs" target="ratgeber.claim.validate" />
         <link rel="informs" target="ratgeber.provenance.validate" />
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
 
@@ -761,7 +761,7 @@
         <link rel="informs" target="packages.kernel-handoff" />
         <link rel="informs" target="seo.structured-data.validate" />
         <link rel="informs" target="surface.contract.validate" />
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
 
@@ -778,7 +778,7 @@
         <link rel="informs" target="packages.kernel-handoff" />
         <link rel="informs" target="participant.json.validate" />
         <link rel="informs" target="surface.contract.validate" />
-        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="informs" target="apps.warpgogol-com" />
       </links>
     </node>
   </nodes>

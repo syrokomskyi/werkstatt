@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Re-export service commands from @gogol/site-kernel-codegen.</purpose>
+<purpose>Re-export service commands from @warpgogol/site-kernel-codegen.</purpose>
 <non-goals>
   <item>Do not implement logic locally — this file is a thin proxy.</item>
 </non-goals>
@@ -13,4 +13,4 @@ export {
   runGenerateIcons,
   runCleanIcons,
   runGenerateOpenSourcePage,
-} from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel-codegen";

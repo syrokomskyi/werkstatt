@@ -3,7 +3,7 @@
 - **Date:** 2026-07-21
 - **Reviewer:** fo-review (Cascade)
 - **Scope:** `git diff HEAD` — 10 files changed, 31 insertions(+), 27 deletions(-)
-- **Mission:** webgogol-com-m000006
+- **Mission:** warpgogol-com-m000006
 
 ## Diff summary
 
@@ -16,17 +16,17 @@
 | `packages/ui/src/sections/donation-card/donation-card-section.astro` | `getEntry("business", …)` → `getEntry("site", …)` |
 | `packages/ui/src/sections/faq-list/faq-list-section.astro` | `getCollection("business", …)` → `getCollection("faq", …)` |
 | `packages/ui/src/sections/send-message/send-message-section.astro` | `getEntry("business", …)` → `getEntry("business-profile", …)` |
-| `packages/os/site-kernel-onboarding/src/templates/package.template.json` | Added `@gogol/content-source` and `@gogol/faq` deps |
-| `systems/registry.yaml` | `currentMission: null` → `webgogol-com-m000006` |
+| `packages/os/site-kernel-onboarding/src/templates/package.template.json` | Added `@warpgogol/content-source` and `@warpgogol/faq` deps |
+| `systems/registry.yaml` | `currentMission: null` → `warpgogol-com-m000006` |
 | `pnpm-lock.yaml` | Lockfile updated for mission workpiece path |
 
 ## Mechanical floor
 
 | Package        | Command                                  | Result |
 | -------------- | ---------------------------------------- | ------ |
-| `@gogol/pbp`   | `pnpm --filter @gogol/pbp build:check`   | PASS   |
-| `@gogol/share` | `pnpm --filter @gogol/share build:check` | PASS   |
-| `@gogol/ui`    | `pnpm --filter @gogol/ui build:check`    | PASS   |
+| `@warpgogol/pbp`   | `pnpm --filter @warpgogol/pbp build:check`   | PASS   |
+| `@warpgogol/share` | `pnpm --filter @warpgogol/share build:check` | PASS   |
+| `@warpgogol/ui`    | `pnpm --filter @warpgogol/ui build:check`    | PASS   |
 
 No RFC files touched — `ref(forge.yaml bindings.commands.validateRfc)` not required.
 
@@ -101,11 +101,11 @@ const contactId = `${ctx.languageCode}/contact/general-email`;
 const locationId = `${ctx.languageCode}/places/backnang`;
 ```
 
-`@gogol/share` AGENTS.md states: _"Do NOT import from apps/_ — handlers are app-agnostic."* The path `places/backnang` is a specific city for webgogol-com. Another site using `@gogol/share` would have a different place slug.
+`@warpgogol/share` AGENTS.md states: _"Do NOT import from apps/_ — handlers are app-agnostic."* The path `places/backnang` is a specific city for warpgogol-com. Another site using `@warpgogol/share` would have a different place slug.
 
 **Fix:** Either (a) make the entity slugs configurable via `SiteContentContext` (add `contactSlug` and `placeSlug` fields), or (b) move the footer handler's PBP entity resolution to the site's own content config and keep the shared handler generic.
 
-**Severity:** High — DNA-1 violation. Blocks reuse of `@gogol/share` by any other site.
+**Severity:** High — DNA-1 violation. Blocks reuse of `@warpgogol/share` by any other site.
 
 ### B-2. PASS — DNA-4 (canonical content)
 
@@ -157,7 +157,7 @@ No new `apps/* → apps/*` or `apps/* → services/*` imports. All changes are w
 
 ### D-2. PASS — Content-source port used correctly
 
-All `getEntry`/`getCollection` calls import from `@gogol/content-source/astro`, not `astro:content` directly (per RFC-0141).
+All `getEntry`/`getCollection` calls import from `@warpgogol/content-source/astro`, not `astro:content` directly (per RFC-0141).
 
 ### D-3. PASS — FAQ collection wiring follows RFC-0475
 
@@ -165,7 +165,7 @@ The `faq-list-section.astro` correctly uses the `faq` collection and filters by 
 
 ### D-4. PASS — Onboarding template updated
 
-`package.template.json` correctly adds `@gogol/content-source` and `@gogol/faq` as dependencies, ensuring new sites scaffolded via `onboarding.scaffold` will have the required packages.
+`package.template.json` correctly adds `@warpgogol/content-source` and `@warpgogol/faq` as dependencies, ensuring new sites scaffolded via `onboarding.scaffold` will have the required packages.
 
 ---
 
@@ -178,7 +178,7 @@ The `faq-list-section.astro` correctly uses the `faq` collection and filters by 
 The `CHANGE_SUMMARY` still says:
 
 ```
-<item>Replaced getBusinessFaqEntries with direct getCollection("business") call — no @gogol/business import.</item>
+<item>Replaced getBusinessFaqEntries with direct getCollection("business") call — no @warpgogol/business import.</item>
 ```
 
 This is now outdated — the collection is `"faq"`, not `"business"`.
@@ -237,7 +237,7 @@ The `semantic-model.ts` FAQ filter bug (A-1) would have been caught by a unit te
 | # | Severity | Axis | Finding |
 | --- | --- | --- | --- |
 | A-1 | **High** | A | Stale FAQ filter prefix in `semantic-model.ts` — returns empty list |
-| B-1 | **High** | B | App-specific entity paths (`places/backnang`) hardcoded in `@gogol/share` — DNA-1 violation |
+| B-1 | **High** | B | App-specific entity paths (`places/backnang`) hardcoded in `@warpgogol/share` — DNA-1 violation |
 | C-1 | **High** | C | `strictness: "migration"` is a permanent silent fallback — defeats schema validation |
 | A-2 | **Medium** | A | Stale people filter prefix in `people-routes.ts` — latent bug |
 | G-2 | **Medium** | G | No regression test for FAQ filter |

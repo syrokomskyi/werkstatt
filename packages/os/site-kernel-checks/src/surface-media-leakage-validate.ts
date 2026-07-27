@@ -29,9 +29,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
-import { jsonldTypes, type MediaLeakagePolicy } from "@gogol/ontology/external-surfaces";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
+import { jsonldTypes, type MediaLeakagePolicy } from "@warpgogol/ontology/external-surfaces";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { ARTIFACT_FILE } from "./surface/shared.ts";
 

@@ -19,8 +19,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { systemPinSchema, type SystemPin } from "@gogol/ontology/operations";
+} from "@warpgogol/site-kernel";
+import { systemPinSchema, type SystemPin } from "@warpgogol/ontology/operations";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
 import { allMigratorIds } from "../migrators/registry.ts";
 import { readRegistry, writeRegistry, findEntry } from "./registry-io.ts";

@@ -19,10 +19,10 @@ operations and MCP tools.
 </CHANGE_SUMMARY>
 */
 
-import type { CapabilityRecord } from "@gogol/ontology";
+import type { CapabilityRecord } from "@warpgogol/ontology";
 import type { AgentActionRef } from "./manifest.ts";
 
-export type { CapabilityRecord } from "@gogol/ontology";
+export type { CapabilityRecord } from "@warpgogol/ontology";
 
 export interface ResolveActiveCapabilitiesInput {
   catalog: CapabilityRecord[];

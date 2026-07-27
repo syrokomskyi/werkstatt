@@ -12,7 +12,7 @@
 */
 
 /**
- * @gogol/star-map — deterministic node layout
+ * @warpgogol/star-map — deterministic node layout
  *
  * DNA-32 / RFC-0028
  *

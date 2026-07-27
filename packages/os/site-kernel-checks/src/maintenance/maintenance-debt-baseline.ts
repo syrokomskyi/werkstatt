@@ -13,15 +13,15 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { GENERATED_MARKER } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import {
   collectMaintenanceDebtItems,

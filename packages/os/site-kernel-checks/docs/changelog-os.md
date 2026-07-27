@@ -130,13 +130,13 @@ export {
   runChangelogGenerate,
   runChangelogRebuildIndex,
   runChangelogBackfill,
-} from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel-checks";
 ```
 
 ### 2. Create `tools/modules/changelog.module.ts`
 
 ```typescript
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 import {
   runChangelogGenerate,
   runChangelogRebuildIndex,

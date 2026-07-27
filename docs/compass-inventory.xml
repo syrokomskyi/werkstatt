@@ -5,7 +5,7 @@
     <status>generated</status>
     <scope>repository-root</scope>
     <generated-at>null</generated-at>
-    <generator>@gogol/site-kernel-checks:compass.inventory</generator>
+    <generator>@warpgogol/site-kernel-checks:compass.inventory</generator>
   </meta>
   <summary>
     <scanned-files>1327</scanned-files>
@@ -16,7 +16,7 @@
     <non-compliant-files>371</non-compliant-files>
   </summary>
   <entries>
-    <entry path="apps/check-webgogol-com/astro.config.mjs" workspace-kind="app" workspace-name="check-webgogol-com" layer="other" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/astro.config.mjs" workspace-kind="app" workspace-name="check-warpgogol-com" layer="other" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>135</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -30,7 +30,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/content.config.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/content.config.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>87</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -44,7 +44,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/env.d.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/env.d.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>41</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -58,7 +58,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/env.schema.generated.mjs" workspace-kind="app" workspace-name="check-webgogol-com" layer="source" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/env.schema.generated.mjs" workspace-kind="app" workspace-name="check-warpgogol-com" layer="source" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>17</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -67,7 +67,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/src/middleware.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/middleware.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>26</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -81,7 +81,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/middleware/language-detect.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/middleware/language-detect.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>117</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -96,7 +96,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/middleware/language-redirect.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/middleware/language-redirect.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>28</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -111,7 +111,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/404.astro" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/404.astro" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>106</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -125,7 +125,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/[...slug].astro" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/[...slug].astro" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>127</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -139,7 +139,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/[lang]/[...slug].astro" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/[lang]/[...slug].astro" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>173</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -153,7 +153,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/api/agent/mcp.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/api/agent/mcp.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>15</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -162,7 +162,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/api/check-runs/[runid].ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".ts" authoring-status="authored" risk-class="medium" complexity="non-trivial" required-scaffolding="standard" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/api/check-runs/[runid].ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".ts" authoring-status="authored" risk-class="medium" complexity="non-trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>70</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -170,7 +170,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/api/check-runs/index.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".ts" authoring-status="authored" risk-class="medium" complexity="non-trivial" required-scaffolding="standard" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/api/check-runs/index.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".ts" authoring-status="authored" risk-class="medium" complexity="non-trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>132</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -178,7 +178,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/check.astro" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/check.astro" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>225</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -192,7 +192,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/pages/index.astro" workspace-kind="app" workspace-name="check-webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/pages/index.astro" workspace-kind="app" workspace-name="check-warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>106</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -206,7 +206,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/scripts/language-persist.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/scripts/language-persist.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>95</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -221,7 +221,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/scripts/layout-orchestrator.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/scripts/layout-orchestrator.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>67</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -236,7 +236,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/styles/biome.generated.css" workspace-kind="app" workspace-name="check-webgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/styles/biome.generated.css" workspace-kind="app" workspace-name="check-warpgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>86</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -245,7 +245,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/src/styles/check-page.css" workspace-kind="app" workspace-name="check-webgogol-com" layer="style" extension=".css" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/styles/check-page.css" workspace-kind="app" workspace-name="check-warpgogol-com" layer="style" extension=".css" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>200</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -253,7 +253,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/src/styles/fonts.imports.css" workspace-kind="app" workspace-name="check-webgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/styles/fonts.imports.css" workspace-kind="app" workspace-name="check-warpgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>0</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -262,7 +262,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/src/styles/global.css" workspace-kind="app" workspace-name="check-webgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/styles/global.css" workspace-kind="app" workspace-name="check-warpgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>177</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -276,7 +276,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/src/styles/local.css" workspace-kind="app" workspace-name="check-webgogol-com" layer="style" extension=".css" authoring-status="authored" risk-class="low" complexity="trivial" required-scaffolding="standard" compliant="true">
+    <entry path="apps/check-warpgogol-com/src/styles/local.css" workspace-kind="app" workspace-name="check-warpgogol-com" layer="style" extension=".css" authoring-status="authored" risk-class="low" complexity="trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>11</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -284,7 +284,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/kernel.config.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-config" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/kernel.config.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-config" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>67</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -299,7 +299,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/modules/changelog.module.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/modules/changelog.module.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>40</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -313,7 +313,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/modules/check.module.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/modules/check.module.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>69</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -322,7 +322,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/modules/deploy.module.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/modules/deploy.module.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>38</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -336,7 +336,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/modules/integrity.module.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/modules/integrity.module.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>55</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -350,7 +350,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/modules/service.module.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/modules/service.module.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>78</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -364,7 +364,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/runtime/app.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/runtime/app.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>35</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -379,7 +379,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/runtime/changelog.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/runtime/changelog.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>30</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -394,7 +394,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/runtime/check.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/runtime/check.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>27</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -409,7 +409,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/runtime/client-export.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/runtime/client-export.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>28</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -424,7 +424,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/runtime/integrity.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/runtime/integrity.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>35</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -439,7 +439,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/check-webgogol-com/tools/runtime/service.ts" workspace-kind="app" workspace-name="check-webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/check-warpgogol-com/tools/runtime/service.ts" workspace-kind="app" workspace-name="check-warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>30</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -854,7 +854,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/astro.config.mjs" workspace-kind="app" workspace-name="webgogol-com" layer="other" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/astro.config.mjs" workspace-kind="app" workspace-name="warpgogol-com" layer="other" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>141</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -868,7 +868,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/content.config.ts" workspace-kind="app" workspace-name="webgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/content.config.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>87</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -882,7 +882,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/env.d.ts" workspace-kind="app" workspace-name="webgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/env.d.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="source" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>41</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -896,7 +896,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/env.schema.generated.mjs" workspace-kind="app" workspace-name="webgogol-com" layer="source" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/env.schema.generated.mjs" workspace-kind="app" workspace-name="warpgogol-com" layer="source" extension=".mjs" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>112</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -905,7 +905,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/middleware.ts" workspace-kind="app" workspace-name="webgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/middleware.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>26</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -919,7 +919,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/middleware/language-detect.ts" workspace-kind="app" workspace-name="webgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/middleware/language-detect.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>117</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -934,7 +934,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/middleware/language-redirect.ts" workspace-kind="app" workspace-name="webgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/middleware/language-redirect.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="middleware" extension=".ts" authoring-status="excluded" risk-class="high" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>28</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -949,7 +949,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/404.astro" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/404.astro" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>106</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -963,7 +963,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/[...slug].astro" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/[...slug].astro" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>127</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -977,7 +977,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/[lang]/[...slug].astro" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/[lang]/[...slug].astro" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>173</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -991,7 +991,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/[lang]/tsyfrovyy-fundament.astro" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/[lang]/tsyfrovyy-fundament.astro" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>25</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1005,7 +1005,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/api/agent/actions/[id].ts" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/api/agent/actions/[id].ts" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>14</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1014,7 +1014,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/api/agent/mcp.ts" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/api/agent/mcp.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>15</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1023,7 +1023,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/api/integration-inbound.ts" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/api/integration-inbound.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>10</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1032,7 +1032,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/api/integration-route.ts" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/api/integration-route.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>10</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1041,7 +1041,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/api/send-message.ts" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/api/send-message.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>10</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1050,7 +1050,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/api/stripe-webhook.ts" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/api/stripe-webhook.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>10</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1059,7 +1059,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/digitales-fundament.astro" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/digitales-fundament.astro" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>22</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1073,7 +1073,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/pages/index.astro" workspace-kind="app" workspace-name="webgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/pages/index.astro" workspace-kind="app" workspace-name="warpgogol-com" layer="page" extension=".astro" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>106</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1087,7 +1087,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/scripts/language-persist.ts" workspace-kind="app" workspace-name="webgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/scripts/language-persist.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>95</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1102,7 +1102,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/scripts/layout-orchestrator.ts" workspace-kind="app" workspace-name="webgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/scripts/layout-orchestrator.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="script" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>67</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1117,7 +1117,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/styles/biome.generated.css" workspace-kind="app" workspace-name="webgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/styles/biome.generated.css" workspace-kind="app" workspace-name="warpgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>86</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1126,7 +1126,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/styles/fonts.imports.css" workspace-kind="app" workspace-name="webgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/styles/fonts.imports.css" workspace-kind="app" workspace-name="warpgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>0</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>false</has-module-contract>
@@ -1135,7 +1135,7 @@
       <has-purpose>false</has-purpose>
       <has-non-goals>false</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/src/styles/global.css" workspace-kind="app" workspace-name="webgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/src/styles/global.css" workspace-kind="app" workspace-name="warpgogol-com" layer="style" extension=".css" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>177</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1149,7 +1149,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/src/styles/local.css" workspace-kind="app" workspace-name="webgogol-com" layer="style" extension=".css" authoring-status="authored" risk-class="low" complexity="trivial" required-scaffolding="standard" compliant="true">
+    <entry path="apps/warpgogol-com/src/styles/local.css" workspace-kind="app" workspace-name="warpgogol-com" layer="style" extension=".css" authoring-status="authored" risk-class="low" complexity="trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>11</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -1157,7 +1157,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/tools/kernel.config.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-config" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/kernel.config.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-config" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>67</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1172,7 +1172,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/modules/changelog.module.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/modules/changelog.module.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>40</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1186,7 +1186,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/modules/check.module.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/modules/check.module.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>69</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1195,7 +1195,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="apps/webgogol-com/tools/modules/deploy.module.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/modules/deploy.module.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>38</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1209,7 +1209,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/modules/integrity.module.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/modules/integrity.module.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>55</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1223,7 +1223,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/modules/service.module.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/modules/service.module.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-module" extension=".ts" authoring-status="excluded" risk-class="low" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>78</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1237,7 +1237,7 @@
         <marker>responsibilities</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/runtime/app.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/runtime/app.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>35</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1252,7 +1252,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/runtime/changelog.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/runtime/changelog.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>30</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1267,7 +1267,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/runtime/check.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/runtime/check.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>27</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1282,7 +1282,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/runtime/client-export.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/runtime/client-export.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>28</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1297,7 +1297,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/runtime/integrity.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/runtime/integrity.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>35</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -1312,7 +1312,7 @@
         <marker>COMPASS_BLOCK</marker>
       </forbidden-markers>
     </entry>
-    <entry path="apps/webgogol-com/tools/runtime/service.ts" workspace-kind="app" workspace-name="webgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
+    <entry path="apps/warpgogol-com/tools/runtime/service.ts" workspace-kind="app" workspace-name="warpgogol-com" layer="tool-runtime" extension=".ts" authoring-status="excluded" risk-class="medium" complexity="non-trivial" required-scaffolding="none" compliant="true">
       <non-empty-lines>30</non-empty-lines>
       <exclusion-reason>generated-marker</exclusion-reason>
       <has-module-contract>true</has-module-contract>
@@ -2619,7 +2619,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>42</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2630,7 +2630,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/app.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/app.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>69</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2641,7 +2641,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/audience.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/audience.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>102</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2652,7 +2652,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/deploy.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/deploy.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>200</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2663,7 +2663,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/evidence.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/evidence.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>192</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2674,7 +2674,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/helpers.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/helpers.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>426</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2685,7 +2685,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/hints.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/hints.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>72</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2697,7 +2697,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/report.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/report.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>103</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2708,7 +2708,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/services-check.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/services-check.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>32</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2719,7 +2719,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/services.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/services.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>270</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2731,7 +2731,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/commands/target.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/commands/target.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>43</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2742,7 +2742,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/index.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/index.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>9</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2753,7 +2753,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/result.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/result.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>26</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -2764,7 +2764,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-check-webgogol/src/target-io.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-check-warpgogol/src/target-io.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>53</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -3838,7 +3838,7 @@
         <violation>no &lt;non-goals&gt; item</violation>
       </violations>
     </entry>
-    <entry path="packages/os/site-kernel-checks/src/command-tables/30-check-webgogol.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-checks/src/command-tables/30-check-warpgogol.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>375</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -4219,7 +4219,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="packages/os/site-kernel-checks/src/diagnostics/rules/check-webgogol.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
+    <entry path="packages/os/site-kernel-checks/src/diagnostics/rules/check-warpgogol.ts" workspace-kind="package" workspace-name="os" layer="other" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="false">
       <non-empty-lines>203</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -12364,7 +12364,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="services/check-webgogol-runner/src/config.ts" workspace-kind="service" workspace-name="check-webgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
+    <entry path="services/check-warpgogol-runner/src/config.ts" workspace-kind="service" workspace-name="check-warpgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>40</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -12372,7 +12372,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="services/check-webgogol-runner/src/local-store.ts" workspace-kind="service" workspace-name="check-webgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
+    <entry path="services/check-warpgogol-runner/src/local-store.ts" workspace-kind="service" workspace-name="check-warpgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>54</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -12380,7 +12380,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="services/check-webgogol-runner/src/run-once.ts" workspace-kind="service" workspace-name="check-webgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
+    <entry path="services/check-warpgogol-runner/src/run-once.ts" workspace-kind="service" workspace-name="check-warpgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>149</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>
@@ -12388,7 +12388,7 @@
       <has-purpose>true</has-purpose>
       <has-non-goals>true</has-non-goals>
     </entry>
-    <entry path="services/check-webgogol-runner/src/worker.ts" workspace-kind="service" workspace-name="check-webgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
+    <entry path="services/check-warpgogol-runner/src/worker.ts" workspace-kind="service" workspace-name="check-warpgogol-runner" layer="source" extension=".ts" authoring-status="authored" risk-class="low" complexity="non-trivial" required-scaffolding="standard" compliant="true">
       <non-empty-lines>21</non-empty-lines>
       <has-module-contract>true</has-module-contract>
       <has-change-summary>true</has-change-summary>

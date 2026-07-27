@@ -60,10 +60,10 @@ cards:
 backgroundImage: "/src/content/pages/de/assets/hero-bg.webp"
 ```
 
-**Component-side rule (updated by RFC-0141)**: Components in `@gogol/ui` use the single shared content-asset map plus `resolveImage` from `@gogol/share`. They MUST NOT declare their own `import.meta.glob` for content assets:
+**Component-side rule (updated by RFC-0141)**: Components in `@warpgogol/ui` use the single shared content-asset map plus `resolveImage` from `@warpgogol/share`. They MUST NOT declare their own `import.meta.glob` for content assets:
 
 ```typescript
-import { resolveImage, resolveImageRequired } from "@gogol/share";
+import { resolveImage, resolveImageRequired } from "@warpgogol/share";
 // The ONE shared content-asset glob (packages/ui/src/content-assets.ts).
 import { contentAssetImages } from "../../content-assets.ts";
 
@@ -77,7 +77,7 @@ const cardImage = resolveImageRequired(
 );
 ```
 
-> **RFC-0141:** the only `import.meta.glob` for content assets lives in `packages/ui/src/content-assets.ts`; the resolution logic lives in the `@gogol/content-source` filesystem adapter (re-exported by `@gogol/share`). `asset.reference.validate` guards unresolved tokens. Do not reintroduce per-component globs.
+> **RFC-0141:** the only `import.meta.glob` for content assets lives in `packages/ui/src/content-assets.ts`; the resolution logic lives in the `@warpgogol/content-source` filesystem adapter (re-exported by `@warpgogol/share`). `asset.reference.validate` guards unresolved tokens. Do not reintroduce per-component globs.
 
 **Key invariants**:
 
@@ -85,7 +85,7 @@ const cardImage = resolveImageRequired(
 - Automatic fallback to `DEFAULT_LANGUAGE` ("de") if image not found in current `lang`
 - Extension priority: `.webp` → `.jpg` → `.jpeg` → `.png`
 - No hardcoded language codes in components — use `lang` prop and `DEFAULT_LANGUAGE` constant
-- No local `ASSETS_SUBPATH`, `EXTENSIONS`, or resolver functions — everything from `@gogol/share`
+- No local `ASSETS_SUBPATH`, `EXTENSIONS`, or resolver functions — everything from `@warpgogol/share`
 
 See [RFC-0053](../rfcs/rfc-0053-image-resolution-contract-with-language-fallback.md) for full specification, migration guide, and acceptance criteria.
 
@@ -97,7 +97,7 @@ Every published material reference in `apps/*` needs an explicit credit record. 
 
 **Do not land uncited material.** `material.credits.validate` runs in `sites-check.author` and `build:check`; missing, duplicate, invalid, or placeholder rights records are deploy-blocking. Run `pnpm exec site-kernel run material.credits.validate --site <app>` after adding video or image assets.
 
-See [docs/authoring/material-credits.md](../authoring/material-credits.md) for author and agent templates, including owner-provided, commissioned Webgogol, and AI platform examples.
+See [docs/authoring/material-credits.md](../authoring/material-credits.md) for author and agent templates, including owner-provided, commissioned Warpgogol, and AI platform examples.
 
 ## Responsive image variants — build-portable provider (RFC-0204)
 
@@ -168,7 +168,7 @@ See [RFC-0269](../rfcs/rfc-0269-emit-a-golden-behavior-snapshot-per-app.md) for 
 
 ## HDRI identity firewall (RFC-0241)
 
-**HDRI** (Handwerk Digital Readiness Index) is an external public good, institutionally separate from the studio (a gGmbH). It is registered as the canonical CKL external source `external:hdri` (`integrations/truth-sources/external-hdri.yaml`, RFC-0214 shape). `hdri.firewall.validate` enforces this on `webgogol-com` (app-scoped, in `sites-check.author`).
+**HDRI** (Handwerk Digital Readiness Index) is an external public good, institutionally separate from the studio (a gGmbH). It is registered as the canonical CKL external source `external:hdri` (`integrations/truth-sources/external-hdri.yaml`, RFC-0214 shape). `hdri.firewall.validate` enforces this on `warpgogol-com` (app-scoped, in `sites-check.author`).
 
 - **MAY** cite HDRI figures as CKL claims (`provenance: external`, `sourceRef: external:hdri`, a validity window) and link to its Zenodo DOI as an external reference.
 - **MAY** render HDRI-derived statistics in Bedarfskarten/regional hubs and their GEO twins — always as a cited, sourced fact.

@@ -12,7 +12,7 @@
 */
 
 /**
- * @gogol/ui - Shared UI components and icons
+ * @warpgogol/ui - Shared UI components and icons
  *
  * @packageDocumentation
  */

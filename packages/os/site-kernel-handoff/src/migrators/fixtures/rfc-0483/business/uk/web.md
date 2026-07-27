@@ -1,4 +1,4 @@
 ---
 domains:
-  primary: "webgogol.com"
+  primary: "warpgogol.com"
 ---

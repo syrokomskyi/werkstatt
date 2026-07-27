@@ -21,8 +21,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { listSiteWorkspaces } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { listSiteWorkspaces } from "@warpgogol/site-kernel";
 import { parse } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 

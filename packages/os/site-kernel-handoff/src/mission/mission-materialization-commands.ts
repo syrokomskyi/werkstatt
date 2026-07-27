@@ -26,9 +26,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { executeKernelPipeline } from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { executeKernelPipeline } from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty } from "./mission-git-commit.ts";
 import { acquireLock, releaseLock } from "../werkstatt/index.ts";
@@ -180,7 +180,7 @@ export async function runMissionValidate(
       // Compute sitemap hash if sitemap exists
       const sitemapPath = path.join(workpieceDir, "dist", "sitemap-index.xml");
       if (existsSync(sitemapPath)) {
-        const { byteHashFile } = await import("@gogol/fingerprint");
+        const { byteHashFile } = await import("@warpgogol/fingerprint");
         sitemapHash = await byteHashFile(sitemapPath);
       } else {
         sitemapHash = "sha256:no-sitemap";

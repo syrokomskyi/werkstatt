@@ -3,7 +3,7 @@
 This is the catalogue of `--ds-*` design-system tokens consumed by the canonical RFC-0101..RFC-0106 section framework. It is enforced statically by:
 
 - **`tokens.colors.section-shell.lint`** (RFC-0122) — no raw `#hex` / `rgb()` / `hsl()` in the scoped CSS.
-- **`tokens.section-shell.contract.validate`** (RFC-0124) — every `--ds-*` reference resolves through `@gogol/tokens` `TOKEN_NAME_SET`.
+- **`tokens.section-shell.contract.validate`** (RFC-0124) — every `--ds-*` reference resolves through `@warpgogol/tokens` `TOKEN_NAME_SET`.
 
 Both validators run in `packages-check.run`. Their scope is identical: the eight canonical section-framework component directories under `packages/ui/src/components/`:
 

@@ -21,14 +21,14 @@ import { readFile, writeFile, mkdir, access } from "node:fs/promises";
 import path, { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { GENERATED_MARKER, hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 
 const DE_LOCALES = new Set(["de", "de-DE", "de-AT", "de-CH"]);
 // __dirname is dist/ at runtime; templates ship in src/ alongside (matches

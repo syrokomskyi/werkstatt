@@ -13,13 +13,13 @@ registrations stay in sync with actual content and schema files.</purpose>
 
 import { join, relative } from "node:path";
 import { readFile } from "node:fs/promises";
-import { collectMarkdownFiles } from "@gogol/site-kernel-content";
+import { collectMarkdownFiles } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   CONTENT_COMPONENTS_SUBPATH,
   collectLangSubdirs,
@@ -66,7 +66,7 @@ export async function runDispatcherSyncValidation(
   // --- Components dispatcher ---
   // Post-RFC-0023: the components dispatcher is OPTIONAL — uni.registry.yaml
   // (built by uni.registry.build) is now the canonical content-schema lookup.
-  // Apps that promoted all components to @gogol/ui no longer need a local
+  // Apps that promoted all components to @warpgogol/ui no longer need a local
   // schemas/components-dispatcher.ts. Apps that still maintain one are still
   // validated below (consistency with content/components/{lang}/*.md).
   let componentDispatcherSource: string | null = null;

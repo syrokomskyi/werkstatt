@@ -22,7 +22,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // Pattern that matches a direct Zod schema definition (not a re-export proxy).
@@ -80,7 +80,7 @@ async function scanApp(appDir: string, siteName: string): Promise<string[]> {
       violations.push(
         `SD-01: ${siteName}/${rel}: non-proxy Zod schema definition found. ` +
           `App-local schemas were retired in RFC-0033. ` +
-          `Move shared schemas to @gogol/share or use plain TypeScript interfaces in @gogol/ui.`,
+          `Move shared schemas to @warpgogol/share or use plain TypeScript interfaces in @warpgogol/ui.`,
       );
     }
   }

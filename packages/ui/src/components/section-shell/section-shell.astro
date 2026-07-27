@@ -2,7 +2,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  [RFC-0101 + RFC-0134] Canonical wrapper component for every shared section in @gogol/ui.
+  [RFC-0101 + RFC-0134] Canonical wrapper component for every shared section in @warpgogol/ui.
   Owns the outer <section> element, ARIA wiring, the container, background paint
   (color / image / texture / transparent / fade), optional section-level effects,
   density, tone, and the RFC-0106 motion reveal hook.
@@ -19,9 +19,9 @@
 </CHANGE_SUMMARY>
 */
 
-import { resolveEffectsForTarget, resolveImage, type SectionShellProps } from "@gogol/share";
+import { resolveEffectsForTarget, resolveImage, type SectionShellProps } from "@warpgogol/share";
 import EffectHost from "../effects/effect-host.astro";
-import ResponsiveImage from "@gogol/ui/components/responsive-image.astro";
+import ResponsiveImage from "@warpgogol/ui/components/responsive-image.astro";
 import "../section-header/section-header.css";
 import "./section-shell.css";
 

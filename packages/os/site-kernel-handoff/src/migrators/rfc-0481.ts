@@ -35,14 +35,14 @@ function mapCompanyToBusiness(
   lang: string,
 ): Record<string, unknown> {
   const company = frontmatter as LegacyCompanyFrontmatter;
-  const name = company.brand?.name ?? company.name ?? "Webgogol";
+  const name = company.brand?.name ?? company.name ?? "Warpgogol";
   const description = company.description ?? "";
   const mission = company.mission ?? "";
   const yearEstablished = company.foundingYear ? parseInt(company.foundingYear, 10) : undefined;
 
   const business: Record<string, unknown> = {
     schema: "pbp/business@1",
-    id: "https://webgogol.com/id/business",
+    id: "https://warpgogol.com/id/business",
     type: "business",
     status: "published",
     name,
@@ -50,34 +50,34 @@ function mapCompanyToBusiness(
     mission,
     brandRefs: {
       default: {
-        ref: "https://webgogol.com/id/brand",
+        ref: "https://warpgogol.com/id/brand",
         expectedType: "brand",
       },
     },
     legalIdentityRef: {
-      ref: "https://webgogol.com/id/legal-identity",
+      ref: "https://warpgogol.com/id/legal-identity",
       expectedType: "legal-identity",
     },
     placeRefs: {
       office: {
-        ref: "https://webgogol.com/id/places/backnang",
+        ref: "https://warpgogol.com/id/places/backnang",
         expectedType: "place",
       },
     },
     contactPointRefs: {
       default: {
-        ref: "https://webgogol.com/id/contact-points/general-email",
+        ref: "https://warpgogol.com/id/contact-points/general-email",
         expectedType: "contact-point",
       },
     },
     webPresenceRefs: {
       default: {
-        ref: "https://webgogol.com/id/web-presences/primary",
+        ref: "https://warpgogol.com/id/web-presences/primary",
         expectedType: "web-presence",
       },
     },
     governance: {
-      authorityRef: "https://webgogol.com/id/business",
+      authorityRef: "https://warpgogol.com/id/business",
       effectiveFrom: "2026-01-01",
       reviewEvery: "P1Y",
     },

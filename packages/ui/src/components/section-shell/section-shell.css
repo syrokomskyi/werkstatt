@@ -201,7 +201,7 @@
 
   /* -----------------------------------------------------------------------
      Adjacent-fade overlap — replaces the legacy `section[class*="--verticalFade"]`
-     utility in @gogol/tokens. Two fade-backed sections back-to-back must
+     utility in @warpgogol/tokens. Two fade-backed sections back-to-back must
      overlap so their gradients blend rather than stacking two solid
      --ds-color-bg bands.
      ----------------------------------------------------------------------- */

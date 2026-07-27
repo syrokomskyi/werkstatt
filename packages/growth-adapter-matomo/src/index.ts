@@ -14,14 +14,14 @@
 */
 
 /**
- * @gogol/growth-adapter-matomo
+ * @warpgogol/growth-adapter-matomo
  *
  * Matomo Analytics implementation of GrowthAdapter. Prefer direct subpath
  * imports for new code:
  *
- * - @gogol/growth-adapter-matomo/adapter
- * - @gogol/growth-adapter-matomo/binding
- * - @gogol/growth-adapter-matomo/transport
+ * - @warpgogol/growth-adapter-matomo/adapter
+ * - @warpgogol/growth-adapter-matomo/binding
+ * - @warpgogol/growth-adapter-matomo/transport
  */
 
 export { createMatomoAdapter, default } from "./adapter.ts";

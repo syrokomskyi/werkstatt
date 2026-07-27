@@ -10,7 +10,7 @@ This repository is optimized for a high-signal workflow for both humans and AI a
 ## Commands
 
 - `pnpm dev`
-  - Start the reference site dev server (`pnpm --filter webgogol-com start`).
+  - Start the reference site dev server (`pnpm --filter warpgogol-com start`).
 - `pnpm build`
   - Turbo build across all workspaces.
 - `pnpm build:check`

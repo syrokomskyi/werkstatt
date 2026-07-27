@@ -135,7 +135,7 @@ Disallowed by default:
 | High | Feature graph / visibility replacement | Architecture | Draft/accept feature-system RFC | Yes |
 | Medium | `getResolvedComponentContent` API naming | Compatibility API | Decide whether to keep alias or introduce clearer API | Likely |
 | Medium | Donation card local variable `componentContent` | Naming clarity | Rename during related section refactor | No |
-| Medium | `@icons/*` README references in UI docs | Doc drift | Replace with `@gogol/ui/icons` guidance | No |
+| Medium | `@icons/*` README references in UI docs | Doc drift | Replace with `@warpgogol/ui/icons` guidance | No |
 | Low | Historical RFC `apps/main` references | Archive drift | Leave unchanged or add supersession notes | No, unless lifecycle changes |
 
 ## Verification Commands
@@ -144,7 +144,7 @@ Disallowed by default:
 pnpm exec site-kernel run compass.inventory
 pnpm exec site-kernel run generator.ownership.lint
 pnpm exec site-kernel run content.surface.validate --app nicaragua-projekt
-pnpm exec site-kernel run content.surface.validate --app webgogol-com
+pnpm exec site-kernel run content.surface.validate --app warpgogol-com
 ```
 
 ## Conclusion

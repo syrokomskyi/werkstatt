@@ -25,7 +25,7 @@ The implementation correctly follows the onboarding.scaffold pattern to replace 
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/site-kernel-handoff run build:check` and `pnpm --filter @gogol/site-kernel-onboarding run build:check` both pass. `rfc.validate RFC-0389` passes.
+Pass — `pnpm --filter @warpgogol/site-kernel-handoff run build:check` and `pnpm --filter @warpgogol/site-kernel-onboarding run build:check` both pass. `rfc.validate RFC-0389` passes.
 
 ### Axis A — Structural correctness
 
@@ -41,7 +41,7 @@ No issues. DNA-47 (Materialization) is fulfilled — full boilerplate generation
 
 ### Axis C — Ecosystem fit
 
-No issues. Package boundaries are correct: `@gogol/site-kernel-handoff` imports from `@gogol/site-kernel-codegen`, `@gogol/site-kernel-onboarding`, and `@gogol/site-kernel` — all are `packages/*` dependencies. No `apps/* → apps/*` imports. Template helpers are properly exported from the onboarding package index.
+No issues. Package boundaries are correct: `@warpgogol/site-kernel-handoff` imports from `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-onboarding`, and `@warpgogol/site-kernel` — all are `packages/*` dependencies. No `apps/* → apps/*` imports. Template helpers are properly exported from the onboarding package index.
 
 ### Axis D — Forward-only compliance
 
@@ -78,7 +78,7 @@ No other issues. The template helper extraction is minimal and focused. No specu
 | Preserve staging/atomic rename | Done | Unchanged from original code |
 | Export template helpers | Done | `templates.ts` created, exported from index |
 | Unify duplicates | Done | `scaffold.ts` and `config-regenerate.ts` import from `templates.ts` |
-| Add workspace dependencies | Done | 3 deps added to `@gogol/site-kernel-handoff/package.json` |
+| Add workspace dependencies | Done | 3 deps added to `@warpgogol/site-kernel-handoff/package.json` |
 
 ### Questions for the author
 

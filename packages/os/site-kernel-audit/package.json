@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-audit",
+  "name": "@warpgogol/site-kernel-audit",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/site-kernel": "workspace:*"
+    "@warpgogol/site-kernel": "workspace:*"
   },
   "devDependencies": {
     "fast-check": "^4.9.0",

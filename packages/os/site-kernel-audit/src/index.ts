@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Public entrypoint for @gogol/site-kernel-audit — delta-scoped audit
+<purpose>Public entrypoint for @warpgogol/site-kernel-audit — delta-scoped audit
 handlers for the amend-onboarding chain (RFC-0136).</purpose>
 <non-goals>
   <item>Do not register kernel commands here — registration is the consumer's responsibility.</item>

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Architecture review — @gogol/chat</title>
+    <title>Architecture review — @warpgogol/chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
       import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
@@ -29,7 +29,7 @@
       <header class="space-y-4">
         <div class="flex items-baseline justify-between">
           <h1 class="text-3xl font-serif text-slate-900">
-            Architecture review — <code class="text-2xl">@gogol/chat</code>
+            Architecture review — <code class="text-2xl">@warpgogol/chat</code>
           </h1>
           <span class="text-sm text-slate-500">2026-07-10</span>
         </div>
@@ -120,7 +120,7 @@
               <div class="text-center text-[10px] text-slate-400">20 secrets in manifest</div>
               <div class="border-2 border-dashed border-slate-400 rounded p-2 text-xs">
                 <div class="font-semibold text-center text-[10px] text-slate-500">
-                  @gogol/share/integration
+                  @warpgogol/share/integration
                 </div>
                 <div class="text-center text-[10px] text-slate-400">
                   deliverEvent, routeEvent, qstash
@@ -174,7 +174,7 @@
           </p>
           <p class="text-sm">
             <strong>Solution.</strong> Move the delivery callback into
-            <code class="text-xs">@gogol/share/integration</code> as a
+            <code class="text-xs">@warpgogol/share/integration</code> as a
             <code class="text-xs">createDeliveryHandler(secrets, extraAdapters)</code> factory. The
             section's API route becomes a 5-line adapter that calls it. The manifest's
             <code class="text-xs">api:</code> block shrinks to the inbound route only.

@@ -16,9 +16,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { access, readdir } from "node:fs/promises";
-import { executeKernelCommand } from "@gogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
 import {
   loadAuditAppContext,
   buildAuditResult,

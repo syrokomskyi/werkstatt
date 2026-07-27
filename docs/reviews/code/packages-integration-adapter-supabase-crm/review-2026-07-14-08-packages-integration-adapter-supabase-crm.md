@@ -30,10 +30,10 @@ The diff cleanly implements RFC-0386 lifecycle sync deltas with correct port ext
 
 Pass — all four impacted packages pass `build:check`:
 
-- `@gogol/integration` — pass
-- `@gogol/integration-adapter-supabase-crm` — pass
-- `@gogol/integration-adapter-stripe` — pass
-- `@gogol/site-kernel-checks` — pass
+- `@warpgogol/integration` — pass
+- `@warpgogol/integration-adapter-supabase-crm` — pass
+- `@warpgogol/integration-adapter-stripe` — pass
+- `@warpgogol/site-kernel-checks` — pass
 
 `rfc.validate RFC-0386` — pass (0 violations). 33 tests pass (8 lifecycle + 5 PBT + 20 existing).
 
@@ -53,7 +53,7 @@ Pass — all four impacted packages pass `build:check`:
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries**: Imports flow correctly. `tenant-registry.ts` imports types from `pipedrive-sync-target.ts` (same package). `pipedrive-sync-target.ts` imports from `@gogol/integration`. Pass.
+- **Package boundaries**: Imports flow correctly. `tenant-registry.ts` imports types from `pipedrive-sync-target.ts` (same package). `pipedrive-sync-target.ts` imports from `@warpgogol/integration`. Pass.
 - **AGENTS.md updates**: `packages/integration-adapter-supabase-crm/AGENTS.md` updated with lifecycle sync documentation, new `CrmBufferReader` methods, and P3/P4 stage-map config. Pass.
 - **Command lifecycle**: `lagebild.validate` command updated from stub to actual DDL check. No new commands added. Pass.
 

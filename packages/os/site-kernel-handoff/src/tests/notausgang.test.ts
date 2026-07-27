@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0380: integration tests for notausgang.export and notausgang.validate deep integrity verification.</purpose>
 <non-goals>
-  <item>Do not test @gogol/fingerprint internals — those have their own test suite.</item>
+  <item>Do not test @warpgogol/fingerprint internals — those have their own test suite.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -18,13 +18,13 @@ import { join } from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { runNotausgangExport } from "../notausgang/notausgang-commands.ts";
 import { runNotausgangValidate } from "../notausgang/notausgang-commands.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 let workspaceRoot: string;
 
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
-    flags: flags as Record<string, import("@gogol/site-kernel").KernelFlagValue>,
+    flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
     args: [],
     argv: [],
   };
@@ -191,7 +191,7 @@ test("export writes YAML artifacts (not JSON)", async () => {
   expect(existsSync(join(outputDir, "artifact-manifest.json"))).toBe(false);
 });
 
-test("export hashes use sha256: prefix from @gogol/fingerprint", async () => {
+test("export hashes use sha256: prefix from @warpgogol/fingerprint", async () => {
   const result = await runNotausgangExport(
     makeInput({
       system: "test-site",

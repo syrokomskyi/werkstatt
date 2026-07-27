@@ -1,14 +1,14 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-Barrel export for @gogol/ontology/operations sub-path.
+Barrel export for @warpgogol/ontology/operations sub-path.
 Re-exports platform operations schemas: handoff, sternsystem, werkstatt,
 mission, release, leitstand, notausgang, materialization, artifact-store,
 naming-policy. These schemas have no relationship to UI structural vocabulary
-and are consumed primarily by @gogol/site-kernel-handoff.
+and are consumed primarily by @warpgogol/site-kernel-handoff.
 </purpose>
 <non-goals>
-  <item>Do not re-export UI ontology schemas (constellation, biome, page-entry, etc.) — those live in @gogol/ontology/schemas.</item>
+  <item>Do not re-export UI ontology schemas (constellation, biome, page-entry, etc.) — those live in @warpgogol/ontology/schemas.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

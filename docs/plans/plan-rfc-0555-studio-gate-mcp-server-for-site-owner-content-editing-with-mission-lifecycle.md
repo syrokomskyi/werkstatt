@@ -11,7 +11,7 @@ scope:
     - studio-gate
     - os/site-kernel-handoff
     - os/site-kernel-content
-    - wgogol-skills
+    - warpgogol-skills
   services: []
   docs:
     - docs/architecture-dna.md
@@ -38,7 +38,7 @@ scope:
 
 - `packages/os/site-kernel-handoff/src/workpiece/workpiece-read.ts` — new command implementation
 - `packages/os/site-kernel-handoff/src/workpiece/workpiece-write.ts` — new command implementation
-- `packages/os/site-kernel-handoff/src/workpiece/dna-22-checker.ts` — shared DNA-22 path validation (uses `loadSystemManifest` from `@gogol/site-kernel-content`)
+- `packages/os/site-kernel-handoff/src/workpiece/dna-22-checker.ts` — shared DNA-22 path validation (uses `loadSystemManifest` from `@warpgogol/site-kernel-content`)
 - `packages/os/site-kernel-handoff/src/workpiece/index.ts` — barrel export
 - `packages/os/site-kernel-handoff/src/mission/mission.module.ts` — register `workpiece.read` and `workpiece.write` commands
 - `packages/os/site-kernel-handoff/src/index.ts` — re-export workpiece commands
@@ -53,7 +53,7 @@ scope:
 - `packages/studio-gate/src/executor.ts` — command execution via child_process
 - `packages/studio-gate/src/dna-22-checker.ts` — re-export from site-kernel-handoff (or inline)
 - `packages/studio-gate/AGENTS.md` — package-level agent guide
-- `packages/wgogol-skills/skills/wg-site-content-edit/SKILL.md` — process layer skill
+- `packages/warpgogol-skills/skills/wg-site-content-edit/SKILL.md` — process layer skill
 - `tools/kernel.config.ts` — no change needed (mission module already registered; workpiece commands register in mission module)
 - `pnpm-workspace.yaml` — no change needed (packages/* glob already covers studio-gate)
 
@@ -73,9 +73,9 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm --filter @gogol/site-kernel-handoff run build:check` — typecheck
-- `pnpm --filter @gogol/site-kernel-handoff run test` — unit tests
-- `pnpm --filter @gogol/studio-gate run build:check` — typecheck
+- `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — typecheck
+- `pnpm --filter @warpgogol/site-kernel-handoff run test` — unit tests
+- `pnpm --filter @warpgogol/studio-gate run build:check` — typecheck
 - `pnpm exec site-kernel run rfc.validate RFC-0555 --json` — RFC validation
 - `pnpm exec site-kernel run ecosystem.manifest.generate` — ecosystem manifest update
 - No new pipeline checks needed — `workpiece.read`/`write` are runtime commands, not build-time validators
@@ -90,7 +90,7 @@ scope:
 
 - Create `packages/os/site-kernel-handoff/src/workpiece/dna-22-checker.ts`
 - Implement `isClientEditable(workpieceRoot: string, relativePath: string): Promise<boolean>`:
-  - Load `system.md` via `loadSystemManifest()` from `@gogol/site-kernel-content`
+  - Load `system.md` via `loadSystemManifest()` from `@warpgogol/site-kernel-content`
   - Parse `clientEditable[]` from the manifest
   - Resolve `path.resolve(workpieceRoot, relativePath)` and verify it starts with `workpieceRoot` (traversal check)
   - Pattern-match `relativePath` against `clientEditable[]` entries (same glob logic as `client.edit.validate` in `packages/os/site-kernel-checks/src/client-edit.ts`)
@@ -99,7 +99,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
+- `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
 
 **Completion criterion:** `dna-22-checker.ts` exists, exports `isClientEditable`, and typecheck passes.
 
@@ -126,7 +126,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
+- `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
 
 **Completion criterion:** `workpiece-read.ts` exists, exports `runWorkpieceRead`, and typecheck passes.
 
@@ -154,7 +154,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
+- `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
 
 **Completion criterion:** `workpiece-write.ts` exists, exports `runWorkpieceWrite`, reads from stdin, and typecheck passes.
 
@@ -175,7 +175,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
+- `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
 - `pnpm exec site-kernel run workpiece.read --help` shows the command (if `--help` is supported, otherwise verify via `command.manifest.generate`)
 
 **Completion criterion:** Both commands appear in the command manifest and are callable via `site-kernel run`.
@@ -209,7 +209,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @gogol/site-kernel-handoff run test` passes
+- `pnpm --filter @warpgogol/site-kernel-handoff run test` passes
 
 **Completion criterion:** All tests pass and cover the acceptance criteria for DNA-22 enforcement and traversal rejection.
 
@@ -224,15 +224,15 @@ scope:
 **Agent actions:**
 
 - Create `packages/studio-gate/package.json`:
-  - `name: "@gogol/studio-gate"`, `private: true`, `type: "module"`
-  - `dependencies`: `@modelcontextprotocol/sdk` (>=1.0.0), `@gogol/site-kernel-handoff` (workspace:*), `@gogol/site-kernel-content` (workspace:*)
+  - `name: "@warpgogol/studio-gate"`, `private: true`, `type: "module"`
+  - `dependencies`: `@modelcontextprotocol/sdk` (>=1.0.0), `@warpgogol/site-kernel-handoff` (workspace:*), `@warpgogol/site-kernel-content` (workspace:*)
   - `devDependencies`: `vitest`, `fast-check`, `typescript`
   - `scripts`: `build`, `build:check`, `test`, `start` (entrypoint)
 - Create `packages/studio-gate/tsconfig.json` (extend `tsconfig/base.json`)
 - Create `packages/studio-gate/turbo.json`
 - Create `packages/studio-gate/src/index.ts`:
   - Read `WERKSTATT_ROOT` env var (fallback to `process.cwd()`)
-  - Read `wg-site-content-edit` SKILL.md from `packages/wgogol-skills/skills/wg-site-content-edit/SKILL.md`
+  - Read `wg-site-content-edit` SKILL.md from `packages/warpgogol-skills/skills/wg-site-content-edit/SKILL.md`
   - Create MCP `Server` with `serverInfo.instructions`
   - Register `tools/list` and `tools/call` handlers
 - Create `packages/studio-gate/src/tools.ts`:
@@ -245,7 +245,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @gogol/studio-gate run build:check` passes
+- `pnpm --filter @warpgogol/studio-gate run build:check` passes
 - `pnpm install` resolves workspace dependencies
 
 **Completion criterion:** Package builds, typecheck passes, MCP server entrypoint exists with 12 tool definitions.
@@ -260,7 +260,7 @@ scope:
 
 **Agent actions:**
 
-- Create `packages/wgogol-skills/skills/wg-site-content-edit/SKILL.md`:
+- Create `packages/warpgogol-skills/skills/wg-site-content-edit/SKILL.md`:
   - Frontmatter: `name: wg-site-content-edit`, `description`, `invocation: mcp`, `category: wg`, `concerns: content-mutation`, `languagePolicy: ref(PREFERENCES.md)`
   - Process section: define the mission lifecycle sequence (open → materialize → read → write → commit → validate → release.prepare → leitstand.propagate alt → approve → release.publish → leitstand.propagate main → reconcile → close)
   - Boundaries: DNA-22 client-editable surface, no direct filesystem access, no auto-commit
@@ -366,9 +366,9 @@ scope:
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0555`
-- `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm --filter @gogol/site-kernel-handoff run test`
-- `pnpm --filter @gogol/studio-gate run build:check`
+- `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
+- `pnpm --filter @warpgogol/site-kernel-handoff run test`
+- `pnpm --filter @warpgogol/studio-gate run build:check`
 - `pnpm exec site-kernel run ecosystem.manifest.validate`
 - `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0555 --implementation-commit <sha>`
 
@@ -396,4 +396,4 @@ scope:
 
 - If implementation reveals an invariant conflict with DNA-22 (e.g. `clientEditable[]` pattern matching cannot be shared between `client.edit.validate` and `workpiece.read`/`write`), run `pnpm exec site-kernel run rfc.supersede.propose --id RFC-0555 --reason "..." --invariant "DNA-22"` instead of working around it.
 - If `@modelcontextprotocol/sdk` >=1.0.0 does not support `serverInfo.instructions` as expected, document the SDK version constraint and adjust the implementation to use the supported API surface.
-- If `loadSystemManifest` from `@gogol/site-kernel-content` cannot be used in the workpiece context (e.g. workpiece `system.md` has a different structure), create a shared loader function in `packages/os/site-kernel-content` instead of duplicating the parsing logic.
+- If `loadSystemManifest` from `@warpgogol/site-kernel-content` cannot be used in the workpiece context (e.g. workpiece `system.md` has a different structure), create a shared loader function in `packages/os/site-kernel-content` instead of duplicating the parsing logic.

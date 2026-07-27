@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>URL transformations and semantic ID generation for structured data. Framework-agnostic — used across all WGogol apps.</purpose>
+<purpose>URL transformations and semantic ID generation for structured data. Framework-agnostic — used across all Warpgogol apps.</purpose>
 <non-goals>
   <item>Do not perform raw URL parsing beyond basic structure validation.</item>
   <item>Do not manage application configuration or external service interactions.</item>

@@ -1,6 +1,6 @@
 ---
 schema: pbp/place@1
-id: https://webgogol.com/id/place/backnang
+id: https://warpgogol.com/id/place/backnang
 type: place
 status: draft
 name: Backnang
@@ -10,5 +10,5 @@ address:
   postalCode: "71522"
   locality: "Backnang"
 governance:
-  authorityRef: https://webgogol.com/id/business
+  authorityRef: https://warpgogol.com/id/business
 ---

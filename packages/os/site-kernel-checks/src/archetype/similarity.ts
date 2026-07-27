@@ -15,7 +15,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { loadUiManifestFiles } from "./shared.ts";
 
 interface SimilarityRow {

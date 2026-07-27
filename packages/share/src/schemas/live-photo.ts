@@ -9,7 +9,7 @@
 </purpose>
 <non-goals>
   <item>Do not carry a video/poster path — the clip is derived from the image token.</item>
-  <item>Do not implement playback or resolution — that is @gogol/ui + resolveVideo.</item>
+  <item>Do not implement playback or resolution — that is @warpgogol/ui + resolveVideo.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

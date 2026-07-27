@@ -21,7 +21,7 @@ import {
   bordbuchEntrySchema,
   type BordbuchEntry,
   type BordbuchEntryKind,
-} from "@gogol/ontology/operations";
+} from "@warpgogol/ontology/operations";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 
 const BORDBUCH_PATH = path.join("bordbuch", "events.ndjson");

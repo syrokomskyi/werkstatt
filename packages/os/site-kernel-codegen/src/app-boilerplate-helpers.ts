@@ -20,9 +20,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import type { SystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import type { SystemManifest } from "@warpgogol/site-kernel-content";
 import { hasGeneratedMarker } from "./generated-marker.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -96,9 +96,9 @@ export function normalizeRoutePath(value: string): string {
   return trimmed ? `/${trimmed}/` : "/";
 }
 
-function isWebgogolSite(manifest: SystemManifest, domain: string): boolean {
+function isWarpgogolSite(manifest: SystemManifest, domain: string): boolean {
   const appId = (manifest as unknown as { app?: string }).app;
-  return appId === "webgogol-com" || domain === "webgogol.com";
+  return appId === "warpgogol-com" || domain === "warpgogol.com";
 }
 
 function surfaceRoutesFromGenerated(appDirectory: string, defaultLang: string): string[] {
@@ -164,7 +164,7 @@ export function buildRetiredSurfaceRedirectBlock(
   appDirectory: string,
   domain: string,
 ): string {
-  if (!isWebgogolSite(manifest, domain)) return "";
+  if (!isWarpgogolSite(manifest, domain)) return "";
 
   const defaultLang = getDefaultLanguage(manifest);
   const liveRoutes = new Set([

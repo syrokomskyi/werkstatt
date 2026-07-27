@@ -12,7 +12,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import { parseDocument } from "yaml";
 import type {
   CheckResult,
@@ -20,8 +20,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { calculateOfferCapacityState, type OfferCapacityPolicy } from "@gogol/share/offer-capacity";
+} from "@warpgogol/site-kernel";
+import { calculateOfferCapacityState, type OfferCapacityPolicy } from "@warpgogol/share/offer-capacity";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const COMMAND = "offer.capacity.validate";

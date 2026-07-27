@@ -49,7 +49,7 @@ describe("createMetricsPusher", () => {
       { endpoint: "https://nonexistent.invalid.example", token: "abc" },
       { timeoutMs: 100 },
     );
-    pusher!.counterAdd("wgogol_factory_smoke_total", 1);
+    pusher!.counterAdd("warpgogol_factory_smoke_total", 1);
     const result = await pusher!.flush();
     expect(result.delivered).toBe(false);
     expect(result.reason).toBeDefined();
@@ -63,7 +63,7 @@ describe("createMetricsPusher", () => {
       { endpoint: "https://10.255.255.1", token: "abc" },
       { timeoutMs: 50 },
     );
-    pusher!.counterAdd("wgogol_factory_smoke_total", 1);
+    pusher!.counterAdd("warpgogol_factory_smoke_total", 1);
     const start = Date.now();
     const result = await pusher!.flush();
     const elapsed = Date.now() - start;

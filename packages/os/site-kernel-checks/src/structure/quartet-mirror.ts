@@ -14,13 +14,13 @@ alignment for page routes (RFC-0014).</purpose>
 
 import { basename, dirname, join, relative } from "node:path";
 import { readFile } from "node:fs/promises";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { fileExists } from "../lib/file-exists.ts";
 import { PAGES_NON_ROUTE_SUBDIRS } from "../lib/route-constants.ts";
 import {

@@ -1,6 +1,6 @@
 import { test, expect, describe, vi } from "vitest";
 import { runAuditDeltaRun } from "../delta.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 function makeInput(flags: Record<string, string> = {}, args: string[] = []): KernelCommandInput {
   return {

@@ -7,11 +7,11 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303 Phase 3: extracted from biome-tokens.ts as part of the domain split.</item>
-  <item>Consolidated: delegates to @gogol/ontology projectBiomeToTokens — single source of truth.</item>
+  <item>Consolidated: delegates to @warpgogol/ontology projectBiomeToTokens — single source of truth.</item>
 </CHANGE_SUMMARY>
 */
 
-import { projectBiomeToTokens } from "@gogol/ontology";
+import { projectBiomeToTokens } from "@warpgogol/ontology";
 
 // Build expected CSS from biome YAML using the canonical projection.
 export function buildExpectedBiomeCss(biome: Record<string, unknown>): Map<string, string> {

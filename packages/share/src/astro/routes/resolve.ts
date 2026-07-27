@@ -39,7 +39,7 @@ export interface RootCanonical {
 /**
  * Build the root-entry canonical contract from the route registry.
  *
- * @param siteUrl Absolute site origin (e.g. "https://webgogol.com").
+ * @param siteUrl Absolute site origin (e.g. "https://warpgogol.com").
  */
 export async function getRootCanonical(siteUrl: string): Promise<RootCanonical> {
   const registry = await getRouteRegistry();

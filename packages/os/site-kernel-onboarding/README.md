@@ -1,6 +1,6 @@
-# @gogol/site-kernel-onboarding
+# @warpgogol/site-kernel-onboarding
 
-New-app scaffold and readiness checklist for the WGogol Site OS (DNA-36, RFC-0029).
+New-app scaffold and readiness checklist for the Warpgogol Site OS (DNA-36, RFC-0029).
 
 ## Commands
 
@@ -30,7 +30,7 @@ pnpm exec site-kernel run onboarding.checklist --site acme
 ## Wiring
 
 ```typescript
-import { createOnboardingModule } from "@gogol/site-kernel-onboarding";
+import { createOnboardingModule } from "@warpgogol/site-kernel-onboarding";
 
 export default defineKernelConfig({
   modules: [createOnboardingModule()],
@@ -49,18 +49,18 @@ The templates in `src/templates/` produce the full canonical app skeleton includ
 
 ## Business layer wiring
 
-After scaffolding, wire the `@gogol/pbp` layer to provide canonical business data via PBP entities (RFC-0471):
+After scaffolding, wire the `@warpgogol/pbp` layer to provide canonical business data via PBP entities (RFC-0471):
 
 1. **Add dependency** (already in scaffolded `package.json`):
 
    ```json
-   "@gogol/pbp": "workspace:*"
+   "@warpgogol/pbp": "workspace:*"
    ```
 
 2. **Wire the collection** in `src/content.config.ts`:
 
    ```ts
-   import { pbpCollections } from "@gogol/pbp/astro";
+   import { pbpCollections } from "@warpgogol/pbp/astro";
    export const collections = {
      ...pbpCollections,
      // other collections...
@@ -78,7 +78,7 @@ After scaffolding, wire the `@gogol/pbp` layer to provide canonical business dat
 
 4. **Use in components**:
    ```ts
-   import { getPbpBusiness, getPbpOfferings } from "@gogol/pbp/loaders";
+   import { getPbpBusiness, getPbpOfferings } from "@warpgogol/pbp/loaders";
    const business = await getPbpBusiness("de");
    const offerings = await getPbpOfferings("de");
    ```
@@ -88,5 +88,5 @@ After scaffolding, wire the `@gogol/pbp` layer to provide canonical business dat
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-onboarding build:check
+pnpm --filter @warpgogol/site-kernel-onboarding build:check
 ```

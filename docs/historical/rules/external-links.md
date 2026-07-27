@@ -1,6 +1,6 @@
 # External Links Convention
 
-This rule defines the standard for marking and styling external links in the webgogol-3 project.
+This rule defines the standard for marking and styling external links in the warpgogol-3 project.
 
 ## Core rule
 

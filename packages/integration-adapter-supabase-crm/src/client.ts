@@ -33,7 +33,7 @@ import type {
   SyncOutboxOp,
   SyncOutboxRow,
   SyncOutboxStatus,
-} from "@gogol/integration/crm-buffer";
+} from "@warpgogol/integration/crm-buffer";
 import { rest, type FetchImpl, type SupabaseClientConfig } from "./supabase-rest.ts";
 
 export type { SupabaseClientConfig } from "./supabase-rest.ts";

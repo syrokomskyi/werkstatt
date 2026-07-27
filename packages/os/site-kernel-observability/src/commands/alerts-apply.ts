@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import {
   createSignozApiClient,
   type SignozAlertRule,
@@ -39,7 +39,7 @@ function buildPlan(
   for (const rule of ALERT_RULES) {
     desiredRules.set(rule.id, {
       ...rule,
-      labels: { ...rule.labels, managed_by: "wgogol" },
+      labels: { ...rule.labels, managed_by: "warpgogol" },
     });
   }
 
@@ -93,8 +93,8 @@ export async function runObservabilityAlertsApply(
 ): Promise<KernelCommandResult<CheckResult>> {
   const dryRun = input.argv.includes("--dry-run");
 
-  const apiUrl = process.env["WGOGOL_SIGNOZ_API_URL"];
-  const apiToken = process.env["WGOGOL_SIGNOZ_API_TOKEN"];
+  const apiUrl = process.env["WARPGOGOL_SIGNOZ_API_URL"];
+  const apiToken = process.env["WARPGOGOL_SIGNOZ_API_TOKEN"];
 
   if (!apiUrl || !apiToken) {
     return diagnosticsResult("observability.alerts.apply", [
@@ -102,9 +102,9 @@ export async function runObservabilityAlertsApply(
         ruleId: "OBS-ALR-APPLY-ENV",
         severity: "error",
         file: "",
-        message: "WGOGOL_SIGNOZ_API_URL and WGOGOL_SIGNOZ_API_TOKEN must be set to apply alerts.",
+        message: "WARPGOGOL_SIGNOZ_API_URL and WARPGOGOL_SIGNOZ_API_TOKEN must be set to apply alerts.",
         fixHint:
-          "Set both env vars: WGOGOL_SIGNOZ_API_URL=https://observe.webgogol.com WGOGOL_SIGNOZ_API_TOKEN=<key>",
+          "Set both env vars: WARPGOGOL_SIGNOZ_API_URL=https://observe.warpgogol.com WARPGOGOL_SIGNOZ_API_TOKEN=<key>",
       },
     ]);
   }

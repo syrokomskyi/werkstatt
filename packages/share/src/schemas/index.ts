@@ -1,10 +1,10 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-RFC-0264: barrel for the entire @gogol/share schemas domain — base page schema,
+RFC-0264: barrel for the entire @warpgogol/share schemas domain — base page schema,
 navigation, feature policy, and the RFC-0101..0106/0202/0210/0220/0231/0257
 canonical section-visual / section-content / media / material-credit / print
-contracts. Consumers should prefer `@gogol/share/schemas` over the deprecated
+contracts. Consumers should prefer `@warpgogol/share/schemas` over the deprecated
 root barrel.
 </purpose>
 <non-goals>
@@ -12,7 +12,7 @@ root barrel.
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0264: initial creation — aggregates the schemas/ domain for the @gogol/share/schemas subpath.</item>
+  <item>RFC-0264: initial creation — aggregates the schemas/ domain for the @warpgogol/share/schemas subpath.</item>
 </CHANGE_SUMMARY>
 */
 

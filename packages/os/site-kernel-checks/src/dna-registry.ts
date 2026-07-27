@@ -22,10 +22,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { listRegisteredKernelCommands, listRegisteredKernelPipelines } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { listRegisteredKernelCommands, listRegisteredKernelPipelines } from "@warpgogol/site-kernel";
 import { diagnosticsResult, failResult } from "./result-helpers.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const DNA_REGISTRY = "docs/architecture-dna.md";
 const RFC_DIR = "docs/rfcs";

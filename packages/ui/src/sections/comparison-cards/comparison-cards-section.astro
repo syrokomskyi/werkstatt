@@ -15,11 +15,11 @@
 
 /* RFC-0103: comparison-cards thin dispatcher — comparison body. */
 
-import type { SectionProps } from "@gogol/share/page";
-import { cast, need, resolveSectionAnchor } from "@gogol/share";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import SectionComparison from "@gogol/ui/components/section-body/comparison.astro";
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@warpgogol/share";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import SectionComparison from "@warpgogol/ui/components/section-body/comparison.astro";
 import type { ComparisonCardsSectionContent } from "./comparison-cards-section.types.generated.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;

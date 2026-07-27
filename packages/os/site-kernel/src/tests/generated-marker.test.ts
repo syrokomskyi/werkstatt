@@ -36,12 +36,12 @@ test("buildGeneratedHeader: .ts uses line-slash comments", () => {
   const header = buildGeneratedHeader({
     filePath: "tools/kernel.config.ts",
     ownerCommand: "kernel.wire",
-    site: "webgogol-com",
+    site: "warpgogol-com",
   });
   expect(header.startsWith(`// ${GENERATED_MARKER}\n`)).toBeTruthy();
   expect(header).toMatch(/^\/\/ Owner command: kernel\.wire$/m);
   expect(header).toMatch(
-    /^\/\/ Regenerate:   pnpm exec site-kernel run kernel\.wire --site webgogol-com$/m,
+    /^\/\/ Regenerate:   pnpm exec site-kernel run kernel\.wire --site warpgogol-com$/m,
   );
   expect(hasGeneratedMarker(header)).toBeTruthy();
 });
@@ -93,11 +93,11 @@ test("stripGeneratedMarker removes the full line-comment advisory block", () => 
     filePath: "tools/kernel.config.ts",
     ownerCommand: "kernel.wire",
   });
-  const content = `${header}import { defineKernelConfig } from "@gogol/site-kernel";\n`;
+  const content = `${header}import { defineKernelConfig } from "@warpgogol/site-kernel";\n`;
   const { changed, content: stripped } = stripGeneratedMarker(content);
   expect(changed).toBe(true);
   expect(hasGeneratedMarker(stripped)).toBe(false);
-  expect(stripped).toBe('import { defineKernelConfig } from "@gogol/site-kernel";\n');
+  expect(stripped).toBe('import { defineKernelConfig } from "@warpgogol/site-kernel";\n');
 });
 
 test("stripGeneratedMarker removes the full HTML block advisory header", () => {

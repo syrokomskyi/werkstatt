@@ -16,13 +16,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { projectServices } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { projectServices } from "@warpgogol/share/semantic";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
-import type { Diagnostic } from "@gogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/site-kernel";
 
 type ServiceFile = {
   path: string;

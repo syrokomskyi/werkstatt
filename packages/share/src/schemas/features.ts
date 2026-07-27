@@ -12,7 +12,7 @@ copy-pasting. Canonical home per RFC-0033.
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0033: Moved from app content schemas/features to @gogol/share. Import switched from "astro/zod" to "zod" for framework neutrality.</item>
+  <item>RFC-0033: Moved from app content schemas/features to @warpgogol/share. Import switched from "astro/zod" to "zod" for framework neutrality.</item>
   <item>RFC-0183: Added Feature Policy schema for policy embedded in existing RFC-0047 content domains.</item>
 </CHANGE_SUMMARY>
 */
@@ -80,7 +80,7 @@ export const featureComponentSchema = z.object({
  *
  * This is a FEATURE-GRAPH concept — it determines how the visibility engine
  * classifies and processes a section. It is NOT the per-section SemanticRole
- * from @gogol/ontology (DNA-17, RFC-0023), which identifies each section
+ * from @warpgogol/ontology (DNA-17, RFC-0023), which identifies each section
  * individually (hero, dna, final-cta, …) and lives in manifest.yaml.
  *
  * SectionKind values:

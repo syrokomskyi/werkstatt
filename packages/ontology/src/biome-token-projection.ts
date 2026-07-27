@@ -7,7 +7,7 @@ projection (RFC-0071). Consumed by biome.css.generate (codegen), biome.contract.
 divergent copies of the same mapping.
 </purpose>
 <non-goals>
-  <item>Do not validate token names against @gogol/tokens — that is the checks package's job.</item>
+  <item>Do not validate token names against @warpgogol/tokens — that is the checks package's job.</item>
   <item>Do not format CSS for emission — callers handle formatting.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -218,7 +218,7 @@ export function projectBiomeToTokens(biome: Record<string, unknown>): Map<string
 /**
  * All token names produced by the projection (primary + aliases + derived).
  * Used by biome.contract.validate to check that every mapped token exists in
- * the @gogol/tokens TOKEN_NAME_SET.
+ * the @warpgogol/tokens TOKEN_NAME_SET.
  */
 export function getAllProjectedTokenNames(): readonly string[] {
   const names = new Set<string>();

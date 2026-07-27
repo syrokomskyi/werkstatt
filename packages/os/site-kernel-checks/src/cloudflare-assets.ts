@@ -24,10 +24,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { fileExists } from "./lib/file-exists.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 /** Matches an `_astro/<file>.<imgext>` origin path anywhere (after any /cdn-cgi/image/ prefix). */
 const ASTRO_ASSET_RE = /_astro\/[A-Za-z0-9._-]+\.(?:webp|avif|jpg|jpeg|png|gif|svg)/gi;

@@ -21,7 +21,7 @@ import {
   type DeliveryRegion,
   type DeliveryTier,
   type ShardAssignment,
-} from "@gogol/integration";
+} from "@warpgogol/integration";
 
 /** A declared destination from system.md integrations.destinations[]. */
 export interface DeclaredDestination {

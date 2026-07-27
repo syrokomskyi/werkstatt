@@ -21,7 +21,7 @@ The diff fixes three real build-check failures (page-markdown base path, media-l
 
 ### Mechanical floor
 
-**Partial pass** — `tsc --noEmit` passes for `@gogol/site-kernel-checks` and `@gogol/ui`. However, `vitest run src/tests/surface-media-leakage-validate.test.ts` **fails 1 test**:
+**Partial pass** — `tsc --noEmit` passes for `@warpgogol/site-kernel-checks` and `@warpgogol/ui`. However, `vitest run src/tests/surface-media-leakage-validate.test.ts` **fails 1 test**:
 
 ```
 FAIL  detects context-aware prohibited string Gemini inside figcaption
@@ -44,7 +44,7 @@ The test encodes the old inverted behavior (flag patterns *inside* credit contex
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries** — Pass. `material-credit.astro` imports `labelForSourceType` from `@gogol/share`, which is the correct package.
+- **Package boundaries** — Pass. `material-credit.astro` imports `labelForSourceType` from `@warpgogol/share`, which is the correct package.
 - **Pipeline placement** — Pass. No new commands; existing validators fixed in place.
 - **Compass sync** — N/A. No repository-wide requirements or contracts changed.
 - **AGENTS.md updates** — N/A. No new rules or patterns introduced.
@@ -70,7 +70,7 @@ The test encodes the old inverted behavior (flag patterns *inside* credit contex
 
 - **False positives** — The `stripCreditContext` regex uses non-greedy `[\s\S]*?` which will fail on nested `<details>` or `<dl>` elements (matches first closing tag). Not a regression — the same pattern was in `extractCreditContextHtml` before. In practice, MaterialCredit does not nest these elements.
 - **Edge cases** — The `surfaceRoutePaths` filtering correctly skips non-surface pages. The `routeFromHtmlPath` function already normalizes with `.replace(/\/+/g, "/")`, so the normalization in `surfaceRoutePaths` is consistent.
-- **Migration path** — The credit YAML data fix (replacing `commissioned-webgogol-material` with human-readable labels) was done via `sed` across 14 files in the workpiece. This is a data fix, not a code fix — new credit files could still contain raw enum values in `license.label`. Consider adding a validator for `license.label` content.
+- **Migration path** — The credit YAML data fix (replacing `commissioned-warpgogol-material` with human-readable labels) was done via `sed` across 14 files in the workpiece. This is a data fix, not a code fix — new credit files could still contain raw enum values in `license.label`. Consider adding a validator for `license.label` content.
 
 ### Spec compliance
 

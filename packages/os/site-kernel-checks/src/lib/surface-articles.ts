@@ -22,8 +22,8 @@ import { parse as yamlParse } from "yaml";
 
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
-import { loadLazySurfacePages } from "@gogol/share/astro/surface-routes";
-import type { PageEntry } from "@gogol/surface";
+import { loadLazySurfacePages } from "@warpgogol/share/astro/surface-routes";
+import type { PageEntry } from "@warpgogol/surface";
 
 export interface SurfaceArticleTypedEntry {
   pageId: string;

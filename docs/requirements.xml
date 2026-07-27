@@ -8,7 +8,7 @@
 
   <vision>
     <statement>
-      WGogol Platform uses Compass as the repository-wide operating model for AI-assisted engineering.
+      Warpgogol Platform uses Compass as the repository-wide operating model for AI-assisted engineering.
       The goal is deterministic, architecture-aware work across a Turborepo that contains reusable kernel packages in `packages/`
       and deployable sites in `apps/`.
     </statement>
@@ -145,7 +145,7 @@
 
   <changelog-os-requirements>
     <requirement id="cl-req-01">
-      The changelog pipeline lives in `@gogol/site-kernel-changelog` at `packages/os/site-kernel-changelog/src/changelog/` and is wired into each app via `tools/modules/changelog.module.ts`. Invoked per-app via `pnpm changelog:generate`.
+      The changelog pipeline lives in `@warpgogol/site-kernel-changelog` at `packages/os/site-kernel-changelog/src/changelog/` and is wired into each app via `tools/modules/changelog.module.ts`. Invoked per-app via `pnpm changelog:generate`.
     </requirement>
     <requirement id="cl-req-02">
       All AI calls must be rate-limited (p-limit 5) and results cached in SQLite WAL mode with a composite key: TreeHash + files.sort() + diffSummary + promptHash + modelVersion.
@@ -203,7 +203,7 @@
       Do not treat `spec/` or `todo/` as primary implementation authority when the same rule already exists in `AGENTS.md` or `docs/*.xml`.
     </requirement>
     <requirement id="req-10">
-      Shared icon assets and generated icon components must be owned by `packages/ui`; apps consume them through `@gogol/ui` imports instead of restoring app-local icon trees.
+      Shared icon assets and generated icon components must be owned by `packages/ui`; apps consume them through `@warpgogol/ui` imports instead of restoring app-local icon trees.
     </requirement>
     <requirement id="req-11">
       Workspace-scoped site OS commands that operate on shared packages or repository-wide assets must be registered in the repository root `tools/kernel.config.ts`.
@@ -212,7 +212,7 @@
       Published videos and content image tokens in `apps/*` must carry RFC-0220 material credits via `*.credits.yaml` sidecars. The credits record is the canonical source for inline disclosure, generated credits pages, and deploy-time validation.
     </requirement>
     <requirement id="req-13">
-      Internal site circulation uses the RFC-0221 handoff model: thin authored-site bundles are validated and migrated forward against the recipient ecosystem by `@gogol/site-kernel-handoff`; `client.export` remains the external full-fork deliverable.
+      Internal site circulation uses the RFC-0221 handoff model: thin authored-site bundles are validated and migrated forward against the recipient ecosystem by `@warpgogol/site-kernel-handoff`; `client.export` remains the external full-fork deliverable.
     </requirement>
     <requirement id="req-13a">
       Deployable backend runtime compositions live in `services/*`. Services are composition-only workspaces for runtime entrypoints, deployment config, environment/store/queue selection, and health checks; reusable schemas, adapters, validators, reports, browser capture, and shared logic belong in `packages/*`.
@@ -290,7 +290,7 @@
       Fleet-level PSEO operation must be coordinated by a stateless Leitstand over per-site primitives. `fleet.status.collect` reads per-system Bordbuch projections, autonomy, visibility, breaker, and escalation status; `fleet.schedule.plan` emits a fair, budget-clipped work queue that never clips safety jobs; `fleet.killswitch` can freeze autonomous action across the fleet without approving content or replacing site state.
     </requirement>
     <requirement id="req-35">
-      Pipeline command results are cached by declared `reads` hash + module hash (RFC-0390). Every registered kernel command MUST declare `reads: string[]` (non-empty picomatch globs) or `cacheable: false`. The `command.reads.validate` command enforces this contract in `PACKAGES_CHECK_PIPELINE`. The cache reuses the existing `CacheLayer` (RFC-0382) with a `command_results` namespace; only `ok: true` results are cached. `--force` bypasses cache reads; `dryRun` bypasses entirely. All hashing uses `@gogol/fingerprint` (DNA-53).
+      Pipeline command results are cached by declared `reads` hash + module hash (RFC-0390). Every registered kernel command MUST declare `reads: string[]` (non-empty picomatch globs) or `cacheable: false`. The `command.reads.validate` command enforces this contract in `PACKAGES_CHECK_PIPELINE`. The cache reuses the existing `CacheLayer` (RFC-0382) with a `command_results` namespace; only `ok: true` results are cached. `--force` bypasses cache reads; `dryRun` bypasses entirely. All hashing uses `@warpgogol/fingerprint` (DNA-53).
     </requirement>
     <requirement id="req-36">
       Sites may declare `businessModel: b2b-only` in `src/content/system.md` to enforce B2B-only content constraints. When declared, `b2b.model.validate` (in `sites-check-author` pipeline) checks that no B2C consumer-protection page entries (e.g., `widerruf`, `musterWiderruf`), route slugs, navigation labels, or statutory references (§ 312g/312j BGB, Verbraucher-Widerrufsrecht) remain in content. Sites may also declare `retiredRoutes` — an array of `{ slug, status: 410 }` entries that the codegen emits as 410 Gone tombstones in `_redirects` (RFC-0487).

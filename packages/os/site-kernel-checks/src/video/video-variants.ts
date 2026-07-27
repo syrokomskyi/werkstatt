@@ -32,18 +32,18 @@
 import { join, relative, basename, extname, dirname } from "node:path";
 import { readdir, readFile, writeFile, mkdir, stat, copyFile, unlink } from "node:fs/promises";
 import { execFile } from "node:child_process";
-import { fileExists, collectFiles } from "@gogol/share/fs";
-import { byteHash } from "@gogol/fingerprint";
+import { fileExists, collectFiles } from "@warpgogol/share/fs";
+import { byteHash } from "@warpgogol/fingerprint";
 import { promisify } from "node:util";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { GENERATED_MARKER } from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import type { VideoManifest, VideoManifestEntry, MediaProfile } from "@gogol/share/schemas/media";
+} from "@warpgogol/site-kernel";
+import { GENERATED_MARKER } from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import type { VideoManifest, VideoManifestEntry, MediaProfile } from "@warpgogol/share/schemas/media";
 import { readDefaultLanguageCode } from "../lib/i18n.ts";
 
 const execFileAsync = promisify(execFile);

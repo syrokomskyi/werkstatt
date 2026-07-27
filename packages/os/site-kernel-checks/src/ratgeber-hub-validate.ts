@@ -26,8 +26,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { ARTIFACT_FILE, readLangs } from "./surface/shared.ts";
 
@@ -195,8 +195,8 @@ export async function runRatgeberHubValidate(
     defaultLang,
   );
   if (existsSync(categoriesDir)) {
-    const { collectMarkdownFiles } = await import("@gogol/site-kernel-content");
-    const { parseMarkdownFrontmatter } = await import("@gogol/site-kernel-content");
+    const { collectMarkdownFiles } = await import("@warpgogol/site-kernel-content");
+    const { parseMarkdownFrontmatter } = await import("@warpgogol/site-kernel-content");
     try {
       const catFiles = await collectMarkdownFiles(categoriesDir);
       for (const catFile of catFiles) {

@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
   RFC-0271 command/runtime helper for Programmatic Surface module contexts declared in
-  app src/content/system.md. This file is the I/O boundary around the pure @gogol/surface
+  app src/content/system.md. This file is the I/O boundary around the pure @warpgogol/surface
   module-context contract.
 </purpose>
 <non-goals>
@@ -21,13 +21,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   findDuplicateBlueprintClaims,
   findModuleForBlueprint,
   type SurfaceModuleContext,
-} from "@gogol/surface";
-import { loadSurfaceModuleContexts, type LoadedModuleContexts } from "@gogol/surface/io";
+} from "@warpgogol/surface";
+import { loadSurfaceModuleContexts, type LoadedModuleContexts } from "@warpgogol/surface/io";
 import { diagnosticsResult } from "../result-helpers.ts";
 
 export { loadSurfaceModuleContexts, type LoadedModuleContexts };

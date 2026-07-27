@@ -13,12 +13,12 @@ archetype usage is unique per page and layer shape is well-formed.</purpose>
 
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { siteBackgroundLayerSchema } from "@gogol/share/schemas/site-background";
+import { siteBackgroundLayerSchema } from "@warpgogol/share/schemas/site-background";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   ok,
   fail,

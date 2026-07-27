@@ -56,7 +56,7 @@ nonGoals:
 
 ## Context
 
-RFC-0176 made each client's site the integration hub: a source produces an `IntegrationEvent`, a per-client Cloudflare Queue carries it, and a **per-client consumer Worker** runs the `gogol-adapter` destinations with the client's tokens. The pilot ([apps/webgogol-com](../../apps/webgogol-com)) ships exactly this: a producer binding in [`wrangler.jsonc`](../../apps/webgogol-com/wrangler.jsonc) and a standalone consumer in [`workers/integration-consumer`](../../apps/webgogol-com/workers/integration-consumer/src/index.ts).
+RFC-0176 made each client's site the integration hub: a source produces an `IntegrationEvent`, a per-client Cloudflare Queue carries it, and a **per-client consumer Worker** runs the `gogol-adapter` destinations with the client's tokens. The pilot ([apps/warpgogol-com](../../apps/warpgogol-com)) ships exactly this: a producer binding in [`wrangler.jsonc`](../../apps/warpgogol-com/wrangler.jsonc) and a standalone consumer in [`workers/integration-consumer`](../../apps/warpgogol-com/workers/integration-consumer/src/index.ts).
 
 The studio now commits to operating client sites ("digital foundations") **at scale on its own Cloudflare account** — hundreds today, thousands over time — building its own site through the same ecosystem it will sell. A client who leaves must be able to redeploy onto their own Cloudflare account with no data migration. The per-client topology of RFC-0176 does not survive that commitment, because Cloudflare's per-account limits bind well before "thousands":
 
@@ -89,7 +89,7 @@ This RFC **amends RFC-0176**. The per-client queue and per-client consumer are *
 
 ## Architectural fit
 
-- **Amends RFC-0176.** Same package (`@gogol/share/integration`), same port and adapter contracts, same "execution on the client's site with the client's tokens" guarantee — now reached via dynamic dispatch instead of a co-located consumer. Only the delivery topology and the one PII-transit non-goal change.
+- **Amends RFC-0176.** Same package (`@warpgogol/share/integration`), same port and adapter contracts, same "execution on the client's site with the client's tokens" guarantee — now reached via dynamic dispatch instead of a co-located consumer. Only the delivery topology and the one PII-transit non-goal change.
 - **RFC-0149 deploy / RFC-0180.** Tenant config and shard assignment are generated, not hand-edited; the shared queues/DLQ/KV are provisioned by the mechanism RFC-0180 specifies. This restores RFC-0081 compliance for `wrangler.jsonc`.
 - **RFC-0177 privacy.** The DPA gains the shared transient-transit clause; the no-datastore and token-isolation properties it relies on are unchanged.
 - **RFC-0168 / RFC-0169 / RFC-0175.** Sources (send-message form, UChat chat widget) and entitlement gating are unchanged — they now target the ingest endpoint rather than a direct producer binding.
@@ -146,7 +146,7 @@ The `site → shard` mapping is **derived** from `siteId` + `region` (no central
 ### TypeScript contracts
 
 ```ts
-// @gogol/share/integration — additive to the RFC-0176 port.
+// @warpgogol/share/integration — additive to the RFC-0176 port.
 
 /** Region/jurisdiction a site's delivery is pinned to. Closed catalog. */
 export type DeliveryRegion = "eu" | "us";
@@ -201,8 +201,8 @@ export interface DispatchExecuteResult {
   "command": "integration.config.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "unknown-delivery-region", "value": "apac" },
-    { "app": "webgogol-com", "rule": "dedicated-tier-without-volume-justification", "siteId": "webgogol-com" }
+    { "app": "warpgogol-com", "rule": "unknown-delivery-region", "value": "apac" },
+    { "app": "warpgogol-com", "rule": "dedicated-tier-without-volume-justification", "siteId": "warpgogol-com" }
   ]
 }
 ```
@@ -214,8 +214,8 @@ The ingest Worker rejects an unsigned/invalid post with 401 and does not enqueue
 ## Rollout
 
 - **Phase 0 (spike, gates the rest):** empirically confirm the WfP unknowns before code — (a) can a tenant Worker be reached by dynamic dispatch on an internal route under load; (b) does the ingest→queue→consumer→dispatch loop work end-to-end; (c) measured ceiling on queues a single consumer can drain (informs `N`). Record results in this RFC before it leaves `draft`.
-- **Phase 1:** introduce `resolveShard`, the dispatch contract, and the shared consumer fan-out in `@gogol/share`; keep the pilot working on a **single `eu-shared-00` shard with one consumer** (behavior-preserving; webgogol-com moves off its standalone per-site consumer).
-- **Phase 2:** move webgogol-com onto WfP as a tenant Worker; the form + UChat post to the shared ingest Worker; the Pipedrive adapter runs via `/internal/integration-route`. Validators green.
+- **Phase 1:** introduce `resolveShard`, the dispatch contract, and the shared consumer fan-out in `@warpgogol/share`; keep the pilot working on a **single `eu-shared-00` shard with one consumer** (behavior-preserving; warpgogol-com moves off its standalone per-site consumer).
+- **Phase 2:** move warpgogol-com onto WfP as a tenant Worker; the form + UChat post to the shared ingest Worker; the Pipedrive adapter runs via `/internal/integration-route`. Validators green.
 - **Phase 3:** generalize provisioning + naming to many sites (RFC-0180); add a second region shard and a `dedicated`-tier path when the first heavy client appears.
 - New apps inherit `integrations.region` (default per studio policy) and `tier: shared` from the scaffold; everything else off.
 
@@ -238,12 +238,12 @@ The ingest Worker rejects an unsigned/invalid post with 401 and does not enqueue
 ## Acceptance criteria
 
 - [x] Phase 0 spike results (WfP dynamic-dispatch execution, ingest→queue→consumer loop, consumer-per-queue density, Cloudflare residency findings) recorded in this RFC <!-- BLOCKED: requires a live Cloudflare WfP account; cannot be run in-repo. Gates the live runtime wiring below. --> (evidence: implemented historically)
-- [x] `DeliveryRegion`, `ShardAssignment`, `resolveShard` (pure, deterministic) defined in `@gogol/share/integration` <!-- packages/share/src/integration/sharding.ts; 11 unit tests (sharding.test.ts) green --> (evidence: packages/ directory, package exists)
+- [x] `DeliveryRegion`, `ShardAssignment`, `resolveShard` (pure, deterministic) defined in `@warpgogol/share/integration` <!-- packages/share/src/integration/sharding.ts; 11 unit tests (sharding.test.ts) green --> (evidence: packages/ directory, package exists)
 - [x] Dispatch contract (`DispatchExecuteRequest`/`Result`) + tenant route handler body that executes gogol-adapter destinations with local secrets only <!-- packages/share/src/integration/dispatch.ts: executeDispatch (handler body) + DISPATCH_ROUTE; dispatch.test.ts green. The Astro route file + shared ingest/consumer Workers are live-wiring, pending the Phase 0 spike. --> (evidence: packages/ directory, package exists)
 - [x] Shared consumer fan-out routes via dynamic dispatch; never reads a destination token; dedup against the region KV; retries → DLQ <!-- dispatchToTenant() implements the token-free pump + ack/retry mapping (test asserts no token in the dispatched body). Deploying it as a Worker bound to each shard queue is live-wiring (Phase 0). --> (evidence: implemented historically)
 - [x] `integration.config.validate` learns `region`/`tier`, rejects unknown region/tier, and drops per-client-queue assumptions <!-- site-kernel-checks/src/integration.ts: unknown-delivery-region / unknown-delivery-tier rules. "Unjustified dedicated" not enforced — no volume signal exists yet; documented omission. --> (evidence: implemented historically)
 - [x] RFC-0176 `amendedBy` lists RFC-0179; RFC-0177 DPA records the shared in-flight PII-transit clause <!-- RFC-0176 frontmatter updated; RFC-0177 clause 6 added --> (evidence: implemented historically)
-- [x] webgogol-com pilot runs on a shared shard with adapter execution via dynamic dispatch; validators green; existing form→Pipedrive behavior preserved <!-- PARTIAL: system.md region/tier=eu/shared, wrangler.jsonc regenerated to tenant form (no queue/KV bindings), integration.shard.json emitted (gogol-int-eu-shared-03), per-site consumer marked retired; validators + full turbo build:check green. Live dynamic-dispatch run is gated on the Phase 0 spike. --> (evidence: implemented historically)
+- [x] warpgogol-com pilot runs on a shared shard with adapter execution via dynamic dispatch; validators green; existing form→Pipedrive behavior preserved <!-- PARTIAL: system.md region/tier=eu/shared, wrangler.jsonc regenerated to tenant form (no queue/KV bindings), integration.shard.json emitted (gogol-int-eu-shared-03), per-site consumer marked retired; validators + full turbo build:check green. Live dynamic-dispatch run is gated on the Phase 0 spike. --> (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging <!-- all 166 RFCs pass --> (evidence: implemented historically)
 
 ## Implementation notes for agents

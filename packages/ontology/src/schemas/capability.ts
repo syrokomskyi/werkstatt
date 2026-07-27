@@ -8,7 +8,7 @@ lossless projection to both OpenAPI (RFC-0289) and MCP tool schemas (RFC-0290).
 </purpose>
 <non-goals>
   <item>Do not resolve entitlements or active-capability logic here — that is
-        @gogol/share/agent/capability.ts (resolveActiveCapabilities).</item>
+        @warpgogol/share/agent/capability.ts (resolveActiveCapabilities).</item>
   <item>Do not widen the JSON-Schema subset beyond what OpenAPI + MCP both
         accept verbatim — widening requires an RFC amending RFC-0288.</item>
 </non-goals>

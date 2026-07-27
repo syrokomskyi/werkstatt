@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseEnvExample, checkEnvContract06 } from "../env/env-contract.ts";
-import type { Diagnostic } from "@gogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/site-kernel";
 
 const VALID_ENV_EXAMPLE = `# Header comment
 # How to obtain: Example header

@@ -1,12 +1,12 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Node.js check runner for the check-webgogol ecosystem: captures site evidence graphs via Playwright and provides runner info.</purpose>
+<purpose>Node.js check runner for the check-warpgogol ecosystem: captures site evidence graphs via Playwright and provides runner info.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Migrated to @gogol/fingerprint byteHash directly (prefixed format), removing the legacy sha256Hex wrapper.</item>
+  <item>Migrated to @warpgogol/fingerprint byteHash directly (prefixed format), removing the legacy sha256Hex wrapper.</item>
   <item>Extracted DOM evidence extraction into dom-extract.ts seam for testability.</item>
   <item>Deepened getCheckRunnerInfo: the const is now the single source of truth; the type is derived via typeof.</item>
 </CHANGE_SUMMARY>
@@ -19,12 +19,12 @@ import {
   type CheckTarget,
   type PageEvidence,
   type SiteEvidenceGraph,
-} from "@gogol/check-core";
-import { byteHash } from "@gogol/fingerprint";
+} from "@warpgogol/check-core";
+import { byteHash } from "@warpgogol/fingerprint";
 import { extractPageEvidenceFromDOM } from "./dom-extract.ts";
 
 export const CHECK_RUNNER_INFO = {
-  name: "@gogol/check-runner-node",
+  name: "@warpgogol/check-runner-node",
   artifactVersion: 1,
   capabilities: {
     targetValidation: true,

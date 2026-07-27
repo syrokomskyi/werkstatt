@@ -49,16 +49,16 @@ These RFCs form the core architectural arc. Agents MUST read them before touchin
 
 **Page routes (DNA-25):**
 
-- Every `apps/*/src/pages/[lang]/[...slug].astro` calls `buildPage(entry, ctx)` from `@gogol/share` and iterates `ResolvedBlock[]`. No hand-assembled composition. Route must stay ≤ 40 lines.
+- Every `apps/*/src/pages/[lang]/[...slug].astro` calls `buildPage(entry, ctx)` from `@warpgogol/share` and iterates `ResolvedBlock[]`. No hand-assembled composition. Route must stay ≤ 40 lines.
 
 **RuntimeContext (DNA-26):**
 
-- `RuntimeContext` from `@gogol/share` has exactly three fields: `locale` (active), `segment` (null at build time), `flags` ({} at build time). Never construct build-time context with non-null `segment` or non-empty `flags`.
+- `RuntimeContext` from `@warpgogol/share` has exactly three fields: `locale` (active), `segment` (null at build time), `flags` ({} at build time). Never construct build-time context with non-null `segment` or non-empty `flags`.
 - `{ segment }` and `{ flag }` visibility clauses are valid to author today and will activate when RFC-0027 Growth lands. They do not fail parse; they always evaluate `false` at build time.
 
 **Growth (DNA-27–30):**
 
-- Never call vendor SDKs (`window.gtag`, `window.plausible`, etc.) directly in `packages/ui/` or `apps/*/src/`. Every emission goes through `emit(eventId, payload)` from `@gogol/growth`.
+- Never call vendor SDKs (`window.gtag`, `window.plausible`, etc.) directly in `packages/ui/` or `apps/*/src/`. Every emission goes through `emit(eventId, payload)` from `@warpgogol/growth`.
 - Every event id must exist in `packages/ontology/growth/events/`. Adding a new event without a catalog entry fails `growth.events.validate`.
 - `system.md growth.<concern>` is scalar — one vendor per concern, permanently. Multi-vendor per concern is forbidden.
 - Default pre-hydration hiding for conditional blocks is `visibility: hidden` (preserves layout box). Opt-in `display: none` via `hideMode: collapse` is forbidden above the first two blocks of a page.
@@ -99,9 +99,9 @@ Why: `dist/` is an ephemeral build output. Writing there directly bypasses Astro
 
 ## Turbo cache contract for app builds (RFC-0259)
 
-`turbo.json` declares `"cache": false` for the `webgogol-com`/`nicaragua-projekt` `build` and `build:check` tasks, and a root `//#registry:build` task (`uni.registry.build` + `archetype.registry.build`, declared outputs, cached) that both apps' build tasks depend on. This is deliberate: an app build self-mutates far beyond `dist/**`/`.astro/**` (image/video variants, `src/*.generated.json`, `sitemap.xml`, …), so a turbo cache hit would restore only the declared outputs and leave every other generated artifact stale or missing.
+`turbo.json` declares `"cache": false` for the `warpgogol-com`/`nicaragua-projekt` `build` and `build:check` tasks, and a root `//#registry:build` task (`uni.registry.build` + `archetype.registry.build`, declared outputs, cached) that both apps' build tasks depend on. This is deliberate: an app build self-mutates far beyond `dist/**`/`.astro/**` (image/video variants, `src/*.generated.json`, `sitemap.xml`, …), so a turbo cache hit would restore only the declared outputs and leave every other generated artifact stale or missing.
 
-**Agents MUST NOT re-enable turbo caching for app `build`/`build:check` tasks** (i.e. remove or flip `"cache": false` back to `true`/omitted on `webgogol-com#build`, `nicaragua-projekt#build`, or their `build:check` counterparts) **without both**:
+**Agents MUST NOT re-enable turbo caching for app `build`/`build:check` tasks** (i.e. remove or flip `"cache": false` back to `true`/omitted on `warpgogol-com#build`, `nicaragua-projekt#build`, or their `build:check` counterparts) **without both**:
 
 1. rfc-0266-generated task `outputs` (the command manifest's declared read/write paths — hand-listing outputs is explicitly rejected, see rfc-0259 Alternatives), and
 2. a green `pipeline.cache.parity --site <name>` run cited in the same change, for both apps.

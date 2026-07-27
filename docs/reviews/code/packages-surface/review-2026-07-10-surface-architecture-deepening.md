@@ -20,11 +20,11 @@ filesReviewed:
 
 ## Verdict: Needs revision
 
-The change introduces a well-structured deepening of `@gogol/surface` and its consumer, but the `pipeline.ts` module contract claims immutability while its functions mutate `VirtualRouteEntry` in-place — a direct `MODULE_CONTRACT` violation. Two dead-code items and one unused export round out the findings.
+The change introduces a well-structured deepening of `@warpgogol/surface` and its consumer, but the `pipeline.ts` module contract claims immutability while its functions mutate `VirtualRouteEntry` in-place — a direct `MODULE_CONTRACT` violation. Two dead-code items and one unused export round out the findings.
 
 ## Mechanical floor
 
-Pass — `tsc --noEmit` for `@gogol/surface` and `@gogol/site-kernel-checks` both exit 0. Tests: 7/7 pass (surface-localized-slug + pseo-safety).
+Pass — `tsc --noEmit` for `@warpgogol/surface` and `@warpgogol/site-kernel-checks` both exit 0. Tests: 7/7 pass (surface-localized-slug + pseo-safety).
 
 ## Axis A — Structural correctness
 
@@ -40,13 +40,13 @@ Pass — `tsc --noEmit` for `@gogol/surface` and `@gogol/site-kernel-checks` bot
 
 - **DNA-42 (Compass markup) — Pass.** All three new files (`decision-composer.ts`, `governance/index.ts`, `pipeline.ts`) carry `MODULE_CONTRACT` with `<purpose>` ≥ 10 words and ≥ 1 `<non-goals>` item, and `CHANGE_SUMMARY` with ≥ 1 item. Updated files (`geo.ts`, `index.ts`) have updated `CHANGE_SUMMARY`.
 
-- **DNA-1 (monorepo boundary) — Pass.** `pipeline.ts` imports from `@gogol/surface` and `@gogol/share/string-utils` — correct direction. No `apps/* → apps/*` or `apps/* → services/*` imports.
+- **DNA-1 (monorepo boundary) — Pass.** `pipeline.ts` imports from `@warpgogol/surface` and `@warpgogol/share/string-utils` — correct direction. No `apps/* → apps/*` or `apps/* → services/*` imports.
 
 - **DNA-24/DNA-25 — Pass.** No block-declarative or buildPage changes.
 
 ## Axis C — Ecosystem fit
 
-- **Package boundaries — Pass.** `@gogol/surface` remains the lower-level package; `pipeline.ts` lives in `site-kernel-checks` (the consumer), which is correct.
+- **Package boundaries — Pass.** `@warpgogol/surface` remains the lower-level package; `pipeline.ts` lives in `site-kernel-checks` (the consumer), which is correct.
 
 - **Compass sync — Not applicable.** No `docs/*.xml` changes needed — the deepening is internal to existing modules.
 

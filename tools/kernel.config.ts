@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Workspace-level kernel configuration for WGogol platform.</purpose>
+<purpose>Workspace-level kernel configuration for Warpgogol platform.</purpose>
 <keywords>workspace, configuration, platform</keywords>
 <responsibilities>
   <item>Registers workspace-scoped modules and commands.</item>
@@ -13,7 +13,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <MODULE_MAP>
-  <entry key="icons.generate">Generates icon components for @gogol/ui package.</entry>
+  <entry key="icons.generate">Generates icon components for @warpgogol/ui package.</entry>
   <entry key="onboarding.scaffold">Generates a fully RFC-compliant new app skeleton (RFC-0029 / DNA-36).</entry>
   <entry key="onboarding.checklist">Emits a readiness report for an in-progress app (RFC-0029 / DNA-36).</entry>
   <entry key="kernel.wire">Generates app-local tools/ kernel wiring from system.md (RFC-0078).</entry>
@@ -55,14 +55,14 @@
 </CHANGE_SUMMARY>
 */
 
-import { defineKernelConfig } from "@gogol/site-kernel/types";
-import { PACKAGES_CHECK_PIPELINE } from "@gogol/site-kernel-checks/pipelines/packages-check";
+import { defineKernelConfig } from "@warpgogol/site-kernel/types";
+import { PACKAGES_CHECK_PIPELINE } from "@warpgogol/site-kernel-checks/pipelines/packages-check";
 
 export default defineKernelConfig({
-  name: "webgogol-platform",
-  description: "WGogol platform workspace configuration",
+  name: "warpgogol-platform",
+  description: "Warpgogol platform workspace configuration",
   moduleLoaders: {
-    icons: async () => (await import("@gogol/site-kernel/icons")).iconsModule,
+    icons: async () => (await import("@warpgogol/site-kernel/icons")).iconsModule,
     "forge-core": async () => (await import("@webgogol/forge/os/core")).forgeCoreModule,
     "forge-compass": async () => (await import("@webgogol/forge/os/compass")).forgeCompassModule,
     "forge-naming": async () => (await import("@webgogol/forge/os/naming-module")).forgeNamingModule,
@@ -73,47 +73,47 @@ export default defineKernelConfig({
     "forge-audit": async () => (await import("@webgogol/forge/os/audit-module")).forgeAuditModule,
     "forge-session": async () =>
       (await import("@webgogol/forge/os/session-module")).forgeSessionModule,
-    lagebild: async () => (await import("@gogol/site-kernel/lagebild-module")).lagebildModule,
+    lagebild: async () => (await import("@warpgogol/site-kernel/lagebild-module")).lagebildModule,
     "commit-message": async () =>
-      (await import("@gogol/site-kernel/commit-message")).commitMessageModule,
+      (await import("@warpgogol/site-kernel/commit-message")).commitMessageModule,
     "pipeline-budget": async () =>
-      (await import("@gogol/site-kernel/pipeline-budget")).pipelineBudgetModule,
+      (await import("@warpgogol/site-kernel/pipeline-budget")).pipelineBudgetModule,
     "command-manifest": async () =>
-      (await import("@gogol/site-kernel/command-manifest-module")).commandManifestModule,
-    cache: async () => (await import("@gogol/site-kernel/cache-module")).cacheModule,
+      (await import("@warpgogol/site-kernel/command-manifest-module")).commandManifestModule,
+    cache: async () => (await import("@warpgogol/site-kernel/cache-module")).cacheModule,
     check: async () =>
-      (await import("@gogol/site-kernel-checks/module")).createStandardCheckModule(),
+      (await import("@warpgogol/site-kernel-checks/module")).createStandardCheckModule(),
     observability: async () =>
-      (await import("@gogol/site-kernel-observability/module")).observabilityModule,
+      (await import("@warpgogol/site-kernel-observability/module")).observabilityModule,
     onboarding: async () =>
-      (await import("@gogol/site-kernel-onboarding/module")).createOnboardingModule(),
+      (await import("@warpgogol/site-kernel-onboarding/module")).createOnboardingModule(),
     handoff: async () =>
-      (await import("@gogol/site-kernel-handoff/handoff-module")).createHandoffModule(),
+      (await import("@warpgogol/site-kernel-handoff/handoff-module")).createHandoffModule(),
     sternsystem: async () =>
-      (await import("@gogol/site-kernel-handoff/sternsystem-module")).createSternsystemModule(),
+      (await import("@warpgogol/site-kernel-handoff/sternsystem-module")).createSternsystemModule(),
     "forge-werkstatt": async () =>
       (await import("@webgogol/forge/os/werkstatt")).forgeWerkstattModule,
     "forge-spec": async () => (await import("@webgogol/forge/os/spec-module")).forgeSpecModule,
     mission: async () =>
-      (await import("@gogol/site-kernel-handoff/mission-module")).createMissionModule(),
+      (await import("@warpgogol/site-kernel-handoff/mission-module")).createMissionModule(),
     bordbuch: async () =>
-      (await import("@gogol/site-kernel-handoff/bordbuch-module")).createBordbuchModule(),
+      (await import("@warpgogol/site-kernel-handoff/bordbuch-module")).createBordbuchModule(),
     "artifact-store": async () =>
       (
-        await import("@gogol/site-kernel-handoff/artifact-store-module")
+        await import("@warpgogol/site-kernel-handoff/artifact-store-module")
       ).createArtifactStoreModule(),
     "behavior-snapshot": async () =>
       (
-        await import("@gogol/site-kernel-handoff/behavior-snapshot-module")
+        await import("@warpgogol/site-kernel-handoff/behavior-snapshot-module")
       ).createBehaviorSnapshotModule(),
     release: async () =>
-      (await import("@gogol/site-kernel-handoff/release-module")).createReleaseModule(),
+      (await import("@warpgogol/site-kernel-handoff/release-module")).createReleaseModule(),
     leitstand: async () =>
-      (await import("@gogol/site-kernel-handoff/leitstand-module")).createLeitstandModule(),
+      (await import("@warpgogol/site-kernel-handoff/leitstand-module")).createLeitstandModule(),
     notausgang: async () =>
-      (await import("@gogol/site-kernel-handoff/notausgang-module")).createNotausgangModule(),
+      (await import("@warpgogol/site-kernel-handoff/notausgang-module")).createNotausgangModule(),
     platform: async () =>
-      (await import("@gogol/site-kernel-handoff/platform-module")).createPlatformModule(),
+      (await import("@warpgogol/site-kernel-handoff/platform-module")).createPlatformModule(),
   },
   pipelines: {
     // Workspace-level pipelines

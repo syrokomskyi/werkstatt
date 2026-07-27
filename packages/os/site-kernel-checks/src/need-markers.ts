@@ -23,9 +23,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { collectFiles } from "@gogol/share/fs";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const MARKER_RE = /NEED_THIS_[A-Z][A-Z0-9_]*/g;
 

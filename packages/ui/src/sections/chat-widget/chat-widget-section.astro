@@ -3,7 +3,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0175: render a consent-gated, click-to-load chat launcher. The first-party launcher is
 the only thing present pre-activation; the vendor script loads only after the visitor clicks (handled
-by the colocated client script + @gogol/chat/client). The vendor binding is read from system.md
+by the colocated client script + @warpgogol/chat/client). The vendor binding is read from system.md
 integrations.chat (engineering-owned); the launcher carries the RFC-0177 legal notice.</purpose>
 <non-goals>
   <item>Do not render any third-party script/iframe/origin in server output (RFC-0177).</item>
@@ -16,11 +16,11 @@ integrations.chat (engineering-owned); the launcher carries the RFC-0177 legal n
 */
 
 import { getCollection } from "astro:content";
-import type { SectionProps } from "@gogol/share/page";
-import { cast, need, resolveSectionAnchor, resolveSemanticTarget } from "@gogol/share";
-import { ChatWidgetConfigSchema, CHAT_CONFIG_SCRIPT_ID } from "@gogol/chat";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast, need, resolveSectionAnchor, resolveSemanticTarget } from "@warpgogol/share";
+import { ChatWidgetConfigSchema, CHAT_CONFIG_SCRIPT_ID } from "@warpgogol/chat";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import type { ChatWidgetSectionContent } from "./chat-widget-section.types.generated.ts";
 import "./chat-widget-section.css";
 

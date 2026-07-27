@@ -27,12 +27,12 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { fileExists } from "./lib/file-exists.ts";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const POSTER_EXTENSIONS = [".webp", ".jpg", ".jpeg", ".png"];
 /** Frontmatter keys that may hold the image token paired with a sibling `live` config. */

@@ -18,8 +18,8 @@ and ratgeber.provenance.validate (RG-PROV-03/RG-PROV-06).
 import { join } from "node:path";
 import { readdir } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
-import { claimRecordSchema, type ClaimRecord } from "@gogol/share/schemas";
-import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+import { claimRecordSchema, type ClaimRecord } from "@warpgogol/share/schemas";
+import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 
 export interface LoadedClaimRecord extends ClaimRecord {
   filePath: string;

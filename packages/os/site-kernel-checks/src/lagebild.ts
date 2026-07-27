@@ -6,7 +6,7 @@ is present and its required environment variables are documented. No per-site
 Workers are allowed; all sites share the single workspace worker.</purpose>
 <non-goals>
   <item>Do not deploy or run the worker — validate workspace structure only.</item>
-  <item>Do not manage tenant lifecycle — that is handled by the CLI handlers in @gogol/site-kernel.</item>
+  <item>Do not manage tenant lifecycle — that is handled by the CLI handlers in @warpgogol/site-kernel.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -22,7 +22,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 
 const WORKER_DIR = "services/lagebild-sync-worker";

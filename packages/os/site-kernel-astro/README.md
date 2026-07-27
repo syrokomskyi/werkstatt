@@ -1,6 +1,6 @@
-# @gogol/site-kernel-astro
+# @warpgogol/site-kernel-astro
 
-Astro-specific path adapter for the WGogol Site OS. Resolves canonical directory paths for any app following the standard Astro site layout.
+Astro-specific path adapter for the Warpgogol Site OS. Resolves canonical directory paths for any app following the standard Astro site layout.
 
 ## Purpose
 
@@ -14,7 +14,7 @@ import {
   getAstroSitePathsFromApp,
   requireAstroSitePaths,
   type AstroSitePaths,
-} from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel-astro";
 ```
 
 ### `AstroSitePaths` shape
@@ -33,7 +33,7 @@ import {
 ### Usage in a kernel command
 
 ```typescript
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 
 export async function runMyCheck(input, context) {
   const paths = requireAstroSitePaths(context); // throws if no app in context
@@ -46,5 +46,5 @@ export async function runMyCheck(input, context) {
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-astro build:check
+pnpm --filter @warpgogol/site-kernel-astro build:check
 ```

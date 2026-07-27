@@ -23,16 +23,16 @@ import {
   type KernelCommandResult,
   type KernelRuntimeContext,
   buildGeneratedHeader,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import {
   resolveEntitlements,
   isValidFeature,
   resolvePseoBudget,
   STRIPE_FEATURE_LOOKUP_MAP,
   type EntitledFeature,
-} from "@gogol/share/entitlement";
+} from "@warpgogol/share/entitlement";
 import { failResult } from "./result-helpers.ts";
 
 const GENERATED_FILE = "src/entitlements.generated.yaml";

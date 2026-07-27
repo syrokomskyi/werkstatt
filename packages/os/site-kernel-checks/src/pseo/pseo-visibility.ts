@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   clusterOutcomeSchema,
   visibilitySnapshotSchema,
@@ -28,8 +28,8 @@ import {
   type ClusterOutcome,
   type VisibilitySnapshot,
   type VirtualRouteEntry,
-} from "@gogol/surface";
-import type { OutcomesPayload } from "@gogol/surface/io";
+} from "@warpgogol/surface";
+import type { OutcomesPayload } from "@warpgogol/surface/io";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const SURFACE_ARTIFACT_FILE = "src/surface.generated.yaml";
@@ -512,4 +512,4 @@ export async function runVisibilityActionPlan(
   };
 }
 
-export { readVisibilityOutcomes, type OutcomesPayload } from "@gogol/surface/io";
+export { readVisibilityOutcomes, type OutcomesPayload } from "@warpgogol/surface/io";

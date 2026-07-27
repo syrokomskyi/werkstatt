@@ -20,8 +20,8 @@ const TEST_INDEX: ContentRefIndex = {
         },
       },
       legal: {
-        de: { companyName: "Webgogol GmbH" },
-        en: { companyName: "Webgogol Ltd." },
+        de: { companyName: "Warpgogol GmbH" },
+        en: { companyName: "Warpgogol Ltd." },
       },
     },
     pages: {
@@ -41,19 +41,19 @@ test("resolveReference — resolves a simple braceless reference", () => {
 test("resolveReference — resolves a nested field path", () => {
   const result = resolveReference(TEST_INDEX, "business.legal.companyName", "de", "de");
   expect(result.resolved).toBe(true);
-  expect(result.value).toBe("Webgogol GmbH");
+  expect(result.value).toBe("Warpgogol GmbH");
 });
 
 test("resolveReference — falls back to default language", () => {
   const result = resolveReference(TEST_INDEX, "business.legal.companyName", "fr", "de");
   expect(result.resolved).toBe(true);
-  expect(result.value).toBe("Webgogol GmbH");
+  expect(result.value).toBe("Warpgogol GmbH");
 });
 
 test("resolveReference — uses English when lang is en", () => {
   const result = resolveReference(TEST_INDEX, "business.legal.companyName", "en", "de");
   expect(result.resolved).toBe(true);
-  expect(result.value).toBe("Webgogol Ltd.");
+  expect(result.value).toBe("Warpgogol Ltd.");
 });
 
 test("resolveReference — REF-01: missing collection", () => {
@@ -126,7 +126,7 @@ test("resolveReferencesDeep — resolves references in nested objects", async ()
 test("resolveReferencesDeep — handles arrays of objects", async () => {
   const data = [{ name: "business.legal.companyName" }, { name: "plain" }];
   const out = await resolveReferencesDeep(TEST_INDEX, data, "de", "de");
-  expect(out).toEqual([{ name: "Webgogol GmbH" }, { name: "plain" }]);
+  expect(out).toEqual([{ name: "Warpgogol GmbH" }, { name: "plain" }]);
 });
 
 test("resolveReferencesDeep — empty index returns data unchanged", async () => {

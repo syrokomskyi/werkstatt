@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
   [RFC-0248] Focused content asset contract validator. It verifies that authored asset
-  tokens are checked through the shared @gogol/content-source candidate-generation contract
+  tokens are checked through the shared @warpgogol/content-source candidate-generation contract
   before downstream material-credit validation runs.
 </purpose>
 <non-goals>
@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { assetReferenceDiagnostics, collectAssetReferenceFindings } from "./asset-reference.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 

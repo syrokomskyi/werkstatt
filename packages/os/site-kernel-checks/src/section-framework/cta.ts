@@ -16,7 +16,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import type { AstroParseHandle } from "../lib/astro-parse.ts";
 import {
   getAstro,

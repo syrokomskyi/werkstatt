@@ -17,8 +17,8 @@ astro-aware caller.
 </CHANGE_SUMMARY>
 */
 
-import type { AgentSurfaceManifest } from "@gogol/share/agent";
-import type { CapabilityRecord } from "@gogol/ontology";
+import type { AgentSurfaceManifest } from "@warpgogol/share/agent";
+import type { CapabilityRecord } from "@warpgogol/ontology";
 import type { AgentGatePorts } from "./ports.ts";
 import { createFixedWindowLimiter, type RateLimiter } from "./limits.ts";
 import { validateAgainstCapabilitySchema, buildIntegrationEventFromAction } from "./actions.ts";

@@ -30,19 +30,19 @@ This is **not** a studio-central, multi-tenant service. We never pool many clien
 
 ## Part 1 — The chat widget (RFC-0175)
 
-A consent-gated, vendor-agnostic popup chat. Piloted with **UChat** on `apps/webgogol-com`.
+A consent-gated, vendor-agnostic popup chat. Piloted with **UChat** on `apps/warpgogol-com`.
 
 ### Click-to-load (the privacy mechanism)
 
-The page renders only a **first-party launcher button**. No third-party script, iframe, network request, or storage exists until the visitor **clicks**. On click, `@gogol/chat/client` (`bindChatLauncher`) dynamically imports the configured adapter, calls `load()` (which injects the vendor script), then `open()`. This is stronger than a cookie banner — nothing third-party loads to be consented to in the first place — and is why **no cookie banner / CMP** is used.
+The page renders only a **first-party launcher button**. No third-party script, iframe, network request, or storage exists until the visitor **clicks**. On click, `@warpgogol/chat/client` (`bindChatLauncher`) dynamically imports the configured adapter, calls `load()` (which injects the vendor script), then `open()`. This is stronger than a cookie banner — nothing third-party loads to be consented to in the first place — and is why **no cookie banner / CMP** is used.
 
 ### Packages
 
 | Package | Role |
 | --- | --- |
-| `@gogol/chat` | `ChatWidgetAdapter` contract, `ChatWidgetConfig`, click-to-load loader, closed `CHAT_ADAPTER_IDS` |
-| `@gogol/chat-adapter-uchat` | UChat adapter — the ONLY place the UChat origin appears. Loads `https://www.uchat.com.au/js/widget/<widgetId>/popup.js` |
-| `@gogol/chat-adapter-null` | No-op default (CI/dev/unentitled) |
+| `@warpgogol/chat` | `ChatWidgetAdapter` contract, `ChatWidgetConfig`, click-to-load loader, closed `CHAT_ADAPTER_IDS` |
+| `@warpgogol/chat-adapter-uchat` | UChat adapter — the ONLY place the UChat origin appears. Loads `https://www.uchat.com.au/js/widget/<widgetId>/popup.js` |
+| `@warpgogol/chat-adapter-null` | No-op default (CI/dev/unentitled) |
 | `packages/ui/src/sections/chat-widget/` | The first-party launcher section + the inbound API route (see Part 2) |
 
 ### Configure a site
@@ -73,9 +73,9 @@ blocks:
 
 ### Add a new chat vendor
 
-1. New package `@gogol/chat-adapter-<vendor>` implementing `ChatWidgetAdapter` (`load()` injects the vendor script lazily; `open()`).
-2. Add the id to `CHAT_ADAPTER_IDS` in `@gogol/chat/src/port.ts`.
-3. Register a **static** `import("@gogol/chat-adapter-<vendor>")` in the **host's** adapter-loader map — the chat-widget section client (`packages/ui/src/sections/chat-widget/chat-widget-section.client.ts`) builds a `ChatAdapterLoaders` map and passes it to `bindChatLauncher`. Static so the bundler code-splits it into a resolvable async chunk (a `/* @vite-ignore */` variable import is **not** bundled and fails in the browser). The map lives in the host, not in `@gogol/chat`, so the port package has no adapter dependency (avoids a workspace cycle: adapters → `@gogol/chat`).
+1. New package `@warpgogol/chat-adapter-<vendor>` implementing `ChatWidgetAdapter` (`load()` injects the vendor script lazily; `open()`).
+2. Add the id to `CHAT_ADAPTER_IDS` in `@warpgogol/chat/src/port.ts`.
+3. Register a **static** `import("@warpgogol/chat-adapter-<vendor>")` in the **host's** adapter-loader map — the chat-widget section client (`packages/ui/src/sections/chat-widget/chat-widget-section.client.ts`) builds a `ChatAdapterLoaders` map and passes it to `bindChatLauncher`. Static so the bundler code-splits it into a resolvable async chunk (a `/* @vite-ignore */` variable import is **not** bundled and fails in the browser). The map lives in the host, not in `@warpgogol/chat`, so the port package has no adapter dependency (avoids a workspace cycle: adapters → `@warpgogol/chat`).
 
 Never import a chat vendor SDK in `apps/*` or section code.
 
@@ -83,7 +83,7 @@ Never import a chat vendor SDK in `apps/*` or section code.
 
 ## Part 2 — The integration hub (RFC-0176, amends RFC-0168)
 
-Contracts live in `@gogol/integration` (pure — secrets are an injected bag; no `astro:env`, no vendor SDK).
+Contracts live in `@warpgogol/integration` (pure — secrets are an injected bag; no `astro:env`, no vendor SDK).
 
 ### Normalized event
 
@@ -120,11 +120,11 @@ integrations:
 
 - **send-message form** — in-process (the existing RFC-0168 path), `/api/send-message`.
 - **chat widget** — out-of-process. UChat's flow POSTs the `IntegrationEvent` to the **section-owned route** `/api/integration-inbound`, authenticated by `INTEGRATION_INBOUND_SECRET`. The route is emitted by `api.routes.generate` from the chat-widget manifest's `api[]` block (which also projects the secrets into the env schema).
-- **Stripe billing webhook** (RFC-0191) — out-of-process. Stripe POSTs to `/api/stripe-webhook`; the route verifies the signature and maps the Stripe event to an `IntegrationEvent` via `@gogol/integration-adapter-stripe` (no Stripe SDK — raw `fetch` + `node:crypto`). Stripe is the billing authority; Lagebild is the mirror. This source feeds the Visitor Sales Funnel (RFC-0188) lifecycle — see `docs/specs/visitor-funnel/`.
+- **Stripe billing webhook** (RFC-0191) — out-of-process. Stripe POSTs to `/api/stripe-webhook`; the route verifies the signature and maps the Stripe event to an `IntegrationEvent` via `@warpgogol/integration-adapter-stripe` (no Stripe SDK — raw `fetch` + `node:crypto`). Stripe is the billing authority; Lagebild is the mirror. This source feeds the Visitor Sales Funnel (RFC-0188) lifecycle — see `docs/specs/visitor-funnel/`.
 
 ### Add a new destination
 
-Implement `DestinationAdapter` (`kind`, `vendor`, `requiredSecrets`, `route(event, secrets)`) in `@gogol/integration/adapters.ts`, register it in `DESTINATION_ADAPTERS`, and add the `(kind, vendor)` to the catalog. `gogol-adapter` reads secrets from the injected bag only.
+Implement `DestinationAdapter` (`kind`, `vendor`, `requiredSecrets`, `route(event, secrets)`) in `@warpgogol/integration/adapters.ts`, register it in `DESTINATION_ADAPTERS`, and add the `(kind, vendor)` to the catalog. `gogol-adapter` reads secrets from the injected bag only.
 
 ---
 
@@ -132,10 +132,10 @@ Implement `DestinationAdapter` (`kind`, `vendor`, `requiredSecrets`, `route(even
 
 A reliability-positioned studio cannot drop a lead when a destination is briefly down — and a German-`e.V.`/SME client base means lead PII must stay physically in the EU. The delivery substrate therefore uses **Upstash QStash + Redis (eu-central-1, Frankfurt)**, not Cloudflare Queues/KV. **Full spec: `docs/specs/integration-delivery.md` (authoritative).**
 
-- Each source **publishes** the `IntegrationEvent` to QStash via `buildQstashPublish()` (`@gogol/integration/qstash.ts`): `Upstash-Deduplication-Id = eventId`, bounded `Upstash-Retries`, exponential backoff → DLQ on exhaustion.
+- Each source **publishes** the `IntegrationEvent` to QStash via `buildQstashPublish()` (`@warpgogol/integration/qstash.ts`): `Upstash-Deduplication-Id = eventId`, bounded `Upstash-Retries`, exponential backoff → DLQ on exhaustion.
 - QStash signs a webhook to the single fan-out route **`/api/integration-route`** (declared by both the send-message and chat-widget manifests; `api.routes.generate` dedupes the route). The handler: (1) verifies the QStash signature (`@upstash/qstash` `Receiver`); (2) idempotency-checks via `restRedisLedger.firstSeen(eventId)` (Upstash Redis `SET NX`, short TTL — never PII); (3) runs `deliverEvent()` (channels + CRM, with the client's tokens); (4) sends the email notification through Cloudflare Email Routing (`send_email` binding). `200` → done; non-2xx → QStash retries → DLQ.
 
-> **Why not Cloudflare Queues/KV?** Regional Services (the data-localization mechanism) excludes non-HTTP triggers (Queues, Cron), and Workers KV has no jurisdiction restriction — so lead PII through a CF Queue could be processed on non-EU infrastructure, failing the firm EU-only requirement. `cloudflare.residency.validate` now **fails the build** if a `wrangler.jsonc` declares `kv_namespaces` or `queues`. The CF-queue primitives still exported from `@gogol/integration` (`enqueueEvent`, `consumeIntegrationBatch`, `kvDedup`) are **legacy** and are not on the EU path; the per-site consumer Worker (`apps/<id>/workers/integration-consumer/`) was **retired**.
+> **Why not Cloudflare Queues/KV?** Regional Services (the data-localization mechanism) excludes non-HTTP triggers (Queues, Cron), and Workers KV has no jurisdiction restriction — so lead PII through a CF Queue could be processed on non-EU infrastructure, failing the firm EU-only requirement. `cloudflare.residency.validate` now **fails the build** if a `wrangler.jsonc` declares `kv_namespaces` or `queues`. The CF-queue primitives still exported from `@warpgogol/integration` (`enqueueEvent`, `consumeIntegrationBatch`, `kvDedup`) are **legacy** and are not on the EU path; the per-site consumer Worker (`apps/<id>/workers/integration-consumer/`) was **retired**.
 
 - The substrate holds events **in-flight only** — it is **never a datastore** of leads/conversations (RFC-0177 clause 4). The Redis ledger stores short-TTL `eventId` keys, never PII.
 
@@ -182,8 +182,8 @@ The code, routes, and unit tests are in place. To activate live delivery (full v
 3. **EU execution** — enable Cloudflare Regional Services (EU) on the site's zone so the Worker itself runs in-region (Data Localization Suite entitlement); `cloudflare.regional-services.validate` checks the live config.
 4. **Local end-to-end test**:
    ```bash
-   pnpm --filter webgogol-com build
-   wrangler dev -c apps/webgogol-com/wrangler.jsonc --persist-to .wrangler/state
+   pnpm --filter warpgogol-com build
+   wrangler dev -c apps/warpgogol-com/wrangler.jsonc --persist-to .wrangler/state
    # POST a signed IntegrationEvent to /api/integration-inbound → it publishes to QStash,
    # QStash calls back /api/integration-route → verify · dedup · deliver.
    ```
@@ -192,7 +192,7 @@ The code, routes, and unit tests are in place. To activate live delivery (full v
 
 ---
 
-## Pilot status (webgogol-com)
+## Pilot status (warpgogol-com)
 
 - ✅ Chat widget placed on the contact page (de + uk); production build renders the first-party launcher with **no `uchat.com.au` origin in static HTML** (click-to-load verified); `consent.activation.validate` passes.
 - ✅ Hub contracts, destination registry, inbound route, **QStash publish + signed `/api/integration-route` callback + Redis dedup**, `deliverEvent` fan-out — all wired; `hub-runtime.test.ts` + `qstash.test.ts` + `deliver-event.test.ts` green (route-once, redelivery dedup, fail-closed auth, schema rejection).

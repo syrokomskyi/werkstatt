@@ -27,14 +27,14 @@ import type {
   KernelPipelineStep,
   KernelRuntimeContext,
   PipelineStepTiming,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { performance } from "node:perf_hooks";
 import {
   executeKernelCommand,
   appendStepTelemetry,
   loadPipelineBudgets,
   lookupExpectedDurationMs,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { access } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -183,7 +183,7 @@ async function runCommandSequence(
   const subResults: PipelineDriverData["subResults"] = [];
   const stepTimings: PipelineStepTiming[] = [];
   // RFC-0270: this driver executes steps via executeKernelCommand (a separate
-  // path from @gogol/site-kernel's executePipelineForApp/executePipelineForWorkspace),
+  // path from @warpgogol/site-kernel's executePipelineForApp/executePipelineForWorkspace),
   // so it needs its own telemetry-append + budget-preference wiring.
   const budgets = await loadPipelineBudgets(context.workspaceRoot);
 
@@ -390,7 +390,7 @@ export interface StandardCheckModuleOptions {
 
 /**
  * Factory that creates a complete "check" KernelModule pre-registered with every
- * standard validation command provided by @gogol/site-kernel-checks.
+ * standard validation command provided by @warpgogol/site-kernel-checks.
  *
  * **IMPORTANT:** Do NOT add commands to extraCommands that are already registered
  * by this factory (e.g., content.validate, tokens.ds.lint, tokens.colors.lint).

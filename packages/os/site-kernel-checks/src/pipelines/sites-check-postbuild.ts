@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@gogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 
 export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "seo.technical.validate" },

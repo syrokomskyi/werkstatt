@@ -30,20 +30,20 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   GENERATED_MARKER,
   buildGeneratedHeader,
   discoverSiteWorkspaces,
   stripGeneratedMarker,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   buildFleetAgentCatalog,
   computeFleetCatalogContentHash,
   type FleetAgentCatalog,
   type FleetAgentCatalogEntry,
   type FleetAgentCatalogSiteInput,
-} from "@gogol/share/agent";
+} from "@warpgogol/share/agent";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const CATALOG_FILE = "fleet/agent-catalog.generated.yaml";

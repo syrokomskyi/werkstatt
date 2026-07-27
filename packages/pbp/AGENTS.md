@@ -1,4 +1,4 @@
-# @gogol/pbp Agent Guide
+# @warpgogol/pbp Agent Guide
 
 This package contains the Public Business Profile (PBP) entity envelope, namespace constants, and URI validation utilities.
 
@@ -11,7 +11,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 
 ## Critical rule
 
-**PBP is the canonical business layer (DNA-20 superseded by RFC-0471).** All sites MUST use `@gogol/pbp` for business entity types, schemas, loaders, and semantic projections. `buildPageSemanticModel` and `buildPbpSemanticProfile` are exported from `@gogol/pbp/semantic-profile`. People records now live in a standalone `people` content collection (`src/content/people/{lang}/`).
+**PBP is the canonical business layer (DNA-20 superseded by RFC-0471).** All sites MUST use `@warpgogol/pbp` for business entity types, schemas, loaders, and semantic projections. `buildPageSemanticModel` and `buildPbpSemanticProfile` are exported from `@warpgogol/pbp/semantic-profile`. People records now live in a standalone `people` content collection (`src/content/people/{lang}/`).
 
 ## API surface
 
@@ -112,7 +112,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 ### Sichtpass, legacy migration, and cutover (RFC-0460..0462)
 
 - `PbpSichtpassMapping`, `PbpVerifiableCredentialMapping` — Sichtpass / VC mapping (RFC-0460)
-- `PbpMigrationMapping`, `PbpLegacyToPbpFieldMap` — Webgogol legacy migration (RFC-0461)
+- `PbpMigrationMapping`, `PbpLegacyToPbpFieldMap` — Warpgogol legacy migration (RFC-0461)
 - `PbpMigrationCoverageReport`, `PbpCutoverChecklist` — migration coverage and cutover (RFC-0462)
 
 ## Runtime layer (RFC-0466)
@@ -121,27 +121,27 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 
 | Entry point | Module | What it provides |
 | --- | --- | --- |
-| `@gogol/pbp/schemas` | `src/schemas/index.ts` | Zod schemas for all Wave 1 entities + `pbpSchemaById` registry + `pbpEntityDiscriminatedUnion` |
-| `@gogol/pbp/loaders` | `src/loaders.ts` | Typed, locale-aware loader functions (`getPbpBusiness`, `getPbpOfferings`, etc.) with deep-merge language fallback (RFC-0008) |
-| `@gogol/pbp/astro` | `src/astro.ts` | `pbpCollections` — Astro content collection definitions for `business-profile` |
-| `@gogol/pbp/compiler` | `src/compiler/index.ts` | `compilePbpProfile` — 14-phase compiler pipeline (discover → parse → validate → index → locale → references → profile → overlays → derivations → semantic → buyer-view → projection → snapshot → publication) |
-| `@gogol/pbp/semantic-profile` | `src/semantic-profile.ts` | `buildPbpSemanticProfile` — maps PBP compiler output to `SemanticSiteProfile` (RFC-0469). Also re-exports `buildPageSemanticModel` (RFC-0470). |
-| `@gogol/pbp/semantic-model` | `src/semantic-model.ts` | `buildPageSemanticModel` — builds a `SemanticPageModel` for a single page from page/prose/site collections via `astro:content` (RFC-0470). RFC-0492: accepts optional `surfaceId`/`depth` params; for depth-1 `website-local` pages, sets `model.industryService` so `buildServiceNodes` emits an industry-specific Service node instead of org-level Service nodes. |
-| `@gogol/pbp/cutover-check` | `src/cutover-check.ts` | `runCutoverCheck` — verifies PBP content coverage and test preconditions (RFC-0462). |
+| `@warpgogol/pbp/schemas` | `src/schemas/index.ts` | Zod schemas for all Wave 1 entities + `pbpSchemaById` registry + `pbpEntityDiscriminatedUnion` |
+| `@warpgogol/pbp/loaders` | `src/loaders.ts` | Typed, locale-aware loader functions (`getPbpBusiness`, `getPbpOfferings`, etc.) with deep-merge language fallback (RFC-0008) |
+| `@warpgogol/pbp/astro` | `src/astro.ts` | `pbpCollections` — Astro content collection definitions for `business-profile` |
+| `@warpgogol/pbp/compiler` | `src/compiler/index.ts` | `compilePbpProfile` — 14-phase compiler pipeline (discover → parse → validate → index → locale → references → profile → overlays → derivations → semantic → buyer-view → projection → snapshot → publication) |
+| `@warpgogol/pbp/semantic-profile` | `src/semantic-profile.ts` | `buildPbpSemanticProfile` — maps PBP compiler output to `SemanticSiteProfile` (RFC-0469). Also re-exports `buildPageSemanticModel` (RFC-0470). |
+| `@warpgogol/pbp/semantic-model` | `src/semantic-model.ts` | `buildPageSemanticModel` — builds a `SemanticPageModel` for a single page from page/prose/site collections via `astro:content` (RFC-0470). RFC-0492: accepts optional `surfaceId`/`depth` params; for depth-1 `website-local` pages, sets `model.industryService` so `buildServiceNodes` emits an industry-specific Service node instead of org-level Service nodes. |
+| `@warpgogol/pbp/cutover-check` | `src/cutover-check.ts` | `runCutoverCheck` — verifies PBP content coverage and test preconditions (RFC-0462). |
 
 ### How to use in a site (after RFC-0469 cutover)
 
 1. Wire collections in `content.config.ts`:
 
 ```typescript
-import { pbpCollections } from "@gogol/pbp/astro";
+import { pbpCollections } from "@warpgogol/pbp/astro";
 export const collections = { ...pbpCollections };
 ```
 
 2. Query data at build time:
 
 ```typescript
-import { getPbpBusiness, getPbpOfferings } from "@gogol/pbp/loaders";
+import { getPbpBusiness, getPbpOfferings } from "@warpgogol/pbp/loaders";
 const business = await getPbpBusiness("de");
 const offerings = await getPbpOfferings("de");
 ```
@@ -156,8 +156,8 @@ PBP content files live under `src/content/business-profile/{lang}/`:
 ### Validation
 
 ```sh
-pnpm --filter @gogol/pbp build:check
-pnpm --filter @gogol/pbp test
+pnpm --filter @warpgogol/pbp build:check
+pnpm --filter @warpgogol/pbp test
 ```
 
 ## Presentation fields (RFC-0482)

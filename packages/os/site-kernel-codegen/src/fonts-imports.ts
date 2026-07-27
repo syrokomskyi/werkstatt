@@ -23,13 +23,13 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { biomeSchema, systemManifestSchema } from "@gogol/ontology/schemas";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { biomeSchema, systemManifestSchema } from "@warpgogol/ontology/schemas";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { GENERATED_MARKER } from "./generated-marker.ts";
 
 interface FontsImportsResult {

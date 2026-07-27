@@ -14,7 +14,7 @@ entries:
     industryFit: []
     contentSchemaKey: brand-label-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/brand-label/brand-label-component.manifest.yaml
     astroFile: packages/ui/src/components/brand-label/brand-label-component.astro
   - id: breadcrumbs-component
@@ -30,7 +30,7 @@ entries:
     industryFit: []
     contentSchemaKey: breadcrumbs-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/breadcrumbs/breadcrumbs-component.manifest.yaml
     astroFile: packages/ui/src/components/breadcrumbs/breadcrumbs-component.astro
   - id: copyright-component
@@ -45,7 +45,7 @@ entries:
     industryFit: []
     contentSchemaKey: copyright-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/copyright/copyright-component.manifest.yaml
     astroFile: packages/ui/src/components/copyright/copyright-component.astro
   - id: donation-card-component
@@ -62,7 +62,7 @@ entries:
       - non-profit
     contentSchemaKey: donation-card-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/donation-card/donation-card-component.manifest.yaml
     astroFile: packages/ui/src/components/donation-card/donation-card-component.astro
   - id: effect-host-component
@@ -78,7 +78,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/effects/effect-host.manifest.yaml
     astroFile: packages/ui/src/components/effects/effect-host.astro
   - id: footer-promo-component
@@ -93,7 +93,7 @@ entries:
     industryFit: []
     contentSchemaKey: footer-promo-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/footer-promo/footer-promo-component.manifest.yaml
     astroFile: packages/ui/src/components/footer-promo/footer-promo-component.astro
   - id: footer-component
@@ -109,7 +109,7 @@ entries:
     industryFit: []
     contentSchemaKey: footer-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/footer/footer-component.manifest.yaml
     astroFile: packages/ui/src/components/footer/footer-component.astro
   - id: header-component
@@ -125,7 +125,7 @@ entries:
     industryFit: []
     contentSchemaKey: header-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/header/header-component.manifest.yaml
     astroFile: packages/ui/src/components/header/header-component.astro
   - id: lang-switcher-component
@@ -140,7 +140,7 @@ entries:
     industryFit: []
     contentSchemaKey: lang-switcher-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/lang-switcher/lang-switcher-component.manifest.yaml
     astroFile: packages/ui/src/components/lang-switcher/lang-switcher-component.astro
   - id: layout-component
@@ -155,7 +155,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: true
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/layout/layout-component.manifest.yaml
     astroFile: packages/ui/src/components/layout/layout-component.astro
   - id: live-photo-component
@@ -171,7 +171,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/live-photo/live-photo.manifest.yaml
     astroFile: packages/ui/src/components/live-photo/live-photo.astro
   - id: material-credit-component
@@ -187,7 +187,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/material-credit/material-credit.manifest.yaml
     astroFile: packages/ui/src/components/material-credit/material-credit.astro
   - id: media-component
@@ -202,7 +202,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/media/media.manifest.yaml
     astroFile: packages/ui/src/components/media/media.astro
   - id: not-found-component
@@ -217,7 +217,7 @@ entries:
     industryFit: []
     contentSchemaKey: not-found-component
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/not-found/not-found-component.manifest.yaml
     astroFile: packages/ui/src/components/not-found/not-found-component.astro
   - id: passport-header-component
@@ -232,7 +232,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/passport-header/passport-header-component.manifest.yaml
     astroFile: packages/ui/src/components/passport-header/passport-header-component.astro
   - id: passport-provenance-component
@@ -248,7 +248,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/passport-provenance/passport-provenance-component.manifest.yaml
     astroFile: packages/ui/src/components/passport-provenance/passport-provenance-component.astro
   - id: passport-score-grid-component
@@ -264,7 +264,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/passport-score-grid/passport-score-grid-component.manifest.yaml
     astroFile: packages/ui/src/components/passport-score-grid/passport-score-grid-component.astro
   - id: passport-star-map-component
@@ -280,7 +280,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/passport-star-map/passport-star-map-component.manifest.yaml
     astroFile: packages/ui/src/components/passport-star-map/passport-star-map-component.astro
   - id: person-profile-component
@@ -296,7 +296,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/person-profile/person-profile-component.manifest.yaml
     astroFile: packages/ui/src/components/person-profile/person-profile-component.astro
   - id: pulsar-component
@@ -312,7 +312,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/pulsar/pulsar-component.manifest.yaml
     astroFile: packages/ui/src/components/pulsar/pulsar-component.astro
   - id: responsive-image-component
@@ -328,7 +328,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/responsive-image/responsive-image.manifest.yaml
     astroFile: packages/ui/src/components/responsive-image/responsive-image.astro
   - id: section-card-grid-component
@@ -344,7 +344,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/cards/section-card-grid.manifest.yaml
     astroFile: packages/ui/src/components/section-body/cards/section-card-grid.astro
   - id: section-comparison-component
@@ -359,7 +359,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/comparison/section-comparison.manifest.yaml
     astroFile: packages/ui/src/components/section-body/comparison/section-comparison.astro
   - id: section-list-component
@@ -374,7 +374,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/list/section-list.manifest.yaml
     astroFile: packages/ui/src/components/section-body/list/section-list.astro
   - id: section-offer-capacity-component
@@ -389,7 +389,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/offer-capacity/section-offer-capacity.manifest.yaml
     astroFile: packages/ui/src/components/section-body/offer-capacity/section-offer-capacity.astro
   - id: section-paragraphs-component
@@ -404,7 +404,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/paragraphs/section-paragraphs.manifest.yaml
     astroFile: packages/ui/src/components/section-body/paragraphs/section-paragraphs.astro
   - id: section-rich-component
@@ -420,7 +420,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/rich/section-rich.manifest.yaml
     astroFile: packages/ui/src/components/section-body/rich/section-rich.astro
   - id: section-split-list-component
@@ -435,7 +435,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/split-list/section-split-list.manifest.yaml
     astroFile: packages/ui/src/components/section-body/split-list/section-split-list.astro
   - id: section-stats-component
@@ -451,7 +451,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-body/stats/section-stats.manifest.yaml
     astroFile: packages/ui/src/components/section-body/stats/section-stats.astro
   - id: section-cta-group-component
@@ -465,7 +465,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-cta-group/section-cta-group.manifest.yaml
     astroFile: packages/ui/src/components/section-cta-group/section-cta-group.astro
   - id: section-cta-component
@@ -479,7 +479,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-cta/section-cta.manifest.yaml
     astroFile: packages/ui/src/components/section-cta/section-cta.astro
   - id: section-header-component
@@ -496,7 +496,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-header/section-header.manifest.yaml
     astroFile: packages/ui/src/components/section-header/section-header.astro
   - id: section-image-component
@@ -512,7 +512,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-image/section-image.manifest.yaml
     astroFile: packages/ui/src/components/section-image/section-image.astro
   - id: section-shell-component
@@ -529,7 +529,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/section-shell/section-shell.manifest.yaml
     astroFile: packages/ui/src/components/section-shell/section-shell.astro
   - id: social-meta-component
@@ -543,7 +543,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: true
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/seo/social-meta/social-meta-component.manifest.yaml
     astroFile: packages/ui/src/components/seo/social-meta/social-meta-component.astro
   - id: structured-data-component
@@ -558,7 +558,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: true
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/seo/structured-data/structured-data-component.manifest.yaml
     astroFile: packages/ui/src/components/seo/structured-data/structured-data-component.astro
   - id: site-background-component
@@ -573,7 +573,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/site-background/site-background-component.manifest.yaml
     astroFile: packages/ui/src/components/site-background/site-background-component.astro
   - id: about-page
@@ -588,7 +588,7 @@ entries:
       - non-profit
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/about-page.manifest.yaml
     astroFile: packages/ui/src/pages/about-page.astro
   - id: cancellation-page
@@ -603,7 +603,7 @@ entries:
       - non-profit
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/cancellation-page.manifest.yaml
     astroFile: packages/ui/src/pages/cancellation-page.astro
   - id: cosmic-page
@@ -617,7 +617,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/cosmic-page.manifest.yaml
     astroFile: packages/ui/src/pages/cosmic-page.astro
   - id: home-page
@@ -632,7 +632,7 @@ entries:
       - non-profit
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/home-page.manifest.yaml
     astroFile: packages/ui/src/pages/home-page.astro
   - id: legal-page
@@ -647,7 +647,7 @@ entries:
       - non-profit
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/legal-page.manifest.yaml
     astroFile: packages/ui/src/pages/legal-page.astro
   - id: privacy-page
@@ -662,7 +662,7 @@ entries:
       - non-profit
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/privacy-page.manifest.yaml
     astroFile: packages/ui/src/pages/privacy-page.astro
   - id: projects-page
@@ -677,7 +677,7 @@ entries:
       - non-profit
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/projects-page.manifest.yaml
     astroFile: packages/ui/src/pages/projects-page.astro
   - id: terms-page
@@ -692,7 +692,7 @@ entries:
       - non-profit
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/pages/terms-page.manifest.yaml
     astroFile: packages/ui/src/pages/terms-page.astro
   - id: approach-section
@@ -708,7 +708,7 @@ entries:
     industryFit: []
     contentSchemaKey: approach-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/approach/approach-section.manifest.yaml
     astroFile: packages/ui/src/sections/approach/approach-section.astro
   - id: article-header-section
@@ -723,7 +723,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/article-header/article-header-section.manifest.yaml
     astroFile: packages/ui/src/sections/article-header/article-header-section.astro
   - id: article-list-section
@@ -739,7 +739,7 @@ entries:
     industryFit: []
     contentSchemaKey: article-list-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/article-list/article-list-section.manifest.yaml
     astroFile: packages/ui/src/sections/article-list/article-list-section.astro
   - id: audience-cards-section
@@ -757,7 +757,7 @@ entries:
       - legal-services
     contentSchemaKey: audience-cards-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/audience-cards/audience-cards-section.manifest.yaml
     astroFile: packages/ui/src/sections/audience-cards/audience-cards-section.astro
   - id: breadcrumbs-section
@@ -773,7 +773,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/breadcrumbs/breadcrumbs-section.manifest.yaml
     astroFile: packages/ui/src/sections/breadcrumbs/breadcrumbs-section.astro
   - id: changelog-section
@@ -788,7 +788,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/changelog/changelog-section.manifest.yaml
     astroFile: packages/ui/src/sections/changelog/changelog-section.astro
   - id: chat-widget-section
@@ -804,7 +804,7 @@ entries:
     industryFit: []
     contentSchemaKey: chat-widget-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/chat-widget/chat-widget-section.manifest.yaml
     astroFile: packages/ui/src/sections/chat-widget/chat-widget-section.astro
   - id: comparison-cards-section
@@ -822,7 +822,7 @@ entries:
       - legal-services
     contentSchemaKey: comparison-cards-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/comparison-cards/comparison-cards-section.manifest.yaml
     astroFile: packages/ui/src/sections/comparison-cards/comparison-cards-section.astro
   - id: controlled-responsibility-block-section
@@ -841,7 +841,7 @@ entries:
       - legal-services
     contentSchemaKey: controlled-responsibility-block-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/controlled-responsibility-block/controlled-responsibility-block-section.manifest.yaml
     astroFile: packages/ui/src/sections/controlled-responsibility-block/controlled-responsibility-block-section.astro
   - id: credits-gallery-section
@@ -856,7 +856,7 @@ entries:
     industryFit: []
     contentSchemaKey: credits-gallery-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/credits-gallery/credits-gallery-section.manifest.yaml
     astroFile: packages/ui/src/sections/credits-gallery/credits-gallery-section.astro
   - id: donation-card-section
@@ -873,7 +873,7 @@ entries:
       - non-profit
     contentSchemaKey: donation-card-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/donation-card/donation-card-section.manifest.yaml
     astroFile: packages/ui/src/sections/donation-card/donation-card-section.astro
   - id: donation-use-section
@@ -890,7 +890,7 @@ entries:
       - non-profit
     contentSchemaKey: donation-use-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/donation-use/donation-use-section.manifest.yaml
     astroFile: packages/ui/src/sections/donation-use/donation-use-section.astro
   - id: faq-list-section
@@ -906,7 +906,7 @@ entries:
     industryFit: []
     contentSchemaKey: faq-list-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/faq-list/faq-list-section.manifest.yaml
     astroFile: packages/ui/src/sections/faq-list/faq-list-section.astro
   - id: final-cta-section
@@ -922,7 +922,7 @@ entries:
     industryFit: []
     contentSchemaKey: final-cta-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/final-cta/final-cta-section.manifest.yaml
     astroFile: packages/ui/src/sections/final-cta/final-cta-section.astro
   - id: hero-decision-card-section
@@ -941,7 +941,7 @@ entries:
       - legal-services
     contentSchemaKey: hero-decision-card-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/hero-decision-card/hero-decision-card-section.manifest.yaml
     astroFile: packages/ui/src/sections/hero-decision-card/hero-decision-card-section.astro
   - id: hero-section
@@ -957,7 +957,7 @@ entries:
     industryFit: []
     contentSchemaKey: hero-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/hero/hero-section.manifest.yaml
     astroFile: packages/ui/src/sections/hero/hero-section.astro
   - id: impact-section
@@ -973,7 +973,7 @@ entries:
     industryFit: []
     contentSchemaKey: impact-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/impact/impact-section.manifest.yaml
     astroFile: packages/ui/src/sections/impact/impact-section.astro
   - id: markdown-section
@@ -989,7 +989,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/markdown/markdown-section.manifest.yaml
     astroFile: packages/ui/src/sections/markdown/markdown-section.astro
   - id: navigation-section
@@ -1004,7 +1004,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/navigation/navigation-section.manifest.yaml
     astroFile: packages/ui/src/sections/navigation/navigation-section.astro
   - id: notausgang-block-section
@@ -1023,7 +1023,7 @@ entries:
       - legal-services
     contentSchemaKey: notausgang-block-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/notausgang-block/notausgang-block-section.manifest.yaml
     astroFile: packages/ui/src/sections/notausgang-block/notausgang-block-section.astro
   - id: open-source-registry-section
@@ -1038,7 +1038,7 @@ entries:
     industryFit: []
     contentSchemaKey: open-source-registry-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/open-source-registry/open-source-registry-section.manifest.yaml
     astroFile: packages/ui/src/sections/open-source-registry/open-source-registry-section.astro
   - id: ownership-block-section
@@ -1057,7 +1057,7 @@ entries:
       - legal-services
     contentSchemaKey: ownership-block-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/ownership-block/ownership-block-section.manifest.yaml
     astroFile: packages/ui/src/sections/ownership-block/ownership-block-section.astro
   - id: people-section
@@ -1074,7 +1074,7 @@ entries:
     industryFit: []
     contentSchemaKey: people-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/people/people-section.manifest.yaml
     astroFile: packages/ui/src/sections/people/people-section.astro
   - id: price-card-section
@@ -1093,7 +1093,7 @@ entries:
       - legal-services
     contentSchemaKey: price-card-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/price-card/price-card-section.manifest.yaml
     astroFile: packages/ui/src/sections/price-card/price-card-section.astro
   - id: problem-section
@@ -1109,7 +1109,7 @@ entries:
     industryFit: []
     contentSchemaKey: problem-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/problem/problem-section.manifest.yaml
     astroFile: packages/ui/src/sections/problem/problem-section.astro
   - id: send-message-section
@@ -1125,7 +1125,7 @@ entries:
     industryFit: []
     contentSchemaKey: send-message-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/send-message/send-message-section.manifest.yaml
     astroFile: packages/ui/src/sections/send-message/send-message-section.astro
   - id: social-proof-section
@@ -1141,7 +1141,7 @@ entries:
     industryFit: []
     contentSchemaKey: social-proof-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/social-proof/social-proof-section.manifest.yaml
     astroFile: packages/ui/src/sections/social-proof/social-proof-section.astro
   - id: toc-section
@@ -1156,7 +1156,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/toc/toc-section.manifest.yaml
     astroFile: packages/ui/src/sections/toc/toc-section.astro
   - id: transparency-section
@@ -1172,7 +1172,7 @@ entries:
     industryFit: []
     contentSchemaKey: transparency-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/transparency/transparency-section.manifest.yaml
     astroFile: packages/ui/src/sections/transparency/transparency-section.astro
   - id: trust-strip-section
@@ -1191,7 +1191,7 @@ entries:
       - non-profit
     contentSchemaKey: trust-strip-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/trust-strip/trust-strip-section.manifest.yaml
     astroFile: packages/ui/src/sections/trust-strip/trust-strip-section.astro
   - id: video-section
@@ -1207,7 +1207,7 @@ entries:
     industryFit: []
     contentSchemaKey: null
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/video-section/video-section.manifest.yaml
     astroFile: packages/ui/src/sections/video-section/video-section.astro
   - id: women-section
@@ -1225,7 +1225,7 @@ entries:
       - non-profit
     contentSchemaKey: women-section
     standalone: false
-    siteName: "@gogol/ui"
+    siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/sections/women/women-section.manifest.yaml
     astroFile: packages/ui/src/sections/women/women-section.astro
 

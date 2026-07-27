@@ -3,8 +3,8 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runPropsContractValidate, validateExampleAgainstSchema } from "../props-contract.ts";
-import { runPropsTypesGenerate } from "@gogol/site-kernel-codegen";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import { runPropsTypesGenerate } from "@warpgogol/site-kernel-codegen";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 /*
 <MODULE_CONTRACT>

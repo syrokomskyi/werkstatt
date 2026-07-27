@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runBarrelSizeLint, countExportLines } from "../barrel-size-lint.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 /*
 <MODULE_CONTRACT>
@@ -47,9 +47,9 @@ async function fixtureWorkspace(): Promise<{ root: string; pkgDir: string }> {
 }
 
 describe("barrel.size.lint (RFC-0264)", () => {
-  it("BARREL-01: fails (error) when @gogol/share's root barrel exceeds the threshold", async () => {
+  it("BARREL-01: fails (error) when @warpgogol/share's root barrel exceeds the threshold", async () => {
     const { root, pkgDir } = await fixtureWorkspace();
-    await writeFile(join(pkgDir, "package.json"), JSON.stringify({ name: "@gogol/share" }), "utf8");
+    await writeFile(join(pkgDir, "package.json"), JSON.stringify({ name: "@warpgogol/share" }), "utf8");
     const lines = Array.from({ length: 130 }, (_, i) => `export const sym${i} = ${i};`).join("\n");
     await writeFile(join(pkgDir, "src", "index.ts"), lines, "utf8");
     const result = await runBarrelSizeLint(input, ctx(root));
@@ -62,7 +62,7 @@ describe("barrel.size.lint (RFC-0264)", () => {
 
   it("BARREL-02: fails when a page.ts symbol reappears in the root barrel", async () => {
     const { root, pkgDir } = await fixtureWorkspace();
-    await writeFile(join(pkgDir, "package.json"), JSON.stringify({ name: "@gogol/share" }), "utf8");
+    await writeFile(join(pkgDir, "package.json"), JSON.stringify({ name: "@warpgogol/share" }), "utf8");
     await writeFile(join(pkgDir, "src", "page.ts"), "export function buildPage() {}\n", "utf8");
     await writeFile(
       join(pkgDir, "src", "index.ts"),
@@ -80,7 +80,7 @@ describe("barrel.size.lint (RFC-0264)", () => {
 
   it("passes when the root barrel is small and has no completed-wave duplicates", async () => {
     const { root, pkgDir } = await fixtureWorkspace();
-    await writeFile(join(pkgDir, "package.json"), JSON.stringify({ name: "@gogol/share" }), "utf8");
+    await writeFile(join(pkgDir, "package.json"), JSON.stringify({ name: "@warpgogol/share" }), "utf8");
     await writeFile(join(pkgDir, "src", "page.ts"), "export function buildPage() {}\n", "utf8");
     await writeFile(
       join(pkgDir, "src", "index.ts"),

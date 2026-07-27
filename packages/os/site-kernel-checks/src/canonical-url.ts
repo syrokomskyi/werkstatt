@@ -21,18 +21,18 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@gogol/share/canonical-url";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/share/canonical-url";
 import {
   resolvePageUpdateStamp,
   isValidStampDate,
   type PageUpdateStampResult,
-} from "@gogol/share/semantic";
-import { localizeUrl } from "@gogol/share/url-policy";
+} from "@warpgogol/share/semantic";
+import { localizeUrl } from "@warpgogol/share/url-policy";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
-import type { Diagnostic } from "@gogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/site-kernel";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 

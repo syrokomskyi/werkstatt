@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  [RFC-0141] The single content-asset glob for @gogol/ui. This is the only place in
+  [RFC-0141] The single content-asset glob for @warpgogol/ui. This is the only place in
   packages/ui that calls import.meta.glob for visitor-facing content images. Sections and
   components import `contentAssetImages` from here instead of declaring their own glob, so
   the filesystem asset surface is centralized behind the Content Source Provider seam.
@@ -13,7 +13,7 @@
   the previous per-file globs.
 </purpose>
 <non-goals>
-  <item>Do not implement resolution logic — sections call resolveImage(contentAssetImages, ...) from @gogol/share.</item>
+  <item>Do not implement resolution logic — sections call resolveImage(contentAssetImages, ...) from @warpgogol/share.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -47,7 +47,7 @@ export const contentAssetVideos = import.meta.glob<string>(
   { eager: true, query: "?url", import: "default" },
 );
 
-/** RFC-0220: raw YAML sidecars for material credits, resolved by @gogol/share helpers. */
+/** RFC-0220: raw YAML sidecars for material credits, resolved by @warpgogol/share helpers. */
 export const contentAssetCredits = import.meta.glob<string>("/src/content/**/*.credits.yaml", {
   eager: true,
   query: "?raw",

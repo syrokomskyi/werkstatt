@@ -30,8 +30,8 @@ commands:
   - business.projection.validate
   - canonical.url.validate
   - chat.config.validate
-  - check-webgogol.app.validate
-  - check-webgogol.runner.validate
+  - check-warpgogol.app.validate
+  - check-warpgogol.runner.validate
   - check.accessibility.validate
   - check.artifact.validate
   - check.audience.profile.validate
@@ -238,7 +238,7 @@ commands:
   - video.media.validate
   - video.variants.validate
   - visibility.expr.validate
-  - webgogol.check-hints.validate
+  - warpgogol.check-hints.validate
   - workspace.discovery.validate
   - workspace.surface.validate
   - workspace.write.boundary.lint

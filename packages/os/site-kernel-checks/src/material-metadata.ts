@@ -31,14 +31,14 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { materialCreditSchema } from "@gogol/share/schemas/material-credit";
-import type { MaterialCredit } from "@gogol/share/schemas/material-credit";
-import type { VideoManifest, LiveVideoManifest } from "@gogol/share/schemas/media";
-import type { ImageVariantManifest } from "@gogol/share/image-provider";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { materialCreditSchema } from "@warpgogol/share/schemas/material-credit";
+import type { MaterialCredit } from "@warpgogol/share/schemas/material-credit";
+import type { VideoManifest, LiveVideoManifest } from "@warpgogol/share/schemas/media";
+import type { ImageVariantManifest } from "@warpgogol/share/image-provider";
 import { diagnosticsResult } from "./result-helpers.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 const exec = promisify(execCallback);
 

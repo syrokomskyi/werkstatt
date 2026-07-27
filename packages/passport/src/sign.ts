@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY> */
 
 /**
- * @gogol/passport — Ed25519 VC signing helpers
+ * @warpgogol/passport — Ed25519 VC signing helpers
  *
  * DNA-34 / RFC-0028
  *
@@ -254,7 +254,7 @@ export function assembleVerifiableCredential(
     issuer: `did:web:${domain}`,
     issuanceDate: subject.issuedAt,
     credentialSubject: {
-      id: `urn:webgogol:app:${appId}`,
+      id: `urn:warpgogol:app:${appId}`,
       systemHash: subject.systemHash,
       commitSha: subject.commitSha,
     },

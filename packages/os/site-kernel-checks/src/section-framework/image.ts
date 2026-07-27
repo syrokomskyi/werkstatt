@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import type { AstroParseHandle } from "../lib/astro-parse.ts";
 import {
   getAstro,
@@ -78,7 +78,7 @@ export async function runSectionImageContractValidate(
         rule: "IMG-01",
         message:
           "Raw <Image> from astro:assets inside a section is forbidden; render images via <SectionImage>.",
-        fix: 'import SectionImage from "@gogol/ui/components/section-image.astro"; <SectionImage imageName=... fade=... />',
+        fix: 'import SectionImage from "@warpgogol/ui/components/section-image.astro"; <SectionImage imageName=... fade=... />',
       });
     });
   }

@@ -14,8 +14,8 @@ founder-trust-card). Links a card to the person's profile page when one is live.
 </CHANGE_SUMMARY>
 */
 
-import type { CtaConfig } from "@gogol/share";
-import type { SectionProps } from "@gogol/share/page";
+import type { CtaConfig } from "@warpgogol/share";
+import type { SectionProps } from "@warpgogol/share/page";
 import {
   cast,
   resolveSectionAnchor,
@@ -23,14 +23,14 @@ import {
   selectPeople,
   resolveEffectsForTarget,
   creditByTarget,
-} from "@gogol/share";
+} from "@warpgogol/share";
 import type { PeopleSectionContent } from "./people-section.types.generated.ts";
 import PersonProfile from "../../components/person-profile/person-profile-component.astro";
-import SectionImage from "@gogol/ui/components/section-image.astro";
-import SectionCta from "@gogol/ui/components/section-cta.astro";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import EffectHost from "@gogol/ui/components/effects/effect-host.astro";
+import SectionImage from "@warpgogol/ui/components/section-image.astro";
+import SectionCta from "@warpgogol/ui/components/section-cta.astro";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import EffectHost from "@warpgogol/ui/components/effects/effect-host.astro";
 import { contentAssetCredits } from "../../content-assets.ts";
 import "./people-section.css";
 

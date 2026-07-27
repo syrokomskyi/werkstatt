@@ -23,7 +23,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   fleetJobSchema,
   fleetPlanSchema,
@@ -31,7 +31,7 @@ import {
   type FleetJob,
   type FleetPlan,
   type FleetSiteStatus,
-} from "@gogol/surface";
+} from "@warpgogol/surface";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 const FLEET_DIR = "fleet";

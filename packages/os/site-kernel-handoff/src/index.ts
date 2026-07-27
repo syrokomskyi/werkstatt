@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 import { runHandoffAbsorb } from "./handoff-absorb.ts";
 import { runHandoffPack } from "./handoff-pack.ts";
 import { runHandoffValidate } from "./handoff-validate.ts";

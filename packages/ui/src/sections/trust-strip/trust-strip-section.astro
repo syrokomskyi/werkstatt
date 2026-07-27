@@ -15,11 +15,11 @@
 
 /* RFC-0103: trust-strip thin dispatcher — optional header + list body. */
 
-import type { SectionProps } from "@gogol/share/page";
-import { cast, need } from "@gogol/share";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import SectionList from "@gogol/ui/components/section-body/list/section-list.astro";
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast, need } from "@warpgogol/share";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import SectionList from "@warpgogol/ui/components/section-body/list/section-list.astro";
 import type { TrustStripSectionContent } from "./trust-strip-section.types.generated.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;

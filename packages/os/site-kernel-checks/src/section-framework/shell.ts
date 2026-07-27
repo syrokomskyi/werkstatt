@@ -16,7 +16,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import type { AstroParseHandle } from "../lib/astro-parse.ts";
 import {
   getAstro,
@@ -75,15 +75,15 @@ export async function runSectionShellContractValidate(
         .some(
           (i) =>
             i.specifier === "SectionShell" &&
-            i.source === "@gogol/ui/components/section-shell.astro",
+            i.source === "@warpgogol/ui/components/section-shell.astro",
         );
       if (!importOk) {
         violations.push({
           file: rel,
           rule: "SHELL-02",
           message:
-            "<SectionShell> used without matching import from @gogol/ui/components/section-shell.astro.",
-          fix: 'import SectionShell from "@gogol/ui/components/section-shell.astro";',
+            "<SectionShell> used without matching import from @warpgogol/ui/components/section-shell.astro.",
+          fix: 'import SectionShell from "@warpgogol/ui/components/section-shell.astro";',
         });
       }
     }

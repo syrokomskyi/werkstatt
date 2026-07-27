@@ -23,7 +23,7 @@ slots:
     label: Video proof
     optional: true
     rationale: >
-      Demonstrate the WGogol operating model immediately after the decision
+      Demonstrate the Warpgogol operating model immediately after the decision
       hero when source material is available. Kept optional because a new site
       may start without a feature video.
 
@@ -65,7 +65,7 @@ slots:
   - cosmicName: Calypso # controlled-responsibility-block
     label: Controlled responsibility block
     rationale: >
-      Clarify what WGogol owns versus what the client keeps. ROI and lead
+      Clarify what Warpgogol owns versus what the client keeps. ROI and lead
       counts are explicitly out of scope; structure and process are in.
 
   - cosmicName: Pan # price-card
@@ -83,13 +83,13 @@ slots:
       responsibility) may be added through the canonical People spotlight
       where narrative weight allows.
 
-  - cosmicName: Atlas # faq-list (reuses existing @gogol/ui section)
+  - cosmicName: Atlas # faq-list (reuses existing @warpgogol/ui section)
     label: FAQ list
     rationale: >
       Remove common operational objections before the final ask. Reuses the
       existing faq-list section; no new implementation needed.
 
-  - cosmicName: Dione # final-cta (reuses existing @gogol/ui section)
+  - cosmicName: Dione # final-cta (reuses existing @warpgogol/ui section)
     label: Final CTA
     rationale: >
       End with one focused written-inquiry action after trust and constraints

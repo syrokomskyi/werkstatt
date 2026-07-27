@@ -1,10 +1,10 @@
-# @gogol/ui
+# @warpgogol/ui
 
-Shared UI primitives and LordIcon assets for WGogol applications.
+Shared UI primitives and LordIcon assets for Warpgogol applications.
 
 ## Scope
 
-`@gogol/ui` is a workspace package consumed by apps in `apps/*`.
+`@warpgogol/ui` is a workspace package consumed by apps in `apps/*`.
 
 It owns:
 
@@ -24,7 +24,7 @@ It does not own app-local content, routes, or styling decisions.
 
 ```astro
 ---
-import { arrowUpIcon as ArrowUpIcon } from "@gogol/ui/icons/lordicon/doodle-outline";
+import { arrowUpIcon as ArrowUpIcon } from "@warpgogol/ui/icons/lordicon/doodle-outline";
 ---
 
 <ArrowUpIcon size={24} color="primary" trigger="hover" />
@@ -34,8 +34,8 @@ import { arrowUpIcon as ArrowUpIcon } from "@gogol/ui/icons/lordicon/doodle-outl
 
 ```astro
 ---
-import LordIconBase from "@gogol/ui/icons/lord-icon-base";
-import type { LordIconProps } from "@gogol/ui/icons/lord-icon-types";
+import LordIconBase from "@warpgogol/ui/icons/lord-icon-base";
+import type { LordIconProps } from "@warpgogol/ui/icons/lord-icon-types";
 ---
 ```
 
@@ -85,8 +85,8 @@ Apps should expose these TypeScript path mappings:
 {
   "compilerOptions": {
     "paths": {
-      "@gogol/ui": ["../../packages/ui/src/index.ts"],
-      "@gogol/ui/*": ["../../packages/ui/src/*"]
+      "@warpgogol/ui": ["../../packages/ui/src/index.ts"],
+      "@warpgogol/ui/*": ["../../packages/ui/src/*"]
     }
   }
 }
@@ -94,14 +94,14 @@ Apps should expose these TypeScript path mappings:
 
 ## Public import contract
 
-- `@gogol/ui`
-- `@gogol/ui/icons`
-- `@gogol/ui/icons/lordicon/doodle-outline`
-- `@gogol/ui/icons/lordicon/doodle-color`
-- `@gogol/ui/icons/lordicon/doodle-black`
-- `@gogol/ui/icons/lordicon/system-regular`
-- `@gogol/ui/icons/lord-icon-base`
-- `@gogol/ui/icons/lord-icon-types`
+- `@warpgogol/ui`
+- `@warpgogol/ui/icons`
+- `@warpgogol/ui/icons/lordicon/doodle-outline`
+- `@warpgogol/ui/icons/lordicon/doodle-color`
+- `@warpgogol/ui/icons/lordicon/doodle-black`
+- `@warpgogol/ui/icons/lordicon/system-regular`
+- `@warpgogol/ui/icons/lord-icon-base`
+- `@warpgogol/ui/icons/lord-icon-types`
 
 ## Maintenance rules
 

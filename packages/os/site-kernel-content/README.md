@@ -1,4 +1,4 @@
-# @gogol/site-kernel-content
+# @warpgogol/site-kernel-content
 
 Framework-free Markdown file discovery and frontmatter parsing utilities for the Site OS.
 
@@ -14,7 +14,7 @@ import {
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
   type ParsedFrontmatter,
-} from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel-content";
 ```
 
 ### `collectMarkdownFiles(dir: string): Promise<string[]>`
@@ -31,11 +31,11 @@ Serializes `data` back to a `--- YAML ---` block and prepends it to `content`.
 
 ## Constraints
 
-- No dependency on `@gogol/site-kernel` or Astro — pure Node.js + `yaml`.
+- No dependency on `@warpgogol/site-kernel` or Astro — pure Node.js + `yaml`.
 - Do not import from this package in Astro route files; use `astro:content` there instead.
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-content build:check
+pnpm --filter @warpgogol/site-kernel-content build:check
 ```

@@ -24,8 +24,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 
 const B2C_PAGE_IDS = new Set(["widerruf", "musterWiderruf"]);
 const B2C_ROUTE_SLUGS = new Set(["widerruf", "widerruf-formular", "vidmova", "forma-vidmovy"]);

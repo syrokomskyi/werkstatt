@@ -7,9 +7,9 @@ reviewer:
 verdict: needs-revision
 diffRange: 84eb5a507...HEAD
 filesReviewed:
-  - apps/webgogol-com/src/pages/api/integration-inbound.ts
-  - apps/webgogol-com/src/pages/api/integration-route.ts
-  - apps/webgogol-com/src/pages/api/stripe-webhook.ts
+  - apps/warpgogol-com/src/pages/api/integration-inbound.ts
+  - apps/warpgogol-com/src/pages/api/integration-route.ts
+  - apps/warpgogol-com/src/pages/api/stripe-webhook.ts
   - packages/chat/AGENTS.md
   - packages/chat/README.md
   - packages/chat/package.json
@@ -36,9 +36,9 @@ filesReviewed:
   - packages/agent-gate/src/actions.ts
   - packages/integration-adapter-supabase-crm/src/tests/funnel-persistence.test.ts
   - packages/check-core/src/run-paths.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/artifact-builders.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/evidence-readers.ts
-  - packages/os/site-kernel-check-webgogol/src/commands/helpers.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/artifact-builders.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/evidence-readers.ts
+  - packages/os/site-kernel-check-warpgogol/src/commands/helpers.ts
 ---
 
 # Code Review: 84eb5a507...HEAD (architecture review fixes for chat and growth ecosystems)
@@ -49,19 +49,19 @@ The diff claims to apply four architectural fixes, but two of the four were not 
 
 ## Mechanical floor
 
-**Fail.** `astro check` on `webgogol-com` produces 3 errors:
+**Fail.** `astro check` on `warpgogol-com` produces 3 errors:
 
 ```
-src/pages/api/integration-inbound.ts:10:22 - error ts(2307): Cannot find module '@gogol/ui/integration-routes/inbound'
-src/pages/api/integration-route.ts:10:22 - error ts(2307): Cannot find module '@gogol/ui/integration-routes/delivery'
-src/pages/api/stripe-webhook.ts:10:22 - error ts(2307): Cannot find module '@gogol/ui/integration-routes/stripe-webhook'
+src/pages/api/integration-inbound.ts:10:22 - error ts(2307): Cannot find module '@warpgogol/ui/integration-routes/inbound'
+src/pages/api/integration-route.ts:10:22 - error ts(2307): Cannot find module '@warpgogol/ui/integration-routes/delivery'
+src/pages/api/stripe-webhook.ts:10:22 - error ts(2307): Cannot find module '@warpgogol/ui/integration-routes/stripe-webhook'
 ```
 
 `tsc --noEmit` passes on all individual packages because the `integration-routes` exports are missing from `packages/ui/package.json` — TypeScript resolves the old `chat-widget/api` exports which still point to deleted files, but this is only caught by `astro check` which resolves through the full export map.
 
 ## Axis A — Structural correctness
 
-1. **`runRelPath` misuse in `evidence-readers.ts`** — `runRelPath(runId, fileName)` constructs `.check-webgogol/runs/<runId>/<fileName>`, but callers pass `relRunDir` (already a full relative path like `.check-webgogol/runs/abc`) as the first argument. This produces double-prefixed paths like `.check-webgogol/runs/.check-webgogol/runs/abc/run.json`. The old code used `posix.join(relRunDir, "run.json")` which was correct. Files: `packages/os/site-kernel-check-webgogol/src/commands/evidence-readers.ts:45-49,134-143`.
+1. **`runRelPath` misuse in `evidence-readers.ts`** — `runRelPath(runId, fileName)` constructs `.check-warpgogol/runs/<runId>/<fileName>`, but callers pass `relRunDir` (already a full relative path like `.check-warpgogol/runs/abc`) as the first argument. This produces double-prefixed paths like `.check-warpgogol/runs/.check-warpgogol/runs/abc/run.json`. The old code used `posix.join(relRunDir, "run.json")` which was correct. Files: `packages/os/site-kernel-check-warpgogol/src/commands/evidence-readers.ts:45-49,134-143`.
 
 2. **Dead code: `registry.ts`** — `packages/growth/src/registry.ts` is created but never imported by `client.ts`, `provider.astro`, or `index.ts`. It defines `ADAPTER_REGISTRY`, `KNOWN_ADAPTER_IDS`, and `getAdapterEntry`, but none of these are consumed anywhere. The file's `MODULE_CONTRACT` claims it is "Consumed by both the client-side bootGrowthLayer() and the build-time validator growth.vendor.resolve" — this is false.
 
@@ -117,9 +117,9 @@ src/pages/api/stripe-webhook.ts:10:22 - error ts(2307): Cannot find module '@gog
 
 ## Axis G — Blind spots
 
-1. **`runRelPath` double-prefix bug** — The `evidence-readers.ts` changes will produce incorrect paths at runtime. The old `posix.join(relRunDir, "run.json")` produced correct paths; the new `runRelPath(relRunDir, "run.json")` prepends `.check-webgogol/runs/` again. This will cause file-not-found errors at runtime when reading run artifacts.
+1. **`runRelPath` double-prefix bug** — The `evidence-readers.ts` changes will produce incorrect paths at runtime. The old `posix.join(relRunDir, "run.json")` produced correct paths; the new `runRelPath(relRunDir, "run.json")` prepends `.check-warpgogol/runs/` again. This will cause file-not-found errors at runtime when reading run artifacts.
 
-2. **`api.routes.generate` will overwrite manifest changes.** The manifest handler paths were updated to `@gogol/ui/integration-routes/*`, but running `api.routes.generate` (which happens during `build.prepare`) will regenerate the generated route files. Since the `packages/ui/package.json` exports are missing, the generated files will fail to resolve. The codegen reads the manifest `handler` field — so the manifest is correct, but the export map must be fixed for the generated files to work.
+2. **`api.routes.generate` will overwrite manifest changes.** The manifest handler paths were updated to `@warpgogol/ui/integration-routes/*`, but running `api.routes.generate` (which happens during `build.prepare`) will regenerate the generated route files. Since the `packages/ui/package.json` exports are missing, the generated files will fail to resolve. The codegen reads the manifest `handler` field — so the manifest is correct, but the export map must be fixed for the generated files to work.
 
 3. **`packages/growth/src/config.ts` still exists.** Unlike `packages/chat/src/config.ts` which was deleted, the growth `config.ts` was not deleted. The `./config` export in `package.json` still points to it. This is correct for the current code (since `client.ts` imports from `./config.ts`), but if Candidate 3 had been applied, this would need updating.
 
@@ -137,19 +137,19 @@ The commit message describes four candidates. Gap table:
 | Candidate 3: Export GrowthAdapterLoaders from index.ts | Missing | `index.ts` does not export `GrowthAdapterLoaders` |
 | Candidate 1: Move API handlers to integration-routes/ | Done | Files moved and renamed |
 | Candidate 1: Update manifest handler paths | Done | `chat-widget-section.manifest.yaml` lines 26,38,46 |
-| Candidate 1: Update generated app route files | Done | 3 files updated to import from `@gogol/ui/integration-routes/*` |
+| Candidate 1: Update generated app route files | Done | 3 files updated to import from `@warpgogol/ui/integration-routes/*` |
 | Candidate 1: Add integration-routes exports to ui package.json | Missing | `packages/ui/package.json` has no `integration-routes` entries |
 | Candidate 1: Delete old chat-widget API files | Done | Files deleted in commit `ebb38d0c6` |
 | Candidate 2: Create port-barrel.ts | Done | File created at `packages/share/src/integration/port-barrel.ts` |
 | Candidate 2: Add ./integration/port export to share package.json | Missing | `packages/share/package.json` has no `./integration/port` entry |
-| Candidate 2: Update type-only consumers to use port barrel | Missing | `agent-gate/src/ports.ts` and `actions.ts` still import from `@gogol/share/integration` |
-| Candidate 2: Update supabase-crm test to use port barrel | Missing | Test still imports from `@gogol/share/integration` |
+| Candidate 2: Update type-only consumers to use port barrel | Missing | `agent-gate/src/ports.ts` and `actions.ts` still import from `@warpgogol/share/integration` |
+| Candidate 2: Update supabase-crm test to use port barrel | Missing | Test still imports from `@warpgogol/share/integration` |
 | Candidate 2: Document split in README | Done | `packages/share/src/integration/README.md` updated |
 
 ## Questions for the author
 
 1. **Why does `bootGrowthLayer()` still take zero parameters?** The commit message, AGENTS.md, and README all claim it accepts a `GrowthAdapterLoaders` map, but the code was never modified. Was the edit lost, or was it never attempted?
 
-2. **Why does `packages/ui/package.json` not have `integration-routes` exports?** The generated app route files import from `@gogol/ui/integration-routes/inbound` etc., but these export paths don't exist in the package's export map. Did the edit to `package.json` get overwritten by `api.routes.generate` during `build:check` and never re-applied?
+2. **Why does `packages/ui/package.json` not have `integration-routes` exports?** The generated app route files import from `@warpgogol/ui/integration-routes/inbound` etc., but these export paths don't exist in the package's export map. Did the edit to `package.json` get overwritten by `api.routes.generate` during `build:check` and never re-applied?
 
-3. **Why was `registry.ts` created but never wired in?** It's imported by nothing. If the intent was to replace the hardcoded map in `client.ts`, that modification was never made. If the intent was to provide `KNOWN_ADAPTER_IDS` for validators, the validator already imports from `@gogol/growth` which doesn't re-export it. Should `registry.ts` be deleted, or should the code be fixed to use it?
+3. **Why was `registry.ts` created but never wired in?** It's imported by nothing. If the intent was to replace the hardcoded map in `client.ts`, that modification was never made. If the intent was to provide `KNOWN_ADAPTER_IDS` for validators, the validator already imports from `@warpgogol/growth` which doesn't re-export it. Should `registry.ts` be deleted, or should the code be fixed to use it?

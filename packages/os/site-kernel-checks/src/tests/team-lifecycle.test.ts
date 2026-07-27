@@ -20,7 +20,7 @@ import type {
   Diagnostic,
   KernelCommandInput,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 async function writeFile(dir: string, rel: string, content: string): Promise<void> {
   const full = path.join(dir, rel);

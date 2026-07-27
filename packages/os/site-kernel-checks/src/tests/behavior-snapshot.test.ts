@@ -8,8 +8,8 @@ import {
   buildBehaviorSnapshot,
   runBehaviorSnapshotValidate,
 } from "../behavior-snapshot.ts";
-import { GENERATED_MARKER, buildGeneratedHeader } from "@gogol/site-kernel";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import { GENERATED_MARKER, buildGeneratedHeader } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { stringify as yamlStringify } from "yaml";
 
 /*
@@ -27,7 +27,7 @@ import { stringify as yamlStringify } from "yaml";
 const FIXTURE_HTML = `<!DOCTYPE html>
 <html lang="de">
 <head>
-  <title>Impressum — WGogol</title>
+  <title>Impressum — Warpgogol</title>
   <meta name="description" content="Rechtliche Informationen." />
   <link rel="canonical" href="https://example.com/de/impressum/" />
   <link rel="alternate" hreflang="de" href="https://example.com/de/impressum/" />
@@ -37,7 +37,7 @@ const FIXTURE_HTML = `<!DOCTYPE html>
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="robots" content="index, follow" />
   <script type="application/ld+json">{"@type":"WebPage","name":"Impressum","url":"https://example.com/de/impressum/"}</script>
-  <script type="application/ld+json">{"@graph":[{"@type":"BreadcrumbList","itemListElement":[1,2,3]},{"@type":"Organization","name":"WGogol"}]}</script>
+  <script type="application/ld+json">{"@graph":[{"@type":"BreadcrumbList","itemListElement":[1,2,3]},{"@type":"Organization","name":"Warpgogol"}]}</script>
 </head>
 <body></body>
 </html>`;
@@ -55,7 +55,7 @@ describe("normalizeVolatile (RFC-0269)", () => {
 describe("extractRouteBehavior (RFC-0269)", () => {
   it("golden fixture: extracts every declared field", () => {
     const behavior = extractRouteBehavior(FIXTURE_HTML, "/de/impressum/", "de", true, false);
-    expect(behavior.title).toBe("Impressum — WGogol");
+    expect(behavior.title).toBe("Impressum — Warpgogol");
     expect(behavior.metaDescription).toBe("Rechtliche Informationen.");
     expect(behavior.canonical).toBe("https://example.com/de/impressum/");
     expect(behavior.hreflang).toEqual({
@@ -71,7 +71,7 @@ describe("extractRouteBehavior (RFC-0269)", () => {
     expect(behavior.breadcrumbDepth).toBe(3);
     expect(behavior.jsonld).toEqual([
       { type: "BreadcrumbList" },
-      { type: "Organization", name: "WGogol" },
+      { type: "Organization", name: "Warpgogol" },
       { type: "WebPage", name: "Impressum", url: "https://example.com/de/impressum/" },
     ]);
     expect(behavior.inSitemap).toBe(true);

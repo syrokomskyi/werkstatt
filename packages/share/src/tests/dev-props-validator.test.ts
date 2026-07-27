@@ -42,7 +42,7 @@ test("buildPage: validateProps is called with planetName, props, and blockId", a
   }> = [];
 
   const page = await buildPage(entry, ctx, {
-    resolveImportPath: () => "@gogol/ui/sections/fixture-section.astro",
+    resolveImportPath: () => "@warpgogol/ui/sections/fixture-section.astro",
     validateProps: async (planetName, props, blockId) => {
       calls.push({ planetName, props, blockId });
     },
@@ -61,7 +61,7 @@ test("buildPage: a validateProps throw (PAGE-PROPS-01) propagates and includes t
 
   try {
     await buildPage(entry, ctx, {
-      resolveImportPath: () => "@gogol/ui/sections/fixture-section.astro",
+      resolveImportPath: () => "@warpgogol/ui/sections/fixture-section.astro",
       validateProps: async (_planetName, props, blockId) => {
         if ("extra" in props) {
           throw new Error(
@@ -82,7 +82,7 @@ test("buildPage: without validateProps, no hook is invoked (opt-in, zero behavio
   const entry = fixtureEntry();
   const ctx = EMPTY_RUNTIME_CONTEXT("en");
   const page = await buildPage(entry, ctx, {
-    resolveImportPath: () => "@gogol/ui/sections/fixture-section.astro",
+    resolveImportPath: () => "@warpgogol/ui/sections/fixture-section.astro",
   });
   expect(page.blocks.length).toBe(1);
 });

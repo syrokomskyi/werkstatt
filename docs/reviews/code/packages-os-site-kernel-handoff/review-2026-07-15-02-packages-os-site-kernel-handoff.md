@@ -29,17 +29,17 @@ The session implements RFC-0389 end-to-end: audit, enhancement, planning, implem
 
 ### Mechanical floor
 
-- `pnpm --filter @gogol/site-kernel-handoff run build:check` — Pass
-- `pnpm --filter @gogol/site-kernel-onboarding run build:check` — Pass
+- `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — Pass
+- `pnpm --filter @warpgogol/site-kernel-onboarding run build:check` — Pass
 - `pnpm exec site-kernel run rfc.validate RFC-0389 --json` — Pass
-- `pnpm exec site-kernel run mission.materialize --mission webgogol-com-m000003 --json` — Pass (37 files, 0 errors, 5s)
+- `pnpm exec site-kernel run mission.materialize --mission warpgogol-com-m000003 --json` — Pass (37 files, 0 errors, 5s)
 
 ### Axis A — Structural correctness
 
 **Finding A-1: Domain extraction via regex is fragile (non-blocking).** The regex `/^  domain:\s*"?([^"\s]+)"?/m` at `mission-materialize.ts:104` assumes 2-space indentation and a top-level `domain:` key in the YAML frontmatter. It works for the current `system.md` format but would fail if:
 
 - The domain is nested under `identity:` (e.g. `identity:\n  domain: ...` becomes `identity:\n    domain: ...` with 4-space indent)
-- The YAML uses single quotes (`domain: 'webgogol.com'`)
+- The YAML uses single quotes (`domain: 'warpgogol.com'`)
 - The frontmatter uses CRLF line endings (the `^` anchor with `/m` flag handles `\r` correctly in JS, but the `---\n` delimiter at line 102 does not handle `\r\n`)
 
 This is acceptable for now — the Sternsystem `system.md` format is controlled and the fallback (empty domain) is graceful. A future iteration should use `gray-matter` or a YAML parser.
@@ -62,10 +62,10 @@ No issues.
 
 No issues.
 
-- Package boundaries: `@gogol/site-kernel-handoff` imports from `@gogol/site-kernel`, `@gogol/site-kernel-codegen`, `@gogol/site-kernel-onboarding` — all `packages/*` dependencies. No `apps/* → apps/*` or cross-service imports.
+- Package boundaries: `@warpgogol/site-kernel-handoff` imports from `@warpgogol/site-kernel`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-onboarding` — all `packages/*` dependencies. No `apps/* → apps/*` or cross-service imports.
 - Template helper extraction is clean: `templates.ts` is the single source of truth, `scaffold.ts` and `config-regenerate.ts` import from it, duplicates removed.
-- Package exports: `@gogol/site-kernel-onboarding` properly exports `readTemplate`, `readRuntimeTemplate`, `applyTokens`, `TEMPLATES_DIR`, `RUNTIME_TEMPLATES_DIR` from `index.ts`.
-- Dependencies: `@gogol/site-kernel-handoff/package.json` correctly declares 3 new workspace dependencies.
+- Package exports: `@warpgogol/site-kernel-onboarding` properly exports `readTemplate`, `readRuntimeTemplate`, `applyTokens`, `TEMPLATES_DIR`, `RUNTIME_TEMPLATES_DIR` from `index.ts`.
+- Dependencies: `@warpgogol/site-kernel-handoff/package.json` correctly declares 3 new workspace dependencies.
 
 ### Axis D — Forward-only compliance
 
@@ -99,7 +99,7 @@ if (!existsSync(systemMdPath)) {
 
 **Finding G-2: Concurrent execution safety preserved.** The existing lock mechanism (`acquireLock` for `system:` and `mission:`) is unchanged. No new concurrency issues introduced.
 
-**Finding G-3: Performance.** The materialization took 5 seconds for webgogol-com (7 templates + kernel.wire + 9 generators). This is within the RFC's 3-8 second estimate. No performance concerns.
+**Finding G-3: Performance.** The materialization took 5 seconds for warpgogol-com (7 templates + kernel.wire + 9 generators). This is within the RFC's 3-8 second estimate. No performance concerns.
 
 ### Spec compliance
 
@@ -116,12 +116,12 @@ if (!existsSync(systemMdPath)) {
 | Preserve staging/atomic rename | Done | Unchanged from original code |
 | Export template helpers | Done | `templates.ts` created, exported from index |
 | Unify duplicates | Done | `scaffold.ts`, `config-regenerate.ts`, `config-template-sync.ts` all import from `templates.ts` |
-| Add workspace dependencies | Done | 3 deps added to `@gogol/site-kernel-handoff/package.json` |
+| Add workspace dependencies | Done | 3 deps added to `@warpgogol/site-kernel-handoff/package.json` |
 | rfc.validate passes | Done | Verified |
-| mission.materialize succeeds | Done | Verified with webgogol-com-m000003 (37 files, 0 errors) |
+| mission.materialize succeeds | Done | Verified with warpgogol-com-m000003 (37 files, 0 errors) |
 
 ### Questions for the author
 
-1. Should the domain extraction use `gray-matter` (already a dependency of `@gogol/site-kernel-content`) instead of regex, to handle edge cases in `system.md` frontmatter formatting? This would require adding `gray-matter` to `@gogol/site-kernel-handoff` dependencies or re-exporting a parser from an existing package.
+1. Should the domain extraction use `gray-matter` (already a dependency of `@warpgogol/site-kernel-content`) instead of regex, to handle edge cases in `system.md` frontmatter formatting? This would require adding `gray-matter` to `@warpgogol/site-kernel-handoff` dependencies or re-exporting a parser from an existing package.
 2. Should `system.md` presence be explicitly validated before running generators, with a clear error message pointing to the Sternsystem bundle as the source of the problem? (Finding G-1)
 3. Should the `kernel.wire` output files be read from the `KernelWireResult.generated` array instead of being hardcoded? (Finding A-2)

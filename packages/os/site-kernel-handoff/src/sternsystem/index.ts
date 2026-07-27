@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 import { runSternsystemRegister } from "./sternsystem-register.ts";
 import { runSternsystemList } from "./sternsystem-list.ts";
 import { runSternsystemValidate } from "./sternsystem-validate.ts";

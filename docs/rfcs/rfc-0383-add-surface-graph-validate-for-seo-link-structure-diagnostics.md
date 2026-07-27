@@ -29,10 +29,10 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
-  - "@gogol/surface"
-  - "@gogol/site-kernel-checks"
+  - "@warpgogol/surface"
+  - "@warpgogol/site-kernel-checks"
 successSignals:
   - "Orphan indexable pages in the generated surface are detected and reported before deployment."
   - "Internal-link distribution is visible as machine-readable diagnostics, not guessed from manual inspection."
@@ -82,8 +82,8 @@ The kernel gains a `surface.graph.validate` command that reads the existing `sur
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.graph.validate --app webgogol-com --json
-pnpm exec site-kernel run surface.graph.validate --app webgogol-com
+pnpm exec site-kernel run surface.graph.validate --app warpgogol-com --json
+pnpm exec site-kernel run surface.graph.validate --app warpgogol-com
 ```
 
 App-scoped: run for a single app. The command reads `src/surface.generated.yaml` (the same artifact `surface.validate` reads). If no artifact exists, it passes with a skip message (same behavior as `surface.validate`).
@@ -195,7 +195,7 @@ The extraction reuses the existing block structure: `entry.page.blocks[]` may co
 
 ## Acceptance criteria
 
-- [ ] `surface.graph.validate` command registered in `@gogol/site-kernel-checks` with correct name and scope.
+- [ ] `surface.graph.validate` command registered in `@warpgogol/site-kernel-checks` with correct name and scope.
 - [ ] Command reads `surface.generated.yaml` and extracts internal links from baked page blocks.
 - [ ] GRAPH-01 (orphan) reports indexable pages with zero inbound internal links.
 - [ ] GRAPH-02 through GRAPH-07 report inbound distribution, crawl depth, link budget, dead ends, cluster isolation, and lazy-page limitations.

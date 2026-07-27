@@ -24,7 +24,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { resolvePlatformSemanticHash } from "./bundle-io.ts";
 import { hasPlatformScopeFiles, hasTrailer, isPlatformScope } from "./platform-scope.ts";
 import { compareSemver } from "./semver.ts";

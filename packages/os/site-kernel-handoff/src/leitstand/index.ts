@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 import {
   runLeitstandPropagate,
   runLeitstandStatus,

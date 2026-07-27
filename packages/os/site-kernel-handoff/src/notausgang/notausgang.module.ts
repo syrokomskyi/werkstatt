@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 
 export function createNotausgangModule(): KernelModule {
   return {
@@ -23,7 +23,7 @@ export function createNotausgangModule(): KernelModule {
       registry.registerCommand({
         name: "notausgang.export",
         description:
-          "Export a full site package with dist artifacts, history, and nulled integrations (RFC-0359, RFC-0380). Writes YAML manifests and uses @gogol/fingerprint for hashing. Flags: --system, --release, --output, [--keep-integration, --reason].",
+          "Export a full site package with dist artifacts, history, and nulled integrations (RFC-0359, RFC-0380). Writes YAML manifests and uses @warpgogol/fingerprint for hashing. Flags: --system, --release, --output, [--keep-integration, --reason].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,

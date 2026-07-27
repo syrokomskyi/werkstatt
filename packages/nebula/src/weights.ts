@@ -16,7 +16,7 @@
 *******************************************************************************/
 
 /**
- * @gogol/nebula — Frozen Nebula Score weights
+ * @warpgogol/nebula — Frozen Nebula Score weights
  *
  * DNA-33 / RFC-0028
  *

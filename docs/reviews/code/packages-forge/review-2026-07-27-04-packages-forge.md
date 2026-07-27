@@ -52,14 +52,14 @@ No issues. SKILL-17 reuses the existing `Violation` interface and validation loo
 
 ### Axis G — Blind spots
 
-No issues. The `(?<!@)` negative lookbehind for `WebGogol` correctly handles the `@webgogol/forge` npm package name edge case. The case-sensitive `RFC-\d{4}` pattern correctly excludes lowercase file paths (`adr-0000-template.md`) and camelCase binding keys (`validateRfc`). The `gi` flag on platform patterns catches case variations.
+No issues. The `(?<!@)` negative lookbehind for `Warpgogol` correctly handles the `@webgogol/forge` npm package name edge case. The case-sensitive `RFC-\d{4}` pattern correctly excludes lowercase file paths (`adr-0000-template.md`) and camelCase binding keys (`validateRfc`). The `gi` flag on platform patterns catches case variations.
 
 ### Spec compliance
 
 | Requirement from RFC-0553 | Status | Evidence |
 | --- | --- | --- |
 | SKILL-17 prohibits RFC-\d{4} and ADR-\d{4} | Done | `SKILL17_ID_PATTERNS` in skill-validate.ts:493 |
-| SKILL-17 prohibits WGogol/WebGogol/WarpGogol | Done | `SKILL17_PLATFORM_PATTERNS` in skill-validate.ts:495 |
+| SKILL-17 prohibits Warpgogol/Warpgogol/WarpGogol | Done | `SKILL17_PLATFORM_PATTERNS` in skill-validate.ts:495 |
 | Generic RFC/ADR terms allowed | Done | Pattern test in skill-validate.test.ts:122-130 |
 | File paths excluded | Done | Pattern test in skill-validate.test.ts:132-135 |
 | All skill files cleaned | Done | grep returns zero matches |
@@ -68,6 +68,6 @@ No issues. The `(?<!@)` negative lookbehind for `WebGogol` correctly handles the
 
 ### Questions for the author
 
-1. The `WGogol` pattern uses `gi` (case-insensitive) — does this match `wgogol` in lowercase contexts like `@gogol/site-kernel`? (Answer: no — `@gogol` does not contain "WGogol" as a word boundary match.)
-2. The `(?<!@)` lookbehind for `WebGogol` — is this supported in all target Node versions? (Answer: Node 16+ supports lookbehind in RegExp.)
+1. The `Warpgogol` pattern uses `gi` (case-insensitive) — does this match `warpgogol` in lowercase contexts like `@warpgogol/site-kernel`? (Answer: no — `@warpgogol` does not contain "Warpgogol" as a word boundary match.)
+2. The `(?<!@)` lookbehind for `Warpgogol` — is this supported in all target Node versions? (Answer: Node 16+ supports lookbehind in RegExp.)
 3. Should SKILL-17 also scan the frontmatter `description` and `triggers` fields? (Answer: yes — `checkSkill17` receives the full `content` including frontmatter, not just the body.)

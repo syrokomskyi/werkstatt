@@ -13,7 +13,7 @@
 */
 
 /**
- * @gogol/growth — GrowthAdapter interface
+ * @warpgogol/growth — GrowthAdapter interface
  *
  * DNA-30: All vendor integrations implement this closed contract.
  * No adapter may extend the interface with vendor-specific methods exposed

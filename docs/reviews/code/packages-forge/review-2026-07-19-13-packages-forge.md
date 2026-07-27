@@ -31,7 +31,7 @@ Clean implementation with proper Compass scaffolding, forward-only discipline, a
 
 ### Mechanical floor
 
-Pass — `@wgogol/forge` build:check and 97 tests pass.
+Pass — `@warpgogol/forge` build:check and 97 tests pass.
 
 ### Axis A — Structural correctness
 
@@ -73,7 +73,7 @@ Pass — `@wgogol/forge` build:check and 97 tests pass.
 - `forge.scaffold` earns its existence — project scaffolding is distinct from skill scaffolding. ✅
 - `StackProfile` type is minimal — `firstWorkspace` is optional, `install` defaults to empty array. ✅
 - `fo-harvest` reuses existing `port-to-forge` / `forge.port.scaffold` — no second porting mechanism. ✅
-- `packagesImpacted` lists only `@wgogol/forge`. ✅
+- `packagesImpacted` lists only `@warpgogol/forge`. ✅
 
 ### Axis G — Blind spots
 

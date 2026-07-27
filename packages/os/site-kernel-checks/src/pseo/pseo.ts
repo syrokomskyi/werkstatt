@@ -25,8 +25,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { Blueprint, PageEntry, SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import type { Blueprint, PageEntry, SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
 import { failResult, passResult } from "../result-helpers.ts";
 import { loadSurfaceBlueprints } from "../surface-expand.ts";
 
@@ -35,7 +35,7 @@ const ARTIFACT_FILE = "src/surface.generated.yaml";
 async function loadAuthoredSlugs(appDir: string): Promise<Set<string>> {
   const slugs = new Set<string>();
   try {
-    const { loadSystemManifest } = await import("@gogol/site-kernel-content");
+    const { loadSystemManifest } = await import("@warpgogol/site-kernel-content");
     const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
     const pages = (manifest as unknown as { pages?: Array<{ routes?: Record<string, string> }> })
       .pages;

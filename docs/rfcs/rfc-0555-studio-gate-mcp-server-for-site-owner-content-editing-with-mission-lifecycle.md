@@ -77,7 +77,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -93,7 +93,7 @@ nonGoals:
 
 ## Context
 
-The WGogol platform manages sites as Sternsystems (DNA-44) with a mission lifecycle (DNA-46): open → materialize → edit → validate → release → reconcile → close. Content lives in `src/content/` (DNA-4) with a client-editable surface whitelist (DNA-22). Mission lifecycle commands (`mission.open`, `mission.materialize`, `mission.git.commit`, `mission.validate`, `mission.reconcile`, `mission.close`, `release.prepare`, `release.publish`, `leitstand.propagate`) already exist as Site OS commands.
+The Warpgogol platform manages sites as Sternsystems (DNA-44) with a mission lifecycle (DNA-46): open → materialize → edit → validate → release → reconcile → close. Content lives in `src/content/` (DNA-4) with a client-editable surface whitelist (DNA-22). Mission lifecycle commands (`mission.open`, `mission.materialize`, `mission.git.commit`, `mission.validate`, `mission.reconcile`, `mission.close`, `release.prepare`, `release.publish`, `leitstand.propagate`) already exist as Site OS commands.
 
 The existing `packages/agent-gate` (RFC-0290) provides an HTTP/JSON-RPC MCP endpoint for public-facing agent interaction — capability dispatch, integration events, rate limiting. It is Astro-integrated and designed for external agents calling site capabilities (contact forms, newsletter signups), not for site owners editing content through mission lifecycle.
 
@@ -136,7 +136,7 @@ pnpm exec site-kernel run workpiece.read --mission <missionId> --path <relative-
 
 Reads a file from the mission workpiece. Flags:
 
-- `--mission` (required) — mission id (e.g. `webgogol-com-m000015`)
+- `--mission` (required) — mission id (e.g. `warpgogol-com-m000015`)
 - `--path` (required) — relative path within workpiece (e.g. `src/content/pages/de/home.md`)
 
 Path validation (before any file I/O):
@@ -299,7 +299,7 @@ The server requires `@modelcontextprotocol/sdk` >= 1.0.0 (the first stable relea
 | `packages/studio-gate/src/executor.ts` | Command execution via child_process |
 | `packages/studio-gate/AGENTS.md` | Package-level agent guide |
 | `packages/os/site-kernel-handoff/src/workpiece/` | New command implementations: workpiece-read.ts, workpiece-write.ts |
-| `packages/wgogol-skills/skills/wg-site-content-edit/SKILL.md` | Process layer skill (wg-skill, in the wg skill pack) |
+| `packages/warpgogol-skills/skills/wg-site-content-edit/SKILL.md` | Process layer skill (wg-skill, in the wg skill pack) |
 | `docs/architecture-dna.md` | DNA-56 entry added |
 
 ### DNA-22 path validation logic
@@ -308,7 +308,7 @@ The `workpiece.read` and `workpiece.write` commands share a path validation func
 
 1. **Resolve** — `path.resolve(workpieceRoot, relativePath)` to get absolute path
 2. **Traversal check** — verify resolved path starts with `workpieceRoot` (reject `../` traversal)
-3. **Load clientEditable** — load `system.md` from workpiece via `loadSystemManifest()` from `@gogol/site-kernel-content` (the canonical loader for RFC-0047 `system.md` frontmatter). Parse `clientEditable[]` array from the parsed manifest. Note: the existing `client.edit.validate` in `site-kernel-checks` reads legacy `system.yaml`; `workpiece.read`/`write` use the canonical `system.md` path via `loadSystemManifest`.
+3. **Load clientEditable** — load `system.md` from workpiece via `loadSystemManifest()` from `@warpgogol/site-kernel-content` (the canonical loader for RFC-0047 `system.md` frontmatter). Parse `clientEditable[]` array from the parsed manifest. Note: the existing `client.edit.validate` in `site-kernel-checks` reads legacy `system.yaml`; `workpiece.read`/`write` use the canonical `system.md` path via `loadSystemManifest`.
 4. **Pattern match** — check if relativePath matches any entry in `clientEditable[]`:
    - `src/content/{business-profile,pages,sections,components,features,people}/**`
    - `src/content/**/assets/**` (whitelisted media extensions)
@@ -365,7 +365,7 @@ Run `ecosystem.manifest.generate` after implementation to update `docs/ecosystem
 
 ## Risks
 
-- **DNA-22 path validation false positives** — the `clientEditable[]` pattern matching may reject valid paths due to glob resolution edge cases. Mitigation: use the same DNA-22 surface definition as `client.edit.validate` (already battle-tested), but load `clientEditable[]` from `system.md` via `loadSystemManifest()` (`@gogol/site-kernel-content`) rather than from legacy `system.yaml`.
+- **DNA-22 path validation false positives** — the `clientEditable[]` pattern matching may reject valid paths due to glob resolution edge cases. Mitigation: use the same DNA-22 surface definition as `client.edit.validate` (already battle-tested), but load `clientEditable[]` from `system.md` via `loadSystemManifest()` (`@warpgogol/site-kernel-content`) rather than from legacy `system.yaml`.
 - **LLM confusion from tool count** — 12 MCP tools may overwhelm smaller LLMs. Mitigation: the `wg-site-content-edit` skill in `serverInfo.instructions` provides the process layer, guiding the LLM through the correct tool sequence.
 - **Command execution latency** — each MCP tool call spawns a child process (`pnpm exec site-kernel run`). For rapid multi-file edits, this adds overhead. Mitigation: acceptable for content editing (not a hot path); LLMs typically make 5-15 tool calls per edit session.
 - **MCP SDK dependency** — `@modelcontextprotocol/sdk` is an external dependency. Mitigation: it is the official Anthropic SDK, widely adopted, and pinned in `package.json`.
@@ -385,8 +385,8 @@ Run `ecosystem.manifest.generate` after implementation to update `docs/ecosystem
 - [x] `.agents/skills/wg-site-content-edit/SKILL.md` exists with process instructions for content editing through mission lifecycle (evidence: .agents/skills/wg-site-content-edit/SKILL.md)
 - [x] DNA-56 entry exists in `docs/architecture-dna.md` and references this RFC (evidence: docs/architecture-dna.md:239-241)
 - [x] Operator can connect an MCP-capable LLM client to studio-gate and perform a content edit through the full mission lifecycle (open → materialize → read → write → commit → validate → release.prepare → leitstand.propagate alt → approve → release.publish → leitstand.propagate main → reconcile → close) (evidence: packages/studio-gate/src/index.ts MCP server with stdio transport, all 12 tools registered)
-- [x] `packages/studio-gate` passes `build:check` (typecheck) (evidence: pnpm --filter @gogol/studio-gate run build:check exit 0)
-- [x] `packages/os/site-kernel-handoff` passes `build:check` (typecheck) with new workpiece commands (evidence: pnpm --filter @gogol/site-kernel-handoff run build:check exit 0, 239 tests pass)
+- [x] `packages/studio-gate` passes `build:check` (typecheck) (evidence: pnpm --filter @warpgogol/studio-gate run build:check exit 0)
+- [x] `packages/os/site-kernel-handoff` passes `build:check` (typecheck) with new workpiece commands (evidence: pnpm --filter @warpgogol/site-kernel-handoff run build:check exit 0, 239 tests pass)
 - [x] `rfc.validate` passes on this file before merging (evidence: this validation run)
 
 ## Implementation notes for agents

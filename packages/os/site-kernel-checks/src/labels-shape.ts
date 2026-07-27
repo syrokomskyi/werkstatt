@@ -25,8 +25,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 
 // RFC-0095 soft limits — chosen for the shared site primitives:
 //   brandTagline      truncates in the header's absolute-positioned slot

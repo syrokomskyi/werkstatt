@@ -7,7 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0357: initial behavior snapshot capture and diff handlers.</item>
-  <item>RFC-0379: add per-route contentHash via @gogol/fingerprint HTML normalization.</item>
+  <item>RFC-0379: add per-route contentHash via @warpgogol/fingerprint HTML normalization.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,9 +19,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
-import { hashHtml } from "@gogol/fingerprint";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
+import { hashHtml } from "@warpgogol/fingerprint";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];

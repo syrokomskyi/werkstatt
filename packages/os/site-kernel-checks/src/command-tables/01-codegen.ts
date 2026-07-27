@@ -26,8 +26,8 @@ import {
   runBiomeCssGenerate,
   runPropsTypesGenerate,
   runFontsImportsGenerate,
-} from "@gogol/site-kernel-codegen";
-import { runKernelWire } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel-codegen";
+import { runKernelWire } from "@warpgogol/site-kernel";
 import { runManifestContractValidate, runMirrorQuintetValidate } from "../manifest.ts";
 import { runUniRegistryBuild, runUniRegistryValidate } from "../registry.ts";
 import {
@@ -245,7 +245,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "manifest.contract.validate",
     description:
-      "Validate every *.manifest.yaml in packages/ui/src/{sections,components,pages}/ against @gogol/ontology manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).",
+      "Validate every *.manifest.yaml in packages/ui/src/{sections,components,pages}/ against @warpgogol/ontology manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,
@@ -290,7 +290,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
     name: "onboarding.yaml.import.lint",
     description:
-      "Block direct YAML.parse of RFC-0076 onboarding artifacts in kernel onboarding/audit/content-discipline sources; require @gogol/share/onboarding-yaml (RFC-0082).",
+      "Block direct YAML.parse of RFC-0076 onboarding artifacts in kernel onboarding/audit/content-discipline sources; require @warpgogol/share/onboarding-yaml (RFC-0082).",
     scope: "workspace",
     flags: {},
     supportsAllSites: true,

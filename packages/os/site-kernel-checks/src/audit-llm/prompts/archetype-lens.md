@@ -1,6 +1,6 @@
 promptVersion: archetype-lens@1.0.0
 
-You are running the WGogol RFC-0074 archetype-lens audit.
+You are running the Warpgogol RFC-0074 archetype-lens audit.
 
 Task:
 

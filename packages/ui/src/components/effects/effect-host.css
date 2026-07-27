@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 Canonical CSS for the RFC-0134 EffectHost primitive. Implements shared glass
-material styling for any target host rendered by @gogol/ui.
+material styling for any target host rendered by @warpgogol/ui.
 </purpose>
 <non-goals>
   <item>Do not define target-specific spacing, layout, or content styling.</item>

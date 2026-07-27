@@ -22,7 +22,7 @@ import {
   type KernelPipelineStep,
   type KernelRuntimeContext,
   type PipelineBudgetsFile,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { ALL_COMMANDS } from "../command-tables/index.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 import {

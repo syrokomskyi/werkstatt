@@ -34,7 +34,7 @@ The diff cleanly implements RFC-0373: services are projected from the business c
 
 ### Mechanical floor
 
-Pass — all four impacted packages pass `build:check` (`@gogol/share`, `@gogol/business`, `@gogol/site-kernel-checks`, `@gogol/site-kernel-content`). `rfc.validate RFC-0373` passes. `services.projection.validate` passes on all three apps. Pre-existing `growth.adapter.contract` failure in `webgogol-com` and `nicaragua-projekt` build:check is unimpacted (confirmed via stash test).
+Pass — all four impacted packages pass `build:check` (`@warpgogol/share`, `@warpgogol/business`, `@warpgogol/site-kernel-checks`, `@warpgogol/site-kernel-content`). `rfc.validate RFC-0373` passes. `services.projection.validate` passes on all three apps. Pre-existing `growth.adapter.contract` failure in `warpgogol-com` and `nicaragua-projekt` build:check is unimpacted (confirmed via stash test).
 
 ### Axis A — Structural correctness
 
@@ -52,7 +52,7 @@ No issues.
 
 No issues.
 
-- **Package boundaries**: correct — projectors in `@gogol/share`, schema in `@gogol/business`, validators in `@gogol/site-kernel-checks`, disk loader in `@gogol/site-kernel-content`.
+- **Package boundaries**: correct — projectors in `@warpgogol/share`, schema in `@warpgogol/business`, validators in `@warpgogol/site-kernel-checks`, disk loader in `@warpgogol/site-kernel-content`.
 - **Pipeline placement**: `services.projection.validate` placed in `APPS_BUILD_CHECK_PIPELINE` after `print.layout.validate`. Correct — it validates source files, not build artifacts.
 - **Command lifecycle**: registered in `16-offer.ts` alongside `offer.capacity.validate` and `offer.provider.validate`. Command metadata includes `scope: "app"`, `supportsAllApps: true`, `flags: {}`.
 - **Compass sync**: `ecosystem.generated.json` regenerated. `ecosystem.manifest.validate` and `workspace.surface.validate` pass.

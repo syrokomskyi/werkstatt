@@ -44,9 +44,9 @@ license:
   copyrightNotice: "Copyright © 2026 Example Business GmbH. All rights reserved unless otherwise stated."
 ```
 
-## Commissioned Webgogol Material
+## Commissioned Warpgogol Material
 
-Use this for materials commissioned by Webgogol for a commercial studio project.
+Use this for materials commissioned by Warpgogol for a commercial studio project.
 
 ```yaml
 id: home-illustration-image
@@ -57,17 +57,17 @@ target:
 sourceType: composite
 title: Home page illustration
 parties:
-  - name: Webgogol
+  - name: Warpgogol
     kind: Organization
     role: rightsHolder
 license:
-  label: commissioned-webgogol-material
-  copyrightNotice: "Copyright © 2026 Webgogol. All rights reserved unless otherwise stated."
+  label: commissioned-warpgogol-material
+  copyrightNotice: "Copyright © 2026 Warpgogol. All rights reserved unless otherwise stated."
 ```
 
 ## AI Platform Participation
 
-When AI tooling materially contributed to the material, disclose only the tool/platform, role, and prompt author. For the Webgogol pilot, VEO is recorded as `AIPlatform`.
+When AI tooling materially contributed to the material, disclose only the tool/platform, role, and prompt author. For the Warpgogol pilot, VEO is recorded as `AIPlatform`.
 
 ```yaml
 parties:

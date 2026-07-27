@@ -1,5 +1,5 @@
 /**
- * @gogol/pbp — Public Business Profile (PBP) entity envelope, namespace, and URI policy.
+ * @warpgogol/pbp — Public Business Profile (PBP) entity envelope, namespace, and URI policy.
  *
  * @see RFC-0399 (Namespace, Entity Envelope and URI Policy)
  * @see RFC-0400 (Primitive Types and Controlled Vocabularies)
@@ -517,7 +517,7 @@ export {
 // RFC-0460: Sichtpass / Verifiable Credential Mapping
 export { type PbpSichtpassMapping, type PbpVerifiableCredentialMapping } from "./sichtpass.js";
 
-// RFC-0461: Webgogol Legacy Migration
+// RFC-0461: Warpgogol Legacy Migration
 export {
   type PbpMigrationMapping,
   type PbpLegacyToPbpFieldMap,

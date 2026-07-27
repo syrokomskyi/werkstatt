@@ -10,13 +10,13 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Architecture review: invert the adapter dependency — the host injects the loader map so
-        @gogol/growth does not depend on the adapter packages (removes the workspace cycle and
+        @warpgogol/growth does not depend on the adapter packages (removes the workspace cycle and
         eliminates the @vite-ignore dynamic import).</item>
 </CHANGE_SUMMARY>
 */
 
 /**
- * @gogol/growth — bootGrowthLayer()
+ * @warpgogol/growth — bootGrowthLayer()
  *
  * This module runs exclusively in the browser. It is bundled by Vite as part
  * of <GrowthProvider client:load> and must not import any Node.js-only APIs.
@@ -39,9 +39,9 @@ import type { GrowthAdapter } from "./adapter.ts";
  * the adapter package and returns its default export. The HOST (e.g. the
  * <GrowthProvider> Astro island) owns this map with STATIC `import()` specifiers
  * so the bundler code-splits each adapter into a resolvable async chunk. Keeping
- * it here (in the host, not the port) avoids @gogol/growth depending on the
+ * it here (in the host, not the port) avoids @warpgogol/growth depending on the
  * adapter packages — which would form a workspace cycle (adapters already depend
- * on @gogol/growth).
+ * on @warpgogol/growth).
  */
 export type GrowthAdapterLoaders = Record<string, () => Promise<{ default: GrowthAdapter }>>;
 
@@ -49,7 +49,7 @@ export type GrowthAdapterLoaders = Record<string, () => Promise<{ default: Growt
  * The global window key used as a boot guard to prevent double-init on SPA
  * navigations or HMR.
  */
-const GROWTH_BOOTED_KEY = "__webgogol_growth_booted__";
+const GROWTH_BOOTED_KEY = "__warpgogol_growth_booted__";
 
 // ---------------------------------------------------------------------------
 // bootGrowthLayer()

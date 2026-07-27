@@ -9,7 +9,7 @@
 
 ## Scope
 
-This document defines the sanctioned pattern for cross-site agent scenarios within the WGogol fleet. It is the doctrine companion to RFC-0292 ("Federate agent surfaces across the fleet").
+This document defines the sanctioned pattern for cross-site agent scenarios within the Warpgogol fleet. It is the doctrine companion to RFC-0292 ("Federate agent surfaces across the fleet").
 
 ## The one rule
 
@@ -43,4 +43,4 @@ A site leaving the fleet (handoff/export per RFC-0221) disappears from the catal
 
 ## Phase 2 (deferred)
 
-Outward publication of a studio-level directory (e.g. `webgogol.com/.well-known/gogol-fleet.json`) with per-client consent semantics is a deliberate later product decision. It requires its own RFC and founder consent. The catalog schema is designed to be publishable as-is (minus `enabled: false` entries) when that decision is made.
+Outward publication of a studio-level directory (e.g. `warpgogol.com/.well-known/gogol-fleet.json`) with per-client consent semantics is a deliberate later product decision. It requires its own RFC and founder consent. The catalog schema is designed to be publishable as-is (minus `enabled: false` entries) when that decision is made.

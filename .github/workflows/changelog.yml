@@ -50,7 +50,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm --filter @gogol/site-kernel-checks build
+        run: pnpm --filter @warpgogol/site-kernel-checks build
 
       - name: Generate changelog — nicaragua-projekt
         if: ${{ github.event.inputs.app == 'nicaragua-projekt' || github.event.inputs.app == 'all' || github.event_name == 'schedule' }}

@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0188: static governance for the Visitor Sales Funnel. The PLATFORM owns the funnel
-stage/event/transition graph (@gogol/share/integration); these validators guard that the app's
+stage/event/transition graph (@warpgogol/share/integration); these validators guard that the app's
 funnel configuration and localized copy stay aligned with it, that no legacy UChat stage string or
 Make.com reference leaks back into the funnel path, and that the canonical transition graph itself
 stays self-consistent (no stranded stage). Node-safe: read disk + pure contracts only — no astro:env,
@@ -22,9 +22,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import {
   FUNNEL_TERMINAL_STAGES,
   FUNNEL_TRANSITION_TRIGGERS,
@@ -36,7 +36,7 @@ import {
   isValidFunnelStage,
   reachableStages,
   scanForMakeComReferences,
-} from "@gogol/integration";
+} from "@warpgogol/integration";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 interface FunnelConfig {
@@ -241,9 +241,9 @@ export async function runFunnelStageValidate(
 // funnel.copy.validate
 // ---------------------------------------------------------------------------
 
-/** Locales that webgogol-com must keep aligned (RFC-0188). */
+/** Locales that warpgogol-com must keep aligned (RFC-0188). */
 const PILOT_REQUIRED_LOCALES: Readonly<Record<string, readonly string[]>> = {
-  "webgogol-com": ["de", "uk"],
+  "warpgogol-com": ["de", "uk"],
 };
 
 /** Legacy tariff copy that must never appear in funnel content (RFC-0188). */

@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0468: validate owner-decision-register.yaml and migration-coverage-report.yaml
-structure and coverage for the Webgogol PBP content tree.</purpose>
+structure and coverage for the Warpgogol PBP content tree.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0468: initial tests for owner decision register and migration coverage report.</item>
@@ -12,10 +12,10 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 
 const WORKSPACE_ROOT = join(fileURLToPath(new URL("../../../..", import.meta.url)));
-const BIZ_PROFILE_DIR = join(WORKSPACE_ROOT, "systems/webgogol-com/src/content/business-profile");
+const BIZ_PROFILE_DIR = join(WORKSPACE_ROOT, "systems/warpgogol-com/src/content/business-profile");
 
 function readYaml(filePath: string): Record<string, unknown> {
   if (!existsSync(filePath)) {

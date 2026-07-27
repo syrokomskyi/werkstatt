@@ -12,7 +12,7 @@ import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { writeMissionManifest, readMissionManifest } from "../mission/mission-io.ts";
-import type { MissionManifest } from "@gogol/ontology/operations";
+import type { MissionManifest } from "@warpgogol/ontology/operations";
 
 function makeManifest(missionId: string, systemId: string): MissionManifest {
   return {

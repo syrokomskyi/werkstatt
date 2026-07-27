@@ -23,9 +23,9 @@ plan.gate.red consumed by APPS_CHECK (Phase 3).
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parse as parseYaml, stringify as yamlStringify } from "yaml";
-import { recordClaimsSchema } from "@gogol/share/schemas";
-import { resolveFieldPath } from "@gogol/share/content/resolve-field-path";
-import { derivedState } from "@gogol/share/knowledge/derivation";
+import { recordClaimsSchema } from "@warpgogol/share/schemas";
+import { resolveFieldPath } from "@warpgogol/share/content/resolve-field-path";
+import { derivedState } from "@warpgogol/share/knowledge/derivation";
 import {
   stableTaskId,
   computeDueAt,
@@ -35,20 +35,20 @@ import {
   type MaintenancePlan,
   type Criticality,
   type MaintenanceTrigger,
-} from "@gogol/share/knowledge/plan";
+} from "@warpgogol/share/knowledge/plan";
 import type {
   AuthoredFreshnessLedger,
   FreshnessCriticality,
-} from "@gogol/share/knowledge/freshness";
-import type { DivergenceRecord } from "@gogol/share/knowledge/source";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/share/knowledge/freshness";
+import type { DivergenceRecord } from "@warpgogol/share/knowledge/source";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type {
   CheckResult,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { writeFileIfChanged } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { passResult } from "./result-helpers.ts";
 import { pathExists, readMarkdownDocument } from "./content-discipline.ts";
 import { collectClaimSidecars, recordPathForSidecar, toPosix } from "./content-claims.ts";

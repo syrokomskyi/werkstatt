@@ -17,7 +17,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { getEntry, getCollection } from "@gogol/content-source/astro";
+import { getEntry, getCollection } from "@warpgogol/content-source/astro";
 
 // ---------------------------------------------------------------------------
 // Shared helpers (moved from content.ts so handlers are self-contained)

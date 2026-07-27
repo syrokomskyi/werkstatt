@@ -18,13 +18,13 @@ import { access, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
-import { collectFiles as collectFilesShared } from "@gogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 
 export const AmendSource = z
   .object({

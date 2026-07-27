@@ -4,7 +4,7 @@
   [RFC-0192/0193] The Blueprint contract type (the declarative spec that configures one surface)
   plus the pure helpers that turn a Blueprint + loaded datasets into the eligibility matrix and
   the materialized VirtualRouteEntry[] (routes + redirect decisions). Framework-free. The runtime
-  Zod schema and the YAML files live in @gogol/ontology (RFC-0193); block baking is added there.
+  Zod schema and the YAML files live in @warpgogol/ontology (RFC-0193); block baking is added there.
 </purpose>
 <non-goals>
   <item>Do not parse YAML or validate (ontology owns the Zod schema).</item>
@@ -45,7 +45,7 @@ export interface BlueprintAxis {
   id: string;
   /**
    * The content-source collection + field whose entries form this axis's value universe,
-   * OR a geo provider reference (RFC-0238) resolved via @gogol/geo.
+   * OR a geo provider reference (RFC-0238) resolved via @warpgogol/geo.
    */
   universe: { collection: string; field: string } | { provider: string };
   /** The record field whose value(s) carry this axis's membership. */

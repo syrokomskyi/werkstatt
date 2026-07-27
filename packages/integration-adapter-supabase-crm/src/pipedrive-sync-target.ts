@@ -23,9 +23,9 @@ import type {
   BufferDealStage,
   BufferSubscription,
   BufferInvoice,
-} from "@gogol/integration/crm-buffer";
-import { BUFFER_DEAL_STAGES } from "@gogol/integration/crm-buffer";
-import type { SubscriptionStatus } from "@gogol/integration";
+} from "@warpgogol/integration/crm-buffer";
+import { BUFFER_DEAL_STAGES } from "@warpgogol/integration/crm-buffer";
+import type { SubscriptionStatus } from "@warpgogol/integration";
 
 // ---------------------------------------------------------------------------
 // CrmSyncTarget — vendor-agnostic sync port

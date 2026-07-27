@@ -52,7 +52,7 @@ export async function executeDispatch(
 /**
  * Minimal structural type for a Workers-for-Platforms dynamic-dispatch binding.
  * `get(siteId)` returns the tenant Worker's fetcher; we never import the platform
- * types (keeps @gogol/share runtime-agnostic, mirroring QueueBinding/KvDedupStore).
+ * types (keeps @warpgogol/share runtime-agnostic, mirroring QueueBinding/KvDedupStore).
  */
 export interface DispatchNamespaceBinding {
   get(siteId: string): { fetch(request: Request): Promise<Response> };

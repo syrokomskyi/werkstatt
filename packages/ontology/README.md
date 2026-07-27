@@ -1,6 +1,6 @@
-# @gogol/ontology
+# @warpgogol/ontology
 
-Closed-enum vocabulary, manifest schema, and cosmic catalogs for the WGogol Uni UI Ontology (DNA-23, RFC-0023).
+Closed-enum vocabulary, manifest schema, and cosmic catalogs for the Warpgogol Uni UI Ontology (DNA-23, RFC-0023).
 
 ## Purpose
 
@@ -10,12 +10,12 @@ Single source of truth for all structural vocabulary used across `packages/ui`, 
 
 | Import | What it provides |
 | --- | --- |
-| `@gogol/ontology` | Barrel — all exports below |
-| `@gogol/ontology/enums` | `Layer`, `ComponentRole`, `Industry` — closed enums + Zod schemas. `SemanticRole` is an open type alias (`string`) since RFC-0084 — section roles are derived from the archetype catalog and validated by `archetype.registry.validate`. |
-| `@gogol/ontology/manifest` | `manifestSchema`, per-layer schemas, `KNOWN_INTENTS` advisory list |
-| `@gogol/ontology/cosmic` | `StarCatalog`, `PlanetCatalog`, `MoonCatalog` + Zod name schemas (DNA-23) |
-| `@gogol/ontology/schemas` | `constellationSchema`, `biomeSchema`, `systemManifestSchema`, `PageEntrySchema`, `BlockEntrySchema`, `getSectionPropsSchema` |
-| `@gogol/ontology/operations` | Platform operations schemas: `handoff`, `sternsystem`, `werkstatt`, `mission`, `release`, `leitstand`, `notausgang`, `materialization`, `artifact-store`, `naming-policy` |
+| `@warpgogol/ontology` | Barrel — all exports below |
+| `@warpgogol/ontology/enums` | `Layer`, `ComponentRole`, `Industry` — closed enums + Zod schemas. `SemanticRole` is an open type alias (`string`) since RFC-0084 — section roles are derived from the archetype catalog and validated by `archetype.registry.validate`. |
+| `@warpgogol/ontology/manifest` | `manifestSchema`, per-layer schemas, `KNOWN_INTENTS` advisory list |
+| `@warpgogol/ontology/cosmic` | `StarCatalog`, `PlanetCatalog`, `MoonCatalog` + Zod name schemas (DNA-23) |
+| `@warpgogol/ontology/schemas` | `constellationSchema`, `biomeSchema`, `systemManifestSchema`, `PageEntrySchema`, `BlockEntrySchema`, `getSectionPropsSchema` |
+| `@warpgogol/ontology/operations` | Platform operations schemas: `handoff`, `sternsystem`, `werkstatt`, `mission`, `release`, `leitstand`, `notausgang`, `materialization`, `artifact-store`, `naming-policy` |
 
 ## Cosmic naming rules (DNA-23)
 
@@ -28,9 +28,9 @@ Cosmic names are manifest/YAML fields and UI strings only. Never use them in imp
 ## Usage
 
 ```typescript
-import { MoonCatalog, moonNameSchema } from "@gogol/ontology/cosmic";
-import { manifestSchema, type ComponentManifest } from "@gogol/ontology/manifest";
-import { Layer, type SemanticRole } from "@gogol/ontology/enums";
+import { MoonCatalog, moonNameSchema } from "@warpgogol/ontology/cosmic";
+import { manifestSchema, type ComponentManifest } from "@warpgogol/ontology/manifest";
+import { Layer, type SemanticRole } from "@warpgogol/ontology/enums";
 // SemanticRole is an open string alias since RFC-0084. To enumerate the
 // currently declared section roles at runtime, read sectionRoles[] from
 // packages/ontology/archetypes/index.json.
@@ -45,13 +45,13 @@ const result = manifestSchema.safeParse(rawYaml);
 ### Block-declarative schema (DNA-24)
 
 ```typescript
-import { BlockEntrySchema, PageEntrySchema } from "@gogol/ontology/schemas";
+import { BlockEntrySchema, PageEntrySchema } from "@warpgogol/ontology/schemas";
 ```
 
 ### Platform operations schemas
 
 ```typescript
-import { handoffManifestSchema, systemPinSchema } from "@gogol/ontology/operations";
+import { handoffManifestSchema, systemPinSchema } from "@warpgogol/ontology/operations";
 ```
 
 ### Archetype registry
@@ -61,5 +61,5 @@ The archetype registry (`src/archetype-registry.ts`) validates `archetypes/index
 ## Validation
 
 ```sh
-pnpm --filter @gogol/ontology build:check
+pnpm --filter @warpgogol/ontology build:check
 ```

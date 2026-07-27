@@ -17,12 +17,12 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 import { parse as yamlParse } from "yaml";
-import { readAstroSiteUrl } from "@gogol/site-kernel-checks/lib/astro-site-url";
-import { readDefaultLanguageCode } from "@gogol/site-kernel-checks/lib/i18n";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { readAstroSiteUrl } from "@warpgogol/site-kernel-checks/lib/astro-site-url";
+import { readDefaultLanguageCode } from "@warpgogol/site-kernel-checks/lib/i18n";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 
 interface ProbeTarget {
   siteId: string;
@@ -92,7 +92,7 @@ export async function runFleetProbeValidate(
   const runnerFiles = await context.io.glob("src/**/*.ts", { cwd: runnerDir });
   for (const file of runnerFiles) {
     const text = await context.io.readFile(join(runnerDir, file));
-    if (text.includes('from "@gogol/') || text.includes('from "apps/')) {
+    if (text.includes('from "@warpgogol/') || text.includes('from "apps/')) {
       // Check for apps/* imports specifically
       if (/from\s+["']\.\.\/\.\.\/apps\//.test(text) || /from\s+["']apps\//.test(text)) {
         diagnostics.push({

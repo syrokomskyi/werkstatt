@@ -19,7 +19,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { loadPassportData } from "@gogol/passport/data";
+import { loadPassportData } from "@warpgogol/passport/data";
 import "./passport-header-component.css";
 
 interface Props {
@@ -46,10 +46,10 @@ const nebulaScore = passport?.nebulaScore?.composite ?? undefined;
 
 <script define:vars={{ appId, nebulaScore }}>
   // Emit passport-view growth event after page hydration.
-  // Uses window.__webgogol_emit__ if the growth layer is active; no-ops otherwise.
+  // Uses window.__warpgogol_emit__ if the growth layer is active; no-ops otherwise.
   (function () {
     function tryEmit() {
-      const emitFn = window.__webgogol_emit__;
+      const emitFn = window.__warpgogol_emit__;
       if (typeof emitFn !== "function") return;
       const payload = { appId };
       if (typeof nebulaScore === "number") payload.nebulaScore = nebulaScore;

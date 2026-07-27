@@ -8,7 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Refine Compass scaffolding to accurately reflect the file's architectural role and responsibilities.</item>
-  <item>Migrated sha256FileHex from deleted ./hash.ts to byteHashFile from @gogol/fingerprint directly.</item>
+  <item>Migrated sha256FileHex from deleted ./hash.ts to byteHashFile from @warpgogol/fingerprint directly.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -18,7 +18,7 @@
  */
 
 import path from "node:path";
-import { byteHashFile } from "@gogol/fingerprint";
+import { byteHashFile } from "@warpgogol/fingerprint";
 import { loadEntitiesById } from "./registry.ts";
 import type { MoveCandidate } from "./types.ts";
 

@@ -13,7 +13,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { connect as tlsConnect, type TLSSocket } from "node:tls";
-import { createMetricsPusher, type MetricsPusher, METRIC_REFS } from "@gogol/observability";
+import { createMetricsPusher, type MetricsPusher, METRIC_REFS } from "@warpgogol/observability";
 import { loadConfig } from "./config.ts";
 import {
   probeTarget,
@@ -61,18 +61,18 @@ const defaultTlsImpl: TlsImpl = (hostname, port) => {
 
 function recordObservation(pusher: MetricsPusher, obs: ProbeObservation): void {
   const labels = { site_id: obs.siteId, route: obs.route };
-  METRIC_REFS.wgogol_probe_up.set(pusher, obs.up, labels);
-  METRIC_REFS.wgogol_probe_ttfb_seconds.set(pusher, obs.ttfbSeconds, labels);
-  METRIC_REFS.wgogol_probe_http_status_class_total.add(pusher, 1, {
+  METRIC_REFS.warpgogol_probe_up.set(pusher, obs.up, labels);
+  METRIC_REFS.warpgogol_probe_ttfb_seconds.set(pusher, obs.ttfbSeconds, labels);
+  METRIC_REFS.warpgogol_probe_http_status_class_total.add(pusher, 1, {
     site_id: obs.siteId,
     route: obs.route,
     status_class: obs.statusClass,
   });
   if (obs.contentOk !== null) {
-    METRIC_REFS.wgogol_probe_content_ok.set(pusher, obs.contentOk, labels);
+    METRIC_REFS.warpgogol_probe_content_ok.set(pusher, obs.contentOk, labels);
   }
   if (obs.certExpiryDays !== null) {
-    METRIC_REFS.wgogol_probe_cert_expiry_days.set(pusher, obs.certExpiryDays, {
+    METRIC_REFS.warpgogol_probe_cert_expiry_days.set(pusher, obs.certExpiryDays, {
       site_id: obs.siteId,
     });
   }

@@ -19,19 +19,19 @@ the RFC-0171 content-source adapter). Part of the Content Knowledge Lifecycle.
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as yamlParse } from "yaml";
-import { recordClaimsSchema } from "@gogol/share/schemas";
+import { recordClaimsSchema } from "@warpgogol/share/schemas";
 import {
   sourceDescriptorSchema,
   type SourceDescriptor,
   type DivergenceRecord,
-} from "@gogol/share/knowledge/source";
+} from "@warpgogol/share/knowledge/source";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { getContentDisciplinePaths, pathExists } from "./content-discipline.ts";
 import { collectClaimSidecars, keyLine, toPosix } from "./content-claims.ts";

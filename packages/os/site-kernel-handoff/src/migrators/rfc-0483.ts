@@ -368,7 +368,7 @@ async function removeBusinessCollectionFromConfig(
   updated = updated.replace(businessCollectionPattern, "");
   updated = updated.replace(/^\s*business,\s*$/m, "");
   updated = updated.replace(
-    /import\s*\{[^}]*businessCollections[^}]*\}\s*from\s*"@gogol\/business\/astro";\n*/g,
+    /import\s*\{[^}]*businessCollections[^}]*\}\s*from\s*"@warpgogol\/business\/astro";\n*/g,
     "",
   );
 

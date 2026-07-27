@@ -19,7 +19,7 @@ import type {
   GrowthAdapterConfig,
   EmittedEvent,
   EventName,
-} from "@gogol/growth/adapter";
+} from "@warpgogol/growth/adapter";
 import { DEFAULT_MATOMO_BINDING, type MatomoBinding, type MatomoBindingEvent } from "./binding.ts";
 import { BrowserMatomoTransport, type MatomoTransport } from "./transport.ts";
 

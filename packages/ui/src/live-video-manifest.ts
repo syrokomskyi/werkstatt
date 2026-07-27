@@ -18,7 +18,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { LiveVideoManifest, LiveVideoManifestEntry } from "@gogol/share/schemas/media";
+import type { LiveVideoManifest, LiveVideoManifestEntry } from "@warpgogol/share/schemas/media";
 import { loadGeneratedManifest } from "./generated-manifest-loader.ts";
 
 const manifest = loadGeneratedManifest<LiveVideoManifest>(

@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { getCollection } from "@gogol/content-source/astro";
+import { getCollection } from "@warpgogol/content-source/astro";
 import type {
   FeaturePolicyContentContext,
   FeaturePolicyTargetRef,

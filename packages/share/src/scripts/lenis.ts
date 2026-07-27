@@ -6,7 +6,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Migrated Lenis initialization to @gogol/share/scripts for platform-wide reuse.</item>
+  <item>Migrated Lenis initialization to @warpgogol/share/scripts for platform-wide reuse.</item>
 </CHANGE_SUMMARY>
 */
 

@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Facilitates the scaffolding of section components and system markdown compilation within the WGogol architecture.</purpose>
+<purpose>Facilitates the scaffolding of section components and system markdown compilation within the Warpgogol architecture.</purpose>
 <non-goals>
   <item>Do not handle raw content parsing outside of defined schemas.</item>
   <item>Do not manage transport or configuration orchestration for sections.</item>
@@ -16,18 +16,18 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { fileExists as exists, collectFiles } from "@gogol/share/fs";
+import { fileExists as exists, collectFiles } from "@warpgogol/share/fs";
 import {
   sectionArchetypeSchema,
   systemManifestSchema,
   type SectionArchetypeContract,
-} from "@gogol/ontology";
-import { parseMarkdownFrontmatter, stringifyMarkdownFrontmatter } from "@gogol/site-kernel-content";
+} from "@warpgogol/ontology";
+import { parseMarkdownFrontmatter, stringifyMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { runPropsTypesGenerate } from "./props-types.ts";
 
 interface SectionScaffoldResult {
@@ -286,10 +286,10 @@ function renderSectionAstro(slug: string, sectionPascal: string, bodyKind: BodyK
     return `---
 ${sectionCompassMarkers(`${slug} composite section — bespoke layout in SectionShell + SectionHeader.`)}
 
-import type { SectionProps } from "@gogol/share/page";
-import { need, cast, resolveSectionAnchor } from "@gogol/share";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
+import type { SectionProps } from "@warpgogol/share/page";
+import { need, cast, resolveSectionAnchor } from "@warpgogol/share";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import type { ${sectionPascal}SectionContent } from "./${slug}-section.types.generated.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
@@ -324,11 +324,11 @@ const props = cast<${sectionPascal}SectionContent>(pageOverride);
   return `---
 ${sectionCompassMarkers(`${slug} thin dispatcher section — ${bodyKind} body.`)}
 
-import type { SectionProps } from "@gogol/share/page";
-import { need, cast, resolveSectionAnchor } from "@gogol/share";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import ${component} from "@gogol/ui/components/${importPath}";
+import type { SectionProps } from "@warpgogol/share/page";
+import { need, cast, resolveSectionAnchor } from "@warpgogol/share";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import ${component} from "@warpgogol/ui/components/${importPath}";
 import type { ${sectionPascal}SectionContent } from "./${slug}-section.types.generated.ts";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;

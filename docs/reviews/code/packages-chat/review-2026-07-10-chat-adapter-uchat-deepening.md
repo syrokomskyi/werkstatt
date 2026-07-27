@@ -28,13 +28,13 @@ The commit successfully splits the widget adapter and widens return types, but t
 
 ### Mechanical floor
 
-**Pass** — `tsc --noEmit` passes for `@gogol/chat`, `@gogol/chat-adapter-uchat`, `@gogol/chat-adapter-null`, and `@gogol/os/site-kernel-checks`. A pre-existing workspace issue (`@gogol/growth-adapter-null` missing) blocks `pnpm` lifecycle commands but is unrelated to this diff.
+**Pass** — `tsc --noEmit` passes for `@warpgogol/chat`, `@warpgogol/chat-adapter-uchat`, `@warpgogol/chat-adapter-null`, and `@warpgogol/os/site-kernel-checks`. A pre-existing workspace issue (`@warpgogol/growth-adapter-null` missing) blocks `pnpm` lifecycle commands but is unrelated to this diff.
 
 ### Axis A — Structural correctness
 
-1. **Barrel import in widget-adapter.ts** — `packages/chat-adapter-uchat/src/widget-adapter.ts:21` imports `ChatWidgetConfig` from `@gogol/chat` (the barrel) instead of `@gogol/chat/port`. The barrel re-exports from `port.ts` but also pulls in `adapter-metadata.ts`. For a type-only import in a browser-only adapter, this creates an unnecessary coupling to the barrel's stability. Should be `import type { ChatWidgetConfig } from "@gogol/chat/port"` — the same entry point already used for `ChatWidgetAdapter` on line 20.
+1. **Barrel import in widget-adapter.ts** — `packages/chat-adapter-uchat/src/widget-adapter.ts:21` imports `ChatWidgetConfig` from `@warpgogol/chat` (the barrel) instead of `@warpgogol/chat/port`. The barrel re-exports from `port.ts` but also pulls in `adapter-metadata.ts`. For a type-only import in a browser-only adapter, this creates an unnecessary coupling to the barrel's stability. Should be `import type { ChatWidgetConfig } from "@warpgogol/chat/port"` — the same entry point already used for `ChatWidgetAdapter` on line 20.
 
-2. **Duplicate type import lines** — `widget-adapter.ts:20` and `widget-adapter.ts:22` both import from `@gogol/chat/port` as separate statements. These should be consolidated into a single `import type { ChatWidgetAdapter, ChatWidgetConfig, ChatWidgetLoadResult, ChatWidgetOpenResult } from "@gogol/chat/port"`.
+2. **Duplicate type import lines** — `widget-adapter.ts:20` and `widget-adapter.ts:22` both import from `@warpgogol/chat/port` as separate statements. These should be consolidated into a single `import type { ChatWidgetAdapter, ChatWidgetConfig, ChatWidgetLoadResult, ChatWidgetOpenResult } from "@warpgogol/chat/port"`.
 
 3. **Comment typo regression** — `widget-adapter.ts:26` says "The popup script auto-mount" (missing "s"). The original `index.ts` had "auto-mounts". Minor, but introduced during the split.
 
@@ -44,9 +44,9 @@ No issues. The diff touches only TypeScript source files in `packages/*` — no 
 
 ### Axis C — Ecosystem fit
 
-1. **`./config` export is a dead path** — `packages/chat/package.json` adds a `"./config"` export pointing to `"./src/config.ts"`. No code in the workspace imports from `@gogol/chat/config` (verified via grep). The `index.ts` barrel re-exports `ChatWidgetConfigSchema` and `CHAT_CONFIG_SCRIPT_ID` from `./port.ts`, not `./config.ts`. This export should be removed — it advertises a path that no consumer uses and implies `config.ts` is still a separate module.
+1. **`./config` export is a dead path** — `packages/chat/package.json` adds a `"./config"` export pointing to `"./src/config.ts"`. No code in the workspace imports from `@warpgogol/chat/config` (verified via grep). The `index.ts` barrel re-exports `ChatWidgetConfigSchema` and `CHAT_CONFIG_SCRIPT_ID` from `./port.ts`, not `./config.ts`. This export should be removed — it advertises a path that no consumer uses and implies `config.ts` is still a separate module.
 
-2. **README and AGENTS.md still reference `@gogol/chat/config`** — `packages/chat/README.md:15,26` and `packages/chat/AGENTS.md:11` both list `@gogol/chat/config` as an entry point pointing to `src/config.ts`. The README usage example even tells users to `import { ChatWidgetConfigSchema } from "@gogol/chat/config"`. Since the config schema is now in `port.ts` and re-exported from the barrel, these references are stale and should be updated or removed.
+2. **README and AGENTS.md still reference `@warpgogol/chat/config`** — `packages/chat/README.md:15,26` and `packages/chat/AGENTS.md:11` both list `@warpgogol/chat/config` as an entry point pointing to `src/config.ts`. The README usage example even tells users to `import { ChatWidgetConfigSchema } from "@warpgogol/chat/config"`. Since the config schema is now in `port.ts` and re-exported from the barrel, these references are stale and should be updated or removed.
 
 3. **`chat-metadata-drift.ts` hardcodes `"widget-adapter.ts"`** — `packages/os/site-kernel-checks/src/chat-metadata-drift.ts:82` hardcodes the filename. The null adapter is explicitly skipped (`if (adapterId === "null") continue`), so this works today. But any future adapter that doesn't name its file `widget-adapter.ts` will be silently skipped by the drift validator (the `catch` block continues on file-not-found). This is a hidden coupling — not a regression from the previous `"index.ts"` hardcoding, but an opportunity to make the validator more robust (e.g. try multiple candidate filenames, or read from `package.json` exports).
 
@@ -56,13 +56,13 @@ No issues. The diff touches only TypeScript source files in `packages/*` — no 
 
 ### Axis E — Agent-facing clarity
 
-1. **Stale documentation** (carried from Axis C) — `AGENTS.md` and `README.md` for `@gogol/chat` still list `@gogol/chat/config` → `src/config.ts` as a live entry point. An agent reading these files would believe `config.ts` is the canonical source for the config schema, when in fact `port.ts` is. This creates navigational confusion for AI agents following the documentation.
+1. **Stale documentation** (carried from Axis C) — `AGENTS.md` and `README.md` for `@warpgogol/chat` still list `@warpgogol/chat/config` → `src/config.ts` as a live entry point. An agent reading these files would believe `config.ts` is the canonical source for the config schema, when in fact `port.ts` is. This creates navigational confusion for AI agents following the documentation.
 
 2. **Compass scaffolding** — `MODULE_CONTRACT` and `CHANGE_SUMMARY` are present in all new and modified source files. The `@ai-invariant` line in `client.ts` is preserved. No issues.
 
 ### Axis F — Pragmatism
 
-1. **`./config` export is speculative** — Adding an export path that no consumer uses violates minimal command surface. The config schema is already accessible via `@gogol/chat` (barrel) and `@gogol/chat/port`. The `./config` subpath added no value and should be removed rather than maintained.
+1. **`./config` export is speculative** — Adding an export path that no consumer uses violates minimal command surface. The config schema is already accessible via `@warpgogol/chat` (barrel) and `@warpgogol/chat/port`. The `./config` subpath added no value and should be removed rather than maintained.
 
 2. **Return types are lean and purposeful** — `ChatWidgetLoadResult` and `ChatWidgetOpenResult` are string unions with exactly the states callers need. No speculative generality. Good.
 
@@ -80,6 +80,6 @@ No spec available — spec compliance skipped. The commit message describes the 
 
 1. Why was `config.ts` not deleted in this commit? The CHANGE_SUMMARY claims the fold is complete, but the file still exists in the commit tree. Was this intentional (to avoid breaking consumers) or an oversight?
 
-2. Who consumes the `@gogol/chat/config` export path? No code in the workspace imports from it. Should it be removed, or is there an external consumer?
+2. Who consumes the `@warpgogol/chat/config` export path? No code in the workspace imports from it. Should it be removed, or is there an external consumer?
 
 3. What should happen when `open()` returns `"no-global"`? The client silently ignores it. Should the launcher show a fallback (e.g. a mailto link) or at least log a warning?

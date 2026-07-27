@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { validateI18nConfigApp } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { validateI18nConfigApp } from "@warpgogol/site-kernel-content";
 
 export interface I18nValidationResult {
   command: "i18n.config.validate";

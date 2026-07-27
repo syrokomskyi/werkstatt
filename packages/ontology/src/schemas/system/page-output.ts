@@ -15,10 +15,10 @@ import { z } from "zod";
 /**
  * RFC-0042/RFC-0050: the semantic role of a page. Drives semantic model
  * construction and the default llms inclusion depth. Mirrors
- * SemanticPageType in @gogol/share/semantic.
+ * SemanticPageType in @warpgogol/share/semantic.
  */
 // NOTE: This enum is mirrored by the `SemanticPageType` union in
-// `@gogol/share/src/semantic/models.ts`. The Zod schema here is the runtime
+// `@warpgogol/share/src/semantic/models.ts`. The Zod schema here is the runtime
 // validator for `system.md`; the TypeScript union in `share` is the
 // compile-time contract. They are kept in sync manually to avoid a circular
 // dependency between `ontology` and `share`.

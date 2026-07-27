@@ -14,7 +14,7 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
-import { missionManifestSchema, type MissionManifest } from "@gogol/ontology/operations";
+import { missionManifestSchema, type MissionManifest } from "@warpgogol/ontology/operations";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 
 const MISSIONS_DIR = "missions";

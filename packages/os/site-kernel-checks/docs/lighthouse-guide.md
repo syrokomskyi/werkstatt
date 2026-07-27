@@ -1,6 +1,6 @@
 # Lighthouse Performance Guide for AI Agents
 
-This document provides guidance for AI agents working with Lighthouse Core Web Vitals compliance in the WGogol monorepo.
+This document provides guidance for AI agents working with Lighthouse Core Web Vitals compliance in the Warpgogol monorepo.
 
 ## Overview
 
@@ -253,7 +253,7 @@ If `lighthouse.validate` is not available:
 
 1. Check `kernel.config.ts` includes the check module
 2. Verify `check.module.ts` registers the command in `extraCommands`
-3. Rebuild the package: `pnpm --filter @gogol/site-kernel-checks build`
+3. Rebuild the package: `pnpm --filter @warpgogol/site-kernel-checks build`
 
 ### False Positives
 

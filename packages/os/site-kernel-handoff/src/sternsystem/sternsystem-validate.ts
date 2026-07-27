@@ -20,10 +20,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { collectFiles } from "@gogol/share/fs";
-import { StarCatalog } from "@gogol/ontology/cosmic";
-import { systemPinSchema } from "@gogol/ontology/operations";
+} from "@warpgogol/site-kernel";
+import { collectFiles } from "@warpgogol/share/fs";
+import { StarCatalog } from "@warpgogol/ontology/cosmic";
+import { systemPinSchema } from "@warpgogol/ontology/operations";
 import { readRegistry, findEntry, hasAppsCollision } from "./registry-io.ts";
 import { evaluateExternalEditGate } from "./external-edit-guard.ts";
 import {

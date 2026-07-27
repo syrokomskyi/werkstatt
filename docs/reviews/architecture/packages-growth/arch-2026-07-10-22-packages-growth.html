@@ -32,7 +32,7 @@
       <header class="space-y-4">
         <div class="flex items-baseline justify-between">
           <h1 class="text-3xl font-serif text-slate-800">
-            Architecture review — <code class="text-2xl">@gogol/growth</code>
+            Architecture review — <code class="text-2xl">@warpgogol/growth</code>
           </h1>
           <span class="text-sm text-slate-500">2026-07-10</span>
         </div>
@@ -127,7 +127,7 @@
                   <div class="text-slate-200">
                     shared: readdir, parseYaml, cross-ref via loadSystemManifest
                   </div>
-                  <div class="text-slate-200">imports EVENT_NAMES from @gogol/growth</div>
+                  <div class="text-slate-200">imports EVENT_NAMES from @warpgogol/growth</div>
                   <div class="text-slate-400 text-[10px] mt-1">├─ validateEvents()</div>
                   <div class="text-slate-400 text-[10px]">├─ validateFunnels()</div>
                   <div class="text-slate-400 text-[10px]">└─ validateExperiments()</div>
@@ -153,7 +153,7 @@
               <strong>Solution.</strong> Deepen: one <code>OntologyCatalogValidator</code> module
               that owns the readdir → parseYaml → validate → cross-reference pipeline. Each catalog
               (events, funnels, experiments) contributes a small entry-validator. The module imports
-              <code>EVENT_NAMES</code> from <code>@gogol/growth</code> and reads system config via
+              <code>EVENT_NAMES</code> from <code>@warpgogol/growth</code> and reads system config via
               <code>loadSystemManifest</code> — like <code>growth-adapter.ts</code> already does.
             </p>
           </div>
@@ -197,7 +197,7 @@
 
           <div class="font-mono text-sm text-slate-600 space-y-0.5">
             <div>packages/growth/src/client.ts:65-73 — ClientRuntimeContext interface</div>
-            <div>packages/growth/src/client.ts:119 — set on window.__webgogol_growth_ctx__</div>
+            <div>packages/growth/src/client.ts:119 — set on window.__warpgogol_growth_ctx__</div>
             <div>packages/growth/src/index.ts:47 — re-exported from barrel</div>
             <div>0 consumers across packages/ui, packages/os, apps/*</div>
           </div>
@@ -217,7 +217,7 @@
                 </div>
                 <div class="rounded border border-slate-300 bg-white p-2 dead">
                   <div class="font-mono text-[10px] text-slate-400">GROWTH_CONTEXT_KEY</div>
-                  <div class="text-slate-400">window.__webgogol_growth_ctx__</div>
+                  <div class="text-slate-400">window.__warpgogol_growth_ctx__</div>
                   <div class="text-slate-400">written ✓ — read ✗</div>
                 </div>
                 <div class="text-center text-slate-400 text-[10px]">
@@ -506,7 +506,7 @@
           steps that reference any event added since RFC-0305, and both funnel and experiment
           validators silently skip their cross-reference checks because <code>system.yaml</code> no
           longer exists. The fix is a deepening — collapse three shallow validators into one module
-          that imports <code>EVENT_NAMES</code> from <code>@gogol/growth</code> and reads system
+          that imports <code>EVENT_NAMES</code> from <code>@warpgogol/growth</code> and reads system
           config via <code>loadSystemManifest</code>. The other candidates are worth exploring but
           carry no active defects.
         </p>

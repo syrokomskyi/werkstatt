@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-observability",
+  "name": "@warpgogol/site-kernel-observability",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -23,10 +23,10 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/observability": "workspace:*",
-    "@gogol/site-kernel": "workspace:*",
-    "@gogol/site-kernel-checks": "workspace:*",
-    "@gogol/site-kernel-content": "workspace:*",
+    "@warpgogol/observability": "workspace:*",
+    "@warpgogol/site-kernel": "workspace:*",
+    "@warpgogol/site-kernel-checks": "workspace:*",
+    "@warpgogol/site-kernel-content": "workspace:*",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

@@ -4,16 +4,16 @@ Every telemetry-grounded incident investigation MUST end in a committed note her
 
 ## Naming convention
 
-`YYYY-MM-DD-<slug>.md` — e.g. `2026-07-07-webgogol-com-5xx-spike.md`
+`YYYY-MM-DD-<slug>.md` — e.g. `2026-07-07-warpgogol-com-5xx-spike.md`
 
 ## Template
 
 ```markdown
 ---
 date: 2026-07-07
-slug: webgogol-com-5xx-spike
+slug: warpgogol-com-5xx-spike
 severity: critical|warning
-sites: [webgogol-com]
+sites: [warpgogol-com]
 status: resolved|ongoing
 ---
 
@@ -33,8 +33,8 @@ status: resolved|ongoing
 
 <key metric values at the time of investigation>
 
-- `wgogol_probe_up{site_id="webgogol-com",route="/"}`: 0 (10m sustained)
-- `wgogol_delivery_requests_total{site_id="webgogol-com",status_class="5xx"}`: 142 (5m window)
+- `warpgogol_probe_up{site_id="warpgogol-com",route="/"}`: 0 (10m sustained)
+- `warpgogol_delivery_requests_total{site_id="warpgogol-com",status_class="5xx"}`: 142 (5m window)
 
 ## Scope
 

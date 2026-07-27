@@ -1,5 +1,5 @@
 ---
-legalName: Webgogol
+legalName: Warpgogol
 owner:
   fullName: "Андрій Сирокомський"
   address:

@@ -28,12 +28,12 @@ Every `services/*` project that reads environment variables from `process.env`, 
 
 Current services:
 
-- `services/check-webgogol-runner` is the Node/Playwright runner for the Check Webgogol site.
-- It consumes `.check-webgogol/queue/*.request.json` and writes `.check-webgogol/runs/<runId>/` artifacts.
-- The site/service boundary is `@gogol/check-core`; do not bypass it with direct site-to-service imports.
-- `findWorkspaceRoot` in `@gogol/check-core` is Node-only (uses `node:fs`). Cloudflare Workers API routes in the Check Webgogol site must read `CHECK_WEBGOGOL_WORKSPACE_ROOT` from the environment directly.
+- `services/check-warpgogol-runner` is the Node/Playwright runner for the Check Warpgogol site.
+- It consumes `.check-warpgogol/queue/*.request.json` and writes `.check-warpgogol/runs/<runId>/` artifacts.
+- The site/service boundary is `@warpgogol/check-core`; do not bypass it with direct site-to-service imports.
+- `findWorkspaceRoot` in `@warpgogol/check-core` is Node-only (uses `node:fs`). Cloudflare Workers API routes in the Check Warpgogol site must read `CHECK_WEBGOGOL_WORKSPACE_ROOT` from the environment directly.
 
 Validation:
 
-- Run `pnpm exec site-kernel run check-webgogol.runner.validate` after changing the runner or the app API boundary.
+- Run `pnpm exec site-kernel run check-warpgogol.runner.validate` after changing the runner or the app API boundary.
 - Run `pnpm exec site-kernel run services.check.run` after changing `services/*`, `pnpm-workspace.yaml`, or service import rules.

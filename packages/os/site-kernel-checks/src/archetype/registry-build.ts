@@ -13,15 +13,15 @@ builds and validates packages/ontology/archetypes/index.yaml from archetype YAML
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fileExists as pathExists } from "@gogol/share/fs";
-import { PlanetCatalog, MoonCatalog } from "@gogol/ontology";
-import { writeFileAtomic } from "@gogol/site-kernel";
+import { fileExists as pathExists } from "@warpgogol/share/fs";
+import { PlanetCatalog, MoonCatalog } from "@warpgogol/ontology";
+import { writeFileAtomic } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   ARCHETYPE_REGISTRY_FILENAME,
   FRAMEWORK_INTERNAL_ARCHETYPES,
@@ -371,7 +371,7 @@ export async function runArchetypeRegistryValidate(
   // catalog matching its layer (section → PlanetCatalog, component →
   // MoonCatalog) AND reject duplicates within the same layer.
   // Without these checks a section archetype can ship a MoonCatalog name (e.g.
-  // Naiad on founder-trust-card during the May 2026 webgogol-com onboarding)
+  // Naiad on founder-trust-card during the May 2026 warpgogol-com onboarding)
   // and the mismatch only surfaces when a downstream constellation slot
   // validator opaquely complains.
   const catalogsByLayer: Record<

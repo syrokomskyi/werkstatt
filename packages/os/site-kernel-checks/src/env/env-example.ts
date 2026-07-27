@@ -3,7 +3,7 @@
 <purpose>RFC-0168 (Session C): generate apps/<id>/.env.example from the app's GENERATED env schema
 (src/env.schema.generated.mjs — the canonical secret union written by api.routes.generate), plus
 STRIPE_SECRET_KEY when the app participates in entitlements (RFC-0169). Comments are grouped per
-Integration Port adapter (single source of truth: @gogol/share/integration) and personalized for
+Integration Port adapter (single source of truth: @warpgogol/share/integration) and personalized for
 the concrete site (its domain). env.example.validate guards that every value stays EMPTY, so a real
 secret can never leak into the repo through the tracked example file.</purpose>
 <non-goals>
@@ -29,15 +29,15 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import {
   CHANNEL_ADAPTERS,
   CRM_ADAPTERS,
   UPSTASH_QSTASH_SECRETS,
   UPSTASH_REDIS_SECRETS,
-} from "@gogol/integration";
+} from "@warpgogol/integration";
 import { passResult, failResult, resultFromViolations } from "../result-helpers.ts";
 
 const ENV_EXAMPLE = ".env.example";
@@ -254,7 +254,7 @@ function renderEnvExample(opts: {
   //   2. Permissions:
   //      - Zone:Read (to list zones and read zone settings)
   //      - Regional Services:Read (to read regional hostname configuration)
-  //   3. Zone Resources: Include — Specific zone — <your-domain> (e.g., webgogol.com)
+  //   3. Zone Resources: Include — Specific zone — <your-domain> (e.g., warpgogol.com)
   //   4. Copy the generated token to CLOUDFLARE_READONLY_API_TOKEN
   //
   // ZONE_ID: Find in Cloudflare Dashboard → Overview → right sidebar "API" section.
@@ -270,7 +270,7 @@ function renderEnvExample(opts: {
         '#   1. Create Custom Token: name it "Regional Services Read-only"\n' +
         "#   2. Permissions: Zone:Read (covers the regional hostnames API endpoint)\n" +
         '#      Enterprise/Data Localization Suite plans may also show "Data Localization Suite:Read"\n' +
-        "#   3. Zone Resources: Include → Specific zone → your domain (e.g., webgogol.com)\n" +
+        "#   3. Zone Resources: Include → Specific zone → your domain (e.g., warpgogol.com)\n" +
         "#   4. Copy token to CLOUDFLARE_READONLY_API_TOKEN below\n" +
         "#\n" +
         "# ACCOUNT_ID & ZONE_ID: Cloudflare Dashboard → Overview → API section (right sidebar).\n" +

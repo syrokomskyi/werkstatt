@@ -12,14 +12,14 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { localizeUrl } from "@gogol/share/url-policy";
+import { localizeUrl } from "@warpgogol/share/url-policy";
 import { defaultLanguageFromManifest } from "../../lib/i18n.ts";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { buildAuditResult, loadAuditAppContext } from "../helpers.ts";
 import type { AuditFinding } from "../types.ts";
 import { escapeXml, finding } from "./helpers.ts";

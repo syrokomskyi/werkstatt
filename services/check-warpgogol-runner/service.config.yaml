@@ -1,0 +1,10 @@
+id: check-warpgogol-runner
+kind: node-runner
+ownerApp: check-warpgogol-com
+entry: src/worker.ts
+publicEndpoints: false
+usesBrowserAutomation: true
+queues:
+  - check-warpgogol-runs
+artifacts:
+  - .check-warpgogol/runs

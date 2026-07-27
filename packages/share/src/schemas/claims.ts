@@ -6,7 +6,7 @@ RFC-0212: the claim annotation surface. A per-record provenance sidecar
 into a CKL claim (RFC-0211) without touching the editable record body. Closed Zod
 schema so `content.claim.validate` can shape-check every sidecar.
 
-Moved from @gogol/business/schemas to @gogol/share/schemas as part of RFC-0470
+Moved from @warpgogol/business/schemas to @warpgogol/share/schemas as part of RFC-0470
 (legacy business layer deletion). This is Content Knowledge Lifecycle (CKL)
 infrastructure, not business-layer code.
 </purpose>
@@ -17,7 +17,7 @@ infrastructure, not business-layer code.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0212: initial claim annotation + record-claims schemas.</item>
-  <item>RFC-0470: moved from @gogol/business/schemas/claims.ts to @gogol/share/schemas/claims.ts.</item>
+  <item>RFC-0470: moved from @warpgogol/business/schemas/claims.ts to @warpgogol/share/schemas/claims.ts.</item>
 </CHANGE_SUMMARY>
 */
 

@@ -1,6 +1,6 @@
-# @gogol/site-kernel
+# @warpgogol/site-kernel
 
-Framework-free core of the WGogol Site OS. Provides workspace discovery, command registry, pipeline execution, CLI entry-point, and RFC governance.
+Framework-free core of the Warpgogol Site OS. Provides workspace discovery, command registry, pipeline execution, CLI entry-point, and RFC governance.
 
 ## Role in the monorepo
 
@@ -33,8 +33,8 @@ pnpm exec site-kernel sites list
 
 ```typescript
 // apps/my-app/tools/kernel.config.ts
-import { defineKernelConfig } from "@gogol/site-kernel";
-import { rfcModule } from "@gogol/site-kernel";
+import { defineKernelConfig } from "@warpgogol/site-kernel";
+import { rfcModule } from "@warpgogol/site-kernel";
 import { checkModule } from "./modules/check.module";
 
 export default defineKernelConfig({
@@ -60,19 +60,19 @@ Flags must use inline assignment syntax: `--title="…" --kind=architecture`.
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel build:check
-pnpm --filter @gogol/site-kernel test
+pnpm --filter @warpgogol/site-kernel build:check
+pnpm --filter @warpgogol/site-kernel test
 ```
 
 ## Related packages
 
 | Package                         | Role                                                          |
 | ------------------------------- | ------------------------------------------------------------- |
-| `@gogol/site-kernel-astro`      | Astro-specific path helpers                                   |
-| `@gogol/site-kernel-content`    | Markdown file discovery and frontmatter parsing               |
-| `@gogol/site-kernel-checks`     | Shared validation commands for all Astro apps                 |
-| `@gogol/site-kernel-integrity`  | File hash tracking, build provenance, Ed25519 signing         |
-| `@gogol/site-kernel-codegen`    | Code generation (icons, Compass skeleton backfill, biome CSS) |
-| `@gogol/site-kernel-changelog`  | AI-powered changelog generation                               |
-| `@gogol/site-kernel-deploy`     | Client workspace export                                       |
-| `@gogol/site-kernel-onboarding` | New-app scaffold and readiness checklist                      |
+| `@warpgogol/site-kernel-astro`      | Astro-specific path helpers                                   |
+| `@warpgogol/site-kernel-content`    | Markdown file discovery and frontmatter parsing               |
+| `@warpgogol/site-kernel-checks`     | Shared validation commands for all Astro apps                 |
+| `@warpgogol/site-kernel-integrity`  | File hash tracking, build provenance, Ed25519 signing         |
+| `@warpgogol/site-kernel-codegen`    | Code generation (icons, Compass skeleton backfill, biome CSS) |
+| `@warpgogol/site-kernel-changelog`  | AI-powered changelog generation                               |
+| `@warpgogol/site-kernel-deploy`     | Client workspace export                                       |
+| `@warpgogol/site-kernel-onboarding` | New-app scaffold and readiness checklist                      |

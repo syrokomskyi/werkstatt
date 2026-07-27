@@ -13,7 +13,7 @@
 */
 
 // Ambient declarations for `.astro` modules so type-checking inside
-// @gogol/ui can re-export Astro components from a TypeScript file.
+// @warpgogol/ui can re-export Astro components from a TypeScript file.
 // (Astro itself supplies these in app workspaces via env.d.ts; this package
 // is consumed by apps but type-checked standalone, so we shim it here.)
 

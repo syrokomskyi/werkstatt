@@ -11,12 +11,12 @@ externally.
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Inlined from the former @gogol/growth-adapter-null package (architecture review 2026-07-10). The null adapter is a built-in, not a vendor integration — it earns no separate package seam.</item>
+  <item>Inlined from the former @warpgogol/growth-adapter-null package (architecture review 2026-07-10). The null adapter is a built-in, not a vendor integration — it earns no separate package seam.</item>
 </CHANGE_SUMMARY>
 */
 
 /**
- * @gogol/growth — built-in NullAdapter
+ * @warpgogol/growth — built-in NullAdapter
  *
  * No-op GrowthAdapter implementation. Use this in:
  *   - Local development (avoids polluting analytics with dev traffic)

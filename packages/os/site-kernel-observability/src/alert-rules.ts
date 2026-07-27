@@ -10,48 +10,48 @@
 </CHANGE_SUMMARY>
 */
 
-export type WgogolAlertSeverity = "critical" | "warning";
-export type WgogolChannelId = "email-studio" | "telegram-studio";
+export type WarpgogolAlertSeverity = "critical" | "warning";
+export type WarpgogolChannelId = "email-studio" | "telegram-studio";
 
-export interface WgogolAlertRule {
+export interface WarpgogolAlertRule {
   id: string;
   name: string;
-  severity: WgogolAlertSeverity;
+  severity: WarpgogolAlertSeverity;
   promql?: string;
   builder?: unknown;
   evalWindow: string;
   forDuration: string;
   condition: { op: ">" | "<" | ">=" | "<=" | "=="; target: number };
-  channels: WgogolChannelId[];
+  channels: WarpgogolChannelId[];
   labels?: Record<string, string>;
   description: string;
 }
 
-export interface WgogolNotificationChannel {
-  id: WgogolChannelId;
+export interface WarpgogolNotificationChannel {
+  id: WarpgogolChannelId;
   kind: "email" | "webhook";
   target: string[];
 }
 
-export const NOTIFICATION_CHANNELS: readonly WgogolNotificationChannel[] = [
+export const NOTIFICATION_CHANNELS: readonly WarpgogolNotificationChannel[] = [
   {
     id: "email-studio",
     kind: "email",
-    target: ["founder@webgogol.com"],
+    target: ["founder@warpgogol.com"],
   },
   {
     id: "telegram-studio",
     kind: "webhook",
-    target: ["WGOGOL_TG_BRIDGE_URL"],
+    target: ["WARPGOGOL_TG_BRIDGE_URL"],
   },
 ];
 
-export const ALERT_RULES: readonly WgogolAlertRule[] = [
+export const ALERT_RULES: readonly WarpgogolAlertRule[] = [
   {
     id: "fleet-site-down",
     name: "Fleet site down",
     severity: "critical",
-    promql: 'min by (site_id) (wgogol_probe_up{route="/"}) == 0',
+    promql: 'min by (site_id) (warpgogol_probe_up{route="/"}) == 0',
     evalWindow: "5m",
     forDuration: "10m",
     condition: { op: "==", target: 0 },
@@ -63,7 +63,7 @@ export const ALERT_RULES: readonly WgogolAlertRule[] = [
     id: "fleet-cert-expiry-warn",
     name: "TLS certificate expiring soon (14 days)",
     severity: "warning",
-    promql: "min by (site_id) (wgogol_probe_cert_expiry_days) < 14",
+    promql: "min by (site_id) (warpgogol_probe_cert_expiry_days) < 14",
     evalWindow: "1h",
     forDuration: "1h",
     condition: { op: "<", target: 14 },
@@ -75,7 +75,7 @@ export const ALERT_RULES: readonly WgogolAlertRule[] = [
     id: "fleet-cert-expiry-crit",
     name: "TLS certificate expiring critical (7 days)",
     severity: "critical",
-    promql: "min by (site_id) (wgogol_probe_cert_expiry_days) < 7",
+    promql: "min by (site_id) (warpgogol_probe_cert_expiry_days) < 7",
     evalWindow: "1h",
     forDuration: "1h",
     condition: { op: "<", target: 7 },
@@ -88,7 +88,7 @@ export const ALERT_RULES: readonly WgogolAlertRule[] = [
     name: "Factory build.check failed",
     severity: "warning",
     promql:
-      'increase(wgogol_factory_command_runs_total{command="build.check",status=~"fail|error"}[6h]) > 0',
+      'increase(warpgogol_factory_command_runs_total{command="build.check",status=~"fail|error"}[6h]) > 0',
     evalWindow: "6h",
     forDuration: "0m",
     condition: { op: ">", target: 0 },

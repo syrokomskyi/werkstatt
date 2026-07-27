@@ -22,24 +22,24 @@ export const STERNSYSTEM_ID_POLICY = {
   regex: STERNSYSTEM_ID_REGEX,
   charset: "ASCII lowercase letters (a-z), digits (0-9), hyphens (-)",
   description: "kebab-case, lowercase, latin-only",
-  examples: ["webgogol-com", "nicaragua-projekt"],
-  counterExamples: ["Webgogol-Com", "nicaragüa-projekt", "webgogol--com", "-webgogol", "webgogol-"],
+  examples: ["warpgogol-com", "nicaragua-projekt"],
+  counterExamples: ["Warpgogol-Com", "nicaragüa-projekt", "warpgogol--com", "-warpgogol", "warpgogol-"],
 } as const;
 
 export const MISSION_ID_POLICY = {
   regex: MISSION_ID_REGEX,
   format: "<system-id>-m<NNNNNN>",
   description: "system id + literal -m + zero-padded six-digit sequence",
-  examples: ["webgogol-com-m000001", "nicaragua-projekt-m000042"],
-  counterExamples: ["webgogol-com-m1", "webgogol-com-M000001", "webgogol-com-m0000001"],
+  examples: ["warpgogol-com-m000001", "nicaragua-projekt-m000042"],
+  counterExamples: ["warpgogol-com-m1", "warpgogol-com-M000001", "warpgogol-com-m0000001"],
 } as const;
 
 export const RELEASE_ID_POLICY = {
   regex: RELEASE_ID_REGEX,
   format: "<system-id>-r<NNNNNN>",
   description: "system id + literal -r + zero-padded six-digit sequence",
-  examples: ["webgogol-com-r000001", "nicaragua-projekt-r000042"],
-  counterExamples: ["webgogol-com-r1", "webgogol-com-R000001", "webgogol-com-r0000001"],
+  examples: ["warpgogol-com-r000001", "nicaragua-projekt-r000042"],
+  counterExamples: ["warpgogol-com-r1", "warpgogol-com-R000001", "warpgogol-com-r0000001"],
 } as const;
 
 export const BORDBUCH_EVENT_ID_POLICY = {

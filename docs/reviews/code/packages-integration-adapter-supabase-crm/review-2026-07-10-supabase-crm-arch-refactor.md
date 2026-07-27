@@ -42,8 +42,8 @@ The diff extracts Pipedrive-specific sync logic behind a vendor-agnostic `CrmSyn
 
 **Pass.** All affected packages typecheck clean:
 
-- `@gogol/integration-adapter-supabase-crm` — `tsc --noEmit` (main + test config)
-- `@gogol/share` — `tsc --noEmit`
+- `@warpgogol/integration-adapter-supabase-crm` — `tsc --noEmit` (main + test config)
+- `@warpgogol/share` — `tsc --noEmit`
 - `lagebild-sync-worker` — `tsc --noEmit`
 
 ## Axis A — Structural correctness
@@ -77,7 +77,7 @@ If `stage` is not a valid `BufferDealStage`, the function silently falls back to
 
 **No issues.**
 
-- **Package boundaries** — `pipedrive-sync-target.ts` imports from `@gogol/share/integration/crm-buffer` (correct direction). `worker.ts` imports from `./pipedrive-sync-target.ts` and `./client.ts` (intra-package). `adapter.ts` imports from `@gogol/share/integration/crm-buffer` (correct).
+- **Package boundaries** — `pipedrive-sync-target.ts` imports from `@warpgogol/share/integration/crm-buffer` (correct direction). `worker.ts` imports from `./pipedrive-sync-target.ts` and `./client.ts` (intra-package). `adapter.ts` imports from `@warpgogol/share/integration/crm-buffer` (correct).
 - **Package exports** — `package.json` adds `./pipedrive-sync-target` export. `index.ts` re-exports `createSyncTarget`, `PipedriveSyncTarget`, `resolvePipedriveStageUpdate`, `STAGE_MAP`, and types.
 - **AGENTS.md** — updated with architecture section documenting the three-layer structure and port split.
 - **README.md** — updated with architecture section.

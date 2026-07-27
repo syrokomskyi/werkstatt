@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { DiagnosticSeverity } from "@gogol/site-kernel";
+import type { DiagnosticSeverity } from "@warpgogol/site-kernel";
 
 /**
  * RFC-0233: the diagnostic domain a rule belongs to. `visual` rules form the

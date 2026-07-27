@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0379: cloudflare-workers adapter — wraps wrangler deploy with injectable CommandRunner, health verification via @gogol/fingerprint HTML normalization.</purpose>
+<purpose>RFC-0379: cloudflare-workers adapter — wraps wrangler deploy with injectable CommandRunner, health verification via @warpgogol/fingerprint HTML normalization.</purpose>
 <non-goals>
   <item>Do not implement netlify or other adapters — only cloudflare-workers in this wave.</item>
   <item>Do not log, echo, or serialize secret values or resolved secrets-file contents.</item>
@@ -15,8 +15,8 @@ import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import type { PropagationResult, HealthCheck } from "@gogol/ontology/operations";
-import { hashHtml } from "@gogol/fingerprint";
+import type { PropagationResult, HealthCheck } from "@warpgogol/ontology/operations";
+import { hashHtml } from "@warpgogol/fingerprint";
 import type {
   CommandRunner,
   DeploymentAdapter,

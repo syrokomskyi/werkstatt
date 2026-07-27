@@ -65,7 +65,7 @@ const creditRecordArb = fc.record({
   parties: fc.array(partyArb, { minLength: 1, maxLength: 4 }),
   license: fc.record({
     label: fc.string({ minLength: 1, maxLength: 20 }),
-    copyrightNotice: fc.option(fc.constant("Copyright © Webgogol. All rights reserved.")),
+    copyrightNotice: fc.option(fc.constant("Copyright © Warpgogol. All rights reserved.")),
   }),
 });
 
@@ -135,7 +135,7 @@ test("rfc-0488 migrator adds aiUsage to ai-generated records with default copyri
       parties: [{ role: "aiPlatform", name: "Midjourney", kind: "AIPlatform" }],
       license: {
         label: "Alle Rechte vorbehalten",
-        copyrightNotice: "Copyright © Webgogol. All rights reserved.",
+        copyrightNotice: "Copyright © Warpgogol. All rights reserved.",
       },
     });
     const data: SternsystemData = { rootPath: dir, dataPaths: [] };
@@ -160,7 +160,7 @@ test("rfc-0488 migrator sets copyrightClaimed: true when Person creator exists",
       ],
       license: {
         label: "Alle Rechte vorbehalten",
-        copyrightNotice: "Copyright © Webgogol. All rights reserved.",
+        copyrightNotice: "Copyright © Warpgogol. All rights reserved.",
       },
     });
     const data: SternsystemData = { rootPath: dir, dataPaths: [] };
@@ -196,7 +196,7 @@ test("rfc-0488 migrator renames Organization creator to commissionedBy for human
     const filePath = await writeCreditsFile(dir, {
       id: "test-org-creator",
       sourceType: "human-made",
-      parties: [{ role: "creator", name: "Webgogol Inc", kind: "Organization" }],
+      parties: [{ role: "creator", name: "Warpgogol Inc", kind: "Organization" }],
       license: { label: "All rights reserved" },
     });
     const data: SternsystemData = { rootPath: dir, dataPaths: [] };

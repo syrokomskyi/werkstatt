@@ -1,6 +1,6 @@
 schema: forge/config@1
 project:
-  name: webgogol
+  name: warpgogol
   stack:
     - typescript
     - astro
@@ -56,6 +56,6 @@ bindings:
       - "**/test/**"
 skillPacks:
   - prefix: wg
-    dir: packages/wgogol-skills/skills
+    dir: packages/warpgogol-skills/skills
 forge:
   syncedVersion: 0.1.4

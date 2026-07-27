@@ -2,7 +2,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  [DNA-25][RFC-0026][RFC-0035] Universal block renderer for all WGogol apps.
+  [DNA-25][RFC-0026][RFC-0035] Universal block renderer for all Warpgogol apps.
   Dynamically dispatches ResolvedBlock[] to section components via
   import.meta.glob(). Zero hand-assembled composition — new sections
   registered in packages/ui automatically become available to all apps.
@@ -20,7 +20,7 @@
   <item>Read section numbering metadata from manifests instead of hardcoded sets.</item>
 </CHANGE_SUMMARY>
 */
-import type { ResolvedBlock, SectionProps } from "@gogol/share/page";
+import type { ResolvedBlock, SectionProps } from "@warpgogol/share/page";
 
 interface Props {
   blocks: readonly ResolvedBlock[];
@@ -69,21 +69,21 @@ const componentModules = import.meta.glob("./components/*/*.astro", { eager: tru
 const componentRegistry = new Map<string, any>();
 
 for (const [path, mod] of Object.entries(sectionModules)) {
-  // Extract the section name from path: ./sections/hero/hero-section.astro -> @gogol/ui/sections/hero
+  // Extract the section name from path: ./sections/hero/hero-section.astro -> @warpgogol/ui/sections/hero
   const match = path.match(/\.\/sections\/([^/]+)/);
   if (match) {
     const sectionName = match[1];
-    const importPath = `@gogol/ui/sections/${sectionName}`;
+    const importPath = `@warpgogol/ui/sections/${sectionName}`;
     componentRegistry.set(importPath, (mod as any).default);
   }
 }
 
 for (const [path, mod] of Object.entries(componentModules)) {
-  // Extract the component name from path: ./components/header/header-component.astro -> @gogol/ui/components/header
+  // Extract the component name from path: ./components/header/header-component.astro -> @warpgogol/ui/components/header
   const match = path.match(/\.\/components\/([^/]+)/);
   if (match) {
     const componentName = match[1];
-    const importPath = `@gogol/ui/components/${componentName}`;
+    const importPath = `@warpgogol/ui/components/${componentName}`;
     componentRegistry.set(importPath, (mod as any).default);
   }
 }

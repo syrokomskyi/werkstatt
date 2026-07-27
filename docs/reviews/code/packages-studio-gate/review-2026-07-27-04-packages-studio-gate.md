@@ -26,13 +26,13 @@ The session implements ADR-0005 (Werkstatt VM deployment model) end-to-end: in-m
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/studio-gate run build:check` exits 0; `pnpm --filter @gogol/studio-gate run test` passes 12/12 tests; `adr.validate ADR-0005` passes.
+Pass — `pnpm --filter @warpgogol/studio-gate run build:check` exits 0; `pnpm --filter @warpgogol/studio-gate run test` passes 12/12 tests; `adr.validate ADR-0005` passes.
 
 ### Axis A — Structural correctness
 
 No issues.
 
-- `.mcp.json` — valid JSON. `studio-gate` entry uses `type: "stdio"`, `command: "pnpm"`, `args: ["--filter", "@gogol/studio-gate", "start"]` — matches the `start` script (`node --import tsx src/index.ts`) in `package.json`.
+- `.mcp.json` — valid JSON. `studio-gate` entry uses `type: "stdio"`, `command: "pnpm"`, `args: ["--filter", "@warpgogol/studio-gate", "start"]` — matches the `start` script (`node --import tsx src/index.ts`) in `package.json`.
 - `build-queue.ts` — `QueuedTask` uses closure-based `execute: () => Promise<void>` (no type casts). `BuildQueue.run<T>` is generic, properly typed. No `any`, no magic numbers (`DEFAULT_BUILD_CONCURRENCY` is named).
 - `index.ts` — `isBuildTriggeringTool(name) ? await buildQueue.run(exec) : await exec()` is a clean conditional dispatch. No duplicated logic.
 - `forge.yaml` — version bump `0.1.3 → 0.1.4`, straightforward.

@@ -12,7 +12,7 @@
 */
 
 /**
- * @gogol/nebula — Input and output types for Nebula Score computation
+ * @warpgogol/nebula — Input and output types for Nebula Score computation
  *
  * DNA-33 / RFC-0028
  */
@@ -55,7 +55,7 @@ export interface AxeResult {
   criticalViolations?: number;
 }
 
-/** Content health check report from @gogol/site-kernel-checks aggregate. */
+/** Content health check report from @warpgogol/site-kernel-checks aggregate. */
 export interface ContentCheckReport {
   /**
    * Total content checks performed (language completeness, prop validity,
@@ -68,7 +68,7 @@ export interface ContentCheckReport {
   failures?: Array<{ rule: string; file: string; message: string }>;
 }
 
-/** DNA-validator aggregate from @gogol/site-kernel-checks. */
+/** DNA-validator aggregate from @warpgogol/site-kernel-checks. */
 export interface DnaCheckReport {
   /**
    * Total DNA validator commands run in build.check.

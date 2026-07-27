@@ -10,7 +10,7 @@
   <item>RFC-0050: Initial implementation of framework-agnostic semantic loader.</item>
   <item>Fix: Apply disk-based content reference substitution (RFC-0045) to prose body text and frontmatter values.</item>
   <item>RFC-0377: thread optional `audience` from system.md into SemanticPageModel, falling back to AUDIENCE_BY_PAGE_TYPE derivation map.</item>
-  <item>RFC-0529: replace disk-based substituteContentReferences with index-based resolveReferencesInString/resolveReferencesDeep from @gogol/share/content-reference.</item>
+  <item>RFC-0529: replace disk-based substituteContentReferences with index-based resolveReferencesInString/resolveReferencesDeep from @warpgogol/share/content-reference.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,7 +23,7 @@ import type {
   SemanticInitiative,
   SemanticFaqEntry,
   SemanticContentReader,
-} from "@gogol/share/semantic";
+} from "@warpgogol/share/semantic";
 import {
   buildSemanticPageModelWith,
   buildOrganizationProfile,
@@ -34,12 +34,12 @@ import {
   projectServices,
   AUDIENCE_BY_PAGE_TYPE,
   type RawPageOutput,
-} from "@gogol/share/semantic";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
-import { localizeUrl } from "@gogol/share/url-policy";
-import { DEFAULT_PROFILE_BASE_BY_LANG } from "@gogol/share/people-profile-defaults";
-import { FS_CAPABILITIES } from "@gogol/content-source";
-import type { ContentEntry, ContentEntryRef, ContentSourceProvider } from "@gogol/content-source";
+} from "@warpgogol/share/semantic";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import { localizeUrl } from "@warpgogol/share/url-policy";
+import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/share/people-profile-defaults";
+import { FS_CAPABILITIES } from "@warpgogol/content-source";
+import type { ContentEntry, ContentEntryRef, ContentSourceProvider } from "@warpgogol/content-source";
 import { parseMarkdownFrontmatter } from "./markdown-frontmatter.ts";
 import { loadSystemManifest } from "./system-manifest.ts";
 import { collectMarkdownFiles } from "./content-files.ts";
@@ -48,7 +48,7 @@ import {
   resolveReferencesInString,
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
-} from "@gogol/share/content-reference";
+} from "@warpgogol/share/content-reference";
 import { emitPipelineLogEvent } from "./pipeline-log.ts";
 
 export interface SemanticLoaderOptions {
@@ -80,7 +80,7 @@ async function readLocalizedMarkdown(
         emitPipelineLogEvent({
           severity: "notice",
           kind: "expected-fallback",
-          packageName: "@gogol/site-kernel-content",
+          packageName: "@warpgogol/site-kernel-content",
           module: "semantic-loader",
           message: `content fallback: ${collection}/${lang}/${relativePath} -> ${collection}/${defaultLang}/${relativePath}`,
           dedupeKey: `content-fallback:${collection}:${lang}:${relativePath}`,
@@ -376,7 +376,7 @@ export function createNodeFsContentProvider(
  * RFC-0144/RFC-0146: the filesystem SemanticContentReader, now backed by the
  * node-side ContentSourceProvider. Page frontmatter and prose body are read
  * through the port; RFC-0045 content-reference substitution is applied to prose
- * bodies. Construction logic lives once in @gogol/share's buildSemanticPageModelWith.
+ * bodies. Construction logic lives once in @warpgogol/share's buildSemanticPageModelWith.
  */
 /**
  * RFC-0325: exported so callers outside loadSemanticSiteModel (e.g. page.markdown.generate, which
@@ -507,7 +507,7 @@ export async function loadSemanticSiteModel(
     // RFC-0160: unprefixed default language; prefixed non-default languages.
     const url = `${baseUrl}${localizeUrl(lang, slug, { defaultLanguage: defaultLang })}`;
 
-    const semanticType = page.semanticType as import("@gogol/share/semantic").SemanticPageType;
+    const semanticType = page.semanticType as import("@warpgogol/share/semantic").SemanticPageType;
     const audience = page.audience ?? AUDIENCE_BY_PAGE_TYPE[semanticType];
 
     const model = await buildSemanticPageModelWith(reader, {
@@ -556,7 +556,7 @@ export async function loadSemanticSiteModel(
       const localized = (langBySlug.get(slug) ?? anchor) as Record<string, unknown>;
       const name = String(localized.name ?? slug);
       const url = `${baseUrl}${localizeUrl(lang, `${baseSeg}/${slug}`, { defaultLanguage: defaultLang })}`;
-      const semanticType = "person" as import("@gogol/share/semantic").SemanticPageType;
+      const semanticType = "person" as import("@warpgogol/share/semantic").SemanticPageType;
       const model = await buildSemanticPageModelWith(reader, {
         pageId: `person:${slug}`,
         semanticType,

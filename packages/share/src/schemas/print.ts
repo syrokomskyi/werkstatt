@@ -3,13 +3,13 @@
 <purpose>
 RFC-0257: TypeScript contracts for the print-ready visitor-page system.
 Defines page-level print config, site-level print labels, and the PDF generator
-result shape. Consumed by @gogol/ontology schemas, @gogol/ui layout, and
-@gogol/site-kernel-checks validators.
+result shape. Consumed by @warpgogol/ontology schemas, @warpgogol/ui layout, and
+@warpgogol/site-kernel-checks validators.
 </purpose>
 <non-goals>
-  <item>Do not implement Zod schemas here — @gogol/ontology owns the Zod validation schemas.</item>
+  <item>Do not implement Zod schemas here — @warpgogol/ontology owns the Zod validation schemas.</item>
   <item>Do not import from Astro or app-specific modules.</item>
-  <item>Do not define runtime print detection logic — that lives in @gogol/ui.</item>
+  <item>Do not define runtime print detection logic — that lives in @warpgogol/ui.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

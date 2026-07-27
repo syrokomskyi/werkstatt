@@ -19,7 +19,7 @@ The diff is a minimal, forward-only removal of a stale `<link rel="preload">` ta
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/ui run build:check` (tsc --noEmit) exits 0. `rfc.validate RFC-0485 --json` status: pass.
+Pass — `pnpm --filter @warpgogol/ui run build:check` (tsc --noEmit) exits 0. `rfc.validate RFC-0485 --json` status: pass.
 
 ### Axis A — Structural correctness
 

@@ -7,7 +7,7 @@
 </purpose>
 <non-goals>
   <item>Do not read content through Astro runtime or astro:content.</item>
-  <item>Do not duplicate formatting logic — delegate to @gogol/share/semantic buildAiTxt.</item>
+  <item>Do not duplicate formatting logic — delegate to @warpgogol/share/semantic buildAiTxt.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -25,11 +25,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { buildAiTxt } from "@gogol/share/semantic";
-import type { AiPolicy } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { buildAiTxt } from "@warpgogol/share/semantic";
+import type { AiPolicy } from "@warpgogol/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 
@@ -64,7 +64,7 @@ export async function runAiGenerate(
     commercial: "yes",
     attribution: "optional",
     license: "Site content remains under its published rights and credits.",
-    contact: "mailto:hi@webgogol.com",
+    contact: "mailto:hi@warpgogol.com",
   };
   const policy = {
     ...defaultPolicy,

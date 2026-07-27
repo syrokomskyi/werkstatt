@@ -12,7 +12,7 @@ for ratgeber articles.</purpose>
 </CHANGE_SUMMARY> */
 
 import "./article-header-section.css";
-import type { SectionProps } from "@gogol/share/page";
+import type { SectionProps } from "@warpgogol/share/page";
 
 const rawProps = (Astro.props as SectionProps) ?? {};
 const p = (rawProps.pageOverride ?? {}) as Record<string, any>;

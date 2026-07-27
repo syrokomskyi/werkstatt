@@ -16,7 +16,7 @@ resolution across pages, and the RFC-0192 Programmatic Surface redirect-stub res
 
 // RFC-0141: content reads flow through the Content Source Provider port (the single named
 // seam that owns the astro:content dependency), not astro:content directly.
-import { getEntry } from "@gogol/content-source/astro";
+import { getEntry } from "@warpgogol/content-source/astro";
 import { EMPTY_RUNTIME_CONTEXT } from "../../runtime-context.ts";
 import type { PageEntry, ResolvedPage } from "../../page.ts";
 import { pageIdToContentFileSlug } from "../../content/entity-id.ts";

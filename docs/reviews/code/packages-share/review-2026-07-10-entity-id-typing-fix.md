@@ -11,7 +11,7 @@ filesReviewed:
   - packages/share/AGENTS.md
   - packages/share/README.md
   - docs/reviews/code/packages-share/review-2026-07-10-share-refactoring-full-branch.md
-  - apps/webgogol-com/src/content/prose/de/open-source.md
+  - apps/warpgogol-com/src/content/prose/de/open-source.md
   - apps/nicaragua-projekt/src/content/prose/de/open-source.md
 ---
 
@@ -23,7 +23,7 @@ The diff replaces `any` with a generic `T = unknown` parameter on `createDispatc
 
 ### Mechanical floor
 
-- `@gogol/share` tsc --noEmit: **pass**
+- `@warpgogol/share` tsc --noEmit: **pass**
 - `pnpm build` from root: **pass** (38/41 tasks, exit code 0 — verified during wg-fix session)
 
 ### Axis A — Structural correctness

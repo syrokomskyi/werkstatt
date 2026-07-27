@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-codegen",
+  "name": "@warpgogol/site-kernel-codegen",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -20,11 +20,11 @@
   },
   "dependencies": {
     "@cyclonedx/cyclonedx-library": "^1.0.0",
-    "@gogol/ontology": "workspace:*",
-    "@gogol/share": "workspace:*",
-    "@gogol/site-kernel": "workspace:*",
-    "@gogol/site-kernel-astro": "workspace:*",
-    "@gogol/site-kernel-content": "workspace:*",
+    "@warpgogol/ontology": "workspace:*",
+    "@warpgogol/share": "workspace:*",
+    "@warpgogol/site-kernel": "workspace:*",
+    "@warpgogol/site-kernel-astro": "workspace:*",
+    "@warpgogol/site-kernel-content": "workspace:*",
     "spdx-license-list": "^6.11.0",
     "yaml": "^2.9.0",
     "zod": "^3.23.0"

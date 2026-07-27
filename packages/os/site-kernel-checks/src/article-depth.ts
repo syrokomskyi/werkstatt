@@ -28,9 +28,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest, createFsSemanticReader } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest, createFsSemanticReader } from "@warpgogol/site-kernel-content";
 import {
   buildSemanticPageModelWith,
   markdownTwinRelPath,
@@ -38,9 +38,9 @@ import {
   type SemanticBuildProfile,
   type SemanticPageModel,
   type SemanticPageType,
-} from "@gogol/share/semantic";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@gogol/share/canonical-url";
-import { localizeUrl } from "@gogol/share/url-policy";
+} from "@warpgogol/share/semantic";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/share/canonical-url";
+import { localizeUrl } from "@warpgogol/share/url-policy";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import {

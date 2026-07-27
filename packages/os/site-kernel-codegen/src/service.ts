@@ -20,9 +20,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { parseMaterialCreditMap, type MaterialCreditRecord } from "@gogol/share/material-credits";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { parseMaterialCreditMap, type MaterialCreditRecord } from "@warpgogol/share/material-credits";
 import {
   formatMaterialCreditLine,
   labelForMaterialCreditRole,
@@ -32,9 +32,9 @@ import {
   materialCreditLabelsSchema,
   materialTargetKey,
   type MaterialCreditLabels,
-} from "@gogol/share/schemas/material-credit";
+} from "@warpgogol/share/schemas/material-credit";
 import { GENERATED_MARKER, hasGeneratedMarker, buildGeneratedHeader } from "./generated-marker.ts";
-import { collectFiles as collectFilesShared } from "@gogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.join(__dirname, "..", "src", "templates", "service");
@@ -223,11 +223,11 @@ export async function runGenerateIcons(
   }
 
   if (jsonFiles.length === 0) {
-    // Apps that consume icons only from @gogol/ui have no app-level icon
+    // Apps that consume icons only from @warpgogol/ui have no app-level icon
     // assets — this is the expected case post-RFC-0023. Silently skip.
     return {
       data: { writtenFiles: 0, skippedExists: 0, indexSkipped: 0 },
-      summary: "[icons.generate] no app-level icons (using @gogol/ui)",
+      summary: "[icons.generate] no app-level icons (using @warpgogol/ui)",
     };
   }
 
@@ -538,7 +538,7 @@ export async function runGenerateMaterialCreditsPage(
   KernelCommandResult<{ writtenFiles: number; creditCount: number; diagnostics?: string[] }>
 > {
   const paths = requireAstroSitePaths(context);
-  const { loadI18nConfigSync, loadSystemManifestSync } = await import("@gogol/site-kernel-content");
+  const { loadI18nConfigSync, loadSystemManifestSync } = await import("@warpgogol/site-kernel-content");
   const i18n = loadI18nConfigSync(paths.appDirectory);
   const system = loadSystemManifestSync(paths.contentDirectory).manifest;
 
@@ -632,7 +632,7 @@ export async function runGenerateI18nMiddleware(
   const middlewarePath = path.join(paths.srcDirectory, "middleware", "language-redirect.ts");
 
   // Import dynamically to avoid hard dependency if not used
-  const { loadI18nConfigSync } = await import("@gogol/site-kernel-content");
+  const { loadI18nConfigSync } = await import("@warpgogol/site-kernel-content");
   const i18n = loadI18nConfigSync(paths.appDirectory);
 
   if (!i18n) {

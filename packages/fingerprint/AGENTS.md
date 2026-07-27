@@ -4,7 +4,7 @@ This file defines the package-specific instruction layer for `packages/fingerpri
 
 ## Package role
 
-- `@gogol/fingerprint` is the RFC-0364 semantic fingerprint package and hash governance authority.
+- `@warpgogol/fingerprint` is the RFC-0364 semantic fingerprint package and hash governance authority.
 - All project hashes for platform, content, release artifacts, snapshots, and generated manifests use this package.
 - No ad hoc direct hashing helpers are allowed outside the package (enforced by `fingerprint.usage.lint`).
 
@@ -14,10 +14,10 @@ The package has a split public API to keep lightweight consumers from transitive
 
 | Entry point | Exports | Parser deps? | Use when |
 | --- | --- | --- | --- |
-| `@gogol/fingerprint` | `byteHash`, `byteHashFile`, `stableStringify`, `stableJsonHash`, types | No | You need byte-level hashing only |
-| `@gogol/fingerprint/semantic` | `fingerprintFile`, `fingerprintTree`, types | Yes | You need parser-backed semantic fingerprints |
+| `@warpgogol/fingerprint` | `byteHash`, `byteHashFile`, `stableStringify`, `stableJsonHash`, types | No | You need byte-level hashing only |
+| `@warpgogol/fingerprint/semantic` | `fingerprintFile`, `fingerprintTree`, types | Yes | You need parser-backed semantic fingerprints |
 
-**Always import primitives from the root entry point** (`@gogol/fingerprint`), not from internal modules.
+**Always import primitives from the root entry point** (`@warpgogol/fingerprint`), not from internal modules.
 
 ## Internal structure
 
@@ -60,6 +60,6 @@ Each normalizer produces a `sha256:`-prefixed hex hash:
 ## Validation
 
 ```sh
-pnpm --filter @gogol/fingerprint build:check
-pnpm --filter @gogol/fingerprint test
+pnpm --filter @warpgogol/fingerprint build:check
+pnpm --filter @warpgogol/fingerprint test
 ```

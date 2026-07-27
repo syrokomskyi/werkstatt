@@ -27,11 +27,11 @@ The diff implements the platform-side of RFC-0487 (retiredRoutes + businessModel
 
 ### Mechanical floor
 
-Pass — `@gogol/ontology`, `@gogol/site-kernel-content`, `@gogol/site-kernel-codegen`, `@gogol/site-kernel-checks` all pass `build:check`. `rfc.validate RFC-0487` passes.
+Pass — `@warpgogol/ontology`, `@warpgogol/site-kernel-content`, `@warpgogol/site-kernel-codegen`, `@warpgogol/site-kernel-checks` all pass `build:check`. `rfc.validate RFC-0487` passes.
 
 ### Axis A — Structural correctness
 
-No issues. The `b2b-model.ts` validator follows the existing `footer-legal.ts` pattern (parseFrontmatter, collectMarkdownFiles, violation accumulation, exit code 1 on violations). The `buildRetiredPageRoutesBlock` function is a pure extension alongside `buildRetiredSurfaceRedirectBlock` — no duplicated logic, just a new function for a new concern. The `SystemManifest` interface in `site-kernel-content` mirrors the Zod schema in `@gogol/ontology` — both gained `retiredRoutes` and `businessModel` fields with consistent types.
+No issues. The `b2b-model.ts` validator follows the existing `footer-legal.ts` pattern (parseFrontmatter, collectMarkdownFiles, violation accumulation, exit code 1 on violations). The `buildRetiredPageRoutesBlock` function is a pure extension alongside `buildRetiredSurfaceRedirectBlock` — no duplicated logic, just a new function for a new concern. The `SystemManifest` interface in `site-kernel-content` mirrors the Zod schema in `@warpgogol/ontology` — both gained `retiredRoutes` and `businessModel` fields with consistent types.
 
 ### Axis B — DNA alignment
 
@@ -60,13 +60,13 @@ No issues. `b2b-model.ts` has clear `MODULE_CONTRACT` with purpose and non-goals
 
 ### Axis F — Pragmatism
 
-No issues. `b2b.model.validate` is a new command, not a flag on `system.manifest.validate` — justified by the RFC because it checks cross-cutting content semantics (prose, navigation, labels) beyond manifest structure. The scan scope is documented (~40-60 files for webgogol-com). The `buildRetiredPageRoutesBlock` function is minimal — 18 lines, single responsibility.
+No issues. `b2b.model.validate` is a new command, not a flag on `system.manifest.validate` — justified by the RFC because it checks cross-cutting content semantics (prose, navigation, labels) beyond manifest structure. The scan scope is documented (~40-60 files for warpgogol-com). The `buildRetiredPageRoutesBlock` function is minimal — 18 lines, single responsibility.
 
 ### Axis G — Blind spots
 
 **Minor finding 1 — `b2b-model.ts` B2B-LABEL-01 false positive risk:** The navigation check matches `semanticTarget.pageId` entries, which is correct per the RFC. However, if a navigation entry uses a different structure (e.g., `href` instead of `semanticTarget`), it would be silently skipped. This is acceptable for the current navigation schema but worth noting if the navigation schema evolves.
 
-**Minor finding 2 — `b2b-model.ts` prose scan performance:** The `collectMarkdownFiles` function uses `readdirSync` recursively. For webgogol-com (~40-60 files) this is fine. For a large site with hundreds of prose files, this could be slow. The RFC documents the expected file count. No action needed now.
+**Minor finding 2 — `b2b-model.ts` prose scan performance:** The `collectMarkdownFiles` function uses `readdirSync` recursively. For warpgogol-com (~40-60 files) this is fine. For a large site with hundreds of prose files, this could be slow. The RFC documents the expected file count. No action needed now.
 
 **Minor finding 3 — `buildRetiredPageRoutesBlock` slug normalization:** The slug is stripped of leading/trailing slashes but not normalized for locale-prefixed routes. If a `retiredRoutes` entry has `slug: "de/widerruf"`, the generated redirect would be `/de/widerruf/* / 410`. This is correct behavior — the RFC declares bare slugs (`widerruf`, not `de/widerruf`) — but the function doesn't validate this. Acceptable since the schema accepts any non-empty string.
 
@@ -87,6 +87,6 @@ No issues. `b2b.model.validate` is a new command, not a flag on `system.manifest
 
 ### Questions for the author
 
-1. The `SystemManifest` interface in `site-kernel-content` is a separate hand-maintained type, not imported from `@gogol/ontology`. Both were updated with the same fields — is there a plan to unify these types to prevent future drift, or is the duplication intentional?
+1. The `SystemManifest` interface in `site-kernel-content` is a separate hand-maintained type, not imported from `@warpgogol/ontology`. Both were updated with the same fields — is there a plan to unify these types to prevent future drift, or is the duplication intentional?
 2. The `b2b-model.ts` prose scan reads entire file contents into memory and runs regex. For sites with very large prose files (e.g., long AGB documents), should there be a file-size guard, or is the current approach acceptable given the expected file sizes?
-3. The `buildRetiredPageRoutesBlock` function is not gated by `isWebgogolSite` (unlike `buildRetiredSurfaceRedirectBlock`). This means any site declaring `retiredRoutes` will get 410 entries. Is this intentional — should `retiredRoutes` be a general mechanism, or should it be webgogol-specific?
+3. The `buildRetiredPageRoutesBlock` function is not gated by `isWarpgogolSite` (unlike `buildRetiredSurfaceRedirectBlock`). This means any site declaring `retiredRoutes` will get 410 entries. Is this intentional — should `retiredRoutes` be a general mechanism, or should it be warpgogol-specific?

@@ -10,8 +10,8 @@
   and <Media> reads synchronously (the video analogue of RFC-0204's image-variant manifest).
 </purpose>
 <non-goals>
-  <item>Do not resolve files — that is @gogol/content-source (resolveMedia) + the generated manifest.</item>
-  <item>Do not implement playback or transcoding — that is @gogol/ui + the kernel command.</item>
+  <item>Do not resolve files — that is @warpgogol/content-source (resolveMedia) + the generated manifest.</item>
+  <item>Do not implement playback or transcoding — that is @warpgogol/ui + the kernel command.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

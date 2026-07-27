@@ -23,7 +23,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readMissionManifest, resolveMissionDir } from "../mission/mission-io.ts";
 import { isClientEditable } from "./dna-22-checker.ts";
 

@@ -20,7 +20,7 @@ The diff is minimal and correct: a single `/* @vite-ignore */` comment addition 
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/growth build:check` (tsc --noEmit) exit 0; `rfc.validate RFC-0486 --json` status: pass.
+Pass — `pnpm --filter @warpgogol/growth build:check` (tsc --noEmit) exit 0; `rfc.validate RFC-0486 --json` status: pass.
 
 ### Axis A — Structural correctness
 

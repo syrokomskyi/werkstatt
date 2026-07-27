@@ -27,10 +27,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { fileExists } from "./lib/file-exists.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 // ---------------------------------------------------------------------------
 // Helpers

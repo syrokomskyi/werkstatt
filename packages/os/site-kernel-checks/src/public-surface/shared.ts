@@ -17,18 +17,18 @@ import type {
   Diagnostic,
   KernelRuntimeContext,
   KernelCommandResult,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { hasGeneratedMarker } from "@gogol/site-kernel-codegen";
-import { parseMaterialCreditMap } from "@gogol/share/material-credits";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
+import { parseMaterialCreditMap } from "@warpgogol/share/material-credits";
 import { diagnosticsResult } from "../result-helpers.ts";
 
 export const TODAY = "2026-07-06";
 export const INDEXNOW_KEY_PATTERN = /^[A-Za-z0-9-]{8,128}$/;
 // RFC-0375: public/ files are Category B (registry-only) — no GENERATED_LINE marker.
 export const SECURITY_EXPIRES = "2027-07-01T00:00:00.000Z";
-export const DEFAULT_SECURITY_CONTACT = "mailto:hi@webgogol.com";
+export const DEFAULT_SECURITY_CONTACT = "mailto:hi@warpgogol.com";
 export const UTF8_DECODER = new TextDecoder("utf-8", { fatal: true });
 
 export type ManifestLike = Record<string, unknown> & {
@@ -339,7 +339,7 @@ export function buildHumansTxt(app: AppPublicContext): string {
   const lines = [
     "",
     "/* TEAM */",
-    `Studio: Webgogol`,
+    `Studio: Warpgogol`,
     `Site: ${siteName}`,
     `Contact: ${DEFAULT_SECURITY_CONTACT}`,
     "",
@@ -356,7 +356,7 @@ export function buildHumansTxt(app: AppPublicContext): string {
     `Last update: ${TODAY}`,
     "",
     "/* TECHNOLOGY */",
-    "Astro 6, TypeScript, Turborepo, pnpm, @gogol/site-kernel",
+    "Astro 6, TypeScript, Turborepo, pnpm, @warpgogol/site-kernel",
     "",
   ];
   return lines.join("\n");

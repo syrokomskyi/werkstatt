@@ -6,14 +6,14 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 
 - This package owns the RFC-0221 internal site handoff surface.
 - It validates thin handoff bundles, compares ecosystem versions, diffs consumed capabilities, and owns the forward migrator registry.
-- It must not change `client.export`; that external full-fork deliverable remains owned by `@gogol/site-kernel-deploy`.
+- It must not change `client.export`; that external full-fork deliverable remains owned by `@warpgogol/site-kernel-deploy`.
 - It owns the Notausgang emergency export and validation commands (`notausgang.export`, `notausgang.validate`).
 
 ## Implementation Rules
 
 - Keep migrators forward-only. Never add downgrade migrators.
 - Migrators operate on the authored set only, never on generated output.
-- Treat `handoff-lock.json` and `handoff-manifest.json` schemas as owned by `@gogol/ontology`; import their types/schemas instead of duplicating shapes locally.
+- Treat `handoff-lock.json` and `handoff-manifest.json` schemas as owned by `@warpgogol/ontology`; import their types/schemas instead of duplicating shapes locally.
 - Register only implemented commands. `handoff.pack` is a thin bundle writer. `handoff.absorb` builds the catch-up report, refuses downgrades, then materializes (apply migrators → inject authored set → delegate regen). It never writes when `--report-only` is passed, and it refuses red-tier bundles unless `--force` is given.
 - `handoff.absorb` must regenerate derived artifacts by delegating to `build.prepare` / `build.check` — never by copying generated files out of the bundle, and never by `git merge`.
 - `handoff.pack` emits a golden `validation/` pack (routes, sitemap hash, llms hashes, scores) from the build output via `validation-pack.ts`; `handoff.absorb --regen` rebuilds it and diffs against the golden one. Keep the captured significant properties in sync with the public outputs (`isGeneratedPublicArtifact`) and the passport scores schema; add new properties to both `buildValidationPack` and `diffValidationPacks`.
@@ -30,7 +30,7 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - `resolveAdapter` throws for any adapter name without a concrete implementation. Do not add fallback-to-null behavior.
 - `leitstand.propagate --channel main` is gated: `alt` must have a healthy propagation of the same release before promoting to `main`.
 - Preflight checks verify: release manifest exists, channel is configured, secret reference syntax is valid, dist directory is present.
-- Health verification uses `@gogol/fingerprint` `hashHtml` to compute per-route content hashes from the behavior snapshot and compare them against live responses. Probe selection is deterministic (home, legal, sitemap, then remaining routes alphabetically, max 10 probes). Content mismatches always produce `unhealthy` verdict; only pure network failures produce `unknown`.
+- Health verification uses `@warpgogol/fingerprint` `hashHtml` to compute per-route content hashes from the behavior snapshot and compare them against live responses. Probe selection is deterministic (home, legal, sitemap, then remaining routes alphabetically, max 10 probes). Content mismatches always produce `unhealthy` verdict; only pure network failures produce `unknown`.
 - `deployment.lastPropagated` is per-channel with `releaseId`, `at`, `healthy`, `state`, `operationId`, and `leaseExpiresAt`. Only Leitstand command handlers write this field.
 - `leitstand.status` shows both channels by default; `--channel` filters to one.
 - `leitstand.rollback` requires `--channel`.
@@ -39,14 +39,14 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 
 - `notausgang.export` produces a self-contained site package with dist, site content, Bordbuch, pin, behavior snapshots, and a YAML manifest.
 - `notausgang.validate` performs **deep integrity verification** (RFC-0380), not shallow existence checks:
-  - Parses and schema-validates `notausgang-manifest.yaml` using `notausgangManifestSchema` from `@gogol/ontology/operations`.
-  - Re-computes `dist/` (byte mode), `site/` (semantic mode), `bordbuch/events.ndjson` (semantic mode), `behavior-snapshots/` (semantic mode), and `artifact-manifest.yaml` (byte mode) hashes via `@gogol/fingerprint`.
+  - Parses and schema-validates `notausgang-manifest.yaml` using `notausgangManifestSchema` from `@warpgogol/ontology/operations`.
+  - Re-computes `dist/` (byte mode), `site/` (semantic mode), `bordbuch/events.ndjson` (semantic mode), `behavior-snapshots/` (semantic mode), and `artifact-manifest.yaml` (byte mode) hashes via `@warpgogol/fingerprint`.
   - Validates Bordbuch NDJSON line-by-line: each line must be valid JSON with `eventId`, `type`, `timestamp`, `systemId` fields, and `systemId` must match the manifest.
   - Validates `system.pin.yaml` content: `systemId` and `platformVersion` must match the manifest.
   - Rejects legacy JSON artifacts (`notausgang-manifest.json`, `artifact-manifest.json`, `system.pin.json`) — forward-only, no JSON fallback.
   - Scans for secrets with refined patterns, excluding safe locations (`bordbuch/`, `system.pin.yaml`, `.hash` files).
   - Returns `CheckStatus` enum (`"valid" | "invalid" | "missing"`) per artifact and a `violations` array with `{ rule, message, file? }` shape (no `severity` field).
-- All hashing must use `@gogol/fingerprint` (DNA-53). Do not use `crypto.createHash` directly — `fingerprint.usage.lint` enforces this invariant.
+- All hashing must use `@warpgogol/fingerprint` (DNA-53). Do not use `crypto.createHash` directly — `fingerprint.usage.lint` enforces this invariant.
 - Export artifacts are YAML-only per RFC-0376, except Bordbuch NDJSON which remains NDJSON.
 
 ## Validation
@@ -54,8 +54,8 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 Run from the repository root:
 
 ```sh
-pnpm --filter @gogol/site-kernel-handoff build:check
-pnpm --filter @gogol/site-kernel-handoff test
+pnpm --filter @warpgogol/site-kernel-handoff build:check
+pnpm --filter @warpgogol/site-kernel-handoff test
 pnpm exec site-kernel run migrator.registry.validate
 ```
 
@@ -107,7 +107,7 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 
 ## Preflight content quality gate (RFC-0517)
 
-- `mission.materialize` runs a two-level preflight gate after `atomicMoveDir` and before `git init`. The gate validates the workpiece content using author-time validators from `MISSION_PREFLIGHT_CRITICAL` and `MISSION_PREFLIGHT_WARNING` pipeline constants (exported from `@gogol/site-kernel-checks`).
+- `mission.materialize` runs a two-level preflight gate after `atomicMoveDir` and before `git init`. The gate validates the workpiece content using author-time validators from `MISSION_PREFLIGHT_CRITICAL` and `MISSION_PREFLIGHT_WARNING` pipeline constants (exported from `@warpgogol/site-kernel-checks`).
 - **Critical validators** (`content-types.validate`, `schema.drift.validate`, `cosmic.catalog.validate`, `biome.contract.validate`) block materialization on failure. The workpiece is preserved on disk (no `git init`) and `evidence/preflight-report.json` is written with failure details.
 - **Warning validators** (`content.filename.validate`, `naming.content.lint`, `mirroring.validate`, `semantic.drift.validate`, `content.links.validate`, `content.references.validate`, `pbp.content.validate`) do not block — failures are logged and written to the report.
 - **`--skip-preflight` flag:** Bypasses the gate, writes `evidence/preflight-report.json` with `skipped: true`, and appends a `preflight-skipped` Bordbuch entry with `writerRole: "mission"`.

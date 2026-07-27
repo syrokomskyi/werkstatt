@@ -30,9 +30,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
-import { surfaceAncestorPageIds } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
+import { surfaceAncestorPageIds } from "@warpgogol/share/semantic";
 import { failResult, passResult } from "./result-helpers.ts";
 
 const ARTIFACT_FILE = "src/surface.generated.yaml";
@@ -46,7 +46,7 @@ interface AuthoredPage {
 /** Load authored pages (pageId + parentPageId + routes) from system.md. Fail-open to []. */
 async function loadAuthoredPages(appDir: string): Promise<AuthoredPage[]> {
   try {
-    const { loadSystemManifest } = await import("@gogol/site-kernel-content");
+    const { loadSystemManifest } = await import("@warpgogol/site-kernel-content");
     const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
     const pages = (manifest as unknown as { pages?: AuthoredPage[] }).pages;
     return Array.isArray(pages) ? pages : [];
@@ -93,7 +93,7 @@ function validateSurfaceHierarchy(entries: VirtualRouteEntry[], defaultLang: str
 
   for (const entry of entries) {
     if (!entry.indexable || entry.noindex) continue;
-    // RFC-0229: the surface hierarchy shape is owned by @gogol/share so the validator and the
+    // RFC-0229: the surface hierarchy shape is owned by @warpgogol/share so the validator and the
     // render-time resolver cannot drift.
     for (const ancestorId of surfaceAncestorPageIds(entry.pageId)) {
       const ancestor = byId.get(ancestorId);

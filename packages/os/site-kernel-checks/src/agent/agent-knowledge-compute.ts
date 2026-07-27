@@ -19,7 +19,7 @@ import {
   createNodeFsContentProvider,
   collectMarkdownFiles,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel-content";
 import {
   formatAgentKnowledge,
   AGENT_KNOWLEDGE_DOMAINS,
@@ -27,9 +27,9 @@ import {
   type AgentKnowledgeDomain,
   type AgentKnowledgeEnvelope,
   type AgentKnowledgeFreshness,
-} from "@gogol/share/agent";
-import { projectWeb } from "@gogol/share/semantic";
-import type { AuthoredFreshnessLedger } from "@gogol/share/knowledge";
+} from "@warpgogol/share/agent";
+import { projectWeb } from "@warpgogol/share/semantic";
+import type { AuthoredFreshnessLedger } from "@warpgogol/share/knowledge";
 import { defaultLanguageFromManifest } from "../lib/i18n.ts";
 
 const FRESHNESS_LEDGER_FILE = "src/freshness.generated.yaml";

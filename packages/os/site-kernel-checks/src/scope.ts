@@ -14,7 +14,7 @@ greenfield and CI are unchanged.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandInput } from "@gogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/site-kernel";
 
 /** Parse `--scope-files a,b,c` into a Set of repo-relative paths, or null when not supplied. */
 export function readScopeFiles(input: KernelCommandInput): Set<string> | null {

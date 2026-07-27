@@ -6,7 +6,7 @@
   single-owner invariant: every kernel command that writes a file outside its
   target app directory (workspace root, docs/, packages/ontology/) MUST be
   declared on SHARED_WRITE_ALLOWLIST and MUST write through writeFileAtomic
-  or the writeFileIfChanged wrapper from @gogol/site-kernel — never a raw
+  or the writeFileIfChanged wrapper from @warpgogol/site-kernel — never a raw
   node:fs/promises writeFile/writeFileSync.
 </purpose>
 <non-goals>
@@ -27,7 +27,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 import { SITES_CHECK_AUTHOR_PIPELINE } from "./pipelines/sites-check-author.ts";
@@ -179,7 +179,7 @@ export function runWsWrite01(
       ruleId: "WS-WRITE-01",
       severity: "error",
       message: `Command \`${entry.command}\` (reachable from an APPS_* pipeline) writes \`${entry.path}\`, which is outside apps/<app>/, but is not declared on SHARED_WRITE_ALLOWLIST.`,
-      fixHint: `Add a SharedWriteEntry for \`${entry.command}\` to SHARED_WRITE_ALLOWLIST in packages/os/site-kernel-checks/src/workspace-write-boundary.ts, and migrate its write to writeFileAtomic from @gogol/site-kernel (RFC-0258).`,
+      fixHint: `Add a SharedWriteEntry for \`${entry.command}\` to SHARED_WRITE_ALLOWLIST in packages/os/site-kernel-checks/src/workspace-write-boundary.ts, and migrate its write to writeFileAtomic from @warpgogol/site-kernel (RFC-0258).`,
     });
   }
 
@@ -191,12 +191,12 @@ export function runWsWrite01(
 // ---------------------------------------------------------------------------
 
 // RFC-0270: a module that itself lives inside packages/os/site-kernel/src (the
-// package that defines writeFileAtomic) cannot import it via the "@gogol/site-kernel"
+// package that defines writeFileAtomic) cannot import it via the "@warpgogol/site-kernel"
 // package specifier — it imports the sibling ./fs-atomic.ts source file directly.
 // RFC-0345: writeFileIfChanged is also accepted because it delegates the actual
 // write to writeFileAtomic while avoiding unchanged-file churn.
 const ATOMIC_IMPORT_PATTERN =
-  /import\s*\{[^}]*\b(writeFileAtomic|writeFileIfChanged)\b[^}]*\}\s*from\s*["'](@gogol\/site-kernel|\.{1,2}\/(.*\/)?fs-(atomic|idempotent)\.ts)["']/;
+  /import\s*\{[^}]*\b(writeFileAtomic|writeFileIfChanged)\b[^}]*\}\s*from\s*["'](@warpgogol\/site-kernel|\.{1,2}\/(.*\/)?fs-(atomic|idempotent)\.ts)["']/;
 const RAW_WRITE_CALL_PATTERN = /\bwriteFileSync?\s*\(/;
 
 /** @internal exported for fixture tests — production callers use the default allowlist. */
@@ -230,9 +230,9 @@ export async function runWsWrite02(
       diagnostics.push({
         ruleId: "WS-WRITE-02",
         severity: "error",
-        message: `Allowlisted module \`${entry.module}\` (command \`${entry.command}\`) does not import writeFileAtomic or writeFileIfChanged from @gogol/site-kernel.`,
+        message: `Allowlisted module \`${entry.module}\` (command \`${entry.command}\`) does not import writeFileAtomic or writeFileIfChanged from @warpgogol/site-kernel.`,
         file: entry.module,
-        fixHint: `Import writeFileAtomic or writeFileIfChanged from "@gogol/site-kernel" in ${entry.module} and use it for the workspace-shared write (RFC-0258/RFC-0345).`,
+        fixHint: `Import writeFileAtomic or writeFileIfChanged from "@warpgogol/site-kernel" in ${entry.module} and use it for the workspace-shared write (RFC-0258/RFC-0345).`,
       });
     }
 

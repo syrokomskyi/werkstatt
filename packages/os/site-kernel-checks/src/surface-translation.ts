@@ -17,7 +17,7 @@
 import { dirname, join } from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import type {
   CheckResult,
@@ -25,10 +25,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { parseMarkdownFrontmatter, stringifyMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { toKebabCase } from "@gogol/share/string-utils";
-import type { SurfaceModuleContext } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import { parseMarkdownFrontmatter, stringifyMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { toKebabCase } from "@warpgogol/share/string-utils";
+import type { SurfaceModuleContext } from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceModuleContexts } from "./pseo/pseo-module-context.ts";
 

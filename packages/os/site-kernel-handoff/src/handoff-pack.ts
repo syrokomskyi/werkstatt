@@ -21,12 +21,12 @@ import {
   handoffManifestSchema,
   type HandoffCapability,
   type HandoffManifestEntry,
-} from "@gogol/ontology/operations";
+} from "@warpgogol/ontology/operations";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   hashFile,
   resolveCurrentEcosystem,

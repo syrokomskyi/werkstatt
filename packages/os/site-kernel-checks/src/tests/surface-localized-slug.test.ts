@@ -6,7 +6,7 @@ import {
   resolveSlug,
   type Blueprint,
   type LocalizedUniverse,
-} from "@gogol/surface";
+} from "@warpgogol/surface";
 
 /**
  * RFC-0199: per-language slug segments must localize the emitted URL while page identity

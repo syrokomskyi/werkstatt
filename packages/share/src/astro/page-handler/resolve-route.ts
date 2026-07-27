@@ -8,7 +8,7 @@
   labels, and optional semantic model building via callback.
 </purpose>
 <non-goals>
-  <item>Do not import from @gogol/pbp — semantic model is injected via optional callback.</item>
+  <item>Do not import from @warpgogol/pbp — semantic model is injected via optional callback.</item>
   <item>Do not render Astro components — this is a build-time data pipeline.</item>
   <item>Do not access Astro global — callers pass Astro.url.origin as siteUrl.</item>
 </non-goals>
@@ -24,7 +24,7 @@
 
 // RFC-0141: content reads flow through the Content Source Provider port (the single named
 // seam that owns the astro:content dependency), not astro:content directly.
-import { getCollection, getEntry } from "@gogol/content-source/astro";
+import { getCollection, getEntry } from "@warpgogol/content-source/astro";
 import { EMPTY_RUNTIME_CONTEXT } from "../../runtime-context.ts";
 import { buildPage, type PageEntry, type ResolvedPage, type ShellBlockConfig } from "../../page.ts";
 import { createDevPropsValidator } from "../../dev-props-validator.ts";
@@ -728,7 +728,7 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
       });
   }
 
-  // Optional semantic model building via callback — avoids circular dep on @gogol/pbp
+  // Optional semantic model building via callback — avoids circular dep on @warpgogol/pbp
   let semanticPage: import("../../semantic/models.ts").SemanticPageModel | null = null;
   if (buildSemanticModel && semanticType) {
     semanticPage = await buildSemanticModel({

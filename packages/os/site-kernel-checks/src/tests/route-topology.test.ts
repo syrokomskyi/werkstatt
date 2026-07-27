@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runRouteTopologyValidate } from "../route-topology.ts";
-import type { KernelCommandInput } from "@gogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/site-kernel";
 import { makeTestSiteContext } from "./helpers.ts";
 
 /*
@@ -39,19 +39,19 @@ ${pages
 `;
 
 const INDEX_ASTRO = `---
-import { resolvePageRoute } from "@gogol/share/route";
+import { resolvePageRoute } from "@warpgogol/share/route";
 ---
 <resolvePageRoute />
 `;
 
 const SLUG_ASTRO = `---
-import { getStaticPathsForDefaultLang } from "@gogol/share/route";
+import { getStaticPathsForDefaultLang } from "@warpgogol/share/route";
 ---
 <getStaticPathsForDefaultLang />
 `;
 
 const PREFIXED_ASTRO = `---
-import { getStaticPathsForPrefixedLangs, getStaticPathsForDefaultLangRedirects } from "@gogol/share/route";
+import { getStaticPathsForPrefixedLangs, getStaticPathsForDefaultLangRedirects } from "@warpgogol/share/route";
 ---
 <getStaticPathsForPrefixedLangs />
 <getStaticPathsForDefaultLangRedirects />

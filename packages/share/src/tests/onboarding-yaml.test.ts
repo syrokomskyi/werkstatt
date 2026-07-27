@@ -31,7 +31,7 @@ generatedAt: 2026-05-23T12:00:00.000Z
 generator: agent`;
 
 test("parseOnboardingArtifactHeader returns the metadata in a two-doc file", () => {
-  const source = `---\n${HEADER_FIXTURE}\n---\nclient: webgogol-com\npayload: 42\n`;
+  const source = `---\n${HEADER_FIXTURE}\n---\nclient: warpgogol-com\npayload: 42\n`;
   const header = parseOnboardingArtifactHeader(source);
   expect(header).toEqual({
     phase: "04-author",
@@ -42,14 +42,14 @@ test("parseOnboardingArtifactHeader returns the metadata in a two-doc file", () 
 });
 
 test("parseOnboardingArtifactHeader reads the merged metadata in a single-doc file", () => {
-  const source = `${HEADER_FIXTURE}\nclient: webgogol-com\npayload: 42\n`;
+  const source = `${HEADER_FIXTURE}\nclient: warpgogol-com\npayload: 42\n`;
   const header = parseOnboardingArtifactHeader(source);
   expect(header?.phase).toBe("04-author");
   expect(header?.derivedFromInputHash).toBe("sha256:deadbeef");
 });
 
 test("parseOnboardingArtifactHeader returns null when the header is missing", () => {
-  const source = "client: webgogol-com\nfoo: bar\n";
+  const source = "client: warpgogol-com\nfoo: bar\n";
   expect(parseOnboardingArtifactHeader(source)).toBe(null);
 });
 
@@ -58,28 +58,28 @@ test("parseOnboardingArtifactHeader returns null for an empty source", () => {
 });
 
 test("parseOnboardingArtifactPayload returns the second doc unchanged in a two-doc file", () => {
-  const source = `---\n${HEADER_FIXTURE}\n---\nclient: webgogol-com\npayload: 42\n`;
+  const source = `---\n${HEADER_FIXTURE}\n---\nclient: warpgogol-com\npayload: 42\n`;
   const schema = z.object({ client: z.string(), payload: z.number() }).strict();
   const data = parseOnboardingArtifactPayload(source, schema);
-  expect(data).toEqual({ client: "webgogol-com", payload: 42 });
+  expect(data).toEqual({ client: "warpgogol-com", payload: 42 });
 });
 
 test("parseOnboardingArtifactPayload strips RFC-0076 keys from a single-doc payload", () => {
-  const source = `${HEADER_FIXTURE}\nclient: webgogol-com\npayload: 42\n`;
+  const source = `${HEADER_FIXTURE}\nclient: warpgogol-com\npayload: 42\n`;
   const schema = z.object({ client: z.string(), payload: z.number() }).strict();
   const data = parseOnboardingArtifactPayload(source, schema);
-  expect(data).toEqual({ client: "webgogol-com", payload: 42 });
+  expect(data).toEqual({ client: "warpgogol-com", payload: 42 });
 });
 
 test("parseOnboardingArtifactPayload preserves a metadata-named key when the schema declares it", () => {
   // RFC-0082 carve-out: contentAtomsFileSchema (and others) declare
   // `generatedAt` as a strict payload field. The helper must NOT strip it
   // from a single-doc payload when the schema's .shape introspects it.
-  const source = `${HEADER_FIXTURE}\nclient: webgogol-com\n`;
+  const source = `${HEADER_FIXTURE}\nclient: warpgogol-com\n`;
   const schema = z.object({ client: z.string(), generatedAt: z.string() }).strict();
   const data = parseOnboardingArtifactPayload(source, schema);
   expect(data).toEqual({
-    client: "webgogol-com",
+    client: "warpgogol-com",
     generatedAt: "2026-05-23T12:00:00.000Z",
   });
 });
@@ -89,7 +89,7 @@ test("parseOnboardingArtifactPayload throws on an empty source", () => {
 });
 
 test("parseOnboardingArtifactPayload rejects doc-count > 2", () => {
-  const source = `---\n${HEADER_FIXTURE}\n---\nclient: webgogol-com\n---\nstray: doc\n`;
+  const source = `---\n${HEADER_FIXTURE}\n---\nclient: warpgogol-com\n---\nstray: doc\n`;
   expect(() => parseOnboardingArtifactPayload(source, z.any())).toThrow(
     /expected exactly 1 or 2 YAML documents/,
   );

@@ -54,7 +54,7 @@ test("aggregateBudgets: golden p50/p95/expectedDurationMs for a fixture sample",
 
 test("aggregateBudgets: groups separately by (pipeline, command, app)", () => {
   const records = [
-    record({ app: "webgogol-com", durationMs: 1000 }),
+    record({ app: "warpgogol-com", durationMs: 1000 }),
     record({ app: "nicaragua-projekt", durationMs: 2000 }),
     record({ pipeline: "build.check", durationMs: 3000 }),
   ];
@@ -108,7 +108,7 @@ test("lookupExpectedDurationMs: exact app match wins over the app-agnostic budge
       {
         pipeline: "p",
         command: "c",
-        app: "webgogol-com",
+        app: "warpgogol-com",
         sampleCount: 1,
         p50Ms: 1,
         p95Ms: 1,
@@ -116,9 +116,9 @@ test("lookupExpectedDurationMs: exact app match wins over the app-agnostic budge
       },
     ],
   };
-  expect(lookupExpectedDurationMs(budgets, "p", "c", "webgogol-com")).toBe(2000);
+  expect(lookupExpectedDurationMs(budgets, "p", "c", "warpgogol-com")).toBe(2000);
   expect(lookupExpectedDurationMs(budgets, "p", "c", "nicaragua-projekt")).toBe(1000);
-  expect(lookupExpectedDurationMs(null, "p", "c", "webgogol-com")).toBe(undefined);
+  expect(lookupExpectedDurationMs(null, "p", "c", "warpgogol-com")).toBe(undefined);
 });
 
 // ---------------------------------------------------------------------------

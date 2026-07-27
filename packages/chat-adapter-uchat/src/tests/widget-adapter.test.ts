@@ -1,6 +1,6 @@
 import { test, expect, describe, beforeEach, afterEach, vi } from "vitest";
 import UChatWidgetAdapter from "../widget-adapter.ts";
-import type { ChatWidgetConfig } from "@gogol/chat/port";
+import type { ChatWidgetConfig } from "@warpgogol/chat/port";
 
 function makeConfig(options: Record<string, string> = {}): ChatWidgetConfig {
   return {

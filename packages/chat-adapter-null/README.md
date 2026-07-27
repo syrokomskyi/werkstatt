@@ -1,4 +1,4 @@
-# @gogol/chat-adapter-null
+# @warpgogol/chat-adapter-null
 
 No-op `ChatWidgetAdapter` for development, testing, and unentitled sites (RFC-0175).
 
@@ -9,7 +9,7 @@ The safe default chat adapter. When `system.md integrations.chat.adapter` is abs
 ## Usage
 
 ```typescript
-import NullChatAdapter from "@gogol/chat-adapter-null";
+import NullChatAdapter from "@warpgogol/chat-adapter-null";
 // adapter.id === "null"
 // adapter.load() — no-op
 // adapter.open() — no-op
@@ -18,5 +18,5 @@ import NullChatAdapter from "@gogol/chat-adapter-null";
 ## Validation
 
 ```sh
-pnpm --filter @gogol/chat-adapter-null build:check
+pnpm --filter @warpgogol/chat-adapter-null build:check
 ```

@@ -68,7 +68,7 @@ No issues. Each test file covers the minimal set of cases: happy path, violation
 ### Axis G — Blind spots
 
 - **Temp dir cleanup on test failure** — all fixture tests use `afterEach(async () => { await rm(workspaceRoot, { recursive: true, force: true }); })`. If a test throws before `afterEach` runs (e.g., `beforeEach` fails), the temp dir leaks. This is a known vitest behavior — `afterEach` runs even on `beforeEach` failure, so this is actually safe. No finding.
-- **`collectFiles` extension matching** — `section-placeholder.test.ts` creates `.astro` files under `sections/<name>/` and relies on `collectFiles` to find them. The `collectFiles` function from `@gogol/share/fs` is not tested in isolation here, but it's an existing shared utility with its own coverage. No finding.
+- **`collectFiles` extension matching** — `section-placeholder.test.ts` creates `.astro` files under `sections/<name>/` and relies on `collectFiles` to find them. The `collectFiles` function from `@warpgogol/share/fs` is not tested in isolation here, but it's an existing shared utility with its own coverage. No finding.
 - **`scripts-placement.test.ts` SP-07 test** — the test creates a `.client.ts` file with a mismatched name. The test asserts `exitCode === 1` and `errors >= 1`, but does not verify the specific rule ID (`SP-07`). Minor — adding `expect(result.data!.errors).toBe(1)` with a diagnostic check would be more precise, but the current assertion is sufficient for regression detection.
 
 ### Spec compliance

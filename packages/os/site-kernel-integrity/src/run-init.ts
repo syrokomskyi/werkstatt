@@ -9,7 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Refine Compass scaffolding to improve clarity and maintainability of the runInit function.</item>
-  <item>Migrated sha256FileHex from deleted ./hash.ts to byteHashFile from @gogol/fingerprint directly.</item>
+  <item>Migrated sha256FileHex from deleted ./hash.ts to byteHashFile from @warpgogol/fingerprint directly.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,7 +19,7 @@
  */
 
 import path from "node:path";
-import { byteHashFile } from "@gogol/fingerprint";
+import { byteHashFile } from "@warpgogol/fingerprint";
 import { discoverManagedFiles, groupFilesByDirectory } from "./discover.ts";
 import { getFileHistory, getFileRevisionFromHistory } from "./git.ts";
 import { writeJsonFile } from "./json.ts";

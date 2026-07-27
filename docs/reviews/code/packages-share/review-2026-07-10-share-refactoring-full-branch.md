@@ -36,7 +36,7 @@ filesReviewed:
   - pnpm-lock.yaml
 ---
 
-# Code Review: fc5652fab...HEAD — `@gogol/share` refactoring C1–C8 + validator barrel flattening
+# Code Review: fc5652fab...HEAD — `@warpgogol/share` refactoring C1–C8 + validator barrel flattening
 
 ### Verdict: Pass
 
@@ -44,8 +44,8 @@ The diff deepens five modules (registry dispatch, unified deep-merge, split inte
 
 ### Mechanical floor
 
-- `@gogol/share` tsc --noEmit: **pass**
-- `@gogol/site-kernel-checks` tsc --noEmit: **pass**
+- `@warpgogol/share` tsc --noEmit: **pass**
+- `@warpgogol/site-kernel-checks` tsc --noEmit: **pass**
 - `pnpm build` from root: **pass** (41/41 tasks, exit code 0)
 
 ### Axis A — Structural correctness
@@ -62,13 +62,13 @@ The diff deepens five modules (registry dispatch, unified deep-merge, split inte
 
 ### Axis B — DNA alignment
 
-- **DNA-1** (monorepo boundary) — PASS. No `apps/* → apps/*` imports. `site-content-handlers.ts` imports from `@gogol/content-source/astro` (package boundary). Validator command tables import from sibling implementation modules, not from `apps/*`.
+- **DNA-1** (monorepo boundary) — PASS. No `apps/* → apps/*` imports. `site-content-handlers.ts` imports from `@warpgogol/content-source/astro` (package boundary). Validator command tables import from sibling implementation modules, not from `apps/*`.
 - **DNA-6** (kebab-case) — PASS. All new filenames (`site-content-handlers.ts`, `orchestration.ts`) are kebab-case. Deleted files were also kebab-case.
 - **DNA-42** (Compass markup) — PASS. `site-content-handlers.ts` and `orchestration.ts` both carry `MODULE_CONTRACT` + `CHANGE_SUMMARY`. `CHANGE_SUMMARY` entries updated on `dev-props-validator.ts`, `feature-policy.ts`, `content/index.ts`, `index.ts`, `entity-id.ts`, `merge.ts`.
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries** — PASS. `@gogol/share` imports from `@gogol/content-source` and `@gogol/ontology` — correct direction. No cross-boundary violations.
+- **Package boundaries** — PASS. `@warpgogol/share` imports from `@warpgogol/content-source` and `@warpgogol/ontology` — correct direction. No cross-boundary violations.
 - **AGENTS.md updates** — PASS. `packages/share/AGENTS.md` updated: table entries for `content`, `feature-policy`, `dev-props-validator`, `astro`, integration hub section, `image-utils` marked deleted, `page-handler` shim noted. `packages/os/site-kernel-checks/AGENTS.md` updated: `validators/` row removed.
 - **Compass sync** — N/A. `docs/compass-inventory.xml` and `docs/grace-inventory.xml` are generated artifacts (output of `compass.inventory.generate`). Their deletion is safe — they are regenerated on demand. Not a repository-wide requirement change.
 - **Command lifecycle** — PASS. `deepMerge` added to `CANONICAL_EXPORTS` in `share-utility.ts`. `createDispatcherResolver` already listed. No new commands introduced or removed in this diff.
@@ -80,9 +80,9 @@ The diff deepens five modules (registry dispatch, unified deep-merge, split inte
 - **`resolveFeaturePolicySync` alias** — PASS. True alias calling `resolveFeaturePolicy`, not a duplicate implementation.
 - **`integration/index.ts` → `orchestration.ts` split** — PASS. The barrel re-exports `orchestration.ts` transparently. No parallel import path.
 - **ajv replacement** — PASS. The hand-rolled `validateShape` is fully deleted, not kept behind a flag. `ajv` added to `package.json` dependencies.
-- **Shim deletions (C6)** — PASS. `image-utils.ts`, `page-handler.ts`, and `dispatch.ts` are fully deleted. Root barrel re-exports from `@gogol/content-source` directly. Export map points `astro/page-handler` to `resolve-route.ts`. No parallel paths.
+- **Shim deletions (C6)** — PASS. `image-utils.ts`, `page-handler.ts`, and `dispatch.ts` are fully deleted. Root barrel re-exports from `@warpgogol/content-source` directly. Export map points `astro/page-handler` to `resolve-route.ts`. No parallel paths.
 - **Validator barrel flattening** — PASS. `validators/index.ts` and all 8 category barrel files deleted. Command tables import directly from implementation modules. `checks.ts` shim deleted, `index.ts` imports from `checks/*.ts` directly. No indirection layer remains.
-- **Dangling `@deprecated` comments** — PASS. Fixed in `3492a10a3`: the two `@deprecated import from "@gogol/share/image-utils" instead` comments in `index.ts` now point to `@gogol/content-source` instead of the deleted subpath.
+- **Dangling `@deprecated` comments** — PASS. Fixed in `3492a10a3`: the two `@deprecated import from "@warpgogol/share/image-utils" instead` comments in `index.ts` now point to `@warpgogol/content-source` instead of the deleted subpath.
 
 ### Axis E — Agent-facing clarity
 
@@ -90,7 +90,7 @@ The diff deepens five modules (registry dispatch, unified deep-merge, split inte
   - `dev-props-validator.ts`: "Replaced hand-rolled validateShape with ajv standard validator."
   - `feature-policy.ts`: "Removed false async from resolveFeaturePolicy; resolveFeaturePolicySync is now a thin alias."
   - `content/index.ts`: "Removed dispatch.ts re-export (merged into entity-id.ts)."
-  - `index.ts`: "C6: image-utils.ts shim deleted; root barrel re-exports from @gogol/content-source directly. page-handler.ts shim deleted; export map points to resolve-route.ts."
+  - `index.ts`: "C6: image-utils.ts shim deleted; root barrel re-exports from @warpgogol/content-source directly. page-handler.ts shim deleted; export map points to resolve-route.ts."
   - `entity-id.ts`: "Merged createDispatcherResolver from dispatch.ts (micro-module consolidation)."
   - `merge.ts`: "Deepening: unified deepMergeEntryData and mergeComponentContent into one configurable deepMerge; old names kept as thin wrappers."
 

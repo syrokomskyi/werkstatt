@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-changelog",
+  "name": "@warpgogol/site-kernel-changelog",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -21,7 +21,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.16",
     "@ai-sdk/openai": "^4.0.16",
-    "@gogol/site-kernel": "workspace:*",
+    "@warpgogol/site-kernel": "workspace:*",
     "ai": "^7.0.32",
     "p-limit": "^7.3.1",
     "semver": "^7.8.5",

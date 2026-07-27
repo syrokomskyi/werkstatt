@@ -8,18 +8,18 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0073: Add PBP content completeness validator with NEED_THIS reporting.</item>
-  <item>RFC-0471: Rewritten to use PBP schemas exclusively (legacy @gogol/business deleted).</item>
+  <item>RFC-0471: Rewritten to use PBP schemas exclusively (legacy @warpgogol/business deleted).</item>
   <item>Renamed from content-business.ts to content-pbp.ts; command renamed content.business.validate → pbp.content.validate.</item>
 </CHANGE_SUMMARY>
 */
 
 import { relative, join } from "node:path";
-import { pbpSchemaById } from "@gogol/pbp/schemas";
+import { pbpSchemaById } from "@warpgogol/pbp/schemas";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 import { readScopeFiles, outOfScope } from "./scope.ts";
 import {

@@ -13,7 +13,7 @@
 
 // RFC-0141: content reads flow through the Content Source Provider port (the single named
 // seam that owns the astro:content dependency), not astro:content directly.
-import { getEntry } from "@gogol/content-source/astro";
+import { getEntry } from "@warpgogol/content-source/astro";
 import { mergeComponentContent } from "../content/merge.ts";
 import {
   getContentRefIndex,

@@ -55,9 +55,9 @@ All three RFCs pass schema validation, referential integrity (V-12 bidirectional
 
 #### WARNING-1 — RFC-0383 `packagesImpacted` may be overstated
 
-**RFC-0383** `@/docs/rfcs/rfc-0383-add-surface-graph-validate-for-seo-link-structure-diagnostics.md:34` Lists `"@gogol/surface"` in `packagesImpacted`. The command only reads the artifact and creates a new handler in `@gogol/site-kernel-checks`. No `@gogol/surface` source files are modified unless the TypeScript types (`GraphDiagnostic`, `SurfaceGraphReport`) are placed there. The RFC doesn't specify where the types live. If they live in `@gogol/site-kernel-checks`, then `@gogol/surface` is not impacted.
+**RFC-0383** `@/docs/rfcs/rfc-0383-add-surface-graph-validate-for-seo-link-structure-diagnostics.md:34` Lists `"@warpgogol/surface"` in `packagesImpacted`. The command only reads the artifact and creates a new handler in `@warpgogol/site-kernel-checks`. No `@warpgogol/surface` source files are modified unless the TypeScript types (`GraphDiagnostic`, `SurfaceGraphReport`) are placed there. The RFC doesn't specify where the types live. If they live in `@warpgogol/site-kernel-checks`, then `@warpgogol/surface` is not impacted.
 
-**Recommendation:** Clarify in the design section where the TypeScript types are defined. If in `@gogol/site-kernel-checks`, remove `"@gogol/surface"` from `packagesImpacted`. If in `@gogol/surface` (for reuse by other consumers), add a note explaining why.
+**Recommendation:** Clarify in the design section where the TypeScript types are defined. If in `@warpgogol/site-kernel-checks`, remove `"@warpgogol/surface"` from `packagesImpacted`. If in `@warpgogol/surface` (for reuse by other consumers), add a note explaining why.
 
 ### Axis D — Agent clarity
 

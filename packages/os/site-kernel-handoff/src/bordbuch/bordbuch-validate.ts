@@ -14,7 +14,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { validateBordbuch, type BordbuchViolation } from "./bordbuch-io.ts";
 
 export interface BordbuchValidateData {

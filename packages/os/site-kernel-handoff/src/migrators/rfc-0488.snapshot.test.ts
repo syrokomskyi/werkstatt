@@ -43,16 +43,16 @@ async function writeCreditsFile(dir: string, fileName: string, record: unknown):
 test("rfc-0488 snapshot: ai-generated record with default copyright gets aiUsage.copyrightClaimed: false", async () => {
   await withTempDir(async (dir) => {
     const filePath = await writeCreditsFile(dir, "ai-generated.credits.yaml", {
-      id: "webgogol-promo-video",
+      id: "warpgogol-promo-video",
       target: { kind: "video", id: "promo-video" },
       sourceType: "ai-generated",
       parties: [
-        { role: "promptAuthor", name: "Webgogol", kind: "Person" },
+        { role: "promptAuthor", name: "Warpgogol", kind: "Person" },
         { role: "aiPlatform", name: "Runway", kind: "AIPlatform" },
       ],
       license: {
         label: "Alle Rechte vorbehalten",
-        copyrightNotice: "Copyright © Webgogol. All rights reserved.",
+        copyrightNotice: "Copyright © Warpgogol. All rights reserved.",
       },
     });
     const data: SternsystemData = { rootPath: dir, dataPaths: [] };
@@ -99,7 +99,7 @@ test("rfc-0488 snapshot: human-made record with Organization creator gets role r
       id: "org-created-image",
       target: { kind: "image", id: "org-image" },
       sourceType: "human-made",
-      parties: [{ role: "creator", name: "Webgogol GmbH", kind: "Organization" }],
+      parties: [{ role: "creator", name: "Warpgogol GmbH", kind: "Organization" }],
       license: { label: "All rights reserved" },
     });
     const data: SternsystemData = { rootPath: dir, dataPaths: [] };

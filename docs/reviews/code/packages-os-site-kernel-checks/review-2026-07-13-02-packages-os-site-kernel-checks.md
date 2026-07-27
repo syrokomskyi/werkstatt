@@ -35,13 +35,13 @@ filesReviewed:
 
 ## Verdict: Needs revision
 
-The implementation delivers the core RFC-0378 promise: a site workspace resolver, `--site` CLI flag, `sites list`, `SITES_*` pipelines, and generated fleet/ecosystem projections. Mechanical checks and validation suites pass. However, two agent-facing clarity gaps and one incomplete spec item remain: generated command manifests still label per-site providers as `app`, the `@gogol/site-kernel` README advertises stale exports and commands, and `notausgang-commands.ts` was supposed to be rewired through the resolver per the RFC decision table but still hardcodes `apps/<systemId>/`. These are fixable in a small follow-up commit and do not require rejecting the change.
+The implementation delivers the core RFC-0378 promise: a site workspace resolver, `--site` CLI flag, `sites list`, `SITES_*` pipelines, and generated fleet/ecosystem projections. Mechanical checks and validation suites pass. However, two agent-facing clarity gaps and one incomplete spec item remain: generated command manifests still label per-site providers as `app`, the `@warpgogol/site-kernel` README advertises stale exports and commands, and `notausgang-commands.ts` was supposed to be rewired through the resolver per the RFC decision table but still hardcodes `apps/<systemId>/`. These are fixable in a small follow-up commit and do not require rejecting the change.
 
 ## Mechanical floor
 
 Pass.
 
-- `pnpm --filter @gogol/site-kernel --filter @gogol/site-kernel-checks --filter @gogol/site-kernel-handoff --filter @gogol/site-kernel-onboarding --filter @gogol/share --filter @gogol/surface --filter @gogol/forge run build:check` — all 7 packages pass `tsc --noEmit`.
+- `pnpm --filter @warpgogol/site-kernel --filter @warpgogol/site-kernel-checks --filter @warpgogol/site-kernel-handoff --filter @warpgogol/site-kernel-onboarding --filter @warpgogol/share --filter @warpgogol/surface --filter @warpgogol/forge run build:check` — all 7 packages pass `tsc --noEmit`.
 - `npx tsx packages/os/site-kernel/src/cli/index.ts run rfc.validate --id RFC-0378 --json` — zero violations for RFC-0378.
 - `workspace.surface.validate`, `cosmic.catalog.validate`, `cosmic.name.unique`, `manifest.contract.validate`, `ecosystem.manifest.validate`, `page.block.validate` — all green in the validation suite run during implementation.
 
@@ -55,13 +55,13 @@ Pass.
 
 No issues.
 
-- DNA-1 (monorepo boundary): `site-kernel-handoff` imports the resolver from `@gogol/site-kernel`; no `apps/* → apps/*` or `apps/* → services/*` imports introduced.
+- DNA-1 (monorepo boundary): `site-kernel-handoff` imports the resolver from `@warpgogol/site-kernel`; no `apps/* → apps/*` or `apps/* → services/*` imports introduced.
 - DNA-42 (Compass scaffolding): `site-workspace-resolver.ts` carries `MODULE_CONTRACT`, `CHANGE_SUMMARY`, and an `@ai-invariant` line for dual representation.
 - DNA-23 (cosmic naming): not touched.
 
 ## Axis C — Ecosystem fit
 
-- **Command provider terminology drift**. `packages/os/site-kernel/src/runtime/registry.ts` at line 162 still builds manifest keys as `app:${site.name}:${commandName}` and emits `provider: "app"` / `provider: "app:webgogol-com"` in `docs/command-manifest.generated.yaml` and `docs/ecosystem.generated.yaml`. The RFC renamed the agent-facing command surface from `--app` to `--site`; leaving the generated provider label as `app` creates a visible inconsistency in the Agent Control Plane projection. The `KernelRegisteredCommandInfo.provider` type (`packages/os/site-kernel/src/types.ts` line 104) is also still `"workspace" | "app"`. Consider `"workspace" | "site"` and updating the manifest builder accordingly.
+- **Command provider terminology drift**. `packages/os/site-kernel/src/runtime/registry.ts` at line 162 still builds manifest keys as `app:${site.name}:${commandName}` and emits `provider: "app"` / `provider: "app:warpgogol-com"` in `docs/command-manifest.generated.yaml` and `docs/ecosystem.generated.yaml`. The RFC renamed the agent-facing command surface from `--app` to `--site`; leaving the generated provider label as `app` creates a visible inconsistency in the Agent Control Plane projection. The `KernelRegisteredCommandInfo.provider` type (`packages/os/site-kernel/src/types.ts` line 104) is also still `"workspace" | "app"`. Consider `"workspace" | "site"` and updating the manifest builder accordingly.
 - **Pipeline naming is correct**. `SITES_CHECK_PIPELINE`, `SITES_BUILD_PREPARE_PIPELINE`, etc. replace the old `APPS_*` constants, and the exported pipeline names in `ecosystem/manifest.ts` are now `sites-check.*`.
 - **Ecosystem projection is complete**. `docs/ecosystem.generated.yaml` now includes `sternsystems: []` and `missions: []` blocks alongside the existing `apps`, `packages`, and `services` sections.
 - **pnpm workspace updated**. `pnpm-workspace.yaml` gained `missions/*/workpiece`, satisfying the dependency-resolution requirement for materialized mission workpieces.
@@ -72,12 +72,12 @@ No issues.
 
 - The `--app` flag is rejected as unknown by the CLI parser; there is no alias or dual-path fallback.
 - `APPS_*` pipeline constants were renamed, not preserved behind a compatibility re-export.
-- The V-23 validator fix (`JSON.parse` → `yamlParse`) was applied in both `@gogol/site-kernel` and `@gogol/forge`, removing a latent bug that would have blocked future RFCs from transitioning to `implemented`.
+- The V-23 validator fix (`JSON.parse` → `yamlParse`) was applied in both `@warpgogol/site-kernel` and `@warpgogol/forge`, removing a latent bug that would have blocked future RFCs from transitioning to `implemented`.
 
 ## Axis E — Agent-facing clarity
 
 - **Stale `README.md` exports and examples**. `packages/os/site-kernel/README.md` still lists `discoverKernelApps`, `loadKernelAppConfig`, and `listKernelApps` as key exports (lines 13–14) and documents `pnpm exec site-kernel list` (line 30). The actual exports are `discoverSiteWorkspaces`, `resolveSiteWorkspace`, `listSiteWorkspaces`, and `sites list`. The README is the first place another agent looks; stale entries will mislead.
-- **Per-site provider label says `app`**. As noted in Axis C, generated manifests use `provider: app` and `provider: app:webgogol-com`. An agent reading `docs/command-manifest.generated.yaml` sees a command provided by an "app" while the CLI requires `--site`; the mismatch is confusing.
+- **Per-site provider label says `app`**. As noted in Axis C, generated manifests use `provider: app` and `provider: app:warpgogol-com`. An agent reading `docs/command-manifest.generated.yaml` sees a command provided by an "app" while the CLI requires `--site`; the mismatch is confusing.
 - **`handoff-pack.ts` error message uses old terminology**. `packages/os/site-kernel-handoff/src/handoff-pack.ts` line 104 says "requires the app name" and line 120 says "no app at apps/${siteName}". Since the flag is `--site`, the message should say "site name" and "no site at ...".
 - **Otherwise clear**. Variable names (`siteName`, `siteId`, `discoverSiteWorkspaces`) are readable; new error messages include resolvable-site lists and RFC references.
 

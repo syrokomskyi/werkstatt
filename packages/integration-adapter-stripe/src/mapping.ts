@@ -26,8 +26,8 @@ import type {
   InvoiceKind,
   LifecycleEventKind,
   SubscriptionPlan,
-} from "@gogol/integration";
-import { INVOICE_KINDS, SUBSCRIPTION_PLANS } from "@gogol/integration";
+} from "@warpgogol/integration";
+import { INVOICE_KINDS, SUBSCRIPTION_PLANS } from "@warpgogol/integration";
 import { z } from "zod";
 import { verifyStripeSignature } from "./signature.ts";
 

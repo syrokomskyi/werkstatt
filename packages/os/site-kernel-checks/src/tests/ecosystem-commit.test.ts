@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { runEcosystemCommit } from "../ecosystem-commit.ts";
 
 const execFileAsync = promisify(execFile);

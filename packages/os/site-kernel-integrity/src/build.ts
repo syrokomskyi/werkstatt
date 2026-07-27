@@ -8,7 +8,7 @@
  * </non-goals>
  * </MODULE_CONTRACT>
  *  * <CHANGE_SUMMARY>
-  <item>Migrated hash imports from deleted ./hash.ts wrapper to @gogol/fingerprint directly.</item>
+  <item>Migrated hash imports from deleted ./hash.ts wrapper to @warpgogol/fingerprint directly.</item>
 </CHANGE_SUMMARY>
  ***************************************************************/
 
@@ -18,7 +18,7 @@
  */
 
 import path from "node:path";
-import { byteHash, byteHashFile } from "@gogol/fingerprint";
+import { byteHash, byteHashFile } from "@warpgogol/fingerprint";
 import { discoverManagedFiles } from "./discover.ts";
 import { discoverDistFiles } from "./internal-dist.ts";
 import { getHeadSha, getRepoUrl } from "./git.ts";

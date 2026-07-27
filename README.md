@@ -1,4 +1,4 @@
-# WGogol
+# Warpgogol
 
 A Turborepo monorepo of Astro 6 sites that compose themselves out of shared packages. **Adding a new client site means writing YAML and Markdown — almost no `.astro` or `.ts`.**
 
@@ -11,13 +11,13 @@ missions/<missionId>/workpiece/       ◄── active mission workpiece (deploy
 ├─ src/content/system.md              ── canonical declaration: pages, planets, biome, growth, passport
 ├─ src/content/pages/<lang>/*.md      ── frontmatter-only `blocks[]` per page
 ├─ src/content/prose/<lang>/*.md      ── all freeform prose
-├─ src/content/business-profile/<lang>/*  ── canonical business data (consumed by @gogol/pbp)
+├─ src/content/business-profile/<lang>/*  ── canonical business data (consumed by @warpgogol/pbp)
 ├─ src/pages/[...slug].astro          ── thin unprefixed default-language route
 ├─ src/pages/[lang]/[...slug].astro   ── thin non-default-language route
 └─ tools/kernel.config.ts             ── site-kernel pipelines
 
 services/                             ◄── deployable backend runtime compositions
-└─ check-webgogol-runner              ── Node/Playwright runner for Check Webgogol runs
+└─ check-warpgogol-runner              ── Node/Playwright runner for Check Warpgogol runs
 
 packages/                             ◄── all logic lives here
 ├─ ui                                 ── Astro sections + components (cosmicName-tagged)
@@ -31,7 +31,7 @@ packages/                             ◄── all logic lives here
 └─ os/site-kernel*                    ── CLI core + content loaders + validators + scaffold + internal handoff
 ```
 
-Sites are registered as Sternsystemen in `systems/registry.yaml` and materialized as mission workpieces under `missions/<missionId>/workpiece/`. Pages are declared in `src/content/system.md` (which `cosmicPlanet` sections each route uses) and authored as YAML-only `*.md` blocks in `src/content/pages/`. Thin generated routes call `buildPage()` and dispatch each block to a `@gogol/ui` section by `cosmicName`; the default language is served unprefixed, while non-default languages live under `/<lang>/`. The `apps/*` directory is retired (RFC-0381). Read the architecture diagrams and rules in [`AGENTS.md`](AGENTS.md), [`docs/authoring/site-composition.md`](docs/authoring/site-composition.md), and [`packages/AGENTS.md`](packages/AGENTS.md).
+Sites are registered as Sternsystemen in `systems/registry.yaml` and materialized as mission workpieces under `missions/<missionId>/workpiece/`. Pages are declared in `src/content/system.md` (which `cosmicPlanet` sections each route uses) and authored as YAML-only `*.md` blocks in `src/content/pages/`. Thin generated routes call `buildPage()` and dispatch each block to a `@warpgogol/ui` section by `cosmicName`; the default language is served unprefixed, while non-default languages live under `/<lang>/`. The `apps/*` directory is retired (RFC-0381). Read the architecture diagrams and rules in [`AGENTS.md`](AGENTS.md), [`docs/authoring/site-composition.md`](docs/authoring/site-composition.md), and [`packages/AGENTS.md`](packages/AGENTS.md).
 
 ## Stack
 
@@ -66,20 +66,20 @@ pnpm exec site-kernel --help
 
 If you cloned without running onboarding, invoke the `setup-ecosystem` skill to configure hooks and verify the ecosystem automatically.
 
-## Check Webgogol
+## Check Warpgogol
 
-The Check Webgogol product surface (the web app that accepts a URL and displays check reports) is pending re-onboarding as a Sternsystem. The backend runner lives separately in `services/check-webgogol-runner` and consumes local queue files from `.check-webgogol/queue`, writing artifacts to `.check-webgogol/runs/<runId>/`.
+The Check Warpgogol product surface (the web app that accepts a URL and displays check reports) is pending re-onboarding as a Sternsystem. The backend runner lives separately in `services/check-warpgogol-runner` and consumes local queue files from `.check-warpgogol/queue`, writing artifacts to `.check-warpgogol/runs/<runId>/`.
 
 ```sh
 # Backend runner
-pnpm --filter check-webgogol-runner run:once
-pnpm --filter check-webgogol-runner dev
+pnpm --filter check-warpgogol-runner run:once
+pnpm --filter check-warpgogol-runner dev
 
 # Backend workspace validators
 pnpm exec site-kernel run services.check.run
 ```
 
-Keep the Check Webgogol product surface and `services/check-webgogol-runner` decoupled through shared contracts in `packages/check-core`; the site never imports runner code, and the runner never imports site code.
+Keep the Check Warpgogol product surface and `services/check-warpgogol-runner` decoupled through shared contracts in `packages/check-core`; the site never imports runner code, and the runner never imports site code.
 
 ## Onboarding a new client site
 
@@ -175,17 +175,17 @@ Every site (mission workpiece or Sternsystem workspace) carries its own deploy s
 | `deploy:alt`        | Deploy the already-built `dist/` to the alt Worker.        |
 
 ```sh
-# Deploy webgogol-com to production
-pnpm --filter webgogol-com build:deploy:main
+# Deploy warpgogol-com to production
+pnpm --filter warpgogol-com build:deploy:main
 
-# Deploy webgogol-com to staging (alt)
-pnpm --filter webgogol-com build:deploy:alt
+# Deploy warpgogol-com to staging (alt)
+pnpm --filter warpgogol-com build:deploy:alt
 ```
 
 Wrangler Worker names follow the site name:
 
-- Production: `<site-name>` (e.g. `webgogol-com`)
-- Alt: `alt-<site-name>` (e.g. `alt-webgogol-com`)
+- Production: `<site-name>` (e.g. `warpgogol-com`)
+- Alt: `alt-<site-name>` (e.g. `alt-warpgogol-com`)
 
 ### Secret files
 
@@ -238,7 +238,7 @@ Leads, chat messages, and Stripe payments captured on a client site become a nor
 
 ## Agent Surface
 
-Every deployed site publishes a machine-consumable **Agent Surface** for AI agents, not just human visitors: a signed discovery document (`/.well-known/agent.json`), structured knowledge JSON for the PBP layer (`/api/agent/v1/*.json`), an OpenAPI 3.1 document (`/.well-known/agent.openapi.json`), and a stateless MCP endpoint (`/api/agent/mcp`) plus direct HTTP action routes (`/api/agent/actions/<id>`) served by the new `@gogol/agent-gate` package. One generated **capability manifest** per site is the single source every one of these is projected from — knowledge reads are free/static; invoking an action (e.g. submitting a lead as an agent) is a paid module gated by the `agent.actions` entitlement and routes through the same Integration Port delivery substrate as the human contact form.
+Every deployed site publishes a machine-consumable **Agent Surface** for AI agents, not just human visitors: a signed discovery document (`/.well-known/agent.json`), structured knowledge JSON for the PBP layer (`/api/agent/v1/*.json`), an OpenAPI 3.1 document (`/.well-known/agent.openapi.json`), and a stateless MCP endpoint (`/api/agent/mcp`) plus direct HTTP action routes (`/api/agent/actions/<id>`) served by the new `@warpgogol/agent-gate` package. One generated **capability manifest** per site is the single source every one of these is projected from — knowledge reads are free/static; invoking an action (e.g. submitting a lead as an agent) is a paid module gated by the `agent.actions` entitlement and routes through the same Integration Port delivery substrate as the human contact form.
 
-- RFC-0286 (manifest spine) · RFC-0287 (knowledge tier) · RFC-0288 (capability catalog) · RFC-0289 (OpenAPI) · RFC-0290 (`@gogol/agent-gate` runtime + MCP) — see `docs/rfcs/`.
+- RFC-0286 (manifest spine) · RFC-0287 (knowledge tier) · RFC-0288 (capability catalog) · RFC-0289 (OpenAPI) · RFC-0290 (`@warpgogol/agent-gate` runtime + MCP) — see `docs/rfcs/`.
 - Full agent-facing mechanics live in each app's generated `AGENTS.md`; workspace-wide invariants live in [`AGENTS.md`](AGENTS.md).

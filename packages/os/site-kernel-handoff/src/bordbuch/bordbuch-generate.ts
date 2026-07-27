@@ -18,13 +18,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { writeFileIfChanged } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { stringify as yamlStringify } from "yaml";
-import type { BordbuchEntry } from "@gogol/ontology/operations";
+import type { BordbuchEntry } from "@warpgogol/ontology/operations";
 import { readBordbuch } from "./bordbuch-io.ts";
-import { loadSurfaceModuleContexts, readVisibilityOutcomes } from "@gogol/surface/io";
-import type { SurfaceModuleContext } from "@gogol/surface";
+import { loadSurfaceModuleContexts, readVisibilityOutcomes } from "@warpgogol/surface/io";
+import type { SurfaceModuleContext } from "@warpgogol/surface";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 
 const FREEZE_FILE = "src/surface/freeze.generated.yaml";

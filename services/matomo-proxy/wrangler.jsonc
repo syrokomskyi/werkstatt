@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "wgogol-matomo-proxy",
+  "name": "warpgogol-matomo-proxy",
   "main": "src/worker.ts",
   "compatibility_date": "2026-07-06",
   "workers_dev": true,

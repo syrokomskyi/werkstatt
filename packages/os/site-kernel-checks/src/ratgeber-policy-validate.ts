@@ -30,13 +30,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   loadSystemManifest,
   collectMarkdownFiles,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel-content";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { ARTIFACT_FILE, readLangs } from "./surface/shared.ts";

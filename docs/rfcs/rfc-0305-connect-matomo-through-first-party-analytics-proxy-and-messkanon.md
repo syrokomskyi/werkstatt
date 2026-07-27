@@ -62,19 +62,19 @@ commands:
 appsImpacted:
   - apps/*
 packagesImpacted:
-  - "@gogol/growth"
-  - "@gogol/growth-adapter-matomo"
-  - "@gogol/ontology"
-  - "@gogol/share"
-  - "@gogol/site-kernel"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-onboarding"
+  - "@warpgogol/growth"
+  - "@warpgogol/growth-adapter-matomo"
+  - "@warpgogol/ontology"
+  - "@warpgogol/share"
+  - "@warpgogol/site-kernel"
+  - "@warpgogol/site-kernel-checks"
+  - "@warpgogol/site-kernel-codegen"
+  - "@warpgogol/site-kernel-onboarding"
 successSignals:
   - "Every production thin site can send the same small Messkanon event vocabulary to Matomo without app-local analytics code."
   - "All browser requests for matomo.js and matomo.php use a first-party proxy endpoint owned by a backs/* worker, while the upstream Matomo Cloud host stays server-side configuration."
   - "The tracker is banner-free by design: cookies disabled, browser feature detection disabled, IP anonymization required at the Matomo instance, Do Not Track respected, and no heatmaps/session recording enabled."
-  - "Client Zero (webgogol-com) is provisioned by code, smoke-tested, visible in the fleet registry, covered by silence detection, and exportable through a tested Notausgang package."
+  - "Client Zero (warpgogol-com) is provisioned by code, smoke-tested, visible in the fleet registry, covered by silence detection, and exportable through a tested Notausgang package."
   - "Legacy generic growth-to-Matomo mapping is gone: no compatibility mode maps arbitrary closed growth events to trackEvent('growth', name, payloadJson)."
 nonGoals:
   - "Do not implement a cookie-based consent banner analytics mode."
@@ -124,7 +124,7 @@ acceptance:
 
 RFC-0027 introduced the vendor-agnostic growth layer. RFC-0170 added a first Matomo adapter and retired Plausible, but it deliberately kept the old closed growth-event catalog and mapped all non-pageview events to a generic Matomo event shape.
 
-That is no longer precise enough for the WGogol fleet.
+That is no longer precise enough for the Warpgogol fleet.
 
 The ecosystem now needs a durable analytics operating model for many thin sites:
 
@@ -155,7 +155,7 @@ Legal interpretation is not implemented by agents. The banner-free tracking post
 
 The current ecosystem has useful pieces, but they are not a production analytics system:
 
-- `@gogol/growth-adapter-matomo` loads `matomo.js` directly from a configured URL and sends `matomo.php` directly to that same origin.
+- `@warpgogol/growth-adapter-matomo` loads `matomo.js` directly from a configured URL and sends `matomo.php` directly to that same origin.
 - The adapter only disables cookies by default; it does not disable browser feature detection, enforce Do Not Track, require host gating, set dimensions, or route through a first-party proxy.
 - Non-pageview events are serialized into a generic `"growth"` category with a JSON payload. That makes Matomo dashboards and goals depend on opaque strings instead of a stable Messkanon vocabulary.
 - The closed growth event catalog contains donation/passport/general CTA events that are not the small outcome-measurement baseline for thin commercial sites.
@@ -173,7 +173,7 @@ Adopt a two-layer analytics architecture:
 Messkanon          = tool-independent measurement vocabulary and KPI definitions
 Matomo Binding     = replaceable mapping from Messkanon to Matomo sites/goals/dimensions/events
 backs/matomo-proxy = first-party browser traffic proxy to the Matomo instance
-@gogol/growth      = site runtime port and emit surface
+@warpgogol/growth      = site runtime port and emit surface
 thin apps          = content/config only; no vendor scripts or event logic
 ```
 
@@ -185,7 +185,7 @@ thin apps          = content/config only; no vendor scripts or event logic
 - All production browser requests for `matomo.js` and `matomo.php` go through a first-party endpoint served by `backs/matomo-proxy`.
 - The upstream Matomo Cloud hostname is never exposed as the site runtime source of truth. It is backend configuration.
 - No Matomo Tag Manager baseline. The code-owned package emits the small approved tracker and event vocabulary directly.
-- Client Zero is `webgogol-com`, provisioned through the same path as every later client.
+- Client Zero is `warpgogol-com`, provisioned through the same path as every later client.
 - Client access is report/export-first, not Matomo-login-first.
 - Provisioning, smoke tests, silence detection, export, and validations are required product surfaces, not operational afterthoughts.
 
@@ -327,8 +327,8 @@ Rules:
 - `adapter: null` is the default for local, CI, and preview unless a test explicitly injects synthetic proxy endpoints.
 - Production tracking is enabled only when `location.hostname === productionHost`.
 - Cloudflare Pages preview domains, localhost, and any non-production host send zero hits.
-- No route, section, component, or page block imports `@gogol/growth-adapter-matomo`.
-- Event producers call `emit()` or a typed analytics helper exported by `@gogol/growth`; they never call `_paq`.
+- No route, section, component, or page block imports `@warpgogol/growth-adapter-matomo`.
+- Event producers call `emit()` or a typed analytics helper exported by `@warpgogol/growth`; they never call `_paq`.
 
 #### Tracker Bootstrap
 
@@ -512,7 +512,7 @@ packages/.../matomo/
   export helpers
 ```
 
-The owning package may be `@gogol/site-kernel-checks`, a new focused package, or another package chosen during implementation. It must not live in `apps/*` or `backs/*`.
+The owning package may be `@warpgogol/site-kernel-checks`, a new focused package, or another package chosen during implementation. It must not live in `apps/*` or `backs/*`.
 
 #### Fleet Registry
 
@@ -762,8 +762,8 @@ Exit: browser requests can be routed first-party without exposing Matomo Cloud h
 
 ### Phase 2: Runtime Rewrite
 
-- Rewrite `@gogol/growth-adapter-matomo` for proxy, banner-free profile, dimensions, host gating, and Messkanon mapping.
-- Update `@gogol/growth` event types or add a typed analytics helper so production events are Messkanon events.
+- Rewrite `@warpgogol/growth-adapter-matomo` for proxy, banner-free profile, dimensions, host gating, and Messkanon mapping.
+- Update `@warpgogol/growth` event types or add a typed analytics helper so production events are Messkanon events.
 - Remove RFC-0170 compatibility options that no longer fit.
 - Update `analytics.config.validate`, `growth.adapter.contract`, and `growth.vendor.resolve`.
 - Ensure `null` still works for local/CI.
@@ -774,7 +774,7 @@ Exit: sites can build with the new config shape and send only approved events.
 
 - Create Matomo Cloud trial or production instance.
 - Configure instance privacy profile.
-- Provision `webgogol-com` by code.
+- Provision `warpgogol-com` by code.
 - Update legal/privacy content through the generated/legal content surface.
 - Deploy proxy and site.
 - Run smoke test.
@@ -825,7 +825,7 @@ Remove or rewrite:
 
 Keep:
 
-- `@gogol/growth` as the site-facing emit layer, including the built-in NullAdapter (inlined from the former `@gogol/growth-adapter-null` package) for local, CI, preview, and disabled analytics.
+- `@warpgogol/growth` as the site-facing emit layer, including the built-in NullAdapter (inlined from the former `@warpgogol/growth-adapter-null` package) for local, CI, preview, and disabled analytics.
 - the principle that apps never call vendor SDKs directly.
 
 Agents implementing this RFC may delete old code paths instead of preserving adapters, aliases, or fallback behavior.
@@ -839,7 +839,7 @@ Agents implementing this RFC may delete old code paths instead of preserving ada
 - **One Matomo siteId for the whole fleet.** Rejected. It destroys per-client export, access boundaries, reporting, and silence detection.
 - **One Matomo instance per client.** Rejected for v1. It maximizes legal/account isolation but makes onboarding, reporting, and cost control too heavy for thin sites.
 - **Give every client a Matomo login.** Rejected as the default. Standard Cloud user limits and the product's report-page model both point to report/export-first access.
-- **Track all current `@gogol/growth` events in Matomo.** Rejected. The thin-site baseline measures contact outcomes, not every growth/system event.
+- **Track all current `@warpgogol/growth` events in Matomo.** Rejected. The thin-site baseline measures contact outcomes, not every growth/system event.
 
 ## Risks
 

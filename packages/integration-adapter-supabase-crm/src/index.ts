@@ -1,8 +1,8 @@
 /*
 <MODULE_CONTRACT>
-<purpose>@gogol/integration-adapter-supabase-crm public entry point. Exports the DestinationAdapter
+<purpose>@warpgogol/integration-adapter-supabase-crm public entry point. Exports the DestinationAdapter
 (supabaseBufferDestinationAdapter), the required secret names, and the Supabase client factory.
-Re-exports CrmBuffer types from @gogol/integration/crm-buffer for convenience.</purpose>
+Re-exports CrmBuffer types from @warpgogol/integration/crm-buffer for convenience.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>

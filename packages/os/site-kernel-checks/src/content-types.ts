@@ -24,7 +24,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { resultFromViolations } from "./result-helpers.ts";
 import { fileExists } from "./lib/file-exists.ts";
 

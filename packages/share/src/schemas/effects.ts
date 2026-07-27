@@ -6,7 +6,7 @@ Owns effect targets, discriminated effect kinds, assignment arrays, and
 schema validation for the RFC-0134 glass-first effects model.
 </purpose>
 <non-goals>
-  <item>Do not render effects — rendering belongs to @gogol/ui.</item>
+  <item>Do not render effects — rendering belongs to @warpgogol/ui.</item>
   <item>Do not implement future effect kinds beyond glass in the initial wave.</item>
 </non-goals>
 </MODULE_CONTRACT>
@@ -120,7 +120,7 @@ export type EffectRenderStrategy = "surface" | "text";
 
 /**
  * RFC-0151 — per-kind metadata. Single source of truth shared by the stack
- * validator (maxPerStack) and the @gogol/ui renderer (strategy).
+ * validator (maxPerStack) and the @warpgogol/ui renderer (strategy).
  */
 export const EFFECT_KIND_META = {
   glass: { strategy: "surface", maxPerStack: 1 },

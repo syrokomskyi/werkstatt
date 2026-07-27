@@ -1,12 +1,12 @@
-# @gogol/ui Agent Guide
+# @warpgogol/ui Agent Guide
 
 Apply this guide when working in `packages/ui/**`.
 
 ## Purpose
 
-- `@gogol/ui` owns shared UI primitives used across WGogol apps.
+- `@warpgogol/ui` owns shared UI primitives used across Warpgogol apps.
 - LordIcon JSON sources and generated Astro icon components live here.
-- Apps consume this package through `@gogol/ui` imports instead of app-local icon folders.
+- Apps consume this package through `@warpgogol/ui` imports instead of app-local icon folders.
 
 ## Component contract
 
@@ -15,7 +15,7 @@ Apply this guide when working in `packages/ui/**`.
 - The folder is incomplete until it contains, at minimum, the authored `.astro` file and its `.manifest.yaml`.
 - The manifest MUST declare a valid component-layer contract: `id`, `uniName`, `layer: component`, `semanticId`, `archetype`, `cosmicName`, `role`, `version`, `intent`, `industryFit`, and `contentSchemaKey` when applicable.
 - `cosmicName` MUST be a unique `MoonCatalog` value and MUST NOT reuse the five passport-reserved names.
-- `role` MUST be one of the closed `ComponentRoleValues` from `@gogol/ontology`; do not invent ad-hoc roles in component manifests.
+- `role` MUST be one of the closed `ComponentRoleValues` from `@warpgogol/ontology`; do not invent ad-hoc roles in component manifests.
 - If the component is shell-invoked via `system.md pages[].shell.*`, register its `cosmicName` in `MOON_IMPORT_PATHS` in `packages/share/src/page.ts` in the same change.
 - AI agents MUST treat a new component without its manifest as an incomplete change and add the manifest before considering the task done.
 - Header desktop navigation must preserve readable full labels. When labels do not fit, keep the adaptive overflow disclosure in the shared header component rather than truncating every label or adding app-local header overrides.
@@ -32,7 +32,7 @@ Every section under `packages/ui/src/sections/<slug>/` MUST:
 
 `section.contract.validate` enforces these in `PACKAGES_CHECK_PIPELINE`. Detect near-duplicates with `section.similarity.report`.
 
-**New sections are materialized only by `section.scaffold`.** Never copy a sibling section folder; the scaffold command guarantees the file set, the manifest fields, the `propsSchemaCompose` wiring, and the import-paths registration in `@gogol/share/src/page.ts` `PLANET_IMPORT_PATHS`.
+**New sections are materialized only by `section.scaffold`.** Never copy a sibling section folder; the scaffold command guarantees the file set, the manifest fields, the `propsSchemaCompose` wiring, and the import-paths registration in `@warpgogol/share/src/page.ts` `PLANET_IMPORT_PATHS`.
 
 ## Canonical structure
 
@@ -56,7 +56,7 @@ packages/ui/
 
 ```astro
 ---
-import { ArrowUpIcon, UserProfileIcon } from "@gogol/ui/icons";
+import { ArrowUpIcon, UserProfileIcon } from "@warpgogol/ui/icons";
 ---
 <ArrowUpIcon size={24} color="primary" trigger="hover" />
 ```
@@ -82,7 +82,7 @@ The command is registered at the workspace level in the repository root `tools/k
 
 RFC-0100 standardizes authored list-item shapes across all shared list-based sections.
 
-### Canonical types (from `@gogol/ui`)
+### Canonical types (from `@warpgogol/ui`)
 
 ```ts
 interface VendorIconConfig {
@@ -196,12 +196,12 @@ Passthrough-only schemas are prohibited for sections with owned authored surface
 
 ## Image rendering — Image Provider Port (RFC-0152)
 
-`<ResponsiveImage>` (`src/components/responsive-image/responsive-image.astro`) is the **canonical primitive for every authored image**. It takes a resolved descriptor (Astro `ImageMetadata` is assignable — i.e. the output of `resolveImage`) plus presentation props, and asks the active **Image Provider** (`@gogol/share`) to build `src` + `srcset`. It owns no optimization logic, so the backend swaps by provider/config without touching any component — which is what makes the same primitive serve in-repo assets today and headless-CMS/DAM URLs later.
+`<ResponsiveImage>` (`src/components/responsive-image/responsive-image.astro`) is the **canonical primitive for every authored image**. It takes a resolved descriptor (Astro `ImageMetadata` is assignable — i.e. the output of `resolveImage`) plus presentation props, and asks the active **Image Provider** (`@warpgogol/share`) to build `src` + `srcset`. It owns no optimization logic, so the backend swaps by provider/config without touching any component — which is what makes the same primitive serve in-repo assets today and headless-CMS/DAM URLs later.
 
 ```astro
 ---
-import ResponsiveImage from "@gogol/ui/components/responsive-image.astro";
-import { resolveImage } from "@gogol/share";
+import ResponsiveImage from "@warpgogol/ui/components/responsive-image.astro";
+import { resolveImage } from "@warpgogol/share";
 const image = resolveImage(images, imageName, { lang });
 ---
 {image && (
@@ -217,7 +217,7 @@ const image = resolveImage(images, imageName, { lang });
 **Agent rules:**
 
 - Render authored images **only** through `<ResponsiveImage>`. Do not introduce raw `<img>` (except genuinely non-resizable sources — SVG logos, `data:` URLs like the donation QR) or Astro `<Image>`/`astro:assets`.
-- Do not hand-write `srcset` or `/cdn-cgi/image` URLs, and do not build a custom resizer. Add/replace an `ImageProvider` in `@gogol/share` and select it via `setDefaultImageProvider` instead (RFC-0152).
+- Do not hand-write `srcset` or `/cdn-cgi/image` URLs, and do not build a custom resizer. Add/replace an `ImageProvider` in `@warpgogol/share` and select it via `setDefaultImageProvider` instead (RFC-0152).
 - Do NOT initialize the build-portable provider manually in app code — `packages/ui/src/image-provider-init.ts` handles it as a side effect of `content-assets.ts`. Do NOT run `sharp` outside `image.variants.generate`.
 - Pass `quality` as a preset (`low|mid|high|max`) or a number; the provider resolves it (Cloudflare requires a numeric value).
 - Deployment / "why are images 404 / how to enable resize" lives in `docs/engineering/image-optimization-and-cloudflare-transformations.md`.
@@ -233,14 +233,14 @@ The page's **single lead/content illustration** must be marked so the post-build
 
 ## Public import contract
 
-- `@gogol/ui` — Package entrypoint (re-exports `VendorIconConfig`, `StandardListItem`)
-- `@gogol/ui/icons` — **Barrel export of all icons (RFC-0016, recommended)**
-- `@gogol/ui/icons/lordicon/doodle-outline` — Per-set exports (legacy)
-- `@gogol/ui/icons/lordicon/doodle-color` — Per-set exports (legacy)
-- `@gogol/ui/icons/lordicon/doodle-black` — Per-set exports (legacy)
-- `@gogol/ui/icons/lordicon/system-regular` — Per-set exports (legacy)
-- `@gogol/ui/icons/lord-icon-base` — Base component
-- `@gogol/ui/icons/lord-icon-types` — Type definitions
+- `@warpgogol/ui` — Package entrypoint (re-exports `VendorIconConfig`, `StandardListItem`)
+- `@warpgogol/ui/icons` — **Barrel export of all icons (RFC-0016, recommended)**
+- `@warpgogol/ui/icons/lordicon/doodle-outline` — Per-set exports (legacy)
+- `@warpgogol/ui/icons/lordicon/doodle-color` — Per-set exports (legacy)
+- `@warpgogol/ui/icons/lordicon/doodle-black` — Per-set exports (legacy)
+- `@warpgogol/ui/icons/lordicon/system-regular` — Per-set exports (legacy)
+- `@warpgogol/ui/icons/lord-icon-base` — Base component
+- `@warpgogol/ui/icons/lord-icon-types` — Type definitions
 
 ## Agent rules
 
@@ -260,12 +260,12 @@ The page's **single lead/content illustration** must be marked so the post-build
 
 **REQUIRED for event emission:**
 
-- All user interaction events must use `emit()` from `@gogol/growth/emit`.
+- All user interaction events must use `emit()` from `@warpgogol/growth/emit`.
 - Emit only event names from the closed `EventName` catalog (`packages/ontology/growth/events/`).
 - Never include `locale` in the payload — it is injected automatically by `emit()`.
 
 ```typescript
-import { emit } from "@gogol/growth/emit";
+import { emit } from "@warpgogol/growth/emit";
 emit("cta-click", { label: "hero-donate", href: "/de/spenden-kontakt" });
 ```
 
@@ -315,8 +315,8 @@ The five PASSPORT-RESERVED moons are implemented here as Mirror Quintet componen
 
 **Agent rules for passport moons:**
 
-- All five moons read `cosmic-passport.json` at SSG build time via `@gogol/passport/data`. Do not duplicate passport loading logic — always use `loadPassportData()`.
-- `PassportHeader` (Methone) emits `passport-view`; `PassportStarMap` (Adrastea) emits `star-map-navigate`. Growth events are fired via `window.__webgogol_emit__` in inline `<script>` blocks — not via direct `import { emit }` (the emit module is not available in inline client scripts).
+- All five moons read `cosmic-passport.json` at SSG build time via `@warpgogol/passport/data`. Do not duplicate passport loading logic — always use `loadPassportData()`.
+- `PassportHeader` (Methone) emits `passport-view`; `PassportStarMap` (Adrastea) emits `star-map-navigate`. Growth events are fired via `window.__warpgogol_emit__` in inline `<script>` blocks — not via direct `import { emit }` (the emit module is not available in inline client scripts).
 - Never write a `<style>` block inside passport `.astro` files — all styles belong in the colocated `.css` file.
 - Never inject `Date.now()` or random values into any path that feeds the `cosmic-star-map.svg` generation — the SVG must remain byte-stable.
 - The `showVC` prop on Bianca is `false` by default; enable only for internal/dev builds.
@@ -328,11 +328,11 @@ The five PASSPORT-RESERVED moons are implemented here as Mirror Quintet componen
 
 ## Chat widget + inbound route (RFC-0175 / RFC-0176)
 
-- `sections/chat-widget/` renders a **first-party** launcher only. The vendor (UChat) script is NEVER in server output — it is injected at runtime by `@gogol/chat/client` (`bindChatLauncher`) ONLY on the visitor's click (click-to-load). The section reads its binding from `system.md integrations.chat` via `getCollection("system")` and injects a PUBLIC `ChatWidgetConfig` blob; it carries the RFC-0177 legal notice + Privacy Policy link. Do not add a vendor `<script>`/iframe to the `.astro` and do not weaken `consent.activation.validate`.
+- `sections/chat-widget/` renders a **first-party** launcher only. The vendor (UChat) script is NEVER in server output — it is injected at runtime by `@warpgogol/chat/client` (`bindChatLauncher`) ONLY on the visitor's click (click-to-load). The section reads its binding from `system.md integrations.chat` via `getCollection("system")` and injects a PUBLIC `ChatWidgetConfig` blob; it carries the RFC-0177 legal notice + Privacy Policy link. Do not add a vendor `<script>`/iframe to the `.astro` and do not weaken `consent.activation.validate`.
 - The integration surface is built from **section-owned** API routes, each declared in its section manifest's `api[]` block (so `api.routes.generate` emits the route + projects its secrets into the env schema):
   - `chat-widget/chat-widget-section.api.ts` → `/api/integration-inbound` (RFC-0176): authenticates (`INTEGRATION_INBOUND_SECRET`), validates the `IntegrationEvent`, and **publishes it to QStash** (`buildQstashPublish`, RFC-0181) for EU-resident delivery.
   - `chat-widget/chat-widget-section.delivery.api.ts` → `/api/integration-route` (RFC-0181): the QStash callback — verify signature (`@upstash/qstash` `Receiver`) · Redis dedup (`restRedisLedger`) · `deliverEvent()` · email via the Cloudflare Email Routing `send_email` binding.
-  - `chat-widget/chat-widget-section.stripe-webhook.api.ts` → `/api/stripe-webhook` (RFC-0191): verify Stripe signature + map to an `IntegrationEvent` via `@gogol/integration-adapter-stripe`.
+  - `chat-widget/chat-widget-section.stripe-webhook.api.ts` → `/api/stripe-webhook` (RFC-0191): verify Stripe signature + map to an `IntegrationEvent` via `@warpgogol/integration-adapter-stripe`.
   - `send-message/send-message-section.api.ts` → `/api/send-message` (the in-process form source; also declares `/api/integration-route` so a form-only site still gets the callback).
 - These are on-demand routes (`prerender = false`). `Astro.locals.runtime.env` throws in Astro v6 — read the `send_email` binding via `import { env } from "cloudflare:workers"`; all string secrets come from `astro:env/server`. **Do not** add Cloudflare Queue/KV bindings — `cloudflare.residency.validate` forbids them (delivery is Upstash, EU). Full reference: `docs/engineering/integration-hub-and-chat-widget.md` + `docs/specs/integration-delivery.md`.
 
@@ -357,4 +357,4 @@ Section numbering is controlled by the `numbered` field in each section's manife
 
 ## Consumer guidance
 
-- App `tsconfig.json` files should map `@gogol/ui` to `../../packages/ui/src/index.ts` and `@gogol/ui/*` to `../../packages/ui/src/*`.
+- App `tsconfig.json` files should map `@warpgogol/ui` to `../../packages/ui/src/index.ts` and `@warpgogol/ui/*` to `../../packages/ui/src/*`.

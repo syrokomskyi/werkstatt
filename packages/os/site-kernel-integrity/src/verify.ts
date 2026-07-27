@@ -8,7 +8,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Migrated sha256FileHex from deleted ./hash.ts to byteHashFile from @gogol/fingerprint directly.</item>
+  <item>Migrated sha256FileHex from deleted ./hash.ts to byteHashFile from @warpgogol/fingerprint directly.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -18,7 +18,7 @@
  */
 
 import path from "node:path";
-import { byteHashFile } from "@gogol/fingerprint";
+import { byteHashFile } from "@warpgogol/fingerprint";
 import { discoverManagedDirectories, discoverManagedFiles } from "./discover.ts";
 import { pathExists } from "./fs.ts";
 import { getManifestFileName, loadDirectoryManifest } from "./manifests.ts";

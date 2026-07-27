@@ -1,9 +1,9 @@
 {
-  "name": "@gogol/share",
+  "name": "@warpgogol/share",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "App-agnostic shared utilities for all WGogol apps: entity-ID normalization, i18n helpers, base Zod schemas",
+  "description": "App-agnostic shared utilities for all Warpgogol apps: entity-ID normalization, i18n helpers, base Zod schemas",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
@@ -272,8 +272,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/content-source": "workspace:*",
-    "@gogol/ontology": "workspace:*",
+    "@warpgogol/content-source": "workspace:*",
+    "@warpgogol/ontology": "workspace:*",
     "@lordicon/element": "^2.3.1",
     "ajv": "^8.20.0",
     "astro": "^7.1.3",

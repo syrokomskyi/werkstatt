@@ -8,7 +8,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0040: Created as shared GSAP counter initialization module in @gogol/share/scripts.</item>
+  <item>RFC-0040: Created as shared GSAP counter initialization module in @warpgogol/share/scripts.</item>
   <item>Extended selector to support .hero__stat in addition to .impact-section__stat.</item>
 </CHANGE_SUMMARY>
 */

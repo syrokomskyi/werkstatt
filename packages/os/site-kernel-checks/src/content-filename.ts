@@ -18,10 +18,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
+} from "@warpgogol/site-kernel";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import { passResult, failResult } from "./result-helpers.ts";
 
 interface ContentFilenameViolation {

@@ -21,7 +21,7 @@
 | Prose content entries | `src/content/prose/{lang}/**/*.md` | **Core** | Long-form prose with language fallback must remain. |
 | Site shell labels | `src/content/site/{lang}/labels.md` | **Core** | Header/footer nav IDs and brand copy live in content. |
 | Navigation labels and targets | `src/content/navigation/{lang}/navigation.md` | **Core** | Navigation owns labels, order, groups, and semantic targets. |
-| Business data | `src/content/business/{lang}/**/*.md` | **Core** | Business data consumed by `@gogol/business`. |
+| Business data | `src/content/business/{lang}/**/*.md` | **Core** | Business data consumed by `@warpgogol/business`. |
 | Route registry | `src/content/system.md` (`pages[].pageId` + `pages[].routes`) | **Core** | Single canonical manifest for routes, planets, and i18n. |
 
 ---

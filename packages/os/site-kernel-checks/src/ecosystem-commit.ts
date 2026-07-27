@@ -23,13 +23,13 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   resolvePlatformSemanticHash,
   parseSemver,
   isPlatformScope,
   extractTrailer,
-} from "@gogol/site-kernel-handoff";
+} from "@warpgogol/site-kernel-handoff";
 
 const execFileAsync = promisify(execFile);
 

@@ -29,7 +29,7 @@ The implementation is structurally sound and all mechanical checks pass, but has
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @wgogol/forge build:check`, `pnpm --filter @gogol/site-kernel-handoff build:check`, `pnpm --filter @gogol/site-kernel-checks build:check`, `rfc.validate`, `platform.consistency.validate --check` all exit 0.
+Pass — `pnpm --filter @warpgogol/forge build:check`, `pnpm --filter @warpgogol/site-kernel-handoff build:check`, `pnpm --filter @warpgogol/site-kernel-checks build:check`, `rfc.validate`, `platform.consistency.validate --check` all exit 0.
 
 ### Axis A — Structural correctness
 
@@ -40,7 +40,7 @@ Pass — `pnpm --filter @wgogol/forge build:check`, `pnpm --filter @gogol/site-k
 ### Axis B — DNA alignment
 
 - **DNA-42 (Compass markup)** — `platform-consistency.ts` and `platform-module.ts` both carry `MODULE_CONTRACT` and `CHANGE_SUMMARY`. Pass.
-- **DNA-53 (fingerprint)** — Uses `resolvePlatformSemanticHash` from `bundle-io.ts` which delegates to `@gogol/fingerprint`. Pass.
+- **DNA-53 (fingerprint)** — Uses `resolvePlatformSemanticHash` from `bundle-io.ts` which delegates to `@warpgogol/fingerprint`. Pass.
 
 ### Axis C — Ecosystem fit
 

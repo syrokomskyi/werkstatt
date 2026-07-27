@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-Barrel export for the @gogol/ontology/cosmic sub-path.
+Barrel export for the @warpgogol/ontology/cosmic sub-path.
 Re-exports all three closed catalogs, their union types, and Zod schemas
 so consumers can import from a single entry point (DNA-23, RFC-0025).
 </purpose>

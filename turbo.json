@@ -21,7 +21,7 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".astro/**"]
     },
-    "webgogol-com#build": {
+    "warpgogol-com#build": {
       "dependsOn": ["^build", "//#registry:build"],
       "cache": false,
       "outputs": ["dist/**", ".astro/**"]
@@ -31,7 +31,7 @@
       "cache": false,
       "outputs": ["dist/**", ".astro/**"]
     },
-    "check-webgogol-com#build": {
+    "check-warpgogol-com#build": {
       "dependsOn": ["^build", "//#registry:build"],
       "cache": false,
       "outputs": ["dist/**", ".astro/**"]
@@ -40,7 +40,7 @@
       "dependsOn": ["^build:check"],
       "outputs": []
     },
-    "webgogol-com#build:check": {
+    "warpgogol-com#build:check": {
       "dependsOn": ["^build:check", "//#registry:build"],
       "cache": false,
       "outputs": []
@@ -50,7 +50,7 @@
       "cache": false,
       "outputs": []
     },
-    "check-webgogol-com#build:check": {
+    "check-warpgogol-com#build:check": {
       "dependsOn": ["^build:check", "//#registry:build"],
       "cache": false,
       "outputs": []

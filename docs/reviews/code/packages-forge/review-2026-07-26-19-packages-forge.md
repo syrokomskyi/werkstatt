@@ -27,7 +27,7 @@ Clean implementation that follows existing forge command patterns. The `forgeRoo
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @wgogol/forge run build:check` exits 0. `pnpm --filter @wgogol/forge run test` — 239 tests pass (25 files).
+Pass — `pnpm --filter @warpgogol/forge run build:check` exits 0. `pnpm --filter @warpgogol/forge run test` — 239 tests pass (25 files).
 
 ### Axis A — Structural correctness
 
@@ -49,7 +49,7 @@ No issues.
 
 - **Package boundaries**: All imports in `create.ts` are within `packages/forge/src/` — no cross-package or kernel imports ✓
 - **Command lifecycle**: `forge.create` registered in `forgeCoreModule`, AGENTS.md command list updated, shipped profiles list updated ✓
-- **Import rules**: `src/` has no `@gogol/*` imports ✓
+- **Import rules**: `src/` has no `@warpgogol/*` imports ✓
 
 ### Axis D — Forward-only compliance
 

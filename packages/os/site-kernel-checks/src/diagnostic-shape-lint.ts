@@ -37,8 +37,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { GENERATED_MARKER } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { isRegisteredRuleId } from "./diagnostics/rules.ts";

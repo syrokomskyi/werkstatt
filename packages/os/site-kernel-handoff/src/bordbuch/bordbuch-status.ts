@@ -15,8 +15,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { BordbuchEntry } from "@gogol/ontology/operations";
+} from "@warpgogol/site-kernel";
+import type { BordbuchEntry } from "@warpgogol/ontology/operations";
 import { readBordbuch } from "./bordbuch-io.ts";
 
 export interface BordbuchStatusData {

@@ -1,6 +1,6 @@
 ---
 id: ADR-0001
-title: "Self-host Playfair Display and DM Mono for apps/webgogol-com"
+title: "Self-host Playfair Display and DM Mono for apps/warpgogol-com"
 status: superseded
 scope: workspace
 decider: architecture
@@ -19,23 +19,23 @@ reviewers:
   - human:andrii-syrokomskyi
 ---
 
-# ADR-0001: Self-host Playfair Display and DM Mono for apps/webgogol-com
+# ADR-0001: Self-host Playfair Display and DM Mono for apps/warpgogol-com
 
 ## Context
 
-`apps/webgogol-com` currently relies on the `handwerk-material-warm` biome, whose typography tokens resolve to:
+`apps/warpgogol-com` currently relies on the `handwerk-material-warm` biome, whose typography tokens resolve to:
 
 - `--ds-font-heading`: "Inter Display", system-ui, sans-serif
 - `--ds-font-body`: "Inter", system-ui, sans-serif
 - `--ds-font-mono`: "JetBrains Mono", ui-monospace, monospace
 
-The self-hosted `@font-face` registry in `packages/os/site-kernel-checks/src/fonts.ts` only covers `Inter` (400/500/600) and `Lora` (400/500/600/700). `Lora` is not referenced by the webgogol-com biome; it is used by `packages/ontology/biomes/nonprofit-trust.yaml` for `apps/nicaragua-projekt`.
+The self-hosted `@font-face` registry in `packages/os/site-kernel-checks/src/fonts.ts` only covers `Inter` (400/500/600) and `Lora` (400/500/600/700). `Lora` is not referenced by the warpgogol-com biome; it is used by `packages/ontology/biomes/nonprofit-trust.yaml` for `apps/nicaragua-projekt`.
 
-German privacy regulation makes direct Google Fonts CDN usage risky. The repository already self-hosts open-source fonts via `@fontsource` (RFC-0164), so the mechanism exists. The design goal for webgogol-com is a DACH/SMB engineering studio identity: expressive serif accents for headings, a neutral sans-serif for body copy, and a technical mono face for labels, code, and metadata.
+German privacy regulation makes direct Google Fonts CDN usage risky. The repository already self-hosts open-source fonts via `@fontsource` (RFC-0164), so the mechanism exists. The design goal for warpgogol-com is a DACH/SMB engineering studio identity: expressive serif accents for headings, a neutral sans-serif for body copy, and a technical mono face for labels, code, and metadata.
 
 ## Decision
 
-Adopt self-hosted `Playfair Display` and `DM Mono` for `apps/webgogol-com` through the existing `@fontsource` / `fonts.generate` pipeline, and keep `Inter` as the body font.
+Adopt self-hosted `Playfair Display` and `DM Mono` for `apps/warpgogol-com` through the existing `@fontsource` / `fonts.generate` pipeline, and keep `Inter` as the body font.
 
 | Family           | Weights       | Styles                    | Biome token         |
 | ---------------- | ------------- | ------------------------- | ------------------- |
@@ -48,7 +48,7 @@ Adopt self-hosted `Playfair Display` and `DM Mono` for `apps/webgogol-com` throu
 - `handwerk-material-warm` biome body family remains `"Inter", system-ui, sans-serif`.
 - `packages/os/site-kernel-checks/src/fonts.ts` gains the new families and italic-face support. The `SelfHostedFont` contract accepts an optional `styles` array so a single weight can emit both `normal` and `italic` `@font-face` rules.
 - `Lora` remains in the self-hosted registry because `packages/ontology/biomes/nonprofit-trust.yaml` still uses it for `apps/nicaragua-projekt`.
-- `apps/webgogol-com/src/styles/fonts.generated.css` and `apps/webgogol-com/src/styles/biome.generated.css` are regenerated through `site-kernel` build prepare commands.
+- `apps/warpgogol-com/src/styles/fonts.generated.css` and `apps/warpgogol-com/src/styles/biome.generated.css` are regenerated through `site-kernel` build prepare commands.
 - No Google Fonts CDN `<link>` or CSS `@import` is introduced.
 
 ## Justification
@@ -67,9 +67,9 @@ Adopt self-hosted `Playfair Display` and `DM Mono` for `apps/webgogol-com` throu
 
 ## Consequences
 
-- **Positive**: webgogol-com gains a distinctive, GDPR-safe typographic palette; the shared font generator becomes capable of italic faces, which benefits future biomes; the design aligns with the Handwerk/SMB positioning.
-- **Negative / trade-off**: `public/fonts` for webgogol-com will grow by several woff2 files; Playfair Display is a display face, so it must be limited to headings and accents or it will impair readability.
-- **Cross-app impact**: `fonts.ts` is shared. Adding Playfair Display and DM Mono means every app will receive these files during `build.prepare`, even if only webgogol-com consumes them. This is acceptable until font discovery becomes biome-driven.
+- **Positive**: warpgogol-com gains a distinctive, GDPR-safe typographic palette; the shared font generator becomes capable of italic faces, which benefits future biomes; the design aligns with the Handwerk/SMB positioning.
+- **Negative / trade-off**: `public/fonts` for warpgogol-com will grow by several woff2 files; Playfair Display is a display face, so it must be limited to headings and accents or it will impair readability.
+- **Cross-app impact**: `fonts.ts` is shared. Adding Playfair Display and DM Mono means every app will receive these files during `build.prepare`, even if only warpgogol-com consumes them. This is acceptable until font discovery becomes biome-driven.
 - **Technical debt**: the `SELF_HOSTED_FONTS` array remains a hand-maintained union of all fonts used by any biome. A future improvement is to derive the required font set from the active biome's typography tokens instead of keeping a global list.
 
 ## Evolution

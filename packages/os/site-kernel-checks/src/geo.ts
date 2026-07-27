@@ -14,8 +14,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { createGeoService, citySlug } from "@gogol/geo";
+} from "@warpgogol/site-kernel";
+import { createGeoService, citySlug } from "@warpgogol/geo";
 import { passResult, failResult } from "./result-helpers.ts";
 
 /** Validate that the geo catalog loads and every entry has required fields. */

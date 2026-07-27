@@ -16,7 +16,7 @@ filesReviewed:
   - AGENTS.md
 ---
 
-# Code Review: cc56f5343~1..cc56f5343 — @gogol/content-source dead code removal
+# Code Review: cc56f5343~1..cc56f5343 — @warpgogol/content-source dead code removal
 
 ### Verdict: Approved
 
@@ -24,11 +24,11 @@ The diff removes three dead exports (`fsContentProvider`, `createAstroLoaders`, 
 
 ### Mechanical floor
 
-Pass — `tsc --noEmit` exits 0 for `@gogol/content-source`, `@gogol/share`, and `@gogol/business`.
+Pass — `tsc --noEmit` exits 0 for `@warpgogol/content-source`, `@warpgogol/share`, and `@warpgogol/business`.
 
 ### Axis A — Structural correctness
 
-No issues. The removed code was dead — `fsContentProvider` had zero importers, `createAstroLoaders` was re-exported through `@gogol/share/astro/loaders` but never called, and `AstroLoaderFactory` was used only by the dead `createAstroLoaders`. The remaining exports in `index.ts` are all consumed. The `asAstroContentEntry` helper in `astro.ts` was correctly removed alongside `fsContentProvider` (it had no other caller).
+No issues. The removed code was dead — `fsContentProvider` had zero importers, `createAstroLoaders` was re-exported through `@warpgogol/share/astro/loaders` but never called, and `AstroLoaderFactory` was used only by the dead `createAstroLoaders`. The remaining exports in `index.ts` are all consumed. The `asAstroContentEntry` helper in `astro.ts` was correctly removed alongside `fsContentProvider` (it had no other caller).
 
 ### Axis B — DNA alignment
 
@@ -36,7 +36,7 @@ No issues. The diff does not touch any DNA invariant. Package boundaries (DNA-1)
 
 ### Axis C — Ecosystem fit
 
-No issues. The `@gogol/share/astro/loaders` re-export of `markdownCollectionLoader` (aliased from `fsMarkdownCollectionLoader`) is preserved — generated `content.config.ts` files are unaffected. The root `AGENTS.md` "Content Source Provider seam" section is updated to remove the `createAstroLoaders` reference. The package-level `AGENTS.md` and `README.md` tables are updated.
+No issues. The `@warpgogol/share/astro/loaders` re-export of `markdownCollectionLoader` (aliased from `fsMarkdownCollectionLoader`) is preserved — generated `content.config.ts` files are unaffected. The root `AGENTS.md` "Content Source Provider seam" section is updated to remove the `createAstroLoaders` reference. The package-level `AGENTS.md` and `README.md` tables are updated.
 
 ### Axis D — Forward-only compliance
 
@@ -50,7 +50,7 @@ No issues. The removal is direct — no compatibility shim, no deprecation flag,
 
 ### Axis F — Pragmatism
 
-No issues. The diff is minimal — only the dead code and its documentation references are removed. No scope creep. The `ContentSourceProvider` interface in `types.ts` is correctly retained: it is used by `createNodeFsContentProvider` in `@gogol/site-kernel-content` (RFC-0146), which is the live node-side provider.
+No issues. The diff is minimal — only the dead code and its documentation references are removed. No scope creep. The `ContentSourceProvider` interface in `types.ts` is correctly retained: it is used by `createNodeFsContentProvider` in `@warpgogol/site-kernel-content` (RFC-0146), which is the live node-side provider.
 
 ### Axis G — Blind spots
 

@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact } from "@warpgogol/surface";
 import { failResult, passResult } from "../result-helpers.ts";
 import { ARTIFACT_FILE } from "./shared.ts";
 

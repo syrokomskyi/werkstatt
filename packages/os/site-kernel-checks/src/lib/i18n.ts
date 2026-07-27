@@ -17,7 +17,7 @@
 
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
-import { parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
+import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 
 export async function readDefaultLanguageCode(contentRoot: string): Promise<string> {
   const systemPath = join(contentRoot, "system.md");

@@ -12,7 +12,7 @@
 */
 
 /**
- * @gogol/passport — Build-time data helper for passport moons
+ * @warpgogol/passport — Build-time data helper for passport moons
  *
  * DNA-31 / RFC-0028
  *
@@ -26,7 +26,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { emitPipelineLogEvent } from "@gogol/site-kernel-content";
+import { emitPipelineLogEvent } from "@warpgogol/site-kernel-content";
 import { PassportSchema } from "./schema.ts";
 import type { PassportJson } from "./schema.ts";
 
@@ -48,7 +48,7 @@ export async function loadPassportData(distDirectory?: string): Promise<Passport
     emitPipelineLogEvent({
       severity: "notice",
       kind: "expected-fallback",
-      packageName: "@gogol/passport",
+      packageName: "@warpgogol/passport",
       module: "data",
       message: `passport prebuild artifact lookup miss: ${passportPath}`,
       dedupeKey: `passport-prebuild-miss:${passportPath}`,
@@ -62,7 +62,7 @@ export async function loadPassportData(distDirectory?: string): Promise<Passport
     emitPipelineLogEvent({
       severity: "warning",
       kind: "diagnostic",
-      packageName: "@gogol/passport",
+      packageName: "@warpgogol/passport",
       module: "data",
       ruleId: "PASSPORT-SCHEMA",
       message: "cosmic-passport.json failed schema validation",

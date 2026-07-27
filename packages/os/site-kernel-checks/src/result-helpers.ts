@@ -16,7 +16,7 @@ ruleId = command; diagnosticsResult takes rich Diagnostic[] with registered ids.
 </CHANGE_SUMMARY>
 */
 
-import type { CheckResult, Diagnostic, KernelCommandResult } from "@gogol/site-kernel";
+import type { CheckResult, Diagnostic, KernelCommandResult } from "@warpgogol/site-kernel";
 
 /**
  * RFC-0203: canonical result builder. Migrated checks emit `Diagnostic[]` with

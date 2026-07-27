@@ -13,7 +13,7 @@ this is the mechanism RFC-0177's consent.activation.validate guards.</purpose>
 <CHANGE_SUMMARY>
   <item>RFC-0175: initial implementation.</item>
   <item>RFC-0175 fix: invert the adapter dependency — the host injects the loader map so
-        @gogol/chat does not depend on the adapter packages (removes the build:check cycle).</item>
+        @warpgogol/chat does not depend on the adapter packages (removes the build:check cycle).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,15 +22,15 @@ import type { ChatWidgetConfig } from "./port.ts";
 import type { ChatWidgetAdapter, ChatAdapterId, ChatWidgetLoadResult } from "./port.ts";
 
 /** The global window key where the active adapter is cached after first load. */
-const CHAT_ADAPTER_KEY = "__webgogol_chat_adapter__";
+const CHAT_ADAPTER_KEY = "__warpgogol_chat_adapter__";
 
 /**
  * Host-supplied adapter loader map: adapter id → a thunk that dynamically imports
  * the adapter package and returns its default export. The HOST (e.g. the chat-widget
- * section client in @gogol/ui) owns this map with STATIC `import()` specifiers so the
+ * section client in @warpgogol/ui) owns this map with STATIC `import()` specifiers so the
  * bundler code-splits each adapter into a resolvable async chunk. Keeping it here (in
- * the host, not the port) avoids @gogol/chat depending on the adapter packages — which
- * would form a workspace cycle (adapters already depend on @gogol/chat).
+ * the host, not the port) avoids @warpgogol/chat depending on the adapter packages — which
+ * would form a workspace cycle (adapters already depend on @warpgogol/chat).
  */
 export type ChatAdapterLoaders = Record<
   ChatAdapterId,

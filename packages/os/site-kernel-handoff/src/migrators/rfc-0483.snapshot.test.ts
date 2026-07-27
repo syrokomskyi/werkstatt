@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0483: snapshot test for the rfc-0483 content migrator — runs on
-real webgogol-com content data and verifies all 60 reference patterns are
+real warpgogol-com content data and verifies all 60 reference patterns are
 correctly migrated, de/ PBP entities are created, presentation fields are
 populated, and the legacy business/ directory is deleted.</purpose>
 <keywords>RFC-0483, migrator, snapshot, test</keywords>
@@ -19,7 +19,7 @@ import { rfc0483Migrator } from "./rfc-0483.ts";
 import type { SternsystemData, MigrationContext } from "./types.ts";
 
 const ctx: MigrationContext = {
-  systemId: "webgogol-com",
+  systemId: "warpgogol-com",
   missionId: "test-mission",
   logger: { info: () => {} },
 };
@@ -80,11 +80,11 @@ async function createSnapshotWorkpiece(dir: string): Promise<void> {
 
   await fs.writeFile(
     path.join(srcDir, "content.config.ts"),
-    `// GENERATED. Do not change this line unless the file contains project specific changes.\nimport { defineCollection } from "astro:content";\nimport { fsDataCollectionLoader } from "@gogol/content-source";\nimport { pbpCollections } from "@gogol/pbp/astro";\nimport { toDataEntryId } from "@gogol/share/content";\nimport { z } from "astro/zod";\n\n// Loads business entity records from src/content/business/{lang}/ as the "business" collection.\n// Used by content references {business.*.*} in pages and prose (RFC-0045).\nconst business = defineCollection({\n  loader: fsDataCollectionLoader({\n    base: "src/content/business",\n    generateId: (entry) => toDataEntryId(entry),\n  }),\n  schema: z.object({}).catchall(z.any()),\n});\n\nexport const collections = {\n  ...pbpCollections,\n  business,\n};\n`,
+    `// GENERATED. Do not change this line unless the file contains project specific changes.\nimport { defineCollection } from "astro:content";\nimport { fsDataCollectionLoader } from "@warpgogol/content-source";\nimport { pbpCollections } from "@warpgogol/pbp/astro";\nimport { toDataEntryId } from "@warpgogol/share/content";\nimport { z } from "astro/zod";\n\n// Loads business entity records from src/content/business/{lang}/ as the "business" collection.\n// Used by content references {business.*.*} in pages and prose (RFC-0045).\nconst business = defineCollection({\n  loader: fsDataCollectionLoader({\n    base: "src/content/business",\n    generateId: (entry) => toDataEntryId(entry),\n  }),\n  schema: z.object({}).catchall(z.any()),\n});\n\nexport const collections = {\n  ...pbpCollections,\n  business,\n};\n`,
   );
 }
 
-test("snapshot: rfc-0483 migrates all {business.*} references from real webgogol-com content", async () => {
+test("snapshot: rfc-0483 migrates all {business.*} references from real warpgogol-com content", async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "rfc-0483-snapshot-"));
   try {
     await createSnapshotWorkpiece(dir);
@@ -125,7 +125,7 @@ test("snapshot: rfc-0483 migrates all {business.*} references from real webgogol
     const configContent = await fs.readFile(configPath, "utf8");
     expect(configContent).not.toContain("const business =");
     expect(configContent).not.toContain("business,");
-    expect(configContent).not.toContain("@gogol/business");
+    expect(configContent).not.toContain("@warpgogol/business");
 
     const deContactPath = path.join(
       dir,
@@ -179,7 +179,7 @@ test("snapshot: rfc-0483 migrates all {business.*} references from real webgogol
   }
 });
 
-test("snapshot: rfc-0483 is idempotent on real webgogol-com content", async () => {
+test("snapshot: rfc-0483 is idempotent on real warpgogol-com content", async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "rfc-0483-snapshot-idem-"));
   try {
     await createSnapshotWorkpiece(dir);

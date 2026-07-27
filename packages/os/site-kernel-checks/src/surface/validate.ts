@@ -23,12 +23,12 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
 import { diagnosticsResult, failResult, passResult } from "../result-helpers.ts";
 import { loadSurfaceBlueprints } from "../surface-expand.ts";
 import { loadApprovedNarrative } from "../surface-enrich.ts";
-import { jsonldTypes } from "@gogol/ontology/external-surfaces";
+import { jsonldTypes } from "@warpgogol/ontology/external-surfaces";
 import { ARTIFACT_FILE, loadAuthoredRoutes, readLangs } from "./shared.ts";
 
 export async function runSurfaceValidate(

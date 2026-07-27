@@ -27,16 +27,16 @@ The semantic layer now lives in **shared packages**, not in each app's `src/sema
 
 **Where the code is:**
 
-- `@gogol/share/semantic/` — pure, framework-agnostic: `models.ts` (contracts), `jsonld*` builders, `llms.ts` (`buildLlmsIndex`/`buildLlmsFull`), `ids.ts`, and the cross-cutting builders below.
-- `@gogol/site-kernel-content/semantic-loader.ts` — the **disk** path (`loadSemanticSiteModel`, used by `llms.generate`) + the node `createNodeFsContentProvider` (RFC-0146).
-- `@gogol/business/semantic-model.ts` + `semantic-profile.ts` — the **Astro** path (per-page JSON-LD at render).
+- `@warpgogol/share/semantic/` — pure, framework-agnostic: `models.ts` (contracts), `jsonld*` builders, `llms.ts` (`buildLlmsIndex`/`buildLlmsFull`), `ids.ts`, and the cross-cutting builders below.
+- `@warpgogol/site-kernel-content/semantic-loader.ts` — the **disk** path (`loadSemanticSiteModel`, used by `llms.generate`) + the node `createNodeFsContentProvider` (RFC-0146).
+- `@warpgogol/business/semantic-model.ts` + `semantic-profile.ts` — the **Astro** path (per-page JSON-LD at render).
 
 **One builder per concern — never duplicate across the two paths:**
 
-- **Per-page model:** `buildSemanticPageModelWith(reader, args)` in `@gogol/share` (RFC-0144). The disk and Astro paths inject a `SemanticContentReader` (RFC-0146: both backed by a `ContentSourceProvider`); the construction logic exists once. Do not add a second per-page builder.
-- **Org profile:** `buildOrganizationProfile(input)` in `@gogol/share` (RFC-0148). Both paths resolve their own data and delegate the `SemanticOrganization` assembly here. No inline org assembly in loaders.
+- **Per-page model:** `buildSemanticPageModelWith(reader, args)` in `@warpgogol/share` (RFC-0144). The disk and Astro paths inject a `SemanticContentReader` (RFC-0146: both backed by a `ContentSourceProvider`); the construction logic exists once. Do not add a second per-page builder.
+- **Org profile:** `buildOrganizationProfile(input)` in `@warpgogol/share` (RFC-0148). Both paths resolve their own data and delegate the `SemanticOrganization` assembly here. No inline org assembly in loaders.
 
-**Business-data projection (RFC-0147/0148):** business schemas project into llms + JSON-LD through pure projectors in `@gogol/share/semantic/business-projection.ts` (`projectOffer`, `projectLocation`, `projectPeople`, …). To project a new business schema: add one `projectX` function + an entry in `BUSINESS_DOMAIN_VISIBILITY`, and call it from `buildOrganizationProfile`. **Privacy boundary is mandatory:** `BUSINESS_DOMAIN_VISIBILITY` marks each domain `public` / `pageMeta` / `none`. `external-services` and `compliance` are `none` — vendor names/addresses and internal compliance dates **must never** reach llms or JSON-LD. `business.projection.validate` enforces this (and registry completeness).
+**Business-data projection (RFC-0147/0148):** business schemas project into llms + JSON-LD through pure projectors in `@warpgogol/share/semantic/business-projection.ts` (`projectOffer`, `projectLocation`, `projectPeople`, …). To project a new business schema: add one `projectX` function + an entry in `BUSINESS_DOMAIN_VISIBILITY`, and call it from `buildOrganizationProfile`. **Privacy boundary is mandatory:** `BUSINESS_DOMAIN_VISIBILITY` marks each domain `public` / `pageMeta` / `none`. `external-services` and `compliance` are `none` — vendor names/addresses and internal compliance dates **must never** reach llms or JSON-LD. `business.projection.validate` enforces this (and registry completeness).
 
 **Per-page output control (RFC-0143):** a page's contribution to `llms.txt`/`llms-full.txt` and `sitemap.xml` is the typed `output:` block in `system.md` (`output.llms: exclude|index-only|summary|full`, `output.sitemap`). See the Generator Contract (`packages/os/site-kernel/docs/generator-contract.md`).
 

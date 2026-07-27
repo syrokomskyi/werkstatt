@@ -1,24 +1,24 @@
 schemaVersion: 1.0.0
 systems:
-  - id: webgogol-com
+  - id: warpgogol-com
     cosmicStar: Vega
-    repo: ../systems-git/webgogol-com
+    repo: ../systems-git/warpgogol-com
     pinnedPlatform: 4.5.0
     currentMission: null
-    lastRelease: webgogol-com-r000001
+    lastRelease: warpgogol-com-r000001
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
-    mirror: git@github.com:syrokomskyi/webgogol-com.git
+    mirror: git@github.com:syrokomskyi/warpgogol-com.git
     deployment:
       adapter: cloudflare-workers
       channels:
         alt:
-          workerName: alt-webgogol-com
-          url: https://alt.webgogol.com
+          workerName: alt-warpgogol-com
+          url: https://alt.warpgogol.com
           secretsFile: env:WERKSTATT_SECRETS_ALT
         main:
-          workerName: webgogol-com
-          url: https://webgogol.com
+          workerName: warpgogol-com
+          url: https://warpgogol.com
           secretsFile: env:WERKSTATT_SECRETS_MAIN
       lastPropagated: {}
     notes: ""

@@ -10,7 +10,7 @@ Apply these instructions when reading or editing files under `src/content/`.
 - Keep page-shell copy, navigation labels, and structured visitor-facing copy here.
 - Keep labels semantic; href resolution belongs elsewhere.
 - Do not create a parallel AI-only content tree.
-- Entity-ID normalization utilities (`toDataEntryId`, `getEntryLanguage`, `stripEntryLanguage`) come from `@gogol/share/content` — do not re-implement them here. The local `src/content/schemas/entity-id.ts` is a thin proxy.
+- Entity-ID normalization utilities (`toDataEntryId`, `getEntryLanguage`, `stripEntryLanguage`) come from `@warpgogol/share/content` — do not re-implement them here. The local `src/content/schemas/entity-id.ts` is a thin proxy.
 - **`src/content/components/` does not exist** in this app — it was removed per RFC-0047. Do not create it.
 - **`src/content/features/` does not exist** in this app — the feature graph was retired per RFC-0047. Do not create it.
 - **`src/content/media/` is forbidden** — optimized assets belong under content-local `assets/` folders (e.g. `pages/{lang}/assets/`, `prose/{lang}/assets/`). Fixed-path exceptions go in `public/`. (This bans the *top-level* `src/content/media/`, not the per-language `media/` below.)
@@ -27,7 +27,7 @@ Apply these instructions when reading or editing files under `src/content/`.
 | `pages/{lang}/assets/**` | Optimized assets owned by page entries |
 | `prose/{lang}/**/*.md` | Long-form prose with default-language fallback |
 | `prose/{lang}/assets/**` | Optimized assets owned by prose entries |
-| `business-profile/{lang}/**/*.md` | PBP entity data loaded by `@gogol/pbp` (semantic profile) |
+| `business-profile/{lang}/**/*.md` | PBP entity data loaded by `@warpgogol/pbp` (semantic profile) |
 | `people/{lang}/**/*.md` | Person records for the data-driven People section (RFC-0200) |
 | `navigation/{lang}/navigation.md` | Navigation labels, order, groups, semantic targets (not route slugs) |
 | `site/{lang}/labels.md` | Shell UI labels, header/footer nav IDs |

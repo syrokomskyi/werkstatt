@@ -1,6 +1,6 @@
-# @gogol/fingerprint
+# @warpgogol/fingerprint
 
-Semantic fingerprint package and hash governance for the WGogol platform (RFC-0364).
+Semantic fingerprint package and hash governance for the Warpgogol platform (RFC-0364).
 
 ## Purpose
 
@@ -10,15 +10,15 @@ Provides deterministic byte, stable JSON, and semantic file/tree fingerprints wi
 
 | Entry point | Exports | Parser deps? |
 | --- | --- | --- |
-| `@gogol/fingerprint` | `byteHash`, `byteHashFile`, `stableStringify`, `stableJsonHash` | No |
-| `@gogol/fingerprint/semantic` | `fingerprintFile`, `fingerprintTree` | Yes |
+| `@warpgogol/fingerprint` | `byteHash`, `byteHashFile`, `stableStringify`, `stableJsonHash` | No |
+| `@warpgogol/fingerprint/semantic` | `fingerprintFile`, `fingerprintTree` | Yes |
 
 The split keeps lightweight consumers (integrity, check-core, check-runner-node) from transitively loading parser packages.
 
 ## Primitives
 
 ```typescript
-import { byteHash, byteHashFile, stableStringify, stableJsonHash } from "@gogol/fingerprint";
+import { byteHash, byteHashFile, stableStringify, stableJsonHash } from "@warpgogol/fingerprint";
 
 byteHash("hello");              // "sha256:2cf24dba..."
 byteHash(Buffer.from([0x00]));  // "sha256:6e340b9c..."
@@ -33,7 +33,7 @@ All hashes are `sha256:`-prefixed hex strings.
 ## Semantic fingerprints
 
 ```typescript
-import { fingerprintFile, fingerprintTree } from "@gogol/fingerprint/semantic";
+import { fingerprintFile, fingerprintTree } from "@warpgogol/fingerprint/semantic";
 
 // Single file — semantic mode uses parser-backed normalizer
 const fileResult = await fingerprintFile("src/pages/index.astro", { mode: "semantic" });
@@ -93,12 +93,12 @@ interface FingerprintResult {
 ## Constraints
 
 - No ad hoc hashing helpers outside this package (enforced by `fingerprint.usage.lint`).
-- Internal modules are not part of the public API — only `@gogol/fingerprint` and `@gogol/fingerprint/semantic` are stable.
+- Internal modules are not part of the public API — only `@warpgogol/fingerprint` and `@warpgogol/fingerprint/semantic` are stable.
 - The Astro normalizer is async (`@astrojs/compiler` `parse()` returns a Promise).
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/fingerprint build:check
-pnpm --filter @gogol/fingerprint test
+pnpm --filter @warpgogol/fingerprint build:check
+pnpm --filter @warpgogol/fingerprint test
 ```

@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { generateLanguageDetectionMiddleware } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { generateLanguageDetectionMiddleware } from "@warpgogol/site-kernel-content";
 
 const MIDDLEWARE_FILENAME = "language-detect.ts";
 const CLIENT_SCRIPT_FILENAME = "language-persist.ts";

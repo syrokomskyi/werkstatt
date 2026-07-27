@@ -1,9 +1,9 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0175: server/build-time surface of @gogol/chat. Re-exports the port contract, the
-config schema, and the closed adapter catalog. The client loader is imported from "@gogol/chat/client".</purpose>
+<purpose>RFC-0175: server/build-time surface of @warpgogol/chat. Re-exports the port contract, the
+config schema, and the closed adapter catalog. The client loader is imported from "@warpgogol/chat/client".</purpose>
 <non-goals>
-  <item>Do not export the client loader here — import "@gogol/chat/client" on the client.</item>
+  <item>Do not export the client loader here — import "@warpgogol/chat/client" on the client.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

@@ -3,7 +3,7 @@
 <purpose>RFC-0520: shared GuardResult types for extracted inline guards in release.prepare and sternsystem.validate.</purpose>
 <non-goals>
   <item>Does not define gate metadata — that is RFC-0518.</item>
-  <item>Does not unify with GateResult from @gogol/surface — different semantics.</item>
+  <item>Does not unify with GateResult from @warpgogol/surface — different semantics.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

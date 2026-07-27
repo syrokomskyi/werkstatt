@@ -24,22 +24,22 @@
 import { join, relative, basename, dirname } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { collectFiles as collectFilesShared } from "@gogol/share/fs";
+import { collectFiles as collectFilesShared } from "@warpgogol/share/fs";
 import type {
   CheckResult,
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   materialCreditSchema,
   materialTargetKey,
   type MaterialTargetDomain,
   type MaterialTarget,
-} from "@gogol/share/schemas/material-credit";
-import type { MaterialCredit } from "@gogol/share/schemas/material-credit";
+} from "@warpgogol/share/schemas/material-credit";
+import type { MaterialCredit } from "@warpgogol/share/schemas/material-credit";
 import { diagnosticsResult, passResult, resultFromViolations } from "./result-helpers.ts";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
 import {
@@ -47,7 +47,7 @@ import {
   selectLocalizedCreditRecords,
   loadMaterialCreditLabels,
   discoverUsageLocations,
-} from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel-codegen";
 
 interface MaterialRef {
   file: string;
@@ -591,7 +591,7 @@ export async function runMaterialCreditsDriftValidate(
       continue;
     }
     const localizedRecords = selectLocalizedCreditRecords(
-      state.records as import("@gogol/share/material-credits").MaterialCreditRecord[],
+      state.records as import("@warpgogol/share/material-credits").MaterialCreditRecord[],
       lang,
       state.defaultLanguage,
     );

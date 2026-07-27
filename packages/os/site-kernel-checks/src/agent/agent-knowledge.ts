@@ -27,11 +27,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { isAgentKnowledgeDomain, type AgentKnowledgeEnvelope } from "@gogol/share/agent";
-import { BUSINESS_DOMAIN_VISIBILITY } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { isAgentKnowledgeDomain, type AgentKnowledgeEnvelope } from "@warpgogol/share/agent";
+import { BUSINESS_DOMAIN_VISIBILITY } from "@warpgogol/share/semantic";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { computeKnowledgeEnvelopes } from "./agent-knowledge-compute.ts";

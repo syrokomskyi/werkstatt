@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: cdc6c889db3f222f7bbd4b3279158a940967e3aeacd2a0addaa71f34103c8af3
+  contentHash: 38eed121d97f8ad3493a01c45432124099b1472a5c1419c7b75ad9d0be7d9cea
   sources:
     - path: docs/architecture-dna.md
-      hash: 84d6227256a43f5c3b71722788450b72a70bef76f0cab782e0e6bc71f44ab4dc
+      hash: 0d1a24e2aebb296cc660953a97aa8c32628d53d3fce898437ff646ebc7f85e4e
     - path: docs/gate-catalog.generated.yaml
       hash: 3579123a98229f0074ecf30d93a1fe146a28cf9fe06b893360ef380536b31d75
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -13,77 +13,77 @@ meta:
     - path: docs/maintenance-debt.queues.generated.yaml
       hash: 0f238d63ebab5cc228a7f54c2b52f8b5bbebc6fcb1ee73311b58edf6371a14d1
     - path: docs/maintenance-debt/queues/demand-slug-overrides.yaml
-      hash: 24e8d42a63d0cc54da6aff666916a00fc590d5af873894ac0308fc689f374b95
+      hash: dab54fc75584d6f6193fbaa33904e92aa23b803fafe73519b4da77dfe72874b5
     - path: docs/maintenance-debt/queues/diagnostic-shim-migration.yaml
       hash: 9e75f0b9b69ba370c6293ed7e108dc0925d59805ed8f505e2d2435777bb91fe7
     - path: docs/maintenance-debt/queues/kernel-io-migration.yaml
       hash: a57d4e73b84d71828e4781566769a7b2fe918be4dcf5d6b77e4654efb17fafb7
     - path: docs/maintenance-debt/queues/prose-credit-sidecars.yaml
-      hash: 050978327cbfe5b6121085db918fbafa562b2dfa379b2c3528ac240bbf865af6
+      hash: ce321ba5b7b9f18c4c2c108bc00ec054bfacccdf552bfb1bee58c21213c241cc
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
-      hash: 8b6c03a6e637c8daa7d55d6dff25b46616fcabaf91131e5d9451bd5583f460aa
+      hash: ad4b6dfdedcc73c92a956a485248f76cd5ca18d544537efa11913d8b14125791
     - path: package.json
-      hash: 4afdaff61d284d58beac2ea3d17e5c307f40def4ee2d82279ad31e37e2f6bba2
+      hash: 5708c28968df4e415605f3a149d4458d65ccde526bba9ea8f80de6f1d32d4c7a
     - path: packages/agent-gate/package.json
-      hash: f7132ce98d642df1e6beb38f13470e773ba439a54468f75e481790422b414f08
+      hash: 1ae0595ee068d5f5eb6f42bac46b4b85b80935d858bdb0e685c871e166a2f14d
     - path: packages/chat-adapter-null/package.json
-      hash: 51b0e6aea7badcda88f416129f37ec550a7eaca27a08b63c07f04c0af2cd5887
+      hash: fbfd72ba75e08e0143136c4c77323bb4573bcdcbb573ecffb4d36176ee840307
     - path: packages/chat-adapter-uchat/package.json
-      hash: 2eb218000c24b355561333710ef63c544dfd6126038da68da8ae4eb7100a6e75
+      hash: 756ff533781884b6608dc3ec42af31ca47c816bec25933669362f329d7dfee9a
     - path: packages/chat/package.json
-      hash: e2b4d0b7986b1a6ce26d8066e134f402a6ebb1747e59baf16899f14deda01471
+      hash: 25c97c40bd67daf3dea1b6d4a9f846576fa1af20fc71d86f70b2fbc97a6130a3
     - path: packages/check-core/package.json
-      hash: 1cbb98e2001a082f9dd5d184e68e1ef086657c17bf9467939d2747225f3a559b
+      hash: fdf01768d35658051a86973f3213f3403cb5224827b225757f3a9679f0855f1f
     - path: packages/check-runner-node/package.json
-      hash: 65256ce748f3e9e0d217bdd109d1e3d784ec052c27aebd9ce572bcce37c2db6e
+      hash: a5b8b5f7d7fe6430e30d40ad7a338d32281fa39c1df8d4cfcbf85b1ec037ee54
     - path: packages/content-source/package.json
-      hash: 26fdba2456838aa2ac3d56626e6d6bc100f1d29f532f89674f29123f61b2394b
+      hash: 52a6a82fef4f43d7774911a657dd19c1eaa568bd363ce12dfd79b9dd76354453
     - path: packages/faq/package.json
-      hash: 1d7b7ecb0afd379c8e0b5f9a733c23b19f4018540d8799f46c6280e8d96d2207
+      hash: 0155b63afac554c6535483b4ce8c1b33da5a9353c139ec3f8f46209420f82be0
     - path: packages/fingerprint/package.json
-      hash: b919ff6c4b59339e6b65fec760d2b9f60ba24f258541789043de6f92cfc6f6a5
+      hash: a4514b6afac4ed0d360cf62e743fc56ccdc0f3302acbe010adc2a1fc70a38bde
     - path: packages/forge/package.json
       hash: 339c15e57b79e934359f550b708f5f7b80b09cea7f0a423b5eed4956abe8b76f
     - path: packages/geo/package.json
-      hash: a09365e68206d71cd10b253583c55d935204077a4611408057dcbf3f72873526
+      hash: 95a96296c9b96a284649022d8d73689a2c78616c087813d18f57f12594c63197
     - path: packages/growth-adapter-matomo/package.json
-      hash: 4597fd8ba59c1787312af62fe833e998588c602128cb8b523750f881f246042a
+      hash: 4e61621ed86cf68b663ce1243853b08394a606e37f7fcbeca61fb7adcb2b8f14
     - path: packages/growth/package.json
-      hash: c99f164eafdbffc1ad46811ba3b5510154eef3bef97126254afa7aedfde9aaaf
+      hash: 164aeb4c47c3bafad5c05021bd1ba6ed58bf767fea7a2eaa7b545d9ccab52099
     - path: packages/integration-adapter-stripe/package.json
-      hash: 9ff7b85580ee6ecaf77e80c06ed12f118d7af45ded074be8ddb55648a9b99e11
+      hash: 73b641b0c050a0743b1599b9d7fe7b61f60ecee5782f81189c2f3e6cd894d53a
     - path: packages/integration-adapter-supabase-crm/package.json
-      hash: 8151a7109294b07389c82a1ec7340d25903af6d21d222f74f140507b4e416ba6
+      hash: 022411b3f021d118cd226323848de3f68ad39fb2cb0080ef8c5729d97d191647
     - path: packages/integration/package.json
-      hash: 06931a20403bd1a8316b5a1e7a87b5ec75cd61fa0e1ab4d364dfa6f7393dbeab
+      hash: c2b3d252d5f8c6004f1622fb036993d79a4cdbc2238b1e8bbbe8a9de5f736991
     - path: packages/nebula/package.json
-      hash: c99840319c12eef85d69f228553876f16a79b01a68030d26211be2fc7fd4a0db
+      hash: 7d62927dabee269e673cd26fb63fed62f6c81731a47de55706a7b348420a1499
     - path: packages/observability/package.json
-      hash: 3e51710fc47fc7d022f4edce333cd09c7ab15d26c57f5c4d54eaa433259a0a90
+      hash: 9d4a17ab41bdbc604edc8110d4ad07c6aa86392243efa47a00e4c3a4448e25f5
     - path: packages/ontology/package.json
-      hash: ab57edbc7ced58d06f8bbe46fb7eecd261b10fd7a57a0da26bfcdbdc0429dd4c
+      hash: 1e1dc9bf699771b0defb72dfd2a22fba4d24a31fc4158da661e1e9fcc55e769b
     - path: packages/os/site-kernel-astro/package.json
-      hash: ce3c24366cfec8749b370476b20d998f830fffd47ecb02c9b462e9c3c469745c
+      hash: da9d5601badf4aec074941374460623e596e5217591e20a29c745bdc361990a7
     - path: packages/os/site-kernel-audit/package.json
-      hash: de713271a8fc161f07530e9c90d4abb8208923454961e4c6007bd8ac21d98397
+      hash: 593670cfe08e9df23fd4366fc7d86112d289e8b50330979ff0cca403b91ab2e1
     - path: packages/os/site-kernel-changelog/package.json
-      hash: deb43ceafaff683591c646b9017c766f454968c846a39c79ac0cbcc2a5e58e3d
-    - path: packages/os/site-kernel-check-webgogol/package.json
-      hash: 0306cd54b1082c9a7e1ba879b65357fc51be9bbd0178cc523b5ea1feb3b8f023
+      hash: 508763ac52502eddc24576a981f01acfc7290dd9e55a79c0be482dae54eaced8
+    - path: packages/os/site-kernel-check-warpgogol/package.json
+      hash: 8513da0519bfbd39d129152595f85c9494f0d90a9de4660b88831694e1f7048e
     - path: packages/os/site-kernel-checks/package.json
-      hash: 28467efe0cbd4f967b9e8be17b5ec405464a7c22173df25f069e7519a4051da5
+      hash: bac1af49daefd93c6ad3b59967b7c02caf355464cf14e9b68634bd7552fe4bfc
     - path: packages/os/site-kernel-checks/src/ci-local.ts
-      hash: f45e336d8252c7944c1829a72d66aae956ad0ff1246e7d427fd3189193428d9e
+      hash: 4fae56dd7e925f001b43a93e79196b5e33efefcb574add4fae98255e0667cfd0
     - path: packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts
       hash: f0754d6af4b324a7eeb19578cf261418518a6ad431d8de08dfdcd80a8f1b7b05
     - path: packages/os/site-kernel-checks/src/diagnostics/rules.ts
-      hash: f8a8ef36fd72a12466ac8df2f48a7470c2fa22e8bb122cb875a5699689bfb183
-    - path: packages/os/site-kernel-checks/src/diagnostics/rules/check-webgogol.ts
-      hash: 1a18a0057e79091ba9093715fde1c5c8e77450330add2f61962d4c5d035fa956
+      hash: 8396ae95ac1652316b9c2f074d7c4ce5afaf555f6a1f731b48dcaf6dea16ee6b
+    - path: packages/os/site-kernel-checks/src/diagnostics/rules/check-warpgogol.ts
+      hash: 9e9374d005044e0bf1cadb0a115a56671b7e22a5043feaede2aeed7644931ec3
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts
       hash: 62c4bd0cb26cb0f697400780a31e7d7542dc2b75d796767f66b6b0ab8449f02b
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts
-      hash: dad422dd98ebbc56578bd04ddeb9420047843854aba894af4aaab55a58deec2b
+      hash: f19588a58508a9fa2f91647c9ed95cce50603e5cf8b77361c4a815c44a005905
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/governance.ts
       hash: 805645f757275dfea692f534aed86961a424c009c5492ff2d9e10fc50e6b7b32
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/ops-fleet.ts
@@ -91,73 +91,73 @@ meta:
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/section-agent.ts
       hash: 8523e85c137e12c75cd05fa3fee85e0aa5d00b67ed91de1a34e57366f2061680
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/types.ts
-      hash: 3219acf01c3c6bd9b00db0a92da5921dbee36e337af8a3c8fda43e741658abad
+      hash: 2de260a8d2bb151331566a210051a102b3d8c1fecedd0d1f9f4a9b6ac402477b
     - path: packages/os/site-kernel-checks/src/ecosystem.ts
       hash: 185f49fcd877f4e5d59d6809d769f07a21e34a3aaecc9bf64f9981c11ea9869b
     - path: packages/os/site-kernel-checks/src/gate-catalog.ts
-      hash: 5b9a80a16d192e123c42e0cce165ed4c725515157f2a21c23c45119208e65f31
+      hash: bd38378132a1519611f8dbd0f93f85c694671b956499d4634c6a4f0d8a4c9bb1
     - path: packages/os/site-kernel-checks/src/module.ts
-      hash: dd4490c1bbbea1d4a6a65fbc180d769477b6af003b973932618637c63e1ff025
+      hash: 68c32d6d23bd3073f357f367928744b5c0e832adfefdf1dd16644a57b2efa9b3
     - path: packages/os/site-kernel-checks/src/pipelines/packages-check.ts
-      hash: dc11eb57d3f2fe0be5f56e34e3b67e83e2fcca166b7ee08b93d3dfb948e16972
+      hash: 6ca67ca4a6377d60da205cb4f8c86a45f49822921106fc9fac40478d46cca22f
     - path: packages/os/site-kernel-checks/src/test-signal.ts
-      hash: 68f36d04e4fd3d5f961bb307b720a2104da938044decd818c042230d307426e7
+      hash: bb22b88b465a6cda6c52d505e0ed0e99975fb9b4e3e15cc7bddc567523dba058
     - path: packages/os/site-kernel-codegen/package.json
-      hash: 109cc31c0a3f1cdb6e070f02c10811347843ba18cc2feee8d6bb24bda3e0c5b7
+      hash: 52f52e2559c7f83003f5dd69a4fd8331f6ea4d6f6a9210b5e8aaafaad2dfbffd
     - path: packages/os/site-kernel-content/package.json
-      hash: d01d1bc77e7d799dedf3dffd2b7234b930953cc54e7be3e5128db73970c4b364
+      hash: 97d28c3124881689fe2a0c49470b425bfc9a1f48906474dcb0fa96e8be82b128
     - path: packages/os/site-kernel-deploy/package.json
-      hash: 7ab3c34702fbe91c561506d4d7dfbd5108e03c805122a8800c44b2eac01b42dc
+      hash: cbeef164c4f63e290e723450ddde430c6c4836c9a3912df08885878b575118ed
     - path: packages/os/site-kernel-handoff/package.json
-      hash: b9b1beaabe0a0c012656ef75a062aff9373ba79bcbcdb494a710f8dd0bba434a
+      hash: c3d134e74ce24572f878173330ceed412b0ef580ab841d485f17e8ae640666ad
     - path: packages/os/site-kernel-integrity/package.json
-      hash: 28f6277833ba532998b66665076c095dd696e27129050d41a38d05251602e305
+      hash: 1335fa81d5170aa34b844154e6d050e37605bbd6ea2a8ba19138f46bbf84f1ab
     - path: packages/os/site-kernel-observability/package.json
-      hash: 14f0c556bc9704e4baf2b9bfa1be659835b968e46b78811d29a169e65f647f61
+      hash: 2ea95680a669aa13ed17cc3d04d7bde159dcb0be82d31a1f87e60316ebee4ead
     - path: packages/os/site-kernel-onboarding/package.json
-      hash: d0b3cb7db4e8194301af65a9b56f46d40257d7a9533bf856977ebbf9c45e56f2
+      hash: b8e2e019eefda430c4b45b28f4a6c674819481334a53910f8ef71cd6ef9e1689
     - path: packages/os/site-kernel/package.json
-      hash: b87deac12ccc92e388b9e4533f7fa4be1b46f13483519a4332febc41280396fd
+      hash: 23db94ed0f7588dd68f25d3c8054b7ed6413232481cc70eeff173a5ce1ad5c78
     - path: packages/os/site-kernel/src/runtime.ts
       hash: ff42e55bbd43d760def255b5f0ba4557bac7d4fb1f4cafd303c9d06b8f2771a4
     - path: packages/passport/package.json
-      hash: 687e138c5c1c10c607f06800afb802336995f53431b9eba8d014b09dd0c2821a
+      hash: 4cff8aaac55627784b576751fa9fe474b2a9603d70a3ca1879de9a369506c4c1
     - path: packages/pbp/package.json
-      hash: 45642bdcfc326b7cc78ce13c497382180fe0dd609bf99b29e1937e70f648d5c9
+      hash: 428c64af164fa15e1ad8ce2f2f47dd5326b62cb54ceb5f26a3b917c3aec9434a
     - path: packages/share/package.json
-      hash: 8daf974c3929ae5b5dba8966a7ad47aecc0838ed8594ce938aaee28f8c70d8e3
+      hash: 0f4ae35824ecc5c7e3e563ddb10af13275673625c0d7eee69f02e4f8632c5158
     - path: packages/star-map/package.json
-      hash: cf6359c1ce051d63a6feddc9be7f4eb0c5b4b12456a3eaff8262489e05811ad6
+      hash: e907d326f9024ab5695a8eb3a4b3459725119d5448c130dc70811f49b2116fd7
     - path: packages/studio-gate/package.json
-      hash: f1c85d487171cbc52a49cc73c4cb85439cb99bae9ef302a71df87dd15a7b399f
+      hash: c7c46438856e7efcb40bf252ace925c7a6ae23107ee033759208e1ba42c27100
     - path: packages/surface/package.json
-      hash: 7781c3775315aa00667dd2de99b11c263f562c2dcc64c9194f455c1e07207157
+      hash: 6a7cc5ad0d14c208d97be7778b3cce8d11e2b08671a46100564a21efdc584bca
     - path: packages/tokens/package.json
-      hash: 73afcf8f6841cbf26652d206f8d03a1823e0cbdb7501f13a80e136aff65d9d2f
+      hash: 3b5100ef09f018547cd87ee64b1e4d9754efb878ea35c869491a46fb480b3b30
     - path: packages/ui/package.json
-      hash: 67e044e0503224bfaab1286799876855643d32e1207d52103c7215ef198e653b
-    - path: packages/wgogol-skills/package.json
-      hash: 948cadbbeb773472808af33aec53572473262bc2e7aeaaeaea249985001a7766
+      hash: 1c12b0e50298c7038692e5a18ca78ec7ae79ec219cec991af602ae193e4f069d
+    - path: packages/warpgogol-skills/package.json
+      hash: cc7f8653664f860321e3cf2376dd2c411a88dce92dc9e6dc9384b104c2e80caf
     - path: pnpm-workspace.yaml
       hash: 6e015b5ca407a7db55e1bc945f3718c5b4ce0c435a96237165b8f072897697ad
     - path: services/cf-analytics-poller/package.json
-      hash: 886dad6155531b553725c7931457f802fb21aa9fd14623010b9bc23212021e34
-    - path: services/check-webgogol-runner/package.json
-      hash: bb1ec17608c64788409e2bc99ec5ba56f01298c4e805b4ed7b52c2e747177176
+      hash: 15c9cf828e0ebda955cfe83dd7850e817ce1453b885ba173dc1124a2d099a94f
+    - path: services/check-warpgogol-runner/package.json
+      hash: 58b4c2dff1aef8f5f26d5361c49a739e955804fe356f041e1f89c0c391844161
     - path: services/fleet-probe-runner/package.json
-      hash: 06eb488e0856c5b6e374c44b61e29f4c4865bd669cdf18787906015a17673d52
+      hash: dd82245b2ef543c422368f3c2497254edeba1c24bb790cbccd44d63d67889af8
     - path: services/lagebild-sync-worker/package.json
-      hash: a4981fe3d7e63469abd2d332c3383bf5b736b023d07f51866bf98816e297386b
+      hash: 01e7d94f2641419b1847028033182c33c88bba5588471ae6dd541d9c83f33ff2
     - path: services/matomo-proxy/package.json
       hash: 4b4d3c1df3646c5bb15c3f60dee51296e2faa67528792113975f75d6bac3b144
     - path: services/observability-stack/package.json
       hash: 64661f54607b3e5c9e97c6a618f0deb1d0eed30976d420b0d5ecaf4b6032158a
     - path: services/telegram-alert-bridge/package.json
-      hash: 9e1a5b8f54843838e75341528892a92598ae7f208effffbb10b0d577a93cbc1d
+      hash: 228295f8b0883facdd44d9d237a1d7bec9e1680f74e7ee5b7b94c0ccb41a050a
     - path: tools/kernel.config.ts
-      hash: c9d55b590bf9e0bccdf37d54ac69a146e25cb8ad0123e3fc851372a4a30dc03e
+      hash: 491f1fa099db12d0ec0c7a506ef5e9f0bf9e14f4cd543c1c27216419adb57bbb
 workspace:
-  name: webgogol-platform
+  name: warpgogol-platform
   version: 4.5.0
   packageManager: pnpm@11.10.0
   packageGlobs:
@@ -166,66 +166,66 @@ workspace:
     - services/*
 apps: []
 sternsystems:
-  - id: webgogol-com
+  - id: warpgogol-com
     currentMission: null
     registeredAt: 2026-07-13T00:00:00.000Z
 missions:
-  - id: webgogol-com-m000010
+  - id: warpgogol-com-m000010
     sternsystem: ""
     status: open
-    workpiecePath: missions/webgogol-com-m000010/workpiece
-  - id: webgogol-com-m000011
+    workpiecePath: missions/warpgogol-com-m000010/workpiece
+  - id: warpgogol-com-m000011
     sternsystem: ""
     status: open
-    workpiecePath: missions/webgogol-com-m000011/workpiece
-  - id: webgogol-com-m000012
+    workpiecePath: missions/warpgogol-com-m000011/workpiece
+  - id: warpgogol-com-m000012
     sternsystem: ""
     status: open
     workpiecePath: null
-  - id: webgogol-com-m000013
+  - id: warpgogol-com-m000013
     sternsystem: ""
     status: open
-    workpiecePath: missions/webgogol-com-m000013/workpiece
-  - id: webgogol-com-m000014
+    workpiecePath: missions/warpgogol-com-m000013/workpiece
+  - id: warpgogol-com-m000014
     sternsystem: ""
     status: open
-    workpiecePath: missions/webgogol-com-m000014/workpiece
+    workpiecePath: missions/warpgogol-com-m000014/workpiece
 packages:
-  - name: "@gogol/agent-gate"
+  - name: "@warpgogol/agent-gate"
     directory: packages/agent-gate
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/integration"
-      - "@gogol/ontology"
-      - "@gogol/share"
+      - "@warpgogol/integration"
+      - "@warpgogol/ontology"
+      - "@warpgogol/share"
       - astro
     testSignal:
-      packageName: "@gogol/agent-gate"
+      packageName: "@warpgogol/agent-gate"
       directory: packages/agent-gate
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/chat"
+  - name: "@warpgogol/chat"
     directory: packages/chat
     workspacePattern: packages/*
     kind: package
     dependencies:
       - zod
     testSignal:
-      packageName: "@gogol/chat"
+      packageName: "@warpgogol/chat"
       directory: packages/chat
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/chat-adapter-null"
+  - name: "@warpgogol/chat-adapter-null"
     directory: packages/chat-adapter-null
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/chat"
+      - "@warpgogol/chat"
     testSignal:
-      packageName: "@gogol/chat-adapter-null"
+      packageName: "@warpgogol/chat-adapter-null"
       directory: packages/chat-adapter-null
       script: vitest run --passWithNoTests
       signal: skipped
@@ -239,14 +239,14 @@ packages:
           consumers; direct tests are deferred until adapter conformance
           fixtures exist.
         reviewAfter: 2026-10-01
-  - name: "@gogol/chat-adapter-uchat"
+  - name: "@warpgogol/chat-adapter-uchat"
     directory: packages/chat-adapter-uchat
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/chat"
+      - "@warpgogol/chat"
     testSignal:
-      packageName: "@gogol/chat-adapter-uchat"
+      packageName: "@warpgogol/chat-adapter-uchat"
       directory: packages/chat-adapter-uchat
       script: vitest run --passWithNoTests
       signal: skipped
@@ -260,30 +260,30 @@ packages:
           validation; direct tests are deferred until browser loader fixtures
           exist.
         reviewAfter: 2026-10-01
-  - name: "@gogol/check-core"
+  - name: "@warpgogol/check-core"
     directory: packages/check-core
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/fingerprint"
-      - "@gogol/site-kernel"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/site-kernel"
       - zod
     testSignal:
-      packageName: "@gogol/check-core"
+      packageName: "@warpgogol/check-core"
       directory: packages/check-core
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/check-runner-node"
+  - name: "@warpgogol/check-runner-node"
     directory: packages/check-runner-node
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/check-core"
-      - "@gogol/fingerprint"
+      - "@warpgogol/check-core"
+      - "@warpgogol/fingerprint"
       - playwright
     testSignal:
-      packageName: "@gogol/check-runner-node"
+      packageName: "@warpgogol/check-runner-node"
       directory: packages/check-runner-node
       script: vitest run --passWithNoTests
       signal: skipped
@@ -295,41 +295,41 @@ packages:
         rationale: Initial runner identity package; capture behavior is covered from the
           command layer.
         reviewAfter: 2026-10-01
-  - name: "@gogol/content-source"
+  - name: "@warpgogol/content-source"
     directory: packages/content-source
     workspacePattern: packages/*
     kind: package
     dependencies:
       - astro
     testSignal:
-      packageName: "@gogol/content-source"
+      packageName: "@warpgogol/content-source"
       directory: packages/content-source
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/faq"
+  - name: "@warpgogol/faq"
     directory: packages/faq
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/content-source"
-      - "@gogol/share"
+      - "@warpgogol/content-source"
+      - "@warpgogol/share"
       - astro
       - zod
     testSignal:
-      packageName: "@gogol/faq"
+      packageName: "@warpgogol/faq"
       directory: packages/faq
       script: vitest run --passWithNoTests
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/fingerprint"
+  - name: "@warpgogol/fingerprint"
     directory: packages/fingerprint
     workspacePattern: packages/*
     kind: package
     dependencies:
       - "@astrojs/compiler"
-      - "@gogol/share"
       - "@typescript-eslint/typescript-estree"
+      - "@warpgogol/share"
       - jsonc-parser
       - postcss
       - remark-frontmatter
@@ -338,7 +338,7 @@ packages:
       - unified
       - yaml
     testSignal:
-      packageName: "@gogol/fingerprint"
+      packageName: "@warpgogol/fingerprint"
       directory: packages/fingerprint
       script: vitest run
       signal: real
@@ -356,7 +356,7 @@ packages:
       script: vitest run --passWithNoTests
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/geo"
+  - name: "@warpgogol/geo"
     directory: packages/geo
     workspacePattern: packages/*
     kind: package
@@ -367,33 +367,33 @@ packages:
       - i18n-iso-countries
       - iso-3166-2
     testSignal:
-      packageName: "@gogol/geo"
+      packageName: "@warpgogol/geo"
       directory: packages/geo
       script: vitest run --passWithNoTests
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/growth"
+  - name: "@warpgogol/growth"
     directory: packages/growth
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/ontology"
+      - "@warpgogol/ontology"
       - astro
       - zod
     testSignal:
-      packageName: "@gogol/growth"
+      packageName: "@warpgogol/growth"
       directory: packages/growth
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/growth-adapter-matomo"
+  - name: "@warpgogol/growth-adapter-matomo"
     directory: packages/growth-adapter-matomo
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/growth"
+      - "@warpgogol/growth"
     testSignal:
-      packageName: "@gogol/growth-adapter-matomo"
+      packageName: "@warpgogol/growth-adapter-matomo"
       directory: packages/growth-adapter-matomo
       script: vitest run --passWithNoTests
       signal: skipped
@@ -407,7 +407,7 @@ packages:
           config validation; direct tests are deferred until vendor fixtures
           exist.
         reviewAfter: 2026-10-01
-  - name: "@gogol/integration"
+  - name: "@warpgogol/integration"
     directory: packages/integration
     workspacePattern: packages/*
     kind: package
@@ -415,61 +415,61 @@ packages:
       - "@upstash/qstash"
       - zod
     testSignal:
-      packageName: "@gogol/integration"
+      packageName: "@warpgogol/integration"
       directory: packages/integration
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/integration-adapter-stripe"
+  - name: "@warpgogol/integration-adapter-stripe"
     directory: packages/integration-adapter-stripe
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/integration"
-      - "@gogol/share"
+      - "@warpgogol/integration"
+      - "@warpgogol/share"
       - zod
     testSignal:
-      packageName: "@gogol/integration-adapter-stripe"
+      packageName: "@warpgogol/integration-adapter-stripe"
       directory: packages/integration-adapter-stripe
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/integration-adapter-supabase-crm"
+  - name: "@warpgogol/integration-adapter-supabase-crm"
     directory: packages/integration-adapter-supabase-crm
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/integration"
-      - "@gogol/share"
+      - "@warpgogol/integration"
+      - "@warpgogol/share"
     testSignal:
-      packageName: "@gogol/integration-adapter-supabase-crm"
+      packageName: "@warpgogol/integration-adapter-supabase-crm"
       directory: packages/integration-adapter-supabase-crm
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/nebula"
+  - name: "@warpgogol/nebula"
     directory: packages/nebula
     workspacePattern: packages/*
     kind: package
     dependencies: []
     testSignal:
-      packageName: "@gogol/nebula"
+      packageName: "@warpgogol/nebula"
       directory: packages/nebula
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/observability"
+  - name: "@warpgogol/observability"
     directory: packages/observability
     workspacePattern: packages/*
     kind: package
     dependencies: []
     testSignal:
-      packageName: "@gogol/observability"
+      packageName: "@warpgogol/observability"
       directory: packages/observability
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/ontology"
+  - name: "@warpgogol/ontology"
     directory: packages/ontology
     workspacePattern: packages/*
     kind: package
@@ -477,39 +477,39 @@ packages:
       - yaml
       - zod
     testSignal:
-      packageName: "@gogol/ontology"
+      packageName: "@warpgogol/ontology"
       directory: packages/ontology
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel"
+  - name: "@warpgogol/site-kernel"
     directory: packages/os/site-kernel
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/fingerprint"
-      - "@gogol/integration-adapter-supabase-crm"
-      - "@gogol/observability"
-      - "@gogol/share"
-      - "@gogol/site-kernel-content"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/integration-adapter-supabase-crm"
+      - "@warpgogol/observability"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel-content"
       - "@webgogol/forge"
       - picomatch
       - tsx
       - yaml
     testSignal:
-      packageName: "@gogol/site-kernel"
+      packageName: "@warpgogol/site-kernel"
       directory: packages/os/site-kernel
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-astro"
+  - name: "@warpgogol/site-kernel-astro"
     directory: packages/os/site-kernel-astro
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/site-kernel"
+      - "@warpgogol/site-kernel"
     testSignal:
-      packageName: "@gogol/site-kernel-astro"
+      packageName: "@warpgogol/site-kernel-astro"
       directory: packages/os/site-kernel-astro
       signal: skipped
       evidence: Astro adapter behavior is covered through app build/check pipelines;
@@ -522,52 +522,52 @@ packages:
           direct package tests are deferred until adapter fixture coverage is
           added.
         reviewAfter: 2026-10-01
-  - name: "@gogol/site-kernel-audit"
+  - name: "@warpgogol/site-kernel-audit"
     directory: packages/os/site-kernel-audit
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/site-kernel"
+      - "@warpgogol/site-kernel"
     testSignal:
-      packageName: "@gogol/site-kernel-audit"
+      packageName: "@warpgogol/site-kernel-audit"
       directory: packages/os/site-kernel-audit
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-changelog"
+  - name: "@warpgogol/site-kernel-changelog"
     directory: packages/os/site-kernel-changelog
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
       - "@ai-sdk/anthropic"
       - "@ai-sdk/openai"
-      - "@gogol/site-kernel"
+      - "@warpgogol/site-kernel"
       - ai
       - p-limit
       - semver
       - simple-git
       - zod
     testSignal:
-      packageName: "@gogol/site-kernel-changelog"
+      packageName: "@warpgogol/site-kernel-changelog"
       directory: packages/os/site-kernel-changelog
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-check-webgogol"
-    directory: packages/os/site-kernel-check-webgogol
+  - name: "@warpgogol/site-kernel-check-warpgogol"
+    directory: packages/os/site-kernel-check-warpgogol
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/check-core"
-      - "@gogol/check-runner-node"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-content"
+      - "@warpgogol/check-core"
+      - "@warpgogol/check-runner-node"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-content"
       - yaml
     testSignal:
-      packageName: "@gogol/site-kernel-check-webgogol"
-      directory: packages/os/site-kernel-check-webgogol
+      packageName: "@warpgogol/site-kernel-check-warpgogol"
+      directory: packages/os/site-kernel-check-warpgogol
       signal: skipped
       evidence: Command package starts with contract validation; end-to-end tests are
         added as capture/report phases land.
@@ -577,7 +577,7 @@ packages:
         rationale: Command package starts with contract validation; end-to-end tests are
           added as capture/report phases land.
         reviewAfter: 2026-10-01
-  - name: "@gogol/site-kernel-checks"
+  - name: "@warpgogol/site-kernel-checks"
     directory: packages/os/site-kernel-checks
     workspacePattern: packages/os/*
     kind: os-package
@@ -585,30 +585,30 @@ packages:
       - "@ai-sdk/anthropic"
       - "@ai-sdk/openai"
       - "@astrojs/compiler"
-      - "@gogol/agent-gate"
-      - "@gogol/chat"
-      - "@gogol/check-core"
-      - "@gogol/check-runner-node"
-      - "@gogol/content-source"
-      - "@gogol/fingerprint"
-      - "@gogol/geo"
-      - "@gogol/growth"
-      - "@gogol/integration"
-      - "@gogol/nebula"
-      - "@gogol/ontology"
-      - "@gogol/passport"
-      - "@gogol/pbp"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-audit"
-      - "@gogol/site-kernel-check-webgogol"
-      - "@gogol/site-kernel-codegen"
-      - "@gogol/site-kernel-content"
-      - "@gogol/site-kernel-integrity"
-      - "@gogol/star-map"
-      - "@gogol/surface"
-      - "@gogol/tokens"
+      - "@warpgogol/agent-gate"
+      - "@warpgogol/chat"
+      - "@warpgogol/check-core"
+      - "@warpgogol/check-runner-node"
+      - "@warpgogol/content-source"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/geo"
+      - "@warpgogol/growth"
+      - "@warpgogol/integration"
+      - "@warpgogol/nebula"
+      - "@warpgogol/ontology"
+      - "@warpgogol/passport"
+      - "@warpgogol/pbp"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-audit"
+      - "@warpgogol/site-kernel-check-warpgogol"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-integrity"
+      - "@warpgogol/star-map"
+      - "@warpgogol/surface"
+      - "@warpgogol/tokens"
       - ai
       - file-type
       - picomatch
@@ -617,56 +617,56 @@ packages:
       - yaml
       - zod
     testSignal:
-      packageName: "@gogol/site-kernel-checks"
+      packageName: "@warpgogol/site-kernel-checks"
       directory: packages/os/site-kernel-checks
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-codegen"
+  - name: "@warpgogol/site-kernel-codegen"
     directory: packages/os/site-kernel-codegen
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
       - "@cyclonedx/cyclonedx-library"
-      - "@gogol/ontology"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-content"
+      - "@warpgogol/ontology"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-content"
       - spdx-license-list
       - yaml
       - zod
     testSignal:
-      packageName: "@gogol/site-kernel-codegen"
+      packageName: "@warpgogol/site-kernel-codegen"
       directory: packages/os/site-kernel-codegen
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-content"
+  - name: "@warpgogol/site-kernel-content"
     directory: packages/os/site-kernel-content
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/content-source"
-      - "@gogol/share"
+      - "@warpgogol/content-source"
+      - "@warpgogol/share"
       - yaml
     testSignal:
-      packageName: "@gogol/site-kernel-content"
+      packageName: "@warpgogol/site-kernel-content"
       directory: packages/os/site-kernel-content
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-deploy"
+  - name: "@warpgogol/site-kernel-deploy"
     directory: packages/os/site-kernel-deploy
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/integration"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
+      - "@warpgogol/integration"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
       - yaml
     testSignal:
-      packageName: "@gogol/site-kernel-deploy"
+      packageName: "@warpgogol/site-kernel-deploy"
       directory: packages/os/site-kernel-deploy
       signal: skipped
       evidence: Deploy/export behavior is operational and not run in unit tests yet;
@@ -677,127 +677,127 @@ packages:
         rationale: Deploy/export behavior is operational and not run in unit tests yet;
           direct tests are deferred until filesystem fixture coverage is added.
         reviewAfter: 2026-10-01
-  - name: "@gogol/site-kernel-handoff"
+  - name: "@warpgogol/site-kernel-handoff"
     directory: packages/os/site-kernel-handoff
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/fingerprint"
-      - "@gogol/ontology"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-checks"
-      - "@gogol/site-kernel-codegen"
-      - "@gogol/site-kernel-content"
-      - "@gogol/site-kernel-onboarding"
-      - "@gogol/surface"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/ontology"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-onboarding"
+      - "@warpgogol/surface"
       - yaml
     testSignal:
-      packageName: "@gogol/site-kernel-handoff"
+      packageName: "@warpgogol/site-kernel-handoff"
       directory: packages/os/site-kernel-handoff
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-integrity"
+  - name: "@warpgogol/site-kernel-integrity"
     directory: packages/os/site-kernel-integrity
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/fingerprint"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
       - ajv
       - ajv-formats
       - uuid
     testSignal:
-      packageName: "@gogol/site-kernel-integrity"
+      packageName: "@warpgogol/site-kernel-integrity"
       directory: packages/os/site-kernel-integrity
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-observability"
+  - name: "@warpgogol/site-kernel-observability"
     directory: packages/os/site-kernel-observability
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/observability"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-checks"
-      - "@gogol/site-kernel-content"
+      - "@warpgogol/observability"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-content"
       - yaml
     testSignal:
-      packageName: "@gogol/site-kernel-observability"
+      packageName: "@warpgogol/site-kernel-observability"
       directory: packages/os/site-kernel-observability
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/site-kernel-onboarding"
+  - name: "@warpgogol/site-kernel-onboarding"
     directory: packages/os/site-kernel-onboarding
     workspacePattern: packages/os/*
     kind: os-package
     dependencies:
-      - "@gogol/fingerprint"
-      - "@gogol/ontology"
-      - "@gogol/passport"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-checks"
-      - "@gogol/site-kernel-codegen"
-      - "@gogol/site-kernel-content"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/ontology"
+      - "@warpgogol/passport"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
       - gray-matter
       - yaml
       - zod
     testSignal:
-      packageName: "@gogol/site-kernel-onboarding"
+      packageName: "@warpgogol/site-kernel-onboarding"
       directory: packages/os/site-kernel-onboarding
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/passport"
+  - name: "@warpgogol/passport"
     directory: packages/passport
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/nebula"
-      - "@gogol/ontology"
-      - "@gogol/site-kernel-content"
-      - "@gogol/star-map"
       - "@noble/ed25519"
+      - "@warpgogol/nebula"
+      - "@warpgogol/ontology"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/star-map"
       - yaml
       - zod
     testSignal:
-      packageName: "@gogol/passport"
+      packageName: "@warpgogol/passport"
       directory: packages/passport
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/pbp"
+  - name: "@warpgogol/pbp"
     directory: packages/pbp
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/content-source"
-      - "@gogol/fingerprint"
-      - "@gogol/share"
-      - "@gogol/site-kernel-content"
+      - "@warpgogol/content-source"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel-content"
       - astro
       - zod
     testSignal:
-      packageName: "@gogol/pbp"
+      packageName: "@warpgogol/pbp"
       directory: packages/pbp
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/share"
+  - name: "@warpgogol/share"
     directory: packages/share
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/content-source"
-      - "@gogol/ontology"
       - "@lordicon/element"
+      - "@warpgogol/content-source"
+      - "@warpgogol/ontology"
       - ajv
       - astro
       - hls.js
@@ -806,58 +806,58 @@ packages:
       - yaml
       - zod
     testSignal:
-      packageName: "@gogol/share"
+      packageName: "@warpgogol/share"
       directory: packages/share
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/star-map"
+  - name: "@warpgogol/star-map"
     directory: packages/star-map
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/ontology"
+      - "@warpgogol/ontology"
     testSignal:
-      packageName: "@gogol/star-map"
+      packageName: "@warpgogol/star-map"
       directory: packages/star-map
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/studio-gate"
+  - name: "@warpgogol/studio-gate"
     directory: packages/studio-gate
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-handoff"
       - "@modelcontextprotocol/sdk"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-handoff"
     testSignal:
-      packageName: "@gogol/studio-gate"
+      packageName: "@warpgogol/studio-gate"
       directory: packages/studio-gate
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/surface"
+  - name: "@warpgogol/surface"
     directory: packages/surface
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/site-kernel-content"
+      - "@warpgogol/site-kernel-content"
       - yaml
       - zod
     testSignal:
-      packageName: "@gogol/surface"
+      packageName: "@warpgogol/surface"
       directory: packages/surface
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@gogol/tokens"
+  - name: "@warpgogol/tokens"
     directory: packages/tokens
     workspacePattern: packages/*
     kind: package
     dependencies: []
     testSignal:
-      packageName: "@gogol/tokens"
+      packageName: "@warpgogol/tokens"
       directory: packages/tokens
       script: vitest run --passWithNoTests
       signal: skipped
@@ -870,26 +870,26 @@ packages:
           lints; direct tests are deferred until token generation logic moves
           here.
         reviewAfter: 2026-10-01
-  - name: "@gogol/ui"
+  - name: "@warpgogol/ui"
     directory: packages/ui
     workspacePattern: packages/*
     kind: package
     dependencies:
-      - "@gogol/chat"
-      - "@gogol/chat-adapter-null"
-      - "@gogol/chat-adapter-uchat"
-      - "@gogol/integration"
-      - "@gogol/integration-adapter-stripe"
-      - "@gogol/integration-adapter-supabase-crm"
-      - "@gogol/passport"
-      - "@gogol/share"
+      - "@warpgogol/chat"
+      - "@warpgogol/chat-adapter-null"
+      - "@warpgogol/chat-adapter-uchat"
+      - "@warpgogol/integration"
+      - "@warpgogol/integration-adapter-stripe"
+      - "@warpgogol/integration-adapter-supabase-crm"
+      - "@warpgogol/passport"
+      - "@warpgogol/share"
       - astro
       - micromark
       - micromark-extension-gfm
       - qrcode
       - yaml
     testSignal:
-      packageName: "@gogol/ui"
+      packageName: "@warpgogol/ui"
       directory: packages/ui
       script: vitest run --passWithNoTests
       signal: skipped
@@ -903,26 +903,26 @@ packages:
           checks; direct component tests are deferred until an Astro component
           smoke harness exists.
         reviewAfter: 2026-10-01
-  - name: "@wgogol/skills"
-    directory: packages/wgogol-skills
+  - name: "@warpgogol/skills"
+    directory: packages/warpgogol-skills
     workspacePattern: packages/*
     kind: package
     dependencies: []
     testSignal:
-      packageName: "@wgogol/skills"
-      directory: packages/wgogol-skills
+      packageName: "@warpgogol/skills"
+      directory: packages/warpgogol-skills
       signal: absent
       evidence: package has no test script
       requiredAction: Add a real test script or document an explicit skipped test signal.
-  - name: "@gogol/cf-analytics-poller"
+  - name: "@warpgogol/cf-analytics-poller"
     directory: services/cf-analytics-poller
     workspacePattern: services/*
     kind: service
     dependencies:
-      - "@gogol/observability"
+      - "@warpgogol/observability"
       - yaml
     testSignal:
-      packageName: "@gogol/cf-analytics-poller"
+      packageName: "@warpgogol/cf-analytics-poller"
       directory: services/cf-analytics-poller
       signal: skipped
       evidence: Poller behavior is currently guarded by TypeScript and observability
@@ -935,36 +935,36 @@ packages:
           command validation; direct service tests are deferred until
           worker-runtime fixtures exist.
         reviewAfter: 2026-10-01
-  - name: check-webgogol-runner
-    directory: services/check-webgogol-runner
+  - name: check-warpgogol-runner
+    directory: services/check-warpgogol-runner
     workspacePattern: services/*
     kind: service
     dependencies:
-      - "@gogol/check-core"
-      - "@gogol/check-runner-node"
-      - "@gogol/site-kernel-check-webgogol"
+      - "@warpgogol/check-core"
+      - "@warpgogol/check-runner-node"
+      - "@warpgogol/site-kernel-check-warpgogol"
     testSignal:
-      packageName: check-webgogol-runner
-      directory: services/check-webgogol-runner
+      packageName: check-warpgogol-runner
+      directory: services/check-warpgogol-runner
       signal: skipped
       evidence: Runner behavior is covered by check-core contracts, check-runner-node
-        type checks, and check-webgogol runner validation; direct service tests
+        type checks, and check-warpgogol runner validation; direct service tests
         are deferred until browser-capture fixtures exist.
       metadata:
         signal: skipped
         owner: platform
         rationale: Runner behavior is covered by check-core contracts, check-runner-node
-          type checks, and check-webgogol runner validation; direct service
+          type checks, and check-warpgogol runner validation; direct service
           tests are deferred until browser-capture fixtures exist.
         reviewAfter: 2026-10-01
-  - name: "@gogol/fleet-probe-runner"
+  - name: "@warpgogol/fleet-probe-runner"
     directory: services/fleet-probe-runner
     workspacePattern: services/*
     kind: service
     dependencies:
-      - "@gogol/observability"
+      - "@warpgogol/observability"
     testSignal:
-      packageName: "@gogol/fleet-probe-runner"
+      packageName: "@warpgogol/fleet-probe-runner"
       directory: services/fleet-probe-runner
       signal: skipped
       evidence: Fleet probe behavior is currently guarded by TypeScript and
@@ -977,15 +977,15 @@ packages:
           observability command validation; direct service tests are deferred
           until probe-runtime fixtures exist.
         reviewAfter: 2026-10-01
-  - name: "@gogol/lagebild-sync-worker"
+  - name: "@warpgogol/lagebild-sync-worker"
     directory: services/lagebild-sync-worker
     workspacePattern: services/*
     kind: service
     dependencies:
-      - "@gogol/integration-adapter-supabase-crm"
-      - "@gogol/share"
+      - "@warpgogol/integration-adapter-supabase-crm"
+      - "@warpgogol/share"
     testSignal:
-      packageName: "@gogol/lagebild-sync-worker"
+      packageName: "@warpgogol/lagebild-sync-worker"
       directory: services/lagebild-sync-worker
       signal: skipped
       evidence: Shared Worker behavior is covered through the Supabase CRM adapter
@@ -1036,13 +1036,13 @@ packages:
           direct tests are deferred because this service has declarative runtime
           configuration.
         reviewAfter: 2026-10-01
-  - name: "@gogol/telegram-alert-bridge"
+  - name: "@warpgogol/telegram-alert-bridge"
     directory: services/telegram-alert-bridge
     workspacePattern: services/*
     kind: service
     dependencies: []
     testSignal:
-      packageName: "@gogol/telegram-alert-bridge"
+      packageName: "@warpgogol/telegram-alert-bridge"
       directory: services/telegram-alert-bridge
       signal: skipped
       evidence: Alert bridge behavior is currently guarded by TypeScript and
@@ -1570,13 +1570,13 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
-  - name: check-webgogol.app.validate
+  - name: check-warpgogol.app.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
       - workspace
-  - name: check-webgogol.runner.validate
+  - name: check-warpgogol.runner.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
@@ -4806,13 +4806,13 @@ commands:
     supportsAllSites: true
     providers:
       - workspace
-  - name: webgogol.check-hints.generate
+  - name: warpgogol.check-hints.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
       - workspace
-  - name: webgogol.check-hints.validate
+  - name: warpgogol.check-hints.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
@@ -6014,10 +6014,10 @@ generatedOwnership:
     command: security.txt.generate
     markerPolicy: registry-only
     module: packages/os/site-kernel-checks/src/public-surface/security.ts
-  - path: public/.well-known/webgogol-check.json
-    command: webgogol.check-hints.generate
+  - path: public/.well-known/warpgogol-check.json
+    command: warpgogol.check-hints.generate
     markerPolicy: registry-only
-    module: packages/os/site-kernel-check-webgogol/src/commands/hints.ts
+    module: packages/os/site-kernel-check-warpgogol/src/commands/hints.ts
   - path: public/{app}-indexnow.txt
     command: indexnow.key.generate
     markerPolicy: registry-only
@@ -6193,17 +6193,30 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 3
-  implemented: 0
+  accepted: 2
+  implemented: 1
   draft: 3
   reviewing: 0
 baseline:
-  implementedRfcs: []
+  implementedRfcs:
+    - id: RFC-0555
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-4
+        - DNA-22
+        - DNA-44
+        - DNA-46
+        - DNA-47
+        - DNA-48
+        - DNA-49
+        - DNA-51
+        - DNA-56
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0555
     draft:
       - RFC-0383
       - RFC-0384
@@ -6388,7 +6401,7 @@ baseline:
       establishingRfc: RFC-0029
       status: active
     - id: DNA-36
-      title: "`@gogol/site-kernel-onboarding` package"
+      title: "`@warpgogol/site-kernel-onboarding` package"
       provenance: rfc
       establishingRfc: RFC-0029
       status: active

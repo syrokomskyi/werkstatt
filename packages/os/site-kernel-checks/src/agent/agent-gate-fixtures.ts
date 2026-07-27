@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0290: agent.gate.fixtures.run — the workspace-scoped regression gate for
-@gogol/agent-gate's conformance corpus (packages/agent-gate/src/tests/*.test.ts,
+@warpgogol/agent-gate's conformance corpus (packages/agent-gate/src/tests/*.test.ts,
 covering the pinned MCP subset + the action interpreter). Any protocol work
 must keep this green.
 </purpose>
@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 export function parseVitestSummary(
   stdout: string,

@@ -1,4 +1,4 @@
-# @gogol/star-map
+# @warpgogol/star-map
 
 Deterministic SSG-rendered SVG diagram of an app's cosmic universe: constellation → stars (pages) → planets (sections) → moons (components, depth 4) (DNA-32, RFC-0028).
 
@@ -16,7 +16,7 @@ import {
   type StarMapInput,
   type StarMapOutput,
   type StarMapManifestSubset,
-} from "@gogol/star-map";
+} from "@warpgogol/star-map";
 ```
 
 ### `renderStarMap(input: StarMapInput): StarMapOutput`
@@ -34,7 +34,7 @@ The SVG uses only static attributes — no IDs, no random values — so it is di
 
 ### `manifestToStarMapInput(manifest: StarMapManifestSubset, registry, depth): StarMapInput`
 
-Adapter that converts a manifest subset + `UniRegistry` into a `StarMapInput`. Accepts `StarMapManifestSubset` — a structural interface that both `@gogol/ontology/schemas` `SystemManifest` and `@gogol/site-kernel-content` `SystemManifest` satisfy, eliminating the need for type casts in consumers.
+Adapter that converts a manifest subset + `UniRegistry` into a `StarMapInput`. Accepts `StarMapManifestSubset` — a structural interface that both `@warpgogol/ontology/schemas` `SystemManifest` and `@warpgogol/site-kernel-content` `SystemManifest` satisfy, eliminating the need for type casts in consumers.
 
 ### `emitStarMap(input, outPath): Promise<StarMapOutput>`
 
@@ -52,8 +52,8 @@ Renders the star map and writes the SVG to `outPath`, creating parent directorie
 ## Usage in the Passport pipeline
 
 ```typescript
-import { manifestToStarMapInput, emitStarMap } from "@gogol/star-map/render";
-import { computeNebulaScore } from "@gogol/nebula";
+import { manifestToStarMapInput, emitStarMap } from "@warpgogol/star-map/render";
+import { computeNebulaScore } from "@warpgogol/nebula";
 
 const input = manifestToStarMapInput(manifest, registry, 3);
 const { svg, hash } = await emitStarMap(input, "dist/.well-known/cosmic-star-map.svg");
@@ -64,5 +64,5 @@ const nebulaScore = computeNebulaScore(inputs);
 ## Validation
 
 ```sh
-pnpm --filter @gogol/star-map build:check
+pnpm --filter @warpgogol/star-map build:check
 ```

@@ -4,7 +4,7 @@
 <purpose>
   [RFC-0152] Provider-agnostic responsive image primitive. Takes a resolved image
   descriptor ({ src, width?, height? } — Astro ImageMetadata is assignable) plus
-  presentation props, and asks the active Image Provider (@gogol/share) to build the
+  presentation props, and asks the active Image Provider (@warpgogol/share) to build the
   src + srcset. Renders a plain <img>; it owns NO optimization logic, so the backend
   (Cloudflare runtime today, CMS/DAM or build-time later) swaps via provider/config
   without touching this component or any section. Replaces direct <Image>/<img> use
@@ -21,14 +21,14 @@
 </CHANGE_SUMMARY>
 */
 
-import { buildImageSources } from "@gogol/share";
+import { buildImageSources } from "@warpgogol/share";
 import type {
   AttributionDisplay,
   ImageDescriptor,
   ImageQualityPreset,
   MaterialCredit,
-} from "@gogol/share";
-import MaterialCreditDisclosure from "@gogol/ui/components/material-credit";
+} from "@warpgogol/share";
+import MaterialCreditDisclosure from "@warpgogol/ui/components/material-credit";
 
 interface Props {
   /** Resolved image (Astro ImageMetadata is assignable). */

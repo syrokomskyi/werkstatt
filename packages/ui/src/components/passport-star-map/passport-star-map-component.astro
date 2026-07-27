@@ -30,7 +30,7 @@
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { loadPassportData } from "@gogol/passport/data";
+import { loadPassportData } from "@warpgogol/passport/data";
 import "./passport-star-map-component.css";
 
 interface Props {
@@ -99,7 +99,7 @@ try {
   // Emit star-map-navigate growth event on mount (DNA-27 / RFC-0028).
   (function () {
     function tryEmit() {
-      const emitFn = window.__webgogol_emit__;
+      const emitFn = window.__warpgogol_emit__;
       if (typeof emitFn !== "function") return;
       emitFn("star-map-navigate", { appId, source: emitSource });
     }

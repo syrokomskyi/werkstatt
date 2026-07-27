@@ -4,7 +4,7 @@
 
 ## Model
 
-The **client's own site is the integration hub** — never a studio-central, multi-tenant service. A normalized `IntegrationEvent` (from a _source_) is routed to _destinations_ declared in `system.md integrations.destinations[]`. Contracts live in `@gogol/integration`.
+The **client's own site is the integration hub** — never a studio-central, multi-tenant service. A normalized `IntegrationEvent` (from a _source_) is routed to _destinations_ declared in `system.md integrations.destinations[]`. Contracts live in `@warpgogol/integration`.
 
 ## Sources
 
@@ -12,7 +12,7 @@ Three first-party sources, each normalizing to one `IntegrationEvent`:
 
 1. The `send-message` form (in-process, `/api/send-message`)
 2. The chat widget (out-of-process — UChat POSTs to the section-owned route `/api/integration-inbound`, authenticated by `INTEGRATION_INBOUND_SECRET`)
-3. **Stripe billing webhooks** (`/api/stripe-webhook`, signature-verified via `@gogol/integration-adapter-stripe` — RFC-0191)
+3. **Stripe billing webhooks** (`/api/stripe-webhook`, signature-verified via `@warpgogol/integration-adapter-stripe` — RFC-0191)
 
 Make.com is excluded from the funnel/billing path by contract.
 
@@ -29,7 +29,7 @@ At most ONE active executor per `(kind, vendor)` — `integration.config.validat
 
 Supersedes the earlier Cloudflare-Queue substrate of RFC-0176/0179. Every source publishes the `IntegrationEvent` to **Upstash QStash** (`qstash-eu-central-1`, Frankfurt) via `buildQstashPublish()` (dedup header = `eventId`; bounded retries → DLQ). QStash signs a webhook to the single fan-out route **`/api/integration-route`**, which verifies the QStash signature (`@upstash/qstash` `Receiver`), idempotency-checks via an **Upstash Redis** short-TTL ledger (`restRedisLedger.firstSeen`), then `deliverEvent()` routes to the client's destinations (channels + CRM) with the client's tokens; email goes through Cloudflare Email Routing (`send_email` binding). The substrate is **in-flight only — never a lead datastore** (RFC-0177).
 
-**Do NOT reintroduce Cloudflare Queues/KV into the EU delivery path** — Regional Services cannot pin non-HTTP triggers (Queues/Cron) or KV to the EU, so the per-site consumer Worker (`apps/<id>/workers/integration-consumer/`) was **retired**. The CF-queue primitives still exported from `@gogol/integration` (`enqueueEvent`, `consumeIntegrationBatch`, `kvDedup`) are legacy and are **not** the EU delivery path.
+**Do NOT reintroduce Cloudflare Queues/KV into the EU delivery path** — Regional Services cannot pin non-HTTP triggers (Queues/Cron) or KV to the EU, so the per-site consumer Worker (`apps/<id>/workers/integration-consumer/`) was **retired**. The CF-queue primitives still exported from `@warpgogol/integration` (`enqueueEvent`, `consumeIntegrationBatch`, `kvDedup`) are legacy and are **not** the EU delivery path.
 
 ## Chat widget (RFC-0175)
 
@@ -43,7 +43,7 @@ In `sites-check.run`: `chat.config.validate`, `integration.config.validate`, `in
 
 - `Astro.locals.runtime.env` is **removed in Astro v6** (it throws). Read runtime bindings via `import { env } from "cloudflare:workers"`. String secrets still come from `astro:env/server`.
 - The delivery routes are **on-demand** Astro routes (`prerender = false`) on a `output: "static"` app; the Cloudflare adapter is attached only at build, so exercise runtime behavior via `astro build` + `wrangler dev` (workerd), not `astro dev` (Node). QStash + Upstash Redis are reached over plain HTTPS (`fetch`) — no Worker binding required — which is exactly why the EU substrate replaced the Cloudflare Queue/KV bindings.
-- Client-side adapters MUST be loaded via **static** dynamic `import("@gogol/chat-adapter-uchat")` specifiers (not a `/* @vite-ignore */` variable) so Vite code-splits them into resolvable async chunks. The loader map lives in the **host** (the chat-widget section client in `@gogol/ui`) and is passed into `bindChatLauncher` — never in `@gogol/chat` itself, so the port package has no adapter dependency (avoids a workspace cycle).
+- Client-side adapters MUST be loaded via **static** dynamic `import("@warpgogol/chat-adapter-uchat")` specifiers (not a `/* @vite-ignore */` variable) so Vite code-splits them into resolvable async chunks. The loader map lives in the **host** (the chat-widget section client in `@warpgogol/ui`) and is passed into `bindChatLauncher` — never in `@warpgogol/chat` itself, so the port package has no adapter dependency (avoids a workspace cycle).
 
 ## Lagebild shared sync worker (RFC-0186)
 

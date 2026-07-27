@@ -3,7 +3,7 @@
 <purpose>
 Re-export barrel for the ADR domain. The ADR module has migrated to
 @webgogol/forge/os/adr (RFC-0521). This file preserves the
-@gogol/site-kernel/adr import path for backward compatibility.
+@warpgogol/site-kernel/adr import path for backward compatibility.
 </purpose>
 <non-goals>
   <item>Do not re-implement ADR logic here — all logic lives in @webgogol/forge/os/adr.</item>

@@ -27,8 +27,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { passResult, failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import {

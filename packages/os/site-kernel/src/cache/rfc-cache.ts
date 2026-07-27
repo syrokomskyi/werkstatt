@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0382: RFC-specific cache helpers. Reads and fills cached RFC frontmatter
-entries using the CacheLayer interface. Content hashing uses @gogol/fingerprint
+entries using the CacheLayer interface. Content hashing uses @warpgogol/fingerprint
 (DNA-53). Cache invalidation is per-file via mtime + content hash.
 </purpose>
 <non-goals>
@@ -19,7 +19,7 @@ entries using the CacheLayer interface. Content hashing uses @gogol/fingerprint
 import { readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 
-import { byteHashFile } from "@gogol/fingerprint";
+import { byteHashFile } from "@warpgogol/fingerprint";
 
 import type { CacheLayer } from "./cache-layer.ts";
 import { listRfcFiles, parseRfcFile, type ParsedRfc } from "@webgogol/forge/os/rfc";

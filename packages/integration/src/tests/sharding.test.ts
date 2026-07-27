@@ -17,13 +17,13 @@ import { test, expect } from "vitest";
 import { fnv1a, resolveShard } from "../sharding.ts";
 
 test("resolveShard is deterministic for the same inputs", () => {
-  const a = resolveShard("webgogol-com", "eu", { shardCount: 4 });
-  const b = resolveShard("webgogol-com", "eu", { shardCount: 4 });
+  const a = resolveShard("warpgogol-com", "eu", { shardCount: 4 });
+  const b = resolveShard("warpgogol-com", "eu", { shardCount: 4 });
   expect(a).toEqual(b);
 });
 
 test("shared tier names the queue/dlq/consumer by the documented scheme", () => {
-  const s = resolveShard("webgogol-com", "eu", { tier: "shared", shardCount: 4 });
+  const s = resolveShard("warpgogol-com", "eu", { tier: "shared", shardCount: 4 });
   expect(s.tier).toBe("shared");
   expect(s.queue).toMatch(/^gogol-int-eu-shared-\d{2}$/);
   expect(s.dlq).toBe(`${s.queue}-dlq`);

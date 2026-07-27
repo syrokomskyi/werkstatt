@@ -8,7 +8,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Initial implementation of icons.generate command for @gogol/ui package.</item>
+  <item>Initial implementation of icons.generate command for @warpgogol/ui package.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,7 +24,7 @@ export const iconsModule: KernelModule = {
     registry.registerCommand({
       name: "icons.generate",
       description:
-        "Generate Astro icon components for @gogol/ui package. " +
+        "Generate Astro icon components for @warpgogol/ui package. " +
         "Reads JSON files from packages/ui/src/assets/icons/lordicon/ " +
         "and outputs components to packages/ui/src/icons/gen/lordicon/.",
       scope: "workspace",

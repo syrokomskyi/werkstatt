@@ -13,7 +13,7 @@ packages/ontology/blueprints, and reads a site's declared blueprint opt-ins from
 
 import { join } from "node:path";
 import { readdir, readFile } from "node:fs/promises";
-import { parseBlueprint, type Blueprint } from "@gogol/surface";
+import { parseBlueprint, type Blueprint } from "@warpgogol/surface";
 
 const BLUEPRINTS_DIR = join("packages", "ontology", "blueprints");
 
@@ -23,7 +23,7 @@ const BLUEPRINTS_DIR = join("packages", "ontology", "blueprints");
  */
 export async function readDeclaredBlueprints(appDir: string): Promise<string[] | null> {
   try {
-    const { loadSystemManifest } = await import("@gogol/site-kernel-content");
+    const { loadSystemManifest } = await import("@warpgogol/site-kernel-content");
     const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
     const surface = (manifest as unknown as { surface?: { blueprints?: unknown } }).surface;
     return Array.isArray(surface?.blueprints) ? surface.blueprints.map(String) : null;

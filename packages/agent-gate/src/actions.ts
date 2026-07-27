@@ -16,8 +16,8 @@ handed to the delivery substrate on success.
 </CHANGE_SUMMARY>
 */
 
-import type { CapabilityInputOutputSchema, CapabilityRecord } from "@gogol/ontology";
-import type { IntegrationEvent } from "@gogol/integration/port";
+import type { CapabilityInputOutputSchema, CapabilityRecord } from "@warpgogol/ontology";
+import type { IntegrationEvent } from "@warpgogol/integration/port";
 
 export interface ValidationFieldError {
   path: string;

@@ -3,7 +3,7 @@ import { validatePbpUri } from "../src/uri.js";
 
 describe("validatePbpUri", () => {
   it("accepts valid HTTPS URIs", () => {
-    expect(validatePbpUri("https://webgogol.com/id/offering/digital-foundation")).toEqual({
+    expect(validatePbpUri("https://warpgogol.com/id/offering/digital-foundation")).toEqual({
       ok: true,
     });
     expect(validatePbpUri("https://example.com/id/business/example")).toEqual({ ok: true });

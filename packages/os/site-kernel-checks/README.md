@@ -1,6 +1,6 @@
-# @gogol/site-kernel-checks
+# @warpgogol/site-kernel-checks
 
-Shared validation and Compass scaffolding inventory commands for all WGogol Astro apps.
+Shared validation and Compass scaffolding inventory commands for all Warpgogol Astro apps.
 
 ## Purpose
 
@@ -10,7 +10,7 @@ Every app in `apps/*` uses this package to get a consistent set of content, stru
 
 ```typescript
 // apps/my-app/tools/modules/check.module.ts
-import { createStandardCheckModule } from "@gogol/site-kernel-checks";
+import { createStandardCheckModule } from "@warpgogol/site-kernel-checks";
 
 export const checkModule = createStandardCheckModule({
   extraCommands: [
@@ -21,7 +21,7 @@ export const checkModule = createStandardCheckModule({
 
 ```typescript
 // apps/my-app/tools/kernel.config.ts
-import { APPS_CHECK_PIPELINE } from "@gogol/site-kernel-checks";
+import { APPS_CHECK_PIPELINE } from "@warpgogol/site-kernel-checks";
 
 export default defineKernelConfig({
   pipelines: {
@@ -97,5 +97,5 @@ Do not add `content.validate`, `tokens.ds.lint`, or any other standard command t
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-checks build:check
+pnpm --filter @warpgogol/site-kernel-checks build:check
 ```

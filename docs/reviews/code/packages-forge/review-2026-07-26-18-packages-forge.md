@@ -24,7 +24,7 @@ The previous axis F findings are resolved. `applyCliBindingDefaults` now returns
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @wgogol/forge run build:check` exits 0. `pnpm --filter @wgogol/forge run test` — 210 tests pass (22 files).
+Pass — `pnpm --filter @warpgogol/forge run build:check` exits 0. `pnpm --filter @warpgogol/forge run test` — 210 tests pass (22 files).
 
 ### Axis A — Structural correctness
 

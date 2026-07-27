@@ -19,12 +19,12 @@ human-readable strings and non-trivial `resolveLabel` fallbacks.
 
 import { readFile } from "node:fs/promises";
 import { join, relative, basename } from "node:path";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 interface Violation {
   file: string;

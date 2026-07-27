@@ -15,9 +15,9 @@
 
 import {
   buildResourceAttributes,
-  type WgogolEnvironment,
-  type WgogolLayer,
-  type WgogolResourceInput,
+  type WarpgogolEnvironment,
+  type WarpgogolLayer,
+  type WarpgogolResourceInput,
 } from "./conventions.ts";
 import { findMetricSpec, isLabelKeyForbidden, isMetricNameValid } from "./metric-registry.ts";
 import { encodeOtlpMetrics, nowUnixNano } from "./otlp-json.ts";
@@ -35,7 +35,7 @@ export interface MetricsPusher {
   flush(): Promise<{ delivered: boolean; reason?: string }>;
 }
 
-const SCOPE_NAME = "@gogol/observability";
+const SCOPE_NAME = "@warpgogol/observability";
 const SCOPE_VERSION = "1";
 const DEFAULT_TIMEOUT_MS = 2000;
 
@@ -56,16 +56,16 @@ function resolveEnv(env?: MetricsPusherEnv): { endpoint?: string; token?: string
   const proc = getGlobalProcess();
   if (proc?.env) {
     return {
-      endpoint: proc.env["WGOGOL_OTLP_ENDPOINT"],
-      token: proc.env["WGOGOL_OTLP_TOKEN"],
+      endpoint: proc.env["WARPGOGOL_OTLP_ENDPOINT"],
+      token: proc.env["WARPGOGOL_OTLP_TOKEN"],
     };
   }
   return {};
 }
 
-function detectEnvironment(): WgogolEnvironment {
+function detectEnvironment(): WarpgogolEnvironment {
   const proc = getGlobalProcess();
-  const raw = proc?.env ? (proc.env["WGOGOL_DEPLOYMENT_ENV"] ?? proc.env["NODE_ENV"]) : undefined;
+  const raw = proc?.env ? (proc.env["WARPGOGOL_DEPLOYMENT_ENV"] ?? proc.env["NODE_ENV"]) : undefined;
   if (raw === "production") return "production";
   if (raw === "preview") return "preview";
   if (raw === "ci") return "ci";
@@ -73,7 +73,7 @@ function detectEnvironment(): WgogolEnvironment {
 }
 
 export function createMetricsPusher(
-  resource: WgogolResourceInput,
+  resource: WarpgogolResourceInput,
   env?: MetricsPusherEnv,
   options?: { timeoutMs?: number },
 ): MetricsPusher | null {
@@ -85,10 +85,10 @@ export function createMetricsPusher(
   const endpoint = resolved.endpoint;
   const token = resolved.token;
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const environment: WgogolEnvironment = resource.environment ?? detectEnvironment();
-  const layer: WgogolLayer = resource.layer;
+  const environment: WarpgogolEnvironment = resource.environment ?? detectEnvironment();
+  const layer: WarpgogolLayer = resource.layer;
 
-  const resourceInput: WgogolResourceInput = {
+  const resourceInput: WarpgogolResourceInput = {
     ...resource,
     environment,
     layer,
@@ -109,7 +109,7 @@ export function createMetricsPusher(
     }
     const spec = findMetricSpec(name);
     if (!spec) {
-      const msg = `[observability] metric name "${name}" is not declared in WGOGOL_METRIC_REGISTRY`;
+      const msg = `[observability] metric name "${name}" is not declared in WARPGOGOL_METRIC_REGISTRY`;
       if (isStrict) throw new Error(msg);
       droppedCount++;
       return;

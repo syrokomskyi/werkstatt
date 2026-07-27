@@ -27,7 +27,7 @@ import type { PbpFallbackReport } from "../locale.js";
 import type { PbpGraphIntegrityError, PbpCycleCheckResult } from "../reference-resolution.js";
 import type { PbpValidationError } from "../validation-errors.js";
 import type { PbpDerivationResult } from "../derivation.js";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 
 export async function publish(
   partial: PartialCompilerResult,

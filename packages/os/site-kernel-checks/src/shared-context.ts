@@ -17,19 +17,19 @@ resolvable and non-ambiguous at author time.
 
 import { join, relative } from "node:path";
 import { readFile } from "node:fs/promises";
-import { PageEntrySchema, systemManifestSchema } from "@gogol/ontology";
+import { PageEntrySchema, systemManifestSchema } from "@warpgogol/ontology";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import {
   collectMarkdownFiles,
   loadSystemManifest,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
-import { collectSharedContextCandidatesByLevel } from "@gogol/share/shared-context";
+} from "@warpgogol/site-kernel-content";
+import { collectSharedContextCandidatesByLevel } from "@warpgogol/share/shared-context";
 import { resultFromViolations } from "./result-helpers.ts";
 
 interface ParsedPage {

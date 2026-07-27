@@ -15,21 +15,21 @@ with no articles still emits a valid, empty-but-conformant feed.</purpose>
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { writeFileAtomic } from "@gogol/site-kernel";
+import { writeFileAtomic } from "@warpgogol/site-kernel";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
-import { buildRssFeed, buildJsonFeed, type FeedItem } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import { buildRssFeed, buildJsonFeed, type FeedItem } from "@warpgogol/share/semantic";
 import {
   canonicalPageUrl,
   canonicalStaticUrl,
   type CanonicalUrlOptions,
-} from "@gogol/share/canonical-url";
+} from "@warpgogol/share/canonical-url";
 import { failResult } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { readEntitledFeatures } from "./lib/entitlements.ts";

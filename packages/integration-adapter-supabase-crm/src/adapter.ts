@@ -27,19 +27,19 @@ import type {
   VisitorFunnelEventKind,
   VisitorFunnelEventPayload,
   VisitorFunnelStage,
-} from "@gogol/integration";
+} from "@warpgogol/integration";
 import {
   FUNNEL_VERSION,
   VISITOR_FUNNEL_EVENT_KINDS,
   bridgeFunnelStage,
   isFunnelStage,
-} from "@gogol/integration";
+} from "@warpgogol/integration";
 import type {
   BufferDealStage,
   BufferUpsertResult,
   CrmBufferWriter,
-} from "@gogol/integration/crm-buffer";
-import { BUFFER_DEAL_STAGES } from "@gogol/integration/crm-buffer";
+} from "@warpgogol/integration/crm-buffer";
+import { BUFFER_DEAL_STAGES } from "@warpgogol/integration/crm-buffer";
 import { createSupabaseCrmBufferClient } from "./client.ts";
 
 /** Map an IntegrationEvent.source onto the buffer's append-only actor enum. */
@@ -105,7 +105,7 @@ function resolveStages(
  *
  *  - SUPABASE_BUFFER_URL          — Supabase project URL (e.g. https://xyz.supabase.co)
  *  - SUPABASE_BUFFER_SERVICE_KEY  — Service role key (server-only)
- *  - SUPABASE_BUFFER_TENANT_ID    — Client UUID for RLS isolation (webgogol-com pilot)
+ *  - SUPABASE_BUFFER_TENANT_ID    — Client UUID for RLS isolation (warpgogol-com pilot)
  */
 export const SUPABASE_BUFFER_SECRETS = [
   "SUPABASE_BUFFER_URL",

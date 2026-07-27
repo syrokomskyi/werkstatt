@@ -1,4 +1,4 @@
-# @gogol/site-kernel-onboarding Agent Guide
+# @warpgogol/site-kernel-onboarding Agent Guide
 
 Apply this guide when working in `packages/os/site-kernel-onboarding/**`.
 
@@ -43,7 +43,7 @@ Boilerplate templates live under `src/templates/` mirroring the target system pa
 
 - For generated TypeScript app surfaces, keep local relative imports aligned with the owning generator/runtime contract; do not copy the package-source `.ts` rule or the legacy `.js` rule blindly across surfaces.
 - Apply import-style changes in the template or generator source, never by editing generated system files directly.
-- Scaffold templates are consumed by `mission.materialize` (RFC-0389), not by a standalone scaffold command. Generated runtime route files are owned by `@gogol/site-kernel-codegen` `runGenerateRoutes`, not by onboarding-local duplicate templates.
+- Scaffold templates are consumed by `mission.materialize` (RFC-0389), not by a standalone scaffold command. Generated runtime route files are owned by `@warpgogol/site-kernel-codegen` `runGenerateRoutes`, not by onboarding-local duplicate templates.
 - If a scaffolded system route must change, update the canonical route template in `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/pages/[lang]/[...slug].template.astro` and regenerate via `routes.generate`; do not add or maintain a second catch-all route template here.
 
 ## Template placeholder format

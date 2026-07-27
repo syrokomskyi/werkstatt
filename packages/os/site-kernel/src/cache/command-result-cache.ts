@@ -4,7 +4,7 @@
 RFC-0390: Command-result cache helpers. Computes cache keys from declared
 `reads` file hashes and command module source hashes, and provides get/set
 helpers for storing and retrieving KernelExecutionReport objects in the
-`command_results` cache namespace. All hashing uses @gogol/fingerprint (DNA-53).
+`command_results` cache namespace. All hashing uses @warpgogol/fingerprint (DNA-53).
 </purpose>
 <non-goals>
   <item>Do not implement cache storage — that lives in cache-layer.ts and sqlite-cache-layer.ts.</item>
@@ -22,8 +22,8 @@ import { join, relative, sep } from "node:path";
 import type { Dirent } from "node:fs";
 import picomatch from "picomatch";
 
-import { byteHash, stableJsonHash } from "@gogol/fingerprint";
-import { fingerprintFile, fingerprintTree } from "@gogol/fingerprint/semantic";
+import { byteHash, stableJsonHash } from "@warpgogol/fingerprint";
+import { fingerprintFile, fingerprintTree } from "@warpgogol/fingerprint/semantic";
 
 import type { CacheLayer } from "./cache-layer.ts";
 import type { KernelExecutionReport } from "../types.ts";
@@ -104,7 +104,7 @@ async function expandGlobs(
 
 /**
  * Compute a deterministic hash of all files matching the declared `reads`
- * patterns. Uses @gogol/fingerprint semantic mode for supported file types
+ * patterns. Uses @warpgogol/fingerprint semantic mode for supported file types
  * and byte mode for others. Returns a stable composite hash.
  *
  * Returns a constant hash for empty `reads` (should not be called with empty
@@ -131,7 +131,7 @@ export async function computeInputsHash(
 
 /**
  * Compute a deterministic hash of a command module's source directory.
- * Uses @gogol/fingerprint fingerprintTree in semantic mode.
+ * Uses @warpgogol/fingerprint fingerprintTree in semantic mode.
  * The caller should cache this per-package per-pipeline-run.
  */
 export async function computeModuleHash(moduleSrcDir: string): Promise<string> {

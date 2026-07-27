@@ -16,7 +16,7 @@ regeneration + validation to the standard build pipeline. Never round-trips gene
 import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { HandoffManifest } from "@gogol/ontology/operations";
+import type { HandoffManifest } from "@warpgogol/ontology/operations";
 import type { AuthoredSet } from "./types.ts";
 
 const TEXT_EXT = new Set([

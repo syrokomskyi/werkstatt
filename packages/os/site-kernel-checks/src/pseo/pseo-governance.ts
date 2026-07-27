@@ -23,8 +23,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { executeKernelCommand } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
 import {
   approvalRecordSchema,
   autonomyLevelSchema,
@@ -40,12 +40,12 @@ import {
   type Escalation,
   type FieldClass,
   type ReviewVerdict,
-} from "@gogol/surface";
+} from "@warpgogol/surface";
 import {
   collectMarkdownFiles,
   loadSystemManifest,
   parseMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel-content";
 import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 const AUTONOMY_STATE_FILE = "src/surface/autonomy.state.yaml";

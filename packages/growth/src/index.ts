@@ -12,15 +12,15 @@
 */
 
 /**
- * @gogol/growth — server-side re-exports
+ * @warpgogol/growth — server-side re-exports
  *
  * This is the server/build-time surface of the growth package.
  * Import from specific sub-paths on the client:
- *   - "@gogol/growth/emit"    for emit()
- *   - "@gogol/growth/client"  for bootGrowthLayer()
- *   - "@gogol/growth/adapter" for GrowthAdapter / EmittedEvent types
- *   - "@gogol/growth/config"  for GrowthConfig types + schema
- *   - "@gogol/growth/provider" for the <GrowthProvider> Astro island
+ *   - "@warpgogol/growth/emit"    for emit()
+ *   - "@warpgogol/growth/client"  for bootGrowthLayer()
+ *   - "@warpgogol/growth/adapter" for GrowthAdapter / EmittedEvent types
+ *   - "@warpgogol/growth/config"  for GrowthConfig types + schema
+ *   - "@warpgogol/growth/provider" for the <GrowthProvider> Astro island
  *
  * RFC-0027 / DNA-27..30
  */
@@ -45,7 +45,7 @@ export type { GrowthConfig, GrowthVendorConfig } from "./config.ts";
 // GrowthAdapterLoaders type — used by provider.astro and host integrations
 export type { GrowthAdapterLoaders } from "./client.ts";
 
-// Built-in NullAdapter — inlined from former @gogol/growth-adapter-null package
+// Built-in NullAdapter — inlined from former @warpgogol/growth-adapter-null package
 export { NullAdapter } from "./null-adapter.ts";
 
 // Emit factory + bridge — used by tests and shared UI type declarations

@@ -107,7 +107,7 @@ The signed VC embedded in `cosmic-passport.json` follows the W3C VC Data Model:
     "https://www.w3.org/2018/credentials/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "type": ["VerifiableCredential", "WGogolPassportCredential"],
+  "type": ["VerifiableCredential", "WarpgogolPassportCredential"],
   "issuer": "https://<domain>/.well-known/cosmic-passport-key.json",
   "issuanceDate": "<ISO-8601>",
   "credentialSubject": {

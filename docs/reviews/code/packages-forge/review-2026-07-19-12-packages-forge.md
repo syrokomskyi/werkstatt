@@ -37,7 +37,7 @@ The implementation is clean, forward-only, and well-aligned with the forge auton
 
 ### Mechanical floor
 
-Pass — `@wgogol/forge` build:check, `@gogol/site-kernel` build:check, and forge vitest (75 tests) all pass.
+Pass — `@warpgogol/forge` build:check, `@warpgogol/site-kernel` build:check, and forge vitest (75 tests) all pass.
 
 ### Axis A — Structural correctness
 
@@ -46,14 +46,14 @@ Pass — `@wgogol/forge` build:check, `@gogol/site-kernel` build:check, and forg
 
 ### Axis B — DNA alignment
 
-- **DNA-1 (monorepo boundary)**: No `apps/*` imports. `@wgogol/forge` is a `packages/*` workspace package. ✅
-- **DNA-2 (pnpm workspace)**: `@wgogol/forge` added as `workspace:*` dependency to `@gogol/site-kernel`. ✅
+- **DNA-1 (monorepo boundary)**: No `apps/*` imports. `@warpgogol/forge` is a `packages/*` workspace package. ✅
+- **DNA-2 (pnpm workspace)**: `@warpgogol/forge` added as `workspace:*` dependency to `@warpgogol/site-kernel`. ✅
 - **DNA-42 (Compass markup)**: All 3 new source files (`forge-config.ts`, `agents-generate.ts`, tests) carry `MODULE_CONTRACT` and `CHANGE_SUMMARY`. ✅
 - No DNA violations found.
 
 ### Axis C — Ecosystem fit
 
-- **Package boundaries**: `@gogol/site-kernel` now imports from `@wgogol/forge/os/rfc` — this is correct since forge owns RFC governance (RFC-0374). The dependency direction is site-kernel → forge, which is the intended inversion. ✅
+- **Package boundaries**: `@warpgogol/site-kernel` now imports from `@warpgogol/forge/os/rfc` — this is correct since forge owns RFC governance (RFC-0374). The dependency direction is site-kernel → forge, which is the intended inversion. ✅
 - **AGENTS.md updates**: Both root and `packages/forge/AGENTS.md` updated with `forge.yaml` documentation and `forge.agents.generate` command. ✅
 - **Command lifecycle**: `forge.agents.generate` registered in `forgeCoreModule` with correct metadata. ✅
 - **Compass sync**: No `docs/*.xml` updates needed — `forge.yaml` is a project config file, not a workspace technology entry (confirmed during audit). ✅
@@ -82,9 +82,9 @@ Pass — `@wgogol/forge` build:check, `@gogol/site-kernel` build:check, and forg
 ### Axis G — Blind spots
 
 - **Performance**: `scanForForbiddenImports` recursively scans `packages/forge/src/` and `os/` directories. Cost is trivial (~30 .ts files). ✅
-- **False positives**: The regex `FORBIDDEN_IMPORT_PATTERN` correctly matches `import ... from "@gogol/..."` and `require("@gogol/...")` specifiers only, not comment text. Test fixture confirms comment-only mentions are ignored. ✅
+- **False positives**: The regex `FORBIDDEN_IMPORT_PATTERN` correctly matches `import ... from "@warpgogol/..."` and `require("@warpgogol/...")` specifiers only, not comment text. Test fixture confirms comment-only mentions are ignored. ✅
 - **Edge cases**: `resolveForgeRoot` throws with a clear error listing both checked paths. `loadForgeConfig` handles missing file, invalid YAML, and schema violations separately. ✅
-- **Doctor scan scope**: The scan skips `tests/` directories. This means test files with `@gogol/*` imports won't be flagged. This is intentional — tests may legitimately import from kernel packages for integration testing. ✅
+- **Doctor scan scope**: The scan skips `tests/` directories. This means test files with `@warpgogol/*` imports won't be flagged. This is intentional — tests may legitimately import from kernel packages for integration testing. ✅
 
 ### Spec compliance
 
@@ -93,8 +93,8 @@ Pass — `@wgogol/forge` build:check, `@gogol/site-kernel` build:check, and forg
 | `forge-config.ts` exports ForgeConfig, zod schema, loadForgeConfig, resolveForgeRoot | Done | `packages/forge/src/config/forge-config.ts` |
 | `forge.agents.generate` registered, produces marker-carrying AGENTS.md | Done | `packages/forge/os/core/core.module.ts:176-185`, `agents-generate.ts:85-89` |
 | `forge.init` creates forge.yaml, uses resolveForgeRoot, never overwrites | Done | `init.ts:44-75`, idempotent checks throughout |
-| `forge.doctor` fails on @gogol/* imports, passes on current tree | Done | `doctor.ts:45-76`, test confirms 0 violations on clean tree |
-| `forge.yaml` at WGogol root | Done | `forge.yaml` |
+| `forge.doctor` fails on @warpgogol/* imports, passes on current tree | Done | `doctor.ts:45-76`, test confirms 0 violations on clean tree |
+| `forge.yaml` at Warpgogol root | Done | `forge.yaml` |
 | `packages/os/site-kernel/src/rfc/` deleted, imports redirected | Done | 7 import sites redirected, 20 files deleted |
 | Unit tests for config and doctor guard | Done | 11 tests across 2 test files |
 | Root AGENTS.md documents forge.yaml | Done | `AGENTS.md:21-27` |

@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@gogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 import { SITES_CHECK_POSTBUILD_PIPELINE } from "./sites-check-postbuild.ts";
 
 // Generation steps first — they produce artifacts the postbuild validators

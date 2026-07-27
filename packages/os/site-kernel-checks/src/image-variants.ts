@@ -23,17 +23,17 @@
 
 import { join, relative, basename, extname } from "node:path";
 import { readFile, writeFile, mkdir, stat, rm } from "node:fs/promises";
-import { collectFiles } from "@gogol/share/fs";
-import { byteHash } from "@gogol/fingerprint";
+import { collectFiles } from "@warpgogol/share/fs";
+import { byteHash } from "@warpgogol/fingerprint";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { GENERATED_MARKER } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import type { ImageVariantEntry, ImageVariantManifest } from "@gogol/share/image-provider";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import type { ImageVariantEntry, ImageVariantManifest } from "@warpgogol/share/image-provider";
 
 const MANIFEST_RELATIVE = "src/image-variants.generated.yaml";
 const VARIANTS_PUBLIC_DIR = "_img";

@@ -1,4 +1,4 @@
-# WGogol Platform Agent Guide
+# Warpgogol Platform Agent Guide
 
 This file defines the repository-wide instruction layer for this Turborepo. Prefer the closest nested `AGENTS.md` for workspace or directory details, and keep this root file focused on monorepo-wide rules.
 
@@ -30,7 +30,7 @@ Tracked patterns (legacy from `apps/**`, retained for historical content): `apps
 `forge.yaml` at the repository root is the machine-readable project configuration for `@webgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects.
 
 - **MUST NOT** run `forge.agents.generate` against this monorepo's root `AGENTS.md` — it is hand-written and carries no generated marker; the edit guard enforces this, do not bypass it.
-- **MUST NOT** re-add any `@gogol/*` import to `packages/forge` source — `forge.doctor` autonomy guard will fail.
+- **MUST NOT** re-add any `@warpgogol/*` import to `packages/forge` source — `forge.doctor` autonomy guard will fail.
 - **MUST NOT** hand-edit a generated `AGENTS.md` in bootstrapped projects — edit `forge.yaml` and regenerate.
 
 ## Forge bindings contract (RFC-0393)
@@ -52,11 +52,11 @@ External specification packages are vendored as immutable snapshots under `docs/
 
 ## Public Business Profile (PBP) program (RFC-0398)
 
-The Public Business Profile (PBP) specification is vendored at `docs/specs/pbp-specification-package/` (accepted, `pbp/*@1`). It defines a universal logical model for the public digital profile of a business, replacing the former business layer (DNA-20) through a 65-RFC, 5-wave implementation program. Webgogol-com is the first migration target.
+The Public Business Profile (PBP) specification is vendored at `docs/specs/pbp-specification-package/` (accepted, `pbp/*@1`). It defines a universal logical model for the public digital profile of a business, replacing the former business layer (DNA-20) through a 65-RFC, 5-wave implementation program. Warpgogol-com is the first migration target.
 
 - **Terminology:** RFC-0398 (Program Charter and Terminology) is the normative glossary. All downstream PBP RFCs MUST use its entity glossary (Business, Product, CatalogEntry, Offering, Policy, Claim, EvidenceSource, Disclosure, Projection, Canonical, Runtime state), state vocabulary (`not-declared`, `false`, `null`, `not-applicable`, `unavailable`, `invalid`), and architectural layer mapping.
 - **Namespace:** `pbp/*@1` is the frozen namespace. No key renames, no semantic changes, no optional→required promotions within `@1`. Incompatible changes require `@2` and a migration contract.
-- **DNA-20 relationship:** `@gogol/pbp` is the canonical business layer for all sites (DNA-20 superseded by RFC-0471). No compatibility layer (ADR-043). PBP lives in `packages/pbp/` (established by RFC-PBP-001). People records now live in a standalone `people` content collection.
+- **DNA-20 relationship:** `@warpgogol/pbp` is the canonical business layer for all sites (DNA-20 superseded by RFC-0471). No compatibility layer (ADR-043). PBP lives in `packages/pbp/` (established by RFC-PBP-001). People records now live in a standalone `people` content collection.
 - **Spec citations:** Always cite as `pbp-specification-package/ADR-NNN` or `pbp-specification-package/<doc-name>#<anchor>`. Never copy spec model content into RFCs — reference the vendored snapshot section instead.
 - **Materialization:** RFCs are lazily materialized via `spec.materialize --spec=pbp-specification-package --next=<N>`. Each materialized RFC carries `specRef: "pbp-specification-package/<node-id>"` traceability.
 
@@ -106,7 +106,7 @@ Use the operator's chosen language for all natural-language output in the sessio
 
 ## Cosmic naming contract (DNA-23, RFC-0025, RFC-0028) — non-negotiable
 
-Every page/section/component carries a `cosmicName` from one of three closed catalogs in `@gogol/ontology`:
+Every page/section/component carries a `cosmicName` from one of three closed catalogs in `@warpgogol/ontology`:
 
 | Layer | Catalog | Source | Used as | Examples |
 | --- | --- | --- | --- | --- |
@@ -114,7 +114,7 @@ Every page/section/component carries a `cosmicName` from one of three closed cat
 | Section | `PlanetCatalog` (Jupiter/Saturn/Mars + dwarf planets) | `*-section.manifest.yaml` `cosmicName` + `system.md` `pages[].planets[].cosmicPlanet` + page `.md` `blocks[].type` (resolved to cosmicPlanet) | invokes a section | `Europa`, `Hyperion`, `Mimas` |
 | Component | `MoonCatalog` (Uranus/Neptune/Pluto + irregular Jupiter/Saturn) | `*-component.manifest.yaml` `cosmicName` + `system.md` `pages[].shell.<slot>.cosmicMoon` | invokes a component (shell, passport) | `Desdemona`, `Oberon`, `Titania` |
 
-**Resolution.** `@gogol/share/page` `PLANET_IMPORT_PATHS` and `MOON_IMPORT_PATHS` map cosmic names to import paths into `@gogol/ui`. **Every name added to a manifest must also appear in one of these maps**, and vice versa — silent mismatches cause `[buildPage] No component import path registered for ...` at runtime.
+**Resolution.** `@warpgogol/share/page` `PLANET_IMPORT_PATHS` and `MOON_IMPORT_PATHS` map cosmic names to import paths into `@warpgogol/ui`. **Every name added to a manifest must also appear in one of these maps**, and vice versa — silent mismatches cause `[buildPage] No component import path registered for ...` at runtime.
 
 **Passport-reserved moons (RFC-0028):** `Methone`, `Despina`, `Klarissa`, `Bianca`, `Adrastea`. These five names are EXCLUSIVELY the cosmicNames of:
 
@@ -158,7 +158,7 @@ See [`docs/policies/agent-surface-ops.md`](docs/policies/agent-surface-ops.md) f
 
 Agents **MUST NOT** run root `pnpm build` or `turbo run build` during agent workflows. See [`docs/policies/build-verification.md`](docs/policies/build-verification.md) for scoped typecheck verification rules, command execution timeout discipline (6-minute budget), and rationale.
 
-Agents **MUST NOT** use name-based `pnpm --filter <name>` for app-level commands (build, build:check, astro build, astro check) when multiple workspaces share the same name — this is the case for every Sternsystem with active mission workpieces (e.g. `webgogol-com` matches both `systems/webgogol-com` and `missions/webgogol-com-m*/workpiece`). A name-based filter runs the command in **all** matching workpieces in parallel, which builds mission workpieces unintentionally and can fail on stale workpiece state. Instead, use a path-based filter (`pnpm --filter ./systems/<id>`) or run the command directly in the target directory (`cd systems/<id> && npx <cmd>`).
+Agents **MUST NOT** use name-based `pnpm --filter <name>` for app-level commands (build, build:check, astro build, astro check) when multiple workspaces share the same name — this is the case for every Sternsystem with active mission workpieces (e.g. `warpgogol-com` matches both `systems/warpgogol-com` and `missions/warpgogol-com-m*/workpiece`). A name-based filter runs the command in **all** matching workpieces in parallel, which builds mission workpieces unintentionally and can fail on stale workpiece state. Instead, use a path-based filter (`pnpm --filter ./systems/<id>`) or run the command directly in the target directory (`cd systems/<id> && npx <cmd>`).
 
 ## Commit discipline (RFC-0480)
 
@@ -368,10 +368,10 @@ pnpm exec site-kernel run uni.registry.validate
 
 ### Ontology enums
 
-Intent tags and industry-fit tags are closed enums defined in `@gogol/ontology`. **Do not use freeform strings** — only values from `UniIntent` and `UniIndustryFit` are valid. Import the Zod schema for validation:
+Intent tags and industry-fit tags are closed enums defined in `@warpgogol/ontology`. **Do not use freeform strings** — only values from `UniIntent` and `UniIndustryFit` are valid. Import the Zod schema for validation:
 
 ```ts
-import { manifestSchema } from "@gogol/ontology";
+import { manifestSchema } from "@warpgogol/ontology";
 ```
 
 ---
@@ -382,26 +382,26 @@ Every package under `packages/*` has its own `AGENTS.md` with full API reference
 
 | Package | Role |
 | --- | --- |
-| `@gogol/share` | App-agnostic utilities: entity-ID normalization, i18n helpers, base schemas, browser scripts, `buildPage()`. **See `packages/share/AGENTS.md`.** |
-| `@gogol/ontology` | Closed UI enums (`UniIntent`, `UniIndustryFit`, `UniLayer`), `manifestSchema` Zod validator, cosmic catalogs, biome/site-family YAMLs |
-| `@gogol/tokens` | CSS-first design tokens (`--ds-*`), biome CSS generation. No raw colors in app CSS — enforced by `tokens.ds.lint` / `tokens.colors.lint` |
-| `@gogol/pbp` | Public Business Profile (PBP) entity envelope, schemas, loaders, compiler, and semantic projections (RFC-0399, `pbp/*@1`). Canonical business layer (DNA-20 superseded) |
-| `@gogol/growth` | Vendor-agnostic event/funnel/experiment runtime. Apps call `emit()` only. See `packages/growth/AGENTS.md` |
-| `@gogol/chat` (+ `@gogol/chat-adapter-uchat` / `-null`) | RFC-0175 consent-gated chat widget port: `ChatWidgetAdapter` contract + click-to-load loader. Vendor script loads ONLY after the visitor clicks (no third-party before activation). Adapters injected via STATIC dynamic `import()` so the bundler code-splits them |
-| `@gogol/integration-adapter-stripe` | RFC-0191 Stripe billing adapter: a first-party source (webhook signature verify + `Stripe → IntegrationEvent` mapping) plus an injectable billing client (Checkout / invoices / subscription items). No Stripe SDK (raw `fetch` + `node:crypto`), no Make.com. |
-| `@gogol/integration-adapter-supabase-crm` | RFC-0176/0186 Supabase CRM-buffer `DestinationAdapter` (the Lagebild MVP). Writes the `IntegrationEvent` into the buffer + outbox; the shared `services/lagebild-sync-worker/` syncs Pipedrive async. Never calls Pipedrive directly. |
-| `@gogol/passport` / `@gogol/star-map` / `@gogol/nebula` | Build provenance, W3C VC-signed passport, deterministic star-map SVG. Private keys: GitHub secrets only |
-| `@gogol/site-kernel-onboarding` | `onboarding.scaffold` CLI — generates RFC-compliant `apps/<id>/`. Never copy an app folder |
-| `@gogol/ui` | Shared icons (LordIcon), sections, shell components. Import icons from `@gogol/ui/icons`. See `packages/ui/AGENTS.md` |
-| `@gogol/content-source` | RFC-0141 Content Source Provider port: the single named seam for where content and assets come from. Ships the `ContentSourceProvider` / `AssetRef` / `ResolvedAsset` contracts and the reference filesystem adapter. |
+| `@warpgogol/share` | App-agnostic utilities: entity-ID normalization, i18n helpers, base schemas, browser scripts, `buildPage()`. **See `packages/share/AGENTS.md`.** |
+| `@warpgogol/ontology` | Closed UI enums (`UniIntent`, `UniIndustryFit`, `UniLayer`), `manifestSchema` Zod validator, cosmic catalogs, biome/site-family YAMLs |
+| `@warpgogol/tokens` | CSS-first design tokens (`--ds-*`), biome CSS generation. No raw colors in app CSS — enforced by `tokens.ds.lint` / `tokens.colors.lint` |
+| `@warpgogol/pbp` | Public Business Profile (PBP) entity envelope, schemas, loaders, compiler, and semantic projections (RFC-0399, `pbp/*@1`). Canonical business layer (DNA-20 superseded) |
+| `@warpgogol/growth` | Vendor-agnostic event/funnel/experiment runtime. Apps call `emit()` only. See `packages/growth/AGENTS.md` |
+| `@warpgogol/chat` (+ `@warpgogol/chat-adapter-uchat` / `-null`) | RFC-0175 consent-gated chat widget port: `ChatWidgetAdapter` contract + click-to-load loader. Vendor script loads ONLY after the visitor clicks (no third-party before activation). Adapters injected via STATIC dynamic `import()` so the bundler code-splits them |
+| `@warpgogol/integration-adapter-stripe` | RFC-0191 Stripe billing adapter: a first-party source (webhook signature verify + `Stripe → IntegrationEvent` mapping) plus an injectable billing client (Checkout / invoices / subscription items). No Stripe SDK (raw `fetch` + `node:crypto`), no Make.com. |
+| `@warpgogol/integration-adapter-supabase-crm` | RFC-0176/0186 Supabase CRM-buffer `DestinationAdapter` (the Lagebild MVP). Writes the `IntegrationEvent` into the buffer + outbox; the shared `services/lagebild-sync-worker/` syncs Pipedrive async. Never calls Pipedrive directly. |
+| `@warpgogol/passport` / `@warpgogol/star-map` / `@warpgogol/nebula` | Build provenance, W3C VC-signed passport, deterministic star-map SVG. Private keys: GitHub secrets only |
+| `@warpgogol/site-kernel-onboarding` | `onboarding.scaffold` CLI — generates RFC-compliant `apps/<id>/`. Never copy an app folder |
+| `@warpgogol/ui` | Shared icons (LordIcon), sections, shell components. Import icons from `@warpgogol/ui/icons`. See `packages/ui/AGENTS.md` |
+| `@warpgogol/content-source` | RFC-0141 Content Source Provider port: the single named seam for where content and assets come from. Ships the `ContentSourceProvider` / `AssetRef` / `ResolvedAsset` contracts and the reference filesystem adapter. |
 | `@webgogol/forge` | RFC-0374 Portable governance ecosystem: 30 skills (fo/shared/meta), generic OS command modules (rfc._, naming.convention.lint, compass._, werkstatt._, workflow._), skill registry, validators, `forge.create` onboarding, `forge.scaffold` stack profiles, and `fo-harvest` self-growth loop. Skills live in `packages/forge/skills/`; `.agents/skills/` is a generated copy synced by `forge.create`. **See `packages/forge/AGENTS.md`.** |
 
 ## Content Source Provider seam (RFC-0141)
 
-Content origin and asset origin are reachable only through `@gogol/content-source` — the named port that makes the filesystem a replaceable adapter (Phase 0 of the headless-CMS arc).
+Content origin and asset origin are reachable only through `@warpgogol/content-source` — the named port that makes the filesystem a replaceable adapter (Phase 0 of the headless-CMS arc).
 
-- **Content reads.** Import `getEntry` / `getCollection` from `@gogol/content-source/astro`, never from `astro:content` directly. That subpath is the single module that owns the `astro:content` dependency. `@gogol/share` content helpers and `page-handler` already route through it.
-- **Collection loaders.** `markdownCollectionLoader` (re-exported from `@gogol/share/astro/loaders`) and the business loader come from the fs adapter (`fsMarkdownCollectionLoader` / `fsDataCollectionLoader`). Generated `content.config.ts` keeps importing `markdownCollectionLoader` unchanged.
+- **Content reads.** Import `getEntry` / `getCollection` from `@warpgogol/content-source/astro`, never from `astro:content` directly. That subpath is the single module that owns the `astro:content` dependency. `@warpgogol/share` content helpers and `page-handler` already route through it.
+- **Collection loaders.** `markdownCollectionLoader` (re-exported from `@warpgogol/share/astro/loaders`) and the business loader come from the fs adapter (`fsMarkdownCollectionLoader` / `fsDataCollectionLoader`). Generated `content.config.ts` keeps importing `markdownCollectionLoader` unchanged.
 - **Assets.** `packages/ui/src/content-assets.ts` is the ONLY place in `packages/ui` that calls `import.meta.glob` for content images. Sections import `contentAssetImages` and resolve via `resolveImage` (relocated into the fs adapter as `resolveAsset`). Do not re-introduce per-component asset globs — `asset.reference.validate` (warning mode) and the centralization are how a future CMS adapter swaps local files for remote URLs without touching sections.
 - **`system.md` stays engineering-owned** and is never served by a provider (`ContentDomain` excludes it).
 - `content.source.parity` is the migration guard: the fs adapter's enumeration must match the on-disk content inventory.
@@ -412,7 +412,7 @@ See [`docs/policies/integration-hub.md`](docs/policies/integration-hub.md) for t
 
 ## Block dispatch (RFC-0091) — registry is authoritative
 
-`packages/share/src/page.ts` resolves a block `type` → cosmicName → import path from the **archetype registry** (`@gogol/ontology/archetypes`). The `PLANET_IMPORT_PATHS_FALLBACK` is for genuinely _unmapped_ names and is spread BEFORE the registry, so a real manifest mapping always wins. Never re-add a hardcoded fallback that shadows a registered cosmicName (this exact bug silently rendered a chat-widget block as a hero — RFC-0175 fix).
+`packages/share/src/page.ts` resolves a block `type` → cosmicName → import path from the **archetype registry** (`@warpgogol/ontology/archetypes`). The `PLANET_IMPORT_PATHS_FALLBACK` is for genuinely _unmapped_ names and is spread BEFORE the registry, so a real manifest mapping always wins. Never re-add a hardcoded fallback that shadows a registered cosmicName (this exact bug silently rendered a chat-widget block as a hero — RFC-0175 fix).
 
 ## Historical note
 

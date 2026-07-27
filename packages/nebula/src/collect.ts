@@ -13,7 +13,7 @@
 */
 
 /**
- * @gogol/nebula — Input collector
+ * @warpgogol/nebula — Input collector
  *
  * DNA-33 / RFC-0028
  *

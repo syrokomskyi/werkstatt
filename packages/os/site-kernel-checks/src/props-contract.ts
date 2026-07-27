@@ -25,9 +25,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { hasGeneratedMarker } from "@gogol/site-kernel";
-import { discoverManifestPropsInfo, propsSchemaSourceHash } from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel";
+import { discoverManifestPropsInfo, propsSchemaSourceHash } from "@warpgogol/site-kernel-codegen";
 import { diagnosticsResult } from "./result-helpers.ts";
 
 type JsonSchema = Record<string, unknown>;

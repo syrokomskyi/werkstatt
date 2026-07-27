@@ -26,9 +26,9 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { SurfaceArtifact, VirtualRouteEntry } from "@gogol/surface";
-import { pageText, tokenize } from "@gogol/surface";
+} from "@warpgogol/site-kernel";
+import type { SurfaceArtifact, VirtualRouteEntry } from "@warpgogol/surface";
+import { pageText, tokenize } from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
 import { loadSurfaceBlueprints } from "./surface-expand.ts";
 import { defaultPageForEntry, jaccard, shingles } from "./surface-quality.ts";

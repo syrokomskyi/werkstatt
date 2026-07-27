@@ -43,10 +43,10 @@ The implementation is structurally sound and covers the RFC acceptance criteria 
 
 Pass — all four affected packages pass `build:check`:
 
-- `@gogol/site-kernel-checks` — pass
-- `@gogol/site-kernel` — pass
-- `@gogol/site-kernel-onboarding` — pass
-- `@gogol/lagebild-sync-worker` — pass
+- `@warpgogol/site-kernel-checks` — pass
+- `@warpgogol/site-kernel` — pass
+- `@warpgogol/site-kernel-onboarding` — pass
+- `@warpgogol/lagebild-sync-worker` — pass
 
 `rfc.validate RFC-0388` — pass (0 violations).
 

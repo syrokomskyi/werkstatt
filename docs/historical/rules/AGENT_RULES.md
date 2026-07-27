@@ -119,7 +119,7 @@ Every section lives in its own workspace folder with:
 
 ## 2. Register the cosmic name
 
-- Pick a free name from `PlanetCatalog` in `@gogol/ontology`
+- Pick a free name from `PlanetCatalog` in `@warpgogol/ontology`
 - Set `cosmicName: <Name>` in `manifest.yaml`
 - Register in `PLANET_IMPORT_PATHS` in `packages/share/src/page.ts`
 - Pin in `src/content/system.md pages[pageId].planets[]` of every app that uses it

@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Check target schemas, parsing, redaction, and host resolution for the check-webgogol ecosystem.</purpose>
+<purpose>Check target schemas, parsing, redaction, and host resolution for the check-warpgogol ecosystem.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>

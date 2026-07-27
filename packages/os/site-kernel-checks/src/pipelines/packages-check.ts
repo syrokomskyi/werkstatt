@@ -27,7 +27,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@gogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 
 export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "manifest.contract.validate" },
@@ -118,7 +118,7 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "onboarding.yaml.import.lint" },
   // RFC-0189: hardcoded strings in shared UI components
   { command: "ui.i18n.lint" },
-  // RFC-0230: hardcoded strings in UI-facing @gogol/share helpers
+  // RFC-0230: hardcoded strings in UI-facing @warpgogol/share helpers
   { command: "share.i18n.lint" },
   // RFC-0205: silent empty-string fallbacks on UI-visible props
   { command: "ui.silent-defaults.lint" },
@@ -146,7 +146,7 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "matomo.smoke.validate" },
   { command: "matomo.silence.validate" },
   { command: "matomo.export.validate" },
-  // RFC-0290: @gogol/agent-gate MCP + action conformance corpus regression gate.
+  // RFC-0290: @warpgogol/agent-gate MCP + action conformance corpus regression gate.
   { command: "agent.gate.fixtures.run" },
   // RFC-0311: offline validation for IndexNow payload shape, filtering, and batching.
   { command: "indexnow.submit.validate" },

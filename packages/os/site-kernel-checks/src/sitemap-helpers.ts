@@ -12,14 +12,14 @@ import { parse as yamlParse } from "yaml";
 */
 
 import { join, dirname } from "node:path";
-import type { WorkspaceIO, DirEntry } from "@gogol/site-kernel";
-import { loadSystemManifest, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { resolvePageOutput, type RawPageOutput } from "@gogol/share/semantic";
-import { localizeUrl } from "@gogol/share/url-policy";
-import { canonicalPageUrl, type CanonicalUrlOptions } from "@gogol/share/canonical-url";
-import { resolvePageUpdateStamp, type PageUpdateStampResult } from "@gogol/share/semantic";
-import { DEFAULT_PROFILE_BASE_BY_LANG } from "@gogol/share/people-profile-defaults";
-import { hasGeneratedMarker } from "@gogol/site-kernel-codegen";
+import type { WorkspaceIO, DirEntry } from "@warpgogol/site-kernel";
+import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { resolvePageOutput, type RawPageOutput } from "@warpgogol/share/semantic";
+import { localizeUrl } from "@warpgogol/share/url-policy";
+import { canonicalPageUrl, type CanonicalUrlOptions } from "@warpgogol/share/canonical-url";
+import { resolvePageUpdateStamp, type PageUpdateStampResult } from "@warpgogol/share/semantic";
+import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/share/people-profile-defaults";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 

@@ -16,7 +16,7 @@
 </CHANGE_SUMMARY>
 */
 
-import ResponsiveImage from "@gogol/ui/components/responsive-image.astro";
+import ResponsiveImage from "@warpgogol/ui/components/responsive-image.astro";
 import {
   getResolvedComponentContent,
   getRouteRegistry,
@@ -24,13 +24,13 @@ import {
   readAttributionPolicy,
   resolveImage,
   resolveSemanticTarget,
-} from "@gogol/share";
-import { getFeaturePolicyResolver } from "@gogol/share/astro/feature-policy";
-import type { FooterComponentContent } from "@gogol/ui/components/footer/types";
-import type { CopyrightComponentContent } from "@gogol/ui/components/copyright/types";
-import Copyright from "@gogol/ui/components/copyright";
-import BrandLabel from "@gogol/ui/components/brand-label";
-import FooterPromo from "@gogol/ui/components/footer-promo";
+} from "@warpgogol/share";
+import { getFeaturePolicyResolver } from "@warpgogol/share/astro/feature-policy";
+import type { FooterComponentContent } from "@warpgogol/ui/components/footer/types";
+import type { CopyrightComponentContent } from "@warpgogol/ui/components/copyright/types";
+import Copyright from "@warpgogol/ui/components/copyright";
+import BrandLabel from "@warpgogol/ui/components/brand-label";
+import FooterPromo from "@warpgogol/ui/components/footer-promo";
 import { loadVendorIcon } from "../../icons/icon-resolver.ts";
 import { contentAssetImages } from "../../content-assets.ts";
 

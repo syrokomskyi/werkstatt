@@ -23,17 +23,17 @@ Biome contract:
 import { readFile, readdir } from "node:fs/promises";
 import { join, relative, extname } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { biomeSchema, siteFamilySchema } from "@gogol/ontology/schemas";
-import { getAllProjectedTokenNames } from "@gogol/ontology";
-import { TOKEN_NAME_SET } from "@gogol/tokens";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { biomeSchema, siteFamilySchema } from "@warpgogol/ontology/schemas";
+import { getAllProjectedTokenNames } from "@warpgogol/ontology";
+import { TOKEN_NAME_SET } from "@warpgogol/tokens";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { fileExists } from "./lib/file-exists.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 // ---------------------------------------------------------------------------
 // Helpers

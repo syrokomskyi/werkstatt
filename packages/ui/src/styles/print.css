@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-RFC-0257: Shared baseline print stylesheet for all WGogol apps.
+RFC-0257: Shared baseline print stylesheet for all Warpgogol apps.
 Injected by layout-component.astro as a media="print" link on every page.
 Token-driven and biome-agnostic — no hardcoded pixel widths or site-specific colors.
 </purpose>

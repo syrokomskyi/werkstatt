@@ -1,12 +1,12 @@
-- siteId: webgogol-com
+- siteId: warpgogol-com
   zoneId: REPLACE_WITH_CLOUDFLARE_ZONE_ID
   workerScripts:
-    - webgogol-com
+    - warpgogol-com
 - siteId: nicaragua-projekt
   zoneId: REPLACE_WITH_CLOUDFLARE_ZONE_ID
   workerScripts:
     - nicaragua-projekt
-- siteId: check-webgogol-com
+- siteId: check-warpgogol-com
   zoneId: REPLACE_WITH_CLOUDFLARE_ZONE_ID
   workerScripts:
-    - check-webgogol-com
+    - check-warpgogol-com

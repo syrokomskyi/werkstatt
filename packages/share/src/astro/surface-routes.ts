@@ -17,9 +17,9 @@
 </CHANGE_SUMMARY>
 */
 
-// Inlined from @gogol/surface/src/types.ts to break the workspace cycle
+// Inlined from @warpgogol/surface/src/types.ts to break the workspace cycle
 // (surface → site-kernel-content → share → surface). These are type-only;
-// the canonical definitions live in @gogol/surface and must stay structurally compatible.
+// the canonical definitions live in @warpgogol/surface and must stay structurally compatible.
 import type { PageEntry } from "../page.ts";
 
 interface VirtualRouteEntry {

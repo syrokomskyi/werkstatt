@@ -6,7 +6,7 @@ import {
   composeEffectPresentation,
   effectVarsToStyle,
 } from "../components/effects/registry.ts";
-import type { Effect } from "@gogol/share/schemas/effects";
+import type { Effect } from "@warpgogol/share/schemas/effects";
 
 describe("section-api-utils", () => {
   test("INTEGRATION_CALLBACK_PATH is a non-empty string", () => {

@@ -13,7 +13,7 @@
 */
 
 /**
- * @gogol/passport — Passport verification
+ * @warpgogol/passport — Passport verification
  *
  * DNA-34 / RFC-0028
  *
@@ -26,7 +26,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { PassportSchema, PassportPublicKeyFileSchema } from "./schema.ts";
 import { verifyCredential, type CredentialSubjectDigest } from "./sign.ts";
 

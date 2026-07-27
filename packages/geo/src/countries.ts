@@ -6,7 +6,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0237: add localized country lookup as the country layer of @gogol/geo.</item>
+  <item>RFC-0237: add localized country lookup as the country layer of @warpgogol/geo.</item>
   <item>Architecture review 2026-07-10: make language set configurable instead of hard-coding de/uk.</item>
 </CHANGE_SUMMARY>
 */

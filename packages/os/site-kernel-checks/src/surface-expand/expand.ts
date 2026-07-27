@@ -17,7 +17,7 @@ VirtualRouteEntry.</purpose>
 */
 
 import { join } from "node:path";
-import type { KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelRuntimeContext } from "@warpgogol/site-kernel";
 import {
   buildAxisFieldMap,
   generateEntries,
@@ -27,10 +27,10 @@ import {
   type SurfaceNarrative,
   type SurfaceRecord,
   type VirtualRouteEntry,
-} from "@gogol/surface";
-import type { PageEntry } from "@gogol/surface";
-import { toKebabCase } from "@gogol/share/string-utils";
-import { createGeoService, type GeoProviderResult } from "@gogol/geo";
+} from "@warpgogol/surface";
+import type { PageEntry } from "@warpgogol/surface";
+import { toKebabCase } from "@warpgogol/share/string-utils";
+import { createGeoService, type GeoProviderResult } from "@warpgogol/geo";
 import { loadApprovedEnrichedBulk, loadApprovedNarrativesBulk } from "../surface-enrich.ts";
 import {
   loadDemandSignals,
@@ -128,7 +128,7 @@ export async function expandBlueprint(
   // Axis-generic, per-language loading. The value universe + records (slugs, matching, freshness)
   // are language-neutral and read from the default language; per-language display content (names,
   // intros, sections, faqs) is loaded for each language for the baker (with default-lang fallback).
-  // RFC-0238: geo provider axes are resolved from @gogol/geo instead of content collections.
+  // RFC-0238: geo provider axes are resolved from @warpgogol/geo instead of content collections.
   // Architecture review 2026-07-10: single providerEntries call per axis, cached for all 3 phases.
   const geo = createGeoService();
   const skylineImages = await loadSkylineImages(ctx);
@@ -195,7 +195,7 @@ export async function expandBlueprint(
   // stem) stays the identity key; a per-language record MAY override its URL segment via a `slug`
   // frontmatter field. Records without one fall back to the neutral slug, so single-language axes
   // and untranslated records are unaffected.
-  // RFC-0238: geo provider axes use @gogol/geo's locale-aware slugByLang.
+  // RFC-0238: geo provider axes use @warpgogol/geo's locale-aware slugByLang.
   const localizedUniverse: LocalizedUniverse = {};
   for (const axis of blueprint.axes) {
     const map = new Map<string, LocalizedSlug>();

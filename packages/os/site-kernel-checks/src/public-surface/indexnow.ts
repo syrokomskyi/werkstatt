@@ -14,14 +14,14 @@ import { parse as yamlParse } from "yaml";
 
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
+import { byteHash } from "@warpgogol/fingerprint";
 import type {
   CheckResult,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { executeKernelCommand } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
 import {
   asString,
   deriveIndexNowKey,

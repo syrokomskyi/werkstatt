@@ -20,7 +20,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { isRegisteredRuleId } from "./diagnostics/rules.ts";

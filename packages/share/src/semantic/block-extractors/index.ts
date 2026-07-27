@@ -7,7 +7,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0208: registered extractors for webgogol-com block types.</item>
+  <item>RFC-0208: registered extractors for warpgogol-com block types.</item>
   <item>RFC-0372: added video-section, donation-card, credits, passport no-op extractors; people extractor now extracts heading; all extractors return heading (possibly empty) for unified SemanticBlock.</item>
 </CHANGE_SUMMARY>
 */
@@ -431,7 +431,7 @@ BLOCK_EXTRACTORS.register<Record<string, unknown>>({
 });
 
 // ---------------------------------------------------------------------------
-// people (nicaragua-projekt, webgogol-com) — extracts heading from header;
+// people (nicaragua-projekt, warpgogol-com) — extracts heading from header;
 // people content itself is sourced from business/people enrichment, not block props.
 // ---------------------------------------------------------------------------
 BLOCK_EXTRACTORS.register<Record<string, unknown>>({
@@ -443,7 +443,7 @@ BLOCK_EXTRACTORS.register<Record<string, unknown>>({
 });
 
 // ---------------------------------------------------------------------------
-// video-section (webgogol-com) — extracts heading and lead from header.
+// video-section (warpgogol-com) — extracts heading and lead from header.
 // ---------------------------------------------------------------------------
 BLOCK_EXTRACTORS.register<Record<string, unknown>>({
   blockType: "video-section",
@@ -466,7 +466,7 @@ BLOCK_EXTRACTORS.register<Record<string, unknown>>({
 });
 
 // ---------------------------------------------------------------------------
-// credits (nicaragua-projekt, webgogol-com) — extracts heading and lead.
+// credits (nicaragua-projekt, warpgogol-com) — extracts heading and lead.
 // ---------------------------------------------------------------------------
 BLOCK_EXTRACTORS.register<Record<string, unknown>>({
   blockType: "credits",

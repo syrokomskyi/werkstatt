@@ -24,7 +24,7 @@ declare module "astro:content" {
 // real schema into apps/*/src/env.schema.generated.mjs). In the package-typecheck
 // context there is no app schema, so we declare the secret names the section API
 // handlers import. Keep in sync with the Integration Port secret catalog
-// (@gogol/integration) + section `api[].secrets`. All optional — a missing
+// (@warpgogol/integration) + section `api[].secrets`. All optional — a missing
 // value degrades to the handler's error path, never a build/runtime throw.
 declare module "astro:env/server" {
   // RFC-0168 Integration Port — channels + CRM (send-message handler).

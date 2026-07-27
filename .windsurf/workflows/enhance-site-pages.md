@@ -19,7 +19,7 @@ Where `<number>` is the expert file number (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 
 1. Read `.agents/workflows/enhance-site-pages.md` for the full process, page mapping, and constraints.
 2. Read the expert file by number from:
    ```
-   /home/syrokomskyi/projects/obsidian/WGogolDocObsidian/Tech/Site/!Research/2026-07-20 Страницы сайта - Улучшения/output/enhance-site-pages/
+   /home/syrokomskyi/projects/obsidian/WarpgogolDocObsidian/Tech/Site/!Research/2026-07-20 Страницы сайта - Улучшения/output/enhance-site-pages/
    ```
 3. Follow the workflow steps: read expert file → read UK page(s) → check RFC triggers → apply changes (uk only, translate German to Ukrainian) → verify → report → commit via `mission.git.commit`.
 

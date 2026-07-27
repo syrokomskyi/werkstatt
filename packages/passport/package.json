@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/passport",
+  "name": "@warpgogol/passport",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -44,10 +44,10 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/nebula": "workspace:*",
-    "@gogol/ontology": "workspace:*",
-    "@gogol/site-kernel-content": "workspace:*",
-    "@gogol/star-map": "workspace:*",
+    "@warpgogol/nebula": "workspace:*",
+    "@warpgogol/ontology": "workspace:*",
+    "@warpgogol/site-kernel-content": "workspace:*",
+    "@warpgogol/star-map": "workspace:*",
     "@noble/ed25519": "^3.1.0",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"

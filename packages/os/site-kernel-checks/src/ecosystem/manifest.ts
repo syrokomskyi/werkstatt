@@ -18,16 +18,16 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { byteHash } from "@gogol/fingerprint";
-import { readJsonFile } from "@gogol/share/fs";
+import { byteHash } from "@warpgogol/fingerprint";
+import { readJsonFile } from "@warpgogol/share/fs";
 import {
   GENERATED_MARKER,
   listSiteWorkspaces,
   listRegisteredKernelCommands,
   loadWorkspaceConfig,
   discoverWorkspacePackages,
-} from "@gogol/site-kernel";
-import type { WorkspacePackageInfo } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import type { WorkspacePackageInfo } from "@warpgogol/site-kernel";
 import { parse, parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { GENERATOR_OWNERSHIP_MAP } from "../generator-ownership.ts";
 import { collectPackageTestSignals } from "../test-signal.ts";
@@ -188,7 +188,7 @@ async function collectSourceHashes(
     "packages/os/site-kernel-checks/src/diagnostics/rules.ts",
     "packages/os/site-kernel-checks/src/diagnostics/rules/types.ts",
     "packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts",
-    "packages/os/site-kernel-checks/src/diagnostics/rules/check-webgogol.ts",
+    "packages/os/site-kernel-checks/src/diagnostics/rules/check-warpgogol.ts",
     "packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts",
     "packages/os/site-kernel-checks/src/diagnostics/rules/ops-fleet.ts",
     "packages/os/site-kernel-checks/src/diagnostics/rules/governance.ts",

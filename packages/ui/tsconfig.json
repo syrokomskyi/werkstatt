@@ -6,12 +6,12 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@gogol/share": ["../share/src/index.ts"],
-      "@gogol/share/i18n": ["../share/src/i18n/localization.ts"],
-      "@gogol/share/*": ["../share/src/*"],
-      "@gogol/ui": ["./src/index.ts"],
-      "@gogol/ui/icons/lordicon/*": ["./src/icons/gen/lordicon/*"],
-      "@gogol/ui/*": ["./src/*"]
+      "@warpgogol/share": ["../share/src/index.ts"],
+      "@warpgogol/share/i18n": ["../share/src/i18n/localization.ts"],
+      "@warpgogol/share/*": ["../share/src/*"],
+      "@warpgogol/ui": ["./src/index.ts"],
+      "@warpgogol/ui/icons/lordicon/*": ["./src/icons/gen/lordicon/*"],
+      "@warpgogol/ui/*": ["./src/*"]
     }
   },
   "include": ["src", "../share/src/env.d.ts"],

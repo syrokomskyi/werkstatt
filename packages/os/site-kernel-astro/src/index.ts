@@ -1,6 +1,6 @@
 /***************************************************************
 <MODULE_CONTRACT>
-<purpose>Facilitates the retrieval and management of directory paths for Astro sites within the WGogol ecosystem.</purpose>
+<purpose>Facilitates the retrieval and management of directory paths for Astro sites within the Warpgogol ecosystem.</purpose>
 <non-goals>
   <item>Do not handle file content parsing or manipulation.</item>
   <item>Do not manage application lifecycle or orchestration.</item>
@@ -14,7 +14,7 @@
 ***************************************************************/
 
 import path from "node:path";
-import type { DiscoveredSiteWorkspace, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { DiscoveredSiteWorkspace, KernelRuntimeContext } from "@warpgogol/site-kernel";
 export interface AstroSitePaths {
   appDirectory: string;
   srcDirectory: string;

@@ -9,7 +9,7 @@
 </purpose>
 <non-goals>
   <item>Do not handle the autoplay (native) path — those elements have no data-trigger.</item>
-  <item>Do not resolve clips or own presentation — that is @gogol/ui.</item>
+  <item>Do not resolve clips or own presentation — that is @warpgogol/ui.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

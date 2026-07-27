@@ -1,6 +1,6 @@
 # Engineering: Image Optimization & Cloudflare Transformations
 
-> RFC-0152 (amends RFC-0149) · packages: `@gogol/share`, `@gogol/ui`, `@gogol/site-kernel-checks`
+> RFC-0152 (amends RFC-0149) · packages: `@warpgogol/share`, `@warpgogol/ui`, `@warpgogol/site-kernel-checks`
 
 This is the operator + agent runbook for how authored images are optimized, why production images can 404, and how to turn on responsive resizing safely.
 
@@ -8,7 +8,7 @@ This is the operator + agent runbook for how authored images are optimized, why 
 
 ## Architecture overview (one minute)
 
-Every authored image renders through one primitive, **`<ResponsiveImage>`** (`@gogol/ui`), which delegates URL/`srcset` construction to the active **Image Provider** (`@gogol/share`, the rendering/optimization analogue of the RFC-0141 content-source port). No component contains optimization logic, so the backend swaps by provider/config — the same primitive serves in-repo assets today and headless-CMS/DAM URLs later.
+Every authored image renders through one primitive, **`<ResponsiveImage>`** (`@warpgogol/ui`), which delegates URL/`srcset` construction to the active **Image Provider** (`@warpgogol/share`, the rendering/optimization analogue of the RFC-0141 content-source port). No component contains optimization logic, so the backend swaps by provider/config — the same primitive serves in-repo assets today and headless-CMS/DAM URLs later.
 
 - Source images stay **in-repo, webp, at maximum quality** (`image.format.validate`); the provider is responsible for downscaling per delivered width.
 - Apps run `@astrojs/cloudflare` with **`imageService: "cloudflare"`** (RFC-0152). The old `imageService: "custom"` + build-time `sharp` is forbidden: it reads originals from `dist/_astro` while the adapter emits them to `dist/client/_astro`, which fails the build in the `generating optimized images` phase (ENOENT). See RFC-0152 for the full history.
@@ -71,7 +71,7 @@ If raw is `200` and transform is `404` → Transformations are off (expected on 
 
 ## Guard: `cloudflare.assets.validate`
 
-A post-build check (`@gogol/site-kernel-checks`, in `APPS_CHECK_POSTBUILD_PIPELINE`) scans `dist/client` HTML and fails the build if any referenced `/_astro/*` asset — directly or inside a `/cdn-cgi/image/.../_astro/...` URL — is missing from the deployable directory. It catches the `dist/_astro` vs `dist/client/_astro` class of 404 before deploy. Run it standalone with `site-kernel run cloudflare.assets.validate --site <app>`.
+A post-build check (`@warpgogol/site-kernel-checks`, in `APPS_CHECK_POSTBUILD_PIPELINE`) scans `dist/client` HTML and fails the build if any referenced `/_astro/*` asset — directly or inside a `/cdn-cgi/image/.../_astro/...` URL — is missing from the deployable directory. It catches the `dist/_astro` vs `dist/client/_astro` class of 404 before deploy. Run it standalone with `site-kernel run cloudflare.assets.validate --site <app>`.
 
 Note: this validates **origin** assets exist; it cannot detect a zone-level Transformations toggle (that is the `curl` check above).
 
@@ -80,6 +80,6 @@ Note: this validates **origin** assets exist; it cannot detect a zone-level Tran
 ## For AI agents
 
 - Render authored images **only** through `<ResponsiveImage>` — never raw `<img>` (except SVG/`data:`) or Astro `<Image>`. See `packages/ui/AGENTS.md`.
-- Do **not** hand-build `srcset` / `/cdn-cgi/image` URLs and do **not** write a custom resizer (sharp cannot run in workerd — RFC-0149). Add/select an `ImageProvider` in `@gogol/share` via `setDefaultImageProvider`. See `packages/share/AGENTS.md`.
+- Do **not** hand-build `srcset` / `/cdn-cgi/image` URLs and do **not** write a custom resizer (sharp cannot run in workerd — RFC-0149). Add/select an `ImageProvider` in `@warpgogol/share` via `setDefaultImageProvider`. See `packages/share/AGENTS.md`.
 - Do **not** force transform URLs on unconditionally. The safe passthrough default exists precisely because `/cdn-cgi/image` 404s on zones without Transformations. Gate it on `PUBLIC_CF_IMAGE_TRANSFORM=on`.
 - `astro.config.mjs` is GENERATED — change `imageService` via the onboarding/codegen template, not by hand-editing per app.

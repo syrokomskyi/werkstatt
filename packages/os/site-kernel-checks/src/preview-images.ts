@@ -13,14 +13,14 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandResult, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { loadSystemManifest, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
-import { resolveNormalizeConfig, normalizeText } from "@gogol/share/text-normalize";
-import type { NormalizeConfig } from "@gogol/share/text-normalize";
+import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import { resolveNormalizeConfig, normalizeText } from "@warpgogol/share/text-normalize";
+import type { NormalizeConfig } from "@warpgogol/share/text-normalize";
 import { generateBrandCardPng } from "./preview-templates.ts";
 import YAML from "yaml";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";

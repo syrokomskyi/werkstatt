@@ -22,21 +22,21 @@ The generated file is imported by global.css and must not be hand-edited.
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { biomeSchema, systemManifestSchema } from "@gogol/ontology/schemas";
+import { biomeSchema, systemManifestSchema } from "@warpgogol/ontology/schemas";
 import {
   BIOME_TO_TOKEN_MAP,
   BIOME_TOKEN_ALIASES,
   BIOME_TOKEN_DERIVED,
   getBiomeField,
-} from "@gogol/ontology";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/ontology";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { GENERATED_MARKER } from "./generated-marker.ts";
-import { normalizeCssValue } from "@gogol/share/css-value-normalize";
+import { normalizeCssValue } from "@warpgogol/share/css-value-normalize";
 
 // Re-export for backward compatibility within codegen internals
 export { normalizeCssValue };
@@ -66,7 +66,7 @@ function formatCssValue(cssVar: string, value: string): string {
   return `${prefix}\n${parts.map((p) => `      ${p}`).join(",\n")}\n    )`;
 }
 
-// BIOME_TO_TOKEN_MAP is imported from @gogol/ontology (consolidated projection).
+// BIOME_TO_TOKEN_MAP is imported from @warpgogol/ontology (consolidated projection).
 
 // ---------------------------------------------------------------------------
 // biome.css.generate
@@ -180,7 +180,7 @@ export async function runBiomeCssGenerate(
   let tokensGenerated = 0;
 
   // Use the consolidated projection: iterate primary mapping, then aliases,
-  // then derived entries — all from @gogol/ontology.
+  // then derived entries — all from @warpgogol/ontology.
   const biomeRecord = biome as unknown as Record<string, unknown>;
 
   for (const [field, cssVar] of Object.entries(BIOME_TO_TOKEN_MAP)) {

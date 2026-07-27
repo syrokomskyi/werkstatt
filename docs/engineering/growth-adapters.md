@@ -9,7 +9,7 @@ Growth adapters are the vendor integration layer of the growth system. Every ana
 ## The GrowthAdapter interface (DNA-30)
 
 ```typescript
-import type { GrowthAdapter, GrowthAdapterConfig, EmittedEvent, EventName } from "@gogol/growth/adapter";
+import type { GrowthAdapter, GrowthAdapterConfig, EmittedEvent, EventName } from "@warpgogol/growth/adapter";
 
 const MyAdapter: GrowthAdapter = {
   id: "my-vendor",                           // kebab-case, unique
@@ -52,10 +52,10 @@ export default MyAdapter;
 
 ## Testing with createEmitQueue()
 
-The `createEmitQueue()` factory from `@gogol/growth/emit` creates an isolated emit queue with closure-based state — no module-level singletons, no cross-test pollution:
+The `createEmitQueue()` factory from `@warpgogol/growth/emit` creates an isolated emit queue with closure-based state — no module-level singletons, no cross-test pollution:
 
 ```typescript
-import { createEmitQueue } from "@gogol/growth/emit";
+import { createEmitQueue } from "@warpgogol/growth/emit";
 
 const queue = createEmitQueue();
 queue.emit("page-view", { path: "/" });
@@ -67,9 +67,9 @@ expect(queue.getQueueLength()).toBe(0); // flushed
 
 ---
 
-## `window.__webgogol_emit__` bridge
+## `window.__warpgogol_emit__` bridge
 
-At module initialization, `emit.ts` assigns `window.__webgogol_emit__` so shared UI components (e.g. Astro inline scripts with `define:vars`) can fire events without importing `@gogol/growth/emit` directly. Events fired through the bridge before `bootGrowthLayer()` completes are queued and flushed on boot.
+At module initialization, `emit.ts` assigns `window.__warpgogol_emit__` so shared UI components (e.g. Astro inline scripts with `define:vars`) can fire events without importing `@warpgogol/growth/emit` directly. Events fired through the bridge before `bootGrowthLayer()` completes are queued and flushed on boot.
 
 ---
 
@@ -77,8 +77,8 @@ At module initialization, `emit.ts` assigns `window.__webgogol_emit__` so shared
 
 | Adapter id | Package | Purpose |
 | --- | --- | --- |
-| `null` | `@gogol/growth` (built-in `src/null-adapter.ts`) | No-op. Logs to `console.debug`. Use in dev/staging. |
-| `matomo` | `@gogol/growth-adapter-matomo` | Matomo Analytics over first-party proxy (RFC-0305). |
+| `null` | `@warpgogol/growth` (built-in `src/null-adapter.ts`) | No-op. Logs to `console.debug`. Use in dev/staging. |
+| `matomo` | `@warpgogol/growth-adapter-matomo` | Matomo Analytics over first-party proxy (RFC-0305). |
 
 ---
 
@@ -86,7 +86,7 @@ At module initialization, `emit.ts` assigns `window.__webgogol_emit__` so shared
 
 1. Create `packages/growth-adapter-<id>/` with `package.json`, `src/index.ts`.
 2. Implement the `GrowthAdapter` interface and `export default`.
-3. Add `@gogol/growth` as a dependency.
+3. Add `@warpgogol/growth` as a dependency.
 4. Add the adapter id to `KNOWN_ADAPTER_IDS` in `packages/growth/src/adapter.ts` and add a loader entry in `packages/growth/src/provider.astro`:
    ```typescript
    // adapter.ts
@@ -96,7 +96,7 @@ At module initialization, `emit.ts` assigns `window.__webgogol_emit__` so shared
    // provider.astro (inside the <script> block)
    const _adapterSpecifiers = {
      // ...existing...
-     "my-vendor": "@gogol/growth-adapter-my-vendor",
+     "my-vendor": "@warpgogol/growth-adapter-my-vendor",
    };
    const growthLoaders = {
      // ...existing...

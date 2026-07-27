@@ -18,7 +18,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 import { loadSurfaceModuleContexts } from "./pseo/pseo-module-context.ts";
 
@@ -47,7 +47,7 @@ export async function runEntitlementModuleValidate(
   // Read declared blueprints from system.md to infer which modules are compiled
   let declaredBlueprints: string[] = [];
   try {
-    const { loadSystemManifest } = await import("@gogol/site-kernel-content");
+    const { loadSystemManifest } = await import("@warpgogol/site-kernel-content");
     const { manifest } = await loadSystemManifest(join(app.directory, "src", "content"));
     const surface = (manifest as unknown as { surface?: { blueprints?: unknown } }).surface;
     declaredBlueprints = Array.isArray(surface?.blueprints) ? surface.blueprints.map(String) : [];

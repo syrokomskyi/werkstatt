@@ -15,18 +15,18 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     environment:
-      WGOGOL_OTLP_TOKEN: ${WGOGOL_OTLP_TOKEN}
+      WARPGOGOL_OTLP_TOKEN: ${WARPGOGOL_OTLP_TOKEN}
     networks:
       - signoz
 
   # RFC-0341: fleet-probe-runner — scheduled synthetic probes of all fleet sites.
   fleet-probe-runner:
-    image: ghcr.io/webgogol/fleet-probe-runner:latest
+    image: ghcr.io/warpgogol/fleet-probe-runner:latest
     restart: unless-stopped
     volumes:
       - ../fleet-probe-runner/targets.generated.json:/app/targets.generated.json:ro
     environment:
-      WGOGOL_OTLP_ENDPOINT: http://otel-collector:4318
+      WARPGOGOL_OTLP_ENDPOINT: http://otel-collector:4318
       # No token needed on the compose network — Caddy guards the public edge.
       PROBE_INTERVAL_MS: "300000"
     networks:
@@ -34,13 +34,13 @@ services:
 
   # RFC-0343: cf-analytics-poller — polls Cloudflare GraphQL analytics into delivery metrics.
   cf-analytics-poller:
-    image: ghcr.io/webgogol/cf-analytics-poller:latest
+    image: ghcr.io/warpgogol/cf-analytics-poller:latest
     restart: unless-stopped
     volumes:
       - ../cf-analytics-poller/zones.yaml:/app/zones.yaml:ro
       - cf_analytics_data:/data
     environment:
-      WGOGOL_OTLP_ENDPOINT: http://otel-collector:4318
+      WARPGOGOL_OTLP_ENDPOINT: http://otel-collector:4318
       CF_ANALYTICS_API_TOKEN: ${CF_ANALYTICS_API_TOKEN}
     networks:
       - signoz

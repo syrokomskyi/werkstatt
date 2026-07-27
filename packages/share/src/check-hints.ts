@@ -1,18 +1,18 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Webgogol check hints schema and parser: defines the hint configuration shape for check-webgogol runs.</purpose>
+<purpose>Warpgogol check hints schema and parser: defines the hint configuration shape for check-warpgogol runs.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Initial implementation for check-webgogol hints support.</item>
+  <item>Initial implementation for check-warpgogol hints support.</item>
 </CHANGE_SUMMARY>
 */
 
 import { z } from "zod";
 
-export const webgogolCheckHintsSchema = z.object({
+export const warpgogolCheckHintsSchema = z.object({
   schemaVersion: z.literal(1),
   siteId: z.string().min(1),
   generatedAt: z.string().datetime(),
@@ -32,8 +32,8 @@ export const webgogolCheckHintsSchema = z.object({
   audienceProfiles: z.array(z.string().min(1)),
 });
 
-export type WebgogolCheckHints = z.infer<typeof webgogolCheckHintsSchema>;
+export type WarpgogolCheckHints = z.infer<typeof warpgogolCheckHintsSchema>;
 
-export function parseWebgogolCheckHints(value: unknown): WebgogolCheckHints {
-  return webgogolCheckHintsSchema.parse(value);
+export function parseWarpgogolCheckHints(value: unknown): WarpgogolCheckHints {
+  return warpgogolCheckHintsSchema.parse(value);
 }

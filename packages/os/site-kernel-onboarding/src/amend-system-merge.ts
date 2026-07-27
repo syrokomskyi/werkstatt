@@ -19,17 +19,17 @@ identity, and markdown body.</purpose>
 
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { systemManifestSchema } from "@gogol/ontology";
+import { systemManifestSchema } from "@warpgogol/ontology";
 import {
   loadSystemManifest,
   parseMarkdownFrontmatter,
   stringifyMarkdownFrontmatter,
-} from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readAmendInputManifest, readFlag } from "./amend.ts";
 
 interface Finding {

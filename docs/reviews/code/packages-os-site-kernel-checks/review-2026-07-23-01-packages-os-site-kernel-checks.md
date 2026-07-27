@@ -25,7 +25,7 @@ The implementation is structurally sound, well-typed, and follows existing patte
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @gogol/site-kernel-checks exec tsc --noEmit` exits 0. All 370 tests pass including 4 new tests.
+Pass — `pnpm --filter @warpgogol/site-kernel-checks exec tsc --noEmit` exits 0. All 370 tests pass including 4 new tests.
 
 ### Axis A — Structural correctness
 
@@ -76,5 +76,5 @@ No issues. Performance: 713ms for ~600 YAML files — documented in RFC. Edge ca
 
 ### Questions for the author
 
-1. The `EXCLUDE_DIRS` set is largely duplicated from `yaml-contract-lint.ts`. If the exclude policy changes (e.g., a new build artifact directory is added), both files need updating. Should a shared `BASE_EXCLUDE_DIRS` be extracted to `@gogol/share/fs` or a local constants module?
+1. The `EXCLUDE_DIRS` set is largely duplicated from `yaml-contract-lint.ts`. If the exclude policy changes (e.g., a new build artifact directory is added), both files need updating. Should a shared `BASE_EXCLUDE_DIRS` be extracted to `@warpgogol/share/fs` or a local constants module?
 2. The `offsetToLine` function is O(n) per duplicate key. If a large YAML file (e.g., a generated registry) has many duplicates, this could be slow. Should a pre-computed line-offset array be used instead?

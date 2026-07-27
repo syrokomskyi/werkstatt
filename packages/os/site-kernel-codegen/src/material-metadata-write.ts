@@ -27,28 +27,28 @@ import { promisify } from "node:util";
 import { join, extname } from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse as parseYaml } from "yaml";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { materialCreditSchema } from "@gogol/share/schemas/material-credit";
-import type { MaterialCredit } from "@gogol/share/schemas/material-credit";
-import type { VideoManifest, LiveVideoManifest } from "@gogol/share/schemas/media";
-import type { ImageVariantManifest } from "@gogol/share/image-provider";
-import type { SemanticSiteModel } from "@gogol/share/semantic";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { materialCreditSchema } from "@warpgogol/share/schemas/material-credit";
+import type { MaterialCredit } from "@warpgogol/share/schemas/material-credit";
+import type { VideoManifest, LiveVideoManifest } from "@warpgogol/share/schemas/media";
+import type { ImageVariantManifest } from "@warpgogol/share/image-provider";
+import type { SemanticSiteModel } from "@warpgogol/share/semantic";
 import {
   loadContentRefIndex,
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
-} from "@gogol/share/content-reference";
-import { loadSystemManifest, loadSemanticSiteModel } from "@gogol/site-kernel-content";
+} from "@warpgogol/share/content-reference";
+import { loadSystemManifest, loadSemanticSiteModel } from "@warpgogol/site-kernel-content";
 
 const exec = promisify(execCallback);
 
-const ENCODER_SETTINGS_VERSION = "WGogol/1.0";
+const ENCODER_SETTINGS_VERSION = "Warpgogol/1.0";
 
 const SKIP_EXTENSIONS = new Set([".ts", ".m3u8", ".vtt", ".webm"]);
 

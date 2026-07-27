@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/integration-adapter-stripe",
+  "name": "@warpgogol/integration-adapter-stripe",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -29,8 +29,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/integration": "workspace:*",
-    "@gogol/share": "workspace:*",
+    "@warpgogol/integration": "workspace:*",
+    "@warpgogol/share": "workspace:*",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { diagnosticsResult } from "@gogol/site-kernel-checks";
+} from "@warpgogol/site-kernel";
+import { diagnosticsResult } from "@warpgogol/site-kernel-checks";
 
 interface ZoneEntry {
   siteId: string;
@@ -120,7 +120,7 @@ export async function runObservabilityDeliveryValidate(
   for (const file of pollerFiles) {
     const normalized = file.replace(/\\/g, "/");
     const text = await context.io.readFile(join(root, normalized));
-    if (text.includes('from "@gogol/') && text.includes("apps/")) {
+    if (text.includes('from "@warpgogol/') && text.includes("apps/")) {
       diagnostics.push({
         ruleId: "OBS-DLV-03",
         severity: "error",

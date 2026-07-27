@@ -1,6 +1,6 @@
-# @gogol/site-kernel-integrity
+# @warpgogol/site-kernel-integrity
 
-File hash tracking, entity registry, build provenance recording, and Ed25519 signing for the WGogol Site OS.
+File hash tracking, entity registry, build provenance recording, and Ed25519 signing for the Warpgogol Site OS.
 
 ## Purpose
 
@@ -22,7 +22,7 @@ Tracks every source file in an app's `.integrity/` manifest so renames, moves, a
 Commands are registered via `STANDARD_INTEGRITY_PIPELINE` — add it to `kernel.config.ts`:
 
 ```typescript
-import { STANDARD_INTEGRITY_PIPELINE } from "@gogol/site-kernel-integrity";
+import { STANDARD_INTEGRITY_PIPELINE } from "@warpgogol/site-kernel-integrity";
 ```
 
 ## Key API
@@ -33,7 +33,7 @@ import {
   generateSigningKeyPairPem,
   signLatestBuildArtifacts,
   verifyManifestSignature,
-} from "@gogol/site-kernel-integrity";
+} from "@warpgogol/site-kernel-integrity";
 ```
 
 ## Environment variables for signing
@@ -52,5 +52,5 @@ import {
 ## Validation
 
 ```sh
-pnpm --filter @gogol/site-kernel-integrity build:check
+pnpm --filter @warpgogol/site-kernel-integrity build:check
 ```

@@ -167,7 +167,7 @@ describe("validateLegalIdentityLegalName (RFC-0531)", () => {
   });
 
   it("returns null when legalName is present", () => {
-    const result = validateLegalIdentityLegalName("WGogol GmbH", LEGAL_IDENTITY_FILE);
+    const result = validateLegalIdentityLegalName("Warpgogol GmbH", LEGAL_IDENTITY_FILE);
     expect(result).toBeNull();
   });
 });

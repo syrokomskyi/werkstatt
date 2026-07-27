@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/cf-analytics-poller",
+  "name": "@warpgogol/cf-analytics-poller",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "run:once": "tsx src/run-once.ts"
   },
   "dependencies": {
-    "@gogol/observability": "workspace:*",
+    "@warpgogol/observability": "workspace:*",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

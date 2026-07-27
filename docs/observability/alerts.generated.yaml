@@ -9,7 +9,7 @@ rules:
   - id: factory-build-check-failed
     name: Factory build.check failed
     severity: warning
-    promql: increase(wgogol_factory_command_runs_total{command="build.check",status=~"fail|error"}[6h])
+    promql: increase(warpgogol_factory_command_runs_total{command="build.check",status=~"fail|error"}[6h])
       > 0
     evalWindow: 6h
     forDuration: 0m
@@ -23,7 +23,7 @@ rules:
   - id: fleet-cert-expiry-crit
     name: TLS certificate expiring critical (7 days)
     severity: critical
-    promql: min by (site_id) (wgogol_probe_cert_expiry_days) < 7
+    promql: min by (site_id) (warpgogol_probe_cert_expiry_days) < 7
     evalWindow: 1h
     forDuration: 1h
     condition:
@@ -37,7 +37,7 @@ rules:
   - id: fleet-cert-expiry-warn
     name: TLS certificate expiring soon (14 days)
     severity: warning
-    promql: min by (site_id) (wgogol_probe_cert_expiry_days) < 14
+    promql: min by (site_id) (warpgogol_probe_cert_expiry_days) < 14
     evalWindow: 1h
     forDuration: 1h
     condition:
@@ -50,7 +50,7 @@ rules:
   - id: fleet-site-down
     name: Fleet site down
     severity: critical
-    promql: min by (site_id) (wgogol_probe_up{route="/"}) == 0
+    promql: min by (site_id) (warpgogol_probe_up{route="/"}) == 0
     evalWindow: 5m
     forDuration: 10m
     condition:
@@ -87,9 +87,9 @@ channels:
   - id: email-studio
     kind: email
     target:
-      - founder@webgogol.com
+      - founder@warpgogol.com
   - id: telegram-studio
     kind: webhook
     target:
-      - WGOGOL_TG_BRIDGE_URL
+      - WARPGOGOL_TG_BRIDGE_URL
 

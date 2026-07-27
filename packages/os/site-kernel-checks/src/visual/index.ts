@@ -26,8 +26,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { diagnosticsResult } from "../result-helpers.ts";
 import { listVisualRules } from "../diagnostics/rules.ts";
 import { loadVisualPages } from "./page-context.ts";

@@ -1,12 +1,12 @@
 kind: analytics-matomo-binding
-id: wgogol-matomo-binding
+id: warpgogol-matomo-binding
 version: 1.0.0
 rfc: RFC-0305
 messkanonVersion: 1.0.0
 
 meta:
-  title: WGogol Matomo Binding
-  description: Replaceable mapping from WGogol Messkanon v1 to Matomo Cloud/On-Premise entities.
+  title: Warpgogol Matomo Binding
+  description: Replaceable mapping from Warpgogol Messkanon v1 to Matomo Cloud/On-Premise entities.
   status: active
   changelog:
     - version: 1.0.0

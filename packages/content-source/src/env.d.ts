@@ -1,7 +1,7 @@
 /***********************************************
 <MODULE_CONTRACT>
 <purpose>Ambient module declarations so this package's standalone `tsc --noEmit` can
-resolve the Astro virtual `astro:content` module. Mirrors @gogol/share/src/env.d.ts.
+resolve the Astro virtual `astro:content` module. Mirrors @warpgogol/share/src/env.d.ts.
 At app build time Astro replaces these loose declarations with the real generated types.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>

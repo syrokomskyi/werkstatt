@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@gogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 
 export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   // Wave 0 (RFC-0023): Uni UI Ontology manifest contract + registry freshness
@@ -306,7 +306,7 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "analytics.messkanon.validate" },
   { command: "analytics.binding.validate" },
   { command: "infra.brief.validate" },
-  // RFC-0032: Shared utility usage in apps must come from @gogol/share
+  // RFC-0032: Shared utility usage in apps must come from @warpgogol/share
   { command: "share.utility.lint" },
   // Styling
   { command: "tokens.ds.lint" },

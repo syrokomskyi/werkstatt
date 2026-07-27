@@ -83,26 +83,26 @@ export function createSignozApiClient(config: SignozApiClientConfig): SignozApiC
     async listManagedRules(): Promise<SignozAlertRule[]> {
       const data = (await apiCall("/alerts/rules")) as { data?: SignozAlertRule[] };
       const rules = data?.data ?? [];
-      return rules.filter((r) => r.labels?.managed_by === "wgogol");
+      return rules.filter((r) => r.labels?.managed_by === "warpgogol");
     },
 
     async listManagedChannels(): Promise<SignozChannel[]> {
       const data = (await apiCall("/alerts/channels")) as { data?: SignozChannel[] };
       const channels = data?.data ?? [];
-      return channels.filter((c) => c.id.startsWith("wgogol-"));
+      return channels.filter((c) => c.id.startsWith("warpgogol-"));
     },
 
     async createRule(rule: SignozAlertRule): Promise<void> {
       await apiCall("/alerts/rules", {
         method: "POST",
-        body: JSON.stringify({ ...rule, labels: { ...rule.labels, managed_by: "wgogol" } }),
+        body: JSON.stringify({ ...rule, labels: { ...rule.labels, managed_by: "warpgogol" } }),
       });
     },
 
     async updateRule(rule: SignozAlertRule): Promise<void> {
       await apiCall(`/alerts/rules/${rule.id}`, {
         method: "PUT",
-        body: JSON.stringify({ ...rule, labels: { ...rule.labels, managed_by: "wgogol" } }),
+        body: JSON.stringify({ ...rule, labels: { ...rule.labels, managed_by: "warpgogol" } }),
       });
     },
 
@@ -113,19 +113,19 @@ export function createSignozApiClient(config: SignozApiClientConfig): SignozApiC
     async createChannel(channel: SignozChannel): Promise<void> {
       await apiCall("/alerts/channels", {
         method: "POST",
-        body: JSON.stringify({ ...channel, id: `wgogol-${channel.id}` }),
+        body: JSON.stringify({ ...channel, id: `warpgogol-${channel.id}` }),
       });
     },
 
     async updateChannel(channel: SignozChannel): Promise<void> {
-      await apiCall(`/alerts/channels/wgogol-${channel.id}`, {
+      await apiCall(`/alerts/channels/warpgogol-${channel.id}`, {
         method: "PUT",
         body: JSON.stringify(channel),
       });
     },
 
     async deleteChannel(id: string): Promise<void> {
-      await apiCall(`/alerts/channels/wgogol-${id}`, { method: "DELETE" });
+      await apiCall(`/alerts/channels/warpgogol-${id}`, { method: "DELETE" });
     },
   };
 }

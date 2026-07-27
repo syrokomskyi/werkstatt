@@ -18,8 +18,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { walkFiles } from "./shared.ts";
 
 // @ai-invariant RFC-0020: The suffix rules and forbidden token sets below are the canonical

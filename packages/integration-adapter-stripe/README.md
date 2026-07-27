@@ -1,4 +1,4 @@
-# @gogol/integration-adapter-stripe
+# @warpgogol/integration-adapter-stripe
 
 RFC-0191 Stripe webhook adapter — a first-party **source** with a deep verify-and-map wrapper. Stripe is the billing authority; Lagebild is the mirror. **No Stripe SDK** (raw `fetch` + `node:crypto`), **no Make.com**.
 
@@ -6,7 +6,7 @@ RFC-0191 Stripe webhook adapter — a first-party **source** with a deep verify-
 
 One responsibility, vendor-isolated to this package:
 
-1. **Source** — verify an incoming Stripe webhook, validate its shape at runtime, map it to a normalized `IntegrationEvent` (`source: "stripe"`), and resolve subscription metadata when needed. Consumed by the `/api/stripe-webhook` route in `@gogol/ui`.
+1. **Source** — verify an incoming Stripe webhook, validate its shape at runtime, map it to a normalized `IntegrationEvent` (`source: "stripe"`), and resolve subscription metadata when needed. Consumed by the `/api/stripe-webhook` route in `@warpgogol/ui`.
 
 ## Public surface
 
@@ -23,13 +23,13 @@ Both are injected by the route/worker — this package **never** imports `astro:
 
 | Package | Role |
 | --- | --- |
-| `@gogol/share/integration` | `IntegrationEvent`, lifecycle/invoice/subscription payload types, the funnel state machine |
-| `@gogol/ui` (`integration-routes/stripe-webhook.api.ts`) | The `/api/stripe-webhook` route that calls `verifyAndMapStripeEvent` |
+| `@warpgogol/share/integration` | `IntegrationEvent`, lifecycle/invoice/subscription payload types, the funnel state machine |
+| `@warpgogol/ui` (`integration-routes/stripe-webhook.api.ts`) | The `/api/stripe-webhook` route that calls `verifyAndMapStripeEvent` |
 | `docs/specs/visitor-funnel/02-stripe.md` | Operator/integrator spec for the Stripe wiring |
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/integration-adapter-stripe build:check
-pnpm --filter @gogol/integration-adapter-stripe test
+pnpm --filter @warpgogol/integration-adapter-stripe build:check
+pnpm --filter @warpgogol/integration-adapter-stripe test
 ```

@@ -12,7 +12,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { KernelPipelineStep } from "@gogol/site-kernel";
+import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 
 export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   // RFC-0376: enforce YAML-only contract before any generators run

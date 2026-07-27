@@ -1,6 +1,6 @@
 # Architecture DNA — Cross-Site Invariants
 
-> **Scope.** This document defines the non-negotiable architectural invariants that every Sternsystem in the WGogol fleet must satisfy. Invariants are extracted from per-site documentation and rewritten here as cross-site OS requirements. Each site's own AGENTS.md may add site-specific extensions but may not weaken these invariants. The `apps/*` directory is retired (RFC-0381); deployable sites are Sternsystems registered in `systems/registry.yaml`.
+> **Scope.** This document defines the non-negotiable architectural invariants that every Sternsystem in the Warpgogol fleet must satisfy. Invariants are extracted from per-site documentation and rewritten here as cross-site OS requirements. Each site's own AGENTS.md may add site-specific extensions but may not weaken these invariants. The `apps/*` directory is retired (RFC-0381); deployable sites are Sternsystems registered in `systems/registry.yaml`.
 >
 > **Phase 2 note.** Items marked _enforceable later_ are candidates for new kernel validation commands. Items marked _enforceable now_ are already checked by existing OS commands.
 >
@@ -269,7 +269,7 @@ Key prohibitions:
 
 ## Invariant 19 — Typed event catalog (DNA-27)
 
-All client-side event tracking uses the closed `EventName` union from `@gogol/growth/adapter`. Application code calls `emit(name, payload)` from `@gogol/growth/emit` — it never imports adapter modules directly or constructs raw analytics calls.
+All client-side event tracking uses the closed `EventName` union from `@warpgogol/growth/adapter`. Application code calls `emit(name, payload)` from `@warpgogol/growth/emit` — it never imports adapter modules directly or constructs raw analytics calls.
 
 Rules:
 
@@ -322,7 +322,7 @@ Rules:
 
 ## Invariant 22 — Vendor-agnostic GrowthAdapter (DNA-30)
 
-Analytics vendors are isolated behind the `GrowthAdapter` interface from `@gogol/growth/adapter`. Application code only calls `emit()` — it never imports vendor SDKs directly.
+Analytics vendors are isolated behind the `GrowthAdapter` interface from `@warpgogol/growth/adapter`. Application code only calls `emit()` — it never imports vendor SDKs directly.
 
 Rules:
 

@@ -1,6 +1,6 @@
 # `icons.generate`
 
-Regenerates Astro icon components for `@gogol/ui` from the canonical LordIcon JSON assets.
+Regenerates Astro icon components for `@warpgogol/ui` from the canonical LordIcon JSON assets.
 
 ## Command
 
@@ -49,7 +49,7 @@ Do not register this shared command separately in app-local `tools/kernel.config
 
 ```astro
 ---
-import { arrowUpIcon as ArrowUpIcon } from "@gogol/ui/icons/lordicon/doodle-outline";
+import { arrowUpIcon as ArrowUpIcon } from "@warpgogol/ui/icons/lordicon/doodle-outline";
 ---
 
 <ArrowUpIcon size={24} color="primary" trigger="hover" />

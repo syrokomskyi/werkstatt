@@ -1,10 +1,10 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-TypeScript companion to @gogol/tokens — exports TOKEN_NAMES (a readonly const
+TypeScript companion to @warpgogol/tokens — exports TOKEN_NAMES (a readonly const
 tuple of every --ds-* custom property defined in tokens.css) and a DesignToken
 type alias for safe usage in validators, style tooling, and tests.
-DEFAULT values are those of the WGogol studio site (apps-todo/main).
+DEFAULT values are those of the Warpgogol studio site (apps-todo/main).
 </purpose>
 <non-goals>
   <item>Do not import or bundle the CSS file — this module is TS-only.</item>

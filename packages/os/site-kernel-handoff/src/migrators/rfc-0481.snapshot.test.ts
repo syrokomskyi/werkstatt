@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0481: snapshot test for the rfc-0481 content migrator — verifies
 the business singleton transformation produces deterministic output on real
-webgogol-com business/de/company.md data.</purpose>
+warpgogol-com business/de/company.md data.</purpose>
 <keywords>RFC-0481, migrator, snapshot, test</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -18,20 +18,20 @@ import { rfc0481Migrator } from "./rfc-0481.ts";
 import type { SternsystemData, MigrationContext } from "./types.ts";
 
 const ctx: MigrationContext = {
-  systemId: "webgogol-com",
+  systemId: "warpgogol-com",
   missionId: "test-mission",
   logger: { info: () => {} },
 };
 
 const REAL_COMPANY_MD = `---
-id: Webgogol
+id: Warpgogol
 mode: bodenstation
 businessType: founder-led-engineering-studio
 industry: web-engineering-for-handwerk-and-small-business
 market: b2b
 jurisdiction: Germany
 brand:
-  name: "Webgogol"
+  name: "Warpgogol"
   author: Andrii Syrokomskyi
 tagline: "Digitales Fundament — tragfähige digitale Basis für kleines Gewerbe und Handwerk"
 foundingYear: "2026"
@@ -40,7 +40,7 @@ areaServed:
   - Backnang
   - Deutschland
 description: >-
-  Webgogol baut Digitales Fundament: tragfähige digitale Basis für kleines Gewerbe
+  Warpgogol baut Digitales Fundament: tragfähige digitale Basis für kleines Gewerbe
   und Handwerk in Deutschland. Offener Preis, schriftliche Bedingungen, Notausgang
   und persönliche Verantwortung des Gründers.
 mission: >-
@@ -96,7 +96,7 @@ test("snapshot: rfc-0481 creates business-profile/de/business.md from real compa
     expect(content).toContain("schema: pbp/business@1");
     expect(content).toContain("type: business");
     expect(content).toContain("status: published");
-    expect(content).toContain("name: Webgogol");
+    expect(content).toContain("name: Warpgogol");
     expect(content).toContain("yearEstablished: 2026");
     expect(content).toContain("brandRefs:");
     expect(content).toContain("legalIdentityRef:");

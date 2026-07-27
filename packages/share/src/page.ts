@@ -13,10 +13,10 @@ pipeline for each block defined in a page's content.
 <CHANGE_SUMMARY>
   <item>Wave 1 (RFC-0026): Initial creation — ResolvedPage/ResolvedBlock types and buildPage pipeline.</item>
   <item>Moved SectionProps into shared package for cross-app consumption.</item>
-  <item>RFC-0091: PLANET_IMPORT_PATHS and BLOCK_TYPE_TO_COSMIC_NAME now derived from registry; import from @gogol/ontology/archetypes instead of literal constants.</item>
+  <item>RFC-0091: PLANET_IMPORT_PATHS and BLOCK_TYPE_TO_COSMIC_NAME now derived from registry; import from @warpgogol/ontology/archetypes instead of literal constants.</item>
   <item>RFC-0262: add the optional BuildPageOptions.validateProps dev-time fail-fast hook, called once per resolved shell and content block.</item>
   <item>RFC-0263: hideSectionNumber injection now keyed off registry-derived roleByCosmicName[planetName] === "hero" instead of the hardcoded UNNUMBERED_HERO_PLANETS literal set (deleted).</item>
-  <item>RFC-0264: relocated SectionProps/SectionPageOverride here from the @gogol/share root barrel (its natural domain owner); consumers now import from @gogol/share/page.</item>
+  <item>RFC-0264: relocated SectionProps/SectionPageOverride here from the @warpgogol/share root barrel (its natural domain owner); consumers now import from @warpgogol/share/page.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,10 +27,10 @@ import {
   blockTypeToCosmicName as registryBlockTypeToCosmicName,
   moonImportPaths as registryMoonImportPaths,
   roleByCosmicName as registryRoleByCosmicName,
-} from "@gogol/ontology/archetypes";
+} from "@warpgogol/ontology/archetypes";
 
 // @ai-invariant: PageEntry and BlockEntry shapes MUST stay structurally
-// compatible with @gogol/ontology/schemas PageEntrySchema / BlockEntrySchema.
+// compatible with @warpgogol/ontology/schemas PageEntrySchema / BlockEntrySchema.
 // Any field change here requires a matching change there and in every
 // system.md pages[] block that references the changed field.
 
@@ -82,7 +82,7 @@ export interface ResolvedBlock {
   /**
    * Stable import path into packages/ui for the component.
    * Used by the page route to dynamically load the component:
-   *   const sections = import.meta.glob("@gogol/ui/sections/*")
+   *   const sections = import.meta.glob("@warpgogol/ui/sections/*")
    *   const Component = sections[block.componentImportPath]
    */
   readonly componentImportPath: string;
@@ -111,7 +111,7 @@ export interface ResolvedPage {
 }
 
 // RFC-0035: Universal Section Props Contract — every resolved content block's
-// props extend this shape. RFC-0264: relocated from the @gogol/share root
+// props extend this shape. RFC-0264: relocated from the @warpgogol/share root
 // barrel to page.ts (its natural domain owner); re-exported from the `./page`
 // subpath.
 export interface SectionProps {
@@ -142,7 +142,7 @@ export type SectionPageOverride<T extends Record<string, any>> = SectionProps & 
 // Three-way alignment: manifest.yaml cosmicName ↔ import-paths map ↔ system.md pin.
 
 // Default PlanetName → import path table
-// Derived from the archetype registry via @gogol/ontology/archetypes
+// Derived from the archetype registry via @warpgogol/ontology/archetypes
 // (RFC-0091). The archetype.registry.build command regenerates
 // packages/ontology/archetypes/index.yaml from manifests.
 // ---------------------------------------------------------------------------

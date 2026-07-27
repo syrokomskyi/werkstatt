@@ -29,15 +29,15 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { resultFromViolations } from "./result-helpers.ts";
-import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { PageEntrySchema, getSectionPropsSchema } from "@gogol/ontology";
-import { systemManifestSchema } from "@gogol/ontology";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { normalizeBlockType } from "@gogol/share/page";
-import { resolveSharedContextProps } from "@gogol/share/shared-context";
+import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { PageEntrySchema, getSectionPropsSchema } from "@warpgogol/ontology";
+import { systemManifestSchema } from "@warpgogol/ontology";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { normalizeBlockType } from "@warpgogol/share/page";
+import { resolveSharedContextProps } from "@warpgogol/share/shared-context";
 import { readScopeFiles, outOfScope } from "./scope.ts";
 
 /**
@@ -206,7 +206,7 @@ export async function runPageBlockValidate(
       string,
       {
         rel: string;
-        entry: import("@gogol/ontology").PageEntry;
+        entry: import("@warpgogol/ontology").PageEntry;
       }
     >();
 

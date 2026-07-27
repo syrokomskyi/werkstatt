@@ -15,8 +15,8 @@ back-compatible generic path. The CrmBufferClient is faked; no network.</purpose
 */
 
 import { test, expect } from "vitest";
-import type { IntegrationEvent } from "@gogol/integration/port";
-import type { CrmBufferWriter } from "@gogol/integration/crm-buffer";
+import type { IntegrationEvent } from "@warpgogol/integration/port";
+import type { CrmBufferWriter } from "@warpgogol/integration/crm-buffer";
 import { persistEventToBuffer } from "../adapter.ts";
 
 function makeFakeClient() {

@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/lagebild-sync-worker",
+  "name": "@warpgogol/lagebild-sync-worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,8 +10,8 @@
     "deploy": "site-kernel run deploy.preflight --service lagebild-sync-worker && wrangler deploy --secrets-file .env"
   },
   "dependencies": {
-    "@gogol/integration-adapter-supabase-crm": "workspace:*",
-    "@gogol/share": "workspace:*"
+    "@warpgogol/integration-adapter-supabase-crm": "workspace:*",
+    "@warpgogol/share": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260721.1",

@@ -15,18 +15,18 @@ print.layout.validate checks shared UI CSS for print-blocking patterns.
 </CHANGE_SUMMARY>
 */
 
-import type { KernelCommandResult, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
-import { loadSystemManifest, parseMarkdownFrontmatter } from "@gogol/site-kernel-content";
-import { pageIdToContentFileSlug } from "@gogol/share/content";
+import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import {
   PRINT_ORIENTATIONS,
   PRINT_PAGE_SIZES,
   PRINT_MARGINS,
   PRINT_BACKGROUND_MODES,
   PRINT_REGIONS,
-} from "@gogol/share/schemas/print";
+} from "@warpgogol/share/schemas/print";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
 interface PrintViolation {

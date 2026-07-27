@@ -19,11 +19,11 @@ contentTypesPath: ./chat-widget-section.types.generated.ts
 # integration-route, which runs the client's destinations with the client's tokens.
 # api.routes.generate emits both src/pages/api/*.ts (prerender = false) and projects
 # these secrets into the app's astro:env schema.
-# Architecture review: API route handlers moved to @gogol/ui/integration-routes —
+# Architecture review: API route handlers moved to @warpgogol/ui/integration-routes —
 # delivery endpoints are integration infrastructure, not UI section logic.
 api:
   - route: integration-inbound
-    handler: "@gogol/ui/integration-routes/inbound"
+    handler: "@warpgogol/ui/integration-routes/inbound"
     methods:
       - POST
     secrets:
@@ -35,7 +35,7 @@ api:
   # and publishes to QStash (EU) for delivery to integration-route, which routes billing
   # events to the Lagebild buffer only (no channel fan-out). No Make.com.
   - route: stripe-webhook
-    handler: "@gogol/ui/integration-routes/stripe-webhook"
+    handler: "@warpgogol/ui/integration-routes/stripe-webhook"
     methods:
       - POST
     secrets:
@@ -43,7 +43,7 @@ api:
       - UPSTASH_QSTASH_URL
       - UPSTASH_QSTASH_TOKEN
   - route: integration-route
-    handler: "@gogol/ui/integration-routes/delivery"
+    handler: "@warpgogol/ui/integration-routes/delivery"
     methods:
       - POST
     # RFC-0181: the single delivery fan-out — verifies QStash, dedups via Redis, then

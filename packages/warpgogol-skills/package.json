@@ -1,0 +1,13 @@
+{
+  "name": "@warpgogol/skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Warpgogol-specific operational skills — not published to npm",
+  "scripts": {
+    "build:check": "echo 'warpgogol-skills: no TypeScript to compile'"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1"
+  }
+}

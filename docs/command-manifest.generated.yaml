@@ -153,7 +153,7 @@ commands:
     writes: []
     pipelines: []
   - name: agent.gate.fixtures.run
-    description: Replay the @gogol/agent-gate MCP + action conformance corpus
+    description: Replay the @warpgogol/agent-gate MCP + action conformance corpus
       (RFC-0290). Workspace-scoped regression gate for any protocol work.
     scope: workspace
     provider: workspace
@@ -230,7 +230,7 @@ commands:
     flags:
       url:
         kind: string
-        description: Remote origin URL to verify (e.g. https://webgogol.com)
+        description: Remote origin URL to verify (e.g. https://warpgogol.com)
     reads: []
     writes: []
     pipelines: []
@@ -633,7 +633,7 @@ commands:
     writes: []
     pipelines: []
   - name: analytics.messkanon.validate
-    description: Validate the tool-independent WGogol Messkanon ontology (RFC-0305).
+    description: Validate the tool-independent Warpgogol Messkanon ontology (RFC-0305).
     scope: workspace
     provider: workspace
     module: check
@@ -1090,9 +1090,9 @@ commands:
     writes: []
     pipelines: []
   - name: barrel.size.lint
-    description: "Guard the @gogol/share barrel split: BARREL-01 fails when a
+    description: "Guard the @warpgogol/share barrel split: BARREL-01 fails when a
       package's root src/index.ts exceeds the export-line threshold (error for
-      @gogol/share, warning elsewhere); BARREL-02 fails when a symbol is
+      @warpgogol/share, warning elsewhere); BARREL-02 fails when a symbol is
       exported from both the root barrel and a declared subpath (RFC-0264)."
     scope: workspace
     provider: workspace
@@ -1550,7 +1550,7 @@ commands:
     pipelines: []
   - name: chat.metadata.drift.validate
     description: "Workspace-scoped drift guard: verify CHAT_ADAPTER_METADATA in
-      @gogol/chat matches the requiredOptions/vendorOrigins declared on each
+      @warpgogol/chat matches the requiredOptions/vendorOrigins declared on each
       ChatWidgetAdapter in chat-adapter-* packages."
     scope: workspace
     provider: workspace
@@ -1565,8 +1565,8 @@ commands:
     writes: []
     pipelines:
       - packages.check
-  - name: check-webgogol.app.validate
-    description: Validate the check-webgogol-com operator app scaffold and
+  - name: check-warpgogol.app.validate
+    description: Validate the check-warpgogol-com operator app scaffold and
       product-facing content (RFC-0300).
     scope: workspace
     provider: workspace
@@ -1576,11 +1576,11 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - apps/check-webgogol-com/**
+      - apps/check-warpgogol-com/**
     writes: []
     pipelines: []
-  - name: check-webgogol.runner.validate
-    description: Validate the Check Webgogol Node runner backend and app API
+  - name: check-warpgogol.runner.validate
+    description: Validate the Check Warpgogol Node runner backend and app API
       boundary (RFC-0304).
     scope: workspace
     provider: workspace
@@ -1590,8 +1590,8 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - services/check-webgogol-runner/**
-      - apps/check-webgogol-com/src/pages/api/check-runs/**
+      - services/check-warpgogol-runner/**
+      - apps/check-warpgogol-com/src/pages/api/check-runs/**
     writes: []
     pipelines: []
   - name: check.accessibility.validate
@@ -1607,9 +1607,9 @@ commands:
       evidence:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.action-pack.generate
@@ -1624,17 +1624,17 @@ commands:
     flags:
       run:
         kind: string
-        description: Path to .check-webgogol/runs/<runId>/run.json.
+        description: Path to .check-warpgogol/runs/<runId>/run.json.
       evidence:
         kind: string
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     pipelines: []
   - name: check.artifact.validate
-    description: Validate a Check Webgogol run artifact layout and run.json envelope
+    description: Validate a Check Warpgogol run artifact layout and run.json envelope
       (RFC-0296).
     scope: workspace
     provider: workspace
@@ -1646,13 +1646,13 @@ commands:
       run:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/run.json.
+        description: Path to .check-warpgogol/runs/<runId>/run.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.audience.profile.validate
-    description: Validate a Check Webgogol audience profile descriptor (RFC-0299).
+    description: Validate a Check Warpgogol audience profile descriptor (RFC-0299).
     scope: workspace
     provider: workspace
     module: check
@@ -1679,10 +1679,10 @@ commands:
     flags:
       run:
         kind: string
-        description: Path to .check-webgogol/runs/<runId>/run.json.
+        description: Path to .check-warpgogol/runs/<runId>/run.json.
       evidence:
         kind: string
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
       profile:
         kind: string
         description: Path to an audience profile YAML file.
@@ -1690,10 +1690,10 @@ commands:
         kind: boolean
         description: Regenerate even when audience-review.json already exists.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
       - packages/ontology/check-audiences/**
     writes:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     pipelines: []
   - name: check.audience.review.validate
     description: Validate a cached audience review artifact (RFC-0299).
@@ -1707,13 +1707,13 @@ commands:
       review:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/audience-review.json.
+        description: Path to .check-warpgogol/runs/<runId>/audience-review.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.compare
-    description: Compare two Check Webgogol report.json files for diagnostic drift
+    description: Compare two Check Warpgogol report.json files for diagnostic drift
       (RFC-0297).
     scope: workspace
     provider: workspace
@@ -1731,7 +1731,7 @@ commands:
         required: true
         description: Head report.json path.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.content-surface.validate
@@ -1747,13 +1747,13 @@ commands:
       evidence:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.deploy-alt.run
-    description: Run the alt-host Check Webgogol sequence before a main deploy (RFC-0301).
+    description: Run the alt-host Check Warpgogol sequence before a main deploy (RFC-0301).
     scope: workspace
     provider: workspace
     module: check
@@ -1771,10 +1771,10 @@ commands:
     reads:
       - <target>
     writes:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     pipelines: []
   - name: check.deploy-main.gate
-    description: Gate deploy:main on the latest alt-host Check Webgogol report
+    description: Gate deploy:main on the latest alt-host Check Warpgogol report
       thresholds (RFC-0301).
     scope: workspace
     provider: workspace
@@ -1785,7 +1785,7 @@ commands:
     flags:
       run:
         kind: string
-        description: Path to .check-webgogol/runs/<runId>/run.json.
+        description: Path to .check-warpgogol/runs/<runId>/run.json.
       report:
         kind: string
         description: Path to report.json.
@@ -1796,11 +1796,11 @@ commands:
         kind: string
         description: Maximum allowed report warnings. Defaults to unlimited.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.deterministic.run
-    description: Run all deterministic Check Webgogol checks against a captured
+    description: Run all deterministic Check Warpgogol checks against a captured
       evidence graph (RFC-0298).
     scope: workspace
     provider: workspace
@@ -1812,9 +1812,9 @@ commands:
       evidence:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.evidence.capture
@@ -1837,7 +1837,7 @@ commands:
     reads:
       - <target>
     writes:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     pipelines: []
   - name: check.evidence.validate
     description: Validate a rendered SiteEvidenceGraph schema, hash, screenshots,
@@ -1852,9 +1852,9 @@ commands:
       evidence:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.fixture.lint
@@ -1892,13 +1892,13 @@ commands:
       evidence:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: check.report.generate
-    description: Generate Check Webgogol JSON and HTML reports from evidence and
+    description: Generate Check Warpgogol JSON and HTML reports from evidence and
       deterministic diagnostics (RFC-0297).
     scope: workspace
     provider: workspace
@@ -1909,17 +1909,17 @@ commands:
     flags:
       run:
         kind: string
-        description: Path to .check-webgogol/runs/<runId>/run.json.
+        description: Path to .check-warpgogol/runs/<runId>/run.json.
       evidence:
         kind: string
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     pipelines: []
   - name: check.run
-    description: Capture evidence and create a canonical Check Webgogol run envelope
+    description: Capture evidence and create a canonical Check Warpgogol run envelope
       (RFC-0293, RFC-0294, RFC-0296).
     scope: workspace
     provider: workspace
@@ -1938,10 +1938,10 @@ commands:
     reads:
       - <target>
     writes:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     pipelines: []
   - name: check.runner.info
-    description: Print the installed Check Webgogol runner capabilities and artifact
+    description: Print the installed Check Warpgogol runner capabilities and artifact
       version (RFC-0296).
     scope: workspace
     provider: workspace
@@ -1954,7 +1954,7 @@ commands:
     writes: []
     pipelines: []
   - name: check.safety.validate
-    description: Validate Check Webgogol host allowlists, secret references, and
+    description: Validate Check Warpgogol host allowlists, secret references, and
       AI-review policy (RFC-0302).
     scope: workspace
     provider: workspace
@@ -2001,9 +2001,9 @@ commands:
       evidence:
         kind: string
         required: true
-        description: Path to .check-webgogol/runs/<runId>/evidence.graph.json.
+        description: Path to .check-warpgogol/runs/<runId>/evidence.graph.json.
     reads:
-      - .check-webgogol/runs/**
+      - .check-warpgogol/runs/**
     writes: []
     pipelines: []
   - name: ci.local.validate
@@ -2938,7 +2938,7 @@ commands:
   - name: cosmic.literals.lint
     description: Fail when any Star/Planet/Moon cosmic-catalog name appears as a
       string literal in packages/share/src — cosmic-name-keyed dispatch behavior
-      must derive from @gogol/ontology/archetypes instead (RFC-0263).
+      must derive from @warpgogol/ontology/archetypes instead (RFC-0263).
     scope: workspace
     provider: workspace
     module: check
@@ -3150,7 +3150,7 @@ commands:
     flags:
       site:
         kind: string
-        description: Site name (e.g. webgogol-com). Required for site deploys.
+        description: Site name (e.g. warpgogol-com). Required for site deploys.
       service:
         kind: string
         description: Service name (e.g. lagebild-sync-worker). Required for service deploys.
@@ -3200,7 +3200,7 @@ commands:
     writes: []
     pipelines: []
   - name: diagnostic.shape.lint
-    description: "Lint @gogol/site-kernel-checks for RFC-0203 diagnostic shape:
+    description: "Lint @warpgogol/site-kernel-checks for RFC-0203 diagnostic shape:
       DSL-02 fails on an unregistered ruleId; DSL-03 on an empty ruleId; DSL-01
       on an unreadable source dir; DSL-04 ratchets
       resultFromViolations/failResult shim usage against a shrink-only baseline
@@ -3963,7 +3963,7 @@ commands:
       - packages.check
   - name: fingerprint.usage.lint
     description: Scan authored source for direct hash usage outside
-      @gogol/fingerprint and the allowlist (RFC-0364, DNA-53). Use --mode
+      @warpgogol/fingerprint and the allowlist (RFC-0364, DNA-53). Use --mode
       warning (default) or --mode fail.
     scope: workspace
     provider: workspace
@@ -4355,7 +4355,7 @@ commands:
   - name: fs.walk.lint
     description: "WALK-01: fails when a packages/** source file declares its own
       nested recursive readdir walker instead of importing collectFiles from
-      @gogol/share/fs (RFC-0303)."
+      @warpgogol/share/fs (RFC-0303)."
     scope: workspace
     provider: workspace
     module: check
@@ -4387,7 +4387,7 @@ commands:
     pipelines: []
   - name: funnel.copy.validate
     description: "Validate localized funnel copy: required locale coverage (de+uk
-      for webgogol-com), cross-locale file parity, and no retired 39 € tariff
+      for warpgogol-com), cross-locale file parity, and no retired 39 € tariff
       copy. No-op pass when no src/content/funnel/ domain exists (RFC-0188)."
     scope: app
     provider: workspace
@@ -5001,7 +5001,7 @@ commands:
       - <app>/src/middleware/language-redirect.ts
     pipelines: []
   - name: icons.generate
-    description: Generate Astro icon components for @gogol/ui package. Reads JSON
+    description: Generate Astro icon components for @warpgogol/ui package. Reads JSON
       files from packages/ui/src/assets/icons/lordicon/ and outputs components
       to packages/ui/src/icons/gen/lordicon/.
     scope: workspace
@@ -5323,7 +5323,7 @@ commands:
     pipelines:
       - packages.check
   - name: kernel.result.envelope.lint
-    description: Lint every check command file in @gogol/site-kernel-checks for the
+    description: Lint every check command file in @warpgogol/site-kernel-checks for the
       legacy flat `return { command, status, violations }` shape (DNA-35,
       RFC-0030).
     scope: workspace
@@ -5854,7 +5854,7 @@ commands:
     pipelines: []
   - name: manifest.contract.validate
     description: Validate every *.manifest.yaml in
-      packages/ui/src/{sections,components,pages}/ against @gogol/ontology
+      packages/ui/src/{sections,components,pages}/ against @warpgogol/ontology
       manifestSchema and check colocated .astro exists (DNA-17, RFC-0023).
     scope: workspace
     provider: workspace
@@ -6580,7 +6580,7 @@ commands:
       - <app>/src/pages/404.astro
     pipelines: []
   - name: not-found.validate
-    description: Validate generated 404 route status handling, shared @gogol/ui
+    description: Validate generated 404 route status handling, shared @warpgogol/ui
       import, and absence of app-local styling (RFC-0310).
     scope: app
     provider: workspace
@@ -6596,7 +6596,7 @@ commands:
   - name: notausgang.export
     description: "Export a full site package with dist artifacts, history, and
       nulled integrations (RFC-0359, RFC-0380). Writes YAML manifests and uses
-      @gogol/fingerprint for hashing. Flags: --system, --release, --output,
+      @warpgogol/fingerprint for hashing. Flags: --system, --release, --output,
       [--keep-integration, --reason]."
     scope: workspace
     provider: workspace
@@ -6696,8 +6696,8 @@ commands:
       - packages.check
   - name: observability.conventions.validate
     description: "Offline lint: every metric name/label key is declared in
-      WGOGOL_METRIC_REGISTRY, naming grammar is valid, no forbidden label keys,
-      no duplicate names, no direct OTLP env reads outside @gogol/observability
+      WARPGOGOL_METRIC_REGISTRY, naming grammar is valid, no forbidden label keys,
+      no duplicate names, no direct OTLP env reads outside @warpgogol/observability
       (RFC-0337)."
     scope: workspace
     provider: workspace
@@ -6730,7 +6730,7 @@ commands:
     pipelines:
       - packages.check
   - name: observability.factory.smoke
-    description: Send a test metric (wgogol_factory_smoke_total) through the OTLP
+    description: Send a test metric (warpgogol_factory_smoke_total) through the OTLP
       pipe to verify end-to-end delivery. Network, manual-only — never in
       pipelines (RFC-0340).
     scope: workspace
@@ -6860,7 +6860,7 @@ commands:
   - name: onboarding.yaml.import.lint
     description: Block direct YAML.parse of RFC-0076 onboarding artifacts in kernel
       onboarding/audit/content-discipline sources; require
-      @gogol/share/onboarding-yaml (RFC-0082).
+      @warpgogol/share/onboarding-yaml (RFC-0082).
     scope: workspace
     provider: workspace
     module: check
@@ -7022,7 +7022,7 @@ commands:
     writes: []
     pipelines: []
   - name: page.pipeline.contract
-    description: Verify buildPage(entry, ctx) from @gogol/share returns a valid
+    description: Verify buildPage(entry, ctx) from @warpgogol/share returns a valid
       ResolvedPage shape and that visibility filtering works correctly (DNA-25,
       RFC-0026).
     scope: workspace
@@ -9065,7 +9065,7 @@ commands:
     writes: []
     pipelines: []
   - name: share.i18n.lint
-    description: Scan registered @gogol/share UI-facing helper targets for
+    description: Scan registered @warpgogol/share UI-facing helper targets for
       unclassified hardcoded public strings (RFC-0230).
     scope: workspace
     provider: workspace
@@ -9083,9 +9083,9 @@ commands:
     pipelines:
       - packages.check
   - name: share.utility.lint
-    description: "Validate that apps use @gogol/share utilities instead of
+    description: "Validate that apps use @warpgogol/share utilities instead of
       re-implementing them locally. Per RFC-0037: allows astro:content imports
-      in @gogol/share."
+      in @warpgogol/share."
     scope: workspace
     provider: workspace
     module: check
@@ -10468,7 +10468,7 @@ commands:
     pipelines: []
   - name: tokens.catalog.sync
     description: Verify that every --ds-* custom property in
-      packages/tokens/src/tokens.css is listed in @gogol/tokens TOKEN_NAMES and
+      packages/tokens/src/tokens.css is listed in @warpgogol/tokens TOKEN_NAMES and
       vice versa. Reports drift in both directions.
     scope: workspace
     provider: workspace
@@ -10529,7 +10529,7 @@ commands:
     pipelines: []
   - name: tokens.section-shell.contract.validate
     description: Verify every --ds-* token referenced under the eight
-      section-framework component directories exists in @gogol/tokens
+      section-framework component directories exists in @warpgogol/tokens
       TOKEN_NAME_SET (RFC-0108 + RFC-0124).
     scope: workspace
     provider: workspace
@@ -10847,7 +10847,7 @@ commands:
     writes: []
     pipelines: []
   - name: warning.diagnostics.lint
-    description: Lint @gogol/site-kernel-checks for actionable warnings that are
+    description: Lint @warpgogol/site-kernel-checks for actionable warnings that are
       emitted only in summary prose instead of canonical Diagnostic[] data.
     scope: workspace
     provider: workspace
@@ -10861,8 +10861,8 @@ commands:
     writes: []
     pipelines:
       - packages.check
-  - name: webgogol.check-hints.generate
-    description: Generate public .well-known/webgogol-check.json hints for URL-first
+  - name: warpgogol.check-hints.generate
+    description: Generate public .well-known/warpgogol-check.json hints for URL-first
       checkers (RFC-0295).
     scope: app
     provider: workspace
@@ -10874,10 +10874,10 @@ commands:
     reads:
       - <app>/src/content/system.md
     writes:
-      - <app>/public/.well-known/webgogol-check.json
+      - <app>/public/.well-known/warpgogol-check.json
     pipelines: []
-  - name: webgogol.check-hints.validate
-    description: Validate the public .well-known/webgogol-check.json hints artifact
+  - name: warpgogol.check-hints.validate
+    description: Validate the public .well-known/warpgogol-check.json hints artifact
       (RFC-0295).
     scope: app
     provider: workspace
@@ -10887,7 +10887,7 @@ commands:
     timeoutMs: null
     flags: {}
     reads:
-      - <app>/public/.well-known/webgogol-check.json
+      - <app>/public/.well-known/warpgogol-check.json
     writes: []
     pipelines: []
   - name: werk.record.validate

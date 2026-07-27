@@ -13,7 +13,7 @@
   <item>RFC-0529: added content.ref-migrate command.</item>
 </CHANGE_SUMMARY>
 */
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 import {
   runCleanIcons,
   runGenerateIcons,
@@ -22,7 +22,7 @@ import {
   runMaterialMetadataWrite,
   runContentRefIndexGenerate,
   runContentRefMigrate,
-} from "@gogol/site-kernel-codegen";
+} from "@warpgogol/site-kernel-codegen";
 
 export const serviceModule: KernelModule = {
   name: "service",

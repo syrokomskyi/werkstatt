@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Target safety validation for the check-webgogol ecosystem: detects secrets and unsafe patterns in check targets.</purpose>
+<purpose>Target safety validation for the check-warpgogol ecosystem: detects secrets and unsafe patterns in check targets.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -10,7 +10,7 @@
 </CHANGE_SUMMARY>
 */
 
-import type { Diagnostic } from "@gogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/site-kernel";
 import type { CheckTarget } from "./target.ts";
 import { targetBaseHost } from "./target.ts";
 

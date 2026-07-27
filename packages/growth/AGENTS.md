@@ -1,4 +1,4 @@
-# `@gogol/growth` — Agent Guide
+# `@warpgogol/growth` — Agent Guide
 
 This package owns the **vendor-agnostic growth layer** — analytics, funnel tracking, and experiment flag reads (DNA-27–30, RFC-0027).
 
@@ -6,17 +6,17 @@ This package owns the **vendor-agnostic growth layer** — analytics, funnel tra
 
 | Entry point | Module | What it provides |
 | --- | --- | --- |
-| `@gogol/growth` | `src/index.ts` | Server/build-time barrel: adapter types, config schema, `NullAdapter`, `createEmitQueue`, `GROWTH_EMIT_KEY`, `EmitQueue` type |
-| `@gogol/growth/adapter` | `src/adapter.ts` | `GrowthAdapter` interface, `EmittedEvent`, `EventName`, `EventPayloadMap`, `FunnelDefinition`, `EVENT_NAMES`, `KNOWN_ADAPTER_IDS` |
-| `@gogol/growth/emit` | `src/emit.ts` | `emit(eventId, payload)` — the ONLY allowed way to fire events. Also exports `createEmitQueue()` factory for tests and `GROWTH_EMIT_KEY` for the `window.__webgogol_emit__` bridge. |
-| `@gogol/growth/client` | `src/client.ts` | `bootGrowthLayer(loaders)`, `GrowthAdapterLoaders` — client-side bootstrap |
-| `@gogol/growth/config` | `src/config.ts` | `GrowthConfigSchema`, `GrowthVendorConfigSchema` |
-| `@gogol/growth/null-adapter` | `src/null-adapter.ts` | `NullAdapter` — built-in no-op adapter for dev/test |
-| `@gogol/growth/provider` | `src/provider.astro` | `<GrowthProvider>` Astro island — owns the static adapter loader map and boots the client |
+| `@warpgogol/growth` | `src/index.ts` | Server/build-time barrel: adapter types, config schema, `NullAdapter`, `createEmitQueue`, `GROWTH_EMIT_KEY`, `EmitQueue` type |
+| `@warpgogol/growth/adapter` | `src/adapter.ts` | `GrowthAdapter` interface, `EmittedEvent`, `EventName`, `EventPayloadMap`, `FunnelDefinition`, `EVENT_NAMES`, `KNOWN_ADAPTER_IDS` |
+| `@warpgogol/growth/emit` | `src/emit.ts` | `emit(eventId, payload)` — the ONLY allowed way to fire events. Also exports `createEmitQueue()` factory for tests and `GROWTH_EMIT_KEY` for the `window.__warpgogol_emit__` bridge. |
+| `@warpgogol/growth/client` | `src/client.ts` | `bootGrowthLayer(loaders)`, `GrowthAdapterLoaders` — client-side bootstrap |
+| `@warpgogol/growth/config` | `src/config.ts` | `GrowthConfigSchema`, `GrowthVendorConfigSchema` |
+| `@warpgogol/growth/null-adapter` | `src/null-adapter.ts` | `NullAdapter` — built-in no-op adapter for dev/test |
+| `@warpgogol/growth/provider` | `src/provider.astro` | `<GrowthProvider>` Astro island — owns the static adapter loader map and boots the client |
 
 ## Rules for AI agents
 
-- Do NOT call vendor analytics SDKs directly. Use `emit()` from `@gogol/growth/emit`.
+- Do NOT call vendor analytics SDKs directly. Use `emit()` from `@warpgogol/growth/emit`.
 - Do NOT include `locale` in the payload — it is injected automatically by `emit()`.
 - Emit only event names from the closed `EventName` catalog. Adding an unknown event ID fails `growth.events.validate`.
 - Event catalog lives in `packages/ontology/growth/events/*.yaml`. `EVENT_NAMES` in `adapter.ts` is the single source of truth.
@@ -25,7 +25,7 @@ This package owns the **vendor-agnostic growth layer** — analytics, funnel tra
 ## Emit an event
 
 ```typescript
-import { emit } from "@gogol/growth/emit";
+import { emit } from "@warpgogol/growth/emit";
 emit("page-view", { path: "/de/services" });
 emit("cta-click", { section: "hero", label: "Contact us" });
 ```
@@ -34,7 +34,7 @@ emit("cta-click", { section: "hero", label: "Contact us" });
 
 ```astro
 ---
-import GrowthProvider from "@gogol/growth/provider";
+import GrowthProvider from "@warpgogol/growth/provider";
 ---
 <GrowthProvider
   appId="my-app"
@@ -64,11 +64,11 @@ The optional `accepts` field is an allow-list of event names the adapter handles
 
 | Package                        | Role                                                         |
 | ------------------------------ | ------------------------------------------------------------ |
-| `@gogol/growth-adapter-matomo` | Matomo adapter for RFC-0305 Messkanon over first-party proxy |
-| `@gogol/ontology`              | Closed event catalog                                         |
+| `@warpgogol/growth-adapter-matomo` | Matomo adapter for RFC-0305 Messkanon over first-party proxy |
+| `@warpgogol/ontology`              | Closed event catalog                                         |
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/growth build:check
+pnpm --filter @warpgogol/growth build:check
 ```

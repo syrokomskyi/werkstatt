@@ -18,7 +18,7 @@ import { z } from "zod";
  * through the Integration Port (RFC-0168).
  *
  * Adapter ids are validated against the closed adapter catalog in
- * @gogol/integration by `integration.config.validate`; each configured
+ * @warpgogol/integration by `integration.config.validate`; each configured
  * adapter's required secret names are validated against the generated env schema
  * by `integration.secrets.validate`.
  *
@@ -123,7 +123,7 @@ export const systemIntegrationsSchema = z.object({
 
   /**
    * RFC-0188: Visitor Sales Funnel binding. The PLATFORM owns the stage/event/
-   * transition graph (@gogol/integration funnel.ts); this block only declares
+   * transition graph (@warpgogol/integration funnel.ts); this block only declares
    * which canonical funnel `version` the app renders, which event `sources` feed it
    * (e.g. uchat, stripe, operator), and whether the pilot is `enabled`. UChat is the
    * conversation runtime — it renders the funnel and requests transitions; it never

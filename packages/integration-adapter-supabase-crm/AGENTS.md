@@ -1,4 +1,4 @@
-# `@gogol/integration-adapter-supabase-crm` — Agent Guide
+# `@warpgogol/integration-adapter-supabase-crm` — Agent Guide
 
 Supabase CRM buffer `DestinationAdapter` — the Lagebild MVP (RFC-0176, RFC-0186).
 
@@ -44,12 +44,12 @@ The package has three layers:
 
 | Package | Role |
 | --- | --- |
-| `@gogol/share/integration` | `DestinationAdapter`, `IntegrationEvent`, `CrmBufferWriter`/`CrmBufferReader` contracts, `SyncOutboxOp` catalog |
+| `@warpgogol/share/integration` | `DestinationAdapter`, `IntegrationEvent`, `CrmBufferWriter`/`CrmBufferReader` contracts, `SyncOutboxOp` catalog |
 | `services/lagebild-sync-worker/` | The async Pipedrive sync worker (thin orchestrator → `CrmSyncTarget`) |
-| `@gogol/integration-adapter-stripe` | Stripe webhook → `IntegrationEvent` mapping (delta 6 verification) |
+| `@warpgogol/integration-adapter-stripe` | Stripe webhook → `IntegrationEvent` mapping (delta 6 verification) |
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/integration-adapter-supabase-crm build:check
+pnpm --filter @warpgogol/integration-adapter-supabase-crm build:check
 ```

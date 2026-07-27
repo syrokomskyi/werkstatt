@@ -14,15 +14,15 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { TOKEN_NAME_SET } from "@gogol/tokens";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import { hasGeneratedMarker } from "@gogol/site-kernel-codegen";
+import { TOKEN_NAME_SET } from "@warpgogol/tokens";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
 import type {
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { fileExists } from "../lib/file-exists.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 import {
@@ -273,7 +273,7 @@ export async function runBiomeTokensValidate(
               token,
               biomeId,
               message: `Biome ${biomeId} maps to unknown token ${token}.`,
-              fixHint: "Verify the token name exists in @gogol/tokens.",
+              fixHint: "Verify the token name exists in @warpgogol/tokens.",
             });
           }
         }

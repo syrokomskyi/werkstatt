@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/fleet-probe-runner",
+  "name": "@warpgogol/fleet-probe-runner",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "health": "tsx src/run-once.ts"
   },
   "dependencies": {
-    "@gogol/observability": "workspace:*"
+    "@warpgogol/observability": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.23.1"

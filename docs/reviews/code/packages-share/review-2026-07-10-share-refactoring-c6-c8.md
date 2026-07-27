@@ -18,7 +18,7 @@ filesReviewed:
   - docs/reviews/code/packages-share/review-2026-07-10-share-refactoring-c1-c5.md
 ---
 
-# Code Review: 4f11ea01c...HEAD — `@gogol/share` refactoring C6–C8
+# Code Review: 4f11ea01c...HEAD — `@warpgogol/share` refactoring C6–C8
 
 ### Verdict: Needs revision
 
@@ -26,7 +26,7 @@ The diff removes two shim files, adds 7 semantic subpath exports, and merges a m
 
 ### Mechanical floor
 
-- `@gogol/share` tsc --noEmit: **pass**
+- `@warpgogol/share` tsc --noEmit: **pass**
 
 ### Axis A — Structural correctness
 
@@ -37,7 +37,7 @@ The diff removes two shim files, adds 7 semantic subpath exports, and merges a m
 
 ### Axis B — DNA alignment
 
-- **DNA-1** (monorepo boundary) — PASS. Root barrel re-exports from `@gogol/content-source` (package boundary).
+- **DNA-1** (monorepo boundary) — PASS. Root barrel re-exports from `@warpgogol/content-source` (package boundary).
 - **DNA-6** (kebab-case) — PASS. All filenames kebab-case.
 - **DNA-42** (Compass markup) — PASS for new content. `entity-id.ts` CHANGE_SUMMARY updated with merge note.
 
@@ -51,9 +51,9 @@ The diff removes two shim files, adds 7 semantic subpath exports, and merges a m
 
 ### Axis D — Forward-only compliance
 
-- **`image-utils` root barrel re-export** — OBSERVATION. The root barrel (`index.ts`) now re-exports from `@gogol/content-source` directly with `@deprecated` comments pointing to `@gogol/share/image-utils`. But `@gogol/share/image-utils` no longer exists in the export map — the subpath is gone. The deprecation comment directs consumers to a non-existent entry point.
+- **`image-utils` root barrel re-export** — OBSERVATION. The root barrel (`index.ts`) now re-exports from `@warpgogol/content-source` directly with `@deprecated` comments pointing to `@warpgogol/share/image-utils`. But `@warpgogol/share/image-utils` no longer exists in the export map — the subpath is gone. The deprecation comment directs consumers to a non-existent entry point.
 
-  This is not a hard failure because no external consumers of `@gogol/share/image-utils` were found. But the comment is misleading. Fix: either remove the `@deprecated` comments (the root barrel is already deprecated as a whole) or point them to `@gogol/content-source` directly.
+  This is not a hard failure because no external consumers of `@warpgogol/share/image-utils` were found. But the comment is misleading. Fix: either remove the `@deprecated` comments (the root barrel is already deprecated as a whole) or point them to `@warpgogol/content-source` directly.
 
 - **`page-handler` redirect** — PASS. Export map points directly to `resolve-route.ts`. No shim, no dual path.
 - **`dispatch.ts` merge** — PASS. Function moved to `entity-id.ts`, old file deleted, barrel re-export removed. No parallel path.
@@ -66,10 +66,10 @@ The diff removes two shim files, adds 7 semantic subpath exports, and merges a m
   <item>Removed dispatch.ts re-export (merged into entity-id.ts).</item>
   ```
 
-- **Missing `CHANGE_SUMMARY` entry in `index.ts`** — FAIL. The root barrel replaced `export * from "./image-utils.ts"` with direct re-exports from `@gogol/content-source` (27 new lines), but `CHANGE_SUMMARY` has no entry for this. Add:
+- **Missing `CHANGE_SUMMARY` entry in `index.ts`** — FAIL. The root barrel replaced `export * from "./image-utils.ts"` with direct re-exports from `@warpgogol/content-source` (27 new lines), but `CHANGE_SUMMARY` has no entry for this. Add:
 
   ```
-  <item>C6: image-utils.ts shim deleted; root barrel re-exports from @gogol/content-source directly. page-handler.ts shim deleted; export map points to resolve-route.ts.</item>
+  <item>C6: image-utils.ts shim deleted; root barrel re-exports from @warpgogol/content-source directly. page-handler.ts shim deleted; export map points to resolve-route.ts.</item>
   ```
 
 - **Compass scaffolding** — PASS. `entity-id.ts` CHANGE_SUMMARY updated.
@@ -84,7 +84,7 @@ The diff removes two shim files, adds 7 semantic subpath exports, and merges a m
 
 ### Axis G — Blind spots
 
-- **Dangling `@deprecated` comments** — See Axis D observation. The two `@deprecated import from "@gogol/share/image-utils" instead` comments in `index.ts` point to a deleted subpath.
+- **Dangling `@deprecated` comments** — See Axis D observation. The two `@deprecated import from "@warpgogol/share/image-utils" instead` comments in `index.ts` point to a deleted subpath.
 - **`createDispatcherResolver` typing** — Pre-existing `Record<string, any>` / `any` return. Not introduced by this diff, but now lives in `entity-id.ts` which previously had clean typing. Consider tightening in a follow-up.
 - **Subpath coverage** — 7 of ~25 semantic modules have subpath entries. The barrel is still required for the remaining ~18. This is acceptable for incremental migration.
 
@@ -101,5 +101,5 @@ No formal spec. C6–C8 were identified in an architecture review session.
 
 ### Questions for the author
 
-1. **Dangling `@deprecated` comments** — the two comments in `index.ts` say `import from "@gogol/share/image-utils" instead`, but that subpath no longer exists. Should they say `@gogol/content-source` instead, or be removed entirely (since the whole root barrel is already deprecated)?
+1. **Dangling `@deprecated` comments** — the two comments in `index.ts` say `import from "@warpgogol/share/image-utils" instead`, but that subpath no longer exists. Should they say `@warpgogol/content-source` instead, or be removed entirely (since the whole root barrel is already deprecated)?
 2. **`content/index.ts` CHANGE_SUMMARY** — should it note the `dispatch.ts` removal?

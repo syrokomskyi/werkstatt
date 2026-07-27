@@ -15,11 +15,11 @@
 
 /* RFC-0103: audience-cards thin dispatcher — cards body. */
 
-import type { SectionProps } from "@gogol/share/page";
-import { cast, need, resolveSectionAnchor } from "@gogol/share";
-import SectionShell from "@gogol/ui/components/section-shell.astro";
-import SectionHeader from "@gogol/ui/components/section-header.astro";
-import SectionCardGrid from "@gogol/ui/components/section-body/cards.astro";
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@warpgogol/share";
+import SectionShell from "@warpgogol/ui/components/section-shell.astro";
+import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import SectionCardGrid from "@warpgogol/ui/components/section-body/cards.astro";
 import type { AudienceCardsSectionContent } from "./audience-cards-section.types.generated.ts";
 
 const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;

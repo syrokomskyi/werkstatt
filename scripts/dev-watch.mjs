@@ -37,7 +37,7 @@ function runGenerators(mission) {
   for (const cmd of generators) {
     const result = spawnSync(
       "pnpm",
-      ["exec", "site-kernel", "run", cmd, "--site", "webgogol-com"],
+      ["exec", "site-kernel", "run", cmd, "--site", "warpgogol-com"],
       { cwd: WORKSPACE_ROOT, stdio: "pipe", encoding: "utf-8" },
     );
     if (result.status !== 0) {

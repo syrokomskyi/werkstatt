@@ -14,11 +14,11 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { createMetricsPusher, METRIC_REFS } from "@gogol/observability";
+} from "@warpgogol/site-kernel";
+import { createMetricsPusher, METRIC_REFS } from "@warpgogol/observability";
 
-const UI_URL = "https://observe.webgogol.com";
-const INGEST_URL = "https://ingest.observe.webgogol.com";
+const UI_URL = "https://observe.warpgogol.com";
+const INGEST_URL = "https://ingest.observe.warpgogol.com";
 
 export async function runObservabilityStackHealth(
   _input: KernelCommandInput,
@@ -76,7 +76,7 @@ export async function runObservabilityStackHealth(
     environment: "production",
   });
   if (pusher) {
-    METRIC_REFS.wgogol_factory_smoke_total.add(pusher, 1);
+    METRIC_REFS.warpgogol_factory_smoke_total.add(pusher, 1);
     const result = await pusher.flush();
     checks.push({
       name: "smoke-metric-roundtrip",
@@ -87,7 +87,7 @@ export async function runObservabilityStackHealth(
     checks.push({
       name: "smoke-metric-roundtrip",
       ok: false,
-      detail: "WGOGOL_OTLP_ENDPOINT/WGOGOL_OTLP_TOKEN not set — skipping smoke test",
+      detail: "WARPGOGOL_OTLP_ENDPOINT/WARPGOGOL_OTLP_TOKEN not set — skipping smoke test",
     });
   }
 

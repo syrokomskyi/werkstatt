@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0219: Visitor funnel + subscription lifecycle state-chart generator and drift-validator.
 `funnel.statechart.generate` emits a GENERATED Mermaid stateDiagram-v2 document derived purely from
-the canonical transition + trigger maps in @gogol/integration. `funnel.statechart.validate`
+the canonical transition + trigger maps in @warpgogol/integration. `funnel.statechart.validate`
 regenerates the document in memory and asserts byte-equality with the committed artifact, plus the
 trigger↔graph bijection invariant for both layers. Node-safe: file I/O + pure contracts only.</purpose>
 <non-goals>
@@ -19,8 +19,8 @@ trigger↔graph bijection invariant for both layers. Node-safe: file I/O + pure 
 
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
-import { writeFileAtomic, buildGeneratedHeader } from "@gogol/site-kernel";
-import type { KernelCommandInput, KernelCommandResult } from "@gogol/site-kernel";
+import { writeFileAtomic, buildGeneratedHeader } from "@warpgogol/site-kernel";
+import type { KernelCommandInput, KernelCommandResult } from "@warpgogol/site-kernel";
 import {
   FUNNEL_SYSTEM_TRIGGERS,
   FUNNEL_TRANSITION_TRIGGERS,
@@ -30,10 +30,10 @@ import {
   SUBSCRIPTION_TRANSITIONS,
   VISITOR_FUNNEL_STAGES,
   isValidFunnelStage,
-} from "@gogol/integration";
-import type { VisitorFunnelStage } from "@gogol/integration";
-import type { SubscriptionStatus } from "@gogol/integration";
-import { SUBSCRIPTION_STATUSES } from "@gogol/integration";
+} from "@warpgogol/integration";
+import type { VisitorFunnelStage } from "@warpgogol/integration";
+import type { SubscriptionStatus } from "@warpgogol/integration";
+import { SUBSCRIPTION_STATUSES } from "@warpgogol/integration";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 
 /** Workspace-relative path to the committed generated document (RFC-0219). */
@@ -196,7 +196,7 @@ export function generateFunnelStatechartDocument(): string {
     "",
     "> Generated from `FUNNEL_TRANSITIONS` + `FUNNEL_TRANSITION_TRIGGERS` (Layer 1) and",
     "> `SUBSCRIPTION_TRANSITIONS` + `SUBSCRIPTION_TRANSITION_TRIGGERS` (Layer 2) in",
-    "> `@gogol/integration`. Do not edit — run `funnel.statechart.generate` to regenerate.",
+    "> `@warpgogol/integration`. Do not edit — run `funnel.statechart.generate` to regenerate.",
     "",
     "## Layer 1 — Visitor Sales Funnel",
     "",

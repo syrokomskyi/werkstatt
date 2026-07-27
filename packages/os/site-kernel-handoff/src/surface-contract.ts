@@ -3,7 +3,7 @@
 <purpose>RFC-0480: surface.contract.validate — validate generated C-surfaces against declarative contract.</purpose>
 <non-goals>
   <item>Does not generate C-surfaces — only validates them against the contract.</item>
-  <item>Does not modify the contract — contracts are declarative in @gogol/ontology/external-surfaces.</item>
+  <item>Does not modify the contract — contracts are declarative in @warpgogol/ontology/external-surfaces.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -20,8 +20,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { urlSchema, jsonldTypes, sitemapShape } from "@gogol/ontology/external-surfaces";
+} from "@warpgogol/site-kernel";
+import { urlSchema, jsonldTypes, sitemapShape } from "@warpgogol/ontology/external-surfaces";
 
 export interface SurfaceContractValidateData {
   systemId: string | null;

@@ -35,7 +35,7 @@ import { pbpSchemaId } from "../../schema-id.js";
 
 const baseEntity = {
   schema: "pbp/business@1",
-  id: "webgogol",
+  id: "warpgogol",
   status: "published" as const,
 };
 
@@ -44,11 +44,11 @@ describe("businessSchema", () => {
     const valid = {
       ...baseEntity,
       type: "business",
-      name: "Webgogol",
+      name: "Warpgogol",
       summary: "Digital agency",
       yearEstablished: 2018,
     };
-    expect(businessSchema.parse(valid)).toMatchObject({ name: "Webgogol" });
+    expect(businessSchema.parse(valid)).toMatchObject({ name: "Warpgogol" });
   });
 
   it("rejects empty string in name (ADR-038)", () => {
@@ -60,7 +60,7 @@ describe("businessSchema", () => {
       businessSchema.parse({
         ...baseEntity,
         type: "business",
-        name: "<strong>Webgogol</strong>",
+        name: "<strong>Warpgogol</strong>",
       }),
     ).toThrow();
   });
@@ -69,9 +69,9 @@ describe("businessSchema", () => {
     expect(() =>
       businessSchema.parse({
         ...baseEntity,
-        id: "webgogol.de",
+        id: "warpgogol.de",
         type: "business",
-        name: "Webgogol",
+        name: "Warpgogol",
       }),
     ).toThrow();
   });
@@ -81,7 +81,7 @@ describe("businessSchema", () => {
       businessSchema.parse({
         ...baseEntity,
         type: "business",
-        name: "Webgogol",
+        name: "Warpgogol",
         unknownField: true,
       }),
     ).toThrow();
@@ -91,7 +91,7 @@ describe("businessSchema", () => {
     const valid = {
       ...baseEntity,
       type: "business",
-      name: "Webgogol",
+      name: "Warpgogol",
       presentation: {
         platformComparison: {
           display: { pageText: "...", disclosure: "..." },
@@ -107,7 +107,7 @@ describe("businessSchema", () => {
     const valid = {
       ...baseEntity,
       type: "business",
-      name: "Webgogol",
+      name: "Warpgogol",
     };
     const parsed = businessSchema.parse(valid);
     expect(parsed.presentation).toBeUndefined();
@@ -118,7 +118,7 @@ describe("businessSchema", () => {
       businessSchema.parse({
         ...baseEntity,
         type: "business",
-        name: "Webgogol",
+        name: "Warpgogol",
         presentation: null,
       }),
     ).toThrow();
@@ -129,19 +129,19 @@ describe("legalIdentitySchema", () => {
   it("accepts a valid legal-identity entity", () => {
     const valid = {
       schema: "pbp/legal-identity@1",
-      id: "webgogol-legal",
+      id: "warpgogol-legal",
       type: "legal-identity",
       status: "published",
-      legalName: "Webgogol GmbH",
+      legalName: "Warpgogol GmbH",
     };
-    expect(legalIdentitySchema.parse(valid)).toMatchObject({ legalName: "Webgogol GmbH" });
+    expect(legalIdentitySchema.parse(valid)).toMatchObject({ legalName: "Warpgogol GmbH" });
   });
 
   it("rejects empty legalName", () => {
     expect(() =>
       legalIdentitySchema.parse({
         schema: "pbp/legal-identity@1",
-        id: "webgogol-legal",
+        id: "warpgogol-legal",
         type: "legal-identity",
         status: "published",
         legalName: "",
@@ -154,23 +154,23 @@ describe("brandSchema", () => {
   it("accepts a valid brand entity", () => {
     const valid = {
       schema: "pbp/brand@1",
-      id: "webgogol-brand",
+      id: "warpgogol-brand",
       type: "brand",
       status: "published",
-      name: "Webgogol",
-      ownerBusinessRef: { ref: "pbp/business@1:webgogol" },
+      name: "Warpgogol",
+      ownerBusinessRef: { ref: "pbp/business@1:warpgogol" },
     };
-    expect(brandSchema.parse(valid)).toMatchObject({ name: "Webgogol" });
+    expect(brandSchema.parse(valid)).toMatchObject({ name: "Warpgogol" });
   });
 
   it("rejects missing ownerBusinessRef", () => {
     expect(() =>
       brandSchema.parse({
         schema: "pbp/brand@1",
-        id: "webgogol-brand",
+        id: "warpgogol-brand",
         type: "brand",
         status: "published",
-        name: "Webgogol",
+        name: "Warpgogol",
       }),
     ).toThrow();
   });
@@ -180,7 +180,7 @@ describe("placeSchema", () => {
   it("accepts a valid place entity", () => {
     const valid = {
       schema: "pbp/place@1",
-      id: "webgogol-hq",
+      id: "warpgogol-hq",
       type: "place",
       status: "published",
       name: "Berlin Office",
@@ -194,7 +194,7 @@ describe("placeSchema", () => {
     expect(() =>
       placeSchema.parse({
         schema: "pbp/place@1",
-        id: "webgogol-hq",
+        id: "warpgogol-hq",
         type: "place",
         status: "published",
         name: "Berlin Office",
@@ -208,12 +208,12 @@ describe("contactPointSchema", () => {
   it("accepts a valid contact-point entity", () => {
     const valid = {
       schema: "pbp/contact-point@1",
-      id: "webgogol-email",
+      id: "warpgogol-email",
       type: "contact-point",
       status: "published",
       name: "General Email",
       channel: "email",
-      value: "hello@webgogol.com",
+      value: "hello@warpgogol.com",
     };
     expect(contactPointSchema.parse(valid)).toMatchObject({ channel: "email" });
   });
@@ -222,12 +222,12 @@ describe("contactPointSchema", () => {
     expect(() =>
       contactPointSchema.parse({
         schema: "pbp/contact-point@1",
-        id: "webgogol-email",
+        id: "warpgogol-email",
         type: "contact-point",
         status: "published",
         name: "General Email",
         channel: "fax",
-        value: "hello@webgogol.com",
+        value: "hello@warpgogol.com",
       }),
     ).toThrow();
   });
@@ -237,13 +237,13 @@ describe("webPresenceSchema", () => {
   it("accepts a valid web-presence entity", () => {
     const valid = {
       schema: "pbp/web-presence@1",
-      id: "webgogol-website",
+      id: "warpgogol-website",
       type: "web-presence",
       status: "published",
-      name: "Webgogol Website",
+      name: "Warpgogol Website",
       kind: "primary-website",
-      canonicalUrl: "https://webgogol.com",
-      businessRef: { ref: "pbp/business@1:webgogol" },
+      canonicalUrl: "https://warpgogol.com",
+      businessRef: { ref: "pbp/business@1:warpgogol" },
       control: "business-controlled",
     };
     expect(webPresenceSchema.parse(valid)).toMatchObject({ kind: "primary-website" });
@@ -254,7 +254,7 @@ describe("productSchema", () => {
   it("accepts a valid product entity", () => {
     const valid = {
       schema: "pbp/product@1",
-      id: "webgogol-seo-audit",
+      id: "warpgogol-seo-audit",
       type: "product",
       status: "published",
       kind: "service",
@@ -267,7 +267,7 @@ describe("productSchema", () => {
     expect(() =>
       productSchema.parse({
         schema: "pbp/product@1",
-        id: "webgogol-seo-audit",
+        id: "warpgogol-seo-audit",
         type: "product",
         status: "published",
         kind: "magic",
@@ -281,11 +281,11 @@ describe("offeringSchema", () => {
   it("accepts a valid offering entity", () => {
     const valid = {
       schema: "pbp/offering@1",
-      id: "webgogol-seo-audit-offering",
+      id: "warpgogol-seo-audit-offering",
       type: "offering",
       status: "published",
       name: "SEO Audit Standard",
-      businessRef: { ref: "pbp/business@1:webgogol" },
+      businessRef: { ref: "pbp/business@1:warpgogol" },
       availability: { mode: "declared" },
       pricing: { currency: "EUR" },
     };
@@ -295,11 +295,11 @@ describe("offeringSchema", () => {
   it("accepts presentation field with price labels (RFC-0482)", () => {
     const valid = {
       schema: "pbp/offering@1",
-      id: "webgogol-seo-audit-offering",
+      id: "warpgogol-seo-audit-offering",
       type: "offering",
       status: "published",
       name: "SEO Audit Standard",
-      businessRef: { ref: "pbp/business@1:webgogol" },
+      businessRef: { ref: "pbp/business@1:warpgogol" },
       availability: { mode: "declared" },
       pricing: { currency: "EUR" },
       presentation: {
@@ -315,11 +315,11 @@ describe("offeringSchema", () => {
     expect(() =>
       offeringSchema.parse({
         schema: "pbp/offering@1",
-        id: "webgogol-seo-audit-offering",
+        id: "warpgogol-seo-audit-offering",
         type: "offering",
         status: "published",
         name: "SEO Audit Standard",
-        businessRef: { ref: "pbp/business@1:webgogol" },
+        businessRef: { ref: "pbp/business@1:warpgogol" },
         availability: { mode: "declared" },
         pricing: { currency: "EUR" },
         presentation: null,
@@ -332,7 +332,7 @@ describe("policySchema", () => {
   it("accepts a valid policy entity", () => {
     const valid = {
       schema: "pbp/policy@1",
-      id: "webgogol-sla",
+      id: "warpgogol-sla",
       type: "policy",
       status: "published",
       kind: "service-level",
@@ -346,7 +346,7 @@ describe("slaPolicySchema", () => {
   it("accepts a valid SLA policy entity", () => {
     const valid = {
       schema: "pbp/sla-policy@1",
-      id: "webgogol-sla-99",
+      id: "warpgogol-sla-99",
       type: "policy",
       status: "published",
       kind: "service-level",
@@ -366,14 +366,14 @@ describe("claimSchema", () => {
   it("accepts a valid claim entity", () => {
     const valid = {
       schema: "pbp/claim@1",
-      id: "webgogol-claim-1",
+      id: "warpgogol-claim-1",
       type: "claim",
       status: "published",
       claimClass: "benefit",
       claimKind: "benefit",
       subject: { kind: "product", name: "SEO Audit" },
       statement: "Improves search visibility",
-      governance: { authorityRef: "webgogol" },
+      governance: { authorityRef: "warpgogol" },
     };
     expect(claimSchema.parse(valid)).toMatchObject({ claimClass: "benefit" });
   });
@@ -383,7 +383,7 @@ describe("evidenceSourceSchema", () => {
   it("accepts a valid evidence-source entity", () => {
     const valid = {
       schema: "pbp/evidence-source@1",
-      id: "webgogol-evidence-1",
+      id: "warpgogol-evidence-1",
       type: "evidence-source",
       status: "published",
       name: "Google Search Console",
@@ -398,7 +398,7 @@ describe("disclosureSchema", () => {
   it("accepts a valid disclosure entity", () => {
     const valid = {
       schema: "pbp/disclosure@1",
-      id: "webgogol-disclosure-1",
+      id: "warpgogol-disclosure-1",
       type: "disclosure",
       status: "published",
       kind: "technology-dependency",
@@ -415,13 +415,13 @@ describe("publicDocumentSchema", () => {
   it("accepts a valid public-document entity", () => {
     const valid = {
       schema: "pbp/public-document@1",
-      id: "webgogol-privacy-policy",
+      id: "warpgogol-privacy-policy",
       type: "public-document",
       status: "published",
       kind: "privacy-policy",
       name: "Privacy Policy",
-      canonicalUrl: "https://webgogol.com/privacy",
-      governance: { authorityRef: "webgogol" },
+      canonicalUrl: "https://warpgogol.com/privacy",
+      governance: { authorityRef: "warpgogol" },
     };
     expect(publicDocumentSchema.parse(valid)).toMatchObject({ kind: "privacy-policy" });
   });
@@ -431,17 +431,17 @@ describe("catalogSchema", () => {
   it("accepts a valid catalog entity", () => {
     const valid = {
       schema: "pbp/catalog@1",
-      id: "webgogol-catalog",
+      id: "warpgogol-catalog",
       type: "catalog",
       status: "published",
-      name: "Webgogol Service Catalog",
-      businessRef: { ref: "pbp/business@1:webgogol" },
+      name: "Warpgogol Service Catalog",
+      businessRef: { ref: "pbp/business@1:warpgogol" },
       entrySource: {
         mode: "manifest-directory",
         logicalPath: "src/content/business-profile/de/catalog",
       },
     };
-    expect(catalogSchema.parse(valid)).toMatchObject({ name: "Webgogol Service Catalog" });
+    expect(catalogSchema.parse(valid)).toMatchObject({ name: "Warpgogol Service Catalog" });
   });
 });
 
@@ -462,7 +462,7 @@ describe("productGroupSchema", () => {
   it("accepts a valid product-group entity", () => {
     const valid = {
       schema: "pbp/product-group@1",
-      id: "webgogol-audit-group",
+      id: "warpgogol-audit-group",
       type: "product-group",
       status: "published",
       name: "Audit Variants",
@@ -478,11 +478,11 @@ describe("productVariantSchema", () => {
   it("accepts a valid product-variant entity", () => {
     const valid = {
       schema: "pbp/product-variant@1",
-      id: "webgogol-audit-basic",
+      id: "warpgogol-audit-basic",
       type: "product-variant",
       status: "published",
       name: "Basic Audit",
-      groupRef: { ref: "pbp/product-group@1:webgogol-audit-group" },
+      groupRef: { ref: "pbp/product-group@1:warpgogol-audit-group" },
       variantValues: { depth: { valueRef: "basic" } },
     };
     expect(productVariantSchema.parse(valid)).toMatchObject({ name: "Basic Audit" });
@@ -493,12 +493,12 @@ describe("catalogEntrySchema", () => {
   it("accepts a valid catalog-entry entity", () => {
     const valid = {
       schema: "pbp/catalog-entry@1",
-      id: "webgogol-entry-seo-audit",
+      id: "warpgogol-entry-seo-audit",
       type: "catalog-entry",
       status: "published",
       name: "SEO Audit Entry",
-      catalogRef: { ref: "pbp/catalog@1:webgogol-catalog" },
-      itemRef: { ref: "pbp/product@1:webgogol-seo-audit" },
+      catalogRef: { ref: "pbp/catalog@1:warpgogol-catalog" },
+      itemRef: { ref: "pbp/product@1:warpgogol-seo-audit" },
     };
     expect(catalogEntrySchema.parse(valid)).toMatchObject({ name: "SEO Audit Entry" });
   });
@@ -508,7 +508,7 @@ describe("guaranteePolicySchema", () => {
   it("accepts a valid guarantee policy entity", () => {
     const valid = {
       schema: "pbp/guarantee-policy@1",
-      id: "webgogol-guarantee",
+      id: "warpgogol-guarantee",
       type: "policy",
       status: "published",
       kind: "guarantee",
@@ -531,7 +531,7 @@ describe("ownershipPolicySchema", () => {
   it("accepts a valid ownership policy entity", () => {
     const valid = {
       schema: "pbp/ownership-policy@1",
-      id: "webgogol-ownership",
+      id: "warpgogol-ownership",
       type: "policy",
       status: "published",
       kind: "ownership",
@@ -549,7 +549,7 @@ describe("exitPolicySchema", () => {
   it("accepts a valid exit policy entity", () => {
     const valid = {
       schema: "pbp/exit-policy@1",
-      id: "webgogol-exit",
+      id: "warpgogol-exit",
       type: "policy",
       status: "published",
       kind: "exit",
@@ -566,7 +566,7 @@ describe("dataRetentionPolicySchema", () => {
   it("accepts a valid data retention policy entity", () => {
     const valid = {
       schema: "pbp/data-retention-policy@1",
-      id: "webgogol-retention",
+      id: "warpgogol-retention",
       type: "policy",
       status: "published",
       kind: "data-retention",

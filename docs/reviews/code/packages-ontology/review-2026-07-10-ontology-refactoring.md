@@ -40,7 +40,7 @@ Three deepening refactors (manifest-resolver extraction, operations schema separ
 
 ## Mechanical floor
 
-Pass — `tsc --noEmit -p packages/ontology/tsconfig.json` exits 0. Consumer packages `@gogol/site-kernel-handoff` and `@gogol/site-kernel-checks` also typecheck clean.
+Pass — `tsc --noEmit -p packages/ontology/tsconfig.json` exits 0. Consumer packages `@warpgogol/site-kernel-handoff` and `@warpgogol/site-kernel-checks` also typecheck clean.
 
 ## Axis A — Structural correctness
 
@@ -54,23 +54,23 @@ No issues.
 
 - **DNA-6 (kebab-case)**: all new filenames use kebab-case (`manifest-resolver.ts`, `operations/index.ts`, `artifact-store.ts`, etc.).
 - **DNA-42 (Compass markup)**: all 10 new operations files and `manifest-resolver.ts` carry `MODULE_CONTRACT` and `CHANGE_SUMMARY`.
-- **DNA-1 (monorepo boundary)**: no `apps/* → apps/*` imports. Consumer imports flow `packages/os → packages/ontology` via the new `@gogol/ontology/operations` sub-path.
+- **DNA-1 (monorepo boundary)**: no `apps/* → apps/*` imports. Consumer imports flow `packages/os → packages/ontology` via the new `@warpgogol/ontology/operations` sub-path.
 - No cosmic naming, no UI component, no route changes — DNA-5/17/23/24/25 not applicable.
 
 ## Axis C — Ecosystem fit
 
 - **Stale Compass path in `docs/knowledge-graph.xml:312`**: `packages/ontology/src/schemas/handoff.ts` → should be `packages/ontology/src/operations/handoff.ts`. The node `packages.ontology.handoff-schemas` points to the old path. **Needs update.**
 - **`docs/grace-inventory.xml` needs regeneration**: the inventory entry for `archetype-registry.ts` (line 1253) records 38 non-empty lines; the file now has 55 lines with Zod validation. New files (`operations/*.ts`, `manifest-resolver.ts`) are not listed. Run `ecosystem.manifest.generate` or the inventory regeneration command.
-- **AGENTS.md and README.md**: updated with the new `@gogol/ontology/operations` entry point. Correct.
+- **AGENTS.md and README.md**: updated with the new `@warpgogol/ontology/operations` entry point. Correct.
 - **`package.json` exports**: `./operations` added pointing to `src/operations/index.ts`. Correct.
-- **Consumer import migration**: all 22 consumer files in `site-kernel-handoff` and `site-kernel-checks` updated from `@gogol/ontology/schemas` to `@gogol/ontology/operations`. Verified no remaining operations schema imports from `@gogol/ontology/schemas`.
+- **Consumer import migration**: all 22 consumer files in `site-kernel-handoff` and `site-kernel-checks` updated from `@warpgogol/ontology/schemas` to `@warpgogol/ontology/operations`. Verified no remaining operations schema imports from `@warpgogol/ontology/schemas`.
 
 ## Axis D — Forward-only compliance
 
 No issues.
 
 - No backward-compat shims: operations schemas were fully removed from `schemas/index.ts` — no re-exports, no deprecated aliases.
-- No dual-paths: consumers must import from `@gogol/ontology/operations` — there is no fallback to `@gogol/ontology/schemas`.
+- No dual-paths: consumers must import from `@warpgogol/ontology/operations` — there is no fallback to `@warpgogol/ontology/schemas`.
 - The `schemas/index.ts` comment on line 77-79 documents the extraction but does not provide a compat layer.
 
 ## Axis E — Agent-facing clarity

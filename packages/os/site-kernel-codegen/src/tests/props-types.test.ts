@@ -9,7 +9,7 @@ import {
   discoverManifestPropsInfo,
   runPropsTypesGenerate,
 } from "../props-types.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 /*
 <MODULE_CONTRACT>
@@ -20,7 +20,7 @@ import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kerne
 </purpose>
 <non-goals>
   <item>Do not test props.contract.validate (PROPS-01/02) — see site-kernel-checks tests.</item>
-  <item>Do not test the dev-time validateProps hook — see @gogol/share tests.</item>
+  <item>Do not test the dev-time validateProps hook — see @warpgogol/share tests.</item>
 </non-goals>
 </MODULE_CONTRACT>
 */

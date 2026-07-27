@@ -29,22 +29,22 @@ filesReviewed:
 
 ### Verdict: Needs revision
 
-The diff successfully converts all 24 kernel modules to use dynamic imports inside async `register()` methods, achieving a ~7x speedup for manifest-driven single-module command execution. However, 9 new source files lack the required Compass scaffolding (DNA-42), and the checks module retains top-level runtime imports from `@gogol/site-kernel` that partially defeat the lazy-loading goal for that package.
+The diff successfully converts all 24 kernel modules to use dynamic imports inside async `register()` methods, achieving a ~7x speedup for manifest-driven single-module command execution. However, 9 new source files lack the required Compass scaffolding (DNA-42), and the checks module retains top-level runtime imports from `@warpgogol/site-kernel` that partially defeat the lazy-loading goal for that package.
 
 ### Mechanical floor
 
 Pass — all 5 affected packages pass `build:check` (`tsc --noEmit`):
 
-- `@gogol/site-kernel` ✓
-- `@gogol/site-kernel-checks` ✓
-- `@gogol/site-kernel-observability` ✓
-- `@gogol/site-kernel-onboarding` ✓
-- `@gogol/site-kernel-handoff` ✓
-- `@gogol/forge` ✓
+- `@warpgogol/site-kernel` ✓
+- `@warpgogol/site-kernel-checks` ✓
+- `@warpgogol/site-kernel-observability` ✓
+- `@warpgogol/site-kernel-onboarding` ✓
+- `@warpgogol/site-kernel-handoff` ✓
+- `@warpgogol/forge` ✓
 
 ### Axis A — Structural correctness
 
-- **Checks module partial lazy loading**: `packages/os/site-kernel-checks/src/module.ts` still has top-level runtime imports from `@gogol/site-kernel` (lines 32–37: `executeKernelCommand`, `appendStepTelemetry`, `loadPipelineBudgets`, `lookupExpectedDurationMs`) and from `./pipelines/index.ts` (lines 40–49). These are used by the pipeline driver functions (`runCommandSequence`, `runAppsCheckImpl`, etc.) defined at module scope. While `ALL_COMMANDS` and `runMirroringValidation` are now correctly lazy-loaded inside `register()`, the pipeline constants and runtime utilities are still eagerly loaded. This is acceptable for the pipeline driver functions (they need these at call time, not registration time), but it means the checks module is only partially lazy — the `./pipelines/index.ts` barrel and `@gogol/site-kernel` runtime imports are still loaded when the module file is imported. **Finding: minor** — the heaviest import (`ALL_COMMANDS` with 17+ command tables) is successfully lazy-loaded, so the performance goal is achieved, but the module is not fully lazy.
+- **Checks module partial lazy loading**: `packages/os/site-kernel-checks/src/module.ts` still has top-level runtime imports from `@warpgogol/site-kernel` (lines 32–37: `executeKernelCommand`, `appendStepTelemetry`, `loadPipelineBudgets`, `lookupExpectedDurationMs`) and from `./pipelines/index.ts` (lines 40–49). These are used by the pipeline driver functions (`runCommandSequence`, `runAppsCheckImpl`, etc.) defined at module scope. While `ALL_COMMANDS` and `runMirroringValidation` are now correctly lazy-loaded inside `register()`, the pipeline constants and runtime utilities are still eagerly loaded. This is acceptable for the pipeline driver functions (they need these at call time, not registration time), but it means the checks module is only partially lazy — the `./pipelines/index.ts` barrel and `@warpgogol/site-kernel` runtime imports are still loaded when the module file is imported. **Finding: minor** — the heaviest import (`ALL_COMMANDS` with 17+ command tables) is successfully lazy-loaded, so the performance goal is achieved, but the module is not fully lazy.
 - **No dead code introduced** — the original barrel files (`index.ts`) are retained for their export surfaces, which is correct.
 - **No duplicated logic** — each new `*.module.ts` file faithfully reproduces the command registrations from the original barrel `index.ts` files (verified for handoff, sternsystem, mission, bordbuch, artifact-store, behavior-snapshot, release, leitstand, notausgang).
 
@@ -70,7 +70,7 @@ Pass — all 5 affected packages pass `build:check` (`tsc --noEmit`):
 ### Axis C — Ecosystem fit
 
 - **Package boundaries** — Pass. All imports flow `packages/* → packages/*` and `tools/* → packages/*`.
-- **Deep export paths** — Pass. `package.json` exports maps in `@gogol/site-kernel` and `@gogol/site-kernel-handoff` correctly declare the new `-module` deep paths alongside the existing barrel paths.
+- **Deep export paths** — Pass. `package.json` exports maps in `@warpgogol/site-kernel` and `@warpgogol/site-kernel-handoff` correctly declare the new `-module` deep paths alongside the existing barrel paths.
 - **Command lifecycle** — Pass. All 571 commands are registered in the manifest; no command metadata changed.
 - **AGENTS.md updates** — Not applicable. The refactor is internal (import structure only); no new rules or patterns are introduced.
 - **Compass sync** — Not applicable. No repository-wide requirements or shared package contracts changed.
@@ -100,7 +100,7 @@ Pass — all 5 affected packages pass `build:check` (`tsc --noEmit`):
 - **Performance** — Pass. The diff claims ~7x speedup for `rfc.list` (1187ms vs ~8s baseline). The manifest-driven fast path loads only the needed module. The `command.manifest.generate` command still takes ~112s because it must load all 24 modules — this is expected and unchanged.
 - **Edge cases** — The `handoff.module.ts` initially had incorrect relative import paths (`../handoff-absorb.ts` instead of `./handoff-absorb.ts`), which was caught and fixed during the session. No remaining edge cases identified.
 - **Concurrent execution** — Not applicable. Module loading is per-command-execution, not concurrent.
-- **Migration path** — The original barrel `index.ts` files are retained, so any code that imports from the barrel (e.g., `createHandoffModule` from `@gogol/site-kernel-handoff/handoff`) still works. The kernel config uses the new `-module` paths. No migration needed for external consumers.
+- **Migration path** — The original barrel `index.ts` files are retained, so any code that imports from the barrel (e.g., `createHandoffModule` from `@warpgogol/site-kernel-handoff/handoff`) still works. The kernel config uses the new `-module` paths. No migration needed for external consumers.
 
 ### Spec compliance
 

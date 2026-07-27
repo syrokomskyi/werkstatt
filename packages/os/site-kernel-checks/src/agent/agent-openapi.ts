@@ -23,15 +23,15 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import {
   formatAgentOpenApi,
   type AgentSurfaceManifest,
   type OpenApiDocument,
   type CapabilitySchemaInput,
-} from "@gogol/share/agent";
+} from "@warpgogol/share/agent";
 import { loadCapabilityCatalog } from "./agent-capability.ts";
 import { diagnosticsResult } from "../result-helpers.ts";
 

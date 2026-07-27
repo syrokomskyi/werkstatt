@@ -18,7 +18,7 @@ import {
   fleetRegistrySchema,
   type FleetRegistry,
   type FleetRegistryEntry,
-} from "@gogol/ontology/operations";
+} from "@warpgogol/ontology/operations";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 
 const REGISTRY_PATH = path.join("systems", "registry.yaml");

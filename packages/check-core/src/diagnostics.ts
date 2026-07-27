@@ -1,7 +1,7 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-  Shared deterministic diagnostic collectors for the check-webgogol ecosystem.
+  Shared deterministic diagnostic collectors for the check-warpgogol ecosystem.
   Both the OS command layer and the runner service import these collectors
   to avoid pipeline duplication.
 </purpose>
@@ -10,11 +10,11 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Extracted from site-kernel-check-webgogol/commands/helpers.ts to eliminate pipeline duplication between OS commands and runner service.</item>
+  <item>Extracted from site-kernel-check-warpgogol/commands/helpers.ts to eliminate pipeline duplication between OS commands and runner service.</item>
 </CHANGE_SUMMARY>
 */
 
-import type { Diagnostic } from "@gogol/site-kernel";
+import type { Diagnostic } from "@warpgogol/site-kernel";
 import type { SiteEvidenceGraph } from "./evidence.ts";
 
 export function makeDiagnostic(

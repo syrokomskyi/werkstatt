@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Centralizes the export of validation and linting functions for modular checks within the WGogol ecosystem.</purpose>
+<purpose>Centralizes the export of validation and linting functions for modular checks within the Warpgogol ecosystem.</purpose>
 <non-goals>
   <item>Do not define new validation logic; only export existing functions.</item>
   <item>Do not manage user interactions or output; maintain a focus on function exports.</item>
@@ -22,7 +22,7 @@ export { runSemanticDriftValidation } from "./checks/semantic-drift.ts";
 export { runCompassInventory, runCompassValidation } from "./compass.ts";
 export * from "./compass-change-summary.ts";
 export * from "./compass-audit.ts";
-export { createCompassInventoryEntries, type CompassInventoryEntry } from "@gogol/site-kernel";
+export { createCompassInventoryEntries, type CompassInventoryEntry } from "@warpgogol/site-kernel";
 
 export * from "./structure.ts";
 

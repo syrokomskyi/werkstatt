@@ -20,7 +20,7 @@ lookups so emitted Diagnostics carry file:line locators.
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 /** A single authored background descriptor (kind + params), as written. */
 export type VisualBackground = Record<string, unknown>;

@@ -16,7 +16,7 @@
 *******************************************************************************/
 
 /**
- * @gogol/growth — GrowthConfig
+ * @warpgogol/growth — GrowthConfig
  *
  * The runtime-serialisable configuration block that the server injects into the
  * page via <GrowthProvider> and that bootGrowthLayer() reads on the client.
@@ -27,14 +27,14 @@
  */
 
 import { z } from "zod";
-import { growthVendorSchema } from "@gogol/ontology/schemas";
+import { growthVendorSchema } from "@warpgogol/ontology/schemas";
 
 // ---------------------------------------------------------------------------
 // Zod schema — used both for authoring-time validation and runtime parsing
 // ---------------------------------------------------------------------------
 
 /**
- * Vendor config schema — re-exported from @gogol/ontology as the single source
+ * Vendor config schema — re-exported from @warpgogol/ontology as the single source
  * of truth. The ontology schema is shared with systemGrowthSchema so the
  * `growth.vendor` shape in system.md and the runtime config stay in sync.
  */
@@ -88,4 +88,4 @@ export type GrowthConfig = z.infer<typeof GrowthConfigSchema>;
 // ---------------------------------------------------------------------------
 
 /** The `id` of the <script type="application/json"> injected by <GrowthProvider>. */
-export const GROWTH_CONFIG_SCRIPT_ID = "__webgogol_growth_config__";
+export const GROWTH_CONFIG_SCRIPT_ID = "__warpgogol_growth_config__";

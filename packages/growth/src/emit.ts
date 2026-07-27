@@ -8,7 +8,7 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Architecture review 2026-07-10: Extracted createEmitQueue() factory so queue logic is testable without module-level state hacks. Added __webgogol_emit__ bridge assignment so shared UI components can fire events through the singleton.</item>
+  <item>Architecture review 2026-07-10: Extracted createEmitQueue() factory so queue logic is testable without module-level state hacks. Added __warpgogol_emit__ bridge assignment so shared UI components can fire events through the singleton.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,14 +19,14 @@
 // Events emitted before bootGrowthLayer() completes are queued and flushed.
 
 /**
- * @gogol/growth — emit() singleton + createEmitQueue() factory
+ * @warpgogol/growth — emit() singleton + createEmitQueue() factory
  *
  * The single call-site for all event tracking in application code.
  * Application code never imports adapters directly — all vendor coupling
  * is inside the adapter module itself (DNA-30).
  *
  * Usage (client-side only):
- *   import { emit } from "@gogol/growth/emit";
+ *   import { emit } from "@warpgogol/growth/emit";
  *   emit("cta-click", { label: "hero-donate", href: "/de/spenden-kontakt" });
  *
  * The locale field is injected automatically from the active GrowthConfig;
@@ -176,15 +176,15 @@ export function _destroyAdapter(): void {
 }
 
 // ---------------------------------------------------------------------------
-// __webgogol_emit__ bridge — connects shared UI components to the singleton
+// __warpgogol_emit__ bridge — connects shared UI components to the singleton
 // ---------------------------------------------------------------------------
 
 /**
  * The window key where the emit bridge is exposed for shared UI components
- * that cannot import @gogol/growth/emit directly (e.g. Astro inline scripts
+ * that cannot import @warpgogol/growth/emit directly (e.g. Astro inline scripts
  * with define:vars).
  */
-export const GROWTH_EMIT_KEY = "__webgogol_emit__";
+export const GROWTH_EMIT_KEY = "__warpgogol_emit__";
 
 // Set up the bridge at module initialization so it's available before
 // bootGrowthLayer() completes. Events fired through the bridge before the

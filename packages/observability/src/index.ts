@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Barrel export for @gogol/observability — the observability port package (RFC-0337).</purpose>
+<purpose>Barrel export for @warpgogol/observability — the observability port package (RFC-0337).</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -15,12 +15,12 @@ export {
   buildResourceAttributes,
   OTLP_ENDPOINT_ENV,
   OTLP_TOKEN_ENV,
-  WGOGOL_ENVIRONMENTS,
-  WGOGOL_LAYERS,
+  WARPGOGOL_ENVIRONMENTS,
+  WARPGOGOL_LAYERS,
   type OtlpKeyValue,
-  type WgogolEnvironment,
-  type WgogolLayer,
-  type WgogolResourceInput,
+  type WarpgogolEnvironment,
+  type WarpgogolLayer,
+  type WarpgogolResourceInput,
 } from "./conventions.ts";
 
 export {
@@ -29,9 +29,9 @@ export {
   isMetricNameValid,
   FORBIDDEN_LABEL_KEYS,
   METRIC_NAME_PATTERN,
-  WGOGOL_METRIC_REGISTRY,
-  type WgogolMetricKind,
-  type WgogolMetricSpec,
+  WARPGOGOL_METRIC_REGISTRY,
+  type WarpgogolMetricKind,
+  type WarpgogolMetricSpec,
 } from "./metric-registry.ts";
 
 export {

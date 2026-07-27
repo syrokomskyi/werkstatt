@@ -20,8 +20,8 @@ import {
 
 const sampleDoc = {
   surfaceVersion: "1.0.0",
-  site: "webgogol-com",
-  baseUrl: "https://webgogol.com",
+  site: "warpgogol-com",
+  baseUrl: "https://warpgogol.com",
   contentHash: "abc123",
   knowledge: [
     { domain: "offer", url: "/api/agent/v1/offer.json", schema: "gogol.agent.knowledge/offer@1" },
@@ -59,7 +59,7 @@ test("buildFleetAgentCatalog: populated doc ⇒ enabled: true with extracted fie
   const entry = catalog.sites[0]!;
   expect(entry.enabled).toBe(true);
   expect(entry.signed).toBe(false);
-  expect(entry.baseUrl).toBe("https://webgogol.com");
+  expect(entry.baseUrl).toBe("https://warpgogol.com");
   expect(entry.surfaceVersion).toBe("1.0.0");
   expect(entry.contentHash).toBe("abc123");
   expect(entry.knowledgeDomains).toEqual(["offer"]);

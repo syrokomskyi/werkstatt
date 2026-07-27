@@ -1,14 +1,14 @@
 /*
 <MODULE_CONTRACT>
 <purpose>Growth block schema (RFC-0027) and shared context schema for the system manifest.
-Exports growthVendorSchema as the canonical vendor config shape, reused by @gogol/growth/config.ts.</purpose>
+Exports growthVendorSchema as the canonical vendor config shape, reused by @warpgogol/growth/config.ts.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303 Phase 3: extracted from schemas/system.ts as part of the domain split.</item>
-  <item>Architecture review 2026-07-10: Extracted growthVendorSchema so @gogol/growth/config.ts can import it instead of duplicating the shape.</item>
+  <item>Architecture review 2026-07-10: Extracted growthVendorSchema so @warpgogol/growth/config.ts can import it instead of duplicating the shape.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,7 +20,7 @@ export const systemSharedContextSchema = z.object({
 
 /**
  * Vendor adapter binding — the canonical schema for the `growth.vendor` block.
- * Shared by systemGrowthSchema (ontology) and GrowthConfigSchema (@gogol/growth/config.ts).
+ * Shared by systemGrowthSchema (ontology) and GrowthConfigSchema (@warpgogol/growth/config.ts).
  *
  * adapter: id of the GrowthAdapter package (e.g. "null", "matomo").
  * options: vendor-specific key/value pairs forwarded to GrowthAdapter.init().

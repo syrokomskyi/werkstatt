@@ -1,6 +1,6 @@
 # Site OS — Operator and Extension Guide
 
-> **Scope.** This document covers the site OS built from `@gogol/site-kernel` and `@gogol/site-kernel-astro`. It explains how to operate any site in `apps/*`, how to extend the OS with cross-site features, and how to add site-specific features to a single app.
+> **Scope.** This document covers the site OS built from `@warpgogol/site-kernel` and `@warpgogol/site-kernel-astro`. It explains how to operate any site in `apps/*`, how to extend the OS with cross-site features, and how to add site-specific features to a single app.
 
 ---
 
@@ -30,8 +30,8 @@ The site OS is a thin runtime layer that lets every app in `apps/*` register typ
 ```
 monorepo root
 ├── packages/
-│   ├── site-kernel          @gogol/site-kernel   ← framework-free OS core
-│   └── site-kernel-astro    @gogol/site-kernel-astro  ← Astro path helpers
+│   ├── site-kernel          @warpgogol/site-kernel   ← framework-free OS core
+│   └── site-kernel-astro    @warpgogol/site-kernel-astro  ← Astro path helpers
 └── apps/
     ├── main/
     │   └── tools/
@@ -92,14 +92,14 @@ apps/<site>/tools/
 
 ## 3. Making the CLI available
 
-The `site-kernel` CLI bin is provided by `@gogol/site-kernel`. For it to be callable by name from anywhere in the monorepo, the root `package.json` must declare it as a `devDependency` and `pnpm install` must have been run.
+The `site-kernel` CLI bin is provided by `@warpgogol/site-kernel`. For it to be callable by name from anywhere in the monorepo, the root `package.json` must declare it as a `devDependency` and `pnpm install` must have been run.
 
 **Root `package.json` requirement:**
 
 ```json
 {
   "devDependencies": {
-    "@gogol/site-kernel": "workspace:*"
+    "@warpgogol/site-kernel": "workspace:*"
   }
 }
 ```
@@ -116,7 +116,7 @@ node_modules/.bin/site-kernel        ← POSIX shell script
 | ---------------------------------------- | ---------------------------------------- |
 | POSIX shells (bash, zsh) — monorepo root | `site-kernel run <command>`              |
 | Explicit `pnpm exec` (works everywhere)  | `pnpm exec site-kernel run <command>`    |
-| Via npm script alias                     | `pnpm --filter @gogol/main site-os:apps` |
+| Via npm script alias                     | `pnpm --filter @warpgogol/main site-os:apps` |
 
 ---
 
@@ -186,8 +186,8 @@ pnpm exec site-kernel apps list --json
 Sample output:
 
 ```
-Workspace: /projects/webgogol-3
-- main -> /projects/webgogol-3/apps/main/tools/kernel.config.ts
+Workspace: /projects/warpgogol-3
+- main -> /projects/warpgogol-3/apps/main/tools/kernel.config.ts
 - my-app -> no config
 ```
 
@@ -339,7 +339,7 @@ In `apps/<name>/package.json`:
 ```json
 {
   "dependencies": {
-    "@gogol/site-kernel": "workspace:*"
+    "@warpgogol/site-kernel": "workspace:*"
   }
 }
 ```
@@ -350,7 +350,7 @@ Run `pnpm install` from the repository root.
 
 ```ts
 // apps/<name>/tools/kernel.config.ts
-import { defineKernelConfig } from "@gogol/site-kernel";
+import { defineKernelConfig } from "@warpgogol/site-kernel";
 import { checkModule } from "./modules/check.module";
 
 export default defineKernelConfig({
@@ -369,7 +369,7 @@ export default defineKernelConfig({
 
 ```ts
 // apps/<name>/tools/modules/check.module.ts
-import type { KernelModule } from "@gogol/site-kernel";
+import type { KernelModule } from "@warpgogol/site-kernel";
 import { runContentValidation } from "../runtime/check";
 
 export const checkModule: KernelModule = {
@@ -390,7 +390,7 @@ export const checkModule: KernelModule = {
 
 ```ts
 // apps/<name>/tools/runtime/check.ts
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 export async function runContentValidation(
   _input: KernelCommandInput,
@@ -449,8 +449,8 @@ When the scope is unclear, start inside one app's `tools/modules/`, make it work
 3. Create `tools/modules/a11y.module.ts` in each app:
 
 ```ts
-import { runA11yValidation } from "@gogol/site-kernel-astro";
-import type { KernelModule } from "@gogol/site-kernel";
+import { runA11yValidation } from "@warpgogol/site-kernel-astro";
+import type { KernelModule } from "@warpgogol/site-kernel";
 
 export const a11yModule: KernelModule = {
   name: "a11y",
@@ -600,15 +600,15 @@ Everything after `--` is forwarded verbatim to the command handler's `input.args
 Kernel packages (use `pnpm` for package-level type/test checks):
 
 ```sh
-pnpm --filter @gogol/site-kernel build:check
+pnpm --filter @warpgogol/site-kernel build:check
 ```
 
 ```sh
-pnpm --filter @gogol/site-kernel test
+pnpm --filter @warpgogol/site-kernel test
 ```
 
 ```sh
-pnpm --filter @gogol/site-kernel-astro build:check
+pnpm --filter @warpgogol/site-kernel-astro build:check
 ```
 
 Single app via OS:

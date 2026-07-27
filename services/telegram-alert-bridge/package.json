@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/telegram-alert-bridge",
+  "name": "@warpgogol/telegram-alert-bridge",
   "version": "0.1.0",
   "private": true,
   "type": "module",

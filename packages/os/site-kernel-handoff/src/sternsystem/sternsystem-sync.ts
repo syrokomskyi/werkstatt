@@ -21,7 +21,7 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { readRegistry, findEntry } from "./registry-io.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { ensureMirrorHook } from "./mirror-hook.ts";

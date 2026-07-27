@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/pbp",
+  "name": "@warpgogol/pbp",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -52,10 +52,10 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
-    "@gogol/content-source": "workspace:*",
-    "@gogol/fingerprint": "workspace:*",
-    "@gogol/share": "workspace:*",
-    "@gogol/site-kernel-content": "workspace:*",
+    "@warpgogol/content-source": "workspace:*",
+    "@warpgogol/fingerprint": "workspace:*",
+    "@warpgogol/share": "workspace:*",
+    "@warpgogol/site-kernel-content": "workspace:*",
     "astro": "^7.1.3",
     "zod": "^4.4.3"
   },

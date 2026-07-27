@@ -96,7 +96,7 @@ export async function runCutoverCheck(appDirectory: string): Promise<PbpCutoverC
   let pbpTestsPass = true;
 
   try {
-    execSync("pnpm --filter @gogol/pbp test", { stdio: "pipe", timeout: 60000 });
+    execSync("pnpm --filter @warpgogol/pbp test", { stdio: "pipe", timeout: 60000 });
   } catch {
     pbpTestsPass = false;
     errors.push("PBP tests failed");
@@ -184,7 +184,7 @@ function checkNoLegacyImports(appDirectory: string): boolean {
 
   try {
     const result = execSync(
-      `grep -r "@gogol/business" "${srcDir}" --include="*.ts" --include="*.astro" -l 2>/dev/null || true`,
+      `grep -r "@warpgogol/business" "${srcDir}" --include="*.ts" --include="*.astro" -l 2>/dev/null || true`,
       { encoding: "utf-8", timeout: 10000 },
     );
     return result.trim() === "";

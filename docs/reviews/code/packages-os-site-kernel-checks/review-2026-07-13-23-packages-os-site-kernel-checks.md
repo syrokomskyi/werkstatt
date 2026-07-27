@@ -80,15 +80,15 @@ filesReviewed:
 
 ### Verdict: Needs revision
 
-The diff is a large-scale refactoring (150 files, 8 logical changes) that is mechanically sound — all three affected packages pass `build:check` and the integration test suite is green. However, Axis D finds a forward-only violation: the `@gogol/share/integration/*` backward-compat re-export barrels are compatibility shims that should be removed, not maintained. Axis C finds that `docs/ecosystem.generated.yaml` is stale (missing `@gogol/integration` package entry) and `docs/policies/integration-hub.md` still references `@gogol/share/integration` instead of `@gogol/integration`.
+The diff is a large-scale refactoring (150 files, 8 logical changes) that is mechanically sound — all three affected packages pass `build:check` and the integration test suite is green. However, Axis D finds a forward-only violation: the `@warpgogol/share/integration/*` backward-compat re-export barrels are compatibility shims that should be removed, not maintained. Axis C finds that `docs/ecosystem.generated.yaml` is stale (missing `@warpgogol/integration` package entry) and `docs/policies/integration-hub.md` still references `@warpgogol/share/integration` instead of `@warpgogol/integration`.
 
 ### Mechanical floor
 
-- `@gogol/site-kernel-checks` `build:check` — **pass**
-- `@gogol/integration` `build:check` — **pass**
-- `@gogol/share` `build:check` — **pass**
-- `@gogol/integration` tests — **31/31 pass**
-- `@gogol/site-kernel-checks` tests — **228/234 pass** (5 pre-existing failures unrelated to this diff; 1 caused by diff fixed in `bc4a0ec61`)
+- `@warpgogol/site-kernel-checks` `build:check` — **pass**
+- `@warpgogol/integration` `build:check` — **pass**
+- `@warpgogol/share` `build:check` — **pass**
+- `@warpgogol/integration` tests — **31/31 pass**
+- `@warpgogol/site-kernel-checks` tests — **228/234 pass** (5 pre-existing failures unrelated to this diff; 1 caused by diff fixed in `bc4a0ec61`)
 
 ### Axis A — Structural correctness
 
@@ -97,29 +97,29 @@ The diff is a large-scale refactoring (150 files, 8 logical changes) that is mec
 
 ### Axis B — DNA alignment
 
-- **DNA-1 (monorepo boundary)** — **pass.** The new `@gogol/integration` package follows the `packages/*` boundary contract. No `apps/* → apps/*` imports introduced.
+- **DNA-1 (monorepo boundary)** — **pass.** The new `@warpgogol/integration` package follows the `packages/*` boundary contract. No `apps/* → apps/*` imports introduced.
 - **DNA-6 (kebab-case)** — **pass.** All new subdirectory names (`agent/`, `pseo/`, `maintenance/`, `pipeline/`, `video/`, `env/`) use kebab-case. New package directory `packages/integration/` is kebab-case.
-- **DNA-42 (Compass markup)** — **pass.** New non-trivial source files in `@gogol/integration` carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` semantic scaffolding (verified in `index.ts`, `port-barrel.ts`, `crm-buffer.ts`). The backward-compat re-export barrels in `@gogol/share/integration/` also carry `MODULE_CONTRACT` markup.
+- **DNA-42 (Compass markup)** — **pass.** New non-trivial source files in `@warpgogol/integration` carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` semantic scaffolding (verified in `index.ts`, `port-barrel.ts`, `crm-buffer.ts`). The backward-compat re-export barrels in `@warpgogol/share/integration/` also carry `MODULE_CONTRACT` markup.
 - **DNA-51 (Werkstatt primitives)** — **N/A.** No mutating Werkstatt commands added or changed.
 
 ### Axis C — Ecosystem fit
 
-- **FAIL — `docs/ecosystem.generated.yaml` is stale.** The new `@gogol/integration` package does not appear in the ecosystem projection. Per AGENTS.md: "When workspace topology, root pipelines, or command surfaces change, update the generator/registries first, then run `ecosystem.manifest.generate`." The extraction of `@gogol/integration` from `@gogol/share` is a workspace topology change. The file must be regenerated.
-- **FAIL — `docs/policies/integration-hub.md` references `@gogol/share/integration` (2 occurrences).** Lines 7 and 32 still say "Contracts live in `@gogol/share/integration`" and "CF-queue primitives still exported from `@gogol/share/integration`". These should reference `@gogol/integration` (the new canonical location) with an optional note that `@gogol/share/integration` re-exports for backward compat.
-- **Additional stale `@gogol/share/integration` references** exist in `docs/specs/visitor-funnel/*.md` (5 files) and `docs/specs/integration-delivery.md` (1 file). These are pre-existing docs not touched by this diff, but the extraction makes them stale. At minimum, `docs/policies/integration-hub.md` (which was created/modified in this diff) must be updated.
-- **Package boundaries** — **pass.** `@gogol/share` now depends on `@gogol/integration` (workspace:*), and `@gogol/integration` has no dependency on `@gogol/share`. The dependency direction is correct.
+- **FAIL — `docs/ecosystem.generated.yaml` is stale.** The new `@warpgogol/integration` package does not appear in the ecosystem projection. Per AGENTS.md: "When workspace topology, root pipelines, or command surfaces change, update the generator/registries first, then run `ecosystem.manifest.generate`." The extraction of `@warpgogol/integration` from `@warpgogol/share` is a workspace topology change. The file must be regenerated.
+- **FAIL — `docs/policies/integration-hub.md` references `@warpgogol/share/integration` (2 occurrences).** Lines 7 and 32 still say "Contracts live in `@warpgogol/share/integration`" and "CF-queue primitives still exported from `@warpgogol/share/integration`". These should reference `@warpgogol/integration` (the new canonical location) with an optional note that `@warpgogol/share/integration` re-exports for backward compat.
+- **Additional stale `@warpgogol/share/integration` references** exist in `docs/specs/visitor-funnel/*.md` (5 files) and `docs/specs/integration-delivery.md` (1 file). These are pre-existing docs not touched by this diff, but the extraction makes them stale. At minimum, `docs/policies/integration-hub.md` (which was created/modified in this diff) must be updated.
+- **Package boundaries** — **pass.** `@warpgogol/share` now depends on `@warpgogol/integration` (workspace:*), and `@warpgogol/integration` has no dependency on `@warpgogol/share`. The dependency direction is correct.
 - **AGENTS.md decomposition** — **pass.** The root `AGENTS.md` now delegates to `docs/policies/*.md` files with correct cross-references. The `docs/knowledge-graph.xml` and `docs/requirements.xml` were updated to reflect the `apps/AGENTS.md` → `docs/authoring/site-composition.md` migration.
 - **Command lifecycle** — **pass.** `rfc.index.validate` is registered in `rfc.module.ts` with correct metadata. `kernel-flags-lint.ts` was updated to include the new command in `KERNEL_FLAG_SCHEMA_SOURCES`.
 
 ### Axis D — Forward-only compliance
 
-- **FAIL — Backward-compat re-export barrels in `@gogol/share/integration/`.** Three files (`index.ts`, `port-barrel.ts`, `crm-buffer.ts`) are pure re-export shims to `@gogol/integration`. Per forward-only discipline: "No compatibility shims, bridges, or dual-paths that keep legacy behavior alive." The diff should update all consumers to import from `@gogol/integration` directly and delete the shims. The `@gogol/share/package.json` `exports` map still exposes `./integration`, `./integration/port`, and `./integration/crm-buffer` — these export paths should be removed once consumers are migrated.
+- **FAIL — Backward-compat re-export barrels in `@warpgogol/share/integration/`.** Three files (`index.ts`, `port-barrel.ts`, `crm-buffer.ts`) are pure re-export shims to `@warpgogol/integration`. Per forward-only discipline: "No compatibility shims, bridges, or dual-paths that keep legacy behavior alive." The diff should update all consumers to import from `@warpgogol/integration` directly and delete the shims. The `@warpgogol/share/package.json` `exports` map still exposes `./integration`, `./integration/port`, and `./integration/crm-buffer` — these export paths should be removed once consumers are migrated.
 
-  **Counterpoint:** The shims are marked with `MODULE_CONTRACT` noting "backward compat" and `CHANGE_SUMMARY` noting "Extraction: integration hub moved to @gogol/integration; this file re-exports for backward compat." This is a deliberate transitional measure, not an indefinite grace period. However, forward-only discipline requires removal in the same change, not a deferred cleanup.
+  **Counterpoint:** The shims are marked with `MODULE_CONTRACT` noting "backward compat" and `CHANGE_SUMMARY` noting "Extraction: integration hub moved to @warpgogol/integration; this file re-exports for backward compat." This is a deliberate transitional measure, not an indefinite grace period. However, forward-only discipline requires removal in the same change, not a deferred cleanup.
 
 ### Axis E — Agent-facing clarity
 
-- **Pass.** The `MODULE_CONTRACT` blocks in the new `@gogol/integration` files clearly state the purpose, non-goals, and change history. The backward-compat barrels explicitly mark themselves as such, so an agent reading them will understand they are looking at a delegation, not the canonical source.
+- **Pass.** The `MODULE_CONTRACT` blocks in the new `@warpgogol/integration` files clearly state the purpose, non-goals, and change history. The backward-compat barrels explicitly mark themselves as such, so an agent reading them will understand they are looking at a delegation, not the canonical source.
 - **No ungrounded assertions** found in new code. Comments in `index-graph.ts` correctly reference `RFC_DIR`, `listRfcFiles`, and the YAML output path.
 - **Compass scaffolding** — **pass** for new non-trivial files. The moved files in `site-kernel-checks/src/{agent,pseo,pipeline,maintenance,video,env}/` retain their existing Compass markup (none was stripped or added).
 
@@ -143,6 +143,6 @@ No spec available — spec compliance skipped. The 8 refactorings were self-defi
 
 ### Questions for the author
 
-1. **Why are the `@gogol/share/integration/*` backward-compat re-export barrels kept instead of migrating all consumers to `@gogol/integration` directly?** Forward-only discipline requires removal in the same change. If there are too many consumers to migrate in one pass, document the migration plan and timeline.
-2. **When will `docs/ecosystem.generated.yaml` be regenerated?** The new `@gogol/integration` package is missing from the projection. Per AGENTS.md, topology changes require regeneration.
-3. **Should `docs/policies/integration-hub.md` be updated to reference `@gogol/integration`?** The policy file was created in this diff but still references `@gogol/share/integration` as the canonical contract location.
+1. **Why are the `@warpgogol/share/integration/*` backward-compat re-export barrels kept instead of migrating all consumers to `@warpgogol/integration` directly?** Forward-only discipline requires removal in the same change. If there are too many consumers to migrate in one pass, document the migration plan and timeline.
+2. **When will `docs/ecosystem.generated.yaml` be regenerated?** The new `@warpgogol/integration` package is missing from the projection. Per AGENTS.md, topology changes require regeneration.
+3. **Should `docs/policies/integration-hub.md` be updated to reference `@warpgogol/integration`?** The policy file was created in this diff but still references `@warpgogol/share/integration` as the canonical contract location.

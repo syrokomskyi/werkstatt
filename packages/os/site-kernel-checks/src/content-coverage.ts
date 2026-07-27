@@ -24,12 +24,12 @@ import {
   normalizeComparableText,
   parseContentAtomsFile,
   parseCoverageLedgerMarkdown,
-} from "@gogol/share/content-discipline";
+} from "@warpgogol/share/content-discipline";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 export async function runContentCoverageValidate(
   _input: KernelCommandInput,
@@ -42,7 +42,7 @@ export async function runContentCoverageValidate(
   //   2. Shared onboarding staging output, but ONLY when its `client` matches the
   //      current app name (the staging dir holds a single in-flight run at a time).
   // Without this guard an already-onboarded app would be checked against another
-  // client's atoms (e.g. webgogol-com's atom-0001..N counted as unplaced in
+  // client's atoms (e.g. warpgogol-com's atom-0001..N counted as unplaced in
   // nicaragua-projekt).
   const siteName = context.site?.name ?? "";
   const appLocalAuthorDir = join(paths.appDirectory, ".author");

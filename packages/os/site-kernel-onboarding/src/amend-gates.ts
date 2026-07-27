@@ -22,10 +22,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { signBytes, verifyBytes } from "@gogol/passport/sign";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
-import type { DiscoveredSiteWorkspace } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { signBytes, verifyBytes } from "@warpgogol/passport/sign";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import type { DiscoveredSiteWorkspace } from "@warpgogol/site-kernel";
 import {
   readAmendInputManifest,
   readFlag,

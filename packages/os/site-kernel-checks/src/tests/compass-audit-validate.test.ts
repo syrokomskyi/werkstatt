@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { runCompassAuditValidate, runCompassAuditBaseline } from "../compass-audit.ts";
-import type { KernelCommandInput } from "@gogol/site-kernel";
+import type { KernelCommandInput } from "@warpgogol/site-kernel";
 import { makeTestContext } from "./helpers.ts";
 
 const execFileAsync = promisify(execFile);

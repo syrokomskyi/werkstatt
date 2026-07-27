@@ -1,4 +1,4 @@
-# @gogol/passport
+# @warpgogol/passport
 
 Cosmic Passport — build-time W3C Verifiable Credential that captures provenance, composition, and the Nebula Score for each deployed app. Emitted to `dist/.well-known/cosmic-passport.json` (DNA-31, DNA-34, RFC-0028).
 
@@ -15,20 +15,20 @@ The Cosmic Passport is a signed, machine-readable document that proves _what_ wa
 
 | Import | What it provides |
 | --- | --- |
-| `@gogol/passport` | Barrel — all exports |
-| `@gogol/passport/schema` | `CosmicPassportSchema`, `PassportClaim` Zod schemas |
-| `@gogol/passport/sign` | `signPassport(passport, privateKeyPem)` |
-| `@gogol/passport/emit` | `emitPassport(passport, distDir)` — writes to `dist/.well-known/cosmic-passport.json` |
-| `@gogol/passport/verify` | `verifyPassport(raw, publicKeyPem)` |
-| `@gogol/passport/key-rotate` | `rotateSigningKey()` — generates a new Ed25519 keypair |
-| `@gogol/passport/data` | `buildPassportData(inputs)` — assembles the passport payload from OS inputs |
+| `@warpgogol/passport` | Barrel — all exports |
+| `@warpgogol/passport/schema` | `CosmicPassportSchema`, `PassportClaim` Zod schemas |
+| `@warpgogol/passport/sign` | `signPassport(passport, privateKeyPem)` |
+| `@warpgogol/passport/emit` | `emitPassport(passport, distDir)` — writes to `dist/.well-known/cosmic-passport.json` |
+| `@warpgogol/passport/verify` | `verifyPassport(raw, publicKeyPem)` |
+| `@warpgogol/passport/key-rotate` | `rotateSigningKey()` — generates a new Ed25519 keypair |
+| `@warpgogol/passport/data` | `buildPassportData(inputs)` — assembles the passport payload from OS inputs |
 
 ## Typical build pipeline
 
 ```typescript
-import { buildPassportData } from "@gogol/passport/data";
-import { signPassport } from "@gogol/passport/sign";
-import { emitPassport } from "@gogol/passport/emit";
+import { buildPassportData } from "@warpgogol/passport/data";
+import { signPassport } from "@warpgogol/passport/sign";
+import { emitPassport } from "@warpgogol/passport/emit";
 
 const passport = buildPassportData({ starMap, nebulaScore, buildMeta });
 const signed   = signPassport(passport, process.env.INTEGRITY_PRIVATE_KEY_PEM!);
@@ -38,7 +38,7 @@ await emitPassport(signed, "./dist");
 ## Verification
 
 ```typescript
-import { verifyPassport } from "@gogol/passport/verify";
+import { verifyPassport } from "@warpgogol/passport/verify";
 
 const result = await verifyPassport(raw, publicKeyPem);
 // result.valid === true if signature is intact
@@ -47,7 +47,7 @@ const result = await verifyPassport(raw, publicKeyPem);
 ## Key rotation
 
 ```typescript
-import { rotateSigningKey } from "@gogol/passport/key-rotate";
+import { rotateSigningKey } from "@warpgogol/passport/key-rotate";
 
 const { publicKeyPem, privateKeyPem } = rotateSigningKey();
 // Store privateKeyPem as a GitHub Actions secret.
@@ -60,7 +60,7 @@ The passport is emitted to `dist/.well-known/cosmic-passport.json` and is public
 
 ## Relationship to site-kernel-integrity
 
-`@gogol/passport` and `@gogol/site-kernel-integrity` serve different purposes:
+`@warpgogol/passport` and `@warpgogol/site-kernel-integrity` serve different purposes:
 
 | Aspect | site-kernel-integrity | passport |
 | --- | --- | --- |
@@ -80,5 +80,5 @@ Signing uses `@noble/ed25519` — a zero-dependency, audited Ed25519 implementat
 ## Validation
 
 ```sh
-pnpm --filter @gogol/passport build:check
+pnpm --filter @warpgogol/passport build:check
 ```

@@ -12,8 +12,8 @@ third-party. The safe default for CI/dev and unentitled sites.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import type { ChatWidgetAdapter } from "@gogol/chat/port";
-import type { ChatWidgetLoadResult, ChatWidgetOpenResult } from "@gogol/chat/port";
+import type { ChatWidgetAdapter } from "@warpgogol/chat/port";
+import type { ChatWidgetLoadResult, ChatWidgetOpenResult } from "@warpgogol/chat/port";
 
 const NullChatAdapter: ChatWidgetAdapter = {
   id: "null",

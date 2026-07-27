@@ -26,7 +26,7 @@ function resolverWith(ancestors: BreadcrumbCrumb[]): BreadcrumbAncestorResolver 
 test("flat trail when there are no ancestors: Home → self", async () => {
   const trail = await buildBreadcrumbTrail({
     pageId: "impressum",
-    pageTitle: "Impressum | Webgogol",
+    pageTitle: "Impressum | Warpgogol",
     selfUrl: "https://example.com/impressum/",
     homeLabel: "Startseite",
     homeUrl: HOME,
@@ -41,7 +41,7 @@ test("flat trail when there are no ancestors: Home → self", async () => {
 test("multi-level trail: Home → ancestors (root-first) → self, site name stripped", async () => {
   const trail = await buildBreadcrumbTrail({
     pageId: "website-local:schreiner:muenchen",
-    pageTitle: "Schreiner-Website in München | Webgogol",
+    pageTitle: "Schreiner-Website in München | Warpgogol",
     selfUrl: SELF,
     homeLabel: "Startseite",
     homeUrl: HOME,

@@ -21,14 +21,14 @@ This site is a **composition shell**. The actual sections, components, runtime, 
 ├─ src/content/system.md            ◄── single canonical manifest (pages/routes, planets, growth, passport, i18n)
 ├─ src/content/pages/{lang}/*.md    ◄── frontmatter-only block-declarative pages (blocks[].type — NOT use:)
 ├─ src/content/prose/{lang}/*.md    ◄── long-form prose (impressum, AGB, datenschutz, projekte, etc.)
-├─ src/content/business-profile/{lang}/  ◄── consumed by @gogol/pbp
+├─ src/content/business-profile/{lang}/  ◄── consumed by @warpgogol/pbp
 ├─ src/content/navigation/{lang}/   ◄── navigation labels, order, groups, semantic targets
 ├─ src/content/site/{lang}/         ◄── shared shell/site UI labels, footer promo copy, layout config
 ├─ src/middleware/language-redirect.ts ◄── GENERATED (gitignored) — from system.md i18n via i18n:middleware:gen
 ├─ src/pages/index.astro            ◄── default-language home at / (self-canonical) + soft lang redirect
 ├─ src/pages/[...slug].astro        ◄── unprefixed default-language pages at /<slug> (RFC-0160)
 ├─ src/pages/[lang]/[...slug].astro ◄── non-default languages only, at /<lang>/<slug> (RFC-0160)
-├─ src/utils/localization.ts        ◄── thin proxy over @gogol/site-kernel-content + @gogol/share/i18n
+├─ src/utils/localization.ts        ◄── thin proxy over @warpgogol/site-kernel-content + @warpgogol/share/i18n
 └─ tools/kernel.config.ts           ◄── site-kernel pipeline wiring
 ```
 
@@ -46,10 +46,10 @@ Swapping the analytics vendor means changing `growth.vendor.adapter` in `src/con
 - There is **no feature graph** in this app (`src/content/features/` is gone — RFC-0047). Visibility lives on page blocks and shell/site settings.
 - Keep navigation targets content-declared in `src/content/navigation/{lang}/navigation.md` (RFC-0044). Navigation owns labels, order, groups, and semantic targets. **It does NOT own canonical page URLs** — those live in `src/content/system.md pages[].routes` (RFC-0048).
 - Route slugs are edited in `src/content/system.md pages[].routes`, not in `navigation.md`.
-- Use shared navigation schema from `@gogol/share/schemas/navigation` (RFC-0046). Configure app-specific navigation groups in `src/content/schemas/navigation.ts` by editing the `appNavigationGroups` array.
+- Use shared navigation schema from `@warpgogol/share/schemas/navigation` (RFC-0046). Configure app-specific navigation groups in `src/content/schemas/navigation.ts` by editing the `appNavigationGroups` array.
 - **Header navigation is explicitly filtered** via `header.navIds` inside `src/content/site/{lang}/labels.md`. The header does NOT automatically show all `group: navigation` items. To change which links appear in the header, edit the `header.navIds` array in labels.md — NOT the navigation.md group field. This is separate from `footer.navIds` which controls the footer links. Keep `header.navIds` and `footer.navIds` identical across all language versions of the same site (same IDs, same order); `labels.shape.hint` fails when localized menu destinations drift.
 - Keep styling in `src/styles/` and use only `--ds-*` design tokens.
-- Machine-readable outputs (JSON-LD, `llms.txt`, `llms-full.txt`) are projections built by the **shared semantic layer** (`@gogol/share/semantic` + the kernel `llms.generate` command) — this app carries no `src/semantic/`. See `docs/historical/rules/SEMANTIC_LAYER.md` (historical reference).
+- Machine-readable outputs (JSON-LD, `llms.txt`, `llms-full.txt`) are projections built by the **shared semantic layer** (`@warpgogol/share/semantic` + the kernel `llms.generate` command) — this app carries no `src/semantic/`. See `docs/historical/rules/SEMANTIC_LAYER.md` (historical reference).
 - Keep `lang` flowing from route to layout to children.
 - Keep React limited to isolated hydrated islands.
 
@@ -85,23 +85,23 @@ pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "<d
 - `mission.reconcile` and `mission.close` block if the workpiece has uncommitted changes.
 - `mission.validate` warns if the workpiece is dirty after validation — commit generated artifacts too.
 
-## Business layer (`@gogol/pbp`)
+## Business layer (`@warpgogol/pbp`)
 
-This app uses `@gogol/pbp` as the canonical business layer (RFC-0471):
+This app uses `@warpgogol/pbp` as the canonical business layer (RFC-0471):
 
-- **Content collections** (`@gogol/pbp`): `pbpCollections` from `@gogol/pbp/astro` — registered in `content.config.ts` for PBP entity data from `src/content/business-profile/`.
-- **Semantic profile** (`@gogol/pbp`): `buildPbpSemanticProfile` from `@gogol/pbp/semantic-profile` — used in page routes for JSON-LD generation.
+- **Content collections** (`@warpgogol/pbp`): `pbpCollections` from `@warpgogol/pbp/astro` — registered in `content.config.ts` for PBP entity data from `src/content/business-profile/`.
+- **Semantic profile** (`@warpgogol/pbp`): `buildPbpSemanticProfile` from `@warpgogol/pbp/semantic-profile` — used in page routes for JSON-LD generation.
 - **People collection**: standalone `people` collection in `content.config.ts` for person records from `src/content/people/`.
 
 | What you need | Import from |
 | --- | --- |
-| `pbpCollections` (Astro content collection) | `@gogol/pbp/astro` |
-| `buildPbpSemanticProfile`, `buildPageSemanticModel` | `@gogol/pbp/semantic-profile` |
+| `pbpCollections` (Astro content collection) | `@warpgogol/pbp/astro` |
+| `buildPbpSemanticProfile`, `buildPageSemanticModel` | `@warpgogol/pbp/semantic-profile` |
 
 **Wiring steps (already done for this app):**
 
-1. In `src/content.config.ts`, import and spread `pbpCollections` from `@gogol/pbp/astro`.
-2. Page routes import `buildPbpSemanticProfile` from `@gogol/pbp/semantic-profile` and call it with `(lang, url, sourceDirectory)`.
+1. In `src/content.config.ts`, import and spread `pbpCollections` from `@warpgogol/pbp/astro`.
+2. Page routes import `buildPbpSemanticProfile` from `@warpgogol/pbp/semantic-profile` and call it with `(lang, url, sourceDirectory)`.
 3. PBP entity files live in `src/content/business-profile/<lang>/`.
 4. Person records live in `src/content/people/<lang>/`.
 
@@ -127,20 +127,20 @@ References resolve in **block props** too (RFC-0138): a `{collection.file.field}
 
 **See also:** `packages/pbp/AGENTS.md`
 
-## Shared utilities (`@gogol/share`)
+## Shared utilities (`@warpgogol/share`)
 
-This app consumes `@gogol/share` (`packages/share/`). Before writing entity-ID, i18n, or base-schema utilities, check that package:
+This app consumes `@warpgogol/share` (`packages/share/`). Before writing entity-ID, i18n, or base-schema utilities, check that package:
 
 | What you need                                             | Import from               |
 | --------------------------------------------------------- | ------------------------- |
-| `toDataEntryId`, `getEntryLanguage`, `stripEntryLanguage` | `@gogol/share/content` |
-| `createLocalizationHelpers` factory                       | `@gogol/share/i18n`    |
-| `componentOverridesSchema`, `ComponentOverrides`          | `@gogol/share/schemas` |
+| `toDataEntryId`, `getEntryLanguage`, `stripEntryLanguage` | `@warpgogol/share/content` |
+| `createLocalizationHelpers` factory                       | `@warpgogol/share/i18n`    |
+| `componentOverridesSchema`, `ComponentOverrides`          | `@warpgogol/share/schemas` |
 
 App-local files that previously contained this logic are now **thin proxies** — do not add logic back into them:
 
-- `src/content/schemas/entity-id.ts` — proxy for `@gogol/share/content`
-- `src/content/schemas/pages/base.ts` — proxy for `@gogol/share/schemas`
+- `src/content/schemas/entity-id.ts` — proxy for `@warpgogol/share/content`
+- `src/content/schemas/pages/base.ts` — proxy for `@warpgogol/share/schemas`
 - `src/utils/localization.ts` — owns `LANGUAGE_MAPPING`; i18n helpers come from the factory
 
 See `packages/share/AGENTS.md` for the full guide.
@@ -226,8 +226,8 @@ blocks:
 - Routes are orchestrators: thin, no hardcoded copy. All text from content collections via `buildPage()`.
 - Canonical routes declared in `system.md pages[pageId].routes`. `[...slug].astro` reads the route registry and resolves by `pageId`.
 - No `src/configure/features.ts` (RFC-0047) — visibility from block `props` and shell/site settings only.
-- Localized sibling URLs via `getLocalizedSiblingPath()` from `@gogol/share`.
-- JSON-LD, breadcrumbs, and `llms` are produced by the **shared semantic layer** (`@gogol/share/semantic` + the kernel `llms.generate`); the route only renders the already-built JSON-LD. Do not add an in-app `src/semantic/`.
+- Localized sibling URLs via `getLocalizedSiblingPath()` from `@warpgogol/share`.
+- JSON-LD, breadcrumbs, and `llms` are produced by the **shared semantic layer** (`@warpgogol/share/semantic` + the kernel `llms.generate`); the route only renders the already-built JSON-LD. Do not add an in-app `src/semantic/`.
 
 ### Standalone pages (dedicated `.astro` routes)
 
@@ -248,7 +248,7 @@ Standalone pages should also set `output.robots: { index: false }` (or a `<meta 
 ## Breadcrumbs (RFC-0229)
 
 Breadcrumbs are **fully automatic** — there is nothing to add to a page. The shared page pipeline
-(`@gogol/share` `buildBreadcrumbTrail`) builds **one** canonical trail per non-home page and projects
+(`@warpgogol/share` `buildBreadcrumbTrail`) builds **one** canonical trail per non-home page and projects
 it into **both** the visible breadcrumbs section **and** the `BreadcrumbList` JSON-LD, so they can
 never drift. The home page is a single node and is intentionally suppressed.
 
@@ -299,7 +299,7 @@ Every app publishes a machine-consumable **Agent Surface**: one generated capabi
 - **Knowledge tier (RFC-0287).** `agent.knowledge.generate` projects the business layer — through the same projectors that feed `llms-full.txt` and JSON-LD — into one static JSON file per public domain under `public/api/agent/v1/`. A domain with no authored content simply has no file (safe default). Withhold a populated domain with `agent: { knowledgeDisabled: [...] }`. `agent.knowledge.validate` enforces the privacy boundary, envelope validity, and generator↔artifact parity (rules `AGK-01`..`AGK-05`).
 - **Action tier (RFC-0288).** The closed capability catalog lives at `packages/ontology/capabilities/*.yaml` — **never author a capability inside an app**. A capability is active on a site only when it holds the `agent.actions` entitlement, every extra `requires.entitlements` is also held, and its `humanEquivalent.sectionType` actually renders on some page (AS-2 — no invisible side doors into the client's CRM). Withhold an otherwise-active capability with `agent: { actionsDisabled: [...] }`. `agent.capability.validate` enforces the catalog schema and this gating (rules `AGC-01`..`AGC-05`); `agent.manifest.generate` lists each active capability as an `AgentActionRef`.
 - **OpenAPI projection (RFC-0289).** `agent.openapi.generate` mechanically projects the manifest into a static OpenAPI 3.1 document at `public/.well-known/agent.openapi.json` — one `GET` per knowledge domain, one `POST` per active action, with the capability's schemas copied verbatim (never transformed). `agent.openapi.validate` enforces manifest↔document bijection and schema fidelity (rules `AGO-01`..`AGO-04`).
-- **Runtime tier — the Agent Gate (RFC-0290).** `agent.routes.generate` emits `src/pages/api/agent/mcp.ts` (always, when the agent surface is enabled) and `src/pages/api/agent/actions/[id].ts` (only when at least one capability is active) as thin re-exports into `@gogol/agent-gate/astro` — **never hand-edit these files or add logic to them**; all MCP/action handling lives once in `@gogol/agent-gate`. The MCP endpoint speaks a pinned Streamable HTTP subset (`PINNED_MCP_PROTOCOL_VERSION`); action invocation (HTTP and MCP `tools/call` alike) goes through the same closed-schema interpreter and the same Integration Port delivery substrate as the human `send-message` form — no second delivery path. `agent.gate.fixtures.run` (workspace-scoped, `packages-check.run`) is the regression gate for any protocol change; `agent.surface.validate`'s `AGS-07` checks the generated routes stay in sync with the manifest.
+- **Runtime tier — the Agent Gate (RFC-0290).** `agent.routes.generate` emits `src/pages/api/agent/mcp.ts` (always, when the agent surface is enabled) and `src/pages/api/agent/actions/[id].ts` (only when at least one capability is active) as thin re-exports into `@warpgogol/agent-gate/astro` — **never hand-edit these files or add logic to them**; all MCP/action handling lives once in `@warpgogol/agent-gate`. The MCP endpoint speaks a pinned Streamable HTTP subset (`PINNED_MCP_PROTOCOL_VERSION`); action invocation (HTTP and MCP `tools/call` alike) goes through the same closed-schema interpreter and the same Integration Port delivery substrate as the human `send-message` form — no second delivery path. `agent.gate.fixtures.run` (workspace-scoped, `packages-check.run`) is the regression gate for any protocol change; `agent.surface.validate`'s `AGS-07` checks the generated routes stay in sync with the manifest.
 
 ## Universal authored import/export contract
 

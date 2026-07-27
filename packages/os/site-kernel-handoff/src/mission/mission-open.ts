@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import type { MissionManifest } from "@gogol/ontology/operations";
+} from "@warpgogol/site-kernel";
+import type { MissionManifest } from "@warpgogol/ontology/operations";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { createMissionDirectories, writeMissionManifest, missionExists } from "./mission-io.ts";
 import {

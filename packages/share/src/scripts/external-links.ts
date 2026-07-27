@@ -8,7 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0011 Phase 2: Extracted from layout.astro inline script into src/scripts canonical pattern.</item>
-  <item>Migrated to @gogol/share/scripts for platform-wide reuse.</item>
+  <item>Migrated to @warpgogol/share/scripts for platform-wide reuse.</item>
 </CHANGE_SUMMARY>
 */
 

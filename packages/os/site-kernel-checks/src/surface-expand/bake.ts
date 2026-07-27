@@ -24,8 +24,8 @@ import type {
   BlueprintPillar,
   SurfaceNarrative,
   VirtualRouteEntry,
-} from "@gogol/surface";
-import type { PageEntry } from "@gogol/surface";
+} from "@warpgogol/surface";
+import type { PageEntry } from "@warpgogol/surface";
 import {
   type Block,
   md,

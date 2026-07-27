@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0175: barrel for @gogol/chat-adapter-uchat. Re-exports the browser-side widget adapter.
+<purpose>RFC-0175: barrel for @warpgogol/chat-adapter-uchat. Re-exports the browser-side widget adapter.
 Server-side funnel integration (RFC-0188 UChat API client + webhook receiver) will live in a
 separate funnel-client.ts module — this barrel keeps the import surface stable for callers.</purpose>
 <non-goals>

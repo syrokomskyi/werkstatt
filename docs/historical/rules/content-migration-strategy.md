@@ -1,6 +1,6 @@
 # Content Migration Strategy
 
-This document defines the **current and authoritative** approach for organizing content in the webgogol-3 project.
+This document defines the **current and authoritative** approach for organizing content in the warpgogol-3 project.
 
 In the current Turborepo layout, these `src/**` and `public/**` references resolve to the reference app under `apps/nicaragua-projekt` unless noted otherwise.
 
@@ -41,7 +41,7 @@ All typed, validated content belongs in Astro Content Collections organized by s
 
 - Pages: `src/content/pages/{lang}/**/*.md` — frontmatter-only block-declarative pages
 - Prose: `src/content/prose/{lang}/**/*.md` — long-form prose with markdown body
-- Business: `src/content/business/{lang}/**/*.md` — business data for `@gogol/business`
+- Business: `src/content/business/{lang}/**/*.md` — business data for `@warpgogol/business`
 - Navigation: `src/content/navigation/{lang}/**/*.md` — navigation labels and targets
 - Site: `src/content/site/{lang}/**/*.md` — shell UI labels and layout settings
 
@@ -108,7 +108,7 @@ Components in `packages/ui/src/` should:
 
 - receive visitor-facing copy as props from page blocks
 - **not** hardcode UI strings, labels, or aria-labels
-- load business data from `@gogol/business` when needed
+- load business data from `@warpgogol/business` when needed
 
 ## Schema convention
 
@@ -117,8 +117,8 @@ Components in `packages/ui/src/` should:
 Canonical page, navigation, and site schemas live in `packages/share/schemas/`. App-local files are thin overrides or proxies.
 
 - `src/content/schemas/navigation.ts` — app-specific navigation grouping
-- `src/content/schemas/entity-id.ts` — proxy for `@gogol/share/content`
-- `src/content/schemas/pages/base.ts` — proxy for `@gogol/share/schemas`
+- `src/content/schemas/entity-id.ts` — proxy for `@warpgogol/share/content`
+- `src/content/schemas/pages/base.ts` — proxy for `@warpgogol/share/schemas`
 
 ### Component copy
 

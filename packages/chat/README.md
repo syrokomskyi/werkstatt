@@ -1,6 +1,6 @@
-# @gogol/chat
+# @warpgogol/chat
 
-Vendor-agnostic chat widget port for WGogol apps (RFC-0175).
+Vendor-agnostic chat widget port for Warpgogol apps (RFC-0175).
 
 ## Purpose
 
@@ -10,9 +10,9 @@ Provides a consent-gated, click-to-load abstraction for chat widgets. No vendor 
 
 | Import | What it provides |
 | --- | --- |
-| `@gogol/chat` | Server/build-time barrel: port types, config schema, adapter catalog, adapter metadata |
-| `@gogol/chat/port` | `ChatWidgetAdapter`, `ChatWidgetLoadResult`, `ChatWidgetOpenResult`, `ChatAdapterId`, `CHAT_ADAPTER_IDS`, `ChatWidgetConfigSchema`, `ChatWidgetConfig`, `CHAT_CONFIG_SCRIPT_ID` |
-| `@gogol/chat/client` | `bindChatLauncher()` — client-side click-to-load bootstrap |
+| `@warpgogol/chat` | Server/build-time barrel: port types, config schema, adapter catalog, adapter metadata |
+| `@warpgogol/chat/port` | `ChatWidgetAdapter`, `ChatWidgetLoadResult`, `ChatWidgetOpenResult`, `ChatAdapterId`, `CHAT_ADAPTER_IDS`, `ChatWidgetConfigSchema`, `ChatWidgetConfig`, `CHAT_CONFIG_SCRIPT_ID` |
+| `@warpgogol/chat/client` | `bindChatLauncher()` — client-side click-to-load bootstrap |
 
 ## Adapter metadata
 
@@ -22,10 +22,10 @@ Each adapter declares `requiredOptions` and `vendorOrigins` on the `ChatWidgetAd
 
 ```typescript
 // Server-side: read config from system.md
-import { ChatWidgetConfigSchema } from "@gogol/chat/port";
+import { ChatWidgetConfigSchema } from "@warpgogol/chat/port";
 
 // Client-side: bind the launcher (host owns the adapter loader map)
-import { bindChatLauncher } from "@gogol/chat/client";
+import { bindChatLauncher } from "@warpgogol/chat/client";
 bindChatLauncher(launcherEl, loaders);
 ```
 
@@ -33,11 +33,11 @@ bindChatLauncher(launcherEl, loaders);
 
 | Adapter | Package                                   | Required options          | Vendor origins |
 | ------- | ----------------------------------------- | ------------------------- | -------------- |
-| `uchat` | `@gogol/chat-adapter-uchat`               | `widgetId` \| `scriptUrl` | `uchat.com.au` |
-| `null`  | `@gogol/chat-adapter-null` (safe default) | —                         | —              |
+| `uchat` | `@warpgogol/chat-adapter-uchat`               | `widgetId` \| `scriptUrl` | `uchat.com.au` |
+| `null`  | `@warpgogol/chat-adapter-null` (safe default) | —                         | —              |
 
 ## Validation
 
 ```sh
-pnpm --filter @gogol/chat build:check
+pnpm --filter @warpgogol/chat build:check
 ```

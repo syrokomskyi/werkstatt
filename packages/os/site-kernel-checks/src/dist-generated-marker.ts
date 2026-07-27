@@ -22,14 +22,14 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import {
   hasGeneratedMarker,
   stripGeneratedMarker,
   isGeneratedMarkerTextCandidate,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
-import { collectFiles } from "@gogol/share/fs";
+import { collectFiles } from "@warpgogol/share/fs";
 
 async function walkTextFiles(dir: string): Promise<string[]> {
   const files = await collectFiles(dir, { ignore: () => false });

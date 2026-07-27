@@ -17,10 +17,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { requireAstroSitePaths } from "@gogol/site-kernel-astro";
-import { collectFiles } from "@gogol/share/fs";
-import { getLineColumn } from "@gogol/share/text-position";
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { collectFiles } from "@warpgogol/share/fs";
+import { getLineColumn } from "@warpgogol/share/text-position";
 
 interface ImportantViolation {
   filePath: string;

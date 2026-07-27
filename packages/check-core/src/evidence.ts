@@ -1,18 +1,18 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Site evidence graph schemas, finalization, parsing, and hash validation for the check-webgogol ecosystem.</purpose>
+<purpose>Site evidence graph schemas, finalization, parsing, and hash validation for the check-warpgogol ecosystem.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Initial implementation as part of check-core package extraction.</item>
-  <item>Migrated hash imports from deleted ./hash.ts wrapper to @gogol/fingerprint directly.</item>
+  <item>Migrated hash imports from deleted ./hash.ts wrapper to @warpgogol/fingerprint directly.</item>
 </CHANGE_SUMMARY>
 */
 
 import { z } from "zod";
-import { byteHash, stableStringify } from "@gogol/fingerprint";
+import { byteHash, stableStringify } from "@warpgogol/fingerprint";
 
 export const viewportEvidenceSchema = z.object({
   name: z.enum(["desktop", "mobile"]),

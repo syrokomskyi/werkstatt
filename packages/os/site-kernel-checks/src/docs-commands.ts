@@ -17,8 +17,8 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
-import { buildCommandManifest, buildGeneratedHeader } from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
+import { buildCommandManifest, buildGeneratedHeader } from "@warpgogol/site-kernel";
 
 function escapeCell(value: string): string {
   return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");

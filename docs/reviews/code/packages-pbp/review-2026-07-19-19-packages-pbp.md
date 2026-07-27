@@ -31,7 +31,7 @@ filesReviewed:
 
 ## Verdict: Approved
 
-The code is well-structured, follows the existing `@gogol/pbp` patterns, and passes `tsc --noEmit` and `vitest run`. All entity interfaces correctly extend `PbpEntity` without redefining envelope fields. Non-entity types (`PbpRuntimeOverlay`, `PbpValidationError`, `PbpRegistryEntry`, `PbpNormalizationRule`) correctly do NOT extend `PbpEntity`. Minor findings are cosmetic and do not block merging.
+The code is well-structured, follows the existing `@warpgogol/pbp` patterns, and passes `tsc --noEmit` and `vitest run`. All entity interfaces correctly extend `PbpEntity` without redefining envelope fields. Non-entity types (`PbpRuntimeOverlay`, `PbpValidationError`, `PbpRegistryEntry`, `PbpNormalizationRule`) correctly do NOT extend `PbpEntity`. Minor findings are cosmetic and do not block merging.
 
 ## Mechanical floor
 

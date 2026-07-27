@@ -18,7 +18,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { readScopeFiles, outOfScope } from "./scope.ts";
-import { loadSystemManifest } from "@gogol/site-kernel-content";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import {
   flattenStringValues,
   getContentDisciplinePaths,
@@ -30,12 +30,12 @@ import {
   parseVoiceProfileFile,
   stripAllowedQuoteBlocks,
   type VoiceProfile,
-} from "@gogol/share/content-discipline";
+} from "@warpgogol/share/content-discipline";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
-} from "@gogol/site-kernel";
+} from "@warpgogol/site-kernel";
 
 interface FamilyVoiceTemplate {
   family?: string;
@@ -97,7 +97,7 @@ export async function runContentVoiceLint(
   //      current app name. The staging dir (onboarding/.output/04-author) holds a
   //      single in-flight onboarding run at a time, so without this guard an
   //      already-onboarded app would be linted against another client's voice
-  //      (e.g. webgogol-com's mandatory phrases leaking into nicaragua-projekt).
+  //      (e.g. warpgogol-com's mandatory phrases leaking into nicaragua-projekt).
   // Apps with no matching profile are scanned with no forbidden/mandatory
   // constraints rather than inheriting a foreign voice.
   const siteName = context.site?.name ?? "";

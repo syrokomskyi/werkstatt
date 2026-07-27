@@ -1,5 +1,5 @@
 {
-  "name": "@gogol/site-kernel-integrity",
+  "name": "@warpgogol/site-kernel-integrity",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,9 +19,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gogol/fingerprint": "workspace:*",
-    "@gogol/share": "workspace:*",
-    "@gogol/site-kernel": "workspace:*",
+    "@warpgogol/fingerprint": "workspace:*",
+    "@warpgogol/share": "workspace:*",
+    "@warpgogol/site-kernel": "workspace:*",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "uuid": "^14.0.1"

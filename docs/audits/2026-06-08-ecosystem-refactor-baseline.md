@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This baseline audit establishes the current state of the WGogol Turborepo ecosystem before targeted refactoring. Key findings include significant truth-layer drift between documentation and implementation, resolved Compass inventory functionality, and a stable but aging RFC corpus.
+This baseline audit establishes the current state of the Warpgogol Turborepo ecosystem before targeted refactoring. Key findings include significant truth-layer drift between documentation and implementation, resolved Compass inventory functionality, and a stable but aging RFC corpus.
 
 ## 1. Compass Inventory Status — RESOLVED ✅
 
@@ -50,11 +50,11 @@ Non-compliant files: 0
 | --- | --- | --- |
 | `docs/technology.xml` | `packages/site-kernel` | `packages/os/site-kernel` |
 | `docs/development-plan.xml` | `packages/site-kernel*` | `packages/os/site-kernel*` |
-| `docs/knowledge-graph.xml` | `apps/main`, `@gogol/main` | `apps/webgogol-com`, `apps/nicaragua-projekt` |
-| `docs/verification-plan.xml` | `apps/main`, `@gogol/main` | `apps/webgogol-com`, `apps/nicaragua-projekt` |
+| `docs/knowledge-graph.xml` | `apps/main`, `@warpgogol/main` | `apps/warpgogol-com`, `apps/nicaragua-projekt` |
+| `docs/verification-plan.xml` | `apps/main`, `@warpgogol/main` | `apps/warpgogol-com`, `apps/nicaragua-projekt` |
 | `README.md` | `system.yaml`, `src/content/assets/system.md` | `src/content/system.md` (RFC-0047) |
 | `README.md` | `src/content/components` | REMOVED per RFC-0047 |
-| Multiple RFCs | `apps/main` | `apps/webgogol-com` or generic placeholder |
+| Multiple RFCs | `apps/main` | `apps/warpgogol-com` or generic placeholder |
 
 **Impact:** AI agents reading Compass documents or RFCs receive fictional workspace topology that doesn't match `pnpm-workspace.yaml` reality.
 
@@ -99,7 +99,7 @@ content.surface.validate: OK with 26 warning(s)
 Warnings: public/ preview images (expected exception per RFC-0150)
 ```
 
-### webgogol-com
+### warpgogol-com
 
 ```
 content.surface.validate: OK with 26 warning(s)
@@ -139,7 +139,7 @@ curl -X POST "https://api.telegram.org/bot8053691768:AAF6nnCXhjfYtR1KpiA_HzDGGUT
 
 **Compatibility APIs (to evaluate):**
 
-- `getResolvedComponentContent()` in `@gogol/share` — may be compatibility shim for new content surfaces.
+- `getResolvedComponentContent()` in `@warpgogol/share` — may be compatibility shim for new content surfaces.
 
 **Stale comments:**
 

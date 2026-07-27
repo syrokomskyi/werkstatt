@@ -11,7 +11,7 @@ import {
   writeApprovedGlossary,
 } from "../surface-translation.ts";
 import { loadSurfaceModuleContexts } from "../pseo/pseo-module-context.ts";
-import type { KernelCommandInput, KernelRuntimeContext } from "@gogol/site-kernel";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
 /*
 <MODULE_CONTRACT>
