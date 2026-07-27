@@ -1496,6 +1496,9 @@ importers:
       '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
+      '@warpgogol/site-kernel-integrity':
+        specifier: workspace:*
+        version: link:../site-kernel-integrity
       '@warpgogol/site-kernel-onboarding':
         specifier: workspace:*
         version: link:../site-kernel-onboarding
