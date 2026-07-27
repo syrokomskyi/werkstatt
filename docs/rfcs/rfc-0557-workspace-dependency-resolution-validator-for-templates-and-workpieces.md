@@ -1,0 +1,309 @@
+---
+id: RFC-0557
+title: "Workspace dependency resolution validator for templates and workpieces"
+status: draft
+# kind options: architecture | contract | command | policy | deprecation
+kind: architecture
+# scope options: app | workspace
+scope: workspace
+owners:
+  - architecture
+# Set by the deciding human together with the status change (RFC-0335).
+# Draft scaffolds must keep this empty; do not prefill a default identity.
+# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
+# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+reviewers: []
+createdAt: 2026-07-27
+updatedAt: 2026-07-27
+implementedAt:
+closedAt:
+supersedes: []
+supersededBy:
+amends: []
+amendedBy: []
+related:
+  - DNA-2
+  - DNA-36
+  - DNA-47
+  - RFC-0137
+  - RFC-0253
+# RFC-0331: DNA invariants this RFC implements, protects, or extends.
+# Required for architecture/contract RFCs created on or after 2026-07-07.
+# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+satisfies:
+  - DNA-2
+  - DNA-47
+# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
+# Set by spec.materialize; leave commented for non-spec RFCs.
+# specRef:
+# RFC-0478: Platform versioning enforcement. Declares the SemVer delta this RFC
+# produces when implemented. Required for post-cutoff implemented RFCs (V-29).
+# Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
+# major (architectural, manually reserved). Default: patch.
+versionBump: patch
+commands:
+  proposed:
+    - template.imports.validate
+    - workpiece.imports.validate
+  added: []
+  changed: []
+  removed: []
+appsImpacted: []
+packagesImpacted:
+  - "@warpgogol/site-kernel-checks"
+  - "@warpgogol/site-kernel-onboarding"
+  - "@warpgogol/site-kernel-handoff"
+successSignals: []
+nonGoals:
+  - "Validate non-workspace third-party peer dependencies (delegated to pnpm install --frozen-lockfile)"
+  - "Validate version compatibility of isomorphic packages like react/react-dom (convention, not enforced by this RFC)"
+  - "Replace pnpm install as the primary dependency resolution mechanism"
+# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
+# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# automatically inside build pipelines). Closed probe vocabulary — see
+# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
+# acceptance:
+#   - probe: run
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
+#     expect:
+#       exitCode: 0
+#   - probe: file-exists
+#     path: "packages/share/src/some-new-module.ts"
+#   - probe: command-registered
+#     name: "some.new.command"
+#   - probe: file-contains
+#     path: "AGENTS.md"
+#     pattern: "Some new governance paragraph"
+---
+
+# RFC-0557: Workspace dependency resolution validator for templates and workpieces
+
+## Context
+
+After the `@gogol → @warpgogol` namespace rename (commit `eff9b03`), five `@warpgogol/site-kernel-*` packages were missing from root `package.json` devDependencies: `site-kernel-astro`, `site-kernel-changelog`, `site-kernel-codegen`, `site-kernel-deploy`, and `site-kernel-integrity`. The template files that `mission.materialize` uses to generate workpiece boilerplate (`kernel.config.template.ts`, `*.module.ts`) import these packages, but root `node_modules` did not contain symlinks for them. The first `mission.materialize` after the rename failed during `build.prepare` with `ERR_MODULE_NOT_FOUND: Cannot find package '@warpgogol/site-kernel-integrity'`.
+
+Additionally, `wrangler@^4.110.0` in the template did not satisfy the peer dependency requirement of `@cloudflare/vite-plugin@^4.114.0`, causing the Astro dev server to crash on startup. And `react@^19.2.7` and `react-dom@^19.2.7` resolved to different minor versions (19.2.7 vs 19.2.8) under pnpm's range resolution, crashing the React server renderer.
+
+These three failure classes — missing workspace packages, unsatisfied peer dependencies, and lockfile drift — were all undetectable by the existing `PACKAGES_CHECK_PIPELINE` and only surfaced at `mission.materialize` time or dev server startup.
+
+## Problem
+
+Three invariants are currently unprotected:
+
+1. **Template → root deps resolution (DNA-2).** Template files in `packages/os/*/src/templates/` import `@warpgogol/*` and `@webgogol/*` workspace packages. These imports are resolved from root `node_modules` during `build.prepare` because workpiece `node_modules` symlinks to the root. If a workspace package is missing from root `package.json` devDependencies, pnpm does not symlink it into root `node_modules`, and the generated workpiece's `kernel.config.ts` or `*.module.ts` fails with `ERR_MODULE_NOT_FOUND`. There is no validator that checks this resolution chain.
+
+2. **Lockfile and peer dependency integrity (DNA-2).** When template `package.json` versions drift from what `pnpm install` resolves — either through stale ranges (`wrangler@^4.110.0` when peer deps require `^4.114.0`) or lockfile desync — the failure only surfaces at dev server startup or build time. No pipeline step runs `pnpm install --frozen-lockfile` to detect this early.
+
+3. **Workpiece import resolution (DNA-47).** After `mission.materialize` generates the workpiece, the generated files (in `tools/`, `src/pages/`, `src/middleware/`) import `@warpgogol/*` packages. If any import cannot be resolved from root `node_modules`, `build.prepare` crashes with a cryptic `ERR_MODULE_NOT_FOUND`. There is no pre-flight check that scans generated files for import resolvability before the pipeline runs.
+
+## Decision
+
+The kernel gains two validator commands:
+
+1. `template.imports.validate` — auto-discovers all `**/src/templates/**/*.template.*` files across workspace packages, extracts `@warpgogol/*` and `@webgogol/*` import specifiers, and verifies that each resolved package name exists in root `package.json` devDependencies. Additionally runs `pnpm install --frozen-lockfile` to detect lockfile drift and unsatisfied peer dependencies. Integrated into `PACKAGES_CHECK_PIPELINE`.
+
+2. `workpiece.imports.validate` — after `mission.materialize` generates the workpiece, scans all generated `.ts`/`.mjs`/`.astro` files in `tools/` and `src/` for `@warpgogol/*` and `@webgogol/*` imports, and verifies each import resolves from root `node_modules`. Integrated into `SITES_BUILD_PREPARE_PIPELINE` as the first step before any other build.prepare command runs.
+
+## Architectural fit
+
+- **DNA-2 (pnpm workspace + Turborepo):** This RFC enforces that root `package.json` devDependencies include every workspace package imported by generated templates. Without this, the pnpm workspace symlink chain breaks silently — packages exist in `packages/os/*` but are not linked into root `node_modules`.
+- **DNA-47 (Materialization):** This RFC adds a pre-flight check to `SITES_BUILD_PREPARE_PIPELINE` that verifies workpiece import resolvability before `build.prepare` runs its full pipeline. This catches materialization-time resolution failures early, with a clear diagnostic instead of a cryptic `ERR_MODULE_NOT_FOUND` deep in the pipeline.
+- **RFC-0137 (config.template.sync):** Complementary — `config.template.sync` propagates dependency versions from a reference system into templates; this RFC validates that the resulting templates' imports are all resolvable from root. Together they form a closed loop: sync versions → validate resolvability.
+- **RFC-0253 (workspace.discovery.validate):** Related — workspace discovery validates the pnpm workspace package list; this RFC validates that the discovered packages' imports are covered by root devDependencies.
+- **Site OS operator model:** Both commands are `scope: workspace` — they run from the monorepo root and do not require a `--site` flag. `template.imports.validate` is a pure static analysis command (no side effects). `workpiece.imports.validate` runs in the context of a materialized workpiece but resolves imports from root `node_modules`.
+
+## Design
+
+### CLI surface
+
+```sh
+# Template validation (runs in PACKAGES_CHECK_PIPELINE)
+pnpm exec site-kernel run template.imports.validate
+pnpm exec site-kernel run template.imports.validate --json
+
+# Workpiece validation (runs in SITES_BUILD_PREPARE_PIPELINE)
+pnpm exec site-kernel run workpiece.imports.validate --site warpgogol-com
+pnpm exec site-kernel run workpiece.imports.validate --site warpgogol-com --json
+```
+
+**`template.imports.validate` flags:**
+
+- `--json` — machine-readable output
+- `--no-frozen-lockfile` — skip `pnpm install --frozen-lockfile` check (for environments without lockfile)
+- `--dry-run` — report violations without exiting non-zero
+
+**`workpiece.imports.validate` flags:**
+
+- `--site <name>` — required, the system id whose workpiece to validate
+- `--json` — machine-readable output
+- `--workpiece-dir <path>` — override workpiece directory (defaults to `missions/<currentMission>/workpiece/`)
+
+### TypeScript contracts
+
+```ts
+interface TemplateImportsValidateData {
+  command: "template.imports.validate";
+  templatesScanned: number;
+  importsFound: Array<{
+    package: string;  // e.g. "@warpgogol/site-kernel-integrity"
+    file: string;     // relative path to template file
+    line: number;
+  }>;
+  missingFromRootDeps: Array<{
+    package: string;
+    importedBy: string[];  // template files that import it
+  }>;
+  frozenLockfileOk: boolean;
+  frozenLockfileError?: string;
+}
+
+interface WorkpieceImportsValidateData {
+  command: "workpiece.imports.validate";
+  site: string;
+  filesScanned: number;
+  importsFound: Array<{
+    package: string;
+    file: string;
+    line: number;
+  }>;
+  unresolved: Array<{
+    package: string;
+    file: string;
+    line: number;
+    error: string;
+  }>;
+}
+```
+
+### File system responsibilities
+
+| Path | Role |
+| --- | --- |
+| `packages/os/*/src/templates/**/*.template.*` | Scanned for `@warpgogol/*` / `@webgogol/*` imports by `template.imports.validate` |
+| `package.json` (root) | Read by `template.imports.validate` to check devDependencies |
+| `pnpm-lock.yaml` | Read by `pnpm install --frozen-lockfile` subprocess |
+| `missions/<id>/workpiece/tools/**/*.ts` | Scanned by `workpiece.imports.validate` |
+| `missions/<id>/workpiece/src/**/*.{ts,mjs,astro}` | Scanned by `workpiece.imports.validate` |
+| `node_modules/@warpgogol/*` | Checked for symlink existence by both commands |
+
+Neither command writes or modifies any file. Both are read-only validators.
+
+### Output format
+
+`template.imports.validate --json`:
+
+```json
+{
+  "command": "template.imports.validate",
+  "status": "fail",
+  "templatesScanned": 42,
+  "importsFound": [
+    { "package": "@warpgogol/site-kernel-integrity", "file": "packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts", "line": 25 }
+  ],
+  "missingFromRootDeps": [
+    {
+      "package": "@warpgogol/site-kernel-codegen",
+      "importedBy": [
+        "packages/os/site-kernel/src/templates/wire/modules/service.module.template.ts",
+        "packages/os/site-kernel-onboarding/src/templates/tools/kernel.config.template.ts"
+      ]
+    }
+  ],
+  "frozenLockfileOk": true,
+  "diagnostics": [
+    {
+      "ruleId": "TEMPLATE-IMPORTS-01",
+      "severity": "error",
+      "message": "Package '@warpgogol/site-kernel-codegen' is imported by 2 template file(s) but is not in root package.json devDependencies",
+      "fixHint": "Add "@warpgogol/site-kernel-codegen": "workspace:*" to root package.json devDependencies and run pnpm install"
+    }
+  ]
+}
+```
+
+`workpiece.imports.validate --site warpgogol-com --json`:
+
+```json
+{
+  "command": "workpiece.imports.validate",
+  "status": "pass",
+  "site": "warpgogol-com",
+  "filesScanned": 87,
+  "importsFound": [
+    { "package": "@warpgogol/site-kernel-integrity", "file": "tools/kernel.config.ts", "line": 25 }
+  ],
+  "unresolved": []
+}
+```
+
+### Failure modes
+
+**`template.imports.validate`:**
+
+- Exit code 1 if any `@warpgogol/*` or `@webgogol/*` import from a template file is not found in root `package.json` devDependencies (error, rule `TEMPLATE-IMPORTS-01`).
+- Exit code 1 if `pnpm install --frozen-lockfile` fails (error, rule `TEMPLATE-IMPORTS-02`). This catches lockfile drift and unsatisfied peer dependencies.
+- Exit code 0 if all imports resolve and lockfile is in sync.
+- `--dry-run` mode reports violations but exits 0.
+- `--no-frozen-lockfile` skips the lockfile check (for CI environments that install differently).
+
+**`workpiece.imports.validate`:**
+
+- Exit code 1 if any `@warpgogol/*` or `@webgogol/*` import from a generated workpiece file cannot be resolved from root `node_modules` (error, rule `WORKPIECE-IMPORTS-01`).
+- Exit code 0 if all imports resolve.
+- If `--site` is not provided or the system has no current mission, exit code 1 with a clear error message.
+
+Both commands produce `Diagnostic[]` output in `--json` mode, consistent with other workspace validators.
+
+## Rollout
+
+- **Default behavior: fail-hard from day one.** Both commands exit non-zero on violations. There is no warn-only mode — the absence of these validators is what caused the `mission.materialize` failure, so a warn mode would defeat the purpose.
+- **`template.imports.validate`** is added to `PACKAGES_CHECK_PIPELINE` after `workspace.discovery.validate` (RFC-0253). This means it runs on every `pnpm run check:all` and in CI. Existing apps automatically comply if their root `package.json` devDependencies are complete (which they are after the fix commit `315ec2d`).
+- **`workpiece.imports.validate`** is added as the first step in `SITES_BUILD_PREPARE_PIPELINE`, before any other `build.prepare` command. This means it runs on every `mission.materialize` and every `build.prepare` invocation. If it fails, the remaining `build.prepare` steps are skipped, saving time and producing a clear error instead of a cascade of `ERR_MODULE_NOT_FOUND` errors.
+- **No migration path needed.** The fix commit (`315ec2d`) already added the missing packages to root `package.json`. The validators merely enforce that this stays correct.
+- **No deprecation.** These are new commands; no existing command is superseded.
+
+## Alternatives considered
+
+1. **Single command in `PACKAGES_CHECK_PIPELINE` only.** Rejected because `build.prepare` already crashes on unresolved imports in the workpiece — but the crash is cryptic (`ERR_MODULE_NOT_FOUND` with a deep stack trace) and surfaces late in the pipeline. A dedicated `workpiece.imports.validate` as the first step in `SITES_BUILD_PREPARE_PIPELINE` produces a clear diagnostic before any other work runs.
+
+2. **Scoped peer dependency check (parsing `peerDependencies` from `node_modules/.pnpm/`).** Rejected as too complex and fragile — pnpm's peer resolution logic is non-trivial and duplicating it would create maintenance burden. `pnpm install --frozen-lockfile` delegates to pnpm's own resolution, which is always correct by definition.
+
+3. **Pinning isomorphic packages (react/react-dom) to exact versions via validator.** Rejected as a convention, not an enforceable invariant — the choice between `^19.2.7` and `19.2.8` is a packaging decision, not an architectural one. The `pnpm install --frozen-lockfile` check catches the symptom (version mismatch at install time) without mandating a specific versioning policy.
+
+4. **Manual post-rename checklist.** Rejected because it relies on human discipline — the exact failure mode that caused the bug in the first place. The rename commit `eff9b03` did not include a checklist step for updating root devDependencies.
+
+## Risks
+
+- **False positives from unused template imports.** A template file might import a package that is only used conditionally or has been removed from the generated output. Mitigation: the validator checks import _specifiers_ in template files, not generated output — if an import is in a template, it must be resolvable, regardless of whether the generated code uses it.
+- **Performance of `pnpm install --frozen-lockfile`.** Running this on every `PACKAGES_CHECK_PIPELINE` invocation adds ~3-5 seconds. Mitigation: the check is only run once per pipeline run, not per-file. In CI, the lockfile is already installed, so `--frozen-lockfile` is a no-op verification.
+- **Auto-discovery false positives.** Scanning `**/src/templates/**/*.template.*` might discover template files that are not used by `mission.materialize`. Mitigation: if a template file imports a package, that package must be resolvable regardless of whether the template is currently used — the invariant is about resolvability, not usage.
+- **Agent misinterpretation.** An agent might think `template.imports.validate` validates _all_ imports in all files, not just template files. Mitigation: the command name includes `template` explicitly, and the `--json` output clearly lists which template files were scanned.
+- **Lockfile-only environments.** Some CI environments might not have `pnpm-lock.yaml` available. Mitigation: `--no-frozen-lockfile` flag allows skipping the lockfile check while still validating import resolvability.
+
+## Acceptance criteria
+
+- [ ] `template.imports.validate` command registered in `@warpgogol/site-kernel-checks` module with `scope: workspace`
+- [ ] `template.imports.validate` auto-discovers `**/src/templates/**/*.template.*` files across all workspace packages
+- [ ] `template.imports.validate` extracts `@warpgogol/*` and `@webgogol/*` import specifiers and checks each against root `package.json` devDependencies
+- [ ] `template.imports.validate` runs `pnpm install --frozen-lockfile` and fails on lockfile drift or unsatisfied peer deps
+- [ ] `template.imports.validate` added to `PACKAGES_CHECK_PIPELINE` after `workspace.discovery.validate`
+- [ ] `workpiece.imports.validate` command registered in `@warpgogol/site-kernel-checks` module with `scope: workspace`
+- [ ] `workpiece.imports.validate` scans generated workpiece files in `tools/` and `src/` for `@warpgogol/*` / `@webgogol/*` imports
+- [ ] `workpiece.imports.validate` verifies each import resolves from root `node_modules` (symlink existence check)
+- [ ] `workpiece.imports.validate` added as first step in `SITES_BUILD_PREPARE_PIPELINE`
+- [ ] Both commands produce `Diagnostic[]` output in `--json` mode with rule IDs `TEMPLATE-IMPORTS-01/02` and `WORKPIECE-IMPORTS-01`
+- [ ] Both commands exit non-zero on violations, zero on pass
+- [ ] `PACKAGES_CHECK_PIPELINE` passes with current root `package.json` (no false positives)
+- [ ] `rfc.validate` passes on this file before merging
+
+## Implementation notes for agents
+
+- Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
+- Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
+- For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
+- Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- Implementation MUST live in `@warpgogol/site-kernel-checks` — both commands are workspace-scoped validators, consistent with `workspace.discovery.validate` and `workspace.surface.validate`.
+- Import extraction MUST use a regex-based static analysis approach (matching `from "@warpgogol/..."` and `from "@webgogol/..."` patterns), not a TypeScript AST parser — templates are not always valid TypeScript (they contain `{{TOKEN}}` placeholders).
+- The `pnpm install --frozen-lockfile` subprocess MUST inherit `process.env` and run from `workspaceRoot`, not from a workpiece directory.
+- When adding `workpiece.imports.validate` to `SITES_BUILD_PREPARE_PIPELINE`, it MUST be the first step — before `surface.generate`, `sitemap.generate`, or any other command that might import from `@warpgogol/*` packages.
