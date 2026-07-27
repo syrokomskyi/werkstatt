@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
@@ -64,6 +65,7 @@ nonGoals:
   - "Do not replicate Sternsystem repos (site content) — that is Layer 4, already handled by git remotes via DNA-44."
   - "Do not implement a custom git protocol — this RFC uses standard git push/pull/fetch over SSH or HTTPS."
   - "Do not implement automatic conflict resolution for platform code — platform code conflicts are resolved by human review and merge, not by automated CRDT merge."
+  - "Do not implement peer discovery in this RFC — Phase 2 peer discovery depends on RFC-0564 (SWIM), which is currently draft. Phase 1 (single remote) does not depend on RFC-0564 and can be implemented independently."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -137,6 +139,7 @@ pnpm exec site-kernel run gitmesh.verify --json
 
 export interface GitMeshConfig {
   remotes: GitMeshRemote[];
+  trackedBranch: string;    // branch to sync (default: "main")
   syncIntervalMs: number;   // auto-sync interval (0 = manual only)
   verifySignatures: boolean; // verify commit signatures on sync
 }
@@ -174,13 +177,30 @@ export interface GitMeshVerifyResult {
 }
 ```
 
+### Convergence algorithm
+
+`gitmesh.sync` fetches the configured `trackedBranch` (default: `main`) from all remotes in `werkstatt.gitmesh.json`. Among all remote-tracking branches (e.g., `refs/remotes/peer-1/main`, `refs/remotes/origin/main`), the commit with the **highest committer timestamp** is selected as the latest. If multiple remotes have the same latest commit, the first reachable remote (in config order) is reported in `fromRemote`. HEAD is advanced via `git merge --ff-only` to the latest commit — this ensures the local branch only moves forward, never diverges.
+
+If `verifySignatures` is `true` and the latest commit has an invalid or missing signature, HEAD is **not** advanced. The command reports the signature failure and leaves the local clone at its current HEAD. The operator decides whether to trust the commit (by setting `verifySignatures: false` and re-running) or to wait for a corrected commit from the canonical remote.
+
+If the remote tip is **not** a descendant of the local HEAD (non-fast-forward, indicating a force-push on the canonical remote), `gitmesh.sync` does **not** auto-reset. It reports `non-fast-forward` and warns the operator. The operator must explicitly reset (`git reset --hard <remote-tip>`) after verifying the force-push is legitimate.
+
+### gitmesh.status semantics
+
+`gitmesh.status` is a **local-only query** based on remote-tracking branches updated by the last `gitmesh.sync`. It does not perform network I/O — no `git ls-remote`, no fetch. The `remoteSha` field reflects the latest known remote state from the last successful sync. For real-time remote state, the operator runs `gitmesh.sync` first, then `gitmesh.status`.
+
+This makes `gitmesh.status` safe to run frequently (e.g., in a health check loop) without network overhead.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel/src/gitmesh/` | New directory. `sync.ts`, `status.ts`, `verify.ts`, `types.ts` modules. |
-| `werkstatt.gitmesh.json` | Git-mesh configuration file. Lists remotes (canonical + peers), sync interval, verify flag. Created by `werkstatt.network.bootstrap` (RFC-0562), edited by operator. |
+| `werkstatt.gitmesh.json` | Git-mesh configuration file. Lists remotes (canonical + peers), tracked branch, sync interval, verify flag. In Phase 1, auto-created by `gitmesh.sync` from existing `.git/config` remotes if the file does not exist. In Phase 2+, created by `werkstatt.network.bootstrap` (RFC-0562), edited by operator. |
+| `werkstatt.identity.json` | Operator identity file (from RFC-0558). Contains the operator's public key used by `gitmesh.verify` for signature verification. Independent of `werkstatt.gitmesh.json` — the two files do not reference each other. |
 | `.git/config` | Git remotes are added/updated by `gitmesh.sync` based on `werkstatt.gitmesh.json`. |
+| `.git/gitmesh.lock` | Lock file acquired by `gitmesh.sync` to prevent concurrent execution. Released on command exit. |
+| `packages/os/site-kernel/AGENTS.md` | Updated with a `gitmesh/` section documenting the new subsystem, similar to existing `src/cache/` and `src/change-impact.ts` documentation. |
 
 ### Output format
 
@@ -202,18 +222,25 @@ export interface GitMeshVerifyResult {
 
 ### Failure modes
 
-| Condition | Behavior |
-| --- | --- |
-| No remotes configured | `gitmesh.sync` fails with `no-remotes` error. |
-| All remotes unreachable | `gitmesh.sync` fails with `all-remotes-unreachable` error. Local clone remains at current HEAD. |
-| Some remotes unreachable | `gitmesh.sync` syncs from reachable remotes. Unreachable remotes are logged as warnings. |
-| Signature verification fails | `gitmesh.sync` logs the invalid commit but does not abort the sync. `gitmesh.verify` reports the invalid signature. The operator decides whether to trust the commit. |
-| Divergent branches (local commits not on any remote) | `gitmesh.sync` reports `ahead: N` in status. Local commits are not lost. Operator must push or merge. |
-| Clone corruption (missing objects) | `gitmesh.sync` detects corruption via `git fsck` and re-clones from a trusted remote. |
+All commands exit 0 on success and 1 on error. Warnings are logged to stderr but do not affect the exit code unless the command cannot complete its primary operation.
+
+| Condition | Behavior | Exit code |
+| --- | --- | --- |
+| No remotes configured | `gitmesh.sync` fails with `no-remotes` error. | 1 |
+| All remotes unreachable | `gitmesh.sync` fails with `all-remotes-unreachable` error. Local clone remains at current HEAD. | 1 |
+| Some remotes unreachable | `gitmesh.sync` syncs from reachable remotes. Unreachable remotes are logged as warnings. Exit 0 if at least one remote synced. | 0 |
+| Signature verification fails (verifySignatures: false) | `gitmesh.sync` logs the invalid commit but does not abort the sync. `gitmesh.verify` reports the invalid signature. The operator decides whether to trust the commit. | 0 |
+| Signature verification fails (verifySignatures: true) | `gitmesh.sync` does not advance HEAD. Reports the invalid signature. Local clone remains at current HEAD. | 1 |
+| Non-fast-forward (force-push detected) | `gitmesh.sync` does not auto-reset. Reports `non-fast-forward` and warns the operator. | 1 |
+| Divergent branches (local commits not on any remote) | `gitmesh.sync` reports `ahead: N` in status. Local commits are not lost. Operator must push or merge. | 0 |
+| Clone corruption (missing objects) | `gitmesh.sync` detects corruption via `git fsck` and re-clones from a trusted remote. | 1 |
+| Concurrent `gitmesh.sync` invocation | Second invocation fails with `sync-in-progress` error. The lock file `.git/gitmesh.lock` prevents concurrent execution. | 1 |
+| Interrupted fetch (crash mid-fetch) | Partial fetch results remain in the object store but HEAD is not advanced. The next `gitmesh.sync` completes the fetch and advances HEAD. `git fsck` is run before each sync to detect corruption. | 1 (if detected) |
+| Uncommitted local changes | `gitmesh.sync` refuses to advance HEAD. Warns the operator to commit or stash local changes first. | 1 |
 
 ## Rollout
 
-- **Phase 1 (single remote):** The existing Werkstatt operates with one remote (GitHub). `gitmesh.sync` is equivalent to `git pull`. `gitmesh.verify` is a new capability — verifying commit signatures.
+- **Phase 1 (single remote):** The existing Werkstatt operates with one remote (GitHub). If `werkstatt.gitmesh.json` does not exist, `gitmesh.sync` auto-creates it from the existing `.git/config` remotes (all existing remotes are added with `trusted: true`). `gitmesh.sync` is equivalent to `git pull`. `gitmesh.verify` is a new capability — verifying commit signatures. Phase 1 does **not** depend on RFC-0564 (SWIM) — there are no peers to discover.
 - **Phase 2 (peer remotes):** When a second workshop joins (RFC-0562 Phase 2), `werkstatt.gitmesh.json` is configured with peer remotes. `gitmesh.sync` fetches from all remotes and converges on the latest signed commit.
 - **Phase 3 (auto-sync):** `syncIntervalMs` is set to a non-zero value. `gitmesh.sync` runs automatically on a timer. Workshops stay in sync without manual intervention.
 - **Phase 4 (signature enforcement):** `verifySignatures` is set to `true`. `gitmesh.sync` refuses to advance HEAD to a commit with an invalid signature. This is a hard enforcement mode for Byzantine resistance.
@@ -229,7 +256,9 @@ export interface GitMeshVerifyResult {
 
 - **Replication lag.** A workshop may lag behind the latest platform code. Missions materialized on a lagging workshop use an older platform version. Mitigation: `gitmesh.status` makes lag visible. `mission.materialize` can check `gitmesh.status` and warn if the workshop is behind.
 - **Signature verification cost.** Verifying all commit signatures in a large repository is expensive. Mitigation: `gitmesh.verify` verifies incrementally — only new commits since the last verification. The first full verification is expensive but subsequent runs are cheap.
+- **Signature verification false positives.** Key rotation (RFC-0558 future `rotateKey`) may cause commits signed with old keys to appear as invalid. Estimated false-positive rate: <0.1% (only during the key rotation window). Mitigation: `gitmesh.verify` accepts a list of valid public keys (current + previous until expiry). The operator configures the accepted key list in `werkstatt.identity.json`.
 - **Trusted remote compromise.** If a trusted remote is compromised, `gitmesh.sync` may pull malicious commits with valid signatures (if the attacker has the private key). Mitigation: key rotation (RFC-0558 future `rotateKey`) invalidates compromised keys. The operator can remove the compromised remote from `werkstatt.gitmesh.json`.
+- **Git object safety.** `git fetch` from untrusted remotes carries a risk of crafted packfiles exploiting git vulnerabilities (e.g., CVE-2024-32002-style path traversal). Mitigation: only fetch from remotes listed in `werkstatt.gitmesh.json` (configured by operator). Future: sandboxed git operations (e.g., `git fetch` in a container with restricted filesystem access).
 - **Merge conflicts.** If two workshops push different commits to the same branch, a merge conflict occurs. Mitigation: platform code changes go through the canonical remote (GitHub PR flow). Peer-to-peer sync is for pull-only replication, not for parallel push. Only the canonical remote accepts pushes.
 - **Agent misinterpretation.** LLM agents may attempt to push platform code changes directly to peer remotes. Mitigation: `gitmesh.sync` is pull-only. Platform code changes go through the standard PR flow on the canonical remote.
 
@@ -255,3 +284,6 @@ export interface GitMeshVerifyResult {
 - Agents MUST NOT auto-advance HEAD to commits with invalid signatures when `verifySignatures` is `true`.
 - `gitmesh.verify` MUST NOT abort on the first invalid signature — it reports all invalid signatures in one pass.
 - The `werkstatt.gitmesh.json` config file MUST NOT contain secrets (no SSH keys, no tokens). Git remotes use SSH agent or HTTPS credential helper.
+- `gitmesh.verify` requires both `werkstatt.gitmesh.json` (for sync config) and `werkstatt.identity.json` (for the operator's public key) to be present. The two files are independent — `werkstatt.gitmesh.json` does not reference `werkstatt.identity.json`.
+- `packages/os/site-kernel/AGENTS.md` MUST be updated with a `gitmesh/` section documenting the new subsystem.
+- `docs/technology.xml` and `docs/development-plan.xml` SHOULD be updated to reflect the new git-mesh subsystem as part of the P2P topology (RFC-0562 Layer 1).
