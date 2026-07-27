@@ -21,6 +21,7 @@ amends:
   - RFC-0370
 amendedBy:
   - RFC-0523
+  - RFC-0556
 related:
   - RFC-0047
   - RFC-0078
