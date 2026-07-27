@@ -346,14 +346,14 @@ The pilot operates at Phase 1–2. Phases 3–4 are future work beyond the pilot
 
 ## Acceptance criteria
 
-- [ ] All 5 layers are described with their dedicated RFC references (0563–0566), each naming its protocol and failure model
-- [ ] Threat model enumerates all adversary classes (byzantine workshop, network observer, rogue operator, sybil attacker, eclipse attacker) and maps each to a mitigation layer
-- [ ] DNA-recovery section explains how a workshop reconstructs from the four persistent layers, including the disposability of in-flight mission workpieces (DNA-46)
-- [ ] Cross-cutting requirements section covers secrets, identity, content addressing, consistency, and pilot scope
-- [ ] Workshop model is defined with its five components (platform clone, SWIM membership, DHT node, Sternsystem repos, deploy target)
-- [ ] Rollout phases are defined (Phase 0–4) with pilot scope (Phase 1–2)
-- [ ] Compass and AGENTS.md synchronization points are identified for Phase 2+ adoption
-- [ ] `rfc.validate` passes on this file before merging
+- [x] All 5 layers are described with their dedicated RFC references (0563–0566), each naming its protocol and failure model (evidence: lines 101–105, 125–133; failure modes at lines 308–314)
+- [x] Threat model enumerates all adversary classes (byzantine workshop, network observer, rogue operator, sybil attacker, eclipse attacker) and maps each to a mitigation layer (evidence: lines 201–207)
+- [x] DNA-recovery section explains how a workshop reconstructs from the four persistent layers, including the disposability of in-flight mission workpieces (DNA-46) (evidence: lines 186–197)
+- [x] Cross-cutting requirements section covers secrets, identity, content addressing, consistency, and pilot scope (evidence: lines 220–226)
+- [x] Workshop model is defined with its five components (platform clone, SWIM membership, DHT node, Sternsystem repos, deploy target) (evidence: lines 175–181)
+- [x] Rollout phases are defined (Phase 0–4) with pilot scope (Phase 1–2) (evidence: lines 316–324)
+- [x] Compass and AGENTS.md synchronization points are identified for Phase 2+ adoption (evidence: lines 209–218)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate RFC-0562 --json → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
