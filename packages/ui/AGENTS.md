@@ -132,6 +132,7 @@ Composite archetypes (hero, hero-decision-card, people, donation-card, price-car
 ### Header contract (RFC-0102)
 
 - `header.heading` is either a string or an array of `{ text, tone }` segments (tones: default / primary / accent / muted / inverse).
+- `header.eyebrow` is an optional short contextual label rendered above the heading (RFC-0567).
 - `header.align` and `body.align` are independent.
 - `header.subheading` is one short line of context; longer text belongs in `body.kind: paragraphs`.
 
@@ -169,7 +170,7 @@ propsSchemaCompose:
 The fragments live in `packages/ontology/src/shared-section-props/` and merge into one strict JSON Schema at validation time. Nine fragments are available (per RFC-0110):
 
 - `section-visual` — RFC-0101 visual modifiers (background, glass, density, tone, containerVariant, motion).
-- `section-header` — RFC-0102 header (tone-segmented heading + subheading + align + level).
+- `section-header` — RFC-0102 header (tone-segmented heading + eyebrow + subheading + align + level).
 - `body-list` / `body-split-list` / `body-stats` / `body-cards` / `body-paragraphs` / `body-comparison` / `body-rich` — RFC-0103 body kinds, one per non-composite archetype.
 
 Composite archetypes (hero, hero-decision-card, people, donation-card, price-card, faq-list, markdown) compose only `section-visual` + `section-header` and declare their bespoke fields locally.

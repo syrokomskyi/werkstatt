@@ -36,7 +36,7 @@ Cosmic names are manifest/YAML fields and UI strings only. Never use them in imp
 Nine fragments in `src/shared-section-props/`:
 
 - `section-visual` — background, glass, density, tone, containerVariant, motion
-- `section-header` — tone-segmented heading, subheading, align, level
+- `section-header` — tone-segmented heading, eyebrow, subheading, align, level
 - `body-list`, `body-split-list`, `body-stats`, `body-cards`, `body-paragraphs`, `body-comparison`, `body-rich`
 
 Section manifests compose them via `propsSchemaCompose` instead of duplicating JSON Schema.
