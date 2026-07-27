@@ -574,7 +574,7 @@ Generated command rows: 654. Raw manifest entries: 1196.
 | `sternsystem.extract` | workspace | workspace | yes | no | Extract an apps/<site>/ site into a Sternsystem git repo (RFC-0356). Flags: --site, [--repo]. |
 | `sternsystem.list` | workspace | workspace | no | no | List all registered Sternsystems with their id, cosmicStar, pinned platform, status (RFC-0354). |
 | `sternsystem.pin` | workspace | workspace | yes | no | Write or update system.pin.json for a Sternsystem (RFC-0354). Flags: --id, [--platform]. |
-| `sternsystem.register` | workspace | workspace | yes | no | Register a new Sternsystem in systems/registry.yaml, create pin, content stubs, open first mission, and trigger materialization (RFC-0354, RFC-0532). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror], [--amend], [--amend-id]. |
+| `sternsystem.register` | workspace | workspace | yes | no | Register a new Sternsystem in systems/registry.yaml, create pin, content stubs, open first mission, and trigger materialization (RFC-0354, RFC-0532). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror], [--owner], [--amend], [--amend-id]. |
 | `sternsystem.status` | workspace | workspace | no | no | Read-only synchronization state inspection for a Sternsystem (RFC-0477). Flags: --id, [--all]. |
 | `sternsystem.sync` | workspace | workspace | yes | no | Push a Sternsystem's local bare repo to an external mirror (RFC-0472, RFC-0480). Push-only — pull and both are removed. Flags: --id, [--all]. |
 | `sternsystem.validate` | workspace | workspace | no | no | Validate registry invariants, bundle contract, and pin file for one or all Sternsystems (RFC-0354). Flags: --id. |

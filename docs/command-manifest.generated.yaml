@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 4080cd85aa2381db033d2dd6c53ead3fba9e997baff5fc061912d87404b73fc1
+  contentHash: ad7540d5da019a119979bf96995f6a4b38e2413f8e8db01a46f713a8ba4b91f1
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -17389,7 +17389,7 @@ commands:
     description: "Register a new Sternsystem in systems/registry.yaml, create pin,
       content stubs, open first mission, and trigger materialization (RFC-0354,
       RFC-0532). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror],
-      [--amend], [--amend-id]."
+      [--owner], [--amend], [--amend-id]."
     scope: workspace
     provider: workspace
     module: sternsystem

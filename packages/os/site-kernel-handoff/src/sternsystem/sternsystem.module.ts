@@ -30,7 +30,7 @@ export function createSternsystemModule(): KernelModule {
       registry.registerCommand({
         name: "sternsystem.register",
         description:
-          "Register a new Sternsystem in systems/registry.yaml, create pin, content stubs, open first mission, and trigger materialization (RFC-0354, RFC-0532). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror], [--amend], [--amend-id].",
+          "Register a new Sternsystem in systems/registry.yaml, create pin, content stubs, open first mission, and trigger materialization (RFC-0354, RFC-0532). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror], [--owner], [--amend], [--amend-id].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,

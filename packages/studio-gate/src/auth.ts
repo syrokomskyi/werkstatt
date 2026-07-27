@@ -214,8 +214,8 @@ export async function verifyOwnership(
   let registry;
   try {
     registry = fleetRegistrySchema.parse(parseYaml(raw));
-  } catch {
-    return { verified: false, error: "registry-parse-error" };
+  } catch (parseErr) {
+    return { verified: false, error: `registry-parse-error: ${(parseErr as Error).message}` };
   }
 
   const entry = registry.systems.find((s) => s.id === siteId);
