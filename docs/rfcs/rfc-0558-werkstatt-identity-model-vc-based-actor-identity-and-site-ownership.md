@@ -46,12 +46,12 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - identity.bootstrap
     - identity.credential.issue
     - identity.credential.verify
     - identity.credential.revoke
-  added: []
   changed: []
   removed: []
 appsImpacted: []

@@ -47,13 +47,14 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - dht.lookup
     - dht.register
     - dht.placement
     - dht.status
     - dht.node.init
-  added: []
+    - dht.capacity.publish
   changed: []
   removed: []
 appsImpacted: []

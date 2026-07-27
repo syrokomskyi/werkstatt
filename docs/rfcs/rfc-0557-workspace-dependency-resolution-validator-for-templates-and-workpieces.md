@@ -44,10 +44,10 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - template.imports.validate
     - workpiece.imports.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []

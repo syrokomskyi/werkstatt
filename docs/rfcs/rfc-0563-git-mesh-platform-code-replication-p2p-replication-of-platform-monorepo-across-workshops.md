@@ -45,11 +45,11 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - gitmesh.sync
     - gitmesh.status
     - gitmesh.verify
-  added: []
   changed: []
   removed: []
 appsImpacted: []
