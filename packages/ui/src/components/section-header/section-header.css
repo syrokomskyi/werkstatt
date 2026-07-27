@@ -78,6 +78,16 @@
   margin-left: auto;
 }
 
+.section-header__eyebrow {
+  margin: 0;
+  font-size: var(--ds-text-sm-80);
+  font-weight: 500;
+  letter-spacing: var(--ds-tracking-md);
+  line-height: 1;
+  color: var(--ds-color-text-muted);
+  text-transform: uppercase;
+}
+
 /* -----------------------------------------------------------------------
    Section number — replaces the .section-number primitive that used to
    live in apps/./styles/global.css (RFC-0095).
