@@ -310,17 +310,17 @@ Concurrent verification: the auth middleware is stateless — each `authenticate
 
 ## Acceptance criteria
 
-- [ ] `packages/studio-gate/src/auth.ts` exists with `authenticateMcpCall` function
-- [ ] `packages/studio-gate/src/index.ts` calls `authenticateMcpCall` before dispatching to `CallToolRequestSchema` handler
-- [ ] Auth middleware reads `authMode` from `werkstatt.identity.json`
-- [ ] In `permissive` mode, calls without credentials produce stderr warnings but execute
-- [ ] In `enforced` mode, calls without valid credentials return MCP error with `authentication-required`
-- [ ] Calls with credential for wrong site return MCP error with `site-mismatch`
-- [ ] Calls with credential with insufficient scope return MCP error with `insufficient-scope`
-- [ ] `SiteOwnershipCredential` grants scope `*` (all tools)
-- [ ] `ActorDelegationCredential` grants only scopes listed in credential
-- [ ] Auth result (actorId, siteId) is injected into MCP tool args as `actor` by the MCP server (not by modifying Site OS command implementations — command-level changes are in RFC-0558)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/studio-gate/src/auth.ts` exists with `authenticateMcpCall` function (evidence: packages/studio-gate/src/auth.ts:103 — implemented as `verifyAuthFromMeta`, same semantics)
+- [x] `packages/studio-gate/src/index.ts` calls `authenticateMcpCall` before dispatching to `CallToolRequestSchema` handler (evidence: packages/studio-gate/src/index.ts:117 — calls `verifyAuthFromMeta` before command execution)
+- [x] Auth middleware reads `authMode` from `werkstatt.identity.json` (evidence: packages/studio-gate/src/auth.ts:118 — `config.authMode` check)
+- [x] In `permissive` mode, calls without credentials produce stderr warnings but execute (evidence: packages/studio-gate/src/index.ts:123-125 — stderr warning, continues execution)
+- [x] In `enforced` mode, calls without valid credentials return MCP error with `authentication-required` (evidence: packages/studio-gate/src/index.ts:119-121, auth.test.ts:191-196)
+- [x] Calls with credential for wrong site return MCP error with `site-mismatch` (evidence: auth.test.ts:243-250 — site-mismatch test, index.ts:161 — error code -32002)
+- [x] Calls with credential with insufficient scope return MCP error with `insufficient-scope` (evidence: auth.test.ts:253-261 — insufficient-scope test, index.ts:163 — error code -32003)
+- [x] `SiteOwnershipCredential` grants scope `*` (all tools) (evidence: auth.test.ts:270-275 — owner credential passes all tools, auth.ts:92-96 — `extractScopes` returns `["*"]` for owner)
+- [x] `ActorDelegationCredential` grants only scopes listed in credential (evidence: auth.test.ts:253-261 — delegation with `workpiece.read` fails for `workpiece.write`)
+- [x] Auth result (actorId, siteId) is injected into MCP tool args as `actor` by the MCP server (not by modifying Site OS command implementations — command-level changes are in RFC-0558) (evidence: packages/studio-gate/src/index.ts:129-131 — `--_authActor` CLI flag injection)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0559 --json` — status: pass)
 
 ## Implementation notes for agents
 
