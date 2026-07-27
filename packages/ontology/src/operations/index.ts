@@ -132,3 +132,23 @@ export type {
   IntegrationNulling,
   NotausgangManifest,
 } from "./notausgang.ts";
+
+// RFC-0565: DHT site registry and content placement schemas.
+export {
+  dhtSiteEntrySchema,
+  dhtConfigSchema,
+  dhtLookupResultSchema,
+  dhtPlacementReasonSchema,
+  workshopCapacitySchema,
+  dhtPlacementResultSchema,
+  dhtCacheEntrySchema,
+} from "./dht.ts";
+export type {
+  DHTSiteEntry,
+  DHTConfig,
+  DHTLookupResult,
+  DHTPlacementReason,
+  WorkshopCapacity,
+  DHTPlacementResult,
+  DHTCacheEntry,
+} from "./dht.ts";
