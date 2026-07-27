@@ -204,24 +204,24 @@ export async function runWorkpieceImportsValidate(
     }
   }
 
-  // ── Check each import resolves from root node_modules ───────────────────────
+  // ── Check each import resolves from workpiece node_modules ──────────────────
   const unresolved: Array<{ package: string; file: string; line: number; error: string }> = [];
 
   for (const imp of allImports) {
-    const nodeModulesPath = join(workspaceRoot, "node_modules", imp.package);
+    const nodeModulesPath = join(workpieceDir, "node_modules", imp.package);
     const exists = await fileExists(nodeModulesPath);
     if (!exists) {
       unresolved.push({
         ...imp,
-        error: `Package '${imp.package}' not found in root node_modules`,
+        error: `Package '${imp.package}' not found in workpiece node_modules`,
       });
       diagnostics.push({
         ruleId: "WORKPIECE-IMPORTS-01",
         severity: "error",
         file: imp.file,
         line: imp.line,
-        message: `Import of '${imp.package}' in ${imp.file}:${imp.line} cannot be resolved from root node_modules.`,
-        fixHint: `Add "${imp.package}": "workspace:*" to root package.json devDependencies and run pnpm install.`,
+        message: `Import of '${imp.package}' in ${imp.file}:${imp.line} cannot be resolved from workpiece node_modules.`,
+        fixHint: `Add "${imp.package}": "workspace:*" to workpiece package.json dependencies and run pnpm install.`,
       });
     }
   }

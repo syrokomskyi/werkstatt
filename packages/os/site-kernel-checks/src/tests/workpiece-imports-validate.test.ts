@@ -56,10 +56,7 @@ describe("runWorkpieceImportsValidate", () => {
 
   it("errors when --site is not provided", async () => {
     tempDir = await mkdtemp(join(tmpdir(), "workpiece-imports-"));
-    const result = await runWorkpieceImportsValidate(
-      makeInput(),
-      makeContext(tempDir),
-    );
+    const result = await runWorkpieceImportsValidate(makeInput(), makeContext(tempDir));
     expect(result.exitCode).toBe(1);
     expect(result.data?.diagnostics).toHaveLength(1);
     expect(result.data?.diagnostics[0].ruleId).toBe("WORKPIECE-IMPORTS-01");
@@ -97,7 +94,7 @@ describe("runWorkpieceImportsValidate", () => {
     expect(result.data?.unresolved).toHaveLength(0);
   });
 
-  it("detects unresolved imports from root node_modules", async () => {
+  it("detects unresolved imports from workpiece node_modules", async () => {
     tempDir = await mkdtemp(join(tmpdir(), "workpiece-imports-"));
     const workpieceDir = join(tempDir, "missions", "m01", "workpiece");
     const srcDir = join(workpieceDir, "src");
@@ -111,10 +108,13 @@ describe("runWorkpieceImportsValidate", () => {
     );
 
     // Create node_modules with only @warpgogol/site-kernel
-    const nodeModulesDir = join(tempDir, "node_modules", "@warpgogol");
+    const nodeModulesDir = join(workpieceDir, "node_modules", "@warpgogol");
     await mkdir(nodeModulesDir, { recursive: true });
     await mkdir(join(nodeModulesDir, "site-kernel"));
-    await writeFile(join(nodeModulesDir, "site-kernel", "package.json"), '{"name":"@warpgogol/site-kernel"}');
+    await writeFile(
+      join(nodeModulesDir, "site-kernel", "package.json"),
+      '{"name":"@warpgogol/site-kernel"}',
+    );
 
     const result = await runWorkpieceImportsValidate(
       makeInput({ site: "test-site", "workpiece-dir": "missions/m01/workpiece" }),
@@ -127,7 +127,7 @@ describe("runWorkpieceImportsValidate", () => {
     expect(result.data?.unresolved[0].package).toBe("@warpgogol/missing-package");
   });
 
-  it("passes when all imports resolve from root node_modules", async () => {
+  it("passes when all imports resolve from workpiece node_modules", async () => {
     tempDir = await mkdtemp(join(tmpdir(), "workpiece-imports-"));
     const workpieceDir = join(tempDir, "missions", "m01", "workpiece");
     const srcDir = join(workpieceDir, "src");
@@ -141,10 +141,13 @@ describe("runWorkpieceImportsValidate", () => {
     );
 
     // Create node_modules with both packages
-    const wgDir = join(tempDir, "node_modules", "@warpgogol");
+    const wgDir = join(workpieceDir, "node_modules", "@warpgogol");
     await mkdir(wgDir, { recursive: true });
     await mkdir(join(wgDir, "site-kernel"));
-    await writeFile(join(wgDir, "site-kernel", "package.json"), '{"name":"@warpgogol/site-kernel"}');
+    await writeFile(
+      join(wgDir, "site-kernel", "package.json"),
+      '{"name":"@warpgogol/site-kernel"}',
+    );
     await mkdir(join(wgDir, "share"));
     await writeFile(join(wgDir, "share", "package.json"), '{"name":"@warpgogol/share"}');
 
