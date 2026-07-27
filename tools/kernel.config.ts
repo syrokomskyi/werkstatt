@@ -27,6 +27,7 @@
   <entry key="docs.archive">Registers workspace umbrella archive command (RFC-0521).</entry>
   <entry key="session.*">Registers workspace session documentation domain commands (RFC-0537).</entry>
   <entry key="lagebild.*">Registers workspace Lagebild commands at the repository root.</entry>
+  <entry key="swim.*">Registers workspace SWIM membership commands (RFC-0564).</entry>
   <entry key="commit.message.lint">RFC-0265: commit message hygiene lint.</entry>
   <entry key="pipeline.budget.generate">RFC-0270: derive pipeline timing budgets from local telemetry.</entry>
   <entry key="command.manifest.generate">RFC-0266: generate the single machine-readable command manifest.</entry>
@@ -52,6 +53,7 @@
   <item>RFC-0394..0397: Register forgeSpecModule for spec.validate, spec.status, spec.materialize.</item>
   <item>RFC-0478: Register platform module for platform.consistency.validate.</item>
   <item>RFC-0537: Register forgeSessionModule for session.save, session.archive, session.validate, session.list.</item>
+  <item>RFC-0564: Register swimModule for swim.join, swim.leave, swim.members, swim.status.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -118,6 +120,7 @@ export default defineKernelConfig({
     gitmesh: async () => (await import("@warpgogol/site-kernel")).gitmeshModule,
     identity: async () =>
       (await import("@warpgogol/site-kernel-handoff/identity-module")).createIdentityModule(),
+    swim: async () => (await import("@warpgogol/site-kernel/swim-module")).swimModule,
   },
   pipelines: {
     // Workspace-level pipelines

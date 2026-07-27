@@ -172,3 +172,13 @@ export type {
   GitMeshStatus,
   GitMeshVerifyResult,
 } from "./gitmesh/types.ts";
+
+// RFC-0564: SWIM membership and CRDT genome
+export { swimModule } from "./swim/swim-module.ts";
+export type {
+  SwimMember,
+  SwimMemberStatus,
+  SwimConfig,
+  SwimMembershipView,
+  GenomeLogEntry,
+} from "./swim/types.ts";

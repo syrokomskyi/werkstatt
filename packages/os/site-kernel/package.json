@@ -65,6 +65,10 @@
       "types": "./src/gitmesh/gitmesh-module.ts",
       "default": "./src/gitmesh/gitmesh-module.ts"
     },
+    "./swim-module": {
+      "types": "./src/swim/swim-module.ts",
+      "default": "./src/swim/swim-module.ts"
+    },
     "./lagebild": {
       "types": "./src/lagebild/index.ts",
       "default": "./src/lagebild/index.ts"
@@ -110,9 +114,7 @@
       "default": "./src/workflow/index.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
