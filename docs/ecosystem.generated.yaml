@@ -2,16 +2,16 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 38eed121d97f8ad3493a01c45432124099b1472a5c1419c7b75ad9d0be7d9cea
+  contentHash: 16704cf080522588e13f3f0e6131651d8a93fb4eead4a9601847f804ab215b92
   sources:
     - path: docs/architecture-dna.md
       hash: 0d1a24e2aebb296cc660953a97aa8c32628d53d3fce898437ff646ebc7f85e4e
     - path: docs/gate-catalog.generated.yaml
-      hash: 3579123a98229f0074ecf30d93a1fe146a28cf9fe06b893360ef380536b31d75
+      hash: 0611e1d07cf54f75f9264f41b7fb95f163708c81084e17aa0e80bfefd28e498e
     - path: docs/maintenance-debt.baseline.generated.yaml
-      hash: a19c994b9c98928e6f6a220751b1cc82e39a25dd411ffc50d414b34f1b41a8f4
+      hash: 122e343d80d63240746248c6fbb023c996489f3030367f065ea9d673f4c8f536
     - path: docs/maintenance-debt.queues.generated.yaml
-      hash: 0f238d63ebab5cc228a7f54c2b52f8b5bbebc6fcb1ee73311b58edf6371a14d1
+      hash: f9205779f19e812635b25601fef688f4b0420e3f19d9ee84ed70a8b101b10a89
     - path: docs/maintenance-debt/queues/demand-slug-overrides.yaml
       hash: dab54fc75584d6f6193fbaa33904e92aa23b803fafe73519b4da77dfe72874b5
     - path: docs/maintenance-debt/queues/diagnostic-shim-migration.yaml
@@ -22,8 +22,18 @@ meta:
       hash: ce321ba5b7b9f18c4c2c108bc00ec054bfacccdf552bfb1bee58c21213c241cc
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: ad4b6dfdedcc73c92a956a485248f76cd5ca18d544537efa11913d8b14125791
+    - path: missions/warpgogol-com-m000010/workpiece/package.json
+      hash: c9b48bf51f792aef7324b44b44270054bdc99fad5b0d02496f5d05831fee5ff2
+    - path: missions/warpgogol-com-m000011/workpiece/package.json
+      hash: c9b48bf51f792aef7324b44b44270054bdc99fad5b0d02496f5d05831fee5ff2
+    - path: missions/warpgogol-com-m000013/workpiece/package.json
+      hash: c9b48bf51f792aef7324b44b44270054bdc99fad5b0d02496f5d05831fee5ff2
+    - path: missions/warpgogol-com-m000014/workpiece/package.json
+      hash: c9b48bf51f792aef7324b44b44270054bdc99fad5b0d02496f5d05831fee5ff2
+    - path: missions/warpgogol-com-m000015/workpiece/package.json
+      hash: d49cd67daabab88bf4a0d6c20612841772f76ede27cdc7adcc0d66276f0edbbf
     - path: package.json
-      hash: 5708c28968df4e415605f3a149d4458d65ccde526bba9ea8f80de6f1d32d4c7a
+      hash: 1e2d595173f61dd1bc82e5934cc416e42a35aa7cfc7998b06ab7b689655d40d0
     - path: packages/agent-gate/package.json
       hash: 1ae0595ee068d5f5eb6f42bac46b4b85b80935d858bdb0e685c871e166a2f14d
     - path: packages/chat-adapter-null/package.json
@@ -43,7 +53,7 @@ meta:
     - path: packages/fingerprint/package.json
       hash: a4514b6afac4ed0d360cf62e743fc56ccdc0f3302acbe010adc2a1fc70a38bde
     - path: packages/forge/package.json
-      hash: 339c15e57b79e934359f550b708f5f7b80b09cea7f0a423b5eed4956abe8b76f
+      hash: 6cacefd62e201cf20372091eb4f2c5e0b86f36f6ea25c111b31e03021055f6c3
     - path: packages/geo/package.json
       hash: 95a96296c9b96a284649022d8d73689a2c78616c087813d18f57f12594c63197
     - path: packages/growth-adapter-matomo/package.json
@@ -71,11 +81,11 @@ meta:
     - path: packages/os/site-kernel-check-warpgogol/package.json
       hash: 8513da0519bfbd39d129152595f85c9494f0d90a9de4660b88831694e1f7048e
     - path: packages/os/site-kernel-checks/package.json
-      hash: bac1af49daefd93c6ad3b59967b7c02caf355464cf14e9b68634bd7552fe4bfc
+      hash: 044561d8a37ef67fb050f2d36666dd8751fa2c40b51c3d0e6d56ea4d763e3d78
     - path: packages/os/site-kernel-checks/src/ci-local.ts
       hash: 4fae56dd7e925f001b43a93e79196b5e33efefcb574add4fae98255e0667cfd0
     - path: packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts
-      hash: f0754d6af4b324a7eeb19578cf261418518a6ad431d8de08dfdcd80a8f1b7b05
+      hash: 4c1b6cae8acf5de10770291d638b4b3027fb257716d0d9a98b305723ede7a0fd
     - path: packages/os/site-kernel-checks/src/diagnostics/rules.ts
       hash: 8396ae95ac1652316b9c2f074d7c4ce5afaf555f6a1f731b48dcaf6dea16ee6b
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/check-warpgogol.ts
@@ -85,7 +95,7 @@ meta:
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts
       hash: f19588a58508a9fa2f91647c9ed95cce50603e5cf8b77361c4a815c44a005905
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/governance.ts
-      hash: 805645f757275dfea692f534aed86961a424c009c5492ff2d9e10fc50e6b7b32
+      hash: d2b0dc10d6fb1245adb2b1e5b9305cb1ad4cc5735a55927c648cf0e8b62291fb
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/ops-fleet.ts
       hash: 6d9c66f46facd8ee1ac2411649134c84a216a30d94a787493895f3cdd5b89f5c
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/section-agent.ts
@@ -93,13 +103,13 @@ meta:
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/types.ts
       hash: 2de260a8d2bb151331566a210051a102b3d8c1fecedd0d1f9f4a9b6ac402477b
     - path: packages/os/site-kernel-checks/src/ecosystem.ts
-      hash: 185f49fcd877f4e5d59d6809d769f07a21e34a3aaecc9bf64f9981c11ea9869b
+      hash: b9c702249118b13804a073fb68399b5f4dfc2b6d511d9a8163062aac63439d1a
     - path: packages/os/site-kernel-checks/src/gate-catalog.ts
       hash: bd38378132a1519611f8dbd0f93f85c694671b956499d4634c6a4f0d8a4c9bb1
     - path: packages/os/site-kernel-checks/src/module.ts
       hash: 68c32d6d23bd3073f357f367928744b5c0e832adfefdf1dd16644a57b2efa9b3
     - path: packages/os/site-kernel-checks/src/pipelines/packages-check.ts
-      hash: 6ca67ca4a6377d60da205cb4f8c86a45f49822921106fc9fac40478d46cca22f
+      hash: 0e8c2130203797bde5795d067a36281727976e5eb6e8067f8f621ca7cd0c919d
     - path: packages/os/site-kernel-checks/src/test-signal.ts
       hash: bb22b88b465a6cda6c52d505e0ed0e99975fb9b4e3e15cc7bddc567523dba058
     - path: packages/os/site-kernel-codegen/package.json
@@ -109,7 +119,7 @@ meta:
     - path: packages/os/site-kernel-deploy/package.json
       hash: cbeef164c4f63e290e723450ddde430c6c4836c9a3912df08885878b575118ed
     - path: packages/os/site-kernel-handoff/package.json
-      hash: c3d134e74ce24572f878173330ceed412b0ef580ab841d485f17e8ae640666ad
+      hash: 1ec029a2f4636fa9275a9f9b3b8f4957f73f7ce86c010c5afa0850bdea441760
     - path: packages/os/site-kernel-integrity/package.json
       hash: 1335fa81d5170aa34b844154e6d050e37605bbd6ea2a8ba19138f46bbf84f1ab
     - path: packages/os/site-kernel-observability/package.json
@@ -139,7 +149,7 @@ meta:
     - path: packages/warpgogol-skills/package.json
       hash: cc7f8653664f860321e3cf2376dd2c411a88dce92dc9e6dc9384b104c2e80caf
     - path: pnpm-workspace.yaml
-      hash: 6e015b5ca407a7db55e1bc945f3718c5b4ce0c435a96237165b8f072897697ad
+      hash: cbc447972e2ad03356938f6d6294e8d88d8ba156a6424a5ee12e657a920569bd
     - path: services/cf-analytics-poller/package.json
       hash: 15c9cf828e0ebda955cfe83dd7850e817ce1453b885ba173dc1124a2d099a94f
     - path: services/check-warpgogol-runner/package.json
@@ -161,13 +171,17 @@ workspace:
   version: 4.5.0
   packageManager: pnpm@11.10.0
   packageGlobs:
+    - missions/*/workpiece
     - packages/*
     - packages/os/*
     - services/*
-apps: []
+apps:
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000015/workpiece
+    packageName: warpgogol-com
 sternsystems:
   - id: warpgogol-com
-    currentMission: null
+    currentMission: warpgogol-com-m000015
     registeredAt: 2026-07-13T00:00:00.000Z
 missions:
   - id: warpgogol-com-m000010
@@ -190,7 +204,266 @@ missions:
     sternsystem: ""
     status: open
     workpiecePath: missions/warpgogol-com-m000014/workpiece
+  - id: warpgogol-com-m000015
+    sternsystem: ""
+    status: open
+    workpiecePath: missions/warpgogol-com-m000015/workpiece
 packages:
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000010/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/agent-gate"
+      - "@warpgogol/content-source"
+      - "@warpgogol/faq"
+      - "@warpgogol/growth"
+      - "@warpgogol/ontology"
+      - "@warpgogol/pbp"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-changelog"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-deploy"
+      - "@warpgogol/site-kernel-integrity"
+      - "@warpgogol/tokens"
+      - "@warpgogol/ui"
+      - "@webgogol/forge"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000010/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000011/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/agent-gate"
+      - "@warpgogol/content-source"
+      - "@warpgogol/faq"
+      - "@warpgogol/growth"
+      - "@warpgogol/ontology"
+      - "@warpgogol/pbp"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-changelog"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-deploy"
+      - "@warpgogol/site-kernel-integrity"
+      - "@warpgogol/tokens"
+      - "@warpgogol/ui"
+      - "@webgogol/forge"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000011/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000013/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/agent-gate"
+      - "@warpgogol/content-source"
+      - "@warpgogol/faq"
+      - "@warpgogol/growth"
+      - "@warpgogol/ontology"
+      - "@warpgogol/pbp"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-changelog"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-deploy"
+      - "@warpgogol/site-kernel-integrity"
+      - "@warpgogol/tokens"
+      - "@warpgogol/ui"
+      - "@webgogol/forge"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000013/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000014/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/agent-gate"
+      - "@warpgogol/content-source"
+      - "@warpgogol/faq"
+      - "@warpgogol/growth"
+      - "@warpgogol/ontology"
+      - "@warpgogol/pbp"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-changelog"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-deploy"
+      - "@warpgogol/site-kernel-integrity"
+      - "@warpgogol/tokens"
+      - "@warpgogol/ui"
+      - "@webgogol/forge"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000014/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000015/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/agent-gate"
+      - "@warpgogol/content-source"
+      - "@warpgogol/faq"
+      - "@warpgogol/growth"
+      - "@warpgogol/ontology"
+      - "@warpgogol/pbp"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-changelog"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-deploy"
+      - "@warpgogol/site-kernel-integrity"
+      - "@warpgogol/tokens"
+      - "@warpgogol/ui"
+      - "@webgogol/forge"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000015/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
   - name: "@warpgogol/agent-gate"
     directory: packages/agent-gate
     workspacePattern: packages/*
@@ -609,6 +882,7 @@ packages:
       - "@warpgogol/star-map"
       - "@warpgogol/surface"
       - "@warpgogol/tokens"
+      - "@webgogol/forge"
       - ai
       - file-type
       - picomatch
@@ -692,6 +966,7 @@ packages:
       - "@warpgogol/site-kernel-content"
       - "@warpgogol/site-kernel-onboarding"
       - "@warpgogol/surface"
+      - "@webgogol/forge"
       - yaml
     testSignal:
       packageName: "@warpgogol/site-kernel-handoff"
@@ -1060,16 +1335,16 @@ quality:
     real: 31
     noop: 0
     absent: 1
-    skipped: 16
+    skipped: 21
   testSignalPolicy:
     hasErrors: true
     errorCount: 1
     warningCount: 0
   maintenanceDebtBaseline:
     exists: true
-    currentItems: 0
+    currentItems: 217
     baselineItems: 230
-    newItems: 0
+    newItems: 217
     expiredItems: 0
 commands:
   - name: adr.archive
@@ -1101,234 +1376,273 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.environment.audit
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: agent.gate.fixtures.run
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: agent.knowledge.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.knowledge.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.manifest.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.manifest.verify
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.openapi.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.openapi.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.routes.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.surface.sign
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.surface.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agent.surface.verify
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: agents.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ai.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ai.policy.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ai.policy.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ai.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend-check.author
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend-check.postbuild
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend-check.run
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend.atoms.merge
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend.delta.files
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend.input.validate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend.phase.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend.provenance.append
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend.provenance.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: amend.system.merge
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: analytics.binding.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: analytics.config.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: analytics.messkanon.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: api.routes.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: app.boilerplate.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: app.contract.full
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: app.layout.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: app.qa.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: archetype.registry.build
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: archetype.registry.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: article.depth.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: artifact.store.gc
     scope: workspace
@@ -1359,24 +1673,28 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: assets.structure.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: astro.exports.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: audit.agent.readiness.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: audit.archive
     scope: workspace
@@ -1389,48 +1707,56 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: audit.llm.run
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: autonomy.demote
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: autonomy.level.report
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: autonomy.level.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: autonomy.promote
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: b2b.model.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: barrel.size.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: behavior.snapshot.capture
     scope: workspace
@@ -1449,306 +1775,387 @@ commands:
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: behavior.snapshot.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: billing.config.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: billing.secrets.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: biome.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: biome.coverage.hint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: biome.css.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: biome.site-background.derive
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: biome.tokens.derive
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: biome.tokens.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: blog.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: blueprint.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: bodenstation.voice.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: bordbuch.append
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: bordbuch.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: bordbuch.status
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: bordbuch.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: breadcrumb.trail.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: canonical.url.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: change.impact.derive
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
+  - name: changelog.backfill
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: changelog.generate
+    scope: app
+    mutatesState: true
+    supportsAllSites: true
+    providers:
+      - site
+  - name: changelog.rebuild-index
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
   - name: chat.config.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: chat.metadata.drift.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check-warpgogol.app.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check-warpgogol.runner.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.accessibility.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.action-pack.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.artifact.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.audience.profile.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.audience.review.run
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.audience.review.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.compare
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.content-surface.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.deploy-alt.run
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.deploy-main.gate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.deterministic.run
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.evidence.capture
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.evidence.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.fixture.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: check.localization.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.report.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.run
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.runner.info
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.safety.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.target.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: check.technical.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: ci.local.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: client.edit.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: client.export
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
   - name: cloudflare.assets.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cloudflare.regional-services.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cloudflare.residency.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cms.schema.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cms.schema.parity
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: command.manifest.generate
     scope: workspace
@@ -1761,12 +2168,14 @@ commands:
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: command.reads.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: commit.message.lint
     scope: workspace
@@ -1779,30 +2188,35 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: compass.audit.baseline
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: compass.audit.plan
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: compass.audit.record
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: compass.audit.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
     gate:
       severity: mixed
@@ -1816,360 +2230,432 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: compass.inventory
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: compass.summary.trim
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: compass.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: config.regenerate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: config.template.sync
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: consent.activation.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: constellation.compose.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: constellation.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: contact.form.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content-types.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.asset.contract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.claim.ledger.append
     scope: app
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: content.claim.ledger.project
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.claim.ledger.query
     scope: app
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: content.claim.report
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.claim.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.coverage.delta
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.coverage.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.derived.stamp
     scope: app
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: content.derived.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.filename.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.freshness.report
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.freshness.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.idempotency.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.layouts.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.links.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.plan.build
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.plan.route
     scope: app
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: content.plan.status
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: content.ref-index.generate
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: content.ref-migrate
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
   - name: content.references.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.source.parity
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.source.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.surface.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.update-stamps.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: content.voice.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cosmic.catalog.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cosmic.literals.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cosmic.name.pick
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cosmic.name.rename
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: cosmic.name.unique
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: css.important.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dedup.helper.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: demand.map.report
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: demand.modifier.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: demand.signal.import
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: demand.signal.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: demands.hierarchy.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: deploy.preflight
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: deploy.scripts.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: deploy.surface.parity.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: diagnostic.shape.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dispatcher.sync.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dist.content-references.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dist.generated-marker.strip
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dist.generated-marker.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dist.sitemap.images.generate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dist.sitemap.images.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: dna.registry.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: docs.archive
     scope: workspace
@@ -2182,30 +2668,35 @@ commands:
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: docs.commands.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: ecosystem.commit
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: ecosystem.manifest.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: ecosystem.manifest.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
     gate:
       severity: error
@@ -2217,204 +2708,238 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: effects.coverage.audit
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: enrich.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: entitlement.module.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: entitlements.resolve
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: entitlements.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: env.alt.check
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: env.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: env.example.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: env.example.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: env.local.check
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: env.main.check
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: escalation.budget.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: escalation.queue.report
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: escalation.route
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: family.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: family.list
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: faq.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feature.graph.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feature.links.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feature.policy.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feature.projections.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feature.references.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feature.visibility.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feed.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: feed.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: file.size.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: fingerprint.calculate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fingerprint.fixtures.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fingerprint.usage.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: first-party-data.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: fleet.agent.catalog.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fleet.agent.catalog.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fleet.killswitch
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fleet.probe.targets.generate
     scope: workspace
@@ -2433,42 +2958,49 @@ commands:
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fleet.sites.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fleet.status.collect
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: fonts.contract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: fonts.imports.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: fonts.origin.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: footer.legal.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: forge.agents.generate
     scope: workspace
@@ -2529,60 +3061,70 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: funnel.contract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: funnel.copy.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: funnel.lagebild.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: funnel.org.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: funnel.stage.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: funnel.statechart.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: funnel.statechart.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: gate.catalog.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: gate.catalog.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
     gate:
       severity: error
@@ -2594,96 +3136,112 @@ commands:
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: generated.file.lookup
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: generated.files.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: generated.marker.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: generator.ownership.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: geo.catalog.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: geo.slug.preview
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: gitattributes.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: gitattributes.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: github.branch-protection.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: growth.adapter.contract
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: growth.events.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: growth.experiment.archive
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: growth.experiment.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: growth.funnel.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: growth.vendor.resolve
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: handoff.absorb
     scope: workspace
@@ -2708,144 +3266,222 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: headers.runtime.probe
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: headers.security.generate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: headers.security.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: humans.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: humans.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: i18n.config.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: i18n.detect.implement
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: i18n.middleware.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
-  - name: icons.generate
-    scope: workspace
-    mutatesState: false
+  - name: icons.clean
+    scope: app
+    mutatesState: true
     supportsAllSites: false
     providers:
+      - site
+  - name: icons.generate
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
       - workspace
   - name: image.format.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: image.variants.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: image.variants.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: import.extensions.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: indexnow.key.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: indexnow.key.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: indexnow.submit
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: indexnow.submit.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: infra.brief.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: integration.config.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: integration.secrets.audit
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: integration.secrets.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: integrity.backfill-revisions
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: integrity.build-record
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: integrity.init
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: integrity.keys.generate
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: integrity.sign
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: integrity.update
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+  - name: integrity.verify
+    scope: app
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
+  - name: integrity.verify-release
+    scope: app
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
   - name: jsonld.parity
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: jsonld.url.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: kernel.cache.clear
     scope: workspace
@@ -2864,96 +3500,112 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: kernel.io.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: kernel.result.envelope.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: kernel.wire
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: labels.shape.hint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: lagebild.tenant.add
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: lagebild.tenant.disable
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: lagebild.tenant.enable
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: lagebild.tenant.rotate-secret
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: lagebild.tenant.status
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: lagebild.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: lagebild.worker.deploy
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: layout.orchestrator.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: legal.processors.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: legal.scaffold
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: legal.translation.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: leitstand.health
     scope: workspace
@@ -2984,138 +3636,173 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: lighthouse.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: live.media.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: live.variants.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: llms.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: llms.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: maintenance.debt.baseline.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: maintenance.debt.baseline.write
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: maintenance.debt.queue.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: maintenance.debt.queue.report
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: maintenance.debt.queue.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: maintenance.debt.report
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: maintenance.debt.triage.report
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: manifest.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: material.credits.drift.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: material.credits.generate
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
   - name: material.credits.report
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: material.credits.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: material.metadata.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: material.metadata.write
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
   - name: matomo.export.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: matomo.provision.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: matomo.proxy.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: matomo.silence.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: matomo.smoke.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: migrator.registry.validate
     scope: workspace
@@ -3128,24 +3815,28 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: mirror.quintet.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: mirror.triad.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: mirroring.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: mission.abort
     scope: workspace
@@ -3242,78 +3933,91 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: naming.content.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: naming.convention.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: naming.layouts.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: naming.pages.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: naming.policy.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: naming.styles.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: naming.suffixes.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: navigation.section.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: nebula.score.compute
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: need.markers.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: not-found.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: not-found.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: notausgang.export
     scope: workspace
@@ -3392,150 +4096,181 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: offer.provider.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: onboarding.synthesize
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: onboarding.yaml.import.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: open-source.generate
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
   - name: open-source.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: overlay.pages.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: packages-check.run
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: packages.check
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: page.block.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: page.blocks.extract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: page.blocks.mirror.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: page.markdown.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: page.markdown.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: page.pipeline.contract
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: page.shell.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: participant.ai-agent.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: participant.json.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: participant.profile.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: participant.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: passport.emit
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: passport.key.rotate
     scope: app
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: passport.verify
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pbp.content.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pbp.profile.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: person.create
     scope: app
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: pipeline.budget.generate
     scope: workspace
@@ -3548,30 +4283,35 @@ commands:
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pipeline.idempotency.smoke
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pipeline.log.hygiene.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pipeline.timeout.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: pipeline.timing.report
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: plan.archive
     scope: workspace
@@ -3584,6 +4324,7 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: platform.consistency.validate
     scope: workspace
@@ -3605,72 +4346,84 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: preview.images.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: print.contract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: print.layout.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: print.pdf.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: print.pdf.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: props.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: props.types.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pseo.experiment.plan
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pseo.product.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pseo.proof.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pseo.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
     gate:
       severity: error
@@ -3684,108 +4437,126 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.artifact.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.declaration.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.icons.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.icons.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.infrastructure.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.managed.clean
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.orphans.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.runtime.probe
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: public.surface.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: pulsar.heartbeat
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: qa.independent.run
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ratgeber.article.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ratgeber.claim.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ratgeber.hub.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ratgeber.policy.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ratgeber.provenance.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: redirect.map.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: release.list
     scope: workspace
@@ -3822,324 +4593,384 @@ commands:
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.archive
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.check
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.command-lifecycle.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.create
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.decision-log.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.dna.trace.generate
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.dna.trace.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.graph
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.implement.stamp
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.index.generate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.index.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.list
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.next-id
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.pipeline.status
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.supersede.propose
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: rfc.verification.emit
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: robots.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: robots.page.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: robots.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: root.canonical.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: route.thin.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: route.topology.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: routes.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: runtime.context.shape
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: runtime.warnings.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: schema.drift.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: scripts.orchestrator.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: scripts.placement.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.background.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.body.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.cta.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.defaults.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: section.header.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.image.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.motion.contract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.placeholder.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.scaffold
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.shell.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: section.similarity.report
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: security.txt.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: security.txt.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: semantic.drift.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
+  - name: semantic.mirror.validate
+    scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
   - name: semantic.parity
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: semantic.targets.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: seo.internal-linking.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: seo.meta.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: seo.structured-data.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: seo.technical.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: services.check.run
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: services.projection.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: services.workspace.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: session.archive
     scope: workspace
@@ -4170,108 +5001,126 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: share.utility.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: shared-ui.thin-copy.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: shared.context.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: shared.section-props.changelog.report
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: shared.section-props.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: site.background.contract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: sitemap.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: sitemap.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: sites-check.author
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: sites-check.postbuild
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: sites-check.run
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: source.binding.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: source.monitor.run
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: source.monitor.status
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: source.monitor.tenant.add
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: source.monitor.tenant.disable
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: source.monitor.tenant.enable
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: spec.materialize
     scope: workspace
@@ -4296,6 +5145,7 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: sternsystem.extract
     scope: workspace
@@ -4349,30 +5199,35 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: styles.global.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.artifact.ready
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.breaker.evaluate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.context.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.contract.validate
     scope: workspace
@@ -4394,60 +5249,70 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.duplicate-content.report
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.duplicate.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.enrich
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.enrich.review
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.evidence.join
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.evidence.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.freshness
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.hub.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
     gate:
       severity: error
@@ -4461,6 +5326,7 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
     gate:
       severity: warning
@@ -4474,312 +5340,371 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.intersection.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.media-leakage.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.review.calibrate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.review.run
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.review.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.rollback.apply
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.rollback.plan
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.service.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.starmap
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.glossary.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.glossary.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.notes.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.notes.review
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.notes.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.qa.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.translation.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: surface.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: system-md.compile
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: system.manifest.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: team.cross-page.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: team.hub.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: team.lifecycle.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
+      - workspace
+  - name: template.imports.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
       - workspace
   - name: test.signal.policy.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: test.signal.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: text.normalize.apply
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: text.normalize.report
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: text.normalize.rules.list
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: text.normalize.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: thin-copy.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: tokens.catalog.sync
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: tokens.colors.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: tokens.colors.section-shell.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: tokens.ds.lint
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: tokens.section-shell.contract.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: trust.rating.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: tsconfig.shape.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ui.i18n.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: ui.silent-defaults.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: uni.registry.build
     scope: workspace
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: uni.registry.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: video.dist.prune
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: video.ios-fallback.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: video.media.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: video.variants.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: video.variants.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: visibility.action.plan
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: visibility.expr.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: visibility.import
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: visibility.reconcile
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: visual.contract.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
     gate:
       severity: mixed
@@ -4793,78 +5718,98 @@ commands:
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: visual.rules.list
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: warning.diagnostics.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: warpgogol.check-hints.generate
     scope: app
     mutatesState: true
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: warpgogol.check-hints.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: werk.record.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: werkstatt.lock.recover
     scope: workspace
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: werkstatt.lock.status
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: werkstatt.operation.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: wikidata.validate
     scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: workflow-amend.list
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: workflow.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
       - workspace
   - name: workflow.list
     scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
+      - site
+      - workspace
+  - name: workpiece.imports.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
       - workspace
   - name: workpiece.read
     scope: workspace
@@ -4883,30 +5828,35 @@ commands:
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: workspace.surface.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: workspace.write.boundary.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: yaml.contract.lint
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: yaml.parse.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
     providers:
+      - site
       - workspace
 commandProvenance:
   - command: analytics.binding.validate
@@ -4928,6 +5878,54 @@ commandProvenance:
     addedBy:
       - RFC-0305
     changedBy: []
+    removedBy: []
+  - command: compass.audit.baseline
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: compass.audit.plan
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: compass.audit.record
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: compass.audit.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: compass.changesummary.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: compass.inventory
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: compass.summary.trim
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: compass.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
     removedBy: []
   - command: consent.activation.validate
     proposedBy: []
@@ -4971,6 +5969,12 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
+  - command: leitstand.propagate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+    removedBy: []
   - command: matomo.export.validate
     proposedBy:
       - RFC-0305
@@ -5006,25 +6010,127 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
+  - command: mission.abort
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+    removedBy: []
+  - command: mission.close
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+      - RFC-0560
+    removedBy: []
+  - command: mission.git.commit
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+      - RFC-0560
+    removedBy: []
+  - command: mission.materialize
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+    removedBy: []
+  - command: mission.open
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+      - RFC-0560
+    removedBy: []
+  - command: mission.reconcile
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+      - RFC-0560
+    removedBy: []
+  - command: mission.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+    removedBy: []
+  - command: release.prepare
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+    removedBy: []
+  - command: release.publish
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0559
+    removedBy: []
+  - command: sternsystem.register
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0561
+    removedBy: []
+  - command: sternsystem.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0561
+    removedBy: []
   - command: surface.generate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0384
     removedBy: []
+  - command: template.imports.validate
+    proposedBy:
+      - RFC-0557
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: werkstatt.lock.recover
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: werkstatt.lock.status
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: werkstatt.operation.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0556
+    removedBy: []
+  - command: workpiece.imports.validate
+    proposedBy:
+      - RFC-0557
+    addedBy: []
+    changedBy: []
+    removedBy: []
   - command: workpiece.read
     proposedBy:
       - RFC-0555
     addedBy:
       - RFC-0555
-    changedBy: []
+    changedBy:
+      - RFC-0559
     removedBy: []
   - command: workpiece.write
     proposedBy:
       - RFC-0555
     addedBy:
       - RFC-0555
-    changedBy: []
+    changedBy:
+      - RFC-0559
     removedBy: []
 pipelines:
   - name: build.check
@@ -5268,6 +6374,7 @@ pipelines:
   - name: build.prepare
     scope: app
     commands:
+      - workpiece.imports.validate
       - yaml.contract.lint
       - yaml.parse.validate
       - content.ref-index.generate
@@ -5372,6 +6479,7 @@ pipelines:
       - workspace.surface.validate
       - gate.catalog.validate
       - workspace.discovery.validate
+      - template.imports.validate
       - test.signal.validate
       - test.signal.policy.validate
       - maintenance.debt.baseline.validate
@@ -5465,6 +6573,7 @@ pipelines:
       - workspace.surface.validate
       - gate.catalog.validate
       - workspace.discovery.validate
+      - template.imports.validate
       - test.signal.validate
       - test.signal.policy.validate
       - maintenance.debt.baseline.validate
@@ -6193,9 +7302,9 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 2
-  implemented: 1
-  draft: 3
+  accepted: 3
+  implemented: 2
+  draft: 10
   reviewing: 0
 baseline:
   implementedRfcs:
@@ -6213,14 +7322,30 @@ baseline:
         - DNA-49
         - DNA-51
         - DNA-56
+    - id: RFC-0556
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-42
+        - DNA-43
+        - DNA-51
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
+      - RFC-0557
     draft:
       - RFC-0383
       - RFC-0384
       - RFC-0387
+      - RFC-0558
+      - RFC-0559
+      - RFC-0560
+      - RFC-0561
+      - RFC-0562
+      - RFC-0563
+      - RFC-0564
     reviewing: []
     superseded: []
     rejected: []
