@@ -6,6 +6,7 @@
   Supports permissive (warn-only) and enforced (reject) modes.
   RFC-0559: adds site-scoping (credential siteId vs _meta.system), per-tool scope
   enforcement, and distinct error types for auth-config-missing vs auth-config-malformed.
+  RFC-0561: adds verifyOwnership function to check registry owner field against VC subject id.
   </purpose>
   <non-goals>
     <item>Does not execute Site OS commands — that remains in executor.ts.</item>
@@ -16,6 +17,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0558: initial auth middleware for Studio Gate.</item>
   <item>RFC-0559: add site-scoping, scope enforcement, malformed config detection, system-id-required error.</item>
+  <item>RFC-0561: add verifyOwnership function to check registry owner field against VC subject id.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,6 +29,8 @@ import {
   type WerkstattIdentityConfig,
   type WerkstattCredential,
 } from "@warpgogol/passport";
+import { fleetRegistrySchema } from "@warpgogol/ontology/operations";
+import { parse as parseYaml } from "yaml";
 
 export interface StudioGateAuthResult {
   authenticated: boolean;
@@ -184,5 +188,62 @@ export async function verifyAuthFromMeta(
     actorId: credential.subject.id,
     siteId: credentialSiteId,
     scopes,
+  };
+}
+
+export interface OwnershipResult {
+  verified: boolean;
+  error?: string;
+  registryOwner?: string;
+  credentialSubjectId?: string;
+}
+
+export async function verifyOwnership(
+  siteId: string,
+  credentialSubjectId: string,
+  werkstattRoot: string,
+): Promise<OwnershipResult> {
+  const registryPath = join(werkstattRoot, "systems", "registry.yaml");
+  let raw: string;
+  try {
+    raw = await readFile(registryPath, "utf-8");
+  } catch {
+    return { verified: false, error: "registry-not-found" };
+  }
+
+  let registry;
+  try {
+    registry = fleetRegistrySchema.parse(parseYaml(raw));
+  } catch {
+    return { verified: false, error: "registry-parse-error" };
+  }
+
+  const entry = registry.systems.find((s) => s.id === siteId);
+  if (!entry) {
+    return { verified: false, error: "site-not-found" };
+  }
+
+  if (!entry.owner) {
+    return {
+      verified: false,
+      error: "owner-not-registered",
+      registryOwner: undefined,
+      credentialSubjectId,
+    };
+  }
+
+  if (entry.owner !== credentialSubjectId) {
+    return {
+      verified: false,
+      error: "owner-mismatch",
+      registryOwner: entry.owner,
+      credentialSubjectId,
+    };
+  }
+
+  return {
+    verified: true,
+    registryOwner: entry.owner,
+    credentialSubjectId,
   };
 }

@@ -24,7 +24,9 @@
     "@warpgogol/site-kernel": "workspace:*",
     "@warpgogol/site-kernel-handoff": "workspace:*",
     "@warpgogol/passport": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@warpgogol/ontology": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "yaml": "^2.7.0"
   },
   "devDependencies": {
     "fast-check": "^4.9.0",
