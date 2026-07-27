@@ -161,6 +161,10 @@ export async function runGeneratedFilesValidate(
       continue;
     }
 
+    if (entry.conditional) {
+      continue;
+    }
+
     const resolvedPath = resolveEntryPath(
       entry,
       app,

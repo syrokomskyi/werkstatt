@@ -111,6 +111,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "mirror.quintet.validate" },
   // Wave 0 (RFC-0023): rebuild registry so uni.registry.validate in build.check is always fresh
   { command: "uni.registry.build" },
+  // RFC-0295: generate Warpgogol check hints before generated.files.validate checks them
+  { command: "warpgogol.check-hints.generate" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
   { command: "generated.files.validate" },
 ];

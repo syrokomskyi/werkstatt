@@ -50,6 +50,11 @@ export interface OwnershipEntry {
    * Used by `generated.edit.guard` for Category B owner resolution.
    */
   module?: string;
+  /**
+   * When true, the file is only generated under certain conditions (e.g. cms-git adapter).
+   * `generated.files.validate` will skip existence checks for conditional entries.
+   */
+  conditional?: boolean;
 }
 
 export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
@@ -387,18 +392,20 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
   },
 
-  // RFC-0171: Decap CMS admin config.
+  // RFC-0171: Decap CMS admin config (conditional — only for cms-git adapter sites).
   {
     path: "public/admin/config.yml",
     command: "cms.schema.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/cms.ts",
+    conditional: true,
   },
   {
     path: "public/admin/index.html",
     command: "cms.schema.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/cms.ts",
+    conditional: true,
   },
 
   // RFC-0204: Responsive image variants (public outputs).
