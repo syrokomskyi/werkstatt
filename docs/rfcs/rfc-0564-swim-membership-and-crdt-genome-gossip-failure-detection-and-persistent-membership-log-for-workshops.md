@@ -1,7 +1,7 @@
 ---
 id: RFC-0564
 title: "SWIM Membership and CRDT Genome: Gossip failure detection and persistent membership log for workshops"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
 enhancedAt: 2026-07-27
-implementedAt:
+implementedAt: 2026-07-27
 closedAt:
 supersedes: []
 supersededBy:
@@ -43,12 +43,12 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - swim.join
     - swim.leave
     - swim.members
     - swim.status
-  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -293,15 +293,15 @@ This RFC does not change `docs/*.xml` Compass documents — SWIM membership is a
 
 ## Acceptance criteria
 
-- [ ] `SwimMember`, `SwimMemberStatus`, `SwimConfig`, `SwimMembershipView`, `GenomeLogEntry` types defined in `packages/os/site-kernel/src/swim/types.ts`
-- [ ] `swim.join` command joins the network via a seed node
-- [ ] `swim.leave` command leaves the network gracefully
-- [ ] `swim.members` command lists current membership view
-- [ ] `swim.status` command reports local SWIM status
-- [ ] `werkstatt.swim.json` config file schema defined and validated
-- [ ] `werkstatt.genome.log` CRDT genome log format defined (NDJSON, append-only, signed)
-- [ ] Workshop restart restores membership view from genome log
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `SwimMember`, `SwimMemberStatus`, `SwimConfig`, `SwimMembershipView`, `GenomeLogEntry` types defined in `packages/os/site-kernel/src/swim/types.ts` (evidence: packages/os/site-kernel/src/swim/types.ts:1-55)
+- [x] `swim.join` command joins the network via a seed node (evidence: packages/os/site-kernel/src/swim/handlers.ts:51-145 — runSwimJoin probes seed via UDP, records alive event)
+- [x] `swim.leave` command leaves the network gracefully (evidence: packages/os/site-kernel/src/swim/handlers.ts:147-191 — runSwimLeave records left event with Ed25519 signature)
+- [x] `swim.members` command lists current membership view (evidence: packages/os/site-kernel/src/swim/handlers.ts:302-348 — runSwimMembers reads genome log, derives membership view)
+- [x] `swim.status` command reports local SWIM status (evidence: packages/os/site-kernel/src/swim/handlers.ts:350-401 — runSwimStatus reports config, genome log size, membership)
+- [x] `werkstatt.swim.json` config file schema defined and validated (evidence: packages/os/site-kernel/src/swim/config.ts:32-66 — validateConfig with Zod schema, loadSwimConfig, createSwimConfig)
+- [x] `werkstatt.genome.log` CRDT genome log format defined (NDJSON, append-only, signed) (evidence: packages/os/site-kernel/src/swim/genome-log.ts:107-120 — appendGenomeEntry writes NDJSON lines, signGenomeEntry uses Ed25519 via @warpgogol/passport)
+- [x] Workshop restart restores membership view from genome log (evidence: packages/os/site-kernel/src/swim/genome-log.ts:107-133 — readGenomeLog reads and verifies entries, deriveMembershipView reconstructs latest state per workshop)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --root ... -- RFC-0564` → "All 1 RFC(s) passed validation")
 
 ## Implementation notes for agents
 
