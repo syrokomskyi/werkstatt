@@ -24,6 +24,7 @@ supersedes: []
 supersededBy:
 amends: []
 amendedBy:
+  - RFC-0558
   - RFC-0559
 related:
   - DNA-22

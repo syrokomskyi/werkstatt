@@ -15,11 +15,13 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0555
 amendedBy: []
 related:
   - DNA-34
@@ -32,7 +34,8 @@ related:
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
-  - DNA-34
+  - DNA-45
+  - DNA-56
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -121,7 +124,7 @@ The Werkstatt gains a VC-based identity model with two new credential types — 
 
 ```sh
 # One-time bootstrap: generate keypair, write werkstatt.identity.json, issue self-ownership VC
-pnpm exec site-kernel run identity.bootstrap --operator-name "Andrii Syrokomskyi" --json
+pnpm exec site-kernel run identity.bootstrap --operator-name "Andrii Syrokomskyi" --domain warpgogol.com --json
 
 # Issue a SiteOwnershipCredential for a specific Sternsystem
 pnpm exec site-kernel run identity.credential.issue \
@@ -176,6 +179,8 @@ export interface WerkstattIdentityConfig {
     keyVersion: string;           // e.g. "v1"
     algId: "Ed25519Signature2020"; // Versioned for future post-quantum migration
   };
+  authMode: "permissive" | "enforced"; // Pilot starts permissive, operator switches to enforced
+  domain: string;                 // e.g. "warpgogol.com" — used for did:web identifiers
   // Private key is NEVER stored in this file — it lives in PASSPORT_SIGNING_KEY env var
   issuedCredentials: WerkstattCredential[];
   revokedCredentialIds: string[];
@@ -184,6 +189,7 @@ export interface WerkstattIdentityConfig {
 export interface WerkstattCredential {
   credentialId: string;     // urn:warpgogol:cred:<uuid>
   type: "SiteOwnershipCredential" | "ActorDelegationCredential";
+  // Discriminated union: narrow via `type` field, not `instanceof`
   subject: SiteOwnershipCredentialSubject | ActorDelegationCredentialSubject;
   proof: VCProof;           // Reuses existing VCProof from passport schema
   issuedAt: string;         // ISO-8601
@@ -206,11 +212,16 @@ export interface StudioGateAuthResult {
 | --- | --- |
 | `werkstatt.identity.json` | Bootstrap config: operator name, public key, issued credentials, revocation list. Created by `identity.bootstrap`, updated by `identity.credential.issue`/`revoke`. |
 | `packages/passport/src/schema.ts` | Extended with `SiteOwnershipCredentialSubject`, `ActorDelegationCredentialSubject`, `WerkstattIdentityConfig`, `WerkstattCredential` types. |
-| `packages/passport/src/sign.ts` | No changes — `signBytes`/`verifyBytes`/`signCredential`/`verifyCredential` are reused as-is. |
+| `packages/passport/src/sign.ts` | No changes to existing functions. Identity credentials use `signBytes`/`verifyBytes` (raw detached signing) with a new `identityCredentialBytes()` canonicalization function in `packages/passport/src/identity-sign.ts`. `signCredential` is NOT reused — it is typed to `CredentialSubjectDigest` (build provenance fields) and cannot accept identity credential subjects. |
 | `packages/studio-gate/src/index.ts` | Auth middleware added before `CallToolRequestSchema` handler. Reads VC token from MCP `_meta.identity` or `X-Werkstatt-Credential` header. |
 | `packages/ontology/src/operations/sternsystem.ts` | `fleetRegistryEntrySchema` gains optional `owner?: string` field (VC subject id). |
 | `packages/os/site-kernel-handoff/src/mission/index.ts` | `actor` flag default changes from `"agent"` to required-from-auth-context. Mission commands receive actor from auth middleware, not CLI flag. |
 | `systems/registry.yaml` | Existing entries continue to validate without `owner`. New entries should include `owner`. |
+| `.env.example` (workspace root) | `PASSPORT_SIGNING_KEY` env var documented with `# How to obtain:` instruction per DNA-40. |
+| `packages/passport/src/identity-sign.ts` | New module: `identityCredentialBytes()` canonicalization + `signIdentityCredential()`/`verifyIdentityCredential()` wrappers around `signBytes`/`verifyBytes`. |
+| `packages/passport/AGENTS.md` | Updated to document new identity credential types and `identity-sign.ts` module. |
+| `packages/studio-gate/AGENTS.md` | Updated to document auth middleware and `authMode` field. |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Updated to document `actor` field semantics change (VC subject id from auth context). |
 
 ### Output format
 
@@ -245,6 +256,37 @@ export interface StudioGateAuthResult {
   "summary": "identity.credential.verify: credential valid"
 }
 ```
+
+### Canonicalization for identity credentials
+
+Identity credential subjects are canonicalized using sorted-key JSON (same determinism contract as `credentialBytes` in `sign.ts`). The `identityCredentialBytes()` function in `packages/passport/src/identity-sign.ts` produces canonical UTF-8 bytes from the subject fields:
+
+```ts
+// SiteOwnershipCredentialSubject → { id, siteId, role } sorted by key
+// ActorDelegationCredentialSubject → { delegatedBy, expiresAt, id, scopes, siteId } sorted by key
+```
+
+The signed bytes are the sorted JSON of the subject fields only (not the full VC envelope). The `proof` is attached after signing, same as the build-provenance passport flow.
+
+### `werkstatt.identity.json` git tracking
+
+The `werkstatt.identity.json` file contains only public keys, credential IDs, and revocation lists — no private key material. It **MUST be committed to git** so that all operators and CI can verify credentials. The private key lives exclusively in the `PASSPORT_SIGNING_KEY` env var.
+
+### Concurrent access
+
+In the pilot, `werkstatt.identity.json` is read by Studio Gate middleware on every MCP call and written only by `identity.credential.issue`/`revoke` commands (infrequent). No file locking is needed for the pilot — the read is a single `readFile` call (atomic at the OS level for small files), and writes are serialized by the operator running one command at a time. If concurrent writes become a concern in multi-operator mode, a file lock can be added in a follow-up RFC.
+
+### Compass sync
+
+This RFC does not change `docs/*.xml` Compass documents — identity is a new platform-level concern, not a modification of existing requirements or technology contracts. If future RFCs elevate identity to a Compass-tracked requirement, `docs/requirements.xml` and `docs/technology.xml` should be updated at that time.
+
+### AGENTS.md updates
+
+The following `AGENTS.md` files need updates during implementation:
+
+- `packages/passport/AGENTS.md` — document new identity credential types, `identity-sign.ts` module, and `WerkstattIdentityConfig` schema.
+- `packages/studio-gate/AGENTS.md` — document auth middleware, `authMode` field, and VC verification flow.
+- `packages/os/site-kernel-handoff/AGENTS.md` — document `actor` field semantics change (VC subject id from auth context, not free-text).
 
 ### Failure modes
 
