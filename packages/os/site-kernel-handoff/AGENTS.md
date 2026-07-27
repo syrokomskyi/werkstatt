@@ -117,12 +117,12 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 ## Sternsystem registration (RFC-0354, RFC-0532)
 
 - `sternsystem.register` is the single entry point for creating a new Sternsystem. It performs the full onboarding-to-mission bridge in one invocation:
-  1. Adds an entry to `systems/registry.yaml` with `id`, `cosmicStar`, `repo`, `pinnedPlatform`, `status: registered`, `registeredAt`, and `deployment` config.
+  1. Adds an entry to `systems/registry.yaml` with `id`, `cosmicStar`, `repo`, `pinnedPlatform`, `status: registered`, `registeredAt`, `deployment` config, and optional `owner` (VC subject id, RFC-0561).
   2. Creates the pin file `systems/<id>/system.pin.json` by delegating to `sternsystem.pin`.
   3. Creates initial content stubs: `systems/<id>/content/system.md` with identity and i18n blocks derived from the brief.
   4. Automatically opens the first mission (`<system-id>-m000001`) by calling `mission.open`.
   5. Triggers `mission.materialize` to produce the first Werkstück from the pinned data.
-- **`--amend` flag:** Updates the pin file, opens an amend mission, and triggers materialization. Does not create a new registry entry. `--amend-id` specifies the amend batch number.
+- **`--amend` flag:** Updates the pin file, opens an amend mission, and triggers materialization. Does not create a new registry entry. `--amend-id` specifies the amend batch number. `--owner` can be used with `--amend` to backfill or update the `owner` field on an existing entry (RFC-0561).
 - **Atomic rollback:** If any step fails, the command cleans up partial state in reverse order: abort mission → remove content stubs → remove pin file → remove registry entry → remove system directory.
 - **Noop case:** If the system-id already exists without `--amend`, the command fails with an explicit error. With `--amend`, it fails if the system-id does not exist.
 - The `onboard` skill orchestrates the full pipeline: brief validation → `onboarding.synthesize` → AI synthesis → `sternsystem.register` → handoff.
