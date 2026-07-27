@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: e6131f7c442494cab73e52850852198735edeabf25244685ac54fc0b5df2e3a6
+  contentHash: ddb605ebde2973827911d0b0f51dae932eb5e96f587f54c15f3990d4df872bfb
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -4241,23 +4241,6 @@ commands:
     requiresNetwork: false
     timeoutMs: null
     flags: {}
-    reads: []
-    writes: []
-    pipelines: []
-  - name: forge.init
-    description: "Deploy forge into a project: create forge.yaml, PREFERENCES.md,
-      copy skills, create docs dirs, copy RFC template."
-    scope: workspace
-    provider: workspace
-    module: forge-core
-    mutatesState: false
-    requiresNetwork: false
-    timeoutMs: null
-    flags:
-      from:
-        kind: string
-        description: Path to an existing project or spec folder to analyze for stack
-          detection.
     reads: []
     writes: []
     pipelines: []
@@ -11039,6 +11022,55 @@ commands:
       - .agents/workflows/**/*.md
       - .windsurf/workflows/**/*.md
     writes: []
+    pipelines: []
+  - name: workpiece.read
+    description: Read a file from a mission workpiece with DNA-22 path validation
+      (RFC-0555).
+    scope: workspace
+    provider: workspace
+    module: mission
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      mission:
+        kind: string
+        required: true
+        description: Mission id.
+      path:
+        kind: string
+        required: true
+        description: Relative path within workpiece.
+    reads:
+      - missions/{mission}/workpiece/**
+    writes: []
+    pipelines: []
+  - name: workpiece.write
+    description: Write a file to a mission workpiece with DNA-22 path validation.
+      Content via stdin. No auto-commit (RFC-0555).
+    scope: workspace
+    provider: workspace
+    module: mission
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      mission:
+        kind: string
+        required: true
+        description: Mission id.
+      path:
+        kind: string
+        required: true
+        description: Relative path within workpiece.
+      stdin:
+        kind: boolean
+        required: true
+        description: Read content from stdin.
+    reads:
+      - missions/{mission}/workpiece/src/content/system.md
+    writes:
+      - missions/{mission}/workpiece/**
     pipelines: []
   - name: workspace.discovery.validate
     description: Validate shared pnpm workspace package discovery helper behavior

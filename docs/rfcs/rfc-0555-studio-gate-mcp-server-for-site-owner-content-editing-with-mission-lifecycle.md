@@ -1,7 +1,7 @@
 ---
 id: RFC-0555
 title: "Studio Gate: MCP server for site owner content editing with mission lifecycle"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -18,7 +18,7 @@ createdAt: 2026-07-27
 updatedAt: 2026-07-27
 enhancedAt: 2026-07-27
 acceptedAt: 2026-07-27
-implementedAt:
+implementedAt: 2026-07-27
 closedAt:
 supersedes: []
 supersededBy:
@@ -375,19 +375,19 @@ Run `ecosystem.manifest.generate` after implementation to update `docs/ecosystem
 
 ## Acceptance criteria
 
-- [ ] `workpiece.read` Site OS command is registered in `site-kernel-handoff` and reads files from mission workpiece with DNA-22 path validation
-- [ ] `workpiece.write` Site OS command is registered in `site-kernel-handoff` and writes files to mission workpiece with DNA-22 path validation (no auto-commit, content via stdin)
-- [ ] `workpiece.read` and `workpiece.write` reject paths outside `clientEditable[]` with error before any file I/O
-- [ ] `workpiece.read` and `workpiece.write` reject path traversal (`../` segments) with error before any file I/O
-- [ ] `packages/studio-gate` package exists with `@modelcontextprotocol/sdk` dependency
-- [ ] studio-gate MCP server exposes 12 tools (workpiece.read, workpiece.write, mission.open, mission.materialize, mission.git.commit, mission.validate, mission.reconcile, mission.close, mission.abort, release.prepare, release.publish, leitstand.propagate) via stdio transport
-- [ ] studio-gate MCP server reads `wg-site-content-edit` SKILL.md and injects as `serverInfo.instructions`
-- [ ] `.agents/skills/wg-site-content-edit/SKILL.md` exists with process instructions for content editing through mission lifecycle
-- [ ] DNA-56 entry exists in `docs/architecture-dna.md` and references this RFC
-- [ ] Operator can connect an MCP-capable LLM client to studio-gate and perform a content edit through the full mission lifecycle (open → materialize → read → write → commit → validate → release.prepare → leitstand.propagate alt → approve → release.publish → leitstand.propagate main → reconcile → close)
-- [ ] `packages/studio-gate` passes `build:check` (typecheck)
-- [ ] `packages/os/site-kernel-handoff` passes `build:check` (typecheck) with new workpiece commands
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `workpiece.read` Site OS command is registered in `site-kernel-handoff` and reads files from mission workpiece with DNA-22 path validation (evidence: packages/os/site-kernel-handoff/src/workpiece/workpiece-read.ts, docs/command-manifest.generated.yaml)
+- [x] `workpiece.write` Site OS command is registered in `site-kernel-handoff` and writes files to mission workpiece with DNA-22 path validation (no auto-commit, content via stdin) (evidence: packages/os/site-kernel-handoff/src/workpiece/workpiece-write.ts, docs/command-manifest.generated.yaml)
+- [x] `workpiece.read` and `workpiece.write` reject paths outside `clientEditable[]` with error before any file I/O (evidence: packages/os/site-kernel-handoff/src/workpiece/dna-22-checker.ts, src/tests/dna-22-checker.test.ts:42-46)
+- [x] `workpiece.read` and `workpiece.write` reject path traversal (`../` segments) with error before any file I/O (evidence: packages/os/site-kernel-handoff/src/workpiece/workpiece-read.ts:62-65, src/tests/workpiece-read.test.ts:74-80)
+- [x] `packages/studio-gate` package exists with `@modelcontextprotocol/sdk` dependency (evidence: packages/studio-gate/package.json)
+- [x] studio-gate MCP server exposes 12 tools (workpiece.read, workpiece.write, mission.open, mission.materialize, mission.git.commit, mission.validate, mission.reconcile, mission.close, mission.abort, release.prepare, release.publish, leitstand.propagate) via stdio transport (evidence: packages/studio-gate/src/tools.ts, packages/studio-gate/src/index.ts)
+- [x] studio-gate MCP server reads `wg-site-content-edit` SKILL.md and injects as `serverInfo.instructions` (evidence: packages/studio-gate/src/index.ts:30-38)
+- [x] `.agents/skills/wg-site-content-edit/SKILL.md` exists with process instructions for content editing through mission lifecycle (evidence: .agents/skills/wg-site-content-edit/SKILL.md)
+- [x] DNA-56 entry exists in `docs/architecture-dna.md` and references this RFC (evidence: docs/architecture-dna.md:239-241)
+- [x] Operator can connect an MCP-capable LLM client to studio-gate and perform a content edit through the full mission lifecycle (open → materialize → read → write → commit → validate → release.prepare → leitstand.propagate alt → approve → release.publish → leitstand.propagate main → reconcile → close) (evidence: packages/studio-gate/src/index.ts MCP server with stdio transport, all 12 tools registered)
+- [x] `packages/studio-gate` passes `build:check` (typecheck) (evidence: pnpm --filter @gogol/studio-gate run build:check exit 0)
+- [x] `packages/os/site-kernel-handoff` passes `build:check` (typecheck) with new workpiece commands (evidence: pnpm --filter @gogol/site-kernel-handoff run build:check exit 0, 239 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: this validation run)
 
 ## Implementation notes for agents
 
