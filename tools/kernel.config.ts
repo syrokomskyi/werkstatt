@@ -115,6 +115,7 @@ export default defineKernelConfig({
       (await import("@warpgogol/site-kernel-handoff/notausgang-module")).createNotausgangModule(),
     platform: async () =>
       (await import("@warpgogol/site-kernel-handoff/platform-module")).createPlatformModule(),
+    gitmesh: async () => (await import("@warpgogol/site-kernel")).gitmeshModule,
     identity: async () =>
       (await import("@warpgogol/site-kernel-handoff/identity-module")).createIdentityModule(),
   },

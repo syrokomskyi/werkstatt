@@ -162,3 +162,13 @@ export * from "./pipeline-budgets.ts";
 // RFC-0266: single command manifest — generator core + generate command
 export { commandManifestModule } from "./command-manifest.module.ts";
 export * from "./command-manifest.ts";
+
+// RFC-0563: Git-mesh platform code replication
+export { gitmeshModule } from "./gitmesh/gitmesh-module.ts";
+export type {
+  GitMeshConfig,
+  GitMeshRemote,
+  GitMeshSyncResult,
+  GitMeshStatus,
+  GitMeshVerifyResult,
+} from "./gitmesh/types.ts";

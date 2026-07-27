@@ -61,6 +61,10 @@
       "types": "./src/generated-marker.ts",
       "default": "./src/generated-marker.ts"
     },
+    "./gitmesh-module": {
+      "types": "./src/gitmesh/gitmesh-module.ts",
+      "default": "./src/gitmesh/gitmesh-module.ts"
+    },
     "./lagebild": {
       "types": "./src/lagebild/index.ts",
       "default": "./src/lagebild/index.ts"
