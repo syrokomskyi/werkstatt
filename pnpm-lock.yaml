@@ -1120,6 +1120,9 @@ importers:
       '@warpgogol/observability':
         specifier: workspace:*
         version: link:../../observability
+      '@warpgogol/ontology':
+        specifier: workspace:*
+        version: link:../../ontology
       '@warpgogol/passport':
         specifier: workspace:*
         version: link:../../passport

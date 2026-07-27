@@ -112,6 +112,14 @@
     "./workflow": {
       "types": "./src/workflow/index.ts",
       "default": "./src/workflow/index.ts"
+    },
+    "./dht": {
+      "types": "./src/dht/types.ts",
+      "default": "./src/dht/types.ts"
+    },
+    "./dht-module": {
+      "types": "./src/dht/dht-module.ts",
+      "default": "./src/dht/dht-module.ts"
     }
   },
   "files": ["src"],
@@ -125,6 +133,7 @@
     "@warpgogol/fingerprint": "workspace:*",
     "@warpgogol/integration-adapter-supabase-crm": "workspace:*",
     "@warpgogol/observability": "workspace:*",
+    "@warpgogol/ontology": "workspace:*",
     "@warpgogol/passport": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",
