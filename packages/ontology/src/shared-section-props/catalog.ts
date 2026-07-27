@@ -51,7 +51,7 @@ export const SHARED_SECTION_PROPS: Record<string, FragmentEntry> = {
   "section-header": {
     latest: v1(
       SECTION_HEADER_FRAGMENT,
-      "Initial release with heading (string or tone-segmented array), subheading, align, level, hideSectionNumber.",
+      "Heading (string or tone-segmented array), eyebrow, subheading, align, level, hideSectionNumber. RFC-0567 added eyebrow.",
     ),
   },
   "body-list": {

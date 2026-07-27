@@ -152,6 +152,7 @@ export const SECTION_HEADER_FRAGMENT: JsonSchemaFragment = {
             },
           ],
         },
+        eyebrow: { type: "string", minLength: 1 },
         subheading: { type: "string", minLength: 1 },
         align: ALIGN_ENUM,
         level: { enum: [1, 2] },

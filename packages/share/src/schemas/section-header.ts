@@ -51,6 +51,8 @@ export const sectionHeaderSchema = z
     /** Suppress the section number even if blocks-renderer supplied one. */
     hideSectionNumber: z.boolean().optional(),
     heading: headingContentSchema,
+    /** RFC-0567 — short contextual label rendered above the heading. */
+    eyebrow: z.string().optional(),
     /** One short paragraph under the title. Longer copy belongs in body.kind: paragraphs (RFC-0103). */
     subheading: z.string().optional(),
     /** Independent header alignment; default "left". */
