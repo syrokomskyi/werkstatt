@@ -1,7 +1,7 @@
 ---
 id: RFC-0559
 title: "Studio Gate Authentication: VC-based access control for MCP-mediated content editing"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
 enhancedAt: 2026-07-27
-implementedAt:
+implementedAt: 2026-07-27
 closedAt:
 supersedes: []
 supersededBy:
