@@ -26,6 +26,7 @@ propsSchema:
   shape: |
     z.object({
       tagline: z.string().optional(),
+      ctaNote: z.string().min(1).optional(),
       backgroundImage: z.string().optional(),
       primaryCta: z.object({
         label: z.string().min(2),
