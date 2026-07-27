@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 4d1c4b3c708c4b1b0e761cd5ba00bf28ac2e1b368d30a8a9507b9e2eb9dafee4
+  contentHash: 1736c9dce72c54949c391f0f8064ed64fd3cac483cf48b3a36d9423243acc277
   sources:
     - path: docs/architecture-dna.md
       hash: 0d1a24e2aebb296cc660953a97aa8c32628d53d3fce898437ff646ebc7f85e4e
@@ -127,7 +127,7 @@ meta:
     - path: packages/os/site-kernel-onboarding/package.json
       hash: b8e2e019eefda430c4b45b28f4a6c674819481334a53910f8ef71cd6ef9e1689
     - path: packages/os/site-kernel/package.json
-      hash: 20a0cb53e528b3de9c0e41d13fd67effc77b2bb6512bfd4db49b85818583de81
+      hash: d60c58f3636afb8dc33492b19e64fe6982927d7bc6e7ba356b0abd59138e2b7f
     - path: packages/os/site-kernel/src/runtime.ts
       hash: ff42e55bbd43d760def255b5f0ba4557bac7d4fb1f4cafd303c9d06b8f2771a4
     - path: packages/passport/package.json
@@ -149,7 +149,7 @@ meta:
     - path: packages/warpgogol-skills/package.json
       hash: cc7f8653664f860321e3cf2376dd2c411a88dce92dc9e6dc9384b104c2e80caf
     - path: pnpm-workspace.yaml
-      hash: cbc447972e2ad03356938f6d6294e8d88d8ba156a6424a5ee12e657a920569bd
+      hash: 13e3b3b725bfb783d8878ddf2e45fe1e944ff3464141e3b594e13adaf84d11d8
     - path: services/cf-analytics-poller/package.json
       hash: 15c9cf828e0ebda955cfe83dd7850e817ce1453b885ba173dc1124a2d099a94f
     - path: services/check-warpgogol-runner/package.json
@@ -165,7 +165,7 @@ meta:
     - path: services/telegram-alert-bridge/package.json
       hash: 228295f8b0883facdd44d9d237a1d7bec9e1680f74e7ee5b7b94c0ccb41a050a
     - path: tools/kernel.config.ts
-      hash: 9ba0253a4350e2ab01428c79801292b16815c980e635ce25b4b30707a2c9bf46
+      hash: c70ff9a9e5feb189f20d8a010244ffd780ff31c235f07b745ef9ebf82f3eaa6f
 workspace:
   name: warpgogol-platform
   version: 4.5.0
@@ -763,11 +763,13 @@ packages:
       - "@warpgogol/fingerprint"
       - "@warpgogol/integration-adapter-supabase-crm"
       - "@warpgogol/observability"
+      - "@warpgogol/passport"
       - "@warpgogol/share"
       - "@warpgogol/site-kernel-content"
       - "@webgogol/forge"
       - picomatch
       - tsx
+      - uuid
       - yaml
     testSignal:
       packageName: "@warpgogol/site-kernel"
@@ -5514,6 +5516,30 @@ commands:
     providers:
       - site
       - workspace
+  - name: swim.join
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: swim.leave
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: swim.members
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: swim.status
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: system-md.compile
     scope: workspace
     mutatesState: true
@@ -6133,6 +6159,30 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0384
+    removedBy: []
+  - command: swim.join
+    proposedBy:
+      - RFC-0564
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: swim.leave
+    proposedBy:
+      - RFC-0564
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: swim.members
+    proposedBy:
+      - RFC-0564
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: swim.status
+    proposedBy:
+      - RFC-0564
+    addedBy: []
+    changedBy: []
     removedBy: []
   - command: template.imports.validate
     proposedBy:
@@ -7348,8 +7398,8 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 6
-  implemented: 8
+  accepted: 5
+  implemented: 9
   draft: 3
   reviewing: 0
 baseline:
@@ -7427,11 +7477,17 @@ baseline:
         - DNA-45
         - DNA-46
         - DNA-49
+    - id: RFC-0563
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-44
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0563
       - RFC-0564
       - RFC-0565
       - RFC-0566
