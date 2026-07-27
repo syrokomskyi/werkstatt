@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 914b196f54d0bd335f71c1ad1f9619262d1ab0737af138770ebd5c432c47ffeb
+  contentHash: cdc6c889db3f222f7bbd4b3279158a940967e3aeacd2a0addaa71f34103c8af3
   sources:
     - path: docs/architecture-dna.md
-      hash: 6ec7a82640f64473d1aee329006302f9fd1823d57e4e1a44bebe6e51e4585257
+      hash: 84d6227256a43f5c3b71722788450b72a70bef76f0cab782e0e6bc71f44ab4dc
     - path: docs/gate-catalog.generated.yaml
       hash: 3579123a98229f0074ecf30d93a1fe146a28cf9fe06b893360ef380536b31d75
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -22,16 +22,8 @@ meta:
       hash: 050978327cbfe5b6121085db918fbafa562b2dfa379b2c3528ac240bbf865af6
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: 8b6c03a6e637c8daa7d55d6dff25b46616fcabaf91131e5d9451bd5583f460aa
-    - path: missions/webgogol-com-m000010/workpiece/package.json
-      hash: ffa31b36838145c8060ee852899af14ac41a8dcf21d02e1f0a2278d8397b9f96
-    - path: missions/webgogol-com-m000011/workpiece/package.json
-      hash: ffa31b36838145c8060ee852899af14ac41a8dcf21d02e1f0a2278d8397b9f96
-    - path: missions/webgogol-com-m000013/workpiece/package.json
-      hash: ffa31b36838145c8060ee852899af14ac41a8dcf21d02e1f0a2278d8397b9f96
-    - path: missions/webgogol-com-m000014/workpiece/package.json
-      hash: ffa31b36838145c8060ee852899af14ac41a8dcf21d02e1f0a2278d8397b9f96
     - path: package.json
-      hash: ff731b234f8f47bb790cca413a5307a1e740096ae9bb27dbd769680dc4ef33fd
+      hash: 4afdaff61d284d58beac2ea3d17e5c307f40def4ee2d82279ad31e37e2f6bba2
     - path: packages/agent-gate/package.json
       hash: f7132ce98d642df1e6beb38f13470e773ba439a54468f75e481790422b414f08
     - path: packages/chat-adapter-null/package.json
@@ -47,11 +39,11 @@ meta:
     - path: packages/content-source/package.json
       hash: 26fdba2456838aa2ac3d56626e6d6bc100f1d29f532f89674f29123f61b2394b
     - path: packages/faq/package.json
-      hash: 84e7b6875d18b339673fa184bc5f9d9a030358985b051d85021493b4282fdb44
+      hash: 1d7b7ecb0afd379c8e0b5f9a733c23b19f4018540d8799f46c6280e8d96d2207
     - path: packages/fingerprint/package.json
       hash: b919ff6c4b59339e6b65fec760d2b9f60ba24f258541789043de6f92cfc6f6a5
     - path: packages/forge/package.json
-      hash: 3766da6271d7e7fd8adaaf3049d3d37e3ff00243377150795ee2b8019e563df9
+      hash: 339c15e57b79e934359f550b708f5f7b80b09cea7f0a423b5eed4956abe8b76f
     - path: packages/geo/package.json
       hash: a09365e68206d71cd10b253583c55d935204077a4611408057dcbf3f72873526
     - path: packages/growth-adapter-matomo/package.json
@@ -125,7 +117,7 @@ meta:
     - path: packages/os/site-kernel-onboarding/package.json
       hash: d0b3cb7db4e8194301af65a9b56f46d40257d7a9533bf856977ebbf9c45e56f2
     - path: packages/os/site-kernel/package.json
-      hash: 4efca35e46f065a69fd29aca58d6c1c28556f0afcc45f7abd54990216f6c6066
+      hash: b87deac12ccc92e388b9e4533f7fa4be1b46f13483519a4332febc41280396fd
     - path: packages/os/site-kernel/src/runtime.ts
       hash: ff42e55bbd43d760def255b5f0ba4557bac7d4fb1f4cafd303c9d06b8f2771a4
     - path: packages/passport/package.json
@@ -136,6 +128,8 @@ meta:
       hash: 8daf974c3929ae5b5dba8966a7ad47aecc0838ed8594ce938aaee28f8c70d8e3
     - path: packages/star-map/package.json
       hash: cf6359c1ce051d63a6feddc9be7f4eb0c5b4b12456a3eaff8262489e05811ad6
+    - path: packages/studio-gate/package.json
+      hash: f1c85d487171cbc52a49cc73c4cb85439cb99bae9ef302a71df87dd15a7b399f
     - path: packages/surface/package.json
       hash: 7781c3775315aa00667dd2de99b11c263f562c2dcc64c9194f455c1e07207157
     - path: packages/tokens/package.json
@@ -145,7 +139,7 @@ meta:
     - path: packages/wgogol-skills/package.json
       hash: 948cadbbeb773472808af33aec53572473262bc2e7aeaaeaea249985001a7766
     - path: pnpm-workspace.yaml
-      hash: 7dda63f95e27c2b88936158b78c7f4bf740b190aed89b11bac3a644adc6eec53
+      hash: 6e015b5ca407a7db55e1bc945f3718c5b4ce0c435a96237165b8f072897697ad
     - path: services/cf-analytics-poller/package.json
       hash: 886dad6155531b553725c7931457f802fb21aa9fd14623010b9bc23212021e34
     - path: services/check-webgogol-runner/package.json
@@ -161,13 +155,12 @@ meta:
     - path: services/telegram-alert-bridge/package.json
       hash: 9e1a5b8f54843838e75341528892a92598ae7f208effffbb10b0d577a93cbc1d
     - path: tools/kernel.config.ts
-      hash: a294f3036f37536df30604b0bd03f9f8a769d559df20401da7927edff3a4fac1
+      hash: c9d55b590bf9e0bccdf37d54ac69a146e25cb8ad0123e3fc851372a4a30dc03e
 workspace:
   name: webgogol-platform
   version: 4.5.0
   packageManager: pnpm@11.10.0
   packageGlobs:
-    - missions/*/workpiece
     - packages/*
     - packages/os/*
     - services/*
@@ -198,210 +191,6 @@ missions:
     status: open
     workpiecePath: missions/webgogol-com-m000014/workpiece
 packages:
-  - name: webgogol-com
-    directory: missions/webgogol-com-m000010/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@gogol/agent-gate"
-      - "@gogol/content-source"
-      - "@gogol/faq"
-      - "@gogol/growth"
-      - "@gogol/ontology"
-      - "@gogol/pbp"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-changelog"
-      - "@gogol/site-kernel-checks"
-      - "@gogol/site-kernel-codegen"
-      - "@gogol/site-kernel-content"
-      - "@gogol/site-kernel-deploy"
-      - "@gogol/site-kernel-integrity"
-      - "@gogol/tokens"
-      - "@gogol/ui"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@wgogol/forge"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: webgogol-com
-      directory: missions/webgogol-com-m000010/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: webgogol-com
-    directory: missions/webgogol-com-m000011/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@gogol/agent-gate"
-      - "@gogol/content-source"
-      - "@gogol/faq"
-      - "@gogol/growth"
-      - "@gogol/ontology"
-      - "@gogol/pbp"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-changelog"
-      - "@gogol/site-kernel-checks"
-      - "@gogol/site-kernel-codegen"
-      - "@gogol/site-kernel-content"
-      - "@gogol/site-kernel-deploy"
-      - "@gogol/site-kernel-integrity"
-      - "@gogol/tokens"
-      - "@gogol/ui"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@wgogol/forge"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: webgogol-com
-      directory: missions/webgogol-com-m000011/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: webgogol-com
-    directory: missions/webgogol-com-m000013/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@gogol/agent-gate"
-      - "@gogol/content-source"
-      - "@gogol/faq"
-      - "@gogol/growth"
-      - "@gogol/ontology"
-      - "@gogol/pbp"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-changelog"
-      - "@gogol/site-kernel-checks"
-      - "@gogol/site-kernel-codegen"
-      - "@gogol/site-kernel-content"
-      - "@gogol/site-kernel-deploy"
-      - "@gogol/site-kernel-integrity"
-      - "@gogol/tokens"
-      - "@gogol/ui"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@wgogol/forge"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: webgogol-com
-      directory: missions/webgogol-com-m000013/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: webgogol-com
-    directory: missions/webgogol-com-m000014/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@gogol/agent-gate"
-      - "@gogol/content-source"
-      - "@gogol/faq"
-      - "@gogol/growth"
-      - "@gogol/ontology"
-      - "@gogol/pbp"
-      - "@gogol/share"
-      - "@gogol/site-kernel"
-      - "@gogol/site-kernel-astro"
-      - "@gogol/site-kernel-changelog"
-      - "@gogol/site-kernel-checks"
-      - "@gogol/site-kernel-codegen"
-      - "@gogol/site-kernel-content"
-      - "@gogol/site-kernel-deploy"
-      - "@gogol/site-kernel-integrity"
-      - "@gogol/tokens"
-      - "@gogol/ui"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@wgogol/forge"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: webgogol-com
-      directory: missions/webgogol-com-m000014/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
   - name: "@gogol/agent-gate"
     directory: packages/agent-gate
     workspacePattern: packages/*
@@ -530,7 +319,7 @@ packages:
     testSignal:
       packageName: "@gogol/faq"
       directory: packages/faq
-      script: vitest run
+      script: vitest run --passWithNoTests
       signal: real
       evidence: test script invokes a non-placeholder command
   - name: "@gogol/fingerprint"
@@ -554,7 +343,7 @@ packages:
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@wgogol/forge"
+  - name: "@webgogol/forge"
     directory: packages/forge
     workspacePattern: packages/*
     kind: package
@@ -562,7 +351,7 @@ packages:
       - yaml
       - zod
     testSignal:
-      packageName: "@wgogol/forge"
+      packageName: "@webgogol/forge"
       directory: packages/forge
       script: vitest run --passWithNoTests
       signal: real
@@ -703,7 +492,7 @@ packages:
       - "@gogol/observability"
       - "@gogol/share"
       - "@gogol/site-kernel-content"
-      - "@wgogol/forge"
+      - "@webgogol/forge"
       - picomatch
       - tsx
       - yaml
@@ -1034,6 +823,20 @@ packages:
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
+  - name: "@gogol/studio-gate"
+    directory: packages/studio-gate
+    workspacePattern: packages/*
+    kind: package
+    dependencies:
+      - "@gogol/site-kernel"
+      - "@gogol/site-kernel-handoff"
+      - "@modelcontextprotocol/sdk"
+    testSignal:
+      packageName: "@gogol/studio-gate"
+      directory: packages/studio-gate
+      script: vitest run
+      signal: real
+      evidence: test script invokes a non-placeholder command
   - name: "@gogol/surface"
     directory: packages/surface
     workspacePattern: packages/*
@@ -1254,10 +1057,10 @@ packages:
         reviewAfter: 2026-10-01
 quality:
   testSignals:
-    real: 30
+    real: 31
     noop: 0
     absent: 1
-    skipped: 20
+    skipped: 16
   testSignalPolicy:
     hasErrors: true
     errorCount: 1
@@ -2680,12 +2483,6 @@ commands:
     providers:
       - workspace
   - name: forge.doctor
-    scope: workspace
-    mutatesState: false
-    supportsAllSites: false
-    providers:
-      - workspace
-  - name: forge.init
     scope: workspace
     mutatesState: false
     supportsAllSites: false
@@ -5069,6 +4866,18 @@ commands:
     supportsAllSites: true
     providers:
       - workspace
+  - name: workpiece.read
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: workpiece.write
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: workspace.discovery.validate
     scope: workspace
     mutatesState: false
@@ -5100,18 +4909,6 @@ commands:
     providers:
       - workspace
 commandProvenance:
-  - command: adr.create
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0542
-    removedBy: []
-  - command: adr.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0542
-    removedBy: []
   - command: analytics.binding.validate
     proposedBy:
       - RFC-0305
@@ -5132,117 +4929,17 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: compass.annotate
-    proposedBy: []
-    addedBy: []
-    changedBy: []
-    removedBy:
-      - RFC-0538
-  - command: compass.changesummary.tidy
-    proposedBy: []
-    addedBy: []
-    changedBy: []
-    removedBy:
-      - RFC-0538
-  - command: compass.changesummary.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0538
-    removedBy: []
-  - command: compass.clear
-    proposedBy: []
-    addedBy: []
-    changedBy: []
-    removedBy:
-      - RFC-0538
-  - command: compass.invariant.add
-    proposedBy: []
-    addedBy: []
-    changedBy: []
-    removedBy:
-      - RFC-0538
-  - command: compass.markup.migrate
-    proposedBy: []
-    addedBy: []
-    changedBy: []
-    removedBy:
-      - RFC-0538
-  - command: compass.summary.trim
-    proposedBy: []
-    addedBy:
-      - RFC-0538
-    changedBy: []
-    removedBy: []
   - command: consent.activation.validate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0305
     removedBy: []
-  - command: docs.archive
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0537
-      - RFC-0542
-    removedBy: []
   - command: env.example.validate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0305
-    removedBy: []
-  - command: forge.create
-    proposedBy:
-      - RFC-0544
-    addedBy:
-      - RFC-0544
-    changedBy: []
-    removedBy: []
-  - command: forge.doctor
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0539
-      - RFC-0540
-      - RFC-0542
-      - RFC-0543
-    removedBy: []
-  - command: forge.init
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0539
-      - RFC-0540
-      - RFC-0542
-      - RFC-0543
-    removedBy: []
-  - command: forge.scaffold
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0542
-    removedBy: []
-  - command: forge.skill.list
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0539
-      - RFC-0542
-    removedBy: []
-  - command: forge.skill.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0539
-      - RFC-0542
-    removedBy: []
-  - command: forge.upgrade
-    proposedBy:
-      - RFC-0543
-    addedBy: []
-    changedBy: []
     removedBy: []
   - command: growth.adapter.contract
     proposedBy: []
@@ -5309,59 +5006,25 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: rfc.create
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0542
-    removedBy: []
-  - command: rfc.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0542
-    removedBy: []
-  - command: session.archive
-    proposedBy:
-      - RFC-0537
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: session.list
-    proposedBy:
-      - RFC-0537
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: session.save
-    proposedBy:
-      - RFC-0537
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: session.validate
-    proposedBy:
-      - RFC-0537
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: spec.materialize
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0542
-    removedBy: []
-  - command: spec.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0542
-    removedBy: []
   - command: surface.generate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0384
+    removedBy: []
+  - command: workpiece.read
+    proposedBy:
+      - RFC-0555
+    addedBy:
+      - RFC-0555
+    changedBy: []
+    removedBy: []
+  - command: workpiece.write
+    proposedBy:
+      - RFC-0555
+    addedBy:
+      - RFC-0555
+    changedBy: []
     removedBy: []
 pipelines:
   - name: build.check
@@ -6530,63 +6193,21 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 2
-  implemented: 7
-  draft: 4
+  accepted: 3
+  implemented: 0
+  draft: 3
   reviewing: 0
 baseline:
-  implementedRfcs:
-    - id: RFC-0537
-      implementedAt: 2026-07-26
-      kind: command
-      scope: workspace
-      dnaRefs: []
-    - id: RFC-0538
-      implementedAt: 2026-07-26
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-42
-        - DNA-54
-    - id: RFC-0539
-      implementedAt: 2026-07-26
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0540
-      implementedAt: 2026-07-26
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0542
-      implementedAt: 2026-07-26
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0543
-      implementedAt: 2026-07-26
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0544
-      implementedAt: 2026-07-26
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-54
+  implementedRfcs: []
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
+      - RFC-0555
     draft:
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0545
     reviewing: []
     superseded: []
     rejected: []
@@ -6865,4 +6486,9 @@ baseline:
       title: Spec vendoring contract
       provenance: rfc
       establishingRfc: RFC-0394
+      status: active
+    - id: DNA-56
+      title: "Studio Gate: MCP-mediated content editing"
+      provenance: rfc
+      establishingRfc: RFC-0555
       status: active
