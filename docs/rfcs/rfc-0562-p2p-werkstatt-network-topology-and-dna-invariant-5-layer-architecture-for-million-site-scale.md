@@ -1,6 +1,6 @@
 ---
 id: RFC-0562
-title: "P2P Werkstatt Network Topology and DNA Invariant: 5-layer architecture for million-site scale"
+title: "P2P Werkstatt Network Topology: 5-layer architecture for million-site scale"
 status: draft
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
@@ -29,6 +30,7 @@ related:
   - RFC-0179
   - RFC-0354
   - RFC-0558
+  - RFC-0560
   - RFC-0561
   - RFC-0563
   - RFC-0564
@@ -46,7 +48,7 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: patch
+versionBump: none
 commands:
   proposed:
     - werkstatt.network.status
@@ -60,14 +62,15 @@ packagesImpacted:
   - packages/ontology
 successSignals:
   - "A reader of this RFC can identify all 5 layers of the P2P topology and trace each layer to its dedicated RFC (0563–0566)."
-  - "The threat model section enumerates the three classes of adversaries (byzantine workshop, network observer, rogue operator) and maps each to a mitigation layer."
-  - "The DNA-recovery section explains how a workshop with no local state can reconstruct full operational capability from the four persistent layers."
+  - "The threat model section enumerates all adversary classes (byzantine workshop, network observer, rogue operator, sybil attacker, eclipse attacker) and maps each to a mitigation layer."
+  - "The DNA-recovery section explains how a workshop with no local state can reconstruct full operational capability from the four persistent layers, including the disposability of in-flight mission workpieces."
 nonGoals:
   - "Do not implement any P2P layer in this RFC — each layer has its own dedicated RFC (0563–0566)."
   - "Do not implement the `werkstatt.network.*` commands — they are proposed names for future implementation."
   - "Do not change the existing monorepo boundary (DNA-1) — the P2P network extends it, it does not replace it."
   - "Do not specify wire protocols or binary formats — each layer RFC defines its own protocol."
   - "Do not implement economic models, token staking, or incentive mechanisms — the pilot uses trusted workshops only."
+  - "Do not establish a new DNA invariant for P2P topology in this RFC — the invariant will be established by a future RFC when the topology is implemented. This RFC is an architectural frame, not a DNA invariant establishment."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -86,7 +89,7 @@ nonGoals:
 #     pattern: "Some new governance paragraph"
 ---
 
-# RFC-0562: P2P Werkstatt Network Topology and DNA Invariant: 5-layer architecture for million-site scale
+# RFC-0562: P2P Werkstatt Network Topology: 5-layer architecture for million-site scale
 
 ## Context
 
@@ -190,6 +193,8 @@ A workshop that loses all local state (disk failure, VM destruction) can recover
 
 No workshop has state that cannot be reconstructed from the network. This is the **DNA-recovery** property: the workshop's DNA (platform code + membership + registry + content + artifacts) is fully recoverable from peers.
 
+**In-flight missions:** A workshop that loses disk while it has an open mission loses the workpiece (`missions/<missionId>/workpiece/`). Per DNA-46, the workpiece is a **non-canonical disposable Werkstück** — it is explicitly disposable. DNA-recovery does not restore in-flight workpieces. The workshop re-opens a mission from the Sternsystem repo's last committed state. Operators should commit workpiece progress frequently (via `mission.git.commit`) to minimize loss.
+
 ### Threat model
 
 | Adversary | Capability | Mitigation |
@@ -199,6 +204,17 @@ No workshop has state that cannot be reconstructed from the network. This is the
 | **Rogue operator** | Attempts to claim ownership of a site they don't own | RFC-0558: VC-based ownership. RFC-0561: registry `owner` field. Layer 3: DHT replicates the `owner` field. Any workshop can verify ownership. |
 | **Sybil attacker** | Creates many fake workshops to dominate the network | Layer 2: SWIM membership is permissioned in the pilot — new workshops require a seed node invitation. Future: proof-of-stake or proof-of-work. |
 | **Eclipse attacker** | Surrounds a workshop with malicious peers to isolate it | Layer 2: SWIM random peer selection prevents deterministic isolation. Layer 3: DHT routing uses multiple disjoint paths (S/Kademlia). |
+
+### Compass and AGENTS.md synchronization
+
+When the P2P topology is adopted (Phase 2+), the following Compass and AGENTS.md files will need synchronization:
+
+- **`docs/technology.xml`** — add workshop model, P2P layers, and protocol stack to the technology landscape.
+- **`docs/development-plan.xml`** — add P2P topology rollout phases to the development plan.
+- **Root `AGENTS.md`** — add a section on workshops, P2P layers, and the workshop model (isolated VM with its own control plane).
+- **`packages/os/site-kernel/AGENTS.md`** — add rules for the new `gitmesh.*`, `swim.*`, `dht.*`, and `deploy.*` command namespaces.
+
+This RFC does not modify these files — they will be updated when the per-layer RFCs are implemented.
 
 ### Cross-cutting requirements
 
@@ -218,7 +234,7 @@ pnpm exec site-kernel run werkstatt.network.status --json
 pnpm exec site-kernel run werkstatt.network.bootstrap --seed <seed-node-address> --json
 ```
 
-These commands are **proposed names only**. Their implementation is deferred to the per-layer RFCs and future implementation RFCs.
+These commands are **proposed names only**. Their implementation is deferred to the per-layer RFCs and future implementation RFCs. Exit codes and warn-vs-fail behavior for these commands will be defined in the implementing RFCs.
 
 ### TypeScript contracts
 
@@ -260,7 +276,7 @@ export interface LayerStatus {
 | `docs/rfcs/rfc-0564-*.md` | Layer 2: SWIM Membership and CRDT Genome RFC. |
 | `docs/rfcs/rfc-0565-*.md` | Layer 3: DHT Site Registry and Content Placement RFC. |
 | `docs/rfcs/rfc-0566-*.md` | Layer 5: Immutable Platform Deploy with Atomic Rollback RFC. |
-| `docs/architecture-dna.md` | This RFC proposes a new DNA invariant for P2P topology (future, not in this RFC). |
+| `docs/architecture-dna.md` | A future RFC will establish a new DNA invariant for P2P topology when the topology is implemented. This RFC does not modify `architecture-dna.md`. |
 
 ### Output format
 
@@ -290,7 +306,7 @@ This is a **proposed output shape** — not implemented in this RFC.
 
 | Condition | Behavior |
 | --- | --- |
-| Workshop loses disk | DNA-recovery: clone platform code from peers, rejoin SWIM, query DHT, clone Sternsystem repos, pull deploy artifacts. Full recovery without data loss. |
+| Workshop loses disk | DNA-recovery: clone platform code from peers, rejoin SWIM, query DHT, clone Sternsystem repos, pull deploy artifacts. In-flight mission workpieces are lost (disposable per DNA-46); workshop re-opens from last committed state. |
 | Workshop goes offline | SWIM marks workshop as suspected, then dead after timeout. DHT routes around it. Other workshops continue operating. |
 | Network partition | Each partition continues operating independently. CRDT genome merges on reunion. DHT converges on reunion. Git-mesh syncs on reunion. |
 | Byzantine workshop serves corrupted code | Git commit signatures (RFC-0560) detect corruption. Content-addressed artifacts detect tampering. Workshop is evicted via SWIM. |
@@ -329,12 +345,13 @@ The pilot operates at Phase 1–2. Phases 3–4 are future work beyond the pilot
 
 ## Acceptance criteria
 
-- [ ] All 5 layers are described with their dedicated RFC references (0563–0566)
-- [ ] Threat model enumerates adversary classes and maps each to a mitigation layer
-- [ ] DNA-recovery section explains how a workshop reconstructs from the four persistent layers
+- [ ] All 5 layers are described with their dedicated RFC references (0563–0566), each naming its protocol and failure model
+- [ ] Threat model enumerates all adversary classes (byzantine workshop, network observer, rogue operator, sybil attacker, eclipse attacker) and maps each to a mitigation layer
+- [ ] DNA-recovery section explains how a workshop reconstructs from the four persistent layers, including the disposability of in-flight mission workpieces (DNA-46)
 - [ ] Cross-cutting requirements section covers secrets, identity, content addressing, consistency, and pilot scope
-- [ ] Workshop model is defined with its five components
+- [ ] Workshop model is defined with its five components (platform clone, SWIM membership, DHT node, Sternsystem repos, deploy target)
 - [ ] Rollout phases are defined (Phase 0–4) with pilot scope (Phase 1–2)
+- [ ] Compass and AGENTS.md synchronization points are identified for Phase 2+ adoption
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
