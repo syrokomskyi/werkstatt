@@ -48,6 +48,11 @@ export function createSternsystemModule(): KernelModule {
           },
           platform: { kind: "string", description: "Pinned platform version." },
           mirror: { kind: "string", description: "External mirror repository URL (optional)." },
+          owner: {
+            kind: "string",
+            description:
+              "VC subject id (did:web:<domain>#<key-version>) for site owner (RFC-0561).",
+          },
           amend: {
             kind: "boolean",
             description: "Amend an existing Sternsystem instead of creating a new one.",

@@ -45,6 +45,11 @@ export function createSternsystemModule(): KernelModule {
           repo: { kind: "string", required: true, description: "Sternsystem repository URL." },
           platform: { kind: "string", description: "Pinned platform version." },
           mirror: { kind: "string", description: "External mirror repository URL (optional)." },
+          owner: {
+            kind: "string",
+            description:
+              "VC subject id (did:web:<domain>#<key-version>) for site owner (RFC-0561).",
+          },
         },
         writes: ["systems/registry.yaml"],
         execute: runSternsystemRegister,

@@ -11,6 +11,7 @@ With --amend: update pin and open amend mission without creating a new registry 
 <CHANGE_SUMMARY>
   <item>RFC-0354: initial register command handler.</item>
   <item>RFC-0532: extend with pin creation, content stubs, mission.open, mission.materialize, --amend/--amend-id flags, and atomic rollback.</item>
+  <item>RFC-0561: add --owner flag for VC subject id (did:web) on new registration and amend backfill.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -144,6 +145,7 @@ export async function runSternsystemRegister(
   const repo = flagString(input, "repo");
   const platform = flagString(input, "platform");
   const mirror = flagString(input, "mirror");
+  const owner = flagString(input, "owner");
   const isAmend = flagBool(input, "amend");
   const amendId = flagNumber(input, "amend-id");
 
@@ -158,6 +160,12 @@ export async function runSternsystemRegister(
       throw new Error(
         `[sternsystem.register] --amend: system '${id}' does not exist in systems/registry.yaml`,
       );
+    }
+
+    if (owner) {
+      entry.owner = owner;
+      await writeRegistry(workspaceRoot, registry);
+      logger.info(`[sternsystem.register] --amend: updated owner for '${id}' to '${owner}'`);
     }
 
     const pinInput: Record<string, KernelFlagValue> = { id };
@@ -242,6 +250,7 @@ export async function runSternsystemRegister(
     status: "registered" as const,
     registeredAt: new Date().toISOString(),
     mirror: mirror ?? undefined,
+    owner: owner ?? undefined,
     notes: "",
   };
 
