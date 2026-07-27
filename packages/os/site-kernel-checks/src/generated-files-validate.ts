@@ -43,11 +43,16 @@ function resolveEntryPath(
   entry: OwnershipEntry,
   app: string | undefined,
   workspaceRoot: string,
+  siteDirectory?: string,
 ): string {
   const posixPath = toPosix(entry.path);
 
   if (isWorkspaceAbsolute(posixPath)) {
     return join(workspaceRoot, posixPath);
+  }
+
+  if (siteDirectory) {
+    return join(siteDirectory, posixPath);
   }
 
   if (app) {
@@ -156,13 +161,20 @@ export async function runGeneratedFilesValidate(
       continue;
     }
 
-    const resolvedPath = resolveEntryPath(entry, app, context.workspaceRoot);
+    const resolvedPath = resolveEntryPath(
+      entry,
+      app,
+      context.workspaceRoot,
+      context.site?.directory,
+    );
     const posixPath = toPosix(entry.path);
 
     if (hasGlobPattern(posixPath)) {
       try {
         const files = await expandGlob(
-          isWorkspaceAbs ? context.workspaceRoot : join(context.workspaceRoot, "apps", app!),
+          isWorkspaceAbs
+            ? context.workspaceRoot
+            : (context.site?.directory ?? join(context.workspaceRoot, "apps", app!)),
           posixPath,
           context.workspaceRoot,
         );
