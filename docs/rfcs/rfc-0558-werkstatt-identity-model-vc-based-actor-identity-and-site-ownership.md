@@ -328,18 +328,18 @@ The following `AGENTS.md` files need updates during implementation:
 
 ## Acceptance criteria
 
-- [ ] `SiteOwnershipCredentialSubject` and `ActorDelegationCredentialSubject` types defined in `packages/passport/src/schema.ts`
-- [ ] `WerkstattIdentityConfig` type defined in `packages/passport/src/schema.ts`
-- [ ] `identity.bootstrap` command registered in `packages/os/site-kernel-handoff` and produces `werkstatt.identity.json`
-- [ ] `identity.credential.issue` command registered and produces signed VCs using `signCredential` from passport
-- [ ] `identity.credential.verify` command registered and verifies VCs using `verifyCredential` from passport
-- [ ] `identity.credential.revoke` command registered and updates revocation list in `werkstatt.identity.json`
-- [ ] `fleetRegistryEntrySchema` in `packages/ontology/src/operations/sternsystem.ts` has optional `owner` field
-- [ ] Studio Gate (`packages/studio-gate/src/index.ts`) has auth middleware that calls `identity.credential.verify` before dispatching MCP tools
-- [ ] `authMode: "permissive"` default allows existing workflow without credentials
-- [ ] `authMode: "enforced"` rejects MCP calls without valid VC
-- [ ] Mission `actor` field accepts VC subject id from auth context
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `SiteOwnershipCredentialSubject` and `ActorDelegationCredentialSubject` types defined in `packages/passport/src/schema.ts` (evidence: packages/passport/src/schema.ts:147-159, pnpm --filter @warpgogol/passport build:check)
+- [x] `WerkstattIdentityConfig` type defined in `packages/passport/src/schema.ts` (evidence: packages/passport/src/schema.ts:170-182, pnpm --filter @warpgogol/passport build:check)
+- [x] `identity.bootstrap` command registered in `packages/os/site-kernel-handoff` and produces `werkstatt.identity.json` (evidence: packages/os/site-kernel-handoff/src/identity/identity-bootstrap.ts, tools/kernel.config.ts:117-118, src/tests/identity-commands.test.ts:44-67)
+- [x] `identity.credential.issue` command registered and produces signed VCs using `signIdentityCredential` from `@warpgogol/passport/identity-sign` (evidence: packages/os/site-kernel-handoff/src/identity/identity-credential-issue.ts, src/tests/identity-commands.test.ts:82-97)
+- [x] `identity.credential.verify` command registered and verifies VCs using `verifyIdentityCredential` from `@warpgogol/passport/identity-sign` (evidence: packages/os/site-kernel-handoff/src/identity/identity-credential-verify.ts, src/tests/identity-commands.test.ts:100-125)
+- [x] `identity.credential.revoke` command registered and updates revocation list in `werkstatt.identity.json` (evidence: packages/os/site-kernel-handoff/src/identity/identity-credential-revoke.ts, src/tests/identity-commands.test.ts:100-125)
+- [x] `fleetRegistryEntrySchema` in `packages/ontology/src/operations/sternsystem.ts` has optional `owner` field (evidence: packages/ontology/src/operations/sternsystem.ts:65-69, pnpm --filter @warpgogol/ontology build:check)
+- [x] Studio Gate (`packages/studio-gate/src/index.ts`) has auth middleware that calls `identity.credential.verify` before dispatching MCP tools (evidence: packages/studio-gate/src/auth.ts, packages/studio-gate/src/index.ts:112-128, pnpm --filter @warpgogol/studio-gate build:check)
+- [x] `authMode: "permissive"` default allows existing workflow without credentials (evidence: packages/studio-gate/src/index.ts:118, packages/os/site-kernel-handoff/src/identity/identity-bootstrap.ts:84)
+- [x] `authMode: "enforced"` rejects MCP calls without valid VC (evidence: packages/studio-gate/src/index.ts:118-128, packages/studio-gate/src/auth.ts:81-91)
+- [x] Mission `actor` field accepts VC subject id from auth context (evidence: packages/os/site-kernel-handoff/src/mission/mission-open.ts:54, mission-close.ts:98, mission-abort.ts:52)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0558 --json — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
