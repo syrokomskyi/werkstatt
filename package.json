@@ -31,7 +31,12 @@
   "devDependencies": {
     "@warpgogol/observability": "workspace:*",
     "@warpgogol/site-kernel": "workspace:*",
+    "@warpgogol/site-kernel-astro": "workspace:*",
+    "@warpgogol/site-kernel-changelog": "workspace:*",
     "@warpgogol/site-kernel-checks": "workspace:*",
+    "@warpgogol/site-kernel-codegen": "workspace:*",
+    "@warpgogol/site-kernel-deploy": "workspace:*",
+    "@warpgogol/site-kernel-integrity": "workspace:*",
     "@warpgogol/site-kernel-handoff": "workspace:*",
     "@warpgogol/site-kernel-observability": "workspace:*",
     "@warpgogol/site-kernel-onboarding": "workspace:*",
