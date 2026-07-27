@@ -9,6 +9,7 @@
   <item>RFC-0354: initial validate command handler.</item>
   <item>RFC-0480: add Bordbuch-vs-git-log consistency check for external edit detection.</item>
   <item>RFC-0520: extract Bordbuch-vs-git-log check into evaluateExternalEditGate pure function.</item>
+  <item>RFC-0561: add owner-format-invalid check and missing-owner notice warning.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -35,6 +36,9 @@ import {
 export interface SternsystemValidateData {
   validated: number;
   violations: Array<{ systemId: string; rule: string; message: string }>;
+  warnings: Array<{ systemId: string; field: string; message: string }>;
+  withOwner: number;
+  withoutOwner: number;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -118,8 +122,11 @@ export async function runSternsystemValidate(
   }
 
   const violations: Array<{ systemId: string; rule: string; message: string }> = [];
+  const warnings: Array<{ systemId: string; field: string; message: string }> = [];
   const seenIds = new Set<string>();
   const seenStars = new Set<string>();
+  let withOwner = 0;
+  let withoutOwner = 0;
 
   for (const entry of systems) {
     // Registry invariants
@@ -131,6 +138,17 @@ export async function runSternsystemValidate(
       });
     }
     seenIds.add(entry.id);
+
+    if (entry.owner) {
+      withOwner++;
+    } else {
+      withoutOwner++;
+      warnings.push({
+        systemId: entry.id,
+        field: "owner",
+        message: "owner field not set; Studio Gate cannot verify ownership for this site",
+      });
+    }
 
     if (entry.status !== "archived" && seenStars.has(entry.cosmicStar)) {
       violations.push({
@@ -277,10 +295,13 @@ export async function runSternsystemValidate(
       logger.error(`  [${v.rule}] ${v.systemId}: ${v.message}`);
     }
   }
+  for (const w of warnings) {
+    logger.warn(`  [${w.field}] ${w.systemId}: ${w.message}`);
+  }
 
   return {
-    data: { validated, violations },
+    data: { validated, violations, warnings, withOwner, withoutOwner },
     exitCode: violations.length > 0 ? 1 : 0,
-    summary: `[sternsystem.validate] ${validated} system${validated === 1 ? "" : "s"} validated, ${violations.length} violation(s)`,
+    summary: `[sternsystem.validate] ${validated} system${validated === 1 ? "" : "s"} validated, ${violations.length} violation(s), ${withOwner} with owner, ${withoutOwner} without owner`,
   };
 }
