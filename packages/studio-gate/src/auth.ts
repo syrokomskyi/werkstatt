@@ -42,6 +42,8 @@ export interface StudioGateAuthResult {
 
 export const IDENTITY_CONFIG_FILENAME = "werkstatt.identity.json";
 
+const FALLBACK_AUTH_MODE = "enforced" as const;
+
 function identityConfigPath(werkstattRoot: string): string {
   return join(werkstattRoot, IDENTITY_CONFIG_FILENAME);
 }
@@ -107,10 +109,10 @@ export async function verifyAuthFromMeta(
   const configResult = await loadIdentityConfig(werkstattRoot);
 
   if (configResult.status === "missing") {
-    return { authenticated: false, authMode: "enforced", error: "auth-config-missing" };
+    return { authenticated: false, authMode: FALLBACK_AUTH_MODE, error: "auth-config-missing" };
   }
   if (configResult.status === "malformed") {
-    return { authenticated: false, authMode: "enforced", error: "auth-config-malformed" };
+    return { authenticated: false, authMode: FALLBACK_AUTH_MODE, error: "auth-config-malformed" };
   }
 
   const config = configResult.config;
