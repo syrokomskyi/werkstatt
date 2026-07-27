@@ -28,6 +28,7 @@ export interface IdentityBootstrapData {
   keyVersion: string;
   authMode: "permissive";
   selfOwnershipCredentialId: string;
+  privateKeyHex: string;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -46,11 +47,6 @@ export async function runIdentityBootstrap(
   if (!operatorName) throw new Error("[identity.bootstrap] --operator-name is required");
   if (!domain) throw new Error("[identity.bootstrap] --domain is required");
 
-  const privateKeyHex = process.env["PASSPORT_SIGNING_KEY"];
-  if (!privateKeyHex) {
-    throw new Error("[identity.bootstrap] PASSPORT_SIGNING_KEY env var is required");
-  }
-
   const keypair = await generateKeypair();
   const keyVersion = "v1";
   const operatorDid = `did:web:${domain}#operator-${keyVersion}`;
@@ -64,7 +60,7 @@ export async function runIdentityBootstrap(
 
   const proof = await signIdentityCredential(
     subject,
-    privateKeyHex,
+    keypair.privateKeyHex,
     `did:web:${domain}#${keyVersion}`,
     issuedAt,
   );
@@ -104,6 +100,7 @@ export async function runIdentityBootstrap(
       keyVersion,
       authMode: "permissive",
       selfOwnershipCredentialId: credentialId,
+      privateKeyHex: keypair.privateKeyHex,
     },
     exitCode: 0,
     summary: "identity.bootstrap: keypair generated, self-ownership VC issued",
