@@ -6,6 +6,14 @@
       "headers": {
         "Authorization": "Bearer ${WGOGOL_SIGNOZ_MCP_TOKEN}"
       }
+    },
+    "studio-gate": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["--filter", "@gogol/studio-gate", "start"],
+      "env": {
+        "WERKSTATT_ROOT": "${workspaceFolder}"
+      }
     }
   }
 }

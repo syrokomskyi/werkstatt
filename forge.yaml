@@ -58,4 +58,4 @@ skillPacks:
   - prefix: wg
     dir: packages/wgogol-skills/skills
 forge:
-  syncedVersion: 0.1.3
+  syncedVersion: 0.1.4
