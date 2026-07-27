@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 16704cf080522588e13f3f0e6131651d8a93fb4eead4a9601847f804ab215b92
+  contentHash: 5499d10a0fae0227f0384c9a3057e2352ff31b68ba0afffd5cabf505603e89ea
   sources:
     - path: docs/architecture-dna.md
       hash: 0d1a24e2aebb296cc660953a97aa8c32628d53d3fce898437ff646ebc7f85e4e
@@ -119,7 +119,7 @@ meta:
     - path: packages/os/site-kernel-deploy/package.json
       hash: cbeef164c4f63e290e723450ddde430c6c4836c9a3912df08885878b575118ed
     - path: packages/os/site-kernel-handoff/package.json
-      hash: 1ec029a2f4636fa9275a9f9b3b8f4957f73f7ce86c010c5afa0850bdea441760
+      hash: ce2ad4fb9c5a9c24370c4981b3096467b5efa4c02a55dba43e759f8be2cbb668
     - path: packages/os/site-kernel-integrity/package.json
       hash: 1335fa81d5170aa34b844154e6d050e37605bbd6ea2a8ba19138f46bbf84f1ab
     - path: packages/os/site-kernel-observability/package.json
@@ -131,7 +131,7 @@ meta:
     - path: packages/os/site-kernel/src/runtime.ts
       hash: ff42e55bbd43d760def255b5f0ba4557bac7d4fb1f4cafd303c9d06b8f2771a4
     - path: packages/passport/package.json
-      hash: 4cff8aaac55627784b576751fa9fe474b2a9603d70a3ca1879de9a369506c4c1
+      hash: 3739ba7535ad213b2faa35ec26a383585f41f42c9d3726dd6f01b553e2d40cd4
     - path: packages/pbp/package.json
       hash: 428c64af164fa15e1ad8ce2f2f47dd5326b62cb54ceb5f26a3b917c3aec9434a
     - path: packages/share/package.json
@@ -139,7 +139,7 @@ meta:
     - path: packages/star-map/package.json
       hash: e907d326f9024ab5695a8eb3a4b3459725119d5448c130dc70811f49b2116fd7
     - path: packages/studio-gate/package.json
-      hash: c7c46438856e7efcb40bf252ace925c7a6ae23107ee033759208e1ba42c27100
+      hash: a7ba63b6ace7340feec38b958dd581572b977eaa4ea802546333cdb12751017d
     - path: packages/surface/package.json
       hash: 6a7cc5ad0d14c208d97be7778b3cce8d11e2b08671a46100564a21efdc584bca
     - path: packages/tokens/package.json
@@ -165,7 +165,7 @@ meta:
     - path: services/telegram-alert-bridge/package.json
       hash: 228295f8b0883facdd44d9d237a1d7bec9e1680f74e7ee5b7b94c0ccb41a050a
     - path: tools/kernel.config.ts
-      hash: 491f1fa099db12d0ec0c7a506ef5e9f0bf9e14f4cd543c1c27216419adb57bbb
+      hash: ab12d95fbf89477e25dbcdc6950df1cde6097325e491df25f2dc08796b1d8064
 workspace:
   name: warpgogol-platform
   version: 4.5.0
@@ -958,6 +958,7 @@ packages:
     dependencies:
       - "@warpgogol/fingerprint"
       - "@warpgogol/ontology"
+      - "@warpgogol/passport"
       - "@warpgogol/share"
       - "@warpgogol/site-kernel"
       - "@warpgogol/site-kernel-astro"
@@ -1104,8 +1105,11 @@ packages:
     kind: package
     dependencies:
       - "@modelcontextprotocol/sdk"
+      - "@warpgogol/ontology"
+      - "@warpgogol/passport"
       - "@warpgogol/site-kernel"
       - "@warpgogol/site-kernel-handoff"
+      - yaml
     testSignal:
       packageName: "@warpgogol/studio-gate"
       directory: packages/studio-gate
@@ -3336,6 +3340,30 @@ commands:
     supportsAllSites: false
     providers:
       - site
+      - workspace
+  - name: identity.bootstrap
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: identity.credential.issue
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: identity.credential.revoke
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: identity.credential.verify
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
       - workspace
   - name: image.format.validate
     scope: app
@@ -5957,6 +5985,30 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
+  - command: identity.bootstrap
+    proposedBy:
+      - RFC-0558
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: identity.credential.issue
+    proposedBy:
+      - RFC-0558
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: identity.credential.revoke
+    proposedBy:
+      - RFC-0558
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: identity.credential.verify
+    proposedBy:
+      - RFC-0558
+    addedBy: []
+    changedBy: []
+    removedBy: []
   - command: integration.config.validate
     proposedBy: []
     addedBy: []
@@ -5968,12 +6020,6 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0305
-    removedBy: []
-  - command: leitstand.propagate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0559
     removedBy: []
   - command: matomo.export.validate
     proposedBy:
@@ -6010,63 +6056,29 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: mission.abort
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0559
-    removedBy: []
   - command: mission.close
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0559
       - RFC-0560
     removedBy: []
   - command: mission.git.commit
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0559
       - RFC-0560
-    removedBy: []
-  - command: mission.materialize
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0559
     removedBy: []
   - command: mission.open
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0559
       - RFC-0560
     removedBy: []
   - command: mission.reconcile
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0559
       - RFC-0560
-    removedBy: []
-  - command: mission.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0559
-    removedBy: []
-  - command: release.prepare
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0559
-    removedBy: []
-  - command: release.publish
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0559
     removedBy: []
   - command: sternsystem.register
     proposedBy: []
@@ -6121,16 +6133,14 @@ commandProvenance:
       - RFC-0555
     addedBy:
       - RFC-0555
-    changedBy:
-      - RFC-0559
+    changedBy: []
     removedBy: []
   - command: workpiece.write
     proposedBy:
       - RFC-0555
     addedBy:
       - RFC-0555
-    changedBy:
-      - RFC-0559
+    changedBy: []
     removedBy: []
 pipelines:
   - name: build.check
@@ -7302,9 +7312,9 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 3
-  implemented: 2
-  draft: 10
+  accepted: 8
+  implemented: 6
+  draft: 3
   reviewing: 0
 baseline:
   implementedRfcs:
@@ -7330,22 +7340,53 @@ baseline:
         - DNA-42
         - DNA-43
         - DNA-51
+    - id: RFC-0557
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-2
+        - DNA-36
+        - DNA-47
+    - id: RFC-0558
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-34
+        - DNA-40
+        - DNA-44
+        - DNA-45
+        - DNA-56
+    - id: RFC-0559
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-22
+        - DNA-56
+    - id: RFC-0560
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-34
+        - DNA-46
+        - DNA-47
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0557
-    draft:
-      - RFC-0383
-      - RFC-0384
-      - RFC-0387
-      - RFC-0558
-      - RFC-0559
-      - RFC-0560
       - RFC-0561
       - RFC-0562
       - RFC-0563
       - RFC-0564
+      - RFC-0565
+      - RFC-0566
+    draft:
+      - RFC-0383
+      - RFC-0384
+      - RFC-0387
     reviewing: []
     superseded: []
     rejected: []

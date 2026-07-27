@@ -10,7 +10,7 @@ RFC-0555: stdio MCP server for site owner content editing with mission lifecycle
 | `src/tools.ts` | 12 tool definitions (workpiece.read, workpiece.write, mission.open, mission.materialize, mission.git.commit, mission.validate, mission.reconcile, mission.close, mission.abort, release.prepare, release.publish, leitstand.propagate) |
 | `src/executor.ts` | Command executor via child_process — passes content via stdin for workpiece.write |
 | `src/build-queue.ts` | ADR-0005: in-memory semaphore-based build queue — limits concurrent build-triggering tool calls (mission.validate, mission.build) per VM |
-| `src/auth.ts` | RFC-0558/RFC-0559: VC-based auth middleware — `verifyAuthFromMeta()` reads `werkstatt.identity.json`, verifies VC tokens from MCP metadata. Supports permissive (warn-only) and enforced (reject) modes. RFC-0559: site-scoping via `_meta.system`, per-tool scope enforcement, distinct error codes (-32001..-32007). |
+| `src/auth.ts` | RFC-0558/RFC-0559: VC-based auth middleware — `verifyAuthFromMeta()` reads `werkstatt.identity.json`, verifies VC tokens from MCP metadata. Supports permissive (warn-only) and enforced (reject) modes. RFC-0559: site-scoping via `_meta.system`, per-tool scope enforcement, distinct error codes (-32001..-32007). RFC-0561: `verifyOwnership()` reads fleet registry and checks `entry.owner` against VC credential subject id. |
 
 ## Boundaries
 
