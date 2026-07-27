@@ -4,6 +4,7 @@
 RFC-0354: Zod schemas for the Sternsystem bundle contract — the durable site unit,
 fleet registry, and version pin. These schemas are the machine-checkable contract
 for all Sternsystem operations.
+RFC-0561: fleetRegistryEntrySchema gains optional owner field (did:web VC subject id).
 </purpose>
 <non-goals>
   <item>Do not perform file IO or git operations — pure shape only.</item>
@@ -13,6 +14,7 @@ for all Sternsystem operations.
 <CHANGE_SUMMARY>
   <item>RFC-0354: initial Sternsystem schemas (SystemPin, FleetRegistryEntry, FleetRegistry).</item>
   <item>RFC-0479: migratorCursor changed from SemVer string to string[] (migrator-id list).</item>
+  <item>RFC-0561: add optional owner field (did:web VC subject id) to fleetRegistryEntrySchema.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,6 +26,7 @@ const semverRe = /^\d+\.\d+\.\d+$/;
 const sha256Re = /^sha256:[0-9a-f]{64}$/;
 const kebabRe = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const repoRe = /^(git@|https?:\/\/|\.\/|\.\.\/|\/).+$/;
+const didWebRe = /^did:web:[a-z0-9.-]+#.+$/;
 
 export const systemPinSchema = z.object({
   schemaVersion: z.string().min(1),
@@ -62,7 +65,11 @@ export const fleetRegistryEntrySchema = z.object({
     .regex(repoRe, "mirror must be a valid git URL (SSH, HTTPS) or local file path")
     .optional(),
   deployment: deploymentConfigSchema.optional(),
-  owner: z.string().min(1).optional().describe("VC subject id of the site owner (RFC-0558)"),
+  owner: z
+    .string()
+    .regex(didWebRe, "owner must be a did:web identifier (did:web:<domain>#<key-version>)")
+    .optional()
+    .describe("VC subject id of the site owner (RFC-0558, RFC-0561)"),
   notes: z.string().default(""),
 });
 
