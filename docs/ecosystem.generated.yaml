@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 1736c9dce72c54949c391f0f8064ed64fd3cac483cf48b3a36d9423243acc277
+  contentHash: 749f587a94fb51e7cf09fea4064329120fbc2ac20acd8aa0c9b4319ed0950f22
   sources:
     - path: docs/architecture-dna.md
       hash: 0d1a24e2aebb296cc660953a97aa8c32628d53d3fce898437ff646ebc7f85e4e
@@ -6161,27 +6161,27 @@ commandProvenance:
       - RFC-0384
     removedBy: []
   - command: swim.join
-    proposedBy:
+    proposedBy: []
+    addedBy:
       - RFC-0564
-    addedBy: []
     changedBy: []
     removedBy: []
   - command: swim.leave
-    proposedBy:
+    proposedBy: []
+    addedBy:
       - RFC-0564
-    addedBy: []
     changedBy: []
     removedBy: []
   - command: swim.members
-    proposedBy:
+    proposedBy: []
+    addedBy:
       - RFC-0564
-    addedBy: []
     changedBy: []
     removedBy: []
   - command: swim.status
-    proposedBy:
+    proposedBy: []
+    addedBy:
       - RFC-0564
-    addedBy: []
     changedBy: []
     removedBy: []
   - command: template.imports.validate
@@ -7398,8 +7398,8 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 5
-  implemented: 9
+  accepted: 4
+  implemented: 10
   draft: 3
   reviewing: 0
 baseline:
@@ -7484,11 +7484,17 @@ baseline:
       dnaRefs:
         - DNA-1
         - DNA-44
+    - id: RFC-0564
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-40
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0564
       - RFC-0565
       - RFC-0566
     draft:
