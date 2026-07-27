@@ -115,4 +115,10 @@ export interface SendMessageSectionContent {
     label?: string;
     placeholder?: string;
   };
+  referrerField?: {
+    enabled: boolean;
+    required: boolean;
+    label?: string;
+    placeholder?: string;
+  };
 }

@@ -161,3 +161,20 @@ propsSchema:
         placeholder:
           type: string
           minLength: 1
+    referrerField:
+      type: object
+      additionalProperties: false
+      required:
+        - enabled
+        - required
+      properties:
+        enabled:
+          type: boolean
+        required:
+          type: boolean
+        label:
+          type: string
+          minLength: 1
+        placeholder:
+          type: string
+          minLength: 1

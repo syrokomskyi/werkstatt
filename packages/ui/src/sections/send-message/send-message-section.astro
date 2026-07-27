@@ -106,6 +106,10 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
       data-phone-field-required={String(props.phoneField?.required ?? false)}
       data-phone-field-label={resolveLabel("phoneFieldLabel", "")}
       data-phone-field-placeholder={resolveLabel("phoneFieldPlaceholder", "")}
+      data-referrer-field-enabled={String(props.referrerField?.enabled ?? false)}
+      data-referrer-field-required={String(props.referrerField?.required ?? false)}
+      data-referrer-field-label={resolveLabel("referrerFieldLabel", "")}
+      data-referrer-field-placeholder={resolveLabel("referrerFieldPlaceholder", "")}
     >
       {
         props.emailField?.enabled && (
@@ -136,6 +140,23 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
               placeholder={resolveLabel("phoneFieldPlaceholder", "")}
               required={props.phoneField.required}
               aria-label={resolveLabel("phoneFieldLabel", "")}
+            />
+          </label>
+        )
+      }
+
+      {
+        props.referrerField?.enabled && (
+          <label class="send-message__field send-message__field--referrer">
+            <input
+              class="send-message__input"
+              type="text"
+              name="referrer"
+              autocomplete="off"
+              data-send-message-referrer
+              placeholder={resolveLabel("referrerFieldPlaceholder", "")}
+              required={props.referrerField.required}
+              aria-label={resolveLabel("referrerFieldLabel", "")}
             />
           </label>
         )
