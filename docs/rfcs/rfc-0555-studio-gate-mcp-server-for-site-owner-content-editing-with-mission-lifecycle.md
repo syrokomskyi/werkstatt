@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
@@ -40,7 +41,7 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: minor
+versionBump: patch
 commands:
   proposed:
     - workpiece.read
@@ -159,18 +160,20 @@ Output:
 #### `workpiece.write`
 
 ```sh
-pnpm exec site-kernel run workpiece.write --mission <missionId> --path <relative-path> --content <content> --json
+echo '<file-content>' | pnpm exec site-kernel run workpiece.write --mission <missionId> --path <relative-path> --stdin --json
 ```
 
-Writes a file to the mission workpiece. Flags:
+Writes a file to the mission workpiece. Content is passed via **stdin** (not a CLI flag) to avoid shell argument length limits (~128KB on Linux). Flags:
 
 - `--mission` (required) — mission id
 - `--path` (required) — relative path within workpiece
-- `--content` (required) — file content to write
+- `--stdin` (required) — read file content from stdin instead of a CLI flag
 
 Path validation (same as `workpiece.read`): resolve, reject traversal, check DNA-22, reject if outside whitelist.
 
 Does NOT auto-commit. The LLM must separately call `mission.git.commit` to commit changes. This allows grouping multiple writes into a single commit.
+
+**Concurrency**: `workpiece.write` does not acquire a Werkstatt lock (DNA-51). It writes a single file atomically at the OS level (`fs.writeFile`). Concurrent writes to the _same path_ from parallel MCP tool calls are the LLM's responsibility — the MCP server processes tool calls sequentially (stdio transport is inherently sequential). `mission.git.commit` is the atomicity boundary for grouping multiple writes.
 
 Output:
 
@@ -236,7 +239,8 @@ interface WorkpieceReadResult {
 interface WorkpieceWriteInput {
   mission: string;
   path: string;
-  content: string;
+  // Content is read from stdin, not passed as a CLI flag, to avoid
+  // shell argument length limits (~128KB on Linux).
 }
 
 interface WorkpieceWriteResult {
@@ -257,6 +261,11 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { readFileSync } from "node:fs";
 
+// WERKSTATT_ROOT resolves the workspace root for site-kernel commands.
+// The LLM client spawns studio-gate with this env var set to the Werkstatt root.
+// Falls back to process.cwd() if unset (for local development).
+const werkstattRoot = process.env.WERKSTATT_ROOT ?? process.cwd();
+
 const skillPath = ".agents/skills/wg-site-content-edit/SKILL.md";
 const instructions = readFileSync(skillPath, "utf8");
 
@@ -267,11 +276,16 @@ const server = new Server(
 
 // Register tools/list and tools/call handlers
 // tools/list returns the 12 tools listed above
-// tools/call dispatches to child_process.exec for site-kernel commands
+// tools/call dispatches to child_process.exec for site-kernel commands,
+// passing WERKSTATT_ROOT as cwd to each invocation.
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
 ```
+
+### MCP SDK version
+
+The server requires `@modelcontextprotocol/sdk` >= 1.0.0 (the first stable release that supports `serverInfo.instructions` in the initialize response). The exact version is pinned in `packages/studio-gate/package.json`.
 
 ### File system responsibilities
 
@@ -281,8 +295,9 @@ await server.connect(transport);
 | `packages/studio-gate/src/index.ts` | MCP server entrypoint (stdio transport) |
 | `packages/studio-gate/src/tools.ts` | Tool definitions and schemas |
 | `packages/studio-gate/src/executor.ts` | Command execution via child_process |
+| `packages/studio-gate/AGENTS.md` | Package-level agent guide |
 | `packages/os/site-kernel-handoff/src/workpiece/` | New command implementations: workpiece-read.ts, workpiece-write.ts |
-| `.agents/skills/wg-site-content-edit/SKILL.md` | Process layer skill (wg-skill, project-specific) |
+| `packages/wgogol-skills/skills/wg-site-content-edit/SKILL.md` | Process layer skill (wg-skill, in the wg skill pack) |
 | `docs/architecture-dna.md` | DNA-56 entry added |
 
 ### DNA-22 path validation logic
@@ -291,7 +306,7 @@ The `workpiece.read` and `workpiece.write` commands share a path validation func
 
 1. **Resolve** — `path.resolve(workpieceRoot, relativePath)` to get absolute path
 2. **Traversal check** — verify resolved path starts with `workpieceRoot` (reject `../` traversal)
-3. **Load clientEditable** — read `system.md` from workpiece, parse `clientEditable[]` array
+3. **Load clientEditable** — load `system.md` from workpiece via `loadSystemManifest()` from `@gogol/site-kernel-content` (the canonical loader for RFC-0047 `system.md` frontmatter). Parse `clientEditable[]` array from the parsed manifest. Note: the existing `client.edit.validate` in `site-kernel-checks` reads legacy `system.yaml`; `workpiece.read`/`write` use the canonical `system.md` path via `loadSystemManifest`.
 4. **Pattern match** — check if relativePath matches any entry in `clientEditable[]`:
    - `src/content/{business-profile,pages,sections,components,features,people}/**`
    - `src/content/**/assets/**` (whitelisted media extensions)
@@ -301,12 +316,29 @@ The `workpiece.read` and `workpiece.write` commands share a path validation func
 
 ### Failure modes
 
-- **Path outside DNA-22** — `workpiece.read` and `workpiece.write` reject with error message. LLM receives the error and must adapt (edit only within `src/content/`).
-- **Path traversal attempt** — rejected with `Path traversal detected` error. No file I/O occurs.
-- **Mission not open** — `workpiece.read`/`write` reject with `Mission '<id>' is not open or does not exist`.
-- **Workpiece not materialized** — `workpiece.read`/`write` reject with `Workpiece for mission '<id>' not found. Run mission.materialize first.`
-- **Command execution failure** — MCP tool returns error result with stderr output. LLM receives the error and can retry or report.
+All `workpiece.read`/`workpiece.write` rejections produce exit code 1 and a JSON error response on stderr. Successful invocations produce exit code 0 and JSON output on stdout.
+
+- **Path outside DNA-22** — `workpiece.read` and `workpiece.write` reject with error message (exit 1). LLM receives the error and must adapt (edit only within `src/content/`).
+- **Path traversal attempt** — rejected with `Path traversal detected` error (exit 1). No file I/O occurs.
+- **Mission not open** — `workpiece.read`/`write` reject with `Mission '<id>' is not open or does not exist` (exit 1).
+- **Workpiece not materialized** — `workpiece.read`/`write` reject with `Workpiece for mission '<id>' not found. Run mission.materialize first.` (exit 1).
+- **Command execution failure** — MCP tool returns error result with stderr output (exit 1). LLM receives the error and can retry or report.
 - **MCP server crash** — LLM client detects server disconnect and can restart it. State is in mission workpiece (filesystem), not in server memory.
+- **WERKSTATT_ROOT not set** — if `WERKSTATT_ROOT` env var is unset and `process.cwd()` is not a valid Werkstatt root, `site-kernel run` commands will fail with a config-loading error. The MCP server logs a warning on startup if `WERKSTATT_ROOT` is unset.
+
+### Compass sync
+
+This RFC adds a new package and new Site OS commands. The following Compass XML files may need synchronization after implementation:
+
+- `docs/source-markup.xml` — new source files in `packages/studio-gate/` and `packages/os/site-kernel-handoff/src/workpiece/`
+- `docs/requirements.xml` — if the new commands introduce new requirements entries
+
+Run `ecosystem.manifest.generate` after implementation to update `docs/ecosystem.generated.yaml`.
+
+### AGENTS.md updates
+
+- `packages/studio-gate/AGENTS.md` — new package-level agent guide (ownership, boundaries, transport contract)
+- `packages/AGENTS.md` — add `studio-gate` to the ownership table
 
 ## Rollout
 
@@ -331,7 +363,7 @@ The `workpiece.read` and `workpiece.write` commands share a path validation func
 
 ## Risks
 
-- **DNA-22 path validation false positives** — the `clientEditable[]` pattern matching may reject valid paths due to glob resolution edge cases. Mitigation: use the same pattern matching logic as `client.edit.validate` (already battle-tested) and share the implementation.
+- **DNA-22 path validation false positives** — the `clientEditable[]` pattern matching may reject valid paths due to glob resolution edge cases. Mitigation: use the same DNA-22 surface definition as `client.edit.validate` (already battle-tested), but load `clientEditable[]` from `system.md` via `loadSystemManifest()` (`@gogol/site-kernel-content`) rather than from legacy `system.yaml`.
 - **LLM confusion from tool count** — 12 MCP tools may overwhelm smaller LLMs. Mitigation: the `wg-site-content-edit` skill in `serverInfo.instructions` provides the process layer, guiding the LLM through the correct tool sequence.
 - **Command execution latency** — each MCP tool call spawns a child process (`pnpm exec site-kernel run`). For rapid multi-file edits, this adds overhead. Mitigation: acceptable for content editing (not a hot path); LLMs typically make 5-15 tool calls per edit session.
 - **MCP SDK dependency** — `@modelcontextprotocol/sdk` is an external dependency. Mitigation: it is the official Anthropic SDK, widely adopted, and pinned in `package.json`.
@@ -342,7 +374,7 @@ The `workpiece.read` and `workpiece.write` commands share a path validation func
 ## Acceptance criteria
 
 - [ ] `workpiece.read` Site OS command is registered in `site-kernel-handoff` and reads files from mission workpiece with DNA-22 path validation
-- [ ] `workpiece.write` Site OS command is registered in `site-kernel-handoff` and writes files to mission workpiece with DNA-22 path validation (no auto-commit)
+- [ ] `workpiece.write` Site OS command is registered in `site-kernel-handoff` and writes files to mission workpiece with DNA-22 path validation (no auto-commit, content via stdin)
 - [ ] `workpiece.read` and `workpiece.write` reject paths outside `clientEditable[]` with error before any file I/O
 - [ ] `workpiece.read` and `workpiece.write` reject path traversal (`../` segments) with error before any file I/O
 - [ ] `packages/studio-gate` package exists with `@modelcontextprotocol/sdk` dependency
