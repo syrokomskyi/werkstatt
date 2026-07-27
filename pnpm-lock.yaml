@@ -1699,6 +1699,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.0.0
         version: 1.29.0(zod@4.4.3)
+      '@warpgogol/ontology':
+        specifier: workspace:*
+        version: link:../ontology
       '@warpgogol/passport':
         specifier: workspace:*
         version: link:../passport
@@ -1708,6 +1711,9 @@ importers:
       '@warpgogol/site-kernel-handoff':
         specifier: workspace:*
         version: link:../os/site-kernel-handoff
+      yaml:
+        specifier: ^2.7.0
+        version: 2.9.0
     devDependencies:
       fast-check:
         specifier: ^4.9.0
