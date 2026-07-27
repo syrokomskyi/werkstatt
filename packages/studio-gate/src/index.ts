@@ -5,6 +5,8 @@ RFC-0555: Studio Gate MCP server entrypoint. Exposes 12 tools (workpiece.read,
 workpiece.write, and 10 mission lifecycle commands) via stdio MCP transport.
 Reads WERKSTATT_ROOT env var for workspace root resolution. Injects
 wg-site-content-edit SKILL.md as serverInfo.instructions.
+ADR-0005: build-triggering tools (mission.validate) are routed through an
+in-memory BuildQueue to limit concurrent builds on the Werkstatt VM.
 </purpose>
 <non-goals>
   <item>Does not define tool schemas — tools.ts handles that.</item>
@@ -14,27 +16,20 @@ wg-site-content-edit SKILL.md as serverInfo.instructions.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0555: initial MCP server entrypoint.</item>
+  <item>ADR-0005: route build-triggering tools through in-memory BuildQueue.</item>
 </CHANGE_SUMMARY>
 */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { STUDIO_GATE_TOOLS } from "./tools.ts";
 import { executeCommand } from "./executor.ts";
+import { BuildQueue, resolveBuildConcurrency, isBuildTriggeringTool } from "./build-queue.ts";
 
-const SKILL_PATH = join(
-  "packages",
-  "wgogol-skills",
-  "skills",
-  "wg-site-content-edit",
-  "SKILL.md",
-);
+const SKILL_PATH = join("packages", "wgogol-skills", "skills", "wg-site-content-edit", "SKILL.md");
 
 async function loadSkillInstructions(werkstattRoot: string): Promise<string | undefined> {
   try {
@@ -70,6 +65,9 @@ function buildCommandArgs(
 async function main(): Promise<void> {
   const werkstattRoot = resolve(process.env["WERKSTATT_ROOT"] ?? process.cwd());
   const instructions = await loadSkillInstructions(werkstattRoot);
+  const buildQueue = new BuildQueue({
+    maxConcurrency: resolveBuildConcurrency(),
+  });
 
   const server = new Server(
     {
@@ -104,16 +102,15 @@ async function main(): Promise<void> {
       };
     }
 
-    const { cliArgs, stdin } = buildCommandArgs(
-      name,
-      (args as Record<string, unknown>) ?? {},
-    );
+    const { cliArgs, stdin } = buildCommandArgs(name, (args as Record<string, unknown>) ?? {});
 
-    const result = await executeCommand(
-      "pnpm",
-      ["exec", "site-kernel", "run", name, ...cliArgs, "--json"],
-      { cwd: werkstattRoot, stdin },
-    );
+    const exec = () =>
+      executeCommand("pnpm", ["exec", "site-kernel", "run", name, ...cliArgs, "--json"], {
+        cwd: werkstattRoot,
+        stdin,
+      });
+
+    const result = isBuildTriggeringTool(name) ? await buildQueue.run(exec) : await exec();
 
     const text =
       result.exitCode === 0
