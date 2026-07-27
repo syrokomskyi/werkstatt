@@ -126,6 +126,27 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - Identity integration: reads `werkstatt.identity.json` for operator public key and `PASSPORT_SIGNING_KEY` env var for Ed25519 signing (RFC-0558). Fails with `identity-not-bootstrapped` if identity is not set up.
 - Ephemeral lifecycle: SWIM instance is created and destroyed within each command invocation — no long-running daemon. Real-time failure detection is deferred to Phase 2.
 
+## DHT (RFC-0565)
+
+- `src/dht/` — S/Kademlia-hardened DHT for site registry lookups and content placement (RFC-0562 Layer 3).
+- `types.ts` — re-exports DHT types and Zod schemas from `@warpgogol/ontology/operations`.
+- `config.ts` — loads `werkstatt.dht.json`, validates schema, creates config with bind address, bootstrap nodes, replication factor, timeout, and cache TTL.
+- `node.ts` — embedded DHT node lifecycle wrapping `@libp2p/kad-dht`: `generateSybilResistantNodeId` (PoW for open membership, identity keypair for pilot), `createDhtNode`, `startDhtNode`, `stopDhtNode`, `dhtPut`, `dhtGet`. Ephemeral per-command — no daemon.
+- `cache.ts` — TTL-based DHT cache (`werkstatt.dht.cache.json`). `loadCache`, `saveCache`, `getCachedEntry`, `setCachedEntry`, `clearCachedEntry`. Cache invalidation is TTL-only (no push invalidation).
+- `init.ts` — `dht.node.init` handler: creates `werkstatt.dht.json` from flags.
+- `lookup.ts` — `dht.lookup` handler: queries DHT (or cache), validates entry signature, routes around dead workshops (SWIM integration seam).
+- `register.ts` — `dht.register` handler: signs DHT entry with operator Ed25519 keypair, LWW conflict resolution on `lastUpdated`, invalidates cache on successful publish.
+- `capacity.ts` — `dht.capacity.publish` handler: signs workshop capacity entry, publishes to DHT key `capacity/<id>`. `verifyCapacity` for signature verification.
+- `placement.ts` — `dht.placement` handler: queries DHT capacity entries, selects best workshop using least-loaded, nearest, or owner-preference strategy.
+- `status.ts` — `dht.status` handler: local-only status query (config, cache, identity, SWIM state). No network I/O.
+- `dht-module.ts` — registers `dht.node.init`, `dht.lookup`, `dht.register`, `dht.capacity.publish`, `dht.placement`, `dht.status` workspace commands. All `cacheable: false`.
+- Config file: `werkstatt.dht.json` (workspace root, gitignored, created by `dht.node.init`).
+- Cache file: `werkstatt.dht.cache.json` (workspace root, gitignored).
+- Identity integration: reads `werkstatt.identity.json` for operator public key and `PASSPORT_SIGNING_KEY` env var for Ed25519 signing (RFC-0558).
+- Signing: DHT entries are signed using `@warpgogol/passport/dht-sign` (`dhtEntryBytes`, `signDhtEntry`, `verifyDhtEntry`).
+- Ephemeral lifecycle: DHT node is created and destroyed within each command invocation — no long-running daemon.
+- Dependencies: `libp2p@^3.3`, `@libp2p/kad-dht@^16.3`, `@libp2p/identify@^4.1`, `@libp2p/peer-id@^6`, `@libp2p/ping@^3.1`, `@libp2p/tcp@^11`, `@multiformats/multiaddr@^13`.
+
 ## Related packages
 
 | Package | Role |
