@@ -126,3 +126,12 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 - **Atomic rollback:** If any step fails, the command cleans up partial state in reverse order: abort mission → remove content stubs → remove pin file → remove registry entry → remove system directory.
 - **Noop case:** If the system-id already exists without `--amend`, the command fails with an explicit error. With `--amend`, it fails if the system-id does not exist.
 - The `onboard` skill orchestrates the full pipeline: brief validation → `onboarding.synthesize` → AI synthesis → `sternsystem.register` → handoff.
+
+## Identity model (RFC-0558)
+
+- **`identity/` module:** `identity-module.ts` registers 4 commands: `identity.bootstrap`, `identity.credential.issue`, `identity.credential.verify`, `identity.credential.revoke`. Shared I/O helpers in `identity/identity-io.ts`.
+- **`werkstatt.identity.json`:** Workspace-level config file storing operator name, public key, auth mode (`permissive` or `enforced`), issued credentials, and revocation list. Created by `identity.bootstrap`, committed to git.
+- **`PASSPORT_SIGNING_KEY` env var:** 32-byte Ed25519 private key as hex. Set after `identity.bootstrap` prints it to stdout. Required for `identity.credential.issue`.
+- **`actor` field semantics:** `mission.open`, `mission.close`, and `mission.abort` accept `actor` from auth context (`--_authActor` flag, set by Studio Gate middleware) with `--actor` CLI flag as fallback, defaulting to `"agent"` for CLI-only access. The `actor` value is a VC subject id (did:web) when authenticated via Studio Gate, or `"agent"` for direct CLI usage.
+- **Credential types:** `SiteOwnershipCredential` (operator → site ownership) and `ActorDelegationCredential` (operator → agent delegation, with expiry and scopes).
+- **Canonicalization:** Identity credential subjects are canonicalized via sorted-key JSON (`identityCredentialBytes` in `@warpgogol/passport/identity-sign`). This is separate from `credentialBytes` in `sign.ts` (which handles build provenance `CredentialSubjectDigest`).

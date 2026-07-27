@@ -13,6 +13,7 @@ Cosmic Passport — build-time W3C Verifiable Credential capturing provenance, c
 | `@warpgogol/passport/verify` | `src/verify.ts` | `verifyPassport(raw, publicKeyPem)` |
 | `@warpgogol/passport/key-rotate` | `src/key-rotate.ts` | `rotateKey()` — generates new Ed25519 keypair |
 | `@warpgogol/passport/data` | `src/data.ts` | `loadPassportData(inputs)` — assembles passport payload from OS inputs |
+| `@warpgogol/passport/identity-sign` | `src/identity-sign.ts` | RFC-0558: `identityCredentialBytes()`, `signIdentityCredential()`, `verifyIdentityCredential()` — canonicalization and sign/verify wrappers for identity credential subjects |
 
 ## Rules for AI agents
 
