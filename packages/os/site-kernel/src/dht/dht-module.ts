@@ -73,7 +73,7 @@ export const dhtModule: KernelModule = {
       scope: "workspace",
       cacheable: false,
       reads: ["werkstatt.dht.json", "werkstatt.identity.json"],
-      writes: [],
+      writes: ["werkstatt.dht.cache.json"],
       execute: runDhtRegister,
     });
 

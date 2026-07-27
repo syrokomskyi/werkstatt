@@ -22,6 +22,7 @@ import type { KernelCommandInput, KernelCommandResult, KernelRuntimeContext } fr
 import type { DHTSiteEntry } from "./types.ts";
 import { dhtSiteEntrySchema } from "./types.ts";
 import { loadDhtConfig } from "./config.ts";
+import { clearCachedEntry } from "./cache.ts";
 import { createDhtNode, startDhtNode, stopDhtNode, dhtPut, dhtGet } from "./node.ts";
 import { signDhtEntry, verifyDhtEntry } from "@warpgogol/passport/dht-sign";
 import { WerkstattIdentityConfigSchema, type WerkstattIdentityConfig } from "@warpgogol/passport";
@@ -286,6 +287,9 @@ export async function runDhtRegister(
     // Publish to DHT
     const valueBytes = new TextEncoder().encode(JSON.stringify(entryToPublish));
     await dhtPut(node, key, valueBytes);
+
+    // Invalidate cache entry for this site (entry has changed)
+    await clearCachedEntry(workspaceRoot, siteId);
 
     return {
       data: {
