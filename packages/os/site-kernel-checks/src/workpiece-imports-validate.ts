@@ -20,6 +20,7 @@ first step.
 
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { parse as parseYaml } from "yaml";
 import { collectFiles, fileExists } from "@warpgogol/share/fs";
 import type {
   CheckResult,
@@ -73,7 +74,10 @@ export async function runWorkpieceImportsValidate(
       message: "--site <name> is required.",
       fixHint: "Pass --site <system-id> to specify which workpiece to validate.",
     });
-    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<WorkpieceImportsValidateData>;
+    return diagnosticsResult(
+      COMMAND,
+      diagnostics,
+    ) as KernelCommandResult<WorkpieceImportsValidateData>;
   }
 
   // ── Resolve workpiece directory ─────────────────────────────────────────────
@@ -91,7 +95,10 @@ export async function runWorkpieceImportsValidate(
         message: `No missions directory found at ${missionsDir}.`,
         fixHint: "Ensure a mission is open for this site before running build.prepare.",
       });
-      return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<WorkpieceImportsValidateData>;
+      return diagnosticsResult(
+        COMMAND,
+        diagnostics,
+      ) as KernelCommandResult<WorkpieceImportsValidateData>;
     }
 
     // Find mission directory containing a workpiece for this site
@@ -104,7 +111,22 @@ export async function runWorkpieceImportsValidate(
         if (!entry.isDirectory()) continue;
         const candidate = join(missionsDir, entry.name, "workpiece");
         if (await fileExists(candidate)) {
-          // Check if this workpiece belongs to the requested site
+          // Check mission.yaml for systemId (canonical mission metadata)
+          const missionFile = join(missionsDir, entry.name, "mission.yaml");
+          if (await fileExists(missionFile)) {
+            try {
+              const missionRaw = await readFile(missionFile, "utf-8");
+              const missionData = parseYaml(missionRaw) as { systemId?: string };
+              if (missionData.systemId === site) {
+                missionWorkpieceDir = candidate;
+                found = true;
+                break;
+              }
+            } catch {
+              continue;
+            }
+          }
+          // Fallback: check system.json for id (legacy convention)
           const systemFile = join(missionsDir, entry.name, "system.json");
           if (await fileExists(systemFile)) {
             try {
@@ -132,7 +154,10 @@ export async function runWorkpieceImportsValidate(
         message: `No current mission workpiece found for site '${site}'.`,
         fixHint: `Open a mission for site '${site}' via mission.open, or pass --workpiece-dir to specify the path.`,
       });
-      return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<WorkpieceImportsValidateData>;
+      return diagnosticsResult(
+        COMMAND,
+        diagnostics,
+      ) as KernelCommandResult<WorkpieceImportsValidateData>;
     }
     workpieceDir = missionWorkpieceDir;
   }
@@ -144,7 +169,10 @@ export async function runWorkpieceImportsValidate(
       message: `Workpiece directory does not exist: ${workpieceDir}.`,
       fixHint: "Run mission.materialize to generate the workpiece before validating.",
     });
-    return diagnosticsResult(COMMAND, diagnostics) as KernelCommandResult<WorkpieceImportsValidateData>;
+    return diagnosticsResult(
+      COMMAND,
+      diagnostics,
+    ) as KernelCommandResult<WorkpieceImportsValidateData>;
   }
 
   // ── Scan workpiece files ────────────────────────────────────────────────────

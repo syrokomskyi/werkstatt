@@ -341,7 +341,13 @@ async function executePipelineForSite(
       if (cached) {
         report = cached;
       } else {
-        report = await executeRegisteredCommand(command, context, step.args ?? [], {
+        // Inject --site for workspace-scoped commands so they receive the site
+        // name from the pipeline context (mirrors executeKernelCommand logic).
+        const stepArgs = [...(step.args ?? [])];
+        if (command.scope === "workspace" && !stepArgs.includes("--site") && site.name) {
+          stepArgs.push("--site", site.name);
+        }
+        report = await executeRegisteredCommand(command, context, stepArgs, {
           timeoutMs: step.timeoutMs,
           expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,
         });
