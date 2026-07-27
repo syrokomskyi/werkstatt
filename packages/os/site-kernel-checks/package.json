@@ -64,6 +64,7 @@
     "@warpgogol/check-runner-node": "workspace:*",
     "@warpgogol/content-source": "workspace:*",
     "@warpgogol/fingerprint": "workspace:*",
+    "@webgogol/forge": "workspace:*",
     "@warpgogol/geo": "workspace:*",
     "@warpgogol/growth": "workspace:*",
     "@warpgogol/integration": "workspace:*",
