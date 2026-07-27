@@ -40,7 +40,7 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) {
-    chunks.push(chunk as Buffer);
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
   }
   return Buffer.concat(chunks).toString("utf8");
 }
@@ -88,9 +88,7 @@ export async function runWorkpieceWrite(
 
   const allowed = await isClientEditable(workpieceDir, normalizedPath);
   if (!allowed) {
-    throw new Error(
-      `Path '${normalizedPath}' is outside client-editable surface (DNA-22)`,
-    );
+    throw new Error(`Path '${normalizedPath}' is outside client-editable surface (DNA-22)`);
   }
 
   const content = await readStdin();
@@ -102,9 +100,7 @@ export async function runWorkpieceWrite(
 
   await writeFile(resolvedPath, content, "utf8");
   const bytesWritten = Buffer.byteLength(content, "utf8");
-  logger.info(
-    `[workpiece.write] ${missionId}: wrote ${normalizedPath} (${bytesWritten} bytes)`,
-  );
+  logger.info(`[workpiece.write] ${missionId}: wrote ${normalizedPath} (${bytesWritten} bytes)`);
 
   return {
     data: { path: normalizedPath, bytesWritten },
