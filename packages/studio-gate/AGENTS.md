@@ -10,7 +10,7 @@ RFC-0555: stdio MCP server for site owner content editing with mission lifecycle
 | `src/tools.ts` | 12 tool definitions (workpiece.read, workpiece.write, mission.open, mission.materialize, mission.git.commit, mission.validate, mission.reconcile, mission.close, mission.abort, release.prepare, release.publish, leitstand.propagate) |
 | `src/executor.ts` | Command executor via child_process — passes content via stdin for workpiece.write |
 | `src/build-queue.ts` | ADR-0005: in-memory semaphore-based build queue — limits concurrent build-triggering tool calls (mission.validate, mission.build) per VM |
-| `src/auth.ts` | RFC-0558: VC-based auth middleware — `verifyAuthFromMeta()` reads `werkstatt.identity.json`, verifies VC tokens from MCP metadata. Supports permissive (warn-only) and enforced (reject) modes. |
+| `src/auth.ts` | RFC-0558/RFC-0559: VC-based auth middleware — `verifyAuthFromMeta()` reads `werkstatt.identity.json`, verifies VC tokens from MCP metadata. Supports permissive (warn-only) and enforced (reject) modes. RFC-0559: site-scoping via `_meta.system`, per-tool scope enforcement, distinct error codes (-32001..-32007). |
 
 ## Boundaries
 
@@ -25,6 +25,47 @@ RFC-0555: stdio MCP server for site owner content editing with mission lifecycle
 - MCP stdio transport (JSON-RPC over stdin/stdout)
 - `serverInfo.instructions` populated from `packages/warpgogol-skills/skills/wg-site-content-edit/SKILL.md`
 - 12 tools exposed via `tools/list` and `tools/call`
+
+## Authentication (RFC-0559)
+
+The auth middleware verifies VC tokens before dispatching to Site OS commands.
+
+### Credential presentation
+
+MCP clients present credentials via `_meta.identity` in the `tools/call` request:
+
+- String form: `_meta.identity: "<credentialId>"`
+- Object form: `_meta.identity.credentialId: "<credentialId>"`
+
+The target system id is provided via `_meta.system` for site-scoping.
+
+### Auth modes
+
+- **permissive** — warns on missing/invalid credentials but allows execution. Use for development.
+- **enforced** — rejects unauthenticated calls with MCP JSON-RPC error responses. Use for production.
+
+Configured in `werkstatt.identity.json` via the `authMode` field (RFC-0558).
+
+### Error codes
+
+| Code | Error string | Meaning |
+| --- | --- | --- |
+| -32001 | `authentication-required` | No credential, credential not found, expired, or signature invalid |
+| -32002 | `site-mismatch` | Credential siteId does not match `_meta.system` |
+| -32003 | `insufficient-scope` | ActorDelegationCredential scopes do not include the tool name |
+| -32004 | `credential-revoked` | Credential is in `revokedCredentialIds` |
+| -32005 | `auth-config-missing` | `werkstatt.identity.json` not found |
+| -32006 | `auth-config-malformed` | `werkstatt.identity.json` is invalid JSON or fails schema validation |
+| -32007 | `system-id-required` | `_meta.system` is absent in enforced mode |
+
+### Scope semantics
+
+- `SiteOwnershipCredential` — grants scope `*` (all tools)
+- `ActorDelegationCredential` — grants only the scopes listed in `subject.scopes`
+
+### Actor context injection
+
+Authenticated actor id is injected via `--_authActor` CLI flag (not `--actor`, which is a user-provided parameter in some mission commands).
 
 ## Validation
 
