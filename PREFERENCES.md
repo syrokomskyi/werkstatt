@@ -3,6 +3,7 @@ aiLanguage: ru
 documentationLanguage: en
 saveSessions: true
 register: business
+formOfAddress: ty
 ---
 
 # Operator Preferences
@@ -11,6 +12,7 @@ register: business
 - `documentationLanguage`: English — generated RFCs, ADRs, READMEs, and other project documentation use English.
 - `saveSessions`: true — agent saves session transcripts at end of each session (RFC-0537). Set to `false` to opt out.
 - `register`: business — communication register (business | creative). Business = core behavioral layer only, professional and efficient. Creative = core + extended behavioral layer (RFC-0549) with creative partnership and emotional support.
+- `formOfAddress`: ty — обращение на «ты» (неформальное). AI использует «ты» во всех обращениях к оператору.
 
 ## Skill invocation tracking (NON-NEGOTIABLE)
 
