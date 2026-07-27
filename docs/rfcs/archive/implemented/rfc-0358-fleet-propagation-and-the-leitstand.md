@@ -20,6 +20,7 @@ amendedBy:
   - RFC-0362
   - RFC-0363
   - RFC-0379
+  - RFC-0566
 related:
   - RFC-0354
   - RFC-0355
