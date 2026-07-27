@@ -32,6 +32,9 @@ propsSchema:
       type: boolean
     tagline:
       type: string
+    ctaNote:
+      type: string
+      minLength: 1
     backgroundImage:
       type: string
     leadImage:
