@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
@@ -43,24 +44,11 @@ versionBump: patch
 commands:
   proposed: []
   added: []
-  changed:
-    - workpiece.read
-    - workpiece.write
-    - mission.open
-    - mission.materialize
-    - mission.git.commit
-    - mission.validate
-    - mission.reconcile
-    - mission.close
-    - mission.abort
-    - release.prepare
-    - release.publish
-    - leitstand.propagate
+  changed: []
   removed: []
 appsImpacted: []
 packagesImpacted:
   - packages/studio-gate
-  - packages/passport
 successSignals:
   - "Studio Gate rejects an MCP call without a credential in enforced mode with a clear authentication-required error."
   - "Studio Gate accepts an MCP call with a valid SiteOwnershipCredential and passes the actor identity to the underlying Site OS command."
@@ -71,6 +59,8 @@ nonGoals:
   - "Do not implement role-based access control beyond owner and delegated agent in the pilot."
   - "Do not implement credential refresh or token rotation — credentials are static VCs with explicit expiry."
   - "Do not implement audit logging beyond existing Bordbuch — auth decisions are logged in Bordbuch via the actor field."
+  - "Do not implement a WERKSTATT_CREDENTIAL env var fallback for MCP clients that do not support _meta.identity — if _meta is unavailable, the X-Werkstatt-Credential header is the fallback. Env var fallback is deferred to a future RFC if a real client need arises."
+  - "Do not modify Site OS command implementations (workpiece.read, workpiece.write, mission lifecycle commands) — command-level changes to accept actor from auth context are in RFC-0558's scope. This RFC only adds the MCP server middleware."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -108,7 +98,7 @@ The grilling session (2026-07-27) established model (B): Studio Gate for content
 
 ## Decision
 
-Studio Gate gains an auth middleware that verifies VC credentials (from RFC-0558) before dispatching any MCP tool. The middleware checks credential validity, site ownership match, and scope sufficiency. Auth mode is controlled by `werkstatt.identity.json` field `authMode` (`permissive` | `enforced`), defaulting to `permissive` for backwards-compatible pilot operation.
+Studio Gate gains an auth middleware that verifies VC credentials (from RFC-0558) before dispatching any MCP tool. The middleware checks credential validity, site ownership match, and scope sufficiency. Auth mode is controlled by `werkstatt.identity.json` field `authMode` (`permissive` | `enforced`), defaulting to `permissive` for pilot operation. `permissive` mode is a permanent configuration option, not a temporary rollout phase — it serves environments where auth is unnecessary (development, testing, single-operator pilot). It is a runtime toggle on a single code path, not a backward compatibility layer: the same middleware code handles both modes, differing only in whether failures block or warn.
 
 ## Architectural fit
 
@@ -117,8 +107,13 @@ Studio Gate gains an auth middleware that verifies VC credentials (from RFC-0558
 - **RFC-0558 (Identity Model):** Depends on RFC-0558 for VC types, `identity.credential.verify` command, and `werkstatt.identity.json` config. This RFC implements the consumer side of the identity model.
 - **RFC-0555 (Studio Gate):** Amends RFC-0555 by adding auth middleware to the existing `CallToolRequestSchema` handler in `packages/studio-gate/src/index.ts`.
 - **Scaling:** The auth middleware is designed to work with future P2P peer identity (RFC-0562) without changes — the credential verification interface is agnostic to the credential source.
+- **Forward-only compliance:** `permissive` mode is a configuration option, not a compatibility shim. The auth middleware is the single code path for all MCP tool dispatch — there is no legacy unauthenticated dispatch path maintained alongside it. In `permissive` mode, the middleware still runs; it simply logs warnings instead of rejecting. Removing `permissive` mode would not delete a code path — it would remove a configuration value.
 
 ## Design
+
+### Actor context propagation
+
+The auth middleware extracts `actorId` and `siteId` from the verified VC and injects `actor` into the MCP tool arguments. The existing `buildCommandArgs` function in `packages/studio-gate/src/index.ts` already converts args to `--key value` CLI flags. For commands that already accept `--actor` (`mission.open`, `mission.close`, `mission.abort`), this is transparent. For commands that do not currently accept `--actor`, the command-level changes to accept and log the actor are in RFC-0558's scope (RFC-0558 file system responsibilities: "Mission commands receive actor from auth middleware, not CLI flag"). This RFC does not modify any Site OS command implementations.
 
 ### CLI surface
 
@@ -156,33 +151,31 @@ export async function authenticateMcpCall(
   // 5. Return auth result
 }
 
-// Tool-to-scope mapping
-const TOOL_SCOPES: Record<string, string> = {
-  "workpiece.read": "workpiece.read",
-  "workpiece.write": "workpiece.write",
-  "mission.open": "mission.open",
-  "mission.materialize": "mission.materialize",
-  "mission.git.commit": "mission.git.commit",
-  "mission.validate": "mission.validate",
-  "mission.reconcile": "mission.reconcile",
-  "mission.close": "mission.close",
-  "mission.abort": "mission.abort",
-  "release.prepare": "release.prepare",
-  "release.publish": "release.publish",
-  "leitstand.propagate": "leitstand.propagate",
-};
-
-// SiteOwnershipCredential has scope "*" (all tools)
-// ActorDelegationCredential has explicit scopes[] from the credential
+// Scopes are derived from STUDIO_GATE_TOOLS in packages/studio-gate/src/tools.ts.
+// Each tool name IS its scope name — no separate TOOL_SCOPES mapping is needed.
+// SiteOwnershipCredential has scope "*" (all tools).
+// ActorDelegationCredential has explicit scopes[] from the credential.
+// The middleware checks: credential.scopes.includes("*") || credential.scopes.includes(toolName).
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/studio-gate/src/index.ts` | Auth middleware inserted before `CallToolRequestSchema` handler. Calls `authenticateMcpCall` and rejects unauthenticated calls in enforced mode. |
+| `packages/studio-gate/src/index.ts` | Auth middleware inserted before `CallToolRequestSchema` handler. Calls `authenticateMcpCall` and rejects unauthenticated calls in enforced mode. Injects `actor` into tool args from VC subject id. |
 | `packages/studio-gate/src/auth.ts` | New file. Auth middleware implementation: credential extraction, verification, site match, scope check. |
 | `werkstatt.identity.json` | Read by auth middleware for `authMode` and revocation list. |
+
+### AGENTS.md updates
+
+- `packages/studio-gate/AGENTS.md` — add `src/auth.ts` module to the "What lives here" table, document the `authMode` configuration in the "Boundaries" section, and add an "Authentication" section describing credential presentation, permissive vs enforced modes, and error codes.
+
+### Compass sync
+
+This RFC adds one new source file (`packages/studio-gate/src/auth.ts`) and modifies `packages/studio-gate/src/index.ts`. After implementation:
+
+- `docs/source-markup.xml` — add `packages/studio-gate/src/auth.ts` to the source-file inventory, update `packages/studio-gate/src/index.ts` entry.
+- Run `ecosystem.manifest.generate` to update `docs/ecosystem.generated.yaml`.
 
 ### Output format
 
@@ -233,19 +226,64 @@ Auth errors are returned as MCP error responses (JSON-RPC error):
 }
 ```
 
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32004,
+    "message": "credential-revoked",
+    "data": {
+      "credentialId": "urn:warpgogol:cred:abc123"
+    }
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32005,
+    "message": "auth-config-missing",
+    "data": {
+      "hint": "werkstatt.identity.json not found. Run identity.bootstrap (RFC-0558) to create it."
+    }
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32006,
+    "message": "auth-config-malformed",
+    "data": {
+      "hint": "werkstatt.identity.json is not valid JSON or is missing required fields."
+    }
+  }
+}
+```
+
 ### Failure modes
 
 | Condition | Permissive mode | Enforced mode |
 | --- | --- | --- |
-| No credential presented | Warn, execute command | Reject with `authentication-required` |
-| Credential signature invalid | Warn, execute command | Reject with `authentication-required` |
-| Credential expired | Warn, execute command | Reject with `authentication-required` |
-| Credential revoked | Warn, execute command | Reject with `authentication-required` |
-| Credential for wrong site | Warn, execute command | Reject with `site-mismatch` |
-| Credential scope insufficient | Warn, execute command | Reject with `insufficient-scope` |
-| `werkstatt.identity.json` not found | Warn, execute command | Reject with `auth-config-missing` |
+| No credential presented | Warn, execute command | Reject with `authentication-required` (-32001) |
+| Credential signature invalid | Warn, execute command | Reject with `authentication-required` (-32001) |
+| Credential expired | Warn, execute command | Reject with `authentication-required` (-32001) |
+| Credential revoked | Warn, execute command | Reject with `credential-revoked` (-32004) |
+| Credential for wrong site | Warn, execute command | Reject with `site-mismatch` (-32002) |
+| Credential scope insufficient | Warn, execute command | Reject with `insufficient-scope` (-32003) |
+| `werkstatt.identity.json` not found | Warn, execute command | Reject with `auth-config-missing` (-32005) |
+| `werkstatt.identity.json` malformed | Warn, execute command | Reject with `auth-config-malformed` (-32006) |
 
 In permissive mode, warnings are written to stderr but the command still executes. This allows gradual rollout without breaking existing workflows.
+
+Concurrent verification: the auth middleware is stateless — each `authenticateMcpCall` invocation reads `werkstatt.identity.json` independently and calls `identity.credential.verify` without shared mutable state. Concurrent MCP tool calls (possible via the BuildQueue for build-triggering tools, ADR-0005) are safe because Ed25519 verification is a pure function and `werkstatt.identity.json` is read-only during MCP server operation (modified only by `identity.credential.issue`/`revoke` CLI commands, not by the MCP server).
 
 ## Rollout
 
@@ -263,7 +301,7 @@ In permissive mode, warnings are written to stderr but the command still execute
 
 ## Risks
 
-- **Credential extraction fragility.** MCP stdio transport does not define a standard auth header. The credential is passed in `_meta.identity` (MCP metadata) or as a custom header. If MCP clients do not support `_meta`, a fallback env var `WERKSTATT_CREDENTIAL` may be needed.
+- **Credential extraction fragility.** MCP stdio transport does not define a standard auth header. The credential is passed in `_meta.identity` (MCP metadata) or as a custom `X-Werkstatt-Credential` header. If MCP clients support neither, the operator must use a client that does or wait for a future RFC adding an env var fallback.
 - **Performance.** Each MCP call now invokes `identity.credential.verify` (Ed25519 signature check, ~1ms). For a typical editing session with 50-100 MCP calls, this adds <100ms total. Negligible.
 - **Agent confusion.** LLM agents may not understand how to present credentials. Mitigation: clear error messages with hints, and the `wg-site-content-edit` skill instructions can include credential setup steps.
 - **Permissive mode false sense of security.** Operators may forget to switch to enforced mode. Mitigation: `identity.bootstrap` output includes a reminder to set `authMode: "enforced"` after testing.
@@ -280,7 +318,7 @@ In permissive mode, warnings are written to stderr but the command still execute
 - [ ] Calls with credential with insufficient scope return MCP error with `insufficient-scope`
 - [ ] `SiteOwnershipCredential` grants scope `*` (all tools)
 - [ ] `ActorDelegationCredential` grants only scopes listed in credential
-- [ ] Auth result (actorId, siteId) is passed to underlying Site OS command as `actor` context
+- [ ] Auth result (actorId, siteId) is injected into MCP tool args as `actor` by the MCP server (not by modifying Site OS command implementations — command-level changes are in RFC-0558)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -293,4 +331,4 @@ In permissive mode, warnings are written to stderr but the command still execute
 - Agents MUST NOT bypass the auth middleware by adding direct command dispatch paths.
 - The auth middleware MUST be the single entry point for all MCP tool calls in Studio Gate.
 - Agents MUST NOT hardcode `authMode` — it is always read from `werkstatt.identity.json`.
-- The `TOOL_SCOPES` mapping MUST be kept in sync with the STUDIO_GATE_TOOLS list in `packages/studio-gate/src/tools.ts`.
+- Scopes are derived from `STUDIO_GATE_TOOLS` in `packages/studio-gate/src/tools.ts` — each tool name IS its scope name. No separate `TOOL_SCOPES` mapping is needed. Adding a new tool to `STUDIO_GATE_TOOLS` automatically makes it a valid scope.
