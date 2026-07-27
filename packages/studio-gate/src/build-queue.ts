@@ -30,9 +30,7 @@ export interface QueueSlotInfo {
 }
 
 interface QueuedTask {
-  fn: () => Promise<unknown>;
-  resolve: (value: unknown) => void;
-  reject: (error: Error) => void;
+  execute: () => Promise<void>;
 }
 
 export class BuildQueue {
@@ -49,12 +47,18 @@ export class BuildQueue {
 
   async run<T>(fn: () => Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      const task: QueuedTask = {
-        fn: fn as () => Promise<unknown>,
-        resolve: resolve as (value: unknown) => void,
-        reject,
+      const execute = async (): Promise<void> => {
+        try {
+          const result = await fn();
+          resolve(result);
+        } catch (error) {
+          reject(error instanceof Error ? error : new Error(String(error)));
+        } finally {
+          this.active--;
+          this.drain();
+        }
       };
-      this.waiting.push(task);
+      this.waiting.push({ execute });
       this.drain();
     });
   }
@@ -71,14 +75,7 @@ export class BuildQueue {
     while (this.active < this.maxConcurrency && this.waiting.length > 0) {
       const task = this.waiting.shift()!;
       this.active++;
-      task
-        .fn()
-        .then((result) => task.resolve(result))
-        .catch((error) => task.reject(error))
-        .finally(() => {
-          this.active--;
-          this.drain();
-        });
+      void task.execute();
     }
   }
 }
