@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
@@ -54,7 +55,6 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - packages/os/site-kernel-handoff
-  - packages/passport
 successSignals:
   - "A mission opened via Studio Gate records the VC subject id as actor in mission.yaml and Bordbuch, not a free-text string."
   - "A commit created by mission.git.commit carries an Ed25519 signature that can be verified against the operator's public key from werkstatt.identity.json."
@@ -95,12 +95,12 @@ The grilling session (2026-07-27) established that signed commits provide an aud
 ## Problem
 
 1. **Actor is not cryptographic.** `mission.open` accepts `--actor` as a free-text flag (`packages/os/site-kernel-handoff/src/mission/index.ts:68`). Any string is accepted. Bordbuch records this string, but it cannot be verified against a keypair.
-2. **No commit signing in workpiece.** `mission.git.commit` creates standard git commits in the workpiece repository (`packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts`). Commits are not signed. There is no cryptographic link between the commit and the actor who made it.
+2. **No commit signing in workpiece.** `mission.git.commit` creates standard git commits in the workpiece repository (`packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts`). Commits are not signed. There is no cryptographic link between the commit and the actor who made it.
 3. **No identity propagation from Studio Gate.** When Studio Gate auth middleware (RFC-0559) authenticates a call, the resulting `actorId` is not passed to the underlying `mission.open` command. The auth context is lost at the command boundary.
 
 ## Decision
 
-The `actor` field in mission manifests and Bordbuch entries becomes a VC subject identifier (multibase public key or `did:web` identifier) instead of a free-text string. `mission.git.commit` signs each commit with the actor's Ed25519 private key using a `Signed-off-by` trailer containing the signature. The auth context from Studio Gate (RFC-0559) is propagated to mission commands via a new `--actor-from-auth` flag that reads the actor identity from environment variables set by the auth middleware.
+The `actor` field in mission manifests and Bordbuch entries becomes a VC subject identifier (multibase public key or `did:web` identifier) instead of a free-text string. `mission.git.commit` signs each commit with the actor's Ed25519 private key using `Werkstatt-Actor` and `Werkstatt-Signature` trailer fields containing the actor id and signature. The auth context from Studio Gate (RFC-0559) is propagated to mission commands via environment variables (`WERKSTATT_ACTOR_ID`, `WERKSTATT_ACTOR_SITE`, `WERKSTATT_ACTOR_SCOPES`) that are inherited by the child `site-kernel` process. The `--actor-from-auth` flag triggers reading these env vars.
 
 ## Architectural fit
 
@@ -108,7 +108,7 @@ The `actor` field in mission manifests and Bordbuch entries becomes a VC subject
 - **DNA-47 (Materialization):** Materialization creates the workpiece git repo. This RFC adds commit signing to `mission.git.commit`, which runs after materialization. No changes to materialization itself.
 - **DNA-34 (VC signing):** Reuses `signBytes` from `packages/passport/src/sign.ts` for commit signing. The same Ed25519 keypair used for VC credentials is used for commit signatures.
 - **RFC-0558 (Identity Model):** Depends on RFC-0558 for the VC subject identifier format and keypair management.
-- **RFC-0559 (Studio Gate Auth):** Depends on RFC-0559 for auth context propagation. Studio Gate sets `WERKSTATT_ACTOR_ID` env var after successful auth, which mission commands read.
+- **RFC-0559 (Studio Gate Auth):** Depends on RFC-0559 for auth context propagation. Studio Gate authenticates the MCP call and sets `WERKSTATT_ACTOR_ID`, `WERKSTATT_ACTOR_SITE`, and `WERKSTATT_ACTOR_SCOPES` env vars in the Studio Gate process. Since Studio Gate spawns `site-kernel` as a child process via `execFile` (`packages/studio-gate/src/executor.ts:36`), the child process inherits these env vars. This is the auth context propagation mechanism — no command flags needed.
 - **Scaling:** Signed commits provide a verifiable audit trail that works across P2P workshops (RFC-0562) — any node can verify that a commit was signed by the claimed actor.
 
 ## Design
@@ -117,10 +117,10 @@ The `actor` field in mission manifests and Bordbuch entries becomes a VC subject
 
 ```sh
 # Mission open with actor from auth context (Studio Gate sets WERKSTATT_ACTOR_ID)
-pnpm exec site-kernel run mission.open --site warpgogol-com --brief "Update homepage" --actor-from-auth --json
+pnpm exec site-kernel run mission.open --system warpgogol-com --brief "Update homepage" --actor-from-auth --json
 
 # Mission open with explicit actor (CLI direct access, backwards compatible)
-pnpm exec site-kernel run mission.open --site warpgogol-com --brief "Update homepage" --actor did:web:warpgogol.com#operator-v1 --json
+pnpm exec site-kernel run mission.open --system warpgogol-com --brief "Update homepage" --actor did:web:warpgogol.com#operator-v1 --json
 
 # Git commit with Ed25519 signature (uses PASSPORT_SIGNING_KEY)
 pnpm exec site-kernel run mission.git.commit --mission warpgogol-com-m000015 --message "Update hero section" --json
@@ -165,10 +165,12 @@ export async function createSignedCommit(
   privateKeyHex: string,  // from PASSPORT_SIGNING_KEY
 ): Promise<SignedCommitResult> {
   // 1. git add -A && git commit -m <message>
-  // 2. Get commit sha
-  // 3. Sign commit sha with signBytes(sha, privateKeyHex)
-  // 4. Add trailer: git commit --amend -m "<message>\n\nSigned-off-by: <actorId>\nSignature: <base64-sig>"
-  // 5. Return result
+  // 2. Get commit sha (pre-amend)
+  // 3. Sign commit sha with signBytes(privateKeyHex, new TextEncoder().encode(sha))
+  //    Note: signBytes(privateKeyHex, message) returns multibase string (packages/passport/src/sign.ts:216)
+  // 4. Add trailers: git commit --amend -m "<message>\n\nWerkstatt-Actor: <actorId>\nWerkstatt-Signature: <multibase-sig>"
+  // 5. Return result with post-amend commit sha
+  // Note: --amend is safe because the workpiece is a local repo, not pushed until mission.reconcile
 }
 ```
 
@@ -179,9 +181,28 @@ export async function createSignedCommit(
 | `packages/os/site-kernel-handoff/src/mission/index.ts` | `actor` flag resolution: reads `--actor-from-auth` env vars, falls back to `--actor` flag, defaults to `"unknown"` if neither provided. |
 | `packages/os/site-kernel-handoff/src/mission/actor-identity.ts` | New file. `resolveActorFromEnv` and `ActorIdentity` type. |
 | `packages/os/site-kernel-handoff/src/mission/signed-commit.ts` | New file. `createSignedCommit` function using `signBytes` from passport. |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | `mission.git.commit` calls `createSignedCommit` when `PASSPORT_SIGNING_KEY` is set. Falls back to unsigned commit if key not set. |
+| `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts` | `mission.git.commit` calls `createSignedCommit` when `PASSPORT_SIGNING_KEY` is set. Falls back to unsigned commit if key not set. |
+| `packages/os/site-kernel-handoff/src/mission/mission-open.ts` | `mission.open` actor resolution: reads `--actor-from-auth` env vars, falls back to `--actor` flag, defaults to `"unknown"` if neither provided. |
+| `packages/os/site-kernel-handoff/src/mission/mission-reconcile.ts` | `mission.reconcile` uses the same actor resolution logic when writing Bordbuch entries. |
+| `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | `mission.close` uses the same actor resolution logic when writing Bordbuch entries. |
 | `missions/*/mission.yaml` | `actor` field stores VC subject id instead of free-text string. |
 | `systems/*/bordbuch/events.ndjson` | Bordbuch entries record VC subject id in `actor` field. |
+
+### Env-var propagation contract
+
+Studio Gate (RFC-0555) spawns `site-kernel` as a child process via `execFile` (`packages/studio-gate/src/executor.ts:36`). The child process inherits the parent's environment. When Studio Gate auth middleware (RFC-0559) authenticates a call, it sets the following env vars in the Studio Gate process before dispatching the command:
+
+| Env var | Value | Source |
+| --- | --- | --- |
+| `WERKSTATT_ACTOR_ID` | VC subject id (e.g. `did:web:warpgogol.com#operator-v1`) | `StudioGateAuthResult.actorId` |
+| `WERKSTATT_ACTOR_SITE` | Sternsystem id (e.g. `warpgogol-com`) | `StudioGateAuthResult.siteId` |
+| `WERKSTATT_ACTOR_SCOPES` | Comma-separated scopes (e.g. `workpiece.read,workpiece.write`) | `StudioGateAuthResult.scopes` |
+
+The `--actor-from-auth` flag on `mission.open` (and other mission commands) triggers reading these env vars. If the flag is not set, the env vars are ignored. This keeps CLI direct access unaffected by Studio Gate's auth context.
+
+### Actor resolution in mission.reconcile and mission.close
+
+`mission.reconcile` and `mission.close` also write Bordbuch entries with an `actor` field. They use the same actor resolution logic as `mission.open`: if `WERKSTATT_ACTOR_ID` is set (from auth context), it is used as the actor; otherwise, the `--actor` flag is used; otherwise, the default `"unknown"` is used. This ensures all Bordbuch entries within a mission consistently record the same actor identity.
 
 ### Output format
 
@@ -194,30 +215,35 @@ export async function createSignedCommit(
     "commitSha": "abc123def456...",
     "signed": true,
     "actorId": "did:web:warpgogol.com#operator-v1",
-    "signature": "base64-ed25519-signature..."
+    "signature": "multibase-ed25519-signature..."
   },
   "summary": "mission.git.commit: created signed commit abc123d for warpgogol-com-m000015"
 }
 ```
 
-When `PASSPORT_SIGNING_KEY` is not set, `signed` is `false` and `signature` is omitted.
+The `commitSha` is the post-amend SHA (after trailers are added via `git commit --amend`). When `PASSPORT_SIGNING_KEY` is not set, `signed` is `false` and `signature` is omitted.
+
+When the workpiece has no changes, `mission.git.commit` returns the current HEAD SHA with `signed: false` and `message: "(no changes — workpiece is clean)"` — no commit or amend is performed.
 
 ### Failure modes
 
 | Condition | Behavior |
 | --- | --- |
-| `WERKSTATT_ACTOR_ID` not set and `--actor` not provided | `mission.open` fails with `actor-required` error. |
-| `WERKSTATT_ACTOR_ID` set but `--actor` also provided | `--actor-from-auth` takes precedence; `--actor` value is ignored with a warning. |
-| `PASSPORT_SIGNING_KEY` not set for `mission.git.commit` | Commit is created without signature. `signed: false` in output. Warning logged to stderr. |
-| `PASSPORT_SIGNING_KEY` set but invalid | `mission.git.commit` fails with `signing-key-invalid` error. |
+| `WERKSTATT_ACTOR_ID` not set and `--actor` not provided | `mission.open` fails with exit code 1 and `actor-required` error. |
+| `WERKSTATT_ACTOR_ID` set but `--actor` also provided | `--actor-from-auth` takes precedence; `--actor` value is ignored with a warning to stderr. Exit code 0. |
+| `PASSPORT_SIGNING_KEY` not set for `mission.git.commit` | Commit is created without signature. `signed: false` in output. Warning logged to stderr. Exit code 0. |
+| `PASSPORT_SIGNING_KEY` set but invalid | `mission.git.commit` fails with exit code 1 and `signing-key-invalid` error. |
+| Workpiece has no changes | `mission.git.commit` returns current HEAD SHA with `signed: false` and no commit is created. Exit code 0. |
 | Existing mission with `actor: "agent"` | No migration needed. `bordbuch.validate` accepts any string in `actor` field. Only new missions use VC subject ids. |
 
 ## Rollout
 
-- **Phase 1 (actor field migration):** `mission.open` accepts both `--actor` (free-text, backwards compatible) and `--actor-from-auth` (from auth context). New missions opened via Studio Gate use `--actor-from-auth`. CLI direct access continues to use `--actor`.
+- **Phase 1 (actor field migration):** `mission.open` accepts both `--actor` (free-text, backwards compatible) and `--actor-from-auth` (from auth context). New missions opened via Studio Gate use `--actor-from-auth`. CLI direct access continues to use `--actor`. The default actor changes from `"agent"` to `"unknown"` when neither `--actor` nor `--actor-from-auth` is provided — CLI workflows that omit `--actor` will see `"unknown"` in Bordbuch entries instead of `"agent"`. This is a visible behavior change for CLI direct access.
 - **Phase 2 (signed commits):** `mission.git.commit` signs commits when `PASSPORT_SIGNING_KEY` is set. If not set, commits are unsigned with a warning. This allows gradual adoption — operators without identity bootstrap still get unsigned commits.
 - **Phase 3 (enforcement):** After all operators have bootstrapped identity, a future RFC can make signed commits mandatory. This RFC does not enforce signing — it enables it.
 - **Historical Bordbuch entries:** Existing entries with `actor: "agent"` remain valid. No migration. `bordbuch.validate` does not reject non-VC actor strings.
+- **Mixed-state missions:** If an operator bootstraps identity mid-mission, the `mission-open` Bordbuch entry will have `actor: "agent"` (or `"unknown"`) but subsequent `mission.git.commit` signatures will reference the VC subject id. This is acceptable — the audit trail shows the transition point.
+- **AGENTS.md update:** `packages/os/site-kernel-handoff/AGENTS.md` should be updated to document the `--actor-from-auth` flag and the env-var propagation contract.
 
 ## Alternatives considered
 
@@ -230,8 +256,10 @@ When `PASSPORT_SIGNING_KEY` is not set, `signed` is `false` and `signature` is o
 
 - **Key not set during transition.** Operators who haven't run `identity.bootstrap` will produce unsigned commits. This is acceptable during rollout — the `signed: false` flag in output makes the state visible.
 - **Signature verification not enforced.** This RFC enables signing but does not verify signatures during `mission.reconcile`. A future RFC may add verification. The pilot relies on the audit trail, not on blocking unsigned commits.
-- **Commit trailer format.** The `Signed-off-by` and `Signature` trailers are not a standard git format. Tools that parse git logs may not understand them. Mitigation: trailers are human-readable and do not interfere with git operations.
+- **Commit trailer format.** The `Werkstatt-Actor` and `Werkstatt-Signature` trailers are custom git trailers, not a standard git format. Tools that parse git logs may not understand them. Mitigation: trailers are human-readable and do not interfere with git operations. The `Werkstatt-` prefix avoids collision with the standard `Signed-off-by` (DCO) trailer.
+- **Key reuse.** `PASSPORT_SIGNING_KEY` is used for both build provenance signing (Cosmic Passport, RFC-0028) and mission commit signing (this RFC). A compromised mission workflow could leak the key that also signs build provenance. Mitigation: the key is only in env vars, never written to disk. A future RFC may introduce a separate `MISSION_SIGNING_KEY` if key separation is needed. For the pilot, key reuse is acceptable — both signing contexts are operator-controlled.
 - **Actor id changes after key rotation.** If the operator rotates keys (RFC-0558 future `rotateKey`), the actor id changes. Old commits retain old actor ids. Bordbuch entries link actor ids to key versions via the VC proof `verificationMethod` field.
+- **CLI actor with signing key.** If an operator runs `mission.git.commit` via CLI with `PASSPORT_SIGNING_KEY` set but without `--actor-from-auth`, the actor id for the signature is taken from the `--actor` flag (or the mission manifest's `openedBy` field as fallback). This ensures the signature's actor id matches the Bordbuch entry's actor field.
 - **Agent misinterpretation.** LLM agents may set `--actor` to arbitrary strings when working via CLI. Mitigation: Studio Gate path uses `--actor-from-auth` which reads from auth context, not from LLM-provided flags.
 
 ## Acceptance criteria
@@ -239,11 +267,14 @@ When `PASSPORT_SIGNING_KEY` is not set, `signed` is `false` and `signature` is o
 - [ ] `ActorIdentity` type and `resolveActorFromEnv` function defined in `packages/os/site-kernel-handoff/src/mission/actor-identity.ts`
 - [ ] `createSignedCommit` function defined in `packages/os/site-kernel-handoff/src/mission/signed-commit.ts`
 - [ ] `mission.open` accepts `--actor-from-auth` flag and reads `WERKSTATT_ACTOR_ID` env var
-- [ ] `mission.git.commit` signs commits with Ed25519 when `PASSPORT_SIGNING_KEY` is set
+- [ ] `mission.git.commit` signs commits with Ed25519 when `PASSPORT_SIGNING_KEY` is set, using `Werkstatt-Actor` and `Werkstatt-Signature` trailers
 - [ ] `mission.git.commit` produces unsigned commit with `signed: false` when key not set
+- [ ] `mission.git.commit` handles no-changes case by returning current HEAD SHA without committing
 - [ ] `mission.yaml` `actor` field stores VC subject id when opened via `--actor-from-auth`
 - [ ] Bordbuch entries record VC subject id in `actor` field
+- [ ] `mission.reconcile` and `mission.close` use the same actor resolution logic as `mission.open`
 - [ ] Existing missions with `actor: "agent"` remain valid in `bordbuch.validate`
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with `--actor-from-auth` flag and env-var propagation contract
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
