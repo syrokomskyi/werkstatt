@@ -11,6 +11,7 @@ query entries via getFaqEntries / getFaqEntriesByTags.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0475: initial implementation — collection factory, loaders, semantic mapping.</item>
+  <item>RFC-0567: getFaqEntriesByTags uses orderTags[tags[0]] with fallback to order for per-tag ordering.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -44,7 +45,14 @@ export async function getFaqEntries(lang: string): Promise<FaqEntry[]> {
 
 export async function getFaqEntriesByTags(lang: string, tags: string[]): Promise<FaqEntry[]> {
   const all = await getFaqEntries(lang);
-  return all.filter((e) => e.tags?.some((t) => tags.includes(t)));
+  const tag = tags[0]; // primary queried tag — caller passes tags in priority order
+  return all
+    .filter((e) => e.tags?.some((t) => tags.includes(t)))
+    .sort((a, b) => {
+      const aOrder = a.orderTags?.[tag] ?? a.order ?? 999;
+      const bOrder = b.orderTags?.[tag] ?? b.order ?? 999;
+      return aOrder - bOrder;
+    });
 }
 
 export function toSemanticFaqEntries(entries: FaqEntry[]): SemanticFaqEntry[] {

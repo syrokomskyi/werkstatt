@@ -9,6 +9,7 @@ strict content contract for FAQ files at src/content/faq/{lang}/.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0475: initial implementation — FAQ content schema with governance block.</item>
+  <item>RFC-0567: add orderTags field for per-tag FAQ ordering.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +34,7 @@ export const faqSchema = z
     question: z.string(),
     answer: z.string(),
     order: z.number().optional(),
+    orderTags: z.record(z.string(), z.number()).optional(),
     tags: z.array(z.string()).optional(),
     governance: faqGovernanceSchema.optional(),
   })
