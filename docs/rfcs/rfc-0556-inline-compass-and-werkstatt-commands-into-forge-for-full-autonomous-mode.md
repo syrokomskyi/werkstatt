@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
@@ -65,7 +66,6 @@ packagesImpacted:
   - forge
   - site-kernel-checks
   - site-kernel-handoff
-  - site-kernel
 successSignals:
   - All 11 compass and werkstatt commands register and execute in a project with only @webgogol/forge installed (no @warpgogol/* packages)
   - forge bin/cli.ts no longer uses .catch(() => null) for compass and werkstatt module imports
@@ -162,22 +162,42 @@ Key utilities to inline into `forge/src/utils/` or `forge/os/compass/handlers/`:
 
 ```ts
 // forge/src/utils/fs-idempotent.ts (new — missing from forge)
-export function writeFileIfChanged(path: string, content: string): Promise<void>;
+export function writeFileIfChanged(filePath: string, content: string): Promise<"written" | "unchanged">;
 
 // forge/os/compass/handlers/compass-inventory.ts (new — from site-kernel)
 export function createCompassInventoryEntries(rootDir: string, options: CompassScanOptions): CompassInventoryEntry[];
 
 // forge/os/compass/handlers/resolve-scan-root.ts (new — from site-kernel)
-export function resolveCompassScanRoot(context: ForgeRuntimeContext): string;
+// In autonomous mode, site-scoped scanning is not available. The function uses
+// --packages/--package flags from input to determine the scan root. Default
+// roots are apps/, packages/, services/ relative to workspaceRoot.
+export function resolveCompassScanRoot(
+  input: ForgeCommandInput,
+  context: ForgeRuntimeContext,
+): string | undefined;
 
 // forge/os/compass/handlers/git-revision.ts (new — from site-kernel-integrity)
-export function getRevisionByPath(filePath: string): number; // git-history-only fallback
+// Git-history-only fallback. Returns revision=1 when git is unavailable (matches
+// existing site-kernel-integrity behavior — files treated as "just created", not
+// "never audited"). The integrity-registry path is dropped entirely in the inlined
+// version; autonomous mode uses git history only.
+export interface GitRevisionResult {
+  revision: number;
+  entityId: string | null;
+  contentHash: string;
+}
+export function getRevisionByPath(
+  cwd: string,
+  repoPath: string,
+): Promise<GitRevisionResult>;
 
 // forge/os/werkstatt/handlers/lock.ts (new — from site-kernel-handoff)
-export function readAllLocks(dir: string): WerkstattLock[];
-export function acquireLock(params: LockParams): Promise<WerkstattLock>;
-export function releaseLock(id: string): Promise<void>;
-export function isLockStale(lock: WerkstattLock): boolean;
+// Note: acquireLock/releaseLock take workspaceRoot as first parameter (not a
+// params object) to match the existing site-kernel-handoff API shape.
+export function readAllLocks(workspaceRoot: string): Promise<Array<WerkstattLock & { stale: boolean }>>;
+export function acquireLock(workspaceRoot: string, scope: string, operationId: string, command: string, owner: string, timeoutSeconds?: number): Promise<WerkstattLock>;
+export function releaseLock(workspaceRoot: string, scope: string): Promise<void>;
+export function isLockStale(lock: WerkstattLock, now?: Date): boolean;
 
 // forge/os/werkstatt/handlers/schema.ts (new — inlined from @warpgogol/ontology)
 export const werkstattLockSchema: z.ZodSchema<WerkstattLock>;
@@ -186,7 +206,7 @@ export const werkstattLockSchema: z.ZodSchema<WerkstattLock>;
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
+| --- | --- |
 | `packages/forge/os/compass/handlers/` | New — compass command implementations (inventory, validate, change-summary, audit) |
 | `packages/forge/os/compass/compass.module.ts` | Changed — remove try/catch, import from handlers/ directly |
 | `packages/forge/os/werkstatt/handlers/` | New — werkstatt command implementations (lock, operation-validate) |
@@ -197,6 +217,8 @@ export const werkstattLockSchema: z.ZodSchema<WerkstattLock>;
 | `packages/os/site-kernel-checks/src/compass*.ts` | Changed — delegate to `@webgogol/forge` implementations |
 | `packages/os/site-kernel-handoff/src/werkstatt/*.ts` | Changed — delegate to `@webgogol/forge` implementations |
 | `packages/forge/AGENTS.md` | Changed — update OS modules table, remove "graceful skip" documentation |
+| `packages/AGENTS.md` | Changed — update forge ownership entry: `os/` is no longer "kernel-dependent" for compass and werkstatt |
+| Root `AGENTS.md` | Changed — update forge import rules: `os/compass/` and `os/werkstatt/` no longer need the `@warpgogol/*` dynamic import exception |
 
 ### Output format
 
@@ -204,7 +226,7 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 
 ### Failure modes
 
-- **Git unavailable (autonomous mode):** `getRevisionByPath` returns `revision=0`. Audit commands operate in safe-degradation mode — files are treated as "never audited" and `compass.audit.validate` emits warnings instead of hard failures.
+- **Git unavailable (autonomous mode):** `getRevisionByPath` returns `revision=1` (matching existing `site-kernel-integrity` behavior). Files are treated as "just created" — not immediately audit-overdue. `compass.audit.validate` emits warnings (not hard failures) for overdue files. The integrity-registry path is dropped entirely; autonomous mode uses git history only.
 - **Missing `writeFileIfChanged` target directory:** Command fails with a clear error message (same as current behavior in kernel mode).
 - **Invalid Compass scaffolding:** `compass.validate` emits diagnostics with the same rule IDs and severity levels as the kernel implementation.
 
@@ -235,8 +257,8 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 
 ## Risks
 
-- **Code duplication (~1300 lines):** Compass and werkstatt logic exists in both forge (autonomous) and kernel-packages (delegating). Mitigated by dependency inversion — kernel-packages delegate to forge, so there is one implementation, not two.
-- **Audit revision accuracy in autonomous mode:** Git-history-only `getRevisionByPath` may count revisions differently than the integrity-registry-based approach. Acceptable — audit is a governance tool, not a build gate, and safe-degradation (revision=0, warn) prevents false failures.
+- **Code duplication (~2200 lines):** Compass and werkstatt logic is inlined into forge (~2,235 lines across 13 files: `compass-inventory.ts` 522, `compass.ts` handlers ~293, `compass-audit.ts` 382, `compass-change-summary.ts` 286, `resolve-compass-scan-root.ts` 73, `fs-idempotent.ts` 42, `compass-audit-helpers.ts` 67, `git.ts` ~25, `werkstatt-lock-status.ts` 71, `werkstatt-lock-recover.ts` 174, `lock.ts` 145, `werkstatt-operation-validate.ts` 105, `werkstatt.ts` schema ~50). Mitigated by dependency inversion — kernel-packages delegate to forge, so there is one implementation, not two.
+- **Audit revision accuracy in autonomous mode:** Git-history-only `getRevisionByPath` may count revisions differently than the integrity-registry-based approach. Acceptable — audit is a governance tool, not a build gate, and safe-degradation (revision=1, warn) prevents false failures.
 - **`port-validate.ts` relaxation:** Removing `@warpgogol/site-kernel-checks` and `@warpgogol/site-kernel-handoff` from `FORBIDDEN_IMPORTS` for os/ modules weakens the autonomy guard. Mitigated by the fact that os/compass/ and os/werkstatt/ will no longer import from those packages at all — the guard becomes unnecessary for these modules.
 - **Agent misinterpretation:** Agents may assume compass/werkstatt commands are still kernel-dependent after reading old AGENTS.md sections. Mitigated by updating `packages/forge/AGENTS.md` to remove "graceful skip" language.
 
@@ -246,7 +268,7 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 - [ ] `forgeCompassModule` and `forgeWerkstattModule` import from handlers/ without any `try/catch` or dynamic `@warpgogol/*` imports
 - [ ] `bin/cli.ts` loads compass and werkstatt modules without `.catch(() => null)`
 - [ ] `writeFileIfChanged` utility exists in `packages/forge/src/utils/fs-idempotent.ts`
-- [ ] `getRevisionByPath` works with git-history-only fallback (returns 0 when git is unavailable)
+- [ ] `getRevisionByPath` works with git-history-only fallback (returns 1 when git is unavailable, matching existing `site-kernel-integrity` behavior)
 - [ ] `site-kernel-checks/src/compass*.ts` delegates to `@webgogol/forge` implementations
 - [ ] `site-kernel-handoff/src/werkstatt/*.ts` delegates to `@webgogol/forge` implementations
 - [ ] `packages/forge/AGENTS.md` updated — OS modules table no longer mentions "graceful skip" for compass and werkstatt
@@ -262,8 +284,9 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- When inlining compass handlers, copy logic from `packages/os/site-kernel-checks/src/compass.ts`, `compass-audit.ts`, and `compass-change-summary.ts`. Adapt types to use `ForgeRuntimeContext` instead of `KernelRuntimeContext`.
+- When inlining compass handlers, copy logic from `packages/os/site-kernel-checks/src/compass.ts`, `compass-audit.ts`, and `compass-change-summary.ts`. Adapt types to use `ForgeRuntimeContext` instead of `KernelRuntimeContext`. Note: `resolveCompassScanRoot` accesses `context.site`/`context.siteExplicit` in kernel mode — in autonomous mode, these fields are absent; the function uses `--packages`/`--package` flags from `input` and defaults to scanning `apps/`, `packages/`, `services/` relative to `workspaceRoot`.
+- `werkstatt-operation-validate.ts` uses `context.io.readFile(filePath)` (the `WorkspaceIO` abstraction) in kernel mode. The inlined version must use `node:fs/promises` `readFile` directly — `ForgeRuntimeContext` has no `io` field.
+- `getRevisionByPath` should use `git log --follow --diff-filter=AMT --format=%H -- <file>` and count output lines (matching existing `site-kernel-integrity/src/git.ts` implementation). Wrap in try/catch — return `revision=1` on any git error (not `0`). The `--diff-filter=AMT` flag excludes deleted files from the count. The integrity-registry path (`loadPathsCurrent`/`loadEntitiesById`) is dropped entirely in the inlined version.
 - When inlining werkstatt handlers, copy logic from `packages/os/site-kernel-handoff/src/werkstatt/lock.ts`, `werkstatt-lock-status.ts`, `werkstatt-lock-recover.ts`, and `packages/os/site-kernel-checks/src/werkstatt-operation-validate.ts`. Inline `werkstattLockSchema` from `packages/ontology/src/operations/werkstatt.ts`.
-- `getRevisionByPath` should use `git log --follow --oneline <file> | wc -l` as the fallback. Wrap in try/catch — return 0 on any git error.
 - After inlining, convert kernel-package files to thin delegation wrappers: `export { runCompassInventory } from '@webgogol/forge'` (or equivalent).
 - Run `forge doctor` after implementation to verify no `@warpgogol/*` import violations in forge source.
