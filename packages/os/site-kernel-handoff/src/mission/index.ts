@@ -51,6 +51,7 @@ export {
 } from "./mission-git-commit.ts";
 export { runMissionCleanup, type MissionCleanupData } from "./mission-cleanup.ts";
 export { resolveActorFromEnv, resolveActor, type ActorIdentity } from "./actor-identity.ts";
+export { createSignedCommit, type SignedCommitResult } from "./signed-commit.ts";
 
 export function createMissionModule(): KernelModule {
   return {
