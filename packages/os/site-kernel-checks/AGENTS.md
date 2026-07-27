@@ -40,6 +40,8 @@ Content validation and Compass scaffolding inventory for all Astro sites in `app
 | `src/team-cross-page.ts` | RFC-0513 `runTeamCrossPageValidate` — validates cross-page consistency: hub lists public active participants, home page shows only active public humans, navigation has team (not founder), JSON endpoints match HTML pages. No-op pass when the site has no people records or no team hub page. |
 | `src/contact-form.ts` | RFC-0514 `runContactFormValidate` — validates that sites using the send-message section declare emailField with enabled: true consistently across all published locales. No-op pass when the site has no send-message blocks. |
 | `src/gate-catalog.ts` | RFC-0519 `runGateCatalogGenerate` and `runGateCatalogValidate` — generates `docs/gate-catalog.generated.yaml` from live command registrations and gate metadata (RFC-0518), validates for drift. Diagnostics: GATE-CAT-01 (missing), GATE-CAT-02 (drift), GATE-CAT-03 (missing gate metadata), GATE-CAT-04 (phase mismatch), GATE-CAT-05 (unknown blocks target). |
+| `src/template-imports-validate.ts` | RFC-0557 `runTemplateImportsValidate` — auto-discovers template files across workspace packages, extracts static + dynamic `@warpgogol/*`/`@webgogol/*` imports, checks root `package.json` devDependencies, and runs `pnpm install --frozen-lockfile` to detect lockfile drift. Integrated into `PACKAGES_CHECK_PIPELINE` after `workspace.discovery.validate`. Diagnostics: TEMPLATE-IMPORTS-01 (missing from root devDeps), TEMPLATE-IMPORTS-02 (frozen-lockfile failure). |
+| `src/workpiece-imports-validate.ts` | RFC-0557 `runWorkpieceImportsValidate` — scans materialized workpiece `tools/**/*.ts` and `src/**/*.{ts,mjs,astro}` files for `@warpgogol/*`/`@webgogol/*` imports and verifies resolvability from root `node_modules`. Integrated into `SITES_BUILD_PREPARE_PIPELINE` as first step. Requires `--site <name>` flag. Diagnostics: WORKPIECE-IMPORTS-01 (unresolved import). |
 | `src/audit/validators/wikidata.ts` | RFC-0531, RFC-0535 `runWikidataValidate` — validates PBP content and rendered JSON-LD for Wikidata integration readiness: QID presence on Business/Brand/LegalIdentity, URL construction from schemeRef+value, projection parity between PBP externalIdentifiers and rendered Organization sameAs, LegalIdentity legalName, Claim/EvidenceSource coverage (notability evidence, factual claim evidence, evidence reference integrity, evidence source URL validity). Diagnostics: wikidata.business-missing-qid, wikidata.brand-missing-qid, wikidata.legalidentity-missing-qid, wikidata.malformed-url, wikidata.projection-parity, wikidata.legalidentity-missing-legalname, wikidata.no-notability-evidence, wikidata.claim-without-evidence, wikidata.evidence-broken-ref, wikidata.evidence-missing-url |
 
 ## Check commands
@@ -57,12 +59,12 @@ A federated **`visual` domain** over the RFC-0203 Diagnostic model that catches 
 
 ## Related packages
 
-| Package                        | Responsibility                                                  |
-| ------------------------------ | --------------------------------------------------------------- |
-| `@warpgogol/site-kernel-codegen`   | Icon/open-source page generation and Compass backfill (codegen) |
-| `@warpgogol/site-kernel-changelog` | AI-powered changelog generation                                 |
-| `@warpgogol/site-kernel-deploy`    | Client workspace export                                         |
-| `@warpgogol/site-kernel-integrity` | Build artifact integrity commands                               |
+| Package | Responsibility |
+| --- | --- |
+| `@warpgogol/site-kernel-codegen` | Icon/open-source page generation and Compass backfill (codegen) |
+| `@warpgogol/site-kernel-changelog` | AI-powered changelog generation |
+| `@warpgogol/site-kernel-deploy` | Client workspace export |
+| `@warpgogol/site-kernel-integrity` | Build artifact integrity commands |
 
 ## Rules
 
