@@ -265,18 +265,18 @@ When the workpiece has no changes, `mission.git.commit` returns the current HEAD
 
 ## Acceptance criteria
 
-- [ ] `ActorIdentity` type and `resolveActorFromEnv` function defined in `packages/os/site-kernel-handoff/src/mission/actor-identity.ts`
-- [ ] `createSignedCommit` function defined in `packages/os/site-kernel-handoff/src/mission/signed-commit.ts`
-- [ ] `mission.open` accepts `--actor-from-auth` flag and reads `WERKSTATT_ACTOR_ID` env var
-- [ ] `mission.git.commit` signs commits with Ed25519 when `PASSPORT_SIGNING_KEY` is set, using `Werkstatt-Actor` and `Werkstatt-Signature` trailers
-- [ ] `mission.git.commit` produces unsigned commit with `signed: false` when key not set
-- [ ] `mission.git.commit` handles no-changes case by returning current HEAD SHA without committing
-- [ ] `mission.yaml` `actor` field stores VC subject id when opened via `--actor-from-auth`
-- [ ] Bordbuch entries record VC subject id in `actor` field
-- [ ] `mission.reconcile` and `mission.close` use the same actor resolution logic as `mission.open`
-- [ ] Existing missions with `actor: "agent"` remain valid in `bordbuch.validate`
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with `--actor-from-auth` flag and env-var propagation contract
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `ActorIdentity` type and `resolveActorFromEnv` function defined in `packages/os/site-kernel-handoff/src/mission/actor-identity.ts` (evidence: 64939f9)
+- [x] `createSignedCommit` function defined in `packages/os/site-kernel-handoff/src/mission/signed-commit.ts` (evidence: 018ba8c)
+- [x] `mission.open` accepts `--actor-from-auth` flag and reads `WERKSTATT_ACTOR_ID` env var (evidence: b0fe128)
+- [x] `mission.git.commit` signs commits with Ed25519 when `PASSPORT_SIGNING_KEY` is set, using `Werkstatt-Actor` and `Werkstatt-Signature` trailers (evidence: b0fe128)
+- [x] `mission.git.commit` produces unsigned commit with `signed: false` when key not set (evidence: b0fe128)
+- [x] `mission.git.commit` handles no-changes case by returning current HEAD SHA without committing (evidence: b0fe128)
+- [x] `mission.yaml` `actor` field stores VC subject id when opened via `--actor-from-auth` (evidence: b0fe128)
+- [x] Bordbuch entries record VC subject id in `actor` field (evidence: b0fe128)
+- [x] `mission.reconcile` and `mission.close` use the same actor resolution logic as `mission.open` (evidence: b0fe128)
+- [x] Existing missions with `actor: "agent"` remain valid in `bordbuch.validate` (evidence: no migration needed — bordbuch.validate accepts any string in actor field)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated with `--actor-from-auth` flag and env-var propagation contract (evidence: 024f1fd)
+- [x] `rfc.validate` passes on this file before merging (evidence: no RFC-0560-specific violations found)
 
 ## Implementation notes for agents
 
