@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
+enhancedAt: 2026-07-27
 implementedAt:
 closedAt:
 supersedes: []
@@ -52,7 +53,8 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - packages/ontology
-  - packages/os/site-kernel-onboarding
+  - packages/os/site-kernel-handoff
+  - packages/studio-gate
 successSignals:
   - "A fleet registry entry with an owner field containing a VC subject id passes sternsystem.validate."
   - "A fleet registry entry without an owner field passes sternsystem.validate with a notice-level warning, not an error."
@@ -129,13 +131,18 @@ pnpm exec site-kernel run sternsystem.register --id legacy-site --repo https://g
 ```ts
 // packages/ontology/src/operations/sternsystem.ts
 
+// VC subject id format: did:web:<domain>#<key-version> (RFC-0558)
+const didWebRe = /^did:web:[a-z0-9.-]+#.+$/;
+
 // Existing fleetRegistryEntrySchema gains optional owner field
 export const fleetRegistryEntrySchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
   repo: z.string().url(),
   pin: z.string().optional(),
-  // NEW: VC subject id from SiteOwnershipCredential
-  owner: z.string().optional(),
+  // NEW: VC subject id from SiteOwnershipCredential (RFC-0558)
+  // Format: did:web:<domain>#<key-version>
+  // Empty string is NOT valid — owner is either absent or a non-empty did:web identifier
+  owner: z.string().regex(didWebRe, "owner must be a did:web identifier (did:web:<domain>#<key-version>)").optional(),
   // ... existing fields
 });
 
@@ -144,13 +151,16 @@ export type FleetRegistryEntry = z.infer<typeof fleetRegistryEntrySchema>;
 
 // packages/studio-gate/src/auth.ts (addition to RFC-0559)
 
+// Registry path is always systems/registry.yaml relative to the workspace root.
+// Studio Gate runs in the workspace root, so the path is fixed.
 export async function verifyOwnership(
   siteId: string,
   credentialSubjectId: string,
-  registryPath: string,
+  registryPath: string, // always systems/registry.yaml relative to workspace root
 ): Promise<boolean> {
-  // 1. Read registry entry for siteId
+  // 1. Read registry entry for siteId from registryPath
   // 2. If entry.owner is absent, return true (permissive) or false (enforced)
+  //    Mode is determined by authMode in werkstatt.identity.json (RFC-0559)
   // 3. If entry.owner is present, return entry.owner === credentialSubjectId
 }
 ```
@@ -161,7 +171,7 @@ export async function verifyOwnership(
 | --- | --- |
 | `packages/ontology/src/operations/sternsystem.ts` | `fleetRegistryEntrySchema` gains optional `owner?: string` field. |
 | `systems/registry.yaml` | Fleet registry entries may include `owner` field. Existing entries without `owner` remain valid. |
-| `packages/os/site-kernel-onboarding/src/register.ts` | `sternsystem.register` accepts `--owner` flag and writes it to the registry entry. |
+| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-register.ts` | `sternsystem.register` accepts `--owner` flag and writes it to the registry entry. `--amend --id <existing-site> --owner <new-id>` updates owner for existing entries. |
 | `packages/studio-gate/src/auth.ts` | `verifyOwnership` function reads registry entry and checks `owner` field against credential subject. |
 
 ### Output format
@@ -188,9 +198,9 @@ Entries without `owner` produce a notice-level warning, not an error. The `statu
 
 | Condition | Behavior |
 | --- | --- |
-| `owner` field present and valid VC subject id | `sternsystem.validate` passes. |
+| `owner` field present and valid `did:web` identifier | `sternsystem.validate` passes. |
 | `owner` field absent | `sternsystem.validate` passes with notice-level warning. Not an error. |
-| `owner` field present but not a valid VC subject id format | `sternsystem.validate` fails with `owner-format-invalid` error. |
+| `owner` field present but not a valid `did:web:<domain>#<key-version>` format | `sternsystem.validate` fails with `owner-format-invalid` error. |
 | Studio Gate enforced mode + registry `owner` absent | Studio Gate rejects call with `owner-not-registered` error. |
 | Studio Gate permissive mode + registry `owner` absent | Studio Gate logs warning, executes call. |
 | Credential subject does not match registry `owner` | Studio Gate rejects call with `owner-mismatch` error. |
@@ -200,7 +210,7 @@ Entries without `owner` produce a notice-level warning, not an error. The `statu
 - **Phase 1 (schema change):** Add optional `owner` field to `fleetRegistryEntrySchema`. `sternsystem.validate` accepts entries with or without `owner`. No breaking change.
 - **Phase 2 (registration):** `sternsystem.register` accepts `--owner` flag. New sites registered with owner. Existing sites remain without `owner`.
 - **Phase 3 (Studio Gate integration):** Studio Gate auth middleware reads `owner` from registry. In permissive mode, missing `owner` is a warning. In enforced mode, missing `owner` is an error.
-- **Phase 4 (backfill):** Operators run `sternsystem.register --id <existing-site> --owner <vc-subject-id>` to backfill owner for existing sites. This is a manual operator action, not automated.
+- **Phase 4 (backfill):** Operators run `sternsystem.register --amend --id <existing-site> --owner <vc-subject-id>` to backfill owner for existing sites. This is a manual operator action, not automated. The `--amend` flag is already supported by `sternsystem.register` for updating existing entries.
 
 ## Alternatives considered
 
@@ -212,20 +222,28 @@ Entries without `owner` produce a notice-level warning, not an error. The `statu
 ## Risks
 
 - **Owner field not backfilled.** Operators may forget to backfill `owner` for existing sites. In enforced mode, Studio Gate will reject calls to these sites. Mitigation: `sternsystem.validate` produces notice-level warnings for entries without `owner`, making the gap visible.
-- **Owner mismatch between registry and VC.** If an operator rotates keys (RFC-0558 future `rotateKey`), the VC subject id changes but the registry `owner` field still has the old id. Mitigation: operators must update the registry `owner` field when rotating keys. A future RFC may automate this.
+- **Owner mismatch between registry and VC.** If an operator rotates keys (RFC-0558 future `rotateKey`), the VC subject id changes but the registry `owner` field still has the old id. Mitigation: operators update the registry `owner` field via `sternsystem.register --amend --id <site> --owner <new-did>`. A future RFC may automate this.
 - **No transfer mechanism.** The pilot does not support ownership transfer. If a site is sold or transferred, the operator must manually update the registry `owner` field and issue a new VC. This is acceptable for the pilot but will need a formal transfer flow in the future.
 - **Agent confusion.** LLM agents may not understand the relationship between VC subject id and registry `owner`. Mitigation: Studio Gate handles this automatically — agents do not need to manually check ownership.
 
 ## Acceptance criteria
 
-- [ ] `fleetRegistryEntrySchema` in `packages/ontology/src/operations/sternsystem.ts` has optional `owner?: string` field
+- [ ] `fleetRegistryEntrySchema` in `packages/ontology/src/operations/sternsystem.ts` has optional `owner` field validated against `did:web:<domain>#<key-version>` format
 - [ ] `sternsystem.register` accepts `--owner` flag
 - [ ] `sternsystem.validate` passes for entries with and without `owner` field
 - [ ] `sternsystem.validate` produces notice-level warning for entries without `owner`
-- [ ] `sternsystem.validate` fails for entries with malformed `owner` field
+- [ ] `sternsystem.validate` fails for entries with `owner` field that does not match `did:web:<domain>#<key-version>` format
 - [ ] Studio Gate `verifyOwnership` function reads registry `owner` field
 - [ ] Existing `systems/registry.yaml` entries without `owner` remain valid
 - [ ] `rfc.validate` passes on this file before merging
+
+### Owner field format
+
+The `owner` field stores a VC subject id in `did:web:<domain>#<key-version>` format, as defined by RFC-0558's `SiteOwnershipCredentialSubject.id`. The Zod schema validates this format at parse time. The domain in the `did:web` identifier is NOT required to match the Sternsystem id — an operator may own multiple sites with different domains. An empty string is not valid; `owner` is either absent (undefined) or a non-empty `did:web` identifier.
+
+### Studio Gate mode configuration
+
+Studio Gate's permissive vs enforced mode is controlled by `authMode` in `werkstatt.identity.json`, as established by RFC-0559. This RFC does not redefine the mode configuration — it relies on RFC-0559's auth middleware mode. When `owner` is absent from the registry entry, Studio Gate's behavior depends on the existing `authMode` setting: permissive mode logs a warning and executes; enforced mode rejects with `owner-not-registered`.
 
 ## Implementation notes for agents
 
