@@ -100,6 +100,19 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - Module: `src/change-impact.module.ts` — registers `change.impact.derive`; add `changeImpactModule` to app `kernel.config.ts`.
 - Advisory only — DNA-35 remains the readiness signal.
 
+## Git-mesh (RFC-0563)
+
+- `src/gitmesh/` — P2P replication of the platform monorepo across workshops (RFC-0562 Layer 1).
+- `types.ts` — `GitMeshConfig`, `GitMeshRemote`, `GitMeshSyncResult`, `GitMeshStatus`, `GitMeshVerifyResult` interfaces.
+- `config.ts` — loads `werkstatt.gitmesh.json`, validates schema, auto-creates from `.git/config` remotes in Phase 1.
+- `git-ops.ts` — thin wrappers around `git` CLI: fetch, merge --ff-only, fsck, rev-parse, commit timestamp, ancestor check, remote list, signature status log.
+- `sync.ts` — `gitmesh.sync` handler: fetches from all remotes, converges on highest committer timestamp, advances HEAD via `git merge --ff-only`. Pull-only — never pushes. Lock file at `.git/gitmesh.lock`.
+- `status.ts` — `gitmesh.status` handler: local-only query (no network I/O). Reports local SHA, remote SHA, behind/ahead counts, last sync time.
+- `verify.ts` — `gitmesh.verify` handler: verifies commit signatures against operator public key from `werkstatt.identity.json`. Incremental via `.git/gitmesh.last-verified`.
+- `gitmesh-module.ts` — registers `gitmesh.sync`, `gitmesh.status`, `gitmesh.verify` workspace commands. All commands are `cacheable: false` (depend on external git/network state).
+- Config file: `werkstatt.gitmesh.json` (workspace root).
+- State files: `.git/gitmesh.lock` (sync lock), `.git/gitmesh.last-sync` (last sync timestamp), `.git/gitmesh.last-verified` (last verified HEAD SHA).
+
 ## Related packages
 
 | Package | Role |

@@ -247,4 +247,17 @@
       <rule>Backfill or mutation automation should be added only after inventory and validation surfaces are stable and idempotent.</rule>
     </rules>
   </Compass-automation>
+
+  <p2p-topology>
+    <layer id="git-mesh" rfc="RFC-0563">
+      <path>`packages/os/site-kernel/src/gitmesh/`</path>
+      <role>Layer 1: P2P replication of the platform monorepo across workshops. Standard git protocols (fetch/merge --ff-only) with commit signature verification (RFC-0560). Commands: gitmesh.sync, gitmesh.status, gitmesh.verify.</role>
+    </layer>
+    <rules>
+      <rule>gitmesh.sync is pull-only — never pushes to remotes.</rule>
+      <rule>Convergence uses highest committer timestamp among remote-tracking branches.</rule>
+      <rule>gitmesh.status is a local-only query — no network I/O.</rule>
+      <rule>gitmesh.verify is incremental — only new commits since last verification are checked.</rule>
+    </rules>
+  </p2p-topology>
 </technology>

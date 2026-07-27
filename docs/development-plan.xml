@@ -418,4 +418,18 @@
     <rule>If generated inventory or validation heuristics produce unstable churn, stop before source mutation work and correct the classification logic first.</rule>
     <rule>Do not bind new Compass validation commands into mandatory build pipelines until the corresponding coverage wave is complete.</rule>
   </rollback-strategy>
+
+  <p2p-rollout>
+    <layer id="layer-1-git-mesh" rfc="RFC-0563">
+      <status>implemented</status>
+      <targets>
+        <target>`packages/os/site-kernel/src/gitmesh/`</target>
+      </targets>
+      <commands>
+        <command>gitmesh.sync</command>
+        <command>gitmesh.status</command>
+        <command>gitmesh.verify</command>
+      </commands>
+    </layer>
+  </p2p-rollout>
 </development-plan>
