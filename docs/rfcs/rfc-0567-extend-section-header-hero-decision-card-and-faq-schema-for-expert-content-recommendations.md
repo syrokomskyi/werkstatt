@@ -224,20 +224,20 @@ return all
 
 ## Acceptance criteria
 
-- [ ] `eyebrow` prop added to `SECTION_HEADER_FRAGMENT` in `packages/ontology/src/shared-section-props/visual-header.ts`
-- [ ] `eyebrow` added to `sectionHeaderSchema` in `packages/share/src/schemas/section-header.ts`
-- [ ] `eyebrow` rendered above `heading` in `<SectionHeader>` Astro component
-- [ ] `ctaNote` prop added to `hero-decision-card` archetype schema and manifest
-- [ ] `ctaNote` rendered between CTAs and decision card in `hero-decision-card-section.astro`
-- [ ] `orderTags` field added to `faqSchema` in `packages/faq/src/schema.ts`
-- [ ] `getFaqEntriesByTags` uses `orderTags[queriedTag]` with fallback to `order`
-- [ ] `packages/faq/AGENTS.md` documents `orderTags` field and per-tag ordering behavior
-- [ ] `pnpm --filter @warpgogol/ontology build:check` passes
-- [ ] `pnpm --filter @warpgogol/share build:check` passes
-- [ ] `pnpm --filter @warpgogol/ui build:check` passes
-- [ ] `pnpm --filter @warpgogol/faq build:check` passes
-- [ ] Existing content passes `page.block.validate` without changes (backward-compatible)
-- [ ] `rfc.validate` passes on this file
+- [x] `eyebrow` prop added to `SECTION_HEADER_FRAGMENT` in `packages/ontology/src/shared-section-props/visual-header.ts` (evidence: packages/ontology/src/shared-section-props/visual-header.ts:155)
+- [x] `eyebrow` added to `sectionHeaderSchema` in `packages/share/src/schemas/section-header.ts` (evidence: packages/share/src/schemas/section-header.ts:55)
+- [x] `eyebrow` rendered above `heading` in `<SectionHeader>` Astro component (evidence: packages/ui/src/components/section-header/section-header.astro:61)
+- [x] `ctaNote` prop added to `hero-decision-card` archetype schema and manifest (evidence: packages/ontology/archetypes/sections/hero-decision-card.yaml:29, packages/ui/src/sections/hero-decision-card/hero-decision-card-section.manifest.yaml:35)
+- [x] `ctaNote` rendered between CTAs and decision card in `hero-decision-card-section.astro` (evidence: packages/ui/src/sections/hero-decision-card/hero-decision-card-section.astro:160)
+- [x] `orderTags` field added to `faqSchema` in `packages/faq/src/schema.ts` (evidence: packages/faq/src/schema.ts:37)
+- [x] `getFaqEntriesByTags` uses `orderTags[queriedTag]` with fallback to `order` (evidence: packages/faq/src/astro.ts:46-56)
+- [x] `packages/faq/AGENTS.md` documents `orderTags` field and per-tag ordering behavior (evidence: packages/faq/AGENTS.md:20,34)
+- [x] `pnpm --filter @warpgogol/ontology build:check` passes (evidence: tsc --noEmit exit 0)
+- [x] `pnpm --filter @warpgogol/share build:check` passes (evidence: tsc --noEmit exit 0)
+- [x] `pnpm --filter @warpgogol/ui build:check` passes (evidence: tsc --noEmit exit 0)
+- [x] `pnpm --filter @warpgogol/faq build:check` passes (evidence: tsc --noEmit exit 0)
+- [x] Existing content passes `page.block.validate` without changes (backward-compatible) (evidence: page.block.validate --json status:pass)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate RFC-0567 --json status:pass)
 
 ## Implementation notes for agents
 
