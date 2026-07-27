@@ -26,7 +26,6 @@ const {
   sectionNumber,
   hideSectionNumber = false,
   heading,
-  eyebrow,
   subheading,
   align = "left",
   level = 2,
@@ -58,7 +57,6 @@ const HeadingTag = `h${level}` as "h1" | "h2";
     { "section-header--with-number": showNumber },
   ]}
 >
-  {eyebrow && <p class="section-header__eyebrow">{eyebrow}</p>}
   <div class="section-header__main">
     {
       showNumber && (

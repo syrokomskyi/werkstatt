@@ -76,12 +76,6 @@
   .hero-decision-card__ctas--center {
     justify-content: center;
   }
-  .hero-decision-card__cta-note {
-    margin: 0;
-    font-size: var(--ds-text-sm-80);
-    line-height: var(--ds-line-height-md);
-    color: var(--ds-color-text-muted);
-  }
   .hero-decision-card__lead {
     margin-bottom: var(--ds-space-4);
   }
