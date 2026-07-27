@@ -129,6 +129,7 @@ const decisionCardAriaLabel = need(
       <SectionHeader
         sectionNumber=""
         heading={need("header.heading", props.header?.heading)}
+        eyebrow={props.header?.eyebrow}
         subheading={props.header?.subheading ?? props.tagline}
         align={props.header?.align ?? "left"}
         level={props.header?.level ?? 1}
@@ -156,6 +157,7 @@ const decisionCardAriaLabel = need(
           )
         }
       </div>
+      {props.ctaNote && <p class="hero-decision-card__cta-note">{props.ctaNote}</p>}
     </div>
 
     {
