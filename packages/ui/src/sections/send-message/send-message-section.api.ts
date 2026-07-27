@@ -15,6 +15,7 @@ form no longer delivers synchronously; the exchange is standardized on the queue
   <item>RFC-0168: route delivery through the Integration Port (channels + CRM).</item>
   <item>RFC-0181: standardize on QStash — publish an IntegrationEvent instead of delivering synchronously.</item>
   <item>RFC-0514: accept structured email/phone as top-level fields; remove regex extraction.</item>
+  <item>RFC-0567: accept and forward referrer field in IntegrationEvent payload.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,7 +30,13 @@ const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_MESSAGE_LENGTH = 4000;
 const DEFAULT_FORM_ID = "send-message";
 
-type SendMessageBody = { message?: unknown; formId?: unknown; email?: unknown; phone?: unknown };
+type SendMessageBody = {
+  message?: unknown;
+  formId?: unknown;
+  email?: unknown;
+  phone?: unknown;
+  referrer?: unknown;
+};
 
 function normalizeString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -51,6 +58,7 @@ export const POST: APIRoute = async ({ request }) => {
   const formId = normalizeFormId(payload.formId);
   const email = normalizeString(payload.email);
   const phone = normalizeString(payload.phone);
+  const referrer = normalizeString(payload.referrer);
 
   if (message.length < 1) return json({ ok: false, error: "empty-message" }, 400);
   if (message.length > MAX_MESSAGE_LENGTH)
@@ -65,7 +73,7 @@ export const POST: APIRoute = async ({ request }) => {
     locale: request.headers.get("accept-language")?.split(",")[0] ?? "",
     occurredAt: new Date().toISOString(),
     contact: { email, ...(phone ? { phone } : {}) },
-    payload: { message },
+    payload: { message, ...(referrer ? { referrer } : {}) },
   };
 
   if (!UPSTASH_QSTASH_TOKEN) {

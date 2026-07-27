@@ -228,7 +228,7 @@ function renderGeneratedTypesFile(info: ManifestPropsInfo, sourceRelPath: string
   const header = [
     buildGeneratedHeader({
       ownerCommand: "props.types.generate",
-      filePath: sourceRelPath,
+      filePath: info.generatedTypesPath,
     }).trimEnd(),
     `// sourceHash: ${sourceHash}`,
     `// Source: ${sourceRelPath}`,

@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0140: Introduce colocated client script for the send-message section.</item>
   <item>RFC-0514: Read structured email/phone fields; remove regex-based hasContactDetails.</item>
+  <item>RFC-0567: Add referrerField handling — query, validate, transmit referrer value.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,6 +20,7 @@ interface SendMessagePayload {
   formId: string;
   email?: string;
   phone?: string;
+  referrer?: string;
 }
 
 const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,6 +62,7 @@ function bindForm(root: HTMLElement): void {
   const textarea = root.querySelector<HTMLTextAreaElement>("[data-send-message-textarea]");
   const emailInput = root.querySelector<HTMLInputElement>("[data-send-message-email]");
   const phoneInput = root.querySelector<HTMLInputElement>("[data-send-message-phone]");
+  const referrerInput = root.querySelector<HTMLInputElement>("[data-send-message-referrer]");
   const button = root.querySelector<HTMLButtonElement>("[data-send-message-submit]");
   const statusEl = root.querySelector<HTMLElement>("[data-send-message-status]");
   const successEl = root.querySelector<HTMLElement>("[data-send-message-success]");
@@ -86,6 +89,8 @@ function bindForm(root: HTMLElement): void {
   const emailFieldRequired = form.dataset.emailFieldRequired === "true";
   const phoneFieldEnabled = form.dataset.phoneFieldEnabled === "true";
   const phoneFieldRequired = form.dataset.phoneFieldRequired === "true";
+  const referrerFieldEnabled = form.dataset.referrerFieldEnabled === "true";
+  const referrerFieldRequired = form.dataset.referrerFieldRequired === "true";
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -93,6 +98,7 @@ function bindForm(root: HTMLElement): void {
     const message = textarea.value.trim();
     const email = emailInput?.value.trim() ?? "";
     const phone = phoneInput?.value.trim() ?? "";
+    const referrer = referrerInput?.value.trim() ?? "";
 
     if (!message || message.length < Math.max(minMessageLength, 1)) {
       setStatus(statusEl, "error", emptyMessage, "");
@@ -118,6 +124,12 @@ function bindForm(root: HTMLElement): void {
       return;
     }
 
+    if (referrerFieldEnabled && referrerFieldRequired && !referrer) {
+      setStatus(statusEl, "error", form.dataset.referrerFieldLabel || "Referrer is required", "");
+      referrerInput?.focus();
+      return;
+    }
+
     button.disabled = true;
     button.textContent = sendingLabel;
     setStatus(statusEl, "idle", "", "");
@@ -126,6 +138,7 @@ function bindForm(root: HTMLElement): void {
       const payload: SendMessagePayload = { message, formId };
       if (emailFieldEnabled && email) payload.email = email;
       if (phoneFieldEnabled && phone) payload.phone = phone;
+      if (referrerFieldEnabled && referrer) payload.referrer = referrer;
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -145,6 +158,7 @@ function bindForm(root: HTMLElement): void {
 
       if (emailInput) emailInput.value = "";
       if (phoneInput) phoneInput.value = "";
+      if (referrerInput) referrerInput.value = "";
       textarea.value = "";
       form.hidden = true;
       if (successEl) {
@@ -156,7 +170,12 @@ function bindForm(root: HTMLElement): void {
       if (fallbackEl && fallbackEmail && fallbackTextEl) {
         form.hidden = true;
         fallbackEl.hidden = false;
-        const fallbackBody = [message, email && "Email: " + email, phone && "Phone: " + phone]
+        const fallbackBody = [
+          message,
+          email && "Email: " + email,
+          phone && "Phone: " + phone,
+          referrer && "Referrer: " + referrer,
+        ]
           .filter(Boolean)
           .join("\n");
         fallbackTextEl.textContent = fallbackBody;
