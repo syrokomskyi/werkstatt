@@ -1,7 +1,7 @@
 ---
 id: RFC-0565
 title: "DHT Site Registry and Content Placement: S/Kademlia-hardened DHT for site lookups and mirror placement"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-27
 updatedAt: 2026-07-28
 enhancedAt: 2026-07-27
-implementedAt:
+implementedAt: 2026-07-28
 closedAt:
 supersedes: []
 supersededBy:
@@ -305,20 +305,20 @@ Registration involves storing the entry on K replication nodes. The cost is O(lo
 
 ## Acceptance criteria
 
-- [ ] `DHTSiteEntry`, `DHTConfig`, `DHTLookupResult`, `DHTPlacementResult`, `WorkshopCapacity` types defined in `packages/os/site-kernel/src/dht/types.ts` with corresponding Zod schemas in `packages/ontology/src/operations/dht.ts`
-- [ ] `dht.lookup` command resolves a site id to its DHT entry
-- [ ] `dht.register` command publishes a local registry entry to the DHT
-- [ ] `dht.placement` command decides which workshop should host a new site
-- [ ] `dht.status` command reports local DHT node status
-- [ ] `dht.node.init` command creates `werkstatt.dht.json` config file
-- [ ] `werkstatt.dht.json` config file schema defined and validated
-- [ ] DHT entries are signed with Ed25519 by the registering workshop (keypair from `identity.bootstrap`, RFC-0558)
-- [ ] DHT entries include `owner` field from RFC-0561 (depends on RFC-0561 being implemented first)
-- [ ] `dht.lookup` routes around dead workshops (detected by SWIM, RFC-0564)
-- [ ] Local caching of DHT lookup results with configurable TTL
-- [ ] `dht.placement` falls back to `reason: "local-fallback"` when SWIM capacity metrics are unavailable
-- [ ] Concurrent registration conflicts resolved via LWW on `lastUpdated` timestamp with owner-signature priority for equal timestamps
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `DHTSiteEntry`, `DHTConfig`, `DHTLookupResult`, `DHTPlacementResult`, `WorkshopCapacity` types defined in `packages/os/site-kernel/src/dht/types.ts` with corresponding Zod schemas in `packages/ontology/src/operations/dht.ts` (evidence: `packages/os/site-kernel/src/dht/types.ts`, `packages/ontology/src/operations/dht.ts`)
+- [x] `dht.lookup` command resolves a site id to its DHT entry (evidence: `packages/os/site-kernel/src/dht/lookup.ts`)
+- [x] `dht.register` command publishes a local registry entry to the DHT (evidence: `packages/os/site-kernel/src/dht/register.ts`)
+- [x] `dht.placement` command decides which workshop should host a new site (evidence: `packages/os/site-kernel/src/dht/placement.ts`)
+- [x] `dht.status` command reports local DHT node status (evidence: `packages/os/site-kernel/src/dht/status.ts`)
+- [x] `dht.node.init` command creates `werkstatt.dht.json` config file (evidence: `packages/os/site-kernel/src/dht/init.ts`)
+- [x] `werkstatt.dht.json` config file schema defined and validated (evidence: `packages/os/site-kernel/src/dht/config.ts`)
+- [x] DHT entries are signed with Ed25519 by the registering workshop (keypair from `identity.bootstrap`, RFC-0558) (evidence: `packages/passport/src/dht-sign.ts`, `packages/os/site-kernel/src/dht/register.ts`)
+- [x] DHT entries include `owner` field from RFC-0561 (depends on RFC-0561 being implemented first) (evidence: `packages/ontology/src/operations/dht.ts` `dhtSiteEntrySchema.owner`)
+- [x] `dht.lookup` routes around dead workshops (detected by SWIM, RFC-0564) (evidence: `packages/os/site-kernel/src/dht/lookup.ts` `isWorkshopAlive` seam)
+- [x] Local caching of DHT lookup results with configurable TTL (evidence: `packages/os/site-kernel/src/dht/cache.ts`)
+- [x] `dht.placement` falls back to `reason: "local-fallback"` when SWIM capacity metrics are unavailable (evidence: `packages/os/site-kernel/src/dht/placement.ts` `selectLeastLoaded`)
+- [x] Concurrent registration conflicts resolved via LWW on `lastUpdated` timestamp with owner-signature priority for equal timestamps (evidence: `packages/os/site-kernel/src/dht/register.ts` `resolveConflict`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --root .` passes with no RFC-0565 violations)
 
 ## Implementation notes for agents
 
