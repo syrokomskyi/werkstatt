@@ -62,6 +62,7 @@ export const fleetRegistryEntrySchema = z.object({
     .regex(repoRe, "mirror must be a valid git URL (SSH, HTTPS) or local file path")
     .optional(),
   deployment: deploymentConfigSchema.optional(),
+  owner: z.string().min(1).optional().describe("VC subject id of the site owner (RFC-0558)"),
   notes: z.string().default(""),
 });
 
