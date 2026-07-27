@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 657. Raw manifest entries: 1199.
+Generated command rows: 661. Raw manifest entries: 1203.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -617,6 +617,10 @@ Generated command rows: 657. Raw manifest entries: 1199.
 | `surface.translation.qa.validate` | site:warpgogol-com, workspace | app | no | no | Validate deterministic PSEO translation QA invariants such as numeric echo checks and human-review gates (RFC-0272). |
 | `surface.translation.validate` | site:warpgogol-com, workspace | app | no | no | Validate PSEO translated artifact lineage, sourceHash freshness, note/glossary ids, and target approval gates (RFC-0272). |
 | `surface.validate` | site:warpgogol-com, workspace | app | no | no | Validate src/surface.generated.yaml: unique pageIds, no collision with authored slugs, and every redirect stub targets a live entry (RFC-0192). |
+| `swim.join` | workspace | workspace | no | yes | RFC-0564: join a SWIM workshop network. Probes the seed node via UDP, creates werkstatt.swim.json if missing (generating UUID v7 for workshopId), records alive event to the CRDT genome log with Ed25519 signature. Ephemeral — SWIM instance is destroyed when command exits. Use --seed <host:port> to specify the seed node. Use --json for machine-readable output. |
+| `swim.leave` | workspace | workspace | no | no | RFC-0564: leave a SWIM workshop network. Records left event to the CRDT genome log with Ed25519 signature. Ephemeral — no long-running daemon to shut down. Use --json for machine-readable output. |
+| `swim.members` | workspace | workspace | no | no | RFC-0564: list workshop members from the CRDT genome log. Local-only query — no network I/O. Reads werkstatt.genome.log, verifies signatures, derives membership view (latest event per workshop wins). Use --json for machine-readable output. |
+| `swim.status` | workspace | workspace | no | no | RFC-0564: check local SWIM status. Reports configuration state, workshopId, genome log size (warns at 10MB), membership view, and any skipped entries. Local-only query — no network I/O. Use --json for machine-readable output. |
 | `system-md.compile` | site:warpgogol-com, workspace | workspace | yes | no | Compile system.md from a site-plan/frontmatter source into an app content directory (RFC-0072). |
 | `system.manifest.validate` | site:warpgogol-com, workspace | app | no | no | Validate apps/<app>/src/content/system.md against systemManifestSchema, fail on legacy system.yaml, check identity.systemStar usage, and verify constellation slugs resolve (DNA-23, RFC-0025, RFC-0077). |
 | `team.cross-page.validate` | site:warpgogol-com, workspace | app | no | no | Validate cross-page consistency: hub lists public active participants, home page shows only active public humans, navigation has team (not founder), JSON endpoints match HTML pages. No-op pass when the site has no people records or no team hub page (RFC-0513). |
