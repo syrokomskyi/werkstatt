@@ -7,7 +7,7 @@
   <item>Redirect incoming requests to the appropriate language-prefixed path.</item>
 </responsibilities>
 <non-goals>
-  <item>Do not implement i18n logic here — delegate to @gogol/share/middleware.</item>
+  <item>Do not implement i18n logic here — delegate to @warpgogol/share/middleware.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <MODULE_MAP>
@@ -22,7 +22,7 @@
 */
 
 // @ai-invariant: High-risk module. Runs on every request. No heavy imports.
-import { createLanguageRedirectMiddleware } from "@gogol/share/middleware";
+import { createLanguageRedirectMiddleware } from "@warpgogol/share/middleware";
 
 export default createLanguageRedirectMiddleware({
   supportedLangs: {{SUPPORTED_LANGS}},
