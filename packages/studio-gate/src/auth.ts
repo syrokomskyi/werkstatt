@@ -1,17 +1,21 @@
 /*
 <MODULE_CONTRACT>
   <purpose>
-  RFC-0558: Studio Gate auth middleware — verifies VC tokens from MCP metadata
-  against werkstatt.identity.json before dispatching to Site OS commands.
+  RFC-0558/RFC-0559: Studio Gate auth middleware — verifies VC tokens from MCP
+  metadata against werkstatt.identity.json before dispatching to Site OS commands.
   Supports permissive (warn-only) and enforced (reject) modes.
+  RFC-0559: adds site-scoping (credential siteId vs _meta.system), per-tool scope
+  enforcement, and distinct error types for auth-config-missing vs auth-config-malformed.
   </purpose>
   <non-goals>
     <item>Does not execute Site OS commands — that remains in executor.ts.</item>
     <item>Does not handle key management — public keys are read from werkstatt.identity.json.</item>
+    <item>Does not modify Site OS command implementations — actor context is injected via --_authActor CLI flag.</item>
   </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0558: initial auth middleware for Studio Gate.</item>
+  <item>RFC-0559: add site-scoping, scope enforcement, malformed config detection, system-id-required error.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,8 +30,14 @@ import {
 
 export interface StudioGateAuthResult {
   authenticated: boolean;
+  authMode: "permissive" | "enforced";
   actorId?: string;
+  siteId?: string;
+  scopes?: string[];
   error?: string;
+  expected?: string;
+  presented?: string | string[];
+  required?: string;
 }
 
 export const IDENTITY_CONFIG_FILENAME = "werkstatt.identity.json";
@@ -36,14 +46,22 @@ function identityConfigPath(werkstattRoot: string): string {
   return join(werkstattRoot, IDENTITY_CONFIG_FILENAME);
 }
 
-export async function loadIdentityConfig(
-  werkstattRoot: string,
-): Promise<WerkstattIdentityConfig | undefined> {
+export type IdentityConfigResult =
+  | { status: "ok"; config: WerkstattIdentityConfig }
+  | { status: "missing" }
+  | { status: "malformed" };
+
+export async function loadIdentityConfig(werkstattRoot: string): Promise<IdentityConfigResult> {
+  let raw: string;
   try {
-    const raw = await readFile(identityConfigPath(werkstattRoot), "utf-8");
-    return WerkstattIdentityConfigSchema.parse(JSON.parse(raw));
+    raw = await readFile(identityConfigPath(werkstattRoot), "utf-8");
   } catch {
-    return undefined;
+    return { status: "missing" };
+  }
+  try {
+    return { status: "ok", config: WerkstattIdentityConfigSchema.parse(JSON.parse(raw)) };
+  } catch {
+    return { status: "malformed" };
   }
 }
 
@@ -69,46 +87,60 @@ function isRevoked(config: WerkstattIdentityConfig, credentialId: string): boole
   return config.revokedCredentialIds.includes(credentialId);
 }
 
+function extractScopes(credential: WerkstattCredential): string[] {
+  if ("scopes" in credential.subject) {
+    return credential.subject.scopes;
+  }
+  return ["*"];
+}
+
+function extractSiteId(credential: WerkstattCredential): string {
+  return credential.subject.siteId;
+}
+
 export async function verifyAuthFromMeta(
   meta: Record<string, unknown> | undefined,
   werkstattRoot: string,
+  toolName: string,
+  systemId?: string,
 ): Promise<StudioGateAuthResult> {
-  const config = await loadIdentityConfig(werkstattRoot);
-  if (!config) {
-    return {
-      authenticated: false,
-      error: "identity-not-configured",
-    };
+  const configResult = await loadIdentityConfig(werkstattRoot);
+
+  if (configResult.status === "missing") {
+    return { authenticated: false, authMode: "enforced", error: "auth-config-missing" };
+  }
+  if (configResult.status === "malformed") {
+    return { authenticated: false, authMode: "enforced", error: "auth-config-malformed" };
   }
 
-  if (config.authMode === "permissive") {
-    const credentialId = extractCredentialId(meta);
-    if (!credentialId) {
-      return { authenticated: false, error: "no-credential-permissive" };
-    }
-    return { authenticated: true, actorId: credentialId };
+  const config = configResult.config;
+  const isEnforced = config.authMode === "enforced";
+
+  if (isEnforced && !systemId) {
+    return { authenticated: false, authMode: "enforced", error: "system-id-required" };
   }
 
   const credentialId = extractCredentialId(meta);
   if (!credentialId) {
     return {
       authenticated: false,
-      error: "authentication-required",
+      authMode: config.authMode,
+      error: isEnforced ? "authentication-required" : "no-credential-permissive",
     };
   }
 
   const credential = findCredential(config, credentialId);
   if (!credential) {
-    return { authenticated: false, error: "credential-not-found" };
+    return { authenticated: false, authMode: config.authMode, error: "credential-not-found" };
   }
 
   if (isRevoked(config, credentialId)) {
-    return { authenticated: false, error: "credential-revoked" };
+    return { authenticated: false, authMode: config.authMode, error: "credential-revoked" };
   }
 
   if (credential.type === "ActorDelegationCredential" && "expiresAt" in credential.subject) {
     if (new Date(credential.subject.expiresAt).getTime() < Date.now()) {
-      return { authenticated: false, error: "credential-expired" };
+      return { authenticated: false, authMode: config.authMode, error: "credential-expired" };
     }
   }
 
@@ -119,8 +151,36 @@ export async function verifyAuthFromMeta(
   );
 
   if (!signatureValid) {
-    return { authenticated: false, error: "signature-invalid" };
+    return { authenticated: false, authMode: config.authMode, error: "signature-invalid" };
   }
 
-  return { authenticated: true, actorId: credential.subject.id };
+  const credentialSiteId = extractSiteId(credential);
+  if (systemId && credentialSiteId !== systemId) {
+    return {
+      authenticated: false,
+      authMode: config.authMode,
+      error: "site-mismatch",
+      expected: systemId,
+      presented: credentialSiteId,
+    };
+  }
+
+  const scopes = extractScopes(credential);
+  if (!scopes.includes("*") && !scopes.includes(toolName)) {
+    return {
+      authenticated: false,
+      authMode: config.authMode,
+      error: "insufficient-scope",
+      required: toolName,
+      presented: scopes,
+    };
+  }
+
+  return {
+    authenticated: true,
+    authMode: config.authMode,
+    actorId: credential.subject.id,
+    siteId: credentialSiteId,
+    scopes,
+  };
 }
