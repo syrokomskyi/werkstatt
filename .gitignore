@@ -280,3 +280,7 @@ docs/sessions/.raw/
 
 # RFC-0548: Operator profile is local and private (not committed)
 .agents/operator-profile.md
+
+# RFC-0564: SWIM membership and CRDT genome — workshop-local state files
+werkstatt.swim.json
+werkstatt.genome.log

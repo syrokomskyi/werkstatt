@@ -113,6 +113,19 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - Config file: `werkstatt.gitmesh.json` (workspace root).
 - State files: `.git/gitmesh.lock` (sync lock), `.git/gitmesh.last-sync` (last sync timestamp), `.git/gitmesh.last-verified` (last verified HEAD SHA).
 
+## SWIM (RFC-0564)
+
+- `src/swim/` — SWIM membership and CRDT genome gossip failure detection for workshops (RFC-0562 Layer 2).
+- `types.ts` — `SwimMember`, `SwimMemberStatus`, `SwimConfig`, `SwimMembershipView`, `GenomeLogEntry` interfaces.
+- `config.ts` — loads `werkstatt.swim.json`, validates schema, creates config with UUID v7 `workshopId` on first `swim.join`.
+- `genome-log.ts` — G-Set genome log: NDJSON append, Ed25519-signed entries via `@warpgogol/passport`, signature verification on read, set-union merge, membership view derivation, 10MB size threshold warning.
+- `handlers.ts` — four command handlers with ephemeral per-command SWIM lifecycle (no daemon). `swim.join` probes seed via UDP, records `alive` event. `swim.leave` records `left` event. `swim.members` and `swim.status` read from genome log only.
+- `swim-module.ts` — registers `swim.join`, `swim.leave`, `swim.members`, `swim.status` workspace commands. All `cacheable: false`.
+- Config file: `werkstatt.swim.json` (workspace root, gitignored, created by `swim.join`).
+- Genome log: `werkstatt.genome.log` (workspace root, gitignored, append-only NDJSON).
+- Identity integration: reads `werkstatt.identity.json` for operator public key and `PASSPORT_SIGNING_KEY` env var for Ed25519 signing (RFC-0558). Fails with `identity-not-bootstrapped` if identity is not set up.
+- Ephemeral lifecycle: SWIM instance is created and destroyed within each command invocation — no long-running daemon. Real-time failure detection is deferred to Phase 2.
+
 ## Related packages
 
 | Package | Role |
