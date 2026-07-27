@@ -13,7 +13,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 The package exports via `src/index.ts`:
 
 - **Run functions:** `runInit`, `runUpdate`, `runVerify`, `runRecordBuild`, `runBackfillRevisions`
-- **Signing:** `generateSigningKeyPairPem`, `signLatestBuildArtifacts`, `loadSignedManifest`, `loadPublicKeyPem`, `verifyManifestSignature`, `compareManifestWithLocalArtifacts`
+- **Signing:** `generateSigningKeyPairPem`, `signPayload`, `signJsonPayload`, `signLatestBuildArtifacts`, `loadSignedManifest`, `loadPublicKeyPem`, `verifyManifestSignature`, `verifyJsonSignature`, `compareManifestWithLocalArtifacts`
 - **Env helpers:** `requireEnv`, `optionalEnv`
 - **Path helpers:** `buildLatestDir`, `signedManifestPath`
 - **FS helpers:** `ensureDir`, `writeText`
