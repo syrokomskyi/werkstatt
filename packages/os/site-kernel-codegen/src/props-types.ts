@@ -15,6 +15,7 @@ schema — replacing hand-written `.types.ts` files.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0262: initial implementation.</item>
+  <item>Fix: pass generatedTypesPath (.ts) to buildGeneratedHeader instead of sourceRelPath (.yaml) — fixes # → // comment prefix bug in generated type files.</item>
 </CHANGE_SUMMARY>
 */
 
