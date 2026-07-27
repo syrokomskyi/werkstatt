@@ -1,0 +1,83 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Styles for the shared 404 component, entirely through design-system tokens.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0310: initial styling for generated shared 404 pages.</item>
+</CHANGE_SUMMARY>
+*/
+
+.not-found {
+  min-height: min(72vh, 760px);
+  display: grid;
+  place-items: center;
+  padding: var(--ds-space-8) var(--ds-space-4);
+  background:
+    radial-gradient(circle at top left, var(--ds-color-accent-soft), transparent 34rem),
+    var(--ds-color-bg);
+}
+
+.not-found__inner {
+  width: min(100%, var(--ds-size-container-narrow));
+  display: grid;
+  gap: var(--ds-space-4);
+  text-align: center;
+}
+
+.not-found__eyebrow {
+  margin: 0;
+  color: var(--ds-color-accent);
+  font-size: var(--ds-font-size-lg);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: var(--ds-line-height-sm);
+  letter-spacing: 0.08em;
+}
+
+.not-found h1 {
+  margin: 0;
+  color: var(--ds-color-text);
+  font-size: var(--ds-font-size-4xl);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: var(--ds-line-height-heading);
+}
+
+.not-found__intro {
+  margin: 0 auto;
+  max-width: 62ch;
+  color: var(--ds-color-text-muted);
+  font-size: var(--ds-font-size-lg);
+  line-height: var(--ds-line-height-lg);
+}
+
+.not-found__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-3);
+}
+
+.not-found__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-4);
+  border: 1px solid var(--ds-color-card-border);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-color-text);
+  background: var(--ds-color-surface-raised);
+  text-decoration: none;
+  font-size: var(--ds-font-size-lg);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: var(--ds-line-height-sm);
+}
+
+.not-found__action--primary {
+  border-color: var(--ds-color-accent);
+  color: var(--ds-color-accent-contrast);
+  background: var(--ds-color-accent);
+}

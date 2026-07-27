@@ -1,0 +1,27 @@
+id: approach-section
+uniName: approach-section
+layer: section
+semanticId: approach
+archetype: approach
+cosmicName: Titan
+role: approach
+version: 1.4.0
+intent:
+  - explain-approach
+  - build-trust
+  - demonstrate-expertise
+industryFit: []
+contentSchemaKey: approach-section
+contentTypesPath: ./approach-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-cards
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body

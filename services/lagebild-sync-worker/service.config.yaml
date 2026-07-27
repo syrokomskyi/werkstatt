@@ -1,0 +1,8 @@
+id: lagebild-sync-worker
+kind: scheduled-worker
+entry: src/index.ts
+publicEndpoints: false
+usesBrowserAutomation: false
+queues:
+  - lagebild-sync-outbox
+artifacts: []

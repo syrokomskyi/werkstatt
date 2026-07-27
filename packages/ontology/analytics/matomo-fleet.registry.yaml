@@ -1,0 +1,12 @@
+kind: analytics-matomo-fleet-registry
+schemaVersion: 1
+version: 1.0.0
+updatedAt: 2026-07-06
+owner: architecture
+policy:
+  sourceOfTruth: git
+  manualMatomoUiChanges: forbidden
+  productionAdapterRequiresRecord: true
+  siteIdSource: provisioning
+  noSecrets: true
+sites: []

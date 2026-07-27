@@ -1,0 +1,74 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of breadcrumb navigation based on semantic data.</purpose>
+<non-goals>
+  <item>Do not handle routing or navigation logic beyond rendering breadcrumbs.</item>
+  <item>Do not manage global state or context for breadcrumb data.</item>
+  <item>Do not parse raw content or handle data fetching outside of component content.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { getResolvedComponentContent } from "@gogol/share";
+import type { SemanticBreadcrumb } from "@gogol/share";
+import type { BreadcrumbsComponentContent } from "./breadcrumbs-component.types.generated.ts";
+import "./breadcrumbs-component.css";
+
+interface Props {
+  lang?: string;
+  defaultLanguageCode?: string;
+  items: SemanticBreadcrumb[];
+  pageOverride?: Partial<BreadcrumbsComponentContent>;
+}
+
+const { lang, defaultLanguageCode, items, pageOverride } = Astro.props as Props;
+const activeLang = lang ?? defaultLanguageCode;
+if (!activeLang || !defaultLanguageCode) {
+  throw new Error("[breadcrumbs] lang and defaultLanguageCode are required.");
+}
+
+const content = await getResolvedComponentContent<BreadcrumbsComponentContent>({
+  componentPath: "breadcrumbs",
+  languageCode: activeLang,
+  defaultLanguageCode,
+  pageOverride,
+});
+
+const visibleItems = items.filter((item) => {
+  const name = typeof item.name === "string" ? item.name.trim() : "";
+  const url = typeof item.url === "string" ? item.url.trim() : "";
+  return Boolean(name && url);
+});
+---
+
+{
+  visibleItems.length > 1 && (
+    <nav class="breadcrumbs" aria-label={content.navAriaLabel}>
+      <div class="container breadcrumbs__container">
+        <ol class="breadcrumbs__list" role="list">
+          {visibleItems.map((item, index) => {
+            const isLast = index === visibleItems.length - 1;
+
+            return (
+              <li class="breadcrumbs__item">
+                {isLast ? (
+                  <span class="breadcrumbs__current" aria-current="page">
+                    {item.name}
+                  </span>
+                ) : (
+                  <a href={item.url} class="breadcrumbs__link">
+                    {item.name}
+                  </a>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </nav>
+  )
+}

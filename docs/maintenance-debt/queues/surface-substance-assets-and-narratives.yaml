@@ -1,0 +1,37 @@
+id: surface-substance-assets-and-narratives
+title: Improve surface narrative and image substance
+status: paused
+owner: content-architecture
+priority: 2
+createdAt: 2026-07-01
+reviewAfter: 2026-08-15
+rationale: >
+  Programmatic and authored surfaces with weak narrative or image substance
+  need bounded review because fixes may touch generated projections, material
+  credits, and CKL provenance.
+pauseReason: >
+  No current debt items match this queue after the nicaragua-projekt app was
+  retired. Reopen when surface.validate warnings reappear for webgogol-com.
+sourceCommands:
+  - surface.validate
+selectors:
+  apps:
+    - webgogol-com
+  ruleIds:
+    - surface.validate
+  severity:
+    - warning
+batchPolicy:
+  maxItemsPerSession: 6
+  commitAfterEachBatch: true
+  push: false
+acceptance:
+  commands:
+    - pnpm exec site-kernel run maintenance.debt.queue.validate --queue surface-substance-assets-and-narratives --json
+    - pnpm exec site-kernel run surface.validate --site <app> --json
+    - pnpm exec site-kernel run asset.reference.validate --site <app> --json
+    - pnpm exec site-kernel run material.credits.validate --site <app> --json
+    - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+notes:
+  - Prefer improving authored source records over editing generated surface output.
+  - Preserve bare image tokens and add material credits when introducing new material.

@@ -1,0 +1,50 @@
+---
+/***************************************************************
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of the impact section within the UI, integrating various components to present statistical data effectively.</purpose>
+<non-goals>
+  <item>Do not handle data fetching or state management for the impact section.</item>
+  <item>Do not modify or extend the functionality of imported components.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+***************************************************************/
+
+/* RFC-0103: impact thin dispatcher — stats body (RFC-0040 bridge via SectionStats). */
+
+import type { SectionProps } from "@gogol/share/page";
+import { need, cast, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionStats from "@gogol/ui/components/section-body/stats.astro";
+import type { ImpactSectionContent } from "./impact-section.types.generated.ts";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "impact");
+const props = cast<ImpactSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="impact"
+  sectionId={sectionId}
+  ariaLabelledBy="impact-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="impact-title"
+  />
+  <SectionStats stats={body.stats} animated={body.animated} align={body.align} lang={lang} />
+</SectionShell>

@@ -1,0 +1,51 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of a problem section within a UI layout, integrating headers and paragraphs.</purpose>
+<non-goals>
+  <item>Do not manage global state or application-level data fetching.</item>
+  <item>Do not perform raw content parsing or validation of input data.</item>
+  <item>Do not implement navigation or routing logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Added Compass scaffolding to define module responsibilities and boundaries for future modifications.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: problem thin dispatcher — paragraphs body. */
+
+import type { SectionProps } from "@gogol/share/page";
+import { need, cast, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionParagraphs from "@gogol/ui/components/section-body/paragraphs.astro";
+import type { ProblemSectionContent } from "./problem-section.types.generated.ts";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "problem");
+const props = cast<ProblemSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="problem"
+  sectionId={sectionId}
+  ariaLabelledBy="problem-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="problem-title"
+  />
+  <SectionParagraphs paragraphs={body.paragraphs} align={body.align} />
+</SectionShell>

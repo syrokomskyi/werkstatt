@@ -1,0 +1,97 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Defines a component to visually represent the freshness of a build based on its timestamp.</purpose>
+<non-goals>
+  <item>Do not handle raw data parsing beyond loading passport data.</item>
+  <item>Do not include client-side logic or polling for live updates.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Enhance file documentation for clarity and future modifications.</item>
+</CHANGE_SUMMARY>
+*/
+
+/**
+ * Pulsar (Despina) — Build freshness heartbeat moon
+ *
+ * Displays a pulsing freshness indicator derived from passport.builtAt.
+ * Three states:
+ *   fresh   — built within the last 24 hours
+ *   recent  — built within the last 7 days
+ *   stale   — older than 7 days
+ *
+ * The component renders purely at SSG build time (no client JS required).
+ * For live heartbeat polling, pair with the pulsar.heartbeat command.
+ *
+ * RFC-0028 / DNA-34 / Despina (Neptune moon)
+ */
+
+import { loadPassportData } from "@gogol/passport/data";
+import "./pulsar-component.css";
+
+interface Props {
+  /** Override the reference "now" timestamp (ISO string). Used in tests. */
+  nowOverride?: string;
+  /** Labels for each freshness state. */
+  labels?: Record<Freshness, string>;
+  /** Descriptions (title attributes) for each freshness state. */
+  descriptions?: Record<Freshness, string>;
+}
+
+const { nowOverride, labels, descriptions } = Astro.props;
+
+const defaultLabels: Record<Freshness, string> = {
+  fresh: "",
+  recent: "",
+  stale: "",
+  unknown: "",
+};
+
+const defaultDescriptions: Record<Freshness, string> = {
+  fresh: "",
+  recent: "",
+  stale: "",
+  unknown: "",
+};
+
+const labelMap = labels ?? defaultLabels;
+const descMap = descriptions ?? defaultDescriptions;
+
+const passport = await loadPassportData();
+const builtAt = passport?.provenance?.builtAt ?? null;
+
+type Freshness = "fresh" | "recent" | "stale" | "unknown";
+
+function computeFreshness(builtAtIso: string | null, nowIso?: string): Freshness {
+  if (!builtAtIso) return "unknown";
+  const built = new Date(builtAtIso).getTime();
+  const now = nowIso ? new Date(nowIso).getTime() : Date.now();
+  const diffMs = now - built;
+  if (diffMs < 0) return "unknown"; // clock skew guard
+  const diffH = diffMs / (1000 * 60 * 60);
+  if (diffH < 24) return "fresh";
+  if (diffH < 24 * 7) return "recent";
+  return "stale";
+}
+
+const freshness: Freshness = computeFreshness(builtAt, nowOverride);
+---
+
+<div
+  class={`pulsar pulsar--${freshness}`}
+  data-component="pulsar"
+  role="status"
+  aria-label={labelMap[freshness]}
+  title={descMap[freshness]}
+>
+  <span class="pulsar__dot" aria-hidden="true"></span>
+  <span class="pulsar__label">{labelMap[freshness]}</span>
+  {
+    builtAt && (
+      <time class="pulsar__time" datetime={builtAt}>
+        {new Date(builtAt).toLocaleString()}
+      </time>
+    )
+  }
+</div>

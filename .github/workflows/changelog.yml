@@ -1,0 +1,74 @@
+name: Generate Changelog
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday at 09:00 UTC
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "Target app: nicaragua-projekt | all"
+        required: false
+        default: "all"
+      force:
+        description: "Force run even if not a release day"
+        required: false
+        default: "false"
+      dry_run:
+        description: "Dry run — print output without writing files"
+        required: false
+        default: "false"
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Restore shared AI cache
+        uses: actions/cache@v4
+        with:
+          path: .changelog-system/cache/
+          key: ai-cache-${{ hashFiles('apps/nicaragua-projekt/.changelog-system/state.json') }}
+          restore-keys: |
+            ai-cache-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm --filter @gogol/site-kernel-checks build
+
+      - name: Generate changelog — nicaragua-projekt
+        if: ${{ github.event.inputs.app == 'nicaragua-projekt' || github.event.inputs.app == 'all' || github.event_name == 'schedule' }}
+        run: |
+          ARGS="--app nicaragua-projekt"
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then ARGS="$ARGS -- --force"; fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then ARGS="$ARGS -- --dry-run"; fi
+          pnpm --filter nicaragua-projekt site-kernel run changelog.generate $ARGS
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+
+      - name: Commit changes
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "changelog-bot"
+          git config user.email "changelog-bot@users.noreply.github.com"
+          git add \
+            apps/nicaragua-projekt/CHANGELOG.md apps/nicaragua-projekt/changelogs/ apps/nicaragua-projekt/.changelog-system/state.json apps/nicaragua-projekt/package.json \
+            .changelog-system/cache/ 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore(changelog): release $(date +%Y-%m-%d)" && git push

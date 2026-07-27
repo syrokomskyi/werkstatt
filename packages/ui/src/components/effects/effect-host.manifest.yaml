@@ -1,0 +1,14 @@
+id: effect-host-component
+uniName: effect-host-component
+layer: component
+semanticId: effect-host
+archetype: section-shell
+cosmicName: Puck
+role: section-shell
+version: 1.0.0
+intent:
+  - render-effect-host
+  - apply-composable-effects
+  - host-glass-surface-effects
+industryFit: []
+contentSchemaKey: null

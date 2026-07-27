@@ -1,0 +1,68 @@
+# Constellation: Nonprofit Donation Funnel
+# [DNA-23][RFC-0025] — Validated by constellation.compose.validate
+id: nonprofit-donation-funnel
+name: Nonprofit Donation Funnel
+family: charity-donation-trust
+description: >
+  Proven section sequence for mission-driven nonprofits converting first-time
+  visitors into recurring donors. Combines emotional narrative with trust signals
+  before the primary CTA.
+forStar: Vega
+version: 1.1.0
+
+slots:
+  - cosmicName: Europa # hero
+    label: Mission hero
+    rationale: >
+      Establishes the human stakes immediately. Visitor must feel the problem
+      within the first viewport before any ask.
+
+  - cosmicName: Callisto # problem
+    label: Problem statement
+    rationale: >
+      Names the specific harm the organisation addresses. Concreteness builds
+      credibility faster than abstract mission statements.
+
+  - cosmicName: Titan # approach (card-grid)
+    label: Approach
+    rationale: >
+      Differentiates the organisation from generic charities by showing the
+      unique method as a card grid. Answers "why you?" before the donor asks.
+      This is the canonical narrative slot — required for the funnel pattern.
+
+  - cosmicName: Ganymede # impact
+    label: Impact evidence
+    rationale: >
+      Numbers and stories convert sceptics. Placed after approach so evidence
+      validates the method, not the other way round.
+
+  - cosmicName: Enceladus # social-proof
+    label: Social proof
+    rationale: >
+      Testimonials from past donors or beneficiaries remove the final
+      hesitation before the donation ask.
+
+  - cosmicName: Rhea # donation-use
+    label: Donation use breakdown
+    rationale: >
+      Transparency about fund allocation increases average gift size and
+      long-term donor retention.
+
+  - cosmicName: Dione # final-cta
+    label: Primary donation CTA
+    rationale: >
+      Single focused call to action at peak trust. No competing links.
+
+  - cosmicName: Iapetus # women
+    label: Women & girls focus
+    optional: true
+    rationale: >
+      Highlights special focus on women and girls in the mission. Optional
+      for donation funnels that don't emphasize gender-specific impact.
+
+  - cosmicName: Tethys # transparency
+    label: Governance & transparency
+    optional: true
+    rationale: >
+      Governance disclosures satisfy institutional donors. Optional for
+      consumer-focused campaigns.

@@ -1,0 +1,7 @@
+id: external:city-heilbronn
+title: "Stadt Heilbronn — official data, facts, and business location pages"
+kind: manual
+endpoint: "https://www.heilbronn.de/wirtschaft/daten-fakten.html"
+expectedType: string
+checkEvery: P6M
+residency: eu

@@ -1,0 +1,14 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for the trust strip section, contributing to the overall UI consistency.</purpose>
+<non-goals>
+  <item>Do not define styles for individual sections or components.</item>
+  <item>Do not handle any JavaScript logic or interactivity.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Added Compass scaffolding to clarify the purpose and boundaries of the CSS file.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: trust-strip — list rendering owned by SectionList; no section-specific CSS. */

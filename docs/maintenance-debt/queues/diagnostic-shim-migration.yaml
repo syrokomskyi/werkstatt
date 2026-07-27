@@ -1,0 +1,41 @@
+id: diagnostic-shim-migration
+title: Migrate resultFromViolations/failResult shim modules to diagnosticsResult
+status: paused
+owner: architecture
+priority: 4
+createdAt: 2026-07-02
+reviewAfter: 2026-10-01
+rationale: >
+  RFC-0261 introduced DSL-04, a shrink-only ratchet on
+  packages/os/site-kernel-checks/src/*.ts modules still using the coarse
+  resultFromViolations/failResult string shim instead of diagnosticsResult
+  with registered, fine-grained ruleIds and locators. The offender set is
+  tracked in packages/os/site-kernel-checks/src/diagnostics/dsl04-baseline.generated.json
+  (60 files remaining after the RFC-0261 first migration batch of 3 modules).
+  This queue plans the burn-down batch by batch. It is paused rather than
+  active because DSL-04 is workspace-scoped, error-severity debt gated
+  directly by diagnostic.shape.lint (not app-scoped warning/info debt from
+  ADVISORY_APP_COMMANDS), so it has no matching entries in the
+  collectMaintenanceDebtItems item pool that maintenance.debt.queue.validate's
+  MDQ-04 rule checks for active queues. Reactivate once/if diagnostic.shape.lint
+  is folded into that item pool, or track batch completion manually against
+  the DSL-04 baseline file count.
+sourceCommands:
+  - diagnostic.shape.lint
+selectors:
+  ruleIds:
+    - DSL-04
+batchPolicy:
+  maxItemsPerSession: 5
+  commitAfterEachBatch: true
+  push: false
+acceptance:
+  commands:
+    - pnpm exec site-kernel run diagnostic.shape.lint --json
+    - pnpm exec site-kernel run diagnostic.shape.lint --write-baseline --json
+    - pnpm exec site-kernel run check.fixture.lint --json
+notes:
+  - "Suggested batch order: growth-*, integration, consent, funnel modules first — their diagnostics are what agents see most."
+  - "Write the red fixture first, then migrate to diagnosticsResult with fine-grained ruleIds and file:line locators."
+  - Do not rename existing registered ruleIds while migrating unrelated modules.
+  - Each migration batch should also close CHECK-FIX-01/02 gaps for the same commands where possible — see check-fixture-lint.baseline.generated.json.

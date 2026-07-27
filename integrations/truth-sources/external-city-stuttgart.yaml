@@ -1,0 +1,7 @@
+id: external:city-stuttgart
+title: Landeshauptstadt Stuttgart — official city facts and statistics
+kind: manual
+endpoint: "https://www.stuttgart.de/en/service/statistik-und-wahlen/stuttgart-in-zahlen"
+expectedType: string
+checkEvery: P6M
+residency: eu

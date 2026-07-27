@@ -1,0 +1,204 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0210] The single media primitive. One component renders every <video> on the platform,
+  profile-driven:
+    - feature    → poster (authored ResponsiveImage or generated first-frame) + <video controls
+                   playsinline> carrying progressive AV1 (+MP4 +WebM) <source>s, data-hls for the lazy
+                   Plyr+hls.js runtime, and <track kind="captions"> per caption. LCP stays the
+                   poster; the player JS attaches lazily (data-video-player).
+    - background → muted, looping, autoplaying, aria-hidden native <video> (no player JS).
+    - ambient    → living photo (RFC-0202): delegates to <LivePhoto>, preserving the existing
+                   poster/tap-button/iOS/reduced-motion behavior.
+  Derived-format URLs come from the GENERATED video manifest (video.variants.generate); a missing
+  entry (dev before build.prepare) degrades to a poster-only render.
+</purpose>
+<non-goals>
+  <item>Do not implement playback/transcoding — that is the runtime + the kernel command.</item>
+  <item>Do not ship player JS for ambient/background — those are native <video>.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0210: introduced the unified media primitive.</item>
+  <item>RFC-0525: added AV1 <source> (first in order) for feature profile progressive delivery.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { resolveImage, resolveVideo, buildImageSources, creditByTarget } from "@gogol/share";
+import type { Media } from "@gogol/share";
+import ResponsiveImage from "../responsive-image/responsive-image.astro";
+import LivePhoto from "../live-photo/live-photo.astro";
+import MaterialCredit from "../material-credit/material-credit.astro";
+import {
+  contentAssetCredits,
+  contentAssetImages,
+  contentAssetVideos,
+} from "../../content-assets.ts";
+import { getVideoEntryByToken } from "../../video-manifest.ts";
+import "./media.css";
+
+interface Props {
+  media: Media;
+  lang?: string;
+  defaultLanguageCode?: string;
+  class?: string;
+}
+
+const { media, lang, defaultLanguageCode, class: className } = Astro.props as Props;
+const activeLang = lang ?? defaultLanguageCode;
+if (!activeLang || !defaultLanguageCode) {
+  throw new Error("[media] lang and defaultLanguageCode are required.");
+}
+const profile = media.profile ?? "feature";
+const subPath = media.subPath;
+
+// ── ambient: living photo (RFC-0202), delegated to <LivePhoto> ────────────────
+const imageToken = media.source.fromImage;
+const ambientImage =
+  profile === "ambient" && imageToken
+    ? resolveImage(contentAssetImages, imageToken, { lang: activeLang, subPath })
+    : null;
+const ambientClip =
+  profile === "ambient" && imageToken
+    ? resolveVideo(contentAssetVideos, imageToken, { lang: activeLang, subPath })
+    : null;
+
+// ── feature / background: explicit source token → generated manifest entry ────
+// Resolved purely through the GENERATED manifest (by `<lang>/<token>`), NOT the bundling glob —
+// feature/background source masters live in a non-bundled `media/` folder so Vite never emits the
+// multi-hundred-MB source to `_astro` (Cloudflare's 25 MiB asset limit). The derived files are
+// served from public/_video.
+const entry =
+  profile !== "ambient" && media.source.name
+    ? getVideoEntryByToken(media.source.name, activeLang)
+    : null;
+
+// Poster: an authored poster image token (ResponsiveImage) wins; else the generated first-frame.
+const authoredPoster = media.poster
+  ? resolveImage(contentAssetImages, media.poster, { lang: activeLang, subPath })
+  : null;
+const posterUrl = entry?.poster;
+const width = entry?.intrinsicWidth;
+const height = entry?.intrinsicHeight;
+const aspectRatio = width && height ? `${width}/${height}` : "16/9";
+
+const sources = entry?.sources;
+const hlsUrl = sources?.hls;
+const av1Url = sources?.av1;
+const mp4Url = sources?.mp4;
+const webmUrl = sources?.webm;
+const manifestCaptions = entry?.captions ?? [];
+const authorCaptions = media.captions ?? [];
+
+const captions = manifestCaptions.map((m) => {
+  const override = authorCaptions.find((a) => a.lang === m.lang);
+  return {
+    ...m,
+    default: override?.default ?? false,
+    label: override?.label ?? m.label,
+  };
+});
+
+const preload = media.preload ?? "metadata";
+const posterSources = authoredPoster ? buildImageSources(authoredPoster, { quality: "max" }) : null;
+const materialCredit =
+  profile === "feature" && media.source.name
+    ? creditByTarget(
+        contentAssetCredits,
+        { kind: "video", id: media.source.name, domain: "pages" },
+        activeLang,
+        defaultLanguageCode,
+      )
+    : null;
+---
+
+{
+  profile === "ambient" && ambientImage && ambientClip ? (
+    <LivePhoto
+      image={ambientImage}
+      videoSrc={ambientClip}
+      alt={media.alt ?? ""}
+      config={{
+        enabled: true,
+        trigger: media.trigger,
+        loop: media.loop,
+        tapBehavior: media.tapBehavior,
+        preload: media.preload,
+      }}
+      class={className}
+    />
+  ) : profile === "background" ? (
+    <video
+      class:list={["media", "media--background", className]}
+      style={`aspect-ratio:${aspectRatio};`}
+      muted
+      loop
+      autoplay
+      playsinline
+      webkit-playsinline
+      preload={preload}
+      poster={posterUrl}
+      aria-hidden="true"
+      tabindex="-1"
+      width={width}
+      height={height}
+    >
+      {mp4Url && <source src={mp4Url} type="video/mp4" />}
+      {webmUrl && <source src={webmUrl} type="video/webm" />}
+    </video>
+  ) : (
+    /* feature */
+    <figure class:list={["media", "media--feature", className]}>
+      <div class="media__frame" style={`aspect-ratio:${aspectRatio};`}>
+        {mp4Url ? (
+          <video
+            class="media__video"
+            controls
+            playsinline
+            webkit-playsinline
+            preload={preload}
+            poster={posterUrl}
+            width={width}
+            height={height}
+            data-video-player
+            data-hls={hlsUrl}
+            aria-label={media.alt}
+          >
+            {av1Url && <source src={av1Url} type='video/webm; codecs="av01.0.05M.08"' />}
+            {mp4Url && <source src={mp4Url} type="video/mp4" />}
+            {webmUrl && <source src={webmUrl} type="video/webm" />}
+            {captions.map((c) => (
+              <track
+                kind="captions"
+                src={c.url}
+                srclang={c.lang}
+                label={c.label ?? c.lang.toUpperCase()}
+                default={c.default || undefined}
+              />
+            ))}
+          </video>
+        ) : posterSources ? (
+          /* No generated video yet (dev): show the authored poster as a graceful placeholder. */
+          <ResponsiveImage image={authoredPoster!} alt={media.alt ?? ""} class="media__video" />
+        ) : posterUrl ? (
+          <img
+            class="media__video"
+            src={posterUrl}
+            alt={media.alt ?? ""}
+            width={width}
+            height={height}
+          />
+        ) : null}
+      </div>
+      {materialCredit && (
+        <MaterialCredit
+          credit={materialCredit}
+          lang={activeLang}
+          defaultLanguageCode={defaultLanguageCode}
+          contentUrl={mp4Url}
+        />
+      )}
+    </figure>
+  )
+}

@@ -1,0 +1,104 @@
+id: donation-card-component
+uniName: donation-card-component
+layer: component
+semanticId: donation-card
+archetype: donation-card
+
+cosmicName: Galatea
+role: person-profile
+version: 1.0.0
+intent:
+  - display-bank-details
+  - facilitate-donation
+  - build-trust
+industryFit: [non-profit]
+contentSchemaKey: donation-card-component
+contentTypesPath: ./donation-card-component.types.generated.ts
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - content
+    - companyName
+    - bankName
+    - iban
+    - bic
+  properties:
+    lang:
+      type: string
+      description: Language code for component content
+    content:
+      type: object
+      additionalProperties: false
+      required:
+        - title
+        - ibanLabel
+        - bicLabel
+        - bankLabel
+        - copyButtonLabel
+        - qrCodeButtonLabel
+        - donationInfoLinkLabel
+        - oldDetailsLabel
+        - oldDetailsButtonLabel
+        - oldDetailsButtonExpandedLabel
+        - kontoLabel
+        - blzLabel
+        - qrCodeModalTitle
+        - qrCodeModalCloseLabel
+        - qrCodeAltText
+        - qrInstruction
+        - donationInfoLinkHref
+        - modalCloseIcon
+      properties:
+        title:
+          type: string
+        ibanLabel:
+          type: string
+        bicLabel:
+          type: string
+        bankLabel:
+          type: string
+        copyButtonLabel:
+          type: string
+        qrCodeButtonLabel:
+          type: string
+        donationInfoLinkLabel:
+          type: string
+        oldDetailsLabel:
+          type: string
+        oldDetailsButtonLabel:
+          type: string
+        oldDetailsButtonExpandedLabel:
+          type: string
+        kontoLabel:
+          type: string
+        blzLabel:
+          type: string
+        qrCodeModalTitle:
+          type: string
+        qrCodeModalCloseLabel:
+          type: string
+        qrCodeAltText:
+          type: string
+        qrInstruction:
+          type: string
+        donationInfoLinkHref:
+          type: string
+        modalCloseIcon:
+          type: string
+    companyName:
+      type: string
+    bankName:
+      type: string
+    iban:
+      type: string
+    bic:
+      type: string
+    konto:
+      type: string
+    blz:
+      type: string
+    trustIndicators:
+      type: array
+      items:
+        type: string

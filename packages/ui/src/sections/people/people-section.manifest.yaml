@@ -1,0 +1,71 @@
+id: people-section
+uniName: people-section
+layer: section
+semanticId: people
+archetype: people
+cosmicName: Mimas
+role: people
+version: 2.0.0
+intent:
+  - humanise-brand
+  - introduce-team
+  - attribute-ownership
+  - build-trust
+industryFit: []
+contentSchemaKey: people-section
+contentTypesPath: ./people-section.types.generated.ts
+
+# RFC-0200: data-driven — no inline `members`; the section loads canonical Person
+# records via `select` (slugs | affiliation | all).
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - select
+  properties:
+    layout:
+      enum: [grid, spotlight]
+    select:
+      type: object
+      additionalProperties: false
+      properties:
+        slugs:
+          type: array
+          items:
+            type: string
+        affiliation:
+          enum: [founder, board, team, patron, author]
+        participantType:
+          type: string
+        status:
+          type: string
+        visibility:
+          type: string
+        all:
+          type: boolean
+    showRole:
+      type: boolean
+    showBio:
+      type: boolean
+    linkToProfile:
+      type: boolean
+    defaultImageFade:
+      type: object
+      additionalProperties: false
+      properties:
+        top:
+          type: boolean
+        bottom:
+          type: boolean
+        left:
+          type: boolean
+        right:
+          type: boolean
+        width:
+          type: number
+          minimum: 0
+          maximum: 0.5

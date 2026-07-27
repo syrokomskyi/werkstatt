@@ -1,0 +1,3 @@
+id: cf-analytics-poller
+kind: scheduled-worker
+entry: src/loop.ts

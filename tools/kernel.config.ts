@@ -1,0 +1,123 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Workspace-level kernel configuration for WGogol platform.</purpose>
+<keywords>workspace, configuration, platform</keywords>
+<responsibilities>
+  <item>Registers workspace-scoped modules and commands.</item>
+  <item>Defines pipelines that operate on the entire workspace.</item>
+  <item>Provides global configuration for all apps.</item>
+</responsibilities>
+<non-goals>
+  <item>Do not define app-specific configuration.</item>
+  <item>Do not manage app-level pipelines.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<MODULE_MAP>
+  <entry key="icons.generate">Generates icon components for @gogol/ui package.</entry>
+  <entry key="onboarding.scaffold">Generates a fully RFC-compliant new app skeleton (RFC-0029 / DNA-36).</entry>
+  <entry key="onboarding.checklist">Emits a readiness report for an in-progress app (RFC-0029 / DNA-36).</entry>
+  <entry key="kernel.wire">Generates app-local tools/ kernel wiring from system.md (RFC-0078).</entry>
+  <entry key="handoff.validate">Validates RFC-0221 internal site handoff bundles.</entry>
+  <entry key="migrator.registry.validate">Validates RFC-0479 migrator registry (id uniqueness, ordering, test coverage).</entry>
+  <entry key="mission.migrate">Applies pending RFC-0479 migrators to a mission workpiece.</entry>
+  <entry key="rfc.*">Registers workspace RFC governance commands at the repository root.</entry>
+  <entry key="adr.*">Registers workspace ADR governance commands at the repository root (RFC-0366, RFC-0521 forge migration).</entry>
+  <entry key="plan.archive">Registers workspace plan archive command (RFC-0521).</entry>
+  <entry key="audit.archive">Registers workspace audit archive command (RFC-0521).</entry>
+  <entry key="docs.archive">Registers workspace umbrella archive command (RFC-0521).</entry>
+  <entry key="session.*">Registers workspace session documentation domain commands (RFC-0537).</entry>
+  <entry key="lagebild.*">Registers workspace Lagebild commands at the repository root.</entry>
+  <entry key="commit.message.lint">RFC-0265: commit message hygiene lint.</entry>
+  <entry key="pipeline.budget.generate">RFC-0270: derive pipeline timing budgets from local telemetry.</entry>
+  <entry key="command.manifest.generate">RFC-0266: generate the single machine-readable command manifest.</entry>
+  <entry key="kernel.cache.*">RFC-0382: kernel cache status and clear commands.</entry>
+  <entry key="compass.*">Registers workspace Compass commands at the repository root (RFC-0374).</entry>
+  <entry key="spec.*">Registers workspace spec vendoring commands: spec.validate, spec.status, spec.materialize (RFC-0394..0397).</entry>
+</MODULE_MAP>
+<CHANGE_SUMMARY>
+  <item>Initial workspace-level kernel configuration.</item>
+  <item>RFC-0029: Add onboardingModule for onboarding.scaffold + onboarding.checklist commands.</item>
+  <item>RFC-0078: Add workspace-scoped kernel.wire command.</item>
+  <item>RFC-0221: Register handoff.validate and migrator.validate workspace commands.</item>
+  <item>RFC-0479: Replace migrator.validate with migrator.registry.validate; register mission.migrate.</item>
+  <item>Register RFC and Lagebild modules at the workspace root to avoid app-context fallback.</item>
+  <item>RFC-0265: Register commitMessageModule for commit.message.lint.</item>
+  <item>RFC-0270: Register pipelineBudgetModule for pipeline.budget.generate.</item>
+  <item>RFC-0266: Register commandManifestModule for command.manifest.generate.</item>
+  <item>RFC-0354: Register sternsystem module for sternsystem.register/list/validate/pin/extract/sync.</item>
+  <item>RFC-0366: Register adrModule for adr.create/validate/list.</item>
+  <item>RFC-0521: Migrate adrModule to forgeAdrModule; register forgePlanModule and forgeAuditModule.</item>
+  <item>Register forgeNamingModule at the workspace root so packages.check can run naming.convention.lint without an app context.</item>
+  <item>Register forgeCompassModule at the workspace root so packages.check can run compass.validate without an app context.</item>
+  <item>RFC-0394..0397: Register forgeSpecModule for spec.validate, spec.status, spec.materialize.</item>
+  <item>RFC-0478: Register platform module for platform.consistency.validate.</item>
+  <item>RFC-0537: Register forgeSessionModule for session.save, session.archive, session.validate, session.list.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { defineKernelConfig } from "@gogol/site-kernel/types";
+import { PACKAGES_CHECK_PIPELINE } from "@gogol/site-kernel-checks/pipelines/packages-check";
+
+export default defineKernelConfig({
+  name: "webgogol-platform",
+  description: "WGogol platform workspace configuration",
+  moduleLoaders: {
+    icons: async () => (await import("@gogol/site-kernel/icons")).iconsModule,
+    "forge-core": async () => (await import("@webgogol/forge/os/core")).forgeCoreModule,
+    "forge-compass": async () => (await import("@webgogol/forge/os/compass")).forgeCompassModule,
+    "forge-naming": async () => (await import("@webgogol/forge/os/naming-module")).forgeNamingModule,
+    workflow: async () => (await import("@webgogol/forge/os/workflow-module")).forgeWorkflowModule,
+    rfc: async () => (await import("@webgogol/forge/os/rfc-module")).forgeRfcModule,
+    adr: async () => (await import("@webgogol/forge/os/adr-module")).forgeAdrModule,
+    "forge-plan": async () => (await import("@webgogol/forge/os/plan-module")).forgePlanModule,
+    "forge-audit": async () => (await import("@webgogol/forge/os/audit-module")).forgeAuditModule,
+    "forge-session": async () =>
+      (await import("@webgogol/forge/os/session-module")).forgeSessionModule,
+    lagebild: async () => (await import("@gogol/site-kernel/lagebild-module")).lagebildModule,
+    "commit-message": async () =>
+      (await import("@gogol/site-kernel/commit-message")).commitMessageModule,
+    "pipeline-budget": async () =>
+      (await import("@gogol/site-kernel/pipeline-budget")).pipelineBudgetModule,
+    "command-manifest": async () =>
+      (await import("@gogol/site-kernel/command-manifest-module")).commandManifestModule,
+    cache: async () => (await import("@gogol/site-kernel/cache-module")).cacheModule,
+    check: async () =>
+      (await import("@gogol/site-kernel-checks/module")).createStandardCheckModule(),
+    observability: async () =>
+      (await import("@gogol/site-kernel-observability/module")).observabilityModule,
+    onboarding: async () =>
+      (await import("@gogol/site-kernel-onboarding/module")).createOnboardingModule(),
+    handoff: async () =>
+      (await import("@gogol/site-kernel-handoff/handoff-module")).createHandoffModule(),
+    sternsystem: async () =>
+      (await import("@gogol/site-kernel-handoff/sternsystem-module")).createSternsystemModule(),
+    "forge-werkstatt": async () =>
+      (await import("@webgogol/forge/os/werkstatt")).forgeWerkstattModule,
+    "forge-spec": async () => (await import("@webgogol/forge/os/spec-module")).forgeSpecModule,
+    mission: async () =>
+      (await import("@gogol/site-kernel-handoff/mission-module")).createMissionModule(),
+    bordbuch: async () =>
+      (await import("@gogol/site-kernel-handoff/bordbuch-module")).createBordbuchModule(),
+    "artifact-store": async () =>
+      (
+        await import("@gogol/site-kernel-handoff/artifact-store-module")
+      ).createArtifactStoreModule(),
+    "behavior-snapshot": async () =>
+      (
+        await import("@gogol/site-kernel-handoff/behavior-snapshot-module")
+      ).createBehaviorSnapshotModule(),
+    release: async () =>
+      (await import("@gogol/site-kernel-handoff/release-module")).createReleaseModule(),
+    leitstand: async () =>
+      (await import("@gogol/site-kernel-handoff/leitstand-module")).createLeitstandModule(),
+    notausgang: async () =>
+      (await import("@gogol/site-kernel-handoff/notausgang-module")).createNotausgangModule(),
+    platform: async () =>
+      (await import("@gogol/site-kernel-handoff/platform-module")).createPlatformModule(),
+  },
+  pipelines: {
+    // Workspace-level pipelines
+    "icons.generate": [{ command: "icons.generate" }],
+    "packages.check": [...PACKAGES_CHECK_PIPELINE],
+  },
+});

@@ -1,0 +1,37 @@
+{
+  "name": "@gogol/site-kernel-codegen",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@cyclonedx/cyclonedx-library": "^1.0.0",
+    "@gogol/ontology": "workspace:*",
+    "@gogol/share": "workspace:*",
+    "@gogol/site-kernel": "workspace:*",
+    "@gogol/site-kernel-astro": "workspace:*",
+    "@gogol/site-kernel-content": "workspace:*",
+    "spdx-license-list": "^6.11.0",
+    "yaml": "^2.9.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@quantco/pnpm-licenses": "2.4.2",
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  }
+}

@@ -1,0 +1,271 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for the send-message section form, textarea, actions, hints, and fallback states.</purpose>
+<non-goals>
+  <item>Do not include JavaScript behavior or interactivity.</item>
+  <item>Do not manage global styles or themes outside the send-message context.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0140: Backfill Compass scaffolding for the send-message section CSS.</item>
+  <item>RFC-0514: Add styles for structured email/phone input fields.</item>
+</CHANGE_SUMMARY>
+*/
+
+.send-message [hidden] {
+  display: none !important;
+}
+
+.send-message {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.send-message__body {
+  margin: 0 auto;
+  max-width: 46rem;
+}
+
+.send-message__body--left {
+  margin-left: 0;
+  margin-right: auto;
+  text-align: left;
+}
+
+.send-message__body--center {
+  text-align: center;
+}
+
+.send-message__body--right {
+  margin-left: auto;
+  margin-right: 0;
+  text-align: right;
+}
+
+.send-message__paragraphs {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.send-message__paragraph {
+  margin: 0;
+  color: var(--ds-color-text-muted, rgba(31, 41, 55, 0.82));
+}
+
+.send-message__form {
+  display: grid;
+  gap: 1rem;
+  margin: 0 auto;
+  width: min(100%, 52rem);
+}
+
+.send-message__field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.send-message__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ds-color-border-strong, rgba(17, 24, 39, 0.18));
+  border-radius: 0.75rem;
+  background: var(--ds-color-surface-raised, rgba(255, 255, 255, 0.92));
+  color: var(--ds-color-text, #111827);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.send-message__input:focus {
+  outline: 2px solid transparent;
+  border-color: var(--ds-color-accent, #d97706);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-color-accent, #d97706) 22%, transparent);
+}
+
+.send-message__field--email,
+.send-message__field--phone {
+  gap: 0;
+}
+
+.send-message__textarea {
+  min-height: 12rem;
+  width: 100%;
+  resize: both;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--ds-color-border-strong, rgba(17, 24, 39, 0.18));
+  border-radius: 1rem;
+  background: var(--ds-color-surface-raised, rgba(255, 255, 255, 0.92));
+  color: var(--ds-color-text, #111827);
+  box-shadow: var(--ds-shadow-md, 0 10px 25px rgba(15, 23, 42, 0.08));
+  line-height: 1.6;
+  font: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.send-message__textarea:focus {
+  outline: 2px solid transparent;
+  border-color: var(--ds-color-accent, #d97706);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-color-accent, #d97706) 22%, transparent);
+}
+
+.send-message__hint {
+  font-size: 0.95rem;
+  color: var(--ds-color-text-muted, rgba(31, 41, 55, 0.82));
+  transition: color 0.2s ease;
+  text-align: center;
+}
+
+.send-message__hint[data-status="error"] {
+  color: var(--ds-color-danger, #b91c1c);
+  font-weight: 500;
+}
+
+.send-message__hint[data-status="success"] {
+  color: var(--ds-color-success, #166534);
+}
+
+.send-message__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.875rem;
+}
+
+.send-message__button {
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 1.4rem;
+  background: var(--ds-color-accent, #d97706);
+  color: var(--ds-color-accent-contrast, #ffffff);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease,
+    box-shadow 0.18s ease;
+  box-shadow: var(--ds-shadow-md, 0 10px 25px rgba(15, 23, 42, 0.08));
+}
+
+.send-message__button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.send-message__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.send-message__status {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.send-message__status[data-status="error"] {
+  color: var(--ds-color-danger, #b91c1c);
+}
+
+.send-message__status[data-status="success"] {
+  color: var(--ds-color-success, #166534);
+}
+
+.send-message__success {
+  margin: 0 auto;
+  width: min(100%, 52rem);
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+  background: var(--ds-color-surface-raised, rgba(255, 255, 255, 0.92));
+  color: var(--ds-color-success, #166534);
+  font-weight: 600;
+  text-align: center;
+  box-shadow: var(--ds-shadow-md, 0 10px 25px rgba(15, 23, 42, 0.08));
+}
+
+.send-message__fallback {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 auto;
+  width: min(100%, 52rem);
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+  background: var(--ds-color-surface-raised, rgba(255, 255, 255, 0.92));
+  box-shadow: var(--ds-shadow-md, 0 10px 25px rgba(15, 23, 42, 0.08));
+}
+
+.send-message__fallback-error {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ds-color-danger, #b91c1c);
+  font-weight: 500;
+}
+
+.send-message__fallback-lead {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ds-color-text-muted, rgba(31, 41, 55, 0.82));
+}
+
+.send-message__fallback-link {
+  color: var(--ds-color-accent, #d97706);
+  text-decoration: none;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.send-message__fallback-link:hover {
+  text-decoration: underline;
+}
+
+.send-message__fallback-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--ds-color-surface, rgba(248, 248, 248, 0.72));
+  border: 1px solid var(--ds-color-border-strong, rgba(17, 24, 39, 0.1));
+}
+
+.send-message__fallback-text {
+  flex: 1;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--ds-color-text, #111827);
+  max-height: 12rem;
+  overflow: auto;
+}
+
+.send-message__copy-btn {
+  flex-shrink: 0;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0.4rem;
+  cursor: pointer;
+  color: var(--ds-color-text-muted, rgba(31, 41, 55, 0.7));
+  border-radius: 0.5rem;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.send-message__copy-btn:hover {
+  color: var(--ds-color-accent, #d97706);
+  background: var(--ds-color-surface-hover, rgba(0, 0, 0, 0.04));
+}
+
+@media (max-width: 640px) {
+  .send-message__actions {
+    align-items: stretch;
+  }
+
+  .send-message__button {
+    width: 100%;
+  }
+}

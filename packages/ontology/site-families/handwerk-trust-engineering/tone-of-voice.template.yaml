@@ -1,0 +1,14 @@
+family: handwerk-trust-engineering
+version: 1.0.0
+voice:
+  tone: grounded
+  posture: founder-led
+  readingLevel: professional-b2b
+  avoids:
+    - hype
+    - vanity metrics
+    - manipulative scarcity
+  prefers:
+    - written conditions
+    - operational clarity
+    - responsible promises

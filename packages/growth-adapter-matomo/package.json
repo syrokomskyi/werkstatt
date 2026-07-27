@@ -1,0 +1,48 @@
+{
+  "name": "@gogol/growth-adapter-matomo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Matomo GrowthAdapter for RFC-0305 Messkanon events over the first-party analytics proxy.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./adapter": {
+      "types": "./src/adapter.ts",
+      "default": "./src/adapter.ts"
+    },
+    "./binding": {
+      "types": "./src/binding.ts",
+      "default": "./src/binding.ts"
+    },
+    "./transport": {
+      "types": "./src/transport.ts",
+      "default": "./src/transport.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "echo 'No build step required — TypeScript sources consumed directly'",
+    "build:check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@gogol/growth": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "architecture",
+      "rationale": "Matomo adapter is integration-bound and currently covered by static config validation; direct tests are deferred until vendor fixtures exist.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

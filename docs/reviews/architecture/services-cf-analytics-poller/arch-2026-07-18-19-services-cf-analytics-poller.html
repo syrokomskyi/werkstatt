@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review — services/cf-analytics-poller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
+      .dead {
+        opacity: 0.35;
+      }
+      .stale {
+        border-color: #dc2626;
+        border-style: dashed;
+      }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-4">
+        <div class="flex items-baseline justify-between">
+          <h1 class="text-3xl font-serif text-slate-800">
+            Architecture review — <code class="text-2xl">@gogol/cf-analytics-poller</code>
+          </h1>
+          <span class="text-sm text-slate-500">2026-07-18</span>
+        </div>
+        <div class="flex gap-6 text-xs text-slate-600">
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 border-2 border-slate-700 bg-white"></div>
+            module
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-0.5 border-t-2 border-dashed border-slate-500"></div>
+            seam
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 border-2 border-red-600 border-dashed"></div>
+            stale / leaking
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 deep"></div>
+            deep module
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 border border-slate-300 dead"></div>
+            dead code
+          </div>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+        <!-- Candidate 1 -->
+        <article
+          id="c1"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              No Cloudflare adapter — <code>graphqlRequest</code> is inline fetch inside
+              <code>loop.ts</code>
+            </h2>
+            <div class="flex gap-2">
+              <span
+                class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"
+                >Strong</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >ports &amp; adapters</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>services/cf-analytics-poller/src/loop.ts</div>
+            <div>services/cf-analytics-poller/src/queries.ts</div>
+            <div>services/cf-analytics-poller/src/poll.ts</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — raw fetch fused into orchestration
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">loop.ts — runPollCycle</div>
+                  <div class="text-slate-700">calls graphqlRequest() directly</div>
+                  <div class="text-slate-700">hardcoded endpoint string</div>
+                  <div class="text-slate-700">try/catch per zone inline</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">loop.ts — graphqlRequest</div>
+                  <div class="text-slate-700">fetch + headers + JSON parse</div>
+                  <div class="text-slate-700">no injection, no fake</div>
+                </div>
+                <div class="text-center text-slate-400 text-[10px]">
+                  runPollCycle is untestable without network
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — deep Cloudflare adapter behind a seam
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">cloudflare-client.ts</div>
+                  <div class="text-slate-700">owns endpoint, auth, query exec</div>
+                  <div class="text-slate-700">accepts FetchImpl = (url, init) =&gt; ...</div>
+                  <div class="text-slate-700">returns shaped responses</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">
+                    loop.ts — runPollCycle(client, pusher)
+                  </div>
+                  <div class="text-slate-700">calls client.zoneHttpRequests(...)</div>
+                  <div class="text-slate-700">calls client.workerInvocations(...)</div>
+                  <div class="text-slate-700">testable with a fake client</div>
+                </div>
+                <div class="text-center text-slate-500 text-[10px]">
+                  one adapter, N tests through the seam
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Problem:</span>
+              <code>runPollCycle</code> calls <code>fetch()</code> directly via the inline
+              <code>graphqlRequest</code> function. There is no seam — the Cloudflare API endpoint,
+              auth header, and response shaping are fused into the cycle orchestration. The cycle
+              cannot be exercised without real network.
+            </div>
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Solution:</span> Extract a
+              <code>CloudflareAnalyticsClient</code> module that owns endpoint, token, query
+              execution, and response shaping. <code>runPollCycle</code> accepts the client as a
+              parameter. A <code>FetchImpl</code> type at the client's seam enables fake injection —
+              mirroring <code>fleet-probe-runner</code>'s <code>FetchImpl</code>/<code
+                >TlsImpl</code
+              >
+              pattern.
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >leverage: one adapter, N tests</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: CF API knowledge in one module</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >depth: cycle interface shrinks</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >parity: matches fleet-probe-runner</span
+            >
+          </div>
+        </article>
+
+        <!-- Candidate 2 -->
+        <article
+          id="c2"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              <code>runPollCycle</code> fuses orchestration, I/O, watermark, and metric dispatch
+            </h2>
+            <div class="flex gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800"
+                >Worth exploring</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>services/cf-analytics-poller/src/loop.ts (lines 61–126)</div>
+            <div>services/cf-analytics-poller/src/watermark.ts</div>
+            <div>services/cf-analytics-poller/src/poll.ts</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — one function, five concerns
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">runPollCycle(pusher)</div>
+                  <div class="text-slate-700">1. loadConfig + loadZones</div>
+                  <div class="text-slate-700">2. settledWindow() — pure, buried</div>
+                  <div class="text-slate-700">3. for zone: graphqlRequest × 2</div>
+                  <div class="text-slate-700">
+                    4. transformZoneResponse / transformWorkersResponse
+                  </div>
+                  <div class="text-slate-700">5. writeWatermark + findMetricSpec + push</div>
+                </div>
+                <div class="text-center text-slate-400 text-[10px]">
+                  understanding the cycle = reading 60 lines
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — orchestration over injected parts
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">
+                    windowing.ts — settledWindow()
+                  </div>
+                  <div class="text-slate-700">pure, independently tested</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">
+                    runPollCycle(client, pusher, window)
+                  </div>
+                  <div class="text-slate-700">iterate zones → client.* → transform</div>
+                  <div class="text-slate-700">delegate push to a emitPoints helper</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">
+                    emit.ts — emitPoints(pusher, points)
+                  </div>
+                  <div class="text-slate-700">findMetricSpec + kind dispatch</div>
+                </div>
+                <div class="text-center text-slate-500 text-[10px]">
+                  each part testable in isolation
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Problem:</span>
+              <code>runPollCycle</code> is 60 lines doing five distinct things: config loading, zone
+              loading, window computation, per-zone GraphQL + transform, and metric dispatch. The
+              <code>settledWindow</code> pure function is buried inside the file rather than earning
+              its own seam. The metric dispatch loop (<code>findMetricSpec</code> + kind branching)
+              duplicates what <code>MetricsPusher</code> already knows.
+            </div>
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Solution:</span> Extract
+              <code>settledWindow</code> into a windowing module, extract the
+              <code>findMetricSpec</code> + kind dispatch into an <code>emitPoints</code> helper (or
+              use <code>METRIC_REFS</code> directly), and let <code>runPollCycle</code> become pure
+              orchestration over the injected client and pusher.
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: window logic in one place</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >leverage: emitPoints reused by run-once + loop</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >depth: cycle body shrinks to orchestration</span
+            >
+          </div>
+        </article>
+
+        <!-- Candidate 3 -->
+        <article
+          id="c3"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              Watermark seam is half-built — <code>readWatermark</code> is dead, write-ahead is
+              incomplete
+            </h2>
+            <div class="flex gap-2">
+              <span
+                class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"
+                >Strong</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>services/cf-analytics-poller/src/watermark.ts</div>
+            <div>services/cf-analytics-poller/src/loop.ts (line 17, line 109)</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — write-only watermark
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">watermark.ts</div>
+                  <div class="text-slate-700">readWatermark() — exported</div>
+                  <div class="text-slate-700">writeWatermark() — exported</div>
+                  <div class="text-slate-700">WATERMARK_PATH — module constant</div>
+                </div>
+                <div class="rounded border-2 border-red-600 border-dashed bg-white p-2 stale">
+                  <div class="font-mono text-[10px] text-red-600">loop.ts</div>
+                  <div class="text-red-700">imports readWatermark ✓</div>
+                  <div class="text-red-700">never calls readWatermark ✗</div>
+                  <div class="text-red-700">writes watermark but never checks it</div>
+                </div>
+                <div class="rounded border border-slate-300 dead bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-400">WATERMARK_PATH</div>
+                  <div class="text-slate-400">
+                    computed at module load — shadowed by re-derivation in both functions
+                  </div>
+                </div>
+                <div class="text-center text-red-400 text-[10px]">
+                  double-push prevention claimed but not implemented
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — complete or delete
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">
+                    Option A: complete the seam
+                  </div>
+                  <div class="text-slate-700">runPollCycle reads watermark first</div>
+                  <div class="text-slate-700">skips zones if window already processed</div>
+                  <div class="text-slate-700">write-ahead prevents double-push on crash</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">
+                    Option B: delete the module
+                  </div>
+                  <div class="text-slate-700">remove watermark.ts entirely</div>
+                  <div class="text-slate-700">remove import + write call from loop.ts</div>
+                  <div class="text-slate-700">settled window is inherently idempotent</div>
+                </div>
+                <div class="text-center text-slate-500 text-[10px]">
+                  either way, the dead code vanishes
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Problem:</span>
+              <code>readWatermark</code> is imported in <code>loop.ts</code> but never called. The
+              README claims "persist before flush to prevent double-push," but the write-ahead
+              pattern is incomplete — the watermark is written and never read, so double-push is not
+              actually prevented. The <code>WATERMARK_PATH</code> module constant is computed at
+              load time and then silently re-derived inside both functions.
+            </div>
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Solution:</span> Either complete the seam
+              (read the watermark at cycle start, skip already-processed windows) or delete the
+              entire module. The <code>settledWindow</code> approach (now−10m, now−5m) is already
+              idempotent for overlapping windows, so deletion may be the honest choice. The deletion
+              test: removing <code>watermark.ts</code> concentrates nothing — the complexity was
+              never wired.
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: double-push logic in one place or gone</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >depth: no shallow dead exports</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >honesty: README matches code</span
+            >
+          </div>
+        </article>
+
+        <!-- Candidate 4 -->
+        <article
+          id="c4"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              Zone map format drift — <code>zones.yaml</code> vs <code>zones.jsonc</code> + inline
+              <code>loadZones</code>
+            </h2>
+            <div class="flex gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800"
+                >Worth exploring</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>services/cf-analytics-poller/zones.yaml</div>
+            <div>services/cf-analytics-poller/src/loop.ts (loadZones, lines 25–32)</div>
+            <div>services/observability-stack/compose.extra.yaml (line 40)</div>
+            <div>services/cf-analytics-poller/README.md (lines 7, 21)</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — three sources of truth, one file
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">zones.yaml — actual file</div>
+                  <div class="text-slate-700">YAML format, parsed by yaml.parse</div>
+                </div>
+                <div class="rounded border-2 border-red-600 border-dashed bg-white p-2 stale">
+                  <div class="font-mono text-[10px] text-red-600">README.md</div>
+                  <div class="text-red-700">says "zones.jsonc"</div>
+                </div>
+                <div class="rounded border-2 border-red-600 border-dashed bg-white p-2 stale">
+                  <div class="font-mono text-[10px] text-red-600">compose.extra.yaml</div>
+                  <div class="text-red-700">mounts zones.jsonc (nonexistent)</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">loop.ts — loadZones()</div>
+                  <div class="text-slate-700">inline, reads "zones.yaml" hardcoded</div>
+                  <div class="text-slate-700">no validation, no schema</div>
+                </div>
+                <div class="text-center text-red-400 text-[10px]">
+                  compose mount breaks at deploy time
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — one zone-map module, one format
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">zone-map.ts</div>
+                  <div class="text-slate-700">loadZoneMap(path?) — owns parsing</div>
+                  <div class="text-slate-700">validates siteId/zoneId/workerScripts</div>
+                  <div class="text-slate-700">format: YAML (per RFC-0376)</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">compose.extra.yaml</div>
+                  <div class="text-slate-700">mounts zones.yaml ✓</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">README.md</div>
+                  <div class="text-slate-700">references zones.yaml ✓</div>
+                </div>
+                <div class="text-center text-slate-500 text-[10px]">
+                  one module, one format, one source of truth
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Problem:</span> The actual file is
+              <code>zones.yaml</code>, but <code>README.md</code> says <code>zones.jsonc</code> and
+              <code>compose.extra.yaml</code> mounts <code>zones.jsonc</code> — a file that does not
+              exist. The Docker volume mount will silently create an empty file or fail.
+              <code>loadZones</code> is a shallow inline function in <code>loop.ts</code> with no
+              schema validation.
+            </div>
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Solution:</span> Extract a
+              <code>zone-map.ts</code> module that owns loading, parsing, and validation. Fix the
+              compose mount and README to reference <code>zones.yaml</code>. The module's seam is
+              the <code>ZoneEntry[]</code> return type; behind it lives all file-format knowledge.
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: zone format in one module</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >leverage: validated ZoneEntry[] for the cycle</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >fixes: deploy-time mount breakage</span
+            >
+          </div>
+        </article>
+
+        <!-- Candidate 5 -->
+        <article
+          id="c5"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              Pusher resource creation duplicated between <code>run-once.ts</code> and
+              <code>runLoop</code>
+            </h2>
+            <div class="flex gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800"
+                >Speculative</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>services/cf-analytics-poller/src/run-once.ts (lines 17–21)</div>
+            <div>services/cf-analytics-poller/src/loop.ts (lines 130–134)</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — pusher factory inlined twice
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">run-once.ts</div>
+                  <div class="text-slate-700">
+                    createMetricsPusher({ serviceName, layer, environment })
+                  </div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">loop.ts — runLoop</div>
+                  <div class="text-slate-700">createMetricsPusher({ same attrs })</div>
+                </div>
+                <div class="text-center text-slate-400 text-[10px]">
+                  identical resource attributes in two places
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — one factory, two callers
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">pusher-factory.ts</div>
+                  <div class="text-slate-700">createPollerPusher() — owns resource attrs</div>
+                </div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">run-once.ts + runLoop</div>
+                  <div class="text-slate-700">both call createPollerPusher()</div>
+                </div>
+                <div class="text-center text-slate-500 text-[10px]">
+                  resource identity defined once
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Problem:</span> Both entrypoints construct
+              a pusher with identical resource attributes (<code
+                >serviceName: "cf-analytics-poller"</code
+              >, <code>layer: "delivery"</code>, <code>environment: "production"</code>). If the
+              resource identity changes, two call sites must be updated in sync.
+            </div>
+            <div class="text-sm">
+              <span class="font-semibold text-slate-700">Solution:</span> Extract a
+              <code>createPollerPusher()</code> factory that encapsulates the resource attributes.
+              Both <code>run-once.ts</code> and <code>runLoop</code> call it. Small win — the
+              deletion test is weak here, but it prevents resource-attribute drift.
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: resource identity in one place</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >leverage: one factory, two callers</span
+            >
+          </div>
+        </article>
+      </section>
+
+      <section
+        id="top-recommendation"
+        class="rounded-xl border-2 border-slate-800 bg-slate-50 p-6 space-y-3"
+      >
+        <h2 class="text-2xl font-serif text-slate-800">Top recommendation</h2>
+        <div class="space-y-2">
+          <p class="text-sm text-slate-700">
+            <a href="#c1" class="font-semibold text-slate-900 underline"
+              >Candidate 1 — No Cloudflare adapter seam</a
+            >. Extracting a <code>CloudflareAnalyticsClient</code> module is the highest-leverage
+            deepening because it unlocks testability of the entire poll cycle — the one thing this
+            service currently lacks. The pattern already exists in the sibling
+            <code>fleet-probe-runner</code> (<code>FetchImpl</code> / <code>TlsImpl</code> injection
+            in <code>probe.ts</code>), so the ecosystem has a proven shape to follow. Once the
+            adapter seam exists, Candidate 2 (separating orchestration from I/O) becomes a natural
+            follow-up, and Candidates 3–4 are independent cleanups that can proceed in parallel.
+          </p>
+          <p class="text-xs text-slate-500">
+            Candidate 3 (watermark) is the strongest independent cleanup — the dead
+            <code>readWatermark</code> import and the incomplete write-ahead pattern are a honesty
+            bug that should be resolved regardless of whether the adapter refactor proceeds.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

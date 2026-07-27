@@ -1,0 +1,75 @@
+id: header-component
+uniName: header-component
+layer: component
+semanticId: header
+archetype: shell.header
+
+cosmicName: Oberon
+role: header
+version: 1.1.0
+intent:
+  - guide-navigation
+  - orient-visitor
+  - establish-identity
+industryFit: []
+contentSchemaKey: header-component
+contentTypesPath: ./header-component.types.generated.ts
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - navAriaLabel
+    - mobileNavAriaLabel
+    - menuButtonAriaLabel
+    - overflowMenuLabel
+    - overflowMenuAriaLabel
+    - ctaLabel
+    - navLinks
+  properties:
+    texture:
+      type: boolean
+      default: false
+      description: Apply noise texture overlay to the header background
+    navAriaLabel:
+      type: string
+    mobileNavAriaLabel:
+      type: string
+    menuButtonAriaLabel:
+      type: string
+    overflowMenuLabel:
+      type: string
+    overflowMenuAriaLabel:
+      type: string
+    ctaLabel:
+      type: string
+    motto:
+      type: string
+    navLinks:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - label
+        properties:
+          label:
+            type: string
+          target:
+            type: string
+          semanticTarget:
+            type: object
+            additionalProperties: false
+            required:
+              - kind
+            properties:
+              kind:
+                type: string
+                enum:
+                  - internal
+                  - external
+              pageId:
+                type: string
+              anchor:
+                type: string
+              href:
+                type: string

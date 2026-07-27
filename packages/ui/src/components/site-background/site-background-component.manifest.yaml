@@ -1,0 +1,24 @@
+id: site-background-component
+uniName: site-background-component
+layer: component
+semanticId: site-background
+archetype: shell.site-background
+cosmicName: Hermippe
+role: site-background
+version: 1.0.0
+intent:
+  - paint-site-background
+  - shell-layer
+industryFit: []
+contentSchemaKey: null
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - layers
+  properties:
+    layers:
+      type: array
+      minItems: 1
+    lang:
+      type: string

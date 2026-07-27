@@ -1,0 +1,250 @@
+<technology>
+  <meta>
+    <document-id>technology</document-id>
+    <version>1.0.0</version>
+    <status>active</status>
+    <scope>repository-root</scope>
+  </meta>
+
+  <runtime>
+    <node>
+      <version-range>&gt;=22</version-range>
+      <source>`package.json` engines.node</source>
+    </node>
+    <package-manager>
+      <name>pnpm</name>
+      <version>11.8.0</version>
+      <source>`package.json` packageManager</source>
+    </package-manager>
+    <workspace-model>
+      <tool>Turborepo</tool>
+      <workspace-file>`pnpm-workspace.yaml`</workspace-file>
+      <pipeline-file>`turbo.json`</pipeline-file>
+    </workspace-model>
+  </runtime>
+
+  <changelog-os-stack>
+    <entry id="cos-01">
+      <name>simple-git</name>
+      <role>Git log extraction, tree hash resolution, diff stats.</role>
+    </entry>
+    <entry id="cos-02">
+      <name>better-sqlite3 (WAL mode, busy_timeout=5000)</name>
+      <role>Persistent AI classification cache. WAL mode prevents SQLITE_BUSY in parallel CI jobs.</role>
+    </entry>
+    <entry id="cos-03">
+      <name>zod</name>
+      <role>Schema validation at all pipeline boundaries (commits, classified results, grouped releases).</role>
+    </entry>
+    <entry id="cos-04">
+      <name>p-limit (concurrency=5)</name>
+      <role>Rate-limits AI API calls to prevent 429 errors during backfill of large repositories.</role>
+    </entry>
+    <entry id="cos-05">
+      <name>semver</name>
+      <role>Deterministic SemVer calculation with major-version guard.</role>
+    </entry>
+    <entry id="cos-06">
+      <name>commander</name>
+      <role>CLI interface for `generate`, `rebuild-index`, `backfill`, `edit` commands.</role>
+    </entry>
+    <entry id="cos-07">
+      <name>ai (Vercel AI SDK)</name>
+      <role>Unified LLM client for OpenAI / Anthropic. temperature=0 for determinism.</role>
+    </entry>
+    <entry id="cos-08">
+      <name>tsx</name>
+      <role>TypeScript execution for changelog scripts without a pre-build step.</role>
+    </entry>
+    <entry id="cos-09">
+      <name>picomatch</name>
+      <role>Glob pattern matching for command-result cache reads declaration (RFC-0390). Zero-dependency, used by Turbo and Vitest.</role>
+    </entry>
+  </changelog-os-stack>
+
+  <monorepo-topology>
+    <layer id="scripts">
+      <path>`scripts/*`</path>
+      <role>Repository-level DevOps and automation scripts. Not packaged; executed directly via tsx.</role>
+    </layer>
+    <layer id="apps">
+      <path>`apps/*`</path>
+      <role>Deployable products with their own content, routes, styles, scripts, and validation.</role>
+    </layer>
+    <layer id="packages">
+      <path>`packages/*`</path>
+      <role>Reusable shared libraries and framework adapters.</role>
+    </layer>
+    <layer id="services">
+      <path>`services/*`</path>
+      <role>Deployable backend runtime composition workspaces: API, Worker, runner, poller, queue, scheduler, and compose-stack wiring. Services are the backend analogue of `apps/*` and must keep shared logic in `packages/*`.</role>
+    </layer>
+    <layer id="integrations">
+      <path>`integrations/*`</path>
+      <role>Integration source descriptors, truth-source registries, monitor outbox state, and other non-runtime integration metadata. This folder is not a pnpm workspace package lane.</role>
+    </layer>
+    <layer id="root-docs">
+      <path>`docs/*`</path>
+      <role>Repository-wide Compass contracts, plans, graphs, and verification guidance for AI agents and maintainers.</role>
+    </layer>
+  </monorepo-topology>
+
+  <workspaces>
+    <workspace id="app-webgogol-com">
+      <path>`apps/webgogol-com`</path>
+      <kind>app</kind>
+      <role>Primary marketing site with Ukrainian and German localization.</role>
+    </workspace>
+    <workspace id="app-nicaragua-projekt">
+      <path>`apps/nicaragua-projekt`</path>
+      <kind>app</kind>
+      <role>Charity project site with German and English localization.</role>
+    </workspace>
+    <workspace id="pkg-kernel">
+      <path>`packages/os/site-kernel`</path>
+      <kind>package</kind>
+      <role>Framework-free site OS core for discovery, runtime, registry, pipelines, and CLI execution.</role>
+    </workspace>
+    <workspace id="pkg-forge">
+      <path>`packages/forge`</path>
+      <kind>package</kind>
+      <role>Portable governance skills and command modules (RFC-0374). src/ is portable; os/ is kernel-dependent. Exports forgeRfcModule, forgeWorkflowModule, forgeNamingModule, forgeCompassModule, forgeWerkstattModule, forgeCoreModule and 29 skills. Project-declared skill packs (RFC-0539) are discovered via discoverPackSkills from forge.yaml skillPacks config and validated by forge.skill.validate (SKILL-01..15).</role>
+    </workspace>
+    <workspace id="pkg-kernel-astro">
+      <path>`packages/os/site-kernel-astro`</path>
+      <kind>package</kind>
+      <role>Astro-specific adapter surface built on top of the kernel core.</role>
+    </workspace>
+    <workspace id="pkg-kernel-checks">
+      <path>`packages/os/site-kernel-checks`</path>
+      <kind>package</kind>
+      <role>Content validation and Compass inventory commands used by Astro sites, including page-driven shared-context validation for RFC-0099, B2B-only business model enforcement via `b2b.model.validate` (RFC-0487), industry dossier validation via `surface.industry.validate`, `surface.doorway-risk.report`, `surface.duplicate-content.report` (RFC-0492), ratgeber claim record validation via `ratgeber.claim.validate` (RFC-0505, RG-CLAIM-01..09), team hub page validation via `team.hub.validate` (RFC-0509), and team JSON endpoint validation via `participant.json.validate` (RFC-0512).</role>
+    </workspace>
+    <workspace id="pkg-kernel-codegen">
+      <path>`packages/os/site-kernel-codegen`</path>
+      <kind>package</kind>
+      <role>File generation commands: icons, open-source page, Compass backfill, Compass markup clearing, and `_redirects` generation from `retiredRoutes` (410 tombstones + 301 redirects, RFC-0487/RFC-0509).</role>
+    </workspace>
+    <workspace id="pkg-kernel-changelog">
+      <path>`packages/os/site-kernel-changelog`</path>
+      <kind>package</kind>
+      <role>AI-powered changelog generation pipeline.</role>
+    </workspace>
+    <workspace id="pkg-kernel-deploy">
+      <path>`packages/os/site-kernel-deploy`</path>
+      <kind>package</kind>
+      <role>Deploy commands: workspace export to client directories.</role>
+    </workspace>
+    <workspace id="pkg-kernel-content">
+      <path>`packages/os/site-kernel-content`</path>
+      <kind>package</kind>
+      <role>Markdown discovery and frontmatter parsing primitives.</role>
+    </workspace>
+    <workspace id="pkg-kernel-integrity">
+      <path>`packages/os/site-kernel-integrity`</path>
+      <kind>package</kind>
+      <role>Integrity tracking, provenance, signing support, and kernel-command adapters.</role>
+    </workspace>
+    <workspace id="pkg-kernel-handoff">
+      <path>`packages/os/site-kernel-handoff`</path>
+      <kind>package</kind>
+      <role>RFC-0221 internal site handoff bundle validation, ecosystem version comparison, capability diffing, forward migrator registry, and Notausgang emergency export/deep integrity verification (RFC-0359, RFC-0380).</role>
+    </workspace>
+    <workspace id="pkg-ui">
+      <path>`packages/ui`</path>
+      <kind>package</kind>
+      <role>Shared UI primitives, canonical LordIcon JSON assets, and generated Astro icon components for app consumers.</role>
+    </workspace>
+    <workspace id="pkg-integration">
+      <path>`packages/integration`</path>
+      <kind>package</kind>
+      <role>Integration hub contracts: IntegrationEvent, DestinationAdapter, funnel state machine, CRM buffer types, QStash/Redis delivery substrate, dispatch/sharding. Pure contracts — no astro:env, no vendor SDK. Consumed by agent-gate, integration adapters, ui, site-kernel-checks, site-kernel-deploy.</role>
+    </workspace>
+    <workspace id="pkg-integration-adapter-supabase-crm">
+      <path>`packages/integration-adapter-supabase-crm`</path>
+      <kind>package</kind>
+      <role>RFC-0186: Shared Lagebild CRM buffer adapter. Multi-tenant sync worker factory, tenant registry types, and Pipedrive destination handlers. One shared Worker serves all clients via Supabase sync_tenants registry.</role>
+    </workspace>
+    <workspace id="pkg-surface">
+      <path>`packages/surface`</path>
+      <kind>package</kind>
+      <role>RFC-0192 Programmatic Surface route-source port: framework-free Blueprint contract/assembly + axis-generic eligibility engine. `BlueprintLevel` includes optional `pillar` field (RFC-0490) for depth-0 hub specialization and optional `dossier` field (RFC-0492) for depth-1 industry dossier configuration. Pure functions only — all I/O lives in kernel commands.</role>
+    </workspace>
+    <workspace id="pkg-share">
+      <path>`packages/share`</path>
+      <kind>package</kind>
+      <role>App-agnostic shared utilities: entity-ID normalization, i18n helpers, base schemas (including `claimRecordSchema`/`ClaimRecord` for RFC-0505 ratgeber claim records), browser scripts, `buildPage()`, semantic layer (`SemanticPageType` includes `"collection"` for CollectionPage + ItemList JSON-LD, RFC-0490; `SemanticPageModel` carries optional `surfaceId`/`depth` for depth-gated JSON-LD corrections, RFC-0492; `buildServiceNodes` suppresses org-level Service nodes for depth-1 `website-local` pages and emits industry-specific Service node instead), and integration hub contracts.</role>
+    </workspace>
+    <workspace id="service-lagebild-sync-worker">
+      <path>`services/lagebild-sync-worker`</path>
+      <kind>service</kind>
+      <role>Shared Lagebild CRM sync Worker workspace package, discovered through the `services/*` pnpm workspace glob and represented in the Agent Control Plane as a backend service.</role>
+    </workspace>
+  </workspaces>
+
+  <testing-stack>
+    <entry id="test-01">
+      <name>vitest</name>
+      <role>Sole test runner for all workspace packages. Replaces node:test (RFC-0347). Every package with a real test script uses `vitest run` and `vitest` for watch mode.</role>
+    </entry>
+    <entry id="test-02">
+      <name>fast-check</name>
+      <role>Property-based testing library for pure functions with verifiable algebraic properties (DNA-41). PBT files use the `.pbt.test.ts` suffix.</role>
+    </entry>
+  </testing-stack>
+
+  <dependency-rules>
+    <rule id="dep-01">Packages must not import from `apps/*`.</rule>
+    <rule id="dep-02">Apps may consume packages through stable public APIs rather than package-private internals.</rule>
+    <rule id="dep-03">Framework adapters depend on the framework-free core, not the other way around.</rule>
+    <rule id="dep-04">Cross-workspace changes must preserve explicit ownership boundaries between routes, content, config, styles, scripts, and semantic outputs.</rule>
+    <rule id="dep-05">Version constraints and compatibility assumptions should be recorded here when they become architectural dependencies rather than local package trivia.</rule>
+    <rule id="dep-06">`packages/ontology` owns the canonical RFC-0071 biome and site-family contracts; validators and codegen must consume those schemas rather than duplicating them locally.</rule>
+    <rule id="dep-07">`packages/tokens` owns the canonical `--ds-*` names that biome validators and biome CSS generation may emit; token-name mapping must stay synchronized with `TOKEN_NAMES`.</rule>
+    <rule id="dep-08">Every authored relative import/export in `packages/**/*.ts(x)` uses the on-disk `.ts` / `.tsx` extension. `tsconfig/base.json` enables `allowImportingTsExtensions`; `tsconfig/node-lib.json` rewrites emitted relative imports to `.js` for build-backed packages.</rule>
+    <rule id="dep-09">Build-backed packages may export runtime from `dist/*.js` and types from `dist/*.d.ts`; source-consumed package surfaces may export raw `src/*.ts` / `.astro` when consumers require source access. The package export target does not change the authored local-import rule.</rule>
+    <rule id="dep-10">Generator-owned app files follow their owning template and Astro/Vite runtime contract. Import-style changes to generated app files belong in the generator/template first, followed by regeneration.</rule>
+    <rule id="dep-11">`packages/surface` owns the `BlueprintLevel` contract including the optional `pillar` field (RFC-0490). `packages/share` owns the `SemanticPageType` union including `"collection"` (RFC-0490) and the `collectionItems` field on `SemanticPageModel`. `packages/ontology` owns the Zod schema mirror that validates `pillar` and `"collection"` at blueprint load time. The baker in `packages/os/site-kernel-checks` reads `pillar` from the level — it must not duplicate pillar content in TypeScript.</rule>
+  </dependency-rules>
+
+  <ai-facing-format-rules>
+    <rule id="fmt-01">For large AI-facing context, plans, reports, and knowledge graphs, prefer XML documents in `docs/`.</rule>
+    <rule id="fmt-02">Do not replace working machine config formats required by tools; Compass XML applies to semantic/project context, not to tool-native config files.</rule>
+    <rule id="fmt-03">When adding structured logs or reports for AI analysis, keep block names stable and aligned with module contracts or semantic anchors.</rule>
+  </ai-facing-format-rules>
+
+  <command-policy>
+    <rule id="cmd-01">Prefer repository-root commands with `pnpm --filter &lt;workspace&gt; ...` for scoped work.</rule>
+    <rule id="cmd-02">Use `turbo run ...` only when the task intentionally spans multiple workspaces.</rule>
+    <rule id="cmd-03">Validate the smallest affected surface first, then expand only when shared boundaries changed.</rule>
+    <rule id="cmd-04">Register workspace-scoped site OS commands in the repository root `tools/kernel.config.ts`; keep app-local `tools/kernel.config.ts` files focused on app-scoped modules and pipelines.</rule>
+  </command-policy>
+
+  <Compass-automation>
+    <surface id="ga-01">
+      <name>Canonical source markup contract</name>
+      <path>`docs/source-markup.xml`</path>
+      <role>Defines repository-wide Compass source scaffolding rules, coverage modes, and anchor conventions.</role>
+    </surface>
+    <surface id="ga-02">
+      <name>Shared Compass commands</name>
+      <path>`packages/os/site-kernel-checks/src/Compass.ts`</path>
+      <role>Owns repository-wide Compass inventory generation and compliance validation. Codegen backfill commands live in `packages/os/site-kernel-codegen`.</role>
+    </surface>
+    <surface id="ga-03">
+      <name>Generated inventory artifact</name>
+      <path>`docs/compass-inventory.xml`</path>
+      <role>Captures the current classification and compliance state of authored source files for rollout and drift analysis.</role>
+    </surface>
+    <surface id="ga-04">
+      <name>Kernel command transport</name>
+      <path>`packages/os/site-kernel/src/runtime.ts`</path>
+      <role>Executes shared workspace-scoped and app-scoped Compass commands through the site OS.</role>
+    </surface>
+    <rules>
+      <rule>Shared Compass automation must stay app-agnostic and run from the workspace root.</rule>
+      <rule>Inventory and validation commands may write machine-readable XML artifacts under `docs/` but must not silently rewrite authored source files.</rule>
+      <rule>Backfill or mutation automation should be added only after inventory and validation surfaces are stable and idempotent.</rule>
+    </rules>
+  </Compass-automation>
+</technology>

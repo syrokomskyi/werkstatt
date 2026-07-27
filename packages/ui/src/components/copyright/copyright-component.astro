@@ -1,0 +1,50 @@
+---
+// @client-script: colocated
+/*
+<MODULE_CONTRACT>
+<purpose>Renders the structured copyright block with dynamic year display per RFC-0005.</purpose>
+<non-goals>
+  <item>Do not fetch content — caller passes resolved copyright data as props.</item>
+  <item>Do not apply layout or spacing styles beyond the component boundary.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0009: Extract copyright rendering from footer.astro into a standalone quartet component.</item>
+  <item>Replace getCopyrightSymbol() switch and symbol map with content-driven symbol field; component is now thin.</item>
+  <item>RFC-0011 Phase 2: Add colocated S-1 script tag; removed from layout.astro per colocation contract.</item>
+  <item>RFC-0031: Replace is:inline src= fallback with native Astro <script> + import of copyright-component.client.ts.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { CopyrightComponentContent } from "@gogol/ui/components/copyright/types";
+import "./copyright-component.css";
+
+type Copyright = CopyrightComponentContent["copyright"];
+
+interface Props {
+  copyright: Copyright;
+}
+
+const { copyright } = Astro.props;
+---
+
+<p class="copyright" data-copyright-component>
+  <span class="copyright__symbol">{copyright.symbol}</span>{" "}
+  <span class="copyright__years">
+    <span data-copyright-year="first">{copyright.yearFirst}</span>
+    {
+      copyright.yearSecond !== undefined && copyright.yearSecond !== copyright.yearFirst && (
+        <>
+          <span class="copyright__year-separator">–</span>
+          <span data-copyright-year="second">{copyright.yearSecond}</span>
+        </>
+      )
+    }
+  </span>{" "}
+  <span class="copyright__holder">{copyright.holder}</span>
+  {copyright.suffix && <span class="copyright__suffix"> {copyright.suffix}</span>}
+</p>
+
+<script>
+  import "./copyright-component.client";
+</script>

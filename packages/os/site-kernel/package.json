@@ -1,0 +1,136 @@
+{
+  "name": "@gogol/site-kernel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "bin": {
+    "site-kernel": "./bin/site-kernel.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./icons": {
+      "types": "./src/icons/icons.module.ts",
+      "default": "./src/icons/icons.module.ts"
+    },
+    "./adr": {
+      "types": "./src/adr/index.ts",
+      "default": "./src/adr/index.ts"
+    },
+    "./adr-module": {
+      "types": "./src/adr/adr.module.ts",
+      "default": "./src/adr/adr.module.ts"
+    },
+    "./change-impact": {
+      "types": "./src/change-impact.ts",
+      "default": "./src/change-impact.ts"
+    },
+    "./change-impact-module": {
+      "types": "./src/change-impact.module.ts",
+      "default": "./src/change-impact.module.ts"
+    },
+    "./cli": {
+      "types": "./dist/cli/index.d.ts",
+      "default": "./dist/cli/index.js"
+    },
+    "./commit-message": {
+      "types": "./src/commit-message.module.ts",
+      "default": "./src/commit-message.module.ts"
+    },
+    "./command-manifest": {
+      "types": "./src/command-manifest.ts",
+      "default": "./src/command-manifest.ts"
+    },
+    "./command-manifest-module": {
+      "types": "./src/command-manifest.module.ts",
+      "default": "./src/command-manifest.module.ts"
+    },
+    "./cache-module": {
+      "types": "./src/cache/cache-module.ts",
+      "default": "./src/cache/cache-module.ts"
+    },
+    "./discovery": {
+      "types": "./src/discovery.ts",
+      "default": "./src/discovery.ts"
+    },
+    "./generated-marker": {
+      "types": "./src/generated-marker.ts",
+      "default": "./src/generated-marker.ts"
+    },
+    "./lagebild": {
+      "types": "./src/lagebild/index.ts",
+      "default": "./src/lagebild/index.ts"
+    },
+    "./lagebild-module": {
+      "types": "./src/lagebild/lagebild.module.ts",
+      "default": "./src/lagebild/lagebild.module.ts"
+    },
+    "./pipeline-budget": {
+      "types": "./src/pipeline-budget.module.ts",
+      "default": "./src/pipeline-budget.module.ts"
+    },
+    "./pipeline-budgets": {
+      "types": "./src/pipeline-budgets.ts",
+      "default": "./src/pipeline-budgets.ts"
+    },
+    "./rfc": {
+      "types": "./src/rfc/index.ts",
+      "default": "./src/rfc/index.ts"
+    },
+    "./semantic": {
+      "types": "./src/semantic/semantic.module.ts",
+      "default": "./src/semantic/semantic.module.ts"
+    },
+    "./runtime": {
+      "types": "./src/runtime.ts",
+      "default": "./src/runtime.ts"
+    },
+    "./types": {
+      "types": "./src/types.ts",
+      "default": "./src/types.ts"
+    },
+    "./workspace-discovery": {
+      "types": "./src/workspace-discovery.ts",
+      "default": "./src/workspace-discovery.ts"
+    },
+    "./workspace-io": {
+      "types": "./src/workspace-io.ts",
+      "default": "./src/workspace-io.ts"
+    },
+    "./workflow": {
+      "types": "./src/workflow/index.ts",
+      "default": "./src/workflow/index.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@gogol/fingerprint": "workspace:*",
+    "@gogol/integration-adapter-supabase-crm": "workspace:*",
+    "@gogol/observability": "workspace:*",
+    "@gogol/share": "workspace:*",
+    "@gogol/site-kernel-content": "workspace:*",
+    "@webgogol/forge": "workspace:*",
+    "picomatch": "^4.0.5",
+    "tsx": "^4.23.1",
+    "yaml": "^2.9.0"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^13.0.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/picomatch": "^4.0.3",
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  }
+}

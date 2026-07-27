@@ -1,0 +1,36 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/sections/breadcrumbs/breadcrumbs-section.astro as an authored ui authored module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not manage routing or navigation logic beyond rendering breadcrumbs.</item>
+  <item>Do not fetch breadcrumb data from external sources.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Initial creation for RFC-0026 block-declarative pages.</item>
+</CHANGE_SUMMARY>
+*/
+
+import BreadcrumbsComponent from "../../components/breadcrumbs/breadcrumbs-component.astro";
+import { getSiteLabelsData, need } from "@gogol/share";
+import type { SectionProps } from "@gogol/share/page";
+import type { SemanticBreadcrumb } from "@gogol/share";
+import "./breadcrumbs-section.css";
+
+// Extract breadcrumb items from pageOverride
+const props = Astro.props as SectionProps;
+const pageOverride = props.pageOverride;
+const { lang, defaultLanguageCode } = props;
+const items: SemanticBreadcrumb[] = Array.isArray(pageOverride?.items) ? pageOverride.items : [];
+const siteLabels = await getSiteLabelsData(props.lang, props.defaultLanguageCode);
+const breadcrumbsLabels = siteLabels?.breadcrumbs as Record<string, unknown> | undefined;
+const navAriaLabel = need(
+  "breadcrumbs.navAriaLabel",
+  typeof breadcrumbsLabels?.navAriaLabel === "string" ? breadcrumbsLabels.navAriaLabel : undefined,
+);
+---
+
+<section class="breadcrumbs-section" aria-label={navAriaLabel}>
+  <BreadcrumbsComponent items={items} lang={lang} defaultLanguageCode={defaultLanguageCode} />
+</section>

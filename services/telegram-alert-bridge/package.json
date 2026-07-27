@@ -1,0 +1,21 @@
+{
+  "name": "@gogol/telegram-alert-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:check": "pnpm exec tsc --noEmit",
+    "deploy": "site-kernel run deploy.preflight --service telegram-alert-bridge && wrangler deploy --secrets-file .env"
+  },
+  "devDependencies": {
+    "wrangler": "^4.112.0"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "observability",
+      "rationale": "Alert bridge behavior is currently guarded by TypeScript and deployment configuration; direct service tests are deferred until webhook fixtures exist.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

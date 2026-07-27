@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "signoz": {
+      "type": "url",
+      "url": "https://observe.webgogol.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${WGOGOL_SIGNOZ_MCP_TOKEN}"
+      }
+    }
+  }
+}

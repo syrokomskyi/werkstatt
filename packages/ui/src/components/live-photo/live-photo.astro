@@ -1,0 +1,132 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0202] Living-photo primitive. Composes the canonical <ResponsiveImage> (RFC-0152) — always
+  rendered as the resting state, poster, fallback, and LCP element — with a strictly additive,
+  decorative <video muted loop playsinline aria-hidden> overlay. Playback (trigger/loop/tap) is
+  driven by data-* attributes consumed by the opt-in @gogol/share livePhotos runtime; the
+  `autoplay` trigger needs no JavaScript. Degrades to the static photo under reduced-motion,
+  load failure, or "not yet triggered".
+</purpose>
+<non-goals>
+  <item>Do not resolve the clip — the caller passes an already-resolved videoSrc (validated to exist).</item>
+  <item>Do not implement playback logic — that is @gogol/share/scripts/live-photos.ts.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0202: introduced the living-photo primitive.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { buildImageSources } from "@gogol/share";
+import type {
+  ImageDescriptor,
+  ImageQualityPreset,
+  LivePhoto as LivePhotoConfig,
+} from "@gogol/share";
+import ResponsiveImage from "../responsive-image/responsive-image.astro";
+import "./live-photo.css";
+
+interface Props {
+  /** Resolved poster image (RFC-0152 descriptor; Astro ImageMetadata is assignable). */
+  image: ImageDescriptor;
+  /** Resolved sibling .webm URL — the caller has already confirmed it resolves. */
+  videoSrc: string;
+  mp4VideoSrc?: string;
+  alt: string;
+  config: LivePhotoConfig;
+  class?: string;
+  loading?: "lazy" | "eager";
+  quality?: number | ImageQualityPreset;
+  /** <img sizes> forwarded to the inner <ResponsiveImage>; defaults to "100vw" via the provider. */
+  sizes?: string;
+}
+
+const {
+  image,
+  videoSrc,
+  mp4VideoSrc,
+  alt,
+  config,
+  class: className,
+  loading = "lazy",
+  quality = "max",
+  sizes,
+} = Astro.props as Props;
+
+const trigger = config.trigger ?? "in-viewport";
+const loop = config.loop ?? true;
+const tapBehavior = config.tapBehavior ?? "toggle";
+const preload = config.preload ?? "metadata";
+
+// `autoplay` plays via native attributes only — the runtime never touches it.
+const native = trigger === "autoplay";
+// A control is rendered whenever a tap can do something: an explicit tap trigger,
+// or a toggle that lets the visitor pause an in-viewport/auto clip.
+const interactive = trigger === "tap" || tapBehavior === "toggle";
+
+// Single-frame poster for the <video poster> attribute (the ResponsiveImage below is the
+// real, srcset-backed resting state; this is only the video element's intrinsic fallback).
+const posterSrc = buildImageSources(image, { quality }).src;
+const aspectRatio = image.width && image.height ? `${image.width}/${image.height}` : undefined;
+---
+
+<div
+  class:list={["live-photo", className]}
+  style={aspectRatio ? `aspect-ratio:${aspectRatio};` : undefined}
+  data-live-photo
+  data-trigger={native ? undefined : trigger}
+  data-loop={loop ? "" : undefined}
+  data-tap-behavior={tapBehavior}
+  data-mp4-src={mp4VideoSrc}
+>
+  <ResponsiveImage
+    image={image}
+    alt={alt}
+    class="live-photo__poster"
+    loading={loading}
+    quality={quality}
+    sizes={sizes}
+  />
+
+  <video
+    class="live-photo__video"
+    poster={posterSrc}
+    muted
+    playsinline
+    webkit-playsinline
+    loop={loop || undefined}
+    autoplay={native || undefined}
+    preload={preload}
+    aria-hidden="true"
+    tabindex="-1"
+    width={image.width}
+    height={image.height}
+    x-webkit-airplay="deny"
+    disablepictureinpicture
+  >
+    <source
+      src={native ? videoSrc : undefined}
+      data-src={native ? undefined : videoSrc}
+      type="video/webm"
+    />
+    {
+      mp4VideoSrc && (
+        <source
+          src={native ? mp4VideoSrc : undefined}
+          data-src={native ? undefined : mp4VideoSrc}
+          type="video/mp4"
+        />
+      )
+    }
+  </video>
+
+  {
+    interactive && (
+      <button type="button" class="live-photo__toggle" aria-pressed="false" aria-label={alt}>
+        <span class="live-photo__toggle-icon" aria-hidden="true" />
+      </button>
+    )
+  }
+</div>

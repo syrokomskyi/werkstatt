@@ -1,0 +1,33 @@
+name: Generated-file hand-edit guard (RFC-0336)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  generated-edit-guard:
+    runs-on: ubuntu-latest
+    name: generated.edit.guard
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: generated.edit.guard
+        run: pnpm exec site-kernel run generated.edit.guard --range origin/main..HEAD --json

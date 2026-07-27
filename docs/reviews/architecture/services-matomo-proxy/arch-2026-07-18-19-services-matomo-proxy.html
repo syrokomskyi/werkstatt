@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review — services/matomo-proxy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
+      .badge-strong {
+        background: #059669;
+        color: white;
+      }
+      .badge-explore {
+        background: #d97706;
+        color: white;
+      }
+      .badge-spec {
+        background: #64748b;
+        color: white;
+      }
+      .badge-tag {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+      }
+      .mass-iface {
+        background: #fef3c7;
+        border: 1px solid #fcd34d;
+      }
+      .mass-impl {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+      }
+      .mass-deep-iface {
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+      }
+      .mass-deep-impl {
+        background: #1e293b;
+        color: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <!-- Header -->
+      <header class="space-y-4">
+        <div class="flex items-baseline justify-between">
+          <h1 class="text-3xl font-bold tracking-tight">
+            Architecture review — <code class="text-2xl">services/matomo-proxy</code>
+          </h1>
+          <span class="text-sm text-slate-500">2026-07-18</span>
+        </div>
+        <div class="flex flex-wrap gap-4 text-xs uppercase tracking-wider text-slate-600">
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-4 bg-white border border-slate-300 rounded"></span>
+            module</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-1 border-t-2 border-dashed border-slate-400"></span>
+            seam</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-4 bg-red-500 rounded"></span> leakage</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="inline-block w-4 h-4 deep rounded"></span> deep module</span
+          >
+        </div>
+      </header>
+
+      <!-- Candidates -->
+      <section id="candidates" class="space-y-10">
+        <!-- Candidate 1: Narrow the proxy module interface -->
+        <article class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-6 space-y-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h2 class="text-xl font-semibold">Narrow the proxy module interface</h2>
+              <div class="flex gap-2">
+                <span class="badge-strong text-xs font-medium px-2.5 py-1 rounded-full"
+                  >Strong</span
+                >
+                <span class="badge-tag text-xs font-medium px-2.5 py-1 rounded-full"
+                  >in-process</span
+                >
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Files</h3>
+              <div class="font-mono text-sm text-slate-700 space-y-0.5">
+                <div>services/matomo-proxy/src/proxy.ts</div>
+                <div>services/matomo-proxy/src/worker.ts</div>
+              </div>
+            </div>
+
+            <!-- Before / After diagram -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Before -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">Before</h4>
+                <div class="space-y-2">
+                  <div class="mass-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">
+                      proxy.ts interface (3 exports + type)
+                    </div>
+                    <div class="mt-1 text-slate-600">
+                      mapProxyPath(request) → UpstreamTarget<br />
+                      buildForwardHeaders(request) → Headers<br />
+                      proxyMatomoRequest(request, env) → Response<br />
+                      <span class="text-slate-400">type UpstreamTarget</span>
+                    </div>
+                  </div>
+                  <div class="mass-impl rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">worker.ts</div>
+                    <div class="text-slate-600">imports proxyMatomoRequest only</div>
+                  </div>
+                  <div class="mass-impl rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">tests</div>
+                    <div class="text-slate-400 italic">none — testSignal: skipped</div>
+                  </div>
+                  <div class="text-xs text-red-600 mt-2">
+                    2 exports have zero consumers. Wide interface, no leverage.
+                  </div>
+                </div>
+              </div>
+              <!-- After -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">After</h4>
+                <div class="space-y-2">
+                  <div class="mass-deep-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">proxy.ts interface (1 export)</div>
+                    <div class="mt-1 text-slate-600">
+                      proxyMatomoRequest(request, env) → Response
+                    </div>
+                  </div>
+                  <div class="mass-deep-impl rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-200">proxy.ts implementation</div>
+                    <div class="text-slate-300">
+                      mapProxyPath ← private<br />
+                      buildForwardHeaders ← private<br />
+                      withCachePolicy ← private<br />
+                      UpstreamTarget ← private<br />
+                      + request-fixture tests through the one seam
+                    </div>
+                  </div>
+                  <div class="text-xs text-emerald-600 mt-2">
+                    1 export, full behavior behind it. Tests and worker cross the same seam.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Problem</h3>
+              <p class="text-sm text-slate-700">
+                Three functions are exported but only <code>proxyMatomoRequest</code> is consumed by
+                <code>worker.ts</code> — the other two are exported "for testability" but no tests
+                exist.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Solution</h3>
+              <p class="text-sm text-slate-700">
+                Make <code>mapProxyPath</code>, <code>buildForwardHeaders</code>, and
+                <code>UpstreamTarget</code> private to the module. Test the full proxy pipeline
+                through <code>proxyMatomoRequest</code> with a stubbed <code>fetch</code>.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Wins</h3>
+              <ul class="text-sm text-slate-700 space-y-1">
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Locality:</strong> all proxy
+                  behavior concentrates behind one seam
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Leverage:</strong> one interface,
+                  one test surface, one consumer
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Depth:</strong> same
+                  implementation, smaller interface
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Testability:</strong> tests cross
+                  the same seam as the worker
+                </li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Candidate 2: Add deploy-time env validation -->
+        <article class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-6 space-y-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h2 class="text-xl font-semibold">
+                Move env validation from request-time to deploy-time
+              </h2>
+              <div class="flex gap-2">
+                <span class="badge-strong text-xs font-medium px-2.5 py-1 rounded-full"
+                  >Strong</span
+                >
+                <span class="badge-tag text-xs font-medium px-2.5 py-1 rounded-full"
+                  >in-process</span
+                >
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Files</h3>
+              <div class="font-mono text-sm text-slate-700 space-y-0.5">
+                <div>services/matomo-proxy/src/config.ts</div>
+                <div>services/matomo-proxy/src/worker.ts</div>
+                <div>services/matomo-proxy/wrangler.jsonc</div>
+              </div>
+            </div>
+
+            <!-- Before / After diagram -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Before -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">Before</h4>
+                <div class="space-y-2">
+                  <div class="mass-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">config.ts interface</div>
+                    <div class="text-slate-600">
+                      resolveMatomoOrigin(env) → string<br />
+                      <span class="text-slate-400">throws on bad host — at request time</span>
+                    </div>
+                  </div>
+                  <div class="rounded p-2 text-xs bg-red-50 border border-red-200">
+                    <div class="font-semibold text-red-700">Failure path</div>
+                    <div class="text-red-600">
+                      deploy → first visitor → 500<br />
+                      operator discovers misconfig from a user report
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- After -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">After</h4>
+                <div class="space-y-2">
+                  <div class="mass-deep-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">config.ts interface</div>
+                    <div class="text-slate-600">
+                      validateProxyEnv(env) → void | never<br />
+                      resolveMatomoOrigin(env) → string
+                    </div>
+                  </div>
+                  <div class="mass-deep-impl rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-200">config.ts implementation</div>
+                    <div class="text-slate-300">
+                      validateProxyEnv runs host validation<br />
+                      + protocol stripping<br />
+                      + bare-host check<br />
+                      cached result — once per isolate
+                    </div>
+                  </div>
+                  <div class="rounded p-2 text-xs bg-emerald-50 border border-emerald-200">
+                    <div class="font-semibold text-emerald-700">Failure path</div>
+                    <div class="text-emerald-600">
+                      deploy → first request → fast 500<br />
+                      with diagnostic error in logs<br />
+                      or health-check probe catches it earlier
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Problem</h3>
+              <p class="text-sm text-slate-700">
+                <code>resolveMatomoOrigin</code> throws at request time — a misconfigured
+                <code>MATOMO_CLOUD_HOST</code> causes a 500 on the first visitor request, not a
+                deploy-time failure.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Solution</h3>
+              <p class="text-sm text-slate-700">
+                Add a <code>validateProxyEnv(env)</code> function that the worker calls on the first
+                request (cached per isolate) or in a health-check endpoint. Concentrate all env
+                validation in one seam so operators get early, diagnostic failure instead of silent
+                500s.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Wins</h3>
+              <ul class="text-sm text-slate-700 space-y-1">
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Locality:</strong> env validation
+                  concentrates in one module, not scattered across request handlers
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Leverage:</strong> one validation
+                  seam serves both health checks and request handlers
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Depth:</strong> hides host
+                  normalization + validation + caching behind one call
+                </li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Candidate 3: Collapse the dead header denylist -->
+        <article class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-6 space-y-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h2 class="text-xl font-semibold">
+                Collapse the dead header denylist into the allowlist
+              </h2>
+              <div class="flex gap-2">
+                <span class="badge-explore text-xs font-medium px-2.5 py-1 rounded-full"
+                  >Worth exploring</span
+                >
+                <span class="badge-tag text-xs font-medium px-2.5 py-1 rounded-full"
+                  >in-process</span
+                >
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Files</h3>
+              <div class="font-mono text-sm text-slate-700 space-y-0.5">
+                <div>services/matomo-proxy/src/proxy.ts (lines 22–66)</div>
+              </div>
+            </div>
+
+            <!-- Before / After diagram -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Before -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">Before</h4>
+                <div class="space-y-2">
+                  <div class="mass-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">
+                      buildForwardHeaders implementation
+                    </div>
+                    <div class="text-slate-600 mt-1">
+                      Layer 1: <code>DROPPED_REQUEST_HEADERS</code> set (7 entries)<br />
+                      Layer 2: drop <code>cf-*</code> prefix<br />
+                      Layer 3: drop <code>x-*</code> prefix<br />
+                      Layer 4: allowlist <code>accept</code>, <code>accept-language</code>,
+                      <code>content-type</code>
+                    </div>
+                  </div>
+                  <div class="text-xs text-red-600 mt-2">
+                    Layers 1–3 are dead code. Layer 4 already excludes everything else. A reader
+                    must understand all 4 to realize only 1 matters.
+                  </div>
+                </div>
+              </div>
+              <!-- After -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">After</h4>
+                <div class="space-y-2">
+                  <div class="mass-deep-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">
+                      buildForwardHeaders implementation
+                    </div>
+                    <div class="text-slate-600 mt-1">
+                      <code>FORWARDED_HEADERS</code> set (3 entries)<br />
+                      one loop, one check, one outcome
+                    </div>
+                  </div>
+                  <div class="mass-deep-impl rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-200">behind the seam</div>
+                    <div class="text-slate-300">
+                      no denylist, no prefix patterns<br />
+                      no <code>DROPPED_REQUEST_HEADERS</code> constant<br />
+                      no <code>drop:Cookie</code> marker comment needed
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Problem</h3>
+              <p class="text-sm text-slate-700">
+                Three filtering layers (explicit denylist, <code>cf-*</code> drop,
+                <code>x-*</code> drop) are redundant — the allowlist in the final
+                <code>if</code> already excludes everything except <code>accept</code>,
+                <code>accept-language</code>, and <code>content-type</code>. The denylist looks
+                load-bearing but changes nothing.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Solution</h3>
+              <p class="text-sm text-slate-700">
+                Delete <code>DROPPED_REQUEST_HEADERS</code>, the <code>cf-*</code> check, and the
+                <code>x-*</code> check. Keep only the allowlist. The <code>drop:Cookie</code> marker
+                comment — which exists solely to placate the string-scanning validator — becomes
+                unnecessary.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Wins</h3>
+              <ul class="text-sm text-slate-700 space-y-1">
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Locality:</strong> header policy
+                  lives in one place, not three redundant layers
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Depth:</strong> removes false
+                  complexity that makes the module look shallower than it is
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Leverage:</strong> one allowlist
+                  is easier to audit than three denylists + one allowlist
+                </li>
+              </ul>
+            </div>
+
+            <div class="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
+              <strong>ADR callout:</strong> The <code>drop:Cookie</code> comment marker exists to
+              satisfy <code>matomo.proxy.validate</code>'s
+              <code>source.includes("Cookie")</code> check. Removing the denylist also requires
+              updating the validator (see candidate 4).
+            </div>
+          </div>
+        </article>
+
+        <!-- Candidate 4: Replace string-scanning with behavioral validation -->
+        <article class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-6 space-y-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h2 class="text-xl font-semibold">
+                Replace string-scanning proxy validation with behavioral checks
+              </h2>
+              <div class="flex gap-2">
+                <span class="badge-explore text-xs font-medium px-2.5 py-1 rounded-full"
+                  >Worth exploring</span
+                >
+                <span class="badge-tag text-xs font-medium px-2.5 py-1 rounded-full"
+                  >local-substitutable</span
+                >
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Files</h3>
+              <div class="font-mono text-sm text-slate-700 space-y-0.5">
+                <div>packages/os/site-kernel-checks/src/analytics-matomo.ts (lines 370–436)</div>
+                <div>services/matomo-proxy/src/proxy.ts</div>
+              </div>
+            </div>
+
+            <!-- Before / After diagram -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Before -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">Before</h4>
+                <div class="space-y-2">
+                  <div class="mass-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">matomo.proxy.validate</div>
+                    <div class="text-slate-600 mt-1">
+                      <code>source.includes("console.log")</code><br />
+                      <code>source.includes("Cookie")</code><br />
+                      <code>source.includes("Authorization")</code><br />
+                      <code>source.includes("CF-Connecting-IP")</code><br />
+                      <span class="text-slate-400">+ <code>drop:</code> marker workaround</span>
+                    </div>
+                  </div>
+                  <div class="mass-impl rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">what it actually checks</div>
+                    <div class="text-slate-600">
+                      "does the source text contain these strings?"<br />
+                      <span class="text-red-600">cannot distinguish comment from code</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- After -->
+              <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+                <h4 class="text-xs uppercase tracking-wider text-slate-500">After</h4>
+                <div class="space-y-2">
+                  <div class="mass-deep-iface rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-700">matomo.proxy.validate</div>
+                    <div class="text-slate-600 mt-1">
+                      import proxy source via AST parser<br />
+                      check: no <code>request.headers.get("cookie")</code><br />
+                      check: no <code>Set-Cookie</code> in response construction<br />
+                      check: <code>Cache-Control: no-store</code> on <code>.php</code><br />
+                      <span class="text-slate-400">or: request-fixture test suite</span>
+                    </div>
+                  </div>
+                  <div class="mass-deep-impl rounded p-2 text-xs">
+                    <div class="font-semibold text-slate-200">behind the seam</div>
+                    <div class="text-slate-300">
+                      AST traversal or fixture runner<br />
+                      understands code structure<br />
+                      no <code>drop:</code> markers needed
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Problem</h3>
+              <p class="text-sm text-slate-700">
+                The validator uses <code>source.includes()</code> to detect forbidden patterns. It
+                cannot distinguish the <code>drop:Cookie</code> comment from actual cookie
+                forwarding. The <code>drop:</code> marker is a workaround that makes the validator
+                look like it's checking behavior — it's checking text.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Solution</h3>
+              <p class="text-sm text-slate-700">
+                Replace string scanning with either AST-level checks (using the existing
+                <code>astro-parse.ts</code> utility adapted for Worker source) or request-fixture
+                tests that exercise <code>proxyMatomoRequest</code> with crafted requests and assert
+                no cookies are forwarded or set.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-1">Wins</h3>
+              <ul class="text-sm text-slate-700 space-y-1">
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Locality:</strong> validation
+                  rules concentrate in one behavioral check, not scattered string matches
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Leverage:</strong> one fixture
+                  suite validates path, headers, cache, and privacy policy simultaneously
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Depth:</strong> validator
+                  understands code structure instead of surface text
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-emerald-600">▸</span> <strong>Removes:</strong> the
+                  <code>drop:</code> marker workaround and its cognitive load
+                </li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Top recommendation -->
+      <section id="top-recommendation" class="bg-slate-900 text-slate-100 rounded-xl p-8 space-y-4">
+        <h2 class="text-2xl font-bold">Top recommendation</h2>
+        <div class="space-y-3">
+          <h3 class="text-lg font-semibold text-emerald-400">
+            <a href="#candidates" class="hover:underline">Narrow the proxy module interface</a>
+          </h3>
+          <p class="text-slate-300">
+            This is the highest-leverage change because it unlocks the others. Making
+            <code>mapProxyPath</code>, <code>buildForwardHeaders</code>, and
+            <code>UpstreamTarget</code> private to <code>proxy.ts</code> deepens the module
+            immediately — same implementation, smaller interface. It also creates the natural test
+            seam for request-fixture tests (candidate 4's behavioral validation) and makes the dead
+            denylist (candidate 3) a private cleanup with no interface impact.
+          </p>
+          <p class="text-slate-400 text-sm">
+            The proxy is 112 lines with 3 exports and zero tests. Collapsing to 1 export and adding
+            fixture tests through that seam is a single focused change that increases depth,
+            locality, and leverage simultaneously.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

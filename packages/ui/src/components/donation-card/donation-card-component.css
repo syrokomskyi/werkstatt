@@ -1,0 +1,355 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/components/donation-card/donation-card-component.css as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not include JavaScript functionality or interactivity.</item>
+  <item>Do not manage global styles or themes outside the component context.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Add trust indicators styling.</item>
+  <item>Add responsive design.</item>
+  <item>Add dropdown and modal styling.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* Donation Card Container */
+.donation-card {
+  background-color: var(--ds-color-surface, #ffffff);
+  border: 1px solid var(--ds-color-border, #e5e7eb);
+  border-radius: var(--ds-radius-sm);
+  padding: var(--ds-space-5, 1.25rem);
+  box-shadow: var(--ds-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  max-width: 100%;
+}
+
+.donation-card__title {
+  font-size: var(--ds-text-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--ds-color-text, #111827);
+  margin: 0 0 var(--ds-space-3, 0.75rem) 0;
+}
+
+.donation-card__organization {
+  font-size: var(--ds-text-base, 1rem);
+  font-weight: 500;
+  color: var(--ds-color-text, #111827);
+  margin-bottom: var(--ds-space-2, 0.5rem);
+}
+
+.donation-card__bank {
+  font-size: var(--ds-text-sm, 0.875rem);
+  color: var(--ds-color-text-muted, #6b7280);
+  margin-bottom: var(--ds-space-4, 1rem);
+}
+
+/* Field Styling */
+.donation-card__field {
+  margin-bottom: var(--ds-space-4, 1rem);
+}
+
+.donation-card__field:last-child {
+  margin-bottom: 0;
+}
+
+.donation-card__label {
+  font-size: var(--ds-text-xs, 0.75rem);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ds-color-text-muted, #6b7280);
+  margin-bottom: var(--ds-space-1, 0.25rem);
+}
+
+.donation-card__value {
+  font-size: var(--ds-text-sm, 0.875rem);
+  color: var(--ds-color-text, #111827);
+  font-family: var(
+    --ds-font-mono,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
+}
+
+.donation-card__value-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2, 0.5rem);
+}
+
+/* IBAN Highlight Block */
+.donation-card__field--iban {
+  background-color: var(--ds-color-surface-alt, #f9fafb);
+  border-radius: var(--ds-radius-sm);
+  padding: var(--ds-space-3, 0.75rem);
+  margin-bottom: var(--ds-space-4, 1rem);
+}
+
+.donation-card__iban-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3, 0.75rem);
+}
+
+.donation-card__iban {
+  font-size: var(--ds-text-lg, 1.125rem);
+  font-weight: 500;
+  color: var(--ds-color-text, #111827);
+  font-family: var(
+    --ds-font-mono,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace
+  );
+  letter-spacing: 0.05em;
+}
+
+/* Copy Button */
+.donation-card__copy-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1, 0.25rem);
+  padding: var(--ds-space-1, 0.25rem) var(--ds-space-2, 0.5rem);
+  background-color: var(--ds-color-primary, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-xs, 0.75rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.donation-card__copy-btn:hover {
+  background-color: var(--ds-color-primary-dark, #2563eb);
+}
+
+.donation-card__copy-btn--small {
+  padding: var(--ds-space-1, 0.25rem);
+}
+
+.donation-card__copy-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .donation-card__copy-label {
+    display: inline;
+  }
+}
+
+/* Grid Layout */
+.donation-card__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ds-space-4, 1rem);
+  margin-bottom: var(--ds-space-4, 1rem);
+}
+
+@media (min-width: 640px) {
+  .donation-card__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Trust Indicators */
+.donation-card__trust {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2, 0.5rem);
+  margin-bottom: var(--ds-space-4, 1rem);
+  padding-top: var(--ds-space-4, 1rem);
+  border-top: 1px solid var(--ds-color-border, #e5e7eb);
+}
+
+.donation-card__trust-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2, 0.5rem);
+  font-size: var(--ds-text-sm, 0.875rem);
+  color: var(--ds-color-text, #111827);
+}
+
+/* Action Buttons */
+.donation-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3, 0.75rem);
+}
+
+@media (min-width: 640px) {
+  .donation-card__actions {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.donation-card__qr-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2, 0.5rem);
+  padding: var(--ds-space-2, 0.5rem) var(--ds-space-3, 0.75rem);
+  background-color: var(--ds-color-primary, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-sm, 0.875rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.donation-card__qr-btn:hover {
+  background-color: var(--ds-color-primary-dark, #2563eb);
+}
+
+.donation-card__info-link {
+  font-size: var(--ds-text-sm, 0.875rem);
+  color: var(--ds-color-primary, #3b82f6);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.donation-card__info-link:hover {
+  text-decoration: underline;
+}
+
+/* Legacy Details Dropdown */
+.donation-card__legacy {
+  margin-top: var(--ds-space-4, 1rem);
+  padding-top: var(--ds-space-4, 1rem);
+  border-top: 1px solid var(--ds-color-border, #e5e7eb);
+}
+
+.donation-card__legacy-toggle {
+  font-size: var(--ds-text-sm, 0.875rem);
+  color: var(--ds-color-primary, #3b82f6);
+  cursor: pointer;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+}
+
+.donation-card__legacy-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.donation-card__legacy-toggle::before {
+  content: "▶ ";
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+details[open] .donation-card__legacy-toggle::before {
+  transform: rotate(90deg);
+}
+
+.donation-card__legacy-content {
+  margin-top: var(--ds-space-3, 0.75rem);
+  padding: var(--ds-space-3, 0.75rem);
+  background-color: var(--ds-color-surface-alt, #f9fafb);
+  border-radius: var(--ds-radius-sm);
+}
+
+/* QR Code Modal */
+.donation-card__modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--ds-z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-space-4, 1rem);
+}
+
+.donation-card__modal[hidden] {
+  display: none;
+}
+
+.donation-card__modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.donation-card__modal-content {
+  position: relative;
+  background-color: white;
+  border-radius: var(--ds-radius-sm);
+  padding: var(--ds-space-5, 1.25rem);
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--ds-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+}
+
+.donation-card__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--ds-space-4, 1rem);
+}
+
+.donation-card__modal-header h3 {
+  margin: 0;
+  font-size: var(--ds-text-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--ds-color-text, #111827);
+}
+
+.donation-card__modal-close {
+  background: none;
+  border: none;
+  font-size: var(--ds-text-xl, 1.25rem);
+  cursor: pointer;
+  color: var(--ds-color-text-muted, #6b7280);
+  padding: var(--ds-space-1, 0.25rem);
+  line-height: 1;
+}
+
+.donation-card__modal-close:hover {
+  color: var(--ds-color-text, #111827);
+}
+
+.donation-card__modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-3, 0.75rem);
+}
+
+.donation-card__qr-image {
+  width: 256px;
+  height: 256px;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-color-border, #e5e7eb);
+}
+
+.donation-card__qr-instruction {
+  font-size: var(--ds-text-sm, 0.875rem);
+  color: var(--ds-color-text-muted, #6b7280);
+  text-align: center;
+  margin: 0;
+}
+
+/* RFC-0257: Modal is hidden in print media */
+@media print {
+  .donation-card__modal {
+    display: none !important;
+  }
+}

@@ -1,0 +1,12 @@
+schema: forge/spec-integrity@1
+files:
+  00-README.md: sha256:ef14b8cf0071eb8b5eb371bb315e09e2ee1a23b917fb250c596336338787805e
+  01-PBP-System-Specification.md: sha256:facf77a6a5d1b839dc0e00adc5937e23c7d47b339cb0b5a4778cf5eef8a9a751
+  02-PBP-Entity-and-Field-Model.md: sha256:bab1b92d6eeba0bb363816b882e4a6b914a4326d07337beb2db1fe642cdd3c00
+  03-PBP-Compiler-Validation-and-Projections.md: sha256:cf115ce16e7192ebf56a02fe67bc934d054d53190861e7187f55a5c956c84e1b
+  04-Webgogol-Migration-Agent-Plan.md: sha256:083256f0fe3330d69fa9be431680d69abcf756c9144a91a000517894180fedfa
+  05-Webgogol-Target-Manifest-Blueprint.md: sha256:0b7d21c6820ea66f4e7c514763d18ea64c35d50b443f70b58eed4ec7988c7451
+  06-PBP-RFC-Roadmap.md: sha256:8ca6548ac9ee99fb16ae7a1dce1ccc1311dfd17149716af1085725632e21d5ff
+  07-PBP-Decision-Log.md: sha256:52d2f03f9387143b5c14d9caa91f736b8ae37210f41de43d00f1c457003490ab
+  PBP-SPECIFICATION-COMPLETE.md: sha256:f85a5fc66ab64c07403dea9a7f5d446593604f6ae37034325176717165357ede
+  SHA256SUMS.txt: sha256:ad0728bc2ba3478b81257c0e03edea7d4fc58d080a77c66a8fca20335b29c3d4

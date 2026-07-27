@@ -1,0 +1,15 @@
+---
+kind: page
+pageId: credits
+cosmicStar: Polaris
+title: "{{TITLE}}"
+description: "{{DESCRIPTION}}"
+lang: {{LANG}}
+blocks:
+  - id: credits-content
+    type: credits
+    props:
+      heading: "{{TITLE}}"
+      lead: "{{DESCRIPTION}}"
+---
+{{GENERATED_HEADER}}

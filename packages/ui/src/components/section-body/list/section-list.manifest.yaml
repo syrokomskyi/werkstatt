@@ -1,0 +1,13 @@
+id: section-list-component
+uniName: section-list-component
+layer: component
+semanticId: section-list
+archetype: section-body-list
+cosmicName: Sinope
+role: section-body
+version: 1.0.0
+intent:
+  - render-icon-capable-list
+  - support-body-kind-list
+industryFit: []
+contentSchemaKey: null

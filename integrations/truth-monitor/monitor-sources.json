@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {
+      "id": "gov:destatis-backnang",
+      "enabled": false,
+      "addedAt": "2026-06-20"
+    }
+  ]
+}

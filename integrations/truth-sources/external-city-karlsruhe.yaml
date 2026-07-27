@@ -1,0 +1,7 @@
+id: external:city-karlsruhe
+title: Stadt Karlsruhe — official city profile and history
+kind: manual
+endpoint: "https://www.karlsruhe.de/ls/stadt-rathaus/unsere-stadt-karlsruhe"
+expectedType: string
+checkEvery: P6M
+residency: eu

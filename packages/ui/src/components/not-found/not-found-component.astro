@@ -1,0 +1,65 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/components/not-found/not-found-component.astro as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not read app content or discover routes.</item>
+  <item>Do not own HTTP status handling; generated Astro routes own status 404.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0310: initial shared biome-aware 404 component.</item>
+</CHANGE_SUMMARY>
+*/
+
+import "./not-found-component.css";
+
+interface Props {
+  lang: string;
+  title: string;
+  intro: string;
+  homeLabel: string;
+  homeHref: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  contactLabel?: string;
+  contactHref?: string;
+}
+
+const {
+  lang,
+  title,
+  intro,
+  homeLabel,
+  homeHref,
+  primaryLabel,
+  primaryHref,
+  contactLabel,
+  contactHref,
+} = Astro.props;
+---
+
+<section class="not-found" aria-labelledby="not-found-title" lang={lang}>
+  <div class="not-found__inner">
+    <p class="not-found__eyebrow">404</p>
+    <h1 id="not-found-title">{title}</h1>
+    <p class="not-found__intro">{intro}</p>
+    <nav class="not-found__actions" aria-label="404 navigation">
+      <a class="not-found__action not-found__action--primary" href={homeHref}>{homeLabel}</a>
+      {
+        primaryLabel && primaryHref && (
+          <a class="not-found__action" href={primaryHref}>
+            {primaryLabel}
+          </a>
+        )
+      }
+      {
+        contactLabel && contactHref && (
+          <a class="not-found__action" href={contactHref}>
+            {contactLabel}
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</section>

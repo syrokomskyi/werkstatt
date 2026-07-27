@@ -1,0 +1,20 @@
+# GitHub branch protection policy — offline validation source (RFC-0476)
+#
+# This file is the versioned source of truth for the required GitHub branch
+# protection rule. The `github.branch-protection.validate` command validates
+# that the CI workflow's job name matches `requiredCheck.name` and that the
+# workflow includes a full `rfc.validate` step.
+#
+# An operator configures the equivalent GitHub repository setting manually.
+# This policy never calls the GitHub API or requires a token.
+
+protectedBranch:
+  name: main
+
+requiredCheck:
+  # Must match the `name:` field of the job in .github/workflows/ci.yml
+  name: Package quality and author checks
+
+requiredWorkflowSteps:
+  # The CI workflow must include these commands as real `run:` steps
+  - pnpm exec site-kernel run rfc.validate

@@ -1,0 +1,26 @@
+id: faq-list
+displayName: Faq List
+version: 1.1.0
+semanticRole: faq-list
+description: |
+  FAQ accordion sourced from business/faq entries. RFC-0101/0102 composed.
+expectedIntents:
+  - explain-approach
+  - build-trust
+  - answer-questions
+expectedIndustryFit:
+  - non-profit
+layoutHint: single-column
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+  shape: |
+    z.object({
+      tag: z.string().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Atlas
+constraints: {}

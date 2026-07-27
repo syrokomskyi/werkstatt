@@ -1,0 +1,91 @@
+<source-markup>
+  <meta>
+    <document-id>source-markup</document-id>
+    <version>2.0.0</version>
+    <status>active</status>
+    <scope>repository-root</scope>
+  </meta>
+
+  <purpose>
+    Define the canonical Compass source-file markup contract for authored code in `apps/`, `packages/`, and `services/`.
+    This document specifies the two required blocks, the inline invariant format, the forbidden set,
+    and the two coverage modes.
+  </purpose>
+
+  <markup-model>
+    <required-header-blocks>
+      <block name="MODULE_CONTRACT">
+        <purpose>State what the file is for and what it must NOT do.</purpose>
+        <required-inner>
+          <inner name="purpose">
+            <rule>One or more sentences, at least 10 words.</rule>
+          </inner>
+          <inner name="non-goals">
+            <rule>At least one `<item>` stating a boundary against scope creep.</rule>
+          </inner>
+        </required-inner>
+      </block>
+      <block name="CHANGE_SUMMARY">
+        <purpose>Capture the latest COMPASS-relevant change to the file.</purpose>
+        <required-inner>
+          <inner name="item">
+            <rule>At least one `<item>` describing the most recent COMPASS-relevant change.</rule>
+          </inner>
+        </required-inner>
+      </block>
+    </required-header-blocks>
+
+    <local-invariants>
+      <format>// @ai-invariant: ...</format>
+      <rules>
+        <rule>Required for files with risk class `high` (blast-radius boundaries such as middleware, discovery/runtime cores, registries).</rule>
+        <rule>Keep invariants short, durable, and directly relevant to failure prevention.</rule>
+        <rule>Optional for non-high-risk files but encouraged when a non-obvious constraint exists.</rule>
+      </rules>
+    </local-invariants>
+
+    <forbidden-blocks>
+      <forbidden name="MODULE_MAP" reason="Restates export names already visible in the code." />
+      <forbidden name="keywords" reason="Restates the filename and purpose." />
+      <forbidden name="responsibilities" reason="Restates what the code does; purpose + non-goals carry the non-derivable signal." />
+      <forbidden name="COMPASS_BLOCK" reason="No downstream consumer; presence is a validation error." />
+    </forbidden-blocks>
+  </markup-model>
+
+  <coverage-modes>
+    <mode name="standard">
+      <applies-to>
+        <item>Every authored, non-excluded source file in `apps/`, `packages/`, and `services/`.</item>
+      </applies-to>
+      <requirements>
+        <item>`MODULE_CONTRACT` with `<purpose>` (>= 10 words) and at least one `<non-goals><item>`.</item>
+        <item>`CHANGE_SUMMARY` with at least one `<item>`.</item>
+        <item>`@ai-invariant` when the file's risk class is `high`.</item>
+      </requirements>
+    </mode>
+
+    <mode name="none">
+      <applies-to>
+        <item>Generated icon trees</item>
+        <item>Generated build output</item>
+        <item>Explicitly excluded generated artifacts tracked by Compass inventory</item>
+        <item>Template files under `src/templates/**` that exist solely as generation inputs</item>
+      </applies-to>
+      <requirements>
+        <item>No source-level Compass markup required.</item>
+      </requirements>
+    </mode>
+  </coverage-modes>
+
+  <astro-handling>
+    <rule>For `.astro` files, the two blocks and any `@ai-invariant` live inside the frontmatter (after the opening `---`), using `/* */` comment style.</rule>
+  </astro-handling>
+
+  <rollout-policy>
+    <rules>
+      <rule>New non-trivial files in `apps/`, `packages/`, and `services/` must follow this contract immediately.</rule>
+      <rule>Do not bulk-edit excluded or generated files to add semantic markup.</rule>
+      <rule>For package generators that emit boilerplate into `apps/*`, place multi-line boilerplate in mirrored template files under `src/templates/**` and keep the authored generator module as the COMPASS-covered source of logic.</rule>
+    </rules>
+  </rollout-policy>
+</source-markup>

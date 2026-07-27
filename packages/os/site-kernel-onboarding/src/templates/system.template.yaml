@@ -1,0 +1,50 @@
+# System manifest for apps/{{CLIENT_ID}}
+# [DNA-23][RFC-0025] — Validated by system.manifest.validate
+app: {{CLIENT_ID}}
+version: 1.0.0
+
+identity:
+  systemStar: {{SYSTEM_STAR}}
+  biome: {{BIOME_ID}}
+  tagline: {{TAGLINE}}
+
+constellations:
+  - {{CONSTELLATION_ID}}
+
+clientEditable:
+  - pages
+  - components
+
+pages:
+  - route: /
+    cosmicStar: {{SYSTEM_STAR}}
+    planets: []
+
+  - route: /cosmic/passport
+    cosmicStar: Polaris
+    planets:
+      - { cosmicPlanet: Methone,  pin: 1.0.0 }
+      - { cosmicPlanet: Despina,  pin: 1.0.0 }
+      - { cosmicPlanet: Klarissa,  pin: 1.0.0 }
+      - { cosmicPlanet: Bianca,   pin: 1.0.0 }
+      - { cosmicPlanet: Adrastea, pin: 1.0.0 }
+
+  - route: /cosmic/star-map
+    cosmicStar: Polaris
+    planets:
+      - { cosmicPlanet: Methone,  pin: 1.0.0 }
+      - { cosmicPlanet: Adrastea, pin: 1.0.0 }
+
+growth:
+  vendor:
+    adapter: "null"
+    options: {}
+  funnels: []
+  experiments: []
+
+release:
+  passport:
+    enabled: true
+    indexable: true
+    keyVersion: v1
+    heartbeatUrl: https://{{DOMAIN}}/.well-known/cosmic-passport.json

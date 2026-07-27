@@ -1,0 +1,38 @@
+# GENERATED. Do not change this line unless the file contains project specific changes.
+
+.vscode/settings.json
+
+node_modules/
+dist/
+.astro/
+.DS_Store
+
+*.log
+
+.env
+.env.production
+.env.main
+.env.alt
+.env copy
+
+# Surface cache — generated, do not commit
+.surface-cache/
+
+.wrangler/
+
+content-validation-report.txt
+
+.integrity/
+
+.cache/
+
+# Turbo cache — do not commit
+.turbo/
+
+# RFC-0204: build-portable image provider — generated artifacts (do not commit)
+public/_img/
+src/image-variants.generated.yaml
+
+# RFC-0210: unified media contract — derived video artifacts + manifest (do not commit)
+public/_video/
+src/video-manifest.generated.yaml

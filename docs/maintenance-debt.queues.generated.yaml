@@ -1,0 +1,221 @@
+meta:
+  schemaVersion: 1
+  deterministic: true
+  generatedAt: null
+  contentHash: bdd552359dcf7d03f531a937387da6e2b25a9775d3500b7af27fe91fbc8e5d03
+  sourceReportHash: ff8ebabfa16e5799ac4edab9b21755b0841beef457d052eff83db9437fdf0c5f
+  baselineHash: 1bb3f002b59b64d2f7534ed6933034de10cff6d018360c816f62410d6cbbff34
+  queueSpecHash: 1d4e5f31e741188b7b56bc67c39a0b14da28db7d9cf4ef880de92cfc15fddad9
+command: maintenance.debt.queue.generate
+ignoredDebtClasses:
+  - sourceCommand: text.normalize.report
+    ruleId: TEXT-NORM-01
+    severity: info
+    rationale: High-volume text normalization cleanup remains deferred outside the
+      initial RFC-0256 queues.
+  - sourceCommand: material.metadata.validate
+    ruleId: material.metadata.toolchain-missing
+    severity: info
+    rationale: Toolchain availability info remains visible but is not an initial
+      burn-down queue.
+queues:
+  - id: prose-credit-sidecars
+    title: Add prose authorship credit sidecars
+    status: active
+    owner: content-architecture
+    priority: 1
+    reviewAfter: 2026-08-01
+    sourceCommands:
+      - material.credits.validate
+    selectors:
+      apps:
+        - webgogol-com
+      ruleIds:
+        - material.credits.missing-prose-credit
+      severity:
+        - warning
+    batchPolicy:
+      maxItemsPerSession: 8
+      commitAfterEachBatch: true
+      push: false
+    totalMatchingItems: 24
+    matchingItemKeys:
+      - 0a956958e14fde5a6aef01bacbcba116eac50c6536e316ac57e66a7bd751b622
+      - 62121c25e16d4051f0d65d11c91157bf28bca48bb26c0f7b7456896f459c7724
+      - d8aab7bce96981b928e404d83a2f77d69d1295de215c155b675a596b637659a1
+      - a00855ebb7d5dd2031ec5c40a228e69c73917b148c6b44c5cedc66f9094c4428
+      - 69f451ebc8e5bd9ebbdff97de90ec5dd9737a771550f6009bcf7c4ff81a781cc
+      - cd32554d712720bf6d7231dc1e1a38ce10445eae908e47c695b1defc59ea20e9
+      - 15115743fa558e042ec2883f92a13a77352f106ecf030eca20361ce484e06035
+      - 08e9a676d072d89041c7277608b038b59e18b89d8433064e7423ca2f24283925
+      - ed859ea7408e988391dfcfde6774774ec32323497faa1d6502db4d4e26720454
+      - b391b682ee5640eb00005cdec66de1422229e7ec324d0081bcd9f2dcb934dc50
+      - 2fbe4aa4f9c7062afdaee1dc20e733961f486170a6d008394b969a60a6cdd1c5
+      - ae32c29ccc584c0c987ae9c7cc8ab37d34241348e2c4dd1baa1da86051583a8d
+      - 36a1b65db84bbf3ba5e314d9b7809d3083ada9ec2a8c74ade88286e160bc8b1e
+      - dcb004bc788cbd26425a14e3915edb05f22122f717d92faef3b191603ac27509
+      - def672bf6a4f0db3060e19ce85a3a20870ed12586e547cd8fd1f21b30534e3af
+      - 3bfc22f176774b6baf64a1f399c73e7d621cc11d80a6047cd5c25b39a06febd6
+      - ee03cb66653fd4fb2cf36f781f3f4abe77c5d5988ef766fa4c653c3c795bad78
+      - 7c48c3ad5779a064d3795ca8520661edc1f3d5ede315e044b3c923a7bb8ce3d5
+      - d72639dc69e22de1b9a793319ab139d92eec6e55e061364920644ee51b4f3146
+      - b597778e8837f30e40ed4335198efc4bb23ecad7b69c464f4679d8614de9b375
+      - 2e0418ef0869d92dbcc4dbd8c0606024a819a9434c92fa2bebf0a629d177249f
+      - 8896901445440dc76ebbdb91f4c6fcc4d4334c980fb9de92e19dbddd908346f8
+      - c040733447bb26b3710d81d23aab77a8dfdc69c368056e9f3fee729438af0843
+      - 4d34554bc3301fcb9029709139b1aeeab752826d0ae2c5bdfbb1b97180cc3ce5
+    nextBatchKeys:
+      - 0a956958e14fde5a6aef01bacbcba116eac50c6536e316ac57e66a7bd751b622
+      - 62121c25e16d4051f0d65d11c91157bf28bca48bb26c0f7b7456896f459c7724
+      - d8aab7bce96981b928e404d83a2f77d69d1295de215c155b675a596b637659a1
+      - a00855ebb7d5dd2031ec5c40a228e69c73917b148c6b44c5cedc66f9094c4428
+      - 69f451ebc8e5bd9ebbdff97de90ec5dd9737a771550f6009bcf7c4ff81a781cc
+      - cd32554d712720bf6d7231dc1e1a38ce10445eae908e47c695b1defc59ea20e9
+      - 15115743fa558e042ec2883f92a13a77352f106ecf030eca20361ce484e06035
+      - 08e9a676d072d89041c7277608b038b59e18b89d8433064e7423ca2f24283925
+    acceptanceCommands:
+      - pnpm exec site-kernel run maintenance.debt.queue.validate --queue
+        prose-credit-sidecars --json
+      - pnpm exec site-kernel run material.credits.validate --site <app> --json
+      - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+  - id: surface-substance-assets-and-narratives
+    title: Improve surface narrative and image substance
+    status: paused
+    owner: content-architecture
+    priority: 2
+    reviewAfter: 2026-08-15
+    sourceCommands:
+      - surface.validate
+    selectors:
+      apps:
+        - webgogol-com
+      ruleIds:
+        - surface.validate
+      severity:
+        - warning
+    batchPolicy:
+      maxItemsPerSession: 6
+      commitAfterEachBatch: true
+      push: false
+    totalMatchingItems: 0
+    matchingItemKeys: []
+    nextBatchKeys: []
+    acceptanceCommands:
+      - pnpm exec site-kernel run maintenance.debt.queue.validate --queue
+        surface-substance-assets-and-narratives --json
+      - pnpm exec site-kernel run surface.validate --site <app> --json
+      - pnpm exec site-kernel run asset.reference.validate --site <app> --json
+      - pnpm exec site-kernel run material.credits.validate --site <app> --json
+      - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+  - id: demand-slug-overrides
+    title: Review demand hierarchy slug overrides
+    status: active
+    owner: architecture
+    priority: 3
+    reviewAfter: 2026-09-01
+    sourceCommands:
+      - demands.hierarchy.validate
+    selectors:
+      apps:
+        - webgogol-com
+      ruleIds:
+        - demands.hierarchy.validate
+      severity:
+        - warning
+    batchPolicy:
+      maxItemsPerSession: 4
+      commitAfterEachBatch: true
+      push: false
+    totalMatchingItems: 36
+    matchingItemKeys:
+      - 0b504b02617df944f41c3e986f4dfbcaf4aa9e51496d319f346278b8e4a92367
+      - 1b2852e7263173c68328fb3882fc1bb5fdac3f7c8ed352fce90aa90ec8810ee4
+      - 1e253e0fb1c66eeec3a2cf6eab76c450d4517284f40f99abb1881efc56c39ab5
+      - 23721f0cf3628c977ba29c0c0597dd57772a4f81515e14b497b82b1e563e84f2
+      - 280900da70bf37c2ee5e27f189ee19572c46e11e3a629be8846de18ce43ed2aa
+      - 28b0fc641c75cfdb492db759761ea27dbd9b0bf190016583e2d2f4f3bc96b909
+      - 34739b546d01bde4f93729a811b4f73d223bd9eb8d76de3bb2658e9c1e0cf439
+      - 3fc6af31e92828bdcbf5253439c5cd9635138674eea3fdf34ca332dde56d74c5
+      - 44fec246b8a248b167e92b6e7a0373c9f267d9bab32902fd96377ca4b0d3c309
+      - 49fb5c0c0d089f176282cfe89ef9a29c882a7afa7f53e31de9762e278b21b248
+      - 4e2ea0a556f5f22742eb175e54b5dbd5affa002a22f6633e5311210bdb0edeb3
+      - 4e8a4a208be0d5d6ec8729554cfd10a63635982252eecea717eba42545d7c11d
+      - 4f04fc0d53538846ed3c67b18130e8332dab25cf33fd50af9f439b392aa97833
+      - 718406525beb28b113878f0d70251e16d48e02d426c100d1fc47325891e85ba4
+      - 7ad37579cd2548c6c74ff8de23c6da17c41acc613a57229be8be0d303d0e52dd
+      - 882ad728d7e1341103ba0341e92a71ea0e07a3b6f6173245bb7d8639e4573c5c
+      - 88f674aa42e5671134de11a7120e35eb76ecd847ab65274e9d84305234d6d2ec
+      - 8e52773a9a70da55f1724412963568b31808585b2ed0e269ec958f5fc1f3ed69
+      - 9653b7edb104fb753ad32ce19ca61a0821697b2d0adf5b30b575c0fc21329528
+      - 96b5fb5ada83c9b19dd0489d6b478fb3ebd9dcb8fc4b07a4aeddd437fd487376
+      - a2e254d2d7a9fa5be383cf9d74a7efc73e96e1af7a368b8e9f2ceb7417dc858e
+      - a57655f39bce3b343398857dcd0f002c5426d7c0675d6a78b967255e43ece202
+      - aa890b3cf5d71dda152679fb16cd0ea4297d3c23f963126bd0d6f2232da9e9f4
+      - b1df2fc6694b7b1f177987f52607faa0192bc95cff6cc3ce9723661f7cb75dfe
+      - b45712ac5799d9d220c7e3b70e5ea1748c41c17b830f2fea9dbfe1bc617a45d7
+      - bce23c73534a933ecca595e404a2a5df35ce3afedfd1dbb3a9ad77614015a2ca
+      - c27f5c87deccf6487a0ae2b5d55064197801efabb8cea8463a19b9f24109a39a
+      - c7ec64d697cf80fc2df4266e7cefed06d00890c50a981f50174e3e918983980d
+      - cfd42ddfbf34b0fe7d79af3e17edf323382f00555825585b03fcfa56c3dfa4d0
+      - d2b74093e91bb55a5294d187291898acb794a7d82a6c3ae7d777585f0a640693
+      - d71721f0eaf7baa9389fb487f184a28e3e9f069063694872b78d0aa09300a7fe
+      - dad44fbe7fb6251d8d7b4d0175aea7ae10bf39d0f9c768216a52d4d162254bbc
+      - dcbabf2f2b72345d300f87d18f55a677cbb3c1304ef6c2dbf5a7f7db670c8a3f
+      - e37a98550468fa58dcfc449cd3874af7d0e02800750c579d07a193a40bb455a6
+      - f722946983cdd1aea1cf2753358f5c320f0521dd29a715e788c1ae595c264b1f
+      - fda95381c2563076044eb40ed30d46880574056ba76958ff84ae2fb608e37ee7
+    nextBatchKeys:
+      - 0b504b02617df944f41c3e986f4dfbcaf4aa9e51496d319f346278b8e4a92367
+      - 1b2852e7263173c68328fb3882fc1bb5fdac3f7c8ed352fce90aa90ec8810ee4
+      - 1e253e0fb1c66eeec3a2cf6eab76c450d4517284f40f99abb1881efc56c39ab5
+      - 23721f0cf3628c977ba29c0c0597dd57772a4f81515e14b497b82b1e563e84f2
+    acceptanceCommands:
+      - pnpm exec site-kernel run maintenance.debt.queue.validate --queue
+        demand-slug-overrides --json
+      - pnpm exec site-kernel run demands.hierarchy.validate --site <app> --json
+      - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+  - id: diagnostic-shim-migration
+    title: Migrate resultFromViolations/failResult shim modules to diagnosticsResult
+    status: paused
+    owner: architecture
+    priority: 4
+    reviewAfter: 2026-10-01
+    sourceCommands:
+      - diagnostic.shape.lint
+    selectors:
+      ruleIds:
+        - DSL-04
+    batchPolicy:
+      maxItemsPerSession: 5
+      commitAfterEachBatch: true
+      push: false
+    totalMatchingItems: 0
+    matchingItemKeys: []
+    nextBatchKeys: []
+    acceptanceCommands:
+      - pnpm exec site-kernel run diagnostic.shape.lint --json
+      - pnpm exec site-kernel run diagnostic.shape.lint --write-baseline --json
+      - pnpm exec site-kernel run check.fixture.lint --json
+  - id: kernel-io-migration
+    title: Migrate command modules from ambient node:fs to the WorkspaceIO port
+      (context.io)
+    status: paused
+    owner: architecture
+    priority: 4
+    reviewAfter: 2026-10-01
+    sourceCommands:
+      - kernel.io.lint
+    selectors:
+      ruleIds:
+        - IO-01
+    batchPolicy:
+      maxItemsPerSession: 5
+      commitAfterEachBatch: true
+      push: false
+    totalMatchingItems: 0
+    matchingItemKeys: []
+    nextBatchKeys: []
+    acceptanceCommands:
+      - pnpm exec site-kernel run kernel.io.lint --json
+      - pnpm exec site-kernel run kernel.io.lint --write-baseline --json
+      - pnpm exec site-kernel run check.fixture.lint --json

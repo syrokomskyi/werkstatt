@@ -1,0 +1,104 @@
+---
+{{GENERATED_HEADER}}
+/*
+<MODULE_CONTRACT>
+<purpose>Generated Astro 404 route. Returns HTTP 404 and renders the shared @gogol/ui not-found component inside the normal site chrome.</purpose>
+<non-goals>
+  <item>Do not discover routes beyond deterministic v1 home/contact targets.</item>
+  <item>Do not serve Markdown twin fallbacks as 200.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0310: initial generated 404 route.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { getRouteRegistry } from "@gogol/share";
+import { resolvePageRoute } from "@gogol/share/astro/page-handler";
+import type { SemanticPageType } from "@gogol/share/semantic";
+import { buildPageSemanticModel, buildPbpSemanticProfile } from "@gogol/pbp/semantic-profile";
+import BaseLayout from "@gogol/ui/components/layout";
+import GrowthProvider from "@gogol/growth/provider.astro";
+import Header from "@gogol/ui/components/header";
+import Footer from "@gogol/ui/components/footer";
+import NotFound from "@gogol/ui/components/not-found/not-found-component.astro";
+import globalStylesheetUrl from "@styles/global.css?url";
+
+export const prerender = true;
+
+Astro.response.status = 404;
+
+const { defaultLanguage } = await getRouteRegistry();
+const lang = defaultLanguage;
+const data = await resolvePageRoute({
+  lang,
+  slug: "",
+  siteUrl: Astro.site?.toString() ?? Astro.url.origin,
+  buildSemanticModel: async ({ pageId, semanticType, lang, url, fallbackFrontmatter, breadcrumbs, collectionItems, surfaceId, depth }) => {
+    const profile = await buildPbpSemanticProfile(
+      lang,
+      url,
+      `${process.cwd()}/src/content/business-profile`,
+    );
+    return buildPageSemanticModel(
+      pageId,
+      semanticType as SemanticPageType,
+      lang,
+      url,
+      profile,
+      fallbackFrontmatter,
+      breadcrumbs,
+      collectionItems,
+      surfaceId,
+      depth,
+    );
+  },
+});
+---
+
+<BaseLayout
+  title={`404 · ${data.page.title}`}
+  description="Diese Seite wurde nicht gefunden."
+  lang={lang}
+  biome={data.biome}
+  skipLinkLabel={data.skipLinkLabel}
+  globalStylesheetUrl={globalStylesheetUrl}
+  orchestratorConfig={data.orchestratorConfig}
+  robots="noindex,follow"
+>
+  {
+    data.growthConfig && (
+      <GrowthProvider
+        appId={data.appId}
+        locale={lang}
+        vendor={data.growthConfig.vendor}
+        activeFunnels={data.growthConfig.funnels ?? []}
+        activeExperiments={data.growthConfig.experiments ?? []}
+      />
+    )
+  }
+  <Header
+    lang={lang}
+    currentPath={Astro.url.pathname}
+    supportedLangs={data.supportedLangs}
+    ctaTarget={data.ctaTarget}
+    defaultLanguage={defaultLanguage}
+  />
+  <main id="main-content">
+    <NotFound
+      lang={lang}
+      title="Diese Seite gibt es hier nicht."
+      intro="Der Link ist vielleicht veraltet oder die Adresse vertippt. Von hier kommen Sie wieder zurück in die wichtigsten Bereiche."
+      homeLabel="Zur Startseite"
+      homeHref="/"
+      primaryLabel="Leistungen ansehen"
+      primaryHref="/leistungen"
+      contactLabel="Kontakt aufnehmen"
+      contactHref="/kontakt"
+    />
+  </main>
+  <Footer lang={lang} defaultLang={defaultLanguage} />
+  <script>
+    import "../scripts/layout-orchestrator";
+  </script>
+</BaseLayout>

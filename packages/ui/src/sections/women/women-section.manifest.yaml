@@ -1,0 +1,38 @@
+id: women-section
+uniName: women-section
+layer: section
+semanticId: women
+archetype: women
+cosmicName: Iapetus
+role: women
+version: 1.4.0
+intent:
+  - humanise-brand
+  - establish-identity
+  - introduce-team
+industryFit:
+  - trades-and-construction
+  - non-profit
+contentSchemaKey: women-section
+contentTypesPath: ./women-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-paragraphs
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body
+    - image
+    - imageAlt
+  properties:
+    image:
+      type: string
+      minLength: 1
+    imageAlt:
+      type: string
+      minLength: 1

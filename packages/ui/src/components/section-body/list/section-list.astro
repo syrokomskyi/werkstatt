@@ -1,0 +1,89 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0103 + RFC-0134] Canonical body component for body.kind: "list". Renders a vertical
+  list of RFC-0100 StandardListItem with optional per-item icon tinted by the
+  shared IconColor enum, plus an optional note paragraph and item-level effects.
+</purpose>
+<non-goals>
+  <item>Do not declare visual modifiers (background, section effects) — owned by &lt;SectionShell&gt;.</item>
+  <item>Do not declare header — owned by &lt;SectionHeader&gt;.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0134 replaces legacy surface prop with composable item effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { resolveEffectsForTarget } from "@gogol/share";
+import type { StandardListItem, IconColor, HorizontalAlign, EffectAssignment } from "@gogol/share";
+import EffectHost from "../../../components/effects/effect-host.astro";
+import { loadVendorIcon } from "../../../icons/icon-resolver.ts";
+import "./section-list.css";
+
+interface Props {
+  items: StandardListItem[];
+  note?: string;
+  iconColor?: IconColor;
+  align?: HorizontalAlign;
+  itemAlign?: HorizontalAlign;
+  hideMarkers?: boolean;
+  class?: string;
+  effects?: EffectAssignment[];
+}
+
+const {
+  items,
+  note,
+  iconColor = "accent",
+  align = "left",
+  itemAlign = "left",
+  hideMarkers = false,
+  class: extraClass = "",
+  effects,
+} = Astro.props as Props;
+
+const itemEffects = resolveEffectsForTarget(effects, "item");
+
+const resolvedItems = await Promise.all(
+  items.map(async (item) => {
+    const Icon = await loadVendorIcon(item.icon);
+    return { text: item.text, Icon, iconConfig: item.icon };
+  }),
+);
+---
+
+<div
+  class:list={["section-list-wrap", `section-list-wrap--align-${align}`]}
+  data-icon-color={iconColor}
+>
+  <ul class:list={["section-list", `section-list--item-${itemAlign}`, extraClass]} role="list">
+    {
+      resolvedItems.map(({ text, Icon, iconConfig }) => (
+        <li>
+          <EffectHost
+            as="div"
+            effects={itemEffects}
+            class="section-list__item section-list__item-surface"
+          >
+            {!hideMarkers &&
+              (Icon ? (
+                <Icon
+                  size={iconConfig?.size ?? 24}
+                  color={iconColor}
+                  trigger="hover"
+                  aria-label=""
+                />
+              ) : (
+                <span class="section-list__marker" aria-hidden="true" />
+              ))}
+            <span class="section-list__text">{text}</span>
+          </EffectHost>
+        </li>
+      ))
+    }
+  </ul>
+  {note && <p class="section-list__note">{note}</p>}
+</div>

@@ -1,0 +1,10 @@
+id: matomo-proxy
+kind: proxy-worker
+ownerApp: null
+entry: src/worker.ts
+publicEndpoints: true
+usesBrowserAutomation: false
+upstreams:
+  - matomo-cloud
+routes:
+  - /_wg/analytics/*

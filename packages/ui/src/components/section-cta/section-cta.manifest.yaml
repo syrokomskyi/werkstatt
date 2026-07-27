@@ -1,0 +1,12 @@
+id: section-cta-component
+uniName: section-cta-component
+layer: component
+semanticId: section-cta
+archetype: section-cta
+cosmicName: Isonoe
+role: section-cta
+version: 1.0.0
+intent:
+  - render-call-to-action
+industryFit: []
+contentSchemaKey: null

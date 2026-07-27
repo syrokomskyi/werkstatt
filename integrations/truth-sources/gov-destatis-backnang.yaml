@@ -1,0 +1,9 @@
+# RFC-0214: pilot source descriptor — manual review cadence for the Backnang
+# population figure (Einwohner) from Statistisches Landesamt Baden-Württemberg.
+# kind: manual means no endpoint is fetched; the monitor tracks review cadence only.
+id: gov:destatis-backnang
+title: Statistisches Landesamt BW — Backnang population (Einwohner)
+kind: manual
+expectedType: integer
+checkEvery: P1Y
+residency: eu

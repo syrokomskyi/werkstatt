@@ -1,0 +1,6 @@
+# GENERATED. Do not change this line unless the file contains project specific changes.
+_worker.js
+_routes.json
+*.map
+.DS_Store
+Thumbs.db

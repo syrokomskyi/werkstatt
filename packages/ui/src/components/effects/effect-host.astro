@@ -1,0 +1,41 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+Shared UI effect renderer host for RFC-0134. Accepts an ordered effect stack for
+one explicit render target and emits the semantic host element with the matching
+visual effect classes and CSS variables.
+</purpose>
+<non-goals>
+  <item>Do not resolve target assignments — callers pass the already-resolved stack.</item>
+  <item>Do not own section-specific padding, layout, or typography.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Introduces the shared RFC-0134 effect host used by sections and body renderers.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { Effect } from "@gogol/share";
+import { composeEffectPresentation, effectVarsToStyle } from "./registry.ts";
+import "./effect-host.css";
+
+interface Props {
+  effects?: Effect[];
+  as?: "div" | "article" | "aside" | "section" | "a";
+  class?: string;
+  href?: string;
+  "aria-label"?: string;
+}
+
+const { effects = [], as: Tag = "div", class: extraClass = "", ...rest } = Astro.props as Props;
+
+// RFC-0151: surface-strategy effects (glass) are composed through the shared
+// effect-kind registry instead of a hardcoded glass branch.
+const { classes, vars } = composeEffectPresentation(effects, "surface");
+const inlineStyle = effectVarsToStyle(vars);
+---
+
+<Tag class:list={["effect-host", ...classes, extraClass]} style={inlineStyle} {...rest}>
+  <slot />
+</Tag>

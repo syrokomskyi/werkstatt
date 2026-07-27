@@ -1,0 +1,172 @@
+kind: analytics-matomo-binding
+id: wgogol-matomo-binding
+version: 1.0.0
+rfc: RFC-0305
+messkanonVersion: 1.0.0
+
+meta:
+  title: WGogol Matomo Binding
+  description: Replaceable mapping from WGogol Messkanon v1 to Matomo Cloud/On-Premise entities.
+  status: active
+  changelog:
+    - version: 1.0.0
+      date: 2026-07-06
+      summary: Initial RFC-0305 Matomo event, goal, dimension, provisioning, and export mapping.
+
+tracker:
+  proxyPath: /_wg/analytics/
+  scriptPath: matomo.js
+  endpointPath: matomo.php
+  privacyProfile: bannerfrei-v1
+  requestMethod: POST
+  requiredQueueCalls:
+    - disableCookies
+    - disableBrowserFeatureDetection
+    - setDoNotTrack
+    - setTrackerUrl
+    - setSiteId
+    - trackPageView
+    - enableLinkTracking
+  forbiddenQueueCalls:
+    - rememberConsentGiven
+    - rememberCookieConsentGiven
+    - enableHeartBeatTimer
+    - setUserId
+    - enableCrossDomainLinking
+
+events:
+  - semanticId: contact.phone_click
+    matomo:
+      category: contact
+      action: phone_click
+      nameFrom: payload.placement
+  - semanticId: contact.form_submit
+    matomo:
+      category: contact
+      action: form_submit
+      nameFrom: payload.formId
+  - semanticId: contact.whatsapp_click
+    matomo:
+      category: contact
+      action: whatsapp_click
+      nameFrom: payload.placement
+  - semanticId: contact.email_click
+    matomo:
+      category: contact
+      action: email_click
+      nameFrom: payload.placement
+  - semanticId: contact.route_click
+    matomo:
+      category: contact
+      action: route_click
+      nameFrom: payload.placement
+
+goals:
+  - key: anfrage_telefon
+    name: Anfrage Telefon
+    semanticId: contact.phone_click
+    match:
+      type: event
+      category: contact
+      action: phone_click
+  - key: anfrage_formular
+    name: Anfrage Formular
+    semanticId: contact.form_submit
+    match:
+      type: event
+      category: contact
+      action: form_submit
+  - key: anfrage_whatsapp
+    name: Anfrage WhatsApp
+    semanticId: contact.whatsapp_click
+    match:
+      type: event
+      category: contact
+      action: whatsapp_click
+  - key: anfrage_email
+    name: Anfrage E-Mail
+    semanticId: contact.email_click
+    match:
+      type: event
+      category: contact
+      action: email_click
+
+dimensions:
+  visit:
+    - name: client_id
+      required: true
+      idSource: fleet.registry
+    - name: messkanon_version
+      required: true
+      idSource: fleet.registry
+    - name: consent_level
+      required: true
+      idSource: fleet.registry
+  action:
+    - name: site_type
+      required: true
+      idSource: fleet.registry
+    - name: page_type
+      required: true
+      idSource: fleet.registry
+    - name: surface_module
+      required: false
+      idSource: fleet.registry
+    - name: pseo_industry
+      required: false
+      idSource: fleet.registry
+    - name: pseo_city
+      required: false
+      idSource: fleet.registry
+    - name: pseo_demand
+      required: false
+      idSource: fleet.registry
+    - name: pseo_locale
+      required: false
+      idSource: fleet.registry
+    - name: pseo_arm
+      required: false
+      idSource: fleet.registry
+    - name: pseo_experiment
+      required: false
+      idSource: fleet.registry
+    - name: pseo_substance_band
+      required: false
+      idSource: fleet.registry
+    - name: pseo_link_model
+      required: false
+      idSource: fleet.registry
+
+siteDefaults:
+  timezone: Europe/Berlin
+  currency: EUR
+  excludeUnknownUrls: true
+  rawRetentionMonths: 24
+  reportRetention: forever
+  heatmapsEnabled: false
+  sessionRecordingsEnabled: false
+
+provisioning:
+  apiMethods:
+    - SitesManager.addSite
+    - Goals.addGoal
+    - CustomDimensions.configureNewCustomDimension
+  idempotencyKey: clientSemanticId
+  registryRequired: true
+
+smoke:
+  syntheticEvent: contact.route_click
+  syntheticName: anfahrt
+  expectFirstSignal: true
+
+exportPackage:
+  includes:
+    - aggregateReports
+    - rawVisitsWithinRetention
+    - siteConfiguration
+    - goals
+    - dimensions
+    - messkanonVersion
+    - matomoBindingVersion
+    - readme
+    - manifestHashes

@@ -1,0 +1,30 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0104] Wrapper that renders 1..N <SectionCta> with a single align prop.
+</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { CtaGroupConfig } from "@gogol/share";
+import SectionCta from "../section-cta/section-cta.astro";
+import "./section-cta-group.css";
+
+type Props = CtaGroupConfig & { lang?: string };
+
+const { align = "left", items, lang } = Astro.props as Props;
+if (!lang) {
+  throw new Error("[section-cta-group] lang is required.");
+}
+---
+
+<div class:list={["section-cta-group", `section-cta-group--align-${align}`]}>
+  {items.map((cta) => <SectionCta {...cta} lang={lang} />)}
+</div>

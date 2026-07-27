@@ -1,0 +1,35 @@
+id: ownership-block
+displayName: Ownership block
+version: 1.2.0
+semanticRole: client-ownership-disclosure
+description: |
+  Explicit list of what belongs to the client (domain, data, agreed materials).
+  RFC-0103 bodyKind: list.
+expectedIntents:
+  - trust
+  - legal-clarity
+  - de-risk
+expectedIndustryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+layoutHint: split
+bodyKind: list
+recommendedItemCount:
+  min: 3
+  max: 8
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+    - body-list
+acceptedCosmicNames:
+  - Helene
+constraints:
+  forbidPhrases:
+    - wir behalten
+    - Eigentum übergeht an
+  mandatoryConcepts:
+    - Domain
+    - Daten

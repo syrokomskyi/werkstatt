@@ -1,0 +1,82 @@
+/*
+<MODULE_CONTRACT>
+<purpose>
+Canonical CSS for the RFC-0134 EffectHost primitive. Implements shared glass
+material styling for any target host rendered by @gogol/ui.
+</purpose>
+<non-goals>
+  <item>Do not define target-specific spacing, layout, or content styling.</item>
+  <item>Do not implement future effect kinds in this first wave.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Introduces the shared RFC-0134 effect host CSS with glass as the first supported effect.</item>
+</CHANGE_SUMMARY>
+*/
+
+@layer components {
+  .effect-host {
+    position: relative;
+    border-radius: var(--ds-radius-sm-plus, var(--ds-radius-2));
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .effect-host--glass {
+    background: color-mix(
+      in srgb,
+      var(--effect-glass-tint, var(--ds-color-surface))
+        calc(var(--effect-glass-tint-opacity, 0.6) * 100%),
+      transparent
+    );
+    -webkit-backdrop-filter: blur(var(--effect-glass-blur, 16px))
+      saturate(var(--effect-glass-saturate, 180%));
+    backdrop-filter: blur(var(--effect-glass-blur, 16px))
+      saturate(var(--effect-glass-saturate, 180%));
+    border: 1px solid var(--ds-color-border-glass);
+    box-shadow: var(--ds-shadow-glass);
+  }
+
+  .effect-host--glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, white 28%, transparent) 0%,
+        color-mix(in srgb, white 10%, transparent) 22%,
+        transparent 58%
+      ),
+      linear-gradient(135deg, color-mix(in srgb, white 14%, transparent) 0%, transparent 42%);
+    opacity: 0.8;
+    z-index: 0;
+  }
+
+  .effect-host--glass > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .effect-host--glass-border-none {
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* RFC-0257: Suppress effects in print media */
+@media print {
+  .effect-host--glass {
+    background: var(--ds-color-surface, #fff) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border: 1px solid var(--ds-color-border, #ccc) !important;
+    box-shadow: none !important;
+  }
+
+  .effect-host--glass::before {
+    content: none !important;
+  }
+}

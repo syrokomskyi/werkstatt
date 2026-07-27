@@ -1,0 +1,11 @@
+---
+{{GENERATED_HEADER}}
+import LordIconBase from "{{LORD_ICON_BASE_SPECIFIER}}";
+import src from "{{JSON_SPECIFIER}}";
+
+type Props = Omit<import("{{LORD_ICON_BASE_SPECIFIER}}").Props, "src">;
+
+const { ...props } = Astro.props;
+---
+
+<LordIconBase {...props} src={src} />

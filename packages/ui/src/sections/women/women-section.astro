@@ -1,0 +1,89 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Renders a composite section for women's content, integrating images and text through reusable components.</purpose>
+<non-goals>
+  <item>Do not handle raw content parsing or data fetching outside of defined props.</item>
+  <item>Do not manage global state or application-wide configurations.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: women — composite (image + paragraphs body) via SectionShell + SectionHeader + SectionParagraphs. */
+
+import type { SectionParagraphsBody } from "@gogol/share";
+import type { SectionProps } from "@gogol/share/page";
+import {
+  cast,
+  need,
+  resolveImageRequired,
+  resolveSectionAnchor,
+  creditByTarget,
+} from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import ResponsiveImage from "@gogol/ui/components/responsive-image.astro";
+import SectionParagraphs from "@gogol/ui/components/section-body/paragraphs.astro";
+import type { WomenSectionContent } from "./women-section.types.generated.ts";
+import "./women-section.css";
+
+import { contentAssetImages, contentAssetCredits } from "../../content-assets.ts";
+const images = contentAssetImages;
+
+const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "women");
+const props = cast<WomenSectionContent>(pageOverride);
+const body = cast<SectionParagraphsBody>(props.body);
+
+if (!props.image) {
+  throw new Error("[RFC-0042]/women-section/image-required");
+}
+
+const resolvedImage = resolveImageRequired(images, props.image, { lang }, "women-section");
+const imageCredit = creditByTarget(
+  contentAssetCredits,
+  { kind: "image", id: props.image, domain: "pages" },
+  lang,
+  defaultLanguageCode,
+);
+---
+
+<SectionShell
+  slug="women"
+  sectionId={sectionId}
+  ariaLabelledBy="women-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <div class="women-section__grid">
+    <div class="women-section__image-wrap">
+      <ResponsiveImage
+        image={resolvedImage}
+        alt={need("imageAlt", props.imageAlt)}
+        class="women-section__image"
+        loading="lazy"
+        credit={imageCredit}
+        lang={lang}
+        defaultLanguageCode={defaultLanguageCode}
+      />
+    </div>
+    <div class="women-section__content">
+      <SectionHeader
+        sectionNumber={sectionNumber}
+        heading={need("header.heading", props.header?.heading)}
+        subheading={props.header?.subheading}
+        align={props.header?.align ?? "left"}
+        level={props.header?.level ?? 2}
+        hideSectionNumber={props.header?.hideSectionNumber}
+        id="women-title"
+      />
+      <SectionParagraphs paragraphs={body.paragraphs} align={body.align} />
+    </div>
+  </div>
+</SectionShell>

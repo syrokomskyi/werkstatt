@@ -1,0 +1,373 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0232] Credits gallery section. Renders the material credits page as an optimized
+  media gallery: each credited material (RFC-0220 *.credits.yaml sidecar) is shown as a
+  responsive image (RFC-0152) or a living-photo / feature video preview (RFC-0202) beside
+  its localized provenance details. The preview is COMPUTED from credit.target.id +
+  credit.target.domain with RFC-0053 language fallback — no media filename is authored, and
+  no raw HTML lives in content. Consumes the shared content-asset maps (RFC-0141); declares
+  no import.meta.glob of its own.
+</purpose>
+<non-goals>
+  <item>Do not author media tokens or HTML; do not declare a new content-asset glob.</item>
+  <item>Do not change the credit schema or discovery — that is RFC-0220.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0232: implement the credits media gallery (replaces the flat markdown list).</item>
+  <item>RFC-0488: type/status badges, AI section, usage basis, stable anchors, neutral placeholder, copyright explanation.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type {
+  ImageDescriptor,
+  LivePhoto as LivePhotoConfig,
+  MaterialCredit,
+  MaterialCreditRecord,
+  MaterialTargetDomain,
+  CreditParty,
+} from "@gogol/share";
+import type { SectionProps } from "@gogol/share/page";
+import {
+  cast,
+  resolveSectionAnchor,
+  getSiteLabelsData,
+  materialCreditLabelsSchema,
+  parseMaterialCreditMap,
+  formatMaterialCreditLine,
+  labelForMaterialCreditRole,
+  labelForSourceType,
+  labelForStatus,
+  labelForUsageBasis,
+} from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import ResponsiveImage from "../../components/responsive-image/responsive-image.astro";
+import LivePhoto from "../../components/live-photo/live-photo.astro";
+import {
+  contentAssetCredits,
+  contentAssetImages,
+  contentAssetVideos,
+} from "../../content-assets.ts";
+import { getVideoEntryByToken } from "../../video-manifest.ts";
+import type { CreditsGallerySectionContent } from "./credits-gallery-section.types.generated.ts";
+import "./credits-gallery-section.css";
+
+const { lang, sectionNumber, defaultLanguageCode, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "credits-gallery");
+const props = cast<CreditsGallerySectionContent>(pageOverride);
+
+const defaultLang = defaultLanguageCode ?? "de";
+
+const localizedSiteLabels = await getSiteLabelsData(lang, defaultLang);
+const defaultSiteLabels =
+  lang === defaultLang ? localizedSiteLabels : await getSiteLabelsData(defaultLang, defaultLang);
+const labels = materialCreditLabelsSchema.parse(
+  (localizedSiteLabels as { materialCredits?: unknown } | null)?.materialCredits ??
+    (defaultSiteLabels as { materialCredits?: unknown } | null)?.materialCredits,
+);
+
+const IMAGE_EXTENSIONS = ["webp", "jpg", "jpeg", "png", "gif"] as const;
+const VIDEO_EXTENSIONS = ["webm", "mp4"] as const;
+const LIVE_PHOTO_CONFIG: LivePhotoConfig = {
+  enabled: true,
+  trigger: "in-viewport",
+  loop: true,
+  tapBehavior: "toggle",
+};
+
+function languageOrder(): string[] {
+  return lang === defaultLang ? [lang] : [lang, defaultLang];
+}
+
+// RFC-0232: the preview is computed from the credit target — id IS the media token,
+// domain IS the owning content domain. No filename is authored in content.
+function resolvePreviewImage(domain: MaterialTargetDomain, id: string): ImageDescriptor | null {
+  for (const dirLang of languageOrder()) {
+    for (const ext of IMAGE_EXTENSIONS) {
+      const key = `/src/content/${domain}/${dirLang}/assets/${id}.${ext}`;
+      const mod = contentAssetImages[key];
+      if (mod?.default) return mod.default;
+    }
+  }
+  return null;
+}
+
+function resolvePreviewVideo(domain: MaterialTargetDomain, id: string): string | null {
+  for (const dirLang of languageOrder()) {
+    for (const ext of VIDEO_EXTENSIONS) {
+      const key = `/src/content/${domain}/${dirLang}/assets/${id}.${ext}`;
+      const url = contentAssetVideos[key];
+      if (url) return url;
+    }
+  }
+  return null;
+}
+
+type Preview =
+  | { kind: "image"; image: ImageDescriptor }
+  | {
+      kind: "video";
+      image: ImageDescriptor;
+      videoSrc: string;
+      mp4VideoSrc?: string;
+      hasAudio?: boolean;
+    }
+  | null;
+
+function resolvePreview(record: MaterialCreditRecord): Preview {
+  const { target } = record.credit;
+  const domain: MaterialTargetDomain = target.domain ?? "pages";
+  const image = resolvePreviewImage(domain, target.id);
+  if (target.kind === "video") {
+    const videoSrc = resolvePreviewVideo(domain, target.id);
+    // A living-photo video uses its sibling still as the poster/resting state.
+    if (videoSrc && image) return { kind: "video", image, videoSrc };
+
+    // Fallback: generated video manifest for feature videos (RFC-0210).
+    // The manifest carries a generated poster + progressive sources; no static
+    // sibling image is required.
+    const entry = getVideoEntryByToken(target.id, lang, defaultLang);
+    if (entry) {
+      const posterImage: ImageDescriptor = {
+        src: entry.poster,
+        width: entry.intrinsicWidth,
+        height: entry.intrinsicHeight,
+        format: "webp",
+      };
+      if (entry.sources.webm || entry.sources.mp4) {
+        return {
+          kind: "video",
+          image: posterImage,
+          videoSrc: entry.sources.webm ?? entry.sources.mp4!,
+          mp4VideoSrc: entry.sources.mp4,
+          hasAudio: entry.hasAudio,
+        };
+      }
+      if (entry.poster) {
+        return { kind: "image", image: posterImage };
+      }
+    }
+
+    if (image) return { kind: "image", image };
+    return null;
+  }
+  return image ? { kind: "image", image } : null;
+}
+
+// RFC-0232: deduplicate to one record per target, preferring an exact language
+// match, then the default language, then a language-agnostic sidecar.
+function selectLocalizedRecords(records: MaterialCreditRecord[]): MaterialCreditRecord[] {
+  const priorityFor = (recordLang: string | undefined): number => {
+    if (recordLang === lang) return 0;
+    if (recordLang === defaultLang) return 1;
+    if (!recordLang) return 2;
+    return -1;
+  };
+  const identityKey = (record: MaterialCreditRecord): string => {
+    const t = record.credit.target;
+    return [t.kind, t.domain ?? "", t.id].join(":");
+  };
+  const best = new Map<string, { record: MaterialCreditRecord; priority: number }>();
+  for (const record of records) {
+    const priority = priorityFor(record.credit.target.lang ?? record.lang);
+    if (priority < 0) continue;
+    const key = identityKey(record);
+    const current = best.get(key);
+    if (!current || priority < current.priority) best.set(key, { record, priority });
+  }
+  return [...best.values()].map((entry) => entry.record);
+}
+
+interface CreditDetail {
+  label: string;
+  name: string;
+  kind: CreditParty["kind"];
+  url?: string;
+}
+
+function creditDetails(credit: MaterialCredit): CreditDetail[] {
+  return credit.parties
+    .filter((party) => party.role !== "sourceMaterial")
+    .map((party) => ({
+      label: labelForMaterialCreditRole(party.role, labels),
+      name: party.name,
+      kind: party.kind,
+      url: party.url,
+    }));
+}
+
+const galleryCards = selectLocalizedRecords(parseMaterialCreditMap(contentAssetCredits))
+  .map((record) => ({ credit: record.credit, preview: resolvePreview(record) }))
+  .sort((a, b) => {
+    const left = `${a.credit.target.domain ?? ""}:${a.credit.target.kind}:${a.credit.target.id}`;
+    const right = `${b.credit.target.domain ?? ""}:${b.credit.target.kind}:${b.credit.target.id}`;
+    return left.localeCompare(right);
+  });
+---
+
+<SectionShell
+  slug="credits-gallery"
+  sectionId={sectionId}
+  ariaLabelledBy={props.heading ? "credits-gallery-title" : undefined}
+  background={props.background ?? { kind: "color" }}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  {
+    props.heading && (
+      <SectionHeader
+        sectionNumber={sectionNumber}
+        heading={props.heading}
+        subheading={props.lead}
+        align="center"
+        level={1}
+        hideSectionNumber={true}
+        id="credits-gallery-title"
+      />
+    )
+  }
+
+  {
+    galleryCards.length === 0 ? (
+      <p class="credits-gallery__empty">{labels.emptyMessage}</p>
+    ) : (
+      <ul class="credits-gallery__grid" role="list">
+        {galleryCards.map(({ credit, preview }) => {
+          const title = credit.title ?? credit.target.id;
+          return (
+            <li class="credits-gallery__card" id={credit.id}>
+              <div class="credits-gallery__media" data-kind={preview?.kind ?? "none"}>
+                {preview?.kind === "video" && preview.image ? (
+                  preview.hasAudio ? (
+                    <video
+                      class="credits-gallery__video"
+                      controls
+                      playsinline
+                      webkit-playsinline
+                      preload="metadata"
+                      poster={preview.image.src}
+                      width={preview.image.width}
+                      height={preview.image.height}
+                      aria-label={title}
+                    >
+                      <source src={preview.videoSrc} type="video/webm" />
+                      {preview.mp4VideoSrc && <source src={preview.mp4VideoSrc} type="video/mp4" />}
+                    </video>
+                  ) : (
+                    <LivePhoto
+                      image={preview.image}
+                      videoSrc={preview.videoSrc}
+                      mp4VideoSrc={preview.mp4VideoSrc}
+                      alt={title}
+                      config={LIVE_PHOTO_CONFIG}
+                      class="credits-gallery__live"
+                      sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw"
+                    />
+                  )
+                ) : preview?.kind === "image" && preview.image ? (
+                  <ResponsiveImage
+                    image={preview.image}
+                    alt={title}
+                    class="credits-gallery__image"
+                    loading="lazy"
+                    quality="high"
+                    sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw"
+                  />
+                ) : (
+                  <div class="credits-gallery__placeholder" aria-hidden="true">
+                    <span>{labels.noPreviewLabel}</span>
+                  </div>
+                )}
+              </div>
+
+              <div class="credits-gallery__body">
+                <h2 class="credits-gallery__title" id={`${credit.id}-title`}>
+                  {title}
+                </h2>
+                <p class="credits-gallery__summary">{formatMaterialCreditLine(credit, labels)}</p>
+                {credit.status && credit.status !== "active" && (
+                  <span class="credits-gallery__status-badge" data-status={credit.status}>
+                    {labelForStatus(credit.status, labels)}
+                  </span>
+                )}
+                {credit.aiUsage && (
+                  <div class="credits-gallery__ai-usage">
+                    <p class="credits-gallery__ai-kind">
+                      {credit.aiUsage.kind === "ai-generated"
+                        ? labels.aiUsageLabels.aiGenerated
+                        : labels.aiUsageLabels.aiAssisted}
+                    </p>
+                    <p class="credits-gallery__ai-human">
+                      {labels.aiUsageLabels.humanContribution}: {credit.aiUsage.humanContribution}
+                    </p>
+                    <p class="credits-gallery__ai-copyright">
+                      {credit.aiUsage.copyrightClaimed
+                        ? labels.aiUsageLabels.copyrightClaimed
+                        : labels.aiUsageLabels.copyrightNotClaimed}
+                    </p>
+                  </div>
+                )}
+                <dl class="credits-gallery__meta">
+                  {creditDetails(credit).map((detail) => (
+                    <div class="credits-gallery__row">
+                      <dt>{detail.label}</dt>
+                      <dd>
+                        {detail.url ? (
+                          <a href={detail.url} target="_blank" rel="noopener noreferrer">
+                            {detail.name}
+                          </a>
+                        ) : (
+                          detail.name
+                        )}
+                        {detail.kind !== "Person" && (
+                          <span class="credits-gallery__kind"> ({detail.kind})</span>
+                        )}
+                      </dd>
+                    </div>
+                  ))}
+                  <div class="credits-gallery__row">
+                    <dt>{labels.sourceType}</dt>
+                    <dd>{labelForSourceType(credit.sourceType, labels)}</dd>
+                  </div>
+                  <div class="credits-gallery__row">
+                    <dt>{labels.license}</dt>
+                    <dd>
+                      {credit.license.url ? (
+                        <a href={credit.license.url} target="_blank" rel="noopener noreferrer">
+                          {credit.license.label}
+                        </a>
+                      ) : (
+                        credit.license.label
+                      )}
+                    </dd>
+                  </div>
+                  {credit.usageBasis && (
+                    <div class="credits-gallery__row">
+                      <dd>
+                        {labelForUsageBasis(credit.usageBasis.type, labels)}
+                        {credit.usageBasis.note ? ` — ${credit.usageBasis.note}` : ""}
+                      </dd>
+                    </div>
+                  )}
+                  {credit.license.copyrightNotice && (
+                    <div class="credits-gallery__row">
+                      <dt>{labels.copyrightLabel}</dt>
+                      <dd>{credit.license.copyrightNotice}</dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    )
+  }
+
+  <p class="credits-gallery__copyright-explanation">{labels.copyrightExplanation}</p>
+</SectionShell>

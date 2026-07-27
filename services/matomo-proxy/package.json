@@ -1,0 +1,22 @@
+{
+  "name": "matomo-proxy",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build:check": "tsc --noEmit",
+    "check": "site-kernel run matomo.proxy.validate"
+  },
+  "devDependencies": {
+    "wrangler": "^4.112.0"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "architecture",
+      "rationale": "Proxy behavior is currently guarded by matomo.proxy.validate and TypeScript; request-fixture tests are scheduled with RFC-0305 fleet controls.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

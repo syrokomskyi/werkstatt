@@ -1,0 +1,79 @@
+id: donation-card-section
+uniName: donation-card-section
+layer: section
+semanticId: donation-card
+archetype: donation-card
+cosmicName: Pandora
+role: donation-use
+version: 1.1.0
+intent:
+  - display-donation-card
+  - facilitate-donation
+  - build-trust
+industryFit:
+  - non-profit
+contentSchemaKey: donation-card-section
+contentTypesPath: ./donation-card-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - labels
+  properties:
+    labels:
+      type: object
+      additionalProperties: false
+      required:
+        - title
+        - ibanLabel
+        - bicLabel
+        - bankLabel
+        - copyButtonLabel
+        - qrCodeButtonLabel
+        - donationInfoLinkLabel
+        - oldDetailsButtonLabel
+        - qrCodeModalTitle
+        - qrCodeModalCloseLabel
+        - qrCodeAltText
+        - qrInstruction
+      properties:
+        title: { type: string, minLength: 1 }
+        ibanLabel: { type: string, minLength: 1 }
+        bicLabel: { type: string, minLength: 1 }
+        bankLabel: { type: string, minLength: 1 }
+        copyButtonLabel: { type: string, minLength: 1 }
+        qrCodeButtonLabel: { type: string, minLength: 1 }
+        donationInfoLinkLabel: { type: string, minLength: 1 }
+        oldDetailsLabel: { type: string }
+        oldDetailsButtonLabel: { type: string, minLength: 1 }
+        oldDetailsButtonExpandedLabel: { type: string }
+        kontoLabel: { type: string }
+        blzLabel: { type: string }
+        qrCodeModalTitle: { type: string, minLength: 1 }
+        qrCodeModalCloseLabel: { type: string, minLength: 1 }
+        qrCodeAltText: { type: string, minLength: 1 }
+        qrInstruction: { type: string, minLength: 1 }
+        donationInfoLinkHref: { type: string }
+        modalCloseIcon: { type: string }
+    title:
+      type: string
+    companyName:
+      type: string
+    bankName:
+      type: string
+    iban:
+      type: string
+    bic:
+      type: string
+    konto:
+      type: string
+    blz:
+      type: string
+    trustIndicators:
+      type: array
+      items:
+        type: string

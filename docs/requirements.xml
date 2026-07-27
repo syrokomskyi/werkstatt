@@ -1,0 +1,362 @@
+<requirements>
+  <meta>
+    <document-id>requirements</document-id>
+    <version>1.0.0</version>
+    <status>active</status>
+    <scope>repository-root</scope>
+  </meta>
+
+  <vision>
+    <statement>
+      WGogol Platform uses Compass as the repository-wide operating model for AI-assisted engineering.
+      The goal is deterministic, architecture-aware work across a Turborepo that contains reusable kernel packages in `packages/`
+      and deployable sites in `apps/`.
+    </statement>
+  </vision>
+
+  <operating-principles>
+    <principle id="gp-01">
+      Read and update machine-readable repository contracts before changing architecture, shared behavior, or high-risk boundaries.
+    </principle>
+    <principle id="gp-02">
+      Treat generated code as a compilation target of approved semantic intent, not as free-form improvisation.
+    </principle>
+    <principle id="gp-03">
+      Prefer XML documents for large AI-facing architecture context, plans, reports, and logs.
+    </principle>
+    <principle id="gp-04">
+      Keep repository rules, Compass documents, and implementation synchronized so that future agents inherit truthful context.
+    </principle>
+  </operating-principles>
+
+  <use-cases>
+    <use-case id="uc-cl-01">
+      <actor>CI scheduler / maintainer</actor>
+      <action>Triggers the changelog pipeline on a weekly or monthly schedule, or manually via CLI.</action>
+      <goal>Produce a versioned changelog file and bump SemVer without manual intervention.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-cl-02">
+      <actor>Changelog pipeline</actor>
+      <action>Collects git commits for the release window, extracts tree hash, diff summary, and sanitizes all text fields before AI processing.</action>
+      <goal>Feed safe, token-efficient, prompt-injection-free input to AI agents.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-cl-03">
+      <actor>AI classifier agent</actor>
+      <action>Classifies each commit (type, severity, module, isBreaking, confidence) using deterministic rules first and LLM as fallback. Results are cached in SQLite WAL with a composite key.</action>
+      <goal>Stable, idempotent classification resilient to cherry-pick and squash merge.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-cl-04">
+      <actor>AI grouper agent</actor>
+      <action>Clusters 50+ technical commits into 5-7 business-level groups based on file path overlap and semantic proximity.</action>
+      <goal>Produce a human-readable changelog grouped by feature, not by raw commit.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-cl-05">
+      <actor>AI writer agent</actor>
+      <action>Generates each changelog section as coherent prose in a single prompt per group. Past tense, no marketing language.</action>
+      <goal>Deliver a changelog readable by users, not a raw commit log.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-cl-06">
+      <actor>Version bumper</actor>
+      <action>Calculates next SemVer deterministically. Breaking changes with AI confidence below 0.85 produce a warning and manual review flag instead of an automatic bump. Major version is hard-locked.</action>
+      <goal>Prevent accidental major bumps; flag uncertain breaking changes for human review.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-cl-07">
+      <actor>Index rebuilder</actor>
+      <action>Writes versioned changelog files (changelog-YYYY-MM-DD-vX.Y.Z.md) atomically via tmp+rename. Rebuilds CHANGELOG.md index entirely. Restores dynamic markers if missing.</action>
+      <goal>Guarantee atomic, idempotent, collision-free file output.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-cl-08">
+      <actor>GitHub Actions</actor>
+      <action>Runs the changelog pipeline on schedule, caches the SQLite DB between runs, and commits results automatically.</action>
+      <goal>Zero-touch changelog generation in CI without token waste or API rate limit errors.</goal>
+      <system>changelog-os</system>
+    </use-case>
+
+    <use-case id="uc-crm-01">
+      <actor>Site operator</actor>
+      <action>Onboards a new site to the shared Lagebild CRM sync worker via `lagebild.tenant.add`, then sets per-tenant secrets via `wrangler secret put`.</action>
+      <goal>Add a new client to the multi-tenant CRM buffer without creating a per-site Worker folder (RFC-0186).</goal>
+      <system>lagebild</system>
+    </use-case>
+
+    <use-case id="uc-crm-02">
+      <actor>Shared sync Worker (cron)</actor>
+      <action>Reads enabled tenants from Supabase `sync_tenants`, resolves secret references from Worker env, and processes each tenant's `sync_outbox` rows with isolation.</action>
+      <goal>Keep every tenant's CRM data in sync without one tenant's failure affecting others (RFC-0186).</goal>
+      <system>lagebild</system>
+    </use-case>
+
+    <use-case id="uc-01">
+      <actor>AI agent</actor>
+      <action>Reads the root Compass documents before planning or editing a cross-workspace task.</action>
+      <goal>Preserve architectural intent and avoid shallow local-only changes.</goal>
+    </use-case>
+
+    <use-case id="uc-02">
+      <actor>Maintainer</actor>
+      <action>Updates shared packages in `packages/` and validates affected apps in `apps/`.</action>
+      <goal>Keep reusable APIs stable and prevent accidental coupling to app-private internals.</goal>
+    </use-case>
+
+    <use-case id="uc-03">
+      <actor>AI agent</actor>
+      <action>Changes an app route, content flow, or layout only after reading the graph, workspace rules, and local module contracts.</action>
+      <goal>Maintain thin routes, explicit ownership boundaries, and content-driven behavior.</goal>
+    </use-case>
+
+    <use-case id="uc-04">
+      <actor>AI agent</actor>
+      <action>Introduces a new module or substantially refactors a high-risk file with explicit semantic scaffolding.</action>
+      <goal>Leave stable anchors and local contracts for future bottom-up retrieval and safe patching.</goal>
+    </use-case>
+
+    <use-case id="uc-05">
+      <actor>Maintainer</actor>
+      <action>Reviews a repository change by comparing code, AGENTS guidance, and Compass XML documents.</action>
+      <goal>Detect drift between implementation, architecture, and verification expectations.</goal>
+    </use-case>
+
+    <use-case id="uc-06">
+      <actor>AI tester</actor>
+      <action>Uses workspace-scoped checks, structured logs, and task-specific markdown instructions to verify behavior.</action>
+      <goal>Assess runtime trajectories without depending only on narrow assertion coverage.</goal>
+    </use-case>
+
+    <use-case id="uc-07">
+      <actor>AI agent</actor>
+      <action>Handles legacy guidance in `.agents/` only after checking active `AGENTS.md` files and root Compass documents.</action>
+      <goal>Use historical context without allowing outdated guidance to override active rules.</goal>
+    </use-case>
+  </use-cases>
+
+  <changelog-os-requirements>
+    <requirement id="cl-req-01">
+      The changelog pipeline lives in `@gogol/site-kernel-changelog` at `packages/os/site-kernel-changelog/src/changelog/` and is wired into each app via `tools/modules/changelog.module.ts`. Invoked per-app via `pnpm changelog:generate`.
+    </requirement>
+    <requirement id="cl-req-02">
+      All AI calls must be rate-limited (p-limit 5) and results cached in SQLite WAL mode with a composite key: TreeHash + files.sort() + diffSummary + promptHash + modelVersion.
+    </requirement>
+    <requirement id="cl-req-03">
+      All commit text fields must be sanitized with `sanitizeForPrompt()` before being sent to any LLM.
+    </requirement>
+    <requirement id="cl-req-04">
+      Breaking changes with AI confidence below `breakingChangeConfidenceThreshold` (default 0.85) must not trigger an automatic SemVer bump; they generate a warning and set `requiresReview: true`.
+    </requirement>
+    <requirement id="cl-req-05">
+      Major version increments are permanently forbidden. The version bumper must throw on any attempt.
+    </requirement>
+    <requirement id="cl-req-06">
+      Versioned changelog files must include the version in their filename: `changelog-YYYY-MM-DD-vX.Y.Z.md`.
+    </requirement>
+    <requirement id="cl-req-07">
+      CHANGELOG.md index must be rebuilt entirely (not appended) and dynamic markers must be restored automatically if absent.
+    </requirement>
+    <requirement id="cl-req-08">
+      All file writes must be atomic: write to a `.tmp` file, then `fs.rename`.
+    </requirement>
+  </changelog-os-requirements>
+
+  <repository-requirements>
+    <requirement id="req-01">
+      `docs/requirements.xml`, `docs/technology.xml`, `docs/development-plan.xml`, `docs/knowledge-graph.xml`, `docs/verification-plan.xml`, `docs/source-markup.xml`, and `docs/styling.xml`
+      are the mandatory repository-level semantic context for AI-driven work.
+    </requirement>
+    <requirement id="req-02">
+      Any task that changes business intent, architecture, shared package APIs, workspace topology, or verification policy must update the affected Compass documents in the same change set.
+    </requirement>
+    <requirement id="req-03">
+      Root and nested `AGENTS.md` files remain the active instruction hierarchy; they must direct agents to the Compass documents first when repository-wide context matters.
+    </requirement>
+    <requirement id="req-04">
+      Legacy `.agents/**` material is reference-only and may add rationale, but it must not override active `AGENTS.md` or Compass contracts.
+    </requirement>
+    <requirement id="req-05">
+      New source files under `apps/` and `packages/` should include Compass semantic scaffolding when the file is non-trivial: `MODULE_CONTRACT`, `MODULE_MAP`, `CHANGE_SUMMARY`, and paired semantic anchors for major blocks.
+    </requirement>
+    <requirement id="req-06">
+      Existing files are adopted incrementally. Backfill Compass scaffolding when creating new files, when substantially editing high-risk files, or when a file has become difficult to navigate without explicit anchors.
+    </requirement>
+    <requirement id="req-07">
+      Do not bulk-edit untouched files only to add markup if that churn is not required by the current task.
+    </requirement>
+    <requirement id="req-08">
+      Repository documentation remains in English, including all Compass artifacts, contracts, verification notes, and migration guidance.
+    </requirement>
+    <requirement id="req-08a">
+      Shared package entrypoints, authored local TypeScript specifiers, and generator-owned app templates must remain synchronized with the active universal import/export contract described in `AGENTS.md`, `packages/AGENTS.md`, `docs/authoring/site-composition.md`, and `docs/technology.xml`.
+    </requirement>
+    <requirement id="req-09">
+      Do not treat `spec/` or `todo/` as primary implementation authority when the same rule already exists in `AGENTS.md` or `docs/*.xml`.
+    </requirement>
+    <requirement id="req-10">
+      Shared icon assets and generated icon components must be owned by `packages/ui`; apps consume them through `@gogol/ui` imports instead of restoring app-local icon trees.
+    </requirement>
+    <requirement id="req-11">
+      Workspace-scoped site OS commands that operate on shared packages or repository-wide assets must be registered in the repository root `tools/kernel.config.ts`.
+    </requirement>
+    <requirement id="req-12">
+      Published videos and content image tokens in `apps/*` must carry RFC-0220 material credits via `*.credits.yaml` sidecars. The credits record is the canonical source for inline disclosure, generated credits pages, and deploy-time validation.
+    </requirement>
+    <requirement id="req-13">
+      Internal site circulation uses the RFC-0221 handoff model: thin authored-site bundles are validated and migrated forward against the recipient ecosystem by `@gogol/site-kernel-handoff`; `client.export` remains the external full-fork deliverable.
+    </requirement>
+    <requirement id="req-13a">
+      Deployable backend runtime compositions live in `services/*`. Services are composition-only workspaces for runtime entrypoints, deployment config, environment/store/queue selection, and health checks; reusable schemas, adapters, validators, reports, browser capture, and shared logic belong in `packages/*`.
+    </requirement>
+    <requirement id="req-14">
+      Hierarchical demand records (RFC-0244) must use canonical folder depth (1/2/3 segments). Base city-level demand records (depth-4 children, e.g., `{industry}/{city}.md`) must set `name` to a service/demand concept, not the city name, to avoid depth-5 title tautology: `{demand.name} für {industry.name} in {city.name}` must not repeat the city.
+    </requirement>
+    <requirement id="req-15">
+      Authored offer pillars (RFC-0243) replace PSEO-generated depth-0 listing pages. Listing pages are authored content (pageId: services) with explicit audience cards linking to authored offer detail pages. Navigation and footer links target the semantic pageId directly. Moved offer pages receive 301 redirects from their legacy URLs. The offer Blueprint no longer emits a depth-0 pillar route.
+    </requirement>
+    <requirement id="req-16">
+      The Agent Control Plane projection (RFC-0245/RFC-0246) lives at `docs/ecosystem.generated.yaml`, is generated from live workspace state by `ecosystem.manifest.generate`, uses schema v2 deterministic metadata (`meta.generatedAt: null`, `meta.contentHash`, source hashes), derives workspace packages from `pnpm-workspace.yaml`, and is drift-guarded by `ecosystem.manifest.validate` plus `workspace.surface.validate` in the package validation pipeline. Agents may use it for planning context, but it is not normative.
+    </requirement>
+    <requirement id="req-17">
+      Workspace-scoped package validation entrypoints `packages.check` and `packages-check.run` must execute targetlessly from the repository root and remain aliases over the same `PACKAGES_CHECK_PIPELINE` step list unless a later accepted RFC explicitly separates them.
+    </requirement>
+    <requirement id="req-18">
+      Agent-facing advisory findings in standard checks must travel as canonical `Diagnostic[]` records, not only as `KernelCommandResult.summary` prose. `warning.diagnostics.lint` guards summary-only warning markers, and `maintenance.debt.report` aggregates warning/info diagnostics from app author advisory checks for return-for-rework planning.
+    </requirement>
+    <requirement id="req-19">
+      The autonomous package quality gate (RFC-0249) is represented by `ci.local.validate` and `test.signal.validate`: CI and local agents must use the same command set for package lint, package checks, app author checks, RFC validation, tests, and test-signal classification; the Agent Control Plane records each workspace package's test signal.
+    </requirement>
+    <requirement id="req-19a">
+      Test signal maturity and maintenance debt baselines (RFC-0251) are explicit, owned, and diffable: package test skips require `gogol.testSignal` owner/rationale/review metadata, no-op test scripts are forbidden by policy validation, and `docs/maintenance-debt.baseline.generated.yaml` separates accepted advisory backlog from new debt.
+    </requirement>
+    <requirement id="req-19b">
+      Advisory maintenance debt queues (RFC-0256) convert accepted warning debt into bounded, ownerful, reviewable work plans under `docs/maintenance-debt/queues/*.yaml`; `maintenance.debt.queue.report` emits the next batch, `maintenance.debt.queue.validate` guards schema/staleness/unqueued accepted warnings, and `maintenance.debt.queue.generate` owns `docs/maintenance-debt.queues.generated.yaml`.
+    </requirement>
+    <requirement id="req-20">
+      Runtime warnings for shared section fallback assets and semantic page targets must have canonical static diagnostic coverage. `section.defaults.validate`, `semantic.targets.validate`, and `runtime.warnings.lint` keep app-specific shared UI defaults and missing route/pageId warnings visible before Astro render logs (RFC-0250).
+    </requirement>
+    <requirement id="req-21">
+      Long-running Site OS command and pipeline execution must expose timing and timeout telemetry. Kernel command results include command-level timing, pipeline results include total duration and slowest-step summaries, and `pipeline.timeout.validate` guards incoherent timeout metadata for standard pipeline descriptors (RFC-0255).
+    </requirement>
+    <requirement id="req-22">
+      PSEO-capable apps must declare `surface.modules` in `src/content/system.md`. Each module owns its Blueprints exactly once, declares its own entitlement, `masterLocale`, `publishedLocales`, offline generation policy, approval policy, and localization references; `surface.context.validate` guards this context before surface generation and enrichment.
+    </requirement>
+    <requirement id="req-23">
+      Every Sternsystem maintains an append-only Bordbuch at `systems/<id>/bordbuch/events.ndjson`. Bordbuch events are hash-chained, secret/PII-guarded, corrected through errata rather than history rewrites, and record both lifecycle events (mission open/close/abort, deployment, release) and runtime operational events (PSEO breaker trips, autonomy demotions, IndexNow submissions). Projections are generated by `bordbuch.generate` into `systems/<id>/public/.well-known/bordbuch.*` (JSON, HTML, YAML) and consumed by PSEO and fleet control loops. Enforced by `bordbuch.validate` and `bordbuch.generate`.
+    </requirement>
+    <requirement id="req-24">
+      PSEO indexability must be gated by deterministic evidence and duplicate checks, not by structural substance alone. Blueprints may declare per-depth evidence policies; `surface.evidence.validate`, `surface.duplicate.validate`, `surface.validate`, `pseo.validate`, and `demand.modifier.lint` guard required narratives, record evidence, freshness validity, duplicate clusters, phantom levels, lazy pages, and path-safe demand slugs.
+    </requirement>
+    <requirement id="req-25">
+      PSEO translations must follow an explicit derived-artifact lifecycle. Approved master-locale enriched artifacts are separately stamped `readyForTranslation` with a normalized `contentHash`; derived target artifacts carry `derivedFrom`, `sourceHash`, translator-note id, glossary id, and target QA state; unapproved or target-gate-failing translations must not render as indexable content.
+    </requirement>
+    <requirement id="req-26">
+      Every PSEO module target language must have approved, current, non-public translator notes and machine-readable glossaries before translation generation can run. `surface.translation.notes.validate` and `surface.translation.glossary.validate` guard approval, source/target language metadata, required sections, moduleContextHash freshness, and term policy shape.
+    </requirement>
+    <requirement id="req-27">
+      Search demand must be a first-class, versioned surface record source. `DemandSignal` records live under `src/content/surface/demand-signals/{lang}`, are imported only through offline aggregate exports, carry provenance and freshness, avoid PII/per-user analytics, and can gate Blueprint depths through `policy.demandPerDepth`; `demand.signal.validate`, `demand.map.report`, and `pseo.proof.validate` guard the demand-map proof surface.
+    </requirement>
+    <requirement id="req-28">
+      Deep evidence-driven Programmatic Surface pages may be bounded by consented Werk records instead of cartesian tuples. `WerkRecord` records live under `src/content/surface/werke/{lang}`, require anchored provenance and publish/client consent, join to axis tuples through `surface.evidence.join`, and can gate Blueprint depths through `evidencePerDepth.minWerkEvidence` plus `existenceSource: works`.
+    </requirement>
+    <requirement id="req-29">
+      PSEO approvals must carry typed authority. Autonomy scopes are declared per module, field-class, and locale with explicit level and ceiling; `autonomy.level.validate`, `autonomy.level.report`, `autonomy.promote`, and `autonomy.demote` guard calibration-backed promotion, instant demotion, typed approvers, and claims/product ceilings.
+    </requirement>
+    <requirement id="req-30">
+      AI review is an auditable generation-lane artifact, never a deterministic build dependency. Review verdicts carry pinned reviewer identity, confidence, checks, and grounding violations; `surface.review.validate` enforces reviewer/generator separation, low-confidence escalation, and no approval with grounding violations.
+    </requirement>
+    <requirement id="req-31">
+      Human involvement is a typed escalation budget. Escalations are routed through `src/surface/escalations.ndjson`, report human-minutes per 1000 pages, require feedback on resolution, and block when budget is exhausted instead of auto-approving under pressure.
+    </requirement>
+    <requirement id="req-32">
+      PSEO visibility must close the measured feedback loop before autonomous expansion. Aggregate, PII-free visibility snapshots are imported offline, reconciled to generated clusters, and converted into governed cluster actions (`expand`, `hold`, `prune`, `enrich`, `escalate`) by `visibility.import`, `visibility.reconcile`, and `visibility.action.plan`; enrichment requires positive demand and outcomes feed proof/Bordbuch control surfaces.
+    </requirement>
+    <requirement id="req-33">
+      Autonomous PSEO expansion must be reversible and breaker-guarded. `surface.generate` records content-addressed surface states with `lastKnownGood` pointers; `surface.breaker.evaluate` freezes/demotes/escalates on tripwires; rollback commands restore prior good state through pointer/noindex/redirect policy and must never delete published URLs.
+    </requirement>
+    <requirement id="req-37">
+      Ratgeber claim records are structured, source-bound, and expiry-tracked. A dedicated content collection `surface/claims/{lang}/*.md` holds claim records with claimId, articleId, claimText, claimType, sourceRefs, calculationInputs, limitations, verifiedAt, expiresAt, and reviewStatus. `ratgeber.claim.validate` enforces schema, uniqueness, article resolution, source binding, calculation inputs, URL validity, expiry warnings, disputed status, and PBP value drift (RG-CLAIM-01..09). `ratgeber.provenance.validate` resolves claimIds against this collection (RG-PROV-03, RG-PROV-06).
+    </requirement>
+    <requirement id="req-34">
+      Fleet-level PSEO operation must be coordinated by a stateless Leitstand over per-site primitives. `fleet.status.collect` reads per-system Bordbuch projections, autonomy, visibility, breaker, and escalation status; `fleet.schedule.plan` emits a fair, budget-clipped work queue that never clips safety jobs; `fleet.killswitch` can freeze autonomous action across the fleet without approving content or replacing site state.
+    </requirement>
+    <requirement id="req-35">
+      Pipeline command results are cached by declared `reads` hash + module hash (RFC-0390). Every registered kernel command MUST declare `reads: string[]` (non-empty picomatch globs) or `cacheable: false`. The `command.reads.validate` command enforces this contract in `PACKAGES_CHECK_PIPELINE`. The cache reuses the existing `CacheLayer` (RFC-0382) with a `command_results` namespace; only `ok: true` results are cached. `--force` bypasses cache reads; `dryRun` bypasses entirely. All hashing uses `@gogol/fingerprint` (DNA-53).
+    </requirement>
+    <requirement id="req-36">
+      Sites may declare `businessModel: b2b-only` in `src/content/system.md` to enforce B2B-only content constraints. When declared, `b2b.model.validate` (in `sites-check-author` pipeline) checks that no B2C consumer-protection page entries (e.g., `widerruf`, `musterWiderruf`), route slugs, navigation labels, or statutory references (§ 312g/312j BGB, Verbraucher-Widerrufsrecht) remain in content. Sites may also declare `retiredRoutes` — an array of `{ slug, status: 410 }` entries that the codegen emits as 410 Gone tombstones in `_redirects` (RFC-0487).
+    </requirement>
+    <requirement id="req-38">
+      Ratgeber depth-1 article pages emit Article JSON-LD with structured Person author (from `authorRecord`), `description`, `mainEntityOfPage` as canonical URL string, and `dateModified` derived from `reviewedAt` or latest `changelog[].date`. FAQPage JSON-LD is prohibited on ratgeber depth-1 pages — FAQ content is rendered as visible HTML blocks only. The C-contract (`jsonld-types.yaml`) declares `FAQPage` in ratgeber depth-1 `prohibitedTypes` and `description`/`mainEntityOfPage` in Article `optional` fields. `seo.structured-data.validate` enforces SD-RAT-01..04 and `surface.contract.validate` checks the C-contract compliance.
+    </requirement>
+  </repository-requirements>
+
+  <source-file-contract-requirements>
+    <file-class id="sfc-01">
+      <name>runtime-core-and-boundary</name>
+      <required-mode>full</required-mode>
+      <required-elements>
+        <element>`MODULE_CONTRACT`</element>
+        <element>`MODULE_MAP`</element>
+        <element>`CHANGE_SUMMARY`</element>
+        <element>balanced `COMPASS_BLOCK` anchors</element>
+        <element>`@ai-invariant` for blast-radius files</element>
+      </required-elements>
+    </file-class>
+    <file-class id="sfc-02">
+      <name>adapters-and-tool-runtime</name>
+      <required-mode>full</required-mode>
+      <required-elements>
+        <element>`MODULE_CONTRACT`</element>
+        <element>`MODULE_MAP`</element>
+        <element>`CHANGE_SUMMARY`</element>
+        <element>stable semantic anchors for major blocks</element>
+      </required-elements>
+    </file-class>
+    <file-class id="sfc-03">
+      <name>app-routes-and-components</name>
+      <required-mode>reduced</required-mode>
+      <required-elements>
+        <element>`MODULE_CONTRACT`</element>
+        <element>`MODULE_MAP`</element>
+        <element>`CHANGE_SUMMARY`</element>
+      </required-elements>
+    </file-class>
+    <file-class id="sfc-04">
+      <name>schemas-and-validation-scripts</name>
+      <required-mode>full</required-mode>
+      <required-elements>
+        <element>`MODULE_CONTRACT`</element>
+        <element>`MODULE_MAP`</element>
+        <element>`CHANGE_SUMMARY`</element>
+        <element>semantic anchors for major logical sections</element>
+      </required-elements>
+    </file-class>
+    <file-class id="sfc-05">
+      <name>generated-or-explicitly-excluded</name>
+      <required-mode>none</required-mode>
+      <required-elements>
+        <element>no source-level Compass markup required</element>
+      </required-elements>
+    </file-class>
+    <authority>
+      The canonical, machine-readable definition of these modes and elements lives in `docs/source-markup.xml`.
+    </authority>
+  </source-file-contract-requirements>
+
+  <change-entry-criteria>
+    <criterion id="entry-01">Identify whether the task is local, workspace-scoped, or cross-workspace.</criterion>
+    <criterion id="entry-02">Read the root Compass documents before touching architecture, shared packages, or high-risk files.</criterion>
+    <criterion id="entry-03">Read the closest applicable `AGENTS.md` files after the root Compass pass.</criterion>
+    <criterion id="entry-04">Update the relevant contract or plan before implementing non-trivial behavior changes.</criterion>
+  </change-entry-criteria>
+</requirements>

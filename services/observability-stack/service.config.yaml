@@ -1,0 +1,7 @@
+id: observability-stack
+kind: compose-stack
+entry: casting.yaml
+publicEndpoints: true
+usesBrowserAutomation: false
+queues: []
+artifacts: []

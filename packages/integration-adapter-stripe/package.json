@@ -1,0 +1,40 @@
+{
+  "name": "@gogol/integration-adapter-stripe",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "RFC-0191 Stripe webhook adapter: a first-party source (webhook signature verification + Stripe→IntegrationEvent mapping) with a deep verify-and-map wrapper. No Stripe SDK — raw fetch + node:crypto. No Make.com.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./signature": {
+      "types": "./src/signature.ts",
+      "default": "./src/signature.ts"
+    },
+    "./mapping": {
+      "types": "./src/mapping.ts",
+      "default": "./src/mapping.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "echo 'No build step required — TypeScript sources consumed directly'",
+    "build:check": "tsc --noEmit",
+    "test:check": "tsc --noEmit --project tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@gogol/integration": "workspace:*",
+    "@gogol/share": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  }
+}

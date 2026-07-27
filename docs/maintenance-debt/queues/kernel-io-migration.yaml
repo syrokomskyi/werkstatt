@@ -1,0 +1,45 @@
+id: kernel-io-migration
+title: "Migrate command modules from ambient node:fs to the WorkspaceIO port (context.io)"
+status: paused
+owner: architecture
+priority: 4
+createdAt: 2026-07-02
+reviewAfter: 2026-10-01
+rationale: >
+  RFC-0267 introduced the WorkspaceIO port (KernelRuntimeContext.io) and
+  kernel.io.lint's IO-01 — a shrink-only ratchet on
+  packages/os/site-kernel-checks/src/*.ts modules still importing
+  node:fs / node:fs/promises / node:child_process directly instead of
+  receiving filesystem/process-execution capability from context.io. The
+  offender set is tracked in
+  packages/os/site-kernel-checks/src/kernel-io-lint.baseline.generated.json
+  (163 files at RFC-0267 landing; robots.generate and ai.generate migrated
+  as pilots in the same commit; sitemap.generate migrated in the RFC-0267
+  follow-up once readdir was added to the port — 162 files now). This queue
+  plans the burn-down batch by batch. It is paused rather than active because IO-01 is workspace-scoped,
+  error-severity debt gated directly by kernel.io.lint (not app-scoped
+  warning/info debt from ADVISORY_APP_COMMANDS), so it has no matching
+  entries in the collectMaintenanceDebtItems item pool that
+  maintenance.debt.queue.validate's MDQ-04 rule checks for active queues.
+  Reactivate once/if kernel.io.lint is folded into that item pool, or track
+  batch completion manually against the kernel-io-lint baseline file count.
+sourceCommands:
+  - kernel.io.lint
+selectors:
+  ruleIds:
+    - IO-01
+batchPolicy:
+  maxItemsPerSession: 5
+  commitAfterEachBatch: true
+  push: false
+acceptance:
+  commands:
+    - pnpm exec site-kernel run kernel.io.lint --json
+    - pnpm exec site-kernel run kernel.io.lint --write-baseline --json
+    - pnpm exec site-kernel run check.fixture.lint --json
+notes:
+  - Prioritize generator-class commands first — they gain --dry-run value immediately (RFC-0267 Rollout step 4).
+  - "Swap fs calls mechanically; do NOT refactor a module's logic in the same commit — keeps diffs reviewable and parity obvious."
+  - "Verify parity after each migration: run the real (non-dry-run) command before and after and diff the written output — see robots.generate/ai.generate for the pattern."
+  - Never bypass the read-only adapter by caching an fs reference at module top-level — kernel.io.lint exists to catch exactly this.
+  - "sitemap.ts (sitemap.generate + sitemap.validate) is DONE: migrated in the RFC-0267 follow-up. This required completing the port with readdir(path): Promise<DirEntry[]> (the people-directory listing needed withFileTypes; DirEntry keeps node:fs Dirent out of command modules). Pattern for the next directory-listing command: use io.readdir and check entry.isFile/isDirectory as booleans, not methods."

@@ -1,0 +1,10 @@
+# RFC-0323: manual public-source bundle for contractor-facing cost-model statements
+# about handwerker marketplaces/platforms. Monitor fetching stays disabled until a
+# human enables and hardens source extraction.
+id: external:handwerker-platform-cost-models
+title: Public handwerker platform cost model pages — MyHammer support and Blauarbeit public pages
+kind: manual
+endpoint: "https://support.my-hammer.de/s/article/Was-kostet-mich-MyHammer"
+expectedType: string
+checkEvery: P3M
+residency: eu

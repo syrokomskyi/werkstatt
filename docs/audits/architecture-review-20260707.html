@@ -1,0 +1,1754 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Architecture Review — @gogol/share</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: "dark" });
+    </script>
+    <style>
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+      }
+      .candidate-card {
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      .candidate-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      }
+      .depth-bar {
+        height: 8px;
+        border-radius: 4px;
+      }
+      .tag-strong {
+        background: #dc2626;
+        color: #fff;
+      }
+      .tag-worth {
+        background: #f59e0b;
+        color: #1f2937;
+      }
+      .tag-speculative {
+        background: #6b7280;
+        color: #fff;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-950 text-gray-200 min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-50">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-white">Architecture Review</h1>
+          <p class="text-sm text-gray-400">@gogol/share — Deepening Opportunities</p>
+        </div>
+        <div class="text-right text-sm text-gray-500">
+          <p>2026-07-07</p>
+          <p>8 candidates identified</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-8 space-y-12">
+      <!-- Summary -->
+      <section class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <h2 class="text-lg font-semibold text-white mb-3">Summary</h2>
+        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+          <code class="text-indigo-400">@gogol/share</code> is the monorepo's shared utilities
+          package — 40+ source files organized into domain subpaths (RFC-0264). The package is
+          functionally mature, but several modules exhibit
+          <strong class="text-white">shallow interfaces over flat conditional logic</strong>,
+          <strong class="text-white">duplicated implementations</strong>, or
+          <strong class="text-white">mixed barrel/orchestration roles</strong> that concentrate
+          rather than hide complexity.
+        </p>
+        <div class="grid grid-cols-3 gap-4 mt-6">
+          <div class="bg-gray-800/50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-red-400">3</p>
+            <p class="text-xs text-gray-500 mt-1">Strong</p>
+          </div>
+          <div class="bg-gray-800/50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-amber-400">3</p>
+            <p class="text-xs text-gray-500 mt-1">Worth Exploring</p>
+          </div>
+          <div class="bg-gray-800/50 rounded-lg p-4 text-center">
+            <p class="text-2xl font-bold text-gray-400">2</p>
+            <p class="text-xs text-gray-500 mt-1">Speculative</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Table of Contents -->
+      <section>
+        <h2 class="text-lg font-semibold text-white mb-4">Candidates</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+          <a
+            href="#c1"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-strong">Strong</span>
+              <span class="text-sm font-medium text-white"
+                >1. Hardcoded component-path dispatcher</span
+              >
+            </div>
+            <p class="text-xs text-gray-500">astro/content.ts — getSemanticSiteContentData</p>
+          </a>
+          <a
+            href="#c2"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-strong">Strong</span>
+              <span class="text-sm font-medium text-white">2. Duplicated deep-merge functions</span>
+            </div>
+            <p class="text-xs text-gray-500">
+              content/merge.ts — deepMergeEntryData vs mergeComponentContent
+            </p>
+          </a>
+          <a
+            href="#c3"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-strong">Strong</span>
+              <span class="text-sm font-medium text-white"
+                >3. Mixed barrel + orchestration in integration hub</span
+              >
+            </div>
+            <p class="text-xs text-gray-500">integration/index.ts — 419 lines</p>
+          </a>
+          <a
+            href="#c4"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-worth">Worth</span>
+              <span class="text-sm font-medium text-white"
+                >4. Sync/async duplication in feature-policy resolver</span
+              >
+            </div>
+            <p class="text-xs text-gray-500">
+              feature-policy.ts — resolveFeaturePolicy vs resolveFeaturePolicySync
+            </p>
+          </a>
+          <a
+            href="#c5"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-worth">Worth</span>
+              <span class="text-sm font-medium text-white"
+                >5. Hand-rolled JSON Schema validator</span
+              >
+            </div>
+            <p class="text-xs text-gray-500">dev-props-validator.ts — validateShape</p>
+          </a>
+          <a
+            href="#c6"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-worth">Worth</span>
+              <span class="text-sm font-medium text-white">6. Re-export shim proliferation</span>
+            </div>
+            <p class="text-xs text-gray-500">
+              image-utils.ts, loaders.ts, page-handler.ts, routes.ts
+            </p>
+          </a>
+          <a
+            href="#c7"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-speculative">Speculative</span>
+              <span class="text-sm font-medium text-white">7. Semantic barrel is too wide</span>
+            </div>
+            <p class="text-xs text-gray-500">semantic/index.ts — 24+ re-exports</p>
+          </a>
+          <a
+            href="#c8"
+            class="block bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-indigo-600 transition"
+          >
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs px-2 py-0.5 rounded tag-speculative">Speculative</span>
+              <span class="text-sm font-medium text-white">8. Micro-module consolidation</span>
+            </div>
+            <p class="text-xs text-gray-500">
+              rfc0042-utils.ts, string-utils.ts, content/dispatch.ts
+            </p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Candidate 1 -->
+      <section id="c1" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-strong">Strong</span>
+          <h2 class="text-lg font-semibold text-white">1. Hardcoded component-path dispatcher</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li><code>packages/share/src/astro/content.ts</code> (376 lines)</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              <code>getSemanticSiteContentData()</code> (lines 40–195) is a 155-line if/else chain
+              dispatching on hardcoded <code>componentPath</code> strings ("brand-label",
+              "breadcrumbs", "header", "footer", etc.). Each branch manually fetches from different
+              collections and assembles a different ad-hoc shape. The function's interface is narrow
+              (3 params → 1 record) but the implementation is a flat conditional —
+              <strong class="text-white">complexity is length, not depth</strong>. Adding a new
+              component path means editing this single function. There is no registry, no
+              extensibility seam, and no per-path testability.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Extract each <code>componentPath</code> branch into a named handler function
+            (<code>brandLabelHandler</code>, <code>headerHandler</code>, <code>footerHandler</code>,
+            etc.) and register them in a <code>Map&lt;string, ComponentContentHandler&gt;</code>.
+            The public function becomes a 5-line registry lookup. Each handler is independently
+            testable and new paths are added by registering a new handler — no edit to the
+            dispatcher.
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                Each handler lives next to its collection-fetch logic, not in a 155-line function.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">
+                New component paths are additive (register a handler) — no edit to the dispatcher.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">
+                Each handler is a pure function testable in isolation with mock collections.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">
+                Before — Flat conditional (shallow)
+              </p>
+              <svg viewBox="0 0 400 200" class="w-full">
+                <rect
+                  x="10"
+                  y="10"
+                  width="380"
+                  height="180"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#374151"
+                />
+                <text x="200" y="30" text-anchor="middle" fill="#9ca3af" font-size="11">
+                  getSemanticSiteContentData(componentPath, lang, defaultLang)
+                </text>
+                <rect
+                  x="20"
+                  y="45"
+                  width="360"
+                  height="135"
+                  rx="4"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="30" y="62" fill="#f87171" font-size="10">
+                  if (componentPath === "brand-label") { ... }
+                </text>
+                <text x="30" y="78" fill="#f87171" font-size="10">
+                  if (componentPath === "breadcrumbs") { ... }
+                </text>
+                <text x="30" y="94" fill="#f87171" font-size="10">
+                  if (componentPath === "lang-switcher") { ... }
+                </text>
+                <text x="30" y="110" fill="#f87171" font-size="10">
+                  if (componentPath === "copyright") { ... }
+                </text>
+                <text x="30" y="126" fill="#f87171" font-size="10">
+                  if (componentPath === "header") { ... 40 lines ... }
+                </text>
+                <text x="30" y="142" fill="#f87171" font-size="10">
+                  if (componentPath === "footer") { ... 75 lines ... }
+                </text>
+                <text x="30" y="158" fill="#f87171" font-size="10">
+                  if (componentPath === "footer-promo") { ... }
+                </text>
+                <text x="30" y="174" fill="#6b7280" font-size="10">
+                  // adding a path = editing this function
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-full"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  Interface: narrow · Implementation: flat conditional · Depth: low
+                </p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">
+                After — Registry dispatch (deepened)
+              </p>
+              <svg viewBox="0 0 400 200" class="w-full">
+                <rect
+                  x="10"
+                  y="10"
+                  width="380"
+                  height="180"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#374151"
+                />
+                <text x="200" y="30" text-anchor="middle" fill="#9ca3af" font-size="11">
+                  getComponentContentData(path, lang, defaultLang)
+                </text>
+                <rect
+                  x="20"
+                  y="42"
+                  width="360"
+                  height="25"
+                  rx="4"
+                  fill="#065f46"
+                  stroke="#10b981"
+                />
+                <text x="30" y="58" fill="#6ee7b7" font-size="10">
+                  const handler = REGISTRY.get(path); return handler?.(lang, defaultLang);
+                </text>
+                <text x="30" y="82" fill="#9ca3af" font-size="9">REGISTRY</text>
+                <rect
+                  x="20"
+                  y="88"
+                  width="110"
+                  height="40"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="25" y="102" fill="#a78bfa" font-size="9">brandLabelHandler</text>
+                <text x="25" y="114" fill="#a78bfa" font-size="9">breadcrumbsHandler</text>
+                <text x="25" y="126" fill="#a78bfa" font-size="9">copyrightHandler</text>
+                <rect
+                  x="140"
+                  y="88"
+                  width="110"
+                  height="40"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="145" y="102" fill="#a78bfa" font-size="9">headerHandler</text>
+                <text x="145" y="114" fill="#a78bfa" font-size="9">footerHandler</text>
+                <text x="145" y="126" fill="#a78bfa" font-size="9">langSwitcherHandler</text>
+                <rect
+                  x="260"
+                  y="88"
+                  width="110"
+                  height="40"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="265" y="102" fill="#a78bfa" font-size="9">footerPromoHandler</text>
+                <text x="265" y="114" fill="#6b7280" font-size="9">+ newHandler</text>
+                <text x="265" y="126" fill="#6b7280" font-size="9">(additive)</text>
+                <text x="30" y="150" fill="#6b7280" font-size="9">
+                  // each handler: independently testable
+                </text>
+                <text x="30" y="165" fill="#6b7280" font-size="9">
+                  // dispatcher: 3 lines, never edited
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-full"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  Interface: same · Implementation: registry + handlers · Depth: high
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Candidate 2 -->
+      <section id="c2" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-strong">Strong</span>
+          <h2 class="text-lg font-semibold text-white">2. Duplicated deep-merge functions</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li><code>packages/share/src/content/merge.ts</code> (77 lines)</li>
+              <li>
+                <code>packages/share/src/shared-context.ts</code> (imports
+                <code>deepMergeEntryData</code>)
+              </li>
+              <li>
+                <code>packages/share/src/astro/content.ts</code> (imports
+                <code>mergeComponentContent</code>)
+              </li>
+              <li>
+                <code>packages/share/src/astro/page-handler/content-fallback.ts</code> (imports
+                <code>deepMergeEntryData</code>)
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              <code>deepMergeEntryData()</code> (lines 18–43) and
+              <code>mergeComponentContent()</code> (lines 49–76) do essentially the same thing:
+              recursively merge two records, override wins, arrays replaced wholesale. The only
+              semantic difference is that <code>deepMergeEntryData</code> preserves the default
+              array when the override array is empty, while
+              <code>mergeComponentContent</code> always replaces arrays. Two functions, two names,
+              two call sites each — <strong class="text-white">a shallow duplicate</strong>
+              where a single configurable function would serve all consumers.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Unify into a single <code>deepMerge(defaults, override, options?)</code> with an
+            <code>{ keepDefaultOnEmptyArray?: boolean }</code> option. Re-export the old names as
+            thin wrappers (or update call sites — only 4 files). The implementation stays at ~30
+            lines instead of ~60.
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                One merge implementation in one place — no hunting for which variant is used where.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">Bug fixes (e.g. null handling) apply once, not twice.</p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">
+                One test suite covers all merge semantics, including the array edge case.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">Before — Two parallel functions</p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect
+                  x="10"
+                  y="10"
+                  width="180"
+                  height="140"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="100" y="30" text-anchor="middle" fill="#f87171" font-size="11">
+                  deepMergeEntryData()
+                </text>
+                <text x="20" y="50" fill="#9ca3af" font-size="9">· 25 lines</text>
+                <text x="20" y="65" fill="#9ca3af" font-size="9">· arrays: keep default</text>
+                <text x="20" y="80" fill="#9ca3af" font-size="9">if override is empty</text>
+                <text x="20" y="100" fill="#6b7280" font-size="9">Used by:</text>
+                <text x="20" y="115" fill="#6b7280" font-size="9">· shared-context.ts</text>
+                <text x="20" y="130" fill="#6b7280" font-size="9">· content-fallback.ts</text>
+                <text x="20" y="145" fill="#6b7280" font-size="9">· resolve-route.ts</text>
+                <rect
+                  x="210"
+                  y="10"
+                  width="180"
+                  height="140"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="300" y="30" text-anchor="middle" fill="#f87171" font-size="11">
+                  mergeComponentContent()
+                </text>
+                <text x="220" y="50" fill="#9ca3af" font-size="9">· 27 lines</text>
+                <text x="220" y="65" fill="#9ca3af" font-size="9">· arrays: always replace</text>
+                <text x="220" y="80" fill="#9ca3af" font-size="9">(even if empty)</text>
+                <text x="220" y="100" fill="#6b7280" font-size="9">Used by:</text>
+                <text x="220" y="115" fill="#6b7280" font-size="9">· astro/content.ts</text>
+                <text x="220" y="130" fill="#6b7280" font-size="9">· (getResolvedComponent</text>
+                <text x="220" y="145" fill="#6b7280" font-size="9">Content)</text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-3/4"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  Two shallow implementations · ~52 total lines · divergent array semantics
+                </p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">
+                After — One configurable function
+              </p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect
+                  x="50"
+                  y="10"
+                  width="300"
+                  height="140"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="200" y="30" text-anchor="middle" fill="#6ee7b7" font-size="11">
+                  deepMerge(defaults, override, options?)
+                </text>
+                <text x="60" y="50" fill="#9ca3af" font-size="9">
+                  · ~30 lines (one implementation)
+                </text>
+                <text x="60" y="65" fill="#9ca3af" font-size="9">
+                  · options.keepDefaultOnEmptyArray: boolean
+                </text>
+                <text x="60" y="80" fill="#9ca3af" font-size="9">
+                  · recursive object merge, override wins
+                </text>
+                <text x="60" y="100" fill="#a78bfa" font-size="9">
+                  // Thin wrappers (or update call sites):
+                </text>
+                <text x="60" y="115" fill="#a78bfa" font-size="9">
+                  export const deepMergeEntryData = (d, o) =&gt;
+                </text>
+                <text x="60" y="130" fill="#a78bfa" font-size="9">
+                  deepMerge(d, o, { keepDefaultOnEmptyArray: true })
+                </text>
+                <text x="60" y="145" fill="#6b7280" font-size="9">
+                  // All 4 consumers served by one function
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-full"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  One deep implementation · ~30 lines · all consumers covered
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Candidate 3 -->
+      <section id="c3" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-strong">Strong</span>
+          <h2 class="text-lg font-semibold text-white">
+            3. Mixed barrel + orchestration in integration hub
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li><code>packages/share/src/integration/index.ts</code> (419 lines)</li>
+              <li><code>packages/share/src/integration/port.ts</code> (144 lines)</li>
+              <li><code>packages/share/src/integration/adapters.ts</code></li>
+              <li><code>packages/share/src/integration/funnel.ts</code> (380 lines)</li>
+              <li><code>packages/share/src/integration/crm-buffer.ts</code> (492 lines)</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              <code>integration/index.ts</code> is simultaneously a barrel (re-exports from 6
+              sibling modules: <code>port.ts</code>, <code>crm-buffer.ts</code>,
+              <code>funnel.ts</code>, <code>lifecycle.ts</code>, <code>sharding.ts</code>,
+              <code>dispatch.ts</code>, <code>qstash.ts</code>) <em>and</em> the orchestration layer
+              (defines <code>deliverLead</code>, <code>routeEvent</code>, <code>deliverEvent</code>,
+              <code>authenticateInbound</code>, <code>consumeIntegrationBatch</code>,
+              <code>upsertLead</code>, plus the closed adapter registries
+              <code>CHANNEL_ADAPTERS</code>, <code>CRM_ADAPTERS</code>,
+              <code>DESTINATION_ADAPTERS</code>). This is
+              <strong class="text-white">419 lines mixing two responsibilities</strong> — export
+              surface and runtime orchestration. The barrel role makes it impossible to import just
+              the orchestration without pulling in all sibling type exports.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Split <code>index.ts</code> into a pure barrel (<code>index.ts</code>, ~40 lines of
+            re-exports) and an <code>orchestration.ts</code> module containing the registries,
+            <code>deliverLead</code>, <code>routeEvent</code>, <code>deliverEvent</code>,
+            <code>authenticateInbound</code>, and the legacy queue/KV types. Consumers who need
+            orchestration import from <code>@gogol/share/integration/orchestration</code>; consumers
+            who only need types import from <code>@gogol/share/integration</code>.
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                Registries + fan-out logic live together, separate from the type-only barrel.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">
+                Type-only consumers don't transitively import adapter implementations.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">
+                Orchestration can be tested without mounting the full barrel.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">Before — One file, two roles</p>
+              <svg viewBox="0 0 400 180" class="w-full">
+                <rect
+                  x="10"
+                  y="10"
+                  width="380"
+                  height="160"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="200" y="28" text-anchor="middle" fill="#f87171" font-size="11">
+                  integration/index.ts — 419 lines
+                </text>
+                <rect
+                  x="20"
+                  y="40"
+                  width="170"
+                  height="55"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="30" y="55" fill="#fbbf24" font-size="9">Barrel role</text>
+                <text x="30" y="70" fill="#9ca3af" font-size="8">export * from port.ts</text>
+                <text x="30" y="82" fill="#9ca3af" font-size="8">export * from crm-buffer.ts</text>
+                <text x="30" y="94" fill="#9ca3af" font-size="8">export * from funnel.ts ...</text>
+                <rect
+                  x="200"
+                  y="40"
+                  width="180"
+                  height="55"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="210" y="55" fill="#f87171" font-size="9">Orchestration role</text>
+                <text x="210" y="70" fill="#9ca3af" font-size="8">deliverLead() 30 lines</text>
+                <text x="210" y="82" fill="#9ca3af" font-size="8">routeEvent() 35 lines</text>
+                <text x="210" y="94" fill="#9ca3af" font-size="8">deliverEvent() + auth ...</text>
+                <rect
+                  x="20"
+                  y="105"
+                  width="360"
+                  height="55"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="30" y="120" fill="#a78bfa" font-size="9">
+                  Registries: CHANNEL_ADAPTERS, CRM_ADAPTERS,
+                </text>
+                <text x="30" y="132" fill="#a78bfa" font-size="9">
+                  DESTINATION_ADAPTERS, secrets maps, ...
+                </text>
+                <text x="30" y="148" fill="#6b7280" font-size="9">
+                  Legacy: QueueBinding, KvDedupStore, enqueueEvent ...
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-2/3"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  Mixed responsibilities · 419 lines · no import seam between types and logic
+                </p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">
+                After — Separated barrel and orchestration
+              </p>
+              <svg viewBox="0 0 400 180" class="w-full">
+                <rect
+                  x="10"
+                  y="10"
+                  width="180"
+                  height="160"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="100" y="28" text-anchor="middle" fill="#6ee7b7" font-size="10">
+                  index.ts — ~40 lines
+                </text>
+                <text x="20" y="45" fill="#fbbf24" font-size="9">Pure barrel</text>
+                <text x="20" y="60" fill="#9ca3af" font-size="8">export * from port.ts</text>
+                <text x="20" y="72" fill="#9ca3af" font-size="8">export * from crm-buffer.ts</text>
+                <text x="20" y="84" fill="#9ca3af" font-size="8">export * from funnel.ts</text>
+                <text x="20" y="96" fill="#9ca3af" font-size="8">export * from lifecycle.ts</text>
+                <text x="20" y="108" fill="#9ca3af" font-size="8">export * from sharding.ts</text>
+                <text x="20" y="120" fill="#9ca3af" font-size="8">export * from dispatch.ts</text>
+                <text x="20" y="132" fill="#9ca3af" font-size="8">export * from qstash.ts</text>
+                <text x="20" y="155" fill="#6b7280" font-size="8">// types only, no logic</text>
+                <rect
+                  x="210"
+                  y="10"
+                  width="180"
+                  height="160"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="300" y="28" text-anchor="middle" fill="#6ee7b7" font-size="10">
+                  orchestration.ts — ~250 lines
+                </text>
+                <text x="220" y="45" fill="#f87171" font-size="9">Registries + fan-out</text>
+                <text x="220" y="60" fill="#9ca3af" font-size="8">CHANNEL_ADAPTERS</text>
+                <text x="220" y="72" fill="#9ca3af" font-size="8">CRM_ADAPTERS</text>
+                <text x="220" y="84" fill="#9ca3af" font-size="8">DESTINATION_ADAPTERS</text>
+                <text x="220" y="100" fill="#9ca3af" font-size="8">deliverLead()</text>
+                <text x="220" y="112" fill="#9ca3af" font-size="8">routeEvent()</text>
+                <text x="220" y="124" fill="#9ca3af" font-size="8">deliverEvent()</text>
+                <text x="220" y="136" fill="#9ca3af" font-size="8">authenticateInbound()</text>
+                <text x="220" y="148" fill="#9ca3af" font-size="8">upsertLead() + legacy</text>
+                <text x="220" y="162" fill="#6b7280" font-size="8">// runtime logic only</text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-full"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  Clean seam · types vs logic · each file &lt; 250 lines
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Candidate 4 -->
+      <section id="c4" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-worth">Worth</span>
+          <h2 class="text-lg font-semibold text-white">
+            4. Sync/async duplication in feature-policy resolver
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li><code>packages/share/src/feature-policy.ts</code> (383 lines)</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              <code>resolveFeaturePolicy()</code> (lines 288–310) and
+              <code>resolveFeaturePolicySync()</code> (lines 315–337) are
+              <strong class="text-white">byte-for-byte identical</strong> except for the
+              <code>async</code> keyword and <code>await</code> on internal calls. The resolution
+              itself is synchronous (<code>resolvePolicyInternal</code> is not async). The async
+              variant exists "for compatibility with content-loading patterns" — but it adds no
+              actual async work. Similarly, <code>createFeaturePolicyResolver()</code> (lines
+              342–358) wraps both in a factory that returns <code>resolve</code>,
+              <code>resolveSync</code>, <code>isEnabled</code>, <code>getBehavior</code> — all
+              calling the same synchronous core.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Keep only <code>resolveFeaturePolicySync</code> (rename to
+            <code>resolveFeaturePolicy</code>). The async wrapper provides no value — callers can
+            <code>await Promise.resolve(syncResult)</code> if they need a Promise. The factory's
+            <code>resolve</code> method can return the sync result wrapped in
+            <code>Promise.resolve()</code> if async compatibility is needed. This removes ~30 lines
+            of pure duplication.
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                One resolver, one cache path — no risk of the two variants diverging.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">Bug fixes apply once. ~30 lines removed.</p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">One test path instead of two identical ones.</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">Before — Two identical functions</p>
+              <svg viewBox="0 0 400 140" class="w-full">
+                <rect
+                  x="10"
+                  y="10"
+                  width="180"
+                  height="120"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="100" y="28" text-anchor="middle" fill="#f87171" font-size="10">
+                  async resolveFeaturePolicy()
+                </text>
+                <text x="20" y="45" fill="#9ca3af" font-size="9">· 22 lines</text>
+                <text x="20" y="60" fill="#9ca3af" font-size="9">· async/await</text>
+                <text x="20" y="75" fill="#9ca3af" font-size="9">
+                  · calls resolvePolicyInternal
+                </text>
+                <text x="20" y="90" fill="#9ca3af" font-size="9">· cache get/set</text>
+                <text x="20" y="110" fill="#6b7280" font-size="9">// no async work happens</text>
+                <text x="20" y="125" fill="#6b7280" font-size="9">
+                  // identical to sync variant
+                </text>
+                <rect
+                  x="210"
+                  y="10"
+                  width="180"
+                  height="120"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="300" y="28" text-anchor="middle" fill="#f87171" font-size="10">
+                  resolveFeaturePolicySync()
+                </text>
+                <text x="220" y="45" fill="#9ca3af" font-size="9">· 22 lines</text>
+                <text x="220" y="60" fill="#9ca3af" font-size="9">· synchronous</text>
+                <text x="220" y="75" fill="#9ca3af" font-size="9">
+                  · calls resolvePolicyInternal
+                </text>
+                <text x="220" y="90" fill="#9ca3af" font-size="9">· cache get/set</text>
+                <text x="220" y="110" fill="#6b7280" font-size="9">// same logic, no async</text>
+                <text x="220" y="125" fill="#6b7280" font-size="9">// byte-for-byte twin</text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-1/2"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  44 lines of duplicated logic · zero async benefit
+                </p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">After — Single resolver</p>
+              <svg viewBox="0 0 400 140" class="w-full">
+                <rect
+                  x="80"
+                  y="10"
+                  width="240"
+                  height="120"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="200" y="28" text-anchor="middle" fill="#6ee7b7" font-size="10">
+                  resolveFeaturePolicy()
+                </text>
+                <text x="90" y="45" fill="#9ca3af" font-size="9">· 22 lines (synchronous)</text>
+                <text x="90" y="60" fill="#9ca3af" font-size="9">
+                  · calls resolvePolicyInternal
+                </text>
+                <text x="90" y="75" fill="#9ca3af" font-size="9">· cache get/set</text>
+                <text x="90" y="95" fill="#a78bfa" font-size="9">// Callers needing async:</text>
+                <text x="90" y="110" fill="#a78bfa" font-size="9">
+                  // await Promise.resolve(result)
+                </text>
+                <text x="90" y="125" fill="#6b7280" font-size="9">// ~20 lines removed</text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-full"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  22 lines · single cache path · no divergence risk
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Candidate 5 -->
+      <section id="c5" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-worth">Worth</span>
+          <h2 class="text-lg font-semibold text-white">5. Hand-rolled JSON Schema validator</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li><code>packages/share/src/dev-props-validator.ts</code> (161 lines)</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              <code>validateShape()</code> (lines 29–89) is a hand-rolled JSON Schema subset
+              validator. It handles <code>type</code>, <code>const</code>, <code>enum</code>,
+              <code>oneOf/anyOf</code>, <code>properties</code>, <code>required</code>,
+              <code>additionalProperties</code>, and <code>items</code> — but silently ignores
+              <code>$ref</code>, <code>pattern</code>, <code>format</code>,
+              <code>if/then/else</code>, <code>minLength</code>, <code>maximum</code>, and many
+              other JSON Schema keywords. This means a manifest using any unsupported keyword
+              <strong class="text-white">silently passes validation</strong> even when props are
+              invalid — a false sense of safety. The function is 60 lines of recursive type-checking
+              that reinvents what <code>ajv</code> or even Zod's
+              <code>z.fromJsonSchema</code> (available in Zod 4) already do, more completely.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Replace <code>validateShape</code> with a standard validator. Two options: (a) use
+            <code>ajv</code> (already a transitive dependency in the monorepo) — 3 lines to compile
+            and validate; or (b) convert the resolved schema to a Zod schema via
+            <code>z.fromJsonSchema()</code> (Zod 4). Either way, the 60-line custom validator is
+            replaced by a 5-line standard call that handles the full JSON Schema spec. The
+            workspace-root resolution and caching logic (lines 91–160) stays unchanged.
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                Validation logic lives in a well-maintained library, not in a 60-line custom
+                function.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">
+                Full JSON Schema coverage — no silent passes on unsupported keywords.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">
+                Standard validator is already tested upstream; only integration needs testing.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">Before — Custom subset validator</p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect
+                  x="10"
+                  y="10"
+                  width="380"
+                  height="140"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="200" y="28" text-anchor="middle" fill="#f87171" font-size="10">
+                  validateShape() — 60 lines
+                </text>
+                <rect
+                  x="20"
+                  y="40"
+                  width="165"
+                  height="100"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="30" y="55" fill="#6ee7b7" font-size="9">Supported:</text>
+                <text x="30" y="70" fill="#9ca3af" font-size="8">type, const, enum</text>
+                <text x="30" y="82" fill="#9ca3af" font-size="8">oneOf/anyOf</text>
+                <text x="30" y="94" fill="#9ca3af" font-size="8">properties, required</text>
+                <text x="30" y="106" fill="#9ca3af" font-size="8">additionalProperties</text>
+                <text x="30" y="118" fill="#9ca3af" font-size="8">items (array)</text>
+                <text x="30" y="132" fill="#6b7280" font-size="8">~8 keywords</text>
+                <rect
+                  x="200"
+                  y="40"
+                  width="175"
+                  height="100"
+                  rx="3"
+                  fill="#111827"
+                  stroke="#374151"
+                />
+                <text x="210" y="55" fill="#f87171" font-size="9">Silently ignored:</text>
+                <text x="210" y="70" fill="#6b7280" font-size="8">$ref, pattern, format</text>
+                <text x="210" y="82" fill="#6b7280" font-size="8">if/then/else</text>
+                <text x="210" y="94" fill="#6b7280" font-size="8">minLength, maxLength</text>
+                <text x="210" y="106" fill="#6b7280" font-size="8">minimum, maximum</text>
+                <text x="210" y="118" fill="#6b7280" font-size="8">minItems, maxItems</text>
+                <text x="210" y="132" fill="#6b7280" font-size="8">~15+ keywords skipped</text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-1/3"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  60 lines · partial coverage · false sense of safety
+                </p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">
+                After — Standard library validator
+              </p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect
+                  x="80"
+                  y="10"
+                  width="240"
+                  height="140"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="200" y="28" text-anchor="middle" fill="#6ee7b7" font-size="10">
+                  ajv.compile(schema) + validate()
+                </text>
+                <text x="90" y="48" fill="#9ca3af" font-size="9">· 3-5 lines replacing 60</text>
+                <text x="90" y="65" fill="#9ca3af" font-size="9">· Full JSON Schema support</text>
+                <text x="90" y="80" fill="#9ca3af" font-size="9">· $ref, pattern, format, ...</text>
+                <text x="90" y="95" fill="#9ca3af" font-size="9">· if/then/else, min/max, ...</text>
+                <text x="90" y="115" fill="#a78bfa" font-size="9">
+                  // workspace resolution + cache
+                </text>
+                <text x="90" y="130" fill="#a78bfa" font-size="9">
+                  // stays unchanged (~70 lines)
+                </text>
+                <text x="90" y="145" fill="#6b7280" font-size="9">// net: ~55 lines removed</text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-full"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  5 lines · full coverage · well-tested upstream
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Candidate 6 -->
+      <section id="c6" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-worth">Worth</span>
+          <h2 class="text-lg font-semibold text-white">6. Re-export shim proliferation</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li>
+                <code>packages/share/src/image-utils.ts</code> (44 lines — re-exports from
+                <code>@gogol/content-source</code>)
+              </li>
+              <li>
+                <code>packages/share/src/astro/loaders.ts</code> (24 lines — re-exports from
+                <code>@gogol/content-source</code>)
+              </li>
+              <li>
+                <code>packages/share/src/astro/page-handler.ts</code> (20 lines — re-exports from
+                <code>./page-handler/resolve-route.ts</code>)
+              </li>
+              <li>
+                <code>packages/share/src/astro/routes.ts</code> (48 lines — re-exports from
+                <code>./routes/*</code>)
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Four files totaling 136 lines contain <strong class="text-white">zero logic</strong> —
+              they are pure re-export shims created by RFC-0141 (content-source port extraction) and
+              RFC-0303 (file-size splits). Each exists to preserve a historical import path.
+              <code>image-utils.ts</code> and <code>loaders.ts</code> re-export from
+              <code>@gogol/content-source</code> — a different package.
+              <code>page-handler.ts</code> and <code>routes.ts</code> re-export from sub-modules
+              within the same directory. <strong class="text-white">Deletion test</strong>: if
+              deleted, complexity does not move — consumers simply update their import path. These
+              are the definition of shallow modules: zero implementation behind a re-export
+              interface.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Evaluate which shims still have external consumers. For shims re-exporting from
+            <code>@gogol/content-source</code> (a separate package), update consumers to import
+            directly from <code>@gogol/content-source</code> and delete the shim. For internal split
+            shims (<code>page-handler.ts</code>, <code>routes.ts</code>), update the package.json
+            <code>exports</code>
+            map to point directly at the sub-module and delete the shim. If any shim still has many
+            consumers, keep it but mark with a deprecation JSDoc and a target removal date.
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                Import paths point at the real source, not an indirection layer.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">
+                136 lines of zero-logic files removed. Less grep noise when searching for
+                implementations.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">No change — shims have no tests (they have no logic).</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">
+                Before — 4 shim files, 136 lines of re-exports
+              </p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect x="10" y="10" width="90" height="50" rx="4" fill="#1f2937" stroke="#dc2626" />
+                <text x="55" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  image-utils.ts
+                </text>
+                <text x="55" y="42" text-anchor="middle" fill="#6b7280" font-size="7">
+                  44 lines · 0 logic
+                </text>
+                <text x="55" y="54" text-anchor="middle" fill="#6b7280" font-size="7">
+                  → content-source
+                </text>
+                <rect
+                  x="110"
+                  y="10"
+                  width="90"
+                  height="50"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="155" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  loaders.ts
+                </text>
+                <text x="155" y="42" text-anchor="middle" fill="#6b7280" font-size="7">
+                  24 lines · 0 logic
+                </text>
+                <text x="155" y="54" text-anchor="middle" fill="#6b7280" font-size="7">
+                  → content-source
+                </text>
+                <rect
+                  x="210"
+                  y="10"
+                  width="90"
+                  height="50"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="255" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  page-handler.ts
+                </text>
+                <text x="255" y="42" text-anchor="middle" fill="#6b7280" font-size="7">
+                  20 lines · 0 logic
+                </text>
+                <text x="255" y="54" text-anchor="middle" fill="#6b7280" font-size="7">
+                  → resolve-route.ts
+                </text>
+                <rect
+                  x="310"
+                  y="10"
+                  width="80"
+                  height="50"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="350" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  routes.ts
+                </text>
+                <text x="350" y="42" text-anchor="middle" fill="#6b7280" font-size="7">
+                  48 lines · 0 logic
+                </text>
+                <text x="350" y="54" text-anchor="middle" fill="#6b7280" font-size="7">
+                  → routes/*
+                </text>
+                <text x="200" y="90" text-anchor="middle" fill="#9ca3af" font-size="10">
+                  136 total lines of pure indirection
+                </text>
+                <text x="200" y="110" text-anchor="middle" fill="#6b7280" font-size="9">
+                  grep for a function → find re-export → follow to real source
+                </text>
+                <text x="200" y="130" text-anchor="middle" fill="#6b7280" font-size="9">
+                  Deletion test: complexity does not move
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-0"></div>
+                <p class="text-xs text-gray-500 mt-1">Zero depth · pure indirection · 136 lines</p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">
+                After — Direct imports, shims removed
+              </p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect
+                  x="100"
+                  y="30"
+                  width="200"
+                  height="100"
+                  rx="6"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="200" y="50" text-anchor="middle" fill="#6ee7b7" font-size="10">
+                  Consumers import directly
+                </text>
+                <text x="120" y="70" fill="#9ca3af" font-size="9">
+                  import { resolveImage } from
+                </text>
+                <text x="120" y="84" fill="#a78bfa" font-size="9">"@gogol/content-source"</text>
+                <text x="120" y="104" fill="#9ca3af" font-size="9">
+                  import { resolvePageRoute } from
+                </text>
+                <text x="120" y="118" fill="#a78bfa" font-size="9">
+                  "@gogol/share/astro/page-handler/resolve-route"
+                </text>
+                <text x="200" y="145" text-anchor="middle" fill="#6b7280" font-size="9">
+                  // 136 lines removed · 4 files deleted
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-full"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  No indirection · import points at real source
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Candidate 7 -->
+      <section id="c7" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-speculative">Speculative</span>
+          <h2 class="text-lg font-semibold text-white">7. Semantic barrel is too wide</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li><code>packages/share/src/semantic/index.ts</code> (37 lines, 24+ re-exports)</li>
+              <li><code>packages/share/src/semantic/jsonld/</code> (11 files)</li>
+              <li><code>packages/share/src/semantic/page-builders/</code> (2 files)</li>
+              <li><code>packages/share/src/semantic/block-extractors/</code> (multiple files)</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              The semantic barrel re-exports from 24+ modules: models, breadcrumbs, extract, ids,
+              jsonld (11 sub-files), llms, llms-policy, output-projection, business-projection,
+              organization-profile, ai, robots, page-utils, page-markdown, feed, image-sitemap,
+              page-builders (2), build-page, block-extraction, block-extractors, update-stamp,
+              markdown-twin-provenance. A consumer importing
+              <code> SemanticBreadcrumb</code> type transitively pulls in the entire semantic layer
+              — including heavy modules like <code>home-page.ts</code> (11KB) and
+              <code>output-projection.ts</code>. This is not shallow per se (the barrel is correct),
+              but it is <strong class="text-white">too wide for tree-shaking</strong> and violates
+              the RFC-0264 spirit of subpath isolation.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Split the semantic barrel into 3-4 subpath entry points:
+            <code>@gogol/share/semantic/models</code> (types + ids + breadcrumbs),
+            <code>@gogol/share/semantic/jsonld</code> (JSON-LD builders),
+            <code>@gogol/share/semantic/builders</code> (page-builders + block-extraction +
+            build-page), <code>@gogol/share/semantic/seo</code> (llms + robots + feed +
+            image-sitemap + output-projection). The root <code>semantic/index.ts</code> remains as a
+            compatibility barrel but consumers migrate to targeted subpaths. This follows the same
+            pattern as the root barrel migration (RFC-0264).
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                Related modules are grouped by concern, not dumped in one barrel.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">
+                Consumers import only what they need — smaller transitive dependency graph.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">
+                Test files can import from specific subpaths, reducing mock surface.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">Before — One mega-barrel</p>
+              <svg viewBox="0 0 400 180" class="w-full">
+                <rect
+                  x="120"
+                  y="10"
+                  width="160"
+                  height="30"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="200" y="28" text-anchor="middle" fill="#f87171" font-size="10">
+                  semantic/index.ts
+                </text>
+                <text x="200" y="50" text-anchor="middle" fill="#6b7280" font-size="9">
+                  24+ export * from
+                </text>
+                <g font-size="8" fill="#9ca3af">
+                  <text x="30" y="70">models</text>
+                  <text x="30" y="82">breadcrumbs</text>
+                  <text x="30" y="94">extract</text>
+                  <text x="30" y="106">ids</text>
+                  <text x="30" y="118">jsonld (11 files)</text>
+                  <text x="30" y="130">llms</text>
+                  <text x="30" y="142">llms-policy</text>
+                  <text x="30" y="154">output-projection</text>
+                  <text x="30" y="166">business-projection</text>
+                  <text x="220" y="70">organization-profile</text>
+                  <text x="220" y="82">ai</text>
+                  <text x="220" y="94">robots</text>
+                  <text x="220" y="106">page-utils</text>
+                  <text x="220" y="118">page-markdown</text>
+                  <text x="220" y="130">feed</text>
+                  <text x="220" y="142">image-sitemap</text>
+                  <text x="220" y="154">page-builders (2)</text>
+                  <text x="220" y="166">block-extractors + more</text>
+                </g>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-1/4"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  24+ re-exports · any import pulls everything
+                </p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">After — Targeted subpaths</p>
+              <svg viewBox="0 0 400 180" class="w-full">
+                <rect x="10" y="60" width="90" height="50" rx="4" fill="#1f2937" stroke="#10b981" />
+                <text x="55" y="78" text-anchor="middle" fill="#6ee7b7" font-size="8">/models</text>
+                <text x="55" y="92" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  types, ids
+                </text>
+                <text x="55" y="104" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  breadcrumbs
+                </text>
+                <rect
+                  x="110"
+                  y="60"
+                  width="90"
+                  height="50"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="155" y="78" text-anchor="middle" fill="#6ee7b7" font-size="8">
+                  /jsonld
+                </text>
+                <text x="155" y="92" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  11 jsonld
+                </text>
+                <text x="155" y="104" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  builders
+                </text>
+                <rect
+                  x="210"
+                  y="60"
+                  width="90"
+                  height="50"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="255" y="78" text-anchor="middle" fill="#6ee7b7" font-size="8">
+                  /builders
+                </text>
+                <text x="255" y="92" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  page-builders
+                </text>
+                <text x="255" y="104" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  block-extract
+                </text>
+                <rect
+                  x="310"
+                  y="60"
+                  width="80"
+                  height="50"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="350" y="78" text-anchor="middle" fill="#6ee7b7" font-size="8">/seo</text>
+                <text x="350" y="92" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  llms, robots
+                </text>
+                <text x="350" y="104" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  feed, sitemap
+                </text>
+                <text x="200" y="135" text-anchor="middle" fill="#a78bfa" font-size="9">
+                  // index.ts = compat barrel
+                </text>
+                <text x="200" y="150" text-anchor="middle" fill="#6b7280" font-size="9">
+                  // consumers migrate to subpaths
+                </text>
+                <text x="200" y="165" text-anchor="middle" fill="#6b7280" font-size="9">
+                  // same pattern as RFC-0264
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-3/4"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  4 subpaths · targeted imports · compat barrel preserved
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Candidate 8 -->
+      <section id="c8" class="candidate-card bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs px-2 py-0.5 rounded tag-speculative">Speculative</span>
+          <h2 class="text-lg font-semibold text-white">8. Micro-module consolidation</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Files</h3>
+            <ul class="text-sm text-gray-400 space-y-1">
+              <li>
+                <code>packages/share/src/rfc0042-utils.ts</code> (96 lines — 3 tiny functions)
+              </li>
+              <li><code>packages/share/src/string-utils.ts</code> (17 lines — 1 function)</li>
+              <li>
+                <code>packages/share/src/content/dispatch.ts</code> (25 lines — 1 function factory)
+              </li>
+              <li><code>packages/share/src/counter-utils.ts</code> (76 lines — 4 functions)</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-indigo-400 mb-2">Problem</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">
+              Four files totaling 214 lines contain 9 functions — an average of 24 lines per file.
+              Each file is a separate subpath export in <code>package.json</code>, a separate module
+              contract, and a separate import path. <code>string-utils.ts</code> exports a single
+              5-line <code>toKebabCase()</code>. <code>rfc0042-utils.ts</code> exports
+              <code>cast()</code> which is literally
+              <code>return pageOverride as unknown as T</code> — a one-line type assertion.
+              <code>content/dispatch.ts</code> exports a 7-line closure factory.
+              <strong class="text-white">Deletion test</strong>: deleting any of these moves ~5
+              lines to the caller — complexity does not concentrate, it barely moves. These are
+              shallow modules with minimal leverage.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Solution</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Consolidate by domain affinity:
+            <code>rfc0042-utils.ts</code> → inline <code>cast()</code> at call sites (it's a
+            one-liner), move <code>need()</code> and <code>withDefault()</code> into
+            <code>content/</code> or <code>counter-utils.ts</code> (they're content helpers);
+            <code>string-utils.ts</code> → merge into <code>content/entity-id.ts</code> (already
+            does string normalization); <code>content/dispatch.ts</code> → merge into
+            <code>content/entity-id.ts</code> (it uses <code>stripEntryLanguage</code> and
+            <code>toDataEntryId</code> from there). This reduces 4 files + 4 subpath exports to 1-2
+            files.
+          </p>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Benefits</h3>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Locality</p>
+              <p class="text-gray-300">
+                Related helpers live next to their consumers, not in isolated micro-files.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Leverage</p>
+              <p class="text-gray-300">
+                Fewer import paths, fewer module contracts, less package.json export map churn.
+              </p>
+            </div>
+            <div class="bg-gray-800/50 rounded p-3">
+              <p class="text-xs text-gray-500 mb-1">Testability</p>
+              <p class="text-gray-300">
+                Tests consolidate naturally — one test file per domain, not per micro-function.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-indigo-400 mb-2">Before / After</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-red-400 font-medium mb-2">Before — 4 micro-files</p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect x="10" y="10" width="90" height="60" rx="4" fill="#1f2937" stroke="#dc2626" />
+                <text x="55" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  rfc0042-utils
+                </text>
+                <text x="55" y="42" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  96 lines
+                </text>
+                <text x="55" y="54" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  need, cast,
+                </text>
+                <text x="55" y="64" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  withDefault
+                </text>
+                <rect
+                  x="110"
+                  y="10"
+                  width="90"
+                  height="60"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="155" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  string-utils
+                </text>
+                <text x="155" y="42" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  17 lines
+                </text>
+                <text x="155" y="56" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  toKebabCase
+                </text>
+                <rect
+                  x="210"
+                  y="10"
+                  width="90"
+                  height="60"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="255" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  dispatch.ts
+                </text>
+                <text x="255" y="42" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  25 lines
+                </text>
+                <text x="255" y="56" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  1 factory
+                </text>
+                <rect
+                  x="310"
+                  y="10"
+                  width="80"
+                  height="60"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#dc2626"
+                />
+                <text x="350" y="28" text-anchor="middle" fill="#f87171" font-size="8">
+                  counter-utils
+                </text>
+                <text x="350" y="42" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  76 lines
+                </text>
+                <text x="350" y="56" text-anchor="middle" fill="#9ca3af" font-size="7">
+                  4 functions
+                </text>
+                <text x="200" y="100" text-anchor="middle" fill="#9ca3af" font-size="10">
+                  214 lines · 4 files · 4 subpath exports
+                </text>
+                <text x="200" y="120" text-anchor="middle" fill="#6b7280" font-size="9">
+                  cast() = 1 line · toKebabCase() = 5 lines
+                </text>
+                <text x="200" y="140" text-anchor="middle" fill="#6b7280" font-size="9">
+                  Deletion test: ~5 lines move to caller
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gray-700 w-1/5"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  4 shallow modules · minimal leverage · 4 export-map entries
+                </p>
+              </div>
+            </div>
+            <div class="bg-gray-800/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 font-medium mb-2">
+                After — Consolidated by affinity
+              </p>
+              <svg viewBox="0 0 400 160" class="w-full">
+                <rect
+                  x="30"
+                  y="20"
+                  width="160"
+                  height="55"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="110" y="38" text-anchor="middle" fill="#6ee7b7" font-size="9">
+                  content/entity-id.ts
+                </text>
+                <text x="40" y="52" fill="#9ca3af" font-size="8">+ toKebabCase()</text>
+                <text x="40" y="64" fill="#9ca3af" font-size="8">+ createDispatcherResolver()</text>
+                <text x="40" y="75" fill="#6b7280" font-size="7">
+                  (already imports these helpers)
+                </text>
+                <rect
+                  x="210"
+                  y="20"
+                  width="160"
+                  height="55"
+                  rx="4"
+                  fill="#1f2937"
+                  stroke="#10b981"
+                />
+                <text x="290" y="38" text-anchor="middle" fill="#6ee7b7" font-size="9">
+                  content/helpers.ts
+                </text>
+                <text x="220" y="52" fill="#9ca3af" font-size="8">+ need(), withDefault()</text>
+                <text x="220" y="64" fill="#9ca3af" font-size="8">+ counter-utils (4 fns)</text>
+                <text x="220" y="75" fill="#6b7280" font-size="7">
+                  (cast inlined at call sites)
+                </text>
+                <text x="200" y="110" text-anchor="middle" fill="#9ca3af" font-size="10">
+                  2 files · 2 subpath exports
+                </text>
+                <text x="200" y="130" text-anchor="middle" fill="#6b7280" font-size="9">
+                  string-utils.ts, dispatch.ts, rfc0042-utils.ts deleted
+                </text>
+                <text x="200" y="145" text-anchor="middle" fill="#6b7280" font-size="9">
+                  2 fewer package.json export entries
+                </text>
+              </svg>
+              <div class="mt-2">
+                <div class="depth-bar bg-gradient-to-r from-green-600 to-green-400 w-3/4"></div>
+                <p class="text-xs text-gray-500 mt-1">
+                  2 consolidated files · related helpers co-located
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Top Recommendation -->
+      <section
+        class="bg-gradient-to-br from-indigo-900/40 to-gray-900 rounded-xl p-6 border border-indigo-800"
+      >
+        <h2 class="text-lg font-semibold text-white mb-4">Top Recommendation</h2>
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-xs px-2 py-0.5 rounded tag-strong">Strong</span>
+          <h3 class="text-base font-medium text-indigo-300">
+            Candidate 1 — Hardcoded component-path dispatcher
+          </h3>
+        </div>
+        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+          This candidate offers the highest leverage: a 155-line flat conditional is replaced by a
+          3-line registry lookup + individually testable handlers. The interface stays the same (no
+          breaking changes), but the internal structure becomes extensible — new component paths are
+          additive, not edits to a monolithic function. The change is contained to a single file
+          (<code>astro/content.ts</code>) and has no RFC implications. It directly improves locality
+          (each handler lives next to its collection logic), leverage (additive extensibility), and
+          testability (per-handler unit tests with mock collections).
+        </p>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          <strong class="text-white">Runner-up:</strong> Candidate 2 (duplicated deep-merge) —
+          smallest effort, immediate payoff, zero risk. Can be done in &lt;30 minutes.
+        </p>
+      </section>
+
+      <!-- Footer -->
+      <footer class="border-t border-gray-800 pt-6 pb-12 text-center">
+        <p class="text-xs text-gray-600">
+          Generated by Cascade · Architecture Review of <code>@gogol/share</code> · 2026-07-07
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

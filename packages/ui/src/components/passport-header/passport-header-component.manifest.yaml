@@ -1,0 +1,14 @@
+id: passport-header-component
+uniName: passport-header-component
+layer: component
+semanticId: passport-header
+archetype: passport-header
+
+cosmicName: Methone
+role: header
+version: 1.0.0
+intent:
+  - display-passport-identity
+  - show-app-name-and-tagline
+industryFit: []
+contentSchemaKey: null

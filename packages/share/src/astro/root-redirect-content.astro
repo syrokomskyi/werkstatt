@@ -1,0 +1,25 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>[RFC-0160] No-op placeholder for the root entry page (`/`).
+  Under unprefixed default-language routing the root page (`/`) serves the default
+  language directly and MUST NOT perform any automatic client-side redirects.
+  The component is retained as a no-op so existing consumer pages do not break;
+  it renders nothing and executes no script.</purpose>
+<non-goals>
+  <item>Do not render <html>/<head>/<body> — the consumer page owns those.</item>
+  <item>Do not emit any script, meta refresh, or language-detection logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0160: removed automatic client-side redirect. Root page is default language with no redirects.</item>
+</CHANGE_SUMMARY>
+*/
+
+export interface Props {
+  /** The site's default language, served at `/`. Ignored — no redirect logic remains. */
+  defaultLanguageCode?: string;
+  /** Retained for interface compatibility; unused. */
+  redirectableLanguageCodes?: readonly string[];
+}
+---

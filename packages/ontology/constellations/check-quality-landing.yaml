@@ -1,0 +1,40 @@
+# Constellation: Check Quality Landing
+# [DNA-23][RFC-0025][RFC-0071][RFC-0072] — Validated by constellation.contract.validate
+id: check-quality-landing
+name: Check Quality Landing
+family: check-quality-operator
+description: >
+  Minimal landing-page pattern for URL-first website-quality operators. The
+  hero establishes what the check covers and how to start; optional slots
+  add comparison, FAQ, and a final CTA as the site grows.
+forStar: Vega
+version: 1.0.0
+
+slots:
+  - cosmicName: Europa # hero
+    label: Quality-check hero
+    rationale: >
+      Establish what the URL-first quality check covers, who it is for, and
+      how to start. The hero carries the primary CTA so a visitor can act
+      immediately without scrolling.
+
+  - cosmicName: Janus # comparison-cards
+    label: Comparison cards
+    optional: true
+    rationale: >
+      Differentiate automated URL-first checking from manual audits or
+      generic platform scanners. Side-by-side claims use concrete examples.
+
+  - cosmicName: Atlas # faq-list
+    label: FAQ list
+    optional: true
+    rationale: >
+      Remove common operational objections: what the check covers, how long
+      it takes, what the report includes, and data handling.
+
+  - cosmicName: Dione # final-cta
+    label: Final CTA
+    optional: true
+    rationale: >
+      End with one focused action after the visitor understands the value.
+      Reuses the existing final-cta section.

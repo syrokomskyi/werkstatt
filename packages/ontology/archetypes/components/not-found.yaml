@@ -1,0 +1,22 @@
+id: layout.not-found
+displayName: Not found
+version: 1.0.0
+semanticRole: component-layout.not-found
+description: |
+  Site-level 404 shell component that orients lost visitors and preserves
+  navigation paths without becoming a normal content section.
+expectedIntents:
+  - guide-lost-visitors
+  - preserve-site-navigation
+expectedIndustryFit:
+  - non-profit
+  - trades-and-construction
+  - consulting-and-coaching
+layoutHint: single-column
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({}).passthrough()
+acceptedCosmicNames:
+  - Cressida
+constraints: {}

@@ -1,0 +1,100 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the integration of the growth layer within Astro pages.</purpose>
+<non-goals>
+  <item>Do not handle raw content parsing or transformation.</item>
+  <item>Do not manage transport or orchestration of external services.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/**
+ * <GrowthProvider> — Astro island that activates the growth layer.
+ *
+ * Place this component once per page, typically inside the root layout's
+ * <head> or just before </body>. It injects the GrowthConfig JSON blob and
+ * bootstraps the client-side growth layer on load.
+ *
+ * Props come from the app's src/content/system.md `growth:` block, resolved server-side.
+ *
+ * RFC-0027 / DNA-29
+ *
+ * @example
+ *   <GrowthProvider
+ *     appId="my-app"
+ *     locale={lang}
+ *     vendor={{ adapter: "plausible", options: { domain: "example.org" } }}
+ *     activeFunnels={["donation-intent-to-confirmation"]}
+ *   />
+ */
+
+import {
+  GrowthConfigSchema,
+  GROWTH_CONFIG_SCRIPT_ID,
+  type GrowthConfig,
+} from "@gogol/growth/config";
+
+interface Props {
+  appId: string;
+  locale: string;
+  vendor: {
+    adapter: string;
+    options?: Record<string, string>;
+  };
+  activeFunnels?: string[];
+  activeExperiments?: string[];
+}
+
+const { appId, locale, vendor, activeFunnels = [], activeExperiments = [] } = Astro.props;
+
+// Validate + serialise the config server-side so the client gets a clean blob.
+const config: GrowthConfig = GrowthConfigSchema.parse({
+  appId,
+  locale,
+  vendor: {
+    adapter: vendor.adapter,
+    options: vendor.options ?? {},
+  },
+  activeFunnels,
+  activeExperiments,
+});
+
+const configJson = JSON.stringify(config);
+---
+
+<!--
+  GrowthProvider injects two things:
+  1. A JSON config blob read by bootGrowthLayer().
+  2. A client script that imports bootGrowthLayer() and calls it with the
+     host-owned adapter loader map.
+
+  The loader map uses a variable specifier for vendor adapters so the bundler
+  does not try to statically resolve packages that may not be a dependency of
+  every consuming app. Apps that declare `adapter: "matomo"` must add
+  @gogol/growth-adapter-matomo to their package.json dependencies.
+  To add a vendor adapter: add it as a dependency in the app's package.json
+  and add a loader entry here.
+-->
+<script id={GROWTH_CONFIG_SCRIPT_ID} type="application/json" set:html={configJson} />
+
+<script>
+  import { bootGrowthLayer } from "@gogol/growth/client";
+  import { NullAdapter } from "@gogol/growth/null-adapter";
+
+  const _adapterSpecifiers: Record<string, string> = {
+    matomo: "@gogol/growth-adapter-matomo",
+  };
+
+  const growthLoaders = {
+    null: () => Promise.resolve({ default: NullAdapter }),
+    matomo: () => import(/* @vite-ignore */ _adapterSpecifiers["matomo"]!),
+  };
+
+  bootGrowthLayer(growthLoaders).catch((err) => {
+    console.warn("[growth] bootGrowthLayer failed:", err);
+  });
+</script>

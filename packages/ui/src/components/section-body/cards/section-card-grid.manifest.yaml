@@ -1,0 +1,15 @@
+id: section-card-grid-component
+uniName: section-card-grid-component
+layer: component
+semanticId: section-card-grid
+archetype: section-body-cards
+cosmicName: Praxidike
+role: section-body
+version: 1.1.0
+intent:
+  - render-card-grid
+  - support-body-kind-cards
+  - panel-effects
+industryFit: []
+contentSchemaKey: null
+changelog: Migrated body-level card visuals from legacy surface glass to composable effects assignments.

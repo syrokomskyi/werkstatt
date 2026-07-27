@@ -1,0 +1,785 @@
+<knowledge-graph>
+  <meta>
+    <document-id>knowledge-graph</document-id>
+    <version>1.0.0</version>
+    <status>active</status>
+    <scope>repository-root</scope>
+  </meta>
+
+  <nodes>
+    <node id="root.rules" type="instruction-layer">
+      <name>Root AGENTS</name>
+      <path>`AGENTS.md`</path>
+      <role>Repository-wide active instruction layer.</role>
+      <links>
+        <link rel="binds-to" target="root.docs.requirements" />
+        <link rel="binds-to" target="root.docs.technology" />
+        <link rel="binds-to" target="root.docs.plan" />
+        <link rel="binds-to" target="root.docs.source-markup" />
+        <link rel="binds-to" target="root.docs.verification" />
+        <link rel="binds-to" target="root.docs.styling" />
+        <link rel="delegates-to" target="apps.rules" />
+        <link rel="delegates-to" target="packages.rules" />
+      </links>
+    </node>
+
+    <node id="root.docs.requirements" type="compass-doc">
+      <name>Requirements</name>
+      <path>`docs/requirements.xml`</path>
+      <role>Repository-wide business and workflow intent.</role>
+      <links>
+        <link rel="informs" target="root.rules" />
+        <link rel="informs" target="root.docs.plan" />
+      </links>
+    </node>
+
+    <node id="root.docs.technology" type="compass-doc">
+      <name>Technology</name>
+      <path>`docs/technology.xml`</path>
+      <role>Runtime, topology, and dependency policy map.</role>
+      <links>
+        <link rel="informs" target="root.docs.plan" />
+        <link rel="constrains" target="packages.kernel" />
+        <link rel="constrains" target="packages.ui" />
+        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="constrains" target="apps.reference" />
+      </links>
+    </node>
+
+    <node id="root.docs.plan" type="compass-doc">
+      <name>Development Plan</name>
+      <path>`docs/development-plan.xml`</path>
+      <role>Execution loop, adoption phases, and rollout policy.</role>
+      <links>
+        <link rel="depends-on" target="root.docs.requirements" />
+        <link rel="depends-on" target="root.docs.technology" />
+        <link rel="depends-on" target="root.docs.source-markup" />
+        <link rel="drives" target="root.docs.verification" />
+        <link rel="drives" target="root.docs.inventory" />
+      </links>
+    </node>
+
+    <node id="root.docs.source-markup" type="compass-doc">
+      <name>Source Markup</name>
+      <path>`docs/source-markup.xml`</path>
+      <role>Canonical Compass source-file scaffolding contract and coverage-mode specification.</role>
+      <links>
+        <link rel="constrains" target="packages.kernel" />
+        <link rel="constrains" target="packages.kernel-checks" />
+        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="constrains" target="apps.reference" />
+      </links>
+    </node>
+
+    <node id="root.docs.verification" type="compass-doc">
+      <name>Verification Plan</name>
+      <path>`docs/verification-plan.xml`</path>
+      <role>Validation strategy, LDD posture, and test/report contracts.</role>
+      <links>
+        <link rel="verifies" target="packages.kernel" />
+        <link rel="verifies" target="packages.ui" />
+        <link rel="verifies" target="apps.webgogol-com" />
+        <link rel="verifies" target="apps.reference" />
+      </links>
+    </node>
+
+    <node id="root.docs.inventory" type="compass-artifact">
+      <name>Compass Inventory</name>
+      <path>`docs/compass-inventory.xml`</path>
+      <role>Generated repository coverage snapshot used for staged rollout and validation.</role>
+      <links>
+        <link rel="generated-by" target="packages.kernel-checks" />
+        <link rel="supports" target="root.docs.plan" />
+        <link rel="supports" target="root.docs.verification" />
+      </links>
+    </node>
+
+    <node id="root.docs.ecosystem" type="generated-artifact">
+      <name>Agent Control Plane</name>
+      <path>`docs/ecosystem.generated.yaml`</path>
+      <role>RFC-0245/RFC-0246 generated machine-readable projection of apps, service workspaces, pnpm-workspace packages, commands, root/app pipelines, generated ownership, RFC counts, maintenance debt surfaces, maintenance debt queue sources, and deterministic schema v2 metadata for agent planning.</role>
+      <links>
+        <link rel="generated-by" target="packages.kernel-checks" />
+        <link rel="supports" target="root.rules" />
+        <link rel="supports" target="root.docs.verification" />
+        <link rel="validates-with" target="packages.kernel" />
+      </links>
+    </node>
+
+    <node id="root.docs.maintenance-debt-queues" type="governance-surface">
+      <name>Maintenance Debt Queues</name>
+      <path>`docs/maintenance-debt/queues/*.yaml` + `docs/maintenance-debt.queues.generated.yaml`</path>
+      <role>RFC-0256 authored and generated planning layer that turns accepted advisory maintenance debt into bounded agent work queues.</role>
+      <links>
+        <link rel="informs" target="root.docs.ecosystem" />
+        <link rel="validates-with" target="packages.kernel-checks" />
+        <link rel="supports" target="root.docs.verification" />
+      </links>
+    </node>
+
+    <node id="root.docs.styling" type="compass-doc">
+      <name>Styling</name>
+      <path>`docs/styling.xml`</path>
+      <role>Layer architecture, biome role, Component CSS Custom Properties API, validation commands, exclusion rules.</role>
+      <links>
+        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="constrains" target="apps.reference" />
+        <link rel="constrains" target="packages.ontology.biomes" />
+        <link rel="constrains" target="packages.tokens.contract" />
+        <link rel="constrains" target="packages.kernel-checks" />
+      </links>
+    </node>
+
+    <node id="apps.rules" type="instruction-layer">
+      <name>Site Composition Guide</name>
+      <path>`docs/authoring/site-composition.md`</path>
+      <role>Shared rules for deployable sites (Sternsystemen).</role>
+      <links>
+        <link rel="scopes" target="apps.webgogol-com" />
+        <link rel="scopes" target="apps.reference" />
+      </links>
+    </node>
+
+    <node id="packages.rules" type="instruction-layer">
+      <name>Packages AGENTS</name>
+      <path>`packages/AGENTS.md`</path>
+      <role>Shared rules for reusable packages.</role>
+      <links>
+        <link rel="scopes" target="packages.kernel" />
+        <link rel="scopes" target="packages.kernel-astro" />
+        <link rel="scopes" target="packages.kernel-checks" />
+        <link rel="scopes" target="packages.kernel-content" />
+        <link rel="scopes" target="packages.kernel-integrity" />
+        <link rel="scopes" target="packages.kernel-handoff" />
+        <link rel="scopes" target="packages.ui" />
+      </links>
+    </node>
+
+    <node id="apps.webgogol-com" type="workspace">
+      <name>apps/webgogol-com</name>
+      <path>`apps/webgogol-com`</path>
+      <role>Primary marketing site with UA/DE localization.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="depends-on" target="packages.kernel-astro" />
+        <link rel="depends-on" target="packages.ui" />
+        <link rel="governed-by" target="apps.rules" />
+      </links>
+    </node>
+
+    <node id="apps.nicaragua-projekt" type="workspace">
+      <name>apps/nicaragua-projekt</name>
+      <path>`apps/nicaragua-projekt`</path>
+      <role>Nicaragua charity project site.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="governed-by" target="apps.rules" />
+      </links>
+    </node>
+
+    <node id="packages.kernel" type="workspace">
+      <name>packages/os/site-kernel</name>
+      <path>`packages/os/site-kernel`</path>
+      <role>Framework-free site OS core.</role>
+      <links>
+        <link rel="governs" target="packages.kernel-astro" />
+        <link rel="governs" target="packages.kernel-checks" />
+        <link rel="governs" target="packages.kernel-content" />
+        <link rel="governs" target="packages.kernel-integrity" />
+        <link rel="governs" target="packages.kernel-handoff" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-astro" type="workspace">
+      <name>packages/os/site-kernel-astro</name>
+      <path>`packages/os/site-kernel-astro`</path>
+      <role>Astro-specific adapter helpers.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-checks" type="workspace">
+      <name>packages/os/site-kernel-checks</name>
+      <path>`packages/os/site-kernel-checks`</path>
+      <role>Content validation and Compass scaffolding inventory commands only.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+      </links>
+    </node>
+
+    <node id="contracts.route-markdown-twins" type="contract">
+      <name>Route Markdown twins</name>
+      <path>`packages/share/src/semantic/markdown-twin-provenance.ts`</path>
+      <role>RFC-0377: generated per-route Markdown artifacts carrying semantic frontmatter (id, route, title, type, domain, audience, lang, metaDescription, priority, tags) and a standardized body section hierarchy (Summary, Business context, Data / APIs, User flows, Constraints).</role>
+      <links>
+        <link rel="defined-by" target="packages.share.semantic" />
+        <link rel="generated-by" target="packages.kernel-checks" />
+        <link rel="validated-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0377" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-codegen" type="workspace">
+      <name>packages/os/site-kernel-codegen</name>
+      <path>`packages/os/site-kernel-codegen`</path>
+      <role>File generation commands: icons, open-source page, engineering boilerplate for apps, Compass backfill, and Compass markup clearing.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="depends-on" target="packages.kernel-checks" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-onboarding" type="workspace">
+      <name>packages/os/site-kernel-onboarding</name>
+      <path>`packages/os/site-kernel-onboarding`</path>
+      <role>Thin onboarding scaffold: creates minimal app skeleton and client-editable seed content, then delegates engineering boilerplate generation to shared generators and kernel.wire.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="depends-on" target="packages.kernel-codegen" />
+        <link rel="depends-on" target="packages.kernel-checks" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-changelog" type="workspace">
+      <name>packages/os/site-kernel-changelog</name>
+      <path>`packages/os/site-kernel-changelog`</path>
+      <role>AI-powered changelog generation pipeline.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-deploy" type="workspace">
+      <name>packages/os/site-kernel-deploy</name>
+      <path>`packages/os/site-kernel-deploy`</path>
+      <role>Deploy commands: workspace export to client directories.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-content" type="workspace">
+      <name>packages/os/site-kernel-content</name>
+      <path>`packages/os/site-kernel-content`</path>
+      <role>Markdown and frontmatter content helpers.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-integrity" type="workspace">
+      <name>packages/os/site-kernel-integrity</name>
+      <path>`packages/os/site-kernel-integrity`</path>
+      <role>Integrity and signing support, including kernel-command adapters.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+      </links>
+    </node>
+
+    <node id="packages.kernel-handoff" type="workspace">
+      <name>packages/os/site-kernel-handoff</name>
+      <path>`packages/os/site-kernel-handoff`</path>
+      <role>RFC-0221 internal site handoff: bundle integrity validation, ecosystem version comparison, capability diffing, and migrator continuity checks.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="depends-on" target="packages.ontology.handoff-schemas" />
+        <link rel="governed-by" target="packages.rules" />
+      </links>
+    </node>
+
+    <node id="packages.ui" type="workspace">
+      <name>packages/ui</name>
+      <path>`packages/ui`</path>
+      <role>Shared UI package that owns canonical LordIcon JSON assets and generated Astro icon components.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="governed-by" target="packages.rules" />
+      </links>
+    </node>
+
+    <node id="packages.ontology.biomes" type="data-surface">
+      <name>Ontology biomes</name>
+      <path>`packages/ontology/biomes/*.yaml`</path>
+      <role>Canonical RFC-0071 biome visual-DNA catalog consumed by validators, onboarding, and biome CSS generation.</role>
+      <links>
+        <link rel="owned-by" target="packages.rules" />
+        <link rel="used-by" target="packages.kernel-checks" />
+        <link rel="used-by" target="packages.kernel-codegen" />
+      </links>
+    </node>
+
+    <node id="packages.ontology.site-families" type="data-surface">
+      <name>Ontology site families</name>
+      <path>`packages/ontology/site-families/*/family.yaml`</path>
+      <role>Canonical RFC-0071 site-family recipes used by onboarding workflows and shared validators.</role>
+      <links>
+        <link rel="owned-by" target="packages.rules" />
+        <link rel="used-by" target="packages.kernel-checks" />
+      </links>
+    </node>
+
+    <node id="packages.ontology.handoff-schemas" type="data-surface">
+      <name>Ontology handoff schemas</name>
+      <path>`packages/ontology/src/operations/handoff.ts`</path>
+      <role>RFC-0221 Zod schemas for handoff-lock.json and handoff-manifest.json.</role>
+      <links>
+        <link rel="owned-by" target="packages.rules" />
+        <link rel="used-by" target="packages.kernel-handoff" />
+      </links>
+    </node>
+
+    <node id="packages.tokens.contract" type="data-surface">
+      <name>Design token contract</name>
+      <path>`packages/tokens/src/{tokens.css,index.ts}`</path>
+      <role>Canonical `--ds-*` token-name inventory that biome validators and codegen map against.</role>
+      <links>
+        <link rel="used-by" target="packages.kernel-checks" />
+        <link rel="used-by" target="packages.kernel-codegen" />
+      </links>
+    </node>
+
+    <node id="packages.integration-adapter-supabase-crm" type="package">
+      <name>Integration adapter: Supabase CRM (Lagebild)</name>
+      <path>`packages/integration-adapter-supabase-crm`</path>
+      <role>RFC-0186: Shared multi-tenant CRM buffer adapter. Tenant registry, sync worker factory, and Pipedrive destination handlers.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="used-by" target="apps.webgogol-com" />
+        <link rel="governed-by" target="packages.rules" />
+      </links>
+    </node>
+
+    <node id="changelog.system" type="subsystem">
+      <name>Changelog OS</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/` + `packages/os/site-kernel-changelog/src/changelog-command.ts`</path>
+      <role>AI-powered changelog generation pipeline. Lives in @gogol/site-kernel-changelog. Each app wires it up via its own changelog.module.ts.</role>
+      <links>
+        <link rel="owned-by" target="root.rules" />
+        <link rel="reads-from" target="changelog.prompts" />
+        <link rel="writes-to" target="changelog.output" />
+      </links>
+    </node>
+
+    <node id="changelog.prompts" type="data">
+      <name>Changelog Prompts</name>
+      <path>`packages/os/site-kernel-changelog/prompts/`</path>
+      <role>Versioned LLM prompts for classifier, grouper, and writer agents. Prompt hash changes auto-invalidate the AI cache.</role>
+    </node>
+
+    <node id="changelog.output" type="data">
+      <name>Changelog Output</name>
+      <path>`CHANGELOG.md`, `changelogs/`</path>
+      <role>Index changelog and versioned per-release files produced by the pipeline.</role>
+    </node>
+
+    <node id="changelog.M-CONTEXT" type="module">
+      <name>M-CONTEXT</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/context.ts`</path>
+      <role>Per-app execution context (ChangelogCtx). Derives all paths from KernelRuntimeContext + env vars + flags.</role>
+      <links><link rel="used-by" target="changelog.system" /></links>
+    </node>
+
+    <node id="changelog.M-TYPES" type="module">
+      <name>M-TYPES</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/types.ts`</path>
+      <role>Zod schemas: RawCommit, ClassifiedCommit, GroupedRelease.</role>
+      <links><link rel="used-by" target="changelog.system" /></links>
+    </node>
+
+    <node id="changelog.M-SANIT" type="module">
+      <name>M-SANIT</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/utils/sanitize.ts`</path>
+      <role>Prompt injection guard. Applied to all commit text fields before AI.</role>
+      <links>
+        <link rel="used-by" target="changelog.M-CLASS" />
+        <link rel="used-by" target="changelog.M-GROUP" />
+        <link rel="used-by" target="changelog.M-WRITE" />
+      </links>
+    </node>
+
+    <node id="changelog.M-LIMIT" type="module">
+      <name>M-LIMIT</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/core/rate-limiter.ts`</path>
+      <role>p-limit(5) wrapper. Prevents AI API rate limit errors.</role>
+      <links>
+        <link rel="used-by" target="changelog.M-CLASS" />
+        <link rel="used-by" target="changelog.M-GROUP" />
+        <link rel="used-by" target="changelog.M-WRITE" />
+      </links>
+    </node>
+
+    <node id="changelog.M-SCHED" type="module">
+      <name>M-SCHED</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/utils/date.ts`</path>
+      <role>Release window detection. Weekly/monthly modes with correct short-month clamping.</role>
+      <links><link rel="used-by" target="changelog.M-MAIN" /></links>
+    </node>
+
+    <node id="changelog.M-GIT" type="module">
+      <name>M-GIT</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/utils/git.ts`</path>
+      <role>Git log extraction via simple-git. Produces RawCommit array scoped to app directory.</role>
+      <links><link rel="used-by" target="changelog.M-MAIN" /></links>
+    </node>
+
+    <node id="changelog.M-ATOMIC" type="module">
+      <name>M-ATOMIC</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/utils/atomic-fs.ts`</path>
+      <role>Atomic file write: tmp+rename. Used by M-INDEX.</role>
+      <links><link rel="used-by" target="changelog.M-INDEX" /></links>
+    </node>
+
+    <node id="changelog.M-CACHE" type="module">
+      <name>M-CACHE</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/core/ai-cache.ts`</path>
+      <role>SQLite WAL + file-based fallback cache with composite key. Resilient to cherry-pick and squash merge.</role>
+      <links>
+        <link rel="used-by" target="changelog.M-CLASS" />
+        <link rel="used-by" target="changelog.M-GROUP" />
+        <link rel="used-by" target="changelog.M-WRITE" />
+      </links>
+    </node>
+
+    <node id="changelog.M-CLASS" type="module">
+      <name>M-CLASS</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/agents/classifier-agent.ts`</path>
+      <role>AI classifier. Deterministic rules + LLM fallback. Outputs ClassifiedCommit with confidence.</role>
+      <links>
+        <link rel="depends-on" target="changelog.M-TYPES" />
+        <link rel="depends-on" target="changelog.M-SANIT" />
+        <link rel="depends-on" target="changelog.M-CACHE" />
+        <link rel="depends-on" target="changelog.M-LIMIT" />
+        <link rel="used-by" target="changelog.M-MAIN" />
+      </links>
+    </node>
+
+    <node id="changelog.M-GROUP" type="module">
+      <name>M-GROUP</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/agents/grouper-agent.ts`</path>
+      <role>AI grouper. Clusters ClassifiedCommits into GroupedRelease.</role>
+      <links>
+        <link rel="depends-on" target="changelog.M-TYPES" />
+        <link rel="depends-on" target="changelog.M-SANIT" />
+        <link rel="depends-on" target="changelog.M-CACHE" />
+        <link rel="depends-on" target="changelog.M-LIMIT" />
+        <link rel="used-by" target="changelog.M-MAIN" />
+      </links>
+    </node>
+
+    <node id="changelog.M-WRITE" type="module">
+      <name>M-WRITE</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/agents/writer-agent.ts`</path>
+      <role>AI writer. Generates human-readable Markdown sections per group.</role>
+      <links>
+        <link rel="depends-on" target="changelog.M-TYPES" />
+        <link rel="depends-on" target="changelog.M-SANIT" />
+        <link rel="depends-on" target="changelog.M-CACHE" />
+        <link rel="depends-on" target="changelog.M-LIMIT" />
+        <link rel="used-by" target="changelog.M-MAIN" />
+      </links>
+    </node>
+
+    <node id="changelog.M-BUMPER" type="module">
+      <name>M-BUMPER</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/core/version-bumper.ts`</path>
+      <role>Confidence-gated SemVer bumper. Major locked. Low-confidence breaking changes produce requiresReview.</role>
+      <links>
+        <link rel="depends-on" target="changelog.M-TYPES" />
+        <link rel="used-by" target="changelog.M-MAIN" />
+      </links>
+    </node>
+
+    <node id="changelog.M-INDEX" type="module">
+      <name>M-INDEX</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog/core/index-rebuilder.ts`</path>
+      <role>Rebuilds CHANGELOG.md index. Writes versioned files atomically. Restores missing dynamic markers.</role>
+      <links>
+        <link rel="depends-on" target="changelog.M-ATOMIC" />
+        <link rel="used-by" target="changelog.M-MAIN" />
+      </links>
+    </node>
+
+    <node id="changelog.M-MAIN" type="module">
+      <name>M-MAIN</name>
+      <path>`packages/os/site-kernel-changelog/src/changelog-command.ts`</path>
+      <role>OS command handlers (runChangelogGenerate, runChangelogRebuildIndex, runChangelogBackfill). Orchestrates the full pipeline.</role>
+      <links>
+        <link rel="depends-on" target="changelog.M-CONTEXT" />
+        <link rel="depends-on" target="changelog.M-SCHED" />
+        <link rel="depends-on" target="changelog.M-GIT" />
+        <link rel="depends-on" target="changelog.M-CLASS" />
+        <link rel="depends-on" target="changelog.M-GROUP" />
+        <link rel="depends-on" target="changelog.M-WRITE" />
+        <link rel="depends-on" target="changelog.M-BUMPER" />
+        <link rel="depends-on" target="changelog.M-INDEX" />
+      </links>
+    </node>
+
+    <node id="legacy.rules" type="reference-layer">
+      <name>Legacy .agents rules</name>
+      <path>`.agents/rules/**`</path>
+      <role>Historical rationale and deep-dive reference only.</role>
+      <links>
+        <link rel="supplements" target="root.rules" />
+        <link rel="must-not-override" target="root.docs.requirements" />
+      </links>
+    </node>
+
+    <node id="rfc.0243" type="compass-doc">
+      <name>RFC-0243 Authored Offer Pillar</name>
+      <path>`docs/rfcs/rfc-0243-authored-offer-pillar-replace-pseo-leistungen-with-authored-listing-page.md`</path>
+      <role>Replaces PSEO-generated /leistungen/ depth-0 pillar with authored listing pages (pageId: services), moves offer detail pages into /leistungen/ namespace, and preserves legacy URLs via 301 redirects.</role>
+      <links>
+        <link rel="informs" target="apps.webgogol-com" />
+        <link rel="constrains" target="packages.ontology.blueprints" />
+        <link rel="informs" target="root.docs.plan" />
+      </links>
+    </node>
+
+    <node id="rfc.0244" type="compass-doc">
+      <name>RFC-0244 Hierarchical Demand Records</name>
+      <path>`docs/rfcs/rfc-0244-hierarchical-demand-records-with-path-derived-slugs.md`</path>
+      <role>Hierarchical folder tree (1/2/3 segments) for demand records with path-derived slugs and optional frontmatter override. Validates via demands.hierarchy.validate.</role>
+      <links>
+        <link rel="informs" target="packages.kernel-checks" />
+        <link rel="constrains" target="apps.webgogol-com" />
+        <link rel="informs" target="root.docs.plan" />
+      </links>
+    </node>
+
+    <node id="packages.surface" type="workspace">
+      <name>packages/surface</name>
+      <path>`packages/surface`</path>
+      <role>RFC-0192 Programmatic Surface route-source port: framework-free Blueprint contract/assembly + axis-generic eligibility engine. `BlueprintLevel` includes optional `pillar` field (RFC-0490) for depth-0 hub specialization with hero, adaptation, productPrice, and finalCta sub-blocks, and optional `dossier` field (RFC-0492) for depth-1 industry dossier configuration (gate thresholds, claim restrictions, doorway/duplicate thresholds). Pure functions only — all I/O lives in kernel commands.</role>
+      <links>
+        <link rel="depends-on" target="packages.kernel" />
+        <link rel="constrains" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0490" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0492" />
+      </links>
+    </node>
+
+    <node id="packages.share.semantic" type="contract">
+      <name>Semantic layer</name>
+      <path>`packages/share/src/semantic/`</path>
+      <role>Full semantic layer: `SemanticPageType` (includes `"collection"` for CollectionPage + ItemList JSON-LD, RFC-0490), `SemanticPageModel` (includes optional `collectionItems`, `surfaceId`/`depth` for depth-gated JSON-LD corrections, `industryService` for industry-specific Service node, RFC-0492), JSON-LD builders (`buildServiceNodes` suppresses org-level Service nodes for depth-1 `website-local` pages), llms projections, page builders.</role>
+      <links>
+        <link rel="used-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0490" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0492" />
+      </links>
+    </node>
+
+    <node id="packages.ontology.blueprints" type="data-surface">
+      <name>Ontology blueprints</name>
+      <path>`packages/ontology/blueprints/*.yaml`</path>
+      <role>Blueprint YAML specs for Programmatic Surface generation. `website-local.yaml` depth-0 level includes `pillar` block and `semanticType: collection` (RFC-0490); depth-1 level includes `dossier` block with gate thresholds, claim restrictions, and doorway/duplicate thresholds (RFC-0492).</role>
+      <links>
+        <link rel="constrains" target="packages.surface" />
+        <link rel="used-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0490" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0492" />
+      </links>
+    </node>
+
+    <node id="surface.hub.validate" type="command">
+      <name>surface.hub.validate</name>
+      <path>`packages/os/site-kernel-checks/src/surface-hub-validate.ts`</path>
+      <role>RFC-0490: validates depth-0 pillar hub configuration — hero CTA anchoring, title template, published industries, commercial promise phrases, priceRef syntax. Diagnostics: pillar-hero-cta-not-anchor, pillar-commercial-promise, pillar-missing-title-template, pillar-orphan-industry (warn), pillar-no-published-industries, pillar-priceref-unresolvable.</role>
+      <links>
+        <link rel="owned-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0490" />
+        <link rel="validates" target="packages.ontology.blueprints" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0490" type="compass-doc">
+      <name>RFC-0490 Industry Navigation Hub</name>
+      <path>`docs/rfcs/rfc-0490-reposition-website-local-pillar-as-industry-navigation-hub.md`</path>
+      <role>Repositions the website-local depth-0 pillar as an industry navigation hub. Adds `pillar` block to `BlueprintLevel`, `"collection"` to `SemanticPageType`, `CollectionPage` + `ItemList` JSON-LD, and `surface.hub.validate` command. Amends RFC-0238 and RFC-0207.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0238" />
+        <link rel="amends" target="docs.rfcs.rfc-0207" />
+        <link rel="informs" target="packages.surface" />
+        <link rel="informs" target="packages.share.semantic" />
+        <link rel="informs" target="packages.ontology.blueprints" />
+        <link rel="informs" target="surface.hub.validate" />
+        <link rel="informs" target="apps.webgogol-com" />
+      </links>
+    </node>
+
+    <node id="surface.industry.validate" type="command">
+      <name>surface.industry.validate</name>
+      <path>`packages/os/site-kernel-checks/src/surface-industry-validate.ts`</path>
+      <role>RFC-0492: validates depth-1 industry dossier records against the publication gate (minimum field counts), claim policy (prohibited result-claim phrases), and deprecated field usage. Reads `dossier.gate` and `dossier.claimRestrictions` from the blueprint's depth-1 level. Diagnostics: industry-gate-below-threshold, industry-claim-restriction, industry-deprecated-field, industry-missing-new-field.</role>
+      <links>
+        <link rel="owned-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0492" />
+        <link rel="validates" target="packages.ontology.blueprints" />
+      </links>
+    </node>
+
+    <node id="surface.doorway-risk.report" type="command">
+      <name>surface.doorway-risk.report</name>
+      <path>`packages/os/site-kernel-checks/src/surface-doorway-risk.ts`</path>
+      <role>RFC-0492: reports depth-4 city pages missing local context fields (localDemandContext, uniqueIntro, uniqueFaq, localEvidence). Diagnostic — emits warnings, blocks surface.validate when flagged share exceeds `dossier.doorwayMaxFlaggedShare` threshold. Diagnostics: doorway-risk-missing-local-context.</role>
+      <links>
+        <link rel="owned-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0492" />
+        <link rel="validates" target="packages.ontology.blueprints" />
+      </links>
+    </node>
+
+    <node id="surface.duplicate-content.report" type="command">
+      <name>surface.duplicate-content.report</name>
+      <path>`packages/os/site-kernel-checks/src/surface-duplicate-content.ts`</path>
+      <role>RFC-0492: reports depth-1 industry page pairs with high prose similarity (shingle-based Jaccard). Blocks surface.validate when any pair exceeds `dossier.duplicateMaxSimilarity` threshold (default 0.70). Diagnostics: duplicate-content-pair.</role>
+      <links>
+        <link rel="owned-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0492" />
+        <link rel="validates" target="packages.ontology.blueprints" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0492" type="compass-doc">
+      <name>RFC-0492 Industry Dossier Model</name>
+      <path>`docs/rfcs/rfc-0492-industry-dossier-model-for-surface-industries-pages.md`</path>
+      <role>Adds `dossier` block to `BlueprintLevel` for depth-1 industry dossier configuration (gate thresholds, claim restrictions, doorway/duplicate thresholds). Adds `IndustryDossierFields` interface, `surfaceId`/`depth` on `SemanticPageModel`, industry-specific Service JSON-LD node, three new commands (`surface.industry.validate`, `surface.doorway-risk.report`, `surface.duplicate-content.report`), and `migrator-0492`. Declares `breaksC: true` for Service JSON-LD type addition.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0238" />
+        <link rel="informs" target="packages.surface" />
+        <link rel="informs" target="packages.share.semantic" />
+        <link rel="informs" target="packages.ontology.blueprints" />
+        <link rel="informs" target="surface.industry.validate" />
+        <link rel="informs" target="surface.doorway-risk.report" />
+        <link rel="informs" target="surface.duplicate-content.report" />
+        <link rel="informs" target="apps.webgogol-com" />
+      </links>
+    </node>
+
+    <node id="ratgeber.provenance.validate" type="command">
+      <name>ratgeber.provenance.validate</name>
+      <path>`packages/os/site-kernel-checks/src/ratgeber-provenance-validate.ts`</path>
+      <role>RFC-0502: validates ratgeber editorial provenance — author IDs resolve to author records, source IDs resolve to source descriptors, claim IDs exist in claim record collection (RFC-0505: updated from sidecars to surface/claims/), source IDs appear in Quellen section. Diagnostics: RG-PROV-01..06.</role>
+      <links>
+        <link rel="owned-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0502" />
+        <link rel="amended-by" target="docs.rfcs.rfc-0505" />
+        <link rel="validates" target="packages.kernel-checks.content-source-binding" />
+      </links>
+    </node>
+
+    <node id="ratgeber.claim.validate" type="command">
+      <name>ratgeber.claim.validate</name>
+      <path>`packages/os/site-kernel-checks/src/ratgeber-claim-validate.ts`</path>
+      <role>RFC-0505: validates ratgeber claim records at surface/claims/{lang}/*.md — schema, claimId uniqueness, articleId resolution, source binding for factual/regulatory claims, calculationInputs for calculation claims, URL validity, expiry warnings, disputed status warnings, PBP value drift warnings. Diagnostics: RG-CLAIM-01..09.</role>
+      <links>
+        <link rel="owned-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0505" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0502" type="compass-doc">
+      <name>RFC-0502 Ratgeber Editorial Provenance</name>
+      <path>`docs/rfcs/rfc-0502-ratgeber-editorial-provenance-authors-sources-claims.md`</path>
+      <role>Adds author records (`surface/authors/{lang}/`), article source bindings (`sources` frontmatter field), claim sidecar scanning for articles, provenance footer in `bakeRatgeberArticle`, and `ratgeber.provenance.validate` command. Amends RFC-0500.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0500" />
+        <link rel="informs" target="packages.kernel-checks" />
+        <link rel="informs" target="packages.kernel-handoff" />
+        <link rel="informs" target="ratgeber.provenance.validate" />
+        <link rel="amended-by" target="docs.rfcs.rfc-0505" />
+        <link rel="informs" target="apps.webgogol-com" />
+      </links>
+    </node>
+
+    <node id="ratgeber.policy.validate" type="command">
+      <name>ratgeber.policy.validate</name>
+      <path>`packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts`</path>
+      <role>RFC-0503: validates ratgeber editorial policy page existence, required H2 sections, review cadence (reviewedAt > 3 months warning), published article required fields, and no review-required article in surface artifact. Diagnostics: RG-POL-01..05.</role>
+      <links>
+        <link rel="owned-by" target="packages.kernel-checks" />
+        <link rel="governed-by" target="docs.rfcs.rfc-0503" />
+        <link rel="validates" target="ratgeber.hub.validate" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0503" type="compass-doc">
+      <name>RFC-0503 Ratgeber Editorial Policy Page and Status Workflow</name>
+      <path>`docs/rfcs/rfc-0503-ratgeber-editorial-policy-page-and-status-workflow.md`</path>
+      <role>Adds editorial policy page (prose + page entries), ratgeber.policy.validate command, hub link to policy page, url-schema extension for /ratgeber/redaktion/, and article status workflow (review-required exclusion from surface). Amends RFC-0500.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0500" />
+        <link rel="informs" target="packages.kernel-checks" />
+        <link rel="informs" target="packages.ontology" />
+        <link rel="informs" target="ratgeber.policy.validate" />
+        <link rel="informs" target="apps.webgogol-com" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0504" type="compass-doc">
+      <name>RFC-0504 Ratgeber Article 12-Section Layout</name>
+      <path>`docs/rfcs/rfc-0504-ratgeber-article-archetype-12-section-layout-header-toc-changelog.md`</path>
+      <role>Adds article-header (Himalia), toc (Metis), changelog (Prometheus) block types to archetype registry. Rewrites bakeRatgeberArticle for 12-section layout with article-header, TOC, sectioned markdown, changelog, three-tier CTA. Adds RG-ART-07..10 validation rules. Adds rfc-0504 migrator (articleSections/changelog fields + H1 stripping). Amends RFC-0500 and RFC-0501.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0500" />
+        <link rel="amends" target="docs.rfcs.rfc-0501" />
+        <link rel="informs" target="packages.kernel-checks" />
+        <link rel="informs" target="packages.ontology" />
+        <link rel="informs" target="packages.ui" />
+        <link rel="informs" target="packages.kernel-handoff" />
+        <link rel="informs" target="ratgeber.article.validate" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0505" type="compass-doc">
+      <name>RFC-0505 Ratgeber Extended Claim Registry</name>
+      <path>`docs/rfcs/rfc-0505-ratgeber-extended-claim-registry-structured-claim-records.md`</path>
+      <role>Adds structured claim record collection (surface/claims/{lang}/*.md) with claimId, articleId, claimText, claimType, sourceRefs, calculationInputs, limitations, verifiedAt, expiresAt, reviewStatus. Adds ratgeber.claim.validate command (RG-CLAIM-01..09). Updates ratgeber.provenance.validate RG-PROV-03 to check claim records instead of sidecars, adds RG-PROV-06. Adds rfc-0505 migrator (transform claim sidecars to claim records, delete sidecars). Amends RFC-0502.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0502" />
+        <link rel="informs" target="packages.kernel-checks" />
+        <link rel="informs" target="packages.share" />
+        <link rel="informs" target="packages.kernel-handoff" />
+        <link rel="informs" target="ratgeber.claim.validate" />
+        <link rel="informs" target="ratgeber.provenance.validate" />
+        <link rel="informs" target="apps.webgogol-com" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0506" type="compass-doc">
+      <name>RFC-0506 Ratgeber Article JSON-LD — Article Fields, BreadcrumbList, FAQPage Prohibition</name>
+      <path>`docs/rfcs/rfc-0506-ratgeber-article-json-ld-article-fields-breadcrumblist-faqpage-prohibition.md`</path>
+      <role>Updates ratgeber depth-1 Article JSON-LD: adds description and mainEntityOfPage to Article optional fields in C-contract, prohibits FAQPage on ratgeber depth-1, extends SemanticPageModel with authorRecord/reviewedAt/changelog, updates buildArticleNode for structured Person author and URL-string mainEntityOfPage, suppresses FAQPage in buildFaqNodes. Adds SD-RAT-01..04 validation rules to seo.structured-data.validate. Extends surface.contract.validate with ratgeber depth-1 Article field checks. Adds rfc-0506 no-op migrator. Amends RFC-0498 and RFC-0500.</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0498" />
+        <link rel="amends" target="docs.rfcs.rfc-0500" />
+        <link rel="informs" target="packages.ontology" />
+        <link rel="informs" target="packages.share" />
+        <link rel="informs" target="packages.kernel-checks" />
+        <link rel="informs" target="packages.kernel-handoff" />
+        <link rel="informs" target="seo.structured-data.validate" />
+        <link rel="informs" target="surface.contract.validate" />
+        <link rel="informs" target="apps.webgogol-com" />
+      </links>
+    </node>
+
+    <node id="docs.rfcs.rfc-0512" type="compass-doc">
+      <name>RFC-0512 Team Machine-Readable Profiles — JSON Endpoints and Schema.org</name>
+      <path>`docs/rfcs/rfc-0512-team-machine-readable-profiles-json-endpoints-and-schema-org.md`</path>
+      <role>Extends SemanticPerson with address, knowsAbout, affiliation fields. Creates participant-json.ts with filterPublicParticipant, buildPersonJsonLd, buildSoftwareApplicationJsonLd, buildTeamHubCollectionPageJsonLd, generateParticipantJsonEndpoints, scanPrivateFields. Adds extraGraphNodes to SemanticPageModel for injecting SoftwareApplication JSON-LD on AI-agent profile pages. Updates C-contract (jsonld-types.yaml, url-schema.yaml) with Person, SoftwareApplication types, team surface policies, and JSON endpoint URL patterns. Adds participant.json.validate command to sites-check-postbuild pipeline. Registers rfc-0512 no-op migrator (C-contract change).</role>
+      <links>
+        <link rel="amends" target="docs.rfcs.rfc-0508" />
+        <link rel="amends" target="docs.rfcs.rfc-0498" />
+        <link rel="informs" target="packages.share" />
+        <link rel="informs" target="packages.ontology" />
+        <link rel="informs" target="packages.kernel-checks" />
+        <link rel="informs" target="packages.kernel-handoff" />
+        <link rel="informs" target="participant.json.validate" />
+        <link rel="informs" target="surface.contract.validate" />
+        <link rel="informs" target="apps.webgogol-com" />
+      </links>
+    </node>
+  </nodes>
+</knowledge-graph>

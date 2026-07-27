@@ -1,0 +1,25 @@
+{
+  "name": "@gogol/fleet-probe-runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:check": "pnpm exec tsc --noEmit",
+    "run:once": "tsx src/run-once.ts",
+    "health": "tsx src/run-once.ts"
+  },
+  "dependencies": {
+    "@gogol/observability": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.1"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "observability",
+      "rationale": "Fleet probe behavior is currently guarded by TypeScript and observability command validation; direct service tests are deferred until probe-runtime fixtures exist.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

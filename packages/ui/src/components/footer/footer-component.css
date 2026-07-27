@@ -1,0 +1,431 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines visual styles for the universal footer component per RFC-0013.</purpose>
+<non-goals>
+  <item>Do not include JavaScript functionality or interactivity.</item>
+  <item>Do not manage global styles or themes outside the footer context.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Implement RFC-0013: Universal footer styles with brand customization.</item>
+  <item>Add photo positioning support (before/behind).</item>
+  <item>Add three-column navigation grid.</item>
+  <item>Add contact section with copy button styling.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* Footer Component Styles per RFC-0013 */
+.footer {
+  position: relative;
+  z-index: var(--ds-z-content);
+  overflow: visible;
+  background-color: var(--ds-color-footer-bg, var(--ds-color-surface-alt));
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+  padding: var(--ds-space-4) 0 var(--ds-space-6);
+  margin-top: 0;
+}
+
+.footer--textured {
+  background-image: url("/textures/section-noise.svg");
+  background-repeat: repeat;
+}
+
+/* Background image layer — aligned with SectionShell bg-image treatment */
+.footer--bg-image {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.footer__bg-image {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.footer__bg-image-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Photo positioning - before footer */
+.footer__photo-wrapper--before {
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.footer__photo-wrapper--before .footer__photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Photo positioning - behind footer content */
+.footer--ds-photo-behind {
+  position: relative;
+}
+
+.footer__photo-wrapper--behind {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.footer__photo-wrapper--behind .footer__photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.footer--ds-photo-behind .footer__container {
+  position: relative;
+  z-index: 10;
+}
+
+/* Container */
+.footer__container {
+  width: 100%;
+  padding: var(--ds-space-6) var(--ds-size-section-padding-x) 0;
+}
+
+/* Main content grid */
+.footer__main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ds-space-12);
+  margin-bottom: var(--ds-space-10);
+}
+
+@media (min-width: 768px) {
+  .footer__main {
+    grid-template-columns: minmax(200px, 300px) 1fr;
+    gap: var(--ds-space-16);
+  }
+}
+
+/* Brand section */
+.footer__brand {
+  max-width: 280px;
+}
+
+/* BrandLabel inside footer — override header colors for dark background */
+.footer__brand-label {
+  margin-bottom: var(--ds-space-4);
+}
+
+.footer__brand-label .brand-label {
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+  background-image: none;
+  text-decoration: none;
+}
+
+.footer__brand-label .brand-label:hover {
+  background-image: none;
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+.footer__brand-label .brand-label__tagline {
+  color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
+}
+
+.footer__logo {
+  font-family: var(--ds-font-heading);
+  font-size: var(--ds-text-3xl);
+  font-weight: 700;
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+  display: block;
+  margin-bottom: var(--ds-space-4);
+  line-height: 1.2;
+}
+
+/* Logo text wrapper: wordmark + optional pulse icon superscript */
+.footer__logo-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  position: relative;
+  padding-right: 2.2em;
+}
+
+.footer__logo-wordmark {
+  display: inline;
+}
+
+.footer__logo-sep {
+  font-weight: 400;
+  opacity: 0.5;
+  margin: 0 0.1em;
+}
+
+/* Pulse icon: superscript next to brand name, aligned like header lang-switcher */
+.footer__logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  position: absolute;
+  top: -0.35em;
+  right: 0.5em;
+  opacity: 0.75;
+  transition:
+    opacity 0.2s var(--ds-ease-smooth),
+    color 0.2s var(--ds-ease-smooth);
+  background-image: none;
+}
+
+/* Hide lord-icon placeholder until library hydrates it */
+.footer__logo-icon lord-icon:not(:defined) {
+  display: none;
+}
+
+.footer__logo-icon:hover {
+  opacity: 1;
+  color: var(--ds-color-accent-hover, var(--ds-color-accent));
+  background-image: none;
+}
+
+.footer__logo-icon:hover lord-icon {
+  color: var(--ds-color-accent-hover, var(--ds-color-accent));
+}
+
+.footer__brand .footer__logo-icon,
+.footer__brand .footer__logo-icon:hover,
+.footer__brand .footer__logo-icon:focus,
+.footer__brand .footer__logo-icon:active {
+  text-decoration: none;
+  background-image: none;
+  background-size: 0;
+}
+
+.footer__logo-icon[data-external-link="1"]::after {
+  content: none;
+}
+
+.footer__tagline {
+  color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
+  font-size: var(--ds-text-1);
+  line-height: 1.5;
+  margin: 0 0 var(--ds-space-5) 0;
+}
+
+/* QR Code */
+.footer__qr {
+  width: fit-content;
+  padding: var(--ds-space-2);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-color-surface-glass);
+  box-shadow: var(--ds-shadow-sm);
+}
+
+.footer__qr-image {
+  display: block;
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+}
+
+/* Navigation grid */
+.footer__nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--ds-space-8);
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+}
+
+@media (min-width: 768px) {
+  .footer__nav {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.footer__nav-group {
+  min-width: 0;
+}
+
+.footer__nav-title {
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
+  margin-bottom: var(--ds-space-4);
+}
+
+.footer__nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer__nav li {
+  margin-bottom: var(--ds-space-3);
+}
+
+.footer__nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  text-decoration: none;
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+  font-size: var(--ds-text-0);
+  font-weight: 500;
+  transition: color 0.2s var(--ds-ease-smooth);
+  position: relative;
+}
+
+.footer__nav a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--ds-color-primary);
+  transition: width 0.2s var(--ds-ease-smooth);
+}
+
+.footer__nav a:hover::after {
+  width: 100%;
+}
+
+.footer__nav a:hover {
+  color: var(--ds-color-accent);
+}
+
+.footer__nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.footer__nav-link--ds-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Channel icons (WhatsApp, Telegram) */
+.footer__channel-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Contact item with email and copy button */
+.footer__contact-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.footer__email {
+  color: var(--ds-color-footer-text, var(--ds-color-text));
+  font-size: var(--ds-text-0);
+}
+
+.footer__copy-btn {
+  background: none;
+  border: none;
+  padding: var(--ds-space-1);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
+  transition: color 0.2s var(--ds-ease-smooth);
+  border-radius: var(--ds-radius-sm);
+}
+
+.footer__copy-btn:hover {
+  color: var(--ds-color-accent);
+  background: var(--ds-color-surface-hover);
+}
+
+.footer__copy-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Bottom section */
+.footer__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+  align-items: center;
+  padding-top: var(--ds-space-3);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .footer__bottom {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+.footer__motto {
+  color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
+  font-weight: 500;
+  font-size: var(--ds-text-sm);
+  margin: 0;
+}
+
+/* Responsive adaptations */
+@media (max-width: 767px) {
+  .footer {
+    padding: var(--ds-space-2) 0 var(--ds-space-4);
+  }
+
+  .footer__main {
+    gap: var(--ds-space-8);
+  }
+
+  .footer__brand {
+    max-width: none;
+    text-align: center;
+  }
+
+  .footer__qr {
+    margin: 0 auto;
+  }
+
+  .footer__nav {
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-6);
+  }
+
+  .footer__nav li {
+    margin-bottom: var(--ds-space-2);
+  }
+
+  .footer__photo-wrapper--before {
+    max-height: 250px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .footer__nav a:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .footer__logo-icon,
+  .footer__nav a,
+  .footer__copy-btn {
+    transition: none;
+  }
+}

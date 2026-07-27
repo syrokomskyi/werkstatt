@@ -1,0 +1,27 @@
+id: impact-section
+uniName: impact-section
+layer: section
+semanticId: impact
+archetype: impact
+cosmicName: Ganymede
+role: impact
+version: 1.5.0
+intent:
+  - demonstrate-expertise
+  - show-social-proof
+  - build-trust
+industryFit: []
+contentSchemaKey: impact-section
+contentTypesPath: ./impact-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-stats
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body

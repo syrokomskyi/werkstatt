@@ -1,0 +1,20 @@
+id: passport-provenance
+displayName: Passport Provenance
+version: 1.0.0
+semanticRole: component-passport-provenance
+description: |
+  Starter RFC-0072 archetype seeded from existing manifest metadata.
+expectedIntents:
+  - display-build-provenance
+  - show-commit-sha-and-timestamp
+  - show-vc-credential
+expectedIndustryFit:
+  - non-profit
+layoutHint: split
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({}).passthrough()
+acceptedCosmicNames:
+  - Bianca
+constraints: {}

@@ -1,0 +1,222 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>RFC-0200: the data-driven People section. Loads canonical Person records (selected by
+slug / affiliation / all), renders a PersonProfile grid or a single-person spotlight (the former
+founder-trust-card). Links a card to the person's profile page when one is live.</purpose>
+<non-goals>
+  <item>Do not inline member data — selection is by slug/affiliation/all.</item>
+  <item>Do not own profile-page routing — that is the route registry (RFC-0200 Phase 2).</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0200: created, replacing the team + founder-trust-card sections.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { CtaConfig } from "@gogol/share";
+import type { SectionProps } from "@gogol/share/page";
+import {
+  cast,
+  resolveSectionAnchor,
+  getParticipantsForSection,
+  selectPeople,
+  resolveEffectsForTarget,
+  creditByTarget,
+} from "@gogol/share";
+import type { PeopleSectionContent } from "./people-section.types.generated.ts";
+import PersonProfile from "../../components/person-profile/person-profile-component.astro";
+import SectionImage from "@gogol/ui/components/section-image.astro";
+import SectionCta from "@gogol/ui/components/section-cta.astro";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import EffectHost from "@gogol/ui/components/effects/effect-host.astro";
+import { contentAssetCredits } from "../../content-assets.ts";
+import "./people-section.css";
+
+const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "people");
+const props = cast<PeopleSectionContent>(pageOverride);
+
+const layout = props.layout ?? "grid";
+const showRole = props.showRole ?? true;
+const showBio = props.showBio ?? false;
+const linkToProfile = props.linkToProfile ?? false;
+const defaultImageFade = props.defaultImageFade;
+
+/**
+ * Escape HTML, then turn `[text](https://…)` into safe external anchors. Used for the
+ * spotlight bio so author-written links in the canonical Person record render as links.
+ */
+function renderBioParagraph(text: string): string {
+  const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return escaped.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    (_m, label: string, href: string) =>
+      `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`,
+  );
+}
+
+function ctaTargetFromString(target: string): CtaConfig["target"] | null {
+  const normalized = target.trim();
+  if (!normalized) return null;
+  if (normalized.startsWith("#")) return { kind: "anchor", anchor: normalized.slice(1) };
+  if (/^https?:\/\//i.test(normalized)) return { kind: "external", href: normalized };
+  return { kind: "internal", pageId: normalized };
+}
+
+const all = await getParticipantsForSection(lang);
+const people = selectPeople(all, props.select);
+
+const hasPeople = people.length > 0;
+const spotlight = layout === "spotlight" ? people[0] : undefined;
+const cardEffects = resolveEffectsForTarget(props.effects, "body");
+
+const spotlightBioParagraphs =
+  showBio && spotlight?.bio
+    ? spotlight.bio
+        .split(/\n{2,}/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map(renderBioParagraph)
+    : [];
+
+let spotlightCta: CtaConfig | null = null;
+if (spotlight?.cta) {
+  const target = ctaTargetFromString(spotlight.cta.target);
+  if (target) {
+    spotlightCta = {
+      label: spotlight.cta.label,
+      target,
+      variant: "primary",
+    };
+  }
+}
+const spotlightImageCredit = spotlight?.photo
+  ? creditByTarget(
+      contentAssetCredits,
+      { kind: "image", id: spotlight.photo, domain: "business" },
+      lang,
+      defaultLanguageCode,
+    )
+  : null;
+---
+
+{
+  hasPeople && (
+    <SectionShell
+      slug="people"
+      sectionId={sectionId}
+      ariaLabelledBy={props.header?.heading ? "people-title" : undefined}
+      background={props.background}
+      effects={props.effects}
+      density={props.density}
+      tone={props.tone}
+      lang={lang}
+    >
+      {props.header?.heading && (
+        <SectionHeader
+          sectionNumber={sectionNumber}
+          heading={props.header.heading}
+          subheading={props.header.subheading}
+          align={props.header.align ?? "left"}
+          level={props.header.level ?? 2}
+          hideSectionNumber={props.header.hideSectionNumber}
+          id="people-title"
+        />
+      )}
+
+      {layout === "spotlight" && spotlight ? (
+        <div class="people-section__spotlight">
+          <EffectHost effects={cardEffects} class="people-section__card">
+            <div class="people-section__accent-line" aria-hidden="true" />
+            <header class="people-section__card-header">
+              <h3 class="people-section__name">
+                {linkToProfile && spotlight.profileUrl ? (
+                  <a href={spotlight.profileUrl} class="people-section__name-link">
+                    {spotlight.name}
+                    <span class="people-section__name-arrow" aria-hidden="true">
+                      →
+                    </span>
+                  </a>
+                ) : (
+                  spotlight.name
+                )}
+              </h3>
+              {(spotlight.location || spotlight.role) && (
+                <p class="people-section__meta">
+                  {spotlight.location && <span>{spotlight.location}</span>}
+                  {spotlight.role && <span>{spotlight.role}</span>}
+                </p>
+              )}
+              {spotlight.stats && spotlight.stats.length > 0 && (
+                <p class="people-section__stats">
+                  {spotlight.stats.map((s) => (
+                    <span class="people-section__stat">
+                      <span class="people-section__stat-value">{s.value}</span>{" "}
+                      <span class="people-section__stat-label">{s.label}</span>
+                    </span>
+                  ))}
+                </p>
+              )}
+            </header>
+            {spotlight.statement && (
+              <blockquote class="people-section__statement">
+                <span class="people-section__quote-mark">"</span>
+                {spotlight.statement}
+              </blockquote>
+            )}
+            {spotlightBioParagraphs.length > 0 && (
+              <div class="people-section__bio">
+                {spotlightBioParagraphs.map((html) => (
+                  <p set:html={html} />
+                ))}
+              </div>
+            )}
+            {spotlightCta && (
+              <SectionCta {...spotlightCta} lang={lang} class="people-section__cta" />
+            )}
+          </EffectHost>
+          {spotlight?.photo && (
+            <div class="people-section__portrait-wrap">
+              <SectionImage
+                imageName={spotlight.photo}
+                alt={spotlight.name}
+                fit="contain"
+                class="people-section__portrait"
+                fade={defaultImageFade}
+                loading="lazy"
+                credit={spotlightImageCredit}
+                lang={lang}
+                defaultLanguageCode={defaultLanguageCode}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div class="people-section__list">
+          {people.map((person) => (
+            <div class="people-section__item">
+              <PersonProfile
+                name={person.name}
+                image={person.photo}
+                role={person.role}
+                bio={person.bio ?? ""}
+                hideRole={!showRole}
+                imageFade={defaultImageFade}
+                live={person.live}
+                lang={lang}
+                defaultLanguageCode={defaultLanguageCode}
+              />
+              {linkToProfile && person.profileUrl && (
+                <a class="people-section__profile-link" href={person.profileUrl}>
+                  {person.name} →
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </SectionShell>
+  )
+}

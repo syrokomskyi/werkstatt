@@ -1,0 +1,20 @@
+{
+  "name": "observability-stack",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:check": "node ../../packages/os/site-kernel/bin/site-kernel.mjs run observability.stack.validate",
+    "check": "node ../../packages/os/site-kernel/bin/site-kernel.mjs run observability.stack.validate",
+    "health": "node ../../packages/os/site-kernel/bin/site-kernel.mjs run observability.stack.health"
+  },
+  "devDependencies": {},
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "observability",
+      "rationale": "Compose-stack behavior is validated by observability.stack.validate; direct tests are deferred because this service has declarative runtime configuration.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

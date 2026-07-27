@@ -1,0 +1,16 @@
+id: layout-component
+uniName: layout-component
+layer: component
+semanticId: layout
+archetype: layout
+
+cosmicName: Umbriel
+# Layout shell role: owns the page <head> and <body> skeleton.
+role: layout-shell
+version: 1.0.0
+intent:
+  - orient-visitor
+  - guide-navigation
+industryFit: []
+contentSchemaKey: null
+standalone: true

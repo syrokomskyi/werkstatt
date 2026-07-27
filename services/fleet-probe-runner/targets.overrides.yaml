@@ -1,0 +1,28 @@
+- siteId: webgogol-com
+  routes:
+    - /
+    - /de/
+    - /en/
+    - /sitemap.xml
+    - /robots.txt
+  sentinels:
+    - "<title>[^<]+</title>"
+    - </html>
+- siteId: nicaragua-projekt
+  routes:
+    - /
+    - /de/
+    - /sitemap.xml
+    - /robots.txt
+  sentinels:
+    - "<title>[^<]+</title>"
+    - </html>
+- siteId: check-webgogol-com
+  routes:
+    - /
+    - /de/
+    - /sitemap.xml
+    - /robots.txt
+  sentinels:
+    - "<title>[^<]+</title>"
+    - </html>

@@ -1,0 +1,17 @@
+---
+kind: prose
+lang: {{LANG}}
+---
+{{GENERATED_HEADER}}
+
+# {{HEADING}}
+
+<p class="lead">{{LEAD_TEXT}}</p>
+
+## {{SCOPE_HEADING}}
+
+**{{SCOPE_INCLUDED_LABEL}}:** {{SCOPE_INCLUDED_TEXT}}
+
+**{{SCOPE_EXCLUDED_LABEL}}:** {{SCOPE_EXCLUDED_TEXT}}
+
+## {{PROCESS_NOTE_TEXT}}

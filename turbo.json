@@ -1,0 +1,80 @@
+{
+  "$schema": "https://v2-10-3.turborepo.dev/schema.json",
+  "tasks": {
+    "//#registry:build": {
+      "inputs": [
+        "packages/ui/src/**/*.manifest.yaml",
+        "apps/*/src/**/*.manifest.yaml",
+        "packages/ontology/archetypes/**",
+        "packages/ontology/src/cosmic/**",
+        "packages/ontology/src/manifest.ts",
+        "packages/ontology/src/enums.ts",
+        "packages/os/site-kernel-checks/src/registry.ts",
+        "packages/os/site-kernel-checks/src/archetype/**",
+        "package.json",
+        "turbo.json",
+        "pnpm-lock.yaml"
+      ],
+      "outputs": ["uni.registry.json", "packages/ontology/archetypes/index.json"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".astro/**"]
+    },
+    "webgogol-com#build": {
+      "dependsOn": ["^build", "//#registry:build"],
+      "cache": false,
+      "outputs": ["dist/**", ".astro/**"]
+    },
+    "nicaragua-projekt#build": {
+      "dependsOn": ["^build", "//#registry:build"],
+      "cache": false,
+      "outputs": ["dist/**", ".astro/**"]
+    },
+    "check-webgogol-com#build": {
+      "dependsOn": ["^build", "//#registry:build"],
+      "cache": false,
+      "outputs": ["dist/**", ".astro/**"]
+    },
+    "build:check": {
+      "dependsOn": ["^build:check"],
+      "outputs": []
+    },
+    "webgogol-com#build:check": {
+      "dependsOn": ["^build:check", "//#registry:build"],
+      "cache": false,
+      "outputs": []
+    },
+    "nicaragua-projekt#build:check": {
+      "dependsOn": ["^build:check", "//#registry:build"],
+      "cache": false,
+      "outputs": []
+    },
+    "check-webgogol-com#build:check": {
+      "dependsOn": ["^build:check", "//#registry:build"],
+      "cache": false,
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "check": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.{md,astro,ts,tsx,css}", "tools/**/*.ts"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": []
+    },
+    "format": {
+      "inputs": ["**/*.{ts,tsx,astro,css,json,md,yml,yaml}"],
+      "outputs": []
+    },
+    "format:check": {
+      "inputs": ["**/*.{ts,tsx,astro,css,json,md,yml,yaml}"],
+      "outputs": []
+    }
+  }
+}

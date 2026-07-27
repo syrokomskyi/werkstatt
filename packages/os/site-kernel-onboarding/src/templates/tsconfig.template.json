@@ -1,0 +1,25 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "src"],
+  "exclude": ["dist", "public", "node_modules", "spec"],
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "es2022",
+    "strictNullChecks": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@schemas/*": ["src/content/schemas/*"],
+      "@styles/*": ["src/styles/*"],
+      "@gogol/ui": ["../../packages/ui/src/index.ts"],
+      "@gogol/ui/*": ["../../packages/ui/src/*"],
+      "@gogol/share": ["../../packages/share/src/index.ts"],
+      "@gogol/share/*": ["../../packages/share/src/*"]
+    }
+  }
+}

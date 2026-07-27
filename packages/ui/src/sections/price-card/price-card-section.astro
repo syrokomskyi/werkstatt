@@ -1,0 +1,134 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Price card composite — price tiers + included features list via SectionShell + SectionHeader.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0134 replaces legacy surface and glass props with composable effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionProps } from "@gogol/share/page";
+import { cast, getSiteSectionLabels, need, resolveEffectsForTarget } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import EffectHost from "../../components/effects/effect-host.astro";
+import { loadVendorIcon } from "../../icons/icon-resolver.ts";
+import type { PriceCardSectionContent } from "./price-card-section.types.generated.ts";
+import "./price-card-section.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const props = cast<PriceCardSectionContent>(pageOverride);
+const panelEffects = resolveEffectsForTarget(props.effects, "panel");
+const siteLabels = await getSiteSectionLabels<Record<string, unknown>>(
+  lang,
+  Astro.props.defaultLanguageCode,
+  "priceCard",
+);
+const monthlyLabel = need(
+  "sections.priceCard.monthly",
+  typeof siteLabels?.monthly === "string" ? siteLabels.monthly : undefined,
+);
+const yearlyLabel = need(
+  "sections.priceCard.yearly",
+  typeof siteLabels?.yearly === "string" ? siteLabels.yearly : undefined,
+);
+const setupLabel = need(
+  "sections.priceCard.setup",
+  typeof siteLabels?.setup === "string" ? siteLabels.setup : undefined,
+);
+const includesHeading = need(
+  "sections.priceCard.includesHeading",
+  typeof siteLabels?.includesHeading === "string" ? siteLabels.includesHeading : undefined,
+);
+
+const resolvedIncludes = await Promise.all(
+  (props.includes ?? []).map(async (item) => {
+    const Icon = await loadVendorIcon(item.icon);
+    return { text: item.text, Icon, iconConfig: item.icon };
+  }),
+);
+---
+
+<SectionShell
+  slug="price-card"
+  ariaLabelledBy="price-card-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="price-card-title"
+  />
+
+  <EffectHost as="div" effects={panelEffects} class="price-card__panel price-card__panel-surface">
+    <dl class="price-card__prices">
+      {
+        props.monthly && (
+          <>
+            <>
+              <dt>{monthlyLabel}</dt>
+              <dd>{props.monthly}</dd>
+            </>
+          </>
+        )
+      }
+      {
+        props.yearly && (
+          <>
+            <>
+              <dt>{yearlyLabel}</dt>
+              <dd>{props.yearly}</dd>
+            </>
+          </>
+        )
+      }
+      {
+        props.setup && (
+          <>
+            <>
+              <dt>{setupLabel}</dt>
+              <dd>{props.setup}</dd>
+            </>
+          </>
+        )
+      }
+    </dl>
+    {
+      props.includes && (
+        <div class="price-card__includes">
+          <h3>{includesHeading}</h3>
+          <ul>
+            {resolvedIncludes.map(({ text, Icon, iconConfig }) => (
+              <li>
+                {Icon ? (
+                  <Icon
+                    size={iconConfig?.size ?? 24}
+                    color="success"
+                    trigger="hover"
+                    aria-label=""
+                  />
+                ) : (
+                  <span class="price-card__marker" aria-hidden="true" />
+                )}
+                <span>{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </EffectHost>
+</SectionShell>

@@ -1,0 +1,61 @@
+name: Autonomous quality gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  autonomous-quality:
+    runs-on: ubuntu-latest
+    name: Package quality and author checks
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Local CI contract
+        run: pnpm exec site-kernel run ci.local.validate --json
+
+      - name: GitHub branch protection policy
+        run: pnpm exec site-kernel run github.branch-protection.validate --json
+
+      - name: Package lint
+        run: pnpm lint:packages
+
+      - name: Package checks
+        run: pnpm exec site-kernel run packages-check.run --json
+
+      - name: RFC validation
+        run: pnpm exec site-kernel run rfc.validate
+
+      - name: RFC command lifecycle validation
+        run: pnpm exec site-kernel run rfc.command-lifecycle.validate --json
+
+      - name: App author checks - nicaragua-projekt
+        run: pnpm exec site-kernel run apps-check.author --app nicaragua-projekt --json
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Test signal validation
+        run: pnpm exec site-kernel run test.signal.validate --json
+
+      - name: Test signal policy validation
+        run: pnpm exec site-kernel run test.signal.policy.validate --json
+
+      - name: Maintenance debt baseline validation
+        run: pnpm exec site-kernel run maintenance.debt.baseline.validate --json

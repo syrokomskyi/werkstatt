@@ -1,0 +1,124 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for the hero-decision-card component, ensuring a cohesive visual presentation.</purpose>
+<non-goals>
+  <item>Do not include JavaScript behavior or interactivity.</item>
+  <item>Do not manage global styles or themes outside this component.</item>
+  <item>Do not parse raw content or data for rendering.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* Content-only CSS for hero-decision-card composite. */
+@layer components {
+  .section-shell[data-slug="hero-decision-card"] {
+    display: flex;
+    flex-direction: column;
+  }
+  /* Full-viewport hero only when it is the first section. The header
+     offset/clearance is owned globally by `main > :first-child`. After
+     breadcrumbs the hero sizes to its content (compact sub-page header), so
+     there is no large gap and no text slipping under the fixed header. */
+  main > .section-shell[data-slug="hero-decision-card"]:first-child {
+    min-height: 100vh;
+  }
+
+  .section-shell[data-slug="hero-decision-card"] .section-shell__container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section-shell[data-slug="hero-decision-card"] .hero-decision-card__grid {
+    flex: 1;
+  }
+
+  .hero-decision-card__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .hero-decision-card__bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-decision-card__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-6);
+    align-items: center;
+  }
+  @media (min-width: 960px) {
+    .hero-decision-card__grid {
+      grid-template-columns: 1fr minmax(300px, 380px);
+    }
+  }
+  .hero-decision-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-4);
+    color: var(--ds-color-hero-text, var(--ds-color-text));
+  }
+  .hero-decision-card__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-3);
+  }
+  .hero-decision-card__text--center {
+    text-align: center;
+    align-items: center;
+  }
+  .hero-decision-card__ctas--center {
+    justify-content: center;
+  }
+  .hero-decision-card__lead {
+    margin-bottom: var(--ds-space-4);
+  }
+  .hero-decision-card__lead-image {
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    border-radius: var(--ds-radius-md, 0.5rem);
+  }
+  .hero-decision-card__lead-image--hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  .hero-decision-card__panel {
+    padding: var(--ds-space-5);
+  }
+  .hero-decision-card__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-3);
+    margin: 0;
+  }
+  .hero-decision-card__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-1);
+  }
+  .hero-decision-card__row dt {
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-sm-80);
+    letter-spacing: var(--ds-tracking-md);
+    text-transform: uppercase;
+    color: var(--ds-color-text-muted);
+  }
+  .hero-decision-card__row dd {
+    margin: 0;
+    color: var(--ds-color-text);
+    font-weight: 600;
+  }
+}

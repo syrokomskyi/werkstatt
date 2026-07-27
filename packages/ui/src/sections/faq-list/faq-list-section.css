@@ -1,0 +1,76 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for the FAQ list section, ensuring a responsive and visually appealing layout.</purpose>
+<non-goals>
+  <item>Do not include JavaScript logic for FAQ item interactions.</item>
+  <item>Do not manage global styles or themes outside this section.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+.faq-list-section__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-size-1, 0.25rem);
+  max-width: 48rem;
+  margin-inline: 0;
+}
+
+.faq-list-section__item {
+  border: 1px solid var(--ds-color-border-subtle, rgba(0, 0, 0, 0.1));
+  border-radius: var(--ds-radius-sm);
+  overflow: hidden;
+  background: var(--ds-color-surface-raised, #fff);
+  transition: box-shadow 180ms var(--ds-ease-smooth, ease);
+}
+
+.faq-list-section__item[open] {
+  box-shadow: var(--ds-shadow-appeal, 0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+.faq-list-section__question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3, 0.75rem);
+  padding: var(--ds-space-4, 1rem) var(--ds-space-5, 1.25rem);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--ds-text-base, 1rem);
+  line-height: var(--ds-line-height-normal, 1.5);
+  color: var(--ds-color-text-primary, #111);
+  list-style: none;
+  user-select: none;
+}
+
+.faq-list-section__question::-webkit-details-marker {
+  display: none;
+}
+
+.faq-list-section__question:hover {
+  background: var(--ds-color-surface-hover, rgba(0, 0, 0, 0.02));
+}
+
+.faq-list-section__icon {
+  flex-shrink: 0;
+  color: var(--ds-color-text-muted, #666);
+  transition: transform 240ms var(--ds-ease-smooth, ease);
+}
+
+.faq-list-section__item[open] .faq-list-section__icon {
+  transform: rotate(180deg);
+}
+
+.faq-list-section__answer {
+  padding: 0 var(--ds-space-5, 1.25rem) var(--ds-space-4, 1rem);
+  font-size: var(--ds-text-sm, 0.9375rem);
+  line-height: var(--ds-line-height-relaxed, 1.7);
+  color: var(--ds-color-text-secondary, #444);
+}
+
+.faq-list-section__answer p {
+  margin: 0;
+}

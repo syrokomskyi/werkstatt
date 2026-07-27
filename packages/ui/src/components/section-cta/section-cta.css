@@ -1,0 +1,88 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for call-to-action (CTA) buttons within the UI component layer, utilizing biome tokens for consistency.</purpose>
+<non-goals>
+  <item>Do not include JavaScript behavior or interactivity for buttons.</item>
+  <item>Do not manage global styles or themes outside of component-specific design.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0104: SectionCta — biome-token driven CTA button. */
+@layer components {
+  .section-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-space-2);
+    border-radius: var(--ds-radius-sm);
+    font-family: var(--ds-font-body);
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition:
+      transform var(--ds-duration-fast) var(--ds-ease-standard),
+      background-color var(--ds-duration-fast) var(--ds-ease-standard);
+  }
+  .section-cta:focus-visible {
+    outline: 2px solid var(--ds-color-accent);
+    outline-offset: 2px;
+  }
+  .section-cta--sm {
+    padding: var(--ds-space-2) var(--ds-space-4);
+    font-size: var(--ds-text-sm);
+  }
+  .section-cta--md {
+    padding: var(--ds-space-3) var(--ds-space-5);
+    font-size: var(--ds-text-base);
+  }
+  .section-cta--lg {
+    padding: var(--ds-space-4) var(--ds-space-6);
+    font-size: var(--ds-text-3);
+  }
+  .section-cta--full-width {
+    width: 100%;
+  }
+
+  .section-cta--primary {
+    background: var(--ds-color-cta);
+    color: var(--ds-color-cta-text);
+    box-shadow: var(--ds-shadow-md);
+  }
+  .section-cta--primary:hover {
+    background: var(--ds-color-cta-hover);
+    transform: translateY(-1px);
+  }
+
+  .section-cta--secondary {
+    background: transparent;
+    color: var(--ds-color-primary);
+    border: 1.5px solid var(--ds-color-primary);
+  }
+  .section-cta--secondary:hover {
+    background: var(--ds-color-primary);
+    color: var(--ds-color-text-inverse);
+    transform: translateY(-1px);
+  }
+
+  .section-cta--ghost {
+    background: transparent;
+    color: var(--ds-color-primary);
+  }
+  .section-cta--ghost:hover {
+    color: var(--ds-color-accent);
+  }
+
+  .section-cta--danger {
+    background: var(--ds-color-danger);
+    color: var(--ds-color-text-inverse);
+  }
+  .section-cta--danger:hover {
+    background: var(--ds-color-danger-bright);
+    transform: translateY(-1px);
+  }
+}

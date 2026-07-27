@@ -1,0 +1,27 @@
+# Funnel: donation-intent-to-confirmation
+# DNA-28 / RFC-0027
+#
+# Tracks the journey from first donation intent to confirmed payment.
+
+id: donation-intent-to-confirmation
+label: "Donation: Intent to Confirmation"
+description: >
+  The primary donation conversion funnel. Measures how many visitors who
+  express donation intent complete a confirmed donation, and where they drop off.
+
+steps:
+  - id: intent
+    label: Donation Intent
+    event: donation-intent
+
+  - id: form-start
+    label: Form Started
+    event: donation-form-start
+
+  - id: form-submit
+    label: Form Submitted
+    event: donation-form-submit
+
+  - id: confirmed
+    label: Donation Confirmed
+    event: donation-confirmed

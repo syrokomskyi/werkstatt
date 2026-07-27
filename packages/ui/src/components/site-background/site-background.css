@@ -1,0 +1,64 @@
+/*******************************************************************************  
+<MODULE_CONTRACT>  
+<purpose>Defines styles for a fixed site background component, ensuring proper layering and responsiveness.</purpose>  
+  
+  
+<non-goals>  
+  <item>Do not handle dynamic content loading or state management.</item>  
+  <item>Do not define global styles outside the site background context.</item>  
+</non-goals>  
+</MODULE_CONTRACT>  
+  
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>  
+*******************************************************************************/
+
+/* RFC-0105: SiteBackground — fixed viewport layers at z-index -1. */
+@layer components {
+  .site-background {
+    position: fixed;
+    inset: 0;
+    z-index: var(--ds-z-behind, -3);
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .site-background__layer {
+    position: absolute;
+    inset: 0;
+  }
+  .site-background__image {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .site-background__image--cover {
+    object-fit: cover;
+  }
+  .site-background__image--tile {
+    object-fit: none;
+    background-repeat: repeat;
+  }
+  .site-background__image--stretch-width {
+    width: 100%;
+    height: auto;
+    object-fit: fill;
+  }
+  .site-background__image--stretch-height {
+    width: auto;
+    height: 100%;
+    object-fit: fill;
+  }
+  .site-background__tint {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+}
+
+/* RFC-0257: SiteBackground is purely decorative — hide in print */
+@media print {
+  .site-background {
+    display: none !important;
+  }
+}

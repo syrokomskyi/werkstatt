@@ -1,0 +1,4 @@
+id: telegram-alert-bridge
+kind: proxy-worker
+entry: src/worker.ts
+publicEndpoints: true

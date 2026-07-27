@@ -1,0 +1,60 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of the donation use section within the UI, integrating various components for a cohesive display.</purpose>
+<non-goals>
+  <item>Do not manage state or data fetching for donation content.</item>
+  <item>Do not implement business logic related to donation processing.</item>
+  <item>Do not parse raw content or handle user input directly.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Pass surface prop from body to SectionCardGrid for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: donation-use thin dispatcher — cards body. */
+
+import type { SectionProps } from "@gogol/share/page";
+import { need, cast, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionCardGrid from "@gogol/ui/components/section-body/cards.astro";
+import type { DonationUseSectionContent } from "./donation-use-section.types.generated.ts";
+import "./donation-use-section.css";
+
+const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "donation-use");
+const props = cast<DonationUseSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="donation-use"
+  sectionId={sectionId}
+  ariaLabelledBy="donation-use-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="donation-use-title"
+  />
+  <SectionCardGrid
+    cards={body.cards}
+    layout={body.layout}
+    columns={body.columns ?? 2}
+    align={body.align}
+    lang={lang}
+    defaultLanguageCode={defaultLanguageCode}
+    effects={body.effects}
+  />
+</SectionShell>

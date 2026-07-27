@@ -1,0 +1,129 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/components/material-credit/material-credit.css as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not use raw colors or hard-coded pixel values.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0220: initial component stylesheet.</item>
+  <item>RFC-0499: add surface page label figcaption style.</item>
+</CHANGE_SUMMARY>
+*/
+
+@layer components {
+  .material-credit {
+    margin-block-start: var(--ds-space-3);
+    color: var(--ds-color-text-muted);
+    font-size: var(--ds-text-1);
+    line-height: var(--ds-line-height-body);
+  }
+
+  .material-credit__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-2);
+    align-items: baseline;
+    cursor: pointer;
+    list-style: none;
+    line-height: var(--ds-line-height-body);
+  }
+
+  .material-credit__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .material-credit__summary::marker {
+    content: "";
+  }
+
+  .material-credit__summary::before {
+    content: "";
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    margin-inline-end: var(--ds-space-2);
+    border-right: 2px solid var(--ds-color-accent, #e39a24);
+    border-bottom: 2px solid var(--ds-color-accent, #e39a24);
+    transform: rotate(-45deg);
+    transition: transform var(--ds-duration-fast, 120ms) ease;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  .material-credit[open] .material-credit__summary::before {
+    transform: rotate(45deg);
+  }
+
+  .material-credit__label {
+    color: var(--ds-color-text);
+    font-weight: var(--ds-font-weight-bold);
+  }
+
+  .material-credit__line {
+    min-width: 0;
+    color: var(--ds-color-text-muted);
+  }
+
+  .material-credit__details {
+    margin-block-start: var(--ds-space-4);
+    max-width: min(100%, var(--ds-size-container-narrow));
+    padding: var(--ds-space-3) var(--ds-space-4);
+    border: var(--ds-border-1) solid color-mix(in srgb, var(--ds-color-border) 70%, transparent);
+    border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, var(--ds-color-surface) 76%, transparent);
+    -webkit-backdrop-filter: blur(var(--ds-space-3));
+    backdrop-filter: blur(var(--ds-space-3));
+    line-height: var(--ds-line-height-body);
+  }
+
+  .material-credit__title {
+    margin-block: 0 var(--ds-space-2);
+    color: var(--ds-color-text);
+    font-weight: var(--ds-font-weight-bold);
+  }
+
+  .material-credit__list {
+    display: grid;
+    gap: var(--ds-space-1);
+    margin: 0;
+  }
+
+  .material-credit__item {
+    display: grid;
+    grid-template-columns: minmax(var(--ds-space-16), max-content) minmax(0, 1fr);
+    gap: var(--ds-space-2);
+  }
+
+  .material-credit__item dt {
+    color: var(--ds-color-text-muted);
+    font-weight: var(--ds-font-weight-bold);
+  }
+
+  .material-credit__item dd {
+    margin: 0;
+    color: var(--ds-color-text);
+  }
+
+  .material-credit__kind,
+  .material-credit__version,
+  .material-credit__generated,
+  .material-credit__note {
+    color: var(--ds-color-text-muted);
+  }
+
+  .material-credit__surface-label {
+    margin-block-start: var(--ds-space-2);
+    font-size: var(--ds-text-1);
+    color: var(--ds-color-text-muted);
+  }
+
+  .material-credit__surface-label a {
+    color: var(--ds-color-text-muted);
+    text-decoration: none;
+  }
+
+  .material-credit__surface-label a:hover {
+    text-decoration: underline;
+  }
+}

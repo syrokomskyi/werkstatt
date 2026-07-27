@@ -1,0 +1,28 @@
+id: faq-list-section
+uniName: faq-list-section
+layer: section
+semanticId: faq-list
+archetype: faq-list
+cosmicName: Atlas
+role: approach
+version: 1.1.0
+intent:
+  - explain-approach
+  - build-trust
+  - answer-questions
+industryFit: []
+contentSchemaKey: faq-list-section
+contentTypesPath: ./faq-list-section.types.generated.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+  properties:
+    tag:
+      type: string

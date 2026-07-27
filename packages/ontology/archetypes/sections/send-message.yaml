@@ -1,0 +1,46 @@
+id: send-message
+displayName: Send message
+version: 1.0.0
+semanticRole: lead-message-capture
+description: |
+  Single-field message capture section with runtime-routed outbound delivery.
+  Requires the visitor to include contact details in the free-text message before submit.
+expectedIntents:
+  - drive-contact
+  - capture-lead
+  - convert-visitor
+expectedIndustryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+layoutHint: single-column
+bodyKind: composite
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+  shape: |
+    z.object({
+      body: z.object({
+        paragraphs: z.array(z.string().min(1)).min(1),
+        align: z.enum(["left", "center", "right"]).optional(),
+      }).strict().optional(),
+      formId: z.string().min(1).optional(),
+      endpoint: z.string().min(1).optional(),
+      placeholder: z.string().min(1),
+      buttonLabel: z.string().min(1),
+      sendingLabel: z.string().min(1).optional(),
+      successMessage: z.string().min(1),
+      errorMessage: z.string().min(1),
+      contactRequirementMessage: z.string().min(1),
+      emptyMessage: z.string().min(1).optional(),
+      minMessageLength: z.number().int().positive().optional(),
+      fallbackEmail: z.string().min(1).optional(),
+      fallbackEmailLabel: z.string().min(1).optional(),
+      fallbackBodyLabel: z.string().min(1).optional(),
+      copyMessageLabel: z.string().min(1).optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Ceres
+constraints: {}

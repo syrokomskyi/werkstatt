@@ -1,0 +1,19 @@
+# RFC-0337/RFC-0338: collector patch — gateway enrichment + PII redaction.
+# Merged into the SigNoz-shipped otel-collector config (runbook step).
+processors:
+  # RFC-0337: enrich Cloudflare-originated traces that lack wgogol.* attributes.
+  transform/wgogol-enrich:
+    trace_statements:
+      - context: resource
+        statements:
+          - set(attributes["wgogol.site_id"], attributes["service.name"]) where attributes["wgogol.site_id"] == nil
+          - set(attributes["wgogol.layer"], "site") where attributes["wgogol.layer"] == nil
+  # RFC-0337: strip query strings / PII-bearing span attributes before storage.
+  transform/wgogol-redact:
+    trace_statements:
+      - context: span
+        statements:
+          - replace_pattern(attributes["url.full"], "\\?.*$", "")
+          - replace_pattern(attributes["http.url"], "\\?.*$", "")
+          - delete_key(attributes, "http.request.header.cookie")
+          - delete_key(attributes, "http.request.header.authorization")

@@ -1,0 +1,14 @@
+id: material-credit-component
+uniName: material-credit-component
+layer: component
+semanticId: material-credit
+archetype: material-credit
+cosmicName: Cordelia
+role: section-body
+version: 1.0.0
+intent:
+  - disclose-material-provenance
+  - render-credits
+  - emit-structured-credit-data
+industryFit: []
+contentSchemaKey: null

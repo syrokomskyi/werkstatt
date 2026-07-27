@@ -1,0 +1,7 @@
+id: external:city-ulm
+title: Stadt Ulm — official city history and business location pages
+kind: manual
+endpoint: "https://www.ulm.de/tourismus/stadtgeschichte/geschichte-der-stadt"
+expectedType: string
+checkEvery: P6M
+residency: eu

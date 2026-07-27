@@ -1,0 +1,19 @@
+---
+kind: page
+pageId: openSource
+cosmicStar: Polaris
+title: "{{TITLE}}"
+description: "{{DESCRIPTION}}"
+lang: {{LANG}}
+blocks:
+  - id: open-source-prose
+    type: markdown
+    props:
+      heading: "{{HEADING}}"
+      contentRef: "prose/open-source"
+  - id: open-source-registry
+    type: open-source-registry
+    props:
+      dataRef: "data/open-source-registry"
+---
+{{GENERATED_HEADER}}

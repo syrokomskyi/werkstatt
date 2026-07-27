@@ -1,0 +1,14 @@
+{
+  "_": "GENERATED. Do not change this line unless the file contains project specific changes.",
+  "schemaVersion": "1.0",
+  "appId": "{{CLIENT_ID}}",
+  "keys": [
+    {
+      "version": "v1",
+      "active": true,
+      "type": "Ed25519VerificationKey2020",
+      "publicKeyMultibase": "{{PUBLIC_KEY_MULTIBASE}}",
+      "createdAt": "{{CREATED_AT}}"
+    }
+  ]
+}

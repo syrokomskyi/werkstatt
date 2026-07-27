@@ -1,0 +1,15 @@
+id: person-profile-component
+uniName: person-profile-component
+layer: component
+semanticId: person-profile
+archetype: person-profile
+
+cosmicName: Miranda
+role: person-profile
+version: 1.1.0
+intent:
+  - introduce-team
+  - humanise-brand
+  - demonstrate-expertise
+industryFit: []
+contentSchemaKey: null

@@ -1,0 +1,55 @@
+{
+  "name": "webgogol-platform",
+  "private": true,
+  "type": "module",
+  "version": "4.5.0",
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "registry:build": "node packages/os/site-kernel/bin/site-kernel.mjs run uni.registry.build && node packages/os/site-kernel/bin/site-kernel.mjs run archetype.registry.build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build": "node scripts/turbo-run.mjs build",
+    "build:gen": "node scripts/turbo-run.mjs build",
+    "build:check": "node scripts/turbo-run.mjs build:check",
+    "check:gen": "node scripts/turbo-run.mjs build:check",
+    "check:all": "turbo run check",
+    "dev": "pnpm --filter webgogol-com start",
+    "test": "turbo run test",
+    "upgrade-packages": "pnpm -r up && pnpm exec site-kernel run config.template.sync --site webgogol-com",
+    "compass:validate": "node packages/os/site-kernel/bin/site-kernel.mjs run compass.validate",
+    "compass:validate:main": "node packages/os/site-kernel/bin/site-kernel.mjs run compass.validate --site webgogol-com",
+    "compass:validate:ref": "node packages/os/site-kernel/bin/site-kernel.mjs run compass.validate --site <app-name>",
+    "compass:inventory": "node packages/os/site-kernel/bin/site-kernel.mjs run compass.inventory",
+    "lint:packages": "eslint \"packages/**/*.ts\"",
+    "lint:yaml": "eslint --config eslint.config.js \"**/*.yaml\"",
+    "git-add-force": "git rm -r --cached . && git add ."
+  },
+  "devDependencies": {
+    "@gogol/observability": "workspace:*",
+    "@gogol/site-kernel": "workspace:*",
+    "@gogol/site-kernel-checks": "workspace:*",
+    "@gogol/site-kernel-handoff": "workspace:*",
+    "@gogol/site-kernel-observability": "workspace:*",
+    "@gogol/site-kernel-onboarding": "workspace:*",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "@webgogol/forge": "workspace:*",
+    "eslint": "^10.7.0",
+    "eslint-plugin-yml": "^1.18.0",
+    "playwright": "^1.61.1",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "rimraf": "^6.1.3",
+    "tsx": "^4.23.1",
+    "turbo": "^2.10.5",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "8.65.0"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0"
+  }
+}

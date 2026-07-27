@@ -1,0 +1,25 @@
+---
+# Language preferences for AI agents working in this repository.
+# Values are IETF BCP 47 language tags (e.g., en, ru, uk, de, es).
+# Edit this file directly or run the my-preferences skill.
+
+aiLanguage: en
+documentationLanguage: en
+register: business
+createdAt: 2026-07-09
+updatedAt: 2026-07-09
+---
+
+# Operator preferences
+
+This file stores operator-level preferences that AI agents read at the start of a session. It is not a governance document; it is personal settings for how the operator wants to interact with agents.
+
+## Current preferences
+
+- **aiLanguage** — language the AI uses for **all** communication with the operator in this session: questions, responses, summaries, reports, status updates, and any other chat output.
+- **documentationLanguage** — default language for newly generated RFCs, ADRs, READMEs, and other project documentation.
+- **register** — communication register (`business` | `creative`). Business = core behavioral layer only, professional and efficient. Creative = core + extended behavioral layer (RFC-0549) with creative partnership and emotional support.
+
+## Changing preferences
+
+Run the `my-preferences` skill or edit this file directly. When an agent asks you to choose a language, your answer is saved here for future sessions.

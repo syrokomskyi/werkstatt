@@ -1,0 +1,30 @@
+/***************************************************************
+<MODULE_CONTRACT>
+<purpose>Defines styles for the transparency section's link elements, ensuring consistent presentation within the UI.</purpose>
+<non-goals>
+  <item>Do not include styles for non-link elements.</item>
+  <item>Do not manage layout outside the transparency section.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+***************************************************************/
+
+/* RFC-0103: transparency content CSS — only the report link wrapping. */
+@layer components {
+  .transparency-section__link-wrap {
+    max-width: var(--ds-size-container-narrow);
+    margin: var(--ds-space-5) 0 0;
+  }
+  .transparency-section__link {
+    color: var(--ds-color-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .transparency-section__link:hover,
+  .transparency-section__link:focus-visible {
+    color: var(--ds-color-text);
+  }
+}

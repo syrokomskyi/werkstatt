@@ -1,0 +1,68 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for a side-by-side comparison component, facilitating layout and visual hierarchy.</purpose>
+<non-goals>
+  <item>Do not include JavaScript behavior or interactivity.</item>
+  <item>Do not handle theming or global style overrides.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: SectionComparison — side-by-side rows. */
+@layer components {
+  .section-comparison {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-3);
+  }
+  .section-comparison--align-center {
+    align-items: center;
+  }
+  .section-comparison--align-right {
+    align-items: flex-end;
+  }
+
+  .section-comparison__labels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ds-space-3);
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-sm-80);
+    letter-spacing: var(--ds-tracking-md);
+    color: var(--ds-color-text-quiet);
+    text-transform: uppercase;
+  }
+  .section-comparison__grid {
+    display: grid;
+    gap: var(--ds-space-3);
+    width: 100%;
+  }
+  .section-comparison__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ds-space-3);
+    background: var(--ds-color-surface);
+    border: 1px solid var(--ds-color-border);
+    border-radius: var(--ds-radius-2);
+    overflow: hidden;
+  }
+  .effect-host--glass.section-comparison__row {
+    background: transparent;
+    border: none;
+  }
+  .section-comparison__cell {
+    padding: var(--ds-space-4);
+    color: var(--ds-color-text);
+    line-height: var(--ds-line-height-lg);
+  }
+  .section-comparison__cell--left {
+    color: var(--ds-color-text-muted);
+    text-decoration: line-through;
+  }
+  .section-comparison__cell--right {
+    background: color-mix(in srgb, var(--ds-color-success) 8%, transparent);
+  }
+}

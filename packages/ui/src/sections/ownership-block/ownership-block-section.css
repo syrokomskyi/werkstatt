@@ -1,0 +1,14 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines visual styles for the ownership block section, contributing to overall UI aesthetics.</purpose>
+<non-goals>
+  <item>Do not define styles for content-specific elements; rendering is handled by SectionList.</item>
+  <item>Do not manage user interactions or dynamic content behavior.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Clarify CSS responsibilities and delineate boundaries for styling in the ownership block.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: ownership-block has no content-specific CSS — list rendering owned by SectionList. */

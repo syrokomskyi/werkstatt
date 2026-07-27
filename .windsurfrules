@@ -1,0 +1,32 @@
+This repository uses `AGENTS.md` as the authoritative instruction system for Windsurf.
+
+Follow the closest applicable guide in this order:
+
+1. `AGENTS.md` at the repository root
+2. `apps/AGENTS.md` or `packages/AGENTS.md`
+3. `apps/<site>/AGENTS.md` or `packages/<pkg>/AGENTS.md`
+4. closer directory-scoped `AGENTS.md`
+
+For repository-wide, cross-workspace, architectural, shared-package, or high-risk tasks, read these GRACE documents before planning or editing code:
+
+- `docs/requirements.xml`
+- `docs/technology.xml`
+- `docs/development-plan.xml`
+- `docs/knowledge-graph.xml`
+- `docs/verification-plan.xml`
+- `docs/source-markup.xml`
+
+Treat `docs/*.xml` as the primary machine-readable semantic layer for AI work in this monorepo and keep the affected files synchronized with code, architecture, and verification changes.
+
+Use `docs/source-markup.xml` as the canonical source-file GRACE contract and `docs/grace-inventory.xml` as the current rollout/inventory snapshot when those files exist.
+
+Compatibility reminders:
+
+- Keep responses concise, technical, and maintainable.
+- Use `pnpm` for commands.
+- Use 2 spaces, not tabs.
+- Keep project documentation in English.
+- Do not remove debug console statements or existing comments unless the task explicitly requires it.
+- Ignore `spec/**`, `todo/**`, generated icon trees, and folders starting with `old-` or `-` unless the task explicitly targets them.
+
+Use legacy `.agents/**` folders only as reference material when a task needs deeper rationale or migration history.

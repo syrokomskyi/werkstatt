@@ -1,0 +1,58 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of the approach section within the UI, integrating various components to present content effectively.</purpose>
+<non-goals>
+  <item>Do not handle data fetching or state management for the section content.</item>
+  <item>Do not implement custom styling or theming beyond the provided props.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Pass surface prop from body to SectionCardGrid for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: approach thin dispatcher — cards body with images. */
+
+import type { SectionProps } from "@gogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionCardGrid from "@gogol/ui/components/section-body/cards.astro";
+import type { ApproachSectionContent } from "./approach-section.types.generated.ts";
+
+const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "approach");
+const props = cast<ApproachSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="approach"
+  sectionId={sectionId}
+  ariaLabelledBy="approach-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="approach-title"
+  />
+  <SectionCardGrid
+    cards={body.cards}
+    layout={body.layout}
+    columns={body.columns ?? 2}
+    align={body.align}
+    lang={lang}
+    defaultLanguageCode={defaultLanguageCode}
+    effects={body.effects}
+  />
+</SectionShell>

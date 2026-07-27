@@ -1,0 +1,60 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["**/AGENTS.md", ".agents/**", "docs/*.xml"],
+  "command": {
+    "dev": {
+      "description": "Start the reference app dev server",
+      "template": "Run dev server for the reference app. Use `pnpm --filter <app-name> dev` to start the Astro dev server."
+    },
+    "check": {
+      "description": "Run full check pipeline on the reference app",
+      "template": "Run the full validation pipeline on the reference app. Execute `pnpm --filter <app-name> check`, then `pnpm --filter <app-name> astro:check` for TypeScript/Astro type checking."
+    },
+    "build": {
+      "description": "Full build of the reference app",
+      "template": "Build the reference app for production. Run `pnpm --filter <app-name> build` which runs the full build.prepare → astro:check → astro build → build.post pipeline."
+    },
+    "lint:tokens": {
+      "description": "Run design token linting on the reference app",
+      "template": "Run design system token linting. Execute `pnpm --filter <app-name> tokens:ds:lint` to check for non-ds tokens, and `pnpm --filter <app-name> tokens:colors:lint` to check for hardcoded colors."
+    },
+    "gen:icons": {
+      "description": "Regenerate icon components from LordIcon JSON",
+      "template": "Regenerate all icon components from packages/ui JSON sources. Execute `pnpm exec site-kernel run icons.generate` from the repository root."
+    },
+    "validate": {
+      "description": "Run content + thin-copy validation on the reference app",
+      "template": "Validate content surface. Run `pnpm --filter <app-name> content:validate` and `pnpm --filter <app-name> thin-copy:validate`."
+    },
+    "compass": {
+      "description": "Run Compass inventory and validation",
+      "template": "Run Compass inventory and validation. Execute `pnpm exec site-kernel run compass.inventory` then `pnpm exec site-kernel run compass.validate`."
+    },
+    "format": {
+      "description": "Format entire codebase with Prettier",
+      "template": "Run prettier formatting on the entire workspace. Execute `pnpm format`."
+    },
+    "sync": {
+      "description": "Run astro sync for type generation",
+      "template": "Regenerate Astro content collection types. Execute `pnpm --filter <app-name> astro sync`."
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "external_directory": {
+      "*": "ask"
+    },
+    "task": "allow",
+    "question": "allow",
+    "webfetch": "allow",
+    "websearch": "allow"
+  },
+  "experimental": {
+    "primary_tools": ["edit"]
+  },
+  "compaction": {
+    "auto": true,
+    "tail_turns": 3
+  }
+}

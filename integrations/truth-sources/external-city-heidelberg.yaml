@@ -1,0 +1,7 @@
+id: external:city-heidelberg
+title: "Stadt Heidelberg — official city, history, and business information"
+kind: manual
+endpoint: "https://www.heidelberg.de/"
+expectedType: string
+checkEvery: P6M
+residency: eu

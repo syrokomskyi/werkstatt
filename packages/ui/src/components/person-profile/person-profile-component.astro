@@ -1,0 +1,99 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  Renders a profile card for an individual: name, portrait, role, bio.
+  RFC-0115 migration — portrait rendering delegated to <SectionImage>,
+  per-instance `imageFade` replaces the four flat imageFade* booleans.
+</purpose>
+<non-goals>
+  <item>Do not render any fade CSS locally; <SectionImage> owns the fade masks.</item>
+  <item>Do not declare flat imageFadeBottom/Top/Left/Right props at component root.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+</CHANGE_SUMMARY>
+*/
+
+import "./person-profile-component.css";
+import { creditByTarget, wrapInlineNumbers } from "@gogol/share";
+import type { ImageFade, LivePhoto } from "@gogol/share";
+import SectionImage from "@gogol/ui/components/section-image.astro";
+import { contentAssetCredits } from "../../content-assets.ts";
+
+interface Props {
+  name: string;
+  image?: string;
+  role?: string;
+  bio: string;
+  hideRole?: boolean;
+  lang?: string;
+  defaultLanguageCode?: string;
+  /** RFC-0041: wrap inline numbers in bio text for GSAP animation. Default false. */
+  animateNumbers?: boolean;
+  /** RFC-0104 / RFC-0115: canonical image fade primitive replacing flat imageFade* flags. */
+  imageFade?: ImageFade;
+  /** RFC-0202: opt-in living photo for the portrait (sibling `<image>.webm`). */
+  live?: LivePhoto;
+}
+
+const {
+  name,
+  image,
+  role,
+  bio,
+  hideRole,
+  lang,
+  defaultLanguageCode,
+  animateNumbers = false,
+  imageFade,
+  live,
+} = Astro.props as Props;
+const activeLang = lang ?? defaultLanguageCode;
+if (!activeLang || !defaultLanguageCode) {
+  throw new Error("[person-profile] lang and defaultLanguageCode are required.");
+}
+
+const rawParagraphs = bio.split(/\n\n|\n/).filter((s) => s.trim());
+const bioParagraphs = rawParagraphs.map((p) => (animateNumbers ? wrapInlineNumbers(p) : null));
+const imageCredit = image
+  ? creditByTarget(
+      contentAssetCredits,
+      { kind: "image", id: image, domain: "business" },
+      activeLang,
+      defaultLanguageCode,
+    )
+  : null;
+---
+
+<div class="person-profile">
+  {
+    image && (
+      <div class="person-profile__image-wrapper">
+        <SectionImage
+          imageName={image}
+          alt={name}
+          fit="cover"
+          quality="max"
+          loading="lazy"
+          fade={imageFade}
+          live={live}
+          lang={activeLang}
+          defaultLanguageCode={defaultLanguageCode}
+          credit={imageCredit}
+          class="person-profile__image"
+          sizes="(max-width: 600px) 240px, (max-width: 900px) 200px, 240px"
+        />
+      </div>
+    )
+  }
+  <div class="person-profile__content">
+    <h3 class="person-profile__name">{name}</h3>
+    {role && !hideRole && <p class="person-profile__role">{role}</p>}
+    <div class="person-profile__bio">
+      {bioParagraphs.map((html, i) => (html ? <p set:html={html} /> : <p>{rawParagraphs[i]}</p>))}
+    </div>
+  </div>
+  <div class="person-profile__clear"></div>
+</div>

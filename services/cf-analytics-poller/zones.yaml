@@ -1,0 +1,12 @@
+- siteId: webgogol-com
+  zoneId: REPLACE_WITH_CLOUDFLARE_ZONE_ID
+  workerScripts:
+    - webgogol-com
+- siteId: nicaragua-projekt
+  zoneId: REPLACE_WITH_CLOUDFLARE_ZONE_ID
+  workerScripts:
+    - nicaragua-projekt
+- siteId: check-webgogol-com
+  zoneId: REPLACE_WITH_CLOUDFLARE_ZONE_ID
+  workerScripts:
+    - check-webgogol-com

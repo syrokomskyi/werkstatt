@@ -1,0 +1,228 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Implements donation card component for displaying bank account details with modern UI, copy functionality, and QR code generation.</purpose>
+<non-goals>
+  <item>Do not handle payment processing or transaction logic.</item>
+  <item>Do not store user data or payment information.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Add dynamic QR code generation at build time.</item>
+  <item>Add collapsible dropdown for legacy account details.</item>
+  <item>Add trust indicators from business layer.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { DonationCardComponentContent } from "./donation-card-component.types.generated.ts";
+import { loadVendorIcon } from "../../icons/icon-resolver.ts";
+import QRCode from "qrcode";
+import "./donation-card-component.css";
+
+const CopyHoverIcon = await loadVendorIcon({
+  vendor: "lordicon",
+  collection: "system-regular",
+  name: "CopyHover",
+});
+
+interface Props {
+  lang?: string;
+  content: DonationCardComponentContent;
+  companyName: string;
+  bankName: string;
+  iban: string;
+  bic: string;
+  konto?: string;
+  blz?: string;
+  trustIndicators?: string[];
+}
+
+const {
+  lang,
+  content: contentOverride,
+  companyName,
+  bankName,
+  iban,
+  bic,
+  konto,
+  blz,
+  trustIndicators,
+} = Astro.props as Props;
+
+if (!lang) {
+  throw new Error("[donation-card] lang is required.");
+}
+
+const content = contentOverride;
+
+// Generate QR code data URL at build time for SEPA transfer
+const sepaData = `BCD\n001\n1\nSCT\n${bic}\n${companyName}\n${iban}\nEUR00.00`;
+const qrCodeDataUrl = await QRCode.toDataURL(sepaData, {
+  width: 256,
+  margin: 2,
+  color: {
+    dark: "#000000",
+    light: "#FFFFFF",
+  },
+});
+
+// Check if legacy account details exist
+const hasLegacyDetails = konto != null && blz != null;
+const hasTrustIndicators = trustIndicators != null && trustIndicators.length > 0;
+
+// Format IBAN with spaces for readability
+const formatIban = (ibanStr: string) => {
+  return ibanStr.replace(/(.{4})/g, "$1 ").trim();
+};
+
+const formattedIban = formatIban(iban);
+---
+
+<div class="donation-card" data-component="donation-card">
+  <h2 class="donation-card__title">{content.title}</h2>
+
+  <div class="donation-card__organization">{companyName}</div>
+
+  <!-- IBAN Section -->
+  <div class="donation-card__field donation-card__field--iban">
+    <div class="donation-card__label">{content.ibanLabel}</div>
+    <div class="donation-card__iban-wrapper">
+      <code class="donation-card__iban">{formattedIban}</code>
+      <button
+        class="donation-card__copy-btn"
+        aria-label={content.copyButtonLabel}
+        title={content.copyButtonLabel}
+        data-copy-value={iban}
+      >
+        <CopyHoverIcon size={20} trigger="click" />
+        <span class="donation-card__copy-label">{content.copyButtonLabel}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BIC and Bank Grid -->
+  <div class="donation-card__grid">
+    <div class="donation-card__field">
+      <div class="donation-card__label">{content.bicLabel}</div>
+      <div class="donation-card__value-wrapper">
+        <code class="donation-card__value">{bic}</code>
+        <button
+          class="donation-card__copy-btn donation-card__copy-btn--small"
+          aria-label={content.copyButtonLabel}
+          title={content.copyButtonLabel}
+          data-copy-value={bic}
+        >
+          <CopyHoverIcon size={16} trigger="click" />
+        </button>
+      </div>
+    </div>
+
+    <div class="donation-card__field">
+      <div class="donation-card__label">{content.bankLabel}</div>
+      <div class="donation-card__value">{bankName}</div>
+    </div>
+  </div>
+
+  <!-- Trust Indicators -->
+  {
+    hasTrustIndicators && (
+      <div class="donation-card__trust">
+        {trustIndicators?.map((indicator) => (
+          <div class="donation-card__trust-item">
+            <svg
+              width={16}
+              height={16}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span>{indicator}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  <!-- Action Buttons -->
+  <div class="donation-card__actions">
+    <button
+      class="donation-card__qr-btn"
+      data-qr-modal-trigger
+      aria-label={content.qrCodeButtonLabel}
+    >
+      <svg
+        width={20}
+        height={20}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <path d="M3 14h7v7H3z"></path>
+      </svg>
+      <span>{content.qrCodeButtonLabel}</span>
+    </button>
+
+    <a href="#spendenhinweise" class="donation-card__info-link">
+      {content.donationInfoLinkLabel}
+    </a>
+  </div>
+
+  <!-- Legacy Details Dropdown -->
+  {
+    hasLegacyDetails && (
+      <details class="donation-card__legacy">
+        <summary class="donation-card__legacy-toggle">{content.oldDetailsButtonLabel}</summary>
+        <div class="donation-card__legacy-content">
+          <div class="donation-card__field">
+            <div class="donation-card__label">{content.kontoLabel}</div>
+            <div class="donation-card__value">{konto}</div>
+          </div>
+          <div class="donation-card__field">
+            <div class="donation-card__label">{content.blzLabel}</div>
+            <div class="donation-card__value">{blz}</div>
+          </div>
+        </div>
+      </details>
+    )
+  }
+</div>
+
+<!-- QR Code Modal -->
+<div class="donation-card__modal" data-qr-modal hidden>
+  <div class="donation-card__modal-overlay" data-qr-modal-close></div>
+  <div class="donation-card__modal-content">
+    <div class="donation-card__modal-header">
+      <h3>{content.qrCodeModalTitle}</h3>
+      <button
+        class="donation-card__modal-close"
+        aria-label={content.qrCodeModalCloseLabel}
+        data-qr-modal-close
+      >
+        {content.modalCloseIcon}
+      </button>
+    </div>
+    <div class="donation-card__modal-body">
+      <img
+        src={qrCodeDataUrl}
+        alt={content.qrCodeAltText}
+        class="donation-card__qr-image"
+        width="256"
+        height="256"
+      />
+      <p class="donation-card__qr-instruction">
+        {content.qrInstruction}
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import "./donation-card-component.client";
+</script>

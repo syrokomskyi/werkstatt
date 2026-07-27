@@ -1,0 +1,58 @@
+name: Scaffold smoke test
+
+# [RFC-0030 Phase C] CI smoke test for onboarding.scaffold.
+# Runs on every PR that touches the scaffold, checks, or the reference app.
+# Generates a throwaway app → rotates key → runs app.contract.full → asserts exit 0 → cleans up.
+# This is the load-bearing acceptance signal for RFC-0029 and RFC-0030 jointly (DNA-35 / DNA-36).
+
+on:
+  pull_request:
+    paths:
+      - "packages/os/site-kernel-onboarding/**"
+      - "packages/os/site-kernel-checks/**"
+      - "apps/nicaragua-projekt/**"
+  workflow_dispatch:
+
+jobs:
+  scaffold-smoke:
+    runs-on: ubuntu-latest
+    name: Scaffold smoke test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run onboarding.scaffold (throwaway client)
+        run: |
+          node packages/os/site-kernel/bin/site-kernel.mjs run onboarding.scaffold \
+            --client __scaffold-test__ \
+            --domain test.example.de \
+            --biome nonprofit-trust \
+            --constellation nonprofit-donation-funnel
+        # The private key is printed to stdout but not captured — smoke test
+        # only verifies that app.contract.full passes, not that signing works.
+
+      - name: Build prepare for scaffolded app
+        run: pnpm --filter __scaffold-test__ build.prepare
+
+      - name: Run app.contract.full on scaffolded app
+        run: |
+          node packages/os/site-kernel/bin/site-kernel.mjs run app.contract.full \
+            --app __scaffold-test__
+        # Exit code propagated by kernel — 0 = all validators pass, 1 = at least one failed.
+
+      - name: Cleanup scaffolded app
+        if: always()
+        run: rm -rf apps/__scaffold-test__

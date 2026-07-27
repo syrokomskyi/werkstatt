@@ -1,0 +1,14 @@
+id: section-image-component
+uniName: section-image-component
+layer: component
+semanticId: section-image
+archetype: section-image
+cosmicName: Taygete
+role: section-image
+version: 1.0.0
+intent:
+  - render-section-image
+  - apply-image-fade-masks
+  - bridge-gsap-parallax
+industryFit: []
+contentSchemaKey: null

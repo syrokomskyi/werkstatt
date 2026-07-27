@@ -1,0 +1,98 @@
+{
+  "name": "@gogol/site-kernel-checks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./audit/types": {
+      "types": "./src/audit/types.ts",
+      "default": "./src/audit/types.ts"
+    },
+    "./ecosystem": {
+      "types": "./src/ecosystem.ts",
+      "default": "./src/ecosystem.ts"
+    },
+    "./lib/astro-site-url": {
+      "types": "./src/lib/astro-site-url.ts",
+      "default": "./src/lib/astro-site-url.ts"
+    },
+    "./lib/i18n": {
+      "types": "./src/lib/i18n.ts",
+      "default": "./src/lib/i18n.ts"
+    },
+    "./maintenance-debt-queue": {
+      "types": "./src/maintenance-debt-queue.ts",
+      "default": "./src/maintenance-debt-queue.ts"
+    },
+    "./module": {
+      "types": "./src/module.ts",
+      "default": "./src/module.ts"
+    },
+    "./pipelines/packages-check": {
+      "types": "./src/pipelines/packages-check.ts",
+      "default": "./src/pipelines/packages-check.ts"
+    },
+    "./pipelines": {
+      "types": "./src/pipelines/index.ts",
+      "default": "./src/pipelines/index.ts"
+    },
+    "./result-helpers": {
+      "types": "./src/result-helpers.ts",
+      "default": "./src/result-helpers.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.16",
+    "@ai-sdk/openai": "^4.0.16",
+    "@astrojs/compiler": "^4.0.0",
+    "@gogol/agent-gate": "workspace:*",
+    "@gogol/chat": "workspace:*",
+    "@gogol/check-core": "workspace:*",
+    "@gogol/check-runner-node": "workspace:*",
+    "@gogol/content-source": "workspace:*",
+    "@gogol/fingerprint": "workspace:*",
+    "@gogol/geo": "workspace:*",
+    "@gogol/growth": "workspace:*",
+    "@gogol/integration": "workspace:*",
+    "@gogol/nebula": "workspace:*",
+    "@gogol/ontology": "workspace:*",
+    "@gogol/passport": "workspace:*",
+    "@gogol/pbp": "workspace:*",
+    "@gogol/share": "workspace:*",
+    "@gogol/site-kernel": "workspace:*",
+    "@gogol/site-kernel-astro": "workspace:*",
+    "@gogol/site-kernel-audit": "workspace:*",
+    "@gogol/site-kernel-check-webgogol": "workspace:*",
+    "@gogol/site-kernel-codegen": "workspace:*",
+    "@gogol/site-kernel-content": "workspace:*",
+    "@gogol/site-kernel-integrity": "workspace:*",
+    "@gogol/star-map": "workspace:*",
+    "@gogol/surface": "workspace:*",
+    "@gogol/tokens": "workspace:*",
+    "ai": "^7.0.32",
+    "file-type": "^22.0.1",
+    "picomatch": "^4.0.5",
+    "playwright": "^1.61.1",
+    "sharp": "^0.35.3",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/picomatch": "^4.0.3",
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  }
+}

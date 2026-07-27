@@ -1,0 +1,40 @@
+// GENERATED. Do not change this line unless the file contains project specific changes.
+{
+  // Cloudflare Workers deployment config for {{CLIENT_ID}}
+  // RFC-0149 / DNA-1 (SSG static assets + on-demand routes on a single Worker)
+  "name": "{{CLIENT_ID}}",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+  // [RFC-0149] Workers static-assets form. The @astrojs/cloudflare adapter emits the
+  // server entrypoint; static files are served from the ASSETS binding. Do NOT add
+  // pages_build_output_dir — that is the legacy Pages form (superseded).
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "placement": {
+    "mode": "smart"
+  },
+  "upload_source_maps": true,
+  // [RFC-0181] Cloudflare Email Routing send binding — the delivery callback emails
+  // lead notifications. Requires Email Routing enabled on the zone + a verified sender
+  // (INTEGRATION_EMAIL_FROM) and destination (INTEGRATION_EMAIL_TO). No Cloudflare KV/
+  // Queues bindings (forbidden — not EU-pinnable; delivery is Upstash QStash/Redis EU).
+  "send_email": [{ "name": "SEND_EMAIL" }],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0,
+    "traces": {
+      "enabled": true,
+      "destinations": ["signoz"],
+      "head_sampling_rate": 1.0
+    },
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1.0,
+      "persist": true,
+      "invocation_logs": true
+    }
+  }
+}

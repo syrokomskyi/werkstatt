@@ -1,0 +1,61 @@
+schema: forge/config@1
+project:
+  name: webgogol
+  stack:
+    - typescript
+    - astro
+    - turborepo
+  packageManager: pnpm
+paths:
+  rfcsDir: docs/rfcs
+  adrsDir: docs/adrs
+  plansDir: docs/plans
+  auditsDir: docs/audits
+  specsDir: docs/specs
+  skillsDir: .agents/skills
+  sessionsDir: docs/sessions
+bindings:
+  schema: forge/bindings@1
+  commands:
+    validateRfc: pnpm exec site-kernel run rfc.validate {id} --json
+    validateAdr: pnpm exec site-kernel run adr.validate {id} --json
+    implementStamp: pnpm exec site-kernel run rfc.implement.stamp --id {id}
+      --implementation-commit {commit}
+    typecheck: pnpm --filter {workspace} run build:check
+    test: pnpm --filter {workspace} run test
+    scopedBuild: pnpm --filter {workspace} run build
+    specValidate: pnpm exec site-kernel run spec.validate --spec={id} --json
+  paths:
+    invariantsFile: docs/architecture-dna.md
+    compassDocs:
+      - docs/requirements.xml
+      - docs/technology.xml
+      - docs/development-plan.xml
+      - docs/knowledge-graph.xml
+      - docs/verification-plan.xml
+      - docs/source-markup.xml
+      - docs/styling.xml
+    reviewsDir: docs/reviews
+    handoffsDir: docs/handoffs
+    sessionsDir: docs/sessions
+  terminology:
+    invariants: DNA
+    compass: Compass XML
+  compass:
+    fileExtensions:
+      - .ts
+      - .tsx
+      - .astro
+      - .js
+      - .mjs
+      - .css
+    testPatterns:
+      - "*.test.ts"
+      - "*.spec.ts"
+      - "**/tests/**"
+      - "**/test/**"
+skillPacks:
+  - prefix: wg
+    dir: packages/wgogol-skills/skills
+forge:
+  syncedVersion: 0.1.3

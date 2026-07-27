@@ -1,0 +1,63 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Defines the structure and rendering logic for a trust strip section, emphasizing a list of trust signals.</purpose>
+<non-goals>
+  <item>Do not handle user interaction state management.</item>
+  <item>Do not perform data fetching or parsing beyond the provided props.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Added Compass scaffolding to improve code clarity and facilitate future modifications.</item>
+  <item>Pass surface prop from body to SectionList for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: trust-strip thin dispatcher — optional header + list body. */
+
+import type { SectionProps } from "@gogol/share/page";
+import { cast, need } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionList from "@gogol/ui/components/section-body/list/section-list.astro";
+import type { TrustStripSectionContent } from "./trust-strip-section.types.generated.ts";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const props = cast<TrustStripSectionContent>(pageOverride);
+const body = need("body", props.body);
+const headerId = props.header?.heading ? "trust-strip-title" : undefined;
+---
+
+<SectionShell
+  slug="trust-strip"
+  ariaLabel={headerId ? undefined : "Vertrauenssignale"}
+  ariaLabelledBy={headerId}
+  background={props.background}
+  effects={props.effects}
+  density={props.density ?? "compact"}
+  tone={props.tone}
+  lang={lang}
+>
+  {
+    props.header?.heading && (
+      <SectionHeader
+        sectionNumber={sectionNumber}
+        heading={props.header.heading}
+        subheading={props.header.subheading}
+        align={props.header.align ?? "center"}
+        level={props.header.level ?? 2}
+        hideSectionNumber={props.header.hideSectionNumber}
+        id={headerId}
+      />
+    )
+  }
+  <SectionList
+    items={body.items}
+    note={body.note}
+    iconColor={body.iconColor}
+    align={body.align ?? "center"}
+    itemAlign={body.itemAlign}
+    hideMarkers={body.hideMarkers}
+    effects={body.effects}
+  />
+</SectionShell>

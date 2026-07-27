@@ -1,0 +1,58 @@
+name: Deploy {{CLIENT_ID}}
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/{{CLIENT_ID}}/**"
+      - "packages/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/{{CLIENT_ID}}/**"
+      - "packages/**"
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    name: Build & Deploy {{CLIENT_ID}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build prepare (icons, biome CSS, registry)
+        run: pnpm --filter {{CLIENT_ID}} build.prepare
+
+      - name: Contract full check
+        run: node packages/os/site-kernel/bin/site-kernel.mjs run app.contract.full --site {{CLIENT_ID}}
+        env:
+          PASSPORT_SIGNING_KEY: ${{ secrets.PASSPORT_SIGNING_KEY }}
+
+      - name: Build
+        run: pnpm --filter {{CLIENT_ID}} build
+        env:
+          PASSPORT_SIGNING_KEY: ${{ secrets.PASSPORT_SIGNING_KEY }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name={{CLIENT_ID}}
+          workingDirectory: apps/{{CLIENT_ID}}

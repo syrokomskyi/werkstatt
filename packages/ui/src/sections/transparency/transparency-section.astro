@@ -1,0 +1,69 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of a transparency section with a header, list, and optional report link.</purpose>
+<non-goals>
+  <item>Do not handle data fetching or state management for content.</item>
+  <item>Do not parse raw content or manage content validation here.</item>
+  <item>Do not implement navigation or routing logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Pass surface prop from body to SectionList for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: transparency thin dispatcher — list body + optional report link. */
+
+import type { SectionProps } from "@gogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionList from "@gogol/ui/components/section-body/list/section-list.astro";
+import type { TransparencySectionContent } from "./transparency-section.types.generated.ts";
+import "./transparency-section.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "transparency");
+const props = cast<TransparencySectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="transparency"
+  sectionId={sectionId}
+  ariaLabelledBy="transparency-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="transparency-title"
+  />
+  <SectionList
+    items={body.items}
+    note={body.note}
+    iconColor={body.iconColor ?? "accent"}
+    align={body.align}
+    itemAlign={body.itemAlign}
+    hideMarkers={body.hideMarkers}
+    effects={body.effects}
+  />
+  {
+    props.reportLinkLabel && props.reportLinkHref && (
+      <p class="transparency-section__link-wrap">
+        <a href={props.reportLinkHref} class="transparency-section__link">
+          {props.reportLinkLabel}
+        </a>
+      </p>
+    )
+  }
+</SectionShell>

@@ -1,0 +1,14 @@
+family: check-quality-operator
+version: 1.0.0
+voice:
+  tone: technical
+  posture: operator-led
+  readingLevel: professional-b2b
+  avoids:
+    - hype
+    - vanity metrics
+    - manipulative scarcity
+  prefers:
+    - concrete evidence
+    - operational clarity
+    - actionable reports

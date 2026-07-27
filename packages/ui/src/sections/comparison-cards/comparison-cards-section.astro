@@ -1,0 +1,56 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of a comparison cards section within a UI layout.</purpose>
+<non-goals>
+  <item>Do not handle data fetching or state management for comparison content.</item>
+  <item>Do not perform validation of props beyond basic type casting.</item>
+  <item>Do not manage global application state or routing logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Pass surface prop from body to SectionComparison for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: comparison-cards thin dispatcher — comparison body. */
+
+import type { SectionProps } from "@gogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionComparison from "@gogol/ui/components/section-body/comparison.astro";
+import type { ComparisonCardsSectionContent } from "./comparison-cards-section.types.generated.ts";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "comparison-cards");
+const props = cast<ComparisonCardsSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="comparison-cards"
+  sectionId={sectionId}
+  ariaLabelledBy="comparison-cards-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="comparison-cards-title"
+  />
+  <SectionComparison
+    rows={body.rows}
+    labels={body.labels}
+    align={body.align}
+    effects={body.effects}
+  />
+</SectionShell>

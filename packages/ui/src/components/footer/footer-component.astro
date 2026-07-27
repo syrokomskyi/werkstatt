@@ -1,0 +1,427 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Implements universal footer component per RFC-0013 with brand customization support.</purpose>
+<non-goals>
+  <item>Do not handle global state management or application-wide configurations.</item>
+  <item>Do not perform data fetching outside of the footer content context.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Implement RFC-0013: Universal footer component with brand customization.</item>
+  <item>Add three-column navigation structure.</item>
+  <item>Add customizable contact information with email copy.</item>
+  <item>Add QR code and globe icon for brand status link.</item>
+  <item>RFC-0507: Add optional Transparenz nav group for transparency-related links (Barrierefreiheit, Open Source, Bildnachweise).</item>
+</CHANGE_SUMMARY>
+*/
+
+import ResponsiveImage from "@gogol/ui/components/responsive-image.astro";
+import {
+  getResolvedComponentContent,
+  getRouteRegistry,
+  getSiteLabelsData,
+  readAttributionPolicy,
+  resolveImage,
+  resolveSemanticTarget,
+} from "@gogol/share";
+import { getFeaturePolicyResolver } from "@gogol/share/astro/feature-policy";
+import type { FooterComponentContent } from "@gogol/ui/components/footer/types";
+import type { CopyrightComponentContent } from "@gogol/ui/components/copyright/types";
+import Copyright from "@gogol/ui/components/copyright";
+import BrandLabel from "@gogol/ui/components/brand-label";
+import FooterPromo from "@gogol/ui/components/footer-promo";
+import { loadVendorIcon } from "../../icons/icon-resolver.ts";
+import { contentAssetImages } from "../../content-assets.ts";
+
+const CopyHoverIcon = await loadVendorIcon({
+  vendor: "lordicon",
+  collection: "system-regular",
+  name: "CopyHover",
+});
+const GlobeHoverIcon = await loadVendorIcon({
+  vendor: "lordicon",
+  collection: "doodle-outline",
+  name: "GlobeHover",
+});
+import "./footer-component.css";
+
+interface Props {
+  lang?: string;
+  defaultLang?: string;
+  pageOverride?: Partial<FooterComponentContent>;
+}
+
+interface FooterLink {
+  label: string;
+  href?: string;
+  external?: boolean;
+  featureFlag?: string;
+  semanticTarget?: {
+    kind: "internal" | "external";
+    pageId?: string;
+    anchor?: string;
+    href?: string;
+  };
+}
+
+const { lang, defaultLang: defaultLangProp, pageOverride } = Astro.props as Props;
+const defaultLang = defaultLangProp ?? (await getRouteRegistry()).defaultLanguage;
+const activeLang = lang ?? defaultLang;
+
+const resolver = await getFeaturePolicyResolver(activeLang, defaultLang);
+const footerVisible = resolver.isEnabled({
+  kind: "component",
+  componentId: "footer",
+  lang: activeLang,
+});
+const navigationVisible = resolver.isEnabled({
+  kind: "item",
+  componentId: "footer",
+  itemId: "navigation",
+  lang: activeLang,
+});
+const contactVisible = resolver.isEnabled({
+  kind: "item",
+  componentId: "footer",
+  itemId: "contact",
+  lang: activeLang,
+});
+const qrCodeVisible = resolver.isEnabled({
+  kind: "item",
+  componentId: "footer",
+  itemId: "qrCode",
+  lang: activeLang,
+});
+const copyrightFeatureEnabled = resolver.isEnabled({
+  kind: "item",
+  componentId: "footer",
+  itemId: "copyright",
+  lang: activeLang,
+});
+// RFC-0231: the footer site-copyright line also honors the attribution visibility
+// policy (default shown). Both the feature policy and the attribution policy must allow it.
+const attributionPolicy = readAttributionPolicy(await getSiteLabelsData(activeLang, defaultLang));
+const copyrightVisible =
+  copyrightFeatureEnabled && (attributionPolicy.footerCopyright ?? "shown") === "shown";
+
+const content = await getResolvedComponentContent<FooterComponentContent>({
+  componentPath: "footer",
+  languageCode: activeLang,
+  defaultLanguageCode: defaultLang,
+  pageOverride,
+});
+
+// Helper to resolve footer links using semantic targets
+async function resolveFooterLink(link: FooterLink): Promise<FooterLink | null> {
+  if (link.semanticTarget) {
+    const target = link.semanticTarget as any;
+    let resolvedHref = await resolveSemanticTarget(target, activeLang);
+    if (!resolvedHref && defaultLang !== activeLang) {
+      resolvedHref = await resolveSemanticTarget(target, defaultLang);
+    }
+    if (!resolvedHref) {
+      console.warn(
+        `[footer-component] Failed to resolve semantic target: ${JSON.stringify(target)} (lang: ${activeLang}, defaultLang: ${defaultLang})`,
+      );
+      return null;
+    }
+    return { ...link, href: resolvedHref };
+  }
+  return link;
+}
+
+const hasEmail = content.contact.email != null && content.contact.email !== "";
+
+function resolveFooterHref(link: any): string {
+  if (link.href) {
+    return link.href;
+  }
+  return "#";
+}
+
+// Photo positioning
+const photoPosition = content.photo?.position ?? "before";
+const hasPhoto = content.photo != null;
+const photoClass = photoPosition === "behind" ? "footer--ds-photo-behind" : "";
+
+// Resolve navigation and legal links through semantic target resolution
+const navigationLinks = (
+  await Promise.all(content.navigationLinks.map((link) => resolveFooterLink(link)))
+).filter((link): link is FooterLink => link !== null);
+
+const legalLinks = (
+  await Promise.all(content.legalLinks.map((link) => resolveFooterLink(link)))
+).filter((link): link is FooterLink => link !== null);
+
+const transparencyLinks = (
+  await Promise.all((content.transparencyLinks ?? []).map((link) => resolveFooterLink(link)))
+).filter((link): link is FooterLink => link !== null);
+
+// Copyright content from copyright.md
+const copyrightContent = await getResolvedComponentContent<CopyrightComponentContent>({
+  componentPath: "copyright",
+  languageCode: activeLang,
+  defaultLanguageCode: defaultLang,
+});
+
+const hasQrCode = false; // QR code asset not provided — feature disabled
+
+// [RFC-0053][RFC-0141] Resolve footer background image from the shared content-asset map.
+const footerImages = contentAssetImages;
+const backgroundImageMeta = content.backgroundImage
+  ? resolveImage(footerImages, content.backgroundImage, { lang: activeLang })
+  : undefined;
+---
+
+{
+  footerVisible && (
+    <>
+      {hasPhoto && photoPosition === "before" && (
+        <div class="footer__photo-wrapper footer__photo-wrapper--before" aria-hidden="true">
+          <ResponsiveImage
+            image={content.photo!}
+            alt={content.photo!.alt}
+            class="footer__photo-image"
+            loading="lazy"
+            lang={activeLang}
+          />
+        </div>
+      )}
+
+      <footer
+        class:list={[
+          "footer",
+          hasPhoto && "footer--ds-with-photo",
+          photoClass,
+          { "footer--textured": content.texture },
+          { "footer--bg-image": !!backgroundImageMeta },
+        ]}
+        data-volume="surface"
+        data-volume-apply="filter"
+        id="kontakt"
+      >
+        {backgroundImageMeta && (
+          <div class="footer__bg-image" aria-hidden="true">
+            <ResponsiveImage
+              image={backgroundImageMeta}
+              alt=""
+              class="footer__bg-image-img"
+              loading="lazy"
+              lang={activeLang}
+            />
+          </div>
+        )}
+
+        {hasPhoto && photoPosition === "behind" && (
+          <div class="footer__photo-wrapper footer__photo-wrapper--behind" aria-hidden="true">
+            <ResponsiveImage
+              image={content.photo!}
+              alt={content.photo!.alt}
+              class="footer__photo-image"
+              loading="lazy"
+              lang={activeLang}
+            />
+          </div>
+        )}
+
+        <slot>
+          <FooterPromo lang={activeLang} defaultLanguageCode={defaultLang} />
+        </slot>
+
+        <div class="footer__container">
+          <div class="footer__main">
+            <div class="footer__brand">
+              <div class="footer__brand-label">
+                <span class="footer__logo-text">
+                  <BrandLabel lang={activeLang} defaultLanguageCode={defaultLang} />
+                  {content.pulseUrl && (
+                    <a
+                      href={content.pulseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="footer__logo-icon"
+                      title={content.statusLinkTitleSuffix}
+                      aria-label={content.statusLinkAriaLabelSuffix}
+                    >
+                      <GlobeHoverIcon
+                        size={22}
+                        loading="eager"
+                        aria-label={content.statusIconAriaLabel}
+                      />
+                    </a>
+                  )}
+                </span>
+              </div>
+              {content.taglineLines && (
+                <p class="footer__tagline">
+                  {content.taglineLines[0]}
+                  <br />
+                  {content.taglineLines[1]}
+                  <br />
+                  {content.taglineLines[2]}
+                </p>
+              )}
+              {/* QR code disabled — provide qr-code.webp in site assets to enable */}
+            </div>
+
+            {navigationVisible && (
+              <nav class="footer__nav" aria-label={content.navAriaLabel}>
+                <div class="footer__nav-group">
+                  <div class="footer__nav-title">{content.navGroups.navigationTitle}</div>
+                  <ul role="list">
+                    {navigationLinks.map((link) => (
+                      <li>
+                        <a
+                          href={resolveFooterHref(link)}
+                          target={link.external ? "_blank" : undefined}
+                          rel={link.external ? "noopener noreferrer" : undefined}
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div class="footer__nav-group">
+                  <div class="footer__nav-title">{content.navGroups.legalTitle}</div>
+                  <ul role="list">
+                    {legalLinks.map((link) => (
+                      <li>
+                        <a href={resolveFooterHref(link)}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {transparencyLinks.length > 0 && (
+                  <div class="footer__nav-group">
+                    <div class="footer__nav-title">{content.navGroups.transparencyTitle}</div>
+                    <ul role="list">
+                      {transparencyLinks.map((link) => (
+                        <li>
+                          <a href={resolveFooterHref(link)}>{link.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {contactVisible && (
+                  <div class="footer__nav-group">
+                    <div class="footer__nav-title">{content.navGroups.contactTitle}</div>
+                    <ul role="list">
+                      {(content.contactIds ?? ["email", "city", "region", "country"]).map((id) => {
+                        if (id === "email" && hasEmail) {
+                          return (
+                            <li class="footer__contact-item">
+                              <span class="footer__email">{content.contact.email}</span>
+                              <button
+                                class="footer__copy-btn"
+                                aria-label={content.copyEmailAriaLabel}
+                                title={content.copyEmailTitle}
+                                data-copy-value={content.contact.email}
+                              >
+                                <CopyHoverIcon size={20} trigger="click" />
+                              </button>
+                            </li>
+                          );
+                        }
+                        if (id === "city" && content.contact.city) {
+                          return (
+                            <li>
+                              {content.contact.city.url ? (
+                                <a href={content.contact.city.url} target="_blank" rel="noopener">
+                                  {content.contact.city.postalCode && (
+                                    <span>{content.contact.city.postalCode}&nbsp;</span>
+                                  )}
+                                  {content.contact.city.name}
+                                </a>
+                              ) : (
+                                <span>
+                                  {content.contact.city.postalCode && (
+                                    <span>{content.contact.city.postalCode}&nbsp;</span>
+                                  )}
+                                  {content.contact.city.name}
+                                </span>
+                              )}
+                            </li>
+                          );
+                        }
+                        if (id === "region" && content.contact.region) {
+                          return (
+                            <li>
+                              {content.contact.region.url ? (
+                                <a href={content.contact.region.url} target="_blank" rel="noopener">
+                                  {content.contact.region.name}
+                                </a>
+                              ) : (
+                                <span>{content.contact.region.name}</span>
+                              )}
+                            </li>
+                          );
+                        }
+                        if (id === "country" && content.contact.country) {
+                          return (
+                            <li>
+                              {content.contact.country.url ? (
+                                <a
+                                  href={content.contact.country.url}
+                                  target="_blank"
+                                  rel="noopener"
+                                >
+                                  {content.contact.country.name}
+                                </a>
+                              ) : (
+                                <span>{content.contact.country.name}</span>
+                              )}
+                            </li>
+                          );
+                        }
+                        console.warn(
+                          `[footer-component] Unknown contactId: "${id}". Expected one of: email, city, region, country.`,
+                        );
+                        return null;
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </nav>
+            )}
+          </div>
+
+          {copyrightVisible && (
+            <div class="footer__bottom">
+              <Copyright copyright={copyrightContent.copyright} />
+              <p class="footer__motto">{content.motto}</p>
+            </div>
+          )}
+        </div>
+      </footer>
+    </>
+  )
+}
+
+<script>
+  const copyButtons = document.querySelectorAll<HTMLButtonElement>(".footer__copy-btn");
+
+  copyButtons.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const value = btn.getAttribute("data-copy-value");
+      if (value) {
+        try {
+          await navigator.clipboard.writeText(value);
+
+          // Manually trigger animation to ensure it plays even if clicking button padding
+          const icon = btn.querySelector("lord-icon");
+          if (icon && "play" in icon && typeof (icon as any).play === "function") {
+            (icon as any).play();
+          }
+        } catch (err) {
+          console.error("[clipboard-copy-failure]", err);
+        }
+      }
+    });
+  });
+</script>

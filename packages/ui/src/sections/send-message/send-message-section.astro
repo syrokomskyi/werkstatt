@@ -1,0 +1,217 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Render a send-message section with structured email/phone fields and client-side validation and runtime channel submission.</purpose>
+<non-goals>
+  <item>Do not perform server-side transport logic in the section itself.</item>
+  <item>Do not store submitted visitor messages in the browser.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Introduce a new shared send-message section with one-field lead capture UX and extensible channel badges.</item>
+  <item>RFC-0514: add structured emailField (required) and phoneField (optional) inputs; remove contactRequirementMessage.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { getEntry } from "astro:content";
+import type { SectionProps } from "@gogol/share/page";
+import { cast, need, resolveSectionAnchor, getSiteSectionLabels } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import type { SendMessageSectionContent } from "./send-message-section.types.generated.ts";
+import "./send-message-section.css";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "send-message");
+const props = cast<SendMessageSectionContent>(pageOverride);
+const formId = props.formId ?? "send-message";
+const endpoint = props.endpoint ?? "/api/send-message";
+const bodyAlign = props.body?.align ?? "center";
+
+const siteLabels = await getSiteSectionLabels<Record<string, unknown>>(
+  lang,
+  Astro.props.defaultLanguageCode,
+  "sendMessage",
+);
+
+function resolveLabel(key: string, fallback: string): string {
+  const propValue = (props as any)[key];
+  if (typeof propValue === "string" && propValue.length > 0) return propValue;
+  const siteValue = siteLabels?.[key];
+  if (typeof siteValue === "string" && siteValue.length > 0) return siteValue;
+  return fallback;
+}
+
+const businessContactEntry =
+  (await getEntry("business-profile", `${lang}/contact/general-email`)) ??
+  (await getEntry("business-profile", "de/contact/general-email"));
+const businessEmail = (businessContactEntry?.data as { value?: string } | undefined)?.value;
+const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
+---
+
+<SectionShell
+  slug="send-message"
+  sectionId={sectionId}
+  ariaLabelledBy="send-message-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <div class="send-message" data-send-message-root>
+    <SectionHeader
+      sectionNumber={sectionNumber}
+      heading={need("header.heading", props.header?.heading)}
+      subheading={props.header?.subheading}
+      align={props.header?.align ?? "center"}
+      level={props.header?.level ?? 2}
+      hideSectionNumber={props.header?.hideSectionNumber}
+      id="send-message-title"
+    />
+
+    {
+      props.body?.paragraphs && props.body.paragraphs.length > 0 && (
+        <div class={`send-message__body send-message__body--${bodyAlign}`}>
+          <div class="send-message__paragraphs">
+            {props.body.paragraphs.map((paragraph) => (
+              <p class="send-message__paragraph">{paragraph}</p>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    <form
+      class="send-message__form"
+      data-send-message-form
+      autocomplete="off"
+      data-endpoint={endpoint}
+      data-form-id={formId}
+      data-locale={lang}
+      data-empty-message={resolveLabel("emptyMessage", "")}
+      data-sending-label={resolveLabel("sendingLabel", "")}
+      data-success-message={resolveLabel("successMessage", "")}
+      data-error-message={resolveLabel("errorMessage", "")}
+      data-min-message-length={String(props.minMessageLength ?? 12)}
+      data-fallback-email={fallbackEmail}
+      data-fallback-email-label={resolveLabel("fallbackEmailLabel", "")}
+      data-fallback-body-label={resolveLabel("fallbackBodyLabel", "")}
+      data-copy-message-label={resolveLabel("copyMessageLabel", "")}
+      data-email-field-enabled={String(props.emailField?.enabled ?? false)}
+      data-email-field-required={String(props.emailField?.required ?? false)}
+      data-email-field-label={resolveLabel("emailFieldLabel", "")}
+      data-email-field-placeholder={resolveLabel("emailFieldPlaceholder", "")}
+      data-phone-field-enabled={String(props.phoneField?.enabled ?? false)}
+      data-phone-field-required={String(props.phoneField?.required ?? false)}
+      data-phone-field-label={resolveLabel("phoneFieldLabel", "")}
+      data-phone-field-placeholder={resolveLabel("phoneFieldPlaceholder", "")}
+    >
+      {
+        props.emailField?.enabled && (
+          <label class="send-message__field send-message__field--email">
+            <input
+              class="send-message__input"
+              type="email"
+              name="email"
+              autocomplete="email"
+              data-send-message-email
+              placeholder={resolveLabel("emailFieldPlaceholder", "")}
+              required={props.emailField.required}
+              aria-label={resolveLabel("emailFieldLabel", "")}
+            />
+          </label>
+        )
+      }
+
+      {
+        props.phoneField?.enabled && (
+          <label class="send-message__field send-message__field--phone">
+            <input
+              class="send-message__input"
+              type="tel"
+              name="phone"
+              autocomplete="tel"
+              data-send-message-phone
+              placeholder={resolveLabel("phoneFieldPlaceholder", "")}
+              required={props.phoneField.required}
+              aria-label={resolveLabel("phoneFieldLabel", "")}
+            />
+          </label>
+        )
+      }
+
+      <label class="send-message__field">
+        <textarea
+          class="send-message__textarea"
+          name="contact-message"
+          autocomplete="off"
+          data-send-message-textarea
+          placeholder={resolveLabel("placeholder", "")}
+          aria-describedby="send-message-hint"></textarea>
+      </label>
+
+      <div
+        class="send-message__hint"
+        id="send-message-hint"
+        data-send-message-status
+        data-status="idle"
+      >
+      </div>
+
+      <div class="send-message__actions">
+        <button
+          class="send-message__button"
+          type="submit"
+          data-send-message-submit
+          data-default-label={resolveLabel("buttonLabel", "")}
+        >
+          {resolveLabel("buttonLabel", "")}
+        </button>
+      </div>
+    </form>
+
+    <div class="send-message__success" data-send-message-success hidden>
+      {resolveLabel("successMessage", "")}
+    </div>
+
+    {
+      fallbackEmail && (
+        <div class="send-message__fallback" data-send-message-fallback hidden>
+          <p class="send-message__fallback-error">{resolveLabel("errorMessage", "")}</p>
+          <p class="send-message__fallback-lead">{resolveLabel("fallbackEmailLabel", "")}</p>
+          <a class="send-message__fallback-link" href={`mailto:${fallbackEmail}`}>
+            {fallbackEmail}
+          </a>
+          <p class="send-message__fallback-lead">{resolveLabel("fallbackBodyLabel", "")}</p>
+          <div class="send-message__fallback-body">
+            <pre class="send-message__fallback-text" data-send-message-fallback-text />
+            <button
+              class="send-message__copy-btn"
+              type="button"
+              aria-label={resolveLabel("copyMessageLabel", "")}
+              title={resolveLabel("copyMessageLabel", "")}
+              data-copy-value=""
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</SectionShell>
+
+<script>
+  import "./send-message-section.client";
+</script>

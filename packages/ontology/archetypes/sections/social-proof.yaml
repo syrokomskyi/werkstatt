@@ -1,0 +1,27 @@
+id: social-proof
+displayName: Social Proof
+version: 1.2.0
+semanticRole: social-proof
+description: |
+  External validation paragraphs + optional registration note. RFC-0103 bodyKind: paragraphs.
+expectedIntents:
+  - show-social-proof
+  - build-trust
+  - convert-visitor
+expectedIndustryFit:
+  - non-profit
+layoutHint: single-column
+bodyKind: paragraphs
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+    - body-paragraphs
+  shape: |
+    z.object({
+      registrationNote: z.string().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Enceladus
+constraints: {}

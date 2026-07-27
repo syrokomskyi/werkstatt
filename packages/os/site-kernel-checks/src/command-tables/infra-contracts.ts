@@ -1,0 +1,316 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Consolidated command table for infrastructure contracts: independent QA, gitattributes/generated-edit guard, env contract, fingerprint, agent environment audit, YAML contract lint, and YAML parse validation.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Merged 33-independent-qa.ts, 34-gitattributes.ts, 36-env-contract.ts, 37-fingerprint.ts, 38-agent-environment.ts, 39-yaml-contract.ts into infra-contracts.ts.</item>
+  <item>RFC-0493: added yaml.parse.validate command entry.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { CheckCommandEntry } from "./types.ts";
+import { runIndependentQa } from "../independent-qa.ts";
+import { runGitattributesGenerate, runGitattributesValidate } from "../gitattributes.ts";
+import { runGeneratedEditGuard } from "../generated-edit-guard.ts";
+import {
+  runEnvContractValidate,
+  runEnvLocalCheck,
+  runEnvMainCheck,
+  runEnvAltCheck,
+  runDeployScriptsValidate,
+} from "../env/env-contract.ts";
+import { runDeployPreflight } from "../env/deploy-preflight.ts";
+import {
+  runFingerprintCalculate,
+  runFingerprintUsageLint,
+  runFingerprintFixturesValidate,
+} from "../fingerprint-commands.ts";
+import { runAgentEnvironmentAudit } from "../agent/agent-environment-audit.ts";
+import { runYamlContractLint } from "../yaml-contract-lint.ts";
+import { runYamlParseValidate } from "../yaml-parse-validate.ts";
+import { runCommandReadsValidate } from "../command-reads-validate.ts";
+
+export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
+  {
+    name: "qa.independent.run",
+    description:
+      "RFC-0333: serve apps/<app>/dist/client and execute every page probe from accepted/implemented " +
+      "RFCs in a headless browser. Reads ONLY dist/client and RFC frontmatter — never app/package source. " +
+      "QA-IND-01 on assertion failure, QA-IND-02 on missing dist, QA-IND-03 on zero probes (fast path).",
+    scope: "app",
+    supportsAllSites: true,
+    mutatesState: false,
+    cacheable: false,
+    reads: ["<app>/dist/client/**", "docs/rfcs/**/*.md"],
+    flags: {
+      rfc: {
+        kind: "string",
+        description: "Restrict to a single RFC's page probes (e.g. --rfc RFC-0322).",
+      },
+    },
+    execute: runIndependentQa,
+  },
+  {
+    name: "gitattributes.generate",
+    description:
+      "Rewrite the machine-managed generated-artifacts block in root .gitattributes from " +
+      "docs/command-manifest.generated.yaml writes globs + GENERATOR_OWNERSHIP_MAP, marking every " +
+      "pattern linguist-generated=true (RFC-0336). Never hand-edit the managed block.",
+    scope: "workspace",
+    flags: {},
+    mutatesState: true,
+    reads: ["docs/command-manifest.generated.yaml", ".gitignore", ".gitattributes"],
+    writes: [".gitattributes"],
+    execute: runGitattributesGenerate,
+  },
+  {
+    name: "gitattributes.validate",
+    description:
+      "Validate the managed .gitattributes block is present and fresh (GITATTR-01), sorted/normalized " +
+      "(GITATTR-02), and warn when a tracked marker-carrying file has no covering pattern (GITATTR-03) (RFC-0336).",
+    scope: "workspace",
+    flags: {},
+    reads: [
+      ".gitattributes",
+      ".gitignore",
+      "docs/command-manifest.generated.yaml",
+      "apps/*/**",
+      "missions/*/workpiece/**",
+    ],
+    execute: runGitattributesValidate,
+  },
+  {
+    name: "generated.edit.guard",
+    description:
+      "Fail when a file carrying GENERATED_MARKER changed without its owning generator/template " +
+      "changing in the same range (GEN-EDIT-01), or the marker was removed without a documented " +
+      "exemption (GEN-EDIT-02). Range defaults to the working tree vs HEAD; pass --range <rev-range> " +
+      "for CI (RFC-0336).",
+    scope: "workspace",
+    flags: {
+      range: {
+        kind: "string",
+        description: "git rev-range to check (default: working tree vs HEAD).",
+      },
+      base: {
+        kind: "string",
+        description: "Shorthand for --range <base>..HEAD.",
+      },
+    },
+    reads: ["**"],
+    execute: runGeneratedEditGuard,
+  },
+  {
+    name: "env.contract.validate",
+    description:
+      "Validate .env.example presence (ENV-CONTRACT-01), comments (ENV-CONTRACT-02), README reference (ENV-CONTRACT-03), " +
+      "empty values (ENV-CONTRACT-04), # How to obtain: instructions (ENV-CONTRACT-05), and formatting — no commented-out " +
+      "variables, blank line between variable blocks (ENV-CONTRACT-06) — across all env-consuming " +
+      "systems/*, services/*, and root (RFC-0388, DNA-40).",
+    scope: "workspace",
+    flags: {},
+    reads: [
+      "systems/*/.env.example",
+      "services/*/.env.example",
+      ".env.example",
+      "missions/*/workpiece/.env.example",
+      "systems/*/README.md",
+      "services/*/README.md",
+      "missions/*/workpiece/README.md",
+      "services/*/src/**/*.ts",
+    ],
+    execute: runEnvContractValidate,
+  },
+  {
+    name: "env.local.check",
+    description:
+      "Check and create .env from .env.example in sites and services when missing (RFC-0388 Rule 7). " +
+      "The .env file is a copy of .env.example — the operator fills values afterward.",
+    scope: "workspace",
+    flags: {},
+    mutatesState: true,
+    reads: [
+      "systems/*/.env.example",
+      "services/*/.env.example",
+      "missions/*/workpiece/.env.example",
+    ],
+    writes: ["systems/*/.env", "services/*/.env", "missions/*/workpiece/.env"],
+    execute: runEnvLocalCheck,
+  },
+  {
+    name: "env.main.check",
+    description:
+      "Check and create .env.main from .env.example in sites when missing (RFC-0388 Rule 7). " +
+      "The .env.main file is a copy of .env.example — the operator fills values afterward.",
+    scope: "workspace",
+    flags: {},
+    mutatesState: true,
+    reads: ["systems/*/.env.example", "missions/*/workpiece/.env.example"],
+    writes: ["systems/*/.env.main", "missions/*/workpiece/.env.main"],
+    execute: runEnvMainCheck,
+  },
+  {
+    name: "env.alt.check",
+    description:
+      "Check and create .env.alt from .env.example in sites when missing (RFC-0388 Rule 7). " +
+      "The .env.alt file is a copy of .env.example — the operator fills values afterward.",
+    scope: "workspace",
+    flags: {},
+    mutatesState: true,
+    reads: ["systems/*/.env.example", "missions/*/workpiece/.env.example"],
+    writes: ["systems/*/.env.alt", "missions/*/workpiece/.env.alt"],
+    execute: runEnvAltCheck,
+  },
+  {
+    name: "deploy.preflight",
+    description:
+      "Pre-deploy validation gate (RFC-0388 Rule 5). Validates that the target env file exists, " +
+      "contains all keys from .env.example, has no extra keys, and has no empty values. " +
+      "Use --site <name> --env main|alt for sites, or --service <name> for services.",
+    scope: "workspace",
+    flags: {
+      site: {
+        kind: "string",
+        description: "Site name (e.g. webgogol-com). Required for site deploys.",
+      },
+      service: {
+        kind: "string",
+        description: "Service name (e.g. lagebild-sync-worker). Required for service deploys.",
+      },
+      env: {
+        kind: "string",
+        description: 'Environment: "main" or "alt". Required with --site.',
+      },
+    },
+    reads: [
+      "systems/*/.env.example",
+      "systems/*/.env.main",
+      "systems/*/.env.alt",
+      "services/*/.env.example",
+      "services/*/.env",
+    ],
+    execute: runDeployPreflight,
+  },
+  {
+    name: "deploy.scripts.validate",
+    description:
+      "Validate deploy scripts in systems/*/package.json (deploy:main with --secrets-file .env.main, " +
+      "deploy:alt with --secrets-file .env.alt) and services/*/package.json (deploy with --secrets-file .env) " +
+      "(RFC-0388 Rule 6, DNA-40).",
+    scope: "workspace",
+    flags: {},
+    reads: [
+      "systems/*/package.json",
+      "missions/*/workpiece/package.json",
+      "services/*/package.json",
+    ],
+    execute: runDeployScriptsValidate,
+  },
+  {
+    name: "fingerprint.calculate",
+    description:
+      "Calculate byte or semantic fingerprint of a file or directory tree (RFC-0364). " +
+      "Utility command — not in any pipeline. Use --path <path> --mode semantic|byte.",
+    scope: "workspace",
+    flags: {
+      path: {
+        kind: "string",
+        required: true,
+        description: "Workspace-relative file or directory path to fingerprint.",
+      },
+      mode: {
+        kind: "string",
+        default: "semantic",
+        description: "Fingerprint mode: semantic or byte.",
+      },
+    },
+    reads: ["packages/**", "integrations/**", "services/**", "docs/rfcs/**"],
+    execute: runFingerprintCalculate,
+  },
+  {
+    name: "fingerprint.usage.lint",
+    description:
+      "Scan authored source for direct hash usage outside @gogol/fingerprint and the allowlist (RFC-0364, DNA-53). " +
+      "Use --mode warning (default) or --mode fail.",
+    scope: "workspace",
+    flags: {
+      mode: {
+        kind: "string",
+        default: "warning",
+        description: "Diagnostic mode: warning or fail.",
+      },
+    },
+    reads: ["packages/**/*.ts", "packages/**/*.tsx", "packages/fingerprint/allowlist.json"],
+    execute: runFingerprintUsageLint,
+  },
+  {
+    name: "fingerprint.fixtures.validate",
+    description:
+      "Validate fingerprint fixture pairs: comment-only invariance, meaningful change detection, " +
+      "JSON key order, Markdown HTML comments, code fences, binary byte changes (RFC-0364).",
+    scope: "workspace",
+    flags: {},
+    reads: ["packages/fingerprint/src/tests/fixtures/**"],
+    execute: runFingerprintFixturesValidate,
+  },
+  {
+    name: "agent.environment.audit",
+    description:
+      "Read-only probe of the local Linux environment: detects installed development " +
+      "tools, checks .gitattributes line-ending rule, and emits a structured JSON report. " +
+      "Use --emit-prompt to append a system-prompt snippet. Advisory only — never gates " +
+      "build pipelines.",
+    scope: "workspace",
+    reads: [".gitattributes", "AGENTS.md"],
+    flags: {
+      "emit-prompt": {
+        kind: "boolean",
+        description:
+          "Append a systemPromptSnippet field and print it to stdout when not in --json mode.",
+      },
+      tools: {
+        kind: "string",
+        description: "Comma-separated list of tools to probe (default: all in RFC-0368 matrix).",
+      },
+    },
+    execute: runAgentEnvironmentAudit,
+  },
+  {
+    name: "yaml.contract.lint",
+    description:
+      "Enforce the YAML-only contract for non-tool-mandatory files. " +
+      "YAML-CONTRACT-01: non-whitelist .json/.jsonc files. " +
+      "YAML-CONTRACT-02: .yml files anywhere. " +
+      "YAML-CONTRACT-03: .generated.json files anywhere. " +
+      "YAML-CONTRACT-04: missing or unparseable whitelist. " +
+      "YAML-CONTRACT-05: .yaml files containing JSON content.",
+    scope: "workspace",
+    flags: {},
+    reads: ["yaml-contract.whitelist.yaml", "**/*.json", "**/*.jsonc", "**/*.yml", "**/*.yaml"],
+    execute: runYamlContractLint,
+  },
+  {
+    name: "yaml.parse.validate",
+    description:
+      "RFC-0493: parse-check all .yaml files. " +
+      "YAML-PARSE-01: parse error. " +
+      "YAML-PARSE-02: duplicate mapping key.",
+    scope: "workspace",
+    flags: {},
+    reads: ["**/*.yaml"],
+    execute: runYamlParseValidate,
+  },
+  {
+    name: "command.reads.validate",
+    description:
+      "RFC-0390: enforce that every registered kernel command declares `reads` (non-empty) or " +
+      "`cacheable: false` (CRC-01), and that `reads` patterns are valid picomatch syntax (CRC-02).",
+    scope: "workspace",
+    flags: {},
+    cacheable: false,
+    execute: runCommandReadsValidate,
+  },
+];

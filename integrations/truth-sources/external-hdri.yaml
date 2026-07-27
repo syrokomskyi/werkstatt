@@ -1,0 +1,13 @@
+# RFC-0241: HDRI (Handwerk Digital Readiness Index) — an external, institutionally separate
+# public good (gGmbH). The studio cites HDRI like any citizen; it never brands HDRI as its own
+# and never places ownership/affiliation links to HDRI on webgogol-com (identity firewall,
+# enforced by hdri.firewall.validate). kind: manual — the Truth Monitor fetch stays disabled;
+# enabling it is a human/operator action (RFC-0214).
+id: external:hdri
+title: "Handwerk Digital Readiness Index (HDRI) — https://handwerk-index.de"
+kind: manual
+expectedType: number
+checkEvery: P540D
+residency: eu
+license: Apache 2.0
+firewall: ownership-forbidden

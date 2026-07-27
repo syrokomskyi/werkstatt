@@ -1,0 +1,84 @@
+# Blueprint: website-service (RFC-0496)
+# Service dossier pages — a separate surface from website-local.
+# Two axes: industry × service. One level: depth-1 (service dossier).
+# Datasets live in the app: apps/<app>/src/content/surface/services/<lang>/*.md
+# Gated by the single `pseo` entitlement (RFC-0169 / RFC-0240).
+id: website-service
+entitlement: pseo
+
+# The record set the eligibility engine counts. Each service record lists the
+# industry and service slug it applies to; a tuple is live when a matching record exists.
+dataset:
+  collection: services
+  status: active
+
+axes:
+  - id: industry
+    universe: { collection: industries, field: slug }
+    match: { recordField: industryId }
+  - id: service
+    universe: { collection: services, field: slug }
+    match: { recordField: slug }
+
+levels:
+  - depth: 0
+    slug: { de: "leistungen/website-service", uk: "posluhy/sait-service" }
+    constellation: website-service-root
+    geo: twin-only
+    semanticType: collection
+    titleTemplate: { de: "Website-Services | Webgogol", uk: "Сайт-сервіси | Webgogol" }
+  - depth: 1
+    slug: { de: "website/{industry}/service", uk: "sait/{industry}/service" }
+    constellation: website-service-industry
+    geo: full
+    titleTemplate:
+      { de: "Website-Services für {industry.name}", uk: "Сайт-сервіси для {industry.name}" }
+  - depth: 2
+    slug: { de: "website/{industry}/{service}", uk: "sait/{industry}/{service}" }
+    constellation: website-service
+    geo: full
+    titleTemplate:
+      {
+        de: "{service.name} für {industry.name} — Website-Struktur",
+        uk: "{service.name} для {industry.name} — структура сайту",
+      }
+    # RFC-0496: service dossier configuration
+    service:
+      gate:
+        minServiceVariants: 3
+        minCustomerQuestions: 3
+        minPriceModels: 3
+        minFaq: 5
+        minPageStructure: 1
+      claimRestrictions:
+        - "mehr Anfragen"
+        - "mehr Termin-Anfragen"
+        - "mehr Buchungen"
+        - "echte Aufträge"
+        - "steigt die Wahrscheinlichkeit"
+        - "weniger Streuverluste"
+        - "höhere Conversion"
+        - "besser gefunden"
+        - "stärkstes Conversion-Signal"
+        - "garantierte Ergebnisse"
+        - "guaranteed results"
+        - "no. 1"
+        - "number one"
+        - "leading provider"
+        - "top rated"
+        - "beste Preis"
+        - "best price"
+        - "cheapest"
+        - "günstigste"
+      mode: warn
+
+policy:
+  minRecordsPerDepth: { 0: 0, 1: 1, 2: 1 }
+  trailingSlash: true
+  maxStubDepth: 2
+
+linking:
+  parent:
+    surface: website-local
+    depth: 1
+    joinField: industryId

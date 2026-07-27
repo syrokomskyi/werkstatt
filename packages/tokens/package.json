@@ -1,0 +1,34 @@
+{
+  "name": "@gogol/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Canonical --ds-* CSS design tokens for the WGogol design system. Single source of truth for colors, typography, spacing, radius, shadows, motion, and z-index (Wave 6, RFC-0023).",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./tokens.css": "./src/tokens.css"
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "echo 'No build step required — TypeScript sources and CSS consumed directly'",
+    "build:check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "architecture",
+      "rationale": "Token package is CSS/catalog-only and covered by token contract lints; direct tests are deferred until token generation logic moves here.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "name": "@gogol/ontology",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Vocabulary for the Uni UI Ontology: ComponentRole, Industry, Layer closed enums; open SemanticRole (derived from archetype catalog, RFC-0084); Manifest Zod schema; and the three closed cosmic catalogs (DNA-23).",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./enums": {
+      "types": "./src/enums.ts",
+      "default": "./src/enums.ts"
+    },
+    "./manifest": {
+      "types": "./src/manifest.ts",
+      "default": "./src/manifest.ts"
+    },
+    "./cosmic": {
+      "types": "./src/cosmic/index.ts",
+      "default": "./src/cosmic/index.ts"
+    },
+    "./schemas": {
+      "types": "./src/schemas/index.ts",
+      "default": "./src/schemas/index.ts"
+    },
+    "./operations": {
+      "types": "./src/operations/index.ts",
+      "default": "./src/operations/index.ts"
+    },
+    "./archetypes": {
+      "types": "./src/archetype-registry.ts",
+      "default": "./src/archetype-registry.ts"
+    },
+    "./shared-section-props": {
+      "types": "./src/shared-section-props/index.ts",
+      "default": "./src/shared-section-props/index.ts"
+    },
+    "./external-surfaces": {
+      "types": "./src/external-surfaces/index.ts",
+      "default": "./src/external-surfaces/index.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "echo 'No build step required — TypeScript sources consumed directly'",
+    "build:check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "direct",
+      "owner": "architecture",
+      "rationale": "Vitest unit tests cover closed enum validation, cosmic catalog uniqueness, and schema parsing."
+    }
+  }
+}

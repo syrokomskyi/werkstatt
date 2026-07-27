@@ -1,0 +1,20 @@
+id: navigation-section
+uniName: navigation-section
+layer: section
+semanticId: navigation
+archetype: navigation
+
+cosmicName: Phoebe
+role: navigation
+version: 1.2.0
+intent:
+  - guide-navigation
+  - orient-visitor
+industryFit: []
+contentSchemaKey: null
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    label:
+      type: string

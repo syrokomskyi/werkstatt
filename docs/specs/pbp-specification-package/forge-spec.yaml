@@ -1,0 +1,925 @@
+schema: forge/spec@1
+id: pbp-specification-package
+title: Public Business Profile (PBP)
+version: "1.0"
+status: accepted
+reviewers:
+  - human:andrii-syrokomskyi
+sourceNote: "External pre-RFC specification package vendored from consultant
+  deliverable (2026-07-18). First implementation target: webgogol-com."
+vendoredAt: 2026-07-19
+documents:
+  readme: 00-README.md
+  system-spec: 01-PBP-System-Specification.md
+  entity-model: 02-PBP-Entity-and-Field-Model.md
+  compiler: 03-PBP-Compiler-Validation-and-Projections.md
+  migration-plan: 04-Webgogol-Migration-Agent-Plan.md
+  target-blueprint: 05-Webgogol-Target-Manifest-Blueprint.md
+  roadmap: 06-PBP-RFC-Roadmap.md
+  decision-log: 07-PBP-Decision-Log.md
+decisions:
+  - id: ADR-001
+    title: System name is Public Business Profile (PBP)
+    status: accepted
+    rationale: Covers business, catalog, offerings, trust, and public projections;
+      UOM was too Offering-focused.
+  - id: ADR-002
+    title: PBP is a logical model, not a single physical format
+    status: accepted
+    rationale: One file per entity does not scale to hundreds of thousands of
+      variants; Markdown/Git, datasets, databases, and adapters are all valid.
+  - id: ADR-003
+    title: Federated product identity
+    status: accepted
+    rationale: Product has a global URI and authority but no mandatory central
+      registry; avoids governance and identity-dispute problems.
+  - id: ADR-004
+    title: Global layer standardizes semantics
+    status: accepted
+    rationale: A business-independent registry holds Category, ComparisonProfile,
+      units, metrics, identifier schemes, derivations, and schemas.
+  - id: ADR-005
+    title: Local catalog is a separate layer
+    status: accepted
+    rationale: Product answers 'what is it', CatalogEntry 'how does this business
+      list it', Offering 'how does this business sell it'.
+  - id: ADR-006
+    title: Offering references CatalogEntry
+    status: accepted
+    rationale: Local SKU, merchandising, and local description do not belong on the
+      global Product.
+  - id: ADR-007
+    title: Category and ComparisonProfile are separated
+    status: accepted
+    rationale: Category answers 'what is it', ComparisonProfile 'by which dimensions
+      is it compared'.
+  - id: ADR-008
+    title: Variant is separate from Bundle
+    status: accepted
+    rationale: ProductGroup + ProductVariant model variation axes; Bundle models
+      composition of independent products.
+  - id: ADR-009
+    title: Module is not an entity
+    status: accepted
+    rationale: "'Module' remains a presentation term; in the model it is a
+      Product/CatalogEntry/Offering with a relation."
+  - id: ADR-010
+    title: Pricing block is named pricing
+    status: accepted
+    rationale: In pbp/offering@1 the name is 'pricing', not 'commercial'; fixes
+      namespace drift.
+  - id: ADR-011
+    title: Charge, Plan, Adjustment are separated
+    status: accepted
+    rationale: Price is not a string or single object; Charge is accrual, Plan is a
+      set of charges and conditions, Adjustment is a discount/correction.
+  - id: ADR-012
+    title: Money is stored as decimal string
+    status: accepted
+    rationale: '"70.00" not float or presentation string; exact arithmetic and
+      stable serialization.'
+  - id: ADR-013
+    title: Buyer quantity is not stored in catalog
+    status: accepted
+    rationale: Selected quantity appears in Quote/Order runtime; Offering stores
+      units, allowances, limits, tiers, minimum rules.
+  - id: ADR-014
+    title: Tax semantics reserved in @1
+    status: accepted
+    rationale: Schema supports buyerTypes, tax treatment, jurisdiction; buyerType is
+      in audience, not inside price.
+  - id: ADR-015
+    title: Policy is a separate entity
+    status: accepted
+    rationale: Reusable SLA, guarantees, rights, cancellation, and retention rules
+      are typed Policies.
+  - id: ADR-016
+    title: Guarantee requires remedy
+    status: accepted
+    rationale: A promise without a remedy is not called a guarantee.
+  - id: ADR-017
+    title: SLA requires a measurement contract
+    status: accepted
+    rationale: Metric, threshold, window, method, evidence, exclusions, and remedy
+      are mandatory.
+  - id: ADR-018
+    title: Claim sidecars are removed
+    status: accepted
+    rationale: All *.claims.yaml keyed by source path are eliminated; replaced by
+      governance in entity, Claim entity, EvidenceSource, no path-based
+      identity.
+  - id: ADR-019
+    title: Disclosure is a separate typed entity
+    status: accepted
+    rationale: Material dependencies/limitations are Disclosure; not a miscellaneous
+      container.
+  - id: ADR-020
+    title: Review is not a Claim
+    status: accepted
+    rationale: Review and AggregateRating have their own schemas; author, source,
+      permissions, freshness differ from business-authored Claim.
+  - id: ADR-021
+    title: Credential is designed now
+    status: accepted
+    rationale: Certification/license/qualification/membership/insurance get a
+      separate entity boundary; implementation may follow Webgogol core.
+  - id: ADR-022
+    title: Derivation Contract generalizes TCO
+    status: accepted
+    rationale: All computed facts go through a versioned deterministic Derivation
+      Contract; no ad hoc formulas or stored calculated strings.
+  - id: ADR-023
+    title: One Buyer View Schema
+    status: accepted
+    rationale: "12 sections: Identity, Suitability, Value, Package, Options,
+      Pricing, Buyer Responsibilities, Fulfillment, Assurances, Rights,
+      Lifecycle, Limitations."
+  - id: ADR-024
+    title: Missing does not mean false
+    status: accepted
+    rationale: Absent = not-declared; explicit false, null, and not-applicable are
+      distinguished.
+  - id: ADR-025
+    title: Locale IDs are identical
+    status: accepted
+    rationale: ID contains no .de, /de/, or other locale marker.
+  - id: ADR-026
+    title: Default locale stores invariant facts
+    status: accepted
+    rationale: Non-default locale contains only allowed localized overrides; price
+      and conditions must not diverge between languages.
+  - id: ADR-027
+    title: Complex collections are keyed maps
+    status: accepted
+    rationale: For localization and references, complex collections are addressed by
+      semantic key, not array index.
+  - id: ADR-028
+    title: Projection is not the source of truth
+    status: accepted
+    rationale: Website, JSON-LD, CRM, contract, invoice views are generated;
+      manually maintained duplicate business facts in templates are forbidden.
+  - id: ADR-029
+    title: Runtime state is separated
+    status: accepted
+    rationale: Inventory/availability/booking capacity overlays static graph through
+      source contracts; Webgogol capacity block is not carried over.
+  - id: ADR-030
+    title: History is stored in Git
+    status: accepted
+    rationale: Curated manifest history = Git; build adds sourceRevision; Bordbuch
+      is an optional derived publication event.
+  - id: ADR-031
+    title: Schema version and data revision are distinct
+    status: accepted
+    rationale: pbp/offering@1 describes format; Git revision describes data state.
+  - id: ADR-032
+    title: Canonical snapshot, not Markdown, is signed
+    status: accepted
+    rationale: Resolved JSON → canonicalization → digest → detached signature; RFC
+      8785 JCS baseline.
+  - id: ADR-033
+    title: Sichtpass is implemented later
+    status: accepted
+    rationale: Schema boundaries and canonicalization ready now; signing and VC
+      mapping later.
+  - id: ADR-034
+    title: Format is temporarily proprietary
+    status: accepted
+    rationale: During deployment PBP remains proprietary; open trigger at 300
+      clients or earlier technical maturity; stable URIs, docs, schemas,
+      conformance tests from day one.
+  - id: ADR-035
+    title: llms.txt does not become a core entity
+    status: accepted
+    rationale: PBP defines MachineUsePolicy; current conventions are projections.
+  - id: ADR-036
+    title: Public/private profiles are physically separated
+    status: accepted
+    rationale: Bank, tax number, secrets, and customer data are outside public PBP.
+  - id: ADR-037
+    title: HTML is forbidden in canonical facts
+    status: accepted
+    rationale: <br> and other presentation markup are not allowed in canonical data
+      fields.
+  - id: ADR-038
+    title: No empty-string semantics
+    status: accepted
+    rationale: Empty string does not mean missing; field omitted or explicit
+      semantic status used.
+  - id: ADR-039
+    title: Controlled vocabularies are required
+    status: accepted
+    rationale: Unit, metric, relation, identifier scheme, and value vocabularies are
+      versioned; no uncontrolled strings like hour/hours/Std/h.
+  - id: ADR-040
+    title: Relation core is minimal
+    status: accepted
+    rationale: optional, requires, incompatibleWith, alternativeTo, included;
+      recommendedWith→Recommendation/Claim, replaces→lifecycle successor,
+      availableAfter→requires+condition.
+  - id: ADR-041
+    title: External standards are mappings, not canonical core
+    status: accepted
+    rationale: PBP maps to Schema.org, GS1, JSON-LD, VC; not limited to their
+      least-common-denominator fields.
+  - id: ADR-042
+    title: Webgogol is first fixture, not universal proof
+    status: accepted
+    rationale: Before RFC freeze, test a minimal physical good and a variant
+      commerce case.
+  - id: ADR-043
+    title: Legacy removed after migration
+    status: accepted
+    rationale: No compatibility layer; old files deleted after 100% coverage and
+      clean build.
+  - id: ADR-044
+    title: hourlyRate is unresolved
+    status: accepted
+    rationale: Do not attach business-global hourly rate automatically; possible
+      outcomes are separate Offering, overage Charge, or private internal rate.
+  - id: ADR-045
+    title: 99% uptime and 7 hours cannot coexist as exact equivalents
+    status: accepted
+    rationale: Owner chooses normative model; recommended 99% per calendar month
+      with calculated allowed downtime.
+  - id: ADR-046
+    title: Capacity waves are not static Offering facts
+    status: accepted
+    rationale: Remove current capacity block from PBP.
+  - id: ADR-047
+    title: Document metadata stays with document descriptor
+    status: accepted
+    rationale: No central meta.md for AGB/privacy/imprint dates.
+  - id: ADR-048
+    title: External services require materiality review
+    status: accepted
+    rationale: Not every internal tool becomes a public Disclosure.
+  - id: ADR-049
+    title: Compliance dates do not prove compliance
+    status: accepted
+    rationale: GoBD dates alone do not create a compliance Claim.
+  - id: ADR-050
+    title: Comparison does not imply ranking
+    status: accepted
+    rationale: ComparisonProfile exposes dimensions; ranking needs a separate
+      transparent methodology/derivation.
+rfcs:
+  - id: RFC-PBP-000
+    title: Program Charter and Terminology
+    dependsOn: []
+    wave: 1
+    sources:
+      - system-spec
+      - readme
+      - decision-log
+    materializedAs: RFC-0398
+  - id: RFC-PBP-001
+    title: Namespace, Entity Envelope and URI Policy
+    dependsOn:
+      - RFC-PBP-000
+    wave: 1
+    sources:
+      - system-spec
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0399
+  - id: RFC-PBP-002
+    title: Primitive Types and Controlled Vocabularies
+    dependsOn:
+      - RFC-PBP-001
+    wave: 1
+    sources:
+      - entity-model
+      - system-spec
+    materializedAs: RFC-0400
+  - id: RFC-PBP-003
+    title: Schema Evolution and Compatibility
+    dependsOn:
+      - RFC-PBP-001
+    wave: 1
+    sources:
+      - system-spec
+      - decision-log
+    materializedAs: RFC-0401
+  - id: RFC-PBP-004
+    title: Package and Source Profiles
+    dependsOn:
+      - RFC-PBP-001
+    wave: 1
+    sources:
+      - system-spec
+      - compiler
+    materializedAs: RFC-0402
+  - id: RFC-PBP-010
+    title: Business
+    dependsOn:
+      - RFC-PBP-001
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0403
+  - id: RFC-PBP-011
+    title: LegalIdentity and Public/Private Boundary
+    dependsOn:
+      - RFC-PBP-010
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0409
+  - id: RFC-PBP-012
+    title: Brand and Person Relations
+    dependsOn:
+      - RFC-PBP-010
+    wave: 2
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0410
+  - id: RFC-PBP-013
+    title: Place and Territory
+    dependsOn:
+      - RFC-PBP-010
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0411
+  - id: RFC-PBP-014
+    title: ContactPoint
+    dependsOn:
+      - RFC-PBP-010
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0412
+  - id: RFC-PBP-015
+    title: WebPresence
+    dependsOn:
+      - RFC-PBP-010
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0413
+  - id: RFC-PBP-020
+    title: Federated Product Identity
+    dependsOn:
+      - RFC-PBP-001
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - system-spec
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0404
+  - id: RFC-PBP-021
+    title: Category Registry
+    dependsOn:
+      - RFC-PBP-020
+    wave: 1
+    sources:
+      - entity-model
+    materializedAs: RFC-0414
+  - id: RFC-PBP-022
+    title: Product Schema
+    dependsOn:
+      - RFC-PBP-020
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0415
+  - id: RFC-PBP-023
+    title: ProductGroup and ProductVariant
+    dependsOn:
+      - RFC-PBP-022
+    wave: 3
+    sources:
+      - entity-model
+    materializedAs: RFC-0425
+  - id: RFC-PBP-024
+    title: Bundles and Composition
+    dependsOn:
+      - RFC-PBP-022
+    wave: 3
+    sources:
+      - entity-model
+    materializedAs: RFC-0426
+  - id: RFC-PBP-025
+    title: Catalog and CatalogEntry
+    dependsOn:
+      - RFC-PBP-020
+      - RFC-PBP-022
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0427
+  - id: RFC-PBP-030
+    title: Offering Core
+    dependsOn:
+      - RFC-PBP-025
+      - RFC-PBP-010
+    wave: 1
+    sources:
+      - entity-model
+      - target-blueprint
+    materializedAs: RFC-0429
+  - id: RFC-PBP-031
+    title: Offering Relations
+    dependsOn:
+      - RFC-PBP-030
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0436
+  - id: RFC-PBP-032
+    title: "Pricing Core: Charge, Plan, Adjustment"
+    dependsOn:
+      - RFC-PBP-030
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+      - target-blueprint
+    materializedAs: RFC-0437
+  - id: RFC-PBP-033
+    title: Usage, Range and Tiered Pricing
+    dependsOn:
+      - RFC-PBP-032
+    wave: 3
+    sources:
+      - entity-model
+    materializedAs: RFC-0444
+  - id: RFC-PBP-034
+    title: Allowances, Overage and Deposits
+    dependsOn:
+      - RFC-PBP-032
+    wave: 1
+    sources:
+      - entity-model
+    materializedAs: RFC-0445
+  - id: RFC-PBP-035
+    title: Tax and Buyer Presentation
+    dependsOn:
+      - RFC-PBP-032
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0446
+  - id: RFC-PBP-036
+    title: Terms and Commercial Lifecycle
+    dependsOn:
+      - RFC-PBP-030
+    wave: 1
+    sources:
+      - entity-model
+    materializedAs: RFC-0438
+  - id: RFC-PBP-040
+    title: Policy Base and Scope
+    dependsOn:
+      - RFC-PBP-030
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0439
+  - id: RFC-PBP-041
+    title: Service Level Policy
+    dependsOn:
+      - RFC-PBP-040
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0447
+  - id: RFC-PBP-042
+    title: Guarantee and Remedy
+    dependsOn:
+      - RFC-PBP-040
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+      - target-blueprint
+    materializedAs: RFC-0448
+  - id: RFC-PBP-043
+    title: Ownership, License and Portability
+    dependsOn:
+      - RFC-PBP-040
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+      - target-blueprint
+    materializedAs: RFC-0449
+  - id: RFC-PBP-044
+    title: Exit and Data Package
+    dependsOn:
+      - RFC-PBP-040
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+      - target-blueprint
+    materializedAs: RFC-0450
+  - id: RFC-PBP-045
+    title: Fulfillment, Shipping, Pickup and Return
+    dependsOn:
+      - RFC-PBP-040
+    wave: 3
+    sources:
+      - entity-model
+    materializedAs: RFC-0451
+  - id: RFC-PBP-046
+    title: Data Retention and Deletion
+    dependsOn:
+      - RFC-PBP-040
+    wave: 1
+    sources:
+      - entity-model
+    materializedAs: RFC-0452
+  - id: RFC-PBP-050
+    title: Claim
+    dependsOn:
+      - RFC-PBP-001
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0405
+  - id: RFC-PBP-051
+    title: EvidenceSource
+    dependsOn:
+      - RFC-PBP-050
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0416
+  - id: RFC-PBP-052
+    title: Disclosure
+    dependsOn:
+      - RFC-PBP-050
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0417
+  - id: RFC-PBP-053
+    title: Credential
+    dependsOn:
+      - RFC-PBP-050
+    wave: 2
+    sources:
+      - entity-model
+    materializedAs: RFC-0418
+  - id: RFC-PBP-054
+    title: Review and AggregateRating
+    dependsOn:
+      - RFC-PBP-050
+    wave: 2
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0419
+  - id: RFC-PBP-055
+    title: PublicDocument
+    dependsOn:
+      - RFC-PBP-050
+    wave: 1
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0420
+  - id: RFC-PBP-060
+    title: Localization and Fallback
+    dependsOn:
+      - RFC-PBP-002
+      - RFC-PBP-004
+    wave: 1
+    sources:
+      - system-spec
+      - compiler
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0406
+  - id: RFC-PBP-061
+    title: Reference Resolution and Graph Integrity
+    dependsOn:
+      - RFC-PBP-001
+      - RFC-PBP-004
+    wave: 1
+    sources:
+      - compiler
+      - system-spec
+    materializedAs: RFC-0407
+  - id: RFC-PBP-062
+    title: Runtime State Overlay
+    dependsOn:
+      - RFC-PBP-061
+    wave: 3
+    sources:
+      - system-spec
+      - compiler
+      - decision-log
+    materializedAs: RFC-0421
+  - id: RFC-PBP-063
+    title: Validation and Error Codes
+    dependsOn:
+      - RFC-PBP-061
+    wave: 1
+    sources:
+      - compiler
+    materializedAs: RFC-0422
+  - id: RFC-PBP-064
+    title: Compiler Pipeline
+    dependsOn:
+      - RFC-PBP-060
+      - RFC-PBP-061
+      - RFC-PBP-063
+    wave: 1
+    sources:
+      - compiler
+    materializedAs: RFC-0428
+  - id: RFC-PBP-065
+    title: Incremental and Bulk Processing
+    dependsOn:
+      - RFC-PBP-064
+    wave: 3
+    sources:
+      - compiler
+    materializedAs: RFC-0430
+  - id: RFC-PBP-070
+    title: Derivation Contract
+    dependsOn:
+      - RFC-PBP-002
+      - RFC-PBP-064
+    wave: 1
+    sources:
+      - compiler
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0431
+  - id: RFC-PBP-071
+    title: First-Year Cost and TCO
+    dependsOn:
+      - RFC-PBP-070
+      - RFC-PBP-032
+    wave: 1
+    sources:
+      - compiler
+      - entity-model
+    materializedAs: RFC-0453
+  - id: RFC-PBP-072
+    title: ComparisonProfile
+    dependsOn:
+      - RFC-PBP-021
+      - RFC-PBP-070
+    wave: 2
+    sources:
+      - entity-model
+      - decision-log
+    materializedAs: RFC-0440
+  - id: RFC-PBP-073
+    title: Comparison Projection
+    dependsOn:
+      - RFC-PBP-072
+    wave: 2
+    sources:
+      - compiler
+      - entity-model
+    materializedAs: RFC-0454
+  - id: RFC-PBP-074
+    title: Buyer View Schema
+    dependsOn:
+      - RFC-PBP-030
+      - RFC-PBP-070
+    wave: 1
+    sources:
+      - system-spec
+      - compiler
+      - decision-log
+    materializedAs: RFC-0441
+  - id: RFC-PBP-080
+    title: Website Projection Contract
+    dependsOn:
+      - RFC-PBP-064
+      - RFC-PBP-074
+    wave: 1
+    sources:
+      - compiler
+      - system-spec
+    materializedAs: RFC-0455
+  - id: RFC-PBP-081
+    title: AI Answer Projection
+    dependsOn:
+      - RFC-PBP-064
+      - RFC-PBP-074
+    wave: 1
+    sources:
+      - compiler
+      - system-spec
+    materializedAs: RFC-0456
+  - id: RFC-PBP-082
+    title: Schema.org Mapping
+    dependsOn:
+      - RFC-PBP-064
+    wave: 1
+    sources:
+      - compiler
+      - system-spec
+    materializedAs: RFC-0432
+  - id: RFC-PBP-083
+    title: Quote and Contract Inputs
+    dependsOn:
+      - RFC-PBP-074
+    wave: 2
+    sources:
+      - compiler
+      - entity-model
+    materializedAs: RFC-0457
+  - id: RFC-PBP-084
+    title: Invoice Input
+    dependsOn:
+      - RFC-PBP-032
+    wave: 2
+    sources:
+      - compiler
+      - entity-model
+    materializedAs: RFC-0458
+  - id: RFC-PBP-085
+    title: CRM Projection
+    dependsOn:
+      - RFC-PBP-064
+    wave: 1
+    sources:
+      - compiler
+    materializedAs: RFC-0433
+  - id: RFC-PBP-086
+    title: MachineUsePolicy and AI Access Projections
+    dependsOn:
+      - RFC-PBP-064
+    wave: 2
+    sources:
+      - compiler
+      - decision-log
+    materializedAs: RFC-0434
+  - id: RFC-PBP-090
+    title: Git Revision and Publication Snapshot
+    dependsOn:
+      - RFC-PBP-064
+    wave: 1
+    sources:
+      - system-spec
+      - compiler
+      - decision-log
+    materializedAs: RFC-0435
+  - id: RFC-PBP-091
+    title: Canonical Serialization
+    dependsOn:
+      - RFC-PBP-090
+    wave: 4
+    sources:
+      - compiler
+      - decision-log
+    materializedAs: RFC-0442
+  - id: RFC-PBP-092
+    title: Signature Envelope
+    dependsOn:
+      - RFC-PBP-091
+    wave: 4
+    sources:
+      - compiler
+      - decision-log
+    materializedAs: RFC-0459
+  - id: RFC-PBP-093
+    title: Sichtpass / Verifiable Credential Mapping
+    dependsOn:
+      - RFC-PBP-092
+    wave: 4
+    sources:
+      - compiler
+      - decision-log
+    materializedAs: RFC-0460
+  - id: RFC-PBP-094
+    title: Registry and Resolver
+    dependsOn:
+      - RFC-PBP-020
+    wave: 4
+    sources:
+      - system-spec
+      - decision-log
+    materializedAs: RFC-0423
+  - id: RFC-PBP-100
+    title: Legacy Extraction Contract
+    dependsOn:
+      - RFC-PBP-001
+      - RFC-PBP-002
+    wave: 1
+    sources:
+      - migration-plan
+    materializedAs: RFC-0408
+  - id: RFC-PBP-101
+    title: Normalization Contract
+    dependsOn:
+      - RFC-PBP-100
+    wave: 1
+    sources:
+      - migration-plan
+    materializedAs: RFC-0424
+  - id: RFC-PBP-102
+    title: Webgogol Legacy Migration
+    dependsOn:
+      - RFC-PBP-101
+      - RFC-PBP-010
+      - RFC-PBP-011
+      - RFC-PBP-013
+      - RFC-PBP-014
+      - RFC-PBP-015
+      - RFC-PBP-020
+      - RFC-PBP-022
+      - RFC-PBP-025
+      - RFC-PBP-030
+      - RFC-PBP-032
+      - RFC-PBP-040
+      - RFC-PBP-041
+      - RFC-PBP-042
+      - RFC-PBP-043
+      - RFC-PBP-044
+      - RFC-PBP-046
+      - RFC-PBP-050
+      - RFC-PBP-051
+      - RFC-PBP-052
+      - RFC-PBP-055
+      - RFC-PBP-060
+      - RFC-PBP-061
+      - RFC-PBP-063
+      - RFC-PBP-064
+      - RFC-PBP-070
+      - RFC-PBP-071
+      - RFC-PBP-074
+      - RFC-PBP-080
+      - RFC-PBP-081
+      - RFC-PBP-082
+      - RFC-PBP-085
+      - RFC-PBP-090
+    wave: 1
+    sources:
+      - migration-plan
+      - target-blueprint
+    materializedAs: RFC-0461
+  - id: RFC-PBP-103
+    title: Migration Coverage and Cutover
+    dependsOn:
+      - RFC-PBP-102
+    wave: 1
+    sources:
+      - migration-plan
+      - decision-log
+    materializedAs: RFC-0462
+  - id: RFC-PBP-104
+    title: Shopify/PIM Adapter Profile
+    dependsOn:
+      - RFC-PBP-023
+      - RFC-PBP-024
+      - RFC-PBP-025
+      - RFC-PBP-065
+    wave: 3
+    sources:
+      - compiler
+      - entity-model
+    materializedAs: RFC-0443
+waves:
+  - id: 1
+    name: Webgogol core
+    goal: Webgogol fully migrated; website and AI projection run from PBP.
+  - id: 2
+    name: Service businesses
+    goal: Deeper policies, credentials, reviews, comparison profiles,
+      contract/invoice projections, multiple Places; validated on 5-10
+      SME/Handwerk clients.
+  - id: 3
+    name: Physical commerce
+    goal: ProductGroup/Variant, bundles, shipping/returns, runtime inventory, bulk
+      processing, Shopify/PIM adapter, tax presentation; validated on 10 000+
+      SKU catalog.
+  - id: 4
+    name: Verification
+    goal: Canonical snapshots, signatures, Sichtpass, credentials, public resolver.
+  - id: 5
+    name: Open standard readiness
+    goal: Trigger at 300 clients or earlier technical maturity; at least 3
+      industries, independent second implementation, large catalog proof, stable
+      @1 period, conformance suite complete.

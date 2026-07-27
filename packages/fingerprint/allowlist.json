@@ -1,0 +1,214 @@
+[
+  {
+    "file": "packages/check-core/src/evidence.ts",
+    "reason": "Check evidence schemas expose contentHash as a wire-format field; this file does not compute fingerprints directly."
+  },
+  {
+    "file": "packages/check-runner-node/src/index.ts",
+    "reason": "Check runner propagates evidence contentHash fields from the shared evidence schema."
+  },
+  {
+    "file": "packages/integration-adapter-stripe/src/signature.ts",
+    "reason": "Stripe request signing and verification require protocol-level SHA-256/HMAC naming."
+  },
+  {
+    "file": "packages/integration-adapter-stripe/src/tests/stripe-adapter.test.ts",
+    "reason": "Stripe adapter tests assert protocol-level SHA-256 signature fixtures."
+  },
+  {
+    "file": "packages/integration-adapter-stripe/src/webhook.ts",
+    "reason": "Stripe webhook signature verification requires raw byte HMAC per Stripe protocol."
+  },
+  {
+    "file": "packages/ontology/src/operations/*.ts",
+    "reason": "Operation manifests declare checksum algorithms as schema literals, not local hash implementations."
+  },
+  {
+    "file": "packages/os/site-kernel-changelog/src/changelog/**",
+    "reason": "Changelog agent cache keys are protocol cache identifiers pending a focused fingerprint API migration."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/agent-knowledge.ts",
+    "reason": "Agent knowledge projection carries contentHash as Agent Surface wire metadata; hash computation belongs to the shared agent protocol builders."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/agent-manifest.ts",
+    "reason": "Agent Surface manifest carries contentHash as protocol metadata; this orchestrator mirrors the generated contract."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/agent-openapi.ts",
+    "reason": "OpenAPI projection exposes contentHash headers/fields defined by the Agent Surface protocol."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/audit-llm.ts",
+    "reason": "Audit LLM cache keys use protocol fallback labels such as sha256:no-atoms; helpers compute hashes through audit/helpers."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/behavior-snapshot.ts",
+    "reason": "Behavior snapshot content-addressed cache uses byte hashes for deterministic snapshot identity."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/command-tables/09b-build-artifacts-part2.ts",
+    "reason": "Command descriptions mention contentHash protocol fields for generated build artifacts; no local hashing is performed."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/compass-audit.ts",
+    "reason": "Compass audit ledger carries contentHash metadata in generated JSON records; this file does not own the fingerprint primitive."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/diagnostics/rules/section-agent.ts",
+    "reason": "Diagnostic rule text references contentHash fields in the Agent Surface protocol."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/ecosystem/manifest.ts",
+    "reason": "ACP manifest hashing now uses @gogol/fingerprint; remaining contentHash names are generated projection metadata."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/ecosystem/types.ts",
+    "reason": "ACP manifest types expose contentHash as generated projection metadata."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/fingerprint-commands.ts",
+    "reason": "Fingerprint command payloads intentionally expose sha256 as the public algorithm label for @gogol/fingerprint results."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/maintenance-debt-baseline.ts",
+    "reason": "Maintenance debt baseline hashing now uses @gogol/fingerprint; remaining contentHash fields are generated projection metadata."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/maintenance-debt-queue.ts",
+    "reason": "Maintenance debt queue hashing now uses @gogol/fingerprint; remaining contentHash fields are generated projection metadata."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/page-markdown.ts",
+    "reason": "Page markdown helpers pass through contentHash metadata from generated page projections."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/surface-translation.ts",
+    "reason": "Surface translation hashes now use @gogol/fingerprint; remaining contentHash names are CKL/provenance metadata fields."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/tests/fleet-leitstand.test.ts",
+    "reason": "Fleet Leitstand tests assert protocol-level sha256 fixture values rather than defining a production hash primitive."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/tests/pseo-visibility-breaker.test.ts",
+    "reason": "Visibility breaker tests assert protocol-level sha256 fixture values rather than defining a production hash primitive."
+  },
+  {
+    "file": "packages/os/site-kernel-checks/src/tests/surface-demand.test.ts",
+    "reason": "Surface demand tests assert protocol-level sha256 fixture values emitted by the demand signal contract."
+  },
+  {
+    "file": "packages/os/site-kernel-codegen/src/props-types.ts",
+    "reason": "Props type generation stores resolved schema hashes as generated manifest metadata."
+  },
+  {
+    "file": "packages/os/site-kernel-codegen/src/service.ts",
+    "reason": "Service generators use dependency and license cache fingerprints for deterministic generated pages."
+  },
+  {
+    "file": "packages/os/site-kernel-handoff/src/**",
+    "reason": "Handoff, mission, release, and Werkstatt artifacts carry protocol hashes and append-only chain identifiers."
+  },
+  {
+    "file": "packages/os/site-kernel-handoff/src/bordbuch.ts",
+    "reason": "Bordbuch hash chaining uses byte-level SHA-256 for append-only log integrity."
+  },
+  {
+    "file": "packages/os/site-kernel-integrity/src/**",
+    "reason": "Integrity registry modules maintain revision/hash-chain protocols and signing metadata."
+  },
+  {
+    "file": "packages/os/site-kernel-integrity/src/signing.ts",
+    "reason": "Cryptographic signing uses HMAC/createSign directly for integrity manifest signatures, not semantic fingerprints."
+  },
+  {
+    "file": "packages/os/site-kernel-onboarding/src/amend*.ts",
+    "reason": "Onboarding amend commands exchange hash identifiers defined by the amend workflow protocol."
+  },
+  {
+    "file": "packages/os/site-kernel-onboarding/src/phase-contract.ts",
+    "reason": "Onboarding phase contract exposes hash field names as protocol metadata."
+  },
+  {
+    "file": "packages/os/site-kernel/src/command-manifest.ts",
+    "reason": "Command manifest contentHash is a generated projection stability field; migration needs a site-kernel dependency decision."
+  },
+  {
+    "file": "packages/os/site-kernel/src/pipeline-budgets.ts",
+    "reason": "Pipeline budget historyHash is a generated telemetry projection field; migration needs a site-kernel dependency decision."
+  },
+  {
+    "file": "packages/os/site-kernel/src/rfc/verification-evidence.ts",
+    "reason": "RFC verification evidence records SHA-256 content identifiers as part of the RFC evidence protocol; legacy site-kernel cannot depend on @gogol/fingerprint until the dependency graph is amended."
+  },
+  {
+    "file": "packages/os/site-kernel/src/tests/command-manifest.test.ts",
+    "reason": "Command manifest tests assert the contentHash projection contract."
+  },
+  {
+    "file": "packages/passport/src/emit.ts",
+    "reason": "Passport emission computes and carries systemHash in the signed passport protocol; migration needs a passport dependency decision."
+  },
+  {
+    "file": "packages/passport/src/schema.ts",
+    "reason": "Passport schema validates the public systemHash wire format; no local hash primitive is defined."
+  },
+  {
+    "file": "packages/passport/src/sign.ts",
+    "reason": "Passport signing uses cryptographic signing keys for JWT-like token generation."
+  },
+  {
+    "file": "packages/passport/src/verify.ts",
+    "reason": "Passport verification recomputes protocol systemHash for signed document validation; migration needs a passport dependency decision."
+  },
+  {
+    "file": "packages/share/src/agent/knowledge.ts",
+    "reason": "@gogol/share cannot depend on @gogol/fingerprint because fingerprint depends on share; contentHash is Agent Surface wire metadata."
+  },
+  {
+    "file": "packages/share/src/agent/manifest.ts",
+    "reason": "@gogol/share cannot depend on @gogol/fingerprint because fingerprint depends on share; this is the Agent Surface canonical contentHash implementation."
+  },
+  {
+    "file": "packages/share/src/agent/openapi.ts",
+    "reason": "Agent OpenAPI helpers expose contentHash protocol fields and headers; no local hash primitive is defined."
+  },
+  {
+    "file": "packages/share/src/agent/tests/knowledge.test.ts",
+    "reason": "Agent knowledge tests assert contentHash stability for the shared wire protocol."
+  },
+  {
+    "file": "packages/share/src/agent/tests/manifest.test.ts",
+    "reason": "Agent manifest tests assert contentHash stability and protocol digest shape inside @gogol/share."
+  },
+  {
+    "file": "packages/share/src/agent/tests/openapi.test.ts",
+    "reason": "Agent OpenAPI tests assert contentHash projection into OpenAPI extension fields."
+  },
+  {
+    "file": "packages/share/src/knowledge/**",
+    "reason": "CKL knowledge types and tests use sourceHash/contentHash field names as provenance metadata."
+  },
+  {
+    "file": "packages/share/src/onboarding-yaml/**",
+    "reason": "Onboarding YAML descriptors include contentHash fields for generated projections."
+  },
+  {
+    "file": "packages/share/src/semantic/markdown-twin-provenance.ts",
+    "reason": "Markdown twin provenance exposes sourceHash metadata for authored/derived relationships."
+  },
+  {
+    "file": "packages/star-map/src/render.ts",
+    "reason": "Star map rendering carries contentHash metadata in its public output contract."
+  },
+  {
+    "file": "packages/surface/src/bordbuch.ts",
+    "reason": "@gogol/surface exposes Bordbuch sha256 hash-chain schema fields and must not depend on @gogol/fingerprint via share."
+  },
+  {
+    "file": "packages/surface/src/evidence-records.ts",
+    "reason": "@gogol/surface exposes evidence anchoredHash schema fields and must not depend on @gogol/fingerprint via share."
+  }
+]

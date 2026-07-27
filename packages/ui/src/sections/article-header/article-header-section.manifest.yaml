@@ -1,0 +1,42 @@
+id: article-header-section
+uniName: article-header-section
+layer: section
+semanticId: article-header
+archetype: article-header
+cosmicName: Himalia
+role: article-metadata-header
+version: 1.0.0
+intent:
+  - surface-content
+  - orient-visitor
+industryFit: []
+contentSchemaKey: null
+
+propsSchemaCompose:
+  - section-visual
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  properties:
+    header:
+      type: object
+      properties:
+        heading:
+          type: string
+        level:
+          type: number
+    category:
+      type: string
+    summary:
+      type: string
+    articleType:
+      type: string
+    authorName:
+      type: string
+    reviewedAt:
+      type: string
+    readTime:
+      type: string
+    hideSectionNumber:
+      type: boolean

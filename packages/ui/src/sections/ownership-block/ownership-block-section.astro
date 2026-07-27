@@ -1,0 +1,56 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Ownership disclosure — RFC-0103 thin dispatcher: SectionShell + SectionHeader + SectionList.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>Pass surface prop from body to SectionList for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionProps } from "@gogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionList from "@gogol/ui/components/section-body/list/section-list.astro";
+import type { OwnershipBlockSectionContent } from "./ownership-block-section.types.generated.ts";
+
+const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "ownership");
+const props = cast<OwnershipBlockSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="ownership-block"
+  sectionId={sectionId}
+  ariaLabelledBy="ownership-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="ownership-title"
+  />
+  <SectionList
+    items={body.items}
+    note={body.note}
+    iconColor={body.iconColor}
+    align={body.align}
+    itemAlign={body.itemAlign}
+    hideMarkers={body.hideMarkers}
+    effects={body.effects}
+  />
+</SectionShell>

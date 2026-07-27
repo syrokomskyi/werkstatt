@@ -1,0 +1,115 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines the layout and styling for card grids and lists within the UI component layer.</purpose>
+<non-goals>
+  <item>Do not include JavaScript behavior or interactivity.</item>
+  <item>Do not manage global styles or themes outside this component.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Tidied by compass.changesummary.tidy; see git history for prior entries.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: SectionCardGrid — canonical card grid / list. */
+@layer components {
+  .section-card-grid {
+    display: grid;
+    gap: var(--ds-space-5);
+  }
+  .section-card-grid--grid.section-card-grid--cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .section-card-grid--grid.section-card-grid--cols-3 {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .section-card-grid--grid.section-card-grid--cols-4 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  .section-card-grid--list {
+    grid-template-columns: 1fr;
+  }
+  .section-card-grid--align-center {
+    justify-items: center;
+  }
+  .section-card-grid--align-right {
+    justify-items: end;
+  }
+
+  .section-card-grid__card {
+    background: var(--ds-color-card-bg);
+    border: 1px solid var(--ds-color-card-border);
+    border-radius: var(--ds-radius-2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+  }
+  .section-card-grid__card--link {
+    transition: transform var(--ds-duration-fast) var(--ds-ease-standard);
+  }
+  .section-card-grid__card--link:hover {
+    transform: translateY(-2px);
+  }
+
+  /* EffectHost integration: remove conflicting background/border when glass is active */
+  .effect-host--glass.section-card-grid__card,
+  .effect-host--glass.section-card-grid__card--link {
+    background: transparent;
+    border: none;
+  }
+
+  .section-card-grid__image-wrap {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--ds-color-surface);
+  }
+  .section-card-grid__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .section-card-grid__body {
+    padding: var(--ds-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-3);
+  }
+  .section-card-grid__badge {
+    align-self: flex-start;
+    color: var(--ds-color-accent);
+    font-size: var(--ds-text-sm-80);
+    font-family: var(--ds-font-mono);
+    text-transform: uppercase;
+    letter-spacing: var(--ds-tracking-md);
+  }
+  .section-card-grid__number {
+    align-self: flex-start;
+    font-family: var(--ds-font-heading);
+    font-size: var(--ds-text-4);
+    font-weight: var(--ds-font-weight-bold);
+    color: var(--ds-color-success);
+    line-height: 1;
+    margin-bottom: var(--ds-space-2);
+  }
+  .section-card-grid__title {
+    margin: 0;
+    font-family: var(--ds-font-heading);
+    font-size: var(--ds-text-3);
+    font-weight: var(--ds-font-weight-bold);
+    color: var(--ds-color-text);
+  }
+  .section-card-grid__description {
+    margin: 0;
+    color: var(--ds-color-text);
+    line-height: var(--ds-line-height-lg);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .section-card-grid--grid.section-card-grid--cols-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+}

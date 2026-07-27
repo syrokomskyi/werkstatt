@@ -1,0 +1,31 @@
+{
+  "name": "@gogol/site-kernel-astro",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "build:check": "pnpm exec tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gogol/site-kernel": "workspace:*"
+  },
+  "devDependencies": {},
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "architecture",
+      "rationale": "Astro adapter behavior is covered through app build/check pipelines; direct package tests are deferred until adapter fixture coverage is added.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

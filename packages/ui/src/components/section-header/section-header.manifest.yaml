@@ -1,0 +1,15 @@
+id: section-header-component
+uniName: section-header-component
+layer: component
+semanticId: section-header
+archetype: section-header
+cosmicName: Pasiphae
+role: section-header
+version: 1.0.0
+intent:
+  - render-section-title
+  - render-section-number
+  - render-tone-segmented-heading
+  - render-optional-subheading
+industryFit: []
+contentSchemaKey: null

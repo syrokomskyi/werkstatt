@@ -1,0 +1,96 @@
+# Constellation: Handwerk Trust Funnel
+# [DNA-23][RFC-0025][RFC-0071][RFC-0072] — Validated by constellation.contract.validate
+id: handwerk-trust-funnel
+name: Handwerk Trust Funnel
+family: handwerk-trust-engineering
+description: >
+  Proven section sequence for founder-led Handwerk sites converting skeptical
+  visitors into qualified written project inquiries. The first screen leads
+  with customer result, findability, and ownership; exit clarity (Notausgang)
+  appears later as proof of transparent terms, not as the primary buying frame.
+forStar: Vega
+version: 1.0.0
+
+slots:
+  - cosmicName: Phobos # hero-decision-card
+    label: Decision-card hero
+    rationale: >
+      Establish the founder, audience fit, and immediate path to a written
+      inquiry. The decision card surfaces findability, ownership, and done-for-you
+      relief in customer language; exit terms are handled later as trust proof.
+
+  - cosmicName: Quaoar # video-section
+    label: Video proof
+    optional: true
+    rationale: >
+      Demonstrate the WGogol operating model immediately after the decision
+      hero when source material is available. Kept optional because a new site
+      may start without a feature video.
+
+  - cosmicName: Deimos # trust-strip
+    label: Trust strip
+    rationale: >
+      Show concrete trust signals early: focused Handwerk fit, open baseline
+      price, own domain/data space, and clear handover. Equally weighted, no
+      aggressive sales framing.
+
+  - cosmicName: Janus # comparison-cards
+    label: Comparison cards
+    rationale: >
+      Differentiate owned digital assets from rented platform profiles, closed
+      builders, and generic agency delivery. Side-by-side claims use concrete
+      examples without volatile third-party price claims unless CKL provenance
+      exists.
+
+  - cosmicName: Epimetheus # audience-cards
+    label: Audience cards
+    rationale: >
+      Keep one active doorway for Handwerk now, while making the modular
+      expansion rule visible: another segment opens only after a signed case
+      and repeated demand.
+
+  - cosmicName: Helene # ownership-block
+    label: Ownership block
+    rationale: >
+      Make ownership and vendor-lock-in boundaries explicit. Domain, data,
+      and agreed materials remain with the client.
+
+  - cosmicName: Telesto # notausgang-block
+    label: Notausgang block
+    rationale: >
+      De-risk the decision after value and ownership are understood by naming
+      the exit path near price, responsibility, FAQ, and the final ask. 30-day
+      notice, export package, and data handover are stated in writing.
+
+  - cosmicName: Calypso # controlled-responsibility-block
+    label: Controlled responsibility block
+    rationale: >
+      Clarify what WGogol owns versus what the client keeps. ROI and lead
+      counts are explicitly out of scope; structure and process are in.
+
+  - cosmicName: Pan # price-card
+    label: Price card
+    optional: true
+    rationale: >
+      Price visibility supports serious qualification. Optional because the
+      home page can defer to the dedicated price page.
+
+  - cosmicName: Mimas # people spotlight
+    label: Founder spotlight
+    optional: true
+    rationale: >
+      Personal founder proof (name, location, years of experience, written
+      responsibility) may be added through the canonical People spotlight
+      where narrative weight allows.
+
+  - cosmicName: Atlas # faq-list (reuses existing @gogol/ui section)
+    label: FAQ list
+    rationale: >
+      Remove common operational objections before the final ask. Reuses the
+      existing faq-list section; no new implementation needed.
+
+  - cosmicName: Dione # final-cta (reuses existing @gogol/ui section)
+    label: Final CTA
+    rationale: >
+      End with one focused written-inquiry action after trust and constraints
+      are visible. Reuses the existing final-cta section.

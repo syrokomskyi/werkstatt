@@ -1,0 +1,21 @@
+# Event: contact.phone_click
+# RFC-0305 / Messkanon
+
+id: contact.phone_click
+label: Contact Phone Click
+description: >
+  A visitor clicked a telephone contact affordance. Payload must identify only
+  the placement, not the phone number or visitor.
+
+category: contact
+autoEmit: false
+
+payload:
+  locale:
+    type: string
+    description: Active locale
+    required: true
+  placement:
+    type: string
+    description: "Stable machine-readable UI placement, such as header or footer"
+    required: true

@@ -1,0 +1,30 @@
+id: ownership-block-section
+uniName: ownership-block-section
+layer: section
+semanticId: ownership-block
+archetype: ownership-block
+cosmicName: Helene
+role: client-ownership-disclosure
+version: 1.2.0
+intent:
+  - trust
+  - legal-clarity
+  - de-risk
+industryFit:
+  - trades-and-construction
+  - consulting-and-coaching
+  - legal-services
+contentSchemaKey: ownership-block-section
+contentTypesPath: ./ownership-block-section.types.ts
+
+propsSchemaCompose:
+  - section-visual
+  - section-header
+  - body-list
+
+propsSchema:
+  type: object
+  additionalProperties: false
+  required:
+    - header
+    - body

@@ -1,0 +1,28 @@
+{
+  "name": "check-webgogol-runner",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/worker.ts",
+    "run:once": "tsx src/run-once.ts",
+    "build:check": "tsc --noEmit",
+    "check": "site-kernel run check-webgogol.runner.validate"
+  },
+  "dependencies": {
+    "@gogol/check-core": "workspace:*",
+    "@gogol/check-runner-node": "workspace:*",
+    "@gogol/site-kernel-check-webgogol": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.1"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "platform",
+      "rationale": "Runner behavior is covered by check-core contracts, check-runner-node type checks, and check-webgogol runner validation; direct service tests are deferred until browser-capture fixtures exist.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

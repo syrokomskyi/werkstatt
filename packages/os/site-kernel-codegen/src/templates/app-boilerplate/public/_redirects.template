@@ -1,0 +1,5 @@
+{{GENERATED_HEADER}}
+# [RFC-0160] Default-language prefix redirect — unprefixed canonical URLs.
+# Redirects /<defaultLang>/* to /* so bookmarks / search results pointing at the
+# old prefixed default language resolve with a 308 Permanent Redirect.
+/{{DEFAULT_LANG}}/* /:splat 308{{RETIRED_SURFACE_REDIRECTS}}{{RETIRED_PAGE_ROUTES}}

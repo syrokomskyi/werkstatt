@@ -1,0 +1,101 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  [RFC-0102] Canonical header component for every shared section. Owns the
+  section-number + heading + optional subheading markup, supports tone-segmented
+  headings from the biome palette, and aligns the whole block independently of
+  the section body.
+</purpose>
+<non-goals>
+  <item>Do not own background, glass, density, or tone — those live on <SectionShell>.</item>
+  <item>Do not own body content — that flows through RFC-0103 body components.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Initial creation per RFC-0102 step 1 — additive landing of the header primitive.</item>
+</CHANGE_SUMMARY>
+*/
+
+import type { SectionHeaderProps, HeadingContent } from "@gogol/share";
+import { composeEffectPresentation, effectVarsToStyle } from "../effects/registry.ts";
+import "../effects/effect-text.css";
+import "./section-header.css";
+
+const {
+  sectionNumber,
+  hideSectionNumber = false,
+  heading,
+  subheading,
+  align = "left",
+  level = 2,
+  id,
+  headingEffects,
+  subheadingEffects,
+} = Astro.props as SectionHeaderProps;
+
+// RFC-0151: typographic effects apply directly to the heading element (no
+// wrapper, no clipping), composed through the shared effect-kind registry.
+const headingPresentation = composeEffectPresentation(headingEffects, "text");
+const headingEffectStyle = effectVarsToStyle(headingPresentation.vars);
+
+const subheadingPresentation = composeEffectPresentation(subheadingEffects, "text");
+const subheadingEffectStyle = effectVarsToStyle(subheadingPresentation.vars);
+
+const showNumber = !hideSectionNumber && Boolean(sectionNumber);
+const segments: Array<{ text: string; tone: string }> = Array.isArray(heading)
+  ? heading.map((s) => ({ text: s.text, tone: s.tone ?? "default" }))
+  : [{ text: heading as string, tone: "default" }];
+
+const HeadingTag = `h${level}` as "h1" | "h2";
+---
+
+<header
+  class:list={[
+    "section-header",
+    `section-header--align-${align}`,
+    { "section-header--with-number": showNumber },
+  ]}
+>
+  <div class="section-header__main">
+    {
+      showNumber && (
+        <span class="section-header__number" aria-hidden="true">
+          {sectionNumber}
+        </span>
+      )
+    }
+    <HeadingTag
+      class:list={["section-header__title", "effect-text", ...headingPresentation.classes]}
+      id={id}
+      style={headingEffectStyle}
+    >
+      {
+        segments.map((s) => (
+          <span
+            class:list={[
+              "section-header__title-segment",
+              `section-header__title-segment--${s.tone}`,
+            ]}
+          >
+            {s.text}
+          </span>
+        ))
+      }
+    </HeadingTag>
+  </div>
+  {
+    subheading && (
+      <p
+        class:list={[
+          "section-header__subheading",
+          "effect-text",
+          ...subheadingPresentation.classes,
+        ]}
+        style={subheadingEffectStyle}
+      >
+        {subheading}
+      </p>
+    )
+  }
+</header>

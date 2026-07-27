@@ -1,0 +1,13 @@
+id: home-page
+uniName: home-page
+layer: page
+semanticId: home
+archetype: home
+
+cosmicName: Vega
+version: 1.0.0
+intent:
+  - establish-identity
+  - drive-donation
+industryFit: [non-profit]
+contentSchemaKey: null

@@ -1,0 +1,19 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@gogol/share": ["../share/src/index.ts"],
+      "@gogol/share/i18n": ["../share/src/i18n/localization.ts"],
+      "@gogol/share/*": ["../share/src/*"],
+      "@gogol/ui": ["./src/index.ts"],
+      "@gogol/ui/icons/lordicon/*": ["./src/icons/gen/lordicon/*"],
+      "@gogol/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "../share/src/env.d.ts"],
+  "exclude": ["dist", "node_modules", "src/icons/gen"]
+}

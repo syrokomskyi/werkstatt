@@ -1,0 +1,22 @@
+---
+kind: prose
+lang: {{LANG}}
+---
+{{GENERATED_HEADER}}
+
+<!--
+  GENERATED FILE — do not edit directly.
+  Source: business/{lang}/assets/*.credits.yaml
+  Regenerate: pnpm exec site-kernel run material.credits.generate --site <app-id>
+  Drift check: pnpm exec site-kernel run material.credits.drift.validate --site <app-id>
+-->
+
+# {{TITLE}}
+
+<p class="lead">{{DESCRIPTION}}</p>
+
+{{CREDIT_LIST}}
+
+---
+
+{{COPYRIGHT_EXPLANATION}}

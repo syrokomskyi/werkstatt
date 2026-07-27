@@ -1,0 +1,28 @@
+{
+  "name": "@gogol/lagebild-sync-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "RFC-0186: Shared Lagebild sync worker. Multi-tenant cron worker that syncs CRM buffer outbox for all clients via tenant registry.",
+  "main": "src/index.ts",
+  "scripts": {
+    "build:check": "tsc --noEmit",
+    "deploy": "site-kernel run deploy.preflight --service lagebild-sync-worker && wrangler deploy --secrets-file .env"
+  },
+  "dependencies": {
+    "@gogol/integration-adapter-supabase-crm": "workspace:*",
+    "@gogol/share": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260721.1",
+    "wrangler": "^4.112.0"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "architecture",
+      "rationale": "Shared Worker behavior is covered through the Supabase CRM adapter package; direct worker tests are deferred until worker-runtime fixtures are added.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

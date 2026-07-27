@@ -1,0 +1,10 @@
+31a9c497c36c29f45529cb3241f977047485ea65d7c30166654cc30dbdbb82fc  /mnt/data/PBP-specification-package.zip
+ef14b8cf0071eb8b5eb371bb315e09e2ee1a23b917fb250c596336338787805e  /mnt/data/pbp-specification-package/00-README.md
+facf77a6a5d1b839dc0e00adc5937e23c7d47b339cb0b5a4778cf5eef8a9a751  /mnt/data/pbp-specification-package/01-PBP-System-Specification.md
+bab1b92d6eeba0bb363816b882e4a6b914a4326d07337beb2db1fe642cdd3c00  /mnt/data/pbp-specification-package/02-PBP-Entity-and-Field-Model.md
+cf115ce16e7192ebf56a02fe67bc934d054d53190861e7187f55a5c956c84e1b  /mnt/data/pbp-specification-package/03-PBP-Compiler-Validation-and-Projections.md
+1da5fabe1b4febe43a9e6bb55995bbc9cbcb3c29b7bd1d181117b82e63468c99  /mnt/data/pbp-specification-package/04-Webgogol-Migration-Agent-Plan.md
+0b7d21c6820ea66f4e7c514763d18ea64c35d50b443f70b58eed4ec7988c7451  /mnt/data/pbp-specification-package/05-Webgogol-Target-Manifest-Blueprint.md
+8ca6548ac9ee99fb16ae7a1dce1ccc1311dfd17149716af1085725632e21d5ff  /mnt/data/pbp-specification-package/06-PBP-RFC-Roadmap.md
+52d2f03f9387143b5c14d9caa91f736b8ae37210f41de43d00f1c457003490ab  /mnt/data/pbp-specification-package/07-PBP-Decision-Log.md
+fd3dfba448683ae7adcae058cac69d8379d489639a12c08afe1fc0c1da07b4cd  /mnt/data/pbp-specification-package/PBP-SPECIFICATION-COMPLETE.md

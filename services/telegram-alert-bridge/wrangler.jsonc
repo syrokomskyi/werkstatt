@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-alert-bridge",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-01-01",
+  "observability": {
+    "logs": {
+      "enabled": true,
+    },
+    "traces": {
+      "enabled": true,
+      "destinations": ["signoz"],
+    },
+  },
+}

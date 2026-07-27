@@ -1,0 +1,37 @@
+name: Turbo cache parity (RFC-0259)
+
+on:
+  schedule:
+    # Weekly, Monday 03:00 UTC. Expensive (real cold + warm build cycle per
+    # app) — not a per-PR gate. See docs/rfcs/rfc-0259-align-turbo-task-contracts-with-generated-build-artifacts.md.
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+jobs:
+  cache-parity:
+    runs-on: ubuntu-latest
+    name: Cold vs warm build parity
+    strategy:
+      matrix:
+        app: [nicaragua-projekt]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: pipeline.cache.parity — ${{ matrix.app }}
+        run: pnpm exec site-kernel run pipeline.cache.parity --app ${{ matrix.app }} --json

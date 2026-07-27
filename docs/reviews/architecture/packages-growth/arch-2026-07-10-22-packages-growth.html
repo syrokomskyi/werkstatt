@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review — packages/growth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
+      .dead {
+        opacity: 0.35;
+      }
+      .stale {
+        border-color: #dc2626;
+        border-style: dashed;
+      }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-4">
+        <div class="flex items-baseline justify-between">
+          <h1 class="text-3xl font-serif text-slate-800">
+            Architecture review — <code class="text-2xl">@gogol/growth</code>
+          </h1>
+          <span class="text-sm text-slate-500">2026-07-10</span>
+        </div>
+        <div class="flex gap-6 text-xs text-slate-600">
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 border-2 border-slate-700 bg-white"></div>
+            module
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-0.5 border-t-2 border-dashed border-slate-500"></div>
+            seam
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 border-2 border-red-600 border-dashed"></div>
+            stale / leaking
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 deep"></div>
+            deep module
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 border border-slate-300 dead"></div>
+            dead code
+          </div>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+        <!-- Candidate 1 -->
+        <article
+          id="c1"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              Stale funnel &amp; experiment validators — hardcoded catalog and legacy
+              <code>system.yaml</code> path
+            </h2>
+            <div class="flex gap-2">
+              <span
+                class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"
+                >Strong</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/os/site-kernel-checks/src/growth-funnel.ts</div>
+            <div>packages/os/site-kernel-checks/src/growth-experiment.ts</div>
+            <div>packages/os/site-kernel-checks/src/growth-events.ts</div>
+            <div>packages/os/site-kernel-checks/src/growth-adapter.ts</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — three shallow validators
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">growth-events.ts</div>
+                  <div class="text-slate-700">imports EVENT_NAMES ✓</div>
+                  <div class="text-slate-700">uses loadSystemManifest ✓</div>
+                </div>
+                <div class="rounded border-2 border-red-600 border-dashed bg-white p-2 stale">
+                  <div class="font-mono text-[10px] text-red-600">growth-funnel.ts</div>
+                  <div class="text-red-700">hardcoded VALID_EVENT_NAMES — missing 7+ events</div>
+                  <div class="text-red-700">reads system.yaml (doesn't exist)</div>
+                </div>
+                <div class="rounded border-2 border-red-600 border-dashed bg-white p-2 stale">
+                  <div class="font-mono text-[10px] text-red-600">growth-experiment.ts</div>
+                  <div class="text-red-700">reads system.yaml (doesn't exist)</div>
+                  <div class="text-red-700">cross-ref check silently no-ops</div>
+                </div>
+                <div class="text-center text-slate-400 text-[10px]">
+                  each reimplements: readdir → parseYaml → validate → cross-ref
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — one deep ontology validator
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded deep p-2 text-white">
+                  <div class="font-mono text-[10px] text-slate-300">OntologyCatalogValidator</div>
+                  <div class="text-slate-200">
+                    shared: readdir, parseYaml, cross-ref via loadSystemManifest
+                  </div>
+                  <div class="text-slate-200">imports EVENT_NAMES from @gogol/growth</div>
+                  <div class="text-slate-400 text-[10px] mt-1">├─ validateEvents()</div>
+                  <div class="text-slate-400 text-[10px]">├─ validateFunnels()</div>
+                  <div class="text-slate-400 text-[10px]">└─ validateExperiments()</div>
+                </div>
+                <div class="text-center text-slate-500 text-[10px]">
+                  one interface, one place to test, one catalog source
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-sm text-slate-700">
+              <strong>Problem.</strong> The funnel validator carries a hardcoded
+              <code>VALID_EVENT_NAMES</code> set that drifted — it's missing
+              <code>contact.phone_click</code>, <code>passport-view</code>,
+              <code>star-map-navigate</code>, and all donation events. Funnel steps referencing any
+              of these are falsely rejected. Both funnel and experiment validators read
+              <code>system.yaml</code>, a file that no longer exists after the RFC-0047
+              <code>system.md</code> migration. Their cross-reference checks silently no-op.
+            </p>
+            <p class="text-sm text-slate-700">
+              <strong>Solution.</strong> Deepen: one <code>OntologyCatalogValidator</code> module
+              that owns the readdir → parseYaml → validate → cross-reference pipeline. Each catalog
+              (events, funnels, experiments) contributes a small entry-validator. The module imports
+              <code>EVENT_NAMES</code> from <code>@gogol/growth</code> and reads system config via
+              <code>loadSystemManifest</code> — like <code>growth-adapter.ts</code> already does.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: catalog drift eliminated — one import</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: system.yaml → system.md fixed once</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >leverage: three validators behind one interface</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >delete 3 × boilerplate readdir/parse blocks</span
+            >
+          </div>
+        </article>
+
+        <!-- Candidate 2 -->
+        <article
+          id="c2"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              Dead <code>ClientRuntimeContext</code> — exported, set on <code>window</code>, never
+              read
+            </h2>
+            <div class="flex gap-2">
+              <span
+                class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"
+                >Strong</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/growth/src/client.ts:65-73 — ClientRuntimeContext interface</div>
+            <div>packages/growth/src/client.ts:119 — set on window.__webgogol_growth_ctx__</div>
+            <div>packages/growth/src/index.ts:47 — re-exported from barrel</div>
+            <div>0 consumers across packages/ui, packages/os, apps/*</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — shallow module with zero readers
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border border-slate-300 bg-white p-2 dead">
+                  <div class="font-mono text-[10px] text-slate-400">ClientRuntimeContext</div>
+                  <div class="text-slate-400">segment: null (always)</div>
+                  <div class="text-slate-400">flags: {} (always)</div>
+                  <div class="text-slate-400">experiments: passthrough</div>
+                </div>
+                <div class="rounded border border-slate-300 bg-white p-2 dead">
+                  <div class="font-mono text-[10px] text-slate-400">GROWTH_CONTEXT_KEY</div>
+                  <div class="text-slate-400">window.__webgogol_growth_ctx__</div>
+                  <div class="text-slate-400">written ✓ — read ✗</div>
+                </div>
+                <div class="text-center text-slate-400 text-[10px]">
+                  deletion test: complexity does not reappear elsewhere
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — deleted
+              </div>
+              <div class="space-y-2 text-xs">
+                <div
+                  class="rounded border border-slate-200 bg-white p-2 text-center text-slate-400"
+                >
+                  <div class="text-[10px]">— removed —</div>
+                </div>
+                <div class="text-center text-slate-500 text-[10px]">
+                  bootGrowthLayer() keeps its real work: config → adapter → emit
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-sm text-slate-700">
+              <strong>Problem.</strong> <code>ClientRuntimeContext</code> is a shallow interface —
+              three fields, all stubs or passthrough. It's written to <code>window</code> but no
+              module in <code>packages/ui</code>, <code>packages/os</code>, or
+              <code>apps/*</code> ever reads it. The deletion test says: deleting it removes dead
+              code; complexity does not reappear across callers.
+            </p>
+            <p class="text-sm text-slate-700">
+              <strong>Solution.</strong> Delete <code>ClientRuntimeContext</code>,
+              <code>GROWTH_CONTEXT_KEY</code>, the <code>window</code> assignment in
+              <code>bootGrowthLayer()</code>, and the re-exports from <code>index.ts</code>. When
+              RFC-0027 persona detection actually ships, reintroduce a context module with real
+              behaviour behind it.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >delete ~30 lines of dead code</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >remove 2 unused exports from barrel</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >remove 1 untyped window global</span
+            >
+          </div>
+        </article>
+
+        <!-- Candidate 3 -->
+        <article
+          id="c3"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              Split adapter registry — two lists that must stay in sync by hand
+            </h2>
+            <div class="flex gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800"
+                >Worth exploring</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >ports &amp; adapters</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/growth/src/adapter.ts:218 — KNOWN_ADAPTER_IDS = ["null", "matomo"]</div>
+            <div>
+              packages/growth/src/provider.astro:84-86 — _adapterSpecifiers = { matomo: "..." }
+            </div>
+            <div>
+              packages/os/site-kernel-checks/src/growth-adapter.ts:38 — imports KNOWN_ADAPTER_IDS
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — registry split across two modules
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="flex items-center gap-2">
+                  <div class="rounded border-2 border-slate-700 bg-white p-2 flex-1">
+                    <div class="font-mono text-[10px] text-slate-500">adapter.ts</div>
+                    <div class="text-slate-700">KNOWN_ADAPTER_IDS</div>
+                    <div class="text-slate-400 text-[10px]">["null", "matomo"]</div>
+                  </div>
+                  <div class="text-slate-400">↔</div>
+                  <div class="rounded border-2 border-slate-700 bg-white p-2 flex-1">
+                    <div class="font-mono text-[10px] text-slate-500">provider.astro</div>
+                    <div class="text-slate-700">_adapterSpecifiers</div>
+                    <div class="text-slate-400 text-[10px]">{ matomo: "..." }</div>
+                  </div>
+                </div>
+                <div class="text-center text-red-600 text-[10px]">
+                  adding an adapter = edit both files, keep in sync manually
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — one registry module at the seam
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded deep p-2 text-white">
+                  <div class="font-mono text-[10px] text-slate-300">adapter-registry.ts</div>
+                  <div class="text-slate-200">KNOWN_ADAPTER_IDS + specifier map</div>
+                  <div class="text-slate-200">single source of truth</div>
+                </div>
+                <div class="flex gap-2">
+                  <div
+                    class="rounded border border-slate-300 bg-white p-1.5 flex-1 text-center text-[10px]"
+                  >
+                    adapter.ts imports
+                  </div>
+                  <div
+                    class="rounded border border-slate-300 bg-white p-1.5 flex-1 text-center text-[10px]"
+                  >
+                    provider.astro imports
+                  </div>
+                  <div
+                    class="rounded border border-slate-300 bg-white p-1.5 flex-1 text-center text-[10px]"
+                  >
+                    validator imports
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-sm text-slate-700">
+              <strong>Problem.</strong> The adapter id list lives in <code>adapter.ts</code>; the
+              module-specifier map lives in <code>provider.astro</code>. Adding an adapter requires
+              editing both and keeping them in sync by hand. The validator in
+              <code>growth-adapter.ts</code> imports <code>KNOWN_ADAPTER_IDS</code> but can't verify
+              the provider's specifier map matches.
+            </p>
+            <p class="text-sm text-slate-700">
+              <strong>Solution.</strong> Deepen: one registry module that owns both the id list and
+              the specifier map. <code>adapter.ts</code>, <code>provider.astro</code>, and the
+              validator all import from it. The seam stays at the
+              <code>GrowthAdapter</code> interface; the registry is behind it.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: adapter registration in one place</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >leverage: validator can check registry ↔ specifier parity</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >eliminate manual sync between .ts and .astro</span
+            >
+          </div>
+        </article>
+
+        <!-- Candidate 4 -->
+        <article
+          id="c4"
+          class="rounded-xl border border-slate-200 bg-white p-6 space-y-5 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-serif text-slate-800">
+              Duplicated vendor config schema — two zod shapes that must agree
+            </h2>
+            <div class="flex gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800"
+                >Worth exploring</span
+              >
+              <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/growth/src/config.ts:35-47 — GrowthVendorConfigSchema</div>
+            <div>
+              packages/ontology/src/schemas/system/growth.ts:39-42 — systemGrowthSchema.vendor
+            </div>
+            <div>packages/growth/src/provider.astro:51-60 — GrowthConfigSchema.parse()</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Before -->
+            <div class="rounded-lg border border-slate-200 bg-stone-50 p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                Before — two identical schemas
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="flex gap-2">
+                  <div class="rounded border-2 border-slate-700 bg-white p-2 flex-1">
+                    <div class="font-mono text-[10px] text-slate-500">config.ts</div>
+                    <div class="text-slate-700 text-[10px]">adapter: z.string().min(1)</div>
+                    <div class="text-slate-700 text-[10px]">options: z.record(...)</div>
+                  </div>
+                  <div class="rounded border-2 border-slate-700 bg-white p-2 flex-1">
+                    <div class="font-mono text-[10px] text-slate-500">ontology/growth.ts</div>
+                    <div class="text-slate-700 text-[10px]">adapter: z.string().min(1)</div>
+                    <div class="text-slate-700 text-[10px]">options: z.record(...)</div>
+                  </div>
+                </div>
+                <div class="text-center text-red-600 text-[10px]">
+                  structural drift: if one adds a field, the other silently drops it
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <div class="text-xs uppercase tracking-wider text-slate-500 mb-3">
+                After — ontology owns the vendor schema
+              </div>
+              <div class="space-y-2 text-xs">
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">ontology/growth.ts</div>
+                  <div class="text-slate-700">GrowthVendorSchema (source)</div>
+                </div>
+                <div class="text-center text-slate-400 text-[10px]">↓ imported</div>
+                <div class="rounded border-2 border-slate-700 bg-white p-2">
+                  <div class="font-mono text-[10px] text-slate-500">config.ts</div>
+                  <div class="text-slate-700">GrowthConfigSchema extends GrowthVendorSchema</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-sm text-slate-700">
+              <strong>Problem.</strong> The <code>vendor</code> object (<code>adapter</code> +
+              <code>options</code>) is defined twice — once in <code>config.ts</code> as
+              <code>GrowthVendorConfigSchema</code>, once in <code>ontology/growth.ts</code> inside
+              <code>systemGrowthSchema</code>. They're structurally identical today, but nothing
+              enforces parity. A field added to one is silently absent from the other.
+            </p>
+            <p class="text-sm text-slate-700">
+              <strong>Solution.</strong> Ontology owns the canonical vendor schema;
+              <code>config.ts</code> imports and composes it into <code>GrowthConfigSchema</code>.
+              One shape, one place to change it.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >locality: vendor schema drift eliminated</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >leverage: one schema, two consumers</span
+            >
+            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700"
+              >delete 1 duplicated zod object</span
+            >
+          </div>
+        </article>
+      </section>
+
+      <!-- Top recommendation -->
+      <section
+        id="top-recommendation"
+        class="rounded-xl border-2 border-emerald-300 bg-emerald-50 p-6 space-y-3"
+      >
+        <h2 class="text-xl font-serif text-slate-800">Top recommendation</h2>
+        <div class="flex items-baseline gap-3">
+          <a href="#c1" class="text-lg font-medium text-emerald-800 hover:underline"
+            >Stale funnel &amp; experiment validators</a
+          >
+          <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800"
+            >Strong</span
+          >
+        </div>
+        <p class="text-sm text-slate-700">
+          This is the only candidate with a live bug: <code>growth-funnel.ts</code> rejects funnel
+          steps that reference any event added since RFC-0305, and both funnel and experiment
+          validators silently skip their cross-reference checks because <code>system.yaml</code> no
+          longer exists. The fix is a deepening — collapse three shallow validators into one module
+          that imports <code>EVENT_NAMES</code> from <code>@gogol/growth</code> and reads system
+          config via <code>loadSystemManifest</code>. The other candidates are worth exploring but
+          carry no active defects.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

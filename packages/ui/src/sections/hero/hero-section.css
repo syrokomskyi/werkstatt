@@ -1,0 +1,412 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Defines styles for the hero section, ensuring responsive and visually appealing layouts.</purpose>
+<non-goals>
+  <item>Do not include JavaScript behavior or interactivity.</item>
+  <item>Do not manage global styles or themes outside the hero context.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Backfill CSS structure for the hero section to align with RFC-0101/0102.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* Content-only CSS for hero composite after RFC-0101/0102. */
+@layer components {
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .hero__bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--ds-color-hero-overlay);
+  }
+
+  .section-shell[data-slug="hero"] {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  /* Full-viewport hero only when it is the first section (e.g. home page).
+     The header offset/clearance is owned globally by `main > :first-child`.
+     After breadcrumbs the hero is a compact sub-page header that sizes to its
+     content, so there is no large gap and no overlap with the fixed header. */
+  main > .section-shell[data-slug="hero"]:first-child {
+    min-height: 100svh;
+  }
+  .section-shell[data-slug="hero"] > .section-shell__container {
+    width: 100%;
+  }
+
+  .hero__container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--ds-space-6);
+    align-items: end;
+    color: var(--ds-color-hero-text);
+    position: relative;
+    padding-inline: var(--ds-size-section-padding-x);
+    padding-block-start: var(--ds-size-section-padding-y);
+    max-width: min(var(--ds-size-container-max), var(--ds-size-section-content-max));
+    margin-inline: auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  @media (min-width: 960px) {
+    .hero__container {
+      grid-template-columns: 1fr 1fr;
+    }
+    .hero__container--inline-lead {
+      grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+      align-items: center;
+    }
+    .hero__container--inline-lead .hero__content {
+      grid-column: 1;
+    }
+  }
+
+  /* The lead image is shown on every breakpoint. It is DOM-first inside
+     .hero__container, so on the single-column mobile layout it renders above
+     the text (image first), and on the two-column desktop layout it sits in
+     the left column. */
+  .hero__portrait {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  .hero__portrait-image {
+    display: block;
+    --section-image-fade-width: 20%;
+    max-height: 50vh;
+    width: auto;
+    /* Preserve the source aspect ratio for every orientation: height always follows
+       width, and `contain` letterboxes rather than stretches if a box is ever imposed
+       (a landscape content photo must never be distorted into the portrait slot). */
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: var(--ds-radius-2);
+  }
+  .hero__portrait-image--fade-top {
+    mask-image: linear-gradient(
+      to top,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to top,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+  }
+  .hero__portrait-image--fade-bottom {
+    mask-image: linear-gradient(
+      to bottom,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+  }
+  .hero__portrait-image--fade-left {
+    mask-image: linear-gradient(
+      to left,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to left,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+  }
+  .hero__portrait-image--fade-right {
+    mask-image: linear-gradient(
+      to right,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      black 0,
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+  }
+  .hero__portrait-image--fade-bottom.hero__portrait-image--fade-top {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      black var(--section-image-fade-width),
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      black var(--section-image-fade-width),
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+  }
+  .hero__portrait-image--fade-left.hero__portrait-image--fade-right {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black var(--section-image-fade-width),
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black var(--section-image-fade-width),
+      black calc(100% - var(--section-image-fade-width)),
+      transparent 100%
+    );
+  }
+  .hero__portrait-image--fade-bottom.hero__portrait-image--fade-left:not(
+      .hero__portrait-image--fade-right
+    ):not(.hero__portrait-image--fade-top) {
+    mask-image:
+      linear-gradient(
+        to bottom,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      ),
+      linear-gradient(
+        to left,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      );
+    -webkit-mask-image:
+      linear-gradient(
+        to bottom,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      ),
+      linear-gradient(
+        to left,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      );
+    mask-composite: intersect;
+    -webkit-mask-composite: intersect;
+  }
+  .hero__portrait-image--fade-bottom.hero__portrait-image--fade-right:not(
+      .hero__portrait-image--fade-left
+    ):not(.hero__portrait-image--fade-top) {
+    mask-image:
+      linear-gradient(
+        to bottom,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      );
+    -webkit-mask-image:
+      linear-gradient(
+        to bottom,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      );
+    mask-composite: intersect;
+    -webkit-mask-composite: intersect;
+  }
+  .hero__portrait-image--fade-bottom.hero__portrait-image--fade-left.hero__portrait-image--fade-right:not(
+      .hero__portrait-image--fade-top
+    ) {
+    mask-image:
+      linear-gradient(
+        to bottom,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0,
+        black var(--section-image-fade-width),
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      );
+    -webkit-mask-image:
+      linear-gradient(
+        to bottom,
+        black 0,
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0,
+        black var(--section-image-fade-width),
+        black calc(100% - var(--section-image-fade-width)),
+        transparent 100%
+      );
+    mask-composite: intersect;
+    -webkit-mask-composite: intersect;
+  }
+  @media (min-width: 960px) {
+    .hero__portrait-image {
+      max-height: 80vh;
+    }
+  }
+
+  .hero__inline-media {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-2);
+    width: 100%;
+    margin-block: var(--ds-space-2) var(--ds-space-1);
+    min-width: 0;
+  }
+  .hero__inline-frame {
+    display: block;
+    width: 100%;
+  }
+  .hero__inline-frame img,
+  .hero__inline-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 42vh;
+    object-fit: cover;
+    border-radius: var(--ds-radius-2);
+  }
+  .hero__inline-media .material-credit {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-block-start: 0;
+  }
+  .hero__inline-media .material-credit__summary,
+  .hero__inline-media .material-credit__line,
+  .hero__inline-media .material-credit__details,
+  .hero__inline-media .material-credit__item dd {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .hero__inline-media .material-credit__item {
+    grid-template-columns: minmax(var(--ds-space-16), max-content) minmax(0, 1fr);
+  }
+  @media (max-width: 640px) {
+    .hero__inline-media .material-credit__item {
+      grid-template-columns: 1fr;
+      gap: var(--ds-space-1);
+    }
+  }
+
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-3);
+  }
+  .hero__tagline {
+    margin: 0;
+    color: var(--ds-color-hero-text);
+    font-family: var(--ds-font-mono);
+    letter-spacing: var(--ds-tracking-md);
+    text-transform: uppercase;
+    font-size: var(--ds-text-sm);
+  }
+  .hero__content .section-header {
+    margin-bottom: 0;
+  }
+  .hero__container .hero__content .section-header__subheading {
+    font-family: var(--ds-font-heading);
+    font-size: var(--ds-text-3xl);
+    font-weight: 600;
+    color: var(--ds-color-hero-text);
+    line-height: var(--ds-line-height-heading);
+    max-width: none;
+  }
+  .hero__description {
+    margin: 0;
+    color: var(--ds-color-text-soft-on-dark);
+    line-height: var(--ds-line-height-xl);
+  }
+
+  .hero__cta-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-3);
+  }
+  .hero__cta,
+  .hero__cta-secondary {
+    min-width: 200px;
+  }
+
+  .hero__cta-secondary {
+    color: var(--ds-color-hero-text);
+    border-color: var(--ds-color-hero-text);
+  }
+
+  .hero__cta-secondary:hover {
+    background-color: var(--ds-color-hero-text);
+    color: var(--ds-color-primary);
+  }
+
+  .hero__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-5);
+    padding-top: var(--ds-space-4);
+  }
+  .hero__stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-space-1);
+    padding: var(--ds-space-3) var(--ds-space-5);
+    border-radius: var(--ds-radius-2);
+    background: rgb(255 255 255 / 0.08);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgb(255 255 255 / 0.12);
+  }
+  .hero__stat-value {
+    font-family: var(--ds-font-heading);
+    font-size: var(--ds-text-3xl);
+    color: var(--ds-color-text-inverse);
+    font-weight: 700;
+  }
+  .hero__stat-label {
+    color: var(--ds-color-text-inverse-84);
+    font-size: var(--ds-text-sm);
+  }
+}

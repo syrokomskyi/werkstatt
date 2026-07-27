@@ -1,0 +1,28 @@
+id: transparency
+displayName: Transparency
+version: 1.3.0
+semanticRole: transparency
+description: |
+  Transparency disclosure section. RFC-0103 bodyKind: list with optional report link.
+expectedIntents:
+  - signal-transparency
+  - build-trust
+  - capture-lead
+expectedIndustryFit:
+  - non-profit
+layoutHint: horizontal-row
+bodyKind: list
+propsSchema:
+  $shape: zod
+  compose:
+    - section-visual
+    - section-header
+    - body-list
+  shape: |
+    z.object({
+      reportLinkLabel: z.string().optional(),
+      reportLinkHref: z.string().optional(),
+    }).strict()
+acceptedCosmicNames:
+  - Tethys
+constraints: {}

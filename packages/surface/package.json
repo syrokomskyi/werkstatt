@@ -1,0 +1,74 @@
+{
+  "name": "@gogol/surface",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "RFC-0192 Programmatic Surface: framework-free route-source port. PageSurfaceProvider contract + axis-generic eligibility engine + Blueprint-driven virtual route generation. Pure functions only — all I/O lives in the kernel command wrapper.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./eligibility": {
+      "types": "./src/eligibility.ts",
+      "default": "./src/eligibility.ts"
+    },
+    "./blueprint": {
+      "types": "./src/blueprint.ts",
+      "default": "./src/blueprint.ts"
+    },
+    "./blueprint-schema": {
+      "types": "./src/blueprint-schema.ts",
+      "default": "./src/blueprint-schema.ts"
+    },
+    "./decision-composer": {
+      "types": "./src/decision-composer.ts",
+      "default": "./src/decision-composer.ts"
+    },
+    "./geo": {
+      "types": "./src/geo.ts",
+      "default": "./src/geo.ts"
+    },
+    "./governance": {
+      "types": "./src/governance/index.ts",
+      "default": "./src/governance/index.ts"
+    },
+    "./io": {
+      "types": "./src/io/index.ts",
+      "default": "./src/io/index.ts"
+    },
+    "./substance": {
+      "types": "./src/substance.ts",
+      "default": "./src/substance.ts"
+    },
+    "./types": {
+      "types": "./src/types.ts",
+      "default": "./src/types.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "echo 'No build step required — TypeScript sources consumed directly'",
+    "build:check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@gogol/site-kernel-content": "workspace:*",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "direct",
+      "owner": "architecture",
+      "rationale": "Vitest unit tests cover eligibility engine pure functions: normalizeSegment, matchesRecord, countMatching, buildRecordIndex, pathKey, enumerateCandidateTuples, buildEligibilityMatrix, nearestLiveAncestor, liveChildrenOf, liveSiblingsOf."
+    }
+  }
+}

@@ -1,0 +1,59 @@
+# Tool-mandatory JSON files that must remain JSON because external tools require it.
+# Category A — do not migrate to YAML.
+# Managed by RFC-0376. Do not add files here unless they are genuinely tool-mandatory.
+npm:
+  - "**/package.json"
+typescript:
+  - "tsconfig*.json"
+  - "**/tsconfig*.json"
+  - "tsconfig/*.json"
+turborepo:
+  - turbo.json
+  - "**/turbo.json"
+cloudflare:
+  - "**/wrangler.jsonc"
+  - "apps/*/.wrangler/deploy/config.json"
+mcp:
+  - .mcp.json
+vscode:
+  - ".vscode/*.json"
+markdownlint:
+  - .markdownlint.json
+skills:
+  - skills-lock.json
+onboarding:
+  - "onboarding/**"
+lordicon:
+  - "packages/ui/src/assets/icons/lordicon/**/*.json"
+publicApi:
+  - "apps/*/public/.well-known/*.json"
+  - "apps/*/public/api/**/*.json"
+  - "apps/*/public/manifest.webmanifest"
+  - "apps/*/public/feed.json"
+githubActions:
+  - ".github/workflows/*.yml"
+  - "apps/*/.github/workflows/*.yml"
+claude:
+  - ".claude/*.json"
+windsurf:
+  - ".windsurf/*.json"
+changelogSystem:
+  - ".changelog-system/*.json"
+opencode:
+  - opencode.json
+integrity:
+  - "apps/*/.integrity/**/*.json"
+fingerprint:
+  - packages/fingerprint/allowlist.json
+  - "packages/fingerprint/src/tests/fixtures/*.json"
+onboardingTemplates:
+  - "packages/os/site-kernel-onboarding/src/templates/*.json"
+  - "packages/os/site-kernel-onboarding/src/templates/**/*.json"
+  - "packages/os/site-kernel-onboarding/src/templates/*.jsonc"
+  - "packages/os/site-kernel-onboarding/src/templates/**/*.jsonc"
+truthMonitor:
+  - "integrations/truth-monitor/*.json"
+surfaceVisibility:
+  - "apps/*/src/surface/visibility/*.json"
+provenance:
+  - "apps/*/provenance/**/*.json"

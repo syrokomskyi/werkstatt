@@ -1,0 +1,66 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Maintains packages/ui/src/components/lang-switcher/lang-switcher-component.css as an authored ui component module so agents can evolve it without rediscovering local boundaries.</purpose>
+<non-goals>
+  <item>Do not define component behavior or JavaScript logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0002: Initial creation of lang-switcher styles.</item>
+  <item>Refactor: simplified to single-button cycle mode.</item>
+  <item>RFC-0003: Restyle lang-switcher as a superscript badge.</item>
+  <item>Revert: restore standalone right-side button styles and move component back to header right side.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* [RFC-0002] Language Switcher Component Styles */
+.lang-switcher__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--ds-color-text);
+  text-decoration: none;
+  font-family: var(--ds-font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin-left: 0.6em;
+  margin-top: 0;
+  position: relative;
+  cursor: pointer;
+  gap: 0;
+}
+
+.lang-switcher__lang-text {
+  display: block;
+  font-size: 0.65rem;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.lang-switcher__nav-icon {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.lang-switcher__link:after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background-color: var(--ds-color-text);
+  transition: width 0.2s var(--ds-ease-smooth, ease);
+}
+
+.lang-switcher__link:hover:after {
+  width: 100%;
+}

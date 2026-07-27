@@ -1,0 +1,45 @@
+{
+  "name": "@gogol/nebula",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nebula Score computation pipeline — composite 0-100 quality metric across four pillars: Performance, Accessibility, Content Health, Architectural Compliance (DNA-33, RFC-0028).",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./weights": {
+      "types": "./src/weights.ts",
+      "default": "./src/weights.ts"
+    },
+    "./compute": {
+      "types": "./src/compute.ts",
+      "default": "./src/compute.ts"
+    },
+    "./collect": {
+      "types": "./src/collect.ts",
+      "default": "./src/collect.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "build": "echo 'No build step required — TypeScript sources consumed directly'",
+    "build:check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "fast-check": "^4.9.0",
+    "vitest": "^4.1.10"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "direct",
+      "owner": "architecture",
+      "rationale": "Vitest unit tests cover derive functions, computeNebulaScore, and toPassportScores."
+    }
+  }
+}

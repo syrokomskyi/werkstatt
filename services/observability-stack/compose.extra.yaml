@@ -1,0 +1,56 @@
+# RFC-0338: compose extension for the SigNoz observability stack.
+# Caddy reverse proxy (TLS + bearer-token auth for OTLP ingest) + placeholders
+# for co-located series services (RFC-0341 fleet-probe-runner, RFC-0343
+# cf-analytics-poller). Foundry generates the base SigNoz compose under pours/;
+# this file is merged via `docker compose -f <foundry-compose> -f compose.extra.yaml up -d`.
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      WGOGOL_OTLP_TOKEN: ${WGOGOL_OTLP_TOKEN}
+    networks:
+      - signoz
+
+  # RFC-0341: fleet-probe-runner — scheduled synthetic probes of all fleet sites.
+  fleet-probe-runner:
+    image: ghcr.io/webgogol/fleet-probe-runner:latest
+    restart: unless-stopped
+    volumes:
+      - ../fleet-probe-runner/targets.generated.json:/app/targets.generated.json:ro
+    environment:
+      WGOGOL_OTLP_ENDPOINT: http://otel-collector:4318
+      # No token needed on the compose network — Caddy guards the public edge.
+      PROBE_INTERVAL_MS: "300000"
+    networks:
+      - signoz
+
+  # RFC-0343: cf-analytics-poller — polls Cloudflare GraphQL analytics into delivery metrics.
+  cf-analytics-poller:
+    image: ghcr.io/webgogol/cf-analytics-poller:latest
+    restart: unless-stopped
+    volumes:
+      - ../cf-analytics-poller/zones.yaml:/app/zones.yaml:ro
+      - cf_analytics_data:/data
+    environment:
+      WGOGOL_OTLP_ENDPOINT: http://otel-collector:4318
+      CF_ANALYTICS_API_TOKEN: ${CF_ANALYTICS_API_TOKEN}
+    networks:
+      - signoz
+
+volumes:
+  caddy_data:
+  caddy_config:
+  cf_analytics_data:
+
+networks:
+  signoz:
+    external: true
+    name: signoz_default

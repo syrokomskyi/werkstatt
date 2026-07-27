@@ -1,0 +1,30 @@
+id: prose-credit-sidecars
+title: Add prose authorship credit sidecars
+status: active
+owner: content-architecture
+priority: 1
+createdAt: 2026-07-01
+reviewAfter: 2026-08-01
+rationale: >
+  Prose records need explicit authorship credit sidecars so published
+  legal, editorial, and narrative material has a reviewable origin.
+sourceCommands:
+  - material.credits.validate
+selectors:
+  apps:
+    - webgogol-com
+  ruleIds:
+    - material.credits.missing-prose-credit
+  severity:
+    - warning
+batchPolicy:
+  maxItemsPerSession: 8
+  commitAfterEachBatch: true
+  push: false
+acceptance:
+  commands:
+    - pnpm exec site-kernel run maintenance.debt.queue.validate --queue prose-credit-sidecars --json
+    - pnpm exec site-kernel run material.credits.validate --site <app> --json
+    - pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+notes:
+  - Do not invent authorship. Use NEED_THIS-style placeholders or documented asserted ownership only where policy allows.

@@ -1,0 +1,41 @@
+// Project-specific: RFC-0186 Lagebild shared sync worker configuration.
+// This file is manually maintained (no generator owns services/ wrangler configs).
+{
+  "name": "gogol-lagebild-sync",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0,
+    "traces": {
+      "enabled": true,
+      "destinations": ["signoz"],
+      "head_sampling_rate": 1.0,
+    },
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1.0,
+      "persist": true,
+      "invocation_logs": true,
+    },
+  },
+  // Secrets (set via `wrangler secret put` or Cloudflare Dashboard):
+  //   LAGEBILD_REGISTRY_URL         — Supabase tenant registry URL
+  //   LAGEBILD_REGISTRY_API_KEY     — Supabase service_role key for registry reads
+  //   LAGEBILD_CRON_GROUP           — optional cron group filter (default: "default")
+  //
+  // Per-tenant secrets (pattern: TENANT_{UPPER_SITE_NAME}_{KIND}):
+  //   sync_tenants.secret_ref fields map to these env keys at runtime.
+  //   Example for site_name "webgogol-com":
+  //     TENANT_WEBGOGOL_COM_PIPEDRIVE_TOKEN
+  //     TENANT_WEBGOGOL_COM_PIPEDRIVE_DOMAIN
+  //     TENANT_WEBGOGOL_COM_SUPABASE_URL
+  //     TENANT_WEBGOGOL_COM_SUPABASE_SERVICE_KEY
+  //
+  // Local testing: copy .env.example → .env for `wrangler dev`.
+  // Deploy: wrangler deploy --secrets-file .env (via lagebild.worker.deploy).
+}

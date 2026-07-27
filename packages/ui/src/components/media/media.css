@@ -1,0 +1,51 @@
+/*
+<MODULE_CONTRACT>
+<purpose>RFC-0210: Media primitive presentation. Token-driven, @layer components, no per-section CSS.</purpose>
+<non-goals>
+  <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0210: introduced media presentation styles.</item>
+</CHANGE_SUMMARY>
+*/
+
+@layer components {
+  .media {
+    display: block;
+    inline-size: 100%;
+    margin: 0;
+  }
+
+  .media__frame {
+    position: relative;
+    inline-size: 100%;
+    overflow: hidden;
+    border-radius: var(--ds-radius-lg, 0.75rem);
+    background: var(--ds-color-surface, #000);
+  }
+
+  .media__video {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  /* Background loop fills its host box. */
+  .media--background {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  /* Plyr (lazy) replaces the native controls when the feature runtime attaches; until then the
+     native controls remain operable (progressive enhancement). */
+  .media--feature .plyr {
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: var(--ds-radius-lg, 0.75rem);
+  }
+}

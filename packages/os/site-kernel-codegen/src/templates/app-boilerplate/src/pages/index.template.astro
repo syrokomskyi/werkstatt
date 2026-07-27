@@ -1,0 +1,100 @@
+---
+{{GENERATED_HEADER}}
+/*
+<MODULE_CONTRACT>
+<purpose>[RFC-0159] Root entry page (`/`). Serves the DEFAULT-language home content
+  directly as fully rendered HTML + JSON-LD (zero redirects) so AI crawlers and
+  lightweight HTTP clients see the offer, not a stub. Canonicalizes to the
+  default-language home (`/<defaultLang>/`) to avoid duplicate content, and embeds
+  a soft client redirect that only fires for supported NON-default browser
+  languages. Mirrors the [lang]/[...slug] route composition.</purpose>
+<non-goals>
+  <item>Do not emit a redirect stub or <meta refresh>.</item>
+  <item>Do not hand-assemble sections — use BlocksRenderer.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0159: replaced redirect-stub proxy with default-language home render.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { getRouteRegistry } from "@gogol/share";
+import { resolvePageRoute } from "@gogol/share/astro/page-handler";
+import type { SemanticPageType } from "@gogol/share/semantic";
+import { buildPageSemanticModel, buildPbpSemanticProfile } from "@gogol/pbp/semantic-profile";
+import BaseLayout from "@gogol/ui/components/layout";
+import BlocksRenderer from "@gogol/ui/blocks-renderer.astro";
+import GrowthProvider from "@gogol/growth/provider.astro";
+import Header from "@gogol/ui/components/header";
+import Footer from "@gogol/ui/components/footer";
+import globalStylesheetUrl from "@styles/global.css?url";
+
+const siteUrl = Astro.site?.toString() ?? Astro.url.origin;
+const { defaultLanguage: lang } = await getRouteRegistry();
+
+const data = await resolvePageRoute({
+  lang,
+  slug: "",
+  siteUrl,
+  buildSemanticModel: async ({ pageId, semanticType, lang, url, surfaceId, depth }) => {
+    const profile = await buildPbpSemanticProfile(
+      lang,
+      url,
+      `${process.cwd()}/src/content/business-profile`,
+    );
+    return buildPageSemanticModel(pageId, semanticType as SemanticPageType, lang, url, profile, undefined, undefined, undefined, surfaceId, depth);
+  },
+});
+---
+
+<BaseLayout
+  title={data.page.title}
+  description={data.resolvedDescription}
+  lang={data.page.lang}
+  biome={data.biome}
+  alternateLinks={data.alternateLinks}
+  semanticPage={data.semanticPage ?? undefined}
+  skipLinkLabel={data.skipLinkLabel}
+  globalStylesheetUrl={globalStylesheetUrl}
+  orchestratorConfig={data.orchestratorConfig}
+>
+  {
+    data.growthConfig && (
+      <GrowthProvider
+        appId={data.appId}
+        locale={lang}
+        vendor={data.growthConfig.vendor}
+        activeFunnels={data.growthConfig.funnels ?? []}
+        activeExperiments={data.growthConfig.experiments ?? []}
+      />
+    )
+  }
+  <Header
+    lang={lang}
+    currentPath={Astro.url.pathname}
+    supportedLangs={data.supportedLangs}
+    localizedSiblingPath={data.localizedSiblingPath}
+    ctaTarget={data.ctaTarget}
+    defaultLanguage={data.defaultLanguageCode}
+  />
+  <BlocksRenderer
+    blocks={data.page.blocks.filter((b) => b.layer === "shell")}
+    lang={lang}
+    defaultLanguageCode={data.defaultLanguageCode}
+    linkRegistry={{}}
+    pageId={data.pageId}
+  />
+  <main id="main-content">
+    <BlocksRenderer
+      blocks={data.page.blocks.filter((b) => b.layer !== "shell")}
+      lang={lang}
+      defaultLanguageCode={data.defaultLanguageCode}
+      linkRegistry={{}}
+      pageId={data.pageId}
+    />
+  </main>
+  <Footer lang={lang} defaultLang={data.defaultLanguageCode} />
+  <script>
+    import "../scripts/layout-orchestrator";
+  </script>
+</BaseLayout>

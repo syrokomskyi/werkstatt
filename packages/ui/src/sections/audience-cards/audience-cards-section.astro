@@ -1,0 +1,59 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>Facilitates the rendering of audience cards within a structured section layout.</purpose>
+<non-goals>
+  <item>Do not handle data fetching or state management for audience cards.</item>
+  <item>Do not perform validation of content beyond basic presence checks.</item>
+  <item>Do not manage global application state or configuration settings.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Pass surface prop from body to SectionCardGrid for glass effects.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* RFC-0103: audience-cards thin dispatcher — cards body. */
+
+import type { SectionProps } from "@gogol/share/page";
+import { cast, need, resolveSectionAnchor } from "@gogol/share";
+import SectionShell from "@gogol/ui/components/section-shell.astro";
+import SectionHeader from "@gogol/ui/components/section-header.astro";
+import SectionCardGrid from "@gogol/ui/components/section-body/cards.astro";
+import type { AudienceCardsSectionContent } from "./audience-cards-section.types.generated.ts";
+
+const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "audience-cards");
+const props = cast<AudienceCardsSectionContent>(pageOverride);
+const body = need("body", props.body);
+---
+
+<SectionShell
+  slug="audience-cards"
+  sectionId={sectionId}
+  ariaLabelledBy="audience-cards-title"
+  background={props.background}
+  effects={props.effects}
+  density={props.density}
+  tone={props.tone}
+  lang={lang}
+>
+  <SectionHeader
+    sectionNumber={sectionNumber}
+    heading={need("header.heading", props.header?.heading)}
+    subheading={props.header?.subheading}
+    align={props.header?.align ?? "left"}
+    level={props.header?.level ?? 2}
+    hideSectionNumber={props.header?.hideSectionNumber}
+    id="audience-cards-title"
+  />
+  <SectionCardGrid
+    cards={body.cards}
+    layout={body.layout}
+    columns={body.columns ?? 4}
+    align={body.align}
+    lang={lang}
+    defaultLanguageCode={defaultLanguageCode}
+    effects={body.effects}
+  />
+</SectionShell>

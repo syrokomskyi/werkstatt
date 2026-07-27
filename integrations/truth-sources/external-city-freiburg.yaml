@@ -1,0 +1,7 @@
+id: external:city-freiburg
+title: Stadt Freiburg / Green City Freiburg — official city and sustainability profile
+kind: manual
+endpoint: "https://greencity.freiburg.de/pb/%2CLen/1450158.html"
+expectedType: string
+checkEvery: P6M
+residency: eu

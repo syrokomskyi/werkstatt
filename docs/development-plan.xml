@@ -1,0 +1,421 @@
+<development-plan>
+  <meta>
+    <document-id>development-plan</document-id>
+    <version>1.0.0</version>
+    <status>active</status>
+    <scope>repository-root</scope>
+  </meta>
+
+  <goal>
+    Establish Compass as the repository-wide AI engineering workflow without destabilizing the existing Turborepo,
+    AGENTS hierarchy, or workspace ownership boundaries.
+  </goal>
+
+  <adoption-strategy>
+    <phase id="phase-1">
+      <name>Root semantic layer</name>
+      <status>completed-in-this-change</status>
+      <outputs>
+        <output>`docs/requirements.xml`</output>
+        <output>`docs/technology.xml`</output>
+        <output>`docs/development-plan.xml`</output>
+        <output>`docs/knowledge-graph.xml`</output>
+        <output>`docs/verification-plan.xml`</output>
+      </outputs>
+      <intent>Create a stable machine-readable contract layer for future agents.</intent>
+    </phase>
+
+    <phase id="phase-2">
+      <name>Instruction binding</name>
+      <status>completed-in-this-change</status>
+      <intent>Update active project rules so agents must consult and maintain the Compass documents.</intent>
+    </phase>
+
+    <phase id="phase-3">
+      <name>Incremental source scaffolding</name>
+      <status>in-progress</status>
+      <intent>
+        Apply `MODULE_CONTRACT`, `MODULE_MAP`, `CHANGE_SUMMARY`, and paired semantic anchors to new files first,
+        then to substantially edited or high-risk existing files when justified by a real task.
+      </intent>
+      <deliverable id="del-0243">
+        <name>RFC-0243 Authored Offer Pillar</name>
+        <status>implemented</status>
+        <description>
+          Replaced PSEO-generated /leistungen/ pillar with authored listing pages (services).
+          Moved offer detail pages into /leistungen/ namespace, updated navigation to semantic targets,
+          added 301 redirects, and removed offer Blueprint depth-0.
+        </description>
+      </deliverable>
+      <deliverable id="del-0244">
+        <name>RFC-0244 Hierarchical demand records</name>
+        <status>implemented</status>
+        <description>
+          Canonical folder tree (1/2/3 segments), path-derived slugs, `demands.hierarchy.validate`,
+          and base city-level `name` set to service concept (not city name) to avoid depth-5 title tautology.
+        </description>
+      </deliverable>
+      <deliverable id="del-0245">
+        <name>RFC-0245 Agent Control Plane</name>
+        <status>implemented</status>
+        <description>
+          Added `ecosystem.manifest.generate`, `ecosystem.manifest.validate`, `maintenance.debt.report`,
+          the generated `docs/ecosystem.generated.yaml` projection, and package-pipeline drift validation.
+        </description>
+      </deliverable>
+      <deliverable id="del-0246">
+        <name>RFC-0246 Harden Agent Control Plane</name>
+        <status>implemented</status>
+        <description>
+          Hardened ACP workspace discovery from `pnpm-workspace.yaml` globs, upgraded the manifest to schema v2
+          deterministic metadata, added `workspace.surface.validate`, and made root package pipelines executable
+          without an app target.
+        </description>
+      </deliverable>
+      <deliverable id="del-0247">
+        <name>RFC-0247 Canonical warning diagnostics</name>
+        <status>implemented</status>
+        <description>
+          Added `warning.diagnostics.lint`, migrated warning-mode app author checks to canonical diagnostics,
+          and expanded `maintenance.debt.report` to aggregate asset, surface, demand, material credit,
+          material metadata, CKL, visual, and text-normalization advisory debt.
+        </description>
+      </deliverable>
+      <deliverable id="del-0249">
+        <name>RFC-0249 Autonomous package quality and CI gates</name>
+        <status>implemented</status>
+        <description>
+          Added `test.signal.validate`, projected package test signals into the Agent Control Plane,
+          added `ci.local.validate`, aligned GitHub workflows with root packageManager via Corepack,
+          and introduced a general PR quality workflow for package lint, package checks, app author checks,
+          RFC validation, tests, and test-signal classification.
+        </description>
+      </deliverable>
+      <deliverable id="del-0250">
+        <name>RFC-0250 Runtime fallback diagnostics</name>
+        <status>implemented</status>
+        <description>
+          Promoted shared section fallback and semantic target runtime warnings into static diagnostic commands:
+          `section.defaults.validate`, `semantic.targets.validate`, and `runtime.warnings.lint`.
+          Removed implicit `hero-1` / `donateContact` fallbacks from the shared hero section while preserving
+          app-authored targets and assets.
+        </description>
+      </deliverable>
+      <deliverable id="del-0251">
+        <name>RFC-0251 Test signal maturity and maintenance debt baselines</name>
+        <status>implemented</status>
+        <description>
+          Added `test.signal.policy.validate`, maintenance debt baseline write/validate/triage commands,
+          package-level skipped-test ownership metadata, CI/local gate wiring, and Agent Control Plane
+          quality summaries so weak test posture and advisory debt are explicit and diffable.
+        </description>
+      </deliverable>
+      <deliverable id="del-0254">
+        <name>RFC-0254 Quiet build/check logs</name>
+        <status>implemented</status>
+        <description>
+          Added structured pipeline log events, grouped expected-fallback output, JSON log summaries,
+          `pipeline.log.hygiene.validate`, and migrated high-volume content/business/passport fallback
+          chatter away from repeated raw console lines.
+        </description>
+      </deliverable>
+      <deliverable id="del-0255">
+        <name>RFC-0255 Pipeline timing and timeout telemetry</name>
+        <status>implemented</status>
+        <description>
+          Added command and pipeline timing envelopes, compact long-pipeline timing summaries,
+          timeout/expected-duration metadata on long-running pipeline surfaces,
+          `pipeline.timing.report`, and `pipeline.timeout.validate`.
+        </description>
+      </deliverable>
+      <deliverable id="del-0256">
+        <name>RFC-0256 Maintenance debt burn-down queues</name>
+        <status>implemented</status>
+        <description>
+          Added authored advisory maintenance debt queues, deterministic queue projection generation,
+          queue health validation, bounded next-batch reporting, command documentation, and package-gate
+          drift coverage so accepted warning debt becomes explicit agent work.
+        </description>
+      </deliverable>
+      <deliverable id="del-0271">
+        <name>RFC-0271 PSEO module contexts</name>
+        <status>implemented</status>
+        <description>
+          Added typed `SurfaceModuleContext` contracts, the `surface.context.validate` command,
+          module-owned Blueprint entitlement resolution, module-master-locale enrichment defaults,
+          and `webgogol-com` module declarations with Ukrainian PSEO authoring language.
+        </description>
+      </deliverable>
+      <deliverable id="del-0276">
+        <name>RFC-0276 Site Bordbuch ledger</name>
+        <status>implemented</status>
+        <description>
+          Added Bordbuch event/status contracts, append/generate/validate/status commands,
+          hash-chain validation, noindex JSON/HTML projections, sensitive-payload guards,
+          and an initial `webgogol-com` Bordbuch event.
+        </description>
+      </deliverable>
+      <deliverable id="del-0274">
+        <name>RFC-0274 PSEO evidence and duplicate gates</name>
+        <status>implemented</status>
+        <description>
+          Added per-depth Blueprint evidence policy, deterministic evidence and duplicate validators,
+          nested semantic text extraction, invalid freshness noindex handling, lazy-page link checks,
+          path-safe demand modifier linting, and regenerated `webgogol-com` twins so unapproved d5
+          Bedarfskarten are noindexed until approved narrative evidence exists.
+        </description>
+      </deliverable>
+      <deliverable id="del-0272">
+        <name>RFC-0272 PSEO translation lifecycle</name>
+        <status>implemented</status>
+        <description>
+          Added ready-for-translation stamping, contentHash lineage, derived translation draft generation,
+          stale sourceHash detection, target QA validation, and render-side targetGate enforcement.
+        </description>
+      </deliverable>
+      <deliverable id="del-0273">
+        <name>RFC-0273 PSEO translator notes and glossaries</name>
+        <status>implemented</status>
+        <description>
+          Added translator note generation/review/validation, glossary validation, approved note/glossary
+          artifacts for `webgogol-com` PSEO and offer modules, and generation prerequisites for translations.
+        </description>
+      </deliverable>
+      <deliverable id="del-0280">
+        <name>RFC-0280 PSEO demand signals</name>
+        <status>implemented</status>
+        <description>
+          Added `DemandSignal` contracts, offline demand import, demand validation, generated demand maps,
+          per-depth Blueprint demand gates, and a proof validator that reads real generated demand-map data.
+        </description>
+      </deliverable>
+      <deliverable id="del-0281">
+        <name>RFC-0281 Werk evidence joins</name>
+        <status>implemented</status>
+        <description>
+          Added `WerkRecord` contracts, anchored consent validation, generated tuple-to-Werk evidence joins,
+          and evidence-driven d5 existence for `website-local` so deep pages are bounded by consented works.
+        </description>
+      </deliverable>
+      <deliverable id="del-0278">
+        <name>RFC-0278 PSEO autonomy levels</name>
+        <status>implemented</status>
+        <description>
+          Added typed approvers, autonomy scopes/states, validation/report/promote/demote commands,
+          L0 webgogol-com scope declarations, and typed approval stamps for ready translation artifacts.
+        </description>
+      </deliverable>
+      <deliverable id="del-0279">
+        <name>RFC-0279 governed AI reviewer</name>
+        <status>implemented</status>
+        <description>
+          Added review input/verdict contracts, offline review run/calibrate/validate commands,
+          reviewer self-approval detection, confidence handling, and grounding-violation guards.
+        </description>
+      </deliverable>
+      <deliverable id="del-0285">
+        <name>RFC-0285 escalation budget</name>
+        <status>implemented</status>
+        <description>
+          Added typed escalation records, route/report/budget validation commands, mandatory feedback checks,
+          and human-minutes-per-1000-pages reporting as the shrinking human-involvement KPI.
+        </description>
+      </deliverable>
+      <deliverable id="del-0282">
+        <name>RFC-0282 PSEO visibility feedback loop</name>
+        <status>implemented</status>
+        <description>
+          Added visibility snapshot/outcome/action contracts, offline import/reconcile/action-plan commands,
+          VIS diagnostics, PII guards, dogfood cluster outcomes, proof integration, and Bordbuch visibility status.
+        </description>
+      </deliverable>
+      <deliverable id="del-0283">
+        <name>RFC-0283 breaker and rollback</name>
+        <status>implemented</status>
+        <description>
+          Added content-addressed surface states from `surface.generate`, breaker tripwire evaluation,
+          freeze/demote/escalate reflexes, rollback plan/apply commands, and BRK diagnostics forbidding URL deletion.
+        </description>
+      </deliverable>
+      <deliverable id="del-0284">
+        <name>RFC-0284 fleet Leitstand</name>
+        <status>implemented</status>
+        <description>
+          Added fleet status/job/plan contracts, membership and generated fleet projections,
+          status collection from per-site primitives, fair budget-clipped scheduling, fleet escalation KPI reporting,
+          and a rehearsed global kill-switch with per-site freeze projection.
+        </description>
+      </deliverable>
+    </phase>
+
+    <phase id="phase-4">
+      <name>LDD-oriented verification maturity</name>
+      <status>planned</status>
+      <intent>
+        Standardize structured logs, reusable verification narratives, and XML issue reports for reusable runtime logic and complex workflows.
+      </intent>
+    </phase>
+  </adoption-strategy>
+
+  <acceptance-gates>
+    <gate id="gate-01">Define and approve the canonical source markup contract before mass source-file rollout.</gate>
+    <gate id="gate-02">Generate repository inventory before adding drift enforcement or backfill automation.</gate>
+    <gate id="gate-03">Keep inventory and validation idempotent before introducing mutation-oriented scaffolding tools.</gate>
+    <gate id="gate-04">Roll out shared packages before app-layer mass adoption.</gate>
+  </acceptance-gates>
+
+  <execution-loop>
+    <step id="loop-01">Update the relevant requirement and plan nodes before non-trivial implementation work.</step>
+    <step id="loop-02">Read `docs/knowledge-graph.xml` and the nearest `AGENTS.md` files to locate authoritative modules and boundaries.</step>
+    <step id="loop-03">Verbalize intent in the target module contract before editing code when touching non-trivial logic.</step>
+    <step id="loop-04">Implement inside stable semantic anchors and add structured logs when the behavior is complex enough to need trajectory inspection.</step>
+    <step id="loop-05">Update verification notes and root Compass documents if architectural reality changed.</step>
+    <step id="loop-06">When generating multi-line app boilerplate from packages, store templates under `src/templates/<generator-name>/`, mirror the target app path in template paths, and keep onboarding/scaffold modules limited to minimal skeleton plus client-editable seed content.</step>
+  </execution-loop>
+
+  <mental-tests>
+    <test id="mt-01">
+      <scenario>Shared package API change</scenario>
+      <walkthrough>
+        Confirm the package is still app-agnostic, identify downstream apps, update graph links, and validate the package before each consumer.
+      </walkthrough>
+    </test>
+    <test id="mt-02">
+      <scenario>App route or content-flow refactor</scenario>
+      <walkthrough>
+        Confirm the route remains thin, content ownership stays in the app content layer, and no middleware or localization invariant is silently broken.
+      </walkthrough>
+    </test>
+    <test id="mt-03">
+      <scenario>High-risk boundary edit</scenario>
+      <walkthrough>
+        Confirm the file has or should gain explicit invariants, stable anchors, and logs sufficient for post-change trajectory review.
+      </walkthrough>
+    </test>
+  </mental-tests>
+
+  <source-markup-policy>
+    <rule id="src-01">Do not retrofit the whole monorepo with semantic tags in one sweep.</rule>
+    <rule id="src-02">Require Compass scaffolding for new non-trivial source files under `apps/` and `packages/`.</rule>
+    <rule id="src-03">Backfill scaffolding during substantial edits to high-risk or hard-to-navigate files.</rule>
+    <rule id="src-04">Keep semantic anchors stable so future patches can target them deterministically.</rule>
+    <rule id="src-05">Use local invariants only where the source file is a true blast-radius boundary.</rule>
+    <rule id="src-06">Do not embed long multi-line boilerplate literals directly in package generators when the output targets `apps/*`; externalize them into mirrored template files.</rule>
+  </source-markup-policy>
+
+  <changelog-os-modules>
+    <module id="M-CONFIG" type="UTILITY" path="packages/os/site-kernel-changelog/src/changelog/config.ts" status="implemented">
+      <purpose>Typed configuration object with Zod schema. Single source of truth for LLM provider, release schedule, versioning thresholds, and cache paths.</purpose>
+    </module>
+    <module id="M-TYPES" type="UTILITY" path="packages/os/site-kernel-changelog/src/changelog/types.ts" status="implemented">
+      <purpose>Shared Zod schemas: RawCommit, ClassifiedCommit, GroupedRelease.</purpose>
+    </module>
+    <module id="M-SANIT" type="UTILITY" path="packages/os/site-kernel-changelog/src/changelog/utils/sanitize.ts" status="implemented">
+      <purpose>Prompt injection guard. sanitizeForPrompt() strips role markers, separators, injection patterns. Applied to all text fields before AI calls.</purpose>
+    </module>
+    <module id="M-LIMIT" type="UTILITY" path="packages/os/site-kernel-changelog/src/changelog/core/rate-limiter.ts" status="implemented">
+      <purpose>p-limit(5) wrapper. Prevents 429 errors during large-repo backfill.</purpose>
+    </module>
+    <module id="M-SCHED" type="UTILITY" path="packages/os/site-kernel-changelog/src/changelog/utils/date.ts" status="implemented">
+      <purpose>Release window detection. Handles weekly/monthly modes. Clamps day-of-month to lastDayOfMonth to fix February-31 bug.</purpose>
+    </module>
+    <module id="M-GIT" type="DATA_LAYER" path="packages/os/site-kernel-changelog/src/changelog/utils/git.ts" status="implemented">
+      <purpose>Git log extraction via simple-git. Extracts tree hash, diff summary (first 15 lines), files list. --no-merges by default.</purpose>
+    </module>
+    <module id="M-ATOMIC" type="UTILITY" path="packages/os/site-kernel-changelog/src/changelog/utils/atomic-fs.ts" status="implemented">
+      <purpose>Atomic file write via tmp+rename pattern. Prevents partial writes on crash.</purpose>
+    </module>
+    <module id="M-CACHE" type="DATA_LAYER" path="packages/os/site-kernel-changelog/src/changelog/core/ai-cache.ts" status="implemented">
+      <purpose>SQLite WAL + file-based fallback cache. Composite key: TreeHash+files+diff+promptHash+modelVersion. Resilient to cherry-pick and squash merge.</purpose>
+    </module>
+    <module id="M-CLASS" type="CORE_LOGIC" path="packages/os/site-kernel-changelog/src/changelog/agents/classifier-agent.ts" status="implemented">
+      <purpose>AI classifier agent. Deterministic rules first, LLM as fallback. Adds confidence field. 3 retries + deterministic template on failure.</purpose>
+      <depends-on>M-TYPES M-SANIT M-CACHE M-LIMIT M-CONFIG</depends-on>
+    </module>
+    <module id="M-GROUP" type="CORE_LOGIC" path="packages/os/site-kernel-changelog/src/changelog/agents/grouper-agent.ts" status="implemented">
+      <purpose>AI grouper agent. Clusters 50+ commits into 5-7 business groups by file path overlap and semantic proximity.</purpose>
+      <depends-on>M-TYPES M-SANIT M-CACHE M-LIMIT M-CONFIG</depends-on>
+    </module>
+    <module id="M-WRITE" type="CORE_LOGIC" path="packages/os/site-kernel-changelog/src/changelog/agents/writer-agent.ts" status="implemented">
+      <purpose>AI writer agent. Generates each section as a single coherent prose block. Past tense, no marketing language.</purpose>
+      <depends-on>M-TYPES M-SANIT M-CACHE M-LIMIT M-CONFIG</depends-on>
+    </module>
+    <module id="M-BUMPER" type="CORE_LOGIC" path="packages/os/site-kernel-changelog/src/changelog/core/version-bumper.ts" status="implemented">
+      <purpose>Confidence-gated SemVer bumper. feat→minor, fix→patch, breaking≥0.85→minor+flag, breaking&lt;0.85→patch+requiresReview. Major locked.</purpose>
+      <depends-on>M-TYPES M-CONFIG</depends-on>
+    </module>
+    <module id="M-INDEX" type="CORE_LOGIC" path="packages/os/site-kernel-changelog/src/changelog/core/index-rebuilder.ts" status="implemented">
+      <purpose>Rebuilds CHANGELOG.md index entirely using dynamic markers. Restores missing markers. Writes versioned changelog-YYYY-MM-DD-vX.Y.Z.md files.</purpose>
+      <depends-on>M-ATOMIC M-CONFIG</depends-on>
+    </module>
+    <module id="M-MAIN" type="ENTRY_POINT" path="packages/os/site-kernel-changelog/src/changelog-command.ts" status="implemented">
+      <purpose>CLI orchestrator (commander). Commands: generate, rebuild-index, backfill, edit. Wires all modules together.</purpose>
+      <depends-on>M-CONFIG M-TYPES M-SCHED M-GIT M-SANIT M-CACHE M-LIMIT M-CLASS M-GROUP M-WRITE M-BUMPER M-INDEX</depends-on>
+    </module>
+  </changelog-os-modules>
+
+  <rollout-waves>
+    <wave id="wave-changelog-01">
+      <name>changelog-os-foundation</name>
+      <status>completed</status>
+      <outputs>
+        <output>M-CONFIG, M-TYPES, M-SANIT, M-LIMIT</output>
+      </outputs>
+    </wave>
+    <wave id="wave-changelog-02">
+      <name>changelog-os-core</name>
+      <status>completed</status>
+      <outputs>
+        <output>M-SCHED, M-GIT, M-ATOMIC, M-CACHE</output>
+      </outputs>
+    </wave>
+    <wave id="wave-changelog-03">
+      <name>changelog-os-agents</name>
+      <status>completed</status>
+      <outputs>
+        <output>M-CLASS, M-GROUP, M-WRITE</output>
+      </outputs>
+    </wave>
+    <wave id="wave-changelog-04">
+      <name>changelog-os-output</name>
+      <status>completed</status>
+      <outputs>
+        <output>M-BUMPER, M-INDEX, M-MAIN</output>
+      </outputs>
+    </wave>
+    <wave id="wave-01">
+      <name>inventory-and-validation-foundation</name>
+      <outputs>
+        <output>`docs/source-markup.xml`</output>
+        <output>`packages/os/site-kernel-checks/src/Compass.ts`</output>
+        <output>`docs/compass-inventory.xml`</output>
+      </outputs>
+    </wave>
+    <wave id="wave-02">
+      <name>shared-package-rollout</name>
+      <targets>
+        <target>`packages/os/site-kernel`</target>
+        <target>`packages/os/site-kernel-astro`</target>
+        <target>`packages/os/site-kernel-content`</target>
+        <target>`packages/os/site-kernel-checks`</target>
+        <target>`packages/os/site-kernel-codegen`</target>
+        <target>`packages/os/site-kernel-changelog`</target>
+        <target>`packages/os/site-kernel-deploy`</target>
+        <target>`packages/os/site-kernel-integrity`</target>
+        <target>`packages/os/site-kernel-handoff`</target>
+      </targets>
+    </wave>
+    <wave id="wave-03">
+      <name>app-rollout</name>
+      <targets>
+        <target>`apps/webgogol-com`</target>
+        <target>`apps/nicaragua-projekt`</target>
+      </targets>
+    </wave>
+  </rollout-waves>
+
+  <rollback-strategy>
+    <rule>If generated inventory or validation heuristics produce unstable churn, stop before source mutation work and correct the classification logic first.</rule>
+    <rule>Do not bind new Compass validation commands into mandatory build pipelines until the corresponding coverage wave is complete.</rule>
+  </rollback-strategy>
+</development-plan>
