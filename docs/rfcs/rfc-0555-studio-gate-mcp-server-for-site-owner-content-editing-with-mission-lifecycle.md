@@ -23,7 +23,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0559
 related:
   - DNA-22
   - DNA-46
