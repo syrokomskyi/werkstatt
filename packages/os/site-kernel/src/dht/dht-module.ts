@@ -26,6 +26,8 @@ export const dhtModule: KernelModule = {
     const { runDhtLookup } = await import("./lookup.ts");
     const { runDhtRegister } = await import("./register.ts");
     const { runDhtCapacityPublish } = await import("./capacity.ts");
+    const { runDhtPlacement } = await import("./placement.ts");
+    const { runDhtStatus } = await import("./status.ts");
 
     registry.registerCommand({
       name: "dht.node.init",
@@ -87,6 +89,38 @@ export const dhtModule: KernelModule = {
       reads: ["werkstatt.dht.json", "werkstatt.identity.json"],
       writes: [],
       execute: runDhtCapacityPublish,
+    });
+
+    registry.registerCommand({
+      name: "dht.placement",
+      description:
+        "RFC-0565: determine the best workshop for placing a site by querying DHT " +
+        "capacity entries. Uses least-loaded strategy by default. " +
+        "Required: --site-id <id>, --workshops <id1,id2,...> (or repeated). " +
+        "Optional: --strategy <least-loaded|nearest|owner-preference>. Use --json for output.",
+      scope: "workspace",
+      cacheable: false,
+      reads: ["werkstatt.dht.json", "werkstatt.identity.json", "werkstatt.swim.json"],
+      writes: [],
+      execute: runDhtPlacement,
+    });
+
+    registry.registerCommand({
+      name: "dht.status",
+      description:
+        "RFC-0565: report local DHT node status including config, cache entries, " +
+        "identity bootstrap state, and SWIM configuration. Local-only query — no network I/O. " +
+        "Use --json for machine-readable output.",
+      scope: "workspace",
+      cacheable: false,
+      reads: [
+        "werkstatt.dht.json",
+        "werkstatt.dht.cache.json",
+        "werkstatt.identity.json",
+        "werkstatt.swim.json",
+      ],
+      writes: [],
+      execute: runDhtStatus,
     });
   },
 };
