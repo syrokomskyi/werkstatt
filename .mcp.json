@@ -12,7 +12,8 @@
       "command": "pnpm",
       "args": ["--filter", "@gogol/studio-gate", "start"],
       "env": {
-        "WERKSTATT_ROOT": "${workspaceFolder}"
+        "WERKSTATT_ROOT": "${workspaceFolder}",
+        "STUDIO_GATE_BUILD_CONCURRENCY": "2"
       }
     }
   }
