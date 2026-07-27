@@ -5,12 +5,12 @@ title: "Werkstatt VM deployment model: single Node.js process, no Docker for Tie
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: workspace
 decider: architecture
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
-implementedAt:
+implementedAt: 2026-07-27
 closedAt:
 supersedes: []
 supersededBy:
