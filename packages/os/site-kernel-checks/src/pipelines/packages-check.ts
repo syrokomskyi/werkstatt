@@ -84,6 +84,8 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "gate.catalog.validate" },
   // RFC-0253: shared workspace discovery must remain deterministic and classified.
   { command: "workspace.discovery.validate" },
+  // RFC-0557: validate that template @warpgogol/* imports resolve from root devDependencies.
+  { command: "template.imports.validate" },
   // RFC-0249: package test posture is explicit even when coverage remains warning-mode debt.
   { command: "test.signal.validate" },
   // RFC-0251: skipped-test intent and advisory-debt backlog are owned and diffable.

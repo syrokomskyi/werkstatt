@@ -31,6 +31,8 @@ export {
   runMaintenanceDebtReport,
 } from "./ecosystem/debt.ts";
 export { runEcosystemCommit } from "./ecosystem-commit.ts";
+export { runTemplateImportsValidate } from "./template-imports-validate.ts";
+export { runWorkpieceImportsValidate } from "./workpiece-imports-validate.ts";
 export type {
   EcosystemCommitInput,
   EcosystemCommitResult,

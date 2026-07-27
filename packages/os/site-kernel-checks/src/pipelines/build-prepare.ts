@@ -9,12 +9,15 @@
   <item>Extracted from module.ts.</item>
   <item>RFC-0493: added yaml.parse.validate after yaml.contract.lint.</item>
   <item>RFC-0528: moved material.metadata.write from before variant generators to after live.variants.generate.</item>
+  <item>RFC-0557: added workpiece.imports.validate as first step before yaml.contract.lint.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 
 export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
+  // RFC-0557: validate workpiece @warpgogol/* imports resolve from root node_modules before any generators run
+  { command: "workpiece.imports.validate" },
   // RFC-0376: enforce YAML-only contract before any generators run
   { command: "yaml.contract.lint" },
   // RFC-0493: parse-check all .yaml files after extension contract, before generators

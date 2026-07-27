@@ -221,3 +221,5 @@ files:
   - packages/os/site-kernel-checks/src/visual/page-context.ts
   - packages/os/site-kernel-checks/src/warning-diagnostics-lint.ts
   - packages/os/site-kernel-checks/src/workspace-write-boundary.ts
+  - packages/os/site-kernel-checks/src/template-imports-validate.ts
+  - packages/os/site-kernel-checks/src/workpiece-imports-validate.ts

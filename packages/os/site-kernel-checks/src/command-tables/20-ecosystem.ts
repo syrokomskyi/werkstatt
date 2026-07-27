@@ -14,6 +14,7 @@
   <item>RFC-0258: register workspace.write.boundary.lint (atomic + allowlisted shared writes).</item>
   <item>RFC-0519: register gate.catalog.generate and gate.catalog.validate.</item>
   <item>RFC-0533: register ecosystem.commit command.</item>
+  <item>RFC-0557: register template.imports.validate and workpiece.imports.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -42,6 +43,8 @@ import {
 import { runTestSignalPolicyValidate, runTestSignalValidate } from "../test-signal.ts";
 import { runWorkspaceWriteBoundaryLint } from "../workspace-write-boundary.ts";
 import { runGateCatalogGenerate, runGateCatalogValidate } from "../gate-catalog.ts";
+import { runTemplateImportsValidate } from "../template-imports-validate.ts";
+import { runWorkpieceImportsValidate } from "../workpiece-imports-validate.ts";
 
 export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
   {
@@ -113,6 +116,29 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: ["pnpm-workspace.yaml", "packages/*/package.json"],
     execute: runWorkspaceDiscoveryValidate,
+  },
+  {
+    name: "template.imports.validate",
+    description:
+      "Validate that all @warpgogol/* and @webgogol/* imports in template files are resolvable from root package.json devDependencies, and run pnpm install --frozen-lockfile to detect lockfile drift (RFC-0557).",
+    scope: "workspace",
+    flags: {},
+    reads: ["packages/os/*/src/templates/**/*.template.*", "package.json", "pnpm-lock.yaml"],
+    execute: runTemplateImportsValidate,
+  },
+  {
+    name: "workpiece.imports.validate",
+    description:
+      "Validate that all @warpgogol/* and @webgogol/* imports in materialized workpiece files resolve from root node_modules (RFC-0557).",
+    scope: "workspace",
+    flags: {},
+    reads: [
+      "missions/*/workpiece/tools/**/*.ts",
+      "missions/*/workpiece/src/**/*.{ts,mjs,astro}",
+      "node_modules/@warpgogol/*",
+      "node_modules/@webgogol/*",
+    ],
+    execute: runWorkpieceImportsValidate,
   },
   {
     name: "maintenance.debt.report",

@@ -153,4 +153,19 @@ export const GOVERNANCE_RULES: Record<string, RuleDescriptor> = {
     "Required command appears only outside run steps",
     "ci.local.validate",
   ),
+  "TEMPLATE-IMPORTS-01": rule(
+    "TEMPLATE-IMPORTS-01",
+    "Template imports a workspace package not in root devDependencies",
+    "template.imports.validate",
+  ),
+  "TEMPLATE-IMPORTS-02": rule(
+    "TEMPLATE-IMPORTS-02",
+    "pnpm install --frozen-lockfile failed (lockfile drift or unsatisfied peer deps)",
+    "template.imports.validate",
+  ),
+  "WORKPIECE-IMPORTS-01": rule(
+    "WORKPIECE-IMPORTS-01",
+    "Workpiece import cannot be resolved from root node_modules",
+    "workpiece.imports.validate",
+  ),
 };
