@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 5499d10a0fae0227f0384c9a3057e2352ff31b68ba0afffd5cabf505603e89ea
+  contentHash: 4d1c4b3c708c4b1b0e761cd5ba00bf28ac2e1b368d30a8a9507b9e2eb9dafee4
   sources:
     - path: docs/architecture-dna.md
       hash: 0d1a24e2aebb296cc660953a97aa8c32628d53d3fce898437ff646ebc7f85e4e
@@ -127,7 +127,7 @@ meta:
     - path: packages/os/site-kernel-onboarding/package.json
       hash: b8e2e019eefda430c4b45b28f4a6c674819481334a53910f8ef71cd6ef9e1689
     - path: packages/os/site-kernel/package.json
-      hash: 23db94ed0f7588dd68f25d3c8054b7ed6413232481cc70eeff173a5ce1ad5c78
+      hash: 20a0cb53e528b3de9c0e41d13fd67effc77b2bb6512bfd4db49b85818583de81
     - path: packages/os/site-kernel/src/runtime.ts
       hash: ff42e55bbd43d760def255b5f0ba4557bac7d4fb1f4cafd303c9d06b8f2771a4
     - path: packages/passport/package.json
@@ -165,7 +165,7 @@ meta:
     - path: services/telegram-alert-bridge/package.json
       hash: 228295f8b0883facdd44d9d237a1d7bec9e1680f74e7ee5b7b94c0ccb41a050a
     - path: tools/kernel.config.ts
-      hash: ab12d95fbf89477e25dbcdc6950df1cde6097325e491df25f2dc08796b1d8064
+      hash: 9ba0253a4350e2ab01428c79801292b16815c980e635ce25b4b30707a2c9bf46
 workspace:
   name: warpgogol-platform
   version: 4.5.0
@@ -3205,6 +3205,24 @@ commands:
     providers:
       - site
       - workspace
+  - name: gitmesh.status
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: gitmesh.sync
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: gitmesh.verify
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: growth.adapter.contract
     scope: workspace
     mutatesState: false
@@ -5967,6 +5985,24 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
+  - command: gitmesh.status
+    proposedBy:
+      - RFC-0563
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: gitmesh.sync
+    proposedBy:
+      - RFC-0563
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: gitmesh.verify
+    proposedBy:
+      - RFC-0563
+    addedBy: []
+    changedBy: []
+    removedBy: []
   - command: growth.adapter.contract
     proposedBy: []
     addedBy: []
@@ -7312,8 +7348,8 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 8
-  implemented: 6
+  accepted: 6
+  implemented: 8
   draft: 3
   reviewing: 0
 baseline:
@@ -7373,12 +7409,28 @@ baseline:
         - DNA-34
         - DNA-46
         - DNA-47
+    - id: RFC-0561
+      implementedAt: 2026-07-27
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-44
+        - DNA-45
+    - id: RFC-0562
+      implementedAt: 2026-07-27
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-40
+        - DNA-44
+        - DNA-45
+        - DNA-46
+        - DNA-49
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0561
-      - RFC-0562
       - RFC-0563
       - RFC-0564
       - RFC-0565

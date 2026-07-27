@@ -265,14 +265,14 @@ All commands exit 0 on success and 1 on error. Warnings are logged to stderr but
 
 ## Acceptance criteria
 
-- [ ] `GitMeshConfig`, `GitMeshRemote`, `GitMeshSyncResult`, `GitMeshStatus`, `GitMeshVerifyResult` types defined in `packages/os/site-kernel/src/gitmesh/types.ts`
-- [ ] `gitmesh.sync` command fetches from all configured remotes and converges on latest signed commit
-- [ ] `gitmesh.status` command reports local SHA, remote SHA, behind/ahead counts, and last sync time
-- [ ] `gitmesh.verify` command verifies all commit signatures against operator public key
-- [ ] `werkstatt.gitmesh.json` config file schema defined and validated
-- [ ] `gitmesh.sync` is pull-only — never pushes to remotes
-- [ ] `gitmesh.verify` reports unsigned commits, invalid signatures, and total verified
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `GitMeshConfig`, `GitMeshRemote`, `GitMeshSyncResult`, `GitMeshStatus`, `GitMeshVerifyResult` types defined in `packages/os/site-kernel/src/gitmesh/types.ts` (evidence: packages/os/site-kernel/src/gitmesh/types.ts:14-57, pnpm --filter @warpgogol/site-kernel build:check passes)
+- [x] `gitmesh.sync` command fetches from all configured remotes and converges on latest signed commit (evidence: packages/os/site-kernel/src/gitmesh/sync.ts:76-92, convergence algorithm selects highest committer timestamp)
+- [x] `gitmesh.status` command reports local SHA, remote SHA, behind/ahead counts, and last sync time (evidence: packages/os/site-kernel/src/gitmesh/status.ts:52-77, no network I/O — local-only query)
+- [x] `gitmesh.verify` command verifies all commit signatures against operator public key (evidence: packages/os/site-kernel/src/gitmesh/verify.ts:38-54, loads public keys from werkstatt.identity.json)
+- [x] `werkstatt.gitmesh.json` config file schema defined and validated (evidence: packages/os/site-kernel/src/gitmesh/config.ts:28-66, validateConfig() enforces all fields, tests in src/tests/gitmesh.test.ts)
+- [x] `gitmesh.sync` is pull-only — never pushes to remotes (evidence: packages/os/site-kernel/src/gitmesh/sync.ts uses only gitFetch and gitMergeFfOnly from git-ops.ts, no push function exists in git-ops.ts)
+- [x] `gitmesh.verify` reports unsigned commits, invalid signatures, and total verified (evidence: packages/os/site-kernel/src/gitmesh/verify.ts:107-119, counts signed/unsigned/invalid separately, does not abort on first invalid)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0563 --json → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
