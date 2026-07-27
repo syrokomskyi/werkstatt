@@ -1,7 +1,7 @@
 ---
 id: RFC-0567
 title: "Extend section-header, hero-decision-card, and FAQ schema for expert content recommendations"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: contract
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-27
 updatedAt: 2026-07-27
 enhancedAt: 2026-07-27
-implementedAt:
+implementedAt: 2026-07-27
 closedAt:
 supersedes: []
 supersededBy:
