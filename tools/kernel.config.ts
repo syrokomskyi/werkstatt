@@ -34,6 +34,7 @@
   <entry key="kernel.cache.*">RFC-0382: kernel cache status and clear commands.</entry>
   <entry key="compass.*">Registers workspace Compass commands at the repository root (RFC-0374).</entry>
   <entry key="spec.*">Registers workspace spec vendoring commands: spec.validate, spec.status, spec.materialize (RFC-0394..0397).</entry>
+  <entry key="dht.*">Registers workspace DHT commands: dht.node.init, dht.lookup, dht.register, dht.placement, dht.status, dht.capacity.publish (RFC-0565).</entry>
 </MODULE_MAP>
 <CHANGE_SUMMARY>
   <item>Initial workspace-level kernel configuration.</item>
@@ -53,6 +54,7 @@
   <item>RFC-0394..0397: Register forgeSpecModule for spec.validate, spec.status, spec.materialize.</item>
   <item>RFC-0478: Register platform module for platform.consistency.validate.</item>
   <item>RFC-0537: Register forgeSessionModule for session.save, session.archive, session.validate, session.list.</item>
+  <item>RFC-0565: Register dhtModule for dht.node.init, dht.lookup, dht.register, dht.placement, dht.status, dht.capacity.publish.</item>
   <item>RFC-0564: Register swimModule for swim.join, swim.leave, swim.members, swim.status.</item>
 </CHANGE_SUMMARY>
 */
@@ -120,6 +122,7 @@ export default defineKernelConfig({
     gitmesh: async () => (await import("@warpgogol/site-kernel")).gitmeshModule,
     identity: async () =>
       (await import("@warpgogol/site-kernel-handoff/identity-module")).createIdentityModule(),
+    dht: async () => (await import("@warpgogol/site-kernel/dht-module")).dhtModule,
     swim: async () => (await import("@warpgogol/site-kernel/swim-module")).swimModule,
   },
   pipelines: {
