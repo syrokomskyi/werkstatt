@@ -21,7 +21,8 @@ implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0358
 amendedBy: []
 related:
   - DNA-44
@@ -46,14 +47,14 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - deploy.artifact.build
     - deploy.artifact.verify
     - deploy.atomic.swap
     - deploy.atomic.rollback
     - deploy.artifact.gc
     - deploy.status
-  added: []
   changed: []
   removed: []
 appsImpacted: []
@@ -285,21 +286,21 @@ export interface TwoPhaseCommitResult {
 
 ## Acceptance criteria
 
-- [ ] `PlatformArtifact`, `ArtifactManifest`, `ArtifactFile`, `DeployStatus`, `AtomicSwapResult` types defined in `packages/os/site-kernel-handoff/src/deploy/types.ts`
-- [ ] `WorkshopDeployStatus`, `TwoPhaseCommitResult` types defined in `packages/os/site-kernel-handoff/src/deploy/types.ts` (Phase 4 only — may be deferred to a follow-up RFC)
-- [ ] `deploy.artifact.build` command builds an immutable platform artifact from the local git clone and stores it in `.werkstatt/artifacts/platform/<sha-256>/`
-- [ ] `deploy.artifact.verify` command verifies an artifact's content hash against its `manifest.json`
-- [ ] `deploy.atomic.swap` command performs an atomic symlink swap using `rename(2)` and verifies the artifact hash before swapping
-- [ ] `deploy.atomic.rollback` command rolls back to the previous artifact by swapping the `current` symlink back
-- [ ] `deploy.artifact.gc` command removes old artifacts not referenced by any symlink, with `--dry-run` support
-- [ ] `deploy.status` command reports current and previous artifact hashes, deployment time, and git SHA
-- [ ] Artifacts are stored in `.werkstatt/artifacts/platform/<sha-256>/` with a `manifest.json` containing file list, hashes, git SHA, and Ed25519 signature
-- [ ] `current` symlink is swapped atomically using `rename(2)` — a unit test verifies that a concurrent reader never sees a partial state
-- [ ] First deployment (no `current` symlink) creates the symlink; `deploy.atomic.rollback` fails with `no-previous-artifact` error code
-- [ ] Two-phase commit (Phase 4): a unit test simulates prepare failure → abort, and commit failure → rollback, verifying no partial state remains
-- [ ] Artifacts are never modified after creation (immutability) — a test verifies that modifying an artifact directory causes `deploy.artifact.verify` to fail
-- [ ] Artifact manifest is signed with Ed25519 using `@warpgogol/site-kernel-integrity` signing utilities
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `PlatformArtifact`, `ArtifactManifest`, `ArtifactFile`, `DeployStatus`, `AtomicSwapResult` types defined in `packages/os/site-kernel-handoff/src/deploy/types.ts` (evidence: `packages/os/site-kernel-handoff/src/deploy/types.ts:1-90`)
+- [x] `WorkshopDeployStatus`, `TwoPhaseCommitResult` types defined in `packages/os/site-kernel-handoff/src/deploy/types.ts` (Phase 4 only — may be deferred to a follow-up RFC) (evidence: `packages/os/site-kernel-handoff/src/deploy/types.ts:60-90` — types defined as stubs, Phase 4 logic deferred)
+- [x] `deploy.artifact.build` command builds an immutable platform artifact from the local git clone and stores it in `.werkstatt/artifacts/platform/<sha-256>/` (evidence: `packages/os/site-kernel-handoff/src/deploy/artifact-build.ts`)
+- [x] `deploy.artifact.verify` command verifies an artifact's content hash against its `manifest.json` (evidence: `packages/os/site-kernel-handoff/src/deploy/artifact-verify.ts`)
+- [x] `deploy.atomic.swap` command performs an atomic symlink swap using `rename(2)` and verifies the artifact hash before swapping (evidence: `packages/os/site-kernel-handoff/src/deploy/atomic-swap.ts` + `atomicSymlinkSwap` in `deploy-utils.ts`)
+- [x] `deploy.atomic.rollback` command rolls back to the previous artifact by swapping the `current` symlink back (evidence: `packages/os/site-kernel-handoff/src/deploy/atomic-rollback.ts`)
+- [x] `deploy.artifact.gc` command removes old artifacts not referenced by any symlink, with `--dry-run` support (evidence: `packages/os/site-kernel-handoff/src/deploy/artifact-gc.ts`)
+- [x] `deploy.status` command reports current and previous artifact hashes, deployment time, and git SHA (evidence: `packages/os/site-kernel-handoff/src/deploy/deploy-status.ts`)
+- [x] Artifacts are stored in `.werkstatt/artifacts/platform/<sha-256>/` with a `manifest.json` containing file list, hashes, git SHA, and Ed25519 signature (evidence: `writeManifest` in `deploy-utils.ts`, `ArtifactManifest` in `types.ts`)
+- [x] `current` symlink is swapped atomically using `rename(2)` — a unit test verifies that a concurrent reader never sees a partial state (evidence: `atomicSymlinkSwap` in `deploy-utils.ts` uses `symlinkSync` + `rename`, test in `deploy.test.ts`)
+- [x] First deployment (no `current` symlink) creates the symlink; `deploy.atomic.rollback` fails with `no-previous-artifact` error code (evidence: test 'deploy.atomic.swap: first deploy' and 'deploy.atomic.rollback: fails with no-previous-artifact' in `deploy.test.ts`)
+- [ ] Two-phase commit (Phase 4): a unit test simulates prepare failure → abort, and commit failure → rollback, verifying no partial state remains (Phase 4 deferred — types defined as stubs)
+- [x] Artifacts are never modified after creation (immutability) — a test verifies that modifying an artifact directory causes `deploy.artifact.verify` to fail (evidence: test 'immutability: modifying an artifact directory causes verify to fail' in `deploy.test.ts`)
+- [x] Artifact manifest is signed with Ed25519 using `@warpgogol/site-kernel-integrity` signing utilities (evidence: `signJsonPayload` in `artifact-build.ts`, exported from `site-kernel-integrity/src/signing.ts`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate` — no RFC-0566-specific errors)
 
 ## Implementation notes for agents
 
