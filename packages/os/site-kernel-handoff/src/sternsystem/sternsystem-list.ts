@@ -21,7 +21,7 @@ export interface SternsystemListData {
   systems: Array<{
     id: string;
     cosmicStar: string;
-    repo: string;
+    mirrors: Array<{ path: string; storageType: string }>;
     pinnedPlatform: string;
     currentMission: string | null;
     lastRelease: string | null;
@@ -41,7 +41,7 @@ export async function runSternsystemList(
   const systems = registry.systems.map((s) => ({
     id: s.id,
     cosmicStar: s.cosmicStar,
-    repo: s.repo,
+    mirrors: s.mirrors,
     pinnedPlatform: s.pinnedPlatform,
     currentMission: s.currentMission,
     lastRelease: s.lastRelease,

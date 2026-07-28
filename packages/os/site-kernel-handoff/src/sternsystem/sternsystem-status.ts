@@ -22,7 +22,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import type { BordbuchEntry } from "@warpgogol/ontology/operations";
-import { readRegistry, findEntry } from "./registry-io.ts";
+import { readRegistry, findEntry, resolveMirrors, resolveMirrorPath } from "./registry-io.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { readMissionManifest } from "../mission/mission-io.ts";
 
@@ -72,16 +72,6 @@ function gitExec(cwd: string, args: string): string {
   }).trim();
 }
 
-function resolveRepoPath(workspaceRoot: string, repo: string): string {
-  if (repo.startsWith("local:")) {
-    return path.resolve(workspaceRoot, repo.slice("local:".length));
-  }
-  if (repo.startsWith("./") || repo.startsWith("../") || repo.startsWith("/")) {
-    return path.resolve(workspaceRoot, repo);
-  }
-  return repo;
-}
-
 function compareSha(
   a: string | null,
   b: string | null,
@@ -95,9 +85,11 @@ async function statusForSystem(
   workspaceRoot: string,
   systemId: string,
 ): Promise<SternsystemStatusData> {
-  const systemDir = path.join(workspaceRoot, "systems", systemId);
   const registry = await readRegistry(workspaceRoot);
   const entry = findEntry(registry, systemId);
+  const systemDir = entry
+    ? resolveMirrors(workspaceRoot, entry).cachePath
+    : path.join(workspaceRoot, "systems", systemId);
 
   // Git SHAs
   let headSha: string | null = null;
@@ -121,8 +113,9 @@ async function statusForSystem(
     }
   }
 
-  if (entry?.repo) {
-    const bareRepoPath = resolveRepoPath(workspaceRoot, entry.repo);
+  if (entry && entry.mirrors.length > 1) {
+    const bareMirror = entry.mirrors[1];
+    const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
     if (existsSync(bareRepoPath)) {
       let branch: string;
       try {
@@ -135,7 +128,7 @@ async function statusForSystem(
       } catch {
         originSha = null;
       }
-      if (entry.mirror) {
+      if (entry.mirrors.length > 2) {
         try {
           mirrorSha = gitExec(bareRepoPath, `rev-parse refs/mirror/${branch}`);
         } catch {

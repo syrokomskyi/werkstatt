@@ -4,7 +4,7 @@ import { fleetRegistryEntrySchema } from "../operations/sternsystem.ts";
 const validBaseEntry = {
   id: "test-site",
   cosmicStar: "Vega",
-  repo: "https://github.com/org/test-site",
+  mirrors: [{ path: "https://github.com/org/test-site", storageType: "non-bare" }],
   pinnedPlatform: "1.0.0",
   currentMission: null,
   lastRelease: null,

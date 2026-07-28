@@ -9,6 +9,7 @@
   <item>RFC-0355: initial Bordbuch hash-chain helpers.</item>
   <item>RFC-0473: add runtime writer-role for pseo and indexnow.submit kinds.</item>
   <item>RFC-0477: add commitAndPushBordbuch helper for git commit+push after bordbuch append.</item>
+  <item>RFC-0574: resolveBordbuchPath uses resolveCachePath (mirrors[0].path) instead of hardcoded systems/<id>/.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,11 +24,16 @@ import {
   type BordbuchEntryKind,
 } from "@warpgogol/ontology/operations";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
+import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
 const BORDBUCH_PATH = path.join("bordbuch", "events.ndjson");
 
-export function resolveBordbuchPath(workspaceRoot: string, systemId: string): string {
-  return path.join(workspaceRoot, "systems", systemId, BORDBUCH_PATH);
+export async function resolveBordbuchPath(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<string> {
+  const cachePath = await resolveCachePath(workspaceRoot, systemId);
+  return path.join(cachePath, BORDBUCH_PATH);
 }
 
 const WRITER_ROLE_KINDS: Record<string, BordbuchEntryKind[]> = {
@@ -76,7 +82,7 @@ export async function readBordbuch(
   workspaceRoot: string,
   systemId: string,
 ): Promise<BordbuchEntry[]> {
-  const filePath = resolveBordbuchPath(workspaceRoot, systemId);
+  const filePath = await resolveBordbuchPath(workspaceRoot, systemId);
   if (!existsSync(filePath)) return [];
   const raw = await fs.readFile(filePath, "utf8");
   const lines = raw.split("\n").filter((l) => l.trim().length > 0);
@@ -103,7 +109,7 @@ export async function appendBordbuchEntry(
     erratumOf?: string;
   },
 ): Promise<BordbuchEntry> {
-  const filePath = resolveBordbuchPath(workspaceRoot, systemId);
+  const filePath = await resolveBordbuchPath(workspaceRoot, systemId);
   const dir = path.dirname(filePath);
   if (!existsSync(dir)) {
     await fs.mkdir(dir, { recursive: true });

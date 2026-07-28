@@ -81,12 +81,12 @@ test("register fails on duplicate id", async () => {
   const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   await writeFile(
     registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    repo: "git@github.com:foo/test.git"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
     "utf8",
   );
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "Sirius", repo: "git@github.com:foo/test2.git" }),
+      makeInput({ id: "test-site", cosmicStar: "Sirius", mirrors: "./systems/test-site" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/already exists/);
@@ -95,7 +95,7 @@ test("register fails on duplicate id", async () => {
 test("register fails on invalid cosmicStar", async () => {
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "NotAStar", repo: "git@github.com:foo/test.git" }),
+      makeInput({ id: "test-site", cosmicStar: "NotAStar", mirrors: "./systems/test-site" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/not in StarCatalog/);
@@ -105,7 +105,7 @@ test("register fails on apps/ collision", async () => {
   await mkdir(join(workspaceRoot, "apps", "test-site"), { recursive: true });
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", cosmicStar: "Vega", repo: "git@github.com:foo/test.git" }),
+      makeInput({ id: "test-site", cosmicStar: "Vega", mirrors: "./systems/test-site" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/extract first/);
@@ -116,7 +116,7 @@ test("validate passes for a system with a local path repo", async () => {
   const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   await writeFile(
     registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    repo: "../systems-git/test-site"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
     "utf8",
   );
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
@@ -130,7 +130,7 @@ test("list returns all registered systems", async () => {
   const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   await writeFile(
     registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: site-a\n    cosmicStar: Vega\n    repo: "git@github.com:foo/a.git"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n  - id: site-b\n    cosmicStar: Sirius\n    repo: "git@github.com:foo/b.git"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: site-a\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/site-a"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n  - id: site-b\n    cosmicStar: Sirius\n    mirrors:\n      - path: "./systems/site-b"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
     "utf8",
   );
 
@@ -144,7 +144,7 @@ test("validate passes on a clean registry", async () => {
   const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   await writeFile(
     registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    repo: "git@github.com:foo/test.git"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
     "utf8",
   );
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
@@ -160,7 +160,7 @@ test("validate detects apps/ collision", async () => {
   const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   await writeFile(
     registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    repo: "git@github.com:foo/test.git"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
     "utf8",
   );
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
@@ -177,7 +177,7 @@ test("pin writes system.pin.json and activates the system", async () => {
   const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   await writeFile(
     registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    repo: "git@github.com:foo/test.git"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
     "utf8",
   );
   await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
@@ -232,7 +232,7 @@ test("pin refuses downgrade", async () => {
   const registryPath = join(workspaceRoot, "systems", "registry.yaml");
   await writeFile(
     registryPath,
-    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    repo: "git@github.com:foo/test.git"\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
     "utf8",
   );
   const cacheDir = join(workspaceRoot, "systems", "test-site");

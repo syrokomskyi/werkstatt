@@ -5,6 +5,7 @@ RFC-0354: Zod schemas for the Sternsystem bundle contract — the durable site u
 fleet registry, and version pin. These schemas are the machine-checkable contract
 for all Sternsystem operations.
 RFC-0561: fleetRegistryEntrySchema gains optional owner field (did:web VC subject id).
+RFC-0574: replace repo/mirror with parameterized mirrors[] array.
 </purpose>
 <non-goals>
   <item>Do not perform file IO or git operations — pure shape only.</item>
@@ -15,6 +16,7 @@ RFC-0561: fleetRegistryEntrySchema gains optional owner field (did:web VC subjec
   <item>RFC-0354: initial Sternsystem schemas (SystemPin, FleetRegistryEntry, FleetRegistry).</item>
   <item>RFC-0479: migratorCursor changed from SemVer string to string[] (migrator-id list).</item>
   <item>RFC-0561: add optional owner field (did:web VC subject id) to fleetRegistryEntrySchema.</item>
+  <item>RFC-0574: replace repo/mirror with mirrors[] array (mirrorEntrySchema, mirrorStorageTypeSchema).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,7 +27,6 @@ import { deploymentConfigSchema } from "./leitstand.ts";
 const semverRe = /^\d+\.\d+\.\d+$/;
 const sha256Re = /^sha256:[0-9a-f]{64}$/;
 const kebabRe = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const repoRe = /^(git@|https?:\/\/|\.\/|\.\.\/|\/).+$/;
 const didWebRe = /^did:web:[a-z0-9.-]+#.+$/;
 
 export const systemPinSchema = z.object({
@@ -51,19 +52,26 @@ export const systemPinSchema = z.object({
   ),
 });
 
+export const mirrorStorageTypeSchema = z.enum(["non-bare", "bare", "bundle"]);
+
+export type MirrorStorageType = z.infer<typeof mirrorStorageTypeSchema>;
+
+export const mirrorEntrySchema = z.object({
+  path: z.string().min(1, "mirror path must be non-empty"),
+  storageType: mirrorStorageTypeSchema,
+});
+
+export type MirrorEntry = z.infer<typeof mirrorEntrySchema>;
+
 export const fleetRegistryEntrySchema = z.object({
   id: z.string().regex(kebabRe, "id must be kebab-case, lowercase, latin-only"),
   cosmicStar: starNameSchema,
-  repo: z.string().regex(repoRe, "repo must be a valid git URL (SSH, HTTPS) or local file path"),
+  mirrors: z.array(mirrorEntrySchema).min(1, "mirrors must contain at least 1 entry"),
   pinnedPlatform: z.string().regex(semverRe, "pinnedPlatform must be x.y.z"),
   currentMission: z.string().nullable().default(null),
   lastRelease: z.string().nullable().default(null),
   status: z.enum(["registered", "active", "paused", "archived"]),
   registeredAt: z.string().datetime(),
-  mirror: z
-    .string()
-    .regex(repoRe, "mirror must be a valid git URL (SSH, HTTPS) or local file path")
-    .optional(),
   deployment: deploymentConfigSchema.optional(),
   owner: z
     .string()

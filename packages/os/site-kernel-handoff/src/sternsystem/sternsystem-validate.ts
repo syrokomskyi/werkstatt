@@ -25,7 +25,13 @@ import type {
 import { collectFiles } from "@warpgogol/share/fs";
 import { StarCatalog } from "@warpgogol/ontology/cosmic";
 import { systemPinSchema } from "@warpgogol/ontology/operations";
-import { readRegistry, findEntry, hasAppsCollision } from "./registry-io.ts";
+import {
+  readRegistry,
+  findEntry,
+  hasAppsCollision,
+  resolveMirrors,
+  resolveMirrorPath,
+} from "./registry-io.ts";
 import { evaluateExternalEditGate } from "./external-edit-guard.ts";
 import {
   collectExternalEditInputs,
@@ -177,7 +183,7 @@ export async function runSternsystemValidate(
     }
 
     // Bundle contract (if cache clone exists)
-    const cacheDir = path.join(workspaceRoot, "systems", entry.id);
+    const cacheDir = resolveMirrors(workspaceRoot, entry).cachePath;
     const bundleViolations = await checkBundleContract(cacheDir, entry.id);
     violations.push(...bundleViolations);
 
@@ -218,12 +224,18 @@ export async function runSternsystemValidate(
       });
     }
 
-    if (entry.mirror) {
-      const bareRepoPath = entry.repo.startsWith("local:")
-        ? path.resolve(workspaceRoot, entry.repo.slice("local:".length))
-        : entry.repo.startsWith("./") || entry.repo.startsWith("../") || entry.repo.startsWith("/")
-          ? path.resolve(workspaceRoot, entry.repo)
-          : entry.repo;
+    // RFC-0574: validate mirror topology — mirrors[0] is cache, mirrors[1] is bare, mirrors[2+] are external
+    if (entry.mirrors.length < 1) {
+      violations.push({
+        systemId: entry.id,
+        rule: "mirrors-empty",
+        message: `system '${entry.id}' has no mirrors — at least 1 mirror (cache clone) is required`,
+      });
+    }
+
+    if (entry.mirrors.length > 1) {
+      const bareMirror = entry.mirrors[1];
+      const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
 
       if (existsSync(bareRepoPath)) {
         try {
@@ -232,11 +244,11 @@ export async function runSternsystemValidate(
             encoding: "utf-8",
             stdio: ["pipe", "pipe", "pipe"],
           }).trim();
-          if (remoteUrl !== entry.mirror) {
+          if (entry.mirrors.length > 2 && remoteUrl !== entry.mirrors[2].path) {
             violations.push({
               systemId: entry.id,
               rule: "mirror-remote-mismatch",
-              message: `mirror remote URL '${remoteUrl}' does not match registry mirror '${entry.mirror}'`,
+              message: `mirror remote URL '${remoteUrl}' does not match registry mirrors[2] '${entry.mirrors[2].path}'`,
             });
           }
         } catch {
@@ -248,12 +260,15 @@ export async function runSternsystemValidate(
         }
       }
 
-      if (/https:\/\/[^:]+:[^@]+@/.test(entry.mirror)) {
-        violations.push({
-          systemId: entry.id,
-          rule: "mirror-credentials",
-          message: `mirror URL contains embedded credentials — use SSH URL instead`,
-        });
+      if (entry.mirrors.length > 2) {
+        const externalMirror = entry.mirrors[2].path;
+        if (/https:\/\/[^:]+:[^@]+@/.test(externalMirror)) {
+          violations.push({
+            systemId: entry.id,
+            rule: "mirror-credentials",
+            message: `external mirror URL contains embedded credentials — use SSH URL instead`,
+          });
+        }
       }
     }
 

@@ -139,7 +139,7 @@ beforeEach(async () => {
           id: "test-site",
           cosmicStar: "Vega",
           status: "registered",
-          repo: "git@github.com:foo/test.git",
+          mirrors: [{ path: "./systems/test-site", storageType: "non-bare" }],
           pinnedPlatform: "4.5.0",
           currentMission: null,
           lastRelease: null,

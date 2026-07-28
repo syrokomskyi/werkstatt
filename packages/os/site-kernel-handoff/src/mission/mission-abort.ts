@@ -24,7 +24,12 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import {
+  readRegistry,
+  writeRegistry,
+  findEntry,
+  resolveCachePath,
+} from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty, countOperatorCommits } from "./mission-git-commit.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
@@ -135,7 +140,7 @@ export async function runMissionAbort(
     );
 
     // Commit and push bordbuch to system git repo (RFC-0477)
-    const systemDir = path.join(workspaceRoot, "systems", manifest.systemId);
+    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
     await commitAndPushBordbuch(systemDir, `Bordbuch: mission-abort ${missionId}`);
 
     const registry = await readRegistry(workspaceRoot);

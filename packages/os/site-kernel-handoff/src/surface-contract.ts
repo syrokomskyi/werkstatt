@@ -22,6 +22,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { urlSchema, jsonldTypes, sitemapShape } from "@warpgogol/ontology/external-surfaces";
+import { resolveCachePath } from "./sternsystem/registry-io.ts";
 
 export interface SurfaceContractValidateData {
   systemId: string | null;
@@ -47,7 +48,7 @@ export async function runSurfaceContractValidate(
   // Determine the site directory to validate
   let siteDir: string;
   if (systemId) {
-    siteDir = path.join(workspaceRoot, "systems", systemId);
+    siteDir = await resolveCachePath(workspaceRoot, systemId);
   } else {
     // Default: validate the first active system or the workspace root
     siteDir = workspaceRoot;

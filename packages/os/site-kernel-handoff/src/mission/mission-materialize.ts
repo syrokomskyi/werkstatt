@@ -30,7 +30,13 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { runKernelWire, executeKernelCommand, executeKernelPipeline } from "@warpgogol/site-kernel";
-import { readRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import {
+  readRegistry,
+  findEntry,
+  resolveCachePath,
+  resolveMirrors,
+  resolveMirrorPath,
+} from "../sternsystem/registry-io.ts";
 import {
   runGenerateAgentsDocs,
   runGenerateApiRoutes,
@@ -270,40 +276,43 @@ async function generateFullBoilerplate(
 }
 
 /**
- * RFC-0356 §1.1 step 2: sync the cache clone at systems/<id>/ from the Sternsystem's
- * remote repo. If the cache clone has a .git directory, fetch + reset to origin/master.
- * If not but the registry has a repo URL, clone it. If no repo URL, skip (offline mode).
+ * RFC-0356 §1.1 step 2: sync the cache clone (mirrors[0]) from the bare repo (mirrors[1]).
+ * If the cache clone has a .git directory, fetch + reset to origin/master.
+ * If not but a bare mirror exists, clone it. If no bare mirror, skip (offline mode).
  */
 async function syncCacheClone(
   workspaceRoot: string,
   systemId: string,
   logger: { info: (msg: string) => void },
 ): Promise<void> {
-  const systemDir = path.join(workspaceRoot, "systems", systemId);
-  const gitDir = path.join(systemDir, ".git");
-
   const registry = await readRegistry(workspaceRoot);
   const entry = findEntry(registry, systemId);
-  if (!entry?.repo) {
-    logger.info(`  No repo URL for system '${systemId}' — skipping cache clone sync`);
+  if (!entry) {
+    logger.info(`  No registry entry for system '${systemId}' — skipping cache clone sync`);
     return;
   }
 
-  const repoUrl = entry.repo.startsWith("local:")
-    ? path.resolve(workspaceRoot, entry.repo.slice("local:".length))
-    : entry.repo;
+  const { cachePath, gitMirrors } = resolveMirrors(workspaceRoot, entry);
+  const gitDir = path.join(cachePath, ".git");
+
+  if (gitMirrors.length === 0) {
+    logger.info(`  No bare mirror for system '${systemId}' — skipping cache clone sync`);
+    return;
+  }
+
+  const bareRepoPath = resolveMirrorPath(workspaceRoot, gitMirrors[0].path);
 
   if (existsSync(gitDir)) {
     // Cache clone exists — fetch and reset to origin/master
-    logger.info(`  Fetching latest from ${repoUrl}…`);
+    logger.info(`  Fetching latest from ${bareRepoPath}…`);
     try {
-      execSync("git fetch origin", { cwd: systemDir, stdio: "pipe", timeout: 30_000 });
+      execSync("git fetch origin", { cwd: cachePath, stdio: "pipe", timeout: 30_000 });
       const branch = execSync("git rev-parse --abbrev-ref HEAD", {
-        cwd: systemDir,
+        cwd: cachePath,
         encoding: "utf-8",
       }).trim();
       execSync(`git reset --hard origin/${branch}`, {
-        cwd: systemDir,
+        cwd: cachePath,
         stdio: "pipe",
         timeout: 30_000,
       });
@@ -313,23 +322,23 @@ async function syncCacheClone(
         `[mission.materialize] failed to sync cache clone for system '${systemId}': ${err instanceof Error ? err.message : String(err)}`,
       );
     }
-  } else if (existsSync(systemDir)) {
+  } else if (existsSync(cachePath)) {
     // Directory exists but is not a git clone — clone into a temp dir and replace
-    logger.info(`  Cloning ${repoUrl} into cache clone…`);
-    const tmpDir = `${systemDir}.clone-${process.pid}-${Date.now()}`;
+    logger.info(`  Cloning ${bareRepoPath} into cache clone…`);
+    const tmpDir = `${cachePath}.clone-${process.pid}-${Date.now()}`;
     try {
-      execSync(`git clone "${repoUrl}" "${tmpDir}"`, {
+      execSync(`git clone "${bareRepoPath}" "${tmpDir}"`, {
         stdio: "pipe",
         timeout: 60_000,
       });
       // Preserve .env and other untracked files from the old directory
-      const oldEntries = await fs.readdir(systemDir, { withFileTypes: true });
-      for (const entry of oldEntries) {
-        if (entry.name === ".git") continue;
-        const src = path.join(systemDir, entry.name);
-        const dest = path.join(tmpDir, entry.name);
+      const oldEntries = await fs.readdir(cachePath, { withFileTypes: true });
+      for (const e of oldEntries) {
+        if (e.name === ".git") continue;
+        const src = path.join(cachePath, e.name);
+        const dest = path.join(tmpDir, e.name);
         if (!existsSync(dest)) {
-          if (entry.isDirectory()) {
+          if (e.isDirectory()) {
             await copyDir(src, dest);
           } else {
             await fs.copyFile(src, dest);
@@ -337,9 +346,9 @@ async function syncCacheClone(
         }
       }
       // Replace old directory with the clone
-      await fs.rm(systemDir, { recursive: true, force: true });
-      await fs.rename(tmpDir, systemDir);
-      logger.info(`  Cache clone populated from ${repoUrl}`);
+      await fs.rm(cachePath, { recursive: true, force: true });
+      await fs.rename(tmpDir, cachePath);
+      logger.info(`  Cache clone populated from ${bareRepoPath}`);
     } catch (err) {
       if (existsSync(tmpDir)) {
         await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
@@ -350,14 +359,14 @@ async function syncCacheClone(
     }
   } else {
     // Directory doesn't exist — clone directly
-    logger.info(`  Cloning ${repoUrl} into cache clone…`);
-    await fs.mkdir(path.dirname(systemDir), { recursive: true });
+    logger.info(`  Cloning ${bareRepoPath} into cache clone…`);
+    await fs.mkdir(path.dirname(cachePath), { recursive: true });
     try {
-      execSync(`git clone "${repoUrl}" "${systemDir}"`, {
+      execSync(`git clone "${bareRepoPath}" "${cachePath}"`, {
         stdio: "pipe",
         timeout: 60_000,
       });
-      logger.info(`  Cache clone populated from ${repoUrl}`);
+      logger.info(`  Cache clone populated from ${bareRepoPath}`);
     } catch (err) {
       throw new Error(
         `[mission.materialize] failed to clone cache clone for system '${systemId}': ${err instanceof Error ? err.message : String(err)}`,
@@ -572,7 +581,7 @@ export async function runMissionMaterialize(
       );
     }
 
-    const systemDir = path.join(workspaceRoot, "systems", manifest.systemId);
+    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
 
     // RFC-0356 §1.1 step 2: fetch the latest remote state into the cache clone.
     await syncCacheClone(workspaceRoot, manifest.systemId, logger);

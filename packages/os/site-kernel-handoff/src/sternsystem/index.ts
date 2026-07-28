@@ -35,16 +35,19 @@ export function createSternsystemModule(): KernelModule {
       registry.registerCommand({
         name: "sternsystem.register",
         description:
-          "Register a new Sternsystem in systems/registry.yaml (RFC-0354, RFC-0532). Flags: --id, --cosmicStar, --repo, [--platform], [--mirror], [--owner], [--amend], [--amend-id].",
+          "Register a new Sternsystem in systems/registry.yaml (RFC-0354, RFC-0532, RFC-0574). Flags: --id, --cosmicStar, --mirrors, [--platform], [--owner], [--amend], [--amend-id].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
           id: { kind: "string", required: true, description: "Sternsystem id." },
           cosmicStar: { kind: "string", required: true, description: "Reserved page cosmic star." },
-          repo: { kind: "string", required: true, description: "Sternsystem repository URL." },
+          mirrors: {
+            kind: "string",
+            required: true,
+            description: "Comma-separated mirror paths (first=cache, second=bare, rest=external).",
+          },
           platform: { kind: "string", description: "Pinned platform version." },
-          mirror: { kind: "string", description: "External mirror repository URL (optional)." },
           owner: {
             kind: "string",
             description:
@@ -91,13 +94,16 @@ export function createSternsystemModule(): KernelModule {
       registry.registerCommand({
         name: "sternsystem.extract",
         description:
-          "Extract an apps/<site>/ site into a Sternsystem git repo (RFC-0356). Flags: --site, [--repo].",
+          "Extract an apps/<site>/ site into a Sternsystem git repo (RFC-0356, RFC-0574). Flags: --site, [--mirrors].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
           site: { kind: "string", required: true, description: "Site id to extract." },
-          repo: { kind: "string", description: "Sternsystem repository URL." },
+          mirrors: {
+            kind: "string",
+            description: "Comma-separated mirror paths (first=cache, second=bare, rest=external).",
+          },
         },
         writes: ["systems/{site}/**", "systems/registry.yaml"],
         execute: runSternsystemExtract,

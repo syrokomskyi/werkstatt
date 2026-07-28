@@ -35,8 +35,20 @@ export type {
 } from "./handoff.ts";
 
 // RFC-0354: Sternsystem bundle contract schemas.
-export { systemPinSchema, fleetRegistryEntrySchema, fleetRegistrySchema } from "./sternsystem.ts";
-export type { SystemPin, FleetRegistryEntry, FleetRegistry } from "./sternsystem.ts";
+export {
+  systemPinSchema,
+  mirrorStorageTypeSchema,
+  mirrorEntrySchema,
+  fleetRegistryEntrySchema,
+  fleetRegistrySchema,
+} from "./sternsystem.ts";
+export type {
+  SystemPin,
+  MirrorStorageType,
+  MirrorEntry,
+  FleetRegistryEntry,
+  FleetRegistry,
+} from "./sternsystem.ts";
 
 // RFC-0362: Werkstatt consistency primitive schemas.
 export { werkstattLockSchema, werkstattOperationRecordSchema } from "./werkstatt.ts";

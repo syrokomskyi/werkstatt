@@ -24,7 +24,13 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import {
+  readRegistry,
+  writeRegistry,
+  findEntry,
+  resolveCachePath,
+  resolveMirrorPath,
+} from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty } from "./mission-git-commit.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
@@ -79,16 +85,6 @@ function gitExec(cwd: string, args: string): string {
     stdio: ["pipe", "pipe", "pipe"],
     timeout: 30_000,
   }).trim();
-}
-
-function resolveRepoPath(workspaceRoot: string, repo: string): string {
-  if (repo.startsWith("local:")) {
-    return path.resolve(workspaceRoot, repo.slice("local:".length));
-  }
-  if (repo.startsWith("./") || repo.startsWith("../") || repo.startsWith("/")) {
-    return path.resolve(workspaceRoot, repo);
-  }
-  return repo;
 }
 
 export async function runMissionClose(
@@ -184,7 +180,7 @@ export async function runMissionClose(
     );
 
     // Commit and push bordbuch to system git repo (RFC-0477)
-    const systemDir = path.join(workspaceRoot, "systems", manifest.systemId);
+    const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
     const bordbuchResult = await commitAndPushBordbuch(
       systemDir,
       `Bordbuch: mission-close ${missionId}`,
@@ -211,8 +207,9 @@ export async function runMissionClose(
     const registry = await readRegistry(workspaceRoot);
     const entry = findEntry(registry, manifest.systemId);
 
-    if (entry?.repo) {
-      const bareRepoPath = resolveRepoPath(workspaceRoot, entry.repo);
+    if (entry && entry.mirrors.length > 1) {
+      const bareMirror = entry.mirrors[1];
+      const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
       if (existsSync(bareRepoPath)) {
         try {
           let branch: string;
@@ -226,7 +223,7 @@ export async function runMissionClose(
           } catch {
             originSha = null;
           }
-          if (entry.mirror) {
+          if (entry.mirrors.length > 2) {
             try {
               mirrorSha = gitExec(bareRepoPath, `rev-parse refs/mirror/${branch}`);
             } catch {
@@ -244,7 +241,7 @@ export async function runMissionClose(
       recommendation = `Mirror is behind origin. Run: sternsystem.sync --id ${manifest.systemId}`;
     } else if (originSha && mirrorSha && originSha === mirrorSha) {
       mirrorInSync = true;
-    } else if (entry?.mirror && !mirrorSha) {
+    } else if (entry && entry.mirrors.length > 2 && !mirrorSha) {
       mirrorInSync = false;
       recommendation = `Mirror ref not found in bare repo. Run: sternsystem.sync --id ${manifest.systemId}`;
     } else {

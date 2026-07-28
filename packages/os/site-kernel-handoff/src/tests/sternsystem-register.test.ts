@@ -104,19 +104,19 @@ test("amend fails when id is not provided", async () => {
 test("register fails when cosmicStar is not provided (non-amend)", async () => {
   await expect(
     runSternsystemRegister(
-      makeInput({ id: "test-site", repo: "git@github.com:foo/test.git" }),
+      makeInput({ id: "test-site", mirrors: "git@github.com:foo/test.git" }),
       makeContext(workspaceRoot),
     ),
   ).rejects.toThrow(/requires --cosmicStar/);
 });
 
-test("register fails when repo is not provided (non-amend)", async () => {
+test("register fails when mirrors is not provided (non-amend)", async () => {
   await expect(
     runSternsystemRegister(
       makeInput({ id: "test-site", cosmicStar: "Vega" }),
       makeContext(workspaceRoot),
     ),
-  ).rejects.toThrow(/requires --repo/);
+  ).rejects.toThrow(/requires --mirrors/);
 });
 
 test("createContentStub creates system.md from brief", async () => {
@@ -126,7 +126,11 @@ test("createContentStub creates system.md from brief", async () => {
 
   await mkdir(join(workspaceRoot, "systems", "test-client"), { recursive: true });
 
-  await createContentStub(workspaceRoot, "test-client");
+  await createContentStub(
+    workspaceRoot,
+    "test-client",
+    join(workspaceRoot, "systems", "test-client"),
+  );
 
   const systemMdPath = join(workspaceRoot, "systems", "test-client", "content", "system.md");
   expect(existsSync(systemMdPath)).toBe(true);
@@ -140,17 +144,21 @@ test("createContentStub creates system.md from brief", async () => {
 test("createContentStub is a no-op when brief does not exist", async () => {
   await mkdir(join(workspaceRoot, "systems", "test-client"), { recursive: true });
 
-  await createContentStub(workspaceRoot, "test-client");
+  await createContentStub(
+    workspaceRoot,
+    "test-client",
+    join(workspaceRoot, "systems", "test-client"),
+  );
 
   const systemMdPath = join(workspaceRoot, "systems", "test-client", "content", "system.md");
   expect(existsSync(systemMdPath)).toBe(false);
 });
 
 test("register rolls back registry entry when materialize fails", async () => {
-  // Register will fail at mission.materialize because the repo URL is a
+  // Register will fail at mission.materialize because the mirrors point to a
   // non-existent local path — git clone fails immediately instead of hanging on SSH.
   const result = await runSternsystemRegister(
-    makeInput({ id: "test-site", cosmicStar: "Vega", repo: "/nonexistent-repo-path" }),
+    makeInput({ id: "test-site", cosmicStar: "Vega", mirrors: "./nonexistent-repo-path" }),
     makeContext(workspaceRoot),
   );
 

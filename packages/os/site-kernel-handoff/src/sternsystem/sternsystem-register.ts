@@ -17,8 +17,7 @@ With --amend: update pin and open amend mission without creating a new registry 
 
 import { mkdir, rm, writeFile, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
-import path from "node:path";
+import { join } from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -33,9 +32,9 @@ import {
   findEntry,
   findEntryByStar,
   hasAppsCollision,
+  resolveMirrorPath,
 } from "./registry-io.ts";
 import { runSternsystemPin } from "./sternsystem-pin.ts";
-import { ensureMirrorHook } from "./mirror-hook.ts";
 import { runMissionOpen } from "../mission/mission-open.ts";
 import { runMissionMaterialize } from "../mission/mission-materialize.ts";
 import { runMissionAbort } from "../mission/mission-abort.ts";
@@ -74,7 +73,11 @@ function makeInput(flags: Record<string, KernelFlagValue>): KernelCommandInput {
   return { flags, args: [], argv: [] };
 }
 
-export async function createContentStub(workspaceRoot: string, id: string): Promise<void> {
+export async function createContentStub(
+  workspaceRoot: string,
+  id: string,
+  systemDir: string,
+): Promise<void> {
   const briefPath = join(workspaceRoot, "onboarding", id, ".input", "00-brief.md");
   if (!existsSync(briefPath)) return;
 
@@ -86,7 +89,7 @@ export async function createContentStub(workspaceRoot: string, id: string): Prom
     return;
   }
 
-  const contentDir = join(workspaceRoot, "systems", id, "content");
+  const contentDir = join(systemDir, "content");
   await mkdir(contentDir, { recursive: true });
 
   const supported = brief.i18n.supported.map((l) => `  - ${l}`).join("\n");
@@ -112,22 +115,21 @@ async function rollbackRegistry(workspaceRoot: string, id: string): Promise<void
   }
 }
 
-async function rollbackPin(workspaceRoot: string, id: string): Promise<void> {
-  const pinPath = join(workspaceRoot, "systems", id, "system.pin.json");
+async function rollbackPin(systemDir: string): Promise<void> {
+  const pinPath = join(systemDir, "system.pin.json");
   if (existsSync(pinPath)) {
     await rm(pinPath, { force: true });
   }
 }
 
-async function rollbackContent(workspaceRoot: string, id: string): Promise<void> {
-  const contentPath = join(workspaceRoot, "systems", id, "content");
+async function rollbackContent(systemDir: string): Promise<void> {
+  const contentPath = join(systemDir, "content");
   if (existsSync(contentPath)) {
     await rm(contentPath, { recursive: true, force: true });
   }
 }
 
-async function rollbackSystemDirIfEmpty(workspaceRoot: string, id: string): Promise<void> {
-  const systemDir = join(workspaceRoot, "systems", id);
+async function rollbackSystemDirIfEmpty(systemDir: string): Promise<void> {
   if (!existsSync(systemDir)) return;
   const gitDir = join(systemDir, ".git");
   if (existsSync(gitDir)) return;
@@ -142,9 +144,8 @@ export async function runSternsystemRegister(
 
   const id = flagString(input, "id");
   const cosmicStar = flagString(input, "cosmicStar");
-  const repo = flagString(input, "repo");
+  const mirrorsFlag = flagString(input, "mirrors");
   const platform = flagString(input, "platform");
-  const mirror = flagString(input, "mirror");
   const owner = flagString(input, "owner");
   const isAmend = flagBool(input, "amend");
   const amendId = flagNumber(input, "amend-id");
@@ -213,7 +214,10 @@ export async function runSternsystemRegister(
   }
 
   if (!cosmicStar) throw new Error("[sternsystem.register] requires --cosmicStar <StarName>");
-  if (!repo) throw new Error("[sternsystem.register] requires --repo <git-url-or-local-path>");
+  if (!mirrorsFlag)
+    throw new Error(
+      "[sternsystem.register] requires --mirrors <comma-separated-paths> (first is cache, second is bare, rest are external)",
+    );
 
   if (!(StarCatalog as readonly string[]).includes(cosmicStar)) {
     throw new Error(`[sternsystem.register] cosmicStar '${cosmicStar}' is not in StarCatalog`);
@@ -240,16 +244,24 @@ export async function runSternsystemRegister(
 
   const pinnedPlatform = platform ?? registry.systems[0]?.pinnedPlatform ?? "0.0.0";
 
+  const VALID_STORAGE_TYPES = ["non-bare", "bare", "bundle"] as const;
+  const mirrors = mirrorsFlag.split(",").map((entry) => {
+    const m = entry.match(/^(.+):(non-bare|bare|bundle)$/);
+    if (m) {
+      return { path: m[1], storageType: m[2] as (typeof VALID_STORAGE_TYPES)[number] };
+    }
+    return { path: entry, storageType: "non-bare" as const };
+  });
+
   const entry = {
     id,
     cosmicStar: cosmicStar as StarName,
-    repo,
+    mirrors,
     pinnedPlatform,
     currentMission: null,
     lastRelease: null,
     status: "registered" as const,
     registeredAt: new Date().toISOString(),
-    mirror: mirror ?? undefined,
     owner: owner ?? undefined,
     notes: "",
   };
@@ -257,7 +269,7 @@ export async function runSternsystemRegister(
   registry.systems.push(entry);
   await writeRegistry(workspaceRoot, registry);
 
-  const systemDir = join(workspaceRoot, "systems", id);
+  const systemDir = resolveMirrorPath(workspaceRoot, mirrors[0].path);
   await mkdir(systemDir, { recursive: true });
 
   let pinCreated = false;
@@ -272,7 +284,7 @@ export async function runSternsystemRegister(
     const pinPath = pinResult.data!.pinPath;
     pinCreated = true;
 
-    await createContentStub(workspaceRoot, id);
+    await createContentStub(workspaceRoot, id, systemDir);
     contentCreated = true;
 
     const missionResult = await runMissionOpen(
@@ -301,21 +313,8 @@ export async function runSternsystemRegister(
       throw materializeError;
     }
 
-    if (mirror) {
-      const bareRepoPath = repo.startsWith("local:")
-        ? path.resolve(workspaceRoot, repo.slice("local:".length))
-        : repo.startsWith("./") || repo.startsWith("../") || repo.startsWith("/")
-          ? path.resolve(workspaceRoot, repo)
-          : repo;
-      if (existsSync(bareRepoPath)) {
-        const hookResult = ensureMirrorHook(bareRepoPath);
-        if (hookResult.installed) {
-          logger.info(`[sternsystem.register] installed post-receive mirror auto-push hook`);
-        } else if (hookResult.updated) {
-          logger.info(`[sternsystem.register] updated post-receive mirror auto-push hook`);
-        }
-      }
-    }
+    // RFC-0574: mirror hook removed — star topology uses explicit sternsystem.sync
+    void workspaceRoot;
 
     logger.success(
       `[sternsystem.register] registered '${id}' (cosmicStar: ${cosmicStar}) — mission ${missionId} opened and materialized`,
@@ -356,13 +355,13 @@ export async function runSternsystemRegister(
       }
     }
     if (contentCreated) {
-      await rollbackContent(workspaceRoot, id);
+      await rollbackContent(systemDir);
     }
     if (pinCreated) {
-      await rollbackPin(workspaceRoot, id);
+      await rollbackPin(systemDir);
     }
     await rollbackRegistry(workspaceRoot, id);
-    await rollbackSystemDirIfEmpty(workspaceRoot, id);
+    await rollbackSystemDirIfEmpty(systemDir);
 
     diagnostics.push(
       `sternsystem.register failed: ${error instanceof Error ? error.message : String(error)}`,

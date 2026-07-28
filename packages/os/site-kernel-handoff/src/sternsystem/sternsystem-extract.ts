@@ -20,7 +20,12 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { systemPinSchema, type SystemPin } from "@warpgogol/ontology/operations";
-import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import {
+  readRegistry,
+  writeRegistry,
+  findEntry,
+  resolveMirrors,
+} from "../sternsystem/registry-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
@@ -31,7 +36,7 @@ import { highestRfcId, snapshotCapabilities } from "./pin-helpers.ts";
 export interface SternsystemExtractData {
   appId: string;
   systemId: string;
-  repo: string;
+  mirrors: Array<{ path: string; storageType: string }>;
   extractedAt: string;
   pinVersion: string;
 }
@@ -64,7 +69,7 @@ export async function runSternsystemExtract(
 ): Promise<KernelCommandResult<SternsystemExtractData>> {
   const { workspaceRoot, logger } = context;
   const siteId = flagString(input, "site");
-  const repo = flagString(input, "repo") ?? `local:systems/${siteId}`;
+  const mirrorsFlag = flagString(input, "mirrors");
 
   if (!siteId) throw new Error("[sternsystem.extract] --site is required");
 
@@ -73,12 +78,26 @@ export async function runSternsystemExtract(
     throw new Error(`[sternsystem.extract] apps/${siteId}/ does not exist`);
   }
 
+  const mirrors = mirrorsFlag
+    ? mirrorsFlag.split(",").map((entry) => {
+        const [pathPart, typePart] = entry.split(":");
+        return { path: pathPart, storageType: typePart || "non-bare" };
+      })
+    : [
+        { path: `../systems-cache/${siteId}`, storageType: "non-bare" },
+        { path: `../systems-git/${siteId}`, storageType: "bare" },
+      ];
+
   const operationId = generateOperationId();
   await acquireLock(workspaceRoot, "registry", operationId, "sternsystem.extract", "agent");
   await acquireLock(workspaceRoot, `system:${siteId}`, operationId, "sternsystem.extract", "agent");
 
   try {
-    const systemDir = path.join(workspaceRoot, "systems", siteId);
+    const registry = await readRegistry(workspaceRoot);
+    const regEntry = findEntry(registry, siteId);
+    const systemDir = regEntry
+      ? resolveMirrors(workspaceRoot, regEntry).cachePath
+      : path.resolve(workspaceRoot, mirrors[0].path);
     await fs.mkdir(systemDir, { recursive: true });
 
     // Copy data paths
@@ -96,8 +115,6 @@ export async function runSternsystemExtract(
     const rfcHead = await highestRfcId(workspaceRoot);
     const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
     const capabilities = await snapshotCapabilities(workspaceRoot);
-    const registry = await readRegistry(workspaceRoot);
-    const regEntry = findEntry(registry, siteId);
     const pin: SystemPin = {
       schemaVersion: "1.0.0",
       systemId: siteId,
@@ -135,16 +152,19 @@ export async function runSternsystemExtract(
     if (regEntry) {
       regEntry.status = "active";
       regEntry.pinnedPlatform = pinVersion;
-      regEntry.repo = repo;
+      regEntry.mirrors = mirrors as Array<{
+        path: string;
+        storageType: "non-bare" | "bare" | "bundle";
+      }>;
       await writeRegistry(workspaceRoot, registry);
     }
 
     const now = new Date().toISOString();
-    logger.success(`[sternsystem.extract] extracted ${siteId} to systems/${siteId}/`);
+    logger.success(`[sternsystem.extract] extracted ${siteId} to ${mirrors[0].path}`);
 
     return {
-      data: { appId: siteId, systemId: siteId, repo, extractedAt: now, pinVersion },
-      summary: `[sternsystem.extract] extracted ${siteId} to systems/${siteId}/`,
+      data: { appId: siteId, systemId: siteId, mirrors, extractedAt: now, pinVersion },
+      summary: `[sternsystem.extract] extracted ${siteId} to ${mirrors[0].path}`,
     };
   } finally {
     await releaseLock(workspaceRoot, `system:${siteId}`);

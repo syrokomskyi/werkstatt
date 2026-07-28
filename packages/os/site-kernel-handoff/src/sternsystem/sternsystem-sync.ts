@@ -16,19 +16,23 @@
 
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import path from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { readRegistry, findEntry } from "./registry-io.ts";
+import {
+  readRegistry,
+  findEntry,
+  resolveMirrors,
+  resolveMirrorPath,
+  resolveCachePath,
+} from "./registry-io.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
-import { ensureMirrorHook } from "./mirror-hook.ts";
 
 export interface SternsystemSyncData {
   systemId: string;
-  mirrorUrl: string;
+  mirrorUrls: string[];
   direction: "push";
   branch: string;
   commitSha: string | null;
@@ -43,16 +47,6 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
 function flagBoolean(input: KernelCommandInput, key: string): boolean {
   const v = input.flags[key];
   return v === true || v === "true";
-}
-
-function resolveRepoPath(workspaceRoot: string, repo: string): string {
-  if (repo.startsWith("local:")) {
-    return path.resolve(workspaceRoot, repo.slice("local:".length));
-  }
-  if (repo.startsWith("./") || repo.startsWith("../") || repo.startsWith("/")) {
-    return path.resolve(workspaceRoot, repo);
-  }
-  return repo;
 }
 
 function git(cwd: string, args: string): string {
@@ -88,14 +82,30 @@ export async function runSternsystemSync(
     throw new Error(`[sternsystem.sync] system '${id}' not found in registry`);
   }
 
-  if (!entry.mirror) {
-    throw new Error(`[sternsystem.sync] system '${id}' has no mirror configured`);
+  if (entry.mirrors.length < 2) {
+    throw new Error(`[sternsystem.sync] system '${id}' has no bare mirror configured`);
   }
 
-  const bareRepoPath = resolveRepoPath(workspaceRoot, entry.repo);
+  const { gitMirrors } = resolveMirrors(workspaceRoot, entry);
+  const bareRepoPath = resolveMirrorPath(workspaceRoot, gitMirrors[0].path);
   if (!existsSync(bareRepoPath)) {
     throw new Error(`[sternsystem.sync] bare repo not found at ${bareRepoPath}`);
   }
+
+  // External mirrors are mirrors[2+] (git accessible, non-bundle)
+  const externalMirrors = entry.mirrors.slice(2).filter((m) => {
+    const proto = m.path;
+    return (
+      proto.startsWith("git@") ||
+      proto.startsWith("ssh://") ||
+      proto.startsWith("https://") ||
+      proto.startsWith("file://") ||
+      proto.startsWith("./") ||
+      proto.startsWith("../") ||
+      proto.startsWith("/")
+    );
+  });
+  const mirrorUrls = externalMirrors.map((m) => m.path);
 
   let branch: string;
   try {
@@ -109,50 +119,44 @@ export async function runSternsystemSync(
     branch = "*";
   }
 
-  const mirrorUrl = entry.mirror;
-
-  const remoteArgs = `remote get-url mirror`;
-  let currentRemoteUrl: string | null = null;
-  try {
-    currentRemoteUrl = git(bareRepoPath, remoteArgs);
-  } catch {
-    currentRemoteUrl = null;
-  }
-
-  if (currentRemoteUrl === null) {
-    logger.info(`[sternsystem.sync] adding remote 'mirror' → ${mirrorUrl}`);
-    git(bareRepoPath, `remote add mirror ${mirrorUrl}`);
-  } else if (currentRemoteUrl !== mirrorUrl) {
-    logger.info(
-      `[sternsystem.sync] updating remote 'mirror' URL: ${currentRemoteUrl} → ${mirrorUrl}`,
-    );
-    git(bareRepoPath, `remote set-url mirror ${mirrorUrl}`);
-  }
-
-  const hookResult = ensureMirrorHook(bareRepoPath);
-  if (hookResult.installed) {
-    logger.info(`[sternsystem.sync] installed post-receive mirror auto-push hook`);
-  } else if (hookResult.updated) {
-    logger.info(`[sternsystem.sync] updated post-receive mirror auto-push hook`);
-  }
-
   const refSpec = syncAll ? "--all" : branchName;
   const tagSpec = syncAll ? " --tags" : "";
 
   const errors: string[] = [];
 
-  if (direction === "push") {
-    logger.info(`[sternsystem.sync] pushing ${refSpec} to mirror…`);
-    try {
-      git(bareRepoPath, `push mirror ${refSpec}${tagSpec}`);
-    } catch (err) {
-      const stderr = (err as Error).message;
-      if (stderr.includes("non-fast-forward") || stderr.includes("rejected")) {
-        errors.push(
-          `git push failed (non-fast-forward): ${stderr}. Mirror may have diverged — disaster recovery required.`,
-        );
-      } else {
-        errors.push(`git push failed: ${stderr}`);
+  for (const mirrorUrl of mirrorUrls) {
+    const remoteName = `mirror-${mirrorUrls.indexOf(mirrorUrl)}`;
+    const currentRemoteUrl = (() => {
+      try {
+        return git(bareRepoPath, `remote get-url ${remoteName}`);
+      } catch {
+        return null;
+      }
+    })();
+
+    if (currentRemoteUrl === null) {
+      logger.info(`[sternsystem.sync] adding remote '${remoteName}' → ${mirrorUrl}`);
+      git(bareRepoPath, `remote add ${remoteName} ${mirrorUrl}`);
+    } else if (currentRemoteUrl !== mirrorUrl) {
+      logger.info(
+        `[sternsystem.sync] updating remote '${remoteName}' URL: ${currentRemoteUrl} → ${mirrorUrl}`,
+      );
+      git(bareRepoPath, `remote set-url ${remoteName} ${mirrorUrl}`);
+    }
+
+    if (direction === "push") {
+      logger.info(`[sternsystem.sync] pushing ${refSpec} to ${remoteName}…`);
+      try {
+        git(bareRepoPath, `push ${remoteName} ${refSpec}${tagSpec}`);
+      } catch (err) {
+        const stderr = (err as Error).message;
+        if (stderr.includes("non-fast-forward") || stderr.includes("rejected")) {
+          errors.push(
+            `git push to ${mirrorUrl} failed (non-fast-forward): ${stderr}. Mirror may have diverged — disaster recovery required.`,
+          );
+        } else {
+          errors.push(`git push to ${mirrorUrl} failed: ${stderr}`);
+        }
       }
     }
   }
@@ -161,7 +165,7 @@ export async function runSternsystemSync(
     const syncedAt = new Date().toISOString();
     const data: SternsystemSyncData = {
       systemId: id,
-      mirrorUrl,
+      mirrorUrls,
       direction: "push",
       branch: syncAll ? "*" : branchName,
       commitSha: null,
@@ -193,7 +197,7 @@ export async function runSternsystemSync(
       {
         writerRole: "sternsystem",
         metadata: {
-          mirrorUrl,
+          mirrorUrls,
           direction,
           branch: syncAll ? "*" : branchName,
           commitSha,
@@ -206,7 +210,7 @@ export async function runSternsystemSync(
   }
 
   // Commit and push bordbuch to system git repo (RFC-0477)
-  const systemDir = path.join(workspaceRoot, "systems", id);
+  const systemDir = await resolveCachePath(workspaceRoot, id);
   await commitAndPushBordbuch(systemDir, `Bordbuch: mirror-sync ${id}`);
 
   logger.success(
@@ -215,7 +219,7 @@ export async function runSternsystemSync(
 
   const data: SternsystemSyncData = {
     systemId: id,
-    mirrorUrl,
+    mirrorUrls,
     direction: "push",
     branch: syncAll ? "*" : branchName,
     commitSha,

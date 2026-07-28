@@ -24,6 +24,12 @@ function git(cwd: string, args: string): string {
   }).trim();
 }
 
+async function setupRegistry(workspaceRoot: string, systemId: string): Promise<void> {
+  await fs.mkdir(path.join(workspaceRoot, "systems"), { recursive: true });
+  const registryYaml = `schemaVersion: "1.0.0"\nsystems:\n  - id: ${systemId}\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/${systemId}"\n        storageType: non-bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n`;
+  await fs.writeFile(path.join(workspaceRoot, "systems", "registry.yaml"), registryYaml, "utf8");
+}
+
 let tmpDir: string;
 let cacheCloneDir: string;
 let workpieceDir: string;
@@ -61,8 +67,10 @@ afterEach(async () => {
 });
 
 test("investigateUntrackedFiles classifies boilerplate files as previous-mission when within mission time range", async () => {
+  const workspaceRoot = path.join(tmpDir, "workspace");
+  await setupRegistry(workspaceRoot, "test-system");
   // Create a bordbuch file with a mission-open entry
-  const bordbuchDir = path.join(tmpDir, "workspace", "systems", "test-system", "bordbuch");
+  const bordbuchDir = path.join(workspaceRoot, "systems", "test-system", "bordbuch");
   await fs.mkdir(bordbuchDir, { recursive: true });
   const missionOpenTime = new Date(Date.now() - 60000).toISOString(); // 1 minute ago
   const bordbuchEntry = {
@@ -85,7 +93,7 @@ test("investigateUntrackedFiles classifies boilerplate files as previous-mission
   const boilerplateFile = "package.json";
   await fs.writeFile(path.join(cacheCloneDir, boilerplateFile), '{"name":"test"}');
 
-  const systemDir = path.join(tmpDir, "workspace", "systems", "test-system");
+  const systemDir = path.join(workspaceRoot, "systems", "test-system");
   // Ensure the system dir has the untracked file
   await fs.mkdir(path.join(systemDir, "bordbuch"), { recursive: true });
   await fs.writeFile(
@@ -93,12 +101,9 @@ test("investigateUntrackedFiles classifies boilerplate files as previous-mission
     JSON.stringify(bordbuchEntry) + "\n",
   );
 
-  const reports = await investigateUntrackedFiles(
-    path.join(tmpDir, "workspace"),
-    "test-system",
-    cacheCloneDir,
-    [boilerplateFile],
-  );
+  const reports = await investigateUntrackedFiles(workspaceRoot, "test-system", cacheCloneDir, [
+    boilerplateFile,
+  ]);
 
   expect(reports).toHaveLength(1);
   expect(reports[0].path).toBe(boilerplateFile);
@@ -108,6 +113,7 @@ test("investigateUntrackedFiles classifies boilerplate files as previous-mission
 test("investigateUntrackedFiles classifies non-boilerplate files as direct-commit when outside mission time range", async () => {
   // No bordbuch entries — no mission time ranges
   const workspaceRoot = path.join(tmpDir, "workspace");
+  await setupRegistry(workspaceRoot, "test-system");
   await fs.mkdir(path.join(workspaceRoot, "systems", "test-system", "bordbuch"), {
     recursive: true,
   });
@@ -131,6 +137,7 @@ test("investigateUntrackedFiles classifies non-boilerplate files as direct-commi
 
 test("investigateUntrackedFiles returns unknown for boilerplate files outside mission time range", async () => {
   const workspaceRoot = path.join(tmpDir, "workspace");
+  await setupRegistry(workspaceRoot, "test-system");
   await fs.mkdir(path.join(workspaceRoot, "systems", "test-system", "bordbuch"), {
     recursive: true,
   });

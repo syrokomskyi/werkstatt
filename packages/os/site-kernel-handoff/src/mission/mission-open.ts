@@ -20,7 +20,12 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import type { MissionManifest } from "@warpgogol/ontology/operations";
-import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
+import {
+  readRegistry,
+  writeRegistry,
+  findEntry,
+  resolveCachePath,
+} from "../sternsystem/registry-io.ts";
 import { createMissionDirectories, writeMissionManifest, missionExists } from "./mission-io.ts";
 import {
   readBordbuch,
@@ -82,7 +87,8 @@ export async function runMissionOpen(
     }
 
     // Check pin file exists
-    const pinPath = path.join(workspaceRoot, "systems", systemId, "system.pin.json");
+    const cacheDir = await resolveCachePath(workspaceRoot, systemId);
+    const pinPath = path.join(cacheDir, "system.pin.json");
     if (!existsSync(pinPath)) {
       throw new Error(
         `[mission.open] system '${systemId}' has no system.pin.json — run sternsystem.pin first`,
@@ -141,7 +147,7 @@ export async function runMissionOpen(
     });
 
     // Commit and push bordbuch to system git repo (RFC-0477)
-    const systemDir = path.join(workspaceRoot, "systems", systemId);
+    const systemDir = await resolveCachePath(workspaceRoot, systemId);
     await commitAndPushBordbuch(systemDir, `Bordbuch: mission-open ${missionId}`);
 
     // Update registry

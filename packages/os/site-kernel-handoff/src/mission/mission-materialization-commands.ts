@@ -36,6 +36,7 @@ import { isWorkpieceDirty, investigateUntrackedFiles } from "./mission-git-commi
 import { acquireLock, releaseLock } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
+import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
 const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
 
@@ -241,7 +242,7 @@ export async function runMissionValidate(
   }
 
   // RFC-0522: warn on dirty cache clone — reconcile will fail until resolved
-  const systemDir = path.join(workspaceRoot, "systems", manifest.systemId);
+  const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
   if (existsSync(path.join(systemDir, ".git"))) {
     const cacheDirtyCheck = isWorkpieceDirty(systemDir);
     if (cacheDirtyCheck.dirty) {
@@ -375,7 +376,7 @@ export async function runMissionDiff(
   if (!missionId) throw new Error("[mission.diff] --mission is required");
 
   const manifest = await readMissionManifest(workspaceRoot, missionId);
-  const systemDir = path.join(workspaceRoot, "systems", manifest.systemId);
+  const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
   const workpieceDir = path.join(resolveMissionDir(workspaceRoot, missionId), "workpiece");
 
   const systemFiles = new Set(await collectRelativeFiles(systemDir));
@@ -480,7 +481,7 @@ export async function runMissionReconcile(
   }
 
   const workpieceDir = path.join(resolveMissionDir(workspaceRoot, missionId), "workpiece");
-  const systemDir = path.join(workspaceRoot, "systems", manifest.systemId);
+  const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
 
   try {
     const now = new Date().toISOString();

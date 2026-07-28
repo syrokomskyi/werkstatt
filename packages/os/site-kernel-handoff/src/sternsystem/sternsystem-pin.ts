@@ -23,7 +23,7 @@ import type {
 import { systemPinSchema, type SystemPin } from "@warpgogol/ontology/operations";
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
 import { allMigratorIds } from "../migrators/registry.ts";
-import { readRegistry, writeRegistry, findEntry } from "./registry-io.ts";
+import { readRegistry, writeRegistry, findEntry, resolveCachePath } from "./registry-io.ts";
 import { highestRfcId, snapshotCapabilities } from "./pin-helpers.ts";
 
 export interface SternsystemPinData {
@@ -60,9 +60,11 @@ export async function runSternsystemPin(
     throw new Error(`[sternsystem.pin] system '${id}' is not registered`);
   }
 
-  const cacheDir = path.join(workspaceRoot, "systems", id);
+  const cacheDir = await resolveCachePath(workspaceRoot, id);
   if (!existsSync(cacheDir)) {
-    throw new Error(`[sternsystem.pin] systems/${id}/ is absent — run sternsystem.register first`);
+    throw new Error(
+      `[sternsystem.pin] cache clone for '${id}' is absent — run sternsystem.register first`,
+    );
   }
 
   const requestedPlatform = flagString(input, "platform");
