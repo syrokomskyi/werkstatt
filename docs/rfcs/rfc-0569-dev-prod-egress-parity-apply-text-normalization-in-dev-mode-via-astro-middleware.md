@@ -148,7 +148,10 @@ export function createDevNormalizeMiddleware(
           statusText: response.statusText,
           headers: response.headers,
         });
-      } catch {
+      } catch (err) {
+        if (import.meta.env.DEV) {
+          console.debug("[dev-normalize] normalizeHtml failed, returning original response:", err);
+        }
         return response;
       }
     }
@@ -165,13 +168,15 @@ The try/catch around `normalizeHtml()` ensures that malformed HTML does not cras
 
 ```ts
 // src/middleware.template.ts (updated by routes.generate)
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import languageRedirectMiddleware from "./middleware/language-redirect";
-import { createDevNormalizeMiddleware } from "@warpgogol/share/text-normalize";
-import { resolveNormalizeConfig } from "@warpgogol/share/text-normalize";
-import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/share/text-normalize";
+import { loadSystemManifestSync } from "@warpgogol/site-kernel-content";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const devNormalize = createDevNormalizeMiddleware(
-  resolveNormalizeConfig(loadSystemManifest("src/content").manifest),
+  resolveNormalizeConfig(loadSystemManifestSync(resolve(__dirname, "content")).manifest),
 );
 
 export const onRequest = import.meta.env.DEV
@@ -183,9 +188,9 @@ The `import.meta.env.DEV` gate is the standard Astro/Vite dev-mode check — it 
 
 ### Config loading
 
-The dev middleware loads the `text.normalize` config from `system.md` via `loadSystemManifest()` from `@warpgogol/site-kernel-content` — the same function used by the existing `loadConfig()` in `packages/os/site-kernel-checks/src/text-normalize.ts:93-106`. This ensures the dev middleware reads the exact same config that the dist sweep reads, maintaining dev/prod parity.
+The dev middleware loads the `text.normalize` config from `system.md` via `loadSystemManifestSync()` from `@warpgogol/site-kernel-content` — the same function family used by the existing `loadConfig()` in `packages/os/site-kernel-checks/src/text-normalize.ts:93-106`. This ensures the dev middleware reads the exact same config that the dist sweep reads, maintaining dev/prod parity.
 
-The config is loaded **per-request** inside the middleware, not cached at module level. This ensures that operators editing `src/content/system.md` to toggle signals (e.g. `text.normalize.signals.dashes: false`) see the change immediately without restarting the dev server. The `loadSystemManifest()` call reads from the filesystem (`node:fs`), which is fast enough in dev (~1ms) and avoids stale-config bugs. Vite's HMR will re-execute the middleware module on `system.md` changes, but per-request loading is the conservative choice that works regardless of HMR timing.
+The config is loaded **at module level** (not per-request) using `loadSystemManifestSync()` with an `import.meta.url`-derived path (`resolve(__dirname, "content")`). This avoids per-request file I/O and is safe because Vite's HMR re-executes the middleware module when `system.md` changes, picking up config edits without a dev server restart. The `import.meta.url`-based path resolution ensures the config loads correctly regardless of the dev server's working directory.
 
 ### `smartypants: false` in dev (`astro.config.template.mjs`)
 

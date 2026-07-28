@@ -13,12 +13,15 @@
 */
 // @ai-invariant: High-risk module. Middleware chain. Language redirect runs first.
 // RFC-0569: dev-normalize middleware applies egress text normalization in dev mode.
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import languageRedirectMiddleware from "./middleware/language-redirect";
 import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/share/text-normalize";
 import { loadSystemManifestSync } from "@warpgogol/site-kernel-content";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const devNormalize = createDevNormalizeMiddleware(
-  resolveNormalizeConfig(loadSystemManifestSync("src/content").manifest),
+  resolveNormalizeConfig(loadSystemManifestSync(resolve(__dirname, "content")).manifest),
 );
 
 export const onRequest = import.meta.env.DEV
