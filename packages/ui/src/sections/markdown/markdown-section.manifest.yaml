@@ -29,6 +29,8 @@ propsSchema:
       minLength: 1
     lead:
       type: string
+    body:
+      type: string
     hideSectionNumber:
       type: boolean
     variant:

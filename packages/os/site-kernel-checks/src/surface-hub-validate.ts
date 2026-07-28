@@ -172,13 +172,15 @@ export async function runSurfaceHubValidate(
 
     // pillar-priceref-unresolvable (syntax fail, resolution warn)
     const priceRef = level0.pillar.productPrice.priceRef;
-    if (!priceRef.startsWith("{business-profile.") || !priceRef.endsWith("}")) {
+    const isBraceless = priceRef.startsWith("business-profile.");
+    const isBraced = priceRef.startsWith("{business-profile.") && priceRef.endsWith("}");
+    if (!isBraceless && !isBraced) {
       diagnostics.push({
         ruleId: "pillar-priceref-unresolvable",
         severity: "error",
         file: `packages/ontology/blueprints/${bp.id}.yaml`,
-        message: `pillar.productPrice.priceRef "${priceRef}" is not a valid PBP reference (expected "{business-profile.…}")`,
-        fixHint: "Use a {business-profile.offerings/…} reference for the price.",
+        message: `pillar.productPrice.priceRef "${priceRef}" is not a valid PBP reference (expected "business-profile.…")`,
+        fixHint: "Use a business-profile.offerings/… reference for the price.",
       });
     } else {
       // Syntax is valid — warn that resolution is not checked at validation time.

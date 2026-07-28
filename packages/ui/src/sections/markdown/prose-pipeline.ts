@@ -19,7 +19,11 @@
 
 import { render } from "astro:content";
 import type { MaterialCreditLabels } from "@warpgogol/share";
-import { getProseContentEntry, wrapInlineNumbers, type AttributionSiteDefault } from "@warpgogol/share";
+import {
+  getProseContentEntry,
+  wrapInlineNumbers,
+  type AttributionSiteDefault,
+} from "@warpgogol/share";
 import {
   getContentRefIndex,
   resolveReferencesInString,
@@ -46,6 +50,7 @@ export interface ProsePipelineOptions {
   lang: string;
   defaultLanguageCode: string;
   contentRef?: string;
+  body?: string;
   animateNumbers?: boolean;
   animateYears?: boolean;
   numberDuration?: number;
@@ -75,12 +80,30 @@ export async function renderProse(opts: ProsePipelineOptions): Promise<ProseRend
     lang,
     defaultLanguageCode,
     contentRef,
+    body,
     animateNumbers = false,
     animateYears = true,
     numberDuration = 3.0,
     materialCreditLabels,
     creditsSiteDefault,
   } = opts;
+
+  // Inline body rendering: when no contentRef but a body string is provided,
+  // render it through micromark with GFM + image resolution. References in the
+  // body are resolved by substituteBlockPropReferences before reaching here, but
+  // we run resolveReferencesInString as a safety net for non-page-handler usage.
+  if (!contentRef && body) {
+    const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
+    const resolvedBody = resolveReferencesInString(index, body, lang, defaultLanguageCode);
+    const html = resolveProseImages(
+      renderMarkdownGfm(resolvedBody, true),
+      lang,
+      defaultLanguageCode,
+      materialCreditLabels,
+      creditsSiteDefault,
+    );
+    return { kind: "html", html };
+  }
 
   const proseEntry = contentRef
     ? await getProseContentEntry(contentRef, lang, defaultLanguageCode)
@@ -92,12 +115,12 @@ export async function renderProse(opts: ProsePipelineOptions): Promise<ProseRend
   let proseBody = "";
   let hasReferences = false;
   let sourceBody: string | undefined;
-  const body = (proseEntry as Record<string, unknown> & { body?: string }).body;
-  if (body && typeof body === "string") {
-    sourceBody = body;
+  const entryBody = (proseEntry as Record<string, unknown> & { body?: string }).body;
+  if (entryBody && typeof entryBody === "string") {
+    sourceBody = entryBody;
     const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
-    proseBody = resolveReferencesInString(index, body, lang, defaultLanguageCode);
-    hasReferences = proseBody !== body;
+    proseBody = resolveReferencesInString(index, entryBody, lang, defaultLanguageCode);
+    hasReferences = proseBody !== entryBody;
   }
 
   // [RFC-0041] Pre-wrap inline numbers server-side when animateNumbers is true.

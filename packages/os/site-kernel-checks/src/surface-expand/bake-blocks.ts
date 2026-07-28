@@ -13,9 +13,12 @@
 
 export type Block = { type: string; props: Record<string, unknown> };
 
-/** A markdown prose block (heading + lead). */
-export function md(heading: string, lead: string): Block {
-  return { type: "markdown", props: { heading, lead, hideSectionNumber: false } };
+/** A markdown prose block (heading + optional lead + optional body). */
+export function md(heading: string, lead: string, body?: string): Block {
+  return {
+    type: "markdown",
+    props: { heading, lead, hideSectionNumber: false, ...(body ? { body } : {}) },
+  };
 }
 
 /**

@@ -101,7 +101,7 @@ levels:
         body:
           de: "Die Branche verändert nicht automatisch den Basispreis. Zusätzliche Seiten, Sprachen, Buchungsfunktionen oder Integrationen werden gesondert vereinbart."
           uk: "Галузь не змінює автоматично базову ціну. Додаткові сторінки, мови, функції бронювання чи інтеграції узгоджуються окремо."
-        priceRef: "{business-profile.offerings/digital-foundation.presentation.price}"
+        priceRef: "business-profile.offerings/digital-foundation.presentation.price"
       finalCta:
         heading:
           de: Ihr Gewerbe ist noch nicht aufgeführt?

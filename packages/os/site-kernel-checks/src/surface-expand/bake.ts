@@ -141,11 +141,11 @@ function bakePillarHub(
     secondaryTarget: p.hero.secondaryCta.target,
   });
 
-  // 2. Adaptation — markdown block with dimensions as subsections.
+  // 2. Adaptation — markdown block with dimensions as body subsections.
   const adaptationBody = p.adaptation.dimensions
     .map((d) => `### ${pillarLang(d.heading, lang, dl)}\n\n${pillarLang(d.body, lang, dl)}`)
     .join("\n\n");
-  const adaptationBlock = md(pillarLang(p.adaptation.heading, lang, dl), adaptationBody);
+  const adaptationBlock = md(pillarLang(p.adaptation.heading, lang, dl), "", adaptationBody);
 
   // 3. Industry catalog — linked cards from all published depth-1 children.
   const industryCards = childrenOf(entry, ctx.entries, ctx.axisOrder)
@@ -173,7 +173,7 @@ function bakePillarHub(
 
   // 4. Product/price — markdown block with PBP price reference interpolation.
   const priceBody = `${pillarLang(p.productPrice.body, lang, dl)}\n\n${p.productPrice.priceRef}`;
-  const priceBlock = md(pillarLang(p.productPrice.heading, lang, dl), priceBody);
+  const priceBlock = md(pillarLang(p.productPrice.heading, lang, dl), "", priceBody);
 
   // 5. Final CTA.
   const finalCtaBlock = ctaBlock(pillarLang(p.finalCta.heading, lang, dl), [

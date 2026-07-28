@@ -38,6 +38,7 @@ interface MarkdownPageOverride {
   heading: string;
   eyebrow?: string;
   lead?: string;
+  body?: string;
   /** RFC-0102: hide the section-number prefix on <SectionHeader>. Default true for prose pages. */
   hideSectionNumber?: boolean;
   variant?: "default" | "open-source";
@@ -75,6 +76,7 @@ const {
   heading,
   eyebrow,
   lead,
+  body,
   hideSectionNumber = true,
   variant = "default",
   pageId,
@@ -110,6 +112,7 @@ const proseResult = await renderProse({
   lang,
   defaultLanguageCode,
   contentRef,
+  body,
   animateNumbers,
   animateYears,
   numberDuration,
