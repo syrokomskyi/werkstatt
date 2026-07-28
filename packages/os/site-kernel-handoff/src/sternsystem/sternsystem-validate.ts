@@ -88,7 +88,7 @@ async function checkBundleContract(
         violations.push({
           systemId,
           rule: "bundle-contract",
-          message: `systems/${systemId}/ contains forbidden path: ${rel}/`,
+          message: `${systemId}: cache clone contains forbidden path: ${rel}/`,
         });
       }
       continue;
@@ -98,14 +98,14 @@ async function checkBundleContract(
       violations.push({
         systemId,
         rule: "bundle-contract",
-        message: `systems/${systemId}/ contains forbidden file: ${rel}`,
+        message: `${systemId}: cache clone contains forbidden file: ${rel}`,
       });
     }
     if (name.includes(".generated.")) {
       violations.push({
         systemId,
         rule: "bundle-contract",
-        message: `systems/${systemId}/ contains generated file: ${rel}`,
+        message: `${systemId}: cache clone contains generated file: ${rel}`,
       });
     }
   }
