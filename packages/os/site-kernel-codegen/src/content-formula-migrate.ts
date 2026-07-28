@@ -17,6 +17,7 @@ Manual command — not in any pipeline. Idempotent: re-running on already-migrat
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { collectMarkdownFiles } from "@warpgogol/site-kernel-content";
+import { scanFormulas } from "@warpgogol/share/formula-eval";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -52,6 +53,9 @@ export async function runContentFormulaMigrate(
     let modified = content;
     const replacements: Array<{ original: string; replacement: string; index: number }> = [];
 
+    // RFC-0570: use scanFormulas to identify spans already inside =(...) formulas
+    const formulaSpans = scanFormulas(content);
+
     let match: RegExpExecArray | null;
     HARDCODED_FORMULA_PATTERN.lastIndex = 0;
     while ((match = HARDCODED_FORMULA_PATTERN.exec(content)) !== null) {
@@ -60,9 +64,13 @@ export async function runContentFormulaMigrate(
         .length;
       if (refCount < 2) continue;
 
-      // Check if this pattern is already inside a =(...) formula
-      const beforeStart = content.slice(Math.max(0, match.index - 2), match.index);
-      if (beforeStart.includes("=(")) continue;
+      // Skip if this pattern is already inside a =(...) formula
+      const matchStart = match.index;
+      const matchEnd = match.index + candidate.length;
+      const insideFormula = formulaSpans.some(
+        (span) => matchStart >= span.start && matchEnd <= span.end,
+      );
+      if (insideFormula) continue;
 
       const replacement = convertToFormulaSyntax(candidate);
       replacements.push({ original: candidate, replacement, index: match.index });

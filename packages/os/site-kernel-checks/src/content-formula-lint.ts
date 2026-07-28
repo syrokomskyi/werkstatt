@@ -26,6 +26,7 @@ import {
   readMarkdownDocument,
 } from "./content-discipline.ts";
 import { readScopeFiles, outOfScope } from "./scope.ts";
+import { scanFormulas } from "@warpgogol/share/formula-eval";
 
 // Detect patterns like: <ref> + <ref> = <number> or <ref> + <ref> × <number>
 // where <ref> is a braceless content reference (collection.file.field)
@@ -56,6 +57,9 @@ export async function runContentFormulaLint(
     if (allow && outOfScope(allow, doc.relativeFile)) continue;
     const source = doc.source;
 
+    // RFC-0570: use scanFormulas to identify spans already inside =(...) formulas
+    const formulaSpans = scanFormulas(source);
+
     let match: RegExpExecArray | null;
     HARDCODED_FORMULA_PATTERN.lastIndex = 0;
     while ((match = HARDCODED_FORMULA_PATTERN.exec(source)) !== null) {
@@ -64,6 +68,14 @@ export async function runContentFormulaLint(
       const refCount = (candidate.match(/[a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+/g) || [])
         .length;
       if (refCount < 2) continue;
+
+      // Skip if this match is inside an existing =(...) formula span
+      const matchStart = match.index;
+      const matchEnd = match.index + candidate.length;
+      const insideFormula = formulaSpans.some(
+        (span) => matchStart >= span.start && matchEnd <= span.end,
+      );
+      if (insideFormula) continue;
 
       const lineNumbers = findLineNumbersContaining(source, candidate);
       const lineSuffix = lineNumbers.length > 0 ? `:${lineNumbers[0]}` : "";
