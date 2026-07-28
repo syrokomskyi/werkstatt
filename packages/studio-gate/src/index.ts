@@ -27,10 +27,10 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { STUDIO_GATE_TOOLS } from "./tools.ts";
-import { executeCommand } from "./executor.ts";
-import { BuildQueue, resolveBuildConcurrency, isBuildTriggeringTool } from "./build-queue.ts";
+import { BuildQueue, resolveBuildConcurrency } from "./build-queue.ts";
 import { verifyAuthFromMeta } from "./auth.ts";
-import type { StudioGateAuthResult } from "./auth.ts";
+import { formatAuthError } from "./auth-errors.ts";
+import { findTool, dispatchTool } from "./tool-dispatcher.ts";
 
 const SKILL_PATH = join(
   "packages",
@@ -47,79 +47,6 @@ async function loadSkillInstructions(werkstattRoot: string): Promise<string | un
   } catch {
     return undefined;
   }
-}
-
-function buildCommandArgs(
-  toolName: string,
-  args: Record<string, unknown>,
-): { cliArgs: string[]; stdin?: string } {
-  const cliArgs: string[] = [];
-  let stdin: string | undefined;
-
-  for (const [key, value] of Object.entries(args)) {
-    if (toolName === "workpiece.write" && key === "content") {
-      stdin = typeof value === "string" ? value : String(value);
-      continue;
-    }
-    if (typeof value === "boolean") {
-      if (value) cliArgs.push(`--${key}`);
-    } else if (typeof value === "string") {
-      cliArgs.push(`--${key}`, value);
-    }
-  }
-
-  return { cliArgs, stdin };
-}
-
-const AUTH_ERROR_CODES: Record<string, { code: number; message: string }> = {
-  "authentication-required": { code: -32001, message: "authentication-required" },
-  "site-mismatch": { code: -32002, message: "site-mismatch" },
-  "insufficient-scope": { code: -32003, message: "insufficient-scope" },
-  "credential-revoked": { code: -32004, message: "credential-revoked" },
-  "auth-config-missing": { code: -32005, message: "auth-config-missing" },
-  "auth-config-malformed": { code: -32006, message: "auth-config-malformed" },
-  "system-id-required": { code: -32007, message: "system-id-required" },
-  "credential-not-found": { code: -32001, message: "authentication-required" },
-  "credential-expired": { code: -32001, message: "authentication-required" },
-  "signature-invalid": { code: -32001, message: "authentication-required" },
-};
-
-function formatAuthError(result: StudioGateAuthResult): {
-  content: { type: "text"; text: string }[];
-  isError: boolean;
-} {
-  const errorKey = result.error ?? "authentication-required";
-  const mapped = AUTH_ERROR_CODES[errorKey] ?? AUTH_ERROR_CODES["authentication-required"]!;
-
-  const data: Record<string, unknown> = {};
-  if (result.expected) data["expected"] = result.expected;
-  if (result.presented) data["presented"] = result.presented;
-  if (result.required) data["required"] = result.required;
-  if (mapped.code === -32001) {
-    data["hint"] =
-      "Provide a valid VC credential in _meta.identity or X-Werkstatt-Credential header";
-  }
-  if (mapped.code === -32005) {
-    data["hint"] =
-      "werkstatt.identity.json not found. Run identity.bootstrap (RFC-0558) to create it.";
-  }
-  if (mapped.code === -32006) {
-    data["hint"] = "werkstatt.identity.json is not valid JSON or is missing required fields.";
-  }
-  if (mapped.code === -32007) {
-    data["hint"] = "_meta.system is required in enforced mode for site-scoping";
-  }
-
-  const errorObject = {
-    code: mapped.code,
-    message: mapped.message,
-    data,
-  };
-
-  return {
-    content: [{ type: "text", text: JSON.stringify(errorObject) }],
-    isError: true,
-  };
 }
 
 async function main(): Promise<void> {
@@ -154,7 +81,7 @@ async function main(): Promise<void> {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
-    const tool = STUDIO_GATE_TOOLS.find((t) => t.name === name);
+    const tool = findTool(name);
     if (!tool) {
       return {
         content: [{ type: "text", text: `Unknown tool: ${name}` }],
@@ -180,28 +107,17 @@ async function main(): Promise<void> {
       process.stderr.write(`[studio-gate] Auth warning: ${authResult.error}\n`);
     }
 
-    const { cliArgs, stdin } = buildCommandArgs(name, (args as Record<string, unknown>) ?? {});
-
-    if (authResult.authenticated && authResult.actorId) {
-      cliArgs.push("--_authActor", authResult.actorId);
-    }
-
-    const exec = () =>
-      executeCommand("pnpm", ["exec", "site-kernel", "run", name, ...cliArgs, "--json"], {
-        cwd: werkstattRoot,
-        stdin,
-      });
-
-    const result = isBuildTriggeringTool(name) ? await buildQueue.run(exec) : await exec();
-
-    const text =
-      result.exitCode === 0
-        ? result.stdout
-        : `Command failed (exit ${result.exitCode}):\n${result.stderr || result.stdout}`;
+    const { text, isError } = await dispatchTool({
+      toolName: name,
+      args: (args as Record<string, unknown>) ?? {},
+      werkstattRoot,
+      authActorId: authResult.authenticated ? authResult.actorId : undefined,
+      buildQueue,
+    });
 
     return {
       content: [{ type: "text", text }],
-      isError: result.exitCode !== 0,
+      isError,
     };
   });
 
