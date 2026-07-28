@@ -153,14 +153,13 @@ test("investigateUntrackedFiles returns unknown for boilerplate files outside mi
   expect(reports[0].likelyOrigin).toBe("unknown");
 });
 
-test("isWorkpieceDirty detects untracked files in cache clone", () => {
+test("isWorkpieceDirty detects untracked files in cache clone", async () => {
   // Add an untracked file to the cache clone
-  fs.writeFile(path.join(cacheCloneDir, "untracked.txt"), "untracked").then(() => {
-    const result = isWorkpieceDirty(cacheCloneDir);
-    expect(result.dirty).toBe(true);
-    expect(result.fileCount).toBe(1);
-    expect(result.files).toContain("untracked.txt");
-  });
+  await fs.writeFile(path.join(cacheCloneDir, "untracked.txt"), "untracked");
+  const result = isWorkpieceDirty(cacheCloneDir);
+  expect(result.dirty).toBe(true);
+  expect(result.fileCount).toBe(1);
+  expect(result.files).toContain("untracked.txt");
 });
 
 test("git clone creates shared object database between cache clone and workpiece", async () => {
