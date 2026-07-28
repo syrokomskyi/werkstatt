@@ -1,7 +1,7 @@
 ---
 id: RFC-0568
 title: "Clone-based workpiece materialization for reliable mission reconcile"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
 enhancedAt: 2026-07-28
-implementedAt:
+implementedAt: 2026-07-28
 closedAt:
 supersedes: []
 supersededBy:
@@ -272,19 +272,19 @@ This is the same idempotency mechanism as RFC-0480, just using `git reset` to un
 
 ## Acceptance criteria
 
-- [ ] `mission.materialize` uses `git clone` instead of `git init` for the workpiece git repository
-- [ ] `mission.materialize` stages only data paths (`src/content`, `public`, `provenance`, `behavior.snapshot.generated.yaml`, `system.pin.json`) in the materialize commit — boilerplate files remain untracked
-- [ ] `mission.reconcile` uses `git merge --no-ff` instead of `git format-patch` + `git am` to transfer commits
-- [ ] `mission.reconcile` detects untracked files in cache clone, investigates their origin, writes `evidence/untracked-files-report.json` (array of `UntrackedFileReport`), and blocks until resolved
-- [ ] `mission.reconcile` determines workpiece branch dynamically (not hardcoded `master`)
-- [ ] `mission.reconcile` pushes merge commit to origin after successful merge
-- [ ] Workpiece `git log` shows full site evolution history including previous mission commits
-- [ ] `mission.reconcile` is idempotent: re-run resets cache clone to `preReconcileSha` and re-merges
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated to reflect clone-based materialization and merge-based reconcile
-- [ ] RFC-0480 and RFC-0522 `amendedBy` fields reference this RFC
-- [ ] `rfc.validate` passes on this file
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes
+- [x] `mission.materialize` uses `git clone` instead of `git init` for the workpiece git repository (evidence: `mission-materialize.ts:645-668` — `git clone` from cache clone into staging dir, `.git` moved into workpiece)
+- [x] `mission.materialize` stages only data paths (`src/content`, `public`, `provenance`, `behavior.snapshot.generated.yaml`, `system.pin.json`) in the materialize commit — boilerplate files remain untracked (evidence: `mission-materialize.ts:792-818` — `git add -- <dataPath>` for each `STERNSYSTEM_DATA_PATHS` + `system.pin.json`; test `data-only materialize commit does not include boilerplate files` verifies `?? package.json` and `?? astro.config.mjs` in `git status --porcelain`)
+- [x] `mission.reconcile` uses `git merge --no-ff` instead of `git format-patch` + `git am` to transfer commits (evidence: `mission-materialization-commands.ts:582-603` — `git fetch` + `git merge --no-ff FETCH_HEAD`; test `git merge --no-ff transfers workpiece commits to cache clone` verifies merge commit and content transfer)
+- [x] `mission.reconcile` detects untracked files in cache clone, investigates their origin, writes `evidence/untracked-files-report.json` (array of `UntrackedFileReport`), and blocks until resolved (evidence: `mission-materialization-commands.ts:510-534` — `investigateUntrackedFiles` call + `atomicWriteFile` to `untracked-files-report.json` + throw with report summary; tests `investigateUntrackedFiles classifies boilerplate files as previous-mission` and `investigateUntrackedFiles classifies non-boilerplate files as direct-commit` verify origin classification)
+- [x] `mission.reconcile` determines workpiece branch dynamically (not hardcoded `master`) (evidence: `mission-materialization-commands.ts:575-580` — `git rev-parse --abbrev-ref HEAD` in workpieceDir)
+- [x] `mission.reconcile` pushes merge commit to origin after successful merge (evidence: `mission-materialization-commands.ts:635-664` — `git push origin <branch>` with 3 retry attempts and exponential backoff 1s/2s/4s)
+- [x] Workpiece `git log` shows full site evolution history including previous mission commits (evidence: test `git clone creates shared object database between cache clone and workpiece` verifies `cacheLog === workpieceLog` after clone)
+- [x] `mission.reconcile` is idempotent: re-run resets cache clone to `preReconcileSha` and re-merges (evidence: `mission-materialization-commands.ts:548-572` — `git reset --hard ${prevReport.preReconcileSha}` before re-merge; test `git merge --no-ff is idempotent via preReconcileSha reset` verifies content consistency after re-run)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated to reflect clone-based materialization and merge-based reconcile (evidence: `AGENTS.md:93` — Workpiece git repository section updated; `AGENTS.md:99-103` — Reconcile section updated with untracked file investigation, merge-based reconcile, push retry)
+- [x] RFC-0480 and RFC-0522 `amendedBy` fields reference this RFC (evidence: `archive/implemented/rfc-0480-*.md:27` — `amendedBy: [RFC-0568]`; `archive/implemented/rfc-0522-*.md:21` — `amendedBy: [RFC-0568]`)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --json` — no errors for RFC-0568)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: `tsc -p tsconfig.json --noEmit` exit 0)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes (evidence: 283 tests passed across 72 test files including 9 new RFC-0568 integration tests)
 
 ## Implementation notes for agents
 
