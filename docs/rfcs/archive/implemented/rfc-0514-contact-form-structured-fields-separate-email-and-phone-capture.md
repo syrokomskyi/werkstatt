@@ -1,7 +1,7 @@
 ---
 id: RFC-0514
 title: "Contact form structured fields — separate email and phone capture"
-status: implemented
+status: superseded
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -18,10 +18,9 @@ createdAt: 2026-07-24
 updatedAt: 2026-07-24
 enhancedAt: 2026-07-24
 implementedAt: 2026-07-24
-closedAt:
+closedAt: 2026-07-28
 supersedes: []
-supersededBy:
-  - RFC-0572
+supersededBy: RFC-0572
 amends: []
 amendedBy: []
 related:
