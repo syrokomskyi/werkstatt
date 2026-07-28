@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
+enhancedAt: 2026-07-28
 implementedAt:
 closedAt:
 supersedes: []
@@ -124,7 +125,7 @@ A new function `createDevNormalizeMiddleware()` is exported from `@warpgogol/sha
 3. Runs `normalizeHtml(body, config)` over it.
 4. Returns the normalized response.
 
-If `config.enabled` is `false`, the middleware is a pass-through. The middleware is gated by `isAstroDev` at the call site (in `src/middleware.ts`), so it is never imported in production builds.
+If `config.enabled` is `false`, the middleware is a pass-through. The middleware is gated by `import.meta.env.DEV` at the call site (in `src/middleware.ts`), so it is never imported in production builds.
 
 ```ts
 // packages/share/src/text-normalize.ts (new export)
@@ -138,18 +139,24 @@ export function createDevNormalizeMiddleware(
     const response = await next();
     if (!config.enabled) return response;
     if (response.headers.get("content-type")?.includes("text/html")) {
-      const body = await response.text();
-      const normalized = normalizeHtml(body, config);
-      return new Response(normalized, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
+      try {
+        const body = await response.text();
+        const normalized = normalizeHtml(body, config);
+        return new Response(normalized, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+        });
+      } catch {
+        return response;
+      }
     }
     return response;
   };
 }
 ```
+
+The try/catch around `normalizeHtml()` ensures that malformed HTML does not crash the dev server — the middleware degrades to returning the original un-normalized response body (same as before this RFC).
 
 ### Generated middleware (`src/middleware.ts`)
 
@@ -157,19 +164,27 @@ export function createDevNormalizeMiddleware(
 
 ```ts
 // src/middleware.template.ts (updated by routes.generate)
-import { isDevelopment } from "astro:env";
 import languageRedirectMiddleware from "./middleware/language-redirect";
 import { createDevNormalizeMiddleware } from "@warpgogol/share/text-normalize";
 import { resolveNormalizeConfig } from "@warpgogol/share/text-normalize";
-// config loaded once at module level from system.md
-const devNormalize = createDevNormalizeMiddleware(resolveNormalizeConfig(/* ... */));
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 
-export const onRequest = isDevelopment
+const devNormalize = createDevNormalizeMiddleware(
+  resolveNormalizeConfig(loadSystemManifest("src/content").manifest),
+);
+
+export const onRequest = import.meta.env.DEV
   ? [languageRedirectMiddleware, devNormalize]
   : languageRedirectMiddleware;
 ```
 
-The exact import path for the system manifest may vary — the generator resolves it at generation time. The `isDevelopment` gate from `astro:env` ensures the middleware never runs in production builds.
+The `import.meta.env.DEV` gate is the standard Astro/Vite dev-mode check — it is `true` during `astro dev` and `false` during `astro build`. This is the same pattern used by `packages/share/src/dev-props-validator.ts` (RFC-0262). The existing `astro.config.mjs` uses `process.argv.includes("dev")` for `isAstroDev`, which is acceptable for the config file but not for middleware (which runs in Vite's module graph where `import.meta.env.DEV` is the canonical check).
+
+### Config loading
+
+The dev middleware loads the `text.normalize` config from `system.md` via `loadSystemManifest()` from `@warpgogol/site-kernel-content` — the same function used by the existing `loadConfig()` in `packages/os/site-kernel-checks/src/text-normalize.ts:93-106`. This ensures the dev middleware reads the exact same config that the dist sweep reads, maintaining dev/prod parity.
+
+The config is loaded **per-request** inside the middleware, not cached at module level. This ensures that operators editing `src/content/system.md` to toggle signals (e.g. `text.normalize.signals.dashes: false`) see the change immediately without restarting the dev server. The `loadSystemManifest()` call reads from the filesystem (`node:fs`), which is fast enough in dev (~1ms) and avoids stale-config bugs. Vite's HMR will re-execute the middleware module on `system.md` changes, but per-request loading is the conservative choice that works regardless of HMR timing.
 
 ### `smartypants: false` in dev (`astro.config.template.mjs`)
 
@@ -204,9 +219,10 @@ In dev, `smartypants: false` prevents Astro from injecting curly quotes, em-dash
 ### Failure modes
 
 - **Dev middleware fails to load** — Astro dev server crashes on startup. Visible immediately, no silent regression. Fix: correct the import or template.
-- **`normalizeHtml()` throws on malformed HTML** — the middleware catches errors and returns the original response body un-normalized. Dev preview degrades to raw typography (same as before this RFC), not a crash.
+- **`normalizeHtml()` throws on malformed HTML** — the middleware catches errors via try/catch and returns the original response body un-normalized. Dev preview degrades to raw typography (same as before this RFC), not a crash.
 - **Config parsing fails** — `resolveNormalizeConfig()` returns `DEFAULT_NORMALIZE_CONFIG` (all signals on) on any parse error, same as the dist sweep behavior.
-- **Performance** — `normalizeHtml()` is a regex tokenizer (not a DOM parser). On a typical page (50-200KB) it adds ~1-5ms per request. In dev mode, page render time is 100-500ms through Vite/HMR, so the overhead is noise.
+- **Performance** — `normalizeHtml()` is a regex tokenizer (not a DOM parser). On a typical page (50-200KB) it adds ~1-5ms per request. The per-request `loadSystemManifest()` call adds ~1ms (filesystem read). In dev mode, page render time is 100-500ms through Vite/HMR, so the total overhead is noise.
+- **Vite optimizeDeps** — `@warpgogol/share` is in the `optimizeDeps.exclude` list in `astro.config.template.mjs` (line 120). The dev middleware import (`@warpgogol/share/text-normalize`) is covered by this existing exclusion and works correctly with Vite's dev transform pipeline. `text-normalize.ts` is server-only and runs in SSR/dev context without issues.
 
 ## Rollout
 
@@ -225,7 +241,7 @@ In dev, `smartypants: false` prevents Astro from injecting curly quotes, em-dash
 
 ## Risks
 
-- **Dev middleware performance** — `normalizeHtml()` adds ~1-5ms per request. Mitigated by `smartypants: false` reducing the signal surface, and by the fact that dev render times are already 100-500ms. If profiling shows a bottleneck, the middleware can cache normalized output per URL (Vite already caches transforms).
+- **Dev middleware performance** — `normalizeHtml()` adds ~1-5ms per request, and per-request `loadSystemManifest()` adds ~1ms. Mitigated by `smartypants: false` reducing the signal surface, and by the fact that dev render times are already 100-500ms. If profiling shows a bottleneck, the middleware can cache the config at module level with Vite HMR invalidation.
 - **Dev/prod drift** — the dev middleware uses `normalizeHtml()` while the dist sweep uses `normalizeByKind()` (which dispatches to `normalizeHtml` for `.html`). They share the same underlying function, so drift is impossible by construction. The only difference: the dist sweep also normalizes `.json`, `.xml`, `.svg`, `.md`, `.txt` files in `dist/`; the dev middleware only sees HTML responses. Non-HTML artifacts (JSON-LD inside HTML, sitemaps, feeds) are covered in dev only if they appear as HTML responses — inline JSON-LD is inside the HTML and is normalized by `normalizeHtml()`.
 - **`smartypants: false` changes dev rendering** — some authors may rely on Astro's smartypants in dev for legitimate typography (en-dash ranges, curly quotes in prose). This is intentional: the published site will not have them either (dist sweep normalizes them), so dev should not show them.
 - **Agent misinterpretation** — agents might think the dev middleware normalizes source files. It does not — it transforms HTML response bodies only, same as the dist sweep. The `@ai-invariant` header in `text-normalize.ts` already says "Authored sources are never touched."
@@ -234,7 +250,7 @@ In dev, `smartypants: false` prevents Astro from injecting curly quotes, em-dash
 ## Acceptance criteria
 
 - [ ] `@warpgogol/share/text-normalize.ts` exports `createDevNormalizeMiddleware()` — a function that takes a `NormalizeConfig` and returns an Astro `MiddlewareHandler` that runs `normalizeHtml()` over HTML response bodies. Unit test covers: enabled config normalizes, disabled config is pass-through, non-HTML responses are pass-through.
-- [ ] `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/middleware.template.ts` chains the dev-normalize middleware, gated by `isDevelopment` (or equivalent `isAstroDev` check), so it only runs in dev mode.
+- [ ] `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/middleware.template.ts` chains the dev-normalize middleware, gated by `import.meta.env.DEV`, so it only runs in dev mode.
 - [ ] `packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs` sets `smartypants: false` when `isAstroDev` is true.
 - [ ] Running `routes.generate --site warpgogol-com` regenerates `src/middleware.ts` with the dev-normalize middleware chained.
 - [ ] Running `config.regenerate --site warpgogol-com` regenerates `astro.config.mjs` with `smartypants: false` in dev.
@@ -255,5 +271,6 @@ In dev, `smartypants: false` prevents Astro from injecting curly quotes, em-dash
 - The `middleware.template.ts` change is in `packages/os/site-kernel-codegen/src/templates/app-boilerplate/` — `routes.generate` owns this template.
 - The `astro.config.template.mjs` change is in `packages/os/site-kernel-onboarding/src/templates/runtime/` — `config.regenerate` owns this template.
 - After implementing, run `routes.generate` and `config.regenerate` on all existing systems to regenerate their `src/middleware.ts` and `astro.config.mjs`.
-- The `isDevelopment` gate from `astro:env` is the preferred dev-mode check in generated middleware. The `isAstroDev = process.argv.includes("dev")` pattern is already used in `astro.config.mjs` and is acceptable for the config file.
+- The `import.meta.env.DEV` gate is the standard Astro/Vite dev-mode check in generated middleware. The `isAstroDev = process.argv.includes("dev")` pattern is already used in `astro.config.mjs` and is acceptable for the config file, but `import.meta.env.DEV` is the canonical check inside Vite's module graph.
+- The dev middleware loads config via `loadSystemManifest()` from `@warpgogol/site-kernel-content` — the same function used by the dist sweep's `loadConfig()`. This ensures dev/prod config parity.
 - Do not add `smartypants: false` to production — the dist sweep handles it. The `smartypants: false` is dev-only, gated by `isAstroDev`.
