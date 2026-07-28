@@ -209,7 +209,7 @@ export function createMissionModule(): KernelModule {
           port: { kind: "string", description: "Port number (default: 4321)." },
           production: { kind: "boolean", description: "Use astro preview instead of astro dev." },
         },
-        writes: [],
+        writes: ["missions/{mission}/workpiece/src/content-ref-index.generated.yaml"],
         reads: ["missions/{mission}/workpiece/**", "missions/{mission}/mission.yaml"],
         cacheable: false,
         execute: runMissionPreview,

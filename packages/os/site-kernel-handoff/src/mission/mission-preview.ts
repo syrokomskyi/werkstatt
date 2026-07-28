@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0480: extracted mission.preview to its own file; blocking astro dev/preview server; works for closed/aborted missions.</item>
+  <item>ADR-0007: run content.ref-index.generate before dev server start to ensure fresh content reference index.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -68,6 +69,14 @@ export async function runMissionPreview(
     cwd: workpiecePath,
     stdio: "ignore",
   });
+
+  // ADR-0007: regenerate content reference index before dev server start
+  // so the resolver reads fresh frontmatter values from source files.
+  spawnSync(
+    "pnpm",
+    ["exec", "site-kernel", "run", "content.ref-index.generate", "--site", manifest.systemId],
+    { cwd: workspaceRoot, stdio: "inherit" },
+  );
 
   logger.info(
     `  Starting astro ${cmd} on port ${port} for mission '${missionId}' (state: ${manifest.state})`,
