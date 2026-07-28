@@ -23,11 +23,12 @@ Uses RFC-0081 GENERATED marker protocol to skip customized files.
 <CHANGE_SUMMARY>
   <item>RFC-0078: Add config.regenerate command for root config files.</item>
   <item>RFC-0081: Use GENERATED marker protocol instead of content comparison. Support JSON via '_' field.</item>
+  <item>RFC-0571: Use requireAstroSitePaths for mission-aware path resolution.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFileSync, writeFileSync } from "node:fs";
-import { access, mkdir } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import matter from "gray-matter";
 import type {
@@ -35,17 +36,9 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
 import { readTemplate, readRuntimeTemplate, applyTokens } from "./templates.ts";
-
-async function pathExists(target: string): Promise<boolean> {
-  try {
-    await access(target);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 async function readFileIfExists(target: string): Promise<string | null> {
   try {
@@ -111,21 +104,14 @@ export async function runConfigRegenerate(
     };
   }
 
-  const appDir = join(context.workspaceRoot, "apps", app);
-  if (!(await pathExists(appDir))) {
-    return {
-      data: { command: "config.regenerate", app, generated: [], skipped: [] },
-      exitCode: 1,
-      summary: "config.regenerate: apps/" + app + " does not exist",
-    };
-  }
+  const { appDirectory: appDir } = requireAstroSitePaths(context);
 
   const tokens = loadSystemTokens(appDir);
   if (!tokens) {
     return {
       data: { command: "config.regenerate", app, generated: [], skipped: [] },
       exitCode: 1,
-      summary: "config.regenerate: unable to read apps/" + app + "/src/content/system.md",
+      summary: "config.regenerate: unable to read " + appDir + "/src/content/system.md",
     };
   }
 
