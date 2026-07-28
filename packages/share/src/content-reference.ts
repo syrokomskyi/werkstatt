@@ -21,6 +21,7 @@ import { readFileSync } from "node:fs";
 import { parse } from "yaml";
 import { substituteRefsDeep } from "./content/substitute-deep.ts";
 import { resolveFieldPath } from "./content/resolve-field-path.ts";
+import { scanFormulas, resolveFormula } from "./formula-eval.ts";
 
 export interface ContentRefIndex {
   version: 1;
@@ -154,12 +155,30 @@ export function resolveReferencesInString(
     return text;
   }
 
-  let result = text;
+  // RFC-0570: resolve =(...) formula expressions first
+  const formulas = scanFormulas(text);
+  let formulaResult = text;
+  if (formulas.length > 0) {
+    // Process formulas in reverse order to preserve indices
+    for (let i = formulas.length - 1; i >= 0; i--) {
+      const { start, end, expression } = formulas[i];
+      const result = resolveFormula(index, expression, lang, defaultLang);
+      const replacement = result.resolved ? result.value : "";
+      formulaResult = formulaResult.slice(0, start) + replacement + formulaResult.slice(end);
+    }
+  }
+
+  // If the entire string was a formula, return the formula result
+  if (formulas.length > 0 && formulas[0].start === 0 && formulas[0].end === text.length) {
+    return formulaResult;
+  }
+
+  let result = formulaResult;
   const pattern = new RegExp(BRACELESS_SCAN_PATTERN.source, "g");
   let match: RegExpExecArray | null;
   const replacements: Map<string, string> = new Map();
 
-  while ((match = pattern.exec(text)) !== null) {
+  while ((match = pattern.exec(formulaResult)) !== null) {
     const candidate = match[0];
     const collectionMatch = candidate.match(/^([a-z][a-z-]*)\./);
     if (!collectionMatch) continue;

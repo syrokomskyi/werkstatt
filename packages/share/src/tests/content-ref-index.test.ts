@@ -134,3 +134,61 @@ test("resolveReferencesDeep — empty index returns data unchanged", async () =>
   const out = await resolveReferencesDeep(EMPTY_CONTENT_REF_INDEX, data, "de", "de");
   expect(out).toEqual(data);
 });
+
+// RFC-0570: Formula expression integration tests
+
+test("resolveReferencesInString — formula with two references and arithmetic", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "=(business.offer.price.setup + business.offer.price.monthly * 12)",
+    "de",
+    "de",
+  );
+  expect(out).toBe("1040");
+});
+
+test("resolveReferencesInString — formula with surrounding text and unit suffix", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "Total: =(business.offer.price.setup + business.offer.price.monthly * 12) €",
+    "de",
+    "de",
+  );
+  expect(out).toBe("Total: 1040 €");
+});
+
+test("resolveReferencesInString — formula and braceless refs coexist", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "=(business.offer.price.setup + business.offer.price.monthly) and business.offer.price.yearly",
+    "de",
+    "de",
+  );
+  expect(out).toBe("270 and 700 €/Jahr");
+});
+
+test("resolveReferencesInString — formula with unresolved ref renders empty", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "Total: =(business.offer.price.nonexistent + 100) €",
+    "de",
+    "de",
+  );
+  expect(out).toBe("Total:  €");
+});
+
+test("resolveReferencesInString — string without formulas is unchanged", () => {
+  const text = "business.offer.price.monthly is the price";
+  const out = resolveReferencesInString(TEST_INDEX, text, "de", "de");
+  expect(out).toBe("70 €/Monat is the price");
+});
+
+test("resolveReferencesInString — formula with nested parentheses", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "=((business.offer.price.setup + business.offer.price.monthly) * 2)",
+    "de",
+    "de",
+  );
+  expect(out).toBe("540");
+});
