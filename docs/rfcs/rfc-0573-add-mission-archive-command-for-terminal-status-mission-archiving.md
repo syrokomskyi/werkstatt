@@ -285,19 +285,19 @@ The `writes` and `reads` arrays are extended to include `missions/**` paths. The
 
 ## Acceptance criteria
 
-- [ ] `mission.archive` command registered in `forgeMissionModule` with `--dry-run` and `--status` flags
-- [ ] `forgeMissionModule` exported from `packages/forge/src/index.ts` and registered in `tools/kernel.config.ts`
-- [ ] `packages/forge/AGENTS.md` OS modules table includes `forgeMissionModule` row
-- [ ] `mission.archive --dry-run` reports what would be moved without touching the filesystem
-- [ ] `mission.archive` moves terminal-state missions to `missions/archive/<state>/<missionId>/`
-- [ ] `mission.archive` is bidirectional — open missions in `archive/` are moved back to `missions/`
-- [ ] `docs.archive` umbrella includes `mission.archive` as a sixth sub-command
-- [ ] `docs.archive` command description updated to mention `mission.archive`
-- [ ] `mission.list` excludes the `archive/` subdirectory from its scan
-- [ ] `mission.status --mission <id>` resolves archived missions by searching both `missions/` and `missions/archive/<state>/`
-- [ ] `--json` output format matches `MissionArchiveResult` interface
-- [ ] Unit tests cover: terminal → archive, open ← archive, skip on destination exists, skip on unreadable manifest, `--status` filter, `--dry-run`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission.archive` command registered in `forgeMissionModule` with `--dry-run` and `--status` flags (evidence: packages/forge/os/mission/mission.module.ts:21-44)
+- [x] `forgeMissionModule` exported from `packages/forge/src/index.ts` and registered in `tools/kernel.config.ts` (evidence: packages/forge/src/index.ts:139, tools/kernel.config.ts:84-85)
+- [x] `packages/forge/AGENTS.md` OS modules table includes `forgeMissionModule` row (evidence: packages/forge/AGENTS.md:27)
+- [x] `mission.archive --dry-run` reports what would be moved without touching the filesystem (evidence: archive.test.ts:112-123, dry-run test passes)
+- [x] `mission.archive` moves terminal-state missions to `missions/archive/<state>/<missionId>/` (evidence: archive.test.ts:64-75, closed→archive/closed/ test passes)
+- [x] `mission.archive` is bidirectional — open missions in `archive/` are moved back to `missions/` (evidence: archive.test.ts:153-169, out-of-archive test passes)
+- [x] `docs.archive` umbrella includes `mission.archive` as a sixth sub-command (evidence: packages/forge/os/core/core.module.ts:336)
+- [x] `docs.archive` command description updated to mention `mission.archive` (evidence: packages/forge/os/core/core.module.ts:272-276)
+- [x] `mission.list` excludes the `archive/` subdirectory from its scan (evidence: packages/os/site-kernel-handoff/src/mission/mission-io.ts:67-69)
+- [x] `mission.status --mission <id>` resolves archived missions by searching both `missions/` and `missions/archive/<state>/` (evidence: packages/os/site-kernel-handoff/src/mission/mission-io.ts:22-31)
+- [x] `--json` output format matches `MissionArchiveResult` interface (evidence: packages/forge/os/mission/types.ts:28-34, handler returns MissionArchiveResult)
+- [x] Unit tests cover: terminal → archive, open ← archive, skip on destination exists, skip on unreadable manifest, `--status` filter, `--dry-run` (evidence: packages/forge/os/mission/handlers/archive.test.ts, 10/10 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate RFC-0573` → pass)
 
 ## Implementation notes for agents
 
