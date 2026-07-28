@@ -535,7 +535,7 @@ export function createDevNormalizeMiddleware(config: NormalizeConfig): Middlewar
         headers: response.headers,
       });
     } catch (err) {
-      if (import.meta.env.DEV) {
+      if (process.env.NODE_ENV !== "production") {
         console.debug("[dev-normalize] normalizeHtml failed, returning original response:", err);
       }
       return response;
