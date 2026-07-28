@@ -22,6 +22,7 @@ Validates braceless collection.file.field syntax only — brace-delimited syntax
   <item>RFC-0138: added a non-fatal advisory when a reference targets an array element by numeric index (order-coupling).</item>
   <item>RFC-0527: rewrite to use the generated content-ref-index instead of disk reads; add braceless syntax support.</item>
   <item>RFC-0529: remove brace-delimited syntax validation — only braceless references are accepted. Add REF-05 diagnostic for residual brace tokens.</item>
+  <item>RFC-0570: add =(...) formula expression validation with REF-06..09 error codes.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -44,6 +45,7 @@ import {
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
 import type { ContentRefIndex } from "@warpgogol/share/content-reference";
 import { resolveReference } from "@warpgogol/share/content-reference";
+import { scanFormulas, resolveFormula } from "@warpgogol/share/formula-eval";
 
 const BRACELESS_PATTERN = /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_.-]+)\b/g;
 
@@ -186,6 +188,20 @@ export async function runContentReferencesValidate(
       violations.push(
         `${doc.relativeFile}${lineSuffix} — REF-05: residual brace-delimited token ${token} — run content.ref-migrate to convert to braceless syntax`,
       );
+    }
+
+    // RFC-0570: validate =(...) formula expressions
+    const formulas = scanFormulas(source);
+    for (const formula of formulas) {
+      const formulaText = source.slice(formula.start, formula.end);
+      const lineNumbers = findLineNumbersContaining(source, formulaText);
+      const lineSuffix = lineNumbers.length > 0 ? `:${lineNumbers[0]}` : "";
+      const result = resolveFormula(index, formula.expression, inferredLang, defaultLang);
+      if (!result.resolved) {
+        violations.push(
+          `${doc.relativeFile}${lineSuffix} — ${result.error ?? "formula error"} =(${formula.expression})`,
+        );
+      }
     }
   }
 
