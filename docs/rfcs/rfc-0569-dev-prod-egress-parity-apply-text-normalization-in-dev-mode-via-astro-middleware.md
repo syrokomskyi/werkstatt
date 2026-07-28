@@ -23,7 +23,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0235
-amendedBy: []
+amendedBy:
+  - RFC-0571
 related:
   - DNA-57
   - RFC-0235
@@ -180,7 +181,7 @@ const devNormalize = createDevNormalizeMiddleware(
 );
 
 export const onRequest = import.meta.env.DEV
-  ? [languageRedirectMiddleware, devNormalize]
+  ? sequence(languageRedirectMiddleware, devNormalize)
   : languageRedirectMiddleware;
 ```
 
@@ -259,7 +260,7 @@ In dev, `smartypants: false` prevents Astro from injecting curly quotes, em-dash
 - [x] `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/middleware.template.ts` chains the dev-normalize middleware, gated by `import.meta.env.DEV`, so it only runs in dev mode. (evidence: packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/middleware.template.ts:24-26)
 - [x] `packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs` sets `smartypants: false` when `isAstroDev` is true. (evidence: packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs:100-102)
 - [x] Running `routes.generate --site warpgogol-com` regenerates `src/middleware.ts` with the dev-normalize middleware chained. (evidence: missions/warpgogol-com-m000016/workpiece/src/middleware.ts:20-30, `pnpm exec site-kernel run routes.generate --site warpgogol-com`)
-- [x] `config.regenerate` cannot reach mission workpiece paths (hardcoded `apps/<id>`). `astro.config.mjs` manually updated to match template — `smartypants: !isAstroDev` present. (evidence: missions/warpgogol-com-m000016/workpiece/astro.config.mjs:98-103)
+- [x] `config.regenerate` reaches mission workpiece paths via `requireAstroSitePaths` (amended by RFC-0571). `astro.config.mjs` regenerated from template — `smartypants: !isAstroDev` present. (evidence: missions/warpgogol-com-m000016/workpiece/astro.config.mjs:98-103, RFC-0571)
 - [x] After regeneration, `astro dev` on `warpgogol-com` shows no em-dashes, curly quotes, or single-char ellipsis on any page — identical to the post-build `dist/` output. (evidence: dev middleware applies `normalizeHtml()` with same config as dist sweep, `smartypants: false` prevents Astro injection; visual verification deferred to operator)
 - [x] `astro build` on `warpgogol-com` is unaffected — the dev middleware does not execute (`import.meta.env.DEV` is `false` in build), and `text.normalize.apply` dist sweep runs as before. (evidence: middleware.template.ts:24 `import.meta.env.DEV` gate, packages/os/site-kernel-checks/src/pipelines/build-post.ts unchanged)
 - [x] Disabling a signal in `src/content/system.md` (e.g. `text.normalize.signals.dashes: false`) produces the same dev output as production — the dev middleware reads the same config via `loadSystemManifestSync`. (evidence: middleware.template.ts:20-22, packages/os/site-kernel-checks/src/text-normalize.ts:93-106 uses same `loadSystemManifest` family)
