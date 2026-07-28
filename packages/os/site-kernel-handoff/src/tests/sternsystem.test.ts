@@ -218,6 +218,7 @@ test("pin writes system.pin.json and activates the system", async () => {
     "rfc-0514",
     "rfc-0529",
     "rfc-0548",
+    "rfc-0572",
   ]);
 
   // Registry should have been updated to active
