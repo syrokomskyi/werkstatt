@@ -13,20 +13,16 @@
 </CHANGE_SUMMARY>
 */
 
-import {
-  buildResourceAttributes,
-  type WarpgogolEnvironment,
-  type WarpgogolLayer,
-  type WarpgogolResourceInput,
-} from "./conventions.ts";
+import { buildResourceAttributes, type WarpgogolResourceInput } from "./conventions.ts";
 import { findMetricSpec, isLabelKeyForbidden, isMetricNameValid } from "./metric-registry.ts";
 import { encodeOtlpMetrics, nowUnixNano } from "./otlp-json.ts";
 import { convertAccumulatedToOtlp, type AccumulatedPoint } from "./otlp-converter.ts";
+import type { OtlpTransport } from "./otlp-transport.ts";
+import { createOtlpHttpTransport } from "./otlp-transport.ts";
+import type { MetricsPusherEnv } from "./env-resolver.ts";
+import { resolvePusherEnv, detectEnvironment } from "./env-resolver.ts";
 
-export interface MetricsPusherEnv {
-  endpoint?: string;
-  token?: string;
-}
+export type { MetricsPusherEnv } from "./env-resolver.ts";
 
 export interface MetricsPusher {
   counterAdd(name: string, value: number, labels?: Record<string, string>): void;
@@ -39,45 +35,12 @@ const SCOPE_NAME = "@warpgogol/observability";
 const SCOPE_VERSION = "1";
 const DEFAULT_TIMEOUT_MS = 2000;
 
-interface ProcessEnvLike {
-  env?: Record<string, string | undefined>;
-}
-
-function getGlobalProcess(): ProcessEnvLike | undefined {
-  if (typeof globalThis === "undefined") return undefined;
-  const g = globalThis as Record<string, unknown>;
-  return typeof g["process"] === "object" && g["process"] !== null
-    ? (g["process"] as ProcessEnvLike)
-    : undefined;
-}
-
-function resolveEnv(env?: MetricsPusherEnv): { endpoint?: string; token?: string } {
-  if (env) return env;
-  const proc = getGlobalProcess();
-  if (proc?.env) {
-    return {
-      endpoint: proc.env["WARPGOGOL_OTLP_ENDPOINT"],
-      token: proc.env["WARPGOGOL_OTLP_TOKEN"],
-    };
-  }
-  return {};
-}
-
-function detectEnvironment(): WarpgogolEnvironment {
-  const proc = getGlobalProcess();
-  const raw = proc?.env ? (proc.env["WARPGOGOL_DEPLOYMENT_ENV"] ?? proc.env["NODE_ENV"]) : undefined;
-  if (raw === "production") return "production";
-  if (raw === "preview") return "preview";
-  if (raw === "ci") return "ci";
-  return "development";
-}
-
 export function createMetricsPusher(
   resource: WarpgogolResourceInput,
   env?: MetricsPusherEnv,
   options?: { timeoutMs?: number },
 ): MetricsPusher | null {
-  const resolved = resolveEnv(env);
+  const resolved = resolvePusherEnv(env);
   if (!resolved.endpoint || !resolved.token) {
     return null;
   }
@@ -85,8 +48,8 @@ export function createMetricsPusher(
   const endpoint = resolved.endpoint;
   const token = resolved.token;
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const environment: WarpgogolEnvironment = resource.environment ?? detectEnvironment();
-  const layer: WarpgogolLayer = resource.layer;
+  const environment = resource.environment ?? detectEnvironment();
+  const layer = resource.layer;
 
   const resourceInput: WarpgogolResourceInput = {
     ...resource,
@@ -144,6 +107,8 @@ export function createMetricsPusher(
     points.push({ name, labels, value, kind });
   }
 
+  const transport: OtlpTransport = createOtlpHttpTransport({ endpoint, token, timeoutMs });
+
   const pusher: MetricsPusher = {
     counterAdd(name, value, labels = {}) {
       addPoint(name, value, labels, "counter");
@@ -169,35 +134,7 @@ export function createMetricsPusher(
 
       const body = encodeOtlpMetrics(resourceAttrs, otlpPoints, SCOPE_NAME, SCOPE_VERSION);
 
-      const url = `${endpoint.replace(/\/$/, "")}/v1/metrics`;
-
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), timeoutMs);
-        try {
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(body),
-            signal: controller.signal,
-          });
-          if (!response.ok) {
-            return {
-              delivered: false,
-              reason: `HTTP ${response.status} ${response.statusText}`,
-            };
-          }
-          return { delivered: true };
-        } finally {
-          clearTimeout(timer);
-        }
-      } catch (error) {
-        const reason = error instanceof Error ? error.message : String(error);
-        return { delivered: false, reason };
-      }
+      return transport.send(JSON.stringify(body));
     },
   };
 
