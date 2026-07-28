@@ -14,6 +14,7 @@
   <item>Run build.prepare pipeline after atomicMoveDir to generate all derived artifacts (surface, sitemap, video/image variants, etc.) before git init.</item>
   <item>Set PUBLIC_IMAGE_PROVIDER=build-portable in workpiece .env files so image.variants.generate produces responsive variants.</item>
   <item>Auto-install Playwright Chromium during materialization (idempotent) — ensures build.post print.pdf.generate and independent-qa work without manual intervention.</item>
+  <item>RFC-0568: replace git init with git clone from cache clone; stage only data paths in materialize commit (DNA-44 compliance).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -641,6 +642,31 @@ export async function runMissionMaterialize(
     }
     await fs.mkdir(stagingDir, { recursive: true });
 
+    // RFC-0568: Clone cache clone into staging dir instead of git init.
+    // This creates a shared git object database between workpiece and cache clone,
+    // enabling git merge --no-ff during reconcile instead of fragile git am patches.
+    // Only clone if the cache clone has a .git directory; otherwise fall through to
+    // the existing copyDir flow for non-git Sternsystems.
+    const hasGitCacheClone = existsSync(path.join(systemDir, ".git"));
+    let clonedGitDir: string | null = null;
+
+    if (hasGitCacheClone) {
+      // Clone into a temporary directory first, then move .git into staging
+      const tempCloneDir = path.join(missionDir, `.clone-${operationId}`);
+      if (existsSync(tempCloneDir)) {
+        await fs.rm(tempCloneDir, { recursive: true, force: true });
+      }
+      execSync(`git clone ${JSON.stringify(systemDir)} ${JSON.stringify(tempCloneDir)}`, {
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      // Move .git from temp clone into staging
+      clonedGitDir = path.join(stagingDir, ".git");
+      await fs.rename(path.join(tempCloneDir, ".git"), clonedGitDir);
+      // Clean up temp clone (everything except .git was moved)
+      await fs.rm(tempCloneDir, { recursive: true, force: true });
+      logger.info(`  Cloned cache clone git history into staging`);
+    }
+
     // Copy data set from Sternsystem
     for (const dataPath of STERNSYSTEM_DATA_PATHS) {
       const src = path.join(systemDir, dataPath);
@@ -661,6 +687,21 @@ export async function runMissionMaterialize(
     if (existsSync(pinFileSrc)) {
       await fs.copyFile(pinFileSrc, path.join(stagingDir, "system.pin.json"));
       logger.info(`  Copied system.pin.json`);
+    }
+
+    // RFC-0568: After clone, remove ALL non-data-path files from the working tree.
+    // The clone brought cache-clone-local files (bordbuch/, etc.) that must not
+    // enter the workpiece. Only keep STERNSYSTEM_DATA_PATHS + system.pin.json.
+    // The .git directory is preserved (it's in .git/, not in the working tree).
+    if (clonedGitDir) {
+      const keepPaths = new Set([...STERNSYSTEM_DATA_PATHS, "system.pin.json", ".git"]);
+      const stagingEntries = await fs.readdir(stagingDir, { withFileTypes: true });
+      for (const entry of stagingEntries) {
+        if (!keepPaths.has(entry.name)) {
+          const entryPath = path.join(stagingDir, entry.name);
+          await fs.rm(entryPath, { recursive: true, force: true });
+        }
+      }
     }
 
     // Generate full runtime boilerplate from onboarding templates and codegen generators (RFC-0389)
@@ -748,21 +789,61 @@ export async function runMissionMaterialize(
       logger.info(`  Bordbuch: preflight-skipped entry appended`);
     }
 
-    // RFC-0480: init git in workpiece and commit materialized state
-    execSync("git init", { cwd: workpieceDir, stdio: ["pipe", "pipe", "pipe"] });
-    execSync("git add -A", { cwd: workpieceDir, stdio: ["pipe", "pipe", "pipe"] });
-    execSync(`git commit -m "materialize from pin ${pinVersion}"`, {
-      cwd: workpieceDir,
-      stdio: ["pipe", "pipe", "pipe"],
-      env: {
-        ...process.env,
-        GIT_AUTHOR_NAME: "mission.materialize",
-        GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
-        GIT_COMMITTER_NAME: "mission.materialize",
-        GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
-      },
-    });
-    logger.info(`  Git initialized in workpiece with initial commit`);
+    // RFC-0568: Clone-based materialization — git commit with data-only staging.
+    // Only stage STERNSYSTEM_DATA_PATHS + system.pin.json. Boilerplate files remain
+    // untracked, ensuring git merge --no-ff during reconcile transfers only data-path
+    // changes into the cache clone (DNA-44 Sternsystem data-only contract compliance).
+    if (existsSync(path.join(workpieceDir, ".git"))) {
+      const dataPathsToAdd = [...STERNSYSTEM_DATA_PATHS, "system.pin.json"];
+      for (const dataPath of dataPathsToAdd) {
+        const fullPath = path.join(workpieceDir, dataPath);
+        if (existsSync(fullPath)) {
+          execSync(`git add -- ${JSON.stringify(dataPath)}`, {
+            cwd: workpieceDir,
+            stdio: ["pipe", "pipe", "pipe"],
+          });
+        }
+      }
+      execSync(`git commit -m "materialize from pin ${pinVersion}"`, {
+        cwd: workpieceDir,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          GIT_AUTHOR_NAME: "mission.materialize",
+          GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
+          GIT_COMMITTER_NAME: "mission.materialize",
+          GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
+        },
+      });
+      logger.info(`  Git commit created in workpiece (data-only, on top of cloned history)`);
+    } else {
+      // RFC-0568: Non-git cache clone fallback — use git init (no shared history)
+      execSync("git init", { cwd: workpieceDir, stdio: ["pipe", "pipe", "pipe"] });
+      const dataPathsToAdd = [...STERNSYSTEM_DATA_PATHS, "system.pin.json"];
+      for (const dataPath of dataPathsToAdd) {
+        const fullPath = path.join(workpieceDir, dataPath);
+        if (existsSync(fullPath)) {
+          execSync(`git add -- ${JSON.stringify(dataPath)}`, {
+            cwd: workpieceDir,
+            stdio: ["pipe", "pipe", "pipe"],
+          });
+        }
+      }
+      execSync(`git commit -m "materialize from pin ${pinVersion}"`, {
+        cwd: workpieceDir,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          GIT_AUTHOR_NAME: "mission.materialize",
+          GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
+          GIT_COMMITTER_NAME: "mission.materialize",
+          GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
+        },
+      });
+      logger.info(
+        `  Git initialized in workpiece with initial commit (non-git cache clone fallback)`,
+      );
+    }
 
     // Write materialization report
     const evidenceDir = path.join(missionDir, "evidence");
