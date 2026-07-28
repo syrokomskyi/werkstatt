@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
+enhancedAt: 2026-07-28
 implementedAt:
 closedAt:
 supersedes: []
@@ -25,6 +26,8 @@ amends:
 amendedBy: []
 related:
   - DNA-42
+  - DNA-46
+  - DNA-47
   - RFC-0356
   - RFC-0389
   - RFC-0480
@@ -35,6 +38,8 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-42
+  - DNA-46
+  - DNA-47
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -63,6 +68,7 @@ nonGoals:
   - Does not change the Bordbuch git synchronization contract (RFC-0477)
   - Does not change the Layer C protection model (RFC-0480)
   - Does not change the git bundle audit trail or mission.cleanup behavior
+  - Does not add cache clone drift detection or interactive merge/overlay prompt — `syncCacheClone` already handles cache clone freshness via fetch + reset, and `sternsystem.validate` detects external edits
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -105,11 +111,13 @@ Additionally, untracked files in the cache clone (e.g., `.github/workflows/deplo
 
 ## Decision
 
-`mission.materialize` clones the cache clone (`systems/<id>/`) instead of running `git init`, creating a shared git object database between workpiece and cache clone. Authored content from the pin is overlaid on top of the cloned state. `mission.reconcile` transfers commits via `git merge --no-ff` instead of `git format-patch` + `git am`, preserving all individual commits and their SHA references. Untracked files in the cache clone are investigated and reported before reconcile, blocking until the operator resolves them.
+`mission.materialize` clones the cache clone (`systems/<id>/`) instead of running `git init`, creating a shared git object database between workpiece and cache clone. Authored content from the cache clone's data directories is overlaid on top of the cloned state. The materialize commit stages only data paths (`STERNSYSTEM_DATA_PATHS`), keeping platform boilerplate untracked. `mission.reconcile` transfers commits via `git merge --no-ff` instead of `git format-patch` + `git am`, preserving all individual commits and their SHA references. Untracked files in the cache clone are investigated and reported before reconcile, blocking until the operator resolves them.
 
 ## Architectural fit
 
-- **DNA-42 (Compass markup contract)**: Reliable git history in the workpiece ensures that Compass inventory and CHANGE_SUMMARY blocks can trace evolution across missions. The full clone gives agents access to prior mission commits for context.
+- **DNA-42 (Compass markup contract)**: Tangential. The full clone gives agents access to prior mission commits for context when authoring CHANGE_SUMMARY blocks, but the clone-vs-init change does not enforce, protect, or extend DNA-42 itself. Listed in `satisfies[]` for traceability only.
+- **DNA-46 (Mission lifecycle)**: This RFC extends DNA-46 by changing the reconcile mechanism from patch-based transfer to merge-based transfer. The lifecycle states (open/closed/aborted), validation-before-reconcile precondition, and lock semantics are preserved.
+- **DNA-47 (Materialization)**: This RFC extends DNA-47 by changing the materialization git initialization from `git init` to `git clone` from the cache clone. The overall pipeline (copy authored content → build.prepare → preflight → git commit) and the `STERNSYSTEM_DATA_PATHS` contract are preserved.
 - **RFC-0480 (mission git workpiece)**: This RFC amends RFC-0480 by changing the materialization mechanism from `git init` to `git clone` and the reconcile mechanism from `git format-patch` + `git am` to `git merge --no-ff`. The edits-only-through-missions invariant, Layer C protection, git bundle audit trail, and workpiece preservation model remain unchanged.
 - **RFC-0522 (reconcile dirty cache clone guard)**: This RFC amends RFC-0522 by removing the 3-way fallback and auto-resolve mechanisms (no longer needed with shared git objects). The dirty cache clone guard is extended to detect and investigate untracked files, not just modified tracked files.
 - **RFC-0356 (mission materialization)**: The materialization flow changes its git initialization step but preserves the overall pipeline: copy authored content → build.prepare → preflight → git commit.
@@ -123,25 +131,32 @@ The operator model is preserved: operators still use `mission.git.commit` to com
 
 The `mission.materialize` command changes its git initialization step:
 
-1. **Clone cache clone** (new): `git clone systems/<id>/ <staging-dir>` — creates a full clone with shared object database. The workpiece inherits all history from the cache clone.
-2. **Detect cache clone drift** (new): Compare cache clone HEAD with pin authored content. If they differ, present a diff to the operator and ask: `merge` (preserve both histories) or `overlay` (pin wins). Default: `merge`.
-3. **Overlay authored content**: Copy authored files from the pin bundle over the cloned working tree. For `overlay` mode, all authored files are overwritten with pin versions. For `merge` mode, a `git merge --allow-unrelated-histories` is attempted first; if conflicts arise, they are surfaced for manual resolution.
-4. **Run build.prepare**: Generate all derived artifacts (surface, sitemap, video/image variants, etc.).
-5. **Ensure Playwright Chromium**: Auto-install if missing (existing behavior from current implementation).
-6. **Run preflight gate**: Content quality checks (RFC-0517).
-7. **Git commit**: `git add -A && git commit -m "materialize from pin <version>"` — creates a single materialize commit on top of the cloned history.
+1. **Sync cache clone** (existing): `syncCacheClone` runs first (unchanged from current implementation) — fetches latest from remote and resets to `origin/<branch>`. This ensures the cache clone is up-to-date before cloning.
+2. **Clone cache clone** (new): `git clone systems/<id>/ <staging-dir>` — creates a full clone with shared object database. The workpiece inherits all history from the cache clone.
+3. **Remove non-data-path files**: Delete files from the clone that are not part of `STERNSYSTEM_DATA_PATHS` and not needed in the workpiece (e.g., `bordbuch/`, `system.pin.json`). These are cache-clone-local files that must not enter the workpiece. The `.gitignore` template (written in step 6) will exclude generated artifacts.
+4. **Overlay authored content**: Copy authored files from the cache clone's data directories (`src/content`, `public`, `provenance`, `behavior.snapshot.generated.yaml`) over the cloned working tree, replacing the cloned versions. This is the existing `STERNSYSTEM_DATA_PATHS` copy step — it overwrites data files with the cache clone's current content.
+5. **Run build.prepare**: Generate all derived artifacts (surface, sitemap, video/image variants, etc.).
+6. **Generate boilerplate**: Write template files (`package.json`, `astro.config.mjs`, `wrangler.jsonc`, `.gitignore`, etc.) and run codegen generators. These files are **not** `git add`-ed — they remain untracked in the workpiece.
+7. **Ensure Playwright Chromium**: Auto-install if missing (existing behavior from current implementation).
+8. **Run preflight gate**: Content quality checks (RFC-0517).
+9. **Git commit (data-only)**: `git add src/content public provenance behavior.snapshot.generated.yaml system.pin.json && git commit -m "materialize from pin <version>"` — creates a materialize commit containing **only data paths** on top of the cloned history. Boilerplate files remain untracked and are excluded from the commit. This ensures that `git merge --no-ff` during reconcile transfers only data-path changes into the cache clone, not platform boilerplate (DNA-44 compliance).
 
 ### Reconcile flow (changed)
 
 The `mission.reconcile` command changes its commit transfer mechanism:
 
 1. **Check dirty cache clone** (enhanced): Run `git status --porcelain` in the cache clone. If there are modified tracked files OR untracked files:
-   - For untracked files: investigate origin (file creation time via `stat`, match against known mission artifacts, check Bordbuch for recent commands that might have created them). Print a report listing each untracked file with its origin analysis.
-   - Block reconcile with a descriptive error: `"cache clone has N untracked file(s) — resolve before reconcile"`.
-2. **Fetch workpiece commits**: `git fetch <workpiece-dir> master` — fetches workpiece commits into the cache clone's object database.
-3. **Merge**: `git merge --no-ff fetched/master -m "reconcile mission <id>"` — creates a merge commit that preserves all individual workpiece commits and their SHA references.
-4. **Record reconciliation report**: Write `evidence/reconciliation-report.json` with `commitSha` (cache clone HEAD after merge), `preReconcileSha` (cache clone HEAD before merge), and `reconciledAt`.
-5. **Update mission manifest**: Set `reconciledAt` in the mission manifest.
+   - For untracked files: investigate origin using these decision rules:
+     - **`previous-mission`**: file path matches a pattern produced by `mission.materialize` boilerplate generation (e.g., `.github/workflows/deploy-*.yml`, `package.json`, `astro.config.mjs`) AND file creation time (via `stat`) is within a previous mission's time range (cross-reference with Bordbuch entries for `mission.materialize` events).
+     - **`direct-commit`**: file does not match boilerplate patterns AND was not created during a known mission time range.
+     - **`unknown`**: cannot be determined (e.g., file creation time unavailable, no Bordbuch entries found).
+   - Write `evidence/untracked-files-report.json` as an array of `UntrackedFileReport` objects (one per untracked file).
+   - Block reconcile with a descriptive error: `"cache clone has N untracked file(s) — resolve before reconcile"`. No `--force` bypass is provided; the operator must `git add` or `rm` the files manually after reviewing the report. This is consistent with RFC-0522's hard refusal pattern.
+2. **Fetch workpiece commits**: Determine the workpiece branch dynamically: `workpieceBranch=$(git -C <workpiece-dir> rev-parse --abbrev-ref HEAD)`, then `git fetch <workpiece-dir> ${workpieceBranch}` — fetches workpiece commits into the cache clone's object database. Using the dynamic branch name avoids failure when the cache clone uses `main` instead of `master`.
+3. **Merge**: `git merge --no-ff FETCH_HEAD -m "reconcile mission <id>"` — creates a merge commit that preserves all individual workpiece commits and their SHA references. Only data-path files (`src/content`, `public`, `provenance`, `behavior.snapshot.generated.yaml`, `system.pin.json`) are affected because the materialize commit and operator commits only stage data paths. Generated files are gitignored in the workpiece and not tracked in the cache clone, so no generated file conflicts can occur.
+4. **Record reconciliation report**: Write `evidence/reconciliation-report.json` with `commitSha` (cache clone HEAD after merge), `preReconcileSha` (cache clone HEAD before merge), `mergeCommitSha`, `transferredCommits`, `message`, and `copiedPaths` (preserved from existing report for non-git fallback).
+5. **Push to origin**: `git push origin <branch>` — pushes the merge commit to the remote so the next materialize's `syncCacheClone` preserves reconciled changes. Non-fatal if push fails (next sync will catch up).
+6. **Update mission manifest**: Set `reconciledAt` in the mission manifest.
 
 ### CLI surface
 
@@ -155,12 +170,20 @@ pnpm exec site-kernel run mission.materialize --mission <id>
 pnpm exec site-kernel run mission.reconcile --mission <id>
 ```
 
-No new flags. Existing flags (`--mission`, `--report-only`, `--skip-preflight`) unchanged.
+No new flags for reconcile. Existing flags (`--mission`, `--report-only`, `--skip-preflight`) unchanged. The `--message` flag on reconcile is preserved.
+
+### Output format
+
+Both commands support `--json` output. The JSON shapes match the TypeScript contracts below:
+
+**`mission.materialize --json`**: Returns `MissionMaterializeData` (unchanged shape — `missionId`, `systemId`, `versionComparison`, `migratorChain`, `capabilityDiff`, `regeneration`, `materializedAt`).
+
+**`mission.reconcile --json`**: Returns `ReconciliationReport` (see TypeScript contracts below).
 
 ### TypeScript contracts
 
 ```ts
-// New: untracked file investigation result
+// New: untracked file investigation result (one per untracked file)
 interface UntrackedFileReport {
   path: string;
   createdAt: string;  // ISO timestamp from stat
@@ -169,7 +192,10 @@ interface UntrackedFileReport {
   originHint?: string;  // e.g., "matches .github/workflows/ pattern from mission m000014"
 }
 
-// Changed: reconciliation report (preReconcileSha now used for merge, not reset)
+// evidence/untracked-files-report.json is an array of UntrackedFileReport objects:
+// UntrackedFileReport[]
+
+// Changed: reconciliation report (preReconcileSha now used for merge reset, not am abort)
 interface ReconciliationReport {
   schemaVersion: "1.0.0";
   missionId: string;
@@ -179,6 +205,8 @@ interface ReconciliationReport {
   reconciledAt: string;
   mergeCommitSha: string;  // the --no-ff merge commit SHA
   transferredCommits: number; // count of commits merged from workpiece
+  message: string;         // preserved from existing report
+  copiedPaths: string[];   // preserved from existing report (non-git fallback)
 }
 ```
 
@@ -196,10 +224,9 @@ interface ReconciliationReport {
 ### Failure modes
 
 1. **Cache clone has no .git directory**: Fallback to `copyDir` (existing behavior for non-git Sternsystems). No clone, no merge — direct file copy.
-2. **Cache clone drift detected during materialize**: Operator is prompted to choose `merge` or `overlay`. If `merge` produces conflicts, materialize blocks until resolved.
-3. **Untracked files in cache clone during reconcile**: Reconcile blocks with an investigation report. Operator must `git add` or `rm` the files manually.
-4. **Merge conflict during reconcile**: `git merge --no-ff` fails. Reconcile reports the conflict files and blocks. Operator resolves in cache clone, then re-runs reconcile (idempotent via `preReconcileSha` reset).
-5. **Workpiece has no commits after materialize**: Reconcile is a no-op (nothing to merge). Report is written with `transferredCommits: 0`.
+2. **Untracked files in cache clone during reconcile**: Reconcile blocks with an investigation report (`evidence/untracked-files-report.json`). Operator must `git add` or `rm` the files manually. No `--force` bypass is provided.
+3. **Merge conflict during reconcile**: `git merge --no-ff` fails. Reconcile reports the conflict files and blocks. Operator resolves conflicts **in the workpiece** (not the cache clone), commits the resolution via `mission.git.commit`, then re-runs reconcile. Reconcile is idempotent: it resets the cache clone to `preReconcileSha` and re-merges. Resolving in the cache clone risks external-edit detection by `sternsystem.validate` (RFC-0480 Bordbuch-vs-git-log check).
+4. **Workpiece has only the materialize commit (no operator edits)**: Reconcile merges the materialize commit, which contains only data-path changes. If the data paths are identical to the cache clone's current state, the merge is effectively a no-op (no file changes). If data paths differ (e.g., `syncCacheClone` updated the cache clone after materialization), the merge applies the data-path delta. Report is written with `transferredCommits: 1` (the materialize commit).
 
 ### Idempotency
 
@@ -245,9 +272,11 @@ This is the same idempotency mechanism as RFC-0480, just using `git reset` to un
 ## Acceptance criteria
 
 - [ ] `mission.materialize` uses `git clone` instead of `git init` for the workpiece git repository
+- [ ] `mission.materialize` stages only data paths (`src/content`, `public`, `provenance`, `behavior.snapshot.generated.yaml`, `system.pin.json`) in the materialize commit — boilerplate files remain untracked
 - [ ] `mission.reconcile` uses `git merge --no-ff` instead of `git format-patch` + `git am` to transfer commits
-- [ ] `mission.reconcile` detects untracked files in cache clone, investigates their origin, writes `evidence/untracked-files-report.json`, and blocks until resolved
-- [ ] `mission.materialize` detects cache clone drift (cache clone HEAD vs pin) and prompts operator to choose `merge` or `overlay`
+- [ ] `mission.reconcile` detects untracked files in cache clone, investigates their origin, writes `evidence/untracked-files-report.json` (array of `UntrackedFileReport`), and blocks until resolved
+- [ ] `mission.reconcile` determines workpiece branch dynamically (not hardcoded `master`)
+- [ ] `mission.reconcile` pushes merge commit to origin after successful merge
 - [ ] Workpiece `git log` shows full site evolution history including previous mission commits
 - [ ] `mission.reconcile` is idempotent: re-run resets cache clone to `preReconcileSha` and re-merges
 - [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated to reflect clone-based materialization and merge-based reconcile
