@@ -16,10 +16,12 @@ import { existsSync } from "node:fs";
 import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 import type {
+  DiscoveredSiteWorkspace,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
+import { runContentRefIndexGenerate } from "@warpgogol/site-kernel-codegen";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 
 export interface MissionPreviewData {
@@ -72,11 +74,24 @@ export async function runMissionPreview(
 
   // ADR-0007: regenerate content reference index before dev server start
   // so the resolver reads fresh frontmatter values from source files.
-  spawnSync(
-    "pnpm",
-    ["exec", "site-kernel", "run", "content.ref-index.generate", "--site", manifest.systemId],
-    { cwd: workspaceRoot, stdio: "inherit" },
-  );
+  // Call in-process with a synthetic site context pointing to the workpiece,
+  // not via --site flag (which relies on registry currentMission and fails
+  // for closed/aborted missions where currentMission is cleared).
+  const workpieceSite: DiscoveredSiteWorkspace = {
+    name: manifest.systemId,
+    directory: workpiecePath,
+    toolsDirectory: path.join(workpiecePath, "tools"),
+  };
+  try {
+    await runContentRefIndexGenerate(
+      { argv: [], args: [], flags: {} },
+      { ...context, site: workpieceSite },
+    );
+  } catch (err) {
+    logger.warn(
+      `  [ADR-0007] content.ref-index.generate failed: ${err instanceof Error ? err.message : String(err)} — index may be stale`,
+    );
+  }
 
   logger.info(
     `  Starting astro ${cmd} on port ${port} for mission '${missionId}' (state: ${manifest.state})`,
