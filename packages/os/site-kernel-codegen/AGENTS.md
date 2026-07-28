@@ -31,6 +31,8 @@ File generation commands for all Astro sites in `apps/*`.
 - Files in `apps/*` that carry the `GENERATED` marker are outputs, not editable sources. When an app route, middleware, `env.d.ts`, `content.config.ts`, stylesheet, or generated AGENTS file must change, edit the owning template or generator in this package first, then re-run the owning command.
 - `runGenerateRoutes` is the canonical owner of `apps/*/src/pages/index.astro`, `apps/*/src/pages/[lang]/[...slug].astro`, `apps/*/src/middleware.ts`, `apps/*/src/content.config.ts`, and `apps/*/src/env.d.ts`. Do not keep duplicate route templates in other packages.
 - For route boilerplate, the canonical template is `src/templates/app-boilerplate/src/pages/[lang]/[...slug].template.astro`. If you need to change the generated catch-all route behavior, change that file and then run `pnpm exec site-kernel run routes.generate --site=<id>`.
+- **Astro middleware chaining**: when a generated `src/middleware.ts` chains multiple middleware handlers, use `sequence()` from `astro:middleware` — the array syntax `[m1, m2]` does NOT work correctly. Always `import { sequence } from "astro:middleware"` and `export const onRequest = sequence(m1, m2)`.
+- **Path resolution in templates**: generated middleware/config files that load content at module level MUST use `import.meta.url`-based path resolution (`dirname(fileURLToPath(import.meta.url))`), not hardcoded relative paths like `"src/content"`. Relative paths break when the dev server's CWD differs from the site root.
 
 ## RFC-0087 invariants (content-driven generation contract)
 
