@@ -586,6 +586,7 @@
     "@warpgogol/integration-adapter-supabase-crm": "workspace:*",
     "@warpgogol/passport": "workspace:*",
     "@warpgogol/share": "workspace:*",
+    "github-slugger": "^2.0.0",
     "micromark": "^4.0.2",
     "micromark-extension-gfm": "^3.0.0",
     "qrcode": "^1.5.4",

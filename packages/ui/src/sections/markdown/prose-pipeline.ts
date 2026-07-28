@@ -29,6 +29,7 @@ import {
   resolveReferencesInString,
   EMPTY_CONTENT_REF_INDEX,
 } from "@warpgogol/share/content-reference";
+import GithubSlugger from "github-slugger";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts";
@@ -38,12 +39,22 @@ import { resolveProseImages, markdownHasImages } from "./prose-image-resolver.ts
  * autolinks). Used on the reference-substitution and number-animation paths so
  * any markdown document renders the same GFM features as Astro's render() path.
  */
+function injectHeadingIds(html: string): string {
+  const slugger = new GithubSlugger();
+  return html.replace(/<h([1-6])>(.*?)<\/h\1>/gs, (_match, level, content) => {
+    const text = content.replace(/<[^>]+>/g, "");
+    const id = slugger.slug(text);
+    return `<h${level} id="${id}">${content}</h${level}>`;
+  });
+}
+
 function renderMarkdownGfm(text: string, allowDangerousHtml: boolean): string {
-  return micromark(text, {
+  const html = micromark(text, {
     allowDangerousHtml,
     extensions: [gfm()],
     htmlExtensions: [gfmHtml()],
   });
+  return injectHeadingIds(html);
 }
 
 export interface ProsePipelineOptions {
