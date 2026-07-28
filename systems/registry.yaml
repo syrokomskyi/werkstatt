@@ -4,7 +4,7 @@ systems:
     cosmicStar: Vega
     repo: ../systems-git/warpgogol-com
     pinnedPlatform: 4.5.0
-    currentMission: null
+    currentMission: warpgogol-com-m000017
     lastRelease: warpgogol-com-r000001
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
