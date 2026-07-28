@@ -1,7 +1,7 @@
 ---
 id: RFC-0574
 title: "Relocate Sternsystem storage outside monorepo and introduce parameterized mirror topology"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-28
-updatedAt: 2026-07-29
+updatedAt: 2026-07-28
 enhancedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-28
 closedAt:
 supersedes: []
 supersededBy:
