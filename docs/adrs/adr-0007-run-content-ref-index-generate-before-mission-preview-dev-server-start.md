@@ -5,12 +5,12 @@ title: "Run content.ref-index.generate before mission.preview dev server start"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
-implementedAt:
+implementedAt: 2026-07-28
 closedAt:
 supersedes: []
 supersededBy:
