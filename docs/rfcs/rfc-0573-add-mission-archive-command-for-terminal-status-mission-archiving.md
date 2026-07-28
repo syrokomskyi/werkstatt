@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
+enhancedAt: 2026-07-28
 implementedAt:
 closedAt:
 supersedes: []
@@ -114,7 +115,7 @@ The kernel gains a `mission.archive` command that moves terminal-state mission d
 - **RFC-0367 (Document archiving):** This RFC applies the same archiving pattern established by RFC-0367 (rfc.archive, adr.archive) to missions. The `archive/<status>/` subdirectory convention, bidirectional behavior, `--dry-run` and `--status` flags, and skip-on-destination-exists semantics are all directly analogous.
 - **RFC-0521 (docs.archive umbrella):** This RFC extends the `docs.archive` umbrella command to include `mission.archive` as a sixth sub-command, alongside `rfc.archive`, `adr.archive`, `plan.archive`, `audit.archive`, and `session.archive`.
 - **RFC-0480 (mission.cleanup):** This RFC is complementary to `mission.cleanup`. The recommended workflow is `mission.cleanup` (remove workpiece/distribution) → `mission.archive` (move remaining directory to archive). `mission.archive` does not require prior cleanup — it checks only `mission.yaml` state, not the presence of workpiece/distribution directories.
-- **Site OS operator model:** `mission.archive` is registered in the `forgeCoreModule` (alongside `docs.archive`), not in the `mission` module in `site-kernel-handoff`. This is because `docs.archive` lives in `packages/forge/os/core/` and must import the archive handler directly. The forge autonomy guard forbids `@warpgogol/*` imports in `packages/forge/`, so the handler must live in `packages/forge/os/mission/`. The mission lifecycle commands (open, close, abort, list, status) remain in `site-kernel-handoff`; only the archiving handler moves to forge.
+- **Site OS operator model:** `mission.archive` is registered in a new `forgeMissionModule` in `packages/forge/os/mission/mission.module.ts`, following the same pattern as `forgePlanModule`, `forgeAuditModule`, and `forgeSessionModule`. The `docs.archive` umbrella command (in `forgeCoreModule`) imports `runMissionArchive` via dynamic import and calls it as a sixth sub-command. The forge autonomy guard forbids `@warpgogol/*` imports in `packages/forge/`, so the handler reads `mission.yaml` directly via `node:fs` and the `yaml` package (already a dependency of `@warpgogol/forge`). The mission lifecycle commands (open, close, abort, list, status) remain in `site-kernel-handoff`; only the archiving handler moves to forge.
 
 ## Design
 
@@ -225,17 +226,27 @@ The command does **not** read or modify:
 - **No `missions/` directory:** The command returns an empty result with `moved: []` and `skipped: []`.
 - **`fs.rename` ENOENT:** If the source directory was moved by another process between scanning and renaming, the mission is skipped with reason `"already moved by another process"`.
 
-### Changes to existing commands
+### Module registration
+
+A new `forgeMissionModule` is created in `packages/forge/os/mission/mission.module.ts`, following the pattern of `forgePlanModule` (`packages/forge/os/plan/plan.module.ts`) and `forgeAuditModule` (`packages/forge/os/audit/audit.module.ts`). The module registers the `mission.archive` command with its flags, scope, writes, and reads.
+
+Three additional files must be updated for the module to be consumable:
+
+1. **`packages/forge/src/index.ts`** — export `forgeMissionModule` from `../os/mission/mission.module.ts`, alongside the existing forge module exports (line 128–139).
+2. **`tools/kernel.config.ts`** — add a module loader entry: `"forge-mission": async () => (await import("@warpgogol/forge/os/mission-module")).forgeMissionModule`, alongside the existing `"forge-plan"`, `"forge-audit"`, and `"forge-session"` entries.
+3. **`packages/forge/AGENTS.md`** — add a `forgeMissionModule` row to the OS modules table: `| forgeMissionModule | mission.archive | os/mission/ |`.
 
 #### `docs.archive` (packages/forge/os/core/core.module.ts)
 
 The `docs.archive` umbrella command is extended to include `mission.archive` as a sixth sub-command. The `subCommands` array gains:
 
 ```ts
+const { runMissionArchive } = await import("../mission/handlers/archive.ts");
+// ...
 { name: "mission.archive", fn: runMissionArchive as ArchiveHandler },
 ```
 
-The `writes` and `reads` arrays are extended to include `missions/**` paths.
+The `writes` and `reads` arrays are extended to include `missions/**` paths. The command description is updated from "runs rfc.archive, adr.archive, plan.archive, audit.archive, and session.archive" to include `mission.archive`.
 
 #### `mission.list` (packages/os/site-kernel-handoff/src/mission/mission-io.ts)
 
@@ -268,15 +279,19 @@ The `writes` and `reads` arrays are extended to include `missions/**` paths.
 - **Agent confusion about workflow order:** Agents may run `mission.archive` before `mission.cleanup`, archiving missions with large `workpiece/` directories still present. This is not harmful (the move operation handles it), but it results in larger archive directories. The recommended workflow is documented as `cleanup → archive`, but the command does not enforce this order. Risk is low — the command works correctly regardless of cleanup state.
 - **`mission.status` path resolution performance:** `resolveMissionDir()` now checks up to three paths (primary + two archive states) instead of one. This adds at most two `existsSync` calls per invocation, which is negligible.
 - **`mission.list` missing archived missions:** Operators who rely on `mission.list` to see all missions (including historical ones) will no longer see archived missions. This is intentional (archived = not active), but if an operator needs to inspect an archived mission, they must use `mission.status --mission <id>` (which searches archive paths) or browse `missions/archive/` directly.
-- **`docs.archive` runtime mismatch:** `docs.archive` runs in the forge runtime, while mission lifecycle commands run in the site-kernel runtime. `mission.archive` is registered in the forge runtime (forgeCoreModule), so `docs.archive` can call it directly. However, `mission.archive` is not available via `site-kernel run` unless the forge module is loaded. This is the same pattern as `rfc.archive` and `adr.archive` — they are forge commands, not site-kernel commands. Risk is low — the kernel config loads forge modules.
+- **`docs.archive` runtime mismatch:** `docs.archive` runs in the forge runtime, while mission lifecycle commands run in the site-kernel runtime. `mission.archive` is registered in the forge runtime (forgeMissionModule), so `docs.archive` can call it directly. However, `mission.archive` is not available via `site-kernel run` unless the forge module is loaded. This is the same pattern as `rfc.archive` and `adr.archive` — they are forge commands, not site-kernel commands. Risk is low — the kernel config loads forge modules.
+- **TOCTOU race with concurrent lifecycle commands:** If `mission.archive` runs concurrently with `mission.close` or `mission.abort`, the archive handler might read a partially-written `mission.yaml` (the lifecycle command writes the manifest via `atomicWriteFile`, but there is a window between the write and the archive handler's read). This is the same TOCTOU risk that all existing archive commands share with respect to their respective lifecycle commands. `fs.rename` is atomic on a single filesystem, so the move operation itself is safe. The handler's skip-on-unreadable-manifest behavior (Failure modes) mitigates the impact: a partially-written file is skipped, not misinterpreted. No additional locking is introduced — the existing archive commands do not use locks, and adding them here would be inconsistent.
 
 ## Acceptance criteria
 
-- [ ] `mission.archive` command registered in `forgeCoreModule` with `--dry-run` and `--status` flags
+- [ ] `mission.archive` command registered in `forgeMissionModule` with `--dry-run` and `--status` flags
+- [ ] `forgeMissionModule` exported from `packages/forge/src/index.ts` and registered in `tools/kernel.config.ts`
+- [ ] `packages/forge/AGENTS.md` OS modules table includes `forgeMissionModule` row
 - [ ] `mission.archive --dry-run` reports what would be moved without touching the filesystem
 - [ ] `mission.archive` moves terminal-state missions to `missions/archive/<state>/<missionId>/`
 - [ ] `mission.archive` is bidirectional — open missions in `archive/` are moved back to `missions/`
 - [ ] `docs.archive` umbrella includes `mission.archive` as a sixth sub-command
+- [ ] `docs.archive` command description updated to mention `mission.archive`
 - [ ] `mission.list` excludes the `archive/` subdirectory from its scan
 - [ ] `mission.status --mission <id>` resolves archived missions by searching both `missions/` and `missions/archive/<state>/`
 - [ ] `--json` output format matches `MissionArchiveResult` interface
@@ -291,6 +306,7 @@ The `writes` and `reads` arrays are extended to include `missions/**` paths.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - The `mission.archive` handler MUST live in `packages/forge/os/mission/handlers/archive.ts` — not in `packages/os/site-kernel-handoff/`. This is required by the forge autonomy guard and the `docs.archive` integration.
-- The `mission.archive` handler MUST NOT import from `@warpgogol/*` packages. It reads `mission.yaml` directly via `node:fs` and a YAML parser, the same way `rfc.archive` reads RFC frontmatter.
+- The `mission.archive` handler MUST NOT import from `@warpgogol/*` packages. It reads `mission.yaml` directly via `node:fs` and the `yaml` package (already a dependency of `@warpgogol/forge`), the same way `rfc.archive` reads RFC frontmatter. The handler does NOT use `missionManifestSchema` from `@warpgogol/ontology/operations` for schema validation — it reads only the `state` field from the parsed YAML. If `mission.yaml` has an unexpected shape (missing or misspelled `state` field), the handler skips it with reason `"unreadable manifest"` rather than failing loudly. This tradeoff is consistent with how `rfc.archive` reads frontmatter without full schema validation.
+- A new `forgeMissionModule` MUST be created in `packages/forge/os/mission/mission.module.ts` and exported from `packages/forge/src/index.ts`. A module loader entry MUST be added to `tools/kernel.config.ts`. The `packages/forge/AGENTS.md` OS modules table MUST be updated with the new module row.
 - `listMissionDirs()` in `packages/os/site-kernel-handoff/src/mission/mission-io.ts` MUST filter out the `archive` entry from the directory listing.
 - `resolveMissionDir()` in `packages/os/site-kernel-handoff/src/mission/mission-io.ts` MUST check archive paths as a fallback when the mission is not found at the primary path.
