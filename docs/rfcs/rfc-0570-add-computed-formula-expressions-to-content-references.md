@@ -1,7 +1,7 @@
 ---
 id: RFC-0570
 title: "Add computed formula expressions to content references"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
 enhancedAt: 2026-07-28
-implementedAt:
+implementedAt: 2026-07-28
 closedAt:
 supersedes: []
 supersededBy:
