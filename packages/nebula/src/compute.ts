@@ -33,6 +33,7 @@ import type {
   ContentCheckReport,
   DnaCheckReport,
 } from "./types.ts";
+import { computePillarScores } from "./pillar-registry.ts";
 
 // ---------------------------------------------------------------------------
 // Pillar score derivation
@@ -108,22 +109,11 @@ export function deriveArchitecturalComplianceScore(dnaChecks: DnaCheckReport): n
 // remain byte-stable for a given (inputs, weightsVersion) pair.
 
 export function computeNebulaScore(inputs: NebulaInputs): NebulaScore {
-  const pillarRawScores = {
-    performance: derivePerformanceScore(inputs.lighthouse),
-    accessibility: deriveAccessibilityScore(inputs.lighthouse, inputs.axe),
-    contentHealth: deriveContentHealthScore(inputs.contentChecks),
-    architecturalCompliance: deriveArchitecturalComplianceScore(inputs.dnaChecks),
-  } as const;
+  const pillars = computePillarScores(inputs);
 
   let compositeRaw = 0;
-  const pillars = {} as NebulaScore["pillars"];
-
-  for (const key of Object.keys(NEBULA_WEIGHTS) as Array<keyof typeof NEBULA_WEIGHTS>) {
-    const score = pillarRawScores[key];
-    const weight = NEBULA_WEIGHTS[key];
-    const contribution = score * weight;
-    compositeRaw += contribution;
-    pillars[key] = { score, weight, contribution: Math.round(contribution * 100) / 100 };
+  for (const key of Object.keys(pillars) as Array<NebulaWeightKey>) {
+    compositeRaw += pillars[key].contribution;
   }
 
   const nebula = clamp(Math.round(compositeRaw), 0, 100);

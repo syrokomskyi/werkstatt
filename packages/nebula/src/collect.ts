@@ -22,7 +22,6 @@
  * returns a complete NebulaInputs object.
  */
 
-import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type {
   NebulaInputs,
@@ -32,6 +31,8 @@ import type {
   DnaCheckReport,
 } from "./types.ts";
 import { createStubNebulaInputs } from "./compute.ts";
+import type { ArtifactReader } from "./artifact-reader.ts";
+import { fsArtifactReader } from "./artifact-reader.ts";
 
 /** Options for collecting Nebula inputs from CI artifacts. */
 export interface CollectNebulaInputsOptions {
@@ -45,6 +46,8 @@ export interface CollectNebulaInputsOptions {
   contentChecksFilename?: string;
   /** Override the DNA-check artifact filename (default: .dna-checks.json) */
   dnaChecksFilename?: string;
+  /** Inject a custom artifact reader (for testing). Defaults to filesystem reader. */
+  reader?: ArtifactReader;
 }
 
 /**
@@ -62,27 +65,32 @@ export async function collectNebulaInputs(
   options: CollectNebulaInputsOptions,
 ): Promise<NebulaInputs> {
   const { appDirectory } = options;
+  const reader = options.reader ?? fsArtifactReader;
   const stub = createStubNebulaInputs();
 
   const lighthouse = await readJsonSafe<LighthouseResult>(
+    reader,
     join(appDirectory, options.lighthouseFilename ?? ".lighthouse-results.json"),
     stub.lighthouse,
     "lighthouse",
   );
 
   const axe = await readJsonSafe<AxeResult>(
+    reader,
     join(appDirectory, options.axeFilename ?? ".axe-results.json"),
     stub.axe,
     "axe",
   );
 
   const contentChecks = await readJsonSafe<ContentCheckReport>(
+    reader,
     join(appDirectory, options.contentChecksFilename ?? ".content-checks.json"),
     stub.contentChecks,
     "content-checks",
   );
 
   const dnaChecks = await readJsonSafe<DnaCheckReport>(
+    reader,
     join(appDirectory, options.dnaChecksFilename ?? ".dna-checks.json"),
     stub.dnaChecks,
     "dna-checks",
@@ -91,9 +99,18 @@ export async function collectNebulaInputs(
   return { lighthouse, axe, contentChecks, dnaChecks };
 }
 
-async function readJsonSafe<T>(filePath: string, fallback: T, label: string): Promise<T> {
+async function readJsonSafe<T>(
+  reader: ArtifactReader,
+  filePath: string,
+  fallback: T,
+  label: string,
+): Promise<T> {
+  const raw = await reader.readJson(filePath);
+  if (raw === undefined) {
+    console.warn(`[nebula] ${label} artifact not found or malformed — using stub`);
+    return fallback;
+  }
   try {
-    const raw = await readFile(filePath, "utf8");
     const parsed = JSON.parse(raw) as Partial<T>;
     return { ...fallback, ...parsed };
   } catch {
