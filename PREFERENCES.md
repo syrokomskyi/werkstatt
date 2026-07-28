@@ -33,6 +33,14 @@ When finishing an RFC implementation, the agent MUST follow `fo-idea-implement` 
 5. **Run `fo-doc-audit`** after stamping to sync documentation surfaces.
 6. **Never work around `RFC-IMP-04` (dirty working tree).** If `rfc.implement.stamp` fails because the working tree is dirty, do NOT `git stash`, `git add -A`, or otherwise force the stamp. Report the uncommitted changes to the operator and stop. The operator is responsible for resolving foreign uncommitted changes.
 
+## Commit hygiene (NON-NEGOTIABLE)
+
+When applying review findings or multi-axis fixes to a file, the agent MUST:
+
+1. **Run `git diff` on every touched file before committing** — not just `git diff --cached`. Unstaged changes in already-touched files are easily missed when using `git add -p` or staging specific hunks.
+2. **Run `git status` after every commit** — confirm the working tree is clean. If files remain unstaged, either commit them or explicitly report them to the operator.
+3. **Never leave partial fixes in the working tree** — if a review finding was applied to a file, the entire fix for that finding must be in the same commit. Do not split a single finding's fix across commits unless the operator explicitly requests it.
+
 ## MANDATORY pre-response checklist for RFC implementation (NON-NEGOTIABLE)
 
 Before sending ANY response that claims an RFC is "complete", "done", or "implemented", the agent MUST verify ALL of the following. If ANY item is unchecked, the response is BLOCKED — complete it first, then respond.
