@@ -24,6 +24,7 @@
 </MODULE_MAP>
 <CHANGE_SUMMARY>
   <item>Annotate Compass scaffolding to enhance navigability and maintainability of the configuration file.</item>
+  <item>RFC-0569: add dev-only smartypants: false for egress parity.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -93,6 +94,12 @@ export default defineConfig({
   build: {
     // Inline all stylesheets — reduces HTTP requests on the CDN.
     inlineStylesheets: "always",
+  },
+  // [RFC-0569 / DNA-57] Disable smartypants in dev mode to prevent Astro from
+  // injecting curly quotes, em-dashes, and single-char ellipsis at render time.
+  // In production, smartypants stays true (default) and the dist sweep normalizes.
+  markdown: {
+    smartypants: !isAstroDev,
   },
   integrations: [react()],
   vite: {
