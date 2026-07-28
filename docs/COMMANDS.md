@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 661. Raw manifest entries: 1203.
+Generated command rows: 674. Raw manifest entries: 1216.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -151,7 +151,6 @@ Generated command rows: 661. Raw manifest entries: 1203.
 | `consent.activation.validate` | site:warpgogol-com, workspace | app | no | no | Fail if a configured chat widget vendor's origin loads as a script/iframe/preconnect in rendered dist HTML before user activation — the click-to-load guarantee (RFC-0175/0177). |
 | `constellation.compose.validate` | site:warpgogol-com, workspace | app | no | no | Validate constellation slot order against the app's section manifests: missing required slots and order violations exit non-zero (DNA-23, RFC-0025). |
 | `constellation.contract.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate constellation YAML files against ontology schema and ensure slot cosmicNames are declared by archetypes (RFC-0072). |
-| `contact.form.validate` | site:warpgogol-com, workspace | app | no | no | Validate that sites using the send-message section declare emailField with enabled: true consistently across all published locales. No-op pass when the site has no send-message blocks (RFC-0514). |
 | `content-types.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate that every manifest.yaml in packages/ui/src/{components,sections}/ with contentSchemaKey has a matching .types.ts sibling (DNA-10, RFC-0034). |
 | `content.asset.contract.validate` | site:warpgogol-com, workspace | app | no | no | Validate RFC-0248 content asset resolver/validator parity, bare-filename token syntax, multi-domain lookup, and default-language fallback. |
 | `content.claim.ledger.append` | site:warpgogol-com, workspace | app | no | no | Append an immutable ClaimEvent to the append-only ledger (src/content/ledger/claims.ndjson); idempotent by event id (RFC-0217). |
@@ -164,6 +163,7 @@ Generated command rows: 661. Raw manifest entries: 1203.
 | `content.derived.stamp` | site:warpgogol-com, workspace | app | no | no | Re-stamp a derived claim's sourceHash + asOf after updating it; refuses on missing source (RFC-0215). |
 | `content.derived.validate` | site:warpgogol-com, workspace | app | no | no | Detect outdated derived claims (translation/copy whose sourceHash drifted from its source) (RFC-0215). |
 | `content.filename.validate` | site:warpgogol-com, workspace | app | no | no | Validate page content filenames match the {pageId}.md convention (RFC-0090). Scans content/pages/{lang}/*.md, reads frontmatter pageId, computes pageIdToContentFileSlug(pageId), and asserts the filename matches. Includes a `git mv` suggestion in the diagnostic. Skips kind:redirect files; reports missing pageId as a violation. |
+| `content.formula.lint` | site:warpgogol-com, workspace | app | no | no | Detect hardcoded arithmetic patterns next to content references and suggest =(...) formula replacement (RFC-0570). Warn-level: never fails builds. |
 | `content.freshness.report` | site:warpgogol-com, workspace | app | no | no | CKL Freshness Ledger health view; never fails (RFC-0213). |
 | `content.freshness.validate` | site:warpgogol-com, workspace | app | no | no | Evaluate CKL claim temporal windows; write the authored Freshness Ledger; expired blocking claims fail (RFC-0213). |
 | `content.idempotency.validate` | site:warpgogol-com, workspace | app | no | no | Run SITES_BUILD_PREPARE_PIPELINE once and assert it left every tracked authored-content file under src/content/** byte-identical. Catches build steps that rewrite or blank NEED_THIS_* legal markers (RFC-0154). |
@@ -193,9 +193,21 @@ Generated command rows: 661. Raw manifest entries: 1203.
 | `demand.signal.import` | site:warpgogol-com, workspace | app | yes | no | Offline-import aggregate GSC/Keyword Planner/manual search-demand exports into versioned demand-signal records (RFC-0280). |
 | `demand.signal.validate` | site:warpgogol-com, workspace | app | no | no | Validate demand-signal schema, axis resolution, freshness, duplicate query bindings, and PII guards (RFC-0280). |
 | `demands.hierarchy.validate` | site:warpgogol-com, workspace | app | no | no | Validate demand record folder hierarchy (canonical 1/2/3 segment levels), detect derived-slug collisions, and warn on slug frontmatter overrides. RFC-0244. |
+| `deploy.artifact.build` | workspace | workspace | yes | no | Build an immutable platform artifact from the local git clone (RFC-0566). Flags: [--skip-build], [--skip-sign]. |
+| `deploy.artifact.gc` | workspace | workspace | yes | no | Garbage-collect unreferenced platform artifacts (RFC-0566). Flags: [--dry-run], [--retain N]. |
+| `deploy.artifact.verify` | workspace | workspace | no | no | Verify an artifact's content hash and signature (RFC-0566). Flags: --hash. |
+| `deploy.atomic.rollback` | workspace | workspace | yes | no | Atomic rollback to the previous artifact via symlink swap (RFC-0566). No flags. |
+| `deploy.atomic.swap` | workspace | workspace | yes | no | Atomic symlink swap to deploy a new artifact (RFC-0566). Flags: --hash. |
 | `deploy.preflight` | site:warpgogol-com, workspace | workspace | no | no | Pre-deploy validation gate (RFC-0388 Rule 5). Validates that the target env file exists, contains all keys from .env.example, has no extra keys, and has no empty values. Use --site <name> --env main\|alt for sites, or --service <name> for services. |
 | `deploy.scripts.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate deploy scripts in systems/*/package.json (deploy:main with --secrets-file .env.main, deploy:alt with --secrets-file .env.alt) and services/*/package.json (deploy with --secrets-file .env) (RFC-0388 Rule 6, DNA-40). |
+| `deploy.status` | workspace | workspace | no | no | Report current and previous platform artifact hashes, git SHA, and deployment time (RFC-0566). |
 | `deploy.surface.parity.validate` | site:warpgogol-com, workspace | app | no | yes | Compare deployed sitemap with the generated local sitemap when --base-url is supplied; skips offline by default (RFC-0318). |
+| `dht.capacity.publish` | workspace | workspace | no | no | RFC-0565: publish workshop capacity to the DHT for placement decisions. Signs the capacity entry with the operator's Ed25519 keypair. Required: --workshop-id <id>, --available-slots <n>, --endpoint <host:port>. Optional: --storage-limit-mb <n>, --bandwidth-limit-mbps <n>. Use --json for output. |
+| `dht.lookup` | workspace | workspace | no | no | RFC-0565: resolve a site id to its DHT entry. Queries the DHT (or local cache if fresh) and validates the entry signature. Routes around dead workshops detected by SWIM. Use --site-id <id> to specify the site. Use --force to bypass cache. Use --json for machine-readable output. |
+| `dht.node.init` | workspace | workspace | no | no | RFC-0565: initialize DHT configuration. Creates werkstatt.dht.json with bind address, bootstrap nodes, replication factor, and timeout parameters. Use --bind <host:port> to specify the bind address. Use --bootstrap <host:port> to specify a bootstrap node (can be repeated). Use --json for machine-readable output. |
+| `dht.placement` | workspace | workspace | no | no | RFC-0565: determine the best workshop for placing a site by querying DHT capacity entries. Uses least-loaded strategy by default. Required: --site-id <id>, --workshops <id1,id2,...> (or repeated). Optional: --strategy <least-loaded\|nearest\|owner-preference>. Use --json for output. |
+| `dht.register` | workspace | workspace | no | no | RFC-0565: publish a local registry entry to the DHT. Signs the entry with the operator's Ed25519 keypair. Uses LWW on lastUpdated for conflict resolution. Required flags: --site-id <id>, --owner <did:web>, --endpoint <host:port>. Optional: --mirrors <host:port> (can be repeated). Use --json for output. |
+| `dht.status` | workspace | workspace | no | no | RFC-0565: report local DHT node status including config, cache entries, identity bootstrap state, and SWIM configuration. Local-only query — no network I/O. Use --json for machine-readable output. |
 | `diagnostic.shape.lint` | site:warpgogol-com, workspace | workspace | no | no | Lint @warpgogol/site-kernel-checks for RFC-0203 diagnostic shape: DSL-02 fails on an unregistered ruleId; DSL-03 on an empty ruleId; DSL-01 on an unreadable source dir; DSL-04 ratchets resultFromViolations/failResult shim usage against a shrink-only baseline (RFC-0261). Pass --write-baseline to regenerate the DSL-04 baseline. |
 | `dispatcher.sync.validate` | site:warpgogol-com, workspace | app | no | no | Validate that dispatcher registrations match actual content and schema files. |
 | `dist.content-references.validate` | site:warpgogol-com, workspace | app | no | no | Scan every .html under apps/<id>/dist for residual {collection.file.field} brace tokens that were not resolved at render time (RFC-0187). |
@@ -204,7 +216,7 @@ Generated command rows: 661. Raw manifest entries: 1203.
 | `dist.sitemap.images.generate` | site:warpgogol-com, workspace | app | no | no | Harvest rendered dist/client HTML for each page's lead/content image and write dist/client/sitemap-images.xml. Post-build (RFC-0172). |
 | `dist.sitemap.images.validate` | site:warpgogol-com, workspace | app | no | no | Validate the content-image contract over rendered HTML: exactly one content image per page, absolute URLs, no synthetic previews, and an up-to-date sitemap-images.xml (RFC-0172). |
 | `dna.registry.validate` | site:warpgogol-com, workspace | workspace | no | no | Keep the canonical DNA registry (docs/architecture-dna.md) in sync with the RFCs that establish invariants (RFC-0158). |
-| `docs.archive` | workspace | workspace | yes | no | Umbrella command that runs rfc.archive, adr.archive, plan.archive, audit.archive, and session.archive in sequence. Passes --dry-run and --status through to all sub-commands. Not atomic — if one sub-command fails, prior moves are not rolled back. Re-running is safe (idempotent). |
+| `docs.archive` | workspace | workspace | yes | no | Umbrella command that runs rfc.archive, adr.archive, plan.archive, audit.archive, session.archive, and mission.archive in sequence. Passes --dry-run and --status through to all sub-commands. Not atomic — if one sub-command fails, prior moves are not rolled back. Re-running is safe (idempotent). |
 | `docs.commands.generate` | site:warpgogol-com, workspace | workspace | yes | no | Generate docs/COMMANDS.md from the live Site OS command registry (RFC-0222). |
 | `docs.commands.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate docs/COMMANDS.md against the live Site OS command registry (RFC-0222). |
 | `ecosystem.commit` | site:warpgogol-com, workspace | workspace | yes | no | Atomic version bump, semantic hash computation, and commit with trailers for platform-scope changes (RFC-0533). Replaces direct git commit for packages/**, integrations/**, services/**. |
@@ -385,6 +397,7 @@ Generated command rows: 661. Raw manifest entries: 1203.
 | `mirror.triad.validate` | site:warpgogol-com, workspace | app | no | no | Validate three-way mirror between component content files and schema files. |
 | `mirroring.validate` | site:warpgogol-com, workspace | app | no | no | Validate that content pages are mirrored across all language directories. |
 | `mission.abort` | workspace | workspace | yes | no | Abort an open mission and discard Werkstück/Distribution (RFC-0355). |
+| `mission.archive` | workspace | workspace | yes | no | Move terminal-state mission directories (state: closed or aborted in mission.yaml) into missions/archive/<state>/<missionId>/ subdirectories. Bidirectional: moves open missions found in archive subdirectories back to missions/. Use --dry-run to preview. Use --status to filter to a single terminal status (closed, aborted). Prefer the docs.archive umbrella command unless you need to archive only missions. |
 | `mission.build` | workspace | workspace | yes | no | Build the Werkstück into a local Distribution (RFC-0356). |
 | `mission.cleanup` | workspace | workspace | yes | no | Remove workpiece/distribution for a closed or aborted mission, or clean old missions by age (RFC-0480). |
 | `mission.close` | workspace | workspace | yes | no | Close an open mission (RFC-0355). |
