@@ -26,38 +26,37 @@ export interface NormalizeResult {
   hash: string;
 }
 
+interface NormalizerEntry {
+  readonly normalizer: string;
+  readonly extensions: ReadonlySet<string>;
+  normalize(content: string): string | Promise<string>;
+}
+
 const TS_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".mts", ".cjs"]);
 const YAML_EXTENSIONS = new Set([".yaml", ".yml"]);
 const MD_EXTENSIONS = new Set([".md", ".mdx"]);
+const HTML_EXTENSIONS = new Set([".html", ".htm"]);
+
+const REGISTRY: ReadonlyArray<NormalizerEntry> = [
+  { normalizer: "typescript", extensions: TS_EXTENSIONS, normalize: normalizeTypeScript },
+  { normalizer: "astro", extensions: new Set([".astro"]), normalize: normalizeAstro },
+  { normalizer: "css", extensions: new Set([".css"]), normalize: normalizeCss },
+  { normalizer: "html", extensions: HTML_EXTENSIONS, normalize: hashHtml },
+  { normalizer: "json", extensions: new Set([".json"]), normalize: normalizeJson },
+  { normalizer: "jsonc", extensions: new Set([".jsonc"]), normalize: normalizeJsonc },
+  { normalizer: "yaml", extensions: YAML_EXTENSIONS, normalize: normalizeYaml },
+  { normalizer: "markdown", extensions: MD_EXTENSIONS, normalize: normalizeMarkdown },
+];
 
 export async function normalizeFile(absPath: string, bytes: Uint8Array): Promise<NormalizeResult> {
   const ext = path.extname(absPath).toLowerCase();
   const content = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
 
   try {
-    if (TS_EXTENSIONS.has(ext)) {
-      return { normalizer: "typescript", hash: normalizeTypeScript(content) };
-    }
-    if (ext === ".astro") {
-      return { normalizer: "astro", hash: await normalizeAstro(content) };
-    }
-    if (ext === ".css") {
-      return { normalizer: "css", hash: normalizeCss(content) };
-    }
-    if (ext === ".html" || ext === ".htm") {
-      return { normalizer: "html", hash: hashHtml(content) };
-    }
-    if (ext === ".json") {
-      return { normalizer: "json", hash: normalizeJson(content) };
-    }
-    if (ext === ".jsonc") {
-      return { normalizer: "jsonc", hash: normalizeJsonc(content) };
-    }
-    if (YAML_EXTENSIONS.has(ext)) {
-      return { normalizer: "yaml", hash: normalizeYaml(content) };
-    }
-    if (MD_EXTENSIONS.has(ext)) {
-      return { normalizer: "markdown", hash: normalizeMarkdown(content) };
+    for (const entry of REGISTRY) {
+      if (entry.extensions.has(ext)) {
+        return { normalizer: entry.normalizer, hash: await entry.normalize(content) };
+      }
     }
   } catch {
     // fall through to text normalizer

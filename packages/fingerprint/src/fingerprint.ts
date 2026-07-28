@@ -20,18 +20,7 @@ import path from "node:path";
 import { byteHash } from "./primitives.ts";
 import type { FingerprintFileResult, FingerprintOptions, FingerprintResult } from "./types.ts";
 import { normalizeFile } from "./normalizers/index.ts";
-
-function normalizePathSep(p: string): string {
-  return p.replace(/\\/g, "/");
-}
-
-function shouldIgnore(filePath: string, ignore: string[]): boolean {
-  const normalized = normalizePathSep(filePath);
-  for (const pattern of ignore) {
-    if (normalized.includes(pattern)) return true;
-  }
-  return false;
-}
+import { normalizePathSep, shouldIgnore } from "./path-matcher.ts";
 
 export async function fingerprintFile(
   filePath: string,
