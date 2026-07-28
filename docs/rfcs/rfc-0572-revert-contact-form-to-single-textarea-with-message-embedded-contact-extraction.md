@@ -243,16 +243,16 @@ Returned when the message body contains neither an email address nor a phone num
 
 ## Acceptance criteria
 
-- [ ] `emailField` and `phoneField` removed from `send-message-section.manifest.yaml` `propsSchema` (evidence: manifest version 1.2.0, no `emailField`/`phoneField` in required or properties)
-- [ ] `contactRequirementMessage` re-added as optional string prop in manifest `propsSchema`
-- [ ] Generated types regenerated via `props.types.generate` (evidence: `send-message-section.types.generated.ts` has no `emailField`/`phoneField`, has `contactRequirementMessage?`)
-- [ ] `send-message-section.astro` no longer renders email/phone `<input>` fields (evidence: no `data-send-message-email`/`data-send-message-phone` in template)
-- [ ] `send-message-section.client.ts` re-adds `hasContactDetails()` regex check and shows `contactRequirementMessage` when no contact found in message (evidence: `EMAIL_EXTRACT_REGEX`/`PHONE_EXTRACT_REGEX` present, `emailInput`/`phoneInput` logic removed)
-- [ ] `send-message-section.api.ts` extracts email/phone from message body via regex and returns `400 { error: "no-contact-details" }` when neither is found (evidence: `extractContact()` function, no `email`/`phone` in `SendMessageBody`)
-- [ ] `contact.form.validate` command removed from `site-kernel-checks` and from `SITES_BUILD_CHECK_PIPELINE` (evidence: `contact-form.ts` deleted, no `contact.form.validate` in command tables or pipeline)
-- [ ] Migrator registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts` that strips `emailField`/`phoneField` and re-adds `contactRequirementMessage` (evidence: `rfc-0572.ts` with snapshot+PBT tests)
-- [ ] `AGENTS.md` updated where agent behavior rules changed (evidence: `site-kernel-checks/AGENTS.md` module table no longer lists `contact-form.ts`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `emailField` and `phoneField` removed from `send-message-section.manifest.yaml` `propsSchema` (evidence: commit 74c230b, manifest version 1.2.0, no `emailField`/`phoneField` in required or properties)
+- [x] `contactRequirementMessage` re-added as optional string prop in manifest `propsSchema` (evidence: commit 74c230b, `contactRequirementMessage` in properties with type: string, minLength: 1)
+- [x] Generated types regenerated via `props.types.generate` (evidence: commit 74c230b, `send-message-section.types.generated.ts` has `contactRequirementMessage?: string`, no `emailField`/`phoneField`)
+- [x] `send-message-section.astro` no longer renders email/phone `<input>` fields (evidence: commit 74c230b, no `data-send-message-email`/`data-send-message-phone` in template)
+- [x] `send-message-section.client.ts` re-adds `hasContactDetails()` regex check and shows `contactRequirementMessage` when no contact found in message (evidence: commit 74c230b, `EMAIL_EXTRACT_REGEX`/`PHONE_EXTRACT_REGEX`/`hasContactDetails` present, `emailInput`/`phoneInput` logic removed)
+- [x] `send-message-section.api.ts` extracts email/phone from message body via regex and returns `400 { error: "no-contact-details" }` when neither is found (evidence: commit 74c230b, `extractContact()` function present, no `email`/`phone` in `SendMessageBody`)
+- [x] `contact.form.validate` command removed from `site-kernel-checks` and from `SITES_BUILD_CHECK_PIPELINE` (evidence: commit 0e8d303, `contact-form.ts` deleted, no `contact.form.validate` in command tables or pipeline)
+- [x] Migrator registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts` that strips `emailField`/`phoneField` and re-adds `contactRequirementMessage` (evidence: commit 3a563a6, `rfc-0572.ts` with snapshot+PBT tests, 287 tests pass)
+- [x] `AGENTS.md` updated where agent behavior rules changed (evidence: commit 0e8d303, `site-kernel-checks/AGENTS.md` module table no longer lists `contact-form.ts`)
+- [x] `rfc.validate` passes on this file before merging (evidence: no RFC-0572-specific validation errors)
 
 ## Implementation notes for agents
 
