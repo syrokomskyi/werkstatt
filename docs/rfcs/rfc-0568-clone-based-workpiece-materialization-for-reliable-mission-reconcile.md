@@ -1,7 +1,7 @@
 ---
 id: RFC-0568
 title: "Clone-based workpiece materialization for reliable mission reconcile"
-status: implemented
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
 enhancedAt: 2026-07-28
-implementedAt: 2026-07-28
+implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
