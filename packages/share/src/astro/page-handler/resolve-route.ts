@@ -182,10 +182,8 @@ function buildHumanProfileBlocks(
     id: "evidence",
     type: "markdown",
     props: {
-      header: {
-        heading: "Nachweise & Beiträge",
-        subheading: "Belegte Ergebnisse und öffentlich zugängliche Arbeiten.",
-      },
+      heading: "Nachweise & Beiträge",
+      lead: "Belegte Ergebnisse und öffentlich zugängliche Arbeiten.",
       contentRef: `prose/${slug}-nachweise`,
       hideSectionNumber: true,
       pageId,
@@ -197,9 +195,7 @@ function buildHumanProfileBlocks(
     id: "career",
     type: "markdown",
     props: {
-      header: {
-        heading: "Beruflicher Werdegang",
-      },
+      heading: "Beruflicher Werdegang",
       contentRef: `prose/${slug}-beruflich`,
       hideSectionNumber: true,
       pageId,
@@ -213,10 +209,8 @@ function buildHumanProfileBlocks(
       id: "personal",
       type: "markdown",
       props: {
-        header: {
-          heading: "Persönlicher Hintergrund",
-          subheading: "Private Einblicke, die ich freiwillig teile.",
-        },
+        heading: "Persönlicher Hintergrund",
+        lead: "Private Einblicke, die ich freiwillig teile.",
         contentRef: `prose/${slug}-persoenlich`,
         hideSectionNumber: true,
         pageId,
@@ -324,10 +318,8 @@ function buildAiAgentProfileBlocks(
     id: "rights",
     type: "markdown",
     props: {
-      header: {
-        heading: "Autonomie & Handlungsrechte",
-        subheading: "Was dieser Agent tun darf und was menschliche Freigabe erfordert.",
-      },
+      heading: "Autonomie & Handlungsrechte",
+      lead: "Was dieser Agent tun darf und was menschliche Freigabe erfordert.",
       contentRef: `prose/${participant.slug}-rechte`,
       hideSectionNumber: true,
       pageId,
@@ -339,10 +331,8 @@ function buildAiAgentProfileBlocks(
     id: "accountability",
     type: "markdown",
     props: {
-      header: {
-        heading: "Verantwortlichkeit & Eskalation",
-        subheading: "Welche Person für diesen Agenten verantwortlich ist und wie eskaliert wird.",
-      },
+      heading: "Verantwortlichkeit & Eskalation",
+      lead: "Welche Person für diesen Agenten verantwortlich ist und wie eskaliert wird.",
       contentRef: `prose/${participant.slug}-verantwortlichkeit`,
       hideSectionNumber: true,
       pageId,
@@ -354,10 +344,8 @@ function buildAiAgentProfileBlocks(
     id: "technical",
     type: "markdown",
     props: {
-      header: {
-        heading: "Technischer Stand",
-        subheading: "Modellfamilie und Überprüfungszyklus.",
-      },
+      heading: "Technischer Stand",
+      lead: "Modellfamilie und Überprüfungszyklus.",
       contentRef: `prose/${participant.slug}-technik`,
       hideSectionNumber: true,
       pageId,
@@ -370,10 +358,8 @@ function buildAiAgentProfileBlocks(
       id: "limitations",
       type: "markdown",
       props: {
-        header: {
-          heading: "Bekannte Einschränkungen",
-          subheading: "Was dieser Agent nicht kann oder nicht tun sollte.",
-        },
+        heading: "Bekannte Einschränkungen",
+        lead: "Was dieser Agent nicht kann oder nicht tun sollte.",
         contentRef: `prose/${participant.slug}-einschraenkungen`,
         hideSectionNumber: true,
         pageId,
