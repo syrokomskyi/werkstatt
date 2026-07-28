@@ -19,21 +19,41 @@
 </CHANGE_SUMMARY>
 */
 
-export * from "./port.ts";
-// Lagebild MVP: CRM buffer types (contacts, deals, stage_transitions, sync_outbox).
-export * from "./crm-buffer.ts";
-// RFC-0188: Visitor Sales Funnel state-machine contracts (platform-owned graph).
-export * from "./funnel.ts";
-// RFC-0191: Client Lifecycle & Stripe Billing event contracts (sibling to the funnel).
-export * from "./lifecycle.ts";
-// RFC-0179: shared sharded delivery placement + the dynamic-dispatch execution seam.
-// NOTE: the Cloudflare-queue naming in sharding.ts is SUPERSEDED for the EU delivery
-// path by RFC-0181 (Upstash QStash/Redis); the dispatch seam (executeDispatch) is reused.
-export * from "./sharding.ts";
-export * from "./dispatch.ts";
-// RFC-0181: EU-resident delivery substrate (Upstash QStash EU + Redis EU).
-export * from "./qstash.ts";
-// Registries + fan-out + inbound auth + legacy delivery substrate types.
-export * from "./orchestration.ts";
-// RFC-0181: QStash delivery callback factory (architecture review).
-export * from "./delivery-handler.ts";
+// Port-barrel re-exports all type/contract modules explicitly.
+export * from "./port-barrel.ts";
+
+// Runtime modules — explicit re-exports to keep the public API surface clear.
+export type {
+  DeliverResult,
+  AdapterReadiness,
+  RouteResult,
+  DeliverEventResult,
+  QueueBinding,
+  KvDedupStore,
+} from "./orchestration.ts";
+export {
+  CHANNEL_ADAPTERS,
+  CRM_ADAPTERS,
+  CHANNEL_ADAPTER_IDS,
+  CRM_ADAPTER_IDS,
+  INTEGRATION_ADAPTER_SECRETS,
+  deliverLead,
+  auditIntegrationReadiness,
+  DESTINATION_ADAPTERS,
+  EXTERNAL_DESTINATION_VENDORS,
+  EXTERNAL_DESTINATION_SECRETS,
+  DESTINATION_VENDORS_BY_KIND,
+  DESTINATION_ADAPTER_SECRETS,
+  routeEvent,
+  IntegrationEventSchema,
+  authenticateInbound,
+  routeEventToReady,
+  deliverEvent,
+  kvDedup,
+  enqueueEvent,
+  consumeIntegrationBatch,
+  upsertLead,
+} from "./orchestration.ts";
+
+export type { DeliveryHandlerConfig } from "./delivery-handler.ts";
+export { createDeliveryHandler } from "./delivery-handler.ts";
