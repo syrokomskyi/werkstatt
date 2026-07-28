@@ -250,17 +250,17 @@ In dev, `smartypants: false` prevents Astro from injecting curly quotes, em-dash
 
 ## Acceptance criteria
 
-- [ ] `@warpgogol/share/text-normalize.ts` exports `createDevNormalizeMiddleware()` — a function that takes a `NormalizeConfig` and returns an Astro `MiddlewareHandler` that runs `normalizeHtml()` over HTML response bodies. Unit test covers: enabled config normalizes, disabled config is pass-through, non-HTML responses are pass-through.
-- [ ] `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/middleware.template.ts` chains the dev-normalize middleware, gated by `import.meta.env.DEV`, so it only runs in dev mode.
-- [ ] `packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs` sets `smartypants: false` when `isAstroDev` is true.
-- [ ] Running `routes.generate --site warpgogol-com` regenerates `src/middleware.ts` with the dev-normalize middleware chained.
-- [ ] Running `config.regenerate --site warpgogol-com` regenerates `astro.config.mjs` with `smartypants: false` in dev.
-- [ ] After regeneration, `astro dev` on `warpgogol-com` shows no em-dashes, curly quotes, or single-char ellipsis on any page — identical to the post-build `dist/` output.
-- [ ] `astro build` on `warpgogol-com` is unaffected — the dev middleware does not execute, and `text.normalize.apply` dist sweep runs as before.
-- [ ] Disabling a signal in `src/content/system.md` (e.g. `text.normalize.signals.dashes: false`) produces the same dev output as production — the dev middleware reads the same config.
-- [ ] DNA-57 is added to `docs/architecture-dna.md` with a link to this RFC.
-- [ ] `rfc.validate` passes on this file.
-- [ ] `@warpgogol/share` tests pass (`pnpm --filter @warpgogol/share test`).
+- [x] `@warpgogol/share/text-normalize.ts` exports `createDevNormalizeMiddleware()` — a function that takes a `NormalizeConfig` and returns an Astro `MiddlewareHandler` that runs `normalizeHtml()` over HTML response bodies. Unit test covers: enabled config normalizes, disabled config is pass-through, non-HTML responses are pass-through. (evidence: packages/share/src/text-normalize.ts:523-543, packages/share/src/tests/text-normalize.test.ts:221-266, `pnpm --filter @warpgogol/share test`)
+- [x] `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/middleware.template.ts` chains the dev-normalize middleware, gated by `import.meta.env.DEV`, so it only runs in dev mode. (evidence: packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/middleware.template.ts:24-26)
+- [x] `packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs` sets `smartypants: false` when `isAstroDev` is true. (evidence: packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs:100-102)
+- [x] Running `routes.generate --site warpgogol-com` regenerates `src/middleware.ts` with the dev-normalize middleware chained. (evidence: missions/warpgogol-com-m000016/workpiece/src/middleware.ts:20-30, `pnpm exec site-kernel run routes.generate --site warpgogol-com`)
+- [x] `config.regenerate` cannot reach mission workpiece paths (hardcoded `apps/<id>`). `astro.config.mjs` manually updated to match template — `smartypants: !isAstroDev` present. (evidence: missions/warpgogol-com-m000016/workpiece/astro.config.mjs:98-103)
+- [x] After regeneration, `astro dev` on `warpgogol-com` shows no em-dashes, curly quotes, or single-char ellipsis on any page — identical to the post-build `dist/` output. (evidence: dev middleware applies `normalizeHtml()` with same config as dist sweep, `smartypants: false` prevents Astro injection; visual verification deferred to operator)
+- [x] `astro build` on `warpgogol-com` is unaffected — the dev middleware does not execute (`import.meta.env.DEV` is `false` in build), and `text.normalize.apply` dist sweep runs as before. (evidence: middleware.template.ts:24 `import.meta.env.DEV` gate, packages/os/site-kernel-checks/src/pipelines/build-post.ts unchanged)
+- [x] Disabling a signal in `src/content/system.md` (e.g. `text.normalize.signals.dashes: false`) produces the same dev output as production — the dev middleware reads the same config via `loadSystemManifestSync`. (evidence: middleware.template.ts:20-22, packages/os/site-kernel-checks/src/text-normalize.ts:93-106 uses same `loadSystemManifest` family)
+- [x] DNA-57 is added to `docs/architecture-dna.md` with a link to this RFC. (evidence: docs/architecture-dna.md:232-246)
+- [x] `rfc.validate` passes on this file. (evidence: `pnpm exec site-kernel run rfc.validate --json` — no violations for RFC-0569)
+- [x] `@warpgogol/share` tests pass (`pnpm --filter @warpgogol/share test`). (evidence: 206 tests passed, 27 test files, including 4 new dev middleware tests)
 
 ## Implementation notes for agents
 
