@@ -25,9 +25,8 @@
  * RFC-0027 / DNA-27..30
  */
 
-// Adapter types + EVENT_NAMES const — used by adapter package authors and validators
-// EVENT_NAMES is the single source of truth for the closed EventName catalog (DNA-27).
-export { EVENT_NAMES, KNOWN_ADAPTER_IDS } from "./adapter.ts";
+// Adapter types — used by adapter package authors and build-time validators.
+// EVENT_NAMES and KNOWN_ADAPTER_IDS live at @warpgogol/growth/adapter only.
 export type {
   GrowthAdapter,
   GrowthAdapterConfig,
@@ -41,9 +40,6 @@ export type {
 // Config types + schema — used by build-time validators and <GrowthProvider>
 export { GrowthConfigSchema, GrowthVendorConfigSchema, GROWTH_CONFIG_SCRIPT_ID } from "./config.ts";
 export type { GrowthConfig, GrowthVendorConfig } from "./config.ts";
-
-// GrowthAdapterLoaders type — used by provider.astro and host integrations
-export type { GrowthAdapterLoaders } from "./client.ts";
 
 // Built-in NullAdapter — inlined from former @warpgogol/growth-adapter-null package
 export { NullAdapter } from "./null-adapter.ts";

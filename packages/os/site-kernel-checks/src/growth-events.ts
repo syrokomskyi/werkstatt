@@ -31,7 +31,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { EVENT_NAMES } from "@warpgogol/growth";
+import { EVENT_NAMES } from "@warpgogol/growth/adapter";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------

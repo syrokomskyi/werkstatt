@@ -28,7 +28,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
-import { KNOWN_ADAPTER_IDS } from "@warpgogol/growth";
+import { KNOWN_ADAPTER_IDS } from "@warpgogol/growth/adapter";
 import { resultFromViolations } from "./result-helpers.ts";
 
 // ---------------------------------------------------------------------------
