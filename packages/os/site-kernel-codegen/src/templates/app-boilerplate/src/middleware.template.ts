@@ -21,10 +21,12 @@ import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol
 import { loadSystemManifestSync } from "@warpgogol/site-kernel-content";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const devNormalize = createDevNormalizeMiddleware(
-  resolveNormalizeConfig(loadSystemManifestSync(resolve(__dirname, "content")).manifest),
-);
+const devNormalize = import.meta.env.DEV
+  ? createDevNormalizeMiddleware(
+      resolveNormalizeConfig(loadSystemManifestSync(resolve(__dirname, "content")).manifest),
+    )
+  : null;
 
 export const onRequest = import.meta.env.DEV
-  ? sequence(languageRedirectMiddleware, devNormalize)
+  ? sequence(languageRedirectMiddleware, devNormalize!)
   : languageRedirectMiddleware;
