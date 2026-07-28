@@ -16,6 +16,7 @@
   <item>Add --whitespace=fix to git am calls and auto-resolve add/add conflicts on generated files by taking theirs (workpiece version).</item>
   <item>RFC-0522: add dirty cache clone warning to mission.validate.</item>
   <item>RFC-0560: use resolveActor(input) in mission.reconcile for actor resolution with --actor-from-auth flag.</item>
+  <item>RFC-0568: replace git format-patch + git am with git merge --no-ff; remove 3-way fallback and auto-resolve; add untracked file investigation; use dynamic branch name; add push retry with exponential backoff.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,7 +32,7 @@ import type {
 import { executeKernelPipeline } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import { isWorkpieceDirty } from "./mission-git-commit.ts";
+import { isWorkpieceDirty, investigateUntrackedFiles } from "./mission-git-commit.ts";
 import { acquireLock, releaseLock } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
@@ -484,10 +485,12 @@ export async function runMissionReconcile(
   try {
     const now = new Date().toISOString();
 
-    // RFC-0480: transfer workpiece commits to cache clone via git format-patch + git am
+    // RFC-0568: transfer workpiece commits to cache clone via git merge --no-ff
     const gitDir = path.join(systemDir, ".git");
     let commitSha: string | null = null;
     let preReconcileSha: string | null = null;
+    let mergeCommitSha: string | null = null;
+    let transferredCommits = 0;
     const copiedPaths: string[] = [];
 
     if (!existsSync(path.join(workpieceDir, ".git"))) {
@@ -504,13 +507,30 @@ export async function runMissionReconcile(
     }
 
     if (existsSync(gitDir)) {
-      // RFC-0522: dirty cache clone guard — refuse before generating patches
+      // RFC-0522/RFC-0568: dirty cache clone guard with untracked file investigation
       const cacheDirtyCheck = isWorkpieceDirty(systemDir);
       if (cacheDirtyCheck.dirty) {
+        // RFC-0568: investigate origin of untracked files and write report
+        const untrackedReport = await investigateUntrackedFiles(
+          workspaceRoot,
+          manifest.systemId,
+          systemDir,
+          cacheDirtyCheck.files,
+        );
+
+        await atomicWriteFile(
+          path.join(evidenceDir, "untracked-files-report.json"),
+          JSON.stringify(untrackedReport, null, 2) + "\n",
+        );
+
+        const reportSummary = untrackedReport
+          .map((r) => `  ${r.path} — ${r.likelyOrigin}${r.originHint ? ` (${r.originHint})` : ""}`)
+          .join("\n");
+
         throw new Error(
-          `[mission.reconcile] cache clone for system '${manifest.systemId}' has ${cacheDirtyCheck.fileCount} uncommitted file(s):\n` +
-            cacheDirtyCheck.files.map((f) => `  ${f}`).join("\n") +
-            `\nResolve uncommitted changes in the cache clone before re-running reconcile.`,
+          `[mission.reconcile] cache clone for system '${manifest.systemId}' has ${cacheDirtyCheck.fileCount} uncommitted/untracked file(s):\n` +
+            reportSummary +
+            `\n\nEvidence written to evidence/untracked-files-report.json.\nResolve uncommitted changes in the cache clone before re-running reconcile.`,
         );
       }
 
@@ -533,7 +553,7 @@ export async function runMissionReconcile(
             preReconcileSha?: string;
           };
           if (prevReport.preReconcileSha) {
-            // Reset cache clone to pre-reconcile state before re-applying patches
+            // RFC-0568: Reset cache clone to pre-reconcile state before re-merging
             try {
               execSync(`git reset --hard ${prevReport.preReconcileSha}`, {
                 cwd: systemDir,
@@ -552,156 +572,97 @@ export async function runMissionReconcile(
         }
       }
 
-      // Generate patches from workpiece (all commits from root)
-      const patchDir = path.join(evidenceDir, "patches");
-      if (existsSync(patchDir)) {
-        await fs.rm(patchDir, { recursive: true, force: true });
-      }
-      await fs.mkdir(patchDir, { recursive: true });
+      // RFC-0568: Determine workpiece branch dynamically (not hardcoded "master")
+      const workpieceBranch = execSync("git rev-parse --abbrev-ref HEAD", {
+        cwd: workpieceDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      }).trim();
 
+      // Fetch workpiece commits into cache clone's object database
+      execSync(`git fetch ${JSON.stringify(workpieceDir)} ${JSON.stringify(workpieceBranch)}`, {
+        cwd: systemDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      });
+
+      // Merge with --no-ff to preserve all individual commits and create an explicit merge commit
+      const mergeMessage = `reconcile mission ${missionId}`;
       try {
-        // RFC-0480: only transfer operator edit commits, not the materialize root commit.
-        // The cache clone already has the full site content; applying the materialize
-        // commit would conflict with every file. Skip the root commit and transfer
-        // only the delta (operator edits + any post-materialize commits).
-        const rootSha = execSync("git rev-list --max-parents=0 HEAD", {
-          cwd: workpieceDir,
-          stdio: "pipe",
-          encoding: "utf-8",
-        }).trim();
-        execSync(`git format-patch ${rootSha}..HEAD -o ${JSON.stringify(patchDir)}`, {
-          cwd: workpieceDir,
+        execSync(`git merge --no-ff FETCH_HEAD -m ${JSON.stringify(mergeMessage)}`, {
+          cwd: systemDir,
           stdio: "pipe",
           encoding: "utf-8",
         });
       } catch (err) {
-        throw new Error(`[mission.reconcile] git format-patch failed: ${(err as Error).message}`);
+        throw new Error(
+          `[mission.reconcile] git merge --no-ff failed: ${(err as Error).message}.\n` +
+            `Resolve conflicts in the workpiece (not the cache clone), commit via mission.git.commit, then re-run reconcile.\n` +
+            `Reconcile is idempotent — it will reset the cache clone to preReconcileSha and re-merge.`,
+        );
       }
 
-      // Apply patches to cache clone
-      const patchFiles = await fs.readdir(patchDir).catch(() => []);
-      if (patchFiles.length > 0) {
+      commitSha = execSync("git rev-parse HEAD", {
+        cwd: systemDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      }).trim();
+
+      mergeCommitSha = execSync("git rev-parse HEAD^1", {
+        cwd: systemDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      }).trim();
+
+      // Count transferred commits (commits in FETCH_HEAD not in preReconcileSha)
+      if (preReconcileSha) {
         try {
-          // Remove tracked files that match .gitignore before applying patches
-          try {
-            execSync(
-              "git rm --cached --ignore-unmatch -r .env .env.production .env.main .env.alt '.env copy' .surface-cache/ 2>/dev/null || true",
-              { cwd: systemDir, stdio: "pipe", encoding: "utf-8" },
-            );
-          } catch {
-            // No tracked files matching these paths — non-fatal
-          }
-
-          for (const patchFile of patchFiles.sort()) {
-            const patchPath = path.join(patchDir, patchFile);
-            try {
-              execSync(`git am --whitespace=fix ${JSON.stringify(patchPath)}`, {
-                cwd: systemDir,
-                stdio: "pipe",
-                encoding: "utf-8",
-              });
-            } catch (err) {
-              // RFC-0522: plain git am failed — abort and retry with 3-way merge
-              try {
-                execSync("git am --abort", { cwd: systemDir, stdio: "pipe", encoding: "utf-8" });
-              } catch {
-                // No am session to abort — continue
-              }
-              try {
-                execSync(`git am --3way --whitespace=fix ${JSON.stringify(patchPath)}`, {
-                  cwd: systemDir,
-                  stdio: "pipe",
-                  encoding: "utf-8",
-                });
-                logger.info(`  Applied ${patchFile} via 3-way merge fallback`);
-              } catch (err3way) {
-                // Auto-resolve add/add conflicts on generated files by taking
-                // the workpiece version (theirs). Generated files are
-                // deterministic outputs — the workpiece version is always
-                // authoritative because it was produced by the latest
-                // build.prepare run.
-                try {
-                  const statusOutput = execSync("git diff --name-only --diff-filter=U", {
-                    cwd: systemDir,
-                    stdio: "pipe",
-                    encoding: "utf-8",
-                  }).trim();
-                  if (statusOutput) {
-                    const conflictFiles = statusOutput.split("\n").filter(Boolean);
-                    for (const cf of conflictFiles) {
-                      execSync(`git checkout --theirs -- ${JSON.stringify(cf)}`, {
-                        cwd: systemDir,
-                        stdio: "pipe",
-                        encoding: "utf-8",
-                      });
-                      execSync(`git add -- ${JSON.stringify(cf)}`, {
-                        cwd: systemDir,
-                        stdio: "pipe",
-                        encoding: "utf-8",
-                      });
-                    }
-                    execSync("GIT_EDITOR=true git am --continue", {
-                      cwd: systemDir,
-                      stdio: "pipe",
-                      encoding: "utf-8",
-                    });
-                    logger.info(
-                      `  Applied ${patchFile} after auto-resolving ${conflictFiles.length} conflict(s) on: ${conflictFiles.join(", ")}`,
-                    );
-                  } else {
-                    throw new Error("no unmerged files found despite am failure");
-                  }
-                } catch (errResolve) {
-                  try {
-                    execSync("git am --abort", {
-                      cwd: systemDir,
-                      stdio: "pipe",
-                      encoding: "utf-8",
-                    });
-                  } catch {
-                    // ignore
-                  }
-                  throw new Error(
-                    `[mission.reconcile] git am conflict on patch ${patchFile} (plain, 3-way, and auto-resolve all failed): ${(err3way as Error).message}. Resolve conflicts in workpiece and re-run reconcile.`,
-                  );
-                }
-              }
-            }
-          }
-
-          commitSha = execSync("git rev-parse HEAD", {
+          const countOutput = execSync(`git rev-list --count ${preReconcileSha}..FETCH_HEAD`, {
             cwd: systemDir,
             stdio: "pipe",
             encoding: "utf-8",
           }).trim();
-
-          // Push to origin so the next materialize's syncCacheClone preserves reconciled changes
-          const branch = execSync("git rev-parse --abbrev-ref HEAD", {
-            cwd: systemDir,
-            stdio: "pipe",
-            encoding: "utf-8",
-          }).trim();
-          try {
-            execSync(`git push origin ${branch}`, {
-              cwd: systemDir,
-              stdio: "pipe",
-              timeout: 30_000,
-            });
-          } catch {
-            logger.info(`  Push failed (non-fatal) — next sync will catch up`);
-          }
-
-          logger.info(
-            `  Applied ${patchFiles.length} patch(es) to cache clone (${commitSha.slice(0, 8)})`,
-          );
-        } catch (err) {
-          if (err instanceof Error && err.message.includes("git am conflict")) {
-            throw err;
-          }
-          logger.info(`  Patch application failed: ${(err as Error).message}`);
+          transferredCommits = parseInt(countOutput, 10);
+        } catch {
+          transferredCommits = 0;
         }
-      } else {
-        logger.info(`  No patches generated — workpiece has no commits`);
+      }
+
+      logger.info(
+        `  Merged ${transferredCommits} commit(s) from workpiece to cache clone (${commitSha.slice(0, 8)})`,
+      );
+
+      // RFC-0568: Push to origin with retry (non-fatal, 3 attempts, exponential backoff)
+      const branch = execSync("git rev-parse --abbrev-ref HEAD", {
+        cwd: systemDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      }).trim();
+
+      const pushBackoffMs = [1000, 2000, 4000];
+      let pushSucceeded = false;
+      for (let attempt = 0; attempt < pushBackoffMs.length; attempt++) {
+        try {
+          execSync(`git push origin ${JSON.stringify(branch)}`, {
+            cwd: systemDir,
+            stdio: "pipe",
+            timeout: 30_000,
+          });
+          pushSucceeded = true;
+          break;
+        } catch {
+          if (attempt < pushBackoffMs.length - 1) {
+            logger.info(
+              `  Push attempt ${attempt + 1} failed — retrying in ${pushBackoffMs[attempt]}ms…`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, pushBackoffMs[attempt]));
+          }
+        }
+      }
+      if (!pushSucceeded) {
+        logger.info(
+          `  Push failed after ${pushBackoffMs.length} attempts (non-fatal) — next sync will catch up`,
+        );
       }
     } else {
       // No git in system dir — fall back to copyDir for non-git Sternsystems
@@ -726,6 +687,8 @@ export async function runMissionReconcile(
       commitSha,
       preReconcileSha,
       reconciledAt: now,
+      mergeCommitSha,
+      transferredCommits,
       message,
       copiedPaths,
     };
@@ -746,7 +709,7 @@ export async function runMissionReconcile(
         preReconcileSha,
         reconciledAt: now,
       },
-      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? commitSha.slice(0, 8) : "no git"})`,
+      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"})`,
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);
