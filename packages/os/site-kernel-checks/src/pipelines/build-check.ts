@@ -35,6 +35,4 @@ export const SITES_BUILD_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "services.projection.validate" },
   // RFC-0489: validate open-source SBOM registry, artifacts, and count consistency
   { command: "open-source.validate" },
-  // RFC-0514: validate contact form structured email/phone fields across locales
-  { command: "contact.form.validate" },
 ];

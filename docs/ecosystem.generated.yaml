@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 52d7debe8de8402ab85b1ab00623d2dc2e9487a9c99c04b53a1b15af67f6192c
+  contentHash: 965f6eb9846e86c2fd6a3155b53dde977a9846016a065cf3d0f0bf819fa804d7
   sources:
     - path: docs/architecture-dna.md
       hash: 738946b5871fd9857cebae096f7d2b7798389628f182d9d6a6004f848ac2804a
@@ -55,7 +55,7 @@ meta:
     - path: packages/fingerprint/package.json
       hash: a4514b6afac4ed0d360cf62e743fc56ccdc0f3302acbe010adc2a1fc70a38bde
     - path: packages/forge/package.json
-      hash: d9c8f2e03eea551d370b152c994b018f294943fc3de133d182b99c2d67d0990b
+      hash: 3717d441025866ee18439e9137913b58208fa12dcf15a06c2ca27f974fdaa91e
     - path: packages/geo/package.json
       hash: 95a96296c9b96a284649022d8d73689a2c78616c087813d18f57f12594c63197
     - path: packages/growth-adapter-matomo/package.json
@@ -147,7 +147,7 @@ meta:
     - path: packages/tokens/package.json
       hash: 9d66afb9097510e178a4a475c8573fd76c8e3f66722a3b3a7d61c5fc20dc9b37
     - path: packages/ui/package.json
-      hash: 1c12b0e50298c7038692e5a18ca78ec7ae79ec219cec991af602ae193e4f069d
+      hash: b7f6b35179434da181c77ecb9485fd70445c5cff29a2215f4aeb5f89c091b057
     - path: packages/warpgogol-skills/package.json
       hash: cc7f8653664f860321e3cf2376dd2c411a88dce92dc9e6dc9384b104c2e80caf
     - path: pnpm-workspace.yaml
@@ -167,7 +167,7 @@ meta:
     - path: services/telegram-alert-bridge/package.json
       hash: 228295f8b0883facdd44d9d237a1d7bec9e1680f74e7ee5b7b94c0ccb41a050a
     - path: tools/kernel.config.ts
-      hash: eb6e5f06704f045715ccea33bb8807d9dec19b0f7ceee8e5d2adab11c29fe0c3
+      hash: 731146ea89c2290953e51c5cd06855d1d3750c5b165b882e9d380c063e9fbed7
 workspace:
   name: warpgogol-platform
   version: 4.5.0
@@ -1237,6 +1237,7 @@ packages:
       - "@warpgogol/passport"
       - "@warpgogol/share"
       - astro
+      - github-slugger
       - micromark
       - micromark-extension-gfm
       - qrcode
@@ -2361,13 +2362,6 @@ commands:
       - workspace
   - name: constellation.contract.validate
     scope: workspace
-    mutatesState: false
-    supportsAllSites: true
-    providers:
-      - site
-      - workspace
-  - name: contact.form.validate
-    scope: app
     mutatesState: false
     supportsAllSites: true
     providers:
@@ -4038,6 +4032,12 @@ commands:
       - site
       - workspace
   - name: mission.abort
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: mission.archive
     scope: workspace
     mutatesState: true
     supportsAllSites: false
@@ -6372,6 +6372,13 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
+  - command: mission.archive
+    proposedBy:
+      - RFC-0573
+    addedBy:
+      - RFC-0573
+    changedBy: []
+    removedBy: []
   - command: mission.close
     proposedBy: []
     addedBy: []
@@ -6395,6 +6402,7 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0568
+      - RFC-0574
     removedBy: []
   - command: mission.open
     proposedBy: []
@@ -6408,6 +6416,7 @@ commandProvenance:
     changedBy:
       - RFC-0560
       - RFC-0568
+      - RFC-0574
     removedBy: []
   - command: mission.status
     proposedBy: []
@@ -6427,11 +6436,18 @@ commandProvenance:
     changedBy:
       - RFC-0561
     removedBy: []
+  - command: sternsystem.sync
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0574
+    removedBy: []
   - command: sternsystem.validate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0561
+      - RFC-0574
     removedBy: []
   - command: surface.generate
     proposedBy: []
@@ -6703,7 +6719,6 @@ pipelines:
       - print.layout.validate
       - services.projection.validate
       - open-source.validate
-      - contact.form.validate
     executableFromRoot: false
   - name: build.post
     scope: app
@@ -7684,7 +7699,7 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 3
+  accepted: 4
   implemented: 17
   draft: 4
   reviewing: 0
@@ -7835,11 +7850,12 @@ baseline:
       - RFC-0179
       - RFC-0305
       - RFC-0572
+      - RFC-0573
     draft:
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0573
+      - RFC-0574
     reviewing: []
     superseded: []
     rejected: []

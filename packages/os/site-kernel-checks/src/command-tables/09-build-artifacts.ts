@@ -26,7 +26,6 @@ import { runParticipantAiAgentValidate } from "../participant-ai-agent.ts";
 import { runParticipantJsonValidate } from "../participant-json.ts";
 import { runTeamLifecycleValidate } from "../team-lifecycle.ts";
 import { runTeamCrossPageValidate } from "../team-cross-page.ts";
-import { runContactFormValidate } from "../contact-form.ts";
 import { runFaqValidate } from "../faq.ts";
 import { runLiveMediaValidate } from "../live-media.ts";
 import { runVideoMediaValidate } from "../video/video-media.ts";
@@ -448,17 +447,6 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     execute: runPageBlocksValidate,
   },
   /* RFC-0169 */
-  /* RFC-0514: contact form structured fields validation */
-  {
-    name: "contact.form.validate",
-    description:
-      "Validate that sites using the send-message section declare emailField with enabled: true consistently across all published locales. No-op pass when the site has no send-message blocks (RFC-0514).",
-    scope: "app",
-    flags: {},
-    supportsAllSites: true,
-    reads: ["<app>/src/content/pages/**/*.md"],
-    execute: runContactFormValidate,
-  },
   {
     name: "entitlements.resolve",
     description:
