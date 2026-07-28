@@ -24,6 +24,7 @@ import { runSemanticDriftValidation } from "../checks/semantic-drift.ts";
 import { runContentVoiceLint } from "../content-voice.ts";
 import { runPbpContentValidate } from "../content-pbp.ts";
 import { runContentReferencesValidate } from "../content-references.ts";
+import { runContentFormulaLint } from "../content-formula-lint.ts";
 import { runB2bModelValidate } from "../b2b-model.ts";
 import { runEffectsContractValidate, runEffectsCoverageAudit } from "../effects-contract.ts";
 import { runContentCoverageValidate } from "../content-coverage.ts";
@@ -101,6 +102,17 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<site>/src/content/business-profile/**/*.md"],
     execute: runPbpContentValidate,
+  },
+  {
+    name: "content.formula.lint",
+    description:
+      "Detect hardcoded arithmetic patterns next to content references and suggest =(...) formula replacement (RFC-0570). Warn-level: never fails builds.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/src/content/**/*.md"],
+    cacheable: false,
+    execute: runContentFormulaLint,
   },
   {
     name: "content.references.validate",

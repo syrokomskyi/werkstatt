@@ -260,6 +260,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   // RFC-0073: content discipline validators
   { command: "pbp.content.validate" },
   { command: "offer.capacity.validate" },
+  // RFC-0570: warn-level hardcoded formula detection (before reference validation)
+  { command: "content.formula.lint" },
   { command: "content.references.validate" },
   // RFC-0487: B2B-only business model compliance (no-op when businessModel absent)
   { command: "b2b.model.validate" },
