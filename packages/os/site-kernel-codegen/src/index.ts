@@ -72,6 +72,9 @@ export { runContentRefIndexGenerate } from "./content-ref-index-generate.ts";
 // RFC-0529: content reference brace→braceless migrator
 export { runContentRefMigrate } from "./content-ref-migrate.ts";
 
+// RFC-0570: hardcoded formula → =(...) syntax migrator
+export { runContentFormulaMigrate } from "./content-formula-migrate.ts";
+
 // RFC-0262: manifest propsSchema -> generated TypeScript prop types
 export {
   runPropsTypesGenerate,

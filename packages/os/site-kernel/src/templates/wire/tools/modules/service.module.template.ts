@@ -11,6 +11,7 @@
   <item>RFC-0527: added content.ref-index.generate command.</item>
   <item>RFC-0528: updated material.metadata.write description, writes, and reads for manifest-based discovery.</item>
   <item>RFC-0529: added content.ref-migrate command.</item>
+  <item>RFC-0570: added content.formula.migrate command.</item>
 </CHANGE_SUMMARY>
 */
 import type { KernelModule } from "@warpgogol/site-kernel";
@@ -22,6 +23,7 @@ import {
   runMaterialMetadataWrite,
   runContentRefIndexGenerate,
   runContentRefMigrate,
+  runContentFormulaMigrate,
 } from "@warpgogol/site-kernel-codegen";
 
 export const serviceModule: KernelModule = {
@@ -125,6 +127,18 @@ export const serviceModule: KernelModule = {
       reads: ["<app>/src/content/**/*.md", "<app>/src/content/**/*.yaml"],
       flags: {},
       execute: runContentRefMigrate,
+    });
+    registry.registerCommand({
+      name: "content.formula.migrate",
+      description:
+        "Convert hardcoded arithmetic patterns next to content references to =(...) formula syntax in src/content/ (RFC-0570). Manual command — not in any pipeline. Idempotent.",
+      scope: "app",
+      mutatesState: true,
+      cacheable: false,
+      writes: ["<app>/src/content/**/*.md"],
+      reads: ["<app>/src/content/**/*.md"],
+      flags: {},
+      execute: runContentFormulaMigrate,
     });
   },
 };
