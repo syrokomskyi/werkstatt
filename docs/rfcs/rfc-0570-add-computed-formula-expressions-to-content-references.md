@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
+enhancedAt: 2026-07-28
 implementedAt:
 closedAt:
 supersedes: []
@@ -62,6 +63,7 @@ nonGoals:
   - "Automatic migration of all hardcoded arithmetic in existing content (manual content.formula.migrate only)"
   - "Support for non-arithmetic expressions (string concatenation, conditionals, date math)"
   - "Client-side runtime formula evaluation (build-time/SSG only)"
+  - "Locale-aware result formatting with thousands separators (formula output is a bare number; locale formatting is a future concern)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -120,31 +122,29 @@ Two new commands are introduced:
 - **RFC-0045 (content data references):** Extends the reference syntax with a new expression form. Does not change existing braceless reference behavior.
 - **RFC-0527 (content reference index):** Reuses the same generated index — no new index format needed.
 - **RFC-0529 (braceless migration):** The `=(...)` delimiter does not conflict with braceless syntax or the `BRACE_RESIDUAL_PATTERN` validator — `=` prefix is unambiguous and not a valid braceless reference start.
-- **Site OS operator model:** Resolution lives in `@warpgogol/share` (same as existing references). Validation lives in `@warpgogol/site-kernel-checks`. Migration lives in `@warpgogol/site-kernel-codegen`. Same module placement as RFC-0529.
+- **Site OS operator model:** Resolution and formula detection logic live in `@warpgogol/share` (same as the existing resolver). Validation lives in `@warpgogol/site-kernel-checks`. Migration lives in `@warpgogol/site-kernel-codegen`. Both `site-kernel-checks` and `site-kernel-codegen` import `scanFormulas` from `@warpgogol/share/formula-eval` — no cross-OS-package dependency (`site-kernel-codegen` does not depend on `site-kernel-checks`).
 
 ## Design
 
 ### CLI surface
 
 ```sh
-# Detect hardcoded arithmetic next to content references (warn in build.check)
-pnpm exec site-kernel run content.formula.lint --site warpgogol-com
+# Detect hardcoded arithmetic next to content references (warn in sites-check-author)
+pnpm exec site-kernel run content.formula.lint --app warpgogol-com
 
 # Convert detected hardcoded formulas to =(...) syntax (manual, writes files)
-pnpm exec site-kernel run content.formula.migrate --site warpgogol-com
+pnpm exec site-kernel run content.formula.migrate --app warpgogol-com
 
 # Existing validator now also checks formula expressions
-pnpm exec site-kernel run content.references.validate --site warpgogol-com
+pnpm exec site-kernel run content.references.validate --app warpgogol-com
 ```
 
-All three commands are site-scoped (`--site <id>`). `content.formula.lint` is read-only and integrates into `build.check` as a warn-level check. `content.formula.migrate` is a manual write command (not in build pipeline).
+All three commands are app-scoped (`--app <id>`), matching the existing `content.references.validate` command scope. `content.formula.lint` is read-only and integrates into `sites-check-author` (the same pipeline that runs `content.references.validate`) as a warn-level check. `content.formula.migrate` is a manual write command (not in any pipeline).
 
 ### TypeScript contracts
 
 ```ts
-// @warpgogol/share/content-reference.ts — extended
-
-const FORMULA_PATTERN = /=\(([^)]+)\)/g;
+// @warpgogol/share/formula-eval.ts — new module
 
 interface FormulaResolution {
   value: string;
@@ -152,10 +152,13 @@ interface FormulaResolution {
   error?: string; // REF-04..07
 }
 
-// Extracts a numeric value from a field string like "200 €" → 200
+// Extracts a numeric value from a field string like "200 €" → 200.
+// Handles: leading number, thin-space/period/comma thousands separators,
+// comma decimal separator (German), negative numbers.
 function extractNumeric(value: unknown): number | null;
 
-// Evaluates a formula expression after substituting all references
+// Evaluates a formula expression after substituting all references.
+// Uses expr-eval for sandboxed arithmetic.
 function resolveFormula(
   index: ContentRefIndex,
   expression: string,
@@ -163,8 +166,16 @@ function resolveFormula(
   defaultLang: string,
 ): FormulaResolution;
 
-// Extended resolveReferencesInString now also scans for =(...) patterns
-// and delegates to resolveFormula for each match.
+// Scans text for =(...) patterns using a paren-depth counter (not a single
+// regex) to handle nested parentheses: =(a + (b * c)) is matched correctly.
+// Returns an array of { start, end, expression } for each formula found.
+function scanFormulas(text: string): Array<{ start: number; end: number; expression: string }>;
+
+// @warpgogol/share/content-reference.ts — extended
+// resolveReferencesInString now calls scanFormulas first; for each formula
+// found, it delegates to resolveFormula and replaces the =(...) span.
+// Strings without =( are unaffected — the scan is O(n) and only fires
+// when the text contains "=(".
 ```
 
 ### File system responsibilities
@@ -172,10 +183,11 @@ function resolveFormula(
 | Path | Role |
 | --- | --- |
 | `packages/share/src/content-reference.ts` | Extended resolver — formula detection, evaluation, substitution |
-| `packages/share/src/formula-eval.ts` | New — numeric extraction + `expr-eval` wrapper |
+| `packages/share/src/formula-eval.ts` | New — `extractNumeric`, `resolveFormula`, `scanFormulas` (shared by lint + migrate) |
+| `packages/share/package.json` | New `./formula-eval` subpath export entry + `expr-eval` dependency |
 | `packages/os/site-kernel-checks/src/content-references.ts` | Extended validator — REF-04..07 error codes |
-| `packages/os/site-kernel-checks/src/content-formula-lint.ts` | New — hardcoded formula detector (reused by migrate) |
-| `packages/os/site-kernel-codegen/src/content-formula-migrate.ts` | New — imports lint detector, writes converted content |
+| `packages/os/site-kernel-checks/src/content-formula-lint.ts` | New — hardcoded formula detector (imports `scanFormulas` from `@warpgogol/share`) |
+| `packages/os/site-kernel-codegen/src/content-formula-migrate.ts` | New — imports `scanFormulas` from `@warpgogol/share`, writes converted content |
 | `src/content/pages/{lang}/*.md` | Scanned by lint; modified by migrate |
 | `src/content/prose/{lang}/*.md` | Scanned by lint; modified by migrate |
 | `src/content-ref-index.generated.yaml` | Read (unchanged, RFC-0527 format) |
@@ -246,11 +258,11 @@ Error codes:
 
 - **Formula resolver (`@warpgogol/share`):** Ships as a non-breaking extension to `resolveReferencesInString`. Strings without `=(...)` are unaffected — existing apps work identically until authors use the new syntax.
 - **`content.references.validate` extension:** REF-04..07 errors only fire when `=(...)` formulas are present. Existing content without formulas passes unchanged.
-- **`content.formula.lint`:** Warn-level in `build.check` from day one. Does not fail builds. Detects hardcoded arithmetic patterns (e.g., `ref + ref × N = number`) and suggests `=(...)` replacement.
+- **`content.formula.lint`:** Warn-level in `sites-check-author` (same pipeline as `content.references.validate`) from day one. Does not fail builds. Detects hardcoded arithmetic patterns (e.g., `ref + ref × N = number`) and suggests `=(...)` replacement.
 - **`content.formula.migrate`:** Manual command — not in any pipeline. Operators run it explicitly to convert detected hardcoded formulas.
 - **New apps:** Automatically compliant — no formulas to migrate, `=(...)` syntax available from day one.
 - **Existing apps (warpgogol-com):** `content.formula.lint` warns about existing hardcoded formulas in `digitales-fundament.md`. Operator runs `content.formula.migrate` to convert them. No flag day required.
-- **`expr-eval` dependency:** Added to `packages/share/package.json`. No breaking change to existing dependencies.
+- **`expr-eval` dependency:** Added to `packages/share/package.json` dependencies. If `expr-eval` does not ship TypeScript types, a `devDependency` on `@types/expr-eval` or a custom `.d.ts` declaration in `packages/share/src/types/` is needed. No breaking change to existing dependencies.
 
 ## Alternatives considered
 
@@ -267,22 +279,23 @@ Error codes:
 ## Risks
 
 - **False positives in `content.formula.lint`:** The hardcoded formula detector may flag prose that coincidentally contains `ref + ref = number` patterns without being a formula. Mitigation: warn-level only, human reviews before running migrate.
-- **Numeric extraction edge cases:** `extractNumeric` must handle formats like `"1 040 €"` (thin space thousands separator), `"1.040 €"` (German thousands separator), `"70 €/Monat"`. If extraction fails, REF-05 is reported — the author fixes the field format or uses a different field.
+- **Numeric extraction edge cases:** `extractNumeric` must handle formats like `"1 040 €"` (thin space thousands separator), `"1.040 €"` (German thousands separator), `"70,50 €"` (German decimal separator), `"-200 €"` (negative numbers), `"70 €/Monat"`. If extraction fails, REF-05 is reported — the author fixes the field format or uses a different field. The formula result is a bare number (e.g., `1040`); the unit suffix is authored after the `=(...)` expression (e.g., `=(...) €`). Locale-aware thousands-separator formatting of the result is a non-goal (future RFC may integrate `formatNumber` from `@warpgogol/share/counter-utils`).
 - **`expr-eval` dependency:** Adds a runtime dependency to `@warpgogol/share`. The package is small (2KB), has no transitive dependencies, and is sandboxed (no `eval`). Low risk.
 - **Agent misinterpretation:** Agents may confuse `=(...)` formula syntax with YAML frontmatter or Astro expressions. Mitigation: the `=(...)` prefix is documented as content-reference-only syntax, not valid YAML or Astro. Implementation notes below explicitly state the scope.
-- **Performance:** Formula evaluation adds one regex scan + one `expr-eval` parse per string with `=(...)`. Negligible — only fires when the pattern is present, which is rare.
+- **Performance:** `scanFormulas` is O(n) per string and only fires when the text contains `"=("` — a fast preliminary check avoids the scan for the vast majority of strings that have no formula. `expr-eval` parsing only runs on matched formula expressions. Negligible cost — formulas are rare in content.
 
 ## Acceptance criteria
 
 - [ ] `@warpgogol/share/content-reference.ts` recognizes `=(...)` formula syntax and evaluates it using `expr-eval` with numeric extraction from field strings
-- [ ] `@warpgogol/share/formula-eval.ts` exports `extractNumeric()` and `resolveFormula()` with unit tests covering: numeric prefix extraction, thin-space/period thousands separators, non-numeric values (returns null), division by zero, syntax errors
+- [ ] `@warpgogol/share/formula-eval.ts` exports `extractNumeric()`, `resolveFormula()`, and `scanFormulas()` with unit tests covering: numeric prefix extraction, thin-space/period/comma thousands separators, comma decimal separator (German), negative numbers, non-numeric values (returns null), division by zero, syntax errors, nested parentheses in `scanFormulas`
+- [ ] `packages/share/package.json` has a `./formula-eval` entry in `exports` and `expr-eval` in `dependencies` (with `@types/expr-eval` or custom `.d.ts` if needed)
 - [ ] `content.references.validate` reports REF-04 (unresolved formula ref), REF-05 (non-numeric operand), REF-06 (syntax error), REF-07 (division by zero) as errors
-- [ ] `content.formula.lint` command registered in `site-kernel-checks`, detects hardcoded arithmetic patterns next to content references, outputs warnings in `--json` format
-- [ ] `content.formula.migrate` command registered in `site-kernel-codegen`, imports the lint detector (no duplicated detection logic), writes converted `=(...)` syntax to content files
-- [ ] `content.formula.lint` integrated into `build.check` as warn-level check
-- [ ] `expr-eval` declared in `packages/share/package.json` dependencies
+- [ ] `content.formula.lint` command registered in `site-kernel-checks`, imports `scanFormulas` from `@warpgogol/share/formula-eval`, detects hardcoded arithmetic patterns next to content references, outputs warnings in `--json` format
+- [ ] `content.formula.migrate` command registered in `site-kernel-codegen`, imports `scanFormulas` from `@warpgogol/share/formula-eval` (no cross-OS-package dependency on `site-kernel-checks`), writes converted `=(...)` syntax to content files
+- [ ] `content.formula.lint` integrated into `sites-check-author` pipeline as warn-level check
 - [ ] Existing apps without `=(...)` formulas pass `content.references.validate` unchanged (non-breaking)
-- [ ] `AGENTS.md` updated with `=(...)` formula syntax documentation in the content references section
+- [ ] `packages/share/AGENTS.md` updated with `=(...)` formula syntax documentation in the content-reference entry-point table row
+- [ ] `docs/source-markup.xml` updated with the new `packages/share/src/formula-eval.ts` source file entry (Compass sync)
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
