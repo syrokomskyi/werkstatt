@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review — @warpgogol/star-map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam { stroke-dasharray: 4 4; }
+      .leak { stroke: #dc2626; }
+      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-4">
+        <h1 class="text-3xl font-bold tracking-tight">Architecture review — @warpgogol/star-map</h1>
+        <div class="flex items-center gap-4 text-sm text-slate-500">
+          <span>2026-07-14</span>
+          <span>·</span>
+          <span>warpgogol monorepo</span>
+        </div>
+        <div class="flex items-center gap-6 text-xs text-slate-400">
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+        <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+          <h2 class="text-xl font-semibold">Extract SVG rendering into a dedicated SvgRenderer module</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
+            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+          </div>
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/star-map/src/render.ts:183-260</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[render.ts 289 lines] --> B[manifestToStarMapInput]
+                    A --> C[buildGraph]
+                    A --> D[svgNode: inline SVG string]
+                    A --> E[svgEdge: inline SVG string]
+                    A --> F[NODE_RADII / NODE_COLORS constants]
+                    A --> G[renderStarMap: assemble SVG]
+                    A --> H[emitStarMap: write file]
+                    A --> I[escapeXml helper]
+                </pre>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[render.ts] --> B[manifestToStarMapInput adapter]
+                    A --> C[buildGraph]
+                    D[SvgRenderer.ts] --> E[renderNode]
+                    D --> F[renderEdge]
+                    D --> G[style constants]
+                    A --> D
+                    A --> H[emitStarMap: write file]
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p><strong class="text-slate-700">Problem:</strong> <code>render.ts</code> is 289 lines mixing the manifest adapter, graph construction, SVG string generation (node/edge helpers, style constants, XML escaping), file I/O, and the public API — the SVG rendering logic is the largest chunk and has no testable seam.</p>
+            <p><strong class="text-slate-700">Solution:</strong> Extract an <code>SvgRenderer</code> module that owns <code>svgNode</code>, <code>svgEdge</code>, style constants, and <code>escapeXml</code>; <code>render.ts</code> calls <code>renderer.render(graph, positions, dimensions)</code> and remains responsible for the adapter and file emission.</p>
+          </div>
+          <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
+            <li><strong>locality:</strong> SVG generation in one module</li>
+            <li><strong>leverage:</strong> renderer testable in isolation</li>
+            <li><strong>depth:</strong> render.ts interface stays narrow</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
+        <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
+        <p class="text-sm text-slate-300">Extract <code>SvgRenderer</code> — the 289-line render module mixes too many concerns; the SVG generation is the largest body and has no testable interface. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review — @webgogol/forge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam { stroke-dasharray: 4 4; }
+      .leak { stroke: #dc2626; }
+      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-4">
+        <h1 class="text-3xl font-bold tracking-tight">Architecture review — @webgogol/forge</h1>
+        <div class="flex items-center gap-4 text-sm text-slate-500">
+          <span>2026-07-14</span>
+          <span>·</span>
+          <span>warpgogol monorepo</span>
+        </div>
+        <div class="flex items-center gap-6 text-xs text-slate-400">
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+        <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+          <h2 class="text-xl font-semibold">Auto-discover FORGE_SKILLS from SKILL.md frontmatter instead of hand-maintaining a 375-line array</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
+            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+          </div>
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/forge/src/registry.ts:111-374</div>
+            <div>packages/forge/src/registry.ts:64-109 (discoverPackSkills)</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[FORGE_SKILLS array 375 lines] --> B[29 hand-typed entries]
+                    B --> C[name, category, concerns, dependsOn, path]
+                    D[discoverPackSkills] --> E[scan dir + parse frontmatter]
+                    D -.leak.-> F[different discovery path for same concept]
+                    classDef leak stroke:#dc2626,stroke-width:2px;
+                    class F leak
+                </pre>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[discoverSkills root] --> B[scan skills/ dir]
+                    B --> C[parse SKILL.md frontmatter]
+                    C --> D[ForgeSkillEntry[]]
+                    E[discoverPackSkills] --> F[scan pack dir]
+                    F --> G[PackSkillEntry[]]
+                    A -.seam.-> E
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p><strong class="text-slate-700">Problem:</strong> <code>FORGE_SKILLS</code> is a 375-line hand-maintained array of 29 skill entries — every skill's name, category, concerns, dependsOn, and path are duplicated here and in the <code>SKILL.md</code> frontmatter, while <code>discoverPackSkills</code> already proves runtime discovery from frontmatter works.</p>
+            <p><strong class="text-slate-700">Solution:</strong> Unify discovery: <code>discoverSkills</code> scans <code>skills/</code> and parses <code>SKILL.md</code> frontmatter (same logic as <code>discoverPackSkills</code>); <code>FORGE_SKILLS</code> becomes a cached call to <code>discoverSkills(forgeRoot)</code>; the hand-maintained array is deleted.</p>
+          </div>
+          <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
+            <li><strong>locality:</strong> skill metadata in one source (frontmatter)</li>
+            <li><strong>leverage:</strong> one discovery function, forge + pack skills</li>
+            <li><strong>depth:</strong> registry.ts interface shrinks by 260 lines</li>
+          </ul>
+        </article>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+          <h2 class="text-xl font-semibold">Split index.ts into focused sub-barrels by concern</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
+            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+          </div>
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/forge/src/index.ts:1-139</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
+                <div class="text-xs text-slate-500">One barrel exports types, utils, config, profiles, validators, CLI output, onboarding, migration adapters, and 11 OS modules</div>
+                <div class="flex flex-col gap-1 text-xs">
+                  <div class="rounded border border-slate-200 px-2 py-1">types (20 exports)</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">utils (10 exports)</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">config (12 exports)</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">onboarding (5 exports)</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">migration adapters (7 exports)</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">OS modules (11 exports)</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
+                <div class="text-xs text-slate-500">Focused sub-barrels by concern</div>
+                <div class="flex flex-col gap-1 text-xs">
+                  <div class="rounded deep text-slate-100 px-2 py-1">/types → canonical types</div>
+                  <div class="rounded deep text-slate-100 px-2 py-1">/config → forge.yaml + bindings</div>
+                  <div class="rounded deep text-slate-100 px-2 py-1">/onboarding → init + scaffold + doctor</div>
+                  <div class="rounded deep text-slate-100 px-2 py-1">/os → all ForgeModule exports</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p><strong class="text-slate-700">Problem:</strong> <code>index.ts</code> is 139 lines exporting 60+ symbols across 9 concerns — consumers that only need <code>ForgeModule</code> types or config helpers transitively pull in onboarding handlers, migration adapters, and validators.</p>
+            <p><strong class="text-slate-700">Solution:</strong> Add focused sub-barrels (<code>/types</code>, <code>/config</code>, <code>/onboarding</code>, <code>/os</code>); <code>index.ts</code> re-exports only the most common types; consumers import from the specific sub-barrel.</p>
+          </div>
+          <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
+            <li><strong>locality:</strong> each concern's exports in one barrel</li>
+            <li><strong>leverage:</strong> consumers import only what they need</li>
+            <li><strong>depth:</strong> index.ts interface shrinks</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
+        <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
+        <p class="text-sm text-slate-300">Auto-discover <code>FORGE_SKILLS</code> — the 375-line hand-maintained array duplicates frontmatter and <code>discoverPackSkills</code> already proves the pattern works. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+      </section>
+    </main>
+  </body>
+</html>

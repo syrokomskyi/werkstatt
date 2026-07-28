@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review — @warpgogol/geo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam { stroke-dasharray: 4 4; }
+      .leak { stroke: #dc2626; }
+      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-4">
+        <h1 class="text-3xl font-bold tracking-tight">Architecture review — @warpgogol/geo</h1>
+        <div class="flex items-center gap-4 text-sm text-slate-500">
+          <span>2026-07-14</span>
+          <span>·</span>
+          <span>warpgogol monorepo</span>
+        </div>
+        <div class="flex items-center gap-6 text-xs text-slate-400">
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+        <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+          <h2 class="text-xl font-semibold">Deepen resolveProviderEntries behind a strategy registry</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
+            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+          </div>
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/geo/src/service.ts:58-132</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[resolveProviderEntries] --> B{provider?}
+                    B -->|.countries| C[inline loop]
+                    B -->|.regions| D[inline loop]
+                    B -->|.cities| E[inline dedup+image]
+                    B -->|other| F[throw]
+                    classDef leak stroke:#dc2626,stroke-width:2px;
+                    class F leak
+                </pre>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[resolveProviderEntries] --> B[ProviderStrategy registry]
+                    B --> C[CountryStrategy]
+                    B --> D[RegionStrategy]
+                    B --> E[CityStrategy]
+                    B -.seam.-> F[register new axis]
+                    A --> G[unknown → throw]
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p><strong class="text-slate-700">Problem:</strong> <code>resolveProviderEntries</code> is a 70-line if/elif/else with three inline branches — each branch has different entry-construction, dedup, and localization logic, making the function shallow and hard to extend.</p>
+            <p><strong class="text-slate-700">Solution:</strong> Introduce a <code>ProviderStrategy</code> interface (one per axis); <code>resolveProviderEntries</code> does a registry lookup and delegates; adding a new geo axis means adding a strategy, not editing the dispatcher.</p>
+          </div>
+          <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
+            <li><strong>locality:</strong> each axis strategy in its own module</li>
+            <li><strong>leverage:</strong> one dispatch interface, N axes</li>
+            <li><strong>depth:</strong> providerEntries interface stays narrow</li>
+          </ul>
+        </article>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+          <h2 class="text-xl font-semibold">Register locale imports dynamically instead of hard-coding de/uk</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
+            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">local-substitutable</span>
+          </div>
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/geo/src/countries.ts:15-24</div>
+            <div>packages/geo/src/regions.ts:14-15</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
+                <div class="text-xs text-slate-500">Hard-coded imports for de + uk only</div>
+                <div class="flex flex-col gap-1 text-xs">
+                  <div class="rounded border border-slate-200 px-2 py-1">import deLocale from .../de.json</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">import ukLocale from .../uk.json</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">registeredLocales = Set(["de","uk"])</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
+                <div class="text-xs text-slate-500">Consumer injects locale registry</div>
+                <div class="rounded deep text-slate-100 px-3 py-2 text-xs">LocaleRegistry<br/><span class="text-slate-400">→ register(lang, localeData)</span><br/><span class="text-slate-400">→ getName(alpha2, lang)</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p><strong class="text-slate-700">Problem:</strong> <code>countries.ts</code> statically imports only <code>de</code> and <code>uk</code> locale JSON — adding a language requires editing this module and the <code>registeredLocales</code> set, even though <code>GeoServiceConfig.languages</code> already accepts arbitrary language codes.</p>
+            <p><strong class="text-slate-700">Solution:</strong> Accept a <code>LocaleRegistry</code> in <code>GeoServiceConfig</code>; consumers register the locales they need; <code>getCountry</code> uses the registry instead of module-level state.</p>
+          </div>
+          <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
+            <li><strong>locality:</strong> locale registration in one place</li>
+            <li><strong>leverage:</strong> config.languages works for any locale</li>
+            <li><strong>depth:</strong> countries module no longer owns locale state</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
+        <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
+        <p class="text-sm text-slate-300">Strategy registry for <code>resolveProviderEntries</code> — the 70-line if/elif is the package's largest shallow module and the most likely to grow. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+      </section>
+    </main>
+  </body>
+</html>

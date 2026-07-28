@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review — @warpgogol/observability</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam { stroke-dasharray: 4 4; }
+      .leak { stroke: #dc2626; }
+      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-4">
+        <h1 class="text-3xl font-bold tracking-tight">Architecture review — @warpgogol/observability</h1>
+        <div class="flex items-center gap-4 text-sm text-slate-500">
+          <span>2026-07-14</span>
+          <span>·</span>
+          <span>warpgogol monorepo</span>
+        </div>
+        <div class="flex items-center gap-6 text-xs text-slate-400">
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 border border-slate-400 rounded-sm"></span> module</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-dashed border-slate-400"></span> seam</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-0.5 border-t-2 border-red-600"></span> leakage</span>
+          <span class="flex items-center gap-1"><span class="inline-block w-4 h-3 rounded-sm deep"></span> deep module</span>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+        <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+          <h2 class="text-xl font-semibold">Deepen createMetricsPusher behind a transport seam</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium px-2.5 py-0.5">Strong</span>
+            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">mock</span>
+          </div>
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/observability/src/pusher.ts:75-205</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[createMetricsPusher 130 lines] --> B[resolveEnv]
+                    A --> C[detectEnvironment]
+                    A --> D[validateMetric]
+                    A --> E[addPoint]
+                    A --> F[flush: fetch POST]
+                    A -.leak.-> G[globalThis.process env reads]
+                    A -.leak.-> H[fetch + AbortController inline]
+                    classDef leak stroke:#dc2626,stroke-width:2px;
+                    class G,H leak
+                </pre>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4">
+                <pre class="mermaid">
+                  flowchart TD
+                    A[createMetricsPusher] --> B[MetricsAccumulator]
+                    B --> C[validate + addPoint]
+                    A --> D[OtlpTransport port]
+                    D --> E[HttpOtlpTransport: fetch]
+                    D -.seam.-> F[MockTransport for tests]
+                    A --> G[flush: encode + transport.send]
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p><strong class="text-slate-700">Problem:</strong> <code>createMetricsPusher</code> is a 130-line factory that mixes env detection, metric validation, point accumulation, OTLP encoding, and HTTP transport (<code>fetch</code> + <code>AbortController</code>) — untestable without network mocks.</p>
+            <p><strong class="text-slate-700">Solution:</strong> Extract an <code>OtlpTransport</code> interface (<code>send(body): Promise&lt;DeliveryResult&gt;</code>); <code>HttpOtlpTransport</code> wraps <code>fetch</code>; the pusher accumulates and validates, then delegates to the transport on <code>flush()</code>.</p>
+          </div>
+          <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
+            <li><strong>locality:</strong> HTTP transport in one adapter</li>
+            <li><strong>leverage:</strong> mock transport enables flush tests</li>
+            <li><strong>depth:</strong> pusher interface is accumulate + flush</li>
+          </ul>
+        </article>
+
+        <article class="rounded-xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+          <h2 class="text-xl font-semibold">Extract env detection into a dedicated resolver module</h2>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-0.5">Worth exploring</span>
+            <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-0.5">in-process</span>
+          </div>
+          <div class="font-mono text-sm text-slate-600 space-y-0.5">
+            <div>packages/observability/src/pusher.ts:46-73</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
+                <div class="text-xs text-slate-500">Env detection inline in pusher.ts</div>
+                <div class="flex flex-col gap-1 text-xs">
+                  <div class="rounded border border-slate-200 px-2 py-1">getGlobalProcess()</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">resolveEnv()</div>
+                  <div class="rounded border border-slate-200 px-2 py-1">detectEnvironment()</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</div>
+              <div class="rounded-lg border border-slate-200 bg-white p-4 space-y-2">
+                <div class="text-xs text-slate-500">Dedicated env-resolver module</div>
+                <div class="rounded deep text-slate-100 px-3 py-2 text-xs">EnvResolver<br/><span class="text-slate-400">→ resolve(): { endpoint, token, env }</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <p><strong class="text-slate-700">Problem:</strong> <code>getGlobalProcess</code>, <code>resolveEnv</code>, and <code>detectEnvironment</code> are private functions in <code>pusher.ts</code> that poke <code>globalThis.process</code> — env detection logic is coupled to the pusher factory and not reusable.</p>
+            <p><strong class="text-slate-700">Solution:</strong> Move them into a dedicated <code>env-resolver.ts</code> module; the pusher imports and calls <code>resolveEnv()</code>; other modules (e.g. conventions) can reuse the resolver.</p>
+          </div>
+          <ul class="list-disc list-inside text-sm space-y-0.5 text-slate-600">
+            <li><strong>locality:</strong> env detection in one module</li>
+            <li><strong>leverage:</strong> one resolver, multiple consumers</li>
+            <li><strong>depth:</strong> pusher.ts no longer owns env logic</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-xl deep text-slate-100 p-6 space-y-3">
+        <h2 class="text-lg font-semibold text-white">Top recommendation</h2>
+        <p class="text-sm text-slate-300">Extract an <code>OtlpTransport</code> seam — the 130-line pusher factory is the package's core module and its HTTP <code>fetch</code> coupling makes flush untestable. <a href="#" class="text-emerald-400 underline">Jump to card →</a></p>
+      </section>
+    </main>
+  </body>
+</html>
