@@ -25,57 +25,16 @@
  */
 
 import * as ed from "@noble/ed25519";
+import bs58 from "bs58";
 import type { VCProof, VerifiableCredential } from "./schema.ts";
 
 // ---------------------------------------------------------------------------
 // Multibase base58btc encoding (prefix "z")
 // ---------------------------------------------------------------------------
 
-const BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-function toBase58(bytes: Uint8Array): string {
-  let result = "";
-  let num = BigInt("0x" + Buffer.from(bytes).toString("hex"));
-  while (num > 0n) {
-    result = BASE58_ALPHABET[Number(num % 58n)] + result;
-    num /= 58n;
-  }
-  // Leading zeros
-  for (const b of bytes) {
-    if (b !== 0) break;
-    result = "1" + result;
-  }
-  return result;
-}
-
-function fromBase58(str: string): Uint8Array {
-  let num = 0n;
-  for (const ch of str) {
-    const idx = BASE58_ALPHABET.indexOf(ch);
-    if (idx < 0) throw new Error(`Invalid base58 character: ${ch}`);
-    num = num * 58n + BigInt(idx);
-  }
-  const hex = num
-    .toString(16)
-    .padStart(num === 0n ? 0 : Math.ceil(num.toString(16).length / 2) * 2, "0");
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-  }
-  // Leading zeros from '1' characters
-  let leadingZeros = 0;
-  for (const ch of str) {
-    if (ch !== "1") break;
-    leadingZeros++;
-  }
-  const result = new Uint8Array(leadingZeros + bytes.length);
-  result.set(bytes, leadingZeros);
-  return result;
-}
-
 /** Encode bytes as multibase base58btc (prefix "z"). */
 export function toMultibase(bytes: Uint8Array): string {
-  return "z" + toBase58(bytes);
+  return "z" + bs58.encode(bytes);
 }
 
 /** Decode multibase base58btc string (prefix "z") to bytes. */
@@ -85,7 +44,7 @@ export function fromMultibase(multibase: string): Uint8Array {
       `Unsupported multibase prefix "${multibase[0]}". Only "z" (base58btc) is supported.`,
     );
   }
-  return fromBase58(multibase.slice(1));
+  return bs58.decode(multibase.slice(1));
 }
 
 // ---------------------------------------------------------------------------
