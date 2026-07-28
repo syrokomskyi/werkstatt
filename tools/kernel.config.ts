@@ -55,6 +55,7 @@
   <item>RFC-0394..0397: Register forgeSpecModule for spec.validate, spec.status, spec.materialize.</item>
   <item>RFC-0478: Register platform module for platform.consistency.validate.</item>
   <item>RFC-0537: Register forgeSessionModule for session.save, session.archive, session.validate, session.list.</item>
+  <item>RFC-0573: Register forgeMissionModule for mission.archive.</item>
   <item>RFC-0565: Register dhtModule for dht.node.init, dht.lookup, dht.register, dht.placement, dht.status, dht.capacity.publish.</item>
   <item>RFC-0564: Register swimModule for swim.join, swim.leave, swim.members, swim.status.</item>
   <item>RFC-0566: Register deployModule for deploy.artifact.build, deploy.artifact.verify, deploy.atomic.swap, deploy.atomic.rollback, deploy.artifact.gc, deploy.status.</item>
@@ -80,6 +81,8 @@ export default defineKernelConfig({
     "forge-audit": async () => (await import("@warpgogol/forge/os/audit-module")).forgeAuditModule,
     "forge-session": async () =>
       (await import("@warpgogol/forge/os/session-module")).forgeSessionModule,
+    "forge-mission": async () =>
+      (await import("@warpgogol/forge/os/mission-module")).forgeMissionModule,
     lagebild: async () => (await import("@warpgogol/site-kernel/lagebild-module")).lagebildModule,
     "commit-message": async () =>
       (await import("@warpgogol/site-kernel/commit-message")).commitMessageModule,

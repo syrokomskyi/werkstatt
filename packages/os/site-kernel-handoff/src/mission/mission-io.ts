@@ -20,7 +20,15 @@ import { atomicWriteFile } from "../werkstatt/atomic.ts";
 const MISSIONS_DIR = "missions";
 
 export function resolveMissionDir(workspaceRoot: string, missionId: string): string {
-  return path.join(workspaceRoot, MISSIONS_DIR, missionId);
+  const primary = path.join(workspaceRoot, MISSIONS_DIR, missionId);
+  if (existsSync(primary)) return primary;
+
+  for (const state of ["closed", "aborted"]) {
+    const archived = path.join(workspaceRoot, MISSIONS_DIR, "archive", state, missionId);
+    if (existsSync(archived)) return archived;
+  }
+
+  return primary;
 }
 
 export function resolveMissionManifestPath(workspaceRoot: string, missionId: string): string {
@@ -64,7 +72,7 @@ export async function listMissionDirs(workspaceRoot: string, systemId?: string):
   if (!existsSync(missionsPath)) return [];
 
   const entries = await fs.readdir(missionsPath, { withFileTypes: true });
-  const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+  const dirs = entries.filter((e) => e.isDirectory() && e.name !== "archive").map((e) => e.name);
 
   if (systemId) {
     return dirs.filter((d) => d.startsWith(`${systemId}-m`));
