@@ -20,8 +20,7 @@ astro-aware caller.
 import type { AgentSurfaceManifest } from "@warpgogol/share/agent";
 import type { CapabilityRecord } from "@warpgogol/ontology";
 import type { AgentGatePorts } from "./ports.ts";
-import { createFixedWindowLimiter, type RateLimiter } from "./limits.ts";
-import { validateAgainstCapabilitySchema, buildIntegrationEventFromAction } from "./actions.ts";
+import type { RateLimiter } from "./limits.ts";
 import { handleJsonRpcRequest } from "./mcp/handler.ts";
 import {
   isJsonRpcRequest,
@@ -29,6 +28,15 @@ import {
   JSON_RPC_ERROR,
   type JsonRpcResponse,
 } from "./mcp/protocol.ts";
+import {
+  type ActionContext,
+  resolveCapability,
+  checkPayloadSize,
+  checkRateLimit,
+  parseJsonBody,
+  validateSchema,
+  buildAndDispatchEvent,
+} from "./action-pipeline.ts";
 
 export type { AgentGatePorts } from "./ports.ts";
 export * from "./actions.ts";
@@ -36,29 +44,37 @@ export * from "./mcp/protocol.ts";
 export * from "./mcp/tools.ts";
 export * from "./limits.ts";
 export type { McpHandlerContext } from "./mcp/handler.ts";
+export type { ActionContext, StepResult } from "./action-pipeline.ts";
 
-// RFC-0291: module-level limiter cache persists across requests in the same isolate.
-// Keyed by `${capabilityId}:${maxPerWindow}` so different capabilities get separate limiters.
-const limiterCache = new Map<string, RateLimiter>();
+/**
+ * RFC-0291: in-isolate limiter store. Keyed by `${capabilityId}:${maxPerWindow}`
+ * so different capabilities get separate limiters. Extracted from the monolithic
+ * handler to enable testing and future swap-out (e.g. Durable Objects).
+ */
+class LimitStore {
+  private cache = new Map<string, RateLimiter>();
+
+  get(capabilityId: string, maxPerWindow: number, ports: AgentGatePorts): RateLimiter | null {
+    if (!ports.createRateLimiter) return null;
+    const cacheKey = `${capabilityId}:${maxPerWindow}`;
+    let limiter = this.cache.get(cacheKey);
+    if (!limiter) {
+      limiter = ports.createRateLimiter(maxPerWindow);
+      this.cache.set(cacheKey, limiter);
+    }
+    return limiter;
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+const limitStore = new LimitStore();
 
 /** Reset the limiter cache — test-only. */
 export function __resetLimiterCache(): void {
-  limiterCache.clear();
-}
-
-function getLimiter(
-  capabilityId: string,
-  maxPerWindow: number,
-  ports: AgentGatePorts,
-): RateLimiter | null {
-  if (!ports.createRateLimiter) return null;
-  const cacheKey = `${capabilityId}:${maxPerWindow}`;
-  let limiter = limiterCache.get(cacheKey);
-  if (!limiter) {
-    limiter = ports.createRateLimiter(maxPerWindow);
-    limiterCache.set(cacheKey, limiter);
-  }
-  return limiter;
+  limitStore.clear();
 }
 
 function extractClientIp(request: Request): string {
@@ -81,15 +97,6 @@ function extractAgentIdentity(request: Request): Record<string, string> {
     totalBytes += new TextEncoder().encode(truncated).length;
   }
   return identity;
-}
-
-function attachIdentity(
-  event: { payload: Record<string, unknown> },
-  identity: Record<string, string>,
-): void {
-  if (Object.keys(identity).length > 0) {
-    event.payload._agentIdentity = identity;
-  }
 }
 
 function jsonResponse(
@@ -146,67 +153,39 @@ export function createAgentGate(
     },
 
     async handleAction(capabilityId: string, request: Request): Promise<Response> {
-      const capability = catalog.find((c) => c.id === capabilityId);
-      const ref = manifest.actions.find((a) => a.id === capabilityId);
-      if (!capability || !ref) {
-        return jsonResponse({ accepted: false, error: "unknown-capability" }, 404);
-      }
-
       const raw = await request.text();
-      const byteLength = new TextEncoder().encode(raw).length;
-      if (byteLength > capability.limits.maxPayloadBytes) {
-        return jsonResponse({ accepted: false, error: "payload-too-large" }, 413);
-      }
-
-      // RFC-0291: per-IP rate limit (fail-open if no limiter).
       const clientIp = extractClientIp(request);
-      const limiter = getLimiter(capabilityId, capability.limits.perMinutePerIp, ports);
-      if (limiter) {
-        const result = limiter.check(`${capabilityId}:${clientIp}`);
-        if (!result.allowed) {
-          return jsonResponse(
-            { accepted: false, error: "rate-limited", retryAfterSeconds: result.retryAfterSeconds },
-            429,
-            { "Retry-After": String(result.retryAfterSeconds) },
-          );
-        }
-      }
+      const agentIdentity = extractAgentIdentity(request);
 
-      let parsed: unknown;
-      try {
-        parsed = raw.length > 0 ? JSON.parse(raw) : {};
-      } catch {
-        return jsonResponse({ accepted: false, error: "invalid-json" }, 400);
-      }
-      const validated = validateAgainstCapabilitySchema(capability.input, parsed);
-      if (!validated.ok) {
-        return jsonResponse(
-          { accepted: false, error: "schema-violation", errors: validated.errors },
-          400,
-        );
-      }
+      const ctx: ActionContext = {
+        capabilityId,
+        request,
+        manifest,
+        catalog,
+        ports,
+        rawBody: raw,
+        clientIp,
+        agentIdentity,
+      };
 
-      const locale =
-        typeof validated.value.locale === "string" &&
-        manifest.languages.supported.includes(validated.value.locale)
-          ? validated.value.locale
-          : manifest.languages.default;
-      const event = buildIntegrationEventFromAction(
-        capability,
-        validated.value,
-        locale,
-        ports.now(),
-      );
-      attachIdentity(event, extractAgentIdentity(request));
-      try {
-        const outcome = await ports.dispatch.send(event);
-        return jsonResponse(outcome, 200);
-      } catch (err) {
-        return jsonResponse(
-          { accepted: false, error: "dispatch-failed", eventId: event.eventId, retryable: true },
-          502,
-        );
+      const steps: (() => Response | Promise<Response | void> | void)[] = [
+        () => resolveCapability(ctx),
+        () => checkPayloadSize(ctx),
+        () =>
+          checkRateLimit(
+            ctx,
+            limitStore.get(capabilityId, ctx.capability!.limits.perMinutePerIp, ports),
+          ),
+        () => parseJsonBody(ctx),
+        () => validateSchema(ctx),
+        () => buildAndDispatchEvent(ctx),
+      ];
+
+      for (const step of steps) {
+        const result = await step();
+        if (result instanceof Response) return result;
       }
+      return jsonResponse({ accepted: false, error: "pipeline-incomplete" }, 500);
     },
   };
 }
