@@ -42,5 +42,12 @@ Append-only log of questions asked and answers given during grilling sessions. U
 - **Answer:** One sternsystem.sync for everything.
 - **Question:** What fields does a mirror entry have?
 - **Answer:** path + storageType only. Protocol inferred from path.
-- **Question:** What AGENTS.md rule replaces the systems/<id>/ rule?
-- **Answer:** "Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces."
+
+## 2026-07-29 — RFC-0574 plan grilling
+
+- **Question:** Should all code changes be in one commit or separate commits per step?
+- **Answer:** One commit for all code + second commit for physical relocation. Keeps schema and registry synchronized.
+- **Question:** Unit tests with mocked execSync or integration tests with real git operations?
+- **Answer:** Both — unit tests for resolveMirrors() and validation rules, integration tests with real git (clone, push, bundle) between temporary directories.
+- **Question:** How to update writes/reads metadata fields that reference systems/{id}/...?
+- **Answer:** Replace with mirrors[0]/{id}/... in all module index.ts files (sternsystem, bordbuch, leitstand, release). *.module.ts files are dead code — don't update them.
