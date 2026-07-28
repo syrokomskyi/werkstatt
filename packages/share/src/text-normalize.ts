@@ -17,12 +17,16 @@ never touched; this only transforms output strings.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0235: initial egress text normalizer.</item>
+  <item>RFC-0569: add createDevNormalizeMiddleware for dev/prod egress parity.</item>
 </CHANGE_SUMMARY>
 */
 
 // @ai-invariant: RFC-0235. Server-only. Never import in browser scripts.
 // All special-character sets are expressed as \u escapes — never literal glyphs —
 // so the source contains no invisible characters and the matchers are auditable.
+// RFC-0569: createDevNormalizeMiddleware adds a dev-only Astro middleware factory.
+
+import type { MiddlewareHandler } from "astro";
 
 export type SignalId = "dashes" | "quotes" | "spaces" | "zeroWidth" | "htmlEntities" | "ellipsis";
 
@@ -505,4 +509,33 @@ export function detectResidual(
     }
   }
   return { line, signals };
+}
+
+/**
+ * RFC-0569: Dev-only Astro middleware factory that applies egress text normalization
+ * to HTML responses in dev mode. Gated by `import.meta.env.DEV` at the call site —
+ * never executes in production builds. Reuses `normalizeHtml()` from this module,
+ * ensuring dev/prod parity with the post-build dist sweep.
+ *
+ * Server-only. The caller loads the NormalizeConfig from `system.md` via
+ * `loadSystemManifest()` from `@warpgogol/site-kernel-content` and passes it in.
+ */
+export function createDevNormalizeMiddleware(config: NormalizeConfig): MiddlewareHandler {
+  return async (_context, next) => {
+    const response = await next();
+    if (!config.enabled) return response;
+    const contentType = response.headers.get("content-type");
+    if (!contentType?.includes("text/html")) return response;
+    try {
+      const body = await response.text();
+      const normalized = normalizeHtml(body, config);
+      return new Response(normalized, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      });
+    } catch {
+      return response;
+    }
+  };
 }
