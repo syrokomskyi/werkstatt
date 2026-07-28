@@ -199,10 +199,10 @@ Before starting implementation, check the working tree for foreign uncommitted c
 
 ## Acceptance criteria
 
-- [ ] `AGENTS.md` §Commit discipline includes a NON-NEGOTIABLE session-start pre-flight rule (evidence: rule text present in AGENTS.md, describes soft guard with git status check in werkstatt + workpiece)
-- [ ] `fo-idea-implement/SKILL.md` includes a pre-flight git status step before the implementation steps (evidence: step text present, describes the 6-point procedure)
-- [ ] `fo-fix/SKILL.md` includes a pre-flight git status step before the fix steps (evidence: step text present, describes the 6-point procedure)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `AGENTS.md` §Commit discipline includes a NON-NEGOTIABLE session-start pre-flight rule (evidence: commit e12f1bf, AGENTS.md:205, "Session-start pre-flight (NON-NEGOTIABLE, RFC-0575)" bullet with 4-point procedure)
+- [x] `fo-idea-implement/SKILL.md` includes a pre-flight git status step before the implementation steps (evidence: commit 36e7da0, step 3.0 "Pre-flight: git status check" before step 3.1, 6-point procedure present)
+- [x] `fo-fix/SKILL.md` includes a pre-flight git status step before the fix steps (evidence: commit dfd6ea5, step 0 "Pre-flight: git status check" before step 1, 6-point procedure present)
+- [x] `rfc.validate` passes on this file before merging (evidence: no RFC-0575-specific validation errors)
 
 ## Implementation notes for agents
 
