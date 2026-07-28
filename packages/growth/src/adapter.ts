@@ -28,42 +28,21 @@
 
 /**
  * Canonical closed list of all event names that may be emitted via emit().
- * THIS is the single source of truth — EventName is derived from this array.
- * Extend only by updating packages/ontology/growth/events/ and adding the
- * new entry here. The growth.events.validate command verifies that every
- * entry in this array has a corresponding .yaml file in the ontology catalog.
+ * Generated from packages/ontology/growth/events/*.yaml — the ontology YAML
+ * files are the single source of truth. Run
+ * `pnpm --filter @warpgogol/growth run codegen:event-names` to regenerate.
  *
  * [DNA-27][RFC-0027] Do NOT duplicate this list elsewhere (e.g. as a hardcoded
  * Set in growth-events.ts). Import EVENT_NAMES and build sets from it.
  */
-export const EVENT_NAMES = [
-  "page-view",
-  "cta-click",
-  "form-start",
-  "form-submit",
-  "form-error",
-  "donation-intent",
-  "donation-form-start",
-  "donation-form-submit",
-  "donation-confirmed",
-  "contact-submit",
-  // RFC-0305 Messkanon contact events
-  "contact.phone_click",
-  "contact.form_submit",
-  "contact.whatsapp_click",
-  "contact.email_click",
-  "contact.route_click",
-  "outbound-click",
-  // RFC-0028 passport events
-  "passport-view",
-  "star-map-navigate",
-] as const;
+export { EVENT_NAMES } from "./event-names.generated.ts";
+import type { EventName as GeneratedEventName } from "./event-names.generated.ts";
 
 /**
  * All event names that may be emitted via emit().
- * Derived from EVENT_NAMES — no separate union literal list required.
+ * Re-exported from the generated file — no separate union literal list required.
  */
-export type EventName = (typeof EVENT_NAMES)[number];
+export type EventName = GeneratedEventName;
 
 /**
  * Payload shapes keyed by EventName.
