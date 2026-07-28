@@ -1,7 +1,7 @@
 ---
 /*
 <MODULE_CONTRACT>
-<purpose>Render a send-message section with structured email/phone fields and client-side validation and runtime channel submission.</purpose>
+<purpose>Render a send-message section with a single textarea for message-embedded contact extraction and runtime channel submission.</purpose>
 <non-goals>
   <item>Do not perform server-side transport logic in the section itself.</item>
   <item>Do not store submitted visitor messages in the browser.</item>
@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>Introduce a new shared send-message section with one-field lead capture UX and extensible channel badges.</item>
   <item>RFC-0514: add structured emailField (required) and phoneField (optional) inputs; remove contactRequirementMessage.</item>
+  <item>RFC-0572: revert to single-textarea — remove email/phone inputs, re-add contactRequirementMessage.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -98,53 +99,12 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
       data-fallback-email-label={resolveLabel("fallbackEmailLabel", "")}
       data-fallback-body-label={resolveLabel("fallbackBodyLabel", "")}
       data-copy-message-label={resolveLabel("copyMessageLabel", "")}
-      data-email-field-enabled={String(props.emailField?.enabled ?? false)}
-      data-email-field-required={String(props.emailField?.required ?? false)}
-      data-email-field-label={resolveLabel("emailFieldLabel", "")}
-      data-email-field-placeholder={resolveLabel("emailFieldPlaceholder", "")}
-      data-phone-field-enabled={String(props.phoneField?.enabled ?? false)}
-      data-phone-field-required={String(props.phoneField?.required ?? false)}
-      data-phone-field-label={resolveLabel("phoneFieldLabel", "")}
-      data-phone-field-placeholder={resolveLabel("phoneFieldPlaceholder", "")}
+      data-contact-requirement-message={resolveLabel("contactRequirementMessage", "")}
       data-referrer-field-enabled={String(props.referrerField?.enabled ?? false)}
       data-referrer-field-required={String(props.referrerField?.required ?? false)}
       data-referrer-field-label={resolveLabel("referrerFieldLabel", "")}
       data-referrer-field-placeholder={resolveLabel("referrerFieldPlaceholder", "")}
     >
-      {
-        props.emailField?.enabled && (
-          <label class="send-message__field send-message__field--email">
-            <input
-              class="send-message__input"
-              type="email"
-              name="email"
-              autocomplete="email"
-              data-send-message-email
-              placeholder={resolveLabel("emailFieldPlaceholder", "")}
-              required={props.emailField.required}
-              aria-label={resolveLabel("emailFieldLabel", "")}
-            />
-          </label>
-        )
-      }
-
-      {
-        props.phoneField?.enabled && (
-          <label class="send-message__field send-message__field--phone">
-            <input
-              class="send-message__input"
-              type="tel"
-              name="phone"
-              autocomplete="tel"
-              data-send-message-phone
-              placeholder={resolveLabel("phoneFieldPlaceholder", "")}
-              required={props.phoneField.required}
-              aria-label={resolveLabel("phoneFieldLabel", "")}
-            />
-          </label>
-        )
-      }
-
       {
         props.referrerField?.enabled && (
           <label class="send-message__field send-message__field--referrer">
@@ -200,7 +160,9 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
       fallbackEmail && (
         <div class="send-message__fallback" data-send-message-fallback hidden>
           <p class="send-message__fallback-error">{resolveLabel("errorMessage", "")}</p>
-          <p class="send-message__fallback-lead">{resolveLabel("fallbackEmailLabel", "")}</p>
+          {resolveLabel("fallbackEmailLabel", "") && (
+            <p class="send-message__fallback-lead">{resolveLabel("fallbackEmailLabel", "")}</p>
+          )}
           <a class="send-message__fallback-link" href={`mailto:${fallbackEmail}`}>
             {fallbackEmail}
           </a>

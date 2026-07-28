@@ -16,6 +16,7 @@ form no longer delivers synchronously; the exchange is standardized on the queue
   <item>RFC-0181: standardize on QStash — publish an IntegrationEvent instead of delivering synchronously.</item>
   <item>RFC-0514: accept structured email/phone as top-level fields; remove regex extraction.</item>
   <item>RFC-0567: accept and forward referrer field in IntegrationEvent payload.</item>
+  <item>RFC-0572: revert to regex extraction from message body; remove top-level email/phone fields.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,17 +27,25 @@ import { UPSTASH_QSTASH_URL, UPSTASH_QSTASH_TOKEN } from "astro:env/server";
 import { buildQstashPublish, QSTASH_EU_BASE, type IntegrationEvent } from "@warpgogol/integration";
 import { json, INTEGRATION_CALLBACK_PATH as CALLBACK_PATH } from "../../section-api-utils.ts";
 
-const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_EXTRACT_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+const PHONE_EXTRACT_REGEX = /(?:\+?\d[\d\s\-()]{7,}\d)/;
 const MAX_MESSAGE_LENGTH = 4000;
 const DEFAULT_FORM_ID = "send-message";
 
 type SendMessageBody = {
   message?: unknown;
   formId?: unknown;
-  email?: unknown;
-  phone?: unknown;
   referrer?: unknown;
 };
+
+function extractContact(message: string): { email?: string; phone?: string } {
+  const emailMatch = message.match(EMAIL_EXTRACT_REGEX);
+  const phoneMatch = message.match(PHONE_EXTRACT_REGEX);
+  return {
+    ...(emailMatch ? { email: emailMatch[0].trim() } : {}),
+    ...(phoneMatch ? { phone: phoneMatch[0].trim() } : {}),
+  };
+}
 
 function normalizeString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -56,15 +65,15 @@ export const POST: APIRoute = async ({ request }) => {
 
   const message = normalizeString(payload.message);
   const formId = normalizeFormId(payload.formId);
-  const email = normalizeString(payload.email);
-  const phone = normalizeString(payload.phone);
   const referrer = normalizeString(payload.referrer);
 
   if (message.length < 1) return json({ ok: false, error: "empty-message" }, 400);
   if (message.length > MAX_MESSAGE_LENGTH)
     return json({ ok: false, error: "message-too-long" }, 400);
-  if (!email) return json({ ok: false, error: "missing-email" }, 400);
-  if (!EMAIL_FORMAT_REGEX.test(email)) return json({ ok: false, error: "invalid-email" }, 400);
+
+  const contact = extractContact(message);
+  if (!contact.email && !contact.phone)
+    return json({ ok: false, error: "no-contact-details" }, 400);
 
   const event: IntegrationEvent = {
     eventId: crypto.randomUUID(),
@@ -72,7 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
     source: formId,
     locale: request.headers.get("accept-language")?.split(",")[0] ?? "",
     occurredAt: new Date().toISOString(),
-    contact: { email, ...(phone ? { phone } : {}) },
+    contact,
     payload: { message, ...(referrer ? { referrer } : {}) },
   };
 

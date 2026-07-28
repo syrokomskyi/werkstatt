@@ -5,7 +5,7 @@ semanticId: send-message
 archetype: send-message
 cosmicName: Ceres
 role: lead-message-capture
-version: 1.1.0
+version: 1.2.0
 intent:
   - drive-contact
   - capture-lead
@@ -66,7 +66,6 @@ propsSchema:
     - buttonLabel
     - successMessage
     - errorMessage
-    - emailField
   properties:
     header:
       type: object
@@ -127,40 +126,9 @@ propsSchema:
     copyMessageLabel:
       type: string
       minLength: 1
-    emailField:
-      type: object
-      additionalProperties: false
-      required:
-        - enabled
-        - required
-      properties:
-        enabled:
-          type: boolean
-        required:
-          type: boolean
-        label:
-          type: string
-          minLength: 1
-        placeholder:
-          type: string
-          minLength: 1
-    phoneField:
-      type: object
-      additionalProperties: false
-      required:
-        - enabled
-        - required
-      properties:
-        enabled:
-          type: boolean
-        required:
-          type: boolean
-        label:
-          type: string
-          minLength: 1
-        placeholder:
-          type: string
-          minLength: 1
+    contactRequirementMessage:
+      type: string
+      minLength: 1
     referrerField:
       type: object
       additionalProperties: false

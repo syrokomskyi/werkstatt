@@ -10,6 +10,7 @@
   <item>RFC-0140: Introduce colocated client script for the send-message section.</item>
   <item>RFC-0514: Read structured email/phone fields; remove regex-based hasContactDetails.</item>
   <item>RFC-0567: Add referrerField handling — query, validate, transmit referrer value.</item>
+  <item>RFC-0572: Revert to regex-based hasContactDetails; remove structured email/phone field logic.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -18,12 +19,15 @@ type StatusKind = "idle" | "error" | "success";
 interface SendMessagePayload {
   message: string;
   formId: string;
-  email?: string;
-  phone?: string;
   referrer?: string;
 }
 
-const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_EXTRACT_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+const PHONE_EXTRACT_REGEX = /(?:\+?\d[\d\s\-()]{7,}\d)/;
+
+function hasContactDetails(message: string): boolean {
+  return EMAIL_EXTRACT_REGEX.test(message) || PHONE_EXTRACT_REGEX.test(message);
+}
 
 function orEmpty(v: string | undefined): string {
   return v ?? "";
@@ -60,8 +64,6 @@ function emitContactSubmit(locale: string, formId: string): void {
 function bindForm(root: HTMLElement): void {
   const form = root.querySelector<HTMLFormElement>("[data-send-message-form]");
   const textarea = root.querySelector<HTMLTextAreaElement>("[data-send-message-textarea]");
-  const emailInput = root.querySelector<HTMLInputElement>("[data-send-message-email]");
-  const phoneInput = root.querySelector<HTMLInputElement>("[data-send-message-phone]");
   const referrerInput = root.querySelector<HTMLInputElement>("[data-send-message-referrer]");
   const button = root.querySelector<HTMLButtonElement>("[data-send-message-submit]");
   const statusEl = root.querySelector<HTMLElement>("[data-send-message-status]");
@@ -85,10 +87,7 @@ function bindForm(root: HTMLElement): void {
   const errorMessage = form.dataset.errorMessage;
   const minMessageLength = Number(form.dataset.minMessageLength ?? "0");
   const fallbackEmail = form.dataset.fallbackEmail ?? "";
-  const emailFieldEnabled = form.dataset.emailFieldEnabled === "true";
-  const emailFieldRequired = form.dataset.emailFieldRequired === "true";
-  const phoneFieldEnabled = form.dataset.phoneFieldEnabled === "true";
-  const phoneFieldRequired = form.dataset.phoneFieldRequired === "true";
+  const contactRequirementMessage = form.dataset.contactRequirementMessage;
   const referrerFieldEnabled = form.dataset.referrerFieldEnabled === "true";
   const referrerFieldRequired = form.dataset.referrerFieldRequired === "true";
 
@@ -96,8 +95,6 @@ function bindForm(root: HTMLElement): void {
     event.preventDefault();
 
     const message = textarea.value.trim();
-    const email = emailInput?.value.trim() ?? "";
-    const phone = phoneInput?.value.trim() ?? "";
     const referrer = referrerInput?.value.trim() ?? "";
 
     if (!message || message.length < Math.max(minMessageLength, 1)) {
@@ -106,21 +103,9 @@ function bindForm(root: HTMLElement): void {
       return;
     }
 
-    if (emailFieldEnabled && emailFieldRequired && !email) {
-      setStatus(statusEl, "error", form.dataset.emailFieldLabel || "Email is required", "");
-      emailInput?.focus();
-      return;
-    }
-
-    if (email && !EMAIL_FORMAT_REGEX.test(email)) {
-      setStatus(statusEl, "error", form.dataset.emailFieldLabel || "Invalid email format", "");
-      emailInput?.focus();
-      return;
-    }
-
-    if (phoneFieldEnabled && phoneFieldRequired && !phone) {
-      setStatus(statusEl, "error", form.dataset.phoneFieldLabel || "Phone is required", "");
-      phoneInput?.focus();
+    if (!hasContactDetails(message)) {
+      setStatus(statusEl, "error", contactRequirementMessage, "");
+      textarea.focus();
       return;
     }
 
@@ -136,8 +121,6 @@ function bindForm(root: HTMLElement): void {
 
     try {
       const payload: SendMessagePayload = { message, formId };
-      if (emailFieldEnabled && email) payload.email = email;
-      if (phoneFieldEnabled && phone) payload.phone = phone;
       if (referrerFieldEnabled && referrer) payload.referrer = referrer;
 
       const response = await fetch(endpoint, {
@@ -156,8 +139,6 @@ function bindForm(root: HTMLElement): void {
         throw new Error("Request failed with status " + response.status);
       }
 
-      if (emailInput) emailInput.value = "";
-      if (phoneInput) phoneInput.value = "";
       if (referrerInput) referrerInput.value = "";
       textarea.value = "";
       form.hidden = true;
@@ -170,12 +151,7 @@ function bindForm(root: HTMLElement): void {
       if (fallbackEl && fallbackEmail && fallbackTextEl) {
         form.hidden = true;
         fallbackEl.hidden = false;
-        const fallbackBody = [
-          message,
-          email && "Email: " + email,
-          phone && "Phone: " + phone,
-          referrer && "Referrer: " + referrer,
-        ]
+        const fallbackBody = [message, referrer && "Referrer: " + referrer]
           .filter(Boolean)
           .join("\n");
         fallbackTextEl.textContent = fallbackBody;

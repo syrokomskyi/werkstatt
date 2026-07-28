@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0140: Backfill Compass scaffolding for the send-message section CSS.</item>
   <item>RFC-0514: Add styles for structured email/phone input fields.</item>
+  <item>RFC-0572: Remove styles for structured email/phone input fields (reverted to single-textarea).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -80,11 +81,6 @@
   outline: 2px solid transparent;
   border-color: var(--ds-color-accent, #d97706);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-color-accent, #d97706) 22%, transparent);
-}
-
-.send-message__field--email,
-.send-message__field--phone {
-  gap: 0;
 }
 
 .send-message__textarea {
