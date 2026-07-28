@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
+enhancedAt: 2026-07-28
 implementedAt:
 closedAt:
 supersedes: []
@@ -26,6 +27,7 @@ related:
   - DNA-44
   - DNA-47
   - RFC-0078
+  - RFC-0381
   - RFC-0389
   - RFC-0569
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
@@ -132,6 +134,20 @@ const { appDirectory: appDir } = requireAstroSitePaths(context);
 
 The `--site` flag resolution (`input.flags.site` → `context.site?.name`) and the `--force` flag behavior are unchanged.
 
+Two error messages in `config-regenerate.ts` that reference `apps/` are updated to use the resolved `appDir` path instead:
+
+```ts
+// Before (line 119)
+summary: "config.regenerate: apps/" + app + " does not exist",
+// After
+summary: "config.regenerate: " + appDir + " does not exist",
+
+// Before (line 128)
+summary: "config.regenerate: unable to read apps/" + app + "/src/content/system.md",
+// After
+summary: "config.regenerate: unable to read " + appDir + "/src/content/system.md",
+```
+
 ### Pipeline placement
 
 `config.regenerate` is added as the **first step** in `SITES_BUILD_PREPARE_PIPELINE` in `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts`:
@@ -231,6 +247,6 @@ The `--json` output shape is unchanged:
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The path resolution change is a two-line edit in `config-regenerate.ts`: add `import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro"` and replace `join(context.workspaceRoot, "apps", app)` with `requireAstroSitePaths(context).appDirectory`.
+- The path resolution change is a five-line edit in `config-regenerate.ts`: add `import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro"`, replace `join(context.workspaceRoot, "apps", app)` with `requireAstroSitePaths(context).appDirectory`, and update two error messages that reference `apps/` to use the resolved `appDir` path instead.
 - The pipeline change is a one-line edit in `build-prepare.ts`: add `{ command: "config.regenerate" }` as the first element of `SITES_BUILD_PREPARE_PIPELINE`.
 - The RFC-0569 amendment updates the acceptance criterion text from `config.regenerate cannot reach mission workpiece paths (hardcoded apps/<id>)` to `config.regenerate reaches mission workpiece paths via requireAstroSitePaths`.
