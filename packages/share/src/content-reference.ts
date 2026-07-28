@@ -176,7 +176,7 @@ export function resolveReferencesInString(
   let result = formulaResult;
   const pattern = new RegExp(BRACELESS_SCAN_PATTERN.source, "g");
   let match: RegExpExecArray | null;
-  const replacements: Map<string, string> = new Map();
+  const replacements: Array<{ start: number; end: number; resolved: string }> = [];
 
   while ((match = pattern.exec(formulaResult)) !== null) {
     const candidate = match[0];
@@ -187,12 +187,17 @@ export function resolveReferencesInString(
 
     const resolved = resolveReference(index, candidate, lang, defaultLang);
     if (resolved.resolved) {
-      replacements.set(candidate, formatValue(resolved.value));
+      replacements.push({
+        start: match.index,
+        end: match.index + candidate.length,
+        resolved: formatValue(resolved.value),
+      });
     }
   }
 
-  for (const [original, resolved] of replacements) {
-    result = result.replaceAll(original, resolved);
+  for (let i = replacements.length - 1; i >= 0; i--) {
+    const { start, end, resolved } = replacements[i];
+    result = result.slice(0, start) + resolved + result.slice(end);
   }
 
   return result;

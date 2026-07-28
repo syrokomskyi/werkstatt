@@ -192,3 +192,32 @@ test("resolveReferencesInString — formula with nested parentheses", () => {
   );
   expect(out).toBe("540");
 });
+
+test("resolveReferencesInString — overlapping prefix references do not corrupt each other", () => {
+  const index: ContentRefIndex = {
+    ...TEST_INDEX,
+    entries: {
+      ...TEST_INDEX.entries,
+      business: {
+        ...TEST_INDEX.entries.business,
+        place: {
+          de: {
+            address: {
+              street: "Elly-Heuss-Knapp-Weg",
+              streetNumber: "29",
+              postalCode: "71522",
+              locality: "Backnang",
+            },
+          },
+        },
+      },
+    },
+  };
+  const out = resolveReferencesInString(
+    index,
+    "business.place.address.street business.place.address.streetNumber business.place.address.postalCode business.place.address.locality",
+    "de",
+    "de",
+  );
+  expect(out).toBe("Elly-Heuss-Knapp-Weg 29 71522 Backnang");
+});

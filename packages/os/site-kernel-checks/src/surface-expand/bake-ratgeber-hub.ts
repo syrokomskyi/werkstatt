@@ -127,21 +127,24 @@ function extractCategories(ctx: BakeCtx, lang: string): RatgeberCategory[] {
   for (const [slug, data] of cats) {
     categories.push({
       slug,
-      name: typeof data.name === "string" ? data.name : slug,
+      name:
+        (typeof data.title === "string" && data.title) ||
+        (typeof data.name === "string" && data.name) ||
+        slug,
       sortOrder: typeof data.sortOrder === "number" ? data.sortOrder : 999,
     });
   }
   return categories.sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
 }
 
-function articleHref(slug: string, lang: string, defaultLang: string): string {
+function articleHref(slug: string, lang: string, defaultLang: string, baseSlug: string): string {
   const prefix = lang === defaultLang ? "" : `${lang}/`;
-  return `/${prefix}ratgeber/${slug}/`.replace(/\/+/g, "/");
+  return `/${prefix}${baseSlug}/${slug}/`.replace(/\/+/g, "/");
 }
 
-function categoryHref(slug: string, lang: string, defaultLang: string): string {
+function categoryHref(slug: string, lang: string, defaultLang: string, baseSlug: string): string {
   const prefix = lang === defaultLang ? "" : `${lang}/`;
-  return `/${prefix}ratgeber/kategorie/${slug}/`.replace(/\/+/g, "/");
+  return `/${prefix}${baseSlug}/kategorie/${slug}/`.replace(/\/+/g, "/");
 }
 
 export function bakeRatgeberHub(
@@ -152,6 +155,7 @@ export function bakeRatgeberHub(
   const dl = ctx.defaultLang;
   const lbl = labelsFor(lang);
   const hlbl = hubLabelsFor(lang);
+  const baseSlug = entry.routes?.[lang] ?? entry.routes?.[dl] ?? "ratgeber";
   const level = ctx.levels.find((l) => l.depth === entry.depth);
   const title =
     level?.titleTemplate?.[lang] ?? level?.titleTemplate?.[dl] ?? titleForEntry(entry, ctx, lang);
@@ -187,7 +191,7 @@ export function bakeRatgeberHub(
           ...(a.question ? { question: a.question } : {}),
           ...(a.reviewedAt ? { reviewedAt: a.reviewedAt } : {}),
           ...(a.readTime ? { readTime: a.readTime } : {}),
-          href: articleHref(a.slug, lang, dl),
+          href: articleHref(a.slug, lang, dl, baseSlug),
         })),
       ),
     );
@@ -200,7 +204,7 @@ export function bakeRatgeberHub(
         hlbl.themenbereiche,
         categories.map((c) => ({
           title: c.name,
-          href: categoryHref(c.slug, lang, dl),
+          href: categoryHref(c.slug, lang, dl, baseSlug),
         })),
         "themenbereiche",
       ),
@@ -208,9 +212,9 @@ export function bakeRatgeberHub(
   }
 
   // 4. So arbeitet die Redaktion — editorial standards + link to policy page
-  const redaktionHref = lang === dl ? "/ratgeber/redaktion/" : `/${lang}/porady/redaktsiya/`;
-  const redaktionLead = `${hlbl.redaktionBody}\n\n[${hlbl.redaktionLink}](${redaktionHref})`;
-  blocks.push(md(hlbl.redaktion, redaktionLead));
+  const redaktionHref =
+    lang === dl ? `/${baseSlug}/redaktion/` : `/${lang}/${baseSlug}/redaktsiya/`;
+  blocks.push(md(hlbl.redaktion, hlbl.redaktionBody, `[${hlbl.redaktionLink}](${redaktionHref})`));
 
   // 5. Neu — 3 most recently published
   const neu = articles
@@ -227,7 +231,7 @@ export function bakeRatgeberHub(
           ...(a.question ? { question: a.question } : {}),
           ...(a.reviewedAt ? { reviewedAt: a.reviewedAt } : {}),
           ...(a.readTime ? { readTime: a.readTime } : {}),
-          href: articleHref(a.slug, lang, dl),
+          href: articleHref(a.slug, lang, dl, baseSlug),
         })),
       ),
     );
@@ -247,7 +251,7 @@ export function bakeRatgeberHub(
           ...(a.question ? { question: a.question } : {}),
           ...(a.reviewedAt ? { reviewedAt: a.reviewedAt } : {}),
           ...(a.readTime ? { readTime: a.readTime } : {}),
-          href: articleHref(a.slug, lang, dl),
+          href: articleHref(a.slug, lang, dl, baseSlug),
         })),
       ),
     );
