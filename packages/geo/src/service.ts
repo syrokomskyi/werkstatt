@@ -55,6 +55,90 @@ function mergeOverrides(defaults: GeoOverrides, caller?: GeoOverrides): GeoOverr
   };
 }
 
+interface ProviderStrategyContext {
+  langs: string[];
+  defaultLang: string;
+  imageResolver: ((neutral: string) => string | undefined) | undefined;
+  filterValues: Set<string> | undefined;
+  allCountries: GeoCountry[];
+  allRegions: GeoRegion[];
+  allCities: GeoCity[];
+}
+
+interface ProviderStrategy {
+  collect(ctx: ProviderStrategyContext): {
+    entries: GeoProviderEntry[];
+    localized: Map<string, GeoLocalizedSlug>;
+  };
+}
+
+const providerStrategies: Record<string, ProviderStrategy> = {
+  "geo.countries": {
+    collect(ctx) {
+      const entries: GeoProviderEntry[] = [];
+      const localized = new Map<string, GeoLocalizedSlug>();
+      for (const c of ctx.allCountries) {
+        if (ctx.filterValues && !ctx.filterValues.has(c.slug)) continue;
+        entries.push({ slug: c.slug, data: { name: c.names[ctx.defaultLang] ?? c.slug } });
+        localized.set(c.slug, { neutral: c.slug });
+      }
+      return { entries, localized };
+    },
+  },
+  "geo.regions": {
+    collect(ctx) {
+      const entries: GeoProviderEntry[] = [];
+      const localized = new Map<string, GeoLocalizedSlug>();
+      for (const r of ctx.allRegions) {
+        if (ctx.filterValues && !ctx.filterValues.has(r.slug)) continue;
+        entries.push({ slug: r.slug, data: { name: r.names[ctx.defaultLang] ?? r.slug } });
+        localized.set(r.slug, { neutral: r.slug });
+      }
+      return { entries, localized };
+    },
+  },
+  "geo.cities": {
+    collect(ctx) {
+      const entries: GeoProviderEntry[] = [];
+      const localized = new Map<string, GeoLocalizedSlug>();
+      const cityByNeutral = new Map<
+        string,
+        { city: GeoCity; data: Record<string, unknown>; hasImage: boolean }
+      >();
+      for (const city of ctx.allCities) {
+        const neutral = city.slugByLang[ctx.defaultLang] ?? city.id;
+        if (ctx.filterValues && !ctx.filterValues.has(neutral)) continue;
+        const data: Record<string, unknown> = { name: city.names[ctx.defaultLang] ?? neutral };
+        let hasImage = false;
+        if (ctx.imageResolver) {
+          const imageSlug = ctx.imageResolver(neutral);
+          if (imageSlug) {
+            data.image = imageSlug;
+            data.imageAlt = city.names[ctx.defaultLang] ?? neutral;
+            hasImage = true;
+          }
+        }
+        const existing = cityByNeutral.get(neutral);
+        if (!existing || (hasImage && !existing.hasImage)) {
+          cityByNeutral.set(neutral, { city, data, hasImage });
+        }
+      }
+      for (const { city, data } of cityByNeutral.values()) {
+        const neutral = city.slugByLang[ctx.defaultLang] ?? city.id;
+        entries.push({ slug: neutral, data });
+        const byLang: Record<string, string> = {};
+        for (const l of ctx.langs) {
+          if (l !== ctx.defaultLang && city.slugByLang[l] && city.slugByLang[l] !== neutral) {
+            byLang[l] = city.slugByLang[l];
+          }
+        }
+        localized.set(neutral, Object.keys(byLang).length ? { neutral, byLang } : { neutral });
+      }
+      return { entries, localized };
+    },
+  },
+};
+
 function resolveProviderEntries(
   provider: string,
   langs: string[],
@@ -65,70 +149,19 @@ function resolveProviderEntries(
   allRegions: GeoRegion[],
   allCities: GeoCity[],
 ): GeoProviderResult {
-  const entries: GeoProviderEntry[] = [];
-  const localized = new Map<string, GeoLocalizedSlug>();
-
-  if (provider === "geo.countries") {
-    for (const c of allCountries) {
-      if (filterValues && !filterValues.has(c.slug)) continue;
-      entries.push({
-        slug: c.slug,
-        data: { name: c.names[defaultLang] ?? c.slug },
-      });
-      localized.set(c.slug, { neutral: c.slug });
-    }
-  } else if (provider === "geo.regions") {
-    for (const r of allRegions) {
-      if (filterValues && !filterValues.has(r.slug)) continue;
-      entries.push({
-        slug: r.slug,
-        data: { name: r.names[defaultLang] ?? r.slug },
-      });
-      localized.set(r.slug, { neutral: r.slug });
-    }
-  } else if (provider === "geo.cities") {
-    const cityByNeutral = new Map<
-      string,
-      {
-        city: GeoCity;
-        data: Record<string, unknown>;
-        hasImage: boolean;
-      }
-    >();
-    for (const city of allCities) {
-      const neutral = city.slugByLang[defaultLang] ?? city.id;
-      if (filterValues && !filterValues.has(neutral)) continue;
-      const data: Record<string, unknown> = { name: city.names[defaultLang] ?? neutral };
-      let hasImage = false;
-      if (imageResolver) {
-        const imageSlug = imageResolver(neutral);
-        if (imageSlug) {
-          data.image = imageSlug;
-          data.imageAlt = city.names[defaultLang] ?? neutral;
-          hasImage = true;
-        }
-      }
-      const existing = cityByNeutral.get(neutral);
-      if (!existing || (hasImage && !existing.hasImage)) {
-        cityByNeutral.set(neutral, { city, data, hasImage });
-      }
-    }
-    for (const { city, data } of cityByNeutral.values()) {
-      const neutral = city.slugByLang[defaultLang] ?? city.id;
-      entries.push({ slug: neutral, data });
-      const byLang: Record<string, string> = {};
-      for (const l of langs) {
-        if (l !== defaultLang && city.slugByLang[l] && city.slugByLang[l] !== neutral) {
-          byLang[l] = city.slugByLang[l];
-        }
-      }
-      localized.set(neutral, Object.keys(byLang).length ? { neutral, byLang } : { neutral });
-    }
-  } else {
+  const strategy = providerStrategies[provider];
+  if (!strategy) {
     throw new Error(`[geo] Unknown provider: "${provider}"`);
   }
-
-  return { entries, localized };
+  return strategy.collect({
+    langs,
+    defaultLang,
+    imageResolver,
+    filterValues,
+    allCountries,
+    allRegions,
+    allCities,
+  });
 }
 
 export function createGeoService(config?: GeoServiceConfig): GeoService {
