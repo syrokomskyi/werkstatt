@@ -15,6 +15,7 @@
 // RFC-0569: dev-normalize middleware applies egress text normalization in dev mode.
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { sequence } from "astro:middleware";
 import languageRedirectMiddleware from "./middleware/language-redirect";
 import { createDevNormalizeMiddleware, resolveNormalizeConfig } from "@warpgogol/share/text-normalize";
 import { loadSystemManifestSync } from "@warpgogol/site-kernel-content";
@@ -25,5 +26,5 @@ const devNormalize = createDevNormalizeMiddleware(
 );
 
 export const onRequest = import.meta.env.DEV
-  ? [languageRedirectMiddleware, devNormalize]
+  ? sequence(languageRedirectMiddleware, devNormalize)
   : languageRedirectMiddleware;
