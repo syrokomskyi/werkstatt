@@ -25,7 +25,11 @@ import type {
 } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 
-const BRACE_REF_PATTERN = /\{([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;
+const BRACE_REF_PATTERN = /\{([a-z][a-z-]*[./][a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;
+
+function normalizeRefSeparator(ref: string): string {
+  return ref.replace(/^([a-z][a-z-]*)\//, "$1.");
+}
 
 function migrateYamlString(value: string): string {
   if (!value.includes("{")) return value;
@@ -37,7 +41,7 @@ function migrateYamlString(value: string): string {
   while ((match = pattern.exec(value)) !== null) {
     const fullMatch = match[0];
     const inner = match[1];
-    replacements.push({ original: fullMatch, replacement: inner });
+    replacements.push({ original: fullMatch, replacement: normalizeRefSeparator(inner) });
   }
 
   for (const { original, replacement } of replacements) {

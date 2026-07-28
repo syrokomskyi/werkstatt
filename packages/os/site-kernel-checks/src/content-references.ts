@@ -47,7 +47,7 @@ import { resolveReference } from "@warpgogol/share/content-reference";
 
 const BRACELESS_PATTERN = /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_.-]+)\b/g;
 
-const BRACE_RESIDUAL_PATTERN = /\{([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;
+const BRACE_RESIDUAL_PATTERN = /\{([a-z][a-z-]*[./][a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;
 
 interface LocalReference {
   collection: string;

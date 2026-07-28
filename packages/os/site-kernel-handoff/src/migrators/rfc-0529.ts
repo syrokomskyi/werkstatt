@@ -22,8 +22,11 @@ import { MigrationError } from "./types.ts";
 
 export const RFC_0529_MIGRATOR_ID = "rfc-0529";
 
-const BRACE_REF_PATTERN =
-  /\{([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;
+const BRACE_REF_PATTERN = /\{([a-z][a-z-]*[./][a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;
+
+function normalizeRefSeparator(ref: string): string {
+  return ref.replace(/^([a-z][a-z-]*)\//, "$1.");
+}
 
 function migrateString(value: string): string {
   if (!value.includes("{")) return value;
@@ -35,7 +38,7 @@ function migrateString(value: string): string {
   while ((match = pattern.exec(value)) !== null) {
     const fullMatch = match[0];
     const inner = match[1];
-    replacements.push({ original: fullMatch, replacement: inner });
+    replacements.push({ original: fullMatch, replacement: normalizeRefSeparator(inner) });
   }
 
   for (const { original, replacement } of replacements) {
@@ -152,10 +155,7 @@ function isGeneratedFile(name: string): boolean {
   );
 }
 
-async function migrateMarkdownFileOnDisk(
-  filePath: string,
-  ctx: MigrationContext,
-): Promise<void> {
+async function migrateMarkdownFileOnDisk(filePath: string, ctx: MigrationContext): Promise<void> {
   let content: string;
   try {
     content = await fs.readFile(filePath, "utf-8");
@@ -181,10 +181,7 @@ async function migrateMarkdownFileOnDisk(
   }
 }
 
-async function migrateYamlFileOnDisk(
-  filePath: string,
-  ctx: MigrationContext,
-): Promise<void> {
+async function migrateYamlFileOnDisk(filePath: string, ctx: MigrationContext): Promise<void> {
   let content: string;
   try {
     content = await fs.readFile(filePath, "utf-8");
