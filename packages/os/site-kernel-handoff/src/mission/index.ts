@@ -48,6 +48,8 @@ export {
   type MissionGitCommitData,
   isWorkpieceDirty,
   type WorkpieceDirtyResult,
+  investigateUntrackedFiles,
+  type UntrackedFileReport,
 } from "./mission-git-commit.ts";
 export { runMissionCleanup, type MissionCleanupData } from "./mission-cleanup.ts";
 export { resolveActorFromEnv, resolveActor, type ActorIdentity } from "./actor-identity.ts";
@@ -255,6 +257,7 @@ export function createMissionModule(): KernelModule {
         writes: [
           "missions/{mission}/mission.yaml",
           "missions/{mission}/evidence/reconciliation-report.json",
+          "missions/{mission}/evidence/untracked-files-report.json",
         ],
         execute: runMissionReconcile,
       });

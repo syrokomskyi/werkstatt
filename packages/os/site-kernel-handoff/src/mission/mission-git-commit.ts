@@ -11,11 +11,12 @@
   <item>RFC-0480: add isWorkpieceDirty() shared helper for dirty workpiece guards.</item>
   <item>RFC-0522: extend WorkpieceDirtyResult with files[] for cache clone guard error messages.</item>
   <item>RFC-0560: integrate Ed25519 signed commits via createSignedCommit when PASSPORT_SIGNING_KEY is set.</item>
+  <item>RFC-0568: add investigateUntrackedFiles helper and UntrackedFileReport type for cache clone untracked file origin analysis.</item>
 </CHANGE_SUMMARY>
 */
 
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import path from "node:path";
 import type {
   KernelCommandInput,
@@ -24,6 +25,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { createSignedCommit } from "./signed-commit.ts";
+import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
 
 export interface MissionGitCommitData {
   missionId: string;
@@ -39,6 +41,86 @@ export interface WorkpieceDirtyResult {
   dirty: boolean;
   fileCount: number;
   files: string[];
+}
+
+export interface UntrackedFileReport {
+  path: string;
+  createdAt: string;
+  sizeBytes: number;
+  likelyOrigin: "previous-mission" | "direct-commit" | "unknown";
+  originHint?: string;
+}
+
+const BOILERPLATE_PATTERNS = [
+  /^\.github\/workflows\/deploy-.*\.yml$/,
+  /^package\.json$/,
+  /^astro\.config\.mjs$/,
+  /^wrangler\.jsonc$/,
+  /^tsconfig\.json$/,
+  /^\.gitignore$/,
+  /^postcss\.config\.cjs$/,
+  /^\.env\.example$/,
+  /^src\/routes\/.*\.astro$/,
+  /^src\/pages\/.*\.astro$/,
+];
+
+function matchesBoilerplatePattern(filePath: string): boolean {
+  return BOILERPLATE_PATTERNS.some((p) => p.test(filePath));
+}
+
+export async function investigateUntrackedFiles(
+  workspaceRoot: string,
+  systemId: string,
+  systemDir: string,
+  files: string[],
+): Promise<UntrackedFileReport[]> {
+  const bordbuchEntries = await readBordbuch(workspaceRoot, systemId);
+  const missionOpenEntries = bordbuchEntries.filter((e) => e.kind === "mission-open");
+  const missionTimeRanges = missionOpenEntries.map((e, i) => {
+    const next = missionOpenEntries[i + 1];
+    return { start: e.occurredAt, end: next ? next.occurredAt : new Date().toISOString() };
+  });
+
+  const reports: UntrackedFileReport[] = [];
+  for (const file of files) {
+    const fullPath = path.join(systemDir, file);
+    let createdAt = "unknown";
+    let sizeBytes = 0;
+    try {
+      const stat = statSync(fullPath);
+      createdAt = stat.mtime.toISOString();
+      sizeBytes = stat.size;
+    } catch {
+      // File may have been removed between detection and investigation
+    }
+
+    const isBoilerplate = matchesBoilerplatePattern(file);
+    const inMissionRange = missionTimeRanges.some(
+      (r) => createdAt !== "unknown" && createdAt >= r.start && createdAt <= r.end,
+    );
+
+    let likelyOrigin: UntrackedFileReport["likelyOrigin"];
+    let originHint: string | undefined;
+
+    if (isBoilerplate && inMissionRange) {
+      const matchingRange = missionTimeRanges.find(
+        (r) => createdAt !== "unknown" && createdAt >= r.start && createdAt <= r.end,
+      );
+      likelyOrigin = "previous-mission";
+      originHint = matchingRange
+        ? `file matches boilerplate pattern and was created during a mission starting at ${matchingRange.start}`
+        : undefined;
+    } else if (!isBoilerplate && !inMissionRange) {
+      likelyOrigin = "direct-commit";
+      originHint =
+        "file does not match boilerplate patterns and was not created during a known mission";
+    } else {
+      likelyOrigin = "unknown";
+    }
+
+    reports.push({ path: file, createdAt, sizeBytes, likelyOrigin, originHint });
+  }
+  return reports;
 }
 
 export interface OperatorCommitsResult {
