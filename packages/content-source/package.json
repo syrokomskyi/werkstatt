@@ -18,6 +18,10 @@
     "./cms-git": {
       "types": "./src/adapters/cms-git/index.ts",
       "default": "./src/adapters/cms-git/index.ts"
+    },
+    "./fs": {
+      "types": "./src/fs.ts",
+      "default": "./src/fs.ts"
     }
   },
   "files": ["src"],

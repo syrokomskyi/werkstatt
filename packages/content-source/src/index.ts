@@ -26,37 +26,6 @@ export type {
   ContentSourceProvider,
 } from "./types.ts";
 
-export { FS_CAPABILITIES } from "./adapters/fs/capabilities.ts";
-
-export {
-  resolveImage,
-  resolveImageRequired,
-  resolveVideo,
-  resolveMedia,
-  createImageResolver,
-  createFsAssetResolver,
-  contentAssetSyntaxDiagnostics,
-  describeContentAssetResolution,
-  IMAGE_EXTENSIONS,
-  CONTENT_ASSET_DOMAINS,
-  VIDEO_EXTENSIONS,
-  MEDIA_SOURCE_EXTENSIONS,
-  DEFAULT_LANGUAGE,
-} from "./adapters/fs/assets.ts";
-export type {
-  ImageResolverOptions,
-  ResolvedMediaSource,
-  ContentAssetDomain,
-  ContentAssetExtension,
-  ContentAssetSyntaxDiagnostic,
-  ContentAssetToken,
-  ContentAssetCandidate,
-  ContentAssetResolutionContract,
-  ContentAssetResolutionOptions,
-} from "./adapters/fs/assets.ts";
-
-export { fsMarkdownCollectionLoader, fsDataCollectionLoader } from "./adapters/fs/loaders.ts";
-export type {
-  MarkdownCollectionLoaderOptions,
-  DataCollectionLoaderOptions,
-} from "./adapters/fs/loaders.ts";
+// FS adapter exports — prefer @warpgogol/content-source/fs for new consumers.
+// Re-exported here for backward compatibility with existing imports.
+export * from "./fs.ts";
