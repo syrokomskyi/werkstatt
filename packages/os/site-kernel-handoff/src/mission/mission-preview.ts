@@ -12,7 +12,7 @@
 */
 
 import { existsSync } from "node:fs";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 import type {
   KernelCommandInput,
@@ -27,7 +27,6 @@ export interface MissionPreviewData {
   workpiecePath: string;
   port: number;
   production: boolean;
-  force: boolean;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -48,7 +47,6 @@ export async function runMissionPreview(
   const missionId = flagString(input, "mission");
   const port = parseInt(flagString(input, "port") ?? "4321", 10);
   const production = flagBool(input, "production");
-  const force = flagBool(input, "force");
 
   if (!missionId) throw new Error("[mission.preview] --mission is required");
 
@@ -64,17 +62,21 @@ export async function runMissionPreview(
   }
 
   const cmd = production ? "preview" : "dev";
-  const astroArgs = ["exec", "astro", cmd, "--port", String(port)];
-  if (force) astroArgs.push("--force");
+
+  // Stop any existing astro dev server on this port before starting a new one
+  spawnSync("pnpm", ["exec", "astro", "dev", "stop"], {
+    cwd: workpiecePath,
+    stdio: "ignore",
+  });
 
   logger.info(
-    `  Starting astro ${cmd} on port ${port} for mission '${missionId}' (state: ${manifest.state})${force ? " (--force)" : ""}`,
+    `  Starting astro ${cmd} on port ${port} for mission '${missionId}' (state: ${manifest.state})`,
   );
   logger.info(`  Workpiece: ${workpiecePath}`);
   logger.info(`  Press Ctrl+C to stop the server.`);
 
   return new Promise((resolve) => {
-    const child = spawn("pnpm", astroArgs, {
+    const child = spawn("pnpm", ["exec", "astro", cmd, "--port", String(port)], {
       cwd: workpiecePath,
       stdio: "inherit",
     });
@@ -87,7 +89,6 @@ export async function runMissionPreview(
           workpiecePath,
           port,
           production,
-          force,
         },
         summary: `[mission.preview] ${missionId} server stopped (exit code: ${code})`,
       });
@@ -101,7 +102,6 @@ export async function runMissionPreview(
           workpiecePath,
           port,
           production,
-          force,
         },
         summary: `[mission.preview] ${missionId} server error: ${err.message}`,
       });
