@@ -27,7 +27,6 @@
  * Emits to: dist/.well-known/cosmic-star-map.svg
  */
 
-import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
@@ -45,6 +44,7 @@ import type {
   StarMapEdge,
 } from "./types.ts";
 import { computeLayout } from "./layout.ts";
+import { renderSvg } from "./svg-renderer.ts";
 
 // ---------------------------------------------------------------------------
 // Adapter: SystemManifest → StarMapInput
@@ -156,53 +156,6 @@ function buildGraph(input: StarMapInput): StarMapGraph {
 }
 
 // ---------------------------------------------------------------------------
-// SVG generation (internal)
-// ---------------------------------------------------------------------------
-
-const NODE_RADII: Record<StarMapNode["kind"], number> = {
-  constellation: 32,
-  star: 20,
-  planet: 12,
-  moon: 7,
-};
-
-const NODE_COLORS: Record<StarMapNode["kind"], string> = {
-  constellation: "#6366f1",
-  star: "#f59e0b",
-  planet: "#10b981",
-  moon: "#94a3b8",
-};
-
-const NODE_LABEL_SIZES: Record<StarMapNode["kind"], number> = {
-  constellation: 13,
-  star: 11,
-  planet: 9,
-  moon: 7,
-};
-
-function svgNode(node: StarMapNode, x: number, y: number): string {
-  const r = NODE_RADII[node.kind];
-  const fill = NODE_COLORS[node.kind];
-  const fontSize = NODE_LABEL_SIZES[node.kind];
-  const label = node.label.length > 12 ? node.label.slice(0, 11) + "…" : node.label;
-
-  const dataRoute = node.route ? ` data-route="${escapeXml(node.route)}"` : "";
-  const dataKind = ` data-kind="${node.kind}"`;
-  const dataName = node.cosmicName ? ` data-cosmic-name="${escapeXml(node.cosmicName)}"` : "";
-
-  return [
-    `  <g class="star-map-node" role="img" aria-label="${escapeXml(node.label)}"${dataRoute}${dataKind}${dataName}>`,
-    `    <circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" opacity="0.9"/>`,
-    `    <text x="${x}" y="${y + r + fontSize + 2}" text-anchor="middle" font-family="system-ui,sans-serif" font-size="${fontSize}" fill="#e2e8f0">${escapeXml(label)}</text>`,
-    `  </g>`,
-  ].join("\n");
-}
-
-function svgEdge(fromX: number, fromY: number, toX: number, toY: number): string {
-  return `  <line x1="${fromX}" y1="${fromY}" x2="${toX}" y2="${toY}" stroke="#334155" stroke-width="1.5" opacity="0.6"/>`;
-}
-
-// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -219,44 +172,12 @@ export function renderStarMap(input: StarMapInput): StarMapOutput {
   const graph = buildGraph(input);
   const positions = computeLayout(graph, width, height);
 
-  const posMap = new Map(positions.map((p) => [p.nodeId, p] as const));
-
-  const edgeSvgLines: string[] = [];
-  for (const edge of graph.edges) {
-    const fromPos = posMap.get(edge.from);
-    const toPos = posMap.get(edge.to);
-    if (fromPos && toPos) {
-      edgeSvgLines.push(svgEdge(fromPos.x, fromPos.y, toPos.x, toPos.y));
-    }
-  }
-
-  const nodeSvgLines: string[] = [];
-  for (const node of graph.nodes) {
-    const pos = posMap.get(node.id);
-    if (pos) {
-      nodeSvgLines.push(svgNode(node, pos.x, pos.y));
-    }
-  }
-
-  const metaComment = `<!-- cosmic-star-map: app=${input.appId} depth=${input.depth} nodes=${graph.nodes.length} edges=${graph.edges.length} -->`;
-
-  const svg = [
-    `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Star Map — ${input.appId}">`,
-    metaComment,
-    `  <rect width="${width}" height="${height}" fill="#0f172a"/>`,
-    `  <g class="star-map-edges">`,
-    ...edgeSvgLines,
-    `  </g>`,
-    `  <g class="star-map-nodes">`,
-    ...nodeSvgLines,
-    `  </g>`,
-    `</svg>`,
-  ].join("\n");
-
-  const hash = createHash("sha256").update(svg).digest("hex");
-
-  return { svg, hash };
+  return renderSvg(graph, positions, {
+    appId: input.appId,
+    depth: input.depth,
+    width,
+    height,
+  });
 }
 
 /**
@@ -272,17 +193,4 @@ export async function emitStarMap(input: StarMapInput, outPath: string): Promise
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, result.svg, "utf8");
   return result;
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function escapeXml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
 }
