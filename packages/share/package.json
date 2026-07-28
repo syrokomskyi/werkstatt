@@ -63,6 +63,10 @@
       "types": "./src/content-reference.ts",
       "default": "./src/content-reference.ts"
     },
+    "./formula-eval": {
+      "types": "./src/formula-eval.ts",
+      "default": "./src/formula-eval.ts"
+    },
     "./check-hints": {
       "types": "./src/check-hints.ts",
       "default": "./src/check-hints.ts"
@@ -272,11 +276,12 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@lordicon/element": "^2.3.1",
     "@warpgogol/content-source": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
-    "@lordicon/element": "^2.3.1",
     "ajv": "^8.20.0",
     "astro": "^7.1.3",
+    "expr-eval": "^2.0.2",
     "hls.js": "^1.6.16",
     "lenis": "^1.3.25",
     "plyr": "^3.8.4",
