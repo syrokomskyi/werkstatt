@@ -38,330 +38,40 @@ import type {
   VirtualRouteEntry,
 } from "./types.ts";
 
-/** A localized string map: lang → value. */
-export type LocalizedString = Record<string, string>;
+export type {
+  LocalizedString,
+  BlueprintAxis,
+  GeoDepth,
+  BlueprintLevelArticle,
+  BlueprintPillarHero,
+  BlueprintPillarAdaptationDimension,
+  BlueprintPillarAdaptation,
+  BlueprintPillarProductPrice,
+  BlueprintPillarFinalCta,
+  BlueprintPillar,
+  ServicePublicationGate,
+  BlueprintServiceConfig,
+  BlueprintLinkingParent,
+  IndustryPublicationGate,
+  BlueprintDossier,
+  IntersectionGate,
+  IntersectionSimilarity,
+  BlueprintIntersectionConfig,
+  BlueprintHubConfig,
+  BlueprintStatusGate,
+  BlueprintLevel,
+  BlueprintLinking,
+  BlueprintProjection,
+  EnrichedFieldSpec,
+  BlueprintDuplicatePolicy,
+  BlueprintEvidenceDepthPolicy,
+  BlueprintDemandDepthPolicy,
+  BlueprintDepthRolePolicy,
+  BlueprintPolicy,
+  Blueprint,
+} from "./blueprint-types.ts";
 
-export interface BlueprintAxis {
-  id: string;
-  /**
-   * The content-source collection + field whose entries form this axis's value universe,
-   * OR a geo provider reference (RFC-0238) resolved via @warpgogol/geo.
-   */
-  universe: { collection: string; field: string } | { provider: string };
-  /** The record field whose value(s) carry this axis's membership. */
-  match: { recordField: string };
-}
-
-export type GeoDepth = "full" | "twin-only" | "off";
-
-/**
- * RFC-0325: static article metadata for a level with no per-record binding (e.g. a depth-0 pillar
- * hub). Depth ≥1 levels bound to a dataset record instead read `publishedAt`/`updatedAt`/`author`/
- * `tags` directly from the matching record's frontmatter (the record wins when both are present).
- */
-export interface BlueprintLevelArticle {
-  publishedAt: string;
-  updatedAt?: string;
-  author?: string;
-  tags?: string[];
-}
-
-export interface BlueprintPillarHero {
-  eyebrow: LocalizedString;
-  heading: LocalizedString;
-  lead: LocalizedString;
-  primaryCta: { label: LocalizedString; target: string };
-  secondaryCta: { label: LocalizedString; target: string };
-}
-
-export interface BlueprintPillarAdaptationDimension {
-  heading: LocalizedString;
-  body: LocalizedString;
-}
-
-export interface BlueprintPillarAdaptation {
-  heading: LocalizedString;
-  dimensions: BlueprintPillarAdaptationDimension[];
-}
-
-export interface BlueprintPillarProductPrice {
-  heading: LocalizedString;
-  body: LocalizedString;
-  priceRef: string;
-}
-
-export interface BlueprintPillarFinalCta {
-  heading: LocalizedString;
-  body: LocalizedString;
-  primaryCta: { label: LocalizedString; target: string };
-  secondaryCta: { label: LocalizedString; target: string };
-}
-
-export interface BlueprintPillar {
-  hero: BlueprintPillarHero;
-  adaptation: BlueprintPillarAdaptation;
-  productPrice: BlueprintPillarProductPrice;
-  finalCta: BlueprintPillarFinalCta;
-}
-
-/** RFC-0496: publication gate thresholds for depth-1 service dossier pages. */
-export interface ServicePublicationGate {
-  minServiceVariants: number;
-  minCustomerQuestions: number;
-  minPriceModels: number;
-  minFaq: number;
-  minPageStructure: number;
-}
-
-/** RFC-0496: blueprint-level service configuration for website-service depth-1 pages. */
-export interface BlueprintServiceConfig {
-  gate: ServicePublicationGate;
-  claimRestrictions: string[];
-  mode: "warn" | "fail";
-}
-
-/** RFC-0496: cross-surface parent linking — service pages link up to their parent industry page. */
-export interface BlueprintLinkingParent {
-  surface: string;
-  depth: number;
-  joinField: string;
-}
-
-/** RFC-0492: publication gate thresholds for depth-1 industry dossier pages. */
-export interface IndustryPublicationGate {
-  minServiceCategories: number;
-  minCustomerJourneys: number;
-  minTrustSignals: number;
-  minArchitectureEntries: number;
-  minModuleMappings: number;
-  minUniqueFaq: number;
-}
-
-/** RFC-0492: blueprint-level dossier configuration for depth-1 industry pages. */
-export interface BlueprintDossier {
-  gate: IndustryPublicationGate;
-  claimRestrictions: string[];
-  doorwayMaxFlaggedShare: number;
-  duplicateMaxSimilarity: number;
-  mode: "warn" | "fail";
-}
-
-/** RFC-0497: gate thresholds for intersection records. */
-export interface IntersectionGate {
-  minLocalServiceQuestions: number;
-  minScenarios: number;
-  minLocalEvidence: number;
-  minUniqueContentBlocks: number;
-  minUniqueFaq: number;
-  minSources: number;
-}
-
-/** RFC-0497: similarity thresholds for intersection pages. */
-export interface IntersectionSimilarity {
-  similarityToIndustryPage: number;
-  similarityToCityPage: number;
-  similarityToServicePage: number;
-  similarityToOtherIntersections: number;
-}
-
-/** RFC-0497: blueprint-level intersection configuration for depth-5 pages. */
-export interface BlueprintIntersectionConfig {
-  gate: IntersectionGate;
-  similarity: IntersectionSimilarity;
-  substanceIndependenceThreshold: number;
-  mode: "warn" | "fail";
-}
-
-/** RFC-0500: hub configuration for depth-0 editorial knowledge hubs (ratgeber). */
-export interface BlueprintHubConfig {
-  cardFields: string[];
-  reservedSlugs: string[];
-}
-
-/** RFC-0500: status gate — only records with allowed statuses are emitted as surface entries. */
-export interface BlueprintStatusGate {
-  allowedStatuses: string[];
-  excludedStatuses: string[];
-}
-
-export interface BlueprintLevel {
-  depth: number;
-  /** lang → slug template, e.g. "website/{industry}/{city}". */
-  slug: LocalizedString;
-  /** Force this level to be emitted as a redirect stub to a live authored or surface pageId. */
-  redirectToPageId?: string;
-  /** The constellation (ordered Planet sequence) that renders this depth. */
-  constellation: string;
-  /** RFC-0195: per-depth GEO contribution. */
-  geo?: GeoDepth;
-  /**
-   * RFC-0193: lang → page-title template with `{axisId.field}` / `{axisId}` tokens, e.g.
-   * "{industry.name} Website in {city.name}". When omitted the baker falls back to joining the
-   * axis-value names.
-   */
-  titleTemplate?: LocalizedString;
-  /** lang → meta-description template (same tokens). Optional. */
-  descriptionTemplate?: LocalizedString;
-  /** lang → static intro prose for this level (used as the lead when no axis-value intro exists,
-   * e.g. a pillar page with no axis data). */
-  intro?: LocalizedString;
-  /**
-   * RFC-0325: this level's generated pages carry this semantic page type for JSON-LD/OG meta
-   * (defaults to "content", mirroring `VirtualRouteEntry.semanticType`). Set to "article" for a
-   * dated editorial genre (Ratgeber-style guides).
-   */
-  semanticType?: string;
-  /** RFC-0325: static article dates for a level with no per-record binding. See BlueprintLevelArticle. */
-  article?: BlueprintLevelArticle;
-  /** RFC-0490: optional pillar-hub configuration for depth-0 hub pages. */
-  pillar?: BlueprintPillar;
-  /** RFC-0492: optional dossier configuration for depth-1 industry pages. */
-  dossier?: BlueprintDossier;
-  /** RFC-0496: optional service configuration for website-service depth-1 pages. */
-  service?: BlueprintServiceConfig;
-  /** RFC-0497: optional intersection configuration for website-local depth-5 pages. */
-  intersection?: BlueprintIntersectionConfig;
-  /** RFC-0500: optional hub configuration for depth-0 editorial knowledge hubs. */
-  hub?: BlueprintHubConfig;
-}
-
-export interface BlueprintLinking {
-  children?: { limit: number };
-  siblings?: { limit: number };
-  teasers?: { relevance?: Array<{ sharedAxis: string; weight: number }> };
-  /** RFC-0496: cross-surface parent linking (e.g. website-service → website-local depth-1). */
-  parent?: BlueprintLinkingParent;
-}
-
-export interface BlueprintProjection {
-  title?: LocalizedString;
-  description?: LocalizedString | { ref: string };
-}
-
-/**
- * RFC-0197/0207: one build-time, frozen, provenanced enriched field.
- *
- * `kind` selects the output shape:
- *   - "field"     — a single string folded into one content block (the original localMarket; default).
- *   - "narrative" — a structured SurfaceNarrative (h1/lead/tagline/bridges) that supplies the hero
- *                   and section headings, replacing template-glue for indexable pages.
- * `scope` selects the generation granularity:
- *   - "tuple"  — one generation per live axis tuple at `scopeDepth` (default — bespoke per page).
- *   - "record" — one generation per axis value (reused across the matrix); requires `axis`.
- */
-export interface EnrichedFieldSpec {
-  field: string;
-  promptId: string;
-  maxTokens: number;
-  scopeDepth: number;
-  kind?: "field" | "narrative";
-  scope?: "tuple" | "record";
-  /** For scope:"record": the axis id whose values this field is generated per. */
-  axis?: string;
-}
-
-export interface BlueprintDuplicatePolicy {
-  method?: "shingle" | "simhash";
-  maxSimilarityWithinCluster?: number;
-}
-
-export interface BlueprintEvidenceDepthPolicy {
-  approvedNarrative?: "required" | "optional";
-  requiredRecordFields?: readonly string[];
-  preferredEvidenceSources?: readonly string[];
-  minTupleSpecificFacts?: number;
-  /** RFC-0281: minimum consented Werk records required for this depth. */
-  minWerkEvidence?: number;
-  /** RFC-0281: when set to "works", candidates at this depth are bounded by the Werk evidence join. */
-  existenceSource?: "records" | "works";
-  freshness?: "valid-and-current" | "valid";
-  duplicate?: BlueprintDuplicatePolicy;
-  leadImage?: "required" | "warning" | "optional";
-  mode?: "error" | "warning";
-}
-
-export interface BlueprintDemandDepthPolicy {
-  minVolume?: number;
-  allowIntents?: readonly ("informational" | "commercial" | "transactional" | "navigational")[];
-  missing?: "noindex" | "do-not-emit";
-  staleAfterDays?: number;
-}
-
-export interface BlueprintDepthRolePolicy {
-  indexability: "index" | "navigation-noindex" | "evidence-gated";
-  canonicalTarget?: "tradeHub" | number;
-  follow?: boolean;
-  includeInSitemap?: boolean;
-  geo?: GeoDepth;
-  localEvidence?: {
-    minVerifiedFacts?: number;
-    minCitySpecificQa?: number;
-    minUniqueTokenShare?: number;
-    maxBodySimilarityWithinBranch?: number;
-  };
-}
-
-/** The eligibility policy as authored in a Blueprint (segmentPattern defaulted by the loader). */
-export interface BlueprintPolicy {
-  minRecordsPerDepth: Record<number, number>;
-  noindexBelowPerDepth?: Record<number, number>;
-  redirectPolicy?: "nearest-ancestor" | "root";
-  trailingSlash?: boolean;
-  maxStubDepth?: number;
-  /** RFC-0194: minimum Page Substance Score (0..100) to index; below ⇒ auto-noindex. */
-  substanceMin?: number;
-  /** RFC-0274: optional per-depth substance floors that override the legacy global floor. */
-  substanceMinPerDepth?: Record<number, number>;
-  /** RFC-0274: per-depth proof profile required before a page may be indexable. */
-  evidencePerDepth?: Record<number, BlueprintEvidenceDepthPolicy>;
-  /** RFC-0280: per-depth search-demand signal gate. */
-  demandPerDepth?: Record<number, BlueprintDemandDepthPolicy>;
-  /** RFC-0324: per-depth indexability role for geo/PSEO levels. */
-  depthRoles?: Record<number, BlueprintDepthRolePolicy>;
-  /** RFC-0194: hard ceiling on indexable pages per surface (sitemap budget). */
-  sitemapBudget?: number;
-  /** RFC-0194: max share (0..1) of a family that may be thin before pseo.validate fails. */
-  maxThinShare?: number;
-  /**
-   * RFC-0240: depths gated behind the regional-hub-or-higher `pseo` tier (e.g. `[3]` for a region-hub
-   * level). Suppressed (dropped) when the resolved entitlements do not report `pseo.regionalUnlocked`.
-   */
-  regionalGateDepths?: readonly number[];
-  /**
-   * RFC-0192: how baked pages are stored. "inline" (default) bakes each page's blocks into the
-   * registry artifact (src/surface.generated.yaml). "lazy" keeps that artifact lightweight
-   * (metadata only) and writes each baked page to its own file (.surface-cache/<pageId>.yaml),
-   * loaded on demand at render — for surfaces too large to hold every page in one artifact.
-   */
-  bake?: "inline" | "lazy";
-  /** RFC-0500: status gate — only records with allowed statuses are emitted as surface entries. */
-  statusGate?: BlueprintStatusGate;
-}
-
-export interface Blueprint {
-  id: string;
-  /** Single gate (RFC-0169). Always "pseo" today; kept explicit for forward tiering. */
-  entitlement: string;
-  dataset: { collection: string; status?: string };
-  axes: BlueprintAxis[];
-  levels: BlueprintLevel[];
-  policy: BlueprintPolicy;
-  linking?: BlueprintLinking;
-  rotation?: { variantsByTupleHash: boolean };
-  projection?: BlueprintProjection;
-  /**
-   * RFC-0196: freshness SLA per depth + the record field carrying lastVerified. `mode` selects how
-   * a page's age is derived from its contributing records' ages: "any" (oldest — decay if any record
-   * is stale, default), "all" (youngest — decay only if every record is stale), or "median".
-   */
-  freshness?: {
-    slaDaysPerDepth: Record<number, number>;
-    field: string;
-    mode?: "any" | "all" | "median";
-  };
-  /** RFC-0197/0207: fields generated once via surface.enrich (string fields and narrative bundles). */
-  enrichedFields?: EnrichedFieldSpec[];
-}
+import type { Blueprint, BlueprintPolicy, BlueprintLevel } from "./blueprint-types.ts";
 
 const DEFAULT_SEGMENT_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 

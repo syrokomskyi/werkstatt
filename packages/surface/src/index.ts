@@ -89,10 +89,110 @@ export {
 
 export { blueprintSchema, parseBlueprint, type ParseBlueprintResult } from "./blueprint-schema.ts";
 
-// Governance and operational schema bags (RFC-0271..0285) — grouped sub-barrel.
-// Architecture review 2026-07-10: these are pure Zod schemas + inferred types with no functions,
-// kept in a sub-folder so the engine interface stays focused on route generation and baking.
-export * from "./governance/index.ts";
+// Governance and operational schema bags (RFC-0271..0285) — explicit re-exports.
+export type {
+  BlueprintModuleClaim,
+  PseoStage,
+  SurfaceModuleContext,
+  SurfaceModules,
+  UrlPolicy,
+} from "./module-context.ts";
+export {
+  findDuplicateBlueprintClaims,
+  findModuleForBlueprint,
+  moduleReviewPolicySchema,
+  moduleSiteModeSchema,
+  normalizeSurfaceModules,
+  pseoStageSchema,
+  surfaceModuleContextSchema,
+  surfaceModulesSchema,
+  urlPolicySchema,
+} from "./module-context.ts";
+
+export type {
+  DemandAxes,
+  DemandIntent,
+  DemandSignal,
+  DemandSignalSource,
+  WerkRecord,
+} from "./evidence-records.ts";
+export {
+  demandAxesSchema,
+  demandIntentSchema,
+  demandSignalSchema,
+  demandSignalSourceSchema,
+  werkRecordSchema,
+} from "./evidence-records.ts";
+
+export type {
+  ApprovalRecord,
+  Approver,
+  AutonomyLevel,
+  AutonomyScope,
+  AutonomyState,
+  Escalation,
+  EscalationBudget,
+  EscalationReason,
+  FieldClass,
+  ReviewInput,
+  ReviewVerdict,
+} from "./governance.ts";
+export {
+  approvalRecordSchema,
+  approverSchema,
+  autonomyLevelSchema,
+  autonomyScopeSchema,
+  autonomyStateSchema,
+  escalationBudgetSchema,
+  escalationReasonSchema,
+  escalationSchema,
+  fieldClassSchema,
+  reviewInputSchema,
+  reviewVerdictSchema,
+} from "./governance.ts";
+
+export type {
+  ClusterAction,
+  ClusterOutcome,
+  VisibilitySnapshot,
+  VisibilitySource,
+} from "./visibility.ts";
+export {
+  clusterActionSchema,
+  clusterOutcomeSchema,
+  visibilitySnapshotSchema,
+  visibilitySourceSchema,
+} from "./visibility.ts";
+
+export type {
+  BreakerVerdict,
+  SurfaceState,
+  SurfaceStateStatus,
+  Tripwire,
+  TripwireAction,
+} from "./breaker.ts";
+export {
+  breakerVerdictSchema,
+  surfaceStateSchema,
+  surfaceStateStatusSchema,
+  tripwireActionSchema,
+  tripwireSchema,
+} from "./breaker.ts";
+
+export type {
+  FleetBreakerState,
+  FleetJob,
+  FleetJobKind,
+  FleetPlan,
+  FleetSiteStatus,
+} from "./fleet.ts";
+export {
+  fleetBreakerStateSchema,
+  fleetJobKindSchema,
+  fleetJobSchema,
+  fleetPlanSchema,
+  fleetSiteStatusSchema,
+} from "./fleet.ts";
 
 export {
   buildTokenDocFreq,
