@@ -33,7 +33,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -85,8 +85,8 @@ Signing is staged: phase 1 may emit unsigned or dev-signed manifests; a producti
 ## Design sketch
 
 ```sh
-pnpm exec site-kernel run material.metadata.write --app webgogol-com
-pnpm exec site-kernel run material.metadata.validate --app webgogol-com
+pnpm exec site-kernel run material.metadata.write --app warpgogol-com
+pnpm exec site-kernel run material.metadata.validate --app warpgogol-com
 ```
 
 - IPTC/XMP fields: `Creator`, `CreditLine`, `CopyrightNotice`, `RightsUsageTerms`, `WebStatementOfRights` (license URL), `Licensor`/`LicensorURL`.

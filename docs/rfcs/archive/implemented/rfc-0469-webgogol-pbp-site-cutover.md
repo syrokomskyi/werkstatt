@@ -1,6 +1,6 @@
 ---
 id: RFC-0469
-title: "Webgogol PBP Site Cutover"
+title: "Warpgogol PBP Site Cutover"
 status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
@@ -48,7 +48,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/pbp"
@@ -56,7 +56,7 @@ packagesImpacted:
   - "@gogol/share"
   - "@gogol/ui"
 successSignals:
-  - "webgogol-com content.config.ts uses pbpCollections instead of businessCollections"
+  - "warpgogol-com content.config.ts uses pbpCollections instead of businessCollections"
   - "All page routes import from @gogol/pbp instead of @gogol/business"
   - "SemanticSiteProfile is built from PBP projections, not legacy loaders"
   - "Schema.org JSON-LD is generated from PBP compiler projections"
@@ -76,7 +76,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "pnpm --filter webgogol-com build"
+#     command: "pnpm --filter warpgogol-com build"
 #     expect:
 #       exitCode: 0
 #   - probe: command-registered
@@ -87,18 +87,18 @@ nonGoals:
 
 **Normative source references:**
 
-- `pbp-specification-package/04-Webgogol-Migration-Agent-Plan.md` — §26 (Cutover phase), §31 (Acceptance criteria)
-- `pbp-specification-package/05-Webgogol-Target-Manifest-Blueprint.md` — §32 (Buyer View), §33 (Blueprint readiness)
-- `systems/webgogol-com/src/content.config.ts` — current Astro collection wiring
-- `systems/webgogol-com/src/pages/*.astro` — current page route handlers
+- `pbp-specification-package/04-Warpgogol-Migration-Agent-Plan.md` — §26 (Cutover phase), §31 (Acceptance criteria)
+- `pbp-specification-package/05-Warpgogol-Target-Manifest-Blueprint.md` — §32 (Buyer View), §33 (Blueprint readiness)
+- `systems/warpgogol-com/src/content.config.ts` — current Astro collection wiring
+- `systems/warpgogol-com/src/pages/*.astro` — current page route handlers
 
-_This RFC switches webgogol-com from `@gogol/business` (DNA-20) to `@gogol/pbp` as the sole business data source. It defines the cutover preconditions, the code changes in the site, and the verification steps._
+_This RFC switches warpgogol-com from `@gogol/business` (DNA-20) to `@gogol/pbp` as the sole business data source. It defines the cutover preconditions, the code changes in the site, and the verification steps._
 
-# RFC-0469: Webgogol PBP Site Cutover
+# RFC-0469: Warpgogol PBP Site Cutover
 
 ## Context
 
-The site `webgogol-com` currently consumes business data through `@gogol/business`:
+The site `warpgogol-com` currently consumes business data through `@gogol/business`:
 
 1. **Content collections:** `content.config.ts` imports `businessCollections` from `@gogol/business/astro` and spreads it into `collections`.
 2. **Page routes:** `index.astro`, `404.astro`, `[...slug].astro`, `[lang]/[...slug].astro` import `buildPageSemanticModel` and `buildSiteSemanticProfile` from `@gogol/business`.
@@ -185,7 +185,7 @@ This adapter:
 
 ### 3. Content collection switch
 
-Update `systems/webgogol-com/src/content.config.ts`:
+Update `systems/warpgogol-com/src/content.config.ts`:
 
 ```ts
 // Before:
@@ -221,10 +221,10 @@ The page route logic remains unchanged — `resolvePageRoute` still calls `build
 
 Files to update:
 
-- `systems/webgogol-com/src/pages/index.astro`
-- `systems/webgogol-com/src/pages/404.astro`
-- `systems/webgogol-com/src/pages/[...slug].astro`
-- `systems/webgogol-com/src/pages/[lang]/[...slug].astro`
+- `systems/warpgogol-com/src/pages/index.astro`
+- `systems/warpgogol-com/src/pages/404.astro`
+- `systems/warpgogol-com/src/pages/[...slug].astro`
+- `systems/warpgogol-com/src/pages/[lang]/[...slug].astro`
 
 ### 5. OS validation switch
 
@@ -246,7 +246,7 @@ The OS validation checks PBP content files against `pbpSchemaById` instead of `b
 Register a new OS command `pbp.cutover.check`:
 
 ```sh
-pnpm exec site-kernel run pbp.cutover.check --app webgogol-com
+pnpm exec site-kernel run pbp.cutover.check --app warpgogol-com
 ```
 
 This command:
@@ -291,14 +291,14 @@ The cutover is executed in this exact order:
 2. **Update `content.config.ts`** — switch from `businessCollections` to `pbpCollections`
 3. **Update page routes** — switch imports from `@gogol/business` to `@gogol/pbp`
 4. **Update OS validation** — switch from `businessSchemaById` to `pbpSchemaById`
-5. **Build staging** — `pnpm --filter webgogol-com build`
+5. **Build staging** — `pnpm --filter warpgogol-com build`
 6. **Visual/content review** — compare staging against production for regressions
 7. **Verify structured data** — check Schema.org JSON-LD output matches expected shape
 8. **Verify contract/CRM adapters** — check integration event payloads
-9. **Run grep** — `grep -r "@gogol/business" systems/webgogol-com/src/` returns 0 results
-10. **Run grep** — `grep -r "src/content/business/" systems/webgogol-com/src/` returns 0 results
+9. **Run grep** — `grep -r "@gogol/business" systems/warpgogol-com/src/` returns 0 results
+10. **Run grep** — `grep -r "src/content/business/" systems/warpgogol-com/src/` returns 0 results
 11. **Commit cutover** — single atomic commit with all changes
-12. **Tag release** — `git tag pbp-cutover-webgogol-com`
+12. **Tag release** — `git tag pbp-cutover-warpgogol-com`
 
 ### 8. Rollback plan
 
@@ -316,7 +316,7 @@ Rollback is safe because legacy files are not deleted in this RFC.
 ## Architectural fit
 
 - **DNA-1 (Monorepo boundary).** Cutover changes are in the site workspace and `@gogol/pbp`. No site-local schemas or loaders.
-- **DNA-20 (Business layer).** This RFC is the point where `@gogol/business` ceases to be the canonical source for `webgogol-com`. The package itself is not deleted (RFC-0470).
+- **DNA-20 (Business layer).** This RFC is the point where `@gogol/business` ceases to be the canonical source for `warpgogol-com`. The package itself is not deleted (RFC-0470).
 - **DNA-55 (Spec vendoring).** Cutover preconditions reference `pbp-specification-package/migration-plan` §26.
 - **RFC-0462 (Cutover checklist).** This RFC populates `PbpCutoverChecklist.ready = true`.
 - **RFC-0466 (PBP Runtime).** Cutover uses `pbpCollections` from RFC-0466.
@@ -328,7 +328,7 @@ Rollback is safe because legacy files are not deleted in this RFC.
 
 ### CLI surface
 
-New command: `pbp.cutover.check --app webgogol-com`
+New command: `pbp.cutover.check --app warpgogol-com`
 
 ### TypeScript contracts
 
@@ -346,11 +346,11 @@ export interface PbpCutoverCheckResult {
 
 | Path | Role |
 | --- | --- |
-| `systems/webgogol-com/src/content.config.ts` | Switch from `businessCollections` to `pbpCollections` |
-| `systems/webgogol-com/src/pages/index.astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
-| `systems/webgogol-com/src/pages/404.astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
-| `systems/webgogol-com/src/pages/[...slug].astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
-| `systems/webgogol-com/src/pages/[lang]/[...slug].astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
+| `systems/warpgogol-com/src/content.config.ts` | Switch from `businessCollections` to `pbpCollections` |
+| `systems/warpgogol-com/src/pages/index.astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
+| `systems/warpgogol-com/src/pages/404.astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
+| `systems/warpgogol-com/src/pages/[...slug].astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
+| `systems/warpgogol-com/src/pages/[lang]/[...slug].astro` | Switch import from `@gogol/business` to `@gogol/pbp` |
 | `packages/pbp/src/semantic-profile.ts` | PBP semantic profile adapter |
 | `packages/os/site-kernel-checks/src/content-business.ts` | Switch from `businessSchemaById` to `pbpSchemaById` |
 
@@ -413,12 +413,12 @@ export interface PbpCutoverCheckResult {
 
 - [x] `pbp.cutover.check` command registered and functional (evidence: packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts:105-113, packages/os/site-kernel-checks/src/pbp-cutover-check.ts)
 - [x] `packages/pbp/src/semantic-profile.ts` exports `buildPbpSemanticProfile` and `buildPbpPageSemanticModel` (evidence: packages/pbp/src/semantic-profile.ts:22-23,27)
-- [x] `content.config.ts` imports `pbpCollections` from `@gogol/pbp/astro` (not `businessCollections`) (evidence: systems/webgogol-com/src/content.config.ts:33,69)
+- [x] `content.config.ts` imports `pbpCollections` from `@gogol/pbp/astro` (not `businessCollections`) (evidence: systems/warpgogol-com/src/content.config.ts:33,69)
 - [x] All 4 page route files import from `@gogol/pbp` (not `@gogol/business`) (evidence: index.astro:28, 404.astro:23, [...slug].astro:31, [lang]/[...slug].astro:36)
 - [x] `packages/os/site-kernel-checks/src/content-business.ts` validates against `pbpSchemaById` (evidence: packages/os/site-kernel-checks/src/content-business.ts:16,91-101)
-- [x] `pnpm --filter webgogol-com build` succeeds (evidence: astro build + astro check — 0 errors, 2026-07-20)
-- [x] `grep -r "@gogol/business" systems/webgogol-com/src/` returns 0 results (evidence: verified 2026-07-20, exit code 1 = no matches)
-- [x] `grep -r "src/content/business/" systems/webgogol-com/src/` returns 0 results (evidence: verified 2026-07-20, exit code 1 = no matches)
+- [x] `pnpm --filter warpgogol-com build` succeeds (evidence: astro build + astro check — 0 errors, 2026-07-20)
+- [x] `grep -r "@gogol/business" systems/warpgogol-com/src/` returns 0 results (evidence: verified 2026-07-20, exit code 1 = no matches)
+- [x] `grep -r "src/content/business/" systems/warpgogol-com/src/` returns 0 results (evidence: verified 2026-07-20, exit code 1 = no matches)
 - [x] Schema.org JSON-LD output matches expected shape (Product, Offer, PriceSpecification) (evidence: buildPbpSemanticProfile produces SemanticSiteProfile — 2026-07-20)
 - [x] Visual/content review confirms no regression (evidence: site build succeeds, people.ts fixed — 2026-07-20)
 - [x] `PbpCutoverChecklist.ready === true` (evidence: cutover completed, legacy deleted in RFC-0471 — 2026-07-20)

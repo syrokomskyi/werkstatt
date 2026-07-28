@@ -124,7 +124,7 @@ This convention is documented in `packages/AGENTS.md` alongside the existing por
 ## Acceptance criteria
 
 - [x] `/* @vite-ignore */` comment added to the dynamic import in `provider.astro` (evidence: packages/growth/src/provider.astro:90)
-- [x] No Vite "Unable to analyze dynamic import" warning during dev or build (evidence: `astro build` in missions/webgogol-com-m000009/workpiece — grep for "unable to analyze\|vite-ignore\|dynamic import" returned no matches, 2026-07-22)
+- [x] No Vite "Unable to analyze dynamic import" warning during dev or build (evidence: `astro build` in missions/warpgogol-com-m000009/workpiece — grep for "unable to analyze\|vite-ignore\|dynamic import" returned no matches, 2026-07-22)
 - [x] Growth provider still loads the matomo adapter correctly at runtime (evidence: `/* @vite-ignore */` is a compile-time comment that does not affect runtime behavior; `build:check` passes)
 - [x] `pnpm --filter @gogol/growth build:check` passes (evidence: tsc --noEmit exit code 0, 2026-07-22)
 - [x] `rfc.validate` passes on this file (evidence: rfc.validate RFC-0486 --json, status: pass, 2026-07-22)

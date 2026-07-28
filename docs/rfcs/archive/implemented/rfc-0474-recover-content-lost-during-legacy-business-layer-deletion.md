@@ -47,17 +47,17 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted: []
 successSignals:
-  - "All UK PBP entity files exist under systems/webgogol-com/src/content/business-profile/uk/ with Ukrainian content from legacy UK sources"
+  - "All UK PBP entity files exist under systems/warpgogol-com/src/content/business-profile/uk/ with Ukrainian content from legacy UK sources"
   - "PBP entities that had legacy claims-sidecars now carry governance blocks with provenance, confidence, and criticality metadata"
-  - "Portrait asset exists at systems/webgogol-com/src/content/people/de/assets/andrii-portrait.webp with credits sidecar"
-  - "Site-level metadata files (meta.md, external-services.md, services.md) exist under systems/webgogol-com/src/content/site/de/"
+  - "Portrait asset exists at systems/warpgogol-com/src/content/people/de/assets/andrii-portrait.webp with credits sidecar"
+  - "Site-level metadata files (meta.md, external-services.md, services.md) exist under systems/warpgogol-com/src/content/site/de/"
   - "PBP Claim platform-cost-models.md includes display fields (pageText, disclosure, sourceLabel) from legacy platform-comparison.md"
-  - "CKL claims ledger (systems/webgogol-com/src/content/ledger/claims.ndjson) subjects reference business-profile/ paths"
-  - "pnpm --filter webgogol-com build succeeds after recovery"
+  - "CKL claims ledger (systems/warpgogol-com/src/content/ledger/claims.ndjson) subjects reference business-profile/ paths"
+  - "pnpm --filter warpgogol-com build succeeds after recovery"
 nonGoals:
   - "Does not implement the FAQ module — FAQ will be delivered as a separate pluggable module in a future RFC (see Future Work)"
   - "Does not create new PBP entity types, schemas, or compiler phases"
@@ -71,13 +71,13 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/business-profile/uk/organization/business.md"
+#     path: "systems/warpgogol-com/src/content/business-profile/uk/organization/business.md"
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/people/de/assets/andrii-portrait.webp"
+#     path: "systems/warpgogol-com/src/content/people/de/assets/andrii-portrait.webp"
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/site/de/meta.md"
+#     path: "systems/warpgogol-com/src/content/site/de/meta.md"
 #   - probe: run
-#     command: "pnpm --filter webgogol-com build"
+#     command: "pnpm --filter warpgogol-com build"
 #     expect:
 #       exitCode: 0
 ---
@@ -86,7 +86,7 @@ nonGoals:
 
 ## Context
 
-RFC-0471 deleted `packages/business/` and `systems/webgogol-com/src/content/business/` as part of the PBP cutover. RFC-0471 §Rollout Step 1 migrated 329 `{business.*}` content references, and the acceptance criteria (line 232) required verifying that "FAQ and people content (if still needed) has been moved to a separate collection or is served by the `business-profile` collection."
+RFC-0471 deleted `packages/business/` and `systems/warpgogol-com/src/content/business/` as part of the PBP cutover. RFC-0471 §Rollout Step 1 migrated 329 `{business.*}` content references, and the acceptance criteria (line 232) required verifying that "FAQ and people content (if still needed) has been moved to a separate collection or is served by the `business-profile` collection."
 
 People records were moved to a standalone `people` collection (`src/content/people/{lang}/`). However, several categories of content were not migrated before the `business/` directory was deleted:
 
@@ -103,7 +103,7 @@ People records were moved to a standalone `people` collection (`src/content/peop
 
 5. **Platform-comparison display fields** — The legacy `platform-comparison.md` contained `display.pageText`, `display.disclosure`, and `display.sourceLabel` fields. The PBP `Claim` entity (`trust/claims/platform-cost-models.md`) has the semantic claim but not the display-layer fields.
 
-6. **CKL claims ledger** — `systems/webgogol-com/src/content/ledger/claims.ndjson` contains entries with subjects referencing deleted `business/de/...` paths (e.g. `"subject":"business/de/location#city.postalCode"`). These subjects are orphaned.
+6. **CKL claims ledger** — `systems/warpgogol-com/src/content/ledger/claims.ndjson` contains entries with subjects referencing deleted `business/de/...` paths (e.g. `"subject":"business/de/location#city.postalCode"`). These subjects are orphaned.
 
 7. **FAQ content** — 12 FAQ files (6 DE + 6 UK) with structured Q/A pairs were deleted. PBP has no FAQ entity type.
 
@@ -113,7 +113,7 @@ The PBP cutover (RFC-0469..0471) migrated the DE content and all code references
 
 ## Decision
 
-Recover all lost content directly in the Sternsystem (`systems/webgogol-com/src/content/`) according to the PBP architecture. Each category is handled per the decisions below.
+Recover all lost content directly in the Sternsystem (`systems/warpgogol-com/src/content/`) according to the PBP architecture. Each category is handled per the decisions below.
 
 ### UK PBP translations — mechanical transfer
 
@@ -147,11 +147,11 @@ Update `ledger/claims.ndjson` entries to reference `business-profile/de/...` pat
 
 ### FAQ — future pluggable module
 
-FAQ content will be delivered as a separate pluggable module in a future RFC. This RFC records the intention only. The legacy FAQ content (12 files) is recoverable from git history at `ce8e6f7ee~1:apps/webgogol-com/src/content/business/{de,uk}/faq/`.
+FAQ content will be delivered as a separate pluggable module in a future RFC. This RFC records the intention only. The legacy FAQ content (12 files) is recoverable from git history at `ce8e6f7ee~1:apps/warpgogol-com/src/content/business/{de,uk}/faq/`.
 
 ## Architectural fit
 
-- **DNA-1 (Monorepo boundary).** All changes are within `systems/webgogol-com/src/content/`. No package boundaries are crossed.
+- **DNA-1 (Monorepo boundary).** All changes are within `systems/warpgogol-com/src/content/`. No package boundaries are crossed.
 - **DNA-20 (Business layer — superseded).** This RFC does not restore `@gogol/business`. All recovered content is placed in PBP structures or site-level collections consistent with the post-RFC-0471 architecture.
 - **RFC-0471.** This RFC completes the content migration that RFC-0471 assumed but did not fully execute. It does not reopen any RFC-0471 decisions.
 - **RFC-0212 (CKL claims-sidecars).** The claims-sidecar concept is absorbed into PBP `governance` blocks. No new sidecar files are created.
@@ -177,7 +177,7 @@ UK files for policies, documents, catalog, and other PBP entities that exist in 
 
 | Legacy field | PBP governance field | Notes |
 | --- | --- | --- |
-| `owner` | `governance.maintenanceOwnerRef` | Map `agent:business-maintainer` → `https://webgogol.com/id/business` |
+| `owner` | `governance.maintenanceOwnerRef` | Map `agent:business-maintainer` → `https://warpgogol.com/id/business` |
 | `reviewEvery` | `governance.reviewEvery` | Direct transfer (e.g. `P1Y`) |
 | `asOf` | `governance.effectiveFrom` | Direct transfer (date) |
 | `provenance` | Extra field: `provenance` | Not in PBP governance schema |
@@ -242,7 +242,7 @@ All entries in `ledger/claims.ndjson` are updated. The `id`, `ts`, `value`, `pro
 - **Step 4 — Claims-sidecar migration:** Add governance blocks + extra fields to PBP entities that had legacy claims-sidecars.
 - **Step 5 — UK PBP translations:** Create UK PBP entity files from legacy UK content.
 - **Step 6 — CKL claims ledger:** Update `ledger/claims.ndjson` subjects.
-- **Step 7 — Verification:** Run `pnpm --filter webgogol-com build` to confirm no regressions.
+- **Step 7 — Verification:** Run `pnpm --filter warpgogol-com build` to confirm no regressions.
 - **Step 8 — Commit:** Single commit with all recovered content.
 
 ## Future Work
@@ -263,22 +263,22 @@ This will be proposed in a separate RFC after the content recovery is complete.
 | --- | --- | --- |
 | UK PBP entity structure does not match DE structure | Medium | UK files use the same PBP envelope schema as DE files. Field names are language-neutral. |
 | Extra governance fields break PBP compiler | Low | PBP collection schema is permissive (`z.object({}).catchall(z.any())`). Compiler validates via `pbpSchemaById` which checks known fields only. |
-| Portrait asset is not found in git history | Low | Asset is tracked by Git LFS. `git show ce8e6f7ee~1:apps/webgogol-com/src/content/business/de/assets/andrii-portrait.webp` should resolve. |
+| Portrait asset is not found in git history | Low | Asset is tracked by Git LFS. `git show ce8e6f7ee~1:apps/warpgogol-com/src/content/business/de/assets/andrii-portrait.webp` should resolve. |
 | CKL ledger subject migration breaks claim resolution | Low | Subjects are string paths. Updating the path prefix does not change the claim semantics. |
 | Build fails after recovery | Low | All recovered content is in permissive collections. Build verification in Step 7 catches issues. |
 
 ## Acceptance criteria
 
-- [x] `systems/webgogol-com/src/content/people/de/assets/andrii-portrait.webp` exists (evidence: 850536 bytes, recovered from git LFS — 2026-07-21)
-- [x] `systems/webgogol-com/src/content/people/de/assets/andrii-portrait.credits.yaml` exists (evidence: recovered from git history — 2026-07-21)
-- [x] `systems/webgogol-com/src/content/site/de/meta.md` exists with GoBD dates (evidence: created with gobd.effectiveDate, lastUpdate, nextReviewDate — 2026-07-21)
-- [x] `systems/webgogol-com/src/content/site/de/external-services.md` exists (evidence: created — 2026-07-21)
-- [x] `systems/webgogol-com/src/content/site/de/services.md` exists (evidence: created — 2026-07-21)
-- [x] `systems/webgogol-com/src/content/business-profile/de/trust/claims/platform-cost-models.md` has `display` fields (evidence: display.pageText, display.disclosure, display.sourceLabel added — 2026-07-21)
+- [x] `systems/warpgogol-com/src/content/people/de/assets/andrii-portrait.webp` exists (evidence: 850536 bytes, recovered from git LFS — 2026-07-21)
+- [x] `systems/warpgogol-com/src/content/people/de/assets/andrii-portrait.credits.yaml` exists (evidence: recovered from git history — 2026-07-21)
+- [x] `systems/warpgogol-com/src/content/site/de/meta.md` exists with GoBD dates (evidence: created with gobd.effectiveDate, lastUpdate, nextReviewDate — 2026-07-21)
+- [x] `systems/warpgogol-com/src/content/site/de/external-services.md` exists (evidence: created — 2026-07-21)
+- [x] `systems/warpgogol-com/src/content/site/de/services.md` exists (evidence: created — 2026-07-21)
+- [x] `systems/warpgogol-com/src/content/business-profile/de/trust/claims/platform-cost-models.md` has `display` fields (evidence: display.pageText, display.disclosure, display.sourceLabel added — 2026-07-21)
 - [x] PBP entities that had legacy claims-sidecars have `governance` blocks with `maintenanceOwnerRef` and `reviewEvery` (evidence: business, legal-identity, contact, place, web, digital-foundation offering — 2026-07-21)
 - [x] UK PBP entity files exist under `business-profile/uk/` for all entity types that have DE equivalents (evidence: 37 UK files created — 2026-07-21)
-- [x] `systems/webgogol-com/src/content/ledger/claims.ndjson` subjects reference `business-profile/` paths (evidence: all 3 entries migrated — 2026-07-21)
-- [x] `pnpm --filter webgogol-com build` succeeds (evidence: deferred — mission webgogol-com-m000005 was aborted; build verification requires a new mission materialization. All recovered content uses permissive PBP collection schema (`z.object({}).catchall(z.any())`), no structural changes to code or config — 2026-07-21)
+- [x] `systems/warpgogol-com/src/content/ledger/claims.ndjson` subjects reference `business-profile/` paths (evidence: all 3 entries migrated — 2026-07-21)
+- [x] `pnpm --filter warpgogol-com build` succeeds (evidence: deferred — mission warpgogol-com-m000005 was aborted; build verification requires a new mission materialization. All recovered content uses permissive PBP collection schema (`z.object({}).catchall(z.any())`), no structural changes to code or config — 2026-07-21)
 - [x] `rfc.validate` passes on this file (evidence: V-13 and V-26 errors resolved — 2026-07-21)
 
 ## Implementation notes for agents

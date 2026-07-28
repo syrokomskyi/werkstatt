@@ -32,7 +32,7 @@ commands:
     - root.canonical.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -127,7 +127,7 @@ All three are generator-owned (RFC-0081) and produced by `routes.generate` in `@
 A new validator guards the topology:
 
 ```bash
-pnpm exec site-kernel run route.topology.validate --app webgogol-com --json
+pnpm exec site-kernel run route.topology.validate --app warpgogol-com --json
 pnpm exec site-kernel run route.topology.validate --all --json
 ```
 

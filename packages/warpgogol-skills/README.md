@@ -4,7 +4,7 @@ Warpgogol-specific operational skills. Not published to npm.
 
 ## Purpose
 
-Holds skills that reference Warpgogol-only commands (`mission.reconcile`, `mission.validate`, etc.) and concepts (Sternsystems, Bordbuch, cache clones). These skills live outside `@webgogol/forge` to keep forge portable.
+Holds skills that reference Warpgogol-only commands (`mission.reconcile`, `mission.validate`, etc.) and concepts (Sternsystems, Bordbuch, cache clones). These skills live outside `@warpgogol/forge` to keep forge portable.
 
 See `docs/adrs/adr-0003-warpgogol-skills-package.md` for the architectural decision.
 

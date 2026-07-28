@@ -5,7 +5,7 @@ ownerCommand: rfc.verification.emit
 editInstead: the rfc.verification.emit generator source (not this file).
 regenerateCommand: pnpm exec site-kernel run rfc.verification.emit
 rfcId: RFC-0304
-title: Introduce backs workspaces and the Check Webgogol runner backend
+title: Introduce backs workspaces and the Check Warpgogol runner backend
 rfcStatus: implemented
 emittedAt: 2026-07-07T17:33:23.719Z
 commit: 15929a0bf01323ade1fb72094f29592d747b9862
@@ -29,25 +29,25 @@ probes:
     durationMs: 1
   - probe:
       probe: file-exists
-      path: backs/check-webgogol-runner/package.json
+      path: backs/check-warpgogol-runner/package.json
     ok: true
     detail: exists
     durationMs: 0
   - probe:
       probe: file-exists
-      path: backs/check-webgogol-runner/back.config.json
+      path: backs/check-warpgogol-runner/back.config.json
     ok: true
     detail: exists
     durationMs: 0
   - probe:
       probe: file-exists
-      path: backs/check-webgogol-runner/src/worker.ts
+      path: backs/check-warpgogol-runner/src/worker.ts
     ok: true
     detail: exists
     durationMs: 0
   - probe:
       probe: file-exists
-      path: backs/check-webgogol-runner/Dockerfile
+      path: backs/check-warpgogol-runner/Dockerfile
     ok: true
     detail: exists
     durationMs: 0
@@ -59,7 +59,7 @@ probes:
     durationMs: 0
   - probe:
       probe: file-exists
-      path: apps/check-webgogol-com/src/pages/api/check-runs/index.ts
+      path: apps/check-warpgogol-com/src/pages/api/check-runs/index.ts
     ok: true
     detail: exists
     durationMs: 0
@@ -77,13 +77,13 @@ probes:
     durationMs: 629
   - probe:
       probe: command-registered
-      name: check-webgogol.runner.validate
+      name: check-warpgogol.runner.validate
     ok: true
     detail: registered
     durationMs: 545
   - probe:
       probe: run
-      command: site-kernel run check-webgogol.runner.validate --json
+      command: site-kernel run check-warpgogol.runner.validate --json
       expect:
         exitCode: 0
     ok: false

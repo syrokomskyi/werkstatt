@@ -7,9 +7,9 @@ createdAt: 2026-07-11
 updatedAt:
 scope:
   apps:
-    - apps/webgogol-com
+    - apps/warpgogol-com
     - apps/nicaragua-projekt
-    - apps/check-webgogol-com
+    - apps/check-warpgogol-com
   packages:
     - packages/share
     - packages/business
@@ -76,7 +76,7 @@ scope:
 ### 2.2 Configuration and data
 
 - No content files need to be authored — content authoring is explicitly out of scope (RFC Phase 5).
-- The existing orphan `business/de/services.md` in webgogol-com is not modified.
+- The existing orphan `business/de/services.md` in warpgogol-com is not modified.
 
 ### 2.3 Documentation and specs
 
@@ -368,7 +368,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass.
-- `pnpm exec site-kernel run services.projection.validate --app webgogol-com` — must pass (no services files = no violations).
+- `pnpm exec site-kernel run services.projection.validate --app warpgogol-com` — must pass (no services files = no violations).
 - `pnpm exec site-kernel run services.projection.validate --app nicaragua-projekt` — must pass.
 
 **Completion criterion:** `services.projection.validate` is registered, runs per-app, and passes on all apps (no services files = no violations).
@@ -423,9 +423,9 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm run build:check` for `webgogol-com`.
+- Run `pnpm run build:check` for `warpgogol-com`.
 - Run `pnpm run build:check` for `nicaragua-projekt`.
-- Run `pnpm run build:check` for `check-webgogol-com`.
+- Run `pnpm run build:check` for `check-warpgogol-com`.
 - Verify `nicaragua-projekt` (no services) omits `## Services` in llms-full.txt with no error.
 - Run `pnpm exec site-kernel run rfc.validate RFC-0373 --json` — must pass.
 
@@ -450,9 +450,9 @@ scope:
 - `pnpm --filter @gogol/business run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-content run build:check`
-- `pnpm exec site-kernel run services.projection.validate --app webgogol-com`
+- `pnpm exec site-kernel run services.projection.validate --app warpgogol-com`
 - `pnpm exec site-kernel run services.projection.validate --app nicaragua-projekt`
-- `pnpm exec site-kernel run services.projection.validate --app check-webgogol-com`
+- `pnpm exec site-kernel run services.projection.validate --app check-warpgogol-com`
 - `pnpm run build:check` (per app, all three)
 - `pnpm exec site-kernel run ecosystem.manifest.validate --json`
 - `pnpm exec site-kernel run workspace.surface.validate --json`

@@ -34,7 +34,7 @@ commands:
   removed: []
 appsImpacted:
   - apps/nicaragua-projekt
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/share
   - packages/ui
@@ -43,7 +43,7 @@ successSignals:
   - "Every legal page rendered in a non-binding language carries a mandatory, machine-checkable language notice that links to the binding document, and a persistent \"unofficial translation\" indicator — both on by default."
   - "A client can mark a legal page's translation as `disabled` in a client-editable surface and the site falls back to the binding-language document with no broken route, no orphan URL, and no engineering involvement."
   - "`legal.translation.validate` fails the build when a page declares a binding language but a non-binding render is missing its notice or links to a non-binding target."
-  - "apps/webgogol-com's AGB (de) and Договір (uk) both carry the clause that the client / their lawyer owns legal correctness of original and translation, while the studio owns technical implementation and good-faith glossary-based translation."
+  - "apps/warpgogol-com's AGB (de) and Договір (uk) both carry the clause that the client / their lawyer owns legal correctness of original and translation, while the studio owns technical implementation and good-faith glossary-based translation."
 nonGoals:
   - "Do NOT make the studio or the platform a legal guarantor of translation accuracy — this RFC reduces studio liability, it does not assume a lawyer's role."
   - "Do NOT auto-translate legal copy or alter the meaning of authored legal text — translation remains an authoring activity governed by glossaries."
@@ -64,7 +64,7 @@ The ecosystem routinely translates legally significant documents (Datenschutzerk
 
 A lawyer review (summarized in the initiative brief) confirms the standard German practice: keep one vetted "controlling" version (here: German), treat the others as service translations with no independent legal force, and state clearly on the page which version binds and which language prevails on conflict. The platform already has the routing primitives to express this cleanly — content-entry language fallback (RFC-0008), per-page locale opt-in (RFC-0097), the unified route/page pipeline (RFC-0026, RFC-0048), and unprefixed-default-language routing (RFC-0160). This RFC turns the lawyer's advice into an enforced, default-on contract built on those primitives.
 
-The existing nonprofit reference app, [apps/nicaragua-projekt](apps/nicaragua-projekt), carries four legal pages (`legalNotice`, `privacyPolicy`, `terms`, `rightOfWithdrawal`) in `de` (binding) and `en` (translation). The studio app, [apps/webgogol-com](apps/webgogol-com), carries `agb`, `datenschutz`, `impressum`, `widerruf` in `de` and a partial `uk` set. Both are direct beneficiaries.
+The existing nonprofit reference app, [apps/nicaragua-projekt](apps/nicaragua-projekt), carries four legal pages (`legalNotice`, `privacyPolicy`, `terms`, `rightOfWithdrawal`) in `de` (binding) and `en` (translation). The studio app, [apps/warpgogol-com](apps/warpgogol-com), carries `agb`, `datenschutz`, `impressum`, `widerruf` in `de` and a partial `uk` set. Both are direct beneficiaries.
 
 ## Problem
 
@@ -74,7 +74,7 @@ The protective behavior the lawyer recommends currently relies entirely on manua
 2. **No mandatory notice.** There is no component, and no enforced requirement, that a non-binding legal render display the "this is an unofficial translation; the German version binds; on conflict the German version prevails" disclaimer, nor that it link to the _specific_ vetted document.
 3. **No client off-switch with safe fallback.** `clientEditable` (DNA-22) covers `pages`, `prose`, `business`, `navigation`, `site` — but the only existing per-locale toggle, RFC-0097 `locales`, lives in `system.md`, which is **not** client-editable, and its semantics _hide_ a page from a locale rather than _fall back_ to the binding version. A client cannot, today, say "do not serve the Ukrainian translation of our AGB; show the German one instead" without engineering.
 4. **No "simplified translation" indicator.** Nothing persistently signals to the Visitor, while they read, that they are looking at a service translation rather than the operative text.
-5. **No contractual allocation of liability.** Neither the German AGB nor the Ukrainian Договір of [apps/webgogol-com](apps/webgogol-com) states that translation-correctness liability rests with the client / their lawyer while the studio provides technical implementation and good-faith, glossary-based translation.
+5. **No contractual allocation of liability.** Neither the German AGB nor the Ukrainian Договір of [apps/warpgogol-com](apps/warpgogol-com) states that translation-correctness liability rests with the client / their lawyer while the studio provides technical implementation and good-faith, glossary-based translation.
 
 ## Decision
 
@@ -88,7 +88,7 @@ The platform gains a **binding-language policy** for legal documents, expressed 
 
 4. **Client off-switch with binding-language fallback.** The client may set a locale's status to `disabled` in the same client-editable `translation` block. A `disabled` locale **falls back to the binding-language document** (redirect to the binding-language localized URL via the RFC-0160 routing layer), rather than serving an untrusted translation. This composes with — and is distinct from — RFC-0097 `locales` (which removes a page from a locale entirely): `disabled` keeps the page reachable but routes the Visitor to the authoritative version. Applied to the four legal pages of [apps/nicaragua-projekt](apps/nicaragua-projekt) per the initiative.
 
-5. **Contractual liability allocation (content).** [apps/webgogol-com](apps/webgogol-com)'s AGB (`prose/de/agb.md`) and Ukrainian Договір (`prose/uk/agb.md`) gain a clause: the client or their lawyer bears legal correctness of both the original and any translation of legal documents; the studio provides technical implementation and a good-faith translation per agreed glossaries, and translations are service versions without independent legal force.
+5. **Contractual liability allocation (content).** [apps/warpgogol-com](apps/warpgogol-com)'s AGB (`prose/de/agb.md`) and Ukrainian Договір (`prose/uk/agb.md`) gain a clause: the client or their lawyer bears legal correctness of both the original and any translation of legal documents; the studio provides technical implementation and a good-faith translation per agreed glossaries, and translations are service versions without independent legal force.
 
 A new workspace command, **`legal.translation.validate`**, enforces parts 1–4 at build time.
 
@@ -209,7 +209,7 @@ export interface TranslationNoticeProps {
 | `packages/share/src/astro/page-handler.ts` | Reads policy, injects notice block, sets indicator flag (mirrors `withDefaultBreadcrumbs`) |
 | `packages/share/src/middleware/language-redirect.ts` / RFC-0160 routing | `disabled` locale → redirect to binding-language URL |
 | `packages/ui/src/sections/translation-notice/**` | New shared section component (5-file mirror) |
-| `apps/webgogol-com/src/content/prose/de/agb.md`, `.../uk/agb.md` | Liability clause copy |
+| `apps/warpgogol-com/src/content/prose/de/agb.md`, `.../uk/agb.md` | Liability clause copy |
 | `packages/os/site-kernel-checks/src/legal-translation.ts` | `legal.translation.validate` implementation |
 
 ### Auto-injection (mirrors breadcrumbs)
@@ -231,7 +231,7 @@ In [page-handler.ts](packages/share/src/astro/page-handler.ts), after `withDefau
       "message": "Non-binding legal render 'en' has notice:false while status is 'unofficial'."
     },
     {
-      "app": "webgogol-com",
+      "app": "warpgogol-com",
       "pageId": "terms",
       "lang": "uk",
       "rule": "notice-link-not-binding",
@@ -250,10 +250,10 @@ Rules: `missing-binding-lang` (binding language has no page file), `missing-noti
 ## Rollout
 
 - **Introduction:** `legal.translation.validate` ships **warn-only for one release** for pages that _already_ declare a binding language but predate the notice, then flips to fail-hard and joins `build.check`. Pages without a `translation` block are never affected.
-- **Reference apps first:** declare `translation` on the four [apps/nicaragua-projekt](apps/nicaragua-projekt) legal pages (`legalNotice`, `privacyPolicy`, `terms`, `rightOfWithdrawal`) with `binding: de`, `en: unofficial`, and set the initiative-requested `disabled` opt-outs where the client requests them. Add the same to [apps/webgogol-com](apps/webgogol-com) legal pages (`binding: de`; `uk` translations `unofficial`).
+- **Reference apps first:** declare `translation` on the four [apps/nicaragua-projekt](apps/nicaragua-projekt) legal pages (`legalNotice`, `privacyPolicy`, `terms`, `rightOfWithdrawal`) with `binding: de`, `en: unofficial`, and set the initiative-requested `disabled` opt-outs where the client requests them. Add the same to [apps/warpgogol-com](apps/warpgogol-com) legal pages (`binding: de`; `uk` translations `unofficial`).
 - **New apps:** the onboarding template seeds a `translation: { binding: <defaultLang> }` stub on generated legal pages, so new thin sites are protected from day one with no extra step.
 - **Indicator default:** on by default ecosystem-wide; opt-out is per-page (`indicator: false`), never global.
-- **Contract copy:** add the liability clause to webgogol-com AGB (de) and Договір (uk) in the same change; it is informational content and ships immediately.
+- **Contract copy:** add the liability clause to warpgogol-com AGB (de) and Договір (uk) in the same change; it is informational content and ships immediately.
 
 ## Alternatives considered
 
@@ -280,7 +280,7 @@ Rules: `missing-binding-lang` (binding language has no page file), `missing-noti
 - [x] A `disabled` locale redirects (308) to the binding-language localized URL via the route registry (RFC-0160); the binding language can never be `disabled` (validator rule `binding-disabled`). No 404/orphan. (evidence: implemented historically)
 - [x] `legal.translation.validate` command registered (app scope, `supportsAllApps`), `--json` output stable, wired into `APPS_CHECK_AUTHOR_PIPELINE`; rules `missing-binding-lang`, `missing-notice`, `binding-disabled`, `disabled-without-fallback`, `unknown-status` implemented. (`notice-link-not-binding` is structurally guaranteed: the link is computed from the binding pageId, never authored.) (evidence: implemented historically)
 - [x] apps/nicaragua-projekt's four legal pages declare `translation` (`binding: de`, `en: unofficial`); build passes and the EN notice/indicator render with a link to the binding `/impressum`. (Client may flip any locale to `disabled` for the off-switch — capability verified via the resolver + redirect path.) (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] apps/webgogol-com legal pages declare `translation` (`binding: de`, `uk: unofficial`); AGB (`prose/de/agb.md` §7(5)) and Договір (`prose/uk/agb.md` §7(5)) carry the liability clause (client/their lawyer owns correctness; studio owns technical implementation + good-faith glossary translation; translations are service versions). Build passes; the uk notice renders at `/uk/umovy` linking to the binding `/agb`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] apps/warpgogol-com legal pages declare `translation` (`binding: de`, `uk: unofficial`); AGB (`prose/de/agb.md` §7(5)) and Договір (`prose/uk/agb.md` §7(5)) carry the liability clause (client/their lawyer owns correctness; studio owns technical implementation + good-faith glossary translation; translations are service versions). Build passes; the uk notice renders at `/uk/umovy` linking to the binding `/agb`. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Onboarding template seeds a `translation` stub on generated legal pages (`legal.scaffold` impressum/datenschutz page templates). (evidence: implemented historically)
 - [x] `AGENTS.md` updated where agent behavior rules changed (`packages/ui/AGENTS.md`: notice non-removable, validator must not be weakened). (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)

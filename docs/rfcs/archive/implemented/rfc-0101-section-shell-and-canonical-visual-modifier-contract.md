@@ -42,7 +42,7 @@ commands:
     - flat visual-modifier props (texture / transparent / opacity / verticalFade / noTopFade / noBottomFade / topVerticalFadeOpacity / bottomVerticalFadeOpacity / glass) on every section
     - VisualModifiers interface and visualModifierSchema in packages/share/src/schemas/visual-modifiers.ts
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -247,7 +247,7 @@ See `## CLI surface`, `## TypeScript contracts`, and `## File system responsibil
 pnpm exec site-kernel run section.shell.contract.validate
 pnpm exec site-kernel run section.background.contract.validate
 pnpm exec site-kernel run section.contract.validate
-pnpm exec site-kernel run page.block.validate --app webgogol-com
+pnpm exec site-kernel run page.block.validate --app warpgogol-com
 pnpm exec site-kernel run section.scaffold --archetype <id> --slug <slug>
 ```
 

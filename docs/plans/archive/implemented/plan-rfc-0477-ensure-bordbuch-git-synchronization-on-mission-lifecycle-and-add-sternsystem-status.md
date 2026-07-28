@@ -211,7 +211,7 @@ No pipeline integration. All commands are operator-invoked.
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` passes
-- `pnpm exec site-kernel run sternsystem.status --id webgogol-com --json` returns valid JSON
+- `pnpm exec site-kernel run sternsystem.status --id warpgogol-com --json` returns valid JSON
 
 **Completion criterion:** `sternsystem.status` registered, returns HEAD/origin/mirror SHAs, dirty files, last 6 bordbuch events, last reconciledAt.
 

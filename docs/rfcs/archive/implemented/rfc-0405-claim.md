@@ -64,7 +64,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -91,7 +91,7 @@ _This RFC defines the `PbpClaim` entity interface. It references the vendored sn
 
 The PBP spec defines Claim as a typed entity for comparative, risk, or factual assertions made by a business (`pbp-specification-package/entity-model` §24). Claims replace the legacy `*.claims.yaml` sidecar pattern (ADR-018) with first-class entities that have their own governance, evidence references, and publication controls.
 
-The current Webgogol model uses path-based `*.claims.yaml` sidecars (migration-plan §2). These are keyed by source file path, duplicate governance, and are not first-class entities. This RFC defines the `PbpClaim` interface that replaces them.
+The current Warpgogol model uses path-based `*.claims.yaml` sidecars (migration-plan §2). These are keyed by source file path, duplicate governance, and are not first-class entities. This RFC defines the `PbpClaim` interface that replaces them.
 
 ## Problem
 

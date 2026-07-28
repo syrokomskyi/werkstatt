@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - os

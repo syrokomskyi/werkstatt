@@ -77,9 +77,9 @@ Every app receives a deterministic IndexNow key derived from the app/project id:
 Example:
 
 ```text
-key:  webgogol-com-indexnow
-file: public/webgogol-com-indexnow.txt
-body: webgogol-com-indexnow
+key:  warpgogol-com-indexnow
+file: public/warpgogol-com-indexnow.txt
+body: warpgogol-com-indexnow
 ```
 
 The key file is UTF-8 text. The key inside the file must strictly match the filename without `.txt`.
@@ -183,8 +183,8 @@ When an app has `src/bordbuch/events.ndjson`, a successful live submission appen
 ```json
 {
   "kind": "indexnow.submit",
-  "appId": "webgogol-com",
-  "key": "webgogol-com-indexnow",
+  "appId": "warpgogol-com",
+  "key": "warpgogol-com-indexnow",
   "urlCount": 42,
   "submittedAt": "2026-07-05T00:00:00.000Z",
   "batchHash": "<sha256>"
@@ -223,13 +223,13 @@ Do not store API response bodies if they contain unexpected data. Store status, 
 ## Acceptance criteria
 
 - [x] Every app emits `public/<app-id>-indexnow.txt`. (evidence: implemented historically)
-- [x] `webgogol-com` emits `public/webgogol-com-indexnow.txt` containing exactly (evidence: implemented historically) `webgogol-com-indexnow`.
+- [x] `warpgogol-com` emits `public/warpgogol-com-indexnow.txt` containing exactly (evidence: implemented historically) `warpgogol-com-indexnow`.
 - [x] `indexnow.key.validate` fails on invalid characters, invalid length, body/filename mismatch, (evidence: implemented historically) and non-UTF-8 content.
 - [x] `indexnow.submit` filters out non-canonical URLs and Markdown twins. (evidence: implemented historically)
 - [x] Live submission is logged in Bordbuch for apps that have Bordbuch enabled. (evidence: implemented historically)
 - [x] `rfc.validate` passes. (evidence: implemented historically)
 
-**As-built, 2026-07-06:** `indexnow.key.generate` and `indexnow.key.validate` are registered and wired into build preparation/author checks. `indexnow.submit` resolves canonical HTML pages from local sitemap indexes and nested sitemap files, intersects explicit `--urls` input with the current canonical sitemap set, excludes Markdown twins/static/API/well-known artifacts, checks the deployed key file before live submission, posts bounded batches with transient retry handling, and appends a Bordbuch `indexnow.submit` event after successful live submission when the app has `src/bordbuch/events.ndjson`. `indexnow.submit.validate` is in `PACKAGES_CHECK_PIPELINE`; fixture coverage locks down payload shape, key-file URL derivation, URL filtering, batching, and deterministic batch hashes. Verified with `indexnow.key.validate` for all apps, `indexnow.submit.validate`, dry-run submissions for `webgogol-com` and `nicaragua-projekt`, package TypeScript checks, command manifest validation, ACP validation, and `rfc.validate`.
+**As-built, 2026-07-06:** `indexnow.key.generate` and `indexnow.key.validate` are registered and wired into build preparation/author checks. `indexnow.submit` resolves canonical HTML pages from local sitemap indexes and nested sitemap files, intersects explicit `--urls` input with the current canonical sitemap set, excludes Markdown twins/static/API/well-known artifacts, checks the deployed key file before live submission, posts bounded batches with transient retry handling, and appends a Bordbuch `indexnow.submit` event after successful live submission when the app has `src/bordbuch/events.ndjson`. `indexnow.submit.validate` is in `PACKAGES_CHECK_PIPELINE`; fixture coverage locks down payload shape, key-file URL derivation, URL filtering, batching, and deterministic batch hashes. Verified with `indexnow.key.validate` for all apps, `indexnow.submit.validate`, dry-run submissions for `warpgogol-com` and `nicaragua-projekt`, package TypeScript checks, command manifest validation, ACP validation, and `rfc.validate`.
 
 ## Implementation notes for agents
 

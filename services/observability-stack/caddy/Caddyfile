@@ -1,8 +1,8 @@
-observe.webgogol.com {
+observe.warpgogol.com {
   reverse_proxy signoz:8080
 }
 
-ingest.observe.webgogol.com {
+ingest.observe.warpgogol.com {
   @unauthorized not header Authorization "Bearer {$WARPGOGOL_OTLP_TOKEN}"
   respond @unauthorized 401
   reverse_proxy otel-collector:4318

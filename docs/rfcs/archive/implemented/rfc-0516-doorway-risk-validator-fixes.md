@@ -26,7 +26,7 @@ versionBump: patch
 
 `surface.doorway-risk.report` (RFC-0492) flags depth-4 city pages missing unique
 local context fields (`localDemandContext`, `uniqueIntro`, `uniqueFaq`,
-`localEvidence`). Two bugs caused false-positive errors on webgogol-com:
+`localEvidence`). Two bugs caused false-positive errors on warpgogol-com:
 
 1. **`localDemandContext` lookup used demand slug** — `checkEntryLocalContext`
    looked up the demand record via `entry.axes.demand`, but depth-4 surface
@@ -43,7 +43,7 @@ local context fields (`localDemandContext`, `uniqueIntro`, `uniqueFaq`,
 ## Problem
 
 The validator produced 13 errors (12 missing-field + 1 threshold-exceeded) on
-webgogol-com, all on German depth-4 pages. The `localDemandContext` errors were
+warpgogol-com, all on German depth-4 pages. The `localDemandContext` errors were
 false positives — the German demand records do lack the field, but the validator
 would have flagged them even if they had it, because the lookup was broken.
 
@@ -119,7 +119,7 @@ if (exceedsThreshold && dossierMode !== "warn") {
 
 ## Acceptance criteria
 
-1. `surface.doorway-risk.report --site webgogol-com` exits 0 (warnings only,
+1. `surface.doorway-risk.report --site warpgogol-com` exits 0 (warnings only,
    no errors) when the blueprint declares `mode: warn`.
 2. Depth-4 pages with demand records that have `localDemandContext` are not
    flagged for `localDemandContext`.

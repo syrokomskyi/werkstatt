@@ -49,7 +49,7 @@ commands:
     - video.variants.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
@@ -67,7 +67,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run video.variants.validate --app webgogol-com"
+#     command: "site-kernel run video.variants.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-contains

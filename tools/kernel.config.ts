@@ -69,17 +69,17 @@ export default defineKernelConfig({
   description: "Warpgogol platform workspace configuration",
   moduleLoaders: {
     icons: async () => (await import("@warpgogol/site-kernel/icons")).iconsModule,
-    "forge-core": async () => (await import("@webgogol/forge/os/core")).forgeCoreModule,
-    "forge-compass": async () => (await import("@webgogol/forge/os/compass")).forgeCompassModule,
+    "forge-core": async () => (await import("@warpgogol/forge/os/core")).forgeCoreModule,
+    "forge-compass": async () => (await import("@warpgogol/forge/os/compass")).forgeCompassModule,
     "forge-naming": async () =>
-      (await import("@webgogol/forge/os/naming-module")).forgeNamingModule,
-    workflow: async () => (await import("@webgogol/forge/os/workflow-module")).forgeWorkflowModule,
-    rfc: async () => (await import("@webgogol/forge/os/rfc-module")).forgeRfcModule,
-    adr: async () => (await import("@webgogol/forge/os/adr-module")).forgeAdrModule,
-    "forge-plan": async () => (await import("@webgogol/forge/os/plan-module")).forgePlanModule,
-    "forge-audit": async () => (await import("@webgogol/forge/os/audit-module")).forgeAuditModule,
+      (await import("@warpgogol/forge/os/naming-module")).forgeNamingModule,
+    workflow: async () => (await import("@warpgogol/forge/os/workflow-module")).forgeWorkflowModule,
+    rfc: async () => (await import("@warpgogol/forge/os/rfc-module")).forgeRfcModule,
+    adr: async () => (await import("@warpgogol/forge/os/adr-module")).forgeAdrModule,
+    "forge-plan": async () => (await import("@warpgogol/forge/os/plan-module")).forgePlanModule,
+    "forge-audit": async () => (await import("@warpgogol/forge/os/audit-module")).forgeAuditModule,
     "forge-session": async () =>
-      (await import("@webgogol/forge/os/session-module")).forgeSessionModule,
+      (await import("@warpgogol/forge/os/session-module")).forgeSessionModule,
     lagebild: async () => (await import("@warpgogol/site-kernel/lagebild-module")).lagebildModule,
     "commit-message": async () =>
       (await import("@warpgogol/site-kernel/commit-message")).commitMessageModule,
@@ -99,8 +99,8 @@ export default defineKernelConfig({
     sternsystem: async () =>
       (await import("@warpgogol/site-kernel-handoff/sternsystem-module")).createSternsystemModule(),
     "forge-werkstatt": async () =>
-      (await import("@webgogol/forge/os/werkstatt")).forgeWerkstattModule,
-    "forge-spec": async () => (await import("@webgogol/forge/os/spec-module")).forgeSpecModule,
+      (await import("@warpgogol/forge/os/werkstatt")).forgeWerkstattModule,
+    "forge-spec": async () => (await import("@warpgogol/forge/os/spec-module")).forgeSpecModule,
     mission: async () =>
       (await import("@warpgogol/site-kernel-handoff/mission-module")).createMissionModule(),
     bordbuch: async () =>

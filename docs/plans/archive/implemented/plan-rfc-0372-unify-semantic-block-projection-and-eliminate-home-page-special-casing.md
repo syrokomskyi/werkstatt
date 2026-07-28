@@ -7,9 +7,9 @@ createdAt: 2026-07-10
 updatedAt:
 scope:
   apps:
-    - apps/webgogol-com
+    - apps/warpgogol-com
     - apps/nicaragua-projekt
-    - apps/check-webgogol-com
+    - apps/check-warpgogol-com
   packages:
     - packages/share
     - packages/os/site-kernel-checks
@@ -30,7 +30,7 @@ scope:
 - [ ] O5 — Add missing extractors (`video-section`, `people`) and passport no-op extractors (acceptance criterion 10)
 - [ ] O6 — Rename `page.blocks.validate` → `page.blocks.extract.validate` with auto-discovery, hard FAIL, frontmatter `id` check, and baseline regeneration (acceptance criteria 11–14)
 - [ ] O7 — All three apps build green with the unified pipeline (acceptance criterion 15)
-- [ ] O8 — `apps/webgogol-com/public/uk/index.md` contains all home page sections (acceptance criterion 16)
+- [ ] O8 — `apps/warpgogol-com/public/uk/index.md` contains all home page sections (acceptance criterion 16)
 - [ ] O9 — Home pages no longer emit Service JSON-LD nodes (services extraction deferred to a separate RFC)
 
 ## 2. Affected artifacts
@@ -65,10 +65,10 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `apps/webgogol-com/src/content/pages/de/home.md` — Already has `id` on all blocks ✓
-- `apps/webgogol-com/src/content/pages/uk/home.md` — Verify `id` fields present
+- `apps/warpgogol-com/src/content/pages/de/home.md` — Already has `id` on all blocks ✓
+- `apps/warpgogol-com/src/content/pages/uk/home.md` — Verify `id` fields present
 - `apps/nicaragua-projekt/src/content/pages/de/home.md` — Already has `id` on all blocks ✓
-- `apps/check-webgogol-com/src/content/pages/` — Verify `id` fields present on all pages with blocks
+- `apps/check-warpgogol-com/src/content/pages/` — Verify `id` fields present on all pages with blocks
 - Any remaining app pages with blocks lacking `id` — backfill with stable ids
 
 ### 2.3 Documentation and specs
@@ -273,9 +273,9 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
-- `pnpm exec site-kernel run page.blocks.extract.validate --app webgogol-com` — must pass (all extractors registered)
+- `pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com` — must pass (all extractors registered)
 - `pnpm exec site-kernel run page.blocks.extract.validate --app nicaragua-projekt` — must pass
-- `pnpm exec site-kernel run page.blocks.extract.validate --app check-webgogol-com` — must pass
+- `pnpm exec site-kernel run page.blocks.extract.validate --app check-warpgogol-com` — must pass
 
 **Completion criterion:** `page.blocks.extract.validate` runs per-app, auto-discovers all block types from frontmatter, fails on missing extractor or missing `id`; old `page.blocks.validate` name is gone; baselines regenerated.
 
@@ -297,7 +297,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — must pass
-- `pnpm exec site-kernel run article.depth.validate --app webgogol-com` — must pass
+- `pnpm exec site-kernel run article.depth.validate --app warpgogol-com` — must pass
 
 **Completion criterion:** `article-depth.ts` reads exclusively from `page.blocks`; `findThinSections` accepts `SemanticBlock[]`.
 
@@ -354,14 +354,14 @@ scope:
 
 - Run `page.blocks.extract.validate` on each app to discover blocks missing `id`
 - Backfill `id` fields in app frontmatter where missing
-- `apps/webgogol-com` home page: already has `id` on all blocks ✓
+- `apps/warpgogol-com` home page: already has `id` on all blocks ✓
 - `apps/nicaragua-projekt` home page: already has `id` on all blocks ✓
 - Check all other pages with blocks in all three apps
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.blocks.extract.validate --app webgogol-com` — must pass (no `missing-id` violations)
-- Same for `nicaragua-projekt` and `check-webgogol-com`
+- `pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com` — must pass (no `missing-id` violations)
+- Same for `nicaragua-projekt` and `check-warpgogol-com`
 
 **Completion criterion:** `page.blocks.extract.validate` passes on all three apps with zero `missing-id` violations.
 
@@ -375,10 +375,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm run build:check` for `webgogol-com`
+- Run `pnpm run build:check` for `warpgogol-com`
 - Run `pnpm run build:check` for `nicaragua-projekt`
-- Run `pnpm run build:check` for `check-webgogol-com`
-- Verify `apps/webgogol-com/public/uk/index.md` contains all home page sections: hero, promo, trust-strip, comparison-cards, audience-cards, ownership-block, notausgang-block, controlled-responsibility-block, price-card, founder, faq-list
+- Run `pnpm run build:check` for `check-warpgogol-com`
+- Verify `apps/warpgogol-com/public/uk/index.md` contains all home page sections: hero, promo, trust-strip, comparison-cards, audience-cards, ownership-block, notausgang-block, controlled-responsibility-block, price-card, founder, faq-list
 - Run `pnpm exec site-kernel run rfc.validate RFC-0372 --json` — must pass
 
 **Validation:**
@@ -401,12 +401,12 @@ scope:
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-content run build:check`
-- `pnpm exec site-kernel run page.blocks.extract.validate --app webgogol-com`
+- `pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com`
 - `pnpm exec site-kernel run page.blocks.extract.validate --app nicaragua-projekt`
-- `pnpm exec site-kernel run page.blocks.extract.validate --app check-webgogol-com`
-- `pnpm exec site-kernel run article.depth.validate --app webgogol-com`
+- `pnpm exec site-kernel run page.blocks.extract.validate --app check-warpgogol-com`
+- `pnpm exec site-kernel run article.depth.validate --app warpgogol-com`
 - `pnpm run build:check` (per app, all three)
-- Verify `apps/webgogol-com/public/uk/index.md` contains all home page sections
+- Verify `apps/warpgogol-com/public/uk/index.md` contains all home page sections
 
 ### 4.2 Evidence artifacts
 

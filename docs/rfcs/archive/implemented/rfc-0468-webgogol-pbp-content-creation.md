@@ -1,6 +1,6 @@
 ---
 id: RFC-0468
-title: "Webgogol PBP Content Creation"
+title: "Warpgogol PBP Content Creation"
 status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
@@ -46,12 +46,12 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/pbp"
 successSignals:
-  - "business-profile/de/ content tree created in systems/webgogol-com/src/content/"
+  - "business-profile/de/ content tree created in systems/warpgogol-com/src/content/"
   - "All PBP entity .md files validate against Zod schemas from RFC-0466"
   - "compilePbpProfile produces 0 fatal errors in migration strictness"
   - "Owner decision register created with all 28 blocking items"
@@ -71,38 +71,38 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/business-profile/de/organization/business.md"
+#     path: "systems/warpgogol-com/src/content/business-profile/de/organization/business.md"
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/business-profile/de/catalog/offerings/digital-foundation.md"
+#     path: "systems/warpgogol-com/src/content/business-profile/de/catalog/offerings/digital-foundation.md"
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/business-profile/de/catalog/policies/delivery-guarantee.md"
+#     path: "systems/warpgogol-com/src/content/business-profile/de/catalog/policies/delivery-guarantee.md"
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/business-profile/de/trust/claims/platform-cost-models.md"
+#     path: "systems/warpgogol-com/src/content/business-profile/de/trust/claims/platform-cost-models.md"
 ---
 
 ## Design
 
 **Normative source references:**
 
-- `pbp-specification-package/04-Webgogol-Migration-Agent-Plan.md` — 20-phase migration plan, owner decisions, legacy deletion manifest
-- `pbp-specification-package/05-Webgogol-Target-Manifest-Blueprint.md` — target entity manifests with exact field values
-- `systems/webgogol-com/src/content/business/de/` — 19 legacy source files to migrate
+- `pbp-specification-package/04-Warpgogol-Migration-Agent-Plan.md` — 20-phase migration plan, owner decisions, legacy deletion manifest
+- `pbp-specification-package/05-Warpgogol-Target-Manifest-Blueprint.md` — target entity manifests with exact field values
+- `systems/warpgogol-com/src/content/business/de/` — 19 legacy source files to migrate
 
-_This RFC creates the PBP content tree for webgogol-com: all entity `.md` files, the owner decision register, and the migration coverage report. It transforms legacy `@gogol/business` data into the PBP entity graph defined by RFC-0398..0462 and validated by RFC-0466/0467._
+_This RFC creates the PBP content tree for warpgogol-com: all entity `.md` files, the owner decision register, and the migration coverage report. It transforms legacy `@gogol/business` data into the PBP entity graph defined by RFC-0398..0462 and validated by RFC-0466/0467._
 
-# RFC-0468: Webgogol PBP Content Creation
+# RFC-0468: Warpgogol PBP Content Creation
 
 ## Context
 
-The Webgogol target manifest blueprint (`05-Webgogol-Target-Manifest-Blueprint.md`) defines the exact target state for all PBP entities after migration. The migration agent plan (`04-Webgogol-Migration-Agent-Plan.md`) defines a 20-phase process with 28 blocking owner decisions. Neither document has been materialized into actual `.md` content files.
+The Warpgogol target manifest blueprint (`05-Warpgogol-Target-Manifest-Blueprint.md`) defines the exact target state for all PBP entities after migration. The migration agent plan (`04-Warpgogol-Migration-Agent-Plan.md`) defines a 20-phase process with 28 blocking owner decisions. Neither document has been materialized into actual `.md` content files.
 
-The legacy content tree at `systems/webgogol-com/src/content/business/de/` contains 19 source files (company.md, offer.md, contact.md, legal.md, location.md, web.md, compliance.md, external-services.md, meta.md, platform-comparison.md, services.md, plus FAQ and people files). These use the `@gogol/business` schema format with presentation-ready strings (`"70 € / Monat"`), growth modules, capacity blocks, and claims sidecars.
+The legacy content tree at `systems/warpgogol-com/src/content/business/de/` contains 19 source files (company.md, offer.md, contact.md, legal.md, location.md, web.md, compliance.md, external-services.md, meta.md, platform-comparison.md, services.md, plus FAQ and people files). These use the `@gogol/business` schema format with presentation-ready strings (`"70 € / Monat"`), growth modules, capacity blocks, and claims sidecars.
 
 This RFC creates the new `business-profile/` content tree alongside the legacy `business/` tree. Both coexist until RFC-0469 (Site Cutover) switches the site and RFC-0470 (Legacy Deletion) removes the old files.
 
 ## Problem
 
-1. **No PBP content tree.** `systems/webgogol-com/src/content/business-profile/` does not exist. No PBP entity `.md` files exist for Webgogol.
+1. **No PBP content tree.** `systems/warpgogol-com/src/content/business-profile/` does not exist. No PBP entity `.md` files exist for Warpgogol.
 2. **Legacy data not transformed.** Legacy fields like `price.monthly: "70 € / Monat"` need to be decomposed into `pricing.charges.monthlySubscription.amount.value: "70.00"` + `pricing.charges.monthlySubscription.recurrence: "P1M"` + `pricing.currency: "EUR"`.
 3. **Growth modules not decomposed.** Legacy `growthModules.visibility/booking/trust/multilingual/automation` need to become separate Product + CatalogEntry + Offering entities.
 4. **Guarantees not typed.** Legacy `guarantees.delivery/uptime/smallChanges/response/dataPackage` need to become typed Policy entities (guarantee, service-level, exit).
@@ -114,10 +114,10 @@ This RFC creates the new `business-profile/` content tree alongside the legacy `
 
 ### 1. Content tree structure
 
-Create `systems/webgogol-com/src/content/business-profile/de/` with the following structure (mirroring the blueprint §2–33):
+Create `systems/warpgogol-com/src/content/business-profile/de/` with the following structure (mirroring the blueprint §2–33):
 
 ```
-systems/webgogol-com/src/content/business-profile/
+systems/warpgogol-com/src/content/business-profile/
   de/
     organization/
       business.md              # PbpBusiness (§3)
@@ -188,11 +188,11 @@ systems/webgogol-com/src/content/business-profile/
 
 ### 2. Entity creation phases
 
-Content creation follows the 20-phase migration plan (§3–26 of `04-Webgogol-Migration-Agent-Plan.md`):
+Content creation follows the 20-phase migration plan (§3–26 of `04-Warpgogol-Migration-Agent-Plan.md`):
 
 #### Phase 1–2: Preparation and inventory
 
-- Create migration branch `pbp-migration-webgogol`
+- Create migration branch `pbp-migration-warpgogol`
 - Snapshot legacy source files (git tag `legacy-snapshot-pre-pbp`)
 - Inventory all 19 legacy files and classify each source field
 - Create `PbpMigrationMapping` records (RFC-0461) for each legacy entity → PBP entity
@@ -236,12 +236,12 @@ Create `de/places/backnang.md` from `location.md`:
 
 Create `de/contact/general-email.md` from `contact.md`:
 
-- `contact.email` → `value: hi@webgogol.com`, `channel: email`
+- `contact.email` → `value: hi@warpgogol.com`, `channel: email`
 - `contact.purposes` → `purposes.*.valueRef`
 
 Create `de/web/primary.md` from `web.md`:
 
-- `web.canonicalUrl` → `canonicalUrl: https://webgogol.com/`
+- `web.canonicalUrl` → `canonicalUrl: https://warpgogol.com/`
 - `web.locales` → `locales.*`
 
 #### Phase 6: Product decomposition
@@ -263,7 +263,7 @@ Create `de/catalog/catalog.md` — single `PbpCatalog` entity with `entrySource.
 
 Create 6 `PbpCatalogEntry` entities, one per product, with:
 
-- `catalogRef` → `https://webgogol.com/id/catalog/main`
+- `catalogRef` → `https://warpgogol.com/id/catalog/main`
 - `itemRef` → corresponding product
 - `offeringRefs` → corresponding offering
 - `merchandising.featured: true` for `digital-foundation`
@@ -332,9 +332,9 @@ Create `de/trust/evidence/platform-pricing-sources.md`:
 
 Create 4 `PbpPublicDocument` entities from `legal.md` and `compliance.md`:
 
-- `terms.md` — `kind: terms-and-conditions`, `canonicalUrl: https://webgogol.com/agb/`
-- `privacy.md` — `kind: privacy-policy`, `canonicalUrl: https://webgogol.com/datenschutz/`
-- `imprint.md` — `kind: imprint`, `canonicalUrl: https://webgogol.com/impressum/`
+- `terms.md` — `kind: terms-and-conditions`, `canonicalUrl: https://warpgogol.com/agb/`
+- `privacy.md` — `kind: privacy-policy`, `canonicalUrl: https://warpgogol.com/datenschutz/`
+- `imprint.md` — `kind: imprint`, `canonicalUrl: https://warpgogol.com/impressum/`
 - `legal-notice.md` — `kind: legal-notice`
 
 #### Phase 14: Disclosures
@@ -391,13 +391,13 @@ Compare old website-facing facts with new projections:
 
 ### 3. Owner decision register
 
-Create `systems/webgogol-com/src/content/business-profile/owner-decision-register.yaml` with all 28 blocking items from the migration plan (§28):
+Create `systems/warpgogol-com/src/content/business-profile/owner-decision-register.yaml` with all 28 blocking items from the migration plan (§28):
 
 ```yaml
 # Business/legal
 - id: 1
   topic: public-legal-form
-  question: "What is the public legal form of Webgogol?"
+  question: "What is the public legal form of Warpgogol?"
   status: open
   blocks: [legal-identity.md]
 - id: 2
@@ -452,27 +452,27 @@ All entity IDs use HTTPS URIs (blueprint convention):
 
 | Entity            | ID                                                          |
 | ----------------- | ----------------------------------------------------------- |
-| Business          | `https://webgogol.com/id/business/webgogol`                 |
-| Brand             | `https://webgogol.com/id/brand/webgogol`                    |
-| LegalIdentity     | `https://webgogol.com/id/legal-identity/webgogol`           |
-| Place             | `https://webgogol.com/id/place/backnang`                    |
-| ContactPoint      | `https://webgogol.com/id/contact-point/general-email`       |
-| WebPresence       | `https://webgogol.com/id/web-presence/primary`              |
-| Catalog           | `https://webgogol.com/id/catalog/main`                      |
-| Product (DF)      | `https://webgogol.com/id/product/digital-foundation`        |
-| CatalogEntry (DF) | `https://webgogol.com/id/catalog-entry/digital-foundation`  |
-| Offering (DF)     | `https://webgogol.com/id/offering/digital-foundation`       |
-| Policy (delivery) | `https://webgogol.com/id/policy/delivery-guarantee`         |
-| Claim             | `https://webgogol.com/id/claim/platform-cost-models`        |
-| EvidenceSource    | `https://webgogol.com/id/evidence/platform-pricing-sources` |
-| Disclosure        | `https://webgogol.com/id/disclosure/cloudflare`             |
-| PublicDocument    | `https://webgogol.com/id/document/terms`                    |
+| Business          | `https://warpgogol.com/id/business/warpgogol`                 |
+| Brand             | `https://warpgogol.com/id/brand/warpgogol`                    |
+| LegalIdentity     | `https://warpgogol.com/id/legal-identity/warpgogol`           |
+| Place             | `https://warpgogol.com/id/place/backnang`                    |
+| ContactPoint      | `https://warpgogol.com/id/contact-point/general-email`       |
+| WebPresence       | `https://warpgogol.com/id/web-presence/primary`              |
+| Catalog           | `https://warpgogol.com/id/catalog/main`                      |
+| Product (DF)      | `https://warpgogol.com/id/product/digital-foundation`        |
+| CatalogEntry (DF) | `https://warpgogol.com/id/catalog-entry/digital-foundation`  |
+| Offering (DF)     | `https://warpgogol.com/id/offering/digital-foundation`       |
+| Policy (delivery) | `https://warpgogol.com/id/policy/delivery-guarantee`         |
+| Claim             | `https://warpgogol.com/id/claim/platform-cost-models`        |
+| EvidenceSource    | `https://warpgogol.com/id/evidence/platform-pricing-sources` |
+| Disclosure        | `https://warpgogol.com/id/disclosure/cloudflare`             |
+| PublicDocument    | `https://warpgogol.com/id/document/terms`                    |
 
-Module entities follow the same pattern: `https://webgogol.com/id/product/visibility`, `https://webgogol.com/id/offering/visibility`, etc.
+Module entities follow the same pattern: `https://warpgogol.com/id/product/visibility`, `https://warpgogol.com/id/offering/visibility`, etc.
 
 ## Architectural fit
 
-- **DNA-1 (Monorepo boundary).** Content files live in the site workspace `systems/webgogol-com/src/content/`. Schemas and compiler live in `packages/pbp/`.
+- **DNA-1 (Monorepo boundary).** Content files live in the site workspace `systems/warpgogol-com/src/content/`. Schemas and compiler live in `packages/pbp/`.
 - **DNA-20 (Business layer).** This RFC creates the PBP content that will replace `@gogol/business` content. Both coexist until RFC-0470.
 - **DNA-55 (Spec vendoring).** Entity field values reference `pbp-specification-package/target-blueprint` sections.
 - **RFC-0461 (Migration contract).** This RFC executes the migration mapping defined by RFC-0461.
@@ -490,11 +490,11 @@ No CLI command. Content files are authored manually by the migration agent.
 
 | Path | Role |
 | --- | --- |
-| `systems/webgogol-com/src/content/business-profile/de/**/*.md` | PBP entity content files (default locale) |
-| `systems/webgogol-com/src/content/business-profile/uk/**/*.md` | PBP entity content files (Ukrainian overrides) |
-| `systems/webgogol-com/src/content/business-profile/owner-decision-register.yaml` | Owner decision register (28 items) |
-| `systems/webgogol-com/src/content/business-profile/migration-coverage-report.yaml` | Migration coverage report |
-| `systems/webgogol-com/src/content/business/de/**/*.md` | Legacy content (untouched until RFC-0470) |
+| `systems/warpgogol-com/src/content/business-profile/de/**/*.md` | PBP entity content files (default locale) |
+| `systems/warpgogol-com/src/content/business-profile/uk/**/*.md` | PBP entity content files (Ukrainian overrides) |
+| `systems/warpgogol-com/src/content/business-profile/owner-decision-register.yaml` | Owner decision register (28 items) |
+| `systems/warpgogol-com/src/content/business-profile/migration-coverage-report.yaml` | Migration coverage report |
+| `systems/warpgogol-com/src/content/business/de/**/*.md` | Legacy content (untouched until RFC-0470) |
 
 ### Output format
 
@@ -529,15 +529,15 @@ N/A — content files.
 
 ## Acceptance criteria
 
-- [x] `systems/webgogol-com/src/content/business-profile/de/` directory created with all entity `.md` files (evidence: 45 .md files across 10 subdirs — 2026-07-20)
+- [x] `systems/warpgogol-com/src/content/business-profile/de/` directory created with all entity `.md` files (evidence: 45 .md files across 10 subdirs — 2026-07-20)
 - [x] All entity files have valid YAML frontmatter with `schema`, `id`, `type`, `status` fields (evidence: verified — 2026-07-20)
-- [x] `organization/business.md` created with fields from `company.md` (evidence: systems/webgogol-com/src/content/business-profile/de/organization/business.md — 2026-07-20)
-- [x] `organization/brand.md` created with fields from `company.md` (evidence: systems/webgogol-com/src/content/business-profile/de/organization/brand.md — 2026-07-20)
-- [x] `organization/legal-identity.md` created with `status: draft` (owner decision #1) (evidence: systems/webgogol-com/src/content/business-profile/de/organization/legal-identity.md — 2026-07-20)
-- [x] `places/backnang.md` created with address from `location.md` (evidence: systems/webgogol-com/src/content/business-profile/de/places/backnang.md — 2026-07-20)
-- [x] `contact/general-email.md` created from `contact.md` (evidence: systems/webgogol-com/src/content/business-profile/de/contact/general-email.md — 2026-07-20)
-- [x] `web/primary.md` created from `web.md` (evidence: systems/webgogol-com/src/content/business-profile/de/web/primary.md — 2026-07-20)
-- [x] `catalog/catalog.md` created (evidence: systems/webgogol-com/src/content/business-profile/de/catalog/catalog.md — 2026-07-20)
+- [x] `organization/business.md` created with fields from `company.md` (evidence: systems/warpgogol-com/src/content/business-profile/de/organization/business.md — 2026-07-20)
+- [x] `organization/brand.md` created with fields from `company.md` (evidence: systems/warpgogol-com/src/content/business-profile/de/organization/brand.md — 2026-07-20)
+- [x] `organization/legal-identity.md` created with `status: draft` (owner decision #1) (evidence: systems/warpgogol-com/src/content/business-profile/de/organization/legal-identity.md — 2026-07-20)
+- [x] `places/backnang.md` created with address from `location.md` (evidence: systems/warpgogol-com/src/content/business-profile/de/places/backnang.md — 2026-07-20)
+- [x] `contact/general-email.md` created from `contact.md` (evidence: systems/warpgogol-com/src/content/business-profile/de/contact/general-email.md — 2026-07-20)
+- [x] `web/primary.md` created from `web.md` (evidence: systems/warpgogol-com/src/content/business-profile/de/web/primary.md — 2026-07-20)
+- [x] `catalog/catalog.md` created (evidence: systems/warpgogol-com/src/content/business-profile/de/catalog/catalog.md — 2026-07-20)
 - [x] 6 `PbpCatalogEntry` entities created (one per product) (evidence: catalog/entries/ has 6 files — 2026-07-20)
 - [x] 8 `PbpProduct` entities created (DF + 2 components + 5 modules) (evidence: products/ has 8 files — 2026-07-20)
 - [x] `offerings/digital-foundation.md` created with decomposed pricing from `offer.md` (evidence: offerings/digital-foundation.md — 2026-07-20)
@@ -548,8 +548,8 @@ N/A — content files.
 - [x] `trust/disclosures/cloudflare.md` created from `external-services.md` (evidence: trust/disclosures/ — 2026-07-20)
 - [x] 4 `PbpPublicDocument` entities created from `legal.md`/`compliance.md` (evidence: documents/ has 4 files — 2026-07-20)
 - [x] `uk/` locale overrides created for `business.md` and `digital-foundation.md` product (evidence: uk/organization/business.md, uk/products/digital-foundation.md — 2026-07-20)
-- [x] `owner-decision-register.yaml` created with all 28 blocking items (evidence: missions/webgogol-com-m000011/workpiece/src/content/business-profile/owner-decision-register.yaml — 2026-07-24)
-- [x] `migration-coverage-report.yaml` shows 100% coverage of 19 legacy files (evidence: missions/webgogol-com-m000011/workpiece/src/content/business-profile/migration-coverage-report.yaml — 2026-07-24)
+- [x] `owner-decision-register.yaml` created with all 28 blocking items (evidence: missions/warpgogol-com-m000011/workpiece/src/content/business-profile/owner-decision-register.yaml — 2026-07-24)
+- [x] `migration-coverage-report.yaml` shows 100% coverage of 19 legacy files (evidence: missions/warpgogol-com-m000011/workpiece/src/content/business-profile/migration-coverage-report.yaml — 2026-07-24)
 - [x] `compilePbpProfile` with `strictness: "migration"` produces 0 fatal errors (evidence: compiler-pipeline.test.ts — 2026-07-20)
 - [x] First-year cost derivation: monthly = 1040 EUR, yearly = 900 EUR (evidence: PBP content — 2026-07-20)
 - [x] Buyer View assembles for `digital-foundation` offering (evidence: compiler buyer-view phase — 2026-07-20)

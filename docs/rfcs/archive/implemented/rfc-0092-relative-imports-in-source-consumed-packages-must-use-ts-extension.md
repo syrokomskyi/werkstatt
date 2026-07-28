@@ -55,7 +55,7 @@ For relative imports inside those source files, TypeScript supports two surface 
 1. **`.ts` extensions** — `import { foo } from "./bar.ts"`. Works at type-check time when `allowImportingTsExtensions: true`. Works at runtime in every loader that can read `.ts` (Vite, Astro dev, `tsx`, `vite-node`) because the specifier matches the on-disk filename.
 2. **`.js` extensions** — the "ship .js, source is .ts" NodeNext convention. Works for packages that BUILD before publishing. Does NOT work for source-consumed packages in `astro dev`, because Astro's SSR module loader hits Node's native ESM resolver for transitive package imports, and Node looks for `./bar.js` literally on disk — there is no `.js` file because the package only ships `.ts`.
 
-The webgogol-4 monorepo flip-flopped between these two conventions at least five times across May 2026. Each agent fixed the loudest current error and silently created the other:
+The warpgogol-4 monorepo flip-flopped between these two conventions at least five times across May 2026. Each agent fixed the loudest current error and silently created the other:
 
 - **Build error** (when `.ts` is used): `share/src/content/dispatch.ts(8,51): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.` Fires in any consumer that runs `tsc` with `noEmit: false` and does NOT carry the flag — most prominently `@gogol/site-kernel-content`.
 - **Dev error** (when `.js` is used): `Cannot find module '…\packages\share\src\semantic\models.js' imported from '…\packages\share\src\semantic\index.ts'`. Fires in Astro dev for every transitive package import after a request.

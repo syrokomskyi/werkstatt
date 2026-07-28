@@ -58,7 +58,7 @@ The platform already treats `src/content/system.md` as the site-owned context su
 ## Problem
 
 - **Regional execution is currently manual.** The repository can forbid Cloudflare KV/Queues, but it cannot prove that the deployed hostname is configured for Regional Services.
-- **Per-site requirements differ.** Some sites require only EU execution; some may allow multiple regions; some may not need a restriction. A shared command must not hardcode `EU` or `webgogol.com`.
+- **Per-site requirements differ.** Some sites require only EU execution; some may allow multiple regions; some may not need a restriction. A shared command must not hardcode `EU` or `warpgogol.com`.
 - **CI needs a safe signal.** The check should be part of the standard app verification pipeline, but it must behave predictably when operator credentials are absent in local development.
 - **The expert script is too ad hoc for this ecosystem.** The core idea is useful, but variable names, site context, result envelopes, pipeline wiring, and redaction must follow Site OS conventions.
 
@@ -83,7 +83,7 @@ The existing `cloudflare.residency.validate` command remains the static author-t
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run cloudflare.regional-services.validate --app webgogol-com
+pnpm exec site-kernel run cloudflare.regional-services.validate --app warpgogol-com
 pnpm exec site-kernel run cloudflare.regional-services.validate --all --json
 ```
 
@@ -105,8 +105,8 @@ Each app may declare allowed Cloudflare Regional Services zones in `src/content/
 deployment:
   cloudflare:
     hostnames:
-      - webgogol.com
-      - www.webgogol.com
+      - warpgogol.com
+      - www.warpgogol.com
     regionalServices:
       allowedZones:
         - eu
@@ -167,13 +167,13 @@ The Cloudflare API adapter should be isolated behind a small function such as `f
   "command": "cloudflare.regional-services.validate",
   "status": "fail",
   "policy": {
-    "appId": "webgogol-com",
-    "hostnames": ["webgogol.com"],
+    "appId": "warpgogol-com",
+    "hostnames": ["warpgogol.com"],
     "allowedZones": ["eu"]
   },
   "hostnames": [
     {
-      "hostname": "webgogol.com",
+      "hostname": "warpgogol.com",
       "enabled": true,
       "region": "us"
     }
@@ -181,10 +181,10 @@ The Cloudflare API adapter should be isolated behind a small function such as `f
   "violations": [
     {
       "rule": "region-not-allowed",
-      "hostname": "webgogol.com",
+      "hostname": "warpgogol.com",
       "expectedRegions": ["eu"],
       "actualRegion": "us",
-      "message": "hostname webgogol.com is active in region us, expected one of eu"
+      "message": "hostname warpgogol.com is active in region us, expected one of eu"
     }
   ]
 }
@@ -261,7 +261,7 @@ The same reliability program can add further `packages/os` checks for engineerin
 - The command `cloudflare.regional-services.validate` is registered and can be run manually.
 - Schema support in `packages/ontology` (`deployment.cloudflare.regionalServices.allowedZones`) is live.
 - `.env.example` generation documents the required variables.
-- `webgogol-com` has `allowedZones: [eu]` declared in `system.md`.
+- `warpgogol-com` has `allowedZones: [eu]` declared in `system.md`.
 
 ## Acceptance criteria
 

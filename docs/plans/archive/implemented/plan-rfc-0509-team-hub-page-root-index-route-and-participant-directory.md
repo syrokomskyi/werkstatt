@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/site-kernel-checks"
@@ -47,11 +47,11 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/{de,uk}/team.md` — new authored team hub page (block-declarative YAML)
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/{de,uk}/founder.md` — **deleted**
-- `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/founder.md` — **deleted**
-- `missions/webgogol-com-m000010/workpiece/src/content/system.md` — add `team` page entry (`semanticType: collection`), remove `founder` page entry, add `founder` to `retiredRoutes` with `status: 301` and `to: participant:andrii-syrokomskyi`
-- `missions/webgogol-com-m000010/workpiece/src/content/navigation/{de,uk}/navigation.md` — replace `founder` nav entry with `team` entry
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/{de,uk}/team.md` — new authored team hub page (block-declarative YAML)
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/{de,uk}/founder.md` — **deleted**
+- `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/founder.md` — **deleted**
+- `missions/warpgogol-com-m000010/workpiece/src/content/system.md` — add `team` page entry (`semanticType: collection`), remove `founder` page entry, add `founder` to `retiredRoutes` with `status: 301` and `to: participant:andrii-syrokomskyi`
+- `missions/warpgogol-com-m000010/workpiece/src/content/navigation/{de,uk}/navigation.md` — replace `founder` nav entry with `team` entry
 - `packages/ontology/src/external-surfaces/url-schema.yaml` — add `/team/` and `/komanda/` route patterns
 
 ### 2.3 Documentation and specs
@@ -134,21 +134,21 @@ scope:
 
 **Agent actions:**
 
-- Create `missions/webgogol-com-m000010/workpiece/src/content/pages/de/team.md` — block-declarative YAML with 4 blocks (hero + 3 people sections), `semanticType` not set here (set in system.md), DE content
-- Create `missions/webgogol-com-m000010/workpiece/src/content/pages/uk/team.md` — same structure, UK content (use the YAML from the RFC as the UK version)
-- Delete `missions/webgogol-com-m000010/workpiece/src/content/pages/{de,uk}/founder.md`
-- Delete `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/founder.md`
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/system.md`:
+- Create `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/team.md` — block-declarative YAML with 4 blocks (hero + 3 people sections), `semanticType` not set here (set in system.md), DE content
+- Create `missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/team.md` — same structure, UK content (use the YAML from the RFC as the UK version)
+- Delete `missions/warpgogol-com-m000010/workpiece/src/content/pages/{de,uk}/founder.md`
+- Delete `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/founder.md`
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/system.md`:
   - Add `team` page entry to `pages[]` with `semanticType: collection`, routes `de: team`, `uk: komanda`, `cosmicStar: Vega`
   - Remove the `founder` page entry from `pages[]`
   - Add `{ slug: founder, status: 301, to: participant:andrii-syrokomskyi }` to `retiredRoutes[]`
   - Update the page-description prose at the bottom (remove the `founder` line, add a `team` line)
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/navigation/{de,uk}/navigation.md`: replace the `founder` entry (id: founder, label: Gründer/Засновник, pageId: founder, routeSlug: gruender/zasnovnyk) with a `team` entry (id: team, label: Team/Команда, pageId: team, routeSlug: team/komanda)
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/navigation/{de,uk}/navigation.md`: replace the `founder` entry (id: founder, label: Gründer/Засновник, pageId: founder, routeSlug: gruender/zasnovnyk) with a `team` entry (id: team, label: Team/Команда, pageId: team, routeSlug: team/komanda)
 
 **Validation:**
 
-- `pnpm exec site-kernel run system.manifest.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run page.block.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run system.manifest.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run page.block.validate --site warpgogol-com --json`
 
 **Completion criterion:** `team.md` exists in both locales with 4 blocks; `founder.md` and `prose/founder.md` are deleted in both locales; `system.md` has `team` page with `semanticType: collection` and `founder` in `retiredRoutes` with `status: 301`; navigation has `team` entry.
 
@@ -168,7 +168,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`
 
 **Completion criterion:** `url-schema.yaml` includes both patterns; `surface.contract.validate` passes.
 
@@ -197,9 +197,9 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run team.hub.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run team.hub.validate --site warpgogol-com --json`
 
-**Completion criterion:** `team.hub.validate` passes on webgogol-com; command is registered and appears in `sites-check-author` pipeline.
+**Completion criterion:** `team.hub.validate` passes on warpgogol-com; command is registered and appears in `sites-check-author` pipeline.
 
 **Human review:** no
 
@@ -219,7 +219,7 @@ scope:
 **Validation:**
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0509`
-- `pnpm exec site-kernel run sites-check.author --site webgogol-com --json`
+- `pnpm exec site-kernel run sites-check.author --site warpgogol-com --json`
 
 **Completion criterion:** All scope docs are updated; `rfc.validate` passes; `sites-check.author` passes.
 
@@ -256,9 +256,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run sites-check.author --site webgogol-com --json`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run team.hub.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run sites-check.author --site warpgogol-com --json`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run team.hub.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 

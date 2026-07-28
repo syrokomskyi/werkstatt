@@ -35,7 +35,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/ontology"
@@ -275,7 +275,7 @@ Description: Rechtliche Angaben gemäß § 5 TMG.
    | Widerrufsbelehrung / right of withdrawal | `rightOfWithdrawal` | `exclude` |
    | Widerrufsformular (fill-in template), if present | — | `exclude` |
 
-   `webgogol-com` currently declares no `semanticType` on its pages, so it generates no page bodies today; as it adopts `semanticType`, the same demotions apply to its legal and open-source pages by the same rule.
+   `warpgogol-com` currently declares no `semanticType` on its pages, so it generates no page bodies today; as it adopts `semanticType`, the same demotions apply to its legal and open-source pages by the same rule.
 
 6. **Phase 6 — onboarding.** `onboarding.scaffold` emits the default `llms` demotions for the standard legal + open-source pages in the scaffolded `system.md`, so new apps start correct.
 

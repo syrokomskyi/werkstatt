@@ -34,7 +34,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/surface
   - packages/share
@@ -86,10 +86,10 @@ A build-time command `surface.generate` expands every entitled surface into virt
 
 ```sh
 # Expand all entitled surfaces into src/surface.generated.json (runs in build.prepare)
-pnpm exec site-kernel run surface.generate --app webgogol-com
+pnpm exec site-kernel run surface.generate --app warpgogol-com
 
 # Structural validation of the generated artifact + provider contracts
-pnpm exec site-kernel run surface.validate --app webgogol-com --json
+pnpm exec site-kernel run surface.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -176,7 +176,7 @@ The engine reuses the legacy matrix shape — ordered axes, `enumerateCandidateT
 - The surface ships disabled by default. An app opts in via the `pseo` entitlement (RFC-0169). With `pseo` absent, `surface.generate` writes an empty artifact and the registry merge is a no-op.
 - `surface.generate` registers in the `build.prepare` pipeline, immediately after `entitlements.resolve`, so the gate is known before expansion.
 - Because there is no legacy programmatic surface in the new ecosystem, there is no migration: this is a clean-slate introduction.
-- The pilot app is `apps/webgogol-com` (RFC-0193); other thin apps adopt by adding the entitlement and a Blueprint, with no engine changes.
+- The pilot app is `apps/warpgogol-com` (RFC-0193); other thin apps adopt by adding the entitlement and a Blueprint, with no engine changes.
 
 ## Alternatives considered
 

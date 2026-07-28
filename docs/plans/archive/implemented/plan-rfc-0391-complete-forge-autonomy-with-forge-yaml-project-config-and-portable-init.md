@@ -183,7 +183,7 @@ scope:
   ```yaml
   schema: forge/config@1
   project:
-    name: webgogol
+    name: warpgogol
     stack: [typescript, astro, turborepo]
     packageManager: pnpm
   paths:

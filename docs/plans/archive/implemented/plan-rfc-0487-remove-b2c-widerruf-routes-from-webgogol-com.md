@@ -7,7 +7,7 @@ createdAt: 2026-07-22
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/site-kernel-codegen"
@@ -25,8 +25,8 @@ scope:
 
 - [ ] O1 — Add `retiredRoutes` and `businessModel` fields to `systemManifestSchema` in `@gogol/ontology` (maps to acceptance: `retiredRoutes` field in `system.md`, `businessModel: b2b-only` declared)
 - [ ] O2 — Extend `buildRetiredSurfaceRedirectBlock` to emit 410 entries from `retiredRoutes` (maps to acceptance: `/widerruf/` and `/widerruf-formular/` return HTTP 410)
-- [ ] O3 — Implement `b2b.model.validate` command in `@gogol/site-kernel-checks` and wire into `sites-check-author` pipeline (maps to acceptance: `b2b.model.validate --app webgogol-com` exits 0)
-- [ ] O4 — Remove widerruf/musterWiderruf from webgogol-com `system.md`, navigation, labels, PBP terms, site meta, and delete 8 page/prose files (maps to acceptance: no widerruf entries remain, 8 files deleted)
+- [ ] O3 — Implement `b2b.model.validate` command in `@gogol/site-kernel-checks` and wire into `sites-check-author` pipeline (maps to acceptance: `b2b.model.validate --app warpgogol-com` exits 0)
+- [ ] O4 — Remove widerruf/musterWiderruf from warpgogol-com `system.md`, navigation, labels, PBP terms, site meta, and delete 8 page/prose files (maps to acceptance: no widerruf entries remain, 8 files deleted)
 - [ ] O5 — Update Compass docs and AGENTS.md (maps to acceptance: `docs/requirements.xml`, `docs/technology.xml`, `packages/os/site-kernel-checks/AGENTS.md` synchronized)
 - [ ] O6 — Validate full pipeline passes (maps to acceptance: `redirect.map.validate`, `surface.contract.validate`, `content.references.validate` all pass)
 
@@ -44,21 +44,21 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `systems/webgogol-com/src/content/system.md` — remove `widerruf` and `musterWiderruf` page entries, add `businessModel: b2b-only` and `retiredRoutes` fields, update page-level rationale
-- `systems/webgogol-com/src/content/navigation/de/navigation.md` — remove widerruf/musterWiderruf nav entries (lines 80-93)
-- `systems/webgogol-com/src/content/navigation/uk/navigation.md` — remove widerruf/musterWiderruf nav entries (lines 80-93)
-- `systems/webgogol-com/src/content/site/de/labels.md` — remove widerruf/musterWiderruf from `legalIds`
-- `systems/webgogol-com/src/content/site/uk/labels.md` — remove widerruf/musterWiderruf from `legalIds`
-- `systems/webgogol-com/src/content/site/de/meta.md` — remove `widerrufCreationDate`, `widerrufFormCreationDate`
-- `systems/webgogol-com/src/content/business-profile/de/documents/terms.md` — remove `widerrufCreationDate`, `widerrufFormCreationDate`
-- Delete: `systems/webgogol-com/src/content/pages/de/widerruf.md`
-- Delete: `systems/webgogol-com/src/content/pages/uk/widerruf.md`
-- Delete: `systems/webgogol-com/src/content/pages/de/muster-widerruf.md`
-- Delete: `systems/webgogol-com/src/content/pages/uk/muster-widerruf.md`
-- Delete: `systems/webgogol-com/src/content/prose/de/widerruf.md`
-- Delete: `systems/webgogol-com/src/content/prose/uk/widerruf.md`
-- Delete: `systems/webgogol-com/src/content/prose/de/muster-widerruf.md`
-- Delete: `systems/webgogol-com/src/content/prose/uk/muster-widerruf.md`
+- `systems/warpgogol-com/src/content/system.md` — remove `widerruf` and `musterWiderruf` page entries, add `businessModel: b2b-only` and `retiredRoutes` fields, update page-level rationale
+- `systems/warpgogol-com/src/content/navigation/de/navigation.md` — remove widerruf/musterWiderruf nav entries (lines 80-93)
+- `systems/warpgogol-com/src/content/navigation/uk/navigation.md` — remove widerruf/musterWiderruf nav entries (lines 80-93)
+- `systems/warpgogol-com/src/content/site/de/labels.md` — remove widerruf/musterWiderruf from `legalIds`
+- `systems/warpgogol-com/src/content/site/uk/labels.md` — remove widerruf/musterWiderruf from `legalIds`
+- `systems/warpgogol-com/src/content/site/de/meta.md` — remove `widerrufCreationDate`, `widerrufFormCreationDate`
+- `systems/warpgogol-com/src/content/business-profile/de/documents/terms.md` — remove `widerrufCreationDate`, `widerrufFormCreationDate`
+- Delete: `systems/warpgogol-com/src/content/pages/de/widerruf.md`
+- Delete: `systems/warpgogol-com/src/content/pages/uk/widerruf.md`
+- Delete: `systems/warpgogol-com/src/content/pages/de/muster-widerruf.md`
+- Delete: `systems/warpgogol-com/src/content/pages/uk/muster-widerruf.md`
+- Delete: `systems/warpgogol-com/src/content/prose/de/widerruf.md`
+- Delete: `systems/warpgogol-com/src/content/prose/uk/widerruf.md`
+- Delete: `systems/warpgogol-com/src/content/prose/de/muster-widerruf.md`
+- Delete: `systems/warpgogol-com/src/content/prose/uk/muster-widerruf.md`
 
 ### 2.3 Documentation and specs
 
@@ -90,7 +90,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` passes
-- `pnpm exec site-kernel run system.manifest.validate --app webgogol-com` still passes (existing system.md without new fields is valid because fields are optional)
+- `pnpm exec site-kernel run system.manifest.validate --app warpgogol-com` still passes (existing system.md without new fields is valid because fields are optional)
 
 **Completion criterion:** `systemManifestSchema` includes `retiredRoutes` and `businessModel` fields; `@gogol/ontology` build passes; existing system.md still validates.
 
@@ -141,7 +141,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run b2b.model.validate --app webgogol-com --json` exits 0 (no `businessModel` field yet → no-op)
+- `pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json` exits 0 (no `businessModel` field yet → no-op)
 
 **Completion criterion:** `b2b.model.validate` command is registered, runs as no-op for apps without `businessModel`, and is wired into `sites-check-author` pipeline.
 
@@ -170,14 +170,14 @@ scope:
 
 ---
 
-### Step 5. Apply site content changes to webgogol-com (via mission workpiece)
+### Step 5. Apply site content changes to warpgogol-com (via mission workpiece)
 
-**Goal:** Remove widerruf/musterWiderruf from webgogol-com and add `retiredRoutes` + `businessModel` fields.
+**Goal:** Remove widerruf/musterWiderruf from warpgogol-com and add `retiredRoutes` + `businessModel` fields.
 
 **Agent actions:**
 
 - **PREREQUISITE:** Cross-page cleanup sessions (expert files 4-8) must be completed first. If not done, STOP and report to the operator.
-- Open a mission workpiece for webgogol-com (RFC-0480)
+- Open a mission workpiece for warpgogol-com (RFC-0480)
 - Edit `system.md`: remove `widerruf` and `musterWiderruf` page entries, add `businessModel: b2b-only` and `retiredRoutes` with 4 entries, update page-level rationale (line 709)
 - Edit `navigation/de/navigation.md`: remove widerruf/musterWiderruf entries
 - Edit `navigation/uk/navigation.md`: remove widerruf/musterWiderruf entries
@@ -190,11 +190,11 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run b2b.model.validate --app webgogol-com --json` exits 0
-- `pnpm exec site-kernel run redirect.map.validate --app webgogol-com` exits 0
-- `pnpm exec site-kernel run content.references.validate --app webgogol-com` exits 0
-- `pnpm exec site-kernel run surface.contract.validate --app webgogol-com` exits 0
-- `pnpm exec site-kernel run system.manifest.validate --app webgogol-com` exits 0
+- `pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json` exits 0
+- `pnpm exec site-kernel run redirect.map.validate --app warpgogol-com` exits 0
+- `pnpm exec site-kernel run content.references.validate --app warpgogol-com` exits 0
+- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com` exits 0
+- `pnpm exec site-kernel run system.manifest.validate --app warpgogol-com` exits 0
 
 **Completion criterion:** All validation commands pass; no widerruf/musterWiderruf entries remain in system.md, navigation, labels, or PBP terms; 8 files deleted; `retiredRoutes` and `businessModel` declared in system.md.
 
@@ -208,7 +208,7 @@ scope:
 
 **Agent actions:**
 
-- Run full `build:check` for webgogol-com
+- Run full `build:check` for warpgogol-com
 - Run `rfc.validate RFC-0487` to verify frontmatter
 - Run `rfc.verification.emit RFC-0487` (if acceptance probes declared)
 - Update RFC frontmatter: `status: implemented`, `implementedAt: 2026-07-22`
@@ -217,7 +217,7 @@ scope:
 **Validation:**
 
 - `pnpm exec site-kernel run rfc.validate RFC-0487 --json` exits 0
-- `pnpm exec site-kernel run app.contract.full --app webgogol-com` exits 0
+- `pnpm exec site-kernel run app.contract.full --app warpgogol-com` exits 0
 
 **Completion criterion:** RFC status is `implemented`; all acceptance criteria checkboxes can be checked; full build passes.
 
@@ -231,11 +231,11 @@ scope:
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run b2b.model.validate --app webgogol-com --json`
-- `pnpm exec site-kernel run redirect.map.validate --app webgogol-com`
-- `pnpm exec site-kernel run content.references.validate --app webgogol-com`
-- `pnpm exec site-kernel run surface.contract.validate --app webgogol-com`
-- `pnpm exec site-kernel run system.manifest.validate --app webgogol-com`
+- `pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json`
+- `pnpm exec site-kernel run redirect.map.validate --app warpgogol-com`
+- `pnpm exec site-kernel run content.references.validate --app warpgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com`
+- `pnpm exec site-kernel run system.manifest.validate --app warpgogol-com`
 
 ### 4.2 Evidence artifacts
 

@@ -49,7 +49,7 @@ The cosmic overlay (DNA-23, RFC-0025) uses three closed catalogs mapped to layer
 - `PlanetCatalog` → section-layer manifests.
 - `MoonCatalog` → component-layer manifests.
 
-During the May 2026 webgogol-com onboarding, the `founder-trust-card` section archetype was found to declare `acceptedCosmicNames: [Naiad]`. Naiad is a Neptune moon — a MoonCatalog entry — and so cannot validly appear on a section-layer manifest. The mistake was discovered only when `constellation.contract.validate` complained about a downstream constellation slot. `archetype.registry.validate` had passed the archetype YAML even though it was structurally illegal.
+During the May 2026 warpgogol-com onboarding, the `founder-trust-card` section archetype was found to declare `acceptedCosmicNames: [Naiad]`. Naiad is a Neptune moon — a MoonCatalog entry — and so cannot validly appear on a section-layer manifest. The mistake was discovered only when `constellation.contract.validate` complained about a downstream constellation slot. `archetype.registry.validate` had passed the archetype YAML even though it was structurally illegal.
 
 The fix cascaded through conflicts: Naiad → Hyperion (taken by `markdown` section) → Mimas (taken by `team` section) → Prometheus (free). Each rename required hand-editing 6 files (archetype YAML, constellation YAML, section manifest, story.md, system.md, site-plan.md), plus a rerun of `archetype.registry.build`.
 
@@ -141,4 +141,4 @@ interface CosmicRenameResult {
 
 - Agents MAY implement this RFC ONLY when status: accepted.
 - Agents MUST NOT change RFC status.
-- Implementation must add a regression test seeded from the webgogol-com Naiad case.
+- Implementation must add a regression test seeded from the warpgogol-com Naiad case.

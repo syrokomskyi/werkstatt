@@ -73,7 +73,7 @@ successSignals:
   - "Passport signing uses per-app Ed25519 keypairs managed by the studio. Public keys are published at `/.well-known/cosmic-passport-key.json`; private keys are stored as GitHub Actions secrets scoped to the app's deploy workflow. `passport.verify` runs on any build artifact and confirms the VC signature against the published key."
 nonGoals:
   - "Do not introduce server-side runtime, edge functions, or live websockets for the passport. Everything is SSG + client-hydration + scheduled rebuilds. DNA-1 remains absolute."
-  - "Do not invent a webgogol-native identity blockchain, DID registry, or VC-revocation ledger. VCs are issued at build time; revocation = rebuild without signing. No revocation registry ships."
+  - "Do not invent a warpgogol-native identity blockchain, DID registry, or VC-revocation ledger. VCs are issued at build time; revocation = rebuild without signing. No revocation registry ships."
   - "Do not embed PII in the passport. The passport is a public document about the *site*, not about its visitors, editors, or clients beyond the business-layer public identity (company name, domain, jurisdiction) already exposed by RFC-0024."
   - "Do not sign private keys into the repository. Private keys live in GitHub Actions secrets and are rotated via `passport.key.rotate`, never committed to Git."
   - "Do not permit clients to disable VC signing. `system.yaml.release.passport.enabled` toggles passport **rendering**; signing happens on every build that produces an artifact, regardless of whether the passport page ships. Build provenance is non-negotiable."
@@ -215,7 +215,7 @@ Each app has an Ed25519 keypair generated at onboarding. Private key lives in Gi
       "issuer": "did:web:nicaragua-projekt.example.org",
       "issuanceDate": "2026-04-25T14:32:18Z",
       "credentialSubject": {
-        "id": "urn:webgogol:app:nicaragua-projekt",
+        "id": "urn:warpgogol:app:nicaragua-projekt",
         "systemHash": "sha256:abc123...",
         "commitSha": "6f345f9abcdef"
       },
@@ -534,7 +534,7 @@ Post-rollout, any new app must pass `passport.emit`, `passport.verify`, `star-ma
 - [x] `apps/nicaragua-projekt/src/content/pages/de/cosmic/passport.md`, `en/cosmic/passport.md`, `de/cosmic/star-map.md`, and `en/cosmic/star-map.md` exist; routes `/cosmic/passport` and `/cosmic/star-map` registered in `system.yaml`. Nested path structure resolves the route mismatch (flat `cosmic-passport.md` replaced by `cosmic/passport.md`). Both language variants exist for both pages — `mirroring.validate` passes. ✅ (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Star Map SVG is byte-stable across repeated runs of `star-map.render` with identical inputs (snapshot test). _(deferred: snapshot test in CI)_ (evidence: tests pass, vitest run exitCode=0)
 - [x] Nebula Score is deterministic (same inputs → same score) and composite from four pillars with published weights. _(verified at CI runtime)_ (evidence: implemented historically)
-- [x] `passport-view` and `star-map-navigate` events registered in the growth catalog; passport moons emit via `window.__webgogol_emit__` client bridge. (evidence: implemented historically)
+- [x] `passport-view` and `star-map-navigate` events registered in the growth catalog; passport moons emit via `window.__warpgogol_emit__` client bridge. (evidence: implemented historically)
 - [x] Cloudflare Pages cron rebuild configured for `nicaragua-projekt` (daily). _(deferred: infra change)_ (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] DNA-31, DNA-32, DNA-33, DNA-34 present in `docs/architecture-dna.md` linked to this RFC. (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `docs/authoring/passport-and-star-map.md` and `docs/engineering/passport-signing-and-keys.md` exist. (evidence: docs/ directory, documentation exists)

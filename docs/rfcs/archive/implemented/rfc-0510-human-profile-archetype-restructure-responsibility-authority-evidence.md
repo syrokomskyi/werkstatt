@@ -45,7 +45,7 @@ commands:
     - sites-check.run
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/site-kernel-checks"
@@ -328,7 +328,7 @@ Mich und meine anderen Projekte kann man im Internet einfach über meinen Nachna
 
 ```yaml
 responsibility:
-  summary: "Architektur und technische Leitung der Webgogol-Plattform"
+  summary: "Architektur und technische Leitung der Warpgogol-Plattform"
   scope: "Geschäftsprozessautomatisierung für kleine und mittlere Unternehmen; Qualitätssicherung und Notausgang-Konzept"
   pbpReferences: []
 authority:
@@ -337,7 +337,7 @@ authority:
     - "Aufnahme und Kündigung von Kundenverhältnissen"
   canCommitTo:
     - "Festlegung der schriftlichen Bedingungen (AGB, Leistungsschein)"
-  escalationRoute: "E-Mail an hi@webgogol.com"
+  escalationRoute: "E-Mail an hi@warpgogol.com"
 evidence:
   claims:
     - claimId: "zenodo-digitale-reife"
@@ -358,7 +358,7 @@ consent:
   approvedMedia:
     - andrii-portrait
   consentDate: "2026-07-24"
-  withdrawalRoute: "E-Mail an hi@webgogol.com"
+  withdrawalRoute: "E-Mail an hi@warpgogol.com"
   profileReviewer: "andrii-syrokomskyi"
 ```
 
@@ -384,7 +384,7 @@ The `stats` field (e.g. "25+ Jahre Erfahrung") is removed from the hero block sy
 
 ```sh
 # Validate the human profile page structure.
-pnpm exec site-kernel run participant.profile.validate --site webgogol-com --json
+pnpm exec site-kernel run participant.profile.validate --site warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -502,11 +502,11 @@ function buildHumanProfileBlocks(participant: ParticipantView, lang: string): Bl
 | `packages/os/site-kernel-checks/src/participant-profile.ts` | New file: `participant.profile.validate` |
 | `packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts` | Register `participant.profile.validate` after `team.hub.validate` (line 170) |
 | `packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts` | Register `participant.profile.validate` command entry |
-| `missions/webgogol-com-m000010/workpiece/src/content/people/{de,uk}/andrii-syrokomskyi.md` | Add `responsibility`, `authority`, `evidence`, update `consent`; remove `stats` from hero usage |
-| `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi-beruflich.md` | New file: professional career prose |
-| `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi-nachweise.md` | New file: evidence links with status labels |
-| `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi-persoenlich.md` | New file: personal background prose (consent-gated) |
-| `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi.md` | Remove (content split into three files above) |
+| `missions/warpgogol-com-m000010/workpiece/src/content/people/{de,uk}/andrii-syrokomskyi.md` | Add `responsibility`, `authority`, `evidence`, update `consent`; remove `stats` from hero usage |
+| `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi-beruflich.md` | New file: professional career prose |
+| `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi-nachweise.md` | New file: evidence links with status labels |
+| `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi-persoenlich.md` | New file: personal background prose (consent-gated) |
+| `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/andrii-syrokomskyi.md` | Remove (content split into three files above) |
 
 ### participant.profile.validate rules
 
@@ -548,8 +548,8 @@ function buildHumanProfileBlocks(participant: ParticipantView, lang: string): Bl
 - [x] Personal block renders only when `consent.approvedFields` includes `bio` and `prose/{slug}-persoenlich` exists. (evidence: packages/share/src/astro/page-handler/resolve-route.ts:177-193, hasPersonalConsent check)
 - [x] CTA block is omitted for `status: former` and `status: retired`. (evidence: packages/share/src/astro/page-handler/resolve-route.ts:195-214, status !== former && status !== retired)
 - [x] Breadcrumb parent is the `team` page (not `about`). (evidence: packages/share/src/astro/people-routes.ts:80-87, teamPage takes precedence over aboutPage)
-- [x] Andrii's prose is split into three files: `-beruflich`, `-nachweise`, `-persoenlich`. (evidence: missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-{beruflich,nachweise,persoenlich}.md created, old andrii-syrokomskyi.md removed)
-- [x] Andrii's Participant record has `responsibility`, `authority`, `evidence`, updated `consent`. (evidence: missions/webgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md:26-52, participant.validate passes)
+- [x] Andrii's prose is split into three files: `-beruflich`, `-nachweise`, `-persoenlich`. (evidence: missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-{beruflich,nachweise,persoenlich}.md created, old andrii-syrokomskyi.md removed)
+- [x] Andrii's Participant record has `responsibility`, `authority`, `evidence`, updated `consent`. (evidence: missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md:26-52, participant.validate passes)
 - [x] `participant.profile.validate` passes and is registered in `SITES_CHECK_AUTHOR_PIPELINE` after `team.hub.validate`. (evidence: packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts:171-172, participant.profile.validate: OK in sites-check.run)
 - [x] `rfc.validate` passes on this file before merging. (evidence: pnpm exec site-kernel run rfc.validate --json, only shared V-19 warning)
 

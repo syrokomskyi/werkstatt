@@ -20,7 +20,7 @@ Pass. `pnpm exec site-kernel run rfc.validate RFC-0381 --json` — 0 violations,
 
 ## Axis A — Structural completeness
 
-- **Decision** is present-tense and clear: "Execute the pilot migration wave for `webgogol-com`."
+- **Decision** is present-tense and clear: "Execute the pilot migration wave for `warpgogol-com`."
 - **CLI surface** shows exact `pnpm exec site-kernel run …` invocations — but multiple commands use flags not defined in their establishing RFCs (see Axis C for details). The invocations are syntactically plausible but semantically inconsistent with the contracts they invoke.
 - **TypeScript contracts** section is absent. This is acceptable only if no command contracts change — but `commands.changed` lists 6 commands, which implies contract changes that should be documented.
 - **File system responsibilities** table names concrete paths. No issues.
@@ -37,7 +37,7 @@ Pass. `pnpm exec site-kernel run rfc.validate RFC-0381 --json` — 0 violations,
 - **FAIL — DNA-50 missing from `satisfies[]` and `related[]` (significant).** The pilot directly exercises DNA-50 (Notausgang export) in Steps 11–12 and the Architectural fit section explicitly references "DNA-50 (Notausgang export): The pilot generates and validates a Notausgang export from `r000001`." But DNA-50 appears in neither `satisfies[]` nor `related[]` in the frontmatter. It should be in `related[]` at minimum, and arguably in `satisfies[]` since the pilot proves the invariant works end-to-end.
 - **FAIL — RFC-0359 and RFC-0380 missing from `related[]` (significant).** The pilot directly exercises `notausgang.export` (RFC-0359) and `notausgang.validate` (RFC-0380) in Steps 11–12. Neither RFC appears in `related[]`. RFC-0380 is especially relevant because it upgrades `notausgang.validate` from shallow existence checks to deep integrity verification — the pilot's Step 12 depends on RFC-0380 being implemented.
 - **QUESTIONABLE — `amends` relationship with RFC-0354 and RFC-0356.** The RFC lists both in `amends[]`, and both RFCs list RFC-0381 in their `amendedBy[]`. But the RFC body describes an execution sequence, not a contract change. The only visible contract deviations are:
-  - `--repo ../systems-git/webgogol-com` (local path) vs RFC-0354's "valid git URL (SSH or HTTPS)" requirement.
+  - `--repo ../systems-git/warpgogol-com` (local path) vs RFC-0354's "valid git URL (SSH or HTTPS)" requirement.
   - `system.pin.yaml` vs RFC-0354's `system.pin.json`.
   - `--site` flag on `sternsystem.extract` vs RFC-0356's `--app` flag.
 
@@ -57,26 +57,26 @@ Pass. `pnpm exec site-kernel run rfc.validate RFC-0381 --json` — 0 violations,
     adapter: cloudflare-workers
     channels:
       alt:
-        workerName: alt-webgogol-com
-        url: https://alt.webgogol.com
+        workerName: alt-warpgogol-com
+        url: https://alt.warpgogol.com
       main:
-        workerName: webgogol-com
-        url: https://webgogol.com
+        workerName: warpgogol-com
+        url: https://warpgogol.com
     secrets:
       - ref: CLOUDFLARE_API_TOKEN
         scope: workspace
   ```
   RFC-0379's `deploymentConfigSchema` has no top-level `secrets` key — secrets are configured per-channel via `secretsFile: secretRefSchema.optional()`. The `secrets` list with `ref` and `scope` fields is not in any defined schema. This registry entry would fail schema validation.
-- **FAIL — `--repo` value violates RFC-0354's contract (critical).** RFC-0354 §2.3 requires: "Valid repo URL. Every `repo` MUST be a valid git URL (SSH or HTTPS)." The pilot uses `--repo ../systems-git/webgogol-com` (a local filesystem path). `sternsystem.validate` enforces this invariant and would reject the entry. Either the RFC must amend RFC-0354 to allow local paths, or the pilot must use a valid SSH/HTTPS URL.
+- **FAIL — `--repo` value violates RFC-0354's contract (critical).** RFC-0354 §2.3 requires: "Valid repo URL. Every `repo` MUST be a valid git URL (SSH or HTTPS)." The pilot uses `--repo ../systems-git/warpgogol-com` (a local filesystem path). `sternsystem.validate` enforces this invariant and would reject the entry. Either the RFC must amend RFC-0354 to allow local paths, or the pilot must use a valid SSH/HTTPS URL.
 - **FAIL — Pin file extension mismatch (significant).** The RFC's success signals and acceptance criteria reference `system.pin.yaml`, but RFC-0354 §3 defines the pin file as `system.pin.json`. The RFC amends RFC-0354 but does not describe this change. If the pin file is migrating to YAML (per RFC-0376), the RFC should explicitly state this and amend RFC-0354's §3 contract.
-- **FAIL — Release ID format inconsistency (significant).** The pilot uses `--release r000001` in multiple commands (Steps 8, 9, 10, 11), but RFC-0357 defines release IDs as `<system-id>-r<NNNNNN>` (e.g., `webgogol-com-r000001`). The short form `r000001` does not match the release ID regex `^[a-z0-9]+(-[a-z0-9]+)*-r\d{6}$` defined in RFC-0357's `ReleaseManifestSchema`.
+- **FAIL — Release ID format inconsistency (significant).** The pilot uses `--release r000001` in multiple commands (Steps 8, 9, 10, 11), but RFC-0357 defines release IDs as `<system-id>-r<NNNNNN>` (e.g., `warpgogol-com-r000001`). The short form `r000001` does not match the release ID regex `^[a-z0-9]+(-[a-z0-9]+)*-r\d{6}$` defined in RFC-0357's `ReleaseManifestSchema`.
 - **FAIL — Command flags don't match establishing RFCs (significant).** Multiple pilot commands use a `--system` flag that is not defined in their establishing RFCs:
-  - `mission.materialize --system webgogol-com --mission …` — RFC-0356 defines `--mission <mission-id>` only.
-  - `mission.validate --system webgogol-com --mission …` — RFC-0356 defines `--mission <mission-id>` only.
-  - `mission.build --system webgogol-com --mission …` — RFC-0356 defines `--mission <mission-id>` only.
-  - `mission.close --system webgogol-com --mission …` — RFC-0355 defines `--mission <mission-id>` only.
-  - `release.publish --system webgogol-com --mission … --release …` — RFC-0357 defines `--release <release-id>` only.
-  - `leitstand.propagate --system webgogol-com --release …` — RFC-0358 defines `--release <release-id>` only.
+  - `mission.materialize --system warpgogol-com --mission …` — RFC-0356 defines `--mission <mission-id>` only.
+  - `mission.validate --system warpgogol-com --mission …` — RFC-0356 defines `--mission <mission-id>` only.
+  - `mission.build --system warpgogol-com --mission …` — RFC-0356 defines `--mission <mission-id>` only.
+  - `mission.close --system warpgogol-com --mission …` — RFC-0355 defines `--mission <mission-id>` only.
+  - `release.publish --system warpgogol-com --mission … --release …` — RFC-0357 defines `--release <release-id>` only.
+  - `leitstand.propagate --system warpgogol-com --release …` — RFC-0358 defines `--release <release-id>` only.
 
   Either these commands are being modified to accept `--system` (which must be described in the RFC body and listed in `commands.changed` with justification), or the pilot invocations are incorrect.
 
@@ -87,7 +87,7 @@ Pass. `pnpm exec site-kernel run rfc.validate RFC-0381 --json` — 0 violations,
 
 ## Axis D — Forward-only compliance
 
-No issues. The RFC is explicitly forward-only: "Once `apps/webgogol-com/` is removed, there is no rollback path to the `apps/` layout." `apps/` is removed in the same RFC wave, not maintained behind a flag. No compatibility shims, no dual-paths, no grace periods. The Notausgang export and Sternsystem git repo are the safety net, not a backward-compatible fallback.
+No issues. The RFC is explicitly forward-only: "Once `apps/warpgogol-com/` is removed, there is no rollback path to the `apps/` layout." `apps/` is removed in the same RFC wave, not maintained behind a flag. No compatibility shims, no dual-paths, no grace periods. The Notausgang export and Sternsystem git repo are the safety net, not a backward-compatible fallback.
 
 ## Axis E — Agent-facing policy
 
@@ -104,7 +104,7 @@ No issues.
 - **FAIL — `commands.changed` should be empty or described (same as Axis C finding).** The RFC claims "no new commands" but lists 6 changed commands. This is either an inflated list or an undocumented change.
 - **Minimal command surface**: Pass — no new commands proposed.
 - **Existing patterns**: Pass — the RFC correctly reuses the entire Sternsystem command surface.
-- **Scope discipline**: `appsImpacted` is correctly scoped to `apps/webgogol-com`. `nonGoals` are explicit and meaningful. No issues except for `packagesImpacted` above.
+- **Scope discipline**: `appsImpacted` is correctly scoped to `apps/warpgogol-com`. `nonGoals` are explicit and meaningful. No issues except for `packagesImpacted` above.
 
 ## Axis G — Blind spots
 
@@ -121,7 +121,7 @@ No issues.
   - If the registry entry was created (Step 1) but extraction failed (Step 3), should the registry entry be removed before re-running?
   - Is the pilot idempotent, or does it require manual cleanup between attempts?
 - **FAIL — Interrupted operation handling (significant).** The RFC does not discuss what happens if the pilot is interrupted between steps (e.g., process crash after release publish but before propagation). The RFC-0362 lock and operation record machinery supports recovery, but the RFC does not describe how to use it for pilot resumption.
-- **Minor gap — CI workflow files not listed.** The rollout says "CI workflows that reference `apps/webgogol-com` paths are updated" but does not list which specific workflow files (e.g., `.github/workflows/ci.yml`, `.github/workflows/cache-parity.yml`). An agent executing the pilot needs to know which files to update.
+- **Minor gap — CI workflow files not listed.** The rollout says "CI workflows that reference `apps/warpgogol-com` paths are updated" but does not list which specific workflow files (e.g., `.github/workflows/ci.yml`, `.github/workflows/cache-parity.yml`). An agent executing the pilot needs to know which files to update.
 - **Minor gap — Secret management details.** The Risks section mentions `CLOUDFLARE_API_TOKEN` but does not specify where it is stored (`.env`? CI secrets?) or confirm its gitignore status. RFC-0379 defines `secretsFile` per channel, but the pilot's registry entry does not use `secretsFile` — it uses an undefined `secrets` list.
 - **Performance**: N/A — the pilot is a one-time execution sequence, not a recurring build-time command.
 - **False positives**: N/A — no new validators.
@@ -130,9 +130,9 @@ No issues.
 
 1. **`commands.changed` classification.** The RFC body says "No new commands are added" and describes the pilot as "a linear sequence of existing commands," but `commands.changed` lists 6 commands. Are these commands being modified (e.g., adding `--system` flags, renaming `--app` to `--site`)? If so, describe the changes. If not, should `commands.changed` be empty?
 2. **Registry entry schema.** The "Registry entry after pilot" section uses a `secrets` key at the deployment level with `ref`/`scope` fields. RFC-0379's `deploymentConfigSchema` has no `secrets` key — it uses per-channel `secretsFile`. Should the registry entry match RFC-0379's schema, or is RFC-0379's schema being amended?
-3. **`--repo` local path.** RFC-0354 §2.3 requires `repo` to be a valid git URL (SSH or HTTPS). The pilot uses `../systems-git/webgogol-com` (a local path). Should RFC-0354 be amended to allow local paths, or should the pilot use a valid SSH/HTTPS URL?
+3. **`--repo` local path.** RFC-0354 §2.3 requires `repo` to be a valid git URL (SSH or HTTPS). The pilot uses `../systems-git/warpgogol-com` (a local path). Should RFC-0354 be amended to allow local paths, or should the pilot use a valid SSH/HTTPS URL?
 4. **Pin file extension.** The RFC references `system.pin.yaml` but RFC-0354 defines `system.pin.json`. Is this an intentional amendment to RFC-0354 (migrating to YAML per RFC-0376), or an error? If intentional, the contract change should be described.
-5. **Release ID format.** The pilot uses `--release r000001` but RFC-0357 defines release IDs as `<system-id>-r<NNNNNN>` (e.g., `webgogol-com-r000001`). Should the pilot use the full release ID, or is a short form being introduced?
+5. **Release ID format.** The pilot uses `--release r000001` but RFC-0357 defines release IDs as `<system-id>-r<NNNNNN>` (e.g., `warpgogol-com-r000001`). Should the pilot use the full release ID, or is a short form being introduced?
 6. **Draft RFC dependencies.** RFC-0378, RFC-0379, and RFC-0380 are all `status: draft`. The Context section says "All the machinery exists." Should the RFC declare these as preconditions and update the Context to reflect that they must be accepted and implemented before the pilot can execute?
 7. **DNA-50 and RFC-0359/0380 references.** The pilot exercises the Notausgang export (Steps 11–12) and the Architectural fit section references DNA-50, but DNA-50 is missing from `satisfies[]`/`related[]` and RFC-0359/RFC-0380 are missing from `related[]`. Should these be added?
 8. **Pilot recovery plan.** If the pilot fails mid-sequence (e.g., after release publish but before propagation), what is the recovery procedure? Can the pilot resume from the failed step, or must it restart from Step 1? Does the mission need to be aborted and re-opened?

@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/surface"
     - "@gogol/ontology"
@@ -33,7 +33,7 @@ scope:
 - [ ] O6 — Add `/:locale?/:industry/:service` route pattern to `url-schema.yaml` C-contract — maps to acceptance criterion "url-schema.yaml contains the route pattern"
 - [ ] O7 — Register no-op migrator `rfc-0496` in migrator registry — maps to acceptance criterion "migrator rfc-0496 registered"
 - [ ] O8 — Add industry-to-service cross-linking block in `website-local` depth-1 baker — maps to acceptance criterion "Industry pages link to their child service pages"
-- [ ] O9 — Add `website-service` to `system.md surface.blueprints` for `webgogol-com` — maps to acceptance criterion "Service pages are generated at /website/{industry}/{service}/"
+- [ ] O9 — Add `website-service` to `system.md surface.blueprints` for `warpgogol-com` — maps to acceptance criterion "Service pages are generated at /website/{industry}/{service}/"
 
 ## 2. Affected artifacts
 
@@ -144,7 +144,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** `url-schema.yaml` contains the new route pattern with `generated: true`; `surface.contract.validate` passes.
 
@@ -285,9 +285,9 @@ scope:
 
 ---
 
-### Step 9. Add `website-service` to `system.md surface.blueprints` for `webgogol-com`
+### Step 9. Add `website-service` to `system.md surface.blueprints` for `warpgogol-com`
 
-**Goal:** Enable the `website-service` surface for `webgogol-com` so `surface.generate` emits service pages.
+**Goal:** Enable the `website-service` surface for `warpgogol-com` so `surface.generate` emits service pages.
 
 **Agent actions:**
 
@@ -296,7 +296,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.generate --site webgogol-com` (if mission workpiece is available)
+- `pnpm exec site-kernel run surface.generate --site warpgogol-com` (if mission workpiece is available)
 - Verify `src/surface.generated.yaml` contains `website-service` routes (empty if no service records exist)
 
 **Completion criterion:** `system.md` declares `website-service` in `surface.blueprints`; `surface.generate` processes the new blueprint.
@@ -370,7 +370,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com` (if mission workpiece available)
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` (if mission workpiece available)
 
 **Completion criterion:** All validation commands pass; all verifiable acceptance criteria are checked off; agent has requested the human operator to perform the `accepted → implemented` transition.
 
@@ -385,7 +385,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com` (if mission workpiece available)
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` (if mission workpiece available)
 - `pnpm --filter @gogol/surface test`
 - `pnpm --filter @gogol/site-kernel-checks test`
 - `pnpm --filter @gogol/site-kernel-handoff test`

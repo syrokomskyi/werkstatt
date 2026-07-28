@@ -19,7 +19,7 @@ related:
   - RFC-0071
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - ontology
   - os/site-kernel-codegen
@@ -27,7 +27,7 @@ packagesImpacted:
 successSignals:
   - Every `--ds-shadow-*` and `--ds-gradient-*` referenced by `@gogol/ui` resolves to the biome's value (not a nicaragua-tinted studio default).
   - Adding a new biome with a different `shadows` / `gradients` set changes the rendered shadows on every consuming site without code edits.
-  - Two existing apps build byte-identical to before the refactor (for nicaragua) and gain a coherent warm-material elevation language (for webgogol-com).
+  - Two existing apps build byte-identical to before the refactor (for nicaragua) and gain a coherent warm-material elevation language (for warpgogol-com).
 nonGoals:
   - Removing `@gogol/tokens` studio defaults — they remain the fallback when a biome doesn't declare a key.
   - Implementing `biome.extends` — that decision stays deferred (see § biome.extends).
@@ -43,15 +43,15 @@ Two original ecosystem decisions were deferred until a second real onboarding ex
 1. **`biome.extends`** — letting a biome inherit from a parent in the same family. Deferred until two biomes in the same family existed.
 2. **Promote semantic gradients/shadows into the biome schema** — deferred until the second onboarding revealed which tokens are actually shared between sites.
 
-After the May 2026 webgogol-com onboarding, the second condition is met and the first is not:
+After the May 2026 warpgogol-com onboarding, the second condition is met and the first is not:
 
 - `packages/ontology/biomes/` carries `nonprofit-trust` (family: `charity-donation-trust`) and `handwerk-material-warm` (family: `handwerk-trust-engineering`). **Different families.**
 - `packages/tokens/src/tokens.css` holds 8 shadow tokens and 3 gradient tokens. The gradient defaults bake nicaragua's brand RGB into the studio: `--ds-gradient-primary: linear-gradient(135deg, rgb(26 67 50) 0%, rgb(45 90 69) 100%)` is the nicaragua brand green, not a generic value.
-- `handwerk-material-warm.yaml` has NO `components`, `shadows`, or `gradients` block at all. webgogol-com inherits the nicaragua-tinted gradients silently — a visible cross-app leak.
+- `handwerk-material-warm.yaml` has NO `components`, `shadows`, or `gradients` block at all. warpgogol-com inherits the nicaragua-tinted gradients silently — a visible cross-app leak.
 
 ## Problem
 
-1. **Studio tokens carry app-specific brand colors.** `--ds-gradient-primary`'s default is nicaragua's green. webgogol-com (warm brown) reading the same default is wrong; the fix is per-app, but the fix surface should be the biome, not the app.
+1. **Studio tokens carry app-specific brand colors.** `--ds-gradient-primary`'s default is nicaragua's green. warpgogol-com (warm brown) reading the same default is wrong; the fix is per-app, but the fix surface should be the biome, not the app.
 2. **Shadows are visual-DNA, not a workspace constant.** A "warm material handwerk" biome wants softer, browner shadow tints than a "documentary nonprofit" biome. Hardcoding `--ds-shadow-md: 0 4px 20px rgb(26 32 44 / 0.12)` in studio tokens denies biome authors that lever.
 3. **`biome.components` already covers per-component colors, but shadows and gradients live elsewhere.** That asymmetry pushes biome authors to override via app-local CSS instead of declaring in the biome.
 
@@ -134,7 +134,7 @@ When those land, the schema change is small (one new `extends?: kebabId` field; 
 1. Land schema additions in `packages/ontology/src/schemas/biome.ts` (`biomeShadowsSchema`, `biomeGradientsSchema`).
 2. Land codegen mapping in `packages/os/site-kernel-codegen/src/biome-css.ts`.
 3. Populate `nonprofit-trust.yaml` and `handwerk-material-warm.yaml` with their respective shadow + gradient blocks.
-4. Re-run `biome.css.generate` for both apps; assert nicaragua's biome.generated.css matches the previous baseline (no rendered diff) and webgogol-com gains the new handwerk-specific values.
+4. Re-run `biome.css.generate` for both apps; assert nicaragua's biome.generated.css matches the previous baseline (no rendered diff) and warpgogol-com gains the new handwerk-specific values.
 5. Verify `pnpm build` workspace-wide is clean.
 
 ## Alternatives considered
@@ -155,7 +155,7 @@ When those land, the schema change is small (one new `extends?: kebabId` field; 
 - [x] `biome-css.ts` BIOME_KEY_TO_CSS_VAR map carries 8 shadow + 3 gradient entries. (evidence: implemented historically)
 - [x] `nonprofit-trust.yaml` carries the previously-studio-default values for shadows + gradients (1:1 port). (evidence: implemented historically)
 - [x] `handwerk-material-warm.yaml` carries handwerk-specific shadow + gradient values. (evidence: implemented historically)
-- [x] `biome.css.generate --app webgogol-com` and `--app nicaragua-projekt` emit `--ds-shadow-*` and `--ds-gradient-*` from their respective biomes. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `biome.css.generate --app warpgogol-com` and `--app nicaragua-projekt` emit `--ds-shadow-*` and `--ds-gradient-*` from their respective biomes. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `pnpm build` workspace-wide passes. (evidence: implemented historically)
 - [x] `biome.extends` remains deferred; this RFC documents the conditions for promotion. Tracked separately. (evidence: implemented historically)
 

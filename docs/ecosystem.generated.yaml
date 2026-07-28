@@ -238,7 +238,7 @@ packages:
       - "@warpgogol/site-kernel-integrity"
       - "@warpgogol/tokens"
       - "@warpgogol/ui"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - astro
       - react
       - react-dom
@@ -289,7 +289,7 @@ packages:
       - "@warpgogol/site-kernel-integrity"
       - "@warpgogol/tokens"
       - "@warpgogol/ui"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - astro
       - react
       - react-dom
@@ -340,7 +340,7 @@ packages:
       - "@warpgogol/site-kernel-integrity"
       - "@warpgogol/tokens"
       - "@warpgogol/ui"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - astro
       - react
       - react-dom
@@ -391,7 +391,7 @@ packages:
       - "@warpgogol/site-kernel-integrity"
       - "@warpgogol/tokens"
       - "@warpgogol/ui"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - astro
       - react
       - react-dom
@@ -444,7 +444,7 @@ packages:
       - "@warpgogol/site-kernel-onboarding"
       - "@warpgogol/tokens"
       - "@warpgogol/ui"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - astro
       - react
       - react-dom
@@ -615,7 +615,7 @@ packages:
       script: vitest run
       signal: real
       evidence: test script invokes a non-placeholder command
-  - name: "@webgogol/forge"
+  - name: "@warpgogol/forge"
     directory: packages/forge
     workspacePattern: packages/*
     kind: package
@@ -623,7 +623,7 @@ packages:
       - yaml
       - zod
     testSignal:
-      packageName: "@webgogol/forge"
+      packageName: "@warpgogol/forge"
       directory: packages/forge
       script: vitest run --passWithNoTests
       signal: real
@@ -772,7 +772,7 @@ packages:
       - "@warpgogol/passport"
       - "@warpgogol/share"
       - "@warpgogol/site-kernel-content"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - libp2p
       - picomatch
       - tsx
@@ -891,7 +891,7 @@ packages:
       - "@warpgogol/star-map"
       - "@warpgogol/surface"
       - "@warpgogol/tokens"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - ai
       - file-type
       - picomatch
@@ -977,7 +977,7 @@ packages:
       - "@warpgogol/site-kernel-integrity"
       - "@warpgogol/site-kernel-onboarding"
       - "@warpgogol/surface"
-      - "@webgogol/forge"
+      - "@warpgogol/forge"
       - yaml
     testSignal:
       packageName: "@warpgogol/site-kernel-handoff"

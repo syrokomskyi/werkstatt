@@ -76,7 +76,7 @@ The unprotected invariant is: **an implementation claim must be reproducible by 
 ```yaml
 acceptance:
   - probe: run
-    command: "site-kernel run material.credits.validate --app webgogol-com"
+    command: "site-kernel run material.credits.validate --app warpgogol-com"
     expect:
       exitCode: 0
   - probe: file-exists

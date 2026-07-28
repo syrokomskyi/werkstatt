@@ -102,25 +102,25 @@ The Leitstand abstracts over deployment targets via a **deployment adapter inter
 
 ```yaml
 systems:
-  - id: webgogol-com
+  - id: warpgogol-com
     cosmicStar: Vega
-    repo: git@github.com:webgogol/webgogol-com.git
+    repo: git@github.com:warpgogol/warpgogol-com.git
     pinnedPlatform: "4.5.0"
     currentMission: null
-    lastRelease: webgogol-com-r000001
+    lastRelease: warpgogol-com-r000001
     status: active
     registeredAt: "2026-07-09T00:00:00Z"
     deployment:
       adapter: cloudflare-pages    # adapter name
-      target: webgogol-com          # target name (project name, bucket, etc.)
-      healthUrl: https://webgogol.com/health
+      target: warpgogol-com          # target name (project name, bucket, etc.)
+      healthUrl: https://warpgogol.com/health
       credentials:
         accountIdRef: env:CF_ACCOUNT_ID
         apiTokenRef: env:CF_API_TOKEN
-      lastPropagatedRelease: webgogol-com-r000001
+      lastPropagatedRelease: warpgogol-com-r000001
       lastPropagationAt: "2026-07-09T14:00:00Z"
       lastPropagationState: succeeded
-      lastPropagationOperationId: op-20260709-140000-webgogol-com-r000001
+      lastPropagationOperationId: op-20260709-140000-warpgogol-com-r000001
       propagationLeaseExpiresAt: null
     notes: ""
 ```
@@ -221,14 +221,14 @@ If propagation fails, health checks fail, or the operation times out, the regist
 | Check | URL | Pass condition |
 | --- | --- | --- |
 | `homepage-200` | `https://<domain>/` | HTTP 200 |
-| `release-marker` | `https://<domain>/.well-known/webgogol-release.json` | Contains the propagated `releaseId`, `distArtifactHash`, and `behaviorSnapshotHash` |
+| `release-marker` | `https://<domain>/.well-known/warpgogol-release.json` | Contains the propagated `releaseId`, `distArtifactHash`, and `behaviorSnapshotHash` |
 | `sitemap-content` | `https://<domain>/sitemap.xml` | HTTP 200 and normalized hash/entry count match the release behavior snapshot |
 | `llms-content` | `https://<domain>/llms-full.txt` | HTTP 200 and normalized hash matches the release behavior snapshot when present |
 | `health-endpoint` | `deployment.healthUrl` | HTTP 200 (if configured) |
 
 Additional checks can be configured per Sternsystem in the registry's `deployment` block.
 
-HTTP status alone is not sufficient for a deployment pass. At least one content-verification check must bind the live site to the intended release artifact, either via `.well-known/webgogol-release.json` or, for hosts that cannot expose that marker, via snapshot-derived sitemap/llms hashes.
+HTTP status alone is not sufficient for a deployment pass. At least one content-verification check must bind the live site to the intended release artifact, either via `.well-known/warpgogol-release.json` or, for hosts that cannot expose that marker, via snapshot-derived sitemap/llms hashes.
 
 The `release-marker` check is the preferred binding. When it is unavailable, the `sitemap-content` and `llms-content` checks compute a deterministic hash of the live response (after stable normalization that removes optimization-only differences such as asset hash names and timestamps) and compare it to the hash recorded in the release behavior snapshot. The release artifact's `behaviorSnapshotHash` is the source of truth for these expected hashes.
 
@@ -398,18 +398,18 @@ export interface DeploymentAdapter {
   "command": "leitstand.propagate",
   "status": "pass",
   "data": {
-    "systemId": "webgogol-com",
-    "releaseId": "webgogol-com-r000001",
+    "systemId": "warpgogol-com",
+    "releaseId": "warpgogol-com-r000001",
     "state": "succeeded",
-    "deploymentUrl": "https://webgogol.com",
+    "deploymentUrl": "https://warpgogol.com",
     "startedAt": "2026-07-09T14:00:00Z",
     "completedAt": "2026-07-09T14:02:30Z",
     "healthChecks": [
-      { "name": "homepage-200", "url": "https://webgogol.com/", "status": 200, "passed": true, "detail": "OK" },
-      { "name": "sitemap-200", "url": "https://webgogol.com/sitemap.xml", "status": 200, "passed": true, "detail": "OK" }
+      { "name": "homepage-200", "url": "https://warpgogol.com/", "status": 200, "passed": true, "detail": "OK" },
+      { "name": "sitemap-200", "url": "https://warpgogol.com/sitemap.xml", "status": 200, "passed": true, "detail": "OK" }
     ]
   },
-  "summary": "[leitstand.propagate] webgogol-com-r000001 deployed to webgogol.com (succeeded, 2/2 health checks passed)"
+  "summary": "[leitstand.propagate] warpgogol-com-r000001 deployed to warpgogol.com (succeeded, 2/2 health checks passed)"
 }
 ```
 
@@ -420,16 +420,16 @@ export interface DeploymentAdapter {
   "command": "leitstand.status",
   "status": "pass",
   "data": {
-    "systemId": "webgogol-com",
-    "lastPropagatedRelease": "webgogol-com-r000001",
+    "systemId": "warpgogol-com",
+    "lastPropagatedRelease": "warpgogol-com-r000001",
     "lastPropagationState": "succeeded",
     "lastPropagationAt": "2026-07-09T14:02:30Z",
     "healthState": "healthy",
     "recentBordbuch": [
-      { "id": "event-000005", "kind": "deployment", "releaseId": "webgogol-com-r000001", "summary": "Release 1.0.0 deployed" }
+      { "id": "event-000005", "kind": "deployment", "releaseId": "warpgogol-com-r000001", "summary": "Release 1.0.0 deployed" }
     ]
   },
-  "summary": "[leitstand.status] webgogol-com: deployed r000001, healthy"
+  "summary": "[leitstand.status] warpgogol-com: deployed r000001, healthy"
 }
 ```
 
@@ -465,7 +465,7 @@ export interface DeploymentAdapter {
 7. Extend `FleetRegistryEntrySchema` (RFC-0354) with `deployment` block.
 8. Implement artifact restore through RFC-0363 before adapter propagation.
 9. Implement MVP secret reference resolution for environment, GitHub secret, and Cloudflare secret names.
-10. **Pilot**: propagate the `webgogol-com-r000001` release (from RFC-0357 pilot) to Cloudflare Pages, verify health checks pass.
+10. **Pilot**: propagate the `warpgogol-com-r000001` release (from RFC-0357 pilot) to Cloudflare Pages, verify health checks pass.
 11. Add DNA-49 to `docs/architecture-dna.md`.
 12. Run `build:check` to verify no regression.
 
@@ -502,9 +502,9 @@ Every Leitstand command emits structured log lines to `stderr` in JSON format. E
   "timestamp": "2026-07-09T14:00:00Z",
   "level": "info",
   "command": "leitstand.propagate",
-  "operationId": "op-20260709-140000-webgogol-com-r000001",
-  "systemId": "webgogol-com",
-  "releaseId": "webgogol-com-r000001",
+  "operationId": "op-20260709-140000-warpgogol-com-r000001",
+  "systemId": "warpgogol-com",
+  "releaseId": "warpgogol-com-r000001",
   "state": "succeeded",
   "durationMs": 150000,
   "message": "deployment succeeded"
@@ -543,7 +543,7 @@ The Leitstand CLI does not integrate with external monitoring systems. Metrics a
 - [x] Preflight validates artifact hashes, adapter target presence, credential reference syntax, and adapter size limits (deferred) (evidence: implemented historically)
 - [x] Registry deployment block is validated before any Leitstand mutation (evidence: implemented historically)
 - [x] Structured observability logs and metrics are emitted for every command (deferred) (evidence: implemented historically)
-- [x] Pilot: propagate `webgogol-com-r000001` to Cloudflare Pages, verify health (deferred) (evidence: implemented historically)
+- [x] Pilot: propagate `warpgogol-com-r000001` to Cloudflare Pages, verify health (deferred) (evidence: implemented historically)
 - [x] DNA-49 added to `docs/architecture-dna.md` (deferred) (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `rfc.validate` passes on this file (evidence: implemented historically)
 

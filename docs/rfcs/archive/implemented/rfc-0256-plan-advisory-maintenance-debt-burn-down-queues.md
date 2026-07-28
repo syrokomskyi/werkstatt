@@ -38,7 +38,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/site-kernel"
@@ -170,7 +170,7 @@ sourceCommands:
   - material.credits.validate
 selectors:
   apps:
-    - webgogol-com
+    - warpgogol-com
     - nicaragua-projekt
   ruleIds:
     - material.credits.missing-prose-credit
@@ -225,7 +225,7 @@ Useful scoped forms:
 
 ```sh
 pnpm exec site-kernel run maintenance.debt.queue.report --queue prose-credit-sidecars --json
-pnpm exec site-kernel run maintenance.debt.queue.report --queue surface-substance --app webgogol-com --json
+pnpm exec site-kernel run maintenance.debt.queue.report --queue surface-substance --app warpgogol-com --json
 pnpm exec site-kernel run maintenance.debt.queue.validate --queue demand-slug-overrides --json
 pnpm exec site-kernel run maintenance.debt.queue.generate --dry-run --json
 ```
@@ -307,7 +307,7 @@ Illustrative JSON shape:
     "items": [
       {
         "key": "08e9a676d072d89041c7277608b038b59e18b89d8433064e7423ca2f24283925",
-        "app": "webgogol-com",
+        "app": "warpgogol-com",
         "sourceCommand": "material.credits.validate",
         "ruleId": "material.credits.missing-prose-credit",
         "file": "src/content/prose/de/muster-widerruf.md",
@@ -332,7 +332,7 @@ Initial selector:
 
 - `sourceCommand: material.credits.validate`
 - `ruleId: material.credits.missing-prose-credit`
-- apps: `webgogol-com`, `nicaragua-projekt`
+- apps: `warpgogol-com`, `nicaragua-projekt`
 
 Work policy:
 
@@ -355,7 +355,7 @@ Initial selector:
 
 - `sourceCommand: surface.validate`
 - `ruleId: surface.validate`
-- apps: `webgogol-com`, `nicaragua-projekt`
+- apps: `warpgogol-com`, `nicaragua-projekt`
 
 Work policy:
 
@@ -379,7 +379,7 @@ Initial selector:
 
 - `sourceCommand: demands.hierarchy.validate`
 - `ruleId: demands.hierarchy.validate`
-- apps: `webgogol-com`, `nicaragua-projekt`
+- apps: `warpgogol-com`, `nicaragua-projekt`
 
 Work policy:
 

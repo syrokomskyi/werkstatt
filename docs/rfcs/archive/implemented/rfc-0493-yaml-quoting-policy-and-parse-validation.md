@@ -275,7 +275,7 @@ export default tseslint.config(
 
 ### 4. Prettier — no change needed
 
-The current Prettier config (`@/home/syrokomskyi/projects/webgogol/webgogol-4/.prettierrc.mjs:48-53`) already has:
+The current Prettier config (`@/home/syrokomskyi/projects/warpgogol/warpgogol-4/.prettierrc.mjs:48-53`) already has:
 
 - `parser: "yaml"` for `*.{yml,yaml}` files
 - `singleQuote: false` (double quotes when quoting is needed)

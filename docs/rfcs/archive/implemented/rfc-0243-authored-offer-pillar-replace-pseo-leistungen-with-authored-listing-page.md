@@ -27,7 +27,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/surface"
@@ -78,7 +78,7 @@ The duplicate was removed in a prior change, but the deeper tension remains: **t
 - **Doctrine §1.2 (Infrastruktur statt Imitation).** Authored pages are owned content; PSEO is a projection. The pillar should be owned.
 - **RFC-0239 (Offer family).** Amends RFC-0239 §Decision: the depth-0 pillar is no longer PSEO-generated. The offer Blueprint's role narrows to thin/geo detail pages when needed.
 - **RFC-0240 (Entitlements).** The `offer` entitlement still gates the offer family, but its value shifts: it unlocks the _offer content domain_ and _potential geo cascade_, not a pre-built pillar page.
-- **RFC-0242 (Bodenstation).** `webgogol-com` dogfoods the authored-pillar pattern: `/leistungen/` is hand-crafted, linking to `/leistungen/digitales-fundament/` and other authored offer pages.
+- **RFC-0242 (Bodenstation).** `warpgogol-com` dogfoods the authored-pillar pattern: `/leistungen/` is hand-crafted, linking to `/leistungen/digitales-fundament/` and other authored offer pages.
 
 ## Design
 

@@ -104,7 +104,7 @@ Both files live under `.output/` (per-client work product, gone after archive) b
 
 ```yaml
 # onboarding/.output/04-author/atoms.yaml
-client: webgogol-handwerk
+client: warpgogol-handwerk
 language: de
 materialsHash: sha256:9af3...
 generatedAt: 2026-05-18T00:11:18Z
@@ -147,7 +147,7 @@ Failure conditions:
 `onboarding/.output/04-author/coverage.md` is the human-readable companion the agent writes alongside placement:
 
 ```markdown
-# Author coverage — webgogol-handwerk
+# Author coverage — warpgogol-handwerk
 
 - Total atoms: 487
 - Placed: 472
@@ -176,7 +176,7 @@ Voice profile shape:
 
 ```yaml
 # onboarding/.output/04-author/voice-profile.yaml
-client: webgogol-handwerk
+client: warpgogol-handwerk
 language: de
 register: "Sie"                     # Sie | Du | you | informal
 forbiddenPhrases:
@@ -220,10 +220,10 @@ Output uses the shared envelope; findings include the reference text, file, and 
 
 ```sh
 # Each validator: one purpose, app-scoped.
-pnpm exec site-kernel run content.coverage.validate --app webgogol-handwerk
-pnpm exec site-kernel run content.voice.lint        --app webgogol-handwerk
-pnpm exec site-kernel run content.business.validate --app webgogol-handwerk
-pnpm exec site-kernel run content.references.validate --app webgogol-handwerk
+pnpm exec site-kernel run content.coverage.validate --app warpgogol-handwerk
+pnpm exec site-kernel run content.voice.lint        --app warpgogol-handwerk
+pnpm exec site-kernel run content.business.validate --app warpgogol-handwerk
+pnpm exec site-kernel run content.references.validate --app warpgogol-handwerk
 ```
 
 All four also support `--all` to iterate over every app in `apps/`.

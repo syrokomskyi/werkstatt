@@ -69,7 +69,7 @@ Pass — zero violations targeting RFC-0553.
   - `fo-idea-status` — 12 RFC + 9 ADR references. Shows RFC/ADR status.
   - `forge-bootstrap` — 9 RFC + 10 ADR references. Onboarding skill that introduces forge's purpose.
 
-  The RFC's Context claims "Forge consumers do not have access to the RFC/ADR infrastructure" — this is **factually wrong**. Forge IS the RFC/ADR infrastructure. Consumers install `@webgogol/forge` specifically for RFC/ADR governance. The `package.json` keywords include `rfc`, `adr`, `governance`.
+  The RFC's Context claims "Forge consumers do not have access to the RFC/ADR infrastructure" — this is **factually wrong**. Forge IS the RFC/ADR infrastructure. Consumers install `@warpgogol/forge` specifically for RFC/ADR governance. The `package.json` keywords include `rfc`, `adr`, `governance`.
 
   The Design section says "Replace 'RFC' references with 'design document' or 'proposal'" — but an RFC in forge is not a "design document". RFC has a specific lifecycle (`draft → accepted → implemented`), specific validation rules (`rfc.validate`), specific frontmatter, and specific DNA invariant relationships. Calling it a "design document" would be factually incorrect and destroy the semantic precision that makes forge useful.
 

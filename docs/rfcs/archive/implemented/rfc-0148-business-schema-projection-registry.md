@@ -34,7 +34,7 @@ commands:
     - llms.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/business"
@@ -63,7 +63,7 @@ nonGoals:
 - Pure node-safe projectors `projectOffer` / `projectLocation` and the `BUSINESS_DOMAIN_VISIBILITY` map (public / pageMeta / **none**) in [`@gogol/share/semantic/business-projection.ts`](../../packages/share/src/semantic/business-projection.ts). Placed in `@gogol/share` (not `@gogol/business`) because `@gogol/business` depends on `@gogol/site-kernel-content` — a registry there would cycle the disk loader.
 - Semantic model gained `SemanticOffer` / `SemanticGuarantee` / `SemanticPrice` / `SemanticLocation`; org-level `offer` / `services` / `location` / `sameAs`.
 - Disk loader (`loadSiteSemanticProfile`) projects offer + location into the org; `buildLlmsFull` emits `## Offer` (prices + guarantees) and `## Location`.
-- Verified: webgogol-com `llms-full.txt` 700 B → 1544 B (full offer + 5 guarantees + NAP); nicaragua gained `## Location` (no offer → omitted). Privacy boundary held — no `external-services`/`compliance` data leaked. `pnpm build` 24/24 green.
+- Verified: warpgogol-com `llms-full.txt` 700 B → 1544 B (full offer + 5 guarantees + NAP); nicaragua gained `## Location` (no offer → omitted). Privacy boundary held — no `external-services`/`compliance` data leaked. `pnpm build` 24/24 green.
 
 **Remaining phases (scoped, not yet implemented):**
 
@@ -71,7 +71,7 @@ nonGoals:
 - Full per-domain projector objects + moving company/legal/contact reads into the registry (no-legacy consolidation of the two profile builders).
 - `business.projection.validate` (registry-completeness + no-leak CI gate).
 - team/web/trust projectors; per-page `relevantTo` JSON-LD attachment.
-- webgogol-com `semanticType` + `output` page adoption (prose → llms).
+- warpgogol-com `semanticType` + `output` page adoption (prose → llms).
 
 ## Context
 
@@ -210,7 +210,7 @@ The inline company/legal/contact reads in both profile builders are **deleted** 
 3. **Phase 2 — high-value public projectors.** Add offer, service (RFC-0147), location, team, web, trust projectors; wire llms sections + JSON-LD nodes.
 4. **Phase 3 — visibility boundary.** Register compliance/external-services as `none`, meta as `pageMeta`; add `business.projection.validate` leak checks.
 5. **Phase 4 — per-page relevance.** Attach page-relevant projections to per-page JSON-LD by `relevantTo`.
-6. **Phase 5 — app adoption.** webgogol-com gains `semanticType` + `output` on content pages; verify its AI/JSON-LD now carry offer, services, location, etc.
+6. **Phase 5 — app adoption.** warpgogol-com gains `semanticType` + `output` on content pages; verify its AI/JSON-LD now carry offer, services, location, etc.
 7. **Phase 6 — onboarding.** Scaffolding documents the registry; new apps get projection for free for any business file they author.
 
 ## Alternatives considered
@@ -238,7 +238,7 @@ The inline company/legal/contact reads in both profile builders are **deleted** 
 - [x] offer + location + team project into llms (offer + team also into JSON-LD). (`service` / `web` / `trust` projectors are inert until those schemas carry content — the current apps' team/trust are empty and there is no per-service catalog; deferred until content exists.) (evidence: implemented historically)
 - [x] Per-page JSON-LD by `relevantTo` — deferred (low value today: the org node carrying offer/team/location already appears in every page's `@graph`). (evidence: implemented historically)
 - [x] `business.projection.validate` enforces registry completeness + the no-leak boundary. (evidence: implemented historically)
-- [x] webgogol-com adopts `semanticType` + `output`; its `llms-full.txt` + JSON-LD carry the offering and location. (evidence: implemented historically)
+- [x] warpgogol-com adopts `semanticType` + `output`; its `llms-full.txt` + JSON-LD carry the offering and location. (evidence: implemented historically)
 - [x] nicaragua output changes only where it has projectable data. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `pnpm build` green for both apps; `rfc.validate` passes. (evidence: implemented historically)
 

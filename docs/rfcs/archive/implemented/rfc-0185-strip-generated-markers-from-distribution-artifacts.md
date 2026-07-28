@@ -106,8 +106,8 @@ The cleanup pass is modeled as a post-generation Site OS command because `sitema
 Two app-scoped commands are introduced:
 
 ```sh
-pnpm exec site-kernel run dist.generated-marker.strip --app webgogol-com
-pnpm exec site-kernel run dist.generated-marker.validate --app webgogol-com --json
+pnpm exec site-kernel run dist.generated-marker.strip --app warpgogol-com
+pnpm exec site-kernel run dist.generated-marker.validate --app warpgogol-com --json
 ```
 
 `dist.generated-marker.strip` mutates only `apps/<site>/dist/client/**`.

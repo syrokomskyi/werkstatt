@@ -82,7 +82,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run bordbuch.validate --system webgogol-com"
+#     command: "site-kernel run bordbuch.validate --system warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -188,7 +188,7 @@ Two new commands are added to `@gogol/site-kernel-handoff`:
 ```sh
 # Append a PSEO event (replaces site.bordbuch.append)
 pnpm exec site-kernel run bordbuch.append \
-  --system webgogol-com \
+  --system warpgogol-com \
   --kind pseo \
   --writer-role runtime \
   --summary "Surface breaker tripped: 2 tripwire(s), 3 page(s) affected" \
@@ -196,7 +196,7 @@ pnpm exec site-kernel run bordbuch.append \
 
 # Append an IndexNow event
 pnpm exec site-kernel run bordbuch.append \
-  --system webgogol-com \
+  --system warpgogol-com \
   --kind indexnow.submit \
   --writer-role runtime \
   --summary "Submitted 42 canonical URL(s) to IndexNow" \
@@ -204,13 +204,13 @@ pnpm exec site-kernel run bordbuch.append \
   --metadata '{"key":"abc","batchHash":"sha256:...","urlCount":42}'
 
 # Validate the unified ledger
-pnpm exec site-kernel run bordbuch.validate --system webgogol-com
+pnpm exec site-kernel run bordbuch.validate --system warpgogol-com
 
 # Get status projection (read-only, replaces site.bordbuch.status)
-pnpm exec site-kernel run bordbuch.status --system webgogol-com
+pnpm exec site-kernel run bordbuch.status --system warpgogol-com
 
 # Generate public projections (replaces site.bordbuch.generate)
-pnpm exec site-kernel run bordbuch.generate --system webgogol-com
+pnpm exec site-kernel run bordbuch.generate --system warpgogol-com
 ```
 
 ### New `bordbuch.status` command
@@ -300,21 +300,21 @@ The projection shape matches the old `bordbuchStatusSchema` from `@gogol/surface
 
 ### Output format
 
-`bordbuch.status --system webgogol-com --json`:
+`bordbuch.status --system warpgogol-com --json`:
 
 ```json
 {
   "command": "bordbuch.status",
   "status": "ok",
   "data": {
-    "systemId": "webgogol-com",
+    "systemId": "warpgogol-com",
     "ledgerHash": "sha256:41f98a81de14c387eeb71feb99b7546b77c33f9c8eb3fc039d732a2b89d5009c",
     "eventCount": 11,
     "latestEvent": { "id": "event-000011", "kind": "mirror-sync", "..." : "..." },
     "openEscalations": [],
     "latestDeploy": null
   },
-  "summary": "[bordbuch.status] webgogol-com: 11 entries, 0 open escalations"
+  "summary": "[bordbuch.status] warpgogol-com: 11 entries, 0 open escalations"
 }
 ```
 

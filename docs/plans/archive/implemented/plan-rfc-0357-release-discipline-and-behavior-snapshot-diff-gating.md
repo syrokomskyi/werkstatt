@@ -41,7 +41,7 @@ scope:
 - [ ] Objective 8 — Release IDs follow `<system-id>-r<NNNNNN>` format (maps to: "Release IDs follow `<system-id>-r<NNNNNN>` format")
 - [ ] Objective 9 — `rfc.validate` passes on RFC-0357 (maps to: "`rfc.validate` passes on this file")
 - [ ] Objective 10 — Advisory `quality-report.json` exists for passport scores and optimization metrics without acting as a hard release gate (maps to: "Advisory `quality-report.json` exists for passport scores and optimization metrics without acting as a hard release gate")
-- [ ] Objective 11 — Pilot: prepare and publish a release for `webgogol-com` after pilot mission closes (maps to: "Pilot: prepare and publish a release for `webgogol-com` after pilot mission closes")
+- [ ] Objective 11 — Pilot: prepare and publish a release for `warpgogol-com` after pilot mission closes (maps to: "Pilot: prepare and publish a release for `warpgogol-com` after pilot mission closes")
 
 ## 2. Affected artifacts
 
@@ -443,20 +443,20 @@ scope:
 
 ---
 
-### Step 11. Pilot: prepare and publish a release for `webgogol-com`
+### Step 11. Pilot: prepare and publish a release for `warpgogol-com`
 
 **Goal:** Exercise the full release flow end-to-end on the reference Sternsystem.
 
-**Prerequisites:** Step 10 complete. RFC-0355 (mission lifecycle) and RFC-0356 (materialization) implemented. A pilot mission for `webgogol-com` has been opened, materialized, validated, and closed.
+**Prerequisites:** Step 10 complete. RFC-0355 (mission lifecycle) and RFC-0356 (materialization) implemented. A pilot mission for `warpgogol-com` has been opened, materialized, validated, and closed.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run release.prepare --mission <pilot-mission-id> --semver 1.0.0 --json` — verify a release candidate is produced in `releases/webgogol-com-r000001/`
+- Run `pnpm exec site-kernel run release.prepare --mission <pilot-mission-id> --semver 1.0.0 --json` — verify a release candidate is produced in `releases/warpgogol-com-r000001/`
 - Verify `release.yaml` has state `prepared`, `snapshotDiffVerdict: "pass"`, and all hash fields populated
-- Run `pnpm exec site-kernel run release.validate --release webgogol-com-r000001 --json` — verify pass
-- Run `pnpm exec site-kernel run release.publish --release webgogol-com-r000001 --json` — verify state transitions to `published`, Bordbuch entry appended, registry `lastRelease` updated
-- Run `pnpm exec site-kernel run release.list --system webgogol-com --json` — verify the release appears
-- Run `pnpm exec site-kernel run release.rollback --release webgogol-com-r000001 --json` — verify state transitions to `rolled-back` (optional, only if rollback is safe for the pilot)
+- Run `pnpm exec site-kernel run release.validate --release warpgogol-com-r000001 --json` — verify pass
+- Run `pnpm exec site-kernel run release.publish --release warpgogol-com-r000001 --json` — verify state transitions to `published`, Bordbuch entry appended, registry `lastRelease` updated
+- Run `pnpm exec site-kernel run release.list --system warpgogol-com --json` — verify the release appears
+- Run `pnpm exec site-kernel run release.rollback --release warpgogol-com-r000001 --json` — verify state transitions to `rolled-back` (optional, only if rollback is safe for the pilot)
 
 **Validation:**
 
@@ -465,9 +465,9 @@ scope:
 - `release.validate` passes on the published release
 - `release.list` shows the release
 
-**Completion criterion:** Pilot release for `webgogol-com` is prepared, published, validated, and listed. Bordbuch has `release-published` entry. Registry `lastRelease` is updated.
+**Completion criterion:** Pilot release for `warpgogol-com` is prepared, published, validated, and listed. Bordbuch has `release-published` entry. Registry `lastRelease` is updated.
 
-**Human review:** Yes — operator must verify the pilot does not disrupt the live `webgogol-com` deployment. Fleet propagation (RFC-0358) is separate but must be coordinated.
+**Human review:** Yes — operator must verify the pilot does not disrupt the live `warpgogol-com` deployment. Fleet propagation (RFC-0358) is separate but must be coordinated.
 
 ---
 
@@ -482,7 +482,7 @@ scope:
 - `pnpm exec site-kernel run compass.validate --json`
 - `pnpm exec site-kernel run ecosystem.manifest.validate --json`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0357` (RFC-0330)
-- Pilot: `release.prepare` + `release.publish` + `release.validate` + `release.list` for `webgogol-com` (Step 11)
+- Pilot: `release.prepare` + `release.publish` + `release.validate` + `release.list` for `warpgogol-com` (Step 11)
 
 ### 4.2 Evidence artifacts
 

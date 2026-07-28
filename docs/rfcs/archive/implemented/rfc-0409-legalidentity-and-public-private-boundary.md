@@ -62,7 +62,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -89,7 +89,7 @@ _This RFC defines the `PbpLegalIdentity` entity interface and the public/private
 
 The PBP spec defines LegalIdentity as a federated entity for the public legal identity of a business (entity-model §6). It carries legal name, legal form, responsible person, registered place, and public identifiers. Private data (tax numbers, banking details) are explicitly excluded from the public LegalIdentity (§6.1).
 
-The current Webgogol model mixes legal identity data into `company.md` and `legal.md` without a clear public/private boundary.
+The current Warpgogol model mixes legal identity data into `company.md` and `legal.md` without a clear public/private boundary.
 
 ## Problem
 

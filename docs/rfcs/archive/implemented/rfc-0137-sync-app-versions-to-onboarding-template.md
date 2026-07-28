@@ -46,7 +46,7 @@ The templates live in `packages/os/site-kernel-onboarding/src/templates/` and se
 
 ## Problem
 
-- `apps/webgogol-com/package.json` was upgraded to `astro ^6.4.x` and newer React versions via `pnpm up --latest`.
+- `apps/warpgogol-com/package.json` was upgraded to `astro ^6.4.x` and newer React versions via `pnpm up --latest`.
 - `config.regenerate --force` reverted those versions to the older template values (`astro ^6.3.6`), causing a silent downgrade.
 - There is no automated or documented way to propagate upgraded versions from a reference app back into the canonical template.
 - Manual copy-paste is error-prone and violates the "thin apps, thick OS" invariant: the OS should own template currency, not individual engineers.
@@ -68,13 +68,13 @@ The kernel gains a `config.template.sync` command that reads selected generated 
 
 ```sh
 # Sync all supported template files from a reference app
-pnpm exec site-kernel run config.template.sync --app webgogol-com
+pnpm exec site-kernel run config.template.sync --app warpgogol-com
 
 # Sync only specific files (comma-separated)
-pnpm exec site-kernel run config.template.sync --app webgogol-com --files package.json,astro.config.mjs
+pnpm exec site-kernel run config.template.sync --app warpgogol-com --files package.json,astro.config.mjs
 
 # Dry-run: show what would change without writing
-pnpm exec site-kernel run config.template.sync --app webgogol-com --dry-run
+pnpm exec site-kernel run config.template.sync --app warpgogol-com --dry-run
 ```
 
 Flags:
@@ -136,16 +136,16 @@ interface ConfigTemplateSyncResult {
 ```json
 {
   "command": "config.template.sync",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "synced": [
     {
       "templateFile": "package.template.json",
-      "sourceFile": "apps/webgogol-com/package.json",
+      "sourceFile": "apps/warpgogol-com/package.json",
       "fieldsUpdated": ["dependencies", "devDependencies"]
     },
     {
       "templateFile": "astro.config.template.mjs",
-      "sourceFile": "apps/webgogol-com/astro.config.mjs",
+      "sourceFile": "apps/warpgogol-com/astro.config.mjs",
       "fieldsUpdated": ["optimizeDeps", "ssr"]
     }
   ],

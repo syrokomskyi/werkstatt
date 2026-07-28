@@ -114,7 +114,7 @@ interface ResolvedFontFace {
   "command": "fonts.selfhost.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "external-font-origin", "match": "fonts.googleapis.com" }
+    { "app": "warpgogol-com", "rule": "external-font-origin", "match": "fonts.googleapis.com" }
   ]
 }
 ```

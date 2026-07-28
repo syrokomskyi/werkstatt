@@ -22,7 +22,7 @@ probes:
     durationMs: 608
   - probe:
       probe: run
-      command: site-kernel run comparative.claim.validate --app webgogol-com --json
+      command: site-kernel run comparative.claim.validate --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true

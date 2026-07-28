@@ -7,7 +7,7 @@ createdAt: 2026-07-22
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/share"
     - "@gogol/ui"
@@ -134,7 +134,7 @@ scope:
   5. For `human-made` records with `creator: Organization`: rename role to `commissionedBy`, flag as `needs-review`.
 - Register `rfc0488Migrator` in `packages/os/site-kernel-handoff/src/migrators/registry.ts`.
 - Create `rfc-0488.pbt.test.ts` — idempotency test: `f(f(x)) === f(x)`.
-- Create `rfc-0488.snapshot.test.ts` — snapshot test on real `webgogol-com` sidecar data.
+- Create `rfc-0488.snapshot.test.ts` — snapshot test on real `warpgogol-com` sidecar data.
 
 **Validation:**
 
@@ -254,18 +254,18 @@ scope:
 
 ---
 
-### Step 8. Run migrator on `webgogol-com`
+### Step 8. Run migrator on `warpgogol-com`
 
-**Goal:** Transform existing sidecar YAML files in the `webgogol-com` workpiece.
+**Goal:** Transform existing sidecar YAML files in the `warpgogol-com` workpiece.
 
 **Agent actions:**
 
-- Run the RFC-0488 migrator on the `webgogol-com` workpiece via `mission.migrate`.
+- Run the RFC-0488 migrator on the `warpgogol-com` workpiece via `mission.migrate`.
 - Verify migrated sidecars pass the extended `materialCreditSchema`.
 
 **Validation:**
 
-- `pnpm exec site-kernel run material.credits.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json`
 
 **Completion criterion:** Migrator runs without errors; sidecars are transformed.
 
@@ -284,7 +284,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run material.credits.validate --site webgogol-com --json` (no `unverified-usage-basis` violations)
+- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json` (no `unverified-usage-basis` violations)
 
 **Completion criterion:** No `unverified-usage-basis` violations remain.
 
@@ -294,20 +294,20 @@ scope:
 
 ### Step 10. Regenerate credits page and verify
 
-**Goal:** Regenerate the credits page for `webgogol-com` and verify the rendered output.
+**Goal:** Regenerate the credits page for `warpgogol-com` and verify the rendered output.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run material.credits.generate --site webgogol-com`.
+- Run `pnpm exec site-kernel run material.credits.generate --site warpgogol-com`.
 - Start dev build and verify `/bildnachweise/` renders without runtime errors.
-- Verify stable anchors work (`/bildnachweise/#webgogol-promo-video`).
+- Verify stable anchors work (`/bildnachweise/#warpgogol-promo-video`).
 - Verify no raw enum values are visible.
 
 **Validation:**
 
-- `pnpm exec site-kernel run material.credits.validate --site webgogol-com --json` exits 0.
-- `pnpm exec site-kernel run content.references.validate --site webgogol-com` exits 0.
-- Dev build of `webgogol-com` starts without runtime errors on `/bildnachweise/`.
+- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json` exits 0.
+- `pnpm exec site-kernel run content.references.validate --site warpgogol-com` exits 0.
+- Dev build of `warpgogol-com` starts without runtime errors on `/bildnachweise/`.
 
 **Completion criterion:** Credits page renders correctly; all validation passes.
 
@@ -384,8 +384,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run material.credits.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run content.references.validate --site webgogol-com`
+- `pnpm exec site-kernel run material.credits.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run content.references.validate --site warpgogol-com`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0488` (RFC-0330)
 
 ### 4.2 Evidence artifacts

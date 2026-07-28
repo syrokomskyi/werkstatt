@@ -37,7 +37,7 @@ commands:
     - site.bordbuch.append
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/surface"
@@ -125,9 +125,9 @@ export interface BreakerVerdict {
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.breaker.evaluate --app webgogol-com --json
-pnpm exec site-kernel run surface.rollback.plan --app webgogol-com --to <lastKnownGood-id> --json
-pnpm exec site-kernel run surface.rollback.apply --app webgogol-com --to <lastKnownGood-id> --json
+pnpm exec site-kernel run surface.breaker.evaluate --app warpgogol-com --json
+pnpm exec site-kernel run surface.rollback.plan --app warpgogol-com --to <lastKnownGood-id> --json
+pnpm exec site-kernel run surface.rollback.apply --app warpgogol-com --to <lastKnownGood-id> --json
 ```
 
 ### File system responsibilities

@@ -32,7 +32,7 @@ commands:
     - page.markdown.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/site-kernel-checks"
@@ -75,7 +75,7 @@ The platform needs a generic definition of "substantive article" before agents e
 
 Draft a Ratgeber content upgrade contract, but do not implement it until this RFC is accepted.
 
-When accepted, German Ratgeber articles on `webgogol-com` should become dated editorial pages with:
+When accepted, German Ratgeber articles on `warpgogol-com` should become dated editorial pages with:
 
 - at least 500 words of substantive body text per article;
 - `publishedAt` and `updatedAt` metadata in `system.md` article declarations;
@@ -88,7 +88,7 @@ When accepted, German Ratgeber articles on `webgogol-com` should become dated ed
 
 This RFC will extend RFC-0167's article model rather than creating a second Ratgeber system. Articles remain block-declarative pages with body prose in `src/content/prose/{lang}/`. Feed and Markdown twin behavior comes from the existing public artifact generators.
 
-The proposed `article.depth.validate` is generic. It should not know webgogol-com article slugs; it checks article pages by semantic type and site policy.
+The proposed `article.depth.validate` is generic. It should not know warpgogol-com article slugs; it checks article pages by semantic type and site policy.
 
 ## Design
 
@@ -105,7 +105,7 @@ For each Ratgeber article:
 
 Word count is a floor, not the target. `article.depth.validate` should also catch heading-only sections and repeated boilerplate.
 
-### webgogol-com editorial targets
+### warpgogol-com editorial targets
 
 When this RFC becomes accepted, update at least:
 
@@ -183,10 +183,10 @@ Later rollout:
 ## Acceptance criteria
 
 - [x] This RFC is accepted before implementation starts. (evidence: implemented historically)
-- [x] `article.depth.validate` is registered and fixture-tested. Registered in (evidence: implemented historically) `packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts`, wired into `apps-check-author.ts` (and therefore `build.check`). Unit-tested (`src/tests/article-depth.test.ts`, 9 cases covering the word-count floor and thin-heading detection) and verified against the live `webgogol-com` article set (`article.depth.validate: OK — 4 article(s) conform`).
+- [x] `article.depth.validate` is registered and fixture-tested. Registered in (evidence: implemented historically) `packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts`, wired into `apps-check-author.ts` (and therefore `build.check`). Unit-tested (`src/tests/article-depth.test.ts`, 9 cases covering the word-count floor and thin-heading detection) and verified against the live `warpgogol-com` article set (`article.depth.validate: OK — 4 article(s) conform`).
 - [x] German Ratgeber articles have at least 500 substantive words each. Confirmed for (evidence: implemented historically) `website-kosten`, `lokale-sichtbarkeit`, and the `ratgeber` hub — each carries a `prose/{lang}/ratgeber-*` body (500-650 words) plus the existing field-driven sections.
 - [x] Article dates are present and source-backed. `publishedAt`/`updatedAt`/`author`/`tags` are (evidence: implemented historically) authored on the topic records (depth-1) and the blueprint level (depth-0 hub); resolved into `VirtualRouteEntry.article` and threaded through `resolveAuthoredStamp` (RFC-0317).
-- [x] Ratgeber articles appear in RSS and JSON Feed. `feed.generate` now includes Programmatic (evidence: implemented historically) Surface article entries; verified `feed.generate: 4 item(s)` (digitalesFundament + the 3 Ratgeber pages) on a full `webgogol-com` build.
+- [x] Ratgeber articles appear in RSS and JSON Feed. `feed.generate` now includes Programmatic (evidence: implemented historically) Surface article entries; verified `feed.generate: 4 item(s)` (digitalesFundament + the 3 Ratgeber pages) on a full `warpgogol-com` build.
 - [x] Article Markdown twins include RFC-0320 provenance. `page.markdown.generate` now emits twins (evidence: implemented historically) for article-typed surface entries (both `de` and `uk` routes); verified frontmatter (`canonical`/`lastModified`/`contentHash`/`license`) and `page.markdown.validate: 56 twin(s)     frontmatter ok`.
 - [x] `rfc.validate` passes. (evidence: implemented historically)
 

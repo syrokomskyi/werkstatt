@@ -43,7 +43,7 @@ nonGoals:
 
 RFC-0095 added `footer.legal.validate` to fail any DE/AT/CH-locale app whose `footer.legalIds` is empty (Impressum + Datenschutz are legally mandated by § 5 TMG and DSGVO). The validator gives the agent a clear failure with the exact remediation path, but the actual authoring work is still manual: create two pages, two prose files, three navigation entries, and edit `labels.md` twice — and the boilerplate text is the same for every German site.
 
-During the May 2026 webgogol-com onboarding this manual authoring took several edits across six files. Every future DE-locale onboarding repeats the same work. The boilerplate is large enough to be worth scaffolding and small enough to fully template.
+During the May 2026 warpgogol-com onboarding this manual authoring took several edits across six files. Every future DE-locale onboarding repeats the same work. The boilerplate is large enough to be worth scaffolding and small enough to fully template.
 
 ## Problem
 
@@ -127,12 +127,12 @@ The onboarding workflow (`.agents/workflows/02-scaffold.md`) gets a step: "Run `
 
 ```
 [OK] legal.scaffold: 6 file(s) written for locale "de":
-       - apps/webgogol-com/src/content/pages/de/impressum.md          (created)
-       - apps/webgogol-com/src/content/pages/de/datenschutz.md        (created)
-       - apps/webgogol-com/src/content/prose/de/impressum.md          (created)
-       - apps/webgogol-com/src/content/prose/de/datenschutz.md        (created)
-       - apps/webgogol-com/src/content/navigation/de/navigation.md    (merged 3 targets)
-       - apps/webgogol-com/src/content/site/de/labels.md              (merged legalIds + contactIds)
+       - apps/warpgogol-com/src/content/pages/de/impressum.md          (created)
+       - apps/warpgogol-com/src/content/pages/de/datenschutz.md        (created)
+       - apps/warpgogol-com/src/content/prose/de/impressum.md          (created)
+       - apps/warpgogol-com/src/content/prose/de/datenschutz.md        (created)
+       - apps/warpgogol-com/src/content/navigation/de/navigation.md    (merged 3 targets)
+       - apps/warpgogol-com/src/content/site/de/labels.md              (merged legalIds + contactIds)
 ```
 
 Re-run:

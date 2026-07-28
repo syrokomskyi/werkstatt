@@ -2,16 +2,16 @@
 <MODULE_CONTRACT>
 <purpose>
 Re-export barrel for the ADR domain. The ADR module has migrated to
-@webgogol/forge/os/adr (RFC-0521). This file preserves the
+@warpgogol/forge/os/adr (RFC-0521). This file preserves the
 @warpgogol/site-kernel/adr import path for backward compatibility.
 </purpose>
 <non-goals>
-  <item>Do not re-implement ADR logic here — all logic lives in @webgogol/forge/os/adr.</item>
+  <item>Do not re-implement ADR logic here — all logic lives in @warpgogol/forge/os/adr.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0366: expose adrModule and ADR types from the ADR domain.</item>
-  <item>RFC-0521: replaced site-kernel ADR implementation with re-export from @webgogol/forge/os/adr.</item>
+  <item>RFC-0521: replaced site-kernel ADR implementation with re-export from @warpgogol/forge/os/adr.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -21,7 +21,7 @@ export {
   runAdrCreate,
   runAdrValidate,
   runAdrArchive,
-} from "@webgogol/forge/os/adr";
+} from "@warpgogol/forge/os/adr";
 export type {
   AdrArchiveResult,
   AdrArchiveMove,
@@ -34,11 +34,11 @@ export type {
   AdrCreateResult,
   AdrValidationViolation,
   AdrValidationResult,
-} from "@webgogol/forge/os/adr";
+} from "@warpgogol/forge/os/adr";
 export {
   ADR_STATUSES,
   ADR_SCOPES,
   ADR_DIR,
   ADR_TEMPLATE_FILE,
   ADR_ID_PATTERN,
-} from "@webgogol/forge/os/adr";
+} from "@warpgogol/forge/os/adr";

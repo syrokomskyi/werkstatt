@@ -137,8 +137,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-leitstand run build:check` — typecheck and tests
 - `pnpm --filter @gogol/ontology run build:check` — schema validation
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — no regression
-- `pnpm exec site-kernel run leitstand.propagate --release webgogol-com-r000001 --json` — pilot
-- `pnpm exec site-kernel run leitstand.health --system webgogol-com --json` — pilot
+- `pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --json` — pilot
+- `pnpm exec site-kernel run leitstand.health --system warpgogol-com --json` — pilot
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0358` — evidence artifact (RFC-0330, for probe-bearing RFCs created on or after 2026-07-07)
 - No new pipeline steps required at this stage; propagation is operator-driven, not part of `apps-check` or `apps-check-postbuild`
 
@@ -300,7 +300,7 @@ scope:
 **Validation:**
 
 - `pnpm exec site-kernel run command.manifest.generate` and `pnpm exec site-kernel run command.manifest.validate` include the four commands with correct metadata
-- `pnpm exec site-kernel run leitstand.status --system webgogol-com --json` returns a pass/fail envelope (will fail because no deployment block exists yet; verify the error message is correct)
+- `pnpm exec site-kernel run leitstand.status --system warpgogol-com --json` returns a pass/fail envelope (will fail because no deployment block exists yet; verify the error message is correct)
 - `pnpm --filter @gogol/site-kernel-leitstand run build:check` passes
 - Unit tests for handlers pass
 
@@ -367,7 +367,7 @@ scope:
 
 - Create `packages/os/site-kernel-leitstand/src/tests/fixtures/`:
   - `release-manifest.yaml` with RFC-0363 artifact reference
-  - `dist/` tree with `.well-known/webgogol-release.json`, `sitemap.xml`, `llms-full.txt`
+  - `dist/` tree with `.well-known/warpgogol-release.json`, `sitemap.xml`, `llms-full.txt`
   - `registry-with-deployment.yaml` and `registry-without-deployment.yaml`
   - `invalid-registry-with-secret.yaml`
 - Create unit tests for:
@@ -393,43 +393,43 @@ scope:
 
 ### Step 10. Seed `systems/registry.yaml` with the pilot deployment block
 
-**Goal:** Provide the data needed for the pilot propagation of `webgogol-com-r000001`.
+**Goal:** Provide the data needed for the pilot propagation of `warpgogol-com-r000001`.
 
 **Agent actions:**
 
 - Ensure `systems/registry.yaml` exists and is tracked (from RFC-0354 implementation)
-- Add a `deployment` block to the `webgogol-com` entry:
+- Add a `deployment` block to the `warpgogol-com` entry:
   - `adapter: cloudflare-pages`
-  - `target: webgogol-com`
-  - `healthUrl: https://webgogol.com/health`
+  - `target: warpgogol-com`
+  - `healthUrl: https://warpgogol.com/health`
   - `credentials: { accountIdRef: env:CF_ACCOUNT_ID, apiTokenRef: env:CF_API_TOKEN }`
   - `lastPropagatedRelease: null` initially
-- Validate the registry with `pnpm exec site-kernel run sternsystem.validate --id webgogol-com --json` (or the new Leitstand registry validator)
+- Validate the registry with `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json` (or the new Leitstand registry validator)
 - Commit the registry change separately
 
 **Validation:**
 
-- `pnpm exec site-kernel run sternsystem.validate --id webgogol-com --json` passes (or equivalent registry validator)
+- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json` passes (or equivalent registry validator)
 - The registry file parses and the deployment block is schema-valid
 
-**Completion criterion:** `systems/registry.yaml` has a valid deployment block for `webgogol-com` with secret references only.
+**Completion criterion:** `systems/registry.yaml` has a valid deployment block for `warpgogol-com` with secret references only.
 
 **Human review:** Yes — registry data is curated and requires operator/architecture approval because it points to a production deployment target.
 
 ---
 
-### Step 11. Pilot: propagate `webgogol-com-r000001` and verify health
+### Step 11. Pilot: propagate `warpgogol-com-r000001` and verify health
 
 **Goal:** Prove the end-to-end propagation flow against a real deployment target.
 
 **Agent actions:**
 
-- Ensure the pilot release `webgogol-com-r000001` is prepared/published via RFC-0357 (prerequisite)
+- Ensure the pilot release `warpgogol-com-r000001` is prepared/published via RFC-0357 (prerequisite)
 - Set environment variables `CF_ACCOUNT_ID` and `CF_API_TOKEN` in the operator environment or CI
-- Run `pnpm exec site-kernel run leitstand.propagate --release webgogol-com-r000001 --json`
-- Run `pnpm exec site-kernel run leitstand.health --system webgogol-com --json`
+- Run `pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --json`
+- Run `pnpm exec site-kernel run leitstand.health --system warpgogol-com --json`
 - Verify the deployment URL serves the release marker and the registry is updated with `lastPropagatedRelease`
-- If health checks fail, use `leitstand.rollback --system webgogol-com` to revert and capture the failure log
+- If health checks fail, use `leitstand.rollback --system warpgogol-com` to revert and capture the failure log
 - Append the pilot result to the Bordbuch as a `deployment` event
 
 **Validation:**
@@ -440,7 +440,7 @@ scope:
 
 **Completion criterion:** Pilot release is live, healthy, and registry propagation state is `succeeded`.
 
-**Human review:** Yes — production deployment to `webgogol.com` requires explicit operator/architecture approval and coordination.
+**Human review:** Yes — production deployment to `warpgogol.com` requires explicit operator/architecture approval and coordination.
 
 ---
 
@@ -509,7 +509,7 @@ scope:
 
 - `docs/rfcs/verification/rfc-0358.generated.json` — RFC-0330 verification evidence
 - Commit messages referencing `RFC-0358` in the subject line (RFC-0265 commit hygiene)
-- Pilot Bordbuch `deployment` event recording the `webgogol-com-r000001` propagation
+- Pilot Bordbuch `deployment` event recording the `warpgogol-com-r000001` propagation
 
 ## 5. Risks and mitigation
 

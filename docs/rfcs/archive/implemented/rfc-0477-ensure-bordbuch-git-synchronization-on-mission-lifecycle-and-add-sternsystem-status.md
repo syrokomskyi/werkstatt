@@ -77,7 +77,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -97,7 +97,7 @@ RFC-0355 established the mission lifecycle (open → reconcile → close/abort) 
 
 The current `mission.reconcile` command (RFC-0356) commits and pushes reconciled content changes to the system git repo. However, `mission.reconcile` also performs `git fetch + reset --hard` on the next materialize, which discards any uncommitted bordbuch entries from prior `mission.open`, `mission.close`, `mission.abort`, or `sternsystem.sync` calls.
 
-This was observed in production: mission `webgogol-com-m000005` was opened, materialized, validated, reconciled, and closed, but the bordbuch `mission-open` entry for m000005 was lost because `mission.reconcile`'s `git reset --hard` overwrote the uncommitted entry written by `mission.open`. Only the `mission-close` entry survived (it was written after reconcile).
+This was observed in production: mission `warpgogol-com-m000005` was opened, materialized, validated, reconciled, and closed, but the bordbuch `mission-open` entry for m000005 was lost because `mission.reconcile`'s `git reset --hard` overwrote the uncommitted entry written by `mission.open`. Only the `mission-close` entry survived (it was written after reconcile).
 
 Additionally, there is no single command to inspect the synchronization state of a Sternsystem — operators must manually run `git log`, `git status`, and compare SHAs across the cache clone, bare repo, and mirror ref.
 
@@ -238,8 +238,8 @@ interface SternsystemStatusData {
 {
   "command": "mission.close",
   "data": {
-    "missionId": "webgogol-com-m000005",
-    "systemId": "webgogol-com",
+    "missionId": "warpgogol-com-m000005",
+    "systemId": "warpgogol-com",
     "state": "closed",
     "closedAt": "2026-07-21T00:15:07.307Z",
     "releaseId": null,
@@ -254,7 +254,7 @@ interface SternsystemStatusData {
         "originSha": "abc123def",
         "mirrorSha": "abb13b9",
         "inSync": false,
-        "recommendation": "Mirror is behind origin. Run: sternsystem.sync --id webgogol-com"
+        "recommendation": "Mirror is behind origin. Run: sternsystem.sync --id warpgogol-com"
       },
       "reconcile": {
         "reconciledAt": "2026-07-21T00:14:57.263Z",
@@ -263,7 +263,7 @@ interface SternsystemStatusData {
     }
   },
   "exitCode": 0,
-  "summary": "[mission.close] closed mission webgogol-com-m000005"
+  "summary": "[mission.close] closed mission warpgogol-com-m000005"
 }
 ```
 
@@ -273,7 +273,7 @@ interface SternsystemStatusData {
 {
   "command": "sternsystem.status",
   "data": {
-    "systemId": "webgogol-com",
+    "systemId": "warpgogol-com",
     "git": {
       "headSha": "abc123def",
       "originSha": "abc123def",
@@ -284,18 +284,18 @@ interface SternsystemStatusData {
     },
     "bordbuch": {
       "lastEvents": [
-        { "id": "event-000009", "kind": "mission-close", "occurredAt": "2026-07-21T00:15:07.311Z", "summary": "Mission webgogol-com-m000005 closed" }
+        { "id": "event-000009", "kind": "mission-close", "occurredAt": "2026-07-21T00:15:07.311Z", "summary": "Mission warpgogol-com-m000005 closed" }
       ],
       "totalEvents": 9
     },
     "lastMission": {
-      "missionId": "webgogol-com-m000005",
+      "missionId": "warpgogol-com-m000005",
       "state": "closed",
       "reconciledAt": "2026-07-21T00:14:57.263Z"
     }
   },
   "exitCode": 0,
-  "summary": "[sternsystem.status] webgogol-com: HEAD=origin, mirror behind by 1 commit"
+  "summary": "[sternsystem.status] warpgogol-com: HEAD=origin, mirror behind by 1 commit"
 }
 ```
 

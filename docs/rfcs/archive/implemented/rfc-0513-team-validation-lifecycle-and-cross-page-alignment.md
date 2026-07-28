@@ -50,7 +50,7 @@ commands:
     - content.voice.lint
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/site-kernel-checks"
@@ -223,8 +223,8 @@ The badge is rendered via the hero block's `tagline` prop (a top-level prop in t
 
 ```sh
 # Validate lifecycle and cross-page consistency.
-pnpm exec site-kernel run team.lifecycle.validate --site webgogol-com --json
-pnpm exec site-kernel run team.cross-page.validate --site webgogol-com --json
+pnpm exec site-kernel run team.lifecycle.validate --site warpgogol-com --json
+pnpm exec site-kernel run team.cross-page.validate --site warpgogol-com --json
 ```
 
 ### File system responsibilities

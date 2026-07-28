@@ -57,7 +57,7 @@ nonGoals:
 
 ## Context
 
-The studio wants to sell an on-site conversational widget (a popup chat) as a paid module, piloting with **UChat** on [apps/webgogol-com](../../apps/webgogol-com). UChat is an omni-channel chat platform with its own flow builder; it does not store conversation data long-term — it forwards captured leads onward (in the pilot, to the client's Pipedrive). Where that data goes is a _destination_ concern owned by RFC-0176; this RFC owns the _source_: getting a widget onto the page.
+The studio wants to sell an on-site conversational widget (a popup chat) as a paid module, piloting with **UChat** on [apps/warpgogol-com](../../apps/warpgogol-com). UChat is an omni-channel chat platform with its own flow builder; it does not store conversation data long-term — it forwards captured leads onward (in the pilot, to the client's Pipedrive). Where that data goes is a _destination_ concern owned by RFC-0176; this RFC owns the _source_: getting a widget onto the page.
 
 The widget is a **third-party client script**, which collides head-on with the ecosystem's privacy posture: cookies are forbidden repository-wide ([AGENTS.md storage policy](../../AGENTS.md)), analytics runs cookieless (RFC-0170), and fonts were self-hosted specifically to delete a third-party hotlink (RFC-0164). A naive `<script src="uchat…">` would set third-party storage and beacon on every page load, before any user action — exactly what the posture eliminates.
 
@@ -87,7 +87,7 @@ A client-side **Chat Widget Port** is introduced in a dedicated package `@gogol/
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run chat.config.validate --app webgogol-com --json
+pnpm exec site-kernel run chat.config.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -137,8 +137,8 @@ The `chat-widget` section renders a first-party `<button>` launcher. Its `client
   "command": "chat.config.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "unknown-chat-adapter", "value": "intercom" },
-    { "app": "webgogol-com", "rule": "missing-required-option", "option": "widgetId" }
+    { "app": "warpgogol-com", "rule": "unknown-chat-adapter", "value": "intercom" },
+    { "app": "warpgogol-com", "rule": "missing-required-option", "option": "widgetId" }
   ]
 }
 ```
@@ -150,7 +150,7 @@ The `chat-widget` section renders a first-party `<button>` launcher. Its `client
 ## Rollout
 
 - Phase 1: `@gogol/chat` port + `null` + `uchat` adapters + `chat-widget` section; `integrations.chat` added to the entitlement catalog (RFC-0169); `chat.config.validate` registered in `apps-check.run`.
-- Phase 2: webgogol-com pilot — `integrations.chat: { adapter: uchat, … }` once entitled; CRM destination configured vendor-native via RFC-0176; Datenschutz updated per RFC-0177.
+- Phase 2: warpgogol-com pilot — `integrations.chat: { adapter: uchat, … }` once entitled; CRM destination configured vendor-native via RFC-0176; Datenschutz updated per RFC-0177.
 - Dev/CI keep `adapter: null` so builds are deterministic and load nothing third-party.
 - New apps inherit the `null` default from the scaffold.
 
@@ -177,7 +177,7 @@ The `chat-widget` section renders a first-party `<button>` launcher. Its `client
 - [x] Closed chat adapter id catalog (`@gogol/chat` `CHAT_ADAPTER_IDS`); unknown ids warn and no-op (evidence: packages/ directory, package exists)
 - [x] `chat.config.validate` registered and in `apps-check.run` (evidence: implemented historically)
 - [x] No vendor SDK imported in `apps/*` or section code; `system.md integrations.chat.options` carries public values only (`chat.config.validate` rejects secrets) (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] webgogol-com configures `uchat` (real widgetId) and places the chat-widget on the contact page; **production build renders the first-party launcher + injected config with NO `uchat.com.au` origin in static HTML** (click-to-load verified); `consent.activation.validate` passes on dist <!-- also fixed a stale RFC-0091 fallback in page.ts that mapped Amalthea→hero and shadowed the registry; nicaragua-projekt stays default (no chat) --> (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] warpgogol-com configures `uchat` (real widgetId) and places the chat-widget on the contact page; **production build renders the first-party launcher + injected config with NO `uchat.com.au` origin in static HTML** (click-to-load verified); `consent.activation.validate` passes on dist <!-- also fixed a stale RFC-0091 fallback in page.ts that mapped Amalthea→hero and shadowed the registry; nicaragua-projekt stays default (no chat) --> (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file before merging (evidence: implemented historically)
 
 ## Implementation notes for agents

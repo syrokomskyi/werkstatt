@@ -7,7 +7,7 @@ createdAt: 2026-07-15
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-handoff"
     - "@gogol/site-kernel-codegen"

@@ -35,7 +35,7 @@ Pass — 0 violations.
 
 ## Axis B — DNA alignment
 
-- **DNA-1 (Monorepo boundary):** Content files in `systems/webgogol-com/src/content/`, schemas/compiler in `packages/pbp/`. Correctly separated.
+- **DNA-1 (Monorepo boundary):** Content files in `systems/warpgogol-com/src/content/`, schemas/compiler in `packages/pbp/`. Correctly separated.
 - **DNA-20 (Business layer):** This RFC creates the PBP content that will replace `@gogol/business` content. Both coexist until RFC-0470. Forward-only — no backward compatibility.
 - **DNA-55 (Spec vendoring):** Entity field values reference `pbp-specification-package/target-blueprint` sections. Correct.
 - `satisfies: [DNA-1, DNA-20]` — both are real invariants and the RFC body explains how each is enforced.
@@ -46,7 +46,7 @@ Pass — 0 violations.
 - **Package boundaries:** Content in site workspace, schemas in package. Correct.
 - **Pipeline placement:** Not applicable — content creation, no build pipeline hooks.
 - **Compass sync:** Not applicable — no repository-wide requirement changes.
-- **AGENTS.md updates:** The RFC does not mention updating `systems/webgogol-com/AGENTS.md` with the new `business-profile/` content directory. **Minor finding — the site's AGENTS.md should document the new content tree.**
+- **AGENTS.md updates:** The RFC does not mention updating `systems/warpgogol-com/AGENTS.md` with the new `business-profile/` content directory. **Minor finding — the site's AGENTS.md should document the new content tree.**
 - **Cosmic naming:** Not applicable — content files, not manifests.
 - **Command lifecycle:** All empty. Correct — no CLI commands.
 - No blocking issues.
@@ -70,7 +70,7 @@ Pass — 0 violations.
 - **Minimal command surface:** No CLI commands. Correct.
 - **Lean contracts:** N/A — content RFC.
 - **Existing patterns:** The RFC follows the existing `src/content/business/{lang}/` pattern with the new `src/content/business-profile/{lang}/` directory. Consistent.
-- **Scope discipline:** `appsImpacted: ["webgogol-com"]`, `packagesImpacted: ["@gogol/pbp"]`. Correct. `nonGoals` are explicit and meaningful — 7 items covering what this RFC does not do.
+- **Scope discipline:** `appsImpacted: ["warpgogol-com"]`, `packagesImpacted: ["@gogol/pbp"]`. Correct. `nonGoals` are explicit and meaningful — 7 items covering what this RFC does not do.
 - **Entity ID scheme:** Uses HTTPS URIs per blueprint convention. Clean and consistent.
 - No issues.
 
@@ -88,4 +88,4 @@ Pass — 0 violations.
 
 1. Which prose fields (descriptions, mission, claim statements) are auto-mapped from legacy content vs. which require human authoring? The RFC should clarify the boundary between agent-mapped and human-authored content.
 2. The `owner-decision-register.yaml` lists 28 items but only items 1-3 are shown in the RFC. Will the full register be created during implementation from the migration plan §28, or does the operator need to provide the complete list?
-3. Should `systems/webgogol-com/AGENTS.md` be updated as part of this RFC to document the new `business-profile/` content directory and its relationship to the legacy `business/` directory?
+3. Should `systems/warpgogol-com/AGENTS.md` be updated as part of this RFC to document the new `business-profile/` content directory and its relationship to the legacy `business/` directory?

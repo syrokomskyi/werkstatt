@@ -27,7 +27,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - site-kernel-checks
   - site-kernel-content

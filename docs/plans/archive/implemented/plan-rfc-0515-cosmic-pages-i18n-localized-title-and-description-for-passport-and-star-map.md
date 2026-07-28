@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-codegen"
   services: []
@@ -21,7 +21,7 @@ scope:
 
 - [ ] O1 — Make `runGenerateOverlayPages` locale-aware: use `manifest.app` as brand for non-DE locales — maps to acceptance criterion "runGenerateOverlayPages uses manifest.app as the brand for non-DE locales"
 - [ ] O2 — Add generator unit test asserting non-DE output does not contain the German tagline — maps to acceptance criterion "Generator unit test asserts non-DE output does not contain the German tagline"
-- [ ] O3 — Regenerate webgogol-com cosmic pages and verify UK output no longer contains the German tagline — maps to acceptance criteria "UK cosmic passport page does not contain the German tagline" and "UK cosmic star-map page does not contain the German tagline"
+- [ ] O3 — Regenerate warpgogol-com cosmic pages and verify UK output no longer contains the German tagline — maps to acceptance criteria "UK cosmic passport page does not contain the German tagline" and "UK cosmic star-map page does not contain the German tagline"
 - [ ] O4 — Verify DE cosmic pages remain unchanged — maps to acceptance criterion "DE cosmic pages remain unchanged (tagline-derived brand retained)"
 
 ## 2. Affected artifacts
@@ -34,10 +34,10 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/passport.md` — regenerated (not hand-edited)
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/star-map.md` — regenerated (not hand-edited)
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/de/cosmic/passport.md` — unchanged after regeneration
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/de/cosmic/star-map.md` — unchanged after regeneration
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/passport.md` — regenerated (not hand-edited)
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/star-map.md` — regenerated (not hand-edited)
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/cosmic/passport.md` — unchanged after regeneration
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/cosmic/star-map.md` — unchanged after regeneration
 
 ### 2.3 Documentation and specs
 
@@ -46,7 +46,7 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `pnpm --filter @gogol/site-kernel-codegen test` — generator unit test
-- `pnpm exec site-kernel run overlay.pages.generate --site webgogol-com` — regeneration
+- `pnpm exec site-kernel run overlay.pages.generate --site warpgogol-com` — regeneration
 - `pnpm exec site-kernel run rfc.validate` — RFC validation
 
 ## 3. Step sequence
@@ -107,7 +107,7 @@ scope:
 **Agent actions:**
 
 - Create `packages/os/site-kernel-codegen/src/tests/cosmic-pages-i18n.test.ts`
-- Add test: "non-DE cosmic pages do not contain the German tagline" — construct a manifest with the webgogol-com tagline, call `buildOverlayFiles`, assert UK passport and star-map content does not contain the tagline string
+- Add test: "non-DE cosmic pages do not contain the German tagline" — construct a manifest with the warpgogol-com tagline, call `buildOverlayFiles`, assert UK passport and star-map content does not contain the tagline string
 - Add test: "DE cosmic pages retain the tagline-derived brand" — assert DE passport content contains the tagline string
 - Add Compass `MODULE_CONTRACT` scaffolding to the test file (per `packages/AGENTS.md` Compass compliance rules)
 
@@ -121,15 +121,15 @@ scope:
 
 ---
 
-### Step 4. Regenerate webgogol-com cosmic pages
+### Step 4. Regenerate warpgogol-com cosmic pages
 
 **Goal:** Regenerate the cosmic page files in the mission workpiece to verify the generator fix produces correct output.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run overlay.pages.generate --site webgogol-com` in the mission workpiece
-- Verify UK cosmic passport `title` is `"Cosmic Passport · webgogol-com"` (not the German tagline)
-- Verify UK cosmic star-map `title` is `"Cosmic Star Map · webgogol-com"` (not the German tagline)
+- Run `pnpm exec site-kernel run overlay.pages.generate --site warpgogol-com` in the mission workpiece
+- Verify UK cosmic passport `title` is `"Cosmic Passport · warpgogol-com"` (not the German tagline)
+- Verify UK cosmic star-map `title` is `"Cosmic Star Map · warpgogol-com"` (not the German tagline)
 - Verify DE cosmic pages remain unchanged (tagline-derived brand retained)
 - Commit regenerated files via `mission.git.commit`
 
@@ -138,7 +138,7 @@ scope:
 - `git diff` on UK cosmic pages shows tagline removed from title/description
 - `git diff` on DE cosmic pages shows no changes
 
-**Completion criterion:** UK cosmic pages use `webgogol-com` as brand; DE cosmic pages unchanged.
+**Completion criterion:** UK cosmic pages use `warpgogol-com` as brand; DE cosmic pages unchanged.
 
 **Human review:** no
 
@@ -172,7 +172,7 @@ scope:
 - `pnpm exec site-kernel run rfc.validate` — RFC validation
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` — TypeScript compiles
 - `pnpm --filter @gogol/site-kernel-codegen test` — generator unit tests pass
-- `pnpm exec site-kernel run overlay.pages.generate --site webgogol-com` — regeneration succeeds
+- `pnpm exec site-kernel run overlay.pages.generate --site warpgogol-com` — regeneration succeeds
 
 ### 4.2 Evidence artifacts
 

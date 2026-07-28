@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-checks"
     - "@gogol/ui"
@@ -45,12 +45,12 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `missions/webgogol-com-m000010/workpiece/src/content/site/de/labels.md` — add `transparencyIds: [barrierefreiheit, openSource, credits]`, remove those three from `legalIds`, add `navGroups.transparencyTitle: "TRANSPARENZ"`.
-- `missions/webgogol-com-m000010/workpiece/src/content/site/uk/labels.md` — same structure, UK labels (`Прозорість`).
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/de/digitales-fundament.md` — remove contradicted claims, add ratgeber link.
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/uk/digitales-fundament.md` — same, UK.
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/de/notausgang.md` — align with migration risk matrix.
-- `missions/webgogol-com-m000010/workpiece/src/content/pages/uk/notausgang.md` — same, UK.
+- `missions/warpgogol-com-m000010/workpiece/src/content/site/de/labels.md` — add `transparencyIds: [barrierefreiheit, openSource, credits]`, remove those three from `legalIds`, add `navGroups.transparencyTitle: "TRANSPARENZ"`.
+- `missions/warpgogol-com-m000010/workpiece/src/content/site/uk/labels.md` — same structure, UK labels (`Прозорість`).
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/digitales-fundament.md` — remove contradicted claims, add ratgeber link.
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/digitales-fundament.md` — same, UK.
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/notausgang.md` — align with migration risk matrix.
+- `missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/notausgang.md` — same, UK.
 - `packages/ontology/blueprints/website-local.yaml` — add local visibility reference to depth-0 level intro or markdown block template (if blueprint-driven), or edit surface topic files directly.
 
 ### 2.3 Documentation and specs
@@ -98,7 +98,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes.
-- `pnpm exec site-kernel run surface.generate --mission webgogol-com-m000010` — hub page generates without errors.
+- `pnpm exec site-kernel run surface.generate --mission warpgogol-com-m000010` — hub page generates without errors.
 
 **Completion criterion:** Hub page `audience-cards` blocks contain cards with `articleType`, `question`, `reviewedAt`, `readTime` props and no `description` prop.
 
@@ -118,7 +118,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes.
-- `pnpm exec site-kernel run ratgeber.hub.validate --mission webgogol-com-m000010` — passes (no warnings after Step 2 removes `description`).
+- `pnpm exec site-kernel run ratgeber.hub.validate --mission warpgogol-com-m000010` — passes (no warnings after Step 2 removes `description`).
 
 **Completion criterion:** RG-HUB-09 fires a warning when a hub card contains `description`, and passes cleanly after Step 2.
 
@@ -138,7 +138,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes.
-- `pnpm exec site-kernel run content.voice.lint --mission webgogol-com-m000010` — passes or warns only on legitimate price tables.
+- `pnpm exec site-kernel run content.voice.lint --mission warpgogol-com-m000010` — passes or warns only on legitimate price tables.
 
 **Completion criterion:** VOICE-CTA-01 fires a warning on ratgeber article pages with 3+ row price tables, and does not fire on articles with inline calculations only.
 
@@ -177,16 +177,16 @@ scope:
 
 **Agent actions:**
 
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/site/de/labels.md`:
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/site/de/labels.md`:
   - Change `legalIds` to `[impressum, datenschutz, agb]`.
   - Add `transparencyIds: [barrierefreiheit, openSource, credits]`.
   - Add `transparencyTitle: "TRANSPARENZ"` to `navGroups`.
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/site/uk/labels.md`: same structure with UK labels (`Прозорість`).
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/site/uk/labels.md`: same structure with UK labels (`Прозорість`).
 - Verify no Widerruf or Muster-Widerrufsformular links remain in footer navIds or legalIds (already removed by RFC-0487).
 
 **Validation:**
 
-- `pnpm exec site-kernel run footer.legal.validate --mission webgogol-com-m000010` — passes (impressum + datenschutz still in `legalIds`).
+- `pnpm exec site-kernel run footer.legal.validate --mission warpgogol-com-m000010` — passes (impressum + datenschutz still in `legalIds`).
 - Dev build — footer renders four groups correctly.
 
 **Completion criterion:** Footer labels have `transparencyIds` with the three transparency links, `legalIds` retains only legal-required links, no stale Widerruf links.
@@ -201,13 +201,13 @@ scope:
 
 **Agent actions:**
 
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/pages/de/digitales-fundament.md`:
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/digitales-fundament.md`:
   - Remove or soften claims about guaranteed KI-Auffindbarkeit.
   - Remove claims that structured data ensures correct location recognition.
   - Remove claims that visibility converts to inquiries.
   - Remove automatic city-page generation recommendation.
   - Add link to `/ratgeber/lokale-sichtbarkeit/` for detailed guidance.
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/pages/uk/digitales-fundament.md`: same changes, link to `/porady/lokalna-vydymist/`.
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/digitales-fundament.md`: same changes, link to `/porady/lokalna-vydymist/`.
 
 **Validation:**
 
@@ -227,11 +227,11 @@ scope:
 **Agent actions:**
 
 - Edit `packages/ontology/blueprints/website-local.yaml`: add a reference to `/ratgeber/lokale-sichtbarkeit/` in the depth-0 level intro or markdown block template (DE), and `/porady/lokalna-vydymist/` (UK). Ensure the reference states that mass city-page generation is not recommended — local visibility rules apply.
-- Alternatively, if the surface pages are driven by topic files, edit `missions/webgogol-com-m000010/workpiece/src/content/surface/topics/de/lokale-sichtbarkeit.md` and the UK counterpart to ensure cross-references are in place.
+- Alternatively, if the surface pages are driven by topic files, edit `missions/warpgogol-com-m000010/workpiece/src/content/surface/topics/de/lokale-sichtbarkeit.md` and the UK counterpart to ensure cross-references are in place.
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.validate --mission webgogol-com-m000010` — passes.
+- `pnpm exec site-kernel run surface.validate --mission warpgogol-com-m000010` — passes.
 - Dev build — website surface pages render with the ratgeber link.
 
 **Completion criterion:** Website-local surface depth-0 page references the lokale-sichtbarkeit ratgeber article and does not justify mass city-page generation.
@@ -246,11 +246,11 @@ scope:
 
 **Agent actions:**
 
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/pages/de/notausgang.md`:
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/notausgang.md`:
   - Align Übergabe and migration artifact descriptions with the website-kosten article's risk matrix.
   - Do not claim that migration necessarily destroys history or requires starting from scratch.
   - Reference the conditional risk matrix (domain ownership, export format, URL stability, external accounts).
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/pages/uk/notausgang.md`: same changes.
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/notausgang.md`: same changes.
 
 **Validation:**
 
@@ -274,7 +274,7 @@ scope:
 - Run `pnpm exec site-kernel run ecosystem.manifest.generate` if command surfaces changed (no new commands, only rules added to existing commands — likely not needed, but check).
 - Verify every acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0507`.
-- Run `pnpm exec site-kernel run ratgeber.hub.validate --mission webgogol-com-m000010` and `content.voice.lint --mission webgogol-com-m000010` — capture output as evidence.
+- Run `pnpm exec site-kernel run ratgeber.hub.validate --mission warpgogol-com-m000010` and `content.voice.lint --mission warpgogol-com-m000010` — capture output as evidence.
 - Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0507 --implementation-commit <sha>`.
 
 **Validation:**
@@ -294,10 +294,10 @@ scope:
 - `pnpm exec site-kernel run rfc.validate --id RFC-0507`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run ratgeber.hub.validate --mission webgogol-com-m000010`
-- `pnpm exec site-kernel run content.voice.lint --mission webgogol-com-m000010`
-- `pnpm exec site-kernel run footer.legal.validate --mission webgogol-com-m000010`
-- `pnpm exec site-kernel run surface.validate --mission webgogol-com-m000010`
+- `pnpm exec site-kernel run ratgeber.hub.validate --mission warpgogol-com-m000010`
+- `pnpm exec site-kernel run content.voice.lint --mission warpgogol-com-m000010`
+- `pnpm exec site-kernel run footer.legal.validate --mission warpgogol-com-m000010`
+- `pnpm exec site-kernel run surface.validate --mission warpgogol-com-m000010`
 
 ### 4.2 Evidence artifacts
 

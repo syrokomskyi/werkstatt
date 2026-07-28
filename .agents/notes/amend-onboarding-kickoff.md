@@ -43,7 +43,7 @@
 - **05-audit** — детерминированные QA + кешируемые LLM-аудиты (`audit.llm.run`), SEO, structured-data, analytics, first-party-data, agent-readiness, `app.qa.validate`.
 - **06-handoff** — `sites-check.author`, build, `sites-check.postbuild`, `app.contract.full`, summary.md, dev-server. `autoRun:false` (ждёт человека). В конце человек МОЖЕТ переместить `onboarding/.input|.output` в process-repo и/или извлечь `apps/<id>/` в отдельный турборепо.
 
-### 2.2 Контентная модель приложения (на примере `apps/webgogol-com`)
+### 2.2 Контентная модель приложения (на примере `apps/warpgogol-com`)
 
 - `src/content/system.md` — единый источник; компилируется из `03-compose/site-plan.md` через `system-md.compile` (RFC-0087: single-owner, idempotent, sourced). Содержит: `identity` (systemStar, biome, domain, ctaTarget, legal), `i18n` (default de, supported de/uk), `constellations`, `clientEditable`, `pages[]` (каждая: `pageId`, `routes.{lang}`, `cosmicStar`, опц. `locales`, `shell`, `planets[]` с `cosmicPlanet`+`pin`), `growth`, `release`.
 - `src/content/pages/{lang}/<slug>.md` — frontmatter-only блок-декларации (RFC-0026): `kind/pageId/cosmicStar/title/description/lang/blocks[]`. Имя файла выводится из pageId (RFC-0090, `pageIdToContentFileSlug`). Локали асимметричны (RFC-0097, `locales: [de]`).
@@ -95,7 +95,7 @@
 3. `docs/rfcs/RFC-0048`, `RFC-0049`, `RFC-0052` — маршруты/sitemap/hreflang/robots (важно для new-route ветки).
 4. `docs/rfcs/RFC-0083` — cosmic.name.rename (если new-route заводит секции).
 5. `tools/kernel.config.ts` — какие команды зарегистрированы, как добавлять новые.
-6. `apps/webgogol-com/AGENTS.md` и `apps/webgogol-com/src/content/AGENTS.md` — локальные правила приложения.
+6. `apps/warpgogol-com/AGENTS.md` и `apps/warpgogol-com/src/content/AGENTS.md` — локальные правила приложения.
 7. `docs/app-onboarding-guide.md`, `docs/architecture-dna.md` — общая картина.
 8. `.agents/rules/` — глобальные правила агентов.
 9. Бегло — `packages/ontology/site-families/`, `.../constellations/`, `.../archetypes/ sections/`, `.../biomes/` — чтобы знать, что переиспользуется при new-route.

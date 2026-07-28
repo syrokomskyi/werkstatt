@@ -70,11 +70,11 @@ acceptance:
   - probe: command-registered
     name: "public.declaration.validate"
   - probe: run
-    command: "site-kernel run public.artifact.validate --app webgogol-com --json"
+    command: "site-kernel run public.artifact.validate --app warpgogol-com --json"
     expect:
       exitCode: 0
   - probe: run
-    command: "site-kernel run public.declaration.validate --app webgogol-com --json"
+    command: "site-kernel run public.declaration.validate --app warpgogol-com --json"
     expect:
       exitCode: 0
 ---
@@ -83,7 +83,7 @@ acceptance:
 
 ## Context
 
-A public-folder audit of `apps/webgogol-com/public/` found that the site already publishes an advanced public surface: `llms.txt`, `llms-full.txt`, Markdown twins, `.well-known/agent.json`, OpenAPI, MCP declarations, agent knowledge JSON, Bordbuch status artifacts, an Ed25519 key, hreflang sitemaps, and `ai.txt`.
+A public-folder audit of `apps/warpgogol-com/public/` found that the site already publishes an advanced public surface: `llms.txt`, `llms-full.txt`, Markdown twins, `.well-known/agent.json`, OpenAPI, MCP declarations, agent knowledge JSON, Bordbuch status artifacts, an Ed25519 key, hreflang sitemaps, and `ai.txt`.
 
 The remaining gaps are not single-file chores. They are drift problems:
 
@@ -250,7 +250,7 @@ Do not remove working runtime declarations merely because `public/` snapshots do
 
 1. Inventory current public artifact declarations for both reference apps.
 2. Implement `public.artifact.validate` over existing generators first.
-3. Fix `sitemap-images.xml` generation/index drift for `webgogol-com`.
+3. Fix `sitemap-images.xml` generation/index drift for `warpgogol-com`.
 4. Extend `page.markdown.generate` coverage for legal/credits/system pages.
 5. Implement `public.declaration.validate`.
 6. Add `public.runtime.probe` with fixture/offline mode and live mode.
@@ -264,14 +264,14 @@ Do not remove working runtime declarations merely because `public/` snapshots do
 
 ## Alternatives considered
 
-- **Patch `apps/webgogol-com/public/` directly.** Rejected. The audit looked at one snapshot, but the platform needs a rule for every current and future app.
+- **Patch `apps/warpgogol-com/public/` directly.** Rejected. The audit looked at one snapshot, but the platform needs a rule for every current and future app.
 - **Put every check into one deploy-only probe.** Rejected. Local generated-artifact errors should fail before deployment; only true runtime behavior belongs in network probes.
 - **Delete declarations when files are missing.** Rejected as a default. Missing declarations are sometimes generator bugs, not optional features.
 
 ## Acceptance criteria
 
 - [x] `public.artifact.validate`, `public.declaration.validate`, and `public.runtime.probe` are (evidence: implemented historically) registered commands.
-- [x] `webgogol-com` no longer declares `sitemap-images.xml` without emitting it. (evidence: implemented historically)
+- [x] `warpgogol-com` no longer declares `sitemap-images.xml` without emitting it. (evidence: implemented historically)
 - [x] Legal/credits/open-source/cosmic visible routes eligible for Markdown twins have generated (evidence: implemented historically) twins and pass `page.markdown.validate`.
 - [x] Static agent/runtime declarations are either backed by generated files/routes or reported as (evidence: implemented historically) runtime probes.
 - [x] `public.runtime.probe --base-url <deploy-url>` can verify the audit's runtime URLs: (evidence: implemented historically) `/api/agent/mcp`, `/api/agent/actions/lead.submit`, and `/.well-known/cosmic-passport.json`.

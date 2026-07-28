@@ -68,7 +68,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` — typecheck passes
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck passes
 - Manual review: SKILL-17 patterns do not match generic "RFC"/"ADR" terms or file paths like `adr-0000-template.md`
 
 **Completion criterion:** `checkSkill17()` function exists, is called in both validation loops, and typecheck passes.
@@ -90,7 +90,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run test` — all tests pass
+- `pnpm --filter @warpgogol/forge run test` — all tests pass
 
 **Completion criterion:** All SKILL-17 tests pass and existing tests still pass.
 
@@ -177,7 +177,7 @@ scope:
 **Validation:**
 
 - `git diff packages/forge/AGENTS.md` — shows the new SKILL-17 bullet
-- `pnpm --filter @webgogol/forge run build:check` — typecheck passes (AGENTS.md is not typechecked, but verifies no accidental code changes)
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck passes (AGENTS.md is not typechecked, but verifies no accidental code changes)
 
 **Completion criterion:** `packages/forge/AGENTS.md` documents SKILL-17 alongside SKILL-11..16.
 
@@ -192,8 +192,8 @@ scope:
 **Agent actions:**
 
 - Run `pnpm exec site-kernel run forge.skill.validate --json` — expect status: "pass", zero violations
-- Run `pnpm --filter @webgogol/forge run build:check` — expect pass
-- Run `pnpm --filter @webgogol/forge run test` — expect all tests pass
+- Run `pnpm --filter @warpgogol/forge run build:check` — expect pass
+- Run `pnpm --filter @warpgogol/forge run test` — expect all tests pass
 - Run `pnpm exec site-kernel run rfc.validate` — expect zero RFC-0553 violations
 - Verify each acceptance criterion in the RFC:
   - [x] SKILL-17 is added to forge.skill.validate prohibiting specific platform RFC/ADR ids and platform names
@@ -246,8 +246,8 @@ scope:
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate`
-- `pnpm --filter @webgogol/forge run build:check`
-- `pnpm --filter @webgogol/forge run test`
+- `pnpm --filter @warpgogol/forge run build:check`
+- `pnpm --filter @warpgogol/forge run test`
 - `pnpm exec site-kernel run forge.skill.validate --json`
 
 ### 4.2 Evidence artifacts

@@ -34,7 +34,7 @@ commands:
     - styles.global.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - os/site-kernel-codegen
@@ -54,12 +54,12 @@ nonGoals:
 
 ## Context
 
-After RFC-0093 fixed the section-scaffold's JSON-stub problem, the first rendered `pnpm --filter webgogol-com dev` view (May 2026) surfaced five new visible failure modes that the existing pipelines did not catch:
+After RFC-0093 fixed the section-scaffold's JSON-stub problem, the first rendered `pnpm --filter warpgogol-com dev` view (May 2026) surfaced five new visible failure modes that the existing pipelines did not catch:
 
 1. **Header looked broken.** `brandTagline` ("Digitales Fundament — tragfähige digitale Basis für kleines Gewerbe und Handwerk") overflowed the fixed-height header — the brand-label tagline used `position: absolute; white-space: nowrap;` with no truncation. Long author-provided taglines bled into the page body below.
 2. **Section padding inconsistent.** Each of the 9 sections defined its own `.section-name .container { max-width: <px>; padding: …; }` rule. Different sections used 720 / 800 / 960 / 1000 / 1120 px — the page looked like a stack of misaligned cards instead of one coherent column.
 3. **CTAs rendered as plain underlined text.** The shared `@gogol/ui` header / final-cta components referenced `.btn` / `.btn--primary` classes that were defined ONLY in `apps/nicaragua-projekt/src/styles/global.css` (a hand-edited 252-line file with site primitives). The scaffold template (`styles.global.generate` output) shipped a bare 81-line skeleton without them. Every new app inherited broken buttons.
-4. **`NEED_THIS_CTALABEL` visible on the rendered page.** The `final-cta` section called `need("ctaLabel", props.ctaLabel)`; webgogol-com's blocks didn't supply `ctaLabel`; the RFC-0042 `need()` helper returns the literal `NEED_THIS_CTALABEL` string for dev visibility — which then shipped to production HTML.
+4. **`NEED_THIS_CTALABEL` visible on the rendered page.** The `final-cta` section called `need("ctaLabel", props.ctaLabel)`; warpgogol-com's blocks didn't supply `ctaLabel`; the RFC-0042 `need()` helper returns the literal `NEED_THIS_CTALABEL` string for dev visibility — which then shipped to production HTML.
 5. **Footer missing RECHTLICHES and KONTAKT columns.** `labels.md` had `legalIds: []` and `contactIds: []`. The footer component conditionally hides empty columns. DE-locale commercial sites are legally required to link Impressum (§ 5 TMG) and Datenschutz (DSGVO) — silent omission is a compliance gap.
 
 All five passed `apps-check.author` and `pnpm build` cleanly. The errors only surfaced when a human opened the rendered page — too late in the workflow.
@@ -161,7 +161,7 @@ Soft warning (exit 0) when `brandTagline` exceeds 40 chars. The CSS in (C) handl
 ### `footer.legal.validate` output
 
 ```
-[ERROR] apps/webgogol-com/src/content/site/de/labels.md — footer.legalIds is
+[ERROR] apps/warpgogol-com/src/content/site/de/labels.md — footer.legalIds is
         empty for locale "de". DE/AT/CH commercial sites must link Impressum
         (§ 5 TMG) and Datenschutz (DSGVO) from the footer. Author the pages
         under src/content/pages/de/ (impressum.md, datenschutz.md), add nav
@@ -172,7 +172,7 @@ Soft warning (exit 0) when `brandTagline` exceeds 40 chars. The CSS in (C) handl
 ### `labels.shape.hint` output
 
 ```
-[HINT] apps/webgogol-com/src/content/site/de/labels.md — brandTagline is 95
+[HINT] apps/warpgogol-com/src/content/site/de/labels.md — brandTagline is 95
        chars long (soft limit: 40). The header brand-label truncates with
        ellipsis, but long taglines lose their tail to readers. Either shorten
        the tagline for the header or omit brandTagline here and put the longer
@@ -181,11 +181,11 @@ Soft warning (exit 0) when `brandTagline` exceeds 40 chars. The CSS in (C) handl
 
 ## Rollout
 
-1. Land the extended `global.template.css`. Regenerate `apps/webgogol-com/src/styles/global.css` via `styles.global.generate`.
+1. Land the extended `global.template.css`. Regenerate `apps/warpgogol-com/src/styles/global.css` via `styles.global.generate`.
 2. Strip per-section `.container { max-width: … }` overrides from the 9 RFC-0093 sections.
 3. Add tagline-truncation CSS to `brand-label-component.css`.
 4. Implement `need.markers.validate`, `footer.legal.validate`, `labels.shape.hint`. Register all three; wire `need.markers.validate` into postbuild, the other two into author pipeline.
-5. For webgogol-com specifically: create Impressum + Datenschutz page stubs (handwritten for now; RFC-0096 will scaffold them) and populate `footer.legalIds` + `footer.contactIds` so `footer.legal.validate` passes.
+5. For warpgogol-com specifically: create Impressum + Datenschutz page stubs (handwritten for now; RFC-0096 will scaffold them) and populate `footer.legalIds` + `footer.contactIds` so `footer.legal.validate` passes.
 
 ## Alternatives considered
 
@@ -204,13 +204,13 @@ Soft warning (exit 0) when `brandTagline` exceeds 40 chars. The CSS in (C) handl
 ## Acceptance criteria
 
 - [x] `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/styles/global.template.css` ships `.container`, `.section-number`, `.btn` family, `.sr-only`, and the four `--ds-size-container-*` / `--ds-size-section-padding-*` tokens. (evidence: packages/ directory, package exists)
-- [x] `apps/webgogol-com/src/styles/global.css` regenerated from the updated template and matches the new baseline. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps/warpgogol-com/src/styles/global.css` regenerated from the updated template and matches the new baseline. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] The 9 RFC-0093 section CSS files no longer define `.section-name .container { max-width: … }` overrides. (evidence: implemented historically)
 - [x] `packages/ui/src/components/brand-label/brand-label-component.css` truncates the tagline with ellipsis and hides it below 768 px. (evidence: packages/ directory, package exists)
-- [x] `need.markers.validate` registered, wired into `APPS_CHECK_POSTBUILD_PIPELINE`, and exits 0 on a clean webgogol-com build. (evidence: implemented historically)
-- [x] `footer.legal.validate` registered, wired into `APPS_CHECK_AUTHOR_PIPELINE`, and exits 0 on webgogol-com (now that Impressum + Datenschutz are authored) and nicaragua-projekt (already had legal links). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `need.markers.validate` registered, wired into `APPS_CHECK_POSTBUILD_PIPELINE`, and exits 0 on a clean warpgogol-com build. (evidence: implemented historically)
+- [x] `footer.legal.validate` registered, wired into `APPS_CHECK_AUTHOR_PIPELINE`, and exits 0 on warpgogol-com (now that Impressum + Datenschutz are authored) and nicaragua-projekt (already had legal links). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `labels.shape.hint` registered, wired into `APPS_CHECK_AUTHOR_PIPELINE`, and exits 0 on both apps with the current short / absent taglines. (evidence: implemented historically)
-- [x] `pnpm --filter webgogol-com dev` → `/de/`: HTTP 200; HTML contains `.btn .btn--primary` on header CTA + final-cta; footer renders NAVIGATION / RECHTLICHES / KONTAKT; zero `NEED_THIS_` tokens; brand-label tagline absent (omitted from labels.md). (evidence: implemented historically)
+- [x] `pnpm --filter warpgogol-com dev` → `/de/`: HTTP 200; HTML contains `.btn .btn--primary` on header CTA + final-cta; footer renders NAVIGATION / RECHTLICHES / KONTAKT; zero `NEED_THIS_` tokens; brand-label tagline absent (omitted from labels.md). (evidence: implemented historically)
 - [x] `pnpm build` workspace-wide: 22/22 tasks green. (evidence: implemented historically)
 
 ## Implementation notes for agents

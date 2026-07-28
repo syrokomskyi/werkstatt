@@ -76,7 +76,7 @@ nonGoals:
 
 The Lagebild integration system writes lead and CRM events into a Supabase-backed CRM buffer and syncs them asynchronously to destination systems such as Pipedrive.
 
-The pilot implementation placed per-site Cloudflare Cron Workers under `integrations/<site>/workers/supabase-sync/`. That layout works for a single client (`webgogol-com`), but it multiplies deployment targets: every new client creates another Worker, another `wrangler.jsonc`, another `package.json`, and another set of operational commands. The sync logic itself is shared (`createSupabaseSyncWorker()`), but the Worker envelope is not.
+The pilot implementation placed per-site Cloudflare Cron Workers under `integrations/<site>/workers/supabase-sync/`. That layout works for a single client (`warpgogol-com`), but it multiplies deployment targets: every new client creates another Worker, another `wrangler.jsonc`, another `package.json`, and another set of operational commands. The sync logic itself is shared (`createSupabaseSyncWorker()`), but the Worker envelope is not.
 
 With the pilot volume low (≤ 50 sites × ≤ 10 events/day), the operational overhead is already visible. At scale, it becomes unsustainable: hundreds of thin Workers, fragmented observability, and no data-driven view of which tenants are active.
 
@@ -160,19 +160,19 @@ export interface TenantSecretRefs {
 
 ```sh
 # Add a tenant (disabled by default)
-pnpm exec site-kernel run lagebild.tenant.add --site webgogol-com --tenant-id <uuid-v7> --vendor pipedrive
+pnpm exec site-kernel run lagebild.tenant.add --site warpgogol-com --tenant-id <uuid-v7> --vendor pipedrive
 
 # Enable after secrets are present
-pnpm exec site-kernel run lagebild.tenant.enable --site webgogol-com
+pnpm exec site-kernel run lagebild.tenant.enable --site warpgogol-com
 
 # Disable without deleting history
-pnpm exec site-kernel run lagebild.tenant.disable --site webgogol-com
+pnpm exec site-kernel run lagebild.tenant.disable --site warpgogol-com
 
 # Inspect tenant health and missing secrets
-pnpm exec site-kernel run lagebild.tenant.status --site webgogol-com
+pnpm exec site-kernel run lagebild.tenant.status --site warpgogol-com
 
 # Rotate a secret reference
-pnpm exec site-kernel run lagebild.tenant.rotate-secret --site webgogol-com --kind pipedrive-token
+pnpm exec site-kernel run lagebild.tenant.rotate-secret --site warpgogol-com --kind pipedrive-token
 
 # Deploy the shared Worker
 pnpm exec site-kernel run lagebild.worker.deploy
@@ -200,7 +200,7 @@ pnpm exec site-kernel run lagebild.validate
   "status": "ok",
   "tenant": {
     "tenant_id": "...",
-    "site_name": "webgogol-com",
+    "site_name": "warpgogol-com",
     "enabled": true,
     "last_seen_at": "2026-06-11T10:00:00Z",
     "last_success_at": "2026-06-11T10:00:00Z",
@@ -227,10 +227,10 @@ pnpm exec site-kernel run lagebild.validate
 2. Implement `tenant-registry.ts` and refactor `worker.ts` to multi-tenant factory in `@gogol/integration-adapter-supabase-crm`.
 3. Create `integrations/lagebild-sync-worker/` as the shared deploy target.
 4. Implement CLI commands under site-kernel.
-5. Migrate `webgogol-com` into `sync_tenants` with `enabled = false`.
+5. Migrate `warpgogol-com` into `sync_tenants` with `enabled = false`.
 6. Add Cloudflare secrets to the shared Worker.
-7. Enable `webgogol-com` and verify sync.
-8. Remove `integrations/webgogol-com/workers/supabase-sync/`.
+7. Enable `warpgogol-com` and verify sync.
+8. Remove `integrations/warpgogol-com/workers/supabase-sync/`.
 9. Add `lagebild.validate` to CI (`APPS_CHECK_PIPELINE`).
 
 New sites that need Lagebild:
@@ -267,7 +267,7 @@ New sites that need Lagebild:
 - [x] `lagebild.validate` checks for forbidden per-site Worker folders and `.dev.vars.example` leaks. (evidence: implemented historically)
 - [x] `lagebild.worker.dev.vars.generate` runs in `APPS_BUILD_PREPARE_PIPELINE`. (evidence: implemented historically)
 - [x] `lagebild.worker.dev.vars.validate` runs in `APPS_CHECK_AUTHOR_PIPELINE`. (evidence: implemented historically)
-- [x] Shared Worker (`integrations/lagebild-sync-worker/`) deploys and processes `webgogol-com`. _(requires secrets + tenant activation)_ (evidence: implemented historically)
+- [x] Shared Worker (`integrations/lagebild-sync-worker/`) deploys and processes `warpgogol-com`. _(requires secrets + tenant activation)_ (evidence: implemented historically)
 - [x] No `integrations/<site>/workers/supabase-sync/` folders exist. (evidence: implemented historically)
 - [x] `lagebild.validate` integrated into `APPS_CHECK_PIPELINE`. (evidence: implemented historically)
 - [x] `AGENTS.md` updated to prohibit per-site sync Worker creation. (evidence: AGENTS.md:1, agent guide updated)

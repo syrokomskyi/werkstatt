@@ -213,7 +213,7 @@ All commands accept `--json` for stable machine-readable output.
 1. Implement validators incrementally — `section.shell.contract.validate` first (highest signal-to-noise), then BG / BODY / CTA / HEAD.
 2. Wire each into `PACKAGES_CHECK_PIPELINE` when implemented.
 3. Implement per-app validators (MOT, SITE, LAY) and wire into `APPS_CHECK_AUTHOR_PIPELINE`.
-4. Run the full pipeline against `apps/webgogol-com` and `apps/nicaragua-projekt`; fix any drift found.
+4. Run the full pipeline against `apps/warpgogol-com` and `apps/nicaragua-projekt`; fix any drift found.
 5. Mark this RFC `implemented` when the entire suite is green workspace-wide.
 
 ## Alternatives considered

@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/share"
     - "@gogol/site-kernel-checks"
@@ -27,7 +27,7 @@ scope:
 ## 1. Objectives
 
 - [ ] Objective 1 — Claim record Zod schema exported from `@gogol/share/schemas` (maps to acceptance criterion: "Claim record Zod schema is exported from @gogol/share/schemas")
-- [ ] Objective 2 — `ratgeber.claim.validate` command implemented with RG-CLAIM-01..09 rules (maps to acceptance criteria: "ratgeber.claim.validate is implemented and registered", "RG-CLAIM-01..09 rules are implemented", "ratgeber.claim.validate --site webgogol-com --json passes")
+- [ ] Objective 2 — `ratgeber.claim.validate` command implemented with RG-CLAIM-01..09 rules (maps to acceptance criteria: "ratgeber.claim.validate is implemented and registered", "RG-CLAIM-01..09 rules are implemented", "ratgeber.claim.validate --site warpgogol-com --json passes")
 - [ ] Objective 3 — `ratgeber.provenance.validate` updated: RG-PROV-03 checks claim records, RG-PROV-06 added (maps to acceptance criteria: "RG-PROV-03 checks claim records instead of sidecars", "RG-PROV-06 checks article claimIds resolve to claim records")
 - [ ] Objective 4 — Migrator `rfc-0505` transforms claim sidecars into claim records and deletes sidecars (maps to acceptance criteria: "Migrator rfc-0505 is registered and transforms claim sidecars", "Migrator deletes claim sidecars after transformation")
 - [ ] Objective 5 — `surface/claims/{lang}/*.md` collection created with initial claim records (maps to acceptance criterion: "surface/claims/{lang}/*.md collection exists with initial claim records")
@@ -161,7 +161,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run ratgeber.claim.validate --site webgogol-com --json` — command is recognized (may pass or produce diagnostics depending on content state).
+- `pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json` — command is recognized (may pass or produce diagnostics depending on content state).
 
 **Completion criterion:** `ratgeber.claim.validate` is registered and callable via the kernel CLI.
 
@@ -270,19 +270,19 @@ scope:
 
 ### Step 9. Run migrator and verify validators
 
-**Goal:** Execute the migrator on webgogol-com and verify both validators pass.
+**Goal:** Execute the migrator on warpgogol-com and verify both validators pass.
 
 **Agent actions:**
 
-- Run migrator via `mission.migrate` on webgogol-com mission workpiece (or manually if no active mission).
-- Run `pnpm exec site-kernel run ratgeber.claim.validate --site webgogol-com --json` — verify it passes (may have warnings for unverified/expired claims).
-- Run `pnpm exec site-kernel run ratgeber.provenance.validate --site webgogol-com --json` — verify it passes.
+- Run migrator via `mission.migrate` on warpgogol-com mission workpiece (or manually if no active mission).
+- Run `pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json` — verify it passes (may have warnings for unverified/expired claims).
+- Run `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json` — verify it passes.
 - Verify claim sidecar files are deleted and claim record files exist in `surface/claims/{lang}/`.
 
 **Validation:**
 
-- `ratgeber.claim.validate --site webgogol-com --json` exits 0 or 2 (warnings only).
-- `ratgeber.provenance.validate --site webgogol-com --json` exits 0 or 2.
+- `ratgeber.claim.validate --site warpgogol-com --json` exits 0 or 2 (warnings only).
+- `ratgeber.provenance.validate --site warpgogol-com --json` exits 0 or 2.
 - No claim sidecar files remain in `surface/articles/{lang}/`.
 
 **Completion criterion:** Both validators pass, sidecars are deleted, claim records exist.
@@ -320,8 +320,8 @@ scope:
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run ratgeber.claim.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run ratgeber.provenance.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 

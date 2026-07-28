@@ -77,7 +77,7 @@ The Integration Port is generalized (amending RFC-0168) into a **source-agnostic
 1. A normalized `IntegrationEvent` (generalizing `LeadMessage`/`Lead`), carrying an `eventId` idempotency key, is produced by any `IntegrationSource`. In-process sources: the send-message form. Out-of-process sources: the chat widget — **UChat POSTs captured leads to an inbound route** `POST /api/integration-inbound`, authenticated by `INTEGRATION_INBOUND_SECRET`. UChat is a _source_, not an orchestrator — removing the lock-in to its flow builder.
 2. A closed `DestinationKind` catalog — `crm`, `calendar`, `email`, `scheduler` — replaces the flat split. Each configured destination declares an **execution mode**: **`gogol-adapter` (default)** — an adapter runs on the client's site with the client's tokens; or **`vendor-native` (optional)** — an upstream vendor's own flow executes it (used when the client did not buy the routing module, or a destination is unreachable statelessly). Same contract, swappable mode; the default keeps integration logic in versioned code.
 3. **Reliable delivery via Cloudflare Queues.** Sources enqueue the `IntegrationEvent`; a queue consumer (a portable Worker on the client's Cloudflare account) runs the `gogol-adapter` destinations with **retries** (queue redelivery, bounded → dead-letter) and **dedup** (a short-TTL KV set keyed by `eventId`+destination, so a redelivery never double-writes). The queue is **transient/in-flight only** — never a datastore of leads (the studio does not become a CRM).
-4. **Pilot:** webgogol-com's `crm` destination is `{ vendor: pipedrive, mode: gogol-adapter }` — the existing `pipedriveCrmAdapter` is **activated** with the client's token; UChat is the source posting inbound. This resolves the "two Pipedrive paths" tension into one: a single destination contract, exactly one active executor.
+4. **Pilot:** warpgogol-com's `crm` destination is `{ vendor: pipedrive, mode: gogol-adapter }` — the existing `pipedriveCrmAdapter` is **activated** with the client's token; UChat is the source posting inbound. This resolves the "two Pipedrive paths" tension into one: a single destination contract, exactly one active executor.
 
 `integration.config.validate` / `integration.secrets.validate` extend to the destination + inbound model; `api.routes.generate` emits the inbound route and the queue/KV bindings.
 
@@ -94,7 +94,7 @@ The Integration Port is generalized (amending RFC-0168) into a **source-agnostic
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run integration.config.validate --app webgogol-com --json
+pnpm exec site-kernel run integration.config.validate --app warpgogol-com --json
 pnpm exec site-kernel run integration.secrets.validate --all
 ```
 
@@ -152,10 +152,10 @@ Flow: a source enqueues an `IntegrationEvent`; the consumer dedups on `eventId`,
   "command": "integration.config.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "unknown-destination-kind", "value": "billing" },
-    { "app": "webgogol-com", "rule": "unknown-vendor-for-kind", "kind": "crm", "value": "salesforce" },
-    { "app": "webgogol-com", "rule": "multiple-active-executors", "kind": "crm", "vendor": "pipedrive" },
-    { "app": "webgogol-com", "rule": "inbound-source-without-secret", "secret": "INTEGRATION_INBOUND_SECRET" }
+    { "app": "warpgogol-com", "rule": "unknown-destination-kind", "value": "billing" },
+    { "app": "warpgogol-com", "rule": "unknown-vendor-for-kind", "kind": "crm", "value": "salesforce" },
+    { "app": "warpgogol-com", "rule": "multiple-active-executors", "kind": "crm", "vendor": "pipedrive" },
+    { "app": "warpgogol-com", "rule": "inbound-source-without-secret", "secret": "INTEGRATION_INBOUND_SECRET" }
   ]
 }
 ```
@@ -168,7 +168,7 @@ The inbound route rejects a missing/invalid signature with 401 and does not enqu
 
 - Phase 1: introduce `IntegrationEvent`(+`eventId`)/`DestinationKind`/`ExecutionMode`/`DestinationAdapter`; map the existing form `Lead`→CRM and channel fan-out onto the new contract; extend validators. (Queue optional this phase; behavior preserved.)
 - Phase 2: add the delivery backbone — `site-kernel-deploy` emits Queues + KV bindings; sources enqueue; consumer fans out with retries + dedup. Migrate the form path onto the queue.
-- Phase 3: webgogol-com pilot — enable `inbound: { sources: [uchat] }`; `destinations: [{ kind: crm, vendor: pipedrive, mode: gogol-adapter }]`; UChat posts captured leads to `/api/integration-inbound`; the Pipedrive token lives in the site's server env.
+- Phase 3: warpgogol-com pilot — enable `inbound: { sources: [uchat] }`; `destinations: [{ kind: crm, vendor: pipedrive, mode: gogol-adapter }]`; UChat posts captured leads to `/api/integration-inbound`; the Pipedrive token lives in the site's server env.
 - Phase 4: add `calendar`/`email`/`scheduler` destinations as demand appears (each a `gogol-adapter`, OAuth tokens per RFC-0177; email may reuse the Resend adapter), or `vendor-native` where appropriate.
 - New apps inherit empty `inbound`/`destinations` (all off) from the scaffold.
 
@@ -195,8 +195,8 @@ The inbound route rejects a missing/invalid signature with 401 and does not enqu
 - [x] Cloudflare Queues producer/consumer + KV dedup; retries + `eventId` dedup; queue is in-flight only, no lead datastore — producer binding `INTEGRATION_QUEUE` + `INTEGRATION_DEDUP` KV in `wrangler.jsonc`; standalone consumer Worker `workers/integration-consumer` (ack/retry→DLQ); unit tests prove route-once + redelivery dedup; consumer bundles clean (`wrangler --dry-run`) <!-- @astrojs/cloudflare v13 has no queue() entrypoint, hence a separate consumer Worker. Go-live: create the queue/DLQ + KV namespace (paste id), set Pipedrive secrets, run the documented `wrangler dev` multi-config e2e (Queues local-dev only) --> (evidence: implemented historically)
 - [x] `integration.config.validate` rejects unknown kind/vendor, multiple active executors per `(kind, vendor)`, and inbound-without-secret — **Phase 1** (evidence: implemented historically)
 - [x] `integration.secrets.validate` requires secrets only for `gogol-adapter` destinations — **Phase 1** (evidence: implemented historically)
-- [x] Existing form channel/CRM behavior preserved; webgogol-com + nicaragua-projekt config/secrets validators pass <!-- full app build not re-run; back-compat verified via validators --> (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] webgogol-com pilot: `crm` destination `{ vendor: pipedrive, mode: gogol-adapter }`; `inbound.sources: [uchat]`; chat-widget placed on the contact page; validators green <!-- live INTEGRATION_PIPEDRIVE_*/INTEGRATION_INBOUND_SECRET values + public UChat widgetId + full astro build are go-live steps (placeholder widgetId in system.md) --> (evidence: implemented historically)
+- [x] Existing form channel/CRM behavior preserved; warpgogol-com + nicaragua-projekt config/secrets validators pass <!-- full app build not re-run; back-compat verified via validators --> (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] warpgogol-com pilot: `crm` destination `{ vendor: pipedrive, mode: gogol-adapter }`; `inbound.sources: [uchat]`; chat-widget placed on the contact page; validators green <!-- live INTEGRATION_PIPEDRIVE_*/INTEGRATION_INBOUND_SECRET values + public UChat widgetId + full astro build are go-live steps (placeholder widgetId in system.md) --> (evidence: implemented historically)
 - [x] No destination vendor SDK imported in `apps/*` or section code (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file before merging (evidence: implemented historically)
 

@@ -2,8 +2,8 @@ import { test, expect } from "vitest";
 import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { runProbe, validateAcceptanceShape, type AcceptanceProbe } from "@webgogol/forge/os/rfc";
-import type { CommandRegistry } from "@webgogol/forge";
+import { runProbe, validateAcceptanceShape, type AcceptanceProbe } from "@warpgogol/forge/os/rfc";
+import type { CommandRegistry } from "@warpgogol/forge";
 
 /*
 <MODULE_CONTRACT>

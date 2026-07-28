@@ -22,7 +22,7 @@ probes:
     durationMs: 677
   - probe:
       probe: run
-      command: site-kernel run public.surface.lint --app webgogol-com --json
+      command: site-kernel run public.surface.lint --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true

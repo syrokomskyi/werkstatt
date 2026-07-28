@@ -31,7 +31,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -284,7 +284,7 @@ Future effects define their own composition rules when introduced.
 Add validation commands:
 
 ```sh
-pnpm exec site-kernel run effects.contract.validate --app webgogol-com
+pnpm exec site-kernel run effects.contract.validate --app warpgogol-com
 pnpm exec site-kernel run effects.contract.validate --all --json
 pnpm exec site-kernel run effects.coverage.audit --packages --json
 ```
@@ -312,10 +312,10 @@ pnpm exec site-kernel run effects.coverage.audit --packages --json
 {
   "command": "effects.contract.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "violations": [
     {
-      "file": "apps/webgogol-com/src/content/pages/de/home.md",
+      "file": "apps/warpgogol-com/src/content/pages/de/home.md",
       "blockId": "price",
       "sectionType": "price-card",
       "target": "card",
@@ -403,7 +403,7 @@ Rejected. The architecture should reserve stackable effects, but implementation 
 - [x] Existing section-level `glass` and body-level `surface.glass` content is migrated or removed. (evidence: implemented historically)
 - [x] `effects.contract.validate` fails unsupported targets, unknown effects, duplicate glass stack entries, and legacy props. — implemented by RFC-0156 (validates authored `effects[]` via `effectAssignmentSchema`; complements the `content.validate` superRefine guard). (evidence: implemented historically)
 - [x] `effects.coverage.audit` reports zero legacy props and complete target declarations for migrated renderers. — implemented by RFC-0156 (0 legacy props across 148 packages/ui files). (evidence: packages/ directory, package exists)
-- [x] `webgogol-com` and `nicaragua-projekt` pass `astro check` after migration. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `warpgogol-com` and `nicaragua-projekt` pass `astro check` after migration. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate RFC-0134` passes. (evidence: implemented historically)
 
 ## Implementation notes for agents

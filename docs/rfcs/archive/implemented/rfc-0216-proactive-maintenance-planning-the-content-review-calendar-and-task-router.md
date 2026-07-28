@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -92,10 +92,10 @@ Due dates are computed _before_ the deadline: a claim with `validUntil` gets a t
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.plan.build  --app webgogol-com           # emit plan + calendar
-pnpm exec site-kernel run content.plan.status --app webgogol-com           # due / overdue / blocking
-pnpm exec site-kernel run content.plan.status --app webgogol-com --json
-pnpm exec site-kernel run content.plan.route  --app webgogol-com --to agent-intake
+pnpm exec site-kernel run content.plan.build  --app warpgogol-com           # emit plan + calendar
+pnpm exec site-kernel run content.plan.status --app warpgogol-com           # due / overdue / blocking
+pnpm exec site-kernel run content.plan.status --app warpgogol-com --json
+pnpm exec site-kernel run content.plan.route  --app warpgogol-com --to agent-intake
 ```
 
 ### TypeScript contracts
@@ -143,7 +143,7 @@ Task ids are a stable hash of `(subject, trigger)` so re-running `content.plan.b
 {
   "command": "content.plan.status",
   "status": "ok",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "due": 3,
   "overdue": 1,
   "blocking": 0,
@@ -167,7 +167,7 @@ Task ids are a stable hash of `(subject, trigger)` so re-running `content.plan.b
 ## Rollout
 
 1. Land `content.plan.build`/`status` reading the three ledgers; emit plan + calendar; wire `status` into `apps-check.postbuild` as report-only.
-2. Define `system.md plan.policy` (leadTime, criticality map, owners) on `webgogol-com`.
+2. Define `system.md plan.policy` (leadTime, criticality map, owners) on `warpgogol-com`.
 3. Turn on the amber/red gate: APPS_CHECK consults `plan.gate.red`. Initially keep all triggers `advisory`/`important` (no red), then graduate the small contract-critical set (price, legal) to `blocking` — the first deploy-blocking CKL behavior, intentionally last in the program.
 4. Land `content.plan.route` to the agent-intake destination; agents pull tasks (RFC-0218). Optional sync to a human tracker via an outbox destination handler.
 

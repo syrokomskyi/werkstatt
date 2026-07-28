@@ -92,13 +92,13 @@ No issues. The RFC is forward-only:
 
 3. **Lean contracts**: The YAML examples are minimal. But without TypeScript contracts (missing Design section), the types for `articleSections`, `changelog`, `secondaryCta` are not formally specified.
 
-4. **Scope discipline**: `nonGoals` are explicit and meaningful. `appsImpacted` is correct (`webgogol-com` only).
+4. **Scope discipline**: `nonGoals` are explicit and meaningful. `appsImpacted` is correct (`warpgogol-com` only).
 
 ## Axis G — Blind spots
 
-1. **`articleSections` slot names do not map to mandatory H2 headings — CRITICAL DESIGN GAP.** The RFC defines valid slot names: `direct-answer`, `definitions`, `analysis`, `example`, `checklist`, `limitations`, `sources`, `webgogol-connection`. But RFC-0501's mandatory 10-section structure uses H2 headings: `## Einleitung`, `## Kernfrage`, `## Wissensbasis`, `## Praxisbezug`, `## Häufige Missverständnisse`, `## Kosten und Trade-offs`, `## Checkliste`, `## FAQ`, `## Zusammenfassung`, `## Quellen` (DE) / `## Вступ`, `## Ключове питання`, `## База знань`, `## Практична частина`, `## Поширені помилки`, `## Витрати і компроміси`, `## Контрольний список`, `## Поширені запитання`, `## Підсумок`, `## Джерела` (UK). The slot names don't correspond to the H2 heading text. The baker needs a mapping table (e.g., `direct-answer` → `## Kernfrage` / `## Ключове питання`) to extract the right section. The RFC must specify this mapping explicitly for both DE and UK.
+1. **`articleSections` slot names do not map to mandatory H2 headings — CRITICAL DESIGN GAP.** The RFC defines valid slot names: `direct-answer`, `definitions`, `analysis`, `example`, `checklist`, `limitations`, `sources`, `warpgogol-connection`. But RFC-0501's mandatory 10-section structure uses H2 headings: `## Einleitung`, `## Kernfrage`, `## Wissensbasis`, `## Praxisbezug`, `## Häufige Missverständnisse`, `## Kosten und Trade-offs`, `## Checkliste`, `## FAQ`, `## Zusammenfassung`, `## Quellen` (DE) / `## Вступ`, `## Ключове питання`, `## База знань`, `## Практична частина`, `## Поширені помилки`, `## Витрати і компроміси`, `## Контрольний список`, `## Поширені запитання`, `## Підсумок`, `## Джерела` (UK). The slot names don't correspond to the H2 heading text. The baker needs a mapping table (e.g., `direct-answer` → `## Kernfrage` / `## Ключове питання`) to extract the right section. The RFC must specify this mapping explicitly for both DE and UK.
 
-2. **`webgogol-connection` slot has no corresponding mandatory section.** It's in the valid set but not in RFC-0501's 10-section structure. Is it an optional H2 heading that articles may include? Where does it go in the heading order? The RFC must clarify.
+2. **`warpgogol-connection` slot has no corresponding mandatory section.** It's in the valid set but not in RFC-0501's 10-section structure. Is it an optional H2 heading that articles may include? Where does it go in the heading order? The RFC must clarify.
 
 3. **RG-ART-07 false positives.** The rule checks `^# ` lines in prose body. This could false-positive on:
    - Markdown comments (`# comment` inside HTML comment blocks)
@@ -119,7 +119,7 @@ No issues. The RFC is forward-only:
 
 2. How do `articleSections` slot names (`direct-answer`, `definitions`, `analysis`, etc.) map to the mandatory H2 headings from RFC-0501 (`## Kernfrage`, `## Wissensbasis`, `## Praxisbezug`, etc.)? The baker needs an explicit mapping table for both DE and UK to extract the correct section content.
 
-3. Where does the `webgogol-connection` slot fit in the mandatory 10-section heading order? It's not in RFC-0501's structure — is it an optional H2 heading? If so, where should authors place it, and does `ratgeber.article.validate` need to check for its presence or absence?
+3. Where does the `warpgogol-connection` slot fit in the mandatory 10-section heading order? It's not in RFC-0501's structure — is it an optional H2 heading? If so, where should authors place it, and does `ratgeber.article.validate` need to check for its presence or absence?
 
 4. Should `@gogol/share` remain in `packagesImpacted`? If so, what specific changes does it need? If not, remove it.
 

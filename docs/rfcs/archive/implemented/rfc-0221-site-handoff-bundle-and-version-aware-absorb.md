@@ -40,7 +40,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - site-kernel-handoff
   - site-kernel-deploy
@@ -187,8 +187,8 @@ interface HandoffLock {
 ### 3. `handoff.pack`
 
 ```sh
-pnpm exec site-kernel run handoff.pack --app webgogol-com
-pnpm exec site-kernel run handoff.pack --app webgogol-com --dry-run
+pnpm exec site-kernel run handoff.pack --app warpgogol-com
+pnpm exec site-kernel run handoff.pack --app warpgogol-com --dry-run
 ```
 
 Pipeline:
@@ -203,8 +203,8 @@ Pipeline:
 ### 4. `handoff.absorb` — version-aware ingest
 
 ```sh
-pnpm exec site-kernel run handoff.absorb --bundle ../handoff/webgogol-com
-pnpm exec site-kernel run handoff.absorb --bundle ../handoff/webgogol-com --report-only
+pnpm exec site-kernel run handoff.absorb --bundle ../handoff/warpgogol-com
+pnpm exec site-kernel run handoff.absorb --bundle ../handoff/warpgogol-com --report-only
 ```
 
 Pipeline:
@@ -281,10 +281,10 @@ interface Migrator {
 
 1. RFC acceptance by the architecture role.
 2. Land `HandoffLock` / `HandoffManifest` schemas in `@gogol/ontology`.
-3. Create `@gogol/site-kernel-handoff` with `handoff.pack` + `handoff.validate` first (read-only, low-risk) and verify a packed bundle for `apps/webgogol-com`.
+3. Create `@gogol/site-kernel-handoff` with `handoff.pack` + `handoff.validate` first (read-only, low-risk) and verify a packed bundle for `apps/warpgogol-com`.
 4. Implement the migrator registry + `migrator.validate`; seed it with no-op markers for historical versions and register RFC-0115 / RFC-0128 / RFC-0178 as the first real migrators.
 5. Implement `handoff.absorb` (start with `--report-only`), then enable the write path.
-6. **Pilot**: pack `webgogol-com` on the current ecosystem, intentionally check out an older ecosystem commit, and absorb forward — confirm green-path automation, then construct a yellow and a red case.
+6. **Pilot**: pack `warpgogol-com` on the current ecosystem, intentionally check out an older ecosystem commit, and absorb forward — confirm green-path automation, then construct a yellow and a red case.
 7. From then on, every RFC that changes a `uni.registry.json` contract MUST register a migrator; `migrator.validate` joins the standard check suite.
 
 ## Alternatives considered
@@ -322,7 +322,7 @@ interface Migrator {
 - [x] Edits to `derived` paths in a bundle raise a migration decision record, never silent re-absorb. <!-- deferred: bundles currently carry only authored entries --> (evidence: original apps retired by RFC-0381, migration completed historically)
 - [x] `migrator.validate` fails on a missing migrator for a contract-changing version bump. (evidence: implemented historically)
 - [x] RFC-0115 / RFC-0128 / RFC-0178 are registered as migrators (or covered by markers). <!-- deferred: registry mechanism done, historical backfill pending exact version pins --> (evidence: implemented historically)
-- [x] Pilot: `webgogol-com` packs on current, absorbs forward from an older ecosystem commit — green path fully automated. <!-- in-sync materialization verified; older-commit catch-up pilot deferred --> (evidence: implemented historically)
+- [x] Pilot: `warpgogol-com` packs on current, absorbs forward from an older ecosystem commit — green path fully automated. <!-- in-sync materialization verified; older-commit catch-up pilot deferred --> (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
 ### Deferred to a follow-up (tracked)
@@ -335,7 +335,7 @@ The mechanism is implemented and runnable end-to-end; the following completeness
 **Closed:**
 
 - _GRACE-complete authored partition_ — `handoff.pack` derives the authored set from the shared GRACE inventory (`createGraceInventoryEntries`) for code plus the RFC-0081 generated marker and public-output path rules for data (`authored-set.ts`), replacing the conservative allowlist. It carries authored code (custom pages/middleware/components/scripts) and excludes generated public outputs (sitemap/robots/feed/llms/ai/pseo) the allowlist previously leaked.
-- _Golden `validation/` pack_ — `handoff.pack` emits `validation/pack.json` (route list, sitemap hash, llms hashes, passport scores) + `sitemap.snapshot.xml` from the build output (`validation-pack.ts`); `handoff.absorb` rebuilds the pack after `--regen` and diffs it against the golden one, reporting route/sitemap/llms/score drift. Verified end-to-end on `webgogol-com` (golden vs live dist → clean).
+- _Golden `validation/` pack_ — `handoff.pack` emits `validation/pack.json` (route list, sitemap hash, llms hashes, passport scores) + `sitemap.snapshot.xml` from the build output (`validation-pack.ts`); `handoff.absorb` rebuilds the pack after `--regen` and diffs it against the golden one, reporting route/sitemap/llms/score drift. Verified end-to-end on `warpgogol-com` (golden vs live dist → clean).
 - _New-app materialization skeleton + install wiring_ — absorb detects a new app (target `apps/<x>` absent) and, with `--regen`, runs `pnpm install` before `build.prepare` / `build.check`. The bundle carries bootstrap config (`package.json`, `astro.config.mjs`, `postcss.config.cjs` — force-included despite their generated marker) so the injected app is complete and buildable. Verified: a new-app inject produces a full skeleton (package.json, all configs, system.md, passport key) and pnpm install succeeds, registering the app as a workspace member. The following `astro build` step (`kernel.wire` integration) is blocked by a separate issue (see item 1 above).
 - _Derived-edit decision records_ — absorb detects when a derived entry in the manifest has a hash mismatch (edited after packing) via `reportDerivedEdits` and raises it as a decision record (error + hash details) requiring `--force` to overwrite, so hand edits are never lost silently.
 

@@ -68,11 +68,11 @@ packagesImpacted:
   - site-kernel-checks
   - site-kernel-handoff
 successSignals:
-  - All 11 compass and werkstatt commands register and execute in a project with only @webgogol/forge installed (no @warpgogol/* packages)
+  - All 11 compass and werkstatt commands register and execute in a project with only @warpgogol/forge installed (no @warpgogol/* packages)
   - forge bin/cli.ts no longer uses .catch(() => null) for compass and werkstatt module imports
   - site-kernel-checks and site-kernel-handoff delegate compass/werkstatt command execution to forge-inlined implementations
 nonGoals:
-  - Creating a separate @webgogol/compass-core npm package — all logic inlines directly into forge os/ modules
+  - Creating a separate @warpgogol/compass-core npm package — all logic inlines directly into forge os/ modules
   - Removing site-kernel-checks or site-kernel-handoff packages — they remain as thin delegation wrappers in werkstatt
   - Changing the compass or werkstatt command names, flags, or --json output shapes
   - Adding integrity-registry support to forge-inlined audit commands — git-history-only is sufficient for autonomous mode
@@ -98,7 +98,7 @@ nonGoals:
 
 ## Context
 
-`@webgogol/forge` is a portable governance toolkit published to npm. When installed in an external project (one without `@warpgogol/*` packages), 11 of its commands silently fail to register. The `forgeCompassModule` (8 commands) and `forgeWerkstattModule` (3 commands) dynamically import `@warpgogol/site-kernel-checks` and `@warpgogol/site-kernel-handoff` via `try/catch` — when those private packages are absent, the catch block swallows the error and no commands are registered.
+`@warpgogol/forge` is a portable governance toolkit published to npm. When installed in an external project (one without `@warpgogol/*` packages), 11 of its commands silently fail to register. The `forgeCompassModule` (8 commands) and `forgeWerkstattModule` (3 commands) dynamically import `@warpgogol/site-kernel-checks` and `@warpgogol/site-kernel-handoff` via `try/catch` — when those private packages are absent, the catch block swallows the error and no commands are registered.
 
 This "graceful skip" pattern was established by RFC-0374 as a pragmatic compromise: forge would work in autonomous mode with a reduced command set, and the full set would activate inside the Warpgogol monorepo where kernel packages are available. The CLI explicitly documents this in `packages/forge/bin/cli.ts:151-158`:
 
@@ -117,7 +117,7 @@ The affected commands enforce DNA-42 (Compass markup contract), DNA-43 (Compass 
 
 ## Problem
 
-DNA-42, DNA-43, and DNA-51 are enforced by commands that do not exist in autonomous mode. An external project installing `@webgogol/forge` gets `compass.validate`, `compass.inventory`, `compass.audit.*`, `werkstatt.lock.*`, and `werkstatt.operation.validate` silently dropped from the command registry. The operator discovers this only when a command is not found — there is no warning, no diagnostic, no `forge.doctor` check for missing commands.
+DNA-42, DNA-43, and DNA-51 are enforced by commands that do not exist in autonomous mode. An external project installing `@warpgogol/forge` gets `compass.validate`, `compass.inventory`, `compass.audit.*`, `werkstatt.lock.*`, and `werkstatt.operation.validate` silently dropped from the command registry. The operator discovers this only when a command is not found — there is no warning, no diagnostic, no `forge.doctor` check for missing commands.
 
 The root cause is a dependency inversion gap: forge already inlines several utilities from `@warpgogol/*` packages (`writeFileAtomic`, `buildGeneratedHeader`, `collectFiles`, `byteHash` in `src/utils/`) to maintain autonomy, but the compass and werkstatt command **implementations** were left as dynamic imports to private kernel packages. This is inconsistent with the established pattern and creates a split-brain architecture where some commands are autonomous and others are not.
 
@@ -141,7 +141,7 @@ Forge inlines all 11 compass and werkstatt command implementations directly into
 No CLI surface changes — all 11 commands keep their existing names, flags, and `--json` output shapes. The only change is that they now register and execute in projects without `@warpgogol/*` packages.
 
 ```sh
-# These now work in any project with @webgogol/forge installed:
+# These now work in any project with @warpgogol/forge installed:
 forge run compass.inventory --json
 forge run compass.validate --json
 forge run compass.summary.trim --file <path>
@@ -215,8 +215,8 @@ export const werkstattLockSchema: z.ZodSchema<WerkstattLock>;
 | `packages/forge/src/utils/fs-idempotent.ts` | New — `writeFileIfChanged` (from site-kernel) |
 | `packages/forge/bin/cli.ts` | Changed — remove `.catch(() => null)` for compass and werkstatt |
 | `packages/forge/src/validators/port-validate.ts` | Changed — remove `@warpgogol/site-kernel-checks` and `@warpgogol/site-kernel-handoff` from `FORBIDDEN_IMPORTS` for os/ modules |
-| `packages/os/site-kernel-checks/src/compass*.ts` | Changed — delegate to `@webgogol/forge` implementations |
-| `packages/os/site-kernel-handoff/src/werkstatt/*.ts` | Changed — delegate to `@webgogol/forge` implementations |
+| `packages/os/site-kernel-checks/src/compass*.ts` | Changed — delegate to `@warpgogol/forge` implementations |
+| `packages/os/site-kernel-handoff/src/werkstatt/*.ts` | Changed — delegate to `@warpgogol/forge` implementations |
 | `packages/forge/AGENTS.md` | Changed — update OS modules table, remove "graceful skip" documentation |
 | `packages/AGENTS.md` | Changed — update forge ownership entry: `os/` is no longer "kernel-dependent" for compass and werkstatt |
 | Root `AGENTS.md` | Changed — update forge import rules: `os/compass/` and `os/werkstatt/` no longer need the `@warpgogol/*` dynamic import exception |
@@ -234,7 +234,7 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 ## Rollout
 
 - **Default behavior:** All 11 commands register unconditionally on `forge` startup. No flags, no opt-in, no graceful skip.
-- **External projects (autonomous mode):** Commands work immediately after `npm install @webgogol/forge`. Git-history-only fallback for audit revision tracking. No migration needed — these commands were previously missing, not broken.
+- **External projects (autonomous mode):** Commands work immediately after `npm install @warpgogol/forge`. Git-history-only fallback for audit revision tracking. No migration needed — these commands were previously missing, not broken.
 - **Warpgogol monorepo (kernel mode):** `tools/kernel.config.ts` continues to register forge modules. Kernel-packages (`site-kernel-checks`, `site-kernel-handoff`) delegate to forge-inlined implementations via dependency inversion. No behavior change for existing pipelines — same command names, same output shapes.
 - **Implementation order:**
   1. Inline compass handlers into `forge/os/compass/handlers/` + `forge/src/utils/fs-idempotent.ts`
@@ -250,7 +250,7 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 
 ## Alternatives considered
 
-- **Separate `@webgogol/compass-core` npm package:** Extract compass logic into a standalone package (based on the existing `@syrokomskyi/code-compass` from the `pipelines` repo). Rejected — adds package management overhead for ~800 lines of code. Inlining into forge is simpler and consistent with the werkstatt decision. The `code-compass` package remains available for non-forge consumers.
+- **Separate `@warpgogol/compass-core` npm package:** Extract compass logic into a standalone package (based on the existing `@syrokomskyi/code-compass` from the `pipelines` repo). Rejected — adds package management overhead for ~800 lines of code. Inlining into forge is simpler and consistent with the werkstatt decision. The `code-compass` package remains available for non-forge consumers.
 
 - **Keep graceful skip, add `forge.doctor` warning:** Instead of inlining, add a diagnostic that warns when commands are skipped. Rejected — the operator explicitly wants all commands functional in external projects, not just a warning that they are missing.
 
@@ -270,8 +270,8 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 - [ ] `bin/cli.ts` loads compass and werkstatt modules without `.catch(() => null)`
 - [ ] `writeFileIfChanged` utility exists in `packages/forge/src/utils/fs-idempotent.ts`
 - [ ] `getRevisionByPath` works with git-history-only fallback (returns 1 when git is unavailable, matching existing `site-kernel-integrity` behavior)
-- [ ] `site-kernel-checks/src/compass*.ts` delegates to `@webgogol/forge` implementations
-- [ ] `site-kernel-handoff/src/werkstatt/*.ts` delegates to `@webgogol/forge` implementations
+- [ ] `site-kernel-checks/src/compass*.ts` delegates to `@warpgogol/forge` implementations
+- [ ] `site-kernel-handoff/src/werkstatt/*.ts` delegates to `@warpgogol/forge` implementations
 - [ ] `packages/forge/AGENTS.md` updated — OS modules table no longer mentions "graceful skip" for compass and werkstatt
 - [ ] `packages/forge/src/validators/port-validate.ts` updated — `FORBIDDEN_IMPORTS` adjusted for os/compass and os/werkstatt
 - [ ] `build:check` passes on `forge`, `site-kernel-checks`, `site-kernel-handoff`
@@ -289,5 +289,5 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 - `werkstatt-operation-validate.ts` uses `context.io.readFile(filePath)` (the `WorkspaceIO` abstraction) in kernel mode. The inlined version must use `node:fs/promises` `readFile` directly — `ForgeRuntimeContext` has no `io` field.
 - `getRevisionByPath` should use `git log --follow --diff-filter=AMT --format=%H -- <file>` and count output lines (matching existing `site-kernel-integrity/src/git.ts` implementation). Wrap in try/catch — return `revision=1` on any git error (not `0`). The `--diff-filter=AMT` flag excludes deleted files from the count. The integrity-registry path (`loadPathsCurrent`/`loadEntitiesById`) is dropped entirely in the inlined version.
 - When inlining werkstatt handlers, copy logic from `packages/os/site-kernel-handoff/src/werkstatt/lock.ts`, `werkstatt-lock-status.ts`, `werkstatt-lock-recover.ts`, and `packages/os/site-kernel-checks/src/werkstatt-operation-validate.ts`. Inline `werkstattLockSchema` from `packages/ontology/src/operations/werkstatt.ts`.
-- After inlining, convert kernel-package files to thin delegation wrappers: `export { runCompassInventory } from '@webgogol/forge'` (or equivalent).
+- After inlining, convert kernel-package files to thin delegation wrappers: `export { runCompassInventory } from '@warpgogol/forge'` (or equivalent).
 - Run `forge doctor` after implementation to verify no `@warpgogol/*` import violations in forge source.

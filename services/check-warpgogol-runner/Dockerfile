@@ -4,8 +4,8 @@ WORKDIR /workspace
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages
-COPY services/check-webgogol-runner ./services/check-webgogol-runner
+COPY services/check-warpgogol-runner ./services/check-warpgogol-runner
 
-RUN corepack enable && pnpm install --filter check-webgogol-runner --frozen-lockfile
+RUN corepack enable && pnpm install --filter check-warpgogol-runner --frozen-lockfile
 
-CMD ["pnpm", "--filter", "check-webgogol-runner", "dev"]
+CMD ["pnpm", "--filter", "check-warpgogol-runner", "dev"]

@@ -36,7 +36,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/site-kernel-codegen"
@@ -159,8 +159,8 @@ All three are cheap and non-destructive. Together they create a closed loop: the
 - [x] `src/content/AGENTS.template.md` contains the generated-prose bullet with the correct `{{APP_ID}}` token and the command name `material.credits.drift.validate`. (evidence: implemented historically)
 - [x] Root `AGENTS.template.md` `## Generated files` table includes the `prose/*/credits.md` row. (evidence: implemented historically)
 - [x] `prose/credits.md.template` contains the four-line HTML comment block naming source domain and commands. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] All affected `src/content/AGENTS.md` files (nicaragua-projekt, webgogol-com) are regenerated with `agents.generate` and include the new section. (evidence: AGENTS.md:1, agent guide updated)
-- [x] `build.check` for nicaragua-projekt and webgogol-com passes with zero violations. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] All affected `src/content/AGENTS.md` files (nicaragua-projekt, warpgogol-com) are regenerated with `agents.generate` and include the new section. (evidence: AGENTS.md:1, agent guide updated)
+- [x] `build.check` for nicaragua-projekt and warpgogol-com passes with zero violations. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes for this document. (evidence: implemented historically)
 
 ## Backfilled sections (RFC-0366)

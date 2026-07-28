@@ -26,7 +26,7 @@
 
 1. **Unicode normalization** — RFC запрещает non-ASCII символы через regex `[a-z0-9]`, но не учитывает Unicode normalization forms (NFC vs. NFD). Строка `café` в NFC и NFD выглядит по-разному байтово, но визуально идентична. Валидатор должен нормализовать перед проверкой или явно запрещать composed/decomposed формы.
 
-2. **Case-insensitive файловые системы** — На Windows/macOS filenames case-insensitive, но RFC требует lowercase-only для ids. Если кто-то создаст директорию `Webgogol-Com` вместо `webgogol-com`, валидатор пропустит id (он валиден), но файловая система может создать проблемы при cross-platform деплое. Нужна cross-check между id и dirname.
+2. **Case-insensitive файловые системы** — На Windows/macOS filenames case-insensitive, но RFC требует lowercase-only для ids. Если кто-то создаст директорию `Warpgogol-Com` вместо `warpgogol-com`, валидатор пропустит id (он валиден), но файловая система может создать проблемы при cross-platform деплое. Нужна cross-check между id и dirname.
 
 3. **Zero-padded sequence overflow** — RFC требует zero-padded three digits (`m001`, `m999`), но не определяет поведение при `m1000`. Валидатор должен либо явно запрещать 4+ цифры, либо поддерживать автоматическое расширение формата. Текущий regex `\d{3}` жестко ограничивает до 999.
 

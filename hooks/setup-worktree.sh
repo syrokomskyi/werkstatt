@@ -12,12 +12,12 @@ echo "=== WGogol worktree setup ==="
 
 ENV_FILES=(
   ".env"
-  "apps/webgogol-com/.env"
-  "apps/webgogol-com/.env.production"
+  "apps/warpgogol-com/.env"
+  "apps/warpgogol-com/.env.production"
   "apps/nicaragua-projekt/.env"
   "apps/nicaragua-projekt/.env.production"
-  "apps/check-webgogol-com/.env"
-  "apps/check-webgogol-com/.env.production"
+  "apps/check-warpgogol-com/.env"
+  "apps/check-warpgogol-com/.env.production"
 )
 
 for rel in "${ENV_FILES[@]}"; do

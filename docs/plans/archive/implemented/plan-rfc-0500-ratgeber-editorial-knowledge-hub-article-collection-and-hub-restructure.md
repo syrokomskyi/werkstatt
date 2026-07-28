@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/surface"
     - "@gogol/ontology"
@@ -61,9 +61,9 @@ scope:
 ### 2.2 Configuration and data
 
 - `packages/ontology/src/external-surfaces/jsonld-types.yaml` — add ratgeber per-depth type policy
-- `missions/webgogol-com-m000010/workpiece/src/content/surface/articles/{lang}/*.md` — migrated from topics
-- `missions/webgogol-com-m000010/workpiece/src/content/surface/article-categories/{lang}/*.md` — new category records
-- `missions/webgogol-com-m000010/workpiece/src/content/prose/{lang}/ratgeber-{slug}.md` — converted from sections
+- `missions/warpgogol-com-m000010/workpiece/src/content/surface/articles/{lang}/*.md` — migrated from topics
+- `missions/warpgogol-com-m000010/workpiece/src/content/surface/article-categories/{lang}/*.md` — new category records
+- `missions/warpgogol-com-m000010/workpiece/src/content/prose/{lang}/ratgeber-{slug}.md` — converted from sections
 
 ### 2.3 Documentation and specs
 
@@ -118,7 +118,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run blueprint.validate --site webgogol-com` (if available)
+- `pnpm exec site-kernel run blueprint.validate --site warpgogol-com` (if available)
 
 **Completion criterion:** `ratgeber.yaml` parses against the extended `blueprintSchema`; no `pillar` or `article` block at depth-0.
 
@@ -203,7 +203,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run ratgeber.hub.validate --site webgogol-com --json` (after content migration)
+- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json` (after content migration)
 
 **Completion criterion:** Command runs and returns diagnostics with correct exit codes.
 
@@ -274,7 +274,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** `surface.contract.validate` enforces the ratgeber type policy.
 
@@ -284,11 +284,11 @@ scope:
 
 ### Step 9. Run migration and create content
 
-**Goal:** Execute the migrator on webgogol-com content and verify the result.
+**Goal:** Execute the migrator on warpgogol-com content and verify the result.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run mission.migrate --mission webgogol-com-m000010` (or the current mission id)
+- Run `pnpm exec site-kernel run mission.migrate --mission warpgogol-com-m000010` (or the current mission id)
 - Verify `surface/articles/{lang}/*.md` exists with correct fields
 - Verify `surface/article-categories/{lang}/*.md` exists with `kosten` and `sichtbarkeit`
 - Verify `prose/{lang}/ratgeber-{slug}.md` exists with converted sections
@@ -296,8 +296,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run ratgeber.hub.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run surface.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run surface.validate --site warpgogol-com --json`
 
 **Completion criterion:** Migration produces valid article records, category records, and prose files; old topics collection removed.
 
@@ -364,9 +364,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run ratgeber.hub.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run surface.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run surface.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
 
 ### 4.2 Evidence artifacts
 

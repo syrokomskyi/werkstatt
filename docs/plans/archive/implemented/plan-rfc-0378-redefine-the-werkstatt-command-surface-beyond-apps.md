@@ -7,7 +7,7 @@ createdAt: 2026-07-12
 updatedAt:
 scope:
   apps:
-    - apps/webgogol-com
+    - apps/warpgogol-com
   packages:
     - packages/os/site-kernel
     - packages/os/site-kernel-checks

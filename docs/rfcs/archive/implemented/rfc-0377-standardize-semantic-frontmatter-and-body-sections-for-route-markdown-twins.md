@@ -68,7 +68,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -129,10 +129,10 @@ No new commands. The existing commands change behavior:
 
 ```sh
 # Still in build.prepare — now emits semantic frontmatter + structured body
-pnpm exec site-kernel run page.markdown.generate --app webgogol-com
+pnpm exec site-kernel run page.markdown.generate --app warpgogol-com
 
 # Still in apps-check.postbuild — now validates semantic fields + body sections
-pnpm exec site-kernel run page.markdown.validate --app webgogol-com
+pnpm exec site-kernel run page.markdown.validate --app warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -259,11 +259,11 @@ Summary fallback chain: `page.lead` → `page.description` → first block's `su
 
 ```yaml
 ---
-canonical: "https://webgogol.com/preis/"
+canonical: "https://warpgogol.com/preis/"
 language: "de"
 lastModified: "2026-07-12"
 contentHash: "sha256:<hex>"
-license: "https://webgogol.com/ai.txt"
+license: "https://warpgogol.com/ai.txt"
 generator: "page.markdown.generate"
 sourceKind: "page"
 schema: "gogol.markdown-twin@2"

@@ -1,6 +1,6 @@
 ---
 id: RFC-0461
-title: "Webgogol Legacy Migration"
+title: "Warpgogol Legacy Migration"
 status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: contract
@@ -58,7 +58,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -77,9 +77,9 @@ nonGoals:
 - `pbp-specification-package/migration-plan` — migration strategy
 - `pbp-specification-package/target-blueprint` — target architecture
 
-_This RFC defines the Webgogol legacy migration contract from `@gogol/business` (DNA-20) to `@gogol/pbp`._
+_This RFC defines the Warpgogol legacy migration contract from `@gogol/business` (DNA-20) to `@gogol/pbp`._
 
-# RFC-0461: Webgogol Legacy Migration
+# RFC-0461: Warpgogol Legacy Migration
 
 ## Context
 
@@ -125,7 +125,7 @@ interface PbpMigrationMapping {
 - **DNA-1 (Monorepo boundary).** All types in `packages/pbp/`.
 - **DNA-20 (Business layer).** `@gogol/business` is the legacy source.
 - **DNA-55 (Spec vendoring).** `specRef: "pbp-specification-package/RFC-PBP-102"`.
-- **RFC-0398 (PBP Program Charter).** This RFC is the migration coverage for Webgogol.
+- **RFC-0398 (PBP Program Charter).** This RFC is the migration coverage for Warpgogol.
 
 ## Implementation details
 

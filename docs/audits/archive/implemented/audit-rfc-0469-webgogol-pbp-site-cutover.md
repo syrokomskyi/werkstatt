@@ -21,7 +21,7 @@ Pass — 0 violations.
 ## Axis A — Structural completeness
 
 - **Decision** is present tense and specific: cutover preconditions, semantic profile adapter, collection switch, page route switch, OS validation switch, cutover check command, execution steps, rollback plan.
-- **CLI surface** specifies exact command: `pnpm exec site-kernel run pbp.cutover.check --app webgogol-com`.
+- **CLI surface** specifies exact command: `pnpm exec site-kernel run pbp.cutover.check --app warpgogol-com`.
 - **TypeScript contracts** — `PbpCutoverCheckResult` interface is minimal and purpose-driven.
 - **File system responsibilities** table names 7 concrete paths.
 - **Output format** documents the JSON shape with all fields.
@@ -36,7 +36,7 @@ Pass — 0 violations.
 ## Axis B — DNA alignment
 
 - **DNA-1 (Monorepo boundary):** Cutover changes in site workspace and `@gogol/pbp`. No site-local schemas. Correct.
-- **DNA-20 (Business layer):** This RFC is the point where `@gogol/business` ceases to be canonical for `webgogol-com`. The package itself is not deleted (RFC-0470). This is a forward-only replacement — no compatibility layer (ADR-043 explicitly rejected).
+- **DNA-20 (Business layer):** This RFC is the point where `@gogol/business` ceases to be canonical for `warpgogol-com`. The package itself is not deleted (RFC-0470). This is a forward-only replacement — no compatibility layer (ADR-043 explicitly rejected).
 - **DNA-55 (Spec vendoring):** Cutover preconditions reference `pbp-specification-package/migration-plan` §26. Correct.
 - `satisfies: [DNA-1, DNA-20]` — both are real invariants and the RFC body explains how each is enforced.
 - No issues.
@@ -46,7 +46,7 @@ Pass — 0 violations.
 - **Package boundaries:** `buildPbpSemanticProfile` in `packages/pbp/`, page routes in site workspace. Correct.
 - **Pipeline placement:** `pbp.cutover.check` is a standalone command, not a build pipeline hook. Correct — it's a pre-cutover verification, not a build-time check.
 - **Compass sync:** The RFC does not mention which `docs/*.xml` files need synchronization. Since it changes `packages/os/site-kernel-checks/src/content-business.ts` to use `pbpSchemaById`, `docs/technology.xml` may need an update for the changed validation source. **Minor finding.**
-- **AGENTS.md updates:** The RFC does not mention updating `systems/webgogol-com/AGENTS.md` to reflect the cutover from `@gogol/business` to `@gogol/pbp`. **Minor finding.**
+- **AGENTS.md updates:** The RFC does not mention updating `systems/warpgogol-com/AGENTS.md` to reflect the cutover from `@gogol/business` to `@gogol/pbp`. **Minor finding.**
 - **Cosmic naming:** Not applicable — no manifest or component changes.
 - **Command lifecycle:** `commands.proposed: []`, `commands.added: []` — **the `pbp.cutover.check` command is described in the RFC body but not listed in `commands.added`.** This should be in `commands.proposed` or `commands.added`. **Finding — the command should be registered in the frontmatter.**
 - One finding (command lifecycle).
@@ -72,7 +72,7 @@ Pass — 0 violations.
 - **Minimal command surface:** `pbp.cutover.check` is a new command, but it's justified — it verifies preconditions that no existing command covers. The alternatives section explains why a flag on an existing command is insufficient.
 - **Lean contracts:** `PbpCutoverCheckResult` is minimal. `buildPbpSemanticProfile` and `buildPbpPageSemanticModel` are thin adapters. Good.
 - **Existing patterns:** The RFC follows the existing `buildSiteSemanticProfile` pattern from `@gogol/business` with a PBP replacement. Consistent.
-- **Scope discipline:** `appsImpacted: ["webgogol-com"]`, `packagesImpacted: ["@gogol/pbp", "@gogol/business", "@gogol/share", "@gogol/ui"]`. The inclusion of `@gogol/business` and `@gogol/ui` is correct — `@gogol/business` is being switched away from, and `@gogol/ui` may have imports that reference business types. Good.
+- **Scope discipline:** `appsImpacted: ["warpgogol-com"]`, `packagesImpacted: ["@gogol/pbp", "@gogol/business", "@gogol/share", "@gogol/ui"]`. The inclusion of `@gogol/business` and `@gogol/ui` is correct — `@gogol/business` is being switched away from, and `@gogol/ui` may have imports that reference business types. Good.
 - **Rollback plan:** 6-step rollback is well-designed. Legacy files as safety net is pragmatic.
 - No issues.
 

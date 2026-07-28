@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel"
   - "@gogol/site-kernel-checks"

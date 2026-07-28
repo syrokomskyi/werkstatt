@@ -78,7 +78,7 @@ nonGoals:
   - "Do not add long-term archival (PDF/A, 3-2-1 snapshots). Invariance is guaranteed by `manifest.yaml` plus SemVer."
   - "Do not move canonical content (including business content) out of `apps/*/src/content/`. Content stays app-local; only schemas, loaders, UI, tokens, and ontology are shared."
   - "Do not add Biomes (contextual token/preference presets) in this RFC. Biomes remain a deferred hypothesis until a second live client drives the requirement."
-  - "Do not rewrite JSON manifests from the external research spec — webgogol adopts the *concepts* of the Cosmic UI Ontology v1 research doc and rebrands the implementation as the **Uni UI Ontology** (Universe / Unique). `cosmos.*` identifiers become `uni.*`; `manifest.json` becomes `manifest.yaml`."
+  - "Do not rewrite JSON manifests from the external research spec — warpgogol adopts the *concepts* of the Cosmic UI Ontology v1 research doc and rebrands the implementation as the **Uni UI Ontology** (Universe / Unique). `cosmos.*` identifiers become `uni.*`; `manifest.json` becomes `manifest.yaml`."
 ---
 
 # RFC-0023: Introduce Uni UI Ontology and manifest-driven component registry
@@ -87,11 +87,11 @@ nonGoals:
 
 The platform is about to absorb three additional client sites: two whose structure closely mirrors `apps/nicaragua-projekt` and one external greenfield project that will be rewritten from scratch. Today, every reusable UI element lives inside `apps/nicaragua-projekt/src/components/`, every content schema lives inside `apps/nicaragua-projekt/src/content/schemas/components/`, and every design token is declared inline in `apps/nicaragua-projekt/src/styles/global.css`. A rich business-description vocabulary exists in `apps-todo/main/src/content/schemas/business/` and its loader `apps-todo/main/src/utils/business-content.ts` but is trapped inside the legacy apps. There is no shared UI surface, no shared business vocabulary, and no machine-readable index of what UI exists.
 
-The external research pass distilled as _Cosmic UI Ontology v1_ (see `Process/Research/2026-04-22 Переиспользование - Экосистема/4 Check & Finalyse - Perplexity Deep Research.md`) answered the cross-cutting question: what should the reusable layer look like so that AI agents, contracts, and multi-client deployment remain coherent across 10+ years. This RFC adopts the _concepts_ of that specification into the webgogol-4 vocabulary under the brand **Uni UI Ontology** (a name that captures both _Universe_ of reusable elements and _Unique_ identification of each one). It fixes every enum value against the current 13-section / 8-component reality of `nicaragua-projekt`, promotes the business layer from `apps-todo` into a first-class shared package, and defines the rollout that prepares `apps/*` for the incoming clients.
+The external research pass distilled as _Cosmic UI Ontology v1_ (see `Process/Research/2026-04-22 Переиспользование - Экосистема/4 Check & Finalyse - Perplexity Deep Research.md`) answered the cross-cutting question: what should the reusable layer look like so that AI agents, contracts, and multi-client deployment remain coherent across 10+ years. This RFC adopts the _concepts_ of that specification into the warpgogol-4 vocabulary under the brand **Uni UI Ontology** (a name that captures both _Universe_ of reusable elements and _Unique_ identification of each one). It fixes every enum value against the current 13-section / 8-component reality of `nicaragua-projekt`, promotes the business layer from `apps-todo` into a first-class shared package, and defines the rollout that prepares `apps/*` for the incoming clients.
 
-**Naming alignment with the source spec.** The source spec uses cosmic metaphors (stars, planets, moons, cosmos) throughout. This RFC retains the spec's _concepts_ and _invariants_ but substitutes a technical vocabulary that matches the webgogol file layout:
+**Naming alignment with the source spec.** The source spec uses cosmic metaphors (stars, planets, moons, cosmos) throughout. This RFC retains the spec's _concepts_ and _invariants_ but substitutes a technical vocabulary that matches the warpgogol file layout:
 
-| Source spec concept | webgogol identifier |
+| Source spec concept | warpgogol identifier |
 | --- | --- |
 | Cosmic UI Ontology | **Uni UI Ontology** |
 | `cosmos.registry.json` | **`uni.registry.json`** |
@@ -117,7 +117,7 @@ Nine unprotected invariants are forcing manual discipline today:
 
 ## Decision
 
-The workspace adopts the **Uni UI Ontology** (derived from _Cosmic UI Ontology v1_ research, rebranded for webgogol use) as the canonical model for page-section-component reuse, plus a shared business-description layer. Four new / expanded packages, one promoted invariant, six new OS commands, and a workspace-level `uni.registry.json` artifact are introduced:
+The workspace adopts the **Uni UI Ontology** (derived from _Cosmic UI Ontology v1_ research, rebranded for warpgogol use) as the canonical model for page-section-component reuse, plus a shared business-description layer. Four new / expanded packages, one promoted invariant, six new OS commands, and a workspace-level `uni.registry.json` artifact are introduced:
 
 - **`@gogol/ontology`** — closed enums (`Layer`, `SemanticRole`, `ComponentRole`, `Industry`, `SectionKind`), open vocabulary (`Intent`), the Zod schema for `manifest.yaml`, migrated content schemas, navigation schemas, and the compatibility graph (`Tension` / `Relation`).
 - **`@gogol/tokens`** — single canonical `--ds-*` declaration and its TypeScript mirror.
@@ -615,7 +615,7 @@ Post-rollout, any new section or component proposed anywhere in the ecosystem mu
 
 1. **Rename `@gogol/ui` → `@gogol/icons` + create fresh `@gogol/ui`.** Rejected: the current `@gogol/ui` description already reads "Shared UI components and icons"; the package was designed to hold both. Avoiding the rename reduces churn on downstream imports.
 2. **Keep `manifest.json` instead of `manifest.yaml`.** Rejected: YAML is more pleasant to hand-author (comments, multi-line strings), aligns with the Astro content-collections frontmatter format already in use, and Zod validates the parsed object identically. The JSON argument of the source spec ("AI agents read JSON") applies to the **registry** (which remains JSON), not to individual hand-authored manifests.
-3. **Keep cosmic vocabulary (`star`, `planet`, `moon`, `cosmos.registry.json`).** Rejected: the webgogol file layout is already technical (`pages/sections/components`); mixing metaphors between filesystem and vocabulary costs cognitive load without adding value. The `Uni UI Ontology` brand preserves spec traceability while aligning vocabulary with implementation.
+3. **Keep cosmic vocabulary (`star`, `planet`, `moon`, `cosmos.registry.json`).** Rejected: the warpgogol file layout is already technical (`pages/sections/components`); mixing metaphors between filesystem and vocabulary costs cognitive load without adding value. The `Uni UI Ontology` brand preserves spec traceability while aligning vocabulary with implementation.
 4. **`Intent` as a closed enum.** Rejected: intent vocabulary evolves faster than roles. Leaving it open avoids ceremony for every new verb.
 5. **Introduce Asteroid / Element as a fourth layer.** Rejected by the source spec (§0). Standalone service elements use `standalone: true` on a component.
 6. **Stateful registry via Cloudflare Durable Objects.** Rejected by the source spec (§0, §8.1). Static build-time registry is sufficient.

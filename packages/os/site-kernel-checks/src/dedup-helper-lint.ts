@@ -33,7 +33,7 @@ const SCAN_ROOT = join("packages");
 
 /**
  * Files that deliberately inline reserved helpers for dependency-free
- * portability (e.g. @webgogol/forge cannot depend on @warpgogol/share).
+ * portability (e.g. @warpgogol/forge cannot depend on @warpgogol/share).
  * Each entry is a repo-relative file path.
  */
 const INLINE_ALLOWLIST = new Set<string>(["packages/forge/src/utils/fs.ts"]);

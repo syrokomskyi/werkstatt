@@ -22,7 +22,7 @@ The diff cleanly implements RFC-0549 by extracting the extended behavioral layer
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @webgogol/forge run build:check` (tsc --noEmit) and `pnpm --filter @webgogol/forge run test` (274 tests, 27 files) both pass.
+Pass — `pnpm --filter @warpgogol/forge run build:check` (tsc --noEmit) and `pnpm --filter @warpgogol/forge run test` (274 tests, 27 files) both pass.
 
 ### Axis A — Structural correctness
 

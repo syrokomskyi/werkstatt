@@ -68,7 +68,7 @@ No issues.
 
 One minor finding:
 
-1. **`appsImpacted` includes `webgogol-com` prematurely.** The RFC explicitly states "No site imports from `@gogol/pbp` until RFC-0469 (cutover)." Since no site changes happen in this RFC, `appsImpacted` should be empty or the RFC should clarify that the impact is indirect (the RFC creates the runtime that webgogol-com will eventually consume).
+1. **`appsImpacted` includes `warpgogol-com` prematurely.** The RFC explicitly states "No site imports from `@gogol/pbp` until RFC-0469 (cutover)." Since no site changes happen in this RFC, `appsImpacted` should be empty or the RFC should clarify that the impact is indirect (the RFC creates the runtime that warpgogol-com will eventually consume).
 
 Otherwise: no commands proposed (appropriate for library-only RFC), TypeScript contracts are minimal, existing patterns from `@gogol/business` are explicitly referenced, and `packagesImpacted` lists only `@gogol/pbp`.
 

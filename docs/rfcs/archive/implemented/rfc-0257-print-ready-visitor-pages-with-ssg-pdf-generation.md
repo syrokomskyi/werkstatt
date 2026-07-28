@@ -49,7 +49,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - apps/*
 packagesImpacted:
   - "@gogol/share"
@@ -60,8 +60,8 @@ packagesImpacted:
   - "@gogol/site-kernel-astro"
   - "@gogol/site-kernel-content"
 successSignals:
-  - "Every page on webgogol-com renders correctly when the visitor presses Ctrl+P or uses the browser print dialog."
-  - "Every page on webgogol-com has a matching PDF at `/_print/<lang>/<path>.pdf` generated during `build.post`."
+  - "Every page on warpgogol-com renders correctly when the visitor presses Ctrl+P or uses the browser print dialog."
+  - "Every page on warpgogol-com has a matching PDF at `/_print/<lang>/<path>.pdf` generated during `build.post`."
   - "Pages with motion, parallax, glass effects, or background images degrade gracefully to static, high-contrast print output."
   - "Print layout validation fails the build if any shared section or shell component introduces print-blocking CSS or fixed positioning."
   - "The pilot implementation adds no app-local print logic; all behavior lives in shared packages and content declarations."
@@ -107,7 +107,7 @@ Today the following failure modes are possible on any `apps/*` site:
 6. **No validation.** Nothing in `build.check` or `build.post` proves that a page will print correctly.
 7. **Per-app workarounds.** Without a shared contract, each site would solve print differently, creating maintenance drift.
 
-These problems are especially severe for the `webgogol-com` pilot because it uses dark hero sections, glass panels, and animated stats.
+These problems are especially severe for the `warpgogol-com` pilot because it uses dark hero sections, glass panels, and animated stats.
 
 ## Decision
 
@@ -167,7 +167,7 @@ These commands are wired into the standard pipelines:
 
 Print mode is detected in two ways, both content-free:
 
-1. **URL query parameter.** Any route that ends with `?print` or contains `?print=...` is treated as a print request. The value is ignored; presence is enough. Example: `https://webgogol.com/de/angebot/?print`.
+1. **URL query parameter.** Any route that ends with `?print` or contains `?print=...` is treated as a print request. The value is ignored; presence is enough. Example: `https://warpgogol.com/de/angebot/?print`.
 2. **Browser print media.** The user pressing `Ctrl+P` triggers the browser's `print` media, which applies the same shared print stylesheet.
 
 In the app route, the `?print` parameter is not used to render a different static file; Astro static sites serve the same HTML for the route regardless of query string. Instead, the page injects a tiny first-party script that reads `window.location.search` and adds `data-print` to `<html>` when the parameter is present. This lets components and CSS react to the explicit print request synchronously before paint, avoiding a flash of screen layout. The script is inline, deferred, and gated by the orchestrator so it does not run when motion is disabled for other reasons.
@@ -219,7 +219,7 @@ Field semantics:
 ```yaml
 print:
   headerLogo: "logo"                         # optional content asset token or public path
-  headerBrandLabel: "Webgogol"               # falls back to top-level brandLabel
+  headerBrandLabel: "Warpgogol"               # falls back to top-level brandLabel
   headerTagline: "Digitales Fundament."      # optional
   footerLegalNotice: "..."                   # small legal text for the footer
   footerShowUrl: true                        # print the canonical URL
@@ -236,7 +236,7 @@ All fields are optional and fall back to existing top-level labels (`brandLabel`
 
 ```yaml
 output:
-  printPdf: true      # default false until full rollout; pilot webgogol-com sets true
+  printPdf: true      # default false until full rollout; pilot warpgogol-com sets true
 ```
 
 When `false` or absent, `print.pdf.generate` exits immediately with a success summary. When `true`, the command generates PDFs for all routable pages whose `print.enabled` is not `false`. This lets the pilot opt in while other apps remain unaffected.
@@ -355,9 +355,9 @@ The layout orchestrator (RFC-0106) already receives its config from `site/{lang}
 `print.pdf.generate` is a new app-scoped Site OS command. It runs only in `build.post` because it needs the built static site in `dist/client`.
 
 ```sh
-pnpm exec site-kernel run print.pdf.generate --app webgogol-com
-pnpm exec site-kernel run print.pdf.generate --app webgogol-com --force
-pnpm exec site-kernel run print.pdf.generate --app webgogol-com --json
+pnpm exec site-kernel run print.pdf.generate --app warpgogol-com
+pnpm exec site-kernel run print.pdf.generate --app warpgogol-com --force
+pnpm exec site-kernel run print.pdf.generate --app warpgogol-com --json
 ```
 
 Behavior:
@@ -380,17 +380,17 @@ The command is idempotent: it skips any PDF that already exists and has a file s
 Given a page route `/de/angebot/` (default language is `de`, so the unprefixed route is `/angebot/`):
 
 - PDF path: `dist/client/_print/de/angebot.pdf`
-- Public URL: `https://webgogol.com/_print/de/angebot.pdf`
+- Public URL: `https://warpgogol.com/_print/de/angebot.pdf`
 
 For nested routes `/de/website/elektriker/deu/bw/`:
 
 - PDF path: `dist/client/_print/de/website/elektriker/deu/bw.pdf`
-- Public URL: `https://webgogol.com/_print/de/website/elektriker/deu/bw.pdf`
+- Public URL: `https://warpgogol.com/_print/de/website/elektriker/deu/bw.pdf`
 
 For the home page `/`:
 
 - PDF path: `dist/client/_print/de/index.pdf` (default language is `de`)
-- Public URL: `https://webgogol.com/_print/de/index.pdf`
+- Public URL: `https://warpgogol.com/_print/de/index.pdf`
 
 For non-default languages, the language prefix is preserved in the `_print` sub-path: `/uk/umovy/` → `dist/client/_print/uk/umovy.pdf`.
 
@@ -454,12 +454,12 @@ The shared `BaseLayout` (`packages/ui/src/components/layout/layout-component.ast
 
 #### 6.2 Page route changes
 
-`apps/webgogol-com/src/pages/[lang]/[...slug].astro` is a generated proxy file (RFC-0078). The onboarding template for thin apps is updated so that all future apps receive the same change:
+`apps/warpgogol-com/src/pages/[lang]/[...slug].astro` is a generated proxy file (RFC-0078). The onboarding template for thin apps is updated so that all future apps receive the same change:
 
 - The `data` object from `resolvePageRoute()` includes a `printMode` boolean derived from `Astro.url.searchParams.has("print")` at build time. For static sites this is always `false` during build, but the prop is passed for completeness and future SSR modes.
 - `BaseLayout` receives `printMode={data.printMode}` and `pdfUrl={data.pdfUrl}`.
 
-No app-local logic is added to `webgogol-com`; the route remains a thin proxy. The change is delivered through the `layout-component.astro` prop contract and the `page-handler` shared helper.
+No app-local logic is added to `warpgogol-com`; the route remains a thin proxy. The change is delivered through the `layout-component.astro` prop contract and the `page-handler` shared helper.
 
 #### 6.3 `@gogol/share/astro/page-handler` changes
 
@@ -560,27 +560,27 @@ export interface PrintPdfGenerateResult {
 | `packages/os/site-kernel-checks/src/print-*.ts` | New validator/generator modules. |
 | `packages/os/site-kernel-checks/src/pipelines/build-post.ts` | Adds `print.pdf.generate` and `print.pdf.validate`. |
 | `packages/os/site-kernel-checks/src/pipelines/build-check.ts` | Adds `print.contract.validate` and `print.layout.validate`. |
-| `apps/webgogol-com/src/content/system.md` | Sets `output.printPdf: true` for the pilot. |
-| `apps/webgogol-com/src/content/pages/{de,uk}/**/*.md` | May add `print` overrides; default behavior is sufficient. |
+| `apps/warpgogol-com/src/content/system.md` | Sets `output.printPdf: true` for the pilot. |
+| `apps/warpgogol-com/src/content/pages/{de,uk}/**/*.md` | May add `print` overrides; default behavior is sufficient. |
 | `dist/client/_print/<lang>/*.pdf` | Generated PDF artifacts, gitignored, deployment artifacts. |
 
 ### 9. CLI surface
 
 ```sh
 # Generate PDFs for the pilot app after the Astro build.
-pnpm exec site-kernel run print.pdf.generate --app webgogol-com
+pnpm exec site-kernel run print.pdf.generate --app warpgogol-com
 
 # Force regeneration even if PDFs already exist.
-pnpm exec site-kernel run print.pdf.generate --app webgogol-com --force
+pnpm exec site-kernel run print.pdf.generate --app warpgogol-com --force
 
 # Validate that expected PDFs exist.
-pnpm exec site-kernel run print.pdf.validate --app webgogol-com --json
+pnpm exec site-kernel run print.pdf.validate --app warpgogol-com --json
 
 # Static analysis of print layout rules.
-pnpm exec site-kernel run print.layout.validate --app webgogol-com --json
+pnpm exec site-kernel run print.layout.validate --app warpgogol-com --json
 
 # Validate content contract for print.
-pnpm exec site-kernel run print.contract.validate --app webgogol-com --json
+pnpm exec site-kernel run print.contract.validate --app warpgogol-com --json
 ```
 
 All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires the app to have been built first; it is a `build.post` command. `print.layout.validate` and `print.contract.validate` run in `build.check`. `print.pdf.validate` runs in `build.post`.
@@ -641,7 +641,7 @@ All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires t
     "skipped": 0,
     "disabled": 3,
     "errors": [],
-    "outputDir": "apps/webgogol-com/dist/client/_print"
+    "outputDir": "apps/warpgogol-com/dist/client/_print"
   }
 }
 ```
@@ -673,7 +673,7 @@ All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires t
 
 ## Rollout
 
-1. **Pilot on webgogol-com.** Implement the full contract for `apps/webgogol-com` first. Set `output.printPdf: true` in `src/content/system.md`. Generate PDFs for all pages except those explicitly opted out. Verify the home page, `/de/angebot/`, `/uk/umovy/`, and a programmatic surface page (`/de/website/elektriker/deu/bw/`) print correctly.
+1. **Pilot on warpgogol-com.** Implement the full contract for `apps/warpgogol-com` first. Set `output.printPdf: true` in `src/content/system.md`. Generate PDFs for all pages except those explicitly opted out. Verify the home page, `/de/angebot/`, `/uk/umovy/`, and a programmatic surface page (`/de/website/elektriker/deu/bw/`) print correctly.
 2. **Opt-in for other apps.** The command is registered in the standard `build.post` pipeline but exits early unless `output.printPdf: true`. Other apps are unaffected until they explicitly enable it.
 3. **Default-on transition.** Once the pilot proves the contract, a follow-up RFC may change the default to `true` for all apps, or add a workspace-level override.
 4. **Template update.** The onboarding template for thin apps (`packages/os/site-kernel-codegen/templates/app-boilerplate/`) is updated to set `output.printPdf: false` and include the print content contract scaffolding. New apps start with the contract ready.
@@ -689,7 +689,7 @@ All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires t
 
 ## Risks
 
-- **Build time increase.** Generating PDFs for every page adds 1–3 seconds per page depending on content complexity. For webgogol-com with ~50 pages, this is acceptable. For thousands of pages, a parallel batching strategy and optional per-page caching may be needed in a follow-up RFC.
+- **Build time increase.** Generating PDFs for every page adds 1–3 seconds per page depending on content complexity. For warpgogol-com with ~50 pages, this is acceptable. For thousands of pages, a parallel batching strategy and optional per-page caching may be needed in a follow-up RFC.
 - **Playwright dependency size.** The Chromium download is large. CI caches must handle it; local dev may skip PDF generation unless `output.printPdf` is enabled. The pilot is the only app that enables it.
 - **False positives in `print.layout.validate`.** Strict rules about `position: fixed` or `min-height: 100vh` could flag legitimate patterns. The validator uses AST parsing with whitelists and fix hints, not regex alone.
 - **Background image ink usage.** `print.background: preserve` may print large background images and waste ink. Authors can opt for `flatten` per page; the default is `preserve` because the design system depends on background for contrast.
@@ -703,13 +703,13 @@ All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires t
 - [x] `packages/ui/src/styles/print.css` exists and is injected by `layout-component.astro` as a `media="print"` stylesheet. (evidence: packages/ directory, package exists)
 - [x] `SectionShell`, `SiteBackground`, `SectionBackground`, and `EffectHost` suppress motion, glass, parallax, and background effects in print media. (evidence: implemented historically)
 - [x] `@gogol/share/astro/page-handler` exposes `printMode` and `pdfUrl` in `ResolvedPageRouteData`. (evidence: packages/ directory, package exists)
-- [x] `apps/webgogol-com/src/content/system.md` sets `output.printPdf: true`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps/warpgogol-com/src/content/system.md` sets `output.printPdf: true`. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `print.pdf.generate` is registered as an app-scoped command and added to `APPS_BUILD_POST_PIPELINE`. (evidence: implemented historically)
 - [x] `print.pdf.validate` is registered as an app-scoped command and added to `APPS_BUILD_POST_PIPELINE` after `print.pdf.generate`. (evidence: implemented historically)
 - [x] `print.layout.validate` is registered as an app-scoped command and added to `APPS_BUILD_CHECK_PIPELINE`. (evidence: implemented historically)
 - [x] `print.contract.validate` is registered as an app-scoped command and added to `APPS_BUILD_CHECK_PIPELINE`. (evidence: implemented historically)
 - [x] Playwright is added as a dependency of `@gogol/site-kernel-checks` and CI installs Chromium for the pilot app. (evidence: packages/ directory, package exists)
-- [x] `webgogol-com` builds successfully with `build:check` and produces at least one non-empty PDF in `dist/client/_print/`. (evidence: implemented historically)
+- [x] `warpgogol-com` builds successfully with `build:check` and produces at least one non-empty PDF in `dist/client/_print/`. (evidence: implemented historically)
 - [x] Browser print dialog on `/de/` and `/uk/umovy/` produces a legible, on-brand page without missing content or overlapping sections. (evidence: implemented historically)
 - [x] `<link rel="alternate" type="application/pdf">` appears in the `<head>` of pages with generated PDFs. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this RFC. (evidence: implemented historically)
@@ -722,15 +722,15 @@ All four commands are app-scoped (`scope: app`). `print.pdf.generate` requires t
 - Agents MUST check `rfc.list --status accepted` before making structural changes to packages or app tools that relate to this RFC's scope.
 - When implementing, agents MUST reference this RFC ID in commit messages or PR descriptions.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
-- Agents MUST NOT add app-local print logic in `apps/webgogol-com/src/` except content declarations (`system.md`, `pages/**`, `site/**`). All code changes belong in `packages/*` or `packages/os/*`.
+- Agents MUST NOT add app-local print logic in `apps/warpgogol-com/src/` except content declarations (`system.md`, `pages/**`, `site/**`). All code changes belong in `packages/*` or `packages/os/*`.
 - Agents MUST keep the print stylesheet token-driven and biome-agnostic; do not hardcode pixel widths or site-specific colors.
 - Agents MUST update the onboarding template for thin apps so that future apps inherit the print contract scaffolding.
 - Agents MUST update `docs/ecosystem.generated.json` via `ecosystem.manifest.generate` after adding or removing commands (AGENTS.md "RFC command lifecycle metadata").
 - Agents MUST run the full validation matrix for the pilot after implementation:
   ```sh
-  pnpm exec site-kernel run print.contract.validate --app webgogol-com --json
-  pnpm exec site-kernel run print.layout.validate --app webgogol-com --json
-  pnpm --filter webgogol-com build:check
-  pnpm exec site-kernel run print.pdf.validate --app webgogol-com --json
+  pnpm exec site-kernel run print.contract.validate --app warpgogol-com --json
+  pnpm exec site-kernel run print.layout.validate --app warpgogol-com --json
+  pnpm --filter warpgogol-com build:check
+  pnpm exec site-kernel run print.pdf.validate --app warpgogol-com --json
   pnpm exec site-kernel run rfc.validate RFC-0257 --json
   ```

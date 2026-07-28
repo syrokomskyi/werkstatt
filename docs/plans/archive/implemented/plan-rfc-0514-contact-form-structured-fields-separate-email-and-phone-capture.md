@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ui"
     - "@gogol/share"
@@ -56,7 +56,7 @@ scope:
 ### 2.2 Configuration and data
 
 - `src/content/site/{de,uk}/labels.md` — add `emailFieldLabel`, `emailFieldPlaceholder`, `phoneFieldLabel`, `phoneFieldPlaceholder` labels
-- Site page content (webgogol-com contact page) — migrator adds `emailField`/`phoneField` props to send-message blocks
+- Site page content (warpgogol-com contact page) — migrator adds `emailField`/`phoneField` props to send-message blocks
 
 ### 2.3 Documentation and specs
 
@@ -195,7 +195,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — verify command compiles
-- `pnpm exec site-kernel run contact.form.validate --site webgogol-com` — verify command runs (may fail if site content not yet migrated — expected at this step)
+- `pnpm exec site-kernel run contact.form.validate --site warpgogol-com` — verify command runs (may fail if site content not yet migrated — expected at this step)
 
 **Completion criterion:** Command is registered, compiles, and runs; it exits non-zero when `emailField` is missing or cross-locale inconsistent.
 
@@ -240,12 +240,12 @@ scope:
 
 **Agent actions:**
 
-- Edit `src/content/site/de/labels.md` (webgogol-com): add the four new labels under the `sendMessage` section
-- Edit `src/content/site/uk/labels.md` (webgogol-com): add the four new labels under the `sendMessage` section
+- Edit `src/content/site/de/labels.md` (warpgogol-com): add the four new labels under the `sendMessage` section
+- Edit `src/content/site/uk/labels.md` (warpgogol-com): add the four new labels under the `sendMessage` section
 
 **Validation:**
 
-- `pnpm exec site-kernel run content.voice.lint --site webgogol-com` — verify labels pass voice lint
+- `pnpm exec site-kernel run content.voice.lint --site warpgogol-com` — verify labels pass voice lint
 
 **Completion criterion:** Labels exist in both DE and UK locales and pass voice lint.
 
@@ -266,7 +266,7 @@ scope:
 - Run `pnpm --filter @gogol/ui run build:check` — full UI package check
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — full checks package check
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — full handoff package check
-- Run `pnpm exec site-kernel run contact.form.validate --site webgogol-com` — verify command passes after migrator application
+- Run `pnpm exec site-kernel run contact.form.validate --site warpgogol-com` — verify command passes after migrator application
 - Check off acceptance criteria in the RFC
 - Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0514 --implementation-commit <sha>`
 
@@ -290,7 +290,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — handoff package compiles and passes
 - `pnpm --filter @gogol/site-kernel-handoff test` — migrator tests pass (including idempotency)
 - `pnpm exec site-kernel run migrator.registry.validate` — migrator-RFC correspondence verified
-- `pnpm exec site-kernel run contact.form.validate --site webgogol-com` — command passes after migrator
+- `pnpm exec site-kernel run contact.form.validate --site warpgogol-com` — command passes after migrator
 
 ### 4.2 Evidence artifacts
 

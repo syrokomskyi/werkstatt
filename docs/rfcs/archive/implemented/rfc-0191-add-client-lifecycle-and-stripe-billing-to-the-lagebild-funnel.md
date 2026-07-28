@@ -41,7 +41,7 @@ commands:
   removed: []
 appsImpacted:
   - apps/*
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/share
   - packages/integration-adapter-stripe
@@ -179,7 +179,7 @@ export interface BufferInvoice {
 5. **Buffer schema phase:** `buffer_subscriptions` + `buffer_invoices` contracts, client methods, and DDL (tenant RLS, append-only invoices).
 6. **Sync phase:** worker creates linked P2/P3 deals on payment, syncs subscription/invoice state, moves P3, decrements change balance.
 7. **Validator phase:** `billing.config.validate`, `billing.secrets.validate`; extend `funnel.lagebild.validate`.
-8. **Pilot phase:** enable `integrations.billing` for `webgogol-com`; configure Stripe per `docs/specs/visitor-funnel/02-stripe.md`; run a full create-site + renewal + change + dunning dry run.
+8. **Pilot phase:** enable `integrations.billing` for `warpgogol-com`; configure Stripe per `docs/specs/visitor-funnel/02-stripe.md`; run a full create-site + renewal + change + dunning dry run.
 
 ## Alternatives considered
 

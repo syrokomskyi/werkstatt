@@ -38,7 +38,7 @@ commands:
     - per-section ad-hoc CTA shapes (`Cta { label, target }`, `primaryCta`, `secondaryCta`, `ctaLabel + ctaAriaLabel + ctaSecondaryLabel + ...`)
     - per-section image-fade flags (`imageFadeBottom`, `imageFadeTop`, `imageFadeLeft`, `imageFadeRight`) duplicated across team / markdown / person-profile
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share

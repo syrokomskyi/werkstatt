@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/share"
     - "@gogol/site-kernel-checks"
@@ -148,8 +148,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run sites-check.author --site webgogol-com` passes (or no-ops if no people records)
-- `pnpm exec site-kernel run sites-check.postbuild --site webgogol-com` passes (or no-ops if no people records)
+- `pnpm exec site-kernel run sites-check.author --site warpgogol-com` passes (or no-ops if no people records)
+- `pnpm exec site-kernel run sites-check.postbuild --site warpgogol-com` passes (or no-ops if no people records)
 
 **Completion criterion:** Both commands registered, pipeline wiring complete, `build:check` passes, commands are discoverable via `site-kernel run --list`.
 
@@ -171,7 +171,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/share run build:check`
-- `pnpm --filter webgogol-com run build:check` (if site exists with people records)
+- `pnpm --filter warpgogol-com run build:check` (if site exists with people records)
 
 **Completion criterion:** Hero block for non-active participants includes `tagline` with localized status badge text; `active`/`draft` participants have no badge; `build:check` passes.
 

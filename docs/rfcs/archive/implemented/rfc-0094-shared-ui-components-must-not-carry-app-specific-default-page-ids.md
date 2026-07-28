@@ -23,7 +23,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - ui
@@ -40,14 +40,14 @@ nonGoals:
 
 ## Context
 
-During the May 2026 webgogol-com onboarding, `pnpm --filter webgogol-com dev` emitted a recurring runtime warning on every page request:
+During the May 2026 warpgogol-com onboarding, `pnpm --filter warpgogol-com dev` emitted a recurring runtime warning on every page request:
 
 ```
 [routes] PageId not found: donateContact
 [routes] PageId not found: donateContact
 ```
 
-The agent had not authored a `donateContact` page (webgogol-com is a Handwerk site with a `contact` pageId; `donateContact` is nicaragua-projekt's donation flow). Yet the shared header and final-cta components were resolving `donateContact` as if it existed.
+The agent had not authored a `donateContact` page (warpgogol-com is a Handwerk site with a `contact` pageId; `donateContact` is nicaragua-projekt's donation flow). Yet the shared header and final-cta components were resolving `donateContact` as if it existed.
 
 Root cause: two shared `@gogol/ui` components carried nicaragua-specific defaults baked into their TypeScript code:
 
@@ -60,7 +60,7 @@ const { primaryCtaTarget = "donateContact", secondaryCtaTarget = "donateContact"
   (pageOverride as FinalCtaPageOverride) ?? {};
 ```
 
-When webgogol-com's layout did not pass an explicit `ctaTarget` and webgogol-com's `final-cta` blocks did not supply `primaryCtaTarget`, the defaults kicked in. The route resolver then looked for `donateContact` in webgogol-com's route registry, didn't find it, and warned on every page render. The header CTA pointed at a 404; the final-cta button anchored to nothing.
+When warpgogol-com's layout did not pass an explicit `ctaTarget` and warpgogol-com's `final-cta` blocks did not supply `primaryCtaTarget`, the defaults kicked in. The route resolver then looked for `donateContact` in warpgogol-com's route registry, didn't find it, and warned on every page render. The header CTA pointed at a 404; the final-cta button anchored to nothing.
 
 This pattern would silently break every future non-nicaragua onboarding. Worse, the pattern was invisible to validators because:
 
@@ -92,7 +92,7 @@ Apps that want a CTA declare its target explicitly via one of:
 ### Site fixes that accompany the contract change
 
 - **nicaragua-projekt** — add explicit `primaryCtaTarget: donateContact` + `secondaryCtaTarget: donateContact` to the `final-cta` blocks in `pages/de/home.md` and `pages/en/home.md` (the only two final-cta usages). Header CTA already flows through `identity.ctaTarget` in `system.md`.
-- **webgogol-com** — set `identity.ctaTarget: contact` in `system.md`; add `primaryCtaTarget: contact` to every `final-cta` block. Prune orphan `forHandwerker` / `guarantees` / `faq` / `donateContact` references from `navigation/de/navigation.md`, `site/de/labels.md`, and the page frontmatter.
+- **warpgogol-com** — set `identity.ctaTarget: contact` in `system.md`; add `primaryCtaTarget: contact` to every `final-cta` block. Prune orphan `forHandwerker` / `guarantees` / `faq` / `donateContact` references from `navigation/de/navigation.md`, `site/de/labels.md`, and the page frontmatter.
 
 ## Architectural fit
 
@@ -134,15 +134,15 @@ Each affected component already has an `if (ctaHref)` / `if (primaryCtaHref)` br
 
 1. Strip the two `= "donateContact"` defaults from `header-component.astro` and `final-cta-section.astro`. Comment-tag the change with `// RFC-0094`.
 2. For nicaragua-projekt's two `final-cta` blocks: add explicit `primaryCtaTarget: donateContact` + `secondaryCtaTarget: donateContact` so the CTA continues to render.
-3. For webgogol-com: set `identity.ctaTarget: contact` in `system.md`; add `primaryCtaTarget: contact` (and `ctaLabel`, `ctaAriaLabel`) to all five `final-cta` blocks; prune the orphan navigation and labels references that surfaced once the defaults stopped covering them.
-4. Verify `pnpm --filter webgogol-com dev` produces zero `[routes] PageId not found` warnings.
+3. For warpgogol-com: set `identity.ctaTarget: contact` in `system.md`; add `primaryCtaTarget: contact` (and `ctaLabel`, `ctaAriaLabel`) to all five `final-cta` blocks; prune the orphan navigation and labels references that surfaced once the defaults stopped covering them.
+4. Verify `pnpm --filter warpgogol-com dev` produces zero `[routes] PageId not found` warnings.
 5. Verify `pnpm --filter nicaragua-projekt dev` still renders the donation CTA correctly.
 
 ## Alternatives considered
 
 - **Add an app-config registry that maps shared components to per-app defaults.** Adds a registry layer and indirection. Per-block / per-`identity` props already give every app a per-component override surface.
 - **Detect the pattern with a lint that flags `…Target = "…"` literals.** Possible, but the surface is small (header + final-cta were the only offenders found). A lint costs more than the value once the offenders are gone. RFC-0094 is a contract change supported by the existing review process.
-- **Keep the defaults and rename them to a generic value (`"contact"`).** Trades one app-specific default for another. Nicaragua's page is `donateContact`, webgogol's is `contact`; any choice is wrong for some app.
+- **Keep the defaults and rename them to a generic value (`"contact"`).** Trades one app-specific default for another. Nicaragua's page is `donateContact`, warpgogol's is `contact`; any choice is wrong for some app.
 
 ## Risks
 
@@ -154,9 +154,9 @@ Each affected component already has an `if (ctaHref)` / `if (primaryCtaHref)` br
 - [x] `packages/ui/src/components/header/header-component.astro` `ctaTarget` destructure has no default value. (evidence: packages/ directory, package exists)
 - [x] `packages/ui/src/sections/final-cta/final-cta-section.astro` `primaryCtaTarget` / `secondaryCtaTarget` destructure has no default values. (evidence: packages/ directory, package exists)
 - [x] Both nicaragua-projekt home pages declare explicit `primaryCtaTarget` + `secondaryCtaTarget` on their final-cta blocks. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] webgogol-com's `system.md` declares `identity.ctaTarget: contact`. (evidence: implemented historically)
-- [x] All five webgogol-com `final-cta` blocks declare `primaryCtaTarget: contact`. (evidence: implemented historically)
-- [x] `pnpm --filter webgogol-com dev` → no `[routes] PageId not found` warnings on `/`, `/de/`, `/de/preis`, `/de/notausgang`, `/de/digitales-fundament`, `/de/kontakt`. (evidence: implemented historically)
+- [x] warpgogol-com's `system.md` declares `identity.ctaTarget: contact`. (evidence: implemented historically)
+- [x] All five warpgogol-com `final-cta` blocks declare `primaryCtaTarget: contact`. (evidence: implemented historically)
+- [x] `pnpm --filter warpgogol-com dev` → no `[routes] PageId not found` warnings on `/`, `/de/`, `/de/preis`, `/de/notausgang`, `/de/digitales-fundament`, `/de/kontakt`. (evidence: implemented historically)
 - [x] `pnpm build` workspace-wide passes (22/22 at the time of land). (evidence: implemented historically)
 
 ## Implementation notes for agents

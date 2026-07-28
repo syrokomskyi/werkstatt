@@ -50,11 +50,11 @@ acceptance:
   - probe: file-exists
     path: "packages/share/src/agent/openapi.ts"
   - probe: run
-    command: "site-kernel run agent.openapi.generate --app webgogol-com"
+    command: "site-kernel run agent.openapi.generate --app warpgogol-com"
     expect:
       exitCode: 0
   - probe: run
-    command: "site-kernel run agent.openapi.validate --app webgogol-com"
+    command: "site-kernel run agent.openapi.validate --app warpgogol-com"
     expect:
       exitCode: 0
 ---
@@ -86,8 +86,8 @@ RFC-0286 fixed the invariant: protocols are sibling projections of one manifest 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.openapi.generate --app webgogol-com
-pnpm exec site-kernel run agent.openapi.validate --app webgogol-com --json
+pnpm exec site-kernel run agent.openapi.generate --app warpgogol-com
+pnpm exec site-kernel run agent.openapi.validate --app warpgogol-com --json
 ```
 
 App-scoped; generate is `mutatesState: true`; validate runs in `APPS_CHECK_PIPELINE`.
@@ -141,7 +141,7 @@ Determinism: all object keys emitted in lexicographic order; paths sorted; two r
 
 1. Ship formatter + command pair; wire pipelines; gitignore the artifact in apps + scaffold.
 2. `agent.manifest.generate` (changed) fills `interfaces.openapi` when generation is enabled.
-3. Both apps emit documents on next build; webgogol-com is the reference consumer test: the document must load in a stock OpenAPI viewer without errors (manual spot-check, not a pipeline step).
+3. Both apps emit documents on next build; warpgogol-com is the reference consumer test: the document must load in a stock OpenAPI viewer without errors (manual spot-check, not a pipeline step).
 4. Future protocol documents (if any) follow this RFC as the template: one formatter, one command pair, one manifest `interfaces` key — nothing else (AS-5).
 
 ## Alternatives considered
@@ -163,7 +163,7 @@ Determinism: all object keys emitted in lexicographic order; paths sorted; two r
 - [x] `agent.openapi.generate` + `agent.openapi.validate` registered and wired (`APPS_BUILD_PREPARE_PIPELINE` immediately after `agent.manifest.generate`; `APPS_CHECK_PIPELINE` immediately after `agent.surface.validate`). (evidence: implemented historically)
 - [x] `AGO-01..04` in the rule registry. (evidence: implemented historically)
 - [x] Manifest `interfaces.openapi` populated (`agent-manifest.ts` now sets the real `/.well-known/agent.openapi.json` URL); `AGS-02/03` bijection green on both apps (verified via `agent.surface.validate`). (evidence: implemented historically)
-- [x] Artifact gitignored in apps + scaffold (already covered by the RFC-0286 root `.gitignore` glob — no new entry needed); both apps' `agent.openapi.generate`/`agent.openapi.validate` individually verified green (webgogol-com: 9 paths/1 action; nicaragua-projekt: 7 paths/0 actions), byte-stable across repeated runs, and both apps' full `build:check` (build.prepare + build.check + astro:check + astro build + build.post) independently re-confirmed 0 errors moments earlier with the underlying RFC-0286/0287/0288 changes in place. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Artifact gitignored in apps + scaffold (already covered by the RFC-0286 root `.gitignore` glob — no new entry needed); both apps' `agent.openapi.generate`/`agent.openapi.validate` individually verified green (warpgogol-com: 9 paths/1 action; nicaragua-projekt: 7 paths/0 actions), byte-stable across repeated runs, and both apps' full `build:check` (build.prepare + build.check + astro:check + astro build + build.post) independently re-confirmed 0 errors moments earlier with the underlying RFC-0286/0287/0288 changes in place. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/site-kernel-checks"
@@ -28,7 +28,7 @@ scope:
 - [ ] O1 — Editorial policy page prose created in DE and UK with all 5 required H2 sections — maps to acceptance criterion "Policy page contains all 5 required H2 sections in both DE and UK"
 - [ ] O2 — Page entries created at `src/content/pages/{lang}/ratgeber-redaktion.md` (frontmatter-only, DNA-24) — maps to acceptance criterion "Page entries exist at src/content/pages/{lang}/ratgeber-redaktion.md"
 - [ ] O3 — Page registered in `system.md` with `cosmicStar: Polaris` and language-keyed routes — maps to acceptance criterion "Page is registered in system.md"
-- [ ] O4 — `ratgeber.policy.validate` command implemented and registered — maps to acceptance criterion "ratgeber.policy.validate passes on webgogol-com"
+- [ ] O4 — `ratgeber.policy.validate` command implemented and registered — maps to acceptance criterion "ratgeber.policy.validate passes on warpgogol-com"
 - [ ] O5 — `bakeRatgeberHub` updated to emit link to policy page with correct link text — maps to acceptance criterion "Hub links to the policy page"
 - [ ] O6 — `url-schema.yaml` extended with `/ratgeber/redaktion/` route pattern — maps to acceptance criterion "breaksC: true"
 - [ ] O7 — `amendedBy` on RFC-0500 updated to include RFC-0503 — maps to rfc.validate V-19 resolution
@@ -101,7 +101,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.block.validate --site webgogol-com` — page entries must pass B-01..B-06 checks (frontmatter-only, no markdown body, valid schema)
+- `pnpm exec site-kernel run page.block.validate --site warpgogol-com` — page entries must pass B-01..B-06 checks (frontmatter-only, no markdown body, valid schema)
 
 **Completion criterion:** Both page entries exist, are frontmatter-only (no markdown body), and pass `page.block.validate`.
 
@@ -129,8 +129,8 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run system.manifest.validate --site webgogol-com` — manifest must parse and validate
-- `pnpm exec site-kernel run page.block.validate --site webgogol-com` — pageId must resolve in system.md (B-04)
+- `pnpm exec site-kernel run system.manifest.validate --site warpgogol-com` — manifest must parse and validate
+- `pnpm exec site-kernel run page.block.validate --site warpgogol-com` — pageId must resolve in system.md (B-04)
 
 **Completion criterion:** `system.manifest.validate` passes and the new pageId `ratgeber-redaktion` is declared in `pages[]`.
 
@@ -157,7 +157,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run ratgeber.policy.validate --site webgogol-com --json` — command executes
+- `pnpm exec site-kernel run ratgeber.policy.validate --site warpgogol-com --json` — command executes
 
 **Completion criterion:** Validator compiles, executes, and produces correct diagnostics for all 5 rules.
 
@@ -215,7 +215,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — TypeScript compiles
-- `pnpm exec site-kernel run ratgeber.hub.validate --site webgogol-com` — RG-HUB-02 still passes (no unexpected block types)
+- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com` — RG-HUB-02 still passes (no unexpected block types)
 
 **Completion criterion:** Hub baker emits a visible link to `/ratgeber/redaktion/` (DE) / `/porady/redaktsiya/` (UK) and RG-HUB-02 still passes.
 
@@ -243,7 +243,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` — YAML parses and validates against the Zod schema
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com` — passes with the extended schema
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` — passes with the extended schema
 
 **Completion criterion:** url-schema.yaml includes the new route pattern and `surface.contract.validate` passes.
 
@@ -304,11 +304,11 @@ scope:
 - `pnpm exec site-kernel run rfc.validate RFC-0500` (V-19 resolved)
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run ratgeber.policy.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run ratgeber.hub.validate --site webgogol-com` (RG-HUB-02 still passes after baker update)
-- `pnpm exec site-kernel run page.block.validate --site webgogol-com` (new page entries pass)
-- `pnpm exec site-kernel run system.manifest.validate --site webgogol-com` (new page registration passes)
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com` (extended url-schema passes)
+- `pnpm exec site-kernel run ratgeber.policy.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com` (RG-HUB-02 still passes after baker update)
+- `pnpm exec site-kernel run page.block.validate --site warpgogol-com` (new page entries pass)
+- `pnpm exec site-kernel run system.manifest.validate --site warpgogol-com` (new page registration passes)
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` (extended url-schema passes)
 
 ### 4.2 Evidence artifacts
 

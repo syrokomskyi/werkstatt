@@ -1,6 +1,6 @@
 ---
 id: RFC-0304
-title: "Introduce backs workspaces and the Check Webgogol runner backend"
+title: "Introduce backs workspaces and the Check Warpgogol runner backend"
 status: implemented
 kind: architecture
 scope: workspace
@@ -36,27 +36,27 @@ related:
 commands:
   proposed: []
   added:
-    - check-webgogol.runner.validate
+    - check-warpgogol.runner.validate
   changed: []
   removed:
     - backs.workspace.validate
     - backs-check.run
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/check-core"
   - "@gogol/check-runner-node"
   - "@gogol/site-kernel"
   - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
 successSignals:
   - "The monorepo has a first-class backs/* workspace layer for deployable backend compositions."
-  - "check-webgogol-com accepts a URL, creates a check run, shows run status, and renders the final report without running Chromium inside the Astro request path."
-  - "backs/check-webgogol-runner executes the existing Check Webgogol runner packages and writes the canonical run artifacts."
+  - "check-warpgogol-com accepts a URL, creates a check run, shows run status, and renders the final report without running Chromium inside the Astro request path."
+  - "backs/check-warpgogol-runner executes the existing Check Warpgogol runner packages and writes the canonical run artifacts."
   - "The same run flow works for third-party websites and for apps/* sites deployed to alt hosting."
   - "Future backend workers such as a Matomo proxy or client integration bridges can be added under backs/* without changing the apps/* contract."
 nonGoals:
-  - "Do not move UI pages, marketing content, or report rendering out of apps/check-webgogol-com."
+  - "Do not move UI pages, marketing content, or report rendering out of apps/check-warpgogol-com."
   - "Do not run Playwright/Chromium inside Astro API endpoints or Cloudflare Worker request handlers."
   - "Do not put check rule logic, report schemas, queue schemas, or storage abstractions directly inside backs/*."
   - "Do not implement the Matomo proxy or client-specific integration workers in this RFC."
@@ -68,38 +68,38 @@ acceptance:
   - probe: file-exists
     path: "backs/AGENTS.md"
   - probe: file-exists
-    path: "backs/check-webgogol-runner/package.json"
+    path: "backs/check-warpgogol-runner/package.json"
   - probe: file-exists
-    path: "backs/check-webgogol-runner/back.config.json"
+    path: "backs/check-warpgogol-runner/back.config.json"
   - probe: file-exists
-    path: "backs/check-webgogol-runner/src/worker.ts"
+    path: "backs/check-warpgogol-runner/src/worker.ts"
   - probe: file-exists
-    path: "backs/check-webgogol-runner/Dockerfile"
+    path: "backs/check-warpgogol-runner/Dockerfile"
   - probe: file-exists
     path: "packages/check-core/src/run-request.ts"
   - probe: file-exists
-    path: "apps/check-webgogol-com/src/pages/api/check-runs/index.ts"
+    path: "apps/check-warpgogol-com/src/pages/api/check-runs/index.ts"
   - probe: command-registered
     name: "backs.workspace.validate"
   - probe: command-registered
     name: "backs-check.run"
   - probe: command-registered
-    name: "check-webgogol.runner.validate"
+    name: "check-warpgogol.runner.validate"
   - probe: run
-    command: "site-kernel run check-webgogol.runner.validate --json"
+    command: "site-kernel run check-warpgogol.runner.validate --json"
     expect:
       exitCode: 0
 ---
 
-# RFC-0304: Introduce backs workspaces and the Check Webgogol runner backend
+# RFC-0304: Introduce backs workspaces and the Check Warpgogol runner backend
 
 ## Context
 
 `apps/*` is the monorepo layer for deployable frontend/site compositions. It works well because app workspaces stay thin: content, shell composition, deployment configuration, and a few proxies. Shared behavior belongs in `packages/*`.
 
-Check Webgogol now needs a real product flow:
+Check Warpgogol now needs a real product flow:
 
-1. A visitor opens `apps/check-webgogol-com`.
+1. A visitor opens `apps/check-warpgogol-com`.
 2. They enter a URL. The URL may belong to a third-party business site or to a WGogol app deployed to alt hosting.
 3. The system captures rendered evidence with a browser, runs deterministic checks, optionally runs a cached audience review, and produces `report.json`, `report.html`, and `action-pack.json`.
 4. The app shows progress and then renders the result.
@@ -110,7 +110,7 @@ The rendered capture lane requires Node + Playwright/Chromium. It is not appropr
 
 There is no first-class workspace location for deployable backend compositions.
 
-If every backend runtime is placed ad hoc under `packages/*`, those packages will become deployment compositions instead of reusable libraries. If backends are hidden inside `apps/*`, site apps will grow request-time worker logic and violate the thin-app rule. If every worker is forced into a `workers/*` naming model, the topology becomes too Cloudflare-specific: the Check Webgogol runner is a Node/container worker, while a Matomo proxy may be a Cloudflare Worker.
+If every backend runtime is placed ad hoc under `packages/*`, those packages will become deployment compositions instead of reusable libraries. If backends are hidden inside `apps/*`, site apps will grow request-time worker logic and violate the thin-app rule. If every worker is forced into a `workers/*` naming model, the topology becomes too Cloudflare-specific: the Check Warpgogol runner is a Node/container worker, while a Matomo proxy may be a Cloudflare Worker.
 
 The ecosystem needs one clear rule that future agents can follow without guessing.
 
@@ -150,19 +150,19 @@ Those belong in `packages/*`.
 The first backend workspace is:
 
 ```text
-backs/check-webgogol-runner
+backs/check-warpgogol-runner
 ```
 
-It executes Check Webgogol runs created by `apps/check-webgogol-com`.
+It executes Check Warpgogol runs created by `apps/check-warpgogol-com`.
 
 ## Architectural fit
 
 - RFC-0047 keeps app workspaces thin and content-driven. This RFC applies the same composition-only discipline to backend workspaces.
 - RFC-0087 requires generators and surfaces to be content-driven and idempotent. Any generated `backs/*` boilerplate follows the same generated-file governance.
 - RFC-0266 / RFC-0267 require command metadata and WorkspaceIO-aware command implementation. New `backs.*` validators use the same command registry and result envelope.
-- RFC-0293 made Check Webgogol URL-first. `backs/check-webgogol-runner` receives a `CheckTarget`; it does not inspect source files from `apps/*`.
+- RFC-0293 made Check Warpgogol URL-first. `backs/check-warpgogol-runner` receives a `CheckTarget`; it does not inspect source files from `apps/*`.
 - RFC-0294 / RFC-0296 require Node/Playwright evidence capture and canonical run artifacts. The runner backend is the long-lived execution lane for that work.
-- RFC-0300 keeps `check-webgogol-com` as the operator app. This RFC amends it: the app may create and observe runs, but it must not execute browser automation.
+- RFC-0300 keeps `check-warpgogol-com` as the operator app. This RFC amends it: the app may create and observe runs, but it must not execute browser automation.
 - RFC-0302 safety policy applies before any runner job starts.
 
 ## Design
@@ -190,14 +190,14 @@ Every backend workspace must include `back.config.json`:
 
 ```json
 {
-  "id": "check-webgogol-runner",
+  "id": "check-warpgogol-runner",
   "kind": "node-runner",
-  "ownerApp": "check-webgogol-com",
+  "ownerApp": "check-warpgogol-com",
   "entry": "src/worker.ts",
   "publicEndpoints": false,
   "usesBrowserAutomation": true,
-  "queues": ["check-webgogol-runs"],
-  "artifacts": [".check-webgogol/runs"]
+  "queues": ["check-warpgogol-runs"],
+  "artifacts": [".check-warpgogol/runs"]
 }
 ```
 
@@ -212,24 +212,24 @@ Allowed `kind` values:
 
 `backs.workspace.validate` validates the manifest shape, workspace membership, package scripts, and boundary rules.
 
-### First Backend: backs/check-webgogol-runner
+### First Backend: backs/check-warpgogol-runner
 
 #### Responsibility
 
-`backs/check-webgogol-runner` consumes queued Check Webgogol run requests and writes canonical run artifacts.
+`backs/check-warpgogol-runner` consumes queued Check Warpgogol run requests and writes canonical run artifacts.
 
 It must use existing packages:
 
 - `@gogol/check-core` for target, request, status, evidence, report, and action-pack contracts;
 - `@gogol/check-runner-node` for Playwright capture;
-- `@gogol/site-kernel-check-webgogol` for command-level orchestration helpers when useful.
+- `@gogol/site-kernel-check-warpgogol` for command-level orchestration helpers when useful.
 
-It must not import from `apps/check-webgogol-com`.
+It must not import from `apps/check-warpgogol-com`.
 
 #### Required Files
 
 ```text
-backs/check-webgogol-runner/
+backs/check-warpgogol-runner/
   package.json
   back.config.json
   Dockerfile
@@ -249,7 +249,7 @@ backs/check-webgogol-runner/
     "dev": "tsx src/worker.ts",
     "run:once": "tsx src/run-once.ts",
     "build:check": "tsc --noEmit",
-    "check": "site-kernel run check-webgogol.runner.validate"
+    "check": "site-kernel run check-warpgogol.runner.validate"
   }
 }
 ```
@@ -263,7 +263,7 @@ The first implementation uses a local filesystem store so the product works in d
 Canonical local layout:
 
 ```text
-.check-webgogol/
+.check-warpgogol/
   queue/
     <runId>.request.json
   runs/
@@ -324,15 +324,15 @@ export interface CheckRunStatus {
 
 The app and backend must both import these types/schemas from `@gogol/check-core`.
 
-### check-webgogol-com App Integration
+### check-warpgogol-com App Integration
 
 The app remains the UI and API control plane.
 
 Add Astro API endpoints:
 
 ```text
-apps/check-webgogol-com/src/pages/api/check-runs/index.ts
-apps/check-webgogol-com/src/pages/api/check-runs/[runId].ts
+apps/check-warpgogol-com/src/pages/api/check-runs/index.ts
+apps/check-warpgogol-com/src/pages/api/check-runs/[runId].ts
 ```
 
 `POST /api/check-runs`:
@@ -376,7 +376,7 @@ Allowed first production mapping:
 - artifacts/screenshots: R2, S3, filesystem volume, or another explicit object store adapter;
 - queue: Cloudflare Queue, Redis queue, Postgres queue table, or another explicit queue adapter.
 
-Adapters belong in packages when reusable. Provider-specific bootstrap belongs in `backs/check-webgogol-runner`.
+Adapters belong in packages when reusable. Provider-specific bootstrap belongs in `backs/check-warpgogol-runner`.
 
 ### Safety
 
@@ -415,16 +415,16 @@ Scope: workspace, read-only aggregate.
 
 Runs all backend workspace validators, beginning with `backs.workspace.validate` and any backend-specific validators.
 
-#### check-webgogol.runner.validate
+#### check-warpgogol.runner.validate
 
 Scope: workspace, read-only.
 
 Validates:
 
-- `backs/check-webgogol-runner` exists;
+- `backs/check-warpgogol-runner` exists;
 - required files exist;
 - package dependencies include `@gogol/check-core` and `@gogol/check-runner-node`;
-- package does not depend on `apps/check-webgogol-com` or import from `apps/*`;
+- package does not depend on `apps/check-warpgogol-com` or import from `apps/*`;
 - Dockerfile exists;
 - `src/worker.ts` imports shared run contracts from `@gogol/check-core`;
 - app API endpoints exist and do not import Playwright;
@@ -435,9 +435,9 @@ Validates:
 1. Add `backs/*` to the workspace and update workspace discovery/ecosystem projection.
 2. Add `backs/AGENTS.md`.
 3. Add `@gogol/check-core` run request/status schemas.
-4. Add `backs.workspace.validate`, `backs-check.run`, and `check-webgogol.runner.validate`.
-5. Create `backs/check-webgogol-runner` with the local filesystem store and Node/Playwright worker.
-6. Add `POST /api/check-runs` and `GET /api/check-runs/[runId]` to `apps/check-webgogol-com`.
+4. Add `backs.workspace.validate`, `backs-check.run`, and `check-warpgogol.runner.validate`.
+5. Create `backs/check-warpgogol-runner` with the local filesystem store and Node/Playwright worker.
+6. Add `POST /api/check-runs` and `GET /api/check-runs/[runId]` to `apps/check-warpgogol-com`.
 7. Add the UI states for URL input, progress, and result rendering.
 8. Prove local end-to-end flow: app creates a request, runner processes it, app renders the report.
 9. Only after the local contract is green, add a production store/queue adapter behind the same contracts.
@@ -445,7 +445,7 @@ Validates:
 ## Alternatives considered
 
 - **Put backend workers under `packages/*`.** Rejected because packages are reusable logic, not deployment compositions.
-- **Put the runner inside `apps/check-webgogol-com`.** Rejected because Playwright/Chromium must not run inside the Astro request path.
+- **Put the runner inside `apps/check-warpgogol-com`.** Rejected because Playwright/Chromium must not run inside the Astro request path.
 - **Use `workers/*` instead of `backs/*`.** Rejected because the ecosystem will need non-edge backends such as Node runners and customer integration processes.
 - **Choose Cloudflare Queues/R2/D1 immediately.** Deferred. The local store proves the product contract first; cloud adapters can follow without changing UI or runner contracts.
 
@@ -461,19 +461,19 @@ Validates:
 
 - [x] `pnpm-workspace.yaml` includes `backs/*`. (evidence: implemented historically)
 - [x] `backs/AGENTS.md` documents backend composition-only rules. (evidence: AGENTS.md:1, agent guide updated)
-- [x] `backs/check-webgogol-runner` exists with `package.json`, `back.config.json`, `Dockerfile`, and `src/worker.ts`. (evidence: implemented historically)
+- [x] `backs/check-warpgogol-runner` exists with `package.json`, `back.config.json`, `Dockerfile`, and `src/worker.ts`. (evidence: implemented historically)
 - [x] `@gogol/check-core` exports `CheckRunRequest` and `CheckRunStatus` schemas. (evidence: packages/ directory, package exists)
-- [x] `apps/check-webgogol-com` exposes `POST /api/check-runs` and `GET /api/check-runs/[runId]`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps/check-warpgogol-com` exposes `POST /api/check-runs` and `GET /api/check-runs/[runId]`. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] The app API endpoints do not import Playwright, `@gogol/check-runner-node`, or `backs/*`. (evidence: packages/ directory, package exists)
 - [x] The runner backend does not import from `apps/*`. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `backs.workspace.validate`, `backs-check.run`, and `check-webgogol.runner.validate` are registered. (evidence: implemented historically)
-- [x] A local end-to-end smoke can submit a URL, process it with the runner, and render a completed report in `check-webgogol-com`. (evidence: implemented historically)
+- [x] `backs.workspace.validate`, `backs-check.run`, and `check-warpgogol.runner.validate` are registered. (evidence: implemented historically)
+- [x] A local end-to-end smoke can submit a URL, process it with the runner, and render a completed report in `check-warpgogol-com`. (evidence: implemented historically)
 - [x] `rfc.validate RFC-0304` passes. (evidence: implemented historically)
 
 ## Implementation notes for agents
 
 - Do not create the first backend by copying an app. A back workspace is not an app and must not contain Astro pages.
-- Do not put queue or store schemas in `apps/check-webgogol-com`; add them to `@gogol/check-core`.
+- Do not put queue or store schemas in `apps/check-warpgogol-com`; add them to `@gogol/check-core`.
 - Keep the local filesystem store deterministic and artifact-compatible with RFC-0296.
 - Use `apply_patch` for manual edits and do not edit generated files directly.
 - When adding workspace topology, update the generator or registry that owns `docs/ecosystem.generated.json`; do not hand-edit the generated projection.

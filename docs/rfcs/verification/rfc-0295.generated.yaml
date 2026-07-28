@@ -5,7 +5,7 @@ ownerCommand: rfc.verification.emit
 editInstead: the rfc.verification.emit generator source (not this file).
 regenerateCommand: pnpm exec site-kernel run rfc.verification.emit
 rfcId: RFC-0295
-title: Publish optional Webgogol check hints in .well-known
+title: Publish optional Warpgogol check hints in .well-known
 rfcStatus: implemented
 emittedAt: 2026-07-07T17:32:55.092Z
 commit: 15929a0bf01323ade1fb72094f29592d747b9862
@@ -16,13 +16,13 @@ acceptanceHash: a3c7889c5e83ac186675ab0967a82dc788f65b750554687154ff49035ca07f8d
 probes:
   - probe:
       probe: command-registered
-      name: webgogol.check-hints.generate
+      name: warpgogol.check-hints.generate
     ok: true
     detail: registered
     durationMs: 581
   - probe:
       probe: command-registered
-      name: webgogol.check-hints.validate
+      name: warpgogol.check-hints.validate
     ok: true
     detail: registered
     durationMs: 329

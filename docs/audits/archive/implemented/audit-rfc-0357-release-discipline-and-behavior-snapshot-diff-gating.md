@@ -84,7 +84,7 @@
 ### 4.3 Добавить locking для sequence number allocation
 
 - Использовать file lock (`releases/.lock`) или database-backed sequence generator для предотвращения race conditions при allocation release IDs.
-- Альтернатива: использовать timestamp-based IDs (например, `webgogol-com-r20260709-143022`) вместо sequence numbers.
+- Альтернатива: использовать timestamp-based IDs (например, `warpgogol-com-r20260709-143022`) вместо sequence numbers.
 
 ### 4.4 Разделить structural facts от quality metrics
 

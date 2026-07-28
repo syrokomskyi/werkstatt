@@ -32,7 +32,7 @@ export { runKernelWire } from "./wire.ts";
 export { iconsModule } from "./icons/icons.module.ts";
 export { runIconsGenerate } from "./icons/index.ts";
 
-// RFC governance domain — migrated to @webgogol/forge (RFC-0374, RFC-0391)
+// RFC governance domain — migrated to @warpgogol/forge (RFC-0374, RFC-0391)
 export {
   runRfcList,
   runRfcCreate,
@@ -60,7 +60,7 @@ export {
   RFC_ID_PATTERN,
   RFC_FULL_REQUIRED_SECTIONS,
   RFC_METADATA_CUTOFF,
-} from "@webgogol/forge/os/rfc";
+} from "@warpgogol/forge/os/rfc";
 export type {
   DnaTraceEntry,
   DnaTraceResult,
@@ -92,7 +92,7 @@ export type {
   RfcArchiveResult,
   RfcArchiveMove,
   RfcArchiveSkip,
-} from "@webgogol/forge/os/rfc";
+} from "@warpgogol/forge/os/rfc";
 
 // ADR governance domain (RFC-0366)
 export * from "./adr/index.ts";
@@ -125,7 +125,7 @@ export {
 export { semanticModule } from "./semantic/semantic.module.ts";
 export { runSemanticPageValidate } from "./semantic/handlers.ts";
 
-// RFC-0075: Agent workflow discovery and linting domain — workflowModule migrated to @webgogol/forge (RFC-0374)
+// RFC-0075: Agent workflow discovery and linting domain — workflowModule migrated to @warpgogol/forge (RFC-0374)
 export { runWorkflowLint, runWorkflowList, runWorkflowAmendList } from "./workflow/index.ts";
 export type {
   WorkflowPhase,

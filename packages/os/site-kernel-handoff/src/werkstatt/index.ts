@@ -2,12 +2,12 @@
 <MODULE_CONTRACT>
 <purpose>Werkstatt helpers — lock, operation, and atomic write utilities used by handoff machinery.</purpose>
 <non-goals>
-  <item>Do not register commands here — werkstatt command module migrated to @webgogol/forge.</item>
+  <item>Do not register commands here — werkstatt command module migrated to @warpgogol/forge.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0362: initial Werkstatt command module.</item>
-  <item>RFC-0374: createWerkstattModule migrated to @webgogol/forge — helpers remain for handoff use.</item>
+  <item>RFC-0374: createWerkstattModule migrated to @warpgogol/forge — helpers remain for handoff use.</item>
 </CHANGE_SUMMARY>
 */
 

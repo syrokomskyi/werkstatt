@@ -32,7 +32,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/os/site-kernel-checks
   - packages/os/site-kernel-codegen
@@ -99,8 +99,8 @@ The command treats `packages/ontology/biomes/*.yaml` and generated `apps/<site>/
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run biome.tokens.validate --app webgogol-com
-pnpm exec site-kernel run biome.tokens.validate --app webgogol-com --json
+pnpm exec site-kernel run biome.tokens.validate --app warpgogol-com
+pnpm exec site-kernel run biome.tokens.validate --app warpgogol-com --json
 pnpm exec site-kernel run biome.tokens.validate --all --json
 ```
 
@@ -203,13 +203,13 @@ For each app, regenerate the expected token projection in memory from `packages/
 {
   "command": "biome.tokens.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "biomeId": "handwerk-material-warm",
   "violations": [
     {
       "rule": "BIOME-TOKEN-02",
       "severity": "error",
-      "app": "webgogol-com",
+      "app": "warpgogol-com",
       "biomeId": "handwerk-material-warm",
       "file": "packages/ui/src/sections/hero/hero-section.css",
       "selector": ".hero__description",
@@ -236,7 +236,7 @@ For each app, regenerate the expected token projection in memory from `packages/
 2. Add it to `PACKAGES_CHECK_PIPELINE` in warning mode for one cycle if false positives appear.
 3. Add app-scoped execution to `apps-check.run` / `build.check` after `biome.css.generate` and before Astro build.
 4. Fix existing violations by updating biome YAML/generator mappings or shared component tokens.
-5. Make the command fail-hard for new apps and for `apps/webgogol-com` once the current known `--ds-color-text-soft-on-dark` issue is corrected canonically.
+5. Make the command fail-hard for new apps and for `apps/warpgogol-com` once the current known `--ds-color-text-soft-on-dark` issue is corrected canonically.
 
 ## Alternatives considered
 

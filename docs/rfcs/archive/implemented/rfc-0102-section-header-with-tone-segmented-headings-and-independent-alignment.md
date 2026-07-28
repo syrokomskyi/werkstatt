@@ -38,7 +38,7 @@ commands:
     - .section-number primitive from app global.css scaffold (moved into packages/ui)
     - duplicated .section__header / .section__title / .section-heading / .section-number CSS across section .css files
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share

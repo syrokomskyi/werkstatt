@@ -96,8 +96,8 @@ This RFC does not create new commands. It changes the behavior and validation co
 No new command names are introduced.
 
 ```sh
-pnpm exec site-kernel run llms.generate --app webgogol-com
-pnpm exec site-kernel run llms.validate --app webgogol-com --json
+pnpm exec site-kernel run llms.generate --app warpgogol-com
+pnpm exec site-kernel run llms.validate --app warpgogol-com --json
 ```
 
 `llms.generate` continues to write:
@@ -129,16 +129,16 @@ Implementation requirements:
 A generated `llms.txt` should have this shape:
 
 ```markdown
-# Webgogol
-> Webgogol baut Digitales Fundament: tragfähige digitale Basis für kleines Gewerbe und Handwerk in Deutschland.
-> For complete documentation in a single file, see [llms-full.txt](https://webgogol.com/llms-full.txt).
+# Warpgogol
+> Warpgogol baut Digitales Fundament: tragfähige digitale Basis für kleines Gewerbe und Handwerk in Deutschland.
+> For complete documentation in a single file, see [llms-full.txt](https://warpgogol.com/llms-full.txt).
 
 ## Primary sources
-- [Digitales Fundament](https://webgogol.com/digitales-fundament): Die getragene digitale Basis. Eigentum beim Kunden, offener Preis, Notausgang.
-- [Offener Preis](https://webgogol.com/preis): 70 € / Monat oder 700 € / Jahr plus 200 € Einrichtung.
+- [Digitales Fundament](https://warpgogol.com/digitales-fundament): Die getragene digitale Basis. Eigentum beim Kunden, offener Preis, Notausgang.
+- [Offener Preis](https://warpgogol.com/preis): 70 € / Monat oder 700 € / Jahr plus 200 € Einrichtung.
 
 ## Organization
-- Name: Webgogol
+- Name: Warpgogol
 - Representative: Andrii Syrokomskyi
 ```
 

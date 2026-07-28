@@ -34,7 +34,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-codegen
   - os/site-kernel-checks
@@ -53,7 +53,7 @@ nonGoals:
 
 ## Context
 
-During the May 2026 webgogol-com onboarding, three classes of regenerated files drifted between the onboarding output (visible to the agent at handoff) and the post-`pnpm build` state (what shipped):
+During the May 2026 warpgogol-com onboarding, three classes of regenerated files drifted between the onboarding output (visible to the agent at handoff) and the post-`pnpm build` state (what shipped):
 
 1. **`src/content/pages/<lang>/cosmic/passport.md` and `star-map.md`** — onboarding wrote app-specific descriptions ("Cosmic Passport — WGogol Release Manifest"); the build's `overlay.pages.generate` rewrote them with template defaults ("Cosmic Passport") because the generator passed only `LANG` to the template, not `APP` or `TITLE`. The `{{APP}}` token in the template's comment resolved to empty: `# System manifest for apps/`.
 
@@ -163,7 +163,7 @@ A generator that needs ANY app-specific value MUST read it from `system.md` via 
 - [x] `generator.ownership.lint` workspace command registered and wired into `PACKAGES_CHECK_PIPELINE`. — `packages/os/site-kernel-checks/src/generator-ownership.ts` (22 paths / 16 commands), registered in `module.ts:1582`, wired in pipeline at `module.ts:337`. (evidence: packages/ directory, package exists)
 - [x] Idempotency test added; CI runs it on every change to `packages/os/site-kernel-codegen` or `packages/os/site-kernel-checks/src/robots.ts`/`ai.ts`/`sitemap.ts`/`llms.ts`. — `packages/os/site-kernel-codegen/src/tests/idempotency.test.ts` (7 tests). (evidence: packages/ directory, package exists)
 - [x] `packages/os/site-kernel-codegen/AGENTS.md` lists the three invariants. — section "RFC-0087 invariants". (evidence: AGENTS.md:1, agent guide updated)
-- [x] Regression: `pnpm --filter webgogol-com build` followed by `git status` produces no diff in `apps/webgogol-com/src/content/` or `apps/webgogol-com/public/`. — verified post-implementation (clean tree before re-run). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Regression: `pnpm --filter warpgogol-com build` followed by `git status` produces no diff in `apps/warpgogol-com/src/content/` or `apps/warpgogol-com/public/`. — verified post-implementation (clean tree before re-run). (evidence: original apps retired by RFC-0381, implemented historically)
 
 ## Implementation notes for agents
 

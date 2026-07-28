@@ -56,7 +56,7 @@ commands:
     - surface.contract.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -357,8 +357,8 @@ During `expandBlueprint`, only `status: published` articles are emitted as depth
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.hub.validate --site webgogol-com --json
-pnpm exec site-kernel run surface.validate --site webgogol-com --json
+pnpm exec site-kernel run ratgeber.hub.validate --site warpgogol-com --json
+pnpm exec site-kernel run surface.validate --site warpgogol-com --json
 ```
 
 `ratgeber.hub.validate` is site-scoped, runs in `build.check`.
@@ -487,7 +487,7 @@ Exit codes: 0 = pass, 1 = any error-level rule triggered, 2 = only warning-level
 7. **Layer C contract:** add ratgeber type policy to `jsonld-types.yaml`.
 8. **Content:** run `mission.migrate` to transform `topics` → `articles`. Create `surface/article-categories/{lang}/*.md` records.
 9. **Compass sync:** update `docs/verification-plan.xml`, `docs/COMMANDS.md`, `docs/requirements.xml`, `docs/technology.xml`, `docs/knowledge-graph.xml`, `packages/os/site-kernel-checks/AGENTS.md`, `packages/surface/AGENTS.md`, `packages/ontology/AGENTS.md`.
-10. **Pilot:** run `ratgeber.hub.validate --site webgogol-com`. Fix any remaining issues.
+10. **Pilot:** run `ratgeber.hub.validate --site warpgogol-com`. Fix any remaining issues.
 
 ## Alternatives considered
 
@@ -506,7 +506,7 @@ Exit codes: 0 = pass, 1 = any error-level rule triggered, 2 = only warning-level
 
 ## Acceptance criteria
 
-- [x] `ratgeber.hub.validate` passes on `webgogol-com`. (evidence: command implemented and registered in command table + pipeline; pending content migration via mission.migrate to fully verify)
+- [x] `ratgeber.hub.validate` passes on `warpgogol-com`. (evidence: command implemented and registered in command table + pipeline; pending content migration via mission.migrate to fully verify)
 - [x] Hub emits `CollectionPage` as primary JSON-LD type. (evidence: blueprint semanticType: collection at depth-0; jsonld-types.yaml surfacePolicy ratgeber depth-0 requiredTypes: [CollectionPage])
 - [x] Hub renders six-block editorial layout. (evidence: bakeRatgeberHub implemented in bake-ratgeber-hub.ts with hero, audience-cards, markdown, final-cta blocks)
 - [x] Article cards show all seven fields. (evidence: blueprint hub.cardFields lists category, title, question, summary, articleType, readTime, reviewedAt)

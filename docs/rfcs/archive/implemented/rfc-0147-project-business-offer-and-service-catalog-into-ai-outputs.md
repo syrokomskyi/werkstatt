@@ -32,7 +32,7 @@ commands:
     - llms.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -41,7 +41,7 @@ packagesImpacted:
 successSignals:
   - "llms-full.txt and JSON-LD include the offering: prices, written guarantees, and the service catalog — drawn from the existing RFC-0138 offer schema and the service schema."
   - "A site with an offer.md but no rich prose still produces an AI file that explains what the business sells, for how much, with what guarantees."
-  - "webgogol-com's llms-full.txt grows from organization contact facts to a substantive business description."
+  - "warpgogol-com's llms-full.txt grows from organization contact facts to a substantive business description."
 nonGoals:
   - "Do not author new business data — project the existing offer/service schemas only."
   - "Do not duplicate the offer source of truth — read RFC-0138 offer-canonical, never a second copy."
@@ -59,7 +59,7 @@ nonGoals:
 - the **organization profile** — `loadSiteSemanticProfile` ([semantic-loader.ts](../../packages/os/site-kernel-content/src/semantic-loader.ts)) reads only `business/company.md`, `legal.md`, `contact.md` → name, legal name, address, founders, contact points, donation account;
 - **per-page content** — prose answer-blocks, people, initiatives, and (for donation-contact pages) FAQ.
 
-But the richest, most decision-relevant business data is authored elsewhere and **never projected**. `apps/webgogol-com/src/content/business/` contains:
+But the richest, most decision-relevant business data is authored elsewhere and **never projected**. `apps/warpgogol-com/src/content/business/` contains:
 
 - `offer.md` — the RFC-0138 canonical offer: `price.{monthly,yearly,setup}` and written `guarantees.{delivery,uptime,smallChanges,response,dataPackage}.{label,detail}` (the single source of truth for prices and guarantees, validated by the offer-canonical schema in [packages/business/src/schemas/offer-canonical.ts](../../packages/business/src/schemas/offer-canonical.ts));
 - `services.md` — the service catalog (service schema);
@@ -67,7 +67,7 @@ But the richest, most decision-relevant business data is authored elsewhere and 
 
 The `SemanticPageModel` even declares a `services?: SemanticService[]` field — but no loader ever populates it, and there is no offer concept in the semantic model at all.
 
-The visible symptom: `apps/webgogol-com/public/llms-full.txt` is ~700 bytes — organization contact facts and nothing else — despite the site having a fully specified offer (price `70 €/Monat`, five written guarantees), a service catalog, and pages. (A secondary cause compounds it: webgogol-com's `system.md` pages carry **no `semanticType`**, so even their prose does not generate — see Rollout.)
+The visible symptom: `apps/warpgogol-com/public/llms-full.txt` is ~700 bytes — organization contact facts and nothing else — despite the site having a fully specified offer (price `70 €/Monat`, five written guarantees), a service catalog, and pages. (A secondary cause compounds it: warpgogol-com's `system.md` pages carry **no `semanticType`**, so even their prose does not generate — see Rollout.)
 
 ## Problem
 
@@ -102,7 +102,7 @@ Project the existing business **offer** and **service catalog** into the semanti
 
 4. **Projection control (RFC-0143).** The offer/service sections honor the same spirit as per-page `output`: a site-level toggle (e.g. `output.offer: false` in `system.md`, default true when an offer exists) lets a site opt out. Kept minimal — site-wide, mirroring the `ai:` / `robots:` policy family, not per-page.
 
-5. **webgogol-com content adoption.** Add `semanticType` (+ the RFC-0143 `output`) to webgogol-com's content pages so their prose also flows into the projection. This is content/manifest work, sequenced after the projection lands so the effect is visible.
+5. **warpgogol-com content adoption.** Add `semanticType` (+ the RFC-0143 `output`) to warpgogol-com's content pages so their prose also flows into the projection. This is content/manifest work, sequenced after the projection lands so the effect is visible.
 
 ## Architectural fit
 
@@ -128,9 +128,9 @@ Project the existing business **offer** and **service catalog** into the semanti
 | `packages/business/src/semantic-profile.ts` | Same projection on the Astro path (shared once RFC-0146 lands). |
 | `packages/share/src/semantic/llms.ts` | Emit `## Offer` / `## Services`. |
 | `packages/share/src/semantic/jsonld.ts` | Emit `Offer` / `Service` on the Organization. |
-| `apps/webgogol-com/src/content/system.md` | Add `semanticType` + `output` to content pages (Rollout). |
+| `apps/warpgogol-com/src/content/system.md` | Add `semanticType` + `output` to content pages (Rollout). |
 
-### Output sketch (webgogol-com `llms-full.txt`)
+### Output sketch (warpgogol-com `llms-full.txt`)
 
 ```txt
 ## Offer
@@ -160,7 +160,7 @@ Project the existing business **offer** and **service catalog** into the semanti
 1. **Phase 1 — model + schema read.** Add the semantic types; read offer/services in the profile loader (disk path).
 2. **Phase 2 — formatters.** Emit `## Offer` / `## Services` in llms and the schema.org nodes in JSON-LD.
 3. **Phase 3 — Astro parity.** Mirror the profile projection on the Astro path (single source once RFC-0146 consolidates the profile builder).
-4. **Phase 4 — webgogol-com content.** Add `semanticType` + `output` to webgogol-com content pages; verify `llms-full.txt` now describes the business.
+4. **Phase 4 — warpgogol-com content.** Add `semanticType` + `output` to warpgogol-com content pages; verify `llms-full.txt` now describes the business.
 5. **Phase 5 — onboarding.** Scaffold/templates note the offer projection so new commercial sites get it for free.
 
 ## Alternatives considered
@@ -169,7 +169,7 @@ Project the existing business **offer** and **service catalog** into the semanti
 
 **Put the offer on a page (per-page `output`).** Rejected. Pricing/guarantees are site-wide facts about the business, not properties of one page; projecting them at the organization level matches their nature and avoids duplication across pages.
 
-**Only fix webgogol-com's missing `semanticType`.** Rejected as insufficient. That alone would surface prose answer-blocks but still omit the structured offer — the highest-value data — because no loader reads it.
+**Only fix warpgogol-com's missing `semanticType`.** Rejected as insufficient. That alone would surface prose answer-blocks but still omit the structured offer — the highest-value data — because no loader reads it.
 
 ## Risks
 
@@ -186,7 +186,7 @@ Project the existing business **offer** and **service catalog** into the semanti
 - [x] `buildLlmsFull` emits `## Offer` (prices + guarantees). (`## Services` + the `buildLlmsIndex` summary line ship with the services projector.) (evidence: implemented historically)
 - [x] JSON-LD emits schema.org `Offer` / `PriceSpecification` on the Organization (`makesOffer`). (`Service` deferred.) (evidence: implemented historically)
 - [x] Site-level `output.offer` opt-out — deferred (absent offer already omits the section). (evidence: implemented historically)
-- [x] webgogol-com content pages gain `semanticType` + `output`; its `llms-full.txt` (1544 → 2929 B) and JSON-LD describe the offering and pages. (evidence: implemented historically)
+- [x] warpgogol-com content pages gain `semanticType` + `output`; its `llms-full.txt` (1544 → 2929 B) and JSON-LD describe the offering and pages. (evidence: implemented historically)
 - [x] nicaragua output unchanged except projectable data (gained `## Location`; no offer → no Offer section). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `pnpm build` green for both apps; `rfc.validate` passes. (evidence: implemented historically)
 
@@ -197,5 +197,5 @@ Project the existing business **offer** and **service catalog** into the semanti
 - Agents MUST read the offer through the RFC-0138 offer-canonical schema in `@gogol/business` — never re-define or copy the offer shape.
 - Agents MUST project offer/services at the organization level, not per-page.
 - Agents MUST keep the offer section omitted when no `offer.md` exists (no error).
-- Agents MUST sequence the webgogol-com `semanticType` adoption after the projection lands, and verify the resulting `llms-full.txt` by inspection.
+- Agents MUST sequence the warpgogol-com `semanticType` adoption after the projection lands, and verify the resulting `llms-full.txt` by inspection.
 - When implementing, agents MUST reference `RFC-0147` in commits / PRs.

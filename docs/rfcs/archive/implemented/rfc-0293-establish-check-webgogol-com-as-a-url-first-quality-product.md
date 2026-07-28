@@ -1,6 +1,6 @@
 ---
 id: RFC-0293
-title: "Establish check-webgogol-com as a URL-first quality product"
+title: "Establish check-warpgogol-com as a URL-first quality product"
 status: implemented
 kind: architecture
 scope: workspace
@@ -38,17 +38,17 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
   - apps/*
 packagesImpacted:
   - "@gogol/check-core"
   - "@gogol/check-runner-node"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
   - "@gogol/site-kernel-checks"
 successSignals:
   - "Every checked target, including apps/* deployed to alt hosting, is audited from its public or private URL rather than from repository source files."
   - "The same check pipeline can evaluate a WGogol site and a third-party site; WGogol hints only improve locator precision."
-  - "The product app check-webgogol-com is a thin WGogol app that displays and manages check runs, while reusable check logic lives in packages/*."
+  - "The product app check-warpgogol-com is a thin WGogol app that displays and manages check runs, while reusable check logic lives in packages/*."
   - "deploy:main can be gated on a successful check of the deploy:alt URL without adding app-specific source validators."
 nonGoals:
   - "Do not build a source-first app validator for apps/*; repository validators already exist for source contracts."
@@ -63,10 +63,10 @@ acceptance:
   - probe: file-exists
     path: "packages/check-core/src/target.ts"
   - probe: file-exists
-    path: "packages/os/site-kernel-check-webgogol/package.json"
+    path: "packages/os/site-kernel-check-warpgogol/package.json"
 ---
 
-# RFC-0293: Establish check-webgogol-com as a URL-first quality product
+# RFC-0293: Establish check-warpgogol-com as a URL-first quality product
 
 ## Context
 
@@ -79,11 +79,11 @@ The deployment workflow also points away from source-first checking. Before publ
 - A source-first checker would create two mental models: internal app checks and external site checks.
 - It would miss deployment-only failures: broken alt-host assets, wrong headers, CDN redirects, stale generated files, robots behavior, missing well-known artifacts, and rendering regressions.
 - It would make the product less portable because findings would assume WGogol source paths.
-- A deployed `check-webgogol-com` app cannot safely execute heavy browser automation inside the normal Cloudflare Worker request path.
+- A deployed `check-warpgogol-com` app cannot safely execute heavy browser automation inside the normal Cloudflare Worker request path.
 
 ## Decision
 
-Build **check-webgogol-com** as a URL-first site-quality product.
+Build **check-warpgogol-com** as a URL-first site-quality product.
 
 Every target is checked through a `CheckTarget` whose primary identity is a URL. This applies equally to:
 
@@ -92,20 +92,20 @@ Every target is checked through a `CheckTarget` whose primary identity is a URL.
 - a third-party business website;
 - a local preview server URL.
 
-WGogol source knowledge is optional. A WGogol site may expose a `.well-known/webgogol-check.json` hint file (RFC-0295). The checker still crawls and renders the URL, but when hints exist it can translate findings into precise `pageId`, `lang`, `blockId`, and source-locator suggestions. Without hints, the same rules run with URL, DOM, screenshot, and text locators.
+WGogol source knowledge is optional. A WGogol site may expose a `.well-known/warpgogol-check.json` hint file (RFC-0295). The checker still crawls and renders the URL, but when hints exist it can translate findings into precise `pageId`, `lang`, `blockId`, and source-locator suggestions. Without hints, the same rules run with URL, DOM, screenshot, and text locators.
 
 The product is split into three layers:
 
 1. **Core package:** evidence graph, target schema, report schema, scoring and shared types.
 2. **Runner package:** Node/Playwright execution lane that captures rendered evidence and runs checks.
-3. **Operator app:** `apps/check-webgogol-com`, a thin WGogol site that launches, displays, compares, and explains reports. It does not own check logic.
+3. **Operator app:** `apps/check-warpgogol-com`, a thin WGogol site that launches, displays, compares, and explains reports. It does not own check logic.
 
 ## Architectural fit
 
-- RFC-0203 already gives the ecosystem a canonical `Diagnostic` model. Check Webgogol extends it with URL and screenshot locators in `data`, not by inventing a parallel finding shape.
-- RFC-0233 already separates deterministic, heuristic, and perceptual visual checks. Check Webgogol applies the same tiering to rendered websites.
-- RFC-0074 already defines deterministic audits plus cached LLM audits. Check Webgogol uses the same split: deterministic URL checks first, cached AI audience reviews second.
-- RFC-0286 establishes well-known agent surfaces. Check Webgogol does not replace that surface; it consumes public artifacts such as `llms.txt`, `ai.txt`, JSON-LD, cosmic passport, and the new optional check hints.
+- RFC-0203 already gives the ecosystem a canonical `Diagnostic` model. Check Warpgogol extends it with URL and screenshot locators in `data`, not by inventing a parallel finding shape.
+- RFC-0233 already separates deterministic, heuristic, and perceptual visual checks. Check Warpgogol applies the same tiering to rendered websites.
+- RFC-0074 already defines deterministic audits plus cached LLM audits. Check Warpgogol uses the same split: deterministic URL checks first, cached AI audience reviews second.
+- RFC-0286 establishes well-known agent surfaces. Check Warpgogol does not replace that surface; it consumes public artifacts such as `llms.txt`, `ai.txt`, JSON-LD, cosmic passport, and the new optional check hints.
 
 ## Design
 
@@ -144,9 +144,9 @@ export interface CheckTargetPolicy {
 ### Commands
 
 ```sh
-pnpm exec site-kernel run check.target.validate --target ./check-targets/webgogol-alt.yaml --json
+pnpm exec site-kernel run check.target.validate --target ./check-targets/warpgogol-alt.yaml --json
 pnpm exec site-kernel run check.run --url https://alt.example.invalid --profile handwerk-de --json
-pnpm exec site-kernel run check.run --target ./check-targets/webgogol-alt.yaml --json
+pnpm exec site-kernel run check.run --target ./check-targets/warpgogol-alt.yaml --json
 ```
 
 `check.run` orchestrates the child commands introduced by RFC-0294 through RFC-0299:
@@ -166,9 +166,9 @@ When child RFCs are not yet implemented, `check.run` must fail with a clear miss
 | --- | --- |
 | `packages/check-core/` | Framework-neutral types and pure scoring/report helpers. |
 | `packages/check-runner-node/` | Node + Playwright crawler, screenshot, DOM extraction, and AI-review execution harness. |
-| `packages/os/site-kernel-check-webgogol/` | Kernel command registration for check commands. |
-| `apps/check-webgogol-com/` | Thin operator app created via onboarding, never by copying another app. |
-| `.check-webgogol/runs/` | Local gitignored run artifacts for CLI/local app development. |
+| `packages/os/site-kernel-check-warpgogol/` | Kernel command registration for check commands. |
+| `apps/check-warpgogol-com/` | Thin operator app created via onboarding, never by copying another app. |
+| `.check-warpgogol/runs/` | Local gitignored run artifacts for CLI/local app development. |
 
 ### Invariants
 
@@ -185,13 +185,13 @@ When child RFCs are not yet implemented, `check.run` must fail with a clear miss
 3. Add optional WGogol `.well-known` hints (RFC-0295).
 4. Add reports, diagnostics, and action packs (RFC-0297).
 5. Add deterministic and AI review lanes (RFC-0298, RFC-0299).
-6. Scaffold `apps/check-webgogol-com` using onboarding (RFC-0300).
+6. Scaffold `apps/check-warpgogol-com` using onboarding (RFC-0300).
 7. Wire the deploy-alt gate before `deploy:main` (RFC-0301).
 
 ## Alternatives considered
 
 - **Source-first validator for WGogol apps.** Rejected: useful internally, but duplicates existing validators and does not become a product for arbitrary sites.
-- **Make `check-webgogol-com` itself run browser checks in production.** Rejected for the first implementation: Cloudflare Worker request paths are not a safe place for Playwright or long crawls.
+- **Make `check-warpgogol-com` itself run browser checks in production.** Rejected for the first implementation: Cloudflare Worker request paths are not a safe place for Playwright or long crawls.
 - **Third-party SaaS checker integration.** Rejected as the spine. External APIs may be adapters later, but the core evidence graph and diagnostics must be first-party and reproducible.
 
 ## Risks

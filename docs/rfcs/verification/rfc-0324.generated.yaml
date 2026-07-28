@@ -16,7 +16,7 @@ acceptanceHash: d3b442fd58bdc9ff301b5563e646368d9185ac84a76985fcbf38f44b0c7231d8
 probes:
   - probe:
       probe: run
-      command: site-kernel run surface.evidence.validate --app webgogol-com
+      command: site-kernel run surface.evidence.validate --app warpgogol-com
         --blueprint website-local --json
       expect:
         exitCode: 0
@@ -25,7 +25,7 @@ probes:
     durationMs: 20496
   - probe:
       probe: run
-      command: site-kernel run surface.duplicate.validate --app webgogol-com
+      command: site-kernel run surface.duplicate.validate --app warpgogol-com
         --blueprint website-local --json
       expect:
         exitCode: 0
@@ -34,7 +34,7 @@ probes:
     durationMs: 18973
   - probe:
       probe: run
-      command: site-kernel run pseo.validate --app webgogol-com --json
+      command: site-kernel run pseo.validate --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true

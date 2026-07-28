@@ -30,7 +30,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
@@ -86,8 +86,8 @@ Adopt a two-step contract:
 
 ```sh
 # Full parity proof (expensive — CI scheduled job, not per-PR):
-pnpm exec site-kernel run pipeline.cache.parity --app webgogol-com
-pnpm exec site-kernel run pipeline.cache.parity --app webgogol-com --json
+pnpm exec site-kernel run pipeline.cache.parity --app warpgogol-com
+pnpm exec site-kernel run pipeline.cache.parity --app warpgogol-com --json
 ```
 
 App-scoped, mutates nothing outside a scratch snapshot directory, requires no network.
@@ -138,7 +138,7 @@ Exit 1 on any parity violation. The command performs: cold run (`turbo run build
 3. Wire a scheduled CI job (weekly) running parity for both apps, so regressions surface even while caching is off.
 4. Step 2 re-enablement happens only via rfc-0266 and a superseding change that flips `cache` back on with generated outputs; that change MUST cite a green parity run in its PR.
 
-**As-built, 2026-07-02:** `turbo.json`'s generic `build`/`build:check` task keys are shared by every workspace package (most of which are plain `tsc --noEmit` library builds, not self-mutating); scoping `cache: false` there would have regressed caching well beyond the RFC's stated "app-affecting" scope. Implemented instead as per-package task overrides — `webgogol-com#build`, `webgogol-com#build:check`, `nicaragua-projekt#build`, `nicaragua-projekt#build:check` — each with `cache: false` and `dependsOn: [..., "//#registry:build"]`; the generic `build`/`build:check` keys and every other package's caching are untouched. Verified via `turbo run build --dry-run=json` / `turbo run build:check --dry-run=json`: both app tasks show `cache.local: false` and `//#registry:build` in their dependency list, and the root task carries the two declared registry outputs. A full `pnpm build` timing run (RFC-0255 output) and the `pipeline.cache.parity` command itself (a real cold+warm build cycle, minutes per app) are deferred to the scheduled CI job below rather than run in-session — consistent with the RFC's own framing of the parity check as CI-scheduled, not per-PR.
+**As-built, 2026-07-02:** `turbo.json`'s generic `build`/`build:check` task keys are shared by every workspace package (most of which are plain `tsc --noEmit` library builds, not self-mutating); scoping `cache: false` there would have regressed caching well beyond the RFC's stated "app-affecting" scope. Implemented instead as per-package task overrides — `warpgogol-com#build`, `warpgogol-com#build:check`, `nicaragua-projekt#build`, `nicaragua-projekt#build:check` — each with `cache: false` and `dependsOn: [..., "//#registry:build"]`; the generic `build`/`build:check` keys and every other package's caching are untouched. Verified via `turbo run build --dry-run=json` / `turbo run build:check --dry-run=json`: both app tasks show `cache.local: false` and `//#registry:build` in their dependency list, and the root task carries the two declared registry outputs. A full `pnpm build` timing run (RFC-0255 output) and the `pipeline.cache.parity` command itself (a real cold+warm build cycle, minutes per app) are deferred to the scheduled CI job below rather than run in-session — consistent with the RFC's own framing of the parity check as CI-scheduled, not per-PR.
 
 ## Alternatives considered
 

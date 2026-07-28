@@ -7,7 +7,7 @@ createdAt: 2026-07-21
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/faq"
     - "@gogol/share"
@@ -30,9 +30,9 @@ scope:
 - [ ] O1 — Create `@gogol/faq` package with Zod schema, collection factory, loaders, and semantic mapping helper (maps to acceptance: package-level criteria)
 - [ ] O2 — Add `faq.validate` command to `site-kernel-checks` and wire into `sites-check-author` pipeline (maps to acceptance: validator-level criteria)
 - [ ] O3 — Update `content.config.ts` and `astro.config.mjs` templates to include FAQ collection by default (maps to acceptance: template-level criteria)
-- [ ] O4 — Recover 12 legacy FAQ files (6 DE + 6 UK) to `systems/webgogol-com/src/content/faq/{lang}/` with claims-sidecar migration (maps to acceptance: site-level criteria)
+- [ ] O4 — Recover 12 legacy FAQ files (6 DE + 6 UK) to `systems/warpgogol-com/src/content/faq/{lang}/` with claims-sidecar migration (maps to acceptance: site-level criteria)
 - [ ] O5 — Update Compass XML and AGENTS.md documentation (maps to acceptance: documentation-level criteria)
-- [ ] O6 — Verify build and validation pass (maps to acceptance: `faq.validate` passes, `pnpm --filter webgogol-com build` succeeds, `rfc.validate` passes)
+- [ ] O6 — Verify build and validation pass (maps to acceptance: `faq.validate` passes, `pnpm --filter warpgogol-com build` succeeds, `rfc.validate` passes)
 
 ## 2. Affected artifacts
 
@@ -56,10 +56,10 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `systems/webgogol-com/src/content/faq/de/*.md` — 6 DE FAQ files (recovered from git history `ce8e6f7ee~1`)
-- `systems/webgogol-com/src/content/faq/uk/*.md` — 6 UK FAQ files (recovered from git history `ce8e6f7ee~1`)
-- `systems/webgogol-com/src/content/faq/de/df-start.md` — governance block with `fieldClaims.question`
-- `systems/webgogol-com/src/content/faq/uk/df-start.md` — governance block with `fieldClaims.question`
+- `systems/warpgogol-com/src/content/faq/de/*.md` — 6 DE FAQ files (recovered from git history `ce8e6f7ee~1`)
+- `systems/warpgogol-com/src/content/faq/uk/*.md` — 6 UK FAQ files (recovered from git history `ce8e6f7ee~1`)
+- `systems/warpgogol-com/src/content/faq/de/df-start.md` — governance block with `fieldClaims.question`
+- `systems/warpgogol-com/src/content/faq/uk/df-start.md` — governance block with `fieldClaims.question`
 
 ### 2.3 Documentation and specs
 
@@ -75,7 +75,7 @@ scope:
 
 - `sites-check-author` pipeline — add `faq.validate` step
 - `pnpm --filter @gogol/faq build:check` — package build verification
-- `pnpm --filter webgogol-com build` — site build verification
+- `pnpm --filter warpgogol-com build` — site build verification
 - `pnpm exec site-kernel run rfc.validate --id RFC-0475` — RFC mechanical validation
 
 ## 3. Step sequence
@@ -212,15 +212,15 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run routes.generate --site webgogol-com` to regenerate `content.config.ts` from the updated codegen template
+- Run `pnpm exec site-kernel run routes.generate --site warpgogol-com` to regenerate `content.config.ts` from the updated codegen template
 - Verify the generated file contains `createFaqCollection` import and `...faq` spread
 
 **Validation:**
 
-- `grep "createFaqCollection" systems/webgogol-com/src/content.config.ts` returns match
-- `grep "...faq" systems/webgogol-com/src/content.config.ts` returns match
+- `grep "createFaqCollection" systems/warpgogol-com/src/content.config.ts` returns match
+- `grep "...faq" systems/warpgogol-com/src/content.config.ts` returns match
 
-**Completion criterion:** `systems/webgogol-com/src/content.config.ts` includes FAQ collection.
+**Completion criterion:** `systems/warpgogol-com/src/content.config.ts` includes FAQ collection.
 
 **Human review:** no
 
@@ -253,17 +253,17 @@ scope:
 
 **Agent actions:**
 
-- Extract 6 DE FAQ files from `ce8e6f7ee~1:apps/webgogol-com/src/content/business/de/faq/`:
+- Extract 6 DE FAQ files from `ce8e6f7ee~1:apps/warpgogol-com/src/content/business/de/faq/`:
   - `df-baukasten.md`, `df-kuendigung.md`, `df-start.md`, `df-vertrag.md`, `df-wer-dahinter.md`, `warum-abonnement.md`
-- Write to `systems/webgogol-com/src/content/faq/de/`
+- Write to `systems/warpgogol-com/src/content/faq/de/`
 - Preserve original frontmatter (`slug`, `question`, `answer`, `order`, `tags`) and body content
 
 **Validation:**
 
-- `ls systems/webgogol-com/src/content/faq/de/` shows 6 `.md` files
+- `ls systems/warpgogol-com/src/content/faq/de/` shows 6 `.md` files
 - Each file has required frontmatter fields
 
-**Completion criterion:** 6 DE FAQ files exist at `systems/webgogol-com/src/content/faq/de/`.
+**Completion criterion:** 6 DE FAQ files exist at `systems/warpgogol-com/src/content/faq/de/`.
 
 **Human review:** no
 
@@ -275,17 +275,17 @@ scope:
 
 **Agent actions:**
 
-- Extract 6 UK FAQ files from `ce8e6f7ee~1:apps/webgogol-com/src/content/business/uk/faq/`:
+- Extract 6 UK FAQ files from `ce8e6f7ee~1:apps/warpgogol-com/src/content/business/uk/faq/`:
   - Same filenames as DE
-- Write to `systems/webgogol-com/src/content/faq/uk/`
+- Write to `systems/warpgogol-com/src/content/faq/uk/`
 - Preserve Ukrainian text as primary source
 
 **Validation:**
 
-- `ls systems/webgogol-com/src/content/faq/uk/` shows 6 `.md` files
+- `ls systems/warpgogol-com/src/content/faq/uk/` shows 6 `.md` files
 - Each file has required frontmatter fields with Ukrainian content
 
-**Completion criterion:** 6 UK FAQ files exist at `systems/webgogol-com/src/content/faq/uk/`.
+**Completion criterion:** 6 UK FAQ files exist at `systems/warpgogol-com/src/content/faq/uk/`.
 
 **Human review:** no
 
@@ -297,17 +297,17 @@ scope:
 
 **Agent actions:**
 
-- Extract claims metadata from `ce8e6f7ee~1:apps/webgogol-com/src/content/business/de/faq/df-start.claims.yaml`:
+- Extract claims metadata from `ce8e6f7ee~1:apps/warpgogol-com/src/content/business/de/faq/df-start.claims.yaml`:
   - `question: { provenance: asserted, asOf: "2026-01-01", confidence: high }`
-- Add `governance` block to `systems/webgogol-com/src/content/faq/de/df-start.md` frontmatter
-- Add same `governance` block to `systems/webgogol-com/src/content/faq/uk/df-start.md` frontmatter
+- Add `governance` block to `systems/warpgogol-com/src/content/faq/de/df-start.md` frontmatter
+- Add same `governance` block to `systems/warpgogol-com/src/content/faq/uk/df-start.md` frontmatter
 - Do NOT create `.claims.yaml` sidecar files
 
 **Validation:**
 
-- `grep "governance" systems/webgogol-com/src/content/faq/de/df-start.md` returns match
-- `grep "governance" systems/webgogol-com/src/content/faq/uk/df-start.md` returns match
-- `grep "fieldClaims" systems/webgogol-com/src/content/faq/de/df-start.md` returns match
+- `grep "governance" systems/warpgogol-com/src/content/faq/de/df-start.md` returns match
+- `grep "governance" systems/warpgogol-com/src/content/faq/uk/df-start.md` returns match
+- `grep "fieldClaims" systems/warpgogol-com/src/content/faq/de/df-start.md` returns match
 
 **Completion criterion:** Both `df-start.md` files contain `governance.fieldClaims.question` block.
 
@@ -348,8 +348,8 @@ scope:
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0475` — must pass
 - Run `pnpm --filter @gogol/faq build:check` — must pass
 - Run `pnpm --filter @gogol/site-kernel-checks build:check` — must pass
-- Run `pnpm exec site-kernel run faq.validate --site webgogol-com` — must pass
-- Run `pnpm --filter webgogol-com build` — must succeed
+- Run `pnpm exec site-kernel run faq.validate --site warpgogol-com` — must pass
+- Run `pnpm --filter warpgogol-com build` — must succeed
 - Fix any failures
 
 **Validation:**
@@ -371,7 +371,7 @@ scope:
 
 - `git add` only files created/modified in this session
 - Commit with message: `feat: RFC-0475 pluggable FAQ content module and content recovery`
-- Run `sternsystem.sync --id webgogol-com` to push to mirror (manual operator action — recommend in output)
+- Run `sternsystem.sync --id warpgogol-com` to push to mirror (manual operator action — recommend in output)
 
 **Validation:**
 
@@ -389,14 +389,14 @@ scope:
 - `pnpm exec site-kernel run rfc.validate --id RFC-0475`
 - `pnpm --filter @gogol/faq build:check`
 - `pnpm --filter @gogol/site-kernel-checks build:check`
-- `pnpm exec site-kernel run faq.validate --site webgogol-com`
-- `pnpm --filter webgogol-com build`
+- `pnpm exec site-kernel run faq.validate --site warpgogol-com`
+- `pnpm --filter warpgogol-com build`
 
 ### 4.2 Evidence artifacts
 
 - Commit messages referencing `RFC-0475` in the subject line (RFC-0265 commit hygiene)
 - `faq.validate` pass output as evidence for acceptance criterion
-- `pnpm --filter webgogol-com build` success as evidence for acceptance criterion
+- `pnpm --filter warpgogol-com build` success as evidence for acceptance criterion
 
 ## 5. Risks and mitigation
 

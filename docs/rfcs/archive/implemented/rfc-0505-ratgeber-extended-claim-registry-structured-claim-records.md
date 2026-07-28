@@ -42,7 +42,7 @@ commands:
     - ratgeber.provenance.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/share"
@@ -221,7 +221,7 @@ Migrator id: `rfc-0505`.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.claim.validate --site webgogol-com --json
+pnpm exec site-kernel run ratgeber.claim.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check` (blocking).
@@ -348,9 +348,9 @@ The validator scans: claim records (~10–50 files per language), article record
 4. Create `packages/os/site-kernel-handoff/src/migrators/rfc-0505.ts`.
 5. Register migrator in `registry.ts`.
 6. Register `ratgeber.claim.validate` in `tools/kernel.config.ts`.
-7. Run migrator on webgogol-com mission workpiece — transforms existing claim sidecars into claim records, deletes sidecars.
+7. Run migrator on warpgogol-com mission workpiece — transforms existing claim sidecars into claim records, deletes sidecars.
 8. Populate `claimText`, `limitations`, and `calculationInputs` for the two reference articles (lokale-sichtbarkeit, website-kosten) — this is human editorial work.
-9. Verify with `ratgeber.claim.validate --site webgogol-com --json` and `ratgeber.provenance.validate --site webgogol-com --json`.
+9. Verify with `ratgeber.claim.validate --site warpgogol-com --json` and `ratgeber.provenance.validate --site warpgogol-com --json`.
 10. Compass sync: update `docs/verification-plan.xml`, `docs/COMMANDS.md`, `docs/requirements.xml`, `docs/technology.xml`, `docs/knowledge-graph.xml`, `packages/os/site-kernel-checks/AGENTS.md`.
 
 ## Alternatives considered
@@ -390,7 +390,7 @@ The validator scans: claim records (~10–50 files per language), article record
 
 - [x] `ratgeber.claim.validate` is implemented and registered in `tools/kernel.config.ts`. (evidence: `packages/os/site-kernel-checks/src/ratgeber-claim-validate.ts` + command registration)
 - [x] Claim record Zod schema is exported from `@gogol/share/schemas`. (evidence: `packages/share/src/schemas/claim-records.ts` + re-export in `packages/share/src/schemas/index.ts`)
-- [x] `ratgeber.claim.validate --site webgogol-com --json` passes. (evidence: command output with `status: pass`)
+- [x] `ratgeber.claim.validate --site warpgogol-com --json` passes. (evidence: command output with `status: pass`)
 - [x] RG-CLAIM-01..09 rules are implemented. (evidence: `packages/os/site-kernel-checks/src/ratgeber-claim-validate.ts` — all 9 rules present)
 - [x] `ratgeber.provenance.validate` RG-PROV-03 checks claim records instead of sidecars. (evidence: `packages/os/site-kernel-checks/src/ratgeber-provenance-validate.ts` — RG-PROV-03 resolves against `surface/claims/`)
 - [x] `ratgeber.provenance.validate` RG-PROV-06 checks article `claimIds` resolve to claim records. (evidence: `packages/os/site-kernel-checks/src/ratgeber-provenance-validate.ts` — RG-PROV-06 rule)

@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-checks"
     - "@gogol/site-kernel-handoff"
@@ -165,7 +165,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run ratgeber.provenance.validate --site webgogol-com --json` — command is found and runs
+- `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json` — command is found and runs
 
 **Completion criterion:** Command is registered, discoverable, and runs without crashing (empty diagnostics on a clean site or appropriate diagnostics on a site with issues).
 
@@ -191,7 +191,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.generate --site webgogol-com` — surface generates with provenance footer block
+- `pnpm exec site-kernel run surface.generate --site warpgogol-com` — surface generates with provenance footer block
 
 **Completion criterion:** Baked article pages include the provenance footer as the final block.
 
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run source.binding.validate --site webgogol-com --json` — runs without error
+- `pnpm exec site-kernel run source.binding.validate --site warpgogol-com --json` — runs without error
 
 **Completion criterion:** `source.binding.validate` scans both business and article claim sidecars.
 
@@ -305,8 +305,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks run test`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run ratgeber.provenance.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run source.binding.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run source.binding.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 

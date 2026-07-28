@@ -60,7 +60,7 @@ nonGoals:
 
 ## Context
 
-The audit found obsolete generated Markdown twins and PSEO generations still present under `apps/webgogol-com/public/`: an old `/digitales-fundament/index.md` twin, earlier flat PSEO trees, city/city duplicates, and empty directories. Some retired URLs may have already been published, so the cleanup must be paired with redirect policy.
+The audit found obsolete generated Markdown twins and PSEO generations still present under `apps/warpgogol-com/public/`: an old `/digitales-fundament/index.md` twin, earlier flat PSEO trees, city/city duplicates, and empty directories. Some retired URLs may have already been published, so the cleanup must be paired with redirect policy.
 
 This is the exact failure mode RFC-0087 and RFC-0307 are meant to prevent: generated outputs must be single-owner, idempotent, and cleaned when their source set changes.
 
@@ -189,7 +189,7 @@ Scope: app plus `--base-url`, networked.
 Inputs:
 
 ```sh
-pnpm exec site-kernel run deploy.surface.parity.validate --app webgogol-com --base-url https://webgogol.com --json
+pnpm exec site-kernel run deploy.surface.parity.validate --app warpgogol-com --base-url https://warpgogol.com --json
 ```
 
 Behavior:
@@ -235,7 +235,7 @@ Behavior:
 - [x] `page.markdown.generate` and `surface.generate` clean stale generated twins before writing current output. (evidence: implemented historically)
 - [x] Empty directories under managed public trees are removed by the cleanup pass. (evidence: implemented historically)
 - [x] Retired audited URL patterns have generated 301/410 policy with target-existence validation. (evidence: implemented historically)
-- [x] `find apps/webgogol-com/public -name index.md` count matches the expected eligible twin set after generation, represented by `public.orphans.validate`. (evidence: implemented historically)
+- [x] `find apps/warpgogol-com/public -name index.md` count matches the expected eligible twin set after generation, represented by `public.orphans.validate`. (evidence: implemented historically)
 - [x] Behavior snapshot diffs show redirect changes and are reviewed before committing. (evidence: implemented historically)
 - [x] `deploy.surface.parity.validate --base-url <prod>` passes before IndexNow submission for a changed public surface. (evidence: implemented historically)
 - [x] `rfc.validate` passes. (evidence: implemented historically)

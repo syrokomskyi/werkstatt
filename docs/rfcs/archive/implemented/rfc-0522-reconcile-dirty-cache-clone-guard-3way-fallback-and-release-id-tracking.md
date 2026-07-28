@@ -66,7 +66,7 @@ Additionally, `release.prepare` creates a release and returns its ID, but does n
 
 ### Incident report
 
-During mission `webgogol-com-m000010`, the following occurred:
+During mission `warpgogol-com-m000010`, the following occurred:
 
 1. Cache clone had 27 uncommitted files from parallel agent work.
 2. `mission.reconcile` failed with `git am` errors: "already exists in index" for 11 generated files.
@@ -115,7 +115,7 @@ The fallback is automatic — no operator flag or intervention needed. `--3way` 
 After successful `release.prepare`, write the release ID to `mission.yaml`:
 
 ```yaml
-releaseId: "webgogol-com-r000001"
+releaseId: "warpgogol-com-r000001"
 ```
 
 On re-run, overwrite the previous value — the last successful `release.prepare` is the active release.

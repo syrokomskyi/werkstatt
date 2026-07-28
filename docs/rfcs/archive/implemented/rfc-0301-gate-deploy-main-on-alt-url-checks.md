@@ -34,7 +34,7 @@ commands:
 appsImpacted:
   - apps/*
 packagesImpacted:
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
   - "@gogol/site-kernel-deploy"
 successSignals:
   - "A WGogol app can deploy to alt, run URL-first checks against that alt URL, and block deploy:main on error diagnostics."
@@ -55,7 +55,7 @@ acceptance:
 
 ## Context
 
-WGogol already reviews sites on a closed alt host before main deployment. Check Webgogol makes that review structured and repeatable. The gate should check the deployed URL, not the source tree, and should preserve the existing source/build validators.
+WGogol already reviews sites on a closed alt host before main deployment. Check Warpgogol makes that review structured and repeatable. The gate should check the deployed URL, not the source tree, and should preserve the existing source/build validators.
 
 ## Problem
 
@@ -71,8 +71,8 @@ Without a formal gate:
 Add a deploy gate:
 
 ```sh
-pnpm exec site-kernel run check.deploy-alt.run --app webgogol-com --json
-pnpm exec site-kernel run check.deploy-main.gate --app webgogol-com --json
+pnpm exec site-kernel run check.deploy-alt.run --app warpgogol-com --json
+pnpm exec site-kernel run check.deploy-main.gate --app warpgogol-com --json
 ```
 
 `check.deploy-alt.run` discovers or receives the alt URL, runs `check.run`, and writes a check report artifact.
@@ -93,7 +93,7 @@ pnpm exec site-kernel run check.deploy-main.gate --app webgogol-com --json
 Each app may declare a check policy in `src/content/system.md`:
 
 ```yaml
-checkWebgogol:
+checkWarpgogol:
   deployGate:
     enabled: true
     altUrlEnv: WEBGOGOL_ALT_URL
@@ -111,13 +111,13 @@ Absent config means the commands are available but not wired into deployment.
 `check.deploy-alt.run` resolves:
 
 1. explicit `--url`;
-2. `checkWebgogol.deployGate.altUrlEnv`;
+2. `checkWarpgogol.deployGate.altUrlEnv`;
 3. deploy module output metadata if available.
 
 It writes artifacts under:
 
 ```txt
-.check-webgogol/deploy/<app>/<timestamp-or-git-sha>/
+.check-warpgogol/deploy/<app>/<timestamp-or-git-sha>/
 ```
 
 ### Gate Rules
@@ -146,10 +146,10 @@ The gate does not perform `deploy:main`; it only authorizes the next step.
 
 ## Rollout
 
-1. Add schema for `checkWebgogol.deployGate`.
+1. Add schema for `checkWarpgogol.deployGate`.
 2. Implement alt URL resolution and report writing.
 3. Implement gate command and fixtures.
-4. Add optional scripts to `webgogol-com` for dogfood only.
+4. Add optional scripts to `warpgogol-com` for dogfood only.
 5. Once stable, update deploy docs/templates so new apps can opt in.
 
 ## Alternatives considered
@@ -166,11 +166,11 @@ The gate does not perform `deploy:main`; it only authorizes the next step.
 
 ## Acceptance criteria
 
-- [x] `checkWebgogol.deployGate` schema exists and is optional. (evidence: implemented historically)
+- [x] `checkWarpgogol.deployGate` schema exists and is optional. (evidence: implemented historically)
 - [x] `check.deploy-alt.run` runs `check.run` against a resolved alt URL and stores artifacts. (evidence: implemented historically)
 - [x] `check.deploy-main.gate` fails on deterministic errors and stale/missing reports. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] AI audience warnings do not block by default. (evidence: implemented historically)
-- [x] `webgogol-com` can opt in without affecting other apps. (evidence: implemented historically)
+- [x] `warpgogol-com` can opt in without affecting other apps. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

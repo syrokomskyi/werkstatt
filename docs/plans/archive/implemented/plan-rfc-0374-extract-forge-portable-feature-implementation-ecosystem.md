@@ -7,9 +7,9 @@ createdAt: 2026-07-11
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
     - nicaragua-projekt
-    - check-webgogol-com
+    - check-warpgogol-com
   packages:
     - "@gogol/forge"
     - "@gogol/site-kernel"
@@ -91,7 +91,7 @@ scope:
 - Delete `createWerkstattModule` or convert to re-export from forge
 - Keep non-module exports (lock.ts, operation.ts, atomic.ts) — they are used by handoff
 
-**Modified: `apps/webgogol-com/tools/kernel.config.ts`**
+**Modified: `apps/warpgogol-com/tools/kernel.config.ts`**
 
 - Replace `rfcModule` import from `@gogol/site-kernel` with `forgeRfcModule` from `@gogol/forge`
 - Add `forgeCompassModule`, `forgeNamingModule`, `forgeWorkflowModule`, `forgeWerkstattModule` imports from `@gogol/forge`
@@ -99,11 +99,11 @@ scope:
 
 **Modified: `apps/nicaragua-projekt/tools/kernel.config.ts`**
 
-- Same changes as webgogol-com
+- Same changes as warpgogol-com
 
-**Modified: `apps/check-webgogol-com/tools/kernel.config.ts`**
+**Modified: `apps/check-warpgogol-com/tools/kernel.config.ts`**
 
-- Same changes as webgogol-com
+- Same changes as warpgogol-com
 
 **Modified: `packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts`**
 
@@ -362,19 +362,19 @@ scope:
 
 **Agent actions:**
 
-- In `apps/webgogol-com/tools/kernel.config.ts`:
+- In `apps/warpgogol-com/tools/kernel.config.ts`:
   - Replace `import { rfcModule } from "@gogol/site-kernel"` with `import { forgeRfcModule, forgeWorkflowModule, forgeCompassModule, forgeNamingModule, forgeWerkstattModule } from "@gogol/forge"`
   - Add forge modules to `modules[]` array (after checkModule, before createOnboardingModule)
   - Remove `rfcModule` from modules[]
 - In `apps/nicaragua-projekt/tools/kernel.config.ts`: same changes
-- In `apps/check-webgogol-com/tools/kernel.config.ts`: same changes
+- In `apps/check-warpgogol-com/tools/kernel.config.ts`: same changes
 - In `packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts`: same changes
 
 **Validation:**
 
-- `pnpm --filter webgogol-com run build:check` passes
+- `pnpm --filter warpgogol-com run build:check` passes
 - `pnpm --filter nicaragua-projekt run build:check` passes
-- `pnpm --filter check-webgogol-com run build:check` passes
+- `pnpm --filter check-warpgogol-com run build:check` passes
 - `pnpm exec site-kernel run rfc.command-lifecycle.validate` passes (all commands still registered)
 
 **Completion criterion:** All kernel.config.ts files import forge modules; all apps build
@@ -474,9 +474,9 @@ scope:
 - Run `pnpm --filter @gogol/site-kernel run build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- Run `pnpm --filter webgogol-com run build:check`
+- Run `pnpm --filter warpgogol-com run build:check`
 - Run `pnpm --filter nicaragua-projekt run build:check`
-- Run `pnpm --filter check-webgogol-com run build:check`
+- Run `pnpm --filter check-warpgogol-com run build:check`
 - Run `pnpm exec site-kernel run forge.skill.validate`
 - Run `pnpm exec site-kernel run rfc.verification.emit --id RFC-0374` (RFC-0330)
 - Commit evidence file
@@ -501,9 +501,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm --filter webgogol-com run build:check`
+- `pnpm --filter warpgogol-com run build:check`
 - `pnpm --filter nicaragua-projekt run build:check`
-- `pnpm --filter check-webgogol-com run build:check`
+- `pnpm --filter check-warpgogol-com run build:check`
 - `pnpm exec site-kernel run rfc.command-lifecycle.validate`
 - `pnpm exec site-kernel run forge.skill.validate`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0374` (RFC-0330)

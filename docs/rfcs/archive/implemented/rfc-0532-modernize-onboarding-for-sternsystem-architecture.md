@@ -96,7 +96,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -114,7 +114,7 @@ nonGoals:
 
 The onboarding ecosystem was designed for the `apps/<id>/` layout (RFC-0070, RFC-0076, RFC-0078). Since then, RFC-0354..0356 introduced the Sternsystem architecture: sites are registered in `systems/registry.yaml` (DNA-45), materialized as mission workpieces (DNA-47), and the `apps/` directory is retired (RFC-0381). The onboarding package (`@gogol/site-kernel-onboarding`) and its workflows (`.agents/workflows/00-prepare.md` through `06-handoff.md`) still reference `apps/<id>/` and the global `onboarding/.input/` + `onboarding/.output/` directories.
 
-The `onboarding/.input/` directory contains 95 files of raw client materials (including `.gitkeep`, `README.md`, and 13 `amend-001/` legal text files) for `webgogol-com`, whose onboarding completed on 2026-05-23 (`onboarding/.output/status.md` shows `lastPhase: handoff`, `outcome: ok-with-build-deferrals`). `webgogol-com` is now an active Sternsystem in `systems/registry.yaml` with `currentMission: webgogol-com-m000013`. The raw onboarding data is a historical artifact with no active consumer — the amend-001 materials were consumed by mission m000013 and are present in the Sternsystem content.
+The `onboarding/.input/` directory contains 95 files of raw client materials (including `.gitkeep`, `README.md`, and 13 `amend-001/` legal text files) for `warpgogol-com`, whose onboarding completed on 2026-05-23 (`onboarding/.output/status.md` shows `lastPhase: handoff`, `outcome: ok-with-build-deferrals`). `warpgogol-com` is now an active Sternsystem in `systems/registry.yaml` with `currentMission: warpgogol-com-m000013`. The raw onboarding data is a historical artifact with no active consumer — the amend-001 materials were consumed by mission m000013 and are present in the Sternsystem content.
 
 Meanwhile, `mission.materialize` (RFC-0389) already reuses scaffold templates from `@gogol/site-kernel-onboarding` for boilerplate generation. The package's template set remains valuable, but its command surface (`onboarding.scaffold`, `brief.validate`, `onboarding.input.validate`, `onboarding.phase.validate`, `onboarding.checklist`) is coupled to the retired `apps/` layout and the global `onboarding/.input/` path.
 
@@ -122,7 +122,7 @@ Meanwhile, `mission.materialize` (RFC-0389) already reuses scaffold templates fr
 
 Three issues require resolution:
 
-1. **Stale onboarding data clutters the repository.** `onboarding/.input/` (95 files) and `onboarding/.output/` (phase artifacts) for `webgogol-com` are committed to git but serve no active purpose. The onboarding completed months ago; the Sternsystem is registered and managed through missions. This is dead weight in the repository.
+1. **Stale onboarding data clutters the repository.** `onboarding/.input/` (95 files) and `onboarding/.output/` (phase artifacts) for `warpgogol-com` are committed to git but serve no active purpose. The onboarding completed months ago; the Sternsystem is registered and managed through missions. This is dead weight in the repository.
 
 2. **Onboarding commands reference retired paths.** `onboarding.scaffold` writes to `apps/<id>/` (retired by RFC-0381). `brief.validate` cross-checks against `apps/<id>/src/content/system.md`. `onboarding.input.validate` and `onboarding.phase.validate` read from the global `onboarding/.input/` and write to `onboarding/.output/`. None of these commands are compatible with the Sternsystem architecture (DNA-44, DNA-45).
 
@@ -321,7 +321,7 @@ interface SternsystemRegisterResult {
 
 ## Rollout
 
-1. **Delete existing onboarding content** — remove `onboarding/.input/` and `onboarding/.output/` in the implementation commit. `webgogol-com` is already registered in `systems/registry.yaml`; the raw materials (including `amend-001/` legal texts) are no longer needed — they were consumed by mission m000013 and are present in the Sternsystem content.
+1. **Delete existing onboarding content** — remove `onboarding/.input/` and `onboarding/.output/` in the implementation commit. `warpgogol-com` is already registered in `systems/registry.yaml`; the raw materials (including `amend-001/` legal texts) are no longer needed — they were consumed by mission m000013 and are present in the Sternsystem content.
 2. **Remove old commands** — delete `brief.validate`, `onboarding.input.validate`, `onboarding.phase.validate`, `onboarding.scaffold`, `onboarding.checklist` from `packages/os/site-kernel-onboarding/src/module.ts`. Delete `src/phase-contract.ts` and `src/scaffold.ts`. Remove their exports from `src/index.ts`.
 3. **Add new command** — implement `onboarding.synthesize` in a new `packages/os/site-kernel-onboarding/src/synthesize.ts` file (reusing hashing and classification logic extracted from the old `phase-contract.ts`). Register it in `src/module.ts` and export from `src/index.ts`.
 4. **Extend sternsystem.register** — update `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-register.ts` to add pin creation (delegate to `sternsystem.pin`), content stub creation, `mission.open` call, `mission.materialize` trigger, and `--amend`/`--amend-id` flags. Update the command registration in `sternsystem.module.ts` with the new flags.
@@ -330,7 +330,7 @@ interface SternsystemRegisterResult {
 7. **Update AGENTS.md** — update `packages/os/site-kernel-onboarding/AGENTS.md` to reflect new commands, paths, and the `fo-onboard` skill. Update `packages/os/site-kernel-handoff/AGENTS.md` to document the extended `sternsystem.register`. Update root `AGENTS.md` onboarding references.
 8. **Update brief.ts** — change path references from `onboarding/.input/` to `onboarding/<system-id>/.input/`. Remove the `apps/<id>/` cross-check (replace with `systems/registry.yaml` check).
 9. **Compass sync** — update `docs/COMMANDS.md` and affected `docs/*.xml` files to reflect the new/changed/removed command surfaces. Run `ecosystem.manifest.generate` after updating the registries.
-10. **No migration needed for existing Sternsystems** — `webgogol-com` is already registered; no onboarding data needs to be preserved. No migrator is required (no Sternsystem data contract is changed).
+10. **No migration needed for existing Sternsystems** — `warpgogol-com` is already registered; no onboarding data needs to be preserved. No migrator is required (no Sternsystem data contract is changed).
 11. **build.check integration** — `onboarding.synthesize` is not added to `build.check` (it is an onboarding-time command, not a build-time check). `sternsystem.register` is not added to `build.check` either.
 
 ## Alternatives considered
@@ -343,12 +343,12 @@ interface SternsystemRegisterResult {
 
 4. **Keep global onboarding/.input/ (single active onboarding)** — preserve the current global directory but update commands for Sternsystem. Rejected: prevents parallel onboarding processes. The per-system namespace (`onboarding/<system-id>/`) is more flexible and aligns with the Sternsystem-per-site architecture.
 
-5. **Migrate existing onboarding content to onboarding/webgogol-com/** — move the 95 files as a historical archive. Rejected: the onboarding is complete, the Sternsystem is registered, and the raw materials serve no future purpose. Archiving adds repository weight without value.
+5. **Migrate existing onboarding content to onboarding/warpgogol-com/** — move the 95 files as a historical archive. Rejected: the onboarding is complete, the Sternsystem is registered, and the raw materials serve no future purpose. Archiving adds repository weight without value.
 6. **Create a separate compound command (e.g. `onboarding.register`)** — instead of extending `sternsystem.register`, create a new command that orchestrates registry + pin + mission. Rejected: `sternsystem.register` already exists in `@gogol/site-kernel-handoff` (RFC-0354) and is the natural entry point for Sternsystem creation. Creating a parallel command would violate the one-command-per-concern principle and create naming confusion. Extending the existing command with new flags is the forward-only path.
 
 ## Risks
 
-- **Loss of onboarding history for webgogol-com.** Deleting `onboarding/.input/` removes the raw client materials that produced `webgogol-com`. Mitigation: the Sternsystem itself (`systems/webgogol-com/`) and its Bordbuch contain the authoritative state; raw materials were never the source of truth after onboarding completed.
+- **Loss of onboarding history for warpgogol-com.** Deleting `onboarding/.input/` removes the raw client materials that produced `warpgogol-com`. Mitigation: the Sternsystem itself (`systems/warpgogol-com/`) and its Bordbuch contain the authoritative state; raw materials were never the source of truth after onboarding completed.
 - **fo-onboard skill complexity.** The skill combines deterministic command invocation with AI synthesis, grilling, and cumulative knowledge. This is more complex than a workflow file. Mitigation: the skill delegates deterministic work to commands and focuses on orchestration + AI synthesis, keeping each concern separable and testable.
 - **Agent confusion during transition.** Agents familiar with the old commands (`onboarding.scaffold`, `brief.validate`) may try to use them after they are removed. Mitigation: update `packages/os/site-kernel-onboarding/AGENTS.md` and root `AGENTS.md` to clearly document the new command surface and skill.
 - **sternsystem.register atomicity.** The command creates a registry entry, pin file, content stubs, and opens a mission in one invocation. A failure mid-way could leave partial state. Mitigation: the command uses atomic staging — if `mission.open` fails, the registry entry and pin file are rolled back. If `mission.materialize` fails after `mission.open` succeeds, the opened mission is aborted before rolling back the registry entry and pin file. Cleanup ordering: abort mission → remove pin file → remove registry entry.

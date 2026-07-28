@@ -70,7 +70,7 @@ The RFC addresses a real problem (media metadata leaking into visible surface pa
 **Two findings.**
 
 - **Command sprawl:** `surface.media-leakage.validate` is proposed as a new command, but the RFC also says `surface.validate` is updated to include media-leakage checks (implementation plan step 4) and `surface.contract.validate` is updated to include the media-leakage policy (step 5). If `surface.validate` already includes the checks, a separate `surface.media-leakage.validate` command may be redundant. The RFC should justify why a separate command is needed instead of extending `surface.validate`.
-- **Scope discipline:** `packagesImpacted` is missing `@gogol/ontology` (V-30 error). `appsImpacted` lists only `webgogol-com` — correct, since only webgogol-com has surface pages currently.
+- **Scope discipline:** `packagesImpacted` is missing `@gogol/ontology` (V-30 error). `appsImpacted` lists only `warpgogol-com` — correct, since only warpgogol-com has surface pages currently.
 
 ## Axis G — Blind spots
 
@@ -78,7 +78,7 @@ The RFC addresses a real problem (media metadata leaking into visible surface pa
 
 - **False-positive risk (critical):** The prohibited strings table includes `Gemini` and `Organization` — both are common English words. A substring scan of rendered HTML for "Gemini" would match legitimate prose mentions (zodiac, astrology, the Gemini constellation, a person named Gemini). A scan for "Organization" would match thousands of legitimate prose uses. The RFC says `Gemini` is prohibited "as media authorship label" and `Organization` "as media author" but does not describe how the validator distinguishes these contexts from legitimate prose. This is the most serious blind spot — without context-aware matching, the validator will produce massive false positives.
 - **Performance:** `surface.media-leakage.validate` scans all rendered surface page HTML. The RFC does not specify the cost (page count, HTML size, regex complexity, I/O patterns for reading rendered HTML from `dist/`).
-- **Edge cases:** The RFC does not consider: (a) empty states (a new site with no surface pages), (b) the case where "Copyright © 2026 Webgogol" legitimately appears in a footer on a surface page (footers are visible HTML), (c) the case where a surface page legitimately mentions "Gemini" in prose (e.g., an industry dossier that references astrology).
+- **Edge cases:** The RFC does not consider: (a) empty states (a new site with no surface pages), (b) the case where "Copyright © 2026 Warpgogol" legitimately appears in a footer on a surface page (footers are visible HTML), (c) the case where a surface page legitimately mentions "Gemini" in prose (e.g., an industry dossier that references astrology).
 - **Migration path:** The RFC does not describe how existing surface pages transition to compliance. Do current surface pages pass without changes? If not, is there a migration window? Are existing baked pages regenerated automatically?
 - **Scope of "surface pages":** The RFC says the policy applies to "surface pages" but does not define which pages are surface pages. Does it include depth-0 pillar hubs? Depth-1 industry pages? Depth-2..5? The `website-service` surface? This needs to be explicit.
 

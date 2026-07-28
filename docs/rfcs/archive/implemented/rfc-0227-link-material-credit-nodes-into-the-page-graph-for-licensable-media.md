@@ -31,7 +31,7 @@ commands:
     - jsonld.parity
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -97,7 +97,7 @@ Consolidate per-material credit nodes into the page's JSON-LD graph instead of e
   "contentUrl": "https://…/hero.webp",
   "creditText": "…",
   "creator": { "@type": "Person", "name": "…" },
-  "copyrightHolder": { "@type": "Organization", "name": "Webgogol" },
+  "copyrightHolder": { "@type": "Organization", "name": "Warpgogol" },
   "license": "https://…/lizenz",
   "acquireLicensePage": "https://…/lizenz"
 }

@@ -183,7 +183,7 @@ scope:
 
 - Create `packages/pbp/src/schemas/__tests__/` directory
 - For each entity schema, create a test file with:
-  - Positive test: valid entity fixture (derived from Webgogol target manifest blueprint) passes validation
+  - Positive test: valid entity fixture (derived from Warpgogol target manifest blueprint) passes validation
   - Negative tests: invalid fixtures (empty string, HTML in canonical field, locale in ID, wrong money format, unknown key) fail validation
 - Create `packages/pbp/src/schemas/__tests__/index.test.ts` — tests for `pbpSchemaById` registry completeness and `pbpEntityDiscriminatedUnion` dispatch
 

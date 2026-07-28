@@ -34,7 +34,7 @@ commands:
     - apps-check.author
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
@@ -69,7 +69,7 @@ Validator behavior in `packages/os/site-kernel-checks/src/asset-reference.ts` cl
 
 Observed consequences:
 
-- `webgogol-com` reports unresolved `logo` and `footer-bg` tokens from `src/content/site/*/labels.md`, even though `footer-bg.webp` exists under `src/content/site/de/assets`.
+- `warpgogol-com` reports unresolved `logo` and `footer-bg` tokens from `src/content/site/*/labels.md`, even though `footer-bg.webp` exists under `src/content/site/de/assets`.
 - `nicaragua-projekt` uses `footer-card-1.webp` and `footer-card-2.webp` in site labels. The `.webp` suffix violates the bare filename rule, but the validator silently strips extensions before checking.
 
 ## Problem
@@ -102,8 +102,8 @@ This reinforces RFC-0141's single resolver rule and RFC-0204's provider portabil
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.asset.contract.validate --app webgogol-com --json
-pnpm exec site-kernel run asset.reference.validate --app webgogol-com --json
+pnpm exec site-kernel run content.asset.contract.validate --app warpgogol-com --json
+pnpm exec site-kernel run asset.reference.validate --app warpgogol-com --json
 ```
 
 `content.asset.contract.validate` is app-scoped and read-only. It verifies:
@@ -227,7 +227,7 @@ If the helper exposes too much internal path detail, agents may start authoring 
 - [x] Existing invalid extension tokens are fixed after the RFC is accepted. (evidence: implemented historically)
 - [x] `content.asset.contract.validate` is registered and included in `apps-check.author`. (evidence: implemented historically)
 - [x] `maintenance.debt.report` can aggregate any remaining asset warnings as canonical diagnostics. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `apps-check.author --app webgogol-com --json`, `apps-check.author --app nicaragua-projekt --json`, and `rfc.validate` pass. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps-check.author --app warpgogol-com --json`, `apps-check.author --app nicaragua-projekt --json`, and `rfc.validate` pass. (evidence: original apps retired by RFC-0381, implemented historically)
 
 ## Implementation notes for agents
 

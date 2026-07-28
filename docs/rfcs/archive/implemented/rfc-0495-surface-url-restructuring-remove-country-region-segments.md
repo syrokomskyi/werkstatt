@@ -43,7 +43,7 @@ commands:
     - redirect.map.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -238,16 +238,16 @@ No new commands. Existing commands are updated:
 
 ```sh
 # Generates _redirects with reversed redirect entries (old → new)
-pnpm exec site-kernel run public.infrastructure.generate --site webgogol-com
+pnpm exec site-kernel run public.infrastructure.generate --site warpgogol-com
 
 # Validates _redirects file carries generated marker and has valid entries
-pnpm exec site-kernel run redirect.map.validate --site webgogol-com
+pnpm exec site-kernel run redirect.map.validate --site warpgogol-com
 
 # Generates surface pages at new URLs
-pnpm exec site-kernel run surface.generate --site webgogol-com
+pnpm exec site-kernel run surface.generate --site warpgogol-com
 
 # Validates surface artifacts (sitemap, internal links) use new URL patterns
-pnpm exec site-kernel run surface.validate --site webgogol-com
+pnpm exec site-kernel run surface.validate --site warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -297,7 +297,7 @@ No new `--json` output shapes. Existing commands produce their standard output.
 
 - **Lands with blueprint update.** The `website-local.yaml` slug templates change, `buildRetiredSurfaceRedirectBlock` is reversed, and `url-schema.yaml` is updated in the same change.
 - **No backward compatibility.** Old depth-4 and depth-5 URLs are not served — they redirect (301) to the new canonical URLs. No dual-path, no feature flag.
-- **Pilot = `webgogol-com` (Germany).** The current dataset only covers Germany (country: `deu`, regions: `bw`), so the redirect map covers `/website/{industry}/deu/bw/{city}/` → `/website/{industry}/{city}/` and `/website/{industry}/deu/bw/{city}/{demand}/` → `/website/{industry}/{city}/{demand}/`.
+- **Pilot = `warpgogol-com` (Germany).** The current dataset only covers Germany (country: `deu`, regions: `bw`), so the redirect map covers `/website/{industry}/deu/bw/{city}/` → `/website/{industry}/{city}/` and `/website/{industry}/deu/bw/{city}/{demand}/` → `/website/{industry}/{city}/{demand}/`.
 - **New sites** get the new slug templates by default via the blueprint; no migration needed.
 - **Pipeline.** `surface.generate` (in `build.prepare`) emits pages at new URLs. `public.infrastructure.generate` emits the reversed `_redirects`. `redirect.map.validate` and `surface.validate` (in `build.check`) verify correctness. `surface.contract.validate` verifies C-contract compliance.
 
@@ -308,7 +308,7 @@ The migrator (`rfc-0495`) is a no-op on authored data. `mission.migrate` runs th
 ### Deployment sequence
 
 1. Platform change merged: blueprint, C-contract, redirect generation, migrator.
-2. Next mission for `webgogol-com`: `mission.materialize` → `mission.migrate` (no-op) → operator edits (if any) → `mission.validate` → `release.prepare` → `mission.reconcile` → `release.publish`.
+2. Next mission for `warpgogol-com`: `mission.materialize` → `mission.migrate` (no-op) → operator edits (if any) → `mission.validate` → `release.prepare` → `mission.reconcile` → `release.publish`.
 3. `release.publish` deploys the new `dist` with new URLs and reversed `_redirects` simultaneously — no intermediate state where old URLs 404.
 
 ## Alternatives considered

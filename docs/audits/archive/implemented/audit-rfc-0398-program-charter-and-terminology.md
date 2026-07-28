@@ -77,7 +77,7 @@ No issues.
 - **Minimal command surface:** No commands. ✓
 - **Lean contracts:** No TypeScript types (charter). ✓
 - **Existing patterns:** Explains why extending `@gogol/business` is insufficient (flat `.md` files with presentation strings cannot represent Charge/Plan/Adjustment, federated product identity, typed Policies, or Claims with Evidence). ✓
-- **Scope discipline:** `appsImpacted: [webgogol-com]`, `packagesImpacted: [@gogol/business, @gogol/ontology]`. `nonGoals` are 5 meaningful items, not boilerplate. ✓
+- **Scope discipline:** `appsImpacted: [warpgogol-com]`, `packagesImpacted: [@gogol/business, @gogol/ontology]`. `nonGoals` are 5 meaningful items, not boilerplate. ✓
 
 ## Axis G — Blind spots
 

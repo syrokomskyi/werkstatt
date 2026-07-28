@@ -279,8 +279,8 @@ All commands support `--json` output with the standard `{ command, status, data,
   "status": "pass",
   "data": {
     "recovered": [
-      { "scope": "mission:webgogol-com-m000001", "action": "removed-stale-lock" },
-      { "artifact": "missions/webgogol-com-m000001.staging-op-abc123/", "action": "removed" }
+      { "scope": "mission:warpgogol-com-m000001", "action": "removed-stale-lock" },
+      { "artifact": "missions/warpgogol-com-m000001.staging-op-abc123/", "action": "removed" }
     ],
     "failed": []
   },

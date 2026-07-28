@@ -36,7 +36,7 @@ commands:
     - surface.evidence.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/site-kernel-checks"
@@ -124,9 +124,9 @@ Combinatorics are bounded by the count of Werke and the axis values they actuall
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run werk.record.validate --app webgogol-com --json
-pnpm exec site-kernel run surface.evidence.join --app webgogol-com --blueprint website-local --json
-pnpm exec site-kernel run surface.generate --app webgogol-com --json
+pnpm exec site-kernel run werk.record.validate --app warpgogol-com --json
+pnpm exec site-kernel run surface.evidence.join --app warpgogol-com --blueprint website-local --json
+pnpm exec site-kernel run surface.generate --app warpgogol-com --json
 ```
 
 ### File system responsibilities
@@ -181,7 +181,7 @@ pnpm exec site-kernel run surface.generate --app webgogol-com --json
 - [x] Deep evidence-driven depths derive candidates from the evidence join, not cartesian enumeration. (evidence: implemented historically)
 - [x] A public page citing a Werk requires publish + client consent (`WERK-02`). (evidence: implemented historically)
 - [x] `surface.evidence.validate` requires `minEvidence` qualifying Werke at the deepest depth. (evidence: implemented historically)
-- [x] Page count at evidence-driven depths is bounded by the number of consenting Werke, verified through regenerated `webgogol-com` surface artifacts. (evidence: implemented historically)
+- [x] Page count at evidence-driven depths is bounded by the number of consenting Werke, verified through regenerated `warpgogol-com` surface artifacts. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

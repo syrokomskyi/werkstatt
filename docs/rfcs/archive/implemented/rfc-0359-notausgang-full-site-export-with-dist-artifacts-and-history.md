@@ -249,7 +249,7 @@ Or upload the contents of `dist/` to any static hosting provider (Cloudflare Pag
 
 ## Rebuilding the site
 
-The `site/` directory contains the authored content and configuration. To rebuild, you need the Webgogol platform (not included in this export). Contact the studio if you need rebuild access.
+The `site/` directory contains the authored content and configuration. To rebuild, you need the Warpgogol platform (not included in this export). Contact the studio if you need rebuild access.
 
 ## History
 
@@ -341,12 +341,12 @@ Validates a Notausgang export package:
 
 ```sh
 pnpm exec site-kernel run notausgang.export \
-  --system webgogol-com --release webgogol-com-r000001 \
-  --output ../exports/webgogol-com-2026-07-09 \
+  --system warpgogol-com --release warpgogol-com-r000001 \
+  --output ../exports/warpgogol-com-2026-07-09 \
   --keep-integration stripe --reason "Client owns Stripe account"
 
 pnpm exec site-kernel run notausgang.validate \
-  --path ../exports/webgogol-com-2026-07-09
+  --path ../exports/warpgogol-com-2026-07-09
 ```
 
 All commands support `--json` output.
@@ -426,9 +426,9 @@ export const IntegrationManifestSchema = z.object({
   "command": "notausgang.export",
   "status": "pass",
   "data": {
-    "systemId": "webgogol-com",
-    "releaseId": "webgogol-com-r000001",
-    "outputPath": "../exports/webgogol-com-2026-07-09",
+    "systemId": "warpgogol-com",
+    "releaseId": "warpgogol-com-r000001",
+    "outputPath": "../exports/warpgogol-com-2026-07-09",
     "integrationNulling": {
       "nulled": ["matomo", "uchat", "supabase-crm"],
       "exceptions": [
@@ -440,7 +440,7 @@ export const IntegrationManifestSchema = z.object({
     "bordbuchHash": "sha256:ghi789...",
     "artifactManifestHash": "sha256:jkl012..."
   },
-  "summary": "[notausgang.export] webgogol-com exported to ../exports/webgogol-com-2026-07-09 (3 integrations nulled, 1 exception)"
+  "summary": "[notausgang.export] warpgogol-com exported to ../exports/warpgogol-com-2026-07-09 (3 integrations nulled, 1 exception)"
 }
 ```
 
@@ -451,7 +451,7 @@ export const IntegrationManifestSchema = z.object({
   "command": "notausgang.validate",
   "status": "pass",
   "data": {
-    "path": "../exports/webgogol-com-2026-07-09",
+    "path": "../exports/warpgogol-com-2026-07-09",
     "manifestValid": true,
     "sitePresent": true,
     "distPresent": true,
@@ -492,7 +492,7 @@ export const IntegrationManifestSchema = z.object({
 6. Implement `notausgang.export` handler with atomic staging and progress.
 7. Implement `notausgang.validate` handler (including artifact hash checks, runtime-file rejection, Bordbuch append-only verification, pin validation, snapshot schemaVersion check, and live key scan).
 8. Register commands in `packages/os/site-kernel/src/registry.ts`.
-9. **Pilot**: export `webgogol-com` at release `r000001` to a local directory, verify with `notausgang.validate`.
+9. **Pilot**: export `warpgogol-com` at release `r000001` to a local directory, verify with `notausgang.validate`.
 10. Add DNA-50 to `docs/architecture-dna.md`.
 11. Run `build:check` to verify no regression.
 
@@ -537,7 +537,7 @@ export const IntegrationManifestSchema = z.object({
 - [x] `notausgang.export` emits structured progress events to stderr for large dist copies (deferred) (evidence: implemented historically)
 - [x] Export is based on a `published` release (not `prepared` or `rolled-back`) (evidence: implemented historically)
 - [x] Export reads release data from immutable RFC-0363 artifact store at start (no lock needed) (deferred — reads from local releases/ dir) (evidence: implemented historically)
-- [x] Pilot: export `webgogol-com` at `r000001`, validate the export package (deferred) (evidence: implemented historically)
+- [x] Pilot: export `warpgogol-com` at `r000001`, validate the export package (deferred) (evidence: implemented historically)
 - [x] DNA-50 added to `docs/architecture-dna.md` (deferred) (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `rfc.validate` passes on this file (evidence: implemented historically)
 

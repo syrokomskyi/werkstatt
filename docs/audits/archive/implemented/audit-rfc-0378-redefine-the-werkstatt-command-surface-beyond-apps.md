@@ -57,7 +57,7 @@ No other issues. The RFC is `status: draft` and contains no self-authorizing lan
 
 **Finding F-2: `@gogol/forge` in `packagesImpacted` may be premature.** RFC-0374 (forge extraction) is `accepted` but not yet `implemented`. If RFC-0378 is implemented before RFC-0374, `@gogol/forge` does not exist as a package. Furthermore, forge commands are workspace-scoped governance commands (`rfc.*`, `naming.*`, `compass.*`, etc.) that do not take `--app` flags, so they may not need any changes. The RFC should note the dependency on RFC-0374's implementation order or explain what specifically changes in forge.
 
-No other issues. `fleet.sites.generate` earns its existence as a separate command (conflating site-list generation with plan/status generation would mix concerns). TypeScript contracts are minimal. `appsImpacted: [apps/webgogol-com]` is correct (only remaining app). `nonGoals` are explicit and meaningful.
+No other issues. `fleet.sites.generate` earns its existence as a separate command (conflating site-list generation with plan/status generation would mix concerns). TypeScript contracts are minimal. `appsImpacted: [apps/warpgogol-com]` is correct (only remaining app). `nonGoals` are explicit and meaningful.
 
 ## Axis G — Blind spots
 

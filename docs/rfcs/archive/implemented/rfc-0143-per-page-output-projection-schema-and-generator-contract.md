@@ -37,7 +37,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/share"
@@ -76,7 +76,7 @@ Two observations:
 1. **Two distinct config shapes are mixed together.** `sitemap` and `llms` are _per-page projections_ — they answer "how does this page contribute to a machine-readable output?". `ai` and `robots` are _site-wide policies_ — a single declarative block per site. These are different kinds of configuration.
 2. **The per-page projection config is informal and scattered.** `semanticType` and `sitemapExclude` are read by the loaders but are **not present in `systemManifestSchema`** ([`packages/ontology/src/schemas/system.ts`](../../packages/ontology/src/schemas/system.ts)) — they are unvalidated "extension fields." RFC-0142 is about to add a third such per-page field (`llms`). Without a structural home, every new per-page projection generator will bolt on another top-level page field.
 
-The ecosystem goal is **thin, standard, manageable** sites. With only two apps today (`nicaragua-projekt`, `webgogol-com`, the latter not yet declaring `semanticType`), the cost of standardizing the per-page projection surface is near-zero. The cost grows with every new app and every new generator.
+The ecosystem goal is **thin, standard, manageable** sites. With only two apps today (`nicaragua-projekt`, `warpgogol-com`, the latter not yet declaring `semanticType`), the cost of standardizing the per-page projection surface is near-zero. The cost grows with every new app and every new generator.
 
 ## Problem
 
@@ -254,7 +254,7 @@ const pageOutputSchema = z.object({
 
 ### Migration
 
-`sitemapExclude: true` → `output: { sitemap: false }`. Mechanical and reviewable; only `nicaragua-projekt` currently uses any per-page projection field, and `webgogol-com` has none.
+`sitemapExclude: true` → `output: { sitemap: false }`. Mechanical and reviewable; only `nicaragua-projekt` currently uses any per-page projection field, and `warpgogol-com` has none.
 
 - **Phase 1**: schema accepts both; `resolvePageOutput` honors the legacy field; `system.manifest.validate` warns on `sitemapExclude`.
 - **Phase 2**: migrate the two apps + onboarding template to `output`.
@@ -275,7 +275,7 @@ No flag day at any phase: defaults preserve current output.
 2. **Phase 2 — schema.** Formalize `semanticType`, `sitemapExclude` (deprecated), `output` in `systemManifestSchema`; wire `system.manifest.validate` checks + deprecation warning.
 3. **Phase 3 — loaders.** Resolve `model.output` in both loaders via the shared helper.
 4. **Phase 4 — consumers.** Point `sitemap.generate` at `model.output.sitemap`; `llms.generate` at `model.output.llms` (coordinated with RFC-0142).
-5. **Phase 5 — app + template migration.** Migrate `nicaragua-projekt`, `webgogol-com`, and the onboarding `system.template.md`.
+5. **Phase 5 — app + template migration.** Migrate `nicaragua-projekt`, `warpgogol-com`, and the onboarding `system.template.md`.
 6. **Phase 6 — contract doc.** Publish the Generator Contract in the architecture docs (`packages/os/site-kernel/docs/`) and reference it from `apps/AGENTS.md` so new generators follow it.
 
 ## Alternatives considered
@@ -308,7 +308,7 @@ No flag day at any phase: defaults preserve current output.
 - [x] `SemanticPageModel.output` present and always resolved; both loaders set it via the shared helper. (evidence: implemented historically)
 - [x] `sitemap.generate` reads `model.output.sitemap`; output bytes unchanged for pages without an `output` block. (evidence: implemented historically)
 - [x] `system.manifest.validate` rejects unknown `output` keys and invalid values; warns on `sitemapExclude` and on sitemap-config conflicts. (evidence: implemented historically)
-- [x] `nicaragua-projekt`, `webgogol-com`, and the onboarding `system.template.md` migrated to `output`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `nicaragua-projekt`, `warpgogol-com`, and the onboarding `system.template.md` migrated to `output`. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Generator Contract documented under `packages/os/site-kernel/docs/` and referenced from `apps/AGENTS.md`. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 

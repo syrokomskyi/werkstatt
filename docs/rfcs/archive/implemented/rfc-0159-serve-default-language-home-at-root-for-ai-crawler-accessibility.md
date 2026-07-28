@@ -30,7 +30,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -51,9 +51,9 @@ nonGoals:
 
 ## Context
 
-The studio's core value proposition is that it builds websites that are accessible to AI agents. An external review found the opposite for `webgogol.com`: the root URL `/` returns a content-less redirect stub instead of rendered HTML. AI crawlers and lightweight HTTP clients (the dominant class of AI agents) therefore index an empty page, undermining the offer at its root.
+The studio's core value proposition is that it builds websites that are accessible to AI agents. An external review found the opposite for `warpgogol.com`: the root URL `/` returns a content-less redirect stub instead of rendered HTML. AI crawlers and lightweight HTTP clients (the dominant class of AI agents) therefore index an empty page, undermining the offer at its root.
 
-The robots policy is permissive (`apps/webgogol-com/public/robots.txt` → `User-agent: *` / empty `Disallow`) and `public/_headers` contains no blocking rules, so the regression is **not** caused by robots.txt or response headers.
+The robots policy is permissive (`apps/warpgogol-com/public/robots.txt` → `User-agent: *` / empty `Disallow`) and `public/_headers` contains no blocking rules, so the regression is **not** caused by robots.txt or response headers.
 
 ## Problem
 
@@ -95,7 +95,7 @@ Concretely:
 A new static validator guards the contract:
 
 ```sh
-pnpm exec site-kernel run root.canonical.validate --app webgogol-com
+pnpm exec site-kernel run root.canonical.validate --app warpgogol-com
 pnpm exec site-kernel run root.canonical.validate --all --json
 ```
 
@@ -145,7 +145,7 @@ export interface Props {
   "status": "fail",
   "violations": [
     {
-      "app": "webgogol-com",
+      "app": "warpgogol-com",
       "rule": "root-renders-stub",
       "message": "src/pages/index.astro delegates to RootRedirectContent stub; expected default-language content render."
     }
@@ -159,7 +159,7 @@ export interface Props {
 
 ## Rollout
 
-- Update the `index.astro` template + `root-redirect-content.astro` in `@gogol/site-kernel-codegen`, regenerate `apps/webgogol-com` and `apps/nicaragua-projekt` root pages.
+- Update the `index.astro` template + `root-redirect-content.astro` in `@gogol/site-kernel-codegen`, regenerate `apps/warpgogol-com` and `apps/nicaragua-projekt` root pages.
 - Add `root.canonical.validate` to `build.check` as warn-first for one cycle, then fail-hard once both apps are migrated.
 - New apps comply from scaffold via the updated template.
 

@@ -289,7 +289,7 @@ Requirements:
     {
       "ruleId": "GEN-EDIT-01",
       "severity": "error",
-      "file": "apps/webgogol-com/public/index.md",
+      "file": "apps/warpgogol-com/public/index.md",
       "message": "Generated file carrying GENERATED_MARKER was modified, but its owner (page.markdown.generate) source/template was not. Edit the generator, then regenerate.",
       "fixHint": "Edit the owning generator/template; run its regenerate command; never hand-edit generated files."
     }

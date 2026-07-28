@@ -46,7 +46,7 @@ commands:
     - surface.doorway-risk.report
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -263,13 +263,13 @@ When an intersection record does not exist or fails the gate, the page is not em
 
 ```sh
 # Validate intersection records against the minimum gate, similarity thresholds, and substance independence test
-pnpm exec site-kernel run surface.intersection.validate --site webgogol-com
+pnpm exec site-kernel run surface.intersection.validate --site warpgogol-com
 
 # Generate the build-time scaling report
-pnpm exec site-kernel run surface.intersection.report --site webgogol-com
+pnpm exec site-kernel run surface.intersection.report --site warpgogol-com
 
 # Both accept --json for machine-readable output
-pnpm exec site-kernel run surface.intersection.validate --site webgogol-com --json
+pnpm exec site-kernel run surface.intersection.validate --site warpgogol-com --json
 ```
 
 Both commands are `scope: workspace` (they operate on a specific site's surface content). `surface.intersection.validate` is integrated into `build.check` as a blocking check (warn mode initially, fail mode after grace period — same pattern as RFC-0492/0496). `surface.intersection.report` is a diagnostic report — it emits warnings in `build.check` but does not block.

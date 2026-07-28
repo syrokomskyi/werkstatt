@@ -40,8 +40,8 @@ scope:
     - packages/
     - docs/
 runs:
-  - content.references.validate --site webgogol-com
-  - content.voice.lint --site webgogol-com
+  - content.references.validate --site warpgogol-com
+  - content.voice.lint --site warpgogol-com
 recoveryRules:
   - on: "Expert recommendation requires changes to a generated page (bildnachweise, website, ratgeber)"
     do: "Check whether the change is content-only or requires generator logic changes in packages/*. If generator changes are needed, pause and raise an RFC."
@@ -89,11 +89,11 @@ selfOrchestration:
 
 ## What this workflow does
 
-Takes expert recommendation files (produced by an external analyst) and applies them sequentially to the Ukrainian (uk) content of the webgogol-com site. German (de) content is left untouched for a separate translation session.
+Takes expert recommendation files (produced by an external analyst) and applies them sequentially to the Ukrainian (uk) content of the warpgogol-com site. German (de) content is left untouched for a separate translation session.
 
 ## Critical context: expert vs codebase gap
 
-The expert analysed the **deployed DE pages on webgogol.com**. The codebase has since undergone major migrations the expert does not know about. Before applying any recommendation, the agent must bridge this gap.
+The expert analysed the **deployed DE pages on warpgogol.com**. The codebase has since undergone major migrations the expert does not know about. Before applying any recommendation, the agent must bridge this gap.
 
 ### What the expert does NOT know
 
@@ -259,9 +259,9 @@ After editing, run from the **monorepo root** (not the workpiece):
 - Check that YAML is valid (no syntax errors).
 - Check that all block `type` values match known archetypes.
 - Check that all `target` references in CTAs point to existing pages.
-- Run `pnpm exec site-kernel run content.references.validate --site webgogol-com` if available.
-- Run `pnpm exec site-kernel run content.voice.lint --site webgogol-com` if available.
-- Run dev build from the workpiece: `pnpm --filter webgogol-com dev` or equivalent, to confirm no runtime errors.
+- Run `pnpm exec site-kernel run content.references.validate --site warpgogol-com` if available.
+- Run `pnpm exec site-kernel run content.voice.lint --site warpgogol-com` if available.
+- Run dev build from the workpiece: `pnpm --filter warpgogol-com dev` or equivalent, to confirm no runtime errors.
 - If Playwright tests exist for the affected route, run them.
 
 ### 6. Report

@@ -197,13 +197,13 @@ All code that reads `.json` files from Category B or C is updated:
 | `fleet/fleet.plan.generated.json` | `fleet/fleet.plan.generated.yaml` |
 | `fleet/fleet.status.generated.json` | `fleet/fleet.status.generated.yaml` |
 | `services/*/service.config.json` | `services/*/service.config.yaml` |
-| `apps/webgogol-com/integration.shard.json` | `apps/webgogol-com/integration.shard.yaml` |
-| `apps/webgogol-com/provenance/amend/amend-001.json` | `apps/webgogol-com/provenance/amend/amend-001.yaml` |
-| `apps/webgogol-com/behavior.snapshot.generated.json` | `apps/webgogol-com/behavior.snapshot.generated.yaml` |
-| `apps/webgogol-com/src/surface/states/*.state.json` | `apps/webgogol-com/src/surface/states/*.state.yaml` |
-| `apps/webgogol-com/src/surface/states/pointer.json` | `apps/webgogol-com/src/surface/states/pointer.yaml` |
-| `apps/webgogol-com/src/surface/visibility/*.json` | `apps/webgogol-com/src/surface/visibility/*.yaml` |
-| `apps/webgogol-com/src/surface/*.generated.json` | `apps/webgogol-com/src/surface/*.generated.yaml` |
+| `apps/warpgogol-com/integration.shard.json` | `apps/warpgogol-com/integration.shard.yaml` |
+| `apps/warpgogol-com/provenance/amend/amend-001.json` | `apps/warpgogol-com/provenance/amend/amend-001.yaml` |
+| `apps/warpgogol-com/behavior.snapshot.generated.json` | `apps/warpgogol-com/behavior.snapshot.generated.yaml` |
+| `apps/warpgogol-com/src/surface/states/*.state.json` | `apps/warpgogol-com/src/surface/states/*.state.yaml` |
+| `apps/warpgogol-com/src/surface/states/pointer.json` | `apps/warpgogol-com/src/surface/states/pointer.yaml` |
+| `apps/warpgogol-com/src/surface/visibility/*.json` | `apps/warpgogol-com/src/surface/visibility/*.yaml` |
+| `apps/warpgogol-com/src/surface/*.generated.json` | `apps/warpgogol-com/src/surface/*.generated.yaml` |
 | `services/fleet-probe-runner/targets.generated.json` | `services/fleet-probe-runner/targets.generated.yaml` |
 | `uni.registry.json` | `uni.registry.yaml` |
 
@@ -452,7 +452,7 @@ await writeFile(path, `${header}${yaml.stringify(output)}\n`);
 | `fleet/fleet.sites.json` | Rename to `fleet/fleet.sites.yaml` |
 | `fleet/killswitch.state.json` | Rename to `fleet/killswitch.state.yaml` |
 | `services/*/service.config.json` | Rename to `services/*/service.config.yaml` |
-| `apps/webgogol-com/integration.shard.json` | Rename to `apps/webgogol-com/integration.shard.yaml` |
+| `apps/warpgogol-com/integration.shard.json` | Rename to `apps/warpgogol-com/integration.shard.yaml` |
 | `uni.registry.json` | Rename to `uni.registry.yaml` (DNA-18, RFC-0023) |
 | `packages/share/src/fs/index.ts` | Add `readYamlFile<T>()` helper alongside `readJsonFile<T>()` |
 | `packages/os/site-kernel-checks/src/dedup-helper-lint.ts` | Add `readYamlFile` to reserved-identifier map |

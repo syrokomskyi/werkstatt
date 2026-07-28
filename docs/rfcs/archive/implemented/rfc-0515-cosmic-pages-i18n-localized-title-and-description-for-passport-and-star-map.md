@@ -46,7 +46,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/site-kernel-codegen"
@@ -67,7 +67,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -85,7 +85,7 @@ nonGoals:
 
 The cosmic passport and star-map pages (`pages/{de,uk}/cosmic/passport.md` and `pages/{de,uk}/cosmic/star-map.md`) are system/audit pages that expose the release manifest and section overview. They are **generated** by the `overlay.pages.generate` command (`packages/os/site-kernel-codegen/src/app-boilerplate.ts:runGenerateOverlayPages`), which produces identical `title` and `description` frontmatter for all locales.
 
-The generator derives the brand component of the title from `brandHeadFromTagline(manifest.identity?.tagline)`. For webgogol-com, the tagline is `"Website, die gefunden wird und Ihrem Betrieb gehört"` — it contains no em-dash, so `brandHeadFromTagline` returns the entire tagline as the brand head. This produces titles like `"Cosmic Passport · Website, die gefunden wird und Ihrem Betrieb gehört"` and descriptions like `"Release manifest for Website, die gefunden wird und Ihrem Betrieb gehört: …"` for **both** DE and UK locales.
+The generator derives the brand component of the title from `brandHeadFromTagline(manifest.identity?.tagline)`. For warpgogol-com, the tagline is `"Website, die gefunden wird und Ihrem Betrieb gehört"` — it contains no em-dash, so `brandHeadFromTagline` returns the entire tagline as the brand head. This produces titles like `"Cosmic Passport · Website, die gefunden wird und Ihrem Betrieb gehört"` and descriptions like `"Release manifest for Website, die gefunden wird und Ihrem Betrieb gehört: …"` for **both** DE and UK locales.
 
 The final integration audit (file 17, finding F-002) flagged this as a P3 issue: while these are not customer-facing pages, the German text in UK-locale metadata is inconsistent and could appear in browser tabs, search results, or shared link previews for Ukrainian-speaking visitors.
 
@@ -135,7 +135,7 @@ for (const lang of langs) {
 }
 ```
 
-For non-DE locales, `manifest.app` (e.g. `webgogol-com`) is used as the brand — it is locale-neutral and does not embed the German tagline. The description template remains in English (the lingua franca for audit pages); the key fix is removing the German tagline from the brand component.
+For non-DE locales, `manifest.app` (e.g. `warpgogol-com`) is used as the brand — it is locale-neutral and does not embed the German tagline. The description template remains in English (the lingua franca for audit pages); the key fix is removing the German tagline from the brand component.
 
 ### Generator test
 
@@ -148,7 +148,7 @@ import { test, expect } from "vitest";
 test("non-DE cosmic pages do not contain the German tagline", () => {
   const tagline = "Website, die gefunden wird und Ihrem Betrieb gehört";
   const manifest = {
-    app: "webgogol-com",
+    app: "warpgogol-com",
     identity: { tagline },
     i18n: { default: "de", supported: { de: {}, uk: {} } },
     release: { passport: { enabled: true } },
@@ -191,7 +191,7 @@ The test uses exact-match (full tagline string) to avoid false positives from co
 ## Rollout
 
 - **Default behavior:** The generator fix applies to all sites with cosmic pages (`release.passport.enabled`). No new build-time command is added.
-- **webgogol-com adoption:** After RFC acceptance, re-run `overlay.pages.generate --site webgogol-com` to regenerate cosmic pages with locale-aware metadata. DE pages remain unchanged; UK pages use `manifest.app` as the brand.
+- **warpgogol-com adoption:** After RFC acceptance, re-run `overlay.pages.generate --site warpgogol-com` to regenerate cosmic pages with locale-aware metadata. DE pages remain unchanged; UK pages use `manifest.app` as the brand.
 - **New sites:** `overlay.pages.generate` produces locale-appropriate metadata from the start — no additional action needed.
 - **No migration needed:** The fix is a generator change, not a data contract change. Regenerating cosmic pages is a build-step, not a migration.
 
@@ -213,9 +213,9 @@ The test uses exact-match (full tagline string) to avoid false positives from co
 ## Acceptance criteria
 
 - [x] `runGenerateOverlayPages` uses `manifest.app` as the brand for non-DE locales (evidence: packages/os/site-kernel-codegen/src/app-boilerplate-helpers.ts:375-399, buildCosmicPageMetadata)
-- [x] UK cosmic passport page (generated) does not contain the German tagline in `title` or `description` (evidence: missions/webgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/passport.md:6-7, title="Cosmic Passport · webgogol-com")
-- [x] UK cosmic star-map page (generated) does not contain the German tagline in `title` or `description` (evidence: missions/webgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/star-map.md:6-7, title="Cosmic Star Map · webgogol-com")
-- [x] DE cosmic pages remain unchanged (tagline-derived brand retained) (evidence: missions/webgogol-com-m000010/workpiece/src/content/pages/de/cosmic/passport.md:6-7, title still contains tagline)
+- [x] UK cosmic passport page (generated) does not contain the German tagline in `title` or `description` (evidence: missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/passport.md:6-7, title="Cosmic Passport · warpgogol-com")
+- [x] UK cosmic star-map page (generated) does not contain the German tagline in `title` or `description` (evidence: missions/warpgogol-com-m000010/workpiece/src/content/pages/uk/cosmic/star-map.md:6-7, title="Cosmic Star Map · warpgogol-com")
+- [x] DE cosmic pages remain unchanged (tagline-derived brand retained) (evidence: missions/warpgogol-com-m000010/workpiece/src/content/pages/de/cosmic/passport.md:6-7, title still contains tagline)
 - [x] Generator unit test asserts non-DE output does not contain the German tagline (evidence: packages/os/site-kernel-codegen/src/tests/cosmic-pages-i18n.test.ts, 5 tests pass)
 - [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --json, no RFC-0515 violations)
 

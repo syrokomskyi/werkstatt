@@ -43,7 +43,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel"
   - "@gogol/site-kernel-checks"
@@ -181,10 +181,10 @@ If another path is chosen during implementation, `generator.ownership.lint` and 
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run site.bordbuch.append --app webgogol-com --kind pseo --status done --title "Generated website-local surface"
-pnpm exec site-kernel run site.bordbuch.generate --app webgogol-com
-pnpm exec site-kernel run site.bordbuch.validate --app webgogol-com --json
-pnpm exec site-kernel run site.bordbuch.status --app webgogol-com --json
+pnpm exec site-kernel run site.bordbuch.append --app warpgogol-com --kind pseo --status done --title "Generated website-local surface"
+pnpm exec site-kernel run site.bordbuch.generate --app warpgogol-com
+pnpm exec site-kernel run site.bordbuch.validate --app warpgogol-com --json
+pnpm exec site-kernel run site.bordbuch.status --app warpgogol-com --json
 ```
 
 Commands may append automatically after successful high-level operations once this RFC is implemented, but they must append only meaningful mission events. Raw debug output does not belong in Bordbuch.

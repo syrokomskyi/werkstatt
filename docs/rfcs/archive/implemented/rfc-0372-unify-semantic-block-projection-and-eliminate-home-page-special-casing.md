@@ -61,7 +61,7 @@ nonGoals:
 
 The Markdown twin generation pipeline (`page.markdown.generate`, RFC-0166) was extended by RFC-0208 to extract semantic text from declared blocks via `BLOCK_EXTRACTORS`. However, RFC-0208 was never applied to home pages: `buildSemanticPageModelWith()` in `packages/share/src/semantic/build-page.ts` has a special `if (semanticType === "home")` branch (lines 180–204) that routes home pages through a separate `buildHomePageSemantic()` builder with a hardcoded set of block IDs inherited from the nicaragua-projekt layout (`hero`, `problem`, `approach`, `impact`, `women`, `transparency`, `donation-use`, `social-proof`, `final-cta`).
 
-The webgogol-com home page declares blocks (`hero-decision-card`, `video-section`, `trust-strip`, `comparison-cards`, `audience-cards`, `ownership-block`, `notausgang-block`, `controlled-responsibility-block`, `price-card`, `people`, `faq-list`) that do not match the hardcoded list. The general `extractContentBlocks()` function — which has registered extractors for most of these types — is never called for home pages. The result: the generated Markdown twin at `apps/webgogol-com/public/uk/index.md` contains only a fraction of the visible home page content.
+The warpgogol-com home page declares blocks (`hero-decision-card`, `video-section`, `trust-strip`, `comparison-cards`, `audience-cards`, `ownership-block`, `notausgang-block`, `controlled-responsibility-block`, `price-card`, `people`, `faq-list`) that do not match the hardcoded list. The general `extractContentBlocks()` function — which has registered extractors for most of these types — is never called for home pages. The result: the generated Markdown twin at `apps/warpgogol-com/public/uk/index.md` contains only a fraction of the visible home page content.
 
 This is not a missing-extractor bug but an architectural defect: two parallel projection paths exist for the same `SemanticPageModel`, and the home path bypasses the extractor registry entirely.
 
@@ -69,13 +69,13 @@ This is not a missing-extractor bug but an architectural defect: two parallel pr
 
 1. **Two projection paths.** `buildSemanticPageModelWith()` has a home-specific branch that calls `buildHomePageSemantic()` + `createHomeAnswerBlocks()` (hardcoded block IDs), while all other page types go through `extractContentBlocks()` → `buildMarkdownPageSemantic()`. The home path is not extractor-aware.
 
-2. **Hardcoded block IDs.** `createHomeAnswerBlocks()` in `packages/share/src/semantic/page-builders/home-page.ts` maps a fixed set of 9 block IDs to answer blocks. Any app whose home page uses different block types (e.g. webgogol-com's `hero-decision-card`, `video-section`, `trust-strip`) silently loses content in the Markdown twin.
+2. **Hardcoded block IDs.** `createHomeAnswerBlocks()` in `packages/share/src/semantic/page-builders/home-page.ts` maps a fixed set of 9 block IDs to answer blocks. Any app whose home page uses different block types (e.g. warpgogol-com's `hero-decision-card`, `video-section`, `trust-strip`) silently loses content in the Markdown twin.
 
 3. **Split model.** `SemanticPageModel` carries both `answerBlocks: SemanticAnswerBlock[]` (from prose/markdown parsing) and `contentBlocks?: SemanticContentBlock[]` (from block extraction). Consumers (`buildPageMarkdown`, `llms.ts`, `jsonld/webpage.ts`) must read both arrays with different rendering logic. `bodyText` is a third representation of the same prose content.
 
 4. **No extractor completeness gate.** `page.blocks.validate` (RFC-0208) has a hardcoded `requiredTypes` list and only warns about unhandled types. There is no hard contract that every block type used in any `apps/*` frontmatter must have a registered extractor.
 
-5. **Missing extractors.** `video-section` (webgogol-com `promo` block) has no extractor. The `people` extractor is a no-op returning an empty object, despite the block carrying person names and roles.
+5. **Missing extractors.** `video-section` (warpgogol-com `promo` block) has no extractor. The `people` extractor is a no-op returning an empty object, despite the block carrying person names and roles.
 
 ## Decision
 
@@ -105,10 +105,10 @@ The semantic block projection system is unified into a single pipeline with no h
 
 ```sh
 # Renamed and strengthened validator (replaces page.blocks.validate)
-pnpm exec site-kernel run page.blocks.extract.validate --app webgogol-com
+pnpm exec site-kernel run page.blocks.extract.validate --app warpgogol-com
 
 # Existing generator (unchanged command name, but now produces complete home twins)
-pnpm exec site-kernel run page.markdown.generate --app webgogol-com
+pnpm exec site-kernel run page.markdown.generate --app warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -194,7 +194,7 @@ export type SemanticPageModel = {
   "status": "fail",
   "violations": [
     {
-      "app": "webgogol-com",
+      "app": "warpgogol-com",
       "page": "pages/de/home.md",
       "blockType": "some-new-block",
       "rule": "missing-extractor",
@@ -214,7 +214,7 @@ export type SemanticPageModel = {
 ## Rollout
 
 - **No backward compatibility.** `SemanticAnswerBlock`, `SemanticContentBlock`, `answerBlocks`, `contentBlocks`, `bodyText`, `buildHomePageSemantic`, `createHomeAnswerBlocks`, `extractMarkdownProps` are deleted in the same change. All consumers are updated atomically.
-- **All apps impacted.** `webgogol-com`, `nicaragua-projekt`, `check-webgogol-com` are updated in the same implementation commit. The `page.blocks.extract.validate` command runs per-app in `build.check`.
+- **All apps impacted.** `warpgogol-com`, `nicaragua-projekt`, `check-warpgogol-com` are updated in the same implementation commit. The `page.blocks.extract.validate` command runs per-app in `build.check`.
 - **Frontmatter `id` backfill.** Blocks in existing app frontmatter that lack an `id` field must be assigned one during implementation. `page.blocks.extract.validate` fails on missing `id`.
 - **Generated baselines.** `kernel-flags-lint.baseline.generated.json` and `check-fixture-lint.baseline.generated.json` must be regenerated to replace `page.blocks.validate` with `page.blocks.extract.validate`. The command table (`09-build-artifacts.ts`) and pipeline registration must be updated in the same commit.
 - **New apps** inherit the unified pipeline from the scaffold — no special home handling to configure.
@@ -224,7 +224,7 @@ export type SemanticPageModel = {
 
 ## Alternatives considered
 
-- **Extend `buildHomePageSemantic()` with webgogol-com block IDs:** Rejected — perpetuates the two-path architecture and requires updating the hardcoded list every time a new block type is added to any home page. The user explicitly requested no legacy.
+- **Extend `buildHomePageSemantic()` with warpgogol-com block IDs:** Rejected — perpetuates the two-path architecture and requires updating the hardcoded list every time a new block type is added to any home page. The user explicitly requested no legacy.
 - **Hybrid: keep home builder for answerBlocks, add extractContentBlocks for contentBlocks:** Rejected — maintains the split model and two rendering paths. The user explicitly requested a clean break.
 - **Keep `bodyText` as a computed getter from `blocks`:** Rejected — adds complexity for no consumer benefit. All consumers can read `blocks` directly.
 - **Soft validator (warn, not fail) for missing extractors:** Rejected — the user explicitly requested a hard contract. Silent omissions in Markdown twins are the exact problem this RFC solves.
@@ -256,8 +256,8 @@ export type SemanticPageModel = {
 - [x] Hardcoded `requiredTypes` list removed from the validator (evidence: implemented historically)
 - [x] Generated baselines (`kernel-flags-lint`, `check-fixture-lint`) regenerated with new command name (evidence: implemented historically)
 - [x] All existing blocks in `apps/*` frontmatter backfilled with `id` fields where missing (evidence: implemented historically)
-- [x] All three apps (`webgogol-com`, `nicaragua-projekt`, `check-webgogol-com`) build green with the unified pipeline (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `apps/webgogol-com/public/uk/index.md` contains all home page sections (hero, promo, trust-strip, comparison-cards, audience-cards, ownership-block, notausgang-block, controlled-responsibility-block, price-card, founder, faq-list) (evidence: implemented historically)
+- [x] All three apps (`warpgogol-com`, `nicaragua-projekt`, `check-warpgogol-com`) build green with the unified pipeline (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps/warpgogol-com/public/uk/index.md` contains all home page sections (hero, promo, trust-strip, comparison-cards, audience-cards, ownership-block, notausgang-block, controlled-responsibility-block, price-card, founder, faq-list) (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging (evidence: implemented historically)
 
 ## Implementation notes for agents

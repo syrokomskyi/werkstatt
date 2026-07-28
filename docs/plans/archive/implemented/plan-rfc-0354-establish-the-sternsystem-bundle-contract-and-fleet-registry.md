@@ -7,7 +7,7 @@ createdAt: 2026-07-09
 updatedAt: 2026-07-09
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/site-kernel-handoff"
@@ -41,7 +41,7 @@ scope:
 
 **Out of scope for this plan (gated by other RFCs):**
 
-- Pilot extraction of `webgogol-com` and `apps/` removal — depends on RFC-0356 (materialization, accepted, not implemented). The pilot registration (metadata-only) is in scope; extraction/materialization is not.
+- Pilot extraction of `warpgogol-com` and `apps/` removal — depends on RFC-0356 (materialization, accepted, not implemented). The pilot registration (metadata-only) is in scope; extraction/materialization is not.
 - Lock/idempotency/atomic-staging primitives — depends on RFC-0362 (Werkstatt consistency, accepted, not implemented). Transitional temp-file-then-rename atomic writes are used until RFC-0362 lands.
 
 ## 2. Affected artifacts
@@ -158,7 +158,7 @@ scope:
 **Validation:**
 
 - `git check-ignore systems/registry.yaml` returns non-zero (not ignored).
-- `git check-ignore systems/webgogol-com/` returns zero (ignored).
+- `git check-ignore systems/warpgogol-com/` returns zero (ignored).
 
 **Completion criterion:** `systems/registry.yaml` exists, is tracked, and all Werkstatt ephemeral directories are gitignored.
 
@@ -452,7 +452,7 @@ scope:
   - [x] `sternsystem.validate` enforces all invariants and bundle contract
   - [x] `sternsystem.validate` refuses dual representation
   - [x] `sternsystem.pin` refuses downgrade
-  - [ ] Pilot: `webgogol-com` registered, extracted, materialized, and removed from `apps/` — **out of scope (depends on RFC-0356)**
+  - [ ] Pilot: `warpgogol-com` registered, extracted, materialized, and removed from `apps/` — **out of scope (depends on RFC-0356)**
   - [ ] `apps/` directory removed after full migration — **out of scope (depends on RFC-0356)**
   - [x] DNA-44 and DNA-45 present in `docs/architecture-dna.md`
   - [x] `pnpm -s run build:check` passes

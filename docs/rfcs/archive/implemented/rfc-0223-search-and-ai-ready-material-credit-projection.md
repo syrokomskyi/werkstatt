@@ -31,7 +31,7 @@ commands:
     - material.credits.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -60,7 +60,7 @@ RFC-0220 shipped the Material Credits contract: localized sidecars, one `<Materi
 That verification also surfaced gaps in how the record is projected for machine consumers:
 
 1. **The projected `creditText` was rendered in the default language (de) on every locale.** A locale fix landed in `fix(rfc-0220): localize JSON-LD creditText per page language` (commit `727f2503`). This RFC records that fix as part of the projection contract so it cannot regress.
-2. **The license is projected as a bare label string when no URL exists.** `license: credit.license.url ?? credit.license.label` emits `"commissioned-webgogol-material"` into `ImageObject.license`, which search engines cannot use. There is no `acquireLicensePage`, so the licensable-images treatment can never trigger even when a license URL is present.
+2. **The license is projected as a bare label string when no URL exists.** `license: credit.license.url ?? credit.license.label` emits `"commissioned-warpgogol-material"` into `ImageObject.license`, which search engines cannot use. There is no `acquireLicensePage`, so the licensable-images treatment can never trigger even when a license URL is present.
 3. **Rights are only a freeform `copyrightNotice` string.** There is no structured `copyrightHolder` / `copyrightYear`, so consumers must parse English prose to learn the holder.
 4. **AI provenance is name-only.** A `VEO` party carries a `note` at best — no model/platform version and no generation date, which the EU AI Act transparency direction and AI search consumers increasingly expect for synthetic media.
 
@@ -128,9 +128,9 @@ All four fields are optional; existing sidecars stay valid.
   "name": "…",
   "creditText": "Erstellt von: … · Rechte: …",   // localized to page language
   "creator": { "@type": "Person", "name": "…" },
-  "copyrightHolder": { "@type": "Organization", "name": "Webgogol" },
+  "copyrightHolder": { "@type": "Organization", "name": "Warpgogol" },
   "copyrightYear": 2026,
-  "copyrightNotice": "Copyright © 2026 Webgogol. …",
+  "copyrightNotice": "Copyright © 2026 Warpgogol. …",
   "license": "https://…",                          // only when a URL exists
   "acquireLicensePage": "https://…"                // only when present
 }
@@ -172,7 +172,7 @@ All four fields are optional; existing sidecars stay valid.
 - [x] JSON-LD `creditText` is localized to the page language on every locale (RFC-0220 default-language defect stays fixed). _(Fixed in commit `727f2503`; verified in built `dist` /uk/ output.)_ (evidence: implemented historically)
 - [x] `<MaterialCredit>` expanded details render AI `version` and `generatedAt` when present, without prompt text. (evidence: implemented historically)
 - [x] `material.credits.validate` fails on `acquireLicensePage` without `url` and on non-date `generatedAt`. _(Negative-tested: both `invalid-license-acquire` and `invalid-ai-date` fire.)_ (evidence: implemented historically)
-- [x] `apps-check.run --app webgogol-com` and `--app nicaragua-projekt` pass after the change. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps-check.run --app warpgogol-com` and `--app nicaragua-projekt` pass after the change. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

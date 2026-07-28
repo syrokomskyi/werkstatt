@@ -30,7 +30,7 @@ commands:
     - surface.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-checks
 successSignals:
@@ -97,7 +97,7 @@ This RFC aligns with the existing `@gogol/surface` Blueprint axis system and the
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run demands.hierarchy.validate --app webgogol-com --json
+pnpm exec site-kernel run demands.hierarchy.validate --app warpgogol-com --json
 ```
 
 Scope: `app`. Supports `--all` and `--json`.
@@ -132,7 +132,7 @@ Exits 0 when no errors exist (warnings are non-blocking). Exits 1 on invalid fol
    - if `data.slug` is present, use it (legacy override)
    - otherwise use `relSlug`
    - if `relSlug` contains no `/` (legacy flat file), keep exact old behaviour
-2. **Organisation migration (webgogol-com).**
+2. **Organisation migration (warpgogol-com).**
    - Move existing city-level records into `{industry}/{city}.md` folders.
    - Move existing topic-level records into `{industry}/{city}/{topic}.md` or `{industry}/{topic}.md` depending on scope.
    - Delete the explicit `slug:` line from migrated files.
@@ -159,8 +159,8 @@ Exits 0 when no errors exist (warnings are non-blocking). Exits 1 on invalid fol
 
 - [x] `loadDataset` derives the neutral slug from the relative path for files inside sub-folders, with legacy basename fallback for flat files. (evidence: implemented historically)
 - [x] `slug:` frontmatter is optional; when present it overrides the derived value. (evidence: implemented historically)
-- [x] `axisDataByLang` contains no collisions for the `webgogol-com` pilot dataset. (evidence: implemented historically)
-- [x] All existing `webgogol-com` demand records are reorganised into one of the three canonical folder patterns; `slug:` lines removed where derived slug matches, preserved as override where derived slug differs to keep routes byte-identical. (evidence: implemented historically)
+- [x] `axisDataByLang` contains no collisions for the `warpgogol-com` pilot dataset. (evidence: implemented historically)
+- [x] All existing `warpgogol-com` demand records are reorganised into one of the three canonical folder patterns; `slug:` lines removed where derived slug matches, preserved as override where derived slug differs to keep routes byte-identical. (evidence: implemented historically)
 - [x] `demands.hierarchy.validate` runs in `apps-check.author` and passes (0 errors, 20 expected warnings for legacy slug overrides). (evidence: implemented historically)
 - [x] `surface.generate` produces identical route sets before and after the reorganisation (verified via pageId stability). (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)

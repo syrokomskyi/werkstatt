@@ -78,7 +78,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -343,8 +343,8 @@ A new `mission-migrate` entry kind is added to `bordbuchEntryKindSchema` in `pac
 ```json
 {
   "schemaVersion": "1.0.0",
-  "missionId": "webgogol-com-m000007",
-  "systemId": "webgogol-com",
+  "missionId": "warpgogol-com-m000007",
+  "systemId": "warpgogol-com",
   "appliedMigrators": ["rfc-0479", "rfc-0481"],
   "skippedMigrators": [],
   "blockedMigrator": null,

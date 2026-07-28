@@ -24,13 +24,13 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - ui
 successSignals:
   - "`section.header.contract.validate` exits zero on the current workspace — the markdown-section HEAD-01 finding is gone."
-  - "`pnpm --filter webgogol-com astro check` and `pnpm --filter nicaragua-projekt astro check` both exit zero."
+  - "`pnpm --filter warpgogol-com astro check` and `pnpm --filter nicaragua-projekt astro check` both exit zero."
   - "Markdown prose pages (legal pages, project descriptions, open-source page) render their heading + lead through the canonical RFC-0102 typography instead of bespoke `.markdown-section__title` / `.markdown-section__lead` rules."
 nonGoals:
   - "Do not introduce a tone-segmented heading shape for prose pages. The migration keeps the single-string `heading` and `lead` model; only the rendering path changes."
@@ -91,13 +91,13 @@ The canonical RFC-0102 typography from `packages/ui/src/components/section-heade
 
 ### Why the slight visual delta is acceptable
 
-Prose pages (impressum, datenschutz, AGB, projekte, open-source, …) previously shipped a layout that was tighter than the bespoke CSS suggested — `space-6` bottom margin and `space-4` lead margin-top were heuristic legacy values from before the section framework existed. Anchoring those values to `<SectionHeader>`'s canonical rhythm is the correct move for cross-site consistency: a contributor browsing webgogol-com's `/impressum` and nicaragua-projekt's `/impressum` will now see the same vertical rhythm without anyone having to remember "markdown is special".
+Prose pages (impressum, datenschutz, AGB, projekte, open-source, …) previously shipped a layout that was tighter than the bespoke CSS suggested — `space-6` bottom margin and `space-4` lead margin-top were heuristic legacy values from before the section framework existed. Anchoring those values to `<SectionHeader>`'s canonical rhythm is the correct move for cross-site consistency: a contributor browsing warpgogol-com's `/impressum` and nicaragua-projekt's `/impressum` will now see the same vertical rhythm without anyone having to remember "markdown is special".
 
 ### Pages affected
 
 All pages whose block list includes `type: markdown`. As of 2026-05-29, that is:
 
-- `apps/webgogol-com/src/content/pages/de/{datenschutz,impressum,agb,projekte,open-source,...}.md` (every legal / prose page)
+- `apps/warpgogol-com/src/content/pages/de/{datenschutz,impressum,agb,projekte,open-source,...}.md` (every legal / prose page)
 - `apps/nicaragua-projekt/src/content/pages/{de,en}/{about-us,donate-contact,legal-notice,open-source,privacy-policy,projects,right-of-withdrawal,terms}.md`
 
 None of these pages pass a `heading` prop with the now-removed `markdown-section__title` class assumption baked into their content. The change is internal to the section's template.
@@ -114,7 +114,7 @@ None of these pages pass a `heading` prop with the now-removed `markdown-section
 - [x] `markdown-section.css` no longer declares `.markdown-section__header`, `.markdown-section__title`, or `.markdown-section__lead`. (evidence: implemented historically)
 - [x] `MarkdownPageOverride` declares `hideSectionNumber?: boolean` with default `true` in the destructure. (evidence: implemented historically)
 - [x] `pnpm exec site-kernel run section.header.contract.validate` exits zero. (evidence: implemented historically)
-- [x] `pnpm --filter webgogol-com astro check` exits zero. (evidence: implemented historically)
+- [x] `pnpm --filter warpgogol-com astro check` exits zero. (evidence: implemented historically)
 - [x] `pnpm --filter nicaragua-projekt astro check` exits zero. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

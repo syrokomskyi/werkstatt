@@ -33,7 +33,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/surface"
@@ -58,7 +58,7 @@ nonGoals:
 
 RFC-0169 established a closed, Stripe-backed entitlement catalog (`blog`, `integrations.*`, `analytics`, `pseo`, `team.profiles`) and RFC-0196 added a `pseo` index-budget tier map (`PSEO_TIER_BUDGET`). The doctrine (`2026-06-24 Programmatic SEO`, §5, §9.10, table in §5) turns the studio's commercial **Angebot** into a productization model where **each module is an entitlement + configuration**, and the same engine deploys in two modes:
 
-- **Bodenstation** (`webgogol-com`, dogfooding): all modules on, high budget, full stack to Bedarfskarten, `Service`/studio voice.
+- **Bodenstation** (`warpgogol-com`, dogfooding): all modules on, high budget, full stack to Bedarfskarten, `Service`/studio voice.
 - **Sternsystem** (client site): only purchased modules on, budget capped by tariff, small geo cascade (the client's fixed country/region/city), `LocalBusiness`/client voice.
 
 The Angebot modules are: **Быть найденным** (`pseo`), **Услуги бизнеса** (`offer`), **Запись без переписки** (`booking`), **Формирование доверия** (`trust`), **Мультиязычность** (`i18n-extra`), **Автоматизация** (`automation`). Today only `pseo` exists; the others, the regional-hub upsell tier, and the `trust→aggregateRating` Sternsystem-only rule are unspecified.
@@ -132,8 +132,8 @@ export const PSEO_REGIONAL_TIERS = ["feature_pseo_regional", "feature_pseo_pro",
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run entitlement.module.validate --app webgogol-com --json
-pnpm exec site-kernel run trust.rating.validate --app webgogol-com --json
+pnpm exec site-kernel run entitlement.module.validate --app warpgogol-com --json
+pnpm exec site-kernel run trust.rating.validate --app warpgogol-com --json
 ```
 
 Both are app-scoped and run in apps build-check.
@@ -146,7 +146,7 @@ Both are app-scoped and run in apps build-check.
 | `packages/surface/src/eligibility.ts` | Gates d3–d4 emission on the regional tier |
 | `packages/os/site-kernel-checks/src/entitlements.ts` | Adds `entitlement.module.validate` |
 | `packages/os/site-kernel-checks/src/pseo.ts` | Adds `trust.rating.validate` |
-| `apps/webgogol-com/...entitlements override` | Bodenstation: all modules on, high budget, no `aggregateRating` |
+| `apps/warpgogol-com/...entitlements override` | Bodenstation: all modules on, high budget, no `aggregateRating` |
 
 ### Output format
 
@@ -155,7 +155,7 @@ Both are app-scoped and run in apps build-check.
   "command": "trust.rating.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "rating-on-bodenstation", "page": "…", "message": "aggregateRating is forbidden in Bodenstation mode (studio is not the local provider)" },
+    { "app": "warpgogol-com", "rule": "rating-on-bodenstation", "page": "…", "message": "aggregateRating is forbidden in Bodenstation mode (studio is not the local provider)" },
     { "app": "client-x", "rule": "unsourced-rating", "page": "…", "message": "aggregateRating requires provenance-backed real reviews (CKL claim)" }
   ]
 }
@@ -169,7 +169,7 @@ Both are app-scoped and run in apps build-check.
 
 - **Catalog extension is additive.** Adding features to the closed catalog + Stripe map is backward-safe; existing sites without the new lookup-keys simply do not get the modules.
 - **Regional tier is opt-in.** Sites on the base `pseo` tier keep d0–d2 + d4–d5 within a small selection; buying the regional tier unlocks d3 region hubs and the larger budget.
-- **Bodenstation dogfooding** (`webgogol-com`) sets an entitlements override enabling all modules with a high budget, and is asserted to emit **no** `aggregateRating` (RFC-0242 ships the datasets).
+- **Bodenstation dogfooding** (`warpgogol-com`) sets an entitlements override enabling all modules with a high budget, and is asserted to emit **no** `aggregateRating` (RFC-0242 ships the datasets).
 - **Pipeline:** both checks join apps build-check; `entitlement.module.validate` runs after surface generation.
 
 ## Alternatives considered
@@ -192,7 +192,7 @@ Both are app-scoped and run in apps build-check.
 - [x] `PSEO_TIER_BUDGET` gains a regional-hub tier and `PSEO_REGIONAL_TIERS`; eligibility gates d3–d4 emission on that tier. (`packages/surface/src/eligibility.ts` gained `forceNonIndexableDepths`; the Blueprint's `policy.regionalGateDepths` — `[3]` for `website-local` — suppresses the region-hub depth unless the resolved entitlements report `pseo.regionalUnlocked`. Verified: `entitlements.resolve` reports `regionalUnlocked: true` for the Bodenstation override, and `/website/elektriker/deu/bw/` now builds.) (evidence: packages/ directory, package exists)
 - [x] `entitlement.module.validate` registered (app scope), wired into apps build-check, fails when compiled modules/routes exceed entitlements or the base Fundament emits virtual routes. (evidence: implemented historically)
 - [x] `trust.rating.validate` registered (app scope), wired into apps build-check, forbids `aggregateRating` on Bodenstation and requires CKL-provenance-backed real reviews on Sternsystem. (Sternsystem branch added: an `aggregateRating` reference now requires a CKL claim — `provenance: external` + a validity window — on a rating/review field in the record's `.claims.yaml` sidecar.) (evidence: implemented historically)
-- [x] Bodenstation (`webgogol-com`) override enables all modules with a high budget and emits no `aggregateRating`. (evidence: implemented historically)
+- [x] Bodenstation (`warpgogol-com`) override enables all modules with a high budget and emits no `aggregateRating`. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents

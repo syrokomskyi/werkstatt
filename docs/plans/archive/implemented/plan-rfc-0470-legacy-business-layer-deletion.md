@@ -7,7 +7,7 @@ createdAt: 2026-07-20
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/business"
     - "@gogol/pbp"
@@ -38,7 +38,7 @@ scope:
 - Migration of 329 content references (`{business.*}`) in page prose and frontmatter
 - Creation of separate FAQ and people content collections
 - Deletion of `packages/business/` directory
-- Deletion of `systems/webgogol-com/src/content/business/` directory
+- Deletion of `systems/warpgogol-com/src/content/business/` directory
 - Removal of `@gogol/business` from `package.json` dependencies
 - DNA-20 supersession in `docs/architecture-dna.md`
 - Git tag `pbp-legacy-deleted`
@@ -74,8 +74,8 @@ These remain as a follow-up execution phase after content migration is complete.
 
 **NOT modified (out of scope):**
 
-- `systems/webgogol-com/src/content.config.ts` — still uses `businessCollections` until content references are migrated
-- `systems/webgogol-com/src/pages/*.astro` — still import from `@gogol/business` until content references are migrated
+- `systems/warpgogol-com/src/content.config.ts` — still uses `businessCollections` until content references are migrated
+- `systems/warpgogol-com/src/pages/*.astro` — still import from `@gogol/business` until content references are migrated
 - `packages/business/` — NOT deleted in this plan phase
 
 ### 2.2 Configuration and data
@@ -264,7 +264,7 @@ These remain as a follow-up execution phase after content migration is complete.
 
 - All build:check commands pass
 - All test suites pass
-- grep verification shows no code imports from `@gogol/business` outside `packages/business/` (excluding `systems/webgogol-com` which is out of scope)
+- grep verification shows no code imports from `@gogol/business` outside `packages/business/` (excluding `systems/warpgogol-com` which is out of scope)
 
 **Completion criterion:** All builds and tests pass. Commit is created.
 
@@ -294,7 +294,7 @@ These remain as a follow-up execution phase after content migration is complete.
 | FAQ/people content loss | Out of scope — content migration is a separate phase. Business package is NOT deleted in this plan. |
 | buildPageSemanticModel dependency on getBusinessFaqEntries | Step 4 inlines or makes FAQ loader optional. Business package still exists as fallback. |
 | content.business.validate breaks | Step 5 updates command description. Step 3 removes getBusinessSchema import. |
-| Other sites break | Out of scope — webgogol-com is the only site. Other sites don't exist yet. |
+| Other sites break | Out of scope — warpgogol-com is the only site. Other sites don't exist yet. |
 
 ## 6. Escalation triggers
 

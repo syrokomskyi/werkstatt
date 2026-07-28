@@ -43,7 +43,7 @@ commands:
     - sites-check-postbuild
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/ontology"
@@ -100,12 +100,12 @@ RFC-0200 emits Person JSON-LD on profile pages with `name`, `jobTitle`, `image`,
 {
   "@context": "https://schema.org",
   "@type": "Person",
-  "@id": "https://webgogol.com/team/andrii-syrokomskyi/#person",
+  "@id": "https://warpgogol.com/team/andrii-syrokomskyi/#person",
   "name": "Andrii Syrokomskyi",
   "jobTitle": "Gründer und technischer Leiter",
   "description": "Programmierer und Entwickler hochlastfähiger Systeme. Mehr als 25 Jahre Berufserfahrung.",
-  "url": "https://webgogol.com/team/andrii-syrokomskyi/",
-  "image": "https://webgogol.com/.../andrii-portrait.webp",
+  "url": "https://warpgogol.com/team/andrii-syrokomskyi/",
+  "image": "https://warpgogol.com/.../andrii-portrait.webp",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Backnang",
@@ -122,7 +122,7 @@ RFC-0200 emits Person JSON-LD on profile pages with `name`, `jobTitle`, `image`,
   ],
   "affiliation": {
     "@type": "Organization",
-    "name": "Webgogol"
+    "name": "Warpgogol"
   }
 }
 ```
@@ -147,16 +147,16 @@ RFC-0200 emits Person JSON-LD on profile pages with `name`, `jobTitle`, `image`,
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "@id": "https://webgogol.com/team/ki-agenten/mira/#software",
+  "@id": "https://warpgogol.com/team/ki-agenten/mira/#software",
   "name": "Mira",
   "applicationCategory": "BusinessApplication",
   "description": "Automatisierte Inhaltsprüfung und Strukturierung von Geschäftsprofilen.",
-  "url": "https://webgogol.com/team/ki-agenten/mira/",
+  "url": "https://warpgogol.com/team/ki-agenten/mira/",
   "operatingSystem": "Web",
   "provider": {
     "@type": "Person",
     "name": "Andrii Syrokomskyi",
-    "url": "https://webgogol.com/team/andrii-syrokomskyi/"
+    "url": "https://warpgogol.com/team/andrii-syrokomskyi/"
   },
   "offers": {
     "@type": "Offer",
@@ -180,20 +180,20 @@ RFC-0200 emits Person JSON-LD on profile pages with `name`, `jobTitle`, `image`,
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "@id": "https://webgogol.com/team/#collection",
+  "@id": "https://warpgogol.com/team/#collection",
   "name": "Team",
-  "description": "Verantwortliche Personen, Teams und KI-Systeme bei Webgogol.",
-  "url": "https://webgogol.com/team/",
+  "description": "Verantwortliche Personen, Teams und KI-Systeme bei Warpgogol.",
+  "url": "https://warpgogol.com/team/",
   "hasPart": [
     {
       "@type": "Person",
       "name": "Andrii Syrokomskyi",
-      "url": "https://webgogol.com/team/andrii-syrokomskyi/"
+      "url": "https://warpgogol.com/team/andrii-syrokomskyi/"
     },
     {
       "@type": "SoftwareApplication",
       "name": "Mira",
-      "url": "https://webgogol.com/team/ki-agenten/mira/"
+      "url": "https://warpgogol.com/team/ki-agenten/mira/"
     }
   ]
 }
@@ -215,8 +215,8 @@ Three public JSON endpoints, generated at build time as static files:
       "publicName": "Andrii Syrokomskyi",
       "role": "Gründer und technischer Leiter",
       "status": "active",
-      "profileUrl": "https://webgogol.com/team/andrii-syrokomskyi/",
-      "profileJsonUrl": "https://webgogol.com/team/andrii-syrokomskyi/profile.json"
+      "profileUrl": "https://warpgogol.com/team/andrii-syrokomskyi/",
+      "profileJsonUrl": "https://warpgogol.com/team/andrii-syrokomskyi/profile.json"
     },
     {
       "slug": "mira",
@@ -224,8 +224,8 @@ Three public JSON endpoints, generated at build time as static files:
       "publicName": "Mira",
       "purpose": "Automatisierte Inhaltsprüfung und Strukturierung von Geschäftsprofilen.",
       "status": "active",
-      "profileUrl": "https://webgogol.com/team/ki-agenten/mira/",
-      "profileJsonUrl": "https://webgogol.com/team/ki-agenten/mira/profile.json"
+      "profileUrl": "https://warpgogol.com/team/ki-agenten/mira/",
+      "profileJsonUrl": "https://warpgogol.com/team/ki-agenten/mira/profile.json"
     }
   ]
 }
@@ -244,7 +244,7 @@ Three public JSON endpoints, generated at build time as static files:
   "location": "Backnang, Baden-Württemberg",
   "languages": ["Deutsch", "Ukrainisch", "Russisch", "Englisch"],
   "responsibilities": [
-    "Architektur und technische Leitung der Webgogol-Plattform",
+    "Architektur und technische Leitung der Warpgogol-Plattform",
     "Geschäftsprozessautomatisierung für kleine und mittlere Unternehmen"
   ],
   "decisionAuthority": [
@@ -269,7 +269,7 @@ Three public JSON endpoints, generated at build time as static files:
       "kind": "publication"
     }
   ],
-  "profileUrl": "https://webgogol.com/team/andrii-syrokomskyi/",
+  "profileUrl": "https://warpgogol.com/team/andrii-syrokomskyi/",
   "sameAs": [
     "https://linkedin.com/in/syrokomskyi"
   ],
@@ -318,9 +318,9 @@ Three public JSON endpoints, generated at build time as static files:
   "accountableHuman": {
     "slug": "andrii-syrokomskyi",
     "publicName": "Andrii Syrokomskyi",
-    "profileUrl": "https://webgogol.com/team/andrii-syrokomskyi/"
+    "profileUrl": "https://warpgogol.com/team/andrii-syrokomskyi/"
   },
-  "escalationRoute": "E-Mail an hi@webgogol.com mit Betreff 'KI-Eskalation'",
+  "escalationRoute": "E-Mail an hi@warpgogol.com mit Betreff 'KI-Eskalation'",
   "technicalStand": {
     "modelFamily": "Claude 4",
     "lastEvaluatedAt": "2026-07-01",
@@ -332,7 +332,7 @@ Three public JSON endpoints, generated at build time as static files:
     { "action": "Preisentscheidungen", "status": "prohibited" },
     { "action": "Kundenkommunikation", "status": "approval-required" }
   ],
-  "profileUrl": "https://webgogol.com/team/ki-agenten/mira/",
+  "profileUrl": "https://warpgogol.com/team/ki-agenten/mira/",
   "lastReviewedAt": "2026-07-01"
 }
 ```
@@ -465,7 +465,7 @@ The generation happens in a new `participant.json.generate` step in `build.prepa
 
 ```sh
 # Validate JSON endpoints and JSON-LD emission.
-pnpm exec site-kernel run participant.json.validate --site webgogol-com --json
+pnpm exec site-kernel run participant.json.validate --site warpgogol-com --json
 ```
 
 ### File system responsibilities
@@ -494,7 +494,7 @@ pnpm exec site-kernel run participant.json.validate --site webgogol-com --json
 {
   "command": "participant.json.validate",
   "status": "pass",
-  "site": "webgogol-com",
+  "site": "warpgogol-com",
   "checked": {
     "profilesJsonExists": true,
     "humanProfilesChecked": 1,

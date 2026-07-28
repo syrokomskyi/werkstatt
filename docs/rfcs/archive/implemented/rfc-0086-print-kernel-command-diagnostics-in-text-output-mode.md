@@ -39,9 +39,9 @@ nonGoals:
 
 Kernel commands return `KernelCommandResult { data, exitCode, summary }`. The `data` payload typically carries a `diagnostics[]` or `violations[]` array with the actionable text — file paths, rule ids, remediation hints. The CLI's text printer renders `summary` (e.g. `brief.validate: 1 violation(s)`) but does NOT render the diagnostics. Only `--json` reveals them.
 
-During the May 2026 webgogol-com onboarding, this surfaced repeatedly. Examples:
+During the May 2026 warpgogol-com onboarding, this surfaced repeatedly. Examples:
 
-- `brief.validate` failed with `[ERROR] brief.validate: 1 violation(s)`. The diagnostic — _"apps/webgogol-com/ already exists. --require-app-absent is set by /00-prepare ... delete it (\`git rm -rf apps/webgogol-com/\` then commit) and re-run /00-prepare ..."_ — was visible only after `--json`.
+- `brief.validate` failed with `[ERROR] brief.validate: 1 violation(s)`. The diagnostic — _"apps/warpgogol-com/ already exists. --require-app-absent is set by /00-prepare ... delete it (\`git rm -rf apps/warpgogol-com/\` then commit) and re-run /00-prepare ..."_ — was visible only after `--json`.
 - `seo.internal-linking.validate` failed with a generic count. The crash details and the offending file were buried in `--json`.
 
 AI agents that drive workflows read the default text output (it is what the workflow `runs:` invocation prints). They miss every diagnostic and either re-run with `--json` (extra round trip) or proceed blindly.
@@ -129,4 +129,4 @@ The 50-line cap protects context windows when an aggregate command like `apps-ch
 
 - Agents MAY implement this RFC ONLY when status: accepted.
 - Agents MUST NOT change RFC status.
-- Implementation MUST add a fixture-based test that the May 2026 webgogol-com diagnostic _"apps/webgogol-com/ already exists. --require-app-absent is set ..."_ appears in text output.
+- Implementation MUST add a fixture-based test that the May 2026 warpgogol-com diagnostic _"apps/warpgogol-com/ already exists. --require-app-absent is set ..."_ appears in text output.

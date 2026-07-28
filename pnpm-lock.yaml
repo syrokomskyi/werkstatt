@@ -51,7 +51,7 @@ importers:
       '@warpgogol/site-kernel-onboarding':
         specifier: workspace:*
         version: link:packages/os/site-kernel-onboarding
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:packages/forge
       eslint:
@@ -168,7 +168,7 @@ importers:
       '@warpgogol/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../../packages/forge
       astro:
@@ -307,7 +307,7 @@ importers:
       '@warpgogol/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../../packages/forge
       astro:
@@ -446,7 +446,7 @@ importers:
       '@warpgogol/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../../packages/forge
       astro:
@@ -585,7 +585,7 @@ importers:
       '@warpgogol/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../../packages/forge
       astro:
@@ -730,7 +730,7 @@ importers:
       '@warpgogol/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../../packages/forge
       astro:
@@ -875,7 +875,7 @@ importers:
       '@warpgogol/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../../packages/forge
       astro:
@@ -1307,7 +1307,7 @@ importers:
       '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../forge
       libp2p:
@@ -1512,7 +1512,7 @@ importers:
       '@warpgogol/tokens':
         specifier: workspace:*
         version: link:../../tokens
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../forge
       ai:
@@ -1662,7 +1662,7 @@ importers:
       '@warpgogol/surface':
         specifier: workspace:*
         version: link:../../surface
-      '@webgogol/forge':
+      '@warpgogol/forge':
         specifier: workspace:*
         version: link:../../forge
       yaml:

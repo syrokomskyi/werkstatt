@@ -59,24 +59,24 @@ scope:
 
 **Changed files in `packages/os/site-kernel/` (re-exports from forge):**
 
-- `packages/os/site-kernel/src/compass-inventory.ts` — becomes thin re-export from `@webgogol/forge/os/compass/handlers/compass-inventory`
-- `packages/os/site-kernel/src/resolve-compass-scan-root.ts` — becomes thin re-export from `@webgogol/forge/os/compass/handlers/resolve-scan-root`
-- `packages/os/site-kernel/src/fs-idempotent.ts` — becomes thin re-export from `@webgogol/forge/src/utils/fs-idempotent`
+- `packages/os/site-kernel/src/compass-inventory.ts` — becomes thin re-export from `@warpgogol/forge/os/compass/handlers/compass-inventory`
+- `packages/os/site-kernel/src/resolve-compass-scan-root.ts` — becomes thin re-export from `@warpgogol/forge/os/compass/handlers/resolve-scan-root`
+- `packages/os/site-kernel/src/fs-idempotent.ts` — becomes thin re-export from `@warpgogol/forge/src/utils/fs-idempotent`
 - `packages/os/site-kernel/src/index.ts` — update re-exports (no change to public API surface)
 
 **Changed files in `packages/os/site-kernel-checks/` (delegation wrappers):**
 
-- `packages/os/site-kernel-checks/src/compass.ts` — delegate to `@webgogol/forge`
-- `packages/os/site-kernel-checks/src/compass-audit.ts` — delegate to `@webgogol/forge`
-- `packages/os/site-kernel-checks/src/compass-change-summary.ts` — delegate to `@webgogol/forge`
-- `packages/os/site-kernel-checks/src/werkstatt-operation-validate.ts` — delegate to `@webgogol/forge`
+- `packages/os/site-kernel-checks/src/compass.ts` — delegate to `@warpgogol/forge`
+- `packages/os/site-kernel-checks/src/compass-audit.ts` — delegate to `@warpgogol/forge`
+- `packages/os/site-kernel-checks/src/compass-change-summary.ts` — delegate to `@warpgogol/forge`
+- `packages/os/site-kernel-checks/src/werkstatt-operation-validate.ts` — delegate to `@warpgogol/forge`
 - `packages/os/site-kernel-checks/src/index.ts` — update re-exports
 
 **Changed files in `packages/os/site-kernel-handoff/` (delegation wrappers):**
 
-- `packages/os/site-kernel-handoff/src/werkstatt/lock.ts` — delegate to `@webgogol/forge`
-- `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-lock-status.ts` — delegate to `@webgogol/forge`
-- `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-lock-recover.ts` — delegate to `@webgogol/forge`
+- `packages/os/site-kernel-handoff/src/werkstatt/lock.ts` — delegate to `@warpgogol/forge`
+- `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-lock-status.ts` — delegate to `@warpgogol/forge`
+- `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-lock-recover.ts` — delegate to `@warpgogol/forge`
 - `packages/os/site-kernel-handoff/src/werkstatt/index.ts` — update re-exports
 
 **Test files moved from `site-kernel-checks` to `forge`:**
@@ -100,7 +100,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 ### 2.4 Validation and pipelines
 
-- `pnpm --filter @webgogol/forge run build:check` — must pass after all forge changes
+- `pnpm --filter @warpgogol/forge run build:check` — must pass after all forge changes
 - `pnpm --filter @warpgogol/site-kernel run build:check` — must pass after re-export conversion
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass after delegation conversion
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — must pass after delegation conversion
@@ -117,12 +117,12 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 - Create `packages/forge/src/utils/fs-idempotent.ts` — move logic from `packages/os/site-kernel/src/fs-idempotent.ts`. Use `writeFileAtomic` from `./fs-atomic.ts` (already in forge). Return type: `Promise<"written" | "unchanged">`.
 - Add `export { writeFileIfChanged } from "./fs-idempotent.ts"` to `packages/forge/src/utils/index.ts`.
-- Convert `packages/os/site-kernel/src/fs-idempotent.ts` to a thin re-export: `export { writeFileIfChanged } from "@webgogol/forge/src/utils/fs-idempotent";`
-- Verify `packages/os/site-kernel/package.json` already has `@webgogol/forge` as a dependency (confirmed: it does).
+- Convert `packages/os/site-kernel/src/fs-idempotent.ts` to a thin re-export: `export { writeFileIfChanged } from "@warpgogol/forge/src/utils/fs-idempotent";`
+- Verify `packages/os/site-kernel/package.json` already has `@warpgogol/forge` as a dependency (confirmed: it does).
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 - `pnpm --filter @warpgogol/site-kernel run build:check` passes.
 
 **Completion criterion:** `writeFileIfChanged` canonical implementation exists in `packages/forge/src/utils/fs-idempotent.ts`. `site-kernel` re-exports it. Both packages compile.
@@ -139,13 +139,13 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 - Create `packages/forge/os/compass/handlers/compass-inventory.ts` — move logic from `packages/os/site-kernel/src/compass-inventory.ts` (522 lines). Replace `import { hasGeneratedMarker } from "./generated-marker.ts"` with `import { hasGeneratedMarker } from "../../../src/utils/generated-marker.ts"`. Replace `import type { KernelCommandInput } from "./types.ts"` with `import type { ForgeCommandInput } from "../../../src/types.ts"`.
 - Create `packages/forge/os/compass/handlers/resolve-scan-root.ts` — move logic from `packages/os/site-kernel/src/resolve-compass-scan-root.ts` (73 lines). Adapt `KernelCommandInput` → `ForgeCommandInput`, `KernelRuntimeContext` → `ForgeRuntimeContext`. The `context.site` and `context.siteExplicit` fields already exist on `ForgeRuntimeContext` — no behavioral change needed.
-- Convert `packages/os/site-kernel/src/compass-inventory.ts` to a thin re-export: `export { createCompassInventoryEntries, type CompassInventoryEntry } from "@webgogol/forge/os/compass/handlers/compass-inventory";`
-- Convert `packages/os/site-kernel/src/resolve-compass-scan-root.ts` to a thin re-export: `export { resolveCompassScanRoot } from "@webgogol/forge/os/compass/handlers/resolve-scan-root";`
+- Convert `packages/os/site-kernel/src/compass-inventory.ts` to a thin re-export: `export { createCompassInventoryEntries, type CompassInventoryEntry } from "@warpgogol/forge/os/compass/handlers/compass-inventory";`
+- Convert `packages/os/site-kernel/src/resolve-compass-scan-root.ts` to a thin re-export: `export { resolveCompassScanRoot } from "@warpgogol/forge/os/compass/handlers/resolve-scan-root";`
 - Verify `packages/os/site-kernel/src/index.ts` re-exports still work (they re-export from the local files, which now re-export from forge).
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 - `pnpm --filter @warpgogol/site-kernel run build:check` passes.
 - `pnpm --filter @warpgogol/site-kernel-codegen run build:check` passes (it re-exports `resolveCompassScanRoot` from `site-kernel`, which now re-exports from forge).
 
@@ -168,7 +168,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 
 **Completion criterion:** All 8 compass handler functions exist in `packages/forge/os/compass/handlers/` and compile without `@warpgogol/*` imports.
 
@@ -190,7 +190,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 
 **Completion criterion:** All 3 werkstatt handler functions + lock helpers + schema exist in `packages/forge/os/werkstatt/handlers/` and compile without `@warpgogol/*` imports.
 
@@ -216,7 +216,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 - `grep -r "@warpgogol/" packages/forge/os/compass/ packages/forge/os/werkstatt/ packages/forge/bin/cli.ts` returns no matches (excluding comments).
 
 **Completion criterion:** `compass.module.ts` and `werkstatt.module.ts` have no try/catch or dynamic `@warpgogol/*` imports. `cli.ts` has no `.catch(() => null)` for compass/werkstatt.
@@ -237,7 +237,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 - `pnpm exec forge doctor` passes with no autonomy guard failures.
 
 **Completion criterion:** `FORBIDDEN_IMPORTS` no longer includes `@warpgogol/site-kernel-checks` or `@warpgogol/site-kernel-handoff`.
@@ -248,16 +248,16 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 ### Step 7. Convert site-kernel-checks to delegation wrappers and move tests to forge
 
-**Goal:** Replace compass and werkstatt-operation-validate implementations in `site-kernel-checks` with re-exports from `@webgogol/forge`. Move all compass/werkstatt test files to forge.
+**Goal:** Replace compass and werkstatt-operation-validate implementations in `site-kernel-checks` with re-exports from `@warpgogol/forge`. Move all compass/werkstatt test files to forge.
 
 **Agent actions:**
 
-- Edit `packages/os/site-kernel-checks/src/compass.ts` — replace the file body with: `export { runCompassInventory, runCompassValidation } from "@webgogol/forge/os/compass/handlers/compass";`
-- Edit `packages/os/site-kernel-checks/src/compass-audit.ts` — replace with: `export { runCompassAuditPlan, runCompassAuditRecord, runCompassAuditBaseline, runCompassAuditValidate } from "@webgogol/forge/os/compass/handlers/compass-audit";`
-- Edit `packages/os/site-kernel-checks/src/compass-change-summary.ts` — replace with re-exports from `@webgogol/forge/os/compass/handlers/compass-change-summary`.
-- Edit `packages/os/site-kernel-checks/src/werkstatt-operation-validate.ts` — replace with: `export { runWerkstattOperationValidate } from "@webgogol/forge/os/werkstatt/handlers/werkstatt-operation-validate";`
+- Edit `packages/os/site-kernel-checks/src/compass.ts` — replace the file body with: `export { runCompassInventory, runCompassValidation } from "@warpgogol/forge/os/compass/handlers/compass";`
+- Edit `packages/os/site-kernel-checks/src/compass-audit.ts` — replace with: `export { runCompassAuditPlan, runCompassAuditRecord, runCompassAuditBaseline, runCompassAuditValidate } from "@warpgogol/forge/os/compass/handlers/compass-audit";`
+- Edit `packages/os/site-kernel-checks/src/compass-change-summary.ts` — replace with re-exports from `@warpgogol/forge/os/compass/handlers/compass-change-summary`.
+- Edit `packages/os/site-kernel-checks/src/werkstatt-operation-validate.ts` — replace with: `export { runWerkstattOperationValidate } from "@warpgogol/forge/os/werkstatt/handlers/werkstatt-operation-validate";`
 - Edit `packages/os/site-kernel-checks/src/index.ts` — update re-exports. `createCompassInventoryEntries` re-export now comes from forge (via `site-kernel` re-export chain).
-- Ensure `packages/os/site-kernel-checks/package.json` has `@webgogol/forge` as a dependency (add if missing).
+- Ensure `packages/os/site-kernel-checks/package.json` has `@warpgogol/forge` as a dependency (add if missing).
 - Move test files from `packages/os/site-kernel-checks/src/tests/` to `packages/forge/os/compass/tests/`:
   - `compass-audit-isauditdue.test.ts`
   - `compass-audit-record.test.ts`
@@ -268,7 +268,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run test` — moved tests pass.
+- `pnpm --filter @warpgogol/forge run test` — moved tests pass.
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes.
 - `pnpm --filter @warpgogol/site-kernel-checks run test` — remaining tests (non-compass) still pass.
 
@@ -280,15 +280,15 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 ### Step 8. Convert site-kernel-handoff werkstatt to delegation wrappers
 
-**Goal:** Replace werkstatt lock implementations in `site-kernel-handoff` with re-exports from `@webgogol/forge`.
+**Goal:** Replace werkstatt lock implementations in `site-kernel-handoff` with re-exports from `@warpgogol/forge`.
 
 **Agent actions:**
 
-- Edit `packages/os/site-kernel-handoff/src/werkstatt/lock.ts` — replace with: `export { acquireLock, releaseLock, heartbeatLock, readAllLocks, isLockStale, removeStaleLock, HEARTBEAT_INTERVAL_MS, DEFAULT_TIMEOUT_SECONDS } from "@webgogol/forge/os/werkstatt/handlers/lock";`
+- Edit `packages/os/site-kernel-handoff/src/werkstatt/lock.ts` — replace with: `export { acquireLock, releaseLock, heartbeatLock, readAllLocks, isLockStale, removeStaleLock, HEARTBEAT_INTERVAL_MS, DEFAULT_TIMEOUT_SECONDS } from "@warpgogol/forge/os/werkstatt/handlers/lock";`
 - Edit `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-lock-status.ts` — replace with re-export from forge.
 - Edit `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-lock-recover.ts` — replace with re-export from forge.
 - Edit `packages/os/site-kernel-handoff/src/werkstatt/index.ts` — update re-exports if needed.
-- Ensure `packages/os/site-kernel-handoff/package.json` has `@webgogol/forge` as a dependency (add if missing).
+- Ensure `packages/os/site-kernel-handoff/package.json` has `@warpgogol/forge` as a dependency (add if missing).
 - Keep `operation.ts` and `atomic.ts` in `site-kernel-handoff` — they are not part of this RFC (not inlined into forge).
 
 **Validation:**
@@ -340,7 +340,7 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run test` — all new tests pass.
+- `pnpm --filter @warpgogol/forge run test` — all new tests pass.
 
 **Completion criterion:** All new edge-case test files exist and pass.
 
@@ -354,13 +354,13 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 
 **Agent actions:**
 
-- Run `pnpm --filter @webgogol/forge run build:check` — must pass.
+- Run `pnpm --filter @warpgogol/forge run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-checks run build:check` — must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff run build:check` — must pass.
 - Run `pnpm exec forge doctor` — must pass with no autonomy guard failures.
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0556` — must pass.
-- Run `pnpm --filter @webgogol/forge test` — all tests (moved + new edge-case) must pass.
+- Run `pnpm --filter @warpgogol/forge test` — all tests (moved + new edge-case) must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-checks test` — remaining (non-compass) tests must pass.
 - Run `pnpm --filter @warpgogol/site-kernel-handoff test` — existing tests must pass.
 - **Run code review:** invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
@@ -385,12 +385,12 @@ No configuration or data file changes. No YAML/JSON manifests, no ontology catal
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0556`
-- `pnpm --filter @webgogol/forge run build:check`
+- `pnpm --filter @warpgogol/forge run build:check`
 - `pnpm --filter @warpgogol/site-kernel run build:check`
 - `pnpm --filter @warpgogol/site-kernel-checks run build:check`
 - `pnpm --filter @warpgogol/site-kernel-handoff run build:check`
 - `pnpm exec forge doctor`
-- `pnpm --filter @webgogol/forge test`
+- `pnpm --filter @warpgogol/forge test`
 - `pnpm --filter @warpgogol/site-kernel-checks test`
 - `pnpm --filter @warpgogol/site-kernel-handoff test`
 

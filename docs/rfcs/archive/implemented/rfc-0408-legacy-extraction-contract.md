@@ -63,7 +63,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -89,7 +89,7 @@ _This RFC defines the TypeScript contracts for the legacy extraction process. It
 
 The PBP migration plan (`pbp-specification-package/migration-plan`) defines an input corpus of 18 legacy files (§2) that must be transformed into PBP entities. The migration agent must preserve confirmed meaning, separate mixed entities, not invent facts, not publish private data, and produce a full migration report.
 
-The current Webgogol model uses `@gogol/business` (DNA-20) with mixed-concern files like `company.md`, `offer.md`, `legal.md`, etc. This RFC defines the extraction contract that the migration agent (RFC-PBP-102) will use.
+The current Warpgogol model uses `@gogol/business` (DNA-20) with mixed-concern files like `company.md`, `offer.md`, `legal.md`, etc. This RFC defines the extraction contract that the migration agent (RFC-PBP-102) will use.
 
 ## Problem
 

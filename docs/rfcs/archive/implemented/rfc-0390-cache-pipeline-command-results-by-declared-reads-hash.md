@@ -59,13 +59,13 @@ nonGoals:
 
 ## Context
 
-The `build:check` pipeline for a site workpiece (e.g. `webgogol-com`) executes 176 sequential site-kernel commands via `executePipelineForSite` in `packages/os/site-kernel/src/runtime/execute-pipeline.ts`. Each command reads files from the site directory (system.md, content, manifests, schemas) and produces a `KernelExecutionReport`. The pipeline is fail-fast: the first failing step aborts the entire pipeline.
+The `build:check` pipeline for a site workpiece (e.g. `warpgogol-com`) executes 176 sequential site-kernel commands via `executePipelineForSite` in `packages/os/site-kernel/src/runtime/execute-pipeline.ts`. Each command reads files from the site directory (system.md, content, manifests, schemas) and produces a `KernelExecutionReport`. The pipeline is fail-fast: the first failing step aborts the entire pipeline.
 
 A full `build:check` run takes hours because every command re-executes on every run, even when none of the files the command reads have changed since the last successful execution. Turbo's `cache: false` for `build:check` tasks (`turbo.json`) means the task itself is never cached by Turbo, and the 176 commands inside the pipeline have no caching layer at all.
 
 RFC-0382 introduced a `CacheLayer` with SQLite storage (`.cache/kernel-cache.db`) and per-file mtime + contentHash invalidation. Currently this cache is used only for RFC frontmatter entries (`rfc_entries` namespace). The infrastructure is ready to be extended.
 
-RFC-0266 introduced the `reads?: string[]` field on `KernelCommandDefinition` — workspace-root-relative path globs declaring which files a command reads. The field is currently "declarative/documentary only" per RFC-0266. Some commands already declare `reads` (notably in `command-tables/30-check-webgogol.ts`, `command-tables/32-analytics-matomo.ts`, `command-tables/infra-contracts.ts`), but the majority of the 176 pipeline commands do not.
+RFC-0266 introduced the `reads?: string[]` field on `KernelCommandDefinition` — workspace-root-relative path globs declaring which files a command reads. The field is currently "declarative/documentary only" per RFC-0266. Some commands already declare `reads` (notably in `command-tables/30-check-warpgogol.ts`, `command-tables/32-analytics-matomo.ts`, `command-tables/infra-contracts.ts`), but the majority of the 176 pipeline commands do not.
 
 `@gogol/fingerprint` (RFC-0364, DNA-53) provides `fingerprintTree` and `fingerprintFile` — semantic and byte-level file hashing with parser-backed normalizers. All project hashes must use this package (DNA-53).
 
@@ -101,10 +101,10 @@ Caching is enabled by default. The `--force` flag bypasses the cache for a full 
 
 ```sh
 # Normal pipeline run — cache active, unchanged commands skipped
-pnpm exec site-kernel pipeline build.check --site webgogol-com
+pnpm exec site-kernel pipeline build.check --site warpgogol-com
 
 # Force full re-execution, bypass cache
-pnpm exec site-kernel pipeline build.check --site webgogol-com --force
+pnpm exec site-kernel pipeline build.check --site warpgogol-com --force
 
 # Validate that all registered commands declare reads or cacheable: false
 pnpm exec site-kernel run command.reads.validate

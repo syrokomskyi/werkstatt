@@ -45,7 +45,7 @@ commands:
     - surface.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -58,7 +58,7 @@ successSignals:
   - "Each service record carries structured fields: serviceId, industryId, name, slug, summary, servicePurpose, customerQuestions, serviceVariants, pricePresentationModels, durationPresentation, consultationRequirements, bookingRequirements, preparationInformation, aftercareInformation, teamRelation, portfolioRequirements, evidenceRequirements, contactJourney, recommendedComponents, recommendedPageStructure, claimRestrictions, faq, sources, reviewStatus, publicationStatus."
   - "The baker (bakePage) generates service pages from the structured fields — hero from summary/servicePurpose, variants block from serviceVariants, price model block from pricePresentationModels, duration block from durationPresentation, booking block from bookingRequirements/contactJourney, FAQ block from faq."
   - "Service pages do not publish fabricated prices, durations, or availability — pricePresentationModels and durationPresentation describe how a client should present these, not fictional values."
-  - "Service pages do not represent Webgogol as the service provider — the page explains how a client should structure the service on their own site."
+  - "Service pages do not represent Warpgogol as the service provider — the page explains how a client should structure the service on their own site."
   - "surface.service.validate enforces a publication gate: minimum 3 service variants, 3 customer questions, 3 price presentation models, 5 FAQ entries, 1 recommended page structure. Pages failing the gate are not emitted."
   - "surface.service.validate enforces claim restrictions — no unfulfillable commercial promises ('mehr Anfragen', 'mehr Buchungen', 'besser gefunden') in any service record text field."
   - "Service pages are linked from their parent industry page (depth-1) via a service catalog block."
@@ -250,10 +250,10 @@ The industry page (depth-1 of `website-local`) gains a service catalog block tha
 
 ```sh
 # Validate service records against the publication gate + claim policy
-pnpm exec site-kernel run surface.service.validate --site webgogol-com
+pnpm exec site-kernel run surface.service.validate --site warpgogol-com
 
 # Accepts --json for machine-readable output
-pnpm exec site-kernel run surface.service.validate --site webgogol-com --json
+pnpm exec site-kernel run surface.service.validate --site warpgogol-com --json
 ```
 
 `surface.service.validate` is `scope: workspace` (operates on a specific site's surface content). It is integrated into `build.check` as a blocking check (warn mode initially, fail mode after grace period — same pattern as RFC-0492's `surface.industry.validate`).
@@ -393,7 +393,7 @@ The migrator (`rfc-0496`) is a no-op on authored data — the `services` collect
 ### Deployment sequence
 
 1. Platform change merged: new blueprint, C-contract, baker, validator, migrator.
-2. Next mission for `webgogol-com`: `mission.materialize` → `mission.migrate` (no-op) → operator authors service records → `mission.validate` → `release.prepare` → `mission.reconcile` → `release.publish`.
+2. Next mission for `warpgogol-com`: `mission.materialize` → `mission.migrate` (no-op) → operator authors service records → `mission.validate` → `release.prepare` → `mission.reconcile` → `release.publish`.
 3. `release.publish` deploys the new `dist` with service pages and updated `_redirects` simultaneously.
 
 ## Alternatives considered
@@ -439,7 +439,7 @@ The migrator (`rfc-0496`) is a no-op on authored data — the `services` collect
 
 ## Acceptance criteria
 
-- [x] `surface/services/{lang}/*.md` collection exists and is loaded by `expandBlueprint` for the `website-service` blueprint. (evidence: systems/webgogol-com/src/content/surface/services/de/.gitkeep, packages/os/site-kernel-checks/src/surface-expand/expand.ts:70-80)
+- [x] `surface/services/{lang}/*.md` collection exists and is loaded by `expandBlueprint` for the `website-service` blueprint. (evidence: systems/warpgogol-com/src/content/surface/services/de/.gitkeep, packages/os/site-kernel-checks/src/surface-expand/expand.ts:70-80)
 - [x] `packages/ontology/blueprints/website-service.yaml` exists with axes `industry × service` and depth-1 level. (evidence: packages/ontology/blueprints/website-service.yaml:1-57, surface-service-validate.test.ts:19-46)
 - [x] `url-schema.yaml` contains the `/:locale?/:industry/:service` route pattern with `generated: true`. (evidence: packages/ontology/src/external-surfaces/url-schema.yaml:34-44, surface.contract.validate — 0 violations)
 - [x] `bakePage` generates service pages from the structured fields for `website-service` depth-1. (evidence: packages/os/site-kernel-checks/src/surface-expand/bake.ts:354-494, bakeServiceDossier function)
@@ -451,8 +451,8 @@ The migrator (`rfc-0496`) is a no-op on authored data — the `services` collect
 - [x] No service page publishes fabricated prices, durations, or availability. (evidence: packages/os/site-kernel-checks/src/surface-expand/bake.ts:354-494, baker uses pricePresentationModels/durationPresentation as structural guidance, not fabricated values)
 - [x] Migrator `rfc-0496` registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts`. (evidence: packages/os/site-kernel-handoff/src/migrators/registry.ts:38, rfc-0496.ts)
 - [x] `migrator.registry.validate` passes with the new migrator. (evidence: migrator.registry.validate — 0 rfc-0496 violations, rfc-0496.pbt.test.ts + rfc-0496.snapshot.test.ts pass)
-- [x] `surface.contract.validate` passes with the updated `url-schema.yaml`. (evidence: surface.contract.validate --site webgogol-com — 3 surfaces validated, 0 violations)
-- [x] `content.references.validate` and `content.voice.lint` pass for all service records. (evidence: content.references.validate --site webgogol-com — 0 violations, content.voice.lint --site webgogol-com — 0 warnings)
+- [x] `surface.contract.validate` passes with the updated `url-schema.yaml`. (evidence: surface.contract.validate --site warpgogol-com — 3 surfaces validated, 0 violations)
+- [x] `content.references.validate` and `content.voice.lint` pass for all service records. (evidence: content.references.validate --site warpgogol-com — 0 violations, content.voice.lint --site warpgogol-com — 0 warnings)
 - [x] `rfc.validate` passes on this file. (evidence: rfc.validate --root — 0 rfc-0496 violations)
 
 ## Implementation notes for agents

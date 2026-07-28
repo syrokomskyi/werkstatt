@@ -216,7 +216,7 @@ export const APPS_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
 
 ```sh
 # Validate one app against APPS_CHECK_PIPELINE.
-pnpm exec site-kernel run apps-check.run --app webgogol-handwerk
+pnpm exec site-kernel run apps-check.run --app warpgogol-handwerk
 
 # Validate the workspace packages against PACKAGES_CHECK_PIPELINE.
 pnpm exec site-kernel run packages-check.run

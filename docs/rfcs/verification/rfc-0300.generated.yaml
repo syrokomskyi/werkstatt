@@ -5,7 +5,7 @@ ownerCommand: rfc.verification.emit
 editInstead: the rfc.verification.emit generator source (not this file).
 regenerateCommand: pnpm exec site-kernel run rfc.verification.emit
 rfcId: RFC-0300
-title: Create the check-webgogol-com operator app
+title: Create the check-warpgogol-com operator app
 rfcStatus: implemented
 emittedAt: 2026-07-07T17:33:00.722Z
 commit: 15929a0bf01323ade1fb72094f29592d747b9862
@@ -16,13 +16,13 @@ acceptanceHash: 96c5b895eb84880a6ddced599e7e859bbcb2c6027cdf72cc5c7cc724bfab5741
 probes:
   - probe:
       probe: file-exists
-      path: apps/check-webgogol-com/package.json
+      path: apps/check-warpgogol-com/package.json
     ok: true
     detail: exists
     durationMs: 1
   - probe:
       probe: command-registered
-      name: check-webgogol.app.validate
+      name: check-warpgogol.app.validate
     ok: true
     detail: registered
     durationMs: 503

@@ -54,7 +54,7 @@ acceptance:
   - probe: command-registered
     name: "comparative.claim.validate"
   - probe: run
-    command: "site-kernel run comparative.claim.validate --app webgogol-com --json"
+    command: "site-kernel run comparative.claim.validate --app warpgogol-com --json"
     expect:
       exitCode: 0
 ---
@@ -287,7 +287,7 @@ For the audited builder/platform FAQ, the recommended direction is to compare ow
 
 1. Add claim schema specialization and comparison record schema.
 2. Add `comparative.claim.validate`.
-3. Migrate `webgogol-com` third-party price/comparison statements into comparison records or prose-bound claim sidecars.
+3. Migrate `warpgogol-com` third-party price/comparison statements into comparison records or prose-bound claim sidecars.
 4. Add source descriptors for each compared public price/source. Start with manual sources when automated fetching is not yet safe.
 5. Update public copy to include Stand disclosures and remove broad unsupported absolutes.
 6. Wire review-due blocking into the maintenance plan gate for comparative claims.
@@ -312,7 +312,7 @@ For the audited builder/platform FAQ, the recommended direction is to compare ow
 - [x] Comparison records or prose-bound claim anchors can represent third-party price and vendor (evidence: implemented historically) statements.
 - [x] `comparative.claim.validate` is registered and emits `CMP-01` through `CMP-06`. (evidence: implemented historically)
 - [x] Review-due blocking comparative claims make `content.plan.status` red until a verification (evidence: implemented historically) ledger event exists or the claim is withdrawn.
-- [x] `webgogol-com` third-party platform price claims have Stand dates, source refs, and review (evidence: implemented historically) cadences.
+- [x] `warpgogol-com` third-party platform price claims have Stand dates, source refs, and review (evidence: implemented historically) cadences.
 - [x] Unsupported absolute competitor capability claims are removed or narrowed to sourced (evidence: implemented historically) ownership/export/exit claims.
 - [x] `rfc.validate` passes. (evidence: implemented historically)
 

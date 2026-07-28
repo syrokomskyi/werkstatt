@@ -51,7 +51,7 @@ acceptance:
   - probe: command-registered
     name: "public.surface.lint"
   - probe: run
-    command: "site-kernel run public.surface.lint --app webgogol-com --json"
+    command: "site-kernel run public.surface.lint --app warpgogol-com --json"
     expect:
       exitCode: 0
 ---
@@ -90,8 +90,8 @@ The command is a cross-artifact lint. It composes and complements specialized va
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run public.surface.lint --app webgogol-com
-pnpm exec site-kernel run public.surface.lint --app webgogol-com --json
+pnpm exec site-kernel run public.surface.lint --app warpgogol-com
+pnpm exec site-kernel run public.surface.lint --app warpgogol-com --json
 ```
 
 The command reads `apps/<app>/public/` and, when `dist/client/` exists, may also read built HTML and generated public output copied by Astro.
@@ -167,7 +167,7 @@ The twin path formula is supplied by the active twin helper from RFC-0166/RFC-03
     {
       "ruleId": "PUBTXT-04",
       "severity": "error",
-      "file": "apps/webgogol-com/public/preis/index.md",
+      "file": "apps/warpgogol-com/public/preis/index.md",
       "message": "Unresolved content reference: {business.offer.price.monthly}",
       "fixHint": "Run the same interpolation pipeline for markdown twins that rendered HTML uses."
     }
@@ -215,8 +215,8 @@ The twin path formula is supplied by the active twin helper from RFC-0166/RFC-03
 - [x] Rules `PUBTXT-01` through `PUBTXT-13` are implemented and fixture-tested. (evidence: implemented historically)
 - [x] `public.surface.lint` is wired into `build.check` and `apps-check.author`; postbuild parity (evidence: implemented historically) runs when `dist/client/` exists.
 - [x] `llms.generate`, `page.markdown.generate`, and any public text generator use the same content (evidence: implemented historically) interpolation path as rendered HTML.
-- [x] `grep -R "{business\\." apps/webgogol-com/public` is empty after regeneration. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `grep -E "^- ---$|^- - |^- ###|<br" apps/webgogol-com/public/**/*.md public/llms-full.txt` (evidence: original apps retired by RFC-0381, implemented historically) has no matches, represented by the lint instead of shell-only CI.
+- [x] `grep -R "{business\\." apps/warpgogol-com/public` is empty after regeneration. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `grep -E "^- ---$|^- - |^- ###|<br" apps/warpgogol-com/public/**/*.md public/llms-full.txt` (evidence: original apps retired by RFC-0381, implemented historically) has no matches, represented by the lint instead of shell-only CI.
 - [x] Same-site links in `llms.txt`, `llms-full.txt`, and Markdown twins resolve locally or are (evidence: implemented historically) classified as runtime-owned.
 - [x] Public offer/business text contains localized labels and amount/currency/unit rendering, not (evidence: implemented historically) bare numeric terms.
 - [x] Sitemap-member pages have descriptions at or above the policy floor, default 70 visible (evidence: implemented historically) characters.
@@ -228,7 +228,7 @@ The twin path formula is supplied by the active twin helper from RFC-0166/RFC-03
 
 - Agents may implement this RFC because its status is `accepted`.
 - Fix generator/projector code first. Never patch generated `public/` files by hand.
-- Do not add app-specific regex exceptions for `webgogol-com`; the lint must work for every app.
+- Do not add app-specific regex exceptions for `warpgogol-com`; the lint must work for every app.
 - Do not weaken a specialized validator because `public.surface.lint` exists.
 - Treat every new recurring public artifact defect as a candidate rule in this command or a specialized validator.
 

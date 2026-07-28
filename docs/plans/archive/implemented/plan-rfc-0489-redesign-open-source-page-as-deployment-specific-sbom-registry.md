@@ -7,7 +7,7 @@ createdAt: 2026-07-22
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-astro"
     - "@gogol/site-kernel-codegen"
@@ -370,12 +370,12 @@ scope:
 
 **Agent actions:**
 
-- Add `openSource` label keys to `missions/webgogol-com-m000010/workpiece/src/content/site/de/labels.md` with German translations of all 24 label keys.
-- Add `openSource` label keys to `missions/webgogol-com-m000010/workpiece/src/content/site/uk/labels.md` with the Ukrainian translations from the RFC.
+- Add `openSource` label keys to `missions/warpgogol-com-m000010/workpiece/src/content/site/de/labels.md` with German translations of all 24 label keys.
+- Add `openSource` label keys to `missions/warpgogol-com-m000010/workpiece/src/content/site/uk/labels.md` with the Ukrainian translations from the RFC.
 
 **Validation:**
 
-- `pnpm exec site-kernel run open-source.generate --site webgogol-com` (verify labels are loaded)
+- `pnpm exec site-kernel run open-source.generate --site warpgogol-com` (verify labels are loaded)
 
 **Completion criterion:** Both label files have `openSource` keys with all 24 labels.
 
@@ -405,22 +405,22 @@ scope:
 
 ### Step 13. Pilot regeneration and full validation
 
-**Goal:** Regenerate the open-source page for `webgogol-com` and verify all acceptance criteria.
+**Goal:** Regenerate the open-source page for `warpgogol-com` and verify all acceptance criteria.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run open-source.generate --site webgogol-com`.
+- Run `pnpm exec site-kernel run open-source.generate --site warpgogol-com`.
 - Verify the generated prose file is under 500 lines.
 - Verify `THIRD_PARTY_NOTICES.txt`, `THIRD_PARTY_LICENSES.txt`, and `sbom.cdx.json` exist in `public/open-source/`.
 - Verify the UK page renders without errors.
-- Run `pnpm exec site-kernel run open-source.validate --site webgogol-com`.
-- Run `pnpm exec site-kernel run content.idempotency.validate --site webgogol-com`.
-- Run dev build of `webgogol-com` and verify `/open-source/` (DE) and `/vidkrytyy-kod/` (UK) render without runtime errors.
+- Run `pnpm exec site-kernel run open-source.validate --site warpgogol-com`.
+- Run `pnpm exec site-kernel run content.idempotency.validate --site warpgogol-com`.
+- Run dev build of `warpgogol-com` and verify `/open-source/` (DE) and `/vidkrytyy-kod/` (UK) render without runtime errors.
 
 **Validation:**
 
-- `pnpm exec site-kernel run open-source.validate --site webgogol-com` exits 0
-- `pnpm exec site-kernel run content.idempotency.validate --site webgogol-com` exits 0
+- `pnpm exec site-kernel run open-source.validate --site warpgogol-com` exits 0
+- `pnpm exec site-kernel run content.idempotency.validate --site warpgogol-com` exits 0
 - Dev build succeeds
 - `pnpm exec site-kernel run rfc.validate RFC-0489` exits 0
 
@@ -439,14 +439,14 @@ scope:
 - `pnpm --filter @gogol/site-kernel-codegen run test`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/ui run build:check`
-- `pnpm exec site-kernel run open-source.validate --site webgogol-com`
-- `pnpm exec site-kernel run content.idempotency.validate --site webgogol-com`
+- `pnpm exec site-kernel run open-source.validate --site warpgogol-com`
+- `pnpm exec site-kernel run content.idempotency.validate --site warpgogol-com`
 - `pnpm exec site-kernel run rfc.validate RFC-0489`
 
 ### 4.2 Evidence artifacts
 
-- Generated `missions/webgogol-com-m000010/workpiece/public/open-source/sbom.cdx.json` — CycloneDX SBOM.
-- Generated `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/open-source.md` — compact prose files.
+- Generated `missions/warpgogol-com-m000010/workpiece/public/open-source/sbom.cdx.json` — CycloneDX SBOM.
+- Generated `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/open-source.md` — compact prose files.
 - Commit messages referencing `RFC-0489` in the subject line (RFC-0265 commit hygiene).
 
 ## 5. Risks and mitigation

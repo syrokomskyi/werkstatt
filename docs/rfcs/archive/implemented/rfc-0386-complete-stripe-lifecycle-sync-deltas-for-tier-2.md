@@ -147,7 +147,7 @@ Lifecycle sync produces no new command output; it drains `sync_outbox` and write
 3. Cover with unit tests (deal linking, P3 stage map, invoice recording) and a `*.pbt.test.ts` for change-balance monotonicity/clamping (DNA-41).
 4. Verify delta 6 against a live Stripe test-mode account following the documented procedure; record the verification in the RFC-0387 runbook.
 5. Swap the UChat payment step from the manual-confirmation branch to the Stripe Checkout link at Tier 2 (operator configuration, RFC-0387).
-6. Scoped `build:check` for the three packages; `lagebild.validate`; `billing.config.validate` / `billing.secrets.validate` for `webgogol-com`.
+6. Scoped `build:check` for the three packages; `lagebild.validate`; `billing.config.validate` / `billing.secrets.validate` for `warpgogol-com`.
 
 ## Alternatives considered
 
@@ -169,7 +169,7 @@ Lifecycle sync produces no new command output; it drains `sync_outbox` and write
 - [x] A `*.pbt.test.ts` asserts change-balance decrement monotonicity and non-negative clamping (DNA-41). (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `/api/stripe-webhook` verified end-to-end against a live Stripe test-mode signing secret; the procedure is recorded in the RFC-0387 runbook. _(Deferred to RFC-0387 runbook — operator will complete during go-live.)_ (evidence: tests pass, vitest run exitCode=0)
 - [x] No Make.com reference exists anywhere in the billing path (`funnel.contract.validate` stays green). (evidence: implemented historically)
-- [x] `lagebild.validate`, `billing.config.validate`, and `billing.secrets.validate` pass for `webgogol-com`. _(lagebild.validate passes; billing validators deferred to RFC-0387 runbook pending site resolution.)_ (evidence: implemented historically)
+- [x] `lagebild.validate`, `billing.config.validate`, and `billing.secrets.validate` pass for `warpgogol-com`. _(lagebild.validate passes; billing validators deferred to RFC-0387 runbook pending site resolution.)_ (evidence: implemented historically)
 - [x] `rfc.validate RFC-0386` passes on this file before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents

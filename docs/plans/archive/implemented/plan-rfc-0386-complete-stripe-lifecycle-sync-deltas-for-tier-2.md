@@ -63,10 +63,10 @@ scope:
 - `pnpm --filter @gogol/integration-adapter-stripe run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run lagebild.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run billing.config.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run billing.secrets.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run funnel.contract.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run billing.config.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run billing.secrets.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run funnel.contract.validate --site warpgogol-com --json`
 
 ## 3. Step sequence
 
@@ -228,7 +228,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run lagebild.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
 
 **Completion criterion:** `lagebild.validate` asserts DDL presence; `build:check` passes for `@gogol/site-kernel-checks`.
 
@@ -266,10 +266,10 @@ scope:
 - Run `pnpm --filter @gogol/integration-adapter-stripe run build:check`
 - Run `pnpm --filter @gogol/ui run build:check`
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check`
-- Run `pnpm exec site-kernel run lagebild.validate --site webgogol-com --json`
-- Run `pnpm exec site-kernel run billing.config.validate --site webgogol-com --json`
-- Run `pnpm exec site-kernel run billing.secrets.validate --site webgogol-com --json`
-- Run `pnpm exec site-kernel run funnel.contract.validate --site webgogol-com --json`
+- Run `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
+- Run `pnpm exec site-kernel run billing.config.validate --site warpgogol-com --json`
+- Run `pnpm exec site-kernel run billing.secrets.validate --site warpgogol-com --json`
+- Run `pnpm exec site-kernel run funnel.contract.validate --site warpgogol-com --json`
 - Grep for `Make.com` or `make.com` in `packages/integration-adapter-supabase-crm/`, `packages/integration-adapter-stripe/`, `packages/ui/src/integration-routes/` — confirm zero matches
 
 **Validation:**
@@ -333,10 +333,10 @@ scope:
 - `pnpm --filter @gogol/integration-adapter-stripe run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run lagebild.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run billing.config.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run billing.secrets.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run funnel.contract.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run lagebild.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run billing.config.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run billing.secrets.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run funnel.contract.validate --site warpgogol-com --json`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0386`
 
 ### 4.2 Evidence artifacts

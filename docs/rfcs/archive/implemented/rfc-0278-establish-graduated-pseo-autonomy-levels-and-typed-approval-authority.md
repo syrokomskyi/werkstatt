@@ -44,7 +44,7 @@ commands:
     - pseo.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/surface"
@@ -184,10 +184,10 @@ Promotion is slow and earned; demotion is instant and cheap. This asymmetry is t
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run autonomy.level.report   --app webgogol-com --module pseo --json
-pnpm exec site-kernel run autonomy.level.validate  --app webgogol-com --json
-pnpm exec site-kernel run autonomy.promote --app webgogol-com --scope pseo/narrative/de --to L2
-pnpm exec site-kernel run autonomy.demote  --app webgogol-com --scope pseo/claims/de   --to L0 --reason "claims defect"
+pnpm exec site-kernel run autonomy.level.report   --app warpgogol-com --module pseo --json
+pnpm exec site-kernel run autonomy.level.validate  --app warpgogol-com --json
+pnpm exec site-kernel run autonomy.promote --app warpgogol-com --scope pseo/narrative/de --to L2
+pnpm exec site-kernel run autonomy.demote  --app warpgogol-com --scope pseo/claims/de   --to L0 --reason "claims defect"
 ```
 
 `autonomy.promote` is itself governed: it fails unless the calibration evidence meets the bar for the requested level, so even the act of granting autonomy is not a matter of asserting it.
@@ -223,7 +223,7 @@ pnpm exec site-kernel run autonomy.demote  --app webgogol-com --scope pseo/claim
 
 1. Add `Approver`, `AutonomyLevel`, `AutonomyScope`, `AutonomyState`, `ApprovalRecord` types and stamp them onto RFC-0197/RFC-0272 provenance (all existing artifacts backfill as `human:` at `L0`).
 2. Register `autonomy.level.validate`/`report` in report-only mode; wire `AUTO-01..06` as warnings first.
-3. Declare per-scope ceilings in `webgogol-com` system.md; every scope starts L0.
+3. Declare per-scope ceilings in `warpgogol-com` system.md; every scope starts L0.
 4. Once RFC-0279's reviewer exists, enable L1 pre-screen, then open L2 promotion for `structural`/`narrative` where calibration passes.
 5. Promote `claims`/`product` no higher than their ceiling; keep the demotion thermostat authoritative.
 6. Treat "all permitted scopes at L4" as the measurable definition of the AI-exclusive milestone, reported by `autonomy.level.report`.
@@ -250,7 +250,7 @@ pnpm exec site-kernel run autonomy.demote  --app webgogol-com --scope pseo/claim
 - [x] `autonomy.promote` refuses promotion without a calibration record meeting the level bar. (evidence: implemented historically)
 - [x] Defined demotion triggers automatically lower a scope and append a Bordbuch event. (evidence: implemented historically)
 - [x] `claims` and `product` field-classes cannot exceed their configured ceiling. (evidence: implemented historically)
-- [x] `webgogol-com` declares per-scope autonomy ceilings with all scopes starting at L0. (evidence: implemented historically)
+- [x] `warpgogol-com` declares per-scope autonomy ceilings with all scopes starting at L0. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

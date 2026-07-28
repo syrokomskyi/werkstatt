@@ -24,7 +24,7 @@ The diff is documentation-only (SKILL.md, AGENTS.md, RFC, plan, audit). No TypeS
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @webgogol/forge run build:check` exits 0. `forge.skill.validate` passes with zero violations. `rfc.validate --id RFC-0554` passes with zero RFC-0554 violations. 281 tests pass.
+Pass — `pnpm --filter @warpgogol/forge run build:check` exits 0. `forge.skill.validate` passes with zero violations. `rfc.validate --id RFC-0554` passes with zero RFC-0554 violations. 281 tests pass.
 
 ### Axis A — Structural correctness
 
@@ -44,7 +44,7 @@ No issues. No compatibility shims or dual-paths. The RFC explicitly amends RFC-0
 
 ### Axis E — Agent-facing clarity
 
-No issues. The SKILL.md step 0 instructions are clear and unambiguous. The two guardrails explicitly forbid operator-facing migration text and permission asks. The `@webgogol/forge` npm package name is excluded from SKILL-17 platform name check (confirmed by `forge.skill.validate` pass).
+No issues. The SKILL.md step 0 instructions are clear and unambiguous. The two guardrails explicitly forbid operator-facing migration text and permission asks. The `@warpgogol/forge` npm package name is excluded from SKILL-17 platform name check (confirmed by `forge.skill.validate` pass).
 
 ### Axis F — Pragmatism
 

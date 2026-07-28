@@ -212,15 +212,15 @@ scope:
 
 - Create `packages/os/site-kernel-checks/src/tests/naming-policy.test.ts` with test cases:
   - **Empty state:** no `systems/registry.yaml` → pass, zero violations.
-  - **Sternsystem id valid:** `webgogol-com` passes `STERNSYSTEM_ID_REGEX`.
+  - **Sternsystem id valid:** `warpgogol-com` passes `STERNSYSTEM_ID_REGEX`.
   - **Sternsystem id invalid — non-ASCII:** `nicaragüa-projekt` → `sternsystem-id-kebab-case-latin-only` violation, non-ASCII diagnostic reported.
-  - **Sternsystem id invalid — uppercase:** `Webgogol-Com` → violation.
-  - **Sternsystem id invalid — consecutive hyphens:** `webgogol--com` → violation.
-  - **Mission id valid:** `webgogol-com-m000001` passes.
-  - **Mission id invalid — wrong sequence width:** `webgogol-com-m1` → violation.
-  - **Mission id invalid — uppercase:** `webgogol-com-M000001` → violation.
-  - **Release id valid:** `webgogol-com-r000001` passes.
-  - **Release id invalid — wrong prefix:** `webgogol-com-x000001` → violation.
+  - **Sternsystem id invalid — uppercase:** `Warpgogol-Com` → violation.
+  - **Sternsystem id invalid — consecutive hyphens:** `warpgogol--com` → violation.
+  - **Mission id valid:** `warpgogol-com-m000001` passes.
+  - **Mission id invalid — wrong sequence width:** `warpgogol-com-m1` → violation.
+  - **Mission id invalid — uppercase:** `warpgogol-com-M000001` → violation.
+  - **Release id valid:** `warpgogol-com-r000001` passes.
+  - **Release id invalid — wrong prefix:** `warpgogol-com-x000001` → violation.
   - **Bordbuch event id valid:** `event-000001` passes.
   - **Bordbuch event id gap:** `event-000001` then `event-000003` → gap violation.
   - **Bordbuch hash-chain break:** `previousHash` mismatch → violation.
@@ -228,7 +228,7 @@ scope:
   - **cosmicStar not in StarCatalog:** `FooStar` → violation.
   - **cosmicStar duplicate:** two active systems with same star → violation.
   - **cosmicStar reactivation conflict:** archived system reactivated when star is in use → violation.
-  - **Directory/manifest mismatch:** directory `Webgogol-Com` vs manifest `webgogol-com` → violation.
+  - **Directory/manifest mismatch:** directory `Warpgogol-Com` vs manifest `warpgogol-com` → violation.
   - **Parse error:** corrupt YAML → `parse-error` violation, scan continues.
   - **Missing file:** registry references system with no directory → `missing-artifact` violation.
   - **`--system` filter:** only validates artifacts for the specified system.

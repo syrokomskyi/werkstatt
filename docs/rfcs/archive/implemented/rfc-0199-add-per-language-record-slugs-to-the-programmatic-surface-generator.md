@@ -30,7 +30,7 @@ commands:
     - surface.validate
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/surface
   - packages/ontology
@@ -85,8 +85,8 @@ This keeps page identity, eligibility, redirect-stub logic, and the matrix shape
 No new commands. Existing surface commands keep their signatures:
 
 ```sh
-pnpm exec site-kernel run surface.generate --app webgogol-com
-pnpm exec site-kernel run surface.validate --app webgogol-com --json
+pnpm exec site-kernel run surface.generate --app warpgogol-com
+pnpm exec site-kernel run surface.validate --app warpgogol-com --json
 ```
 
 `surface.generate` now emits localized slug segments; `surface.validate` checks that every per-language slug is collision-free within its axis and language and that fallbacks are well-formed.
@@ -188,7 +188,7 @@ The matrix, `pageIdFor`, eligibility, and redirect-stub code continue to key on 
 - [x] `surface.validate` rejects duplicate localized slugs; warns on mixed paths (`untranslated-route` advisory) (`packages/os/site-kernel-checks/src/surface.ts`) (evidence: packages/ directory, package exists)
 - [x] `--json` output format for the new diagnostics documented and stable (see Output format above; `localizedSlugViolations` + `warnings`) (evidence: implemented historically)
 - [x] Existing single-language surfaces produce byte-identical output (no migration) — empty universe ⇒ neutral fallback (unit test); nicaragua-projekt has no surfaces and is unaffected (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] webgogol-com uk surface URLs fully localized; `sitemap.validate` green (e.g. `/uk/sait/elektryk/berlin`, `/uk/sait/elektryk/posluha/fotovoltaika`; build green) (evidence: implemented historically)
+- [x] warpgogol-com uk surface URLs fully localized; `sitemap.validate` green (e.g. `/uk/sait/elektryk/berlin`, `/uk/sait/elektryk/posluha/fotovoltaika`; build green) (evidence: implemented historically)
 - [x] `AGENTS.md` / surface authoring docs note the per-language slug field (`apps/AGENTS.md` Programmatic Surface § "Per-language URL segments") (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file before merging (evidence: implemented historically)
 

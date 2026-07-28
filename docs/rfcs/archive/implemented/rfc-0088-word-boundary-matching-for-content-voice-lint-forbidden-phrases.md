@@ -23,7 +23,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-checks
 successSignals:
@@ -47,7 +47,7 @@ if (scannedValue.toLocaleLowerCase().includes(phrase.toLocaleLowerCase())) {
 }
 ```
 
-That triggered a false positive on `webgogol-com`: the Handwerk family forbids the marketing word **"hype"**, and `open-source.generate` (RFC-0078) writes an attribution list including the npm package **"rehype"**. Substring matching flagged `rehype` as forbidden. The single failure was the only blocker in an otherwise-green `apps-check.author` pass — exactly the kind of noise that erodes trust in voice linting.
+That triggered a false positive on `warpgogol-com`: the Handwerk family forbids the marketing word **"hype"**, and `open-source.generate` (RFC-0078) writes an attribution list including the npm package **"rehype"**. Substring matching flagged `rehype` as forbidden. The single failure was the only blocker in an otherwise-green `apps-check.author` pass — exactly the kind of noise that erodes trust in voice linting.
 
 Other classes of false positives the same code path would produce on a longer corpus:
 
@@ -108,7 +108,7 @@ Tests should cover:
 ## Rollout
 
 1. Land the matcher in `packages/os/site-kernel-checks/src/content-voice.ts`.
-2. Re-run `content.voice.lint` against `apps/nicaragua-projekt` and `apps/webgogol-com`. Confirm previous violations remain flagged and the `rehype-in-hype` false positive is gone.
+2. Re-run `content.voice.lint` against `apps/nicaragua-projekt` and `apps/warpgogol-com`. Confirm previous violations remain flagged and the `rehype-in-hype` false positive is gone.
 3. Add a fixture-based test under `packages/os/site-kernel-checks/src/tests/`.
 
 ## Alternatives considered
@@ -125,11 +125,11 @@ Tests should cover:
 - [x] `matchesForbiddenPhrase` exported from `content-voice.ts` (or a sibling module) for testability. — re-exported in `packages/os/site-kernel-checks/src/index.ts`. (evidence: packages/ directory, package exists)
 - [x] Both forbidden-phrase and preferred-phrasing scans use it. — single matcher used by both code paths in `content-voice.ts`. (evidence: implemented historically)
 - [x] Fixture test covers the six cases above. — `packages/os/site-kernel-checks/src/tests/content-voice.test.ts` (21 tests including the `rehype-in-hype` regression). (evidence: packages/ directory, package exists)
-- [x] `apps/webgogol-com` `content.voice.lint` exits 0 against current authored content. — verified per commit 3e0f6dc3. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps/warpgogol-com` `content.voice.lint` exits 0 against current authored content. — verified per commit 3e0f6dc3. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Existing nicaragua-projekt voice violations (if any) remain flagged. — only the pre-existing `mandatoryPhrase` violations remain. (evidence: original apps retired by RFC-0381, implemented historically)
 
 ## Implementation notes for agents
 
 - Agents MAY implement this RFC ONLY when status: accepted.
 - Agents MUST NOT change RFC status.
-- Implementation MUST seed the regression test with the literal "rehype-in-hype" case from the May 2026 webgogol-com audit.
+- Implementation MUST seed the regression test with the literal "rehype-in-hype" case from the May 2026 warpgogol-com audit.

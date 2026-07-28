@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/surface
   - packages/ontology
@@ -43,7 +43,7 @@ packagesImpacted:
   - packages/ui
 successSignals:
   - "A business-specific programmatic page family is declared entirely in one Blueprint YAML — axes, datasets, per-depth constellation, eligibility policy, and internal-linking rules — with no bespoke route or section code."
-  - "The webgogol-com pilot ships an industry × city long-tail plus pillar pages, rendered from existing shared Planets, gated by the `pseo` entitlement."
+  - "The warpgogol-com pilot ships an industry × city long-tail plus pillar pages, rendered from existing shared Planets, gated by the `pseo` entitlement."
   - "Two different businesses can run different programmatic surfaces by shipping different Blueprints over the same engine."
 nonGoals:
   - "Do not implement the eligibility engine or the route-source seam (RFC-0192)."
@@ -70,7 +70,7 @@ The legacy studio app encoded this implicitly across `pseo.ts` (relevance scorin
 
 A **Blueprint** is introduced: a declarative YAML in `packages/ontology/blueprints/<id>.yaml` that fully specifies one `PageSurfaceProvider` (RFC-0192) without code. A Blueprint declares: the ordered **axes** and their value **universes** (each bound to a content-source collection + field), the **record dataset** and the axis→field bindings that build the engine's `matches(record, tuple)` predicate, the **constellation per depth** (which existing Planets render at each level), the **eligibility policy** (thresholds, redirect policy, trailing slash), the **internal-linking rules** (children / siblings / teasers, with axis-generic relevance scoring generalizing `pseo.ts`), and **deterministic template rotation** (pick a constellation variant by a hash of the axis tuple, so different values get visibly different layouts).
 
-A generic provider reads the Blueprint and drives the engine; no per-business code. The first Blueprint, `website-local`, is shipped and piloted on `apps/webgogol-com`: an `industry × city` long-tail plus the `/website`, `/website/[industry]`, `/webdesign/[city]`, and `/ratgeber/[topic]` pillar levels, rendered entirely from existing shared Planets. `blueprint.validate` checks a Blueprint against its datasets and the section catalog.
+A generic provider reads the Blueprint and drives the engine; no per-business code. The first Blueprint, `website-local`, is shipped and piloted on `apps/warpgogol-com`: an `industry × city` long-tail plus the `/website`, `/website/[industry]`, `/webdesign/[city]`, and `/ratgeber/[topic]` pillar levels, rendered entirely from existing shared Planets. `blueprint.validate` checks a Blueprint against its datasets and the section catalog.
 
 ## Architectural fit
 
@@ -86,7 +86,7 @@ A generic provider reads the Blueprint and drives the engine; no per-business co
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run blueprint.validate --app webgogol-com --json
+pnpm exec site-kernel run blueprint.validate --app warpgogol-com --json
 ```
 
 ### Blueprint schema (illustrative `website-local.yaml`)
@@ -159,7 +159,7 @@ export function createBlueprintProvider(bp: Blueprint): PageSurfaceProvider;
 | Path | Role |
 | --- | --- |
 | `packages/ontology/blueprints/<id>.yaml` | Declarative page-family spec (client/agent-authorable) |
-| `apps/webgogol-com/src/content/<datasets>/{lang}/*.md` | Pilot datasets via content-source (industries, cities, services, topics, businesses-local) |
+| `apps/warpgogol-com/src/content/<datasets>/{lang}/*.md` | Pilot datasets via content-source (industries, cities, services, topics, businesses-local) |
 | `packages/os/site-kernel-checks/src/blueprint.ts` | `blueprint.validate` |
 
 ### Output format

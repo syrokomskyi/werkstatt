@@ -67,7 +67,7 @@ Pass with 5 warnings:
 
 ## Axis F — Pragmatism
 
-- **Scope discipline mostly correct.** `appsImpacted` lists only `webgogol-com` — correct, ratgeber is webgogol-com only. `nonGoals` are explicit and meaningful (lines 60–65).
+- **Scope discipline mostly correct.** `appsImpacted` lists only `warpgogol-com` — correct, ratgeber is warpgogol-com only. `nonGoals` are explicit and meaningful (lines 60–65).
 - **Missing package in `packagesImpacted`.** `@gogol/site-kernel-handoff` is missing (see Axis C). This is a scope accuracy issue.
 - **No new commands proposed.** The RFC extends existing commands — pragmatic. No command duplication.
 - **C-contract change is minimal.** Two optional fields added to Article type, one prohibited type added to ratgeber depth-1 surface policy. This is the minimum needed — no speculative generality.

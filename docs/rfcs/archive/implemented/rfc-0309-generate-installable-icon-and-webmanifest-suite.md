@@ -197,7 +197,7 @@ Failure severity: `error`.
 - [x] Every app emits the required files listed above. (evidence: implemented historically)
 - [x] `manifest.webmanifest` includes valid installable icon entries. (evidence: implemented historically)
 - [x] Shared head output links the generated icon suite. (evidence: implemented historically)
-- [x] `public.icons.validate --app webgogol-com` and `--app nicaragua-projekt` pass. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `public.icons.validate --app warpgogol-com` and `--app nicaragua-projekt` pass. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Lighthouse no longer reports missing installable icon/webmanifest basics for the generated (evidence: implemented historically) suite.
 - [x] No app-local hand-authored raster icon set is introduced. (evidence: implemented historically)
 - [x] `rfc.validate` passes. (evidence: implemented historically)

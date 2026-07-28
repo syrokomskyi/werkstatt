@@ -54,7 +54,7 @@ No issues. The `pillar` field is an optional extension on `BlueprintLevel` — s
 
 - **Status gate:** The RFC has `status: draft` and explicitly states "Agents MAY implement code changes only when this RFC has status `accepted`" (line 492). No self-authorizing language. ✓
 
-- **Implementation notes** do not reference RFC-0224 (accepted→implemented transition) or RFC-0330 (verification evidence for probe-bearing RFCs). The RFC has acceptance criteria with verification commands (`surface.hub.validate --site webgogol-com`, `content.references.validate --site webgogol-com`, dev build) — RFC-0224 governs the transition. Minor — the notes are explicit behavioral rules but could cite the governance RFCs.
+- **Implementation notes** do not reference RFC-0224 (accepted→implemented transition) or RFC-0330 (verification evidence for probe-bearing RFCs). The RFC has acceptance criteria with verification commands (`surface.hub.validate --site warpgogol-com`, `content.references.validate --site warpgogol-com`, dev build) — RFC-0224 governs the transition. Minor — the notes are explicit behavioral rules but could cite the governance RFCs.
 
 - **Anti-fabrication:** The acceptance criteria distinguish between code changes (type extensions, baker logic, validator) and content (blueprint YAML content via migrator). The blueprint content (hero headings, adaptation dimensions, CTAs) is authored content in the RFC itself, not claimed to be auto-generated. ✓
 
@@ -66,7 +66,7 @@ No issues. The `pillar` field is an optional extension on `BlueprintLevel` — s
 
 - **`surface.hub.validate` vs. extending `surface.validate`.** The RFC does not explain why a separate command is needed instead of extending the existing `surface.validate` with hub-specific checks. `surface.validate` already validates surface configuration; adding pillar-specific rules as a section within it would reduce command surface. The alternatives section should justify the separate command.
 
-- **Scope discipline:** `appsImpacted` lists only `webgogol-com` — correct, as `website-local` is only deployed there. `nonGoals` are explicit and meaningful (7 items covering URL changes, search, schema changes, cross-page edits). ✓
+- **Scope discipline:** `appsImpacted` lists only `warpgogol-com` — correct, as `website-local` is only deployed there. `nonGoals` are explicit and meaningful (7 items covering URL changes, search, schema changes, cross-page edits). ✓
 
 ## Axis G — Blind spots
 

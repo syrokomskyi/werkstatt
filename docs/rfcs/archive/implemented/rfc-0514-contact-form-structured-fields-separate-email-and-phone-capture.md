@@ -49,7 +49,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/ui"
@@ -73,7 +73,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -117,7 +117,7 @@ The send-message section gains structured `emailField` and `phoneField` props in
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run contact.form.validate --site webgogol-com
+pnpm exec site-kernel run contact.form.validate --site warpgogol-com
 pnpm exec site-kernel run contact.form.validate --all --json
 ```
 
@@ -189,7 +189,7 @@ The privacy posture is unchanged from the existing send-message flow. Structured
 ## Rollout
 
 - **Migrator (RFC-0479):** A migrator adds default `emailField: { enabled: true, required: true }` and `phoneField: { enabled: false, required: false }` props to existing sites' send-message block configurations. The migrator also removes `contactRequirementMessage` from block props (no longer needed). The migrator runs during `mission.migrate` for each site with a send-message block.
-- **webgogol-com adoption:** After RFC acceptance and migrator application, verify `emailField: { enabled: true, required: true }` and `phoneField: { enabled: true, required: false }` on the contact page's send-message block. Add corresponding labels to `site/{de,uk}/labels.md`.
+- **warpgogol-com adoption:** After RFC acceptance and migrator application, verify `emailField: { enabled: true, required: true }` and `phoneField: { enabled: true, required: false }` on the contact page's send-message block. Add corresponding labels to `site/{de,uk}/labels.md`.
 - **New sites:** `onboarding.scaffold` includes `emailField: { enabled: true, required: true }` by default in the contact page template.
 - **Pipeline integration:** `contact.form.validate` runs in `SITES_BUILD_CHECK_PIPELINE` (in `build.check`) for all sites that use the send-message section. It is a blocking step — cross-locale inconsistency or missing `emailField` fails the build.
 - **Performance:** `contact.form.validate` scans page content files for send-message blocks across all published locales. For a typical site (2 locales, ~50 pages), this is a single-pass file scan reading ~100 files — negligible I/O cost (< 100ms).

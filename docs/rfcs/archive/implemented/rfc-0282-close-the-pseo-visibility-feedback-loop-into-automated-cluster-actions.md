@@ -36,7 +36,7 @@ commands:
     - site.bordbuch.status
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/surface"
@@ -129,9 +129,9 @@ visibilityPolicy:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run visibility.import --app webgogol-com --source gsc --input ./exports/gsc.json --json
-pnpm exec site-kernel run visibility.reconcile --app webgogol-com --json
-pnpm exec site-kernel run visibility.action.plan --app webgogol-com --module pseo --json
+pnpm exec site-kernel run visibility.import --app warpgogol-com --source gsc --input ./exports/gsc.json --json
+pnpm exec site-kernel run visibility.reconcile --app warpgogol-com --json
+pnpm exec site-kernel run visibility.action.plan --app warpgogol-com --module pseo --json
 ```
 
 ### File system responsibilities

@@ -49,7 +49,7 @@ successSignals:
   - "tsc --noEmit and vitest run pass"
 nonGoals:
   - "Does not define migration agent — that is RFC-0408"
-  - "Does not define specific normalization rules for Webgogol"
+  - "Does not define specific normalization rules for Warpgogol"
   - "Does not define Zod schemas"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
@@ -57,7 +57,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists

@@ -22,7 +22,7 @@ The implementation is a clean, minimal content addition to three existing files 
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @webgogol/forge run build:check` (tsc --noEmit) exits 0. `forge.skill.validate` passes with 0 SKILL-11/12/13 violations. `rfc.validate RFC-0551` passes with 3 V-19 warnings (expected for amending draft).
+Pass — `pnpm --filter @warpgogol/forge run build:check` (tsc --noEmit) exits 0. `forge.skill.validate` passes with 0 SKILL-11/12/13 violations. `rfc.validate RFC-0551` passes with 3 V-19 warnings (expected for amending draft).
 
 ### Axis A — Structural correctness
 

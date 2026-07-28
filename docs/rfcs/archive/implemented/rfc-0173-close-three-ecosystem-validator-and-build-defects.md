@@ -30,12 +30,12 @@ commands:
     - apps-check.run
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/share
   - packages/os/site-kernel-checks
 successSignals:
-  - "`grace.validate`, `content.coverage.validate`, and a clean `pnpm build` of webgogol-com all exit 0 on an untouched checkout — the three standing red checks go green."
+  - "`grace.validate`, `content.coverage.validate`, and a clean `pnpm build` of warpgogol-com all exit 0 on an untouched checkout — the three standing red checks go green."
   - "`git status` is clean after `pnpm build` (no tracked business content mutated)."
 nonGoals:
   - "Do not weaken any validator's rules to make them pass — each fix addresses the underlying drift, not the gate."
@@ -58,7 +58,7 @@ packages/share/src/middleware/language-redirect.ts: missing GRACE_BLOCK anchors
 
 The middleware file is treated as authored scaffolding subject to GRACE marker requirements (RFC-0155) but carries no `<GRACE_BLOCK id="…">` … `</GRACE_BLOCK>` anchors. Either the file legitimately owns regenerable regions that must be wrapped in anchors, or it is a hand-authored exception that belongs in the grace exclusion set. The fix must pick one and make it explicit — not relax the check.
 
-### Defect 2 — `content.coverage.validate` fails: webgogol-com `atom-0005` unplaced
+### Defect 2 — `content.coverage.validate` fails: warpgogol-com `atom-0005` unplaced
 
 ```
 atom-0005 — unplaced atom with no coverage.md rationale
@@ -66,7 +66,7 @@ atom-0005 — unplaced atom with no coverage.md rationale
 
 `atom-0005` text is `"Offener Preis: 70 €/Monat oder 700 €/Jahr plus 200 € Einrichtung"` (`onboarding/.output/04-author/atoms.yaml`). The validator requires the normalized atom string (NFKC + whitespace-collapse + lowercase, see `normalizeComparableText`) to match a whole frontmatter value or body of an authored page/prose/business file verbatim. The price copy has since been refactored:
 
-- the canonical price now lives as structured fields in `apps/webgogol-com/src/content/business/de/offer.md` (`monthly: "70 € / Monat"`, `yearly: "700 € / Jahr"`, `setup: "200 €"`);
+- the canonical price now lives as structured fields in `apps/warpgogol-com/src/content/business/de/offer.md` (`monthly: "70 € / Monat"`, `yearly: "700 € / Jahr"`, `setup: "200 €"`);
 - the nearest surviving sentence (`pages/de/contact.md`) reads `"Offener Preis: 70 € / Monat oder …"` — spaces around the `/` differ from the atom's `70 €/Monat`, so normalization (which collapses runs of whitespace but does not insert/remove single spaces around `/`) no longer matches;
 - `pages/de/home.md` rewords it with `+` instead of `plus`.
 
@@ -81,13 +81,13 @@ A build-prepare generator rewrites the `NEED_THIS_*` placeholder markers inside 
 The three defects are fixed under one change, each at its root cause, with no validator rule weakened:
 
 1. **Grace anchors** — add the required `<GRACE_BLOCK>` anchors to `packages/share/src/middleware/language-redirect.ts` around its regenerable region, or register it as an explicit grace exception if it is fully hand-authored. `grace.validate` then passes with the file properly classified.
-2. **Atom coverage** — declare `atom-0005` in `onboarding/.output/04-author/coverage.md` as placed-via-refactor / retired-verbatim with a closed-enum reason, and correct the now-false "all 15 atoms appear verbatim" statement. `content.coverage.validate --app webgogol-com` then passes without touching authored copy.
+2. **Atom coverage** — declare `atom-0005` in `onboarding/.output/04-author/coverage.md` as placed-via-refactor / retired-verbatim with a closed-enum reason, and correct the now-false "all 15 atoms appear verbatim" statement. `content.coverage.validate --app warpgogol-com` then passes without touching authored copy.
 3. **Build mutation** — make the build-prepare generator that touches `business/**` NEED_THIS markers idempotent (do not rewrite already-tracked markers), and extend the build-idempotency smoke to assert a clean `git status` for `apps/*/src/content/business/**` after build.
 
 ## Acceptance criteria
 
 - [x] `grace.validate` exits 0 with `language-redirect.ts` anchored (added `<GRACE_BLOCK id="language-redirect-factory">`; no rule relaxation). Also fixed an app-scoped instance of the same class: `nicaragua-projekt/src/pages/favicon.ico.ts` (now carries GRACE markers; subsequently promoted to a generated boilerplate route) (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `content.coverage.validate --app webgogol-com` exits 0; `atom-0005` declared in `coverage.md` with the closed-enum reason `redundant` and the stale "all 15 verbatim" line corrected; no authored page copy changed (evidence: implemented historically)
+- [x] `content.coverage.validate --app warpgogol-com` exits 0; `atom-0005` declared in `coverage.md` with the closed-enum reason `redundant` and the stale "all 15 verbatim" line corrected; no authored page copy changed (evidence: implemented historically)
 - [x] Build no longer mutates tracked content (RFC-0154 honored): the real culprit was a wall-clock "Zuletzt generiert" timestamp in the `open-source.generate` output (prose/<lang>/open-source.md), not business NEED_THIS markers; removed it so the generator is a pure function of source. `content.idempotency.validate` passes cold-cache for both apps (evidence: implemented historically)
 - [x] Build-idempotency smoke covers tracked `business/**`: the existing `content.idempotency.validate` (RFC-0154) asserts every tracked file under `src/content/**` (which includes `business/**`) is byte-identical after build.prepare — verified cold-cache for both apps (evidence: implemented historically)
 - [x] `apps-check.run` is green for both reference apps (97/97 steps each) (evidence: implemented historically)

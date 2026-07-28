@@ -7,7 +7,7 @@ createdAt: 2026-07-21
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-handoff"
   services: []
@@ -22,7 +22,7 @@ scope:
 - [ ] O1 — Create `rfc-0481` migrator that generates `business-profile/{lang}/business.md` from legacy `business/{lang}/company.md` — maps to acceptance criteria 1, 2, 7, 8
 - [ ] O2 — Register migrator in `migratorRegistry` — maps to acceptance criterion 2
 - [ ] O3 — Write PBT idempotency test (`f(f(x)) == f(x)`) — maps to acceptance criteria 5, 6
-- [ ] O4 — Write snapshot test on real `webgogol-com` data — maps to acceptance criterion 7
+- [ ] O4 — Write snapshot test on real `warpgogol-com` data — maps to acceptance criterion 7
 - [ ] O5 — Pass `build:check`, `test`, and `migrator.registry.validate` — maps to acceptance criteria 3, 4, 5
 - [ ] O6 — Verify `mission.migrate` creates `business.md` for both locales — maps to acceptance criterion 8
 - [ ] O7 — Verify `astro build` no longer throws `PBP-REF: No Business entity found` — maps to acceptance criterion 9
@@ -66,19 +66,19 @@ scope:
 - Import `Migrator`, `SternsystemData`, `MigrationContext`, `MigrationError` from `./types.ts`
 - Implement `mapCompanyToBusiness(rawFrontmatter, lang)` — parse YAML frontmatter from `company.md`, map fields per RFC §Decision.1:
   - `schema` → `pbp/business@1`
-  - `id` → `https://webgogol.com/id/business`
+  - `id` → `https://warpgogol.com/id/business`
   - `type` → `business`
   - `status` → `published`
   - `name` → `brand.name` or top-level `name`
   - `description` → from `description`
   - `mission` → from `mission`
   - `yearEstablished` → `parseInt(foundingYear)`
-  - `brandRefs.default` → `{ ref: "https://webgogol.com/id/brand", expectedType: "brand" }`
-  - `legalIdentityRef` → `{ ref: "https://webgogol.com/id/legal-identity", expectedType: "legal-identity" }`
-  - `placeRefs.office` → `{ ref: "https://webgogol.com/id/places/backnang", expectedType: "place" }`
-  - `contactPointRefs.default` → `{ ref: "https://webgogol.com/id/contact-points/general-email", expectedType: "contact-point" }`
-  - `webPresenceRefs.default` → `{ ref: "https://webgogol.com/id/web-presences/primary", expectedType: "web-presence" }`
-  - `governance` → `{ authorityRef: "https://webgogol.com/id/business", effectiveFrom: "2026-01-01", reviewEvery: "P1Y" }`
+  - `brandRefs.default` → `{ ref: "https://warpgogol.com/id/brand", expectedType: "brand" }`
+  - `legalIdentityRef` → `{ ref: "https://warpgogol.com/id/legal-identity", expectedType: "legal-identity" }`
+  - `placeRefs.office` → `{ ref: "https://warpgogol.com/id/places/backnang", expectedType: "place" }`
+  - `contactPointRefs.default` → `{ ref: "https://warpgogol.com/id/contact-points/general-email", expectedType: "contact-point" }`
+  - `webPresenceRefs.default` → `{ ref: "https://warpgogol.com/id/web-presences/primary", expectedType: "web-presence" }`
+  - `governance` → `{ authorityRef: "https://warpgogol.com/id/business", effectiveFrom: "2026-01-01", reviewEvery: "P1Y" }`
 - Implement `transform(data, ctx)`:
   - Read locales from `ctx` (need to determine how locales are available — check if `MigrationContext` has locales or if we read from `system.md`)
   - For each locale: check if `business-profile/{lang}/business.md` exists with `schema: pbp/business@1` → skip (idempotent)
@@ -142,16 +142,16 @@ scope:
 
 ### Step 4. Write snapshot test
 
-**Goal:** Create `rfc-0481.snapshot.test.ts` that runs the migrator on real `webgogol-com` `business/de/company.md` and snapshots the output.
+**Goal:** Create `rfc-0481.snapshot.test.ts` that runs the migrator on real `warpgogol-com` `business/de/company.md` and snapshots the output.
 
 **Agent actions:**
 
 - Create `packages/os/site-kernel-handoff/src/migrators/__tests__/rfc-0481.snapshot.test.ts`
 - Add `MODULE_CONTRACT` and `CHANGE_SUMMARY` scaffolding
-- Read real `systems/webgogol-com/src/content/business/de/company.md` as input
+- Read real `systems/warpgogol-com/src/content/business/de/company.md` as input
 - Run migrator on temp dir with that input
 - Snapshot the output `business-profile/de/business.md` using vitest snapshot
-- Verify snapshot contains `schema: pbp/business@1`, `type: business`, `name: Webgogol`
+- Verify snapshot contains `schema: pbp/business@1`, `type: business`, `name: Warpgogol`
 
 **Validation:**
 

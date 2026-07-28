@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>
 RFC-0557: template.imports.validate — auto-discovers all template files across
-workspace packages, extracts @warpgogol/* and @webgogol/* import specifiers
+workspace packages, extracts @warpgogol/* and @warpgogol/* import specifiers
 (both static `from "..."` and dynamic `import("...")` patterns), and verifies
 each resolved package name exists in root package.json devDependencies.
 Additionally runs `pnpm install --frozen-lockfile` to detect lockfile drift
@@ -38,11 +38,11 @@ const execFileAsync = promisify(execFile);
 
 const COMMAND = "template.imports.validate";
 
-/** Regex matching static `from "@warpgogol/..."` / `from "@webgogol/..."` imports. */
-const STATIC_IMPORT_RE = /from\s+["'](@(?:warpgogol|webgogol)\/[^"']+)["']/g;
+/** Regex matching static `from "@warpgogol/..."` / `from "@warpgogol/..."` imports. */
+const STATIC_IMPORT_RE = /from\s+["'](@(?:warpgogol|warpgogol)\/[^"']+)["']/g;
 
-/** Regex matching dynamic `import("@warpgogol/...")` / `import("@webgogol/...")` imports. */
-const DYNAMIC_IMPORT_RE = /import\s*\(\s*["'](@(?:warpgogol|webgogol)\/[^"']+)["']/g;
+/** Regex matching dynamic `import("@warpgogol/...")` / `import("@warpgogol/...")` imports. */
+const DYNAMIC_IMPORT_RE = /import\s*\(\s*["'](@(?:warpgogol|warpgogol)\/[^"']+)["']/g;
 
 export interface TemplateImportsValidateData extends CheckResult {
   templatesScanned: number;
@@ -74,7 +74,7 @@ function normalizePackageName(specifier: string): string {
   return specifier.split("/")[0];
 }
 
-/** Extract @warpgogol/* and @webgogol/* import specifiers from source text. */
+/** Extract @warpgogol/* and @warpgogol/* import specifiers from source text. */
 export function extractWorkspaceImports(source: string, filePath: string): TemplateImport[] {
   const results: TemplateImport[] = [];
   const lines = source.split(/\r?\n/);

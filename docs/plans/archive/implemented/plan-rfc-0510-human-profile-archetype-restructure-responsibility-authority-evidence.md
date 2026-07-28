@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/share"
     - "@gogol/site-kernel-checks"
@@ -43,11 +43,11 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `missions/webgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md` — add `responsibility`, `authority`, `evidence` fields; update `consent`; remove `stats` from hero usage
-- `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-beruflich.md` — new file: professional career prose
-- `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-nachweise.md` — new file: evidence links with status labels
-- `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-persoenlich.md` — new file: personal background prose (consent-gated)
-- `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi.md` — remove (content split into three files)
+- `missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md` — add `responsibility`, `authority`, `evidence` fields; update `consent`; remove `stats` from hero usage
+- `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-beruflich.md` — new file: professional career prose
+- `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-nachweise.md` — new file: evidence links with status labels
+- `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-persoenlich.md` — new file: personal background prose (consent-gated)
+- `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi.md` — remove (content split into three files)
 
 ### 2.3 Documentation and specs
 
@@ -159,7 +159,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run participant.profile.validate --site webgogol-com --json` — command is discoverable
+- `pnpm exec site-kernel run participant.profile.validate --site warpgogol-com --json` — command is discoverable
 
 **Completion criterion:** Command is registered, discoverable, and typechecks; pipeline includes it after `team.hub.validate`.
 
@@ -173,19 +173,19 @@ scope:
 
 **Agent actions:**
 
-- Create `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-beruflich.md` with the professional career prose (from RFC-0510 §Andrii's profile restructure)
-- Create `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-nachweise.md` with the evidence links list
-- Create `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-persoenlich.md` with the personal background prose
-- Remove `missions/webgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi.md` (content split into three files)
-- Edit `missions/webgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md`:
+- Create `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-beruflich.md` with the professional career prose (from RFC-0510 §Andrii's profile restructure)
+- Create `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-nachweise.md` with the evidence links list
+- Create `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi-persoenlich.md` with the personal background prose
+- Remove `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/andrii-syrokomskyi.md` (content split into three files)
+- Edit `missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md`:
   - Add `responsibility`, `authority`, `evidence` fields per RFC-0510 §Andrii's profile restructure YAML
   - Update `consent` with `approvedMedia`, `withdrawalRoute`, `profileReviewer`
   - Remove `stats` from frontmatter (no longer used in hero)
 
 **Validation:**
 
-- `pnpm exec site-kernel run participant.validate --site webgogol-com --json` — Participant record validates against schema
-- `pnpm exec site-kernel run content.references.validate --site webgogol-com --json` — prose file references resolve
+- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json` — Participant record validates against schema
+- `pnpm exec site-kernel run content.references.validate --site warpgogol-com --json` — prose file references resolve
 
 **Completion criterion:** Three prose files exist; old prose file removed; Participant record has new fields and validates; content references resolve.
 
@@ -200,7 +200,7 @@ scope:
 **Agent actions:**
 
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0510` — only shared V-19 warning expected
-- Run `pnpm exec site-kernel run sites-check.run --site webgogol-com --json` — full author pipeline including new `participant.profile.validate`
+- Run `pnpm exec site-kernel run sites-check.run --site warpgogol-com --json` — full author pipeline including new `participant.profile.validate`
 - Run `pnpm --filter @gogol/share run build:check` — package typecheck
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — package typecheck
 - Verify each acceptance criterion in RFC-0510 against the implemented code
@@ -244,10 +244,10 @@ scope:
 - `pnpm exec site-kernel run rfc.validate --id RFC-0510`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run sites-check.run --site webgogol-com --json`
-- `pnpm exec site-kernel run participant.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run participant.profile.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run content.references.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run sites-check.run --site warpgogol-com --json`
+- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run participant.profile.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run content.references.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 

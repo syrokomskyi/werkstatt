@@ -60,11 +60,11 @@ acceptance:
   - probe: file-exists
     path: "packages/share/src/agent/knowledge.ts"
   - probe: run
-    command: "site-kernel run agent.knowledge.generate --app webgogol-com"
+    command: "site-kernel run agent.knowledge.generate --app warpgogol-com"
     expect:
       exitCode: 0
   - probe: run
-    command: "site-kernel run agent.knowledge.validate --app webgogol-com"
+    command: "site-kernel run agent.knowledge.validate --app warpgogol-com"
     expect:
       exitCode: 0
 ---
@@ -101,8 +101,8 @@ The knowledge tier is the third projection of the same model: plain, typed JSON,
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.knowledge.generate --app webgogol-com
-pnpm exec site-kernel run agent.knowledge.validate --app webgogol-com --json
+pnpm exec site-kernel run agent.knowledge.generate --app warpgogol-com
+pnpm exec site-kernel run agent.knowledge.validate --app warpgogol-com --json
 ```
 
 App-scoped. `agent.knowledge.generate` (`mutatesState: true`) runs in `APPS_BUILD_PREPARE_PIPELINE` after `entitlements.resolve` and **before** `agent.manifest.generate`, which consumes the emitted file list. Canonical order: `entitlements.resolve` → `agent.knowledge.generate` → `agent.manifest.generate` → `agent.openapi.generate` (RFC-0289). This refines the RFC-0286 ordering (which pins the manifest after `entitlements.resolve` and `surface.generate`): the knowledge tier slots in before the manifest so `AgentKnowledgeRef`s point at real files. `agent.knowledge.validate` runs in `APPS_CHECK_PIPELINE`.
@@ -173,7 +173,7 @@ A domain with no content in the app emits **no file** (safe default: absent inpu
 ## Rollout
 
 1. Implement formatter + commands; wire pipelines in the canonical order above; gitignore `public/api/agent/v1/` in both apps and the scaffold.
-2. First `pnpm build` on each app emits knowledge files from existing business content — zero authoring required. webgogol-com is the reference: expect `company/legal/contact/offer/service/location/web/people/trust/faq` coverage per its business tree.
+2. First `pnpm build` on each app emits knowledge files from existing business content — zero authoring required. warpgogol-com is the reference: expect `company/legal/contact/offer/service/location/web/people/trust/faq` coverage per its business tree.
 3. `llms.generate` change ships in the same wave (one added line; twins and existing sections unchanged).
 4. New apps get the tier automatically via the pipeline; onboarding needs no new phase.
 5. Envelope evolution: breaking payload change ⇒ bump the domain's `@N` schema tag by RFC; agents pin on the tag, not the URL (AS-7).
@@ -198,7 +198,7 @@ A domain with no content in the app emits **no file** (safe default: absent inpu
 - [x] `AGK-01..AGK-05` registered (inline rule ids, consistent with the rest of this codebase). (evidence: implemented historically)
 - [x] `agent.manifest.generate` lists emitted files as `AgentKnowledgeRef`s; `AGS-02/03` bijection holds on both apps (verified green after fixing a URL double-prefix bug caught by this exact check). (evidence: implemented historically)
 - [x] `llms.generate` emits the discovery line (`buildLlmsIndex` in `@gogol/share/semantic/llms.ts`); full `@gogol/share` suite (179 tests) green, no snapshot regressions. (evidence: packages/ directory, package exists)
-- [x] Both apps `build:check` green (webgogol-com and nicaragua-projekt full pipelines, including `astro build`, verified); webgogol-com emits 8 domain files (company/contact/faq/legal/location/offer/people/web) from existing content — "service" and "trust" deliberately unpopulated in v1 (no stable cross-app projector yet, documented in Non-goals). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Both apps `build:check` green (warpgogol-com and nicaragua-projekt full pipelines, including `astro build`, verified); warpgogol-com emits 8 domain files (company/contact/faq/legal/location/offer/people/web) from existing content — "service" and "trust" deliberately unpopulated in v1 (no stable cross-app projector yet, documented in Non-goals). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `public/api/agent/v1/` gitignored in apps + scaffold template (root `.gitignore` glob); generated `AGENTS.md` template documents the tier. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

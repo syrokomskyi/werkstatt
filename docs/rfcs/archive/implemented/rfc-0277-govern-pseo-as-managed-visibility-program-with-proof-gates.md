@@ -36,7 +36,7 @@ commands:
     - surface.context.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/surface"
@@ -123,9 +123,9 @@ Thresholds are module-context or experiment-config data, not hard-coded constant
 
 ```yaml
 pseoExperiments:
-  - id: webgogol-local-visibility-g1
+  - id: warpgogol-local-visibility-g1
     module: pseo
-    app: webgogol-com
+    app: warpgogol-com
     windowDays: 90
     clusters:
       - blueprint: website-local
@@ -142,9 +142,9 @@ pseoExperiments:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run pseo.experiment.plan --app webgogol-com --module pseo --json
-pnpm exec site-kernel run pseo.proof.validate --app webgogol-com --module pseo --json
-pnpm exec site-kernel run pseo.product.validate --app webgogol-com --json
+pnpm exec site-kernel run pseo.experiment.plan --app warpgogol-com --module pseo --json
+pnpm exec site-kernel run pseo.proof.validate --app warpgogol-com --module pseo --json
+pnpm exec site-kernel run pseo.product.validate --app warpgogol-com --json
 ```
 
 `pseo.product.validate` checks authored product language and module context for forbidden promises:
@@ -179,7 +179,7 @@ If observability is missing, proof validation reports "not enough data" instead 
 
 ## Rollout
 
-1. Declare PSEO stage as `internalCapability` for `webgogol-com`.
+1. Declare PSEO stage as `internalCapability` for `warpgogol-com`.
 2. Add URL non-destruction policy to module/product context.
 3. Add proof-gate experiment config for a small pilot cluster.
 4. Wire GSC/observability inputs into Bordbuch status or an interim report.

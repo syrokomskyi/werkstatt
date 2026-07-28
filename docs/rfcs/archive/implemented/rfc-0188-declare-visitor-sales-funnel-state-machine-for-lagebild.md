@@ -47,7 +47,7 @@ commands:
   removed: []
 appsImpacted:
   - apps/*
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/share
   - packages/chat
@@ -81,7 +81,7 @@ The repository now has the main integration foundations required for a durable c
 - RFC-0176 generalized the integration port into a source-agnostic destination hub using normalized `IntegrationEvent` objects.
 - RFC-0181 moved delivery onto an EU-resident delivery substrate.
 - RFC-0186 introduced Lagebild: a Supabase-backed CRM buffer plus one shared multi-tenant sync Worker that drains `sync_outbox` rows to Pipedrive per tenant.
-- `apps/webgogol-com` is the pilot and currently configures `integrations.chat.adapter: uchat`, inbound source `uchat`, and destination `{ kind: crm, vendor: pipedrive, mode: gogol-adapter }`.
+- `apps/warpgogol-com` is the pilot and currently configures `integrations.chat.adapter: uchat`, inbound source `uchat`, and destination `{ kind: crm, vendor: pipedrive, mode: gogol-adapter }`.
 
 UChat is the conversational front end the studio standardizes on. It is a capable, multilingual chat runtime, and the studio will **build the funnel conversation in UChat and replicate it across all client sites in `apps/*`**. What this RFC changes is not the choice of chat vendor — it is **where the process authority lives**. Before this architecture existed, the sales and onboarding workflow lived inside a UChat bot wired to Make.com and Pipedrive, and that wiring made UChat _and Make.com_ the de-facto process engine and state owner.
 
@@ -105,9 +105,9 @@ The same export also makes explicit what we **discard completely** — it is mec
 - the **Pipedrive Webhook Router** (`crm_pipeline_id is 8`, `crm_stage_id is 51/58`) acting as the canonical dispatcher;
 - legacy stage names (`q_website_tier`, `new_chat`, `q_new`, `after_start_now_delay`, …);
 - legacy pricing copy (`Jährlich 39€`, `Monatlich 39€`) and DEPRECATED tier-choice blocks;
-- legacy support/material addresses scattered in messages (`support@webgoral.com`, `material@webgogol.com`, `hi@webgogol.com`) — these must come from the business layer, not be hardcoded in funnel copy or UChat nodes.
+- legacy support/material addresses scattered in messages (`support@webgoral.com`, `material@warpgogol.com`, `hi@warpgogol.com`) — these must come from the business layer, not be hardcoded in funnel copy or UChat nodes.
 
-The offer has also changed. The pilot's canonical offer is now `apps/webgogol-com/src/content/business/{de,uk}/offer.md`: `70 € / Monat`, `700 € / Jahr`, `200 €` setup, five written guarantees (delivery, uptime, smallChanges, response, dataPackage), and keyed growth modules (`visibility +29 €/mo`, `booking +29 €/mo`, `trust +19 €/mo`, `multilingual 129 € once + 29 €/mo`, `automation +59–199 €/mo`), plus `changePrice 15 €`, `hourlyRate 90 €`, `billingDay 1`. The conversation must sell **this** offer, in `de` and `uk`, and the old `39€` tariff dialogue is deleted, not migrated.
+The offer has also changed. The pilot's canonical offer is now `apps/warpgogol-com/src/content/business/{de,uk}/offer.md`: `70 € / Monat`, `700 € / Jahr`, `200 €` setup, five written guarantees (delivery, uptime, smallChanges, response, dataPackage), and keyed growth modules (`visibility +29 €/mo`, `booking +29 €/mo`, `trust +19 €/mo`, `multilingual 129 € once + 29 €/mo`, `automation +59–199 €/mo`), plus `changePrice 15 €`, `hourlyRate 90 €`, `billingDay 1`. The conversation must sell **this** offer, in `de` and `uk`, and the old `39€` tariff dialogue is deleted, not migrated.
 
 ## Problem
 
@@ -289,17 +289,17 @@ The funnel introduces a dedicated app content domain `src/content/funnel/{lang}/
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run funnel.contract.validate --app webgogol-com --json
-pnpm exec site-kernel run funnel.stage.validate --app webgogol-com --json
-pnpm exec site-kernel run funnel.copy.validate --app webgogol-com --json
-pnpm exec site-kernel run funnel.lagebild.validate --app webgogol-com --json
+pnpm exec site-kernel run funnel.contract.validate --app warpgogol-com --json
+pnpm exec site-kernel run funnel.stage.validate --app warpgogol-com --json
+pnpm exec site-kernel run funnel.copy.validate --app warpgogol-com --json
+pnpm exec site-kernel run funnel.lagebild.validate --app warpgogol-com --json
 ```
 
 Proposed command responsibilities:
 
 - `funnel.contract.validate`: validates configured funnel version, allowed sources (UChat + Stripe + operator), allowed event kinds, entitlement alignment, and the absence of any Make.com reference.
 - `funnel.stage.validate`: validates that every configured transition uses known stages and has no unreachable required stage; validates that UChat stage-field mappings reference only canonical stages.
-- `funnel.copy.validate`: validates localized prompt/button/legal-copy coverage, verifies that `webgogol-com` has both `de` and `uk` coverage, and verifies prices derive from `business.offer` rather than hardcoded UChat/legacy tariff text.
+- `funnel.copy.validate`: validates localized prompt/button/legal-copy coverage, verifies that `warpgogol-com` has both `de` and `uk` coverage, and verifies prices derive from `business.offer` rather than hardcoded UChat/legacy tariff text.
 - `funnel.lagebild.validate`: validates that the app's funnel configuration is compatible with its Lagebild tenant, buffer stage catalog, destination mode, sync Worker placement, and that UChat provisioning binds to the platform funnel version.
 
 ### Output format
@@ -308,7 +308,7 @@ Proposed command responsibilities:
 {
   "command": "funnel.stage.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "violations": [
     {
       "rule": "unknown-funnel-stage",
@@ -317,7 +317,7 @@ Proposed command responsibilities:
     },
     {
       "rule": "offer-price-not-from-business-layer",
-      "file": "apps/webgogol-com/src/content/funnel/de/create-site.md",
+      "file": "apps/warpgogol-com/src/content/funnel/de/create-site.md",
       "message": "Funnel copy must reference business.offer price fields instead of hardcoding legacy tariff text."
     }
   ]
@@ -379,7 +379,7 @@ At any point the Visitor may ask a free question and return to the exact stage a
 3. **Lagebild schema phase:** extend buffer contracts and migrations to store canonical funnel stages, typed payload snapshots, offer snapshots, and append-only legal-consent events. Generic `BUFFER_DEAL_STAGES` is superseded or bridged without losing existing rows.
 4. **UChat integration phase:** build the clean UChat funnel (no Make.com, no `39€`) and the `chat-adapter-uchat` integration: a UChat API client that provisions copy/offer and requests transitions, plus a signed inbound webhook receiver that emits normalized funnel events into Lagebild. Add the localized `funnel/{lang}` content domain and the per-app UChat binding config.
 5. **Make.com excision phase:** delete every Make.com webhook/scenario reference from the funnel path, from app/integration config, and from the UChat flows; payment confirmation moves to a direct Stripe webhook source. `funnel.contract.validate` fails if any Make.com reference remains.
-6. **UChat funnel templating phase (`webgogol-com` pilot):** stand up the clean UChat funnel for the pilot, provisioned from platform content, with stage mirroring and transition requests going through the adapter. The UChat funnel owns no copy of record, no transitions, no pricing source, no consent of record, and no CRM writes.
+6. **UChat funnel templating phase (`warpgogol-com` pilot):** stand up the clean UChat funnel for the pilot, provisioned from platform content, with stage mirroring and transition requests going through the adapter. The UChat funnel owns no copy of record, no transitions, no pricing source, no consent of record, and no CRM writes.
 7. **Offer alignment phase:** author funnel copy in both `de` and `uk` so all pricing, guarantees, and modules derive from `business.offer` and sync into UChat; Ukrainian uses formal capitalized address.
 8. **Client rollout phase:** new client sites adopt the funnel by replicating the templated UChat funnel plus system/content configuration and `lagebild.tenant.add`; zero Make.com scenarios and no per-site bespoke process logic.
 9. **Hardening phase:** add funnel validators to `apps-check.run` for entitled sites; keep non-entitled sites on null/no-op behavior.
@@ -426,13 +426,13 @@ At any point the Visitor may ask a free question and return to the exact stage a
 - [x] Canonical funnel stage/event/transition TypeScript contracts exist in a shared package and are platform-owned (not defined in UChat). (evidence: implemented historically)
 - [x] Lagebild buffer can persist canonical funnel stage, append-only transitions, captured qualification fields, offer snapshots, and append-only legal-consent evidence. (evidence: implemented historically)
 - [x] `funnel.contract.validate`, `funnel.stage.validate`, `funnel.copy.validate`, and `funnel.lagebild.validate` are registered with stable `--json` output. (evidence: implemented historically)
-- [x] The UChat funnel for `webgogol-com` demonstrates: resume-at-stage, free-question-and-return, no `No match`/`No reply` dead-end, full `de`/`uk` parity, and copy/pricing provisioned from platform content. (evidence: implemented historically)
-- [x] `webgogol-com` pilot uses current `business.offer` values (`70 € / Monat`, `700 € / Jahr`, `200 €` setup, keyed growth modules) and no legacy `39€` tariff copy anywhere, including inside UChat. (evidence: implemented historically)
+- [x] The UChat funnel for `warpgogol-com` demonstrates: resume-at-stage, free-question-and-return, no `No match`/`No reply` dead-end, full `de`/`uk` parity, and copy/pricing provisioned from platform content. (evidence: implemented historically)
+- [x] `warpgogol-com` pilot uses current `business.offer` values (`70 € / Monat`, `700 € / Jahr`, `200 €` setup, keyed growth modules) and no legacy `39€` tariff copy anywhere, including inside UChat. (evidence: implemented historically)
 - [x] **Make.com is absent everywhere in the funnel** (no webhook, scenario, mode, or dependency in any source, transition, persistence step, or destination, including UChat flows); UChat connects to Lagebild directly; `funnel.contract.validate` fails on any Make.com reference. (evidence: implemented historically)
 - [x] UChat owns no canonical state: no transition graph, no pricing source, no legal consent of record, and no CRM writes live in UChat; it renders the conversation and requests transitions via the adapter. (evidence: implemented historically)
-- [x] Funnel copy has `de` and `uk` coverage for `webgogol-com`; Ukrainian direct address uses formal capitalized forms. (`src/content/funnel/{de,uk}`; enforced by `funnel.copy.validate`.) (evidence: implemented historically)
+- [x] Funnel copy has `de` and `uk` coverage for `warpgogol-com`; Ukrainian direct address uses formal capitalized forms. (`src/content/funnel/{de,uk}`; enforced by `funnel.copy.validate`.) (evidence: implemented historically)
 - [x] Pipedrive ids/stages are mapped at the adapter/sync boundary only and never appear in visitor-facing state-machine contracts or as a dispatcher. (The canonical `funnel.ts` contracts carry zero Pipedrive ids; mapping lives solely in the sync worker `STAGE_MAP`/`resolvePipedriveStageUpdate`; the legacy Pipedrive webhook router is retired.) (evidence: implemented historically)
-- [x] `apps-check.run --app webgogol-com` includes the funnel validators (they are in `APPS_CHECK_AUTHOR_PIPELINE`; no-op pass for every app until the funnel block / content / Stripe source is enabled). (evidence: implemented historically)
+- [x] `apps-check.run --app warpgogol-com` includes the funnel validators (they are in `APPS_CHECK_AUTHOR_PIPELINE`; no-op pass for every app until the funnel block / content / Stripe source is enabled). (evidence: implemented historically)
 - [x] `rfc.validate RFC-0188` passes before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents
@@ -443,7 +443,7 @@ At any point the Visitor may ask a free question and return to the exact stage a
 - Agents MUST NOT introduce Make.com anywhere in the funnel, in any mode, transitional or permanent. UChat integrates with Lagebild directly via the UChat API and signed inbound webhooks (RFC-0176 inbound auth).
 - Agents MUST treat the Visitor's comfort as a first-class requirement: continuous thread, resume-at-stage, free-question-and-return, no dead-ends, human tone, and offer transparency — delivered through the UChat funnel.
 - Agents MUST keep apps thin. Shared state-machine and UChat-adapter logic belong in `packages/*`; app content/configuration (including `funnel/{lang}` copy and per-app UChat binding config) belongs in `apps/*/src/content/**`.
-- Agents MUST keep `de` and `uk` funnel content aligned for `apps/webgogol-com` and use formal capitalized Ukrainian address forms (`Ви/Ваш`).
+- Agents MUST keep `de` and `uk` funnel content aligned for `apps/warpgogol-com` and use formal capitalized Ukrainian address forms (`Ви/Ваш`).
 - Agents MUST NOT hardcode price, guarantee, owner, contact, or legal data in funnel copy, components, or UChat flows; source the business layer, provision it into UChat, and capture deal-time snapshots where needed.
 - Agents MUST NOT introduce cookies, `document.cookie`, `Set-Cookie`, or cookie-based middleware.
 - Agents MUST NOT store secrets in Supabase tenant registry rows, markdown, generated files, or client-side UChat/chat configuration. UChat API keys live in server-side secret storage only.

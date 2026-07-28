@@ -51,7 +51,7 @@ commands:
     - leitstand.status
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-handoff"
   - "@gogol/ontology"
@@ -80,7 +80,7 @@ acceptance:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -101,7 +101,7 @@ RFC-0358 established the Leitstand (fleet propagation) with a `DeploymentAdapter
 - `resolveAdapter()` in `leitstand-commands.ts` returns a `nullAdapter` for every adapter name — propagation logs intent and succeeds without deploying anything.
 - Health checks return `unknown` with zero checks; nothing compares deployed output to the release behavior snapshot (RFC-0357/RFC-0269).
 - Propagation reads dist from the local `releases/<id>/` directory only; the RFC-0363 artifact store (DNA-52: "deployment, rollback, and Notausgang workflows resolve artifacts through the store") is bypassed.
-- The registry default adapter name is `cloudflare-pages`, but the ecosystem's real deployment form is **Cloudflare Workers** (RFC-0149 / DNA-1): `wrangler deploy` with static assets on a single Worker. `apps/webgogol-com/package.json` already deploys two named Workers — `alt-webgogol-com` (alt.webgogol.com) and `webgogol-com` (production) — via `wrangler deploy --name <worker> --secrets-file <env>`.
+- The registry default adapter name is `cloudflare-pages`, but the ecosystem's real deployment form is **Cloudflare Workers** (RFC-0149 / DNA-1): `wrangler deploy` with static assets on a single Worker. `apps/warpgogol-com/package.json` already deploys two named Workers — `alt-warpgogol-com` (alt.warpgogol.com) and `warpgogol-com` (production) — via `wrangler deploy --name <worker> --secrets-file <env>`.
 
 The operator decision for the pilot wave (RFC-0381): propagation is staged **alt → main** — a release must be deployed and health-verified on the alt channel before it may reach production.
 
@@ -134,19 +134,19 @@ The Leitstand gains a concrete `cloudflare-workers` adapter that wraps `wrangler
 
 ```sh
 # stage a published release on the alt channel (default)
-pnpm exec site-kernel run leitstand.propagate --release webgogol-com-r000001 --json
+pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --json
 
 # promote the same release to production after alt is healthy
-pnpm exec site-kernel run leitstand.propagate --release webgogol-com-r000001 --channel main --json
+pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000001 --channel main --json
 
 # verify a deployed channel on demand
-pnpm exec site-kernel run leitstand.health --system webgogol-com --channel alt --json
+pnpm exec site-kernel run leitstand.health --system warpgogol-com --channel alt --json
 
 # rollback production to the previous published release
-pnpm exec site-kernel run leitstand.rollback --system webgogol-com --channel main --json
+pnpm exec site-kernel run leitstand.rollback --system warpgogol-com --channel main --json
 
 # show both channels' deployment state (optional --channel to filter)
-pnpm exec site-kernel run leitstand.status --system webgogol-com --json
+pnpm exec site-kernel run leitstand.status --system warpgogol-com --json
 ```
 
 All four commands stay workspace-scoped. New flag `--channel <alt|main>` (default `alt` for propagate/health; required for rollback; optional filter for status, which shows both channels by default).
@@ -285,12 +285,12 @@ After deploy, the adapter fetches a probe set derived from the release behavior 
 2. Implement the adapter with an injectable `CommandRunner` so tests stub wrangler.
 3. Wire preflight, channel gating, and rehydration into the four commands.
 4. Cover with unit tests: channel gate, preflight failures, health verdict mapping, rehydration path, secret redaction.
-5. First real invocation happens in the RFC-0381 pilot (webgogol-com r000001 → alt → main).
+5. First real invocation happens in the RFC-0381 pilot (warpgogol-com r000001 → alt → main).
 
 ## Alternatives considered
 
 - **Implement `cloudflare-pages` as RFC-0358 originally named.** Rejected: RFC-0149 retired the Pages form; the ecosystem deploys single Workers. Keeping the name would codify a dead platform shape.
-- **Deploy via Cloudflare REST API instead of wrangler.** Rejected: wrangler is already the proven deploy path for `webgogol-com` (`deploy:alt`/`deploy:main` scripts), handles bundling/limits/secrets natively, and is pinned in the workspace. The adapter seam allows an API-based adapter later without a contract change.
+- **Deploy via Cloudflare REST API instead of wrangler.** Rejected: wrangler is already the proven deploy path for `warpgogol-com` (`deploy:alt`/`deploy:main` scripts), handles bundling/limits/secrets natively, and is pinned in the workspace. The adapter seam allows an API-based adapter later without a contract change.
 - **Traffic-split canary on one Worker.** Rejected for this wave: adds runtime routing complexity; the alt Worker already provides a full-fidelity staging environment. Canary remains a future adapter extension.
 - **Automatic rollback on failed health check.** Rejected: on the alt channel rollback is pointless (nothing user-facing broke); on main it can mask a bad _previous_ release. Rollback stays an explicit operator/agent decision.
 

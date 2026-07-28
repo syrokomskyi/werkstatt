@@ -32,7 +32,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/surface"
@@ -81,7 +81,7 @@ Introduce a polymorphic **`offer`** family and **delete** the `website-service` 
    | 1     | `offer` | `/leistungen/{offer}/` | `/uk/posluhy/{offer}/` | full      |
 
 2. **Mode polymorphism (shared voice rule):**
-   - **Bodenstation** (`webgogol-com`): the studio's own services; JSON-LD `Organization`/`ProfessionalService` + `Service` (no `LocalBusiness`); B2B intent ("website for small business", "local SEO for trades").
+   - **Bodenstation** (`warpgogol-com`): the studio's own services; JSON-LD `Organization`/`ProfessionalService` + `Service` (no `LocalBusiness`); B2B intent ("website for small business", "local SEO for trades").
    - **Sternsystem** (client site): the client's own services; JSON-LD `LocalBusiness` (the client _is_ the provider — legitimate); B2C intent.
 3. **No nesting under `/sait/`.** The offer family is a top-level space; it is not a geo cascade. An offer may carry an optional `areaServed` field for `Service` markup, but no geo URL axis.
 4. **Hard deletion, no legacy:** remove `website-service.yaml`, its constellations' service-only depths, and every `/sait/**/posluha/**` route. No 301s, no aliases. Former content migrates by meaning: business services → `offer`; client demand → `demand` axis of `local`.
@@ -91,7 +91,7 @@ Introduce a polymorphic **`offer`** family and **delete** the `website-service` 
 
 - **Doctrine §1.2 (Infrastruktur statt Imitation) + §1.3 (two render modes).** The provider in JSON-LD is always the site's own business — impersonation becomes impossible by construction.
 - **Doctrine §3.2 / §4 / §9.1–9.4.** Encodes the offer↔demand split and the `/posluha/` deletion exactly.
-- **RFC-0225 (owned digital assets positioning).** The studio's offer catalog (Fundament + growth modules) is the commercial surface for `webgogol-com`'s own positioning.
+- **RFC-0225 (owned digital assets positioning).** The studio's offer catalog (Fundament + growth modules) is the commercial surface for `warpgogol-com`'s own positioning.
 - **RFC-0192/0193.** The offer family is another Blueprint over the existing port; no new engine.
 - **RFC-0240.** `offer` is a separately purchasable entitlement, independent from `pseo`.
 
@@ -119,7 +119,7 @@ policy:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run offer.provider.validate --app webgogol-com --json
+pnpm exec site-kernel run offer.provider.validate --app warpgogol-com --json
 ```
 
 `offer.provider.validate` (app scope) inspects each emitted offer page's provider node and the offer records, and fails when the provider is anything other than the site's own business profile, or when an offer record names an external provider.
@@ -131,8 +131,8 @@ pnpm exec site-kernel run offer.provider.validate --app webgogol-com --json
 | `packages/ontology/blueprints/offer.yaml` | New offer Blueprint |
 | `packages/ontology/blueprints/website-service.yaml` | **Deleted** |
 | `packages/os/site-kernel-checks/src/pseo.ts` | Adds `offer.provider.validate` |
-| `apps/webgogol-com/src/content/surface/offers/{de,uk}/*.md` | Studio offer records (renamed/migrated from services where they are studio offers) |
-| `apps/webgogol-com/src/content/surface/services/**` | **Deleted** (migrated to offers or to local demands) |
+| `apps/warpgogol-com/src/content/surface/offers/{de,uk}/*.md` | Studio offer records (renamed/migrated from services where they are studio offers) |
+| `apps/warpgogol-com/src/content/surface/services/**` | **Deleted** (migrated to offers or to local demands) |
 
 ### Output format
 
@@ -141,7 +141,7 @@ pnpm exec site-kernel run offer.provider.validate --app webgogol-com --json
   "command": "offer.provider.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "foreign-provider", "page": "offer:elektriker-notdienst", "message": "offer page provider must be the site's own business profile, found external LocalBusiness" }
+    { "app": "warpgogol-com", "rule": "foreign-provider", "page": "offer:elektriker-notdienst", "message": "offer page provider must be the site's own business profile, found external LocalBusiness" }
   ]
 }
 ```
@@ -154,7 +154,7 @@ pnpm exec site-kernel run offer.provider.validate --app webgogol-com --json
 
 - **Delete-and-replace, no flag day.** `website-service.yaml` and `/posluha/` routes are removed in the same change that lands the `offer` Blueprint. No redirects (explicit client decision; the surface is being rewritten).
 - **Content migration is a one-time editorial pass:** classify each former `service` as either a studio/business _offer_ (→ `offers` collection) or client _demand_ (→ `demands` collection, RFC-0238). Nothing is auto-migrated by URL.
-- **Bodenstation pilot:** `webgogol-com` publishes its own offer catalog (`Digitales Fundament`, growth modules, named guarantees) under `/leistungen/`.
+- **Bodenstation pilot:** `warpgogol-com` publishes its own offer catalog (`Digitales Fundament`, growth modules, named guarantees) under `/leistungen/`.
 - **Authored pillar (RFC-0243 amendment).** The depth-0 pillar `/leistungen/` is authored, not PSEO-generated. The offer Blueprint no longer emits a pillar route; authored pages own `/leistungen/` and `/uk/posluhy/`.
 - **New apps:** the `offer` family is available via onboarding behind the `offer` entitlement; without it, no offer routes are emitted.
 - **Pipeline:** `offer.provider.validate` joins apps build-check.
@@ -178,7 +178,7 @@ pnpm exec site-kernel run offer.provider.validate --app webgogol-com --json
 - [x] `website-service.yaml` and all `/sait/**/posluha/**` routes deleted; no redirects/aliases remain and `blueprint.validate` rejects their re-introduction. (evidence: implemented historically)
 - [x] Offer pages are mode-polymorphic (Bodenstation `Service`/studio, Sternsystem `LocalBusiness`/client) with the provider always equal to the site's own business profile. (evidence: implemented historically)
 - [x] `offer.provider.validate` registered (app scope), wired into apps build-check, with documented `--json` output and a `foreign-provider` rule. (evidence: implemented historically)
-- [x] `webgogol-com` `services` content migrated to `offers` (studio offers) and/or `demands` (client demand); no orphaned service records remain. (evidence: original apps retired by RFC-0381, migration completed historically)
+- [x] `warpgogol-com` `services` content migrated to `offers` (studio offers) and/or `demands` (client demand); no orphaned service records remain. (evidence: original apps retired by RFC-0381, migration completed historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents

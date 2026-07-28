@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/surface"
     - "@gogol/share"
@@ -116,7 +116,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/surface run build:check`
-- `pnpm exec site-kernel run blueprint.validate --site webgogol-com`
+- `pnpm exec site-kernel run blueprint.validate --site warpgogol-com`
 
 **Completion criterion:** `dossierSchema` validates the `BlueprintDossier` shape; existing blueprints without `dossier` still pass.
 
@@ -196,7 +196,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** `jsonld-types.yaml` declares `Service`; `surface.contract.validate` passes.
 
@@ -219,7 +219,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.generate --site webgogol-com` (verify depth-1 pages bake without errors)
+- `pnpm exec site-kernel run surface.generate --site warpgogol-com` (verify depth-1 pages bake without errors)
 
 **Completion criterion:** Depth-1 `website-local` pages bake with dossier blocks from industry record fields; absent fields omit their block.
 
@@ -246,7 +246,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.industry.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run surface.industry.validate --site warpgogol-com --json`
 
 **Completion criterion:** `surface.industry.validate` runs, reports gate failures and claim violations, and is wired into `build.check` (warn mode initially).
 
@@ -272,7 +272,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.doorway-risk.report --site webgogol-com --json`
+- `pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com --json`
 
 **Completion criterion:** `surface.doorway-risk.report` runs, flags depth-4 pages missing local context fields, and is wired into `build.check` as diagnostic.
 
@@ -297,7 +297,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.duplicate-content.report --site webgogol-com --json`
+- `pnpm exec site-kernel run surface.duplicate-content.report --site warpgogol-com --json`
 
 **Completion criterion:** `surface.duplicate-content.report` runs, flags depth-1 industry pairs with >0.70 similarity, and blocks `surface.validate` when threshold exceeded.
 
@@ -348,7 +348,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run blueprint.validate --site webgogol-com`
+- `pnpm exec site-kernel run blueprint.validate --site warpgogol-com`
 
 **Completion criterion:** `website-local.yaml` depth-1 level has a valid `dossier` block.
 
@@ -417,7 +417,7 @@ scope:
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0492` (RFC-0330)
 
 ### 4.2 Evidence artifacts

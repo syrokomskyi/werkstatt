@@ -38,7 +38,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - business
@@ -93,7 +93,7 @@ Introduce two things:
 
 ```sh
 # App-scoped: validate descriptors + sourceRef resolution
-pnpm exec site-kernel run content.source.validate --app webgogol-com
+pnpm exec site-kernel run content.source.validate --app warpgogol-com
 
 # Workspace-scoped: the shared monitor (mirrors lagebild.*)
 pnpm exec site-kernel run source.monitor.tenant.add    --source gov:destatis-backnang
@@ -183,7 +183,7 @@ export interface DivergenceRecord {
 
 1. Land descriptor schema + `content.source.validate` (`CKL-SRC-01/02` at `warning`, then `error`).
 2. Stand up the Truth Monitor worker disabled by default; no source is monitored until explicitly enabled (`source.monitor.tenant.enable`), mirroring Lagebild's disabled-by-default tenants.
-3. Pilot one real source on `webgogol-com` (a low-risk public statistic) end-to-end: descriptor → enable → `source.monitor.run` → divergence → Diagnostic → task (RFC-0216).
+3. Pilot one real source on `warpgogol-com` (a low-risk public statistic) end-to-end: descriptor → enable → `source.monitor.run` → divergence → Diagnostic → task (RFC-0216).
 4. Expand sources per client as value justifies; `manual` sources cover facts with no machine endpoint (they still get a review cadence).
 
 ## Alternatives considered
@@ -207,7 +207,7 @@ export interface DivergenceRecord {
 - [x] Single shared `integrations/truth-monitor/` with a `monitor_sources.json` registry; no per-site worker. (evidence: implemented historically)
 - [x] `source.monitor.tenant.add/enable/disable/status` + `source.monitor.run` registered (workspace scope), disabled by default. (evidence: implemented historically)
 - [x] Divergence records are PII-free and EU-residency-compliant; `cloudflare.residency.validate` still passes. (evidence: implemented historically)
-- [x] The monitor never mutates content; pilot manual source `gov:destatis-backnang` added and registered on `webgogol-com`. (evidence: implemented historically)
+- [x] The monitor never mutates content; pilot manual source `gov:destatis-backnang` added and registered on `warpgogol-com`. (evidence: implemented historically)
 - [x] `docs/COMMANDS.md` + `AGENTS.md` updated. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

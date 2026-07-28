@@ -7,7 +7,7 @@ createdAt: 2026-07-10
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/site-kernel-handoff"
@@ -551,7 +551,7 @@ scope:
 
 ---
 
-### Step 15. Pilot extraction of `webgogol-com`
+### Step 15. Pilot extraction of `warpgogol-com`
 
 **Goal:** Execute the end-to-end pilot described in RFC-0356 §5.2.
 
@@ -559,27 +559,27 @@ scope:
 
 **Agent actions:**
 
-1. Register `webgogol-com` as a Sternsystem if not already registered (RFC-0354): `sternsystem.register --id webgogol-com --cosmicStar ... --repo git@github.com:webgogol/webgogol-com.git`.
-2. Run `sternsystem.extract --app webgogol-com --repo git@github.com:webgogol/webgogol-com.git`.
-3. Verify the extracted Sternsystem: `sternsystem.validate --id webgogol-com`.
-4. Open a verification mission: `mission.open --system webgogol-com --brief "Pilot extraction verification"`.
-5. Materialize: `mission.materialize --mission webgogol-com-m000001`.
-6. Validate: `mission.validate --mission webgogol-com-m000001`.
-7. Reconcile: `mission.reconcile --mission webgogol-com-m000001`.
-8. Close: `mission.close --mission webgogol-com-m000001`.
+1. Register `warpgogol-com` as a Sternsystem if not already registered (RFC-0354): `sternsystem.register --id warpgogol-com --cosmicStar ... --repo git@github.com:warpgogol/warpgogol-com.git`.
+2. Run `sternsystem.extract --app warpgogol-com --repo git@github.com:warpgogol/warpgogol-com.git`.
+3. Verify the extracted Sternsystem: `sternsystem.validate --id warpgogol-com`.
+4. Open a verification mission: `mission.open --system warpgogol-com --brief "Pilot extraction verification"`.
+5. Materialize: `mission.materialize --mission warpgogol-com-m000001`.
+6. Validate: `mission.validate --mission warpgogol-com-m000001`.
+7. Reconcile: `mission.reconcile --mission warpgogol-com-m000001`.
+8. Close: `mission.close --mission warpgogol-com-m000001`.
 9. Verify the Bordbuch has the expected entries.
-10. Confirm `apps/webgogol-com/` is removed and no dual representation remains.
+10. Confirm `apps/warpgogol-com/` is removed and no dual representation remains.
 
 **Validation:**
 
-- `sternsystem.validate --id webgogol-com` passes
-- `mission.validate --mission webgogol-com-m000001` passes
-- `apps/webgogol-com/` does not exist
-- `pnpm -s run build:check` passes with no `apps/webgogol-com/` regression
+- `sternsystem.validate --id warpgogol-com` passes
+- `mission.validate --mission warpgogol-com-m000001` passes
+- `apps/warpgogol-com/` does not exist
+- `pnpm -s run build:check` passes with no `apps/warpgogol-com/` regression
 
 **Completion criterion:** The pilot Sternsystem is extracted, verified, materialized, validated, reconciled, and closed; the source app is removed.
 
-**Human review:** yes — this is a workspace-topology change and requires architecture approval before `apps/webgogol-com/` is removed.
+**Human review:** yes — this is a workspace-topology change and requires architecture approval before `apps/warpgogol-com/` is removed.
 
 ## 4. Validation suite
 
@@ -594,7 +594,7 @@ scope:
 - `pnpm exec site-kernel run mission.materialize --mission <id> --json` (smoke test)
 - `pnpm exec site-kernel run mission.validate --mission <id> --json` (smoke test)
 - `pnpm exec site-kernel run mission.diff --mission <id> --json` (smoke test)
-- `pnpm exec site-kernel run sternsystem.validate --id webgogol-com --json` (pilot)
+- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json` (pilot)
 - `pnpm -s run build:check`
 - `pnpm exec site-kernel run compass.validate --json`
 - `pnpm exec site-kernel run ecosystem.manifest.validate --json`
@@ -617,7 +617,7 @@ scope:
 | `mission.reconcile` pushes to the wrong remote | Step 9 reads the repo URL from `systems/registry.yaml` and aborts on remote drift |
 | Lock/idempotency primitives not ready | Cross-dependency: RFC-0362 must be implemented first; Step 3 uses RFC-0362 helpers |
 | `platformSemanticHash` not ready | Cross-dependency: RFC-0364 must be implemented first; Step 3 and Step 10 use `@gogol/fingerprint` |
-| Pilot removal of `apps/webgogol-com/` breaks CI | Step 15 requires human review; workspace discovery and CI are updated as part of the extraction |
+| Pilot removal of `apps/warpgogol-com/` breaks CI | Step 15 requires human review; workspace discovery and CI are updated as part of the extraction |
 
 ## 6. Escalation triggers
 

@@ -27,7 +27,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/surface
   - packages/star-map

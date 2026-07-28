@@ -46,7 +46,7 @@ nonGoals:
 
 RFC-0076 declares that every machine-readable file under `onboarding/.output/<phase>/` carries an RFC-0076 metadata header (`phase`, `derivedFromInputHash`, `generatedAt`, `generator`). For YAML artifacts that _also_ have a strict data schema (`axes.yaml`, `infra-config.yaml`, `linking-plan.yaml`, `analytics-config.yaml`, `atoms.yaml`, `voice-profile.yaml`, `first-party-data.yaml`), the natural file shape is two YAML documents: a header followed by `---` and then the payload.
 
-The yaml package's default `parse()` rejects multi-document files (`"Source contains multiple documents; please use YAML.parseAllDocuments()"`). During the first full onboarding run for `webgogol-com` (May 2026), this rule bit three independent code paths in the kernel:
+The yaml package's default `parse()` rejects multi-document files (`"Source contains multiple documents; please use YAML.parseAllDocuments()"`). During the first full onboarding run for `warpgogol-com` (May 2026), this rule bit three independent code paths in the kernel:
 
 1. `packages/os/site-kernel-onboarding/src/phase-contract.ts` — `parseOutputHeader` for YAML files crashed on `axes.yaml` after the agent wrote a legitimate RFC-0076 header.
 2. `packages/os/site-kernel-checks/src/audit-validators.ts` — `seo.internal-linking.validate`, `analytics.config.validate`, and `first-party-data.validate` all crashed on the same pattern in their respective YAML inputs.
@@ -144,4 +144,4 @@ export function parseOnboardingArtifactPayload<T>(
 
 - Agents MAY implement this RFC ONLY when status: accepted.
 - Agents MUST NOT change RFC status.
-- When migrating a call site, agents MUST run the relevant validator against the existing webgogol-com onboarding artifacts as a smoke test before considering the migration complete.
+- When migrating a call site, agents MUST run the relevant validator against the existing warpgogol-com onboarding artifacts as a smoke test before considering the migration complete.

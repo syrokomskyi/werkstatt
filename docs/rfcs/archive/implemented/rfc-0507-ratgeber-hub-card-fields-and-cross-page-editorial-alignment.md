@@ -40,7 +40,7 @@ commands:
     - content.voice.lint
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
 successSignals:
@@ -267,15 +267,15 @@ Default behavior after implementation: existing sites with `surfaceId: ratgeber`
 
 - [x] `linkedCardGrid` in `bake-blocks.ts` accepts optional `articleType`, `question`, `reviewedAt`, `readTime` card props. (evidence: `pnpm --filter @gogol/site-kernel-checks run build:check` passes, commit 7fed55f47)
 - [x] `bakeRatgeberHub` passes `articleType`, `question`, `reviewedAt`, `readTime` from article records to `linkedCardGrid` and does not pass `description`. (evidence: `pnpm --filter @gogol/site-kernel-checks run build:check` passes, commit 7fed55f47)
-- [x] `ratgeber.hub.validate` emits RG-HUB-09 warning when a hub page `audience-cards` block card contains a `description` key. (evidence: `ratgeber.hub.validate --site webgogol-com` passes cleanly after surface.generate, commit 7fed55f47)
-- [x] `content.voice.lint` emits VOICE-CTA-01 warning when a ratgeber article page markdown block contains a table with 3+ price-pattern data rows. (evidence: `content.voice.lint --site webgogol-com` emits 4 VOICE-CTA-01 warnings on existing price tables, commit 7fed55f47)
+- [x] `ratgeber.hub.validate` emits RG-HUB-09 warning when a hub page `audience-cards` block card contains a `description` key. (evidence: `ratgeber.hub.validate --site warpgogol-com` passes cleanly after surface.generate, commit 7fed55f47)
+- [x] `content.voice.lint` emits VOICE-CTA-01 warning when a ratgeber article page markdown block contains a table with 3+ price-pattern data rows. (evidence: `content.voice.lint --site warpgogol-com` emits 4 VOICE-CTA-01 warnings on existing price tables, commit 7fed55f47)
 - [x] `/leistungen/digitales-fundament/` prose (DE + UK) does not contain claims about guaranteed KI-Auffindbarkeit, structured data location recognition, visibility-to-inquiry conversion, or automatic city-page generation. (evidence: edited digitales-fundament.md DE+UK, mission commit 1a1f)
 - [x] `/leistungen/digitales-fundament/` prose (DE + UK) links to `/ratgeber/lokale-sichtbarkeit/` (DE) or `/porady/lokalna-vydymist/` (UK). (evidence: ratgeber link added to included-features subheading and growth-modules visibility card, mission commit 1a1f)
 - [x] `/website/` surface page prose (DE + UK) references local visibility rules and links to the ratgeber article. (evidence: website-local.yaml blueprint intro updated with ratgeber link, commit 17f2da672)
 - [x] `/notausgang/` prose (DE + UK) references the conditional migration risk matrix (domain ownership, export format, URL stability, external accounts). (evidence: migration-risks markdown block added to notausgang.md DE+UK, mission commit 69f4)
 - [x] Footer navigation (DE + UK) does not contain links to Widerruf or Muster-Widerrufsformular. (evidence: legalIds in labels.md DE+UK contains only impressum, datenschutz, agb, mission commit 1b8e)
 - [x] Footer navigation (DE + UK) groups Barrierefreiheit, Open Source, and Bildnachweise under a Transparenz section. (evidence: transparencyIds + transparencyTitle added to labels.md DE+UK, footer-component.astro renders Transparenz group, mission commit 1b8e + commit 3275d037b)
-- [x] `ratgeber.hub.validate` and `content.voice.lint` pass after all changes. (evidence: `ratgeber.hub.validate --site webgogol-com` → OK, `content.voice.lint --site webgogol-com` → OK with 4 advisory warnings)
+- [x] `ratgeber.hub.validate` and `content.voice.lint` pass after all changes. (evidence: `ratgeber.hub.validate --site warpgogol-com` → OK, `content.voice.lint --site warpgogol-com` → OK with 4 advisory warnings)
 - [x] `docs/verification-plan.xml` updated with RG-HUB-09 and VOICE-CTA-01. (evidence: new check-set `apps-ratgeber-hub-card-fields-rfc-0507` added, commit c6f46cf1c)
 - [x] `packages/os/site-kernel-checks/AGENTS.md` module table updated for `ratgeber-hub-validate.ts` and `content-voice.ts`. (evidence: RG-HUB-09 added to ratgeber-hub-validate entry, content-voice.ts entry added, commit c6f46cf1c)
 

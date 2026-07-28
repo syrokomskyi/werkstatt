@@ -50,7 +50,7 @@ The `related[]` list does not include RFC-0376, but RFC-0376 line 36 lists RFC-0
 - `surface.generate` → `public/.well-known/pseo-manifest.json`, `public/**/*.md` (`command-tables/09b-build-artifacts-part2.ts:57-60`)
 - `surface.starmap.generate` → `public/.well-known/pseo-star-map.svg` (`command-tables/09b-build-artifacts-part2.ts:103`)
 - `feed.generate` → also writes `public/feed.json` (JSON Feed, `command-tables/09b-build-artifacts-part2.ts:361`)
-- `webgogol.check.hints.generate` → `public/.well-known/webgogol-check.json` (`command-tables/30-check-webgogol.ts:184`)
+- `warpgogol.check.hints.generate` → `public/.well-known/warpgogol-check.json` (`command-tables/30-check-warpgogol.ts:184`)
 - `passport.key.rotate` → `public/.well-known/cosmic-passport-key.json` (`command-tables/06-growth-passport.ts:140`)
 
 Some of these may not currently emit markers (e.g. JSON files using `buildGeneratedJsonAdvisory` field-based markers rather than `buildGeneratedHeader` comment markers). The RFC should explicitly address each: either list them as "no change needed (already no comment marker)" or add them to the removal list.
@@ -67,7 +67,7 @@ Some of these may not currently emit markers (e.g. JSON files using `buildGenera
 - `agent.openapi.generate` (`public/.well-known/agent.openapi.json`)
 - `agent.knowledge.generate` (`public/api/agent/v1/*.json`)
 - `cms.schema.generate` (`public/admin/index.html`, `public/admin/config.yml`)
-- `webgogol.check.hints.generate` (`public/.well-known/webgogol-check.json`)
+- `warpgogol.check.hints.generate` (`public/.well-known/warpgogol-check.json`)
 - `passport.key.rotate` (`public/.well-known/cosmic-passport-key.json`)
 
 Without registration, `generated.file.lookup` will report these files as non-generated, and `generated.edit.guard` will not protect them. The RFC's rollout step 1 says "Update all `public/**` entries in `GENERATOR_OWNERSHIP_MAP`" but doesn't acknowledge that many entries are missing entirely.

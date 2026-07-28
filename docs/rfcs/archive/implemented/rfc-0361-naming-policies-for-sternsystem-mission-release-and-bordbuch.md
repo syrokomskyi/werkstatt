@@ -89,12 +89,12 @@ Introduce `naming.policy.validate` as the consolidated naming policy validator f
 
 | Rule                | Pattern                       | Example                        |
 | ------------------- | ----------------------------- | ------------------------------ |
-| Format              | kebab-case                    | `webgogol-com`                 |
-| Case                | lowercase only                | `Webgogol-Com` is invalid      |
+| Format              | kebab-case                    | `warpgogol-com`                 |
+| Case                | lowercase only                | `Warpgogol-Com` is invalid      |
 | Character set       | Latin-only (a-z, 0-9, hyphen) | `nicaragüa-projekt` is invalid |
-| Start               | letter or digit               | `-webgogol` is invalid         |
-| End                 | letter or digit               | `webgogol-` is invalid         |
-| Consecutive hyphens | not allowed                   | `webgogol--com` is invalid     |
+| Start               | letter or digit               | `-warpgogol` is invalid         |
+| End                 | letter or digit               | `warpgogol-` is invalid         |
+| Consecutive hyphens | not allowed                   | `warpgogol--com` is invalid     |
 | Regex               | `^[a-z0-9]+(-[a-z0-9]+)*$`    |                                |
 
 **Latin-only clarification**: The regex `^[a-z0-9]+(-[a-z0-9]+)*$` uses the ASCII character class `[a-z0-9]`. Non-ASCII lowercase letters (ä, ñ, я) are NOT in this class and will fail. The policy is explicit: **only ASCII lowercase letters (a-z), digits (0-9), and hyphens (-) are permitted**.
@@ -103,7 +103,7 @@ Introduce `naming.policy.validate` as the consolidated naming policy validator f
 
 | Rule | Pattern | Example |
 | --- | --- | --- |
-| Format | `<system-id>-m<NNNNNN>` | `webgogol-com-m000001` |
+| Format | `<system-id>-m<NNNNNN>` | `warpgogol-com-m000001` |
 | System id | must match an existing Sternsystem id |  |
 | Sequence | `m` + zero-padded six digits | `m000001`, `m000042`, `m999999` |
 | Scope | per-system (each system has its own m000001, m000002, ...) |  |
@@ -114,7 +114,7 @@ Introduce `naming.policy.validate` as the consolidated naming policy validator f
 
 | Rule | Pattern | Example |
 | --- | --- | --- |
-| Format | `<system-id>-r<NNNNNN>` | `webgogol-com-r000001` |
+| Format | `<system-id>-r<NNNNNN>` | `warpgogol-com-r000001` |
 | System id | must match an existing Sternsystem id |  |
 | Sequence | `r` + zero-padded six digits | `r000001`, `r000042`, `r999999` |
 | Scope | per-system (each system has its own r000001, r000002, ...) |  |
@@ -149,7 +149,7 @@ Validation is ASCII-first:
 
 - normalize each candidate id to NFC for diagnostics;
 - reject any non-ASCII code point before applying the regex;
-- reject case-folding collisions on case-insensitive filesystems (for example `Webgogol-Com` and `webgogol-com` in parallel directories);
+- reject case-folding collisions on case-insensitive filesystems (for example `Warpgogol-Com` and `warpgogol-com` in parallel directories);
 - compare directory names with manifest ids exactly after path normalization.
 
 The validator reports both the raw value and the normalized diagnostic value, but it never accepts a value because normalization made it look valid.
@@ -237,7 +237,7 @@ The command is an aggregator, not the owner of every invariant. Shared regexes a
 
 ```sh
 pnpm exec site-kernel run naming.policy.validate
-pnpm exec site-kernel run naming.policy.validate --system webgogol-com
+pnpm exec site-kernel run naming.policy.validate --system warpgogol-com
 pnpm exec site-kernel run naming.policy.validate --json
 pnpm exec site-kernel run naming.policy.validate --migrate-plan tmp/naming-cleanup-plan.json
 ```
@@ -258,24 +258,24 @@ export const STERNSYSTEM_ID_POLICY = {
   regex: STERNSYSTEM_ID_REGEX,
   charset: "ASCII lowercase letters (a-z), digits (0-9), hyphens (-)",
   description: "kebab-case, lowercase, latin-only",
-  examples: ["webgogol-com", "nicaragua-projekt"],
-  counterExamples: ["Webgogol-Com", "nicaragüa-projekt", "webgogol--com", "-webgogol", "webgogol-"],
+  examples: ["warpgogol-com", "nicaragua-projekt"],
+  counterExamples: ["Warpgogol-Com", "nicaragüa-projekt", "warpgogol--com", "-warpgogol", "warpgogol-"],
 };
 
 export const MISSION_ID_POLICY = {
   regex: MISSION_ID_REGEX,
   format: "<system-id>-m<NNNNNN>",
   description: "system id + literal -m + zero-padded six-digit sequence",
-  examples: ["webgogol-com-m000001", "nicaragua-projekt-m000042"],
-  counterExamples: ["webgogol-com-m1", "webgogol-com-M000001", "webgogol-com-m0000001"],
+  examples: ["warpgogol-com-m000001", "nicaragua-projekt-m000042"],
+  counterExamples: ["warpgogol-com-m1", "warpgogol-com-M000001", "warpgogol-com-m0000001"],
 };
 
 export const RELEASE_ID_POLICY = {
   regex: RELEASE_ID_REGEX,
   format: "<system-id>-r<NNNNNN>",
   description: "system id + literal -r + zero-padded six-digit sequence",
-  examples: ["webgogol-com-r000001", "nicaragua-projekt-r000042"],
-  counterExamples: ["webgogol-com-r1", "webgogol-com-R000001", "webgogol-com-r0000001"],
+  examples: ["warpgogol-com-r000001", "nicaragua-projekt-r000042"],
+  counterExamples: ["warpgogol-com-r1", "warpgogol-com-R000001", "warpgogol-com-r0000001"],
 };
 ```
 

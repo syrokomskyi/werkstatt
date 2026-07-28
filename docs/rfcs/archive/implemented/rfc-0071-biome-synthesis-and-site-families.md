@@ -105,7 +105,7 @@ family: handwerk-trust-engineering
 
 # Provenance — written during scaffold; required for biomes generated from a client bundle
 provenance:
-  client: webgogol-handwerk
+  client: warpgogol-handwerk
   selectedConcept: concept-2
   selectedDirection: 2
   sourceFiles:

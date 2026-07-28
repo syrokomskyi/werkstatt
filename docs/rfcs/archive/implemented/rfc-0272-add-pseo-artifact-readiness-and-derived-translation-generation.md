@@ -37,7 +37,7 @@ commands:
     - content.derived.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/site-kernel-checks"
@@ -152,19 +152,19 @@ quality:
 
 ```sh
 # Mark a reviewed source artifact as ready for translation.
-pnpm exec site-kernel run surface.artifact.ready --app webgogol-com \
+pnpm exec site-kernel run surface.artifact.ready --app warpgogol-com \
   --module pseo \
   --page-id website-local:friseur:deu:bw:karlsruhe:balayage \
   --field narrative
 
 # Generate all missing or outdated target-language drafts from ready source artifacts.
-pnpm exec site-kernel run surface.translation.generate --app webgogol-com --module pseo --json
+pnpm exec site-kernel run surface.translation.generate --app warpgogol-com --module pseo --json
 
 # Validate lifecycle, source hashes, approval gates, and stale translations.
-pnpm exec site-kernel run surface.translation.validate --app webgogol-com --module pseo --json
+pnpm exec site-kernel run surface.translation.validate --app warpgogol-com --module pseo --json
 
 # Validate deterministic target-language quality gates.
-pnpm exec site-kernel run surface.translation.qa.validate --app webgogol-com --module pseo --json
+pnpm exec site-kernel run surface.translation.qa.validate --app warpgogol-com --module pseo --json
 ```
 
 ### Generation rules

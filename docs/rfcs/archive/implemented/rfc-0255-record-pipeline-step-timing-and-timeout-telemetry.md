@@ -39,7 +39,7 @@ commands:
     - apps-check.postbuild
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/site-kernel"
@@ -63,7 +63,7 @@ nonGoals:
 The 2026-07-01 audit found that root `pnpm build:check` exceeded a 20 minute agent command timeout. The follow-up investigation showed that this was not a code failure:
 
 - `nicaragua-projekt` app-level `build:check` completed successfully in roughly seven minutes.
-- `webgogol-com` app-level `build:check` completed successfully in roughly nine and a half minutes.
+- `warpgogol-com` app-level `build:check` completed successfully in roughly nine and a half minutes.
 - The combined root command plus orchestration overhead simply needed a larger timeout.
 
 The important discovery is not "make the timeout bigger." The discovery is that the platform currently does not make long-running pipeline behavior explicit enough. A human or agent must infer where time went by reading a long stream of output.
@@ -123,14 +123,14 @@ This RFC does not replace Turborepo. It measures Site OS pipeline steps inside e
 ```sh
 pnpm exec site-kernel run pipeline.timing.report --json
 pnpm exec site-kernel run pipeline.timeout.validate --json
-pnpm --filter webgogol-com build:check
+pnpm --filter warpgogol-com build:check
 pnpm --filter nicaragua-projekt build:check
 ```
 
 Optional future flags:
 
 ```sh
-pnpm exec site-kernel run pipeline.timing.report --app webgogol-com --pipeline build.check --json
+pnpm exec site-kernel run pipeline.timing.report --app warpgogol-com --pipeline build.check --json
 pnpm exec site-kernel run pipeline.timing.report --last-run --json
 pnpm exec site-kernel run pipeline.timeout.validate --strict --json
 ```
@@ -212,7 +212,7 @@ Rules:
 A long pipeline should end with a concise timing summary:
 
 ```txt
-== webgogol-com: build:check timing ==
+== warpgogol-com: build:check timing ==
 [OK] total 9m 26s, 123 check step(s), 0 timeout(s)
 slowest:
   1. astro build                 3m 12s
@@ -303,7 +303,7 @@ The best first implementation is measurement without enforcement.
 
 Do not begin by optimizing or changing timeouts. First make every pipeline explain itself: how long it ran, which steps were slow, which timeout was in force, and whether the command was healthy.
 
-Once that visibility exists, optimization work can be precise. For example, if `webgogol-com build:check` is slow because of Astro build, that is a different project than if it is slow because of surface generation or postbuild SEO validation.
+Once that visibility exists, optimization work can be precise. For example, if `warpgogol-com build:check` is slow because of Astro build, that is a different project than if it is slow because of surface generation or postbuild SEO validation.
 
 ## Alternatives considered
 

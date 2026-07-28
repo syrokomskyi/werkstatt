@@ -12,7 +12,7 @@ verdict: needs-revision
 
 ## Verdict: Needs revision
 
-The RFC is well-structured and addresses a real legal/compliance gap, but has a critical V-30 compliance issue: it declares `breaksC: true` and lists `@gogol/ontology` in `packagesImpacted` but never proposes any changes to `packages/ontology/src/external-surfaces/` — the declarative C-contract files. V-30 requires that `breaksC: true` RFCs update the C-contract. Additionally, `satisfies: [DNA-44]` is mismatched — DNA-44 is the Sternsystem bundle contract, not a B2B business-model invariant. The RFC also references `content.references.validate --site webgogol-com` but the command scope is `app`, not `site`.
+The RFC is well-structured and addresses a real legal/compliance gap, but has a critical V-30 compliance issue: it declares `breaksC: true` and lists `@gogol/ontology` in `packagesImpacted` but never proposes any changes to `packages/ontology/src/external-surfaces/` — the declarative C-contract files. V-30 requires that `breaksC: true` RFCs update the C-contract. Additionally, `satisfies: [DNA-44]` is mismatched — DNA-44 is the Sternsystem bundle contract, not a B2B business-model invariant. The RFC also references `content.references.validate --site warpgogol-com` but the command scope is `app`, not `site`.
 
 ## Mechanical validation (rfc.validate)
 
@@ -21,7 +21,7 @@ Pass — `rfc.validate RFC-0487 --json` returned 0 violations. The frontmatter i
 ## Axis A — Structural completeness
 
 - **Decision** is clear and actionable — 6 concrete decisions in present tense.
-- **CLI surface** is partially specified: `b2b.model.validate` is described in prose (§7) but lacks exact flag syntax (`--site` vs `--app`), `--json` output shape, and exit code behavior. The acceptance criteria use `--site webgogol-com` but the command scope pattern in `@gogol/site-kernel-checks` uses `--app` (see `redirect.map.validate` which uses `supportsAllApps: true` with `scope: "app"`).
+- **CLI surface** is partially specified: `b2b.model.validate` is described in prose (§7) but lacks exact flag syntax (`--site` vs `--app`), `--json` output shape, and exit code behavior. The acceptance criteria use `--site warpgogol-com` but the command scope pattern in `@gogol/site-kernel-checks` uses `--app` (see `redirect.map.validate` which uses `supportsAllApps: true` with `scope: "app"`).
 - **TypeScript contracts** are absent — no type signatures for `retiredRoutes` schema, `businessModel` field, or `b2b.model.validate` output shape.
 - **File system responsibilities** table is missing — the RFC describes changes in prose and inline YAML but does not provide a concrete path-to-role mapping table.
 - **Output format** for `b2b.model.validate --json` is not documented.
@@ -29,7 +29,7 @@ Pass — `rfc.validate RFC-0487 --json` returned 0 violations. The frontmatter i
 - **Rollout** is well-structured (platform → site → cross-page → validation).
 - **Alternatives considered** is honest with 4 real alternatives and rejection reasons.
 - **Risks** covers broken links, search indexing, legal review, and external backlinks. Missing: agent misinterpretation risk and false-positive rate for `b2b.model.validate`.
-- **Acceptance criteria** are mostly checkable but `content.references.validate --site webgogol-com` uses wrong flag (`--site` vs `--app`).
+- **Acceptance criteria** are mostly checkable but `content.references.validate --site warpgogol-com` uses wrong flag (`--site` vs `--app`).
 - **Implementation notes** are explicit behavioral rules — good.
 
 ## Axis B — DNA alignment
@@ -68,11 +68,11 @@ Pass — `rfc.validate RFC-0487 --json` returned 0 violations. The frontmatter i
 - **`retiredRoutes` field**: Minimal and focused — just slug + status. Good.
 - **`businessModel` field**: Single enum value `b2b-only`. The RFC should consider whether this should be an open string or a closed enum. If closed enum, what other values are anticipated? If only `b2b-only`, could it be a boolean `b2bOnly: true`?
 - **Existing patterns**: The RFC correctly extends the existing `buildRetiredSurfaceRedirectBlock` pattern rather than inventing a new redirect mechanism.
-- **Scope discipline**: `appsImpacted: [webgogol-com]` is correct. `packagesImpacted` lists 3 packages — all genuinely impacted.
+- **Scope discipline**: `appsImpacted: [warpgogol-com]` is correct. `packagesImpacted` lists 3 packages — all genuinely impacted.
 
 ## Axis G — Blind spots
 
-- **Performance**: `b2b.model.validate` scans prose content for § 312g, § 312j, Verbraucher-Widerrufsrecht references. The RFC does not specify the scan scope (all prose files? all content files?) or estimate file count. For webgogol-com this is likely < 100 files — low cost. But the RFC should state the scope.
+- **Performance**: `b2b.model.validate` scans prose content for § 312g, § 312j, Verbraucher-Widerrufsrecht references. The RFC does not specify the scan scope (all prose files? all content files?) or estimate file count. For warpgogol-com this is likely < 100 files — low cost. But the RFC should state the scope.
 - **False positives**: `b2b.model.validate` checks for "Widerruf" in navigation labels — but "Widerruf" could appear in legitimate B2B contexts (e.g., "Widerruf ist für Unternehmer ausgeschlossen" in AGB). The RFC does not describe how to suppress noise during the transition period when AGB still contains Widerruf references (deferred to file 6 session).
 - **Edge cases**: The RFC does not consider what happens if `retiredRoutes` contains a slug that is still present in `pages[]` (conflict detection). The `b2b.model.validate` description says "retiredRoutes is the allowed escape hatch" for route slugs — but this contradicts the check "No route slugs widerruf... in pages[] or retiredRoutes." If retiredRoutes is the escape hatch, the check should only flag slugs in `pages[]`, not in `retiredRoutes`.
 - **Migration path**: Existing apps without `businessModel` field — do they pass `b2b.model.validate`? The RFC says the check runs "when `businessModel: b2b-only` is declared" — so apps without the field are exempt. This should be explicitly stated.
@@ -86,6 +86,6 @@ Pass — `rfc.validate RFC-0487 --json` returned 0 violations. The frontmatter i
 
 3. The `b2b.model.validate` description says retiredRoutes is "the allowed escape hatch" for route slugs, but also says it checks "No route slugs widerruf... in pages[] or retiredRoutes." These are contradictory — if retiredRoutes is the escape hatch, the check should only flag slugs in `pages[]`, not in `retiredRoutes`. Which is correct?
 
-4. The acceptance criteria use `content.references.validate --site webgogol-com` and `b2b.model.validate --site webgogol-com`, but the command scope pattern in `@gogol/site-kernel-checks` uses `--app` (e.g., `redirect.map.validate` has `scope: "app"` with `supportsAllApps: true`). Should the flag be `--app` instead of `--site`?
+4. The acceptance criteria use `content.references.validate --site warpgogol-com` and `b2b.model.validate --site warpgogol-com`, but the command scope pattern in `@gogol/site-kernel-checks` uses `--app` (e.g., `redirect.map.validate` has `scope: "app"` with `supportsAllApps: true`). Should the flag be `--app` instead of `--site`?
 
 5. The RFC does not specify the pipeline placement for `b2b.model.validate` — should it run in `sites-check-author`, `sites-check-postbuild`, or both? And should it be blocking (hard fail) or advisory (warning) during the transition period when AGB still contains Widerruf references?

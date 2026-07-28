@@ -35,7 +35,7 @@ commands:
     - autonomy.level.report
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/share"
@@ -97,9 +97,9 @@ Human involvement is governed as a **measured escalation budget** with three rul
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run escalation.queue.report --app webgogol-com --json
-pnpm exec site-kernel run escalation.route --app webgogol-com --reason claims-class --artifact <ref> --json
-pnpm exec site-kernel run escalation.budget.validate --app webgogol-com --json
+pnpm exec site-kernel run escalation.queue.report --app warpgogol-com --json
+pnpm exec site-kernel run escalation.route --app warpgogol-com --reason claims-class --artifact <ref> --json
+pnpm exec site-kernel run escalation.budget.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

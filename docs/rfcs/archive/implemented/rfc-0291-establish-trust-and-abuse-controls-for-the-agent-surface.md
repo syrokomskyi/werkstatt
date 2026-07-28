@@ -57,7 +57,7 @@ acceptance:
   - probe: file-exists
     path: "packages/share/src/agent/proof.ts"
   - probe: run
-    command: "site-kernel run agent.surface.validate --app webgogol-com"
+    command: "site-kernel run agent.surface.validate --app warpgogol-com"
     expect:
       exitCode: 0
   - probe: file-contains
@@ -102,7 +102,7 @@ Three additions, all inside existing components:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.manifest.verify --app webgogol-com --url https://webgogol.com --json
+pnpm exec site-kernel run agent.manifest.verify --app warpgogol-com --url https://warpgogol.com --json
 ```
 
 App-scoped, network-performing, **never** in `build.check` (post-deploy gate, like `passport.verify`). Local mode (`--url` omitted): verifies the signature of the freshly generated `public/.well-known/agent.json` against the committed public key — this mode IS safe for pipelines and is added to `APPS_CHECK_PIPELINE` guarded by key-material presence (skips with a note when the site has no passport key).
@@ -154,7 +154,7 @@ export function createFixedWindowLimiter(windowSeconds: 60, maxPerWindow: number
 
 ## Rollout
 
-1. Ship `proof.ts` + signing in the generator + `AGS-08..10`; webgogol-com (passport-enabled) signs immediately; sites without passports ship unsigned with the warning.
+1. Ship `proof.ts` + signing in the generator + `AGS-08..10`; warpgogol-com (passport-enabled) signs immediately; sites without passports ship unsigned with the warning.
 2. Ship gate enforcement (limits + identity passthrough + freshness `_meta`); fixtures extended (429 fixture, oversize fixture, identity-passthrough fixture) — `agent.gate.fixtures.run` stays the regression gate.
 3. Add `agent.manifest.verify` local mode to `APPS_CHECK_PIPELINE`; document the `--url` mode next to `passport.verify` in deploy runbooks.
 4. Phase 2 (separate change, same RFC scope, may trail): `site-kernel-deploy` emits a Cloudflare rate-limit rule for `/api/agent/*` into `wrangler.jsonc` as defense-in-depth under the platform limiter; until then the in-gate limiter is the only throttle and is documented as best-effort.

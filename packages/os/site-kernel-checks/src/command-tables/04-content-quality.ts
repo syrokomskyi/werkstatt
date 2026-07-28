@@ -20,7 +20,7 @@ import {
 } from "../checks/tokens.ts";
 import { runMirroringValidation } from "../checks/mirroring.ts";
 import { runSemanticDriftValidation } from "../checks/semantic-drift.ts";
-// compass.* handlers migrated to @webgogol/forge — see packages/forge/os/compass/
+// compass.* handlers migrated to @warpgogol/forge — see packages/forge/os/compass/
 import { runContentVoiceLint } from "../content-voice.ts";
 import { runPbpContentValidate } from "../content-pbp.ts";
 import { runContentReferencesValidate } from "../content-references.ts";
@@ -426,8 +426,8 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/src/content/pages/**/*.md"],
     execute: runSemanticDriftValidation,
   },
-  // compass.* migrated to @webgogol/forge — see packages/forge/os/compass/
-  /* Compass scaffolding — migrated to @webgogol/forge */
+  // compass.* migrated to @warpgogol/forge — see packages/forge/os/compass/
+  /* Compass scaffolding — migrated to @warpgogol/forge */
   {
     name: "content.claim.validate",
     description:

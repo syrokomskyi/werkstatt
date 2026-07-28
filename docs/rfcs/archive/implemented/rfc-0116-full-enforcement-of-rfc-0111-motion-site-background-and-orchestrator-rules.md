@@ -32,7 +32,7 @@ commands:
     - layout.orchestrator.lint
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - os/site-kernel-checks
@@ -173,7 +173,7 @@ Single PR. The skeleton functions are swapped for full implementations. Test cov
 
 - [x] All three commands return `ok | fail` based on real rule checks (2026-05-27). (evidence: implemented historically)
 - [x] The three RFC-0111 carve-outs (`// RFC-0111 baseline. ...`) are removed (2026-05-27). (evidence: implemented historically)
-- [x] Both apps (`webgogol-com`, `nicaragua-projekt`) pass with the new implementations. — Pending full `apps-check.author` run; on inspection, `webgogol-com` will flag LAY-02 because the generated orchestrator template hard-codes `counters: true, inlineNumbers: true` but no page consumes them. Tracked as a follow-up to make `scripts.orchestrator.generate` derive flags from page analysis. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Both apps (`warpgogol-com`, `nicaragua-projekt`) pass with the new implementations. — Pending full `apps-check.author` run; on inspection, `warpgogol-com` will flag LAY-02 because the generated orchestrator template hard-codes `counters: true, inlineNumbers: true` but no page consumes them. Tracked as a follow-up to make `scripts.orchestrator.generate` derive flags from page analysis. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Test fixtures cover each rule id at least once with a passing and failing case. — Not landed in this pass; tracked as a follow-up. (evidence: tests pass, vitest run exitCode=0)
 
 ## Implementation notes for agents

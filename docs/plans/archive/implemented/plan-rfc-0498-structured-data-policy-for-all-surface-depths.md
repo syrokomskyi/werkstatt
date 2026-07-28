@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/share"
@@ -29,7 +29,7 @@ scope:
 ## 1. Objectives
 
 - [ ] O1 — Add per-depth JSON-LD type policy to the C-contract (`jsonld-types.yaml`) — maps to acceptance criterion "Every surface page emits WebPage as the primary JSON-LD type"
-- [ ] O2 — Extend the baker to emit JSON-LD according to per-depth policy for all surface depths — maps to acceptance criteria "No surface page emits LocalBusiness/Electrician/HairSalon", "No surface page emits Offer/BookAction/PriceSpecification", "website-local depth-1, website-service depth-1, and website-local depth-5 pages emit Service with provider.name: Webgogol"
+- [ ] O2 — Extend the baker to emit JSON-LD according to per-depth policy for all surface depths — maps to acceptance criteria "No surface page emits LocalBusiness/Electrician/HairSalon", "No surface page emits Offer/BookAction/PriceSpecification", "website-local depth-1, website-service depth-1, and website-local depth-5 pages emit Service with provider.name: Warpgogol"
 - [ ] O3 — Extend `seo.structured.data.validate` with prohibited-type, Service provider, and fabricated-offer checks — maps to acceptance criterion "seo.structured.data.validate enforces required types, prohibited types, Service provider, and fabricated offer checks for surface pages"
 - [ ] O4 — Extend `surface.validate` with BreadcrumbList URL check — maps to acceptance criterion "surface.validate checks BreadcrumbList URLs in generated surface artifacts"
 - [ ] O5 — Extend `surface.contract.validate` with per-depth JSON-LD type policy checks — maps to acceptance criterion "surface.contract.validate includes per-depth JSON-LD type policy checks against the C-contract"
@@ -101,7 +101,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology build:check` passes
-- `surface.contract.validate --site webgogol-com` passes (contract loads with new section)
+- `surface.contract.validate --site warpgogol-com` passes (contract loads with new section)
 
 **Completion criterion:** `jsonldTypesContract.parse(loadYaml("jsonld-types.yaml"))` succeeds with `surfacePolicy` array containing 7 entries.
 
@@ -157,7 +157,7 @@ scope:
     - Resolve the surface+depth from the route registry or `SemanticModelOptions`
     - Check required types are present (existing logic, extended to use C-contract policy)
     - Check no prohibited types are present (new: `seo-structured-data.prohibited-{type}`)
-    - Check Service `provider.name` is "Webgogol" when Service is emitted (new: `seo-structured-data.service-provider-mismatch`)
+    - Check Service `provider.name` is "Warpgogol" when Service is emitted (new: `seo-structured-data.service-provider-mismatch`)
     - Check no `Offer`, `BookAction`, `PriceSpecification`, `QuantitativeValue` nodes are present (new: `seo-structured-data.fabricated-offer`)
   - Non-surface pages continue to use the existing per-page `structuredData` requirements from `system.md`
 - Add `CHANGE_SUMMARY` entry: `RFC-0498: extend with prohibited-type, Service provider, and fabricated-offer checks for surface pages`
@@ -165,7 +165,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes
-- `pnpm exec site-kernel run seo.structured.data.validate --site webgogol-com` passes on a built site
+- `pnpm exec site-kernel run seo.structured.data.validate --site warpgogol-com` passes on a built site
 
 **Completion criterion:** `seo.structured.data.validate` reports `prohibited-{type}`, `service-provider-mismatch`, and `fabricated-offer` findings for surface pages that violate the per-depth policy.
 
@@ -191,7 +191,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks build:check` passes
-- `pnpm exec site-kernel run surface.validate --site webgogol-com` passes
+- `pnpm exec site-kernel run surface.validate --site warpgogol-com` passes
 
 **Completion criterion:** `surface.validate` reports `SURF-BREADCRUMB-URL` for any surface artifact with breadcrumb URLs containing old `/deu/bw/` segments.
 
@@ -217,7 +217,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check` passes
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com` passes
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` passes
 
 **Completion criterion:** `surface.contract.validate` reports `jsonld-surface-policy-missing` when the section is absent and `jsonld-surface-policy-overlap` when required and prohibited types overlap.
 
@@ -296,9 +296,9 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
-- `pnpm exec site-kernel run surface.validate --site webgogol-com`
-- `pnpm exec site-kernel run seo.structured.data.validate --site webgogol-com` (requires built dist)
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+- `pnpm exec site-kernel run surface.validate --site warpgogol-com`
+- `pnpm exec site-kernel run seo.structured.data.validate --site warpgogol-com` (requires built dist)
 
 ### 4.2 Evidence artifacts
 

@@ -42,7 +42,7 @@ scope:
 - [ ] Objective 3 — `notausgang.validate` command registered with full verification suite (maps to: "`notausgang.validate` command registered and tested" + all validate criteria)
 - [ ] Objective 4 — `--json` output stable for both commands (maps to: "`--json` output stable for both commands")
 - [ ] Objective 5 — Export package layout matches the RFC contract (maps to: "Export package includes: `site/`, `dist/`, `artifact-manifest.json`, `bordbuch/events.ndjson`, `system.pin.json`, `behavior-snapshots/`, `README.md`, `notausgang-manifest.json`" + "`site/` is data-only")
-- [ ] Objective 6 — Pilot export of `webgogol-com` at `r000001` validates successfully (maps to: "Pilot: export `webgogol-com` at `r000001`, validate the export package")
+- [ ] Objective 6 — Pilot export of `warpgogol-com` at `r000001` validates successfully (maps to: "Pilot: export `warpgogol-com` at `r000001`, validate the export package")
 - [ ] Objective 7 — `rfc.validate` passes (maps to: "`rfc.validate` passes on this file")
 
 ## 2. Affected artifacts
@@ -86,7 +86,7 @@ scope:
 
 - No `apps/*` configuration changes required — Notausgang is a workspace-level command
 - `IntegrationManifest` is a per-Sternsystem data file (location: `src/content/site/integration-manifest.json` — single file, not language-scoped, since secret locations are not localized)
-- Pilot requires a published release for `webgogol-com` at `r000001` (depends on RFC-0357 + RFC-0363 implementation)
+- Pilot requires a published release for `warpgogol-com` at `r000001` (depends on RFC-0357 + RFC-0363 implementation)
 
 ### 2.3 Documentation and specs
 
@@ -329,13 +329,13 @@ scope:
 
 **Goal:** End-to-end verification with a real Sternsystem.
 
-> **Gated on dependencies:** Requires a published release for `webgogol-com` at `r000001` (RFC-0357 + RFC-0363).
+> **Gated on dependencies:** Requires a published release for `warpgogol-com` at `r000001` (RFC-0357 + RFC-0363).
 
 **Agent actions:**
 
-- Ensure `webgogol-com` has a published release at `r000001`
-- Run `pnpm exec site-kernel run notausgang.export --system webgogol-com --release webgogol-com-r000001 --output ../exports/webgogol-com-2026-07-09`
-- Run `pnpm exec site-kernel run notausgang.validate --path ../exports/webgogol-com-2026-07-09`
+- Ensure `warpgogol-com` has a published release at `r000001`
+- Run `pnpm exec site-kernel run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output ../exports/warpgogol-com-2026-07-09`
+- Run `pnpm exec site-kernel run notausgang.validate --path ../exports/warpgogol-com-2026-07-09`
 - Verify the export package contains all required files
 - Verify `site/` is data-only (no runtime files)
 - Verify integrations are nulled
@@ -384,7 +384,7 @@ scope:
 - `pnpm --filter @gogol/ontology build:check` — schema compilation
 - `pnpm --filter @gogol/site-kernel-handoff build:check` — package compilation
 - `pnpm --filter @gogol/site-kernel-handoff test` — unit and integration tests
-- `pnpm exec site-kernel run notausgang.export --system webgogol-com --release webgogol-com-r000001 --output <path>` — pilot export
+- `pnpm exec site-kernel run notausgang.export --system warpgogol-com --release warpgogol-com-r000001 --output <path>` — pilot export
 - `pnpm exec site-kernel run notausgang.validate --path <path>` — pilot validation
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0359` (RFC-0330, if acceptance probes declared)
 

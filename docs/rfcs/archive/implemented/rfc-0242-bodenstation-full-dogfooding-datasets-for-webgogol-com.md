@@ -1,6 +1,6 @@
 ---
 id: RFC-0242
-title: "Bodenstation full dogfooding datasets for webgogol com"
+title: "Bodenstation full dogfooding datasets for warpgogol com"
 kind: architecture
 scope: app
 status: implemented
@@ -31,11 +31,11 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
 successSignals:
-  - "`webgogol-com` deploys the full local stack down to Bedarfskarten (d5) in Bodenstation mode, dogfooding every growth module before it is sold to clients."
+  - "`warpgogol-com` deploys the full local stack down to Bedarfskarten (d5) in Bodenstation mode, dogfooding every growth module before it is sold to clients."
   - "Every Bodenstation surface page speaks in the engineer's voice and emits `Organization`/`ProfessionalService` + `Service` JSON-LD (the studio), never `LocalBusiness` for a trade it does not perform, and never `aggregateRating`."
   - "The pilot dataset covers Gewerke × Germany geo cascade (`deu`/region/city from @gogol/geo) × substantive demands, each Bedarfskarte passing the substance gate as a genuine engineering analysis."
   - "`bodenstation.voice.validate` fails the build if a Bodenstation page emits `LocalBusiness`/`aggregateRating` or impersonates a tradesperson, enforcing Infrastruktur statt Imitation."
@@ -48,13 +48,13 @@ nonGoals:
   - "Does not introduce district (Bezirk) URL axes."
 ---
 
-# RFC-0242: Bodenstation full dogfooding datasets for webgogol com
+# RFC-0242: Bodenstation full dogfooding datasets for warpgogol com
 
 ## Context
 
-The doctrine (`2026-06-24 Programmatic SEO`, §1.3, §5 "two deployment scenarios", §10 R2) decides that **Bodenstation** — the studio's own site `webgogol-com` — deploys the **full stack down to Bedarfskarten** so the studio proves the module works before selling it ("полный догфудинг"). In Bodenstation mode the page voice is the **engineer demonstrating understanding of demand**, and JSON-LD is `Organization`/`ProfessionalService` + `Service` (the studio), **never** `LocalBusiness` for a trade the studio does not perform, and **never** `aggregateRating`.
+The doctrine (`2026-06-24 Programmatic SEO`, §1.3, §5 "two deployment scenarios", §10 R2) decides that **Bodenstation** — the studio's own site `warpgogol-com` — deploys the **full stack down to Bedarfskarten** so the studio proves the module works before selling it ("полный догфудинг"). In Bodenstation mode the page voice is the **engineer demonstrating understanding of demand**, and JSON-LD is `Organization`/`ProfessionalService` + `Service` (the studio), **never** `LocalBusiness` for a trade the studio does not perform, and **never** `aggregateRating`.
 
-RFC-0237–0241 deliver the machinery (geo package, local v2, offer family, entitlements, HDRI firewall). This RFC is the **app-level composition**: the datasets and overrides that turn `webgogol-com` into the reference Bodenstation deployment, plus a voice/markup guard specific to Bodenstation.
+RFC-0237–0241 deliver the machinery (geo package, local v2, offer family, entitlements, HDRI firewall). This RFC is the **app-level composition**: the datasets and overrides that turn `warpgogol-com` into the reference Bodenstation deployment, plus a voice/markup guard specific to Bodenstation.
 
 ## Problem
 
@@ -65,7 +65,7 @@ RFC-0237–0241 deliver the machinery (geo package, local v2, offer family, enti
 
 ## Decision
 
-Make `webgogol-com` the canonical **Bodenstation** deployment with full dogfooding datasets and an enforcing voice guard.
+Make `warpgogol-com` the canonical **Bodenstation** deployment with full dogfooding datasets and an enforcing voice guard.
 
 1. **Full local stack to d5.** Author the pilot dataset: Gewerke (industries) × Germany geo cascade (`deu` → regions → cities, all from `@gogol/geo`) × substantive `demands`, producing real Bedarfskarten at d5.
 2. **All modules on (override).** A Bodenstation entitlements override enables `pseo` (high/regional budget), `offer`, `booking`, `trust`, `i18n-extra`, `automation`, so the studio tests its own offer on itself.
@@ -84,7 +84,7 @@ Make `webgogol-com` the canonical **Bodenstation** deployment with full dogfoodi
 
 ### Bodenstation composition
 
-- **Mode:** `webgogol-com` is pinned to Bodenstation mode (studio business profile = the studio).
+- **Mode:** `warpgogol-com` is pinned to Bodenstation mode (studio business profile = the studio).
 - **Entitlements override:** all Angebot modules enabled; `pseo` on the regional-hub (or higher) tier for full scale.
 - **Datasets (app content):**
   - `surface/industries/{de,uk}/*` — the Gewerke the studio demonstrates.
@@ -97,20 +97,20 @@ Make `webgogol-com` the canonical **Bodenstation** deployment with full dogfoodi
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run bodenstation.voice.validate --app webgogol-com --json
+pnpm exec site-kernel run bodenstation.voice.validate --app warpgogol-com --json
 ```
 
-App-scoped; runs in `webgogol-com` build-check.
+App-scoped; runs in `warpgogol-com` build-check.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `apps/webgogol-com/src/content/surface/industries/{de,uk}/*.md` | Gewerke records |
-| `apps/webgogol-com/src/content/surface/demands/{de,uk}/*.md` | Bedarfskarte demand records |
-| `apps/webgogol-com/src/content/surface/offers/{de,uk}/*.md` | Studio offer records |
-| `apps/webgogol-com/src/content/enriched/website-local/{de,uk}/**` | Approved d5 narratives |
-| `apps/webgogol-com/<entitlements override>` | Bodenstation: all modules on, high budget |
+| `apps/warpgogol-com/src/content/surface/industries/{de,uk}/*.md` | Gewerke records |
+| `apps/warpgogol-com/src/content/surface/demands/{de,uk}/*.md` | Bedarfskarte demand records |
+| `apps/warpgogol-com/src/content/surface/offers/{de,uk}/*.md` | Studio offer records |
+| `apps/warpgogol-com/src/content/enriched/website-local/{de,uk}/**` | Approved d5 narratives |
+| `apps/warpgogol-com/<entitlements override>` | Bodenstation: all modules on, high budget |
 | `packages/os/site-kernel-checks/src/bodenstation.ts` | `bodenstation.voice.validate` |
 
 ### Output format
@@ -120,8 +120,8 @@ App-scoped; runs in `webgogol-com` build-check.
   "command": "bodenstation.voice.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "localbusiness-on-bodenstation", "page": "website-local:elektriker:deu:bw:stuttgart:wallbox-installation", "message": "Bodenstation must emit Service/studio, not LocalBusiness for a trade the studio does not perform" },
-    { "app": "webgogol-com", "rule": "rating-on-bodenstation", "page": "…", "message": "aggregateRating is forbidden in Bodenstation mode" }
+    { "app": "warpgogol-com", "rule": "localbusiness-on-bodenstation", "page": "website-local:elektriker:deu:bw:stuttgart:wallbox-installation", "message": "Bodenstation must emit Service/studio, not LocalBusiness for a trade the studio does not perform" },
+    { "app": "warpgogol-com", "rule": "rating-on-bodenstation", "page": "…", "message": "aggregateRating is forbidden in Bodenstation mode" }
   ]
 }
 ```
@@ -135,7 +135,7 @@ App-scoped; runs in `webgogol-com` build-check.
 - **Seed iteratively.** Start with one or two Gewerke across a few BW cities + a handful of demands; grow by budget and substance, not by raw page count (doctrine §1.7).
 - **Approve narratives before publish.** d5 enriched narratives are frozen + approved (RFC-0207); unapproved content never renders.
 - **Verify the firewall.** RFC-0241's `hdri.firewall.validate` runs on the same site; any HDRI figure is a cited external claim.
-- **Pipeline:** `bodenstation.voice.validate` joins `webgogol-com` build-check; the deployment is the live reference for client sales.
+- **Pipeline:** `bodenstation.voice.validate` joins `warpgogol-com` build-check; the deployment is the live reference for client sales.
 
 ## Alternatives considered
 
@@ -153,10 +153,10 @@ App-scoped; runs in `webgogol-com` build-check.
 
 ## Acceptance criteria
 
-- [x] `webgogol-com` deploys the full local stack to d5 in Bodenstation mode, consuming `@gogol/geo` (Germany `deu`/regions/cities) and the local v2 cascade. (Dataset only covers Baden-Württemberg cities so far — acceptable per the RFC's own "seed iteratively" rollout note — but `src/content/enriched/website-local/` is empty, so no d5 pages have the approved enriched narrative the Design section calls for; the build log shows 17 narrative-missing warnings.) (evidence: packages/ directory, package exists)
+- [x] `warpgogol-com` deploys the full local stack to d5 in Bodenstation mode, consuming `@gogol/geo` (Germany `deu`/regions/cities) and the local v2 cascade. (Dataset only covers Baden-Württemberg cities so far — acceptable per the RFC's own "seed iteratively" rollout note — but `src/content/enriched/website-local/` is empty, so no d5 pages have the approved enriched narrative the Design section calls for; the build log shows 17 narrative-missing warnings.) (evidence: packages/ directory, package exists)
 - [x] Bodenstation entitlements override enables all Angebot modules with a high/regional `pseo` budget. (evidence: implemented historically)
 - [x] Every Bodenstation surface page emits `Organization`/`ProfessionalService` + `Service` (studio), never `LocalBusiness`/`aggregateRating`. (`SemanticOrganization.schemaType` + `company.mode === "bodenstation"` now drive `@type: ["Organization", "ProfessionalService"]` in `buildOrganizationNode`; verified present in the built `dist/client/index.html` / `uk/index.html`, with `LocalBusiness`/`aggregateRating` absent from the full `dist/client` build.) (evidence: implemented historically)
-- [x] `bodenstation.voice.validate` registered (app scope), wired into `webgogol-com` build-check, with documented `--json` output and `localbusiness-on-bodenstation` / `rating-on-bodenstation` / `impersonation` rules (fail-closed). (`impersonation` rule added — a closed de/uk pattern set for tradesperson-impersonation phrasing — in `packages/os/site-kernel-checks/src/bodenstation-voice.ts`.) (evidence: packages/ directory, package exists)
+- [x] `bodenstation.voice.validate` registered (app scope), wired into `warpgogol-com` build-check, with documented `--json` output and `localbusiness-on-bodenstation` / `rating-on-bodenstation` / `impersonation` rules (fail-closed). (`impersonation` rule added — a closed de/uk pattern set for tradesperson-impersonation phrasing — in `packages/os/site-kernel-checks/src/bodenstation-voice.ts`.) (evidence: packages/ directory, package exists)
 - [x] Pilot Bedarfskarten pass the substance gate as genuine engineering analyses (no synthetic stubs). (`pseo.validate` passes — 41 routes, 40 indexable, 1 thin; sampled demand records read as genuine analyses, not stubs.) (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 

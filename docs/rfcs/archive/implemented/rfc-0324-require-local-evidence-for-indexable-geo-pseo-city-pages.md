@@ -53,15 +53,15 @@ nonGoals:
   - "Do not delete published PSEO URLs without redirect/noindex/rollback policy."
 acceptance:
   - probe: run
-    command: "site-kernel run surface.evidence.validate --app webgogol-com --blueprint website-local --json"
+    command: "site-kernel run surface.evidence.validate --app warpgogol-com --blueprint website-local --json"
     expect:
       exitCode: 0
   - probe: run
-    command: "site-kernel run surface.duplicate.validate --app webgogol-com --blueprint website-local --json"
+    command: "site-kernel run surface.duplicate.validate --app warpgogol-com --blueprint website-local --json"
     expect:
       exitCode: 0
   - probe: run
-    command: "site-kernel run pseo.validate --app webgogol-com --json"
+    command: "site-kernel run pseo.validate --app warpgogol-com --json"
     expect:
       exitCode: 0
 ---
@@ -70,7 +70,7 @@ acceptance:
 
 ## Context
 
-The public audit found that the `website/**` PSEO branch on `webgogol-com` had become a tree of near-identical pages. City pages lacked city facts, intermediate `/deu` and `/deu/bw` levels added no unique substance, related links repeated the same description, and `medianSubstance` reported a healthy value even though the metric mostly counted template volume.
+The public audit found that the `website/**` PSEO branch on `warpgogol-com` had become a tree of near-identical pages. City pages lacked city facts, intermediate `/deu` and `/deu/bw` levels added no unique substance, related links repeated the same description, and `medianSubstance` reported a healthy value even though the metric mostly counted template volume.
 
 The owner decision is:
 
@@ -261,7 +261,7 @@ Valid patterns:
 1. Add depth-role policy support to the relevant Blueprint schema.
 2. Mark `/deu` and `/deu/bw` equivalents as `navigation-noindex` for `website-local`.
 3. Add local evidence fields to city records or linked evidence records.
-4. Populate `webgogol-com` city pages with at least three source-backed facts and one city-specific QA per indexable city page.
+4. Populate `warpgogol-com` city pages with at least three source-backed facts and one city-specific QA per indexable city page.
 5. Recalculate `medianSubstance` from unique token share.
 6. Update related-link generation to use target-specific facts.
 7. Regenerate surface artifacts and inspect behavior snapshot diffs before reindexing.
@@ -288,7 +288,7 @@ Valid patterns:
 - [x] `pseo-manifest.json` reports unique-token-share `medianSubstance`. (evidence: implemented historically)
 - [x] `surface.duplicate.validate` fails indexable branch pairs above 70 percent normalized body (evidence: implemented historically) similarity.
 - [x] Related-link descriptions vary by target-specific data and do not repeat one trade (evidence: implemented historically) description across a card set.
-- [x] `webgogol-com` `website-local` branch passes `surface.evidence.validate`, (evidence: implemented historically) `surface.duplicate.validate`, and `pseo.validate`.
+- [x] `warpgogol-com` `website-local` branch passes `surface.evidence.validate`, (evidence: implemented historically) `surface.duplicate.validate`, and `pseo.validate`.
 - [x] `rfc.validate` passes. (evidence: implemented historically)
 
 ## Implementation notes for agents

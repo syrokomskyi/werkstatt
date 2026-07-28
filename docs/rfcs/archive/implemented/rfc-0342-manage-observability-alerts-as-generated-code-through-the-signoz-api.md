@@ -164,7 +164,7 @@ pnpm exec site-kernel run observability.alerts.apply --dry-run
 pnpm exec site-kernel run observability.alerts.apply --json
 ```
 
-- Env: `WGOGOL_SIGNOZ_API_URL` (e.g. `https://observe.webgogol.com`), `WGOGOL_SIGNOZ_API_TOKEN` (SigNoz API key with rule/channel write permission). Missing env → clear error, exit non-zero.
+- Env: `WGOGOL_SIGNOZ_API_URL` (e.g. `https://observe.warpgogol.com`), `WGOGOL_SIGNOZ_API_TOKEN` (SigNoz API key with rule/channel write permission). Missing env → clear error, exit non-zero.
 - Reads current rules and channels from the SigNoz API; the **managed set** is rules labeled `managed_by: wgogol` and channels named with prefix `wgogol-`.
 - Diffs managed set vs. projection by `wgogol_rule_id` / channel id → create / update / delete; never touches unmanaged objects.
 - `--dry-run` prints the plan and exits 0 without mutating. Without it, prints the plan, applies, then re-reads to verify convergence; non-convergence → non-zero exit.

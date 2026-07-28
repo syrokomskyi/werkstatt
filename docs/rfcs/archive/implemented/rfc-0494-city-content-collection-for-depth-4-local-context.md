@@ -49,7 +49,7 @@ commands:
     - surface.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/site-kernel-checks"
@@ -75,7 +75,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -192,7 +192,7 @@ No new commands. The existing `surface.doorway-risk.report` (RFC-0492) works unc
 
 ```sh
 # Existing command — now passes when city records have the required fields
-pnpm exec site-kernel run surface.doorway-risk.report --site webgogol-com
+pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com
 ```
 
 ### TypeScript contracts

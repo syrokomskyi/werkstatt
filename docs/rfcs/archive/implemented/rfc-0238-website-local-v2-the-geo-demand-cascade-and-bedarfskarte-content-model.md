@@ -42,7 +42,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -167,7 +167,7 @@ howSolved: "…"                   # how the Fundament/module captures it
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run demand.modifier.lint --app webgogol-com --json
+pnpm exec site-kernel run demand.modifier.lint --app warpgogol-com --json
 ```
 
 `demand.modifier.lint` scans the `demands` collection and the slug universe and fails when a demand slug is an **intent modifier** (a closed, configurable lexicon: price/cheap/cost, urgent/today/24h, near/nearby, best/top/cheapest, plus de/uk equivalents `preis`, `guenstig`, `dringend`, `in-der-naehe`, `ціна`, `терміново`, `поруч`, `найкращий`). Modifiers must be page blocks/FAQ, not records.
@@ -180,8 +180,8 @@ pnpm exec site-kernel run demand.modifier.lint --app webgogol-com --json
 | `packages/surface/src/blueprint.ts` | Adds `universe.provider` (geo-backed axis source) |
 | `packages/surface/src/blueprint-schema.ts` | Schema allows `universe.provider` alongside `collection`/`field` |
 | `packages/os/site-kernel-checks/src/pseo.ts` | Adds `demand.modifier.lint` |
-| `apps/webgogol-com/src/content/surface/demands/{de,uk}/*.md` | New demand records (Bedarfskarte fields) |
-| `apps/webgogol-com/src/content/surface/cities/**` | Removed (geo identity now in @gogol/geo) |
+| `apps/warpgogol-com/src/content/surface/demands/{de,uk}/*.md` | New demand records (Bedarfskarte fields) |
+| `apps/warpgogol-com/src/content/surface/cities/**` | Removed (geo identity now in @gogol/geo) |
 
 ### Output format
 
@@ -190,7 +190,7 @@ pnpm exec site-kernel run demand.modifier.lint --app webgogol-com --json
   "command": "demand.modifier.lint",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "modifier-as-demand", "slug": "guenstig", "message": "intent modifier must be a block/FAQ inside a Bedarfskarte, not a demand record" }
+    { "app": "warpgogol-com", "rule": "modifier-as-demand", "slug": "guenstig", "message": "intent modifier must be a block/FAQ inside a Bedarfskarte, not a demand record" }
   ]
 }
 ```
@@ -203,7 +203,7 @@ pnpm exec site-kernel run demand.modifier.lint --app webgogol-com --json
 
 - **Lands with RFC-0237.** The geo package and this Blueprint rewrite ship together; there is no intermediate single-axis state.
 - **No backward compatibility.** Legacy `/website/{industry}/{city}/` URLs are not redirected (explicit client decision). Old city gazetteer records are deleted; their local prose is re-authored as city-presence (d4) and demand (d5) content.
-- **Pilot = `webgogol-com` (Germany).** Seed `country: de` → `deu`, regions like `DE-BW` → `bw`, the existing cities, and a first set of `demands` per industry.
+- **Pilot = `warpgogol-com` (Germany).** Seed `country: de` → `deu`, regions like `DE-BW` → `bw`, the existing cities, and a first set of `demands` per industry.
 - **New apps** get the v2 Blueprint by default via onboarding; they declare a geo selection and author demands.
 - **Pipeline.** `demand.modifier.lint` joins the apps build-check pipeline next to `pseo.validate`.
 
@@ -225,10 +225,10 @@ pnpm exec site-kernel run demand.modifier.lint --app webgogol-com --json
 
 - [x] `website-local.yaml` rewritten to the five-axis cascade (d0–d5) with geo-provider axes and per-depth substance/freshness config. (evidence: implemented historically)
 - [x] `@gogol/surface` Blueprint type + schema accept `universe.provider` (geo-backed axis source) and the generator resolves geo slugs via `@gogol/geo` (RFC-0199 localized universe). (evidence: packages/ directory, package exists)
-- [x] `demands` collection + Bedarfskarte content model defined; `webgogol-com` ships pilot demand records for at least one industry. (evidence: implemented historically)
+- [x] `demands` collection + Bedarfskarte content model defined; `warpgogol-com` ships pilot demand records for at least one industry. (evidence: implemented historically)
 - [x] `demand.modifier.lint` registered (app scope), wired into apps build-check, with documented `--json` output and the de/uk modifier lexicon. (evidence: implemented historically)
 - [x] Resolved URLs match the canon (`/website/elektriker/deu/bw/stuttgart/wallbox-installation/`, uk twin) and each live d5 page gets a Markdown twin + breadcrumb trail. (evidence: implemented historically)
-- [x] Legacy single-axis city gazetteer removed from `webgogol-com`; no legacy redirects added. (evidence: implemented historically)
+- [x] Legacy single-axis city gazetteer removed from `warpgogol-com`; no legacy redirects added. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents

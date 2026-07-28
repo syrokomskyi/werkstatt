@@ -156,7 +156,7 @@ interface MaintenanceDebtReport {
     {
       "sourceCommand": "material.credits.validate",
       "severity": "warning",
-      "app": "webgogol-com",
+      "app": "warpgogol-com",
       "message": "Missing prose credit for authored material reference"
     }
   ]

@@ -75,7 +75,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -109,7 +109,7 @@ The operator's requirement now is that transplant must perform a **real migratio
 ## Architectural fit
 
 - **DNA-54 (Forge bindings contract)** — the migration adapter's `analyze` phase fills the same stack-dependent bindings (`typecheck`, `test`, `scopedBuild`) that `forge-bootstrap` greenfield fills interactively. The adapter derives them from the source project's manifest files instead of asking the operator, but the contract is the same: bindings are declared in `forge.yaml`, referenced by skills via `ref()`, never hardcoded.
-- **RFC-0374 (forge extraction)** — the migration-adapter registry is portable: adapters live in `packages/forge/src/migration-adapters/`, have no `@gogol/*` imports, and are shipped as part of `@webgogol/forge`.
+- **RFC-0374 (forge extraction)** — the migration-adapter registry is portable: adapters live in `packages/forge/src/migration-adapters/`, have no `@gogol/*` imports, and are shipped as part of `@warpgogol/forge`.
 - **RFC-0391 (portable init)** — `runInit()` remains as the internal config-writing primitive; only its CLI exposure is removed. `forge.create` continues to call it.
 - **RFC-0540 (binding defaults)** — the adapter fills the null stack bindings that `forge.init` left; it does not touch forge-CLI defaults.
 - **RFC-0542 (self-documenting output)** — `forge.create`'s `nextSteps` already point to `/forge-bootstrap`; the transplant mode's final report includes migration summary (files copied, bindings derived, workspace updated).
@@ -264,7 +264,7 @@ Next steps:
 
 - **Keep `forge init` but add non-empty-directory guard** — rejected: `forge init` in an existing project still silently skips files and overwrites skills. The guard would make it refuse in the exact scenario it was designed for. The operator's decision is to remove the standalone path entirely.
 - **Universal migrator with configurable rules (no adapters)** — rejected: a single universal migrator cannot know how to derive bindings for different stacks (Node/TS vs Phaser vs Python). The adapter architecture allows each stack to encapsulate its own detection, analysis, and migration logic. The registry is extensible for future stacks without modifying a monolithic migrator.
-- **External npm packages for adapters** — rejected for initial shipment: adds package management complexity for the first two adapters. Built-in adapters ship with `@webgogol/forge`; the `migrationAdapters` config field in `forge.yaml` supports external adapters via `module:` for future expansion.
+- **External npm packages for adapters** — rejected for initial shipment: adds package management complexity for the first two adapters. Built-in adapters ship with `@warpgogol/forge`; the `migrationAdapters` config field in `forge.yaml` supports external adapters via `module:` for future expansion.
 - **Make `forge.create` interactive with migration** — rejected: `forge.create` is non-interactive (RFC-0544). The migration interview belongs in the `forge-bootstrap` skill, which is the interactive layer.
 
 ## Risks

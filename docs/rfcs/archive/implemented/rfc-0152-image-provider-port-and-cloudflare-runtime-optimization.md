@@ -35,14 +35,14 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ui"
   - "@gogol/share"
   - "@gogol/site-kernel-astro"
   - "@gogol/site-kernel-checks"
 successSignals:
-  - "apps/nicaragua-projekt and apps/webgogol-com build green with <Image>/responsive markup restored — no `generating optimized images` ENOENT, no <img> downgrade lingering as the final contract."
+  - "apps/nicaragua-projekt and apps/warpgogol-com build green with <Image>/responsive markup restored — no `generating optimized images` ENOENT, no <img> downgrade lingering as the final contract."
   - "Every authored image renders with a real responsive srcset; originals stay in-repo at maximum quality and are downscaled per-variant by the active provider, not shipped full-size."
   - "Image rendering goes through a single provider-agnostic <ResponsiveImage> primitive; switching optimization backend (Cloudflare runtime → CMS/DAM) is a provider/config change, not a component rewrite."
   - "A headless-CMS image (remote URL) flows through the same <ResponsiveImage> with a cms-native provider that builds srcset from the CMS/DAM URL params — no bespoke per-CMS image code in sections."
@@ -138,7 +138,7 @@ Revert the interim `<img>` edits in `@gogol/ui` (hero, section-image, footer/-pr
 3. Add `cloudflare.assets.validate` to the check pipeline.
 4. Ship safe-by-default: the `cloudflare-runtime` provider serves the **raw origin asset** (no `/cdn-cgi/image`, no srcset) unless `PUBLIC_CF_IMAGE_TRANSFORM=on`. This keeps images working on a zone that has not enabled Transformations.
 5. Enable Cloudflare Image Transformations on each zone, then set `PUBLIC_CF_IMAGE_TRANSFORM=on` for that app's build; verify real `/cdn-cgi/image` variants are served (HTTP 200, `content-type: image/*`).
-6. Repeat for `webgogol-com`.
+6. Repeat for `warpgogol-com`.
 
 ## Future phases (informative, non-binding)
 

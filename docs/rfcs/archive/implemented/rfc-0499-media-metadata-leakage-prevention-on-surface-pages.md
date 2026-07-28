@@ -40,19 +40,19 @@ commands:
     - surface.contract.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/share"
   - "@gogol/ui"
   - "@gogol/ontology"
 successSignals:
-  - "No surface page renders visible media metadata text (Gemini, AIPlatform, Webgogol Organization, commissioned-webgogol-material, Copyright © 2026 Webgogol) in the readable card body or prose blocks."
+  - "No surface page renders visible media metadata text (Gemini, AIPlatform, Warpgogol Organization, commissioned-warpgogol-material, Copyright © 2026 Warpgogol) in the readable card body or prose blocks."
   - "Media metadata appears only in JSON-LD script blocks (structured data) and on the dedicated /bildnachweise/ provenance registry page (RFC-0488)."
   - "AI-generated images on surface pages display a short 'Konzeptillustration' label (or localized equivalent) and a link to the precise /bildnachweise/#... anchor — no full Bildnachweis text in the page body."
   - "surface.media-leakage.validate scans all rendered surface page HTML for prohibited metadata strings and fails on any match."
   - "The baker (bakePage) does not emit media metadata fields into readable block props — metadata stays in JSON-LD script blocks only."
-  - "No surface page shows internal enum values (commissioned-webgogol-material, linked-public-source, AIPlatform, Organization) to visitors — these are mapped to localized human-readable labels by the material credits renderer (RFC-0488)."
+  - "No surface page shows internal enum values (commissioned-warpgogol-material, linked-public-source, AIPlatform, Organization) to visitors — these are mapped to localized human-readable labels by the material credits renderer (RFC-0488)."
 nonGoals:
   - "Does not change the material credits page (/bildnachweise/) — that is governed by RFC-0488."
   - "Does not change the credits sidecar schema (*.credits.yaml) — that is governed by RFC-0220."
@@ -70,7 +70,7 @@ RFC-0220 introduced site-wide material credits with a structured sidecar schema.
 
 An external expert review (file 14.3, §15) identified that surface pages still leak media metadata into the readable page body:
 
-> С текущей страницы убрать видимый вывод: Gemini 3.1 Image AIPlatform Webgogol Organization commissioned-webgogol-material Copyright © 2026 Webgogol
+> С текущей страницы убрать видимый вывод: Gemini 3.1 Image AIPlatform Warpgogol Organization commissioned-warpgogol-material Copyright © 2026 Warpgogol
 >
 > На странице оставить: изображение; корректный alt; короткую отметку Konzeptillustration; ссылку на точный объект /bildnachweise/#...
 >
@@ -80,8 +80,8 @@ The current baker (`bakePage`) may emit media metadata fields into readable bloc
 
 ## Problem
 
-1. **Internal enum values visible.** Values like `commissioned-webgogol-material`, `linked-public-source`, `AIPlatform`, `Organization` may appear in readable card bodies on surface pages.
-2. **Full Bildnachweis text in page body.** The full media provenance text (e.g., "Gemini 3.1 Image", "Copyright © 2026 Webgogol") may appear in readable prose or card descriptions instead of only in JSON-LD and on `/bildnachweise/`.
+1. **Internal enum values visible.** Values like `commissioned-warpgogol-material`, `linked-public-source`, `AIPlatform`, `Organization` may appear in readable card bodies on surface pages.
+2. **Full Bildnachweis text in page body.** The full media provenance text (e.g., "Gemini 3.1 Image", "Copyright © 2026 Warpgogol") may appear in readable prose or card descriptions instead of only in JSON-LD and on `/bildnachweise/`.
 3. **No enforcement.** There is no validator that scans rendered surface page HTML for prohibited metadata strings.
 4. **Inconsistent with RFC-0488.** RFC-0488 maps internal enum values to human-readable labels on the credits page, but surface pages may still render the raw values.
 
@@ -102,15 +102,15 @@ The following strings must not appear in the readable HTML body of any surface p
 | `Gemini` | Context-aware: only flagged inside credit-context elements (`<figcaption>`, `<details>`, card metadata `<dl>`) — not in prose body text | AI model name is internal metadata, not visitor-facing |
 | `AIPlatform` | Case-sensitive whole-word match | Internal enum value (`CreditPartyKind`) |
 | `Organization` | Context-aware: only flagged as a media author label (inside `<figcaption>`, `<details>`, card metadata `<dl>`) — not in general prose | Internal enum value (`CreditPartyKind`) |
-| `commissioned-webgogol-material` | Case-sensitive whole-word match | Internal enum value (`MaterialSourceType`) |
+| `commissioned-warpgogol-material` | Case-sensitive whole-word match | Internal enum value (`MaterialSourceType`) |
 | `linked-public-source` | Case-sensitive whole-word match | Internal enum value |
-| `Copyright © 2026 Webgogol` | Exact phrase match in card body (footer excluded) | Repetitive copyright boilerplate — per-material usage status is on `/bildnachweise/` |
+| `Copyright © 2026 Warpgogol` | Exact phrase match in card body (footer excluded) | Repetitive copyright boilerplate — per-material usage status is on `/bildnachweise/` |
 
 **Context-aware matching.** The validator does not use naive substring scanning for "Gemini" and "Organization" — both are common words that appear legitimately in prose. Instead:
 
 1. For `Gemini`: the string is flagged only when it appears inside an element whose `data-credit-context` attribute is set (emitted by `<MaterialCredit>` and `<figcaption>` for credited images), or inside a card description that maps to a media credit sidecar field.
 2. For `Organization`: the string is flagged only as a media author label (inside `<figcaption>`, `<details>`, or a card metadata `<dl>`), not as a general prose word.
-3. For enum values (`AIPlatform`, `commissioned-webgogol-material`, `linked-public-source`): case-sensitive whole-word match anywhere in visible HTML — these strings are internal codes that never appear in legitimate prose.
+3. For enum values (`AIPlatform`, `commissioned-warpgogol-material`, `linked-public-source`): case-sensitive whole-word match anywhere in visible HTML — these strings are internal codes that never appear in legitimate prose.
 
 ### Allowed visible media labels on surface pages
 
@@ -158,10 +158,10 @@ The prohibited visible strings and the matching strategy are declared in the Lay
 
 ```sh
 # Validate media leakage on rendered surface pages
-pnpm exec site-kernel run surface.media-leakage.validate --site webgogol-com --json
+pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json
 
 # Validate Layer C contract (includes media-leakage policy)
-pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json
+pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json
 ```
 
 `surface.media-leakage.validate` is site-scoped and runs in `sites-check-postbuild` (after the production build, because it scans rendered HTML from `dist/client/`). It exits non-zero when any prohibited string is found in visible HTML, or when an AI-generated image lacks the `Konzeptillustration` label or `/bildnachweise/#...` link.
@@ -243,7 +243,7 @@ interface MediaLeakageValidateResult {
 | `prohibited-string-in-visible-html` | fail | 1 | A prohibited string appears in visible HTML (not inside `<script>`) |
 | `missing-konzeptillustration-label` | fail | 1 | An AI-generated image on a surface page lacks the `Konzeptillustration` (or localized equivalent) label |
 | `missing-bildnachweise-link` | fail | 1 | An AI-generated image on a surface page lacks a link to `/bildnachweise/#...` |
-| `enum-value-in-visible-html` | fail | 1 | An internal enum value (`AIPlatform`, `commissioned-webgogol-material`, `linked-public-source`) appears in visible HTML |
+| `enum-value-in-visible-html` | fail | 1 | An internal enum value (`AIPlatform`, `commissioned-warpgogol-material`, `linked-public-source`) appears in visible HTML |
 
 ### Pipeline placement
 
@@ -257,7 +257,7 @@ interface MediaLeakageValidateResult {
 4. **Existing validators:** update `surface.validate` and `surface.contract.validate` to include media-leakage checks.
 5. **UI components:** update `<MaterialCredit>` to suppress visible credit rows on surface pages and emit the `Konzeptillustration` label instead.
 6. **Compass sync:** update `docs/verification-plan.xml` with the new validator. Update `docs/COMMANDS.md` with the new command. Update `packages/os/site-kernel-checks/AGENTS.md`.
-7. **Pilot:** run `surface.media-leakage.validate --site webgogol-com` after the next production build. Fix any remaining leakage in the baker or content.
+7. **Pilot:** run `surface.media-leakage.validate --site warpgogol-com` after the next production build. Fix any remaining leakage in the baker or content.
 8. **New sites:** new sites scaffold with the media-leakage validator from day one — it is part of `sites-check-postbuild` for all sites with surface pages. Sites with no surface pages pass with zero violations.
 
 ## Alternatives considered
@@ -271,9 +271,9 @@ interface MediaLeakageValidateResult {
 
 | Risk | Likelihood | Mitigation |
 | --- | --- | --- |
-| **False positives for "Gemini" and "Organization"** | Medium | Context-aware matching: "Gemini" is only flagged inside credit-context elements (`<figcaption>`, `<details>`, card metadata `<dl>`), not in prose. "Organization" is only flagged as a media author label, not as a general word. Enum values (`AIPlatform`, `commissioned-webgogol-material`) use case-sensitive whole-word match — these strings never appear in legitimate prose. |
-| **Performance: scanning all surface page HTML** | Low | The validator scans only surface page routes (identified by `surfaceId` in the route registry), not all pages. For `webgogol-com` (~50-100 surface pages, ~50KB HTML each), the scan is negligible. The scan runs once per `sites-check-postbuild` invocation, not per request. |
-| **Footer copyright on surface pages** | Low | The footer copyright line ("Copyright © 2026 Webgogol") appears in the footer, which is visible HTML. The validator excludes footer elements (scoped to `<footer>` or `[data-footer]`) from the `Copyright © 2026 Webgogol` check — the prohibition targets per-material copyright boilerplate in card bodies, not the site-wide footer. |
+| **False positives for "Gemini" and "Organization"** | Medium | Context-aware matching: "Gemini" is only flagged inside credit-context elements (`<figcaption>`, `<details>`, card metadata `<dl>`), not in prose. "Organization" is only flagged as a media author label, not as a general word. Enum values (`AIPlatform`, `commissioned-warpgogol-material`) use case-sensitive whole-word match — these strings never appear in legitimate prose. |
+| **Performance: scanning all surface page HTML** | Low | The validator scans only surface page routes (identified by `surfaceId` in the route registry), not all pages. For `warpgogol-com` (~50-100 surface pages, ~50KB HTML each), the scan is negligible. The scan runs once per `sites-check-postbuild` invocation, not per request. |
+| **Footer copyright on surface pages** | Low | The footer copyright line ("Copyright © 2026 Warpgogol") appears in the footer, which is visible HTML. The validator excludes footer elements (scoped to `<footer>` or `[data-footer]`) from the `Copyright © 2026 Warpgogol` check — the prohibition targets per-material copyright boilerplate in card bodies, not the site-wide footer. |
 | **Legitimate "Gemini" in prose** | Low | An industry dossier might mention astrology or the Gemini constellation. Context-aware matching ensures only credit-context occurrences are flagged. |
 | **Baker regression: dropping JSON-LD** | Low | The baker changes only affect readable block props. JSON-LD `<script>` emission is handled by the semantic layer (`buildJsonLd` in `@gogol/share`), which is not modified by this RFC. The semantic layer continues to emit `ImageObject`/`VideoObject` with full credit fields. |
 | **Migration: existing surface pages** | Low | Surface pages are regenerated by `surface.generate` on each build. The baker changes take effect on the next build — no manual content migration is needed. |
@@ -304,7 +304,7 @@ interface MediaLeakageValidateResult {
 
 ## Acceptance criteria
 
-- [x] No surface page renders `Gemini` (in credit context), `AIPlatform`, `Organization` (as media author), `commissioned-webgogol-material`, `linked-public-source`, or `Copyright © 2026 Webgogol` (in card body) in visible HTML. (evidence: `surface.media-leakage.validate` scans rendered HTML with context-aware matching; `MaterialCredit` component suppresses credit rows in surfacePage mode)
+- [x] No surface page renders `Gemini` (in credit context), `AIPlatform`, `Organization` (as media author), `commissioned-warpgogol-material`, `linked-public-source`, or `Copyright © 2026 Warpgogol` (in card body) in visible HTML. (evidence: `surface.media-leakage.validate` scans rendered HTML with context-aware matching; `MaterialCredit` component suppresses credit rows in surfacePage mode)
 - [x] AI-generated images on surface pages display a `Konzeptillustration` (or localized equivalent) label. (evidence: `material-credit.astro` emits `<figcaption>` with `konzeptLabel` from `labels.aiUsageLabels.aiGenerated` when `surfacePage && isAiGenerated`)
 - [x] AI-generated images on surface pages link to `/bildnachweise/#...`. (evidence: `material-credit.astro` emits `<a href={bildnachweiseHref}>` where `bildnachweiseHref = /bildnachweise/#${credit.id}`)
 - [x] `surface.media-leakage.validate` scans rendered HTML and fails on prohibited strings using context-aware matching. (evidence: `surface-media-leakage-validate.ts` implements exact, whole-word, and context-aware matching strategies against `mediaLeakagePolicy.prohibitedStrings`)

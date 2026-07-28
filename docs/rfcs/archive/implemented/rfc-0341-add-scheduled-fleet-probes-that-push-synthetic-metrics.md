@@ -37,9 +37,9 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/observability"
   - "@gogol/site-kernel-observability"
@@ -49,7 +49,7 @@ successSignals:
   - "The probe target list is generated from the workspace (never hand-maintained), so a newly onboarded app enters monitoring by construction."
   - "For static sites this synthetic lane — not APM — answers 'is the site alive and serving correct content', reusing the studio's own probing know-how instead of deploying a second uptime product."
 nonGoals:
-  - "Do not probe third-party sites; this runner monitors the studio's own fleet only (the check-webgogol product lane, RFC-0304, owns external URLs)."
+  - "Do not probe third-party sites; this runner monitors the studio's own fleet only (the check-warpgogol product lane, RFC-0304, owns external URLs)."
   - "Do not run Playwright/browser capture in the 5-minute pulse lane; the pulse is plain HTTP + TLS. A daily browser-based deep probe is Phase 2 of this RFC."
   - "Do not store probe artifacts or reports; the output is metrics only (deep-probe evidence in Phase 2 stays local to the runner with short retention)."
   - "Do not define alert thresholds here (RFC-0342)."
@@ -77,7 +77,7 @@ acceptance:
 
 For a fleet of static sites, the dominant failure modes are external: a stale or broken deploy, DNS/TLS trouble, Cloudflare serving 5xx, an empty page shipped by a bad build. None of these are visible from inside (there is no server code on most pages, RFC-0149/DNA-1), so the primary health signal must be **synthetic**: an outside agent requesting the site on a schedule.
 
-The ecosystem already owns probing machinery: `@gogol/check-core` (targets, safety, evidence contracts) and `@gogol/check-runner-node` (Playwright capture) power the check-webgogol product via `backs/check-webgogol-runner` (RFC-0304). What is missing is not a probe engine but (a) a **scheduled, own-fleet** consumer of it and (b) **time series** — today a check run produces one-off artifacts, not history, trends, or alertable signals.
+The ecosystem already owns probing machinery: `@gogol/check-core` (targets, safety, evidence contracts) and `@gogol/check-runner-node` (Playwright capture) power the check-warpgogol product via `backs/check-warpgogol-runner` (RFC-0304). What is missing is not a probe engine but (a) a **scheduled, own-fleet** consumer of it and (b) **time series** — today a check run produces one-off artifacts, not history, trends, or alertable signals.
 
 RFC-0337 provides the metrics port; RFC-0338 provides the backend and a compose home (`compose.extra.yaml`) on the same EU VPS, which doubles as a genuine outside-in vantage point (not Cloudflare, not the developer's machine).
 
@@ -97,7 +97,7 @@ Create **`backs/fleet-probe-runner`** (kind `scheduled-worker`, Node, no browser
 
 For each target route:
 
-- `GET` with `User-Agent: WGogol-FleetProbe/1 (+https://webgogol.com)`, no cookies, `Accept-Encoding: identity`.
+- `GET` with `User-Agent: WGogol-FleetProbe/1 (+https://warpgogol.com)`, no cookies, `Accept-Encoding: identity`.
 - **TTFB** = time from request start until response headers received.
 - **Status class** = `2xx | 3xx | 4xx | 5xx | error` (network/timeout → `error`).
 - **Content sentinel** (HTML routes only): body matches all sentinel regexes (default: `<title>[^<]+</title>` and `</html>`).
@@ -127,8 +127,8 @@ Writes `backs/fleet-probe-runner/targets.generated.json` (GENERATED marker via `
   "schemaVersion": 1,
   "targets": [
     {
-      "siteId": "webgogol-com",
-      "origin": "https://webgogol.com",
+      "siteId": "warpgogol-com",
+      "origin": "https://warpgogol.com",
       "routes": ["/", "/de/", "/en/", "/sitemap.xml", "/robots.txt"],
       "sentinels": ["<title>[^<]+</title>", "</html>"]
     }
@@ -198,7 +198,7 @@ Deployment: a service entry in `backs/observability-stack/compose.extra.yaml` wi
 - **Deploy OneUptime/Uptime Kuma alongside SigNoz.** Rejected: second product to operate, strictly weaker checks than the in-house engine, and no content sentinels; the studio's check stack already exists.
 - **Cloudflare Workers cron probing.** Rejected: probing Cloudflare-served sites from inside Cloudflare hides an entire class of failures (CF outage/misconfig); the EU VPS is a true external vantage.
 - **Playwright for every pulse.** Rejected: ~100× cost per probe for negligible added signal at 5-minute cadence; browser depth belongs in the daily deep lane.
-- **Reusing backs/check-webgogol-runner directly.** Rejected: that runner is queue-driven, product-scoped (third-party URLs, Playwright-first). Shared logic belongs in packages, not by coupling two deployables.
+- **Reusing backs/check-warpgogol-runner directly.** Rejected: that runner is queue-driven, product-scoped (third-party URLs, Playwright-first). Shared logic belongs in packages, not by coupling two deployables.
 
 ## Risks
 

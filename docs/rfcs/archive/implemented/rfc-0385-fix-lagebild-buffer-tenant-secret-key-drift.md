@@ -74,7 +74,7 @@ if (!url || !serviceKey || !tenantId) {
 }
 ```
 
-The consequence is a hard failure the moment the `crm:supabase-buffer` destination is activated for `webgogol-com`: every buffer write throws `supabase-buffer: missing credentials`, even when the tenant secret is correctly configured. This blocks the entire Tier 1 funnel (RFC-0188) because no funnel event can reach Lagebild. The drift also means `integration.secrets.validate` and `env.contract.validate` can pass against a name (`TENANT_ID`) that the read path does not use, so the failure is invisible until live delivery.
+The consequence is a hard failure the moment the `crm:supabase-buffer` destination is activated for `warpgogol-com`: every buffer write throws `supabase-buffer: missing credentials`, even when the tenant secret is correctly configured. This blocks the entire Tier 1 funnel (RFC-0188) because no funnel event can reach Lagebild. The drift also means `integration.secrets.validate` and `env.contract.validate` can pass against a name (`TENANT_ID`) that the read path does not use, so the failure is invisible until live delivery.
 
 `TENANT_ID` is also an unqualified name that collides conceptually with the `TENANT_ID` variable used by unrelated tenant-scoped code, whereas every other buffer secret uses the `SUPABASE_BUFFER_*` prefix.
 

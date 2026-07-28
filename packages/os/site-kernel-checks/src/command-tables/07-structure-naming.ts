@@ -17,7 +17,7 @@ import {
   runQuartetMirrorValidation,
   runDispatcherSyncValidation,
 } from "../structure.ts";
-// werkstatt.operation.validate migrated to @webgogol/forge — see packages/forge/os/werkstatt/
+// werkstatt.operation.validate migrated to @warpgogol/forge — see packages/forge/os/werkstatt/
 import { runNamingPolicyValidate } from "../structure/naming-policy.ts";
 import {
   runRouteSlimValidation,
@@ -107,9 +107,9 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     reads: ["<app>/src/content/**/*.md", "<app>/src/content/schemas/**/*.ts"],
     execute: runDispatcherSyncValidation,
   },
-  // naming.convention.lint migrated to @webgogol/forge — see packages/forge/os/naming/
-  /* Wave 2: workspace-wide naming convention — migrated to @webgogol/forge */
-  // werkstatt.operation.validate migrated to @webgogol/forge — see packages/forge/os/werkstatt/
+  // naming.convention.lint migrated to @warpgogol/forge — see packages/forge/os/naming/
+  /* Wave 2: workspace-wide naming convention — migrated to @warpgogol/forge */
+  // werkstatt.operation.validate migrated to @warpgogol/forge — see packages/forge/os/werkstatt/
   /* RFC-0361: Consolidated naming policy validator */
   {
     name: "naming.policy.validate",

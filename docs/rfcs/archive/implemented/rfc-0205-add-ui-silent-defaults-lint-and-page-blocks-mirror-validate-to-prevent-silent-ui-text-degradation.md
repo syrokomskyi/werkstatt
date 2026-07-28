@@ -36,7 +36,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-checks
   - ontology
@@ -353,7 +353,7 @@ Both commands emit the standard kernel result envelope (RFC-0030):
 ### Phase 2 — `page.blocks.mirror.validate` (author gate, per-app)
 
 1. Implement the validator.
-2. Run against `apps/nicaragua-projekt` and `apps/webgogol-com`. Fix any missing localized props.
+2. Run against `apps/nicaragua-projekt` and `apps/warpgogol-com`. Fix any missing localized props.
 3. Register in `APPS_CHECK_AUTHOR_PIPELINE`.
 4. Only fails when localized twins exist AND props are missing; apps with single-language content pass silently.
 
@@ -366,7 +366,7 @@ Both commands emit the standard kernel result envelope (RFC-0030):
 
 ### Phase 4 — Fail-hard by default
 
-After all three phases are clean across `nicaragua-projekt` and `webgogol-com`, remove any transitional exemptions. Both commands become unconditional fail-hard gates.
+After all three phases are clean across `nicaragua-projekt` and `warpgogol-com`, remove any transitional exemptions. Both commands become unconditional fail-hard gates.
 
 ## Alternatives considered
 
@@ -392,7 +392,7 @@ After all three phases are clean across `nicaragua-projekt` and `webgogol-com`, 
 - [x] `rfc.validate` passes on this file before merging (evidence: implemented historically)
 - [x] `packages/ui/src` passes `ui.silent-defaults.lint` with zero violations (evidence: packages/ directory, package exists)
 - [x] `apps/nicaragua-projekt` passes `page.blocks.mirror.validate` with zero violations (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `apps/webgogol-com` passes `page.blocks.mirror.validate` with zero violations (evidence: implemented historically)
+- [x] `apps/warpgogol-com` passes `page.blocks.mirror.validate` with zero violations (evidence: implemented historically)
 - [x] `AGENTS.md` updated: agents must not add `?? ""` or `defaultContent` with empty strings on UI-visible props; agents must declare `labels` as required in section manifests (evidence: AGENTS.md:1, agent guide updated)
 - [x] `packages/ontology/archetypes/sections/donation-card.yaml` updated with `labels` in Zod schema (evidence: packages/ directory, package exists)
 - [x] Relevant section manifests updated: `labels` in `required`, label keys with `minLength: 1` (evidence: implemented historically)

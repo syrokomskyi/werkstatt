@@ -37,7 +37,7 @@ commands:
     - "per-section ad-hoc list / cards / stats / paragraphs / comparison shapes (items: string[], cards: ApproachCard[], stats: ImpactStat[], paragraphs: string[], rows: ComparisonRow[])"
     - broken donation-use rendering that types items as objects but renders them as strings
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share

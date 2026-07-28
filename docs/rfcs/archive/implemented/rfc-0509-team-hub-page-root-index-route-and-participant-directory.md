@@ -46,7 +46,7 @@ commands:
     - public.infrastructure.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/site-kernel-checks"
@@ -56,7 +56,7 @@ packagesImpacted:
 successSignals:
   - "The /team/ route (DE: /team/, UK: /komanda/) renders a team hub page — not a 404."
   - "The hub page emits CollectionPage JSON-LD as the primary type with a breadcrumb trail Home → Team."
-  - "The hub renders four sections: hero (Verantwortung bei Webgogol), Verantwortliche Personen (people section filtered to active public humans), Teams und Funktionen (organization units), KI-Agenten (AI agents)."
+  - "The hub renders four sections: hero (Verantwortung bei Warpgogol), Verantwortliche Personen (people section filtered to active public humans), Teams und Funktionen (organization units), KI-Agenten (AI agents)."
   - "The hub lists only participants with visibility: public and status: active — draft, private, suspended, and former participants are excluded."
   - "The hub uses a compact list layout with links to individual profile pages — not a large portrait grid."
   - "The existing /team/andrii-syrokomskyi/ profile route is preserved and linked from the hub."
@@ -120,8 +120,8 @@ The navigation entry `founder` (label: "Засновник" / "Gründer") is rep
 kind: page
 pageId: team
 cosmicStar: Vega
-title: "Хто несе відповідальність у Webgogol"
-description: "Реєстр відповідальності: люди, команди та ШІ-системи, які беруть участь у роботі Webgogol."
+title: "Хто несе відповідальність у Warpgogol"
+description: "Реєстр відповідальності: люди, команди та ШІ-системи, які беруть участь у роботі Warpgogol."
 lang: uk
 blocks:
   - id: team-hero
@@ -129,10 +129,10 @@ blocks:
     props:
       hideSectionNumber: true
       header:
-        heading: "Хто несе відповідальність у Webgogol"
+        heading: "Хто несе відповідальність у Warpgogol"
         level: 1
       tagline: >-
-        Тут видно, які люди, команди та ШІ-системи беруть участь у роботі Webgogol,
+        Тут видно, які люди, команди та ШІ-системи беруть участь у роботі Warpgogol,
         за що вони відповідають і хто відповідає за рішення.
 
   - id: team-humans
@@ -198,7 +198,7 @@ When a `people` section's `select` matches zero participants (e.g. no AI agents 
 
 ```sh
 # Validate the team hub page structure and participant visibility.
-pnpm exec site-kernel run team.hub.validate --site webgogol-com --json
+pnpm exec site-kernel run team.hub.validate --site warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -209,11 +209,11 @@ The `PeopleSelect` interface and `selectPeople` function already ship the `parti
 
 | Path | Edit |
 | --- | --- |
-| `missions/webgogol-com-m000010/workpiece/src/content/pages/{de,uk}/team.md` | New authored team hub page |
-| `missions/webgogol-com-m000010/workpiece/src/content/pages/{de,uk}/founder.md` | **Deleted** |
-| `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/founder.md` | **Deleted** |
-| `missions/webgogol-com-m000010/workpiece/src/content/system.md` | Add `team` page entry (`semanticType: collection`); remove `founder` page entry; add `founder` to `retiredRoutes` with status `301` |
-| `missions/webgogol-com-m000010/workpiece/src/content/navigation/{de,uk}/navigation.md` | Replace `founder` nav entry with `team` entry |
+| `missions/warpgogol-com-m000010/workpiece/src/content/pages/{de,uk}/team.md` | New authored team hub page |
+| `missions/warpgogol-com-m000010/workpiece/src/content/pages/{de,uk}/founder.md` | **Deleted** |
+| `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/founder.md` | **Deleted** |
+| `missions/warpgogol-com-m000010/workpiece/src/content/system.md` | Add `team` page entry (`semanticType: collection`); remove `founder` page entry; add `founder` to `retiredRoutes` with status `301` |
+| `missions/warpgogol-com-m000010/workpiece/src/content/navigation/{de,uk}/navigation.md` | Replace `founder` nav entry with `team` entry |
 | `packages/ontology/src/external-surfaces/url-schema.yaml` | Add `/team/` and `/komanda/` route patterns |
 | `packages/ontology/src/schemas/system/manifest.ts` | Extend `retiredRoutes` to a discriminated union: `status: 301` requires `to` (URL path), `status: 410` forbids `to` |
 | `packages/os/site-kernel-checks/src/team-hub.ts` | New file: `team.hub.validate` |
@@ -282,9 +282,9 @@ All rules are errors (exit code 1). The `--json` output shape follows the standa
 
 ## Acceptance criteria
 
-- [x] `pages/{de,uk}/team.md` exists with the four-block structure (hero + 3 people sections). (evidence: missions/webgogol-com-m000010/workpiece/src/content/pages/{de,uk}/team.md, file existence verified)
+- [x] `pages/{de,uk}/team.md` exists with the four-block structure (hero + 3 people sections). (evidence: missions/warpgogol-com-m000010/workpiece/src/content/pages/{de,uk}/team.md, file existence verified)
 - [x] `pages/{de,uk}/founder.md` and `prose/{de,uk}/founder.md` are deleted. (evidence: `ls` confirms all 4 files removed)
-- [x] `system.md` has a `team` page entry with `semanticType: collection` and routes `de: team`, `uk: komanda`. (evidence: missions/webgogol-com-m000010/workpiece/src/content/system.md:560-568)
+- [x] `system.md` has a `team` page entry with `semanticType: collection` and routes `de: team`, `uk: komanda`. (evidence: missions/warpgogol-com-m000010/workpiece/src/content/system.md:560-568)
 - [x] `system.md` has a `founder` entry in `retiredRoutes` with `status: 301` and `to: participant:andrii-syrokomskyi`. (evidence: system.md:15-20, retiredRoutes has gruender+zasnovnyk with status 301 and to paths)
 - [x] `system.md` no longer has a `founder` page entry. (evidence: system.md pages[] search confirms no pageId: founder)
 - [x] Navigation has a `team` entry (not `founder`). (evidence: navigation/{de,uk}/navigation.md, founder entry replaced with team)
@@ -292,7 +292,7 @@ All rules are errors (exit code 1). The `--json` output shape follows the standa
 - [x] `team.hub.validate` passes and is registered in `apps-check.run`. (evidence: packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts:161-175, pipelines/sites-check-author.ts:169-170)
 - [x] `/team/` (DE) and `/komanda/` (UK) render the hub page without 404. (evidence: system.md:560-568 registers team page with routes de: team, uk: komanda; catch-all `[...slug].astro` handles route; `team.hub.validate` passes; build.prepare succeeded — pre-existing ratgeber page.markdown.generate failure is unrelated)
 - [x] `/gruender/` (DE) and `/zasnovnyk/` (UK) redirect to `/team/andrii-syrokomskyi/` and `/komanda/andrii-syrokomskyi/` respectively. (evidence: `public/_redirects` contains `/gruender/* /team/andrii-syrokomskyi 301` and `/zasnovnyk/* /komanda/andrii-syrokomskyi 301`)
-- [x] `surface.contract.validate` passes with the updated C-contract. (evidence: `pnpm exec site-kernel run surface.contract.validate --site webgogol-com` exit code 0, 5 surfaces validated, 0 violations)
+- [x] `surface.contract.validate` passes with the updated C-contract. (evidence: `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` exit code 0, 5 surfaces validated, 0 violations)
 - [x] `people-section.astro` suppresses empty sections (heading + body) when `selectPeople` returns `[]`. (evidence: packages/ui/src/sections/people/people-section.astro:71,105,222 — hasPeople guard wraps entire SectionShell)
 - [x] `rfc.validate` passes on this file before merging. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0509` exit code 0)
 

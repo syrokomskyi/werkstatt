@@ -38,7 +38,7 @@ commands:
     - biome.tokens.derive
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - ontology
@@ -50,7 +50,7 @@ packagesImpacted:
   - ui
 successSignals:
   - "`pnpm exec site-kernel run packages-check.run` exits zero — all 30 step(s) passed (down from 10 step failures at session start)."
-  - "`pnpm --filter webgogol-com astro check` and `pnpm --filter nicaragua-projekt astro check` exit zero."
+  - "`pnpm --filter warpgogol-com astro check` and `pnpm --filter nicaragua-projekt astro check` exit zero."
   - "`biome.site-background.derive` is registered and writes a derived siteBackground block into both shipped biome YAMLs."
   - "`onboarding.scaffold` seeds `system.md shell.background` from `biome.siteBackground` on first materialisation (RFC-0129 step 3)."
   - "grace.validate accepts 525 authored files — markers backfilled for 92 previously-failing files (68 by `grace.backfill` + 24 by RFC-0133 follow-up edits)."
@@ -128,7 +128,7 @@ pnpm exec site-kernel run biome.site-background.derive --biome packages/ontology
 pnpm exec site-kernel run biome.site-background.derive --biome packages/ontology/biomes/nonprofit-trust.yaml --inplace
 ```
 
-Both `astro check` runs (webgogol-com, nicaragua-projekt) remain at 0 errors after the biome edits because the shipped `system.md` files still declare their own per-page shell.background overrides — the biome-level default is now the fallback path, not the active path.
+Both `astro check` runs (warpgogol-com, nicaragua-projekt) remain at 0 errors after the biome edits because the shipped `system.md` files still declare their own per-page shell.background overrides — the biome-level default is now the fallback path, not the active path.
 
 **Step 5 — validator alignment** confirmed: `biome.contract.validate` already accepts `siteBackground` via the schema additions from RFC-0114. Both biomes pass: `OK — 2 biomes, 2 systems valid`.
 
@@ -163,7 +163,7 @@ From 10 step failures at session start to 0 at session end.
 ## Acceptance criteria
 
 - [x] `pnpm exec site-kernel run packages-check.run` exits zero — all 30 step(s) passed. (evidence: implemented historically)
-- [x] `pnpm --filter webgogol-com astro check` exits zero. (evidence: implemented historically)
+- [x] `pnpm --filter warpgogol-com astro check` exits zero. (evidence: implemented historically)
 - [x] `pnpm --filter nicaragua-projekt astro check` exits zero. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `biome.site-background.derive` is registered and produces a deterministic YAML output on both shipped biomes. (evidence: implemented historically)
 - [x] `onboarding.scaffold` substitutes `{{SHELL_BACKGROUND_YAML}}` into `system.template.md` from the resolved biome's `siteBackground`. (evidence: implemented historically)

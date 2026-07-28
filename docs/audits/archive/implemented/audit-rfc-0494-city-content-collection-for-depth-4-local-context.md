@@ -62,7 +62,7 @@ No issues. The RFC does not propose compatibility shims, dual paths, or legacy p
 
 2. **Naive pluralization convention is unreliable.** The RFC claims the implicit loading "generalizes to future geo-provider axes" (line 250). But `${axis.id}s` produces wrong plurals for `city` → `citys`, `industry` → `industrys`, `country` → `countrys`. Only `region` → `regions` and `demand` → `demands` happen to be correct. The convention should derive the collection name from the provider name (`geo.cities` → `"cities"`) instead.
 
-3. **Scope discipline is good.** `nonGoals` are explicit and meaningful (7 items). `appsImpacted` lists only `webgogol-com`. The RFC does not over-reach.
+3. **Scope discipline is good.** `nonGoals` are explicit and meaningful (7 items). `appsImpacted` lists only `warpgogol-com`. The RFC does not over-reach.
 
 ## Axis G — Blind spots
 

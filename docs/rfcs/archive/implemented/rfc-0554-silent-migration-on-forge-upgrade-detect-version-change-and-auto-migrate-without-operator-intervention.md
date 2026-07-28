@@ -53,7 +53,7 @@ appsImpacted: []
 packagesImpacted:
   - forge
 successSignals:
-  - "When @webgogol/forge is updated, the next forge-bootstrap invocation detects the version change"
+  - "When @warpgogol/forge is updated, the next forge-bootstrap invocation detects the version change"
   - "Upgrade migration runs silently inside forge-bootstrap without operator intervention or awareness"
   - "The existing forge.syncedVersion field in forge.yaml records the last-synced Forge version"
   - "forge.upgrade CLI remains available for manual sync alongside the silent session-start check"
@@ -73,7 +73,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -89,13 +89,13 @@ nonGoals:
 
 ## Context
 
-RFC-0543 established the npm publication and consumer upgrade contract for `@webgogol/forge`, including the `forge.upgrade` CLI command and the `forge.syncedVersion` field in `forge.yaml`. `forge.upgrade` already implements: version detection (comparing installed version vs `forge.syncedVersion`), skill sync (`.agents/skills/` from installed package), binding-default additions (RFC-0540), and `forge.syncedVersion` update.
+RFC-0543 established the npm publication and consumer upgrade contract for `@warpgogol/forge`, including the `forge.upgrade` CLI command and the `forge.syncedVersion` field in `forge.yaml`. `forge.upgrade` already implements: version detection (comparing installed version vs `forge.syncedVersion`), skill sync (`.agents/skills/` from installed package), binding-default additions (RFC-0540), and `forge.syncedVersion` update.
 
-However, `forge.upgrade` is a CLI command that the operator must know to run. After `pnpm update @webgogol/forge`, nothing automatically triggers `forge.upgrade` — the project's skills, binding defaults, and behavioral layer may be stale until the operator manually runs the command. This violates the barrier-free principle (RFC-0547): the operator should not need to know that a migration is needed.
+However, `forge.upgrade` is a CLI command that the operator must know to run. After `pnpm update @warpgogol/forge`, nothing automatically triggers `forge.upgrade` — the project's skills, binding defaults, and behavioral layer may be stale until the operator manually runs the command. This violates the barrier-free principle (RFC-0547): the operator should not need to know that a migration is needed.
 
 ## Problem
 
-`forge.upgrade` (RFC-0543) provides the upgrade mechanism but not the trigger. After a consumer updates `@webgogol/forge`:
+`forge.upgrade` (RFC-0543) provides the upgrade mechanism but not the trigger. After a consumer updates `@warpgogol/forge`:
 
 1. **No automatic trigger** — `forge.upgrade` exists but nothing invokes it automatically. The operator must know to run `forge upgrade` manually after `pnpm update`.
 
@@ -105,7 +105,7 @@ However, `forge.upgrade` is a CLI command that the operator must know to run. Af
 
 ## Decision
 
-The `forge-bootstrap` skill gains a silent version check at its start (step 0, before language selection). The check compares the installed `@webgogol/forge` version against `forge.syncedVersion` in `forge.yaml`. If they differ, `forge-bootstrap` silently runs `forge upgrade` (which internally invokes `runUpgrade` from `packages/forge/src/onboarding/upgrade.ts`) to sync skills, add missing binding defaults, and update `forge.syncedVersion`. The operator is not informed, asked, or interrupted — migration happens transparently before the skill's normal flow begins.
+The `forge-bootstrap` skill gains a silent version check at its start (step 0, before language selection). The check compares the installed `@warpgogol/forge` version against `forge.syncedVersion` in `forge.yaml`. If they differ, `forge-bootstrap` silently runs `forge upgrade` (which internally invokes `runUpgrade` from `packages/forge/src/onboarding/upgrade.ts`) to sync skills, add missing binding defaults, and update `forge.syncedVersion`. The operator is not informed, asked, or interrupted — migration happens transparently before the skill's normal flow begins.
 
 The `forge.upgrade` CLI command remains available for manual sync. This is not a dual-path — it is a single upgrade mechanism (`runUpgrade`) with two entry points: the CLI (operator-initiated) and `forge-bootstrap` (session-initiated, silent).
 
@@ -138,7 +138,7 @@ A new step 0 is added to the `forge-bootstrap` skill, before the existing step 1
 
 1. Read `forge.yaml`. If absent, the skill's existing guardrail refuses — no change.
 2. Read `forge.syncedVersion` from `forge.yaml`. If absent or `null`, treat as "never synced".
-3. Resolve the installed `@webgogol/forge` version via `resolveForgeRoot` + `readForgePackageVersion` (existing functions in `packages/forge/src/onboarding/upgrade.ts`).
+3. Resolve the installed `@warpgogol/forge` version via `resolveForgeRoot` + `readForgePackageVersion` (existing functions in `packages/forge/src/onboarding/upgrade.ts`).
 4. If `forge.syncedVersion` equals the installed version — skip to step 1 (language selection), no migration needed.
 5. If versions differ (or `syncedVersion` is `null`) — silently invoke `runUpgrade` from `packages/forge/src/onboarding/upgrade.ts` with `dryRun: false`. This syncs `.agents/skills/`, adds missing binding defaults, updates `forge.syncedVersion`, and runs `forge.doctor` — all existing `forge.upgrade` behavior.
 6. If `runUpgrade` succeeds — proceed to step 1 (language selection) as if nothing happened.
@@ -158,7 +158,7 @@ export async function runUpgrade(
 // packages/forge/skills/meta/forge-bootstrap/SKILL.md — new step 0 instruction
 // The skill instructs the agent to:
 //   1. Read forge.yaml and forge.syncedVersion
-//   2. Compare against installed @webgogol/forge version
+//   2. Compare against installed @warpgogol/forge version
 //   3. If different, run `forge upgrade` CLI silently (output not shown to operator)
 //      — internally invokes runUpgrade, which syncs skills, adds binding defaults,
 //        updates forge.syncedVersion, and runs forge.doctor
@@ -198,7 +198,7 @@ If `runUpgrade` fails, the error is logged to the session log with `status: "fai
 
 - **`runUpgrade` fails** — log the error to the session log (not shown to the operator), continue with the old configuration. `forge.syncedVersion` is not updated. The next `forge-bootstrap` invocation retries. The operator is not interrupted.
 - **`forge.yaml` missing `forge.syncedVersion`** — `runUpgrade` already handles this: `fromVersion === null` triggers a full sync (RFC-0543, `packages/forge/src/onboarding/upgrade.ts:265`). No special handling needed.
-- **`node_modules/@webgogol/forge` not found** — `resolveForgeRoot` throws. The skill catches the error, logs it, and proceeds to step 1. Forge may not be installed as a dependency yet (e.g. fresh checkout before `pnpm install`).
+- **`node_modules/@warpgogol/forge` not found** — `resolveForgeRoot` throws. The skill catches the error, logs it, and proceeds to step 1. Forge may not be installed as a dependency yet (e.g. fresh checkout before `pnpm install`).
 - **Major version upgrade with breaking changes** — `runUpgrade` syncs skills and binding defaults but cannot handle structural breaking changes (e.g. renamed config fields). The operator may need to re-run `forge create` or `forge-bootstrap` manually. This is documented as a limitation in nonGoals.
 - **Concurrent execution** — two agents running `forge-bootstrap` simultaneously could trigger `runUpgrade` at the same time. `runUpgrade` overwrites `.agents/skills/` files and updates `forge.yaml` — concurrent runs may produce a partial write. Mitigation: `runUpgrade` is idempotent (overwrite semantics); a concurrent run that completes after the other produces the same final state. The `forge.yaml` write is a single `writeFileSync` — last writer wins, and both writers write the same version.
 - **Interrupted mid-upgrade** — if the session is interrupted during `runUpgrade`, `.agents/skills/` may be partially synced and `forge.syncedVersion` may not be updated. The next `forge-bootstrap` invocation detects the version mismatch again and retries. `runUpgrade` is idempotent (overwrite semantics, RFC-0543).
@@ -227,14 +227,14 @@ If `runUpgrade` fails, the error is logged to the session log with `status: "fai
 ## Risks
 
 - **Silent migration breaks something** — the operator may not realize what changed. Mitigation: `runUpgrade` is idempotent and tested (RFC-0543). If something breaks, the operator can `git reset` — the migration changes are committed files.
-- **Performance impact** — version check runs on every `forge-bootstrap` invocation. Mitigation: it is two file reads (`forge.yaml` + `package.json`) and a string comparison. The full `runUpgrade` only runs when versions differ — once after each `pnpm update @webgogol/forge`.
+- **Performance impact** — version check runs on every `forge-bootstrap` invocation. Mitigation: it is two file reads (`forge.yaml` + `package.json`) and a string comparison. The full `runUpgrade` only runs when versions differ — once after each `pnpm update @warpgogol/forge`.
 - **Major version upgrades** — `runUpgrade` may not cover all breaking changes. Mitigation: documented as a nonGoal; major upgrades may require manual re-bootstrap.
 - **Agent misinterpretation** — agents may ask the operator about migration or report version numbers. Mitigation: the SKILL.md must explicitly state that migration is silent, no questions are asked, and no version information is shown to the operator.
 - **Concurrent `forge-bootstrap` runs** — two agents triggering `runUpgrade` simultaneously. Mitigation: `runUpgrade` is idempotent; last writer wins with the same version. Accepted residual risk.
 
 ## Acceptance criteria
 
-- [x] `forge-bootstrap` SKILL.md includes a step 0 (before language selection) that checks `forge.syncedVersion` against the installed `@webgogol/forge` version (evidence: packages/forge/skills/meta/forge-bootstrap/SKILL.md:45-55, forge.skill.validate pass)
+- [x] `forge-bootstrap` SKILL.md includes a step 0 (before language selection) that checks `forge.syncedVersion` against the installed `@warpgogol/forge` version (evidence: packages/forge/skills/meta/forge-bootstrap/SKILL.md:45-55, forge.skill.validate pass)
 - [x] When versions differ, `forge-bootstrap` silently runs `forge upgrade` (which internally invokes `runUpgrade`) to sync skills, add missing binding defaults, and update `forge.syncedVersion` (evidence: packages/forge/skills/meta/forge-bootstrap/SKILL.md:53, runUpgrade in packages/forge/src/onboarding/upgrade.ts:97-357, 281 tests pass)
 - [x] The silent check produces no operator-facing text about migration, version numbers, or upgrade mechanics (evidence: packages/forge/skills/meta/forge-bootstrap/SKILL.md:40,55, guardrail "never informs the operator about migration")
 - [x] `forge.syncedVersion` is updated in `forge.yaml` after successful silent upgrade (evidence: runUpgrade calls updateSyncedVersion in packages/forge/src/onboarding/upgrade.ts:330, existing test "syncedVersion should be updated" passes)

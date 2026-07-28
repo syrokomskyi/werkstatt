@@ -5,7 +5,7 @@ ownerCommand: rfc.verification.emit
 editInstead: the rfc.verification.emit generator source (not this file).
 regenerateCommand: pnpm exec site-kernel run rfc.verification.emit
 rfcId: RFC-0321
-title: Close webgogol-com offer content audit decisions
+title: Close warpgogol-com offer content audit decisions
 rfcStatus: implemented
 emittedAt: 2026-07-07T17:35:34.920Z
 commit: 15929a0bf01323ade1fb72094f29592d747b9862
@@ -16,7 +16,7 @@ acceptanceHash: d4e3a92c6f514be158d132bc4b52f5dfbc3212ce9ba9da849a79e4c42e33322b
 probes:
   - probe:
       probe: run
-      command: site-kernel run content.references.validate --app webgogol-com --json
+      command: site-kernel run content.references.validate --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true
@@ -24,7 +24,7 @@ probes:
     durationMs: 20207
   - probe:
       probe: run
-      command: site-kernel run redirect.map.validate --app webgogol-com --json
+      command: site-kernel run redirect.map.validate --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true
@@ -32,7 +32,7 @@ probes:
     durationMs: 18057
   - probe:
       probe: run
-      command: site-kernel run public.surface.lint --app webgogol-com --json
+      command: site-kernel run public.surface.lint --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true

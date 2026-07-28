@@ -14,7 +14,7 @@
 </CHANGE_SUMMARY> 
 */
 
-// workflowModule migrated to @webgogol/forge (RFC-0374) — see packages/forge/os/workflow/
+// workflowModule migrated to @warpgogol/forge (RFC-0374) — see packages/forge/os/workflow/
 export { runWorkflowLint, runWorkflowList, runWorkflowAmendList } from "./handlers.ts";
 export type {
   WorkflowPhase,

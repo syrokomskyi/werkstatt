@@ -38,9 +38,9 @@ commands:
     - page.block.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/share"
@@ -66,7 +66,7 @@ nonGoals:
 The platform already distinguishes legal pages from marketing pages, but it does so indirectly. Today a legal page is authored as `semanticType: content` and then tagged with `output.sitemap.category: legal` and `output.llms: exclude`:
 
 ```yaml
-@apps/webgogol-com/src/content/system.md:401-408
+@apps/warpgogol-com/src/content/system.md:401-408
   - pageId: datenschutz
     semanticType: content
     output:
@@ -206,15 +206,15 @@ The command is not mandatory for the initial implementation; it can ship after t
 No new commands are added in the initial implementation. Existing commands change behavior:
 
 ```sh
-pnpm exec site-kernel run system.manifest.validate --app webgogol-com
-pnpm exec site-kernel run sitemap.generate --app webgogol-com
-pnpm exec site-kernel run llms.generate --app webgogol-com
+pnpm exec site-kernel run system.manifest.validate --app warpgogol-com
+pnpm exec site-kernel run sitemap.generate --app warpgogol-com
+pnpm exec site-kernel run llms.generate --app warpgogol-com
 ```
 
 Proposed later:
 
 ```sh
-pnpm exec site-kernel run legal.page.validate --app webgogol-com
+pnpm exec site-kernel run legal.page.validate --app warpgogol-com
 pnpm exec site-kernel run legal.page.validate --all --json
 ```
 
@@ -302,10 +302,10 @@ export const semanticPageTypeSchema = z.enum([
 {
   "command": "system.manifest.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "findings": [
     {
-      "file": "apps/webgogol-com/src/content/system.md",
+      "file": "apps/warpgogol-com/src/content/system.md",
       "line": 104,
       "rule": "legal-semantic-type-mismatch",
       "severity": "error",
@@ -321,10 +321,10 @@ Proposed `legal.page.validate --json` will emit:
 {
   "command": "legal.page.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "findings": [
     {
-      "file": "apps/webgogol-com/src/content/pages/de/agb.md",
+      "file": "apps/warpgogol-com/src/content/pages/de/agb.md",
       "rule": "legal-marketing-section",
       "severity": "error",
       "message": "Legal page 'agb' must not use a hero or ctaGroup section."
@@ -350,9 +350,9 @@ This is a flag-day change with no backward compatibility.
 3. **Phase 3 — validation.** Update `system.manifest.validate` to reject the legacy combination. Update `audit/helpers.ts` to derive `isLegal` from `semanticType`.
 4. **Phase 4 — generators.** Confirm `sitemap.generate` and `llms.generate` continue to read the resolved projection; their output should be unchanged for correctly migrated pages.
 5. **Phase 5 — app migration.** Update all three apps:
-   - `apps/webgogol-com/src/content/system.md`: impressum, datenschutz, agb, widerruf, musterWiderruf, barrierefreiheit → `semanticType: legal`.
+   - `apps/warpgogol-com/src/content/system.md`: impressum, datenschutz, agb, widerruf, musterWiderruf, barrierefreiheit → `semanticType: legal`.
    - `apps/nicaragua-projekt/src/content/system.md`: legalNotice, privacyPolicy, terms, rightOfWithdrawal → `semanticType: legal`.
-   - `apps/check-webgogol-com/src/content/system.md`: impressum, datenschutz → `semanticType: legal`.
+   - `apps/check-warpgogol-com/src/content/system.md`: impressum, datenschutz → `semanticType: legal`.
 6. **Phase 6 — template.** Update `system.template.md` and onboarding scaffold so new apps use `semanticType: legal` for legal pages.
 7. **Phase 7 — optional legal validator.** Implement `legal.page.validate` once the type change is stable.
 8. **Phase 8 — docs.** Update `apps/AGENTS.md` and relevant GRACE XML to document that legal pages use `semanticType: legal`.
@@ -389,7 +389,7 @@ All implementation phases ship together in one change. No app is left on the leg
 - [x] `resolvePageOutput` applies legal-page defaults when `semanticType === "legal"`. (evidence: implemented historically)
 - [x] `system.manifest.validate` rejects `output.sitemap.category: "legal"` unless `semanticType: legal`. (evidence: implemented historically)
 - [x] `system.manifest.validate` rejects any non-legal `semanticType` with `output.sitemap.category: "legal"`. (evidence: implemented historically)
-- [x] `apps/webgogol-com`, `apps/nicaragua-projekt`, and `apps/check-webgogol-com` migrate all legal pages to `semanticType: legal`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps/warpgogol-com`, `apps/nicaragua-projekt`, and `apps/check-warpgogol-com` migrate all legal pages to `semanticType: legal`. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `audit/helpers.ts` derives `isLegal` from `semanticType`. (evidence: implemented historically)
 - [x] `sitemap.generate` and `llms.generate` output is unchanged for migrated pages. (evidence: implemented historically)
 - [x] Onboarding `system.template.md` scaffolds legal pages with `semanticType: legal`. (evidence: implemented historically)

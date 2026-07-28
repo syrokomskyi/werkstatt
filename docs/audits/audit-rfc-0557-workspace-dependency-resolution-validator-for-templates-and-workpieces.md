@@ -12,7 +12,7 @@ verdict: needs-revision
 
 ## Verdict: Needs revision
 
-The RFC addresses a real gap (template/workpiece import resolvability is unprotected), but the described regex extraction pattern `from "@warpgogol/..."` / `from "@webgogol/..."` would miss dynamic `import("@webgogol/forge")` specifiers — exactly the pattern present in `kernel.config.template.ts` (the file that caused the original bug). Additionally, `packagesImpacted` lists `@warpgogol/site-kernel-handoff` with no justification, and the "read-only validators" claim is inaccurate for `template.imports.validate` when running `pnpm install --frozen-lockfile`.
+The RFC addresses a real gap (template/workpiece import resolvability is unprotected), but the described regex extraction pattern `from "@warpgogol/..."` / `from "@warpgogol/..."` would miss dynamic `import("@warpgogol/forge")` specifiers — exactly the pattern present in `kernel.config.template.ts` (the file that caused the original bug). Additionally, `packagesImpacted` lists `@warpgogol/site-kernel-handoff` with no justification, and the "read-only validators" claim is inaccurate for `template.imports.validate` when running `pnpm install --frozen-lockfile`.
 
 ## Mechanical validation (rfc.validate)
 
@@ -20,15 +20,15 @@ Pass — zero violations.
 
 ## Axis A — Structural completeness
 
-- **FAIL — Import extraction regex is insufficient for dynamic imports.** The RFC states (line 307): "Import extraction MUST use a regex-based static analysis approach (matching `from "@warpgogol/..."` and `from "@webgogol/..."` patterns)". However, `packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts:36-40` uses dynamic `import()`:
+- **FAIL — Import extraction regex is insufficient for dynamic imports.** The RFC states (line 307): "Import extraction MUST use a regex-based static analysis approach (matching `from "@warpgogol/..."` and `from "@warpgogol/..."` patterns)". However, `packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts:36-40` uses dynamic `import()`:
   ```ts
-  rfc: async () => (await import("@webgogol/forge")).forgeRfcModule,
-  workflow: async () => (await import("@webgogol/forge")).forgeWorkflowModule,
-  compass: async () => (await import("@webgogol/forge")).forgeCompassModule,
-  naming: async () => (await import("@webgogol/forge")).forgeNamingModule,
-  werkstatt: async () => (await import("@webgogol/forge")).forgeWerkstattModule,
+  rfc: async () => (await import("@warpgogol/forge")).forgeRfcModule,
+  workflow: async () => (await import("@warpgogol/forge")).forgeWorkflowModule,
+  compass: async () => (await import("@warpgogol/forge")).forgeCompassModule,
+  naming: async () => (await import("@warpgogol/forge")).forgeNamingModule,
+  werkstatt: async () => (await import("@warpgogol/forge")).forgeWerkstattModule,
   ```
-  These are `import("@webgogol/forge")` patterns, not `from "@webgogol/forge"`. The RFC's regex would produce a false negative on the exact file that caused the original `ERR_MODULE_NOT_FOUND` failure. The regex must also match `import("@warpgogol/...")` and `import("@webgogol/...")` dynamic import specifiers.
+  These are `import("@warpgogol/forge")` patterns, not `from "@warpgogol/forge"`. The RFC's regex would produce a false negative on the exact file that caused the original `ERR_MODULE_NOT_FOUND` failure. The regex must also match `import("@warpgogol/...")` and `import("@warpgogol/...")` dynamic import specifiers.
 
 - **FAIL — "Read-only validators" claim is inaccurate.** Line 189 states: "Neither command writes or modifies any file. Both are read-only validators." However, `template.imports.validate` runs `pnpm install --frozen-lockfile` (line 103), which can modify `node_modules/` if packages are missing. While `--frozen-lockfile` prevents lockfile changes, it does install missing packages to satisfy the lockfile. The RFC should clarify that `template.imports.validate` is read-only with respect to source files but may modify `node_modules/` via the subprocess, or restrict the claim to `workpiece.imports.validate` only.
 
@@ -88,7 +88,7 @@ No issues. The RFC introduces new commands with no backward compatibility shims,
 
 ## Questions for the author
 
-1. How will the regex extraction handle dynamic `import("@webgogol/forge")` specifiers in `kernel.config.template.ts`? The current `from "@warpgogol/..."` pattern misses these, and this is the exact file that caused the original bug.
+1. How will the regex extraction handle dynamic `import("@warpgogol/forge")` specifiers in `kernel.config.template.ts`? The current `from "@warpgogol/..."` pattern misses these, and this is the exact file that caused the original bug.
 
 2. Why is `@warpgogol/site-kernel-handoff` listed in `packagesImpacted`? It has no template files and the RFC describes no changes to it.
 

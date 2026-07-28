@@ -72,7 +72,7 @@ Pass with 3 warnings (all expected for a draft RFC):
 - **Minimal command surface:** `ratgeber.hub.validate` is a new command, not a flag on `surface.validate`. Justified — the six-block layout check, card standard, category coverage, and commercial claim check are substantial domain-specific logic that would overload `surface.validate`. Pass.
 - **Lean contracts:** `ArticleRecord`, `ArticleType`, `ArticleCategoryRecord` are minimal. `BlueprintHubConfig` has 2 fields, `BlueprintStatusGate` has 2 fields. No speculative generality. Pass.
 - **Existing patterns:** The baker specialization follows the existing pattern in `bake.ts` (depth-4 city, depth-5 intersection specializations). The migrator follows the existing `rfc-NNNN.ts` pattern. Pass.
-- **Scope discipline:** `appsImpacted` lists only `webgogol-com` (correct — ratgeber is only on webgogol-com). `packagesImpacted` lists 6 packages, all genuinely impacted. `nonGoals` are 7 explicit, meaningful items. Pass.
+- **Scope discipline:** `appsImpacted` lists only `warpgogol-com` (correct — ratgeber is only on warpgogol-com). `packagesImpacted` lists 6 packages, all genuinely impacted. `nonGoals` are 7 explicit, meaningful items. Pass.
 
 ## Axis G — Blind spots
 

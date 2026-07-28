@@ -56,7 +56,7 @@ acceptance:
   - probe: file-exists
     path: "packages/share/src/agent/capability.ts"
   - probe: run
-    command: "site-kernel run agent.capability.validate --app webgogol-com"
+    command: "site-kernel run agent.capability.validate --app warpgogol-com"
     expect:
       exitCode: 0
   - probe: file-contains
@@ -101,7 +101,7 @@ The v1 catalog ships exactly two records:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.capability.validate --app webgogol-com --json
+pnpm exec site-kernel run agent.capability.validate --app warpgogol-com --json
 pnpm exec site-kernel run agent.capability.validate --all --json
 ```
 
@@ -203,7 +203,7 @@ export function resolveActiveCapabilities(input: {
 
 1. Add `agent.actions` to `ENTITLED_FEATURES` + `STRIPE_FEATURE_LOOKUP_MAP`; create the Stripe Feature `feature_agent_actions` (founder action, documented in `docs/engineering/`).
 2. Ship the zod schema, the two v1 records, `capability.ts`, and the validator; wire `APPS_CHECK_PIPELINE`.
-3. Extend `agent.manifest.generate` with `resolveActiveCapabilities`; dogfood on webgogol-com via `entitlementsOverride: [agent.actions]` in `system.md` (established RFC-0169 dogfood path).
+3. Extend `agent.manifest.generate` with `resolveActiveCapabilities`; dogfood on warpgogol-com via `entitlementsOverride: [agent.actions]` in `system.md` (established RFC-0169 dogfood path).
 4. nicaragua-projekt holds no `agent.actions` ⇒ advertises zero actions — verifying the gate with zero config.
 5. New capabilities (e.g. `quote.request`, future commerce verbs) are one YAML + one catalog-schema-conformant commit each; input shapes beyond the closed subset require an RFC amending this one.
 
@@ -223,11 +223,11 @@ export function resolveActiveCapabilities(input: {
 ## Acceptance criteria
 
 - [x] `packages/ontology/capabilities/lead.submit.yaml` + `appointment.request.yaml` exist and validate; catalog zod schema (`capabilityRecordSchema`) exported from `@gogol/ontology` (root barrel + `./schemas` subpath). (evidence: packages/ directory, package exists)
-- [x] `agent.actions` in `ENTITLED_FEATURES` + `feature_agent_actions` lookup map; `entitlements.resolve` passes it through unchanged (generic catalog-driven mapping, no per-feature code); override dogfood works on webgogol-com (`entitlementsOverride` in `system.md`, verified `entitlements.resolve` resolves it, `agent.manifest.generate` emits 1 action). (evidence: implemented historically)
+- [x] `agent.actions` in `ENTITLED_FEATURES` + `feature_agent_actions` lookup map; `entitlements.resolve` passes it through unchanged (generic catalog-driven mapping, no per-feature code); override dogfood works on warpgogol-com (`entitlementsOverride` in `system.md`, verified `entitlements.resolve` resolves it, `agent.manifest.generate` emits 1 action). (evidence: implemented historically)
 - [x] `packages/share/src/agent/capability.ts` with `resolveActiveCapabilities` (6 unit tests: entitlement gating, section gating, extra-entitlement gating, disabled-list, determinism via `capabilityToActionRef`). (evidence: packages/ directory, package exists)
 - [x] `agent.capability.validate` registered in `APPS_CHECK_PIPELINE` (`apps-check.author`, between `agent.knowledge.validate` and `agent.surface.validate`); `AGC-01..05` in the rule registry (`AGC-06` field-level check deliberately deferred — no field-mapping data available yet, matches the Risks section). (evidence: implemented historically)
-- [x] `agent.manifest.generate` emits `AgentActionRef`s (verified: `lead.submit` active on webgogol-com after `entitlements.resolve`, byte-stable across repeated runs); the RFC-0288 AGS-02 carve-out (action routes not yet checked for existence) remains documented and in force, to be closed by RFC-0290. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] Both apps' `agent.capability.validate` + `agent.manifest.generate` + `agent.surface.validate` individually verified green (webgogol-com: 1 action after override + `entitlements.resolve`; nicaragua: 0 actions, no `agent.actions` entitlement); both apps' full `build:check` runs were re-verified through `build.prepare`/`build.check` with these exact changes and 0 errors before this commit (webgogol-com and nicaragua-projekt both still finishing their `astro build`/`build.post` tails under heavy concurrent system load at commit time — no error surfaced through any stage reached). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `agent.manifest.generate` emits `AgentActionRef`s (verified: `lead.submit` active on warpgogol-com after `entitlements.resolve`, byte-stable across repeated runs); the RFC-0288 AGS-02 carve-out (action routes not yet checked for existence) remains documented and in force, to be closed by RFC-0290. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Both apps' `agent.capability.validate` + `agent.manifest.generate` + `agent.surface.validate` individually verified green (warpgogol-com: 1 action after override + `entitlements.resolve`; nicaragua: 0 actions, no `agent.actions` entitlement); both apps' full `build:check` runs were re-verified through `build.prepare`/`build.check` with these exact changes and 0 errors before this commit (warpgogol-com and nicaragua-projekt both still finishing their `astro build`/`build.post` tails under heavy concurrent system load at commit time — no error surfaced through any stage reached). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Generated `AGENTS.md` template documents the catalog, the entitlement + section gating, and the never-app-authored rule; regenerated for both apps. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

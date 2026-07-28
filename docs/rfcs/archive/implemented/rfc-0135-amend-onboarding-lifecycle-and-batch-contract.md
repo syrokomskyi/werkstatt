@@ -43,7 +43,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-onboarding
   - os/site-kernel-checks
@@ -128,7 +128,7 @@ The only mandatory hand-authored file in a batch. Parsed by `gray-matter` and va
 ---
 amend:
   batch: amend-007            # must equal the folder name
-  targetApp: webgogol-com     # apps/<id>/ — must already exist
+  targetApp: warpgogol-com     # apps/<id>/ — must already exist
 sources:
   - file: Angebot_Digitales_Fundament_RU_v0.8.md
     sourceId: digitales-fundament-angebot   # stable across versions; identity for supersession
@@ -181,7 +181,7 @@ export type AmendBrief = z.infer<typeof AmendBrief>;
 The amend analog of `brief.validate` + `onboarding.input.validate`, with the precondition inverted.
 
 ```sh
-pnpm exec site-kernel run amend.input.validate --app webgogol-com --batch amend-007
+pnpm exec site-kernel run amend.input.validate --app warpgogol-com --batch amend-007
 ```
 
 Behavior:
@@ -321,7 +321,7 @@ All five commands emit the shared kernel envelope. Example:
 ```json
 {
   "command": "amend.input.validate",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "batch": "amend-007",
   "status": "fail",
   "findings": [
@@ -351,7 +351,7 @@ All five commands emit the shared kernel envelope. Example:
 3. Implement `amend.atoms.merge`, `content.coverage.delta`, and the cumulative `coverage-ledger.yaml` writer (single owner, idempotent per RFC-0087).
 4. Implement `amend.provenance.append` (immutable, signed) and `amend.provenance.validate`; ensure `apps/<id>/provenance/` is exempt from client-export exclusion.
 5. Register all five commands; `amend.provenance.validate` and `content.coverage.delta` are wired into the amend gates by RFC-0136, not into the greenfield `apps-check.*` pipelines.
-6. This is additive: no greenfield command changes behavior. `apps/webgogol-com` is the first amend target (design example `digitalesFundament` strengthen + `sichtpass`/`umsicht`/`empfehler` new-route), but no content is authored under this RFC.
+6. This is additive: no greenfield command changes behavior. `apps/warpgogol-com` is the first amend target (design example `digitalesFundament` strengthen + `sichtpass`/`umsicht`/`empfehler` new-route), but no content is authored under this RFC.
 
 ## Alternatives considered
 

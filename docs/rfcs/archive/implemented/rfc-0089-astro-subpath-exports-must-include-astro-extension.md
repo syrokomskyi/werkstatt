@@ -26,7 +26,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - growth
   - ui
@@ -60,7 +60,7 @@ But every consumer — the scaffold template `src/pages/[lang]/[...slug].templat
 import GrowthProvider from "@gogol/growth/provider.astro";
 ```
 
-Node and pnpm tolerate this loosely (the specifier and the key differ by exactly the file extension); Vite's `commonjs--resolver`, used by the static build path, does NOT — it requires an exact match against the `exports` map. The May 2026 webgogol-com first build failed with:
+Node and pnpm tolerate this loosely (the specifier and the key differ by exactly the file extension); Vite's `commonjs--resolver`, used by the static build path, does NOT — it requires an exact match against the `exports` map. The May 2026 warpgogol-com first build failed with:
 
 ```
 [commonjs--resolver] Missing "./provider.astro" specifier in "@gogol/growth" package
@@ -148,11 +148,11 @@ pnpm exec site-kernel run astro.exports.lint
 
 - [x] `@gogol/growth/package.json` exports include `./provider.astro` aliasing `./provider`. — commit 2a74222e. (evidence: packages/ directory, package exists)
 - [x] `astro.exports.lint` workspace command registered and wired into `PACKAGES_CHECK_PIPELINE`. — `packages/os/site-kernel-checks/src/astro-exports.ts`; registered in `module.ts:1595`, wired at `module.ts:339`. (evidence: packages/ directory, package exists)
-- [x] Regression seed: a build of `apps/webgogol-com` from a clean tree succeeds at the `[vite] commonjs--resolver` step that produced the May 2026 error. — `pnpm --filter webgogol-com build` exits 0 with 15 pages. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Regression seed: a build of `apps/warpgogol-com` from a clean tree succeeds at the `[vite] commonjs--resolver` step that produced the May 2026 error. — `pnpm --filter warpgogol-com build` exits 0 with 15 pages. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Scaffold template doc-comment mentions the dual-key convention. — updated per commit 2a74222e. (evidence: implemented historically)
 
 ## Implementation notes for agents
 
 - Agents MAY implement this RFC ONLY when status: accepted.
 - Agents MUST NOT change RFC status.
-- Implementation MUST run `pnpm --filter webgogol-com build` end-to-end and confirm the previous `Missing "./provider.astro" specifier` error no longer surfaces.
+- Implementation MUST run `pnpm --filter warpgogol-com build` end-to-end and confirm the previous `Missing "./provider.astro" specifier` error no longer surfaces.

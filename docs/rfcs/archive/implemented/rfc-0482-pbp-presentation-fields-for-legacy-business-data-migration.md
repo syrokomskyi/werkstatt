@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/pbp"
 successSignals:
@@ -141,7 +141,7 @@ The PBP compiler (`compilePbpProfile`) and semantic profile (`buildPbpSemanticPr
 
 ### 5. Schema scope: 5 entities for current migration
 
-The `presentation` field is added to 5 entity schemas (offering, legal-identity, web-presence, public-document, business) because these are the entities that carry legacy display-formatted strings requiring migration in the webgogol-com site. Other entity schemas (product, place, contact-point, brand, catalog, etc.) may receive `presentation` fields in the future via a new RFC when a site migration requires it. This RFC does not claim the list is exhaustive — it is the minimum set needed to unblock RFC-0483.
+The `presentation` field is added to 5 entity schemas (offering, legal-identity, web-presence, public-document, business) because these are the entities that carry legacy display-formatted strings requiring migration in the warpgogol-com site. Other entity schemas (product, place, contact-point, brand, catalog, etc.) may receive `presentation` fields in the future via a new RFC when a site migration requires it. This RFC does not claim the list is exhaustive — it is the minimum set needed to unblock RFC-0483.
 
 ## Architectural fit
 
@@ -222,7 +222,7 @@ Migrated `business-profile/de/offerings/digital-foundation.md`:
 
 ```yaml
 schema: pbp/offering@1
-id: https://webgogol.com/id/offerings/digital-foundation
+id: https://warpgogol.com/id/offerings/digital-foundation
 type: offering
 # ... structural fields (pricing, package, relatedOfferings) ...
 presentation:
@@ -287,8 +287,8 @@ Legacy `business/de/web.md`:
 
 ```yaml
 domains:
-  primary: webgogol.com
-  german: webgogol.com
+  primary: warpgogol.com
+  german: warpgogol.com
 ```
 
 Migrated `business-profile/de/web/primary.md`:
@@ -298,8 +298,8 @@ schema: pbp/web-presence@1
 # ... structural fields ...
 presentation:
   domains:
-    primary: webgogol.com
-    german: webgogol.com
+    primary: warpgogol.com
+    german: warpgogol.com
 ```
 
 ### Public document presentation
@@ -357,7 +357,7 @@ With `z.record(z.string(), z.unknown()).optional()`, an empty record `presentati
 ## Rollout
 
 - **Upon acceptance:** Schema changes are backward-compatible (additive optional fields). No migrator needed — existing entities without `presentation` validate unchanged. `versionBump: patch` per RFC-0478.
-- **webgogol-com:** RFC-0483 migrator will move legacy data into `presentation.*` fields as part of the content reference migration.
+- **warpgogol-com:** RFC-0483 migrator will move legacy data into `presentation.*` fields as part of the content reference migration.
 - **Compiler strictness:** After this RFC, the compiler can move from `migration` to `production` mode for entities that currently carry extra fields (offerings with `guarantees`). The `presentation` field will accept them.
 - **New Sternsystems:** Onboarding templates may include `presentation` blocks in PBP entity templates. Not required — `presentation` is optional.
 - **AGENTS.md update:** `packages/pbp/AGENTS.md` should be updated to document the `presentation` field in the Runtime layer section.

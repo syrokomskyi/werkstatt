@@ -34,7 +34,7 @@ probes:
     durationMs: 3
   - probe:
       probe: run
-      command: site-kernel run agent.openapi.generate --app webgogol-com
+      command: site-kernel run agent.openapi.generate --app warpgogol-com
       expect:
         exitCode: 0
     ok: true
@@ -42,7 +42,7 @@ probes:
     durationMs: 27042
   - probe:
       probe: run
-      command: site-kernel run agent.openapi.validate --app webgogol-com
+      command: site-kernel run agent.openapi.validate --app warpgogol-com
       expect:
         exitCode: 0
     ok: true

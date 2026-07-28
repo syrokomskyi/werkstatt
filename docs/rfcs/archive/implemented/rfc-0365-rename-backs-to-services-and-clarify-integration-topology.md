@@ -40,7 +40,7 @@ commands:
     - services.workspace.validate
     - services.check.run
   changed:
-    - check-webgogol.runner.validate
+    - check-warpgogol.runner.validate
     - env.contract.validate
     - env.local.check
     - fleet.probe.targets.generate
@@ -56,11 +56,11 @@ commands:
     - backs.workspace.validate
     - backs-check.run
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel"
   - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
   - "@gogol/site-kernel-observability"
 successSignals:
   - "The deployable backend composition layer is named `services/*`, not `backs/*`, in active instructions, Compass XML, workspace discovery, command metadata, validators, and generated projections."
@@ -81,7 +81,7 @@ nonGoals:
 
 RFC-0304 introduced `backs/*` as the monorepo layer for deployable backend runtime compositions. That decision solved the missing-backend-location problem, but the name `backs` is terse internal jargon. Since RFC-0304, the layer has grown beyond "the back side of an app" into standalone deployable compositions with their own manifests, environment contracts, validation commands, import boundaries, and operational runbooks:
 
-- `backs/check-webgogol-runner`
+- `backs/check-warpgogol-runner`
 - `backs/matomo-proxy`
 - `backs/fleet-probe-runner`
 - `backs/cf-analytics-poller`
@@ -171,7 +171,7 @@ A service MUST NOT import from `apps/*`.
 Examples:
 
 - `packages/integration-adapter-supabase-crm` owns Lagebild worker logic and tenant registry contracts.
-- `packages/check-core` and `packages/check-runner-node` own Check Webgogol contracts and browser runner behavior.
+- `packages/check-core` and `packages/check-runner-node` own Check Warpgogol contracts and browser runner behavior.
 - `packages/observability` owns reusable metric contracts and exporters.
 
 ### `integrations/*`
@@ -219,7 +219,7 @@ Move every existing `backs/*` project to `services/*`:
 | From                          | To                               |
 | ----------------------------- | -------------------------------- |
 | `backs/cf-analytics-poller`   | `services/cf-analytics-poller`   |
-| `backs/check-webgogol-runner` | `services/check-webgogol-runner` |
+| `backs/check-warpgogol-runner` | `services/check-warpgogol-runner` |
 | `backs/fleet-probe-runner`    | `services/fleet-probe-runner`    |
 | `backs/matomo-proxy`          | `services/matomo-proxy`          |
 | `backs/observability-stack`   | `services/observability-stack`   |
@@ -269,7 +269,7 @@ Canonical command names:
 `services.check.run` is the composite service validation pipeline. It must run at least:
 
 1. `services.workspace.validate`
-2. `check-webgogol.runner.validate`
+2. `check-warpgogol.runner.validate`
 3. `env.contract.validate`
 
 If implementation keeps old commands temporarily, they MUST be deprecated aliases that call the new handlers and emit a warning diagnostic. The target state of this RFC is that `backs.workspace.validate` and `backs-check.run` are absent from `docs/command-manifest.generated.json`, `docs/COMMANDS.md`, and standard pipeline references. Do not keep aliases indefinitely.
@@ -278,8 +278,8 @@ Rename handler files and exports where useful:
 
 | Old source surface | Target source surface |
 | --- | --- |
-| `packages/os/site-kernel-check-webgogol/src/commands/backs.ts` | `.../commands/services.ts` |
-| `packages/os/site-kernel-check-webgogol/src/commands/backs-check.ts` | `.../commands/services-check.ts` |
+| `packages/os/site-kernel-check-warpgogol/src/commands/backs.ts` | `.../commands/services.ts` |
+| `packages/os/site-kernel-check-warpgogol/src/commands/backs-check.ts` | `.../commands/services-check.ts` |
 | `runBacksWorkspaceValidate` | `runServicesWorkspaceValidate` |
 | `runBacksCheckRun` | `runServicesCheckRun` |
 
@@ -295,13 +295,13 @@ If any command flags expose the old noun, rename them:
 
 The implementation MUST update all currently known active command surfaces that read or write `backs/*` or `integrations/lagebild-sync-worker`.
 
-#### Check Webgogol
+#### Check Warpgogol
 
 - `services.workspace.validate` reads `pnpm-workspace.yaml`, `services/**`, and `apps/**/*.ts`.
 - `services.check.run` replaces `backs-check.run`.
-- `check-webgogol.runner.validate` reads `services/check-webgogol-runner/**`.
+- `check-warpgogol.runner.validate` reads `services/check-warpgogol-runner/**`.
 - App-source import guards check for imports from `services/*`, not `backs/*`.
-- Runner source guards check `services/check-webgogol-runner`.
+- Runner source guards check `services/check-warpgogol-runner`.
 
 #### Env Contract
 
@@ -373,15 +373,15 @@ Do not hand-edit generated files carrying the generated marker. Update the ownin
 
 Implementation MUST check at least these source locations for path and command ownership:
 
-- `packages/os/site-kernel-checks/src/command-tables/30-check-webgogol.ts`
+- `packages/os/site-kernel-checks/src/command-tables/30-check-warpgogol.ts`
 - `packages/os/site-kernel-checks/src/command-tables/32-analytics-matomo.ts`
 - `packages/os/site-kernel-checks/src/command-tables/35-json-generated-marker.ts`
 - `packages/os/site-kernel-checks/src/command-tables/36-env-contract.ts`
-- `packages/os/site-kernel-checks/src/diagnostics/rules/check-webgogol.ts`
+- `packages/os/site-kernel-checks/src/diagnostics/rules/check-warpgogol.ts`
 - `packages/os/site-kernel-checks/src/env-contract.ts`
-- `packages/os/site-kernel-check-webgogol/src/commands.ts`
-- `packages/os/site-kernel-check-webgogol/src/commands/backs.ts`
-- `packages/os/site-kernel-check-webgogol/src/commands/backs-check.ts`
+- `packages/os/site-kernel-check-warpgogol/src/commands.ts`
+- `packages/os/site-kernel-check-warpgogol/src/commands/backs.ts`
+- `packages/os/site-kernel-check-warpgogol/src/commands/backs-check.ts`
 - `packages/os/site-kernel-observability/src/module.ts`
 - `packages/os/site-kernel-observability/src/commands/*.ts`
 - `packages/os/site-kernel/src/lagebild/**`
@@ -413,7 +413,7 @@ Run these commands after implementation:
 ```sh
 pnpm exec site-kernel run services.workspace.validate --json
 pnpm exec site-kernel run services.check.run --json
-pnpm exec site-kernel run check-webgogol.runner.validate --json
+pnpm exec site-kernel run check-warpgogol.runner.validate --json
 pnpm exec site-kernel run env.contract.validate --json
 pnpm exec site-kernel run observability.conventions.validate --json
 pnpm exec site-kernel run observability.workers.validate --json
@@ -451,7 +451,7 @@ If Compass inventory is path-sensitive in the implementation branch, also run th
 - [x] Generated command docs, ecosystem manifest, and `.gitattributes` reflect `services/*`. (evidence: implemented historically)
 - [x] Active AGENTS and Compass XML describe `services/*` as the deployable service layer and `integrations/*` as declarative registry data. (evidence: implemented historically)
 - [x] `lagebild.validate` and Lagebild worker commands operate on `services/lagebild-sync-worker`. (evidence: implemented historically)
-- [x] Env, observability, fleet probe, Matomo proxy, and Check Webgogol validators operate on `services/*`. (evidence: implemented historically)
+- [x] Env, observability, fleet probe, Matomo proxy, and Check Warpgogol validators operate on `services/*`. (evidence: implemented historically)
 - [x] `rfc.validate` and `services.check.run` pass. (evidence: implemented historically)
 - [x] `packages-check.run` passes. Current run reaches the RFC-specific service checks but still fails on pre-existing package-level debt gates outside this topology migration. (evidence: original apps retired by RFC-0381, migration completed historically)
 

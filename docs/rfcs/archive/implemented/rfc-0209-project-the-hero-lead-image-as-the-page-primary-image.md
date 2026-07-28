@@ -124,7 +124,7 @@ Optional `surface.validate` (or `dist.sitemap.images.validate`) tightening: for 
 ## Rollout
 
 - Pure improvement, no flag day: pages with an explicit `output.image` are unchanged; pages with a `leadImage` upgrade from screenshot to real photo; pages with neither keep the screenshot.
-- Land behind the existing render path so every app benefits at once; verify on `apps/webgogol-com` surface pages + an authored hero page, then confirm `pnpm build:check` stays green.
+- Land behind the existing render path so every app benefits at once; verify on `apps/warpgogol-com` surface pages + an authored hero page, then confirm `pnpm build:check` stays green.
 - No content migration required.
 
 ## Alternatives considered
@@ -143,7 +143,7 @@ Optional `surface.validate` (or `dist.sitemap.images.validate`) tightening: for 
 ## Acceptance criteria
 
 - [x] `primaryImage` precedence is `output.image → resolved hero leadImage → preview screenshot`, implemented in the asset-aware render layer (`layout-component.astro`; the framework-free `page-handler.ts` ships the raw `leadImageToken`) (evidence: implemented historically)
-- [x] An authored page with a `leadImage` and no `output.image` emits that image as og:image / twitter:image / JSON-LD `primaryImageOfPage`, absolute, with the leadImage alt (verified: webgogol-com home → `/_astro/home-illustration.<hash>.webp`; nicaragua home → `/_astro/hero-1.<hash>.webp`) (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] An authored page with a `leadImage` and no `output.image` emits that image as og:image / twitter:image / JSON-LD `primaryImageOfPage`, absolute, with the leadImage alt (verified: warpgogol-com home → `/_astro/home-illustration.<hash>.webp`; nicaragua home → `/_astro/hero-1.<hash>.webp`) (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] A `website-local` surface industry×city page emits its resolved city/industry photo as og:image (not a `/preview/` URL) — verified `/website/elektriker` → og:image, og:image:alt, and JSON-LD `primaryImageOfPage` all = `/_astro/elektriker.<hash>.webp` (evidence: implemented historically)
 - [x] Pages with neither a leadImage nor `output.image` still emit the preview screenshot (verified: `/impressum`, `/datenschutz` → `/preview/de/<slug>.png`) (evidence: implemented historically)
 - [x] The `<head>` image agrees with the page's `sitemap-images.xml` entry (RFC-0172) — verified for `/website/elektriker` (both `/_astro/elektriker.<hash>.webp`); no second `x-content-image` signal, so the IMGSITEMAP-01 one-per-page contract holds (evidence: implemented historically)

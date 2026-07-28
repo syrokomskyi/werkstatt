@@ -251,7 +251,7 @@ It emits canonical diagnostics:
 - [x] `.well-known/*` and `/api/agent/v1/*` have short freshness policy or ETag. (evidence: implemented historically)
 - [x] CSP has no wildcard source. (evidence: implemented historically)
 - [x] `headers.security.validate` passes for both reference apps. (evidence: implemented historically)
-- [x] `headers.runtime.probe --base-url https://webgogol.com` can produce a structured report. (evidence: implemented historically)
+- [x] `headers.runtime.probe --base-url https://warpgogol.com` can produce a structured report. (evidence: implemented historically)
 - [x] `rfc.validate` passes. (evidence: implemented historically)
 
 ## Implementation notes for agents

@@ -44,7 +44,7 @@ commands:
     - test.signal.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:

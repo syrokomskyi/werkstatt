@@ -65,7 +65,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -212,7 +212,7 @@ interface PbpEntityRef {
 ## Architectural fit
 
 - **DNA-1 (Monorepo boundary).** `packages/pbp/` is a shared reusable library in `packages/*`. No site imports from another site. The package is app-agnostic and reusable across all sites that will adopt PBP.
-- **DNA-20 (Business layer).** This RFC does not supersede DNA-20. `@gogol/business` remains canonical for existing sites. `packages/pbp/` is under construction and not consumed by sites until RFC-PBP-102 (Webgogol Legacy Migration).
+- **DNA-20 (Business layer).** This RFC does not supersede DNA-20. `@gogol/business` remains canonical for existing sites. `packages/pbp/` is under construction and not consumed by sites until RFC-PBP-102 (Warpgogol Legacy Migration).
 - **DNA-55 (Spec vendoring).** This RFC is the second materialized RFC from the `pbp-specification-package` spec, carrying `specRef: "pbp-specification-package/RFC-PBP-001"` traceability.
 - **RFC-0398 (Program Charter).** This RFC implements the namespace policy declared in RFC-0398 §5 and the entity glossary from RFC-0398 §2. It uses the terminology established by the charter.
 - **Compass sync.** `docs/requirements.xml` and `docs/technology.xml` will need updates to record the new `@gogol/pbp` package. This is done during implementation, not at draft stage.
@@ -308,7 +308,7 @@ N/A — this RFC introduces a TypeScript library, not a CLI command. Programmati
 ## Rollout
 
 - **Immediate:** Upon acceptance, the `packages/pbp/` package is created with the envelope types, URI validation, and schema ID utilities. Downstream RFCs (RFC-PBP-002, RFC-PBP-003, RFC-PBP-004, RFC-PBP-010+) can import from `@gogol/pbp`.
-- **No site impact:** No existing site changes. `@gogol/pbp` is not consumed by any site until RFC-PBP-102 (Webgogol Legacy Migration). `@gogol/business` (DNA-20) remains canonical.
+- **No site impact:** No existing site changes. `@gogol/pbp` is not consumed by any site until RFC-PBP-102 (Warpgogol Legacy Migration). `@gogol/business` (DNA-20) remains canonical.
 - **Build integration:** `packages/pbp/` is added to the pnpm workspace and Turborepo pipeline. `tsc --noEmit` and `vitest run` run as part of the standard package build.
 - **Compass sync:** `docs/requirements.xml` and `docs/technology.xml` are updated to record the new package during implementation.
 
@@ -344,7 +344,7 @@ N/A — this RFC introduces a TypeScript library, not a CLI command. Programmati
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
-- The `packages/pbp/` package MUST NOT be consumed by any site until RFC-PBP-102 (Webgogol Legacy Migration). This is enforced by AGENTS.md policy, not by import restrictions.
+- The `packages/pbp/` package MUST NOT be consumed by any site until RFC-PBP-102 (Warpgogol Legacy Migration). This is enforced by AGENTS.md policy, not by import restrictions.
 - Downstream RFCs extend `PbpEntity` with `interface PbpBusiness extends PbpEntity { ... }` — they MUST NOT redefine `schema`, `id`, `type`, `status`, or `governance`.
 - If implementation reveals an invariant conflict with DNA-20, run `site-kernel run rfc.supersede.propose --id RFC-0399 --reason "..." --invariant "DNA-20"` instead of working around it (RFC-0334).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.

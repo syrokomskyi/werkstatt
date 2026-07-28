@@ -90,7 +90,7 @@ export {
   type SternsystemPinData,
 } from "./sternsystem/index.ts";
 
-// createWerkstattModule migrated to @webgogol/forge — see packages/forge/os/werkstatt/
+// createWerkstattModule migrated to @warpgogol/forge — see packages/forge/os/werkstatt/
 export {
   runWerkstattLockStatus,
   type WerkstattLockStatusData,

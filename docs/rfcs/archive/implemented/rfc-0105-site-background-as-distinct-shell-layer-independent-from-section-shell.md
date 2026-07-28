@@ -33,7 +33,7 @@ commands:
     - any implicit coupling between section-level background and global site background
     - the ambiguous shared "background" component name (renamed to site-background)
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share

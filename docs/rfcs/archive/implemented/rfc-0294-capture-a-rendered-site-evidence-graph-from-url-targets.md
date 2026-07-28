@@ -30,11 +30,11 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/check-core"
   - "@gogol/check-runner-node"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
 successSignals:
   - "A URL target is captured into a deterministic SiteEvidenceGraph containing crawl, DOM, metadata, text, structured data, screenshots, network, and well-known artifact evidence."
   - "Every later check consumes the evidence graph instead of fetching the target independently."
@@ -56,7 +56,7 @@ acceptance:
 
 ## Context
 
-Check Webgogol needs one stable evidence layer that works for WGogol apps deployed to alt hosting and for third-party sites. The evidence must reflect rendered reality, not source assumptions. It also needs to be reusable: deterministic checks, AI audience review, report generation, before/after comparison, and agent action packs should all read the same captured artifact.
+Check Warpgogol needs one stable evidence layer that works for WGogol apps deployed to alt hosting and for third-party sites. The evidence must reflect rendered reality, not source assumptions. It also needs to be reusable: deterministic checks, AI audience review, report generation, before/after comparison, and agent action packs should all read the same captured artifact.
 
 ## Problem
 
@@ -162,15 +162,15 @@ The graph must be serialized as sorted-key JSON. `contentHash` is a SHA-256 hex 
 The command accepts either a URL or a target file:
 
 ```sh
-pnpm exec site-kernel run check.evidence.capture --url https://alt.example.invalid --out .check-webgogol/runs/run-001 --json
-pnpm exec site-kernel run check.evidence.capture --target ./check-targets/client.yaml --out .check-webgogol/runs/run-002 --json
+pnpm exec site-kernel run check.evidence.capture --url https://alt.example.invalid --out .check-warpgogol/runs/run-001 --json
+pnpm exec site-kernel run check.evidence.capture --target ./check-targets/client.yaml --out .check-warpgogol/runs/run-002 --json
 ```
 
 ### Discovery Order
 
 1. Fetch `robots.txt` and enforce target policy.
 2. Fetch `sitemap.xml` and sitemap indexes when allowed.
-3. Fetch `/.well-known/webgogol-check.json` when present.
+3. Fetch `/.well-known/warpgogol-check.json` when present.
 4. Seed crawl from `startPaths`, sitemap URLs, and same-host links.
 5. Stop at `maxPages`, host boundary, and safety-policy limits.
 
@@ -189,9 +189,9 @@ For every page:
 
 | Path                                               | Role                                      |
 | -------------------------------------------------- | ----------------------------------------- |
-| `.check-webgogol/runs/<runId>/evidence.graph.json` | Captured graph, gitignored.               |
-| `.check-webgogol/runs/<runId>/screenshots/**.png`  | Screenshot evidence, gitignored.          |
-| `.check-webgogol/runs/<runId>/capture.log.jsonl`   | Structured capture log, secrets redacted. |
+| `.check-warpgogol/runs/<runId>/evidence.graph.json` | Captured graph, gitignored.               |
+| `.check-warpgogol/runs/<runId>/screenshots/**.png`  | Screenshot evidence, gitignored.          |
+| `.check-warpgogol/runs/<runId>/capture.log.jsonl`   | Structured capture log, secrets redacted. |
 | `packages/check-core/src/evidence.ts`              | Evidence graph schemas and hash helpers.  |
 | `packages/check-runner-node/src/capture.ts`        | Playwright capture implementation.        |
 
@@ -231,7 +231,7 @@ For every page:
 
 - [x] `SiteEvidenceGraph` and nested evidence schemas exist and are unit-tested. (evidence: implemented historically)
 - [x] `check.evidence.capture` can capture at least one desktop and one mobile page from a local URL. (evidence: implemented historically)
-- [x] Capture writes graph and screenshots under `.check-webgogol/runs/<runId>/`. (evidence: implemented historically)
+- [x] Capture writes graph and screenshots under `.check-warpgogol/runs/<runId>/`. (evidence: implemented historically)
 - [x] `check.evidence.validate` detects schema, hash, missing-screenshot, and secret-leak failures. (evidence: implemented historically)
 - [x] The graph never stores auth secret values. (evidence: implemented historically)
 - [x] `check.run` consumes the graph path instead of letting child checks fetch independently. (evidence: implemented historically)
@@ -239,6 +239,6 @@ For every page:
 
 ## Implementation notes for agents
 
-- Do not put crawler logic in `apps/check-webgogol-com`.
+- Do not put crawler logic in `apps/check-warpgogol-com`.
 - Do not make a validator refetch the target if an evidence graph is available.
 - Keep the graph stable and explicit; adding a new evidence field requires schema tests and contentHash updates.

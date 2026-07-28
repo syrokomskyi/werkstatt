@@ -30,13 +30,13 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/check-runner-node"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
 successSignals:
   - "Long-running browser checks execute in Node local, CI, or a dedicated runner context, never in a normal deployed site request."
-  - "All run artifacts have a stable directory layout and can be loaded by the check-webgogol-com app without re-running the crawl."
+  - "All run artifacts have a stable directory layout and can be loaded by the check-warpgogol-com app without re-running the crawl."
   - "The runner can operate locally first and later be replaced or supplemented by a remote runner without changing report schemas."
 nonGoals:
   - "Do not introduce Cloudflare KV, Queues, or long-running Worker jobs for the MVP."
@@ -55,7 +55,7 @@ acceptance:
 
 ## Context
 
-`check-webgogol-com` should be deployable and locally runnable. But browser-based site evaluation requires capabilities that a normal Cloudflare Worker request path does not provide: Playwright, long timeouts, large screenshots, and multi-page crawling.
+`check-warpgogol-com` should be deployable and locally runnable. But browser-based site evaluation requires capabilities that a normal Cloudflare Worker request path does not provide: Playwright, long timeouts, large screenshots, and multi-page crawling.
 
 The architecture must therefore separate the **operator app** from the **check runner**.
 
@@ -76,8 +76,8 @@ Introduce a Node runner and a stable artifact store contract.
 
 The MVP execution modes are:
 
-1. **Local CLI mode:** developer runs `check.run`; artifacts are written to `.check-webgogol/runs/`.
-2. **Local operator mode:** `apps/check-webgogol-com` is run locally and reads local artifacts.
+1. **Local CLI mode:** developer runs `check.run`; artifacts are written to `.check-warpgogol/runs/`.
+2. **Local operator mode:** `apps/check-warpgogol-com` is run locally and reads local artifacts.
 3. **CI gate mode:** CI runs `check.run` after `deploy:alt`; artifacts are uploaded as CI artifacts and the summary gates `deploy:main`.
 4. **Deployed app mode:** the deployed app displays imported or published report artifacts. It does not run Playwright in the request path.
 
@@ -95,7 +95,7 @@ A future remote runner may consume the same target and artifact schemas.
 ### Artifact Directory Layout
 
 ```txt
-.check-webgogol/
+.check-warpgogol/
   runs/
     <runId>/
       run.json
@@ -142,7 +142,7 @@ export interface CheckArtifactManifest {
 
 ```sh
 pnpm exec site-kernel run check.runner.info --json
-pnpm exec site-kernel run check.artifact.validate --run .check-webgogol/runs/<runId> --json
+pnpm exec site-kernel run check.artifact.validate --run .check-warpgogol/runs/<runId> --json
 ```
 
 `check.runner.info` prints browser availability, Playwright version, timeout defaults, supported viewport profiles, and whether AI review credentials are configured.
@@ -171,7 +171,7 @@ pnpm exec site-kernel run check.artifact.validate --run .check-webgogol/runs/<ru
 2. Implement `@gogol/check-runner-node` entrypoints and `check.runner.info`.
 3. Implement `check.artifact.validate` with red/green fixtures.
 4. Make `check.run` write the standard layout.
-5. Make `apps/check-webgogol-com` read/import runs only through this manifest.
+5. Make `apps/check-warpgogol-com` read/import runs only through this manifest.
 
 ## Alternatives considered
 
@@ -196,6 +196,6 @@ pnpm exec site-kernel run check.artifact.validate --run .check-webgogol/runs/<ru
 
 ## Implementation notes for agents
 
-- Keep runner code out of `apps/check-webgogol-com`.
+- Keep runner code out of `apps/check-warpgogol-com`.
 - Do not introduce persistent cloud storage in this RFC.
 - Use sorted JSON and SHA-256 hex for all artifact hashes.

@@ -69,7 +69,7 @@ Pass — zero violations.
 - **Performance:** `git format-patch` on large repos — addressed in Risks. Good.
 - **False positives:** auto-doctor false positives — addressed in Risks. Good.
 - **Edge cases:** empty project transplant, source without `.git`, git history transfer failure — all addressed in Failure modes. Good.
-- **Migration path for existing projects:** projects created before this RFC won't have `@webgogol/forge` as devDependency. The RFC doesn't address this. Minor — forge is at 0.1.2, recently published, likely no external projects yet.
+- **Migration path for existing projects:** projects created before this RFC won't have `@warpgogol/forge` as devDependency. The RFC doesn't address this. Minor — forge is at 0.1.2, recently published, likely no external projects yet.
 
 ## Questions for the author
 

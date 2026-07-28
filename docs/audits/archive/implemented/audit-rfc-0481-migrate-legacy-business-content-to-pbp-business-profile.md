@@ -51,7 +51,7 @@ Pass with warnings:
 
 - **Pass:** No self-authorizing language — RFC is `status: draft` and does not claim implementation permission.
 - **Pass:** Implementation notes reference governance rules implicitly (RFC-0479 migrator registry).
-- **Fail:** The RFC's `nonGoals` say "Does not delete the legacy business/ collection" — but this contradicts RFC-0471 which already deleted `systems/webgogol-com/src/content/business/`. The RFC needs to clarify: does `business/` still exist or not? (It does exist in the workpiece, but RFC-0471 claims it was deleted from the system cache clone.)
+- **Fail:** The RFC's `nonGoals` say "Does not delete the legacy business/ collection" — but this contradicts RFC-0471 which already deleted `systems/warpgogol-com/src/content/business/`. The RFC needs to clarify: does `business/` still exist or not? (It does exist in the workpiece, but RFC-0471 claims it was deleted from the system cache clone.)
 
 ## Axis F — Pragmatism
 

@@ -38,7 +38,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/ui"
@@ -420,7 +420,7 @@ Additive, no flag day, no content migration:
 2. Add `<LivePhoto>` and the `<SectionImage>` seam; static rendering is byte-for-byte unchanged when `live` is absent.
 3. Add the `livePhotos` orchestrator option + runtime; mirror the ontology fragment.
 4. Add `live.media.validate` and wire it into `APPS_CHECK_AUTHOR_PIPELINE`. It is **fail-hard** but **no-op passes** when an app has no living photos and no clips — so all existing apps stay green.
-5. **Pilot — `nicaragua-projekt` "Über uns" team.** Copy the five team loops from `pipelines-webgogol-4/apps/video-loop/.output/7-mux-audio/nicaragua-projekt/team/` into `apps/nicaragua-projekt/src/content/business/de/assets/`, renamed to match each portrait token (`maria-calderon_animated_result.webm → maria-calderon.webm`, etc.). Add `live` to the five `Person` records. The People section animates them; `live.media.validate` proves the pairing; the build stays green.
+5. **Pilot — `nicaragua-projekt` "Über uns" team.** Copy the five team loops from `pipelines-warpgogol-4/apps/video-loop/.output/7-mux-audio/nicaragua-projekt/team/` into `apps/nicaragua-projekt/src/content/business/de/assets/`, renamed to match each portrait token (`maria-calderon_animated_result.webm → maria-calderon.webm`, etc.). Add `live` to the five `Person` records. The People section animates them; `live.media.validate` proves the pairing; the build stays green.
 6. Opt-in adoption elsewhere: any site adds `live` to any `SectionImage`-backed photo and flips `livePhotos: true` in its layout orchestrator. No existing page is forced to change.
 
 ## Alternatives considered
@@ -450,7 +450,7 @@ Additive, no flag day, no content migration:
 - [x] The `livePhotos` runtime is opt-in, scheduler-deferred, gated on `[data-live-photo][data-trigger]`; `autoplay` works with zero JavaScript; sites without living photos ship no extra bytes. (evidence: implemented historically)
 - [x] Living photos produce CLS 0 (aspect-ratio reserved) and keep the static `<img>` as the LCP/measured element. (evidence: implemented historically)
 - [x] `live.media.validate` fails `missing-video` and `orphan-video`, no-op passes with zero living photos, and is registered in `APPS_CHECK_AUTHOR_PIPELINE`. (evidence: implemented historically)
-- [x] Pilot: `nicaragua-projekt` "Über uns" animates the five team portraits; `astro check` and the author pipeline stay green; `webgogol-com` is unaffected (no `live` configs). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Pilot: `nicaragua-projekt` "Über uns" animates the five team portraits; `astro check` and the author pipeline stay green; `warpgogol-com` is unaffected (no `live` configs). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `AGENTS.md` updated where agent authoring rules changed (the no-`video:`-field convention, the poster/clip pairing). (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate RFC-0202` passes. (evidence: implemented historically)
 

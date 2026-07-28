@@ -26,7 +26,7 @@ Pass — zero violations.
 
 3. **`forge.upgrade` listed in both `proposed` and `added`.** For a draft-status RFC, a new command should be in `proposed` only (it moves to `added` upon implementation). Having the same command in both buckets is redundant and confusing. Compare RFC-0540 and RFC-0542, which leave `proposed` empty and list only in `added`/`changed`.
 
-4. **`repository.url` is factually incorrect.** The proposed metadata (line 121) specifies `"url": "https://github.com/webgogol/forge.git"`, but the actual git remote is `git@github.com:syrokomskyi/webgogol-4.git`. There is no `webgogol/forge` repo on GitHub. The URL should point to the monorepo (`https://github.com/syrokomskyi/webgogol-4.git`) with `"directory": "packages/forge"`, or whatever the canonical public remote will be.
+4. **`repository.url` is factually incorrect.** The proposed metadata (line 121) specifies `"url": "https://github.com/warpgogol/forge.git"`, but the actual git remote is `git@github.com:syrokomskyi/warpgogol-4.git`. There is no `warpgogol/forge` repo on GitHub. The URL should point to the monorepo (`https://github.com/syrokomskyi/warpgogol-4.git`) with `"directory": "packages/forge"`, or whatever the canonical public remote will be.
 
 5. **`forge.syncedVersion` schema placement is unclear.** The YAML example (line 154) shows a new top-level `forge:` section, but the current `forgeConfigSchema` (`packages/forge/src/config/forge-config.ts:79`) has no `forge` top-level key — the schema is `schema`, `project`, `paths`, `bindings`. The RFC should explicitly state where in the schema this field lives, whether it requires a schema version bump (`forge/config@1` → `forge/config@2`), and whether it is optional (nullable, default `null`) so existing configs don't break.
 
@@ -71,5 +71,5 @@ No issues. The RFC correctly states "Agents MAY implement code changes ONLY when
 ## Questions for the author
 
 1. Is `forge.publish.check` a new registered command or a `prepublishOnly` script enhancement? The design and acceptance criteria must commit to one — the current "or" makes the criterion uncheckable.
-2. What is the correct `repository.url`? The proposed `https://github.com/webgogol/forge.git` does not match the actual remote (`syrokomskyi/webgogol-4`). Will a public `webgogol/forge` repo be created, or should the URL point to the monorepo?
+2. What is the correct `repository.url`? The proposed `https://github.com/warpgogol/forge.git` does not match the actual remote (`syrokomskyi/warpgogol-4`). Will a public `warpgogol/forge` repo be created, or should the URL point to the monorepo?
 3. Where does `forge.syncedVersion` live in `forgeConfigSchema`? Is it a new top-level `forge:` section, or under `project`? Is it optional (nullable) so existing configs don't break? Does it require a schema version bump?

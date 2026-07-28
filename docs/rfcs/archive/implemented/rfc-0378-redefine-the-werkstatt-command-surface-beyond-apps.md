@@ -48,7 +48,7 @@ commands:
     - workspace.surface.validate
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel"
   - "@gogol/site-kernel-checks"
@@ -81,7 +81,7 @@ acceptance:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -112,9 +112,9 @@ RFC-0354 §5 mandates that `apps/` is removed after the migration wave (executed
 
 ## Problem
 
-There is no way to address a runnable site workspace that lives outside `apps/`. The moment RFC-0381 materializes `webgogol-com` into a mission workpiece and deletes `apps/webgogol-com`:
+There is no way to address a runnable site workspace that lives outside `apps/`. The moment RFC-0381 materializes `warpgogol-com` into a mission workpiece and deletes `apps/warpgogol-com`:
 
-1. `site-kernel run build.check --app webgogol-com` fails — discovery finds nothing.
+1. `site-kernel run build.check --app warpgogol-com` fails — discovery finds nothing.
 2. `pnpm install` does not link the workpiece — `workspace:` dependencies break.
 3. `fleet.plan.generate` / `fleet.status.generate` read a stale `fleet.sites.yaml` pointing at a deleted path.
 4. The Agent Control Plane projection (`docs/ecosystem.generated.yaml`) silently loses its only site, and agents lose their map.
@@ -141,7 +141,7 @@ The kernel gains a **site workspace resolver** that resolves a site id to its ru
 
 ```sh
 # after this RFC — identical semantics, new addressing
-pnpm exec site-kernel run build.check --site webgogol-com
+pnpm exec site-kernel run build.check --site warpgogol-com
 pnpm exec site-kernel run page.block.validate --all --json
 pnpm exec site-kernel sites list
 pnpm exec site-kernel run fleet.sites.generate --json
@@ -214,7 +214,7 @@ Resolution order for one id: read `systems/registry.yaml`; if the id is register
   "command": "fleet.sites.generate",
   "status": "ok",
   "sites": [
-    { "site": "webgogol-com", "source": "apps", "path": "apps/webgogol-com" }
+    { "site": "warpgogol-com", "source": "apps", "path": "apps/warpgogol-com" }
   ],
   "written": "fleet/fleet.sites.yaml"
 }

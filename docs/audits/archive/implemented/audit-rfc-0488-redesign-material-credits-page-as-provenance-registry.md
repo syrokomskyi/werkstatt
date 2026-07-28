@@ -25,9 +25,9 @@ The RFC is architecturally sound and well-scoped, but has a blocking mechanical 
 ## Axis A — Structural completeness
 
 - **Missing `## Problem` section** (V-13). The `## Context` → `## Current problems` structure is semantically equivalent but does not satisfy the validator. Rename `## Current problems` to `## Problem` or add a `## Problem` section.
-- **CLI surface** is thin. The RFC lists `material.credits.validate`, `material.credits.generate`, `material.credits.report` as changed commands but does not show exact command invocations with flags and scope. Only `material.credits.validate --site webgogol-com` appears in acceptance criteria. The `--json` output shape is not documented for any command.
+- **CLI surface** is thin. The RFC lists `material.credits.validate`, `material.credits.generate`, `material.credits.report` as changed commands but does not show exact command invocations with flags and scope. Only `material.credits.validate --site warpgogol-com` appears in acceptance criteria. The `--json` output shape is not documented for any command.
 - **Failure modes** does not specify exit codes. It uses "fail" and "warn" but does not map to exit codes (0 vs 1). The existing validator uses `resultFromViolations` (exit 1 on violations) and `diagnosticsResult` (exit 0 with warnings) — the RFC should state which new rules are fail (exit 1) vs warn (exit 0).
-- **Rollout** describes the adoption path but does not specify default behavior for new apps: do new apps get the new validation rules (`missing-usage-basis`, `organization-as-author`, etc.) by default, or only `webgogol-com`?
+- **Rollout** describes the adoption path but does not specify default behavior for new apps: do new apps get the new validation rules (`missing-usage-basis`, `organization-as-author`, etc.) by default, or only `warpgogol-com`?
 
 ## Axis B — DNA alignment
 
@@ -73,7 +73,7 @@ The RFC is architecturally sound and well-scoped, but has a blocking mechanical 
 
 ## Axis G — Blind spots
 
-- **Usage location discovery performance.** The generator scans all page blocks for references to each credit's `target.id`. For a site with N pages and M credits, this is O(N×M) lookups. The RFC does not estimate the cost or describe the I/O pattern. For `webgogol-com` (small site) this is fine, but the RFC should state the expected scale and whether the scan is incremental or full-rebuild.
+- **Usage location discovery performance.** The generator scans all page blocks for references to each credit's `target.id`. For a site with N pages and M credits, this is O(N×M) lookups. The RFC does not estimate the cost or describe the I/O pattern. For `warpgogol-com` (small site) this is fine, but the RFC should state the expected scale and whether the scan is incremental or full-rebuild.
 - **`organization-as-author` rule scope.** The rule fails when `sourceType: "human-made"` has a `creator` party with `kind: "Organization"`. But the RFC's migrator step 5 says "rename the party role to `commissionedBy`" — this implies the Organization might be a `commissionedBy` party, not the `creator`. The validator rule should check only parties with role `creator` or `coCreator`, not any party with `kind: "Organization"`. A human-made work can have an Organization as `commissionedBy` or `rightsHolder` without violating § 7 UrhG.
 - **Label completeness for new `sourceType` values.** The RFC adds 5 new `sourceType` values (`commissioned`, `licensed-third-party`, `customer-supplied`, `public-domain`, `screenshot`). `sourceTypeLabels` is a `Record<MaterialSourceType, string>` — every value in the enum must have a label. The RFC should state that the labels file must include all 10 `sourceType` values (5 existing + 5 new) or the `Record` type is incomplete.
 - **Concurrent migration** is not addressed. If two missions run simultaneously on the same Sternsystem (which DNA-46 forbids — only one open mission per system), the migrator could conflict. This is covered by DNA-46 but the RFC doesn't reference it.

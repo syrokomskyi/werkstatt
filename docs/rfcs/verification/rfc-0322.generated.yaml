@@ -22,7 +22,7 @@ probes:
     durationMs: 591
   - probe:
       probe: run
-      command: site-kernel run offer.capacity.validate --app webgogol-com --json
+      command: site-kernel run offer.capacity.validate --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true

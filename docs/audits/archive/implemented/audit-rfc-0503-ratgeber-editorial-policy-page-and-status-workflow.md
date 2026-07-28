@@ -29,7 +29,7 @@ Pass with 4 warnings:
 - **No TypeScript contracts**: The RFC provides no type signatures for the validator function, the policy page schema, or the required-sections configuration. RFC-0501 and RFC-0502 both include `### TypeScript contracts` subsections.
 - **No `--json` output format**: The CLI surface shows the command invocation but does not document the `--json` output shape. RFC-0502 includes an explicit JSON example.
 - **No exit codes**: The failure modes table specifies severities but does not document exit codes (0 = pass, 1 = error, 2 = warning-only). RFC-0500 and RFC-0501 both specify exit codes.
-- **Rollout incomplete**: The rollout lists 7 steps but does not describe default behavior for new apps (do new apps need the policy page at onboarding?) or adoption path for existing apps beyond `webgogol-com`.
+- **Rollout incomplete**: The rollout lists 7 steps but does not describe default behavior for new apps (do new apps need the policy page at onboarding?) or adoption path for existing apps beyond `warpgogol-com`.
 - **Decision section**: Present tense, single decision ✓. But it mixes the editorial policy page decision with the status workflow decision — two decisions in one RFC. This is acceptable for a tightly coupled pair, but the sections that follow should be explicit about which decision each addresses.
 
 ## Axis B — DNA alignment

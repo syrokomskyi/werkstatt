@@ -294,7 +294,7 @@ scope:
 
 | Risk (from RFC) | Mitigation (plan step) |
 | --------------- | ---------------------- |
-| Loss of onboarding history for webgogol-com | Step 7 deletes only after all code is updated; Sternsystem + Bordbuch remain authoritative |
+| Loss of onboarding history for warpgogol-com | Step 7 deletes only after all code is updated; Sternsystem + Bordbuch remain authoritative |
 | fo-onboard skill complexity | Step 6 delegates deterministic work to commands; skill focuses on orchestration |
 | Agent confusion during transition | Step 8 updates all AGENTS.md files with new command surface |
 | sternsystem.register atomicity | Step 5 implements rollback: abort mission → remove pin → remove registry entry |

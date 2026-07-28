@@ -50,7 +50,7 @@ commands:
   removed:
     - pbp.cutover.check
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/pbp"
@@ -60,7 +60,7 @@ successSignals:
   - signal: grep
     description: "No imports from @gogol/business outside docs/rfcs/ and missions/"
   - signal: build
-    description: "pnpm --filter webgogol-com build succeeds without @gogol/business"
+    description: "pnpm --filter warpgogol-com build succeeds without @gogol/business"
   - signal: test
     description: "pnpm --filter @gogol/pbp run test passes"
 nonGoals:
@@ -73,7 +73,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -93,18 +93,18 @@ RFC-0470 completed the **import migration phase**: schemas (`recordClaimsSchema`
 
 However, the `@gogol/business` package still exists and is still consumed:
 
-- `systems/webgogol-com/src/content.config.ts` still registers `businessCollections` from `@gogol/business/astro`.
-- `systems/webgogol-com/src/pages/*.astro` still import `buildPageSemanticModel` from `@gogol/business` (not yet switched to `@gogol/pbp/semantic-profile`).
+- `systems/warpgogol-com/src/content.config.ts` still registers `businessCollections` from `@gogol/business/astro`.
+- `systems/warpgogol-com/src/pages/*.astro` still import `buildPageSemanticModel` from `@gogol/business` (not yet switched to `@gogol/pbp/semantic-profile`).
 - `packages/os/site-kernel-checks/src/content-business.ts` still imports `getBusinessSchema` from `@gogol/business/dispatcher` for legacy validation.
-- 329 content references (`{business.*}`) in 32 markdown files under `systems/webgogol-com/src/content/` still reference the `business` content collection.
+- 329 content references (`{business.*}`) in 32 markdown files under `systems/warpgogol-com/src/content/` still reference the `business` content collection.
 - `packages/share/src/astro/people.ts` reads from the `business` content collection for the People section.
 - `@gogol/business` remains in `packages/pbp/package.json` dependencies.
 
-DNA-20 (Business layer) is still marked as active in `docs/architecture-dna.md`. The PBP cutover (RFC-0469) is implemented for `webgogol-com`, but the legacy layer has not been removed.
+DNA-20 (Business layer) is still marked as active in `docs/architecture-dna.md`. The PBP cutover (RFC-0469) is implemented for `warpgogol-com`, but the legacy layer has not been removed.
 
 ## Problem
 
-The `@gogol/business` package is dead code in practice — `webgogol-com` has completed the PBP cutover (RFC-0469) and all schema/semantic-model imports have been migrated (RFC-0470). But the package still exists, still appears in `package.json` dependencies, and still serves as a content collection source. This creates:
+The `@gogol/business` package is dead code in practice — `warpgogol-com` has completed the PBP cutover (RFC-0469) and all schema/semantic-model imports have been migrated (RFC-0470). But the package still exists, still appears in `package.json` dependencies, and still serves as a content collection source. This creates:
 
 1. **Agent confusion** — agents see `@gogol/business` in the codebase and may import from it instead of `@gogol/pbp` or `@gogol/share`.
 2. **Maintenance burden** — the package must be kept in sync with Astro version bumps and zod changes despite being unused.
@@ -123,7 +123,7 @@ The legacy `@gogol/business` package, its content directory, and all remaining r
 - **DNA-55 (Spec vendoring).** The PBP specification (`pbp-specification-package`) remains the normative source. Deletion is the execution of the supersession path defined in RFC-0398.
 - **RFC-0398 (PBP Program Charter).** This RFC completes the supersession: "DNA-20 is superseded when RFC-PBP-103 (Migration Coverage and Cutover) is implemented and legacy files are deleted."
 - **RFC-0470 (Import migration).** This RFC is the direct successor — it executes the deletion preconditions defined in RFC-0470 §1.5.
-- **RFC-0469 (Site Cutover).** Deletion happens only after cutover is verified. Cutover is implemented for `webgogol-com`.
+- **RFC-0469 (Site Cutover).** Deletion happens only after cutover is verified. Cutover is implemented for `warpgogol-com`.
 
 ## Design
 
@@ -142,15 +142,15 @@ N/A — this RFC deletes code and migrates content references. No new TypeScript
 | Path | Action |
 | --- | --- |
 | `packages/business/` | Delete entire directory |
-| `systems/webgogol-com/src/content/business/` | Delete entire directory |
-| `systems/webgogol-com/package.json` | Remove `@gogol/business` from dependencies |
+| `systems/warpgogol-com/src/content/business/` | Delete entire directory |
+| `systems/warpgogol-com/package.json` | Remove `@gogol/business` from dependencies |
 | `packages/pbp/package.json` | Remove `@gogol/business` from dependencies |
-| `systems/webgogol-com/src/content.config.ts` | Replace `businessCollections` with `pbpCollections` from `@gogol/pbp/astro` |
-| `systems/webgogol-com/src/pages/*.astro` | Replace `buildPageSemanticModel` import from `@gogol/business` with `@gogol/pbp/semantic-profile` |
+| `systems/warpgogol-com/src/content.config.ts` | Replace `businessCollections` with `pbpCollections` from `@gogol/pbp/astro` |
+| `systems/warpgogol-com/src/pages/*.astro` | Replace `buildPageSemanticModel` import from `@gogol/business` with `@gogol/pbp/semantic-profile` |
 | `packages/os/site-kernel-checks/src/content-business.ts` | Remove `getBusinessSchema` import, use `pbpSchemaById` only |
 | `packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts` | Remove `content.business.validate` command entry |
 | `packages/share/src/astro/people.ts` | Update to read from `business-profile` collection instead of `business` |
-| `systems/webgogol-com/src/content/**/*.md` | Migrate 329 `{business.*}` content references to `{business-profile.*}` or inline values |
+| `systems/warpgogol-com/src/content/**/*.md` | Migrate 329 `{business.*}` content references to `{business-profile.*}` or inline values |
 | `packages/AGENTS.md` | Remove `@gogol/business` row, update `@gogol/pbp` and `@gogol/share` rows |
 | `packages/business/AGENTS.md` | Delete with the package |
 | `docs/architecture-dna.md` | Mark DNA-20 as superseded |
@@ -171,10 +171,10 @@ N/A — deletion operation.
 ## Rollout
 
 - **Immediate:** Upon acceptance, deletion is defined but NOT executed. Execution requires all preconditions to pass.
-- **Step 1 — Content reference migration:** Migrate 329 `{business.*}` content references in `systems/webgogol-com/src/content/**/*.md` to `{business-profile.*}` or inline values. This is the largest step and may be done incrementally.
+- **Step 1 — Content reference migration:** Migrate 329 `{business.*}` content references in `systems/warpgogol-com/src/content/**/*.md` to `{business-profile.*}` or inline values. This is the largest step and may be done incrementally.
 - **Step 2 — People section:** Update `packages/share/src/astro/people.ts` to read from the `business-profile` collection.
-- **Step 3 — content.config.ts:** Replace `businessCollections` with `pbpCollections` in `systems/webgogol-com/src/content.config.ts`.
-- **Step 4 — Page imports:** Replace `buildPageSemanticModel` imports in `systems/webgogol-com/src/pages/*.astro` from `@gogol/business` to `@gogol/pbp/semantic-profile`.
+- **Step 3 — content.config.ts:** Replace `businessCollections` with `pbpCollections` in `systems/warpgogol-com/src/content.config.ts`.
+- **Step 4 — Page imports:** Replace `buildPageSemanticModel` imports in `systems/warpgogol-com/src/pages/*.astro` from `@gogol/business` to `@gogol/pbp/semantic-profile`.
 - **Step 5 — content-business.ts:** Remove `getBusinessSchema` import, use `pbpSchemaById` only. Remove `content.business.validate` command from command table.
 - **Step 6 — Package deletion:** Delete `packages/business/` directory. Remove `@gogol/business` from all `package.json` dependencies.
 - **Step 7 — Documentation:** Mark DNA-20 as superseded in `docs/architecture-dna.md`. Update `docs/requirements.xml` and `docs/technology.xml`. Remove `@gogol/business` row from `packages/AGENTS.md`.
@@ -194,22 +194,22 @@ N/A — deletion operation.
 - **Missed content reference.** A `{business.*}` reference in a file outside the scanned paths may break after deletion. Mitigation: comprehensive grep across all `*.md` files; build verification after migration.
 - **People section data loss.** If `people.ts` is not updated before the `business` collection is deleted, the People section will break. Mitigation: update `people.ts` before deleting the collection.
 - **DNA-20 references in other docs.** Other Compass XML files or RFCs may reference DNA-20 as active. Mitigation: `grep -r "DNA-20" docs/` to find and update references.
-- **Other sites.** If other sites besides `webgogol-com` still use `@gogol/business`, deletion breaks them. Mitigation: `grep -r "@gogol/business" systems/` to verify no other site imports it. As of this RFC, `webgogol-com` is the only site.
+- **Other sites.** If other sites besides `warpgogol-com` still use `@gogol/business`, deletion breaks them. Mitigation: `grep -r "@gogol/business" systems/` to verify no other site imports it. As of this RFC, `warpgogol-com` is the only site.
 - **Agent confusion.** Agents may try to import from `@gogol/business` after deletion. Mitigation: `packages/AGENTS.md` and `packages/pbp/AGENTS.md` are updated to state that `@gogol/pbp` is the only business layer.
 
 ## Acceptance criteria
 
-- [x] All 329 `{business.*}` content references in `systems/webgogol-com/src/content/**/*.md` migrated to `{business-profile.*}` or inline values (evidence: grep returns 0 results — 2026-07-20)
+- [x] All 329 `{business.*}` content references in `systems/warpgogol-com/src/content/**/*.md` migrated to `{business-profile.*}` or inline values (evidence: grep returns 0 results — 2026-07-20)
 - [x] `packages/share/src/astro/people.ts` updated to read from standalone `people` collection (deviation from RFC text: uses `people` collection instead of `business-profile` — better architecture, people records are not PBP entities) (evidence: packages/share/src/astro/people.ts, 2026-07-20)
-- [x] `systems/webgogol-com/src/content.config.ts` uses `pbpCollections` from `@gogol/pbp/astro` (evidence: content.config.ts:34,80 — 2026-07-20)
-- [x] `systems/webgogol-com/src/pages/*.astro` import `buildPageSemanticModel` from `@gogol/pbp/semantic-profile` (evidence: index.astro:28, 404.astro:23, [...slug].astro:31 — 2026-07-20)
+- [x] `systems/warpgogol-com/src/content.config.ts` uses `pbpCollections` from `@gogol/pbp/astro` (evidence: content.config.ts:34,80 — 2026-07-20)
+- [x] `systems/warpgogol-com/src/pages/*.astro` import `buildPageSemanticModel` from `@gogol/pbp/semantic-profile` (evidence: index.astro:28, 404.astro:23, [...slug].astro:31 — 2026-07-20)
 - [x] `content-business.ts` updated — no `@gogol/business` imports, uses `pbpSchemaById` only (evidence: grep returns 0 — 2026-07-20)
 - [x] `content.business.validate` command updated to PBP schemas (kept, not removed — validates `business-profile/` content against `pbpSchemaById`) (evidence: packages/os/site-kernel-checks/src/content-business.ts, 2026-07-20)
 - [x] `packages/business/` directory deleted (evidence: directory does not exist — 2026-07-20)
-- [x] `systems/webgogol-com/src/content/business/` directory deleted (evidence: directory does not exist — 2026-07-20)
+- [x] `systems/warpgogol-com/src/content/business/` directory deleted (evidence: directory does not exist — 2026-07-20)
 - [x] `@gogol/business` removed from all `package.json` dependencies (evidence: grep returns 0 active imports — 2026-07-20)
 - [x] `pnpm install` succeeds without `@gogol/business` (evidence: pnpm-lock.yaml updated — 2026-07-20)
-- [x] `pnpm --filter webgogol-com build` succeeds (evidence: astro build + astro check — 0 errors, 2026-07-20)
+- [x] `pnpm --filter warpgogol-com build` succeeds (evidence: astro build + astro check — 0 errors, 2026-07-20)
 - [x] `pnpm --filter @gogol/pbp run build:check` passes (evidence: tsc --noEmit exit 0 — 2026-07-20)
 - [x] `pnpm --filter @gogol/pbp run test` passes (evidence: 12 files, 169 tests passed — 2026-07-20)
 - [x] `grep -r "@gogol/business" systems/ packages/ services/ --include="*.ts" --include="*.astro" --include="*.json"` returns 0 active results (evidence: remaining references are historical comments only — 2026-07-20)
@@ -228,9 +228,9 @@ N/A — deletion operation.
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Content reference migration (Step 1) MAY be done incrementally across multiple commits before the deletion commit.
 - Package deletion MUST be a single atomic commit.
-- Deletion MUST NOT execute until all content references are migrated and `pnpm --filter webgogol-com build` succeeds.
+- Deletion MUST NOT execute until all content references are migrated and `pnpm --filter warpgogol-com build` succeeds.
 - Before deletion, verify that FAQ and people content (if still needed) has been moved to a separate collection or is served by the `business-profile` collection.
-- Before deletion, verify that no other site besides `webgogol-com` imports from `@gogol/business`.
+- Before deletion, verify that no other site besides `warpgogol-com` imports from `@gogol/business`.
 - After deletion, run the full verification suite (grep + build + test commands).
 - Git tag `pbp-legacy-deleted` MUST be created in the same commit or immediately after.
 - Agents MUST NOT attempt to restore `@gogol/business` after deletion. If a need arises, create a new RFC.

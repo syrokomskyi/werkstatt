@@ -1,6 +1,6 @@
 ---
 id: RFC-0487
-title: "Remove B2C widerruf routes from webgogol-com"
+title: "Remove B2C widerruf routes from warpgogol-com"
 status: implemented
 kind: architecture
 scope: workspace
@@ -32,7 +32,7 @@ commands:
     - public.infrastructure.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-codegen"
   - "@gogol/site-kernel-checks"
@@ -42,9 +42,9 @@ successSignals:
   - "/vidmova/ and /forma-vidmovy/ return HTTP 410 Gone"
   - "No widerruf or musterWiderruf entries remain in system.md, navigation, labels, or sitemap"
   - "No internal links to /widerruf/ or /widerruf-formular/ remain in any page"
-  - "b2b.model.validate --app webgogol-com exits 0"
-  - "redirect.map.validate --app webgogol-com passes with 410 entries for retired routes"
-  - "content.references.validate --app webgogol-com exits 0 (after cross-page cleanup)"
+  - "b2b.model.validate --app warpgogol-com exits 0"
+  - "redirect.map.validate --app warpgogol-com passes with 410 entries for retired routes"
+  - "content.references.validate --app warpgogol-com exits 0 (after cross-page cleanup)"
 nonGoals:
   - "Does not modify AGB content — AGB consumer provision removal is a separate content task (expert file 6 session)"
   - "Does not modify /kontakt/ — contact page B2B clarification is a separate content task (expert file 5 session)"
@@ -54,20 +54,20 @@ nonGoals:
   - "Does not remove Git history — historical files remain in version control, just not rendered"
 ---
 
-# RFC-0487: Remove B2C widerruf routes from webgogol-com
+# RFC-0487: Remove B2C widerruf routes from warpgogol-com
 
 ## Context
 
-Webgogol operates exclusively as a **B2B platform** — the product `Digitales Fundament` is offered only to Unternehmer (§ 14 BGB) who conclude contracts in the course of their commercial or independent professional activity.
+Warpgogol operates exclusively as a **B2B platform** — the product `Digitales Fundament` is offered only to Unternehmer (§ 14 BGB) who conclude contracts in the course of their commercial or independent professional activity.
 
-The German Widerrufsrecht (§ 312g BGB) applies to Verbraucher (consumers) in distance and off-premises contracts, **not** to entrepreneurs. The site currently publishes two B2C legal pages that are legally inapplicable to Webgogol's actual business model:
+The German Widerrufsrecht (§ 312g BGB) applies to Verbraucher (consumers) in distance and off-premises contracts, **not** to entrepreneurs. The site currently publishes two B2C legal pages that are legally inapplicable to Warpgogol's actual business model:
 
 - `/widerruf/` (UK: `/vidmova/`) — Widerrufsbelehrung (right of withdrawal notice)
 - `/widerruf-formular/` (UK: `/forma-vidmovy/`) — Muster-Widerrufsformular (model withdrawal form)
 
 These pages are linked from the footer (both DE and UK), referenced in AGB, Impressum, and Datenschutz, and indexed in sitemaps. Their continued presence:
 
-1. Creates the impression that Webgogol accepts B2C contracts
+1. Creates the impression that Warpgogol accepts B2C contracts
 2. Contradicts the B2B-only positioning of the AGB
 3. Confuses Widerruf (consumer right) with Kündigung (contract termination)
 4. May be perceived as a voluntarily promised contractual right
@@ -96,7 +96,7 @@ The declarative C-contract in `packages/ontology/src/external-surfaces/url-schem
 
 ## Decision
 
-1. **Remove both routes entirely** from webgogol-com — no rewrite, no redirect to `/notausgang/` (Widerruf and Kündigung are different legal mechanisms).
+1. **Remove both routes entirely** from warpgogol-com — no rewrite, no redirect to `/notausgang/` (Widerruf and Kündigung are different legal mechanisms).
 2. **Return HTTP 410 Gone** for all four retired URL variants:
    - `/widerruf/`
    - `/widerruf-formular/`
@@ -223,7 +223,7 @@ The existing `redirect.map.validate` (RFC-0318) already supports status 410 — 
 New command in `@gogol/site-kernel-checks`:
 
 ```sh
-pnpm exec site-kernel run b2b.model.validate --app webgogol-com --json
+pnpm exec site-kernel run b2b.model.validate --app warpgogol-com --json
 ```
 
 Scope: `app`, supports `--app` flag (consistent with `redirect.map.validate`, `content.references.validate`). Runs in `sites-check-author` pipeline. All checks are **blocking** (exit code 1 on any violation) — there is no advisory mode.
@@ -239,7 +239,7 @@ When `businessModel: b2b-only` is declared in `system.md`, the command checks:
 - No references to § 312g BGB or § 312j BGB in prose content (B2B-PROSE-01)
 - No "Verbraucher-Widerrufsrecht" in prose content (B2B-PROSE-02)
 
-**Scan scope:** prose files under `src/content/prose/**` and page files under `src/content/pages/**` for the declared locales. For webgogol-com this is approximately 40-60 files — low cost, single-pass regex scan.
+**Scan scope:** prose files under `src/content/prose/**` and page files under `src/content/pages/**` for the declared locales. For warpgogol-com this is approximately 40-60 files — low cost, single-pass regex scan.
 
 **Apps without `businessModel` field:** the command is a no-op (exit 0, no violations). The check only activates when `businessModel: b2b-only` is explicitly declared. Existing apps without the field are exempt.
 
@@ -273,7 +273,7 @@ The following pages contain links to `/widerruf/` and need cleanup in their own 
 | Kontakt (`pages/de/contact.md`, `pages/uk/contact.md`) | File 5 | B2B-only clarification (not a link removal) |
 | Notausgang (`pages/de/notausgang.md`, `pages/uk/notausgang.md`) | File 4 | Widerruf vs Kündigung distinction |
 
-Until those sessions run, `content.references.validate --app webgogol-com` will report broken links from those pages to the retired routes, and `b2b.model.validate --app webgogol-com` will report B2B-PROSE-01/02 violations. This is expected and will be resolved by the respective sessions. **Rollout order:** cross-page cleanup sessions (files 4-8) must complete before the route removal mission is deployed.
+Until those sessions run, `content.references.validate --app warpgogol-com` will report broken links from those pages to the retired routes, and `b2b.model.validate --app warpgogol-com` will report B2B-PROSE-01/02 violations. This is expected and will be resolved by the respective sessions. **Rollout order:** cross-page cleanup sessions (files 4-8) must complete before the route removal mission is deployed.
 
 ## Architectural fit
 
@@ -317,10 +317,10 @@ Until those sessions run, `content.references.validate --app webgogol-com` will 
    - Regenerate routes and public infrastructure
 
 4. **Validation** (after step 3):
-   - `b2b.model.validate --app webgogol-com` passes (all checks blocking)
-   - `redirect.map.validate --app webgogol-com` passes (410 entries valid)
-   - `content.references.validate --app webgogol-com` passes (cross-page cleanup done in step 2)
-   - `surface.contract.validate --app webgogol-com` passes (Breaks-C acknowledged)
+   - `b2b.model.validate --app warpgogol-com` passes (all checks blocking)
+   - `redirect.map.validate --app warpgogol-com` passes (410 entries valid)
+   - `content.references.validate --app warpgogol-com` passes (cross-page cleanup done in step 2)
+   - `surface.contract.validate --app warpgogol-com` passes (Breaks-C acknowledged)
 
 ## Risks
 
@@ -376,21 +376,21 @@ interface B2bModelValidateData {
 | `packages/os/site-kernel-checks/src/b2b-model.ts` | New: `b2b.model.validate` command handler |
 | `packages/os/site-kernel-checks/src/command-tables/*.ts` | Register `b2b.model.validate` command |
 | `packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts` | Add `b2b.model.validate` to author pipeline |
-| `systems/webgogol-com/src/content/system.md` | Remove widerruf/musterWiderruf pages, add `retiredRoutes` and `businessModel` |
-| `systems/webgogol-com/src/content/navigation/de/navigation.md` | Remove widerruf/musterWiderruf nav entries |
-| `systems/webgogol-com/src/content/navigation/uk/navigation.md` | Remove widerruf/musterWiderruf nav entries |
-| `systems/webgogol-com/src/content/site/de/labels.md` | Remove widerruf/musterWiderruf from `legalIds` |
-| `systems/webgogol-com/src/content/site/uk/labels.md` | Remove widerruf/musterWiderruf from `legalIds` |
-| `systems/webgogol-com/src/content/site/de/meta.md` | Remove `widerrufCreationDate`, `widerrufFormCreationDate` |
-| `systems/webgogol-com/src/content/business-profile/de/documents/terms.md` | Remove `widerrufCreationDate`, `widerrufFormCreationDate` |
-| `systems/webgogol-com/src/content/pages/de/widerruf.md` | Delete |
-| `systems/webgogol-com/src/content/pages/uk/widerruf.md` | Delete |
-| `systems/webgogol-com/src/content/pages/de/muster-widerruf.md` | Delete |
-| `systems/webgogol-com/src/content/pages/uk/muster-widerruf.md` | Delete |
-| `systems/webgogol-com/src/content/prose/de/widerruf.md` | Delete |
-| `systems/webgogol-com/src/content/prose/uk/widerruf.md` | Delete |
-| `systems/webgogol-com/src/content/prose/de/muster-widerruf.md` | Delete |
-| `systems/webgogol-com/src/content/prose/uk/muster-widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/system.md` | Remove widerruf/musterWiderruf pages, add `retiredRoutes` and `businessModel` |
+| `systems/warpgogol-com/src/content/navigation/de/navigation.md` | Remove widerruf/musterWiderruf nav entries |
+| `systems/warpgogol-com/src/content/navigation/uk/navigation.md` | Remove widerruf/musterWiderruf nav entries |
+| `systems/warpgogol-com/src/content/site/de/labels.md` | Remove widerruf/musterWiderruf from `legalIds` |
+| `systems/warpgogol-com/src/content/site/uk/labels.md` | Remove widerruf/musterWiderruf from `legalIds` |
+| `systems/warpgogol-com/src/content/site/de/meta.md` | Remove `widerrufCreationDate`, `widerrufFormCreationDate` |
+| `systems/warpgogol-com/src/content/business-profile/de/documents/terms.md` | Remove `widerrufCreationDate`, `widerrufFormCreationDate` |
+| `systems/warpgogol-com/src/content/pages/de/widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/pages/uk/widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/pages/de/muster-widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/pages/uk/muster-widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/prose/de/widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/prose/uk/widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/prose/de/muster-widerruf.md` | Delete |
+| `systems/warpgogol-com/src/content/prose/uk/muster-widerruf.md` | Delete |
 | `docs/requirements.xml` | Document `businessModel` and `retiredRoutes` fields |
 | `docs/technology.xml` | Add `b2b.model.validate` to command surface |
 | `packages/os/site-kernel-checks/AGENTS.md` | Document `b2b.model.validate` command |
@@ -425,9 +425,9 @@ This RFC adds new schema fields (`retiredRoutes`, `businessModel`) to `systemMan
 - [x] No `widerruf` or `musterWiderruf` entries in `legalIds` (DE + UK) (evidence: workpiece src/content/site/{de,uk}/labels.md — legalIds entries removed, commit 3894)
 - [x] `widerrufCreationDate` and `widerrufFormCreationDate` absent from PBP terms and site meta (evidence: workpiece src/content/site/de/meta.md and business-profile/de/documents/terms.md — fields removed, commit 3894)
 - [x] 8 page/prose files deleted (DE + UK × widerruf + muster-widerruf) (evidence: workpiece — 8 files deleted via rm, commit 3894)
-- [x] `b2b.model.validate --app webgogol-com` exits 0 (evidence: `pnpm exec site-kernel run b2b.model.validate --site webgogol-com --root missions/webgogol-com-m000010/workpiece --json` — status: pass, count: 0)
-- [x] `redirect.map.validate --app webgogol-com` exits 0 (evidence: `pnpm exec site-kernel run redirect.map.validate --site webgogol-com --root missions/webgogol-com-m000010/workpiece --json` — status: pass)
-- [x] `surface.contract.validate --app webgogol-com` exits 0 (with `breaksC: true` acknowledged) (evidence: `pnpm exec site-kernel run surface.contract.validate --site webgogol-com --root missions/webgogol-com-m000010/workpiece --json` — exitCode: 0, RFC frontmatter breaksC: true)
+- [x] `b2b.model.validate --app warpgogol-com` exits 0 (evidence: `pnpm exec site-kernel run b2b.model.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — status: pass, count: 0)
+- [x] `redirect.map.validate --app warpgogol-com` exits 0 (evidence: `pnpm exec site-kernel run redirect.map.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — status: pass)
+- [x] `surface.contract.validate --app warpgogol-com` exits 0 (with `breaksC: true` acknowledged) (evidence: `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --root missions/warpgogol-com-m000010/workpiece --json` — exitCode: 0, RFC frontmatter breaksC: true)
 - [x] `retiredRoutes` field in `system.md` lists all four retired slugs with `status: 410` (evidence: workpiece src/content/system.md:6-14 — retiredRoutes with widerruf, widerruf-formular, vidmova, forma-vidmovy, all status: 410)
 - [x] `businessModel: b2b-only` declared in `system.md` (evidence: workpiece src/content/system.md:5 — businessModel: b2b-only)
 - [x] Cross-page cleanup sessions (expert files 4-8) completed before route removal deployment (evidence: commits c1ef and 3894 — widerruf references removed from AGB DE, Impressum DE, consent funnel; AGB UK and Impressum UK already clean from enhance-site-pages mission)

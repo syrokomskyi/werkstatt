@@ -40,7 +40,7 @@ commands:
     - material.credits.report
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -237,7 +237,7 @@ export function resolveAttributionDisplay(i: AttributionDisplayInputs): Attribut
 - [x] A site-level `attribution.credits` switch governs inline credit visibility site-wide while `/bildnachweise/` and all JSON-LD remain complete; a per-placement `creditDisplay` overrides one credit back to visible. (Per-**page** override is deferred — see Design §2.) (evidence: original apps retired by RFC-0381, implemented historically)
 - [~] Footer copyright honors the `attribution.footerCopyright` policy; prose-image credits honor the policy via `markdown-section`. A visible prose **byline** element does not exist yet, so `proseAuthorship` is shipped-and-reserved.
 - [x] `material.credits.validate` accepts the new `display` field and adds the `attribution-policy-lang-skew` warn; the `attribution-hide-drops-provenance` static check and the report visibility column are deferred (see Design §5). (evidence: implemented historically)
-- [x] `build:check` is green on both `webgogol-com` and `nicaragua-projekt` (32/32); `rfc.validate` passes. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `build:check` is green on both `warpgogol-com` and `nicaragua-projekt` (32/32); `rfc.validate` passes. (evidence: original apps retired by RFC-0381, implemented historically)
 
 ## Implementation notes for agents
 

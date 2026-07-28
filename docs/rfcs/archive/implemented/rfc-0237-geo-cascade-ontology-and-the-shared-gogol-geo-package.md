@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/geo"
   - "@gogol/surface"
@@ -59,7 +59,7 @@ nonGoals:
 
 ## Context
 
-The Programmatic Surface (RFC-0192/0193) currently models geography with a **single `city` axis** whose universe is a per-app gazetteer: `apps/webgogol-com/src/content/surface/cities/{de,uk}/*.md`. Each city record hand-carries its display name, its `state` as free German prose (`"Baden-Württemberg"`), and its URL slug as the filename stem. There is no country level and no region level; the URL is `…/{industry}/{city}/`.
+The Programmatic Surface (RFC-0192/0193) currently models geography with a **single `city` axis** whose universe is a per-app gazetteer: `apps/warpgogol-com/src/content/surface/cities/{de,uk}/*.md`. Each city record hand-carries its display name, its `state` as free German prose (`"Baden-Württemberg"`), and its URL slug as the filename stem. There is no country level and no region level; the URL is `…/{industry}/{city}/`.
 
 The canonical PSEO doctrine (`2026-06-24 Programmatic SEO`, sections 2, 4, 11) makes geography a **three-level cascade — Land → Region → Stadt — anchored on ISO 3166** so identities are stable for centuries while slugs stay localizable. The client added two binding refinements on top of the doctrine:
 
@@ -106,7 +106,7 @@ Introduce a new shared, framework-free package **`@gogol/geo`** that owns the ge
 
 ```sh
 # Validate that every geo reference in an app resolves and that slugs do not collide.
-pnpm exec site-kernel run geo.catalog.validate --app webgogol-com
+pnpm exec site-kernel run geo.catalog.validate --app warpgogol-com
 pnpm exec site-kernel run geo.catalog.validate --all --json
 
 # Developer aid: preview the resolved per-language slug for a city.
@@ -196,8 +196,8 @@ Where a library lacks the localized **name** for a city in a language (e.g. the 
   "command": "geo.catalog.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "unresolved-city", "ref": "neckarsulm", "message": "no GeoCity for id; not in shared catalog or overrides" },
-    { "app": "webgogol-com", "rule": "slug-collision", "lang": "uk", "slug": "noienburh", "message": "DE-BW cities 12345/67890 collide on uk slug" }
+    { "app": "warpgogol-com", "rule": "unresolved-city", "ref": "neckarsulm", "message": "no GeoCity for id; not in shared catalog or overrides" },
+    { "app": "warpgogol-com", "rule": "slug-collision", "lang": "uk", "slug": "noienburh", "message": "DE-BW cities 12345/67890 collide on uk slug" }
   ]
 }
 ```
@@ -210,7 +210,7 @@ Where a library lacks the localized **name** for a city in a language (e.g. the 
 
 - **New package first.** Introduce `@gogol/geo` with the four wrapped libraries and the slug pipeline; unit-test the de/uk slug rules (`münchen`→`muenchen`, `Штутгарт`→`shtuthart`).
 - **Generator integration is owned by RFC-0238.** This RFC ships the package and the `geo.catalog.validate` check; RFC-0238 rewires the `website-local` Blueprint axes to consume it. The two land together.
-- **App migration.** `apps/webgogol-com` replaces `surface/cities/**` gazetteer fields with a thin geo selection; presence/Bedarf prose moves to RFC-0238 content domains. No backward compatibility, no redirects from the old single-axis URLs (explicit client decision: legacy is not preserved).
+- **App migration.** `apps/warpgogol-com` replaces `surface/cities/**` gazetteer fields with a thin geo selection; presence/Bedarf prose moves to RFC-0238 content domains. No backward compatibility, no redirects from the old single-axis URLs (explicit client decision: legacy is not preserved).
 - **New apps** comply from day one: they only ever declare a geo selection; the gazetteer is never copied.
 - **Pipeline.** `geo.catalog.validate` joins the apps build-check pipeline next to the existing surface checks.
 

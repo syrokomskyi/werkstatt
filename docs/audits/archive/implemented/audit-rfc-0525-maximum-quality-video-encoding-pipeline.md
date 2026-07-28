@@ -60,7 +60,7 @@ No issues. The `av1` field is additive (optional). The `ENCODER_SETTINGS_VERSION
 
 2. **Encoding time estimates are honest.** SVT-AV1 preset 2: 20-40 min for 1080p. VP9 `cpu-used 0`: 10-20 min. Acceptable because encoding is cached and runs once per source change.
 
-3. **`packagesImpacted` and `appsImpacted` are accurate.** `@gogol/share` (schema), `@gogol/ui` (Media component), `@gogol/site-kernel-checks` (encoding functions). `webgogol-com` and `nicaragua-projekt` are the sites with authored videos.
+3. **`packagesImpacted` and `appsImpacted` are accurate.** `@gogol/share` (schema), `@gogol/ui` (Media component), `@gogol/site-kernel-checks` (encoding functions). `warpgogol-com` and `nicaragua-projekt` are the sites with authored videos.
 
 ## Axis G — Blind spots
 

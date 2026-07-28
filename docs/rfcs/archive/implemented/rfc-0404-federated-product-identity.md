@@ -65,7 +65,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -93,7 +93,7 @@ _This RFC defines the `PbpProduct` entity interface and the federated identity m
 
 The PBP spec defines Product as an identifiable carrier of value with a globally unique URI and an authority (system-spec §3.4). Unlike a central product registry, PBP uses federated identity: a manufacturer can publish a Product, a business can publish its own service, and a seller creates a CatalogEntry referencing the Product (ADR-003).
 
-The current Webgogol model has no separate Product entity — `offer.md` mixes Product, Offering, Pricing, and Policy into a single file (migration-plan §2). This RFC defines the `PbpProduct` interface that separates Product identity from commercial terms.
+The current Warpgogol model has no separate Product entity — `offer.md` mixes Product, Offering, Pricing, and Policy into a single file (migration-plan §2). This RFC defines the `PbpProduct` interface that separates Product identity from commercial terms.
 
 ## Problem
 

@@ -63,11 +63,11 @@ acceptance:
   - probe: file-exists
     path: "packages/share/src/agent/manifest.ts"
   - probe: run
-    command: "site-kernel run agent.manifest.generate --app webgogol-com"
+    command: "site-kernel run agent.manifest.generate --app warpgogol-com"
     expect:
       exitCode: 0
   - probe: run
-    command: "site-kernel run agent.surface.validate --app webgogol-com"
+    command: "site-kernel run agent.surface.validate --app warpgogol-com"
     expect:
       exitCode: 0
 ---
@@ -123,8 +123,8 @@ The workspace gains the **Agent Surface**: a per-site machine surface governed b
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run agent.manifest.generate --app webgogol-com
-pnpm exec site-kernel run agent.surface.validate --app webgogol-com --json
+pnpm exec site-kernel run agent.manifest.generate --app warpgogol-com
+pnpm exec site-kernel run agent.surface.validate --app warpgogol-com --json
 ```
 
 Both are app-scoped. `agent.manifest.generate` is registered with `mutatesState: true` and runs in `APPS_BUILD_PREPARE_PIPELINE` **after** `entitlements.resolve` and after `surface.generate` (so the final page/route set is known). `agent.surface.validate` runs in `APPS_CHECK_PIPELINE`.
@@ -140,7 +140,7 @@ export const AGENT_SURFACE_VERSION = "1.0.0"; // semver of THIS schema, bumped b
 export interface AgentSurfaceManifest {
   surfaceVersion: string;              // AGENT_SURFACE_VERSION
   site: string;                        // system.md `app`
-  baseUrl: string;                     // canonical origin, e.g. "https://webgogol.com"
+  baseUrl: string;                     // canonical origin, e.g. "https://warpgogol.com"
   languages: { default: string; supported: string[] };
   /** Deterministic hash over the manifest body minus this field (sorted-key JSON, sha256 hex). */
   contentHash: string;
@@ -202,7 +202,7 @@ export function buildAgentSurfaceManifest(input: AgentSurfaceManifestInput): Age
     {
       "ruleId": "AGS-01",
       "severity": "error",
-      "file": "apps/webgogol-com/public/.well-known/agent.json",
+      "file": "apps/warpgogol-com/public/.well-known/agent.json",
       "message": "knowledge ref 'compliance' violates BUSINESS_DOMAIN_VISIBILITY (visibility: none)",
       "fix": "Remove the domain from the knowledge projection; 'none' domains never reach agent outputs."
     }
@@ -254,7 +254,7 @@ Rules owned by this RFC (later RFCs extend the set):
 
 - [x] `agent:` block added to `systemManifestSchema` (closed, defaults documented above); `system.manifest.validate` accepts both apps unchanged. (evidence: implemented historically)
 - [x] `packages/share/src/agent/manifest.ts` exists with `AGENT_SURFACE_VERSION`, the interfaces above, and pure `buildAgentSurfaceManifest` (unit-tested: determinism, contentHash stability, sorted-key serialization — 7 tests green). (evidence: packages/ directory, package exists)
-- [x] `agent.manifest.generate` registered (`mutatesState: true`), wired into `APPS_BUILD_PREPARE_PIPELINE` after `entitlements.resolve` and `surface.generate`; writes both artifacts; byte-stable across repeated runs on unchanged input (verified: repeated run on webgogol-com produced byte-identical output). (evidence: implemented historically)
+- [x] `agent.manifest.generate` registered (`mutatesState: true`), wired into `APPS_BUILD_PREPARE_PIPELINE` after `entitlements.resolve` and `surface.generate`; writes both artifacts; byte-stable across repeated runs on unchanged input (verified: repeated run on warpgogol-com produced byte-identical output). (evidence: implemented historically)
 - [x] `agent.surface.validate` registered, wired into `APPS_CHECK_PIPELINE`, emitting `AGS-01..AGS-06` as canonical Diagnostics (inline rule ids, consistent with every other check in this codebase — there is no separate central rule-id file to update). (evidence: implemented historically)
 - [x] `src/agent-surface.generated.json` and `public/.well-known/agent.json` gitignored in both apps (root `.gitignore` glob `apps/*/...`, which also covers future scaffolded apps — no dedicated scaffold `.gitignore` template exists to duplicate this in). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `--json` output stable and documented as above. (evidence: implemented historically)

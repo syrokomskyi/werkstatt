@@ -27,7 +27,7 @@ commands:
     - effects.coverage.audit
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -370,10 +370,10 @@ Extend the RFC-0134 validator rules:
 {
   "command": "effects.contract.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "violations": [
     {
-      "file": "apps/webgogol-com/src/content/pages/de/home.md",
+      "file": "apps/warpgogol-com/src/content/pages/de/home.md",
       "blockId": "intro",
       "sectionType": "markdown",
       "target": "heading",
@@ -431,7 +431,7 @@ Additive, no flag day, no content migration required:
 - [x] `SectionHeader` applies `text`-strategy effects directly to `<h{level}>` with no wrapper and no clipping; tone segments unaffected. (evidence: implemented historically)
 - [x] Heading effects produce zero layout shift (CLS) and ship zero JavaScript. (evidence: implemented historically)
 - [x] `effects.contract.validate` fails `unsupported-kind-for-target` and `duplicate-kind-in-stack`. — now a standalone command (RFC-0156), alongside the `effectAssignmentSchema.superRefine` guard in `content.validate`. (evidence: implemented historically)
-- [x] `webgogol-com` and `nicaragua-projekt` pass `astro check`; existing pages render unchanged without edits. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `warpgogol-com` and `nicaragua-projekt` pass `astro check`; existing pages render unchanged without edits. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate RFC-0151` passes. (evidence: implemented historically)
 
 ## Implementation notes for agents

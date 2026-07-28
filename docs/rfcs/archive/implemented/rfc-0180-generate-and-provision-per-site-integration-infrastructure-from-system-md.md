@@ -52,7 +52,7 @@ nonGoals:
 
 ## Context
 
-RFC-0179 fixes the delivery topology for thousand-site scale (Workers for Platforms tenants + a shared, sharded queue/consumer/KV backbone). It does not specify **how** a site's deployment config and its place on that backbone come into existence. Today they do not: the [webgogol-com pilot](../../apps/webgogol-com/wrangler.jsonc) carries its queue/KV bindings as hand-written changes **after** the `// GENERATED` marker, which RFC-0081 (generated-file governance) forbids except as the declared pilot exception. There is also no command to onboard a new site's infrastructure, and no defined procedure for a client to take their site to their own Cloudflare account.
+RFC-0179 fixes the delivery topology for thousand-site scale (Workers for Platforms tenants + a shared, sharded queue/consumer/KV backbone). It does not specify **how** a site's deployment config and its place on that backbone come into existence. Today they do not: the [warpgogol-com pilot](../../apps/warpgogol-com/wrangler.jsonc) carries its queue/KV bindings as hand-written changes **after** the `// GENERATED` marker, which RFC-0081 (generated-file governance) forbids except as the declared pilot exception. There is also no command to onboard a new site's infrastructure, and no defined procedure for a client to take their site to their own Cloudflare account.
 
 For one pilot this is tolerable. For thousands it is the gap that blocks scale: every new site would need a human to edit `wrangler.jsonc`, run `wrangler queues create …`, paste a KV id, and remember the naming. This RFC makes that path generated, idempotent, and reversible.
 
@@ -84,14 +84,14 @@ Provisioning becomes a **generated, idempotent, kernel-owned** flow, amending RF
 
 ```sh
 # Generate tenant config + shard assignment from content (idempotent, no network).
-pnpm exec site-kernel run integration.infrastructure.generate --app webgogol-com
+pnpm exec site-kernel run integration.infrastructure.generate --app warpgogol-com
 pnpm exec site-kernel run integration.infrastructure.generate --all --json
 
 # Provision shared resources + tenant upload (CD; idempotent; needs CF credentials).
-pnpm exec site-kernel run integration.infrastructure.provision --app webgogol-com
+pnpm exec site-kernel run integration.infrastructure.provision --app warpgogol-com
 
 # Portability: re-home a site onto the client's own Cloudflare account.
-pnpm exec site-kernel run site.export.account --app webgogol-com --account <client-cf-account-id>
+pnpm exec site-kernel run site.export.account --app warpgogol-com --account <client-cf-account-id>
 ```
 
 `generate` is pure/offline (safe for any agent, runs in `build.check`). `provision` and `site.export.account` mutate external state (`mutatesState: true`) and require credentials; they are operator/CD commands, not agent commands.
@@ -126,7 +126,7 @@ export interface ProvisionPlan {
 | `apps/*/wrangler.jsonc` | Generated tenant config (no queue/KV bindings); `// GENERATED` authoritative again |
 | `apps/*/integration.shard.json` | Generated `ShardAssignment` record (read by provision/CD) |
 | `packages/os/site-kernel-onboarding/src/templates/wrangler.template.jsonc` | Unchanged base; queue/KV never templated into tenants |
-| `apps/webgogol-com/workers/integration-consumer/**` | Retired as a per-site Worker; superseded by shared consumers (RFC-0179) |
+| `apps/warpgogol-com/workers/integration-consumer/**` | Retired as a per-site Worker; superseded by shared consumers (RFC-0179) |
 
 ### Output format
 
@@ -134,12 +134,12 @@ export interface ProvisionPlan {
 {
   "command": "integration.infrastructure.provision",
   "status": "ok",
-  "siteId": "webgogol-com",
+  "siteId": "warpgogol-com",
   "plan": {
     "queues": [{ "name": "gogol-int-eu-shared-00", "status": "exists" }],
     "dlqs": [{ "name": "gogol-int-eu-shared-00-dlq", "status": "exists" }],
     "dedupNamespace": { "name": "gogol-int-dedup-eu", "id": "…", "status": "exists" },
-    "tenantUpload": { "dispatchNamespace": "gogol-sites", "script": "webgogol-com", "status": "uploaded" }
+    "tenantUpload": { "dispatchNamespace": "gogol-sites", "script": "warpgogol-com", "status": "uploaded" }
   }
 }
 ```
@@ -150,8 +150,8 @@ export interface ProvisionPlan {
 
 ## Rollout
 
-- **Phase 1:** implement `integration.infrastructure.generate` (offline); regenerate webgogol-com's `wrangler.jsonc` to the tenant form (no bindings) + emit `integration.shard.json`; close the RFC-0081 pilot exception. Wire into `build.check`.
-- **Phase 2:** implement `integration.infrastructure.provision`; provision the shared `eu-shared-00` shard + consumer once; upload webgogol-com as a tenant. CD calls provision before deploy.
+- **Phase 1:** implement `integration.infrastructure.generate` (offline); regenerate warpgogol-com's `wrangler.jsonc` to the tenant form (no bindings) + emit `integration.shard.json`; close the RFC-0081 pilot exception. Wire into `build.check`.
+- **Phase 2:** implement `integration.infrastructure.provision`; provision the shared `eu-shared-00` shard + consumer once; upload warpgogol-com as a tenant. CD calls provision before deploy.
 - **Phase 3:** onboarding (RFC-0070) calls `generate` for every new site; add `site.export.account` and validate it against a throwaway secondary account.
 - **Phase 4:** scale knobs — bump shared `shardCount`, add a region, promote a noisy site to `dedicated` — all via regeneration; document the drain-before-retire step for re-sharding.
 
@@ -175,7 +175,7 @@ export interface ProvisionPlan {
 - [x] `integration.infrastructure.generate` core: `computeSiteInfrastructure` + `renderShardRecord` emit the tenant `SiteInfrastructure`/`integration.shard.json` deterministically (pure, offline) <!-- packages/os/site-kernel-deploy/src/infrastructure-generate.ts. The resolver + shard record are done and typecheck-green. Kernel-command registration + the build.check wiring were never wired (the per-app wire-template surface is a separate step). NOTE: the shard assignment output targets the RFC-0179 CF-Queues substrate which RFC-0181 has since replaced with Upstash QStash+Redis; the generate core remains as a pure resolver but its shard output is architecturally superseded. --> (evidence: packages/ directory, package exists)
 - [x] `integration.infrastructure.provision` idempotently ensures shared queues/DLQ/dedup KV + tenant dispatch-namespace upload; re-run is a no-op <!-- SUPERSEDED BY RFC-0181: the CF-Queues/KV delivery substrate this command would provision has been replaced by Upstash QStash+Redis (RFC-0181, implemented 2026-06-08). The provision command was never built and is now architecturally obsolete — there are no CF queues/DLQ/KV to create. --> (evidence: command registered in kernel module)
 - [x] `site.export.account` redeploys a site to a client account and prints a DNS cutover checklist with no data-export step <!-- DEFERRED: live-credential operator command, not superseded. The portability concept remains valid under the QStash substrate (RFC-0181) but the command was never built. Requires live CF credentials and a target account to implement/verify. --> (evidence: implemented historically)
-- [x] webgogol-com `wrangler.jsonc` regenerated to the tenant form; RFC-0081 pilot exception closed; per-site consumer Worker retired <!-- Done prior to RFC-0381 app retirement: wrangler.jsonc had no queue/KV bindings, integration.shard.json was added, workers/integration-consumer marked RETIRED. Full turbo build:check was green. NOTE: apps/webgogol-com/ has since been extracted to a Sternsystem (RFC-0381, implemented 2026-07-13); the wrangler.jsonc now lives in the Sternsystem git repo at ../systems-git/webgogol-com. --> (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] warpgogol-com `wrangler.jsonc` regenerated to the tenant form; RFC-0081 pilot exception closed; per-site consumer Worker retired <!-- Done prior to RFC-0381 app retirement: wrangler.jsonc had no queue/KV bindings, integration.shard.json was added, workers/integration-consumer marked RETIRED. Full turbo build:check was green. NOTE: apps/warpgogol-com/ has since been extracted to a Sternsystem (RFC-0381, implemented 2026-07-13); the wrangler.jsonc now lives in the Sternsystem git repo at ../systems-git/warpgogol-com. --> (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `siteId` immutability + drift check enforced by `integration.config.validate` <!-- DEFERRED: needs a deployed-id source to diff against. The Sternsystem registry (RFC-0354, RFC-0381) now provides a stable siteId source, but the drift check command was never wired. --> (evidence: implemented historically)
 - [x] `generate` core is pure/offline and agent-safe; `provision`/`site.export.account` (when wired) are `mutatesState` operator commands excluded from agent sets <!-- computeSiteInfrastructure does no I/O. The mutating commands are documented as operator-only in Implementation notes; provision is superseded by RFC-0181, site.export.account remains deferred. --> (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] RFC-0081 `amendedBy` lists RFC-0180 <!-- RFC-0081 frontmatter updated --> (evidence: implemented historically)

@@ -67,7 +67,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -83,7 +83,7 @@ nonGoals:
 
 ## Context
 
-The Sternsystem architecture (RFC-0354, DNA-44, DNA-45) uses a local bare git repository as the canonical `origin` for each system's cache clone. The `repo` field in `systems/registry.yaml` points to this local bare repo (e.g. `../systems-git/webgogol-com`). `mission.materialize` fetches from this origin; `mission.reconcile` pushes to it.
+The Sternsystem architecture (RFC-0354, DNA-44, DNA-45) uses a local bare git repository as the canonical `origin` for each system's cache clone. The `repo` field in `systems/registry.yaml` points to this local bare repo (e.g. `../systems-git/warpgogol-com`). `mission.materialize` fetches from this origin; `mission.reconcile` pushes to it.
 
 This setup provides speed (local `file://` protocol) and offline capability. However, there is no mechanism to synchronize the local bare repo with an external remote (e.g. GitHub). Operators must manually run `git push` / `git fetch` against the external remote, remembering the exact git incantations. There is no audit trail for these operations, and `sternsystem.validate` does not check whether an external mirror is configured or consistent.
 
@@ -118,19 +118,19 @@ The kernel gains a `sternsystem.sync` command that synchronizes a Sternsystem's 
 
 ```sh
 # Default: push current branch to mirror
-pnpm exec site-kernel run sternsystem.sync --id webgogol-com
+pnpm exec site-kernel run sternsystem.sync --id warpgogol-com
 
 # Pull from mirror into local bare repo
-pnpm exec site-kernel run sternsystem.sync --id webgogol-com --direction pull
+pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --direction pull
 
 # Both directions
-pnpm exec site-kernel run sternsystem.sync --id webgogol-com --direction both
+pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --direction both
 
 # All branches + tags
-pnpm exec site-kernel run sternsystem.sync --id webgogol-com --all
+pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --all
 
 # JSON output for agent consumption
-pnpm exec site-kernel run sternsystem.sync --id webgogol-com --json
+pnpm exec site-kernel run sternsystem.sync --id warpgogol-com --json
 ```
 
 **Scope:** workspace
@@ -190,14 +190,14 @@ interface SternsystemSyncData {
   "command": "sternsystem.sync",
   "status": "ok",
   "data": {
-    "systemId": "webgogol-com",
-    "mirrorUrl": "git@github.com:syrokomskyi/webgogol-com.git",
+    "systemId": "warpgogol-com",
+    "mirrorUrl": "git@github.com:syrokomskyi/warpgogol-com.git",
     "direction": "push",
     "branch": "master",
     "commitSha": "a1b2c3d4e5f6...",
     "syncedAt": "2026-07-20T19:20:00.000Z"
   },
-  "summary": "[sternsystem.sync] webgogol-com mirrored (push, branch: master)"
+  "summary": "[sternsystem.sync] warpgogol-com mirrored (push, branch: master)"
 }
 ```
 
@@ -208,8 +208,8 @@ On failure:
   "command": "sternsystem.sync",
   "status": "fail",
   "data": {
-    "systemId": "webgogol-com",
-    "mirrorUrl": "git@github.com:syrokomskyi/webgogol-com.git",
+    "systemId": "warpgogol-com",
+    "mirrorUrl": "git@github.com:syrokomskyi/warpgogol-com.git",
     "direction": "push",
     "branch": "master",
     "commitSha": null,
@@ -238,14 +238,14 @@ The command always exits non-zero on failure. `--json` output includes the error
 ## Rollout
 
 - **Default behavior:** `mirror` is an optional field. Existing systems without `mirror` are unaffected — `sternsystem.sync` errors with "no mirror configured", `sternsystem.validate` produces no warning.
-- **Adoption for webgogol-com:** Add `mirror: git@github.com:syrokomskyi/webgogol-com.git` to the registry entry. Run `sternsystem.sync --id webgogol-com` to perform the initial push.
+- **Adoption for warpgogol-com:** Add `mirror: git@github.com:syrokomskyi/warpgogol-com.git` to the registry entry. Run `sternsystem.sync --id warpgogol-com` to perform the initial push.
 - **New systems:** Set `mirror` during `sternsystem.register --mirror <url>` if an external repo is available. The `--mirror` flag is optional on `sternsystem.register`. Systems without a mirror are valid.
 - **No pipeline integration:** `sternsystem.sync` is not part of `build.check`, `mission.reconcile`, or any automated pipeline. It is a standalone operator/agent command.
 - **No deprecation:** No existing command is superseded. `sternsystem.validate` is extended with a warning, not a breaking change.
 
 ## Alternatives considered
 
-1. **Replace `repo` with GitHub URL directly.** Set `repo: git@github.com:syrokomskyi/webgogol-com.git` in the registry. Rejected: loses offline capability and local `file://` speed. `mission.materialize` and `mission.reconcile` would require network access for every fetch/push.
+1. **Replace `repo` with GitHub URL directly.** Set `repo: git@github.com:syrokomskyi/warpgogol-com.git` in the registry. Rejected: loses offline capability and local `file://` speed. `mission.materialize` and `mission.reconcile` would require network access for every fetch/push.
 
 2. **Replace `repo` with `localRepo` + `remoteRepo` fields.** Two explicit fields instead of `repo` + `mirror`. Rejected: breaks the existing `fleetRegistryEntrySchema` contract (renaming `repo`), requires changes to `syncCacheClone` and `mission.reconcile`, and adds complexity for a single mirror. The `mirror` approach is additive and non-breaking.
 
@@ -278,7 +278,7 @@ The command always exits non-zero on failure. `--json` output includes the error
 - [x] `--json` output format matches the documented shape (evidence: sternsystem-sync.ts:148-165, SternsystemSyncData interface)
 - [x] `sternsystem.validate` produces warning when `mirror` is set but remote is missing or URL mismatched in bare repo (evidence: sternsystem-validate.ts:197-234)
 - [x] Bordbuch entry written with kind `mirror-sync`, metadata: `mirrorUrl`, `direction`, `branch`, `commitSha`, `result` (evidence: sternsystem-sync.ts:139-155, appendBordbuchEntry call)
-- [x] `mirror: git@github.com:syrokomskyi/webgogol-com.git` added to `webgogol-com` in `systems/registry.yaml` (evidence: systems/registry.yaml:6)
+- [x] `mirror: git@github.com:syrokomskyi/warpgogol-com.git` added to `warpgogol-com` in `systems/registry.yaml` (evidence: systems/registry.yaml:6)
 - [x] DNA-45 prose in `docs/architecture-dna.md` updated to include `mirror` in the field list (evidence: docs/architecture-dna.md:197)
 - [x] `sternsystem.register` supports optional `--mirror` flag (evidence: sternsystem-register.ts:48, index.ts:45)
 - [x] `sternsystem.validate` warns when `mirror` URL contains embedded credentials (evidence: sternsystem-validate.ts:227-233)

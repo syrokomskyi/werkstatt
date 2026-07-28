@@ -46,7 +46,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/faq"
@@ -57,7 +57,7 @@ packagesImpacted:
 successSignals:
   - "@gogol/faq package exists with Zod schema, Astro collection factory, and loader"
   - "faq.validate command in site-kernel-checks validates FAQ entries and no-ops when FAQ collection is absent"
-  - "12 FAQ files (6 DE + 6 UK) restored to systems/webgogol-com/src/content/faq/{lang}/"
+  - "12 FAQ files (6 DE + 6 UK) restored to systems/warpgogol-com/src/content/faq/{lang}/"
   - "df-start.md carries governance block with fieldClaims migrated from legacy claims-sidecar"
   - "content.config.ts template includes FAQ collection by default"
   - "faq-list-section renders FAQ entries from the new collection"
@@ -78,9 +78,9 @@ nonGoals:
 #   - probe: file-exists
 #     path: "packages/faq/src/astro.ts"
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/faq/de/df-start.md"
+#     path: "systems/warpgogol-com/src/content/faq/de/df-start.md"
 #   - probe: file-exists
-#     path: "systems/webgogol-com/src/content/faq/uk/df-start.md"
+#     path: "systems/warpgogol-com/src/content/faq/uk/df-start.md"
 ---
 
 # RFC-0475: Pluggable FAQ content module and content recovery
@@ -91,7 +91,7 @@ RFC-0471 deleted the legacy `business/{lang}/faq/` directory containing 12 struc
 
 ## Decision
 
-Create a new `@gogol/faq` workspace package that owns the FAQ content collection: Zod schema, Astro collection factory (`createFaqCollection`), loader functions (`getFaqEntries`, `getFaqEntriesByTags`), and `FaqEntry` type. Add a `faq.validate` command to `site-kernel-checks` (no-op when FAQ directory is absent). Update `content.config.ts` and `astro.config.mjs` templates to include FAQ collection by default. Recover 12 legacy FAQ files to `systems/webgogol-com/src/content/faq/{lang}/`, migrating the one claims-sidecar (`df-start.claims.yaml`) into a frontmatter `governance` block.
+Create a new `@gogol/faq` workspace package that owns the FAQ content collection: Zod schema, Astro collection factory (`createFaqCollection`), loader functions (`getFaqEntries`, `getFaqEntriesByTags`), and `FaqEntry` type. Add a `faq.validate` command to `site-kernel-checks` (no-op when FAQ directory is absent). Update `content.config.ts` and `astro.config.mjs` templates to include FAQ collection by default. Recover 12 legacy FAQ files to `systems/warpgogol-com/src/content/faq/{lang}/`, migrating the one claims-sidecar (`df-start.claims.yaml`) into a frontmatter `governance` block.
 
 ## Architectural fit
 
@@ -130,7 +130,7 @@ Optional tag filtering is done in the route handler via `getFaqEntriesByTags(lan
 
 ## Context
 
-RFC-0471 deleted `packages/business/` and `systems/webgogol-com/src/content/business/` as part of the PBP cutover. RFC-0474 recovered most lost content (UK translations, claims-sidecars, portrait asset, site-level metadata, CKL ledger subjects). However, FAQ content was explicitly deferred:
+RFC-0471 deleted `packages/business/` and `systems/warpgogol-com/src/content/business/` as part of the PBP cutover. RFC-0474 recovered most lost content (UK translations, claims-sidecars, portrait asset, site-level metadata, CKL ledger subjects). However, FAQ content was explicitly deferred:
 
 > RFC-0474 nonGoals: "Does not implement the FAQ module — FAQ will be delivered as a separate pluggable module in a future RFC."
 
@@ -324,11 +324,11 @@ Add to ownership table:
 
 Detailed agent guide covering: scope, public API, content location, validation, integration with `faq-list-section`, and non-goals.
 
-## Part B: Content recovery (webgogol-com)
+## Part B: Content recovery (warpgogol-com)
 
 ### Legacy FAQ files
 
-12 files recovered from `ce8e6f7ee~1:apps/webgogol-com/src/content/business/{lang}/faq/`:
+12 files recovered from `ce8e6f7ee~1:apps/warpgogol-com/src/content/business/{lang}/faq/`:
 
 | Language | Files |
 | --- | --- |
@@ -337,7 +337,7 @@ Detailed agent guide covering: scope, public API, content location, validation, 
 
 ### Content location
 
-Restored to `systems/webgogol-com/src/content/faq/{lang}/`.
+Restored to `systems/warpgogol-com/src/content/faq/{lang}/`.
 
 ### Claims-sidecar migration
 
@@ -397,11 +397,11 @@ UK FAQ files use Ukrainian text from legacy `business/uk/faq/` files as the prim
 
 ### Part B — Content recovery
 
-- **Step 9 — Restore DE FAQ files:** Recover 6 DE files from `ce8e6f7ee~1` to `systems/webgogol-com/src/content/faq/de/`.
-- **Step 10 — Restore UK FAQ files:** Recover 6 UK files from `ce8e6f7ee~1` to `systems/webgogol-com/src/content/faq/uk/`.
+- **Step 9 — Restore DE FAQ files:** Recover 6 DE files from `ce8e6f7ee~1` to `systems/warpgogol-com/src/content/faq/de/`.
+- **Step 10 — Restore UK FAQ files:** Recover 6 UK files from `ce8e6f7ee~1` to `systems/warpgogol-com/src/content/faq/uk/`.
 - **Step 11 — Migrate claims-sidecar:** Add `governance.fieldClaims` block to `df-start.md` (DE + UK) from legacy `df-start.claims.yaml`.
-- **Step 12 — Verify:** Run `faq.validate` and `pnpm --filter webgogol-com build` to confirm no regressions.
-- **Step 13 — Sync:** Run `sternsystem.sync --id webgogol-com` to push to mirror.
+- **Step 12 — Verify:** Run `faq.validate` and `pnpm --filter warpgogol-com build` to confirm no regressions.
+- **Step 13 — Sync:** Run `sternsystem.sync --id warpgogol-com` to push to mirror.
 - **Step 14 — Commit:** Single commit with package + content + templates + docs.
 
 ## Risks
@@ -438,14 +438,14 @@ UK FAQ files use Ukrainian text from legacy `business/uk/faq/` files as the prim
 - [x] `content.config.template.ts` (both codegen and onboarding) includes `createFaqCollection()` and spreads FAQ collection into `collections` (evidence: packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/content.config.template.ts:31,77,87, packages/os/site-kernel-onboarding/src/templates/runtime/content.config.template.ts:24,66,76)
 - [x] `astro.config.template.mjs` (onboarding) includes `@gogol/faq` in `optimizeDeps.exclude` (ssr.noExternal already covered by regex) (evidence: packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs:101)
 
-### Site-level (webgogol-com)
+### Site-level (warpgogol-com)
 
-- [x] `systems/webgogol-com/src/content/faq/de/` contains 6 FAQ files with Ukrainian-compatible structure (evidence: systems/webgogol-com/src/content/faq/de/ — 6 files recovered from git ce8e6f7ee~1, gitignored under systems/\*)
-- [x] `systems/webgogol-com/src/content/faq/uk/` contains 6 FAQ files with Ukrainian text from legacy UK sources (evidence: systems/webgogol-com/src/content/faq/uk/ — 6 files recovered from git ce8e6f7ee~1, gitignored under systems/\*)
-- [x] `systems/webgogol-com/src/content/faq/de/df-start.md` has `governance.fieldClaims.question` block migrated from legacy `df-start.claims.yaml` (evidence: systems/webgogol-com/src/content/faq/de/df-start.md:11-16)
-- [x] `systems/webgogol-com/src/content/faq/uk/df-start.md` has `governance.fieldClaims.question` block migrated from legacy `df-start.claims.yaml` (evidence: systems/webgogol-com/src/content/faq/uk/df-start.md:11-16)
-- [x] `faq.validate` passes on webgogol-com (evidence: mission webgogol-com-m000005 materialized; `pnpm exec site-kernel run faq.validate --site webgogol-com` — [OK] faq.validate: OK — 12 FAQ entry/entries conform; also passes as step 84/177 in build.check pipeline)
-- [x] `pnpm --filter webgogol-com build` succeeds (evidence: mission webgogol-com-m000005 materialized; `pnpm exec site-kernel pipeline build.check --site webgogol-com` — DONE 177/177 steps; FAQ collection syncs correctly with Astro content collections after asOf date quoting fix; pre-existing astro check type errors and missing business/de/offer content reference are unrelated to RFC-0475)
+- [x] `systems/warpgogol-com/src/content/faq/de/` contains 6 FAQ files with Ukrainian-compatible structure (evidence: systems/warpgogol-com/src/content/faq/de/ — 6 files recovered from git ce8e6f7ee~1, gitignored under systems/\*)
+- [x] `systems/warpgogol-com/src/content/faq/uk/` contains 6 FAQ files with Ukrainian text from legacy UK sources (evidence: systems/warpgogol-com/src/content/faq/uk/ — 6 files recovered from git ce8e6f7ee~1, gitignored under systems/\*)
+- [x] `systems/warpgogol-com/src/content/faq/de/df-start.md` has `governance.fieldClaims.question` block migrated from legacy `df-start.claims.yaml` (evidence: systems/warpgogol-com/src/content/faq/de/df-start.md:11-16)
+- [x] `systems/warpgogol-com/src/content/faq/uk/df-start.md` has `governance.fieldClaims.question` block migrated from legacy `df-start.claims.yaml` (evidence: systems/warpgogol-com/src/content/faq/uk/df-start.md:11-16)
+- [x] `faq.validate` passes on warpgogol-com (evidence: mission warpgogol-com-m000005 materialized; `pnpm exec site-kernel run faq.validate --site warpgogol-com` — [OK] faq.validate: OK — 12 FAQ entry/entries conform; also passes as step 84/177 in build.check pipeline)
+- [x] `pnpm --filter warpgogol-com build` succeeds (evidence: mission warpgogol-com-m000005 materialized; `pnpm exec site-kernel pipeline build.check --site warpgogol-com` — DONE 177/177 steps; FAQ collection syncs correctly with Astro content collections after asOf date quoting fix; pre-existing astro check type errors and missing business/de/offer content reference are unrelated to RFC-0475)
 
 ### Documentation-level
 

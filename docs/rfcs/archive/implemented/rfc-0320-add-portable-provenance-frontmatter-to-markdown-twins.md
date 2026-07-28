@@ -64,11 +64,11 @@ Every generated Markdown twin begins with YAML frontmatter carrying portable pro
 
 ```yaml
 ---
-canonical: "https://webgogol.com/preis/"
+canonical: "https://warpgogol.com/preis/"
 language: "de"
 lastModified: "2026-07-05"
 contentHash: "sha256:<hex>"
-license: "https://webgogol.com/ai.txt"
+license: "https://warpgogol.com/ai.txt"
 generator: "page.markdown.generate"
 sourceKind: "page"
 ---

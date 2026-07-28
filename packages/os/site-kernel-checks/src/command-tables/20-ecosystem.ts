@@ -120,7 +120,7 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
   {
     name: "template.imports.validate",
     description:
-      "Validate that all @warpgogol/* and @webgogol/* imports in template files are resolvable from root package.json devDependencies, and run pnpm install --frozen-lockfile to detect lockfile drift (RFC-0557).",
+      "Validate that all @warpgogol/* and @warpgogol/* imports in template files are resolvable from root package.json devDependencies, and run pnpm install --frozen-lockfile to detect lockfile drift (RFC-0557).",
     scope: "workspace",
     flags: {},
     reads: ["packages/os/*/src/templates/**/*.template.*", "package.json", "pnpm-lock.yaml"],
@@ -129,14 +129,14 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
   {
     name: "workpiece.imports.validate",
     description:
-      "Validate that all @warpgogol/* and @webgogol/* imports in materialized workpiece files resolve from root node_modules (RFC-0557).",
+      "Validate that all @warpgogol/* and @warpgogol/* imports in materialized workpiece files resolve from root node_modules (RFC-0557).",
     scope: "workspace",
     flags: {},
     reads: [
       "missions/*/workpiece/tools/**/*.ts",
       "missions/*/workpiece/src/**/*.{ts,mjs,astro}",
       "node_modules/@warpgogol/*",
-      "node_modules/@webgogol/*",
+      "node_modules/@warpgogol/*",
     ],
     execute: runWorkpieceImportsValidate,
   },

@@ -176,7 +176,7 @@ pnpm exec site-kernel run archetype.registry.validate
 pnpm exec site-kernel run cosmic.name.pick \
   --catalog planet \
   --archetype trust-strip \
-  --exclude-used apps/webgogol-handwerk/src/content/system.md \
+  --exclude-used apps/warpgogol-handwerk/src/content/system.md \
   --json
 ```
 
@@ -249,7 +249,7 @@ Outputs a markdown table sorted by similarity. Findings at similarity ≥ 0.85 a
 Reads the agent's `onboarding/.output/03-compose/site-plan.md` plus the chosen biome and writes the _final_ `apps/<id>/src/content/system.md`. The site-plan markdown is a structured-but-readable document the agent authors during compose; it has a strict heading and list shape so the compiler can parse it. Example:
 
 ```markdown
-# Site plan — webgogol-handwerk
+# Site plan — warpgogol-handwerk
 
 ## Biome
 handwerk-material-warm

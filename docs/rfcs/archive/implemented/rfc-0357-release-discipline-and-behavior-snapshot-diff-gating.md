@@ -108,7 +108,7 @@ Release IDs follow the format `<system-id>-r<NNNNNN>`:
 - `-r`: literal separator
 - `<NNNNNN>`: zero-padded six-digit sequence number, starting at `000001`, scoped to the Sternsystem
 
-Examples: `webgogol-com-r000001`, `webgogol-com-r000002`.
+Examples: `warpgogol-com-r000001`, `warpgogol-com-r000002`.
 
 The sequence number is **per-system**, allocated under the RFC-0362 `system:<system-id>` lock and derived from the release registry plus Bordbuch (highest `r<NNNNNN>` + 1). A repeated `release.prepare` with the same operation id returns the existing release candidate instead of allocating a second id.
 
@@ -532,15 +532,15 @@ export const BehaviorSnapshotDiffSchema = z.object({
   "command": "release.prepare",
   "status": "pass",
   "data": {
-    "releaseId": "webgogol-com-r000001",
-    "systemId": "webgogol-com",
-    "missionId": "webgogol-com-m000001",
+    "releaseId": "warpgogol-com-r000001",
+    "systemId": "warpgogol-com",
+    "missionId": "warpgogol-com-m000001",
     "semver": "1.0.0",
     "state": "prepared",
     "snapshotDiffVerdict": "pass",
     "behaviorSnapshotHash": "sha256:abc123..."
   },
-  "summary": "[release.prepare] webgogol-com-r000001 prepared (snapshot diff: pass)"
+  "summary": "[release.prepare] warpgogol-com-r000001 prepared (snapshot diff: pass)"
 }
 ```
 
@@ -609,7 +609,7 @@ export const BehaviorSnapshotDiffSchema = z.object({
 7. Implement `release.prepare` (production build + snapshot capture + diff).
 8. Implement `release.publish` (discipline gates + RFC-0363 artifact store put + Bordbuch append + registry update).
 9. Implement `release.validate` + `release.list` + `release.rollback`.
-10. **Pilot**: prepare and publish a release for `webgogol-com` after the pilot mission (RFC-0356) closes.
+10. **Pilot**: prepare and publish a release for `warpgogol-com` after the pilot mission (RFC-0356) closes.
 11. Add DNA-48 to `docs/architecture-dna.md`.
 12. Run `build:check` to verify no regression.
 
@@ -653,7 +653,7 @@ export const BehaviorSnapshotDiffSchema = z.object({
 - [x] `release.publish` stores the production dist in RFC-0363 artifact storage before updating registry `lastRelease` (deferred — artifact.store.put integration not yet wired into publish) (evidence: implemented historically)
 - [x] `release.publish` appends `release-published` entry to Bordbuch and updates registry `lastRelease` (evidence: implemented historically)
 - [x] Release IDs follow `<system-id>-r<NNNNNN>` format (kebab-case, lowercase, latin-only) (evidence: implemented historically)
-- [x] Pilot: prepare and publish a release for `webgogol-com` after pilot mission closes (deferred) (evidence: implemented historically)
+- [x] Pilot: prepare and publish a release for `warpgogol-com` after pilot mission closes (deferred) (evidence: implemented historically)
 - [x] DNA-48 added to `docs/architecture-dna.md` (deferred) (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `rfc.validate` passes on this file (evidence: implemented historically)
 

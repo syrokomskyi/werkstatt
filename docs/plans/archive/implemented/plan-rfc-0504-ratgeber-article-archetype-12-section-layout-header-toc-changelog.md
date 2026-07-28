@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/site-kernel-checks"
@@ -127,7 +127,7 @@ scope:
 
 ### Step 3. Rewrite bakeRatgeberArticle for 12-section layout
 
-**Goal:** Replace the current 5-block baker with the 12-section layout: breadcrumbs → article-header → direct-answer → TOC → main analysis → practical tool → limitations → Webgogol connection → sources → authorship/review → changelog → contextual next step (CTA).
+**Goal:** Replace the current 5-block baker with the 12-section layout: breadcrumbs → article-header → direct-answer → TOC → main analysis → practical tool → limitations → Warpgogol connection → sources → authorship/review → changelog → contextual next step (CTA).
 
 **Agent actions:**
 
@@ -160,7 +160,7 @@ scope:
 
 - Edit `packages/os/site-kernel-checks/src/ratgeber-article-validate.ts`:
   - **RG-ART-07**: Check prose body for H1 headings (`^# ` outside fenced code blocks and HTML comments). Error severity.
-  - **RG-ART-08**: Check `articleSections` entries are from the valid set (`direct-answer`, `definitions`, `analysis`, `example`, `checklist`, `limitations`, `sources`, `webgogol-connection`). Error severity.
+  - **RG-ART-08**: Check `articleSections` entries are from the valid set (`direct-answer`, `definitions`, `analysis`, `example`, `checklist`, `limitations`, `sources`, `warpgogol-connection`). Error severity.
   - **RG-ART-09**: Check `changelog` entries have `date`, `summary`, `authorId`; `authorId` must resolve to an author record (reuse RFC-0502's author resolution). Error severity.
   - **RG-ART-10**: Check `secondaryCta.target` is a valid internal URL (starts with `/` or `#`). Error severity.
 - Implement H1 detection that skips fenced code blocks (`...`) and HTML comments (`<!-- ... -->`).
@@ -301,7 +301,7 @@ scope:
 **Agent actions:**
 
 - Verify each acceptance criterion in the RFC against the implemented code. Mark `[x]` for verified criteria.
-- Run `pnpm exec site-kernel run ratgeber.article.validate --site webgogol-com --json` — must pass.
+- Run `pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json` — must pass.
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0504` — must pass.
 - Run `pnpm --filter @gogol/ontology build:check` — must pass.
 - Run `pnpm --filter @gogol/site-kernel-checks build:check` — must pass.
@@ -331,7 +331,7 @@ scope:
 - `pnpm --filter @gogol/ui build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run ratgeber.article.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 

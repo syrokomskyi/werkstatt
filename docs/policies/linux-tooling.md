@@ -1,6 +1,6 @@
 # Linux Development Tooling
 
-This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX environment with native GNU coreutils. For a generic, reusable setup path on Windows, run the `windows-ai-tooling` skill (shipped via `@webgogol/forge`).
+This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX environment with native GNU coreutils. For a generic, reusable setup path on Windows, run the `windows-ai-tooling` skill (shipped via `@warpgogol/forge`).
 
 ## Tool inventory
 
@@ -141,9 +141,9 @@ set enable-bracketed-paste off
 
 Restart the terminal or run `exec bash` to apply. This is a per-user setting — no `sudo` needed.
 
-## Cross-platform exception: @webgogol/forge
+## Cross-platform exception: @warpgogol/forge
 
-`@webgogol/forge` is published to npm and must remain cross-platform. Its `windows-ai-tooling` skill and any Windows-specific logic in `packages/forge/` must be preserved for consumers running on Windows. The rest of the monorepo assumes Linux.
+`@warpgogol/forge` is published to npm and must remain cross-platform. Its `windows-ai-tooling` skill and any Windows-specific logic in `packages/forge/` must be preserved for consumers running on Windows. The rest of the monorepo assumes Linux.
 
 ## Post-migration checklist
 

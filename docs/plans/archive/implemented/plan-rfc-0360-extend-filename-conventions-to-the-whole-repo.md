@@ -220,7 +220,7 @@ scope:
 - Run `pnpm exec site-kernel run rfc.validate RFC-0360 --json`.
 - Run `pnpm -s run build:check` (or the repository's equivalent root command).
 - Run `pnpm exec site-kernel run packages-check.run --json`.
-- Run `pnpm exec site-kernel run apps-check.author --app webgogol-com --json` (or another representative app) to confirm the app-scoped pipeline still passes.
+- Run `pnpm exec site-kernel run apps-check.author --app warpgogol-com --json` (or another representative app) to confirm the app-scoped pipeline still passes.
 
 **Validation:**
 
@@ -261,7 +261,7 @@ scope:
 - `pnpm exec site-kernel run docs.commands.validate --json`
 - `pnpm -s run build:check`
 - `pnpm exec site-kernel run packages-check.run --json`
-- `pnpm exec site-kernel run apps-check.author --app webgogol-com --json` (representative app)
+- `pnpm exec site-kernel run apps-check.author --app warpgogol-com --json` (representative app)
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0360` (only if acceptance probes are added)
 
 ### 4.2 Evidence artifacts

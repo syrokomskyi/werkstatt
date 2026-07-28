@@ -60,8 +60,8 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `pnpm exec site-kernel run rfc.validate` — must pass on RFC-0546
-- `pnpm --filter @webgogol/forge run build:check` — typecheck must pass
-- `pnpm --filter @webgogol/forge run test` — unit tests must pass
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
+- `pnpm --filter @warpgogol/forge run test` — unit tests must pass
 - `pnpm exec site-kernel run forge.skill.validate` — must pass on redesigned forge-bootstrap skill
 
 ## 3. Step sequence
@@ -78,9 +78,9 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 
-**Completion criterion:** `MigrationAdapter`, `AdapterAnalysis`, `MigrationResult`, and `Conflict` interfaces are defined and exported from `@webgogol/forge`
+**Completion criterion:** `MigrationAdapter`, `AdapterAnalysis`, `MigrationResult`, and `Conflict` interfaces are defined and exported from `@warpgogol/forge`
 
 **Human review:** no
 
@@ -98,7 +98,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 - Existing `forge.yaml` files without `migrationAdapters` still pass validation
 
 **Completion criterion:** `forgeConfigSchema` includes optional `migrationAdapters` field; existing `forge.yaml` files validate unchanged
@@ -121,7 +121,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 
 **Completion criterion:** `node-typescript-pnpm` adapter implements all four phases with correct detection and binding derivation
 
@@ -143,7 +143,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 
 **Completion criterion:** `phaser-pnpm` adapter implements all four phases with correct Phaser detection
 
@@ -164,7 +164,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 
 **Completion criterion:** Registry exists with `getAdapters()` and `detectAdapter()` functions, supports built-in + config-discovered adapters
 
@@ -185,7 +185,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 - `forge --help` does not list `forge.init`
 
 **Completion criterion:** `forge.init` is not registered as a CLI command; `runInit()` remains in `src/onboarding/init.ts`
@@ -230,7 +230,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 - `grep -r "forge.init\|forge init" packages/forge/README.md packages/forge/AGENTS.md AGENTS.md packages/forge/src/config/forge-config.ts packages/forge/src/onboarding/upgrade.ts packages/forge/bin/cli.ts` returns zero matches (excluding CHANGE_SUMMARY comments which are historical)
 
 **Completion criterion:** Zero `forge.init` references in user-facing documentation and error messages across all listed files
@@ -251,8 +251,8 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
-- `pnpm --filter @webgogol/forge run test` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run test` passes
 
 **Completion criterion:** `forge.doctor` has zero "forge init" suggestions; migration-adapter registry check exists
 
@@ -275,7 +275,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run test` passes
+- `pnpm --filter @warpgogol/forge run test` passes
 
 **Completion criterion:** All test files pass; coverage includes detect/analyze/migrate/postSetup for both adapters, registry discovery, conflict resolution, forge-protected file enforcement
 
@@ -300,8 +300,8 @@ scope:
 
 - `git status` — no uncommitted changes from the current session
 - `pnpm exec site-kernel run rfc.validate` passes on RFC-0546
-- `pnpm --filter @webgogol/forge run build:check` passes
-- `pnpm --filter @webgogol/forge run test` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run test` passes
 - `pnpm exec site-kernel run forge.skill.validate` passes
 - Review report exists in `docs/reviews/code/` for this session
 
@@ -314,8 +314,8 @@ scope:
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate` — must pass on RFC-0546
-- `pnpm --filter @webgogol/forge run build:check` — typecheck must pass
-- `pnpm --filter @webgogol/forge run test` — unit tests must pass
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
+- `pnpm --filter @warpgogol/forge run test` — unit tests must pass
 - `pnpm exec site-kernel run forge.skill.validate` — must pass on redesigned forge-bootstrap skill
 
 ### 4.2 Evidence artifacts

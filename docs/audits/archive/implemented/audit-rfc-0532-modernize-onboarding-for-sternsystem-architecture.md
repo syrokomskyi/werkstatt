@@ -76,7 +76,7 @@ Pass with 2 warnings (V-12): `RFC-0532.supersedes` includes RFC-0070 and RFC-007
 
 ## Axis G — Blind spots
 
-- **`onboarding/.input/amend-001/` contains 13 active legal-text files** (AGB, datenschutz, impressum, widerruf in de/uk). The RFC says to delete all of `onboarding/.input/` (rollout step 1), but `webgogol-com` has `currentMission: webgogol-com-m000013`. If these amend materials were input to an active or recent mission, deleting them loses provenance. The RFC should confirm these materials are fully consumed and no longer needed.
+- **`onboarding/.input/amend-001/` contains 13 active legal-text files** (AGB, datenschutz, impressum, widerruf in de/uk). The RFC says to delete all of `onboarding/.input/` (rollout step 1), but `warpgogol-com` has `currentMission: warpgogol-com-m000013`. If these amend materials were input to an active or recent mission, deleting them loses provenance. The RFC should confirm these materials are fully consumed and no longer needed.
 
 - **`sternsystem.register` atomicity under concurrent registration.** The RFC mentions atomic staging and rollback (Risks §sternsystem.register atomicity) and references DNA-51 (Werkstatt consistency primitives), but doesn't describe how two concurrent `sternsystem.register` calls for different system-ids are serialized. The existing implementation in `@gogol/site-kernel-handoff` uses `readRegistry`/`writeRegistry` — does the RFC's extended version need a lock?
 

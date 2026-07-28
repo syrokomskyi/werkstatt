@@ -64,7 +64,7 @@ This is the root cause of the Wave 3 blocker in [RFC-0033](RFC-0033-retire-app-l
 
 The types have no app-specific data. `BrandLabelComponentContent` is `{ brandLabel: string; brandAriaLabel: string; brandTagline?: string }` — identical regardless of which client uses the component. The only app-specific thing is the _content values_ in `.md` files, not the _shape type_.
 
-[RFC-0022](RFC-0022-extract-shared-site-utilities-to-webgogol-share.md) and [RFC-0029](RFC-0029-greenfield-rebuild-and-client-onboarding-playbook.md) both establish that component code lives in `packages/ui`. Content-shape types are part of that component's contract.
+[RFC-0022](RFC-0022-extract-shared-site-utilities-to-warpgogol-share.md) and [RFC-0029](RFC-0029-greenfield-rebuild-and-client-onboarding-playbook.md) both establish that component code lives in `packages/ui`. Content-shape types are part of that component's contract.
 
 ## Problem
 

@@ -68,7 +68,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -214,12 +214,12 @@ No new command output. The observable output change is in the rendered JSON-LD `
 ```json
 {
   "@type": ["Organization", "ProfessionalService"],
-  "@id": "https://webgogol.com/#organization",
-  "name": "Webgogol",
+  "@id": "https://warpgogol.com/#organization",
+  "name": "Warpgogol",
   "sameAs": [
     "https://www.wikidata.org/wiki/Q123456",
-    "https://linkedin.com/company/webgogol",
-    "https://github.com/webgogol"
+    "https://linkedin.com/company/warpgogol",
+    "https://github.com/warpgogol"
   ]
 }
 ```

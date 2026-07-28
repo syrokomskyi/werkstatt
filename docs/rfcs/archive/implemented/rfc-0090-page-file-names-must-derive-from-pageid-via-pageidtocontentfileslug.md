@@ -25,7 +25,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-checks
   - os/site-kernel-onboarding
@@ -52,7 +52,7 @@ await getEntry("pages", `${lang}/${fileSlug}`);
 
 `pageIdToContentFileSlug("forHandwerker")` → `"for-handwerker"`, `pageIdToContentFileSlug("home")` → `"home"`, etc.
 
-During the May 2026 webgogol-com onboarding, three filenames diverged from this rule:
+During the May 2026 warpgogol-com onboarding, three filenames diverged from this rule:
 
 | pageId    | system.md routes.de | File the agent authored            | File the resolver wanted |
 | --------- | ------------------- | ---------------------------------- | ------------------------ |
@@ -97,7 +97,7 @@ pnpm exec site-kernel run content.pages.filename.validate --app <id>
 ### Output format
 
 ```
-[ERROR] apps/webgogol-com/src/content/pages/de/preis.md — frontmatter says
+[ERROR] apps/warpgogol-com/src/content/pages/de/preis.md — frontmatter says
         `pageId: pricing` but pageIdToContentFileSlug("pricing") is "pricing".
         Rename the file: `git mv preis.md pricing.md` (RFC-0090).
 ```
@@ -116,7 +116,7 @@ pnpm exec site-kernel run content.pages.filename.validate --app <id>
 
 1. Land the scaffold fix (`index.md` → `home.md`). Already in flight in the same change set as this RFC.
 2. Implement `content.pages.filename.validate`. Add to `APPS_CHECK_AUTHOR_PIPELINE`.
-3. Audit `apps/nicaragua-projekt` and `apps/webgogol-com` — they should all already follow the rule after this RFC's scaffold + author fixes.
+3. Audit `apps/nicaragua-projekt` and `apps/warpgogol-com` — they should all already follow the rule after this RFC's scaffold + author fixes.
 4. Document the rule in `packages/os/site-kernel-onboarding/AGENTS.md` (or wherever onboarding authoring guidance lives).
 
 ## Alternatives considered
@@ -126,15 +126,15 @@ pnpm exec site-kernel run content.pages.filename.validate --app <id>
 
 ## Risks
 
-- Existing apps with non-conforming filenames break on the next pnpm install. Mitigation: the RFC ships with renames for the only known case (`webgogol-com`); the validator's diagnostic includes the exact `git mv` command for any future drift.
+- Existing apps with non-conforming filenames break on the next pnpm install. Mitigation: the RFC ships with renames for the only known case (`warpgogol-com`); the validator's diagnostic includes the exact `git mv` command for any future drift.
 
 ## Acceptance criteria
 
 - [x] `onboarding.scaffold` writes `home.md` (not `index.md`). — `packages/os/site-kernel-onboarding/src/scaffold.ts` + boilerplate templates corrected per commit b87716f0. (evidence: packages/ directory, package exists)
 - [x] `content.pages.filename.validate` registered and wired into `APPS_CHECK_AUTHOR_PIPELINE`. — `packages/os/site-kernel-checks/src/content-filename.ts`; imported in `module.ts:157` and wired into author pipeline. (evidence: packages/ directory, package exists)
 - [x] Validator diagnostic includes the suggested `git mv` command. — `content-filename.ts` formats `git mv <from> <to>` per violation. (evidence: implemented historically)
-- [x] Both existing apps pass the new validator. — verified per commit b87716f0 (webgogol-com 19 files, nicaragua-projekt 10 files). (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] Regression seed: the May 2026 webgogol-com `preis.md`/`kontakt.md`/`index.md` cases fail validation in a fixture test. — covered by the validator's logic (`pageIdToContentFileSlug` mismatch detection) and confirmed by the renames in the May 2026 onboarding. (evidence: implemented historically)
+- [x] Both existing apps pass the new validator. — verified per commit b87716f0 (warpgogol-com 19 files, nicaragua-projekt 10 files). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Regression seed: the May 2026 warpgogol-com `preis.md`/`kontakt.md`/`index.md` cases fail validation in a fixture test. — covered by the validator's logic (`pageIdToContentFileSlug` mismatch detection) and confirmed by the renames in the May 2026 onboarding. (evidence: implemented historically)
 
 ## Implementation notes for agents
 

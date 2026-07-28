@@ -70,7 +70,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -233,8 +233,8 @@ export const MISSION_PREFLIGHT_WARNING: KernelPipelineStep[] = [
 ```json
 {
   "schemaVersion": "1.0.0",
-  "missionId": "webgogol-com-m000123",
-  "systemId": "webgogol-com",
+  "missionId": "warpgogol-com-m000123",
+  "systemId": "warpgogol-com",
   "criticalPassed": true,
   "criticalResults": [
     { "command": "content-types.validate", "ok": true, "exitCode": 0, "summary": "all valid" }
@@ -253,11 +253,11 @@ Bordbuch entry for `--skip-preflight` (appended via `appendBordbuchEntry` with `
 {
   "schemaVersion": "1.0.0",
   "id": "event-000007",
-  "systemId": "webgogol-com",
+  "systemId": "warpgogol-com",
   "occurredAt": "2026-07-24T08:30:00.000Z",
   "kind": "preflight-skipped",
   "status": "done",
-  "missionId": "webgogol-com-m000123",
+  "missionId": "warpgogol-com-m000123",
   "releaseId": null,
   "actor": "agent",
   "summary": "Preflight content quality gate skipped via --skip-preflight flag",

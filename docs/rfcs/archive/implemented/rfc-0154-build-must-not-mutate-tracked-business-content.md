@@ -25,7 +25,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-checks
   - os/site-kernel-onboarding
@@ -41,7 +41,7 @@ nonGoals:
 
 ## Context
 
-During the 2026-06 audit it was observed (and recorded in the ecosystem-findings notes) that a plain `pnpm build` rewrites tracked, hand-authored business content. On `apps/webgogol-com` the build replaced `NEED_THIS_*` markers in `src/content/business/de/{legal,company}.md` with real values for some fields and **blanked others to `""`**. Two invariants break:
+During the 2026-06 audit it was observed (and recorded in the ecosystem-findings notes) that a plain `pnpm build` rewrites tracked, hand-authored business content. On `apps/warpgogol-com` the build replaced `NEED_THIS_*` markers in `src/content/business/de/{legal,company}.md` with real values for some fields and **blanked others to `""`**. Two invariants break:
 
 1. **Build idempotency / clean tree.** A build must be a pure function of the source tree; it must not modify tracked inputs. A dirty tree after `build` hides real diffs and breaks CI clean-tree checks.
 2. **The legal-data safety gate.** `semantic.page.validate` relies on the presence of `NEED_THIS_*` markers to fail production builds when mandatory legal fields (Steuernummer, IBAN, Impressum address, …) are still unfilled (RFC-0042). A build step that **blanks** a marker to `""` removes the very signal the gate checks → missing legal data could pass silently. For a studio shipping client sites this is a compliance risk, not a cosmetic bug.
@@ -58,8 +58,8 @@ Building a site MUST NOT modify any tracked file under `apps/*/src/content/busin
 
 ## Acceptance criteria
 
-- [x] The build step that rewrites `apps/webgogol-com/src/content/business/de/{legal,company}.md` is identified and no longer runs during `build`. — investigation finding: **no current `APPS_BUILD_PREPARE_PIPELINE` step mutates `src/content`** (verified: `build.prepare` on webgogol-com leaves the business tree byte-identical, 0 changes). The 2026-06-02 observation is not reproducible via the standard build — it was amend-pipeline-specific or already fixed. There is no current build-time mutator to remove; the guard below prevents regression. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] A clean `build.prepare` followed by a `src/content/**` snapshot reports no changes — proven by `content.idempotency.validate` passing on webgogol-com. (evidence: implemented historically)
+- [x] The build step that rewrites `apps/warpgogol-com/src/content/business/de/{legal,company}.md` is identified and no longer runs during `build`. — investigation finding: **no current `APPS_BUILD_PREPARE_PIPELINE` step mutates `src/content`** (verified: `build.prepare` on warpgogol-com leaves the business tree byte-identical, 0 changes). The 2026-06-02 observation is not reproducible via the standard build — it was amend-pipeline-specific or already fixed. There is no current build-time mutator to remove; the guard below prevents regression. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] A clean `build.prepare` followed by a `src/content/**` snapshot reports no changes — proven by `content.idempotency.validate` passing on warpgogol-com. (evidence: implemented historically)
 - [x] No build path may replace a `NEED_THIS_*` marker with an empty string; `content.idempotency.validate` flags marker removal as CRITICAL, and `semantic.page.validate` (unchanged) still fails production builds on unresolved markers. (evidence: implemented historically)
 - [x] `content.idempotency.validate` is registered (app-scoped): snapshots `src/content/**`, runs `APPS_BUILD_PREPARE_PIPELINE` once, and exits non-zero on any authored-content change. Opt-in for CI (it runs the full prepare pipeline), mirroring `pipeline.idempotency.smoke`'s design — it is the complementary guard the latter misses (smoke only proves pass-1 ≡ pass-2, so an identical-every-run mutation would slip through). (evidence: implemented historically)
 

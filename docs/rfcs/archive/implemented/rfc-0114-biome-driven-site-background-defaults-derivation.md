@@ -30,7 +30,7 @@ commands:
     - biome.tokens.derive
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - ontology

@@ -32,9 +32,9 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/observability"
   - "@gogol/site-kernel-observability"
@@ -85,9 +85,9 @@ Create **`backs/cf-analytics-poller`** (kind `scheduled-worker`, Node), co-locat
 ```jsonc
 [
   {
-    "siteId": "webgogol-com",          // must equal an apps/* workspace dir name
+    "siteId": "warpgogol-com",          // must equal an apps/* workspace dir name
     "zoneId": "<cloudflare zone id>",  // from the CF dashboard, not a secret
-    "workerScripts": ["webgogol-com"]  // wrangler `name`s attributed to this site
+    "workerScripts": ["warpgogol-com"]  // wrangler `name`s attributed to this site
   }
 ]
 ```

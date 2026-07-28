@@ -31,15 +31,15 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/site-kernel-checks"
 successSignals:
   - "HDRI (Handwerk Digital Readiness Index) data enters the system only as CKL claims with `provenance: external`, a Zenodo-DOI source binding, and a temporal validity window — never as an asserted/guessed fact."
-  - "An identity firewall guarantees `webgogol-com` contains no page, link, badge, or markup that presents HDRI as a studio project or brand; HDRI is cited strictly as an independent third-party source."
+  - "An identity firewall guarantees `warpgogol-com` contains no page, link, badge, or markup that presents HDRI as a studio project or brand; HDRI is cited strictly as an independent third-party source."
   - "Bedarfskarten and regional hubs may use HDRI-derived figures (e.g. regional digital-readiness statistics) as fact-dense, provenanced inputs feeding both SEO and GEO twins."
-  - "`hdri.firewall.validate` fails the build on any HDRI ownership/branding signal on webgogol-com, and on any HDRI-derived fact lacking external provenance + DOI + validity window."
+  - "`hdri.firewall.validate` fails the build on any HDRI ownership/branding signal on warpgogol-com, and on any HDRI-derived fact lacking external provenance + DOI + validity window."
   - "The arrangement removes the conflict of interest and strengthens E-E-A-T: an independent cited source is more credible than a self-proclaimed index."
 nonGoals:
   - "Does not build, host, or govern the HDRI project itself (HDRI is an institutionally separate gGmbH public good)."
@@ -53,7 +53,7 @@ nonGoals:
 
 ## Context
 
-The doctrine (`2026-06-24 Programmatic SEO`, §1.5, §7, §9.12) is explicit: **HDRI** (Handwerk Digital Readiness Index) is an external public good, institutionally separate from the studio (a gGmbH). The studio **uses** HDRI's public data like any citizen — citing it as an external source — but **never** brands HDRI as its own and **never** places ownership links to HDRI on `webgogol-com`. This simultaneously removes a conflict of interest and improves E-E-A-T (an independent source is more credible than a self-proclaimed metric).
+The doctrine (`2026-06-24 Programmatic SEO`, §1.5, §7, §9.12) is explicit: **HDRI** (Handwerk Digital Readiness Index) is an external public good, institutionally separate from the studio (a gGmbH). The studio **uses** HDRI's public data like any citizen — citing it as an external source — but **never** brands HDRI as its own and **never** places ownership links to HDRI on `warpgogol-com`. This simultaneously removes a conflict of interest and improves E-E-A-T (an independent source is more credible than a self-proclaimed metric).
 
 The platform already has the Content Knowledge Lifecycle (CKL, RFC-0211–0218): facts are **claims** with `provenance ∈ {external, derived, asserted, generated}`, a temporal validity window, and (for external) a source binding (RFC-0214). HDRI fits this model directly as an `external` source with a Zenodo-DOI binding. What is missing is (a) the canonical HDRI source descriptor and (b) an **identity firewall** check that forbids any HDRI branding/ownership signal on the studio site.
 
@@ -62,17 +62,17 @@ The platform already has the Content Knowledge Lifecycle (CKL, RFC-0211–0218):
 - **Conflict-of-interest risk.** Without a firewall, an agent or author could link HDRI as a studio asset, undermining both honesty and E-E-A-T.
 - **Unprovenanced figures.** HDRI-derived statistics (regional digital readiness) could be pasted as plain numbers, violating Anti-Fabrikation (doctrine §1.6) and CKL.
 - **No canonical source descriptor.** Each use of HDRI data could invent its own citation, fragmenting provenance.
-- **No enforcement.** Nothing checks that HDRI on `webgogol-com` is cited-only, never branded.
+- **No enforcement.** Nothing checks that HDRI on `warpgogol-com` is cited-only, never branded.
 
 ## Decision
 
-Adopt HDRI as a **single canonical external CKL source** and enforce an **identity firewall** on `webgogol-com`.
+Adopt HDRI as a **single canonical external CKL source** and enforce an **identity firewall** on `warpgogol-com`.
 
 1. **Canonical source descriptor** `external:hdri` (an RFC-0214 external source binding): name, Zenodo-DOI URL, license, and the validity-window policy for derived figures. Every HDRI-derived fact is a CKL claim with `provenance: external`, `source: external:hdri`, and an `asOf`/validity window.
 2. **Identity firewall (normative MAY/MUST-NOT):**
    - MAY: cite HDRI figures as provenanced claims; link to the Zenodo DOI as an external reference; render HDRI statistics in Bedarfskarten/regional hubs and their GEO twins.
    - MUST NOT: present HDRI as a studio project/brand; add HDRI ownership/affiliation links, logos, badges, or "our index" framing; mark HDRI as `provenance: asserted|generated`; emit HDRI markup that implies the studio authors/owns it.
-3. **New check `hdri.firewall.validate`** scans `webgogol-com` content/markup for HDRI ownership/branding signals and verifies every HDRI-derived fact carries the external provenance + DOI + validity window.
+3. **New check `hdri.firewall.validate`** scans `warpgogol-com` content/markup for HDRI ownership/branding signals and verifies every HDRI-derived fact carries the external provenance + DOI + validity window.
 4. **GEO benefit:** provenanced, fact-dense HDRI data is ideal fodder for GEO twins and `llms.txt` (RFC-0195) — an external cited source raises answer-engine trust.
 
 ## Architectural fit
@@ -96,7 +96,7 @@ doi: "https://doi.org/10.5281/zenodo.XXXXXXX"
 license: "CC-BY-4.0"
 # Derived figures carry their own asOf; HDRI releases define the validity window.
 validityPolicy: { defaultWindowDays: 540 }
-firewall: ownership-forbidden   # webgogol-com may cite, never brand
+firewall: ownership-forbidden   # warpgogol-com may cite, never brand
 ```
 
 A claim using it:
@@ -113,7 +113,7 @@ digitalReadinessBw:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run hdri.firewall.validate --app webgogol-com --json
+pnpm exec site-kernel run hdri.firewall.validate --app warpgogol-com --json
 ```
 
 App-scoped; runs in apps build-check.
@@ -124,7 +124,7 @@ App-scoped; runs in apps build-check.
 | --- | --- |
 | `packages/share/src/sources.ts` (or CKL source registry) | Registers the `external:hdri` source descriptor |
 | `packages/os/site-kernel-checks/src/hdri.ts` | Adds `hdri.firewall.validate` |
-| `apps/webgogol-com/src/content/**/*.claims.yaml` | HDRI-derived facts as external claims |
+| `apps/warpgogol-com/src/content/**/*.claims.yaml` | HDRI-derived facts as external claims |
 
 ### Output format
 
@@ -133,8 +133,8 @@ App-scoped; runs in apps build-check.
   "command": "hdri.firewall.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "hdri-ownership-signal", "where": "navigation/de/main.md", "message": "HDRI must be cited as external, not linked as a studio project" },
-    { "app": "webgogol-com", "rule": "unprovenanced-hdri-fact", "where": "surface/demands/de/wallbox.md", "message": "HDRI-derived figure lacks provenance:external + DOI + validity window" }
+    { "app": "warpgogol-com", "rule": "hdri-ownership-signal", "where": "navigation/de/main.md", "message": "HDRI must be cited as external, not linked as a studio project" },
+    { "app": "warpgogol-com", "rule": "unprovenanced-hdri-fact", "where": "surface/demands/de/wallbox.md", "message": "HDRI-derived figure lacks provenance:external + DOI + validity window" }
   ]
 }
 ```
@@ -146,7 +146,7 @@ App-scoped; runs in apps build-check.
 ## Rollout
 
 - **Source descriptor first.** Register `external:hdri`; document the firewall MAY/MUST-NOT in AGENTS.
-- **Adopt incrementally.** As HDRI figures are used in Bedarfskarten/regional hubs, they land as external claims; `hdri.firewall.validate` enforces from day one for `webgogol-com`.
+- **Adopt incrementally.** As HDRI figures are used in Bedarfskarten/regional hubs, they land as external claims; `hdri.firewall.validate` enforces from day one for `warpgogol-com`.
 - **Truth Monitor stays manual.** Proposing the source is an agent action; enabling monitoring/fetch is a human/operator action (RFC-0214).
 - **New apps** inherit the firewall rule via the shared check; sites that never cite HDRI pass trivially (no HDRI facts → nothing to enforce).
 - **Pipeline:** joins apps build-check.
@@ -168,16 +168,16 @@ App-scoped; runs in apps build-check.
 ## Acceptance criteria
 
 - [x] Canonical `external:hdri` source descriptor registered (Zenodo DOI, license, validity policy, `firewall: ownership-forbidden`). (`integrations/truth-sources/external-hdri.yaml`; the `sourceDescriptorSchema` in `@gogol/share/knowledge/source` gained optional `license`/`firewall` fields to carry them.) (evidence: packages/ directory, package exists)
-- [x] HDRI-derived facts modeled as CKL claims (`provenance: external`, `source: external:hdri`, validity window). No HDRI statistic is authored on `webgogol-com` yet (content authoring, not code); the validation mechanism for such a claim is in place via `hdri.firewall.validate`'s `unprovenanced-hdri-fact` rule, ready for the first authored HDRI fact. (evidence: implemented historically)
+- [x] HDRI-derived facts modeled as CKL claims (`provenance: external`, `source: external:hdri`, validity window). No HDRI statistic is authored on `warpgogol-com` yet (content authoring, not code); the validation mechanism for such a claim is in place via `hdri.firewall.validate`'s `unprovenanced-hdri-fact` rule, ready for the first authored HDRI fact. (evidence: implemented historically)
 - [x] `hdri.firewall.validate` registered (app scope), wired into apps build-check, with documented `--json` output and `hdri-ownership-signal` / `unprovenanced-hdri-fact` rules (fail-closed). (Both rules now implemented in `packages/os/site-kernel-checks/src/hdri-firewall.ts`; `unprovenanced-hdri-fact` scans `.claims.yaml` sidecars for any claim `sourceRef: external:hdri` lacking `provenance: external` + a validity window.) (evidence: packages/ directory, package exists)
 - [x] `AGENTS.md` documents the HDRI MAY/MUST-NOT firewall rules. (Root `AGENTS.md` § "HDRI identity firewall (RFC-0241)".) (evidence: AGENTS.md:1, agent guide updated)
-- [x] No HDRI ownership/branding signal exists anywhere on `webgogol-com`. (evidence: implemented historically)
+- [x] No HDRI ownership/branding signal exists anywhere on `warpgogol-com`. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status `accepted` (or `implemented`).
-- Never present HDRI as a studio brand/project or add HDRI ownership links/logos to `webgogol-com`; cite it only as an external source with its DOI.
+- Never present HDRI as a studio brand/project or add HDRI ownership links/logos to `warpgogol-com`; cite it only as an external source with its DOI.
 - Never mark an HDRI-derived fact as `asserted`/`generated`; it is always `provenance: external` with a validity window.
 - Enabling the HDRI Truth Monitor is a human/operator action, not an agent action.
 - Agents MUST reference this RFC id in commit messages when implementing.

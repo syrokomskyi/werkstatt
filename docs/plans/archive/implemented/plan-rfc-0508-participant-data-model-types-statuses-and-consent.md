@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/share"
     - "@gogol/site-kernel-checks"
@@ -57,8 +57,8 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `missions/webgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md` — migrator adds `participantType`, `status`, `visibility`, `relationshipType`, `consent` fields
-- `missions/webgogol-com-m000010/workpiece/src/content/people/uk/andrii-syrokomskyi.md` — same migration
+- `missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md` — migrator adds `participantType`, `status`, `visibility`, `relationshipType`, `consent` fields
+- `missions/warpgogol-com-m000010/workpiece/src/content/people/uk/andrii-syrokomskyi.md` — same migration
 
 ### 2.3 Documentation and specs
 
@@ -116,7 +116,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 
-**Completion criterion:** `participant.validate --site webgogol-com --json` runs (pass or fail depending on migration state); `people.validate` no longer registered.
+**Completion criterion:** `participant.validate --site warpgogol-com --json` runs (pass or fail depending on migration state); `people.validate` no longer registered.
 
 **Human review:** no
 
@@ -171,20 +171,20 @@ scope:
 
 ---
 
-### Step 5. Run migrator on webgogol-com workpiece
+### Step 5. Run migrator on warpgogol-com workpiece
 
 **Goal:** Transform existing Andrii Person records to Participant records.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run mission.migrate --mission webgogol-com-m000010` (or the appropriate mission for the current workpiece)
-- Verify `missions/webgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md` now has `participantType: human`, `status: active`, `visibility: public`, `relationshipType: founder`, `consent` record
-- Verify `missions/webgogol-com-m000010/workpiece/src/content/people/uk/andrii-syrokomskyi.md` same
+- Run `pnpm exec site-kernel run mission.migrate --mission warpgogol-com-m000010` (or the appropriate mission for the current workpiece)
+- Verify `missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md` now has `participantType: human`, `status: active`, `visibility: public`, `relationshipType: founder`, `consent` record
+- Verify `missions/warpgogol-com-m000010/workpiece/src/content/people/uk/andrii-syrokomskyi.md` same
 - Commit workpiece changes via `mission.git.commit`
 
 **Validation:**
 
-- `pnpm exec site-kernel run participant.validate --site webgogol-com --json` — passes
+- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json` — passes
 
 **Completion criterion:** Both Andrii records have participant fields; `participant.validate` passes.
 
@@ -222,7 +222,7 @@ scope:
 **Agent actions:**
 
 - Run full validation suite: `pnpm --filter @gogol/share run build:check`, `pnpm --filter @gogol/site-kernel-checks run build:check`, `pnpm --filter @gogol/site-kernel-handoff run build:check`, `pnpm --filter @gogol/ui run build:check`
-- Run `pnpm exec site-kernel run participant.validate --site webgogol-com --json` — passes
+- Run `pnpm exec site-kernel run participant.validate --site warpgogol-com --json` — passes
 - Run `pnpm exec site-kernel run migrator.registry.validate`
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0508`
 - Check off all acceptance criteria in the RFC with `(evidence: ...)` annotations
@@ -247,7 +247,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run participant.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run participant.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 

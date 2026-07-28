@@ -32,9 +32,9 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-observability"
   - "@gogol/site-kernel-onboarding"
@@ -55,7 +55,7 @@ acceptance:
     path: "packages/os/site-kernel-onboarding/src/templates/wrangler.template.jsonc"
     pattern: "\"destinations\": \\[\"signoz\"\\]"
   - probe: file-contains
-    path: "apps/webgogol-com/wrangler.jsonc"
+    path: "apps/warpgogol-com/wrangler.jsonc"
     pattern: "\"destinations\": \\[\"signoz\"\\]"
   - probe: run
     command: "site-kernel run observability.workers.validate --json"
@@ -69,7 +69,7 @@ acceptance:
 
 All runtime code in this ecosystem executes on Cloudflare Workers: each site is one Worker serving static assets plus a few on-demand API routes (RFC-0149), and additional workers live under `backs/*` (`matomo-proxy`) and `integrations/*` (`lagebild-sync-worker`). The wrangler configs already enable Workers observability **logs** (`observability.logs`, head sampling 1.0), but nothing exports **traces**, and nothing leaves the Cloudflare dashboard.
 
-Cloudflare Workers supports automatic tracing with export to any OTLP endpoint: a `traces` block inside the existing wrangler `observability` object references a named **destination**, and destinations (OTLP endpoint URL + custom headers) are configured once per Cloudflare account (see Cloudflare docs: Workers observability → Traces, and Exporting OpenTelemetry Data). RFC-0338 provides that endpoint: `https://ingest.observe.webgogol.com/v1/traces` guarded by the `WGOGOL_OTLP_TOKEN` bearer header.
+Cloudflare Workers supports automatic tracing with export to any OTLP endpoint: a `traces` block inside the existing wrangler `observability` object references a named **destination**, and destinations (OTLP endpoint URL + custom headers) are configured once per Cloudflare account (see Cloudflare docs: Workers observability → Traces, and Exporting OpenTelemetry Data). RFC-0338 provides that endpoint: `https://ingest.observe.warpgogol.com/v1/traces` guarded by the `WGOGOL_OTLP_TOKEN` bearer header.
 
 Site `wrangler.jsonc` files are GENERATED artifacts (RFC-0081/RFC-0336) owned by the onboarding template `packages/os/site-kernel-onboarding/src/templates/wrangler.template.jsonc` — the fleet-wide change is one template edit plus regeneration.
 
@@ -96,7 +96,7 @@ Site `wrangler.jsonc` files are GENERATED artifacts (RFC-0081/RFC-0336) owned by
 }
 ```
 
-2. **Create the Cloudflare account-level destination** named `signoz` (one-time dashboard step, documented in `backs/observability-stack/README.md`): type Traces, OTLP endpoint `https://ingest.observe.webgogol.com/v1/traces`, custom header `Authorization: Bearer <WGOGOL_OTLP_TOKEN>`.
+2. **Create the Cloudflare account-level destination** named `signoz` (one-time dashboard step, documented in `backs/observability-stack/README.md`): type Traces, OTLP endpoint `https://ingest.observe.warpgogol.com/v1/traces`, custom header `Authorization: Bearer <WGOGOL_OTLP_TOKEN>`.
 
 3. **Add `observability.workers.validate`** to `@gogol/site-kernel-observability`: an offline workspace validator that keeps every wrangler config inside this contract.
 

@@ -103,7 +103,7 @@ Mission IDs follow the format `<system-id>-m<NNNNNN>`:
 - `-m`: literal separator
 - `<NNNNNN>`: zero-padded six-digit sequence number, starting at `000001`, scoped to the Sternsystem
 
-Examples: `webgogol-com-m000001`, `webgogol-com-m000002`, `nicaragua-projekt-m000001`.
+Examples: `warpgogol-com-m000001`, `warpgogol-com-m000002`, `nicaragua-projekt-m000001`.
 
 The sequence number is **per-system**: each Sternsystem has its own `m000001`, `m000002`, ... counter. The counter is derived from the Bordbuch (the highest existing mission number + 1) while holding the RFC-0362 `system:<id>` and `registry` locks.
 
@@ -515,14 +515,14 @@ export const BordbuchEntrySchema = z.object({
   "command": "mission.open",
   "status": "pass",
   "data": {
-    "missionId": "webgogol-com-m000001",
-    "systemId": "webgogol-com",
+    "missionId": "warpgogol-com-m000001",
+    "systemId": "warpgogol-com",
     "state": "open",
     "brief": "Update hero section copy",
     "openedAt": "2026-07-09T12:00:00Z",
     "pinAtOpen": "4.5.0"
   },
-  "summary": "[mission.open] opened mission webgogol-com-m000001 for webgogol-com"
+  "summary": "[mission.open] opened mission warpgogol-com-m000001 for warpgogol-com"
 }
 ```
 
@@ -533,11 +533,11 @@ export const BordbuchEntrySchema = z.object({
   "command": "bordbuch.validate",
   "status": "pass",
   "data": {
-    "systemId": "webgogol-com",
+    "systemId": "warpgogol-com",
     "events": 5,
     "violations": []
   },
-  "summary": "[bordbuch.validate] webgogol-com: 5 entries, 0 violations"
+  "summary": "[bordbuch.validate] warpgogol-com: 5 entries, 0 violations"
 }
 ```
 
@@ -565,7 +565,7 @@ export const BordbuchEntrySchema = z.object({
 5. Register commands in `packages/os/site-kernel/src/registry.ts`.
 6. Implement `mission.open` + `mission.list` + `bordbuch.append` first (low-risk, no materialization dependency).
 7. Implement `mission.close` + `mission.abort` + `mission.status` + `bordbuch.validate`.
-8. **Pilot**: open a mission on the extracted `webgogol-com` Sternsystem, verify the Bordbuch entry is appended, then abort it.
+8. **Pilot**: open a mission on the extracted `warpgogol-com` Sternsystem, verify the Bordbuch entry is appended, then abort it.
 9. Add DNA-46 to `docs/architecture-dna.md`.
 10. Run `build:check` to verify no regression.
 
@@ -606,7 +606,7 @@ export const BordbuchEntrySchema = z.object({
 - [x] Bordbuch append-only invariant enforced by `bordbuch.validate` (evidence: implemented historically)
 - [x] `mission.open` updates `systems/registry.yaml` `currentMission` (evidence: implemented historically)
 - [x] `mission.close` and `mission.abort` clear `systems/registry.yaml` `currentMission` (evidence: implemented historically)
-- [x] Pilot: open and abort a mission on `webgogol-com` Sternsystem, verify Bordbuch entries (deferred — requires registered Sternsystem) (evidence: implemented historically)
+- [x] Pilot: open and abort a mission on `warpgogol-com` Sternsystem, verify Bordbuch entries (deferred — requires registered Sternsystem) (evidence: implemented historically)
 - [x] DNA-46 added to `docs/architecture-dna.md` (deferred) (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `rfc.validate` passes on this file (evidence: implemented historically)
 

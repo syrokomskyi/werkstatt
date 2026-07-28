@@ -37,7 +37,7 @@ commands:
     - apps-check.author
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
@@ -111,7 +111,7 @@ Material-credit warnings relate to RFC-0220, but this RFC does not change the cr
 ```sh
 pnpm exec site-kernel run warning.diagnostics.lint --json
 pnpm exec site-kernel run maintenance.debt.report --json
-pnpm exec site-kernel run apps-check.author --app webgogol-com --json
+pnpm exec site-kernel run apps-check.author --app warpgogol-com --json
 ```
 
 `warning.diagnostics.lint` is workspace-scoped and scans check modules for summary-only warning patterns.
@@ -190,7 +190,7 @@ interface MaintenanceDebtReport {
     {
       "sourceCommand": "material.credits.validate",
       "severity": "warning",
-      "app": "webgogol-com",
+      "app": "warpgogol-com",
       "ruleId": "material.credits.validate",
       "file": "src/content/prose/de/credits.md",
       "message": "Prose authored material has no authorship credit sidecar.",

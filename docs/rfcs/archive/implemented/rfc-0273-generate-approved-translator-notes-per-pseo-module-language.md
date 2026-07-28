@@ -35,7 +35,7 @@ commands:
     - surface.translation.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/surface"
@@ -151,11 +151,11 @@ The glossary is allowed to be AI-drafted, but it follows the same freeze-review-
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.translation.notes.generate --app webgogol-com --module pseo --target de
-pnpm exec site-kernel run surface.translation.notes.review --app webgogol-com --module pseo --target de
-pnpm exec site-kernel run surface.translation.notes.review --app webgogol-com --module pseo --target de --approve
-pnpm exec site-kernel run surface.translation.notes.validate --app webgogol-com --module pseo --json
-pnpm exec site-kernel run surface.translation.glossary.validate --app webgogol-com --module pseo --json
+pnpm exec site-kernel run surface.translation.notes.generate --app warpgogol-com --module pseo --target de
+pnpm exec site-kernel run surface.translation.notes.review --app warpgogol-com --module pseo --target de
+pnpm exec site-kernel run surface.translation.notes.review --app warpgogol-com --module pseo --target de --approve
+pnpm exec site-kernel run surface.translation.notes.validate --app warpgogol-com --module pseo --json
+pnpm exec site-kernel run surface.translation.glossary.validate --app warpgogol-com --module pseo --json
 ```
 
 ### Validation rules
@@ -182,7 +182,7 @@ pnpm exec site-kernel run surface.translation.glossary.validate --app webgogol-c
 
 1. Add note schema and validation.
 2. Add glossary schema and validation.
-3. Generate a `pseo/de` translator note and glossary for `webgogol-com` from the Ukrainian master context.
+3. Generate a `pseo/de` translator note and glossary for `warpgogol-com` from the Ukrainian master context.
 4. Review and approve the note and glossary manually.
 5. Make `surface.translation.generate` refuse target-language generation without approved required note/glossary artifacts.
 6. Add approved examples back into the note after the first few translations are reviewed.
@@ -208,7 +208,7 @@ pnpm exec site-kernel run surface.translation.glossary.validate --app webgogol-c
 - [x] `surface.translation.notes.generate`, `surface.translation.notes.review`, and `surface.translation.notes.validate` are registered. (evidence: implemented historically)
 - [x] Notes and glossaries carry provenance, approval state, source language, target language, and moduleContextHash. (evidence: implemented historically)
 - [x] `surface.translation.generate` requires approved, current note/glossary artifacts unless an explicit draft-only override is used. (evidence: implemented historically)
-- [x] `webgogol-com` has approved `pseo/de` translator note and glossary artifacts before PSEO translation generation is enabled. (evidence: implemented historically)
+- [x] `warpgogol-com` has approved `pseo/de` translator note and glossary artifacts before PSEO translation generation is enabled. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Implementation notes for agents

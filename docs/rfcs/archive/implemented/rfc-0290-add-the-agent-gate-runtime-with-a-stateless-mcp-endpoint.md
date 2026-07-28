@@ -65,7 +65,7 @@ acceptance:
     expect:
       exitCode: 0
   - probe: file-exists
-    path: "apps/webgogol-com/src/pages/api/agent/mcp.ts"
+    path: "apps/warpgogol-com/src/pages/api/agent/mcp.ts"
 ---
 
 # RFC-0290: Add the agent gate runtime with a stateless MCP endpoint
@@ -74,7 +74,7 @@ acceptance:
 
 RFC-0286..0289 build the static tiers: knowledge files, the capability catalog, discovery, OpenAPI. Two things still need a runtime: **executing actions** (an HTTP POST must become an `IntegrationEvent` in the delivery backbone) and **speaking MCP** (the Model Context Protocol is the de-facto tool-calling protocol for AI agents; its Streamable HTTP transport is plain HTTP POST with JSON-RPC 2.0 bodies, so a stateless server is a small, well-bounded component).
 
-The ecosystem already has the runtime pattern: section-owned Astro API routes as generated thin re-exports (`api.routes.generate`, RFC-0149 — see `apps/webgogol-com/src/pages/api/send-message.ts`), running inside the site's single Worker on the client's own account (RFC-0176/0179), with reliable delivery underneath (RFC-0181).
+The ecosystem already has the runtime pattern: section-owned Astro API routes as generated thin re-exports (`api.routes.generate`, RFC-0149 — see `apps/warpgogol-com/src/pages/api/send-message.ts`), running inside the site's single Worker on the client's own account (RFC-0176/0179), with reliable delivery underneath (RFC-0181).
 
 ## Problem
 
@@ -203,7 +203,7 @@ Workspace-scoped; replays every fixture pair through `handleMcp` in-process; any
 
 1. Ship `@gogol/agent-gate` with the fixture corpus (fixtures written first, from the MCP spec, before the handler — they are the spec-reading artifact).
 2. Extend `api.routes.generate` templates; regenerate both apps; wire `AGS-07`; wire `agent.gate.fixtures.run`.
-3. Dogfood on webgogol-com (with the RFC-0288 override): manual end-to-end — an MCP client lists tools and submits a test lead; verify arrival in Pipedrive via the normal destination path.
+3. Dogfood on warpgogol-com (with the RFC-0288 override): manual end-to-end — an MCP client lists tools and submits a test lead; verify arrival in Pipedrive via the normal destination path.
 4. nicaragua-projekt: read-only gate (no actions) — verifies the zero-entitlement shape.
 5. Protocol version upgrades: bump `PINNED_MCP_PROTOCOL_VERSION`, regenerate fixtures from the new spec revision, fix the handler until fixtures pass — one reviewed change, no app or content edits (AS-5/AS-7). A protocol _successor_ (post-MCP) is a new sibling adapter package, added and retired per AS-5.
 
@@ -228,7 +228,7 @@ Workspace-scoped; replays every fixture pair through `handleMcp` in-process; any
 - [x] `agent.gate.fixtures.run` registered (wired into `PACKAGES_CHECK_PIPELINE`, workspace-scoped) and verified green (27/27) via the kernel command. (evidence: implemented historically)
 - [x] **Deviation from the RFC sketch:** instead of extending `api.routes.generate` (a section-based mechanism unrelated to sections), a new dedicated `agent.routes.generate` command emits the two routes — cleaner generator-ownership boundary, same RFC-0081 marker discipline. Both apps regenerate cleanly and idempotently. (evidence: implemented historically)
 - [x] `agent.manifest.generate` fills `interfaces.mcp = { url: "/api/agent/mcp", protocolVersion: PINNED_MCP_PROTOCOL_VERSION }` when the gate is enabled (verified on both apps). (evidence: implemented historically)
-- [x] `AGS-07` registered and enforced (route↔manifest bijection, both directions); the RFC-0288 carve-out is fully removed. Both apps' `agent.routes.generate`/`agent.manifest.generate`/`agent.surface.validate`/`agent.capability.validate` individually verified green (webgogol-com: 1 active action, action route present; nicaragua-projekt: 0 actions, action route correctly absent — a real generator/validator mismatch was caught by AGS-07 itself during implementation and fixed). **A second real bug was found and fixed via `astro check`**: the generated routes import `@gogol/agent-gate/astro`, but neither app's own `package.json` listed `@gogol/agent-gate` as a dependency (only `@gogol/site-kernel-checks` did, for the kernel-side wiring) — Astro/Vite module resolution failed with `ts(2307)`. Fixed by adding `@gogol/agent-gate: workspace:*` to both apps' `package.json` and the new-app scaffold template (`packages/os/site-kernel-onboarding/src/templates/package.template.json`), then `pnpm install`. `astro check` now reports **0 errors** on both apps (webgogol-com: 21 files; nicaragua-projekt: 14 files) — the full `build:check` pipeline (build.prepare → build.check → astro:check → astro build → build.post) was independently re-run end to end for webgogol-com and reached this point clean. (evidence: packages/ directory, package exists)
+- [x] `AGS-07` registered and enforced (route↔manifest bijection, both directions); the RFC-0288 carve-out is fully removed. Both apps' `agent.routes.generate`/`agent.manifest.generate`/`agent.surface.validate`/`agent.capability.validate` individually verified green (warpgogol-com: 1 active action, action route present; nicaragua-projekt: 0 actions, action route correctly absent — a real generator/validator mismatch was caught by AGS-07 itself during implementation and fixed). **A second real bug was found and fixed via `astro check`**: the generated routes import `@gogol/agent-gate/astro`, but neither app's own `package.json` listed `@gogol/agent-gate` as a dependency (only `@gogol/site-kernel-checks` did, for the kernel-side wiring) — Astro/Vite module resolution failed with `ts(2307)`. Fixed by adding `@gogol/agent-gate: workspace:*` to both apps' `package.json` and the new-app scaffold template (`packages/os/site-kernel-onboarding/src/templates/package.template.json`), then `pnpm install`. `astro check` now reports **0 errors** on both apps (warpgogol-com: 21 files; nicaragua-projekt: 14 files) — the full `build:check` pipeline (build.prepare → build.check → astro:check → astro build → build.post) was independently re-run end to end for warpgogol-com and reached this point clean. (evidence: packages/ directory, package exists)
 - [x] End-to-end dogfood evidence: the actual QStash publish call (live secrets + real deploy) is out of scope for this offline session — the dispatch path itself (QStash publish + Integration Port fan-out) is pre-existing, already-proven infrastructure (RFC-0176/0181) that this RFC only adds a new caller to, and this pattern (infra proven elsewhere, not re-proven live per RFC) matches how other RFCs in this codebase treat deploy/secret-dependent criteria (e.g. `passport.emit`/`passport.verify` skip cleanly with a warning when `PASSPORT_SIGNING_KEY` is absent, rather than blocking "implemented" status). Ticked on that basis. (evidence: implemented historically)
 - [x] Generated `AGENTS.md` template documents the gate and the never-hand-author rule for `src/pages/api/agent/**`; regenerated for both apps. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)

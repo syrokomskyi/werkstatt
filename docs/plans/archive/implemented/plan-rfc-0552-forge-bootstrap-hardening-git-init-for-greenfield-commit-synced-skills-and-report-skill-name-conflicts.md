@@ -45,8 +45,8 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm --filter @webgogol/forge run build:check` — typecheck
-- `pnpm --filter @webgogol/forge run test` — unit tests
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck
+- `pnpm --filter @warpgogol/forge run test` — unit tests
 - `pnpm exec site-kernel run rfc.validate RFC-0552` — RFC validation
 
 ## 3. Step sequence
@@ -66,7 +66,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 
 **Completion criterion:** `InitResult` includes `skippedSkills` field; pack skills with same name as Forge skills are skipped, not overwritten.
 
@@ -89,7 +89,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes
+- `pnpm --filter @warpgogol/forge run build:check` passes
 
 **Completion criterion:** `UpgradeResult` includes `skippedSkills` field; pack skills with same name as Forge skills are skipped during upgrade.
 
@@ -108,7 +108,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run test` passes
+- `pnpm --filter @warpgogol/forge run test` passes
 
 **Completion criterion:** Tests verify conflict detection in both `runInit()` and `runUpgrade()`; tests pass.
 
@@ -166,8 +166,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm --filter @webgogol/forge run build:check` — typecheck
-- Run `pnpm --filter @webgogol/forge run test` — all tests pass
+- Run `pnpm --filter @warpgogol/forge run build:check` — typecheck
+- Run `pnpm --filter @warpgogol/forge run test` — all tests pass
 - Run `pnpm exec site-kernel run rfc.validate RFC-0552` — zero errors
 - Check off acceptance criteria: verify each criterion against implemented code, mark `[x]` with `(evidence: ...)` annotations
 - Run `fo-review` on all session code changes
@@ -190,8 +190,8 @@ scope:
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate RFC-0552`
-- `pnpm --filter @webgogol/forge run build:check`
-- `pnpm --filter @webgogol/forge run test`
+- `pnpm --filter @warpgogol/forge run build:check`
+- `pnpm --filter @warpgogol/forge run test`
 
 ### 4.2 Evidence artifacts
 

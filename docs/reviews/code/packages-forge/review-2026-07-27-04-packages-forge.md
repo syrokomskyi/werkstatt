@@ -24,11 +24,11 @@ The implementation adds SKILL-17 validation logic with clean, minimal code follo
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @webgogol/forge run build:check` passes; `pnpm --filter @webgogol/forge exec vitest run` passes (281 tests); `forge.skill.validate` passes with 0 violations; `rfc.validate` passes.
+Pass — `pnpm --filter @warpgogol/forge run build:check` passes; `pnpm --filter @warpgogol/forge exec vitest run` passes (281 tests); `forge.skill.validate` passes with 0 violations; `rfc.validate` passes.
 
 ### Axis A — Structural correctness
 
-No issues. `checkSkill17` follows the same structure as `checkSkill11` — pattern array, disable marker, line-by-line scan. The function is correctly wired into both forge skill and pack skill validation loops. The `SKILL17_PLATFORM_PATTERNS` uses a negative lookbehind `(?<!@)` to exclude the `@webgogol/forge` npm package name — this is the correct approach.
+No issues. `checkSkill17` follows the same structure as `checkSkill11` — pattern array, disable marker, line-by-line scan. The function is correctly wired into both forge skill and pack skill validation loops. The `SKILL17_PLATFORM_PATTERNS` uses a negative lookbehind `(?<!@)` to exclude the `@warpgogol/forge` npm package name — this is the correct approach.
 
 ### Axis B — DNA alignment
 
@@ -52,7 +52,7 @@ No issues. SKILL-17 reuses the existing `Violation` interface and validation loo
 
 ### Axis G — Blind spots
 
-No issues. The `(?<!@)` negative lookbehind for `Warpgogol` correctly handles the `@webgogol/forge` npm package name edge case. The case-sensitive `RFC-\d{4}` pattern correctly excludes lowercase file paths (`adr-0000-template.md`) and camelCase binding keys (`validateRfc`). The `gi` flag on platform patterns catches case variations.
+No issues. The `(?<!@)` negative lookbehind for `Warpgogol` correctly handles the `@warpgogol/forge` npm package name edge case. The case-sensitive `RFC-\d{4}` pattern correctly excludes lowercase file paths (`adr-0000-template.md`) and camelCase binding keys (`validateRfc`). The `gi` flag on platform patterns catches case variations.
 
 ### Spec compliance
 

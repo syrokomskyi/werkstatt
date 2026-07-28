@@ -39,7 +39,7 @@ Sites are registered as Sternsystemen in `systems/registry.yaml` and materialize
 - **Turborepo + pnpm workspaces** — `pnpm` is the only package manager; the root `packageManager` pins the version
 - **TypeScript strict** with content-declared schemas (Zod)
 - **Node ≥ 22** (see `package.json` engines.node)
-- **Linux (Ubuntu)** development environment — see [`docs/policies/linux-tooling.md`](docs/policies/linux-tooling.md) for the tool inventory. `@webgogol/forge` is the sole cross-platform exception (published to npm).
+- **Linux (Ubuntu)** development environment — see [`docs/policies/linux-tooling.md`](docs/policies/linux-tooling.md) for the tool inventory. `@warpgogol/forge` is the sole cross-platform exception (published to npm).
 
 ## Quick start
 

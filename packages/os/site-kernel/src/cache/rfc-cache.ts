@@ -22,7 +22,7 @@ import { join } from "node:path";
 import { byteHashFile } from "@warpgogol/fingerprint";
 
 import type { CacheLayer } from "./cache-layer.ts";
-import { listRfcFiles, parseRfcFile, type ParsedRfc } from "@webgogol/forge/os/rfc";
+import { listRfcFiles, parseRfcFile, type ParsedRfc } from "@warpgogol/forge/os/rfc";
 
 export const RFC_CACHE_NAMESPACE = "rfc_entries";
 export const RFC_CACHE_SCHEMA_VERSION = 1;

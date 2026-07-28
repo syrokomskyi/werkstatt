@@ -79,7 +79,7 @@ An Integration Port is introduced in a shared package: a closed `IntegrationChan
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run integration.config.validate --app webgogol-com --json
+pnpm exec site-kernel run integration.config.validate --app warpgogol-com --json
 pnpm exec site-kernel run integration.secrets.validate --all
 ```
 
@@ -129,8 +129,8 @@ export interface CrmAdapter {
   "command": "integration.config.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "unknown-channel-adapter", "value": "discord" },
-    { "app": "webgogol-com", "rule": "missing-secret", "secret": "INTEGRATION_PIPEDRIVE_API_TOKEN" }
+    { "app": "warpgogol-com", "rule": "unknown-channel-adapter", "value": "discord" },
+    { "app": "warpgogol-com", "rule": "missing-secret", "secret": "INTEGRATION_PIPEDRIVE_API_TOKEN" }
   ]
 }
 ```

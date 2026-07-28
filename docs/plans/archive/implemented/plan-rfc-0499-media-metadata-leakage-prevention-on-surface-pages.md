@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-checks"
     - "@gogol/share"
@@ -86,7 +86,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json` — contract loads without errors
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json` — contract loads without errors
 
 **Completion criterion:** `mediaLeakagePolicy` section present in `jsonld-types.yaml`; Zod schema validates the YAML; `build:check` passes for `@gogol/ontology`.
 
@@ -112,7 +112,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.generate --site webgogol-com` — baker runs without errors
+- `pnpm exec site-kernel run surface.generate --site warpgogol-com` — baker runs without errors
 - Manual spot-check: inspect a generated surface page artifact for absence of media metadata in block props
 
 **Completion criterion:** No media metadata fields (`author`, `source`, `aiPlatform`, `copyright`, `usageBasis`) appear in readable block props of generated surface pages; `Konzeptillustration` label and `/bildnachweise/#...` link are emitted for AI-generated images; `build:check` passes.
@@ -169,7 +169,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.media-leakage.validate --site webgogol-com --json` — command runs and returns valid result
+- `pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json` — command runs and returns valid result
 
 **Completion criterion:** `surface.media-leakage.validate` command is registered, runs in `sites-check-postbuild`, scans rendered HTML with context-aware matching, and returns violations in the specified format.
 
@@ -195,8 +195,8 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
 - `pnpm --filter @gogol/site-kernel-handoff run build:check` — typecheck passes
-- `pnpm exec site-kernel run surface.validate --site webgogol-com --json` — passes
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json` — includes media-leakage policy checks
+- `pnpm exec site-kernel run surface.validate --site warpgogol-com --json` — passes
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json` — includes media-leakage policy checks
 
 **Completion criterion:** `surface.validate` includes media-leakage rules; `surface.contract.validate` includes media-leakage policy from Layer C contract; both pass `build:check`.
 
@@ -239,8 +239,8 @@ scope:
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — must pass
 - Run `pnpm --filter @gogol/ui run build:check` — must pass
 - Run `pnpm --filter @gogol/share run build:check` — must pass
-- Run `pnpm exec site-kernel run surface.media-leakage.validate --site webgogol-com --json` — must pass (0 violations)
-- Run `pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json` — must pass
+- Run `pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json` — must pass (0 violations)
+- Run `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json` — must pass
 - Check off all acceptance criteria in the RFC with inline `(evidence: ...)` annotations
 - Stamp the RFC as implemented: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0499 --implementation-commit <sha>`
 
@@ -264,8 +264,8 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/ui run build:check`
 - `pnpm --filter @gogol/share run build:check`
-- `pnpm exec site-kernel run surface.media-leakage.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run surface.media-leakage.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 
@@ -278,7 +278,7 @@ scope:
 | --- | --- |
 | False positives for "Gemini" and "Organization" | Step 4: context-aware matching using `data-credit-context` attribute and credit-context elements (`<figcaption>`, `<details>`, `<dl>`); Step 3: add `data-credit-context` attribute to credit-context elements |
 | Performance: scanning all surface page HTML | Step 4: validator scans only surface page routes (identified by `surfaceId` in route registry), not all pages; runs once per `sites-check-postbuild` invocation |
-| Footer copyright on surface pages | Step 4: validator excludes `<footer>` and `[data-footer]` elements from `Copyright © 2026 Webgogol` check |
+| Footer copyright on surface pages | Step 4: validator excludes `<footer>` and `[data-footer]` elements from `Copyright © 2026 Warpgogol` check |
 | Legitimate "Gemini" in prose | Step 4: context-aware matching ensures only credit-context occurrences are flagged |
 | Baker regression: dropping JSON-LD | Step 2: verify `buildJsonLd` in `@gogol/share` is not affected; JSON-LD emission is handled by the semantic layer, which is not modified |
 | Migration: existing surface pages | Step 2: surface pages are regenerated by `surface.generate` on each build — no manual content migration needed |

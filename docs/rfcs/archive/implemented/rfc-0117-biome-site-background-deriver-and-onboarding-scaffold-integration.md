@@ -33,7 +33,7 @@ commands:
     - onboarding.scaffold
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - ontology

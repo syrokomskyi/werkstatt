@@ -67,7 +67,7 @@ Pass with one V-19 warning: `RFC-0512.amends includes RFC-0200, but RFC-0200.ame
 - **Minimal command surface**: `participant.json.validate` is structurally distinct from `participant.validate` (JSON endpoint shape, private field exclusion, JSON-LD type compliance vs. participant schema validation). A separate command is justified.
 - **Lean contracts**: TypeScript types are minimal ✓
 - **Existing patterns**: Extends `jsonld-types.yaml` `surfacePolicy` and `url-schema.yaml` `routePatterns` following the RFC-0498/RFC-0509 pattern ✓
-- **Scope discipline**: `appsImpacted: [webgogol-com]` and `packagesImpacted: [@gogol/share, @gogol/ontology, @gogol/site-kernel-checks]` are correct and minimal ✓
+- **Scope discipline**: `appsImpacted: [warpgogol-com]` and `packagesImpacted: [@gogol/share, @gogol/ontology, @gogol/site-kernel-checks]` are correct and minimal ✓
 - **`nonGoals`**: Six meaningful non-goals that clearly delegate to sibling RFCs ✓
 
 ## Axis G — Blind spots

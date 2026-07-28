@@ -42,7 +42,7 @@
     "@warpgogol/site-kernel-onboarding": "workspace:*",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
-    "@webgogol/forge": "workspace:*",
+    "@warpgogol/forge": "workspace:*",
     "eslint": "^10.7.0",
     "eslint-plugin-yml": "^1.18.0",
     "playwright": "^1.61.1",

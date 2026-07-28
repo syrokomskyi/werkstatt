@@ -187,7 +187,7 @@ No logic change required: it reads the `href` out of the rendered HTML and check
 
 ## Verification (the "did links move?" checks)
 
-Run on BOTH reference apps (`webgogol-com`, `nicaragua-projekt`) after a clean rebuild:
+Run on BOTH reference apps (`warpgogol-com`, `nicaragua-projekt`) after a clean rebuild:
 
 1. **Twin presence & URL form.** For a known deep page (e.g. a `/team/<slug>` profile if present, otherwise any non-home page), assert `dist/client/<route>.md` exists and `dist/client/<route>/index.md` does NOT.
 2. **Home exception.** Assert `dist/client/index.md` exists; for each non-default language, assert `dist/client/<lang>/index.md` exists. Assert no `dist/client/index/…` oddity.

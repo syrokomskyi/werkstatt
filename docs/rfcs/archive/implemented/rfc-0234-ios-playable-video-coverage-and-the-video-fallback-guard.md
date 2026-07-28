@@ -41,7 +41,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/share"
@@ -157,7 +157,7 @@ Wired into `APPS_BUILD_CHECK_PIPELINE` immediately after `video.variants.validat
 - [x] A `media:` source whose manifest MP4 is missing on disk fails with `[mp4-missing]`. (evidence: implemented historically)
 - [x] On iOS, `live-photos.ts` keeps the transparent poster when no MP4 fallback is authored. (evidence: implemented historically)
 - [x] `nicaragua-projekt` `build:check` is green (its 5 transparent portraits validate as poster-only). (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `webgogol-com` `build:check` is green (feature-video MP4 coverage intact, 0 living photos). (evidence: implemented historically)
+- [x] `warpgogol-com` `build:check` is green (feature-video MP4 coverage intact, 0 living photos). (evidence: implemented historically)
 - [x] `live.media.validate` fails `[dual-source]` when both `<token>.webm` and `<token>.mp4` exist. (evidence: implemented historically)
 - [x] `live.variants.generate` derives WebM + opaque-only MP4 into `public/_video/live`, hash-cached and idempotent, and `<SectionImage>` renders the generated `/_video/live/...` URLs. (evidence: implemented historically)
 - [x] Phase 3: HEVC-with-alpha MP4 generated on a macOS host for true iOS-transparent playback. (evidence: implemented historically)

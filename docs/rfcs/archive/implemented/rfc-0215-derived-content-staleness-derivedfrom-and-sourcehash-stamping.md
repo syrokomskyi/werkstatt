@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - business
@@ -98,10 +98,10 @@ While a derivative is `outdated`, policy (per `system.md`) chooses: report only,
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.derived.validate --app webgogol-com
-pnpm exec site-kernel run content.derived.validate --app webgogol-com --json
+pnpm exec site-kernel run content.derived.validate --app warpgogol-com
+pnpm exec site-kernel run content.derived.validate --app warpgogol-com --json
 # Re-stamp after updating a derivative (records current source hash + bumps asOf)
-pnpm exec site-kernel run content.derived.stamp --app webgogol-com \
+pnpm exec site-kernel run content.derived.stamp --app warpgogol-com \
   --subject "business/uk/offer#priceDescription"
 ```
 
@@ -176,7 +176,7 @@ Hash normalization is whitespace- and markup-insensitive (so a cosmetic reflow o
 
 1. Factor the enriched-content hasher into `packages/share/src/knowledge/derivation.ts`; refactor RFC-0207's enrich flow onto it with parity.
 2. Land `content.derived.validate` at `warning`; land `content.derived.stamp`.
-3. Backfill stamps for existing translated business records on `webgogol-com` (DE↔UK) via agent localization (RFC-0218), establishing the baseline hashes.
+3. Backfill stamps for existing translated business records on `warpgogol-com` (DE↔UK) via agent localization (RFC-0218), establishing the baseline hashes.
 4. Promote `CKL-DERIV-01` to `error` for legal/price content via `derivation.policy` once the baseline is stamped and clean.
 
 ## Alternatives considered
@@ -199,7 +199,7 @@ Hash normalization is whitespace- and markup-insensitive (so a cosmetic reflow o
 - [x] `content.derived.stamp` registered; refuses to stamp against a non-resolving source (verified). (evidence: implemented historically)
 - [x] `derived` claims carry `derivedFrom` + `sourceHash` in the RFC-0212 sidecar; no new file kind. (evidence: implemented historically)
 - [x] `system.md` criticality promotion (`knowledge.derivation.critical`) controls outdated → blocking. _Render-side handling modes (notice / noindex) are deferred to the rendering integration; validate currently reports + gates._ (evidence: implemented historically)
-- [x] DE↔UK translation on `webgogol-com` stamped (`uk/company#tagline`); unstamped/changed source ⇒ outdated, re-stamp ⇒ current (verified end-to-end + unit-tested). (evidence: implemented historically)
+- [x] DE↔UK translation on `warpgogol-com` stamped (`uk/company#tagline`); unstamped/changed source ⇒ outdated, re-stamp ⇒ current (verified end-to-end + unit-tested). (evidence: implemented historically)
 - [x] `docs/COMMANDS.md` + `AGENTS.md` updated; `rfc.validate` passes on this file. (evidence: AGENTS.md:1, agent guide updated)
 
 ## Implementation notes for agents

@@ -53,7 +53,7 @@ No issues. The RFC does not propose compatibility shims, dual paths, or deprecat
 
 - **Two new commands are justified.** `team.lifecycle.validate` (status transitions, review cadence, CTA removal) and `team.cross-page.validate` (hub ↔ profile, home ↔ profile, navigation ↔ hub, JSON ↔ HTML) have distinct scopes. Combining them into one command would mix lifecycle and consistency concerns. The separation is pragmatic.
 - **Prose section reference validation is based on a model mismatch.** Section 3 proposes checking that prose files contain headings like `## Beruflich`, `## Nachweise`, `## Persönlich`, etc. But RFC-0510/0511 use **separate prose files per section** (`prose/{slug}-beruflich.md`, `prose/{slug}-nachweise.md`, `prose/{slug}-persoenlich.md`), not anchor-based references within a single file. The prose files contain body text only — the headings are in the block props (`header.heading`), not in the prose files. The existing `content.references.validate` already checks that `contentRef: prose/{slug}-beruflich` resolves to an existing file. The proposed extension to check for `## Beruflich` headings inside prose files would **fail on the current content** because those headings are not in the prose files. This is the most serious finding — the RFC needs to either (a) reconcile with the file-based model from RFC-0510/0511 or (b) explain what additional value the heading check provides beyond file existence (which is already covered).
-- **`appsImpacted` and `packagesImpacted` are correctly scoped** — only `webgogol-com`, `@gogol/share`, and `@gogol/site-kernel-checks`.
+- **`appsImpacted` and `packagesImpacted` are correctly scoped** — only `warpgogol-com`, `@gogol/share`, and `@gogol/site-kernel-checks`.
 
 ## Axis G — Blind spots
 

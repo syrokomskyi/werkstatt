@@ -32,7 +32,7 @@ commands:
     - content.references.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -63,7 +63,7 @@ In practice, two gaps block the intended single-source-of-truth flow for block-d
 
 2. **There is no canonical shape for offer data.** Prices, written guarantees, and growth modules live nowhere structured. The figures (70 €/Monat, 700 €/Jahr, 200 € Einrichtung, and contested SLA/guarantee claims) are copy-pasted into `decisionCard` / `price-card` props across `home.md`, `pricing.md`, and `digitalesFundament`. There is no place a reference like `{business.offer.price.yearly}` could even resolve to.
 
-The May 2026 amend-onboarding dry-run on `apps/webgogol-com` surfaced both gaps concretely: strengthening `digitalesFundament` "through the business layer" was impossible because (a) references in props are inert and (b) no offer file exists. The page was strengthened with literal props instead — the established but duplication-prone pattern.
+The May 2026 amend-onboarding dry-run on `apps/warpgogol-com` surfaced both gaps concretely: strengthening `digitalesFundament` "through the business layer" was impossible because (a) references in props are inert and (b) no offer file exists. The page was strengthened with literal props instead — the established but duplication-prone pattern.
 
 ## Problem
 
@@ -165,7 +165,7 @@ No new command. `content.references.validate` keeps the shared envelope; its dia
 1. Implement `substituteRefsDeep` in the shared render path; add fixture tests (a price-card prop referencing `{business.offer.price.monthly}` renders the resolved value).
 2. Add the optional `offer` schema to `@gogol/business`; document the frontmatter.
 3. Update `content.references.validate` docs to state props are substituted at render time (no behavior change).
-4. **Opt-in migration:** create `apps/webgogol-com/src/content/business/de/offer.md` with the public figures (70/700/200) and migrate `home.md`, `pricing.md`, `digitalesFundament` price/decision props to `{business.offer.price.*}` in a follow-up content change. Contested SLA/guarantee claims stay `NEED_THIS_*` until sourced.
+4. **Opt-in migration:** create `apps/warpgogol-com/src/content/business/de/offer.md` with the public figures (70/700/200) and migrate `home.md`, `pricing.md`, `digitalesFundament` price/decision props to `{business.offer.price.*}` in a follow-up content change. Contested SLA/guarantee claims stay `NEED_THIS_*` until sourced.
 5. No flag day: pages that keep literal strings continue to work.
 
 ## Alternatives considered

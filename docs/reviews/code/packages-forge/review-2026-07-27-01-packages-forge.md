@@ -23,7 +23,7 @@ The diff adds `skippedSkills` conflict detection to `runInit()` and `syncPackSki
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @webgogol/forge run build:check` exits 0. `pnpm --filter @webgogol/forge run test` passes (277 tests). `rfc.validate RFC-0552` passes with 0 errors, 0 warnings.
+Pass — `pnpm --filter @warpgogol/forge run build:check` exits 0. `pnpm --filter @warpgogol/forge run test` passes (277 tests). `rfc.validate RFC-0552` passes with 0 errors, 0 warnings.
 
 ### Axis A — Structural correctness
 

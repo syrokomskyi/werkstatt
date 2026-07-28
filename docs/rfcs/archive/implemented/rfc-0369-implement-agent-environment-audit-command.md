@@ -204,7 +204,7 @@ If the rule is missing, the result `status` becomes `degraded` and `gitattribute
   },
   "gitattributes": {
     "present": true,
-    "path": "C:\\projects\\webgogol\\webgogol-4\\.gitattributes",
+    "path": "C:\\projects\\warpgogol\\warpgogol-4\\.gitattributes",
     "lineEndingRule": true
   },
   "systemPromptSnippet": "..."

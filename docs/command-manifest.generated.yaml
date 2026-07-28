@@ -19244,7 +19244,7 @@ commands:
       - build.check
       - check
   - name: template.imports.validate
-    description: Validate that all @warpgogol/* and @webgogol/* imports in template
+    description: Validate that all @warpgogol/* and @warpgogol/* imports in template
       files are resolvable from root package.json devDependencies, and run pnpm
       install --frozen-lockfile to detect lockfile drift (RFC-0557).
     scope: workspace
@@ -19262,7 +19262,7 @@ commands:
     pipelines:
       - packages.check
   - name: template.imports.validate
-    description: Validate that all @warpgogol/* and @webgogol/* imports in template
+    description: Validate that all @warpgogol/* and @warpgogol/* imports in template
       files are resolvable from root package.json devDependencies, and run pnpm
       install --frozen-lockfile to detect lockfile drift (RFC-0557).
     scope: workspace
@@ -20597,7 +20597,7 @@ commands:
     writes: []
     pipelines: []
   - name: workpiece.imports.validate
-    description: Validate that all @warpgogol/* and @webgogol/* imports in
+    description: Validate that all @warpgogol/* and @warpgogol/* imports in
       materialized workpiece files resolve from root node_modules (RFC-0557).
     scope: workspace
     provider: site:warpgogol-com
@@ -20610,12 +20610,12 @@ commands:
       - missions/*/workpiece/tools/**/*.ts
       - missions/*/workpiece/src/**/*.{ts,mjs,astro}
       - node_modules/@warpgogol/*
-      - node_modules/@webgogol/*
+      - node_modules/@warpgogol/*
     writes: []
     pipelines:
       - build.prepare
   - name: workpiece.imports.validate
-    description: Validate that all @warpgogol/* and @webgogol/* imports in
+    description: Validate that all @warpgogol/* and @warpgogol/* imports in
       materialized workpiece files resolve from root node_modules (RFC-0557).
     scope: workspace
     provider: workspace

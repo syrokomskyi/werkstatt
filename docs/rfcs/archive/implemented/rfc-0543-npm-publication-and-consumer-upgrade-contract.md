@@ -70,7 +70,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -120,13 +120,13 @@ This monorepo is the sole publication source for `@wgogol/forge`. A new `forge.u
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/syrokomskyi/webgogol-4.git",
+    "url": "https://github.com/syrokomskyi/warpgogol-4.git",
     "directory": "packages/forge"
   },
   "description": "Framework for documenting and implementing ideas — RFC/ADR governance, skills, and project bootstrapping.",
   "keywords": ["rfc", "adr", "governance", "skills", "ai-agent", "documentation", "framework"],
-  "homepage": "https://github.com/syrokomskyi/webgogol-4#readme",
-  "bugs": { "url": "https://github.com/syrokomskyi/webgogol-4/issues" }
+  "homepage": "https://github.com/syrokomskyi/warpgogol-4#readme",
+  "bugs": { "url": "https://github.com/syrokomskyi/warpgogol-4/issues" }
 }
 ```
 

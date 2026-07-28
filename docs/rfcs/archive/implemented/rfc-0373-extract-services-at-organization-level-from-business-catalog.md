@@ -34,7 +34,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -75,7 +75,7 @@ The business layer already has the infrastructure for a repeatable services coll
 - `packages/business/src/dispatcher.ts` registers `"services/": businessServiceSchema` in `repeatableBusinessSchemasByPrefix`.
 - `packages/business/src/loaders.ts` exports `getBusinessServices()` which reads `business/{lang}/services/{slug}.md` with default-language fallback.
 
-But no `business/{lang}/services/` subdirectory exists in any app yet. The orphan `business/de/services.md` file in webgogol-com (`{ websiteDevelopment: { backupRetentionDays: "30" } }`) is a config fragment, not a service catalog — it matches no schema and is not the source this RFC projects.
+But no `business/{lang}/services/` subdirectory exists in any app yet. The orphan `business/de/services.md` file in warpgogol-com (`{ websiteDevelopment: { backupRetentionDays: "30" } }`) is a config fragment, not a service catalog — it matches no schema and is not the source this RFC projects.
 
 ## Problem
 
@@ -142,7 +142,7 @@ Project the business service catalog into `SemanticOrganization.services` at the
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run services.projection.validate --app webgogol-com
+pnpm exec site-kernel run services.projection.validate --app warpgogol-com
 pnpm exec site-kernel run services.projection.validate --all --json
 ```
 
@@ -225,7 +225,7 @@ export type SemanticService = {
 {
   "command": "services.projection.validate",
   "status": "pass",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "servicesProjected": 3,
   "services": [
     { "id": "website-development", "name": "Website Development" },
@@ -240,7 +240,7 @@ Failure:
 {
   "command": "services.projection.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "violations": [
     {
       "file": "src/content/business/de/services/website-development.md",
@@ -312,7 +312,7 @@ Failure:
 
 **RFC-0372 ordering.** If RFC-0372 lands first, there is a window where `page.services` is dead and org-level services are not yet wired. Mitigation: the window is harmless — JSON-LD and llms simply omit services during that interval. If this RFC lands first, `extractServices()` still runs but its output is unused — also harmless.
 
-**`services.projection.validate` false-positive on `ambiguous-source`.** The orphan `business/de/services.md` config fragment in webgogol-com predates this RFC. If a `services/` directory is later created alongside it, the validator flags `ambiguous-source`. Mitigation: this rule is advisory (warn), not blocking — the projection reads from `services/`, not `services.md`. The orphan file is not modified by this RFC.
+**`services.projection.validate` false-positive on `ambiguous-source`.** The orphan `business/de/services.md` config fragment in warpgogol-com predates this RFC. If a `services/` directory is later created alongside it, the validator flags `ambiguous-source`. Mitigation: this rule is advisory (warn), not blocking — the projection reads from `services/`, not `services.md`. The orphan file is not modified by this RFC.
 
 **Agent misinterpretation of content scope.** Agents implementing this RFC might assume they need to author `business/{lang}/services/{slug}.md` content files. Mitigation: Phase 5 explicitly states content authoring is out of scope. NonGoals reinforces this. The projection contract is ready for when content arrives; `services.projection.validate` passes with no services files.
 
@@ -332,7 +332,7 @@ Failure:
 - [x] `extractServices()` and `services` return field removed from `home-page.ts`. (evidence: implemented historically)
 - [x] `services.projection.validate` command registered and wired into `APPS_BUILD_CHECK_PIPELINE`. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
-- [x] `pnpm build` green for webgogol-com and nicaragua-projekt. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `pnpm build` green for warpgogol-com and nicaragua-projekt. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] nicaragua-projekt (no services) omits `## Services` with no error. (evidence: original apps retired by RFC-0381, implemented historically)
 
 ## Implementation notes for agents

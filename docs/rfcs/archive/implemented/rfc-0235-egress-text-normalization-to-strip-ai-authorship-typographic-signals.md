@@ -47,7 +47,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/ontology"
@@ -70,7 +70,7 @@ nonGoals:
 
 ## Context
 
-Texts shown to visitors across `apps/` (`nicaragua-projekt`, `webgogol-com`) carry typographic markers that trip "written by AI" heuristics used by search engines, social platforms, and AI-content detectors. The markers are:
+Texts shown to visitors across `apps/` (`nicaragua-projekt`, `warpgogol-com`) carry typographic markers that trip "written by AI" heuristics used by search engines, social platforms, and AI-content detectors. The markers are:
 
 - **Special dashes:** U+2012 figure dash, U+2013 en dash, U+2014 em dash, U+2015 horizontal bar (the regular hyphen-minus U+002D is the desired target, not a marker).
 - **Typographic quotes:** U+00AB «, U+00BB », and the U+2018–U+201F range; plus the "smart" quotes U+201C “, U+201D ”, U+2018 ‘, U+2019 ’ used in place of straight `"`/`'`.
@@ -219,7 +219,7 @@ Runs in `APPS_CHECK_POSTBUILD_PIPELINE`. Re-scans `dist/` (same exclusions) for 
 
 ## Rollout
 
-1. **Phase 1 (this RFC):** `text-normalize.ts` + `SIGNAL_REGISTRY` + per-format normalizers + `rehypeNormalizeText` in `@gogol/share`; `textNormalizeSchema` in ontology; the four `text.normalize.*` commands; wire Layer 3 + backstop into `build.post`; Layer 1 (`smartypants:false` + rehype) and Layer 2 (OG) in the codegen templates. Pilot on `nicaragua-projekt`, then `webgogol-com`.
+1. **Phase 1 (this RFC):** `text-normalize.ts` + `SIGNAL_REGISTRY` + per-format normalizers + `rehypeNormalizeText` in `@gogol/share`; `textNormalizeSchema` in ontology; the four `text.normalize.*` commands; wire Layer 3 + backstop into `build.post`; Layer 1 (`smartypants:false` + rehype) and Layer 2 (OG) in the codegen templates. Pilot on `nicaragua-projekt`, then `warpgogol-com`.
 2. **Phase 2 (deferred):** optional per-channel overrides (e.g. keep typography in rendered HTML but normalize `llms.txt`), if a site ever asks for it. Not built now (contradicts "find all" by default).
 3. **Phase 3 (deferred):** an opt-in author-side `text.normalize.report --fix` to clean sources on request (still never automatic; the default remains adapter-only).
 
@@ -243,16 +243,16 @@ Runs in `APPS_CHECK_POSTBUILD_PIPELINE`. Re-scans `dist/` (same exclusions) for 
 ## Acceptance criteria
 
 - [x] `@gogol/share/text-normalize.ts` exports `SIGNAL_REGISTRY`, `normalizeText/Html/Json/Xml/Markdown`, `normalizeByKind`, `normalizeKindForPath`, `resolveNormalizeConfig`, and `detectResidual`; 29 unit tests cover JSON-LD quote re-escaping, ZWJ-emoji preservation, code-fence protection, structural-entity protection, codepoint-exact matching, and idempotency. _(Verified: share suite 157/157 green.)_ (evidence: packages/ directory, package exists)
-- [x] `text.normalize.apply` runs in `build.post` after all dist mutation and before the postbuild validators; rewrites `.html/.json/.xml/.svg/.md/.txt`; honors the exclusion list (signed passport JSON, `*-key.json`, `_astro/*`, binaries via kind=null). _(Verified: nicaragua normalized 36/63, webgogol-com 148/199.)_ (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `text.normalize.apply` runs in `build.post` after all dist mutation and before the postbuild validators; rewrites `.html/.json/.xml/.svg/.md/.txt`; honors the exclusion list (signed passport JSON, `*-key.json`, `_astro/*`, binaries via kind=null). _(Verified: nicaragua normalized 36/63, warpgogol-com 148/199.)_ (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] ~~Render-time `smartypants:false` + `rehypeNormalizeText`~~ — **dropped per founder** (dist sweep is the finished product; no per-render duplication). `astro dev` shows raw author typography by design. (evidence: implemented historically)
 - [x] `preview.images.generate` normalizes `pageTitle`/`pageDescription`/`siteName`/`siteTagline` and the hardcoded `—` separator before rasterization (config-aware via `resolveNormalizeConfig`). (evidence: implemented historically)
-- [x] Existing committed OG cards reached via `preview.images.generate --force-normalize` (re-render only signal-bearing cards). _(Verified: regenerated 27 nicaragua + 33 webgogol committed PNGs; valid PNG output; clean cards untouched.)_ (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Existing committed OG cards reached via `preview.images.generate --force-normalize` (re-render only signal-bearing cards). _(Verified: regenerated 27 nicaragua + 33 warpgogol committed PNGs; valid PNG output; clean cards untouched.)_ (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Signed cosmic-passport JSON + `*-key.json` are excluded from the sweep; `passport.verify` stays green after `text.normalize.apply`. _(Verified in both build:check runs.)_ (evidence: implemented historically)
 - [x] `text.normalize.validate` (warn-only) reports residual enabled signals in `dist/` as RFC-0203 Diagnostics and does **not** change build exit code. _(Verified: 0 residual on both apps; runs in postbuild.)_ (evidence: implemented historically)
 - [x] `text.normalize.report` (advisory, source) and `text.normalize.rules.list` (registry, lists 6 signals) exist. (evidence: implemented historically)
 - [x] `text` block added to `systemManifestSchema` (optional; all signals on when absent), strict per-signal shape, validated by `system.manifest.validate`. (evidence: implemented historically)
-- [x] Pilot: full `build:check` of `nicaragua-projekt` and `webgogol-com` is green and leaves zero enabled signals across rendered HTML, `llms*.txt`, twins, `feed.xml`, `sitemap*.xml`, inline JSON-LD (9 blocks reparse), and OG source text; `rfc.validate` green. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `text.normalize.report` wired into the author pipeline (`APPS_CHECK_AUTHOR_PIPELINE`, after `content.voice.lint`) — advisory, does not gate. _(Verified: 41 nicaragua / 78 webgogol source files reported; build:check stays green.)_ (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Pilot: full `build:check` of `nicaragua-projekt` and `warpgogol-com` is green and leaves zero enabled signals across rendered HTML, `llms*.txt`, twins, `feed.xml`, `sitemap*.xml`, inline JSON-LD (9 blocks reparse), and OG source text; `rfc.validate` green. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `text.normalize.report` wired into the author pipeline (`APPS_CHECK_AUTHOR_PIPELINE`, after `content.voice.lint`) — advisory, does not gate. _(Verified: 41 nicaragua / 78 warpgogol source files reported; build:check stays green.)_ (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Client toggling permitted: `src/content/system.md` is not an engineering-only path and `client.edit.validate` enforces only the surface whitelist + Change-Scope trailers, so editing the `text.normalize` block needs no engineering scope. A field-level partial-YAML gate for `system.md` does not exist in the ecosystem (the schema "client-writable" comments are aspirational); building one is out of scope for this RFC. (evidence: implemented historically)
 
 ## Implementation notes for agents

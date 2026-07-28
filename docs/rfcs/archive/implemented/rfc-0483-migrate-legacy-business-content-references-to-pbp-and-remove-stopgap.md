@@ -33,7 +33,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-handoff"
 successSignals:
@@ -61,7 +61,7 @@ RFC-0471 deleted `@gogol/business` and established `@gogol/pbp` as the canonical
 1. Migration of 329 `{business.*}` content references across 32 files
 2. Deletion of the legacy `business/` content directory
 
-A stopgap commit (`2b4ed46cb`) re-registered the old `business` collection in `content.config.ts` as a local `defineCollection` (not an import from the deleted `@gogol/business` package) to keep references resolving. This was always intended to be temporary. In the canonical `systems/webgogol-com/src/content.config.ts`, the old `import { businessCollections } from "@gogol/business/astro"` line is a broken import to a deleted package; the mission workpiece's `content.config.ts` has the local collection definition that is the actual stopgap.
+A stopgap commit (`2b4ed46cb`) re-registered the old `business` collection in `content.config.ts` as a local `defineCollection` (not an import from the deleted `@gogol/business` package) to keep references resolving. This was always intended to be temporary. In the canonical `systems/warpgogol-com/src/content.config.ts`, the old `import { businessCollections } from "@gogol/business/astro"` line is a broken import to a deleted package; the mission workpiece's `content.config.ts` has the local collection definition that is the actual stopgap.
 
 RFC-0482 (prerequisite) adds optional `presentation` fields to PBP schemas, providing a target for the ~41 reference patterns that have no structural PBP equivalent. This RFC performs the actual migration.
 
@@ -224,8 +224,8 @@ No `docs/*.xml` Compass files reference the `business` content collection — ve
 
 After migration, the following AGENTS.md files need regeneration or manual updates:
 
-- `systems/webgogol-com/AGENTS.md` — GENERATED file, references `src/content/business/{lang}/` in lines 30, 95, 119. Regenerate with `pnpm exec site-kernel run agents.generate --site webgogol-com` after the `business/` directory is deleted.
-- `systems/webgogol-com/src/content/AGENTS.md` — GENERATED file, references `business/{lang}/` in the content domain map. Regenerate with `agents.generate`.
+- `systems/warpgogol-com/AGENTS.md` — GENERATED file, references `src/content/business/{lang}/` in lines 30, 95, 119. Regenerate with `pnpm exec site-kernel run agents.generate --site warpgogol-com` after the `business/` directory is deleted.
+- `systems/warpgogol-com/src/content/AGENTS.md` — GENERATED file, references `business/{lang}/` in the content domain map. Regenerate with `agents.generate`.
 - `docs/authoring/site-composition.md` — hand-maintained, references `src/content/business/` in lines 136, 159, 188, 448. Update manually to reference `src/content/business-profile/` and `src/content/people/` instead.
 
 ## Design
@@ -327,12 +327,12 @@ The migrator is invoked by `mission.migrate` (RFC-0479). No separate `--json` ou
 
 ### Snapshot test
 
-The migrator must have a snapshot test on real webgogol-com content data, per RFC-0479. The snapshot fixture should include all 60 unique `{business.*}` reference patterns to verify complete mapping coverage.
+The migrator must have a snapshot test on real warpgogol-com content data, per RFC-0479. The snapshot fixture should include all 60 unique `{business.*}` reference patterns to verify complete mapping coverage.
 
 ## Rollout
 
 - **Upon acceptance of RFC-0482 + RFC-0483:** Implement the migrator and register it.
-- **mission.migrate:** The migrator runs during the `mission.migrate` step of the next mission for webgogol-com.
+- **mission.migrate:** The migrator runs during the `mission.migrate` step of the next mission for warpgogol-com.
 - **Operator edits:** After migration, the operator reviews the diff, fixes any translation issues in de/ entities, and validates.
 - **release.prepare:** Validates that no `{business.*}` references remain and `business/` directory is deleted.
 
@@ -360,7 +360,7 @@ The migrator must have a snapshot test on real webgogol-com content data, per RF
 
 - [ ] Migrator registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts` with id `rfc-0483`
 - [ ] Migrator is idempotent (PBT `f(f(x)) == f(x)` passes)
-- [ ] Migrator has a snapshot test on real webgogol-com content
+- [ ] Migrator has a snapshot test on real warpgogol-com content
 - [ ] `migrator.registry.validate` passes
 - [ ] All 329 `{business.*}` references are replaced with `{business-profile.*}` references
 - [ ] `de/contact/general-email.md` exists with `schema: pbp/contact-point@1`
@@ -371,12 +371,12 @@ The migrator must have a snapshot test on real webgogol-com content data, per RF
 - [ ] `de/policies/*.md` exist (11 files matching uk/ policies)
 - [ ] `src/content/business/` directory is deleted
 - [ ] `business` collection is removed from `content.config.ts`
-- [ ] `pnpm --filter webgogol-com exec astro check` passes
+- [ ] `pnpm --filter warpgogol-com exec astro check` passes
 - [ ] No `[content-reference]` warnings for `business.*` references in build output
 - [ ] No `[footer-component] Unknown contactId` warnings in build output
 - [ ] `de/business.md` has `presentation.externalServices.chatbotPlatform` field
 - [ ] `docs/authoring/site-composition.md` updated to reference `business-profile/` instead of `business/`
-- [ ] `systems/webgogol-com/AGENTS.md` regenerated via `agents.generate` after `business/` deletion
+- [ ] `systems/warpgogol-com/AGENTS.md` regenerated via `agents.generate` after `business/` deletion
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents

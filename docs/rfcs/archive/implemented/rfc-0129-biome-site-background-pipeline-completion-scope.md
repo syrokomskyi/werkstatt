@@ -29,7 +29,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - ontology
@@ -88,7 +88,7 @@ Treat the remaining RFC-0114 / RFC-0117 work as a single multi-package change wi
 
 4. **Sample data in shipped biome YAMLs.**
    - Add an explicit `siteBackground` block to `packages/ontology/biomes/handwerk-material-warm.yaml` and `packages/ontology/biomes/nonprofit-trust.yaml` matching the visual identity each biome already conveys.
-   - Acceptance: `astro build` on webgogol-com and nicaragua-projekt produces unchanged visual output (because the shipped `system.md` already declares its own background) **or** explicitly migrates each app to drop the per-app shell.background and inherit the biome default. Decide per app.
+   - Acceptance: `astro build` on warpgogol-com and nicaragua-projekt produces unchanged visual output (because the shipped `system.md` already declares its own background) **or** explicitly migrates each app to drop the per-app shell.background and inherit the biome default. Decide per app.
 
 5. **Validator alignment.**
    - Extend `biome.contract.validate` (per RFC-0114 §"File system responsibilities") to accept the new block and reject a `parallax` on a `static` biome (RFC-0106 envelope rule).
@@ -118,7 +118,7 @@ RFC-0129 lives in the same session that closed seven other open RFCs and migrate
 ## Implementation notes for agents
 
 - When picking this up: open the four files named in §"Sequenced implementation order" in one editor session. Do not split steps across PRs.
-- Before step 4, run `pnpm --filter webgogol-com astro build` and `pnpm --filter nicaragua-projekt astro build` and take a screenshot of `/`. Compare against the post-step-4 build. If the visual changes, decide explicitly whether to drop the per-app override or keep it.
+- Before step 4, run `pnpm --filter warpgogol-com astro build` and `pnpm --filter nicaragua-projekt astro build` and take a screenshot of `/`. Compare against the post-step-4 build. If the visual changes, decide explicitly whether to drop the per-app override or keep it.
 - If a future session decides that constellations need a `siteBackground` override on top of the biome default, prefer a small additive RFC (constellation-as-override, never as primary source) over reopening RFC-0125.
 
 ## Backfilled sections (RFC-0366)

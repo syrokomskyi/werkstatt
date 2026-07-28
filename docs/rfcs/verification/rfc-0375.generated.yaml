@@ -28,7 +28,7 @@ probes:
   - probe:
       probe: run
       command: site-kernel run generated.file.lookup --path
-        apps/webgogol-com/public/robots.txt --json
+        apps/warpgogol-com/public/robots.txt --json
       expect:
         exitCode: 0
     ok: true

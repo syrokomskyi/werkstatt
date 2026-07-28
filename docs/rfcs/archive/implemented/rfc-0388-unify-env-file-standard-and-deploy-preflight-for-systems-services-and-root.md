@@ -138,8 +138,8 @@ A new command `deploy.preflight` runs before every `wrangler deploy` and validat
 
 ```sh
 # Sites
-pnpm exec site-kernel run deploy.preflight --site webgogol-com --env main
-pnpm exec site-kernel run deploy.preflight --site webgogol-com --env alt
+pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env main
+pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env alt
 
 # Services
 pnpm exec site-kernel run deploy.preflight --service lagebild-sync-worker
@@ -162,8 +162,8 @@ Deploy scripts in `package.json` call `deploy.preflight` before `wrangler deploy
 
 ```json
 {
-  "deploy:main": "site-kernel run deploy.preflight --site webgogol-com --env main && wrangler deploy --name webgogol-com --secrets-file .env.main",
-  "deploy:alt": "site-kernel run deploy.preflight --site webgogol-com --env alt && wrangler deploy --name alt-webgogol-com --secrets-file .env.alt",
+  "deploy:main": "site-kernel run deploy.preflight --site warpgogol-com --env main && wrangler deploy --name warpgogol-com --secrets-file .env.main",
+  "deploy:alt": "site-kernel run deploy.preflight --site warpgogol-com --env alt && wrangler deploy --name alt-warpgogol-com --secrets-file .env.alt",
   "build:deploy:main": "pnpm run build:main && pnpm run deploy:main",
   "build:deploy:alt": "pnpm run build:alt && pnpm run deploy:alt"
 }
@@ -233,8 +233,8 @@ pnpm exec site-kernel run env.main.check
 pnpm exec site-kernel run deploy.scripts.validate
 
 # Pre-deploy gate (sites)
-pnpm exec site-kernel run deploy.preflight --site webgogol-com --env main
-pnpm exec site-kernel run deploy.preflight --site webgogol-com --env alt
+pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env main
+pnpm exec site-kernel run deploy.preflight --site warpgogol-com --env alt
 
 # Pre-deploy gate (services)
 pnpm exec site-kernel run deploy.preflight --service lagebild-sync-worker
@@ -298,7 +298,7 @@ interface EnvContractViolation {
 {
   "command": "deploy.preflight",
   "status": "fail",
-  "target": "systems/webgogol-com/.env.main",
+  "target": "systems/warpgogol-com/.env.main",
   "keysChecked": 8,
   "violations": [
     {
@@ -337,7 +337,7 @@ interface EnvContractViolation {
    - `deploy:main` → `--secrets-file .env.main` + preflight.
    - `deploy:alt` → `--secrets-file .env.alt` + preflight.
 6. Create root `.env.example` with all root variables documented.
-7. Create `systems/webgogol-com/.env.example` (or regenerate via `env.example.generate`).
+7. Create `systems/warpgogol-com/.env.example` (or regenerate via `env.example.generate`).
 8. Migrate `services/lagebild-sync-worker`:
    - Convert `.dev.vars.example` → `.env.example` (with `# How to obtain:`).
    - Convert `.dev.vars` → `.env`.

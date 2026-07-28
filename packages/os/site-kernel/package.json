@@ -137,7 +137,7 @@
     "@warpgogol/passport": "workspace:*",
     "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",
-    "@webgogol/forge": "workspace:*",
+    "@warpgogol/forge": "workspace:*",
     "@libp2p/kad-dht": "^16.3.4",
     "@libp2p/identify": "^4.1.0",
     "@libp2p/peer-id": "^6.0.0",

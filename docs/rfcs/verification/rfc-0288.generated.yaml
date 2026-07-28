@@ -34,7 +34,7 @@ probes:
     durationMs: 0
   - probe:
       probe: run
-      command: site-kernel run agent.capability.validate --app webgogol-com
+      command: site-kernel run agent.capability.validate --app warpgogol-com
       expect:
         exitCode: 0
     ok: true

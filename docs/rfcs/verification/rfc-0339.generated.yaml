@@ -29,7 +29,7 @@ probes:
     durationMs: 110
   - probe:
       probe: file-contains
-      path: apps/webgogol-com/wrangler.jsonc
+      path: apps/warpgogol-com/wrangler.jsonc
       pattern: '"destinations": \["signoz"\]'
     ok: true
     detail: pattern found

@@ -59,11 +59,11 @@ describe("extractWorkspaceImports", () => {
     expect(imports[0].line).toBe(1);
   });
 
-  it("extracts static @webgogol imports", () => {
-    const source = `import { bar } from "@webgogol/forge";`;
+  it("extracts static @warpgogol imports", () => {
+    const source = `import { bar } from "@warpgogol/forge";`;
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@webgogol/forge");
+    expect(imports[0].package).toBe("@warpgogol/forge");
   });
 
   it("extracts dynamic import() specifiers", () => {
@@ -73,25 +73,25 @@ describe("extractWorkspaceImports", () => {
     expect(imports[0].package).toBe("@warpgogol/site-kernel-integrity");
   });
 
-  it("extracts dynamic @webgogol import() specifiers", () => {
-    const source = `const mod = await import("@webgogol/forge");`;
+  it("extracts dynamic @warpgogol import() specifiers", () => {
+    const source = `const mod = await import("@warpgogol/forge");`;
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(1);
-    expect(imports[0].package).toBe("@webgogol/forge");
+    expect(imports[0].package).toBe("@warpgogol/forge");
   });
 
   it("extracts both static and dynamic imports from the same file", () => {
     const source = [
       `import { foo } from "@warpgogol/site-kernel";`,
       `const bar = await import("@warpgogol/share/fs");`,
-      `import { baz } from "@webgogol/forge";`,
+      `import { baz } from "@warpgogol/forge";`,
     ].join("\n");
     const imports = extractWorkspaceImports(source, "test.ts");
     expect(imports).toHaveLength(3);
     expect(imports.map((i) => i.package)).toEqual([
       "@warpgogol/site-kernel",
       "@warpgogol/share",
-      "@webgogol/forge",
+      "@warpgogol/forge",
     ]);
   });
 

@@ -124,13 +124,13 @@ scope:
 - `fleet/fleet.plan.generated.json` → `fleet/fleet.plan.generated.yaml`
 - `fleet/fleet.status.generated.json` → `fleet/fleet.status.generated.yaml`
 - `services/*/service.config.json` → `services/*/service.config.yaml`
-- `apps/webgogol-com/integration.shard.json` → `apps/webgogol-com/integration.shard.yaml`
-- `apps/webgogol-com/provenance/amend/amend-001.json` → `apps/webgogol-com/provenance/amend/amend-001.yaml`
-- `apps/webgogol-com/behavior.snapshot.generated.json` → `apps/webgogol-com/behavior.snapshot.generated.yaml`
-- `apps/webgogol-com/src/surface/states/*.state.json` → `*.state.yaml`
-- `apps/webgogol-com/src/surface/states/pointer.json` → `pointer.yaml`
-- `apps/webgogol-com/src/surface/visibility/*.json` → `*.yaml`
-- `apps/webgogol-com/src/surface/*.generated.json` → `*.generated.yaml`
+- `apps/warpgogol-com/integration.shard.json` → `apps/warpgogol-com/integration.shard.yaml`
+- `apps/warpgogol-com/provenance/amend/amend-001.json` → `apps/warpgogol-com/provenance/amend/amend-001.yaml`
+- `apps/warpgogol-com/behavior.snapshot.generated.json` → `apps/warpgogol-com/behavior.snapshot.generated.yaml`
+- `apps/warpgogol-com/src/surface/states/*.state.json` → `*.state.yaml`
+- `apps/warpgogol-com/src/surface/states/pointer.json` → `pointer.yaml`
+- `apps/warpgogol-com/src/surface/visibility/*.json` → `*.yaml`
+- `apps/warpgogol-com/src/surface/*.generated.json` → `*.generated.yaml`
 - `services/fleet-probe-runner/targets.generated.json` → `targets.generated.yaml`
 - `uni.registry.json` → `uni.registry.yaml`
 

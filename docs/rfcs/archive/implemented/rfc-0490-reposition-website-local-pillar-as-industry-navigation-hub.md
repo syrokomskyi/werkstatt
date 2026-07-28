@@ -47,7 +47,7 @@ commands:
     - surface.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/surface"
@@ -60,7 +60,7 @@ successSignals:
   - "An industry catalog section shows all published industries as linked cards with trade name, one specific trade task, typical contact scenario, and a link to the industry page — generated from the surface axis universe, not hardcoded."
   - "A 'Gleiche Grundlage, angepasste Struktur' (same basis, adapted structure) block shows the base price from PBP references and explains that the trade does not change the base price."
   - "A final CTA block addresses unlisted trades with 'Ihr Gewerbe ist noch nicht aufgeführt?' and offers 'Unverbindliche Anfrage starten' + 'Preis ansehen'."
-  - "The page title is 'Website für Handwerk und Gewerbe | Branchenübersicht | Webgogol' (DE) / 'Сайт для ремесла та бізнесу | Огляд галузей | Webgogol' (UK), not the generic 'Website erstellen lassen' / 'Створення вебсайту'."
+  - "The page title is 'Website für Handwerk und Gewerbe | Branchenübersicht | Warpgogol' (DE) / 'Сайт для ремесла та бізнесу | Огляд галузей | Warpgogol' (UK), not the generic 'Website erstellen lassen' / 'Створення вебсайту'."
   - "The meta description communicates the hub function: how Digitales Fundament adapts to different trades."
   - "JSON-LD for the pillar page emits CollectionPage + ItemList (of published industry links) + BreadcrumbList — not per-card Product or Service nodes."
   - "No unfulfillable commercial promises ('Anfragen, die zu echten Aufträgen führen', 'lokale Sichtbarkeit aufbauen') appear in any industry card description or meta description on the hub page."
@@ -138,8 +138,8 @@ levels:
     geo: twin-only
     semanticType: collection
     titleTemplate:
-      de: "Website für Handwerk und Gewerbe | Branchenübersicht | Webgogol"
-      uk: "Сайт для ремесла та бізнесу | Огляд галузей | Webgogol"
+      de: "Website für Handwerk und Gewerbe | Branchenübersicht | Warpgogol"
+      uk: "Сайт для ремесла та бізнесу | Огляд галузей | Warpgogol"
     descriptionTemplate:
       de: "Wie das Digitale Fundament an Elektriker, Friseure und andere lokale Betriebe angepasst wird: Leistungen, Einsatzgebiet, Kontaktwege und passende Funktionen."
       uk: "Як Цифровий фундамент адаптується до електриків, перукарів та іншого локального бізнесу: послуги, зона роботи, шляхи контакту та відповідні функції."
@@ -209,8 +209,8 @@ levels:
           de: "Ihr Gewerbe ist noch nicht aufgeführt?"
           uk: "Вашої галузі ще немає в списку?"
         body:
-          de: "Beschreiben Sie kurz Ihren Betrieb, Ihre Leistungen und Ihr Einsatzgebiet. Webgogol prüft, wie das Digitale Fundament für Ihre Situation aufgebaut werden kann."
-          uk: "Коротко опишіть свій бізнес, послуги та зону роботи. Webgogol перевірить, як Цифровий фундамент можна побудувати для вашої ситуації."
+          de: "Beschreiben Sie kurz Ihren Betrieb, Ihre Leistungen und Ihr Einsatzgebiet. Warpgogol prüft, wie das Digitale Fundament für Ihre Situation aufgebaut werden kann."
+          uk: "Коротко опишіть свій бізнес, послуги та зону роботи. Warpgogol перевірить, як Цифровий фундамент можна побудувати для вашої ситуації."
         primaryCta:
           label:
             de: "Unverbindliche Anfrage starten"
@@ -466,7 +466,7 @@ No `migratorCursor` entry is needed — the blueprint change ships with the plat
 7. **Labels**: no new label keys needed — the pillar reads all labels from the blueprint `pillar` block.
 8. **Compass sync**: update `docs/technology.xml` and `docs/knowledge-graph.xml` to reflect the new `pillar` field on `BlueprintLevel` and the `"collection"` semantic page type.
 9. **AGENTS.md**: update `packages/share/AGENTS.md` semantic table to note the `"collection"` type and `collectionItems` field.
-10. **Pilot**: regenerate the surface for `webgogol-com` and verify the rendered `/website/` and `/sait/` pages.
+10. **Pilot**: regenerate the surface for `warpgogol-com` and verify the rendered `/website/` and `/sait/` pages.
 11. **Switch to fail-hard**: enable `surface.hub.validate` in `APPS_CHECK_AUTHOR_PIPELINE`.
 
 ## Alternatives considered
@@ -512,13 +512,13 @@ No `migratorCursor` entry is needed — the blueprint change ships with the plat
 - [x] `surface.hub.validate` enforces: `pillar-hero-cta-not-anchor`, `pillar-commercial-promise`, `pillar-missing-title-template`, `pillar-no-published-industries`. (evidence: `packages/os/site-kernel-checks/src/surface-hub-validate.ts`, command exit 0 verified)
 - [x] `surface.hub.validate` warns on `pillar-orphan-industry` and `pillar-priceref-unresolvable`. (evidence: `packages/os/site-kernel-checks/src/surface-hub-validate.ts`, 1 warning verified)
 - [x] `website-local.yaml` is updated directly in the implementation commit (no migrator). (evidence: git log shows direct edit, no migrator registered)
-- [x] `surface.hub.validate --site webgogol-com --json` exits 0. (evidence: `node packages/os/site-kernel/bin/site-kernel.mjs run surface.hub.validate --site webgogol-com --json` → exitCode 0, 0 errors, 1 warning)
-- [x] `content.references.validate --site webgogol-com` exits 0. (evidence: `node packages/os/site-kernel/bin/site-kernel.mjs run content.references.validate --site webgogol-com` → OK, 0 warnings)
+- [x] `surface.hub.validate --site warpgogol-com --json` exits 0. (evidence: `node packages/os/site-kernel/bin/site-kernel.mjs run surface.hub.validate --site warpgogol-com --json` → exitCode 0, 0 errors, 1 warning)
+- [x] `content.references.validate --site warpgogol-com` exits 0. (evidence: `node packages/os/site-kernel/bin/site-kernel.mjs run content.references.validate --site warpgogol-com` → OK, 0 warnings)
 - [x] `docs/technology.xml` and `docs/knowledge-graph.xml` updated to reflect the new `pillar` field and `"collection"` semantic type. (evidence: `docs/technology.xml:163-177,206-207`, `docs/knowledge-graph.xml:550-607`)
 - [x] `packages/share/AGENTS.md` semantic table updated to note the `"collection"` type and `collectionItems` field. (evidence: `packages/share/AGENTS.md:15`)
-- [x] Dev build of `webgogol-com` starts without runtime errors on `/website/` and `/sait/`. (evidence: `pnpm --filter webgogol-com run build` — `/uk/sait/index.html` and `/de/website/index.html` prerendered successfully; `/open-source` crash is pre-existing and unrelated)
+- [x] Dev build of `warpgogol-com` starts without runtime errors on `/website/` and `/sait/`. (evidence: `pnpm --filter warpgogol-com run build` — `/uk/sait/index.html` and `/de/website/index.html` prerendered successfully; `/open-source` crash is pre-existing and unrelated)
 - [x] The rendered `/website/` page shows: hub hero, adaptation block, industry catalog, product/price block, final CTA. (evidence: 5 `section-shell` blocks in rendered HTML, `industry-catalog` anchor present)
-- [x] The rendered `/sait/` page shows the same layout in Ukrainian. (evidence: `missions/webgogol-com-m000010/workpiece/dist/client/uk/sait/index.html` — 5 section-shell blocks, CollectionPage + ItemList JSON-LD)
+- [x] The rendered `/sait/` page shows the same layout in Ukrainian. (evidence: `missions/warpgogol-com-m000010/workpiece/dist/client/uk/sait/index.html` — 5 section-shell blocks, CollectionPage + ItemList JSON-LD)
 - [x] No unfulfillable commercial promises appear in any industry card on the hub page. (evidence: grep for known promise phrases in rendered HTML returned 0 matches)
 - [x] `rfc.validate RFC-0490` passes. (evidence: `node packages/os/site-kernel/bin/site-kernel.mjs run rfc.validate RFC-0490` → 0 errors, 1 warning V-30 advisory)
 - [x] RFC-0238 `amendedBy` includes RFC-0490; RFC-0207 `amendedBy` includes RFC-0490. (evidence: `docs/rfcs/archive/implemented/rfc-0238-*.md:17-19`, `docs/rfcs/archive/implemented/rfc-0207-*.md:19-21`)

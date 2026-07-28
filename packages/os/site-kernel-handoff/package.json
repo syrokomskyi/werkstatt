@@ -104,7 +104,7 @@
   },
   "dependencies": {
     "@warpgogol/fingerprint": "workspace:*",
-    "@webgogol/forge": "workspace:*",
+    "@warpgogol/forge": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
     "@warpgogol/passport": "workspace:*",
     "@warpgogol/share": "workspace:*",

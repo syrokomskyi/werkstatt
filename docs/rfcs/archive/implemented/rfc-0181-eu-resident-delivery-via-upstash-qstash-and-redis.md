@@ -134,8 +134,8 @@ Signature verification on the callback uses Upstash's `@upstash/qstash` `Receive
   "command": "integration.config.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "delivery-provider-unknown", "value": "sqs" },
-    { "app": "webgogol-com", "rule": "delivery-secret-missing", "secret": "UPSTASH_QSTASH_TOKEN" }
+    { "app": "warpgogol-com", "rule": "delivery-provider-unknown", "value": "sqs" },
+    { "app": "warpgogol-com", "rule": "delivery-secret-missing", "secret": "UPSTASH_QSTASH_TOKEN" }
   ]
 }
 ```
@@ -147,7 +147,7 @@ A non-2xx callback makes QStash retry (bounded → DLQ). The Redis idempotency c
 ## Rollout
 
 - Phase 1: `qstash.ts` pure publish-builder + `IdempotencyLedger` + tests; validators learn the delivery secrets; spec + README + AGENTS clauses. Mark the CF-queue substrate superseded.
-- Phase 2: wire the site callback route (`@upstash/qstash` Receiver + Redis ledger + `routeEventToReady`); webgogol-com publishes to QStash EU; live secrets via untracked env.
+- Phase 2: wire the site callback route (`@upstash/qstash` Receiver + Redis ledger + `routeEventToReady`); warpgogol-com publishes to QStash EU; live secrets via untracked env.
 - Phase 3: enable Regional Services (EU) on each client zone; document the residency posture in the Datenschutz/DPA.
 - Phase 4 (future tier 2): EU-incorporated/self-hosted substrate for clients requiring structural sovereignty.
 
@@ -171,7 +171,7 @@ A non-2xx callback makes QStash retry (bounded → DLQ). The Redis idempotency c
 - [x] `integration.config.validate` validates the Upstash delivery provider + EU region <!-- delivery-provider-unknown / delivery-region-not-eu rules. Secret-PRESENCE validation (UPSTASH_QSTASH_TOKEN etc. in the env schema) is a follow-up once the callback route declares them via api[].secrets. --> (evidence: implemented historically)
 - [x] CF-Queues/KV substrate marked superseded for the EU delivery path; RFC-0179/0177 `amendedBy` list RFC-0181 <!-- sharding.ts/index.ts/RFC-0179 notes; RFC-0177 clause 6 restated; back-refs added --> (evidence: implemented historically)
 - [x] `docs/specs/integration-delivery.md` + README document the subsystem AND the honest physical-vs-structural EU argumentation <!-- docs/specs/integration-delivery.md + packages/share/src/integration/README.md. Per-app AGENTS.md is template-generated (RFC-0079) — a clause there is a generator follow-up; the spec is the authoritative agent doc. --> (evidence: AGENTS.md:1, agent guide updated)
-- [x] webgogol-com declares `integrations.delivery: { provider: upstash, region: eu }`; validators + build green <!-- system.md updated; system.manifest.validate + integration.config.validate + full turbo build:check green --> (evidence: implemented historically)
+- [x] warpgogol-com declares `integrations.delivery: { provider: upstash, region: eu }`; validators + build green <!-- system.md updated; system.manifest.validate + integration.config.validate + full turbo build:check green --> (evidence: implemented historically)
 - [x] Callback wiring implemented: inbound route publishes to QStash EU (`buildQstashPublish`); the `/api/integration-route` callback verifies the QStash signature (`@upstash/qstash` `Receiver`), runs the Redis EU idempotency ledger (`restRedisLedger`), and executes the client's destinations (`executeDispatch`) <!-- chat-widget-section.api.ts (publish) + chat-widget-section.delivery.api.ts (callback); manifest api[] emits both routes + projects the UPSTASH_* secrets; @upstash/qstash added to @gogol/ui; full turbo build:check green (27/27, Worker bundles the Receiver). REMAINING (ops, not code): set live secrets in deploy env + enable Regional Services (EU) on the zone for in-EU execution, then run the live e2e. --> (evidence: packages/ directory, package exists)
 - [x] Live e2e + Regional Services (EU) on the zone — ops step with live secrets (creds in .env; Regional Services entitlement to confirm) <!-- not runnable in-repo --> (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file before merging <!-- all 167 RFCs pass --> (evidence: implemented historically)

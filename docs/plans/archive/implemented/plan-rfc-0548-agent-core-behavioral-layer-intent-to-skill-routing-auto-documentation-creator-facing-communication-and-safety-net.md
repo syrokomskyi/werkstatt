@@ -57,7 +57,7 @@ scope:
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0548`
 - `pnpm exec site-kernel run forge.skill.validate` — must pass with new `triggers` field
-- `pnpm --filter @webgogol/forge build:check`
+- `pnpm --filter @warpgogol/forge build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 - `pnpm exec site-kernel run migrator.registry.validate`
@@ -76,7 +76,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge build:check` passes
+- `pnpm --filter @warpgogol/forge build:check` passes
 - `pnpm exec site-kernel run forge.skill.validate` passes (no skills have `triggers` yet — field is optional)
 
 **Completion criterion:** `triggers` field is accepted in skill frontmatter schema; SKILL-16 validation rule is implemented; typecheck passes.
@@ -98,7 +98,7 @@ scope:
 **Validation:**
 
 - `pnpm exec site-kernel run forge.skill.validate` passes with all skills having valid `triggers` fields
-- `pnpm --filter @webgogol/forge build:check` passes
+- `pnpm --filter @warpgogol/forge build:check` passes
 
 **Completion criterion:** All 22 fo-skills have `triggers` arrays in frontmatter; `forge.skill.validate` passes.
 
@@ -124,7 +124,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge build:check` passes
+- `pnpm --filter @warpgogol/forge build:check` passes
 - Manual inspection: run `forge.agents.generate` on a test project and verify the behavioral layer section is present with correct routing table
 
 **Completion criterion:** `agents-generate.ts` produces AGENTS.md with a Behavioral layer section containing intent-to-skill routing table from `triggers` fields; section markers are present; extended layer is conditionally included based on register.
@@ -145,8 +145,8 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge build:check` passes
-- `pnpm --filter @webgogol/forge test` — `create.test.ts` verifies AGENTS.md is generated after `forge.create`
+- `pnpm --filter @warpgogol/forge build:check` passes
+- `pnpm --filter @warpgogol/forge test` — `create.test.ts` verifies AGENTS.md is generated after `forge.create`
 
 **Completion criterion:** `forge.create` calls `forge.agents.generate` after `forge.init`; AGENTS.md exists from first moment; `nextSteps` no longer mention manual AGENTS.md generation.
 
@@ -220,7 +220,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge build:check` passes (AGENTS.md is documentation, not code, but verify no broken references)
+- `pnpm --filter @warpgogol/forge build:check` passes (AGENTS.md is documentation, not code, but verify no broken references)
 
 **Completion criterion:** `packages/forge/AGENTS.md` Output contract section documents the Core behavioral layer.
 
@@ -253,7 +253,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge test` passes
+- `pnpm --filter @warpgogol/forge test` passes
 - `pnpm --filter @gogol/site-kernel-handoff test` passes
 
 **Completion criterion:** All tests pass; test coverage includes routing table generation, conditional extended layer, section markers, idempotency, migrator PBT and snapshot.
@@ -291,9 +291,9 @@ scope:
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0548`
-- `pnpm --filter @webgogol/forge build:check`
+- `pnpm --filter @warpgogol/forge build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
-- `pnpm --filter @webgogol/forge test`
+- `pnpm --filter @warpgogol/forge test`
 - `pnpm --filter @gogol/site-kernel-handoff test`
 - `pnpm exec site-kernel run forge.skill.validate`
 - `pnpm exec site-kernel run migrator.registry.validate`

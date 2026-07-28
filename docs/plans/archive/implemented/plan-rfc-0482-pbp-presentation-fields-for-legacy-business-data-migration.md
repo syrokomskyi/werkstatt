@@ -7,7 +7,7 @@ createdAt: 2026-07-22
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/pbp"
   services: []

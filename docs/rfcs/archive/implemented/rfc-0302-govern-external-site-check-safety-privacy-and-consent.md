@@ -32,11 +32,11 @@ commands:
     - check.evidence.capture
   removed: []
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/check-core"
   - "@gogol/check-runner-node"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
 successSignals:
   - "The checker does not become a crawler abuse tool."
   - "Private alt checks require explicit target policy and host allowlists."
@@ -55,7 +55,7 @@ acceptance:
 
 ## Context
 
-Check Webgogol can inspect websites outside the WGogol workspace. That makes safety and consent first-class architecture. A crawler that follows arbitrary links, stores screenshots with personal data, or ignores robots policy would be dangerous and reputationally unacceptable.
+Check Warpgogol can inspect websites outside the WGogol workspace. That makes safety and consent first-class architecture. A crawler that follows arbitrary links, stores screenshots with personal data, or ignores robots policy would be dangerous and reputationally unacceptable.
 
 ## Problem
 

@@ -107,11 +107,11 @@ scope:
 **Agent actions:**
 
 - Add `license: "MIT"` (already in README, not in package.json)
-- Add `repository: { type: "git", url: "https://github.com/syrokomskyi/webgogol-4.git", directory: "packages/forge" }`
+- Add `repository: { type: "git", url: "https://github.com/syrokomskyi/warpgogol-4.git", directory: "packages/forge" }`
 - Add `description: "Framework for documenting and implementing ideas — RFC/ADR governance, skills, and project bootstrapping."`
 - Add `keywords: ["rfc", "adr", "governance", "skills", "ai-agent", "documentation", "framework"]`
-- Add `homepage: "https://github.com/syrokomskyi/webgogol-4#readme"`
-- Add `bugs: { url: "https://github.com/syrokomskyi/webgogol-4/issues" }`
+- Add `homepage: "https://github.com/syrokomskyi/warpgogol-4#readme"`
+- Add `bugs: { url: "https://github.com/syrokomskyi/warpgogol-4/issues" }`
 
 **Validation:**
 

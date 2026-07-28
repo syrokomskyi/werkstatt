@@ -33,7 +33,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/site-kernel"
@@ -123,8 +123,8 @@ The owner should be `@gogol/site-kernel` for pipeline logging primitives and `@g
 ```sh
 pnpm exec site-kernel run pipeline.log.hygiene.validate --json
 pnpm exec site-kernel run packages-check.run --json
-pnpm exec site-kernel run apps-check.author --app webgogol-com --json
-pnpm --filter webgogol-com build:check
+pnpm exec site-kernel run apps-check.author --app warpgogol-com --json
+pnpm --filter warpgogol-com build:check
 ```
 
 `pipeline.log.hygiene.validate` is workspace-scoped and read-only.
@@ -184,7 +184,7 @@ Default successful output should emphasize:
 Example:
 
 ```txt
-== webgogol-com: build.post ==
+== warpgogol-com: build.post ==
 [OK] 27 step(s) passed
 [notice] content fallback: 38 expected default-language fallback(s), grouped by 6 source(s)
 [notice] passport prebuild artifact: 8 expected lookup miss(es) before postbuild emission
@@ -308,7 +308,7 @@ Astro and Vite logs cannot be fully controlled. Mitigation: group external tool 
 - [x] `pipeline.log.hygiene.validate` is included in `PACKAGES_CHECK_PIPELINE` after current known-noise sources are migrated or allowlisted. (evidence: implemented historically)
 - [x] High-volume content fallback, business-loader fallback, content-reference fallback, and passport prebuild lookup messages are no longer emitted as repeated raw console lines in default app `build:check` output. (evidence: implemented historically)
 - [x] Warning-like log events that require action are represented as canonical diagnostics. (evidence: implemented historically)
-- [x] Both `pnpm --filter nicaragua-projekt build:check` and `pnpm --filter webgogol-com build:check` pass. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Both `pnpm --filter nicaragua-projekt build:check` and `pnpm --filter warpgogol-com build:check` pass. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `pnpm exec site-kernel run packages-check.run --json`, `pnpm exec site-kernel run ci.local.validate --json`, `pnpm test`, and `rfc.validate` pass. (evidence: tests pass, vitest run exitCode=0)
 
 Verification note (2026-07-01): implementation-scoped package checks passed for `@gogol/site-kernel`, `@gogol/site-kernel-checks`, `@gogol/site-kernel-content`, and `@gogol/business`. Full workspace/app validation is currently blocked by an unrelated RFC-0257 workspace change where `packages/ontology/src/schemas/page-entry.ts` imports `@gogol/share/schemas/print`, which is not resolvable from the current package exports.

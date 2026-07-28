@@ -60,7 +60,7 @@
     "@warpgogol/content-source": "workspace:*",
     "@warpgogol/faq": "workspace:*",
     "@warpgogol/pbp": "workspace:*",
-    "@webgogol/forge": "workspace:*",
+    "@warpgogol/forge": "workspace:*",
     "@warpgogol/growth": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
     "@warpgogol/share": "workspace:*",

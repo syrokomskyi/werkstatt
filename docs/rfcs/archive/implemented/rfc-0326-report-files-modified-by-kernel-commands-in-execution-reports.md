@@ -103,7 +103,7 @@ No new commands. The change is visible in existing command output:
 **Pretty mode (new line after command output):**
 
 ```
-== webgogol-com: ecosystem.manifest.generate ==
+== warpgogol-com: ecosystem.manifest.generate ==
 [OK] ecosystem.manifest.generate: 3 file(s) written
 [Modified 3 file(s): docs/ecosystem.generated.json, docs/COMMANDS.md, docs/command-manifest.generated.json] Re-read before editing.
 ```
@@ -131,18 +131,18 @@ No new commands. The change is visible in existing command output:
   "pipelineName": "build.check",
   "ok": true,
   "filesModified": [
-    "apps/webgogol-com/public/sitemap.xml",
-    "apps/webgogol-com/public/robots.txt"
+    "apps/warpgogol-com/public/sitemap.xml",
+    "apps/warpgogol-com/public/robots.txt"
   ],
   "steps": [
     {
       "commandName": "sitemap.generate",
-      "filesModified": ["apps/webgogol-com/public/sitemap.xml"],
+      "filesModified": ["apps/warpgogol-com/public/sitemap.xml"],
       "..."
     },
     {
       "commandName": "robots.generate",
-      "filesModified": ["apps/webgogol-com/public/robots.txt"],
+      "filesModified": ["apps/warpgogol-com/public/robots.txt"],
       "..."
     }
   ]

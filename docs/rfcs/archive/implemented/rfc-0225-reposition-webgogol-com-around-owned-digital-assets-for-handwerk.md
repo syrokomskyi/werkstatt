@@ -1,6 +1,6 @@
 ---
 id: RFC-0225
-title: "Reposition webgogol-com around owned digital assets for Handwerk"
+title: "Reposition warpgogol-com around owned digital assets for Handwerk"
 status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
@@ -29,15 +29,15 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/ontology"
 successSignals:
   - "`pnpm exec site-kernel run rfc.validate` passes."
-  - "`pnpm exec site-kernel run page.block.validate --app webgogol-com` passes."
+  - "`pnpm exec site-kernel run page.block.validate --app warpgogol-com` passes."
   - "`pnpm --filter @gogol/ontology build:check` passes."
-  - "`pnpm exec site-kernel run apps-check.run --app webgogol-com` passes or reports only pre-existing unrelated issues."
+  - "`pnpm exec site-kernel run apps-check.run --app warpgogol-com` passes or reports only pre-existing unrelated issues."
 nonGoals:
   - "No four-segment homepage launch before a signed case proves a second doorway."
   - "No new shared UI package contract unless existing section archetypes cannot express the content."
@@ -45,13 +45,13 @@ nonGoals:
   - "No live third-party platform price claim without CKL provenance."
 ---
 
-# RFC-0225: Reposition webgogol-com around owned digital assets for Handwerk
+# RFC-0225: Reposition warpgogol-com around owned digital assets for Handwerk
 
 ## Context
 
-The `webgogol-com` homepage is the studio's primary marketing surface for small local businesses and Handwerk in Germany. A June 2026 external communication review (`WarpGogol-STRA.pdf`) found that the page currently explains the product as a technical and contractual foundation, but lets the "Notausgang" exit promise appear too early in the first decision frame. The visitor's first question is "why this provider?", while the page partially answers "how can I leave?" before the result is clear.
+The `warpgogol-com` homepage is the studio's primary marketing surface for small local businesses and Handwerk in Germany. A June 2026 external communication review (`WarpGogol-STRA.pdf`) found that the page currently explains the product as a technical and contractual foundation, but lets the "Notausgang" exit promise appear too early in the first decision frame. The visitor's first question is "why this provider?", while the page partially answers "how can I leave?" before the result is clear.
 
-The site's long-term strategy remains bigger than a web-studio pitch: Webgogol builds owned digital assets and infrastructure for small businesses. The homepage needs to translate that philosophy into a customer-readable first-screen promise for the current launch market: Handwerk and small local operators around Backnang / Stuttgart.
+The site's long-term strategy remains bigger than a web-studio pitch: Warpgogol builds owned digital assets and infrastructure for small businesses. The homepage needs to translate that philosophy into a customer-readable first-screen promise for the current launch market: Handwerk and small local operators around Backnang / Stuttgart.
 
 The app is already an RFC-0047 CMS-friendly content surface. The repositioning should therefore happen through `src/content/system.md`, localized page blocks, prose, navigation, and site labels first, using existing shared section archetypes where they fit.
 
@@ -67,7 +67,7 @@ The invariant to protect is not "remove digital sovereignty". It is the opposite
 
 ## Decision
 
-`webgogol-com` adopts a "one proven doorway, modular expansion later" homepage strategy:
+`warpgogol-com` adopts a "one proven doorway, modular expansion later" homepage strategy:
 
 - The first screen leads with the result for Handwerk: a website/digital asset that helps the business be found, brings calls and inquiries closer, and belongs to the customer.
 - The ownership-versus-rental contrast moves directly below the first proof layer and compares owned digital assets with lead platforms and closed builders.
@@ -98,9 +98,9 @@ Validation uses existing commands:
 
 ```sh
 pnpm exec site-kernel run rfc.validate
-pnpm exec site-kernel run page.block.validate --app webgogol-com
-pnpm exec site-kernel run material.credits.validate --app webgogol-com
-pnpm exec site-kernel run apps-check.run --app webgogol-com
+pnpm exec site-kernel run page.block.validate --app warpgogol-com
+pnpm exec site-kernel run material.credits.validate --app warpgogol-com
+pnpm exec site-kernel run apps-check.run --app warpgogol-com
 ```
 
 ### TypeScript contracts
@@ -123,13 +123,13 @@ No new TypeScript contract is required for the initial implementation. Existing 
 
 | Path | Role |
 | --- | --- |
-| `docs/rfcs/rfc-0225-reposition-webgogol-com-around-owned-digital-assets-for-handwerk.md` | Governance record for the repositioning decision. |
-| `apps/webgogol-com/src/content/system.md` | Homepage constellation order and page rationale. |
-| `apps/webgogol-com/src/content/pages/de/home.md` | German homepage blocks and first-screen communication. |
-| `apps/webgogol-com/src/content/pages/uk/home.md` | Ukrainian mirrored homepage blocks. |
-| `apps/webgogol-com/src/content/prose/{de,uk}/home-*.md` | Longer FAQ/video explanatory copy. |
-| `apps/webgogol-com/src/content/site/{de,uk}/labels.md` | Header/footer copy and nav emphasis. |
-| `apps/webgogol-com/src/content/navigation/{de,uk}/navigation.md` | Navigation labels if the public wording changes. |
+| `docs/rfcs/rfc-0225-reposition-warpgogol-com-around-owned-digital-assets-for-handwerk.md` | Governance record for the repositioning decision. |
+| `apps/warpgogol-com/src/content/system.md` | Homepage constellation order and page rationale. |
+| `apps/warpgogol-com/src/content/pages/de/home.md` | German homepage blocks and first-screen communication. |
+| `apps/warpgogol-com/src/content/pages/uk/home.md` | Ukrainian mirrored homepage blocks. |
+| `apps/warpgogol-com/src/content/prose/{de,uk}/home-*.md` | Longer FAQ/video explanatory copy. |
+| `apps/warpgogol-com/src/content/site/{de,uk}/labels.md` | Header/footer copy and nav emphasis. |
+| `apps/warpgogol-com/src/content/navigation/{de,uk}/navigation.md` | Navigation labels if the public wording changes. |
 
 Generated files and route files are not edited for this repositioning.
 
@@ -148,7 +148,7 @@ Failure remains covered by existing validators:
 
 ## Rollout
 
-This RFC applies only to `webgogol-com`.
+This RFC applies only to `warpgogol-com`.
 
 The first rollout is a direct homepage content revision:
 
@@ -165,7 +165,7 @@ Future rollout opens a second segment only when a signed case and observable dem
 
 **Scenario A: one Handwerk focus only.** This is fast and clear, but leaves no visible architecture for later segment expansion.
 
-**Scenario B: four public segment doors now.** This uses the segmentation idea too early. Without signed cases in each segment, it risks making Webgogol look like a generic agency for everyone.
+**Scenario B: four public segment doors now.** This uses the segmentation idea too early. Without signed cases in each segment, it risks making Warpgogol look like a generic agency for everyone.
 
 **Scenario C: one focus with modular expansion.** This is selected. It preserves launch focus, keeps the founder-scale workload realistic, and leaves a clear condition for future segment expansion.
 

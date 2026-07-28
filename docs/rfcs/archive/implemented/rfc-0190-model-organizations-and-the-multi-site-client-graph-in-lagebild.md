@@ -32,7 +32,7 @@ commands:
   removed: []
 appsImpacted:
   - apps/*
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/share
   - packages/integration-adapter-supabase-crm
@@ -153,7 +153,7 @@ A new `upsert_organization` handler upserts the Pipedrive Organization (dedup by
 4. **Adapter phase:** resolve-or-create the Organization from the funnel event and link the deal.
 5. **Sync phase:** add the worker `upsert_organization` handler + person↔org linkage in Pipedrive.
 6. **Validator phase:** add `funnel.org.validate`; extend `funnel.lagebild.validate`.
-7. **Pilot phase:** enable for `webgogol-com`; verify the Person→N Deals→Organization graph in Pipedrive matches the spec (`docs/specs/visitor-funnel/01-pipedrive.md`).
+7. **Pilot phase:** enable for `warpgogol-com`; verify the Person→N Deals→Organization graph in Pipedrive matches the spec (`docs/specs/visitor-funnel/01-pipedrive.md`).
 
 ## Alternatives considered
 

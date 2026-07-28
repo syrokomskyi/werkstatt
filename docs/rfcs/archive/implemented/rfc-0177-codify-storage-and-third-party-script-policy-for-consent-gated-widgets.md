@@ -89,7 +89,7 @@ The storage / third-party-script policy is codified with the following clauses, 
 
 ```sh
 pnpm exec site-kernel run consent.activation.validate --all --json
-pnpm exec site-kernel run legal.processors.validate --app webgogol-com --json
+pnpm exec site-kernel run legal.processors.validate --app warpgogol-com --json
 ```
 
 ### Policy contract
@@ -125,7 +125,7 @@ Storage & third-party policy (codified):
   "command": "consent.activation.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "third-party-before-activation", "origin": "widget.uchat.com.au", "page": "/" }
+    { "app": "warpgogol-com", "rule": "third-party-before-activation", "origin": "widget.uchat.com.au", "page": "/" }
   ]
 }
 ```
@@ -135,8 +135,8 @@ Storage & third-party policy (codified):
   "command": "legal.processors.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "missing-processor-disclosure", "processor": "uchat" },
-    { "app": "webgogol-com", "rule": "missing-dpa-reference", "scope": "studio-client" }
+    { "app": "warpgogol-com", "rule": "missing-processor-disclosure", "processor": "uchat" },
+    { "app": "warpgogol-com", "rule": "missing-dpa-reference", "scope": "studio-client" }
   ]
 }
 ```
@@ -148,7 +148,7 @@ Storage & third-party policy (codified):
 ## Rollout
 
 - Codify clauses in AGENTS.md; add `consent.activation.validate` and `legal.processors.validate`; register both in `apps-check.run`.
-- webgogol-com pilot: update `de`/`uk` Datenschutz to name UChat (processor) and Pipedrive (recipient) — purpose, legal basis (activation), data categories, retention, DSAR path — and reference the studio↔client DPA, under RFC-0174 binding-language rules; add the in-widget legal line.
+- warpgogol-com pilot: update `de`/`uk` Datenschutz to name UChat (processor) and Pipedrive (recipient) — purpose, legal basis (activation), data categories, retention, DSAR path — and reference the studio↔client DPA, under RFC-0174 binding-language rules; add the in-widget legal line.
 - Both reference apps build green with no widget/external destination configured (validators no-op when absent).
 
 ## Alternatives considered
@@ -173,9 +173,9 @@ Storage & third-party policy (codified):
 - [x] `legal.processors.validate` fails when a widget/external destination is configured without a processor + recipients disclosure and a DPA reference; in `apps-check.run` (author) (evidence: implemented historically)
 - [x] First-party cookie prohibition unchanged; no first-party cookie exception introduced (evidence: implemented historically)
 - [x] Server-side credential/OAuth storage permitted; visitor/lead PII + conversation history not persisted (queue in-flight only — composes with RFC-0176) (evidence: implemented historically)
-- [x] webgogol-com Datenschutz names UChat (processor) + Pipedrive (recipient) + Art. 28 Auftragsverarbeitung (DPA) — pre-existing comprehensive disclosure; `legal.processors.validate` passes with chat configured (2 vendors disclosed + DPA reference) (evidence: implemented historically)
+- [x] warpgogol-com Datenschutz names UChat (processor) + Pipedrive (recipient) + Art. 28 Auftragsverarbeitung (DPA) — pre-existing comprehensive disclosure; `legal.processors.validate` passes with chat configured (2 vendors disclosed + DPA reference) (evidence: implemented historically)
 - [x] In-widget legal line + Privacy Policy link required before contact fields (chat-widget config) <!-- chat-widget section props: legalNotice + privacyPolicyPageId (semantic ref, resolved per-locale) required --> (evidence: implemented historically)
-- [x] Both reference apps build green; validators no-op when nothing is configured <!-- validators verified no-op pass on webgogol-com + nicaragua-projekt --> (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Both reference apps build green; validators no-op when nothing is configured <!-- validators verified no-op pass on warpgogol-com + nicaragua-projekt --> (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file before merging (evidence: implemented historically)
 
 ## Implementation notes for agents

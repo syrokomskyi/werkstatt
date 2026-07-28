@@ -36,7 +36,7 @@ commands:
     - pseo.proof.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/site-kernel-checks"
@@ -120,13 +120,13 @@ policy:
 
 ```sh
 # Offline ingestion: read an export (GSC/Keyword Planner) into versioned records.
-pnpm exec site-kernel run demand.signal.import --app webgogol-com --source gsc --input ./exports/gsc-2026-07.json --json
+pnpm exec site-kernel run demand.signal.import --app warpgogol-com --source gsc --input ./exports/gsc-2026-07.json --json
 
 # Validate signal records: schema, axis resolution, freshness, dedupe.
-pnpm exec site-kernel run demand.signal.validate --app webgogol-com --json
+pnpm exec site-kernel run demand.signal.validate --app warpgogol-com --json
 
 # Produce the demand map: query → volume → intent by cluster.
-pnpm exec site-kernel run demand.map.report --app webgogol-com --blueprint website-local --json
+pnpm exec site-kernel run demand.map.report --app warpgogol-com --blueprint website-local --json
 ```
 
 Import is offline: it reads a provided export file or a cached API pull performed outside the deterministic build. The build itself never calls an external API.
@@ -158,7 +158,7 @@ Import is offline: it reads a provided export file or a cached API pull performe
 ## Rollout
 
 1. Add `DemandSignal` schema, `demand.signal.import`, and `demand.signal.validate`.
-2. Import a first GSC/Keyword export for `webgogol-com` (dogfood surface) and one pilot client industry.
+2. Import a first GSC/Keyword export for `warpgogol-com` (dogfood surface) and one pilot client industry.
 3. Add `demand.map.report`; wire it into `pseo.proof.validate`'s demand-map gate.
 4. Add optional Blueprint demand gates in report-only mode; observe how many current tuples lack demand.
 5. Promote the deepest-depth demand gate to `do-not-emit` once the demand map is trusted, tightening existence toward searched intent.

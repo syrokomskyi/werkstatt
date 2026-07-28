@@ -53,7 +53,7 @@ acceptance:
   - probe: command-registered
     name: "agent.surface.verify"
   - probe: run
-    command: "site-kernel run agent.surface.verify --app webgogol-com --json"
+    command: "site-kernel run agent.surface.verify --app warpgogol-com --json"
     expect:
       exitCode: 0
 ---
@@ -201,8 +201,8 @@ Behavior:
 - [x] `agent.surface.sign` and `agent.surface.verify` are registered. (evidence: implemented historically)
 - [x] `proof` in `.well-known/agent.json` is non-null when a signing key is configured. (evidence: implemented historically)
 - [x] `/api/agent/v1/*.json` artifacts that contain `contentHash` also contain a valid proof or an explicit unsigned diagnostic in local mode. (evidence: implemented historically)
-- [x] `agent.surface.verify --app webgogol-com` passes against generated local artifacts when test signing material is configured. (evidence: implemented historically)
-- [x] `agent.surface.verify --base-url https://webgogol.com` can verify deployed artifacts without repo-private state. — Deferred: URL-based remote verification mode is not yet wired; local artifact verification is implemented. (evidence: implemented historically)
+- [x] `agent.surface.verify --app warpgogol-com` passes against generated local artifacts when test signing material is configured. (evidence: implemented historically)
+- [x] `agent.surface.verify --base-url https://warpgogol.com` can verify deployed artifacts without repo-private state. — Deferred: URL-based remote verification mode is not yet wired; local artifact verification is implemented. (evidence: implemented historically)
 - [x] No app imports signing libraries directly; signing logic lives in packages. (evidence: implemented historically)
 - [x] `rfc.validate` passes. (evidence: implemented historically)
 

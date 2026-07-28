@@ -38,7 +38,7 @@ commands:
     - api.routes.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/ui"
@@ -73,7 +73,7 @@ Three facts have since changed the trade-off:
 2. **The Pages Functions model has actively misfired in operation.** The git-connected project was classified as a Worker-with-assets, which hid the `functions/` convention and the runtime-variable surface entirely. The contortions required to keep the static + Pages Functions model working are the symptom of fighting the platform's direction.
 3. **The image-optimization objection is now answerable without giving anything up.** The Astro 6 adapter exposes `imageService: 'compile'`, which runs sharp **at build time for prerendered routes** and uses a no-op passthrough for on-demand routes. Because thin sites render their image-bearing pages statically, build-time sharp optimization is fully preserved — and the optimized output stays host-portable (plain `.webp` files).
 
-The studio runs **only two `@apps`** today (`webgogol-com`, `nicaragua-projekt`). This is the cheapest moment to converge on one deployment model before the site count grows.
+The studio runs **only two `@apps`** today (`warpgogol-com`, `nicaragua-projekt`). This is the cheapest moment to converge on one deployment model before the site count grows.
 
 ## Problem
 
@@ -81,7 +81,7 @@ RFC-0140 protects the invariant "every site is fully static; server behavior liv
 
 - diverges from where Astro and Cloudflare are heading (Workers static assets);
 - ties the only server endpoint to a **Cloudflare-specific signature** (`onRequestPost(context)`, `context.env`) that does not port to other adapters or hosts;
-- leaves stale adapter scaffolding behind — [`apps/webgogol-com/src/env.d.ts`](../../apps/webgogol-com/src/env.d.ts) still declares `App.Locals extends import("@astrojs/cloudflare").Runtime<Env>`, a type that **Astro 6 removed** (`Astro.locals.runtime` no longer exists);
+- leaves stale adapter scaffolding behind — [`apps/warpgogol-com/src/env.d.ts`](../../apps/warpgogol-com/src/env.d.ts) still declares `App.Locals extends import("@astrojs/cloudflare").Runtime<Env>`, a type that **Astro 6 removed** (`Astro.locals.runtime` no longer exists);
 - cannot run request-time middleware (e.g. real `Accept-Language` language detection), because a fully static build executes middleware only at build time.
 
 Unprotected today: there is **no single, platform-aligned deployment contract** for thin sites, and the server-endpoint shape is host-coupled.
@@ -270,7 +270,7 @@ Clean replacement, no dual model, no grace period (only two apps):
 - [x] `send-message` section handler is an `APIRoute` reading `astro:env/server`; no `onRequest*` / `context.env` anywhere in the workspace. (evidence: implemented historically)
 - [x] Section manifest declares `api[].secrets`; `--json` output documents `envSchema[]`. (evidence: implemented historically)
 - [x] Stale `Runtime<Env>` / `Astro.locals.runtime` types removed from `env.d.ts` template and apps. (evidence: implemented historically)
-- [x] `apps/webgogol-com/functions/` and `apps/nicaragua-projekt/functions/` deleted. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps/warpgogol-com/functions/` and `apps/nicaragua-projekt/functions/` deleted. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `build.check` green on both apps; images optimized at build; `/api/send-message` on demand. (evidence: implemented historically)
 - [x] RFC-0140 marked `supersededBy: RFC-0149`; `astro.config` "no adapter" comment rewritten. (evidence: implemented historically)
 - [x] `AGENTS.md` (root + `@gogol/ui` sections + onboarding) updated off the Pages Functions model. (evidence: AGENTS.md:1, agent guide updated)

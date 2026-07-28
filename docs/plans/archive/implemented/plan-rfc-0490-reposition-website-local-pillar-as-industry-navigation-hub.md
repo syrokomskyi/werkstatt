@@ -7,7 +7,7 @@ createdAt: 2026-07-22
 updatedAt: 2026-07-23
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/surface"
     - "@gogol/share"
@@ -229,7 +229,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run surface.hub.validate --site webgogol-com --json` exits 0.
+- `pnpm exec site-kernel run surface.hub.validate --site warpgogol-com --json` exits 0.
 
 **Completion criterion:** `surface.hub.validate` is registered, runs, and enforces all six rules; it is in `SITES_CHECK_AUTHOR_PIPELINE`.
 
@@ -263,10 +263,10 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run surface.generate --site webgogol-com` to regenerate the surface.
-- Run `pnpm exec site-kernel run surface.hub.validate --site webgogol-com --json` — confirm exit 0.
-- Run `pnpm exec site-kernel run content.references.validate --site webgogol-com` — confirm PBP references resolve.
-- Run `pnpm --filter webgogol-com run build` — confirm no runtime errors.
+- Run `pnpm exec site-kernel run surface.generate --site warpgogol-com` to regenerate the surface.
+- Run `pnpm exec site-kernel run surface.hub.validate --site warpgogol-com --json` — confirm exit 0.
+- Run `pnpm exec site-kernel run content.references.validate --site warpgogol-com` — confirm PBP references resolve.
+- Run `pnpm --filter warpgogol-com run build` — confirm no runtime errors.
 - Inspect the rendered `/website/` and `/sait/` pages — confirm the five-block hub layout.
 - Inspect the JSON-LD output — confirm `CollectionPage` + `ItemList`.
 - Run `pnpm exec site-kernel run rfc.validate RFC-0490 --json` — confirm pass.
@@ -292,12 +292,12 @@ scope:
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.generate --site webgogol-com`
-- `pnpm exec site-kernel run surface.hub.validate --site webgogol-com --json`
-- `pnpm exec site-kernel run content.references.validate --site webgogol-com`
+- `pnpm exec site-kernel run surface.generate --site warpgogol-com`
+- `pnpm exec site-kernel run surface.hub.validate --site warpgogol-com --json`
+- `pnpm exec site-kernel run content.references.validate --site warpgogol-com`
 - `pnpm exec site-kernel run rfc.validate RFC-0490 --json`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0490`
-- `pnpm --filter webgogol-com run build` (dev build, no runtime errors)
+- `pnpm --filter warpgogol-com run build` (dev build, no runtime errors)
 
 ### 4.2 Evidence artifacts
 

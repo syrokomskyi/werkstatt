@@ -81,7 +81,7 @@ scope:
   - `agent.knowledge.generate` → `public/api/agent/v1/*.json` (glob)
   - `surface.generate` → `public/.well-known/pseo-manifest.json`, `public/**/*.md` (PSEO pages)
   - `surface.starmap.generate` → `public/.well-known/pseo-star-map.svg`
-  - `webgogol.check.hints.generate` → `public/.well-known/webgogol-check.json`
+  - `warpgogol.check.hints.generate` → `public/.well-known/warpgogol-check.json`
   - `passport.key.rotate` → `public/.well-known/cosmic-passport-key.json`
   - `preview.images.generate` → `public/og-image.png`
   - `bordbuch.generate` → `public/bordbuch.html`
@@ -134,7 +134,7 @@ scope:
 
 **Agent actions:**
 
-- Add entries for: `agent.manifest.generate`, `agent.openapi.generate`, `agent.knowledge.generate`, `surface.generate`, `surface.starmap.generate`, `webgogol.check.hints.generate`, `passport.key.rotate`, `preview.images.generate`, `bordbuch.generate`, `cms.schema.generate`, `image.variants.generate` (public outputs), `video.variants.generate` (public outputs), `live.variants.generate` (public outputs).
+- Add entries for: `agent.manifest.generate`, `agent.openapi.generate`, `agent.knowledge.generate`, `surface.generate`, `surface.starmap.generate`, `warpgogol.check.hints.generate`, `passport.key.rotate`, `preview.images.generate`, `bordbuch.generate`, `cms.schema.generate`, `image.variants.generate` (public outputs), `video.variants.generate` (public outputs), `live.variants.generate` (public outputs).
 - Each entry gets `markerPolicy: "registry-only"` and `module: "<path>"`.
 - Verify no duplicate paths (single-owner invariant, RFC-0087).
 
@@ -166,7 +166,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run generated.file.lookup --path apps/webgogol-com/public/robots.txt --json` returns `generated: true`.
+- `pnpm exec site-kernel run generated.file.lookup --path apps/warpgogol-com/public/robots.txt --json` returns `generated: true`.
 
 **Completion criterion:** Command registered, returns correct metadata for known generated files, returns `generated: false` for non-generated files.
 
@@ -192,7 +192,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run generated.files.validate --app webgogol-com --json` passes.
+- `pnpm exec site-kernel run generated.files.validate --app warpgogol-com --json` passes.
 
 **Completion criterion:** Command registered, validates existence of all registry-declared files, correctly expands globs.
 
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run generated.marker.validate --app webgogol-com --phase=author` no longer reports Category B files.
+- `pnpm exec site-kernel run generated.marker.validate --app warpgogol-com --phase=author` no longer reports Category B files.
 
 **Completion criterion:** `generated.marker.validate` only checks Category A files; Category B files are not in its expected list.
 
@@ -262,7 +262,7 @@ scope:
 - `cms.ts`: remove `buildGeneratedHeader()` from admin HTML and `config.yml`.
 - `site-bordbuch.ts`: remove `buildGeneratedHeader()` from bordbuch HTML.
 - `feed.ts`: remove marker from feed XML output (if present).
-- For JSON-output generators (`agent.manifest.generate`, `agent.openapi.generate`, `agent.knowledge.generate`, `webgogol.check.hints.generate`, `passport.key.rotate`): these already don't emit comment markers in JSON — no change needed.
+- For JSON-output generators (`agent.manifest.generate`, `agent.openapi.generate`, `agent.knowledge.generate`, `warpgogol.check.hints.generate`, `passport.key.rotate`): these already don't emit comment markers in JSON — no change needed.
 - For binary generators (`preview.images.generate`): already no marker — no change needed.
 - Remove unused imports of `GENERATED_MARKER`, `hasGeneratedMarker`, `buildGeneratedHeader` only from files where they are no longer used at all (e.g. `llms.ts` after `LLMS_MARKER` is removed). Files that still use `hasGeneratedMarker` for skip-if-hand-edited logic (like `robots.ts`) must keep the import — only the marker emission line is removed, not the detection logic.
 - **Do NOT remove** marker emission from `src/` or `docs/` generators (Category A).
@@ -270,8 +270,8 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run build.prepare --app webgogol-com` regenerates public files without markers.
-- `grep -r "GENERATED" apps/webgogol-com/public/` returns no results (after regeneration).
+- `pnpm exec site-kernel run build.prepare --app warpgogol-com` regenerates public files without markers.
+- `grep -r "GENERATED" apps/warpgogol-com/public/` returns no results (after regeneration).
 
 **Completion criterion:** All listed `public/**` generators produce clean output without `GENERATED_MARKER`.
 
@@ -293,7 +293,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes.
-- `pnpm exec site-kernel run semantic.parity --app webgogol-com` passes (after `build.prepare` regenerated `llms.txt` without marker).
+- `pnpm exec site-kernel run semantic.parity --app warpgogol-com` passes (after `build.prepare` regenerated `llms.txt` without marker).
 
 **Completion criterion:** `stripMarker` function deleted; parity check compares raw content; `semantic.parity` passes.
 
@@ -363,11 +363,11 @@ scope:
 - `pnpm --filter @gogol/site-kernel run build:check`
 - `pnpm exec site-kernel run rfc.acceptance.run --id RFC-0375 --json`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0375` (RFC-0330)
-- `pnpm exec site-kernel run generated.file.lookup --path apps/webgogol-com/public/robots.txt --json`
-- `pnpm exec site-kernel run generated.files.validate --app webgogol-com --json`
-- `pnpm exec site-kernel run generated.marker.validate --app webgogol-com --phase=author`
+- `pnpm exec site-kernel run generated.file.lookup --path apps/warpgogol-com/public/robots.txt --json`
+- `pnpm exec site-kernel run generated.files.validate --app warpgogol-com --json`
+- `pnpm exec site-kernel run generated.marker.validate --app warpgogol-com --phase=author`
 - `pnpm exec site-kernel run generated.edit.guard --json`
-- `pnpm exec site-kernel run semantic.parity --app webgogol-com`
+- `pnpm exec site-kernel run semantic.parity --app warpgogol-com`
 - `pnpm exec site-kernel run generator.ownership.lint`
 
 ### 4.2 Evidence artifacts

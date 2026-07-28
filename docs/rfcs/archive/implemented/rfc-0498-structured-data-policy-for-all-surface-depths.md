@@ -49,7 +49,7 @@ commands:
     - surface.contract.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -58,22 +58,22 @@ packagesImpacted:
   - "@gogol/pbp"
 successSignals:
   - "Every surface page emits JSON-LD with @type WebPage as the primary type — never LocalBusiness, Electrician, HairSalon, or any trade-specific business type."
-  - "Depth-1 industry pages (website-local) emit WebPage + BreadcrumbList + Service (provider=Webgogol, serviceType=Digitales Fundament für {industry}, audience={industry})."
-  - "website-service depth-1 service pages emit WebPage + BreadcrumbList + Service (provider=Webgogol, serviceType=Digitales Fundament für {industry} — {service}, audience={industry})."
+  - "Depth-1 industry pages (website-local) emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry}, audience={industry})."
+  - "website-service depth-1 service pages emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry} — {service}, audience={industry})."
   - "Depth-4 city pages emit WebPage + BreadcrumbList (no Service, no LocalBusiness — the city page is a navigation hub, not a service offering)."
-  - "Depth-5 intersection pages emit WebPage + BreadcrumbList + Service (provider=Webgogol, serviceType=Digitales Fundament für {industry} — {service}, areaServed={city}, audience={industry}) — only when the intersection gate (RFC-0497) passes."
-  - "No surface page emits Offer, BookAction, PriceSpecification, or QuantitativeValue with fabricated values — Webgogol does not sell haircuts or electrical installations."
-  - "No surface page emits LocalBusiness, Electrician, HairSalon, or any schema.org business type — Webgogol is not a local business."
-  - "The Service JSON-LD on surface pages always has provider: { @type: Organization, name: Webgogol } — never a fabricated business."
+  - "Depth-5 intersection pages emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry} — {service}, areaServed={city}, audience={industry}) — only when the intersection gate (RFC-0497) passes."
+  - "No surface page emits Offer, BookAction, PriceSpecification, or QuantitativeValue with fabricated values — Warpgogol does not sell haircuts or electrical installations."
+  - "No surface page emits LocalBusiness, Electrician, HairSalon, or any schema.org business type — Warpgogol is not a local business."
+  - "The Service JSON-LD on surface pages always has provider: { @type: Organization, name: Warpgogol } — never a fabricated business."
   - "BreadcrumbList JSON-LD reflects the canonical URL hierarchy (RFC-0495) — no /deu/bw/ segments in breadcrumb URLs."
-  - "seo.structured-data.validate (RFC-0074) enforces the per-depth type policy for surface pages: required types present, prohibited types absent, Service provider.name is Webgogol, no fabricated Offer/PriceSpecification."
+  - "seo.structured-data.validate (RFC-0074) enforces the per-depth type policy for surface pages: required types present, prohibited types absent, Service provider.name is Warpgogol, no fabricated Offer/PriceSpecification."
   - "surface.validate checks BreadcrumbList URLs in generated surface artifacts against the canonical URL hierarchy (no /deu/bw/ segments)."
   - "surface.contract.validate includes per-depth JSON-LD type policy checks against the C-contract."
 nonGoals:
   - "Does not change the JSON-LD emission for non-surface pages (home, legal, pricing, blog, etc.) — those are governed by their own RFCs and system.md declarations."
   - "Does not add new JSON-LD types beyond WebPage, BreadcrumbList, and Service — FAQPage, Organization, etc. are already handled by existing structured data emission."
   - "Does not change the structured data audit validator (RFC-0074) beyond updating it to enforce the surface per-depth policy — the validator's core logic is preserved."
-  - "Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Webgogol does not have reviews to markup."
+  - "Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Warpgogol does not have reviews to markup."
   - "Does not emit Event, Product, or Offer JSON-LD on surface pages — the surface is not an e-commerce or event surface."
 ---
 
@@ -83,7 +83,7 @@ nonGoals:
 
 RFC-0432 established the schema.org mapping contract for the PBP compiler. RFC-0492 (industry dossier model) specified that depth-1 industry pages emit `WebPage + BreadcrumbList + Service` — not `Electrician`, `HairSalon`, or `LocalBusiness` — and extended `SemanticModelOptions` with `surfaceId` and `depth` to gate the depth-1 correction. However, RFC-0492's correction was limited to depth-1 `website-local` pages. An external expert review (file 14.3, §14) reinforced this for all surface depths:
 
-> Webgogol не является салоном и не продаёт Haarschnitt.
+> Warpgogol не является салоном и не продаёт Haarschnitt.
 >
 > Если страница существует, использовать: WebPage, Service, BreadcrumbList.
 >
@@ -93,8 +93,8 @@ Currently, the structured data emission for surface pages is not governed by a p
 
 ## Problem
 
-1. **No per-depth type policy.** The baker may emit trade-specific business types (`HairSalon`, `Electrician`, `LocalBusiness`) on surface pages, creating a false impression that Webgogol is such a business.
-2. **No prohibition on fabricated offers.** Surface pages may emit `Offer`, `BookAction`, or `PriceSpecification` with fabricated values — prices, availability, or service details that Webgogol does not actually provide.
+1. **No per-depth type policy.** The baker may emit trade-specific business types (`HairSalon`, `Electrician`, `LocalBusiness`) on surface pages, creating a false impression that Warpgogol is such a business.
+2. **No prohibition on fabricated offers.** Surface pages may emit `Offer`, `BookAction`, or `PriceSpecification` with fabricated values — prices, availability, or service details that Warpgogol does not actually provide.
 3. **No enforcement.** `seo.structured-data.validate` (RFC-0074) checks for required types but does not check for prohibited types.
 4. **Breadcrumb inconsistency.** BreadcrumbList JSON-LD may still reflect the old URL hierarchy with `/deu/bw/` segments (RFC-0495 changes the URL structure).
 
@@ -121,7 +121,7 @@ The `Service` JSON-LD on website-local depth-1, website-service depth-1, and web
   "@type": "Service",
   "provider": {
     "@type": "Organization",
-    "name": "Webgogol"
+    "name": "Warpgogol"
   },
   "serviceType": "Digitales Fundament für {industry}",
   "audience": {
@@ -142,7 +142,7 @@ For website-local depth-5 (intersection) pages, the Service also includes:
 }
 ```
 
-No `Offer`, `PriceSpecification`, `QuantitativeValue`, or `BookAction` is attached to the Service. Webgogol does not sell the trade service; it sells the Digitales Fundament (website product), which is referenced from PBP, not from surface page JSON-LD.
+No `Offer`, `PriceSpecification`, `QuantitativeValue`, or `BookAction` is attached to the Service. Warpgogol does not sell the trade service; it sells the Digitales Fundament (website product), which is referenced from PBP, not from surface page JSON-LD.
 
 ### BreadcrumbList
 
@@ -168,7 +168,7 @@ No `/deu/bw/` segments in breadcrumb URLs.
 
 1. **Required types check** (existing): every emitted surface page has the required JSON-LD types for its surface+depth.
 2. **Prohibited types check** (new): no surface page has any prohibited JSON-LD type for its surface+depth.
-3. **Service provider check** (new): the Service JSON-LD has `provider.name: Webgogol` — not a fabricated business name.
+3. **Service provider check** (new): the Service JSON-LD has `provider.name: Warpgogol` — not a fabricated business name.
 4. **Fabricated offer check** (new): no surface page emits `Offer`, `BookAction`, `PriceSpecification`, or `QuantitativeValue` with fabricated values.
 
 `surface.validate` is extended with: 5. **BreadcrumbList URL check** (new): BreadcrumbList URLs in generated surface artifacts match the canonical URL hierarchy (no `/deu/bw/` segments, per RFC-0495).
@@ -202,13 +202,13 @@ No new commands. Existing commands are updated:
 
 ```sh
 # Extended with prohibited-type checking for surface pages
-pnpm exec site-kernel run seo.structured-data.validate --site webgogol-com
+pnpm exec site-kernel run seo.structured-data.validate --site warpgogol-com
 
 # Extended with BreadcrumbList URL checks for surface artifacts
-pnpm exec site-kernel run surface.validate --site webgogol-com
+pnpm exec site-kernel run surface.validate --site warpgogol-com
 
 # Extended with per-depth JSON-LD type policy checks against C-contract
-pnpm exec site-kernel run surface.contract.validate --site webgogol-com
+pnpm exec site-kernel run surface.contract.validate --site warpgogol-com
 ```
 
 All three commands are `scope: app` (they operate on a specific site's built artifacts). `seo.structured-data.validate` runs in `sites-check-postbuild` (it requires built `dist/` HTML). `surface.validate` runs in `build.check`. `surface.contract.validate` runs in `build.check`.
@@ -253,7 +253,7 @@ The `seo.structured-data.validate` extension uses the existing `extractAllJsonLd
 No new `--json` output shapes. `seo.structured-data.validate` produces its standard `AuditResult` with additional `ruleId` patterns:
 
 - `seo-structured-data.prohibited-{type}` — prohibited type found on surface page
-- `seo-structured-data.service-provider-mismatch` — Service provider.name is not "Webgogol"
+- `seo-structured-data.service-provider-mismatch` — Service provider.name is not "Warpgogol"
 - `seo-structured-data.fabricated-offer` — Offer/BookAction/PriceSpecification/QuantitativeValue found on surface page
 
 `surface.validate` produces its standard output with additional `SURF-BREADCRUMB-URL` diagnostic for breadcrumb URLs containing `/deu/bw/` segments.
@@ -264,7 +264,7 @@ No new `--json` output shapes. `seo.structured-data.validate` produces its stand
 | --- | --- |
 | Surface page missing required type | `seo.structured-data.validate` reports `seo-structured-data.missing-{type}` (error) |
 | Surface page has prohibited type | `seo.structured-data.validate` reports `seo-structured-data.prohibited-{type}` (error) |
-| Service provider.name is not "Webgogol" | `seo.structured-data.validate` reports `seo-structured-data.service-provider-mismatch` (error) |
+| Service provider.name is not "Warpgogol" | `seo.structured-data.validate` reports `seo-structured-data.service-provider-mismatch` (error) |
 | Surface page emits Offer/BookAction/PriceSpecification | `seo.structured-data.validate` reports `seo-structured-data.fabricated-offer` (error) |
 | BreadcrumbList URL contains /deu/bw/ segments | `surface.validate` reports `SURF-BREADCRUMB-URL` (error) |
 | `jsonld-types.yaml` surfacePolicy section missing | `surface.contract.validate` reports `jsonld-surface-policy-missing` (error) |
@@ -277,7 +277,7 @@ No new `--json` output shapes. `seo.structured-data.validate` produces its stand
 
 - **Lands with C-contract update.** The `jsonld-types.yaml` `surfacePolicy` section, `seo.structured-data.validate` extension, `surface.validate` extension, and `surface.contract.validate` extension are merged in the same change.
 - **No backward compatibility.** Prohibited JSON-LD types are removed from the baker's emission — no dual-path, no feature flag. Existing `dist/` artifacts that contain prohibited types will fail `seo.structured-data.validate` until rebuilt.
-- **Pilot = `webgogol-com`.** The current dataset has 2 industries × 6 cities × ~4 services = ~48 potential pages. The validator scan cost is trivial for this scale.
+- **Pilot = `warpgogol-com`.** The current dataset has 2 industries × 6 cities × ~4 services = ~48 potential pages. The validator scan cost is trivial for this scale.
 - **New sites** comply from day one — the baker emits correct JSON-LD per the C-contract policy from the first build.
 - **Pipeline.** `surface.contract.validate` (in `build.check`) verifies C-contract compliance. `seo.structured-data.validate` (in `sites-check-postbuild`) verifies rendered HTML. `surface.validate` (in `build.check`) verifies generated artifacts.
 
@@ -288,7 +288,7 @@ The migrator (`rfc-0498`) is a no-op on authored data — the per-depth type pol
 ### Deployment sequence
 
 1. Platform change merged: C-contract, baker JSON-LD emission, validator extensions, migrator.
-2. Next mission for `webgogol-com`: `mission.materialize` → `mission.migrate` (no-op) → operator edits (if any) → `mission.validate` → `release.prepare` → `mission.reconcile` → `release.publish`.
+2. Next mission for `warpgogol-com`: `mission.materialize` → `mission.migrate` (no-op) → operator edits (if any) → `mission.validate` → `release.prepare` → `mission.reconcile` → `release.publish`.
 3. `release.publish` deploys the new `dist` with correct JSON-LD — no intermediate state where prohibited types are served.
 
 ## Alternatives considered
@@ -329,7 +329,7 @@ The migrator (`rfc-0498`) is a no-op on authored data — the per-depth type pol
 - [x] Every surface page emits `WebPage` as the primary JSON-LD type. (evidence: buildWebPageNode in packages/share/src/semantic/jsonld/webpage.ts always emits WebPage; surface pages inherit this via buildJsonLd)
 - [x] No surface page emits `LocalBusiness`, `Electrician`, `HairSalon`, or any trade-specific business type. (evidence: surfacePolicy prohibitedTypes in packages/ontology/src/external-surfaces/jsonld-types.yaml; seo.structured-data.validate checks prohibited types in packages/os/site-kernel-checks/src/audit/validators/seo-structured-data.ts)
 - [x] No surface page emits `Offer`, `BookAction`, `PriceSpecification`, or `QuantitativeValue` with fabricated values. (evidence: fabricated-offer check in seo-structured-data.ts lines 201-216; prohibitedTypes in surfacePolicy entries)
-- [x] website-local depth-1, website-service depth-1, and website-local depth-5 pages emit `Service` with `provider.name: Webgogol`. (evidence: buildServiceNodes in packages/share/src/semantic/jsonld/service.ts emits industry Service for these depths; buildPageSemanticModel in packages/pbp/src/semantic-model.ts sets industryService; service-provider-mismatch check in seo-structured-data.ts)
+- [x] website-local depth-1, website-service depth-1, and website-local depth-5 pages emit `Service` with `provider.name: Warpgogol`. (evidence: buildServiceNodes in packages/share/src/semantic/jsonld/service.ts emits industry Service for these depths; buildPageSemanticModel in packages/pbp/src/semantic-model.ts sets industryService; service-provider-mismatch check in seo-structured-data.ts)
 - [x] BreadcrumbList URLs match the canonical URL hierarchy (no `/deu/bw/` segments). (evidence: SURF-BREADCRUMB-URL check in packages/os/site-kernel-checks/src/surface/validate.ts lines 173-184)
 - [x] `seo.structured-data.validate` enforces required types, prohibited types, Service provider, and fabricated offer checks for surface pages. (evidence: packages/os/site-kernel-checks/src/audit/validators/seo-structured-data.ts lines 153-218; build:check passes)
 - [x] `surface.validate` checks BreadcrumbList URLs in generated surface artifacts. (evidence: packages/os/site-kernel-checks/src/surface/validate.ts SURF-BREADCRUMB-URL check; build:check passes)

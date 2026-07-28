@@ -33,10 +33,10 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/check-core"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
 successSignals:
   - "Every check finding is a canonical Diagnostic with URL/screenshot/source hint data, not free-form prose."
   - "Reports are deterministic JSON and human-readable HTML generated from the same data."
@@ -74,7 +74,7 @@ Without a strict report and action format, those findings are not enough for an 
 
 ## Decision
 
-All Check Webgogol checks emit canonical `Diagnostic[]` and one generated **CheckReport**. A second generated artifact, the **AgentActionPack**, groups diagnostics into concrete repair tasks.
+All Check Warpgogol checks emit canonical `Diagnostic[]` and one generated **CheckReport**. A second generated artifact, the **AgentActionPack**, groups diagnostics into concrete repair tasks.
 
 Reports are evidence-first:
 
@@ -182,9 +182,9 @@ export interface AgentRepairTask {
 ### Commands
 
 ```sh
-pnpm exec site-kernel run check.report.generate --run .check-webgogol/runs/<runId> --json
-pnpm exec site-kernel run check.action-pack.generate --run .check-webgogol/runs/<runId> --json
-pnpm exec site-kernel run check.compare --before .check-webgogol/runs/a --after .check-webgogol/runs/b --json
+pnpm exec site-kernel run check.report.generate --run .check-warpgogol/runs/<runId> --json
+pnpm exec site-kernel run check.action-pack.generate --run .check-warpgogol/runs/<runId> --json
+pnpm exec site-kernel run check.compare --before .check-warpgogol/runs/a --after .check-warpgogol/runs/b --json
 ```
 
 ### Validation Rules
@@ -203,7 +203,7 @@ pnpm exec site-kernel run check.compare --before .check-webgogol/runs/a --after 
 2. Implement report generation from diagnostics and graph.
 3. Implement action-pack grouping with deterministic priority rules.
 4. Implement before/after comparison by report hashes and diagnostic keys.
-5. Make `apps/check-webgogol-com` render reports and tasks from these artifacts only.
+5. Make `apps/check-warpgogol-com` render reports and tasks from these artifacts only.
 
 ## Alternatives considered
 

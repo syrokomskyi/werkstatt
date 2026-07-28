@@ -126,7 +126,7 @@ _This RFC materializes the runtime layer: Zod schemas, locale-aware loaders, and
 
 RFC-0398..0462 established the PBP program with 65 RFCs, all marked `implemented`. However, every one of these RFCs explicitly states `"Does not define Zod schemas"` as a non-goal. The result is that `packages/pbp/` contains only TypeScript interfaces — 30+ entity types, primitive types, migration contracts, and projection contracts — but zero Zod schemas imports, zero loader functions, and zero Astro content collection definitions.
 
-The legacy `@gogol/business` package (DNA-20) has all of these: 12 Zod schemas in `src/schemas/`, typed locale-aware loaders in `src/loaders.ts`, and `businessCollections` in `src/astro.ts`. The site `webgogol-com` wires these in `content.config.ts` and calls `getBusinessCompany("de")` etc. from its pages.
+The legacy `@gogol/business` package (DNA-20) has all of these: 12 Zod schemas in `src/schemas/`, typed locale-aware loaders in `src/loaders.ts`, and `businessCollections` in `src/astro.ts`. The site `warpgogol-com` wires these in `content.config.ts` and calls `getBusinessCompany("de")` etc. from its pages.
 
 Without Zod schemas, loaders, and Astro collections in `@gogol/pbp`, no site can consume PBP data. The migration plan (`pbp-specification-package/migration-plan`) and cutover checklist (RFC-0462) cannot be executed. This RFC closes the runtime gap.
 
@@ -307,7 +307,7 @@ Each `.md` file has YAML frontmatter that maps directly to the entity interface:
 ```yaml
 ---
 schema: pbp/business@1
-id: webgogol
+id: warpgogol
 type: business
 status: published
 name: WGogol
@@ -476,7 +476,7 @@ N/A — library-only.
 
 - **Immediate:** Upon acceptance, Zod schemas, loaders, and Astro collections are implemented in `@gogol/pbp`.
 - **No site impact:** Sites still use `@gogol/business` until RFC-0469 (Site Cutover). The new exports are available but not yet consumed by any site.
-- **Golden fixtures:** Each entity schema ships with positive (valid entity) and negative (invalid entity) fixture tests. Fixtures are derived from the Webgogol target manifest blueprint (`pbp-specification-package/target-blueprint`).
+- **Golden fixtures:** Each entity schema ships with positive (valid entity) and negative (invalid entity) fixture tests. Fixtures are derived from the Warpgogol target manifest blueprint (`pbp-specification-package/target-blueprint`).
 - **Dependency chain:** RFC-0467 (Compiler) depends on this RFC. RFC-0468 (Content) depends on this RFC. RFC-0469 (Cutover) depends on RFC-0467 and RFC-0468. RFC-0470 (Legacy Deletion) depends on RFC-0469.
 
 ## Alternatives considered

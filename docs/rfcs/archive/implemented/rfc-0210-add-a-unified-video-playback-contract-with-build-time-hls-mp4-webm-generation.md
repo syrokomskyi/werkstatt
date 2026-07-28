@@ -46,7 +46,7 @@ commands:
     - live.media.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -79,11 +79,11 @@ The platform has, in two prior RFCs, established the exact shapes this RFC compo
 
 1. **RFC-0202 (living photos)** introduced the first `<video>` on the platform: an opt-in, decorative, muted, looping clip layered over an authored image, resolved by convention (sibling `<image-token>.webm`), rendered by `<LivePhoto>`, driven by an opt-in scheduler-deferred runtime ([live-photos.ts](packages/share/src/scripts/live-photos.ts)), and guarded by `live.media.validate`. As-built, that runtime already grew past its webm-only non-goal: it carries a WebM→MP4 fallback, iOS gesture handling, a `canplaythrough` readiness gate, a labeled tap/start button, visibility-pause, and reduced-motion suppression.
 2. **RFC-0204 (build-portable image variants)** established the canonical pattern for **deriving missing asset formats at build time**: a kernel command (`image.variants.generate`) scans in-repo content assets, generates derivatives with a native tool (`sharp`), writes them to a deterministic, always-deployed, gitignored path (`public/_img/**`), emits a `GENERATED` manifest read synchronously by a render-time provider, is idempotent (skip-on-exists), runs in `build.prepare`, and is gated by `image.variants.validate` in `build.check`. Both commands are no-ops when the feature is not engaged.
-3. **The `video-loop` pipeline** (`pipelines-webgogol-4/apps/video-loop`) already encodes source video into seamless loops in **WebM (VP9)** and/or **MP4 (H.264)** via ffmpeg ([ffmpeg.ts](../../pipelines-webgogol-4/apps/video-loop/run/media/ffmpeg.ts)), with per-video `brief-*.md` declarations. It is the proven ffmpeg recipe this RFC reuses, extended with HLS.
+3. **The `video-loop` pipeline** (`pipelines-warpgogol-4/apps/video-loop`) already encodes source video into seamless loops in **WebM (VP9)** and/or **MP4 (H.264)** via ffmpeg ([ffmpeg.ts](../../pipelines-warpgogol-4/apps/video-loop/run/media/ffmpeg.ts)), with per-video `brief-*.md` declarations. It is the proven ffmpeg recipe this RFC reuses, extended with HLS.
 
 The thin-site deploy model is `pnpm build` (local / own CI: `site-kernel build.prepare` → `astro build` → `build.post`) followed by `wrangler deploy`. The build runs in an environment we control, so **ffmpeg can be a documented build prerequisite** (as `video-loop` already documents) — unlike a git-connected Cloudflare Pages build.
 
-A founder requirement now exists: thin sites in `apps/` need a **content video section** (number, heading, subheading, video, markdown text under the video). The pilot is `apps/webgogol-com` — a promo placed immediately after the hero, sourced from `promo-uk.mp4` (a German `promo-de.mp4` follows). Videos across the framework range from 1–30 minutes, sometimes with scrubbing, sometimes as decorative background — and we want **one** technology to maintain, not a per-case zoo.
+A founder requirement now exists: thin sites in `apps/` need a **content video section** (number, heading, subheading, video, markdown text under the video). The pilot is `apps/warpgogol-com` — a promo placed immediately after the hero, sourced from `promo-uk.mp4` (a German `promo-de.mp4` follows). Videos across the framework range from 1–30 minutes, sometimes with scrubbing, sometimes as decorative background — and we want **one** technology to maintain, not a per-case zoo.
 
 ## Problem
 
@@ -218,7 +218,7 @@ Authoring example — the pilot promo section (immediately after hero, per found
     media:
       profile: feature
       source: { name: promo }       # ⇒ uk/assets/promo.mp4 (+ de/assets/promo.mp4)
-      alt: "Огляд цифрового фундаменту Webgogol"
+      alt: "Огляд цифрового фундаменту Warpgogol"
       ladder: auto
       captions:
         - { lang: uk, default: true }   # ⇒ uk/assets/promo.uk.vtt
@@ -252,7 +252,7 @@ Mirrors `image.variants.generate`, upgraded with a cache because video encoding 
 
 So "если нужный файл есть — пропускаем" becomes "if this exact source+profile+settings was ever encoded, never encode it again" — strictly stronger and deploy-cheap. A cold deploy from a warm cache does no encoding; ffmpeg is required only for a genuinely new/changed source. If ffmpeg is absent **and** there is uncached work, the command fails with a clear, actionable error (it does not silently ship a missing format).
 
-ffmpeg invocation lives in a small wrapper in `@gogol/site-kernel-checks` (or a shared media lib), porting the proven recipes from [video-loop ffmpeg.ts](../../pipelines-webgogol-4/apps/video-loop/run/media/ffmpeg.ts) and adding the HLS muxing args. `ENCODER_SETTINGS_VERSION` is bumped whenever the encode recipe changes, forcing a clean re-encode.
+ffmpeg invocation lives in a small wrapper in `@gogol/site-kernel-checks` (or a shared media lib), porting the proven recipes from [video-loop ffmpeg.ts](../../pipelines-warpgogol-4/apps/video-loop/run/media/ffmpeg.ts) and adding the HLS muxing args. `ENCODER_SETTINGS_VERSION` is bumped whenever the encode recipe changes, forcing a clean re-encode.
 
 #### Manifest shape
 
@@ -384,7 +384,7 @@ Additive, no flag day, no content migration:
 4. Land the shared `media` runtime (generalized `live-photos.ts`) + the lazy `videoPlayers` runtime; keep the RFC-0202 `livePhotos` option as an alias.
 5. Land `video.media.validate` (folds in `live.media.validate` with the profile-aware orphan rule); swap it into `apps-check.author`. Fail-hard but no-op when an app has no media.
 6. Land the `video-section` quintet + ontology fragments.
-7. **Pilot — `apps/webgogol-com`.** Copy `pipelines-webgogol-4/apps/video-loop/.input/videos/webgogol-com/promo-uk-2026-06-19.mp4` → `apps/webgogol-com/src/content/pages/uk/assets/promo.mp4` (and the German cut → `.../de/assets/promo.mp4`). Add a `video-section` block to `home.md` immediately **after** the hero (founder decision). `video.variants.generate` derives the HLS ladder + MP4 (+ WebM) + poster; the section renders with lazy Plyr; captions added once the VTT is authored. Build (`build:check`) stays green; Lighthouse stays green (no player JS until the video is in view).
+7. **Pilot — `apps/warpgogol-com`.** Copy `pipelines-warpgogol-4/apps/video-loop/.input/videos/warpgogol-com/promo-uk-2026-06-19.mp4` → `apps/warpgogol-com/src/content/pages/uk/assets/promo.mp4` (and the German cut → `.../de/assets/promo.mp4`). Add a `video-section` block to `home.md` immediately **after** the hero (founder decision). `video.variants.generate` derives the HLS ladder + MP4 (+ WebM) + poster; the section renders with lazy Plyr; captions added once the VTT is authored. Build (`build:check`) stays green; Lighthouse stays green (no player JS until the video is in view).
 8. **Migrate `nicaragua-projekt` living photos** from `live:` to the ambient profile transparently (alias projection) — no content edit required; behavior unchanged.
 9. Opt-in elsewhere: any site adds a `video-section` or a `media`/`live` config and flips `media` / `videoPlayers` in its orchestrator.
 
@@ -420,7 +420,7 @@ Additive, no flag day, no content migration:
 - [x] `videoPlayers` runtime loads Plyr (+ hls.js only for stream on non-Safari) lazily/in-viewport, gated on `[data-video-player]`; ambient/background ship zero player JS. RFC-0202's tap button + iOS handling + reduced-motion + WebM→MP4 fallback are preserved via the existing `live-photos` runtime (kept, not renamed to `media`). (evidence: implemented historically)
 - [x] `video.media.validate` enforces `missing-source` + `missing-alt` (fail) and warns `missing-captions`; no-op passes with zero media; added to `apps-check.author`. _As-built: it runs alongside (not replacing) `live.media.validate`, which retains the ambient `orphan-video`/poster-pairing rule — so a section `promo.mp4` is not a false-positive without re-implementing the orphan check._ (evidence: implemented historically)
 - [x] `video-section` quintet renders number/heading/subheading (section-header) + feature `<Media>` + markdown-under-video via `contentRef`. _As-built: the `media` props are declared inline in the section's `propsSchema` rather than as a separate `body-media` compose fragment._ (evidence: implemented historically)
-- [x] Pilot: `webgogol-com` home shows `promo` immediately after the hero (`pnpm build` green 30/30, `astro:check` 0 errors); `nicaragua-projekt` living photos unchanged (no `media:` configs → new commands no-op). _uk is live; the `de` cut awaits the `promo-de` source asset._ (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Pilot: `warpgogol-com` home shows `promo` immediately after the hero (`pnpm build` green 30/30, `astro:check` 0 errors); `nicaragua-projekt` living photos unchanged (no `media:` configs → new commands no-op). _uk is live; the `de` cut awaits the `promo-de` source asset._ (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `AGENTS.md` updated (one media contract, no raw `<video>`, lang-by-directory media tokens, gitignored artifacts/cache); `docs/*.xml` GRACE synchronized (build green ⇒ `grace.validate` passes). _As-built: media props inlined in the section manifest rather than mirrored as a dedicated CMS fragment._ (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate RFC-0210` passes. (evidence: implemented historically)
 

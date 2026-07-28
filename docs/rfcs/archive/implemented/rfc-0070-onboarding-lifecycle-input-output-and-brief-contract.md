@@ -117,8 +117,8 @@ The "no draft folder" rule is firm: the agent writes the _final_ site files dire
 ```markdown
 ---
 client:
-  id: webgogol-handwerk          # kebab-case; becomes apps/<id>/ folder name
-  domain: webgogol-handwerk.de   # primary FQDN (no protocol, no path)
+  id: warpgogol-handwerk          # kebab-case; becomes apps/<id>/ folder name
+  domain: warpgogol-handwerk.de   # primary FQDN (no protocol, no path)
 i18n:
   default: de                    # ISO 639-1
   supported: [de]                # array of ISO 639-1; must include default
@@ -213,7 +213,7 @@ The five phases are **conceptual**, not registered commands. Each one is owned b
 After each phase the agent updates `onboarding/.output/status.md`:
 
 ```markdown
-# Build status — webgogol-handwerk
+# Build status — warpgogol-handwerk
 
 - Last phase: 03-compose
 - Outcome: ok
@@ -222,7 +222,7 @@ After each phase the agent updates `onboarding/.output/status.md`:
 ## Phase log
 
 - 01-synthesize · ok · 2026-05-18T00:11:02Z · artifacts: 01-synthesize/blueprint.md, 01-synthesize/family-pick.md
-- 02-scaffold · ok · 2026-05-18T00:11:18Z · artifacts: 02-scaffold/visual-plan.md · sites scaffolded: apps/webgogol-handwerk/ · biome: packages/ontology/biomes/handwerk-material-warm.yaml
+- 02-scaffold · ok · 2026-05-18T00:11:18Z · artifacts: 02-scaffold/visual-plan.md · sites scaffolded: apps/warpgogol-handwerk/ · biome: packages/ontology/biomes/handwerk-material-warm.yaml
 - 03-compose · ok · 2026-05-18T00:11:54Z · artifacts: 03-compose/site-plan.md, 03-compose/section-gap.md · sections proposed: 9 (in packages/ui/src/sections/) · constellation: handwerk-trust-funnel
 - 04-author · pending
 - 05-audit · pending
@@ -256,7 +256,7 @@ Every kernel command (existing and new) follows the shared envelope:
 ```json
 {
   "command": "brief.validate",
-  "client": "webgogol-handwerk",
+  "client": "warpgogol-handwerk",
   "status": "ok",
   "diagnostics": [],
   "runtimeMs": 18

@@ -43,7 +43,7 @@ commands:
     - surface.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -58,7 +58,7 @@ successSignals:
   - "With no ANTHROPIC API key present, `pnpm build:check` stays deterministic and green: the baker falls back to the deterministic title/intro and the stub enrichment provider; no LLM is called on the build path."
   - "surface.enrich.review lists every pending (approved:false) enriched entry with a readable diff and batch-approves them in one command."
 nonGoals:
-  - "Do not generate images with AI and do not stand up a purchased-stock pipeline — migrate the existing webgogol-4-apps-todo/main webp assets; the founder adds remaining city/industry/service images manually via the per-record image field."
+  - "Do not generate images with AI and do not stand up a purchased-stock pipeline — migrate the existing warpgogol-4-apps-todo/main webp assets; the founder adds remaining city/industry/service images manually via the per-record image field."
   - "Do not call an LLM at build or request time — generation stays the explicit, offline, idempotent surface.enrich step (RFC-0197); build.check never calls a provider."
   - "Do not add or change other blueprints — website-service and ratgeber are untouched this pass (they keep today's deterministic baker behavior)."
   - "Do not change page identity, eligibility, redirect stubs, or slug resolution — identity stays keyed on the neutral axis tuple (RFC-0199)."
@@ -71,8 +71,8 @@ nonGoals:
 
 ## Context
 
-- The Programmatic Surface shipped as a route-source seam (RFC-0192), a Blueprint contract with the `website-local` pilot (RFC-0193), a substance gate (RFC-0194), dual SEO+GEO projection (RFC-0195), entitlement/freshness coupling (RFC-0196), and build-time frozen LLM enrichment (RFC-0197). It is live on `apps/webgogol-com` (industry × city, de + uk).
-- The legacy "fat" site `webgogol-4-apps-todo/main` rendered the same long-tail pages far more strongly. Its strength was **rich hand-authored per-record data** — `industries/de/elektriker.md` carries `specialFocus[{title,description}]`, `scenarioSnippets`, `painPoints`, `proofSignals`, `mustHaves`, `startInputs`, `siteStructure`, `faqs`; `cities/de/stuttgart.md` carries `decisionFactors`, `regionNotes`, `localPainPoints`, `localTrustCues`, `mobileBehaviorNotes`, `firstChecks`, `nearby` — and **real images** (`assets/images/cities/*-skyline.webp`, `*-architecture.webp`, `assets/images/industries/elektriker.webp`). The fat site rendered ~13 distinct sections per page, several with images.
+- The Programmatic Surface shipped as a route-source seam (RFC-0192), a Blueprint contract with the `website-local` pilot (RFC-0193), a substance gate (RFC-0194), dual SEO+GEO projection (RFC-0195), entitlement/freshness coupling (RFC-0196), and build-time frozen LLM enrichment (RFC-0197). It is live on `apps/warpgogol-com` (industry × city, de + uk).
+- The legacy "fat" site `warpgogol-4-apps-todo/main` rendered the same long-tail pages far more strongly. Its strength was **rich hand-authored per-record data** — `industries/de/elektriker.md` carries `specialFocus[{title,description}]`, `scenarioSnippets`, `painPoints`, `proofSignals`, `mustHaves`, `startInputs`, `siteStructure`, `faqs`; `cities/de/stuttgart.md` carries `decisionFactors`, `regionNotes`, `localPainPoints`, `localTrustCues`, `mobileBehaviorNotes`, `firstChecks`, `nearby` — and **real images** (`assets/images/cities/*-skyline.webp`, `*-architecture.webp`, `assets/images/industries/elektriker.webp`). The fat site rendered ~13 distinct sections per page, several with images.
 - The current thin surface produces visibly weaker pages. The founder named four defects: (1) repeated text (hero and the section under it); (2) untranslated Ukrainian; (3) template-glued headings; (4) no images for cities, professions, or services.
 
 This RFC ports the **best of the fat site (data + images)** into the thin architecture and replaces template-glue with **bespoke, transcreated, frozen AI narrative** — without weakening any existing invariant.
@@ -137,16 +137,16 @@ Record fields for `elektriker`/`friseur` port directly from the fat site. Record
 ```sh
 # Generate (offline, idempotent). Real provider used only when ANTHROPIC_API_KEY is set;
 # otherwise the deterministic stub runs and builds stay green.
-pnpm exec site-kernel run surface.enrich --app webgogol-com --blueprint website-local
-pnpm exec site-kernel run surface.enrich --app webgogol-com --regenerate   # overwrite existing
+pnpm exec site-kernel run surface.enrich --app warpgogol-com --blueprint website-local
+pnpm exec site-kernel run surface.enrich --app warpgogol-com --regenerate   # overwrite existing
 
 # Review + batch-approve pending frozen entries.
-pnpm exec site-kernel run surface.enrich.review --app webgogol-com               # list + diffs
-pnpm exec site-kernel run surface.enrich.review --app webgogol-com --approve-all
-pnpm exec site-kernel run surface.enrich.review --app webgogol-com --approve website-local:elektriker:berlin
+pnpm exec site-kernel run surface.enrich.review --app warpgogol-com               # list + diffs
+pnpm exec site-kernel run surface.enrich.review --app warpgogol-com --approve-all
+pnpm exec site-kernel run surface.enrich.review --app warpgogol-com --approve website-local:elektriker:berlin
 
 # Validate (build.check; warn-first, with one uk gate).
-pnpm exec site-kernel run surface.validate --app webgogol-com --json
+pnpm exec site-kernel run surface.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -202,9 +202,9 @@ A `narrative` enriched entry is stored as an ordinary frozen content file whose 
 | `packages/os/site-kernel-checks/src/surface-expand.ts` | `bakePage` rewrite: narrative-driven hero, no echo, field-driven blocks, imaged teasers |
 | `packages/os/site-kernel-checks/src/surface-enrich.ts` | Narrative + record-scope generation; structured read; real provider injected at call site; `surface.enrich.review` |
 | `packages/os/site-kernel-checks/src/surface.ts` | `surface.validate` gains `lead-image-missing`, `narrative-missing` (warn) + `untranslated-route` (gate) |
-| `apps/webgogol-com/src/content/surface/{cities,industries}/<lang>/*.md` | `image` + `imageAlt`; ported rich record fields |
-| `apps/webgogol-com/src/content/<assets>/…` | Migrated webp (city skyline/architecture, industry photos) from the fat site |
-| `apps/webgogol-com/src/content/enriched/website-local/<lang>/*-narrative.md` | Frozen, provenanced, approval-gated narrative entries |
+| `apps/warpgogol-com/src/content/surface/{cities,industries}/<lang>/*.md` | `image` + `imageAlt`; ported rich record fields |
+| `apps/warpgogol-com/src/content/<assets>/…` | Migrated webp (city skyline/architecture, industry photos) from the fat site |
+| `apps/warpgogol-com/src/content/enriched/website-local/<lang>/*-narrative.md` | Frozen, provenanced, approval-gated narrative entries |
 
 ### Output format
 
@@ -232,7 +232,7 @@ A `narrative` enriched entry is stored as an ordinary frozen content file whose 
 
 ## Rollout
 
-- **Opt-in by blueprint.** Only `website-local` on `webgogol-com` adopts the new anatomy this pass. Other blueprints/apps are untouched: the field-presence-driven baker renders thin records exactly as today, so `website-service` and `ratgeber` are byte-stable.
+- **Opt-in by blueprint.** Only `website-local` on `warpgogol-com` adopts the new anatomy this pass. Other blueprints/apps are untouched: the field-presence-driven baker renders thin records exactly as today, so `website-service` and `ratgeber` are byte-stable.
 - **Default provider unchanged.** The stub stays default; the real Claude provider is wired behind `ANTHROPIC_API_KEY` at the `surface.enrich` call site. CI and `build:check` stay deterministic and green with no key.
 - **Warn-first validators.** `lead-image-missing` and `narrative-missing` warn; the uk `untranslated-route` gate noindexes rather than failing the build's render — so adoption is incremental and never a flag day.
 - **Asset migration.** The fat-site webp assets migrate for `elektriker`/`friseur` (and any overlapping city); the founder adds remaining city/industry images manually via the `image` field.

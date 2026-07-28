@@ -66,7 +66,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -115,13 +115,13 @@ The kernel gains a `wikidata.validate` command (scope: `app`, registered in `sit
 
 ```sh
 # Check a single site (warnings for missing QIDs)
-pnpm exec site-kernel run wikidata.validate --app webgogol-com
+pnpm exec site-kernel run wikidata.validate --app warpgogol-com
 
 # Strict mode (errors for missing QIDs)
-pnpm exec site-kernel run wikidata.validate --app webgogol-com --strict
+pnpm exec site-kernel run wikidata.validate --app warpgogol-com --strict
 
 # JSON output
-pnpm exec site-kernel run wikidata.validate --app webgogol-com --json
+pnpm exec site-kernel run wikidata.validate --app warpgogol-com --json
 
 # All sites
 pnpm exec site-kernel run wikidata.validate --all --strict --json
@@ -191,7 +191,7 @@ type WikidataValidationRule =
 {
   "command": "wikidata.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "findings": [
     {
       "ruleId": "wikidata.business-missing-qid",

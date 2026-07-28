@@ -43,7 +43,7 @@ successSignals:
 nonGoals:
   - "Do not build a runtime discovery service or registry API — the catalog is a generated file, consumed by the Leitstand and by builds, not a service in any data path."
   - "Do not aggregate knowledge content, leads, or any per-site data into the catalog — it holds discovery documents (agent.json) only; PII and business facts stay on each site (RFC-0176/0177 isolation)."
-  - "Do not publish the fleet catalog externally in v1 — an outward-facing studio-level directory (e.g. on webgogol-com) is a deliberate later product decision, listed as phase 2."
+  - "Do not publish the fleet catalog externally in v1 — an outward-facing studio-level directory (e.g. on warpgogol-com) is a deliberate later product decision, listed as phase 2."
   - "Do not invent a cross-site capability invocation protocol — sites talk to sites via their public agent surfaces like any external consumer; being fleet siblings grants no special channel."
 acceptance:
   - probe: command-registered
@@ -155,7 +155,7 @@ export function buildFleetAgentCatalog(
 1. Ship builder + command pair + `FAC-*` rules; register in root `tools/kernel.config.ts`; generate and commit the first catalog (1 site today — the value grows with the roster, the mechanism is roster-size-independent).
 2. Leitstand integration: `fleet.plan`/status surfaces read the catalog where machine-surface posture is relevant (signed coverage, action coverage). This is a consumer change inside the RFC-0284 machinery, not a new plane.
 3. Cross-site scenario doctrine (documentation, `docs/engineering/`): a fleet site's build or agent that needs a sibling capability resolves it catalog → `baseUrl` → public surface; never through repo-internal imports of another app's content.
-4. Phase 2 (explicitly deferred, needs a product decision + its own RFC): outward publication of a studio directory (e.g. `webgogol.com/.well-known/gogol-fleet.json`) with per-client consent semantics — the catalog schema above is designed to be publishable as-is, minus `enabled: false` entries.
+4. Phase 2 (explicitly deferred, needs a product decision + its own RFC): outward publication of a studio directory (e.g. `warpgogol.com/.well-known/gogol-fleet.json`) with per-client consent semantics — the catalog schema above is designed to be publishable as-is, minus `enabled: false` entries.
 
 ## Alternatives considered
 

@@ -28,7 +28,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/surface
   - packages/os/site-kernel-checks
@@ -74,7 +74,7 @@ A `pseo.validate` command consolidates the surface's quality checks: substance d
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run pseo.validate --app webgogol-com --json
+pnpm exec site-kernel run pseo.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

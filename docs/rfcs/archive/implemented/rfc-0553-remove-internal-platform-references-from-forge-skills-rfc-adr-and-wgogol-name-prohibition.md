@@ -60,7 +60,7 @@ nonGoals:
   - "Removing generic 'RFC'/'ADR' terms from skill files — these are forge's domain vocabulary (forge IS an RFC/ADR governance framework)"
   - "Removing generic example ids like 'RFC-XXXX' or 'ADR-XXXX' (literal placeholder X's) — these are illustrative, not platform references"
   - "Removing RFC/ADR references from Forge source code (TypeScript) — only skill .md files are in scope"
-  - "Removing @webgogol/forge package name — the npm package name remains as-is"
+  - "Removing @warpgogol/forge package name — the npm package name remains as-is"
   - "Removing forge.yaml or PREFERENCES.md references — these are configuration files, not skills"
   - "Renaming the forge.doctor or forge.skill.validate commands — these are CLI commands, not skill content"
   - "Removing file path references like 'adr-0000-template.md' — these are file names, not RFC/ADR id references"
@@ -70,7 +70,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -86,7 +86,7 @@ nonGoals:
 
 ## Context
 
-Forge is published to npm as `@webgogol/forge` and used by external consumers. Forge IS an RFC/ADR governance framework — its `package.json` description reads "Framework for documenting and implementing ideas — RFC/ADR governance, skills, and project bootstrapping" with keywords `["rfc", "adr", "governance"]`. The terms "RFC" and "ADR" are forge's domain vocabulary and must remain in skill files.
+Forge is published to npm as `@warpgogol/forge` and used by external consumers. Forge IS an RFC/ADR governance framework — its `package.json` description reads "Framework for documenting and implementing ideas — RFC/ADR governance, skills, and project bootstrapping" with keywords `["rfc", "adr", "governance"]`. The terms "RFC" and "ADR" are forge's domain vocabulary and must remain in skill files.
 
 However, the Forge skill files (`packages/forge/skills/**/*.md`) currently contain two categories of internal platform references that external consumers should not see:
 
@@ -194,7 +194,7 @@ All `packages/forge/skills/**/*.md` files are scanned and cleaned:
 - [x] SKILL-17 is added to forge.skill.validate prohibiting specific platform RFC/ADR ids (RFC-\d{4}, ADR-\d{4}) and platform names (WGogol, WebGogol, WarpGogol) in skill files (evidence: packages/forge/src/validators/skill-validate.ts:493-548, checkSkill17 function with SKILL17_ID_PATTERNS and SKILL17_PLATFORM_PATTERNS)
 - [x] SKILL-17 allows generic "RFC"/"ADR" terms and generic placeholder ids (RFC-XXXX, ADR-XXXX) (evidence: packages/forge/src/tests/skill-validate.test.ts:122-130, pattern test confirms RFC-XXXX does not match, bare RFC/ADR terms do not match)
 - [x] SKILL-17 excludes file paths (adr-0000-template.md) and binding key names (validateRfc) from the prohibition (evidence: packages/forge/src/tests/skill-validate.test.ts:132-135, pattern test confirms lowercase file paths do not match; SKILL17_ID_PATTERNS uses case-sensitive \bRFC-\d{4}\b which does not match camelCase validateRfc)
-- [x] All existing packages/forge/skills/**/*.md files are cleaned of specific platform RFC/ADR id references and platform name references (evidence: grep -rnE 'RFC-[0-9]{4}|ADR-[0-9]{4}' packages/forge/skills/ returns zero matches; grep -rnE '\bWGogol\b|\bWebGogol\b|\bWarpGogol\b' packages/forge/skills/ returns zero matches excluding @webgogol/forge npm package name)
+- [x] All existing packages/forge/skills/**/*.md files are cleaned of specific platform RFC/ADR id references and platform name references (evidence: grep -rnE 'RFC-[0-9]{4}|ADR-[0-9]{4}' packages/forge/skills/ returns zero matches; grep -rnE '\bWGogol\b|\bWebGogol\b|\bWarpGogol\b' packages/forge/skills/ returns zero matches excluding @warpgogol/forge npm package name)
 - [x] forge.skill.validate passes on all cleaned skill files (evidence: pnpm exec site-kernel run forge.skill.validate --json returns status: pass, 0 violations)
 - [x] packages/forge/AGENTS.md documents SKILL-17 alongside SKILL-11..16 (evidence: packages/forge/AGENTS.md:87, SKILL-17 bullet added in bindings contract section; packages/forge/AGENTS.md:51, pack skills section updated)
 - [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --json returns ok: true, zero errors)

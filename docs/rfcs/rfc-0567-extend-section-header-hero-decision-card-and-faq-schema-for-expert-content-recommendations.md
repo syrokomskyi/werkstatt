@@ -83,7 +83,7 @@ nonGoals:
 
 ## Context
 
-Expert content recommendations for the webgogol.com home page (file 1, "Index plus") identified three content patterns that the current archetype and FAQ schemas cannot express:
+Expert content recommendations for the warpgogol.com home page (file 1, "Index plus") identified three content patterns that the current archetype and FAQ schemas cannot express:
 
 1. **Eyebrow text above a section heading** — a short contextual label (region, audience, category) rendered above the heading. The `section-header` fragment (RFC-0102) defines `heading` and `subheading` but has no `eyebrow` prop. The `hero-decision-card` archetype composes `section-header` and inherits this limitation.
 2. **CTA note text under hero CTAs** — a short clarifying sentence between the CTAs and the decision card (e.g., "Kurze Angaben genügen — keine perfekten Texte nötig"). The `hero-decision-card` archetype has no prop for this.

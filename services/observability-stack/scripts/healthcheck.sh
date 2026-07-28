@@ -4,11 +4,11 @@
 set -euo pipefail
 
 echo "=== SigNoz UI ==="
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" https://observe.webgogol.com
+curl -sS -o /dev/null -w "HTTP %{http_code}\n" https://observe.warpgogol.com
 
 echo "=== OTLP ingest (no token, expect 401) ==="
 curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
-  -X POST https://ingest.observe.webgogol.com/v1/metrics \
+  -X POST https://ingest.observe.warpgogol.com/v1/metrics \
   -H "Content-Type: application/json" \
   -d '{"resourceMetrics":[]}'
 

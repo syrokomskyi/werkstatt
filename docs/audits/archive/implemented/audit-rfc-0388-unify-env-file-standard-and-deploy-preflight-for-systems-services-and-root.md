@@ -43,7 +43,7 @@ The `related[]` entries (DNA-1, DNA-2) are relevant and not decorative.
 2. `lagebild.worker.dev.vars.validate` — validates `.dev.vars.example` for leaked values. If `.dev.vars` is eliminated, this command must be removed (its function is subsumed by `env.contract.validate` / `env.example.validate`).
 3. `lagebild.worker.deploy` — currently runs `npx wrangler deploy` without `--secrets-file`. RFC-0388 Rule 6 says services deploy with `--secrets-file .env`, but this command is not listed in `commands.changed`.
 
-Additionally, `lagebild.worker.dev.vars.validate` is registered in the `sites-check-author.ts` pipeline (`@/c:/projects/webgogol/webgogol-4/packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts:211`). The RFC's Rollout section does not mention removing or replacing this pipeline entry.
+Additionally, `lagebild.worker.dev.vars.validate` is registered in the `sites-check-author.ts` pipeline (`@/c:/projects/warpgogol/warpgogol-4/packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts:211`). The RFC's Rollout section does not mention removing or replacing this pipeline entry.
 
 **Minor — `env.example.validate` not listed in `commands.changed`.** The existing `env.example.validate` command (in `env-example.ts:305-339`) checks for non-empty values in `.env.example`. The RFC adds a `# How to obtain:` enforcement rule (Rule 3, `ENV-CONTRACT-05`), but `env.example.validate` is not listed in `commands.changed`. It's unclear whether the new rule lives in `env.contract.validate` or `env.example.validate`. The RFC body says `env.contract.validate` enforces it (Rule 3), but the `commands.changed` list only includes `env.contract.validate` — so this is consistent. However, the generator (`env.example.generate`) is listed in `commands.changed`, which is correct.
 
@@ -65,7 +65,7 @@ No issues. The RFC does not contain self-authorizing language. Implementation no
 
 ## Axis G — Blind spots
 
-**Minor — `lagebild.worker.deploy` currently spawns `npx wrangler deploy` without `--secrets-file`.** The RFC's Rule 6 says services deploy with `--secrets-file .env`, but the existing `lagebild.worker.deploy` handler (`@/c:/projects/webgogol/webgogol-4/packages/os/site-kernel/src/lagebild/handlers.ts:438`) uses `spawn("npx", ["wrangler", "deploy"])`. The RFC should explicitly state that this handler must be updated to include `--secrets-file .env` and the preflight call.
+**Minor — `lagebild.worker.deploy` currently spawns `npx wrangler deploy` without `--secrets-file`.** The RFC's Rule 6 says services deploy with `--secrets-file .env`, but the existing `lagebild.worker.deploy` handler (`@/c:/projects/warpgogol/warpgogol-4/packages/os/site-kernel/src/lagebild/handlers.ts:438`) uses `spawn("npx", ["wrangler", "deploy"])`. The RFC should explicitly state that this handler must be updated to include `--secrets-file .env` and the preflight call.
 
 **Minor — performance of `deploy.preflight`.** The RFC states parsing a small `.env` file is "sub-millisecond" — this is accurate. No performance concern.
 

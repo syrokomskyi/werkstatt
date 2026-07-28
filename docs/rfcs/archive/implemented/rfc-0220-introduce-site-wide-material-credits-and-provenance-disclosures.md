@@ -47,7 +47,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -59,7 +59,7 @@ successSignals:
   - "Every published authored material in an app has a machine-readable credit record before deployment."
   - "A visitor sees a compact localized disclosure row below a video, image, or article and can expand it for provenance details without leaving the page."
   - "Each app exposes a localized credits page listing the same expanded details for all credited materials on the site."
-  - "The pilot webgogol-com promo video credits Sveta Svega Kim and Serhii Nemo as creators, records VEO assistance for the backing material, and records Andrii Syrokomskyi as reviewer."
+  - "The pilot warpgogol-com promo video credits Sveta Svega Kim and Serhii Nemo as creators, records VEO assistance for the backing material, and records Andrii Syrokomskyi as reviewer."
   - "Search and AI consumers receive consistent ImageObject, VideoObject, and CreativeWork credit/provenance data from the same source as the visible UI."
 nonGoals:
   - "Does not decide legal ownership, transfer, or license terms for a client contract."
@@ -73,7 +73,7 @@ nonGoals:
 
 ## Context
 
-The platform now has first-class contracts for authored images (`resolveImage`, `ResponsiveImage`, image variants) and authored video (`mediaSchema`, `<Media>`, `video-section`, video variants). `apps/webgogol-com` is the pilot site and already publishes a feature video on the home page through the RFC-0210 media contract:
+The platform now has first-class contracts for authored images (`resolveImage`, `ResponsiveImage`, image variants) and authored video (`mediaSchema`, `<Media>`, `video-section`, video variants). `apps/warpgogol-com` is the pilot site and already publishes a feature video on the home page through the RFC-0210 media contract:
 
 ```yaml
 media:
@@ -97,7 +97,7 @@ Three invariants are currently unprotected:
 2. **Visible UI and semantic data can drift.** If one section hand-renders a credit line while another emits JSON-LD or a credits page manually copies the text, the three outputs will diverge. This repeats the exact duplication pattern the platform has already removed for image and media delivery.
 3. **AI participation is easy to mislabel.** A naive `author: AI Agent` field would blur human creators, AI tools, model/platform assistance, prompt/workflow authorship, and human review. The platform needs a role chain, not a single author string.
 
-For the pilot, `apps/webgogol-com/src/content/pages/de/home.md` and its Ukrainian twin reference the `promo` feature video. There is no required field or sidecar that records:
+For the pilot, `apps/warpgogol-com/src/content/pages/de/home.md` and its Ukrainian twin reference the `promo` feature video. There is no required field or sidecar that records:
 
 - creators: Sveta Svega Kim and Serhii Nemo
 - backing material assistance: VEO
@@ -123,10 +123,10 @@ The contract distinguishes human and organizational roles from AI/workflow roles
 
 Visitor-facing labels are localized by language. The internal platform concept stays "Material Credits", but the public German label is `Bildnachweis`; Ukrainian and other locales use their natural local-language equivalent. The generated credits page is linked from the footer as soon as it exists, beside the OpenSource disclosure.
 
-For Webgogol-owned commissioned studio materials, the default rights notice is:
+For Warpgogol-owned commissioned studio materials, the default rights notice is:
 
 ```text
-Copyright © 2026 Webgogol. All rights reserved unless otherwise stated.
+Copyright © 2026 Warpgogol. All rights reserved unless otherwise stated.
 ```
 
 This is the commercial-studio default for a Germany-based studio. A client-specific or jointly owned material may override it per sidecar, but agents must not invent such overrides without a human source.
@@ -147,9 +147,9 @@ Expanded AI details disclose only the tool/model/platform, role, and prompt/work
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run material.credits.validate --app webgogol-com
-pnpm exec site-kernel run material.credits.generate --app webgogol-com
-pnpm exec site-kernel run material.credits.report --app webgogol-com --json
+pnpm exec site-kernel run material.credits.validate --app warpgogol-com
+pnpm exec site-kernel run material.credits.generate --app warpgogol-com
+pnpm exec site-kernel run material.credits.report --app warpgogol-com --json
 ```
 
 `material.credits.validate` is app-scoped and runs in `APPS_CHECK_AUTHOR_PIPELINE` after `asset.reference.validate` and `video.media.validate`, because it depends on the same discovered content references. It exits non-zero when an in-scope material lacks credits or when a credit record has invalid role/license shape.
@@ -245,7 +245,7 @@ export interface MaterialCredit {
 
 The short `creditLine` is optional. If absent, the platform derives a localized compact line from `parties` and `license`. The expanded details always render from the structured fields, never from an opaque freeform string.
 
-Pilot record shape for the `webgogol-com` promo video:
+Pilot record shape for the `warpgogol-com` promo video:
 
 ```yaml
 id: promo-video
@@ -270,7 +270,7 @@ parties:
     kind: Person
 license:
   label: internal-editorial
-  copyrightNotice: Copyright © 2026 Webgogol. All rights reserved unless otherwise stated.
+  copyrightNotice: Copyright © 2026 Warpgogol. All rights reserved unless otherwise stated.
 ```
 
 ### File system responsibilities
@@ -329,7 +329,7 @@ Pretty output groups violations by page/content file. JSON output is stable and 
 1. Land the schema, scanner, report command, and validator as warn-only behind `material.credits.report`.
 2. Add `material.credits.generate`, templates, and generator ownership entries. Require a `credits` page entry in `system.md`; missing route is a validator error once the command is wired.
 3. Add `<MaterialCredit>` and wire it into `<Media>` for `feature` media first. Then wire image-bearing shared components as they pass through existing image primitives.
-4. Pilot `webgogol-com`: add `promo.credits.yaml` in both supported language scopes or a default-language anchor with localized labels; generate the credits page; verify the visible disclosure row under the promo video and the generated `/open-source`-style credits page.
+4. Pilot `warpgogol-com`: add `promo.credits.yaml` in both supported language scopes or a default-language anchor with localized labels; generate the credits page; verify the visible disclosure row under the promo video and the generated `/open-source`-style credits page.
 5. Switch `material.credits.validate` to fail-hard in `APPS_CHECK_AUTHOR_PIPELINE` for explicit media and lead/content images. Expand to all resolved authored images once the scanner has low false positives.
 6. New apps scaffold with a `credits` route and empty generated page from day one. Existing apps adopt by adding sidecars for every discovered material; apps with no published materials beyond generated OpenSource/license pages pass with an empty credits page.
 7. A later RFC or amendment may add `material.metadata.write` to preserve or write C2PA/IPTC/XMP metadata from the same source records.
@@ -354,7 +354,7 @@ Pretty output groups violations by page/content file. JSON output is stable and 
 ## Implementation decisions
 
 - Public labels are localized. German uses `Bildnachweis`; Ukrainian and future locales use their natural equivalent. The code concept and command namespace remain `material credits`.
-- The default rights notice for Webgogol-owned commissioned studio materials is `Copyright © 2026 Webgogol. All rights reserved unless otherwise stated.`
+- The default rights notice for Warpgogol-owned commissioned studio materials is `Copyright © 2026 Warpgogol. All rights reserved unless otherwise stated.`
 - The generated credits page is linked from the footer immediately.
 - Expanded AI details show only tool/model/platform, role, and prompt/workflow author; they do not show prompt text by default.
 - The pilot records `VEO` as `AIPlatform`.
@@ -370,8 +370,8 @@ Pretty output groups violations by page/content file. JSON output is stable and 
 - [x] Each app has a `system.md pages[]` entry for `pageId: credits` before the generated page is considered live. (evidence: implemented historically)
 - [x] The generated credits page lists the expanded details for all credited materials, compactly and localized. (evidence: implemented historically)
 - [x] JSON-LD projection emits `ImageObject`, `VideoObject`, or `CreativeWork` credit fields from the same records used by the UI. (evidence: implemented historically)
-- [x] Pilot `webgogol-com` promo video records Sveta Svega Kim and Serhii Nemo as creators, VEO as AI assistance for backing material, and Andrii Syrokomskyi as reviewer. _(Serhii Nemo is recorded as `coCreator`, which renders under the same "Created by" group.)_ (evidence: implemented historically)
-- [x] `apps-check.run --app webgogol-com` and `app.contract.full --app webgogol-com` pass after pilot implementation. _(apps-check.run: 129/129 green on both apps, includes `material.credits.validate`. `app.contract.full` has 2 residual failures that pre-date and are unrelated to RFC-0220: `feature.graph.validate` (missing `src/content/features` dir, RFC-0183 dead scaffolding) and `app.qa.validate` (`onboarding.phase.stale-output` manifest drift).)_ (evidence: implemented historically)
+- [x] Pilot `warpgogol-com` promo video records Sveta Svega Kim and Serhii Nemo as creators, VEO as AI assistance for backing material, and Andrii Syrokomskyi as reviewer. _(Serhii Nemo is recorded as `coCreator`, which renders under the same "Created by" group.)_ (evidence: implemented historically)
+- [x] `apps-check.run --app warpgogol-com` and `app.contract.full --app warpgogol-com` pass after pilot implementation. _(apps-check.run: 129/129 green on both apps, includes `material.credits.validate`. `app.contract.full` has 2 residual failures that pre-date and are unrelated to RFC-0220: `feature.graph.validate` (missing `src/content/features` dir, RFC-0183 dead scaffolding) and `app.qa.validate` (`onboarding.phase.stale-output` manifest drift).)_ (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 
 ## Amendment: living-photo (RFC-0202) video coverage

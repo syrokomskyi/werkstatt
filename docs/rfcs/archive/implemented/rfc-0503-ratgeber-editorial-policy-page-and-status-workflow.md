@@ -41,7 +41,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/site-kernel-checks"
@@ -185,7 +185,7 @@ The link is emitted by appending a `ctaBlock` after the `md` block, or by includ
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.policy.validate --site webgogol-com --json
+pnpm exec site-kernel run ratgeber.policy.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check`.
@@ -287,7 +287,7 @@ const REVIEW_CADENCE_MONTHS = 3;
 7. Register command in the check module command table (`09b-build-artifacts-part2.ts`).
 8. Update `amendedBy` on RFC-0500 to include RFC-0503.
 9. Compass sync: update `docs/verification-plan.xml`, `docs/COMMANDS.md`, `docs/requirements.xml`, `docs/technology.xml`, `docs/knowledge-graph.xml`, `packages/os/site-kernel-checks/AGENTS.md`.
-10. Run `ratgeber.policy.validate --site webgogol-com`.
+10. Run `ratgeber.policy.validate --site warpgogol-com`.
 
 ## Alternatives considered
 
@@ -318,11 +318,11 @@ const REVIEW_CADENCE_MONTHS = 3;
 
 ## Acceptance criteria
 
-- [x] `/ratgeber/redaktion/` (DE) and `/porady/redaktsiya/` (UK) render the editorial policy page. (evidence: `missions/webgogol-com-m000010/workpiece/src/content/pages/de/ratgeber-redaktion.md`, `src/content/pages/uk/ratgeber-redaktion.md`, `src/content/system.md:470-478`)
-- [x] Policy page contains all 5 required H2 sections in both DE and UK. (evidence: `missions/webgogol-com-m000010/workpiece/src/content/prose/de/ratgeber-redaktion.md`, `src/content/prose/uk/ratgeber-redaktion.md`, `packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts` RG-POL-02)
-- [x] Page entries exist at `src/content/pages/{lang}/ratgeber-redaktion.md` (frontmatter-only, DNA-24). (evidence: `missions/webgogol-com-m000010/workpiece/src/content/pages/de/ratgeber-redaktion.md`, `src/content/pages/uk/ratgeber-redaktion.md`)
-- [x] Page is registered in `system.md` with `cosmicStar: Polaris` and language-keyed routes. (evidence: `missions/webgogol-com-m000010/workpiece/src/content/system.md:470-478`)
+- [x] `/ratgeber/redaktion/` (DE) and `/porady/redaktsiya/` (UK) render the editorial policy page. (evidence: `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/ratgeber-redaktion.md`, `src/content/pages/uk/ratgeber-redaktion.md`, `src/content/system.md:470-478`)
+- [x] Policy page contains all 5 required H2 sections in both DE and UK. (evidence: `missions/warpgogol-com-m000010/workpiece/src/content/prose/de/ratgeber-redaktion.md`, `src/content/prose/uk/ratgeber-redaktion.md`, `packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts` RG-POL-02)
+- [x] Page entries exist at `src/content/pages/{lang}/ratgeber-redaktion.md` (frontmatter-only, DNA-24). (evidence: `missions/warpgogol-com-m000010/workpiece/src/content/pages/de/ratgeber-redaktion.md`, `src/content/pages/uk/ratgeber-redaktion.md`)
+- [x] Page is registered in `system.md` with `cosmicStar: Polaris` and language-keyed routes. (evidence: `missions/warpgogol-com-m000010/workpiece/src/content/system.md:470-478`)
 - [x] Hub links to the policy page in the "So arbeitet die Redaktion" block with link text "Mehr zur Redaktion" (DE) / "Докладніше про редакцію" (UK). (evidence: `packages/os/site-kernel-checks/src/surface-expand/bake-ratgeber-hub.ts:62,72,190-193`)
-- [x] `ratgeber.policy.validate` passes on `webgogol-com`. (evidence: `packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts`, `pnpm --filter @gogol/site-kernel-checks run build:check` passes)
+- [x] `ratgeber.policy.validate` passes on `warpgogol-com`. (evidence: `packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts`, `pnpm --filter @gogol/site-kernel-checks run build:check` passes)
 - [x] No `review-required` article appears in the surface artifact. (evidence: `packages/os/site-kernel-checks/src/ratgeber-policy-validate.ts` RG-POL-05)
 - [x] `rfc.validate` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0503` — 0 violations, 0 warnings)

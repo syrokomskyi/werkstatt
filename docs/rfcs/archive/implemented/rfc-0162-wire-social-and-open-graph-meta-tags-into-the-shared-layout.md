@@ -56,7 +56,7 @@ RFC-0150 (`implemented`) already generates per-page preview images via `preview.
 
 ## Problem
 
-- No social/OG meta means every share of a webgogol site renders as bare text — directly defeating the "widgets" goal.
+- No social/OG meta means every share of a warpgogol site renders as bare text — directly defeating the "widgets" goal.
 - The RFC-0150 preview images are wasted build output because no `og:image` points at them.
 - The `SemanticPageModel` (the single per-page projection consumed by JSON-LD) has no `primaryImage`/`ogType` field, so there is no canonical source to project social meta from.
 - There is no validator guaranteeing that indexable pages carry coherent social meta, so the gap can silently reappear.

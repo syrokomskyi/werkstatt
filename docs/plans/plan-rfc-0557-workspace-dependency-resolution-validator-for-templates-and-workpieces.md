@@ -19,8 +19,8 @@ scope:
 
 ## 1. Objectives
 
-- [ ] Objective 1 — Implement `template.imports.validate` command that auto-discovers template files, extracts static + dynamic `@warpgogol/*`/`@webgogol/*` imports, and checks them against root `package.json` devDependencies — maps to acceptance criteria [1-5]
-- [ ] Objective 2 — Implement `workpiece.imports.validate` command that scans materialized workpiece files for `@warpgogol/*`/`@webgogol/*` imports and verifies resolvability from root `node_modules` — maps to acceptance criteria [6-9]
+- [ ] Objective 1 — Implement `template.imports.validate` command that auto-discovers template files, extracts static + dynamic `@warpgogol/*`/`@warpgogol/*` imports, and checks them against root `package.json` devDependencies — maps to acceptance criteria [1-5]
+- [ ] Objective 2 — Implement `workpiece.imports.validate` command that scans materialized workpiece files for `@warpgogol/*`/`@warpgogol/*` imports and verifies resolvability from root `node_modules` — maps to acceptance criteria [6-9]
 - [ ] Objective 3 — Register both commands in the diagnostic rule registry with rule IDs `TEMPLATE-IMPORTS-01/02` and `WORKPIECE-IMPORTS-01` — maps to acceptance criterion [10]
 - [ ] Objective 4 — Wire `template.imports.validate` into `PACKAGES_CHECK_PIPELINE` after `workspace.discovery.validate` and `workpiece.imports.validate` as first step in `SITES_BUILD_PREPARE_PIPELINE` — maps to acceptance criteria [5, 9]
 - [ ] Objective 5 — Verify both commands exit non-zero on violations, zero on pass, and that `PACKAGES_CHECK_PIPELINE` passes with current root `package.json` — maps to acceptance criteria [11, 12]
@@ -65,7 +65,7 @@ scope:
 - Create `packages/os/site-kernel-checks/src/template-imports-validate.ts`
 - Implement `runTemplateImportsValidate(input, context)`:
   - Auto-discover `**/src/templates/**/*.template.*` files across workspace packages using `collectFiles` from `@warpgogol/share/fs`
-  - Read each template file, extract `@warpgogol/*` and `@webgogol/*` import specifiers using regex matching both `from "@warpgogol/..."` / `from "@webgogol/..."` (static) AND `import("@warpgogol/...")` / `import("@webgogol/...")` (dynamic)
+  - Read each template file, extract `@warpgogol/*` and `@warpgogol/*` import specifiers using regex matching both `from "@warpgogol/..."` / `from "@warpgogol/..."` (static) AND `import("@warpgogol/...")` / `import("@warpgogol/...")` (dynamic)
   - Read root `package.json`, parse `devDependencies` keys
   - For each extracted package, check if it exists in root devDependencies — if not, emit `TEMPLATE-IMPORTS-01` diagnostic
   - Unless `--no-frozen-lockfile` flag is set, run `pnpm install --frozen-lockfile` from `context.workspaceRoot` with `process.env` inherited — if it fails, emit `TEMPLATE-IMPORTS-02` diagnostic
@@ -97,8 +97,8 @@ scope:
   - Require `--site <name>` flag — if missing, emit error diagnostic and exit 1
   - Resolve workpiece directory: `--workpiece-dir` override or `missions/<currentMission>/workpiece/` (read from registry)
   - Scan `tools/**/*.ts` and `src/**/*.{ts,mjs,astro}` in the workpiece directory using `collectFiles`
-  - Extract `@warpgogol/*` and `@webgogol/*` import specifiers using the same regex as Step 1 (both static and dynamic)
-  - For each extracted package, check if `node_modules/@warpgogol/<name>` or `node_modules/@webgogol/<name>` symlink exists in root `node_modules` — if not, emit `WORKPIECE-IMPORTS-01` diagnostic
+  - Extract `@warpgogol/*` and `@warpgogol/*` import specifiers using the same regex as Step 1 (both static and dynamic)
+  - For each extracted package, check if `node_modules/@warpgogol/<name>` or `node_modules/@warpgogol/<name>` symlink exists in root `node_modules` — if not, emit `WORKPIECE-IMPORTS-01` diagnostic
   - Support `--json`, `--site`, `--workpiece-dir` flags
   - Return `diagnosticsResult("workpiece.imports.validate", diagnostics)` with `WorkpieceImportsValidateData`
 - Use `fileExists` from `@warpgogol/share/fs` for symlink existence check
@@ -123,7 +123,7 @@ scope:
 - In `packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts`:
   - Import both handlers
   - Add `template.imports.validate` entry to `ECOSYSTEM_COMMANDS` with `scope: "workspace"`, `flags: { json: {}, "no-frozen-lockfile": {}, "dry-run": {} }`, `reads: ["packages/os/*/src/templates/**/*.template.*", "package.json", "pnpm-lock.yaml"]`, `execute: runTemplateImportsValidate`
-  - Add `workpiece.imports.validate` entry with `scope: "workspace"`, `flags: { json: {}, site: {}, "workpiece-dir": {} }`, `reads: ["missions/*/workpiece/tools/**/*.ts", "missions/*/workpiece/src/**/*.{ts,mjs,astro}", "node_modules/@warpgogol/*", "node_modules/@webgogol/*"]`, `execute: runWorkpieceImportsValidate`
+  - Add `workpiece.imports.validate` entry with `scope: "workspace"`, `flags: { json: {}, site: {}, "workpiece-dir": {} }`, `reads: ["missions/*/workpiece/tools/**/*.ts", "missions/*/workpiece/src/**/*.{ts,mjs,astro}", "node_modules/@warpgogol/*", "node_modules/@warpgogol/*"]`, `execute: runWorkpieceImportsValidate`
 - In `packages/os/site-kernel-checks/src/diagnostics/rules/governance.ts`, register three new rule descriptors:
   - `TEMPLATE-IMPORTS-01` — error, domain: governance, description: "Template imports a workspace package not in root devDependencies"
   - `TEMPLATE-IMPORTS-02` — error, domain: governance, description: "pnpm install --frozen-lockfile failed (lockfile drift or unsatisfied peer deps)"
@@ -172,7 +172,7 @@ scope:
 
 - Create `packages/os/site-kernel-checks/src/tests/template-imports-validate.test.ts`:
   - Test static import extraction: `from "@warpgogol/site-kernel-integrity"` → extracts `@warpgogol/site-kernel-integrity`
-  - Test dynamic import extraction: `import("@webgogol/forge")` → extracts `@webgogol/forge`
+  - Test dynamic import extraction: `import("@warpgogol/forge")` → extracts `@warpgogol/forge`
   - Test mixed imports in one file (both static and dynamic)
   - Test that non-workspace imports (`from "node:fs"`, `from "astro"`) are not extracted
   - Test template with `{{TOKEN}}` placeholders does not break regex
@@ -183,7 +183,7 @@ scope:
   - Test symlink existence check: existing symlink → no diagnostic; missing → `WORKPIECE-IMPORTS-01` diagnostic
   - Test missing `--site` flag → error diagnostic, exit 1
 - Use `vitest` (`import { test, expect } from "vitest"`)
-- Use property-based tests for the regex extractor (DNA-41): generate random `@warpgogol/*` / `@webgogol/*` specifiers and verify round-trip extraction
+- Use property-based tests for the regex extractor (DNA-41): generate random `@warpgogol/*` / `@warpgogol/*` specifiers and verify round-trip extraction
 
 **Validation:**
 
@@ -297,7 +297,7 @@ scope:
 | Auto-discovery false positives | Step 5 tests verify that template files with `{{TOKEN}}` placeholders do not break the regex |
 | Agent misinterpretation | Step 7 AGENTS.md update documents the command scope explicitly |
 | Lockfile-only environments | Step 1 implements `--no-frozen-lockfile` flag |
-| Dynamic import false negatives | Step 5 tests explicitly cover `import("@webgogol/forge")` pattern from `kernel.config.template.ts` |
+| Dynamic import false negatives | Step 5 tests explicitly cover `import("@warpgogol/forge")` pattern from `kernel.config.template.ts` |
 
 ## 6. Escalation triggers
 

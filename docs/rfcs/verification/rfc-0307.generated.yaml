@@ -28,7 +28,7 @@ probes:
     durationMs: 1095
   - probe:
       probe: run
-      command: site-kernel run public.artifact.validate --app webgogol-com --json
+      command: site-kernel run public.artifact.validate --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true
@@ -36,7 +36,7 @@ probes:
     durationMs: 32133
   - probe:
       probe: run
-      command: site-kernel run public.declaration.validate --app webgogol-com --json
+      command: site-kernel run public.declaration.validate --app warpgogol-com --json
       expect:
         exitCode: 0
     ok: true

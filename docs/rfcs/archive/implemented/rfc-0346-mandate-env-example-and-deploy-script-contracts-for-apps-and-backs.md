@@ -155,7 +155,7 @@ Every `apps/*/package.json` MUST contain these six scripts (matching the onboard
 pnpm exec site-kernel run env.contract.validate --all
 
 # Validate a single project
-pnpm exec site-kernel run env.contract.validate --app webgogol-com
+pnpm exec site-kernel run env.contract.validate --app warpgogol-com
 pnpm exec site-kernel run env.contract.validate --back cf-analytics-poller
 
 # Check/create .env (local) for all projects that have .env.example
@@ -277,7 +277,7 @@ This heuristic is conservative — it may flag a project that references `proces
    - `backs/fleet-probe-runner` — `WGOGOL_OTLP_ENDPOINT`, `WGOGOL_OTLP_TOKEN`, `PROBE_INTERVAL_MS`, `PROBE_CONCURRENCY`, `PROBE_REQUEST_TIMEOUT_MS`
    - `backs/telegram-alert-bridge` — `BRIDGE_SECRET`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
    - `backs/matomo-proxy` — `MATOMO_CLOUD_HOST`
-   - `backs/check-webgogol-runner` — (check if env-consuming; create if needed)
+   - `backs/check-warpgogol-runner` — (check if env-consuming; create if needed)
 5. Migrate `backs/cf-analytics-poller/README.md` and `backs/fleet-probe-runner/README.md`: replace env-variable tables with `.env.example` reference.
 6. Run `env.local.check --all` and `env.production.check --all` to create missing `.env` / `.env.production` files.
 7. Run `deploy.scripts.validate --all` and fix any missing scripts in existing apps.
@@ -321,7 +321,7 @@ This heuristic is conservative — it may flag a project that references `proces
 - [x] All four commands registered in the command table and `index.ts` exports (evidence: implemented historically)
 - [x] `env.contract.validate` integrated into `backs-check.run` pipeline (evidence: implemented historically)
 - [x] `deploy.scripts.validate` integrated into `apps-check.author` pipeline (evidence: implemented historically)
-- [x] `.env.example` created for `backs/cf-analytics-poller`, `backs/fleet-probe-runner`, `backs/telegram-alert-bridge`, `backs/matomo-proxy`, `backs/check-webgogol-runner` (evidence: implemented historically)
+- [x] `.env.example` created for `backs/cf-analytics-poller`, `backs/fleet-probe-runner`, `backs/telegram-alert-bridge`, `backs/matomo-proxy`, `backs/check-warpgogol-runner` (evidence: implemented historically)
 - [x] `README.md` env-variable tables migrated to `.env.example` reference in all `backs/*` that had them (evidence: implemented historically)
 - [x] Missing `.env` / `.env.production` files created in `apps/*` via `env.local.check` / `env.production.check` (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `packages/os/site-kernel-onboarding/src/templates/package.template.json` verified to already contain the six deploy scripts (no change needed — it does) (evidence: packages/ directory, package exists)

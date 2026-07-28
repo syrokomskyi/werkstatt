@@ -92,7 +92,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -371,7 +371,7 @@ alternates:
 
 ```sh
 pnpm exec site-kernel run surface.contract.validate
-pnpm exec site-kernel run surface.contract.validate --app webgogol-com
+pnpm exec site-kernel run surface.contract.validate --app warpgogol-com
 ```
 
 Validates that generated C-surfaces match the declarative contract:

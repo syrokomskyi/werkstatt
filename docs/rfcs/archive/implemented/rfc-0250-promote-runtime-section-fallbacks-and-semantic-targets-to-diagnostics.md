@@ -35,7 +35,7 @@ commands:
     - maintenance.debt.report
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
@@ -66,7 +66,7 @@ The 2026-07-01 architecture audit confirmed that RFC-0247 and RFC-0248 improved 
 
 However, the fresh `pnpm build` output still contains actionable runtime warnings that do not travel through the canonical diagnostic model:
 
-- `webgogol-com` Programmatic Surface pages render shared `hero-section` fallback behavior and emit `[resolveImage] Image not found: "hero-1" (lang: de, defaultLang: de)`.
+- `warpgogol-com` Programmatic Surface pages render shared `hero-section` fallback behavior and emit `[resolveImage] Image not found: "hero-1" (lang: de, defaultLang: de)`.
 - The same render path resolves default CTA targets from `hero-section` and emits `[routes] PageId not found: donateContact` when the app does not define that pageId.
 - Generated surface routes also emit repeated content-entry lookup warnings such as `Entry pages -> de/website-local:... was not found` during Astro content resolution. These warnings are expected in the sense that surface pages are synthetic, but they are not represented as diagnostics, and therefore agents cannot tell whether they are benign framework noise or real content drift.
 
@@ -131,9 +131,9 @@ The change preserves the composition-only app rule. Apps should not patch around
 
 ```sh
 pnpm exec site-kernel run section.defaults.validate --json
-pnpm exec site-kernel run semantic.targets.validate --app webgogol-com --json
+pnpm exec site-kernel run semantic.targets.validate --app warpgogol-com --json
 pnpm exec site-kernel run runtime.warnings.lint --json
-pnpm exec site-kernel run apps-check.author --app webgogol-com --json
+pnpm exec site-kernel run apps-check.author --app warpgogol-com --json
 pnpm exec site-kernel run maintenance.debt.report --json
 ```
 
@@ -272,8 +272,8 @@ Removing defaults can change visual output if a page relied on implicit portrait
 - [x] `hero-section` no longer implicitly falls back to `"hero-1"` or `"donateContact"` for apps that do not declare those tokens/targets. (evidence: implemented historically)
 - [x] Missing section fallback assets and missing semantic targets are canonical diagnostics with registered rule ids. (evidence: implemented historically)
 - [x] `maintenance.debt.report --json` aggregates non-failing warning/info findings from the new validators. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `pnpm build` emits no previous `hero-1` / `donateContact` runtime warnings for `webgogol-com`. (evidence: implemented historically)
-- [x] `pnpm exec site-kernel run apps-check.author --app webgogol-com --json` passes or reports only intentional warning-mode diagnostics. (evidence: implemented historically)
+- [x] `pnpm build` emits no previous `hero-1` / `donateContact` runtime warnings for `warpgogol-com`. (evidence: implemented historically)
+- [x] `pnpm exec site-kernel run apps-check.author --app warpgogol-com --json` passes or reports only intentional warning-mode diagnostics. (evidence: implemented historically)
 - [x] `pnpm exec site-kernel run apps-check.author --app nicaragua-projekt --json` passes and preserves intentionally authored `hero-1` / `donateContact` behavior. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `pnpm exec site-kernel run packages-check.run --json`, `pnpm lint:packages`, `pnpm test`, `pnpm build`, and `rfc.validate` pass. (evidence: implemented historically)
 

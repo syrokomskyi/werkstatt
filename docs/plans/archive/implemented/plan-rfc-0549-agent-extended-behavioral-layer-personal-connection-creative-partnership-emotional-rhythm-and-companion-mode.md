@@ -45,8 +45,8 @@ scope:
 ### 2.4 Validation and pipelines
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0549`
-- `pnpm --filter @webgogol/forge run build:check`
-- `pnpm --filter @webgogol/forge run test` (agents-generate tests)
+- `pnpm --filter @warpgogol/forge run build:check`
+- `pnpm --filter @warpgogol/forge run test` (agents-generate tests)
 - No new commands proposed
 - No migrator needed (RFC-0548's migrator handles AGENTS.md regeneration; this RFC adds conditional content within that same regeneration)
 
@@ -64,7 +64,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes with the new function.
+- `pnpm --filter @warpgogol/forge run build:check` passes with the new function.
 
 **Completion criterion:** `readRegister` function exists, is exported, and returns `"business"` when PREFERENCES.md is missing or has no register field.
 
@@ -86,7 +86,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 - Function returns non-empty array containing all nine section headers.
 
 **Completion criterion:** `buildExtendedBehavioralLayer()` returns string array containing all nine section names and the key policy phrases ("questions not declarations", "outcome-based praise", "saveCompanionSessions", "pull-only").
@@ -108,7 +108,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 - Manual check: generated AGENTS.md with register=creative contains extended sections; with register=business does not.
 
 **Completion criterion:** `runAgentsGenerate` produces AGENTS.md with extended layer when register=creative, without extended layer when register=business.
@@ -155,7 +155,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run test` — all agents-generate tests pass.
+- `pnpm --filter @warpgogol/forge run test` — all agents-generate tests pass.
 
 **Completion criterion:** All test cases pass; extended layer inclusion/exclusion is verified for creative, business, and missing-register scenarios.
 
@@ -175,7 +175,7 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` passes.
+- `pnpm --filter @warpgogol/forge run build:check` passes.
 
 **Completion criterion:** `packages/forge/AGENTS.md` Output contract section mentions the extended behavioral layer and its conditional inclusion.
 
@@ -191,8 +191,8 @@ scope:
 
 - Verify `packages/forge/AGENTS.md` is updated (Step 6).
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0549` — must pass with zero RFC-specific errors.
-- Run `pnpm --filter @webgogol/forge run build:check` — must pass.
-- Run `pnpm --filter @webgogol/forge run test` — all tests pass.
+- Run `pnpm --filter @warpgogol/forge run build:check` — must pass.
+- Run `pnpm --filter @warpgogol/forge run test` — all tests pass.
 - Run code review: invoke `fo-review` via the `skill` tool on all session code changes. Wait for the review report.
 - Run fix if needed: if `fo-review` reported findings, invoke `fo-fix`. Re-run `fo-review` to confirm. Maximum 3 iterations.
 - Check off acceptance criteria: verify each criterion in RFC-0549 against the implemented code. Mark `[x]` for verified criteria with inline `(evidence: ...)` annotations.
@@ -214,8 +214,8 @@ scope:
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0549`
-- `pnpm --filter @webgogol/forge run build:check`
-- `pnpm --filter @webgogol/forge run test`
+- `pnpm --filter @warpgogol/forge run build:check`
+- `pnpm --filter @warpgogol/forge run test`
 - No acceptance probes declared (no `acceptance` frontmatter field in RFC-0549)
 - No `rfc.verification.emit` needed (RFC has no acceptance probes)
 

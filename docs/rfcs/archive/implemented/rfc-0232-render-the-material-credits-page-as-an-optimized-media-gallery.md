@@ -38,7 +38,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/ui"
@@ -171,7 +171,7 @@ No new schema is added to the credit sidecar. `CreditsSectionProps` reuses the s
 ## Rollout
 
 - The new section ships in `@gogol/ui` and is created via `section.scaffold` (RFC-0112), then specialized.
-- `material.credits.generate` is updated to emit the `credits` block; re-running it on each app migrates the page with no hand-editing. Pilot adoption is `apps/nicaragua-projekt` (`/bildnachweise`), then `apps/webgogol-com`.
+- `material.credits.generate` is updated to emit the `credits` block; re-running it on each app migrates the page with no hand-editing. Pilot adoption is `apps/nicaragua-projekt` (`/bildnachweise`), then `apps/warpgogol-com`.
 - New apps comply from day one because the generator emits the new block type.
 - The prose fallback (`prose/{lang}/credits.md`) keeps being generated, so no tooling that reads it breaks; the page simply stops referencing it.
 - No `build.check` rule changes; `page.block.validate` already enforces that `credits` is a known block type once the alias is registered.

@@ -7,7 +7,7 @@ createdAt: 2026-07-25
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
     - nicaragua-projekt
   packages:
     - "@gogol/share"

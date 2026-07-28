@@ -80,7 +80,7 @@ A Blog module is introduced as a new content archetype set plus a semantic `arti
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run blog.validate --app webgogol-com --json
+pnpm exec site-kernel run blog.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts

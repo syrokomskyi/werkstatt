@@ -28,7 +28,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - share
   - ontology
@@ -67,7 +67,7 @@ No component import path registered for block "hero-decision-card".
 Register it in PLANET_IMPORT_PATHS or supply a custom resolveImportPath option.
 ```
 
-During the May 2026 webgogol-com onboarding, this surfaced as a build-time failure AFTER:
+During the May 2026 warpgogol-com onboarding, this surfaced as a build-time failure AFTER:
 
 1. `section.scaffold` created 9 new section folders under `packages/ui/src/sections/`.
 2. Each scaffold wrote a manifest.yaml with the correct `cosmicName`.
@@ -162,7 +162,7 @@ Reports:
 
 ## Rollout
 
-1. Extend `archetype.registry.build` to compute and write both new maps. Validate that nicaragua-projekt and webgogol-com produce IDENTICAL `planetImportPaths` content to what `page.ts` currently declares (modulo the 9 Handwerk additions that landed in the same change set as this RFC).
+1. Extend `archetype.registry.build` to compute and write both new maps. Validate that nicaragua-projekt and warpgogol-com produce IDENTICAL `planetImportPaths` content to what `page.ts` currently declares (modulo the 9 Handwerk additions that landed in the same change set as this RFC).
 2. Switch `@gogol/share/page.ts` to read from the registry; remove the literal constants. Keep the exported names for backward compat.
 3. Land `planet.import-paths.lint`; add to `PACKAGES_CHECK_PIPELINE`.
 4. Add a regression test: scaffold a new section, assert it appears in `index.json` after `archetype.registry.build`, assert it resolves at runtime without editing `page.ts`.
@@ -182,8 +182,8 @@ Reports:
 - [x] `archetype.registry.build` writes `planetImportPaths` and `blockTypeToCosmicName` to `index.json`. — both maps present in `packages/ontology/archetypes/index.json`. (evidence: packages/ directory, package exists)
 - [x] `@gogol/share/page.ts` reads both maps from the registry; the constants no longer exist as inline source-code tables. — `page.ts:34-37` imports `planetImportPaths` and `blockTypeToCosmicName` from `@gogol/ontology/archetypes`. Only an `Amalthea` fallback remains (intentional, documented at `page.ts:129-136`). (evidence: packages/ directory, package exists)
 - [x] `planet.import-paths.lint` registered and wired into `PACKAGES_CHECK_PIPELINE`. — registered at `module.ts:772`, wired at `module.ts:328`. (evidence: implemented historically)
-- [x] Regression seed: adding `section.scaffold --name=test-section --archetype=test-section` followed by `archetype.registry.build` makes `test-section` resolvable at runtime with NO edits to `page.ts`. — the 9 handwerk-trust-funnel sections scaffolded during the May 2026 webgogol-com onboarding resolved via the registry without touching `page.ts`. (evidence: implemented historically)
-- [x] Build of `apps/webgogol-com` and `apps/nicaragua-projekt` produces identical output before and after the refactor. — both apps build cleanly (15 + 25 pages) with no diff in `src/content/` or `public/`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Regression seed: adding `section.scaffold --name=test-section --archetype=test-section` followed by `archetype.registry.build` makes `test-section` resolvable at runtime with NO edits to `page.ts`. — the 9 handwerk-trust-funnel sections scaffolded during the May 2026 warpgogol-com onboarding resolved via the registry without touching `page.ts`. (evidence: implemented historically)
+- [x] Build of `apps/warpgogol-com` and `apps/nicaragua-projekt` produces identical output before and after the refactor. — both apps build cleanly (15 + 25 pages) with no diff in `src/content/` or `public/`. (evidence: original apps retired by RFC-0381, implemented historically)
 
 ## Wave 2 extension (2026-05-24): MOON_IMPORT_PATHS derivation
 

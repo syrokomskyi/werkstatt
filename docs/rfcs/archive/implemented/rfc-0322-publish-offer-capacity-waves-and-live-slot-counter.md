@@ -52,7 +52,7 @@ acceptance:
   - probe: command-registered
     name: "offer.capacity.validate"
   - probe: run
-    command: "site-kernel run offer.capacity.validate --app webgogol-com --json"
+    command: "site-kernel run offer.capacity.validate --app warpgogol-com --json"
     expect:
       exitCode: 0
 ---
@@ -90,7 +90,7 @@ Introduce a shared **Offer Capacity Wave** contract.
 
 1. Capacity is authored as structured business data, not prose.
 2. The active wave is computed from `startsAt`, `cadence`, `timezone`, and the current date.
-3. Slot totals use the owner-approved canonical range for the offer, initially `3-4` sites per month for `webgogol-com`.
+3. Slot totals use the owner-approved canonical range for the offer, initially `3-4` sites per month for `warpgogol-com`.
 4. Open slots are computed from current reservation/admission records. If those records are absent or stale, the UI must show wave timing and capacity policy but must not publish a precise open slot count.
 5. The visible UI uses a shared component that updates from the visitor's current date/time in the site timezone. It may animate progress, but the animation never changes the factual count.
 6. Static machine-readable artifacts publish the capacity policy and verification metadata, not a frozen live countdown.
@@ -226,7 +226,7 @@ Required behavior:
 Visual direction:
 
 - restrained operational UI for normal sites;
-- for `webgogol-com`, a clear engineering-style counter is encouraged: wave index, progress ring or bar, days remaining, and open-slot chips.
+- for `warpgogol-com`, a clear engineering-style counter is encouraged: wave index, progress ring or bar, days remaining, and open-slot chips.
 
 ### Public artifact projection
 
@@ -272,7 +272,7 @@ It warns on:
 
 1. Add the capacity schema and pure wave helper.
 2. Add the UI component and wire it into the offer/contact pages that discuss capacity.
-3. Add `webgogol-com` capacity policy with `slotRange: 3-4`, `maxSlotsPerWave: 4`, and a start date chosen by the owner.
+3. Add `warpgogol-com` capacity policy with `slotRange: 3-4`, `maxSlotsPerWave: 4`, and a start date chosen by the owner.
 4. Replace static Empfehler-Club scarcity copy with references to the capacity policy and counter.
 5. Add `offer.capacity.validate`.
 6. Regenerate agent knowledge and public artifacts.
@@ -297,10 +297,10 @@ It warns on:
 - [x] `@gogol/business` supports an optional structured offer `capacity` block. (evidence: packages/ directory, package exists)
 - [x] A pure wave helper calculates active wave state from policy plus `now`. (evidence: implemented historically)
 - [x] A shared accessible capacity counter component renders wave timing and, when evidenced, (evidence: implemented historically) open slots.
-- [x] `webgogol-com` uses `3-4` sites per month as the canonical capacity range. (evidence: implemented historically)
+- [x] `warpgogol-com` uses `3-4` sites per month as the canonical capacity range. (evidence: implemented historically)
 - [x] Static generated public artifacts do not publish unsupported frozen open-slot counts. (evidence: implemented historically)
 - [x] `offer.capacity.validate` is registered and fixture-tested. (evidence: tests pass, vitest run exitCode=0)
-- [x] `offer.capacity.validate --app webgogol-com --json` passes. (evidence: implemented historically)
+- [x] `offer.capacity.validate --app warpgogol-com --json` passes. (evidence: implemented historically)
 - [x] `rfc.validate` passes. (evidence: implemented historically)
 
 ## Implementation notes for agents

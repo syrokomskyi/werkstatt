@@ -28,11 +28,11 @@ filesReviewed:
 
 ### Verdict: Approved
 
-The implementation correctly delivers the barrier-free onboarding redesign: redesigned SKILL.md with register selection, name/gender, auto-doctor, silent auto-ADR, project analysis, first creation moment, and welcoming report with zero CLI commands. Scaffold profiles now include `@webgogol/forge` and `operator-profile.md` in `.gitignore`. Git history transfer is implemented via `format-patch` + `git am`. Three minor findings on axes A and G — duplicated code, swallowed errors, and command injection risk — do not block approval but should be fixed.
+The implementation correctly delivers the barrier-free onboarding redesign: redesigned SKILL.md with register selection, name/gender, auto-doctor, silent auto-ADR, project analysis, first creation moment, and welcoming report with zero CLI commands. Scaffold profiles now include `@warpgogol/forge` and `operator-profile.md` in `.gitignore`. Git history transfer is implemented via `format-patch` + `git am`. Three minor findings on axes A and G — duplicated code, swallowed errors, and command injection risk — do not block approval but should be fixed.
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @webgogol/forge run build:check` (typecheck), `pnpm --filter @webgogol/forge run test` (260 tests), `forge.skill.validate` (0 violations), `rfc.validate RFC-0547` (passed).
+Pass — `pnpm --filter @warpgogol/forge run build:check` (typecheck), `pnpm --filter @warpgogol/forge run test` (260 tests), `forge.skill.validate` (0 violations), `rfc.validate RFC-0547` (passed).
 
 ### Axis A — Structural correctness
 
@@ -79,7 +79,7 @@ No issues. The `postSetup` duplication is a pragmatic trade-off (adapters are in
 | Project analysis + recommendations | Done | SKILL.md:153-165 |
 | First creation moment | Done | SKILL.md:167-177 |
 | Welcoming report with zero CLI commands | Done | SKILL.md:179-215, forge.skill.validate: 0 violations |
-| `@webgogol/forge` in all scaffold profiles | Done | forge-shell.yaml:18, astro-typescript-turborepo.yaml:57, phaser-turborepo.yaml:57 |
+| `@warpgogol/forge` in all scaffold profiles | Done | forge-shell.yaml:18, astro-typescript-turborepo.yaml:57, phaser-turborepo.yaml:57 |
 | `operator-profile.md` in `.gitignore` | Done | All three profiles |
 | `.git` removed from DEFAULT_EXCLUDE_PATTERNS | Done | types.ts:59-65 |
 | `postSetup` implemented in both adapters | Done | node-typescript-pnpm/index.ts:123-149, phaser-pnpm/index.ts:123-150 |

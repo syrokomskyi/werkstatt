@@ -7,7 +7,7 @@ createdAt: 2026-07-12
 updatedAt: 2026-07-12
 scope:
   apps:
-    - apps/webgogol-com
+    - apps/warpgogol-com
   packages:
     - packages/share
     - packages/os/site-kernel-checks
@@ -28,7 +28,7 @@ scope:
 - [x] Restructure `buildPageMarkdown` body output into the five standardized sections (Summary, Business context, Data / APIs, User flows, Constraints) with fallback handling (maps to: body section pattern emitted).
 - [x] Update `page.markdown.generate` to emit semantic frontmatter fields and the new schema tag `gogol.markdown-twin@2` (maps to: `page.markdown.generate` threads semantic meta).
 - [x] Update `page.markdown.validate` with `MDMETA-08..12` and `MDBODY-01..05` rules (maps to: validator implements new rules).
-- [x] Update behavior snapshot to record new frontmatter fields and regenerate twins for `apps/webgogol-com` (maps to: existing apps pass validation).
+- [x] Update behavior snapshot to record new frontmatter fields and regenerate twins for `apps/warpgogol-com` (maps to: existing apps pass validation).
 - [x] Sync `docs/knowledge-graph.xml` and `docs/verification-plan.xml` with the new contract and validation rules (maps to: Compass docs updated).
 
 ## 2. Affected artifacts
@@ -48,7 +48,7 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `apps/webgogol-com/src/content/system.md` — optionally add `audience` to selected pages; default derivation covers all pages without changes.
+- `apps/warpgogol-com/src/content/system.md` — optionally add `audience` to selected pages; default derivation covers all pages without changes.
 - Generated `public/**/*.md` twins — regenerated with the new frontmatter and body structure during the first `build.prepare` after implementation.
 
 ### 2.3 Documentation and specs
@@ -144,11 +144,11 @@ scope:
   - Set `lang`, `title`, `type`, `metaDescription`, `tags` from `SemanticPageModel`.
   - Set `visibility: "public"` and omit `agentRoles` (reserved for v1).
   - Pass `provenance.semantic` to `buildMarkdownTwin`.
-- Regenerate twins for `apps/webgogol-com` after the change.
+- Regenerate twins for `apps/warpgogol-com` after the change.
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.markdown.generate --app webgogol-com` succeeds.
+- `pnpm exec site-kernel run page.markdown.generate --app warpgogol-com` succeeds.
 - At least one generated twin (e.g. `public/preis.md`) contains the new semantic frontmatter fields and `schema: "gogol.markdown-twin@2"`.
 
 **Completion criterion:** Every generated twin in `public/` has the new semantic frontmatter fields and the `@2` schema tag.
@@ -172,7 +172,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run page.markdown.validate --app webgogol-com` passes after regenerating twins.
+- `pnpm exec site-kernel run page.markdown.validate --app warpgogol-com` passes after regenerating twins.
 - Intentionally stale twins (if any remain) fail `MDMETA-12`.
 
 **Completion criterion:** `page.markdown.validate` passes for the reference app and correctly reports `MDMETA-08..12` / `MDBODY-01..05` violations on malformed twins.
@@ -186,12 +186,12 @@ scope:
 **Agent actions:**
 
 - Update the behavior snapshot extractor to include the new semantic fields (or at least the `schema` tag) in the twin metadata snapshot.
-- Run `pnpm run build:check` for `apps/webgogol-com` end-to-end (evidence: `webgogol-com-build-check2.log` shows `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok`).
+- Run `pnpm run build:check` for `apps/warpgogol-com` end-to-end (evidence: `warpgogol-com-build-check2.log` shows `page.markdown.validate: 54 twin link(s) ok, 54 twin(s) frontmatter ok`).
 - Inspect and commit the regenerated twins and updated behavior snapshot.
 
 **Validation:**
 
-- `pnpm run build:check` for `apps/webgogol-com` passes (verified via `webgogol-com-build-check2.log`).
+- `pnpm run build:check` for `apps/warpgogol-com` passes (verified via `warpgogol-com-build-check2.log`).
 - `behavior.snapshot.validate` reports no drift (or the schema tag bump is documented as expected).
 
 **Completion criterion:** The reference app's `build:check` pipeline is green and the behavior snapshot diff is reviewed/committed.
@@ -249,14 +249,14 @@ scope:
 - `pnpm --filter @gogol/site-kernel-checks run test`
 - `pnpm --filter @gogol/site-kernel-content run build:check`
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run page.markdown.validate --site webgogol-com`
-- `pnpm run build:check` for `apps/webgogol-com`
+- `pnpm exec site-kernel run page.markdown.validate --site warpgogol-com`
+- `pnpm run build:check` for `apps/warpgogol-com`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0377` (RFC-0330)
 
 ### 4.2 Evidence artifacts
 
 - `docs/rfcs/verification/rfc-0377.generated.json` — verification evidence emitted by `rfc.verification.emit`.
-- Regenerated `public/**/*.md` twins for `apps/webgogol-com`.
+- Regenerated `public/**/*.md` twins for `apps/warpgogol-com`.
 - Updated behavior snapshot files.
 - Commit messages referencing `RFC-0377` in the subject line (RFC-0265).
 

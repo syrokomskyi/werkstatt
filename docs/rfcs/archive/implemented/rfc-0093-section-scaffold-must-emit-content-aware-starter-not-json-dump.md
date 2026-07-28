@@ -25,7 +25,7 @@ commands:
     - section.scaffold
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-codegen
   - os/site-kernel-checks
@@ -56,7 +56,7 @@ const { pageOverride } = Astro.props as SectionProps;
 </section>
 ```
 
-That is a developer-debug stub. Shipping it produces the page screenshot the May 2026 webgogol-com onboarding handed off: the entire site is a wall of `{"items":[{"label":"Preis","value":"70 €/Monat or 700 €/Jahr + 200 € Einrichtung"},…]}` text. No styling, no semantic structure, no recognizable site.
+That is a developer-debug stub. Shipping it produces the page screenshot the May 2026 warpgogol-com onboarding handed off: the entire site is a wall of `{"items":[{"label":"Preis","value":"70 €/Monat or 700 €/Jahr + 200 € Einrichtung"},…]}` text. No styling, no semantic structure, no recognizable site.
 
 This pattern is invisible during the onboarding workflow because:
 
@@ -79,7 +79,7 @@ The agent finishes the workflow with a green ladder and the site is still unfit 
 
 **B. Add `section.placeholder.lint`** to `PACKAGES_CHECK_PIPELINE`. It scans every `.astro` file under `packages/ui/src/sections/` and fails on any file matching `JSON\.stringify\s*\(\s*pageOverride`. Failure prints the section name and points at this RFC.
 
-**C. Backfill the 9 webgogol-com handwerk sections** scaffolded during the May 2026 onboarding with real content-aware markup using biome tokens.
+**C. Backfill the 9 warpgogol-com handwerk sections** scaffolded during the May 2026 onboarding with real content-aware markup using biome tokens.
 
 ## Architectural fit
 
@@ -149,8 +149,8 @@ const resolve = (t?: string) => (t ? linkRegistry[t] ?? `#${t}` : "#");
 
 1. Update `packages/os/site-kernel-codegen/src/section-scaffold.ts` to emit the new starter (this RFC ships the change).
 2. Implement `section.placeholder.lint` in `packages/os/site-kernel-checks/src/section-placeholder.ts`. Register in `module.ts`, wire into `PACKAGES_CHECK_PIPELINE`.
-3. Backfill the 9 webgogol-com sections (hero-decision-card, trust-strip, comparison-cards, audience-cards, ownership-block, notausgang-block, controlled-responsibility-block, price-card, founder-trust-card) with bespoke markup matching their content schemas.
-4. Verify `pnpm --filter webgogol-com dev` renders `/de/` with no raw JSON visible.
+3. Backfill the 9 warpgogol-com sections (hero-decision-card, trust-strip, comparison-cards, audience-cards, ownership-block, notausgang-block, controlled-responsibility-block, price-card, founder-trust-card) with bespoke markup matching their content schemas.
+4. Verify `pnpm --filter warpgogol-com dev` renders `/de/` with no raw JSON visible.
 5. Update root `AGENTS.md` to note the lint and the scaffold's new behavior.
 
 ## Alternatives considered
@@ -168,8 +168,8 @@ const resolve = (t?: string) => (t ? linkRegistry[t] ?? `#${t}` : "#");
 
 - [x] `section.scaffold` writes a content-aware starter, not `{JSON.stringify(pageOverride ?? {})}`. (evidence: implemented historically)
 - [x] `section.placeholder.lint` workspace command registered and wired into `PACKAGES_CHECK_PIPELINE`. (evidence: implemented historically)
-- [x] The 9 webgogol-com handwerk sections backfilled with content-aware markup. (evidence: implemented historically)
-- [x] `pnpm --filter webgogol-com dev` → `curl /de/` returns rendered HTML with no `JSON.stringify` text visible. (evidence: implemented historically)
+- [x] The 9 warpgogol-com handwerk sections backfilled with content-aware markup. (evidence: implemented historically)
+- [x] `pnpm --filter warpgogol-com dev` → `curl /de/` returns rendered HTML with no `JSON.stringify` text visible. (evidence: implemented historically)
 - [x] Root `AGENTS.md` mentions the lint and the new scaffold behavior. (evidence: AGENTS.md:1, agent guide updated)
 
 ## Implementation notes for agents

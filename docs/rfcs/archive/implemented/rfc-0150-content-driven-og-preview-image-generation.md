@@ -62,7 +62,7 @@ nonGoals:
 
 ## Context
 
-All apps under `apps/*` need durable social preview images for Open Graph and Twitter metadata. A single example exists at `apps/webgogol-com/public/og-image.webp`, but the platform lacks a repository-wide contract for where preview images live, how they are generated, how pages resolve fallbacks, and how standard validation proves that every site is ready for deployment.
+All apps under `apps/*` need durable social preview images for Open Graph and Twitter metadata. A single example exists at `apps/warpgogol-com/public/og-image.webp`, but the platform lacks a repository-wide contract for where preview images live, how they are generated, how pages resolve fallbacks, and how standard validation proves that every site is ready for deployment.
 
 The current platform architecture treats apps as thin composition layers. Shared logic belongs in `packages/*`, app-authored intent belongs in `src/content/**`, generated app outputs must follow Site OS ownership rules, and public deployment artifacts must remain self-contained per app. Preview images therefore need a content-driven and Site OS-driven contract rather than per-site scripts or ad-hoc manual conventions.
 
@@ -112,10 +112,10 @@ The key boundary is that `public/preview/**/*.png` and `public/og-image.png` pre
 The Site OS gains two app-scoped commands:
 
 ```sh
-pnpm exec site-kernel run preview.images.generate --app webgogol-com
-pnpm exec site-kernel run preview.images.validate --app webgogol-com
-pnpm exec site-kernel run preview.images.generate --app webgogol-com --json
-pnpm exec site-kernel run preview.images.validate --app webgogol-com --json
+pnpm exec site-kernel run preview.images.generate --app warpgogol-com
+pnpm exec site-kernel run preview.images.validate --app warpgogol-com
+pnpm exec site-kernel run preview.images.generate --app warpgogol-com --json
+pnpm exec site-kernel run preview.images.validate --app warpgogol-com --json
 ```
 
 `preview.images.generate`:
@@ -246,7 +246,7 @@ If implementation needs a machine-readable report, it MAY write a non-authoritat
 ```json
 {
   "command": "preview.images.generate",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "status": "ok",
   "format": "png",
   "requiredFallback": "/og-image.png",
@@ -291,7 +291,7 @@ If implementation needs a machine-readable report, it MAY write a non-authoritat
 ```json
 {
   "command": "preview.images.validate",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "status": "fail",
   "requiredFallback": "/og-image.png",
   "violations": [

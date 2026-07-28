@@ -43,7 +43,7 @@ commands:
     - page.markdown.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/share"
@@ -75,7 +75,7 @@ RFC-0166 defined markdown twins as the "negotiation surface" for LLMs — minima
 - Markdown body: `answerBlocks`, `bodyText`
 - Business projections: `people`, `initiatives`, `faqEntries`
 
-This works perfectly for prose-heavy pages (like `nicaragua-projekt/about-us`) that use `contentRef` to reference `prose/*.md` files. However, modern block-based pages (like `webgogol-com/digitales-fundament`) declare content through `blocks:` in frontmatter — hero-decision-card, audience-cards, comparison-cards, price-card, faq-list — with no prose reference. The current semantic builder sees these as having **zero** `answerBlocks` and `bodyText`, resulting in **6-line, 150-byte markdown twins** that are nearly empty.
+This works perfectly for prose-heavy pages (like `nicaragua-projekt/about-us`) that use `contentRef` to reference `prose/*.md` files. However, modern block-based pages (like `warpgogol-com/digitales-fundament`) declare content through `blocks:` in frontmatter — hero-decision-card, audience-cards, comparison-cards, price-card, faq-list — with no prose reference. The current semantic builder sees these as having **zero** `answerBlocks` and `bodyText`, resulting in **6-line, 150-byte markdown twins** that are nearly empty.
 
 This is a silent degradation: the pages render correctly in browsers (Astro components process the blocks), but their LLM-negotiation surface is vacuous. When an AI agent or search crawler reads `public/digitales-fundament/index.md`, it sees only:
 
@@ -83,7 +83,7 @@ This is a silent degradation: the pages render correctly in browsers (Astro comp
 # Digitales Fundament — das Produkt
 > Ein tragfähiges digitales Fundament...
 
-Source: https://webgogol.com/digitales-fundament
+Source: https://warpgogol.com/digitales-fundament
 ```
 
 The 12 blocks of rich content (hero, guarantees, comparison, pricing, FAQ, timeline) are invisible to the twin. RFC-0207 addresses bespoke AI narrative for Programmatic Surface pages; this RFC addresses the foundational semantic gap for **all** block-based pages.
@@ -132,7 +132,7 @@ The semantic loader (`loadSemanticSiteModel`) and builder (`buildSemanticPageMod
 
 | App | Block-based pages | Current twin size | Target twin size |
 | --- | --- | --- | --- |
-| webgogol-com | digitales-fundament, pricing, notausgang, contact | ~150 bytes | ~1500-3000 bytes |
+| warpgogol-com | digitales-fundament, pricing, notausgang, contact | ~150 bytes | ~1500-3000 bytes |
 | nicaragua-projekt | (mostly prose-based, some hybrid) | Already good | Maintain |
 | Future apps | Any app using block declarations | Empty | Rich |
 
@@ -239,7 +239,7 @@ export const BLOCK_EXTRACTORS = new BlockExtractorRegistry();
 ```typescript
 // packages/share/src/semantic/block-extractors/index.ts
 
-// Hero decision card (webgogol-com product pages)
+// Hero decision card (warpgogol-com product pages)
 BLOCK_EXTRACTORS.register<HeroDecisionCardProps>({
   blockType: "hero-decision-card",
   extract(props) {
@@ -252,7 +252,7 @@ BLOCK_EXTRACTORS.register<HeroDecisionCardProps>({
   },
 });
 
-// Comparison cards (webgogol-com pricing)
+// Comparison cards (warpgogol-com pricing)
 BLOCK_EXTRACTORS.register<ComparisonCardsProps>({
   blockType: "comparison-cards",
   extract(props) {
@@ -547,7 +547,7 @@ export interface BlockValidationResult {
 
 ### Phase 2: Extractor library
 
-1. Implement extractors for webgogol-com block types:
+1. Implement extractors for warpgogol-com block types:
    - `hero-decision-card`
    - `comparison-cards`
    - `audience-cards`
@@ -566,7 +566,7 @@ export interface BlockValidationResult {
 ### Phase 3: Activation
 
 1. Remove feature flag
-2. Run `pnpm exec site-kernel run page.markdown.generate --app webgogol-com`
+2. Run `pnpm exec site-kernel run page.markdown.generate --app warpgogol-com`
 3. Verify twin sizes increase (6 lines → 50-100 lines per page)
 4. Run `page.blocks.validate` to confirm no unhandled text blocks
 
@@ -589,8 +589,8 @@ export interface BlockValidationResult {
 | `packages/share/src/semantic/business-projection.ts` | Extend `projectPeople` to include bio/role in markdown output |
 | `packages/os/site-kernel-checks/src/page-blocks-validate.ts` | Validation: `page.blocks.validate`, `page.blocks.extract.validate` |
 | `packages/os/site-kernel-checks/src/page-markdown.ts` | Ensure `page.markdown.generate` calls updated builder |
-| `apps/webgogol-com/src/content/pages/**/*.md` | Source of block declarations (no change needed) |
-| `apps/webgogol-com/public/**/*.md` | Output: enriched markdown twins (generated) |
+| `apps/warpgogol-com/src/content/pages/**/*.md` | Source of block declarations (no change needed) |
+| `apps/warpgogol-com/public/**/*.md` | Output: enriched markdown twins (generated) |
 
 ## Alternatives considered
 
@@ -610,12 +610,12 @@ export interface BlockValidationResult {
 ## Acceptance criteria
 
 - [x] `BlockTextExtractor`, `ExtractionContext`, `ExtractedBlockContent`, `BlockExtractorRegistry` types defined in `@gogol/share` (evidence: packages/ directory, package exists)
-- [x] Extractor implementations for all webgogol-com block types used in production (evidence: implemented historically)
+- [x] Extractor implementations for all warpgogol-com block types used in production (evidence: implemented historically)
 - [x] `SemanticPageModel` extended with optional `contentBlocks: SemanticContentBlock[]` (evidence: implemented historically)
 - [x] `buildSemanticPageModelWith` traverses `blocks` array and applies registered extractors (evidence: implemented historically)
 - [x] `buildPageMarkdown` renders `contentBlocks` as H2 sections with descriptions and lists (evidence: implemented historically)
-- [x] `page.markdown.generate` produces twins ≥ 1000 bytes for webgogol-com block-based pages (evidence: implemented historically)
-- [x] `page.blocks.validate` passes for webgogol-com with no `no-extractor-for-text-block` warnings (evidence: implemented historically)
+- [x] `page.markdown.generate` produces twins ≥ 1000 bytes for warpgogol-com block-based pages (evidence: implemented historically)
+- [x] `page.blocks.validate` passes for warpgogol-com with no `no-extractor-for-text-block` warnings (evidence: implemented historically)
 - [x] Person/team pages include bio, role, and affiliations in markdown twins (evidence: implemented historically)
 - [x] Prose-based pages (nicaragua-projekt) remain unchanged (byte-stable) (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Validation pipeline includes `page.blocks.validate` (evidence: implemented historically)
@@ -624,7 +624,7 @@ export interface BlockValidationResult {
 ## Implementation notes for agents
 
 - Agents MAY implement when RFC status is `accepted`.
-- Agents MUST register extractors for all block types that contain text in `apps/webgogol-com/src/content/pages/**/*.md`.
+- Agents MUST register extractors for all block types that contain text in `apps/warpgogol-com/src/content/pages/**/*.md`.
 - Agents MUST keep extraction axis-generic — no hard-coded "industry"/"city" logic in extractors.
 - Agents MUST NOT change visual rendering; extraction is read-only.
 - Agents MUST NOT call LLMs during extraction; extraction is deterministic property access.

@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-checks"
   services: []
@@ -49,7 +49,7 @@ scope:
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck the modified package
 - `pnpm --filter @gogol/site-kernel-checks run test` — run unit tests
-- `pnpm exec site-kernel run surface.doorway-risk.report --site webgogol-com` — verify doorway-risk report (when city records exist)
+- `pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com` — verify doorway-risk report (when city records exist)
 
 ## 3. Step sequence
 
@@ -184,7 +184,7 @@ scope:
 - `pnpm exec site-kernel run rfc.validate --id RFC-0494`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run test`
-- `pnpm exec site-kernel run surface.doorway-risk.report --site webgogol-com` (runtime, requires city records)
+- `pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com` (runtime, requires city records)
 
 ### 4.2 Evidence artifacts
 

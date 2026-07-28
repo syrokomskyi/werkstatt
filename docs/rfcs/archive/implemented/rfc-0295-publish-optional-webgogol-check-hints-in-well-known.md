@@ -1,6 +1,6 @@
 ---
 id: RFC-0295
-title: "Publish optional Webgogol check hints in .well-known"
+title: "Publish optional Warpgogol check hints in .well-known"
 status: implemented
 kind: contract
 scope: workspace
@@ -25,8 +25,8 @@ related:
 commands:
   proposed: []
   added:
-    - webgogol.check-hints.generate
-    - webgogol.check-hints.validate
+    - warpgogol.check-hints.generate
+    - warpgogol.check-hints.validate
   changed: []
   removed: []
 appsImpacted:
@@ -36,7 +36,7 @@ packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/site-kernel-codegen"
 successSignals:
-  - "WGogol sites expose a generated /.well-known/webgogol-check.json artifact that maps rendered URLs and sections to stable source-level anchors."
+  - "WGogol sites expose a generated /.well-known/warpgogol-check.json artifact that maps rendered URLs and sections to stable source-level anchors."
   - "The checker can evaluate a WGogol site without the hints, but when hints exist diagnostics gain pageId/lang/blockId/source locators."
   - "The hint artifact contains no visitor data, private business domains, secrets, raw prose bodies, or auth material."
 nonGoals:
@@ -45,18 +45,18 @@ nonGoals:
   - "Do not hand-author the hint artifact in apps/*."
 acceptance:
   - probe: command-registered
-    name: "webgogol.check-hints.generate"
+    name: "warpgogol.check-hints.generate"
   - probe: command-registered
-    name: "webgogol.check-hints.validate"
+    name: "warpgogol.check-hints.validate"
   - probe: file-exists
     path: "packages/share/src/check-hints.ts"
 ---
 
-# RFC-0295: Publish optional Webgogol check hints in .well-known
+# RFC-0295: Publish optional Warpgogol check hints in .well-known
 
 ## Context
 
-Check Webgogol is URL-first. It must work on arbitrary websites. For WGogol sites, however, the ecosystem already has stable semantic identities: `pageId`, language routes, block ids, cosmic names, source files, and generated behavior snapshots. If a deployed WGogol site can expose a safe, generated map from rendered surface to source anchors, the checker can produce much more actionable recommendations for AI agents.
+Check Warpgogol is URL-first. It must work on arbitrary websites. For WGogol sites, however, the ecosystem already has stable semantic identities: `pageId`, language routes, block ids, cosmic names, source files, and generated behavior snapshots. If a deployed WGogol site can expose a safe, generated map from rendered surface to source anchors, the checker can produce much more actionable recommendations for AI agents.
 
 ## Problem
 
@@ -66,7 +66,7 @@ Without hints, a finding can say:
 
 That is useful but not surgical. For WGogol work, an agent should know:
 
-> Update `apps/webgogol-com/src/content/pages/de/home.md`, block `hero`, prop `heading` or `lead`.
+> Update `apps/warpgogol-com/src/content/pages/de/home.md`, block `hero`, prop `heading` or `lead`.
 
 The checker must get that precision without reading local source as the audit truth.
 
@@ -75,7 +75,7 @@ The checker must get that precision without reading local source as the audit tr
 Every WGogol app may generate:
 
 ```txt
-/.well-known/webgogol-check.json
+/.well-known/warpgogol-check.json
 ```
 
 This artifact is a public or private-alt-safe hint projection. It contains stable identities and locators, not raw private content.
@@ -93,7 +93,7 @@ The artifact is optional. Absence never fails a generic URL check. Presence upgr
 ### Artifact Contract
 
 ```ts
-export interface WebgogolCheckHints {
+export interface WarpgogolCheckHints {
   schemaVersion: "1.0.0";
   app: string;
   origin: string;
@@ -105,20 +105,20 @@ export interface WebgogolCheckHints {
     default: string;
     supported: string[];
   };
-  pages: WebgogolPageHint[];
+  pages: WarpgogolPageHint[];
   contentHash: string;
 }
 
-export interface WebgogolPageHint {
+export interface WarpgogolPageHint {
   pageId: string;
   lang: string;
   urlPath: string;
   titleHash?: string;
   source: SourceAnchor;
-  sections: WebgogolSectionHint[];
+  sections: WarpgogolSectionHint[];
 }
 
-export interface WebgogolSectionHint {
+export interface WarpgogolSectionHint {
   blockId: string;
   type: string;
   cosmicName?: string;
@@ -144,8 +144,8 @@ export interface SourceAnchor {
 ### Generation
 
 ```sh
-pnpm exec site-kernel run webgogol.check-hints.generate --app webgogol-com
-pnpm exec site-kernel run webgogol.check-hints.validate --app webgogol-com --json
+pnpm exec site-kernel run warpgogol.check-hints.generate --app warpgogol-com
+pnpm exec site-kernel run warpgogol.check-hints.validate --app warpgogol-com --json
 ```
 
 Generation runs in `APPS_BUILD_PREPARE_PIPELINE` after route and surface generation and before postbuild checks that may consume public files.
@@ -173,8 +173,8 @@ If a section cannot expose selectors yet, the hint uses order and heading hash a
 ## Rollout
 
 1. Add hint types and pure builder in `@gogol/share`.
-2. Register `webgogol.check-hints.generate` and `webgogol.check-hints.validate`.
-3. Add `public/.well-known/webgogol-check.json` to generated artifact governance and gitignore templates.
+2. Register `warpgogol.check-hints.generate` and `warpgogol.check-hints.validate`.
+3. Add `public/.well-known/warpgogol-check.json` to generated artifact governance and gitignore templates.
 4. Add stable `data-*` attributes to shared render paths where needed, through packages, not app routes.
 5. Make `check.evidence.capture` read the artifact when present and attach section hints to `SiteEvidenceGraph`.
 
@@ -192,9 +192,9 @@ If a section cannot expose selectors yet, the hint uses order and heading hash a
 
 ## Acceptance criteria
 
-- [x] `webgogol-check.json` schema and pure builder exist in `@gogol/share`. (evidence: packages/ directory, package exists)
-- [x] `webgogol.check-hints.generate` writes the artifact under `public/.well-known/`. (evidence: implemented historically)
-- [x] `webgogol.check-hints.validate` emits `CW-HINT-*` diagnostics. (evidence: implemented historically)
+- [x] `warpgogol-check.json` schema and pure builder exist in `@gogol/share`. (evidence: packages/ directory, package exists)
+- [x] `warpgogol.check-hints.generate` writes the artifact under `public/.well-known/`. (evidence: implemented historically)
+- [x] `warpgogol.check-hints.validate` emits `CW-HINT-*` diagnostics. (evidence: implemented historically)
 - [x] The artifact contains hashes and anchors but no raw prose bodies or secrets. (evidence: implemented historically)
 - [x] `check.evidence.capture` can attach page and section hints when the artifact exists. (evidence: implemented historically)
 - [x] Absence of the artifact does not fail a generic check run. (evidence: implemented historically)

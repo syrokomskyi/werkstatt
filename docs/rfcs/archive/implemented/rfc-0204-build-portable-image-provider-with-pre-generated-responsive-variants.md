@@ -33,7 +33,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/site-kernel-codegen"
@@ -163,7 +163,7 @@ export function createBuildPortableProvider(manifest: ImageVariantManifest): Ima
 
 - Introduced opt-in: apps keep `cloudflare-runtime` unless they set `PUBLIC_IMAGE_PROVIDER=build-portable`. No flag day.
 - `image.variants.generate` joins `build.prepare`; `image.variants.validate` joins `build.check`. Both are no-ops for apps not on the build-portable provider.
-- First adopter: `apps/nicaragua-projekt` (to clear the `/wir-ueber-uns` yellow score without requiring the Cloudflare zone feature). `apps/webgogol-com` follows.
+- First adopter: `apps/nicaragua-projekt` (to clear the `/wir-ueber-uns` yellow score without requiring the Cloudflare zone feature). `apps/warpgogol-com` follows.
 - New apps inherit the command wiring through the boilerplate generators; default provider unchanged.
 - Does not supersede `cloudflare-runtime`; an app on an Image-Transformations-enabled zone may stay on it.
 

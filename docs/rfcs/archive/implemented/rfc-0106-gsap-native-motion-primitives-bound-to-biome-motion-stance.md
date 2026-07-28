@@ -37,7 +37,7 @@ commands:
     - per-image parallax CSS hand-rolled in section .css
     - per-section ad-hoc `animated: boolean` flag where it duplicates the biome motion stance
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share

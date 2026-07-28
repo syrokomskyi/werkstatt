@@ -59,7 +59,7 @@ RFC-0189 introduced `ui.i18n.lint` to prevent hardcoded visitor-facing strings i
 ```ts
 // packages/share/src/schemas/material-credit.ts
 export const WEBGOGOL_DEFAULT_RIGHTS_NOTICE =
-  "Copyright © 2026 Webgogol. All rights reserved unless otherwise stated.";
+  "Copyright © 2026 Warpgogol. All rights reserved unless otherwise stated.";
 
 const LABELS: Record<string, MaterialCreditLabels> = {
   de: {

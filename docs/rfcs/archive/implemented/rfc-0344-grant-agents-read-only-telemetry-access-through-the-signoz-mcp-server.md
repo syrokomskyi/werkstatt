@@ -74,7 +74,7 @@ Access must arrive governed: an ungoverned admin key in an agent's hands would b
 
 Amend RFC-0218's operating model with a **telemetry-read lane**:
 
-1. **Connection.** The workspace `.mcp.json` gains a `signoz` MCP server entry pointing at the SigNoz MCP endpoint of the RFC-0338 deployment (`https://observe.webgogol.com` scope), authenticated by env `WGOGOL_SIGNOZ_MCP_TOKEN`. If the pinned SigNoz version exposes MCP only via a sidecar, that sidecar joins `backs/observability-stack/compose.extra.yaml` — either way the repo entry is identical for agents.
+1. **Connection.** The workspace `.mcp.json` gains a `signoz` MCP server entry pointing at the SigNoz MCP endpoint of the RFC-0338 deployment (`https://observe.warpgogol.com` scope), authenticated by env `WGOGOL_SIGNOZ_MCP_TOKEN`. If the pinned SigNoz version exposes MCP only via a sidecar, that sidecar joins `backs/observability-stack/compose.extra.yaml` — either way the repo entry is identical for agents.
 2. **Key policy.** The token is a SigNoz API key with **viewer** role, created per the RFC-0338 runbook, stored only in the developer/CI env — never in the repo. Rotation follows the stack's rotate-token runbook section.
 3. **Usage policy (binding for agents).**
    - Agents MAY: query metrics, traces, logs, alert states, service views; correlate across `wgogol_probe_*`, `wgogol_factory_*`, `wgogol_delivery_*`, and worker traces by `site_id`; create _ephemeral_ incident dashboards only if named `incident-<date>-<slug>`.

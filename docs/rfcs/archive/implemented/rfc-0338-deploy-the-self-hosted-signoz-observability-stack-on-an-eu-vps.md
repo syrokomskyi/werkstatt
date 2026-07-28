@@ -43,7 +43,7 @@ packagesImpacted:
   - "@gogol/site-kernel-observability"
   - "@gogol/site-kernel-checks"
 successSignals:
-  - "SigNoz UI is reachable at https://observe.webgogol.com behind TLS; OTLP ingest is reachable at https://ingest.observe.webgogol.com only with the bearer token."
+  - "SigNoz UI is reachable at https://observe.warpgogol.com behind TLS; OTLP ingest is reachable at https://ingest.observe.warpgogol.com only with the bearer token."
   - "All stack configuration (casting.yaml, collector patch, Caddyfile, compose extras, runbook) lives versioned in backs/observability-stack; the server holds no unversioned configuration except .env secrets."
   - "observability.stack.validate proves the config offline in CI; observability.stack.health round-trips a real test metric into SigNoz on demand."
   - "All telemetry data rests in the EU; retention is bounded (traces 15d, metrics 30d, logs 7d); nightly backups exist and the restore path is documented."
@@ -117,7 +117,7 @@ The monorepo has an established home for deployable backend compositions: `backs
 | OS | Ubuntu 24.04 LTS |
 | Runtime | Docker Engine ≥ 24 with compose plugin; `foundryctl` (latest release) |
 | Firewall | inbound 22 (SSH, key-only, no password auth), 80 (ACME redirect), 443 only |
-| Hostnames | `observe.webgogol.com` (UI), `ingest.observe.webgogol.com` (OTLP) — both DNS-only A records to the VPS IP |
+| Hostnames | `observe.warpgogol.com` (UI), `ingest.observe.warpgogol.com` (OTLP) — both DNS-only A records to the VPS IP |
 | Working dir | `/opt/observability` (owned clone of `backs/observability-stack` content + `.env`) |
 
 ### Workspace layout
@@ -172,11 +172,11 @@ The SigNoz version is pinned via the Foundry mechanism available at implementati
 ### Caddyfile (TLS + ingest auth)
 
 ```caddyfile
-observe.webgogol.com {
+observe.warpgogol.com {
   reverse_proxy signoz:8080
 }
 
-ingest.observe.webgogol.com {
+ingest.observe.warpgogol.com {
   @unauthorized not header Authorization "Bearer {$WGOGOL_OTLP_TOKEN}"
   respond @unauthorized 401
   reverse_proxy otel-collector:4318
@@ -251,8 +251,8 @@ RESTIC_PASSWORD=
 
 #### observability.stack.health — workspace, read-only, network; manual/on-demand only
 
-- `GET https://observe.webgogol.com` expects HTTP 200/302.
-- `POST https://ingest.observe.webgogol.com/v1/metrics` **without** token expects 401.
+- `GET https://observe.warpgogol.com` expects HTTP 200/302.
+- `POST https://ingest.observe.warpgogol.com/v1/metrics` **without** token expects 401.
 - With `WGOGOL_OTLP_ENDPOINT`/`WGOGOL_OTLP_TOKEN` set: pushes `wgogol_factory_smoke_total` via `@gogol/observability` and expects HTTP 2xx.
 - Never wired into `build.check`/`packages-check` (network); exits non-zero on any failed probe.
 

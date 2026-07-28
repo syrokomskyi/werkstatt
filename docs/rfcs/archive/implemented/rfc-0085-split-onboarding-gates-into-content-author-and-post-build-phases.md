@@ -48,7 +48,7 @@ nonGoals:
 - Build-output validators (`passport.verify`, `audit.agent.readiness.validate`, `generated.marker.validate` against `public/sitemap.xml` / `public/llms.txt`, `lighthouse.budget.check`).
 - LLM cache validators (`audit.llm.run`) that depend on the rendered HTML in `dist/`.
 
-During the May 2026 webgogol-com onboarding, every author-phase iteration tripped `apps-check.run` with `dist/`-missing errors that had nothing to do with the content being authored. The errors masked the real signal: the content-discipline validators that _did_ matter for the author phase were green, but the agent had to filter the noise to see it. The workflow `04-author.md` and `05-audit.md` both list `apps-check.run` as a required gate, forcing the agent to either run `pnpm --filter <app> build` (out of scope for content phases) or accept the workflow exiting non-zero and document the deferral.
+During the May 2026 warpgogol-com onboarding, every author-phase iteration tripped `apps-check.run` with `dist/`-missing errors that had nothing to do with the content being authored. The errors masked the real signal: the content-discipline validators that _did_ matter for the author phase were green, but the agent had to filter the noise to see it. The workflow `04-author.md` and `05-audit.md` both list `apps-check.run` as a required gate, forcing the agent to either run `pnpm --filter <app> build` (out of scope for content phases) or accept the workflow exiting non-zero and document the deferral.
 
 ## Problem
 
@@ -144,10 +144,10 @@ The split is mechanical, based on whether each validator reads from `dist/`:
 - [x] Workflow files `04-author.md`, `05-audit.md`, `06-handoff.md` updated. (evidence: implemented historically)
 - [x] `app.qa.validate` calls `apps-check.author`. (evidence: implemented historically)
 - [x] `06-handoff.md` lists `pnpm --filter <client.id> build` as a workflow step. (evidence: implemented historically)
-- [x] Regression: webgogol-com `apps-check.author` exits 0 against the May 2026 authored content. (evidence: implemented historically)
+- [x] Regression: warpgogol-com `apps-check.author` exits 0 against the May 2026 authored content. (evidence: implemented historically)
 
 ## Implementation notes for agents
 
 - Agents MAY implement this RFC ONLY when status: accepted.
 - Agents MUST NOT change RFC status.
-- Agents implementing this RFC MUST run the resulting workflows end-to-end against `apps/nicaragua-projekt/` AND `apps/webgogol-com/` to confirm the split does not regress either side.
+- Agents implementing this RFC MUST run the resulting workflows end-to-end against `apps/nicaragua-projekt/` AND `apps/warpgogol-com/` to confirm the split does not regress either side.

@@ -71,7 +71,7 @@ Pass — 0 violations.
 - **Minimal command surface:** No CLI commands. Correct.
 - **Lean contracts:** `PbpCompilerInput`, `PbpCompilerResult`, `PbpResolvedGraph`, `PbpBuyerView`, `PbpProjectionSet` — all minimal and purpose-driven.
 - **Existing patterns:** The RFC extends the existing `PbpCompilerPhase` contract from RFC-0428 rather than inventing a new pipeline structure.
-- **Scope discipline:** `packagesImpacted: ["@gogol/pbp"]` — correct, only one package. `appsImpacted: ["webgogol-com"]` — correct, but the RFC explicitly states no site impact until RFC-0469.
+- **Scope discipline:** `packagesImpacted: ["@gogol/pbp"]` — correct, only one package. `appsImpacted: ["warpgogol-com"]` — correct, but the RFC explicitly states no site impact until RFC-0469.
 - **Phase 8 and 13 stubs:** Justified — Wave 3/4 features with stable signatures. Pragmatic.
 - No issues.
 

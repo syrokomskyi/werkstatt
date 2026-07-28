@@ -68,7 +68,7 @@ successSignals:
   - "`RuntimeContext.flags` and `RuntimeContext.segment` are populated at hydration time by the chosen adapter. Build-time visibility evaluation still uses `EMPTY_RUNTIME_CONTEXT`; client-time visibility evaluation uses the hydrated context. Both evaluations use the same `evalVisibility` function (RFC-0026)."
 nonGoals:
   - "Do not introduce Cloudflare Durable Objects, KV, Workers-side persistence, or any server-side runtime. Growth lives in static builds + client-side adapters + vendor-hosted infrastructure. DNA-1 (static SSG) is absolute."
-  - "Do not invent a webgogol-native analytics backend. The studio is not in the analytics-vendor business. Adapters delegate to existing vendors (Plausible, PostHog, Matomo, GA4, Cloudflare Web Analytics)."
+  - "Do not invent a warpgogol-native analytics backend. The studio is not in the analytics-vendor business. Adapters delegate to existing vendors (Plausible, PostHog, Matomo, GA4, Cloudflare Web Analytics)."
   - "Do not permit free-form event ids. `emit('random-string')` fails `growth.events.validate`. The event catalog is a closed vocabulary (DNA-19 pattern)."
   - "Do not permit engineering-only experiments. Experiments are a client-editable content type; anyone who can commit content may author an experiment. Engineering controls the *event catalog* and *adapter configuration*, not the experiment library."
   - "Do not re-evaluate block visibility at runtime after hydration completes. Visibility resolves once at hydration and blocks are shown/hidden accordingly; there is no reactive re-render cycle on flag change within a page view."

@@ -5,7 +5,7 @@ ownerCommand: rfc.verification.emit
 editInstead: the rfc.verification.emit generator source (not this file).
 regenerateCommand: pnpm exec site-kernel run rfc.verification.emit
 rfcId: RFC-0293
-title: Establish check-webgogol-com as a URL-first quality product
+title: Establish check-warpgogol-com as a URL-first quality product
 rfcStatus: implemented
 emittedAt: 2026-07-07T17:32:52.991Z
 commit: 15929a0bf01323ade1fb72094f29592d747b9862
@@ -34,7 +34,7 @@ probes:
     durationMs: 26
   - probe:
       probe: file-exists
-      path: packages/os/site-kernel-check-webgogol/package.json
+      path: packages/os/site-kernel-check-warpgogol/package.json
     ok: true
     detail: exists
     durationMs: 29

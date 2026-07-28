@@ -33,7 +33,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
@@ -80,8 +80,8 @@ The unprotected invariant is: **a change to an app's public behavior must be vis
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run behavior.snapshot.generate --app webgogol-com
-pnpm exec site-kernel run behavior.snapshot.validate --app webgogol-com --json
+pnpm exec site-kernel run behavior.snapshot.generate --app warpgogol-com
+pnpm exec site-kernel run behavior.snapshot.validate --app warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -160,7 +160,7 @@ Exit 1 on drift or on a missing committed snapshot (`SNAP-02`, error, fixHint = 
 - [x] `AGENTS.md` documents the snapshot-diff review discipline. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
-**As-built, 2026-07-02:** `validate` runs BEFORE `generate` inside `build.post` (not after, as a literal reading of "wire generate into build.post... and validate into apps-check.postbuild" might suggest) — `APPS_CHECK_POSTBUILD_PIPELINE` (which now includes `behavior.snapshot.validate`) is spread into `APPS_BUILD_POST_PIPELINE` BEFORE the new `behavior.snapshot.generate` step. This ordering is load-bearing: `generate` overwrites the working-tree snapshot file, so if it ran first, `validate` would diff the fresh build against a same-run copy of itself and never detect drift — the ordering makes `validate` compare against the git-committed file left over from the previous commit, then `generate` refreshes the working tree for the next commit (which only enters history if reviewed and committed). HTML extraction is regex-based (title/meta/canonical/hreflang/OG/Twitter/robots/JSON-LD), matching the existing house style in `audit-validators.ts`/`consent.ts` rather than adding an HTML-parser dependency. Verified end-to-end against real dist output for both apps: webgogol-com (176 routes) and nicaragua-projekt (39 routes); two full rebuilds of each produced byte-identical committed snapshots (determinism proof, includes Astro-hashed asset URLs normalizing correctly). Initial snapshots committed in the same commit as this implementation, per Rollout step 1 — this PR's diff over the two `behavior.snapshot.generated.json` files IS the format review.
+**As-built, 2026-07-02:** `validate` runs BEFORE `generate` inside `build.post` (not after, as a literal reading of "wire generate into build.post... and validate into apps-check.postbuild" might suggest) — `APPS_CHECK_POSTBUILD_PIPELINE` (which now includes `behavior.snapshot.validate`) is spread into `APPS_BUILD_POST_PIPELINE` BEFORE the new `behavior.snapshot.generate` step. This ordering is load-bearing: `generate` overwrites the working-tree snapshot file, so if it ran first, `validate` would diff the fresh build against a same-run copy of itself and never detect drift — the ordering makes `validate` compare against the git-committed file left over from the previous commit, then `generate` refreshes the working tree for the next commit (which only enters history if reviewed and committed). HTML extraction is regex-based (title/meta/canonical/hreflang/OG/Twitter/robots/JSON-LD), matching the existing house style in `audit-validators.ts`/`consent.ts` rather than adding an HTML-parser dependency. Verified end-to-end against real dist output for both apps: warpgogol-com (176 routes) and nicaragua-projekt (39 routes); two full rebuilds of each produced byte-identical committed snapshots (determinism proof, includes Astro-hashed asset URLs normalizing correctly). Initial snapshots committed in the same commit as this implementation, per Rollout step 1 — this PR's diff over the two `behavior.snapshot.generated.json` files IS the format review.
 
 ## Implementation notes for agents
 

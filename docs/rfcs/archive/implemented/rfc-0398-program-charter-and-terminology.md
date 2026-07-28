@@ -42,7 +42,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/business"
@@ -64,7 +64,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -92,7 +92,7 @@ _This RFC establishes terminology and scope only. It does not copy model content
 
 The `@gogol/business` package (DNA-20) defines the canonical business-layer vocabulary for client sites: schemas for `company`, `web`, `contact`, `location`, `legal`, `compliance`, `external-services`, `services`, `offers`, `trust`, and `faq`. This model was sufficient for single-service craft businesses but cannot represent federated product identity, structured pricing (Charge/Plan/Adjustment), typed Policies, Claims with Evidence, Disclosures, runtime state overlays, or deterministic projections to Schema.org, CRM, contract, and invoice inputs.
 
-The PBP specification package (vendored at `docs/specs/pbp-specification-package/`, accepted 2026-07-19) defines a replacement logical model: Public Business Profile (PBP). The spec contains 50 architectural decisions (ADR-001..050), a 65-node RFC roadmap, and a 5-wave implementation plan. Webgogol-com is the first migration target.
+The PBP specification package (vendored at `docs/specs/pbp-specification-package/`, accepted 2026-07-19) defines a replacement logical model: Public Business Profile (PBP). The spec contains 50 architectural decisions (ADR-001..050), a 65-node RFC roadmap, and a 5-wave implementation plan. Warpgogol-com is the first migration target.
 
 This charter RFC is the entry point of the PBP RFC program (spec node `RFC-PBP-000`). It fixes the name, scope, terminology, architectural layers, and namespace policy that all downstream PBP RFCs inherit. Without this charter, downstream RFCs risk terminological drift (e.g. "Offering" vs "Offer" vs "Service", "canonical" vs "source", "missing" vs "false").
 
@@ -184,7 +184,7 @@ Empty string does not mean missing. A field is either omitted (`not-declared`) o
 
 - **DNA-20 (Business layer is canonical site description).** This charter does not supersede DNA-20. DNA-20 is superseded when RFC-PBP-103 (Migration Coverage and Cutover) is implemented and legacy `@gogol/business` files are deleted. Until then, DNA-20 and PBP coexist: `@gogol/business` remains canonical for existing sites; PBP is under construction. This RFC declares the intent and the path.
 - **DNA-55 (Spec vendoring contract).** This RFC is the first materialized RFC from the `pbp-specification-package` spec. It follows RFC-0394 (vendoring), RFC-0395 (ingest + acceptance), and RFC-0396 (lazy materialization with `specRef` traceability).
-- **DNA-4 (Canonical content in `src/content/`).** PBP canonical data continues to live under `src/content/business/` in the Webgogol case. The physical format changes (from flat `.md` files to PBP manifest structure) but the directory contract is preserved.
+- **DNA-4 (Canonical content in `src/content/`).** PBP canonical data continues to live under `src/content/business/` in the Warpgogol case. The physical format changes (from flat `.md` files to PBP manifest structure) but the directory contract is preserved.
 - **DNA-24 (Block-declarative pages).** PBP projections feed into block-declarative pages through the existing `buildPage` pipeline (DNA-25). PBP does not introduce a parallel render path.
 - **Compass sync.** This charter does not change repository-wide requirements or app-package relationships by itself. When downstream RFCs (starting with RFC-PBP-001) establish `packages/pbp/` and define the new entity model, `docs/requirements.xml` and `docs/technology.xml` will need synchronization to record the new package and its contracts. This is deferred to the implementing RFCs, not this charter.
 
@@ -206,9 +206,9 @@ All downstream PBP RFCs MUST:
 ## Rollout
 
 - **Immediate:** This charter is the first PBP RFC. Upon acceptance, downstream RFCs (RFC-PBP-001 through RFC-PBP-104) can be materialized and authored using this terminology.
-- **No flag day:** `@gogol/business` (DNA-20) continues to function for all existing sites. PBP is constructed alongside it in a new `packages/pbp/` package. No existing site changes until RFC-PBP-102 (Webgogol Legacy Migration).
-- **Supersession path:** DNA-20 is superseded by RFC-PBP-103 (Migration Coverage and Cutover) after Webgogol migration is complete and legacy files are deleted (ADR-043: no compatibility layer).
-- **Wave 1 scope:** 43 RFCs (see `pbp-specification-package/roadmap` §14, Wave 1). Result: Webgogol fully migrated, website and AI projection run from PBP.
+- **No flag day:** `@gogol/business` (DNA-20) continues to function for all existing sites. PBP is constructed alongside it in a new `packages/pbp/` package. No existing site changes until RFC-PBP-102 (Warpgogol Legacy Migration).
+- **Supersession path:** DNA-20 is superseded by RFC-PBP-103 (Migration Coverage and Cutover) after Warpgogol migration is complete and legacy files are deleted (ADR-043: no compatibility layer).
+- **Wave 1 scope:** 43 RFCs (see `pbp-specification-package/roadmap` §14, Wave 1). Result: Warpgogol fully migrated, website and AI projection run from PBP.
 
 ## Alternatives considered
 
@@ -220,7 +220,7 @@ All downstream PBP RFCs MUST:
 ## Risks
 
 - **Terminological drift.** If downstream RFCs define terms differently, integration points break. Mitigation: this RFC is the normative glossary; `rfc.validate` can check for term consistency in future.
-- **Scope creep.** PBP's ambition (65 RFCs, 5 waves) is large. Mitigation: Wave 1 is scoped to Webgogol only; Waves 2–5 are gated on additional conformance cases (minimal physical good, variant commerce, 10 000+ SKU catalog).
+- **Scope creep.** PBP's ambition (65 RFCs, 5 waves) is large. Mitigation: Wave 1 is scoped to Warpgogol only; Waves 2–5 are gated on additional conformance cases (minimal physical good, variant commerce, 10 000+ SKU catalog).
 - **DNA-20 limbo.** During construction, both `@gogol/business` and `packages/pbp/` exist. Agents may be confused about which is canonical. Mitigation: DNA-20 remains canonical until RFC-PBP-103; `packages/pbp/` is under construction and not consumed by sites until migration.
 - **Package proliferation.** A new `packages/pbp/` package adds to the monorepo surface. Mitigation: the package is established by RFC-PBP-001 with a clear contract; it is the single home for all PBP schemas, loaders, and projection contracts.
 

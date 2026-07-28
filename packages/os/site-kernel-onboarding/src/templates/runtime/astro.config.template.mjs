@@ -135,7 +135,7 @@ export default defineConfig({
         "@warpgogol/site-kernel-content",
         "@warpgogol/site-kernel-deploy",
         "@warpgogol/site-kernel-integrity",
-        "@webgogol/forge",
+        "@warpgogol/forge",
         "@lordicon/element",
       ],
     },

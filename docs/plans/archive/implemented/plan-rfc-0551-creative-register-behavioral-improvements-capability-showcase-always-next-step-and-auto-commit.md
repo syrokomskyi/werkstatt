@@ -46,7 +46,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 ### 2.4 Validation and pipelines
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0551` — must pass with zero errors (V-19 warnings expected)
-- `pnpm --filter @webgogol/forge run build:check` — typecheck must pass
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
 - `pnpm exec site-kernel run forge.skill.validate` — SKILL-11 (no hardcoded project literals), SKILL-12 (concerns), SKILL-13 (knowledge files) must pass
 
 ## 3. Step sequence
@@ -90,7 +90,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` — typecheck passes
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck passes
 - Visual inspection: `buildExtendedBehavioralLayer()` returns 10 sections, with "Always-next-step" as section 10
 
 **Completion criterion:** `extended-behavioral-layer.ts` exports `buildExtendedBehavioralLayer()` that returns 10 sections including "Always-next-step" with the supersession note.
@@ -119,7 +119,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` — typecheck passes
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck passes
 - Visual inspection: `generateBehavioralLayer()` includes a "Commit policy" section with register-conditional text
 
 **Completion criterion:** `agents-generate.ts` `generateBehavioralLayer()` includes a "Commit policy" section stating that in creative register the agent auto-commits without asking, and in business register the agent asks before committing, with the companion mode and verification caveats.
@@ -155,7 +155,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 **Agent actions:**
 
 - Run `pnpm exec site-kernel run rfc.validate --id RFC-0551 --json` — must pass (V-19 warnings expected)
-- Run `pnpm --filter @webgogol/forge run build:check` — typecheck must pass
+- Run `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
 - Run `pnpm exec site-kernel run forge.skill.validate` — SKILL-11/12/13 must pass for forge-bootstrap
 - Check `git status` — no uncommitted changes from this session
 
@@ -199,7 +199,7 @@ None. No YAML/JSON/NDJSON changes. No ontology catalogs. No content schemas.
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate --id RFC-0551` — must pass (V-19 warnings expected for amending draft)
-- `pnpm --filter @webgogol/forge run build:check` — typecheck must pass
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck must pass
 - `pnpm exec site-kernel run forge.skill.validate` — SKILL-11/12/13 must pass
 
 ### 4.2 Evidence artifacts

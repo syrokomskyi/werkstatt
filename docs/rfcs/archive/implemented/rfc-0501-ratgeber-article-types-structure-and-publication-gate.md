@@ -42,7 +42,7 @@ commands:
     - surface.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
 successSignals:
@@ -169,7 +169,7 @@ The `bakeRatgeberArticle` baker (from RFC-0500) emits a context-specific closing
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.article.validate --site webgogol-com --json
+pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check` (blocking).
@@ -241,7 +241,7 @@ All checks are scoped to the content beneath the specified H2 heading (up to the
 5. **Migrator:** Implement `rfc-0501-article-status-review` migrator — set all existing `status: published` ratgeber articles to `status: review-required` (their prose bodies don't have the 10-section structure yet). Register in migrator registry.
 6. **Content (human):** Update existing article prose bodies to include the 10-section structure. This is human authoring — an agent MUST NOT auto-generate prose bodies. Once an article's prose body is updated, set its `status` back to `published`.
 7. **Compass sync:** Update `docs/verification-plan.xml`, `docs/COMMANDS.md`, `docs/requirements.xml`, `docs/technology.xml`, `docs/knowledge-graph.xml`, `packages/os/site-kernel-checks/AGENTS.md`.
-8. **Pilot:** Run `ratgeber.article.validate --site webgogol-com`. Fix any remaining issues.
+8. **Pilot:** Run `ratgeber.article.validate --site warpgogol-com`. Fix any remaining issues.
 
 ## Alternatives considered
 
@@ -265,7 +265,7 @@ All checks are scoped to the content beneath the specified H2 heading (up to the
 
 - Agents MAY implement code changes only when this RFC has status `accepted`.
 - Agents MUST NOT auto-generate article prose bodies with the 10-section structure — this is human editorial authoring. The agent's job is the validator, baker CTA logic, migrator, and command registration.
-- Agents MUST run `ratgeber.article.validate --site webgogol-com --json` after implementation to verify the validator works.
+- Agents MUST run `ratgeber.article.validate --site warpgogol-com --json` after implementation to verify the validator works.
 - Agents MUST implement the `rfc-0501-article-status-review` migrator and register it in the migrator registry.
 - Agents MUST update `amendedBy` on RFC-0500 to include RFC-0501.
 - Agents MUST update `packages/os/site-kernel-checks/AGENTS.md` to document the new `ratgeber-article-validate.ts` module.

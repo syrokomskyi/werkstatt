@@ -34,7 +34,7 @@ commands:
     - pseo.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/site-kernel-checks"
@@ -167,7 +167,7 @@ All generated files carry the RFC-0081 marker. Shared writes outside the target 
 ```json
 {
   "command": "surface.plan.generate",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "blueprints": [
     {
       "id": "website-local",
@@ -225,9 +225,9 @@ Dirty flags are produced by changes to source records, CKL claims, freshness led
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.plan.generate --app webgogol-com --json
-pnpm exec site-kernel run surface.generate --app webgogol-com --json
-pnpm exec site-kernel run surface.graph.validate --app webgogol-com --json
+pnpm exec site-kernel run surface.plan.generate --app warpgogol-com --json
+pnpm exec site-kernel run surface.generate --app warpgogol-com --json
+pnpm exec site-kernel run surface.graph.validate --app warpgogol-com --json
 ```
 
 `surface.generate` may call `surface.plan.generate` internally and fail early when module budget or CI memory policy would be exceeded.

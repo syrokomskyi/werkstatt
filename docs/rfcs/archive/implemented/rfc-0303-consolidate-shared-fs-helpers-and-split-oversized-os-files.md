@@ -246,11 +246,11 @@ Standard RFC-0203 `CheckResult`:
 
 ## Rollout
 
-Executed as four independently-green phases. After each phase: `pnpm --filter @gogol/share build:check`, `pnpm exec site-kernel run packages-check`, and `pnpm --filter webgogol-com build:check` MUST pass before starting the next.
+Executed as four independently-green phases. After each phase: `pnpm --filter @gogol/share build:check`, `pnpm exec site-kernel run packages-check`, and `pnpm --filter warpgogol-com build:check` MUST pass before starting the next.
 
 1. **Phase 1 — Extract + migrate helpers.** Create `@gogol/share/fs` + `@gogol/share/text-position`; rewrite `collectMarkdownFiles` as a wrapper; migrate every duplicate call site (`walk`, `fileExists`, `getLineColumn`, `readJsonFile`, `discoverWorkspacePackages`) and delete the local copies. Purely mechanical; no behavior change.
 2. **Phase 2 — Guard lints + docs.** Land `fs.walk.lint`, `dedup.helper.lint`, `file.size.lint` (warn + ratchet) in `PACKAGES_CHECK_PIPELINE` with red/green fixtures; add the "Shared helpers catalog" to `packages/AGENTS.md`. Flip `fs.walk.lint`/`dedup.helper.lint` to error (Phase 1 drove them to zero).
-3. **Phase 3 — Split oversized files** by the map above, one file per commit, lowest-risk first (`naming` → `structure` → `section-framework` → `archetype` → `checks` → `surface-expand` → `page-handler` → `runtime`). `runtime.ts` and `page-handler.ts` are hot paths: each requires an extra `astro dev` + `astro build` smoke on `webgogol-com`. Ratchet `file.size.lint` down after each split; flip to error when all eight are under threshold.
+3. **Phase 3 — Split oversized files** by the map above, one file per commit, lowest-risk first (`naming` → `structure` → `section-framework` → `archetype` → `checks` → `surface-expand` → `page-handler` → `runtime`). `runtime.ts` and `page-handler.ts` are hot paths: each requires an extra `astro dev` + `astro build` smoke on `warpgogol-com`. Ratchet `file.size.lint` down after each split; flip to error when all eight are under threshold.
 4. **Phase 4 — Constants dedup** (`PAGES_*`, `DEFAULT_PROFILE_BASE_BY_LANG`, `VALID_AFFILIATIONS`).
 
 New apps/packages comply automatically: the catalog + `dedup.helper.lint` make importing the canonical helper the path of least resistance, and `file.size.lint` warns before a new file grows unwieldy.
@@ -266,19 +266,19 @@ New apps/packages comply automatically: the catalog + `dedup.helper.lint` make i
 
 - **Wide mechanical diff (Phase 1).** Mitigated by scripted find-replace of imports, per-package `build:check`, and no signature changes.
 - **`runtime.ts` split touches the execution core.** Mitigated by doing it last, one seam per commit, with app dev+build smokes and the existing kernel test suite (`packages/os/site-kernel/src/tests/`).
-- **Astro/Vite subpath resolution for `@gogol/share/fs`.** RFC-0092/RFC-0264 history shows dev vs build resolution can diverge; each phase's checklist includes an `astro build` on `webgogol-com`. `@gogol/share/fs` is server-only — it must never be imported by browser scripts (documented banner + the existing "server-only" convention).
+- **Astro/Vite subpath resolution for `@gogol/share/fs`.** RFC-0092/RFC-0264 history shows dev vs build resolution can diverge; each phase's checklist includes an `astro build` on `warpgogol-com`. `@gogol/share/fs` is server-only — it must never be imported by browser scripts (documented banner + the existing "server-only" convention).
 - **Lint false positives.** Mitigated by canonical-file allowlists and `**/tests/**` exclusion; all three ship green fixtures per RFC-0261.
 
 ## Acceptance criteria
 
-- [x] `@gogol/share/fs` (`collectFiles`, `fileExists`, `readJsonFile`) and `@gogol/share/text-position` (`getLineColumn`) exist, are exported in `package.json`, and resolve in `astro dev` AND `astro build` for `webgogol-com`. (evidence: packages/ directory, package exists)
+- [x] `@gogol/share/fs` (`collectFiles`, `fileExists`, `readJsonFile`) and `@gogol/share/text-position` (`getLineColumn`) exist, are exported in `package.json`, and resolve in `astro dev` AND `astro build` for `warpgogol-com`. (evidence: packages/ directory, package exists)
 - [x] `collectMarkdownFiles` is a wrapper over `collectFiles` with identical observable behavior; its tests still pass. (evidence: implemented historically)
 - [x] Every duplicate of `walk`/`fileExists`/`getLineColumn`/`readJsonFile`/`discoverWorkspacePackages` is deleted and imports the canonical helper (`fs.walk.lint` + `dedup.helper.lint` report zero). (evidence: implemented historically)
 - [x] The three duplicated constants have a single owner and are imported at former copy sites. (evidence: implemented historically)
 - [x] The eight oversized files are split per the map; each original path remains a thin re-export shim; each new file has a re-expanded `MODULE_MAP`; no public symbol/command name changed. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `fs.walk.lint`, `dedup.helper.lint`, `file.size.lint` registered in `PACKAGES_CHECK_PIPELINE` with red/green fixtures and RFC-0203 rule ids + fixHints. (evidence: implemented historically)
 - [x] `packages/AGENTS.md` "Shared helpers catalog — import, do not re-implement" section added and linked from the check-module guide. (evidence: AGENTS.md:1, agent guide updated)
-- [x] `pnpm --filter @gogol/ui build:check` and `webgogol-com build:check` are green. `packages.check` (the workspace pipeline) blocks on a pre-existing, unrelated `naming.convention.lint` violation (`apps/check-webgogol-com/.../[runId].ts`, predates this RFC) — the 3 new lints were verified individually (0 errors each) since the pipeline halts on first failure. `nicaragua-projekt build:check` fails on a pre-existing, unrelated missing `astro:env` declaration (`UPSTASH_QSTASH_TOKEN`, introduced by RFC-0290/agent-gate, commit `4855423e`) unrelated to any file touched by this RFC. (evidence: packages/ directory, package exists)
+- [x] `pnpm --filter @gogol/ui build:check` and `warpgogol-com build:check` are green. `packages.check` (the workspace pipeline) blocks on a pre-existing, unrelated `naming.convention.lint` violation (`apps/check-warpgogol-com/.../[runId].ts`, predates this RFC) — the 3 new lints were verified individually (0 errors each) since the pipeline halts on first failure. `nicaragua-projekt build:check` fails on a pre-existing, unrelated missing `astro:env` declaration (`UPSTASH_QSTASH_TOKEN`, introduced by RFC-0290/agent-gate, commit `4855423e`) unrelated to any file touched by this RFC. (evidence: packages/ directory, package exists)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents

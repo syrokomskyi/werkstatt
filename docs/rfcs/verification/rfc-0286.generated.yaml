@@ -35,7 +35,7 @@ probes:
     durationMs: 1
   - probe:
       probe: run
-      command: site-kernel run agent.manifest.generate --app webgogol-com
+      command: site-kernel run agent.manifest.generate --app warpgogol-com
       expect:
         exitCode: 0
     ok: true
@@ -43,7 +43,7 @@ probes:
     durationMs: 21724
   - probe:
       probe: run
-      command: site-kernel run agent.surface.validate --app webgogol-com
+      command: site-kernel run agent.surface.validate --app warpgogol-com
       expect:
         exitCode: 0
     ok: true

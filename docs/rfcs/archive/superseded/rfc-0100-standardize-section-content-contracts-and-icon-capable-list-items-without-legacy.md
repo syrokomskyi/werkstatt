@@ -35,7 +35,7 @@ commands:
   removed:
     - legacy string-only list item handling in shared UI sections
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - ui
@@ -144,7 +144,7 @@ Existing commands gain additional duties:
 
 ```sh
 pnpm exec site-kernel run section.contract.validate
-pnpm exec site-kernel run page.block.validate --app webgogol-com
+pnpm exec site-kernel run page.block.validate --app warpgogol-com
 pnpm exec site-kernel run section.scaffold --archetype trust-strip --slug trust-strip
 ```
 
@@ -232,7 +232,7 @@ For app-scoped enforcement via `page.block.validate`, a stable violation example
 ```json
 {
   "command": "page.block.validate",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "status": "fail",
   "violations": [
     {

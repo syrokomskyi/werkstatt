@@ -34,7 +34,7 @@ probes:
     durationMs: 0
   - probe:
       probe: run
-      command: site-kernel run agent.knowledge.generate --app webgogol-com
+      command: site-kernel run agent.knowledge.generate --app warpgogol-com
       expect:
         exitCode: 0
     ok: true
@@ -42,7 +42,7 @@ probes:
     durationMs: 13898
   - probe:
       probe: run
-      command: site-kernel run agent.knowledge.validate --app webgogol-com
+      command: site-kernel run agent.knowledge.validate --app warpgogol-com
       expect:
         exitCode: 0
     ok: false

@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/share"
     - "@gogol/ontology"
@@ -151,7 +151,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/ontology run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
 
 **Completion criterion:** C-contract files updated; `surface.contract.validate` passes with the new definitions.
 
@@ -175,7 +175,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run participant.json.validate --site webgogol-com --json`
+- `pnpm exec site-kernel run participant.json.validate --site warpgogol-com --json`
 
 **Completion criterion:** Validator runs, passes on valid output, fails on private field leakage; registered in command table and postbuild pipeline.
 
@@ -256,9 +256,9 @@ scope:
   - `pnpm --filter @gogol/ontology run build:check`
   - `pnpm --filter @gogol/site-kernel-checks run build:check`
   - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-  - `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+  - `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
   - `pnpm exec site-kernel run migrator.registry.validate`
-  - `pnpm exec site-kernel run sites-check.postbuild --site webgogol-com`
+  - `pnpm exec site-kernel run sites-check.postbuild --site warpgogol-com`
 - Check off each acceptance criterion in the RFC with `(evidence: <command or file>)`
 - Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0512 --implementation-commit <sha>`
 
@@ -280,9 +280,9 @@ scope:
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run sites-check.postbuild --site webgogol-com`
+- `pnpm exec site-kernel run sites-check.postbuild --site warpgogol-com`
 
 ### 4.2 Evidence artifacts
 

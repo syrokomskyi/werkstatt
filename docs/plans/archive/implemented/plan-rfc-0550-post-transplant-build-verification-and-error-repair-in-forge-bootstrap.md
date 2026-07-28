@@ -157,7 +157,7 @@ scope:
 
 - `pnpm exec site-kernel run rfc.validate RFC-0550` — RFC mechanical validation
 - `pnpm exec site-kernel run forge.skill.validate` — skill validation (SKILL-11/12/13)
-- `pnpm --filter @webgogol/forge run build:check` — package typecheck (confirms no TS regressions in forge package, though this RFC is skill-only)
+- `pnpm --filter @warpgogol/forge run build:check` — package typecheck (confirms no TS regressions in forge package, though this RFC is skill-only)
 
 ### 4.2 Evidence artifacts
 

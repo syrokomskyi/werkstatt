@@ -47,7 +47,7 @@ scope:
 
 | File | Change |
 | --- | --- |
-| `systems/registry.yaml` | Add `mirror: git@github.com:syrokomskyi/webgogol-com.git` to `webgogol-com` entry |
+| `systems/registry.yaml` | Add `mirror: git@github.com:syrokomskyi/warpgogol-com.git` to `warpgogol-com` entry |
 
 ### 2.3 Documentation and specs
 
@@ -219,19 +219,19 @@ No pipeline integration. `sternsystem.sync` is standalone. Validation:
 
 ---
 
-### Step 7. Add `mirror` to `webgogol-com` in registry.yaml
+### Step 7. Add `mirror` to `warpgogol-com` in registry.yaml
 
 **Goal:** Configure the mirror for the existing system.
 
 **Agent actions:**
 
-- Edit `systems/registry.yaml`: add `mirror: git@github.com:syrokomskyi/webgogol-com.git` after the `repo` line in the `webgogol-com` entry
+- Edit `systems/registry.yaml`: add `mirror: git@github.com:syrokomskyi/warpgogol-com.git` after the `repo` line in the `warpgogol-com` entry
 
 **Validation:**
 
-- `pnpm exec site-kernel run sternsystem.validate --id webgogol-com --json`
+- `pnpm exec site-kernel run sternsystem.validate --id warpgogol-com --json`
 
-**Completion criterion:** `webgogol-com` entry has `mirror` field; `sternsystem.validate` passes (may show mirror-remote-missing warning if remote not yet configured — that's expected).
+**Completion criterion:** `warpgogol-com` entry has `mirror` field; `sternsystem.validate` passes (may show mirror-remote-missing warning if remote not yet configured — that's expected).
 
 **Human review:** no
 

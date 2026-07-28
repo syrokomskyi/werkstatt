@@ -39,9 +39,9 @@ commands:
     - entitlements.resolve
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel"
   - "@gogol/site-kernel-checks"
@@ -573,9 +573,9 @@ No change to `--json` output shapes. The generators return the same `KernelComma
 - [x] All 6 generators with `generatedAt` set it to `null` instead of `new Date().toISOString()` (evidence: implemented historically)
 - [x] `entitlements.resolve` uses `writeFileIfChanged` (no timestamp to nullify) (evidence: implemented historically)
 - [x] `uni-registry-concurrency.test.ts` updated to expect `generatedAt: null` (evidence: tests pass, vitest run exitCode=0)
-- [x] `pnpm build` run twice in a row on `webgogol-com` produces zero `git status` changes on second run (evidence: implemented historically)
+- [x] `pnpm build` run twice in a row on `warpgogol-com` produces zero `git status` changes on second run (evidence: implemented historically)
 - [x] `pnpm build` run twice in a row on `nicaragua-projekt` produces zero `git status` changes on second run (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `pnpm build` run twice in a row on `check-webgogol-com` produces zero `git status` changes on second run (evidence: implemented historically)
+- [x] `pnpm build` run twice in a row on `check-warpgogol-com` produces zero `git status` changes on second run (evidence: implemented historically)
 - [x] `rfc.validate` passes on this RFC file before merging (evidence: implemented historically)
 - [x] Full `pnpm run build:check` passes for all three apps (evidence: build:check passes, exitCode=0)
 

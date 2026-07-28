@@ -43,7 +43,7 @@ commands:
     - surface.contract.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/ontology"
   - "@gogol/share"
@@ -63,7 +63,7 @@ successSignals:
 nonGoals:
   - "Does not change JSON-LD emission for non-ratgeber surfaces — those are governed by RFC-0498."
   - "Does not add new JSON-LD types beyond Article and BreadcrumbList — both are already in the C-contract."
-  - "Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Webgogol does not have reviews to markup."
+  - "Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Warpgogol does not have reviews to markup."
   - "Does not change the ratgeber hub (depth-0) JSON-LD — that remains CollectionPage + BreadcrumbList (RFC-0500)."
   - "Does not change the URL structure — canonical URLs are already defined by RFC-0495."
 ---
@@ -116,7 +116,7 @@ Update `packages/ontology/src/external-surfaces/jsonld-types.yaml`:
 | `headline` | Article record `title` | Yes |
 | `description` | Article record `summary` | Yes (expert requirement) |
 | `author` | Author record (RFC-0502) → `{ @type: Person, name: author.name, url: author.contactUrl }` | Yes |
-| `publisher` | `{ @type: Organization, name: Webgogol, url: https://webgogol.com }` | Yes (expert requirement) |
+| `publisher` | `{ @type: Organization, name: Warpgogol, url: https://warpgogol.com }` | Yes (expert requirement) |
 | `datePublished` | Article first publication date (from `publishedAt` or earliest changelog entry) | Yes |
 | `dateModified` | Latest of `reviewedAt` or latest `changelog[].date` (RFC-0504) | Optional (emitted when available) |
 | `mainEntityOfPage` | Canonical URL of the article page | Yes (expert requirement) |
@@ -174,10 +174,10 @@ No new commands. Existing commands are updated:
 
 ```sh
 # Extended with SD-RAT-01..04 for ratgeber depth-1 pages
-pnpm exec site-kernel run seo.structured-data.validate --site webgogol-com --json
+pnpm exec site-kernel run seo.structured-data.validate --site warpgogol-com --json
 
 # Extended with ratgeber depth-1 Article field checks against C-contract
-pnpm exec site-kernel run surface.contract.validate --site webgogol-com --json
+pnpm exec site-kernel run surface.contract.validate --site warpgogol-com --json
 ```
 
 Both commands are `scope: app`. `seo.structured-data.validate` runs in `sites-check-postbuild` (requires built `dist/` HTML). `surface.contract.validate` runs in `build.check`.
@@ -279,7 +279,7 @@ No new `--json` output shapes. `seo.structured-data.validate` produces its stand
 2. Update `@gogol/share` JSON-LD renderer for ratgeber depth-1 pages.
 3. Add SD-RAT-01..04 validation rules to `seo.structured-data.validate`.
 4. Update `surface.contract.validate` to check the new C-contract.
-5. Verify with `surface.contract.validate` and `seo.structured-data.validate` on webgogol-com.
+5. Verify with `surface.contract.validate` and `seo.structured-data.validate` on warpgogol-com.
 6. Run dev build and verify JSON-LD output in page source.
 
 ## Alternatives considered

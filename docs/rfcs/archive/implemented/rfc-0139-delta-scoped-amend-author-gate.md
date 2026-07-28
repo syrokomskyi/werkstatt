@@ -33,7 +33,7 @@ commands:
     - page.shell.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel-onboarding
   - os/site-kernel-checks
@@ -159,7 +159,7 @@ data.carriedForward[]: {command, count}   # out-of-scope debt (non-blocking)
 
 ## Acceptance criteria
 
-- [x] `amend.delta.files --app webgogol-com --batch amend-001` lists exactly the 6 legal pageIds' page+prose files (both locales) plus the batch's new business files. (evidence: implemented historically)
+- [x] `amend.delta.files --app warpgogol-com --batch amend-001` lists exactly the 6 legal pageIds' page+prose files (both locales) plus the batch's new business files. (evidence: implemented historically)
 - [x] `content.references.validate` / `content.voice.lint` / `content.business.validate` / `page.block.validate` / `page.shell.validate` accept `--scope-files` and, without it, produce byte-identical output to today. (evidence: implemented historically)
 - [x] With the founder-trust-card schema drift deliberately re-introduced, `amend-check.author` for amend-001 is **green** (home.md debt is carried-forward, not blocking), and a deliberately broken legal page is **red**. (evidence: implemented historically)
 - [x] Greenfield `apps-check.run` / `packages-check.run` behaviour is unchanged. (evidence: implemented historically)

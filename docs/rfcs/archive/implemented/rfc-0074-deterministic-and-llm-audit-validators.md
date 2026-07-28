@@ -135,7 +135,7 @@ The LLM driver is one command with one purpose: _run an audit prompt with cachin
 {
   "command": "audit.llm.run",
   "kind": "cultural",
-  "app": "webgogol-handwerk",
+  "app": "warpgogol-handwerk",
   "status": "fail",
   "findings": [
     {

@@ -45,7 +45,7 @@ commands:
   removed: []
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/share"
@@ -162,7 +162,7 @@ The set is deliberately small and additive — the registry is the extension poi
 
 ## Rollout
 
-1. **Phase 1 (this RFC):** registry + `visual.*` commands + the four founding Tier-1 rules; `visual.contract.validate` added to `build.check`; pilot on `nicaragua-projekt` (reproduce + catch the 2026-06-23 fade bug) then `webgogol-com`. RFC-0203 registry gains the `domain`/`tier`/`severityClass` facets.
+1. **Phase 1 (this RFC):** registry + `visual.*` commands + the four founding Tier-1 rules; `visual.contract.validate` added to `build.check`; pilot on `nicaragua-projekt` (reproduce + catch the 2026-06-23 fade bug) then `warpgogol-com`. RFC-0203 registry gains the `domain`/`tier`/`severityClass` facets.
 2. **Phase 2 (deferred, `accepted`):** Tier-2 rendered-DOM/regression behind a build-time headless browser; rules ship `warning`-class.
 3. **Phase 3 (deferred, `accepted`):** Tier-3 sampled LLM perceptual audit on `audit.llm.run`, changed-pages-only, opt-in per Stripe tier.
 4. **Federation follow-up:** re-tag the existing static visual lints into the `visual` domain for full discoverability.

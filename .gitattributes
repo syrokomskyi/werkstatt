@@ -41,7 +41,7 @@ apps/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
 # Regenerate:   pnpm exec site-kernel run gitattributes.generate
 ../clients/<app>/**                                                                linguist-generated=true
 ../handoff/**                                                                      linguist-generated=true
-.check-webgogol/runs/**                                                            linguist-generated=true
+.check-warpgogol/runs/**                                                            linguist-generated=true
 apps/**                                                                            linguist-generated=true
 apps/**/*.{astro,ts,tsx,md}                                                        linguist-generated=true
 apps/**/*.{yaml,yml,md}                                                            linguist-generated=true
@@ -70,7 +70,7 @@ apps/*/public/.well-known/bordbuch/**                                           
 apps/*/public/.well-known/bordbuch/index.html                                      linguist-generated=true
 apps/*/public/.well-known/cosmic-passport-key.json                                 linguist-generated=true
 apps/*/public/.well-known/security.txt                                             linguist-generated=true
-apps/*/public/.well-known/webgogol-check.json                                      linguist-generated=true
+apps/*/public/.well-known/warpgogol-check.json                                      linguist-generated=true
 apps/*/public/_headers                                                             linguist-generated=true
 apps/*/public/_img/**                                                              linguist-generated=true
 apps/*/public/_img/**/*.webp                                                       linguist-generated=true

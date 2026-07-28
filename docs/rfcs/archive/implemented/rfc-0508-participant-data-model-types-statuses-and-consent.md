@@ -46,7 +46,7 @@ commands:
   removed:
     - people.validate
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/site-kernel-checks"
@@ -380,7 +380,7 @@ The `people` collection name and file paths (`src/content/people/{lang}/`) are u
 
 ```sh
 # Validate the Participant contract for one site (or all). Joins apps-check.run.
-pnpm exec site-kernel run participant.validate --site webgogol-com --json
+pnpm exec site-kernel run participant.validate --site warpgogol-com --json
 pnpm exec site-kernel run participant.validate --all
 ```
 
@@ -429,7 +429,7 @@ export async function getParticipantBySlug(slug: string, lang: string): Promise<
 | `packages/os/site-kernel-checks/src/participant.ts` | New file: `participant.validate` (replaces `people.ts`) |
 | `packages/os/site-kernel-checks/src/people.ts` | Removed (replaced by `participant.ts`) |
 | `packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts` | Replace `people.validate` step with `participant.validate` |
-| `missions/webgogol-com-m000010/workpiece/src/content/people/{de,uk}/andrii-syrokomskyi.md` | Migrate: add `participantType: human`, `status: active`, `visibility: public`, `relationshipType: founder`, `consent` record |
+| `missions/warpgogol-com-m000010/workpiece/src/content/people/{de,uk}/andrii-syrokomskyi.md` | Migrate: add `participantType: human`, `status: active`, `visibility: public`, `relationshipType: founder`, `consent` record |
 
 ### Migrator
 
@@ -533,7 +533,7 @@ It **warns** (does not fail) when:
 - [x] `getParticipantsForSection` and `getParticipantProfileRoutes` replace the Person equivalents in `packages/share/src/astro/`. (evidence: packages/share/src/astro/people.ts, packages/share/src/astro/people-routes.ts)
 - [x] `participant.validate` registered in `apps-check.run`; `--json` output stable; no-op pass when a site has no people records. (evidence: packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts, packages/os/site-kernel-checks/src/participant.ts)
 - [x] RFC-0508 migrator registered in `packages/os/site-kernel-handoff/src/migrators/`; idempotent (PBT f(f(x))==f(x)). (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0508.ts, rfc-0508.pbt.test.ts)
-- [x] Existing Andrii Person records migrated to `participantType: human` with `status: active`, `visibility: public`, `relationshipType: founder`, `consent` record (placeholder with `profileReviewer = slug` — human review pending). (evidence: missions/webgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md)
+- [x] Existing Andrii Person records migrated to `participantType: human` with `status: active`, `visibility: public`, `relationshipType: founder`, `consent` record (placeholder with `profileReviewer = slug` — human review pending). (evidence: missions/warpgogol-com-m000010/workpiece/src/content/people/de/andrii-syrokomskyi.md)
 - [x] `participant.validate` enforces: consent for public humans, `accountableHumanId` for AI agents, `visibility: private` for service-accounts, no active CTA for former/retired participants. (evidence: packages/os/site-kernel-checks/src/participant.ts)
 - [x] `platform.consistency.validate` passes (semantic hash changed, `versionBump: minor` declared). (evidence: frontmatter versionBump: minor)
 - [x] `rfc.validate` passes on this file before merging. (evidence: rfc.validate --root output, only V-19 warning)

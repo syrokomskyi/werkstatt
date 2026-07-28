@@ -7,7 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0348: added compass.markup.migrate to extraCommands; updated header to v2 two-block contract.</item>
-  <item>RFC-0374: compass.* commands migrated to @webgogol/forge — see packages/forge/os/compass/</item>
+  <item>RFC-0374: compass.* commands migrated to @warpgogol/forge — see packages/forge/os/compass/</item>
 </CHANGE_SUMMARY>
 */
 import type { KernelModule } from "@warpgogol/site-kernel";
@@ -15,7 +15,7 @@ import {
   createStandardCheckModule,
   runSemanticMirrorValidate,
 } from "@warpgogol/site-kernel-checks";
-// compass.* handlers migrated to @webgogol/forge — see packages/forge/os/compass/
+// compass.* handlers migrated to @warpgogol/forge — see packages/forge/os/compass/
 
 export const checkModule: KernelModule = createStandardCheckModule({
   defaultLang: "de",

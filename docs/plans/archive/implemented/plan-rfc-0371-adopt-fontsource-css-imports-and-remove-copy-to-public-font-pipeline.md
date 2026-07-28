@@ -7,9 +7,9 @@ createdAt: 2026-07-09
 updatedAt:
 scope:
   apps:
-    - apps/webgogol-com
+    - apps/warpgogol-com
     - apps/nicaragua-projekt
-    - apps/check-webgogol-com
+    - apps/check-warpgogol-com
   packages:
     - packages/ontology
     - packages/os/site-kernel-checks
@@ -17,7 +17,7 @@ scope:
     - packages/os/site-kernel-content
   services: []
   docs:
-    - docs/adrs/adr-0001-self-host-playfair-dm-mono-for-webgogol-com.md
+    - docs/adrs/adr-0001-self-host-playfair-dm-mono-for-warpgogol-com.md
     - docs/rfcs/archive/implemented/rfc-0164-self-host-web-fonts-and-remove-the-google-fonts-hotlink.md
     - AGENTS.md
     - docs/requirements.xml
@@ -75,18 +75,18 @@ scope:
 | `packages/ontology/biomes/handwerk-material-warm.yaml` | Add `fonts:` section: Inter (400,500,600), Playfair Display (400,700; italic 400), DM Mono (300,400,500) |
 | `packages/ontology/biomes/nonprofit-trust.yaml` | Add `fonts:` section: Inter (400,500,600), Lora (400,500,600,700) |
 | `packages/ontology/biomes/check-concrete-blueprint.yaml` | Change `headingFamily` from `'Inter Display', system-ui, sans-serif` to `'Inter', system-ui, sans-serif` (G4). Add `fonts:` section: Inter (400,500,600) |
-| `apps/webgogol-com/package.json` | Add dependencies: `@fontsource/inter`, `@fontsource/playfair-display`, `@fontsource/dm-mono` |
+| `apps/warpgogol-com/package.json` | Add dependencies: `@fontsource/inter`, `@fontsource/playfair-display`, `@fontsource/dm-mono` |
 | `apps/nicaragua-projekt/package.json` | Add dependencies: `@fontsource/inter`, `@fontsource/lora` |
-| `apps/check-webgogol-com/package.json` | Add dependencies: `@fontsource/inter` |
-| `apps/webgogol-com/src/styles/global.css` | Replace `@import "./fonts.generated.css"` with `@import "./fonts.imports.css"` (line 45) |
+| `apps/check-warpgogol-com/package.json` | Add dependencies: `@fontsource/inter` |
+| `apps/warpgogol-com/src/styles/global.css` | Replace `@import "./fonts.generated.css"` with `@import "./fonts.imports.css"` (line 45) |
 | `apps/nicaragua-projekt/src/styles/global.css` | Same replacement (line 45) |
-| `apps/check-webgogol-com/src/styles/global.css` | Same replacement (line 45) |
+| `apps/check-warpgogol-com/src/styles/global.css` | Same replacement (line 45) |
 
 ### 2.3 Documentation and specs
 
 | File | Change |
 | --- | --- |
-| `docs/adrs/adr-0001-self-host-playfair-dm-mono-for-webgogol-com.md` | Set `status: superseded`, add `supersededBy: [RFC-0371]` in frontmatter |
+| `docs/adrs/adr-0001-self-host-playfair-dm-mono-for-warpgogol-com.md` | Set `status: superseded`, add `supersededBy: [RFC-0371]` in frontmatter |
 | `AGENTS.md` (root) | Add "Font licensing" section: all web fonts from `@fontsource/*`, approved license list, redistribution obligation |
 | `docs/requirements.xml` | Sync biome contract extension (new `fonts` field) |
 | `docs/technology.xml` | Sync Fontsource CSS import pattern |
@@ -165,9 +165,9 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` passes
-- `pnpm exec site-kernel run fonts.imports.generate --app webgogol-com` produces correct `fonts.imports.css` with Inter, Playfair Display, DM Mono imports
+- `pnpm exec site-kernel run fonts.imports.generate --app warpgogol-com` produces correct `fonts.imports.css` with Inter, Playfair Display, DM Mono imports
 
-**Completion criterion:** `fonts.imports.generate --app webgogol-com` writes `src/styles/fonts.imports.css` with 9 `@import` lines matching the RFC example.
+**Completion criterion:** `fonts.imports.generate --app warpgogol-com` writes `src/styles/fonts.imports.css` with 9 `@import` lines matching the RFC example.
 
 **Human review:** no
 
@@ -192,7 +192,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run fonts.contract.validate --app webgogol-com --json` returns `status: "pass"` after migration (or reports violations before migration)
+- `pnpm exec site-kernel run fonts.contract.validate --app warpgogol-com --json` returns `status: "pass"` after migration (or reports violations before migration)
 
 **Completion criterion:** `fonts.contract.validate` enforces all 4 rules and returns structured JSON violations.
 
@@ -217,7 +217,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run fonts.origin.validate --app webgogol-com` passes after build (no external font origins)
+- `pnpm exec site-kernel run fonts.origin.validate --app warpgogol-com` passes after build (no external font origins)
 
 **Completion criterion:** `fonts.origin.validate` detects external font origins in dist HTML and returns structured violations.
 
@@ -238,7 +238,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run kernel.wire --app webgogol-com` regenerates `tools/kernel.config.ts` with new commands
+- `pnpm exec site-kernel run kernel.wire --app warpgogol-com` regenerates `tools/kernel.config.ts` with new commands
 
 **Completion criterion:** All 3 pipeline files reference the new commands; no references to `fonts.generate` or `fonts.selfhost.validate` remain in pipeline files.
 
@@ -252,7 +252,7 @@ scope:
 
 **Agent actions:**
 
-- For each app (`webgogol-com`, `nicaragua-projekt`, `check-webgogol-com`):
+- For each app (`warpgogol-com`, `nicaragua-projekt`, `check-warpgogol-com`):
   1. Add `@fontsource/*` packages to `package.json` dependencies (matching the biome `fonts` section)
   2. Run `pnpm install` to resolve new dependencies
   3. Run `pnpm exec site-kernel run fonts.imports.generate --app <app>` to produce `fonts.imports.css`
@@ -324,7 +324,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-codegen run build:check` passes
-- `pnpm exec site-kernel run app.boilerplate.validate --app webgogol-com` passes (template matches generated file)
+- `pnpm exec site-kernel run app.boilerplate.validate --app warpgogol-com` passes (template matches generated file)
 
 **Completion criterion:** Codegen template references `fonts.imports.css`; new template file exists with default Inter imports.
 
@@ -338,7 +338,7 @@ scope:
 
 **Agent actions:**
 
-- In `docs/adrs/adr-0001-self-host-playfair-dm-mono-for-webgogol-com.md`:
+- In `docs/adrs/adr-0001-self-host-playfair-dm-mono-for-warpgogol-com.md`:
   - Set `status: superseded`
   - Add `supersededBy: [RFC-0371]` to frontmatter
   - Add a note at the end of the document: "Superseded by RFC-0371 — the delivery mechanism changes from copy-to-public to Fontsource CSS imports. The font family selections (Playfair Display, DM Mono, Inter) remain valid."
@@ -412,9 +412,9 @@ scope:
 - `pnpm --filter @gogol/ontology run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
 - `pnpm --filter @gogol/site-kernel-codegen run build:check`
-- `pnpm --filter webgogol-com run build:check`
+- `pnpm --filter warpgogol-com run build:check`
 - `pnpm --filter nicaragua-projekt run build:check`
-- `pnpm --filter check-webgogol-com run build:check`
+- `pnpm --filter check-warpgogol-com run build:check`
 - `pnpm exec site-kernel run fonts.contract.validate --all --json`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0371` (RFC-0330)
 

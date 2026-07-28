@@ -90,7 +90,7 @@ UTF-8 plain text with LF line endings:
 
 ```text
 /* TEAM */
-Studio: Webgogol
+Studio: Warpgogol
 Site: <site display name>
 Contact: <public contact URL or mailto when already approved>
 Location: <site/studio location when available>

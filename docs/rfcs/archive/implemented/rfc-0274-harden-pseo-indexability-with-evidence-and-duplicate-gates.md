@@ -39,7 +39,7 @@ commands:
     - demand.modifier.lint
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/site-kernel-checks"
@@ -167,9 +167,9 @@ Diagnostics report the pair, similarity score, shared shingles, and the first di
 ## CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.evidence.validate --app webgogol-com --blueprint website-local --json
-pnpm exec site-kernel run surface.duplicate.validate --app webgogol-com --blueprint website-local --json
-pnpm exec site-kernel run pseo.validate --app webgogol-com --json
+pnpm exec site-kernel run surface.evidence.validate --app warpgogol-com --blueprint website-local --json
+pnpm exec site-kernel run surface.duplicate.validate --app warpgogol-com --blueprint website-local --json
+pnpm exec site-kernel run pseo.validate --app warpgogol-com --json
 ```
 
 `pseo.validate` becomes the aggregate quality gate that includes substance, evidence, duplicate, freshness, entitlement, and link checks.
@@ -188,7 +188,7 @@ pnpm exec site-kernel run pseo.validate --app webgogol-com --json
 1. Fix known validator holes first; these are low-risk correctness repairs.
 2. Add rendered-text extraction and duplicate reporting in warning mode.
 3. Add Blueprint evidence policy for `website-local` d5.
-4. Calibrate thresholds on `webgogol-com` pilot pages.
+4. Calibrate thresholds on `warpgogol-com` pilot pages.
 5. Promote d5 missing narrative/evidence from warning to indexability blocker.
 
 ## Alternatives considered

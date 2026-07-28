@@ -42,13 +42,13 @@ commands:
     - surface.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-checks"
   - "@gogol/ontology"
   - "@gogol/ui"
 successSignals:
-  - "Every ratgeber article page renders a 12-section layout: breadcrumbs → article-header → direct-answer → TOC → main analysis (prose body) → practical tool → limitations → Webgogol connection → sources → authorship/review → changelog → contextual next step (CTA)."
+  - "Every ratgeber article page renders a 12-section layout: breadcrumbs → article-header → direct-answer → TOC → main analysis (prose body) → practical tool → limitations → Warpgogol connection → sources → authorship/review → changelog → contextual next step (CTA)."
   - "The article-header block displays seven fields: Themenbereich (category), H1 (title), Kurzbeschreibung (summary), Artikeltyp (articleType), Autor (author name), Zuletzt fachlich geprüft (reviewedAt), Lesezeit (readTime)."
   - "The article page has exactly one H1 — in the article-header block. The prose body uses H2 headings only."
   - "The TOC block is auto-generated from H2 headings in the prose body. No manual TOC editing."
@@ -103,7 +103,7 @@ The ratgeber article page (depth-1) renders twelve blocks in order:
 | 5 | Main analysis | Prose body (10-section structure, RFC-0501) | Existing (markdown block) |
 | 6 | Practical tool | `articleSections: checklist` or type-specific tool | New |
 | 7 | Limitations | `articleSections: limitations` from prose | New |
-| 8 | Webgogol connection | `articleSections: webgogol-connection` from prose | New |
+| 8 | Warpgogol connection | `articleSections: warpgogol-connection` from prose | New |
 | 9 | Sources | `## Quellen` / `## Джерела` section from prose | Existing (part of markdown) |
 | 10 | Authorship and review | Author record + reviewedAt (RFC-0502) | Existing (provenance footer) |
 | 11 | Changelog | Frontmatter `changelog` array | New |
@@ -142,9 +142,9 @@ articleSections:
   - sources
 ```
 
-Valid section names: `direct-answer`, `definitions`, `analysis`, `example`, `checklist`, `limitations`, `sources`, `webgogol-connection`.
+Valid section names: `direct-answer`, `definitions`, `analysis`, `example`, `checklist`, `limitations`, `sources`, `warpgogol-connection`.
 
-Each slot name maps to a mandatory H2 heading from RFC-0501 (except `webgogol-connection`, which is optional):
+Each slot name maps to a mandatory H2 heading from RFC-0501 (except `warpgogol-connection`, which is optional):
 
 | Slot                  | DE heading                     | UK heading                | Optional? |
 | --------------------- | ------------------------------ | ------------------------- | --------- |
@@ -155,9 +155,9 @@ Each slot name maps to a mandatory H2 heading from RFC-0501 (except `webgogol-co
 | `checklist`           | `## Checkliste`                | `## Контрольний список`   | No        |
 | `limitations`         | `## Kosten und Trade-offs`     | `## Витрати і компроміси` | No        |
 | `sources`             | `## Quellen`                   | `## Джерела`              | No        |
-| `webgogol-connection` | `## Webgogol-Bezug`            | `## Зв'язок із Webgogol`  | Yes       |
+| `warpgogol-connection` | `## Warpgogol-Bezug`            | `## Зв'язок із Warpgogol`  | Yes       |
 
-The `webgogol-connection` slot is an optional H2 heading. When present, it must appear after `## Zusammenfassung` / `## Підсумок` and before `## Quellen` / `## Джерела` in the heading order. `ratgeber.article.validate` does not require its presence but accepts it if present.
+The `warpgogol-connection` slot is an optional H2 heading. When present, it must appear after `## Zusammenfassung` / `## Підсумок` and before `## Quellen` / `## Джерела` in the heading order. `ratgeber.article.validate` does not require its presence but accepts it if present.
 
 When `articleSections` is present, the baker extracts named sections from the prose body and renders them as separate blocks. When absent, the baker renders the prose body as a single markdown block (field-presence-driven rendering, not a compatibility shim). When a slot is listed in `articleSections` but the corresponding H2 heading is not found in the prose body, the baker skips that block silently (no error, no warning — the field-presence-driven pattern).
 
@@ -243,7 +243,7 @@ Migrator id: `rfc-0504`.
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.article.validate --site webgogol-com --json
+pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check` (blocking). The `--json` output shape follows the standard check-command contract: `{ exitCode, summary, diagnostics: Array<{ ruleId, severity, message, file?, fixHint?, data? }> }`.
@@ -253,7 +253,7 @@ Site-scoped, runs in `build.check` (blocking). The `--json` output shape follows
 ```ts
 type ArticleSectionSlot =
   | "direct-answer" | "definitions" | "analysis" | "example"
-  | "checklist" | "limitations" | "sources" | "webgogol-connection";
+  | "checklist" | "limitations" | "sources" | "warpgogol-connection";
 
 interface ChangelogEntry {
   date: string;       // YYYY-MM-DD
@@ -311,7 +311,7 @@ Exit codes: 0 = pass, 1 = any error-level rule triggered, 2 = only warning-level
 5. Create `packages/os/site-kernel-handoff/src/migrators/rfc-0504.ts`.
 6. Register migrator in `registry.ts`.
 7. Add UI components for `article-header`, `toc`, `changelog` in `@gogol/ui`.
-8. Run migrator on webgogol-com mission workpiece.
+8. Run migrator on warpgogol-com mission workpiece.
 9. Verify with `ratgeber.article.validate` and dev build.
 
 ## Alternatives considered
@@ -332,7 +332,7 @@ Exit codes: 0 = pass, 1 = any error-level rule triggered, 2 = only warning-level
 
 ## Acceptance criteria
 
-- [x] `bakeRatgeberArticle` emits a 12-section layout: breadcrumbs → article-header → direct-answer → TOC → main analysis → practical tool → limitations → Webgogol connection → sources → authorship/review → changelog → contextual next step (CTA). (evidence: `packages/os/site-kernel-checks/src/surface-expand/bake-ratgeber-article.ts` — article-header, toc, sectioned markdown, changelog, three-tier CTA blocks emitted)
+- [x] `bakeRatgeberArticle` emits a 12-section layout: breadcrumbs → article-header → direct-answer → TOC → main analysis → practical tool → limitations → Warpgogol connection → sources → authorship/review → changelog → contextual next step (CTA). (evidence: `packages/os/site-kernel-checks/src/surface-expand/bake-ratgeber-article.ts` — article-header, toc, sectioned markdown, changelog, three-tier CTA blocks emitted)
 - [x] The article-header block displays seven fields: category, title (H1), summary, articleType, author name, reviewedAt, readTime. (evidence: `packages/ui/src/sections/article-header/article-header-section.astro` — all seven fields rendered)
 - [x] The article page has exactly one H1 — in the article-header block. The prose body contains no H1 headings (RG-ART-07). (evidence: `packages/os/site-kernel-checks/src/ratgeber-article-validate.ts` — `hasH1OutsideCodeBlocks` helper + RG-ART-07 rule)
 - [x] The TOC block is auto-generated from H2 headings in the prose body when ≥ 3 H2 headings are present. (evidence: `packages/os/site-kernel-checks/src/surface-expand/bake-ratgeber-article.ts` — TOC block emitted with `sourceContentRef` for renderer-time H2 extraction)
@@ -343,7 +343,7 @@ Exit codes: 0 = pass, 1 = any error-level rule triggered, 2 = only warning-level
 - [x] Three-tier CTA system renders primary (articleType-specific), secondary (optional frontmatter), and tertiary (fixed contact) tiers. (evidence: `packages/os/site-kernel-checks/src/surface-expand/bake-ratgeber-article.ts` — `secondaryCta` frontmatter merged with `buildContextualCta` output + fixed contact CTA)
 - [x] `article-header`, `toc`, `changelog` block types are registered in `archetypes/index.yaml` with cosmic names `Himalia`, `Metis`, `Prometheus` respectively. (evidence: `packages/ontology/archetypes/index.yaml` — `blockTypeToCosmicName`, `roleByCosmicName`, `planetImportPaths` entries)
 - [x] Migrator `rfc-0504` is registered in the migrator registry and transforms existing article records (adds empty `articleSections` and `changelog`, strips H1 headings). (evidence: `packages/os/site-kernel-handoff/src/migrators/rfc-0504.ts` + `registry.ts` — migrator registered, PBT + snapshot tests pass)
-- [x] `ratgeber.article.validate --site webgogol-com --json` passes. (evidence: `packages/os/site-kernel-checks/src/ratgeber-article-validate.ts` — `build:check` passes, validator compiles with RG-ART-07..10)
+- [x] `ratgeber.article.validate --site warpgogol-com --json` passes. (evidence: `packages/os/site-kernel-checks/src/ratgeber-article-validate.ts` — `build:check` passes, validator compiles with RG-ART-07..10)
 - [x] `rfc.validate RFC-0504` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0504 --json` — status: pass, exitCode: 0)
 
 ## Implementation notes for agents

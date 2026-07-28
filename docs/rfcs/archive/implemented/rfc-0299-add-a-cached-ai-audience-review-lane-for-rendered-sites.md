@@ -33,11 +33,11 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/check-core"
   - "@gogol/check-runner-node"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
   - "@gogol/ontology"
 successSignals:
   - "AI review evaluates rendered pages against explicit audience profiles, not vague generic taste."
@@ -80,8 +80,8 @@ Add a cached AI audience review lane:
 
 ```sh
 pnpm exec site-kernel run check.audience.profile.validate --profile handwerk-owner-de --json
-pnpm exec site-kernel run check.audience.review.run --run .check-webgogol/runs/<runId> --profile handwerk-owner-de --json
-pnpm exec site-kernel run check.audience.review.validate --run .check-webgogol/runs/<runId> --json
+pnpm exec site-kernel run check.audience.review.run --run .check-warpgogol/runs/<runId> --profile handwerk-owner-de --json
+pnpm exec site-kernel run check.audience.review.validate --run .check-warpgogol/runs/<runId> --json
 ```
 
 The reviewer receives only the evidence graph, screenshots, deterministic diagnostics, audience profile, and prompt rubric. It never crawls the web directly and never invents factual corrections.
@@ -173,7 +173,7 @@ sha256(evidenceGraphHash + profileHash + promptHash + modelVersion + viewportSet
 Cache entries live under:
 
 ```txt
-.check-webgogol/cache/audience-review.jsonl
+.check-warpgogol/cache/audience-review.jsonl
 ```
 
 ### Review Rules

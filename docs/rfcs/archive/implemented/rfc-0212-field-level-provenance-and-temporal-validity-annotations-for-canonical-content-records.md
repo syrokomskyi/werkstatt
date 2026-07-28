@@ -36,7 +36,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - business
@@ -91,9 +91,9 @@ Introduce a **per-record provenance sidecar**: for a record `business/{lang}/<na
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.claim.validate --app webgogol-com
-pnpm exec site-kernel run content.claim.validate --app webgogol-com --json
-pnpm exec site-kernel run content.claim.report   --app webgogol-com   # coverage, never fails
+pnpm exec site-kernel run content.claim.validate --app warpgogol-com
+pnpm exec site-kernel run content.claim.validate --app warpgogol-com --json
+pnpm exec site-kernel run content.claim.report   --app warpgogol-com   # coverage, never fails
 ```
 
 ### Sidecar format
@@ -189,7 +189,7 @@ Coverage is `annotated load-bearing fields / total load-bearing fields`. The rep
 ## Rollout
 
 1. Land the schema + both commands; wire `content.claim.validate` into `apps-check.author` at `warning`.
-2. Backfill sidecars for the existing high-value records (location, offer, company, compliance) on the pilot app `webgogol-com` via agent authoring (RFC-0218).
+2. Backfill sidecars for the existing high-value records (location, offer, company, compliance) on the pilot app `warpgogol-com` via agent authoring (RFC-0218).
 3. Promote `CKL-CLAIM-01/02` to `error` after the pilot is clean.
 4. Document `compliance.effectiveDate` / `service.source` as legacy inline forms; the validator reads both until a later cleanup RFC removes the inline duplicates.
 
@@ -214,7 +214,7 @@ New apps: `onboarding.scaffold` seeds an empty sidecar convention; agents annota
 - [x] `content.claim.validate` registered (app scope), emits RFC-0203 Diagnostics, runs in `apps-check.author`. (evidence: implemented historically)
 - [x] `content.claim.report` registered (app scope), always exit 0, reports provenance coverage. (evidence: implemented historically)
 - [x] Field-path resolution reuses RFC-0045 helpers; dangling keys are `CKL-CLAIM-02`. (evidence: implemented historically)
-- [x] At least the location/offer/company/compliance records on `webgogol-com` carry validated sidecars. (evidence: implemented historically)
+- [x] At least the location/offer/company/compliance records on `warpgogol-com` carry validated sidecars. (evidence: implemented historically)
 - [x] `docs/COMMANDS.md` lists both commands under the CKL group. (evidence: docs/ directory, documentation exists)
 - [x] `AGENTS.md` notes the sidecar convention for load-bearing facts. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)

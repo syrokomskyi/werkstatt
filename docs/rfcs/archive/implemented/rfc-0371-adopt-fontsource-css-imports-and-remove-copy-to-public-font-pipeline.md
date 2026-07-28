@@ -66,7 +66,7 @@ nonGoals:
 
 ## Context
 
-RFC-0164 introduced self-hosted web fonts by copying woff2 binaries from `@fontsource/*` packages into `apps/*/public/fonts/` and generating a `fonts.generated.css` with hand-written `@font-face` rules pointing to `/fonts/*.woff2`. ADR-0001 extended this registry with Playfair Display and DM Mono for `apps/webgogol-com`.
+RFC-0164 introduced self-hosted web fonts by copying woff2 binaries from `@fontsource/*` packages into `apps/*/public/fonts/` and generating a `fonts.generated.css` with hand-written `@font-face` rules pointing to `/fonts/*.woff2`. ADR-0001 extended this registry with Playfair Display and DM Mono for `apps/warpgogol-com`.
 
 This approach works but has architectural friction:
 
@@ -162,14 +162,14 @@ const biomeFontsSchema = z.array(biomeFontEntrySchema).optional();
 
 ```sh
 # Generate fonts.imports.css from the biome fonts section
-pnpm exec site-kernel run fonts.imports.generate --app webgogol-com
+pnpm exec site-kernel run fonts.imports.generate --app warpgogol-com
 
 # Validate font contract at author time (no font files in public, at least one import, package deps, licenses)
-pnpm exec site-kernel run fonts.contract.validate --app webgogol-com
+pnpm exec site-kernel run fonts.contract.validate --app warpgogol-com
 pnpm exec site-kernel run fonts.contract.validate --all --json
 
 # Validate no external font origins in built HTML (post-build)
-pnpm exec site-kernel run fonts.origin.validate --app webgogol-com
+pnpm exec site-kernel run fonts.origin.validate --app warpgogol-com
 pnpm exec site-kernel run fonts.origin.validate --all --json
 ```
 

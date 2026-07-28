@@ -62,7 +62,7 @@ commands:
     - surface.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/surface"
@@ -78,7 +78,7 @@ successSignals:
   - "Absent fields omit their block — the baker is field-presence-driven, consistent with the existing RFC-0193 bake contract."
   - "No unfulfillable commercial promises ('mehr Anfragen', 'steigt die Wahrscheinlichkeit', 'höhere Conversion', 'stärkstes Conversion-Signal') appear in any industry page block. surface.industry.validate enforces a closed claim-restriction list."
   - "The Notausgang secondary CTA in the hero is conditional: it appears only when the industry record declares notdienst: true (or equivalent field). Industries without this field do not show the Notausgang CTA."
-  - "JSON-LD for depth-1 industry pages emits WebPage + BreadcrumbList + Service (provider=Webgogol, serviceType=Digitales Fundament für {industry}, audience={industry}) — not Electrician, HairSalon, or LocalBusiness."
+  - "JSON-LD for depth-1 industry pages emits WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry}, audience={industry}) — not Electrician, HairSalon, or LocalBusiness."
   - "No full Bildnachweis text or JSON-LD appears in the readable card body — media metadata stays in JSON-LD script blocks only."
   - "surface.industry.validate enforces the publication gate: minimum 5 service categories, 3 customer journeys, 4 trust signals, 1 recommended architecture, 3 module mappings, 5 unique FAQ entries. Pages failing the gate are not emitted as live routes."
   - "surface.doorway-risk.report flags city pages (depth-4) that lack unique local context (localDemandContext, uniqueIntro, uniqueFaq, localEvidence) — these are auto-noindexed or not emitted."
@@ -101,7 +101,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -135,7 +135,7 @@ The `website-local` surface (RFC-0238) generates a six-level geo-demand cascade.
 
 8. **FAQ conflicts.** "Wie schnell kann eine Elektriker-Website online sein?" with answer "innerhalb weniger Tage" contradicts the canonical 12 Werktage. Result-claim FAQ questions ("Welche Inhalte erhöhen Termin-Anfragen?") make unmeasurable promises.
 
-9. **Structured data misrepresentation.** Pages may emit Electrician/HairSalon/LocalBusiness JSON-LD, creating a false impression that Webgogol is such a business. The expert requires WebPage + Service (provider=Webgogol).
+9. **Structured data misrepresentation.** Pages may emit Electrician/HairSalon/LocalBusiness JSON-LD, creating a false impression that Warpgogol is such a business. The expert requires WebPage + Service (provider=Warpgogol).
 
 10. **Media metadata leakage.** Full Bildnachweis text and JSON-LD appear in readable card bodies instead of staying in structured data scripts.
 
@@ -216,7 +216,7 @@ The hero's secondary CTA (`secondaryLabel: lbl.exit, secondaryTarget: "notausgan
 
 Depth-1 industry pages emit `WebPage` + `BreadcrumbList` + `Service` where:
 
-- `provider.name` = "Webgogol"
+- `provider.name` = "Warpgogol"
 - `serviceType` = "Digitales Fundament für {industry.name}"
 - `audience` = {industry.name}
 
@@ -311,16 +311,16 @@ Result-claim phrases are allowed only when the record provides a `measurementDef
 
 ```sh
 # Validate industry records against the publication gate + claim policy
-pnpm exec site-kernel run surface.industry.validate --site webgogol-com
+pnpm exec site-kernel run surface.industry.validate --site warpgogol-com
 
 # Report city pages (depth-4) that lack unique local context (doorway risk)
-pnpm exec site-kernel run surface.doorway-risk.report --site webgogol-com
+pnpm exec site-kernel run surface.doorway-risk.report --site warpgogol-com
 
 # Report industry pages (depth-1) with >0.70 prose similarity to another industry page
-pnpm exec site-kernel run surface.duplicate-content.report --site webgogol-com
+pnpm exec site-kernel run surface.duplicate-content.report --site warpgogol-com
 
 # All three accept --json for machine-readable output
-pnpm exec site-kernel run surface.industry.validate --site webgogol-com --json
+pnpm exec site-kernel run surface.industry.validate --site warpgogol-com --json
 ```
 
 All three commands are `scope: workspace` (they operate on a specific site's surface content). `surface.industry.validate` is integrated into `build.check` as a blocking check. `surface.doorway-risk.report` and `surface.duplicate-content.report` are diagnostic reports — they emit warnings in `build.check` but do not block unless the doorway or duplicate threshold is exceeded (configurable in the blueprint).
@@ -548,7 +548,7 @@ The migrator is idempotent: running it twice produces the same result. After mig
 
 - **Doorway-risk report noise.** Many depth-4 city pages may lack unique local context initially. Mitigation: the report is diagnostic (warn status) and only blocks when the `doorwayMaxFlaggedShare` threshold is exceeded. Operators can suppress specific pages by adding the required local context fields.
 
-- **Layer C break.** The JSON-LD change from `LocalBusiness`/`Electrician`/`HairSalon` to `Service` is a Layer C break. Mitigation: `breaksC: true` is declared, the C-contract (`jsonld-types.yaml`) is updated, and `surface.contract.validate` verifies the change. The `Service` type is more accurate — Webgogol is the provider, not the trade business.
+- **Layer C break.** The JSON-LD change from `LocalBusiness`/`Electrician`/`HairSalon` to `Service` is a Layer C break. Mitigation: `breaksC: true` is declared, the C-contract (`jsonld-types.yaml`) is updated, and `surface.contract.validate` verifies the change. The `Service` type is more accurate — Warpgogol is the provider, not the trade business.
 
 - **Agent misinterpretation.** Agents may attempt to fill dossier fields with LLM-generated content instead of authored trade-specific expertise. Mitigation: the "Implementation notes for agents" section explicitly prohibits LLM-generated dossier fields. The `surface.industry.validate` claim detection catches many hallucination patterns (result claims, measurable promises).
 
@@ -580,8 +580,8 @@ The migrator is idempotent: running it twice produces the same result. After mig
 - [x] `versionBump: minor` validated by `platform.consistency.validate` (V-29) (evidence: RFC frontmatter `versionBump: minor`)
 - [x] Blueprint `website-local.yaml` gains `dossier` config block on depth-1 level (evidence: `packages/ontology/blueprints/website-local.yaml` depth-1 `dossier` block)
 - [x] Existing Elektriker and Friseur industry records migrated (deprecated fields preserved as fallback) (evidence: `packages/os/site-kernel-handoff/src/migrators/rfc-0492.ts` copy-if-absent idempotent migrator)
-- [x] `content.references.validate --site webgogol-com` passes after migration (new fields are plain frontmatter — no `contentRef` tokens, no validator changes needed) (evidence: new dossier fields are structured arrays/objects, not content references)
-- [x] `content.voice.lint --site webgogol-com` passes after migration (new fields are structured arrays/objects, not prose — voice lint operates on prose blocks only) (evidence: new dossier fields are structured data, not prose blocks)
+- [x] `content.references.validate --site warpgogol-com` passes after migration (new fields are plain frontmatter — no `contentRef` tokens, no validator changes needed) (evidence: new dossier fields are structured arrays/objects, not content references)
+- [x] `content.voice.lint --site warpgogol-com` passes after migration (new fields are structured arrays/objects, not prose — voice lint operates on prose blocks only) (evidence: new dossier fields are structured data, not prose blocks)
 - [x] `AGENTS.md` updated with agent instructions: dossier fields must be authored, not LLM-generated (evidence: `packages/AGENTS.md` surface entry, `packages/share/AGENTS.md` semantic entry, `packages/pbp/AGENTS.md` semantic-model entry)
 - [x] `rfc.validate` passes on this file before merging (evidence: this run)
 

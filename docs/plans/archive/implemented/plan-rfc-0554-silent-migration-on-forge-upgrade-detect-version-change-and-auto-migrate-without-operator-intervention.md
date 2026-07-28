@@ -47,14 +47,14 @@ No new commands. No registry entries. No pipeline wiring changes. The `forge.upg
 
 - `pnpm exec forge skill.validate` — verify the modified SKILL.md passes SKILL-01..16
 - `pnpm exec forge rfc.validate --id RFC-0554` — verify the RFC passes
-- `pnpm --filter @webgogol/forge run build:check` — typecheck (no TS changes expected, but verifies no regressions)
-- `pnpm --filter @webgogol/forge run test` — existing upgrade tests still pass
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck (no TS changes expected, but verifies no regressions)
+- `pnpm --filter @warpgogol/forge run test` — existing upgrade tests still pass
 
 ## 3. Step sequence
 
 ### Step 1. Add step 0 to forge-bootstrap SKILL.md
 
-**Goal:** Add a silent version check as step 0, before the existing step 1 (language selection), instructing the agent to compare `forge.syncedVersion` against the installed `@webgogol/forge` version and silently run `forge upgrade` if they differ.
+**Goal:** Add a silent version check as step 0, before the existing step 1 (language selection), instructing the agent to compare `forge.syncedVersion` against the installed `@warpgogol/forge` version and silently run `forge upgrade` if they differ.
 
 **Agent actions:**
 
@@ -62,7 +62,7 @@ No new commands. No registry entries. No pipeline wiring changes. The `forge.upg
 - Add a new `### 0. Silent version check (before language selection)` section before `### 1. Language selection (first step)`
 - The step 0 instructions must direct the agent to:
   1. Read `forge.yaml` and extract `forge.syncedVersion`
-  2. Resolve the installed `@webgogol/forge` version (by reading `node_modules/@webgogol/forge/package.json` or running `forge upgrade --json` and checking the output)
+  2. Resolve the installed `@warpgogol/forge` version (by reading `node_modules/@warpgogol/forge/package.json` or running `forge upgrade --json` and checking the output)
   3. If versions match — skip to step 1, no migration needed
   4. If versions differ (or `syncedVersion` is `null`/absent) — silently run `forge upgrade` via CLI (the agent runs the command internally and does not show any output to the operator — the upgrade happens invisibly)
   5. If `forge upgrade` fails — log the error to the session log (not shown to the operator), proceed to step 1 with the old configuration
@@ -109,8 +109,8 @@ No new commands. No registry entries. No pipeline wiring changes. The `forge.upg
 
 - Run `pnpm exec forge rfc.validate --id RFC-0554 --json` — verify zero RFC-0554-specific violations
 - Run `pnpm exec forge skill.validate` — verify SKILL-01..16 pass for all skills including modified forge-bootstrap
-- Run `pnpm --filter @webgogol/forge run build:check` — typecheck passes (no TS changes, but verifies no regressions from SKILL.md changes)
-- Run `pnpm --filter @webgogol/forge run test` — existing upgrade tests still pass (runUpgrade is unchanged)
+- Run `pnpm --filter @warpgogol/forge run build:check` — typecheck passes (no TS changes, but verifies no regressions from SKILL.md changes)
+- Run `pnpm --filter @warpgogol/forge run test` — existing upgrade tests still pass (runUpgrade is unchanged)
 - Verify `forge.upgrade` CLI still works: `pnpm exec forge upgrade --help` prints help
 
 **Validation:**
@@ -153,8 +153,8 @@ No new commands. No registry entries. No pipeline wiring changes. The `forge.upg
 ### 4.1 Required checks
 
 - `pnpm exec forge rfc.validate --id RFC-0554`
-- `pnpm --filter @webgogol/forge run build:check`
-- `pnpm --filter @webgogol/forge run test`
+- `pnpm --filter @warpgogol/forge run build:check`
+- `pnpm --filter @warpgogol/forge run test`
 - `pnpm exec forge skill.validate`
 
 ### 4.2 Evidence artifacts

@@ -26,7 +26,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - os/site-kernel-checks
@@ -60,7 +60,7 @@ Once shipped, the deferred acceptance criteria in RFC-0134 (L8/L9) and RFC-0151 
 
 ## Acceptance criteria
 
-- [x] `effects.contract.validate` is registered (app-scoped, `--json`) and fails `unsupported-kind-for-target` and `duplicate-kind-in-stack` via the shared `effectAssignmentSchema` — proven by `src/tests/effects-contract.test.ts`. Validates real content (50 assignments on webgogol-com). (evidence: implemented historically)
+- [x] `effects.contract.validate` is registered (app-scoped, `--json`) and fails `unsupported-kind-for-target` and `duplicate-kind-in-stack` via the shared `effectAssignmentSchema` — proven by `src/tests/effects-contract.test.ts`. Validates real content (50 assignments on warpgogol-com). (evidence: implemented historically)
 - [x] `effects.coverage.audit` is registered (workspace-scoped) and reports 0 legacy effect props across 148 packages/ui files (62 reference the effects system). (evidence: packages/ directory, package exists)
 - [x] Both commands are wired in: `effects.contract.validate` → `APPS_CHECK_AUTHOR_PIPELINE`; `effects.coverage.audit` → `PACKAGES_CHECK_PIPELINE`. (evidence: implemented historically)
 - [x] RFC-0134 (L8/L9) and RFC-0151 (L7) deferred effects-validator criteria are now satisfied and re-checked. (evidence: implemented historically)

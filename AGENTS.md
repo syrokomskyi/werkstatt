@@ -27,7 +27,7 @@ Tracked patterns (legacy from `apps/**`, retained for historical content): `apps
 
 ## Forge project configuration (RFC-0391)
 
-`forge.yaml` at the repository root is the machine-readable project configuration for `@webgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects.
+`forge.yaml` at the repository root is the machine-readable project configuration for `@warpgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects.
 
 - **MUST NOT** run `forge.agents.generate` against this monorepo's root `AGENTS.md` — it is hand-written and carries no generated marker; the edit guard enforces this, do not bypass it.
 - **MUST NOT** re-add any `@warpgogol/*` import to `packages/forge` source — `forge.doctor` autonomy guard will fail.
@@ -64,7 +64,7 @@ The Public Business Profile (PBP) specification is vendored at `docs/specs/pbp-s
 
 This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX environment with native GNU coreutils. See [`docs/policies/linux-tooling.md`](docs/policies/linux-tooling.md) for the tool inventory, installation commands, and environment audit.
 
-**Exception:** `@webgogol/forge` (published to npm) must remain cross-platform — it ships skills and command modules that consumers may run on Windows or Linux. Forge source and skills must not assume a POSIX-only environment.
+**Exception:** `@warpgogol/forge` (published to npm) must remain cross-platform — it ships skills and command modules that consumers may run on Windows or Linux. Forge source and skills must not assume a POSIX-only environment.
 
 ## Active instruction model
 
@@ -395,7 +395,7 @@ Every package under `packages/*` has its own `AGENTS.md` with full API reference
 | `@warpgogol/site-kernel-onboarding` | `onboarding.scaffold` CLI — generates RFC-compliant `apps/<id>/`. Never copy an app folder |
 | `@warpgogol/ui` | Shared icons (LordIcon), sections, shell components. Import icons from `@warpgogol/ui/icons`. See `packages/ui/AGENTS.md` |
 | `@warpgogol/content-source` | RFC-0141 Content Source Provider port: the single named seam for where content and assets come from. Ships the `ContentSourceProvider` / `AssetRef` / `ResolvedAsset` contracts and the reference filesystem adapter. |
-| `@webgogol/forge` | RFC-0374 Portable governance ecosystem: 30 skills (fo/shared/meta), generic OS command modules (rfc._, naming.convention.lint, compass._, werkstatt._, workflow._), skill registry, validators, `forge.create` onboarding, `forge.scaffold` stack profiles, and `fo-harvest` self-growth loop. Skills live in `packages/forge/skills/`; `.agents/skills/` is a generated copy synced by `forge.create`. **See `packages/forge/AGENTS.md`.** |
+| `@warpgogol/forge` | RFC-0374 Portable governance ecosystem: 30 skills (fo/shared/meta), generic OS command modules (rfc._, naming.convention.lint, compass._, werkstatt._, workflow._), skill registry, validators, `forge.create` onboarding, `forge.scaffold` stack profiles, and `fo-harvest` self-growth loop. Skills live in `packages/forge/skills/`; `.agents/skills/` is a generated copy synced by `forge.create`. **See `packages/forge/AGENTS.md`.** |
 
 ## Content Source Provider seam (RFC-0141)
 
@@ -422,11 +422,11 @@ See [`docs/policies/integration-hub.md`](docs/policies/integration-hub.md) for t
 
 ## Agent skills
 
-Skills are managed by `@webgogol/forge` (RFC-0374). The source of truth is `packages/forge/skills/{wg,shared,meta}/`; `.agents/skills/<name>/` contains generated copies for IDE discovery, synced by `forge.create`. Run `pnpm exec site-kernel run forge.skill.validate` to check skill frontmatter and invariants.
+Skills are managed by `@warpgogol/forge` (RFC-0374). The source of truth is `packages/forge/skills/{wg,shared,meta}/`; `.agents/skills/<name>/` contains generated copies for IDE discovery, synced by `forge.create`. Run `pnpm exec site-kernel run forge.skill.validate` to check skill frontmatter and invariants.
 
 ### Windows AI tooling (forge consumers only)
 
-The `windows-ai-tooling` skill is part of `@webgogol/forge` (published to npm) and remains cross-platform for external consumers. It is **not** used in this monorepo, which develops on Linux (Ubuntu). See `packages/forge/skills/shared/windows-ai-tooling/SKILL.md` and RFC-0368 for the original policy context.
+The `windows-ai-tooling` skill is part of `@warpgogol/forge` (published to npm) and remains cross-platform for external consumers. It is **not** used in this monorepo, which develops on Linux (Ubuntu). See `packages/forge/skills/shared/windows-ai-tooling/SKILL.md` and RFC-0368 for the original policy context.
 
 ### Issue tracker
 

@@ -77,7 +77,7 @@ No issues.
 
 Minor finding:
 
-- **`appsImpacted` completeness.** The list is empty, but any app using the `chat-widget-section` manifest (webgogol-com) will have its generated env schema change when the manifest's `api[].secrets` entry is renamed from `TENANT_ID` to `SUPABASE_BUFFER_TENANT_ID`. While no direct app source code changes are needed (the env schema is generated from the manifest), the operator's `.env` / `.env.production` files must rename the key. The RFC could note this in `appsImpacted` or in the rollout, though the cross-reference to RFC-0387's runbook partially covers it.
+- **`appsImpacted` completeness.** The list is empty, but any app using the `chat-widget-section` manifest (warpgogol-com) will have its generated env schema change when the manifest's `api[].secrets` entry is renamed from `TENANT_ID` to `SUPABASE_BUFFER_TENANT_ID`. While no direct app source code changes are needed (the env schema is generated from the manifest), the operator's `.env` / `.env.production` files must rename the key. The RFC could note this in `appsImpacted` or in the rollout, though the cross-reference to RFC-0387's runbook partially covers it.
 
 Otherwise no issues:
 
@@ -100,4 +100,4 @@ No issues.
 
 1. The `commands.changed` list includes `env.contract.validate` and `integration.secrets.validate`, but the RFC describes no code changes to these validators. Do they need code changes, or do they already enforce the canonical name correctly once the source alignment is fixed? If no validator code is modified, should the listing be qualified (e.g., "behavior changes as a consequence of source fix, no validator code change")?
 2. The `chat-widget-section.manifest.yaml` `api[].secrets` entry (line 68) is the source for the generated `astro:env` schema. The RFC's file system responsibilities table lists this manifest, but the TypeScript contracts section does not show the YAML diff. Should the RFC include the manifest YAML change as an explicit contract snippet for agent clarity?
-3. Should `appsImpacted` include `webgogol-com` (or note that any app using the chat-widget section is transitively impacted via the generated env schema), or is the manifest-driven propagation considered fully transparent to the app layer?
+3. Should `appsImpacted` include `warpgogol-com` (or note that any app using the chat-widget section is transitively impacted via the generated env schema), or is the manifest-driven propagation considered fully transparent to the app layer?

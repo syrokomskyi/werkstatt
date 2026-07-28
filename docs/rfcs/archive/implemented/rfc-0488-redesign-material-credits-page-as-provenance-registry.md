@@ -45,7 +45,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/ui"
@@ -54,10 +54,10 @@ packagesImpacted:
   - "@gogol/site-kernel-handoff"
 successSignals:
   - "The credits page shows each material as a card with preview, type badge, human-readable source status, usage locations, AI participation details, and a stable anchor — not a flat text list with raw enum values."
-  - "Internal enum values (commissioned-webgogol-material, linked-public-source, AIPlatform, Organization) are never shown to visitors; they are mapped to localized human-readable labels."
-  - "AI-generated materials display a nuanced copyright status instead of automatically claiming 'Copyright © Webgogol. All rights reserved.'"
+  - "Internal enum values (commissioned-warpgogol-material, linked-public-source, AIPlatform, Organization) are never shown to visitors; they are mapped to localized human-readable labels."
+  - "AI-generated materials display a nuanced copyright status instead of automatically claiming 'Copyright © Warpgogol. All rights reserved.'"
   - "Third-party materials (Stuttgart Marathon photo, Komoot screenshot) either have a verified usageBasis or are removed from the site."
-  - "Each material card has a stable URL anchor (/bildnachweise/#webgogol-promo-video) that deep-links from other pages."
+  - "Each material card has a stable URL anchor (/bildnachweise/#warpgogol-promo-video) that deep-links from other pages."
   - "Repetitive copyright boilerplate is replaced by per-material usage status; a single explanatory text appears once at the bottom."
   - "Broken previews (single-letter placeholders, orphan 'Image' entry) are eliminated; build fails on missing previews for active records."
   - "material.credits.validate enforces: every active record has a preview, every third-party record has a usageBasis, Organization is never the author of a human-made work, AI-generated works don't auto-claim copyright."
@@ -79,13 +79,13 @@ RFC-0220 introduced site-wide material credits with a structured sidecar schema 
 
 ### Current problems
 
-1. **Raw enum values shown to visitors.** The credits page outputs internal values like `commissioned-webgogol-material`, `linked-public-source`, `screenshot-of-linked-public-source`, `AIPlatform`, and `Organization` directly in the visible `<dl>` metadata. These are internal codes, not public language.
+1. **Raw enum values shown to visitors.** The credits page outputs internal values like `commissioned-warpgogol-material`, `linked-public-source`, `screenshot-of-linked-public-source`, `AIPlatform`, and `Organization` directly in the visible `<dl>` metadata. These are internal codes, not public language.
 
-2. **Repetitive copyright boilerplate.** Every material card repeats `Copyright © 2026 Webgogol. All rights reserved unless otherwise stated.` even when the material is AI-generated (where the claim is legally questionable) or third-party (where the claim is false).
+2. **Repetitive copyright boilerplate.** Every material card repeats `Copyright © 2026 Warpgogol. All rights reserved unless otherwise stated.` even when the material is AI-generated (where the claim is legally questionable) or third-party (where the claim is false).
 
 3. **AI-generated materials auto-claim copyright.** The default `copyrightNotice` is applied uniformly. For fully AI-generated output, German copyright law (§ 2 Abs. 2 UrhG) requires human creative contribution; an organization cannot automatically be the author. The current schema and rendering do not distinguish.
 
-4. **Organization as author.** For human-made materials (e.g. the Andrii Syrokomskyi portrait), the `creator` is listed as `Webgogol (Organization)`. In Germany, only a natural person can be an Urheber (§ 7 UrhG). The schema allows this but the rendering should clarify the role.
+4. **Organization as author.** For human-made materials (e.g. the Andrii Syrokomskyi portrait), the `creator` is listed as `Warpgogol (Organization)`. In Germany, only a natural person can be an Urheber (§ 7 UrhG). The schema allows this but the rendering should clarify the role.
 
 5. **Third-party materials lack verified usage basis.** The Stuttgart Marathon photo uses `linked-public-source` as its license label, which is not a legal basis. The Komoot screenshot uses `screenshot-of-linked-public-source`, which also does not establish permission. These need either a verified `usageBasis` or removal.
 
@@ -103,7 +103,7 @@ RFC-0220 introduced site-wide material credits with a structured sidecar schema 
 
 The current material credits system (RFC-0220 + RFC-0232) is functional but has significant gaps that undermine its purpose as a provenance and rights disclosure surface:
 
-1. **Raw enum values shown to visitors** — internal codes like `commissioned-webgogol-material`, `AIPlatform`, `Organization` appear directly in the visible page.
+1. **Raw enum values shown to visitors** — internal codes like `commissioned-warpgogol-material`, `AIPlatform`, `Organization` appear directly in the visible page.
 2. **Repetitive copyright boilerplate** — every card repeats the same copyright notice, even for AI-generated or third-party materials where the claim is legally incorrect.
 3. **AI-generated materials auto-claim copyright** — German copyright law (§ 2 Abs. 2 UrhG) requires human creative contribution; the schema does not distinguish.
 4. **Third-party materials lack verified usage basis** — `linked-public-source` is a label, not a legal basis.
@@ -303,7 +303,7 @@ The generator (`material.credits.generate`) discovers where each credited materi
 
 The gallery section renders a "Використовується на" (Used on) list with human-readable page names and links.
 
-**Performance note:** the discovery scan is O(N×M) where N is the number of pages and M is the number of credit records. For `webgogol-com` (small site, ~20 pages, ~15 credits) this is negligible. The scan reuses the same content-reference resolution as existing validators (`collectMaterialRefs` in `material-credits.ts`), so no new I/O pattern is introduced. The scan runs at generation time (build.prepare), not at request time.
+**Performance note:** the discovery scan is O(N×M) where N is the number of pages and M is the number of credit records. For `warpgogol-com` (small site, ~20 pages, ~15 credits) this is negligible. The scan reuses the same content-reference resolution as existing validators (`collectMaterialRefs` in `material-credits.ts`), so no new I/O pattern is introduced. The scan runs at generation time (build.prepare), not at request time.
 
 ### Preview enforcement
 
@@ -362,7 +362,7 @@ The gallery section is updated to:
 A migrator (RFC-0479) transforms existing sidecar YAML files:
 
 1. Add `status: active` to all records.
-2. For `ai-generated` records with the default copyright notice: add `aiUsage: { kind: "ai-generated", humanContribution: "Konzeption, Auswahl, Zusammenstellung und Nachbearbeitung durch Webgogol", copyrightClaimed: <context-dependent> }`. The migrator checks: if the record already has a `humanContribution` field, explicit authorship parties (Person creator), or a non-default `copyrightNotice`, set `copyrightClaimed: true`. Otherwise set `copyrightClaimed: false`.
+2. For `ai-generated` records with the default copyright notice: add `aiUsage: { kind: "ai-generated", humanContribution: "Konzeption, Auswahl, Zusammenstellung und Nachbearbeitung durch Warpgogol", copyrightClaimed: <context-dependent> }`. The migrator checks: if the record already has a `humanContribution` field, explicit authorship parties (Person creator), or a non-default `copyrightNotice`, set `copyrightClaimed: true`. Otherwise set `copyrightClaimed: false`.
 3. For `third-party` records: add `usageBasis: { type: "unverified", note: "Rights review required" }` (forces operator to verify or remove).
 4. For `screenshot-of-linked-public-source` records: map `sourceType` to `screenshot` and add `usageBasis: { type: "unverified" }`.
 5. For `human-made` records with `creator: Organization`: rename the party role to `commissionedBy` and add a `Person` creator if known, or flag as `needs-review`.
@@ -419,13 +419,13 @@ New apps get the new validation rules by default — `material.credits.validate`
 ## Rollout
 
 1. **Schema + labels**: extend `materialCreditSchema` and `materialCreditLabelsSchema` in `@gogol/share`. Add label mapping helpers. The labels update (step 6) MUST happen in the same mission as the schema change — the new label fields are required in a `.strict()` schema, so existing labels files will fail `materialCreditLabelsSchema.parse()` until updated.
-2. **Migrator**: implement and register the RFC-0488 migrator in `@gogol/site-kernel-handoff`. Run it on `webgogol-com` to transform existing sidecars.
+2. **Migrator**: implement and register the RFC-0488 migrator in `@gogol/site-kernel-handoff`. Run it on `warpgogol-com` to transform existing sidecars.
 3. **Generator**: update `renderMaterialCreditProse` and `runGenerateMaterialCreditsPage` with label mapping, AI fields, usage locations, and anchors.
 4. **UI**: update `credits-gallery-section.astro` with new rendering.
 5. **Validator**: add new validation rules to `material.credits.validate`.
 6. **Labels**: add new `materialCredits` label keys to `src/content/site/{lang}/labels.md` for DE and UK. All 10 `sourceType` values (5 existing + 5 new), all 5 `status` values, all 8 `usageBasis.type` values, and `copyrightExplanation` must be present.
 7. **Rights audit**: operator reviews Stuttgart Marathon photo and Komoot screenshot. Either add verified `usageBasis` or remove the sidecar and asset.
-8. **Pilot**: regenerate the credits page for `webgogol-com` and verify the rendered output.
+8. **Pilot**: regenerate the credits page for `warpgogol-com` and verify the rendered output.
 9. **Switch to fail-hard**: enable new validation rules in `APPS_CHECK_AUTHOR_PIPELINE` (already wired — `material.credits.validate` is already a step in the pipeline).
 10. **Compass sync**: update `docs/technology.xml` if it tracks `@gogol/share` schema exports. Update `packages/share/AGENTS.md` to document the new label mapping helpers (`labelForSourceType`, `labelForStatus`, `labelForUsageBasis`).
 
@@ -460,11 +460,11 @@ New apps get the new validation rules by default — `material.credits.validate`
 - [x] `credits-gallery-section.astro` replaces single-letter placeholders with neutral type-labeled placeholders. (evidence: `packages/ui/src/sections/credits-gallery/credits-gallery-section.astro`)
 - [x] `material.credits.validate` enforces: `missing-preview`, `blocked-status`, `expired-status`, `missing-usage-basis`, `unverified-usage-basis`, `organization-as-author`, `ai-copyright-overstatement`. (evidence: `packages/os/site-kernel-checks/src/material-credits.ts:440-500`)
 - [x] RFC-0488 migrator is registered and transforms existing sidecars idempotently. (evidence: `packages/os/site-kernel-handoff/src/migrators/rfc-0488.ts`, PBT + snapshot tests pass)
-- [x] `src/content/site/{lang}/labels.md` includes new `materialCredits` label keys for DE and UK. (evidence: workpiece `missions/webgogol-com-m000010/workpiece/src/content/site/{de,uk}/labels.md`)
-- [x] Operator has reviewed Stuttgart Marathon photo and Komoot screenshot. Stuttgart: `usageBasis.type: quotation-right` (§ 51 UrhG, public event photo with source attribution). Komoot: `usageBasis.type: express-permission` (owned by Andrii Syrokomskyi, page owner). Komoot `sourceType` corrected from `composite` to `screenshot`, creator/rightsHolder corrected to Andrii Syrokomskyi. Both `reviewedAt: 2026-07-22`. (evidence: workpiece `missions/webgogol-com-m000010/workpiece/src/content/prose/{de,uk}/assets/winnenden-salzburg-tour.credits.yaml`, `marathon-stuttgart.credits.yaml`)
-- [x] `material.credits.validate --site webgogol-com` exits 0 after migration and rights audit. (evidence: `material.credits.validate --site webgogol-com --json` → status: warn, 0 violations; 3 missing-preview assets restored from Git LFS history — elektriker.webp, friseur.webp from surface/assets, promo.webm from pages/de/media)
-- [x] `content.references.validate --site webgogol-com` exits 0. (evidence: `content.references.validate --site webgogol-com --json` → status: pass)
-- [x] Dev build of `webgogol-com` starts without runtime errors on `/bildnachweise/`. (evidence: `astro build` → Complete! in 9.11s; `dist/client/de/bildnachweise/index.html` and `dist/client/bildnachweise/index.html` generated)
+- [x] `src/content/site/{lang}/labels.md` includes new `materialCredits` label keys for DE and UK. (evidence: workpiece `missions/warpgogol-com-m000010/workpiece/src/content/site/{de,uk}/labels.md`)
+- [x] Operator has reviewed Stuttgart Marathon photo and Komoot screenshot. Stuttgart: `usageBasis.type: quotation-right` (§ 51 UrhG, public event photo with source attribution). Komoot: `usageBasis.type: express-permission` (owned by Andrii Syrokomskyi, page owner). Komoot `sourceType` corrected from `composite` to `screenshot`, creator/rightsHolder corrected to Andrii Syrokomskyi. Both `reviewedAt: 2026-07-22`. (evidence: workpiece `missions/warpgogol-com-m000010/workpiece/src/content/prose/{de,uk}/assets/winnenden-salzburg-tour.credits.yaml`, `marathon-stuttgart.credits.yaml`)
+- [x] `material.credits.validate --site warpgogol-com` exits 0 after migration and rights audit. (evidence: `material.credits.validate --site warpgogol-com --json` → status: warn, 0 violations; 3 missing-preview assets restored from Git LFS history — elektriker.webp, friseur.webp from surface/assets, promo.webm from pages/de/media)
+- [x] `content.references.validate --site warpgogol-com` exits 0. (evidence: `content.references.validate --site warpgogol-com --json` → status: pass)
+- [x] Dev build of `warpgogol-com` starts without runtime errors on `/bildnachweise/`. (evidence: `astro build` → Complete! in 9.11s; `dist/client/de/bildnachweise/index.html` and `dist/client/bildnachweise/index.html` generated)
 - [x] `rfc.validate RFC-0488` passes. (evidence: `pnpm exec site-kernel run rfc.validate RFC-0488 --json` → status: pass)
 - [x] RFC-0220 `amendedBy` includes RFC-0488; RFC-0232 `amendedBy` includes RFC-0488. (evidence: `docs/rfcs/archive/implemented/rfc-0220-*.md`, `docs/rfcs/archive/implemented/rfc-0232-*.md`)
 

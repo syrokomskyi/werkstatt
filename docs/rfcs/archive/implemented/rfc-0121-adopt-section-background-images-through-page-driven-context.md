@@ -40,7 +40,7 @@ commands:
     - site.background.contract.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -206,7 +206,7 @@ All changed validators continue to return the RFC-0111 envelope:
   "status": "fail",
   "violations": [
     {
-      "file": "apps/webgogol-com/src/content/pages/de/home.md",
+      "file": "apps/warpgogol-com/src/content/pages/de/home.md",
       "rule": "BG-04",
       "message": "blocks[2] background.kind=image is missing imageName.",
       "fix": "Use background: { kind: image, imageName: \"...\" } with a bare filename."

@@ -197,12 +197,12 @@ Glob matching: use the same matcher already used for command-manifest `reads`/`w
   "status": "ok",
   "mode": "working-tree",
   "overall": "low",
-  "impactedApps": ["webgogol-com"],
+  "impactedApps": ["warpgogol-com"],
   "perPath": [
-    { "path": "apps/webgogol-com/src/content/pages/de/home.md", "class": "low", "ruleId": "IMP-CONTENT" }
+    { "path": "apps/warpgogol-com/src/content/pages/de/home.md", "class": "low", "ruleId": "IMP-CONTENT" }
   ],
   "recommendation": {
-    "commands": ["apps-check.author --app webgogol-com"],
+    "commands": ["apps-check.author --app warpgogol-com"],
     "note": "Advisory only. app.contract.full remains the readiness signal (DNA-35)."
   }
 }

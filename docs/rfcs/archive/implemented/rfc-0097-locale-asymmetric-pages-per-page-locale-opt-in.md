@@ -22,7 +22,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - share
   - os/site-kernel-content
@@ -59,7 +59,7 @@ The runtime route resolver in `@gogol/share/astro/routes.ts` iterates `i18n.supp
 [routes] No route for pageId impressum in language uk
 ```
 
-This was the noise the user saw after the May 2026 webgogol-com onboarding added Impressum + Datenschutz (DE-only — Ukrainian law has no Impressum requirement). The warning fires on every page render in every locale that doesn't have the page.
+This was the noise the user saw after the May 2026 warpgogol-com onboarding added Impressum + Datenschutz (DE-only — Ukrainian law has no Impressum requirement). The warning fires on every page render in every locale that doesn't have the page.
 
 ## Problem
 
@@ -112,7 +112,7 @@ Three call sites in `@gogol/share`:
 
 ### Migration
 
-- webgogol-com: add `locales: [de]` to the `impressum` and `datenschutz` entries in `system.md`.
+- warpgogol-com: add `locales: [de]` to the `impressum` and `datenschutz` entries in `system.md`.
 - nicaragua-projekt: `donateContact` has routes in `{de, en}` — both are listed in `i18n.supported`, so no `locales` field is needed.
 - Other apps unaffected.
 
@@ -141,7 +141,7 @@ Three call sites in `@gogol/share`:
 - [x] `resolveLocalizedPagePath` returns `null` without warning for pages outside their declared `locales`. — `packages/share/src/astro/routes.ts:resolveLocalizedPagePath` short-circuits silently when `entry.locales` is set and `lang ∉ entry.locales`. (evidence: packages/ directory, package exists)
 - [x] `getStaticPathsFromRegistry` filters by `locales`. — same module, defensive re-check in the lang × slug iteration so authored routes drifting from `locales` never produce a half-built page. (evidence: implemented historically)
 - [x] `getLocalizedSiblingPath` returns the locale-home path when the target locale is not in the source page's `locales`; the language-switcher reaches home instead of a 404. — wired in the same module. (evidence: implemented historically)
-- [x] webgogol-com `system.md` carries `locales: [de]` on impressum + datenschutz. — annotated in the pages list. (evidence: implemented historically)
+- [x] warpgogol-com `system.md` carries `locales: [de]` on impressum + datenschutz. — annotated in the pages list. (evidence: implemented historically)
 - [x] nicaragua-projekt build remains identical (no `locales` field added; routes already cover all supported locales). — schema field is optional; nicaragua's manifest is unchanged. (evidence: original apps retired by RFC-0381, implemented historically)
 
 ## Implementation notes for agents

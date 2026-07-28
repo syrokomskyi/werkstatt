@@ -185,7 +185,7 @@ packages/ontology/src/shared-section-props/
 ### Apps migrated
 
 ```
-apps/webgogol-com/src/content/pages/de/{home,notausgang,pricing,contact,digitales-fundament}.md
+apps/warpgogol-com/src/content/pages/de/{home,notausgang,pricing,contact,digitales-fundament}.md
 apps/nicaragua-projekt/src/content/pages/de/{home,about-us,faq}.md
 apps/nicaragua-projekt/src/content/pages/en/{home,about-us,faq}.md
 ```

@@ -34,7 +34,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - business
@@ -94,9 +94,9 @@ For each claim with a validity window, given `today`:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run content.freshness.validate --app webgogol-com
-pnpm exec site-kernel run content.freshness.validate --app webgogol-com --json
-pnpm exec site-kernel run content.freshness.report   --app webgogol-com   # ledger view, never fails
+pnpm exec site-kernel run content.freshness.validate --app warpgogol-com
+pnpm exec site-kernel run content.freshness.validate --app warpgogol-com --json
+pnpm exec site-kernel run content.freshness.report   --app warpgogol-com   # ledger view, never fails
 ```
 
 ### TypeScript contracts

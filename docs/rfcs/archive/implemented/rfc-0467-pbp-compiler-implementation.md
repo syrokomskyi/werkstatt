@@ -52,7 +52,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@gogol/pbp"
@@ -334,7 +334,7 @@ async function resolveReferences(
 
 - For each `PbpEntityRef` in each entity: verifies target exists in the index
 - Verifies `expectedType` matches the target entity's `type` field
-- Detects locale suffixes in IDs (`webgogol.de`, `webgogol/de/`) — emits `PBP-REF` error
+- Detects locale suffixes in IDs (`warpgogol.de`, `warpgogol/de/`) — emits `PBP-REF` error
 - Runs cycle detection on 5 graph types (RFC-0407):
   - `requires` (Offering → Offering)
   - `category-broader` (Category → Category)
@@ -586,7 +586,7 @@ N/A — library-only. The compiler returns `PbpCompilerResult` to the caller.
 
 - **Immediate:** Upon acceptance, the compiler is implemented in `packages/pbp/src/compiler/`.
 - **No site impact:** The compiler is not yet called by any site. Sites still use `@gogol/business` loaders until RFC-0469.
-- **Golden fixtures:** Each phase ships with golden fixture tests. Fixtures are derived from the Webgogol target manifest blueprint (`pbp-specification-package/target-blueprint`).
+- **Golden fixtures:** Each phase ships with golden fixture tests. Fixtures are derived from the Warpgogol target manifest blueprint (`pbp-specification-package/target-blueprint`).
 - **Dependency chain:** Depends on RFC-0466 (Zod schemas). Required by RFC-0468 (Content) and RFC-0469 (Cutover).
 
 ## Alternatives considered
@@ -598,7 +598,7 @@ N/A — library-only. The compiler returns `PbpCompilerResult` to the caller.
 
 ## Risks
 
-- **Performance.** The 14-phase pipeline may be slow for large catalogs. Mitigation: Wave 1 is scoped to Webgogol (~30 entities). Incremental processing (RFC-0430) is Wave 3.
+- **Performance.** The 14-phase pipeline may be slow for large catalogs. Mitigation: Wave 1 is scoped to Warpgogol (~30 entities). Incremental processing (RFC-0430) is Wave 3.
 - **Determinism violations.** If any phase uses non-deterministic operations (e.g. `Object.keys()` order, `Date.now()`), reproducible builds break. Mitigation: all phases use sorted iteration; `buildTime` is injected from the caller, not `new Date()`.
 - **Schema drift.** If Zod schemas (RFC-0466) diverge from the compiler's expectations, validation may pass but projections may fail. Mitigation: golden fixture tests validate the full pipeline end-to-end.
 - **Migration strictness.** The `migration` strictness mode allows errors to pass, which may mask real issues. Mitigation: the migration plan (RFC-0468) requires all errors to be resolved before cutover (RFC-0469).

@@ -45,7 +45,7 @@ commands:
   removed: []
 appsImpacted:
   - apps/nicaragua-projekt
-  - apps/webgogol-com
+  - apps/warpgogol-com
   - apps/*
 packagesImpacted:
   - packages/business
@@ -73,7 +73,7 @@ nonGoals:
 Both shipping sites already present "the people behind the business", but each does it differently and redundantly:
 
 - **nicaragua-projekt** renders a `team` section on its About page ([`about-us.md`](../../apps/nicaragua-projekt/src/content/pages/de/about-us.md)) whose `members[]` (name, role, image) are **inlined per page file per language**, while the bios live separately in `business/{lang}/team/{slug}.md` ([`martina-morich.md`](../../apps/nicaragua-projekt/src/content/business/de/team/martina-morich.md)), and a **per-app route hack** in [`[lang]/[...slug].astro`](../../apps/nicaragua-projekt/src/pages/[lang]/[...slug].astro) stitches the bios back into the block by matching `slug` and the hardcoded cosmic planet name `"Mimas"`.
-- **webgogol-com** renders a solo "about me" via a bespoke `founder-trust-card` section ([`home.md`](../../apps/webgogol-com/src/content/pages/de/home.md)) with its own fields (name, location, yearsExperience, statement, image, cta).
+- **warpgogol-com** renders a solo "about me" via a bespoke `founder-trust-card` section ([`home.md`](../../apps/warpgogol-com/src/content/pages/de/home.md)) with its own fields (name, location, yearsExperience, statement, image, cta).
 - Independently, **governance identity** lives in `company.brand.founders[]` and `company.boardMembers[]` ([`company.md`](../../apps/nicaragua-projekt/src/content/business/de/company.md)), which feed `buildSiteSemanticProfile` → Organization/Person JSON-LD ([`semantic-profile.ts`](../../packages/business/src/semantic-profile.ts)).
 
 The platform already has every building block this module needs: the business content layer with RFC-0008 deep-merge localization and RFC-0024 schema dispatch, the Image Provider Port (RFC-0152), the corrected JSON-LD pipeline (RFC-0163) and shared org-profile assembler (RFC-0148), the route-source / virtual-route pattern (RFC-0192) with entitlement gating (RFC-0169), per-language localized slugs (RFC-0048/RFC-0199), and the section scaffold (RFC-0112). What is missing is the **composition of these into one coherent, agent-buildable, sellable People module**.
@@ -118,7 +118,7 @@ pnpm exec site-kernel run people.validate --app nicaragua-projekt --json
 pnpm exec site-kernel run people.validate --all
 
 # Scaffold a new canonical Person record (+ asset placeholder, optional profile-page opt-in).
-pnpm exec site-kernel run person.create --app webgogol-com --slug andrii-syrokomskyi --lang de --page
+pnpm exec site-kernel run person.create --app warpgogol-com --slug andrii-syrokomskyi --lang de --page
 ```
 
 ### TypeScript contracts
@@ -240,7 +240,7 @@ export async function getPersonProfileRoutes(): Promise<PersonRouteEntry[]>;
 ## Rollout
 
 - **Phase 0 — Canonical Person records + governance rewire (ungated).** Add `personSchema` + `people/` loaders; rename both apps' `business/{lang}/team/` → `business/{lang}/people/` and enrich records (photo token, role, affiliations, lifespan, spotlight fields migrated out of `company`/`founder-trust-card`). Rewire `buildSiteSemanticProfile` to derive founders/board/team from `affiliations`; remove `company.brand.founders`/`boardMembers`. Extend `SemanticPerson` + the Person JSON-LD node. Ship `people.validate` v1 (record contract) and join `apps-check.run`.
-- **Phase 1 — People section (ungated).** Add the `people` section (grid + spotlight), its manifest (`intent: introduce-team, humanise-brand, attribute-ownership, build-trust`), and uni.registry entry; reserve a new cosmic planet name. Migrate nicaragua's About to the new section (select by `affiliation`/`slugs`) and webgogol's home to `layout: spotlight`. **Delete** `team` and `founder-trust-card` and the route bio-merge hack + its codegen template.
+- **Phase 1 — People section (ungated).** Add the `people` section (grid + spotlight), its manifest (`intent: introduce-team, humanise-brand, attribute-ownership, build-trust`), and uni.registry entry; reserve a new cosmic planet name. Migrate nicaragua's About to the new section (select by `affiliation`/`slugs`) and warpgogol's home to `layout: spotlight`. **Delete** `team` and `founder-trust-card` and the route bio-merge hack + its codegen template.
 - **Phase 2 — Per-member profile pages (gated by `team.profiles`).** Add `getPersonProfileRoutes` + the route-registry merge behind the entitlement; add the page-handler `person:` branch and the `person` page archetype; emit `ProfilePage`/`Person`/`og:profile`; profile pages feed Markdown twins (RFC-0166) and the sitemap automatically. Activate `linkToProfile`. Extend `people.validate` with route/entitlement checks. Add `"team.profiles"` to the entitlement catalog + `entitlements.validate`.
 - **Phase 3 — Agent buildability hardening.** Ship the `section.scaffold` `people` template + the `person.create` command; document the authoring surface in `apps/AGENTS.md` (add a person, place the section on any page, pick members by slug, enable a profile page, the gating); confirm deterministic `NEED_THIS_*` placeholders and registry discoverability.
 
@@ -267,10 +267,10 @@ The module ships **disabled-for-pages-by-default**: an app with no `people/` rec
 - [x] `personSchema` + `PERSON_AFFILIATIONS` defined in `@gogol/business`; `getPeople`/`getPersonBySlug` loaders; `people/` registered in the repeatable dispatcher (replacing `team/`). (evidence: packages/ directory, package exists)
 - [x] `company.brand.founders` and `company.boardMembers` removed; `buildSiteSemanticProfile` derives founders/board/team from `affiliations`; `SemanticPerson` + Person JSON-LD emit `birthDate`/`deathDate`/`image`/`sameAs`. **Both** the Astro and the disk (`semantic-loader.ts`) paths derive governance from affiliations. (evidence: implemented historically)
 - [x] `people` section (grid + spotlight) self-loads records via a build-time enumerator; supports `select` by `slugs`/`affiliation`/`all` and `linkToProfile`; manifest + uni.registry entry added. **Scope notes:** the introductory word is composed as a preceding `markdown` block (not a section `intro` prop — avoids duplicating the prose pipeline); the cosmic planet is the reused `Mimas` (the `team`→`people` archetype rename) rather than a newly reserved name. (evidence: implemented historically)
-- [x] `team` and `founder-trust-card` sections deleted; inline `members[]` block shape removed; the route-level bio-merge hack and its codegen template removed; both apps migrated (nicaragua About → `people` section; webgogol home → `spotlight`). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `team` and `founder-trust-card` sections deleted; inline `members[]` block shape removed; the route-level bio-merge hack and its codegen template removed; both apps migrated (nicaragua About → `people` section; warpgogol home → `spotlight`). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Member photos resolve through the Image Provider Port (RFC-0152) via a `business/<lang>/assets/` token fallback; no raw `/src` image paths remain in people content. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `"person"` added to `semanticPageTypeSchema` / `SemanticPageType`; `getPersonProfileRoutes` + route-registry merge gate per-member pages behind `team.profiles`; the page handler synthesizes `person:<slug>` blocks from the record; pages emit `@type ["WebPage","ProfilePage"]` + `Person` `mainEntity` + `og:type=profile`, and feed the sitemap + Markdown twins + llms. (evidence: original apps retired by RFC-0381, implemented historically)
-- [x] `"team.profiles"` added to `ENTITLED_FEATURES` + Stripe lookup map; `entitlements.validate` recognizes it (closed-catalog check); with the feature absent, no profile route compiles and the sitemap omits them (fail-open when entitlements unknown). Gating mirrors the verified blog/pseo pattern; webgogol-com dogfoods `team.profiles`. (evidence: implemented historically)
+- [x] `"team.profiles"` added to `ENTITLED_FEATURES` + Stripe lookup map; `entitlements.validate` recognizes it (closed-catalog check); with the feature absent, no profile route compiles and the sitemap omits them (fail-open when entitlements unknown). Gating mirrors the verified blog/pseo pattern; warpgogol-com dogfoods `team.profiles`. (evidence: implemented historically)
 - [x] `people.validate` registered and in `apps-check` (author phase); `--json` output stable; no-op pass when an app uses no people; warns (non-fatal) on a `page.enabled` record without the `team.profiles` entitlement. (evidence: implemented historically)
 - [x] `person.create` scaffolds a record (optional `--page`) with `NEED_THIS_*` placeholders. **Scope note:** no bespoke `section.scaffold` _people_ template was added — the generic `composite` bodyKind scaffold already covers a people-style section; `person.create` is the people-specific scaffold. (evidence: implemented historically)
 - [x] `apps/AGENTS.md` (and `packages/ui/AGENTS.md` for the section) document the People authoring surface for AI agents; `docs/COMMANDS.md` lists `people.validate` + `person.create`. (evidence: AGENTS.md:1, agent guide updated)

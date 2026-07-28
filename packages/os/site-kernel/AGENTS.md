@@ -66,9 +66,9 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 
 ## RFC governance
 
-- The `rfc.*` command domain has migrated to `@webgogol/forge/os/rfc` (RFC-0374, RFC-0391). The former `src/rfc/` tree is deleted.
-- site-kernel re-exports RFC types and handlers from `@webgogol/forge/os/rfc` in `src/index.ts` for backward-compatible imports.
-- The `forgeRfcModule` is registered in `tools/kernel.config.ts` via `@webgogol/forge/os/rfc-module`.
+- The `rfc.*` command domain has migrated to `@warpgogol/forge/os/rfc` (RFC-0374, RFC-0391). The former `src/rfc/` tree is deleted.
+- site-kernel re-exports RFC types and handlers from `@warpgogol/forge/os/rfc` in `src/index.ts` for backward-compatible imports.
+- The `forgeRfcModule` is registered in `tools/kernel.config.ts` via `@warpgogol/forge/os/rfc-module`.
 - RFC files live in `docs/rfcs/` at the workspace root.
 - Agent behavioral rules for RFCs are in the root `AGENTS.md`, not per-RFC.
 
@@ -82,7 +82,7 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - `cache-module.ts` — registers `kernel.cache.status` and `kernel.cache.clear` commands.
 - Cache DB stored at `.cache/kernel-cache.db` (gitignored).
 - All RFC commands support `--force-cache-refresh` flag to bypass cache.
-- Manifest-first lifecycle validation: lifecycle handler in `@webgogol/forge/os/rfc` reads command names from `docs/command-manifest.generated.yaml` first, falls back to `listRegisteredKernelCommands` when manifest is stale.
+- Manifest-first lifecycle validation: lifecycle handler in `@warpgogol/forge/os/rfc` reads command names from `docs/command-manifest.generated.yaml` first, falls back to `listRegisteredKernelCommands` when manifest is stale.
 
 ## Command-result cache (RFC-0390)
 

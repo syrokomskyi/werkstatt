@@ -3,7 +3,7 @@
 <purpose>
 RFC-0557: workpiece.imports.validate — scans all generated .ts/.mjs/.astro files
 in the materialized workpiece's tools/ and src/ directories for @warpgogol/* and
-@webgogol/* imports, and verifies each import resolves from root node_modules
+@warpgogol/* imports, and verifies each import resolves from root node_modules
 (symlink existence check). Integrated into SITES_BUILD_PREPARE_PIPELINE as the
 first step.
 </purpose>

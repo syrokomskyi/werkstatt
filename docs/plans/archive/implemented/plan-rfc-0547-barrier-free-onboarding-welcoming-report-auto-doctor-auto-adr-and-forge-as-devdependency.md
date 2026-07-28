@@ -20,7 +20,7 @@ scope:
 
 - [ ] Objective 1 — Redesign `forge-bootstrap` SKILL.md with barrier-free process (register selection, name/gender, auto-doctor, silent auto-ADR, project analysis, first creation moment, welcoming report) — maps to acceptance criteria 1-10
 - [ ] Objective 2 — Create knowledge files (`forge-about.md`, `operator-profile-template.md`, `project-narrative-template.md`, `milestone-gallery/`) and declare them in skill frontmatter — maps to acceptance criteria 15-20
-- [ ] Objective 3 — Add `@webgogol/forge` as devDependency in all scaffold profiles — maps to acceptance criterion 11
+- [ ] Objective 3 — Add `@warpgogol/forge` as devDependency in all scaffold profiles — maps to acceptance criterion 11
 - [ ] Objective 4 — Add `operator-profile.md` to `.gitignore` in all scaffold profiles — maps to acceptance criterion 12
 - [ ] Objective 5 — Implement git history transfer (remove `.git` from excludes, implement `postSetup` in both adapters) — maps to acceptance criteria 13-14
 - [ ] Objective 6 — Update `packages/forge/AGENTS.md` Output contract section — maps to acceptance criterion 21
@@ -36,9 +36,9 @@ scope:
 
 ### 2.2 Configuration and data
 
-- `packages/forge/profiles/forge-shell.yaml` — add `@webgogol/forge` to install steps; add `operator-profile.md` to `.gitignore`
-- `packages/forge/profiles/astro-typescript-turborepo.yaml` — add `@webgogol/forge` to root devDependencies install; add `operator-profile.md` to `.gitignore`
-- `packages/forge/profiles/phaser-turborepo.yaml` — add `@webgogol/forge` to root devDependencies install; add `operator-profile.md` to `.gitignore`
+- `packages/forge/profiles/forge-shell.yaml` — add `@warpgogol/forge` to install steps; add `operator-profile.md` to `.gitignore`
+- `packages/forge/profiles/astro-typescript-turborepo.yaml` — add `@warpgogol/forge` to root devDependencies install; add `operator-profile.md` to `.gitignore`
+- `packages/forge/profiles/phaser-turborepo.yaml` — add `@warpgogol/forge` to root devDependencies install; add `operator-profile.md` to `.gitignore`
 - `packages/forge/skills/meta/forge-bootstrap/SKILL.md` — redesigned process, `knowledge` frontmatter array
 
 ### 2.3 Documentation and specs
@@ -51,8 +51,8 @@ scope:
 
 ### 2.4 Validation and pipelines
 
-- `pnpm --filter @webgogol/forge run build:check` — typecheck
-- `pnpm --filter @webgogol/forge run test` — unit tests
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck
+- `pnpm --filter @warpgogol/forge run test` — unit tests
 - `pnpm exec site-kernel run forge.skill.validate` — skill validation
 - `pnpm exec site-kernel run rfc.validate RFC-0547` — RFC validation
 
@@ -118,27 +118,27 @@ scope:
 
 ### Step 3. Update scaffold profiles
 
-**Goal:** Add `@webgogol/forge` as devDependency and `operator-profile.md` to `.gitignore` in all three profiles.
+**Goal:** Add `@warpgogol/forge` as devDependency and `operator-profile.md` to `.gitignore` in all three profiles.
 
 **Agent actions:**
 
 - `packages/forge/profiles/forge-shell.yaml`:
-  - Add `pnpm add -D @webgogol/forge` to `install` array.
+  - Add `pnpm add -D @warpgogol/forge` to `install` array.
   - Add a `.gitignore` file entry in `workspace.files` with content including `operator-profile.md`.
 - `packages/forge/profiles/astro-typescript-turborepo.yaml`:
-  - Add `@webgogol/forge` to the root `install` array (alongside `pnpm add -D typescript turbo`).
+  - Add `@warpgogol/forge` to the root `install` array (alongside `pnpm add -D typescript turbo`).
   - Add `operator-profile.md` to the existing `.gitignore` file content in `workspace.files`.
 - `packages/forge/profiles/phaser-turborepo.yaml`:
-  - Add `@webgogol/forge` to the root `install` array (alongside `pnpm add -D typescript turbo`).
+  - Add `@warpgogol/forge` to the root `install` array (alongside `pnpm add -D typescript turbo`).
   - Add `operator-profile.md` to the existing `.gitignore` file content in `workspace.files`.
 
 **Validation:**
 
-- All three profiles contain `@webgogol/forge` in their install steps.
+- All three profiles contain `@warpgogol/forge` in their install steps.
 - All three profiles contain `operator-profile.md` in their `.gitignore` content.
-- `pnpm --filter @webgogol/forge run test` — scaffold-project tests pass.
+- `pnpm --filter @warpgogol/forge run test` — scaffold-project tests pass.
 
-**Completion criterion:** All three profiles include both `@webgogol/forge` in install steps and `operator-profile.md` in `.gitignore` content.
+**Completion criterion:** All three profiles include both `@warpgogol/forge` in install steps and `operator-profile.md` in `.gitignore` content.
 
 **Human review:** no
 
@@ -162,8 +162,8 @@ scope:
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run build:check` — typecheck passes.
-- `pnpm --filter @webgogol/forge run test` — migration-adapter tests pass.
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck passes.
+- `pnpm --filter @warpgogol/forge run test` — migration-adapter tests pass.
 - `DEFAULT_EXCLUDE_PATTERNS` no longer contains `.git`.
 
 **Completion criterion:** Both adapters have working `postSetup` implementations; typecheck and tests pass.
@@ -185,15 +185,15 @@ scope:
   - Add test: `postSetup` transfers git history via format-patch + git am when source has commits (accept path).
   - Add test: `postSetup` falls back to `git init` when git history transfer fails (decline path / failure path).
 - `packages/forge/src/tests/scaffold-project.test.ts` (or `stack-profile.test.ts`):
-  - Add test: all three profiles include `@webgogol/forge` in install steps.
+  - Add test: all three profiles include `@warpgogol/forge` in install steps.
   - Add test: all three profiles include `operator-profile.md` in `.gitignore` content.
 - `packages/forge/src/tests/skill-validate.test.ts`:
   - Verify `forge-bootstrap` skill passes `forge.skill.validate` with the new `knowledge` array.
 
 **Validation:**
 
-- `pnpm --filter @webgogol/forge run test` — all tests pass.
-- `pnpm --filter @webgogol/forge run build:check` — typecheck passes.
+- `pnpm --filter @warpgogol/forge run test` — all tests pass.
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck passes.
 
 **Completion criterion:** All new and updated tests pass; typecheck passes.
 
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `packages/forge/AGENTS.md` contains the updated Output contract paragraph.
-- `pnpm --filter @webgogol/forge run build:check` — typecheck passes (AGENTS.md is not typechecked, but ensures no code breakage).
+- `pnpm --filter @warpgogol/forge run build:check` — typecheck passes (AGENTS.md is not typechecked, but ensures no code breakage).
 
 **Completion criterion:** AGENTS.md Output contract section includes the zero-CLI-commands-in-skill-reports clarification.
 
@@ -227,8 +227,8 @@ scope:
 
 **Agent actions:**
 
-- Run `pnpm --filter @webgogol/forge run build:check` — typecheck.
-- Run `pnpm --filter @webgogol/forge run test` — all tests.
+- Run `pnpm --filter @warpgogol/forge run build:check` — typecheck.
+- Run `pnpm --filter @warpgogol/forge run test` — all tests.
 - Run `pnpm exec site-kernel run forge.skill.validate` — skill validation.
 - Run `pnpm exec site-kernel run rfc.validate RFC-0547` — RFC validation.
 - Check off each acceptance criterion in the RFC file with inline `(evidence: <file:line>, <test-or-command>)` annotations (V-27).
@@ -254,8 +254,8 @@ scope:
 ### 4.1 Required checks
 
 - `pnpm exec site-kernel run rfc.validate RFC-0547`
-- `pnpm --filter @webgogol/forge run build:check`
-- `pnpm --filter @webgogol/forge run test`
+- `pnpm --filter @warpgogol/forge run build:check`
+- `pnpm --filter @warpgogol/forge run test`
 - `pnpm exec site-kernel run forge.skill.validate`
 
 ### 4.2 Evidence artifacts
@@ -272,7 +272,7 @@ scope:
 | Auto-ADR content quality | Step 2: SKILL.md instructs agent to ask operator's reason for adopting Forge and include in ADR |
 | Recommendation quality | Step 2: SKILL.md specifies creator-facing recommendations, not technical refactors |
 | Git history transfer performance | Step 4: postSetup warns operator; operator can decline |
-| `@webgogol/forge` version drift | Step 3: `forge.doctor` checks `forge.syncedVersion` (already implemented per RFC-0543) |
+| `@warpgogol/forge` version drift | Step 3: `forge.doctor` checks `forge.syncedVersion` (already implemented per RFC-0543) |
 | Agent misinterpretation (CLI commands in report) | Step 2: SKILL.md explicitly states "zero CLI commands"; Step 6: AGENTS.md reinforces |
 | Operator declines everything | Step 2: SKILL.md notes no step is mandatory beyond language, register, and project verification |
 | First creation moment fails | Step 2: SKILL.md offers template or recommendation as fallback |

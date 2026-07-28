@@ -50,7 +50,7 @@ Additionally:
 
 > `SITES_BUILD_CHECK_PIPELINE` — after `yaml.contract.lint` (which runs in `build.prepare`), before the Astro build.
 
-This is **incorrect**. `yaml.contract.lint` runs in `SITES_BUILD_PREPARE_PIPELINE` (confirmed at `@/home/syrokomskyi/projects/webgogol/webgogol-4/packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:17`), not in `SITES_BUILD_CHECK_PIPELINE`. The RFC proposes adding `yaml.parse.validate` to `SITES_BUILD_CHECK_PIPELINE` "after `yaml.contract.lint`" — but `yaml.contract.lint` is not in that pipeline. The RFC should either:
+This is **incorrect**. `yaml.contract.lint` runs in `SITES_BUILD_PREPARE_PIPELINE` (confirmed at `@/home/syrokomskyi/projects/warpgogol/warpgogol-4/packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:17`), not in `SITES_BUILD_CHECK_PIPELINE`. The RFC proposes adding `yaml.parse.validate` to `SITES_BUILD_CHECK_PIPELINE` "after `yaml.contract.lint`" — but `yaml.contract.lint` is not in that pipeline. The RFC should either:
 
 1. Add `yaml.parse.validate` to `SITES_BUILD_PREPARE_PIPELINE` (after `yaml.contract.lint`), or
 2. Add it to `SITES_BUILD_CHECK_PIPELINE` as a standalone step (not "after yaml.contract.lint").
@@ -96,7 +96,7 @@ export default tseslint.config(
 );
 ```
 
-The current `eslint.config.js` (`@/home/syrokomskyi/projects/webgogol/webgogol-4/eslint.config.js`) uses `typescript-eslint` flat config with a custom `local-rules` plugin only. The proposed config uses `yml.parsers[".yaml"]` — but `eslint-plugin-yml` flat-config support requires `eslint-plugin-yml/flat` or the `yaml-eslint-parser` package as a separate parser dependency. The RFC should specify the correct import path for flat config (e.g., `import yml from "eslint-plugin-yml/flat"` or the equivalent for the current version) and verify compatibility with ESLint 10.x (the repo uses `eslint: ^10.7.0`).
+The current `eslint.config.js` (`@/home/syrokomskyi/projects/warpgogol/warpgogol-4/eslint.config.js`) uses `typescript-eslint` flat config with a custom `local-rules` plugin only. The proposed config uses `yml.parsers[".yaml"]` — but `eslint-plugin-yml` flat-config support requires `eslint-plugin-yml/flat` or the `yaml-eslint-parser` package as a separate parser dependency. The RFC should specify the correct import path for flat config (e.g., `import yml from "eslint-plugin-yml/flat"` or the equivalent for the current version) and verify compatibility with ESLint 10.x (the repo uses `eslint: ^10.7.0`).
 
 **Minimal command surface**: `yaml.parse.validate` earns its existence — it checks parse validity and duplicate keys, which `yaml.contract.lint` does not do. Not a flag on an existing command.
 

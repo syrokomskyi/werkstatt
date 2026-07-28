@@ -94,7 +94,7 @@ Package boundaries are correct: `@gogol/surface` (blueprint types), `@gogol/onto
 - **`surface.redirect.validate`** — this is a runtime check (verifies 301 responses on a deployed site). The ecosystem is build-time-focused. The RFC does not explain how this command connects to the deployed site (HTTP requests? Playwright? checking the `_redirects` file?). If it checks the `_redirects` file statically, it could be a flag on `surface.validate`. If it checks live URLs, it needs a target URL parameter and is closer to a fleet probe than a build check.
 - **No TypeScript contracts** — the RFC provides no type signatures for redirect map entries, migration data, or validation results.
 - **Existing patterns** — the RFC does not check whether `surface.generate` or `surface.validate` can be extended before proposing new commands.
-- **Scope discipline** — `appsImpacted: [webgogol-com]` is correct (only webgogol-com uses `website-local`). `packagesImpacted` is correct. `nonGoals` are explicit and meaningful. OK.
+- **Scope discipline** — `appsImpacted: [warpgogol-com]` is correct (only warpgogol-com uses `website-local`). `packagesImpacted` is correct. `nonGoals` are explicit and meaningful. OK.
 
 ## Axis G — Blind spots
 

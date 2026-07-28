@@ -58,7 +58,7 @@ commands:
     - every legacy per-section visual / header / body / cta / image-fade prop and CSS class superseded by RFC-0101 through RFC-0106
     - packages/share/src/schemas/visual-modifiers.ts
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -87,7 +87,7 @@ nonGoals:
 
 RFC-0101 through RFC-0106 define the new section-assembly framework: shell, header, body content union, CTA, site background, and motion. Each RFC describes its own slice in isolation. This RFC sequences the repo-wide rollout, enforces a flag-day cutover, and updates the agent-facing documentation so AI-driven workflows produce compliant sites end to end.
 
-This is the only RFC in the series that performs writes outside `packages/share`, `packages/ui`, `packages/ontology`, and the related validators — it migrates `apps/webgogol-com`, `apps/nicaragua-projekt`, the scaffold templates, the workflows under `.agents/`, and the agent rules.
+This is the only RFC in the series that performs writes outside `packages/share`, `packages/ui`, `packages/ontology`, and the related validators — it migrates `apps/warpgogol-com`, `apps/nicaragua-projekt`, the scaffold templates, the workflows under `.agents/`, and the agent rules.
 
 ## Problem
 
@@ -142,7 +142,7 @@ Section `.css` files keep only content-specific rules; visual modifier CSS is go
 
 ### Step 5 — Migrate apps
 
-`apps/webgogol-com` and `apps/nicaragua-projekt`:
+`apps/warpgogol-com` and `apps/nicaragua-projekt`:
 
 - Page Markdown frontmatter under `src/content/pages/{lang}/*.md` is rewritten to the new shape: structured `background`, `glass`, `density`, `tone`, `header.{heading, subheading, align}`, `body.{kind, ...}`, optional `cta` / `ctaGroup`, optional `motion`.
 - Pages that need a site background add a `site-background` shell block at the top of the `blocks: [...]` list.
@@ -211,9 +211,9 @@ The last gate in the merge train runs:
 
 ```
 pnpm exec site-kernel run packages-check.run
-pnpm exec site-kernel run apps-check.author --app webgogol-com
+pnpm exec site-kernel run apps-check.author --app warpgogol-com
 pnpm exec site-kernel run apps-check.author --app nicaragua-projekt
-pnpm exec site-kernel run onboarding.phase.validate --app webgogol-com --phase=04-author
+pnpm exec site-kernel run onboarding.phase.validate --app warpgogol-com --phase=04-author
 pnpm exec site-kernel run onboarding.phase.validate --app nicaragua-projekt --phase=04-author
 pnpm exec site-kernel run workflow.lint
 pnpm exec site-kernel run rfc.validate
@@ -295,13 +295,13 @@ The migration is verifiable per app: the train passes when `apps-check.author` i
 ## Risks
 
 - The merge train is large. Mitigation: each step is a separate commit verified by validators; the train only merges when the final gate is green.
-- Hidden coupling in app-specific overrides (e.g., bespoke prose in `apps/webgogol-com/src/content/prose/`) may surface during page-block validation; mitigation: prose is content-only and untouched.
+- Hidden coupling in app-specific overrides (e.g., bespoke prose in `apps/warpgogol-com/src/content/prose/`) may surface during page-block validation; mitigation: prose is content-only and untouched.
 - Some biomes may need a `motion.reveal` envelope update to allow agents to express the desired effect — addressed by amending the biome YAML, not the framework.
 
 ## Acceptance criteria
 
 - [x] `packages-check.run` is green workspace-wide. (evidence: implemented historically)
-- [x] `apps-check.author --app webgogol-com` and `apps-check.author --app nicaragua-projekt` are green. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `apps-check.author --app warpgogol-com` and `apps-check.author --app nicaragua-projekt` are green. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `onboarding.phase.validate --phase=04-author` is green for both apps. (evidence: implemented historically)
 - [x] `workflow.lint` is green. (evidence: implemented historically)
 - [x] `rfc.validate` is green for RFC-0101..RFC-0107 and updates the supersede relationships: (evidence: implemented historically)

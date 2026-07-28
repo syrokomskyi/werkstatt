@@ -162,7 +162,7 @@ scope:
 **Agent actions:**
 
 - Create `packages/os/site-kernel-handoff/src/werkstatt/lock.ts`:
-  - `acquireLock(scope, operationId, command, owner, timeoutSeconds?)` — writes a `WerkstattLock` JSON file to `.werkstatt/locks/<sanitized-scope>.lock.json`. The scope is sanitized for the filename by replacing `:` with `--` (e.g., `system:webgogol-com` → `system--webgogol-com.lock.json`) to stay Windows-safe. The `scope` field inside the JSON retains the original value. Fails if the lock file exists and is not stale; returns the lock object.
+  - `acquireLock(scope, operationId, command, owner, timeoutSeconds?)` — writes a `WerkstattLock` JSON file to `.werkstatt/locks/<sanitized-scope>.lock.json`. The scope is sanitized for the filename by replacing `:` with `--` (e.g., `system:warpgogol-com` → `system--warpgogol-com.lock.json`) to stay Windows-safe. The `scope` field inside the JSON retains the original value. Fails if the lock file exists and is not stale; returns the lock object.
   - `releaseLock(scope)` — removes the lock file using the same sanitization.
   - `readAllLocks()` — reads all `.werkstatt/locks/*.lock.json` files; returns array with `stale: boolean` computed from `heartbeatAt + timeoutSeconds` vs current time and process liveness.
   - `isStaleLock(lock)` — checks `heartbeatAt + timeoutSeconds` age and process absence.
@@ -274,7 +274,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` passes
-- `pnpm exec site-kernel run apps-check.run --app webgogol-com --json` passes (new step runs with zero violations)
+- `pnpm exec site-kernel run apps-check.run --app warpgogol-com --json` passes (new step runs with zero violations)
 
 **Completion criterion:** `APPS_CHECK_AUTHOR_PIPELINE` includes `werkstatt.operation.validate`; `apps-check.run` passes.
 
@@ -357,7 +357,7 @@ scope:
 - Run `pnpm --filter @gogol/site-kernel-handoff run build:check` — verify pass
 - Run `pnpm --filter @gogol/site-kernel-handoff run test` — verify pass
 - Run `pnpm --filter @gogol/site-kernel-checks run build:check` — verify pass
-- Run `pnpm exec site-kernel run apps-check.run --app webgogol-com --json` — verify pass (includes `werkstatt.operation.validate`)
+- Run `pnpm exec site-kernel run apps-check.run --app warpgogol-com --json` — verify pass (includes `werkstatt.operation.validate`)
 - Run `pnpm exec site-kernel run werkstatt.lock.status --json` — verify empty-state pass
 - Run `pnpm exec site-kernel run werkstatt.lock.recover --json` — verify empty-state pass
 - Run `pnpm exec site-kernel run werkstatt.operation.validate --json` — verify zero violations
@@ -387,7 +387,7 @@ scope:
 - `pnpm --filter @gogol/site-kernel-handoff run build:check`
 - `pnpm --filter @gogol/site-kernel-handoff run test`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run apps-check.run --app webgogol-com --json`
+- `pnpm exec site-kernel run apps-check.run --app warpgogol-com --json`
 - `pnpm exec site-kernel run werkstatt.lock.status --json`
 - `pnpm exec site-kernel run werkstatt.lock.recover --json`
 - `pnpm exec site-kernel run werkstatt.operation.validate --json`

@@ -111,14 +111,14 @@ Without a single convention layer, each emitter added by RFC-0339..0343 would in
 Introduce an **observability port**: OTLP/HTTP is the only telemetry protocol in the ecosystem, the backend is reachable only through two environment variables, and all names come from one closed, typed vocabulary.
 
 1. New runtime package **`packages/observability` (`@gogol/observability`)** — zero-dependency conventions + minimal OTLP/HTTP JSON push client, usable from Node backs, kernel commands, and Cloudflare Workers alike.
-2. New kernel module package **`packages/os/site-kernel-observability` (`@gogol/site-kernel-observability`)** — hosts all `observability.*` and `fleet.probe.*` commands added by this series, registered into the kernel like `@gogol/site-kernel-check-webgogol`.
+2. New kernel module package **`packages/os/site-kernel-observability` (`@gogol/site-kernel-observability`)** — hosts all `observability.*` and `fleet.probe.*` commands added by this series, registered into the kernel like `@gogol/site-kernel-check-warpgogol`.
 3. New workspace command **`observability.conventions.validate`** — offline lint that keeps every emitter inside the closed vocabulary.
 
 ### The environment contract (the port)
 
 | Variable | Meaning |
 | --- | --- |
-| `WGOGOL_OTLP_ENDPOINT` | Base URL of the OTLP/HTTP ingest, e.g. `https://ingest.observe.webgogol.com`. Emitters append `/v1/metrics`, `/v1/traces`, `/v1/logs`. |
+| `WGOGOL_OTLP_ENDPOINT` | Base URL of the OTLP/HTTP ingest, e.g. `https://ingest.observe.warpgogol.com`. Emitters append `/v1/metrics`, `/v1/traces`, `/v1/logs`. |
 | `WGOGOL_OTLP_TOKEN` | Bearer token sent as `Authorization: Bearer <token>`. |
 
 If **either** variable is absent or empty, every emitter built on `@gogol/observability` MUST become a silent no-op (`createMetricsPusher` returns `null`). No emitter may fail, warn repeatedly, retry, or block on the backend. This single rule keeps the factory offline-deterministic.
@@ -129,11 +129,11 @@ Every OTLP resource emitted anywhere MUST consist of exactly these attributes (n
 
 | Attribute | Required | Values |
 | --- | --- | --- |
-| `service.name` | yes | The workspace directory name of the emitter: an app id (`webgogol-com`), a back id (`fleet-probe-runner`), an integration worker name, or the literal `site-kernel` for factory runs. |
+| `service.name` | yes | The workspace directory name of the emitter: an app id (`warpgogol-com`), a back id (`fleet-probe-runner`), an integration worker name, or the literal `site-kernel` for factory runs. |
 | `service.version` | no | Git short SHA when known. |
 | `deployment.environment` | yes | `production` \| `preview` \| `development` \| `ci` |
 | `wgogol.layer` | yes | `site` \| `back` \| `factory` \| `probe` \| `delivery` |
-| `wgogol.site_id` | conditional | The app workspace directory name (`webgogol-com`, `nicaragua-projekt`, `check-webgogol-com`) whenever the signal is about one specific site. Required on all `site`-, `probe`-, and `delivery`-layer signals; required on `factory` signals produced by app-scoped commands. |
+| `wgogol.site_id` | conditional | The app workspace directory name (`warpgogol-com`, `nicaragua-projekt`, `check-warpgogol-com`) whenever the signal is about one specific site. Required on all `site`-, `probe`-, and `delivery`-layer signals; required on `factory` signals produced by app-scoped commands. |
 
 Rule: for site workers, `service.name` and `wgogol.site_id` are identical. Cloudflare-originated traces that arrive without `wgogol.*` attributes are enriched at the collector gateway (RFC-0338/RFC-0339): `wgogol.site_id` is copied from `service.name`, `wgogol.layer` is set to `site`.
 
@@ -266,14 +266,14 @@ Behavioral contract (binding):
       { "key": "service.name", "value": { "stringValue": "fleet-probe-runner" } },
       { "key": "deployment.environment", "value": { "stringValue": "production" } },
       { "key": "wgogol.layer", "value": { "stringValue": "probe" } },
-      { "key": "wgogol.site_id", "value": { "stringValue": "webgogol-com" } }
+      { "key": "wgogol.site_id", "value": { "stringValue": "warpgogol-com" } }
     ]},
     "scopeMetrics": [{
       "scope": { "name": "@gogol/observability", "version": "1" },
       "metrics": [
         { "name": "wgogol_probe_up", "gauge": { "dataPoints": [
           { "asDouble": 1, "timeUnixNano": "1751884800000000000",
-            "attributes": [ { "key": "site_id", "value": { "stringValue": "webgogol-com" } } ] }
+            "attributes": [ { "key": "site_id", "value": { "stringValue": "warpgogol-com" } } ] }
         ] } },
         { "name": "wgogol_probe_http_status_class_total", "unit": "1", "sum": {
           "aggregationTemporality": 1, "isMonotonic": true, "dataPoints": [
@@ -328,7 +328,7 @@ Output uses the canonical Diagnostic envelope (RFC-0203), `--json` supported.
 ## Rollout
 
 1. Create `packages/observability` with `conventions.ts`, `metric-registry.ts` (smoke entry only), `otlp-json.ts`, `pusher.ts`, `redact.ts`; unit-test the OTLP envelope against the fixture above, the no-op-when-env-absent rule, and registry validation.
-2. Create `packages/os/site-kernel-observability`, register the module into the kernel command registry (mirror `@gogol/site-kernel-check-webgogol` registration), implement `observability.conventions.validate` with fixture tests per rule.
+2. Create `packages/os/site-kernel-observability`, register the module into the kernel command registry (mirror `@gogol/site-kernel-check-warpgogol` registration), implement `observability.conventions.validate` with fixture tests per rule.
 3. Wire the command into `PACKAGES_CHECK_PIPELINE`; regenerate the command manifest; run `gitattributes.generate` if any generated outputs were added (RFC-0336).
 4. Later RFCs in the series append registry entries and consume the pusher; no flag day.
 

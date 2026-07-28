@@ -12,7 +12,7 @@ verdict: needs-revision
 
 ## Verdict: Needs revision
 
-The RFC correctly identifies the goal (delete `@gogol/business` and legacy content after PBP cutover) but its core precondition claim — "no site, package, or OS command imports from them" — is factually false. 13 real code imports from `@gogol/business` exist outside `packages/business/`, spanning `@gogol/pbp`, `@gogol/site-kernel-checks` (7 files), codegen/onboarding templates, and `systems/webgogol-com` page routes. The deletion manifest does not account for these dependencies and would break the build.
+The RFC correctly identifies the goal (delete `@gogol/business` and legacy content after PBP cutover) but its core precondition claim — "no site, package, or OS command imports from them" — is factually false. 13 real code imports from `@gogol/business` exist outside `packages/business/`, spanning `@gogol/pbp`, `@gogol/site-kernel-checks` (7 files), codegen/onboarding templates, and `systems/warpgogol-com` page routes. The deletion manifest does not account for these dependencies and would break the build.
 
 ## Mechanical validation (rfc.validate)
 
@@ -45,8 +45,8 @@ Pass for RFC-0470 specifically. The 5 `rfc.validate` errors target RFC-0466/0467
   - `packages/os/site-kernel-checks/src/` — 7 files importing `recordClaimsSchema`, `getBusinessSchema`, `PERSON_AFFILIATIONS`, `ClaimAnnotation`
   - `packages/os/site-kernel-codegen/src/templates/app-boilerplate/src/content.config.template.ts` — `businessCollections` import
   - `packages/os/site-kernel-onboarding/src/templates/runtime/content.config.template.ts` — `businessCollections` import
-  - `systems/webgogol-com/src/content.config.ts` — `businessCollections` import
-  - `systems/webgogol-com/src/pages/*.astro` — 4 files importing `buildPageSemanticModel`, `buildSiteSemanticProfile`
+  - `systems/warpgogol-com/src/content.config.ts` — `businessCollections` import
+  - `systems/warpgogol-com/src/pages/*.astro` — 4 files importing `buildPageSemanticModel`, `buildSiteSemanticProfile`
 
   The RFC's deletion manifest does not include a migration plan for these imports. Deleting `packages/business/` without migrating them will break the build.
 
@@ -79,7 +79,7 @@ Pass for RFC-0470 specifically. The 5 `rfc.validate` errors target RFC-0466/0467
 
 - **No new command.** Correct — deletion is manual.
 - **Lean contracts.** N/A — deletion RFC.
-- **Scope discipline.** `appsImpacted` lists only `webgogol-com` — correct (only site). `packagesImpacted` is incomplete (see Axis C).
+- **Scope discipline.** `appsImpacted` lists only `warpgogol-com` — correct (only site). `packagesImpacted` is incomplete (see Axis C).
 - **`nonGoals` are meaningful** — 6 explicit non-goals, each referencing the owning RFC.
 
 ## Axis G — Blind spots
@@ -89,13 +89,13 @@ Pass for RFC-0470 specifically. The 5 `rfc.validate` errors target RFC-0466/0467
   2. Moves `buildPageSemanticModel` to `@gogol/share` or `@gogol/pbp` (it is a semantic model builder, not business logic)
   3. Moves `getBusinessSchema` / `businessSchemaById` / `parseBusinessEntryData` to `@gogol/site-kernel-checks` or deletes them if unused after cutover
   4. Replaces `businessCollections` with `pbpCollections` in codegen/onboarding templates and site `content.config.ts`
-  5. Removes `buildSiteSemanticProfile` from site page routes (already done in this session for `systems/webgogol-com`, but templates still reference it)
+  5. Removes `buildSiteSemanticProfile` from site page routes (already done in this session for `systems/warpgogol-com`, but templates still reference it)
 
 - **FAQ/people content.** The RFC notes FAQ and people files will be deleted from `business/` and says "if still needed, they should be moved to a separate content collection before this RFC executes." But it does not verify whether they ARE still needed. The `people.ts` check in `site-kernel-checks` imports `PERSON_AFFILIATIONS` from `@gogol/business/schemas` — this suggests people content is still actively checked.
 
 - **`content.business.validate` command.** The command table (`04-content-quality.ts:96`) references `content.business.validate` which validates against `@gogol/business` schemas. This command needs to be removed or rewritten to use PBP schemas.
 
-- **Mission workpieces.** Old mission workpieces (`missions/webgogol-com-m000002..m000004`) still import `@gogol/business`. These are historical artifacts and should probably be excluded from the grep, but the RFC does not mention them.
+- **Mission workpieces.** Old mission workpieces (`missions/warpgogol-com-m000002..m000004`) still import `@gogol/business`. These are historical artifacts and should probably be excluded from the grep, but the RFC does not mention them.
 
 - **`pnpm-workspace.yaml`.** The RFC checks `grep -r "@gogol/business" pnpm-workspace.yaml` but `@gogol/business` is not referenced there (it's a workspace package, auto-resolved). This precondition is meaningless.
 

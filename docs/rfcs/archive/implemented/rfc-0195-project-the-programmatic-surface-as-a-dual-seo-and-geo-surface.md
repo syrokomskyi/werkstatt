@@ -31,7 +31,7 @@ commands:
     - llms.generate
   removed: []
 appsImpacted:
-  - apps/webgogol-com
+  - apps/warpgogol-com
 packagesImpacted:
   - packages/surface
   - packages/share
@@ -76,7 +76,7 @@ The Programmatic Surface is defined as a **dual surface**: every page the engine
 
 ```sh
 # unchanged command, extended to enumerate generated entries
-pnpm exec site-kernel run surface.generate --app webgogol-com
+pnpm exec site-kernel run surface.generate --app warpgogol-com
 ```
 
 ### TypeScript contracts

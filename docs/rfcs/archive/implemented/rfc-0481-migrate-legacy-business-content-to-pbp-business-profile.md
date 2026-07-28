@@ -35,7 +35,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-handoff"
 successSignals:
@@ -62,11 +62,11 @@ RFC-0471 deleted `@gogol/business` and replaced it with `@gogol/pbp` (DNA-20 sup
 RFC-0471's acceptance criteria items 1 and 8 claim:
 
 - "All 329 `{business.*}` content references migrated to `{business-profile.*}` or inline values" (checked 2026-07-20)
-- "`systems/webgogol-com/src/content/business/` directory deleted" (checked 2026-07-20)
+- "`systems/warpgogol-com/src/content/business/` directory deleted" (checked 2026-07-20)
 
 **Both were falsely checked.** Verification on 2026-07-21:
 
-- `systems/webgogol-com/src/content/business/` still exists with 30 .md files
+- `systems/warpgogol-com/src/content/business/` still exists with 30 .md files
 - 32 content files still contain `{business.*}` references
 
 The `@gogol/business` package was deleted, but the site content was not migrated. This left the site in a broken state: the PBP compiler has no `business` entity to resolve, and content references still point to the old `business/` collection.
@@ -97,7 +97,7 @@ As a result:
 Register a migrator with `id: "rfc-0481"` in `packages/os/site-kernel-handoff/src/migrators/registry.ts` that:
 
 1. **Creates `business-profile/{lang}/business.md`** — the PBP Business singleton — from legacy `business/{lang}/company.md` frontmatter. Maps:
-   - `id` → `https://webgogol.com/id/business`
+   - `id` → `https://warpgogol.com/id/business`
    - `schema` → `pbp/business@1`
    - `type` → `business`
    - `status` → `published`
@@ -105,12 +105,12 @@ Register a migrator with `id: "rfc-0481"` in `packages/os/site-kernel-handoff/sr
    - `description` → from `description`
    - `mission` → from `mission`
    - `yearEstablished` → from `foundingYear` (parseInt)
-   - `brandRefs.default` → `{ ref: "https://webgogol.com/id/brand", expectedType: "brand" }`
-   - `legalIdentityRef` → `{ ref: "https://webgogol.com/id/legal-identity", expectedType: "legal-identity" }`
-   - `placeRefs.office` → `{ ref: "https://webgogol.com/id/places/backnang", expectedType: "place" }`
-   - `contactPointRefs.default` → `{ ref: "https://webgogol.com/id/contact-points/general-email", expectedType: "contact-point" }`
-   - `webPresenceRefs.default` → `{ ref: "https://webgogol.com/id/web-presences/primary", expectedType: "web-presence" }`
-   - `governance` → `{ authorityRef: "https://webgogol.com/id/business", effectiveFrom: "2026-01-01", reviewEvery: "P1Y" }`
+   - `brandRefs.default` → `{ ref: "https://warpgogol.com/id/brand", expectedType: "brand" }`
+   - `legalIdentityRef` → `{ ref: "https://warpgogol.com/id/legal-identity", expectedType: "legal-identity" }`
+   - `placeRefs.office` → `{ ref: "https://warpgogol.com/id/places/backnang", expectedType: "place" }`
+   - `contactPointRefs.default` → `{ ref: "https://warpgogol.com/id/contact-points/general-email", expectedType: "contact-point" }`
+   - `webPresenceRefs.default` → `{ ref: "https://warpgogol.com/id/web-presences/primary", expectedType: "web-presence" }`
+   - `governance` → `{ authorityRef: "https://warpgogol.com/id/business", effectiveFrom: "2026-01-01", reviewEvery: "P1Y" }`
 
 2. **Skips if already migrated** — if `business-profile/{lang}/business.md` already exists with `schema: pbp/business@1`, the migrator is a no-op for that locale (idempotency).
 
@@ -192,22 +192,22 @@ The migrator writes a markdown file with YAML frontmatter in PBP entity format:
 ```yaml
 ---
 schema: pbp/business@1
-id: https://webgogol.com/id/business
+id: https://warpgogol.com/id/business
 type: business
 status: published
-name: "Webgogol"
+name: "Warpgogol"
 description: "..."
 yearEstablished: 2026
 brandRefs:
   default:
-    ref: https://webgogol.com/id/brand
+    ref: https://warpgogol.com/id/brand
     expectedType: brand
 legalIdentityRef:
-  ref: https://webgogol.com/id/legal-identity
+  ref: https://warpgogol.com/id/legal-identity
   expectedType: legal-identity
 # ... remaining fields
 governance:
-  authorityRef: https://webgogol.com/id/business
+  authorityRef: https://warpgogol.com/id/business
   effectiveFrom: "2026-01-01"
   reviewEvery: P1Y
 ---
@@ -226,12 +226,12 @@ The migrator checks for the existence of `business-profile/{lang}/business.md` w
 ### Tests
 
 - **PBT test:** `rfc-0481.pbt.test.ts` — generates random legacy `company.md` frontmatter, runs the migrator twice, asserts the output is identical.
-- **Snapshot test:** `rfc-0481.snapshot.test.ts` — runs the migrator on the real `webgogol-com` `business/de/company.md` and snapshots the output `business.md`.
+- **Snapshot test:** `rfc-0481.snapshot.test.ts` — runs the migrator on the real `warpgogol-com` `business/de/company.md` and snapshots the output `business.md`.
 
 ## Rollout
 
 - **Immediate:** Upon acceptance, the migrator is registered but not applied. It runs on the next `mission.migrate` for any Sternsystem whose `migratorCursor` does not include `rfc-0481`.
-- **webgogol-com:** The next mission's `mission.migrate` creates `business-profile/de/business.md` and `business-profile/uk/business.md`. Operator then manually creates remaining `de/` PBP entities. `mission.validate` (with build) verifies the full entity graph.
+- **warpgogol-com:** The next mission's `mission.migrate` creates `business-profile/de/business.md` and `business-profile/uk/business.md`. Operator then manually creates remaining `de/` PBP entities. `mission.validate` (with build) verifies the full entity graph.
 - **New Sternsystems:** Automatically comply — onboarding creates `business-profile/` with PBP entities from templates. The migrator is a no-op (idempotent skip).
 - **Compass sync:** No `docs/*.xml` changes needed — this RFC does not change repository-wide requirements or app-package relationships. It adds a migrator to an existing package.
 
@@ -257,8 +257,8 @@ The migrator checks for the existence of `business-profile/{lang}/business.md` w
 - [x] `pnpm exec site-kernel run migrator.registry.validate` passes with `rfc-0481` registered (evidence: `migrator.registry.validate` exit 0, "2 migrator(s) in registry — no violations")
 - [x] PBT test proves idempotency: `f(f(x)) == f(x)` for random `company.md` frontmatter (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0481.pbt.test.ts:73, `rfc-0481 migrator is idempotent: f(f(x)) == f(x) for random company.md`)
 - [x] Snapshot test matches expected `business.md` output from real `business/de/company.md` (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0481.snapshot.test.ts:89, `snapshot: rfc-0481 creates business-profile/de/business.md from real company.md`)
-- [x] `mission.migrate` on `webgogol-com` creates `business-profile/de/business.md` and `business-profile/uk/business.md` (migrator `rfc-0481`) (evidence: `mission.migrate --mission webgogol-com-m000009` exit 0, "created business-profile/de/business.md" + "created business-profile/uk/business.md")
-- [x] `astro build` no longer throws `PBP-REF: No Business entity found in the entity index.` after `mission.migrate` + operator creates remaining `de/` entities (evidence: `pnpm --filter webgogol-com run build` — no `PBP-REF` or `No Business entity` errors in output; remaining build failures are pre-existing URL type issues unrelated to PBP)
+- [x] `mission.migrate` on `warpgogol-com` creates `business-profile/de/business.md` and `business-profile/uk/business.md` (migrator `rfc-0481`) (evidence: `mission.migrate --mission warpgogol-com-m000009` exit 0, "created business-profile/de/business.md" + "created business-profile/uk/business.md")
+- [x] `astro build` no longer throws `PBP-REF: No Business entity found in the entity index.` after `mission.migrate` + operator creates remaining `de/` entities (evidence: `pnpm --filter warpgogol-com run build` — no `PBP-REF` or `No Business entity` errors in output; remaining build failures are pre-existing URL type issues unrelated to PBP)
 - [x] `rfc.validate` passes on this file (RFC status: implemented) (evidence: `rfc.validate --json` shows 0 violations for RFC-0481)
 
 ## Implementation notes for agents

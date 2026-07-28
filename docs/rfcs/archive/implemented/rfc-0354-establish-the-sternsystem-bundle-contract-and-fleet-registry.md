@@ -45,7 +45,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel"
   - "@gogol/site-kernel-handoff"
@@ -152,9 +152,9 @@ The fleet registry is the single machine-readable index of all Sternsystems in t
 ```yaml
 schemaVersion: "1.0.0"
 systems:
-  - id: webgogol-com              # kebab-case, lowercase, latin-only (DNA-6)
+  - id: warpgogol-com              # kebab-case, lowercase, latin-only (DNA-6)
     cosmicStar: Vega              # from StarCatalog (DNA-23)
-    repo: git@github.com:webgogol/webgogol-com.git
+    repo: git@github.com:warpgogol/warpgogol-com.git
     pinnedPlatform: "4.5.0"       # semver tag of the pinned platform version
     currentMission: null          # mission id or null (see RFC-0355)
     lastRelease: null             # release id or null (see RFC-0357)
@@ -426,9 +426,9 @@ export const FleetRegistrySchema = z.object({
   "data": {
     "systems": [
       {
-        "id": "webgogol-com",
+        "id": "warpgogol-com",
         "cosmicStar": "Vega",
-        "repo": "git@github.com:webgogol/webgogol-com.git",
+        "repo": "git@github.com:warpgogol/warpgogol-com.git",
         "pinnedPlatform": "4.5.0",
         "currentMission": null,
         "lastRelease": null,
@@ -478,19 +478,19 @@ export const FleetRegistrySchema = z.object({
 6. Create an empty `systems/registry.yaml` with `schemaVersion: "1.0.0"` and `systems: []`.
 7. Implement `sternsystem.register` + `sternsystem.list` first (low-risk, no bundle validation).
 8. Implement `sternsystem.validate` + `sternsystem.pin`.
-9. **Pilot**: register and extract `webgogol-com`, validate materialization, then remove `apps/webgogol-com`.
+9. **Pilot**: register and extract `warpgogol-com`, validate materialization, then remove `apps/warpgogol-com`.
 10. Add DNA-44 and DNA-45 to `docs/architecture-dna.md`.
 11. Run `build:check` to verify no `apps/` pipeline regression.
 
 ### Pilot registration
 
-The pilot registration of `webgogol-com` is no longer metadata-only in the final migration. Registration and extraction are separate commands, but the implementation wave is not complete until `apps/webgogol-com` is removed and materialization validates.
+The pilot registration of `warpgogol-com` is no longer metadata-only in the final migration. Registration and extraction are separate commands, but the implementation wave is not complete until `apps/warpgogol-com` is removed and materialization validates.
 
 ```yaml
 systems:
-  - id: webgogol-com
+  - id: warpgogol-com
     cosmicStar: Vega
-    repo: git@github.com:webgogol/webgogol-com.git
+    repo: git@github.com:warpgogol/warpgogol-com.git
     pinnedPlatform: "4.5.0"
     currentMission: null
     lastRelease: null
@@ -532,7 +532,7 @@ systems:
 - [x] `sternsystem.validate` enforces all registry invariants (§2.3) and bundle contract (§1.2) (evidence: implemented historically)
 - [x] `sternsystem.validate` refuses dual representation (apps/ collision, §6.4) (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `sternsystem.pin` refuses downgrade (RFC-0221 §4.1 matrix) (evidence: implemented historically)
-- [x] Pilot: `webgogol-com` registered, extracted, materialized, and removed from `apps/` (deferred to RFC-0356 materialization) (evidence: implemented historically)
+- [x] Pilot: `warpgogol-com` registered, extracted, materialized, and removed from `apps/` (deferred to RFC-0356 materialization) (evidence: implemented historically)
 - [x] `apps/` directory removed after full migration (deferred to full migration wave) (evidence: original apps retired by RFC-0381, migration completed historically)
 - [x] DNA-44 and DNA-45 added to `docs/architecture-dna.md` (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `pnpm -s run build:check` passes with no `apps/` pipeline regression (deferred to full migration) (evidence: build:check passes, exitCode=0)

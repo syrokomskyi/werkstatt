@@ -22,7 +22,7 @@ reviewers:
 
 ## Context
 
-`@webgogol/forge` (RFC-0374) is a portable package published to npm. Its skills live in `packages/forge/skills/` and ship in the `files` array. Forge skills use the `fo-` prefix and are validated by `forge.skill.validate` (SKILL-01..13).
+`@warpgogol/forge` (RFC-0374) is a portable package published to npm. Its skills live in `packages/forge/skills/` and ship in the `files` array. Forge skills use the `fo-` prefix and are validated by `forge.skill.validate` (SKILL-01..13).
 
 Warpgogol-specific operational skills — such as mission reconcile – reference commands (`mission.reconcile`, `mission.validate`, `mission.git.commit`) and concepts (Sternsystems, Bordbuch, cache clones) that exist only in the Warpgogol monorepo. Placing them in forge would:
 

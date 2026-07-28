@@ -48,7 +48,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-handoff"
   - "@gogol/site-kernel-codegen"
@@ -62,7 +62,7 @@ successSignals:
   - "`mission.diff --mission <id>` shows the data-set diff between the mission Werkstück and the Sternsystem's original pinned state."
   - "`mission.reconcile --mission <id>` writes the validated data changes from the Werkstück to the Sternsystem's git repo (cache clone)."
   - "The version-compare matrix from RFC-0221 §4.1 is enforced: downgrade is refused, explicit upgrade catch-up applies migrators, in-sync fast-paths."
-  - "Pilot: `webgogol-com` is extracted from `apps/webgogol-com/` into a data-only Sternsystem, a mission is opened, materialized, validated, closed, and `apps/webgogol-com/` is removed."
+  - "Pilot: `warpgogol-com` is extracted from `apps/warpgogol-com/` into a data-only Sternsystem, a mission is opened, materialized, validated, closed, and `apps/warpgogol-com/` is removed."
 nonGoals:
   - "Does not define the mission lifecycle state machine — that is RFC-0355."
   - "Does not define release discipline — that is RFC-0357."
@@ -102,7 +102,7 @@ Three invariants are unprotected:
 
 2. **No validation gate before reconciliation.** There is no command that runs `app.contract.full` on the mission Werkstück and gates `mission.reconcile` / `mission.close` on a pass. Without this, unvalidated changes could be committed to the Sternsystem's repo.
 
-3. **No extraction path for existing `apps/` sites.** The pilot Sternsystem `webgogol-com` is registered in the fleet registry (RFC-0354) but its bundle does not yet exist as an independent repo. There is no command that extracts an `apps/<app>/` site into a Sternsystem git repo.
+3. **No extraction path for existing `apps/` sites.** The pilot Sternsystem `warpgogol-com` is registered in the fleet registry (RFC-0354) but its bundle does not yet exist as an independent repo. There is no command that extracts an `apps/<app>/` site into a Sternsystem git repo.
 
 ## Decision
 
@@ -321,19 +321,19 @@ Extracts an existing `apps/<app>/` site into a Sternsystem git repo. This is the
 9. **Validate materialization**: open a verification mission, materialize, run `mission.validate`, and inspect the data diff.
 10. **Remove source app**: only after the verification mission passes validation and reconciliation, remove `apps/<app>/` in the same migration wave. If the extracted Sternsystem fails to materialize or validate, abort the extraction, keep `apps/<app>/`, and require the operator to fix the platform templates or data classifier before retrying. A registered active Sternsystem and an `apps/<id>/` directory must not coexist after extraction completes.
 
-#### 5.2 Pilot: `webgogol-com`
+#### 5.2 Pilot: `warpgogol-com`
 
-The pilot extraction of `webgogol-com` is the first use of `sternsystem.extract`:
+The pilot extraction of `warpgogol-com` is the first use of `sternsystem.extract`:
 
-1. Run `sternsystem.extract --app webgogol-com --repo git@github.com:webgogol/webgogol-com.git`.
-2. Verify the extracted Sternsystem validates: `sternsystem.validate --id webgogol-com`.
-3. Open a mission: `mission.open --system webgogol-com --brief "Pilot extraction verification"`.
-4. Materialize: `mission.materialize --mission webgogol-com-m000001`.
-5. Validate: `mission.validate --mission webgogol-com-m000001`.
-6. If validation passes, reconcile the mission: `mission.reconcile --mission webgogol-com-m000001`.
-7. Close the mission: `mission.close --mission webgogol-com-m000001`.
+1. Run `sternsystem.extract --app warpgogol-com --repo git@github.com:warpgogol/warpgogol-com.git`.
+2. Verify the extracted Sternsystem validates: `sternsystem.validate --id warpgogol-com`.
+3. Open a mission: `mission.open --system warpgogol-com --brief "Pilot extraction verification"`.
+4. Materialize: `mission.materialize --mission warpgogol-com-m000001`.
+5. Validate: `mission.validate --mission warpgogol-com-m000001`.
+6. If validation passes, reconcile the mission: `mission.reconcile --mission warpgogol-com-m000001`.
+7. Close the mission: `mission.close --mission warpgogol-com-m000001`.
 8. Verify the Bordbuch has the expected entries.
-9. Remove `apps/webgogol-com/` and update workspace discovery so no app compatibility path remains.
+9. Remove `apps/warpgogol-com/` and update workspace discovery so no app compatibility path remains.
 
 ## Architectural fit
 
@@ -466,8 +466,8 @@ export const AuthoredDiffSchema = z.object({
   "command": "mission.materialize",
   "status": "pass",
   "data": {
-    "missionId": "webgogol-com-m000001",
-    "systemId": "webgogol-com",
+    "missionId": "warpgogol-com-m000001",
+    "systemId": "warpgogol-com",
     "versionComparison": {
       "verdict": "in-sync",
       "pinVersion": "4.5.0",
@@ -486,7 +486,7 @@ export const AuthoredDiffSchema = z.object({
     },
     "materializedAt": "2026-07-09T12:05:00Z"
   },
-  "summary": "[mission.materialize] webgogol-com-m000001 materialized (in-sync, green)"
+  "summary": "[mission.materialize] warpgogol-com-m000001 materialized (in-sync, green)"
 }
 ```
 
@@ -497,7 +497,7 @@ export const AuthoredDiffSchema = z.object({
   "command": "mission.validate",
   "status": "pass",
   "data": {
-    "missionId": "webgogol-com-m000001",
+    "missionId": "warpgogol-com-m000001",
     "contractFull": {
       "passed": true,
       "validators": [
@@ -511,7 +511,7 @@ export const AuthoredDiffSchema = z.object({
     },
     "validatedAt": "2026-07-09T12:10:00Z"
   },
-  "summary": "[mission.validate] webgogol-com-m000001 validation passed"
+  "summary": "[mission.validate] warpgogol-com-m000001 validation passed"
 }
 ```
 
@@ -545,7 +545,7 @@ export const AuthoredDiffSchema = z.object({
 8. Implement `mission.validate` (wraps `app.contract.full` + readable build).
 9. Implement `mission.preview`, `mission.build`, `mission.diff`, and `mission.reconcile`.
 10. Implement `sternsystem.extract`.
-11. **Pilot**: extract `webgogol-com` from `apps/webgogol-com/` into a Sternsystem, open a mission, materialize, validate, reconcile, and close.
+11. **Pilot**: extract `warpgogol-com` from `apps/warpgogol-com/` into a Sternsystem, open a mission, materialize, validate, reconcile, and close.
 12. Add DNA-47 to `docs/architecture-dna.md`.
 13. Run `build:check` to verify no `apps/` pipeline regression.
 
@@ -600,7 +600,7 @@ This is the concrete resolution of the RFC-0221 `kernel.wire` chicken-egg for St
 - [x] `sternsystem.extract` copies only Sternsystem data paths (no scripts, runtime config, `packages/`, `dist/`, `*.generated.*`) (evidence: packages/ directory, package exists)
 - [x] `sternsystem.extract` writes `system.pin.json` with `platformSemanticHash` and initial `bordbuch/events.ndjson` (evidence: implemented historically)
 - [x] `sternsystem.extract` removes `apps/<app>/` after materialization and validation pass (deferred — requires pilot verification) (evidence: implemented historically)
-- [x] Pilot: `webgogol-com` extracted, mission opened, materialized, validated, closed (deferred — requires registered Sternsystem) (evidence: implemented historically)
+- [x] Pilot: `warpgogol-com` extracted, mission opened, materialized, validated, closed (deferred — requires registered Sternsystem) (evidence: implemented historically)
 - [x] DNA-47 added to `docs/architecture-dna.md` (deferred) (evidence: docs/architecture-dna.md:1, DNA invariants documented)
 - [x] `rfc.validate` passes on this file (evidence: implemented historically)
 

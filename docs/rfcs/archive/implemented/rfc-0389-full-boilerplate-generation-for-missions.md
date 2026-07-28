@@ -34,7 +34,7 @@ commands:
     - mission.materialize
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-handoff"
   - "@gogol/site-kernel-codegen"
@@ -245,8 +245,8 @@ The `--json` output shape remains the same. The `regeneration.regeneratedFiles` 
   "command": "mission.materialize",
   "status": "ok",
   "data": {
-    "missionId": "webgogol-com-m000001",
-    "systemId": "webgogol-com",
+    "missionId": "warpgogol-com-m000001",
+    "systemId": "warpgogol-com",
     "versionComparison": { "verdict": "in-sync", "..." : "..." },
     "migratorChain": [],
     "capabilityDiff": { "tier": "green", "items": [] },
@@ -258,7 +258,7 @@ The `--json` output shape remains the same. The `regeneration.regeneratedFiles` 
         "tsconfig.json",
         ".gitignore",
         "postcss.config.cjs",
-        ".github/workflows/deploy-webgogol-com.yml",
+        ".github/workflows/deploy-warpgogol-com.yml",
         "tools/kernel.config.ts",
         "tools/modules/check.module.ts",
         "tools/modules/service.module.ts",

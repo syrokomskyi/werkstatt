@@ -7,7 +7,7 @@ createdAt: 2026-07-24
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/share"
     - "@gogol/ontology"
@@ -179,7 +179,7 @@ scope:
 
 **Validation:**
 
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com` — passes with updated contract
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com` — passes with updated contract
 
 **Completion criterion:** `url-schema.yaml` includes both patterns; `surface.contract.validate` passes.
 
@@ -213,7 +213,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run participant.ai-agent.validate --site webgogol-com --json` — exits 0 with `count: 0` (no AI-agent participants exist)
+- `pnpm exec site-kernel run participant.ai-agent.validate --site warpgogol-com --json` — exits 0 with `count: 0` (no AI-agent participants exist)
 
 **Completion criterion:** `participant.ai-agent.validate` command exists, typechecks, and passes as a no-op (zero AI-agent participants).
 
@@ -252,7 +252,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run sites-check.author --site webgogol-com` — pipeline runs with the new step
+- `pnpm exec site-kernel run sites-check.author --site warpgogol-com` — pipeline runs with the new step
 
 **Completion criterion:** Command registered in table; pipeline step added after `participant.profile.validate`; typecheck and pipeline pass.
 
@@ -327,8 +327,8 @@ scope:
   - `pnpm exec site-kernel run rfc.validate --id RFC-0511`
   - `pnpm --filter @gogol/share run build:check`
   - `pnpm --filter @gogol/site-kernel-checks run build:check`
-  - `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
-  - `pnpm exec site-kernel run sites-check.author --site webgogol-com`
+  - `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+  - `pnpm exec site-kernel run sites-check.author --site warpgogol-com`
 - Check off each acceptance criterion in the RFC with `(evidence: ...)` annotations
 - Stamp: `pnpm exec site-kernel run rfc.implement.stamp --id RFC-0511 --implementation-commit <sha>`
 
@@ -348,8 +348,8 @@ scope:
 - `pnpm exec site-kernel run rfc.validate --id RFC-0511`
 - `pnpm --filter @gogol/share run build:check`
 - `pnpm --filter @gogol/site-kernel-checks run build:check`
-- `pnpm exec site-kernel run surface.contract.validate --site webgogol-com`
-- `pnpm exec site-kernel run sites-check.author --site webgogol-com`
+- `pnpm exec site-kernel run surface.contract.validate --site warpgogol-com`
+- `pnpm exec site-kernel run sites-check.author --site warpgogol-com`
 - `pnpm exec site-kernel run rfc.verification.emit --id RFC-0511` (if acceptance probes declared)
 
 ### 4.2 Evidence artifacts

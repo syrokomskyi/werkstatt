@@ -44,7 +44,7 @@ nonGoals:
 
 Meanwhile, `packages/ontology/archetypes/sections/*.yaml` ships dozens of additional archetypes with novel `semanticRole` values: `hero-with-decision-card`, `founder-led-trust`, `client-ownership-disclosure`, `exit-clause-disclosure`, `pricing-disclosure`, `scope-of-responsibility-disclosure`, `side-by-side-comparison`, `audience-self-identification`, `trust-evidence-row`, `faq-list`, `donation-card`, `breadcrumbs`.
 
-During the May 2026 webgogol-com onboarding, every newly scaffolded handwerk-family section failed `sectionManifestSchema.parse` because `role: hero-with-decision-card` (copied from the archetype's `semanticRole`) was rejected. The temporary fix appended all the missing roles to `SemanticRoleValues` — converting a structural mismatch into a list to maintain by hand.
+During the May 2026 warpgogol-com onboarding, every newly scaffolded handwerk-family section failed `sectionManifestSchema.parse` because `role: hero-with-decision-card` (copied from the archetype's `semanticRole`) was rejected. The temporary fix appended all the missing roles to `SemanticRoleValues` — converting a structural mismatch into a list to maintain by hand.
 
 ## Problem
 
@@ -127,10 +127,10 @@ pnpm exec site-kernel run archetype.registry.validate
 - [x] `archetype.registry.validate` rejects manifests whose `role` is not in the corresponding archetype-derived set. (evidence: implemented historically)
 - [x] `SemanticRoleValues` removed from `packages/ontology/src/enums.ts`. (evidence: packages/ directory, package exists)
 - [x] Optional: a generated `.d.ts` provides IDE-only union type for autocomplete. (evidence: implemented historically)
-- [x] Regression test seeded from webgogol-com `hero-decision-card-section.manifest.yaml`. (evidence: implemented historically)
+- [x] Regression test seeded from warpgogol-com `hero-decision-card-section.manifest.yaml`. (evidence: implemented historically)
 
 ## Implementation notes for agents
 
 - Agents MAY implement this RFC ONLY when status: accepted.
 - Agents MUST NOT change RFC status.
-- This RFC supersedes the temporary `SemanticRoleValues` enlargement that landed during the webgogol-com onboarding.
+- This RFC supersedes the temporary `SemanticRoleValues` enlargement that landed during the warpgogol-com onboarding.

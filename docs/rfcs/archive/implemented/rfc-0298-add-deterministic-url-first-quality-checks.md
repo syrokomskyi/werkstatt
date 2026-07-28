@@ -33,10 +33,10 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - check-webgogol-com
+  - check-warpgogol-com
 packagesImpacted:
   - "@gogol/check-core"
-  - "@gogol/site-kernel-check-webgogol"
+  - "@gogol/site-kernel-check-warpgogol"
 successSignals:
   - "A captured evidence graph can be checked for technical, localization, accessibility, and content-surface problems without any LLM call."
   - "The same deterministic checks work for WGogol and third-party targets."
@@ -73,7 +73,7 @@ Add deterministic checks that consume `SiteEvidenceGraph` and emit canonical dia
 The aggregate command:
 
 ```sh
-pnpm exec site-kernel run check.deterministic.run --run .check-webgogol/runs/<runId> --json
+pnpm exec site-kernel run check.deterministic.run --run .check-warpgogol/runs/<runId> --json
 ```
 
 runs:

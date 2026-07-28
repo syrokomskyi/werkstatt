@@ -67,7 +67,7 @@ The `content.config.ts` registers both `componentContent` and `pages` collection
 
 `schemas/features.ts` is the one schema that is still actively wired — `content.config.ts` passes `siteFeaturesSchema` directly into `defineCollection`. But its content is pure app-agnostic Zod: it models the four-node feature graph (page → section → component → item) defined in RFC-0018. Every future app will need the exact same schema to register its own `siteFeatures` collection. Today it would be copy-pasted.
 
-[RFC-0032](RFC-0032-enforce-app-agnostic-utility-extraction-to-webgogol-share.md) is introducing `share.utility.lint` to catch duplicated utilities. This RFC is the corresponding _deprecation action_ — it removes the specific schemas that RFC-0032's linter will flag as misplaced, before the linter even ships.
+[RFC-0032](RFC-0032-enforce-app-agnostic-utility-extraction-to-warpgogol-share.md) is introducing `share.utility.lint` to catch duplicated utilities. This RFC is the corresponding _deprecation action_ — it removes the specific schemas that RFC-0032's linter will flag as misplaced, before the linter even ships.
 
 ## Problem
 

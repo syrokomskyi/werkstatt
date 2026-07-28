@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/ontology"
     - "@gogol/share"
@@ -87,7 +87,7 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 **Validation:**
 
 - `pnpm --filter @gogol/ontology build:check`
-- `pnpm exec site-kernel run surface.contract.validate --app webgogol-com --json`
+- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com --json`
 
 **Completion criterion:** `jsonld-types.yaml` Article type includes `description` and `mainEntityOfPage` in optional; ratgeber depth-1 prohibitedTypes includes `FAQPage`; `build:check` passes.
 
@@ -197,7 +197,7 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
-- `pnpm exec site-kernel run surface.contract.validate --app webgogol-com --json`
+- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com --json`
 
 **Completion criterion:** `surface.contract.validate` reports violations if Article optional fields or FAQPage prohibition are missing from C-contract; `build:check` passes.
 
@@ -272,7 +272,7 @@ No content files are modified. The no-op migrator advances `migratorCursor` with
 - `pnpm --filter @gogol/site-kernel-checks build:check`
 - `pnpm --filter @gogol/site-kernel-handoff build:check`
 - `pnpm exec site-kernel run migrator.registry.validate`
-- `pnpm exec site-kernel run surface.contract.validate --app webgogol-com --json`
+- `pnpm exec site-kernel run surface.contract.validate --app warpgogol-com --json`
 
 ### 4.2 Evidence artifacts
 

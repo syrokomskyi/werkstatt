@@ -30,7 +30,7 @@ commands:
     - feature.graph.validate
 appsImpacted:
   - nicaragua-projekt
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - site-kernel-checks
   - share
@@ -217,7 +217,7 @@ Localized content follows the existing content merge semantics. Because arrays r
 
 ```sh
 pnpm exec site-kernel run feature.policy.validate --app nicaragua-projekt
-pnpm exec site-kernel run feature.policy.validate --app webgogol-com
+pnpm exec site-kernel run feature.policy.validate --app warpgogol-com
 pnpm exec site-kernel run feature.references.validate --app nicaragua-projekt
 pnpm exec site-kernel run feature.visibility.validate --app nicaragua-projekt
 ```

@@ -82,7 +82,7 @@ A per-page `output.robots` projection is added to the closed `output` schema (RF
 
 ```sh
 pnpm exec site-kernel run dist.sitemap.images.generate --app nicaragua-projekt
-pnpm exec site-kernel run feed.generate --app webgogol-com
+pnpm exec site-kernel run feed.generate --app warpgogol-com
 pnpm exec site-kernel run feed.validate --all --json
 pnpm exec site-kernel run robots.page.validate --all
 ```
@@ -128,7 +128,7 @@ export type FeedItem = {
   "command": "feed.validate",
   "status": "fail",
   "violations": [
-    { "app": "webgogol-com", "rule": "feed-item-missing-pubdate", "item": "/blog/foo" }
+    { "app": "warpgogol-com", "rule": "feed-item-missing-pubdate", "item": "/blog/foo" }
   ]
 }
 ```

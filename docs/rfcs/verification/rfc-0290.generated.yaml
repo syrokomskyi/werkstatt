@@ -42,7 +42,7 @@ probes:
     durationMs: 22093
   - probe:
       probe: file-exists
-      path: apps/webgogol-com/src/pages/api/agent/mcp.ts
+      path: apps/warpgogol-com/src/pages/api/agent/mcp.ts
     ok: true
     detail: exists
     durationMs: 3

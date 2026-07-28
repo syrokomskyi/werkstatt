@@ -45,7 +45,7 @@ commands:
     - source.binding.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/site-kernel-checks"
@@ -94,7 +94,7 @@ id: andrii-syrokomskyi
 name: "Andrii Syrokomskyi"
 role: "Redakteur"
 bio: "Betreut den Ratgeber seit 2026. Hintergrund in Webentwicklung und digitalem Fundament für kleines Gewerbe."
-contactUrl: "https://webgogol.com/kontakt"
+contactUrl: "https://warpgogol.com/kontakt"
 ```
 
 Required fields: `id`, `name`, `role`, `bio`.
@@ -179,7 +179,7 @@ The mandatory `## Quellen` section (RFC-0501) in the prose body must list all re
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run ratgeber.provenance.validate --site webgogol-com --json
+pnpm exec site-kernel run ratgeber.provenance.validate --site warpgogol-com --json
 ```
 
 Site-scoped, runs in `build.check`.
@@ -275,7 +275,7 @@ The Quellen section coverage check matches `sourceId` strings in the prose body'
 4. Create claim sidecars for articles with factual claims.
 5. Register source descriptors in `integrations/truth-sources/` as needed.
 6. Register command in `tools/kernel.config.ts`.
-7. Run `ratgeber.provenance.validate --site webgogol-com`.
+7. Run `ratgeber.provenance.validate --site warpgogol-com`.
 
 ## Alternatives considered
 

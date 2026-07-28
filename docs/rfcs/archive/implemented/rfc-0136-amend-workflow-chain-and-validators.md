@@ -42,7 +42,7 @@ commands:
     - workflow.lint
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - os/site-kernel
   - os/site-kernel-checks
@@ -228,7 +228,7 @@ All commands emit the shared envelope. Example delta-audit non-regression failur
 ```json
 {
   "command": "audit.delta.run",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "batch": "amend-007",
   "status": "fail",
   "findings": [
@@ -255,7 +255,7 @@ All commands emit the shared envelope. Example delta-audit non-regression failur
 1. Implement `amend.phase.validate`, `audit.delta.run`, and the `amend-check.*` composites; wire the RFC-0135 commands into the composites.
 2. Extend `workflow.lint` for `chain: amend` (precondition inversion, compose branch) and add `workflow-amend.list`. Keep greenfield linting unchanged.
 3. Write the six `.agents/workflows-amend/` files + README, conforming to the extended shape. Add `workflow.lint` over the amend chain to `PACKAGES_CHECK_PIPELINE` (it already lints `.agents/workflows/`; extend its glob to `.agents/workflows-amend/`).
-4. Dry-run the chain against `apps/webgogol-com` with the design-example batch (`digitalesFundament` strengthen + `sichtpass`/`umsicht`/`empfehler` new-route) **without authoring content** — verify the gates, branches, and pause conditions fire correctly.
+4. Dry-run the chain against `apps/warpgogol-com` with the design-example batch (`digitalesFundament` strengthen + `sichtpass`/`umsicht`/`empfehler` new-route) **without authoring content** — verify the gates, branches, and pause conditions fire correctly.
 5. Update root `AGENTS.md`: amend intakes start from `.agents/workflows-amend/a0-intake.md`; greenfield still starts from `.agents/workflows/00-prepare.md`.
 
 ## Alternatives considered
@@ -281,7 +281,7 @@ All commands emit the shared envelope. Example delta-audit non-regression failur
 - [x] `audit.delta.run` registered; delta-scoped, cache-reusing, with the non-regression guarantee. (evidence: implemented historically)
 - [x] `amend-check.author/postbuild/run` registered; split per RFC-0085; wired to RFC-0135 gates. (evidence: implemented historically)
 - [x] `workflow.lint` (amend glob) added to `PACKAGES_CHECK_PIPELINE`. (evidence: implemented historically)
-- [x] Dry-run against `apps/webgogol-com` with the design-example batch exercises both branches and all three pause conditions without authoring content. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] Dry-run against `apps/warpgogol-com` with the design-example batch exercises both branches and all three pause conditions without authoring content. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Root `AGENTS.md` references the amend chain entry point. (evidence: AGENTS.md:1, agent guide updated)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)
 

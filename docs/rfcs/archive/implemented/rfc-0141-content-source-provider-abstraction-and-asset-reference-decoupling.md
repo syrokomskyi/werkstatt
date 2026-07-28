@@ -37,7 +37,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
@@ -125,11 +125,11 @@ This RFC ships **only** the port, the fs adapter, the asset decoupling, and the 
 
 ```sh
 # Every asset token in content resolves through the active provider (fail-hard).
-pnpm exec site-kernel run asset.reference.validate --app webgogol-com
+pnpm exec site-kernel run asset.reference.validate --app warpgogol-com
 pnpm exec site-kernel run asset.reference.validate --all --json
 
 # Migration guard: fs provider output must equal legacy astro:content output.
-pnpm exec site-kernel run content.source.parity --app webgogol-com --json
+pnpm exec site-kernel run content.source.parity --app warpgogol-com --json
 ```
 
 `asset.reference.validate` is workspace-scoped, runs per app, and joins `APPS_CHECK_PIPELINE`. `content.source.parity` is a migration-time guard intended to run during the refactor and in CI until the legacy direct-access paths are removed.
@@ -212,7 +212,7 @@ Consumers never branch on provider id. Components handle `ResolvedAsset` by `kin
 {
   "command": "asset.reference.validate",
   "status": "fail",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "violations": [
     {
       "domain": "pages",
@@ -286,7 +286,7 @@ This section is a forward-looking note only. It is **not** part of the Phase 0 d
 - [x] Shared resolver replaces every direct `import.meta.glob` content-asset call site in `packages/ui` (single `src/content-assets.ts`; 11 sites migrated). `<SmartImage>` deferred — the shared-resolver path satisfies this criterion without adding a manifest-bound component. (evidence: packages/ directory, package exists)
 - [x] `image-utils.ts` bare-filename logic becomes the fs adapter's `resolveAsset` (`src/adapters/fs/assets.ts`); `@gogol/share` re-exports it unchanged. (evidence: packages/ directory, package exists)
 - [x] `asset.reference.validate` is implemented with stable `--json` output and joins `APPS_CHECK_AUTHOR_PIPELINE` (warning mode per rollout). (evidence: implemented historically)
-- [x] `content.source.parity` is implemented and green for `webgogol-com` and `nicaragua-projekt`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `content.source.parity` is implemented and green for `warpgogol-com` and `nicaragua-projekt`. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Rendered output unchanged across the refactor — verified by a full green `pnpm build:check` (both apps build); the resolver was relocated verbatim and the unified glob is a resolution-preserving superset. (No literal dist byte-diff was run.) (evidence: implemented historically)
 - [x] `system.md` and the engineering surface remain outside any provider (`ContentDomain` excludes it; nonGoal enforced). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] Root `AGENTS.md` documents the seam and lists `@gogol/content-source`; `onboarding.scaffold` needs no change (the fs provider is the default via the unchanged loader import). GRACE XML knowledge-graph backfill for the new package is a tracked follow-up. (evidence: AGENTS.md:1, agent guide updated)

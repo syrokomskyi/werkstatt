@@ -58,7 +58,7 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 # acceptance:
 #   - probe: run
-#     command: "site-kernel run some.command.validate --app webgogol-com"
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
 #     expect:
 #       exitCode: 0
 #   - probe: file-exists
@@ -83,7 +83,7 @@ _This RFC defines the migration coverage report and cutover checklist contract._
 
 ## Context
 
-RFC-0461 defines the Webgogol legacy migration mapping from `@gogol/business` (DNA-20) to `@gogol/pbp`. This RFC defines the coverage report that verifies all legacy entities are mapped and the cutover checklist that determines when it is safe to delete `@gogol/business` and switch sites to `@gogol/pbp`.
+RFC-0461 defines the Warpgogol legacy migration mapping from `@gogol/business` (DNA-20) to `@gogol/pbp`. This RFC defines the coverage report that verifies all legacy entities are mapped and the cutover checklist that determines when it is safe to delete `@gogol/business` and switch sites to `@gogol/pbp`.
 
 ## Problem
 
@@ -130,7 +130,7 @@ interface PbpCutoverChecklist {
 - **DNA-1 (Monorepo boundary).** All types in `packages/pbp/`.
 - **DNA-20 (Business layer).** `@gogol/business` is the legacy being replaced.
 - **DNA-55 (Spec vendoring).** `specRef: "pbp-specification-package/RFC-PBP-103"`.
-- **RFC-0461 (Webgogol Legacy Migration).** This RFC is the cutover gate for RFC-0461.
+- **RFC-0461 (Warpgogol Legacy Migration).** This RFC is the cutover gate for RFC-0461.
 
 ## Implementation details
 

@@ -7,7 +7,7 @@ createdAt: 2026-07-23
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-checks"
     - "@gogol/site-kernel-handoff"
@@ -170,7 +170,7 @@ scope:
 **Validation:**
 
 - `pnpm --filter @gogol/site-kernel-checks run build:check` — typecheck passes
-- `pnpm exec site-kernel run ratgeber.article.validate --site webgogol-com --json` — command is found (may skip if no articles exist yet)
+- `pnpm exec site-kernel run ratgeber.article.validate --site warpgogol-com --json` — command is found (may skip if no articles exist yet)
 
 **Completion criterion:** `ratgeber.article.validate` is callable via the kernel CLI and appears in the command table.
 

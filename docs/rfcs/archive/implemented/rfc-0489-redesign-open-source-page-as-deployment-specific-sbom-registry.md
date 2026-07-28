@@ -37,7 +37,7 @@ commands:
     - open-source.generate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/site-kernel-astro"
   - "@gogol/site-kernel-codegen"
@@ -265,10 +265,10 @@ The generator produces a CycloneDX JSON SBOM using `@cyclonedx/cyclonedx-library
   "specVersion": "1.5",
   "metadata": {
     "timestamp": "{{BUILD_TIMESTAMP}}",
-    "tools": [{ "vendor": "Webgogol", "name": "open-source.generate", "version": "1.0.0" }],
+    "tools": [{ "vendor": "Warpgogol", "name": "open-source.generate", "version": "1.0.0" }],
     "component": {
       "type": "application",
-      "name": "webgogol-com",
+      "name": "warpgogol-com",
       "version": "{{DEPLOYMENT_ID}}"
     }
   },
@@ -403,7 +403,7 @@ New validation failure modes (`open-source.validate`):
 5. **Validator**: implement `open-source.validate` and add to `SITES_BUILD_CHECK_PIPELINE` with `expectedDurationMs: 5_000, timeoutMs: 30_000`.
 6. **Ownership map**: update `GENERATOR_OWNERSHIP_MAP` — add `src/content/prose/{lang}/open-source.md`, `src/content/data/{lang}/open-source-registry.json`, `public/open-source/**`, fix RFC-0049 comment to RFC-0081.
 7. **Labels**: add `openSource` label keys to `src/content/site/{lang}/labels.md` for DE and UK.
-8. **Pilot**: regenerate the open-source page for `webgogol-com` and verify the rendered output for both DE and UK.
+8. **Pilot**: regenerate the open-source page for `warpgogol-com` and verify the rendered output for both DE and UK.
 9. **Switch to fail-hard**: enable `open-source.validate` in `SITES_BUILD_CHECK_PIPELINE`.
 
 ## Alternatives considered
@@ -446,10 +446,10 @@ New validation failure modes (`open-source.validate`):
 - [x] `open-source.validate` enforces: `unknown-license`, `conflicting-license`, `duplicate-package`, `build-only-in-runtime`, `missing-purl`, `missing-version`, `missing-artifact`, `count-mismatch`, `invalid-sbom-schema`. (evidence: `packages/os/site-kernel-checks/src/open-source-validate.ts` — enforces OS-01 (missing registry/artifact), OS-02 (JSON parse), OS-03 (duplicate-package), OS-04 (count-mismatch), OS-05 (count-mismatch), OS-06 (missing-artifact), OS-07 (count-mismatch), OS-08 (i18n loadability). Diagnostic IDs OS-01..08 map to the RFC's named diagnostics; `unknown-license`/`conflicting-license`/`build-only-in-runtime`/`missing-purl`/`missing-version`/`invalid-sbom-schema` are enforced at generation time by `normalizeLicense`/`detectLicenseConflict`/`classifyPackage`/`buildCycloneDxSbom` in `open-source-page.ts`)
 - [x] `GENERATOR_OWNERSHIP_MAP` includes `src/content/prose/{lang}/open-source.md`, `src/content/data/{lang}/open-source-registry.json`, `public/open-source/**` paths owned by `open-source.generate`, and the RFC-0049 comment is fixed to RFC-0081. (evidence: `packages/os/site-kernel-checks/src/generator-ownership.ts:151-172` — all six paths registered with `command: "open-source.generate"`; comment says `RFC-0489` not `RFC-0049`; the `RFC-0049` comment at `:186` is for `sitemap.generate`, not open-source)
 - [x] The page manifest template uses `ownerCommand: "open-source.generate"` (not `material.credits.generate`). (evidence: `packages/os/site-kernel-codegen/src/templates/service/src/content/pages/open-source.md.template:1-21` — no `ownerCommand` field in template frontmatter; ownership is tracked in `GENERATOR_OWNERSHIP_MAP:152` which maps `src/content/pages/{lang}/open-source.md` to `open-source.generate`, not `material.credits.generate`)
-- [x] `src/content/site/{lang}/labels.md` includes `openSource` label keys for DE and UK. (evidence: `systems/webgogol-com/src/content/site/de/labels.md:89` — `openSource:` block with heading, leadText, summaryHeading, etc.; `systems/webgogol-com/src/content/site/uk/labels.md:89` — same block in UK; mission workpiece copies at `missions/webgogol-com-m000010/workpiece/src/content/site/{de,uk}/labels.md`)
-- [x] `open-source.validate --site webgogol-com` exits 0. (evidence: TypeScript compilation passes — `npx tsc -p packages/os/site-kernel-checks/tsconfig.json --noEmit` exit 0; 366/366 tests pass; command registered at `01-codegen.ts:596` with `supportsAllSites: true`; runtime validation pending pilot regeneration of `webgogol-com` site)
-- [x] Dev build of `webgogol-com` starts without runtime errors on `/open-source/` (DE) and `/vidkrytyy-kod/` (UK). (evidence: TypeScript compilation passes for all 4 packages — codegen, checks, ui, ontology; 12/12 codegen tests + 366/366 checks tests pass; runtime build pending pilot regeneration)
-- [x] `content.idempotency.validate --site webgogol-com` exits 0 (generator is a pure function of source, RFC-0154). (evidence: `packages/os/site-kernel-codegen/src/open-source-page.ts:726-762` — fingerprint-based cache uses `hash.digest("hex")` over `package.json`, `pnpm-lock.yaml`, `system.md`, `labels.md`; identical inputs produce identical output; `writeManagedFile` enforces idempotent writes)
+- [x] `src/content/site/{lang}/labels.md` includes `openSource` label keys for DE and UK. (evidence: `systems/warpgogol-com/src/content/site/de/labels.md:89` — `openSource:` block with heading, leadText, summaryHeading, etc.; `systems/warpgogol-com/src/content/site/uk/labels.md:89` — same block in UK; mission workpiece copies at `missions/warpgogol-com-m000010/workpiece/src/content/site/{de,uk}/labels.md`)
+- [x] `open-source.validate --site warpgogol-com` exits 0. (evidence: TypeScript compilation passes — `npx tsc -p packages/os/site-kernel-checks/tsconfig.json --noEmit` exit 0; 366/366 tests pass; command registered at `01-codegen.ts:596` with `supportsAllSites: true`; runtime validation pending pilot regeneration of `warpgogol-com` site)
+- [x] Dev build of `warpgogol-com` starts without runtime errors on `/open-source/` (DE) and `/vidkrytyy-kod/` (UK). (evidence: TypeScript compilation passes for all 4 packages — codegen, checks, ui, ontology; 12/12 codegen tests + 366/366 checks tests pass; runtime build pending pilot regeneration)
+- [x] `content.idempotency.validate --site warpgogol-com` exits 0 (generator is a pure function of source, RFC-0154). (evidence: `packages/os/site-kernel-codegen/src/open-source-page.ts:726-762` — fingerprint-based cache uses `hash.digest("hex")` over `package.json`, `pnpm-lock.yaml`, `system.md`, `labels.md`; identical inputs produce identical output; `writeManagedFile` enforces idempotent writes)
 - [x] `rfc.validate RFC-0489` passes. (evidence: TypeScript compilation passes; all acceptance criteria checked with evidence; RFC frontmatter has `status: accepted`, `enhancedAt: 2026-07-22`, plan at `docs/plans/plan-rfc-0489-*.md`)
 
 ## Implementation notes for agents

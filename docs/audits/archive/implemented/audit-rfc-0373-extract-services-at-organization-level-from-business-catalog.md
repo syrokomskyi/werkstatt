@@ -23,7 +23,7 @@
 | Item | Result | Notes |
 | --- | --- | --- |
 | Decision is single, present tense | **pass** | "Project the business service catalog into `SemanticOrganization.services`…" — clear, decisive. |
-| CLI surface shows exact invocations | **pass** | `pnpm exec site-kernel run services.projection.validate --app webgogol-com` and `--all --json`. |
+| CLI surface shows exact invocations | **pass** | `pnpm exec site-kernel run services.projection.validate --app warpgogol-com` and `--all --json`. |
 | TypeScript contracts are minimal signatures | **pass** | `projectServices()` signature, `OrganizationProfileInput` extension, `SemanticService` type change. No full implementations. |
 | File system responsibilities table | **fail** | **Missing `packages/share/src/semantic/jsonld.ts`**. The `buildJsonLd()` function at line 36–47 constructs `servicesListNode` from `context.page.services`. Removing `SemanticPageModel.services` breaks this file. The RFC lists `jsonld/service.ts`, `jsonld/context.ts`, `jsonld/organization.ts`, `jsonld/webpage.ts` but omits the top-level `jsonld.ts` which also reads `context.page.services` directly. |
 | Output format documents `--json` shape | **pass** | Both pass and failure JSON examples provided. |
@@ -100,7 +100,7 @@
 | Exit code behavior specified | **partial** | The failure JSON example shows `status: "fail"` but the RFC doesn't explicitly state the exit code (non-zero on fail, zero on pass). The output format section implies it but doesn't state it. |
 | Warn-vs-fail behavior for each rule | **partial** | The RFC lists 4 validation rules (missing-name, duplicate-slug, duplicate-ids, ambiguous-source) but doesn't specify which are fail-hard vs. warn. Are all 4 blocking? Is `ambiguous-source` (orphan `services.md` alongside `services/`) really blocking, or advisory? |
 | New-app compliance | **pass** | No services directory → no violations. New apps automatically comply. |
-| Existing app adoption | **pass** | webgogol-com and nicaragua-projekt both pass with no services content. |
+| Existing app adoption | **pass** | warpgogol-com and nicaragua-projekt both pass with no services content. |
 
 ### Findings
 
@@ -137,7 +137,7 @@ No findings. Agent-facing policy is well-specified.
 | `businessServiceSchema` defines slug, name, category, serviceType, etc. | `packages/business/src/schemas/service.ts` | **pass** — schema matches description. |
 | `dispatcher.ts` registers `"services/": businessServiceSchema` | `dispatcher.ts` line 45 | **pass**. |
 | `getBusinessServices()` reads `business/{lang}/services/{slug}.md` | `loaders.ts` line 333–337 | **pass**. |
-| No `business/{lang}/services/` subdirectory exists | `find_by_name` on `apps/webgogol-com/src/content/business` | **pass** — only `services.md` orphan file found. |
+| No `business/{lang}/services/` subdirectory exists | `find_by_name` on `apps/warpgogol-com/src/content/business` | **pass** — only `services.md` orphan file found. |
 | RFC-0372 is accepted, not yet implemented | `rfc-0372*.md` frontmatter | **pass** — `status: accepted`. |
 | `buildServiceNodes()` reads from `context.page.services` | `jsonld/service.ts` line 31 | **pass**. |
 | `servicesListId` derived from `page.services` | `jsonld/context.ts` line 38 | **pass**. |

@@ -38,7 +38,7 @@ commands:
   removed:
     - legacy componentContent resolution paths
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - share
@@ -70,7 +70,7 @@ The repository has already moved toward a thin-app, page-declarative architectur
 
 Despite this direction, shared Astro helpers in `packages/share` still expose legacy `componentContent`-based resolution paths. That surface encourages duplicated component context across pages, keeps old mental models alive, and prevents the ecosystem from treating page content as the single authoritative source.
 
-The current pain is visible in `apps/webgogol-com`: several pages repeat near-identical context for shared components. Authors must duplicate data because the platform has no generic cross-page fallback contract for shared component context.
+The current pain is visible in `apps/warpgogol-com`: several pages repeat near-identical context for shared components. Authors must duplicate data because the platform has no generic cross-page fallback contract for shared component context.
 
 ## Problem
 
@@ -113,7 +113,7 @@ Backward compatibility is intentionally removed:
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run shared.context.validate --app webgogol-com
+pnpm exec site-kernel run shared.context.validate --app warpgogol-com
 pnpm exec site-kernel run shared.context.validate --app nicaragua-projekt --json
 ```
 
@@ -196,7 +196,7 @@ Contract notes:
 ```json
 {
   "command": "shared.context.validate",
-  "app": "webgogol-com",
+  "app": "warpgogol-com",
   "status": "fail",
   "violations": [
     {
@@ -277,7 +277,7 @@ Implemented surfaces:
 
 App/config rollout completed in:
 
-- `apps/webgogol-com/src/content/system.md`
+- `apps/warpgogol-com/src/content/system.md`
 - `apps/nicaragua-projekt/src/content/system.md`
 - generator-owned cosmic overlay templates in `packages/os/site-kernel-codegen` and `packages/os/site-kernel-onboarding`
 
@@ -286,9 +286,9 @@ Targeted verification completed:
 - `pnpm --filter @gogol/site-kernel-checks build`
 - `pnpm --filter @gogol/site-kernel-codegen build`
 - `pnpm --filter @gogol/site-kernel build`
-- `site-kernel run system.manifest.validate` for `webgogol-com` and `nicaragua-projekt`
-- `site-kernel run shared.context.validate` for `webgogol-com` and `nicaragua-projekt`
-- `site-kernel run page.block.validate` for `webgogol-com` and `nicaragua-projekt`
+- `site-kernel run system.manifest.validate` for `warpgogol-com` and `nicaragua-projekt`
+- `site-kernel run shared.context.validate` for `warpgogol-com` and `nicaragua-projekt`
+- `site-kernel run page.block.validate` for `warpgogol-com` and `nicaragua-projekt`
 - `pnpm exec site-kernel run rfc.validate RFC-0099 --json`
 
 ## Implementation notes for agents

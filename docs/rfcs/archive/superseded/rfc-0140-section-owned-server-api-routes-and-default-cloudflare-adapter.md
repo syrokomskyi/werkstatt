@@ -27,7 +27,7 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
   - nicaragua-projekt
 packagesImpacted:
   - "@gogol/site-kernel-codegen"
@@ -54,7 +54,7 @@ nonGoals:
 
 Sites are scaffolded as radically thin Astro apps with `output: "static"` and no server adapter ([`astro.config.template.mjs`](../../packages/os/site-kernel-onboarding/src/templates/runtime/astro.config.template.mjs)). They deploy to Cloudflare Pages (RFC-0029) and render entirely from the CDN.
 
-The new `send-message` section (RFC-0103 family) needs a server endpoint to forward a contact message to an outbound channel (Telegram today, email later). A hand-written `apps/webgogol-com/src/pages/api/send-message.ts` was added with `export const prerender = false`. Astro cannot build an on-demand route without an adapter, so the build fails:
+The new `send-message` section (RFC-0103 family) needs a server endpoint to forward a contact message to an outbound channel (Telegram today, email later). A hand-written `apps/warpgogol-com/src/pages/api/send-message.ts` was added with `export const prerender = false`. Astro cannot build an on-demand route without an adapter, so the build fails:
 
 ```
 [NoAdapterInstalled] Cannot use server-rendered pages without an adapter.
@@ -62,7 +62,7 @@ The new `send-message` section (RFC-0103 family) needs a server endpoint to forw
 
 (The trailing `Assertion failed … src\win\async.c` is a secondary libuv crash on Windows after the real error; it is not a separate fault.)
 
-`@astrojs/cloudflare` is already a dependency of `webgogol-com` ([`package.json`](../../apps/webgogol-com/package.json)) but is not wired into the config. More fundamentally, the endpoint is bespoke, app-local, and duplicated: it violates the "thin apps, thick OS" invariant. The same need will recur for many sections across many sites — there may be dozens of such endpoints, each present only when the section that needs it is present.
+`@astrojs/cloudflare` is already a dependency of `warpgogol-com` ([`package.json`](../../apps/warpgogol-com/package.json)) but is not wired into the config. More fundamentally, the endpoint is bespoke, app-local, and duplicated: it violates the "thin apps, thick OS" invariant. The same need will recur for many sections across many sites — there may be dozens of such endpoints, each present only when the section that needs it is present.
 
 ## Problem
 
@@ -187,7 +187,7 @@ A directory-glob ownership entry is added to [`generator-ownership.ts`](../../pa
 
 1. **Phase 1 (static + Pages Function)**: Keep `output: "static"`, no adapter; move the send-message handler into `@gogol/ui` as a Pages Function with a subpath export. This unblocks the build (no on-demand Astro route → no NoAdapterInstalled).
 2. **Phase 2 (contract)**: Add the `api:` schema to `@gogol/ontology`; declare `api:` in the send-message manifest.
-3. **Phase 3 (codegen)**: Implement `api.routes.generate`, register it in the pipeline + onboarding scaffold + ownership registry; replace the hand-written `apps/webgogol-com/src/pages/api/send-message.ts` with the generated `apps/webgogol-com/functions/api/send-message.ts`.
+3. **Phase 3 (codegen)**: Implement `api.routes.generate`, register it in the pipeline + onboarding scaffold + ownership registry; replace the hand-written `apps/warpgogol-com/src/pages/api/send-message.ts` with the generated `apps/warpgogol-com/functions/api/send-message.ts`.
 4. **New apps**: Comply automatically via the templates and pipeline.
 
 ## Alternatives considered
@@ -207,12 +207,12 @@ A directory-glob ownership entry is added to [`generator-ownership.ts`](../../pa
 ## Acceptance criteria
 
 - [x] `astro.config` stays `output: "static"` with no adapter; the template documents the Pages-Function model. (evidence: implemented historically)
-- [x] `webgogol-com` and `nicaragua-projekt` build green from the repo root (no NoAdapterInstalled; SSG image pipeline intact). (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] `warpgogol-com` and `nicaragua-projekt` build green from the repo root (no NoAdapterInstalled; SSG image pipeline intact). (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `@gogol/ontology` section manifest schema accepts an optional `api:` block. (evidence: packages/ directory, package exists)
 - [x] send-message handler is a Pages Function in `@gogol/ui` with a subpath export; the manifest declares its `api:` route. (evidence: packages/ directory, package exists)
 - [x] `api.routes.generate` writes thin GENERATED re-exports only for used, API-declaring sections; garbage-collects stale GENERATED routes; is idempotent. (evidence: implemented historically)
 - [x] `api.routes.generate` is registered in `APPS_BUILD_PREPARE_PIPELINE`, `onboarding.scaffold`, and `generator-ownership.ts`. (evidence: implemented historically)
-- [x] The hand-written `apps/webgogol-com/src/pages/api/send-message.ts` is replaced by the generated `functions/api/send-message.ts`. (evidence: original apps retired by RFC-0381, implemented historically)
+- [x] The hand-written `apps/warpgogol-com/src/pages/api/send-message.ts` is replaced by the generated `functions/api/send-message.ts`. (evidence: original apps retired by RFC-0381, implemented historically)
 - [x] `rfc.validate` passes on this file before merging. (evidence: implemented historically)
 
 ## Implementation notes for agents

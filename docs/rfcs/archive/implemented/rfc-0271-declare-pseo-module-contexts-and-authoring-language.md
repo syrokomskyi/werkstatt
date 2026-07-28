@@ -33,7 +33,7 @@ commands:
     - entitlement.module.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/surface"
   - "@gogol/ontology"
@@ -42,7 +42,7 @@ successSignals:
   - "Each PSEO-capable app declares one or more module contexts with a master/review locale that may be any supported site language and may differ from the site's default language."
   - "LLM-generated PSEO artifacts are created first in the module master locale, not implicitly in DEFAULT_LANGUAGE."
   - "Entitlement, budget, generation policy, tone, source boundaries, and approval policy resolve from the module context instead of scattered blueprint-specific code."
-  - "webgogol-com can declare `masterLocale: uk` for its PSEO module while keeping any existing site default language unchanged."
+  - "warpgogol-com can declare `masterLocale: uk` for its PSEO module while keeping any existing site default language unchanged."
 nonGoals:
   - "Do not change language routing, hreflang, canonical URLs, or the existing site default-language contract."
   - "Do not call an LLM during normal build or request handling."
@@ -55,7 +55,7 @@ nonGoals:
 
 The Programmatic Surface now behaves like a product module, not a single route generator. A site may run several paid modules over time: PSEO local surfaces, offer surfaces, passport pages, diagnostics, or future tenant-specific modules. Each module has different entitlement, language, generation, review, evidence, and editorial rules.
 
-The current PSEO enrichment model assumes that generated content is scoped by Blueprint and language, but it does not declare the language in which the operator wants to write, review, and correct canonical generated artifacts. That language is not always the site's default language. For `webgogol-com`, the developer-review language for PSEO artifacts can be Ukrainian (`uk`), while the public site may still have another default language for routing or fallback.
+The current PSEO enrichment model assumes that generated content is scoped by Blueprint and language, but it does not declare the language in which the operator wants to write, review, and correct canonical generated artifacts. That language is not always the site's default language. For `warpgogol-com`, the developer-review language for PSEO artifacts can be Ukrainian (`uk`), while the public site may still have another default language for routing or fallback.
 
 ## Problem
 
@@ -181,8 +181,8 @@ export interface SurfaceModuleContext {
 ### CLI surface
 
 ```sh
-pnpm exec site-kernel run surface.context.validate --app webgogol-com --json
-pnpm exec site-kernel run surface.enrich --app webgogol-com --module pseo
+pnpm exec site-kernel run surface.context.validate --app warpgogol-com --json
+pnpm exec site-kernel run surface.enrich --app warpgogol-com --module pseo
 ```
 
 ## Failure modes
@@ -196,7 +196,7 @@ pnpm exec site-kernel run surface.enrich --app webgogol-com --module pseo
 ## Rollout
 
 1. Add the module context schema and `surface.context.validate`.
-2. Migrate `webgogol-com` to declare `surface.modules.pseo.authoringLanguage: uk`.
+2. Migrate `warpgogol-com` to declare `surface.modules.pseo.authoringLanguage: uk`.
 3. Refactor `surface.enrich` to read authoring language from module context.
 4. Refactor entitlement checks to resolve per Blueprint through module context.
 5. Keep existing Blueprint fields backward-compatible during one migration window, but warn when PSEO Blueprints are enabled without a module context.
@@ -217,7 +217,7 @@ pnpm exec site-kernel run surface.enrich --app webgogol-com --module pseo
 
 - [x] `SurfaceModuleContext` type and schema exist in the shared surface/kernel layer. (evidence: implemented historically)
 - [x] `surface.context.validate` is registered and emits RFC-0203 diagnostics. (evidence: implemented historically)
-- [x] `webgogol-com` declares a PSEO module context with `masterLocale: uk`. (evidence: implemented historically)
+- [x] `warpgogol-com` declares a PSEO module context with `masterLocale: uk`. (evidence: implemented historically)
 - [x] `surface.enrich` defaults to the module master locale. (evidence: implemented historically)
 - [x] `surface.generate` and `entitlement.module.validate` resolve entitlement per module/Blueprint, not through a hard-coded global PSEO gate. (evidence: implemented historically)
 - [x] `rfc.validate` passes on this file. (evidence: implemented historically)

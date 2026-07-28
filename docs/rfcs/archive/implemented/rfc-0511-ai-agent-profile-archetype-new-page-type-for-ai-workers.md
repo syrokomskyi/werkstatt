@@ -43,7 +43,7 @@ commands:
     - surface.contract.validate
   removed: []
 appsImpacted:
-  - webgogol-com
+  - warpgogol-com
 packagesImpacted:
   - "@gogol/share"
   - "@gogol/ontology"
@@ -212,7 +212,7 @@ The rights section is rendered from a dedicated prose file (`prose/{lang}/{slug}
 This block renders:
 
 - The accountable human's name, linked to their profile page (`/team/[human-slug]/`)
-- The escalation route (e.g. "E-Mail an hi@webgogol.com mit Betreff 'KI-Eskalation'")
+- The escalation route (e.g. "E-Mail an hi@warpgogol.com mit Betreff 'KI-Eskalation'")
 - The operational owner (if different from accountable human)
 - The review frequency (e.g. "Vierteljährliche Überprüfung")
 
@@ -368,7 +368,7 @@ The route registry stores an `aiAgentSlug` flag on `LocalizedRouteEntry` (set by
 
 ```sh
 # Validate AI-agent profile pages.
-pnpm exec site-kernel run participant.ai-agent.validate --site webgogol-com --json
+pnpm exec site-kernel run participant.ai-agent.validate --site warpgogol-com --json
 ```
 
 ### TypeScript contracts
@@ -481,7 +481,7 @@ function buildAiAgentProfileBlocks(participant: ParticipantView, lang: string): 
         body: {
           kind: "paragraphs",
           align: "center",
-          paragraphs: [`Bei Problemen: ${participant.aiAgent!.escalationRoute ?? "E-Mail an hi@webgogol.com"}`],
+          paragraphs: [`Bei Problemen: ${participant.aiAgent!.escalationRoute ?? "E-Mail an hi@warpgogol.com"}`],
         },
       },
     });
@@ -616,7 +616,7 @@ It **warns** (does not fail) when:
 - [x] `url-schema.yaml` includes `/team/ki-agenten/:agentSlug` and `/komanda/ki-agenty/:agentSlug` patterns. (evidence: url-schema.yaml:63-78, both patterns with generated: true)
 - [x] `participant.ai-agent.validate` passes (no-op when no AI-agent participants exist) and is registered in `SITES_CHECK_AUTHOR_PIPELINE` after `participant.profile.validate`. (evidence: participant-ai-agent.ts:125-127 no-op pass; sites-check-author.ts:173-174 pipeline entry; command-tables/09-build-artifacts.ts:193-207 registration; 9 unit tests pass)
 - [x] `surface.contract.validate` passes with the updated C-contract. (evidence: surface.contract.validate exit 0, 5 surfaces validated, 0 violations)
-- [x] `rfc.validate` passes on this file before merging. (evidence: rfc.validate --site webgogol-com produces no diagnostics for RFC-0511)
+- [x] `rfc.validate` passes on this file before merging. (evidence: rfc.validate --site warpgogol-com produces no diagnostics for RFC-0511)
 
 ## Implementation notes for agents
 

@@ -135,7 +135,7 @@ pnpm exec site-kernel run grace.changesummary.validate --all
 pnpm exec site-kernel run grace.changesummary.tidy --all
 
 # Scope to one app or the packages
-pnpm exec site-kernel run grace.changesummary.tidy --app webgogol-com
+pnpm exec site-kernel run grace.changesummary.tidy --app warpgogol-com
 pnpm exec site-kernel run grace.changesummary.tidy --packages
 ```
 

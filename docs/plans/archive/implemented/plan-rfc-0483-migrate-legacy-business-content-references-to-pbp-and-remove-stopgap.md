@@ -7,7 +7,7 @@ createdAt: 2026-07-22
 updatedAt:
 scope:
   apps:
-    - webgogol-com
+    - warpgogol-com
   packages:
     - "@gogol/site-kernel-handoff"
     - "@gogol/site-kernel-codegen"
@@ -42,11 +42,11 @@ scope:
 - `packages/os/site-kernel-handoff/src/migrators/rfc-0483.ts` — **Create** — migrator implementation
 - `packages/os/site-kernel-handoff/src/migrators/registry.ts` — **Edit** — add `rfc0483Migrator` to `migratorRegistry` array
 - `packages/os/site-kernel-handoff/src/migrators/rfc-0483.pbt.test.ts` — **Create** — PBT idempotency test
-- `packages/os/site-kernel-handoff/src/migrators/rfc-0483.snapshot.test.ts` — **Create** — snapshot test reading from canonical `systems/webgogol-com/src/content/`
+- `packages/os/site-kernel-handoff/src/migrators/rfc-0483.snapshot.test.ts` — **Create** — snapshot test reading from canonical `systems/warpgogol-com/src/content/`
 
 ### 2.2 Configuration and data
 
-- `systems/webgogol-com/src/content.config.ts` — **Regenerate** — via `routes.generate` after template update (removes broken `@gogol/business` import and `...businessCollections` spread)
+- `systems/warpgogol-com/src/content.config.ts` — **Regenerate** — via `routes.generate` after template update (removes broken `@gogol/business` import and `...businessCollections` spread)
 - Workpiece `src/content.config.ts` — **Migrator edit** — removes local `business` collection definition
 - Workpiece `src/content/business/` — **Migrator delete** — entire directory
 - Workpiece `src/content/business-profile/de/**` — **Migrator create/edit** — new PBP entities + presentation fields
@@ -56,8 +56,8 @@ scope:
 
 - `docs/rfcs/rfc-0483-migrate-legacy-business-content-references-to-pbp-and-remove-stopgap.md` — read-only reference (accepted)
 - `docs/authoring/site-composition.md` — **Edit** — update `src/content/business/` references to `src/content/business-profile/` and `src/content/people/` (lines 136, 159, 188, 448)
-- `systems/webgogol-com/AGENTS.md` — **Post-mission** — regenerate via `agents.generate` after `mission.reconcile` (see Post-mission steps below)
-- `systems/webgogol-com/src/content/AGENTS.md` — **Post-mission** — regenerate via `agents.generate` after `mission.reconcile`
+- `systems/warpgogol-com/AGENTS.md` — **Post-mission** — regenerate via `agents.generate` after `mission.reconcile` (see Post-mission steps below)
+- `systems/warpgogol-com/src/content/AGENTS.md` — **Post-mission** — regenerate via `agents.generate` after `mission.reconcile`
 - No `docs/*.xml` Compass sync needed (verified by grep — no references to `business` content collection)
 
 ### 2.4 Validation and pipelines
@@ -91,21 +91,21 @@ scope:
 
 ---
 
-### Step 2. Regenerate canonical webgogol-com content.config.ts
+### Step 2. Regenerate canonical warpgogol-com content.config.ts
 
-**Goal:** Regenerate `systems/webgogol-com/src/content.config.ts` from the updated template to remove the broken `@gogol/business` import.
+**Goal:** Regenerate `systems/warpgogol-com/src/content.config.ts` from the updated template to remove the broken `@gogol/business` import.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run routes.generate --site webgogol-com`
+- Run `pnpm exec site-kernel run routes.generate --site warpgogol-com`
 - Verify the regenerated file no longer contains `business` collection or `@gogol/business` import
 - Verify it still contains `...pbpCollections`, `system`, `pages`, `prose`, `site`, `navigation`, `people`, `...faq`
 
 **Validation:**
 
-- `pnpm --filter webgogol-com exec astro check` passes (scoped typecheck)
+- `pnpm --filter warpgogol-com exec astro check` passes (scoped typecheck)
 
-**Completion criterion:** `systems/webgogol-com/src/content.config.ts` has no `business` collection or `@gogol/business` import.
+**Completion criterion:** `systems/warpgogol-com/src/content.config.ts` has no `business` collection or `@gogol/business` import.
 
 **Human review:** no
 
@@ -206,13 +206,13 @@ scope:
 
 ### Step 6. Write snapshot test
 
-**Goal:** Create `rfc-0483.snapshot.test.ts` that reads real content from `systems/webgogol-com/src/content/`, runs the migrator, and verifies correct output.
+**Goal:** Create `rfc-0483.snapshot.test.ts` that reads real content from `systems/warpgogol-com/src/content/`, runs the migrator, and verifies correct output.
 
 **Agent actions:**
 
 - Create `packages/os/site-kernel-handoff/src/migrators/rfc-0483.snapshot.test.ts`
 - Add `MODULE_CONTRACT` and `CHANGE_SUMMARY` scaffolding
-- Read real content from `systems/webgogol-com/src/content/` at test time:
+- Read real content from `systems/warpgogol-com/src/content/` at test time:
   - Copy `business/de/` and `business/uk/` with all legacy files
   - Copy `business-profile/uk/` with all PBP entities
   - Copy `business-profile/de/` with existing entities (business.md, organization/legal-identity.md, organization/brand.md, web.md, company.md, contact.md, location.md)
@@ -320,7 +320,7 @@ scope:
 
 After `mission.reconcile` transfers the workpiece commits to the canonical system (including the deletion of `src/content/business/`), the operator should:
 
-1. Run `pnpm exec site-kernel run agents.generate --site webgogol-com` to regenerate `systems/webgogol-com/AGENTS.md` and `systems/webgogol-com/src/content/AGENTS.md`
+1. Run `pnpm exec site-kernel run agents.generate --site warpgogol-com` to regenerate `systems/warpgogol-com/AGENTS.md` and `systems/warpgogol-com/src/content/AGENTS.md`
 2. Verify no stale `src/content/business/` references remain in GENERATED files
 3. Commit the regenerated AGENTS.md files
 
