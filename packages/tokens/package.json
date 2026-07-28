@@ -18,9 +18,11 @@
     "build": "echo 'No build step required — TypeScript sources and CSS consumed directly'",
     "build:check": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "codegen:token-names": "tsx scripts/gen-token-names.ts"
   },
   "devDependencies": {
+    "tsx": "^4.19.0",
     "vitest": "^4.1.10"
   },
   "gogol": {
