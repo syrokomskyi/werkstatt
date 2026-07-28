@@ -202,6 +202,7 @@ Rules:
 - `mission.reconcile` and `mission.close` block if the workpiece has uncommitted changes — run `mission.git.commit` first.
 - `mission.validate` warns (non-blocking) if the workpiece is dirty after validation — commit generated artifacts too.
 - Before sending any response to the operator, verify via `git status` that no uncommitted changes from the current session remain. If any exist, commit first.
+- **Session-start pre-flight (NON-NEGOTIABLE, RFC-0575):** At the start of `fo-idea-implement` and `fo-fix` skill pipelines, the agent MUST run `git status --short` in the werkstatt root and in each active mission workpiece (if any). If foreign uncommitted changes are found, the agent MUST: (1) report them to the operator, (2) never modify, stage, or discard them, (3) stage only its own files by explicit path, (4) verify `git diff --cached --name-only` before every commit excludes foreign files.
 - **Git hook activation (RFC-0534).** The pre-commit hook at `hooks/pre-commit` requires `git config core.hooksPath hooks/` to be active. Agents MUST invoke the `setup-ecosystem` skill when setting up a new development environment or after cloning the repository without onboarding. The `onboard` skill's Prepare step checks and configures this automatically for new onboarding.
 
 ## HDRI identity firewall, image resolution, material credits, responsive variants, derived artifact invalidation, silent UI text, behavior snapshot
