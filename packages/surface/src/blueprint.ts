@@ -38,7 +38,7 @@ import type {
   VirtualRouteEntry,
 } from "./types.ts";
 
-export type {
+import type {
   LocalizedString,
   BlueprintAxis,
   GeoDepth,
@@ -71,7 +71,38 @@ export type {
   Blueprint,
 } from "./blueprint-types.ts";
 
-import type { Blueprint, BlueprintPolicy, BlueprintLevel } from "./blueprint-types.ts";
+export type {
+  LocalizedString,
+  BlueprintAxis,
+  GeoDepth,
+  BlueprintLevelArticle,
+  BlueprintPillarHero,
+  BlueprintPillarAdaptationDimension,
+  BlueprintPillarAdaptation,
+  BlueprintPillarProductPrice,
+  BlueprintPillarFinalCta,
+  BlueprintPillar,
+  ServicePublicationGate,
+  BlueprintServiceConfig,
+  BlueprintLinkingParent,
+  IndustryPublicationGate,
+  BlueprintDossier,
+  IntersectionGate,
+  IntersectionSimilarity,
+  BlueprintIntersectionConfig,
+  BlueprintHubConfig,
+  BlueprintStatusGate,
+  BlueprintLevel,
+  BlueprintLinking,
+  BlueprintProjection,
+  EnrichedFieldSpec,
+  BlueprintDuplicatePolicy,
+  BlueprintEvidenceDepthPolicy,
+  BlueprintDemandDepthPolicy,
+  BlueprintDepthRolePolicy,
+  BlueprintPolicy,
+  Blueprint,
+};
 
 const DEFAULT_SEGMENT_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
