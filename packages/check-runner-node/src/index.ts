@@ -12,7 +12,6 @@
 </CHANGE_SUMMARY>
 */
 
-import { mkdir } from "node:fs/promises";
 import { join, posix } from "node:path";
 import {
   finalizeEvidenceGraph,
@@ -21,7 +20,11 @@ import {
   type SiteEvidenceGraph,
 } from "@warpgogol/check-core";
 import { byteHash } from "@warpgogol/fingerprint";
-import { extractPageEvidenceFromDOM } from "./dom-extract.ts";
+import type { BrowserCapturePort, CapturedPage } from "./browser-capture-port.ts";
+import { PlaywrightCaptureAdapter } from "./playwright-adapter.ts";
+
+export type { BrowserCapturePort, CapturedPage } from "./browser-capture-port.ts";
+export { PlaywrightCaptureAdapter } from "./playwright-adapter.ts";
 
 export const CHECK_RUNNER_INFO = {
   name: "@warpgogol/check-runner-node",
@@ -47,67 +50,31 @@ export interface CaptureEvidenceOptions {
   relativeRunDir: string;
 }
 
-const VIEWPORTS = [
-  { name: "desktop" as const, width: 1440, height: 1100 },
-  { name: "mobile" as const, width: 390, height: 844 },
-];
-
 export async function captureSiteEvidenceGraph(
   target: CheckTarget,
   options: CaptureEvidenceOptions,
+  capturePort: BrowserCapturePort = new PlaywrightCaptureAdapter(),
 ): Promise<SiteEvidenceGraph> {
-  const { chromium } = await import("playwright");
-  const browser = await chromium.launch();
   const pages: PageEvidence[] = [];
   const startPaths = target.startPaths?.length ? target.startPaths : ["/"];
   const maxPages = target.maxPages ?? startPaths.length;
   const paths = startPaths.slice(0, maxPages);
   const screenshotDir = join(options.runDir, "screenshots");
-  await mkdir(screenshotDir, { recursive: true });
+  const relativeScreenshotDir = posix.join(options.relativeRunDir, "screenshots");
 
   try {
     for (const path of paths) {
       const url = new URL(path, target.baseUrl).toString();
-      const context = await browser.newContext({ viewport: VIEWPORTS[0] });
-      const page = await context.newPage();
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 20_000 });
-      const pageEvidence = await page.evaluate(extractPageEvidenceFromDOM);
-      const viewports = [];
-      for (const viewport of VIEWPORTS) {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        const safeName = path.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "index";
-        const screenshotFile = `${safeName}-${viewport.name}.png`;
-        const screenshotPath = join(screenshotDir, screenshotFile);
-        await page.screenshot({ path: screenshotPath, fullPage: true });
-        viewports.push({
-          ...viewport,
-          screenshot: posix.join(options.relativeRunDir, "screenshots", screenshotFile),
-        });
-      }
-      await context.close();
-      pages.push({
+      const captured = await capturePort.capturePage(
         url,
         path,
-        title: pageEvidence.title,
-        lang: pageEvidence.lang,
-        canonical: pageEvidence.canonical,
-        metaDescription: pageEvidence.metaDescription,
-        text: pageEvidence.text,
-        contentHash: byteHash(pageEvidence.text),
-        sections: pageEvidence.sections.map((section) => ({
-          id: section.id,
-          index: section.index,
-          anchor: section.anchor,
-          heading: section.heading,
-          text: section.text,
-          htmlHash: byteHash(section.html),
-        })),
-        viewports,
-        links: pageEvidence.links,
-      });
+        screenshotDir,
+        relativeScreenshotDir,
+      );
+      pages.push(capturedPageToEvidence(captured));
     }
   } finally {
-    await browser.close();
+    await capturePort.close();
   }
 
   return finalizeEvidenceGraph({
@@ -117,4 +84,32 @@ export async function captureSiteEvidenceGraph(
     capturedAt: new Date().toISOString(),
     pages,
   });
+}
+
+function capturedPageToEvidence(captured: CapturedPage): PageEvidence {
+  return {
+    url: captured.url,
+    path: captured.path,
+    title: captured.title,
+    lang: captured.lang,
+    canonical: captured.canonical,
+    metaDescription: captured.metaDescription,
+    text: captured.text,
+    contentHash: byteHash(captured.text),
+    sections: captured.sections.map((section) => ({
+      id: section.id,
+      index: section.index,
+      anchor: section.anchor,
+      heading: section.heading,
+      text: section.text,
+      htmlHash: byteHash(section.html),
+    })),
+    viewports: captured.screenshots.map((s) => ({
+      name: s.name as "desktop" | "mobile",
+      width: s.width,
+      height: s.height,
+      screenshot: s.path,
+    })),
+    links: [...captured.links],
+  };
 }
