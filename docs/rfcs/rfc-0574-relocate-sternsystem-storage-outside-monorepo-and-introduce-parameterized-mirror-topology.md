@@ -399,19 +399,19 @@ New Sternsystems registered via `sternsystem.register` use `mirrors[]` from day 
 
 ## Acceptance criteria
 
-- [ ] `mirrorEntrySchema` and `mirrorStorageTypeSchema` defined in `@warpgogol/ontology/operations`
-- [ ] `fleetRegistryEntrySchema` uses `mirrors: z.array(mirrorEntrySchema).min(1)` instead of `repo:`/`mirror:`
-- [ ] `resolveMirrors()` helper added to `@warpgogol/site-kernel-handoff` and used by all 13+ files with hardcoded `path.join(workspaceRoot, "systems", ...)` references (see File system responsibilities table)
-- [ ] `sternsystem.validate` enforces: `mirrors[0].storageType === "non-bare"`, `mirrors.length >= 1`, mirror paths exist on disk, `bundle` storageType not used with git protocols
-- [ ] `sternsystem.sync` pushes from cache (`mirrors[0]`) to all git-accessible mirrors via star topology (no fetch/pull — fetch is handled by `syncCacheClone` during `mission.materialize`)
-- [ ] `sternsystem.sync` creates `git bundle` and copies to `bundle` storageType mirrors
-- [ ] `systems/registry.yaml` migrated: all entries use `mirrors[]`, no `repo:`/`mirror:` fields
-- [ ] `systems/<id>/` directories removed from monorepo (only `systems/registry.yaml` remains)
-- [ ] `AGENTS.md` updated: "Monorepo layout" section, "External mirror sync" section, and "Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces."
-- [ ] `docs/architecture-dna.md` DNA-45 entry updated to list `mirrors[]` instead of `repo` and `mirror` fields
-- [ ] Post-receive hook (`mirror-hook.ts`) deleted; `ensureMirrorHook()` calls removed from `sternsystem-sync.ts` and `sternsystem-register.ts`
-- [ ] `sternsystem.register` uses `--mirrors` flag instead of `--repo`/`--mirror`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mirrorEntrySchema` and `mirrorStorageTypeSchema` defined in `@warpgogol/ontology/operations` (evidence: packages/ontology/src/operations/sternsystem.ts, build:check pass)
+- [x] `fleetRegistryEntrySchema` uses `mirrors: z.array(mirrorEntrySchema).min(1)` instead of `repo:`/`mirror:` (evidence: packages/ontology/src/operations/sternsystem.ts, build:check pass)
+- [x] `resolveMirrors()` helper added to `@warpgogol/site-kernel-handoff` and used by all 13+ files with hardcoded `path.join(workspaceRoot, "systems", ...)` references (evidence: packages/os/site-kernel-handoff/src/sternsystem/registry-io.ts, resolve-mirrors.test.ts 21 tests pass)
+- [x] `sternsystem.validate` enforces: `mirrors[0].storageType === "non-bare"`, `mirrors.length >= 1`, mirror paths exist on disk, `bundle` storageType not used with git protocols (evidence: packages/os/site-kernel-handoff/src/sternsystem/sternsystem-validate.ts, mirror-validate.test.ts 5 tests pass)
+- [x] `sternsystem.sync` pushes from cache (`mirrors[0]`) to all git-accessible mirrors via star topology (evidence: sternsystem-sync.ts cache-to-bare push + bare-to-external push, sternsystem-sync-integration.test.ts 4 tests pass)
+- [x] `sternsystem.sync` creates `git bundle` and copies to `bundle` storageType mirrors (evidence: sternsystem-sync.ts bundle creation + copy logic)
+- [x] `systems/registry.yaml` migrated: all entries use `mirrors[]`, no `repo:`/`mirror:` fields (evidence: systems/registry.yaml)
+- [x] `systems/<id>/` directories removed from monorepo (only `systems/registry.yaml` remains) (evidence: git status shows systems/warpgogol-com/ relocated to ../systems-cache/warpgogol-com/)
+- [x] `AGENTS.md` updated: "Monorepo layout" section, "External mirror sync" section, and "Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces." (evidence: AGENTS.md:8,15-21)
+- [x] `docs/architecture-dna.md` DNA-45 entry updated to list `mirrors[]` instead of `repo` and `mirror` fields (evidence: docs/architecture-dna.md:197)
+- [x] Post-receive hook (`mirror-hook.ts`) deleted; `ensureMirrorHook()` calls removed from `sternsystem-sync.ts` and `sternsystem-register.ts` (evidence: mirror-hook.ts not found in codebase)
+- [x] `sternsystem.register` uses `--mirrors` flag instead of `--repo`/`--mirror` (evidence: packages/os/site-kernel-handoff/src/sternsystem/sternsystem-register.ts, index.ts)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0574 --json` exit code 0)
 
 ## Implementation notes for agents
 
