@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-28
 updatedAt: 2026-07-28
+enhancedAt: 2026-07-28
 implementedAt:
 closedAt:
 supersedes: []
@@ -36,7 +37,7 @@ satisfies: []
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: patch
+versionBump: none
 commands:
   proposed: []
   added: []
@@ -44,10 +45,12 @@ commands:
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
-packagesImpacted:
-  - "@warpgogol/forge"
+packagesImpacted: []
 successSignals: []
-nonGoals: []
+nonGoals:
+  - "No new Site OS command — the pre-flight check is a procedural rule, not a tooling-level command"
+  - "No new DNA invariant — session hygiene is operational discipline, not architecture"
+  - "No automated validator or tooling-level enforcement — the guard is agent-discipline-based, enforced through AGENTS.md rules and code review"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -104,7 +107,7 @@ This RFC extends existing operational discipline rules without introducing new c
 The pre-flight check runs at the beginning of `fo-idea-implement` (step 3.1, before reading the RFC) and `fo-fix` (step 1, before analyzing findings). The procedure:
 
 1. Run `git status --short` in the werkstatt repository root.
-2. If `systems/registry.yaml` has a `currentMission` for any Sternsystem, run `git status --short` in the mission workpiece directory (`missions/<missionId>/workpiece/`).
+2. If `systems/registry.yaml` has a `currentMission` for any Sternsystem, run `git status --short` in **each** active mission workpiece directory (`missions/<missionId>/workpiece/`). Iterate over all `currentMission` entries — there may be multiple Sternsystems with active missions.
 3. If either repository has uncommitted changes, record the list of dirty files as the **foreign changes set**.
 4. Report the foreign changes set to the operator in the first response.
 5. Proceed with the skill pipeline, treating the foreign changes set as **untouchable**.
