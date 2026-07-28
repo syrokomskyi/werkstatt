@@ -36,6 +36,7 @@ import { renderProse } from "./prose-pipeline.ts";
 /** RFC-0035: Markdown section specific pageOverride shape */
 interface MarkdownPageOverride {
   heading: string;
+  eyebrow?: string;
   lead?: string;
   /** RFC-0102: hide the section-number prefix on <SectionHeader>. Default true for prose pages. */
   hideSectionNumber?: boolean;
@@ -72,6 +73,7 @@ interface MarkdownPageOverride {
 const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const {
   heading,
+  eyebrow,
   lead,
   hideSectionNumber = true,
   variant = "default",
@@ -184,6 +186,7 @@ const shouldShowLanguageLabels = showLanguageColumns && showLanguageLabels;
       heading && (
         <SectionHeader
           heading={heading}
+          eyebrow={eyebrow}
           subheading={lead}
           level={1}
           align="center"

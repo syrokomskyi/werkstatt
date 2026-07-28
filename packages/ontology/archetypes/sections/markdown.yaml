@@ -23,6 +23,7 @@ propsSchema:
     z.object({
       contentRef: z.string().optional(),
       heading: z.string().optional(),
+      eyebrow: z.string().optional(),
       lead: z.string().optional(),
       hideSectionNumber: z.boolean().optional(),
       variant: z.enum(["default", "open-source"]).optional(),

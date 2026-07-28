@@ -5,7 +5,7 @@ semanticId: markdown
 archetype: markdown
 cosmicName: Hyperion
 role: markdown
-version: 1.4.0
+version: 1.5.0
 intent:
   - surface-content
   - fulfill-legal-requirement
@@ -24,6 +24,9 @@ propsSchema:
       type: string
     heading:
       type: string
+    eyebrow:
+      type: string
+      minLength: 1
     lead:
       type: string
     hideSectionNumber:
