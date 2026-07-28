@@ -16,6 +16,7 @@
 
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import path from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -86,10 +87,30 @@ export async function runSternsystemSync(
     throw new Error(`[sternsystem.sync] system '${id}' has no bare mirror configured`);
   }
 
-  const { gitMirrors } = resolveMirrors(workspaceRoot, entry);
+  const { gitMirrors, cachePath } = resolveMirrors(workspaceRoot, entry);
   const bareRepoPath = resolveMirrorPath(workspaceRoot, gitMirrors[0].path);
   if (!existsSync(bareRepoPath)) {
     throw new Error(`[sternsystem.sync] bare repo not found at ${bareRepoPath}`);
+  }
+
+  // RFC-0574: star topology — first push cache clone to bare repo (mirrors[1])
+  let branch: string;
+  try {
+    branch = git(bareRepoPath, "symbolic-ref HEAD");
+  } catch {
+    throw new Error(`[sternsystem.sync] bare repo has no commits — nothing to push`);
+  }
+  const branchName = branch.replace("refs/heads/", "");
+
+  if (existsSync(path.join(cachePath, ".git"))) {
+    logger.info(`[sternsystem.sync] pushing cache clone to bare repo…`);
+    try {
+      git(cachePath, `push origin ${branchName}`);
+    } catch (err) {
+      logger.warn(
+        `[sternsystem.sync] cache-to-bare push failed (non-fatal): ${(err as Error).message}`,
+      );
+    }
   }
 
   // External mirrors are mirrors[2+] (git accessible, non-bundle)
@@ -107,14 +128,6 @@ export async function runSternsystemSync(
   });
   const mirrorUrls = externalMirrors.map((m) => m.path);
 
-  let branch: string;
-  try {
-    branch = git(bareRepoPath, "symbolic-ref HEAD");
-  } catch {
-    throw new Error(`[sternsystem.sync] bare repo has no commits — nothing to push`);
-  }
-  const branchName = branch.replace("refs/heads/", "");
-
   if (syncAll) {
     branch = "*";
   }
@@ -122,7 +135,7 @@ export async function runSternsystemSync(
   const refSpec = syncAll ? "--all" : branchName;
   const tagSpec = syncAll ? " --tags" : "";
 
-  const errors: string[] = [];
+  const warnings: string[] = [];
 
   for (const mirrorUrl of mirrorUrls) {
     const remoteName = `mirror-${mirrorUrls.indexOf(mirrorUrl)}`;
@@ -150,33 +163,17 @@ export async function runSternsystemSync(
         git(bareRepoPath, `push ${remoteName} ${refSpec}${tagSpec}`);
       } catch (err) {
         const stderr = (err as Error).message;
-        if (stderr.includes("non-fast-forward") || stderr.includes("rejected")) {
-          errors.push(
-            `git push to ${mirrorUrl} failed (non-fast-forward): ${stderr}. Mirror may have diverged — disaster recovery required.`,
-          );
-        } else {
-          errors.push(`git push to ${mirrorUrl} failed: ${stderr}`);
-        }
+        const msg =
+          stderr.includes("non-fast-forward") || stderr.includes("rejected")
+            ? `git push to ${mirrorUrl} failed (non-fast-forward): ${stderr}. Mirror may have diverged — disaster recovery required.`
+            : `git push to ${mirrorUrl} failed: ${stderr}`;
+        warnings.push(msg);
+        logger.warn(`[sternsystem.sync] ${msg}`);
       }
     }
   }
 
-  if (errors.length > 0) {
-    const syncedAt = new Date().toISOString();
-    const data: SternsystemSyncData = {
-      systemId: id,
-      mirrorUrls,
-      direction: "push",
-      branch: syncAll ? "*" : branchName,
-      commitSha: null,
-      syncedAt,
-    };
-    return {
-      data,
-      exitCode: 1,
-      summary: `[sternsystem.sync] failed: ${errors.join("; ")}`,
-    };
-  }
+  // RFC-0574: per-mirror failures are non-fatal — sync continues and reports warnings
 
   let commitSha: string;
   try {
