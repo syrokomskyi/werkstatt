@@ -17,7 +17,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0480
-amendedBy: []
+amendedBy:
+  - RFC-0568
 related:
   - DNA-46
   - DNA-47
