@@ -162,7 +162,11 @@ See [`docs/policies/agent-surface-ops.md`](docs/policies/agent-surface-ops.md) f
 
 Agents **MUST NOT** run root `pnpm build` or `turbo run build` during agent workflows. See [`docs/policies/build-verification.md`](docs/policies/build-verification.md) for scoped typecheck verification rules, command execution timeout discipline (6-minute budget), and rationale.
 
-Agents **MUST NOT** use name-based `pnpm --filter <name>` for app-level commands (build, build:check, astro build, astro check) when multiple workspaces share the same name — this is the case for every Sternsystem with active mission workpieces (e.g. `warpgogol-com` matches both `systems/warpgogol-com` and `missions/warpgogol-com-m*/workpiece`). A name-based filter runs the command in **all** matching workpieces in parallel, which builds mission workpieces unintentionally and can fail on stale workpiece state. Instead, use a path-based filter (`pnpm --filter ./systems/<id>`) or run the command directly in the target directory (`cd systems/<id> && npx <cmd>`).
+Agents **MUST NOT** use name-based `pnpm --filter <name>` for app-level commands (build, build:check, astro build, astro check, astro dev, start) when multiple workspaces share the same name — this is the case for every Sternsystem with active mission workpieces (e.g. `warpgogol-com` matches both `systems/warpgogol-com` and every `missions/warpgogol-com-m*/workpiece`). A name-based filter runs the command in **all** matching workpieces in parallel, which builds or starts dev servers in mission workpieces unintentionally and can fail on stale workpiece state. Instead, use one of:
+
+- **Path-based filter:** `pnpm --filter ./systems/<id> exec <cmd>` or `pnpm --filter ./missions/<missionId>/workpiece exec <cmd>`
+- **Direct execution:** `cd <dir> && pnpm exec <cmd>`
+- **Mission dev server:** `pnpm exec site-kernel run mission.preview --mission <missionId> --port <port>` (preferred for mission workpieces)
 
 ## Commit discipline (RFC-0480)
 
