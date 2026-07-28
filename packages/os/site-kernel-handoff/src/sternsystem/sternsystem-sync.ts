@@ -17,6 +17,8 @@
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { tmpdir } from "node:os";
+import * as fs from "node:fs/promises";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -170,6 +172,43 @@ export async function runSternsystemSync(
         warnings.push(msg);
         logger.warn(`[sternsystem.sync] ${msg}`);
       }
+    }
+  }
+
+  // RFC-0574: bundle mirrors — create git bundle from bare repo and copy to backup endpoints
+  const bundleMirrors = entry.mirrors.slice(2).filter((m) => m.storageType === "bundle");
+  for (const bundleMirror of bundleMirrors) {
+    const bundlePath = path.join(tmpdir(), `${id}-${Date.now()}.bundle`);
+    try {
+      git(bareRepoPath, `bundle create "${bundlePath}" --all`);
+      logger.info(`[sternsystem.sync] created bundle for ${bundleMirror.path}`);
+      // Copy bundle to backup endpoint (non-git protocols: ftp, s3, rsync)
+      // For file-based bundle mirrors, copy directly
+      if (
+        bundleMirror.path.startsWith("./") ||
+        bundleMirror.path.startsWith("../") ||
+        bundleMirror.path.startsWith("/")
+      ) {
+        const destPath = resolveMirrorPath(workspaceRoot, bundleMirror.path);
+        await fs.mkdir(path.dirname(destPath), { recursive: true });
+        await fs.copyFile(bundlePath, destPath);
+        logger.info(`[sternsystem.sync] copied bundle to ${destPath}`);
+      } else {
+        // Non-file protocols (ftp, s3, rsync) — log as warning (external tool required)
+        warnings.push(
+          `bundle copy to ${bundleMirror.path} requires external tool (ftp/s3/rsync) — bundle created at ${bundlePath}`,
+        );
+        logger.warn(
+          `[sternsystem.sync] bundle copy to ${bundleMirror.path} requires external tool`,
+        );
+      }
+    } catch (err) {
+      const msg = `bundle creation/copy for ${bundleMirror.path} failed: ${(err as Error).message}`;
+      warnings.push(msg);
+      logger.warn(`[sternsystem.sync] ${msg}`);
+    } finally {
+      // Cleanup temp bundle
+      await fs.rm(bundlePath, { force: true }).catch(() => {});
     }
   }
 

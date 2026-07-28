@@ -5,19 +5,20 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 ## Monorepo layout
 
 - This repository is a Turborepo + pnpm-workspace monorepo on Astro 6 + TypeScript strict.
-- Deployable sites live as Sternsystemen registered in `systems/registry.yaml`. Each Sternsystem has a git repo (referenced by `repo:` in the registry), a pin file (`systems/<id>/system.pin.json`), and an active mission workpiece at `missions/<missionId>/workpiece/` when a mission is in progress. The `apps/*` directory is retired (RFC-0381); shared site composition conventions now live in `docs/authoring/site-composition.md`.
+- Deployable sites live as Sternsystemen registered in `systems/registry.yaml`. Each Sternsystem declares a `mirrors[]` array (RFC-0574): `mirrors[0]` is the non-bare cache clone (outside the monorepo), `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors. A pin file lives at `mirrors[0].path/system.pin.json`, and an active mission workpiece at `missions/<missionId>/workpiece/` when a mission is in progress. The `apps/*` directory is retired (RFC-0381); shared site composition conventions now live in `docs/authoring/site-composition.md`.
 - Deployable backend runtime compositions live in `services/*`. Treat them as the backend analogue of site workspaces: thin wiring, runtime entrypoints, environment/store/queue selection, deployment config, and health checks only.
 - Shared and reusable libraries live in `packages/*` (UI, share, ontology, business, growth, growth-adapters, passport, nebula, star-map, tokens, agent-gate, forge) and `packages/os/*` (site-kernel and its sub-modules, including changelog, deploy, integrity, onboarding, and handoff).
 - New sites must be created via `onboarding.scaffold`, not by copying an existing site.
 - A site's job is **composition only**: `src/content/system.md` + `src/content/**` + a few thin proxy files. All section, component, runtime, and validator logic lives in `packages/*`. If you find yourself adding logic to a site, ask whether it belongs in a package first.
 - A service workspace's job is **runtime composition only**. Shared schemas, reusable browser capture, check rules, report shapes, adapters, and validators belong in `packages/*`; services must not import from site workspaces, and site workspaces must not import from `services/*`.
 
-## External mirror sync (RFC-0472)
+## External mirror sync (RFC-0472, RFC-0574)
 
-- Each Sternsystem may declare an optional `mirror` field in `systems/registry.yaml` pointing to an external git remote (e.g. GitHub).
-- `sternsystem.sync --id <id>` synchronizes the local bare repo with the mirror. It is a **manual operator action** — agents MUST NOT run it automatically after `mission.reconcile` or any other pipeline step.
-- Agents MAY recommend running `sternsystem.sync` in their output when `mirror` is configured and a reconcile has completed.
-- `sternsystem.validate` warns when the mirror remote is missing, URL-mismatched, or contains embedded credentials.
+- Each Sternsystem declares a `mirrors[]` array in `systems/registry.yaml`. `mirrors[0]` is the non-bare cache clone, `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors (git remotes, backup endpoints).
+- `sternsystem.sync --id <id>` synchronizes all mirrors via star topology through `mirrors[0]` (cache clone). It pushes from cache to bare, then from bare to external git mirrors. Per-mirror failures are non-fatal. It is a **manual operator action** — agents MUST NOT run it automatically after `mission.reconcile` or any other pipeline step.
+- Agents MAY recommend running `sternsystem.sync` in their output when external mirrors are configured and a reconcile has completed.
+- `sternsystem.validate` enforces mirror topology rules: `mirrors[0]` must be non-bare, mirror paths must exist, `bundle` storageType must not use git protocols, and no embedded credentials.
+- Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces.
 
 ## Repository setup (Git LFS)
 

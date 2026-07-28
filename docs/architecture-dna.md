@@ -194,7 +194,7 @@ A Sternsystem is a durable, independently versioned, data-only site bundle store
 
 ## DNA-45 · Fleet registry
 
-`systems/registry.yaml` is the machine-readable index of all Sternsystems. Each entry carries: `id`, `cosmicStar`, `repo`, `mirror`, `pinnedPlatform`, `currentMission`, `lastRelease`, `status` (registered/active/paused/archived), `registeredAt`, and `deployment` config. The registry is the single source of truth for fleet state; all Sternsystem operations read and update it. Enforced by `sternsystem.validate` and `sternsystem.list`. Established by RFC-0354.
+`systems/registry.yaml` is the machine-readable index of all Sternsystems. Each entry carries: `id`, `cosmicStar`, `mirrors` (array of `{ path, storageType }` — RFC-0574), `pinnedPlatform`, `currentMission`, `lastRelease`, `status` (registered/active/paused/archived), `registeredAt`, and `deployment` config. The registry is the single source of truth for fleet state; all Sternsystem operations read and update it. Enforced by `sternsystem.validate` and `sternsystem.list`. Established by RFC-0354.
 
 ## DNA-46 · Mission lifecycle
 
