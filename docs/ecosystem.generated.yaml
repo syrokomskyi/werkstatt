@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 965f6eb9846e86c2fd6a3155b53dde977a9846016a065cf3d0f0bf819fa804d7
+  contentHash: 78e704c8104f29c08c1ceade07d27ea383572a889d972b9ad7498486affc909e
   sources:
     - path: docs/architecture-dna.md
       hash: 738946b5871fd9857cebae096f7d2b7798389628f182d9d6a6004f848ac2804a
@@ -22,16 +22,6 @@ meta:
       hash: ce321ba5b7b9f18c4c2c108bc00ec054bfacccdf552bfb1bee58c21213c241cc
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: ad4b6dfdedcc73c92a956a485248f76cd5ca18d544537efa11913d8b14125791
-    - path: missions/warpgogol-com-m000010/workpiece/package.json
-      hash: 66a548e4049014a423d6953cf03a32bb5ef2bdfb144dbae035df5299b72d3cc6
-    - path: missions/warpgogol-com-m000011/workpiece/package.json
-      hash: 66a548e4049014a423d6953cf03a32bb5ef2bdfb144dbae035df5299b72d3cc6
-    - path: missions/warpgogol-com-m000013/workpiece/package.json
-      hash: 66a548e4049014a423d6953cf03a32bb5ef2bdfb144dbae035df5299b72d3cc6
-    - path: missions/warpgogol-com-m000014/workpiece/package.json
-      hash: 66a548e4049014a423d6953cf03a32bb5ef2bdfb144dbae035df5299b72d3cc6
-    - path: missions/warpgogol-com-m000015/workpiece/package.json
-      hash: 4c2317d38334887952be7450c1360364aee0ee879f5a107c8149c8d3572e5fa1
     - path: missions/warpgogol-com-m000016/workpiece/package.json
       hash: b881b770783f5cbc029627661d581b82eba1d33311a092bc284e636d261cc51d
     - path: package.json
@@ -186,292 +176,11 @@ sternsystems:
     currentMission: warpgogol-com-m000016
     registeredAt: 2026-07-13T00:00:00.000Z
 missions:
-  - id: warpgogol-com-m000010
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000010/workpiece
-  - id: warpgogol-com-m000011
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000011/workpiece
-  - id: warpgogol-com-m000012
-    sternsystem: ""
-    status: open
-    workpiecePath: null
-  - id: warpgogol-com-m000013
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000013/workpiece
-  - id: warpgogol-com-m000014
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000014/workpiece
-  - id: warpgogol-com-m000015
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000015/workpiece
   - id: warpgogol-com-m000016
     sternsystem: ""
     status: open
     workpiecePath: missions/warpgogol-com-m000016/workpiece
 packages:
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000010/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000010/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000011/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000011/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000013/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000013/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000014/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000014/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000015/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-handoff"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/site-kernel-onboarding"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000015/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
   - name: warpgogol-com
     directory: missions/warpgogol-com-m000016/workpiece
     workspacePattern: missions/*/workpiece
@@ -1414,7 +1123,7 @@ quality:
     real: 31
     noop: 0
     absent: 1
-    skipped: 22
+    skipped: 17
   testSignalPolicy:
     hasErrors: true
     errorCount: 1
@@ -7699,8 +7408,8 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 4
-  implemented: 17
+  accepted: 3
+  implemented: 18
   draft: 4
   reviewing: 0
 baseline:
@@ -7845,12 +7554,17 @@ baseline:
       dnaRefs:
         - DNA-44
         - DNA-47
+    - id: RFC-0573
+      implementedAt: 2026-07-28
+      kind: command
+      scope: workspace
+      dnaRefs:
+        - DNA-46
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
       - RFC-0572
-      - RFC-0573
     draft:
       - RFC-0383
       - RFC-0384
