@@ -14,8 +14,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { existsSync } from "node:fs";
-import { dirname, join, posix } from "node:path";
+import { posix } from "node:path";
 
 const CHECK_WEBGOGOL_ROOT = ".check-warpgogol";
 const RUNS_SUBDIR = "runs";
@@ -34,15 +33,4 @@ export function screenshotsRelDir(runId: string): string {
 
 export function logsRelDir(runId: string): string {
   return posix.join(runRelDir(runId), "logs");
-}
-
-export function findWorkspaceRoot(configuredRoot?: string): string {
-  if (configuredRoot && configuredRoot.length > 0) return configuredRoot;
-  let current = process.cwd();
-  for (;;) {
-    if (existsSync(join(current, "pnpm-workspace.yaml"))) return current;
-    const parent = dirname(current);
-    if (parent === current) return process.cwd();
-    current = parent;
-  }
 }

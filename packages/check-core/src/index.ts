@@ -16,6 +16,7 @@ export * from "./diagnostics.ts";
 export * from "./evidence.ts";
 export * from "./report.ts";
 export * from "./run-paths.ts";
+export * from "./workspace-resolver.ts";
 export * from "./run-request.ts";
 export * from "./safety.ts";
 export * from "./target.ts";
