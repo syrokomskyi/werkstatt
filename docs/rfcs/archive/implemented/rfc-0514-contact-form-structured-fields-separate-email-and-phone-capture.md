@@ -21,6 +21,7 @@ implementedAt: 2026-07-24
 closedAt:
 supersedes: []
 supersededBy:
+  - RFC-0572
 amends: []
 amendedBy: []
 related:
