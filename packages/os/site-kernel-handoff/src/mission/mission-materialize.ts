@@ -13,6 +13,7 @@
   <item>RFC-0517: add preflight content quality gate between atomicMoveDir and git init.</item>
   <item>Run build.prepare pipeline after atomicMoveDir to generate all derived artifacts (surface, sitemap, video/image variants, etc.) before git init.</item>
   <item>Set PUBLIC_IMAGE_PROVIDER=build-portable in workpiece .env files so image.variants.generate produces responsive variants.</item>
+  <item>Auto-install Playwright Chromium during materialization (idempotent) — ensures build.post print.pdf.generate and independent-qa work without manual intervention.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -488,6 +489,42 @@ async function runPreflightGate(
   return report;
 }
 
+async function ensurePlaywrightChromium(
+  workspaceRoot: string,
+  logger: { info: (msg: string) => void },
+): Promise<void> {
+  const home = process.env["HOME"] ?? "/tmp";
+  const playwrightCache = path.join(home, ".cache", "ms-playwright");
+  let chromiumFound = false;
+  if (existsSync(playwrightCache)) {
+    try {
+      const entries = await fs.readdir(playwrightCache);
+      chromiumFound = entries.some((e) => e.startsWith("chromium"));
+    } catch {
+      chromiumFound = false;
+    }
+  }
+  if (chromiumFound) {
+    logger.info(`  Playwright Chromium: already installed`);
+    return;
+  }
+  logger.info(`  Playwright Chromium: not found — installing…`);
+  try {
+    execSync("pnpm exec playwright install chromium", {
+      cwd: workspaceRoot,
+      stdio: ["pipe", "pipe", "pipe"],
+      timeout: 120_000,
+    });
+    logger.info(`  Playwright Chromium: installed`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.info(
+      `  Playwright Chromium: install failed (non-fatal) — ${msg}. ` +
+        `Run 'pnpm exec playwright install chromium' manually before build:check.`,
+    );
+  }
+}
+
 export async function runMissionMaterialize(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -655,6 +692,10 @@ export async function runMissionMaterialize(
     }
     process.env["PUBLIC_IMAGE_PROVIDER"] = "build-portable";
     logger.info(`  PUBLIC_IMAGE_PROVIDER set to build-portable in .env files`);
+
+    // Ensure Playwright Chromium is installed (needed by build.post → print.pdf.generate
+    // and independent-qa). Idempotent — skips if browsers are already present.
+    await ensurePlaywrightChromium(workspaceRoot, logger);
 
     // Run build.prepare pipeline to generate all derived artifacts
     // (surface, sitemap, video/image variants, llms, feed, etc.)
