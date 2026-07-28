@@ -14,12 +14,14 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-07-28
-updatedAt: 2026-07-28
+updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0354
 amendedBy: []
 related:
   - DNA-44
@@ -48,14 +50,23 @@ satisfies:
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
 versionBump: minor
+breaksC: true
 commands:
   proposed: []
   added: []
   changed:
     - sternsystem.sync
     - sternsystem.validate
+    - sternsystem.register
+    - sternsystem.pin
+    - sternsystem.status
+    - sternsystem.extract
     - mission.materialize
     - mission.reconcile
+    - mission.open
+    - mission.close
+    - mission.abort
+    - notausgang.export
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -71,10 +82,10 @@ successSignals:
   - "sternsystem.sync synchronizes all git-accessible mirrors via star topology through cache"
 nonGoals:
   - "Does not change the mission workpiece lifecycle (open/materialize/validate/reconcile/close)"
-  - "Does not change the Bordbuch hash-chain or Bordbuch git synchronization"
+  - "Does not change the Bordbuch hash-chain mechanism or Bordbuch git synchronization protocol — but the Bordbuch storage path changes from systems/<id>/bordbuch/ to mirrors[0].path/bordbuch/ (path relocation, not mechanism change)"
   - "Does not introduce a new backup command — sternsystem.sync handles all mirror synchronization"
   - "Does not change the Notausgang export or release artifact store"
-  - "Does not modify the mirror auto-push hook (post-receive) — the hook remains on bare mirrors"
+  - "Does not modify the Bordbuch entry schema or Bordbuch event types"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -217,15 +228,25 @@ Git-accessible protocols: `file`, `ssh`, `https`. Non-git protocols (`ftp`, `s3`
 | --- | --- |
 | `systems/registry.yaml` | Stays in monorepo. Contains `mirrors[]` instead of `repo:`/`mirror:`. |
 | `systems/<id>/` | **Removed** from monorepo. Cache clone relocated to `mirrors[0].path`. |
-| `mirrors[0].path` (external) | Non-bare git repo. Cache clone for mission lifecycle. Browsable by operator. |
+| `mirrors[0].path` (external) | Non-bare git repo. Cache clone for mission lifecycle. Browsable by operator. Contains `bordbuch/`, `system.pin.json`, content. |
 | `mirrors[1..N].path` (external) | Additional mirrors: bare repos, external remotes, backup endpoints. |
 | `packages/ontology/src/operations/sternsystem.ts` | Schema definition: `fleetRegistryEntrySchema` gains `mirrors[]`, loses `repo:`/`mirror:`. |
 | `packages/os/site-kernel-handoff/src/sternsystem/registry-io.ts` | `resolveRegistryPath` unchanged. Path resolution helpers updated. |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | `syncCacheClone` and `systemDir` resolve from `mirrors[0].path` instead of `path.join(workspaceRoot, "systems", systemId)`. |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | `runMissionReconcile` resolves `systemDir` from `mirrors[0].path`. |
-| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-sync.ts` | Star-topology sync: fetch from git mirrors into cache, push from cache to git mirrors, bundle+copy to backup mirrors. |
+| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-sync.ts` | Star-topology sync: push from cache to git mirrors, bundle+copy to backup mirrors. Post-receive hook removed from bare mirrors. |
 | `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-validate.ts` | New validation rules for mirror topology. |
-| `AGENTS.md` | Updated rule: "Agents MUST NEVER edit any Sternsystem mirror directly." |
+| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-register.ts` | 5 call sites (lines 89, 116, 123, 130, 260) updated to use `mirrors[0].path`. `--repo`/`--mirror` flags replaced by `--mirrors`. |
+| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-pin.ts` | `cacheDir` resolves from `mirrors[0].path` (line 63). |
+| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-status.ts` | `systemDir` resolves from `mirrors[0].path` (line 98). |
+| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-extract.ts` | `systemDir` resolves from `mirrors[0].path` (line 81). |
+| `packages/os/site-kernel-handoff/src/sternsystem/mirror-hook.ts` | Post-receive hook removed — `sternsystem.sync` handles all propagation in star topology. |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | `syncCacheClone` and `systemDir` resolve from `mirrors[0].path` instead of `path.join(workspaceRoot, "systems", systemId)`. |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | `runMissionReconcile` and `runMissionDiff` resolve `systemDir` from `mirrors[0].path` (lines 244, 378, 483). |
+| `packages/os/site-kernel-handoff/src/mission/mission-open.ts` | `pinPath` and `commitAndPushBordbuch` resolve from `mirrors[0].path` (lines 85, 144). |
+| `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | `commitAndPushBordbuch` resolves from `mirrors[0].path` (line 187). |
+| `packages/os/site-kernel-handoff/src/mission/mission-abort.ts` | `commitAndPushBordbuch` resolves from `mirrors[0].path` (line 138). |
+| `packages/os/site-kernel-handoff/src/notausgang/notausgang-commands.ts` | Bordbuch and pin paths resolve from `mirrors[0].path` (lines 205, 212). |
+| `packages/os/site-kernel-handoff/src/surface-contract.ts` | `siteDir` resolves from `mirrors[0].path` (line 50). |
+| `AGENTS.md` | Updated rules: "Monorepo layout" section, "External mirror sync" section, and "Agents MUST NEVER edit any Sternsystem mirror directly." |
 
 ### Output format
 
@@ -307,9 +328,11 @@ Pretty vs JSON output: identical semantics. Pretty mode logs to stderr/stdout wi
 
 ### Migration order
 
-1. **Schema change** (`@warpgogol/ontology`): Add `mirrors[]` to `fleetRegistryEntrySchema`. Keep `repo:` and `mirror:` as deprecated optional fields during migration. Add `mirrorEntrySchema` and `mirrorStorageTypeSchema`.
-2. **Path resolution** (`@warpgogol/site-kernel-handoff`): Add `resolveMirrors()` helper. Update `mission.materialize`, `mission.reconcile`, `sternsystem.sync`, `sternsystem.validate` to use `resolveMirrors()` when `mirrors[]` is present, fall back to `repo:`/`mirror:` when only legacy fields exist.
-3. **Registry migration**: For each entry in `systems/registry.yaml`, convert `repo:` + `mirror:` to `mirrors[]`. Example:
+The migration is **atomic** — all changes land in a single commit wave. There is no dual-schema period and no fallback logic. The ecosystem is forward-only.
+
+1. **Schema change** (`@warpgogol/ontology`): Replace `repo:` and `mirror:` in `fleetRegistryEntrySchema` with `mirrors: z.array(mirrorEntrySchema).min(1)`. Add `mirrorEntrySchema` and `mirrorStorageTypeSchema`. Remove `repoRe` (no longer needed). Export `MirrorEntry` and `MirrorStorageType` types.
+2. **Path resolution** (`@warpgogol/site-kernel-handoff`): Add `resolveMirrors()` helper. Update **all** 13+ files with hardcoded `path.join(workspaceRoot, "systems", ...)` references to use `resolveMirrors()` (see File system responsibilities table for the complete list).
+3. **Registry migration**: Convert the single entry in `systems/registry.yaml` from `repo:` + `mirror:` to `mirrors[]` in the same commit:
    ```yaml
    # Before
    repo: ../systems-git/warpgogol-com
@@ -323,14 +346,17 @@ Pretty vs JSON output: identical semantics. Pretty mode logs to stderr/stdout wi
      - path: git@github.com:syrokomskyi/warpgogol-com.git
        storageType: bare
    ```
-4. **Physical relocation**: Move `systems/<id>/` directories to their new `mirrors[0].path` locations outside the monorepo. The existing git history in each cache clone is preserved.
-5. **Remove legacy fields**: After all entries are migrated, remove `repo:` and `mirror:` from `fleetRegistryEntrySchema`. Remove fallback logic in path resolution.
-6. **AGENTS.md update**: Replace the rule about `systems/<id>/` with the mirror-based rule.
-7. **sternsystem.sync star topology**: Update sync to iterate all `mirrors[1..N]`, fetch git-accessible mirrors into cache, push from cache to git mirrors, bundle+copy to backup mirrors.
+4. **Physical relocation**: Move `systems/<id>/` directories to their new `mirrors[0].path` locations outside the monorepo. The existing git history in each cache clone is preserved. After the move, update the `origin` git remote in each cache clone to point to the new relative path of the bare mirror (`mirrors[1].path`), since relative paths change when the cache clone moves from `systems/<id>/` to `../systems-cache/<id>/`.
+5. **Remove post-receive hook**: Delete `mirror-hook.ts` and remove `ensureMirrorHook()` calls from `sternsystem-sync.ts` and `sternsystem-register.ts`. In the star topology, `sternsystem.sync` handles all propagation from cache to mirrors — the post-receive hook on bare mirrors would cause a double-push.
+6. **AGENTS.md update**: Update the "Monorepo layout" section (replace `repo:` reference with `mirrors[]`), update the "External mirror sync" section (replace single `mirror` field with `mirrors[]` star topology), and add the rule: "Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces."
+7. **DNA-45 prose update**: Update `docs/architecture-dna.md` DNA-45 entry to list `mirrors[]` instead of `repo` and `mirror` fields.
+8. **Compass sync**: Update `docs/requirements.xml` and `docs/technology.xml` if they reference the fleet registry `repo`/`mirror` fields.
+9. **sternsystem.sync star topology**: Update sync to iterate all `mirrors[1..N]`, push from cache to git mirrors, bundle+copy to backup mirrors. Fetch from bare mirrors into cache is handled by `syncCacheClone` during `mission.materialize` (unchanged).
+10. **sternsystem.register update**: Replace `--repo` and `--mirror` flags with `--mirrors` (comma-separated list of `path:storageType` pairs). The command constructs the cache clone at `mirrors[0].path` and clones from `mirrors[1]` (bare) if available.
 
-### No flag day
+### Atomic migration
 
-The migration uses a dual-schema period: `mirrors[]` is accepted alongside `repo:`/`mirror:`. Commands check for `mirrors[]` first, fall back to legacy fields. This allows incremental migration of registry entries without breaking running missions.
+The migration is a single atomic change — no dual-schema period, no fallback logic. With only one entry in `systems/registry.yaml`, a one-shot migration is trivial. The schema, path resolution, registry, physical relocation, and AGENTS.md updates all land in one commit wave.
 
 ### New Sternsystems
 
@@ -352,9 +378,9 @@ New Sternsystems registered via `sternsystem.register` use `mirrors[]` from day 
 
 ## Risks
 
-- **Path resolution breakage:** Multiple commands hardcode `path.join(workspaceRoot, "systems", systemId)`. Missing any call site breaks mission lifecycle silently. Mitigation: grep for all `"systems"` path references and update them. The `resolveMirrors()` helper centralizes resolution.
+- **Path resolution breakage:** 13+ files across `packages/os/site-kernel-handoff/src/` hardcode `path.join(workspaceRoot, "systems", systemId)`. Missing any call site breaks mission lifecycle silently. Mitigation: the `resolveMirrors()` helper centralizes resolution; the File system responsibilities table enumerates every call site.
 
-- **Migration complexity:** Each registry entry must be converted from `repo:`/`mirror:` to `mirrors[]`. Errors in conversion can break materialization. Mitigation: dual-schema period allows incremental migration; `sternsystem.validate` catches topology errors.
+- **Migration complexity:** Each registry entry must be converted from `repo:`/`mirror:` to `mirrors[]`. Errors in conversion can break materialization. Mitigation: atomic migration with `sternsystem.validate` catching topology errors before and after the switch.
 
 - **Backup mirror reliability:** `git bundle` + FTP/S3/rsync copy introduces non-git failure modes (network timeouts, permission errors). Mitigation: per-mirror failures are non-fatal in `sternsystem.sync`; failed mirrors are logged and skipped.
 
@@ -364,17 +390,26 @@ New Sternsystems registered via `sternsystem.register` use `mirrors[]` from day 
 
 - **Protocol inference ambiguity:** `path` strings like `user@host:path` could be SSH or SCP. Mitigation: `git@` prefix and `ssh://` scheme are unambiguous SSH; `scp://` or `sftp://` schemes map to bundle storageType.
 
+- **Concurrent sync and materialize:** If `sternsystem.sync` pushes from cache to mirrors while `mission.materialize` fetches into cache, there is a potential race. Mitigation: `sternsystem.sync` acquires the `system:<id>` lock before touching the cache clone, same as `mission.materialize`.
+
+- **Origin remote path change:** Moving the cache clone from `systems/<id>/` to `../systems-cache/<id>/` changes the relative path to the bare repo. The `origin` git remote in the cache clone must be updated during migration (step 4). Mitigation: `git remote set-url origin <new-relative-path>` is part of the migration script.
+
+- **Bordbuch path relocation:** The Bordbuch physically moves from `systems/<id>/bordbuch/` to `mirrors[0].path/bordbuch/`. All `commitAndPushBordbuch(systemDir, ...)` calls in `mission-open.ts`, `mission-close.ts`, `mission-abort.ts`, and `sternsystem-sync.ts` must use `mirrors[0].path`. The hash-chain mechanism is unchanged — only the storage path moves.
+
 ## Acceptance criteria
 
 - [ ] `mirrorEntrySchema` and `mirrorStorageTypeSchema` defined in `@warpgogol/ontology/operations`
 - [ ] `fleetRegistryEntrySchema` uses `mirrors: z.array(mirrorEntrySchema).min(1)` instead of `repo:`/`mirror:`
-- [ ] `resolveMirrors()` helper added to `@warpgogol/site-kernel-handoff` and used by `mission.materialize`, `mission.reconcile`, `sternsystem.sync`, `sternsystem.validate`
+- [ ] `resolveMirrors()` helper added to `@warpgogol/site-kernel-handoff` and used by all 13+ files with hardcoded `path.join(workspaceRoot, "systems", ...)` references (see File system responsibilities table)
 - [ ] `sternsystem.validate` enforces: `mirrors[0].storageType === "non-bare"`, `mirrors.length >= 1`, mirror paths exist on disk, `bundle` storageType not used with git protocols
-- [ ] `sternsystem.sync` synchronizes all git-accessible mirrors via star topology through `mirrors[0]` (fetch into cache, push from cache)
+- [ ] `sternsystem.sync` pushes from cache (`mirrors[0]`) to all git-accessible mirrors via star topology (no fetch/pull — fetch is handled by `syncCacheClone` during `mission.materialize`)
 - [ ] `sternsystem.sync` creates `git bundle` and copies to `bundle` storageType mirrors
 - [ ] `systems/registry.yaml` migrated: all entries use `mirrors[]`, no `repo:`/`mirror:` fields
 - [ ] `systems/<id>/` directories removed from monorepo (only `systems/registry.yaml` remains)
-- [ ] `AGENTS.md` rule updated: "Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces."
+- [ ] `AGENTS.md` updated: "Monorepo layout" section, "External mirror sync" section, and "Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces."
+- [ ] `docs/architecture-dna.md` DNA-45 entry updated to list `mirrors[]` instead of `repo` and `mirror` fields
+- [ ] Post-receive hook (`mirror-hook.ts`) deleted; `ensureMirrorHook()` calls removed from `sternsystem-sync.ts` and `sternsystem-register.ts`
+- [ ] `sternsystem.register` uses `--mirrors` flag instead of `--repo`/`--mirror`
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -385,6 +420,9 @@ New Sternsystems registered via `sternsystem.register` use `mirrors[]` from day 
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces. This replaces the previous rule about `systems/<id>/`.
-- When implementing path resolution changes, search for ALL hardcoded `path.join(workspaceRoot, "systems", ...)` references — missing any call site breaks mission lifecycle silently.
-- The dual-schema migration period means `repo:`/`mirror:` must still be read during transition. Do not remove legacy field parsing until all registry entries are migrated.
+- When implementing path resolution changes, update ALL 13+ files with hardcoded `path.join(workspaceRoot, "systems", ...)` references — the File system responsibilities table enumerates every call site. Missing any breaks mission lifecycle silently.
+- The migration is atomic — no dual-schema period, no fallback logic. `repo:`/`mirror:` are removed from the schema in the same commit that adds `mirrors[]`.
 - `sternsystem.sync` remains a manual operator action — agents MUST NOT run it automatically after `mission.reconcile` or any other pipeline step.
+- The post-receive hook on bare mirrors is removed entirely. In the star topology, `sternsystem.sync` handles all propagation from cache to mirrors. The hook would cause a double-push.
+- The Bordbuch storage path changes from `systems/<id>/bordbuch/` to `mirrors[0].path/bordbuch/`. The hash-chain mechanism is unchanged — only the path moves.
+- After physical relocation, update the `origin` git remote in each cache clone to point to the new relative path of the bare mirror.
