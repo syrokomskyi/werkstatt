@@ -3,7 +3,7 @@ observe.webgogol.com {
 }
 
 ingest.observe.webgogol.com {
-  @unauthorized not header Authorization "Bearer {$WGOGOL_OTLP_TOKEN}"
+  @unauthorized not header Authorization "Bearer {$WARPGOGOL_OTLP_TOKEN}"
   respond @unauthorized 401
   reverse_proxy otel-collector:4318
 }
