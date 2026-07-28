@@ -697,7 +697,11 @@ export async function runMissionMaterialize(
       const keepPaths = new Set([...STERNSYSTEM_DATA_PATHS, "system.pin.json", ".git"]);
       const stagingEntries = await fs.readdir(stagingDir, { withFileTypes: true });
       for (const entry of stagingEntries) {
-        if (!keepPaths.has(entry.name)) {
+        // Check if entry name is an exact match OR a parent directory of any keep path
+        // (e.g. "src" is the parent of "src/content")
+        const isKeepPath =
+          keepPaths.has(entry.name) || [...keepPaths].some((kp) => kp.startsWith(`${entry.name}/`));
+        if (!isKeepPath) {
           const entryPath = path.join(stagingDir, entry.name);
           await fs.rm(entryPath, { recursive: true, force: true });
         }
