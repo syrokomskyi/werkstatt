@@ -13,8 +13,6 @@
 </CHANGE_SUMMARY>
 */
 
-import type { EligibilityPolicy } from "./types.ts";
-
 /** A localized string map: lang → value. */
 export type LocalizedString = Record<string, string>;
 

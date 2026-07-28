@@ -9,7 +9,6 @@ DEFAULT values are those of the Warpgogol studio site (apps-todo/main).
 <non-goals>
   <item>Do not import or bundle the CSS file — this module is TS-only.</item>
   <item>Do not export token VALUES — values live exclusively in tokens.css.</item>
-  <item>Do not include app-specific override tokens (e.g. --ds-z-*).</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>

@@ -19,7 +19,7 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as yamlParse } from "yaml";
-import type { ClusterOutcome } from "../governance/index.ts";
+import type { ClusterOutcome } from "../visibility.ts";
 
 export interface OutcomesPayload {
   generatedAt: string | null;

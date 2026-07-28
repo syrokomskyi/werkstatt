@@ -8,6 +8,7 @@ Deterministic SSG-rendered SVG diagram of an app's cosmic universe (DNA-32, RFC-
 | --- | --- | --- |
 | `@warpgogol/star-map` | `src/index.ts` | Barrel: `renderStarMap`, `manifestToStarMapInput`, `emitStarMap`, types (`StarMapInput`, `StarMapOutput`, `StarMapManifestSubset`, ...) |
 | `@warpgogol/star-map/render` | `src/render.ts` | `renderStarMap(input)` — produces deterministic SVG + SHA-256 hash; `manifestToStarMapInput` adapter (accepts `StarMapManifestSubset`); `emitStarMap` helper |
+| — | `src/svg-renderer.ts` | SVG node/edge rendering, assembly, and SHA-256 hashing — extracted from `render.ts` for independent testability |
 
 ## Hierarchy depth
 

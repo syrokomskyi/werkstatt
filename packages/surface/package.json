@@ -31,10 +31,6 @@
       "types": "./src/geo.ts",
       "default": "./src/geo.ts"
     },
-    "./governance": {
-      "types": "./src/governance/index.ts",
-      "default": "./src/governance/index.ts"
-    },
     "./io": {
       "types": "./src/io/index.ts",
       "default": "./src/io/index.ts"
