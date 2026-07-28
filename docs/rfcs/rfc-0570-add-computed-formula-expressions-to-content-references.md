@@ -1,0 +1,297 @@
+---
+id: RFC-0570
+title: "Add computed formula expressions to content references"
+status: draft
+# kind options: architecture | contract | command | policy | deprecation
+kind: architecture
+# scope options: app | workspace
+scope: workspace
+owners:
+  - architecture
+# Set by the deciding human together with the status change (RFC-0335).
+# Draft scaffolds must keep this empty; do not prefill a default identity.
+# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
+# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+reviewers: []
+createdAt: 2026-07-28
+updatedAt: 2026-07-28
+implementedAt:
+closedAt:
+supersedes: []
+supersededBy:
+amends: []
+amendedBy: []
+related:
+  - RFC-0045
+  - RFC-0527
+  - RFC-0529
+# RFC-0331: DNA invariants this RFC implements, protects, or extends.
+# Required for architecture/contract RFCs created on or after 2026-07-07.
+# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+satisfies:
+  - DNA-4
+  - DNA-24
+# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
+# Set by spec.materialize; leave commented for non-spec RFCs.
+# specRef:
+# RFC-0478: Platform versioning enforcement. Declares the SemVer delta this RFC
+# produces when implemented. Required for post-cutoff implemented RFCs (V-29).
+# Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
+# major (architectural, manually reserved). Default: patch.
+versionBump: patch
+commands:
+  proposed:
+    - content.formula.lint
+    - content.formula.migrate
+  added: []
+  changed:
+    - content.references.validate
+  removed: []
+appsImpacted:
+  - warpgogol-com
+# List only packages actually impacted. Leave empty if unknown.
+packagesImpacted:
+  - "@warpgogol/share"
+  - "@warpgogol/site-kernel-checks"
+  - "@warpgogol/site-kernel-codegen"
+successSignals:
+  - "Formula expressions with =(ref + ref * 12) syntax resolve at build time without hardcoded results"
+  - "content.formula.lint detects hardcoded arithmetic next to content references"
+  - "content.references.validate reports REF-04..07 for formula errors"
+nonGoals:
+  - "Automatic migration of all hardcoded arithmetic in existing content (manual content.formula.migrate only)"
+  - "Support for non-arithmetic expressions (string concatenation, conditionals, date math)"
+  - "Client-side runtime formula evaluation (build-time/SSG only)"
+# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
+# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
+# automatically inside build pipelines). Closed probe vocabulary — see
+# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
+# acceptance:
+#   - probe: run
+#     command: "site-kernel run some.command.validate --app warpgogol-com"
+#     expect:
+#       exitCode: 0
+#   - probe: file-exists
+#     path: "packages/share/src/some-new-module.ts"
+#   - probe: command-registered
+#     name: "some.new.command"
+#   - probe: file-contains
+#     path: "AGENTS.md"
+#     pattern: "Some new governance paragraph"
+---
+
+# RFC-0570: Add computed formula expressions to content references
+
+## Context
+
+Content references (RFC-0045, RFC-0527, RFC-0529) allow markdown content files to reference frontmatter values from other content files using braceless `collection.file.field` syntax. The resolver (`@warpgogol/share/content-reference.ts`) substitutes these references at build time via a generated index (`content-ref-index.generated.yaml`).
+
+However, the resolver only supports **direct field substitution** — it cannot compute values from multiple references. When content needs to express a derived value (e.g., "setup price + monthly price × 12 = total"), authors must hardcode the arithmetic result as a literal string alongside the references:
+
+```yaml
+description: "business-profile.offerings/digital-foundation.presentation.price.setup + business-profile.offerings/digital-foundation.presentation.price.monthly × 12 = 1 040 €"
+```
+
+This pattern is already present in `digitales-fundament.md` (DE + UK). The hardcoded result (`1 040 €`) drifts from the source values when prices change — the same class of bug that content references were designed to eliminate.
+
+## Problem
+
+DNA-4 (Canonical content in `src/content/`) is violated whenever a derived numeric result is hardcoded in prose instead of computed from canonical source fields. The current resolver (`resolveReferencesInString` in `@warpgogol/share/content-reference.ts`) treats the entire string as text — it substitutes individual references but cannot evaluate arithmetic expressions over them.
+
+Concrete failure mode: if `price.setup` changes from 200 to 250 in the business-profile frontmatter, the hardcoded `1 040 €` in `digitales-fundament.md` becomes stale and incorrect. There is no validator that detects this drift — `content.references.validate` checks that individual references resolve, but does not detect hardcoded arithmetic results sitting next to them.
+
+DNA-24 (Block-declarative pages) is also affected: block props containing formula descriptions are not fully declarative — they mix live references with dead literals.
+
+## Decision
+
+The content reference resolver gains support for **computed formula expressions** using `=(...)` delimiter syntax. Formulas contain braceless content references, arithmetic operators (`+`, `-`, `*`, `/`), numeric literals, and parentheses for grouping. The resolver extracts numeric values from field strings (e.g., `"200 €"` → `200`), evaluates the expression using a sandboxed math parser (`expr-eval`), and formats the result with the surrounding text.
+
+Two new commands are introduced:
+
+- `content.formula.lint` — detects hardcoded arithmetic patterns next to content references (warn-level in `build.check`)
+- `content.formula.migrate` — manually converts detected hardcoded formulas to `=(...)` syntax
+
+`content.references.validate` is extended with REF-04..07 error codes for formula-specific failures.
+
+## Architectural fit
+
+- **DNA-4 (Canonical content in `src/content/`):** Formulas eliminate hardcoded derived values in prose — every numeric result is computed from canonical frontmatter fields at build time.
+- **DNA-24 (Block-declarative pages):** Block props with formula expressions remain fully declarative — no arithmetic is hardcoded, the block prop declares the computation, and the resolver evaluates it.
+- **RFC-0045 (content data references):** Extends the reference syntax with a new expression form. Does not change existing braceless reference behavior.
+- **RFC-0527 (content reference index):** Reuses the same generated index — no new index format needed.
+- **RFC-0529 (braceless migration):** The `=(...)` delimiter does not conflict with braceless syntax or the `BRACE_RESIDUAL_PATTERN` validator — `=` prefix is unambiguous and not a valid braceless reference start.
+- **Site OS operator model:** Resolution lives in `@warpgogol/share` (same as existing references). Validation lives in `@warpgogol/site-kernel-checks`. Migration lives in `@warpgogol/site-kernel-codegen`. Same module placement as RFC-0529.
+
+## Design
+
+### CLI surface
+
+```sh
+# Detect hardcoded arithmetic next to content references (warn in build.check)
+pnpm exec site-kernel run content.formula.lint --site warpgogol-com
+
+# Convert detected hardcoded formulas to =(...) syntax (manual, writes files)
+pnpm exec site-kernel run content.formula.migrate --site warpgogol-com
+
+# Existing validator now also checks formula expressions
+pnpm exec site-kernel run content.references.validate --site warpgogol-com
+```
+
+All three commands are site-scoped (`--site <id>`). `content.formula.lint` is read-only and integrates into `build.check` as a warn-level check. `content.formula.migrate` is a manual write command (not in build pipeline).
+
+### TypeScript contracts
+
+```ts
+// @warpgogol/share/content-reference.ts — extended
+
+const FORMULA_PATTERN = /=\(([^)]+)\)/g;
+
+interface FormulaResolution {
+  value: string;
+  resolved: boolean;
+  error?: string; // REF-04..07
+}
+
+// Extracts a numeric value from a field string like "200 €" → 200
+function extractNumeric(value: unknown): number | null;
+
+// Evaluates a formula expression after substituting all references
+function resolveFormula(
+  index: ContentRefIndex,
+  expression: string,
+  lang: string,
+  defaultLang: string,
+): FormulaResolution;
+
+// Extended resolveReferencesInString now also scans for =(...) patterns
+// and delegates to resolveFormula for each match.
+```
+
+### File system responsibilities
+
+| Path | Role |
+| --- | --- |
+| `packages/share/src/content-reference.ts` | Extended resolver — formula detection, evaluation, substitution |
+| `packages/share/src/formula-eval.ts` | New — numeric extraction + `expr-eval` wrapper |
+| `packages/os/site-kernel-checks/src/content-references.ts` | Extended validator — REF-04..07 error codes |
+| `packages/os/site-kernel-checks/src/content-formula-lint.ts` | New — hardcoded formula detector (reused by migrate) |
+| `packages/os/site-kernel-codegen/src/content-formula-migrate.ts` | New — imports lint detector, writes converted content |
+| `src/content/pages/{lang}/*.md` | Scanned by lint; modified by migrate |
+| `src/content/prose/{lang}/*.md` | Scanned by lint; modified by migrate |
+| `src/content-ref-index.generated.yaml` | Read (unchanged, RFC-0527 format) |
+
+### Output format
+
+`content.formula.lint`:
+
+```json
+{
+  "command": "content.formula.lint",
+  "status": "pass",
+  "warnings": [
+    {
+      "file": "src/content/pages/de/digitales-fundament.md",
+      "line": 269,
+      "pattern": "ref + ref × 12 = 1 040 €",
+      "suggestion": "=(business-profile.offerings/digital-foundation.presentation.price.setup + business-profile.offerings/digital-foundation.presentation.price.monthly * 12) €"
+    }
+  ]
+}
+```
+
+`content.references.validate` (extended with formula errors):
+
+```json
+{
+  "command": "content.references.validate",
+  "status": "fail",
+  "violations": [
+    {
+      "file": "src/content/pages/de/digitales-fundament.md",
+      "line": 269,
+      "rule": "REF-04",
+      "message": "Formula reference unresolved: business-profile.offerings/digital-foundation.presentation.price.nonexistent"
+    }
+  ]
+}
+```
+
+Error codes:
+
+- `REF-04`: Formula reference unresolved (a content reference inside `=(...)` does not resolve)
+- `REF-05`: Formula operand is not numeric (a resolved value cannot be parsed as a number)
+- `REF-06`: Formula syntax error (malformed expression — unbalanced parens, unknown operator)
+- `REF-07`: Formula division by zero
+
+### Failure modes
+
+**Build-time (`content.references.validate`):**
+
+- REF-04..07 are **errors** — build fails with non-zero exit.
+- In `--json` mode, violations appear in the `violations` array with `rule`, `file`, `line`, `message`.
+- In pretty mode, violations are printed as red error lines.
+
+**Build-time (`content.formula.lint` in `build.check`):**
+
+- Hardcoded formula detection is **warn-level** — does not fail the build.
+- Warnings appear in `--json` as `warnings[]` array.
+- In pretty mode, yellow warning lines.
+
+**Runtime (SSR/SSG, `resolveReferencesInString`):**
+
+- If a formula cannot be evaluated (REF-04..07), the resolver renders an **empty string** — never the raw `=(...)` expression. This prevents leaking formula syntax to the page, matching the existing behavior for unresolved braceless references (which render as-is only when the index is empty; formula failures are always silent).
+- Division by zero at runtime → empty string (build-time validator catches it first in normal workflows).
+
+## Rollout
+
+- **Formula resolver (`@warpgogol/share`):** Ships as a non-breaking extension to `resolveReferencesInString`. Strings without `=(...)` are unaffected — existing apps work identically until authors use the new syntax.
+- **`content.references.validate` extension:** REF-04..07 errors only fire when `=(...)` formulas are present. Existing content without formulas passes unchanged.
+- **`content.formula.lint`:** Warn-level in `build.check` from day one. Does not fail builds. Detects hardcoded arithmetic patterns (e.g., `ref + ref × N = number`) and suggests `=(...)` replacement.
+- **`content.formula.migrate`:** Manual command — not in any pipeline. Operators run it explicitly to convert detected hardcoded formulas.
+- **New apps:** Automatically compliant — no formulas to migrate, `=(...)` syntax available from day one.
+- **Existing apps (warpgogol-com):** `content.formula.lint` warns about existing hardcoded formulas in `digitales-fundament.md`. Operator runs `content.formula.migrate` to convert them. No flag day required.
+- **`expr-eval` dependency:** Added to `packages/share/package.json`. No breaking change to existing dependencies.
+
+## Alternatives considered
+
+1. **`{...}` brace delimiter for formulas** — rejected because RFC-0529 just migrated all content references _away from_ brace syntax. The `BRACE_RESIDUAL_PATTERN` validator would flag formulas as malformed brace references, creating a conflict. The `=(...)` prefix is unambiguous and does not conflict with any existing syntax.
+
+2. **`[[...]]` double-bracket delimiter** — viable but visually heavier and less intuitive than `=(...)`, which mirrors spreadsheet formula syntax. Rejected in favor of `=(...)`.
+
+3. **Custom minimal expression parser (shunting-yard)** — rejected in favor of `expr-eval` per the project policy of preferring external packages over reimplementing solved problems. `expr-eval` is a sandboxed math evaluator (no `eval`/`Function`), 2KB, well-maintained.
+
+4. **Require pure numeric fields in frontmatter** — rejected as too invasive. Fields like `price.setup` store `"200 €"` with units; forcing authors to split numbers from units would break existing content and reduce readability. The `extractNumeric` approach handles this transparently.
+
+5. **Automatic migration of all hardcoded formulas via RFC-0529 migrator** — rejected because detecting formulas in free text is error-prone (false positives on prose that happens to contain `+` or `×`). A separate `content.formula.lint` + `content.formula.migrate` pair with human review is safer.
+
+## Risks
+
+- **False positives in `content.formula.lint`:** The hardcoded formula detector may flag prose that coincidentally contains `ref + ref = number` patterns without being a formula. Mitigation: warn-level only, human reviews before running migrate.
+- **Numeric extraction edge cases:** `extractNumeric` must handle formats like `"1 040 €"` (thin space thousands separator), `"1.040 €"` (German thousands separator), `"70 €/Monat"`. If extraction fails, REF-05 is reported — the author fixes the field format or uses a different field.
+- **`expr-eval` dependency:** Adds a runtime dependency to `@warpgogol/share`. The package is small (2KB), has no transitive dependencies, and is sandboxed (no `eval`). Low risk.
+- **Agent misinterpretation:** Agents may confuse `=(...)` formula syntax with YAML frontmatter or Astro expressions. Mitigation: the `=(...)` prefix is documented as content-reference-only syntax, not valid YAML or Astro. Implementation notes below explicitly state the scope.
+- **Performance:** Formula evaluation adds one regex scan + one `expr-eval` parse per string with `=(...)`. Negligible — only fires when the pattern is present, which is rare.
+
+## Acceptance criteria
+
+- [ ] `@warpgogol/share/content-reference.ts` recognizes `=(...)` formula syntax and evaluates it using `expr-eval` with numeric extraction from field strings
+- [ ] `@warpgogol/share/formula-eval.ts` exports `extractNumeric()` and `resolveFormula()` with unit tests covering: numeric prefix extraction, thin-space/period thousands separators, non-numeric values (returns null), division by zero, syntax errors
+- [ ] `content.references.validate` reports REF-04 (unresolved formula ref), REF-05 (non-numeric operand), REF-06 (syntax error), REF-07 (division by zero) as errors
+- [ ] `content.formula.lint` command registered in `site-kernel-checks`, detects hardcoded arithmetic patterns next to content references, outputs warnings in `--json` format
+- [ ] `content.formula.migrate` command registered in `site-kernel-codegen`, imports the lint detector (no duplicated detection logic), writes converted `=(...)` syntax to content files
+- [ ] `content.formula.lint` integrated into `build.check` as warn-level check
+- [ ] `expr-eval` declared in `packages/share/package.json` dependencies
+- [ ] Existing apps without `=(...)` formulas pass `content.references.validate` unchanged (non-breaking)
+- [ ] `AGENTS.md` updated with `=(...)` formula syntax documentation in the content references section
+- [ ] `rfc.validate` passes on this file
+
+## Implementation notes for agents
+
+- Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
+- Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
+- For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
+- Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- Agents MUST NOT use `=(...)` formula syntax in YAML frontmatter keys or Astro expressions — it is content-reference syntax only, resolved by `resolveReferencesInString` in `@warpgogol/share`.
+- Agents MUST NOT hardcode numeric results of arithmetic over content references in prose or block props — use `=(...)` formula syntax instead. `content.formula.lint` will warn about such patterns.
+- Agents MUST NOT duplicate the hardcoded formula detection logic between `content.formula.lint` and `content.formula.migrate` — the migrate command imports the lint detector.
