@@ -177,7 +177,7 @@ export default defineConfig({
     },
     ssr: {
       external: ["node:async_hooks"],
-      noExternal: [/^@warpgogol\//, /^@warpgogol\//],
+      noExternal: [/^@warpgogol\//],
     },
   },
 });

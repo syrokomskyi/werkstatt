@@ -110,6 +110,47 @@ function statusBadge(status: string | undefined, lang: string): string | undefin
 }
 
 /**
+ * RFC-0510: Localized labels for human profile page blocks.
+ */
+const HUMAN_PROFILE_LABELS: Record<
+  string,
+  {
+    responsibilityHeading: string;
+    responsibilitySubheading: string;
+    responsibilityPrimary: string;
+    responsibilitySecondary: string;
+    evidenceHeading: string;
+    evidenceLead: string;
+    careerHeading: string;
+    personalHeading: string;
+    personalLead: string;
+  }
+> = {
+  de: {
+    responsibilityHeading: "Verantwortung & Entscheidungsbefugnis",
+    responsibilitySubheading: "Für diese Entscheidungen und Ergebnisse trage ich persönlich.",
+    responsibilityPrimary: "Verantwortung",
+    responsibilitySecondary: "Entscheidungsbefugnis",
+    evidenceHeading: "Nachweise & Beiträge",
+    evidenceLead: "Belegte Ergebnisse und öffentlich zugängliche Arbeiten.",
+    careerHeading: "Beruflicher Werdegang",
+    personalHeading: "Persönlicher Hintergrund",
+    personalLead: "Private Einblicke, die ich freiwillig teile.",
+  },
+  uk: {
+    responsibilityHeading: "Відповідальність і повноваження",
+    responsibilitySubheading: "За ці рішення та результати я несу особисту відповідальність.",
+    responsibilityPrimary: "Відповідальність",
+    responsibilitySecondary: "Повноваження",
+    evidenceHeading: "Докази та роботи",
+    evidenceLead: "Задокументовані результати та публічно доступні роботи.",
+    careerHeading: "Професійний шлях",
+    personalHeading: "Особистий контекст",
+    personalLead: "Особисті деталі, якими я ділюся добровільно.",
+  },
+};
+
+/**
  * RFC-0510: Build the six-block human profile page structure from a ParticipantView.
  * Blocks: hero, controlled-responsibility-block, evidence markdown, career markdown,
  * personal markdown (consent-gated), final-cta.
@@ -122,6 +163,7 @@ function buildHumanProfileBlocks(
   const blocks: Array<Record<string, unknown>> = [];
   const name = participant?.name ?? slug;
   const pageId = participantPageId(slug);
+  const labels = HUMAN_PROFILE_LABELS[lang] ?? HUMAN_PROFILE_LABELS["de"]!;
 
   // RFC-0513: Status badge for non-active participants
   const badge = statusBadge(participant?.status, lang);
@@ -154,12 +196,16 @@ function buildHumanProfileBlocks(
       id: "responsibility",
       type: "controlled-responsibility-block",
       props: {
+        background: { kind: "transparent" },
         header: {
-          heading: "Verantwortung & Entscheidungsbefugnis",
-          subheading: "Für diese Entscheidungen und Ergebnisse trage ich persönlich.",
+          heading: labels.responsibilityHeading,
+          subheading: labels.responsibilitySubheading,
         },
         body: {
-          labels: { primary: "Verantwortung", secondary: "Entscheidungsbefugnis" },
+          labels: {
+            primary: labels.responsibilityPrimary,
+            secondary: labels.responsibilitySecondary,
+          },
           primaryItems: [
             ...(participant?.responsibility?.summary
               ? [{ text: participant.responsibility.summary }]
@@ -182,10 +228,11 @@ function buildHumanProfileBlocks(
     id: "evidence",
     type: "markdown",
     props: {
-      heading: "Nachweise & Beiträge",
-      lead: "Belegte Ergebnisse und öffentlich zugängliche Arbeiten.",
+      heading: labels.evidenceHeading,
+      lead: labels.evidenceLead,
       contentRef: `prose/${slug}-nachweise`,
-      hideSectionNumber: true,
+      background: { kind: "transparent" },
+      hideSectionNumber: false,
       pageId,
     },
   });
@@ -195,9 +242,10 @@ function buildHumanProfileBlocks(
     id: "career",
     type: "markdown",
     props: {
-      heading: "Beruflicher Werdegang",
+      heading: labels.careerHeading,
       contentRef: `prose/${slug}-beruflich`,
-      hideSectionNumber: true,
+      background: { kind: "transparent" },
+      hideSectionNumber: false,
       pageId,
     },
   });
@@ -209,10 +257,11 @@ function buildHumanProfileBlocks(
       id: "personal",
       type: "markdown",
       props: {
-        heading: "Persönlicher Hintergrund",
-        lead: "Private Einblicke, die ich freiwillig teile.",
+        heading: labels.personalHeading,
+        lead: labels.personalLead,
         contentRef: `prose/${slug}-persoenlich`,
-        hideSectionNumber: true,
+        background: { kind: "transparent" },
+        hideSectionNumber: false,
         pageId,
       },
     });
@@ -266,6 +315,57 @@ function autonomyLabel(level: string, lang: string): string {
 }
 
 /**
+ * RFC-0511: Localized labels for AI-agent profile page blocks.
+ */
+const AI_AGENT_PROFILE_LABELS: Record<
+  string,
+  {
+    purposeHeading: string;
+    purposeSubheading: string;
+    purposePrimary: string;
+    purposeSecondary: string;
+    rightsHeading: string;
+    rightsLead: string;
+    accountabilityHeading: string;
+    accountabilityLead: string;
+    technicalHeading: string;
+    technicalLead: string;
+    limitationsHeading: string;
+    limitationsLead: string;
+  }
+> = {
+  de: {
+    purposeHeading: "Zweck & Funktionsumfang",
+    purposeSubheading: "Welche Aufgabe dieser Agent erfüllt und welche Fähigkeiten er hat.",
+    purposePrimary: "Zweck",
+    purposeSecondary: "Fähigkeiten",
+    rightsHeading: "Autonomie & Handlungsrechte",
+    rightsLead: "Was dieser Agent tun darf und was menschliche Freigabe erfordert.",
+    accountabilityHeading: "Verantwortlichkeit & Eskalation",
+    accountabilityLead:
+      "Welche Person für diesen Agenten verantwortlich ist und wie eskaliert wird.",
+    technicalHeading: "Technischer Stand",
+    technicalLead: "Modellfamilie und Überprüfungszyklus.",
+    limitationsHeading: "Bekannte Einschränkungen",
+    limitationsLead: "Was dieser Agent nicht kann oder nicht tun sollte.",
+  },
+  uk: {
+    purposeHeading: "Призначення та функціональність",
+    purposeSubheading: "Яке завдання виконує цей агент і які можливості він має.",
+    purposePrimary: "Призначення",
+    purposeSecondary: "Можливості",
+    rightsHeading: "Автономія та права дій",
+    rightsLead: "Що цьому агенту дозволено робити, а що вимагає людського погодження.",
+    accountabilityHeading: "Відповідальність та ескалація",
+    accountabilityLead: "Хто відповідає за цього агента і як відбувається ескалація.",
+    technicalHeading: "Технічний стан",
+    technicalLead: "Сімейство моделі та цикл перевірки.",
+    limitationsHeading: "Відомі обмеження",
+    limitationsLead: "Чого цей агент не може або не повинен робити.",
+  },
+};
+
+/**
  * RFC-0511: Build the seven-block AI-agent profile page structure from a ParticipantView.
  * Blocks: hero, purpose (controlled-responsibility-block), rights (markdown),
  * accountability (markdown), technical (markdown), limitations (markdown), cta.
@@ -278,6 +378,7 @@ function buildAiAgentProfileBlocks(
   const ai = participant.aiAgent;
   const name = participant.publicName ?? participant.name ?? participant.slug;
   const pageId = participantPageId(participant.slug);
+  const labels = AI_AGENT_PROFILE_LABELS[lang] ?? AI_AGENT_PROFILE_LABELS["de"]!;
 
   // Block 1: Hero (name, purpose, autonomy level — no portrait)
   // RFC-0513: Status badge takes precedence over purposeStatement for non-active participants
@@ -302,11 +403,11 @@ function buildAiAgentProfileBlocks(
     type: "controlled-responsibility-block",
     props: {
       header: {
-        heading: "Zweck & Funktionsumfang",
-        subheading: "Welche Aufgabe dieser Agent erfüllt und welche Fähigkeiten er hat.",
+        heading: labels.purposeHeading,
+        subheading: labels.purposeSubheading,
       },
       body: {
-        labels: { primary: "Zweck", secondary: "Fähigkeiten" },
+        labels: { primary: labels.purposePrimary, secondary: labels.purposeSecondary },
         primaryItems: ai ? [{ text: ai.purposeStatement }] : [],
         secondaryItems: (participant.capabilities ?? []).map((c) => ({ text: c })),
       },
@@ -318,8 +419,8 @@ function buildAiAgentProfileBlocks(
     id: "rights",
     type: "markdown",
     props: {
-      heading: "Autonomie & Handlungsrechte",
-      lead: "Was dieser Agent tun darf und was menschliche Freigabe erfordert.",
+      heading: labels.rightsHeading,
+      lead: labels.rightsLead,
       contentRef: `prose/${participant.slug}-rechte`,
       hideSectionNumber: true,
       pageId,
@@ -331,8 +432,8 @@ function buildAiAgentProfileBlocks(
     id: "accountability",
     type: "markdown",
     props: {
-      heading: "Verantwortlichkeit & Eskalation",
-      lead: "Welche Person für diesen Agenten verantwortlich ist und wie eskaliert wird.",
+      heading: labels.accountabilityHeading,
+      lead: labels.accountabilityLead,
       contentRef: `prose/${participant.slug}-verantwortlichkeit`,
       hideSectionNumber: true,
       pageId,
@@ -344,8 +445,8 @@ function buildAiAgentProfileBlocks(
     id: "technical",
     type: "markdown",
     props: {
-      heading: "Technischer Stand",
-      lead: "Modellfamilie und Überprüfungszyklus.",
+      heading: labels.technicalHeading,
+      lead: labels.technicalLead,
       contentRef: `prose/${participant.slug}-technik`,
       hideSectionNumber: true,
       pageId,
@@ -358,8 +459,8 @@ function buildAiAgentProfileBlocks(
       id: "limitations",
       type: "markdown",
       props: {
-        heading: "Bekannte Einschränkungen",
-        lead: "Was dieser Agent nicht kann oder nicht tun sollte.",
+        heading: labels.limitationsHeading,
+        lead: labels.limitationsLead,
         contentRef: `prose/${participant.slug}-einschraenkungen`,
         hideSectionNumber: true,
         pageId,

@@ -85,11 +85,11 @@ export async function getParticipantProfileRoutes(): Promise<ParticipantRouteEnt
   const defaultLang = system.i18n.default;
   const supportedLangs = Object.keys(system.i18n.supported ?? { [defaultLang]: true });
 
-  // RFC-0510: prefer the Team page (pageId === "team" or semanticType === "collection") as the
-  // breadcrumb parent and base segment. Fall back to the About page when no Team page exists.
-  const teamPage = (system.pages ?? []).find(
-    (p) => p.pageId === "team" || p.semanticType === "collection",
-  );
+  // RFC-0510: prefer the Team page (pageId === "team") as the breadcrumb parent and base
+  // segment. Fall back to any collection-typed page, then the About page.
+  const teamPage =
+    (system.pages ?? []).find((p) => p.pageId === "team") ??
+    (system.pages ?? []).find((p) => p.semanticType === "collection");
   const aboutPage = (system.pages ?? []).find((p) => p.semanticType === "about");
   const parentPage = teamPage ?? aboutPage;
   const parentPageId = typeof parentPage?.pageId === "string" ? parentPage.pageId : undefined;
