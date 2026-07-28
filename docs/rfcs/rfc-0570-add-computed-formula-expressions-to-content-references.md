@@ -59,7 +59,7 @@ packagesImpacted:
 successSignals:
   - "Formula expressions with =(ref + ref * 12) syntax resolve at build time without hardcoded results"
   - "content.formula.lint detects hardcoded arithmetic next to content references"
-  - "content.references.validate reports REF-04..07 for formula errors"
+  - "content.references.validate reports REF-06..09 for formula errors"
 nonGoals:
   - "Automatic migration of all hardcoded arithmetic in existing content (manual content.formula.migrate only)"
   - "Support for non-arithmetic expressions (string concatenation, conditionals, date math)"
@@ -114,7 +114,7 @@ Two new commands are introduced:
 - `content.formula.lint` — detects hardcoded arithmetic patterns next to content references (warn-level in `build.check`)
 - `content.formula.migrate` — manually converts detected hardcoded formulas to `=(...)` syntax
 
-`content.references.validate` is extended with REF-04..07 error codes for formula-specific failures.
+`content.references.validate` is extended with REF-06..09 error codes for formula-specific failures.
 
 ## Architectural fit
 
@@ -150,7 +150,7 @@ All three commands are app-scoped (`--app <id>`), matching the existing `content
 interface FormulaResolution {
   value: string;
   resolved: boolean;
-  error?: string; // REF-04..07
+  error?: string; // REF-06..09
 }
 
 // Extracts a numeric value from a field string like "200 €" → 200.
@@ -222,7 +222,7 @@ function scanFormulas(text: string): Array<{ start: number; end: number; express
     {
       "file": "src/content/pages/de/digitales-fundament.md",
       "line": 269,
-      "rule": "REF-04",
+      "rule": "REF-06",
       "message": "Formula reference unresolved: business-profile.offerings/digital-foundation.presentation.price.nonexistent"
     }
   ]
@@ -231,16 +231,18 @@ function scanFormulas(text: string): Array<{ start: number; end: number; express
 
 Error codes:
 
-- `REF-04`: Formula reference unresolved (a content reference inside `=(...)` does not resolve)
-- `REF-05`: Formula operand is not numeric (a resolved value cannot be parsed as a number)
-- `REF-06`: Formula syntax error (malformed expression — unbalanced parens, unknown operator)
-- `REF-07`: Formula division by zero
+- `REF-06`: Formula reference unresolved (a content reference inside `=(...)` does not resolve)
+- `REF-07`: Formula operand is not numeric (a resolved value cannot be parsed as a number)
+- `REF-08`: Formula syntax error (malformed expression — unbalanced parens, unknown operator)
+- `REF-09`: Formula division by zero
+
+> Note: REF-04 (ambiguous braceless pattern) and REF-05 (residual brace token) are already in use by the existing validator. Formula errors start at REF-06.
 
 ### Failure modes
 
 **Build-time (`content.references.validate`):**
 
-- REF-04..07 are **errors** — build fails with non-zero exit.
+- REF-06..09 are **errors** — build fails with non-zero exit.
 - In `--json` mode, violations appear in the `violations` array with `rule`, `file`, `line`, `message`.
 - In pretty mode, violations are printed as red error lines.
 
@@ -252,13 +254,13 @@ Error codes:
 
 **Runtime (SSR/SSG, `resolveReferencesInString`):**
 
-- If a formula cannot be evaluated (REF-04..07), the resolver renders an **empty string** — never the raw `=(...)` expression. This prevents leaking formula syntax to the page, matching the existing behavior for unresolved braceless references (which render as-is only when the index is empty; formula failures are always silent).
+- If a formula cannot be evaluated (REF-06..09), the resolver renders an **empty string** — never the raw `=(...)` expression. This prevents leaking formula syntax to the page, matching the existing behavior for unresolved braceless references (which render as-is only when the index is empty; formula failures are always silent).
 - Division by zero at runtime → empty string (build-time validator catches it first in normal workflows).
 
 ## Rollout
 
 - **Formula resolver (`@warpgogol/share`):** Ships as a non-breaking extension to `resolveReferencesInString`. Strings without `=(...)` are unaffected — existing apps work identically until authors use the new syntax.
-- **`content.references.validate` extension:** REF-04..07 errors only fire when `=(...)` formulas are present. Existing content without formulas passes unchanged.
+- **`content.references.validate` extension:** REF-06..09 errors only fire when `=(...)` formulas are present. Existing content without formulas passes unchanged.
 - **`content.formula.lint`:** Warn-level in `sites-check-author` (same pipeline as `content.references.validate`) from day one. Does not fail builds. Detects hardcoded arithmetic patterns (e.g., `ref + ref × N = number`) and suggests `=(...)` replacement.
 - **`content.formula.migrate`:** Manual command — not in any pipeline. Operators run it explicitly to convert detected hardcoded formulas.
 - **New apps:** Automatically compliant — no formulas to migrate, `=(...)` syntax available from day one.
@@ -280,7 +282,7 @@ Error codes:
 ## Risks
 
 - **False positives in `content.formula.lint`:** The hardcoded formula detector may flag prose that coincidentally contains `ref + ref = number` patterns without being a formula. Mitigation: warn-level only, human reviews before running migrate.
-- **Numeric extraction edge cases:** `extractNumeric` must handle formats like `"1 040 €"` (thin space thousands separator), `"1.040 €"` (German thousands separator), `"70,50 €"` (German decimal separator), `"-200 €"` (negative numbers), `"70 €/Monat"`. If extraction fails, REF-05 is reported — the author fixes the field format or uses a different field. The formula result is a bare number (e.g., `1040`); the unit suffix is authored after the `=(...)` expression (e.g., `=(...) €`). Locale-aware thousands-separator formatting of the result is a non-goal (future RFC may integrate `formatNumber` from `@warpgogol/share/counter-utils`).
+- **Numeric extraction edge cases:** `extractNumeric` must handle formats like `"1 040 €"` (thin space thousands separator), `"1.040 €"` (German thousands separator), `"70,50 €"` (German decimal separator), `"-200 €"` (negative numbers), `"70 €/Monat"`. If extraction fails, REF-07 is reported — the author fixes the field format or uses a different field. The formula result is a bare number (e.g., `1040`); the unit suffix is authored after the `=(...)` expression (e.g., `=(...) €`). Locale-aware thousands-separator formatting of the result is a non-goal (future RFC may integrate `formatNumber` from `@warpgogol/share/counter-utils`).
 - **`expr-eval` dependency:** Adds a runtime dependency to `@warpgogol/share`. The package is small (2KB), has no transitive dependencies, and is sandboxed (no `eval`). Low risk.
 - **Agent misinterpretation:** Agents may confuse `=(...)` formula syntax with YAML frontmatter or Astro expressions. Mitigation: the `=(...)` prefix is documented as content-reference-only syntax, not valid YAML or Astro. Implementation notes below explicitly state the scope.
 - **Performance:** `scanFormulas` is O(n) per string and only fires when the text contains `"=("` — a fast preliminary check avoids the scan for the vast majority of strings that have no formula. `expr-eval` parsing only runs on matched formula expressions. Negligible cost — formulas are rare in content.
@@ -290,7 +292,7 @@ Error codes:
 - [ ] `@warpgogol/share/content-reference.ts` recognizes `=(...)` formula syntax and evaluates it using `expr-eval` with numeric extraction from field strings
 - [ ] `@warpgogol/share/formula-eval.ts` exports `extractNumeric()`, `resolveFormula()`, and `scanFormulas()` with unit tests covering: numeric prefix extraction, thin-space/period/comma thousands separators, comma decimal separator (German), negative numbers, non-numeric values (returns null), division by zero, syntax errors, nested parentheses in `scanFormulas`
 - [ ] `packages/share/package.json` has a `./formula-eval` entry in `exports` and `expr-eval` in `dependencies` (with `@types/expr-eval` or custom `.d.ts` if needed)
-- [ ] `content.references.validate` reports REF-04 (unresolved formula ref), REF-05 (non-numeric operand), REF-06 (syntax error), REF-07 (division by zero) as errors
+- [ ] `content.references.validate` reports REF-06 (unresolved formula ref), REF-07 (non-numeric operand), REF-08 (syntax error), REF-09 (division by zero) as errors
 - [ ] `content.formula.lint` command registered in `site-kernel-checks`, imports `scanFormulas` from `@warpgogol/share/formula-eval`, detects hardcoded arithmetic patterns next to content references, outputs warnings in `--json` format
 - [ ] `content.formula.migrate` command registered in `site-kernel-codegen`, imports `scanFormulas` from `@warpgogol/share/formula-eval` (no cross-OS-package dependency on `site-kernel-checks`), writes converted `=(...)` syntax to content files
 - [ ] `content.formula.lint` integrated into `sites-check-author` pipeline as warn-level check
