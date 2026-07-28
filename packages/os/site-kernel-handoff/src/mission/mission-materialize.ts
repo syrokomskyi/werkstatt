@@ -15,6 +15,7 @@
   <item>Set PUBLIC_IMAGE_PROVIDER=build-portable in workpiece .env files so image.variants.generate produces responsive variants.</item>
   <item>Auto-install Playwright Chromium during materialization (idempotent) — ensures build.post print.pdf.generate and independent-qa work without manual intervention.</item>
   <item>RFC-0568: replace git init with git clone from cache clone; stage only data paths in materialize commit (DNA-44 compliance).</item>
+  <item>Run pnpm install after atomicMoveDir to link workpiece workspace deps before build.prepare (fixes workpiece.imports.validate failure on fresh workpiece).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -737,6 +738,26 @@ export async function runMissionMaterialize(
     }
     process.env["PUBLIC_IMAGE_PROVIDER"] = "build-portable";
     logger.info(`  PUBLIC_IMAGE_PROVIDER set to build-portable in .env files`);
+
+    // Link workpiece into pnpm workspace before build.prepare runs.
+    // The fresh workpiece has no node_modules — without this step, workpiece.imports.validate
+    // (first step of build.prepare) fails because @warpgogol/* symlinks don't exist yet.
+    logger.info(`  Linking workpiece workspace dependencies…`);
+    try {
+      execSync("pnpm install", {
+        cwd: workspaceRoot,
+        stdio: ["pipe", "pipe", "pipe"],
+        timeout: 120_000,
+      });
+      logger.info(`  Workpiece workspace dependencies linked`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `[mission.materialize] pnpm install failed — workpiece cannot be linked into workspace.\n` +
+          `  Error: ${msg}\n` +
+          `  Run 'pnpm install' manually at the workspace root, then re-run mission.materialize.`,
+      );
+    }
 
     // Ensure Playwright Chromium is installed (needed by build.post → print.pdf.generate
     // and independent-qa). Idempotent — skips if browsers are already present.
