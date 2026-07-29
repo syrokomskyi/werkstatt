@@ -132,6 +132,7 @@ async function runPreflight(
   dep: DeploymentConfig,
   channel: Channel,
   channelConfig: DeploymentChannel,
+  missionId?: string,
 ): Promise<PreflightCheck[]> {
   const checks: PreflightCheck[] = [];
 
@@ -180,7 +181,21 @@ async function runPreflight(
   });
 
   // 5. Wrangler binary resolves
-  const wranglerCheck = await checkWranglerAvailable();
+  let wranglerBinPath: string | undefined;
+  if (missionId) {
+    const workpieceBin = path.join(
+      workspaceRoot,
+      "missions",
+      missionId,
+      "workpiece",
+      "node_modules",
+      ".bin",
+    );
+    if (existsSync(workpieceBin)) {
+      wranglerBinPath = workpieceBin;
+    }
+  }
+  const wranglerCheck = await checkWranglerAvailable(workspaceRoot, wranglerBinPath);
   checks.push({
     name: "wrangler-available",
     passed: wranglerCheck.available,
@@ -200,43 +215,69 @@ async function runPreflight(
   return checks;
 }
 
-async function checkWranglerAvailable(): Promise<{ available: boolean; detail: string }> {
+async function checkWranglerAvailable(
+  workspaceRoot: string,
+  nodeModulesBinPath?: string,
+): Promise<{ available: boolean; detail: string }> {
   try {
     const { execFile } = await import("node:child_process");
+    const env: Record<string, string> = { ...process.env } as Record<string, string>;
+    if (nodeModulesBinPath) {
+      env.PATH = `${nodeModulesBinPath}:${process.env.PATH ?? ""}`;
+    }
     const result = await new Promise<{ exitCode: number; stdout: string; stderr: string }>(
       (resolve) => {
-        execFile("npx", ["wrangler", "--version"], (err, stdout, stderr) => {
-          resolve({
-            exitCode: err ? 1 : 0,
-            stdout: stdout ?? "",
-            stderr: stderr ?? "",
-          });
-        });
+        execFile(
+          "npx",
+          ["--yes", "wrangler", "--version"],
+          { cwd: workspaceRoot, env },
+          (err, stdout, stderr) => {
+            resolve({
+              exitCode: err ? 1 : 0,
+              stdout: stdout ?? "",
+              stderr: stderr ?? "",
+            });
+          },
+        );
       },
     );
     if (result.exitCode === 0) {
       return { available: true, detail: `wrangler resolved: ${result.stdout.trim()}` };
     }
-    return { available: false, detail: "wrangler --version exited non-zero" };
+    return {
+      available: false,
+      detail: `wrangler --version exited non-zero: ${result.stderr.trim().slice(0, 100)}`,
+    };
   } catch {
     return { available: false, detail: "wrangler binary not found" };
   }
 }
 
 async function checkDistSize(distPath: string): Promise<{ withinLimit: boolean; detail: string }> {
-  const WORKERS_LIMIT = 25 * 1024 * 1024;
+  const STATIC_ASSETS_LIMIT = 20 * 1024 * 1024 * 1024;
+  const PER_FILE_LIMIT = 25 * 1024 * 1024;
   let totalSize = 0;
+  let largestFile = 0;
+  let largestFilePath = "";
   const { collectFiles } = await import("@warpgogol/share/fs");
   for (const file of await collectFiles(distPath)) {
     const stat = await fs.stat(file);
     totalSize += stat.size;
+    if (stat.size > largestFile) {
+      largestFile = stat.size;
+      largestFilePath = file;
+    }
   }
-  const withinLimit = totalSize <= WORKERS_LIMIT;
+  const sizeWithinLimit = totalSize <= STATIC_ASSETS_LIMIT;
+  const perFileWithinLimit = largestFile <= PER_FILE_LIMIT;
+  const withinLimit = sizeWithinLimit && perFileWithinLimit;
   return {
     withinLimit,
     detail: withinLimit
-      ? `Dist size ${(totalSize / 1024 / 1024).toFixed(2)} MiB within 25 MiB limit`
-      : `Dist size ${(totalSize / 1024 / 1024).toFixed(2)} MiB exceeds 25 MiB Workers limit`,
+      ? `Dist size ${(totalSize / 1024 / 1024).toFixed(2)} MiB within 20 GiB static-assets limit`
+      : !sizeWithinLimit
+        ? `Dist size ${(totalSize / 1024 / 1024 / 1024).toFixed(2)} GiB exceeds 20 GiB static-assets limit`
+        : `Largest file ${largestFilePath} (${(largestFile / 1024 / 1024).toFixed(2)} MiB) exceeds 25 MiB per-file limit`,
   };
 }
 
@@ -322,6 +363,8 @@ export async function runLeitstandPropagate(
     const channelConfig = getChannelConfig(dep, channel);
     const adapter = resolveAdapter(dep.adapter);
     const distPath = path.join(workspaceRoot, "releases", releaseId, "dist");
+    const serverDistPath = path.join(distPath, "server");
+    const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
     const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
 
     // Preflight
@@ -331,6 +374,7 @@ export async function runLeitstandPropagate(
       dep,
       channel,
       channelConfig,
+      releaseManifest.missionId as string | undefined,
     );
     const preflightPassed = preflightChecks.every((c) => c.passed);
     if (!preflightPassed) {
@@ -354,15 +398,33 @@ export async function runLeitstandPropagate(
       `  Adapter: ${adapter.name}, channel: ${channel}, worker: ${channelConfig.workerName}`,
     );
 
+    // Resolve workpiece node_modules/.bin for wrangler binary resolution
+    const missionId = releaseManifest.missionId as string;
+    let nodeModulesBinPath: string | undefined;
+    if (missionId) {
+      const workpieceBin = path.join(
+        workspaceRoot,
+        "missions",
+        missionId,
+        "workpiece",
+        "node_modules",
+        ".bin",
+      );
+      if (existsSync(workpieceBin)) {
+        nodeModulesBinPath = workpieceBin;
+      }
+    }
+
     const result = await adapter.propagate({
       systemId,
       releaseId,
       channel,
-      distPath: effectiveDistPath,
+      distPath: existsSync(serverDistPath) ? effectiveServerDistPath : effectiveDistPath,
       workerName: channelConfig.workerName,
       url: channelConfig.url,
       secretsFilePath,
       expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
+      nodeModulesBinPath,
     });
 
     // Run health verification after deploy

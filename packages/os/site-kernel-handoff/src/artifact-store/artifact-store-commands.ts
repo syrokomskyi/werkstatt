@@ -109,10 +109,7 @@ export async function runArtifactStorePut(
 
   try {
     const { treeHash, fileCount, byteSize } = await hashDir(distDir);
-    const distArtifactHash = `sha256:${crypto
-      .createHash("sha256")
-      .update(await fs.readFile(distDir))
-      .digest("hex")}`;
+    const distArtifactHash = treeHash;
 
     // For MVP, we store a manifest alongside the dist directory reference
     // A full implementation would create a tar.gz archive

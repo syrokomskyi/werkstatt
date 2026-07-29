@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0358: initial deployment adapter interface.</item>
   <item>RFC-0379: channel model — replace target/credentials with channel/workerName/url/secretsFilePath; add CommandRunner type.</item>
+  <item>RFC-0585: add nodeModulesBinPath to PropagateInput/RollbackInput for wrangler resolution from dist/server/.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ export interface PropagateInput {
   url: string;
   secretsFilePath: string | undefined;
   expectedBehaviorSnapshotHash: string;
+  nodeModulesBinPath?: string;
 }
 
 export interface RollbackInput {
@@ -38,6 +40,7 @@ export interface RollbackInput {
   workerName: string;
   url: string;
   secretsFilePath: string | undefined;
+  nodeModulesBinPath?: string;
 }
 
 export interface HealthInput {

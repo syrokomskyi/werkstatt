@@ -11,7 +11,7 @@ systems:
         storageType: bare
     pinnedPlatform: 4.5.0
     currentMission: null
-    lastRelease: warpgogol-com-r000003
+    lastRelease: warpgogol-com-r000001
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
     deployment:
@@ -19,12 +19,26 @@ systems:
       channels:
         alt:
           workerName: alt-warpgogol-com
-          url: https://alt.warpgogol.com
+          url: https://alt-warpgogol-com.syrokomskyi.workers.dev
           secretsFile: env:WERKSTATT_SECRETS_ALT
         main:
           workerName: warpgogol-com
           url: https://warpgogol.com
           secretsFile: env:WERKSTATT_SECRETS_MAIN
-      lastPropagated: {}
+      lastPropagated:
+        alt:
+          releaseId: warpgogol-com-r000001
+          at: 2026-07-29T18:26:07.899Z
+          healthy: true
+          state: succeeded
+          operationId: op-ms6f0kv4-suluu6e8
+          leaseExpiresAt: null
+        main:
+          releaseId: warpgogol-com-r000001
+          at: 2026-07-29T18:29:21.121Z
+          healthy: true
+          state: succeeded
+          operationId: op-ms6f1eo0-6upm4bju
+          leaseExpiresAt: null
     notes: ""
 

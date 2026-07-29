@@ -259,13 +259,22 @@ export async function runReleasePrepare(
       const now = new Date().toISOString();
 
       // RFC-0585: Capture behavior snapshots and run diff
+      // Astro Cloudflare adapter outputs HTML to dist/client/ — scan that for routes
+      const clientDistDir = existsSync(path.join(distDest, "client"))
+        ? path.join(distDest, "client")
+        : distDest;
       const readableSnapshotPath = path.join(stagingDir, "readable-snapshot.json");
       const productionSnapshotPath = path.join(stagingDir, "behavior-snapshot.json");
       const snapshotDiffPath = path.join(stagingDir, "snapshot-diff.json");
 
       const readableResult = await runBehaviorSnapshotCapture(
         {
-          flags: { dist: distDest, system: systemId, "build-kind": "readable", release: releaseId },
+          flags: {
+            dist: clientDistDir,
+            system: systemId,
+            "build-kind": "readable",
+            release: releaseId,
+          },
           argv: [],
           args: [],
         },
@@ -281,7 +290,7 @@ export async function runReleasePrepare(
       const productionResult = await runBehaviorSnapshotCapture(
         {
           flags: {
-            dist: distDest,
+            dist: clientDistDir,
             system: systemId,
             "build-kind": "production",
             release: releaseId,

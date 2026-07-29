@@ -25,6 +25,16 @@ import type {
   HealthInput,
 } from "../adapter.ts";
 
+function filterEnv(env: Record<string, string | undefined>): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(env)) {
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 function createDefaultCommandRunner(): CommandRunner {
   return (cmd, args, opts) =>
     new Promise((resolve, reject) => {
@@ -88,7 +98,8 @@ async function readBehaviorSnapshot(
   const snapshotPath = path.join(workspaceRoot, "releases", releaseId, "behavior-snapshot.json");
   if (!existsSync(snapshotPath)) return null;
   const content = await fs.readFile(snapshotPath, "utf8");
-  return JSON.parse(content) as BehaviorSnapshot;
+  const parsed = JSON.parse(content) as { behaviorSnapshot?: BehaviorSnapshot } & BehaviorSnapshot;
+  return parsed.behaviorSnapshot ?? parsed;
 }
 
 function selectProbeRoutes(routes: RouteFact[], maxProbes: number): RouteFact[] {
@@ -136,17 +147,25 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
 
       const secretsEnv = input.secretsFilePath ? await sourceDotenv(input.secretsFilePath) : {};
 
-      const wranglerArgs = ["exec", "wrangler", "deploy", "--name", input.workerName];
+      const env: Record<string, string> = { ...filterEnv(process.env), ...secretsEnv };
+      if (input.nodeModulesBinPath) {
+        env.PATH = `${input.nodeModulesBinPath}:${process.env.PATH ?? ""}`;
+      }
+
+      const wranglerArgs = ["--yes", "wrangler", "deploy", "--name", input.workerName];
       if (input.secretsFilePath) {
         wranglerArgs.push("--secrets-file", input.secretsFilePath);
       }
 
-      const result = await runner("pnpm", wranglerArgs, {
+      const result = await runner("npx", wranglerArgs, {
         cwd: input.distPath,
-        env: secretsEnv,
+        env,
       });
 
       if (result.exitCode !== 0) {
+        console.error(`[cloudflare-workers] wrangler deploy failed (exit ${result.exitCode})`);
+        console.error(`[cloudflare-workers] stdout: ${result.stdout.slice(-500)}`);
+        console.error(`[cloudflare-workers] stderr: ${result.stderr.slice(-500)}`);
         return {
           systemId: input.systemId,
           releaseId: input.releaseId,
@@ -176,14 +195,19 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
 
       const secretsEnv = input.secretsFilePath ? await sourceDotenv(input.secretsFilePath) : {};
 
-      const wranglerArgs = ["exec", "wrangler", "deploy", "--name", input.workerName];
+      const env: Record<string, string> = { ...filterEnv(process.env), ...secretsEnv };
+      if (input.nodeModulesBinPath) {
+        env.PATH = `${input.nodeModulesBinPath}:${process.env.PATH ?? ""}`;
+      }
+
+      const wranglerArgs = ["--yes", "wrangler", "deploy", "--name", input.workerName];
       if (input.secretsFilePath) {
         wranglerArgs.push("--secrets-file", input.secretsFilePath);
       }
 
-      const result = await runner("pnpm", wranglerArgs, {
+      const result = await runner("npx", wranglerArgs, {
         cwd: input.distPath,
-        env: secretsEnv,
+        env,
       });
 
       const deployedUrl = extractDeploymentUrl(result.stdout) ?? input.url;
