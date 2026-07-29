@@ -43,17 +43,6 @@ If the type cannot be determined, ask the user.
 
 ### 3. RFC implementation flow
 
-#### 3.0. Pre-flight: git status check
-
-Before starting implementation, check the working tree for foreign uncommitted changes:
-
-1. Run `git status --short` in the werkstatt root.
-2. If `systems/registry.yaml` has a `currentMission`, also run `git status --short` in each active mission workpiece directory (`missions/<missionId>/workpiece/`).
-3. If either repository has changes, report them to the operator before proceeding.
-4. Treat all pre-existing changes as foreign — never modify, stage, or discard them.
-5. When committing, stage only files you created or modified in this session by explicit path. Never use `git add -A` or `git add .`.
-6. Before every commit, verify `git diff --cached --name-only` excludes foreign files.
-
 #### 3.1. Prerequisite checks (per RFC)
 
 The pipeline is: create → audit → enhance → plan → implement. Audit, enhance, and a plan are **mandatory** — no RFC may proceed to implementation without all three being completed. The RFC must also be `accepted` — this skill does not transition `draft` to `accepted`; that is the responsibility of `fo-idea-plan`.
