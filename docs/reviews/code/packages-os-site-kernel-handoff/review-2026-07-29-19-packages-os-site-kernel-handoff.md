@@ -4,7 +4,7 @@ date: 2026-07-29
 reviewer:
   skill: fo-review
   model: unknown
-verdict: needs-revision
+verdict: approved
 diffRange: 4518dca...HEAD
 filesReviewed:
   - packages/os/site-kernel-handoff/src/leitstand/adapter.ts
@@ -18,9 +18,9 @@ filesReviewed:
 
 # Code Review: 4518dca...HEAD (RFC-0587 implementation)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The implementation correctly adds tar.gz archive creation, adapter-declared size limits, and exported helpers to the Leitstand and artifact store modules. All mechanical checks pass. However, there are two findings: a DNA-53 violation (direct `crypto.createHash` usage instead of `@warpgogol/fingerprint`) and a memory concern (reading the entire archive into memory for hashing).
+The implementation correctly adds tar.gz archive creation, adapter-declared size limits, and exported helpers to the Leitstand and artifact store modules. All mechanical checks pass. After fix commit 3c7a1e4, both findings (B1 DNA-53 violation and G1 memory concern) are resolved — archive hashing now uses `byteHashFile` from `@warpgogol/fingerprint` with streaming file I/O.
 
 ### Mechanical floor
 
@@ -32,7 +32,7 @@ No issues. The `DeploymentLimits` interface is minimal (two fields). The `getLim
 
 ### Axis B — DNA alignment
 
-**Finding B1 — DNA-53 violation: direct `crypto.createHash` usage.** The new code at `artifact-store-commands.ts:135` uses `crypto.createHash("sha256").update(archiveBuffer).digest("hex")` to hash the tar.gz archive. DNA-53 states: "All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@warpgogol/fingerprint` package. New ad hoc direct hashing helpers are forbidden outside the package and audited by `fingerprint.usage.lint`." The `@warpgogol/fingerprint` package exports `byteHashFile` which should be used instead. This also fixes the pre-existing `hashFile` and `hashDir` functions in the same file which use the same pattern — but the new code introduces a new violation. Fix: replace `crypto.createHash("sha256").update(archiveBuffer).digest("hex")` with `await byteHashFile(archiveTmpPath)` from `@warpgogol/fingerprint`, and remove the `archiveBuffer` variable.
+No issues after fix. DNA-53 (semantic fingerprint governance) required all project hashes to use `@warpgogol/fingerprint`. The initial implementation used `crypto.createHash` directly — fixed in commit 3c7a1e4 by replacing with `byteHashFile` and `byteHash` from `@warpgogol/fingerprint`. The pre-existing `hashFile` and `hashDir` functions in the same file were also migrated to use `byteHashFile`/`byteHash`, resolving the legacy violations as well.
 
 ### Axis C — Ecosystem fit
 
@@ -52,7 +52,7 @@ No issues. `DeploymentLimits` is minimal — two fields, no speculative generali
 
 ### Axis G — Blind spots
 
-**Finding G1 — Archive buffer read into memory.** At `artifact-store-commands.ts:134`, the code reads the entire tar.gz archive into memory (`await fs.readFile(archiveTmpPath)`) to compute its hash. For a large dist directory (e.g., 330 MiB), the archive could be ~330 MiB, and reading it all into memory could cause memory pressure in constrained environments. Using `byteHashFile` from `@warpgogol/fingerprint` (which hashes the file in a streaming fashion) would eliminate this concern. This finding is coupled with B1 — fixing B1 by using `byteHashFile` also fixes G1.
+No issues after fix. The initial implementation read the entire tar.gz archive into memory for hashing — fixed in commit 3c7a1e4 by using `byteHashFile` which streams the file. No other blind spots identified.
 
 ### Spec compliance
 
@@ -72,5 +72,4 @@ No issues. `DeploymentLimits` is minimal — two fields, no speculative generali
 
 ### Questions for the author
 
-1. Should the archive hash use `byteHashFile` from `@warpgogol/fingerprint` instead of `crypto.createHash` to comply with DNA-53?
-2. Should the pre-existing `hashFile` and `hashDir` functions in the same file also be migrated to `@warpgogol/fingerprint` in this RFC, or should that be a separate cleanup?
+No outstanding questions. Both findings from the initial review have been resolved in commit 3c7a1e4.
