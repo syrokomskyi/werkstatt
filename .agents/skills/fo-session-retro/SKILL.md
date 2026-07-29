@@ -94,16 +94,6 @@ Read `PREFERENCES.md` at the repository root. Use `aiLanguage` for all communica
 
 Read `_shared/fo-pipeline-conventions.md` for commit discipline, language policy, and recoverable error handling.
 
-### 1.5. Git hygiene check (RFC-0581)
-
-Before gathering session insights, verify that the working tree is clean:
-
-1. Run `git status --short` in the werkstatt root.
-2. If `systems/registry.yaml` has a `currentMission`, also run `git status --short` in each active mission workpiece directory.
-3. If uncommitted changes are found, report them to the operator and ask whether to commit. Use `mission.git.commit` for workpiece changes, `ecosystem.commit` or `git commit` for werkstatt changes.
-4. If the operator declines, proceed — the uncommitted changes remain in the tree.
-5. If no uncommitted changes are found, proceed silently.
-
 ### 2. Gather session insights
 
 Review the current session to identify discoveries. Use in priority order:
@@ -242,15 +232,15 @@ If any operator insights were routed to `.agents/operator-profile.md`, offer the
 
 ### 7. Report
 
-Present a concise summary:
+Present a concise summary in `aiLanguage`. **Translate all labels, headings, and column names to `aiLanguage`** — the template below is structural only. Only identifiers (file paths, skill names, RFC/ADR ids) stay untranslated.
 
 ```
-## Session Retro Summary
+## <Session Retro Summary in aiLanguage>
 
-### Insights discovered: <N>
-### Insights confirmed: <M>
+### <Insights discovered>: <N>
+### <Insights confirmed>: <M>
 
-| # | Insight | Category | Routed to | Status |
+| # | <Insight> | <Category> | <Routed to> | <Status> |
 | --- | --- | --- | --- | --- |
 | 1 | ... | Rule | packages/AGENTS.md | committed |
 | 2 | ... | Decision | fo-idea-create-adr | ADR-XXXX created |
@@ -259,9 +249,9 @@ Present a concise summary:
 | 5 | ... | Operator | .agents/operator-profile.md | committed |
 | 6 | ... | Context | memory DB | saved |
 
-### Delegated skills invoked: <count>
-### Direct edits: <count>
-### Commit: <hash | none — no direct edits>
+### <Delegated skills invoked>: <count>
+### <Direct edits>: <count>
+### <Commit>: <hash | none — no direct edits>
 ```
 
 ## Relationship to other session-end skills
