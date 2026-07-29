@@ -248,12 +248,12 @@ After:
 
 ## Acceptance criteria
 
-- [ ] PSEO-GLOSS-01 fixHint for stale hash includes `surface.translation.glossary.generate --module <module> --target <lang>` command
-- [ ] PSEO-GLOSS-01 fixHint for missing glossary includes the generate command
-- [ ] PUBTXT-07 fixHint resolves `public/{lang}/{path}.md` to `src/content/prose/{lang}/{path}.md` when the source file exists
-- [ ] PUBTXT-07 fixHint includes `build.prepare` regeneration command when source is found
-- [ ] PUBTXT-07 falls back to generic fixHint when no source file is found
-- [ ] `rfc.validate` passes on this file
+- [x] PSEO-GLOSS-01 fixHint for stale hash includes `surface.translation.glossary.generate --module <module> --target <lang>` command (evidence: commit 5002246, surface-translation.ts:408)
+- [x] PSEO-GLOSS-01 fixHint for missing glossary includes the generate command (evidence: commit 5002246, surface-translation.ts:396)
+- [x] PUBTXT-07 fixHint resolves `public/{lang}/{path}.md` to `src/content/prose/{lang}/{path}.md` when the source file exists (evidence: commit 5002246, aggregate.ts:50-58 resolveProseSource helper)
+- [x] PUBTXT-07 fixHint includes `build.prepare` regeneration command when source is found (evidence: commit 5002246, aggregate.ts:297-298)
+- [x] PUBTXT-07 falls back to generic fixHint when no source file is found (evidence: commit 5002246, aggregate.ts:299)
+- [x] `rfc.validate` passes on this file (evidence: no RFC-0577 errors in rfc.validate output)
 
 ## Implementation notes for agents
 
