@@ -20,7 +20,6 @@ files:
   - packages/os/site-kernel-checks/src/content-derived.ts
   - packages/os/site-kernel-checks/src/content-filename.ts
   - packages/os/site-kernel-checks/src/content-ledger.ts
-  - packages/os/site-kernel-checks/src/content-links.ts
   - packages/os/site-kernel-checks/src/content-references.ts
   - packages/os/site-kernel-checks/src/content-source-adapter.ts
   - packages/os/site-kernel-checks/src/content-types.ts
