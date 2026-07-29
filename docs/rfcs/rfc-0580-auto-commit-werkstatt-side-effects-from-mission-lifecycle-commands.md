@@ -239,20 +239,20 @@ The helper stages **only specific file paths** (never `git add -A` or `git add .
 
 ## Acceptance criteria
 
-- [ ] `commitWerkstattSideEffects` helper defined in `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-commit.ts` with TypeScript types
-- [ ] Helper stages only specific file paths (never `git add -A`)
-- [ ] Helper is idempotent — skips commit when `git diff --quiet -- <files>` reports no changes
-- [ ] Helper throws on `git commit` failure (does not warn)
-- [ ] `mission.open` calls helper with `registry.yaml` + `mission.yaml`
-- [ ] `mission.materialize` calls helper with `mission.yaml` + `pnpm-lock.yaml`
-- [ ] `mission.migrate` calls helper with `mission.yaml`
-- [ ] `mission.reconcile` calls helper with `mission.yaml`
-- [ ] `mission.close` calls helper with `registry.yaml` + `mission.yaml`
-- [ ] `mission.abort` calls helper with `registry.yaml` + `mission.yaml`
-- [ ] Commit message format: `werkstatt: <command> <missionId>`
-- [ ] Unit tests for `commitWerkstattSideEffects` (idempotent skip, specific-file staging, throw on failure)
-- [ ] Integration test: after `mission.open`, `git status` in monorepo is clean
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `commitWerkstattSideEffects` helper defined in `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-commit.ts` with TypeScript types (evidence: packages/os/site-kernel-handoff/src/werkstatt/werkstatt-commit.ts:7-40)
+- [x] Helper stages only specific file paths (never `git add -A`) (evidence: packages/os/site-kernel-handoff/src/werkstatt/werkstatt-commit.ts:22, test src/tests/werkstatt-commit.test.ts:56)
+- [x] Helper is idempotent — skips commit when `git diff --quiet -- <files>` reports no changes (evidence: packages/os/site-kernel-handoff/src/werkstatt/werkstatt-commit.ts:25-34, test src/tests/werkstatt-commit.test.ts:41)
+- [x] Helper throws on `git commit` failure (does not warn) (evidence: packages/os/site-kernel-handoff/src/werkstatt/werkstatt-commit.ts:36, test src/tests/werkstatt-commit.test.ts:74)
+- [x] `mission.open` calls helper with `registry.yaml` + `mission.yaml` (evidence: packages/os/site-kernel-handoff/src/mission/mission-open.ts:158-166)
+- [x] `mission.materialize` calls helper with `mission.yaml` + `pnpm-lock.yaml` (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:911-919)
+- [x] `mission.migrate` calls helper with `mission.yaml` (evidence: packages/os/site-kernel-handoff/src/mission/mission-migrate.ts:220-225)
+- [x] `mission.reconcile` calls helper with `mission.yaml` (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:810-815)
+- [x] `mission.close` calls helper with `registry.yaml` + `mission.yaml` (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:291-299)
+- [x] `mission.abort` calls helper with `registry.yaml` + `mission.yaml` (evidence: packages/os/site-kernel-handoff/src/mission/mission-abort.ts:154-162)
+- [x] Commit message format: `werkstatt: <command> <missionId>` (evidence: test src/tests/werkstatt-commit.test.ts:112)
+- [x] Unit tests for `commitWerkstattSideEffects` (idempotent skip, specific-file staging, throw on failure) (evidence: src/tests/werkstatt-commit.test.ts, 5 tests passing)
+- [x] Integration test: after `mission.open`, `git status` in monorepo is clean (evidence: src/tests/mission-open-clean-tree.test.ts, 1 test passing)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --json, no violations for RFC-0580)
 
 ## Pre-existing gaps (out of scope)
 
