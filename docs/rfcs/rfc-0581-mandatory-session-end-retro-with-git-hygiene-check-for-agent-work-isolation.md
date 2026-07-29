@@ -1,7 +1,7 @@
 ---
 id: RFC-0581
 title: "Mandatory session-end retro with git hygiene check for agent work isolation"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
