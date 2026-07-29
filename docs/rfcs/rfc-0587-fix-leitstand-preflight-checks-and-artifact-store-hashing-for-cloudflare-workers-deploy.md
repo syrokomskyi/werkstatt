@@ -300,31 +300,30 @@ async function checkDistSize(
 
 ### New work (this RFC implements)
 
-- [ ] `artifact.store.put` creates a `tar.gz` archive and stores `distArtifactHash` as the archive hash (evidence: `artifact-store-commands.ts:<line>`, `artifact.store.put --json` output contains `archivePath`)
-- [ ] `artifact.store.put` is idempotent: re-running for the same `releaseId` removes any existing manifest for that release before writing the new one (evidence: only one `.manifest.json` file exists for a release after multiple `put` runs with different dist content)
-- [ ] `artifactStoreRehydrate` extracts the tar.gz archive to the output directory (evidence: `artifact-store-commands.ts:<line>`, files present after rehydration)
-- [ ] `DeploymentAdapter` interface has `getLimits(): DeploymentLimits` method (evidence: `adapter.ts:<line>`)
-- [ ] `checkDistSize` receives limits from `adapter.getLimits()` via `runPreflight` parameter pass-through (evidence: `leitstand-commands.ts:<line>`, no hardcoded limit constants in `checkDistSize`)
-- [ ] `cloudflare-workers` adapter `getLimits()` returns `maxTotalSize: 20 * 1024**3`, `maxFileSize: 25 * 1024**2` (evidence: `cloudflare-workers.ts:<line>`)
-- [ ] `null` adapter `getLimits()` returns `maxTotalSize: Infinity`, `maxFileSize: Infinity` (evidence: `leitstand-commands.ts:<line>`)
-- [ ] `filterEnv` is exported from `cloudflare-workers.ts` (evidence: `export function filterEnv` in module)
-- [ ] `sourceDotenv` is exported from `cloudflare-workers.ts` (evidence: `export async function sourceDotenv` in module)
-- [ ] `ArtifactStorePutData` retains `siteContentHash` field alongside new `archivePath` (evidence: `artifact-store-commands.ts:<line>`)
+- [x] `artifact.store.put` creates a `tar.gz` archive and stores `distArtifactHash` as the archive hash (evidence: `artifact-store-commands.ts:125-136`, `artifact.store.put --json` output contains `archivePath`)
+- [x] `artifact.store.put` is idempotent: re-running for the same `releaseId` removes any existing manifest for that release before writing the new one (evidence: `artifact-store-commands.ts:152-156`, only one `.manifest.json` file exists for a release after multiple `put` runs with different dist content)
+- [x] `artifactStoreRehydrate` extracts the tar.gz archive to the output directory (evidence: `artifact-store-commands.ts:427-430`, files present after rehydration via `tarExtract`)
+- [x] `DeploymentAdapter` interface has `getLimits(): DeploymentLimits` method (evidence: `adapter.ts:56-68`)
+- [x] `checkDistSize` receives limits from `adapter.getLimits()` via `runPreflight` parameter pass-through (evidence: `leitstand-commands.ts:218`, no hardcoded limit constants in `checkDistSize`)
+- [x] `cloudflare-workers` adapter `getLimits()` returns `maxTotalSize: 20 * 1024**3`, `maxFileSize: 25 * 1024**2` (evidence: `cloudflare-workers.ts:228-230`)
+- [x] `null` adapter `getLimits()` returns `maxTotalSize: Infinity`, `maxFileSize: Infinity` (evidence: `leitstand-commands.ts:87-89`)
+- [x] `filterEnv` is exported from `cloudflare-workers.ts` (evidence: `cloudflare-workers.ts:29` — `export function filterEnv`)
+- [x] `sourceDotenv` is exported from `cloudflare-workers.ts` (evidence: `cloudflare-workers.ts:62` — `export async function sourceDotenv`)
+- [x] `ArtifactStorePutData` retains `siteContentHash` field alongside new `archivePath` (evidence: `artifact-store-commands.ts:73-84`)
 
 ### Formalized hotfixes (already in codebase, verified by this RFC)
 
-- [ ] `checkWranglerAvailable` uses `npx --yes wrangler` with workpiece `node_modules/.bin` in `PATH` (evidence: `leitstand-commands.ts:231-232`, preflight passes when wrangler is in workpiece `node_modules`)
-- [ ] `checkDistSize` uses 20 GiB total / 25 MiB per-file limits (evidence: `leitstand-commands.ts:257-258`)
-- [ ] Adapter uses `npx --yes wrangler deploy` from `distPath` (evidence: `cloudflare-workers.ts:155-163`)
-- [ ] Adapter logs `stdout` and `stderr` on wrangler deploy failure (evidence: `cloudflare-workers.ts:165-168`)
-- [ ] `filterEnv` filters `undefined` values from `process.env` (evidence: `cloudflare-workers.ts:28-36`)
-- [ ] `sourceDotenv` skips comments (`#`) and empty lines (evidence: `cloudflare-workers.ts:65-67`)
+- [x] `checkWranglerAvailable` uses `npx --yes wrangler` with workpiece `node_modules/.bin` in `PATH` (evidence: `leitstand-commands.ts:237-243`, preflight passes when wrangler is in workpiece `node_modules`)
+- [x] Adapter uses `npx --yes wrangler deploy` from `distPath` (evidence: `cloudflare-workers.ts:156-161`)
+- [x] Adapter logs `stdout` and `stderr` on wrangler deploy failure (evidence: `cloudflare-workers.ts:167-169`)
+- [x] `filterEnv` filters `undefined` values from `process.env` (evidence: `cloudflare-workers.ts:29-37`)
+- [x] `sourceDotenv` skips comments (`#`) and empty lines (evidence: `cloudflare-workers.ts:68`)
 
 ### Build and validation
 
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: exit code 0, no TypeScript errors)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes (evidence: 345 tests passed, 0 failures)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --json` exit code 0)
 
 ## Implementation notes for agents
 
