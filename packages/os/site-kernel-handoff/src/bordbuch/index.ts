@@ -18,7 +18,6 @@ export { runBordbuchStatus, type BordbuchStatusData } from "./bordbuch-status.ts
 export { runBordbuchGenerate } from "./bordbuch-generate.ts";
 export {
   runBordbuchRepair,
-  type BordbuchRepairPlan,
   type BordbuchRepairResult,
   type BordbuchRepairOrphan,
 } from "./bordbuch-repair.ts";

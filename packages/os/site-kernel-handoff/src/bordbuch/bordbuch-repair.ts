@@ -37,13 +37,6 @@ export interface BordbuchRepairOrphan {
   metadataSource: "auto-derived" | "operator-supplied";
 }
 
-export interface BordbuchRepairPlan {
-  systemId: string;
-  orphans: BordbuchRepairOrphan[];
-  hashChainBroken: boolean;
-  eventIdGaps: boolean;
-}
-
 export interface BordbuchRepairResult {
   systemId: string;
   insertedEvents: number;
