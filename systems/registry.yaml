@@ -27,18 +27,18 @@ systems:
           secretsFile: env:WERKSTATT_SECRETS_MAIN
       lastPropagated:
         alt:
-          releaseId: warpgogol-com-r000001
-          at: 2026-07-29T18:26:07.899Z
+          releaseId: warpgogol-com-r000002
+          at: 2026-07-29T22:31:17.768Z
           healthy: true
           state: succeeded
-          operationId: op-ms6f0kv4-suluu6e8
+          operationId: op-ms6nrw3a-c1pbpd3d
           leaseExpiresAt: null
         main:
-          releaseId: warpgogol-com-r000001
-          at: 2026-07-29T18:29:21.121Z
+          releaseId: warpgogol-com-r000002
+          at: 2026-07-29T22:32:43.196Z
           healthy: true
           state: succeeded
-          operationId: op-ms6f1eo0-6upm4bju
+          operationId: op-ms6nt3qf-ulvucjcc
           leaseExpiresAt: null
     notes: ""
 
