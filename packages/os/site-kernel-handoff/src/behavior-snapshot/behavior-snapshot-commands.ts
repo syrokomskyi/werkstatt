@@ -72,14 +72,12 @@ export function isRouteRedirected(routePath: string, rules: RedirectRule[]): boo
   });
 }
 
-export async function collectRoutes(distDir: string): Promise<RouteFact[]> {
+export async function collectRoutes(
+  distDir: string,
+  redirectRules: RedirectRule[] = [],
+): Promise<RouteFact[]> {
   const routes: RouteFact[] = [];
   if (!existsSync(distDir)) return routes;
-
-  const redirectsPath = path.join(distDir, "_redirects");
-  const redirectRules = existsSync(redirectsPath)
-    ? parseRedirectRules(await fs.readFile(redirectsPath, "utf8"))
-    : [];
 
   for (const fullPath of await collectFiles(distDir, { extensions: [".html"] })) {
     if (path.basename(fullPath) !== "index.html") continue;
@@ -137,13 +135,18 @@ export async function runBehaviorSnapshotCapture(
     throw new Error(`[behavior.snapshot.capture] dist directory not found: ${distDir}`);
   }
 
-  const routes = await collectRoutes(distDir);
+  const redirectsPath = path.join(distDir, "_redirects");
+  const redirectsContent = existsSync(redirectsPath)
+    ? await fs.readFile(redirectsPath, "utf8")
+    : "";
+  const redirectRules = redirectsContent ? parseRedirectRules(redirectsContent) : [];
+
+  const routes = await collectRoutes(distDir, redirectRules);
   const sitemapPath = path.join(distDir, "sitemap.xml");
   const sitemapHash = await hashFileIfExists(sitemapPath);
   const robotsPath = path.join(distDir, "robots.txt");
   const robotsContent = existsSync(robotsPath) ? await fs.readFile(robotsPath, "utf8") : "";
   const headersPath = path.join(distDir, "_headers");
-  const redirectsPath = path.join(distDir, "_redirects");
 
   const snapshot: BehaviorSnapshot = {
     routes,
@@ -152,7 +155,7 @@ export async function runBehaviorSnapshotCapture(
     llmsHashes: {},
     robotsDirectives: robotsContent,
     headersHash: await hashFileIfExists(headersPath),
-    redirectsHash: await hashFileIfExists(redirectsPath),
+    redirectsHash: redirectsContent ? await hashContent(redirectsContent) : "sha256:absent",
   };
 
   const now = new Date().toISOString();

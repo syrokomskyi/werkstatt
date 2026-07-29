@@ -13,7 +13,7 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { isRouteRedirected, collectRoutes } from "./behavior-snapshot-commands.ts";
-import { parseRedirectRules } from "@warpgogol/share/redirects";
+import { parseRedirectRules, type RedirectRule } from "@warpgogol/share/redirects";
 
 let tmpDir: string;
 
@@ -64,9 +64,9 @@ test("collectRoutes: excludes redirected routes from snapshot", async () => {
   await fs.writeFile(path.join(tmpDir, "index.html"), "<html>home</html>");
   await fs.writeFile(path.join(tmpDir, "agb", "index.html"), "<html>agb</html>");
   await fs.writeFile(path.join(tmpDir, "de", "agb", "index.html"), "<html>de-agb</html>");
-  await fs.writeFile(path.join(tmpDir, "_redirects"), "/de/* / 308\n");
 
-  const routes = await collectRoutes(tmpDir);
+  const rules: RedirectRule[] = parseRedirectRules("/de/* / 308");
+  const routes = await collectRoutes(tmpDir, rules);
 
   const paths = routes.map((r) => r.path);
   expect(paths).toContain("/");
@@ -74,7 +74,7 @@ test("collectRoutes: excludes redirected routes from snapshot", async () => {
   expect(paths).not.toContain("/de/agb");
 });
 
-test("collectRoutes: without _redirects, all routes included", async () => {
+test("collectRoutes: without redirect rules, all routes included", async () => {
   mkdirSync(path.join(tmpDir, "agb"), { recursive: true });
   mkdirSync(path.join(tmpDir, "de", "agb"), { recursive: true });
   await fs.writeFile(path.join(tmpDir, "index.html"), "<html>home</html>");
