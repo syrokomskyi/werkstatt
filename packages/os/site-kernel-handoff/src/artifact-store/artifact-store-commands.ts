@@ -14,8 +14,8 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
 import { create as tarCreate, extract as tarExtract } from "tar";
+import { byteHash, byteHashFile } from "@warpgogol/fingerprint";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -43,8 +43,7 @@ function hashPath(workspaceRoot: string, hash: string): string {
 }
 
 async function hashFile(filePath: string): Promise<string> {
-  const data = await fs.readFile(filePath);
-  return `sha256:${crypto.createHash("sha256").update(data).digest("hex")}`;
+  return byteHashFile(filePath);
 }
 
 async function hashDir(
@@ -57,15 +56,15 @@ async function hashDir(
 
   for (const fullPath of await collectFiles(dir)) {
     const relPath = path.relative(dir, fullPath).replace(/\\/g, "/");
-    const data = await fs.readFile(fullPath);
-    const hash = crypto.createHash("sha256").update(data).digest("hex");
-    hashes.push(`${relPath}:${hash}`);
+    const fileHash = await byteHashFile(fullPath);
+    hashes.push(`${relPath}:${fileHash}`);
     fileCount++;
-    byteSize += data.length;
+    const stat = await fs.stat(fullPath);
+    byteSize += stat.size;
   }
 
   hashes.sort();
-  const treeHash = `sha256:${crypto.createHash("sha256").update(hashes.join("\n")).digest("hex")}`;
+  const treeHash = byteHash(hashes.join("\n"));
   return { treeHash, fileCount, byteSize };
 }
 
@@ -131,9 +130,7 @@ export async function runArtifactStorePut(
       ["."],
     );
 
-    const archiveBuffer = await fs.readFile(archiveTmpPath);
-    const archiveHash = `sha256:${crypto.createHash("sha256").update(archiveBuffer).digest("hex")}`;
-    const distArtifactHash = archiveHash;
+    const distArtifactHash = await byteHashFile(archiveTmpPath);
 
     // Move archive to content-addressed path
     const storeDir = hashPath(workspaceRoot, distArtifactHash);
