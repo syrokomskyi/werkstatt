@@ -17,6 +17,7 @@
   <item>RFC-0522: add dirty cache clone warning to mission.validate.</item>
   <item>RFC-0560: use resolveActor(input) in mission.reconcile for actor resolution with --actor-from-auth flag.</item>
   <item>RFC-0568: replace git format-patch + git am with git merge --no-ff; remove 3-way fallback and auto-resolve; add untracked file investigation; use dynamic branch name; add push retry with exponential backoff.</item>
+  <item>RFC-0578: add structured BUILD-01 diagnostic with pattern matching for common Astro build failures in mission.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,6 +26,7 @@ import { existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import path from "node:path";
 import type {
+  Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
@@ -65,7 +67,74 @@ export interface MissionValidateData {
   missionId: string;
   contractFull: { passed: boolean; validators: Array<Record<string, unknown>> };
   build: { succeeded: boolean; routeCount: number; sitemapHash: string; error?: string };
+  diagnostics?: Diagnostic[];
   validatedAt: string;
+}
+
+interface BuildFailurePattern {
+  id: string;
+  test: (errorOutput: string) => boolean;
+  fixHint: string;
+  excerpt: (errorOutput: string) => string;
+}
+
+function extractErrorLine(output: string, pattern: RegExp): string {
+  const lines = output.split("\n");
+  const matchLine = lines.find((l) => pattern.test(l));
+  return (matchLine ?? lines[0] ?? "").trim().slice(0, 200);
+}
+
+const BUILD_FAILURE_PATTERNS: BuildFailurePattern[] = [
+  {
+    id: "enoent-system-manifest",
+    test: (out) => /ENOENT.*system\.md|loadSystemManifestSync.*not found/i.test(out),
+    fixHint:
+      "Guard loadSystemManifestSync with import.meta.env.DEV — it resolves __dirname differently during prerender. See middleware.template.ts.",
+    excerpt: (out) => extractErrorLine(out, /ENOENT|loadSystemManifestSync/i),
+  },
+  {
+    id: "module-not-found",
+    test: (out) => /Cannot find module|Module not found|ERR_MODULE_NOT_FOUND/i.test(out),
+    fixHint:
+      "Check the import path in the file shown above. If it's a workspace package, run pnpm install. If it's a relative path, verify the file exists.",
+    excerpt: (out) => extractErrorLine(out, /Cannot find module|Module not found/i),
+  },
+  {
+    id: "content-schema-error",
+    test: (out) => /schema|frontmatter|collection.*error|ZodError/i.test(out),
+    fixHint:
+      "Check the frontmatter of the file shown above against its content collection schema. Look for missing required fields or type mismatches.",
+    excerpt: (out) => extractErrorLine(out, /schema|frontmatter|ZodError/i),
+  },
+  {
+    id: "typescript-error",
+    test: (out) => /error TS\d+:|Type .* is not assignable/i.test(out),
+    fixHint:
+      "Fix the TypeScript type mismatch in the file shown above. Check the component props schema or the type declaration.",
+    excerpt: (out) => extractErrorLine(out, /error TS\d+/i),
+  },
+];
+
+function matchBuildFailure(errorOutput: string): BuildFailurePattern | undefined {
+  return BUILD_FAILURE_PATTERNS.find((p) => p.test(errorOutput));
+}
+
+export function buildFailureDiagnostics(buildError: string): Diagnostic[] {
+  const pattern = matchBuildFailure(buildError);
+  return [
+    {
+      ruleId: "BUILD-01",
+      severity: "error",
+      message: pattern
+        ? `Astro build failed (${pattern.id}): ${pattern.excerpt(buildError)}`
+        : `Astro build failed: ${buildError.slice(0, 200)}`,
+      fixHint: pattern?.fixHint ?? "Read the full build output above for the error details.",
+      data: {
+        patternId: pattern?.id ?? "unknown",
+        buildErrorLength: buildError.length,
+      },
+    },
+  ];
 }
 
 export async function runMissionValidate(
@@ -197,6 +266,7 @@ export async function runMissionValidate(
 
   const passed = staticPassed && buildSucceeded;
   const now = new Date().toISOString();
+  const buildDiagnostics = buildError ? buildFailureDiagnostics(buildError) : [];
   const report = {
     schemaVersion: "1.0.0",
     missionId,
@@ -215,6 +285,7 @@ export async function runMissionValidate(
       ...(buildError ? { error: buildError } : {}),
       failedSteps,
     },
+    ...(buildDiagnostics.length > 0 ? { diagnostics: buildDiagnostics } : {}),
     validatedAt: now,
   };
 

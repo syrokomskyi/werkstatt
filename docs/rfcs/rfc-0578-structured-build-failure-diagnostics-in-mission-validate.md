@@ -272,12 +272,12 @@ After:
 
 ## Acceptance criteria
 
-- [ ] `mission.validate` emits a `BUILD-01` diagnostic when the Astro build fails
-- [ ] The diagnostic includes a `patternId` in `data` identifying the matched pattern (or `"unknown"`)
-- [ ] The diagnostic includes an actionable `fixHint` specific to the matched pattern
-- [ ] At least 4 patterns are defined: `enoent-system-manifest`, `module-not-found`, `content-schema-error`, `typescript-error`
-- [ ] The raw `build.error` string is preserved in `data.build.error` for backward compatibility
-- [ ] `rfc.validate` passes on this file
+- [x] `mission.validate` emits a `BUILD-01` diagnostic when the Astro build fails (evidence: commit <TBD>, mission-materialization-commands.ts:269 buildDiagnostics)
+- [x] The diagnostic includes a `patternId` in `data` identifying the matched pattern (or `"unknown"`) (evidence: commit <TBD>, mission-materialization-commands.ts:133-134)
+- [x] The diagnostic includes an actionable `fixHint` specific to the matched pattern (evidence: commit <TBD>, mission-materialization-commands.ts:87-115 BUILD_FAILURE_PATTERNS fixHints)
+- [x] At least 4 patterns are defined: `enoent-system-manifest`, `module-not-found`, `content-schema-error`, `typescript-error` (evidence: commit <TBD>, mission-materialization-commands.ts:87-116)
+- [x] The raw `build.error` string is preserved in `data.build.error` for backward compatibility (evidence: commit <TBD>, mission-materialization-commands.ts:285)
+- [x] `rfc.validate` passes on this file (evidence: no RFC-0578 errors in rfc.validate output)
 
 ## Implementation notes for agents
 
