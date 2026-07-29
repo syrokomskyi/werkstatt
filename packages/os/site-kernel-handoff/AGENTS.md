@@ -87,6 +87,17 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 - `mission.close` writes `evidence/close-report.json` with git, mirror, and reconcile status blocks.
 - `sternsystem.status --id <id>` is a read-only command showing HEAD SHA, origin SHA, mirror SHA, dirty files, last 6 bordbuch events, and last reconciledAt. Use `--all` for all systems.
 
+## Werkstatt side-effect auto-commit (RFC-0580)
+
+All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abort`, `mission.materialize`, `mission.migrate`, `mission.reconcile`) auto-commit werkstatt-level side-effect files to the monorepo working tree after updating them. The shared helper `commitWerkstattSideEffects` in `werkstatt/werkstatt-commit.ts` stages only specific file paths (never `git add -A`), is idempotent (skips when no staged changes), and throws on commit failure. The helper does NOT push — werkstatt monorepo push is a separate operator-controlled operation.
+
+- `mission.open`, `mission.close`, `mission.abort` commit `systems/registry.yaml` + `missions/<id>/mission.yaml`.
+- `mission.materialize` commits `missions/<id>/mission.yaml` + `pnpm-lock.yaml`.
+- `mission.migrate` commits `missions/<id>/mission.yaml`.
+- `mission.reconcile` commits `missions/<id>/mission.yaml`.
+- Commit message format: `werkstatt: <command> <missionId>`.
+- The shared `gitExec` utility lives in `werkstatt/git-exec.ts` with an `allowNonZero` option for git commands that use non-zero exit codes as signals (e.g. `git diff --cached --quiet`).
+
 ## Mission git workpiece and Layer C protection (RFC-0480)
 
 - **Edits-only-through-missions invariant:** All site edits go through mission workpieces. `sternsystem.sync` is push-only (pull/both removed). `sternsystem.validate` detects external edits via Bordbuch-vs-git-log consistency check. Systems with detected external edits should be demoted to `paused` status, which blocks `mission.materialize`.
