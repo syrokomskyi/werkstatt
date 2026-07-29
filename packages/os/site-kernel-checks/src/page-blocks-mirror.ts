@@ -14,12 +14,14 @@ Catches missing nested props (labels, effects, background) caused by
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0205: Initial implementation.</item>
+  <item>RFC-0576: Migrate to diagnosticsResult with registered MIRROR-01..03 ruleIds, preserve existing fixHints.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 import type {
+  Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
@@ -27,6 +29,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
+import { diagnosticsResult, passResult } from "./result-helpers.ts";
 
 interface BlockMirrorViolation {
   file: string;
@@ -34,19 +37,12 @@ interface BlockMirrorViolation {
   blockIndex: number;
   blockId?: string;
   blockType: string;
-  rule: string;
+  ruleId: string;
   severity: "error";
   missingProp?: string;
   missingLabelKey?: string;
   message: string;
   fixHint: string;
-}
-
-interface PageBlocksMirrorResult {
-  command: "page.blocks.mirror.validate";
-  status: "pass" | "fail";
-  pagesCompared: number;
-  violations: BlockMirrorViolation[];
 }
 
 interface PageBlock {
@@ -131,7 +127,7 @@ function compareBlocks(
         blockIndex: i,
         blockId: defaultBlock.id,
         blockType: defaultBlock.type,
-        rule: "MIRROR-01",
+        ruleId: "MIRROR-01",
         severity: "error",
         message: `Localized page is missing block[${i}] (type="${defaultBlock.type}", id="${defaultBlock.id ?? ""}") that exists in default-language twin`,
         fixHint: `Add a block with type="${defaultBlock.type}" at index ${i} in the localized page`,
@@ -146,7 +142,7 @@ function compareBlocks(
         blockIndex: i,
         blockId: defaultBlock.id,
         blockType: defaultBlock.type,
-        rule: "MIRROR-01",
+        ruleId: "MIRROR-01",
         severity: "error",
         message: `Localized block[${i}] has type="${localizedBlock.type}" but default twin has type="${defaultBlock.type}"`,
         fixHint: `Change localized block[${i}] type to "${defaultBlock.type}"`,
@@ -166,7 +162,7 @@ function compareBlocks(
           blockIndex: i,
           blockId: defaultBlock.id,
           blockType: defaultBlock.type,
-          rule: "MIRROR-02",
+          ruleId: "MIRROR-02",
           severity: "error",
           missingProp: propKey,
           message: `Localized block[${i}] (type="${defaultBlock.type}") is missing prop "${propKey}" that exists in default-language twin`,
@@ -192,7 +188,7 @@ function compareBlocks(
                 blockIndex: i,
                 blockId: defaultBlock.id,
                 blockType: defaultBlock.type,
-                rule: "MIRROR-03",
+                ruleId: "MIRROR-03",
                 severity: "error",
                 missingProp: "labels",
                 missingLabelKey: labelKey,
@@ -212,23 +208,22 @@ function compareBlocks(
 export async function runPageBlocksMirrorValidate(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
-): Promise<KernelCommandResult<PageBlocksMirrorResult>> {
+): Promise<KernelCommandResult> {
   const violations: BlockMirrorViolation[] = [];
 
   let paths: ReturnType<typeof requireAstroSitePaths>;
   try {
     paths = requireAstroSitePaths(context);
   } catch (err) {
-    return {
-      exitCode: 1,
-      data: {
-        command: "page.blocks.mirror.validate",
-        status: "fail",
-        pagesCompared: 0,
-        violations: [],
+    return diagnosticsResult("page.blocks.mirror.validate", [
+      {
+        ruleId: "MIRROR-01",
+        severity: "error",
+        message: (err as Error).message,
+        file: "",
+        fixHint: "Ensure the site has a valid astro.config with appDirectory defined.",
       },
-      summary: (err as Error).message,
-    };
+    ]);
   }
 
   const pagesDir = join(paths.appDirectory, "src", "content", "pages");
@@ -277,26 +272,11 @@ export async function runPageBlocksMirrorValidate(
   }
 
   if (violations.length > 0) {
-    return {
-      exitCode: 1,
-      data: {
-        command: "page.blocks.mirror.validate",
-        status: "fail",
-        pagesCompared,
-        violations,
-      },
-      summary: `page.blocks.mirror.validate: ${violations.length} violation(s) across ${pagesCompared} localized page twin(s)`,
-    };
+    return diagnosticsResult("page.blocks.mirror.validate", violations as Diagnostic[]);
   }
 
-  return {
-    exitCode: 0,
-    data: {
-      command: "page.blocks.mirror.validate",
-      status: "pass",
-      pagesCompared,
-      violations: [],
-    },
-    summary: `page.blocks.mirror.validate: OK (${pagesCompared} localized twin page pair(s) checked)`,
-  };
+  return passResult(
+    "page.blocks.mirror.validate",
+    `page.blocks.mirror.validate: OK (${pagesCompared} localized twin page pair(s) checked)`,
+  );
 }
