@@ -531,6 +531,15 @@ export interface MissionReconcileData {
   autoResolvedPaths?: string[];
 }
 
+// RFC-0584: shared merge-abort helper — attempts git merge --abort, silently catches failure
+function abortMerge(systemDir: string): void {
+  try {
+    execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
+  } catch {
+    // merge --abort also failed — continue to throw
+  }
+}
+
 export async function runMissionReconcile(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -751,11 +760,7 @@ export async function runMissionReconcile(
             logger.info(`  Auto-resolved bordbuch/ conflict (kept cache clone version)`);
           } catch (resolveErr) {
             // Auto-resolution failed — abort merge and throw
-            try {
-              execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
-            } catch {
-              // merge --abort also failed — continue to throw
-            }
+            abortMerge(systemDir);
             throw new Error(
               `[mission.reconcile] bordbuch auto-resolution failed: ${(resolveErr as Error).message}.\n` +
                 `Merge has been aborted. Inspect the cache clone state manually.\n` +
@@ -764,11 +769,7 @@ export async function runMissionReconcile(
           }
         } else {
           // Abort merge and throw existing error
-          try {
-            execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
-          } catch {
-            // merge --abort also failed — continue to throw
-          }
+          abortMerge(systemDir);
           throw new Error(
             `[mission.reconcile] git merge --no-ff failed: ${(err as Error).message}.\n` +
               `Resolve conflicts in the workpiece (not the cache clone), commit via mission.git.commit, then re-run reconcile.\n` +

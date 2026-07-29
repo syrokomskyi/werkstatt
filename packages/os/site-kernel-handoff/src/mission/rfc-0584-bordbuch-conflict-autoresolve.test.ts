@@ -23,6 +23,9 @@ function git(cwd: string, args: string): string {
   }).trim();
 }
 
+// Helper for git commands expected to fail with a conflict (exit code 1).
+// Not a general-purpose error swallower — only use for merge commands where
+// non-zero exit signals a conflict, not an unexpected git failure.
 function gitExpectFail(cwd: string, args: string): string {
   try {
     return execSync(`git ${args}`, {
@@ -80,7 +83,10 @@ test("RFC-0584: bordbuch delete-modify conflict is auto-resolved by keeping cach
   git(workpieceDir, 'commit -m "remove bordbuch from workpiece"');
 
   // Modify bordbuch in cache clone (simulating bordbuch.append during mission)
-  await fs.writeFile(path.join(cacheCloneDir, "bordbuch/events.ndjson"), '{"event":"mission-open"}\n');
+  await fs.writeFile(
+    path.join(cacheCloneDir, "bordbuch/events.ndjson"),
+    '{"event":"mission-open"}\n',
+  );
   git(cacheCloneDir, "add bordbuch/events.ndjson");
   git(cacheCloneDir, 'commit -m "append bordbuch event"');
 
@@ -104,11 +110,7 @@ test("RFC-0584: bordbuch delete-modify conflict is auto-resolved by keeping cach
   const conflictedPaths = statusOutput
     .split("\n")
     .filter(
-      (l) =>
-        l.startsWith("DU") ||
-        l.startsWith("UD") ||
-        l.startsWith("AA") ||
-        l.startsWith("UU"),
+      (l) => l.startsWith("DU") || l.startsWith("UD") || l.startsWith("AA") || l.startsWith("UU"),
     )
     .map((l) => l.slice(3).trim());
 
@@ -168,11 +170,7 @@ test("RFC-0584: non-bordbuch conflict causes hard failure with merge abort", asy
   const conflictedPaths = statusOutput
     .split("\n")
     .filter(
-      (l) =>
-        l.startsWith("DU") ||
-        l.startsWith("UD") ||
-        l.startsWith("AA") ||
-        l.startsWith("UU"),
+      (l) => l.startsWith("DU") || l.startsWith("UD") || l.startsWith("AA") || l.startsWith("UU"),
     )
     .map((l) => l.slice(3).trim());
 
@@ -206,7 +204,10 @@ test("RFC-0584: mixed bordbuch + non-bordbuch conflicts cause hard failure with 
   git(workpieceDir, 'commit -m "edit system.md in workpiece + remove bordbuch"');
 
   // Modify bordbuch in cache clone (creates bordbuch delete-modify conflict)
-  await fs.writeFile(path.join(cacheCloneDir, "bordbuch/events.ndjson"), '{"event":"mission-open"}\n');
+  await fs.writeFile(
+    path.join(cacheCloneDir, "bordbuch/events.ndjson"),
+    '{"event":"mission-open"}\n',
+  );
   // Modify system.md in cache clone (creates non-bordbuch modify-modify conflict)
   await fs.writeFile(path.join(cacheCloneDir, "src/content/system.md"), "# Cache Clone Edit\n");
   git(cacheCloneDir, "add -A");
@@ -226,11 +227,7 @@ test("RFC-0584: mixed bordbuch + non-bordbuch conflicts cause hard failure with 
   const conflictedPaths = statusOutput
     .split("\n")
     .filter(
-      (l) =>
-        l.startsWith("DU") ||
-        l.startsWith("UD") ||
-        l.startsWith("AA") ||
-        l.startsWith("UU"),
+      (l) => l.startsWith("DU") || l.startsWith("UD") || l.startsWith("AA") || l.startsWith("UU"),
     )
     .map((l) => l.slice(3).trim());
 
