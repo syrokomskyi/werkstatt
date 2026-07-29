@@ -178,6 +178,12 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - **Coexistence with Leitstand:** This module adds a complementary symlink-swap deployment path for local platform deployments. The Leitstand (DNA-49) continues to manage Cloudflare Workers deployments via adapter plugins.
 - **Two-phase commit:** `TwoPhaseCommitResult` and `WorkshopDeployStatus` types are defined in `types.ts` as stubs for Phase 4 multi-workshop atomic deploys. No logic is implemented in the pilot.
 
+## Release commands (RFC-0357 / RFC-0585)
+
+- **`release.prepare`:** Runs a production `astro build` on the mission workpiece (or reuses `missions/<id>/distribution/dist` when it exists). Captures production and readable behavior snapshots from the build output via `behavior.snapshot.capture`, runs `behavior.snapshot.diff` between them, and computes `distTreeHash`, `siteContentHash`, `behaviorSnapshotHash`, and `readableSnapshotHash` via `@warpgogol/fingerprint` — never `sha256:pending`. If the snapshot diff fails, the prepare aborts with a non-zero exit code.
+- **`release.publish`:** Refuses to publish any release whose `distTreeHash` is `sha256:pending` or missing, or whose `dist/` directory does not exist. The guard is fail-hard from the first run — no opt-in, no grace period.
+- **Forward-only:** Existing releases with `sha256:pending` hashes must be deleted manually by the operator before running the new `release.prepare`. No migration path is provided.
+
 ## Test conventions
 
 - **Await async operations before sync assertions:** When testing sync functions that inspect file state (e.g. `isWorkpieceDirty`, `existsSync`), always `await fs.writeFile()` or other async I/O before calling the sync function. Using `.then()` without awaiting creates a race condition — the assertion may execute before the file is written, causing flaky test failures.
