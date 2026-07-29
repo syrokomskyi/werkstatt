@@ -10,6 +10,7 @@
   <item>surface.generate now cleans up stale Markdown twins and lazy-cache files from the previous run before writing new ones.</item>
   <item>RFC-0303: extracted generate handler from surface.ts into surface/generate.ts.</item>
   <item>RFC-0496: post-bake injection of service catalog blocks into website-local depth-1 industry pages.</item>
+  <item>RFC-0582: remove existsSync collection-directory filter from blueprint selection; add SURFACE-GEN-01 post-generation consistency check.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,7 +34,7 @@ import {
   type VirtualRouteEntry,
 } from "@warpgogol/surface";
 import { markdownTwinRelPath } from "@warpgogol/share/semantic";
-import { failResult } from "../result-helpers.ts";
+import { diagnosticsResult, failResult } from "../result-helpers.ts";
 import {
   loadSurfaceBlueprints,
   expandBlueprint,
@@ -83,11 +84,7 @@ export async function runSurfaceGenerate(
   const blueprints = allBlueprints.filter((bp) => {
     const owner = modules.find((module) => module.blueprints.includes(bp.id));
     const moduleEntitled = !owner || entitled === null || entitled.has(owner.entitlement);
-    return (
-      moduleEntitled &&
-      (declared === null || declared.includes(bp.id)) &&
-      existsSync(join(appDir, "src", "content", "surface", bp.dataset.collection))
-    );
+    return moduleEntitled && (declared === null || declared.includes(bp.id));
   });
 
   const indexBudget = await readPseoIndexBudget(appDir);
@@ -178,6 +175,20 @@ export async function runSurfaceGenerate(
         `blueprint "${blueprint.id}" expansion failed: ${err instanceof Error ? err.message : String(err)}`,
       ]);
     }
+  }
+
+  // RFC-0582: post-generation consistency check. surfaces[] always has one entry per
+  // processed blueprint (countFor is called for every blueprint in the loop), so checking
+  // surfaceId membership would never fire. Instead, check the `generated` count field.
+  const emptyBlueprints = surfaces.filter((s) => s.generated === 0);
+  if (emptyBlueprints.length > 0) {
+    return diagnosticsResult("surface.generate", [
+      {
+        ruleId: "SURFACE-GEN-01",
+        severity: "error",
+        message: `declared blueprint '${emptyBlueprints[0]!.surfaceId}' produced zero entries — check expandBlueprint logs`,
+      },
+    ]);
   }
 
   // RFC-0496: inject service catalog blocks into website-local depth-1 industry pages.
