@@ -1,69 +1,76 @@
 ---
-reviewId: REVIEW-CODE-2026-07-29-19
+reviewId: REVIEW-CODE-2026-07-29-20
 date: 2026-07-29
 reviewer:
   skill: fo-review
   model: unknown
 verdict: needs-revision
-diffRange: 36fdafb...HEAD
+diffRange: 4518dca...HEAD
 filesReviewed:
-  - packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts
-  - packages/os/site-kernel-handoff/src/mission/rfc-0584-bordbuch-conflict-autoresolve.test.ts
+  - packages/os/site-kernel-handoff/src/leitstand/adapter.ts
+  - packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts
+  - packages/os/site-kernel-handoff/src/leitstand/adapters/index.ts
+  - packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts
+  - packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts
+  - packages/os/site-kernel-handoff/package.json
   - packages/os/site-kernel-handoff/AGENTS.md
-  - docs/rfcs/rfc-0584-auto-resolve-bordbuch-delete-modify-conflicts-in-mission-reconcile.md
 ---
 
-# Code Review: 36fdafb...HEAD (RFC-0584 implementation)
+# Code Review: 4518dca...HEAD (RFC-0587 implementation)
 
 ### Verdict: Needs revision
 
-The implementation correctly adds bordbuch delete-modify conflict auto-resolution to `mission.reconcile` with proper error handling, evidence reporting, and test coverage. However, there are two findings: a duplicated code pattern (merge --abort in two branches) and a test-only helper that could mask real git failures.
+The implementation correctly adds tar.gz archive creation, adapter-declared size limits, and exported helpers to the Leitstand and artifact store modules. All mechanical checks pass. However, there are two findings: a DNA-53 violation (direct `crypto.createHash` usage instead of `@warpgogol/fingerprint`) and a memory concern (reading the entire archive into memory for hashing).
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @warpgogol/site-kernel-handoff build:check` and `pnpm --filter @warpgogol/site-kernel-handoff test` (341 tests, including 3 new) all pass.
+Pass — `pnpm --filter @warpgogol/site-kernel-handoff build:check` and `pnpm --filter @warpgogol/site-kernel-handoff test` (345 tests) all pass.
 
 ### Axis A — Structural correctness
 
-**Finding A1 — Duplicated Code (merge --abort pattern).** The `git merge --abort` call with its try/catch is duplicated in two branches of the catch block: once in the auto-resolution failure path (lines 757-760) and once in the non-bordbuch conflict path (lines 770-773). Both perform the same operation: attempt abort, silently catch failure, then throw. This is a Fowler Duplicated Code smell. Consider extracting a helper `abortMerge(systemDir: string)` that wraps the abort + try/catch, and calling it from both branches.
+No issues. The `DeploymentLimits` interface is minimal (two fields). The `getLimits()` method is a simple getter. The `checkDistSize` refactor cleanly replaces hardcoded constants with the `limits` parameter. The tar.gz creation uses the `tar` npm package's `create`/`extract` API correctly. The idempotent manifest removal logic correctly checks `existing.manifestPath !== path.join(storeDir, ...)` before unlinking to avoid removing the same file being written.
 
 ### Axis B — DNA alignment
 
-No issues. DNA-46 (Mission lifecycle) is the relevant invariant — it states every change passes through a mission and is enforced by `mission.reconcile`. The auto-resolution preserves this invariant: it only resolves bordbuch (cache-clone-only) conflicts, not workpiece data conflicts. The bordbuch is the append-only hash-chained log, and keeping the cache clone version (`--ours`) preserves the canonical bordbuch state.
+**Finding B1 — DNA-53 violation: direct `crypto.createHash` usage.** The new code at `artifact-store-commands.ts:135` uses `crypto.createHash("sha256").update(archiveBuffer).digest("hex")` to hash the tar.gz archive. DNA-53 states: "All project hashes for platform, content, release artifacts, snapshots, and generated manifests use the shared `@warpgogol/fingerprint` package. New ad hoc direct hashing helpers are forbidden outside the package and audited by `fingerprint.usage.lint`." The `@warpgogol/fingerprint` package exports `byteHashFile` which should be used instead. This also fixes the pre-existing `hashFile` and `hashDir` functions in the same file which use the same pattern — but the new code introduces a new violation. Fix: replace `crypto.createHash("sha256").update(archiveBuffer).digest("hex")` with `await byteHashFile(archiveTmpPath)` from `@warpgogol/fingerprint`, and remove the `archiveBuffer` variable.
 
 ### Axis C — Ecosystem fit
 
-No issues. The change is scoped to `packages/os/site-kernel-handoff` which owns `mission.reconcile`. AGENTS.md was updated with the new behavior. No package boundary violations. No new commands introduced.
+No issues. All changes are scoped to `packages/os/site-kernel-handoff`. The `tar` npm package is a well-maintained external dependency (per the ecosystem preference for external packages over custom code). AGENTS.md was updated with the new `getLimits()`, tar.gz archive, rehydrate extraction, and exported helpers documentation. No package boundary violations. No new commands introduced.
 
 ### Axis D — Forward-only compliance
 
-No issues. The old error path (throw on any merge failure) is replaced, not preserved alongside the new logic. No dual-paths or compatibility shims.
+No issues. The old `distArtifactHash = treeHash` path is completely replaced with the tar.gz archive hash — no dual path. The old empty-directory `artifactStoreRehydrate` is replaced with tar.gz extraction — no fallback. The hardcoded limit constants in `checkDistSize` are removed, replaced by adapter-declared limits — no backward compat.
 
 ### Axis E — Agent-facing clarity
 
-No issues. New test file carries `MODULE_CONTRACT` and `CHANGE_SUMMARY` Compass scaffolding. The RFC-0584 reference in the code comment (`// RFC-0584: auto-resolve bordbuch/ delete-modify conflicts`) provides traceability. Variable names (`autoResolvedPaths`, `conflictedPaths`, `allBordbuch`) are self-documenting.
+No issues. All modified source files carry `CHANGE_SUMMARY` updates with RFC-0587 entries. The `DeploymentLimits` interface and `getLimits()` method are self-documenting. The `archivePath` field in `ArtifactStorePutData` is clearly named. The `filterEnv` and `sourceDotenv` exports are straightforward.
 
 ### Axis F — Pragmatism
 
-No issues. The `autoResolvedPaths?: string[]` field is optional and only populated when auto-resolution occurs — no speculative generality. The change extends the existing merge try/catch block rather than introducing a new abstraction layer. Scope is minimal: one interface field, one logic block, one evidence field, one summary suffix.
+No issues. `DeploymentLimits` is minimal — two fields, no speculative generality. The `getLimits()` method is a simple getter with no over-engineering. The tar.gz creation is straightforward. The `null` adapter returns `Infinity` limits — correct for a no-op adapter.
 
 ### Axis G — Blind spots
 
-**Finding G1 — `gitExpectFail` test helper masks real failures.** The `gitExpectFail` function (test file line 31-39) catches all git errors and returns an empty string. This is used for `git merge` which is expected to fail (exit code 1 on conflict). However, if the merge fails for a different reason (e.g., bad ref, missing FETCH_HEAD), the test would still pass silently because the helper swallows the error. Consider checking the error output or exit code to distinguish "expected conflict" from "unexpected git failure", or at minimum adding a comment that the helper is specifically for merge commands that fail with conflicts.
+**Finding G1 — Archive buffer read into memory.** At `artifact-store-commands.ts:134`, the code reads the entire tar.gz archive into memory (`await fs.readFile(archiveTmpPath)`) to compute its hash. For a large dist directory (e.g., 330 MiB), the archive could be ~330 MiB, and reading it all into memory could cause memory pressure in constrained environments. Using `byteHashFile` from `@warpgogol/fingerprint` (which hashes the file in a streaming fashion) would eliminate this concern. This finding is coupled with B1 — fixing B1 by using `byteHashFile` also fixes G1.
 
 ### Spec compliance
 
-| Requirement from the spec (RFC-0584) | Status | Evidence |
+| Requirement from the spec (RFC-0587) | Status | Evidence |
 | --- | --- | --- |
-| Auto-resolve bordbuch/ delete-modify conflicts by keeping cache clone version | Done | mission-materialization-commands.ts:733-754 |
-| Fail with existing error when non-bordbuch conflicts occur | Done | mission-materialization-commands.ts:768-780 |
-| Abort merge and fail when mixed bordbuch + non-bordbuch conflicts occur | Done | mission-materialization-commands.ts:768-780 (same path as non-bordbuch) |
-| Result includes autoResolvedPaths field | Done | mission-materialization-commands.ts:895-903 |
-| Log message emitted | Done | mission-materialization-commands.ts:752-754 |
-| Unit test covers auto-resolution scenario | Done | rfc-0584-bordbuch-conflict-autoresolve.test.ts test 1 |
-| Unit test covers non-bordbuch hard-failure scenario | Done | rfc-0584-bordbuch-conflict-autoresolve.test.ts test 2 |
+| `artifact.store.put` creates tar.gz archive | Done | artifact-store-commands.ts:125-132 |
+| `distArtifactHash` is archive hash | Done | artifact-store-commands.ts:136 |
+| Idempotent manifest storage | Done | artifact-store-commands.ts:152-156 |
+| `artifactStoreRehydrate` extracts tar.gz | Done | artifact-store-commands.ts:427-430 |
+| `DeploymentAdapter.getLimits()` | Done | adapter.ts:56-68 |
+| `checkDistSize` uses adapter limits | Done | leitstand-commands.ts:218 |
+| `cloudflare-workers` `getLimits()` returns 20 GiB / 25 MiB | Done | cloudflare-workers.ts:228-230 |
+| `null` adapter `getLimits()` returns Infinity | Done | leitstand-commands.ts:87-89 |
+| `filterEnv` exported | Done | cloudflare-workers.ts:29 |
+| `sourceDotenv` exported | Done | cloudflare-workers.ts:62 |
+| `ArtifactStorePutData` retains `siteContentHash` | Done | artifact-store-commands.ts:73-84 |
 
 ### Questions for the author
 
-1. Should the `git merge --abort` duplication be extracted into a helper, or is the current inline form preferred for clarity of each error path?
-2. Is the `gitExpectFail` test helper sufficient, or should it verify that the failure is specifically a conflict (exit code 1) rather than any git error?
+1. Should the archive hash use `byteHashFile` from `@warpgogol/fingerprint` instead of `crypto.createHash` to comply with DNA-53?
+2. Should the pre-existing `hashFile` and `hashDir` functions in the same file also be migrated to `@warpgogol/fingerprint` in this RFC, or should that be a separate cleanup?
