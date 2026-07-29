@@ -13,7 +13,13 @@
 */
 
 import type { SectionProps } from "@warpgogol/share/page";
-import { cast, getSiteSectionLabels, need, resolveEffectsForTarget } from "@warpgogol/share";
+import {
+  cast,
+  getSiteSectionLabels,
+  need,
+  resolveEffectsForTarget,
+  resolveSectionAnchor,
+} from "@warpgogol/share";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import EffectHost from "../../components/effects/effect-host.astro";
@@ -22,6 +28,7 @@ import type { PriceCardSectionContent } from "./price-card-section.types.generat
 import "./price-card-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
+const sectionId = await resolveSectionAnchor(Astro.props, "price-card");
 const props = cast<PriceCardSectionContent>(pageOverride);
 const panelEffects = resolveEffectsForTarget(props.effects, "panel");
 const siteLabels = await getSiteSectionLabels<Record<string, unknown>>(
@@ -56,6 +63,7 @@ const resolvedIncludes = await Promise.all(
 
 <SectionShell
   slug="price-card"
+  sectionId={sectionId}
   ariaLabelledBy="price-card-title"
   background={props.background}
   effects={props.effects}
