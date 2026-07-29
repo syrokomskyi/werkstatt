@@ -16,7 +16,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0589
 related:
   - RFC-0318
   - RFC-0480

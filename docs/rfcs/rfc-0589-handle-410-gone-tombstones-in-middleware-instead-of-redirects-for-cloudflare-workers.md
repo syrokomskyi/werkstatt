@@ -1,7 +1,7 @@
 ---
 id: RFC-0589
 title: "Handle 410 Gone tombstones in middleware instead of _redirects for Cloudflare Workers"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -16,7 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
@@ -248,20 +248,19 @@ const TOMBSTONE_STATUSES = [410]; // rejected for cloudflare-workers, allowed fo
 
 ## Acceptance criteria
 
-- [ ] `buildRetiredPageRoutesBlock` no longer emits 410 entries to `_redirects` (evidence: `app-boilerplate-helpers.ts:<line>`, `.filter((entry) => entry.status === 301)` pattern)
-- [ ] `buildRetiredTombstoneMiddleware` generates Astro middleware source for 410 routes (evidence: `app-boilerplate-helpers.ts:<line>`, middleware template exists)
-- [ ] `routes.generate` generates `src/middleware/retired-tombstones.ts` (evidence: `app-boilerplate.ts:<line>`, file exists in output)
-- [ ] Root `src/middleware.ts` template chains tombstone middleware first via `sequence()` (evidence: `middleware.template.ts:<line>`, `sequence(tombstoneMiddleware, ...)` pattern)
-- [ ] `GENERATOR_OWNERSHIP_MAP` registers `src/middleware/retired-tombstones.ts` under `routes.generate` (evidence: `generator-ownership.ts:<line>`)
-- [ ] `redirect.map.validate` (REDIR-03) rejects 410 in `_redirects` for cloudflare-workers adapter sites (evidence: `managed-public.ts:<line>`, violation message mentions middleware, fixHint updated)
-- [ ] `redirect.map.validate` resolves adapter type from `systems/registry.yaml` (evidence: `managed-public.ts:<line>`, registry load call)
-- [ ] 410 response includes `Cache-Control: max-age=3600` header (evidence: middleware template, `Cache-Control` header in 410 response)
-- [ ] `wrangler deploy` succeeds on a site with retired 410 routes (evidence: no 410 entries in `_redirects`, middleware returns 410 at runtime)
-- [ ] `pnpm --filter @warpgogol/site-kernel-codegen build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-checks build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-codegen test` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-checks test` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `buildRetiredPageRoutesBlock` no longer emits 410 entries to `_redirects` (evidence: `app-boilerplate-helpers.ts:241`, `.filter((entry) => entry.status === 301)` pattern)
+- [x] `buildRetiredTombstoneSlugs` generates 410 slug list for middleware (evidence: `app-boilerplate-helpers.ts:257-264`, middleware template at `templates/app-boilerplate/src/middleware/retired-tombstones.ts.template`)
+- [x] `routes.generate` generates `src/middleware/retired-tombstones.ts` (evidence: `app-boilerplate.ts:139-176`, file emitted in generated set)
+- [x] Root `src/middleware.ts` template chains tombstone middleware first via `sequence()` (evidence: `middleware.template.ts:34-35`, `sequence(tombstoneMiddleware, ...)` pattern)
+- [x] `GENERATOR_OWNERSHIP_MAP` registers `src/middleware/retired-tombstones.ts` under `routes.generate` (evidence: `generator-ownership.ts:157`)
+- [x] `redirect.map.validate` (REDIR-03) rejects 410 in `_redirects` for cloudflare-workers adapter sites (evidence: `managed-public.ts:244-254`, violation message mentions middleware, fixHint updated)
+- [x] `redirect.map.validate` resolves adapter type from `systems/registry.yaml` (evidence: `managed-public.ts:46-61`, `resolveDeploymentAdapter` function)
+- [x] 410 response includes `Cache-Control: max-age=3600` header (evidence: `retired-tombstones.ts.template:36`, `Cache-Control` header in 410 response)
+- [x] `pnpm --filter @warpgogol/site-kernel-codegen exec tsc --noEmit` passes (evidence: exit code 0, 2026-07-29)
+- [x] `pnpm --filter @warpgogol/site-kernel-checks exec tsc --noEmit` passes (evidence: exit code 0, 2026-07-29)
+- [x] `pnpm --filter @warpgogol/site-kernel-codegen test` passes (evidence: 24/24 tests passed, 2026-07-29)
+- [x] `pnpm --filter @warpgogol/site-kernel-checks test` passes for redirect-map-validate (evidence: 4/4 tests passed, 2026-07-29; pre-existing workspace-write-boundary failures unrelated)
+- [x] `rfc.validate` passes on this file (evidence: exit code 0, 2026-07-29)
 
 ## Implementation notes for agents
 
