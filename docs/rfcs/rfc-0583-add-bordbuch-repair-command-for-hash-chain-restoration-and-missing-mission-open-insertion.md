@@ -15,15 +15,18 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0355
 amendedBy: []
 related:
   - DNA-51
   - RFC-0355
+  - RFC-0362
   - RFC-0473
   - RFC-0477
 satisfies:
@@ -98,8 +101,8 @@ The kernel gains a `bordbuch.repair` command that detects `orphan-mission-close`
 
 ## Architectural fit
 
-- **DNA-51 (Werkstatt consistency primitives):** Bordbuch is a consistency primitive. A repair command ensures the bordbuch can be restored to a valid state after accidental corruption, maintaining the integrity guarantee.
-- **RFC-0355 (Mission lifecycle and Bordbuch):** The repair command uses the same `bordbuchEntrySchema` validation as `bordbuch.append` and respects the writer-role surface. Inserted `mission-open` events use the `mission` writer-role.
+- **DNA-51 (Werkstatt consistency primitives):** Bordbuch is a consistency primitive. A repair command ensures the bordbuch can be restored to a valid state after accidental corruption, maintaining the integrity guarantee. The command uses RFC-0362 lock primitives (`system:<id>` lock scope) to prevent concurrent repair or append operations. Idempotency: running `bordbuch.repair` on an already-valid bordbuch is a no-op (the second `validateBordbuch` finds no violations, exits 0 with `insertedEvents: 0`).
+- **RFC-0355 (Mission lifecycle and Bordbuch):** This RFC amends RFC-0355 §3.4 (append-only invariant) to add an explicit exception for `bordbuch.repair`. The append-only invariant states "no command may rewrite or renumber historical events." `bordbuch.repair` is a meta-level disaster-recovery tool (analogous to `fsck` for a filesystem) that operates outside the bordbuch's own append-only protocol. It is the only command permitted to rewrite the bordbuch file, and only when `bordbuch.validate` reports `orphan-mission-close` violations. Normal append-path commands (`bordbuch.append`, `mission.open`, `mission.close`) remain strictly append-only. The repair command uses the same `bordbuchEntrySchema` validation as `bordbuch.append`. Inserted `mission-open` events use the `mission` writer-role, but the writer-role validation is performed by the repair command itself (not via `bordbuch.append`) because the repair command is a disaster-recovery tool that writes the file directly, bypassing the normal append surface. This bypass is intentional and limited to repair.
 - **RFC-0473 (Unified bordbuch schemas):** The command operates on the unified bordbuch at `mirrors[0].path/bordbuch/events.ndjson`, consistent with `bordbuch.append` and `bordbuch.validate`.
 - **RFC-0477 (Bordbuch git synchronization):** After repair, the operator must commit the bordbuch change in the cache clone. The command does not auto-commit — it only writes the repaired file.
 - **Site OS operator model:** `bordbuch.repair` is workspace-scoped, on-demand, not in any pipeline. It is provided by the `handoff` module alongside `bordbuch.append` and `bordbuch.validate`.
@@ -130,7 +133,7 @@ Flags:
 - `--dry-run` (optional): Show planned repairs without writing.
 - `--mission` (optional): Repair only the specified mission id.
 - `--metadata` (optional): JSON object with `occurredAt`, `summary`, `actor` for the inserted mission-open event. If omitted, metadata is auto-derived from the corresponding mission-close event.
-- `--json` (optional): Machine-readable output.
+- `--json` (optional): Machine-readable output. Handled by the kernel CLI framework automatically; not declared as a command-specific flag.
 
 ### TypeScript contracts
 
@@ -156,32 +159,36 @@ export interface BordbuchRepairResult {
   recomputedHashes: number;
   repairedFilePath: string;
   dryRun: boolean;
+  orphans?: BordbuchRepairPlan["orphans"]; // Present only in dry-run mode
 }
 
 export async function runBordbuchRepair(
-  workspaceRoot: string,
-  systemId: string,
-  options?: {
-    dryRun?: boolean;
-    missionId?: string;
-    metadata?: {
-      occurredAt?: string;
-      summary?: string;
-      actor?: string;
-    };
-  },
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<BordbuchRepairResult>>;
 ```
 
 The repair algorithm:
 
 1. Read all entries via `readBordbuch`.
-2. Run `validateBordbuch` to identify violations.
-3. For each `orphan-mission-close`, derive or accept operator-supplied metadata for a `mission-open` event.
-4. Insert `mission-open` events before their corresponding `mission-close`/`mission-abort`.
-5. Recompute all `id` (sequential), `previousHash`, and `hash` fields.
-6. Validate the repaired bordbuch with `validateBordbuch`.
-7. Write atomically (unless `--dry-run`).
+2. Run `validateBordbuch` to identify violations. If no violations found, exit 0 with `insertedEvents: 0`.
+3. Filter violations to `orphan-mission-close` only. If other violation types exist (`duplicate-mission-id`, `sensitive-payload`, `hash-mismatch`, `hash-chain-gap`, `unmatched-mission-open`), exit non-zero — these are unrepairable by this command.
+4. For each `orphan-mission-close` (processed in log order), derive or accept operator-supplied metadata for a `mission-open` event:
+   - `occurredAt`: auto-derived from the corresponding `mission-close`/`mission-abort` event's `occurredAt` (ensures non-decreasing ordering). If operator-supplied via `--metadata`, use the provided value.
+   - `summary`: "Mission opened (auto-repaired)" unless operator-supplied.
+   - `actor`: "agent" unless operator-supplied.
+   - `status`: "done".
+   - `missionId`: copied from the orphan `mission-close`/`mission-abort` event.
+   - `releaseId`: `null`.
+   - `writerRole`: "mission" (implied; not validated via `bordbuch.append` surface).
+5. Insert each `mission-open` event immediately before its corresponding `mission-close`/`mission-abort` event in the entry list.
+6. Recompute all `id` (sequential from `event-000001`), `previousHash`, and `hash` fields for every entry. The `computeEntryHash` function (currently private in `bordbuch-io.ts`) must be exported for reuse.
+7. Validate the repaired bordbuch with `validateBordbuch`. If violations remain, exit non-zero and do not write.
+8. Write atomically (unless `--dry-run`) using `atomicWriteFile`.
+
+**Idempotency:** Running `bordbuch.repair` on an already-valid bordbuch is a no-op — step 2 finds no violations, and the command exits 0 with `insertedEvents: 0`.
+
+**`--mission` flag semantics:** When `--mission` is specified, only the orphan for that mission id is repaired. If other orphans remain, the post-repair `validateBordbuch` (step 7) will fail on the remaining orphans, the file is not written, and the command exits non-zero with a message listing the remaining orphan missions. The operator must either repair all orphans at once (omit `--mission`) or repair them one at a time (re-running until all are resolved).
 
 ### File system responsibilities
 
@@ -189,6 +196,10 @@ The repair algorithm:
 | --- | --- |
 | `mirrors[0].path/bordbuch/events.ndjson` | Read and written by bordbuch.repair (via `resolveBordbuchPath`) |
 | `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts` | New module implementing the repair command |
+| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts` | `computeEntryHash` exported (currently private) for reuse by repair module |
+| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch.module.ts` | Command registration added to `createBordbuchModule()` |
+| `packages/os/site-kernel-handoff/src/bordbuch/index.ts` | `runBordbuchRepair` and types exported from barrel |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Updated to document `bordbuch.repair` command |
 
 ### Output format
 
@@ -207,14 +218,38 @@ The repair algorithm:
 }
 ```
 
-On dry-run, `dryRun: true` and the file is not written. The `data.orphans` array shows planned insertions with derived metadata.
+On dry-run, `dryRun: true`, the file is not written, and `data.orphans` is present with planned insertions and derived metadata:
+
+```json
+{
+  "command": "bordbuch.repair",
+  "status": "ok",
+  "data": {
+    "systemId": "warpgogol-com",
+    "insertedEvents": 0,
+    "recomputedHashes": 0,
+    "repairedFilePath": "../systems-cache/warpgogol-com/bordbuch/events.ndjson",
+    "dryRun": true,
+    "orphans": [
+      {
+        "missionId": "warpgogol-com-m000016",
+        "closeEventId": "event-000008",
+        "closeEventKind": "mission-close",
+        "proposedOpen": { "schemaVersion": "1.0.0", "systemId": "warpgogol-com", "occurredAt": "2026-07-28T10:20:38.590Z", "kind": "mission-open", "status": "done", "missionId": "warpgogol-com-m000016", "releaseId": null, "actor": "agent", "summary": "Mission opened (auto-repaired)" },
+        "metadataSource": "auto-derived"
+      }
+    ]
+  },
+  "summary": "Dry-run: 1 repair planned for warpgogol-com"
+}
+```
 
 ### Failure modes
 
 - **No violations found:** If `bordbuch.validate` passes, the command exits 0 with `insertedEvents: 0` and a message "No repairs needed."
 - **Unrepairable violation:** If the bordbuch has violations beyond `orphan-mission-close` (e.g. `duplicate-mission-id`, `sensitive-payload`), the command exits non-zero with a message listing the unrepairable violations. These require manual intervention.
 - **Repaired bordbuch still invalid:** If after repair `bordbuch.validate` still fails, the command exits non-zero, does not write the file, and reports the remaining violations.
-- **Lock failure:** If the bordbuch lock cannot be acquired, the command exits non-zero with a lock-contention message.
+- **Lock failure:** If the `system:<id>` lock cannot be acquired (per RFC-0362 / DNA-51), the command exits non-zero with a lock-contention message. This prevents concurrent repair or concurrent `bordbuch.append` / `mission.open` / `mission.close` operations from interfering.
 
 ## Rollout
 
@@ -240,7 +275,9 @@ On dry-run, `dryRun: true` and the file is not written. The `data.orphans` array
 
 ## Acceptance criteria
 
-- [ ] `bordbuch.repair` command registered in the `handoff` module with workspace scope
+- [ ] `bordbuch.repair` command registered in `bordbuch.module.ts` (`createBordbuchModule()`) with workspace scope, `mutatesState: true`, `cacheable: false`, `supportsAllSites: false`, and `writes`/`reads` paths declared
+- [ ] `runBordbuchRepair` and types exported from `bordbuch/index.ts` barrel
+- [ ] `computeEntryHash` exported from `bordbuch-io.ts` for reuse by the repair module
 - [ ] Detects `orphan-mission-close` violations and inserts missing `mission-open` events
 - [ ] Auto-derives metadata from the corresponding `mission-close` event when `--metadata` is not provided
 - [ ] `--metadata` flag overrides auto-derived metadata
@@ -249,11 +286,13 @@ On dry-run, `dryRun: true` and the file is not written. The `data.orphans` array
 - [ ] `--dry-run` shows planned repairs without writing
 - [ ] Post-repair `bordbuch.validate` is run internally; command fails if repaired bordbuch is still invalid
 - [ ] Unit test covers the orphan-mission-close repair scenario
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated to document `bordbuch.repair`
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
+- Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits. Use `rfc.implement.stamp` per RFC-0476.
+- Agents MUST use RFC-0362 lock primitives (`system:<id>` lock scope) when acquiring the bordbuch lock.
 - Agents MUST NOT run `bordbuch.repair` proactively — only when `bordbuch.validate` reports `orphan-mission-close` violations.
 - Agents MUST commit the repaired bordbuch in the cache clone after running `bordbuch.repair`. The command does not auto-commit.
 - Agents MUST NOT use `bordbuch.repair` to fabricate events that did not occur — the command is for restoring missing events only.
