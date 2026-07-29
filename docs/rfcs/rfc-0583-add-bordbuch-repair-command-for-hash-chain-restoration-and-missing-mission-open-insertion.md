@@ -1,7 +1,7 @@
 ---
 id: RFC-0583
 title: "Add bordbuch.repair command for hash-chain restoration and missing mission-open insertion"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -18,7 +18,7 @@ createdAt: 2026-07-29
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
 acceptedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
@@ -277,18 +277,18 @@ On dry-run, `dryRun: true`, the file is not written, and `data.orphans` is prese
 
 ## Acceptance criteria
 
-- [ ] `bordbuch.repair` command registered in `bordbuch.module.ts` (`createBordbuchModule()`) with workspace scope, `mutatesState: true`, `cacheable: false`, `supportsAllSites: false`, and `writes`/`reads` paths declared
-- [ ] `runBordbuchRepair` and types exported from `bordbuch/index.ts` barrel
-- [ ] `computeEntryHash` exported from `bordbuch-io.ts` for reuse by the repair module
-- [ ] Detects `orphan-mission-close` violations and inserts missing `mission-open` events
-- [ ] Auto-derives metadata from the corresponding `mission-close` event when `--metadata` is not provided
-- [ ] `--metadata` flag overrides auto-derived metadata
-- [ ] Recomputes hash chain and event-id sequence after insertion
-- [ ] `bordbuch.validate` passes after `bordbuch.repair` on a previously broken bordbuch
-- [ ] `--dry-run` shows planned repairs without writing
-- [ ] Post-repair `bordbuch.validate` is run internally; command fails if repaired bordbuch is still invalid
-- [ ] Unit test covers the orphan-mission-close repair scenario
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated to document `bordbuch.repair`
+- [x] `bordbuch.repair` command registered in `bordbuch.module.ts` (`createBordbuchModule()`) with workspace scope, `mutatesState: true`, `cacheable: false`, `supportsAllSites: false`, and `writes`/`reads` paths declared
+- [x] `runBordbuchRepair` and types exported from `bordbuch/index.ts` barrel
+- [x] `computeEntryHash` exported from `bordbuch-io.ts` for reuse by the repair module
+- [x] Detects `orphan-mission-close` violations and inserts missing `mission-open` events
+- [x] Auto-derives metadata from the corresponding `mission-close` event when `--metadata` is not provided
+- [x] `--metadata` flag overrides auto-derived metadata
+- [x] Recomputes hash chain and event-id sequence after insertion
+- [x] `bordbuch.validate` passes after `bordbuch.repair` on a previously broken bordbuch
+- [x] `--dry-run` shows planned repairs without writing
+- [x] Post-repair `bordbuch.validate` is run internally; command fails if repaired bordbuch is still invalid
+- [x] Unit test covers the orphan-mission-close repair scenario
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated to document `bordbuch.repair`
 
 ## Implementation notes for agents
 
