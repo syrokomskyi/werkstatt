@@ -8,35 +8,34 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: split out of checks.ts (Phase 3 file-size split).</item>
+  <item>RFC-0576: Migrate to diagnosticsResult with registered MIRROR-MISSING ruleId, add fixHint, preserve error/warning severity distinction.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import type {
+  Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { diagnosticsResult, passResult } from "../result-helpers.ts";
 
 export async function runMirroringValidation(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
   defaultLang?: string,
-): Promise<KernelCommandResult<{ checkedPages: number }>> {
+): Promise<KernelCommandResult> {
   const paths = requireAstroSitePaths(context);
 
   let rootEntries;
   try {
     rootEntries = await readdir(paths.contentPagesDirectory, { withFileTypes: true });
   } catch {
-    return {
-      data: { checkedPages: 0 },
-      exitCode: 0,
-      summary: "[mirroring] OK (no content pages directory)",
-    };
+    return passResult("mirroring.validate", "[mirroring] OK (no content pages directory)");
   }
 
   const langDirs = rootEntries
@@ -44,11 +43,10 @@ export async function runMirroringValidation(
     .map((entry) => entry.name);
 
   if (langDirs.length < 2) {
-    return {
-      data: { checkedPages: 0 },
-      exitCode: 0,
-      summary: `[mirroring] OK (only ${langDirs.length} language — nothing to mirror)`,
-    };
+    return passResult(
+      "mirroring.validate",
+      `[mirroring] OK (only ${langDirs.length} language — nothing to mirror)`,
+    );
   }
 
   const pagesByLang = new Map<string, Map<string, string>>();
@@ -95,7 +93,7 @@ export async function runMirroringValidation(
     // No system.md (or unparseable) → fall back to strict all-locale mirroring.
   }
 
-  let hasErrors = false;
+  const diagnostics: Diagnostic[] = [];
   let checkedPages = 0;
 
   for (const pageId of allPages) {
@@ -119,26 +117,35 @@ export async function runMirroringValidation(
     if (missingIn.length > 0) {
       const missingInDefault = defaultLang ? missingIn.filter((l) => l === defaultLang) : missingIn;
       const missingInNonDefault = defaultLang ? missingIn.filter((l) => l !== defaultLang) : [];
+      const sourceLang = existsIn[0] ?? defaultLang ?? langDirs[0];
 
-      if (missingInDefault.length > 0) {
-        context.logger.error(
-          `${pageId}: missing in [${missingInDefault.join(", ")}] (exists in: ${existsIn.join(", ")})`,
-        );
-        hasErrors = true;
+      for (const lang of missingInDefault) {
+        diagnostics.push({
+          ruleId: "MIRROR-MISSING",
+          severity: "error",
+          file: `src/content/pages/${lang}/${pageId}.md`,
+          message: `${pageId}: missing in [${lang}] (exists in: ${existsIn.join(", ")})`,
+          fixHint: `Create src/content/pages/${lang}/${pageId}.md (copy structure from src/content/pages/${sourceLang}/${pageId}.md). Add ${lang}: route in system.md pages[].routes.`,
+        });
       }
-      if (missingInNonDefault.length > 0) {
-        context.logger.warn(
-          `${pageId}: missing in [${missingInNonDefault.join(", ")}] (exists in: ${existsIn.join(", ")})`,
-        );
+      for (const lang of missingInNonDefault) {
+        diagnostics.push({
+          ruleId: "MIRROR-MISSING",
+          severity: "warning",
+          file: `src/content/pages/${lang}/${pageId}.md`,
+          message: `${pageId}: missing in [${lang}] (exists in: ${existsIn.join(", ")})`,
+          fixHint: `Create src/content/pages/${lang}/${pageId}.md (copy structure from src/content/pages/${sourceLang}/${pageId}.md). Add ${lang}: route in system.md pages[].routes.`,
+        });
       }
     }
   }
 
-  return {
-    data: { checkedPages },
-    exitCode: hasErrors ? 1 : 0,
-    summary: hasErrors
-      ? undefined
-      : `[mirroring] OK (${checkedPages} pages × ${langDirs.length} languages)`,
-  };
+  if (diagnostics.length === 0) {
+    return passResult(
+      "mirroring.validate",
+      `[mirroring] OK (${checkedPages} pages × ${langDirs.length} languages)`,
+    );
+  }
+
+  return diagnosticsResult("mirroring.validate", diagnostics);
 }
