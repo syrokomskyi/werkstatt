@@ -5,12 +5,12 @@ title: "Enforce three-phase build pipeline in distribution-producing commands"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
