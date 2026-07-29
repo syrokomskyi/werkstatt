@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-07-28
-updatedAt: 2026-07-28
+updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -52,7 +53,7 @@ packagesImpacted:
 successSignals:
   - "content.links.validate emits canonical Diagnostics with registered LINK-01..03 ruleIds and fixHints"
   - "mirroring.validate emits canonical Diagnostics with registered MIRROR-MISSING ruleId and fixHint pointing to source file"
-  - "page.blocks.mirror.validate emits canonical Diagnostics via diagnosticsResult with registered MIRROR-01 ruleId"
+  - "page.blocks.mirror.validate emits canonical Diagnostics via diagnosticsResult with registered MIRROR-01..03 ruleIds"
   - "parseUrl normalizes trailing slashes for non-root paths before route lookup"
 nonGoals:
   - "Does not change localizeUrl or route generation output"
@@ -102,7 +103,7 @@ The trailing slash mismatch between `localizeUrl` (no trailing slash) and author
 
 ## Decision
 
-`content.links.validate`, `mirroring.validate`, and `page.blocks.mirror.validate` are migrated to emit canonical `Diagnostic[]` via `diagnosticsResult` with registered ruleIds (LINK-01..03, MIRROR-MISSING, MIRROR-01) and actionable `fixHint` fields. `parseUrl` in `content-links.ts` normalizes trailing slashes for non-root paths before route lookup.
+`content.links.validate`, `mirroring.validate`, and `page.blocks.mirror.validate` are migrated to emit canonical `Diagnostic[]` via `diagnosticsResult` with registered ruleIds (LINK-01..03, MIRROR-MISSING, MIRROR-01..03) and actionable `fixHint` fields. `parseUrl` in `content-links.ts` normalizes trailing slashes for non-root paths before route lookup. `mirroring.validate` preserves its current error/warning distinction by emitting error-severity diagnostics for default-language missing pages and warning-severity diagnostics for non-default-language missing pages, all under the registered MIRROR-MISSING ruleId.
 
 ## Architectural fit
 
@@ -134,18 +135,28 @@ The `--json` output shape changes: `data.diagnostics` is now populated with cano
 In `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`:
 
 ```ts
-// LINK-01: external URL missing or malformed
-// LINK-02: anchor link target not found in same-page headings
+// LINK-01: anchor link target not found on the page (same-page #anchor or cross-page #anchor)
+rule("LINK-01", "Anchor link target not found on page", "content.links.validate", "error"),
+
+// LINK-02: same-page anchor must not carry a path or language prefix
+rule("LINK-02", "Same-page anchor must not carry path prefix", "content.links.validate", "error"),
+
 // LINK-03: internal path does not resolve to a known route
-rule("LINK-01", "External URL is missing or malformed", "content.links.validate", "error"),
-rule("LINK-02", "Anchor link target not found", "content.links.validate", "error"),
 rule("LINK-03", "Internal path does not resolve to a known route", "content.links.validate", "error"),
 
 // MIRROR-MISSING: page exists in one language but not another
+// severityDefault is "error" (default-language missing); non-default-language
+// missing pages emit warning-severity diagnostics under the same ruleId.
 rule("MIRROR-MISSING", "Page missing in a declared language", "mirroring.validate", "error"),
 
-// MIRROR-01: localized page block structure does not match default-language twin
-rule("MIRROR-01", "Localized page block mismatch vs default-language twin", "page.blocks.mirror.validate", "error"),
+// MIRROR-01: localized page is missing a block or has wrong block type vs default-language twin
+rule("MIRROR-01", "Localized page block missing or type mismatch vs default-language twin", "page.blocks.mirror.validate", "error"),
+
+// MIRROR-02: localized block is missing a prop that exists in default-language twin
+rule("MIRROR-02", "Localized block missing prop vs default-language twin", "page.blocks.mirror.validate", "error"),
+
+// MIRROR-03: localized block labels object is missing a key from default-language twin
+rule("MIRROR-03", "Localized block labels missing key vs default-language twin", "page.blocks.mirror.validate", "error"),
 ```
 
 #### parseUrl normalization
@@ -177,28 +188,38 @@ function parseUrl(value: string): { path: string | null; anchor: string | null }
 
 #### fixHint patterns
 
-For `content.links.validate` (LINK-03):
+For `content.links.validate`:
 
-```
-fixHint: `Internal path "${path}" does not resolve to a known route. Check the route map in system.md or remove the link.`
-```
+- LINK-01 (anchor not found):
+  ```
+  fixHint: `Anchor "${anchor}" not found on page "${pageId}". Add the anchor to system.md anchors registry for this page, or add a matching heading in the prose file, or fix the anchor text.`
+  ```
+- LINK-02 (same-page anchor with path prefix):
+  ```
+  fixHint: `Same-page anchor must not carry a path or language prefix. Use "${anchor}" instead of "${value}".`
+  ```
+- LINK-03 (unresolved internal path):
+  ```
+  fixHint: `Internal path "${path}" does not resolve to a known route. Check the route map in system.md or remove the link.`
+  ```
 
-For `mirroring.validate` (MIRROR-MISSING):
+For `mirroring.validate` (MIRROR-MISSING) — one diagnostic per missing (page, lang) pair:
 
 ```
 fixHint: `Create src/content/pages/${missingLang}/${pageId}.md (copy structure from src/content/pages/${sourceLang}/${pageId}.md). Add ${missingLang}: route in system.md pages[].routes.`
 ```
 
-For `page.blocks.mirror.validate` (MIRROR-01) — fixHints already exist in the custom interface; they are preserved when migrating to `diagnosticsResult`.
+For `page.blocks.mirror.validate` (MIRROR-01, MIRROR-02, MIRROR-03) — fixHints already exist in the custom interface; they are preserved verbatim when migrating to `diagnosticsResult`.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-checks/src/content-links.ts` | Migrate to `diagnosticsResult`, register LINK-01..03, add fixHints, normalize `parseUrl` |
-| `packages/os/site-kernel-checks/src/checks/mirroring.ts` | Migrate from custom result to `diagnosticsResult`, register MIRROR-MISSING, add fixHint |
-| `packages/os/site-kernel-checks/src/page-blocks-mirror.ts` | Migrate to `diagnosticsResult`, register MIRROR-01 (fixHints already present) |
-| `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts` | Add LINK-01..03, MIRROR-MISSING, MIRROR-01 to registry |
+| `packages/os/site-kernel-checks/src/content-links.ts` | Migrate to `diagnosticsResult`, register LINK-01..03, add fixHints, normalize `parseUrl`, remove from DSL-04 baseline |
+| `packages/os/site-kernel-checks/src/checks/mirroring.ts` | Migrate from custom result to `diagnosticsResult`, register MIRROR-MISSING, add fixHint, preserve error/warning severity distinction |
+| `packages/os/site-kernel-checks/src/page-blocks-mirror.ts` | Migrate to `diagnosticsResult`, register MIRROR-01..03 (fixHints already present) |
+| `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts` | Add LINK-01..03, MIRROR-MISSING, MIRROR-01..03 to registry |
+| `packages/os/site-kernel-checks/src/diagnostics/dsl04-baseline.generated.yaml` | Remove `content-links.ts` entry (migrated off `resultFromViolations` shim); regenerate via `diagnostic.shape.lint --write-baseline` |
 
 ### Output format
 
@@ -253,20 +274,29 @@ After:
 }
 ```
 
+### Data shape changes
+
+The `data` field of `ForgeCommandResult` changes for two validators:
+
+- **`mirroring.validate`**: `data.checkedPages` is removed. The new `data` shape is `CheckResult` (`{ command, status, diagnostics, summary }`). No pipeline or agent reads `data.checkedPages` — it was only used in the summary string.
+- **`page.blocks.mirror.validate`**: `data.pagesCompared` and `data.violations[]` are removed. The new `data` shape is `CheckResult`. The `pagesCompared` count is preserved in the summary string only.
+
 ### Failure modes
 
 - All three validators exit non-zero (exitCode: 1) when any error-severity diagnostic is emitted, same as current behavior.
+- `mirroring.validate` emits warning-severity diagnostics for non-default-language missing pages — these do not fail the pipeline (exit 0), preserving current behavior where only default-language missing sets `hasErrors = true`.
 - Warnings (if any) do not fail the pipeline — same as `diagnosticsResult` default behavior.
 - `parseUrl` trailing slash normalization only affects route lookup — the original link text in the diagnostic message preserves the author's original spelling for clarity.
 - Root path `/` is never normalized (preserved as-is).
 
 ## Rollout
 
-- **No flag day.** All three validators already run in `build.check` pipelines. The output shape changes from non-canonical to canonical, but the exit-code behavior is identical (exit 1 on errors).
+- **No flag day.** All three validators already run in `build.check` pipelines. The output shape changes from non-canonical to canonical, but the exit-code behavior is identical (exit 1 on errors, exit 0 on warnings-only).
 - **No migration path needed for apps.** Apps do not consume validator output programmatically — only the kernel pipeline and agents do.
-- **Agent-facing improvement.** Agents parsing `ForgeCommandResult.data.diagnostics` now find all violations in the canonical array with `fixHint` fields. The `fix-patterns.md` catalog in `wg-mission-complete` can reference LINK-01..03, MIRROR-MISSING, and MIRROR-01 by ruleId.
+- **Agent-facing improvement.** Agents parsing `ForgeCommandResult.data.diagnostics` now find all violations in the canonical array with `fixHint` fields. The `fix-patterns.md` catalog in `wg-mission-complete` can reference LINK-01..03, MIRROR-MISSING, and MIRROR-01..03 by ruleId.
 - **Trailing slash normalization** is a pure bug fix — existing links that were false-positive LINK-03 will now pass. No app changes needed.
 - `diagnostic.shape.lint` (DSL-02) will now enforce that these three validators use registered ruleIds — future drift is prevented.
+- **DSL-04 baseline shrink.** `content-links.ts` is removed from `dsl04-baseline.generated.yaml` after migration. `mirroring.ts` and `page-blocks-mirror.ts` are not in the baseline (they use custom result shapes, not `resultFromViolations`). Regenerate the baseline via `pnpm exec site-kernel run diagnostic.shape.lint --write-baseline`.
 
 ## Alternatives considered
 
@@ -284,18 +314,19 @@ After:
 - **Agent misinterpretation.** Agents that previously parsed the summary string of `mirroring.validate` will need to parse `data.diagnostics` instead. This is an improvement — the canonical array is structured and documented.
 - **diagnostic.shape.lint enforcement.** After migration, DSL-02 will enforce that these validators use registered ruleIds. If a future change adds a new ruleId without registering it, the lint will fail. This is the intended behavior.
 - **Performance.** No impact — `diagnosticsResult` is a pure function that builds the result object. `parseUrl` normalization is a single `endsWith` + `slice` check.
-- **Maintenance burden.** Three files are modified in one package. The rule registry gains 5 entries. Low ongoing maintenance.
+- **Maintenance burden.** Three files are modified in one package. The rule registry gains 8 entries (LINK-01..03, MIRROR-MISSING, MIRROR-01..03). Low ongoing maintenance.
 
 ## Acceptance criteria
 
 - [ ] LINK-01, LINK-02, LINK-03 registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`
 - [ ] MIRROR-MISSING registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`
-- [ ] MIRROR-01 registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`
+- [ ] MIRROR-01, MIRROR-02, MIRROR-03 registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`
 - [ ] `content.links.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with LINK-01..03 ruleIds and fixHints
-- [ ] `mirroring.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-MISSING ruleId and fixHint pointing to source file to copy
-- [ ] `page.blocks.mirror.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-01 ruleId (existing fixHints preserved)
+- [ ] `mirroring.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-MISSING ruleId and fixHint pointing to source file to copy; default-language missing = error severity, non-default missing = warning severity
+- [ ] `page.blocks.mirror.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-01..03 ruleIds (existing fixHints preserved)
 - [ ] `parseUrl` in `content-links.ts` strips trailing slash for non-root paths before route lookup
 - [ ] `diagnostic.shape.lint` passes for all three migrated validators (DSL-02: registered ruleIds)
+- [ ] `content-links.ts` removed from `dsl04-baseline.generated.yaml` (DSL-04: no longer uses `resultFromViolations` shim)
 - [ ] Existing apps pass validation without changes (trailing slash normalization only reduces false positives)
 - [ ] `rfc.validate` passes on this file
 
