@@ -365,18 +365,18 @@ In `runVideoVariantsGenerate`, `ref.maxSizeMb` is resolved as `cfg.maxSizeMb ?? 
 
 ## Acceptance criteria
 
-- [ ] `mediaSchema` has an optional `maxSizeMb: z.number().nonnegative()` field in `packages/share/src/schemas/media.ts`
-- [ ] `encodeMp4` in `video-variants.ts` uses two-pass with calculated bitrate when `maxSizeMb > 0` and `durationSec` is known
-- [ ] `encodeMp4` falls back to CRF 17 when `maxSizeMb === 0` or `durationSec` is undefined
-- [ ] `calculateTargetBitrate` correctly computes `videoBitrate = (maxSizeMb * 1024 * 1024 * 8 / durationSec) - 128000`
-- [ ] Warning is logged when calculated video bitrate < 200 kbps
-- [ ] `ENCODER_SETTINGS_VERSION` is bumped to `"5"`
-- [ ] `hashFileForProfile` includes `maxSizeMb` in the hash input
-- [ ] `MediaRef` and `RawMediaConfig` carry `maxSizeMb` (default 24)
-- [ ] `runVideoVariantsGenerate` resolves `maxSizeMb` from frontmatter and passes it to `encodeMp4`
-- [ ] The cache→public copy loop skips `ffmpeg2pass.log*` files alongside `.done` (the pass-log file must not be deployed)
-- [ ] `calculateTargetBitrate` is covered by property-based tests (`*.pbt.test.ts`) verifying: `videoBitrate = (maxSizeMb * 1024 * 1024 * 8 / durationSec) - 128000`, monotonicity in `maxSizeMb`, inverse proportionality to `durationSec` (DNA-41)
-- [ ] `rfc.validate` passes on this RFC file
+- [x] `mediaSchema` has an optional `maxSizeMb: z.number().nonnegative()` field in `packages/share/src/schemas/media.ts` (evidence: packages/share/src/schemas/media.ts:89, `z.number().nonnegative().optional()`)
+- [x] `encodeMp4` in `video-variants.ts` uses two-pass with calculated bitrate when `maxSizeMb > 0` and `durationSec` is known (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:280-330, pass 1 + pass 2 with `-b:v`)
+- [x] `encodeMp4` falls back to CRF 17 when `maxSizeMb === 0` or `durationSec` is undefined (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:244-266, CRF fallback path when `calculateTargetBitrate` returns null)
+- [x] `calculateTargetBitrate` correctly computes `videoBitrate = (maxSizeMb * 1024 * 1024 * 8 / durationSec) - 128000` (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:222-231, PBT formula-correctness test passes)
+- [x] Warning is logged when calculated video bitrate < 200 kbps (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:269-275, `logger?.warn(...)` when `videoBitrate < MIN_VIDEO_BITRATE_BPS`)
+- [x] `ENCODER_SETTINGS_VERSION` is bumped to `"5"` (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:56)
+- [x] `hashFileForProfile` includes `maxSizeMb` in the hash input (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:483, `|max=${maxSizeMb}|` in hash string)
+- [x] `MediaRef` and `RawMediaConfig` carry `maxSizeMb` (default 24) (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:82,117, `maxSizeMb: number` on MediaRef, `maxSizeMb?: number` on RawMediaConfig; default 24 at line 534)
+- [x] `runVideoVariantsGenerate` resolves `maxSizeMb` from frontmatter and passes it to `encodeMp4` (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:534,639, `cfg.maxSizeMb ?? DEFAULT_MAX_SIZE_MB` → `encodeMp4(... ref.maxSizeMb, ctx.logger)`)
+- [x] The cache→public copy loop skips `ffmpeg2pass.log*` files alongside `.done` (the pass-log file must not be deployed) (evidence: packages/os/site-kernel-checks/src/video/video-variants.ts:658, `if (entry.name.startsWith("ffmpeg2pass.log")) continue;`)
+- [x] `calculateTargetBitrate` is covered by property-based tests (`*.pbt.test.ts`) verifying: `videoBitrate = (maxSizeMb * 1024 * 1024 * 8 / durationSec) - 128000`, monotonicity in `maxSizeMb`, inverse proportionality to `durationSec` (DNA-41) (evidence: packages/os/site-kernel-checks/src/video/video-variants.pbt.test.ts, 6 PBT properties all pass)
+- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0591 --json` → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
