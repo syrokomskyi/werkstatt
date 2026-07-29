@@ -1,7 +1,7 @@
 ---
 id: RFC-0576
 title: "Migrate content.links.validate and mirroring.validate to canonical Diagnostics"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-28
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
