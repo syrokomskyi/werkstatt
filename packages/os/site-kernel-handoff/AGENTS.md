@@ -183,9 +183,17 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - **Coexistence with Leitstand:** This module adds a complementary symlink-swap deployment path for local platform deployments. The Leitstand (DNA-49) continues to manage Cloudflare Workers deployments via adapter plugins.
 - **Two-phase commit:** `TwoPhaseCommitResult` and `WorkshopDeployStatus` types are defined in `types.ts` as stubs for Phase 4 multi-workshop atomic deploys. No logic is implemented in the pilot.
 
+## Three-phase build pipeline (RFC-0356, RFC-0357)
+
+- **All distribution-producing commands must run the full three-phase build pipeline:** `build.prepare` → `astro build` → `build.post`, unconditionally and in that order. Each phase must succeed — a failure in any phase aborts the build and the distribution is not signed.
+- **`build.post` is non-negotiable:** it runs `text.normalize.apply` (RFC-0235 egress text normalizer that replaces em dashes, curly quotes, special spaces, and other AI-authorship typographic signals), `passport.emit`, `dist.sitemap.images.generate`, `video.dist.prune`, and `dist.generated-marker.strip`. Without `build.post`, the dist output is raw Astro output — unnormalized and unsigned.
+- **Affected commands:** `mission.build`, `mission.validate` (after the `astro build` step), and `release.prepare` (fresh build path, not the reuse path).
+- **`mission.build` also writes `build-input-hash.json`** so `release.prepare` can reuse the distribution when the build input hash matches (content tree hash + platform version + platform semantic hash).
+- **Never call `execSync("pnpm exec astro build")` directly** without wrapping it in the full pipeline. The pipeline runner (`executeKernelPipeline`) resolves the site workspace (including mission workpieces) and invokes all registered commands in the pipeline.
+
 ## Release commands (RFC-0357 / RFC-0585)
 
-- **`release.prepare`:** Runs a production `astro build` on the mission workpiece (or reuses `missions/<id>/distribution/dist` when it exists). Captures production and readable behavior snapshots from the build output via `behavior.snapshot.capture`, runs `behavior.snapshot.diff` between them, and computes `distTreeHash`, `siteContentHash`, `behaviorSnapshotHash`, and `readableSnapshotHash` via `@warpgogol/fingerprint` — never `sha256:pending`. If the snapshot diff fails, the prepare aborts with a non-zero exit code.
+- **`release.prepare`:** Runs the full three-phase build pipeline (`build.prepare` → `astro build` → `build.post`) on the mission workpiece, or reuses `missions/<id>/distribution/dist` when its `build-input-hash.json` matches the current build input. Captures production and readable behavior snapshots from the build output via `behavior.snapshot.capture`, runs `behavior.snapshot.diff` between them, and computes `distTreeHash`, `siteContentHash`, `behaviorSnapshotHash`, and `readableSnapshotHash` via `@warpgogol/fingerprint` — never `sha256:pending`. If the snapshot diff fails, the prepare aborts with a non-zero exit code.
 - **`release.publish`:** Refuses to publish any release whose `distTreeHash` is `sha256:pending` or missing, or whose `dist/` directory does not exist. The guard is fail-hard from the first run — no opt-in, no grace period.
 - **Forward-only:** Existing releases with `sha256:pending` hashes must be deleted manually by the operator before running the new `release.prepare`. No migration path is provided.
 
