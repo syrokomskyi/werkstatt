@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0357: initial behavior snapshot capture and diff handlers.</item>
   <item>RFC-0379: add per-route contentHash via @warpgogol/fingerprint HTML normalization.</item>
+  <item>RFC-0585: return full snapshot wrapper from capture so release.prepare can write it to disk for diff.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -45,6 +46,16 @@ interface BehaviorSnapshot {
   redirectsHash: string;
 }
 
+export interface BehaviorSnapshotWrapper {
+  schemaVersion: string;
+  systemId: string;
+  releaseId: string | null;
+  buildKind: string;
+  capturedAt: string;
+  behaviorSnapshot: BehaviorSnapshot;
+  behaviorSnapshotHash: string;
+}
+
 async function hashContent(content: string): Promise<string> {
   return `sha256:${crypto.createHash("sha256").update(content).digest("hex")}`;
 }
@@ -80,6 +91,7 @@ export interface BehaviorSnapshotCaptureData {
   behaviorSnapshotHash: string;
   routeCount: number;
   capturedAt: string;
+  wrapper: BehaviorSnapshotWrapper;
 }
 
 export async function runBehaviorSnapshotCapture(
@@ -146,6 +158,7 @@ export async function runBehaviorSnapshotCapture(
       behaviorSnapshotHash: wrapper.behaviorSnapshotHash,
       routeCount: snapshot.routeCount,
       capturedAt: now,
+      wrapper,
     },
     summary: `[behavior.snapshot.capture] ${systemId} (${buildKind}): ${snapshot.routeCount} routes`,
   };

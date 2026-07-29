@@ -11,17 +11,20 @@
   <item>RFC-0480: add C-surface regression check to release.prepare; block on C-surface regression without breaksC: true.</item>
   <item>RFC-0520: extract C-surface regression check into evaluateCSurfaceGate pure function.</item>
   <item>RFC-0522: write releaseId to mission manifest via writeMissionManifest after successful release preparation.</item>
+  <item>RFC-0585: restore production build, behavior snapshot capture + diff, and real hash computation in release.prepare; add distTreeHash guard to release.publish.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
+import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
 import {
   readMissionManifest,
   writeMissionManifest,
@@ -34,6 +37,10 @@ import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-
 import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
 import { checkBreaksCDeclaration } from "./breaks-c-helper.ts";
+import {
+  runBehaviorSnapshotCapture,
+  runBehaviorSnapshotDiff,
+} from "../behavior-snapshot/behavior-snapshot-commands.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -115,6 +122,10 @@ export interface ReleasePrepareData {
   snapshotDiffVerdict: "pass" | "fail";
   cSurfaceVerdict: "pass" | "fail" | "skipped";
   behaviorSnapshotHash: string;
+  distTreeHash: string;
+  siteContentHash: string;
+  readableSnapshotHash: string;
+  buildReused: boolean;
 }
 
 export async function runReleasePrepare(
@@ -181,18 +192,119 @@ export async function runReleasePrepare(
         }
       }
 
-      // Copy distribution if it exists
+      // RFC-0585: Run production build (or reuse distribution), capture snapshots, compute hashes
+      const workpieceDir = path.join(missionDir, "workpiece");
       const distributionDir = path.join(missionDir, "distribution", "dist");
+      const distDest = path.join(stagingDir, "dist");
+      let buildReused = false;
+
       if (existsSync(distributionDir)) {
-        const distDest = path.join(stagingDir, "dist");
         await fs.mkdir(distDest, { recursive: true });
         await copyDir(distributionDir, distDest);
+        buildReused = true;
+        logger.info(`  Reused distribution from mission.build`);
+      } else if (existsSync(workpieceDir)) {
+        logger.info(`  Running astro build in ${workpieceDir}…`);
+        try {
+          execSync("pnpm exec astro build", {
+            cwd: workpieceDir,
+            stdio: "pipe",
+            timeout: 300_000,
+          });
+        } catch (err) {
+          const buildError = err instanceof Error ? err.message : String(err);
+          throw new Error(`[release.prepare] astro build failed: ${buildError.slice(0, 200)}`);
+        }
+        const workpieceDist = path.join(workpieceDir, "dist");
+        if (existsSync(workpieceDist)) {
+          await fs.mkdir(distDest, { recursive: true });
+          await copyDir(workpieceDist, distDest);
+        } else {
+          throw new Error(`[release.prepare] astro build produced no dist/ directory`);
+        }
+      } else {
+        throw new Error(
+          `[release.prepare] no workpiece or distribution found for mission '${missionId}'`,
+        );
       }
 
       const now = new Date().toISOString();
 
       const { version: platformVersion, commit } = await resolveCurrentEcosystem(workspaceRoot);
       const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
+
+      // RFC-0585: Capture behavior snapshots and run diff
+      const readableSnapshotPath = path.join(stagingDir, "readable-snapshot.json");
+      const productionSnapshotPath = path.join(stagingDir, "behavior-snapshot.json");
+      const snapshotDiffPath = path.join(stagingDir, "snapshot-diff.json");
+
+      const readableResult = await runBehaviorSnapshotCapture(
+        {
+          flags: { dist: distDest, system: systemId, "build-kind": "readable", release: releaseId },
+          argv: [],
+          args: [],
+        },
+        context,
+      );
+      if (!readableResult.data)
+        throw new Error("[release.prepare] readable snapshot capture returned no data");
+      await fs.writeFile(
+        readableSnapshotPath,
+        JSON.stringify(readableResult.data.wrapper, null, 2) + "\n",
+      );
+
+      const productionResult = await runBehaviorSnapshotCapture(
+        {
+          flags: {
+            dist: distDest,
+            system: systemId,
+            "build-kind": "production",
+            release: releaseId,
+          },
+          argv: [],
+          args: [],
+        },
+        context,
+      );
+      if (!productionResult.data)
+        throw new Error("[release.prepare] production snapshot capture returned no data");
+      await fs.writeFile(
+        productionSnapshotPath,
+        JSON.stringify(productionResult.data.wrapper, null, 2) + "\n",
+      );
+
+      const diffResult = await runBehaviorSnapshotDiff(
+        {
+          flags: { baseline: readableSnapshotPath, candidate: productionSnapshotPath },
+          argv: [],
+          args: [],
+        },
+        context,
+      );
+      if (!diffResult.data)
+        throw new Error("[release.prepare] behavior snapshot diff returned no data");
+      await fs.writeFile(snapshotDiffPath, JSON.stringify(diffResult.data, null, 2) + "\n");
+
+      const snapshotDiffVerdict = diffResult.data.verdict as "pass" | "fail";
+      if (snapshotDiffVerdict === "fail") {
+        throw new Error(
+          `[release.prepare] behavior snapshot diff failed — ${diffResult.data.differences.length} structural differences`,
+        );
+      }
+
+      // RFC-0585: Compute real hashes via @warpgogol/fingerprint
+      const distTreeResult = await fingerprintTree(distDest, { mode: "byte" });
+      const distTreeHash = distTreeResult.value;
+
+      const contentDir = path.join(workpieceDir, "src", "content");
+      let siteContentHash = "sha256:absent";
+      if (existsSync(contentDir)) {
+        const contentResult = await fingerprintTree(contentDir, { mode: "semantic" });
+        siteContentHash = contentResult.value;
+      }
+
+      const behaviorSnapshotHash = productionResult.data.behaviorSnapshotHash;
+      const readableSnapshotHash = readableResult.data.behaviorSnapshotHash;
 
       // Write release manifest
       const releaseManifest: Record<string, unknown> = {
@@ -207,14 +319,14 @@ export async function runReleasePrepare(
         state: "prepared",
         commitSha: commit === "unknown" ? "0000000" : commit,
         platformSemanticHash,
-        siteContentHash: "sha256:pending",
-        distTreeHash: "sha256:pending",
+        siteContentHash,
+        distTreeHash,
         distArtifactHash: null,
         artifact: null,
-        behaviorSnapshotHash: "sha256:pending",
-        readableSnapshotHash: "sha256:pending",
+        behaviorSnapshotHash,
+        readableSnapshotHash,
         qualityReportHash: null,
-        snapshotDiffVerdict: "pass",
+        snapshotDiffVerdict,
         cSurfaceVerdict: "pass" as const,
         migratorVerdict: "pass",
         versionCompareVerdict: "in-sync",
@@ -280,7 +392,7 @@ export async function runReleasePrepare(
       }
 
       logger.success(
-        `[release.prepare] ${releaseId} prepared (snapshot diff: pass, C-surface: ${cSurfaceVerdict})`,
+        `[release.prepare] ${releaseId} prepared (snapshot diff: ${snapshotDiffVerdict}, C-surface: ${cSurfaceVerdict})`,
       );
 
       return {
@@ -290,11 +402,15 @@ export async function runReleasePrepare(
           missionId,
           semver,
           state: "prepared",
-          snapshotDiffVerdict: "pass",
+          snapshotDiffVerdict,
           cSurfaceVerdict,
-          behaviorSnapshotHash: "sha256:pending",
+          behaviorSnapshotHash,
+          distTreeHash,
+          siteContentHash,
+          readableSnapshotHash,
+          buildReused,
         },
-        summary: `[release.prepare] ${releaseId} prepared (snapshot diff: pass, C-surface: ${cSurfaceVerdict})`,
+        summary: `[release.prepare] ${releaseId} prepared (snapshot diff: ${snapshotDiffVerdict}, C-surface: ${cSurfaceVerdict})`,
       };
     } finally {
       await releaseLock(workspaceRoot, `release:${releaseId}`);
@@ -326,6 +442,7 @@ export interface ReleasePublishData {
   state: "published";
   publishedAt: string;
   artifactUri: string | null;
+  distVerified: boolean;
 }
 
 export async function runReleasePublish(
@@ -345,6 +462,22 @@ export async function runReleasePublish(
   const state = manifest.state as string;
   if (state !== "prepared") {
     throw new Error(`[release.publish] release '${releaseId}' is not prepared (state: ${state})`);
+  }
+
+  // RFC-0585: Check distTreeHash is not pending
+  const distTreeHash = manifest.distTreeHash as string | undefined;
+  if (!distTreeHash || distTreeHash === "sha256:pending") {
+    throw new Error(
+      `[release.publish] distTreeHash is pending or missing — run release.prepare to compute a real hash before publishing`,
+    );
+  }
+
+  // RFC-0585: Check dist directory exists
+  const distDir = path.join(releaseDir, "dist");
+  if (!existsSync(distDir)) {
+    throw new Error(
+      `[release.publish] release '${releaseId}' has no dist/ directory — run release.prepare to build and stage the distribution`,
+    );
   }
 
   // Check snapshot diff verdict
@@ -417,6 +550,7 @@ export async function runReleasePublish(
         state: "published",
         publishedAt: now,
         artifactUri: (manifest.artifact as string) ?? null,
+        distVerified: true,
       },
       summary: `[release.publish] ${releaseId} published`,
     };
