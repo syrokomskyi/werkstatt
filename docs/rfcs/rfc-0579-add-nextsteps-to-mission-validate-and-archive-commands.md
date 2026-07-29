@@ -1,7 +1,7 @@
 ---
 id: RFC-0579
 title: "Add nextSteps to mission.validate and archive commands"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -15,8 +15,8 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-28
-updatedAt: 2026-07-28
-implementedAt:
+updatedAt: 2026-07-29
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
