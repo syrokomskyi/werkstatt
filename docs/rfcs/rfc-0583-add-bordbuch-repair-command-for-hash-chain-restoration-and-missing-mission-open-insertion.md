@@ -1,7 +1,7 @@
 ---
 id: RFC-0583
 title: "Add bordbuch.repair command for hash-chain restoration and missing mission-open insertion"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,10 +12,12 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
+acceptedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
