@@ -12,6 +12,7 @@
   <item>RFC-0520: extract C-surface regression check into evaluateCSurfaceGate pure function.</item>
   <item>RFC-0522: write releaseId to mission manifest via writeMissionManifest after successful release preparation.</item>
   <item>RFC-0585: restore production build, behavior snapshot capture + diff, and real hash computation in release.prepare; add distTreeHash guard to release.publish.</item>
+  <item>ADR-0008: run full three-phase build pipeline (build.prepare → astro build → build.post) in release.prepare fresh build path; delegate to shared runPipelinePhase and computeBuildInputHash helpers.</item>
 </CHANGE_SUMMARY>
 */
 

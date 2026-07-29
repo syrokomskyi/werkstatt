@@ -1,3 +1,15 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Shared helpers for the three-phase build pipeline (build.prepare → astro build → build.post) used by mission.build, mission.validate, and release.prepare. Centralizes pipeline execution and build-input-hash computation to eliminate duplication.</purpose>
+<non-goals>
+  <item>Does not define pipeline composition or command registration — that lives in site-kernel-checks pipelines.</item>
+  <item>Does not run astro build directly — callers own the execSync call between build.prepare and build.post.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>ADR-0008: extracted runPipelinePhase and computeBuildInputHash from mission-materialization-commands.ts and release-commands.ts to eliminate 5x duplicated pipeline execution pattern and 2x duplicated build-input-hash computation.</item>
+</CHANGE_SUMMARY>
+*/
 import path from "node:path";
 import { existsSync } from "node:fs";
 import type { KernelPipelineReport } from "@warpgogol/site-kernel";
