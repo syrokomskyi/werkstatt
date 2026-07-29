@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -101,7 +102,7 @@ When the operator signals session end (explicitly: "we're done", "на этом 
 This RFC extends existing operational discipline rules without introducing new commands, DNA invariants, or architectural contracts:
 
 - **RFC-0575 (Session-start pre-flight).** This RFC adds the session-end complement. Together they form a bracket: check at start (RFC-0575) → commit during (RFC-0480) → verify at end (this RFC). The operator explicitly triggers the session-end check, while the session-start check is automatic at skill pipeline entry.
-- **RFC-0480 (Commit discipline).** This RFC does not replace the per-change commit rule (edit → verify → commit → respond). It adds a safety net: if the agent forgot or deferred a commit, the session-end retro catches it before the session closes.
+- **RFC-0480 (Commit discipline).** This RFC does not replace the per-change commit rule (edit → verify → commit → respond) or the per-response `git status` verification ("Before sending any response to the operator, verify via `git status` that no uncommitted changes from the current session remain"). It adds a complementary session-end safety net: if the agent forgot or deferred a commit despite RFC-0480, the session-end retro catches it before the session closes. If RFC-0480 was followed perfectly throughout the session, the session-end check finds a clean tree and proceeds silently. The two rules are complementary, not redundant — RFC-0480 is per-response, RFC-0581 is per-session-end.
 - **RFC-0265 (Commit message hygiene).** By catching uncommitted changes at session end, the retro reduces the likelihood of stranded changes that later sessions sweep into unrelated commits.
 - **RFC-0476 (RFC implementation transitions).** By ensuring a clean working tree at session end, this RFC reduces the likelihood of `rfc.implement.stamp` encountering RFC-IMP-04 in a subsequent session.
 - **RFC-0537 (Session documentation).** The `fo-session-retro` skill already exists for insight capture. This RFC extends it with a git hygiene pre-step, not a new skill.
@@ -113,8 +114,10 @@ This RFC extends existing operational discipline rules without introducing new c
 
 The session-end retro is triggered by an **explicit operator signal**. The agent does not auto-detect session end (the operator may close the chat without warning). Recognized signals include:
 
-- Explicit closings: "we're done", "на этом всё", "that's it", "мы закончили", "на этом закончим", "wrap up", "close the session"
+- Explicit closings (illustrative, not exhaustive): "we're done", "на этом всё", "that's it", "мы закончили", "на этом закончим", "wrap up", "close the session", "das war's", "wir sind fertig", "damit fertig"
 - Skill invocation: the operator explicitly invokes `/fo-session-retro` or says "run session retro"
+
+The list is illustrative — agents should recognize any clear session-closing signal regardless of language. When uncertain whether the operator is signaling session end, the agent asks: "Should I run the session-end retro?"
 
 When the agent detects a session-end signal, it MUST invoke `fo-session-retro` via the `skill` tool. The agent does not skip the retro even if no insights are apparent — the git hygiene check runs regardless.
 
@@ -193,6 +196,7 @@ The existing step 2 (Gather session insights) already runs `git diff HEAD` and `
 - **Uncommitted changes, operator requests changes first.** Agent applies the requested changes, commits, then proceeds to insight triage.
 - **Mission workpiece not found.** If `currentMission` points to a workpiece that does not exist on disk, the check skips the workpiece and proceeds with only the werkstatt check.
 - **Operator closes chat without signaling.** The retro does not run. The next session's pre-flight check (RFC-0575) will discover the dirty tree. This is the same behavior as today — the retro is a soft guard triggered by operator signal, not a hard enforcement mechanism.
+- **Concurrent sessions.** If two agent sessions are running simultaneously and one signals session-end, the git hygiene check reports all uncommitted changes — including those from the other session. The agent does not attempt to distinguish its own changes from the other session's. The operator decides which changes to commit. This mirrors RFC-0575's foreign-changes handling: the agent reports, the operator decides, the agent never discards or stages foreign changes without explicit operator instruction.
 
 ## Rollout
 
