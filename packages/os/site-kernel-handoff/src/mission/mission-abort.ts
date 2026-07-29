@@ -12,6 +12,7 @@
   <item>RFC-0480: add non-blocking dirty workpiece warning to mission.abort.</item>
   <item>Block mission.abort on dirty workpiece and unreconciled operator commits to prevent silent loss of changes.</item>
   <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
+  <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,7 +34,7 @@ import {
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty, countOperatorCommits } from "./mission-git-commit.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
-import { acquireLock, releaseLock } from "../werkstatt/index.ts";
+import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { resolveActor } from "./actor-identity.ts";
 
 export interface MissionAbortData {
@@ -149,6 +150,13 @@ export async function runMissionAbort(
       entry.currentMission = null;
       await writeRegistry(workspaceRoot, registry);
     }
+
+    // RFC-0580: auto-commit werkstatt side-effects
+    await commitWerkstattSideEffects(
+      workspaceRoot,
+      [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
+      `werkstatt: mission.abort ${missionId}`,
+    );
 
     return {
       data: {

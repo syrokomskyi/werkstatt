@@ -16,6 +16,7 @@
   <item>Auto-install Playwright Chromium during materialization (idempotent) — ensures build.post print.pdf.generate and independent-qa work without manual intervention.</item>
   <item>RFC-0568: replace git init with git clone from cache clone; stage only data paths in materialize commit (DNA-44 compliance).</item>
   <item>Run pnpm install after atomicMoveDir to link workpiece workspace deps before build.prepare (fixes workpiece.imports.validate failure on fresh workpiece).</item>
+  <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml, pnpm-lock.yaml) after writeMissionManifest.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -56,7 +57,12 @@ import {
   MISSION_PREFLIGHT_WARNING,
 } from "@warpgogol/site-kernel-checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
+import {
+  acquireLock,
+  releaseLock,
+  generateOperationId,
+  commitWerkstattSideEffects,
+} from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
 import type { KernelPipelineStep } from "@warpgogol/site-kernel";
@@ -906,6 +912,13 @@ export async function runMissionMaterialize(
     // Update mission manifest
     manifest.materializedAt = now;
     await writeMissionManifest(workspaceRoot, manifest);
+
+    // RFC-0580: auto-commit werkstatt side-effects
+    await commitWerkstattSideEffects(
+      workspaceRoot,
+      [path.join("missions", missionId, "mission.yaml"), "pnpm-lock.yaml"],
+      `werkstatt: mission.materialize ${missionId}`,
+    );
 
     return {
       data: report,

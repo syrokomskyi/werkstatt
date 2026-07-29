@@ -19,6 +19,7 @@
   <item>RFC-0568: replace git format-patch + git am with git merge --no-ff; remove 3-way fallback and auto-resolve; add untracked file investigation; use dynamic branch name; add push retry with exponential backoff.</item>
   <item>RFC-0578: add structured BUILD-01 diagnostic with pattern matching for common Astro build failures in mission.validate.</item>
   <item>RFC-0579: populate nextSteps in mission.validate for pass, fail, and dirty-workpiece states.</item>
+  <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml) after writeMissionManifest in mission.reconcile.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -37,7 +38,7 @@ import { executeKernelPipeline } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty, investigateUntrackedFiles } from "./mission-git-commit.ts";
-import { acquireLock, releaseLock } from "../werkstatt/index.ts";
+import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
@@ -805,6 +806,13 @@ export async function runMissionReconcile(
 
     manifest.reconciledAt = now;
     await writeMissionManifest(workspaceRoot, manifest);
+
+    // RFC-0580: auto-commit werkstatt side-effects
+    await commitWerkstattSideEffects(
+      workspaceRoot,
+      [path.join("missions", missionId, "mission.yaml")],
+      `werkstatt: mission.reconcile ${missionId}`,
+    );
 
     return {
       data: {

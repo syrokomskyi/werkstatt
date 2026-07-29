@@ -12,6 +12,7 @@
   <item>RFC-0480: add dirty workpiece guard to mission.close.</item>
   <item>RFC-0522: resolve releaseId with flag→manifest precedence; add warnings[] to CloseReport.</item>
   <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
+  <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -34,7 +35,7 @@ import {
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty } from "./mission-git-commit.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
-import { acquireLock, releaseLock } from "../werkstatt/index.ts";
+import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
 
@@ -286,6 +287,13 @@ export async function runMissionClose(
       entry.currentMission = null;
       await writeRegistry(workspaceRoot, registry);
     }
+
+    // RFC-0580: auto-commit werkstatt side-effects
+    await commitWerkstattSideEffects(
+      workspaceRoot,
+      [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
+      `werkstatt: mission.close ${missionId}`,
+    );
 
     return {
       data: {

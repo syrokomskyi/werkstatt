@@ -11,6 +11,7 @@ the cursor, and writes a migration report to evidence/.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0479: initial mission.migrate command handler.</item>
+  <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml) after writeMissionManifest.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,7 +24,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import { acquireLock, releaseLock } from "../werkstatt/index.ts";
+import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
 import { migratorsToApply } from "../migrators/registry.ts";
@@ -215,6 +216,13 @@ export async function runMissionMigrate(
 
     manifest.migratedAt = now;
     await writeMissionManifest(workspaceRoot, manifest);
+
+    // RFC-0580: auto-commit werkstatt side-effects
+    await commitWerkstattSideEffects(
+      workspaceRoot,
+      [path.join("missions", missionId, "mission.yaml")],
+      `werkstatt: mission.migrate ${missionId}`,
+    );
 
     await appendBordbuchEntry(
       workspaceRoot,

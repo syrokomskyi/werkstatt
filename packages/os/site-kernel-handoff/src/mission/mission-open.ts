@@ -9,6 +9,7 @@
   <item>RFC-0355: initial mission.open command handler.</item>
   <item>RFC-0477: commit and push bordbuch after appending mission-open entry.</item>
   <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
+  <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,7 +34,12 @@ import {
   deriveNextMissionNumberSafe,
   commitAndPushBordbuch,
 } from "../bordbuch/bordbuch-io.ts";
-import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
+import {
+  acquireLock,
+  releaseLock,
+  generateOperationId,
+  commitWerkstattSideEffects,
+} from "../werkstatt/index.ts";
 import { resolveActor } from "./actor-identity.ts";
 
 export interface MissionOpenData {
@@ -153,6 +159,13 @@ export async function runMissionOpen(
     // Update registry
     entry.currentMission = missionId;
     await writeRegistry(workspaceRoot, registry);
+
+    // RFC-0580: auto-commit werkstatt side-effects
+    await commitWerkstattSideEffects(
+      workspaceRoot,
+      [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
+      `werkstatt: mission.open ${missionId}`,
+    );
 
     return {
       data: {
