@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -47,17 +48,18 @@ commands:
   proposed: []
   added: []
   changed:
-    - release.prepare
     - behavior.snapshot.capture
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
+  - "@warpgogol/site-kernel-checks"
 successSignals: []
 nonGoals:
   - "Preflight check fixes (covered by RFC-0587)"
-  - "_redirects 410 handling (covered by RFC-0589)"
+  - "_redirects 410 Gone handling (covered by RFC-0589)"
+  - "dist/client/ detection and behaviorSnapshot wrapper unwrapping — already fixed in commit 89085ed"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -80,25 +82,29 @@ nonGoals:
 
 ## Context
 
-The first real-world Cloudflare Workers propagation of `warpgogol-com-r000001` revealed that behavior snapshot route collection was incompatible with the Astro Cloudflare adapter's dist layout. The adapter outputs HTML files to `dist/client/` and server code to `dist/server/`, but `release.prepare` passed `dist/` (the root) to `behavior.snapshot.capture`, causing all route paths to be prefixed with `/client/`. Health verification then probed `/client/agb` instead of `/agb`, and every route returned a content hash mismatch.
+The first real-world Cloudflare Workers propagation of `warpgogol-com-r000001` revealed three bugs in behavior snapshot route collection. Bugs 1 and 2 were fixed in commit `89085ed` and are documented here for context. Bug 3 remains unfixed and is the sole focus of this RFC's decision.
 
-Additionally, `readBehaviorSnapshot` in the Cloudflare Workers adapter expected the routes array at the top level of the snapshot JSON, but `behavior.snapshot.capture` wraps it in a `behaviorSnapshot` field. This caused the adapter to find zero routes and skip health verification entirely.
+**Bug 1 (fixed in `89085ed`):** The Astro Cloudflare adapter outputs HTML files to `dist/client/` and server code to `dist/server/`, but `release.prepare` passed `dist/` (the root) to `behavior.snapshot.capture`, causing all route paths to be prefixed with `/client/`. Health verification then probed `/client/agb` instead of `/agb`, and every route returned a content hash mismatch. The fix detects `dist/client/` and passes it as the HTML directory.
 
-Finally, routes that are redirected by `_redirects` rules (e.g. `/de/*` → `/*` with 308) were included in the behavior snapshot. The health checker followed the redirect and received the content of the target page, which did not match the hash of the redirected page's prerendered HTML.
+**Bug 2 (fixed in `89085ed`):** `readBehaviorSnapshot` in the Cloudflare Workers adapter expected the routes array at the top level of the snapshot JSON, but `behavior.snapshot.capture` wraps it in a `behaviorSnapshot` field. This caused the adapter to find zero routes and skip health verification entirely. The fix unwraps the `behaviorSnapshot` field via `raw.behaviorSnapshot ?? raw`.
+
+**Bug 3 (unfixed — focus of this RFC):** Routes that are redirected by `_redirects` rules (e.g. `/de/*` → `/*` with 308) were included in the behavior snapshot. The health checker followed the redirect and received the content of the target page, which did not match the hash of the redirected page's prerendered HTML.
 
 ## Problem
 
-DNA-48 (Release discipline) requires behavior snapshots that bind the live site to the build output. DNA-49 (Fleet propagation) uses these snapshots for health verification. Three bugs prevent this contract from being upheld:
-
-1. **`/client/` route prefix** (`packages/os/site-kernel-handoff/src/release/release-commands.ts:268`): `release.prepare` passes `distDest` (the dist root) to `behavior.snapshot.capture`. The Astro Cloudflare adapter outputs HTML to `dist/client/`, so `collectRoutes` scans `dist/` and finds HTML under `client/`, prefixing all 154 routes with `/client/`.
-
-2. **Snapshot wrapper unwrapping** (`packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:94`): `readBehaviorSnapshot` reads `snapshot.routes` directly, but `behavior.snapshot.capture` writes `{ behaviorSnapshot: { routes: [...] } }`. The adapter found zero routes and skipped all health checks.
+DNA-48 (Release discipline) requires behavior snapshots that bind the live site to the build output. DNA-49 (Fleet propagation) uses these snapshots for health verification. Bugs 1 and 2 were fixed in commit `89085ed`. Bug 3 remains:
 
 3. **Redirected routes in snapshot** (`packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts:63`): `collectRoutes` scans all `index.html` files in the dist directory, including those for routes that are redirected by `_redirects` rules. For example, `/de/agb` is prerendered but redirected to `/agb` (308). The health checker follows the redirect, receives `/agb`'s content, and the hash mismatches.
 
+**Already fixed (for context):**
+
+1. **`/client/` route prefix** — fixed in `89085ed`. `release.prepare` now detects `dist/client/` at `release-commands.ts:263-265`.
+
+2. **Snapshot wrapper unwrapping** — fixed in `89085ed`. `readBehaviorSnapshot` now unwraps via `parsed.behaviorSnapshot ?? parsed` at `cloudflare-workers.ts:101-102`.
+
 ## Decision
 
-`release.prepare` detects the HTML output directory (`dist/client/` for Cloudflare adapter, `dist/` for static) and passes it to `behavior.snapshot.capture`. `readBehaviorSnapshot` in the adapter unwraps the `behaviorSnapshot` field. `collectRoutes` reads `_redirects` and excludes routes that match redirect source patterns from the behavior snapshot.
+`collectRoutes` reads `_redirects` and excludes routes that match redirect source patterns (301, 308) from the behavior snapshot. Bugs 1 and 2 were already fixed in commit `89085ed` and require no further changes.
 
 ## Architectural fit
 
@@ -116,41 +122,38 @@ DNA-48 (Release discipline) requires behavior snapshots that bind the live site 
 No new commands. Changed commands:
 
 ```sh
-# release.prepare now detects dist/client/ automatically
-pnpm exec site-kernel run release.prepare --mission <id>
-
-# behavior.snapshot.capture can be called directly with the HTML directory
-pnpm exec site-kernel run behavior.snapshot.capture --dist <html-dir> --system <id>
+# behavior.snapshot.capture now excludes redirected routes from the snapshot
+pnpm exec site-kernel run behavior.snapshot.capture --dist <html-dir> --system <id> --build-kind <readable|production>
 ```
 
 ### TypeScript contracts
 
 ```ts
-// release.prepare — detect HTML output directory
-function resolveHtmlDir(distDir: string): string {
-  const clientDir = path.join(distDir, "client");
-  return existsSync(clientDir) ? clientDir : distDir;
-}
-
 // collectRoutes — exclude redirected routes
+// parseRedirectRules is exported from @warpgogol/site-kernel-checks
+// (existing function in src/public-surface/managed-public.ts, now exported)
+
 interface RedirectRule {
   from: string;   // e.g. "/de/*"
-  to: string;     // e.g. "/:splat"
+  to: string | undefined;  // e.g. "/:splat" (matches existing site-kernel-checks type)
   status: number; // e.g. 308
+  line: string;   // original line (matches existing type)
 }
 
-function parseRedirectRules(redirectsContent: string): RedirectRule[];
-function isRouteRedirected(routePath: string, rules: RedirectRule[]): boolean;
-
-// readBehaviorSnapshot — unwrap behaviorSnapshot field
-function readBehaviorSnapshot(snapshotPath: string): {
-  routes: RouteFact[];
-  sitemapHash: string | null;
-  robotsHash: string | null;
-} {
-  const raw = JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
-  const snapshot = raw.behaviorSnapshot ?? raw;  // handle both wrapped and unwrapped
-  return { routes: snapshot.routes ?? [], ... };
+// New function in behavior-snapshot-commands.ts
+function isRouteRedirected(routePath: string, rules: RedirectRule[]): boolean {
+  // Convert _redirects glob patterns to regex matchers.
+  // "*" in _redirects matches any sequence of characters.
+  // Example: "/de/*" → /^\/de\/.*/$ which matches "/de/agb", "/de/agb/terms"
+  // Literal paths match exactly.
+  // Only 301 and 308 redirects trigger exclusion (410 is handled by RFC-0589).
+  for (const rule of rules) {
+    if (rule.status !== 301 && rule.status !== 308) continue;
+    const pattern = rule.from.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
+    const regex = new RegExp(`^${pattern}$`);
+    if (regex.test(routePath)) return true;
+  }
+  return false;
 }
 ```
 
@@ -158,11 +161,9 @@ function readBehaviorSnapshot(snapshotPath: string): {
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-handoff/src/release/release-commands.ts` | `release.prepare` resolves `dist/client/` for snapshot capture |
-| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts` | `collectRoutes` reads `_redirects` and excludes redirected routes |
-| `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts` | `readBehaviorSnapshot` unwraps `behaviorSnapshot` field |
-| `releases/<id>/dist/client/_redirects` | Read by `collectRoutes` to determine redirect rules |
-| `releases/<id>/behavior-snapshot.json` | Written by `release.prepare`, read by adapter |
+| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts` | `collectRoutes` reads `_redirects` and excludes redirected routes via `isRouteRedirected` |
+| `packages/os/site-kernel-checks/src/public-surface/managed-public.ts` | `parseRedirectRules` exported (already exists, now exported for reuse) |
+| `<distDir>/_redirects` | Read by `collectRoutes` to determine redirect rules (same `distDir` passed to `collectRoutes`) |
 
 ### Output format
 
@@ -191,40 +192,38 @@ Routes that match `_redirects` source patterns (e.g. `/de/*`) are excluded from 
 ### Failure modes
 
 - **Missing `_redirects` file**: `collectRoutes` proceeds without redirect exclusion. All HTML routes are included. This is the current behavior and is safe — redirected routes will mismatch in health checks, but the snapshot is still usable.
-- **Malformed `_redirects` line**: `parseRedirectRules` skips lines it cannot parse. A warning is logged.
-- **Missing `dist/client/` directory**: `resolveHtmlDir` falls back to `dist/` root. This handles static-only builds (no Cloudflare adapter).
-- **Snapshot without `behaviorSnapshot` wrapper**: `readBehaviorSnapshot` handles both wrapped and unwrapped formats via `raw.behaviorSnapshot ?? raw`.
+- **Malformed `_redirects` line**: `parseRedirectRules` skips lines it cannot parse (empty lines, comments starting with `#`, lines without a `from` field). This is existing behavior from the `site-kernel-checks` implementation.
+- **410 Gone redirects**: Not excluded by this RFC. 410 tombstone handling is covered by RFC-0589, which moves 410 handling to middleware. If 410 routes remain in the snapshot after RFC-0589 implementation, a follow-up may be needed.
 
 ## Rollout
 
-- **Default behavior**: All fixes are active immediately upon implementation. No feature flags.
-- **Existing releases**: Releases with existing behavior snapshots that have `/client/` prefixed routes will fail health verification. Re-running `release.prepare` for the same mission regenerates the snapshot with correct paths.
-- **New releases**: Automatically use `dist/client/` detection and redirect exclusion from day one.
-- **Pipeline integration**: No pipeline changes. `release.prepare` → `behavior.snapshot.capture` → `leitstand.propagate` flow is unchanged; only the internal implementations are fixed.
+- **Default behavior**: Redirect exclusion is active immediately upon implementation. No feature flags.
+- **Existing releases**: Releases with existing behavior snapshots that include redirected routes will fail health verification. Re-running `release.prepare` for the same mission regenerates the snapshot with redirect exclusion applied.
+- **New releases**: Automatically use redirect exclusion from day one.
+- **Pipeline integration**: No pipeline changes. `release.prepare` → `behavior.snapshot.capture` → `leitstand.propagate` flow is unchanged; only the `collectRoutes` internal implementation is fixed.
 
 ## Alternatives considered
 
-1. **Hardcode `dist/client/` path**: Rejected — not all adapters use `dist/client/`. Static-only builds output HTML to `dist/` root. The `resolveHtmlDir` helper detects the correct directory.
+1. **Follow redirects in health checker and compare target hash**: Rejected — redirected routes should not be in the snapshot at all. Including them adds noise and the hash comparison is meaningless (the redirected page's HTML is never served).
 
-2. **Strip `/client/` prefix in health checker**: Rejected — the behavior snapshot should have correct route paths from the start. Stripping prefixes in the health checker is a workaround that hides the root cause.
+2. **Separate `behavior.snapshot.redirect.exclude` command**: Rejected — redirect exclusion is a concern of `collectRoutes`, not a separate command. Adding a command for this would be over-engineering.
 
-3. **Follow redirects in health checker and compare target hash**: Rejected — redirected routes should not be in the snapshot at all. Including them adds noise and the hash comparison is meaningless (the redirected page's HTML is never served).
-
-4. **Separate `behavior.snapshot.redirect.exclude` command**: Rejected — redirect exclusion is a concern of `collectRoutes`, not a separate command. Adding a command for this would be over-engineering.
+3. **Exclude 410 Gone routes in this RFC**: Rejected — 410 tombstone handling is architecturally distinct (middleware-level, not `_redirects`-level) and is covered by RFC-0589. Mixing 410 exclusion into this RFC would create a coupling between two independent fixes.
 
 ## Risks
 
-- **Adapter-specific dist layout**: This fix assumes Cloudflare adapter uses `dist/client/` for HTML. If a future adapter uses a different layout, `resolveHtmlDir` must be updated. Mitigation: the helper is a single function in `release-commands.ts`.
-- **Redirect rule parsing**: `parseRedirectRules` must handle all `_redirects` syntax variants (splat `*`, named `:splat`, literal paths). Mitigation: reuse the existing `parseRedirectRules` from `redirect.map.validate` in `site-kernel-checks`.
-- **False negative on redirect exclusion**: If a route is redirected but the redirect rule is malformed, the route remains in the snapshot and will mismatch. Mitigation: `parseRedirectRules` logs a warning on malformed lines.
-- **Agent misinterpretation**: Agents may think `dist/client/` is a hardcoded path. Mitigation: AGENTS.md should document that `resolveHtmlDir` is adapter-aware.
+- **Redirect rule parsing**: `parseRedirectRules` handles whitespace-delimited `_redirects` lines (`from to status`). It does not handle advanced Cloudflare Pages syntax (e.g., query parameters, placeholders in `from`). Mitigation: the existing parser in `site-kernel-checks` is sufficient for the current `_redirects` format used by the ecosystem.
+- **False negative on redirect exclusion**: If a route is redirected but the redirect rule is malformed, the route remains in the snapshot and will mismatch. Mitigation: `parseRedirectRules` skips unparseable lines (existing behavior).
+- **Glob pattern edge cases**: The `*` wildcard in `_redirects` matches any sequence of characters. The regex conversion escapes all regex special characters before replacing `*` with `.*`. Edge case: a literal `*` in a route path (unlikely in practice) would be treated as a wildcard. Mitigation: route paths with literal `*` are not used in this ecosystem.
+- **410 Gone routes**: This RFC does not exclude 410-redirected routes. If RFC-0589 does not fully address prerendered 410 pages, a follow-up RFC may be needed. Mitigation: RFC-0589 moves 410 handling to middleware, which should prevent 410 routes from being prerendered.
 
 ## Acceptance criteria
 
-- [ ] `release.prepare` passes `dist/client/` (when it exists) to `behavior.snapshot.capture` instead of `dist/` root (evidence: `release-commands.ts:<line>`, snapshot routes have no `/client/` prefix)
-- [ ] `readBehaviorSnapshot` in the cloudflare-workers adapter unwraps the `behaviorSnapshot` field (evidence: `cloudflare-workers.ts:<line>`, `raw.behaviorSnapshot ?? raw` pattern)
-- [ ] `collectRoutes` reads `_redirects` and excludes routes matching redirect source patterns (evidence: `behavior-snapshot-commands.ts:<line>`, `/de/*` routes absent from snapshot)
-- [ ] `parseRedirectRules` is reused from `site-kernel-checks` or extracted to a shared helper (evidence: no duplicate redirect parsing logic)
+- [x] `release.prepare` passes `dist/client/` (when it exists) to `behavior.snapshot.capture` instead of `dist/` root (evidence: `release-commands.ts:263-265`, already fixed in commit `89085ed`)
+- [x] `readBehaviorSnapshot` in the cloudflare-workers adapter unwraps the `behaviorSnapshot` field (evidence: `cloudflare-workers.ts:101-102`, already fixed in commit `89085ed`)
+- [ ] `collectRoutes` reads `_redirects` and excludes routes matching redirect source patterns (301, 308) (evidence: `behavior-snapshot-commands.ts:<line>`, `/de/*` routes absent from snapshot)
+- [ ] `parseRedirectRules` is exported from `@warpgogol/site-kernel-checks` and imported in `behavior-snapshot-commands.ts` (evidence: no duplicate redirect parsing logic)
+- [ ] `isRouteRedirected` converts `*` wildcard patterns to regex matchers and excludes matching routes (evidence: `behavior-snapshot-commands.ts:<line>`, test with `/de/*` pattern)
 - [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
 - [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes
 - [ ] `rfc.validate` passes on this file
@@ -235,7 +234,8 @@ Routes that match `_redirects` source patterns (e.g. `/de/*`) are excluded from 
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
-- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The `parseRedirectRules` function SHOULD be reused from `packages/os/site-kernel-checks/src/public-surface/managed-public.ts` or extracted to `@warpgogol/share` if shared. Do not duplicate redirect parsing logic.
-- The `resolveHtmlDir` helper MUST be exported from `release-commands.ts` or moved to `@warpgogol/site-kernel-astro` if other commands need it.
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
+- Export `parseRedirectRules` from `packages/os/site-kernel-checks/src/public-surface/managed-public.ts` (add `export` keyword). The existing `RedirectRule` type (`to: string | undefined`, `line: string`) is used as-is — do not create a parallel type.
+- Implement `isRouteRedirected` locally in `behavior-snapshot-commands.ts`. It converts `*` to `.*` in regex patterns, escaping all other regex special characters first. Only 301 and 308 redirects trigger exclusion.
+- Bugs 1 and 2 are already fixed in commit `89085ed`. Do not re-implement `dist/client/` detection or `behaviorSnapshot` wrapper unwrapping.
 - Related RFCs: RFC-0587 (preflight checks), RFC-0589 (_redirects 410 handling).
