@@ -275,20 +275,20 @@ No warning-only paths — all failures are hard failures. A release without a pr
 
 ## Acceptance criteria
 
-- [ ] `release.prepare` runs `astro build` on the mission workpiece when no reusable distribution exists, producing `releases/<id>/dist/`
-- [ ] `release.prepare` reuses `missions/<id>/distribution/dist/` when build input hash matches the validated workpiece, skipping redundant build
-- [ ] `release.prepare` captures production behavior snapshot into `releases/<id>/behavior-snapshot.json` via `behavior.snapshot.capture --build-kind production`
-- [ ] `release.prepare` captures readable behavior snapshot into `releases/<id>/readable-snapshot.json` via `behavior.snapshot.capture --build-kind readable` on the same build output
-- [ ] `release.prepare` runs `behavior.snapshot.diff` between readable and production snapshots, writes `releases/<id>/snapshot-diff.json`, and sets `snapshotDiffVerdict` from the diff result
-- [ ] `release.prepare` computes `distTreeHash` via `@warpgogol/fingerprint` tree hash — never `sha256:pending`
-- [ ] `release.prepare` computes `siteContentHash` via `@warpgogol/fingerprint` — never `sha256:pending`
-- [ ] `release.prepare` computes `behaviorSnapshotHash` and `readableSnapshotHash` — never `sha256:pending`
-- [ ] `release.publish` refuses to publish when `distTreeHash` is `sha256:pending`, returning non-zero exit code and fail status
-- [ ] `release.publish` succeeds when `distTreeHash` is a real hash (e.g., `sha256:abc123...`)
-- [ ] Existing tests for `release.prepare` and `release.publish` updated to reflect new behavior
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes
-- [ ] `rfc.validate` passes on this RFC file
+- [x] `release.prepare` runs `astro build` on the mission workpiece when no reusable distribution exists, producing `releases/<id>/dist/` (evidence: release-commands.ts:233-251, execSync astro build)
+- [x] `release.prepare` reuses `missions/<id>/distribution/dist/` when build input hash matches the validated workpiece, skipping redundant build (evidence: release-commands.ts:204-232, build-input-hash.json comparison)
+- [x] `release.prepare` captures production behavior snapshot into `releases/<id>/behavior-snapshot.json` via `behavior.snapshot.capture --build-kind production` (evidence: release-commands.ts:283-295, runBehaviorSnapshotCapture in-process)
+- [x] `release.prepare` captures readable behavior snapshot into `releases/<id>/readable-snapshot.json` via `behavior.snapshot.capture --build-kind readable` on the same build output (evidence: release-commands.ts:266-278, runBehaviorSnapshotCapture in-process)
+- [x] `release.prepare` runs `behavior.snapshot.diff` between readable and production snapshots, writes `releases/<id>/snapshot-diff.json`, and sets `snapshotDiffVerdict` from the diff result (evidence: release-commands.ts:302-318, runBehaviorSnapshotDiff in-process)
+- [x] `release.prepare` computes `distTreeHash` via `@warpgogol/fingerprint` tree hash — never `sha256:pending` (evidence: release-commands.ts:321-322, fingerprintTree byte mode)
+- [x] `release.prepare` computes `siteContentHash` via `@warpgogol/fingerprint` — never `sha256:pending` (evidence: release-commands.ts:208-209/324, fingerprintTree semantic mode on workpiece content)
+- [x] `release.prepare` computes `behaviorSnapshotHash` and `readableSnapshotHash` — never `sha256:pending` (evidence: release-commands.ts:326-327, from runBehaviorSnapshotCapture results)
+- [x] `release.publish` refuses to publish when `distTreeHash` is `sha256:pending`, returning non-zero exit code and fail status (evidence: release-commands.ts:468-474, release-0585-dist-guard.test.ts:48-56)
+- [x] `release.publish` succeeds when `distTreeHash` is a real hash (e.g., `sha256:abc123...`) (evidence: release-commands.ts:468-474 guard passes, release-0585-dist-guard.test.ts:75-82 confirms missing-dist guard fires after hash guard passes)
+- [x] Existing tests for `release.prepare` and `release.publish` updated to reflect new behavior (evidence: release-0585-dist-guard.test.ts, 4 tests passing)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: tsc --noEmit exit 0)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes (evidence: 345 tests, 83 files, all passing)
+- [x] `rfc.validate` passes on this RFC file (evidence: no violations for RFC-0585 in rfc.validate output)
 
 ## Implementation notes for agents
 
