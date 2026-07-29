@@ -100,7 +100,7 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 
 ## Reconcile dirty cache clone guard, untracked file investigation, and releaseId tracking (RFC-0522, RFC-0568)
 
-- **Dirty cache clone guard in `mission.reconcile`:** Before merging, `mission.reconcile` checks the cache clone (`systems/<id>/`) for uncommitted changes via `isWorkpieceDirty`. If dirty, it investigates untracked file origins via `investigateUntrackedFiles` (cross-references Bordbuch `mission-open` entries for time ranges and matches against boilerplate file patterns), writes `evidence/untracked-files-report.json` with the analysis, and throws an error listing the files with their likely origin (`previous-mission`, `direct-commit`, or `unknown`). The guard is placed inside the `existsSync(gitDir)` check to avoid errors on non-git cache clones (copyDir fallback).
+- **Dirty cache clone guard in `mission.reconcile`:** Before merging, `mission.reconcile` checks the cache clone (`mirrors[0].path`) for uncommitted changes via `isWorkpieceDirty`. If dirty, it investigates untracked file origins via `investigateUntrackedFiles` (cross-references Bordbuch `mission-open` entries for time ranges and matches against boilerplate file patterns), writes `evidence/untracked-files-report.json` with the analysis, and throws an error listing the files with their likely origin (`previous-mission`, `direct-commit`, or `unknown`). The guard is placed inside the `existsSync(gitDir)` check to avoid errors on non-git cache clones (copyDir fallback).
 - **Merge-based reconcile (RFC-0568):** `mission.reconcile` uses `git fetch` + `git merge --no-ff` to transfer workpiece commits into the cache clone. The workpiece branch name is determined dynamically (not hardcoded). Conflicts are resolved in the workpiece (not the cache clone) — the operator commits fixes via `mission.git.commit` and re-runs reconcile (idempotent via `preReconcileSha` reset). The old `git format-patch` + `git am` patch-based mechanism and its 3-way fallback / auto-resolve code are removed (forward-only).
 - **Push retry (RFC-0568):** After merge, `mission.reconcile` pushes to origin with 3 retry attempts and exponential backoff (1s, 2s, 4s). If all attempts fail, the push is non-fatal — the merge commit is in the cache clone locally and the workpiece is preserved on disk until `mission.cleanup`.
 - **`releaseId` in `release.prepare`:** After successful release preparation, `release.prepare` writes the `releaseId` to the mission manifest via `writeMissionManifest` (Zod-validated). This associates the mission with its release.
@@ -120,9 +120,9 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 ## Sternsystem registration (RFC-0354, RFC-0532)
 
 - `sternsystem.register` is the single entry point for creating a new Sternsystem. It performs the full onboarding-to-mission bridge in one invocation:
-  1. Adds an entry to `systems/registry.yaml` with `id`, `cosmicStar`, `repo`, `pinnedPlatform`, `status: registered`, `registeredAt`, `deployment` config, and optional `owner` (VC subject id, RFC-0561).
-  2. Creates the pin file `systems/<id>/system.pin.json` by delegating to `sternsystem.pin`.
-  3. Creates initial content stubs: `systems/<id>/content/system.md` with identity and i18n blocks derived from the brief.
+  1. Adds an entry to `systems/registry.yaml` with `id`, `cosmicStar`, `mirrors` (RFC-0574), `pinnedPlatform`, `status: registered`, `registeredAt`, `deployment` config, and optional `owner` (VC subject id, RFC-0561).
+  2. Creates the pin file `mirrors[0].path/system.pin.json` by delegating to `sternsystem.pin`.
+  3. Creates initial content stubs: `mirrors[0].path/content/system.md` with identity and i18n blocks derived from the brief.
   4. Automatically opens the first mission (`<system-id>-m000001`) by calling `mission.open`.
   5. Triggers `mission.materialize` to produce the first Werkstück from the pinned data.
 - **`--amend` flag:** Updates the pin file, opens an amend mission, and triggers materialization. Does not create a new registry entry. `--amend-id` specifies the amend batch number. `--owner` can be used with `--amend` to backfill or update the `owner` field on an existing entry (RFC-0561).
