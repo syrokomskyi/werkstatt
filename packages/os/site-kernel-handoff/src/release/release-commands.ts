@@ -142,9 +142,9 @@ export async function runReleasePrepare(
   if (!missionId) throw new Error("[release.prepare] --mission is required");
 
   const manifest = await readMissionManifest(workspaceRoot, missionId);
-  if (manifest.state !== "open" && manifest.state !== "closed") {
+  if (manifest.state !== "closed") {
     throw new Error(
-      `[release.prepare] mission '${missionId}' is not open or closed (state: ${manifest.state})`,
+      `[release.prepare] mission '${missionId}' is not closed (state: ${manifest.state}). Run \`mission.close --mission ${missionId}\` first.`,
     );
   }
 

@@ -38,7 +38,7 @@ test("null releaseId produces missing-release-id warning", () => {
     warnings.push({
       rule: "missing-release-id",
       message:
-        "Mission closed without release — releaseId is null. Run release.prepare before close to associate a release.",
+        "Mission closed without release — releaseId is null. Run release.prepare after close to associate a release.",
     });
   }
   expect(warnings).toHaveLength(1);
@@ -52,7 +52,7 @@ test("non-null releaseId produces no warning", () => {
     warnings.push({
       rule: "missing-release-id",
       message:
-        "Mission closed without release — releaseId is null. Run release.prepare before close to associate a release.",
+        "Mission closed without release — releaseId is null. Run release.prepare after close to associate a release.",
     });
   }
   expect(warnings).toHaveLength(0);

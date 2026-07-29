@@ -90,6 +90,7 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 
 - `mission.close` refuses to close a mission with null `reconciledAt` — this is a hard guard, not a warning.
 - `mission.close` writes `evidence/close-report.json` with git, mirror, and reconcile status blocks.
+- `release.prepare` requires `state: closed` — open missions are refused with a message directing to `mission.close` first (RFC-0590). The workflow is: `mission.close` → `release.prepare` on the closed mission.
 - `sternsystem.status --id <id>` is a read-only command showing HEAD SHA, origin SHA, mirror SHA, dirty files, last 6 bordbuch events, and last reconciledAt. Use `--all` for all systems.
 
 ## Bordbuch repair (RFC-0583)

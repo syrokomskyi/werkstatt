@@ -19,6 +19,7 @@ amends:
   - RFC-0480
 amendedBy:
   - RFC-0568
+  - RFC-0590
 related:
   - DNA-46
   - DNA-47

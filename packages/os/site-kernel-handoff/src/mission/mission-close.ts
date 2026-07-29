@@ -255,7 +255,7 @@ export async function runMissionClose(
       warnings.push({
         rule: "missing-release-id",
         message:
-          "Mission closed without release — releaseId is null. Run release.prepare before close to associate a release.",
+          "Mission closed without release — releaseId is null. Run release.prepare after close to associate a release.",
       });
     }
 
