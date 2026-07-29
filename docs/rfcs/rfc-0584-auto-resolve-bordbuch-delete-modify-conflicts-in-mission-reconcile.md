@@ -306,13 +306,13 @@ When no bordbuch conflicts occur, `autoResolvedPaths` is absent from `data` and 
 
 ## Acceptance criteria
 
-- [ ] `mission.reconcile` auto-resolves `bordbuch/` delete-modify conflicts by keeping the cache clone version
-- [ ] `mission.reconcile` fails with existing error when non-bordbuch conflicts occur
-- [ ] `mission.reconcile` aborts merge and fails when mixed bordbuch + non-bordbuch conflicts occur
-- [ ] Reconcile result includes `autoResolvedPaths` field when bordbuch conflicts were auto-resolved
-- [ ] Log message `Auto-resolved bordbuch/ conflict (kept cache clone version)` is emitted
-- [ ] Unit test covers the bordbuch delete-modify conflict auto-resolution scenario
-- [ ] Unit test covers the non-bordbuch conflict hard-failure scenario
+- [x] `mission.reconcile` auto-resolves `bordbuch/` delete-modify conflicts by keeping the cache clone version (evidence: mission-materialization-commands.ts:733-754, rfc-0584-bordbuch-conflict-autoresolve.test.ts test 1)
+- [x] `mission.reconcile` fails with existing error when non-bordbuch conflicts occur (evidence: mission-materialization-commands.ts:768-780, rfc-0584-bordbuch-conflict-autoresolve.test.ts test 2)
+- [x] `mission.reconcile` aborts merge and fails when mixed bordbuch + non-bordbuch conflicts occur (evidence: mission-materialization-commands.ts:768-780, rfc-0584-bordbuch-conflict-autoresolve.test.ts test 3)
+- [x] Reconcile result includes `autoResolvedPaths` field when bordbuch conflicts were auto-resolved (evidence: mission-materialization-commands.ts:895-903, interface at :531)
+- [x] Log message `Auto-resolved bordbuch/ conflict (kept cache clone version)` is emitted (evidence: mission-materialization-commands.ts:752-754)
+- [x] Unit test covers the bordbuch delete-modify conflict auto-resolution scenario (evidence: rfc-0584-bordbuch-conflict-autoresolve.test.ts test 1)
+- [x] Unit test covers the non-bordbuch conflict hard-failure scenario (evidence: rfc-0584-bordbuch-conflict-autoresolve.test.ts test 2)
 
 ## Implementation notes for agents
 
