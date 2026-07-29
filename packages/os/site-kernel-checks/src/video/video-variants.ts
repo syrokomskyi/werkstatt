@@ -26,6 +26,7 @@
   <item>RFC-0210: introduced video.variants.generate and video.variants.validate.</item>
   <item>RFC-0525: upgraded encoding parameters (CRF/preset), added AV1 progressive via libsvtav1, added per-rendition HLS audio bitrate, extended ffmpeg check for libsvtav1, added av1 to validator.</item>
   <item>Performance: faster ffmpeg presets (x264 slow→medium, VP9 deadline best→good/cpu-used 2, AV1 preset 2→6). AV1 encoding is now opt-in via media.av1 frontmatter (default false) to skip the slowest encoder for most sources.</item>
+  <item>RFC-0591: two-pass bitrate-capped MP4 encoding with maxSizeMb frontmatter field; ENCODER_SETTINGS_VERSION bumped to 5; calculateTargetBitrate pure function; copy loop skips ffmpeg2pass.log* files.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -43,7 +44,11 @@ import type {
 } from "@warpgogol/site-kernel";
 import { GENERATED_MARKER } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
-import type { VideoManifest, VideoManifestEntry, MediaProfile } from "@warpgogol/share/schemas/media";
+import type {
+  VideoManifest,
+  VideoManifestEntry,
+  MediaProfile,
+} from "@warpgogol/share/schemas/media";
 import { readDefaultLanguageCode } from "../lib/i18n.ts";
 
 const execFileAsync = promisify(execFile);
@@ -52,7 +57,10 @@ const MANIFEST_RELATIVE = "src/video-manifest.generated.yaml";
 const VIDEO_PUBLIC_DIR = "_video";
 const CACHE_RELATIVE = join(".cache", "video");
 /** Bump to force a clean re-encode of every source when the ffmpeg recipe changes. */
-const ENCODER_SETTINGS_VERSION = "4";
+const ENCODER_SETTINGS_VERSION = "5";
+const AUDIO_BITRATE_BPS = 128_000;
+const DEFAULT_MAX_SIZE_MB = 24;
+const MIN_VIDEO_BITRATE_BPS = 200_000;
 
 const SOURCE_EXTENSIONS = [".mp4", ".webm"];
 const HLS_LADDER_AUTO = [360, 540, 720, 1080] as const;
@@ -74,6 +82,8 @@ interface MediaRef {
   posterTime: number;
   /** Opt-in AV1 progressive encoding (RFC-0525). Default false — AV1 is the slowest encoder. */
   av1: boolean;
+  /** Maximum MP4 file size in MiB (RFC-0591). Default 24 — two-pass bitrate-capped encoding. 0 disables (CRF 17). */
+  maxSizeMb: number;
   lang: string;
   token: string;
   captionLangs: string[];
@@ -108,6 +118,7 @@ interface RawMediaConfig {
   ladder?: "auto" | number[];
   posterTime?: number;
   av1?: boolean;
+  maxSizeMb?: number;
   captions?: { lang?: string }[];
 }
 
@@ -207,15 +218,77 @@ function resolveLadder(ladder: "auto" | number[], sourceHeight: number | undefin
 
 // ─── encoding (into a cache dir) ──────────────────────────────────────────────
 
-async function encodeMp4(source: string, outDir: string, hasAudio: boolean): Promise<void> {
+/**
+ * Calculate the target video bitrate for two-pass encoding (RFC-0591).
+ * Returns null when two-pass cannot run (maxSizeMb <= 0 or durationSec <= 0/undefined).
+ * Formula: videoBitrate = floor(maxSizeMb * 1024 * 1024 * 8 / durationSec) - AUDIO_BITRATE_BPS
+ */
+export function calculateTargetBitrate(
+  durationSec: number | undefined,
+  maxSizeMb: number,
+): { videoBitrate: number; audioBitrate: number } | null {
+  if (maxSizeMb <= 0 || !durationSec || durationSec <= 0) return null;
+  const totalBitrate = Math.floor((maxSizeMb * 1024 * 1024 * 8) / durationSec);
+  const videoBitrate = totalBitrate - AUDIO_BITRATE_BPS;
+  if (videoBitrate <= 0) return null;
+  return { videoBitrate, audioBitrate: AUDIO_BITRATE_BPS };
+}
+
+async function encodeMp4(
+  source: string,
+  outDir: string,
+  hasAudio: boolean,
+  durationSec: number | undefined,
+  maxSizeMb: number,
+  logger?: { warn: (msg: string) => void },
+): Promise<void> {
   const audio = hasAudio ? ["-c:a", "aac", "-b:a", "128k"] : ["-an"];
+  const target = calculateTargetBitrate(durationSec, maxSizeMb);
+
+  if (!target) {
+    // CRF fallback: no size guarantee (maxSizeMb === 0 or durationSec unknown).
+    await ffmpeg([
+      "-i",
+      source,
+      "-c:v",
+      "libx264",
+      "-crf",
+      "17",
+      "-preset",
+      "medium",
+      "-profile:v",
+      "high",
+      "-level",
+      "4.0",
+      "-pix_fmt",
+      "yuv420p",
+      ...audio,
+      "-movflags",
+      "+faststart",
+      join(outDir, "progressive.h264.mp4"),
+    ]);
+    return;
+  }
+
+  if (target.videoBitrate < MIN_VIDEO_BITRATE_BPS) {
+    const kbps = Math.round(target.videoBitrate / 1000);
+    logger?.warn(
+      `video.variants.generate: calculated video bitrate ${kbps} kbps is below 200 kbps — ` +
+        `quality will be noticeably degraded. Consider increasing maxSizeMb or shortening the source.`,
+    );
+  }
+
+  const videoBitrateStr = `${Math.round(target.videoBitrate / 1000)}k`;
+  const passLogPrefix = join(outDir, "ffmpeg2pass.log");
+
+  // Pass 1: analysis only (no output file).
   await ffmpeg([
     "-i",
     source,
     "-c:v",
     "libx264",
-    "-crf",
-    "17",
+    "-b:v",
+    videoBitrateStr,
     "-preset",
     "medium",
     "-profile:v",
@@ -224,11 +297,45 @@ async function encodeMp4(source: string, outDir: string, hasAudio: boolean): Pro
     "4.0",
     "-pix_fmt",
     "yuv420p",
+    "-pass",
+    "1",
+    "-passlogfile",
+    passLogPrefix,
+    "-an",
+    "-f",
+    "null",
+    "/dev/null",
+  ]);
+
+  // Pass 2: final encode with audio.
+  await ffmpeg([
+    "-i",
+    source,
+    "-c:v",
+    "libx264",
+    "-b:v",
+    videoBitrateStr,
+    "-preset",
+    "medium",
+    "-profile:v",
+    "high",
+    "-level",
+    "4.0",
+    "-pix_fmt",
+    "yuv420p",
+    "-pass",
+    "2",
+    "-passlogfile",
+    passLogPrefix,
     ...audio,
     "-movflags",
     "+faststart",
     join(outDir, "progressive.h264.mp4"),
   ]);
+
+  // Clean up pass-log files (they are also skipped in the copy loop as a safety net).
+  for (const suffix of ["-0.log", ".log"])
+    await unlink(join(outDir, `ffmpeg2pass${suffix}`)).catch(() => {});
 }
 
 async function encodeWebm(source: string, outDir: string, hasAudio: boolean): Promise<void> {
@@ -370,13 +477,14 @@ async function hashFileForProfile(
   ladder: number[],
   posterTime: number,
   av1: boolean,
+  maxSizeMb: number,
 ): Promise<string> {
   const bytes = await readFile(file);
   return byteHash(
     Buffer.concat([
       bytes,
       Buffer.from(
-        `|${profile}|${ladder.join(",")}|p${posterTime}|av1=${av1}|v${ENCODER_SETTINGS_VERSION}`,
+        `|${profile}|${ladder.join(",")}|p${posterTime}|av1=${av1}|max=${maxSizeMb}|v${ENCODER_SETTINGS_VERSION}`,
       ),
     ]),
   )
@@ -427,6 +535,7 @@ export async function runVideoVariantsGenerate(
           ladder: cfg.ladder ?? "auto",
           posterTime: typeof cfg.posterTime === "number" ? cfg.posterTime : 1,
           av1: cfg.av1 === true,
+          maxSizeMb: typeof cfg.maxSizeMb === "number" ? cfg.maxSizeMb : DEFAULT_MAX_SIZE_MB,
           lang,
           token: token.replace(/\.(mp4|webm)$/i, ""),
           captionLangs: (cfg.captions ?? [])
@@ -523,6 +632,7 @@ export async function runVideoVariantsGenerate(
       ladder,
       ref.posterTime,
       ref.av1,
+      ref.maxSizeMb,
     );
     const cacheDir = join(cacheRoot, hash);
     const publicDir = join(publicVideoDir, ref.lang, ref.token);
@@ -530,7 +640,14 @@ export async function runVideoVariantsGenerate(
 
     if (!(await fileExists(join(cacheDir, ".done")))) {
       await mkdir(cacheDir, { recursive: true });
-      await encodeMp4(ref.sourceAbs, cacheDir, probe.hasAudio);
+      await encodeMp4(
+        ref.sourceAbs,
+        cacheDir,
+        probe.hasAudio,
+        probe.durationSec,
+        ref.maxSizeMb,
+        ctx.logger,
+      );
       await encodeWebm(ref.sourceAbs, cacheDir, probe.hasAudio);
       if (ref.av1) await encodeAv1(ref.sourceAbs, cacheDir, probe.hasAudio);
       await encodePoster(ref.sourceAbs, cacheDir, ref.posterTime);
@@ -549,6 +666,7 @@ export async function runVideoVariantsGenerate(
     await mkdir(publicDir, { recursive: true });
     for (const entry of await readdir(cacheDir, { withFileTypes: true })) {
       if (entry.name === ".done") continue;
+      if (entry.name.startsWith("ffmpeg2pass.log")) continue;
       const s = join(cacheDir, entry.name);
       const d = join(publicDir, entry.name);
       if (entry.isDirectory()) await copyDir(s, d);

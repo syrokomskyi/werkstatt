@@ -18,6 +18,7 @@
   <item>RFC-0210: introduced the unified media playback contract + video manifest types.</item>
   <item>RFC-0525: added av1 field to VideoManifestSources for AV1 progressive delivery.</item>
   <item>RFC-0525: added opt-in av1 boolean to mediaSchema (default false) to skip slow AV1 encoding.</item>
+  <item>RFC-0591: added maxSizeMb field to mediaSchema for two-pass bitrate-capped MP4 encoding.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -78,6 +79,14 @@ export const mediaSchema = z
      * feature videos where AV1 bandwidth savings justify the encoding cost.
      */
     av1: z.boolean().optional(),
+
+    /**
+     * Maximum size of the progressive MP4 file in MiB. When set, MP4 encoding switches
+     * to two-pass with a target bitrate calculated from the source duration. Default: 24
+     * (1 MiB safety margin under Cloudflare's 25 MiB per-asset limit). Set to 0 to disable
+     * two-pass and use CRF 17 (no size guarantee — may exceed the Cloudflare limit).
+     */
+    maxSizeMb: z.number().nonnegative().optional(),
 
     /** Playback behavior (profile-clamped at render: ambient/background force muted+loop, never controls). */
     autoplay: z.boolean().optional(),
