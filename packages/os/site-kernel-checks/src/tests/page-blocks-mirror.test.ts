@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runPageBlocksMirrorValidate } from "../page-blocks-mirror.ts";
-import type { KernelCommandInput } from "@warpgogol/site-kernel";
+import type { CheckResult, KernelCommandInput } from "@warpgogol/site-kernel";
 import { makeTestSiteContext } from "./helpers.ts";
 
 /*
@@ -16,6 +16,10 @@ import { makeTestSiteContext } from "./helpers.ts";
   </purpose>
 </MODULE_CONTRACT>
 */
+
+function diagnosticsOf(result: { data?: unknown }) {
+  return (result.data as CheckResult).diagnostics;
+}
 
 const SYSTEM_MD = `---
 title: Test
@@ -90,7 +94,7 @@ describe("page.blocks.mirror.validate", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.pagesCompared).toBe(1);
+    expect(diagnosticsOf(result)).toEqual([]);
   });
 
   it("fails with MIRROR-01 when localized is missing a block", async () => {
@@ -113,7 +117,7 @@ describe("page.blocks.mirror.validate", () => {
     );
 
     expect(result.exitCode).toBe(1);
-    expect(result.data!.violations.some((v) => v.rule === "MIRROR-01")).toBe(true);
+    expect(diagnosticsOf(result).some((d) => d.ruleId === "MIRROR-01")).toBe(true);
   });
 
   it("fails with MIRROR-01 when block types mismatch", async () => {
@@ -133,7 +137,7 @@ describe("page.blocks.mirror.validate", () => {
     );
 
     expect(result.exitCode).toBe(1);
-    expect(result.data!.violations.some((v) => v.rule === "MIRROR-01")).toBe(true);
+    expect(diagnosticsOf(result).some((d) => d.ruleId === "MIRROR-01")).toBe(true);
   });
 
   it("fails with MIRROR-02 when localized is missing a prop", async () => {
@@ -154,7 +158,11 @@ describe("page.blocks.mirror.validate", () => {
 
     expect(result.exitCode).toBe(1);
     expect(
-      result.data!.violations.some((v) => v.rule === "MIRROR-02" && v.missingProp === "subtitle"),
+      diagnosticsOf(result).some(
+        (d) =>
+          d.ruleId === "MIRROR-02" &&
+          (d as unknown as Record<string, unknown>).missingProp === "subtitle",
+      ),
     ).toBe(true);
   });
 
@@ -176,7 +184,11 @@ describe("page.blocks.mirror.validate", () => {
 
     expect(result.exitCode).toBe(1);
     expect(
-      result.data!.violations.some((v) => v.rule === "MIRROR-03" && v.missingLabelKey === "cancel"),
+      diagnosticsOf(result).some(
+        (d) =>
+          d.ruleId === "MIRROR-03" &&
+          (d as unknown as Record<string, unknown>).missingLabelKey === "cancel",
+      ),
     ).toBe(true);
   });
 
@@ -193,6 +205,6 @@ describe("page.blocks.mirror.validate", () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.pagesCompared).toBe(0);
+    expect(diagnosticsOf(result)).toEqual([]);
   });
 });
