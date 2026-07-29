@@ -528,6 +528,7 @@ export interface MissionReconcileData {
   commitSha: string | null;
   preReconcileSha: string | null;
   reconciledAt: string;
+  autoResolvedPaths?: string[];
 }
 
 export async function runMissionReconcile(
@@ -598,6 +599,7 @@ export async function runMissionReconcile(
     let mergeCommitSha: string | null = null;
     let transferredCommits = 0;
     const copiedPaths: string[] = [];
+    let autoResolvedPaths: string[] = [];
 
     if (!existsSync(path.join(workpieceDir, ".git"))) {
       throw new Error(
@@ -694,6 +696,7 @@ export async function runMissionReconcile(
 
       // Merge with --no-ff to preserve all individual commits and create an explicit merge commit
       const mergeMessage = `reconcile mission ${missionId}`;
+      // RFC-0584: auto-resolve bordbuch/ delete-modify conflicts by keeping cache clone version
       try {
         execSync(`git merge --no-ff FETCH_HEAD -m ${JSON.stringify(mergeMessage)}`, {
           cwd: systemDir,
@@ -701,11 +704,77 @@ export async function runMissionReconcile(
           encoding: "utf-8",
         });
       } catch (err) {
-        throw new Error(
-          `[mission.reconcile] git merge --no-ff failed: ${(err as Error).message}.\n` +
-            `Resolve conflicts in the workpiece (not the cache clone), commit via mission.git.commit, then re-run reconcile.\n` +
-            `Reconcile is idempotent — it will reset the cache clone to preReconcileSha and re-merge.`,
-        );
+        // Check if all conflicts are bordbuch-only (delete/modify)
+        let conflictedPaths: string[] = [];
+        try {
+          const statusOutput = execSync("git status --porcelain", {
+            cwd: systemDir,
+            stdio: "pipe",
+            encoding: "utf-8",
+          });
+          conflictedPaths = statusOutput
+            .split("\n")
+            .filter(
+              (l) =>
+                l.startsWith("DU") ||
+                l.startsWith("UD") ||
+                l.startsWith("AA") ||
+                l.startsWith("UU"),
+            )
+            .map((l) => l.slice(3).trim());
+        } catch {
+          // git status failed — fall through to existing error
+        }
+
+        const allBordbuch =
+          conflictedPaths.length > 0 && conflictedPaths.every((p) => p.startsWith("bordbuch/"));
+
+        if (allBordbuch) {
+          // Auto-resolve: keep cache clone's bordbuch (ours)
+          try {
+            execSync("git checkout --ours bordbuch/", {
+              cwd: systemDir,
+              stdio: "pipe",
+              encoding: "utf-8",
+            });
+            execSync("git add bordbuch/", {
+              cwd: systemDir,
+              stdio: "pipe",
+              encoding: "utf-8",
+            });
+            execSync("git commit --no-edit", {
+              cwd: systemDir,
+              stdio: "pipe",
+              encoding: "utf-8",
+            });
+            autoResolvedPaths = conflictedPaths;
+            logger.info(`  Auto-resolved bordbuch/ conflict (kept cache clone version)`);
+          } catch (resolveErr) {
+            // Auto-resolution failed — abort merge and throw
+            try {
+              execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
+            } catch {
+              // merge --abort also failed — continue to throw
+            }
+            throw new Error(
+              `[mission.reconcile] bordbuch auto-resolution failed: ${(resolveErr as Error).message}.\n` +
+                `Merge has been aborted. Inspect the cache clone state manually.\n` +
+                `Reconcile is idempotent — it will reset the cache clone to preReconcileSha and re-merge.`,
+            );
+          }
+        } else {
+          // Abort merge and throw existing error
+          try {
+            execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
+          } catch {
+            // merge --abort also failed — continue to throw
+          }
+          throw new Error(
+            `[mission.reconcile] git merge --no-ff failed: ${(err as Error).message}.\n` +
+              `Resolve conflicts in the workpiece (not the cache clone), commit via mission.git.commit, then re-run reconcile.\n` +
+              `Reconcile is idempotent — it will reset the cache clone to preReconcileSha and re-merge.`,
+          );
+        }
       }
 
       commitSha = execSync("git rev-parse HEAD", {
@@ -797,6 +866,7 @@ export async function runMissionReconcile(
       transferredCommits,
       message,
       copiedPaths,
+      autoResolvedPaths,
     };
 
     await atomicWriteFile(
@@ -814,6 +884,11 @@ export async function runMissionReconcile(
       `werkstatt: mission.reconcile ${missionId}`,
     );
 
+    const autoResolveSuffix =
+      autoResolvedPaths.length > 0
+        ? `, ${autoResolvedPaths.length} bordbuch conflict${autoResolvedPaths.length > 1 ? "s" : ""} auto-resolved`
+        : "";
+
     return {
       data: {
         missionId,
@@ -821,8 +896,9 @@ export async function runMissionReconcile(
         commitSha,
         preReconcileSha,
         reconciledAt: now,
+        ...(autoResolvedPaths.length > 0 ? { autoResolvedPaths } : {}),
       },
-      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"})`,
+      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix})`,
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);
