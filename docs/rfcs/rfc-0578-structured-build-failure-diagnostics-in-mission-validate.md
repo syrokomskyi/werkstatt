@@ -1,7 +1,7 @@
 ---
 id: RFC-0578
 title: "Structured build failure diagnostics in mission.validate"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -15,8 +15,8 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-28
-updatedAt: 2026-07-28
-implementedAt:
+updatedAt: 2026-07-29
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
@@ -272,11 +272,11 @@ After:
 
 ## Acceptance criteria
 
-- [x] `mission.validate` emits a `BUILD-01` diagnostic when the Astro build fails (evidence: commit <TBD>, mission-materialization-commands.ts:269 buildDiagnostics)
-- [x] The diagnostic includes a `patternId` in `data` identifying the matched pattern (or `"unknown"`) (evidence: commit <TBD>, mission-materialization-commands.ts:133-134)
-- [x] The diagnostic includes an actionable `fixHint` specific to the matched pattern (evidence: commit <TBD>, mission-materialization-commands.ts:87-115 BUILD_FAILURE_PATTERNS fixHints)
-- [x] At least 4 patterns are defined: `enoent-system-manifest`, `module-not-found`, `content-schema-error`, `typescript-error` (evidence: commit <TBD>, mission-materialization-commands.ts:87-116)
-- [x] The raw `build.error` string is preserved in `data.build.error` for backward compatibility (evidence: commit <TBD>, mission-materialization-commands.ts:285)
+- [x] `mission.validate` emits a `BUILD-01` diagnostic when the Astro build fails (evidence: commit cbdf3e8, mission-materialization-commands.ts:269 buildDiagnostics)
+- [x] The diagnostic includes a `patternId` in `data` identifying the matched pattern (or `"unknown"`) (evidence: commit cbdf3e8, mission-materialization-commands.ts:133-134)
+- [x] The diagnostic includes an actionable `fixHint` specific to the matched pattern (evidence: commit cbdf3e8, mission-materialization-commands.ts:87-115 BUILD_FAILURE_PATTERNS fixHints)
+- [x] At least 4 patterns are defined: `enoent-system-manifest`, `module-not-found`, `content-schema-error`, `typescript-error` (evidence: commit cbdf3e8, mission-materialization-commands.ts:87-116)
+- [x] The raw `build.error` string is preserved in `data.build.error` for backward compatibility (evidence: commit cbdf3e8, mission-materialization-commands.ts:285)
 - [x] `rfc.validate` passes on this file (evidence: no RFC-0578 errors in rfc.validate output)
 
 ## Implementation notes for agents
