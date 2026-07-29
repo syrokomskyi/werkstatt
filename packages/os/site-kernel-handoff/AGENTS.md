@@ -34,6 +34,10 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - `deployment.lastPropagated` is per-channel with `releaseId`, `at`, `healthy`, `state`, `operationId`, and `leaseExpiresAt`. Only Leitstand command handlers write this field.
 - `leitstand.status` shows both channels by default; `--channel` filters to one.
 - `leitstand.rollback` requires `--channel`.
+- `DeploymentAdapter` interface declares `getLimits(): DeploymentLimits` (RFC-0587). Each adapter declares its own size limits: `cloudflare-workers` returns 20 GiB total / 25 MiB per-file; `null` returns `Infinity`. `runPreflight` passes the adapter to `checkDistSize` — no hardcoded limits in `leitstand-commands.ts`.
+- `filterEnv` and `sourceDotenv` are exported from `cloudflare-workers.ts` and re-exported from `adapters/index.ts` for reuse by future adapters (RFC-0587).
+- `artifact.store.put` creates a `tar.gz` archive using the `tar` npm package and stores `distArtifactHash` as the archive hash (RFC-0587). It is idempotent: re-running for the same `releaseId` removes any existing manifest before writing the new one. The old tar.gz archive is not removed (content-addressed).
+- `artifactStoreRehydrate` extracts the tar.gz archive to the output directory using `tar` (RFC-0587). Throws if the archive is missing.
 
 ## Notausgang (RFC-0359 / RFC-0380)
 
