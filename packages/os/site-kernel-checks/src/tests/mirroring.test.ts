@@ -69,10 +69,10 @@ describe("mirroring.validate (RFC-0576)", () => {
     expect(diagnosticsOf(result)).toEqual([]);
   });
 
-  it("emits MIRROR-MISSING with error severity for missing default-language page", async () => {
+  it("emits MIRROR-MISSING with warning severity for missing non-default-language page", async () => {
     await writeFile(join(pagesDir, "de", "home.md"), "---\ntitle: Home\n---\n# Home\n");
     await writeFile(join(pagesDir, "en", "home.md"), "---\ntitle: Home\n---\n# Home\n");
-    // uk missing — but de is the default, so missing in de is error
+    // uk missing — non-default language → warning
 
     const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
     const result = await runMirroringValidation(
@@ -81,7 +81,8 @@ describe("mirroring.validate (RFC-0576)", () => {
       "de",
     );
 
-    expect(result.exitCode).toBe(1);
+    // Only warnings (non-default missing) → exitCode 0
+    expect(result.exitCode).toBe(0);
     const diags = diagnosticsOf(result);
     const missingUk = diags.filter((d) => (d.file ?? "").includes("/uk/"));
     expect(missingUk.length).toBeGreaterThan(0);
@@ -115,7 +116,7 @@ describe("mirroring.validate (RFC-0576)", () => {
 
   it("emits fixHint on all MIRROR-MISSING diagnostics", async () => {
     await writeFile(join(pagesDir, "de", "home.md"), "---\ntitle: Home\n---\n# Home\n");
-    // en and uk missing
+    // en and uk missing (non-default) → warnings, exitCode 0
 
     const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
     const result = await runMirroringValidation(
@@ -124,7 +125,8 @@ describe("mirroring.validate (RFC-0576)", () => {
       "de",
     );
 
-    expect(result.exitCode).toBe(1);
+    // Only warnings → exitCode 0
+    expect(result.exitCode).toBe(0);
     const diags = diagnosticsOf(result);
     expect(diags.length).toBeGreaterThan(0);
     expect(diags.every((d) => d.fixHint !== undefined && d.fixHint.length > 0)).toBe(true);
