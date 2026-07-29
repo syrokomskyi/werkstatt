@@ -281,8 +281,8 @@ async function encodeMp4(
   const videoBitrateStr = `${Math.round(target.videoBitrate / 1000)}k`;
   const passLogPrefix = join(outDir, "ffmpeg2pass.log");
 
-  // Pass 1: analysis only (no output file).
-  await ffmpeg([
+  // Shared encoder settings for both passes (RFC-0591).
+  const encoderArgs = [
     "-i",
     source,
     "-c:v",
@@ -297,45 +297,30 @@ async function encodeMp4(
     "4.0",
     "-pix_fmt",
     "yuv420p",
-    "-pass",
-    "1",
     "-passlogfile",
     passLogPrefix,
-    "-an",
-    "-f",
-    "null",
-    "/dev/null",
-  ]);
+  ];
+
+  // Pass 1: analysis only (no output file).
+  await ffmpeg([...encoderArgs, "-pass", "1", "-an", "-f", "null", "/dev/null"]);
 
   // Pass 2: final encode with audio.
   await ffmpeg([
-    "-i",
-    source,
-    "-c:v",
-    "libx264",
-    "-b:v",
-    videoBitrateStr,
-    "-preset",
-    "medium",
-    "-profile:v",
-    "high",
-    "-level",
-    "4.0",
-    "-pix_fmt",
-    "yuv420p",
+    ...encoderArgs,
     "-pass",
     "2",
-    "-passlogfile",
-    passLogPrefix,
     ...audio,
     "-movflags",
     "+faststart",
     join(outDir, "progressive.h264.mp4"),
   ]);
 
-  // Clean up pass-log files (they are also skipped in the copy loop as a safety net).
-  for (const suffix of ["-0.log", ".log"])
-    await unlink(join(outDir, `ffmpeg2pass${suffix}`)).catch(() => {});
+  // Clean up all pass-log files (copy loop also skips them as a safety net).
+  for (const entry of await readdir(outDir, { withFileTypes: true })) {
+    if (entry.name.startsWith("ffmpeg2pass.log")) {
+      await unlink(join(outDir, entry.name)).catch(() => {});
+    }
+  }
 }
 
 async function encodeWebm(source: string, outDir: string, hasAudio: boolean): Promise<void> {

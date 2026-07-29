@@ -16,13 +16,13 @@
 
 import { test, expect } from "vitest";
 import fc from "fast-check";
-import { calculateTargetBitrate } from "./video-variants.ts";
+import { calculateTargetBitrate } from "../video/video-variants.ts";
 
 const AUDIO_BITRATE_BPS = 128_000;
 
 const positiveInput = fc.record({
-  maxSizeMb: fc.float({ min: 0.1, max: 100, noNaN: true }),
-  durationSec: fc.float({ min: 0.1, max: 600, noNaN: true }),
+  maxSizeMb: fc.float({ min: Math.fround(0.1), max: 100, noNaN: true }),
+  durationSec: fc.float({ min: Math.fround(0.1), max: 600, noNaN: true }),
 });
 
 test("PBT: formula correctness — videoBitrate = floor(maxSizeMb * 1024 * 1024 * 8 / durationSec) - 128000", () => {
@@ -47,7 +47,7 @@ test("PBT: monotonicity in maxSizeMb — increasing maxSizeMb never decreases vi
       fc.record({
         durationSec: fc.float({ min: 1, max: 600, noNaN: true }),
         small: fc.float({ min: 1, max: 50, noNaN: true }),
-        delta: fc.float({ min: 0.1, max: 50, noNaN: true }),
+        delta: fc.float({ min: Math.fround(0.1), max: 50, noNaN: true }),
       }),
       ({ durationSec, small, delta }) => {
         const a = calculateTargetBitrate(durationSec, small);
@@ -66,7 +66,7 @@ test("PBT: inverse proportionality to durationSec — increasing durationSec nev
       fc.record({
         maxSizeMb: fc.float({ min: 1, max: 100, noNaN: true }),
         small: fc.float({ min: 1, max: 300, noNaN: true }),
-        delta: fc.float({ min: 0.1, max: 300, noNaN: true }),
+        delta: fc.float({ min: Math.fround(0.1), max: 300, noNaN: true }),
       }),
       ({ maxSizeMb, small, delta }) => {
         const a = calculateTargetBitrate(small, maxSizeMb);
@@ -82,8 +82,8 @@ test("PBT: inverse proportionality to durationSec — increasing durationSec nev
 test("PBT: null on zero or negative maxSizeMb", () => {
   fc.assert(
     fc.property(
-      fc.oneof(fc.constant(0), fc.float({ min: -100, max: -0.1, noNaN: true })),
-      fc.float({ min: 0.1, max: 600, noNaN: true }),
+      fc.oneof(fc.constant(0), fc.float({ min: -100, max: Math.fround(-0.1), noNaN: true })),
+      fc.float({ min: Math.fround(0.1), max: 600, noNaN: true }),
       (maxSizeMb, durationSec) => {
         expect(calculateTargetBitrate(durationSec, maxSizeMb)).toBeNull();
       },
@@ -94,8 +94,8 @@ test("PBT: null on zero or negative maxSizeMb", () => {
 test("PBT: null on zero, negative, or undefined durationSec", () => {
   fc.assert(
     fc.property(
-      fc.float({ min: 0.1, max: 100, noNaN: true }),
-      fc.oneof(fc.constant(0), fc.float({ min: -100, max: -0.1, noNaN: true })),
+      fc.float({ min: Math.fround(0.1), max: 100, noNaN: true }),
+      fc.oneof(fc.constant(0), fc.float({ min: -100, max: Math.fround(-0.1), noNaN: true })),
       (maxSizeMb, durationSec) => {
         expect(calculateTargetBitrate(durationSec, maxSizeMb)).toBeNull();
       },
