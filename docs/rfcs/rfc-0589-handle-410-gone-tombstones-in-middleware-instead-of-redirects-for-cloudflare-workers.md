@@ -1,7 +1,7 @@
 ---
 id: RFC-0589
 title: "Handle 410 Gone tombstones in middleware instead of _redirects for Cloudflare Workers"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,7 +12,8 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
 implementedAt:
