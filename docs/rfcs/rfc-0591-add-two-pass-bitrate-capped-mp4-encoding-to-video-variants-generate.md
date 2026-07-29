@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-07-29
-updatedAt: 2026-07-29
+updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -351,6 +352,12 @@ In `runVideoVariantsGenerate`, `ref.maxSizeMb` is resolved as `cfg.maxSizeMb ?? 
 
 - **`ffprobe` duration missing.** If `ffprobe` fails to report duration, the encoder falls back to CRF 17 without a size guarantee. This is rare (ffprobe reliably reports duration for valid MP4/WebM files) but possible with corrupted sources. The fallback ensures the build does not fail.
 
+- **Duration rounding precision.** The existing `ffprobe` implementation rounds duration to the nearest integer (`Math.round(Number(json.format.duration))`). The bitrate calculation uses this rounded `durationSec`, introducing up to ~0.7% error in the target bitrate. For a 72.5-second video, `durationSec` becomes 73, slightly lowering the bitrate. This is acceptable: the 1 MiB safety margin (24 MiB target vs 25 MiB limit) absorbs this variance, and two-pass libx264 is accurate to 1–2% of the target bitrate, so the actual file size stays within 23.5–24.5 MiB.
+
+- **Stale pass-log on interrupted encode.** If pass 1 succeeds but pass 2 crashes (or the build is interrupted), `ffmpeg2pass.log` remains in the cache dir without a `.done` marker. The next run re-encodes from scratch — pass 1 overwrites the stale log file. This is self-healing: no manual cleanup is needed.
+
+- **Two-pass encoding accuracy.** Two-pass libx264 with `-b:v` targets the average bitrate but the actual file size may deviate by 1–2%. For a 24 MiB target, this means the actual file may be 23.5–24.5 MiB — still under the 25 MiB Cloudflare limit. The 1 MiB safety margin (24 vs 25) accounts for this variance.
+
 - **Cache invalidation.** The `ENCODER_SETTINGS_VERSION` bump from `"4"` to `"5"` invalidates all existing `.cache/video` entries. The first `video.variants.generate` after implementation re-encodes every source. This is expected and correct.
 
 - **Agent misinterpretation.** Agents might think `maxSizeMb` applies to WebM or AV1. The `nonGoals` section and the Design section explicitly state it applies only to progressive MP4. Agents might also think setting `maxSizeMb: 0` is the default — it is not; the default is 24.
@@ -366,6 +373,8 @@ In `runVideoVariantsGenerate`, `ref.maxSizeMb` is resolved as `cfg.maxSizeMb ?? 
 - [ ] `hashFileForProfile` includes `maxSizeMb` in the hash input
 - [ ] `MediaRef` and `RawMediaConfig` carry `maxSizeMb` (default 24)
 - [ ] `runVideoVariantsGenerate` resolves `maxSizeMb` from frontmatter and passes it to `encodeMp4`
+- [ ] The cache→public copy loop skips `ffmpeg2pass.log*` files alongside `.done` (the pass-log file must not be deployed)
+- [ ] `calculateTargetBitrate` is covered by property-based tests (`*.pbt.test.ts`) verifying: `videoBitrate = (maxSizeMb * 1024 * 1024 * 8 / durationSec) - 128000`, monotonicity in `maxSizeMb`, inverse proportionality to `durationSec` (DNA-41)
 - [ ] `rfc.validate` passes on this RFC file
 
 ## Implementation notes for agents

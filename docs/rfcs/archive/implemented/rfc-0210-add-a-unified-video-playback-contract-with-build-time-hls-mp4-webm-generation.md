@@ -21,6 +21,7 @@ amendedBy:
   - RFC-0525
   - RFC-0526
   - RFC-0528
+  - RFC-0591
 related:
   - DNA-04
   - DNA-15

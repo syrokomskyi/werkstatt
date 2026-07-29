@@ -26,6 +26,7 @@ amends:
 amendedBy:
   - RFC-0526
   - RFC-0528
+  - RFC-0591
 related:
   - RFC-0210
   - RFC-0149
