@@ -319,17 +319,17 @@ The `data` field of `ForgeCommandResult` changes for two validators:
 
 ## Acceptance criteria
 
-- [ ] LINK-01, LINK-02, LINK-03 registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`
-- [ ] MIRROR-MISSING registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`
-- [ ] MIRROR-01, MIRROR-02, MIRROR-03 registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts`
-- [ ] `content.links.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with LINK-01..03 ruleIds and fixHints
-- [ ] `mirroring.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-MISSING ruleId and fixHint pointing to source file to copy; default-language missing = error severity, non-default missing = warning severity
-- [ ] `page.blocks.mirror.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-01..03 ruleIds (existing fixHints preserved)
-- [ ] `parseUrl` in `content-links.ts` strips trailing slash for non-root paths before route lookup
-- [ ] `diagnostic.shape.lint` passes for all three migrated validators (DSL-02: registered ruleIds)
-- [ ] `content-links.ts` removed from `dsl04-baseline.generated.yaml` (DSL-04: no longer uses `resultFromViolations` shim)
-- [ ] Existing apps pass validation without changes (trailing slash normalization only reduces false positives)
-- [ ] `rfc.validate` passes on this file
+- [x] LINK-01, LINK-02, LINK-03 registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts` (evidence: commit d09ae3c, lines 498-513)
+- [x] MIRROR-MISSING registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts` (evidence: commit d09ae3c, lines 515-520)
+- [x] MIRROR-01, MIRROR-02, MIRROR-03 registered in `DIAGNOSTIC_RULES` in `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts` (evidence: commit d09ae3c, lines 522-537)
+- [x] `content.links.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with LINK-01..03 ruleIds and fixHints (evidence: commit feb33d0, content-links.ts:303-312)
+- [x] `mirroring.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-MISSING ruleId and fixHint pointing to source file to copy; default-language missing = error severity, non-default missing = warning severity (evidence: commit b74543b, mirroring.ts:124-141)
+- [x] `page.blocks.mirror.validate` emits canonical `Diagnostic[]` via `diagnosticsResult` with MIRROR-01..03 ruleIds (existing fixHints preserved) (evidence: commit b8c4e5a, page-blocks-mirror.ts:274-275)
+- [x] `parseUrl` in `content-links.ts` strips trailing slash for non-root paths before route lookup (evidence: commit feb33d0, content-links.ts:183-185)
+- [x] `diagnostic.shape.lint` passes for all three migrated validators (DSL-02: registered ruleIds) (evidence: no LINK/MIRROR DSL-02 errors in lint output)
+- [x] `content-links.ts` removed from `dsl04-baseline.generated.yaml` (DSL-04: no longer uses `resultFromViolations` shim) (evidence: commit 4bc4e8a)
+- [x] Existing apps pass validation without changes (trailing slash normalization only reduces false positives) (evidence: build:check passes, 14/14 RFC-0576 tests pass)
+- [x] `rfc.validate` passes on this file (evidence: no RFC-0576 errors in rfc.validate output)
 
 ## Implementation notes for agents
 
