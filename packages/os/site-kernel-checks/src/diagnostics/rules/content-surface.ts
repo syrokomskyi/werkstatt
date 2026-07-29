@@ -9,6 +9,7 @@
   <item>RFC-0303 Phase 3: extracted from diagnostics/rules.ts as part of the domain split.</item>
   <item>Register comparative commercial claim rule ids.</item>
   <item>Register article depth rule ids.</item>
+  <item>RFC-0576: Register LINK-01..03, MIRROR-MISSING, MIRROR-01..03 for content.links.validate, mirroring.validate, page.blocks.mirror.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -493,5 +494,42 @@ export const CONTENT_SURFACE_RULES: Record<string, RuleDescriptor> = {
     "VIS-05",
     "Visibility import contains PII or per-user analytics rows",
     "visibility.import",
+  ),
+
+  // content.links.validate (RFC-0576) — internal link and anchor validation.
+  "LINK-01": rule("LINK-01", "Anchor link target not found on page", "content.links.validate"),
+  "LINK-02": rule(
+    "LINK-02",
+    "Same-page anchor must not carry path prefix",
+    "content.links.validate",
+  ),
+  "LINK-03": rule(
+    "LINK-03",
+    "Internal path does not resolve to a known route",
+    "content.links.validate",
+  ),
+
+  // mirroring.validate (RFC-0576) — language mirroring enforcement (DNA-11).
+  "MIRROR-MISSING": rule(
+    "MIRROR-MISSING",
+    "Page missing in a declared language",
+    "mirroring.validate",
+  ),
+
+  // page.blocks.mirror.validate (RFC-0576) — localized block structure comparison.
+  "MIRROR-01": rule(
+    "MIRROR-01",
+    "Localized page block missing or type mismatch vs default-language twin",
+    "page.blocks.mirror.validate",
+  ),
+  "MIRROR-02": rule(
+    "MIRROR-02",
+    "Localized block missing prop vs default-language twin",
+    "page.blocks.mirror.validate",
+  ),
+  "MIRROR-03": rule(
+    "MIRROR-03",
+    "Localized block labels missing key vs default-language twin",
+    "page.blocks.mirror.validate",
   ),
 };
