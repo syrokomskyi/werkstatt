@@ -72,7 +72,7 @@ export function isRouteRedirected(routePath: string, rules: RedirectRule[]): boo
   });
 }
 
-async function collectRoutes(distDir: string): Promise<RouteFact[]> {
+export async function collectRoutes(distDir: string): Promise<RouteFact[]> {
   const routes: RouteFact[] = [];
   if (!existsSync(distDir)) return routes;
 
