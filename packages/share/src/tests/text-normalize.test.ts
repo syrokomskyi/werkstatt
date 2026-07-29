@@ -143,6 +143,25 @@ test("markdown: prose normalized, fenced + inline code protected", () => {
   expect(normalizeMarkdown(input, ALL_ON)).toBe("He-said\n```\nx—y\n```\nand `a—b` end");
 });
 
+// --- CSS < in style block (regression) ---------------------------------------
+
+test("html: CSS media query < in <style> does not trap the skip stack", () => {
+  const input = "<style>@media (width<=768px){.x{color:red}}</style><p>a\u2014b</p>";
+  expect(normalizeHtml(input, ALL_ON)).toBe(
+    "<style>@media (width<=768px){.x{color:red}}</style><p>a-b</p>",
+  );
+});
+
+test("html: text after <style> with CSS < is still normalized", () => {
+  const input =
+    "<style>.a{color:red}@media (width<=768px){.a{color:blue}}</style>" +
+    '<span aria-label="Warpgogol \u2014 Home">link</span>' +
+    "<p>\u0426\u0438\u0444\u0440\u043e\u0432\u0438\u0439 \u0444\u0443\u043d\u0434\u0430\u043c\u0435\u043d\u0442 \u2014 \u043f\u0440\u043e\u0434\u0443\u043a\u0442</p>";
+  const out = normalizeHtml(input, ALL_ON);
+  expect(out).toContain('aria-label="Warpgogol - Home"');
+  expect(out).not.toContain("\u2014");
+});
+
 // --- idempotency -------------------------------------------------------------
 
 test("all transforms are idempotent", () => {

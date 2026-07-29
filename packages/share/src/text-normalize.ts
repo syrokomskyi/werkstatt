@@ -324,7 +324,10 @@ export function normalizeHtml(input: string, cfg: NormalizeConfig): string {
   );
 
   // 2. Tokenize on tags; normalize text segments + whitelisted attributes.
-  const tokens = html.split(/(<[^>]*>)/);
+  // Only match real HTML tags (starting with a letter, /, or !) — not stray <
+  // in CSS like @media (width<=768px) which would swallow the </style> closer
+  // and permanently trap the skip stack.
+  const tokens = html.split(/(<[a-zA-Z/!][^>]*>)/);
   const skipStack: string[] = [];
   const out: string[] = [];
 
@@ -409,7 +412,8 @@ export function normalizeXml(input: string, cfg: NormalizeConfig): string {
   });
 
   // 2. Element text content (between tags). XML attributes rarely carry prose; skip them.
-  const tokens = xml.split(/(<[^>]*>)/);
+  // Only match real XML tags (starting with letter, /, or !) — not stray < in content.
+  const tokens = xml.split(/(<[a-zA-Z/!][^>]*>)/);
   xml = tokens.map((t) => (t.startsWith("<") ? t : normalizeText(t, cfg))).join("");
 
   // 3. Restore CDATA placeholders.
