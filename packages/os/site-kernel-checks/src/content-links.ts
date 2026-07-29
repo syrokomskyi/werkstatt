@@ -11,12 +11,14 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0206: Introduce content link and anchor validation.</item>
+  <item>RFC-0576: Migrate to diagnosticsResult with registered LINK-01..03 ruleIds, add fixHints, normalize parseUrl trailing slashes.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type {
+  Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
@@ -31,7 +33,7 @@ import {
   getContentDisciplinePaths,
   readMarkdownDocument,
 } from "./content-discipline.ts";
-import { resultFromViolations } from "./result-helpers.ts";
+import { diagnosticsResult } from "./result-helpers.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
 const COMMAND = "content.links.validate";
@@ -161,18 +163,29 @@ interface Violation {
   line?: number;
   rule: string;
   message: string;
+  fixHint: string;
 }
 
-/** Parse a URL string into { path, anchor } */
+/** Parse a URL string into { path, anchor }.
+ * RFC-0576: normalizes trailing slashes for non-root paths so that /uk/tsina/
+ * matches route map entry /uk/tsina (localizeUrl produces no trailing slash). */
 function parseUrl(value: string): { path: string | null; anchor: string | null } {
   const hashIndex = value.indexOf("#");
   if (hashIndex === 0) {
     return { path: null, anchor: value };
   }
+  let path: string;
+  let anchor: string | null = null;
   if (hashIndex > 0) {
-    return { path: value.slice(0, hashIndex), anchor: value.slice(hashIndex) };
+    path = value.slice(0, hashIndex);
+    anchor = value.slice(hashIndex);
+  } else {
+    path = value;
   }
-  return { path: value, anchor: null };
+  if (path.length > 1 && path.endsWith("/")) {
+    path = path.slice(0, -1);
+  }
+  return { path, anchor };
 }
 
 export async function runContentLinksValidate(
@@ -288,12 +301,16 @@ export async function runContentLinksValidate(
     }
   }
 
-  const violationMessages = violations.map((v) => {
-    const loc = v.line ? `${v.file}:${v.line}` : v.file;
-    return `${loc} — [${v.rule}] ${v.message}`;
-  });
+  const diagnostics: Diagnostic[] = violations.map((v) => ({
+    ruleId: v.rule,
+    severity: "error" as const,
+    message: v.message,
+    file: v.file,
+    line: v.line,
+    fixHint: v.fixHint,
+  }));
 
-  return resultFromViolations(COMMAND, violationMessages);
+  return diagnosticsResult(COMMAND, diagnostics);
 }
 
 function validateUrl(
@@ -327,6 +344,7 @@ function validateUrl(
         line,
         rule: "LINK-01",
         message: `Anchor "${anchor}" not found on page "${filePageId}" for lang "${lang}". Add to system.md anchor registry or prose heading.`,
+        fixHint: `Anchor "${anchor}" not found on page "${filePageId}". Add the anchor to system.md anchors registry for this page, or add a matching heading in the prose file, or fix the anchor text.`,
       });
     }
     return;
@@ -344,6 +362,7 @@ function validateUrl(
           line,
           rule: "LINK-02",
           message: `Same-page anchor must not carry path prefix. Use "${anchor}" instead of "${value}"`,
+          fixHint: `Same-page anchor must not carry a path or language prefix. Use "${anchor}" instead of "${value}".`,
         });
         return;
       }
@@ -361,6 +380,7 @@ function validateUrl(
             line,
             rule: "LINK-02",
             message: `Same-page anchor must not carry language prefix. Use "${anchor}" instead of "${value}"`,
+            fixHint: `Same-page anchor must not carry a path or language prefix. Use "${anchor}" instead of "${value}".`,
           });
           return;
         }
@@ -375,6 +395,7 @@ function validateUrl(
         line,
         rule: "LINK-03",
         message: `Internal path "${path}" does not resolve to a known route`,
+        fixHint: `Internal path "${path}" does not resolve to a known route. Check the route map in system.md or remove the link.`,
       });
       return;
     }
@@ -391,6 +412,7 @@ function validateUrl(
             line,
             rule: "LINK-01",
             message: `Anchor "${anchor}" not found on target page "${routeEntry.pageId}"`,
+            fixHint: `Anchor "${anchor}" not found on page "${routeEntry.pageId}". Add the anchor to system.md anchors registry for this page, or add a matching heading in the prose file, or fix the anchor text.`,
           });
         }
       }
