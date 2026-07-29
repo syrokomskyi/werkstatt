@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -54,7 +55,7 @@ packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
 successSignals:
   - "release.prepare runs a production build (or reuses mission distribution when build input hash matches) and copies dist into releases/<id>/dist/"
-  - "release.prepare captures production behavior snapshot and copies readable snapshot from mission evidence"
+  - "release.prepare captures production and readable behavior snapshots from the build output and runs behavior.snapshot.diff"
   - "release.prepare computes real distTreeHash, siteContentHash, behaviorSnapshotHash, and readableSnapshotHash — none are sha256:pending"
   - "release.publish refuses to publish a release whose distTreeHash is sha256:pending"
   - "A release without a production dist artifact cannot reach state published"
@@ -62,7 +63,7 @@ nonGoals:
   - Deprecating mission.build — it remains a separate command for preview and testing without creating a release
   - Adding artifact.store.put integration into release.prepare — artifact store is a separate command (RFC-0363)
   - Changing the release id derivation scheme or the six-digit numbering
-  - Adding behavior snapshot diff gating — that is already specified in RFC-0357 §3 and is a separate concern
+  - Migrating existing crypto.createHash usage in behavior-snapshot-commands.ts and artifact-store-commands.ts to @warpgogol/fingerprint — that is a broader DNA-53 conformance concern that predates this RFC and should be addressed in a separate dedicated RFC
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -111,14 +112,14 @@ This creates a **fail-late** pipeline: the error surfaces at deployment time, no
 
 ## Decision
 
-`release.prepare` runs a production build on the mission workpiece (or reuses `missions/<id>/distribution/dist` when the build input hash matches the validated workpiece), captures production and readable behavior snapshots, computes all release hashes via `@warpgogol/fingerprint`, and writes them as real values — never `sha256:pending`. `release.publish` refuses to publish any release whose `distTreeHash` is `sha256:pending`.
+`release.prepare` runs a production build on the mission workpiece (or reuses `missions/<id>/distribution/dist` when the build input hash matches the validated workpiece), captures production and readable behavior snapshots from the build output, runs `behavior.snapshot.diff` between them, computes all release hashes via `@warpgogol/fingerprint`, and writes them as real values — never `sha256:pending`. `release.publish` refuses to publish any release whose `distTreeHash` is `sha256:pending`.
 
 ## Architectural fit
 
 - **DNA-48 (Release discipline)**: Restores the release discipline gate that RFC-0357 specified — a release cannot be published without a hash-verified dist artifact.
 - **DNA-52 (Release artifact store)**: Ensures `distTreeHash` is a real hash, enabling `artifact.store.put` to store a content-addressed record. A pending hash makes artifact store verification meaningless.
 - **DNA-53 (Semantic fingerprint governance)**: All hashes (`distTreeHash`, `siteContentHash`, `behaviorSnapshotHash`, `readableSnapshotHash`) are computed via `@warpgogol/fingerprint`, not ad hoc hashing.
-- **RFC-0357 §6.1**: This RFC restores conformance with the original specification for `release.prepare` steps 4–9 (production build, behavior snapshot capture, hash computation).
+- **RFC-0357 §6.1**: This RFC restores conformance with the original specification for `release.prepare` steps 4–9 (production build, behavior snapshot capture, behavior snapshot diff, hash computation).
 - **RFC-0358 (Leitstand)**: `leitstand.propagate` preflight already checks dist presence — this RFC moves the gate earlier in the pipeline (fail-fast at prepare/publish instead of fail-late at propagate).
 - **Scaling Playbook**: Applies uniformly across all growth stages — every system goes through the same release pipeline regardless of fleet size.
 
@@ -150,10 +151,10 @@ interface ReleasePrepareData {
   state: "prepared";
   snapshotDiffVerdict: "pass" | "fail";
   cSurfaceVerdict: "pass" | "fail" | "skipped";
+  behaviorSnapshotHash: string;   // sha256 of production behavior-snapshot.json
   // Changed from "sha256:pending" to real hash
   distTreeHash: string;           // @warpgogol/fingerprint tree hash of dist/
   siteContentHash: string;        // @warpgogol/fingerprint hash of authored content set
-  behaviorSnapshotHash: string;   // sha256 of behavior-snapshot.json
   readableSnapshotHash: string;   // sha256 of readable-snapshot.json
   buildReused: boolean;            // true if distribution/dist was reused (hash matched)
 }
@@ -166,11 +167,12 @@ interface ReleasePublishData {
   publishedAt: string;
   // New field: dist verification result
   distVerified: boolean;
+  artifactUri: string | null;
 }
 
 // Build input hash for reuse decision
 interface BuildInputHashInput {
-  workpiecePath: string;
+  workpieceTreeHash: string;      // @warpgogol/fingerprint tree hash of workpiece content
   platformVersion: string;
   platformSemanticHash: string;
 }
@@ -181,11 +183,12 @@ interface BuildInputHashInput {
 | Path | Role |
 | --- | --- |
 | `missions/<id>/workpiece/` | Production build source — `astro build` runs here |
+| `missions/<id>/workpiece/dist/` | Build output — used for readable snapshot capture and as production build output |
 | `missions/<id>/distribution/dist/` | Reuse candidate — checked if build input hash matches |
-| `missions/<id>/evidence/` | Source for readable behavior snapshot copy |
 | `releases/<id>/dist/` | Production build output — copied from workpiece or reused distribution |
-| `releases/<id>/behavior-snapshot.json` | Production behavior snapshot — captured from build output |
-| `releases/<id>/readable-snapshot.json` | Readable behavior snapshot — copied from mission evidence |
+| `releases/<id>/behavior-snapshot.json` | Production behavior snapshot — captured from build output via `behavior.snapshot.capture --build-kind production` |
+| `releases/<id>/readable-snapshot.json` | Readable behavior snapshot — captured from the same build output via `behavior.snapshot.capture --build-kind readable` |
+| `releases/<id>/snapshot-diff.json` | Behavior snapshot diff result — produced by `behavior.snapshot.diff` |
 | `releases/<id>/release.yaml` | Release manifest — all hashes written as real values |
 
 `release.prepare` writes all files in the staging directory first, then atomically renames to the final release directory (existing behavior, unchanged).
@@ -234,18 +237,20 @@ interface BuildInputHashInput {
 
 | Condition | Behavior | Exit code |
 | --- | --- | --- |
-| `mission.build` not run and workpiece has no `dist/` | `release.prepare` runs fresh production build | 0 (success) |
-| Production build fails | `release.prepare` throws with build error output | 1 |
+| `mission.build` not run and workpiece has no `dist/` | `release.prepare` runs fresh `astro build`, captures both snapshots, computes hashes | 0 (success) |
+| Production build (`astro build`) fails | `release.prepare` throws with build error output | 1 |
 | `distribution/dist` exists but build input hash mismatch | `release.prepare` runs fresh build (ignores stale distribution) | 0 (success) |
-| `release.publish` with `distTreeHash: sha256:pending` | `release.publish` refuses, returns fail status | 1 |
-| `release.publish` with real `distTreeHash` | `release.publish` proceeds as before | 0 |
+| `distribution/dist` exists and build input hash matches | `release.prepare` reuses distribution, still captures snapshots and computes hashes | 0 (success) |
+| Behavior snapshot diff fails (structural mismatch) | `release.prepare` sets `snapshotDiffVerdict: fail`, writes diff report, exits non-zero | 1 |
 | Behavior snapshot capture fails | `release.prepare` throws with snapshot error | 1 |
+| `release.publish` with `distTreeHash: sha256:pending` | `release.publish` refuses, returns fail status | 1 |
+| `release.publish` with real `distTreeHash` and `snapshotDiffVerdict: pass` | `release.publish` proceeds as before | 0 |
 
 No warning-only paths — all failures are hard failures. A release without a production build is an invalid state and must not be created.
 
 ## Rollout
 
-- **Forward-only, no migration**: Existing releases (r000001–r000003) are deleted. No legacy compatibility, no migration path. The new guards apply to all future `release.prepare` and `release.publish` invocations.
+- **Forward-only, no migration**: Existing releases (r000001–r000003) are deleted manually by the operator before running the new `release.prepare`. No `release.rollback` is needed for unpublished releases; published ones should be rolled back first if they were propagated. The new guards apply to all future `release.prepare` and `release.publish` invocations.
 - **No grace period**: The guard is fail-hard from the first run. There is no `--strict` opt-in — the correct behavior is the only behavior.
 - **New apps**: All new systems automatically comply because `release.prepare` runs the production build itself.
 - **Pipeline integration**: No change to the pipeline order (`release.prepare` → `release.publish` → `leitstand.propagate`). The guards are internal to the existing commands.
@@ -263,7 +268,7 @@ No warning-only paths — all failures are hard failures. A release without a pr
 
 - **Build time in release.prepare**: Running `astro build` inside `release.prepare` adds 30–120 seconds to the command. Mitigated by reuse logic: when `mission.build` already produced a distribution with matching build input hash, the build is skipped.
 - **Build environment dependency**: `release.prepare` now requires a working build environment (Node, pnpm, Astro) on the operator's machine. Previously, `release.prepare` could run without build tooling if dist was pre-built. This is acceptable — the operator must have build tooling to work with the monorepo.
-- **Behavior snapshot capture complexity**: Capturing a production behavior snapshot requires the same infrastructure as `mission.validate`'s snapshot capture. If the snapshot capture logic is not reusable, this RFC requires duplicating or extracting it. Implementation should verify that the existing `behavior.snapshot.capture` command can be invoked from `release.prepare`.
+- **Behavior snapshot capture complexity**: Capturing behavior snapshots reuses the existing `behavior.snapshot.capture` command (in-process call to `runBehaviorSnapshotCapture`). No new infrastructure is needed — the command already accepts `--dist`, `--system`, `--build-kind`, and `--release` flags. `release.prepare` calls it twice: once with `--build-kind readable` and once with `--build-kind production`, both on the same `dist/` output. The readable snapshot is captured from the same build output, not from `mission.validate`'s evidence directory (which does not produce a snapshot file today).
 - **Agent misinterpretation risk**: Agents may attempt to run `release.publish` on releases created by the old `release.prepare` (with pending hashes). The guard will refuse, and the agent should re-run `release.prepare` — not manually edit `release.yaml` to replace `sha256:pending` with a real hash.
 - **False positive rate**: The build input hash comparison for reuse logic must be deterministic. If the hash includes irrelevant inputs (e.g., timestamps), the reuse path never triggers and every `release.prepare` runs a fresh build. The hash should include only the workpiece content tree hash and platform version.
 
@@ -271,8 +276,9 @@ No warning-only paths — all failures are hard failures. A release without a pr
 
 - [ ] `release.prepare` runs `astro build` on the mission workpiece when no reusable distribution exists, producing `releases/<id>/dist/`
 - [ ] `release.prepare` reuses `missions/<id>/distribution/dist/` when build input hash matches the validated workpiece, skipping redundant build
-- [ ] `release.prepare` captures production behavior snapshot into `releases/<id>/behavior-snapshot.json`
-- [ ] `release.prepare` copies readable behavior snapshot from `missions/<id>/evidence/` into `releases/<id>/readable-snapshot.json`
+- [ ] `release.prepare` captures production behavior snapshot into `releases/<id>/behavior-snapshot.json` via `behavior.snapshot.capture --build-kind production`
+- [ ] `release.prepare` captures readable behavior snapshot into `releases/<id>/readable-snapshot.json` via `behavior.snapshot.capture --build-kind readable` on the same build output
+- [ ] `release.prepare` runs `behavior.snapshot.diff` between readable and production snapshots, writes `releases/<id>/snapshot-diff.json`, and sets `snapshotDiffVerdict` from the diff result
 - [ ] `release.prepare` computes `distTreeHash` via `@warpgogol/fingerprint` tree hash — never `sha256:pending`
 - [ ] `release.prepare` computes `siteContentHash` via `@warpgogol/fingerprint` — never `sha256:pending`
 - [ ] `release.prepare` computes `behaviorSnapshotHash` and `readableSnapshotHash` — never `sha256:pending`
