@@ -10,4 +10,4 @@
 </CHANGE_SUMMARY>
 */
 
-export { createCloudflareWorkersAdapter } from "./cloudflare-workers.ts";
+export { createCloudflareWorkersAdapter, filterEnv, sourceDotenv } from "./cloudflare-workers.ts";

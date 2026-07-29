@@ -9,6 +9,7 @@
   <item>RFC-0358: initial leitstand command handlers.</item>
   <item>RFC-0379: channel model — alt/main channels, preflight, resolveAdapter throws for unimplemented, per-channel lastPropagated with operational state, --channel flag on all commands.</item>
   <item>RFC-0379 post-review: complete preflight (artifact hash, wrangler availability, dist size limit); add artifact-store rehydration for propagate and rollback.</item>
+  <item>RFC-0587: adapter-declared size limits via getLimits() passed through runPreflight to checkDistSize; remove hardcoded limit constants.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,7 +32,13 @@ import type {
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
-import type { DeploymentAdapter, PropagateInput, RollbackInput, HealthInput } from "./adapter.ts";
+import type {
+  DeploymentAdapter,
+  DeploymentLimits,
+  PropagateInput,
+  RollbackInput,
+  HealthInput,
+} from "./adapter.ts";
 import { createCloudflareWorkersAdapter } from "./adapters/index.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 
@@ -76,6 +83,9 @@ const nullAdapter: DeploymentAdapter = {
   },
   async health(_input: HealthInput) {
     return { state: "unknown" as const, checks: [] };
+  },
+  getLimits() {
+    return { maxTotalSize: Infinity, maxFileSize: Infinity };
   },
 };
 
@@ -132,6 +142,7 @@ async function runPreflight(
   dep: DeploymentConfig,
   channel: Channel,
   channelConfig: DeploymentChannel,
+  adapter: DeploymentAdapter,
   missionId?: string,
 ): Promise<PreflightCheck[]> {
   const checks: PreflightCheck[] = [];
@@ -202,9 +213,9 @@ async function runPreflight(
     detail: wranglerCheck.detail,
   });
 
-  // 6. Dist size within Workers static-assets limits (25 MiB per Worker)
+  // 6. Dist size within adapter-declared limits
   if (existsSync(distPath)) {
-    const sizeCheck = await checkDistSize(distPath);
+    const sizeCheck = await checkDistSize(distPath, adapter.getLimits());
     checks.push({
       name: "dist-size-limit",
       passed: sizeCheck.withinLimit,
@@ -253,9 +264,10 @@ async function checkWranglerAvailable(
   }
 }
 
-async function checkDistSize(distPath: string): Promise<{ withinLimit: boolean; detail: string }> {
-  const STATIC_ASSETS_LIMIT = 20 * 1024 * 1024 * 1024;
-  const PER_FILE_LIMIT = 25 * 1024 * 1024;
+async function checkDistSize(
+  distPath: string,
+  limits: DeploymentLimits,
+): Promise<{ withinLimit: boolean; detail: string }> {
   let totalSize = 0;
   let largestFile = 0;
   let largestFilePath = "";
@@ -268,16 +280,18 @@ async function checkDistSize(distPath: string): Promise<{ withinLimit: boolean; 
       largestFilePath = file;
     }
   }
-  const sizeWithinLimit = totalSize <= STATIC_ASSETS_LIMIT;
-  const perFileWithinLimit = largestFile <= PER_FILE_LIMIT;
+  const sizeWithinLimit = totalSize <= limits.maxTotalSize;
+  const perFileWithinLimit = largestFile <= limits.maxFileSize;
   const withinLimit = sizeWithinLimit && perFileWithinLimit;
+  const totalLimitMiB = limits.maxTotalSize / 1024 / 1024;
+  const fileLimitMiB = limits.maxFileSize / 1024 / 1024;
   return {
     withinLimit,
     detail: withinLimit
-      ? `Dist size ${(totalSize / 1024 / 1024).toFixed(2)} MiB within 20 GiB static-assets limit`
+      ? `Dist size ${(totalSize / 1024 / 1024).toFixed(2)} MiB within ${totalLimitMiB.toFixed(0)} MiB total limit`
       : !sizeWithinLimit
-        ? `Dist size ${(totalSize / 1024 / 1024 / 1024).toFixed(2)} GiB exceeds 20 GiB static-assets limit`
-        : `Largest file ${largestFilePath} (${(largestFile / 1024 / 1024).toFixed(2)} MiB) exceeds 25 MiB per-file limit`,
+        ? `Dist size ${(totalSize / 1024 / 1024).toFixed(2)} MiB exceeds ${totalLimitMiB.toFixed(0)} MiB total limit`
+        : `Largest file ${largestFilePath} (${(largestFile / 1024 / 1024).toFixed(2)} MiB) exceeds ${fileLimitMiB.toFixed(0)} MiB per-file limit`,
   };
 }
 
@@ -374,6 +388,7 @@ export async function runLeitstandPropagate(
       dep,
       channel,
       channelConfig,
+      adapter,
       releaseManifest.missionId as string | undefined,
     );
     const preflightPassed = preflightChecks.every((c) => c.passed);

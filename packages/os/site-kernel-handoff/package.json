@@ -116,6 +116,7 @@
     "@warpgogol/site-kernel-integrity": "workspace:*",
     "@warpgogol/site-kernel-onboarding": "workspace:*",
     "@warpgogol/surface": "workspace:*",
+    "tar": "^7.4.3",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

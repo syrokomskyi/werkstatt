@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0363: initial artifact store command handlers.</item>
+  <item>RFC-0587: tar.gz archive creation, idempotent manifest storage, rehydrate extraction.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -14,6 +15,7 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { create as tarCreate, extract as tarExtract } from "tar";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -74,6 +76,7 @@ export interface ArtifactStorePutData {
   distArtifactHash: string;
   distTreeHash: string;
   siteContentHash: string;
+  archivePath: string;
   byteSize: number;
   fileCount: number;
   uri: string;
@@ -109,12 +112,51 @@ export async function runArtifactStorePut(
 
   try {
     const { treeHash, fileCount, byteSize } = await hashDir(distDir);
-    const distArtifactHash = treeHash;
 
-    // For MVP, we store a manifest alongside the dist directory reference
-    // A full implementation would create a tar.gz archive
+    // Create tar.gz archive of the dist directory
+    const archiveTmpPath = path.join(
+      workspaceRoot,
+      ARTIFACTS_DIR,
+      "tmp",
+      `${releaseId}-${Date.now()}.tar.gz`,
+    );
+    await fs.mkdir(path.dirname(archiveTmpPath), { recursive: true });
+
+    await tarCreate(
+      {
+        gzip: true,
+        file: archiveTmpPath,
+        cwd: distDir,
+      },
+      ["."],
+    );
+
+    const archiveBuffer = await fs.readFile(archiveTmpPath);
+    const archiveHash = `sha256:${crypto.createHash("sha256").update(archiveBuffer).digest("hex")}`;
+    const distArtifactHash = archiveHash;
+
+    // Move archive to content-addressed path
     const storeDir = hashPath(workspaceRoot, distArtifactHash);
     await fs.mkdir(storeDir, { recursive: true });
+    const archivePath = path.join(storeDir, `${distArtifactHash}.tar.gz`);
+    await fs.rename(archiveTmpPath, archivePath);
+
+    // Clean up tmp dir if empty
+    const tmpDir = path.dirname(archiveTmpPath);
+    try {
+      await fs.rmdir(tmpDir);
+    } catch {
+      // not empty or already removed — fine
+    }
+
+    // Idempotent: remove any existing manifest for this releaseId before writing new one
+    const existing = await findArtifactManifest(workspaceRoot, releaseId);
+    if (
+      existing &&
+      existing.manifestPath !== path.join(storeDir, `${distArtifactHash}.manifest.json`)
+    ) {
+      await fs.unlink(existing.manifestPath).catch(() => {});
+    }
 
     const now = new Date().toISOString();
     const manifest = {
@@ -131,6 +173,7 @@ export async function runArtifactStorePut(
         : "sha256:unspecified",
       distTreeHash: treeHash,
       distArtifactHash,
+      archivePath: path.relative(workspaceRoot, archivePath),
       behaviorSnapshotHash: null,
       readableSnapshotHash: null,
       snapshotDiffHash: null,
@@ -149,6 +192,7 @@ export async function runArtifactStorePut(
         distArtifactHash,
         distTreeHash: treeHash,
         siteContentHash: manifest.siteContentHash,
+        archivePath: manifest.archivePath,
         byteSize,
         fileCount,
         uri: `local://${manifestPath}`,
@@ -370,8 +414,23 @@ export async function artifactStoreRehydrate(
     throw new Error(`[artifact.store] no artifact found for release ${releaseId}`);
   }
 
+  const archiveRel = found.manifest.archivePath as string | undefined;
+  if (!archiveRel) {
+    throw new Error(`[artifact.store] no archive path in manifest for release ${releaseId}`);
+  }
+
+  const archivePath = path.resolve(workspaceRoot, archiveRel);
+  if (!existsSync(archivePath)) {
+    throw new Error(`[artifact.store] archive not found for release ${releaseId}: ${archivePath}`);
+  }
+
   const resolved = path.resolve(workspaceRoot, outputDir);
   await fs.mkdir(resolved, { recursive: true });
+
+  await tarExtract({
+    file: archivePath,
+    cwd: resolved,
+  });
 
   return {
     verified: true,

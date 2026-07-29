@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0379: initial cloudflare-workers adapter with injectable CommandRunner, secretsFile resolution, deterministic health probes.</item>
+  <item>RFC-0587: export filterEnv and sourceDotenv; add getLimits() for adapter-declared size limits.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,7 +26,7 @@ import type {
   HealthInput,
 } from "../adapter.ts";
 
-function filterEnv(env: Record<string, string | undefined>): Record<string, string> {
+export function filterEnv(env: Record<string, string | undefined>): Record<string, string> {
   const result: Record<string, string> = {};
   for (const [key, value] of Object.entries(env)) {
     if (value !== undefined) {
@@ -58,7 +59,7 @@ function createDefaultCommandRunner(): CommandRunner {
     });
 }
 
-async function sourceDotenv(filePath: string): Promise<Record<string, string>> {
+export async function sourceDotenv(filePath: string): Promise<Record<string, string>> {
   const env: Record<string, string> = {};
   if (!existsSync(filePath)) return env;
   const content = await fs.readFile(filePath, "utf8");
@@ -222,6 +223,10 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         completedAt: new Date().toISOString(),
         healthChecks: [],
       };
+    },
+
+    getLimits() {
+      return { maxTotalSize: 20 * 1024 * 1024 * 1024, maxFileSize: 25 * 1024 * 1024 };
     },
 
     async health(

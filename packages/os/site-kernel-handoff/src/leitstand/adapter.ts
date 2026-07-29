@@ -9,6 +9,7 @@
   <item>RFC-0358: initial deployment adapter interface.</item>
   <item>RFC-0379: channel model — replace target/credentials with channel/workerName/url/secretsFilePath; add CommandRunner type.</item>
   <item>RFC-0585: add nodeModulesBinPath to PropagateInput/RollbackInput for wrangler resolution from dist/server/.</item>
+  <item>RFC-0587: add DeploymentLimits interface and getLimits() method for adapter-declared size limits.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -52,6 +53,11 @@ export interface HealthInput {
   workspaceRoot: string;
 }
 
+export interface DeploymentLimits {
+  maxTotalSize: number;
+  maxFileSize: number;
+}
+
 export interface DeploymentAdapter {
   name: string;
   propagate(input: PropagateInput): Promise<PropagationResult>;
@@ -59,4 +65,5 @@ export interface DeploymentAdapter {
   health(
     input: HealthInput,
   ): Promise<{ state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] }>;
+  getLimits(): DeploymentLimits;
 }
