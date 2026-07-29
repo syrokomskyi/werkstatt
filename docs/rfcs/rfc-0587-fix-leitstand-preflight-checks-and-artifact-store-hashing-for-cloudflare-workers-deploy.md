@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -79,37 +80,49 @@ nonGoals:
 
 ## Context
 
-The first real-world Cloudflare Workers propagation of `warpgogol-com-r000001` revealed seven distinct bugs in the Leitstand preflight checks and artifact store. Each bug independently blocked the deployment pipeline and required manual intervention. DNA-49 (Fleet propagation) and DNA-52 (Release artifact store) define the contracts these commands enforce, but the implementation contained errors that prevented the contracts from being upheld:
+The first real-world Cloudflare Workers propagation of `warpgogol-com-r000001` revealed seven distinct bugs in the Leitstand preflight checks and artifact store. Six of these were fixed as hotfixes directly in the codebase during the deployment attempt; this RFC formalizes those fixes and adds two remaining design improvements that were not yet implemented: tar.gz archive creation in `artifact.store.put` and adapter-declared size limits via `getLimits()`.
 
-- `artifact.store.put` called `fs.readFile(distDir)` on a directory, causing `EISDIR`.
+DNA-49 (Fleet propagation) and DNA-52 (Release artifact store) define the contracts these commands enforce. The hotfixed bugs and the remaining design gaps prevented the contracts from being fully upheld:
+
+**Already fixed as hotfixes (formalized by this RFC):**
+
 - `findArtifactManifest` returned the first manifest found (oldest), not the latest, causing hash mismatches after re-runs.
-- `checkWranglerAvailable` ran `npx wrangler` without `--yes` and without the workpiece `node_modules/.bin` in `PATH`, failing to resolve wrangler.
-- `checkDistSize` applied the 25 MiB Workers script limit to the entire dist directory (330 MiB of static assets), using the wrong limit type.
-- The Cloudflare Workers adapter ran `pnpm exec wrangler` from `dist/server/` which has no `package.json`.
-- `process.env` spread into a `Record<string, string>` caused type errors when `undefined` values were present.
-- The adapter silently swallowed wrangler deploy `stdout`/`stderr` on failure, making debugging impossible.
+- `checkWranglerAvailable` ran `npx wrangler` without `--yes` and without the workpiece `node_modules/.bin` in `PATH` — fixed to use `npx --yes wrangler` with PATH injection.
+- `checkDistSize` applied the 25 MiB Workers script limit to the entire dist directory (330 MiB of static assets) — fixed to use 20 GiB total / 25 MiB per-file limits.
+- The Cloudflare Workers adapter ran `pnpm exec wrangler` from `dist/server/` — fixed to use `npx --yes wrangler deploy` from `distPath`.
+- `process.env` spread into `Record<string, string>` caused type errors — fixed via `filterEnv` helper.
+- The adapter silently swallowed wrangler deploy `stdout`/`stderr` on failure — fixed to log both to `console.error`.
+- `sourceDotenv` did not filter comments and empty lines — fixed to skip `#` and empty lines.
+
+**Not yet implemented (this RFC's new work):**
+
+- `artifact.store.put` stores `distArtifactHash` as the tree hash, not a tar.gz archive hash. No durable archive is created for restoration.
+- `checkDistSize` uses hardcoded limits in `leitstand-commands.ts` instead of adapter-declared limits, making it platform-specific.
 
 ## Problem
 
-DNA-49 requires preflight checks to verify dist size, wrangler availability, and artifact integrity before deployment. DNA-52 requires content-addressed artifact storage with hash verification. The current implementation fails to uphold these invariants:
+DNA-49 requires preflight checks to verify dist size, wrangler availability, and artifact integrity before deployment. DNA-52 requires content-addressed artifact storage with hash verification. Six bugs were fixed as hotfixes during the first deployment attempt; two design gaps remain:
 
-1. **`artifact.store.put` EISDIR** (`packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts:111`): `fs.readFile(distDir)` on a directory crashes. The workaround uses `treeHash` as `distArtifactHash`, but the original design intended a `tar.gz` archive hash.
+1. **No tar.gz archive** (`packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts:111-112`): `artifact.store.put` sets `distArtifactHash = treeHash` and stores only a JSON manifest. No durable archive is created. `artifactStoreRehydrate` (`artifact-store-commands.ts:363-380`) creates an empty directory without restoring any content. DNA-52's "durable, content-addressed records" contract is not fully upheld because there is no archive to restore from.
 
-2. **Duplicate artifact manifests** (`artifact-store-commands.ts:307`): `findArtifactManifest` scans `sha256/*/*.manifest.json` and returns the first match by `releaseId`. Multiple `artifact.store.put` runs create multiple manifests, and the first (oldest) is returned, causing preflight hash mismatches.
+2. **Duplicate artifact manifests** (`artifact-store-commands.ts:307-331`): `findArtifactManifest` scans `sha256/*/*.manifest.json` and returns the first match by `releaseId`. If the dist content changes between `artifact.store.put` runs (different tree hash → different manifest directory), multiple manifests for the same release exist, and the first found (not necessarily the latest) is returned, causing preflight hash mismatches.
 
-3. **Wrangler resolution failure** (`leitstand-commands.ts:218`): `checkWranglerAvailable` ran `npx wrangler` without `--yes` and without the workpiece `node_modules/.bin` in `PATH`. The adapter ran `pnpm exec wrangler` from `dist/server/` which has no `package.json`.
+3. **Hardcoded dist size limits** (`leitstand-commands.ts:256-282`): `checkDistSize` hardcodes `20 * 1024 * 1024 * 1024` and `25 * 1024 * 1024` directly in the function body. Each platform (Cloudflare Workers, Netlify, Vercel) has different limits. The limits should be declared by the adapter via a `getLimits()` method and passed through `runPreflight` to `checkDistSize`.
 
-4. **Wrong dist size limit** (`leitstand-commands.ts:228`): `checkDistSize` used `25 * 1024 * 1024` (25 MiB Workers script limit) instead of the 20 GiB static assets limit. A 330 MiB dist directory falsely failed preflight.
+4. **Unexported helpers** (`adapters/cloudflare-workers.ts:28,61`): `filterEnv` and `sourceDotenv` are module-private. Other adapters (netlify, vercel) would need to duplicate them. They should be exported for reuse.
 
-5. **Silent deploy failures** (`adapters/cloudflare-workers.ts:165`): The adapter caught wrangler deploy errors but did not log `stdout`/`stderr`, making it impossible to diagnose deployment failures.
+**Already fixed as hotfixes (formalized, not re-implemented by this RFC):**
 
-6. **`process.env` type error** (`adapters/cloudflare-workers.ts:139`): Spreading `process.env` into `Record<string, string>` fails when `undefined` values are present.
-
-7. **Secrets file parsing** (`adapters/cloudflare-workers.ts:139`): The `sourceDotenv` helper did not filter comments (`#`) and empty lines, polluting environment variables passed to wrangler.
+- `checkWranglerAvailable` now uses `npx --yes wrangler` with workpiece `node_modules/.bin` in `PATH` (`leitstand-commands.ts:218-254`).
+- `checkDistSize` now uses 20 GiB total / 25 MiB per-file limits (`leitstand-commands.ts:256-282`).
+- Adapter uses `npx --yes wrangler deploy` from `distPath` (`cloudflare-workers.ts:155-163`).
+- `filterEnv` filters `undefined` from `process.env` (`cloudflare-workers.ts:28-36`).
+- Adapter logs `stdout`/`stderr` on deploy failure (`cloudflare-workers.ts:165-168`).
+- `sourceDotenv` skips comments and empty lines (`cloudflare-workers.ts:65-67`).
 
 ## Decision
 
-The `artifact.store.put`, `leitstand.propagate`, and the `cloudflare-workers` adapter gain correctness fixes: `artifact.store.put` creates a `tar.gz` archive and is idempotent per release; `findArtifactManifest` returns the single manifest for a release; `checkWranglerAvailable` uses `npx --yes wrangler` with workpiece `node_modules/.bin` in `PATH`; `checkDistSize` uses adapter-declared size limits; the adapter logs `stdout`/`stderr` on deploy failure; `process.env` is filtered for `undefined` values; and `sourceDotenv` strips comments and empty lines.
+The `artifact.store.put` command gains tar.gz archive creation and idempotent manifest storage. The `DeploymentAdapter` interface gains a `getLimits()` method for adapter-declared size limits, passed through `runPreflight` to `checkDistSize`. `filterEnv` and `sourceDotenv` are exported from the cloudflare-workers adapter module for reuse by future adapters. `artifactStoreRehydrate` extracts the tar.gz archive during restoration. This RFC formalizes six already-applied hotfixes (wrangler resolution, dist size limits, adapter command execution, env filtering, error logging, dotenv parsing) without re-implementing them.
 
 ## Architectural fit
 
@@ -163,12 +176,13 @@ interface PropagateInput {
   nodeModulesBinPath?: string;
 }
 
-// artifact.store.put — idempotent, creates tar.gz
+// artifact.store.put — idempotent, creates tar.gz; retains siteContentHash
 interface ArtifactStorePutData {
   releaseId: string;
   systemId: string;
   distArtifactHash: string;   // sha256 of tar.gz archive
   distTreeHash: string;       // tree hash of dist directory
+  siteContentHash: string;    // sha256 of site content (unchanged from current)
   archivePath: string;        // path to tar.gz in artifact store
   byteSize: number;
   fileCount: number;
@@ -176,21 +190,38 @@ interface ArtifactStorePutData {
   createdAt: string;
 }
 
-// filterEnv helper — filters undefined from process.env
-function filterEnv(env: Record<string, string | undefined>): Record<string, string>;
+// filterEnv helper — filters undefined from process.env (exported)
+export function filterEnv(env: Record<string, string | undefined>): Record<string, string>;
 
-// sourceDotenv — strips comments (#) and empty lines
-function sourceDotenv(filePath: string): Record<string, string>;
+// sourceDotenv — strips comments (#) and empty lines (exported, async)
+export async function sourceDotenv(filePath: string): Promise<Record<string, string>>;
+
+// runPreflight gains adapter parameter for limit resolution
+async function runPreflight(
+  workspaceRoot: string,
+  releaseId: string,
+  dep: DeploymentConfig,
+  channel: Channel,
+  channelConfig: DeploymentChannel,
+  adapter: DeploymentAdapter,  // new parameter
+  missionId?: string,
+): Promise<PreflightCheck[]>;
+
+// checkDistSize uses adapter limits instead of hardcoded values
+async function checkDistSize(
+  distPath: string,
+  limits: DeploymentLimits,  // new parameter
+): Promise<{ withinLimit: boolean; detail: string }>;
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts` | `runArtifactStorePut` creates tar.gz, idempotent manifest; `findArtifactManifest` returns single manifest |
-| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `checkWranglerAvailable` uses npx --yes with PATH; `checkDistSize` uses adapter limits |
-| `packages/os/site-kernel-handoff/src/leitstand/adapter.ts` | `DeploymentAdapter` interface gains `getLimits()` |
-| `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts` | `filterEnv`, `sourceDotenv` fix, error logging |
+| `packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts` | `runArtifactStorePut` creates tar.gz, idempotent manifest; `findArtifactManifest` returns single manifest; `artifactStoreRehydrate` extracts tar.gz |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `runPreflight` receives adapter and passes limits to `checkDistSize`; `checkDistSize` uses adapter-declared limits |
+| `packages/os/site-kernel-handoff/src/leitstand/adapter.ts` | `DeploymentAdapter` interface gains `getLimits(): DeploymentLimits` |
+| `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts` | Export `filterEnv` and `sourceDotenv`; `getLimits()` returns 20 GiB / 25 MiB |
 | `.werkstatt/artifacts/releases/sha256/<prefix>/<hash>.tar.gz` | tar.gz archive written by `artifact.store.put` |
 | `.werkstatt/artifacts/releases/sha256/<prefix>/<hash>.manifest.json` | Single manifest per release (idempotent) |
 
@@ -227,20 +258,22 @@ function sourceDotenv(filePath: string): Record<string, string>;
 ### Failure modes
 
 - **`artifact.store.put` on missing dist**: Throws `dist directory not found` (unchanged).
-- **`artifact.store.put` idempotent overwrite**: If a manifest for the same `releaseId` exists, it is removed before writing the new one. The old tar.gz archive is NOT removed (content-addressed — may be referenced by other releases).
-- **`checkWranglerAvailable` failure**: Preflight check fails with `wrangler --version exited non-zero: <stderr>`. Deployment is blocked.
-- **`checkDistSize` failure**: Reports which limit was exceeded (total vs per-file) with the offending file path for per-file violations.
-- **Adapter deploy failure**: Logs full `stdout` and `stderr` to `console.error` before returning `succeeded: false`. Does not re-throw.
-- **`sourceDotenv` on missing file**: Returns empty object (unchanged). Does not throw.
-- **`filterEnv` with all-undefined**: Returns empty object. Does not throw.
+- **`artifact.store.put` idempotent overwrite**: If a manifest for the same `releaseId` exists in a different hash directory, it is removed before writing the new one. The old tar.gz archive is NOT removed (content-addressed — may be referenced by other releases). The existing lock at `artifact-store-commands.ts:102-108` (scope `release:${releaseId}`) prevents concurrent puts for the same release.
+- **`artifactStoreRehydrate` on missing archive**: If the tar.gz archive does not exist but the manifest is found, throws `archive not found for release <id>`. Does not silently create an empty directory.
+- **`checkWranglerAvailable` failure**: Preflight check fails with `wrangler --version exited non-zero: <stderr>`. Deployment is blocked. (Already fixed as hotfix.)
+- **`checkDistSize` failure**: Reports which limit was exceeded (total vs per-file) with the offending file path for per-file violations. Limits come from `adapter.getLimits()`.
+- **Adapter deploy failure**: Logs full `stdout` and `stderr` to `console.error` before returning `succeeded: false`. Does not re-throw. (Already fixed as hotfix.)
+- **`sourceDotenv` on missing file**: Returns empty object (unchanged). Does not throw. (Already fixed as hotfix — skips comments and empty lines.)
+- **`filterEnv` with all-undefined**: Returns empty object. Does not throw. (Already fixed as hotfix.)
 
 ## Rollout
 
-- **Default behavior**: All fixes are active immediately upon implementation. No feature flags, no grace period — the current behavior is broken and blocks deployment.
-- **Existing releases**: Releases already in the artifact store with tree-hash manifests remain valid. The next `artifact.store.put` for the same release overwrites the manifest with a tar.gz-based one.
+- **Default behavior**: The new tar.gz archive creation and adapter-declared limits are active immediately upon implementation. No feature flags, no grace period.
+- **Existing releases**: Old manifests with tree-hash-based `distArtifactHash` remain findable by `findArtifactManifest` (which searches by `releaseId`, not by hash scheme). `artifactStorePreflight` verifies `distTreeHash` (unchanged field), so old manifests remain compatible. The next `artifact.store.put` for the same release overwrites the manifest with a tar.gz-based one and removes the old manifest. Old tar.gz archives are not created for existing releases — only new `put` runs create them.
 - **New releases**: Automatically use tar.gz archive hashing and idempotent manifest storage from day one.
 - **Adapter limits**: The `null` adapter declares `maxTotalSize: Infinity` and `maxFileSize: Infinity`. The `cloudflare-workers` adapter declares `maxTotalSize: 20 GiB` and `maxFileSize: 25 MiB`.
 - **Pipeline integration**: No pipeline changes. `release.publish` → `artifact.store.put` → `leitstand.propagate` flow is unchanged; only the internal implementations are fixed.
+- **Hotfixed bugs**: Six bugs were fixed as hotfixes during the first deployment attempt and are already in the codebase. This RFC formalizes them; no re-implementation is needed for those six.
 
 ## Alternatives considered
 
@@ -264,14 +297,30 @@ function sourceDotenv(filePath: string): Record<string, string>;
 
 ## Acceptance criteria
 
+### New work (this RFC implements)
+
 - [ ] `artifact.store.put` creates a `tar.gz` archive and stores `distArtifactHash` as the archive hash (evidence: `artifact-store-commands.ts:<line>`, `artifact.store.put --json` output contains `archivePath`)
-- [ ] `artifact.store.put` is idempotent: re-running for the same `releaseId` overwrites the existing manifest, not creates a duplicate (evidence: only one `.manifest.json` file exists for a release after multiple `put` runs)
-- [ ] `findArtifactManifest` returns the single manifest for a release (evidence: `artifact-store-commands.ts:<line>`, no duplicate manifests in `.werkstatt/artifacts/releases/`)
-- [ ] `checkWranglerAvailable` uses `npx --yes wrangler` with workpiece `node_modules/.bin` in `PATH` (evidence: `leitstand-commands.ts:<line>`, preflight passes when wrangler is in workpiece `node_modules`)
-- [ ] `checkDistSize` uses adapter-declared limits via `adapter.getLimits()` (evidence: `leitstand-commands.ts:<line>`, `cloudflare-workers.ts:<line>` declares `maxTotalSize: 20 GiB`, `maxFileSize: 25 MiB`)
-- [ ] Adapter logs `stdout` and `stderr` on wrangler deploy failure (evidence: `cloudflare-workers.ts:<line>`, `console.error` call in failure path)
-- [ ] `filterEnv` helper filters `undefined` values from `process.env` (evidence: `cloudflare-workers.ts:<line>`)
-- [ ] `sourceDotenv` strips comments (`#`) and empty lines (evidence: `cloudflare-workers.ts:<line>`)
+- [ ] `artifact.store.put` is idempotent: re-running for the same `releaseId` removes any existing manifest for that release before writing the new one (evidence: only one `.manifest.json` file exists for a release after multiple `put` runs with different dist content)
+- [ ] `artifactStoreRehydrate` extracts the tar.gz archive to the output directory (evidence: `artifact-store-commands.ts:<line>`, files present after rehydration)
+- [ ] `DeploymentAdapter` interface has `getLimits(): DeploymentLimits` method (evidence: `adapter.ts:<line>`)
+- [ ] `checkDistSize` receives limits from `adapter.getLimits()` via `runPreflight` parameter pass-through (evidence: `leitstand-commands.ts:<line>`, no hardcoded limit constants in `checkDistSize`)
+- [ ] `cloudflare-workers` adapter `getLimits()` returns `maxTotalSize: 20 * 1024**3`, `maxFileSize: 25 * 1024**2` (evidence: `cloudflare-workers.ts:<line>`)
+- [ ] `null` adapter `getLimits()` returns `maxTotalSize: Infinity`, `maxFileSize: Infinity` (evidence: `leitstand-commands.ts:<line>`)
+- [ ] `filterEnv` is exported from `cloudflare-workers.ts` (evidence: `export function filterEnv` in module)
+- [ ] `sourceDotenv` is exported from `cloudflare-workers.ts` (evidence: `export async function sourceDotenv` in module)
+- [ ] `ArtifactStorePutData` retains `siteContentHash` field alongside new `archivePath` (evidence: `artifact-store-commands.ts:<line>`)
+
+### Formalized hotfixes (already in codebase, verified by this RFC)
+
+- [ ] `checkWranglerAvailable` uses `npx --yes wrangler` with workpiece `node_modules/.bin` in `PATH` (evidence: `leitstand-commands.ts:231-232`, preflight passes when wrangler is in workpiece `node_modules`)
+- [ ] `checkDistSize` uses 20 GiB total / 25 MiB per-file limits (evidence: `leitstand-commands.ts:257-258`)
+- [ ] Adapter uses `npx --yes wrangler deploy` from `distPath` (evidence: `cloudflare-workers.ts:155-163`)
+- [ ] Adapter logs `stdout` and `stderr` on wrangler deploy failure (evidence: `cloudflare-workers.ts:165-168`)
+- [ ] `filterEnv` filters `undefined` values from `process.env` (evidence: `cloudflare-workers.ts:28-36`)
+- [ ] `sourceDotenv` skips comments (`#`) and empty lines (evidence: `cloudflare-workers.ts:65-67`)
+
+### Build and validation
+
 - [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
 - [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes
 - [ ] `rfc.validate` passes on this file
@@ -282,8 +331,11 @@ function sourceDotenv(filePath: string): Record<string, string>;
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
-- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The tar.gz archive creation MUST use `node:tar` (or equivalent) and NOT shell out to `tar` command — the adapter must remain cross-platform per AGENTS.md exception for `@warpgogol/forge`.
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
+- The tar.gz archive creation MUST use `node:tar` (or equivalent) and NOT shell out to `tar` command — the handoff package must remain cross-platform.
 - The `filterEnv` helper MUST be exported from the adapter module so other adapters can reuse it.
 - The `sourceDotenv` helper MUST be exported from the adapter module or moved to `@warpgogol/share` if other adapters need it.
+- The existing lock at `artifact-store-commands.ts:102-108` (scope `release:${releaseId}`) already prevents concurrent `artifact.store.put` for the same release. The idempotent overwrite does not change the locking behavior — it only removes old manifests within the lock scope.
+- `runPreflight` currently does not receive the adapter. The implementation must add an `adapter: DeploymentAdapter` parameter to `runPreflight` and pass it from `runLeitstandPropagate` (where the adapter is already resolved at line 364).
+- `artifactStoreRehydrate` must extract the tar.gz archive to the output directory using `node:tar` or equivalent, replacing the current empty-directory creation.
 - Related RFCs: RFC-0588 (behavior snapshot route collection), RFC-0589 (_redirects 410 handling).
