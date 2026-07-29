@@ -32,13 +32,7 @@ import {
   sameSitePath,
 } from "./shared.ts";
 import { passResult } from "../result-helpers.ts";
-
-type RedirectRule = {
-  from: string;
-  to: string | undefined;
-  status: number;
-  line: string;
-};
+import { parseRedirectRules, type RedirectRule } from "@warpgogol/share/redirects";
 
 function normalizeUrlPath(pathname: string): string {
   const clean = pathname.trim().replace(/^\/+|\/+$/g, "");
@@ -49,23 +43,6 @@ function routePathVariants(pathname: string): string[] {
   const normalized = normalizeUrlPath(pathname);
   const noSlash = normalized === "/" ? "/" : normalized.replace(/\/$/, "");
   return normalized === noSlash ? [normalized] : [normalized, noSlash];
-}
-
-function parseRedirectRules(body: string): RedirectRule[] {
-  return body
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line && !line.startsWith("#"))
-    .map((line) => {
-      const [from, to, statusRaw] = line.split(/\s+/);
-      return {
-        from: from ?? "",
-        to,
-        status: Number(statusRaw ?? 301),
-        line,
-      };
-    })
-    .filter((rule) => rule.from.length > 0);
 }
 
 async function sitemapPaths(
