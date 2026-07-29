@@ -26,3 +26,4 @@ export {
   generateOperationId,
 } from "./operation.ts";
 export { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "./atomic.ts";
+export { gitExec } from "./git-exec.ts";

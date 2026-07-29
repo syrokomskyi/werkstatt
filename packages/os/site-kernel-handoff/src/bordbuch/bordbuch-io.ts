@@ -10,6 +10,7 @@
   <item>RFC-0473: add runtime writer-role for pseo and indexnow.submit kinds.</item>
   <item>RFC-0477: add commitAndPushBordbuch helper for git commit+push after bordbuch append.</item>
   <item>RFC-0574: resolveBordbuchPath uses resolveCachePath (mirrors[0].path) instead of hardcoded systems/<id>/.</item>
+  <item>RFC-0580: extract gitExec into shared werkstatt/git-exec.ts with allowNonZero option.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -17,7 +18,6 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { execSync } from "node:child_process";
 import {
   bordbuchEntrySchema,
   type BordbuchEntry,
@@ -25,6 +25,7 @@ import {
 } from "@warpgogol/ontology/operations";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { gitExec } from "../werkstatt/git-exec.ts";
 
 const BORDBUCH_PATH = path.join("bordbuch", "events.ndjson");
 
@@ -314,15 +315,6 @@ export interface CommitAndPushResult {
   commitSha: string | null;
   pushed: boolean;
   error: string | null;
-}
-
-function gitExec(cwd: string, args: string): string {
-  return execSync(`git ${args}`, {
-    cwd,
-    encoding: "utf-8",
-    stdio: ["pipe", "pipe", "pipe"],
-    timeout: 30_000,
-  }).trim();
 }
 
 export async function commitAndPushBordbuch(
