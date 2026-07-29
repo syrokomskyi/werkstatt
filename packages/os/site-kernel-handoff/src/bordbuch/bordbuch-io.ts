@@ -11,6 +11,7 @@
   <item>RFC-0477: add commitAndPushBordbuch helper for git commit+push after bordbuch append.</item>
   <item>RFC-0574: resolveBordbuchPath uses resolveCachePath (mirrors[0].path) instead of hardcoded systems/<id>/.</item>
   <item>RFC-0580: extract gitExec into shared werkstatt/git-exec.ts with allowNonZero option.</item>
+  <item>RFC-0583: export computeEntryHash for reuse by bordbuch.repair.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -66,7 +67,7 @@ export function containsSensitivePayload(text: string): boolean {
   return SENSITIVE_PATTERNS.some((p) => p.test(text));
 }
 
-function computeEntryHash(entry: Omit<BordbuchEntry, "hash">): string {
+export function computeEntryHash(entry: Omit<BordbuchEntry, "hash">): string {
   const stable = JSON.stringify(entry, Object.keys(entry).sort());
   return `sha256:${createHash("sha256").update(stable).digest("hex")}`;
 }

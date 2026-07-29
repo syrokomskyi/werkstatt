@@ -21,6 +21,7 @@ export {
   readBordbuch,
   validateWriterRole,
   commitAndPushBordbuch,
+  computeEntryHash,
   type BordbuchViolation,
   type CommitAndPushResult,
 } from "./bordbuch-io.ts";
