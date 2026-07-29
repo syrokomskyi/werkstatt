@@ -67,6 +67,10 @@
       "types": "./src/formula-eval.ts",
       "default": "./src/formula-eval.ts"
     },
+    "./redirects": {
+      "types": "./src/redirects.ts",
+      "default": "./src/redirects.ts"
+    },
     "./check-hints": {
       "types": "./src/check-hints.ts",
       "default": "./src/check-hints.ts"
