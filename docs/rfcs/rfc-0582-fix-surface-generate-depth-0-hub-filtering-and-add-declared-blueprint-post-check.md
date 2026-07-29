@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -23,11 +24,11 @@ amends: []
 amendedBy: []
 related:
   - DNA-22
+  - DNA-39
   - RFC-0192
   - RFC-0193
   - RFC-0390
-satisfies:
-  - DNA-22
+satisfies: []
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -95,7 +96,8 @@ The `surface.generate` command removes the `existsSync` collection-directory fil
 
 ## Architectural fit
 
-- **DNA-22 (Client-editable surface):** Programmatic Surface blueprints declared in `system.md` must produce their depth-0 hub page regardless of collection directory state. The current filter violates this contract by silently dropping declared blueprints.
+- **DNA-22 (Client-editable surface):** The `surface.blueprints[]` declaration in `system.md` is part of the client-editable surface. The current filter silently drops declared blueprints based on an engineering concern (directory existence), undermining the client's declaration.
+- **DNA-39 (Route registry as merge of route sources):** The Programmatic Surface is the second route source, contributing build-time-materialized virtual routes via `src/surface.generated.yaml`. The `existsSync` filter causes this source to silently omit declared blueprints, breaking the merge contract.
 - **RFC-0192 (Programmatic Surface route source):** This RFC amends the surface generation semantics by removing a redundant filesystem-existence gate that contradicts the blueprint contract.
 - **RFC-0193 (Blueprint adoption):** Sites declare blueprints in `system.md surface.blueprints[]`; the generation command must honor all declared and entitled blueprints.
 - **RFC-0390 (Command-result cache):** After removing the `existsSync` filter, the command no longer depends on filesystem state beyond its declared `reads` globs. The cache key contract remains sound — no new invalidation mechanism is needed.
@@ -121,6 +123,8 @@ The command's behavior changes: it no longer silently skips blueprints whose col
 
 ```ts
 // packages/os/site-kernel-checks/src/surface/generate.ts
+// Additional import needed: diagnosticsResult from "../result-helpers.ts"
+// (failResult uses ruleId=command name, not a custom diagnostic code)
 
 // BEFORE (line 83-91):
 const blueprints = allBlueprints.filter((bp) => {
@@ -140,12 +144,18 @@ const blueprints = allBlueprints.filter((bp) => {
   return moduleEntitled && (declared === null || declared.includes(bp.id));
 });
 
-// Post-generation consistency check (new, after allEntries is populated):
-const generatedBlueprintIds = new Set(surfaces.map((s) => s.surfaceId));
-const missingBlueprints = blueprints.filter((bp) => !generatedBlueprintIds.has(bp.id));
-if (missingBlueprints.length > 0) {
-  return failResult("surface.generate", [
-    `SURFACE-GEN-01: declared blueprint '${missingBlueprints[0].id}' produced zero entries — check expandBlueprint logs`,
+// Post-generation consistency check (new, after allEntries is populated and surfaces[] is built).
+// surfaces[] always has one entry per processed blueprint (countFor is called for every
+// blueprint in the loop), so checking surfaceId membership would never fire. Instead,
+// check the `generated` count field — it reflects entries.length for that blueprint.
+const emptyBlueprints = surfaces.filter((s) => s.generated === 0);
+if (emptyBlueprints.length > 0) {
+  return diagnosticsResult("surface.generate", [
+    {
+      ruleId: "SURFACE-GEN-01",
+      severity: "error",
+      message: `declared blueprint '${emptyBlueprints[0]!.surfaceId}' produced zero entries — check expandBlueprint logs`,
+    },
   ]);
 }
 ```
@@ -173,14 +183,16 @@ No change to the `--json` output shape. On failure, the standard `failResult` fo
       "message": "declared blueprint 'ratgeber' produced zero entries — check expandBlueprint logs"
     }
   ],
-  "exitCode": 1,
-  "ok": false
+  "summary": { "error": 1, "warning": 0, "info": 0 },
+  "exitCode": 1
 }
 ```
 
+Note: `diagnosticsResult` (from `result-helpers.ts`) is used instead of `failResult` because `failResult` sets `ruleId` to the command name ("surface.generate"), not a custom diagnostic code. `diagnosticsResult` accepts a `Diagnostic[]` with explicit `ruleId` fields.
+
 ### Failure modes
 
-- **SURFACE-GEN-01 (error):** A declared and entitled blueprint produced zero entries in `surface.generated.yaml`. The command exits non-zero. This indicates either a bug in `expandBlueprint` or a misconfigured blueprint (e.g. missing required fields in `system.md`).
+- **SURFACE-GEN-01 (error):** A declared and entitled blueprint produced zero entries in `surface.generated.yaml`. The command exits non-zero. This indicates either a bug in `expandBlueprint` or a misconfigured blueprint (e.g. missing required fields in `system.md`). Under normal operation, `expandBlueprint` always returns at least the depth-0 hub entry because `generateEntries` (from `@warpgogol/surface`) generates depth-0 hubs from the blueprint's level definitions, not from collection records. Gates (demand, evidence, freshness, budget) set `noindex` on entries but do not remove them. Therefore, a zero-entry result means the blueprint itself is broken — not that the collection is merely empty.
 - **Blueprint expansion error (existing):** If `expandBlueprint` throws, the command already exits non-zero with the blueprint id and error message. No change.
 - **Empty collection (not an error):** A blueprint whose collection directory exists but contains zero records is not an error — depth-0 hubs are still generated. This is the correct behavior after removing the `existsSync` filter.
 
@@ -213,7 +225,7 @@ No change to the `--json` output shape. On failure, the standard `failResult` fo
 - [ ] Post-generation consistency check added: `SURFACE-GEN-01` fires when a declared and entitled blueprint produces zero entries
 - [ ] `surface.generate` produces depth-0 hub entries for `ratgeber` blueprint even when `src/content/surface/articles/` does not exist
 - [ ] `mission.validate` passes for a site with `ratgeber` blueprint declared and no `articles` collection directory
-- [ ] Unit test covers the depth-0-hub-without-collection-directory scenario
+- [ ] Unit test in `packages/os/site-kernel-checks/src/tests/surface-generate.test.ts` covers the depth-0-hub-without-collection-directory scenario
 - [ ] `kernel.cache.clear --namespace command_results` documented as a one-time post-implementation step
 
 ## Implementation notes for agents
@@ -222,5 +234,6 @@ No change to the `--json` output shape. On failure, the standard `failResult` fo
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT create empty collection directories (e.g. `src/content/surface/articles/.gitkeep`) as a workaround for `SURFACE-GEN-01` — the fix removes the need for collection directories to exist for depth-0 hubs.
 - Agents MUST run `kernel.cache.clear --namespace command_results` once after implementing this RFC to invalidate stale `surface.generate` cache entries.
+- The `existsSync` import in `generate.ts` remains used (for the `.surface-cache` directory check at line 108) — do not remove it when removing the blueprint filter.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
