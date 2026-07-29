@@ -35,7 +35,10 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { executeKernelPipeline } from "@warpgogol/site-kernel";
+import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { byteHash } from "@warpgogol/fingerprint";
 import { collectFiles } from "@warpgogol/share/fs";
+import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty, investigateUntrackedFiles } from "./mission-git-commit.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
@@ -265,6 +268,33 @@ export async function runMissionValidate(
       buildError = err instanceof Error ? err.message : String(err);
       logger.info(`  Build failed: ${buildError}`);
     }
+
+    // RFC-0356: run build.post after astro build — text.normalize.apply,
+    // passport.emit, etc. must all run before the validation verdict.
+    if (buildSucceeded) {
+      logger.info(`  Running build.post pipeline for ${manifest.systemId}…`);
+      try {
+        const postResult = await executeKernelPipeline({
+          workspaceRoot,
+          pipelineName: "build.post",
+          siteName: manifest.systemId,
+          outputFormat: "pretty",
+        });
+        const postReport = Array.isArray(postResult) ? postResult[0] : postResult;
+        if (!postReport.ok) {
+          const failed = postReport.steps
+            .filter((s) => !s.ok)
+            .map((s) => `${s.commandName} (exit ${s.exitCode})`);
+          buildError = `build.post failed: ${failed.join(", ")}`;
+          buildSucceeded = false;
+          logger.info(`  build.post failed: ${buildError}`);
+        }
+      } catch (err) {
+        buildError = err instanceof Error ? err.message : String(err);
+        buildSucceeded = false;
+        logger.info(`  build.post failed: ${buildError}`);
+      }
+    }
   }
 
   const passed = staticPassed && buildSucceeded;
@@ -392,22 +422,73 @@ export async function runMissionBuild(
   const workpieceDir = path.join(missionDir, "workpiece");
   const distributionDir = path.join(missionDir, "distribution");
 
-  // RFC-0356 §4: run astro build in the workpiece directory.
-  logger.info(`  Running astro build in ${workpieceDir}…`);
+  // RFC-0356 §4: run build.prepare → astro build → build.post unconditionally.
+  // All three phases must succeed — without build.post the distribution is
+  // unsigned (text.normalize.apply, passport.emit, etc. never run).
   let buildSucceeded = false;
   let buildError: string | undefined;
+
+  // Phase 1: build.prepare (codegen, derived artifacts)
+  logger.info(`  Running build.prepare pipeline for ${manifest.systemId}…`);
   try {
-    execSync("pnpm exec astro build", {
-      cwd: workpieceDir,
-      stdio: "pipe",
-      timeout: 300_000,
-      encoding: "utf-8",
+    const prepareResult = await executeKernelPipeline({
+      workspaceRoot,
+      pipelineName: "build.prepare",
+      siteName: manifest.systemId,
+      outputFormat: "pretty",
     });
-    buildSucceeded = true;
+    const prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
+    if (!prepareReport.ok) {
+      const failed = prepareReport.steps
+        .filter((s) => !s.ok)
+        .map((s) => `${s.commandName} (exit ${s.exitCode})`);
+      throw new Error(`build.prepare failed: ${failed.join(", ")}`);
+    }
   } catch (err) {
     buildError = err instanceof Error ? err.message : String(err);
-    logger.info(`  Build failed: ${buildError}`);
+    logger.info(`  build.prepare failed: ${buildError}`);
   }
+
+  // Phase 2: astro build
+  if (!buildError) {
+    logger.info(`  Running astro build in ${workpieceDir}…`);
+    try {
+      execSync("pnpm exec astro build", {
+        cwd: workpieceDir,
+        stdio: "pipe",
+        timeout: 300_000,
+        encoding: "utf-8",
+      });
+    } catch (err) {
+      buildError = err instanceof Error ? err.message : String(err);
+      logger.info(`  Astro build failed: ${buildError}`);
+    }
+  }
+
+  // Phase 3: build.post (text.normalize.apply, passport.emit, etc.)
+  if (!buildError) {
+    logger.info(`  Running build.post pipeline for ${manifest.systemId}…`);
+    try {
+      const postResult = await executeKernelPipeline({
+        workspaceRoot,
+        pipelineName: "build.post",
+        siteName: manifest.systemId,
+        outputFormat: "pretty",
+      });
+      const postReport = Array.isArray(postResult) ? postResult[0] : postResult;
+      if (!postReport.ok) {
+        const failed = postReport.steps
+          .filter((s) => !s.ok)
+          .map((s) => `${s.commandName} (exit ${s.exitCode})`);
+        throw new Error(`build.post failed: ${failed.join(", ")}`);
+      }
+    } catch (err) {
+      buildError = err instanceof Error ? err.message : String(err);
+      logger.info(`  build.post failed: ${buildError}`);
+    }
+  }
+
+  buildSucceeded = !buildError;
 
   // Copy dist/ from workpiece to distribution/
   const distSrc = path.join(workpieceDir, "dist");
@@ -417,6 +498,25 @@ export async function runMissionBuild(
       await fs.rm(distDest, { recursive: true, force: true });
     }
     await copyDir(distSrc, distDest);
+  }
+
+  // Write build-input-hash.json so release.prepare can reuse this distribution
+  if (buildSucceeded) {
+    const { version: platformVersion } = await resolveCurrentEcosystem(workspaceRoot);
+    const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
+    const contentDir = path.join(workpieceDir, "src", "content");
+    let workpieceTreeHash = "sha256:absent";
+    if (existsSync(contentDir)) {
+      const contentResult = await fingerprintTree(contentDir, { mode: "semantic" });
+      workpieceTreeHash = contentResult.value;
+    }
+    const buildInputHash = byteHash(
+      `${workpieceTreeHash}|${platformVersion}|${platformSemanticHash}`,
+    );
+    await atomicWriteFile(
+      path.join(distributionDir, "build-input-hash.json"),
+      JSON.stringify({ buildInputHash, computedAt: new Date().toISOString() }, null, 2) + "\n",
+    );
   }
 
   const now = new Date().toISOString();

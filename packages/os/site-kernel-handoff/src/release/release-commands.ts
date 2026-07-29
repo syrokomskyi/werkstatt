@@ -24,6 +24,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
+import { executeKernelPipeline } from "@warpgogol/site-kernel";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
 import { byteHash } from "@warpgogol/fingerprint";
 import {
@@ -232,6 +233,29 @@ export async function runReleasePrepare(
         buildReused = true;
         logger.info(`  Reused distribution from mission.build (build input hash matched)`);
       } else if (existsSync(workpieceDir)) {
+        // RFC-0356: run build.prepare → astro build → build.post unconditionally.
+        // All three phases must succeed — without build.post the distribution is
+        // unsigned (text.normalize.apply, passport.emit, etc. never run).
+        logger.info(`  Running build.prepare pipeline for ${systemId}…`);
+        try {
+          const prepareResult = await executeKernelPipeline({
+            workspaceRoot,
+            pipelineName: "build.prepare",
+            siteName: systemId,
+            outputFormat: "pretty",
+          });
+          const prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
+          if (!prepareReport.ok) {
+            const failed = prepareReport.steps
+              .filter((s) => !s.ok)
+              .map((s) => `${s.commandName} (exit ${s.exitCode})`);
+            throw new Error(`build.prepare failed: ${failed.join(", ")}`);
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          throw new Error(`[release.prepare] build.prepare failed: ${msg.slice(0, 200)}`);
+        }
+
         logger.info(`  Running astro build in ${workpieceDir}…`);
         try {
           execSync("pnpm exec astro build", {
@@ -243,6 +267,27 @@ export async function runReleasePrepare(
           const buildError = err instanceof Error ? err.message : String(err);
           throw new Error(`[release.prepare] astro build failed: ${buildError.slice(0, 200)}`);
         }
+
+        logger.info(`  Running build.post pipeline for ${systemId}…`);
+        try {
+          const postResult = await executeKernelPipeline({
+            workspaceRoot,
+            pipelineName: "build.post",
+            siteName: systemId,
+            outputFormat: "pretty",
+          });
+          const postReport = Array.isArray(postResult) ? postResult[0] : postResult;
+          if (!postReport.ok) {
+            const failed = postReport.steps
+              .filter((s) => !s.ok)
+              .map((s) => `${s.commandName} (exit ${s.exitCode})`);
+            throw new Error(`build.post failed: ${failed.join(", ")}`);
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          throw new Error(`[release.prepare] build.post failed: ${msg.slice(0, 200)}`);
+        }
+
         const workpieceDist = path.join(workpieceDir, "dist");
         if (existsSync(workpieceDist)) {
           await fs.mkdir(distDest, { recursive: true });
