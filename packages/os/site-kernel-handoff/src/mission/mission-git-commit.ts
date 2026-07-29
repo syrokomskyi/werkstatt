@@ -208,7 +208,7 @@ export async function runMissionGitCommit(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<MissionGitCommitData>> {
-  const { workspaceRoot, logger } = context;
+  const { workspaceRoot } = context;
   const missionId = flagString(input, "mission");
   const message = flagString(input, "message");
 
@@ -271,15 +271,6 @@ export async function runMissionGitCommit(
 
   if (signingKey) {
     const result = await createSignedCommit(workpieceDir, message, actorId, signingKey);
-    if (result.signed) {
-      logger.success(
-        `[mission.git.commit] ${missionId} signed commit: ${result.commitSha.slice(0, 12)}`,
-      );
-    } else {
-      logger.success(
-        `[mission.git.commit] ${missionId} committed: ${result.commitSha.slice(0, 12)}`,
-      );
-    }
 
     const data: MissionGitCommitData = {
       missionId,
@@ -303,8 +294,6 @@ export async function runMissionGitCommit(
   process.stderr.write(`[warn] PASSPORT_SIGNING_KEY not set — producing unsigned commit.\n`);
 
   const commitSha = git(workpieceDir, `commit -m ${JSON.stringify(message)}`);
-
-  logger.success(`[mission.git.commit] ${missionId} committed: ${commitSha.slice(0, 12)}`);
 
   const data: MissionGitCommitData = {
     missionId,
