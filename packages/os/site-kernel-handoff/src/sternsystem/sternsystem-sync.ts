@@ -30,6 +30,7 @@ import {
   resolveMirrors,
   resolveMirrorPath,
   resolveCachePath,
+  isGitAccessible,
 } from "./registry-io.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
 
@@ -116,18 +117,7 @@ export async function runSternsystemSync(
   }
 
   // External mirrors are mirrors[2+] (git accessible, non-bundle)
-  const externalMirrors = entry.mirrors.slice(2).filter((m) => {
-    const proto = m.path;
-    return (
-      proto.startsWith("git@") ||
-      proto.startsWith("ssh://") ||
-      proto.startsWith("https://") ||
-      proto.startsWith("file://") ||
-      proto.startsWith("./") ||
-      proto.startsWith("../") ||
-      proto.startsWith("/")
-    );
-  });
+  const externalMirrors = entry.mirrors.slice(2).filter((m) => isGitAccessible(m.path));
   const mirrorUrls = externalMirrors.map((m) => m.path);
 
   if (syncAll) {
@@ -139,8 +129,9 @@ export async function runSternsystemSync(
 
   const warnings: string[] = [];
 
-  for (const mirrorUrl of mirrorUrls) {
-    const remoteName = `mirror-${mirrorUrls.indexOf(mirrorUrl)}`;
+  for (let i = 0; i < mirrorUrls.length; i++) {
+    const mirrorUrl = mirrorUrls[i];
+    const remoteName = `mirror-${i}`;
     const currentRemoteUrl = (() => {
       try {
         return git(bareRepoPath, `remote get-url ${remoteName}`);
@@ -196,7 +187,7 @@ export async function runSternsystemSync(
       } else {
         // Non-file protocols (ftp, s3, rsync) — log as warning (external tool required)
         warnings.push(
-          `bundle copy to ${bundleMirror.path} requires external tool (ftp/s3/rsync) — bundle created at ${bundlePath}`,
+          `bundle copy to ${bundleMirror.path} requires external tool (ftp/s3/rsync) — bundle was created but not copied (temp bundle cleaned up)`,
         );
         logger.warn(
           `[sternsystem.sync] bundle copy to ${bundleMirror.path} requires external tool`,

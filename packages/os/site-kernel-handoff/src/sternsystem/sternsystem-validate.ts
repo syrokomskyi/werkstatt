@@ -31,6 +31,7 @@ import {
   hasAppsCollision,
   resolveMirrors,
   resolveMirrorPath,
+  isGitAccessible,
 } from "./registry-io.ts";
 import { evaluateExternalEditGate } from "./external-edit-guard.ts";
 import {
@@ -231,6 +232,25 @@ export async function runSternsystemValidate(
         rule: "mirrors-empty",
         message: `system '${entry.id}' has no mirrors — at least 1 mirror (cache clone) is required`,
       });
+    }
+
+    if (entry.mirrors.length >= 1 && entry.mirrors[0].storageType !== "non-bare") {
+      violations.push({
+        systemId: entry.id,
+        rule: "cache-must-be-non-bare",
+        message: `mirrors[0] must have storageType 'non-bare' (got '${entry.mirrors[0].storageType}') — cache clone must be a working tree for git push`,
+      });
+    }
+
+    for (let i = 0; i < entry.mirrors.length; i++) {
+      const m = entry.mirrors[i];
+      if (m.storageType === "bundle" && isGitAccessible(m.path)) {
+        violations.push({
+          systemId: entry.id,
+          rule: "bundle-no-git-protocol",
+          message: `mirrors[${i}] has storageType 'bundle' but uses git-accessible protocol '${m.path}' — bundle mirrors must not use git protocols`,
+        });
+      }
     }
 
     if (entry.mirrors.length > 1) {

@@ -132,3 +132,34 @@ test("validate resolves cache dir from mirrors[0].path", async () => {
   // Cleanup
   await rm(join(workspaceRoot, "..", "systems-cache"), { recursive: true, force: true });
 });
+
+test("validate detects mirrors[0] with wrong storageType (bare instead of non-bare)", async () => {
+  await writeRegistry(
+    workspaceRoot,
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: bare\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+  );
+  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+
+  const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
+  const cacheViolations = result.data!.violations.filter(
+    (v) => v.rule === "cache-must-be-non-bare",
+  );
+  expect(cacheViolations).toHaveLength(1);
+  expect(cacheViolations[0].message).toContain("non-bare");
+});
+
+test("validate detects bundle storageType with git-accessible protocol", async () => {
+  await writeRegistry(
+    workspaceRoot,
+    'schemaVersion: "1.0.0"\nsystems:\n  - id: test-site\n    cosmicStar: Vega\n    mirrors:\n      - path: "./systems/test-site"\n        storageType: non-bare\n      - path: "../systems-git/test-site"\n        storageType: bare\n      - path: "git@github.com:foo/test.git"\n        storageType: bundle\n    pinnedPlatform: "4.5.0"\n    currentMission: null\n    lastRelease: null\n    status: registered\n    registeredAt: "2026-01-01T00:00:00Z"\n    notes: ""\n',
+  );
+  await mkdir(join(workspaceRoot, "systems", "test-site"), { recursive: true });
+
+  const result = await runSternsystemValidate(makeInput({}), makeContext(workspaceRoot));
+  const bundleViolations = result.data!.violations.filter(
+    (v) => v.rule === "bundle-no-git-protocol",
+  );
+  expect(bundleViolations).toHaveLength(1);
+  expect(bundleViolations[0].message).toContain("bundle");
+  expect(bundleViolations[0].message).toContain("git");
+});
