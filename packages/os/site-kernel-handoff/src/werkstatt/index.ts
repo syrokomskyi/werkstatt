@@ -27,3 +27,4 @@ export {
 } from "./operation.ts";
 export { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "./atomic.ts";
 export { gitExec } from "./git-exec.ts";
+export { commitWerkstattSideEffects, type CommitWerkstattResult } from "./werkstatt-commit.ts";
