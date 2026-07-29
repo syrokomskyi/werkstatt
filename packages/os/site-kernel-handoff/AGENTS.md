@@ -130,6 +130,7 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - **`releaseId` precedence in `mission.close`:** The `--release` CLI flag overrides the manifest `releaseId`. Precedence: flag → manifest → null. If `releaseId` is null, `mission.close` adds a `missing-release-id` warning to `close-report.json`'s `warnings` array.
 - **Dirty cache clone warning in `mission.validate`:** `mission.validate` warns if the cache clone has uncommitted files — reconcile will fail until resolved. The warning is placed inside the `existsSync(.git)` check to avoid errors on non-git cache clones.
 - **`isWorkpieceDirty` return type:** Extended with `files: string[]` field listing the dirty file paths from `git status --porcelain`. Uses `execSync` directly (not the trimming `git()` helper) to preserve leading spaces in porcelain output.
+- **Test helpers that swallow errors:** When using helpers like `gitExpectFail` that catch all errors and return empty strings, add a comment explaining the specific expected failure mode (e.g. "merge commands that fail with conflicts, exit code 1"). This prevents masking unexpected git failures as silent successes.
 
 ## Preflight content quality gate (RFC-0517)
 
