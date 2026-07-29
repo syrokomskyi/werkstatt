@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -116,9 +117,22 @@ The command's behavior changes: after `git merge --no-ff` fails, it checks if al
 
 ### TypeScript contracts
 
-````ts
+```ts
 // packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts
-// Inside runMissionReconcile, after git merge --no-ff fails:
+
+// Interface change: add optional autoResolvedPaths to MissionReconcileData
+export interface MissionReconcileData {
+  missionId: string;
+  systemId: string;
+  commitSha: string | null;
+  preReconcileSha: string | null;
+  reconciledAt: string;
+  autoResolvedPaths?: string[];
+}
+
+// Inside runMissionReconcile, replace the existing try/catch around git merge:
+
+let autoResolvedPaths: string[] = [];
 
 try {
   execSync(`git merge --no-ff FETCH_HEAD -m ${JSON.stringify(mergeMessage)}`, {
@@ -128,39 +142,63 @@ try {
   });
 } catch (err) {
   // Check if all conflicts are bordbuch-only (delete/modify)
-  const statusOutput = execSync("git status --porcelain", {
-    cwd: systemDir,
-    stdio: "pipe",
-    encoding: "utf-8",
-  });
-  const conflictedPaths = statusOutput
-    .split("\n")
-    .filter((l) => l.startsWith("DU") || l.startsWith("UD") || l.startsWith("AA") || l.startsWith("UU"))
-    .map((l) => l.slice(3).trim());
+  let conflictedPaths: string[] = [];
+  try {
+    const statusOutput = execSync("git status --porcelain", {
+      cwd: systemDir,
+      stdio: "pipe",
+      encoding: "utf-8",
+    });
+    conflictedPaths = statusOutput
+      .split("\n")
+      .filter((l) => l.startsWith("DU") || l.startsWith("UD") || l.startsWith("AA") || l.startsWith("UU"))
+      .map((l) => l.slice(3).trim());
+  } catch {
+    // git status failed — fall through to existing error
+  }
 
   const allBordbuch = conflictedPaths.length > 0 && conflictedPaths.every((p) => p.startsWith("bordbuch/"));
 
   if (allBordbuch) {
     // Auto-resolve: keep cache clone's bordbuch (ours)
-    execSync("git checkout --ours bordbuch/", {
-      cwd: systemDir,
-      stdio: "pipe",
-      encoding: "utf-8",
-    });
-    execSync("git add bordbuch/", {
-      cwd: systemDir,
-      stdio: "pipe",
-      encoding: "utf-8",
-    });
-    execSync(`git commit --no-edit`, {
-      cwd: systemDir,
-      stdio: "pipe",
-      encoding: "utf-8",
-    });
-    logger.info(`  Auto-resolved bordbuch/ conflict (kept cache clone version)`);
+    try {
+      execSync("git checkout --ours bordbuch/", {
+        cwd: systemDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      });
+      execSync("git add bordbuch/", {
+        cwd: systemDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      });
+      execSync("git commit --no-edit", {
+        cwd: systemDir,
+        stdio: "pipe",
+        encoding: "utf-8",
+      });
+      autoResolvedPaths = conflictedPaths;
+      logger.info(`  Auto-resolved bordbuch/ conflict (kept cache clone version)`);
+    } catch (resolveErr) {
+      // Auto-resolution failed — abort merge and throw
+      try {
+        execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
+      } catch {
+        // merge --abort also failed — continue to throw
+      }
+      throw new Error(
+        `[mission.reconcile] bordbuch auto-resolution failed: ${(resolveErr as Error).message}.\n` +
+          `Merge has been aborted. Inspect the cache clone state manually.\n` +
+          `Reconcile is idempotent — it will reset the cache clone to preReconcileSha and re-merge.`,
+      );
+    }
   } else {
     // Abort merge and throw existing error
-    execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
+    try {
+      execSync("git merge --abort", { cwd: systemDir, stdio: "pipe" });
+    } catch {
+      // merge --abort also failed — continue to throw
+    }
     throw new Error(
       `[mission.reconcile] git merge --no-ff failed: ${(err as Error).message}.\n` +
         `Resolve conflicts in the workpiece (not the cache clone), commit via mission.git.commit, then re-run reconcile.\n` +
@@ -169,16 +207,53 @@ try {
   }
 }
 
+// After merge (successful or auto-resolved), existing logic continues:
+// commitSha, mergeCommitSha, transferredCommits, push...
+
+// Evidence report includes autoResolvedPaths:
+const report = {
+  schemaVersion: "1.0.0",
+  missionId,
+  systemId: manifest.systemId,
+  commitSha,
+  preReconcileSha,
+  reconciledAt: now,
+  mergeCommitSha,
+  transferredCommits,
+  message,
+  copiedPaths,
+  autoResolvedPaths,
+};
+
+// Summary extended when auto-resolution occurred:
+const autoResolveSuffix =
+  autoResolvedPaths.length > 0 ? `, ${autoResolvedPaths.length} bordbuch conflict${autoResolvedPaths.length > 1 ? "s" : ""} auto-resolved` : "";
+const summary = `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix})`;
+
+// Return data includes autoResolvedPaths when non-empty:
+return {
+  data: {
+    missionId,
+    systemId: manifest.systemId,
+    commitSha,
+    preReconcileSha,
+    reconciledAt: now,
+    ...(autoResolvedPaths.length > 0 ? { autoResolvedPaths } : {}),
+  },
+  summary,
+};
+```
+
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
-| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modified: add bordbuch conflict auto-resolution in `runMissionReconcile` |
+| --- | --- |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modified: add bordbuch conflict auto-resolution in `runMissionReconcile`, extend `MissionReconcileData` with `autoResolvedPaths?`, include `autoResolvedPaths` in evidence report and summary |
 | `mirrors[0].path/bordbuch/events.ndjson` | Auto-resolved to cache clone version (`--ours`) during merge conflict |
 
 ### Output format
 
-No change to the `--json` output shape. The reconcile result includes an additional `autoResolvedPaths` field when bordbuch conflicts were auto-resolved:
+The `--json` output gains an optional `autoResolvedPaths` field (absent when no auto-resolution occurred, present as `string[]` when bordbuch conflicts were auto-resolved). The `autoResolvedPaths` array lists the actual conflicted paths from `git status --porcelain`, not a hardcoded value:
 
 ```json
 {
@@ -194,14 +269,17 @@ No change to the `--json` output shape. The reconcile result includes an additio
   },
   "summary": "[mission.reconcile] warpgogol-com-m000019 reconciled (abc123de, 3 commits merged, 1 bordbuch conflict auto-resolved)"
 }
-````
+```
+
+When no bordbuch conflicts occur, `autoResolvedPaths` is absent from `data` and the summary has no auto-resolve suffix. The `reconciliation-report.json` evidence file also includes `autoResolvedPaths` for auditability.
 
 ### Failure modes
 
 - **Bordbuch-only conflicts (auto-resolved):** When all conflicted paths are under `bordbuch/`, the command auto-resolves with `--ours` and completes the merge. The result includes `autoResolvedPaths`.
 - **Non-bordbuch conflicts (hard failure):** When any conflicted path is outside `bordbuch/`, the command aborts the merge (`git merge --abort`) and throws the existing error message. The operator must resolve the conflict in the workpiece.
 - **Mixed bordbuch + non-bordbuch conflicts (hard failure):** Same as non-bordbuch — the command does not partially auto-resolve. All conflicts must be resolved manually.
-- **Merge abort failure:** If `git merge --abort` fails, the command throws with a message to manually inspect the cache clone state.
+- **Auto-resolution failure:** If `git checkout --ours bordbuch/` or `git add bordbuch/` or `git commit --no-edit` fails during auto-resolution, the command aborts the merge (`git merge --abort`) and throws with a message to inspect the cache clone state. The cache clone is left in a clean (non-conflicted) state if abort succeeds.
+- **Merge abort failure:** If `git merge --abort` fails (in either the non-bordbuch or auto-resolution failure path), the command throws with a message to manually inspect the cache clone state.
 
 ## Rollout
 
