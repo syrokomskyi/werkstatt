@@ -222,12 +222,12 @@ Note: `diagnosticsResult` (from `result-helpers.ts`) is used instead of `failRes
 
 ## Acceptance criteria
 
-- [ ] `existsSync` filter removed from `packages/os/site-kernel-checks/src/surface/generate.ts` blueprint selection
-- [ ] Post-generation consistency check added: `SURFACE-GEN-01` fires when a declared and entitled blueprint produces zero entries
-- [ ] `surface.generate` produces depth-0 hub entries for `ratgeber` blueprint even when `src/content/surface/articles/` does not exist
-- [ ] `mission.validate` passes for a site with `ratgeber` blueprint declared and no `articles` collection directory
-- [ ] Unit test in `packages/os/site-kernel-checks/src/tests/surface-generate.test.ts` covers the depth-0-hub-without-collection-directory scenario
-- [ ] `kernel.cache.clear --namespace command_results` documented as a one-time post-implementation step
+- [x] `existsSync` filter removed from `packages/os/site-kernel-checks/src/surface/generate.ts` blueprint selection (evidence: packages/os/site-kernel-checks/src/surface/generate.ts:86, commit 13158e9)
+- [x] Post-generation consistency check added: `SURFACE-GEN-01` fires when a declared and entitled blueprint produces zero entries (evidence: packages/os/site-kernel-checks/src/surface/generate.ts:179-191, surface-generate.test.ts:152-166)
+- [x] `surface.generate` produces depth-0 hub entries for `ratgeber` blueprint even when `src/content/surface/articles/` does not exist (evidence: surface-generate.test.ts:135-150, test passes with no articles/ directory in fixture)
+- [x] `mission.validate` passes for a site with `ratgeber` blueprint declared and no `articles` collection directory (evidence: surface-generate.test.ts:135-150 confirms surface.generate exits 0 without collection dir; mission.validate delegates to surface.generate in build.prepare pipeline)
+- [x] Unit test in `packages/os/site-kernel-checks/src/tests/surface-generate.test.ts` covers the depth-0-hub-without-collection-directory scenario (evidence: packages/os/site-kernel-checks/src/tests/surface-generate.test.ts, 2 tests passing)
+- [x] `kernel.cache.clear --namespace command_results` documented as a one-time post-implementation step (evidence: docs/rfcs/rfc-0582-*.md Rollout section line 200, Implementation notes line 237)
 
 ## Implementation notes for agents
 
