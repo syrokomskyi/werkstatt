@@ -1,7 +1,7 @@
 ---
 id: RFC-0587
 title: "Fix Leitstand preflight checks and artifact store hashing for Cloudflare Workers deploy"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,7 +12,8 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
@@ -290,7 +291,7 @@ async function checkDistSize(
 ## Risks
 
 - **tar.gz archive disk space**: Each `artifact.store.put` creates a tar.gz archive. For large dist directories (330 MiB), this doubles storage. Mitigation: `artifact.store.gc` already handles retention by age.
-- **Idempotent put data loss**: If two agents run `artifact.store.put` for the same release concurrently, the second overwrites the first's manifest. Mitigation: `werkstatt.lock` (DNA-51) should be acquired before `artifact.store.put`.
+- **Idempotent put data loss**: If two agents run `artifact.store.put` for the same release concurrently, the second overwrites the first's manifest. Mitigation: `artifact.store.put` already acquires a `werkstatt.lock` with scope `release:${releaseId}` (`artifact-store-commands.ts:102-108`, DNA-51), preventing concurrent puts for the same release.
 - **Adapter limits maintenance**: When Cloudflare changes Workers limits, the adapter must be updated. Mitigation: limits are declared in one place (`cloudflare-workers.ts` `getLimits()`).
 - **Agent misinterpretation**: Agents may think `artifact.store.put` is not idempotent and avoid re-running it. Mitigation: AGENTS.md update and command `--help` text should state idempotency explicitly.
 - **npx network access**: `npx --yes wrangler` may attempt to download wrangler if not cached. Mitigation: preflight check runs `npx --yes wrangler --version` which is fast if wrangler is already cached.
