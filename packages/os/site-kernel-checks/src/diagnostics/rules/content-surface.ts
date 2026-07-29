@@ -10,6 +10,7 @@
   <item>Register comparative commercial claim rule ids.</item>
   <item>Register article depth rule ids.</item>
   <item>RFC-0576: Register LINK-01..03, MIRROR-MISSING, MIRROR-01..03 for content.links.validate, mirroring.validate, page.blocks.mirror.validate.</item>
+  <item>RFC-0576 review fix: Register MIRROR-CONFIG for config/setup errors in page.blocks.mirror.validate.</item>
 </CHANGE_SUMMARY>
 */
 

@@ -12,6 +12,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0206: Introduce content link and anchor validation.</item>
   <item>RFC-0576: Migrate to diagnosticsResult with registered LINK-01..03 ruleIds, add fixHints, normalize parseUrl trailing slashes.</item>
+  <item>RFC-0576 review fix: Rename Violation.rule to Violation.ruleId for consistency.</item>
 </CHANGE_SUMMARY>
 */
 

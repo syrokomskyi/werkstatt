@@ -7,6 +7,8 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted aggregate commands from public-surface.ts into public-surface/aggregate.ts.</item>
+  <item>RFC-0577: Enrich PUBTXT-07 fixHint with resolveProseSource helper and build.prepare command.</item>
+  <item>RFC-0577 review fix: Make resolveProseSource async and use context.io.exists instead of existsSync.</item>
 </CHANGE_SUMMARY>
 */
 

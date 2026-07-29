@@ -15,6 +15,7 @@ Catches missing nested props (labels, effects, background) caused by
 <CHANGE_SUMMARY>
   <item>RFC-0205: Initial implementation.</item>
   <item>RFC-0576: Migrate to diagnosticsResult with registered MIRROR-01..03 ruleIds, preserve existing fixHints.</item>
+  <item>RFC-0576 review fix: Use registered MIRROR-CONFIG ruleId for config errors instead of misusing MIRROR-01.</item>
 </CHANGE_SUMMARY>
 */
 
