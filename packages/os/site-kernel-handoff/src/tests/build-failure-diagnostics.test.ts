@@ -1,3 +1,12 @@
+/*
+<MODULE_CONTRACT>
+<purpose>RFC-0578: tests for buildFailureDiagnostics pattern matching in mission.validate.</purpose>
+<keywords>RFC-0578, BUILD-01, buildFailureDiagnostics, pattern matching, test</keywords>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0578: add unit tests for buildFailureDiagnostics pattern matching.</item>
+</CHANGE_SUMMARY>
+*/
 import { describe, it, expect } from "vitest";
 import { buildFailureDiagnostics } from "../mission/mission-materialization-commands.ts";
 
@@ -28,7 +37,8 @@ describe("buildFailureDiagnostics", () => {
   });
 
   it("matches typescript-error pattern", () => {
-    const error = "src/components/Header.astro:10:5 - error TS2322: Type 'string' is not assignable to type 'number'";
+    const error =
+      "src/components/Header.astro:10:5 - error TS2322: Type 'string' is not assignable to type 'number'";
     const diags = buildFailureDiagnostics(error);
     expect(diags[0].data?.patternId).toBe("typescript-error");
     expect(diags[0].fixHint).toContain("TypeScript");

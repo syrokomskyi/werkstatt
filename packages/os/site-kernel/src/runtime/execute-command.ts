@@ -13,6 +13,7 @@ resolves a workspace-scoped or app-scoped command from CLI options and runs it.
 <CHANGE_SUMMARY>
   <item>RFC-0303: split out of runtime.ts (Phase 3 file-size split, hot-path file 8/8).</item>
   <item>RFC-0326: extract intents from createDefaultIO() and surface as filesModified on the execution report for both real and dry runs.</item>
+  <item>RFC-0579: propagate nextSteps from KernelCommandResult to KernelExecutionReport and render as "Next steps:" block in pretty mode.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -230,7 +231,7 @@ export async function executeRegisteredCommand(
     }
 
     // RFC-0579: render nextSteps as a "Next steps:" block in pretty mode.
-    if (report.nextSteps && report.nextSteps.length > 0) {
+    if (context.outputFormat !== "json" && report.nextSteps && report.nextSteps.length > 0) {
       console.log("\nNext steps:");
       for (const step of report.nextSteps) {
         const prefix = step.kind === "required" ? "*" : " ";
