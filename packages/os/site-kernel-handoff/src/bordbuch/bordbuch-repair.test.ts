@@ -146,7 +146,7 @@ async function writeRegistry(): Promise<void> {
     systems: [
       {
         id: systemId,
-        cosmicStar: "Sol",
+        cosmicStar: "Sirius",
         mirrors: [{ path: `./cache/${systemId}`, storageType: "non-bare" }],
         pinnedPlatform: "1.0.0",
         currentMission: null,
@@ -162,7 +162,7 @@ async function writeRegistry(): Promise<void> {
       `schemaVersion: "${registry.schemaVersion}"`,
       `systems:`,
       `  - id: "${systemId}"`,
-      `    cosmicStar: Sol`,
+      `    cosmicStar: Sirius`,
       `    mirrors:`,
       `      - path: "./cache/${systemId}"`,
       `        storageType: non-bare`,
@@ -299,7 +299,7 @@ test("--metadata overrides auto-derived metadata", async () => {
   expect(openEntry!.occurredAt).toBe("2026-07-28T09:30:00.000Z");
 });
 
-test("--mission filters to only the specified mission", async () => {
+test("--mission filters to only the specified mission; remaining orphans cause failure", async () => {
   const e1 = makeEntry(
     {
       id: "event-000001",
@@ -322,17 +322,7 @@ test("--mission filters to only the specified mission", async () => {
   );
   await writeBordbuch([e1, e2]);
 
-  const result = await runBordbuchRepair(
-    makeInput({ system: systemId, mission: "m001" }),
-    mockContext(tmpDir),
-  );
-
-  expect(result.data!.insertedEvents).toBe(1);
-
-  const repaired = await readBordbuchFile();
-  const m001Open = repaired.find((e) => e.kind === "mission-open" && e.missionId === "m001");
-  expect(m001Open).toBeDefined();
-
-  const m002Open = repaired.find((e) => e.kind === "mission-open" && e.missionId === "m002");
-  expect(m002Open).toBeUndefined();
+  await expect(
+    runBordbuchRepair(makeInput({ system: systemId, mission: "m001" }), mockContext(tmpDir)),
+  ).rejects.toThrow(/repaired bordbuch still invalid.*m002/);
 });
