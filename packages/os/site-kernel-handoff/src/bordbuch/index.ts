@@ -17,6 +17,12 @@ export { runBordbuchValidate, type BordbuchValidateData } from "./bordbuch-valid
 export { runBordbuchStatus, type BordbuchStatusData } from "./bordbuch-status.ts";
 export { runBordbuchGenerate } from "./bordbuch-generate.ts";
 export {
+  runBordbuchRepair,
+  type BordbuchRepairPlan,
+  type BordbuchRepairResult,
+  type BordbuchRepairOrphan,
+} from "./bordbuch-repair.ts";
+export {
   appendBordbuchEntry,
   readBordbuch,
   validateWriterRole,

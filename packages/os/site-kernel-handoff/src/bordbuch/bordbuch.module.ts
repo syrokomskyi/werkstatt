@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Lazy loading refactor: extracted from bordbuch/index.ts to use dynamic imports inside async register().</item>
+  <item>RFC-0583: add bordbuch.repair command registration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,6 +23,7 @@ export function createBordbuchModule(): KernelModule {
       const { runBordbuchValidate } = await import("./bordbuch-validate.ts");
       const { runBordbuchStatus } = await import("./bordbuch-status.ts");
       const { runBordbuchGenerate } = await import("./bordbuch-generate.ts");
+      const { runBordbuchRepair } = await import("./bordbuch-repair.ts");
       registry.registerCommand({
         name: "bordbuch.append",
         description:
@@ -102,6 +104,28 @@ export function createBordbuchModule(): KernelModule {
         ],
         cacheable: false,
         execute: runBordbuchGenerate,
+      });
+      registry.registerCommand({
+        name: "bordbuch.repair",
+        description:
+          "Repair orphan-mission-close violations by inserting missing mission-open events and recomputing the hash chain (RFC-0583).",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          system: { kind: "string", required: true, description: "Sternsystem id." },
+          "dry-run": { kind: "boolean", description: "Show planned repairs without writing." },
+          mission: { kind: "string", description: "Repair only the specified mission id." },
+          metadata: {
+            kind: "string",
+            description:
+              "JSON object with occurredAt, summary, actor for the inserted mission-open event.",
+          },
+        },
+        writes: ["systems/{system}/bordbuch/events.ndjson"],
+        reads: ["systems/{system}/bordbuch/events.ndjson"],
+        cacheable: false,
+        execute: runBordbuchRepair,
       });
     },
   };
