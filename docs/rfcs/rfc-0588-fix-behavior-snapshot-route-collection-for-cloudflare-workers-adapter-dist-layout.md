@@ -55,7 +55,7 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
-  - "@warpgogol/site-kernel-checks"
+  - "@warpgogol/share"
 successSignals: []
 nonGoals:
   - "Preflight check fixes (covered by RFC-0587)"
@@ -222,12 +222,12 @@ Routes that match `_redirects` source patterns (e.g. `/de/*`) are excluded from 
 
 - [x] `release.prepare` passes `dist/client/` (when it exists) to `behavior.snapshot.capture` instead of `dist/` root (evidence: `release-commands.ts:263-265`, already fixed in commit `89085ed`)
 - [x] `readBehaviorSnapshot` in the cloudflare-workers adapter unwraps the `behaviorSnapshot` field (evidence: `cloudflare-workers.ts:101-102`, already fixed in commit `89085ed`)
-- [ ] `collectRoutes` reads `_redirects` and excludes routes matching redirect source patterns (301, 308) (evidence: `behavior-snapshot-commands.ts:<line>`, `/de/*` routes absent from snapshot)
-- [ ] `parseRedirectRules` is exported from `@warpgogol/site-kernel-checks` and imported in `behavior-snapshot-commands.ts` (evidence: no duplicate redirect parsing logic)
-- [ ] `isRouteRedirected` converts `*` wildcard patterns to regex matchers and excludes matching routes (evidence: `behavior-snapshot-commands.ts:<line>`, test with `/de/*` pattern)
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `collectRoutes` reads `_redirects` and excludes routes matching redirect source patterns (301, 308) (evidence: `behavior-snapshot-commands.ts:75-96`, `/de/*` routes absent from snapshot — `behavior-snapshot.test.ts:61-75`)
+- [x] `parseRedirectRules` is exported from `@warpgogol/share/redirects` and imported in `behavior-snapshot-commands.ts` (evidence: `behavior-snapshot-commands.ts:26`, `packages/share/src/redirects.ts:22-37`)
+- [x] `isRouteRedirected` converts `*` wildcard patterns to regex matchers and excludes matching routes (evidence: `behavior-snapshot-commands.ts:65-73`, test with `/de/*` pattern — `behavior-snapshot.test.ts:28-35`)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: exit code 0, no TypeScript errors)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes (evidence: 354 tests passed, 0 failures)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --json` exit code 0)
 
 ## Implementation notes for agents
 
@@ -236,7 +236,7 @@ Routes that match `_redirects` source patterns (e.g. `/de/*`) are excluded from 
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
-- Export `parseRedirectRules` from `packages/os/site-kernel-checks/src/public-surface/managed-public.ts` (add `export` keyword). The existing `RedirectRule` type (`to: string | undefined`, `line: string`) is used as-is — do not create a parallel type.
+- `parseRedirectRules` and `RedirectRule` are extracted to `@warpgogol/share/redirects` subpath (RFC-0588 plan decision). `managed-public.ts` imports them from there. The existing `RedirectRule` type (`to: string | undefined`, `line: string`) is used as-is — do not create a parallel type.
 - Implement `isRouteRedirected` locally in `behavior-snapshot-commands.ts`. It converts `*` to `.*` in regex patterns, escaping all other regex special characters first. Only 301 and 308 redirects trigger exclusion.
 - Bugs 1 and 2 are already fixed in commit `89085ed`. Do not re-implement `dist/client/` detection or `behaviorSnapshot` wrapper unwrapping.
 - Related RFCs: RFC-0587 (preflight checks), RFC-0589 (_redirects 410 handling).
