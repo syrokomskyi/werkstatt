@@ -76,6 +76,7 @@ A federated **`visual` domain** over the RFC-0203 Diagnostic model that catches 
 - No app-specific business logic here. App-specific commands stay in `apps/*/tools/`.
 - No hardcoded app names, languages, or content paths.
 - Missing directories return empty results (no throws) — graceful degradation for new/sparse apps.
+- **Do not silently filter declared entries by filesystem existence (RFC-0582).** When a blueprint or declaration is declared in `system.md`, do not add `existsSync` filters that silently drop it from processing. Let the expansion/generation logic handle empty or missing collection states — depth-0 hubs are generated from blueprint level definitions, not collection records. If a declared and entitled blueprint produces zero entries, emit a diagnostic (e.g. `SURFACE-GEN-01`) rather than silently skipping it.
 - `createCompassInventoryEntries` is part of the public API so that `site-kernel-codegen` can reuse it for backfill operations.
 - `APPS_CHECK_PIPELINE` is the authoritative ordered list of active app pipeline steps; spread it in `kernel.config.ts` pipelines and append app-specific steps after.
 - `PACKAGES_CHECK_PIPELINE` is the authoritative ordered list of active workspace package validation steps; shared UI copy checks belong there rather than in package-local ad-hoc scripts.
