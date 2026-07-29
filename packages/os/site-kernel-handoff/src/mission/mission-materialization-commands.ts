@@ -35,10 +35,8 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { executeKernelPipeline } from "@warpgogol/site-kernel";
-import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
-import { byteHash } from "@warpgogol/fingerprint";
 import { collectFiles } from "@warpgogol/share/fs";
-import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
+import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty, investigateUntrackedFiles } from "./mission-git-commit.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
@@ -274,21 +272,7 @@ export async function runMissionValidate(
     if (buildSucceeded) {
       logger.info(`  Running build.post pipeline for ${manifest.systemId}…`);
       try {
-        const postResult = await executeKernelPipeline({
-          workspaceRoot,
-          pipelineName: "build.post",
-          siteName: manifest.systemId,
-          outputFormat: "pretty",
-        });
-        const postReport = Array.isArray(postResult) ? postResult[0] : postResult;
-        if (!postReport.ok) {
-          const failed = postReport.steps
-            .filter((s) => !s.ok)
-            .map((s) => `${s.commandName} (exit ${s.exitCode})`);
-          buildError = `build.post failed: ${failed.join(", ")}`;
-          buildSucceeded = false;
-          logger.info(`  build.post failed: ${buildError}`);
-        }
+        await runPipelinePhase(workspaceRoot, "build.post", manifest.systemId);
       } catch (err) {
         buildError = err instanceof Error ? err.message : String(err);
         buildSucceeded = false;
@@ -431,19 +415,7 @@ export async function runMissionBuild(
   // Phase 1: build.prepare (codegen, derived artifacts)
   logger.info(`  Running build.prepare pipeline for ${manifest.systemId}…`);
   try {
-    const prepareResult = await executeKernelPipeline({
-      workspaceRoot,
-      pipelineName: "build.prepare",
-      siteName: manifest.systemId,
-      outputFormat: "pretty",
-    });
-    const prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
-    if (!prepareReport.ok) {
-      const failed = prepareReport.steps
-        .filter((s) => !s.ok)
-        .map((s) => `${s.commandName} (exit ${s.exitCode})`);
-      throw new Error(`build.prepare failed: ${failed.join(", ")}`);
-    }
+    await runPipelinePhase(workspaceRoot, "build.prepare", manifest.systemId);
   } catch (err) {
     buildError = err instanceof Error ? err.message : String(err);
     logger.info(`  build.prepare failed: ${buildError}`);
@@ -469,19 +441,7 @@ export async function runMissionBuild(
   if (!buildError) {
     logger.info(`  Running build.post pipeline for ${manifest.systemId}…`);
     try {
-      const postResult = await executeKernelPipeline({
-        workspaceRoot,
-        pipelineName: "build.post",
-        siteName: manifest.systemId,
-        outputFormat: "pretty",
-      });
-      const postReport = Array.isArray(postResult) ? postResult[0] : postResult;
-      if (!postReport.ok) {
-        const failed = postReport.steps
-          .filter((s) => !s.ok)
-          .map((s) => `${s.commandName} (exit ${s.exitCode})`);
-        throw new Error(`build.post failed: ${failed.join(", ")}`);
-      }
+      await runPipelinePhase(workspaceRoot, "build.post", manifest.systemId);
     } catch (err) {
       buildError = err instanceof Error ? err.message : String(err);
       logger.info(`  build.post failed: ${buildError}`);
@@ -502,17 +462,7 @@ export async function runMissionBuild(
 
   // Write build-input-hash.json so release.prepare can reuse this distribution
   if (buildSucceeded) {
-    const { version: platformVersion } = await resolveCurrentEcosystem(workspaceRoot);
-    const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
-    const contentDir = path.join(workpieceDir, "src", "content");
-    let workpieceTreeHash = "sha256:absent";
-    if (existsSync(contentDir)) {
-      const contentResult = await fingerprintTree(contentDir, { mode: "semantic" });
-      workpieceTreeHash = contentResult.value;
-    }
-    const buildInputHash = byteHash(
-      `${workpieceTreeHash}|${platformVersion}|${platformSemanticHash}`,
-    );
+    const { buildInputHash } = await computeBuildInputHash(workspaceRoot, workpieceDir);
     await atomicWriteFile(
       path.join(distributionDir, "build-input-hash.json"),
       JSON.stringify({ buildInputHash, computedAt: new Date().toISOString() }, null, 2) + "\n",

@@ -24,9 +24,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { executeKernelPipeline } from "@warpgogol/site-kernel";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
-import { byteHash } from "@warpgogol/fingerprint";
 import {
   readMissionManifest,
   writeMissionManifest,
@@ -36,7 +34,8 @@ import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/inde
 import { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
-import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
+import { resolveCurrentEcosystem } from "../bundle-io.ts";
+import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
 import { checkBreaksCDeclaration } from "./breaks-c-helper.ts";
 import {
@@ -200,19 +199,11 @@ export async function runReleasePrepare(
       const distDest = path.join(stagingDir, "dist");
       let buildReused = false;
 
-      const { version: platformVersion, commit } = await resolveCurrentEcosystem(workspaceRoot);
-      const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
+      const { commit } = await resolveCurrentEcosystem(workspaceRoot);
 
       // RFC-0585: Compute build input hash for reuse decision
-      const contentDir = path.join(workpieceDir, "src", "content");
-      let workpieceTreeHash = "sha256:absent";
-      if (existsSync(contentDir)) {
-        const contentResult = await fingerprintTree(contentDir, { mode: "semantic" });
-        workpieceTreeHash = contentResult.value;
-      }
-      const buildInputHash = byteHash(
-        `${workpieceTreeHash}|${platformVersion}|${platformSemanticHash}`,
-      );
+      const { buildInputHash, workpieceTreeHash, platformVersion, platformSemanticHash } =
+        await computeBuildInputHash(workspaceRoot, workpieceDir);
 
       const distributionMetaPath = path.join(missionDir, "distribution", "build-input-hash.json");
       const canReuseDistribution =
@@ -238,19 +229,7 @@ export async function runReleasePrepare(
         // unsigned (text.normalize.apply, passport.emit, etc. never run).
         logger.info(`  Running build.prepare pipeline for ${systemId}…`);
         try {
-          const prepareResult = await executeKernelPipeline({
-            workspaceRoot,
-            pipelineName: "build.prepare",
-            siteName: systemId,
-            outputFormat: "pretty",
-          });
-          const prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
-          if (!prepareReport.ok) {
-            const failed = prepareReport.steps
-              .filter((s) => !s.ok)
-              .map((s) => `${s.commandName} (exit ${s.exitCode})`);
-            throw new Error(`build.prepare failed: ${failed.join(", ")}`);
-          }
+          await runPipelinePhase(workspaceRoot, "build.prepare", systemId);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           throw new Error(`[release.prepare] build.prepare failed: ${msg.slice(0, 200)}`);
@@ -270,19 +249,7 @@ export async function runReleasePrepare(
 
         logger.info(`  Running build.post pipeline for ${systemId}…`);
         try {
-          const postResult = await executeKernelPipeline({
-            workspaceRoot,
-            pipelineName: "build.post",
-            siteName: systemId,
-            outputFormat: "pretty",
-          });
-          const postReport = Array.isArray(postResult) ? postResult[0] : postResult;
-          if (!postReport.ok) {
-            const failed = postReport.steps
-              .filter((s) => !s.ok)
-              .map((s) => `${s.commandName} (exit ${s.exitCode})`);
-            throw new Error(`build.post failed: ${failed.join(", ")}`);
-          }
+          await runPipelinePhase(workspaceRoot, "build.post", systemId);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           throw new Error(`[release.prepare] build.post failed: ${msg.slice(0, 200)}`);
