@@ -12,6 +12,7 @@ Read `PREFERENCES.md` at the repository root before starting. If the file is mis
 - Generated documentation, commit messages, and persisted artifacts must use `documentationLanguage`.
 - Internal reasoning, tool-call planning, and intermediate agent monologue may stay in the agent's working language (usually English).
 - Do not translate existing files automatically; preferences affect only new output and the current session.
+- **Report and summary templates in skill definitions are structural examples only.** All labels, headings, table headers, column names, and descriptions in operator-facing output must be translated to `aiLanguage`. Only identifiers (RFC-XXXX, ADR-XXXX, file paths, slash commands, CLI flags) stay in their original form. Do not copy English template labels verbatim into the operator-facing output.
 
 ## Recoverable errors
 
@@ -26,23 +27,17 @@ Stage only the files this skill produces or modifies. Another agent may be worki
 - **RFC pipeline**: create → audit → enhance → plan → implement (includes review → fix)
 - **ADR pipeline**: create → implement (includes review → fix)
 
-## Stop step semantics
-
-Several skills (`fo-idea-audit`, `fo-idea-enhance`) end with a "Stop" step that says "Do not run the next skill." This instruction applies **only to standalone invocations** — when the operator runs `/fo-idea-audit` or `/fo-idea-enhance` directly.
-
-When a skill is invoked **inline by an orchestrator** (e.g. `fo-idea-i-just-want-to-see-the-result`, `fo-idea-i-just-want-to-see-the-plan`), "Stop" means **end this skill's execution and return control to the orchestrator**. The orchestrator then proceeds to the next pipeline step. The "Do not run X" guardrail does not block the orchestrator — the orchestrator explicitly handles inter-step transitions.
-
 ## Forward-only discipline
 
 The ecosystem is forward-only. No backward compatibility layers, no shims, no dual-paths. Legacy code paths are deleted, not maintained behind a flag. Deprecation means removal in the same change, not an indefinite grace period.
 
 ## Compass terminology
 
-Use Compass (not GRACE) in all new code, documentation, and log messages (RFC-0353).
+Use Compass (not GRACE) in all new code, documentation, and log messages.
 
 ## Compass scaffolding
 
-Non-trivial new source files in `apps/` or `packages/` must carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` scaffolding (DNA-42).
+Non-trivial new source files in `apps/` or `packages/` must carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` scaffolding. Check the project's invariants file for the canonical Compass markup rule.
 
 ## Build verification discipline
 
@@ -67,4 +62,58 @@ Every `run_command` call MUST use a 6-minute (360 000 ms) execution budget. This
 - The `run_command` tool has no built-in timeout parameter. `WaitMsBeforeAsync` is the only mechanism to regain control after a fixed duration.
 - Abandoning a still-running process is acceptable — the process may complete in the background, but the agent is unblocked and can retry or try an alternative.
 - This covers all command classes: `pnpm exec site-kernel run ...`, `pnpm --filter <pkg> run build:check`, `astro check`, `git`, `pnpm install`, etc.
-- Site-kernel commands already have internal `timeoutMs` (RFC-0255), but the agent-side 6-min budget is a safety net for ALL commands, not just site-kernel.
+- Site-kernel commands already have internal `timeoutMs`, but the agent-side 6-min budget is a safety net for ALL commands, not just site-kernel.
+
+## Binding resolution and degradation
+
+### How to resolve bindings
+
+Skills reference bindings by key, never by value. To resolve a binding:
+
+1. Read `forge.yaml` at the project root.
+2. Navigate to the `bindings` section.
+3. Resolve the key (e.g. `commands.validateRfc`) to its value.
+4. If the value contains placeholders (`{id}`, `{workspace}`, `{file}`), substitute them with the actual values for the current operation.
+5. If the binding is `null` or the `bindings` section is absent, the capability is absent.
+
+### Binding keys
+
+| Key                     | Type                   | Description                            |
+| ----------------------- | ---------------------- | -------------------------------------- |
+| `commands.validateRfc`  | string \| null         | Command to validate an RFC             |
+| `commands.validateAdr`  | string \| null         | Command to validate an ADR             |
+| `commands.typecheck`    | string \| null         | Scoped typecheck command               |
+| `commands.test`         | string \| null         | Scoped test command                    |
+| `commands.scopedBuild`  | string \| null         | Scoped build command                   |
+| `commands.specValidate` | string \| null         | Spec validation command                |
+| `paths.invariantsFile`  | string \| null         | Path to the project's invariants file  |
+| `paths.compassDocs`     | string[]               | Machine-readable semantic docs to sync |
+| `paths.reviewsDir`      | string \| null         | Directory for code reviews             |
+| `paths.handoffsDir`     | string \| null         | Directory for handoff documents        |
+| `terminology`           | Record<string, string> | Project-specific terminology mapping   |
+
+### Degradation contract
+
+- **Required binding unresolvable** (missing or `null`): the skill refuses to start with: `Skill <name> requires binding <key>; add it to forge.yaml or mark the capability absent deliberately.`
+- **Optional binding absent** (`null` / empty): the dependent step is skipped and the skill's final report MUST contain a `Degraded:` line naming each skipped capability.
+- **Silent skips are a contract violation.** Every skipped capability must appear in the final report.
+
+### Worked example
+
+A skill needs to run `rfc.validate` for `RFC-XXXX`:
+
+1. Read `forge.yaml` → `bindings.commands.validateRfc` = `"pnpm exec site-kernel run rfc.validate {id} --json"`
+2. Substitute `{id}` → `"pnpm exec site-kernel run rfc.validate RFC-XXXX --json"`
+3. Run the resolved command.
+
+If `bindings.commands.validateRfc` were `null`, the skill would skip the step and report: `Degraded: commands.validateRfc — not configured in forge.yaml`.
+
+## Session-end sequence
+
+After completing implementation work, the operator may run a three-step session-end sequence. These are **operator-invoked**, never automatic:
+
+1. **`fo-doc-audit`** — are existing docs in sync with code changes? (mechanical check)
+2. **`fo-session-retro`** — did the session produce insights worth routing to a durable home? (reflective triage)
+3. **`fo-handoff`** — what does the next agent need? (continuity document)
+
+Most sessions need only `fo-doc-audit`. `fo-session-retro` is valuable after debugging sessions, exploratory work, or when non-obvious behaviors were discovered. `fo-handoff` is needed when work is incomplete and another agent will continue.
