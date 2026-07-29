@@ -1,7 +1,7 @@
 ---
 id: RFC-0591
 title: "Add two-pass bitrate-capped MP4 encoding to video.variants.generate"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-29
-updatedAt: 2026-07-30
+updatedAt: 2026-07-29
 enhancedAt: 2026-07-30
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
