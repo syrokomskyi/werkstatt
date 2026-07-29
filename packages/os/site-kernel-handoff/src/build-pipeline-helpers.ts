@@ -12,7 +12,7 @@
 */
 import path from "node:path";
 import { existsSync } from "node:fs";
-import type { KernelPipelineReport } from "@warpgogol/site-kernel";
+import type { DiscoveredSiteWorkspace, KernelPipelineReport } from "@warpgogol/site-kernel";
 import { executeKernelPipeline } from "@warpgogol/site-kernel";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
 import { byteHash } from "@warpgogol/fingerprint";
@@ -22,17 +22,21 @@ import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "./bundle-i
  * Runs a kernel pipeline phase and throws a descriptive error if it fails.
  * Centralizes the executeKernelPipeline → unwrap → ok-check → format-failings pattern
  * that is used by mission.build, mission.validate, and release.prepare.
+ * When `siteWorkspace` is provided, bypasses site discovery (needed for closed-mission
+ * workpieces where registry.currentMission is null).
  */
 export async function runPipelinePhase(
   workspaceRoot: string,
   pipelineName: string,
   siteName: string,
+  siteWorkspace?: DiscoveredSiteWorkspace,
 ): Promise<KernelPipelineReport> {
   const result = await executeKernelPipeline({
     workspaceRoot,
     pipelineName,
     siteName,
     outputFormat: "pretty",
+    siteWorkspace,
   });
   const report: KernelPipelineReport = Array.isArray(result) ? result[0] : result;
   if (!report.ok) {

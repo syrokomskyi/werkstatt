@@ -607,6 +607,7 @@ const EXECUTE_KERNEL_PIPELINE_OPTION_KEYS = [
   "dryRun",
   "force",
   "outputFormat",
+  "siteWorkspace",
 ];
 
 export async function executeKernelPipeline(
@@ -618,6 +619,24 @@ export async function executeKernelPipeline(
     "executeKernelPipeline options",
   );
   progressLine(`pipeline ${options.pipelineName} — resolving target …`);
+
+  // Pre-resolved site workspace bypasses discovery (e.g. closed-mission workpieces
+  // where registry.currentMission is null and discovery can't find the workpiece).
+  if (options.siteWorkspace) {
+    const site = options.siteWorkspace;
+    progressLine(`pipeline ${options.pipelineName} — 1 site(s): ${site.name}`);
+    progressLine(`[${site.name}] loading app runtime …`);
+    const { registry } = await loadAppRuntime(options.workspaceRoot, site);
+    progressLine(`[${site.name}] app runtime ready`);
+    const steps = registry.getPipeline(options.pipelineName);
+    if (!steps) {
+      throw new Error(
+        `Kernel pipeline \`${options.pipelineName}\` is not registered for site \`${site.name}\`.`,
+      );
+    }
+    return executePipelineForSite(site, registry, options, steps);
+  }
+
   if (!options.siteName && !(options.allSites ?? false)) {
     const workspaceConfig = await loadWorkspaceConfig(options.workspaceRoot);
     if (workspaceConfig) {

@@ -21,6 +21,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import type {
+  DiscoveredSiteWorkspace,
   KernelCommandInput,
   KernelCommandResult,
   KernelRuntimeContext,
@@ -228,9 +229,20 @@ export async function runReleasePrepare(
         // RFC-0356: run build.prepare → astro build → build.post unconditionally.
         // All three phases must succeed — without build.post the distribution is
         // unsigned (text.normalize.apply, passport.emit, etc. never run).
+        //
+        // Construct a synthetic DiscoveredSiteWorkspace pointing to the workpiece so
+        // the pipeline executor can load the app runtime without relying on
+        // registry.currentMission (which is null for closed missions).
+        const workpieceSite: DiscoveredSiteWorkspace = {
+          name: systemId,
+          directory: workpieceDir,
+          toolsDirectory: path.join(workpieceDir, "tools"),
+          configPath: path.join(workpieceDir, "tools", "kernel.config.ts"),
+        };
+
         logger.info(`  Running build.prepare pipeline for ${systemId}…`);
         try {
-          await runPipelinePhase(workspaceRoot, "build.prepare", systemId);
+          await runPipelinePhase(workspaceRoot, "build.prepare", systemId, workpieceSite);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           throw new Error(`[release.prepare] build.prepare failed: ${msg.slice(0, 200)}`);
@@ -250,7 +262,7 @@ export async function runReleasePrepare(
 
         logger.info(`  Running build.post pipeline for ${systemId}…`);
         try {
-          await runPipelinePhase(workspaceRoot, "build.post", systemId);
+          await runPipelinePhase(workspaceRoot, "build.post", systemId, workpieceSite);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           throw new Error(`[release.prepare] build.post failed: ${msg.slice(0, 200)}`);

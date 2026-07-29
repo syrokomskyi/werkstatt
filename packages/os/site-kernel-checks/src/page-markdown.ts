@@ -302,11 +302,11 @@ export async function runPageMarkdownGenerate(
     // from the people collection, mirroring sitemap-helpers.ts.
     // RFC-0510: prefer the Team page (pageId === "team" or semanticType === "collection") as the
     // base segment for person profile twins. Fall back to the About page when no Team page exists.
-    const teamPage = pages.find(
-      (p) =>
-        (p as Record<string, unknown>).pageId === "team" ||
-        (p as Record<string, unknown>).semanticType === "collection",
-    );
+    // Fix: prioritize pageId === "team" over semanticType === "collection" — multiple pages can
+    // have semanticType "collection" (e.g. ratgeber hub), and the OR condition matched the wrong one.
+    const teamPage =
+      pages.find((p) => (p as Record<string, unknown>).pageId === "team") ??
+      pages.find((p) => (p as Record<string, unknown>).semanticType === "collection");
     const aboutPage = pages.find((p) => (p as Record<string, unknown>).semanticType === "about");
     const parentPage = teamPage ?? aboutPage;
     const baseFor = (lang: string): string =>

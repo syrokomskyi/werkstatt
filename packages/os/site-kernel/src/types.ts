@@ -390,6 +390,8 @@ export interface ExecuteKernelPipelineOptions {
   outputFormat?: KernelOutputFormat;
   /** RFC-0390: when true, bypass cache reads for a full re-execution. Successful results are still written. */
   force?: boolean;
+  /** Pre-resolved site workspace — bypasses site discovery when provided (e.g. for closed-mission workpieces). */
+  siteWorkspace?: DiscoveredSiteWorkspace;
 }
 
 export interface SiteWorkspacesListResult {
