@@ -4,7 +4,7 @@ date: 2026-07-29
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: a7f06aa...HEAD
 filesReviewed:
   - packages/share/src/redirects.ts
@@ -19,9 +19,9 @@ filesReviewed:
 
 # Code Review: a7f06aa...HEAD (RFC-0588 implementation)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The implementation correctly extracts `parseRedirectRules` to `@warpgogol/share/redirects`, implements `isRouteRedirected` with glob-to-regex conversion, and modifies `collectRoutes` to exclude redirected routes. However, there is one finding on Axis G regarding a potential double-read of `_redirects` that should be addressed.
+The implementation correctly extracts `parseRedirectRules` to `@warpgogol/share/redirects`, implements `isRouteRedirected` with glob-to-regex conversion, and modifies `collectRoutes` to exclude redirected routes. After fix commit 4cfce70, the G-1 finding (double read of `_redirects`) is resolved — the file is now read once in `runBehaviorSnapshotCapture` and the content is reused for both parsing and hashing.
 
 ### Mechanical floor
 
@@ -53,7 +53,7 @@ No issues. No new command added — redirect exclusion is an internal implementa
 
 ### Axis G — Blind spots
 
-**Finding G-1 (minor): Double read of `_redirects` file.** `collectRoutes` reads `_redirects` at `behavior-snapshot-commands.ts:80-82` via `fs.readFile`, and `runBehaviorSnapshotCapture` reads the same file again at `behavior-snapshot-commands.ts:137` via `hashFileIfExists` for `redirectsHash`. This is a redundant I/O operation on every snapshot capture. The file content could be read once and reused for both parsing and hashing. This is not a correctness issue — both reads are consistent — but it is an unnecessary double I/O on a file that always exists when redirects are configured.
+**Finding G-1 (resolved): Double read of `_redirects` file.** Initially `collectRoutes` and `runBehaviorSnapshotCapture` each read `_redirects` independently. Fixed in commit 4cfce70 — `runBehaviorSnapshotCapture` now reads `_redirects` once, passes parsed rules to `collectRoutes`, and computes `redirectsHash` from the same content via `hashContent`.
 
 ### Spec compliance
 
@@ -72,4 +72,4 @@ No issues. No new command added — redirect exclusion is an internal implementa
 
 ### Questions for the author
 
-1. Should `collectRoutes` and `runBehaviorSnapshotCapture` share a single read of `_redirects` to avoid the double I/O, or is the redundancy acceptable given the file is typically small?
+No outstanding questions. The G-1 finding has been resolved in commit 4cfce70.
