@@ -12,6 +12,7 @@
 
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
@@ -45,6 +46,16 @@ import {
   workspaceRel,
 } from "./shared.ts";
 import { passResult } from "../result-helpers.ts";
+
+function resolveProseSource(file: string, appDir: string): string | null {
+  if (!file.startsWith("public/")) return null;
+  const proseRel = file.replace(/^public\//, "");
+  const prosePath = join(appDir, "src", "content", "prose", proseRel);
+  if (existsSync(prosePath)) {
+    return `src/content/prose/${proseRel}`;
+  }
+  return null;
+}
 
 export async function runPublicArtifactGenerate(
   _input: KernelCommandInput,
@@ -278,12 +289,14 @@ export async function runPublicSurfaceLint(
           !routePaths.has(normalizedPath) &&
           !fileCandidates.some((candidate) => publicPaths.has(candidate))
         ) {
+          const proseSource = resolveProseSource(file, app.appDirectory);
           messages.push({
             severity: "error",
             file,
             message: `PUBTXT-07 same-site generated link target is not locally known: ${target}`,
-            fixHint:
-              "Use a canonical generated route/public file or add the target to the owning route/declaration set.",
+            fixHint: proseSource
+              ? `Fix the source file ${proseSource}, then re-run: pnpm exec site-kernel pipeline build.prepare --site <id>.`
+              : "Use a canonical generated route/public file or add the target to the owning route/declaration set.",
           });
         }
       }

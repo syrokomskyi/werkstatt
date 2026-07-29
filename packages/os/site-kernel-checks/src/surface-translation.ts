@@ -26,7 +26,10 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { parseMarkdownFrontmatter, stringifyMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import {
+  parseMarkdownFrontmatter,
+  stringifyMarkdownFrontmatter,
+} from "@warpgogol/site-kernel-content";
 import { toKebabCase } from "@warpgogol/share/string-utils";
 import type { SurfaceModuleContext } from "@warpgogol/surface";
 import { diagnosticsResult, passResult } from "./result-helpers.ts";
@@ -393,7 +396,7 @@ function glossaryDiagnostics(
       severity: "error",
       file,
       message: `Missing translation glossary for ${module.id}/${target}.`,
-      fixHint: "Create and approve the module target-language glossary.",
+      fixHint: `Run: pnpm exec site-kernel run surface.translation.glossary.generate --module ${module.id} --target ${target} to create the glossary, then approve it.`,
     });
     return diagnostics;
   }
@@ -405,7 +408,7 @@ function glossaryDiagnostics(
       severity: "error",
       file,
       message: `Glossary ${module.id}/${target} is missing approval or has a stale moduleContextHash.`,
-      fixHint: "Review, approve, and restamp the glossary against the current module context.",
+      fixHint: `Run: pnpm exec site-kernel run surface.translation.glossary.generate --module ${module.id} --target ${target}. Then re-run validation.`,
     });
   }
   if (data.id !== module.localization?.glossaryRefs?.[target]) {
