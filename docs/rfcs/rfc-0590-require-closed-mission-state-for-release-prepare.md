@@ -15,18 +15,21 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes:
-  - RFC-0357
 supersededBy:
-amends: []
+amends:
+  - RFC-0357
+  - RFC-0522
 amendedBy: []
 related:
   - DNA-48
   - DNA-46
   - RFC-0355
   - RFC-0585
+  - RFC-0522
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -55,6 +58,7 @@ successSignals:
   - "release.prepare refuses open missions with a clear error message"
   - "release.prepare accepts closed missions and completes the build pipeline"
   - "No existing release workflow breaks because all prior releases used closed missions"
+  - "mission.close missing-release-id warning reflects the reversed workflow (release.prepare runs after close)"
 nonGoals:
   - "This RFC does not change release.publish (already requires closed mission per RFC-0357)"
   - "This RFC does not add a dry-run or review mode for pre-close validation"
@@ -87,6 +91,8 @@ RFC-0357 established the release discipline contract, including the state transi
 
 This allowance was designed to let operators review a release candidate before finalizing the mission. In practice, it introduces a class of risks: `release.prepare` on an open mission can build from a dirty or unvalidated workpiece, bypass the reconcile gate, and produce a release artifact from content that has not passed the full mission close validation.
 
+RFC-0522 added a `missing-release-id` warning to `mission.close` when `releaseId` is null, with the message "Run `release.prepare` before close to associate a release." This warning assumed the old workflow where `release.prepare` runs on an open mission before `mission.close`. Tightening `release.prepare` to require `state: closed` reverses the workflow: `mission.close` now runs first, then `release.prepare` on the closed mission. The RFC-0522 warning must be reworded to reflect the new order.
+
 The mission lifecycle (DNA-46) and release discipline (DNA-48) are separate cycles by design. `mission.close` is the validation gate that finalizes the workpiece (reconcile, bordbuch close entry, registry cleanup). `release.prepare` is the build gate that produces an immutable artifact. Allowing the build gate to run before the validation gate undermines the separation of concerns.
 
 ## Problem
@@ -112,14 +118,19 @@ The `mission.close` guard (RFC-0480) refuses to close a mission with null `recon
 
 ## Decision
 
-`release.prepare` accepts only missions with `state === "closed"`. Missions in `open` state are refused with a clear error message directing the operator to run `mission.close` first. This supersedes the RFC-0357 transition table entry that allowed `open` missions.
+`release.prepare` accepts only missions with `state === "closed"`. Missions in `open` state are refused with a clear error message directing the operator to run `mission.close` first. This amends the RFC-0357 transition table entry that allowed `open` missions. It also amends RFC-0522's `missing-release-id` warning in `mission.close` to reflect the reversed workflow (release.prepare runs after close, not before).
 
 ## Architectural fit
 
 - **DNA-46 (Mission lifecycle):** Enforces the separation between mission lifecycle and release lifecycle. `mission.close` is the gate that finalizes the workpiece; `release.prepare` builds from the finalized artifact.
 - **DNA-48 (Release discipline):** Tightens the release contract. A release is now always produced from a validated, reconciled, and closed mission — never from an active editing surface.
 - **RFC-0355 (Mission lifecycle and Bordbuch):** Aligns with the bordbuch close entry requirement. A release from a closed mission guarantees the bordbuch audit trail is complete.
+- **RFC-0522 (releaseId tracking):** The `missing-release-id` warning in `mission.close` assumed `release.prepare` runs before close. This RFC amends RFC-0522 by rewording the warning to direct operators to run `release.prepare` after close instead.
 - **RFC-0585 (Restore release.prepare production build):** Compatible — RFC-0585 restored the production build in `release.prepare`; this RFC constrains when `release.prepare` may run, not how it builds.
+
+### Invariant chain: closed implies reconciled
+
+A mission with `state: closed` always has `reconciledAt` set to a non-null value because `mission.close` enforces this as a hard guard (per `packages/os/site-kernel-handoff/AGENTS.md` and RFC-0480). This means `release.prepare`'s `state === "closed"` check transitively guarantees the mission has been reconciled — no separate `reconciledAt` check is needed in `release.prepare`.
 
 ## Design
 
@@ -139,7 +150,7 @@ Error message for open missions:
 
 ### TypeScript contracts
 
-The change is a single-line condition update in `release-commands.ts`:
+The state check change is a single-line condition update in `release-commands.ts`:
 
 ```ts
 // Before (RFC-0357):
@@ -157,6 +168,16 @@ if (manifest.state !== "closed") {
 }
 ```
 
+The `mission.close` warning change is a single-line message update in `mission-close.ts`:
+
+```ts
+// Before (RFC-0522):
+"Mission closed without release — releaseId is null. Run release.prepare before close to associate a release."
+
+// After (RFC-0590):
+"Mission closed without release — releaseId is null. Run release.prepare after close to associate a release."
+```
+
 No new types or interfaces are introduced.
 
 ### File system responsibilities
@@ -164,6 +185,8 @@ No new types or interfaces are introduced.
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/release/release-commands.ts` | State check updated (line ~145) |
+| `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | `missing-release-id` warning message reworded (line ~258) |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Document closed-mission requirement for `release.prepare` |
 | `missions/<id>/mission.yaml` | Read to check `state` field |
 
 No files are created or deleted. No generated files need regeneration.
@@ -183,7 +206,7 @@ No `--json` output shape changes. The command fails fast with a non-zero exit co
 - **Default behavior:** Fail-hard from the first release after acceptance. No grace period, no `--strict` flag.
 - **Existing apps:** No migration needed. All prior releases were prepared from closed missions in practice (the `open` path was rarely used). No existing release artifacts are invalidated.
 - **New apps:** Automatically comply — `release.prepare` refuses open missions from day one.
-- **Deprecation path:** RFC-0357's transition table entry for `open` missions is superseded. The note "`release.prepare` MAY run before `mission.close`" is removed.
+- **Deprecation path:** RFC-0357's transition table entry for `open` missions is amended. The note "`release.prepare` MAY run before `mission.close`" is removed. RFC-0522's `missing-release-id` warning is reworded to direct operators to run `release.prepare` after close.
 - **Pipeline integration:** No pipeline changes. `release.prepare` is a standalone command, not part of `build.prepare` or `build.check`.
 
 ## Alternatives considered
@@ -206,14 +229,16 @@ No `--json` output shape changes. The command fails fast with a non-zero exit co
 - [ ] `release.prepare` refuses missions with `state: "open"` and exits non-zero
 - [ ] Error message includes the mission id, current state, and directs to `mission.close`
 - [ ] `release.prepare` accepts missions with `state: "closed"` and completes the build pipeline
-- [ ] `packages/os/site-kernel-handoff/src/release/release-commands.ts` is the only source file changed
+- [ ] `mission.close` `missing-release-id` warning says "after close" instead of "before close"
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents the closed-mission requirement for `release.prepare`
 - [ ] `rfc.validate` passes on this RFC file
-- [ ] RFC-0357 transition table is updated to remove the `open` allowance
+- [ ] RFC-0357 frontmatter `amendedBy` includes RFC-0590
+- [ ] RFC-0522 frontmatter `amendedBy` includes RFC-0590
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- The implementation is a single-line change in `packages/os/site-kernel-handoff/src/release/release-commands.ts` (line ~145).
+- The implementation is a two-line change: one in `packages/os/site-kernel-handoff/src/release/release-commands.ts` (state check, line ~145) and one in `packages/os/site-kernel-handoff/src/mission/mission-close.ts` (warning message, line ~258).
 - Agents MUST NOT add a `--force` flag to bypass the closed-mission check.
 - Agents MUST NOT add a `release.dry-run` command as part of this RFC — that is explicitly a non-goal.
 - If an operator asks to prepare a release from an open mission, agents MUST direct them to `mission.close` first, not attempt to bypass the check.
