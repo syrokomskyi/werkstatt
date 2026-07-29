@@ -38,6 +38,7 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - `filterEnv` and `sourceDotenv` are exported from `cloudflare-workers.ts` and re-exported from `adapters/index.ts` for reuse by future adapters (RFC-0587).
 - `artifact.store.put` creates a `tar.gz` archive using the `tar` npm package and stores `distArtifactHash` as the archive hash (RFC-0587). It is idempotent: re-running for the same `releaseId` removes any existing manifest before writing the new one. The old tar.gz archive is not removed (content-addressed).
 - `artifactStoreRehydrate` extracts the tar.gz archive to the output directory using `tar` (RFC-0587). Throws if the archive is missing.
+- `collectRoutes` in `behavior.snapshot.capture` reads `_redirects` and excludes routes matching 301/308 redirect source patterns from the behavior snapshot (RFC-0588). `parseRedirectRules` is reused from `@warpgogol/share/redirects`. 410 Gone handling is deferred to RFC-0589.
 
 ## Notausgang (RFC-0359 / RFC-0380)
 
