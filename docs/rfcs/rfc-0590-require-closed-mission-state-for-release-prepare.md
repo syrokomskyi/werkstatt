@@ -1,7 +1,7 @@
 ---
 id: RFC-0590
 title: "Require closed mission state for release.prepare"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: contract
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes:
 supersededBy:
