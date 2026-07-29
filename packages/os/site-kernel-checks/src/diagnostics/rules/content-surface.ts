@@ -532,4 +532,9 @@ export const CONTENT_SURFACE_RULES: Record<string, RuleDescriptor> = {
     "Localized block labels missing key vs default-language twin",
     "page.blocks.mirror.validate",
   ),
+  "MIRROR-CONFIG": rule(
+    "MIRROR-CONFIG",
+    "Page blocks mirror validator could not resolve site paths (missing astro config)",
+    "page.blocks.mirror.validate",
+  ),
 };

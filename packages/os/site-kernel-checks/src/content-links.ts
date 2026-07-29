@@ -161,7 +161,7 @@ function resolveAnchor(
 interface Violation {
   file: string;
   line?: number;
-  rule: string;
+  ruleId: string;
   message: string;
   fixHint: string;
 }
@@ -302,7 +302,7 @@ export async function runContentLinksValidate(
   }
 
   const diagnostics: Diagnostic[] = violations.map((v) => ({
-    ruleId: v.rule,
+    ruleId: v.ruleId,
     severity: "error" as const,
     message: v.message,
     file: v.file,
@@ -342,7 +342,7 @@ function validateUrl(
       violations.push({
         file: relativeFile,
         line,
-        rule: "LINK-01",
+        ruleId: "LINK-01",
         message: `Anchor "${anchor}" not found on page "${filePageId}" for lang "${lang}". Add to system.md anchor registry or prose heading.`,
         fixHint: `Anchor "${anchor}" not found on page "${filePageId}". Add the anchor to system.md anchors registry for this page, or add a matching heading in the prose file, or fix the anchor text.`,
       });
@@ -360,7 +360,7 @@ function validateUrl(
         violations.push({
           file: relativeFile,
           line,
-          rule: "LINK-02",
+          ruleId: "LINK-02",
           message: `Same-page anchor must not carry path prefix. Use "${anchor}" instead of "${value}"`,
           fixHint: `Same-page anchor must not carry a path or language prefix. Use "${anchor}" instead of "${value}".`,
         });
@@ -378,7 +378,7 @@ function validateUrl(
           violations.push({
             file: relativeFile,
             line,
-            rule: "LINK-02",
+            ruleId: "LINK-02",
             message: `Same-page anchor must not carry language prefix. Use "${anchor}" instead of "${value}"`,
             fixHint: `Same-page anchor must not carry a path or language prefix. Use "${anchor}" instead of "${value}".`,
           });
@@ -393,7 +393,7 @@ function validateUrl(
       violations.push({
         file: relativeFile,
         line,
-        rule: "LINK-03",
+        ruleId: "LINK-03",
         message: `Internal path "${path}" does not resolve to a known route`,
         fixHint: `Internal path "${path}" does not resolve to a known route. Check the route map in system.md or remove the link.`,
       });
@@ -410,7 +410,7 @@ function validateUrl(
           violations.push({
             file: relativeFile,
             line,
-            rule: "LINK-01",
+            ruleId: "LINK-01",
             message: `Anchor "${anchor}" not found on target page "${routeEntry.pageId}"`,
             fixHint: `Anchor "${anchor}" not found on page "${routeEntry.pageId}". Add the anchor to system.md anchors registry for this page, or add a matching heading in the prose file, or fix the anchor text.`,
           });

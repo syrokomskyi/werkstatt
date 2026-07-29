@@ -12,7 +12,6 @@
 
 import { join } from "node:path";
 import { readFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
@@ -47,11 +46,15 @@ import {
 } from "./shared.ts";
 import { passResult } from "../result-helpers.ts";
 
-function resolveProseSource(file: string, appDir: string): string | null {
+async function resolveProseSource(
+  file: string,
+  appDir: string,
+  context: KernelRuntimeContext,
+): Promise<string | null> {
   if (!file.startsWith("public/")) return null;
   const proseRel = file.replace(/^public\//, "");
   const prosePath = join(appDir, "src", "content", "prose", proseRel);
-  if (existsSync(prosePath)) {
+  if (await context.io.exists(prosePath)) {
     return `src/content/prose/${proseRel}`;
   }
   return null;
@@ -289,7 +292,7 @@ export async function runPublicSurfaceLint(
           !routePaths.has(normalizedPath) &&
           !fileCandidates.some((candidate) => publicPaths.has(candidate))
         ) {
-          const proseSource = resolveProseSource(file, app.appDirectory);
+          const proseSource = await resolveProseSource(file, app.appDirectory, context);
           messages.push({
             severity: "error",
             file,

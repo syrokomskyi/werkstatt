@@ -217,7 +217,7 @@ export async function runPageBlocksMirrorValidate(
   } catch (err) {
     return diagnosticsResult("page.blocks.mirror.validate", [
       {
-        ruleId: "MIRROR-01",
+        ruleId: "MIRROR-CONFIG",
         severity: "error",
         message: (err as Error).message,
         file: "",
