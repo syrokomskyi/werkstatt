@@ -37,6 +37,7 @@ import {
   normalizeAppPath,
   buildRetiredSurfaceRedirectBlock,
   buildRetiredPageRoutesBlock,
+  buildRetiredTombstoneSlugs,
   getSupportedLanguages,
   getDefaultLanguage,
   getBiomeDisplayName,
@@ -135,6 +136,16 @@ export async function runGenerateRoutes(
     filePath: "src/pages/index.astro",
   }).trimEnd();
   const routesTokens = { GENERATED_HEADER: routesHeader };
+  const tombstoneSlugs = buildRetiredTombstoneSlugs(manifest);
+  const tombstoneHeader = buildGeneratedHeader({
+    ownerCommand: "routes.generate",
+    site: appId,
+    filePath: "src/middleware/retired-tombstones.ts",
+  }).trimEnd();
+  const tombstoneTokens = {
+    GENERATED_HEADER: tombstoneHeader,
+    TOMBSTONE_PREFIXES: JSON.stringify(tombstoneSlugs),
+  };
   return runGeneratedFileSet("routes.generate", context, [
     {
       absolutePath: path.join(paths.srcDirectory, "pages", "index.astro"),
@@ -156,6 +167,13 @@ export async function runGenerateRoutes(
     {
       absolutePath: path.join(paths.srcDirectory, "middleware.ts"),
       content: applyTokens(readTemplate("src/middleware.template.ts"), routesTokens),
+    },
+    {
+      absolutePath: path.join(paths.srcDirectory, "middleware", "retired-tombstones.ts"),
+      content: applyTokens(
+        readTemplate("src/middleware/retired-tombstones.ts.template"),
+        tombstoneTokens,
+      ),
     },
     {
       absolutePath: path.join(paths.srcDirectory, "content.config.ts"),

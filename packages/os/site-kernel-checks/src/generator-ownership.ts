@@ -153,6 +153,9 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   // i18n.middleware.generate — RFC-0055 language redirect middleware
   { path: "src/middleware/language-redirect.ts", command: "i18n.middleware.generate" },
 
+  // RFC-0589: retired tombstone middleware (410 Gone handling, routes.generate owned)
+  { path: "src/middleware/retired-tombstones.ts", command: "routes.generate" },
+
   // open-source.generate — RFC-0489 deployment-specific SBOM registry
   { path: "src/content/pages/{lang}/open-source.md", command: "open-source.generate" },
   { path: "src/content/prose/{lang}/open-source.md", command: "open-source.generate" },

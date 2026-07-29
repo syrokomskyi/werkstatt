@@ -9,6 +9,7 @@
   <item>RFC-0303: extracted helpers from app-boilerplate.ts into app-boilerplate-helpers.ts.</item>
   <item>RFC-0495: reverse redirect direction in buildRetiredSurfaceRedirectBlock (old URLs with country/region → new URLs without). Fix surfaceRoutesFromGenerated to use YAML parsing. Add surfaceEntriesFromGenerated for depth-filtered entries.</item>
   <item>RFC-0515: add buildCosmicPageMetadata — locale-aware brand resolution for cosmic pages. Default locale uses tagline-derived brand; non-default locales use manifest.app to avoid embedding master-locale tagline in non-DE metadata.</item>
+  <item>RFC-0589: filter 410 from buildRetiredPageRoutesBlock (only 301 in _redirects). Add buildRetiredTombstoneMiddleware for 410 handling via Astro middleware.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -237,22 +238,27 @@ export function buildRetiredPageRoutesBlock(manifest: SystemManifest): string {
   if (retiredRoutes.length === 0) return "";
 
   const entries = retiredRoutes
+    .filter((entry) => entry.status === 301)
     .map((entry) => {
       const slug = entry.slug.replace(/^\/+|\/+$/g, "");
-      if (entry.status === 301) {
-        const target = entry.to.replace(/^\/+|\/+$/g, "");
-        return `/${slug}/* /${target} 301`;
-      }
-      return `/${slug}/* / ${entry.status}`;
+      const target = entry.to.replace(/^\/+|\/+$/g, "");
+      return `/${slug}/* /${target} 301`;
     })
     .sort();
 
   if (entries.length === 0) return "";
-  return `\n${[
-    "# [RFC-0487/RFC-0509] Retired page routes — 410 Gone tombstones + 301 redirects.",
-    ...entries,
-    "",
-  ].join("\n")}`;
+  return `\n${["# [RFC-0487/RFC-0509] Retired page routes — 301 redirects.", ...entries, ""].join(
+    "\n",
+  )}`;
+}
+
+export function buildRetiredTombstoneSlugs(manifest: SystemManifest): string[] {
+  const retiredRoutes = manifest.retiredRoutes ?? [];
+  return retiredRoutes
+    .filter((entry) => entry.status === 410)
+    .map((entry) => entry.slug.replace(/^\/+|\/+$/g, ""))
+    .filter((slug) => slug.length > 0)
+    .sort();
 }
 
 export function getSupportedLanguages(manifest: SystemManifest): string[] {

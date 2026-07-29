@@ -7,11 +7,13 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted managed-public commands from public-surface.ts into public-surface/managed-public.ts.</item>
+  <item>RFC-0589: REDIR-03 rejects 410 for cloudflare-workers adapter sites. Valid statuses expanded to [200, 301, 302, 303, 307, 308]. Adapter resolved from systems/registry.yaml.</item>
 </CHANGE_SUMMARY>
 */
 
 import { promises as fs } from "node:fs";
 import { join } from "node:path";
+import { parse as yamlParse } from "yaml";
 import type {
   CheckResult,
   KernelCommandInput,
@@ -37,6 +39,25 @@ import { parseRedirectRules, type RedirectRule } from "@warpgogol/share/redirect
 function normalizeUrlPath(pathname: string): string {
   const clean = pathname.trim().replace(/^\/+|\/+$/g, "");
   return clean ? `/${clean}/` : "/";
+}
+
+const VALID_REDIRECT_STATUSES = [200, 301, 302, 303, 307, 308];
+
+export async function resolveDeploymentAdapter(
+  context: KernelRuntimeContext,
+  appId: string,
+): Promise<string | null> {
+  const registryPath = join(context.workspaceRoot, "systems", "registry.yaml");
+  try {
+    const raw = await context.io.readFile(registryPath);
+    const parsed = yamlParse(raw) as {
+      systems?: Array<{ id: string; deployment?: { adapter?: string } }>;
+    };
+    const system = parsed.systems?.find((s) => s.id === appId);
+    return system?.deployment?.adapter ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function routePathVariants(pathname: string): string[] {
@@ -219,14 +240,24 @@ export async function runRedirectMapValidate(
 
   const livePaths = await sitemapPaths(context, app);
   const rules = parseRedirectRules(body);
+  const adapter = await resolveDeploymentAdapter(context, app.appId);
+  const rejects410 = adapter === "cloudflare-workers" || adapter === "null" || adapter === null;
   const fromTargets = new Map(rules.map((rule) => [normalizeUrlPath(rule.from), rule]));
   for (const rule of rules) {
-    if (![301, 308, 410].includes(rule.status)) {
+    if (rule.status === 410 && rejects410) {
+      messages.push({
+        severity: "error",
+        file: appRel(app.appDirectory, redirectsPath),
+        message: `REDIR-03 status code 410 is not supported by ${adapter ?? "unknown"} adapter _redirects. Use middleware for 410 tombstones (RFC-0589).`,
+        fixHint:
+          "Use 301 or 308 for redirects. 410 tombstones are handled by middleware (RFC-0589).",
+      });
+    } else if (!VALID_REDIRECT_STATUSES.includes(rule.status)) {
       messages.push({
         severity: "error",
         file: appRel(app.appDirectory, redirectsPath),
         message: `REDIR-03 unsupported redirect status in "${rule.line}".`,
-        fixHint: "Use 301, 308, or 410 for public URL retirement.",
+        fixHint: "Use 200, 301, 302, 303, 307, or 308 for _redirects entries.",
       });
     }
     const fromPattern = rule.from.includes("*") || rule.from.includes(":");
@@ -247,7 +278,7 @@ export async function runRedirectMapValidate(
         severity: "error",
         file: appRel(app.appDirectory, redirectsPath),
         message: `REDIR-05 redirect target is not in the generated sitemap: ${rule.to}`,
-        fixHint: "Point to a live canonical route or use 410.",
+        fixHint: "Point to a live canonical route.",
       });
     }
     if (fromTargets.has(target)) {
