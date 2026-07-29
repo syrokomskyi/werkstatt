@@ -227,14 +227,14 @@ No `--json` output shape changes. The command fails fast with a non-zero exit co
 
 ## Acceptance criteria
 
-- [ ] `release.prepare` refuses missions with `state: "open"` and exits non-zero
-- [ ] Error message includes the mission id, current state, and directs to `mission.close`
-- [ ] `release.prepare` accepts missions with `state: "closed"` and completes the build pipeline
-- [ ] `mission.close` `missing-release-id` warning says "after close" instead of "before close"
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents the closed-mission requirement for `release.prepare`
-- [ ] `rfc.validate` passes on this RFC file
-- [ ] RFC-0357 frontmatter `amendedBy` includes RFC-0590
-- [ ] RFC-0522 frontmatter `amendedBy` includes RFC-0590
+- [x] `release.prepare` refuses missions with `state: "open"` and exits non-zero (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:145-149, `manifest.state !== "closed"` throws)
+- [x] Error message includes the mission id, current state, and directs to `mission.close` (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:147, message contains missionId, state, and `mission.close --mission`)
+- [x] `release.prepare` accepts missions with `state: "closed"` and completes the build pipeline (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:145, `state === "closed"` passes the check; pnpm --filter @warpgogol/site-kernel-handoff test — 354 tests pass)
+- [x] `mission.close` `missing-release-id` warning says "after close" instead of "before close" (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:258, test mission-close-release-id-warning.test.ts:41,55)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` documents the closed-mission requirement for `release.prepare` (evidence: packages/os/site-kernel-handoff/AGENTS.md:93)
+- [x] `rfc.validate` passes on this RFC file (evidence: `pnpm exec site-kernel run rfc.validate` — zero errors for RFC-0590)
+- [x] RFC-0357 frontmatter `amendedBy` includes RFC-0590 (evidence: docs/rfcs/archive/implemented/rfc-0357-release-discipline-and-behavior-snapshot-diff-gating.md:24)
+- [x] RFC-0522 frontmatter `amendedBy` includes RFC-0590 (evidence: docs/rfcs/archive/implemented/rfc-0522-reconcile-dirty-cache-clone-guard-3way-fallback-and-release-id-tracking.md:22)
 
 ## Implementation notes for agents
 
