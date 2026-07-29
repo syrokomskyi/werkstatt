@@ -9,6 +9,7 @@
   <item>RFC-0357: initial behavior snapshot capture and diff handlers.</item>
   <item>RFC-0379: add per-route contentHash via @warpgogol/fingerprint HTML normalization.</item>
   <item>RFC-0585: return full snapshot wrapper from capture so release.prepare can write it to disk for diff.</item>
+  <item>RFC-0588: exclude redirected routes (301, 308) from snapshot via _redirects parsing.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,6 +23,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
+import { parseRedirectRules, type RedirectRule } from "@warpgogol/share/redirects";
 import { hashHtml } from "@warpgogol/fingerprint";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -60,14 +62,30 @@ async function hashContent(content: string): Promise<string> {
   return `sha256:${crypto.createHash("sha256").update(content).digest("hex")}`;
 }
 
+export function isRouteRedirected(routePath: string, rules: RedirectRule[]): boolean {
+  return rules.some((rule) => {
+    if (rule.status !== 301 && rule.status !== 308) return false;
+    const escaped = rule.from.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = escaped.replace(/\*/g, ".*");
+    const regex = new RegExp(`^${pattern}$`);
+    return regex.test(routePath);
+  });
+}
+
 async function collectRoutes(distDir: string): Promise<RouteFact[]> {
   const routes: RouteFact[] = [];
   if (!existsSync(distDir)) return routes;
+
+  const redirectsPath = path.join(distDir, "_redirects");
+  const redirectRules = existsSync(redirectsPath)
+    ? parseRedirectRules(await fs.readFile(redirectsPath, "utf8"))
+    : [];
 
   for (const fullPath of await collectFiles(distDir, { extensions: [".html"] })) {
     if (path.basename(fullPath) !== "index.html") continue;
     const relPath = path.relative(distDir, fullPath).replace(/\\/g, "/");
     const routePath = "/" + relPath.replace(/index\.html$/, "").replace(/\/$/, "");
+    if (isRouteRedirected(routePath || "/", redirectRules)) continue;
     const html = await fs.readFile(fullPath, "utf8");
     const contentHash = hashHtml(html);
     routes.push({ path: routePath || "/", contentHash });
