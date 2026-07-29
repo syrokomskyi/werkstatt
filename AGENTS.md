@@ -206,6 +206,20 @@ Rules:
 - **Session-start pre-flight (NON-NEGOTIABLE, RFC-0575):** At the start of `fo-idea-implement` and `fo-fix` skill pipelines, the agent MUST run `git status --short` in the werkstatt root and in each active mission workpiece (if any). If foreign uncommitted changes are found, the agent MUST: (1) report them to the operator, (2) never modify, stage, or discard them, (3) stage only its own files by explicit path, (4) verify `git diff --cached --name-only` before every commit excludes foreign files.
 - **Git hook activation (RFC-0534).** The pre-commit hook at `hooks/pre-commit` requires `git config core.hooksPath hooks/` to be active. Agents MUST invoke the `setup-ecosystem` skill when setting up a new development environment or after cloning the repository without onboarding. The `onboard` skill's Prepare step checks and configures this automatically for new onboarding.
 
+## Session-end discipline (RFC-0581)
+
+**Session-end retro with git hygiene check (NON-NEGOTIABLE, RFC-0581):** When the operator signals session end ("we're done", "на этом всё", "that's it", "мы закончили", "das war's", "wir sind fertig", or similar), the agent MUST invoke `fo-session-retro`. Before the retro's insight triage begins, the agent performs a git hygiene check:
+
+1. Run `git status --short` in the werkstatt root and in each active mission workpiece (if any).
+2. If uncommitted changes are found, report them to the operator and ask whether to commit.
+3. If the operator confirms, commit using the appropriate path (`mission.git.commit` for workpieces, `ecosystem.commit` or `git commit` for werkstatt).
+4. If the operator declines, proceed with the retro — the uncommitted changes remain.
+5. If no uncommitted changes are found, proceed silently to insight triage.
+
+The agent does not auto-commit. The operator decides whether to commit. The signal list is illustrative — agents should recognize any clear session-closing signal regardless of language. When uncertain whether the operator is signaling session end, the agent asks: "Should I run the session-end retro?"
+
+This rule is complementary to RFC-0480's per-response `git status` verification, not a replacement. RFC-0480 checks before each response; RFC-0581 is a final safety net at session end. Together with RFC-0575 (session-start pre-flight), they form a bracket: check at start → commit during → verify at end.
+
 ## HDRI identity firewall, image resolution, material credits, responsive variants, derived artifact invalidation, silent UI text, behavior snapshot
 
 See [`docs/policies/content-contracts.md`](docs/policies/content-contracts.md) for the full text of these contracts:
