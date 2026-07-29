@@ -215,6 +215,7 @@ export async function executeRegisteredCommand(
       logs,
       logSummary: summarizeLogs(logs),
       timing: result?.timing ?? timing(false),
+      nextSteps: result?.nextSteps,
       filesModified,
     };
 
@@ -225,6 +226,15 @@ export async function executeRegisteredCommand(
       const formatted = formatFailureDiagnostics(report.data);
       for (const line of formatted) {
         logger.error(line);
+      }
+    }
+
+    // RFC-0579: render nextSteps as a "Next steps:" block in pretty mode.
+    if (report.nextSteps && report.nextSteps.length > 0) {
+      console.log("\nNext steps:");
+      for (const step of report.nextSteps) {
+        const prefix = step.kind === "required" ? "*" : " ";
+        console.log(`  ${prefix} ${step.action}`);
       }
     }
 

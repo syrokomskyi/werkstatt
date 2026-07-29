@@ -13,6 +13,7 @@
   <item>RFC-0326: add fileIntents to KernelRuntimeContext; add filesModified to KernelExecutionReport and KernelPipelineReport.</item>
   <item>RFC-0390: add cacheable to KernelCommandMetadata; add cached to KernelExecutionReport; add force to ExecuteKernelPipelineOptions; update reads JSDoc.</item>
   <item>RFC-0518: add GateMetadata, GateSeverity, GatePhase, GateConditional types and optional gate field to KernelCommandMetadata.</item>
+  <item>RFC-0579: add KernelNextStep interface and optional nextSteps field to KernelCommandResult and KernelExecutionReport.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -146,11 +147,17 @@ export interface KernelRegisteredCommandInfo extends KernelCommandMetadata {
   writes?: string[];
 }
 
+export interface KernelNextStep {
+  action: string;
+  kind: "required" | "optional";
+}
+
 export interface KernelCommandResult<TData = unknown> {
   data?: TData;
   exitCode?: number;
   summary?: string;
   timing?: KernelCommandTiming;
+  nextSteps?: KernelNextStep[];
 }
 
 // ---------------------------------------------------------------------------
@@ -306,6 +313,7 @@ export interface KernelExecutionReport<TData = unknown> {
     suppressedDebug: number;
   };
   timing: KernelCommandTiming;
+  nextSteps?: KernelNextStep[];
   /**
    * RFC-0326: workspace-root-relative POSIX paths of files this command
    * actually wrote, mkdir'd, or removed during this invocation. Empty array

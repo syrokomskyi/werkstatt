@@ -29,6 +29,7 @@ import type {
   Diagnostic,
   KernelCommandInput,
   KernelCommandResult,
+  KernelNextStep,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { executeKernelPipeline } from "@warpgogol/site-kernel";
@@ -298,10 +299,17 @@ export async function runMissionValidate(
     const reason = !staticPassed
       ? `${failedSteps.length}/${stepCount} steps failed`
       : "astro build failed";
+    const failNextSteps: KernelNextStep[] = [
+      {
+        action: `Fix the failing validators above, then re-run: pnpm exec site-kernel run mission.validate --mission ${missionId}`,
+        kind: "required",
+      },
+    ];
     return {
       data: report as unknown as MissionValidateData,
       exitCode: 1,
       summary: `[mission.validate] ${missionId} validation FAILED (${reason})`,
+      nextSteps: failNextSteps,
     };
   }
 
@@ -323,9 +331,33 @@ export async function runMissionValidate(
     }
   }
 
+  // RFC-0579: populate nextSteps based on workpiece dirty state
+  const passNextSteps: KernelNextStep[] = dirtyCheck.dirty
+    ? [
+        {
+          action: `Commit uncommitted changes: pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"`,
+          kind: "required",
+        },
+        {
+          action: `Then run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+          kind: "optional",
+        },
+      ]
+    : [
+        {
+          action: `Run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+          kind: "optional",
+        },
+        {
+          action: `Then run: pnpm exec site-kernel run mission.close --mission ${missionId}`,
+          kind: "optional",
+        },
+      ];
+
   return {
     data: report as unknown as MissionValidateData,
     summary: `[mission.validate] ${missionId} validation passed (${stepCount} steps, ${routeCount} routes built)`,
+    nextSteps: passNextSteps,
   };
 }
 
