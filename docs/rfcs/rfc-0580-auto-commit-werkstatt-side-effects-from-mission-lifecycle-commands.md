@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
+enhancedAt: 2026-07-29
 implementedAt:
 closedAt:
 supersedes: []
@@ -58,7 +59,10 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
 successSignals: []
-nonGoals: []
+nonGoals:
+  - "Adding commitAndPushBordbuch to mission.migrate and mission.materialize — these handlers append bordbuch entries but do not commit them to the cache clone. This is a pre-existing bordbuch hygiene gap separate from werkstatt auto-commit. Track separately."
+  - "Adding bordbuch entry recording to mission.reconcile — reconcile does not call appendBordbuchEntry at all. This is a separate gap in bordbuch audit trail, not a werkstatt commit issue."
+  - "Auto-committing werkstatt side-effects from sternsystem.sync — sternsystem.sync may mutate registry.yaml but is not a mission lifecycle command. Track separately if needed."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -99,7 +103,7 @@ DNA-51 (Werkstatt consistency primitives) requires shared lock, idempotency, and
 
 ## Decision
 
-Mission lifecycle commands (`mission.open`, `mission.materialize`, `mission.migrate`, `mission.reconcile`, `mission.close`, `mission.abort`) auto-commit their werkstatt-level side-effect files (`systems/registry.yaml`, `missions/<id>/mission.yaml`, `pnpm-lock.yaml`) to the monorepo working tree via a shared `commitWerkstattSideEffects` helper, using `gitExec` for git operations, with idempotent skip when no changes are present, and throwing on commit failure.
+Mission lifecycle commands (`mission.open`, `mission.materialize`, `mission.migrate`, `mission.reconcile`, `mission.close`, `mission.abort`) auto-commit their werkstatt-level side-effect files (`systems/registry.yaml`, `missions/<id>/mission.yaml`, `pnpm-lock.yaml`) to the monorepo working tree via a shared `commitWerkstattSideEffects` helper, using the existing `gitExec` utility (exported from `bordbuch-io.ts` and reused) for git operations, with idempotent skip when no changes are present, and throwing on commit failure.
 
 ## Architectural fit
 
@@ -146,12 +150,18 @@ export async function commitWerkstattSideEffects(
 ): Promise<{ committed: boolean; commitSha: string | null }>;
 ```
 
-Each lifecycle handler calls `commitWerkstattSideEffects` after its primary work:
+The helper uses `gitExec` exported from `bordbuch-io.ts` (the existing private utility, now exported for reuse). This avoids duplicating the git wrapper and keeps a single git utility for all werkstatt-level operations.
+
+Each lifecycle handler calls `commitWerkstattSideEffects` after all werkstatt-level file writes are complete — after `writeRegistry` and `writeMissionManifest`. The call goes at the end of the handler's `try` block, before the `return`. The existing `commitAndPushBordbuch` call (which operates on the cache clone, a separate git repo) is independent and remains in its current position.
 
 ```ts
-// mission.open example
-await writeRegistry(workspaceRoot, registry);
+// mission.open example (simplified — actual handler has more steps)
 await writeMissionManifest(workspaceRoot, manifest);
+await appendBordbuchEntry(workspaceRoot, systemId, "mission-open", brief, actor, { missionId, ... });
+await commitAndPushBordbuch(systemDir, `Bordbuch: mission-open ${missionId}`);
+entry.currentMission = missionId;
+await writeRegistry(workspaceRoot, registry);
+// Auto-commit werkstatt side-effects (RFC-0580)
 await commitWerkstattSideEffects(
   workspaceRoot,
   [
@@ -170,6 +180,9 @@ await commitWerkstattSideEffects(
 | `missions/<id>/mission.yaml` | Staged + committed by all 6 lifecycle commands |
 | `pnpm-lock.yaml` | Staged + committed by `mission.materialize` (after `pnpm install`) |
 | `packages/os/site-kernel-handoff/src/werkstatt/werkstatt-commit.ts` | New helper file |
+| `packages/os/site-kernel-handoff/src/werkstatt/index.ts` | Updated to export `commitWerkstattSideEffects` |
+| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts` | Export `gitExec` (currently private) for reuse by `werkstatt-commit.ts` |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Update Bordbuch git synchronization section to document parallel werkstatt auto-commit pattern |
 | `packages/os/site-kernel-handoff/src/mission/mission-open.ts` | Updated to call helper |
 | `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | Updated to call helper |
 | `packages/os/site-kernel-handoff/src/mission/mission-migrate.ts` | Updated to call helper |
@@ -187,7 +200,9 @@ No change to `--json` output shape. The auto-commit is a side-effect, not a resu
 | --- | --- |
 | No changes to side-effect files | Skip commit silently (idempotent) |
 | `git commit` fails (pre-commit hook, auth) | **Throw** — command fails, agent must resolve |
-| Foreign uncommitted changes in same files | `git add <specific paths>` stages only the named files; foreign changes in other files are not touched |
+| Conditional `registry.yaml` writes | In `mission.close` and `mission.abort`, `writeRegistry` is only called when `entry.currentMission === missionId`. If the condition is false, `registry.yaml` is not modified. The helper's `git add` on an unchanged file is a no-op (harmless) — the idempotent skip handles this case |
+| Foreign uncommitted changes in same files | `git add <specific paths>` stages ALL changes in those files, including foreign ones. Mitigated by DNA-51 locks: lifecycle commands acquire `registry` and `system:<id>` locks, serializing access. Concurrent manual edits to `registry.yaml` or `mission.yaml` while a lifecycle command holds the lock are unlikely but not impossible — the helper does not detect or reject this case |
+| Foreign uncommitted changes in other files | `git add <specific paths>` stages only the named files; foreign changes in other files are not touched |
 | `git` not available | Throw — command fails with clear error |
 
 The helper stages **only specific file paths** (never `git add -A` or `git add .`), preventing accidental pickup of foreign changes from concurrent sessions.
@@ -237,6 +252,14 @@ The helper stages **only specific file paths** (never `git add -A` or `git add .
 - [ ] Unit tests for `commitWerkstattSideEffects` (idempotent skip, specific-file staging, throw on failure)
 - [ ] Integration test: after `mission.open`, `git status` in monorepo is clean
 - [ ] `rfc.validate` passes on this file before merging
+
+## Pre-existing gaps (out of scope)
+
+- **`mission.migrate` and `mission.materialize` do not call `commitAndPushBordbuch`** — these handlers append bordbuch entries via `appendBordbuchEntry` but never commit them to the cache clone. This means the bordbuch `events.ndjson` file in the cache clone is left dirty after these commands. This is a pre-existing bordbuch hygiene gap, separate from werkstatt auto-commit. This RFC adds `commitWerkstattSideEffects` to these handlers (committing `mission.yaml` to the werkstatt tree), but the bordbuch entry remains uncommitted in the cache clone. Track this gap separately.
+
+- **`mission.reconcile` does not call `appendBordbuchEntry`** — the reconcile handler performs git merge + push on the cache clone but does not record a bordbuch entry at all. This is a separate gap in bordbuch audit trail, not a werkstatt commit issue.
+
+- **`sternsystem.sync` boundary** — `sternsystem.sync` also calls `commitAndPushBordbuch` and may mutate werkstatt-level files, but is not a mission lifecycle command. It is out of scope for this RFC.
 
 ## Implementation notes for agents
 
