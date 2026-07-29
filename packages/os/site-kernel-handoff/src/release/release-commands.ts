@@ -25,6 +25,7 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { byteHash } from "@warpgogol/fingerprint";
 import {
   readMissionManifest,
   writeMissionManifest,
@@ -198,11 +199,38 @@ export async function runReleasePrepare(
       const distDest = path.join(stagingDir, "dist");
       let buildReused = false;
 
-      if (existsSync(distributionDir)) {
+      const { version: platformVersion, commit } = await resolveCurrentEcosystem(workspaceRoot);
+      const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
+
+      // RFC-0585: Compute build input hash for reuse decision
+      const contentDir = path.join(workpieceDir, "src", "content");
+      let workpieceTreeHash = "sha256:absent";
+      if (existsSync(contentDir)) {
+        const contentResult = await fingerprintTree(contentDir, { mode: "semantic" });
+        workpieceTreeHash = contentResult.value;
+      }
+      const buildInputHash = byteHash(
+        `${workpieceTreeHash}|${platformVersion}|${platformSemanticHash}`,
+      );
+
+      const distributionMetaPath = path.join(missionDir, "distribution", "build-input-hash.json");
+      const canReuseDistribution =
+        existsSync(distributionDir) &&
+        existsSync(distributionMetaPath) &&
+        (await (async () => {
+          try {
+            const meta = JSON.parse(await fs.readFile(distributionMetaPath, "utf8"));
+            return meta.buildInputHash === buildInputHash;
+          } catch {
+            return false;
+          }
+        })());
+
+      if (canReuseDistribution) {
         await fs.mkdir(distDest, { recursive: true });
         await copyDir(distributionDir, distDest);
         buildReused = true;
-        logger.info(`  Reused distribution from mission.build`);
+        logger.info(`  Reused distribution from mission.build (build input hash matched)`);
       } else if (existsSync(workpieceDir)) {
         logger.info(`  Running astro build in ${workpieceDir}…`);
         try {
@@ -229,9 +257,6 @@ export async function runReleasePrepare(
       }
 
       const now = new Date().toISOString();
-
-      const { version: platformVersion, commit } = await resolveCurrentEcosystem(workspaceRoot);
-      const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
 
       // RFC-0585: Capture behavior snapshots and run diff
       const readableSnapshotPath = path.join(stagingDir, "readable-snapshot.json");
@@ -296,12 +321,7 @@ export async function runReleasePrepare(
       const distTreeResult = await fingerprintTree(distDest, { mode: "byte" });
       const distTreeHash = distTreeResult.value;
 
-      const contentDir = path.join(workpieceDir, "src", "content");
-      let siteContentHash = "sha256:absent";
-      if (existsSync(contentDir)) {
-        const contentResult = await fingerprintTree(contentDir, { mode: "semantic" });
-        siteContentHash = contentResult.value;
-      }
+      const siteContentHash = workpieceTreeHash;
 
       const behaviorSnapshotHash = productionResult.data.behaviorSnapshotHash;
       const readableSnapshotHash = readableResult.data.behaviorSnapshotHash;
