@@ -94,6 +94,16 @@ Read `PREFERENCES.md` at the repository root. Use `aiLanguage` for all communica
 
 Read `_shared/fo-pipeline-conventions.md` for commit discipline, language policy, and recoverable error handling.
 
+### 1.5. Git hygiene check (RFC-0581)
+
+Before gathering session insights, verify that the working tree is clean:
+
+1. Run `git status --short` in the werkstatt root.
+2. If `systems/registry.yaml` has a `currentMission`, also run `git status --short` in each active mission workpiece directory.
+3. If uncommitted changes are found, report them to the operator and ask whether to commit. Use `mission.git.commit` for workpiece changes, `ecosystem.commit` or `git commit` for werkstatt changes.
+4. If the operator declines, proceed — the uncommitted changes remain in the tree.
+5. If no uncommitted changes are found, proceed silently.
+
 ### 2. Gather session insights
 
 Review the current session to identify discoveries. Use in priority order:
