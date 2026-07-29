@@ -87,6 +87,17 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 - `mission.close` writes `evidence/close-report.json` with git, mirror, and reconcile status blocks.
 - `sternsystem.status --id <id>` is a read-only command showing HEAD SHA, origin SHA, mirror SHA, dirty files, last 6 bordbuch events, and last reconciledAt. Use `--all` for all systems.
 
+## Bordbuch repair (RFC-0583)
+
+`bordbuch.repair` is an on-demand disaster-recovery command that detects `orphan-mission-close` violations, inserts missing `mission-open` events with auto-derived or operator-supplied metadata, recomputes the hash chain and event-id sequence, and writes the repaired bordbuch atomically. It amends RFC-0355 §3.4 (append-only invariant) as a meta-level tool — the only command permitted to rewrite the bordbuch file, and only when `bordbuch.validate` reports `orphan-mission-close` violations.
+
+- **Flags:** `--system` (required), `--dry-run` (show planned repairs without writing), `--mission` (repair only the specified mission id), `--metadata` (JSON with `occurredAt`, `summary`, `actor` overrides).
+- **Idempotent:** running on an already-valid bordbuch is a no-op (exits 0 with `insertedEvents: 0`).
+- **Unrepairable violations** (`duplicate-mission-id`, `sensitive-payload`, `hash-mismatch`, `hash-chain-gap`) cause non-zero exit without writing.
+- **Does not auto-commit** — the operator must commit the repaired bordbuch in the cache clone manually.
+- **Not in any pipeline** — operator-only, never automated. Agents MUST NOT run `bordbuch.repair` proactively — only when `bordbuch.validate` reports `orphan-mission-close` violations.
+- Uses RFC-0362 lock primitives (`system:<id>` and `bordbuch:<id>` lock scopes) to prevent concurrent repair or append operations.
+
 ## Werkstatt side-effect auto-commit (RFC-0580)
 
 All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abort`, `mission.materialize`, `mission.migrate`, `mission.reconcile`) auto-commit werkstatt-level side-effect files to the monorepo working tree after updating them. The shared helper `commitWerkstattSideEffects` in `werkstatt/werkstatt-commit.ts` stages only specific file paths (never `git add -A`), is idempotent (skips when no staged changes), and throws on commit failure. The helper does NOT push — werkstatt monorepo push is a separate operator-controlled operation.
