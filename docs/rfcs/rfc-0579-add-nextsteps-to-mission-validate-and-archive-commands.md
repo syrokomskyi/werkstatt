@@ -283,13 +283,13 @@ After:
 
 ## Acceptance criteria
 
-- [ ] `KernelNextStep` interface defined in `packages/os/site-kernel/src/types.ts`
-- [ ] `KernelCommandResult` includes optional `nextSteps?: KernelNextStep[]` field
-- [ ] Site-kernel CLI renders `nextSteps` as a "Next steps:" block in pretty mode
-- [ ] `mission.validate` populates `nextSteps` for pass, fail, and dirty-workpiece states
-- [ ] All 6 archive command handlers (`rfc.archive`, `adr.archive`, `plan.archive`, `audit.archive`, `session.archive`, `mission.archive`) populate `nextSteps`
-- [ ] `--json` output includes `nextSteps` as a top-level field when populated
-- [ ] `rfc.validate` passes on this file
+- [x] `KernelNextStep` interface defined in `packages/os/site-kernel/src/types.ts` (evidence: commit 7051a1a, types.ts:150-153)
+- [x] `KernelCommandResult` includes optional `nextSteps?: KernelNextStep[]` field (evidence: commit 7051a1a, types.ts:160)
+- [x] Site-kernel CLI renders `nextSteps` as a "Next steps:" block in pretty mode (evidence: commit 7051a1a, execute-command.ts:232-239)
+- [x] `mission.validate` populates `nextSteps` for pass, fail, and dirty-workpiece states (evidence: commit 7051a1a, mission-materialization-commands.ts:302-355)
+- [x] All 6 archive command handlers (`rfc.archive`, `adr.archive`, `plan.archive`, `audit.archive`, `session.archive`, `mission.archive`) populate `nextSteps` (evidence: commit 7051a1a, forge/os/*/handlers/archive.ts)
+- [x] `--json` output includes `nextSteps` as a top-level field when populated (evidence: commit 7051a1a, KernelExecutionReport.nextSteps surfaced in JSON output)
+- [x] `rfc.validate` passes on this file (evidence: no RFC-0579 errors in rfc.validate output)
 
 ## Implementation notes for agents
 
