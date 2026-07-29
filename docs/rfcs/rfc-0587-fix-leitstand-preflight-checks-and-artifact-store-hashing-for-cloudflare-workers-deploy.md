@@ -1,7 +1,7 @@
 ---
 id: RFC-0587
 title: "Fix Leitstand preflight checks and artifact store hashing for Cloudflare Workers deploy"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
-implementedAt:
+implementedAt: 2026-07-29
 closedAt:
 supersedes: []
 supersededBy:
