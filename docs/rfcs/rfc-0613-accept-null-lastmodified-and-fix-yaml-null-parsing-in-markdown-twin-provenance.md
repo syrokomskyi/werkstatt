@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-07-30
-updatedAt: 2026-07-30
+updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -82,21 +83,24 @@ nonGoals:
 
 ## Context
 
-RFC-0602 (timestamp determinism) made generators emit `lastModified: null` instead of `new Date().toISOString()` in generated markdown twins, so that re-running a generator produces byte-identical output. However, `page.markdown.validate` (established by RFC-0320) was not updated to accept `null` as a valid value for `lastModified`.
+RFC-0602 (timestamp determinism) made generators emit `lastModified: null` instead of `new Date().toISOString()` in generated markdown twins, so that re-running a generator produces byte-identical output. The code fixes to accept `null` were applied during RFC-0602 implementation (confirmed by CHANGE_SUMMARY entries in both source files referencing RFC-0602). However, RFC-0320 (which established the provenance frontmatter contract) was never formally amended to accept `null` as a valid value for `lastModified`, and no regression tests exist to prevent future reversal.
 
-During mission `warpgogol-com-m000022` validation (2026-07-30), `page.markdown.validate` reported MDMETA-04 errors for all generated markdown twins: `lastModified is not a valid YYYY-MM-DD date: null`. The root cause was twofold:
+This RFC formally amends RFC-0320 to align with RFC-0602 and adds regression tests for the already-applied code changes.
 
-1. **YAML null parsing bug**: `parseMarkdownTwinFrontmatter` in `packages/share/src/semantic/markdown-twin-provenance.ts` is a hand-rolled parser that treats all YAML values as strings. It parsed the YAML `null` keyword as the string `"null"` instead of JS `null`.
-2. **Validator not updated for RFC-0602**: `page.markdown.validate` in `packages/os/site-kernel-checks/src/page-markdown.ts` required `lastModified` to be a valid `YYYY-MM-DD` date string. The string `"null"` (from the parsing bug) or even JS `null` (if parsed correctly) was rejected by MDMETA-02 (missing required field) and MDMETA-04 (invalid date format).
+### Already-applied code changes
+
+The following fixes were applied during RFC-0602 implementation and are present in the codebase:
+
+1. **YAML null parsing**: `parseMarkdownTwinFrontmatter` in `packages/share/src/semantic/markdown-twin-provenance.ts:224` converts the string `"null"` to JS `null`: `frontmatter[key] = stripped === "null" ? null : stripped;`
+2. **MDMETA-02 acceptance**: `page.markdown.validate` in `packages/os/site-kernel-checks/src/page-markdown.ts:560` excludes `lastModified` from the null-check: `frontmatter[field] == null && field !== "lastModified"`
+3. **MDMETA-04 acceptance**: `page.markdown.validate` in `packages/os/site-kernel-checks/src/page-markdown.ts:572-577` only validates the date format when `lastModified` is a non-null string: `lastModified != null && typeof lastModified === "string"`
 
 ## Problem
 
-Two bugs prevent `mission.validate` from passing when generated markdown twins use `lastModified: null` per RFC-0602:
+Two gaps remain after RFC-0602 implementation:
 
-1. `parseMarkdownTwinFrontmatter` (`packages/share/src/semantic/markdown-twin-provenance.ts:221-224`) parses YAML `null` as the string `"null"` instead of JS `null`.
-2. `page.markdown.validate` (`packages/os/site-kernel-checks/src/page-markdown.ts:558-577`) rejects `null` for `lastModified` with MDMETA-02 and MDMETA-04, contradicting RFC-0602 determinism.
-
-This gap is protected by manual discipline only — no test verifies that `null` is correctly parsed or accepted by the validator.
+1. **No formal amendment**: RFC-0320's contract still describes `lastModified` as a source-backed `YYYY-MM-DD` date. The `null` acceptance is an undocumented deviation from the established contract.
+2. **No regression tests**: No test verifies that `null` is correctly parsed by `parseMarkdownTwinFrontmatter` or accepted by `page.markdown.validate`. A future refactor could silently revert the fixes without any test failure.
 
 ## Decision
 
@@ -119,21 +123,37 @@ No CLI change — `page.markdown.validate` keeps its existing flags and interfac
 
 ### TypeScript contracts
 
+The existing types already support `null` — no type change is needed:
+
 ```ts
-// parseMarkdownTwinFrontmatter return type — no change, but null handling fixed
-interface MarkdownTwinFrontmatter {
-  lastModified: string | null;  // null is now a valid value
-  [key: string]: string | null;
+// packages/share/src/semantic/markdown-twin-provenance.ts
+export interface MarkdownTwinProvenance {
+  canonical: string;
+  language: string;
+  lastModified: string | null;  // null is a valid value per RFC-0602
+  license: string;
+  generator: string;
+  sourceKind: string;
+  // ...
 }
+
+// parseMarkdownTwinFrontmatter returns Record<string, unknown>
+// Null values are represented as JS null, not the string "null"
+export function parseMarkdownTwinFrontmatter(
+  content: string,
+): { frontmatter: Record<string, unknown>; body: string } | null;
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/share/src/semantic/markdown-twin-provenance.ts` | Fix `parseMarkdownTwinFrontmatter` to parse YAML `null` as JS `null` |
-| `packages/os/site-kernel-checks/src/page-markdown.ts` | Fix MDMETA-02 and MDMETA-04 to accept `null` for `lastModified` |
-| `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts` | New regression tests for `null` parsing and validation |
+| `packages/share/src/semantic/markdown-twin-provenance.ts` | Already fixed — `parseMarkdownTwinFrontmatter` parses YAML `null` as JS `null` (applied during RFC-0602) |
+| `packages/os/site-kernel-checks/src/page-markdown.ts` | Already fixed — MDMETA-02 and MDMETA-04 accept `null` for `lastModified` (applied during RFC-0602) |
+| `packages/share/src/tests/markdown-twin-provenance.test.ts` | New regression tests for `null` parsing |
+| `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts` | New regression tests for `null` validation (MDMETA-02, MDMETA-04) |
+| `packages/os/site-kernel-checks/AGENTS.md` | Add agent education rule: `lastModified: null` is intentional for generated files |
+| `docs/rfcs/archive/implemented/rfc-0320-*.md` | Add `RFC-0613` to `amendedBy` list (V-19 fix) |
 
 ### MDMETA-02 fix
 
@@ -170,8 +190,10 @@ frontmatter[key] = stripped === "null" ? null : stripped;
 ### Failure modes
 
 - **MDMETA-02**: Still fires for truly missing fields (not in frontmatter at all). Does NOT fire for `lastModified: null`.
-- **MDMETA-04**: Still fires for invalid date strings (e.g., `"2026-7-4"`, `"null"` if parsing is not fixed). Does NOT fire for `lastModified: null`.
+- **MDMETA-04**: Still fires for invalid date strings (e.g., `"2026-7-4"`). Does NOT fire for `lastModified: null`.
 - **MDMETA-04 with non-string lastModified**: If `lastModified` is a number or boolean (should not happen in well-formed frontmatter), the `typeof lastModified === "string"` guard prevents a false positive.
+- **Bare `null` vs quoted `"null"`**: The parser converts bare YAML `null` (unquoted) to JS `null` — this is the valid, deterministic value. Quoted `"null"` is parsed as the string `"null"`, which MDMETA-04 correctly rejects as an invalid date format. This distinction is intentional.
+- **Broad null conversion**: `parseMarkdownTwinFrontmatter` converts `"null"` to `null` for ALL fields, not just `lastModified`. This is safe because no other frontmatter field (canonical, contentHash, license, generator, sourceKind, semantic.*) can legitimately contain the string `"null"`.
 
 ## Rollout
 
