@@ -1,7 +1,7 @@
 ---
 id: RFC-0598
 title: "Add section.css.import.validate for colocated CSS import integrity"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
