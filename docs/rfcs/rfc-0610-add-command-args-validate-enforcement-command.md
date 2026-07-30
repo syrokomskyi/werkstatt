@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -28,8 +29,7 @@ related:
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies:
-  - DNA-54
+satisfies: []
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -49,7 +49,6 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-checks"
-  - "@warpgogol/site-kernel"
 successSignals:
   - "command.args.validate passes with zero violations when all registered commands use flag-only arguments."
   - "command.args.validate detects any command handler that reads input.args[0] or references the removed args field."
@@ -98,13 +97,13 @@ Each of these violations is currently invisible until someone tries to use the c
 
 ## Decision
 
-The kernel gains a `command.args.validate` command that statically analyzes all registered command definitions and their handler source code for compliance with the flag-only standard established by RFC-0609. The command is added to the `build.check` pipeline so non-compliant commands fail the build.
+The kernel gains a `command.args.validate` command that statically analyzes all registered command definitions and their handler source code for compliance with the flag-only standard established by RFC-0609. The command is added to `PACKAGES_CHECK_PIPELINE` so non-compliant commands fail the workspace package check.
 
 ## Architectural fit
 
 - **RFC-0609 (flag-only standard):** This RFC is the enforcement layer for RFC-0609. RFC-0609 establishes the standard; this RFC prevents regression.
-- **DNA-54 (Forge bindings contract):** By ensuring all commands use flag-only arguments, this RFC also ensures forge.yaml binding templates can be uniformly validated — all bindings should use `--<flag> {id}` format.
 - **RFC-0260 (typed flag schemas):** This RFC extends the flag schema validation from runtime (KERNEL-FLAG-01) to static analysis — catching violations before the command is ever invoked.
+- **RFC-0393 (forge bindings):** By ensuring all commands use flag-only arguments, this RFC indirectly supports uniform forge.yaml binding templates (`--<flag> {id}` format). However, this RFC does not directly enforce DNA-54 — DNA-54 governs hardcoded literals in forge skill bodies, not command argument patterns.
 
 ## Design
 
@@ -115,17 +114,17 @@ pnpm exec site-kernel run command.args.validate --json
 pnpm exec site-kernel run command.args.validate
 ```
 
-Scope: `workspace`. No flags needed — the command scans all registered commands in the kernel registry.
+Scope: `workspace`. No flags needed — the command scans all registered commands in the kernel registry and their handler source files.
 
 ### Detection rules
 
 The command performs three static analysis checks:
 
-**ARG-COMPLIANCE-01** — Handler reads `input.args`. After RFC-0609, `KernelCommandInput` no longer has an `args` field. Any handler source file that references `input.args` is non-compliant. The check scans handler source files (identified via the command registration's `execute` function source location or the module file pattern) for the pattern `input.args`.
+**ARG-COMPLIANCE-01** — Handler reads `input.args`. After RFC-0609, `KernelCommandInput` no longer has an `args` field. Any handler source file that references `input.args` is non-compliant. While TypeScript also flags this as a type error after RFC-0609, the validator provides structured `CheckResult` diagnostics with fix hints integrated into the `packages-check` pipeline, and catches violations without requiring a full typecheck pass. The check scans handler source files for the pattern `input.args` (after stripping comments and string literals).
 
-**ARG-COMPLIANCE-02** — Command registered with `flags: {}` but handler reads an entity id. A command that declares no flags but whose handler reads `input.flags["id"]` (or any flag) is inconsistent — either the flag should be declared in the schema, or the handler should not read it. This catches commands where the registration was not updated to match the handler.
+**ARG-COMPLIANCE-02** — Command registered with `flags: {}` but handler reads an entity id. A command that declares no flags but whose handler reads `input.flags["id"]` (or any named flag via string literal) is inconsistent — either the flag should be declared in the schema, or the handler should not read it. This catches commands where the registration was not updated to match the handler. This is the only rule that TypeScript cannot catch — it is a structural inconsistency between registration and handler, not a type error.
 
-**ARG-COMPLIANCE-03** — Dual-path fallback (`?? input.args[0]`). Any handler that contains `?? input.args[0]` or `|| input.args[0]` is using the dual-path pattern explicitly prohibited by RFC-0609.
+**ARG-COMPLIANCE-03** — Dual-path fallback (`?? input.args[0]`). Any handler that contains `?? input.args[0]` or `|| input.args[0]` is using the dual-path pattern explicitly prohibited by RFC-0609. Like ARG-COMPLIANCE-01, TypeScript flags this as a type error after RFC-0609 (since `input.args` is removed), but the validator provides structured diagnostics with fix hints.
 
 ### TypeScript contracts
 
@@ -145,9 +144,10 @@ interface CommandArgsViolation {
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-checks/src/command-args-validate.ts` | New module — implements `runCommandArgsValidate` |
-| `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` | Register command |
-| `packages/os/site-kernel-checks/src/pipelines/build-check.ts` | Add command to `build.check` pipeline |
+| `packages/os/site-kernel-checks/src/command-tables/governance-checks.ts` | Register command |
+| `packages/os/site-kernel-checks/src/pipelines/packages-check.ts` | Add command to `PACKAGES_CHECK_PIPELINE` |
 | `packages/forge/os/**/*.module.ts` | Scanned for command registrations (flags schema) |
+| `packages/os/site-kernel-checks/src/command-tables/*.ts` | Scanned for command registrations (data-driven `CheckCommandEntry[]` tables) |
 | `packages/os/site-kernel-*/src/**/*.ts` | Scanned for handler source code (input.args references) |
 
 ### Output format
@@ -180,14 +180,14 @@ interface CommandArgsViolation {
 ## Rollout
 
 - **Dependency:** RFC-0609 must be implemented first. This RFC's checks assume `input.args` no longer exists in `KernelCommandInput`. If RFC-0609 is not yet implemented, ARG-COMPLIANCE-01 will produce false positives on the 6 commands that still use positional args.
-- **Default behavior:** The command runs in `build.check` in fail mode from the start. Since RFC-0609 migrates all existing commands before this RFC is implemented, there should be zero violations on the first run.
+- **Default behavior:** The command runs in `PACKAGES_CHECK_PIPELINE` in fail mode from the start. Since RFC-0609 migrates all existing commands before this RFC is implemented, there should be zero violations on the first run.
 - **Existing apps:** No app-level changes — the command scans command registrations and handler source code, not app content.
 - **New apps:** Automatically benefit — any new command registered with positional args is caught at build time.
-- **Integration with `build.check`:** The command is added to the `build.check` pipeline after the existing validators. It runs on every `build.check` invocation.
+- **Integration with `PACKAGES_CHECK_PIPELINE`:** The command is added to `PACKAGES_CHECK_PIPELINE` (in `packages-check.ts`), alongside `kernel.flags.lint`, `kernel.io.lint`, and `generator.ownership.lint` — all workspace-level governance checks over command/kernel source code. It runs on every `packages-check.run` invocation.
 
 ## Alternatives considered
 
-- **Rely on TypeScript compiler only:** After RFC-0609 removes `args` from `KernelCommandInput`, TypeScript will flag `input.args` references as type errors. Rejected — this catches ARG-COMPLIANCE-01 but not ARG-COMPLIANCE-02 (flags: {} with handler reading flags) or ARG-COMPLIANCE-03 (dual-path fallback using `?? input.args[0]` before the type is removed). A dedicated validator provides clearer error messages and catches structural issues the compiler cannot.
+- **Rely on TypeScript compiler only:** After RFC-0609 removes `args` from `KernelCommandInput`, TypeScript will flag `input.args` references (including `?? input.args[0]`) as type errors. This catches ARG-COMPLIANCE-01 and ARG-COMPLIANCE-03 at the type level. Rejected as sufficient — TypeScript does not catch ARG-COMPLIANCE-02 (flags: {} with handler reading a named flag), which is a structural inconsistency between registration and handler, not a type error. Additionally, the validator provides structured `CheckResult` diagnostics with fix hints integrated into the `packages-check` pipeline, and catches violations in CI without requiring a full typecheck pass.
 
 - **Add a lint rule to eslint:** Rejected — eslint rules are generic and would need custom rule development. The kernel's validator pattern (CheckResult, build.check integration) is already established and provides better error messages with fix hints.
 
@@ -197,18 +197,19 @@ interface CommandArgsViolation {
 
 - **False positives from string literals:** A handler might contain `input.args` in a comment or string literal, not as actual code. Mitigation: the source scanner uses the same comment and string-literal exclusion approach as `generated-timestamp-validate.ts` (RFC-0602) — lines starting with `//` or inside `/* */` blocks are skipped, and matches inside string literals are skipped.
 - **False positives from dynamic flag access:** A handler might use `input.flags[flagName]` where `flagName` is a variable, not a string literal. The check for ARG-COMPLIANCE-02 should only flag `flags: {}` registrations where the handler reads a specific named flag via string literal — not dynamic flag access patterns.
-- **Performance:** Scanning all handler source files on every `build.check` adds overhead. Mitigation: the scan is limited to `packages/forge/os/**/*.ts` and `packages/os/site-kernel-*/src/**/*.ts` — a bounded set of files (~50-80 files). The scan uses regex, not AST parsing, so it is fast.
+- **Performance:** Scanning all handler source files on every `packages-check.run` adds overhead. Mitigation: the scan is limited to `packages/forge/os/**/*.ts`, `packages/os/site-kernel-checks/src/command-tables/*.ts`, and `packages/os/site-kernel-*/src/**/*.ts` — a bounded set of files (~60-90 files). The scan uses regex, not AST parsing, so it is fast.
 - **Agent misinterpretation risk:** An agent might see ARG-COMPLIANCE-02 and think it means "all commands must have flags" — but commands that genuinely take no arguments (e.g. `docs.archive`) are compliant with `flags: {}` as long as the handler does not read any flags. The error message should clarify: "Handler reads input.flags['id'] but command declares flags: {} — add the flag to the schema."
+- **`as any` escape hatch:** A handler might use `(input as any).args` to bypass both TypeScript's type check and the regex scanner (which looks for `input.args` as a literal pattern). The existing `no-as-any` ESLint rule is the first line of defense against this pattern. The validator does not attempt to catch `as any` casts — that is the lint's responsibility.
 
 ## Acceptance criteria
 
-- [ ] `command.args.validate` command registered in `01-codegen.ts` with `scope: workspace`
+- [ ] `command.args.validate` command registered in `governance-checks.ts` with `scope: workspace`
 - [ ] `runCommandArgsValidate` implemented in `packages/os/site-kernel-checks/src/command-args-validate.ts`
 - [ ] ARG-COMPLIANCE-01 detects handler source files that reference `input.args`
 - [ ] ARG-COMPLIANCE-02 detects command registrations with `flags: {}` whose handler reads a named flag
 - [ ] ARG-COMPLIANCE-03 detects `?? input.args[0]` and `|| input.args[0]` patterns
 - [ ] Comment and string-literal exclusion prevents false positives
-- [ ] Command added to `build.check` pipeline
+- [ ] Command added to `PACKAGES_CHECK_PIPELINE`
 - [ ] `--json` output follows standard `CheckResult` shape with `diagnostics[]`
 - [ ] Unit test in `src/tests/command-args-validate.test.ts` covers all three rules, comment exclusion, and clean-pass scenarios
 - [ ] `rfc.validate` passes on this file
@@ -218,9 +219,9 @@ interface CommandArgsViolation {
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - **RFC-0609 MUST be implemented first.** This RFC's checks assume `input.args` is removed from `KernelCommandInput`. Implementing this RFC before RFC-0609 will produce false positives on the 6 commands that still use positional args.
 - The source scanner should use the same `stripCommentsAndStrings` approach as `generated-timestamp-validate.ts` (RFC-0602) to avoid false positives from comments and string literals.
-- The scanner should scan only handler source files in `packages/forge/os/**/*.ts` and `packages/os/site-kernel-*/src/**/*.ts` — not all `.ts` files in the monorepo.
+- The scanner should scan handler source files in `packages/forge/os/**/*.ts`, `packages/os/site-kernel-checks/src/command-tables/*.ts`, and `packages/os/site-kernel-*/src/**/*.ts` — not all `.ts` files in the monorepo.
 - ARG-COMPLIANCE-02 should only flag `flags: {}` registrations where the handler reads a specific named flag via string literal (e.g. `input.flags["id"]`). Dynamic flag access (`input.flags[variable]`) should not trigger this rule.
-- The command MUST be added to `build.check` in fail mode (not warning mode) — since RFC-0609 migrates all existing commands first, there should be zero violations on the first run.
+- The command MUST be added to `PACKAGES_CHECK_PIPELINE` in fail mode (not warning mode) — since RFC-0609 migrates all existing commands first, there should be zero violations on the first run.
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0610 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
