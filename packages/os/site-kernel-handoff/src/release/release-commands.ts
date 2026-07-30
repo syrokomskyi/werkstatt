@@ -13,6 +13,7 @@
   <item>RFC-0522: write releaseId to mission manifest via writeMissionManifest after successful release preparation.</item>
   <item>RFC-0585: restore production build, behavior snapshot capture + diff, and real hash computation in release.prepare; add distTreeHash guard to release.publish.</item>
   <item>ADR-0008: run full three-phase build pipeline (build.prepare → astro build → build.post) in release.prepare fresh build path; delegate to shared runPipelinePhase and computeBuildInputHash helpers.</item>
+  <item>RFC-0596: call storeArtifactCore (lock-free) inside release.publish before state transition; extend ReleasePublishData with distArtifactHash; extend release.validate to check artifact field for published releases.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -44,6 +45,7 @@ import {
   runBehaviorSnapshotCapture,
   runBehaviorSnapshotDiff,
 } from "../behavior-snapshot/behavior-snapshot-commands.ts";
+import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -496,6 +498,7 @@ export interface ReleasePublishData {
   state: "published";
   publishedAt: string;
   artifactUri: string | null;
+  distArtifactHash: string | null;
   distVerified: boolean;
 }
 
@@ -569,7 +572,15 @@ export async function runReleasePublish(
   try {
     const now = new Date().toISOString();
 
-    // Update manifest
+    // RFC-0596: Store artifact BEFORE state transition (eliminates partial failure)
+    // release.publish already holds release:${releaseId} and system:${systemId} locks,
+    // so we call the lock-free core directly — not runArtifactStorePut which would deadlock.
+    const distDir = path.join(releaseDir, "dist");
+    const artifactResult = await storeArtifactCore(workspaceRoot, releaseId, distDir, systemId);
+
+    // Update manifest with artifact reference and state transition in a single write
+    manifest.artifact = artifactResult.uri;
+    manifest.distArtifactHash = artifactResult.distArtifactHash;
     manifest.state = "published";
     manifest.publishedAt = now;
     await writeReleaseYaml(workspaceRoot, releaseId, manifest);
@@ -604,6 +615,7 @@ export async function runReleasePublish(
         state: "published",
         publishedAt: now,
         artifactUri: (manifest.artifact as string) ?? null,
+        distArtifactHash: (manifest.distArtifactHash as string) ?? null,
         distVerified: true,
       },
       summary: `[release.publish] ${releaseId} published`,
@@ -650,9 +662,22 @@ export async function runReleaseValidate(
 
   const manifest = await readReleaseManifest(workspaceRoot, releaseId);
   const distDir = path.join(releaseDir, "dist");
-  const artifactPresent = existsSync(distDir) || manifest.artifact !== null;
+  const releaseState = manifest.state as string;
 
-  logger.success(`[release.validate] ${releaseId} valid (state: ${manifest.state})`);
+  let artifactPresent: boolean;
+  if (releaseState === "published") {
+    artifactPresent =
+      manifest.artifact !== null && manifest.artifact !== undefined && manifest.artifact !== "null";
+    if (!artifactPresent) {
+      logger.warn(
+        `[release.validate] published release '${releaseId}' has no artifact — run release.publish to store it`,
+      );
+    }
+  } else {
+    artifactPresent = existsSync(distDir) || manifest.artifact !== null;
+  }
+
+  logger.success(`[release.validate] ${releaseId} valid (state: ${releaseState})`);
 
   return {
     data: {

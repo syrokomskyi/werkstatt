@@ -21,6 +21,8 @@ import {
 export {
   runArtifactStorePut,
   type ArtifactStorePutData,
+  storeArtifactCore,
+  type StoreArtifactCoreResult,
   runArtifactStoreGet,
   type ArtifactStoreGetData,
   runArtifactStoreValidate,

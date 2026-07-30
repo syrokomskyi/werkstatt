@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0363: initial artifact store command handlers.</item>
   <item>RFC-0587: tar.gz archive creation, idempotent manifest storage, rehydrate extraction.</item>
+  <item>RFC-0596: extract lock-free storeArtifactCore from runArtifactStorePut; fix systemId derivation bug (split("-m") → release manifest systemId).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -82,6 +83,122 @@ export interface ArtifactStorePutData {
   createdAt: string;
 }
 
+export interface StoreArtifactCoreResult {
+  distArtifactHash: string;
+  distTreeHash: string;
+  siteContentHash: string;
+  archivePath: string;
+  byteSize: number;
+  fileCount: number;
+  uri: string;
+  createdAt: string;
+}
+
+export async function storeArtifactCore(
+  workspaceRoot: string,
+  releaseId: string,
+  distDir: string,
+  systemId: string,
+  sitePath?: string,
+): Promise<StoreArtifactCoreResult> {
+  const { treeHash, fileCount, byteSize } = await hashDir(distDir);
+
+  // Create tar.gz archive of the dist directory
+  const archiveTmpPath = path.join(
+    workspaceRoot,
+    ARTIFACTS_DIR,
+    "tmp",
+    `${releaseId}-${Date.now()}.tar.gz`,
+  );
+  await fs.mkdir(path.dirname(archiveTmpPath), { recursive: true });
+
+  await tarCreate(
+    {
+      gzip: true,
+      file: archiveTmpPath,
+      cwd: distDir,
+    },
+    ["."],
+  );
+
+  const distArtifactHash = await byteHashFile(archiveTmpPath);
+
+  // Move archive to content-addressed path
+  const storeDir = hashPath(workspaceRoot, distArtifactHash);
+  await fs.mkdir(storeDir, { recursive: true });
+  const archivePath = path.join(storeDir, `${distArtifactHash}.tar.gz`);
+  await fs.rename(archiveTmpPath, archivePath);
+
+  // Clean up tmp dir if empty
+  const tmpDir = path.dirname(archiveTmpPath);
+  try {
+    await fs.rmdir(tmpDir);
+  } catch {
+    // not empty or already removed — fine
+  }
+
+  // Idempotent: remove any existing manifest for this releaseId before writing new one
+  const existing = await findArtifactManifest(workspaceRoot, releaseId);
+  if (
+    existing &&
+    existing.manifestPath !== path.join(storeDir, `${distArtifactHash}.manifest.json`)
+  ) {
+    await fs.unlink(existing.manifestPath).catch(() => {});
+  }
+
+  const now = new Date().toISOString();
+  const manifest = {
+    schemaVersion: "1.0.0" as const,
+    artifactKind: "release-dist" as const,
+    systemId,
+    releaseId,
+    missionId: releaseId.replace("-r", "-m"),
+    platformVersion: "unknown",
+    sternsystemCommitSha: null,
+    createdAt: now,
+    siteContentHash: sitePath
+      ? await hashFile(path.resolve(workspaceRoot, sitePath))
+      : "sha256:unspecified",
+    distTreeHash: treeHash,
+    distArtifactHash,
+    archivePath: path.relative(workspaceRoot, archivePath),
+    behaviorSnapshotHash: null,
+    readableSnapshotHash: null,
+    snapshotDiffHash: null,
+    byteSize,
+    fileCount,
+  };
+
+  const manifestPath = path.join(storeDir, `${distArtifactHash}.manifest.json`);
+  await atomicWriteFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+
+  return {
+    distArtifactHash,
+    distTreeHash: treeHash,
+    siteContentHash: manifest.siteContentHash,
+    archivePath: manifest.archivePath,
+    byteSize,
+    fileCount,
+    uri: `local://${manifestPath}`,
+    createdAt: now,
+  };
+}
+
+async function deriveSystemIdFromRelease(
+  workspaceRoot: string,
+  releaseId: string,
+): Promise<string> {
+  const manifestPath = path.join(workspaceRoot, "releases", releaseId, "release.yaml");
+  if (existsSync(manifestPath)) {
+    const content = await fs.readFile(manifestPath, "utf8");
+    for (const line of content.split("\n")) {
+      const match = line.match(/^systemId:\s*(.+)$/);
+      if (match) return match[1].trim();
+    }
+  }
+  return releaseId.split("-r")[0] ?? releaseId;
+}
+
 export async function runArtifactStorePut(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -100,6 +217,8 @@ export async function runArtifactStorePut(
     throw new Error(`[artifact.store.put] dist directory not found: ${distDir}`);
   }
 
+  const systemId = await deriveSystemIdFromRelease(workspaceRoot, releaseId);
+
   const operationId = generateOperationId();
   await acquireLock(
     workspaceRoot,
@@ -110,92 +229,25 @@ export async function runArtifactStorePut(
   );
 
   try {
-    const { treeHash, fileCount, byteSize } = await hashDir(distDir);
+    const result = await storeArtifactCore(workspaceRoot, releaseId, distDir, systemId, sitePath);
 
-    // Create tar.gz archive of the dist directory
-    const archiveTmpPath = path.join(
-      workspaceRoot,
-      ARTIFACTS_DIR,
-      "tmp",
-      `${releaseId}-${Date.now()}.tar.gz`,
+    logger.success(
+      `[artifact.store.put] stored artifact for ${releaseId}: ${result.distArtifactHash}`,
     );
-    await fs.mkdir(path.dirname(archiveTmpPath), { recursive: true });
-
-    await tarCreate(
-      {
-        gzip: true,
-        file: archiveTmpPath,
-        cwd: distDir,
-      },
-      ["."],
-    );
-
-    const distArtifactHash = await byteHashFile(archiveTmpPath);
-
-    // Move archive to content-addressed path
-    const storeDir = hashPath(workspaceRoot, distArtifactHash);
-    await fs.mkdir(storeDir, { recursive: true });
-    const archivePath = path.join(storeDir, `${distArtifactHash}.tar.gz`);
-    await fs.rename(archiveTmpPath, archivePath);
-
-    // Clean up tmp dir if empty
-    const tmpDir = path.dirname(archiveTmpPath);
-    try {
-      await fs.rmdir(tmpDir);
-    } catch {
-      // not empty or already removed — fine
-    }
-
-    // Idempotent: remove any existing manifest for this releaseId before writing new one
-    const existing = await findArtifactManifest(workspaceRoot, releaseId);
-    if (
-      existing &&
-      existing.manifestPath !== path.join(storeDir, `${distArtifactHash}.manifest.json`)
-    ) {
-      await fs.unlink(existing.manifestPath).catch(() => {});
-    }
-
-    const now = new Date().toISOString();
-    const manifest = {
-      schemaVersion: "1.0.0" as const,
-      artifactKind: "release-dist" as const,
-      systemId: releaseId.split("-m")[0] ?? releaseId,
-      releaseId,
-      missionId: releaseId.replace("-r", "-m"),
-      platformVersion: "unknown",
-      sternsystemCommitSha: null,
-      createdAt: now,
-      siteContentHash: sitePath
-        ? await hashFile(path.resolve(workspaceRoot, sitePath))
-        : "sha256:unspecified",
-      distTreeHash: treeHash,
-      distArtifactHash,
-      archivePath: path.relative(workspaceRoot, archivePath),
-      behaviorSnapshotHash: null,
-      readableSnapshotHash: null,
-      snapshotDiffHash: null,
-      byteSize,
-      fileCount,
-    };
-
-    const manifestPath = path.join(storeDir, `${distArtifactHash}.manifest.json`);
-    await atomicWriteFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
-
-    logger.success(`[artifact.store.put] stored artifact for ${releaseId}: ${distArtifactHash}`);
     return {
       data: {
         releaseId,
-        systemId: manifest.systemId,
-        distArtifactHash,
-        distTreeHash: treeHash,
-        siteContentHash: manifest.siteContentHash,
-        archivePath: manifest.archivePath,
-        byteSize,
-        fileCount,
-        uri: `local://${manifestPath}`,
-        createdAt: now,
+        systemId,
+        distArtifactHash: result.distArtifactHash,
+        distTreeHash: result.distTreeHash,
+        siteContentHash: result.siteContentHash,
+        archivePath: result.archivePath,
+        byteSize: result.byteSize,
+        fileCount: result.fileCount,
+        uri: result.uri,
+        createdAt: result.createdAt,
       },
-      summary: `[artifact.store.put] ${releaseId} artifact stored (${distArtifactHash.slice(0, 16)}...)`,
+      summary: `[artifact.store.put] ${releaseId} artifact stored (${result.distArtifactHash.slice(0, 16)}...)`,
     };
   } finally {
     await releaseLock(workspaceRoot, `release:${releaseId}`);
