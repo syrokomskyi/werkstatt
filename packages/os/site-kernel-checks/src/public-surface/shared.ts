@@ -10,8 +10,10 @@
 </CHANGE_SUMMARY>
 */
 
+import { readFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { TextDecoder } from "node:util";
+import { parse as parseYaml } from "yaml";
 import type {
   CheckResult,
   Diagnostic,
@@ -21,6 +23,7 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
+import { biomeSchema } from "@warpgogol/ontology/schemas";
 import { parseMaterialCreditMap } from "@warpgogol/share/material-credits";
 import { diagnosticsResult } from "../result-helpers.ts";
 
@@ -38,6 +41,11 @@ export type ManifestLike = Record<string, unknown> & {
   credits?: unknown;
 };
 
+export interface BiomePaletteColors {
+  brand: string;
+  surface: string;
+}
+
 export interface AppPublicContext {
   appId: string;
   appDirectory: string;
@@ -49,6 +57,7 @@ export interface AppPublicContext {
   languages: string[];
   defaultLanguage: string;
   materialCreditNames: string[];
+  biomePalette: BiomePaletteColors | undefined;
 }
 
 export function asRecord(value: unknown): Record<string, unknown> | undefined {
@@ -173,6 +182,30 @@ export async function loadPublicContext(context: KernelRuntimeContext): Promise<
     record.credit.parties.map((party) => party.name),
   );
 
+  const biomeId = asString(asRecord(typedManifest.identity)?.biome);
+  let biomePalette: BiomePaletteColors | undefined;
+  if (biomeId) {
+    const biomePath = join(
+      context.workspaceRoot,
+      "packages",
+      "ontology",
+      "biomes",
+      `${biomeId}.yaml`,
+    );
+    try {
+      const biomeRaw = parseYaml(await readFile(biomePath, "utf-8"));
+      const biomeResult = biomeSchema.safeParse(biomeRaw);
+      if (biomeResult.success) {
+        biomePalette = {
+          brand: biomeResult.data.palette.brand,
+          surface: biomeResult.data.palette.surface,
+        };
+      }
+    } catch {
+      // Biome YAML not found or invalid — fallback to hashColor in icon generator
+    }
+  }
+
   return {
     appId,
     appDirectory: paths.appDirectory,
@@ -184,6 +217,7 @@ export async function loadPublicContext(context: KernelRuntimeContext): Promise<
     languages: supported.length > 0 ? supported : [defaultLanguage],
     defaultLanguage,
     materialCreditNames: uniqueSorted(materialCreditNames),
+    biomePalette,
   };
 }
 

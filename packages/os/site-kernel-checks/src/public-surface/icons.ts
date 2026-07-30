@@ -74,8 +74,8 @@ function siteDisplayName(app: AppPublicContext): string {
 
 function buildIconSvg(app: AppPublicContext, maskable = false): string {
   const biome = asString(asRecord(app.manifest.identity)?.biome) ?? app.appId;
-  const bg = hashColor(`${biome}:${app.appId}`, 17);
-  const fg = hashColor(`${app.appId}:${biome}`, 42);
+  const bg = app.biomePalette?.surface ?? hashColor(`${biome}:${app.appId}`, 17);
+  const fg = app.biomePalette?.brand ?? hashColor(`${app.appId}:${biome}`, 42);
   const inset = maskable ? 14 : 6;
   const radius = maskable ? 22 : 26;
   return [
@@ -111,8 +111,8 @@ async function icoFromSvg(svg: string): Promise<Buffer> {
 
 function buildWebManifest(app: AppPublicContext): string {
   const biome = asString(asRecord(app.manifest.identity)?.biome) ?? app.appId;
-  const themeColor = hashColor(`${biome}:${app.appId}`, 17);
-  const backgroundColor = hashColor(`${app.appId}:${biome}`, 42);
+  const themeColor = app.biomePalette?.surface ?? hashColor(`${biome}:${app.appId}`, 17);
+  const backgroundColor = app.biomePalette?.brand ?? hashColor(`${app.appId}:${biome}`, 42);
   const name = siteDisplayName(app);
   return `${JSON.stringify(
     {
