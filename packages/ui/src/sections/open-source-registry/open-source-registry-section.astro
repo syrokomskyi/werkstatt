@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0489: New UI section for deployment-specific SBOM registry with semantic HTML and accessibility.</item>
   <item>Fix: resolve dataRef at build time — load registry JSON via import.meta.glob and merge with openSource labels from the site collection.</item>
+  <item>RFC-0608: fetch /.well-known/build-identity.json at request time (SSR) for deployment metadata display.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -49,6 +50,32 @@ const openSourceLabels = (labelsEntry?.data as Record<string, unknown>)?.openSou
   Record<string, unknown> | undefined;
 
 const registryJson = props.dataRef ? resolveRegistryData(props.dataRef, lang) : undefined;
+
+// RFC-0608: Fetch build-identity.json at request time (SSR)
+// On Cloudflare Workers, static assets are served before Worker code executes,
+// so a same-origin fetch works for this file.
+let deploymentMetadata = {
+  deploymentId: "—",
+  buildTimestamp: "—",
+  commitSha: "—",
+};
+try {
+  const response = await fetch(`${Astro.url.origin}/.well-known/build-identity.json`);
+  if (response.ok) {
+    const buildIdentity = (await response.json()) as {
+      releaseId?: string;
+      buildTimestamp?: string;
+      commitSha?: string;
+    };
+    deploymentMetadata = {
+      deploymentId: buildIdentity.releaseId ?? "—",
+      buildTimestamp: buildIdentity.buildTimestamp ?? "—",
+      commitSha: buildIdentity.commitSha ?? "—",
+    };
+  }
+} catch {
+  // File not found (e.g., local dev before release.prepare) — keep placeholders
+}
 
 const data = {
   ...(openSourceLabels ?? {}),
@@ -126,15 +153,15 @@ const data = {
       <dl class="open-source-registry__deployment-grid">
         <div class="open-source-registry__deployment-item">
           <dt>{data.deploymentIdLabel}</dt>
-          <dd>{data.deploymentMetadata.deploymentId}</dd>
+          <dd>{deploymentMetadata.deploymentId}</dd>
         </div>
         <div class="open-source-registry__deployment-item">
           <dt>{data.buildTimestampLabel}</dt>
-          <dd>{data.deploymentMetadata.buildTimestamp}</dd>
+          <dd>{deploymentMetadata.buildTimestamp}</dd>
         </div>
         <div class="open-source-registry__deployment-item">
           <dt>{data.commitShaLabel}</dt>
-          <dd>{data.deploymentMetadata.commitSha}</dd>
+          <dd>{deploymentMetadata.commitSha}</dd>
         </div>
       </dl>
     </section>

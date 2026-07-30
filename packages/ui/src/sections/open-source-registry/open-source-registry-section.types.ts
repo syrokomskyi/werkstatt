@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0489: New type definitions for open-source-registry section.</item>
+  <item>RFC-0608: remove deploymentMetadata from data (fetched from build-identity.json at request time via SSR).</item>
 </CHANGE_SUMMARY>
 ***************************************************************/
 
@@ -20,12 +21,6 @@ export interface OpenSourceRegistrySummary {
     license: string;
     count: number;
   }>;
-}
-
-export interface OpenSourceRegistryDeploymentMetadata {
-  deploymentId: string;
-  buildTimestamp: string;
-  commitSha: string;
 }
 
 export interface OpenSourceRegistryDownload {
@@ -74,7 +69,6 @@ export interface OpenSourceRegistrySectionContent {
     sbomFileLabel: string;
     componentTableHeading: string;
     summary: OpenSourceRegistrySummary;
-    deploymentMetadata: OpenSourceRegistryDeploymentMetadata;
     downloads: OpenSourceRegistryDownload[];
     components: OpenSourceRegistryComponent[];
   };
