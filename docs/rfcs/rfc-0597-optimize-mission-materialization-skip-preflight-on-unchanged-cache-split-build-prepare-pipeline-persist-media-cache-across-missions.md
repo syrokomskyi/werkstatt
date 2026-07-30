@@ -1,7 +1,7 @@
 ---
 id: RFC-0597
 title: "Optimize mission materialization: skip preflight on unchanged cache, split build.prepare pipeline, persist media cache across missions"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
