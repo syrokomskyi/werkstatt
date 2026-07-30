@@ -42,6 +42,9 @@ const STATIC_ASSET_EXEMPT_DIRS = ["public/textures/"];
 
 const PREVIEW_DIR = "public/preview/";
 
+const STALE_MESSAGE =
+  "File in public/ is not produced by any registered generator and is not a declared static asset.";
+
 export async function runGeneratedStaleValidate(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -110,13 +113,14 @@ export async function runGeneratedStaleValidate(
 
       const slug = filename.replace(/\.png$/, "");
       const parts = relToSite.split("/");
-      const lang = parts[2] ?? "";
+      // Expected structure: public/preview/{lang}/{slug}.png → parts = ["public", "preview", lang, slug.png]
+      const lang = parts.length >= 4 ? (parts[2] ?? "") : "";
       if (!lang) {
         diagnostics.push({
           ruleId: "STALE-01",
           severity: "error",
           file: relToSite,
-          message: `File in public/ is not produced by any registered generator and is not a declared static asset.`,
+          message: STALE_MESSAGE,
           fixHint: `Remove this file: git rm ${relToSite}`,
         });
         continue;
@@ -131,7 +135,7 @@ export async function runGeneratedStaleValidate(
       ruleId: "STALE-01",
       severity: "error",
       file: relToSite,
-      message: `File in public/ is not produced by any registered generator and is not a declared static asset.`,
+      message: STALE_MESSAGE,
       fixHint: `Remove this file: git rm ${relToSite}`,
     });
   }
