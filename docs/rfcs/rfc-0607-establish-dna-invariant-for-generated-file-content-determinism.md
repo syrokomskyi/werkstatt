@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -30,7 +32,8 @@ related:
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies: []
+satisfies:
+  - DNA-58
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -96,7 +99,7 @@ There is no DNA invariant that asserts: "generated files must match their genera
 
 A new DNA invariant — **DNA-58: Generated-file content determinism** — is established in `docs/architecture-dna.md`:
 
-> Every text-based generated file committed to git must be byte-identical to what its owning generator would produce from current source data (after line-ending normalization). Content drift — a committed file whose content diverges from its generator's current output — is a violation. Binary files (PNG, ICO, WebP, MP4, WebM) are excluded; their determinism is covered by RFC-0602 and RFC-0603. Enforcement: `generated.drift.validate` (RFC-0601). Established by RFC-0607.
+> Every text-based generated file committed to git must be byte-identical to what its owning generator would produce from current source data (after line-ending normalization). Content drift — a committed file whose content diverges from its generator's current output — is a violation. Binary files (PNG, ICO, WebP, MP4, WebM, JPG, JPEG, GIF, TIFF, HEIC, HEIF, SVG) are excluded; their determinism is covered by RFC-0602 and RFC-0603. Enforcement: `generated.drift.validate` (RFC-0601). Established by RFC-0607.
 
 This invariant extends the determinism principle from DNA-18 (Uni registry) to all text-based generated files. DNA-18 remains unchanged — it is still the single UI index invariant. DNA-58 is the general generated-file content invariant.
 
@@ -117,7 +120,7 @@ This RFC is a policy RFC — it establishes a DNA invariant and does not introdu
 
 The invariant is added to `docs/architecture-dna.md` as DNA-58:
 
-> **DNA-58 · Generated-file content determinism** Every text-based generated file committed to git must be byte-identical to what its owning generator would produce from current source data (after line-ending normalization). Content drift is a violation. Binary files (PNG, ICO, WebP, MP4, WebM) are excluded. Enforcement: `generated.drift.validate` (RFC-0601). Established by RFC-0607.
+> **DNA-58 · Generated-file content determinism** Every text-based generated file committed to git must be byte-identical to what its owning generator would produce from current source data (after line-ending normalization). Content drift is a violation. Binary files (PNG, ICO, WebP, MP4, WebM, JPG, JPEG, GIF, TIFF, HEIC, HEIF, SVG) are excluded. Enforcement: `generated.drift.validate` (RFC-0601). Established by RFC-0607.
 
 ### File system responsibilities
 
