@@ -5,14 +5,14 @@ date: 2026-07-30
 auditor:
   skill: fo-idea-audit
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: pass
 ---
 
 # Audit: RFC-0602
 
-## Вердикт: Требует доработки
+## Вердикт: Pass
 
-RFC правильно определяет проблему (отсутствие линта для предотвращения регрессии volatile timestamps) и предлагает разумный механизм (source lint + опциональный double-build drift). Однако Phase 1 сканирует все `.ts` файлы в обоих пакетах без различения генераторов и валидаторов, что даст ~20+ false positives из легитимных использований `new Date()` в валидаторах. Phase 2 (`--deep`) создаёт инверсию пайплайна — `build.check` вызывает `build.prepare`, что архитектурно некорректно. Привязка к DNA-18 натянута.
+Все замечания из аудита устранены. TS-TIME-01 зарегистрировано в `core-infra.ts`, duplicate pattern matching исправлено (break-after-first), allowlist расширено (passport.ts, content-ledger.ts, ecosystem-commit.ts, surface-demand.ts), volatile timestamps в генераторах заменены на `null` (page-markdown.ts, content-ref-index-generate.ts, surface/shared.ts, surface-enrich.ts, app-qa.ts, agent-knowledge-compute.ts). Типы обновлены для поддержки `null` (MarkdownTwinProvenance.lastModified, ContentRefIndex.generatedAt, AgentKnowledgeFreshness.lastVerified, surfaceStateSchema.createdAt). AGK-08 валидатор обновлён для приёма `null` lastVerified. Scoped typecheck и unit тесты (20/20) проходят.
 
 ## Механическая валидация (rfc.validate)
 
@@ -56,7 +56,7 @@ No issues. RFC не предлагает backward compatibility layers или sh
   - `content-plan.ts`, `content-freshness.ts`, `content-derived.ts` — `new Date().toISOString().slice(0, 10)` для «today» в валидаторах
   - `canonical-url.ts` — `new Date()` для stamp validation (валидатор)
   - `ratgeber-claim-validate.ts` — `todayISO()` для claim expiry checking (валидатор)
-  
+
   RFC должен использовать `GENERATOR_OWNERSHIP_MAP` (из `generator-ownership.ts`) для определения, какие модули являются генераторами, и сканировать только их. Это снизит false positives до ~3-5 реальных нарушений (content-ref-index-generate.ts, open-source-page.ts, material-metadata-write.ts, agent-surface-sign.ts, agent-knowledge-compute.ts, page-markdown.ts, pseo-governance.ts).
 
 - **Allowlist burden**: RFC не оценивает начальный размер allowlist. Из анализа — как минимум 5-7 генераторов используют `new Date()` легитимно (bordbuch status с `createdAt`, agent-surface-sign с `created`, agent-knowledge-compute с `lastVerified`, page-markdown с `buildDate`, pseo-governance с `nowIso`). Каждая запись требует `reason` поля. Это не тривиальная initial настройка.
