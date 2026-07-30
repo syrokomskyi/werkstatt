@@ -9,6 +9,7 @@
   <item>RFC-0303 Phase 3: extracted from diagnostics/rules.ts as part of the domain split.</item>
   <item>Register environment/deploy, fingerprint, JSON marker, and DNA registry rule ids.</item>
   <item>Register analytics and chat metadata drift rule ids.</item>
+  <item>RFC-0601: register DRIFT-01 (error) and DRIFT-02 (info) for generated.drift.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -461,6 +462,19 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "GEN-FILES-01",
     "Registry-declared generated file is missing or glob expansion failed",
     "generated.files.validate",
+  ),
+
+  // generated.drift.validate — RFC-0601 content drift detection in generated files.
+  "DRIFT-01": rule(
+    "DRIFT-01",
+    "Committed file content differs from generator output",
+    "generated.drift.validate",
+  ),
+  "DRIFT-02": rule(
+    "DRIFT-02",
+    "Generator does not support dryRun mode; skipped",
+    "generated.drift.validate",
+    "info",
   ),
 
   // yaml.contract.lint — YAML-first workspace convention enforcement.
