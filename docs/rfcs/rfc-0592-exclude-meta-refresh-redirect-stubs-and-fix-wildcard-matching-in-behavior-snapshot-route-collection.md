@@ -182,13 +182,13 @@ No change to the `behavior.snapshot.capture` output shape. The `routes[]` array 
 
 ## Acceptance criteria
 
-- [ ] `isRouteRedirected` matches `/de` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts`, test with `/de/*` rule and `/de` route)
-- [ ] `isRouteRedirected` still matches `/de/agb` and `/de/agb/terms` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts`, existing test updated)
-- [ ] `isRouteRedirected` does NOT match `/agb` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts`, existing test retained)
-- [ ] Existing test at `behavior-snapshot.test.ts:32` updated from `toBe(false)` to `toBe(true)` for `/de` matching `/de/*`
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes with updated tests
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `isRouteRedirected` matches `/de` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts:30`, `expect(isRouteRedirected("/de", rules)).toBe(true)`)
+- [x] `isRouteRedirected` still matches `/de/agb` and `/de/agb/terms` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts:31-32`, `expect(isRouteRedirected("/de/agb", rules)).toBe(true)` and `/de/agb/terms`)
+- [x] `isRouteRedirected` does NOT match `/agb` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts:33`, `expect(isRouteRedirected("/agb", rules)).toBe(false)`)
+- [x] Existing test at `behavior-snapshot.test.ts:30` updated from `toBe(false)` to `toBe(true)` for `/de` matching `/de/*` (evidence: commit `eb6f078`)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes with updated tests (evidence: 354 tests passed, 0 failures)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: `tsc --noEmit` exit 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: no RFC-0592 violations)
 
 ## Implementation notes for agents
 
