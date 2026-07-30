@@ -59,34 +59,94 @@ export interface OwnershipEntry {
 
 export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   // overlay.pages.generate — RFC-0026 / RFC-0047 overlay content pages
-  { path: "src/content/pages/root-redirect.md", command: "overlay.pages.generate" },
-  { path: "src/content/pages/{lang}/cosmic/passport.md", command: "overlay.pages.generate" },
-  { path: "src/content/pages/{lang}/cosmic/star-map.md", command: "overlay.pages.generate" },
+  {
+    path: "src/content/pages/root-redirect.md",
+    command: "overlay.pages.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/content/pages/{lang}/cosmic/passport.md",
+    command: "overlay.pages.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/content/pages/{lang}/cosmic/star-map.md",
+    command: "overlay.pages.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
 
   // routes.generate — RFC-0078 thin runtime entrypoints
-  { path: "src/pages/index.astro", command: "routes.generate" },
-  { path: "src/pages/404.astro", command: "routes.generate" },
+  {
+    path: "src/pages/index.astro",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/pages/404.astro",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
   // RFC-0160: unprefixed default-language page route.
-  { path: "src/pages/[...slug].astro", command: "routes.generate" },
-  { path: "src/pages/[lang]/[...slug].astro", command: "routes.generate" },
-  { path: "src/middleware.ts", command: "routes.generate" },
-  { path: "src/content.config.ts", command: "routes.generate" },
-  { path: "src/env.d.ts", command: "routes.generate" },
+  {
+    path: "src/pages/[...slug].astro",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/pages/[lang]/[...slug].astro",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/middleware.ts",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/content.config.ts",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/env.d.ts",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
 
   // api.routes.generate — RFC-0149 section-owned Astro APIRoute re-exports + env schema.
   // Route stem is dynamic (one per section api[] entry on used sections); the
   // {route} placeholder declares single ownership of the whole src/pages/api/ tree.
-  { path: "src/pages/api/{route}.ts", command: "api.routes.generate" },
-  { path: "src/env.schema.generated.mjs", command: "api.routes.generate" },
+  {
+    path: "src/pages/api/{route}.ts",
+    command: "api.routes.generate",
+    module: "packages/os/site-kernel-codegen/src/api-routes.ts",
+  },
+  {
+    path: "src/env.schema.generated.mjs",
+    command: "api.routes.generate",
+    module: "packages/os/site-kernel-codegen/src/api-routes.ts",
+  },
 
   // env.example.generate — RFC-0168 (Session C): generated, leak-guarded secret template.
-  { path: ".env.example", command: "env.example.generate" },
+  {
+    path: ".env.example",
+    command: "env.example.generate",
+    module: "packages/os/site-kernel-checks/src/env/env-example.ts",
+  },
 
   // styles.global.generate — RFC-0078 global stylesheet boilerplate
-  { path: "src/styles/global.css", command: "styles.global.generate" },
+  {
+    path: "src/styles/global.css",
+    command: "styles.global.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
 
   // scripts.orchestrator.generate — RFC-0078 layout orchestrator
-  { path: "src/scripts/layout-orchestrator.ts", command: "scripts.orchestrator.generate" },
+  {
+    path: "src/scripts/layout-orchestrator.ts",
+    command: "scripts.orchestrator.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
 
   // public.infrastructure.generate — RFC-0078 public static infrastructure
   {
@@ -109,15 +169,35 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   },
 
   // agents.generate — RFC-0079 generated AGENTS.md files
-  { path: "AGENTS.md", command: "agents.generate" },
-  { path: "src/content/AGENTS.md", command: "agents.generate" },
-  { path: "src/styles/AGENTS.md", command: "agents.generate" },
+  {
+    path: "AGENTS.md",
+    command: "agents.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/content/AGENTS.md",
+    command: "agents.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
+  {
+    path: "src/styles/AGENTS.md",
+    command: "agents.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
 
   // biome.css.generate — RFC-0025 / RFC-0071 biome-scoped CSS
-  { path: "src/styles/biome.generated.css", command: "biome.css.generate" },
+  {
+    path: "src/styles/biome.generated.css",
+    command: "biome.css.generate",
+    module: "packages/os/site-kernel-codegen/src/biome-css.ts",
+  },
 
   // RFC-0371: Fontsource CSS imports (biome-driven).
-  { path: "src/styles/fonts.imports.css", command: "fonts.imports.generate" },
+  {
+    path: "src/styles/fonts.imports.css",
+    command: "fonts.imports.generate",
+    module: "packages/os/site-kernel-codegen/src/fonts-imports.ts",
+  },
 
   // RFC-0166: per-page Markdown twins ({route} claims the public *.md twin tree).
   {
@@ -134,7 +214,11 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   },
 
   // RFC-0169: resolved subscription entitlements.
-  { path: "src/entitlements.generated.yaml", command: "entitlements.resolve" },
+  {
+    path: "src/entitlements.generated.yaml",
+    command: "entitlements.resolve",
+    module: "packages/os/site-kernel-checks/src/entitlements.ts",
+  },
 
   // RFC-0165: RSS feed.
   {
@@ -145,21 +229,57 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   },
 
   // legal.scaffold — RFC-0096 Impressum / Datenschutz stubs (DE/AT/CH locales only)
-  { path: "src/content/pages/{lang}/impressum.md", command: "legal.scaffold" },
-  { path: "src/content/pages/{lang}/datenschutz.md", command: "legal.scaffold" },
-  { path: "src/content/prose/{lang}/impressum.md", command: "legal.scaffold" },
-  { path: "src/content/prose/{lang}/datenschutz.md", command: "legal.scaffold" },
+  {
+    path: "src/content/pages/{lang}/impressum.md",
+    command: "legal.scaffold",
+    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+  },
+  {
+    path: "src/content/pages/{lang}/datenschutz.md",
+    command: "legal.scaffold",
+    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+  },
+  {
+    path: "src/content/prose/{lang}/impressum.md",
+    command: "legal.scaffold",
+    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+  },
+  {
+    path: "src/content/prose/{lang}/datenschutz.md",
+    command: "legal.scaffold",
+    module: "packages/os/site-kernel-codegen/src/legal-scaffold.ts",
+  },
 
   // i18n.middleware.generate — RFC-0055 language redirect middleware
-  { path: "src/middleware/language-redirect.ts", command: "i18n.middleware.generate" },
+  {
+    path: "src/middleware/language-redirect.ts",
+    command: "i18n.middleware.generate",
+    module: "packages/os/site-kernel-codegen/src/service.ts",
+  },
 
   // RFC-0589: retired tombstone middleware (410 Gone handling, routes.generate owned)
-  { path: "src/middleware/retired-tombstones.ts", command: "routes.generate" },
+  {
+    path: "src/middleware/retired-tombstones.ts",
+    command: "routes.generate",
+    module: "packages/os/site-kernel-codegen/src/app-boilerplate.ts",
+  },
 
   // open-source.generate — RFC-0489 deployment-specific SBOM registry
-  { path: "src/content/pages/{lang}/open-source.md", command: "open-source.generate" },
-  { path: "src/content/prose/{lang}/open-source.md", command: "open-source.generate" },
-  { path: "src/content/data/{lang}/open-source-registry.json", command: "open-source.generate" },
+  {
+    path: "src/content/pages/{lang}/open-source.md",
+    command: "open-source.generate",
+    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+  },
+  {
+    path: "src/content/prose/{lang}/open-source.md",
+    command: "open-source.generate",
+    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+  },
+  {
+    path: "src/content/data/{lang}/open-source-registry.json",
+    command: "open-source.generate",
+    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
+  },
   {
     path: "public/open-source/THIRD_PARTY_NOTICES.txt",
     command: "open-source.generate",
@@ -180,8 +300,16 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   },
 
   // material.credits.generate — RFC-0220 material credits page
-  { path: "src/content/pages/{lang}/credits.md", command: "material.credits.generate" },
-  { path: "src/content/prose/{lang}/credits.md", command: "material.credits.generate" },
+  {
+    path: "src/content/pages/{lang}/credits.md",
+    command: "material.credits.generate",
+    module: "packages/os/site-kernel-codegen/src/service.ts",
+  },
+  {
+    path: "src/content/prose/{lang}/credits.md",
+    command: "material.credits.generate",
+    module: "packages/os/site-kernel-codegen/src/service.ts",
+  },
 
   // robots.generate — RFC-0052 canonical robots.txt builder (single owner per RFC-0087)
   {
@@ -297,10 +425,12 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
   {
     path: "packages/ui/src/sections/{id}/{id}.types.generated.ts",
     command: "props.types.generate",
+    module: "packages/os/site-kernel-codegen/src/props-types.ts",
   },
   {
     path: "packages/ui/src/components/{id}/{id}.types.generated.ts",
     command: "props.types.generate",
+    module: "packages/os/site-kernel-codegen/src/props-types.ts",
   },
 
   // RFC-0286: Agent Surface Manifest — public JSON projection.
