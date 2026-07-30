@@ -8,12 +8,14 @@
 <CHANGE_SUMMARY>
   <item>RFC-0358: initial leitstand module.</item>
   <item>RFC-0379: add --channel flag to all four commands; rollback requires --channel.</item>
+  <item>RFC-0608: propagate always alt (removes --channel); add leitstand.promote for alt→main with build-identity verification; rollback transitions release state.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { KernelModule } from "@warpgogol/site-kernel";
 import {
   runLeitstandPropagate,
+  runLeitstandPromote,
   runLeitstandStatus,
   runLeitstandRollback,
   runLeitstandHealth,
@@ -22,6 +24,8 @@ import {
 export {
   runLeitstandPropagate,
   type LeitstandPropagateData,
+  runLeitstandPromote,
+  type LeitstandPromoteData,
   runLeitstandStatus,
   type LeitstandStatusData,
   runLeitstandRollback,
@@ -44,17 +48,40 @@ export function createLeitstandModule(): KernelModule {
     register(registry) {
       registry.registerCommand({
         name: "leitstand.propagate",
-        description:
-          "Deploy a published release to a channel (RFC-0379). Flags: --release, [--channel alt|main].",
+        description: "Deploy a published release to the alt channel (RFC-0608). Flags: --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
           release: { kind: "string", required: true, description: "Published release id." },
-          channel: { kind: "string", description: "Deployment channel: alt (default) or main." },
         },
-        writes: ["systems/registry.yaml", "systems/{system}/bordbuch/events.ndjson"],
+        writes: [
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+          "releases/{release}/release.yaml",
+        ],
         execute: runLeitstandPropagate,
+      });
+      registry.registerCommand({
+        name: "leitstand.promote",
+        description:
+          "Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --release.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          release: {
+            kind: "string",
+            required: true,
+            description: "Alt-deployed release id to promote.",
+          },
+        },
+        writes: [
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+          "releases/{release}/release.yaml",
+        ],
+        execute: runLeitstandPromote,
       });
       registry.registerCommand({
         name: "leitstand.status",
@@ -84,7 +111,11 @@ export function createLeitstandModule(): KernelModule {
           },
           "to-release": { kind: "string", description: "Explicit target release id." },
         },
-        writes: ["systems/registry.yaml", "systems/{system}/bordbuch/events.ndjson"],
+        writes: [
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+          "releases/{release}/release.yaml",
+        ],
         execute: runLeitstandRollback,
       });
       registry.registerCommand({

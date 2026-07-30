@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>Lazy-loading kernel module for RFC-0358/0379 Leitstand fleet propagation commands: propagate, status, rollback, and health.</purpose>
+  <purpose>Lazy-loading kernel module for RFC-0358/0379/0608 Leitstand fleet propagation commands: propagate, promote, status, rollback, and health.</purpose>
   <non-goals>
     <item>Do not re-export types or utilities — the barrel leitstand/index.ts remains the public API surface.</item>
     <item>Do not register release or notausgang commands here.</item>
@@ -20,25 +20,51 @@ export function createLeitstandModule(): KernelModule {
     async register(registry) {
       const {
         runLeitstandPropagate,
+        runLeitstandPromote,
         runLeitstandStatus,
         runLeitstandRollback,
         runLeitstandHealth,
       } = await import("./leitstand-commands.ts");
       registry.registerCommand({
         name: "leitstand.propagate",
-        description:
-          "Deploy a published release to a channel (RFC-0379). Flags: --release, [--channel alt|main].",
+        description: "Deploy a published release to the alt channel (RFC-0608). Flags: --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
           release: { kind: "string", required: true, description: "Published release id." },
-          channel: { kind: "string", description: "Deployment channel: alt (default) or main." },
         },
-        writes: ["systems/registry.yaml", "systems/{system}/bordbuch/events.ndjson"],
+        writes: [
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+          "releases/{release}/release.yaml",
+        ],
         reads: ["releases/{release}/**", "systems/registry.yaml"],
         cacheable: false,
         execute: runLeitstandPropagate,
+      });
+      registry.registerCommand({
+        name: "leitstand.promote",
+        description:
+          "Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --release.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          release: {
+            kind: "string",
+            required: true,
+            description: "Alt-deployed release id to promote.",
+          },
+        },
+        writes: [
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+          "releases/{release}/release.yaml",
+        ],
+        reads: ["releases/{release}/**", "systems/registry.yaml"],
+        cacheable: false,
+        execute: runLeitstandPromote,
       });
       registry.registerCommand({
         name: "leitstand.status",
@@ -70,7 +96,11 @@ export function createLeitstandModule(): KernelModule {
           },
           "to-release": { kind: "string", description: "Explicit target release id." },
         },
-        writes: ["systems/registry.yaml", "systems/{system}/bordbuch/events.ndjson"],
+        writes: [
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+          "releases/{release}/release.yaml",
+        ],
         reads: ["systems/registry.yaml", "releases/*/release.yaml"],
         cacheable: false,
         execute: runLeitstandRollback,

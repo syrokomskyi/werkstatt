@@ -10,13 +10,13 @@
   <item>RFC-0379: channel model — alt/main channels, preflight, resolveAdapter throws for unimplemented, per-channel lastPropagated with operational state, --channel flag on all commands.</item>
   <item>RFC-0379 post-review: complete preflight (artifact hash, wrangler availability, dist size limit); add artifact-store rehydration for propagate and rollback.</item>
   <item>RFC-0587: adapter-declared size limits via getLimits() passed through runPreflight to checkDistSize; remove hardcoded limit constants.</item>
+  <item>RFC-0608: leitstand.propagate always deploys to alt (removes --channel); adds leitstand.promote for alt→main with build-identity verification; rollback transitions release state.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import yaml from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -32,6 +32,8 @@ import type {
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { readReleaseManifest, writeReleaseYaml } from "../release/release-commands.ts";
+import { buildIdentitySchema } from "@warpgogol/ontology/operations";
 import type {
   DeploymentAdapter,
   DeploymentLimits,
@@ -93,22 +95,6 @@ function resolveAdapter(name: string | undefined): DeploymentAdapter {
   if (!name || name === "null") return nullAdapter;
   if (name === "cloudflare-workers") return createCloudflareWorkersAdapter();
   throw new Error(`[leitstand] adapter-not-implemented: '${name}' has no concrete implementation`);
-}
-
-async function readReleaseManifest(
-  workspaceRoot: string,
-  releaseId: string,
-): Promise<Record<string, unknown>> {
-  const manifestPath = path.join(workspaceRoot, "releases", releaseId, "release.yaml");
-  if (!existsSync(manifestPath)) {
-    throw new Error(`release '${releaseId}' not found`);
-  }
-  const content = await fs.readFile(manifestPath, "utf8");
-  const parsed = yaml.parse(content);
-  if (typeof parsed !== "object" || parsed === null) {
-    throw new Error(`release '${releaseId}' manifest is not a valid YAML object`);
-  }
-  return parsed as Record<string, unknown>;
 }
 
 function getChannelConfig(dep: DeploymentConfig, channel: Channel): DeploymentChannel {
@@ -311,17 +297,18 @@ function buildLastPropagatedEntry(
   };
 }
 
-// §5.1: leitstand.propagate
+// §5.1: leitstand.propagate (RFC-0608: always alt, no --channel)
 export interface LeitstandPropagateData {
   systemId: string;
   releaseId: string;
-  channel: Channel;
+  channel: "alt";
   state: "succeeded" | "failed" | "failed-stale" | "in-progress";
   deploymentUrl: string;
   startedAt: string;
   completedAt: string | null;
   preflight: { passed: boolean; checks: PreflightCheck[] };
   health: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] };
+  releaseState: "alt-deployed";
 }
 
 export async function runLeitstandPropagate(
@@ -332,7 +319,13 @@ export async function runLeitstandPropagate(
   const releaseId = flagString(input, "release");
   if (!releaseId) throw new Error("[leitstand.propagate] --release is required");
 
-  const channel = parseChannel(flagString(input, "channel"), "alt");
+  if (input.flags["channel"] !== undefined) {
+    throw new Error(
+      "[leitstand.propagate] --channel is removed; use leitstand.promote for main deployment",
+    );
+  }
+
+  const channel: Channel = "alt";
 
   const releaseManifest = await readReleaseManifest(workspaceRoot, releaseId);
   if (releaseManifest.state !== "published") {
@@ -362,16 +355,6 @@ export async function runLeitstandPropagate(
     const dep = entry.deployment as DeploymentConfig;
     if (!dep) {
       throw new Error(`[leitstand.propagate] system '${systemId}' has no deployment config`);
-    }
-
-    // Channel gate: main requires healthy alt of same release
-    if (channel === "main" && dep.channels.alt) {
-      const altProp = dep.lastPropagated?.alt;
-      if (!altProp || altProp.releaseId !== releaseId || !altProp.healthy) {
-        throw new Error(
-          `[leitstand.propagate] main-channel gate: alt channel must have a healthy propagation of release '${releaseId}' before promoting to main`,
-        );
-      }
     }
 
     const channelConfig = getChannelConfig(dep, channel);
@@ -467,6 +450,12 @@ export async function runLeitstandPropagate(
     entry.deployment = dep;
     await writeRegistry(workspaceRoot, registry);
 
+    // RFC-0608: transition release state to alt-deployed on success
+    if (result.state === "succeeded") {
+      releaseManifest.state = "alt-deployed";
+      await writeReleaseYaml(workspaceRoot, releaseId, releaseManifest);
+    }
+
     // Append Bordbuch
     await appendBordbuchEntry(
       workspaceRoot,
@@ -501,8 +490,233 @@ export async function runLeitstandPropagate(
         completedAt: result.completedAt,
         preflight: { passed: preflightPassed, checks: preflightChecks },
         health: { state: healthResult.state, checks: healthResult.checks },
+        releaseState: "alt-deployed",
       },
       summary: `[leitstand.propagate] ${releaseId} deployed to ${channel} (${result.state}, health: ${healthResult.state})`,
+    };
+  } finally {
+    await releaseLock(workspaceRoot, `deployment:${systemId}`);
+  }
+}
+
+// §5.1b: leitstand.promote (RFC-0608: alt→main with build-identity verification)
+export interface LeitstandPromoteData {
+  systemId: string;
+  releaseId: string;
+  channel: "main";
+  state: "succeeded" | "failed";
+  deploymentUrl: string;
+  buildIdentityVerified: boolean;
+  healthState: "healthy" | "unhealthy" | "unknown";
+  releaseState: "promoted";
+}
+
+export async function runLeitstandPromote(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<LeitstandPromoteData>> {
+  const { workspaceRoot, logger } = context;
+  const releaseId = flagString(input, "release");
+  if (!releaseId) throw new Error("[leitstand.promote] --release is required");
+
+  const releaseManifest = await readReleaseManifest(workspaceRoot, releaseId);
+  if (releaseManifest.state !== "alt-deployed") {
+    throw new Error(
+      `[leitstand.promote] release '${releaseId}' must be in state 'alt-deployed' (current: ${releaseManifest.state}). Run leitstand.propagate first.`,
+    );
+  }
+
+  const systemId = releaseManifest.systemId as string;
+  const operationId = generateOperationId();
+
+  await acquireLock(
+    workspaceRoot,
+    `deployment:${systemId}`,
+    operationId,
+    "leitstand.promote",
+    "agent",
+  );
+
+  try {
+    const registry = await readRegistry(workspaceRoot);
+    const entry = findEntry(registry, systemId);
+    if (!entry) {
+      throw new Error(`[leitstand.promote] system '${systemId}' not found in registry`);
+    }
+
+    const dep = entry.deployment as DeploymentConfig;
+    if (!dep) {
+      throw new Error(`[leitstand.promote] system '${systemId}' has no deployment config`);
+    }
+
+    const altConfig = getChannelConfig(dep, "alt");
+    const mainConfig = getChannelConfig(dep, "main");
+    const adapter = resolveAdapter(dep.adapter);
+
+    // 1. Fetch build-identity.json from alt URL
+    const buildIdentityUrl = `${altConfig.url}/.well-known/build-identity.json`;
+    logger.info(`  Fetching build identity from ${buildIdentityUrl}...`);
+    const response = await fetch(buildIdentityUrl);
+    if (!response.ok) {
+      throw new Error(
+        `[leitstand.promote] build-identity.json not found at alt URL (${response.status}): ${buildIdentityUrl}`,
+      );
+    }
+    const rawBuildIdentity = await response.json();
+    const parseResult = buildIdentitySchema.safeParse(rawBuildIdentity);
+    if (!parseResult.success) {
+      throw new Error(
+        `[leitstand.promote] build-identity.json schema validation failed: ${parseResult.error.message}`,
+      );
+    }
+    const buildIdentity = parseResult.data;
+
+    // 2. Verify build identity fields match release manifest
+    const fieldsToVerify: Array<[string, string | undefined, string]> = [
+      ["releaseId", releaseId, buildIdentity.releaseId],
+      ["distTreeHash", releaseManifest.distTreeHash as string, buildIdentity.distTreeHash],
+      [
+        "behaviorSnapshotHash",
+        releaseManifest.behaviorSnapshotHash as string,
+        buildIdentity.behaviorSnapshotHash,
+      ],
+      ["siteContentHash", releaseManifest.siteContentHash as string, buildIdentity.siteContentHash],
+    ];
+    for (const [fieldName, manifestValue, identityValue] of fieldsToVerify) {
+      if (manifestValue !== identityValue) {
+        throw new Error(
+          `[leitstand.promote] build-identity mismatch for '${fieldName}': manifest='${manifestValue}', identity='${identityValue}'`,
+        );
+      }
+    }
+    logger.success(`  Build identity verified for ${releaseId}`);
+
+    // 3. Run health check against alt deployment
+    const altHealthResult = await adapter.health({
+      systemId,
+      channel: "alt",
+      deploymentUrl: altConfig.url,
+      releaseId,
+      expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
+      workspaceRoot,
+    });
+
+    if (altHealthResult.state !== "healthy") {
+      throw new Error(
+        `[leitstand.promote] alt deployment is not healthy (state: ${altHealthResult.state}). Cannot promote to main.`,
+      );
+    }
+
+    // 4. Deploy to main channel
+    const distPath = path.join(workspaceRoot, "releases", releaseId, "dist");
+    const serverDistPath = path.join(distPath, "server");
+    const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
+    const secretsFilePath = await resolveSecretsFilePath(mainConfig.secretsFile);
+
+    // Rehydrate dist from artifact store if missing
+    let effectiveDistPath = distPath;
+    if (!existsSync(distPath)) {
+      logger.info(`  Dist missing locally — rehydrating from artifact store...`);
+      const rehydrated = await artifactStoreRehydrate(workspaceRoot, releaseId, distPath);
+      effectiveDistPath = rehydrated.output;
+      logger.info(`  Rehydrated to ${effectiveDistPath}`);
+    }
+
+    const missionId = releaseManifest.missionId as string;
+    let nodeModulesBinPath: string | undefined;
+    if (missionId) {
+      const workpieceBin = path.join(
+        workspaceRoot,
+        "missions",
+        missionId,
+        "workpiece",
+        "node_modules",
+        ".bin",
+      );
+      if (existsSync(workpieceBin)) {
+        nodeModulesBinPath = workpieceBin;
+      }
+    }
+
+    logger.info(`  Promoting to main channel (worker: ${mainConfig.workerName})...`);
+    const result = await adapter.propagate({
+      systemId,
+      releaseId,
+      channel: "main",
+      distPath: existsSync(serverDistPath) ? effectiveServerDistPath : effectiveDistPath,
+      workerName: mainConfig.workerName,
+      url: mainConfig.url,
+      secretsFilePath,
+      expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
+      nodeModulesBinPath,
+    });
+
+    // 5. Run health check on main
+    const mainHealthResult = await adapter.health({
+      systemId,
+      channel: "main",
+      deploymentUrl: mainConfig.url,
+      releaseId,
+      expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
+      workspaceRoot,
+    });
+
+    // 6. Update registry — main channel lastPropagated
+    if (!dep.lastPropagated) {
+      dep.lastPropagated = {};
+    }
+    dep.lastPropagated["main"] = buildLastPropagatedEntry(
+      releaseId,
+      result.state === "succeeded" ? "succeeded" : "failed",
+      result.state === "succeeded" && mainHealthResult.state === "healthy",
+      operationId,
+    );
+    entry.deployment = dep;
+    await writeRegistry(workspaceRoot, registry);
+
+    // 7. Transition release state to promoted on success
+    if (result.state === "succeeded") {
+      releaseManifest.state = "promoted";
+      await writeReleaseYaml(workspaceRoot, releaseId, releaseManifest);
+    }
+
+    // 8. Append Bordbuch
+    await appendBordbuchEntry(
+      workspaceRoot,
+      systemId,
+      "deployment",
+      `Release ${releaseId} promoted to main`,
+      "agent",
+      {
+        writerRole: "leitstand",
+        metadata: {
+          releaseId,
+          channel: "main",
+          promote: true,
+          state: result.state,
+          healthState: mainHealthResult.state,
+          buildIdentityVerified: true,
+          operationId,
+        },
+      },
+    );
+
+    logger.success(
+      `[leitstand.promote] ${releaseId} promoted to main (${result.state}, health: ${mainHealthResult.state})`,
+    );
+
+    return {
+      data: {
+        systemId,
+        releaseId,
+        channel: "main",
+        state: result.state as "succeeded" | "failed",
+        deploymentUrl: result.deploymentUrl,
+        buildIdentityVerified: true,
+        healthState: mainHealthResult.state,
+        releaseState: "promoted",
+      },
+      summary: `[leitstand.promote] ${releaseId} promoted to main (${result.state}, health: ${mainHealthResult.state})`,
     };
   } finally {
     await releaseLock(workspaceRoot, `deployment:${systemId}`);
@@ -688,6 +902,21 @@ export async function runLeitstandRollback(
     );
     entry.deployment = dep;
     await writeRegistry(workspaceRoot, registry);
+
+    // RFC-0608: transition release state on rollback
+    if (result.state === "succeeded" && currentRelease) {
+      try {
+        const rolledBackManifest = await readReleaseManifest(workspaceRoot, currentRelease);
+        if (channel === "main") {
+          rolledBackManifest.state = "rolled-back";
+        } else {
+          rolledBackManifest.state = "published";
+        }
+        await writeReleaseYaml(workspaceRoot, currentRelease, rolledBackManifest);
+      } catch {
+        // Release manifest may not exist for very old releases — non-fatal
+      }
+    }
 
     // Append Bordbuch
     await appendBordbuchEntry(

@@ -78,7 +78,7 @@ async function listReleaseIds(workspaceRoot: string): Promise<string[]> {
   return entries.filter((e) => e.isDirectory() && !e.name.includes(".staging-")).map((e) => e.name);
 }
 
-async function readReleaseManifest(
+export async function readReleaseManifest(
   workspaceRoot: string,
   releaseId: string,
 ): Promise<Record<string, unknown>> {
@@ -97,7 +97,7 @@ async function readReleaseManifest(
   return result;
 }
 
-async function writeReleaseYaml(
+export async function writeReleaseYaml(
   workspaceRoot: string,
   releaseId: string,
   manifest: Record<string, unknown>,
