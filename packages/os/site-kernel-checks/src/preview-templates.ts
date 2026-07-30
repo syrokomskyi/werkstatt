@@ -10,6 +10,7 @@ Generates 1200x630 social preview images with brand-aware design tokens.</purpos
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0155: backfill MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0603: deterministic PNG encoding — disable adaptiveFiltering, remove redundant resize, set palette: false.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -130,11 +131,13 @@ function buildBrandCardSvg(input: PreviewTemplateInput): string {
  */
 export async function generateBrandCardPng(input: PreviewTemplateInput): Promise<Buffer> {
   const svg = buildBrandCardSvg(input);
+  // RFC-0603: deterministic PNG encoding — no adaptiveFiltering, no palette
+  // quantization, no redundant resize pass. The SVG is already at 1200x630
+  // native viewBox, so resize is a no-op that introduces a second processing pass.
   const png = await sharp(Buffer.from(svg, "utf-8"), {
     density: 144, // higher density for crisper text
   })
-    .resize(OG_WIDTH, OG_HEIGHT, { fit: "fill" })
-    .png({ compressionLevel: 9, adaptiveFiltering: true, effort: 10 })
+    .png({ compressionLevel: 9, adaptiveFiltering: false, palette: false, effort: 10 })
     .toBuffer();
   return png;
 }
