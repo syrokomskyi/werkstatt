@@ -140,8 +140,8 @@ interface RouteFact {
   redirectTarget?: string;          // present when contentHash is null
 }
 
-// Reuses existing isHtmlRedirectPage from @warpgogol/share/redirects
-// (moved from @warpgogol/share/semantic/image-sitemap by RFC-0592).
+// Reuses existing isHtmlRedirectPage from @warpgogol/share/semantic/image-sitemap.
+// If RFC-0592 later moves it to @warpgogol/share/redirects, the import path updates.
 // No new redirect detection helper is created.
 
 // New helper: extract redirect target from meta-refresh tag
@@ -168,7 +168,7 @@ function verifyRedirectRoute(
 | Path | Role |
 | --- | --- |
 | `packages/ontology/src/operations/leitstand.ts` | `RouteFact` type moved here from local interfaces; `contentHash` becomes `string \| null`, add optional `redirectTarget` |
-| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts` | `collectRoutes` reuses `isHtmlRedirectPage` from `@warpgogol/share/redirects`; sets `contentHash: null` + `redirectTarget` for redirect pages; imports `RouteFact` from ontology |
+| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts` | `collectRoutes` reuses `isHtmlRedirectPage` from `@warpgogol/share/semantic/image-sitemap`; sets `contentHash: null` + `redirectTarget` for redirect pages; imports `RouteFact` from ontology |
 | `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts` | Health check: `fetchWithRetry` uses `redirect: "manual"` for `contentHash: null` routes; verifies HTTP 307/308 + `Location` header; imports `RouteFact` from ontology |
 | `packages/os/site-kernel-checks/src/behavior-snapshot.ts` | `buildBehaviorSnapshot` excludes meta-refresh redirect stubs from `RouteBehavior[]` (golden snapshot drift detection — redirect stubs are not real content routes and would create noise in drift diffs) |
 
