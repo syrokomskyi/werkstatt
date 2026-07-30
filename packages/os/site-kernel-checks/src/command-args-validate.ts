@@ -52,22 +52,11 @@ const SCAN_DIRS = [
 
 const COMMAND_TABLES_DIR = "packages/os/site-kernel-checks/src/command-tables";
 
-const IGNORED_DIRS = new Set([
-  ".astro",
-  ".turbo",
-  "coverage",
-  "dist",
-  "node_modules",
-  "tests",
-]);
+const IGNORED_DIRS = new Set([".astro", ".turbo", "coverage", "dist", "node_modules", "tests"]);
 
 const INPUT_ARGS_PATTERN = /\binput\.args\b/;
-const DUAL_PATH_PATTERNS: RegExp[] = [
-  /\?\?\s*input\.args\[/,
-  /\|\|\s*input\.args\[/,
-];
-const NAMED_FLAG_READ_PATTERN =
-  /\binput(?:\.|\?\.)flags\s*\[\s*["']([a-zA-Z0-9_-]+)["']\s*\]/g;
+const DUAL_PATH_PATTERNS: RegExp[] = [/\?\?\s*input\.args\[/, /\|\|\s*input\.args\[/];
+const NAMED_FLAG_READ_PATTERN = /\binput(?:\.|\?\.)flags\s*\[\s*["']([a-zA-Z0-9_-]+)["']\s*\]/g;
 
 // ---------------------------------------------------------------------------
 // File collection
@@ -77,10 +66,7 @@ function toPosixPath(path: string): string {
   return path.replace(/\\/g, "/");
 }
 
-async function collectTsFiles(
-  workspaceRoot: string,
-  relativeDir: string,
-): Promise<string[]> {
+async function collectTsFiles(workspaceRoot: string, relativeDir: string): Promise<string[]> {
   const absoluteDir = join(workspaceRoot, relativeDir);
   const files: string[] = [];
 
@@ -95,10 +81,7 @@ async function collectTsFiles(
     for (const entry of entries) {
       if (entry.isDirectory()) {
         if (IGNORED_DIRS.has(entry.name)) continue;
-        await visit(
-          join(currentAbsoluteDir, entry.name),
-          `${currentRelativeDir}/${entry.name}`,
-        );
+        await visit(join(currentAbsoluteDir, entry.name), `${currentRelativeDir}/${entry.name}`);
         continue;
       }
 
@@ -219,10 +202,7 @@ interface SourceViolation {
   fix: string;
 }
 
-function scanFileForArgsViolations(
-  file: string,
-  workspaceRoot: string,
-): SourceViolation[] {
+export function scanFileForArgsViolations(file: string, workspaceRoot: string): SourceViolation[] {
   const absPath = join(workspaceRoot, file);
   let content: string;
   try {
@@ -246,7 +226,7 @@ function scanFileForArgsViolations(
           file,
           line: i + 1,
           message: `Handler uses dual-path fallback with input.args[0] — prohibited by RFC-0609.`,
-          fix: "Remove the input.args[0] fallback and use input.flags[\"<name>\"] exclusively.",
+          fix: 'Remove the input.args[0] fallback and use input.flags["<name>"] exclusively.',
         });
       } else {
         violations.push({
@@ -254,7 +234,7 @@ function scanFileForArgsViolations(
           file,
           line: i + 1,
           message: `Handler reads input.args — the args field was removed from KernelCommandInput by RFC-0609.`,
-          fix: "Use input.flags[\"<name>\"] instead of input.args[0].",
+          fix: 'Use input.flags["<name>"] instead of input.args[0].',
         });
       }
     }
@@ -267,12 +247,12 @@ function scanFileForArgsViolations(
 // Detection: ARG-COMPLIANCE-02
 // ---------------------------------------------------------------------------
 
-function hasEmptyFlags(flags: Record<string, unknown> | undefined): boolean {
+export function hasEmptyFlags(flags: Record<string, unknown> | undefined): boolean {
   if (!flags) return true;
   return Object.keys(flags).length === 0;
 }
 
-function extractNamedFlagReads(body: string): Set<string> {
+export function extractNamedFlagReads(body: string): Set<string> {
   const flags = new Set<string>();
   for (const match of body.matchAll(NAMED_FLAG_READ_PATTERN)) {
     const name = match[1];
