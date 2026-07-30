@@ -15,11 +15,13 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0358
 amendedBy: []
 related:
   - RFC-0358
@@ -49,6 +51,7 @@ commands:
     - leitstand.promote
   changed:
     - leitstand.propagate
+    - leitstand.rollback
     - release.prepare
   removed: []
 appsImpacted: []
@@ -130,6 +133,7 @@ The release lifecycle gains a mandatory alt-to-main promotion chain enforced by 
 - **RFC-0301 (archived)**: established the concept of gating main deployment on alt checks. This RFC formalizes it as a state-machine invariant with cryptographic verification rather than URL-based check reports.
 - **RFC-0585**: `release.prepare` already computes `distTreeHash`, `behaviorSnapshotHash`, `siteContentHash`, `platformVersion`, `commitSha`. This RFC extends `release.prepare` to write these into `build-identity.json` — no new hash computation needed.
 - **RFC-0596**: `release.publish` stores the artifact and transitions to `published`. This RFC adds `alt-deployed` and `promoted` as post-publish states, preserving the artifact-first invariant.
+- **RFC-0587**: fixed leitstand preflight checks and artifact store hashing for Cloudflare Workers deploy. This RFC builds on that foundation — the preflight checks from RFC-0587 remain unchanged; the promotion gate adds build-identity verification on top of the existing preflight + health check pipeline.
 
 ## Design
 
@@ -154,7 +158,7 @@ The `alt-deployed` and `promoted` states are stored in the release manifest (`re
 
 ### CLI surface
 
-````sh
+```sh
 # Deploy to alt (was: leitstand.propagate --channel alt)
 pnpm exec site-kernel run leitstand.propagate --release <release-id>
 
@@ -170,11 +174,13 @@ pnpm exec site-kernel run leitstand.health --channel alt
 ```
 
 **`leitstand.propagate` changes:**
+
 - `--channel` flag removed; always deploys to alt.
 - Requires release state `published`.
 - On success, transitions release state to `alt-deployed` and updates `deployment.lastPropagated.alt` in the registry.
 
 **`leitstand.promote` (new):**
+
 - `--release <release-id>` (required).
 - Requires release state `alt-deployed`.
 - Fetches `/.well-known/build-identity.json` from the alt channel URL.
@@ -202,9 +208,13 @@ pnpm exec site-kernel run leitstand.health --channel alt
   "buildTimestamp": "2026-07-30T18:00:00.000Z",
   "targetPlatform": "cloudflare-workers"
 }
-````
+```
 
 This file is the **single source of truth** for build identity. The open-source page's `deploymentMetadata` section is populated from the same object during `release.prepare`'s post-build phase, replacing the independent `resolveDeploymentMetadata` computation in `open-source-page.ts`.
+
+**Sequencing:** `open-source.generate` runs during `SITES_BUILD_PREPARE_PIPELINE` (build-prepare.ts) as part of the build. At this point, `build-identity.json` does not exist yet — release hashes are computed by `release.prepare` after the build completes. The resolution is a **post-build dual-write**: after `release.prepare` computes hashes and writes `build-identity.json` into `dist/client/.well-known/`, it also updates the open-source registry JSON (`open-source-registry.json`) with the same build identity data. This means `open-source.generate` during `build.prepare` produces the page without deployment metadata (or with placeholder values), and `release.prepare` overwrites the registry JSON with real data after hash computation. The open-source page renders from `open-source-registry.json` at request time, so the final rendered page always shows the correct build identity.
+
+**Verified vs displayed fields:** `leitstand.promote` cryptographically verifies `releaseId`, `distTreeHash`, `behaviorSnapshotHash`, and `siteContentHash` — these four fields are the promotion gate. The remaining fields (`systemId`, `missionId`, `semver`, `platformVersion`, `platformSemanticHash`, `commitSha`, `buildTimestamp`, `targetPlatform`) are included in the file for open-source page display and agent discoverability, but are NOT verified by the promotion gate.
 
 ### TypeScript contracts
 
@@ -288,6 +298,7 @@ interface LeitstandPromoteData {
 | Alt health check fails | `leitstand.promote` throws: "alt deployment is not healthy" |
 | `--channel` flag passed to `leitstand.propagate` | `leitstand.propagate` throws: "--channel is removed; use leitstand.promote for main deployment" |
 | Network error fetching build-identity.json | `leitstand.promote` throws: "cannot reach alt deployment at <url>" |
+| Alt deployment serving a different release's `build-identity.json` | `leitstand.promote` throws: "build-identity.json releaseId mismatch: expected <release-id>, got <actual-id>" |
 
 All failures exit non-zero. In `--json` mode, the error is in the `error` field with a machine-readable `code`.
 
@@ -299,8 +310,10 @@ All failures exit non-zero. In `--json` mode, the error is in the `error` field 
 4. **Add `leitstand.promote`**: new command in `leitstand-commands.ts`, registered in the Leitstand module. Implements the build-identity fetch, hash verification, live health re-check, and main deployment.
 5. **Update `leitstand.rollback`**: preserve `--channel` flag. Rolling back main sets release state to `rolled-back`. Rolling back alt sets release state back to `published` (re-deploy to alt required before another promote).
 6. **Update `docs/COMMANDS.md`** and `packages/os/site-kernel-handoff/AGENTS.md` with the new command and state machine.
-7. **Existing releases**: all previous test releases can be deleted (operator confirmed). No migration path needed.
-8. **New sites**: automatically comply from day one — `release.prepare` writes `build-identity.json`, and the promotion chain is the only path.
+7. **Update `docs/architecture-dna.md`** DNA-49 entry: add `leitstand.promote` to the enforcement command list (currently `leitstand.propagate`, `leitstand.status`, `leitstand.rollback`, `leitstand.health`).
+8. **`leitstand.status`**: no changes needed — it reads deployment channel state from the registry (`deployment.lastPropagated`), not release manifest state. The new release states (`alt-deployed`, `promoted`) are visible via `release.validate` or by reading the release manifest directly.
+9. **Existing releases**: all previous test releases can be deleted (operator confirmed). No migration path needed.
+10. **New sites**: automatically comply from day one — `release.prepare` writes `build-identity.json`, and the promotion chain is the only path.
 
 ## Alternatives considered
 
@@ -329,8 +342,11 @@ All failures exit non-zero. In `--json` mode, the error is in the `error` field 
 - [ ] `leitstand.promote` runs live health checks against alt deployment before deploying to main
 - [ ] `leitstand.promote` transitions release state from `alt-deployed` to `promoted` on success
 - [ ] `leitstand.rollback --channel main` transitions release state to `rolled-back`
+- [ ] `leitstand.rollback --channel alt` transitions release state back to `published`
 - [ ] `leitstand.propagate --channel alt` throws a clear error directing to the new command surface
 - [ ] `docs/COMMANDS.md` and `packages/os/site-kernel-handoff/AGENTS.md` document the new state machine and command surface
+- [ ] `docs/architecture-dna.md` DNA-49 entry includes `leitstand.promote` in the enforcement command list
+- [ ] `release.prepare` performs post-build dual-write: writes `build-identity.json` and updates `open-source-registry.json` with the same build identity data
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents

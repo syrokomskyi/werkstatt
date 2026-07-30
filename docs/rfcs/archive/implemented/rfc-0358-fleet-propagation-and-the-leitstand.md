@@ -21,6 +21,7 @@ amendedBy:
   - RFC-0363
   - RFC-0379
   - RFC-0566
+  - RFC-0608
 related:
   - RFC-0354
   - RFC-0355
