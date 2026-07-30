@@ -20,6 +20,12 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 - Framework adapters should stay thin and depend on the framework-free core, not the other way around.
 - Shared UI assets that are reused by multiple apps belong in `packages/ui`, not in app-local folders.
 
+## Generated file writes
+
+- Always use `writeFileIfChanged` from `@warpgogol/site-kernel` (re-exported from `@warpgogol/forge/utils`, RFC-0345) for generated file writes — both text and binary. It accepts `string | Uint8Array` and skips the disk write when content is byte-identical to the existing file.
+- Do NOT use raw `writeFile` from `node:fs/promises` for generated files. Raw `writeFile` always writes, creating git churn and LFS bloat on every regeneration cycle.
+- For binary generated files (PNG, icons), pass `Buffer` directly — `writeFileIfChanged` compares bytes via `Buffer.compare`.
+
 ## Ownership boundaries
 
 | Package | Responsibility |
