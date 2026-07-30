@@ -117,6 +117,17 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - Commit message format: `werkstatt: <command> <missionId>`.
 - The shared `gitExec` utility lives in `werkstatt/git-exec.ts` with an `allowNonZero` option for git commands that use non-zero exit codes as signals (e.g. `git diff --cached --quiet`).
 
+## Mission materialization optimization (RFC-0597)
+
+`mission.materialize` and `mission.close` use a split pipeline and materialization state file to optimize dev-mode materialization speed.
+
+- **Pipeline split:** `mission.materialize` runs `build.prepare.dev` (codegen-only, ~38 steps) instead of `build.prepare.full` (all steps including media transcoding). `mission.validate` and `release.prepare` continue to use `build.prepare.full` for production validation.
+- **State file:** `mission.close` writes `systems-cache/<id>/.materialization-state.json` (outside git) as the final step of a successful close. It records the cache clone HEAD hash, timestamp, and mission ID. `mission.materialize` reads this file and skips preflight if the cache clone HEAD is unchanged since the last close.
+- **Preflight skip precedence:** `--skip-preflight` flag (operator override) always skips preflight and does not consult the state file. The state-file-based skip is automatic and only applies when the flag is not set. Both paths append a `preflight-skipped` bordbuch entry with distinct reason metadata.
+- **Media cache warming:** `mission.materialize` copies `.cache/video/` and `.cache/video-live/` from the cache clone to the workpiece after data-path copy. `mission.close` copies them back from the workpiece to the cache clone as the final step. This avoids re-encoding unchanged video sources across missions.
+- **`mission.reconcile` does NOT write the state file or copy `.cache/`** — it only transfers commits via git merge. The state file reflects "last successful close", not "last reconcile".
+- **`--json` output:** `mission.materialize` gains `preflightSkipped`, `preflightSkipReason`, `pipelineUsed`, `mediaCacheWarmed`, and `mediaCacheSources` fields.
+
 ## Validation gates (RFC-0593)
 
 - `mission.open` runs `bordbuch.validate` as a pre-flight gate before lock acquisition. If violations exist, `mission.open` refuses to open a new mission and directs the operator to run `bordbuch.repair` first. No side effects (directories, manifests, registry updates) are created on validation failure.
