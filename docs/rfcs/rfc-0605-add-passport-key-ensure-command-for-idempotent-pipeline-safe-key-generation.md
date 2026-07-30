@@ -16,6 +16,7 @@ reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
+# Audit-driven enhancements applied (AUDIT-RFC-0605-01): generateKeypair export, version behavior, file permissions, all-inactive keys edge case, AGENTS.md/Compass sync notes.
 implementedAt:
 closedAt:
 supersedes: []
@@ -78,7 +79,7 @@ nonGoals:
 
 ## Context
 
-`passport.key.rotate` (RFC-0028, DNA-34) is the existing command for generating Ed25519 keypairs and updating `public/.well-known/cosmic-passport-key.json`. It always generates a new keypair, marks existing keys as inactive, and prints the private key to stdout for manual storage in GitHub Actions secrets. This is correct for operator-initiated key rotation but unsafe for pipeline execution: in CI, the private key would leak to logs, and repeated `build.prepare` runs would rotate the key on every invocation.
+`passport.key.rotate` (RFC-0028; DNA-34 reclassified to feature by RFC-0161) is the existing command for generating Ed25519 keypairs and updating `public/.well-known/cosmic-passport-key.json`. It always generates a new keypair, marks existing keys as inactive, and prints the private key to stdout for manual storage in GitHub Actions secrets. This is correct for operator-initiated key rotation but unsafe for pipeline execution: in CI, the private key would leak to logs, and repeated `build.prepare` runs would rotate the key on every invocation.
 
 RFC-0604 wants to add passport key generation to the `build.prepare` pipeline so that `public/.well-known/cosmic-passport-key.json` is guaranteed to exist after build preparation. This requires a pipeline-safe variant that is idempotent (no-op if key exists) and does not print the private key.
 
@@ -96,7 +97,7 @@ The kernel gains a `passport.key.ensure` command that creates the passport publi
 
 ## Architectural fit
 
-- **DNA-34** (Passport key rotation): `passport.key.ensure` extends the passport key family with a pipeline-safe variant. It reuses `generateKeypair` and `PassportPublicKeyFileSchema` from `@warpgogol/passport` but does not rotate existing keys.
+- **RFC-0028 / DNA-34** (Passport key rotation, reclassified to feature by RFC-0161): `passport.key.ensure` extends the passport key family with a pipeline-safe variant. It reuses `PassportPublicKeyFileSchema` from `@warpgogol/passport` and calls `generateKeypair` (which must be exported from `@warpgogol/passport` — see Rollout). It does not rotate existing keys.
 - **RFC-0028**: `passport.key.rotate` remains the operator-only command for manual rotation. `passport.key.ensure` is the pipeline-safe command for initial creation.
 - **GENERATOR_OWNERSHIP_MAP**: `passport.key.ensure` replaces `passport.key.rotate` as the registered owner of `public/.well-known/cosmic-passport-key.json` in `GENERATOR_OWNERSHIP_MAP`, since it is the command that runs in the pipeline. `passport.key.rotate` remains a registered command but is not in the ownership map (operator-only action).
 
@@ -134,14 +135,14 @@ interface EnsureKeyResult {
 }
 ```
 
-When `created` is `false`, the command is a no-op: the existing key file is untouched and no private key is generated.
+When `created` is `false`, the command is a no-op: the existing key file is untouched and no private key is generated. The `version` field is the active key's version from the existing file (the entry with `active: true`).
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `<app>/public/.well-known/cosmic-passport-key.json` | Created if missing; untouched if existing |
-| `--private-key-out <path>` | Private key written to this file only when a new key is created and the flag is provided |
+| `--private-key-out <path>` | Private key written to this file only when a new key is created and the flag is provided. File is created with `0600` permissions (owner-only read/write) |
 
 ### Output format
 
@@ -178,15 +179,18 @@ When a new key is created:
 
 - **Manifest missing**: fails with `PKE-01: Could not read system manifest: <error>`.
 - **Key generation error**: fails with `PKE-02: Key generation failed: <error>`.
-- **Existing key file corrupt**: fails with `PKE-03: Existing key file is invalid: <error>` (does not silently overwrite a corrupt file).
+- **Existing key file corrupt**: fails with `PKE-03: Existing key file is invalid: <error>` (does not silently overwrite a corrupt file). This includes the case where the file is schema-valid but contains no key with `active: true` — a file with all keys inactive is functionally broken and must not be silently fixed.
 - **Private key output path unwritable**: fails with `PKE-04: Could not write private key to <path>: <error>` (does not fall back to stdout).
 
 ## Rollout
 
+- `generateKeypair` is exported from `@warpgogol/passport` (add to `packages/passport/src/index.ts`). Currently it is defined in `packages/passport/src/sign.ts:88` but not included in the barrel export.
 - `passport.key.ensure` is registered as a new command in the passport command table (`packages/os/site-kernel-checks/src/command-tables/06-growth-passport.ts`).
 - `GENERATOR_OWNERSHIP_MAP` is updated to list `passport.key.ensure` (replacing `passport.key.rotate`) as the owner of `public/.well-known/cosmic-passport-key.json`.
 - `passport.key.rotate` remains registered and available for operator-initiated rotations.
 - RFC-0604 adds `passport.key.ensure` to the `build.prepare` pipeline once this RFC is accepted and implemented.
+- **AGENTS.md**: `packages/passport/AGENTS.md` must be updated to list `generateKeypair` in the exports table.
+- **Compass sync**: `docs/COMMANDS.md` must be updated to list `passport.key.ensure` if it maintains a command inventory.
 
 ## Alternatives considered
 
@@ -197,18 +201,21 @@ When a new key is created:
 ## Risks
 
 - **Two commands writing to the same file**: `passport.key.ensure` and `passport.key.rotate` both write to `public/.well-known/cosmic-passport-key.json`. `GENERATOR_OWNERSHIP_MAP` lists only `passport.key.ensure` as the owner to satisfy `generator.ownership.lint`. If an operator runs `passport.key.rotate` after `passport.key.ensure`, the file will have multiple keys (old ones marked inactive). This is by design — `passport.key.rotate` is for manual rotation.
-- **Private key not stored**: If `--private-key-out` is not provided in the pipeline, the private key is generated but not stored anywhere. The operator must run `passport.key.rotate` manually for the initial key creation to obtain the private key, or use `--private-key-out` in a controlled environment.
+- **Private key not stored**: If `--private-key-out` is not provided in the pipeline, the private key is generated but not stored anywhere. The operator must run `passport.key.rotate` manually for the initial key creation to obtain the private key, or use `--private-key-out` in a controlled environment. The recommended workflow is: operator runs `passport.key.rotate` once to create the initial key and store the private key in GitHub Actions secrets; subsequent `build.prepare` runs call `passport.key.ensure` which is a no-op. The pipeline-generated key (without `--private-key-out`) is only useful for development environments where passport signing is not required.
 
 ## Acceptance criteria
 
+- [ ] `generateKeypair` exported from `@warpgogol/passport` (added to `packages/passport/src/index.ts`)
 - [ ] `passport.key.ensure` command registered in `packages/os/site-kernel-checks/src/command-tables/06-growth-passport.ts` with `scope: "app"`, `mutatesState: true`, `cacheable: false`
 - [ ] Command creates `public/.well-known/cosmic-passport-key.json` if it does not exist
 - [ ] Command is a no-op (exit 0, `created: false`) if the key file already exists
 - [ ] Command never prints the private key to stdout
-- [ ] `--private-key-out` flag writes the private key to the specified file path when a new key is created
+- [ ] `--private-key-out` flag writes the private key to the specified file path when a new key is created, with `0600` file permissions
 - [ ] `GENERATOR_OWNERSHIP_MAP` lists `passport.key.ensure` as the owner of `public/.well-known/cosmic-passport-key.json`
 - [ ] `generator.ownership.lint` passes with no multi-owner violations
 - [ ] `passport.key.rotate` remains registered and unchanged
+- [ ] Command fails with PKE-03 if existing key file has no active key (all keys `active: false`)
+- [ ] `packages/passport/AGENTS.md` updated to list `generateKeypair` in the exports table
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
