@@ -256,6 +256,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "generated.marker.validate", args: ["--phase=author"] },
   // RFC-0375: verify all registry-declared generated files exist on disk
   { command: "generated.files.validate" },
+  // RFC-0612: detect registry drift between GENERATOR_OWNERSHIP_MAP and files on disk
+  { command: "ownership.sync.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
   { command: "generated.stale.validate" },
   // RFC-0150: content-driven OG preview image validation

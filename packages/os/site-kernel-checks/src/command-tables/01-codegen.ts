@@ -49,6 +49,7 @@ import { runGeneratedFileLookup } from "../generated-file-lookup.ts";
 import { runGeneratedFilesValidate } from "../generated-files-validate.ts";
 import { runGeneratedStaleValidate } from "../generated-stale-validate.ts";
 import { runGeneratedDriftValidate } from "../generated-drift-validate.ts";
+import { runOwnershipSyncValidate } from "../ownership-sync-validate.ts";
 import { runPropsContractValidate } from "../props-contract.ts";
 import { runOpenSourceValidate } from "../open-source-validate.ts";
 import { runGeneratedTimestampValidate } from "../generated-timestamp-validate.ts";
@@ -606,6 +607,19 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runGeneratedStaleValidate,
+  },
+  /* RFC-0612: ownership registry drift detection */
+  {
+    name: "ownership.sync.validate",
+    description:
+      "Detect files in public/ not covered by GENERATOR_OWNERSHIP_MAP (OWN-01) and entries matching no file (OWN-02) (RFC-0612).",
+    scope: "workspace",
+    flags: {
+      app: { kind: "string", description: "App id for app-scoped path resolution." },
+    },
+    supportsAllSites: true,
+    cacheable: false,
+    execute: runOwnershipSyncValidate,
   },
   /* RFC-0601: content drift detection in generated files */
   {

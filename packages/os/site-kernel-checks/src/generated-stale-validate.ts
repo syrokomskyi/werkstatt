@@ -39,7 +39,7 @@ import {
   expandGlob,
 } from "./generated-files-validate.ts";
 
-const STATIC_ASSET_EXEMPT_DIRS = ["public/textures/"];
+export const STATIC_ASSET_EXEMPT_DIRS = ["public/textures/"];
 
 const PREVIEW_DIR = "public/preview/";
 

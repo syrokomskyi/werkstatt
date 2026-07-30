@@ -124,6 +124,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "passport.key.ensure" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
   { command: "generated.files.validate" },
+  // RFC-0612: detect registry drift between GENERATOR_OWNERSHIP_MAP and files on disk
+  { command: "ownership.sync.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
   { command: "generated.stale.validate" },
 ];
@@ -177,6 +179,8 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "uni.registry.build" },
   { command: "i18n.middleware.generate" },
   { command: "generated.files.validate" },
+  // RFC-0612: detect registry drift between GENERATOR_OWNERSHIP_MAP and files on disk
+  { command: "ownership.sync.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
   { command: "generated.stale.validate" },
 ];
