@@ -9,10 +9,29 @@
 */
 
 import { test, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+
+const mockState = vi.hoisted(() => ({
+  validateResult: {
+    data: null as Record<string, unknown> | null,
+    exitCode: 0,
+    summary: "",
+  },
+  onValidate: null as (() => Promise<void> | void) | null,
+}));
+
+vi.mock("../mission/mission-materialization-commands.ts", () => ({
+  runMissionValidate: vi.fn(async () => {
+    if (mockState.onValidate) await mockState.onValidate();
+    return mockState.validateResult;
+  }),
+  runMissionMaterialize: vi.fn(),
+  runMissionMigrate: vi.fn(),
+  runMissionReconcile: vi.fn(),
+}));
 
 function gitInit(dir: string): void {
   execSync("git init", { cwd: dir, stdio: "pipe" });
@@ -29,6 +48,8 @@ let tmpWorkspace: string;
 
 beforeEach(() => {
   tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-close-validate-gate-"));
+  mockState.validateResult = { data: null, exitCode: 0, summary: "" };
+  mockState.onValidate = null;
 });
 
 afterEach(() => {
@@ -67,7 +88,6 @@ systems:
   mkdirSync(join(tmpWorkspace, "systems", "test-system", "bordbuch"), { recursive: true });
   gitCommit(tmpWorkspace, "add system");
 
-  // Create mission directory with manifest in reconciled state
   const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
   mkdirSync(missionDir, { recursive: true });
   mkdirSync(join(missionDir, "workpiece"), { recursive: true });
@@ -99,8 +119,7 @@ systems:
 test("mission.close refuses when validation fails", async () => {
   setupWorkspace();
 
-  // Mock runMissionValidate to return failure
-  const mockRunMissionValidate = vi.fn().mockResolvedValue({
+  mockState.validateResult = {
     data: {
       missionId: "test-system-m000001",
       contractFull: {
@@ -113,14 +132,7 @@ test("mission.close refuses when validation fails", async () => {
     },
     exitCode: 1,
     summary: "Validation failed",
-  });
-
-  vi.doMock("../mission/mission-materialization-commands.ts", () => ({
-    runMissionValidate: mockRunMissionValidate,
-    runMissionMaterialize: vi.fn(),
-    runMissionMigrate: vi.fn(),
-    runMissionReconcile: vi.fn(),
-  }));
+  };
 
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
@@ -133,45 +145,32 @@ test("mission.close refuses when validation fails", async () => {
     /validation failed for mission 'test-system-m000001'/,
   );
 
-  // Verify mission remains open
   const manifestRaw = await import("node:fs/promises").then((fs) =>
     fs.readFile(join(tmpWorkspace, "missions", "test-system-m000001", "mission.yaml"), "utf8"),
   );
   const manifest = JSON.parse(manifestRaw);
   expect(manifest.state).toBe("open");
-
-  vi.doUnmock("../mission/mission-materialization-commands.ts");
 });
 
 test("mission.close refuses when state changed during validation (re-check inside lock)", async () => {
   setupWorkspace();
 
-  // Mock runMissionValidate to pass, but simulate state change during validation
-  const { readMissionManifest } = await import("../mission/mission-io.ts");
-  const { writeMissionManifest } = await import("../mission/mission-io.ts");
+  mockState.validateResult = {
+    data: {
+      missionId: "test-system-m000001",
+      contractFull: { passed: true, validators: [] },
+      build: { succeeded: true, routeCount: 5, sitemapHash: "abc" },
+    },
+    exitCode: 0,
+    summary: "Validation passed",
+  };
 
-  const mockRunMissionValidate = vi.fn().mockImplementation(async () => {
-    // Simulate another process aborting the mission during validation
+  mockState.onValidate = async () => {
+    const { readMissionManifest, writeMissionManifest } = await import("../mission/mission-io.ts");
     const manifest = await readMissionManifest(tmpWorkspace, "test-system-m000001");
     manifest.state = "aborted";
     await writeMissionManifest(tmpWorkspace, manifest);
-    return {
-      data: {
-        missionId: "test-system-m000001",
-        contractFull: { passed: true, validators: [] },
-        build: { succeeded: true, routeCount: 5, sitemapHash: "abc" },
-      },
-      exitCode: 0,
-      summary: "Validation passed",
-    };
-  });
-
-  vi.doMock("../mission/mission-materialization-commands.ts", () => ({
-    runMissionValidate: mockRunMissionValidate,
-    runMissionMaterialize: vi.fn(),
-    runMissionMigrate: vi.fn(),
-    runMissionReconcile: vi.fn(),
-  }));
+  };
 
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
@@ -183,6 +182,4 @@ test("mission.close refuses when state changed during validation (re-check insid
   await expect(runMissionClose(input, context)).rejects.toThrow(
     /state changed to 'aborted' during validation/,
   );
-
-  vi.doUnmock("../mission/mission-materialization-commands.ts");
 });
