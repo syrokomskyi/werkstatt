@@ -85,7 +85,6 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
 }
 
 async function runInlineValidate(
-  workspaceRoot: string,
   missionId: string,
   context: KernelRuntimeContext,
 ): Promise<{ passed: boolean; failures: string[]; report: MissionValidateData | null }> {
@@ -151,7 +150,7 @@ export async function runMissionClose(
   // RFC-0593: inline validation gate — run mission.validate before acquiring locks.
   // This avoids holding registry/system/mission locks for 2+ minutes during the build.
   // State is re-checked inside the lock after validation passes.
-  const validationCheck = await runInlineValidate(workspaceRoot, missionId, context);
+  const validationCheck = await runInlineValidate(missionId, context);
   if (!validationCheck.passed) {
     const failureLines = validationCheck.failures.map((f) => `  ${f}`).join("\n");
     throw new Error(
