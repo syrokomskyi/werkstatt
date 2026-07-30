@@ -16,6 +16,7 @@ review instead of shipping silently.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0269: initial implementation.</item>
+  <item>RFC-0595: exclude meta-refresh redirect stubs from golden snapshot routes.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,7 +24,7 @@ import { createHash } from "node:crypto";
 import { readFile, mkdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileExists, collectFiles } from "@warpgogol/share/fs";
-import { markdownTwinRelPath } from "@warpgogol/share/semantic";
+import { isHtmlRedirectPage, markdownTwinRelPath } from "@warpgogol/share/semantic";
 import {
   GENERATED_MARKER,
   hasGeneratedMarker,
@@ -258,6 +259,7 @@ export async function buildBehaviorSnapshot(
     const route = routeFromHtmlPath(distClientDir, htmlPath);
     const lang = langFromRoute(route);
     const html = await readFile(htmlPath, "utf8");
+    if (isHtmlRedirectPage(html)) continue;
     const twinPath = join(distClientDir, markdownTwinRelPath(route, { supportedLangs }));
     const hasMarkdownTwin = await fileExists(twinPath);
     routes.push(extractRouteBehavior(html, route, lang, sitemapUrls.has(route), hasMarkdownTwin));

@@ -11,6 +11,7 @@
   <item>RFC-0585: return full snapshot wrapper from capture so release.prepare can write it to disk for diff.</item>
   <item>RFC-0588: exclude redirected routes (301, 308) from snapshot via _redirects parsing.</item>
   <item>RFC-0592: fix wildcard matching so /de/* matches /de (directory root without trailing slash).</item>
+  <item>RFC-0595: detect redirect pages, set contentHash: null + redirectTarget.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,19 +25,18 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
-import { parseRedirectRules, type RedirectRule } from "@warpgogol/share/redirects";
+import {
+  parseRedirectRules,
+  extractRedirectTarget,
+  type RedirectRule,
+} from "@warpgogol/share/redirects";
+import { isHtmlRedirectPage } from "@warpgogol/share/semantic";
 import { hashHtml } from "@warpgogol/fingerprint";
+import type { RouteFact } from "@warpgogol/ontology/operations";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
   return typeof v === "string" ? v : undefined;
-}
-
-interface RouteFact {
-  path: string;
-  canonical?: string;
-  status?: number;
-  contentHash?: string;
 }
 
 interface BehaviorSnapshot {
@@ -86,8 +86,13 @@ export async function collectRoutes(
     const routePath = "/" + relPath.replace(/index\.html$/, "").replace(/\/$/, "");
     if (isRouteRedirected(routePath || "/", redirectRules)) continue;
     const html = await fs.readFile(fullPath, "utf8");
-    const contentHash = hashHtml(html);
-    routes.push({ path: routePath || "/", contentHash });
+    if (isHtmlRedirectPage(html)) {
+      const redirectTarget = extractRedirectTarget(html) ?? "unknown";
+      routes.push({ path: routePath || "/", contentHash: null, redirectTarget });
+    } else {
+      const contentHash = hashHtml(html);
+      routes.push({ path: routePath || "/", contentHash });
+    }
   }
 
   routes.sort((a, b) => a.path.localeCompare(b.path));

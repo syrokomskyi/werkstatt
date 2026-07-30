@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0379: initial cloudflare-workers adapter with injectable CommandRunner, secretsFile resolution, deterministic health probes.</item>
   <item>RFC-0587: export filterEnv and sourceDotenv; add getLimits() for adapter-declared size limits.</item>
+  <item>RFC-0595: verify redirect routes by HTTP status + Location header.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -16,7 +17,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import type { PropagationResult, HealthCheck } from "@warpgogol/ontology/operations";
+import type { PropagationResult, HealthCheck, RouteFact } from "@warpgogol/ontology/operations";
 import { hashHtml } from "@warpgogol/fingerprint";
 import type {
   CommandRunner,
@@ -83,11 +84,6 @@ function extractDeploymentUrl(stdout: string): string | undefined {
   return match ? match[0] : undefined;
 }
 
-interface RouteFact {
-  path: string;
-  contentHash?: string;
-}
-
 interface BehaviorSnapshot {
   routes: RouteFact[];
 }
@@ -121,12 +117,13 @@ function selectProbeRoutes(routes: RouteFact[], maxProbes: number): RouteFact[] 
 async function fetchWithRetry(
   url: string,
   maxAttempts: number,
-): Promise<{ ok: boolean; status: number; body: string } | null> {
+  redirect: "follow" | "manual" = "follow",
+): Promise<{ ok: boolean; status: number; body: string; headers: Headers } | null> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
-      const response = await fetch(url, { redirect: "follow" });
+      const response = await fetch(url, { redirect });
       const body = await response.text();
-      return { ok: response.ok, status: response.status, body };
+      return { ok: response.ok, status: response.status, body, headers: response.headers };
     } catch {
       if (attempt < maxAttempts - 1) {
         const delayMs = Math.min(1000 * 2 ** attempt, 30000);
@@ -261,6 +258,46 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
 
       for (const route of probeRoutes) {
         const url = `${input.deploymentUrl}${route.path === "/" ? "" : route.path}`;
+
+        if (route.contentHash === null) {
+          const response = await fetchWithRetry(url, maxAttempts, "manual");
+
+          if (response === null) {
+            anyNetworkFailure = true;
+            allPassed = false;
+            checks.push({
+              name: `probe:${route.path}`,
+              url,
+              status: 0,
+              passed: false,
+              detail: "Network failure after retries",
+            });
+            continue;
+          }
+
+          const isRedirectStatus = response.status === 307 || response.status === 308;
+          const location = response.headers.get("location") ?? "";
+          const targetKnown = route.redirectTarget && route.redirectTarget !== "unknown";
+          const locationMatches = targetKnown ? location === route.redirectTarget : true;
+          const passed = isRedirectStatus && locationMatches;
+
+          if (!passed) allPassed = false;
+          if (!isRedirectStatus) anyContentMismatch = true;
+
+          checks.push({
+            name: `probe:${route.path}`,
+            url,
+            status: response.status,
+            passed,
+            detail: isRedirectStatus
+              ? locationMatches
+                ? `Redirect ${response.status} → ${location}`
+                : `Redirect ${response.status} but Location mismatch: got ${location}, expected ${route.redirectTarget}`
+              : `Expected redirect status (307/308), got ${response.status}`,
+          });
+          continue;
+        }
+
         const response = await fetchWithRetry(url, maxAttempts);
 
         if (response === null) {

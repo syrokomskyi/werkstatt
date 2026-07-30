@@ -120,6 +120,7 @@ export {
   deploymentConfigSchema,
   healthCheckSchema,
   propagationResultSchema,
+  routeFactSchema,
 } from "./leitstand.ts";
 export type {
   DeploymentAdapterName,
@@ -129,6 +130,7 @@ export type {
   DeploymentConfig,
   HealthCheck,
   PropagationResult,
+  RouteFact,
 } from "./leitstand.ts";
 
 // RFC-0359: Notausgang export schemas.

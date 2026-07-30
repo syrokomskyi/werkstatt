@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0358: initial leitstand schemas.</item>
   <item>RFC-0379: remove cloudflare-pages/vercel from adapter enum, add null; replace flat target/credentials/lastPropagation with channel model (channels + per-channel lastPropagated with operational state).</item>
+  <item>RFC-0595: add RouteFact with contentHash: string | null and optional redirectTarget.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -68,6 +69,14 @@ export const propagationResultSchema = z.object({
   healthChecks: z.array(healthCheckSchema),
 });
 
+export const routeFactSchema = z.object({
+  path: z.string(),
+  canonical: z.string().optional(),
+  status: z.number().int().optional(),
+  contentHash: z.string().nullable(),
+  redirectTarget: z.string().optional(),
+});
+
 export type DeploymentAdapterName = z.infer<typeof deploymentAdapterNameSchema>;
 export type SecretRef = z.infer<typeof secretRefSchema>;
 export type DeploymentChannel = z.infer<typeof deploymentChannelSchema>;
@@ -75,3 +84,4 @@ export type LastPropagatedChannel = z.infer<typeof lastPropagatedChannelSchema>;
 export type DeploymentConfig = z.infer<typeof deploymentConfigSchema>;
 export type HealthCheck = z.infer<typeof healthCheckSchema>;
 export type PropagationResult = z.infer<typeof propagationResultSchema>;
+export type RouteFact = z.infer<typeof routeFactSchema>;

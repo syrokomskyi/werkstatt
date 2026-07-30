@@ -5,6 +5,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0588: initial behavior snapshot redirect exclusion tests.</item>
   <item>RFC-0592: update wildcard matching test for /de directory root (now matches /de/*).</item>
+  <item>RFC-0595: add redirect page detection tests (contentHash: null + redirectTarget).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -14,7 +15,11 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { isRouteRedirected, collectRoutes } from "./behavior-snapshot-commands.ts";
-import { parseRedirectRules, type RedirectRule } from "@warpgogol/share/redirects";
+import {
+  parseRedirectRules,
+  extractRedirectTarget,
+  type RedirectRule,
+} from "@warpgogol/share/redirects";
 
 let tmpDir: string;
 
@@ -98,4 +103,51 @@ test("parseRedirectRules: import from @warpgogol/share/redirects works correctly
   expect(rules[0].status).toBe(301);
   expect(rules[1].from).toBe("/de/*");
   expect(rules[1].status).toBe(308);
+});
+
+test("collectRoutes: redirect pages get contentHash: null + redirectTarget", async () => {
+  mkdirSync(path.join(tmpDir, "de"), { recursive: true });
+  const normalHtml = "<html><head><title>Home</title></head><body>content</body></html>";
+  const redirectHtml =
+    '<html><head><meta http-equiv="refresh" content="0;url=/"></head><body></body></html>';
+  await fs.writeFile(path.join(tmpDir, "index.html"), normalHtml);
+  await fs.writeFile(path.join(tmpDir, "de", "index.html"), redirectHtml);
+
+  const routes = await collectRoutes(tmpDir);
+
+  const homeRoute = routes.find((r) => r.path === "/");
+  expect(homeRoute).toBeDefined();
+  expect(homeRoute!.contentHash).not.toBeNull();
+  expect(homeRoute!.redirectTarget).toBeUndefined();
+
+  const deRoute = routes.find((r) => r.path === "/de");
+  expect(deRoute).toBeDefined();
+  expect(deRoute!.contentHash).toBeNull();
+  expect(deRoute!.redirectTarget).toBe("/");
+});
+
+test("collectRoutes: redirect page with unparseable target gets 'unknown'", async () => {
+  mkdirSync(path.join(tmpDir, "weird"), { recursive: true });
+  const redirectHtml =
+    '<html><head><meta http-equiv="refresh" content="0"></head><body></body></html>';
+  await fs.writeFile(path.join(tmpDir, "weird", "index.html"), redirectHtml);
+
+  const routes = await collectRoutes(tmpDir);
+  const weirdRoute = routes.find((r) => r.path === "/weird");
+  expect(weirdRoute).toBeDefined();
+  expect(weirdRoute!.contentHash).toBeNull();
+  expect(weirdRoute!.redirectTarget).toBe("unknown");
+});
+
+test("collectRoutes: non-redirect routes retain contentHash as string", async () => {
+  await fs.writeFile(path.join(tmpDir, "index.html"), "<html>home</html>");
+  const routes = await collectRoutes(tmpDir);
+  expect(routes).toHaveLength(1);
+  expect(routes[0].contentHash).not.toBeNull();
+  expect(typeof routes[0].contentHash).toBe("string");
+});
+
+test("extractRedirectTarget: import from @warpgogol/share/redirects works in handoff tests", () => {
+  const html = '<meta http-equiv="refresh" content="0;url=/target">';
+  expect(extractRedirectTarget(html)).toBe("/target");
 });

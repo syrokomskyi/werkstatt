@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0588: extracted parseRedirectRules and RedirectRule from site-kernel-checks/managed-public.ts into @warpgogol/share/redirects subpath.</item>
+  <item>RFC-0595: add extractRedirectTarget helper for parsing url= from meta-refresh tags.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,4 +34,17 @@ export function parseRedirectRules(body: string): RedirectRule[] {
       };
     })
     .filter((rule) => rule.from.length > 0);
+}
+
+/**
+ * Extract the redirect target URL from a `<meta http-equiv="refresh" content="0;url=...">` tag.
+ * Returns the immediate target only (first hop). Returns null if the tag is
+ * absent or the url= value cannot be parsed.
+ */
+export function extractRedirectTarget(html: string): string | null {
+  const m = html.match(
+    /<meta[^>]+http-equiv=["']refresh["'][^>]*content=["']\s*\d+\s*;\s*url=([^"']+)['"][^>]*>/i,
+  );
+  if (!m?.[1]) return null;
+  return m[1].trim();
 }
