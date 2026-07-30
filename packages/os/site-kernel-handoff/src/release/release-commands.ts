@@ -150,6 +150,13 @@ export async function runReleasePrepare(
     );
   }
 
+  // RFC-0480: require successful reconcile before preparing a release
+  if (!manifest.reconciledAt) {
+    throw new Error(
+      `[release.prepare] mission '${missionId}' has not been reconciled — run mission.reconcile before preparing a release`,
+    );
+  }
+
   // Check validation has passed
   const missionDir = resolveMissionDir(workspaceRoot, missionId);
   const validationPath = path.join(missionDir, "evidence", "validation-report.json");
@@ -550,17 +557,6 @@ export async function runReleasePublish(
     throw new Error(
       `[release.publish] version-compare verdict is refuse-downgrade — cannot publish`,
     );
-  }
-
-  // RFC-0480: require successful reconcile before publishing
-  const missionId = manifest.missionId as string;
-  if (missionId) {
-    const mission = await readMissionManifest(workspaceRoot, missionId);
-    if (!mission.reconciledAt) {
-      throw new Error(
-        `[release.publish] mission '${missionId}' has not been reconciled — run mission.reconcile before publishing`,
-      );
-    }
   }
 
   const systemId = manifest.systemId as string;
