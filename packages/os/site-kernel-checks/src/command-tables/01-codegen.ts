@@ -48,6 +48,7 @@ import { runGeneratedMarkerValidate } from "../generated-marker-validate.ts";
 import { runGeneratedFileLookup } from "../generated-file-lookup.ts";
 import { runGeneratedFilesValidate } from "../generated-files-validate.ts";
 import { runGeneratedStaleValidate } from "../generated-stale-validate.ts";
+import { runGeneratedDriftValidate } from "../generated-drift-validate.ts";
 import { runPropsContractValidate } from "../props-contract.ts";
 import { runOpenSourceValidate } from "../open-source-validate.ts";
 
@@ -604,6 +605,19 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runGeneratedStaleValidate,
+  },
+  /* RFC-0601: content drift detection in generated files */
+  {
+    name: "generated.drift.validate",
+    description:
+      "Detect content drift in text-based generated files by re-invoking owning generators with dryRun and comparing output (RFC-0601, DNA-58).",
+    scope: "workspace",
+    flags: {
+      app: { kind: "string", description: "App id for app-scoped path resolution." },
+    },
+    supportsAllSites: true,
+    cacheable: false,
+    execute: runGeneratedDriftValidate,
   },
   /* RFC-0489: open-source SBOM registry validation */
   {
