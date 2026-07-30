@@ -15,11 +15,12 @@
   <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
   <item>RFC-0593: add mission.validate inline gate before lock acquisition; re-check state inside locks.</item>
   <item>RFC-0597: write .materialization-state.json and copy .cache/ from workpiece to cache clone as final step.</item>
+  <item>ADR-0010: stop any running dev/preview server for the workpiece before closing the mission.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
-import { execSync } from "node:child_process";
+import { execSync, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import type {
@@ -209,6 +210,17 @@ export async function runMissionClose(
     const workpieceDir = path.join(missionDir, "workpiece");
     const evidenceDir = path.join(missionDir, "evidence");
     await fs.mkdir(evidenceDir, { recursive: true });
+
+    // ADR-0010: stop any running dev/preview server for the workpiece before
+    // transitioning the mission to closed. Best-effort — if no server is running,
+    // astro dev stop silently succeeds. This frees the dev port and prevents
+    // serving stale content from a closed mission.
+    if (existsSync(workpieceDir)) {
+      spawnSync("pnpm", ["exec", "astro", "dev", "stop"], {
+        cwd: workpieceDir,
+        stdio: "ignore",
+      });
+    }
 
     const dirtyCheck = isWorkpieceDirty(workpieceDir);
     if (dirtyCheck.dirty) {
