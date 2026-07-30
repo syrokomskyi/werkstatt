@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-07-30
-updatedAt: 2026-07-30
+updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -25,6 +26,7 @@ amendedBy: []
 related:
   - RFC-0584
   - RFC-0568
+  - RFC-0604
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -44,8 +46,7 @@ commands:
   changed:
     - mission.reconcile
   removed: []
-appsImpacted:
-  - warpgogol-com
+appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
@@ -128,19 +129,24 @@ const isBordbuchPath = (p: string) =>
 const allBordbuch = conflictedPaths.every(isBordbuchPath);
 ```
 
-The `git checkout --ours` and `git add` commands also expand to include the new paths:
+The `git checkout --ours` and `git add` commands use the `conflictedPaths` array dynamically rather than hardcoding path literals. This ensures only actually-conflicted paths are checked out and added, avoiding errors when some bordbuch artifacts do not exist (e.g., `public/.well-known/bordbuch*` may not exist if `bordbuch.generate` has not been run yet):
 
 ```ts
-execSync("git checkout --ours bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/", { cwd: systemDir, ... });
-execSync("git add bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/", { cwd: systemDir, ... });
+const pathArgs = conflictedPaths.map((p) => JSON.stringify(p)).join(" ");
+execSync(`git checkout --ours -- ${pathArgs}`, { cwd: systemDir, ... });
+execSync(`git add -- ${pathArgs}`, { cwd: systemDir, ... });
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modify `isBordbuchPath` and `git checkout --ours` / `git add` commands |
-| `packages/os/site-kernel-handoff/src/tests/mission-reconcile.test.ts` | New regression test for `public/.well-known/bordbuch*` conflict auto-resolution |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modify `isBordbuchPath` and `git checkout --ours` / `git add` commands to use dynamic `conflictedPaths` |
+| `packages/os/site-kernel-handoff/src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts` | New regression test for `public/.well-known/bordbuch*` conflict auto-resolution (also covers RFC-0584 `bordbuch/` path scenario) |
+
+### Output format
+
+The `--json` output shape is unchanged from RFC-0584. The `autoResolvedPaths` field (optional `string[]` in `MissionReconcileData`) already exists and now includes `public/.well-known/bordbuch*` paths in addition to `bordbuch/` paths when auto-resolution occurs. No new fields are introduced.
 
 ### Failure modes
 
@@ -153,6 +159,8 @@ execSync("git add bordbuch/ public/.well-known/bordbuch.json public/.well-known/
 - **No migration needed**: The expanded auto-resolution applies immediately to all missions. Existing and future missions benefit from the fix without any flag day.
 - **No pipeline change**: `mission.reconcile` remains in the same lifecycle position.
 - **Idempotent re-run**: If a previous reconcile failed due to this conflict, re-running after the fix will reset the cache clone to `preReconcileSha` and re-merge with the expanded auto-resolution.
+- **AGENTS.md**: No update needed to `packages/os/site-kernel-handoff/AGENTS.md` — the expanded auto-resolution is an internal implementation detail of `mission.reconcile`, not a new agent-facing rule.
+- **RFC-0584 amendedBy**: Implementation must update RFC-0584's `amendedBy` field to include `RFC-0614` (V-19 bidirectional referential integrity).
 
 ## Alternatives considered
 
@@ -167,12 +175,14 @@ execSync("git add bordbuch/ public/.well-known/bordbuch.json public/.well-known/
 
 ## Acceptance criteria
 
-- [ ] `isBordbuchPath` in `mission-materialization-commands.ts` matches both `bordbuch/` and `public/.well-known/bordbuch*` paths (evidence: unit test in `packages/os/site-kernel-handoff/src/tests/mission-reconcile.test.ts`)
-- [ ] `git checkout --ours` and `git add` commands include `public/.well-known/bordbuch.json` and `public/.well-known/bordbuch/` paths (evidence: code inspection)
+- [ ] `isBordbuchPath` in `mission-materialization-commands.ts` matches both `bordbuch/` and `public/.well-known/bordbuch*` paths (evidence: unit test in `packages/os/site-kernel-handoff/src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts`)
+- [ ] `git checkout --ours` and `git add` commands use `conflictedPaths` dynamically, robust against partial bordbuch artifact sets (evidence: code inspection)
 - [ ] `mission.reconcile` auto-resolves delete/modify conflicts for `public/.well-known/bordbuch*` paths without manual intervention (evidence: unit test)
 - [ ] `mission.reconcile` still aborts on non-bordbuch conflicts (evidence: unit test)
+- [ ] Regression test covers both RFC-0584 `bordbuch/` and RFC-0614 `public/.well-known/bordbuch*` conflict scenarios (evidence: unit test)
 - [ ] `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes with new tests (evidence: test output)
 - [ ] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0614 --json`)
+- [ ] RFC-0584 `amendedBy` field updated to include `RFC-0614` (evidence: `docs/rfcs/archive/implemented/rfc-0584-*.md` frontmatter)
 
 ## Implementation notes for agents
 
