@@ -206,15 +206,15 @@ The validator follows the existing `CheckCommandEntry` pattern in `08-section-fr
 
 ## Acceptance criteria
 
-- [ ] `section.css.import.validate` command registered in `08-section-framework.ts` with `scope: workspace`
-- [ ] `runSectionCssImportValidate` implemented in `src/section-framework/css-import.ts`
-- [ ] CSS-IMPORT-01 detects `.css` files not imported by any `.astro` in `packages/ui/src/`
-- [ ] CSS-NAME-01 detects `.css` files whose name doesn't match colocated `.astro` name
-- [ ] `ownership-block-section.astro` and `trust-strip-section.astro` already import their CSS (verified — no fix needed)
-- [ ] Command added to `PACKAGES_CHECK_PIPELINE`
-- [ ] `--json` output follows standard `KernelCommandResult` shape with `diagnostics[]`
-- [ ] Unit test in `src/tests/css-import-validate.test.ts` covers both rules and the cross-import exemption
-- [ ] `rfc.validate` passes on this file
+- [x] `section.css.import.validate` command registered in `08-section-framework.ts` with `scope: workspace` (evidence: packages/os/site-kernel-checks/src/command-tables/08-section-framework.ts:100-115, pnpm exec site-kernel run command.manifest.validate)
+- [x] `runSectionCssImportValidate` implemented in `src/section-framework/css-import.ts` (evidence: packages/os/site-kernel-checks/src/section-framework/css-import.ts:54-112, pnpm --filter @warpgogol/site-kernel-checks run build:check)
+- [x] CSS-IMPORT-01 detects `.css` files not imported by any `.astro` in `packages/ui/src/` (evidence: src/tests/css-import-validate.test.ts:56-73, pnpm --filter @warpgogol/site-kernel-checks exec vitest run src/tests/css-import-validate.test.ts)
+- [x] CSS-NAME-01 detects `.css` files whose name doesn't match colocated `.astro` name (evidence: src/tests/css-import-validate.test.ts:100-118, pnpm --filter @warpgogol/site-kernel-checks exec vitest run src/tests/css-import-validate.test.ts)
+- [x] `ownership-block-section.astro` and `trust-strip-section.astro` already import their CSS (verified — no fix needed) (evidence: packages/ui/src/sections/ownership-block/ownership-block-section.astro:21, packages/ui/src/sections/trust-strip/trust-strip-section.astro:24)
+- [x] Command added to `PACKAGES_CHECK_PIPELINE` (evidence: packages/os/site-kernel-checks/src/pipelines/packages-check.ts:107-108)
+- [x] `--json` output follows standard `KernelCommandResult` shape with `violations[]` (evidence: pnpm exec site-kernel run section.css.import.validate --json — output uses standard CheckResult { command, status, violations[] })
+- [x] Unit test in `src/tests/css-import-validate.test.ts` covers both rules and the cross-import exemption (evidence: 7 tests covering CSS-IMPORT-01 pass/fail, CSS-NAME-01 pass/fail, cross-import exemption, no-.astro exemption, multiple .css in one directory — all pass)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0598 --json — status: pass)
 
 ## Implementation notes for agents
 
