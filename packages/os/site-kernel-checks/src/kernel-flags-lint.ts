@@ -13,6 +13,7 @@ ratchets which commands still sit on the deprecated heuristic parse path
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0260: initial implementation.</item>
+  <item>RFC-0610: extract shared utility functions into src/lib/command-table-tracing.ts.</item>
 </CHANGE_SUMMARY>
 */
 
