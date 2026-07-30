@@ -10,6 +10,7 @@
   <item>Register environment/deploy, fingerprint, JSON marker, and DNA registry rule ids.</item>
   <item>Register analytics and chat metadata drift rule ids.</item>
   <item>RFC-0601: register DRIFT-01 (error) and DRIFT-02 (info) for generated.drift.validate.</item>
+  <item>RFC-0602: register TS-TIME-01 for generated.timestamp.validate.</item>
 </CHANGE_SUMMARY>
 */
 

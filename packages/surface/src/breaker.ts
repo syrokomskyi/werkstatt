@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0283: initial implementation of circuit-breaker and reversible surface-state contracts.</item>
+  <item>RFC-0602: allow null createdAt in surfaceStateSchema for timestamp determinism.</item>
 </CHANGE_SUMMARY>
 */
 

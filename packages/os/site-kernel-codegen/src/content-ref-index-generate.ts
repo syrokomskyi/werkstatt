@@ -11,6 +11,7 @@ index file for the index-based resolver in @warpgogol/share/content-reference.</
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0527: initial implementation of content.ref-index.generate command.</item>
+  <item>RFC-0602: replace volatile generatedAt with null for timestamp determinism.</item>
 </CHANGE_SUMMARY>
 */
 

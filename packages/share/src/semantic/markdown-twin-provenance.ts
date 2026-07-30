@@ -14,6 +14,7 @@ over the normalized Markdown body (excluding frontmatter).
 <CHANGE_SUMMARY>
   <item>RFC-0320: initial implementation.</item>
   <item>RFC-0377: extended provenance with MarkdownTwinSemanticMeta, derivation maps, and bumped schema to gogol.markdown-twin@2.</item>
+  <item>RFC-0602: allow null lastModified for person-slug twins without source-backed stamps.</item>
 </CHANGE_SUMMARY>
 */
 

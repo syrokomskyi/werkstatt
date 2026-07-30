@@ -14,6 +14,7 @@ and resolves braceless collection.file.field references without astro:content (R
         Replace parseContentReference, resolveContentReference, substituteContentReferences,
         substituteContentReferencesInData with loadContentRefIndex, resolveReference,
         resolveReferencesInString, resolveReferencesDeep.</item>
+  <item>RFC-0602: allow null generatedAt in ContentRefIndex for timestamp determinism.</item>
 </CHANGE_SUMMARY>
 */
 

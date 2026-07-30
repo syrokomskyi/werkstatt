@@ -17,6 +17,7 @@ advisories (AGK-01..05).
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0287: initial knowledge tier generator + validator.</item>
+  <item>RFC-0602: accept null lastVerified in AGK-08 freshness validation.</item>
 </CHANGE_SUMMARY>
 */
 

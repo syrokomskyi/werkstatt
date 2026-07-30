@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0133: backfilled MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
+  <item>RFC-0602: replace volatile generatedAt with null in audit report frontmatter.</item>
 </CHANGE_SUMMARY>
 */
 

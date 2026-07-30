@@ -17,6 +17,7 @@ import { parse as yamlParse } from "yaml";
 <CHANGE_SUMMARY>
   <item>RFC-0197: initial implementation with a deterministic stub provider.</item>
   <item>RFC-0244: derive neutral slug from relative path for nested demand records; `slug:` frontmatter optional override; legacy basename fallback for flat files.</item>
+  <item>RFC-0602: replace volatile generatedAt with null in enrichment provenance.</item>
 </CHANGE_SUMMARY>
 */
 

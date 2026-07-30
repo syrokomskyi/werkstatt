@@ -8,6 +8,7 @@ import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted shared helpers from surface.ts into surface/shared.ts.</item>
+  <item>RFC-0602: replace volatile createdAt with null in surface state recording.</item>
 </CHANGE_SUMMARY>
 */
 

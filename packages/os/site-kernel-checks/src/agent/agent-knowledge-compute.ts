@@ -8,6 +8,7 @@ import { parse as yamlParse } from "yaml";
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted computeKnowledgeEnvelopes from agent-knowledge.ts into agent-knowledge-compute.ts.</item>
+  <item>RFC-0602: replace volatile lastVerified with null for derived-source freshness fallback.</item>
 </CHANGE_SUMMARY>
 */
 

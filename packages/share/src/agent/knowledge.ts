@@ -14,6 +14,7 @@ this module never reads files or invents fact shapes.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0287: initial knowledge tier — domain list, envelope, formatter.</item>
+  <item>RFC-0602: allow null lastVerified in AgentKnowledgeFreshness for derived-source fallback.</item>
 </CHANGE_SUMMARY>
 */
 

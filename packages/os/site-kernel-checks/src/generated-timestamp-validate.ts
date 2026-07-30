@@ -14,6 +14,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0602: initial implementation — Phase 1 source lint + Phase 2 double-build drift detection.</item>
+  <item>RFC-0602 fix: add pattern field to allowlist entries, add passport/content-ledger/ecosystem-commit/surface-demand to allowlist, fix duplicate pattern matching with break-after-first.</item>
 </CHANGE_SUMMARY>
 */
 
