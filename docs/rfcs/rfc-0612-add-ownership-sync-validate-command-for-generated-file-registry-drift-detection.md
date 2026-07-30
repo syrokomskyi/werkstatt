@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-07-30
-updatedAt: 2026-07-30
+updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -55,12 +56,12 @@ successSignals:
   - "ownership.sync.validate detects files in public/ not covered by any GENERATOR_OWNERSHIP_MAP entry (expanded glob) and reports OWN-01 diagnostics."
   - "ownership.sync.validate detects GENERATOR_OWNERSHIP_MAP entries that never match any file on disk and reports OWN-02 diagnostics."
   - "After adding missing entries to GENERATOR_OWNERSHIP_MAP, ownership.sync.validate passes with zero violations."
-  - "ownership.sync.validate runs in build.post pipeline after build.prepare, before generated.stale.validate."
+  - "ownership.sync.validate runs in build.prepare pipeline before generated.stale.validate, and in sites-check-author pipeline before generated.stale.validate."
 nonGoals:
   - "Do not check content drift — that is the domain of RFC-0601 (generated.drift.validate)."
   - "Do not check for stale git-tracked files — that is the domain of RFC-0600 (generated.stale.validate)."
   - "Do not auto-add missing entries to GENERATOR_OWNERSHIP_MAP — the command is informational: it reports and exits non-zero."
-  - "Do not check files outside public/ and src/ — authored content files are not generated outputs."
+  - "Do not check authored content files in src/content/ — they are not generated outputs."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -100,11 +101,11 @@ The kernel gains an `ownership.sync.validate` command that compares files in `pu
 - **OWN-01**: file on disk not covered by any ownership entry (missing registration)
 - **OWN-02**: ownership entry that matches no file on disk (phantom registration)
 
-The command runs in the `build.post` pipeline after `build.prepare`, before `generated.stale.validate`.
+The command runs in the `build.prepare` pipeline before `generated.stale.validate`, and in the `sites-check-author` pipeline before `generated.stale.validate`. This ensures registry drift is caught before stale validation produces false positives.
 
 ## Architectural fit
 
-- **DNA-58 (Generated-file content determinism)**: `ownership.sync.validate` extends the generated-file governance stack by ensuring the ownership registry itself stays in sync with actual generator outputs. Without this check, registry drift causes false positives in `generated.stale.validate` (RFC-0600), undermining the determinism enforcement chain.
+- **DNA-58 (Generated-file content determinism)**: `ownership.sync.validate` is a supporting check for the determinism chain — it does not directly verify content byte-identicalness (that is `generated.drift.validate`'s role). Instead, it ensures the ownership registry itself stays complete and accurate. Without this check, registry drift causes false positives in `generated.stale.validate` (RFC-0600), which undermines the overall determinism enforcement stack. The alignment is indirect but necessary: a broken registry makes all downstream generated-file validators unreliable.
 - **RFC-0600 (generated.stale.validate)**: Complementary — stale validate checks for orphaned git-tracked files; ownership sync validate checks for unregistered generated files. Together they form a two-layer defense: ownership sync catches missing registrations before stale validate misidentifies generated files as stale.
 - **RFC-0601 (generated.drift.validate)**: Orthogonal — drift validate checks content determinism; ownership sync validate checks registry completeness.
 - **RFC-0375 (Universal generated-file detection)**: The ownership map is the concrete implementation of the generated-file detection contract; this RFC ensures it stays accurate.
@@ -128,15 +129,10 @@ interface OwnershipSyncInput {
   workspaceRoot: string;
 }
 
-interface OwnershipSyncResult {
-  command: "ownership.sync.validate";
-  status: "pass" | "fail";
-  violations: Array<{
-    rule: "OWN-01" | "OWN-02";
-    file: string;
-    message: string;
-  }>;
-}
+// Returns KernelCommandResult<CheckResult> with Diagnostic[] —
+// consistent with generated.stale.validate and generated.files.validate.
+// OWN-01 → severity: "error", ruleId: "OWN-01"
+// OWN-02 → severity: "warning", ruleId: "OWN-02"
 ```
 
 ### File system responsibilities
@@ -147,10 +143,14 @@ interface OwnershipSyncResult {
 | `public/**` | Scanned for generated files (after `build.prepare`) |
 | `src/pages/**/*.astro`, `src/middleware.ts`, `src/content.config.ts`, `src/env.d.ts` | Scanned for generated source files |
 | `packages/os/site-kernel-checks/src/ownership-sync-validate.ts` | New module implementing the command |
+| `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` | Command table registration for `ownership.sync.validate` |
+| `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` | Pipeline integration — before `generated.stale.validate` |
+| `packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts` | Pipeline integration — before `generated.stale.validate` |
+| `packages/os/site-kernel-checks/AGENTS.md` | Module table entry for `src/ownership-sync-validate.ts` |
 
 ### Placeholder expansion
 
-All placeholders in `GENERATOR_OWNERSHIP_MAP` entries (`{system}`, `{app}`, `{lang}`, `{route}`, `{slug}`, `{id}`, `{category}`) are expanded to `*` before glob matching, consistent with `generated.stale.validate` and `generated.files.validate`.
+All placeholders in `GENERATOR_OWNERSHIP_MAP` entries (`{system}`, `{app}`, `{lang}`, `{route}`, `{slug}`, `{id}`, `{category}`) are expanded to `*` before glob matching, consistent with `generated.files.validate`. The `{system}` placeholder is used by bordbuch entries (`systems/{system}/public/...`) and must be expanded for workspace-absolute paths. Entries with `conditional: true` are exempt from OWN-02 (phantom registration) when their condition isn't met, consistent with `generated.stale.validate` and `generated.files.validate` which already skip conditional entries.
 
 ### Output format
 
@@ -158,9 +158,9 @@ All placeholders in `GENERATOR_OWNERSHIP_MAP` entries (`{system}`, `{app}`, `{la
 {
   "command": "ownership.sync.validate",
   "status": "fail",
-  "violations": [
-    { "rule": "OWN-01", "file": "public/feed.json", "message": "File on disk not covered by any GENERATOR_OWNERSHIP_MAP entry" },
-    { "rule": "OWN-02", "file": "public/old-format.xml", "message": "Ownership entry matches no file on disk" }
+  "diagnostics": [
+    { "ruleId": "OWN-01", "severity": "error", "file": "public/feed.json", "message": "File on disk not covered by any GENERATOR_OWNERSHIP_MAP entry" },
+    { "ruleId": "OWN-02", "severity": "warning", "file": "public/old-format.xml", "message": "Ownership entry matches no file on disk" }
   ]
 }
 ```
@@ -169,34 +169,38 @@ All placeholders in `GENERATOR_OWNERSHIP_MAP` entries (`{system}`, `{app}`, `{la
 
 - **OWN-01 (missing registration)**: exit code 1. The file exists on disk after `build.prepare` but no ownership entry covers it. Fix: add the file to `GENERATOR_OWNERSHIP_MAP`.
 - **OWN-02 (phantom registration)**: exit code 1. An ownership entry exists but no file matches the expanded glob. Fix: remove the stale entry or fix the generator that should produce the file.
-- **Static assets**: Files in `public/` that are not generated (e.g., `public/.htaccess`, `public/robots.txt`) must be excluded via a static-asset allowlist or by checking the `markerPolicy` field in the ownership entry.
+- **Static assets**: Files in `public/` that are not generated (e.g., `public/.htaccess`, `public/robots.txt`) are excluded via the existing `STATIC_ASSET_EXEMPT_DIRS` pattern from `generated-stale-validate.ts`. The exemption list is reused, not duplicated — `ownership.sync.validate` imports it from the same module.
 
 ## Rollout
 
-- **Pipeline integration**: `ownership.sync.validate` is added to the `build.post` pipeline after `build.prepare` and before `generated.stale.validate`. This ensures registry drift is caught before stale validation produces false positives.
+- **Pipeline integration**: `ownership.sync.validate` is added to the `build.prepare` pipeline (and `sites-check-author` pipeline) before `generated.stale.validate`. This ensures registry drift is caught before stale validation produces false positives.
 - **Existing apps**: No migration needed — the command reads the existing `GENERATOR_OWNERSHIP_MAP` and filesystem. Apps with complete ownership maps pass immediately.
 - **New apps**: Automatically compliant if their generators are registered in `GENERATOR_OWNERSHIP_MAP` during onboarding.
-- **Static assets**: A static-asset exclusion list (or `markerPolicy: "static"` in ownership entries) prevents false positives for hand-authored files in `public/`.
+- **Static assets**: The existing `STATIC_ASSET_EXEMPT_DIRS` exclusion list (from `generated-stale-validate.ts`) prevents false positives for hand-authored files in `public/`.
 
 ## Alternatives considered
 
 - **Extend `generated.stale.validate` (RFC-0600) with OWN-01 diagnostic**: Rejected because stale validate checks for orphaned git-tracked files, not registry completeness. Mixing the two concerns in one command makes diagnostics ambiguous — a file could be both unregistered AND stale, and the operator would not know which fix to apply.
+- **Extend `generated.files.validate` (RFC-0375) with OWN-02 diagnostic**: Rejected because `generated.files.validate` checks the forward direction (declared files exist), while OWN-02 is the reverse direction (entries matching no file). Although conceptually adjacent, combining them would mix two different comparison directions in one command, making the diagnostic output harder to interpret. A separate command keeps each validator's scope clean.
 - **Instrument `writeFileIfChanged` to track written files**: Rejected because it requires modifying the shared write utility across all packages, creating a coupling between the write primitive and the validation layer. Filesystem diff after `build.prepare` is simpler and sufficient.
 
 ## Risks
 
-- **False positives for static assets**: Files in `public/` that are hand-authored (not generated) will trigger OWN-01. Mitigation: a static-asset exclusion list or `markerPolicy: "static"` field.
+- **False positives for static assets**: Files in `public/` that are hand-authored (not generated) will trigger OWN-01. Mitigation: reuse the existing `STATIC_ASSET_EXEMPT_DIRS` exclusion list from `generated-stale-validate.ts`.
 - **Placeholder expansion gaps**: If new placeholders are added to `GENERATOR_OWNERSHIP_MAP` without updating the expansion logic in `ownership.sync.validate`, entries will not match. Mitigation: use the same shared placeholder expansion utility as `generated.stale.validate` and `generated.files.validate`.
-- **Performance**: Scanning `public/` after `build.prepare` is fast (directory walk + glob match). No measurable impact expected.
+- **Performance**: Scanning `public/` after `build.prepare` is a directory walk + glob match. Warpgogol-com's `public/` contains ~200-400 files (preview images, surface pages, media variants, static assets). The scan is O(n×m) where n = files on disk, m = ownership entries (~60). Expected runtime: <50ms. No measurable pipeline impact.
 - **Agent misinterpretation**: Agents may confuse OWN-01 (missing registration) with STALE-01 (orphaned file). The diagnostic messages and fix hints must clearly distinguish the two.
 
 ## Acceptance criteria
 
 - [ ] `ownership.sync.validate` command registered in `packages/os/site-kernel-checks` with `--site` and `--json` flags (evidence: `packages/os/site-kernel-checks/src/ownership-sync-validate.ts`)
+- [ ] `ownership.sync.validate` registered in command table `src/command-tables/01-codegen.ts` (evidence: `src/command-tables/01-codegen.ts`)
 - [ ] OWN-01 diagnostic reports files in `public/` not covered by any `GENERATOR_OWNERSHIP_MAP` entry after placeholder expansion (evidence: unit test in `src/tests/ownership-sync-validate.test.ts`)
 - [ ] OWN-02 diagnostic reports `GENERATOR_OWNERSHIP_MAP` entries that match no file on disk (evidence: unit test in `src/tests/ownership-sync-validate.test.ts`)
-- [ ] Command integrated into `build.post` pipeline after `build.prepare`, before `generated.stale.validate` (evidence: pipeline definition in `src/pipelines/`)
-- [ ] Static assets in `public/` (e.g., `robots.txt`, `.htaccess`) excluded from OWN-01 via static-asset allowlist or `markerPolicy: "static"` (evidence: unit test)
+- [ ] Command integrated into `build.prepare` pipeline before `generated.stale.validate` (evidence: pipeline definition in `src/pipelines/build-prepare.ts`)
+- [ ] Command integrated into `sites-check-author` pipeline before `generated.stale.validate` (evidence: pipeline definition in `src/pipelines/sites-check-author.ts`)
+- [ ] Static assets in `public/` excluded from OWN-01 via reused `STATIC_ASSET_EXEMPT_DIRS` from `generated-stale-validate.ts` (evidence: unit test)
+- [ ] `conditional: true` entries exempt from OWN-02 when condition not met (evidence: unit test)
 - [ ] `pnpm --filter @warpgogol/site-kernel-checks test -- --run` passes with new tests (evidence: test output)
 - [ ] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0612 --json`)
 
@@ -205,6 +209,7 @@ All placeholders in `GENERATOR_OWNERSHIP_MAP` entries (`{system}`, `{app}`, `{la
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST use the same placeholder expansion logic as `generated.stale.validate` and `generated.files.validate` — extract a shared utility if duplication is detected.
-- Agents MUST NOT add static assets to `GENERATOR_OWNERSHIP_MAP` to silence OWN-01 — use the static-asset exclusion list instead.
+- Agents MUST NOT add static assets to `GENERATOR_OWNERSHIP_MAP` to silence OWN-01 — use the `STATIC_ASSET_EXEMPT_DIRS` exclusion list instead.
+- Agents MUST reuse the `STATIC_ASSET_EXEMPT_DIRS` list from `generated-stale-validate.ts` — do not duplicate it in `ownership-sync-validate.ts`.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id RFC-0612 --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
