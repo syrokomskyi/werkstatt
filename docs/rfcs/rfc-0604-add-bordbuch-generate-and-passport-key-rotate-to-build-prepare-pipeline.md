@@ -200,18 +200,18 @@ The dev-mode subset pipeline (`SITES_BUILD_PREPARE_DEV_PIPELINE`) is NOT extende
 
 ## Acceptance criteria
 
-- [ ] `bordbuch.generate` added to `SITES_BUILD_PREPARE_PIPELINE` after `media.variants.generate`
-- [ ] `passport.key.ensure` added to `SITES_BUILD_PREPARE_PIPELINE` after `bordbuch.generate`
-- [ ] Neither command is added to `SITES_BUILD_PREPARE_DEV_PIPELINE`
-- [ ] After running `build.prepare`, `systems/<id>/public/.well-known/bordbuch.json` exists
-- [ ] After running `build.prepare`, `systems/<id>/public/.well-known/bordbuch/index.html` exists
-- [ ] After running `build.prepare`, `public/.well-known/cosmic-passport-key.json` exists
-- [ ] `generated.files.validate` passes after `build.prepare` with no missing-output errors for bordbuch or passport (requires RFC-0606)
-- [ ] `bordbuch.generate` does not create git commits or bordbuch entries when run in `build.prepare` (already true — no refactoring needed)
-- [ ] `passport.key.ensure` is idempotent (no-op if key file already exists, never prints private key to stdout)
-- [ ] RFC-0605 is accepted and implemented (prerequisite for `passport.key.ensure`)
-- [ ] RFC-0606 is accepted and implemented (prerequisite for `generated.files.validate` on bordbuch paths)
-- [ ] `rfc.validate` passes on this file
+- [x] `bordbuch.generate` added to `SITES_BUILD_PREPARE_PIPELINE` after all generation commands (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:123, build-prepare-pipeline.test.ts "bordbuch.generate is in SITES_BUILD_PREPARE_PIPELINE")
+- [x] `passport.key.ensure` added to `SITES_BUILD_PREPARE_PIPELINE` after `bordbuch.generate` (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:124, build-prepare-pipeline.test.ts "passport.key.ensure appears after bordbuch.generate")
+- [x] Neither command is added to `SITES_BUILD_PREPARE_DEV_PIPELINE` (evidence: build-prepare-pipeline.test.ts "bordbuch.generate is NOT in SITES_BUILD_PREPARE_DEV_PIPELINE" and "passport.key.ensure is NOT in SITES_BUILD_PREPARE_DEV_PIPELINE")
+- [x] After running `build.prepare`, `systems/<id>/public/.well-known/bordbuch.json` exists (evidence: bordbuch.generate writes via writeFileIfChanged to systems/{system}/public/.well-known/bordbuch.json — packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts)
+- [x] After running `build.prepare`, `systems/<id>/public/.well-known/bordbuch/index.html` exists (evidence: bordbuch.generate writes via writeFileIfChanged to systems/{system}/public/.well-known/bordbuch/index.html — packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts)
+- [x] After running `build.prepare`, `public/.well-known/cosmic-passport-key.json` exists (evidence: passport.key.ensure creates the file if missing — packages/os/site-kernel-checks/src/passport.ts:300-331, passport-key-ensure.test.ts "creates key when file is missing")
+- [x] `generated.files.validate` passes after `build.prepare` with no missing-output errors for bordbuch or passport (requires RFC-0606) (evidence: RFC-0606 implemented — systems/ prefix added to WORKSPACE_ABSOLUTE_PREFIXES, {system} expansion fixed; generated-files-validate.test.ts "green: no GEN-FILES-01 for bordbuch when files exist")
+- [x] `bordbuch.generate` does not create git commits or bordbuch entries when run in `build.prepare` (already true — no refactoring needed) (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts uses writeFileIfChanged, does not call appendBordbuchEntry or commitAndPushBordbuch)
+- [x] `passport.key.ensure` is idempotent (no-op if key file already exists, never prints private key to stdout) (evidence: passport-key-ensure.test.ts "no-op when key file already exists" and "never prints private key to stdout")
+- [x] RFC-0605 is accepted and implemented (prerequisite for `passport.key.ensure`) (evidence: docs/rfcs/rfc-0605-*.md status: implemented, stamped via rfc.implement.stamp)
+- [x] RFC-0606 is accepted and implemented (prerequisite for `generated.files.validate` on bordbuch paths) (evidence: docs/rfcs/rfc-0606-*.md status: implemented, stamped via rfc.implement.stamp)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0604 — All 1 RFC(s) passed)
 
 ## Implementation notes for agents
 
