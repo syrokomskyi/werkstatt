@@ -218,20 +218,20 @@ The command uses the existing `Diagnostic` type from `@warpgogol/site-kernel` an
 
 ## Acceptance criteria
 
-- [ ] `generated.stale.validate` command registered in `01-codegen.ts` with `scope: workspace`
-- [ ] `runGeneratedStaleValidate` implemented in `src/generated-stale-validate.ts`
-- [ ] STALE-01 detects files in `public/` not produced by any registered generator
-- [ ] Static assets in `public/textures/` are not flagged as stale
-- [ ] Per-page preview images (`public/preview/{lang}/{slug}.png`) for existing content pages are not flagged as stale
-- [ ] Per-page preview images for deleted content pages ARE flagged as stale
-- [ ] Command added to `SITES_BUILD_PREPARE_PIPELINE` after `generated.files.validate`
-- [ ] Command added to `SITES_BUILD_PREPARE_DEV_PIPELINE` (RFC-0597)
-- [ ] Command added to `SITES_CHECK_AUTHOR_PIPELINE` after `generated.files.validate`
-- [ ] `--json` output follows standard `CheckResult` shape with `diagnostics[]`
-- [ ] Uses `collectFiles` from `@warpgogol/share/fs` (no `git ls-files` dependency)
-- [ ] Uses `diagnosticsResult()` from `./result-helpers.ts` (no custom `StaleFileDiagnostic` interface)
-- [ ] Unit test in `src/tests/generated-stale-validate.test.ts` covers stale detection, static asset exemption, preview image resolution, and clean-pass scenarios
-- [ ] `rfc.validate` passes on this file
+- [x] `generated.stale.validate` command registered in `01-codegen.ts` with `scope: workspace` (evidence: packages/os/site-kernel-checks/src/command-tables/01-codegen.ts:595-606, command.manifest.validate passed)
+- [x] `runGeneratedStaleValidate` implemented in `src/generated-stale-validate.ts` (evidence: packages/os/site-kernel-checks/src/generated-stale-validate.ts:38-120, tsc --noEmit passed)
+- [x] STALE-01 detects files in `public/` not produced by any registered generator (evidence: src/tests/generated-stale-validate.test.ts:56-70, test "red: reports STALE-01 for orphaned file in public/" passed)
+- [x] Static assets in `public/textures/` are not flagged as stale (evidence: src/tests/generated-stale-validate.test.ts:72-86, test "green: static asset in public/textures/ is not flagged" passed)
+- [x] Per-page preview images (`public/preview/{lang}/{slug}.png`) for existing content pages are not flagged as stale (evidence: src/tests/generated-stale-validate.test.ts:88-104, test "green: preview image for existing content page is not flagged" passed)
+- [x] Per-page preview images for deleted content pages ARE flagged as stale (evidence: src/tests/generated-stale-validate.test.ts:106-121, test "red: preview image for deleted content page is flagged as stale" passed)
+- [x] Command added to `SITES_BUILD_PREPARE_PIPELINE` after `generated.files.validate` (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:123-124)
+- [x] Command added to `SITES_BUILD_PREPARE_DEV_PIPELINE` (RFC-0597) (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:176-177)
+- [x] Command added to `SITES_CHECK_AUTHOR_PIPELINE` after `generated.files.validate` (evidence: packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts:259-260)
+- [x] `--json` output follows standard `CheckResult` shape with `diagnostics[]` (evidence: packages/os/site-kernel-checks/src/generated-stale-validate.ts:119, uses diagnosticsResult() which returns CheckResult)
+- [x] Uses `collectFiles` from `@warpgogol/share/fs` (no `git ls-files` dependency) (evidence: packages/os/site-kernel-checks/src/generated-stale-validate.ts:31, import { collectFiles } from "@warpgogol/share/fs")
+- [x] Uses `diagnosticsResult()` from `./result-helpers.ts` (no custom `StaleFileDiagnostic` interface) (evidence: packages/os/site-kernel-checks/src/generated-stale-validate.ts:32, import { diagnosticsResult } from "./result-helpers.ts")
+- [x] Unit test in `src/tests/generated-stale-validate.test.ts` covers stale detection, static asset exemption, preview image resolution, and clean-pass scenarios (evidence: src/tests/generated-stale-validate.test.ts, 7 tests passed)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate — no errors for RFC-0600)
 
 ## Implementation notes for agents
 
