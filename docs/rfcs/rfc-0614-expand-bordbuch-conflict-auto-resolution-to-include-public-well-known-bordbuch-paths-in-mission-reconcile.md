@@ -1,7 +1,7 @@
 ---
 id: RFC-0614
 title: "Expand bordbuch conflict auto-resolution to include public well-known bordbuch paths in mission reconcile"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-30
-updatedAt: 2026-07-31
+updatedAt: 2026-07-30
 enhancedAt: 2026-07-31
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
