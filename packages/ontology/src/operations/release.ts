@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0357: initial release and behavior snapshot schemas.</item>
+  <item>RFC-0608: extend releaseStateSchema with alt-deployed and promoted; add buildIdentitySchema.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -14,7 +15,13 @@ import { z } from "zod";
 import { STERNSYSTEM_ID_REGEX, MISSION_ID_REGEX, RELEASE_ID_REGEX } from "./naming-policy.ts";
 import { releaseArtifactRefSchema as artifactRefSchema } from "./artifact-store.ts";
 
-export const releaseStateSchema = z.enum(["prepared", "published", "rolled-back"]);
+export const releaseStateSchema = z.enum([
+  "prepared",
+  "published",
+  "alt-deployed",
+  "promoted",
+  "rolled-back",
+]);
 
 export const releaseManifestSchema = z.object({
   schemaVersion: z.string().min(1),
@@ -62,7 +69,23 @@ export const behaviorSnapshotDiffSchema = z.object({
   differences: z.array(behaviorSnapshotDifferenceSchema),
 });
 
+export const buildIdentitySchema = z.object({
+  releaseId: z.string().regex(RELEASE_ID_REGEX),
+  systemId: z.string().regex(STERNSYSTEM_ID_REGEX),
+  missionId: z.string().regex(MISSION_ID_REGEX),
+  semver: z.string(),
+  distTreeHash: z.string(),
+  behaviorSnapshotHash: z.string(),
+  siteContentHash: z.string(),
+  platformVersion: z.string(),
+  platformSemanticHash: z.string(),
+  commitSha: z.string(),
+  buildTimestamp: z.string().datetime(),
+  targetPlatform: z.string(),
+});
+
 export type ReleaseState = z.infer<typeof releaseStateSchema>;
 export type ReleaseManifest = z.infer<typeof releaseManifestSchema>;
+export type BuildIdentity = z.infer<typeof buildIdentitySchema>;
 export type BehaviorSnapshotDifference = z.infer<typeof behaviorSnapshotDifferenceSchema>;
 export type BehaviorSnapshotDiff = z.infer<typeof behaviorSnapshotDiffSchema>;

@@ -103,10 +103,12 @@ export {
   releaseArtifactRefSchema as releaseArtifactRefSchemaV2,
   behaviorSnapshotDifferenceSchema,
   behaviorSnapshotDiffSchema,
+  buildIdentitySchema,
 } from "./release.ts";
 export type {
   ReleaseState,
   ReleaseManifest,
+  BuildIdentity,
   BehaviorSnapshotDifference,
   BehaviorSnapshotDiff,
 } from "./release.ts";
