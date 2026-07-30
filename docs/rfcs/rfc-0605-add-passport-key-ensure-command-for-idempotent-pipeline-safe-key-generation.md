@@ -40,9 +40,9 @@ satisfies: []
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - passport.key.ensure
-  added: []
   changed: []
   removed: []
 appsImpacted: []

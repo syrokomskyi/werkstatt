@@ -46,9 +46,7 @@ versionBump: patch
 commands:
   proposed: []
   added: []
-  changed:
-    - build.prepare
-    - SITES_BUILD_PREPARE_PIPELINE
+  changed: []
   removed: []
 appsImpacted:
   - warpgogol-com

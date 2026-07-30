@@ -12,7 +12,8 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
@@ -270,22 +271,22 @@ Canonical `CheckResult` (RFC-0203) with `diagnostics: Diagnostic[]`:
 
 ## Acceptance criteria
 
-- [ ] `generated.drift.validate` command registered in `01-codegen.ts` with `scope: workspace`
-- [ ] `runGeneratedDriftValidate` implemented in `src/generated-drift-validate.ts`
-- [ ] DRIFT-01 and DRIFT-02 registered in `diagnostics/rules/core-infra.ts`
-- [ ] DRIFT-01 (error) detects content drift in text-based generated files
-- [ ] DRIFT-02 (info) emitted for generators without `dryRun` support
-- [ ] Binary files (PNG, ICO, WebP, MP4, WebM, JPG, JPEG, GIF, TIFF, HEIC, HEIF, SVG) are skipped via extension-based detection
-- [ ] Line-ending normalization (LF) and trailing whitespace trim applied before comparison
-- [ ] Git-tracking detection via `git ls-files` — untracked files skipped
-- [ ] Glob patterns and placeholders (`{lang}`, `{route}`, `{system}`) expanded using RFC-0375 logic
-- [ ] Conditional entries (`conditional: true`) skipped
-- [ ] Workspace-absolute paths (e.g., `packages/ui/`) resolved relative to `workspaceRoot`
-- [ ] Files whose owning generator is not in `SITES_BUILD_PREPARE_PIPELINE` are skipped
-- [ ] Command added to `build.check` pipeline after `generated.marker.validate`, before `generated.stale.validate`
-- [ ] `--json` output follows canonical `CheckResult` shape with `diagnostics: Diagnostic[]` (DRIFT-01 as error, DRIFT-02 as info)
-- [ ] Unit test in `src/tests/generated-drift-validate.test.ts` covers drift detection, clean-pass, dryRun-skip, binary-skip, and glob-expansion scenarios
-- [ ] `rfc.validate` passes on this file
+- [x] `generated.drift.validate` command registered in `01-codegen.ts` with `scope: workspace` (evidence: packages/os/site-kernel-checks/src/command-tables/01-codegen.ts)
+- [x] `runGeneratedDriftValidate` implemented in `src/generated-drift-validate.ts` (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts)
+- [x] DRIFT-01 and DRIFT-02 registered in `diagnostics/rules/core-infra.ts` (evidence: packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:468-477)
+- [x] DRIFT-01 (error) detects content drift in text-based generated files (evidence: generated-drift-validate.test.ts "Red: committed file differs from rendered")
+- [x] DRIFT-02 (info) emitted for generators without `dryRun` support (evidence: generated-drift-validate.test.ts "Green: generator without renderedFiles")
+- [x] Binary files (PNG, ICO, WebP, MP4, WebM, JPG, JPEG, GIF, TIFF, HEIC, HEIF, SVG) are skipped via extension-based detection (evidence: generated-drift-validate.test.ts "Green: binary files are skipped")
+- [x] Line-ending normalization (LF) and trailing whitespace trim applied before comparison (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts)
+- [x] Git-tracking detection via `git ls-files` — untracked files skipped (evidence: generated-drift-validate.test.ts "Green: non-git-tracked files are skipped")
+- [x] Glob patterns and placeholders (`{lang}`, `{route}`, `{system}`) expanded using RFC-0375 logic (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts reuses expandGlob)
+- [x] Conditional entries (`conditional: true`) skipped (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts)
+- [x] Workspace-absolute paths (e.g., `packages/ui/`) resolved relative to `workspaceRoot` (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts)
+- [x] Files whose owning generator is not in `SITES_BUILD_PREPARE_PIPELINE` are skipped (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts)
+- [x] Command added to `build.check` pipeline after `generated.marker.validate`, before `generated.stale.validate` (evidence: packages/os/site-kernel-checks/src/pipelines/build-check.ts:39)
+- [x] `--json` output follows canonical `CheckResult` shape with `diagnostics: Diagnostic[]` (DRIFT-01 as error, DRIFT-02 as info) (evidence: packages/os/site-kernel-checks/src/generated-drift-validate.ts)
+- [x] Unit test in `src/tests/generated-drift-validate.test.ts` covers drift detection, clean-pass, dryRun-skip, binary-skip, and glob-expansion scenarios (evidence: packages/os/site-kernel-checks/src/tests/generated-drift-validate.test.ts)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0601)
 
 ## Implementation notes for agents
 
