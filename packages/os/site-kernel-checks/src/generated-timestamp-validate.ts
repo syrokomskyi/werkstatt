@@ -42,7 +42,8 @@ export interface TimestampAllowlistEntry {
 const TIMESTAMP_ALLOWLIST: TimestampAllowlistEntry[] = [
   {
     module: "packages/os/site-kernel-checks/src/agent/agent-surface-sign.ts",
-    reason: "Ed25519 signing proof `created` timestamp — deterministic per RFC-0308, not a generated file field.",
+    reason:
+      "Ed25519 signing proof `created` timestamp — deterministic per RFC-0308, not a generated file field.",
   },
   {
     module: "packages/os/site-kernel-checks/src/surface-breaker.ts",
@@ -78,10 +79,7 @@ const RULE_ID = "TS-TIME-01";
  * - Block comment state (tracked across lines via `inBlockComment`)
  * - String literals ('...', "...", `...`)
  */
-function stripCommentsAndStrings(
-  line: string,
-  state: { inBlockComment: boolean },
-): string {
+export function stripCommentsAndStrings(line: string, state: { inBlockComment: boolean }): string {
   let result = "";
   let i = 0;
   const len = line.length;
@@ -140,7 +138,7 @@ function stripCommentsAndStrings(
 // Phase 1: Source lint
 // ---------------------------------------------------------------------------
 
-function scanModuleForTimestamps(
+export function scanModuleForTimestamps(
   modulePath: string,
   workspaceRoot: string,
 ): { line: number; pattern: string }[] {
@@ -168,10 +166,7 @@ function scanModuleForTimestamps(
   return violations;
 }
 
-function runPhase1(
-  workspaceRoot: string,
-  mode: "warning" | "fail",
-): Diagnostic[] {
+export function runPhase1(workspaceRoot: string, mode: "warning" | "fail"): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
   // Collect unique module paths from ownership map
@@ -239,18 +234,25 @@ async function runPhase2(
   const files1 = new Set(run1?.filesModified ?? []);
   const files2 = new Set(run2?.filesModified ?? []);
 
-  // Files that changed between the two runs have non-deterministic content
+  // Files that changed between the two runs have non-deterministic content.
+  // Symmetric difference: files in one run but not the other.
+  const drifted = new Set<string>();
+  for (const file of files1) {
+    if (!files2.has(file)) drifted.add(file);
+  }
   for (const file of files2) {
-    if (!files1.has(file)) {
-      diagnostics.push({
-        ruleId: RULE_ID,
-        severity: mode === "warning" ? "warning" : "error",
-        message: `Generated file "${file}" drifted between two consecutive build.prepare runs — contains non-deterministic content (likely a volatile timestamp).`,
-        file,
-        data: { phase: 2, field: "timestamp" },
-        fixHint: `Find the volatile timestamp in the generator source and replace with a deterministic value. Run generated.timestamp.validate (without --deep) to identify the source pattern.`,
-      });
-    }
+    if (!files1.has(file)) drifted.add(file);
+  }
+
+  for (const file of drifted) {
+    diagnostics.push({
+      ruleId: RULE_ID,
+      severity: mode === "warning" ? "warning" : "error",
+      message: `Generated file "${file}" drifted between two consecutive build.prepare runs — contains non-deterministic content (likely a volatile timestamp).`,
+      file,
+      data: { phase: 2, field: "timestamp" },
+      fixHint: `Find the volatile timestamp in the generator source and replace with a deterministic value. Run generated.timestamp.validate (without --deep) to identify the source pattern.`,
+    });
   }
 
   return diagnostics;
@@ -274,7 +276,7 @@ export async function runGeneratedTimestampValidate(
 
   // Phase 2 only when --deep is passed
   if (deep) {
-    diagnostics.push(...await runPhase2(context, mode));
+    diagnostics.push(...(await runPhase2(context, mode)));
   }
 
   return diagnosticsResult("generated.timestamp.validate", diagnostics);
