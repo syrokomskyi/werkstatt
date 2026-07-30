@@ -1,6 +1,6 @@
 ---
 id: RFC-0592
-title: "Exclude meta-refresh redirect stubs and fix wildcard matching in behavior snapshot route collection"
+title: "Fix wildcard matching in behavior snapshot route collection"
 status: draft
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-07-29
-updatedAt: 2026-07-29
+updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -26,6 +27,7 @@ related:
   - DNA-49
   - RFC-0588
   - RFC-0379
+  - RFC-0595
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -49,7 +51,6 @@ commands:
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
-  - "@warpgogol/share"
   - "@warpgogol/site-kernel-handoff"
 successSignals: []
 nonGoals:
@@ -57,6 +58,8 @@ nonGoals:
   - "Changing dist-size-limit preflight checks (video size handled by separate RFC)"
   - "Modifying the health check probe logic or redirect-following behavior"
   - "410 Gone handling (covered by RFC-0589)"
+  - "Meta-refresh redirect stub exclusion from the behavior snapshot (covered by RFC-0595, which marks redirect routes with contentHash: null + redirectTarget instead of excluding them)"
+  - "Moving isHtmlRedirectPage between @warpgogol/share subpath modules (RFC-0595 imports it from its current location)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -75,37 +78,35 @@ nonGoals:
 #     pattern: "Some new governance paragraph"
 ---
 
-# RFC-0592: Exclude meta-refresh redirect stubs and fix wildcard matching in behavior snapshot route collection
+# RFC-0592: Fix wildcard matching in behavior snapshot route collection
 
 ## Context
 
-The second real-world Cloudflare Workers propagation of `warpgogol-com-r000002` revealed two remaining gaps in behavior snapshot route collection that RFC-0588 did not cover. RFC-0588 excluded 301/308 routes by parsing `_redirects` rules and matching redirect source patterns against route paths. However, two edge cases persisted:
+The second real-world Cloudflare Workers propagation of `warpgogol-com-r000002` revealed a remaining gap in behavior snapshot route collection that RFC-0588 did not cover. RFC-0588 excluded 301/308 routes by parsing `_redirects` rules and matching redirect source patterns against route paths. However, one edge case persisted:
 
-1. **Meta-refresh redirect stub pages**: Astro generates `de/index.html` as a meta-refresh redirect stub (RFC-0160 prefixed-default-language convention) that redirects `/de/` → `/`. The `_redirects` rule `/de/* /:splat 308` covers `/de/anything` but not `/de` itself (the route path produced by `collectRoutes` has no trailing slash). The health checker follows the redirect chain (`/de` → 307 → `/de/` → 308 → `/`) and receives the homepage content, which does not match the stub page's hash.
+**Wildcard matching gap**: The `isRouteRedirected` function converts `/de/*` to regex `^/de/.*$`, which matches `/de/agb` but not `/de` (no trailing slash, no path after). Since `collectRoutes` strips trailing slashes from route paths, the `/de` route is never excluded by the wildcard rule.
 
-2. **Wildcard matching gap**: The `isRouteRedirected` function converts `/de/*` to regex `^/de/.*$`, which matches `/de/agb` but not `/de` (no trailing slash, no path after). Since `collectRoutes` strips trailing slashes from route paths, the `/de` route is never excluded by the wildcard rule.
+The meta-refresh redirect stub exclusion was originally part of this RFC but has been split into RFC-0595, which proposes a more complete approach: marking redirect routes with `contentHash: null` + `redirectTarget` and verifying the redirect itself via health checks (HTTP 307/308 + Location header), rather than simply excluding them.
 
 ## Problem
 
-DNA-48 (Release discipline) requires behavior snapshots that accurately represent the deployable surface. DNA-49 (Fleet propagation) uses these snapshots for health verification. Two gaps cause false-negative health checks:
+DNA-48 (Release discipline) requires behavior snapshots that accurately represent the deployable surface. DNA-49 (Fleet propagation) uses these snapshots for health verification. A wildcard matching gap causes false-negative health checks:
 
-1. **Meta-refresh stubs in snapshot** (`packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts:75-94`): `collectRoutes` scans all `index.html` files and includes routes whose HTML is a meta-refresh redirect stub. The existing `isHtmlRedirectPage` function in `@warpgogol/share/semantic/image-sitemap` detects these pages but is not used by `collectRoutes`. Health checks on these routes always fail because the live server follows the redirect and returns different content.
-
-2. **Wildcard matching misses directory root** (`behavior-snapshot-commands.ts:65-73`): `isRouteRedirected` converts `/de/*` to `^/de/.*$`, which does not match `/de` (the route path without trailing slash). Since `collectRoutes` strips trailing slashes, redirected directory roots are never excluded from the snapshot.
+**Wildcard matching misses directory root** (`behavior-snapshot-commands.ts:65-73`): `isRouteRedirected` converts `/de/*` to `^/de/.*$`, which does not match `/de` (the route path without trailing slash). Since `collectRoutes` strips trailing slashes, redirected directory roots are never excluded from the snapshot.
 
 During the `warpgogol-com-r000002` deployment, the `probe:/de` health check reported `unhealthy` with "Content hash mismatch" even though the deployment was correct. The operator had to manually edit `systems/registry.yaml` with `sed` to mark the channel as healthy, bypassing the health gate.
 
 ## Decision
 
-`collectRoutes` excludes routes whose `index.html` is a meta-refresh redirect stub by reusing the existing `isHtmlRedirectPage` detector. `isRouteRedirected` matches wildcard patterns against the directory root (e.g. `/de/*` matches `/de`). The `isHtmlRedirectPage` function is moved from `@warpgogol/share/semantic/image-sitemap` to `@warpgogol/share/redirects` where redirect-detection logic belongs.
+`isRouteRedirected` matches wildcard patterns against the directory root (e.g. `/de/*` matches `/de`). The regex for `/de/*` becomes `^/de(/.*)?$` instead of `^/de/.*$`, so it matches `/de`, `/de/`, `/de/agb`, `/de/agb/terms`, etc.
 
 ## Architectural fit
 
-- **DNA-48 (Release discipline)**: Behavior snapshots must accurately represent the deployable surface. Excluding redirect stubs ensures the snapshot only contains routes with real content.
-- **DNA-49 (Fleet propagation)**: Health verification probes routes from the behavior snapshot. False negatives from redirect stubs block valid deployments and erode trust in the health gate.
-- **RFC-0588**: Introduced redirect exclusion for 301/308 routes from `_redirects`. This RFC extends that logic with meta-refresh stub detection and wildcard matching fix.
+- **DNA-48 (Release discipline)**: Behavior snapshots must accurately represent the deployable surface. Fixing wildcard matching ensures redirected directory roots are correctly excluded from the snapshot.
+- **DNA-49 (Fleet propagation)**: Health verification probes routes from the behavior snapshot. False negatives from unmatched wildcard rules block valid deployments and erode trust in the health gate.
+- **RFC-0588**: Introduced redirect exclusion for 301/308 routes from `_redirects`. This RFC fixes the wildcard matching logic in that exclusion.
 - **RFC-0379**: Implemented the cloudflare-workers adapter with health verification. This RFC fixes the snapshot that health verification depends on.
-- **RFC-0160**: Established prefixed-default-language convention where `/de/` redirects to `/`. The meta-refresh stub pages are generated by this convention.
+- **RFC-0595**: Handles meta-refresh redirect stub detection and marking redirect routes with `contentHash: null` + `redirectTarget`. This RFC is complementary — it fixes the `_redirects`-based wildcard matching that RFC-0595 does not address.
 
 ## Design
 
@@ -114,29 +115,15 @@ During the `warpgogol-com-r000002` deployment, the `probe:/de` health check repo
 No new commands. Changed commands:
 
 ```sh
-# behavior.snapshot.capture now excludes meta-refresh redirect stubs and fixes wildcard matching
+# behavior.snapshot.capture now fixes wildcard matching for _redirects rules
 pnpm exec site-kernel run behavior.snapshot.capture --dist <html-dir> --system <id> --build-kind <readable|production>
 ```
 
-No new flags. The exclusion is automatic — any `index.html` containing `<meta http-equiv="refresh">` is excluded from the snapshot.
+No new flags. The wildcard matching fix is automatic — `/de/*` now matches `/de` in addition to `/de/anything`.
 
 ### TypeScript contracts
 
 ```ts
-// Moved from @warpgogol/share/semantic/image-sitemap to @warpgogol/share/redirects
-// Existing function, no signature change:
-
-/**
- * True when the HTML is a meta-refresh redirect stub (no real content) — e.g. the
- * RFC-0160 prefixed-default-language `/de/…` → `/…` stubs.
- *
- * Note: we deliberately do NOT treat `window.location` as a stub signal. Full
- * content pages (the root home, RFC-0159) carry a *soft* client-side language
- * redirect for non-default browser locales while still serving complete HTML;
- * those must be harvested, not skipped.
- */
-export function isHtmlRedirectPage(html: string): boolean;
-
 // Updated in behavior-snapshot-commands.ts:
 
 export function isRouteRedirected(routePath: string, rules: RedirectRule[]): boolean {
@@ -154,77 +141,52 @@ export function isRouteRedirected(routePath: string, rules: RedirectRule[]): boo
   }
   return false;
 }
-
-// Updated collectRoutes — adds meta-refresh stub exclusion:
-export async function collectRoutes(
-  distDir: string,
-  redirectRules: RedirectRule[] = [],
-): Promise<RouteFact[]> {
-  // ... existing logic ...
-  for (const fullPath of await collectFiles(distDir, { extensions: [".html"] })) {
-    if (path.basename(fullPath) !== "index.html") continue;
-    const routePath = /* ... existing path derivation ... */;
-    if (isRouteRedirected(routePath || "/", redirectRules)) continue;
-    const html = await fs.readFile(fullPath, "utf8");
-    if (isHtmlRedirectPage(html)) continue; // NEW: skip meta-refresh stubs
-    const contentHash = hashHtml(html);
-    routes.push({ path: routePath || "/", contentHash });
-  }
-  // ...
-}
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/share/src/redirects.ts` | Receives `isHtmlRedirectPage` (moved from `semantic/image-sitemap`) |
-| `packages/share/src/semantic/image-sitemap.ts` | Re-exports `isHtmlRedirectPage` from `@warpgogol/share/redirects` for backward compatibility |
-| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts` | `collectRoutes` adds `isHtmlRedirectPage` check; `isRouteRedirected` fixes wildcard matching |
-| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot.test.ts` | New tests for meta-refresh exclusion and wildcard root matching |
+| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts` | `isRouteRedirected` fixes wildcard matching for directory root |
+| `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot.test.ts` | Update existing test asserting `/de` does NOT match `/de/*` (now it should match); add test for `/de/` matching |
 
 ### Output format
 
-No change to the `behavior.snapshot.capture` output shape. The `routes[]` array in the snapshot will contain fewer entries (redirect stubs excluded), but the `RouteFact` interface and JSON wrapper are unchanged.
+No change to the `behavior.snapshot.capture` output shape. The `routes[]` array in the snapshot may contain fewer entries (redirected directory roots now excluded by wildcard rules), but the `RouteFact` interface and JSON wrapper are unchanged.
 
 ### Failure modes
 
-- **False positive risk**: A page that uses `<meta http-equiv="refresh">` for a legitimate non-redirect purpose (e.g. auto-refresh of a dashboard) would be excluded from the snapshot. This is acceptable because: (a) the existing `isHtmlRedirectPage` comment already documents this trade-off, (b) such pages are rare in static marketing sites, (c) the page is still deployed and accessible — just not health-checked.
 - **Wildcard over-matching risk**: Making `/de/*` match `/de` could over-exclude if there were a legitimate non-redirected `/de` route. In practice, if `/de/*` is in `_redirects` with 308, then `/de` is also a redirect — they are semantically the same route.
 
 ## Rollout
 
-- **Default behavior**: The exclusion is automatic. No flags, no opt-in.
-- **Existing apps**: The next `release.prepare` will produce a snapshot with fewer routes (redirect stubs excluded). This is a smaller snapshot, not a breaking change — health checks will probe fewer routes, all of which have real content.
+- **Default behavior**: The wildcard matching fix is automatic. No flags, no opt-in.
+- **Existing apps**: The next `release.prepare` will produce a snapshot with fewer routes (redirected directory roots now excluded). This is a smaller snapshot, not a breaking change — health checks will probe fewer routes.
 - **New apps**: Automatically comply from day one.
 - **Pipeline integration**: `behavior.snapshot.capture` runs inside `build.post` via `behavior.snapshot.generate`. No pipeline changes needed.
 - **Migration**: The next release for each system will have a behavior snapshot diff (fewer routes). The diff is expected and should be reviewed by the operator before committing the refreshed snapshot.
 
 ## Alternatives considered
 
-1. **Only fix wildcard matching** — Rejected because meta-refresh stubs from other conventions (not covered by `_redirects` rules) would still be included. The `isHtmlRedirectPage` detector catches all meta-refresh stubs regardless of `_redirects` rules.
+1. **Only fix wildcard matching, no meta-refresh exclusion** — This is the chosen approach. Meta-refresh redirect stub detection and marking is handled by RFC-0595, which proposes a more complete solution (marking redirect routes with `contentHash: null` + `redirectTarget` and verifying the redirect via health checks) rather than simply excluding them.
 
-2. **Only add meta-refresh stub exclusion** — Rejected because the wildcard matching gap would still cause `/de` to be included if a non-meta-refresh redirect method were used in the future. Both fixes are needed for defense-in-depth.
-
-3. **Add `--force` flag to `leitstand.propagate`** — Rejected by the operator. Health check false negatives are bugs to fix in the code, not to bypass with flags. A `--force` flag would mask real deployment issues.
-
-4. **Move `isHtmlRedirectPage` to a new `@warpgogol/share/html` module** — Rejected as over-engineering. `@warpgogol/share/redirects` already exists and is the natural home for redirect-detection logic.
+2. **Add `--force` flag to `leitstand.propagate`** — Rejected by the operator. Health check false negatives are bugs to fix in the code, not to bypass with flags. A `--force` flag would mask real deployment issues.
 
 ## Risks
 
-- **Snapshot diff noise**: The first release after implementation will show a behavior snapshot diff (fewer routes). Operators must understand this is expected, not a regression. The diff should be reviewed before committing.
-- **False positive on legitimate meta-refresh**: A page using meta-refresh for auto-refresh (not redirect) would be excluded from health checks. Acceptable trade-off — the page is still deployed, just not probed.
-- **Agent misinterpretation**: Agents might think this RFC changes the `_redirects` format or adds new redirect rules. It does not — it only changes which routes are included in the behavior snapshot.
-- **Backward compatibility**: `isHtmlRedirectPage` is moved to a new module. The old import path (`@warpgogol/share/semantic/image-sitemap`) must re-export it to avoid breaking existing consumers.
+- **Snapshot diff noise**: The first release after implementation will show a behavior snapshot diff (fewer routes — redirected directory roots now excluded). Operators must understand this is expected, not a regression. The diff should be reviewed before committing.
+- **Agent misinterpretation**: Agents might think this RFC changes the `_redirects` format or adds new redirect rules. It does not — it only fixes the wildcard matching logic in `isRouteRedirected`.
+- **Existing test breakage**: The existing test at `behavior-snapshot.test.ts:32` asserts `expect(isRouteRedirected("/de", rules)).toBe(false)`. This test must be updated to `toBe(true)` as part of the implementation.
+- **AGENTS.md update**: `packages/os/site-kernel-handoff/AGENTS.md` has a section about `collectRoutes` and RFC-0588 redirect exclusion. It should be updated to mention the wildcard matching fix from this RFC.
 
 ## Acceptance criteria
 
-- [ ] `isHtmlRedirectPage` moved from `@warpgogol/share/semantic/image-sitemap` to `@warpgogol/share/redirects` with backward-compatible re-export
-- [ ] `collectRoutes` excludes routes whose `index.html` contains `<meta http-equiv="refresh">` (evidence: `behavior-snapshot.test.ts`, test with meta-refresh stub HTML)
 - [ ] `isRouteRedirected` matches `/de` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts`, test with `/de/*` rule and `/de` route)
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes with new tests
+- [ ] `isRouteRedirected` still matches `/de/agb` and `/de/agb/terms` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts`, existing test updated)
+- [ ] `isRouteRedirected` does NOT match `/agb` for wildcard rule `/de/*` (evidence: `behavior-snapshot.test.ts`, existing test retained)
+- [ ] Existing test at `behavior-snapshot.test.ts:32` updated from `toBe(false)` to `toBe(true)` for `/de` matching `/de/*`
+- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes with updated tests
 - [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- [ ] `pnpm --filter @warpgogol/share build:check` passes
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -232,7 +194,8 @@ No change to the `behavior.snapshot.capture` output shape. The `routes[]` array 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
-- The `isHtmlRedirectPage` move MUST include a backward-compatible re-export from `@warpgogol/share/semantic/image-sitemap` to avoid breaking existing consumers.
 - The wildcard regex change MUST be tested with both `/de` (directory root) and `/de/agb` (sub-path) to ensure both match `/de/*`.
-- After implementation, the next `release.prepare` for each system will produce a behavior snapshot diff. Agents MUST NOT auto-commit the refreshed snapshot — the operator must review and commit it manually.
-- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
+- The existing test asserting `isRouteRedirected("/de", rules)` returns `false` MUST be updated to `true` — this is a behavior change, not a test bug.
+- After implementation, the next `release.prepare` for each system will produce a behavior snapshot diff (fewer routes). Agents MUST NOT auto-commit the refreshed snapshot — the operator must review and commit it manually.
+- `packages/os/site-kernel-handoff/AGENTS.md` should be updated to mention the wildcard matching fix in the `collectRoutes` / RFC-0588 section.
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N` instead of working around it (RFC-0334).
