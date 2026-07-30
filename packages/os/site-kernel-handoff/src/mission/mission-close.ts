@@ -105,6 +105,9 @@ async function runInlineValidate(
   if (failures.length === 0 && result.summary) {
     failures.push(result.summary);
   }
+  if (result.data) {
+    failures.push(`See evidence/validation-report.json for details`);
+  }
   return { passed: false, failures, report: result.data ?? null };
 }
 

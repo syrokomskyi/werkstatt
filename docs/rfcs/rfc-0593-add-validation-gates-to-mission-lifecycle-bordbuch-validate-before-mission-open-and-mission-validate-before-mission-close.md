@@ -233,18 +233,18 @@ The workpiece is only accessible to the current mission (single-open-mission con
 
 ## Acceptance criteria
 
-- [ ] `mission.open` calls `bordbuch.validate` before creating directories or writing the manifest
-- [ ] `mission.open` exits with code 1 and a descriptive error when bordbuch has violations
-- [ ] `mission.open` does not create any side effects (no directories, no manifest, no registry update) when bordbuch validation fails
-- [ ] `mission.close` calls `mission.validate` after the `reconciledAt` check and before state transition
-- [ ] `mission.close` exits with code 1 and a descriptive error when validation fails
-- [ ] `mission.close` does not transition the mission to `closed` state when validation fails
-- [ ] `mission.close` error output includes the list of failed validators with file references
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with the new gate behavior in the mission lifecycle section (Bordbuch git synchronization / Werkstatt side-effect auto-commit sections)
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents the invariant chain: `reconciledAt` implies `materializedAt` via the validate → reconcile → close flow
-- [ ] Unit tests cover both gates (bordbuch violation blocks open, validation failure blocks close)
-- [ ] Unit test verifies `mission.close` re-checks state inside lock after out-of-lock validation
-- [ ] `rfc.validate` passes on this file
+- [x] `mission.open` calls `bordbuch.validate` before creating directories or writing the manifest (evidence: packages/os/site-kernel-handoff/src/mission/mission-open.ts:83-96, preflightBordbuch runs before acquireLock and createMissionDirectories at line 124)
+- [x] `mission.open` exits with code 1 and a descriptive error when bordbuch has violations (evidence: packages/os/site-kernel-handoff/src/mission/mission-open.ts:88-96, mission-open-bordbuch-gate.test.ts:92-97)
+- [x] `mission.open` does not create any side effects (no directories, no manifest, no registry update) when bordbuch validation fails (evidence: mission-open-bordbuch-gate.test.ts:98-100, preflightBordbuch runs before acquireLock and createMissionDirectories)
+- [x] `mission.close` calls `mission.validate` after the `reconciledAt` check and before state transition (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:145-154, runInlineValidate called after reconciledAt check at line 139, before acquireLock at line 156)
+- [x] `mission.close` exits with code 1 and a descriptive error when validation fails (evidence: mission-close-validate-gate.test.ts:117-125, throws with failure list)
+- [x] `mission.close` does not transition the mission to `closed` state when validation fails (evidence: mission-close-validate-gate.test.ts:127-130, manifest.state remains "open" after failed validation)
+- [x] `mission.close` error output includes the list of failed validators with file references (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:98-110, lists validator names + exit codes + evidence/validation-report.json reference)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated with the new gate behavior in the mission lifecycle section (Bordbuch git synchronization / Werkstatt side-effect auto-commit sections) (evidence: packages/os/site-kernel-handoff/AGENTS.md:118-124, "Validation gates (RFC-0593)" section)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` documents the invariant chain: `reconciledAt` implies `materializedAt` via the validate → reconcile → close flow (evidence: packages/os/site-kernel-handoff/AGENTS.md:122, "Invariant chain" bullet point)
+- [x] Unit tests cover both gates (bordbuch violation blocks open, validation failure blocks close) (evidence: mission-open-bordbuch-gate.test.ts, mission-close-validate-gate.test.ts)
+- [x] Unit test verifies `mission.close` re-checks state inside lock after out-of-lock validation (evidence: mission-close-validate-gate.test.ts:140-170, "state changed to 'aborted' during validation" test)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate RFC-0593 --json → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
