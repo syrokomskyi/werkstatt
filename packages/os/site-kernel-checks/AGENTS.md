@@ -121,6 +121,16 @@ Every registered kernel command MUST declare either `reads: string[]` (non-empty
 - Network-dependent commands (Cloudflare API, Matomo API, Stripe API, Supabase) MUST be marked `cacheable: false`.
 - Commands that depend on external binaries (exiftool, c2patool) SHOULD be marked `cacheable: false` unless the binary version is included in the cache key.
 
+## Pipeline registration (three-place rule)
+
+When adding a new pipeline constant to `src/pipelines/`, register it in **three** locations:
+
+1. **Template** — `packages/os/site-kernel/src/templates/wire/tools/kernel.config.template.ts` (so new Sternsystems get it automatically).
+2. **Telemetry** — `src/pipeline/pipeline-telemetry.ts` `standardPipelines()` array.
+3. **Ecosystem manifest** — `src/ecosystem/manifest.ts` `exported` array.
+
+Missing (2) or (3) leaves the pipeline invisible to `pipeline.timing.report` and the Agent Control Plane manifest, causing drift between the kernel config and the ecosystem manifest.
+
 ## Architecture reference
 
 → `packages/os/site-kernel/AGENTS.md` — kernel architecture table  
