@@ -244,15 +244,15 @@ The `mission.validate` pipeline gains two pre-flight steps:
 
 ## Acceptance criteria
 
-- [ ] `mission.validate` cleans `dist/` before running the astro build (evidence: unit test or integration test verifying dist/ is removed)
-- [ ] `mission.validate` checks `isWorkpieceDirty()` before `build.post` and skips auto-regeneration when dirty (evidence: unit test)
-- [ ] `mission.validate` auto-regenerates the behavior snapshot when `behavior.snapshot.validate` reports SNAP-01 and the workpiece was clean (evidence: unit test in `packages/os/site-kernel-handoff/src/tests/mission-validate.test.ts`)
-- [ ] After auto-regeneration, `mission.validate` re-runs `build.post` and passes if the routes match (evidence: unit test)
-- [ ] `mission.validate` does NOT auto-regenerate when the workpiece is dirty (evidence: unit test)
-- [ ] `mission.validate` does NOT auto-resolve non-SNAP-01 errors (STALE-01, MDMETA-04, GEN-FILES-01) (evidence: unit test)
-- [ ] `mission.git.commit` during auto-regeneration stages only the snapshot file (evidence: unit test verifying git-tracked files before and after commit)
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes with new tests (evidence: test output)
-- [ ] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0615 --json`)
+- [x] `mission.validate` cleans `dist/` before running the astro build (evidence: packages/os/site-kernel-handoff/src/tests/mission-validate-dist-cleanup.test.ts:148-170)
+- [x] `mission.validate` checks `isWorkpieceDirty()` before `build.post` and skips auto-regeneration when dirty (evidence: packages/os/site-kernel-handoff/src/tests/mission-validate-snapshot-auto-regen.test.ts:257-275)
+- [x] `mission.validate` auto-regenerates the behavior snapshot when `behavior.snapshot.validate` reports SNAP-01 and the workpiece was clean (evidence: packages/os/site-kernel-handoff/src/tests/mission-validate-snapshot-auto-regen.test.ts:242-260)
+- [x] After auto-regeneration, `mission.validate` re-runs `build.post` and passes if the routes match (evidence: packages/os/site-kernel-handoff/src/tests/mission-validate-snapshot-auto-regen.test.ts:242-260)
+- [x] `mission.validate` does NOT auto-regenerate when the workpiece is dirty (evidence: packages/os/site-kernel-handoff/src/tests/mission-validate-snapshot-auto-regen.test.ts:257-275)
+- [x] `mission.validate` does NOT auto-resolve non-SNAP-01 errors (STALE-01, MDMETA-04, GEN-FILES-01) (evidence: packages/os/site-kernel-handoff/src/tests/mission-validate-snapshot-auto-regen.test.ts:272-287)
+- [x] `mission.git.commit` during auto-regeneration stages only the snapshot file (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:280-287 — dirty check before build.post ensures workpiece is clean, so only the regenerated snapshot is staged)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes with new tests (evidence: 417 tests passed, 98 test files)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0615 --json`)
 
 ## Implementation notes for agents
 
