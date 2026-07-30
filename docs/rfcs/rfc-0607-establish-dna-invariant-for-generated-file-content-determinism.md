@@ -155,12 +155,12 @@ This RFC does not introduce or modify any commands. It is a policy-only RFC.
 
 ## Acceptance criteria
 
-- [ ] DNA-58 section added to `docs/architecture-dna.md` after DNA-57
-- [ ] DNA-58 text matches the Decision section of this RFC
-- [ ] DNA-58 enforcement status references RFC-0601 (`generated.drift.validate`)
-- [ ] RFC-0601 `satisfies` field updated to include DNA-58 (after this RFC is accepted)
-- [ ] `rfc.validate` passes on this file
-- [ ] `rfc.validate` passes on RFC-0601 after its `satisfies` update
+- [x] DNA-58 section added to `docs/architecture-dna.md` after DNA-57 (evidence: docs/architecture-dna.md:247-249, DNA-58 section present after DNA-57)
+- [x] DNA-58 text matches the Decision section of this RFC (evidence: docs/architecture-dna.md:249, text aligned with RFC-0607 Decision section and Invariant text section — both list full binary file set)
+- [x] DNA-58 enforcement status references RFC-0601 (`generated.drift.validate`) (evidence: docs/architecture-dna.md:249, "Enforcement: `generated.drift.validate` (RFC-0601)")
+- [x] RFC-0601 `satisfies` field updated to include DNA-58 (after this RFC is accepted) (evidence: docs/rfcs/rfc-0601-*.md:36-37, `satisfies: [DNA-58]`)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0607 --json` → status: pass, 0 violations)
+- [x] `rfc.validate` passes on RFC-0601 after its `satisfies` update (evidence: `pnpm exec site-kernel run rfc.validate RFC-0601 --json` → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
