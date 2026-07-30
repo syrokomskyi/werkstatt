@@ -11,6 +11,7 @@
   <item>Register analytics and chat metadata drift rule ids.</item>
   <item>RFC-0601: register DRIFT-01 (error) and DRIFT-02 (info) for generated.drift.validate.</item>
   <item>RFC-0602: register TS-TIME-01 for generated.timestamp.validate.</item>
+  <item>RFC-0610: register ARG-COMPLIANCE-01/02/03 for command.args.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -300,6 +301,23 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "Command has not migrated to a typed flags schema (heuristic parse path)",
     "kernel.flags.lint",
     "warning",
+  ),
+
+  // RFC-0610: command argument flag-only enforcement.
+  "ARG-COMPLIANCE-01": rule(
+    "ARG-COMPLIANCE-01",
+    "Handler reads removed input.args field (flag-only standard violation)",
+    "command.args.validate",
+  ),
+  "ARG-COMPLIANCE-02": rule(
+    "ARG-COMPLIANCE-02",
+    "Command registered with empty flags but handler reads named flag",
+    "command.args.validate",
+  ),
+  "ARG-COMPLIANCE-03": rule(
+    "ARG-COMPLIANCE-03",
+    "Handler uses dual-path fallback with input.args[0] (prohibited)",
+    "command.args.validate",
   ),
 
   // Existing validators migrated while enforcing RFC-0247.
