@@ -71,8 +71,6 @@ export const propagationResultSchema = z.object({
 
 export const routeFactSchema = z.object({
   path: z.string(),
-  canonical: z.string().optional(),
-  status: z.number().int().optional(),
   contentHash: z.string().nullable(),
   redirectTarget: z.string().optional(),
 });

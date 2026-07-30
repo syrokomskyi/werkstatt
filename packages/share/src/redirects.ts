@@ -45,6 +45,10 @@ export function extractRedirectTarget(html: string): string | null {
   const m = html.match(
     /<meta[^>]+http-equiv=["']refresh["'][^>]*content=["']\s*\d+\s*;\s*url=([^"']+)['"][^>]*>/i,
   );
-  if (!m?.[1]) return null;
-  return m[1].trim();
+  if (m?.[1]) return m[1].trim();
+  const m2 = html.match(
+    /<meta[^>]+content=["']\s*\d+\s*;\s*url=([^"']+)['"][^>]*http-equiv=["']refresh["'][^>]*>/i,
+  );
+  if (m2?.[1]) return m2[1].trim();
+  return null;
 }

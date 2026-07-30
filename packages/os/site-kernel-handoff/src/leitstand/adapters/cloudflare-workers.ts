@@ -99,6 +99,35 @@ async function readBehaviorSnapshot(
   return parsed.behaviorSnapshot ?? parsed;
 }
 
+/**
+ * Verify a redirect route response: HTTP status must be 307 or 308,
+ * and if redirectTarget is known (not "unknown"), the Location header
+ * must match it exactly.
+ *
+ * Only HTTP-level redirects are supported. Static hosting that serves
+ * meta-refresh HTML pages with HTTP 200 will fail this check — the
+ * cloudflare-workers adapter always issues HTTP-level redirects.
+ */
+export function verifyRedirectRoute(
+  status: number,
+  location: string,
+  route: RouteFact,
+): { passed: boolean; detail: string } {
+  const isRedirectStatus = status === 307 || status === 308;
+  const targetKnown = route.redirectTarget && route.redirectTarget !== "unknown";
+  const locationMatches = targetKnown ? location === route.redirectTarget : true;
+  const passed = isRedirectStatus && locationMatches;
+
+  return {
+    passed,
+    detail: isRedirectStatus
+      ? locationMatches
+        ? `Redirect ${status} → ${location}`
+        : `Redirect ${status} but Location mismatch: got ${location}, expected ${route.redirectTarget}`
+      : `Expected redirect status (307/308), got ${status}`,
+  };
+}
+
 function selectProbeRoutes(routes: RouteFact[], maxProbes: number): RouteFact[] {
   const homeRoutes = routes.filter((r) => r.path === "/" || /^\/[a-z]{2}\/?$/.test(r.path));
   const legalRoutes = routes.filter((r) =>
@@ -275,25 +304,18 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
             continue;
           }
 
-          const isRedirectStatus = response.status === 307 || response.status === 308;
           const location = response.headers.get("location") ?? "";
-          const targetKnown = route.redirectTarget && route.redirectTarget !== "unknown";
-          const locationMatches = targetKnown ? location === route.redirectTarget : true;
-          const passed = isRedirectStatus && locationMatches;
+          const result = verifyRedirectRoute(response.status, location, route);
 
-          if (!passed) allPassed = false;
-          if (!isRedirectStatus) anyContentMismatch = true;
+          if (!result.passed) allPassed = false;
+          if (response.status !== 307 && response.status !== 308) anyContentMismatch = true;
 
           checks.push({
             name: `probe:${route.path}`,
             url,
             status: response.status,
-            passed,
-            detail: isRedirectStatus
-              ? locationMatches
-                ? `Redirect ${response.status} → ${location}`
-                : `Redirect ${response.status} but Location mismatch: got ${location}, expected ${route.redirectTarget}`
-              : `Expected redirect status (307/308), got ${response.status}`,
+            passed: result.passed,
+            detail: result.detail,
           });
           continue;
         }

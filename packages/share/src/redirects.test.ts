@@ -50,3 +50,13 @@ test("parseRedirectRules: still works correctly alongside extractRedirectTarget"
   expect(rules[0].from).toBe("/old");
   expect(rules[1].from).toBe("/de/*");
 });
+
+test("extractRedirectTarget: returns first hop only (multi-hop scenario)", () => {
+  const html = `<meta http-equiv="refresh" content="0;url=/intermediate">`;
+  expect(extractRedirectTarget(html)).toBe("/intermediate");
+});
+
+test("extractRedirectTarget: handles reversed attribute order (content before http-equiv)", () => {
+  const html = `<meta content="0;url=/target" http-equiv="refresh">`;
+  expect(extractRedirectTarget(html)).toBe("/target");
+});
