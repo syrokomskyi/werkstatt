@@ -31,7 +31,7 @@ When finishing an RFC implementation, the agent MUST follow `fo-idea-implement` 
 3. **Use `rfc.implement.stamp`** — direct edits to `status`, `implementedAt`, and `updatedAt` are prohibited (RFC-0476). Run `rfc.implement.stamp --id RFC-XXXX --implementation-commit <sha> --dry-run` first, then without `--dry-run`.
 4. **Commit the stamped RFC separately** — the implementation commit and the stamp commit MUST be separate.
 5. **Run `fo-doc-audit`** after stamping to sync documentation surfaces.
-6. **Never work around `RFC-IMP-04` (dirty working tree).** If `rfc.implement.stamp` fails because the working tree is dirty, do NOT `git stash`, `git add -A`, or otherwise force the stamp. Report the uncommitted changes to the operator and stop. The operator is responsible for resolving foreign uncommitted changes.
+6. **Never work around `RFC-IMP-04` (dirty RFC file).** If `rfc.implement.stamp` fails because the RFC file itself has uncommitted changes, commit the RFC file first, then retry. Do NOT `git stash`, `git add -A`, or otherwise force the stamp. Uncommitted changes in unrelated files (from other agents) are ignored by the check and do not block stamping.
 
 ## MANDATORY pre-response checklist for RFC implementation (NON-NEGOTIABLE)
 
