@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -52,7 +53,6 @@ commands:
   changed:
     - mission.materialize
     - mission.close
-    - mission.reconcile
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -130,7 +130,7 @@ No new commands. No new flags. The operator experience is unchanged — `mission
 
 ```sh
 # Operator runs the same command as before:
-pnpm exec site-kernel run mission.materialize --id warpgogol-com-m000023
+pnpm exec site-kernel run mission.materialize --mission warpgogol-com-m000023
 
 # Internally:
 # 1. Check .materialization-state.json — if cache clone HEAD matches last close, skip preflight
@@ -201,26 +201,50 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "fonts.imports.generate" },
   { command: "cms.schema.generate" },
   { command: "archetype.registry.build" },
+  { command: "uni.registry.build" },
   { command: "i18n.middleware.generate" },
-  // Excluded from .dev (production-only):
+  { command: "generated.files.validate" },
+  // Excluded from .dev (production-only or workspace-scoped):
   //   sitemap.generate, preview.images.generate, llms.generate,
   //   public.managed.clean, page.markdown.generate, feed.generate,
   //   ai.generate, ai.policy.generate, robots.generate,
   //   public.artifact.generate, image.variants.generate,
   //   video.variants.generate, live.variants.generate,
-  //   material.metadata.write, manifest.contract.validate,
-  //   mirror.quintet.validate, uni.registry.build,
-  //   warpgogol.check-hints.generate, generated.files.validate
+  //   material.metadata.write, warpgogol.check-hints.generate
+  // Excluded (workspace-scoped validators, not needed for dev server startup):
+  //   manifest.contract.validate, mirror.quintet.validate
 ];
 ```
 
 The existing `SITES_BUILD_PREPARE_PIPELINE` remains unchanged and is used by `mission.validate`, `release.prepare`, and any other command that needs the full production artifact set.
 
+### Pipeline registration and invocation
+
+The new pipeline is registered in `tools/kernel.config.ts` alongside the existing `build.prepare`:
+
+```ts
+import {
+  SITES_BUILD_PREPARE_PIPELINE,
+  SITES_BUILD_PREPARE_DEV_PIPELINE,
+} from "@warpgogol/site-kernel-checks/pipelines";
+
+// in the pipelines section:
+pipelines: {
+  "build.prepare": [...SITES_BUILD_PREPARE_PIPELINE],
+  "build.prepare.dev": [...SITES_BUILD_PREPARE_DEV_PIPELINE],
+  // ... other pipelines unchanged
+},
+```
+
+`mission.materialize` invokes it via `executeKernelPipeline({ pipelineName: "build.prepare.dev", ... })` — the same API it currently uses for `build.prepare`, just with a different pipeline name. The kernel registry resolves the pipeline by name (`registry.getPipeline(options.pipelineName)`). No new invocation API is needed.
+
+The template at `packages/os/site-kernel-codegen/src/templates/wire/tools/kernel.config.template.ts` must also be updated so new Sternsystems get the `.dev` pipeline registration automatically.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `systems-cache/<id>/.materialization-state.json` | New. State file tracking cache clone HEAD at last close. Outside git. Created/updated by `mission.close` / `mission.reconcile`. Read by `mission.materialize`. |
+| `systems-cache/<id>/.materialization-state.json` | New. State file tracking cache clone HEAD at last close. Outside git. Created/updated by `mission.close` only. Read by `mission.materialize`. |
 | `systems-cache/<id>/.cache/video/` | New (persisted). Content-addressed video encoding cache (RFC-0210). Copied from workpiece at mission close, copied to workpiece at materialization. Outside git. |
 | `systems-cache/<id>/.cache/video-live/` | New (persisted). Content-addressed living-photo cache (RFC-0234). Same lifecycle as `.cache/video/`. |
 | `missions/<id>/workpiece/.cache/video/` | Existing (gitignored). Populated by `video.variants.generate`. Now warmed from cache clone at materialization. |
@@ -228,6 +252,16 @@ The existing `SITES_BUILD_PREPARE_PIPELINE` remains unchanged and is used by `mi
 | `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` | Modified. Exports new `SITES_BUILD_PREPARE_DEV_PIPELINE` alongside existing `SITES_BUILD_PREPARE_PIPELINE`. |
 | `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | Modified. Reads state file, conditionally skips preflight, runs `.dev` pipeline, copies `.cache/` from cache clone. |
 | `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | Modified. Writes state file with current cache clone HEAD. Copies `.cache/` from workpiece to cache clone. |
+
+### `--skip-preflight` flag and state-file skip precedence
+
+The existing `--skip-preflight` flag (operator override) and the new automatic state-file-based skip are independent mechanisms with defined precedence:
+
+1. **`--skip-preflight` flag set:** Preflight is always skipped. A bordbuch `preflight-skipped` entry is appended with reason `"operator override via --skip-preflight flag"`. The state file is not consulted.
+2. **Flag not set, state file matches HEAD:** Preflight is skipped automatically. A bordbuch `preflight-skipped` entry is appended with reason `"cache-clone-head-unchanged"`. The `preflightSkipReason` field in `--json` output is `"cache-clone-head-unchanged"`.
+3. **Flag not set, state file missing or HEAD mismatch:** Preflight runs normally. No bordbuch entry.
+
+The `preflightSkipReason` field in `--json` output distinguishes the two skip paths: `"operator-override"` when the flag is used, `"cache-clone-head-unchanged"` when the state file triggers the skip.
 
 ### Output format
 
@@ -255,13 +289,15 @@ When preflight is not skipped: `preflightSkipped: false`, `preflightSkipReason: 
 - **`.cache/` copy fails (workpiece → cache clone at close):** Log a warning, continue close. Next materialization will encode from scratch — slower but correct.
 - **`build.prepare.dev` step fails:** Same behavior as current `build.prepare` failure — materialization fails with the step's error.
 - **State file stale (HEAD matches but content was force-pushed without HEAD change):** Not possible — git HEAD changes on every push. If somehow the same HEAD is reused with different content (amended commit), the state file's `lastValidatedAt` timestamp provides auditability but preflight would be skipped. This is an acceptable edge case — `mission.validate` at close re-validates everything.
+- **Existing workpiece `.cache/` from failed materialization:** If a previous materialization attempt failed and left a partial `.cache/` in the workpiece, the cache clone's `.cache/` replaces (not merges with) the workpiece's `.cache/`. The copy is `rm -rf workpiece/.cache/video && cp -r cache/.cache/video workpiece/.cache/video` semantics — stale entries from a failed run do not persist.
+- **Concurrent materialization:** The existing lock mechanism (`acquireLock` for `system:${systemId}` and `mission:${missionId}` in `mission-materialize.ts:565-578`) prevents concurrent materialization for the same system. Different systems have independent state files and `.cache/` directories. No new locking is needed.
 
 ## Rollout
 
 - **Default behavior:** All three optimizations are active by default. No opt-in flag.
 - **Existing missions:** Missions materialized before this RFC have no state file — first materialization runs full preflight and writes the state file. Subsequent materializations benefit from the skip.
 - **`mission.validate` / `release.prepare`:** These commands continue to use the full `SITES_BUILD_PREPARE_PIPELINE` (now effectively `build.prepare.full`). Production artifacts are generated at validation/release time, not at materialization time.
-- **`mission.close` / `mission.reconcile`:** These commands write the state file and copy `.cache/` to the cache clone. If the workpiece has no `.cache/` (e.g., no media content), the copy is a no-op.
+- **`mission.close`:** This command writes the state file and copies `.cache/` to the cache clone. If the workpiece has no `.cache/` (e.g., no media content), the copy is a no-op. `mission.reconcile` does NOT write the state file or copy `.cache/` — it only transfers commits. The state file reflects "last successful close", not "last reconcile".
 - **New apps:** New Sternsystems benefit automatically from the first materialization onward.
 - **No migration path needed:** The optimizations are additive — if the state file or `.cache/` is absent, behavior falls back to current (full preflight, full pipeline, no media cache warming).
 
@@ -281,19 +317,22 @@ When preflight is not skipped: `preflightSkipped: false`, `preflightSkipReason: 
 
 - **Stale preflight skip after force-push with same HEAD:** If someone amends a commit and force-pushes to the cache clone's remote, the HEAD hash changes (amended commits have different hashes). This risk is negligible — git HEAD is a reliable change indicator.
 - **`build.prepare.dev` missing a generator needed for dev.** If a generator is incorrectly classified as production-only but the dev server depends on its output, the dev server will fail. Mitigation: the `.dev` pipeline includes all codegen generators that produce files under `src/` (routes, middleware, styles, surface, agents). Only `public/` static file generators and media transcoders are excluded. If a dev server issue arises, the missing generator is moved from `.dev` to `.full` — but this is a bug, not a design flaw.
-- **Media cache disk usage.** `.cache/video/` can grow to hundreds of MB per system. The cache clone filesystem must accommodate this. Mitigation: content-addressed cache means unchanged sources don't accumulate duplicates. Old hashes from removed sources persist but can be cleaned manually.
-- **Agent confusion about pipeline split.** Agents may not understand why `build.prepare` runs fewer steps at materialization vs. validation. Mitigation: the RFC and AGENTS.md must clearly state that `build.prepare.dev` is for dev-mode materialization and `build.prepare.full` (the original pipeline) is for production validation.
+- **Media cache disk usage.** `.cache/video/` can grow to hundreds of MB per system. The cache clone filesystem must accommodate this. Mitigation: content-addressed cache means unchanged sources don't accumulate duplicates. Old hashes from removed sources persist but can be cleaned manually. Copying 500 MB between cache clone and workpiece takes ~5-10 seconds on SSD (sequential I/O), negligible compared to the 180s+ re-encoding it replaces.
+- **`.dev` pipeline cost.** The `.dev` pipeline runs ~38 codegen steps. Based on existing telemetry, codegen steps complete in ~10-15 seconds total. This is well within the "under 30 seconds" success signal for the unchanged-cache case (where preflight is also skipped).
+- **Agent confusion about pipeline split.** Agents may not understand why `build.prepare` runs fewer steps at materialization vs. validation. Mitigation: the following AGENTS.md files must be updated:
+  - `packages/os/site-kernel-handoff/AGENTS.md` — document that `mission.materialize` uses `build.prepare.dev` and `mission.validate`/`release.prepare` use `build.prepare.full`
+  - `packages/os/site-kernel-checks/AGENTS.md` — document the new `SITES_BUILD_PREPARE_DEV_PIPELINE` export in the pipelines module table
 - **State file not committed to git.** Since the state file lives outside git in the cache clone, it is machine-local. Different developers may have different state files. This is acceptable — the state file is a local optimization, not a source of truth. If missing, preflight runs normally.
 
 ## Acceptance criteria
 
-- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` exported from `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` with all codegen generators and no media/static-public generators
+- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` exported from `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` with all codegen generators, `generated.files.validate`, and `uni.registry.build`; no media/static-public generators
 - [ ] `SITES_BUILD_PREPARE_PIPELINE` (full) unchanged and still used by `mission.validate` and `release.prepare`
 - [ ] `mission.materialize` reads `systems-cache/<id>/.materialization-state.json` and skips preflight when cache clone HEAD matches `cacheCloneHead` in the state file
-- [ ] `mission.materialize` runs `SITES_BUILD_PREPARE_DEV_PIPELINE` instead of `SITES_BUILD_PREPARE_PIPELINE`
+- [ ] `mission.materialize` runs `SITES_BUILD_PREPARE_DEV_PIPELINE` (registered as `build.prepare.dev` in `tools/kernel.config.ts`) instead of `SITES_BUILD_PREPARE_PIPELINE`
 - [ ] `mission.materialize` copies `.cache/video/` and `.cache/video-live/` from cache clone to workpiece after git clone, when they exist
-- [ ] `mission.close` (or `mission.reconcile`) writes `systems-cache/<id>/.materialization-state.json` with current cache clone HEAD hash
-- [ ] `mission.close` (or `mission.reconcile`) copies `.cache/video/` and `.cache/video-live/` from workpiece to cache clone
+- [ ] `mission.close` writes `systems-cache/<id>/.materialization-state.json` with current cache clone HEAD hash
+- [ ] `mission.close` copies `.cache/video/` and `.cache/video-live/` from workpiece to cache clone
 - [ ] `mission.materialize` `--json` output includes `preflightSkipped`, `pipelineUsed`, and `mediaCacheWarmed` fields
 - [ ] Unit tests in `packages/os/site-kernel-handoff/src/tests/` verify: preflight skip on matching HEAD, preflight run on missing state file, media cache copy from cache clone, media cache copy to cache clone at close
 - [ ] `bordbuch.validate` at `mission.open` remains unchanged (RFC-0593 preserved)
@@ -309,4 +348,4 @@ When preflight is not skipped: `preflightSkipped: false`, `preflightSkipReason: 
 - Agents MUST NOT add `--force-preflight` or `--skip-build-prepare` flags to `mission.materialize`. The operator requested no new flags. To force preflight, delete `systems-cache/<id>/.materialization-state.json`.
 - Agents MUST preserve `bordbuch.validate` at `mission.open` (RFC-0593). This RFC does not touch `mission.open`.
 - Agents MUST ensure `mission.validate` and `release.prepare` continue to use the full `SITES_BUILD_PREPARE_PIPELINE` — only `mission.materialize` uses `.dev`.
-- When classifying pipeline steps for `.dev` vs `.full`, a step belongs in `.dev` if and only if its output is consumed by `astro dev` (generated `src/` files, middleware, styles, surface artifacts). Steps that write to `public/` for production `dist/` consumption belong in `.full`.
+- When classifying pipeline steps for `.dev` vs `.full`, a step belongs in `.dev` if and only if its output is consumed by `astro dev` (generated `src/` files, middleware, styles, surface artifacts). Steps that write to `public/` for production `dist/` consumption belong in `.full`. Validators that catch silent codegen failures (e.g., `generated.files.validate`) also belong in `.dev` as a safety net. Workspace-scoped validators (`manifest.contract.validate`, `mirror.quintet.validate`) are excluded from `.dev` because they validate cross-package contracts not needed for dev server startup.
