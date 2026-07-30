@@ -25,6 +25,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { optionalEnv } from "@warpgogol/site-kernel-integrity";
 import { emitPassport } from "@warpgogol/passport/emit";
@@ -324,7 +325,7 @@ export async function runPassportKeyEnsure(
 
   try {
     await mkdir(dirname(publicKeyFilePath), { recursive: true });
-    await writeFile(publicKeyFilePath, JSON.stringify(keyFile, null, 2), "utf8");
+    await writeFileIfChanged(publicKeyFilePath, JSON.stringify(keyFile, null, 2));
   } catch (err) {
     return fail("passport.key.ensure", [
       `PKE-02: Could not write public key file: ${(err as Error).message}`,
