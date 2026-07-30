@@ -8,7 +8,7 @@ Cosmic Passport — build-time W3C Verifiable Credential capturing provenance, c
 | --- | --- | --- |
 | `@warpgogol/passport` | `src/index.ts` | Barrel: all exports |
 | `@warpgogol/passport/schema` | `src/schema.ts` | `PassportSchema`, `PassportPublicKeyFileSchema` — Zod schemas |
-| `@warpgogol/passport/sign` | `src/sign.ts` | `signPassport(passport, privateKeyPem)` — Ed25519 signing |
+| `@warpgogol/passport/sign` | `src/sign.ts` | `signPassport(passport, privateKeyPem)`, `generateKeypair()` — Ed25519 signing and key generation |
 | `@warpgogol/passport/emit` | `src/emit.ts` | `emitPassport(passport, distDir)` — writes to `dist/.well-known/cosmic-passport.json` |
 | `@warpgogol/passport/verify` | `src/verify.ts` | `verifyPassport(raw, publicKeyPem)` |
 | `@warpgogol/passport/key-rotate` | `src/key-rotate.ts` | `rotateKey()` — generates new Ed25519 keypair |
