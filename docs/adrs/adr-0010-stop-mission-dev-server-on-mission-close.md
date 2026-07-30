@@ -5,11 +5,11 @@ title: "Stop mission dev server on mission close"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-07-30
-updatedAt: 2026-07-30
+updatedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
