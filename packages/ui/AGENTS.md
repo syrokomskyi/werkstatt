@@ -52,6 +52,10 @@ packages/ui/
 
 ## Usage
 
+### Open-source registry security rule
+
+- **Never display exact dependency versions on public open-source pages.** Showing exact version numbers exposes the deployment to targeted attacks against known vulnerabilities in specific package versions. Version data remains in the downloadable SBOM (`sbom.cdx.json`) for those who need it. The component table shows package name, license, scope, and source link only.
+
 ### Generated icons (new pattern — RFC-0016)
 
 ```astro
