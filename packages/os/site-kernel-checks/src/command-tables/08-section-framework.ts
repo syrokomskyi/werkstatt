@@ -31,6 +31,7 @@ import {
   runSharedSectionPropsChangelogReport,
 } from "../shared-section-props.ts";
 import { runSectionPlaceholderLint } from "../section-placeholder.ts";
+import { runSectionCssImportValidate } from "../section-framework/css-import.ts";
 import { runBiomeTokensValidate } from "../biome-tokens.ts";
 import { runTokensCatalogSync } from "../tokens-catalog-sync.ts";
 
@@ -95,6 +96,22 @@ export const SECTION_FRAMEWORK_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["packages/ui/src/sections/**/*.astro", "packages/ui/src/sections/**/*.manifest.yaml"],
     execute: runSectionImageContractValidate,
+  },
+  /* RFC-0598: colocated CSS import integrity */
+  {
+    name: "section.css.import.validate",
+    description:
+      "Validate every colocated .css file under packages/ui/src/sections/ and packages/ui/src/components/ is imported by at least one .astro file (CSS-IMPORT-01) and that .css filename matches colocated .astro filename (CSS-NAME-01).",
+    scope: "workspace",
+    flags: {},
+    supportsAllSites: true,
+    reads: [
+      "packages/ui/src/sections/**/*.css",
+      "packages/ui/src/sections/**/*.astro",
+      "packages/ui/src/components/**/*.css",
+      "packages/ui/src/components/**/*.astro",
+    ],
+    execute: runSectionCssImportValidate,
   },
   /* RFC-0122 */
   {

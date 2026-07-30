@@ -20,3 +20,4 @@ export { runSectionImageContractValidate } from "./section-framework/image.ts";
 export { runSectionMotionContractValidate } from "./section-framework/motion.ts";
 export { runSiteBackgroundContractValidate } from "./section-framework/site-background.ts";
 export { runLayoutOrchestratorLint } from "./section-framework/orchestrator.ts";
+export { runSectionCssImportValidate } from "./section-framework/css-import.ts";

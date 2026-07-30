@@ -104,6 +104,8 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "section.body.contract.validate" },
   { command: "section.cta.contract.validate" },
   { command: "section.image.contract.validate" },
+  // RFC-0598: colocated CSS import integrity
+  { command: "section.css.import.validate" },
   // RFC-0122: section-framework component CSS token contract
   { command: "tokens.colors.section-shell.lint" },
   // RFC-0124: section-framework token references must exist in TOKEN_NAME_SET
