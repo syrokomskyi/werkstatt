@@ -327,17 +327,28 @@ When preflight is not skipped: `preflightSkipped: false`, `preflightSkipReason: 
 
 ## Acceptance criteria
 
-- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` exported from `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` with all codegen generators, `generated.files.validate`, and `uni.registry.build`; no media/static-public generators
-- [ ] `SITES_BUILD_PREPARE_PIPELINE` (full) unchanged and still used by `mission.validate` and `release.prepare`
-- [ ] `mission.materialize` reads `systems-cache/<id>/.materialization-state.json` and skips preflight when cache clone HEAD matches `cacheCloneHead` in the state file
-- [ ] `mission.materialize` runs `SITES_BUILD_PREPARE_DEV_PIPELINE` (registered as `build.prepare.dev` in `tools/kernel.config.ts`) instead of `SITES_BUILD_PREPARE_PIPELINE`
-- [ ] `mission.materialize` copies `.cache/video/` and `.cache/video-live/` from cache clone to workpiece after git clone, when they exist
-- [ ] `mission.close` writes `systems-cache/<id>/.materialization-state.json` with current cache clone HEAD hash
-- [ ] `mission.close` copies `.cache/video/` and `.cache/video-live/` from workpiece to cache clone
-- [ ] `mission.materialize` `--json` output includes `preflightSkipped`, `pipelineUsed`, and `mediaCacheWarmed` fields
-- [ ] Unit tests in `packages/os/site-kernel-handoff/src/tests/` verify: preflight skip on matching HEAD, preflight run on missing state file, media cache copy from cache clone, media cache copy to cache clone at close
-- [ ] `bordbuch.validate` at `mission.open` remains unchanged (RFC-0593 preserved)
-- [ ] `rfc.validate` passes on this file
+- [x] `SITES_BUILD_PREPARE_DEV_PIPELINE` exported from `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` with all codegen generators, `generated.files.validate`, and `uni.registry.build`; no media/static-public generators
+  - Evidence: `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:121-173` exports `SITES_BUILD_PREPARE_DEV_PIPELINE`; re-exported in `pipelines/index.ts:18` and `module.ts:35-69`.
+- [x] `SITES_BUILD_PREPARE_PIPELINE` (full) unchanged and still used by `mission.validate` and `release.prepare`
+  - Evidence: `SITES_BUILD_PREPARE_PIPELINE` unchanged in `build-prepare.ts:13-14`; `mission-materialize.ts` pipeline switch only affects `mission.materialize`.
+- [x] `mission.materialize` reads `systems-cache/<id>/.materialization-state.json` and skips preflight when cache clone HEAD matches `cacheCloneHead` in the state file
+  - Evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:667-699` reads state file and sets `preflightSkipped` on HEAD match; test `mission-materialize-preflight-skip.test.ts` verifies.
+- [x] `mission.materialize` runs `SITES_BUILD_PREPARE_DEV_PIPELINE` (registered as `build.prepare.dev` in `tools/kernel.config.ts`) instead of `SITES_BUILD_PREPARE_PIPELINE`
+  - Evidence: `mission-materialize.ts:856-863` invokes `pipelineName: "build.prepare.dev"`; `kernel.config.template.ts:41-59` registers the pipeline.
+- [x] `mission.materialize` copies `.cache/video/` and `.cache/video-live/` from cache clone to workpiece after git clone, when they exist
+  - Evidence: `mission-materialize.ts:778-800` copies `MEDIA_CACHE_DIRS` from cache clone to staging dir with replace semantics.
+- [x] `mission.close` writes `systems-cache/<id>/.materialization-state.json` with current cache clone HEAD hash
+  - Evidence: `mission-close.ts:353-382` writes state file with `cacheCloneHead` from `git rev-parse HEAD`; test `mission-close-state-file.test.ts` verifies.
+- [x] `mission.close` copies `.cache/video/` and `.cache/video-live/` from workpiece to cache clone
+  - Evidence: `mission-close.ts:384-406` copies `MEDIA_CACHE_DIRS` from workpiece to cache clone; test `mission-close-state-file.test.ts` verifies.
+- [x] `mission.materialize` `--json` output includes `preflightSkipped`, `pipelineUsed`, and `mediaCacheWarmed` fields
+  - Evidence: `mission-materialize.ts:1000-1004` adds `preflightSkipped`, `preflightSkipReason`, `pipelineUsed`, `mediaCacheWarmed`, `mediaCacheSources` to result data.
+- [x] Unit tests in `packages/os/site-kernel-handoff/src/tests/` verify: preflight skip on matching HEAD, preflight run on missing state file, media cache copy from cache clone, media cache copy to cache clone at close
+  - Evidence: `src/tests/mission-materialize-preflight-skip.test.ts` (5 tests) and `src/tests/mission-close-state-file.test.ts` (4 tests) — all 9 pass.
+- [x] `bordbuch.validate` at `mission.open` remains unchanged (RFC-0593 preserved)
+  - Evidence: No changes to `mission-open.ts`; `mission-close.ts` only adds state file write and `.cache/` copy after existing close logic.
+- [x] `rfc.validate` passes on this file
+  - Evidence: `pnpm exec site-kernel run rfc.validate` reports no errors for RFC-0597.
 
 ## Implementation notes for agents
 
