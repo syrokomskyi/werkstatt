@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -28,8 +29,7 @@ related:
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies:
-  - DNA-18
+satisfies: []
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -83,11 +83,11 @@ A public folder regeneration experiment on warpgogol-com (2026-07-30) revealed t
 
 Running `open-source.generate` manually (with or without `--force`) returned `[open-source] up to date` and produced zero output files. The `public/open-source/` directory remained empty.
 
-The root cause is in `packages/os/site-kernel-codegen/src/open-source-page.ts:751-762`: the fingerprint cache short-circuit checks only whether the content page (`src/content/pages/{lang}/open-source.md`) exists on disk, but does not verify that the public download artifacts exist. When the fingerprint matches (because `pnpm-lock.yaml` and `system.md` are unchanged), the generator returns early without writing any public files — even if they were deleted.
+The root cause is in `packages/os/site-kernel-codegen/src/open-source-page.ts:800-820`: the fingerprint cache short-circuit checks only whether the content page (`src/content/pages/{lang}/open-source.md`) exists on disk, but does not verify that the public download artifacts exist. When the fingerprint matches (because `pnpm-lock.yaml` and `system.md` are unchanged), the generator returns early without writing any public files — even if they were deleted.
 
 ## Problem
 
-The fingerprint cache short-circuit at `open-source-page.ts:756-762` checks only `firstPagePath` (the content page) via `fs.access`, but the generator produces **five** categories of output:
+The fingerprint cache short-circuit at `open-source-page.ts:800-820` checks only `firstPagePath` (the content page) via `fs.access`, but the generator produces **five** categories of output:
 
 1. Content pages: `src/content/pages/{lang}/open-source.md`
 2. Prose pages: `src/content/prose/{lang}/open-source.md`
@@ -95,7 +95,7 @@ The fingerprint cache short-circuit at `open-source-page.ts:756-762` checks only
 4. Public download artifacts: `public/open-source/THIRD_PARTY_NOTICES.txt`, `public/open-source/THIRD_PARTY_LICENSES.txt`, `public/open-source/sbom.cdx.json`
 5. Fingerprint cache: `.cache/open-source.fingerprint`
 
-If any of outputs 1–4 are missing but the fingerprint matches, the generator silently skips regeneration. This violates the RFC-0087 idempotency contract (re-running a generator must produce identical output) and the RFC-0375 `generated.files.validate` expectation that all registry-declared files exist after their owning command runs.
+If any of outputs 1–4 are missing but the fingerprint matches, the generator silently skips regeneration. The fingerprint cache itself (item 5) is not part of the completeness check — if it is missing, the generator already falls through to full regeneration via the existing catch block at line 818. This violates the RFC-0087 idempotency contract (re-running a generator must produce identical output) and the RFC-0375 `generated.files.validate` expectation that all registry-declared files exist after their owning command runs.
 
 The `--force` flag does not help because the short-circuit logic does not check `--force` — it only checks fingerprint match + content page existence.
 
@@ -105,7 +105,7 @@ The `open-source.generate` fingerprint cache short-circuit checks **all declared
 
 ## Architectural fit
 
-- **DNA-18 (Uni registry is the single UI index)**: Extends the determinism principle — generated outputs must be reproducible from their generators, and a generator that silently skips missing outputs breaks the reproducibility contract.
+- **RFC-0087 (content-driven generation contract)**: The idempotency invariant (re-running a generator must produce identical output) is violated when the fingerprint cache short-circuit skips regeneration of missing outputs. This RFC does not establish or enforce a DNA invariant — it fixes a bug in the generator's implementation of the RFC-0087 contract.
 - **RFC-0489 (open-source SBOM registry)**: This RFC fixes a bug in the generator introduced by RFC-0489. The fingerprint cache was added for performance but the completeness check was incomplete.
 - **RFC-0345 (idempotent file writes)**: Aligns with the idempotency contract — `writeFileIfChanged` ensures no redundant writes, but the generator must still produce all outputs when they are missing.
 - **RFC-0375 (generated.files.validate)**: The validator already checks for missing registry-declared files. This RFC ensures the generator itself does not cause those failures.
@@ -126,6 +126,8 @@ The fix adds a `declaredOutputPaths` array to the fingerprint cache check block 
 
 ```ts
 // After fingerprint match is confirmed, check ALL declared output paths:
+// Note: paths use contentDirectory + "prose"/"data" (not contentProseDirectory/
+// contentDataDirectory, which do not exist on AstroSitePaths).
 const declaredOutputPaths = [
   // Content pages (per language)
   ...supportedLangs.map((lang) =>
@@ -133,11 +135,11 @@ const declaredOutputPaths = [
   ),
   // Prose pages (per language)
   ...supportedLangs.map((lang) =>
-    path.join(paths.contentProseDirectory, lang, "open-source.md")
+    path.join(paths.contentDirectory, "prose", lang, "open-source.md")
   ),
   // Registry JSON (per language)
   ...supportedLangs.map((lang) =>
-    path.join(paths.contentDataDirectory, lang, "open-source-registry.json")
+    path.join(paths.contentDirectory, "data", lang, "open-source-registry.json")
   ),
   // Public download artifacts
   path.join(paths.publicDirectory, "open-source", "THIRD_PARTY_NOTICES.txt"),
@@ -156,11 +158,15 @@ if (allOutputsExist.every(Boolean)) {
 context.logger.info("[open-source] fingerprint matches, but output file(s) missing; regenerating");
 ```
 
+The `declaredOutputPaths` array must match the output paths declared in `GENERATOR_OWNERSHIP_MAP` (`packages/os/site-kernel-checks/src/generator-ownership.ts:159-180`). The ownership map uses glob patterns (`{lang}`), while the runtime check uses concrete paths with actual language codes — the two must stay in sync. If a new output is added to the generator, it must be added to both the `declaredOutputPaths` array and the ownership map.
+
+The existence check runs regardless of `context.dryRun` — it inspects disk state from previous real runs, not the current run. In dry-run mode, missing outputs still trigger full regeneration (which then skips writes via the existing `if (!context.dryRun)` guards at lines 911 and 947). This is the correct behavior: dry-run should report whether regeneration would occur, not skip the check.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-codegen/src/open-source-page.ts` | Fix target — fingerprint cache short-circuit logic (lines 751-771) |
+| `packages/os/site-kernel-codegen/src/open-source-page.ts` | Fix target — fingerprint cache short-circuit logic (lines 800-820) |
 | `packages/os/site-kernel-checks/src/generator-ownership.ts` | Reference — declared output paths for open-source.generate |
 | `public/open-source/THIRD_PARTY_NOTICES.txt` | Output — must be regenerated when missing |
 | `public/open-source/THIRD_PARTY_LICENSES.txt` | Output — must be regenerated when missing |
@@ -209,7 +215,7 @@ No change to `--json` output shape. The command continues to return `KernelComma
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- The fix is in `packages/os/site-kernel-codegen/src/open-source-page.ts` lines 751-771. Replace the single `fs.access(firstPagePath)` check with a loop over all declared output paths.
+- The fix is in `packages/os/site-kernel-codegen/src/open-source-page.ts` lines 800-820. Replace the single `fs.access(firstPagePath)` check with a loop over all declared output paths.
 - The `declaredOutputPaths` array must match the actual outputs written by the generator later in the function. Read the full function body to identify all `writeFile`/`writeManagedFile` calls.
 - Agents MUST NOT add a `--force` bypass — the fix must work without any operator flag.
 - Agents MUST NOT remove the fingerprint cache — it provides a legitimate performance benefit.
