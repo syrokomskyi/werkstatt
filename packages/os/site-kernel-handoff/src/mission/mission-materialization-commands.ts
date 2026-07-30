@@ -33,9 +33,10 @@ import type {
   KernelCommandInput,
   KernelCommandResult,
   KernelNextStep,
+  KernelPipelineReport,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { executeKernelPipeline } from "@warpgogol/site-kernel";
+import { executeKernelCommand, executeKernelPipeline } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
 import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
@@ -240,6 +241,14 @@ export async function runMissionValidate(
 
   if (staticPassed) {
     const workpieceDir = path.join(missionDir, "workpiece");
+
+    // RFC-0615: clean stale dist/ before build to prevent false positives
+    const distDir = path.join(workpieceDir, "dist");
+    if (existsSync(distDir)) {
+      logger.info(`  Cleaning stale dist/ before build…`);
+      await fs.rm(distDir, { recursive: true, force: true });
+    }
+
     logger.info(`  Running astro build in ${workpieceDir}…`);
     try {
       const buildOutput = execSync("pnpm exec astro build", {
@@ -268,16 +277,95 @@ export async function runMissionValidate(
       logger.info(`  Build failed: ${buildError}`);
     }
 
+    // RFC-0615: check dirty state before build.post — auto-regeneration
+    // requires a clean workpiece because mission.git.commit stages all changes.
+    const dirtyBeforeBuildPost = isWorkpieceDirty(workpieceDir);
+    if (dirtyBeforeBuildPost.dirty) {
+      logger.info(
+        `  [warn] workpiece has ${dirtyBeforeBuildPost.fileCount} uncommitted file(s) — snapshot auto-regeneration will be skipped`,
+      );
+    }
+
     // RFC-0356: run build.post after astro build — text.normalize.apply,
     // passport.emit, etc. must all run before the validation verdict.
+    // RFC-0615: use executeKernelPipeline instead of runPipelinePhase so we
+    // can inspect step-level diagnostics for SNAP-01 detection.
+    let postPipelineReport: KernelPipelineReport | undefined;
     if (buildSucceeded) {
       logger.info(`  Running build.post pipeline for ${manifest.systemId}…`);
       try {
-        await runPipelinePhase(workspaceRoot, "build.post", manifest.systemId);
+        const postResult = await executeKernelPipeline({
+          workspaceRoot,
+          pipelineName: "build.post",
+          siteName: manifest.systemId,
+          outputFormat: "pretty",
+        });
+        postPipelineReport = Array.isArray(postResult) ? postResult[0] : postResult;
+        if (!postPipelineReport.ok) {
+          buildError = `build.post failed at step: ${postPipelineReport.timing.failedStep ?? "unknown"}`;
+          buildSucceeded = false;
+          logger.info(`  ${buildError}`);
+        }
       } catch (err) {
         buildError = err instanceof Error ? err.message : String(err);
         buildSucceeded = false;
         logger.info(`  build.post failed: ${buildError}`);
+      }
+    }
+
+    // RFC-0615: auto-regenerate behavior snapshot on SNAP-01 when workpiece was clean
+    if (
+      postPipelineReport &&
+      !postPipelineReport.ok &&
+      !dirtyBeforeBuildPost.dirty &&
+      !buildSucceeded
+    ) {
+      const snapshotStep = postPipelineReport.steps.find(
+        (s) => s.commandName === "behavior.snapshot.validate",
+      );
+      const snap01Diagnostics =
+        (
+          snapshotStep?.data as { diagnostics?: { ruleId: string }[] } | undefined
+        )?.diagnostics?.filter((d) => d.ruleId === "SNAP-01") ?? [];
+
+      if (snap01Diagnostics.length > 0) {
+        logger.info(`  SNAP-01 detected — auto-regenerating behavior snapshot…`);
+        try {
+          await executeKernelCommand({
+            workspaceRoot,
+            commandName: "behavior.snapshot.generate",
+            siteName: manifest.systemId,
+          });
+
+          await executeKernelCommand({
+            workspaceRoot,
+            commandName: "mission.git.commit",
+            argv: [`--mission=${missionId}`, "--message=chore: auto-regenerate behavior snapshot"],
+          });
+
+          logger.info(`  Re-running build.post after snapshot regeneration…`);
+          const revalidateResult = await executeKernelPipeline({
+            workspaceRoot,
+            pipelineName: "build.post",
+            siteName: manifest.systemId,
+            outputFormat: "pretty",
+          });
+          const revalidateReport = Array.isArray(revalidateResult)
+            ? revalidateResult[0]
+            : revalidateResult;
+
+          if (revalidateReport.ok) {
+            buildSucceeded = true;
+            buildError = undefined;
+            logger.info(`  build.post passed after snapshot regeneration`);
+          } else {
+            buildError = `build.post still failing after snapshot regeneration: ${revalidateReport.timing.failedStep ?? "unknown"}`;
+            logger.info(`  ${buildError}`);
+          }
+        } catch (regenErr) {
+          buildError = `snapshot auto-regeneration failed: ${regenErr instanceof Error ? regenErr.message : String(regenErr)}`;
+          logger.info(`  ${buildError}`);
+        }
       }
     }
   }
