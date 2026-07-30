@@ -268,15 +268,15 @@ interface AgentsGenerateResult {
 
 ## Acceptance criteria
 
-- [ ] `forge.agents.generate` discovers workspace directories (containing `package.json`) and generates nested `AGENTS.md` for each, with the generated marker
-- [ ] Workspace type auto-detection correctly classifies app (astro.config), service (Dockerfile/service.config.yaml), and package (package.json only) workspaces
-- [ ] `forge.agents.generate` skips existing hand-written `AGENTS.md` (no generated marker) and reports them in the `skipped` array
-- [ ] `forge.agents.generate` regenerates existing generated `AGENTS.md` (with generated marker) when content differs
-- [ ] `forge.upgrade` generates missing nested `AGENTS.md` for workspace directories without touching hand-written files
-- [ ] `forge.doctor` reports missing nested `AGENTS.md`, stale generated files, and hand-written improvement opportunities as diagnostics
-- [ ] `forge-bootstrap` proposes improvements to existing hand-written `AGENTS.md` during transplant onboarding, with operator confirmation
-- [ ] `--json` output includes `generated` and `skipped` arrays covering both root and nested files — note: `generated` array semantics change from root-only to root + nested (additive, but existing consumers should expect additional entries)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `forge.agents.generate` discovers workspace directories (containing `package.json`) and generates nested `AGENTS.md` for each, with the generated marker (evidence: packages/forge/src/onboarding/nested-agents-generate.ts:31-50, packages/forge/src/tests/agents-generate.test.ts:238-251)
+- [x] Workspace type auto-detection correctly classifies app (astro.config), service (Dockerfile/service.config.yaml), and package (package.json only) workspaces (evidence: packages/forge/src/onboarding/workspace-discovery.ts:35-52, packages/forge/src/tests/workspace-discovery.test.ts:22-62)
+- [x] `forge.agents.generate` skips existing hand-written `AGENTS.md` (no generated marker) and reports them in the `skipped` array (evidence: packages/forge/src/onboarding/nested-agents-generate.ts:41-43, packages/forge/src/tests/agents-generate.test.ts:253-265)
+- [x] `forge.agents.generate` regenerates existing generated `AGENTS.md` (with generated marker) when content differs (evidence: packages/forge/src/onboarding/nested-agents-generate.ts:45-46, packages/forge/src/tests/agents-generate.test.ts:267-284)
+- [x] `forge.upgrade` generates missing nested `AGENTS.md` for workspace directories without touching hand-written files (evidence: packages/forge/src/onboarding/upgrade.ts:333-342, packages/forge/src/tests/upgrade.test.ts)
+- [x] `forge.doctor` reports missing nested `AGENTS.md`, stale generated files, and hand-written improvement opportunities as diagnostics (evidence: packages/forge/src/onboarding/doctor.ts:344-426)
+- [x] `forge-bootstrap` proposes improvements to existing hand-written `AGENTS.md` during transplant onboarding, with operator confirmation (evidence: packages/forge/skills/meta/forge-bootstrap/SKILL.md:228-238)
+- [x] `--json` output includes `generated` and `skipped` arrays covering both root and nested files — note: `generated` array semantics change from root-only to root + nested (additive, but existing consumers should expect additional entries) (evidence: packages/forge/src/onboarding/agents-generate.ts:467-510, packages/forge/src/tests/agents-generate.test.ts:301-308)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0611 passed during audit step)
 
 ## Implementation notes for agents
 
