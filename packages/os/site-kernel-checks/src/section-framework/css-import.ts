@@ -23,32 +23,31 @@ import type {
 } from "@warpgogol/site-kernel";
 import { ok, fail, type Violation, type CheckResult } from "./shared.ts";
 
-const UI_SECTIONS = join("packages", "ui", "src", "sections");
-const UI_COMPONENTS = join("packages", "ui", "src", "components");
+const UI_DIRS = [
+  join("packages", "ui", "src", "sections"),
+  join("packages", "ui", "src", "components"),
+];
 
-async function collectCssFiles(workspaceRoot: string): Promise<string[]> {
-  const sectionsRoot = join(workspaceRoot, UI_SECTIONS);
-  const componentsRoot = join(workspaceRoot, UI_COMPONENTS);
-  const [sections, components] = await Promise.all([
-    collectFiles(sectionsRoot, { extensions: [".css"], ignore: () => false }),
-    collectFiles(componentsRoot, { extensions: [".css"], ignore: () => false }),
-  ]);
-  return [...sections, ...components];
-}
-
-async function collectAstroFiles(workspaceRoot: string): Promise<string[]> {
-  const sectionsRoot = join(workspaceRoot, UI_SECTIONS);
-  const componentsRoot = join(workspaceRoot, UI_COMPONENTS);
-  const [sections, components] = await Promise.all([
-    collectFiles(sectionsRoot, { extensions: [".astro"], ignore: () => false }),
-    collectFiles(componentsRoot, { extensions: [".astro"], ignore: () => false }),
-  ]);
-  return [...sections, ...components];
+async function collectByExtension(workspaceRoot: string, extension: string): Promise<string[]> {
+  const results = await Promise.all(
+    UI_DIRS.map((dir) =>
+      collectFiles(join(workspaceRoot, dir), {
+        extensions: [extension],
+        ignore: () => false,
+      }),
+    ),
+  );
+  return results.flat();
 }
 
 function stripExt(filename: string): string {
   const dot = filename.lastIndexOf(".");
   return dot > 0 ? filename.slice(0, dot) : filename;
+}
+
+function isImportedBy(cssBasename: string, astroText: string): boolean {
+  const escaped = cssBasename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`import\\s+["']\\.\\.?/[^"']*${escaped}["']`).test(astroText);
 }
 
 export async function runSectionCssImportValidate(
@@ -58,13 +57,12 @@ export async function runSectionCssImportValidate(
   const cmd = "section.css.import.validate";
   const violations: Violation[] = [];
 
-  const cssFiles = await collectCssFiles(context.workspaceRoot);
-  const astroFiles = await collectAstroFiles(context.workspaceRoot);
+  const cssFiles = await collectByExtension(context.workspaceRoot, ".css");
+  const astroFiles = await collectByExtension(context.workspaceRoot, ".astro");
 
   const astroContents = await Promise.all(
     astroFiles.map(async (file) => ({
       file,
-      rel: relative(context.workspaceRoot, file).replace(/\\/g, "/"),
       text: await readFile(file, "utf-8"),
     })),
   );
@@ -74,12 +72,7 @@ export async function runSectionCssImportValidate(
     const cssBasename = basename(cssFile);
     const cssDir = dirname(cssFile);
 
-    const imported = astroContents.some((a) => {
-      const importPattern = new RegExp(
-        `import\\s+["']\\.\\.?/[^"']*${cssBasename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']`,
-      );
-      return importPattern.test(a.text);
-    });
+    const imported = astroContents.some((a) => isImportedBy(cssBasename, a.text));
 
     if (!imported) {
       violations.push({
@@ -90,7 +83,7 @@ export async function runSectionCssImportValidate(
       });
     }
 
-    const astroInSameDir = astroFiles.filter((f) => dirname(f) === cssDir && f.endsWith(".astro"));
+    const astroInSameDir = astroFiles.filter((f) => dirname(f) === cssDir);
 
     if (astroInSameDir.length > 0) {
       const cssStem = stripExt(cssBasename);
@@ -99,13 +92,9 @@ export async function runSectionCssImportValidate(
         return astroStem === cssStem;
       });
 
-      const importedBySameDirAstro = astroContents.some((a) => {
-        if (dirname(a.file) !== cssDir) return false;
-        const importPattern = new RegExp(
-          `import\\s+["']\\.\\.?/[^"']*${cssBasename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']`,
-        );
-        return importPattern.test(a.text);
-      });
+      const importedBySameDirAstro = astroContents.some(
+        (a) => dirname(a.file) === cssDir && isImportedBy(cssBasename, a.text),
+      );
 
       if (!hasMatchingAstro && !importedBySameDirAstro) {
         const astroRel = relative(context.workspaceRoot, astroInSameDir[0]).replace(/\\/g, "/");
