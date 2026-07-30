@@ -798,22 +798,46 @@ export async function runGenerateOpenSourcePage(
   const dependencyFingerprint = hash.digest("hex");
 
   // Check fingerprint cache
-  const firstPagePath = path.join(paths.contentPagesDirectory, supportedLangs[0], "open-source.md");
+  // RFC-0599: check ALL declared output paths, not just the content page.
+  // The declaredOutputPaths array must match the output paths in
+  // GENERATOR_OWNERSHIP_MAP (site-kernel-checks/src/generator-ownership.ts).
+  const declaredOutputPaths = [
+    // Content pages (per language)
+    ...supportedLangs.map((lang) => path.join(paths.contentPagesDirectory, lang, "open-source.md")),
+    // Prose pages (per language)
+    ...supportedLangs.map((lang) =>
+      path.join(paths.contentDirectory, "prose", lang, "open-source.md"),
+    ),
+    // Registry JSON (per language)
+    ...supportedLangs.map((lang) =>
+      path.join(paths.contentDirectory, "data", lang, "open-source-registry.json"),
+    ),
+    // Public download artifacts
+    path.join(paths.publicDirectory, "open-source", "THIRD_PARTY_NOTICES.txt"),
+    path.join(paths.publicDirectory, "open-source", "THIRD_PARTY_LICENSES.txt"),
+    path.join(paths.publicDirectory, "open-source", "sbom.cdx.json"),
+  ];
   try {
     const existingFingerprint = await fs.readFile(fingerprintCacheFile, "utf8");
     const fingerprintMatches = toCleanText(existingFingerprint) === dependencyFingerprint;
     if (fingerprintMatches) {
-      try {
-        await fs.access(firstPagePath);
+      const allOutputsExist = await Promise.all(
+        declaredOutputPaths.map((p) =>
+          fs
+            .access(p)
+            .then(() => true)
+            .catch(() => false),
+        ),
+      );
+      if (allOutputsExist.every(Boolean)) {
         return {
           data: { dependencyCount: 0 },
           summary: "[open-source] up to date",
         };
-      } catch {
-        context.logger.info(
-          "[open-source] fingerprint matches, but output file missing; regenerating",
-        );
       }
+      context.logger.info(
+        "[open-source] fingerprint matches, but output file(s) missing; regenerating",
+      );
     }
   } catch {
     context.logger.info("[open-source] cache miss; regenerating");
