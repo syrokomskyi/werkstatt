@@ -997,7 +997,7 @@ export async function runMissionMaterialize(
         passed: prepareReport.steps.filter((s) => s.ok).length,
         failed: prepareReport.steps.filter((s) => !s.ok).length,
       },
-      preflightSkipped,
+      preflightSkipped: skipPreflight || preflightSkipped,
       preflightSkipReason: skipPreflight ? "operator-override" : preflightSkipReason,
       pipelineUsed: "build.prepare.dev",
       mediaCacheWarmed,
