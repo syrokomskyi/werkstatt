@@ -60,12 +60,13 @@ packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
   - "@warpgogol/ontology"
   - "@warpgogol/site-kernel-codegen"
+  - "@warpgogol/ui"
 successSignals:
   - "leitstand.propagate always deploys to alt; --channel flag removed for propagate"
   - "leitstand.promote refuses when release state is not alt-deployed"
   - "leitstand.promote fetches /.well-known/build-identity.json from alt URL and verifies hashes match the release manifest before deploying to main"
   - "release.prepare writes /.well-known/build-identity.json into dist/client/ with all release hashes"
-  - "open-source-registry.json deployment metadata is populated from the same build identity object"
+  - "open-source page fetches build-identity.json at request time (SSR) for deployment metadata display"
 nonGoals:
   - "Do not change leitstand.rollback --channel semantics (rollback remains per-channel)"
   - "Do not remove the open-source page; it continues to display build metadata sourced from build-identity.json"
@@ -211,9 +212,9 @@ pnpm exec site-kernel run leitstand.health --channel alt
 }
 ```
 
-This file is the **single source of truth** for build identity. The open-source page's `deploymentMetadata` section is populated from the same object during `release.prepare`'s post-build phase, replacing the independent `resolveDeploymentMetadata` computation in `open-source-page.ts`.
+This file is the **single source of truth** for build identity. The open-source page's `deploymentMetadata` section is fetched from this file at request time (SSR), replacing the independent `resolveDeploymentMetadata` computation in `open-source-page.ts`.
 
-**Sequencing:** `open-source.generate` runs during `SITES_BUILD_PREPARE_PIPELINE` (build-prepare.ts) as part of the build. At this point, `build-identity.json` does not exist yet — release hashes are computed by `release.prepare` after the build completes. The resolution is a **post-build dual-write**: after `release.prepare` computes hashes and writes `build-identity.json` into `dist/client/.well-known/`, it also updates the open-source registry JSON (`open-source-registry.json`) with the same build identity data. This means `open-source.generate` during `build.prepare` produces the page without deployment metadata (or with placeholder values), and `release.prepare` overwrites the registry JSON with real data after hash computation. The open-source page renders from `open-source-registry.json` at request time, so the final rendered page always shows the correct build identity.
+**Sequencing:** `open-source.generate` runs during `SITES_BUILD_PREPARE_PIPELINE` (build-prepare.ts) as part of the build. At this point, `build-identity.json` does not exist yet — release hashes are computed by `release.prepare` after the build completes. The resolution is **SSR fetch**: the open-source registry section component fetches `/.well-known/build-identity.json` server-side at request time (Astro SSR). On Cloudflare Workers, static assets are served before Worker code executes, so a same-origin fetch works. `open-source.generate` no longer writes `deploymentMetadata` to the registry JSON — the component reads it from `build-identity.json` directly. If the file is not found (e.g., during local development before any release), placeholder values are displayed.
 
 **Verified vs displayed fields:** `leitstand.promote` cryptographically verifies `releaseId`, `distTreeHash`, `behaviorSnapshotHash`, and `siteContentHash` — these four fields are the promotion gate. The remaining fields (`systemId`, `missionId`, `semver`, `platformVersion`, `platformSemanticHash`, `commitSha`, `buildTimestamp`, `targetPlatform`) are included in the file for open-source page display and agent discoverability, but are NOT verified by the promotion gate.
 
@@ -263,7 +264,8 @@ interface LeitstandPromoteData {
 | `releases/<id>/dist/client/.well-known/build-identity.json` | Written by `release.prepare` after hash computation; served as a static public file |
 | `releases/<id>/release.yaml` | Release manifest; `state` field extended with `alt-deployed` and `promoted` |
 | `systems/registry.yaml` | `deployment.lastPropagated.alt` and `.main` updated by `propagate` and `promote` respectively |
-| `packages/os/site-kernel-codegen/src/open-source-page.ts` | `resolveDeploymentMetadata` replaced — reads from `build-identity.json` instead of computing independently |
+| `packages/os/site-kernel-codegen/src/open-source-page.ts` | `resolveDeploymentMetadata` removed; `deploymentMetadata` removed from `openSourceRegistryDataSchema` and `buildRegistryData` output |
+| `packages/ui/src/sections/open-source-registry/open-source-registry-section.astro` | Fetches `/.well-known/build-identity.json` server-side at request time; renders deployment metadata from fetched data |
 | `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `runLeitstandPropagate` loses `--channel`; new `runLeitstandPromote` added |
 | `packages/os/site-kernel-handoff/src/release/release-commands.ts` | `runReleasePrepare` gains `build-identity.json` write step |
 
@@ -306,7 +308,7 @@ All failures exit non-zero. In `--json` mode, the error is in the `error` field 
 ## Rollout
 
 1. **Extend `releaseStateSchema`** in `packages/ontology/src/operations/release.ts` with `alt-deployed` and `promoted`.
-2. **Update `release.prepare`** to write `build-identity.json` into `dist/client/.well-known/` after hash computation. Update `open-source-page.ts` to read deployment metadata from this file instead of computing independently.
+2. **Update `release.prepare`** to write `build-identity.json` into `dist/client/.well-known/` after hash computation. Remove `resolveDeploymentMetadata` and `deploymentMetadata` from `open-source-page.ts` and `openSourceRegistryDataSchema`. Update the open-source registry section component to fetch `/.well-known/build-identity.json` server-side at request time (SSR).
 3. **Update `leitstand.propagate`**: remove `--channel` flag, always deploy to alt, transition release state to `alt-deployed` on success.
 4. **Add `leitstand.promote`**: new command in `leitstand-commands.ts`, registered in the Leitstand module. Implements the build-identity fetch, hash verification, live health re-check, and main deployment.
 5. **Update `leitstand.rollback`**: preserve `--channel` flag. Rolling back main sets release state to `rolled-back`. Rolling back alt sets release state back to `published` (re-deploy to alt required before another promote).
@@ -347,7 +349,7 @@ All failures exit non-zero. In `--json` mode, the error is in the `error` field 
 - [ ] `leitstand.propagate --channel alt` throws a clear error directing to the new command surface
 - [ ] `docs/COMMANDS.md` and `packages/os/site-kernel-handoff/AGENTS.md` document the new state machine and command surface
 - [ ] `docs/architecture-dna.md` DNA-49 entry includes `leitstand.promote` in the enforcement command list
-- [ ] `release.prepare` performs post-build dual-write: writes `build-identity.json` and updates `open-source-registry.json` with the same build identity data
+- [ ] `release.prepare` writes `build-identity.json` into `dist/client/.well-known/` and the open-source page fetches it at request time (SSR)
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
