@@ -9,18 +9,22 @@
   <item>RFC-0237: introduce the shared city catalog builder with locale-aware slug derivation.</item>
   <item>RFC-0238: derive stable baseIds before applying composite-city overrides.</item>
   <item>Architecture review 2026-07-10: iterate configured languages instead of hard-coding de/uk.</item>
+  <item>ADR-0009: replace country-state-city (GPL 3.0) with @tansuasici/country-state-city (MIT).</item>
 </CHANGE_SUMMARY>
 */
 
-import { City } from "country-state-city";
+import { createRequire } from "node:module";
+import type { City as CSCCity } from "@tansuasici/country-state-city";
 import { citySlug } from "./slug.ts";
 import type { GeoCity, GeoOverrides } from "./types.ts";
 
-interface CSCCity {
-  name: string;
-  countryCode: string;
-  stateCode?: string;
-}
+const cscRequire = createRequire(import.meta.url);
+const { CountryStateCity } = cscRequire("@tansuasici/country-state-city") as {
+  CountryStateCity: {
+    getCountryByIso2(iso2: string): { id: number } | undefined;
+    getCitiesByCountryId(id: number): CSCCity[];
+  };
+};
 
 /** Build the shared city catalog for a country. */
 export function buildCityCatalog(
@@ -30,12 +34,14 @@ export function buildCityCatalog(
 ): GeoCity[] {
   const langs = languages ?? ["de", "uk"];
   const primaryLang = langs[0] ?? "de";
-  const raw = (City.getCitiesOfCountry(countryAlpha2) ?? []) as CSCCity[];
+  const country = CountryStateCity.getCountryByIso2(countryAlpha2);
+  if (!country) return [];
+  const raw = CountryStateCity.getCitiesByCountryId(country.id) as CSCCity[];
   const cities: GeoCity[] = [];
   for (const city of raw) {
     if (!city.stateCode) continue;
     const regionCode = `${city.countryCode}-${city.stateCode}`;
-    // RFC-0238: stable baseId from raw country-state-city name for override lookup.
+    // RFC-0238: stable baseId from raw @tansuasici/country-state-city name for override lookup.
     const baseId = `${countryAlpha2.toLowerCase()}-${city.stateCode.toLowerCase()}-${citySlug(city.name, primaryLang)}`;
     const names: Record<string, string> = {};
     for (const lang of langs) {

@@ -5,7 +5,7 @@ title: "Replace country-state-city with tansuasici/country-state-city"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-07-30

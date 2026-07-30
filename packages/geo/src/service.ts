@@ -29,7 +29,7 @@ import type {
 } from "./types.ts";
 
 /**
- * RFC-0238: country-state-city returns short canonical names (e.g. "Freiburg"),
+ * RFC-0238: @tansuasici/country-state-city returns short canonical names (e.g. "Freiburg"),
  * but German composite-city names need full qualifiers ("Freiburg im Breisgau",
  * "Frankfurt am Main", "Ludwigshafen am Rhein") for uniqueness and SEO.
  *

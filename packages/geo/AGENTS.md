@@ -9,7 +9,7 @@ This package owns the shared geo gazetteer used by Site OS validators and genera
 - `providerEntries(provider, langs, defaultLang, options?)` resolves geo provider axes (`geo.countries`, `geo.regions`, `geo.cities`) into entries + localized slugs. Unknown provider strings throw. The optional `imageResolver` callback keeps image-probing in the consumer.
 - Slug generation uses a `SlugStrategy` registry in `slug.ts`. German and Ukrainian strategies are pre-registered. Add a new language by inserting a `SlugStrategy` entry into the `slugStrategies` Map — no runtime registration API.
 - Keep locale-aware URL slugs deterministic. Changes to slug behavior can affect generated routes and must be validated before merge.
-- Use ISO-backed sources where possible: `i18n-iso-countries`, `iso-3166-2`, and `country-state-city`.
+- Use ISO-backed sources where possible: `i18n-iso-countries`, `iso-3166-2`, and `@tansuasici/country-state-city`.
 - Composite-city corrections belong in the central override layer in `service.ts` (`DEFAULT_OVERRIDES.cityNames`), not in downstream validators or generated content.
 - Region name overrides go in `GeoOverrides.regionNames` keyed by ISO 3166-2 code (e.g. `"DE-BW"`).
 

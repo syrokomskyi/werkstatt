@@ -12,7 +12,9 @@
       "default": "./src/index.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "echo 'No build step required — TypeScript sources consumed directly'",
     "build:check": "tsc --noEmit",
@@ -21,7 +23,7 @@
   },
   "dependencies": {
     "@sindresorhus/slugify": "^3.0.0",
-    "country-state-city": "^3.2.1",
+    "@tansuasici/country-state-city": "^2.0.15",
     "cyrillic-to-translit-js": "^3.2.1",
     "i18n-iso-countries": "^7.14.0",
     "iso-3166-2": "^1.0.0"
