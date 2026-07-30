@@ -49,10 +49,12 @@ packagesImpacted:
   - "@warpgogol/site-kernel-checks"
 successSignals:
   - "generated.files.validate resolves systems/{system}/ paths from workspace root"
-  - "bordbuch.json and bordbuch/index.html are found by generated.files.validate after build.prepare"
+  - "generated.files.validate checks file existence for systems/{system}/ entries by expanding {system} to the --site value"
+  - "bordbuch.json and bordbuch/index.html are validated by generated.files.validate after build.prepare"
 nonGoals:
-  - "Does not change the GENERATOR_OWNERSHIP_MAP entries themselves — only the path resolution logic in generated.files.validate."
+  - "Does not change the GENERATOR_OWNERSHIP_MAP entries themselves — only the path resolution and brace expansion logic in generated.files.validate."
   - "Does not add any new commands to the build.prepare pipeline — that is RFC-0604."
+  - "Does not fix {id} brace expansion for packages/ui/src/sections/{id}/ and packages/ui/src/components/{id}/ entries — same silent-pass issue but separate scope; noted as a known limitation."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -75,20 +77,29 @@ nonGoals:
 
 ## Context
 
-`generated.files.validate` (RFC-0375) checks that every registry-declared generated file in `GENERATOR_OWNERSHIP_MAP` exists on disk. The path resolution logic in `packages/os/site-kernel-checks/src/generated-files-validate.ts` uses `WORKSPACE_ABSOLUTE_PREFIXES` (line 35) to determine which paths are workspace-root-relative: `["packages/", "docs/", "apps/", ".gitattributes", ".env"]`.
+`generated.files.validate` (RFC-0375) checks that every registry-declared generated file in `GENERATOR_OWNERSHIP_MAP` exists on disk. The path resolution logic in `packages/os/site-kernel-checks/src/generated-files-validate.ts` uses `WORKSPACE_ABSOLUTE_PREFIXES` to determine which paths are workspace-root-relative: `["packages/", "docs/", "apps/", ".gitattributes", ".env"]`.
 
 The `GENERATOR_OWNERSHIP_MAP` includes entries with paths like `systems/{system}/public/.well-known/bordbuch.json` (line 386 of `generator-ownership.ts`). The `systems/` prefix is not in `WORKSPACE_ABSOLUTE_PREFIXES`, so `resolveEntryPath` falls through to the `siteDirectory` or `apps/<app>/` branch, resolving the path incorrectly (e.g., `apps/warpgogol-com/systems/warpgogol-com/public/...` instead of `systems/warpgogol-com/public/...`).
 
+Additionally, the bordbuch paths contain the `{system}` placeholder, which triggers the glob branch in `runGeneratedFilesValidate` (via `hasGlobPattern`). However, `expandGlob` only handles `*` and `**` wildcards — its internal `hasWildcards` helper checks `p.includes("*")`, not `{`. As a result, `{system}` is never expanded: `expandGlob` returns the literal path string, `files.length` is 1, and no `GEN-FILES-01` error is reported. The validator silently passes regardless of whether the bordbuch files exist on disk.
+
 ## Problem
 
-`generated.files.validate` cannot find files declared with `systems/{system}/` paths in `GENERATOR_OWNERSHIP_MAP`. The bordbuch entries (`systems/{system}/public/.well-known/bordbuch.json` and `systems/{system}/public/.well-known/bordbuch/index.html`) are workspace-root-relative but not recognized as such. This means:
+`generated.files.validate` cannot validate files declared with `systems/{system}/` paths in `GENERATOR_OWNERSHIP_MAP`. There are two distinct bugs:
 
-1. `generated.files.validate` reports false-positive `GEN-FILES-01` errors for bordbuch files even after `bordbuch.generate` has written them.
-2. RFC-0604 cannot use `generated.files.validate` as an acceptance criterion for bordbuch files without this fix.
+1. **Path resolution**: `systems/` is not in `WORKSPACE_ABSOLUTE_PREFIXES`, so `resolveEntryPath` resolves `systems/{system}/...` paths relative to `apps/<app>/` or `siteDirectory` instead of the workspace root.
+2. **Brace expansion**: `{system}` is not expanded by `expandGlob`, so the glob branch never checks file existence — it returns the literal path with `{system}` unexpanded, `files.length` is 1, and no error is reported. This means the validator silently passes whether or not the bordbuch files exist.
+
+The RFC's original Problem section claimed "false-positive `GEN-FILES-01` errors" — this is incorrect. Running `generated.files.validate --site warpgogol-com` confirms no bordbuch or `systems/` errors appear in the output. The actual problem is a **silent false negative**: the validator never checks these files at all.
+
+RFC-0604 cannot use `generated.files.validate` as an acceptance criterion for bordbuch files without this fix — the validator would pass even if the files are missing.
 
 ## Decision
 
-`WORKSPACE_ABSOLUTE_PREFIXES` in `generated-files-validate.ts` is extended to include `"systems/"`, so that `GENERATOR_OWNERSHIP_MAP` entries with `systems/{system}/` paths are resolved from the workspace root.
+Two changes in `generated-files-validate.ts`:
+
+1. `WORKSPACE_ABSOLUTE_PREFIXES` is extended to include `"systems/"`, so that `GENERATOR_OWNERSHIP_MAP` entries with `systems/{system}/` paths are resolved from the workspace root.
+2. `expandGlob` is extended to expand `{system}` (and generic `{placeholder}`) brace patterns by substituting the `--site` flag value. When `{system}` is present and `--site` is provided, the placeholder is replaced before glob expansion. This makes the glob branch check the actual file path on disk.
 
 ## Architectural fit
 
@@ -116,28 +127,40 @@ const WORKSPACE_ABSOLUTE_PREFIXES = ["packages/", "docs/", "apps/", ".gitattribu
 const WORKSPACE_ABSOLUTE_PREFIXES = ["packages/", "docs/", "apps/", "systems/", ".gitattributes", ".env"];
 ```
 
-The `isWorkspaceAbsolute` function (line 37) already checks `WORKSPACE_ABSOLUTE_PREFIXES`, so adding `"systems/"` is a one-line change. The `resolveEntryPath` function (line 42) will then resolve `systems/{system}/...` paths from `workspaceRoot` instead of falling through to the `apps/<app>/` branch.
+The `isWorkspaceAbsolute` function already checks `WORKSPACE_ABSOLUTE_PREFIXES`, so adding `"systems/"` ensures `resolveEntryPath` resolves `systems/{system}/...` paths from `workspaceRoot`.
+
+Additionally, `expandGlob` is extended to handle `{placeholder}` brace patterns. When a path segment contains `{placeholder}`, it is replaced with the `--site` value (for `{system}`) before glob expansion. This ensures the glob branch checks the actual file path on disk instead of returning the literal unexpanded path.
+
+```ts
+// In runGeneratedFilesValidate, before calling expandGlob:
+// Replace {system} with the --site value
+const expandedPath = posixPath.replace(/\{system\}/g, app ?? "*");
+```
+
+When `--site` is not provided, `{system}` is replaced with `*` (wildcard), which `expandGlob` already handles by scanning all directories under `systems/`.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-checks/src/generated-files-validate.ts` | `WORKSPACE_ABSOLUTE_PREFIXES` array updated |
-| `systems/{system}/public/.well-known/bordbuch.json` | Now correctly found by `generated.files.validate` |
-| `systems/{system}/public/.well-known/bordbuch/index.html` | Now correctly found by `generated.files.validate` |
+| `packages/os/site-kernel-checks/src/generated-files-validate.ts` | `WORKSPACE_ABSOLUTE_PREFIXES` array updated; `expandGlob` or `runGeneratedFilesValidate` extended to substitute `{system}` with `--site` value |
+| `systems/{system}/public/.well-known/bordbuch.json` | Now correctly validated by `generated.files.validate` |
+| `systems/{system}/public/.well-known/bordbuch/index.html` | Now correctly validated by `generated.files.validate` |
 
 ### Output format
 
-No change to output format. The fix eliminates false-positive `GEN-FILES-01` errors for `systems/{system}/` paths.
+No change to output format. The fix enables `GEN-FILES-01` errors to be reported when `systems/{system}/` files are missing (previously silent false negatives).
 
 ### Failure modes
 
-No new failure modes. The fix only affects path resolution, not validation logic.
+- If `--site` is not provided and a `systems/{system}/` entry is encountered, `{system}` is replaced with `*` (wildcard). `expandGlob` scans all directories under `systems/` and reports a warning if no files match.
+- If `--site` is provided but the system directory does not exist under `systems/`, `expandGlob` returns an empty array and a `GEN-FILES-01` warning is reported.
+- No new error-level diagnostics are introduced — the fix enables existing `GEN-FILES-01` to fire correctly for `systems/{system}/` paths.
 
 ## Rollout
 
-- One-line change to `WORKSPACE_ABSOLUTE_PREFIXES` in `generated-files-validate.ts`.
-- No flag day, no migration. Existing `systems/{system}/` entries in `GENERATOR_OWNERSHIP_MAP` that were previously false-positive are now correctly resolved.
+- Two changes to `generated-files-validate.ts`: add `"systems/"` to `WORKSPACE_ABSOLUTE_PREFIXES`, and add `{system}` → `--site` substitution before glob expansion.
+- No flag day, no migration. Existing `systems/{system}/` entries in `GENERATOR_OWNERSHIP_MAP` that were previously silent false negatives are now correctly validated.
 - Must be implemented before RFC-0604 can use `generated.files.validate` as an acceptance criterion for bordbuch files.
 
 ## Alternatives considered
@@ -147,13 +170,17 @@ No new failure modes. The fix only affects path resolution, not validation logic
 
 ## Risks
 
-- **Glob expansion for systems/{system}/ patterns**: The `{system}` placeholder in `systems/{system}/public/...` is a glob-like pattern. The existing `expandGlob` function handles `{` patterns (line 66: `path.includes("{")`). Adding `"systems/"` to `WORKSPACE_ABSOLUTE_PREFIXES` means these patterns will be expanded from the workspace root, which should work correctly since `systems/` is at the root.
+- **`expandGlob` does not handle `{placeholder}` brace patterns**: The existing `expandGlob` function only handles `*` and `**` wildcards — its internal `hasWildcards` helper checks `p.includes("*")`, not `{`. The `hasGlobPattern` function (which checks `{`) routes these entries to the glob branch, but `expandGlob` returns the literal unexpanded path. This RFC fixes the issue by substituting `{system}` with the `--site` value before calling `expandGlob`.
+- **`{id}` entries have the same issue**: `packages/ui/src/sections/{id}/{id}.types.generated.ts` and `packages/ui/src/components/{id}/{id}.types.generated.ts` use `{id}` and are workspace-absolute (`packages/` prefix), but `{id}` is never expanded. This is a known limitation — fixing `{id}` expansion requires scanning all section/component directories and is out of scope for this RFC. The `{id}` entries silently pass today and will continue to do so after this RFC.
+- **False negative → false positive transition**: Before this fix, bordbuch entries silently pass (false negative). After this fix, if bordbuch files are missing, `GEN-FILES-01` errors will be reported. Sites that have not run `bordbuch.generate` will see new errors. This is the correct behavior — the errors were always warranted, just not reported.
 
 ## Acceptance criteria
 
 - [ ] `"systems/"` added to `WORKSPACE_ABSOLUTE_PREFIXES` in `packages/os/site-kernel-checks/src/generated-files-validate.ts`
-- [ ] `generated.files.validate --site warpgogol-com` finds `systems/warpgogol-com/public/.well-known/bordbuch.json` after `bordbuch.generate` has run
-- [ ] No false-positive `GEN-FILES-01` errors for `systems/{system}/` paths
+- [ ] `{system}` placeholder is substituted with the `--site` value (or `*` when `--site` is not provided) before glob expansion in `runGeneratedFilesValidate`
+- [ ] `generated.files.validate --site warpgogol-com` reports `GEN-FILES-01` error when `systems/warpgogol-com/public/.well-known/bordbuch.json` does not exist
+- [ ] `generated.files.validate --site warpgogol-com` passes (no `GEN-FILES-01` for bordbuch) when `systems/warpgogol-com/public/.well-known/bordbuch.json` exists after `bordbuch.generate` has run
+- [ ] `generated.files.validate` without `--site` expands `{system}` to `*` and scans all `systems/*/` directories
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
