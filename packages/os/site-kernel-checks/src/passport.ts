@@ -14,6 +14,8 @@ Cosmic Passport pipeline (DNA-31..34, RFC-0028).
   <item>Wave 1 (RFC-0028): Initial creation.</item>
   <item>Fix (RFC-0029 review): Wrap return values in canonical { data, exitCode, summary } shape so non-zero exits propagate to CI.</item>
   <item>Use collectNebulaInputs from @warpgogol/nebula/collect for full 4-pillar input collection.</item>
+  <item>RFC-0605: Added runPassportKeyEnsure — idempotent key creation, no-op if key exists, never prints private key to stdout, supports --private-key-out flag with 0600 permissions.</item>
+  <item>Fix (review A-1): Replaced raw writeFile with writeFileIfChanged for cosmic-passport-key.json to avoid git churn on every regeneration cycle.</item>
 </CHANGE_SUMMARY>
 */
 
