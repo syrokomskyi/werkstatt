@@ -1,7 +1,7 @@
 ---
 id: RFC-0605
 title: "Add passport.key.ensure command for idempotent pipeline-safe key generation"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -18,7 +18,7 @@ createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
 # Audit-driven enhancements applied (AUDIT-RFC-0605-01): generateKeypair export, version behavior, file permissions, all-inactive keys edge case, AGENTS.md/Compass sync notes.
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
