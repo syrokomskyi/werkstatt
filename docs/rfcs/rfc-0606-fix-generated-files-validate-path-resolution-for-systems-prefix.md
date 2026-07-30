@@ -177,12 +177,12 @@ No change to output format. The fix enables `GEN-FILES-01` errors to be reported
 
 ## Acceptance criteria
 
-- [ ] `"systems/"` added to `WORKSPACE_ABSOLUTE_PREFIXES` in `packages/os/site-kernel-checks/src/generated-files-validate.ts`
-- [ ] `{system}` placeholder is substituted with the `--site` value (or `*` when `--site` is not provided) before glob expansion in `runGeneratedFilesValidate`
-- [ ] `generated.files.validate --site warpgogol-com` reports `GEN-FILES-01` error when `systems/warpgogol-com/public/.well-known/bordbuch.json` does not exist
-- [ ] `generated.files.validate --site warpgogol-com` passes (no `GEN-FILES-01` for bordbuch) when `systems/warpgogol-com/public/.well-known/bordbuch.json` exists after `bordbuch.generate` has run
-- [ ] `generated.files.validate` without `--site` expands `{system}` to `*` and scans all `systems/*/` directories
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `"systems/"` added to `WORKSPACE_ABSOLUTE_PREFIXES` in `packages/os/site-kernel-checks/src/generated-files-validate.ts` (evidence: packages/os/site-kernel-checks/src/generated-files-validate.ts:39)
+- [x] `{system}` placeholder is substituted with the `--site` value (or `*` when `--site` is not provided) before glob expansion in `runGeneratedFilesValidate` (evidence: packages/os/site-kernel-checks/src/generated-files-validate.ts:176, generated-files-validate.test.ts "wildcard" test)
+- [x] `generated.files.validate --site warpgogol-com` reports `GEN-FILES-01` error when `systems/warpgogol-com/public/.well-known/bordbuch.json` does not exist (evidence: generated-files-validate.test.ts "red: reports GEN-FILES-01 for missing bordbuch files")
+- [x] `generated.files.validate --site warpgogol-com` passes (no `GEN-FILES-01` for bordbuch) when `systems/warpgogol-com/public/.well-known/bordbuch.json` exists after `bordbuch.generate` has run (evidence: generated-files-validate.test.ts "green: no GEN-FILES-01 for bordbuch when files exist")
+- [x] `generated.files.validate` without `--site` expands `{system}` to `*` and scans all `systems/*/` directories (evidence: generated-files-validate.test.ts "wildcard: expands {system} to * when --site is not provided")
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate RFC-0606 — All 1 RFC(s) passed)
 
 ## Implementation notes for agents
 
