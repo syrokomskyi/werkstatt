@@ -684,6 +684,54 @@ function buildThirdPartyLicenses(deps: ClassifiedDependency[]): string {
   return lines.join("\n");
 }
 
+// ─── Deployment metadata resolution (RFC-0489 fallbacks) ──────────────────────
+
+function resolveGitCommitSha(appDirectory: string): string {
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], {
+      cwd: appDirectory,
+      encoding: "utf8",
+      timeout: 5_000,
+    }).trim();
+  } catch {
+    return "—";
+  }
+}
+
+function inferTargetPlatform(appDirectory: string): string {
+  try {
+    const config = readFileSync(path.join(appDirectory, "astro.config.mjs"), "utf8");
+    if (config.includes("@astrojs/cloudflare")) return "cloudflare-workers";
+    if (config.includes("@astrojs/vercel")) return "vercel";
+    if (config.includes("@astrojs/netlify")) return "netlify";
+    if (config.includes("@astrojs/node")) return "node";
+    return "—";
+  } catch {
+    return "—";
+  }
+}
+
+async function resolveBuildTimestamp(cacheFile: string): Promise<string> {
+  try {
+    const stat = await fs.stat(cacheFile);
+    return stat.mtime.toISOString();
+  } catch {
+    return "—";
+  }
+}
+
+async function resolveDeploymentMetadata(
+  appDirectory: string,
+  cacheFile: string,
+): Promise<DeploymentMetadata> {
+  return {
+    deploymentId: process.env.DEPLOYMENT_ID ?? "—",
+    commitSha: process.env.COMMIT_SHA ?? resolveGitCommitSha(appDirectory),
+    buildTimestamp: process.env.BUILD_TIMESTAMP ?? (await resolveBuildTimestamp(cacheFile)),
+    targetPlatform: process.env.TARGET_PLATFORM ?? inferTargetPlatform(appDirectory),
+  };
+}
+
 // ─── Main generator ───────────────────────────────────────────────────────────
 
 export async function runGenerateOpenSourcePage(
@@ -701,7 +749,8 @@ export async function runGenerateOpenSourcePage(
   const fingerprintCacheFile = path.join(cacheDir, "open-source.fingerprint");
 
   // Load system manifest and guard with hasSystemPage
-  const { loadI18nConfigSync, loadSystemManifestSync } = await import("@warpgogol/site-kernel-content");
+  const { loadI18nConfigSync, loadSystemManifestSync } =
+    await import("@warpgogol/site-kernel-content");
   const system = loadSystemManifestSync(paths.contentDirectory).manifest;
 
   if (!hasSystemPage(system, "openSource")) {
@@ -841,13 +890,8 @@ export async function runGenerateOpenSourcePage(
       (d) => d.scope === "runtime" || d.scope === "browser-bundle" || d.scope === "worker-runtime",
     );
 
-    // Deployment metadata
-    const metadata: DeploymentMetadata = {
-      deploymentId: process.env.DEPLOYMENT_ID ?? "—",
-      commitSha: process.env.COMMIT_SHA ?? "—",
-      buildTimestamp: process.env.BUILD_TIMESTAMP ?? "—",
-      targetPlatform: process.env.TARGET_PLATFORM ?? "—",
-    };
+    // Deployment metadata (RFC-0489 fallbacks: git rev-parse, astro config, cache mtime)
+    const metadata = await resolveDeploymentMetadata(appDirectory, fingerprintCacheFile);
 
     // Generate downloadable artifacts
     const noticesContent = buildThirdPartyNotices(publicDeps);
