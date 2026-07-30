@@ -495,10 +495,10 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-check-warpgogol/src/commands/hints.ts",
   },
 
-  // RFC-0028: Cosmic passport key rotation.
+  // RFC-0028: Cosmic passport key — owned by passport.key.ensure (RFC-0605).
   {
     path: "public/.well-known/cosmic-passport-key.json",
-    command: "passport.key.rotate",
+    command: "passport.key.ensure",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/passport.ts",
   },

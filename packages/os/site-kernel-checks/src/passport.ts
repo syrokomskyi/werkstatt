@@ -17,8 +17,8 @@ Cosmic Passport pipeline (DNA-31..34, RFC-0028).
 </CHANGE_SUMMARY>
 */
 
-import { writeFile, mkdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { writeFile, mkdir, readFile, chmod } from "node:fs/promises";
+import { join, dirname } from "node:path";
 import { parse as parseYaml } from "yaml";
 import type {
   KernelCommandInput,
@@ -30,6 +30,9 @@ import { optionalEnv } from "@warpgogol/site-kernel-integrity";
 import { emitPassport } from "@warpgogol/passport/emit";
 import { verifyPassport } from "@warpgogol/passport/verify";
 import { rotateKey } from "@warpgogol/passport/key-rotate";
+import { generateKeypair } from "@warpgogol/passport/sign";
+import { PassportPublicKeyFileSchema } from "@warpgogol/passport/schema";
+import type { PassportPublicKeyFile } from "@warpgogol/passport/schema";
 import { manifestToStarMapInput, emitStarMap } from "@warpgogol/star-map/render";
 import { computeNebulaScore } from "@warpgogol/nebula/compute";
 import { collectNebulaInputs } from "@warpgogol/nebula/collect";
@@ -221,6 +224,145 @@ export async function runPassportKeyRotate(
   }
 
   return pass("passport.key.rotate", "key rotated; private key printed to stdout");
+}
+
+// ---------------------------------------------------------------------------
+// runPassportKeyEnsure — RFC-0605: idempotent pipeline-safe key creation
+// ---------------------------------------------------------------------------
+
+export async function runPassportKeyEnsure(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult> {
+  let paths: ReturnType<typeof requireAstroSitePaths>;
+  try {
+    paths = requireAstroSitePaths(context);
+  } catch (err) {
+    return fail("passport.key.ensure", [(err as Error).message]);
+  }
+
+  let manifest: SystemManifest;
+  try {
+    const systemResult = await loadSystemManifest(paths.contentDirectory);
+    manifest = systemResult.manifest;
+  } catch (err) {
+    return fail("passport.key.ensure", [
+      `PKE-01: Could not read system manifest: ${(err as Error).message}`,
+    ]);
+  }
+
+  const publicKeyFilePath = join(
+    paths.appDirectory,
+    "public",
+    ".well-known",
+    "cosmic-passport-key.json",
+  );
+
+  // Check if key file already exists
+  let existingRaw: string | null = null;
+  try {
+    existingRaw = await readFile(publicKeyFilePath, "utf8");
+  } catch {
+    // File does not exist — will create
+  }
+
+  if (existingRaw !== null) {
+    // Key file exists — no-op, but validate it has an active key
+    let parsed: PassportPublicKeyFile;
+    try {
+      parsed = PassportPublicKeyFileSchema.parse(JSON.parse(existingRaw));
+    } catch (err) {
+      return fail("passport.key.ensure", [
+        `PKE-03: Existing key file is invalid: ${(err as Error).message}`,
+      ]);
+    }
+
+    const activeKey = parsed.keys.find((k) => k.active);
+    if (!activeKey) {
+      return fail("passport.key.ensure", [
+        "PKE-03: Existing key file has no active key (all keys are inactive)",
+      ]);
+    }
+
+    return {
+      data: {
+        command: "passport.key.ensure",
+        status: "pass",
+        violations: [],
+        created: false,
+        version: activeKey.version,
+        publicKeyFilePath,
+      },
+      exitCode: 0,
+      summary: `passport key exists (${activeKey.version}) — no-op`,
+    };
+  }
+
+  // Key file does not exist — create a new one
+  let keypair: { privateKeyHex: string; publicKeyMultibase: string };
+  try {
+    keypair = await generateKeypair();
+  } catch (err) {
+    return fail("passport.key.ensure", [
+      `PKE-02: Key generation failed: ${(err as Error).message}`,
+    ]);
+  }
+
+  const newKey = {
+    version: "v1",
+    active: true,
+    type: "Ed25519VerificationKey2020" as const,
+    publicKeyMultibase: keypair.publicKeyMultibase,
+    createdAt: new Date().toISOString(),
+  };
+
+  const keyFile = {
+    schemaVersion: "1.0" as const,
+    appId: manifest.app,
+    keys: [newKey],
+  };
+
+  try {
+    await mkdir(dirname(publicKeyFilePath), { recursive: true });
+    await writeFile(publicKeyFilePath, JSON.stringify(keyFile, null, 2), "utf8");
+  } catch (err) {
+    return fail("passport.key.ensure", [
+      `PKE-02: Could not write public key file: ${(err as Error).message}`,
+    ]);
+  }
+
+  // If --private-key-out is provided, write the private key to that path
+  const privateKeyOut = input.flags["private-key-out"];
+  let privateKeyWrittenTo: string | undefined;
+
+  if (typeof privateKeyOut === "string" && privateKeyOut.length > 0) {
+    try {
+      await mkdir(dirname(privateKeyOut), { recursive: true });
+      await writeFile(privateKeyOut, keypair.privateKeyHex, "utf8");
+      await chmod(privateKeyOut, 0o600);
+      privateKeyWrittenTo = privateKeyOut;
+    } catch (err) {
+      return fail("passport.key.ensure", [
+        `PKE-04: Could not write private key to ${privateKeyOut}: ${(err as Error).message}`,
+      ]);
+    }
+  }
+
+  return {
+    data: {
+      command: "passport.key.ensure",
+      status: "pass",
+      violations: [],
+      created: true,
+      version: "v1",
+      publicKeyFilePath,
+      privateKeyWrittenTo,
+    },
+    exitCode: 0,
+    summary: privateKeyWrittenTo
+      ? `passport key created (v1) — private key written to ${privateKeyWrittenTo}`
+      : "passport key created (v1)",
+  };
 }
 
 // ---------------------------------------------------------------------------

@@ -48,7 +48,7 @@ export type { KeyRotateOptions, KeyRotateResult } from "./key-rotate.ts";
 
 export { loadPassportData } from "./data.ts";
 
-export { signBytes, verifyBytes } from "./sign.ts";
+export { signBytes, verifyBytes, generateKeypair } from "./sign.ts";
 
 export {
   identityCredentialBytes,

@@ -19,6 +19,7 @@ import {
   runPassportEmit,
   runPassportVerify,
   runPassportKeyRotate,
+  runPassportKeyEnsure,
   runStarMapRender,
   runNebulaScoreCompute,
   runPulsarHeartbeat,
@@ -154,6 +155,24 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     writes: ["<app>/public/.well-known/cosmic-passport-key.json"],
     cacheable: false,
     execute: runPassportKeyRotate,
+  },
+  {
+    name: "passport.key.ensure",
+    description:
+      "Ensure public/.well-known/cosmic-passport-key.json exists. Creates a new Ed25519 keypair if missing (no-op if exists). Never prints private key to stdout (RFC-0605).",
+    scope: "app",
+    flags: {
+      "private-key-out": {
+        kind: "string",
+        description:
+          "File path to write the private key to (only when a new key is created). File is created with 0600 permissions.",
+      },
+    },
+    supportsAllSites: false,
+    mutatesState: true,
+    writes: ["<app>/public/.well-known/cosmic-passport-key.json"],
+    cacheable: false,
+    execute: runPassportKeyEnsure,
   },
   {
     name: "pulsar.heartbeat",
