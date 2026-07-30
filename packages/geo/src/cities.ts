@@ -18,6 +18,9 @@ import type { City as CSCCity } from "@tansuasici/country-state-city";
 import { citySlug } from "./slug.ts";
 import type { GeoCity, GeoOverrides } from "./types.ts";
 
+// Load CJS build via createRequire — the ESM build (index.node.mjs) uses
+// __dirname at line 103, which is undefined in ESM context, causing
+// ReferenceError before reaching fallback paths. ADR-0009.
 const cscRequire = createRequire(import.meta.url);
 const { CountryStateCity } = cscRequire("@tansuasici/country-state-city") as {
   CountryStateCity: {
@@ -36,7 +39,7 @@ export function buildCityCatalog(
   const primaryLang = langs[0] ?? "de";
   const country = CountryStateCity.getCountryByIso2(countryAlpha2);
   if (!country) return [];
-  const raw = CountryStateCity.getCitiesByCountryId(country.id) as CSCCity[];
+  const raw = CountryStateCity.getCitiesByCountryId(country.id);
   const cities: GeoCity[] = [];
   for (const city of raw) {
     if (!city.stateCode) continue;
