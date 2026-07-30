@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0260: register kernel.flags.lint (typed kernel command flag schema governance).</item>
   <item>RFC-0261: register check.fixture.lint (fixture coverage ratchet for *.validate/*.lint commands).</item>
+  <item>RFC-0610: register command.args.validate (flag-only argument pattern enforcement).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -48,6 +49,7 @@ import { runWarningDiagnosticsLint } from "../warning-diagnostics-lint.ts";
 import { runKernelFlagsLint } from "../kernel-flags-lint.ts";
 import { runKernelIoLint } from "../kernel-io-lint.ts";
 import { runCheckFixtureLint } from "../check-fixture-lint.ts";
+import { runCommandArgsValidate } from "../command-args-validate.ts";
 import { runPipelineLogHygieneValidate } from "../pipeline/pipeline-log-hygiene.ts";
 import { runSchemaDriftValidate } from "../schema-drift.ts";
 import { runContentTypesValidate } from "../content-types.ts";
@@ -198,6 +200,22 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     },
     reads: ["packages/os/site-kernel-checks/src/**/*.ts", "packages/os/site-kernel/src/**/*.ts"],
     execute: runKernelIoLint,
+  },
+  /* RFC-0610 */
+  {
+    name: "command.args.validate",
+    description:
+      "RFC-0610: statically analyze command registrations and handler source code for flag-only argument compliance. ARG-COMPLIANCE-01: handler reads removed input.args field. ARG-COMPLIANCE-02: command registered with empty flags but handler reads named flag. ARG-COMPLIANCE-03: handler uses dual-path fallback with input.args[0].",
+    scope: "workspace",
+    supportsAllSites: true,
+    cacheable: false,
+    flags: {},
+    reads: [
+      "packages/forge/os/**/*.ts",
+      "packages/os/site-kernel-checks/src/command-tables/*.ts",
+      "packages/os/site-kernel-*/src/**/*.ts",
+    ],
+    execute: runCommandArgsValidate,
   },
   /* RFC-0261 */
   {
@@ -438,7 +456,9 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     description:
       "Validate that apps use @warpgogol/share utilities instead of re-implementing them locally. Per RFC-0037: allows astro:content imports in @warpgogol/share.",
     scope: "workspace",
-    flags: {},
+    flags: {
+      app: { kind: "string", description: "Target a specific app by name." },
+    },
     supportsAllSites: true,
     reads: ["<app>/src/**/*.ts", "<app>/src/**/*.tsx", "packages/share/src/**/*.ts"],
     execute: runShareUtilityLint,
@@ -449,7 +469,9 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     description:
       "Validate i18n configuration in src/content/assets/system.md. Checks default language, supported languages, and orphan content files (RFC-0038).",
     scope: "workspace",
-    flags: {},
+    flags: {
+      app: { kind: "string", description: "Target a specific app by name." },
+    },
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md"],
     execute: runI18nConfigValidate,
