@@ -13,6 +13,7 @@
   <item>RFC-0522: resolve releaseId with flag→manifest precedence; add warnings[] to CloseReport.</item>
   <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
+  <item>RFC-0593: add mission.validate inline gate before lock acquisition; re-check state inside locks.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -35,6 +36,10 @@ import {
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty } from "./mission-git-commit.ts";
 import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
+import {
+  runMissionValidate,
+  type MissionValidateData,
+} from "./mission-materialization-commands.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
@@ -79,6 +84,30 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
   return typeof v === "string" ? v : undefined;
 }
 
+async function runInlineValidate(
+  workspaceRoot: string,
+  missionId: string,
+  context: KernelRuntimeContext,
+): Promise<{ passed: boolean; failures: string[]; report: MissionValidateData | null }> {
+  const syntheticInput: KernelCommandInput = { argv: [], args: [], flags: { mission: missionId } };
+  const result = await runMissionValidate(syntheticInput, context);
+  if (result.exitCode === 0) {
+    return { passed: true, failures: [], report: result.data ?? null };
+  }
+  const failures: string[] = [];
+  if (result.data?.contractFull?.validators) {
+    for (const v of result.data.contractFull.validators) {
+      if (v.status === "fail") {
+        failures.push(`${v.name}: exit code ${v.exitCode}`);
+      }
+    }
+  }
+  if (failures.length === 0 && result.summary) {
+    failures.push(result.summary);
+  }
+  return { passed: false, failures, report: result.data ?? null };
+}
+
 function gitExec(cwd: string, args: string): string {
   return execSync(`git ${args}`, {
     cwd,
@@ -116,6 +145,17 @@ export async function runMissionClose(
     );
   }
 
+  // RFC-0593: inline validation gate — run mission.validate before acquiring locks.
+  // This avoids holding registry/system/mission locks for 2+ minutes during the build.
+  // State is re-checked inside the lock after validation passes.
+  const validationCheck = await runInlineValidate(workspaceRoot, missionId, context);
+  if (!validationCheck.passed) {
+    const failureLines = validationCheck.failures.map((f) => `  ${f}`).join("\n");
+    throw new Error(
+      `[mission.close] validation failed for mission '${missionId}' — fix issues and re-run mission.validate\n${failureLines}`,
+    );
+  }
+
   await acquireLock(workspaceRoot, "registry", manifest.operationId, "mission.close", actor);
   await acquireLock(
     workspaceRoot,
@@ -133,6 +173,15 @@ export async function runMissionClose(
   );
 
   try {
+    // RFC-0593: re-read manifest inside lock and re-check state — between out-of-lock
+    // validation and lock acquisition, another process could have aborted the mission.
+    const lockedManifest = await readMissionManifest(workspaceRoot, missionId);
+    if (lockedManifest.state !== "open") {
+      throw new Error(
+        `[mission.close] mission '${missionId}' state changed to '${lockedManifest.state}' during validation — aborting close`,
+      );
+    }
+
     const now = new Date().toISOString();
 
     // RFC-0480: create git bundle from workpiece as audit artifact
