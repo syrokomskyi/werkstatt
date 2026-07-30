@@ -86,7 +86,7 @@
   }
 
   .open-source-registry__components details {
-    margin-top: var(--ds-space-3);
+    margin: var(--ds-space-6) 0 var(--ds-space-3);
   }
 
   .open-source-registry__components details > summary {
@@ -102,6 +102,7 @@
     display: inline;
     font-size: var(--ds-font-size-lg);
     font-weight: 600;
+    margin: 0;
   }
 
   .open-source-registry__components details > summary > h3::before {
