@@ -343,21 +343,21 @@ The `KERNEL-ARG-01` diagnostic is emitted in the standard `Diagnostic[]` array r
 
 ## Acceptance criteria
 
-- [ ] `KernelCommandInput` in `packages/os/site-kernel/src/types.ts` no longer has an `args` field
-- [ ] `resolveCommandFlags` in `packages/os/site-kernel/src/runtime/argv.ts` emits `KERNEL-ARG-01` for positional tokens and does not return `args`
-- [ ] `rfc.validate` accepts `--id RFC-0609` and rejects `RFC-0609` (positional) with KERNEL-ARG-01
-- [ ] `adr.validate` accepts `--id ADR-0003` and rejects positional
-- [ ] `session.validate` accepts `--id` flag
-- [ ] `rfc.command-lifecycle.validate`, `rfc.graph`, `rfc.pipeline.status` accept `--id` flag
-- [ ] `forge.create` accepts `--name` flag and rejects positional
-- [ ] All 15 dual-path and positional-only handlers in `site-kernel-checks`, `site-kernel-handoff`, and `site-kernel-codegen` no longer read `input.args[0]`
-- [ ] `forge.yaml` binding templates for `validateRfc`, `validateAdr`, `specValidate` use flag format
-- [ ] All `.agents/skills/fo/*/SKILL.md` files that reference positional command invocations are updated
-- [ ] `ForgeCommandInput` in `packages/forge/src/types.ts` no longer has an `args` field
-- [ ] `parseKernelArgv` no longer returns `args`; returns `{ argv, flags, diagnostics }`
-- [ ] Unit tests for `KERNEL-ARG-01` diagnostic in `packages/os/site-kernel/src/tests/` (positional token rejected, fix hint correct)
-- [ ] `rfc.validate` passes on this file
-- [ ] All affected packages pass `build:check` (typecheck)
+- [x] `KernelCommandInput` in `packages/os/site-kernel/src/types.ts` no longer has an `args` field (evidence: packages/os/site-kernel/src/types.ts:68-71, `pnpm --filter @warpgogol/site-kernel run build:check`)
+- [x] `resolveCommandFlags` in `packages/os/site-kernel/src/runtime/argv.ts` emits `KERNEL-ARG-01` for positional tokens and does not return `args` (evidence: packages/os/site-kernel/src/runtime/argv.ts:195-244, src/tests/flags.test.ts:49-51)
+- [x] `rfc.validate` accepts `--id RFC-0609` and rejects `RFC-0609` (positional) with KERNEL-ARG-01 (evidence: packages/forge/os/rfc/handlers/validate.ts:40, `pnpm exec site-kernel run rfc.validate --id RFC-0609 --json` passes)
+- [x] `adr.validate` accepts `--id ADR-0003` and rejects positional (evidence: packages/forge/os/adr/handlers/validate.ts:53)
+- [x] `session.validate` accepts `--id` flag (evidence: packages/forge/os/session/handlers/validate.ts:62)
+- [x] `rfc.command-lifecycle.validate`, `rfc.graph`, `rfc.pipeline.status` accept `--id` flag (evidence: packages/forge/os/rfc/handlers/lifecycle.ts:190, index-graph.ts:101, pipeline-status.ts:87)
+- [x] `forge.create` accepts `--name` flag and rejects positional (evidence: packages/forge/src/onboarding/create.ts:51)
+- [x] All 15 dual-path and positional-only handlers in `site-kernel-checks`, `site-kernel-handoff`, and `site-kernel-codegen` no longer read `input.args[0]` (evidence: `grep -r 'input\.args' packages/os/` returns zero results in handler source)
+- [x] `forge.yaml` binding templates for `validateRfc`, `validateAdr`, `specValidate` use flag format (evidence: forge.yaml:20-21, packages/forge/src/config/forge-config.ts:188-189)
+- [x] All `.agents/skills/fo/*/SKILL.md` files that reference positional command invocations are updated (evidence: `grep -r 'rfc\.validate [A-Z]\|adr\.validate [A-Z]' .agents/skills/` returns zero results)
+- [x] `ForgeCommandInput` in `packages/forge/src/types.ts` no longer has an `args` field (evidence: packages/forge/src/types.ts:23-26, `pnpm --filter @warpgogol/forge run build:check`)
+- [x] `parseKernelArgv` no longer returns `args`; returns `{ argv, flags, diagnostics }` (evidence: packages/os/site-kernel/src/runtime/argv.ts:95-124, src/tests/runtime.test.ts:48-53)
+- [x] Unit tests for `KERNEL-ARG-01` diagnostic in `packages/os/site-kernel/src/tests/` (positional token rejected, fix hint correct) (evidence: src/tests/flags.test.ts:49-51,105-108,141-146,151-155, `pnpm --filter @warpgogol/site-kernel run test` — 191 tests pass)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0609 --json` — ok: true)
+- [x] All affected packages pass `build:check` (typecheck) (evidence: `pnpm --filter @warpgogol/site-kernel run build:check`, `pnpm --filter @warpgogol/forge run build:check`, `pnpm --filter @warpgogol/site-kernel-checks run build:check`, `pnpm --filter @warpgogol/site-kernel-handoff run build:check`, `pnpm --filter @warpgogol/site-kernel-codegen run build:check`, `pnpm --filter @warpgogol/site-kernel-audit run build:check` — all pass)
 
 ## Implementation notes for agents
 
