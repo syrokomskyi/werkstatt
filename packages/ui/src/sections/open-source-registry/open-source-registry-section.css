@@ -44,11 +44,19 @@
     margin: 0 0 var(--ds-space-1);
   }
 
-  .open-source-registry__summary-item dd,
-  .open-source-registry__deployment-item dd {
+  .open-source-registry__summary-item dd {
     font-size: var(--ds-font-size-xl);
     font-weight: 600;
     margin: 0;
+  }
+
+  .open-source-registry__deployment-item dd {
+    font-family: var(--ds-font-mono);
+    font-size: var(--ds-text-xs);
+    font-weight: 500;
+    margin: 0;
+    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   .open-source-registry__license-list {
