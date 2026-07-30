@@ -222,18 +222,18 @@ function verifyRedirectRoute(
 
 ## Acceptance criteria
 
-- [ ] `behavior.snapshot.capture` detects HTML redirect pages (meta-refresh) and sets `contentHash: null` + `redirectTarget`
-- [ ] `behavior.snapshot.generate` excludes meta-refresh redirect stubs from the golden snapshot (redirect stubs are not real content routes)
-- [ ] `RouteFact` moved to `@warpgogol/ontology/operations/leitstand.ts` with `contentHash: string | null` and optional `redirectTarget`
-- [ ] Health check skips content-hash comparison for routes with `contentHash: null`
-- [ ] Health check verifies HTTP 307/308 status for redirect routes
-- [ ] Health check verifies `Location` header matches `redirectTarget` when `redirectTarget` is known
-- [ ] Non-redirect routes are unaffected — content-hash comparison works as before
-- [ ] Unit tests cover: redirect page detection, redirect health check (307 pass, 200 fail), non-redirect route unaffected, multi-hop redirect target extraction
-- [ ] `rfc.validate` passes on this file
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test` passes
-- [ ] `pnpm --filter @warpgogol/ontology build:check` passes
+- [x] `behavior.snapshot.capture` detects HTML redirect pages (meta-refresh) and sets `contentHash: null` + `redirectTarget` (evidence: `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot-commands.ts:84-91` — `isHtmlRedirectPage` + `extractRedirectTarget`)
+- [x] `behavior.snapshot.generate` excludes meta-refresh redirect stubs from the golden snapshot (redirect stubs are not real content routes) (evidence: `packages/os/site-kernel-checks/src/behavior-snapshot.ts:263` — `if (isHtmlRedirectPage(html)) continue`)
+- [x] `RouteFact` moved to `@warpgogol/ontology/operations/leitstand.ts` with `contentHash: string | null` and optional `redirectTarget` (evidence: `packages/ontology/src/operations/leitstand.ts:72-78` — `routeFactSchema`)
+- [x] Health check skips content-hash comparison for routes with `contentHash: null` (evidence: `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:262` — `if (route.contentHash === null)` branch with `continue`)
+- [x] Health check verifies HTTP 307/308 status for redirect routes (evidence: `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:278` — `isRedirectStatus = response.status === 307 || response.status === 308`)
+- [x] Health check verifies `Location` header matches `redirectTarget` when `redirectTarget` is known (evidence: `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:280-281` — `targetKnown` + `locationMatches`)
+- [x] Non-redirect routes are unaffected — content-hash comparison works as before (evidence: `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:330-345` — `if (route.contentHash)` branch unchanged)
+- [x] Unit tests cover: redirect page detection, redirect health check (307 pass, 200 fail), non-redirect route unaffected, multi-hop redirect target extraction (evidence: `packages/os/site-kernel-handoff/src/behavior-snapshot/behavior-snapshot.test.ts:104-149`, `packages/share/src/redirects.test.ts:1-65`)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate RFC-0595 --json` exit 0, 1 warning V-30 non-blocking)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes (evidence: exit 0, `tsc --noEmit` clean)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test` passes (evidence: 87 test files, 369 tests passed)
+- [x] `pnpm --filter @warpgogol/ontology build:check` passes (evidence: exit 0, `tsc --noEmit` clean)
 
 ## Implementation notes for agents
 
