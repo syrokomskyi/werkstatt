@@ -198,7 +198,7 @@ Rules:
 
 - **Platform-scope changes MUST use `ecosystem.commit`** (RFC-0533). The command atomically bumps `package.json` version, computes the platform semantic hash, writes `docs/platform-version-log.generated.yaml`, and commits with `X-Platform-Bump` / `X-Platform-Version` / `X-RFC` trailers. Direct `git commit` for platform scope is blocked by the pre-commit hook (`hooks/pre-commit`) and enforced by PC-04 in `platform.consistency.validate`.
 - Commit only files changed in the current session. Check `git status` and `git diff` before committing to exclude changes from other sessions or agents.
-- `mission.git.commit` stages all workpiece changes (`git add -A`) and commits with a structured audit-trail message.
+- `mission.git.commit` stages all workpiece changes (`git add -A`) and commits with a structured audit-trail message. RFC-0594: it also runs targeted content validators (`pbp.content.validate`, `semantic.drift.validate`, `faq.validate`) based on changed file paths before committing — invalid content is refused with exit code 1.
 - Direct `git commit` in the workpiece is discouraged but not technically prevented.
 - `mission.reconcile` and `mission.close` block if the workpiece has uncommitted changes — run `mission.git.commit` first.
 - `mission.validate` warns (non-blocking) if the workpiece is dirty after validation — commit generated artifacts too.
