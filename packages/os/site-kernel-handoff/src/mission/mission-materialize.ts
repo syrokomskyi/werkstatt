@@ -17,6 +17,7 @@
   <item>RFC-0568: replace git init with git clone from cache clone; stage only data paths in materialize commit (DNA-44 compliance).</item>
   <item>Run pnpm install after atomicMoveDir to link workpiece workspace deps before build.prepare (fixes workpiece.imports.validate failure on fresh workpiece).</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml, pnpm-lock.yaml) after writeMissionManifest.</item>
+  <item>RFC-0597: skip preflight on unchanged cache clone HEAD, run build.prepare.dev instead of build.prepare, warm .cache/video/ and .cache/video-live/ from cache clone.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -81,6 +82,11 @@ export interface MissionMaterializeData {
   capabilityDiff: { tier: "green" | "yellow" | "red"; items: Array<Record<string, unknown>> };
   regeneration: { regeneratedFiles: string[]; success: boolean };
   materializedAt: string;
+  preflightSkipped: boolean;
+  preflightSkipReason: string | null;
+  pipelineUsed: string;
+  mediaCacheWarmed: boolean;
+  mediaCacheSources: number;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -99,6 +105,17 @@ const STERNSYSTEM_DATA_PATHS = [
   "provenance",
   "behavior.snapshot.generated.yaml",
 ];
+
+// RFC-0597: Materialization state file interface
+interface MaterializationState {
+  systemId: string;
+  cacheCloneHead: string;
+  lastValidatedAt: string;
+  lastMissionId: string;
+}
+
+// RFC-0597: Media cache directories to persist across missions
+const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
 
 async function copyDir(src: string, dest: string): Promise<void> {
   if (!existsSync(src)) return;
@@ -642,9 +659,48 @@ export async function runMissionMaterialize(
           capabilityDiff: { tier: "green", items: [] },
           regeneration: { regeneratedFiles: [], success: true },
           materializedAt: new Date().toISOString(),
+          preflightSkipped: false,
+          preflightSkipReason: null,
+          pipelineUsed: "build.prepare.dev",
+          mediaCacheWarmed: false,
+          mediaCacheSources: 0,
         },
         summary: `[mission.materialize] ${missionId} report-only: ${verdict}`,
       };
+    }
+
+    // RFC-0597: Read materialization state file and determine if preflight can be skipped
+    let preflightSkipped = false;
+    let preflightSkipReason: string | null = null;
+
+    if (!skipPreflight) {
+      const stateFilePath = path.join(systemDir, ".materialization-state.json");
+      if (existsSync(stateFilePath)) {
+        try {
+          const stateRaw = await fs.readFile(stateFilePath, "utf8");
+          const state = JSON.parse(stateRaw) as MaterializationState;
+          // Get current cache clone HEAD
+          let currentHead: string | null = null;
+          try {
+            currentHead = execSync("git rev-parse HEAD", {
+              cwd: systemDir,
+              stdio: "pipe",
+              encoding: "utf-8",
+            }).trim();
+          } catch {
+            // HEAD cannot be resolved — fail safe, run preflight
+          }
+          if (currentHead && state.cacheCloneHead === currentHead) {
+            preflightSkipped = true;
+            preflightSkipReason = "cache-clone-head-unchanged";
+            logger.info(
+              `  Preflight skip: cache clone HEAD unchanged (${currentHead.slice(0, 12)})`,
+            );
+          }
+        } catch {
+          // Corrupt state file — fail safe, run preflight
+        }
+      }
     }
 
     // Stage Werkstück
@@ -724,6 +780,30 @@ export async function runMissionMaterialize(
       }
     }
 
+    // RFC-0597: Warm media cache from cache clone to workpiece after data-path copy
+    let mediaCacheWarmed = false;
+    let mediaCacheSources = 0;
+    for (const cacheDir of MEDIA_CACHE_DIRS) {
+      const srcCache = path.join(systemDir, cacheDir);
+      if (existsSync(srcCache)) {
+        const destCache = path.join(stagingDir, cacheDir);
+        try {
+          // Replace (not merge) — stale entries from failed runs do not persist
+          if (existsSync(destCache)) {
+            await fs.rm(destCache, { recursive: true, force: true });
+          }
+          await copyDir(srcCache, destCache);
+          mediaCacheWarmed = true;
+          mediaCacheSources++;
+          logger.info(`  Warmed ${cacheDir} from cache clone`);
+        } catch (err) {
+          logger.info(
+            `  Warning: failed to warm ${cacheDir} from cache clone: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
+    }
+
     // Generate full runtime boilerplate from onboarding templates and codegen generators (RFC-0389)
     const regeneratedFiles = await generateFullBoilerplate(
       stagingDir,
@@ -778,12 +858,11 @@ export async function runMissionMaterialize(
     // and independent-qa). Idempotent — skips if browsers are already present.
     await ensurePlaywrightChromium(workspaceRoot, logger);
 
-    // Run build.prepare pipeline to generate all derived artifacts
-    // (surface, sitemap, video/image variants, llms, feed, etc.)
-    logger.info(`  Running build.prepare pipeline for ${manifest.systemId}…`);
+    // RFC-0597: Run build.prepare.dev pipeline (codegen-only) instead of build.prepare.full
+    logger.info(`  Running build.prepare.dev pipeline for ${manifest.systemId}…`);
     const prepareResult = await executeKernelPipeline({
       workspaceRoot,
-      pipelineName: "build.prepare",
+      pipelineName: "build.prepare.dev",
       siteName: manifest.systemId,
       outputFormat: "pretty",
     });
@@ -803,16 +882,18 @@ export async function runMissionMaterialize(
     );
 
     // RFC-0517: preflight content quality gate — runs after atomicMoveDir, before git init
+    // RFC-0597: preflight is skipped if --skip-preflight flag is set OR state file HEAD matches
+    const effectiveSkipPreflight = skipPreflight || preflightSkipped;
     const preflightReport = await runPreflightGate(
       workspaceRoot,
       workpieceDir,
       manifest.systemId,
       missionId,
-      skipPreflight,
+      effectiveSkipPreflight,
       logger,
     );
 
-    // RFC-0517: append Bordbuch entry when preflight is skipped
+    // RFC-0517/RFC-0597: append Bordbuch entry when preflight is skipped
     if (skipPreflight) {
       await appendBordbuchEntry(
         workspaceRoot,
@@ -827,6 +908,20 @@ export async function runMissionMaterialize(
         },
       );
       logger.info(`  Bordbuch: preflight-skipped entry appended`);
+    } else if (preflightSkipped) {
+      await appendBordbuchEntry(
+        workspaceRoot,
+        manifest.systemId,
+        "preflight-skipped",
+        `Preflight content quality gate skipped — cache clone HEAD unchanged for mission ${missionId}`,
+        "agent",
+        {
+          writerRole: "mission",
+          missionId,
+          metadata: { reason: "cache-clone-head-unchanged" },
+        },
+      );
+      logger.info(`  Bordbuch: preflight-skipped entry appended (cache-clone-head-unchanged)`);
     }
 
     // RFC-0568: Clone-based materialization — git commit with data-only staging.
@@ -902,6 +997,11 @@ export async function runMissionMaterialize(
         passed: prepareReport.steps.filter((s) => s.ok).length,
         failed: prepareReport.steps.filter((s) => !s.ok).length,
       },
+      preflightSkipped,
+      preflightSkipReason: skipPreflight ? "operator-override" : preflightSkipReason,
+      pipelineUsed: "build.prepare.dev",
+      mediaCacheWarmed,
+      mediaCacheSources,
       materializedAt: now,
     };
     await atomicWriteFile(

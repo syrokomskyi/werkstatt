@@ -14,6 +14,7 @@
   <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
   <item>RFC-0593: add mission.validate inline gate before lock acquisition; re-check state inside locks.</item>
+  <item>RFC-0597: write .materialization-state.json and copy .cache/ from workpiece to cache clone as final step.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -43,6 +44,23 @@ import {
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
+
+// RFC-0597: Media cache directories to persist across missions
+const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
+
+async function copyDirRecursive(src: string, dest: string): Promise<void> {
+  await fs.mkdir(dest, { recursive: true });
+  const entries = await fs.readdir(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      await copyDirRecursive(srcPath, destPath);
+    } else {
+      await fs.copyFile(srcPath, destPath);
+    }
+  }
+}
 
 export interface CloseReportGit {
   commitSha: string | null;
@@ -123,7 +141,7 @@ export async function runMissionClose(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<MissionCloseData>> {
-  const { workspaceRoot } = context;
+  const { workspaceRoot, logger } = context;
   const missionId = flagString(input, "mission");
   const actor = resolveActor(input);
   const releaseIdFlag = flagString(input, "release");
@@ -345,6 +363,66 @@ export async function runMissionClose(
       [path.join("systems", "registry.yaml"), path.join("missions", missionId, "mission.yaml")],
       `werkstatt: mission.close ${missionId}`,
     );
+
+    // RFC-0597: Write materialization state file and copy .cache/ to cache clone.
+    // This is the FINAL step — only executed after the close has succeeded (bundle created,
+    // bordbuch committed, state transitioned to closed). If close failed midway, no state
+    // file is written — next materialization runs full preflight (safe fallback).
+    try {
+      const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+      // Get current cache clone HEAD
+      let cacheCloneHead: string | null = null;
+      try {
+        cacheCloneHead = execSync("git rev-parse HEAD", {
+          cwd: systemDir,
+          stdio: "pipe",
+          encoding: "utf-8",
+        }).trim();
+      } catch {
+        // cache clone HEAD cannot be resolved — skip state file write
+      }
+      if (cacheCloneHead) {
+        const stateFile = {
+          systemId: manifest.systemId,
+          cacheCloneHead,
+          lastValidatedAt: now,
+          lastMissionId: missionId,
+        };
+        await atomicWriteFile(
+          path.join(systemDir, ".materialization-state.json"),
+          JSON.stringify(stateFile, null, 2) + "\n",
+        );
+        logger.info(`  Wrote .materialization-state.json (HEAD: ${cacheCloneHead.slice(0, 12)})`);
+      }
+
+      // Copy .cache/video/ and .cache/video-live/ from workpiece to cache clone
+      const workpieceDir = path.join(missionDir, "workpiece");
+      for (const cacheDir of MEDIA_CACHE_DIRS) {
+        const srcCache = path.join(workpieceDir, cacheDir);
+        if (existsSync(srcCache)) {
+          const destCache = path.join(systemDir, cacheDir);
+          try {
+            // Replace (not merge) — clean copy from workpiece
+            if (existsSync(destCache)) {
+              await fs.rm(destCache, { recursive: true, force: true });
+            }
+            // Ensure parent directory exists
+            await fs.mkdir(path.dirname(destCache), { recursive: true });
+            // Copy recursively
+            await copyDirRecursive(srcCache, destCache);
+            logger.info(`  Copied ${cacheDir} from workpiece to cache clone`);
+          } catch (err) {
+            logger.info(
+              `  Warning: failed to copy ${cacheDir} to cache clone: ${err instanceof Error ? err.message : String(err)}`,
+            );
+          }
+        }
+      }
+    } catch (err) {
+      logger.info(
+        `  Warning: failed to write materialization state or copy .cache/: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
 
     return {
       data: {
