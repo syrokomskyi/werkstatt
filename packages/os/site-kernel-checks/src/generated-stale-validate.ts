@@ -17,6 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0600: initial implementation.</item>
+  <item>RFC-0600: review fix — extract STALE_MESSAGE constant, validate preview path segment count.</item>
 </CHANGE_SUMMARY>
 */
 import { join, relative, basename } from "node:path";
