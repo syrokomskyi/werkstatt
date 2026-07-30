@@ -176,14 +176,14 @@ The `--json` output shape is unchanged from RFC-0584. The `autoResolvedPaths` fi
 
 ## Acceptance criteria
 
-- [ ] `isBordbuchPath` in `mission-materialization-commands.ts` matches both `bordbuch/` and `public/.well-known/bordbuch*` paths (evidence: unit test in `packages/os/site-kernel-handoff/src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts`)
-- [ ] `git checkout --ours` and `git add` commands use `conflictedPaths` dynamically, robust against partial bordbuch artifact sets (evidence: code inspection)
-- [ ] `mission.reconcile` auto-resolves delete/modify conflicts for `public/.well-known/bordbuch*` paths without manual intervention (evidence: unit test)
-- [ ] `mission.reconcile` still aborts on non-bordbuch conflicts (evidence: unit test)
-- [ ] Regression test covers both RFC-0584 `bordbuch/` and RFC-0614 `public/.well-known/bordbuch*` conflict scenarios (evidence: unit test)
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes with new tests (evidence: test output)
-- [ ] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0614 --json`)
-- [ ] RFC-0584 `amendedBy` field updated to include `RFC-0614` (evidence: `docs/rfcs/archive/implemented/rfc-0584-*.md` frontmatter)
+- [x] `isBordbuchPath` in `mission-materialization-commands.ts` matches both `bordbuch/` and `public/.well-known/bordbuch*` paths (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:789-790`, unit test `src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts` test cases 1-3)
+- [x] `git checkout --ours` and `git add` commands use `conflictedPaths` dynamically, robust against partial bordbuch artifact sets (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:796-806`, unit test test case 4 "partial bordbuch set")
+- [x] `mission.reconcile` auto-resolves delete/modify conflicts for `public/.well-known/bordbuch*` paths without manual intervention (evidence: unit test `src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts` test cases 2-3)
+- [x] `mission.reconcile` still aborts on non-bordbuch conflicts (evidence: unit test `src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts` test case 5 "mixed conflict")
+- [x] Regression test covers both RFC-0584 `bordbuch/` and RFC-0614 `public/.well-known/bordbuch*` conflict scenarios (evidence: unit test `src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts` test cases 1-3)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes with new tests (evidence: 412 tests passed, 96 test files, 0 failures)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0614 --json` — status: pass, violations: [])
+- [x] RFC-0584 `amendedBy` field updated to include `RFC-0614` (evidence: `docs/rfcs/archive/implemented/rfc-0584-auto-resolve-bordbuch-delete-modify-conflicts-in-mission-reconcile.md:25-26`)
 
 ## Implementation notes for agents
 
