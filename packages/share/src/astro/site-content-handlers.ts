@@ -161,6 +161,16 @@ const footerHandler: SiteContentHandler = async (ctx) => {
     label: target.label,
     semanticTarget: target.semanticTarget,
   }));
+  const transparencyIds = footer?.transparencyIds as string[] | undefined;
+  const filteredTransparencyTargets = transparencyIds?.length
+    ? transparencyIds
+        .map((id) => ctx.targets.find((target) => target.id === id))
+        .filter((target): target is NonNullable<typeof target> => target != null)
+    : [];
+  const transparencyLinks = filteredTransparencyTargets.map((target) => ({
+    label: target.label,
+    semanticTarget: target.semanticTarget,
+  }));
 
   return {
     qrAlt: footer?.qrAlt ?? "",
@@ -174,9 +184,12 @@ const footerHandler: SiteContentHandler = async (ctx) => {
       navigationTitle: "Navigation",
       legalTitle: "Legal",
       contactTitle: "Contact",
+      transparencyTitle: "Transparency",
     },
     navigationLinks,
     legalLinks,
+    transparencyIds,
+    transparencyLinks,
     disabledContactHref: footer?.disabledContactHref ?? "#",
     copyEmailAriaLabel: footer?.copyEmailAriaLabel ?? "Copy email address",
     copyEmailTitle: footer?.copyEmailTitle ?? "Copy email address",
