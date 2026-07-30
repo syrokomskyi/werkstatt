@@ -510,6 +510,13 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/preview-images.ts",
   },
+  // RFC-0603: per-page OG preview images.
+  {
+    path: "public/preview/{lang}/{slug}.png",
+    command: "preview.images.generate",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-checks/src/preview-images.ts",
+  },
 
   // RFC-0473: Bordbuch public projections (unified ledger, workspace-scoped).
   {
