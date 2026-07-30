@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 682. Raw manifest entries: 1230.
+Generated command rows: 683. Raw manifest entries: 1231.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -369,8 +369,9 @@ Generated command rows: 682. Raw manifest entries: 1230.
 | `legal.scaffold` | site:warpgogol-com, workspace | app | yes | no | Generate Impressum and Datenschutz page+prose stubs for every DE/AT/CH locale in system.md i18n.supported. Merges nav targets and footer.legalIds/contactIds into the per-locale labels.md. Idempotent. Reads identity.legal.* from system.md; missing fields land as NEED_THIS_<FIELD> placeholders (RFC-0096). |
 | `legal.translation.validate` | site:warpgogol-com, workspace | app | no | no | Validate the RFC-0174 binding-language policy: every page `translation` block is internally consistent (status enum, binding never disabled, mandatory notice on while a locale is unofficial, binding-language file present, disabled locales have a fallback). |
 | `leitstand.health` | workspace | workspace | no | no | Run health checks against a deployed channel (RFC-0379). Flags: --system, [--channel alt\|main]. |
-| `leitstand.propagate` | workspace | workspace | yes | no | Deploy a published release to a channel (RFC-0379). Flags: --release, [--channel alt\|main]. |
-| `leitstand.rollback` | workspace | workspace | yes | no | Rollback a channel to the previous published release (RFC-0379). Flags: --system, --channel alt\|main, [--to-release]. |
+| `leitstand.promote` | workspace | workspace | yes | no | Promote a verified alt-deployed release to the main channel with live build-identity verification (RFC-0608). Flags: --release. |
+| `leitstand.propagate` | workspace | workspace | yes | no | Deploy a published release to the alt channel (RFC-0608). Flags: --release. |
+| `leitstand.rollback` | workspace | workspace | yes | no | Rollback a channel to the previous published release (RFC-0379/RFC-0608). Transitions release state: main→rolled-back, alt→published. Flags: --system, --channel alt\|main, [--to-release]. |
 | `leitstand.status` | workspace | workspace | no | no | Print deployment state for both channels (RFC-0379). Flags: --system, [--channel alt\|main]. |
 | `lighthouse.budget.check` | site:warpgogol-com, workspace | app | no | no | Post-build Lighthouse performance budget check. |
 | `lighthouse.validate` | site:warpgogol-com, workspace | app | no | no | Performance lint that runs against source — heavy lighthouse runs live in postbuild. |

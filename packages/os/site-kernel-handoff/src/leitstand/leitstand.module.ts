@@ -83,7 +83,7 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.rollback",
         description:
-          "Rollback a channel to the previous published release (RFC-0379). Flags: --system, --channel alt|main, [--to-release].",
+          "Rollback a channel to the previous published release (RFC-0379/RFC-0608). Transitions release state: main→rolled-back, alt→published. Flags: --system, --channel alt|main, [--to-release].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,

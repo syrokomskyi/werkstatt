@@ -23,12 +23,14 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - `handoff.absorb` detects derived-file edits before materializing: if any manifest derived entry has a hash mismatch (edited after packing), it raises a decision record and refuses without `--force`. This check is in `derived-edits.ts` / `reportDerivedEdits`. Bundles currently pack only authored entries (no `derived` kind), so the path is wired but not exercised in the current pack format; it activates if future packs carry derived snapshot entries.
 - Keep every relative import in package source on the on-disk `.ts` extension, per RFC-0092.
 
-## Leitstand (RFC-0358 / RFC-0379)
+## Leitstand (RFC-0358 / RFC-0379 / RFC-0608)
 
 - The Leitstand deploys published releases via adapter plugins. The adapter enum is `cloudflare-workers | netlify | null`. `cloudflare-pages` and `vercel` are removed (forward-only).
 - The channel model defines `alt` (staging) and `main` (production) channels in `deployment.channels`. Each channel has `workerName`, `url`, and optional `secretsFile` (a secret reference, never a raw value).
 - `resolveAdapter` throws for any adapter name without a concrete implementation. Do not add fallback-to-null behavior.
-- `leitstand.propagate --channel main` is gated: `alt` must have a healthy propagation of the same release before promoting to `main`.
+- `leitstand.propagate` always deploys to the `alt` channel (RFC-0608). The `--channel` flag is removed; passing it throws with a message directing to `leitstand.promote`. On success, the release state transitions from `published` to `alt-deployed`.
+- `leitstand.promote` (RFC-0608) promotes a verified `alt-deployed` release to the `main` channel. It requires release state `alt-deployed`, fetches `/.well-known/build-identity.json` from the alt URL, verifies `releaseId`/`distTreeHash`/`behaviorSnapshotHash`/`siteContentHash` against the release manifest, runs live health checks against the alt deployment, then deploys to main via the adapter. On success, the release state transitions to `promoted`.
+- `leitstand.rollback` transitions release state after rollback: `main` channel → `rolled-back`, `alt` channel → `published` (back to pre-alt-deployment state). The state transition is non-fatal if the release manifest is missing.
 - Preflight checks verify: release manifest exists, channel is configured, secret reference syntax is valid, dist directory is present.
 - Health verification uses `@warpgogol/fingerprint` `hashHtml` to compute per-route content hashes from the behavior snapshot and compare them against live responses. Probe selection is deterministic (home, legal, sitemap, then remaining routes alphabetically, max 10 probes). Content mismatches always produce `unhealthy` verdict; only pure network failures produce `unknown`.
 - `deployment.lastPropagated` is per-channel with `releaseId`, `at`, `healthy`, `state`, `operationId`, and `leaseExpiresAt`. Only Leitstand command handlers write this field.
