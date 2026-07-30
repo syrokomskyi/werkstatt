@@ -10,6 +10,7 @@ colocated .astro filename.</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0598: created validator for colocated CSS import integrity.</item>
+  <item>RFC-0598: refactored per fo-review — extracted collectByExtension and isImportedBy helpers, removed dead code.</item>
 </CHANGE_SUMMARY>
 */
 
