@@ -756,7 +756,7 @@ export async function runMissionReconcile(
 
       // Merge with --no-ff to preserve all individual commits and create an explicit merge commit
       const mergeMessage = `reconcile mission ${missionId}`;
-      // RFC-0584: auto-resolve bordbuch/ delete-modify conflicts by keeping cache clone version
+      // RFC-0584, RFC-0614: auto-resolve bordbuch/ and public/.well-known/bordbuch* delete-modify conflicts by keeping cache clone version
       try {
         execSync(`git merge --no-ff FETCH_HEAD -m ${JSON.stringify(mergeMessage)}`, {
           cwd: systemDir,
@@ -793,22 +793,17 @@ export async function runMissionReconcile(
         if (allBordbuch) {
           // Auto-resolve: keep cache clone's bordbuch (ours)
           try {
-            execSync(
-              "git checkout --ours bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/",
-              {
-                cwd: systemDir,
-                stdio: "pipe",
-                encoding: "utf-8",
-              },
-            );
-            execSync(
-              "git add bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/",
-              {
-                cwd: systemDir,
-                stdio: "pipe",
-                encoding: "utf-8",
-              },
-            );
+            const pathArgs = conflictedPaths.map((p) => JSON.stringify(p)).join(" ");
+            execSync(`git checkout --ours -- ${pathArgs}`, {
+              cwd: systemDir,
+              stdio: "pipe",
+              encoding: "utf-8",
+            });
+            execSync(`git add -- ${pathArgs}`, {
+              cwd: systemDir,
+              stdio: "pipe",
+              encoding: "utf-8",
+            });
             execSync("git commit --no-edit", {
               cwd: systemDir,
               stdio: "pipe",
