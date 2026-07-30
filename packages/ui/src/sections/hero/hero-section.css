@@ -54,7 +54,6 @@
     color: var(--ds-color-hero-text);
     position: relative;
     padding-inline: var(--ds-size-section-padding-x);
-    padding-block-start: var(--ds-size-section-padding-y);
     max-width: min(var(--ds-size-container-max), var(--ds-size-section-content-max));
     margin-inline: auto;
     width: 100%;
