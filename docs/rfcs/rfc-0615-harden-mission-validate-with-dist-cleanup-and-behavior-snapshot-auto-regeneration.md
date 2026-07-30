@@ -1,7 +1,7 @@
 ---
 id: RFC-0615
 title: "Harden mission.validate with dist cleanup and behavior snapshot auto-regeneration"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
