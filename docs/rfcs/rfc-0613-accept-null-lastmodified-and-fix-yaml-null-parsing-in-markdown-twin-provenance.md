@@ -193,7 +193,7 @@ frontmatter[key] = stripped === "null" ? null : stripped;
 - **MDMETA-02**: Still fires for truly missing fields (not in frontmatter at all). Does NOT fire for `lastModified: null`.
 - **MDMETA-04**: Still fires for invalid date strings (e.g., `"2026-7-4"`). Does NOT fire for `lastModified: null`.
 - **MDMETA-04 with non-string lastModified**: If `lastModified` is a number or boolean (should not happen in well-formed frontmatter), the `typeof lastModified === "string"` guard prevents a false positive.
-- **Bare `null` vs quoted `"null"`**: The parser converts bare YAML `null` (unquoted) to JS `null` — this is the valid, deterministic value. Quoted `"null"` is parsed as the string `"null"`, which MDMETA-04 correctly rejects as an invalid date format. This distinction is intentional.
+- **Bare `null` vs quoted `"null"`**: The parser strips quotes before checking for `null`, so both bare YAML `null` (unquoted) and quoted `"null"` are converted to JS `null`. This is the valid, deterministic value. Invalid date strings (e.g., `"2026-7-4"`) are not affected by the null conversion and are rejected by MDMETA-04.
 - **Broad null conversion**: `parseMarkdownTwinFrontmatter` converts `"null"` to `null` for ALL fields, not just `lastModified`. This is safe because no other frontmatter field (canonical, contentHash, license, generator, sourceKind, semantic.*) can legitimately contain the string `"null"`.
 
 ## Rollout
@@ -210,19 +210,19 @@ frontmatter[key] = stripped === "null" ? null : stripped;
 
 ## Risks
 
-- **False negatives**: If `parseMarkdownTwinFrontmatter` is not fixed first, the validator will receive the string `"null"` instead of JS `null`, and MDMETA-04 will still fire. Both fixes must be applied together.
+- **False negatives**: If `parseMarkdownTwinFrontmatter` is not fixed first, the validator will receive the string `"null"` instead of JS `null` (for bare YAML `null`), and MDMETA-04 will still fire. Both fixes must be applied together.
 - **Agent confusion**: Agents may interpret `lastModified: null` as a missing field and try to fill in a date. The MDMETA-02 fix explicitly excludes `lastModified` from the null-check, but agents should be educated via AGENTS.md that `null` is intentional for generated files.
 - **Schema drift**: If a future RFC changes the `lastModified` field type, both the parser and validator must be updated in sync.
 
 ## Acceptance criteria
 
-- [ ] `parseMarkdownTwinFrontmatter` in `packages/share/src/semantic/markdown-twin-provenance.ts` parses YAML `null` as JS `null` (evidence: unit test in `packages/share/src/tests/markdown-twin-provenance.test.ts`)
-- [ ] `page.markdown.validate` accepts `lastModified: null` without MDMETA-02 error (evidence: unit test in `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts`)
-- [ ] `page.markdown.validate` accepts `lastModified: null` without MDMETA-04 error (evidence: unit test in `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts`)
-- [ ] `page.markdown.validate` still rejects invalid date strings with MDMETA-04 (evidence: unit test)
-- [ ] `pnpm --filter @warpgogol/share test -- --run` passes (evidence: test output)
-- [ ] `pnpm --filter @warpgogol/site-kernel-checks test -- --run` passes (evidence: test output)
-- [ ] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0613 --json`)
+- [x] `parseMarkdownTwinFrontmatter` in `packages/share/src/semantic/markdown-twin-provenance.ts` parses YAML `null` as JS `null` (evidence: `packages/share/src/tests/markdown-twin-provenance.test.ts:25-30` — bare null test, `packages/share/src/tests/markdown-twin-provenance.test.ts:33-38` — quoted null test)
+- [x] `page.markdown.validate` accepts `lastModified: null` without MDMETA-02 error (evidence: `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts:111-130` — null accepted, exitCode 0)
+- [x] `page.markdown.validate` accepts `lastModified: null` without MDMETA-04 error (evidence: `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts:111-130` — null accepted, exitCode 0)
+- [x] `page.markdown.validate` still rejects invalid date strings with MDMETA-04 (evidence: `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts:148-165` — `"2026-7-4"` rejected with MDMETA-04, exitCode 1)
+- [x] `pnpm --filter @warpgogol/share test` passes (evidence: 30 test files, 265 tests passed, including 8 new tests in `markdown-twin-provenance.test.ts`)
+- [x] `pnpm --filter @warpgogol/site-kernel-checks test` passes (evidence: 111 test files, 674 tests passed, including 5 new tests in `page-markdown.test.ts`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0613 --json` — status: pass, violations: [], exitCode: 0)
 
 ## Implementation notes for agents
 
