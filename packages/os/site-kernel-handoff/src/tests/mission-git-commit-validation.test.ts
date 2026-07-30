@@ -72,7 +72,6 @@ afterEach(() => {
 test("no content files changed — no validators run", async () => {
   const { runPreCommitValidation } = await import("../mission/mission-git-commit.ts");
   const result = await runPreCommitValidation(
-    tmpWorkspace,
     ["astro.config.mjs", "package.json"],
     "test-system",
     tmpWorkspace,
@@ -89,7 +88,6 @@ test("prefix matching — business-profile and pages trigger correct validators"
     "semantic.drift.validate": { ok: true, exitCode: 0, summary: "pass" },
   };
   const result = await runPreCommitValidation(
-    tmpWorkspace,
     ["src/content/business-profile/de/offerings/automation.md", "src/content/pages/de/index.md"],
     "test-system",
     tmpWorkspace,
@@ -104,7 +102,6 @@ test("unregistered validator — skipped with warning, commit proceeds", async (
   const { runPreCommitValidation } = await import("../mission/mission-git-commit.ts");
   mockState.throwNotRegistered = "faq.validate";
   const result = await runPreCommitValidation(
-    tmpWorkspace,
     ["src/content/faq/de/general.md"],
     "test-system",
     tmpWorkspace,
@@ -124,7 +121,6 @@ test("validator fails — passed is false, failure recorded with files", async (
     },
   };
   const result = await runPreCommitValidation(
-    tmpWorkspace,
     ["src/content/business-profile/de/offerings/automation.md"],
     "test-system",
     tmpWorkspace,

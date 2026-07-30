@@ -78,7 +78,6 @@ function selectValidators(changedFiles: string[]): string[] {
 }
 
 export async function runPreCommitValidation(
-  workpieceDir: string,
   changedFiles: string[],
   systemId: string,
   workspaceRoot: string,
@@ -377,7 +376,6 @@ export async function runMissionGitCommit(
   // RFC-0594: run targeted content validators based on changed file paths
   const dirtyResult = isWorkpieceDirty(workpieceDir);
   const preCommitValidation = await runPreCommitValidation(
-    workpieceDir,
     dirtyResult.files,
     manifest.systemId,
     workspaceRoot,
