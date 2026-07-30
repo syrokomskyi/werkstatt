@@ -4,6 +4,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0588: initial behavior snapshot redirect exclusion tests.</item>
+  <item>RFC-0592: update wildcard matching test for /de directory root (now matches /de/*).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,11 +26,11 @@ afterEach(() => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test("isRouteRedirected: /de/* wildcard matches /de/agb, /de/agb/terms, /de/", () => {
+test("isRouteRedirected: /de/* wildcard matches /de, /de/agb, /de/agb/terms, /de/", () => {
   const rules = parseRedirectRules("/de/* / 308");
+  expect(isRouteRedirected("/de", rules)).toBe(true);
   expect(isRouteRedirected("/de/agb", rules)).toBe(true);
   expect(isRouteRedirected("/de/agb/terms", rules)).toBe(true);
-  expect(isRouteRedirected("/de", rules)).toBe(false);
   expect(isRouteRedirected("/agb", rules)).toBe(false);
 });
 

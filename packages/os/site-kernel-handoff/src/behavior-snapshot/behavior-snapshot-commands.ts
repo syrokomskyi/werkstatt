@@ -10,6 +10,7 @@
   <item>RFC-0379: add per-route contentHash via @warpgogol/fingerprint HTML normalization.</item>
   <item>RFC-0585: return full snapshot wrapper from capture so release.prepare can write it to disk for diff.</item>
   <item>RFC-0588: exclude redirected routes (301, 308) from snapshot via _redirects parsing.</item>
+  <item>RFC-0592: fix wildcard matching so /de/* matches /de (directory root without trailing slash).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -66,7 +67,7 @@ export function isRouteRedirected(routePath: string, rules: RedirectRule[]): boo
   return rules.some((rule) => {
     if (rule.status !== 301 && rule.status !== 308) return false;
     const escaped = rule.from.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
-    const pattern = escaped.replace(/\*/g, ".*");
+    const pattern = escaped.replace(/\/\*$/, "(/.*)?$").replace(/\*/g, ".*");
     const regex = new RegExp(`^${pattern}$`);
     return regex.test(routePath);
   });
