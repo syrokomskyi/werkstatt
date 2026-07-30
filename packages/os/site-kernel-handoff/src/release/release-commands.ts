@@ -575,7 +575,7 @@ export async function runReleasePublish(
     // RFC-0596: Store artifact BEFORE state transition (eliminates partial failure)
     // release.publish already holds release:${releaseId} and system:${systemId} locks,
     // so we call the lock-free core directly — not runArtifactStorePut which would deadlock.
-    const distDir = path.join(releaseDir, "dist");
+    // distDir was already declared and validated above (RFC-0585 check).
     const artifactResult = await storeArtifactCore(workspaceRoot, releaseId, distDir, systemId);
 
     // Update manifest with artifact reference and state transition in a single write
@@ -674,7 +674,11 @@ export async function runReleaseValidate(
       );
     }
   } else {
-    artifactPresent = existsSync(distDir) || manifest.artifact !== null;
+    artifactPresent =
+      existsSync(distDir) ||
+      (manifest.artifact !== null &&
+        manifest.artifact !== undefined &&
+        manifest.artifact !== "null");
   }
 
   logger.success(`[release.validate] ${releaseId} valid (state: ${releaseState})`);
