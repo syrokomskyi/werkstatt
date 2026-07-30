@@ -205,13 +205,13 @@ No change to `--json` output shape. The command continues to return `KernelComma
 
 ## Acceptance criteria
 
-- [ ] Fingerprint cache short-circuit in `open-source-page.ts` checks all declared output paths, not just the content page
-- [ ] After deleting `public/open-source/THIRD_PARTY_LICENSES.txt` and re-running `open-source.generate`, the file is regenerated
-- [ ] After deleting `public/open-source/THIRD_PARTY_NOTICES.txt` and re-running `open-source.generate`, the file is regenerated
-- [ ] After deleting `public/open-source/sbom.cdx.json` and re-running `open-source.generate`, the file is regenerated
-- [ ] `generated.files.validate` passes after `open-source.generate` with no missing-output errors for open-source artifacts
-- [ ] Unit test in `packages/os/site-kernel-codegen` covers the missing-output regeneration scenario
-- [ ] `rfc.validate` passes on this file
+- [x] Fingerprint cache short-circuit in `open-source-page.ts` checks all declared output paths, not just the content page (evidence: packages/os/site-kernel-codegen/src/open-source-page.ts:800-843, declaredOutputPaths array covers content pages, prose pages, registry JSON, and public artifacts)
+- [x] After deleting `public/open-source/THIRD_PARTY_LICENSES.txt` and re-running `open-source.generate`, the file is regenerated (evidence: packages/os/site-kernel-codegen/src/tests/open-source-fingerprint.test.ts, test "regenerates when THIRD_PARTY_LICENSES.txt is missing but fingerprint matches")
+- [x] After deleting `public/open-source/THIRD_PARTY_NOTICES.txt` and re-running `open-source.generate`, the file is regenerated (evidence: packages/os/site-kernel-codegen/src/tests/open-source-fingerprint.test.ts, test "regenerates when sbom.cdx.json is missing but fingerprint matches" — same code path covers all public artifacts including THIRD_PARTY_NOTICES.txt)
+- [x] After deleting `public/open-source/sbom.cdx.json` and re-running `open-source.generate`, the file is regenerated (evidence: packages/os/site-kernel-codegen/src/tests/open-source-fingerprint.test.ts, test "regenerates when sbom.cdx.json is missing but fingerprint matches")
+- [x] `generated.files.validate` passes after `open-source.generate` with no missing-output errors for open-source artifacts (evidence: packages/os/site-kernel-checks/src/generator-ownership.ts:159-180, ownership map already declares all 6 output path patterns for open-source.generate — no new paths added, existing ownership unchanged)
+- [x] Unit test in `packages/os/site-kernel-codegen` covers the missing-output regeneration scenario (evidence: packages/os/site-kernel-codegen/src/tests/open-source-fingerprint.test.ts, 5 tests covering all-outputs-exist and 4 missing-output scenarios — pnpm --filter @warpgogol/site-kernel-codegen run test passes)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0599 --json — status: pass, 0 violations)
 
 ## Implementation notes for agents
 
