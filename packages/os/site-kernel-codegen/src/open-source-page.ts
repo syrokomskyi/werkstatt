@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0489: New module for open-source page generation with i18n, compact prose, JSON data file, SBOM, SPDX normalization, and downloadable artifacts.</item>
+  <item>RFC-0608: remove deploymentMetadata from registry JSON (UI fetches build-identity.json at request time); remove resolveDeploymentMetadata/resolveGitCommitSha/resolveBuildTimestamp; SBOM uses placeholder metadata.</item>
 </CHANGE_SUMMARY>
 ***************************************************************/
 
@@ -59,12 +60,6 @@ type ClassifiedDependency = {
   description?: string | undefined;
   licenseText?: string | undefined;
   additionalText?: string | undefined;
-};
-
-type DeploymentMetadata = {
-  deploymentId: string;
-  commitSha: string;
-  buildTimestamp: string;
 };
 
 type SbomComponent = {
@@ -126,11 +121,6 @@ export const openSourceRegistryDataSchema = z
           count: z.number(),
         }),
       ),
-    }),
-    deploymentMetadata: z.object({
-      deploymentId: z.string(),
-      buildTimestamp: z.string(),
-      commitSha: z.string(),
     }),
     downloads: z.array(
       z.object({
@@ -428,18 +418,14 @@ export function deduplicatePackages(deps: ClassifiedDependency[]): ClassifiedDep
 
 // ─── CycloneDX SBOM generation ────────────────────────────────────────────────
 
-export function buildCycloneDxSbom(
-  components: SbomComponent[],
-  metadata: DeploymentMetadata,
-): string {
+export function buildCycloneDxSbom(components: SbomComponent[]): string {
   const bom = {
     bomFormat: "CycloneDX",
     specVersion: "1.5",
     serialNumber: `urn:uuid:${crypto.randomUUID()}`,
     version: 1,
     metadata: {
-      timestamp:
-        metadata.buildTimestamp !== "—" ? metadata.buildTimestamp : new Date().toISOString(),
+      timestamp: new Date().toISOString(),
       tools: [
         {
           vendor: "Warpgogol",
@@ -450,9 +436,9 @@ export function buildCycloneDxSbom(
       component: {
         type: "application",
         name: "warpgogol-site",
-        version: metadata.deploymentId !== "—" ? metadata.deploymentId : "dev",
+        version: "dev",
       },
-      properties: [{ name: "warpgogol:commitSha", value: metadata.commitSha }],
+      properties: [],
     },
     components: components.map((c) => ({
       type: c.type,
@@ -580,7 +566,6 @@ function buildOpenSourcePageManifest(
 
 function buildRegistryData(
   deps: ClassifiedDependency[],
-  metadata: DeploymentMetadata,
   labels: OpenSourceLabels,
   lang: string,
 ): string {
@@ -611,7 +596,6 @@ function buildRegistryData(
       componentsWithNotice: noticeCount,
       licenseDistribution,
     },
-    deploymentMetadata: metadata,
     downloads: [
       {
         label: labels.noticeFileLabel,
@@ -702,40 +686,6 @@ function buildThirdPartyLicenses(deps: ClassifiedDependency[]): string {
   }
 
   return lines.join("\n");
-}
-
-// ─── Deployment metadata resolution (RFC-0489 fallbacks) ──────────────────────
-
-function resolveGitCommitSha(appDirectory: string): string {
-  try {
-    return execFileSync("git", ["rev-parse", "HEAD"], {
-      cwd: appDirectory,
-      encoding: "utf8",
-      timeout: 5_000,
-    }).trim();
-  } catch {
-    return "—";
-  }
-}
-
-async function resolveBuildTimestamp(cacheFile: string): Promise<string> {
-  try {
-    const stat = await fs.stat(cacheFile);
-    return stat.mtime.toISOString();
-  } catch {
-    return "—";
-  }
-}
-
-async function resolveDeploymentMetadata(
-  appDirectory: string,
-  cacheFile: string,
-): Promise<DeploymentMetadata> {
-  return {
-    deploymentId: process.env.DEPLOYMENT_ID ?? "—",
-    commitSha: process.env.COMMIT_SHA ?? resolveGitCommitSha(appDirectory),
-    buildTimestamp: process.env.BUILD_TIMESTAMP ?? (await resolveBuildTimestamp(cacheFile)),
-  };
 }
 
 // ─── Main generator ───────────────────────────────────────────────────────────
@@ -903,9 +853,6 @@ export async function runGenerateOpenSourcePage(
       (d) => d.scope === "runtime" || d.scope === "browser-bundle" || d.scope === "worker-runtime",
     );
 
-    // Deployment metadata (RFC-0489 fallbacks: git rev-parse, astro config, cache mtime)
-    const metadata = await resolveDeploymentMetadata(appDirectory, fingerprintCacheFile);
-
     // Generate downloadable artifacts
     const noticesContent = buildThirdPartyNotices(publicDeps);
     const licensesContent = buildThirdPartyLicenses(publicDeps);
@@ -919,7 +866,7 @@ export async function runGenerateOpenSourcePage(
       scope: d.scope,
       relationship: d.relationship,
     }));
-    const sbomContent = buildCycloneDxSbom(sbomComponents, metadata);
+    const sbomContent = buildCycloneDxSbom(sbomComponents);
 
     if (!context.dryRun) {
       const artifactsDir = path.join(paths.publicDirectory, "open-source");
@@ -955,7 +902,7 @@ export async function runGenerateOpenSourcePage(
         labels.leadText,
         labels.heading,
       );
-      const registryJson = buildRegistryData(deduplicated, metadata, labels, lang);
+      const registryJson = buildRegistryData(deduplicated, labels, lang);
 
       if (!context.dryRun) {
         const pagePath = path.join(paths.contentPagesDirectory, lang, "open-source.md");
