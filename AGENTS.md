@@ -243,6 +243,7 @@ See [`docs/policies/generated-file-governance.md`](docs/policies/generated-file-
 - YAML quoting policy (RFC-0493) — plain scalars by default, double quotes when needed, never single quotes; parse validation via yaml.parse.validate
 - Relative imports — HARD RULE (RFC-0092) — .ts extensions in packages/\*_/_.ts(x)
 - Section components must render real content (RFC-0093)
+- **Generated docs files must not be hand-edited.** Files like `docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, and `docs/gate-catalog.generated.yaml` carry the `GENERATED` marker and are overwritten on the next build. To add or update a command entry, run `command.manifest.generate` then `docs.commands.generate`. To update the gate catalog, run `gate.catalog.generate`. Always check the file header for a `GENERATED` marker and `Owner command:` line before editing — if present, run the owning generator instead.
 
 ## Onboarding a new site (one paragraph)
 
