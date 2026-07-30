@@ -13,6 +13,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0375: initial implementation.</item>
+  <item>RFC-0612: extract expandOwnershipPlaceholders as shared utility for reuse by ownership.sync.validate and generated.stale.validate.</item>
 </CHANGE_SUMMARY>
 */
 import { join, relative, resolve } from "node:path";
@@ -73,6 +74,17 @@ export function resolveEntryPath(
 
 export function hasGlobPattern(path: string): boolean {
   return path.includes("*") || path.includes("{");
+}
+
+export function expandOwnershipPlaceholders(path: string, app?: string): string {
+  return toPosix(path)
+    .replace(/\{system\}/g, app ?? "*")
+    .replace(/\{app\}/g, app ?? "*")
+    .replace(/\{lang\}/g, "*")
+    .replace(/\{route\}/g, "*")
+    .replace(/\{slug\}/g, "*")
+    .replace(/\{id\}/g, "*")
+    .replace(/\{category\}/g, "*");
 }
 
 async function checkFileExists(io: WorkspaceIO, filePath: string): Promise<boolean> {
@@ -224,15 +236,7 @@ export async function runGeneratedFilesValidate(
       continue;
     }
 
-    const posixPath = toPosix(entry.path);
-    const expandedPath = posixPath
-      .replace(/\{system\}/g, app ?? "*")
-      .replace(/\{app\}/g, app ?? "*")
-      .replace(/\{lang\}/g, "*")
-      .replace(/\{route\}/g, "*")
-      .replace(/\{slug\}/g, "*")
-      .replace(/\{id\}/g, "*")
-      .replace(/\{category\}/g, "*");
+    const expandedPath = expandOwnershipPlaceholders(entry.path, app);
 
     if (isWorkspaceAbs && expandedPath.startsWith(systemsPrefix)) {
       const restAfterSystems = expandedPath.slice(systemsPrefix.length);

@@ -13,10 +13,12 @@
   <item>Do not check for stale git-tracked files — that is the domain of RFC-0600 (generated.stale.validate).</item>
   <item>Do not auto-add missing entries to GENERATOR_OWNERSHIP_MAP — the command is informational.</item>
   <item>Do not check authored content files in src/content/ — they are not generated outputs.</item>
+  <item>Do not apply the content-aware preview image exemption from generated.stale.validate — preview images must be covered by GENERATOR_OWNERSHIP_MAP entries with {lang}/{slug} placeholders. If a preview image generator is not registered, that is a legitimate OWN-01 finding.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0612: initial implementation.</item>
+  <item>RFC-0612: extract shared expandOwnershipPlaceholders to generated-files-validate.ts (review fix).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -37,24 +39,12 @@ import {
   hasGlobPattern,
   resolveEntryPath,
   expandGlob,
+  expandOwnershipPlaceholders,
 } from "./generated-files-validate.ts";
 import { STATIC_ASSET_EXEMPT_DIRS } from "./generated-stale-validate.ts";
 
-const OWN_01_MESSAGE =
-  "File on disk not covered by any GENERATOR_OWNERSHIP_MAP entry.";
-const OWN_02_MESSAGE =
-  "Ownership entry matches no file on disk (phantom registration).";
-
-function expandPlaceholders(path: string, app: string | undefined): string {
-  return toPosix(path)
-    .replace(/\{system\}/g, app ?? "*")
-    .replace(/\{app\}/g, app ?? "*")
-    .replace(/\{lang\}/g, "*")
-    .replace(/\{route\}/g, "*")
-    .replace(/\{slug\}/g, "*")
-    .replace(/\{id\}/g, "*")
-    .replace(/\{category\}/g, "*");
-}
+const OWN_01_MESSAGE = "File on disk not covered by any GENERATOR_OWNERSHIP_MAP entry.";
+const OWN_02_MESSAGE = "Ownership entry matches no file on disk (phantom registration).";
 
 export async function runOwnershipSyncValidate(
   input: KernelCommandInput,
@@ -73,13 +63,16 @@ export async function runOwnershipSyncValidate(
 
   // --- Build expected path set from GENERATOR_OWNERSHIP_MAP ---
   const expectedPaths = new Set<string>();
-  const nonConditionalEntries: Array<{ entry: typeof GENERATOR_OWNERSHIP_MAP[number]; expandedPath: string }> = [];
+  const phantomEntries: Array<{
+    entry: (typeof GENERATOR_OWNERSHIP_MAP)[number];
+    resolvedPath: string;
+  }> = [];
 
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
     const isWorkspaceAbs = isWorkspaceAbsolute(entry.path);
     if (!isWorkspaceAbs && !app && !context.site?.directory) continue;
 
-    const expandedPath = expandPlaceholders(entry.path, app);
+    const expandedPath = expandOwnershipPlaceholders(entry.path, app);
 
     if (hasGlobPattern(expandedPath)) {
       try {
@@ -91,7 +84,10 @@ export async function runOwnershipSyncValidate(
           expectedPaths.add(toPosix(f));
         }
         if (files.length === 0 && !entry.conditional) {
-          nonConditionalEntries.push({ entry, expandedPath });
+          const resolvedPath = isWorkspaceAbs
+            ? join(context.workspaceRoot, expandedPath)
+            : join(basePath, expandedPath);
+          phantomEntries.push({ entry, resolvedPath });
         }
       } catch {
         // Glob expansion failures are non-fatal.
@@ -107,21 +103,14 @@ export async function runOwnershipSyncValidate(
       if (!entry.conditional) {
         const exists = await context.io.exists(resolvedPath);
         if (!exists) {
-          nonConditionalEntries.push({ entry, expandedPath });
+          phantomEntries.push({ entry, resolvedPath });
         }
       }
     }
   }
 
   // --- OWN-02: phantom registrations (entries matching no file) ---
-  for (const { entry, expandedPath } of nonConditionalEntries) {
-    const isWorkspaceAbs = isWorkspaceAbsolute(entry.path);
-    const basePath = isWorkspaceAbs
-      ? context.workspaceRoot
-      : (context.site?.directory ?? join(context.workspaceRoot, "apps", app!));
-    const resolvedPath = isWorkspaceAbs
-      ? join(context.workspaceRoot, expandedPath)
-      : join(basePath, expandedPath);
+  for (const { entry, resolvedPath } of phantomEntries) {
     const relPath = toPosix(relative(context.workspaceRoot, resolvedPath));
     diagnostics.push({
       ruleId: "OWN-02",

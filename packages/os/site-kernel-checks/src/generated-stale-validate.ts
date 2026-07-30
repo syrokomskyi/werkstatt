@@ -18,6 +18,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0600: initial implementation.</item>
   <item>RFC-0600: review fix — extract STALE_MESSAGE constant, validate preview path segment count.</item>
+  <item>RFC-0612: use shared expandOwnershipPlaceholders from generated-files-validate.ts.</item>
 </CHANGE_SUMMARY>
 */
 import { join, relative, basename } from "node:path";
@@ -37,6 +38,7 @@ import {
   hasGlobPattern,
   resolveEntryPath,
   expandGlob,
+  expandOwnershipPlaceholders,
 } from "./generated-files-validate.ts";
 
 export const STATIC_ASSET_EXEMPT_DIRS = ["public/textures/"];
@@ -76,13 +78,7 @@ export async function runGeneratedStaleValidate(
     const posixPath = toPosix(entry.path);
     if (posixPath.startsWith(PREVIEW_DIR)) continue;
 
-    const expandedPath = posixPath
-      .replace(/\{app\}/g, app ?? "*")
-      .replace(/\{lang\}/g, "*")
-      .replace(/\{route\}/g, "*")
-      .replace(/\{slug\}/g, "*")
-      .replace(/\{id\}/g, "*")
-      .replace(/\{category\}/g, "*");
+    const expandedPath = expandOwnershipPlaceholders(entry.path, app);
 
     const resolvedPath = resolveEntryPath(
       { ...entry, path: expandedPath },
