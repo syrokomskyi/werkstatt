@@ -17,7 +17,7 @@ The Cosmic Passport is a signed, machine-readable document that proves _what_ wa
 | --- | --- |
 | `@warpgogol/passport` | Barrel — all exports |
 | `@warpgogol/passport/schema` | `CosmicPassportSchema`, `PassportClaim` Zod schemas |
-| `@warpgogol/passport/sign` | `signPassport(passport, privateKeyPem)` |
+| `@warpgogol/passport/sign` | `signPassport(passport, privateKeyPem)`, `generateKeypair()` — Ed25519 signing and key generation |
 | `@warpgogol/passport/emit` | `emitPassport(passport, distDir)` — writes to `dist/.well-known/cosmic-passport.json` |
 | `@warpgogol/passport/verify` | `verifyPassport(raw, publicKeyPem)` |
 | `@warpgogol/passport/key-rotate` | `rotateSigningKey()` — generates a new Ed25519 keypair |
