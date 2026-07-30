@@ -194,16 +194,16 @@ All placeholders in `GENERATOR_OWNERSHIP_MAP` entries (`{system}`, `{app}`, `{la
 
 ## Acceptance criteria
 
-- [ ] `ownership.sync.validate` command registered in `packages/os/site-kernel-checks` with `--site` and `--json` flags (evidence: `packages/os/site-kernel-checks/src/ownership-sync-validate.ts`)
-- [ ] `ownership.sync.validate` registered in command table `src/command-tables/01-codegen.ts` (evidence: `src/command-tables/01-codegen.ts`)
-- [ ] OWN-01 diagnostic reports files in `public/` not covered by any `GENERATOR_OWNERSHIP_MAP` entry after placeholder expansion (evidence: unit test in `src/tests/ownership-sync-validate.test.ts`)
-- [ ] OWN-02 diagnostic reports `GENERATOR_OWNERSHIP_MAP` entries that match no file on disk (evidence: unit test in `src/tests/ownership-sync-validate.test.ts`)
-- [ ] Command integrated into `build.prepare` pipeline before `generated.stale.validate` (evidence: pipeline definition in `src/pipelines/build-prepare.ts`)
-- [ ] Command integrated into `sites-check-author` pipeline before `generated.stale.validate` (evidence: pipeline definition in `src/pipelines/sites-check-author.ts`)
-- [ ] Static assets in `public/` excluded from OWN-01 via reused `STATIC_ASSET_EXEMPT_DIRS` from `generated-stale-validate.ts` (evidence: unit test)
-- [ ] `conditional: true` entries exempt from OWN-02 when condition not met (evidence: unit test)
-- [ ] `pnpm --filter @warpgogol/site-kernel-checks test -- --run` passes with new tests (evidence: test output)
-- [ ] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0612 --json`)
+- [x] `ownership.sync.validate` command registered in `packages/os/site-kernel-checks` with `--site` and `--json` flags (evidence: `packages/os/site-kernel-checks/src/ownership-sync-validate.ts:91-152`, `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts:611-623`)
+- [x] `ownership.sync.validate` registered in command table `src/command-tables/01-codegen.ts` (evidence: `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts:611-623`)
+- [x] OWN-01 diagnostic reports files in `public/` not covered by any `GENERATOR_OWNERSHIP_MAP` entry after placeholder expansion (evidence: `packages/os/site-kernel-checks/src/tests/ownership-sync-validate.test.ts:106-122`, test "red: reports OWN-01 for unregistered file in public/")
+- [x] OWN-02 diagnostic reports `GENERATOR_OWNERSHIP_MAP` entries that match no file on disk (evidence: `packages/os/site-kernel-checks/src/tests/ownership-sync-validate.test.ts:135-147`, test "red: reports OWN-02 for ownership entry with no matching file")
+- [x] Command integrated into `build.prepare` pipeline before `generated.stale.validate` (evidence: `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:127-130`)
+- [x] Command integrated into `sites-check-author` pipeline before `generated.stale.validate` (evidence: `packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts:259-262`)
+- [x] Static assets in `public/` excluded from OWN-01 via reused `STATIC_ASSET_EXEMPT_DIRS` from `generated-stale-validate.ts` (evidence: `packages/os/site-kernel-checks/src/tests/ownership-sync-validate.test.ts:149-160`, test "green: static asset in public/textures/ -> no OWN-01")
+- [x] `conditional: true` entries exempt from OWN-02 when condition not met (evidence: `packages/os/site-kernel-checks/src/tests/ownership-sync-validate.test.ts:162-175`, test "green: conditional entry with no matching file -> no OWN-02")
+- [x] `pnpm --filter @warpgogol/site-kernel-checks test -- --run` passes with new tests (evidence: 669 tests pass, 110 test files, including 7 new ownership-sync-validate tests)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0612 --json` — zero violations)
 
 ## Implementation notes for agents
 

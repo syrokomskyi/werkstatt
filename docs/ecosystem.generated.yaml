@@ -2,12 +2,12 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: d1f059f043d0b5f5e3482d87505404a8c85df9924b2577ba7809bdf2944a8074
+  contentHash: 466107cfc15d7069248d0c40e579d6cd9f9ef6836d1c98dfcbb805cb41aa837b
   sources:
     - path: docs/architecture-dna.md
-      hash: 78fd5b5600e517ec6d28ba825b779e37adda842eac1eb302731c2d1223af74dd
+      hash: a39731f4d1255faea2683de2b5b9c948e57e32564e4a74feee0aaa8863a24460
     - path: docs/gate-catalog.generated.yaml
-      hash: 0611e1d07cf54f75f9264f41b7fb95f163708c81084e17aa0e80bfefd28e498e
+      hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
       hash: 122e343d80d63240746248c6fbb023c996489f3030367f065ea9d673f4c8f536
     - path: docs/maintenance-debt.queues.generated.yaml
@@ -53,7 +53,7 @@ meta:
     - path: packages/forge/package.json
       hash: 15d1b24e9aeee6f4ee85d7c06e2e28df16c83e621fea81e27c66c72ac84aa7e8
     - path: packages/geo/package.json
-      hash: 95a96296c9b96a284649022d8d73689a2c78616c087813d18f57f12594c63197
+      hash: 6aa800488d6c38a5666738d686eb69d30815e3fe8a7cb9ce4777715fa2627aa2
     - path: packages/growth-adapter-matomo/package.json
       hash: 4e61621ed86cf68b663ce1243853b08394a606e37f7fcbeca61fb7adcb2b8f14
     - path: packages/growth/package.json
@@ -91,7 +91,7 @@ meta:
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts
       hash: b6871526182bb140326d402fc69a26b345370b06677621e2636ecf5e360468f2
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts
-      hash: f19588a58508a9fa2f91647c9ed95cce50603e5cf8b77361c4a815c44a005905
+      hash: 3251075ad1c437c4387deeca46de7ac25d5feaa43f6b090dd12855e122680dc3
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/governance.ts
       hash: d2b0dc10d6fb1245adb2b1e5b9305cb1ad4cc5735a55927c648cf0e8b62291fb
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/ops-fleet.ts
@@ -107,7 +107,7 @@ meta:
     - path: packages/os/site-kernel-checks/src/module.ts
       hash: 7cb608a816393e36d1cf3cc4082d2e177d003f75a79aff35147a3cb26a218483
     - path: packages/os/site-kernel-checks/src/pipelines/packages-check.ts
-      hash: 1db42132d71a63a302a82da2cd7be789d15cff2cb12002c01edb1ac23e43c121
+      hash: e0bd84ffe2594513dda10288ec7b3857f2250e4fd04dab14460d544ea3517d32
     - path: packages/os/site-kernel-checks/src/test-signal.ts
       hash: bb22b88b465a6cda6c52d505e0ed0e99975fb9b4e3e15cc7bddc567523dba058
     - path: packages/os/site-kernel-codegen/package.json
@@ -586,7 +586,7 @@ packages:
     kind: package
     dependencies:
       - "@sindresorhus/slugify"
-      - country-state-city
+      - "@tansuasici/country-state-city"
       - cyrillic-to-translit-js
       - i18n-iso-countries
       - iso-3166-2
@@ -1312,9 +1312,9 @@ quality:
     warningCount: 0
   maintenanceDebtBaseline:
     exists: true
-    currentItems: 245
+    currentItems: 243
     baselineItems: 230
-    newItems: 245
+    newItems: 243
     expiredItems: 0
 commands:
   - name: adr.archive
@@ -2128,6 +2128,13 @@ commands:
       - workspace
   - name: cms.schema.parity
     scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: command.args.validate
+    scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
@@ -3185,6 +3192,13 @@ commands:
       phase: workspace
       blocks:
         - release.prepare
+  - name: generated.drift.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
   - name: generated.edit.guard
     scope: workspace
     mutatesState: false
@@ -3208,6 +3222,20 @@ commands:
       - workspace
   - name: generated.marker.validate
     scope: app
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: generated.stale.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: generated.timestamp.validate
+    scope: workspace
     mutatesState: false
     supportsAllSites: true
     providers:
@@ -3706,6 +3734,12 @@ commands:
   - name: leitstand.health
     scope: workspace
     mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: leitstand.promote
+    scope: workspace
+    mutatesState: true
     supportsAllSites: false
     providers:
       - workspace
@@ -4241,6 +4275,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: ownership.sync.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: true
+    providers:
+      - site
+      - workspace
   - name: packages-check.run
     scope: workspace
     mutatesState: false
@@ -4336,6 +4377,13 @@ commands:
     scope: app
     mutatesState: true
     supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: passport.key.ensure
+    scope: app
+    mutatesState: true
+    supportsAllSites: false
     providers:
       - site
       - workspace
@@ -5992,6 +6040,12 @@ commands:
       - site
       - workspace
 commandProvenance:
+  - command: adr.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
   - command: analytics.binding.validate
     proposedBy:
       - RFC-0305
@@ -6025,6 +6079,13 @@ commandProvenance:
     changedBy:
       - RFC-0595
     removedBy: []
+  - command: command.args.validate
+    proposedBy:
+      - RFC-0610
+    addedBy:
+      - RFC-0610
+    changedBy: []
+    removedBy: []
   - command: consent.activation.validate
     proposedBy: []
     addedBy: []
@@ -6036,6 +6097,63 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0305
+    removedBy: []
+  - command: forge.agents.generate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0611
+    removedBy: []
+  - command: forge.create
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: forge.doctor
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0611
+    removedBy: []
+  - command: forge.upgrade
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0611
+    removedBy: []
+  - command: generated.drift.validate
+    proposedBy:
+      - RFC-0601
+    addedBy:
+      - RFC-0601
+    changedBy: []
+    removedBy: []
+  - command: generated.files.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0606
+    removedBy: []
+  - command: generated.stale.validate
+    proposedBy:
+      - RFC-0600
+    addedBy:
+      - RFC-0600
+    changedBy: []
+    removedBy: []
+  - command: generated.timestamp.validate
+    proposedBy:
+      - RFC-0602
+    addedBy:
+      - RFC-0602
+    changedBy: []
+    removedBy: []
+  - command: geo.slug.preview
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
     removedBy: []
   - command: growth.adapter.contract
     proposedBy: []
@@ -6055,6 +6173,18 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
+  - command: i18n.config.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: i18n.detect.implement
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
   - command: integration.config.validate
     proposedBy: []
     addedBy: []
@@ -6066,6 +6196,25 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0305
+    removedBy: []
+  - command: leitstand.promote
+    proposedBy:
+      - RFC-0608
+    addedBy:
+      - RFC-0608
+    changedBy: []
+    removedBy: []
+  - command: leitstand.propagate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0608
+    removedBy: []
+  - command: leitstand.rollback
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0608
     removedBy: []
   - command: matomo.export.validate
     proposedBy:
@@ -6127,11 +6276,61 @@ commandProvenance:
     changedBy:
       - RFC-0593
     removedBy: []
+  - command: mission.reconcile
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0614
+    removedBy: []
+  - command: mission.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0615
+    removedBy: []
+  - command: open-source.generate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0599
+    removedBy: []
+  - command: ownership.sync.validate
+    proposedBy:
+      - RFC-0612
+    addedBy:
+      - RFC-0612
+    changedBy: []
+    removedBy: []
+  - command: page.markdown.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0613
+    removedBy: []
+  - command: passport.key.ensure
+    proposedBy: []
+    addedBy:
+      - RFC-0605
+    changedBy: []
+    removedBy: []
+  - command: pbp.profile.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: preview.images.generate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0603
+    removedBy: []
   - command: release.prepare
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0590
+      - RFC-0608
     removedBy: []
   - command: release.publish
     proposedBy: []
@@ -6139,12 +6338,54 @@ commandProvenance:
     changedBy:
       - RFC-0596
     removedBy: []
+  - command: rfc.command-lifecycle.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: rfc.graph
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: rfc.pipeline.status
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: rfc.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
   - command: section.css.import.validate
     proposedBy:
       - RFC-0598
     addedBy:
       - RFC-0598
     changedBy: []
+    removedBy: []
+  - command: section.scaffold
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: session.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
+    removedBy: []
+  - command: share.utility.lint
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0609
     removedBy: []
   - command: surface.generate
     proposedBy: []
@@ -6301,6 +6542,8 @@ pipelines:
       - app.boilerplate.validate
       - generated.marker.validate
       - generated.files.validate
+      - ownership.sync.validate
+      - generated.stale.validate
       - preview.images.validate
       - pbp.content.validate
       - offer.capacity.validate
@@ -6354,6 +6597,8 @@ pipelines:
       - print.layout.validate
       - services.projection.validate
       - open-source.validate
+      - generated.drift.validate
+      - generated.timestamp.validate
     executableFromRoot: false
   - name: build.post
     scope: app
@@ -6456,7 +6701,57 @@ pipelines:
       - mirror.quintet.validate
       - uni.registry.build
       - warpgogol.check-hints.generate
+      - bordbuch.generate
+      - passport.key.ensure
       - generated.files.validate
+      - ownership.sync.validate
+      - generated.stale.validate
+    executableFromRoot: false
+  - name: build.prepare.dev
+    scope: app
+    commands:
+      - config.regenerate
+      - workpiece.imports.validate
+      - yaml.contract.lint
+      - yaml.parse.validate
+      - content.ref-index.generate
+      - kernel.wire
+      - agents.generate
+      - overlay.pages.generate
+      - routes.generate
+      - not-found.generate
+      - api.routes.generate
+      - env.example.generate
+      - entitlements.resolve
+      - surface.generate
+      - surface.freshness
+      - surface.starmap
+      - content.freshness.validate
+      - agent.knowledge.generate
+      - agent.manifest.generate
+      - agent.openapi.generate
+      - agent.routes.generate
+      - agent.surface.sign
+      - styles.global.generate
+      - scripts.orchestrator.generate
+      - public.infrastructure.generate
+      - security.txt.generate
+      - indexnow.key.generate
+      - humans.generate
+      - public.icons.generate
+      - headers.security.generate
+      - open-source.generate
+      - material.credits.generate
+      - icons.generate
+      - biome.css.generate
+      - fonts.imports.generate
+      - cms.schema.generate
+      - archetype.registry.build
+      - uni.registry.build
+      - i18n.middleware.generate
+      - generated.files.validate
+      - ownership.sync.validate
+      - generated.stale.validate
     executableFromRoot: false
   - name: compass.standard
     scope: workspace
@@ -6539,6 +6834,7 @@ pipelines:
       - pipeline.timeout.validate
       - kernel.flags.lint
       - kernel.io.lint
+      - command.args.validate
       - check.fixture.lint
       - props.contract.validate
       - analytics.messkanon.validate
@@ -6634,6 +6930,7 @@ pipelines:
       - pipeline.timeout.validate
       - kernel.flags.lint
       - kernel.io.lint
+      - command.args.validate
       - check.fixture.lint
       - props.contract.validate
       - analytics.messkanon.validate
@@ -6802,6 +7099,8 @@ pipelines:
       - app.boilerplate.validate
       - generated.marker.validate
       - generated.files.validate
+      - ownership.sync.validate
+      - generated.stale.validate
       - preview.images.validate
       - pbp.content.validate
       - offer.capacity.validate
@@ -7023,6 +7322,8 @@ pipelines:
       - app.boilerplate.validate
       - generated.marker.validate
       - generated.files.validate
+      - ownership.sync.validate
+      - generated.stale.validate
       - preview.images.validate
       - pbp.content.validate
       - offer.capacity.validate
@@ -7101,12 +7402,16 @@ pipelines:
 generatedOwnership:
   - path: .env.example
     command: env.example.generate
+    module: packages/os/site-kernel-checks/src/env/env-example.ts
   - path: AGENTS.md
     command: agents.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: packages/ui/src/components/{id}/{id}.types.generated.ts
     command: props.types.generate
+    module: packages/os/site-kernel-codegen/src/props-types.ts
   - path: packages/ui/src/sections/{id}/{id}.types.generated.ts
     command: props.types.generate
+    module: packages/os/site-kernel-codegen/src/props-types.ts
   - path: public/_headers
     command: public.infrastructure.generate
     markerPolicy: registry-only
@@ -7140,7 +7445,7 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-checks/src/agent-openapi.ts
   - path: public/.well-known/cosmic-passport-key.json
-    command: passport.key.rotate
+    command: passport.key.ensure
     markerPolicy: registry-only
     module: packages/os/site-kernel-checks/src/passport.ts
   - path: public/.well-known/pseo-manifest.json
@@ -7197,6 +7502,10 @@ generatedOwnership:
     command: public.icons.generate
     markerPolicy: registry-only
     module: packages/os/site-kernel-checks/src/public-surface/icons.ts
+  - path: public/feed.json
+    command: feed.generate
+    markerPolicy: registry-only
+    module: packages/os/site-kernel-checks/src/feed.ts
   - path: public/feed.xml
     command: feed.generate
     markerPolicy: registry-only
@@ -7253,10 +7562,18 @@ generatedOwnership:
     command: open-source.generate
     markerPolicy: registry-only
     module: packages/os/site-kernel-codegen/src/open-source-page.ts
+  - path: public/preview/{lang}/{slug}.png
+    command: preview.images.generate
+    markerPolicy: registry-only
+    module: packages/os/site-kernel-checks/src/preview-images.ts
   - path: public/robots.txt
     command: robots.generate
     markerPolicy: registry-only
     module: packages/os/site-kernel-checks/src/robots.ts
+  - path: public/sitemap-{category}.xml
+    command: sitemap.generate
+    markerPolicy: registry-only
+    module: packages/os/site-kernel-checks/src/sitemap.ts
   - path: public/sitemap.xml
     command: sitemap.generate
     markerPolicy: registry-only
@@ -7271,64 +7588,94 @@ generatedOwnership:
     module: packages/os/site-kernel-checks/src/agent/agent-routes.ts
   - path: src/content.config.ts
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/content/AGENTS.md
     command: agents.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/content/data/{lang}/open-source-registry.json
     command: open-source.generate
+    module: packages/os/site-kernel-codegen/src/open-source-page.ts
   - path: src/content/pages/{lang}/cosmic/passport.md
     command: overlay.pages.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/content/pages/{lang}/cosmic/star-map.md
     command: overlay.pages.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/content/pages/{lang}/credits.md
     command: material.credits.generate
+    module: packages/os/site-kernel-codegen/src/service.ts
   - path: src/content/pages/{lang}/datenschutz.md
     command: legal.scaffold
+    module: packages/os/site-kernel-codegen/src/legal-scaffold.ts
   - path: src/content/pages/{lang}/impressum.md
     command: legal.scaffold
+    module: packages/os/site-kernel-codegen/src/legal-scaffold.ts
   - path: src/content/pages/{lang}/open-source.md
     command: open-source.generate
+    module: packages/os/site-kernel-codegen/src/open-source-page.ts
   - path: src/content/pages/root-redirect.md
     command: overlay.pages.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/content/prose/{lang}/credits.md
     command: material.credits.generate
+    module: packages/os/site-kernel-codegen/src/service.ts
   - path: src/content/prose/{lang}/datenschutz.md
     command: legal.scaffold
+    module: packages/os/site-kernel-codegen/src/legal-scaffold.ts
   - path: src/content/prose/{lang}/impressum.md
     command: legal.scaffold
+    module: packages/os/site-kernel-codegen/src/legal-scaffold.ts
   - path: src/content/prose/{lang}/open-source.md
     command: open-source.generate
+    module: packages/os/site-kernel-codegen/src/open-source-page.ts
   - path: src/entitlements.generated.yaml
     command: entitlements.resolve
+    module: packages/os/site-kernel-checks/src/entitlements.ts
   - path: src/env.d.ts
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/env.schema.generated.mjs
     command: api.routes.generate
+    module: packages/os/site-kernel-codegen/src/api-routes.ts
   - path: src/middleware.ts
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/middleware/language-redirect.ts
     command: i18n.middleware.generate
+    module: packages/os/site-kernel-codegen/src/service.ts
   - path: src/middleware/retired-tombstones.ts
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/pages/[...slug].astro
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/pages/[lang]/[...slug].astro
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/pages/404.astro
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/pages/api/{route}.ts
     command: api.routes.generate
+    module: packages/os/site-kernel-codegen/src/api-routes.ts
   - path: src/pages/index.astro
     command: routes.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/scripts/layout-orchestrator.ts
     command: scripts.orchestrator.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/styles/AGENTS.md
     command: agents.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: src/styles/biome.generated.css
     command: biome.css.generate
+    module: packages/os/site-kernel-codegen/src/biome-css.ts
   - path: src/styles/fonts.imports.css
     command: fonts.imports.generate
+    module: packages/os/site-kernel-codegen/src/fonts-imports.ts
   - path: src/styles/global.css
     command: styles.global.generate
+    module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
   - path: systems/{system}/public/.well-known/bordbuch.json
     command: bordbuch.generate
     markerPolicy: registry-only
@@ -7338,9 +7685,9 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 3
-  implemented: 8
-  draft: 3
+  accepted: 4
+  implemented: 22
+  draft: 5
   reviewing: 0
 baseline:
   implementedRfcs:
@@ -7400,15 +7747,106 @@ baseline:
       dnaRefs:
         - DNA-46
         - DNA-47
+    - id: RFC-0598
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs:
+        - DNA-5
+        - DNA-17
+        - DNA-37
+    - id: RFC-0599
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs: []
+    - id: RFC-0600
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs:
+        - DNA-18
+    - id: RFC-0601
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs:
+        - DNA-18
+        - DNA-58
+    - id: RFC-0602
+      implementedAt: 2026-07-30
+      kind: policy
+      scope: workspace
+      dnaRefs:
+        - DNA-18
+        - DNA-35
+        - DNA-53
+    - id: RFC-0603
+      implementedAt: 2026-07-30
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-18
+    - id: RFC-0604
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs: []
+    - id: RFC-0605
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs:
+        - DNA-34
+    - id: RFC-0606
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs: []
+    - id: RFC-0607
+      implementedAt: 2026-07-30
+      kind: policy
+      scope: workspace
+      dnaRefs:
+        - DNA-18
+        - DNA-57
+        - DNA-58
+    - id: RFC-0608
+      implementedAt: 2026-07-30
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-48
+        - DNA-49
+    - id: RFC-0609
+      implementedAt: 2026-07-30
+      kind: policy
+      scope: workspace
+      dnaRefs:
+        - DNA-54
+    - id: RFC-0610
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs:
+        - DNA-54
+    - id: RFC-0611
+      implementedAt: 2026-07-30
+      kind: command
+      scope: workspace
+      dnaRefs: []
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0598
+      - RFC-0612
+      - RFC-0614
     draft:
       - RFC-0383
       - RFC-0384
       - RFC-0387
+      - RFC-0613
+      - RFC-0615
     reviewing: []
     superseded: []
     rejected: []
@@ -7697,4 +8135,9 @@ baseline:
       title: Dev/prod egress parity
       provenance: rfc
       establishingRfc: null
+      status: active
+    - id: DNA-58
+      title: Generated-file content determinism
+      provenance: rfc
+      establishingRfc: RFC-0607
       status: active
