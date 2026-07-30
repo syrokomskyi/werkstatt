@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -32,6 +33,7 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-46
+  - DNA-47
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -51,9 +53,14 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
-  - "@warpgogol/ontology"
-successSignals: []
-nonGoals: []
+successSignals:
+  - "Zero missions closed with invalid content after gate implementation"
+  - "bordbuch.repair triggered proactively at mission.open, not reactively after close"
+nonGoals:
+  - "Does not add a validation gate to mission.abort — aborted missions discard the workpiece, so content validity is irrelevant"
+  - "Does not add a validation gate to release.prepare — release.prepare already runs its own validation (behavior snapshot diff, migrator validation, bordbuch consistency per DNA-48)"
+  - "Does not cache mission.validate results — each mission.close runs a fresh validation"
+  - "Does not add a --force bypass flag — validation gates are hard gates, not warnings"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -104,7 +111,7 @@ Both gaps rely on manual discipline: the operator must remember to run `mission.
 
 - **DNA-46 (Mission lifecycle)** — extends the mission lifecycle enforcement chain. Currently `mission.close` checks `reconciledAt`; this RFC adds content validation as a second gate. `mission.open` gains a bordbuch integrity gate.
 - **DNA-47 (Materialization)** — `mission.validate` is already part of the materialization flow. This RFC makes it mandatory before close, not optional.
-- **RFC-0355** — the original mission lifecycle RFC. This RFC amends the `mission.open` and `mission.close` behavior.
+- **RFC-0355** — the original mission lifecycle RFC. This RFC extends the `mission.open` and `mission.close` behavior with validation gates. RFC-0355 is archived (implemented); this RFC does not amend the archived document but adds new enforcement behavior to the commands it established.
 - **RFC-0583** — `bordbuch.repair` exists as a disaster-recovery tool. The `mission.open` gate makes it proactive: the operator is forced to repair before opening a new mission.
 - **RFC-0517** — pre-materialize content quality gate. This RFC extends the same principle to the close phase.
 
@@ -151,8 +158,8 @@ async function runInlineValidate(
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/mission/mission-open.ts` | Add `preflightBordbuch` call before lock acquisition |
-| `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | Add `runInlineValidate` call after `reconciledAt` check, before lock release |
-| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts` | Export `runBordbuchValidate` for reuse (already exists as internal) |
+| `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | Add `runInlineValidate` call after `reconciledAt` check, before `acquireLock` — validation runs outside the lock scope to avoid holding registry/system/mission locks for 2+ minutes. State is re-checked inside the lock before transition. |
+| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts` | `validateBordbuch` already exported — `mission.open` calls it directly |
 | `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | `runMissionValidate` already exists — `mission.close` calls it directly |
 
 ### Output format
@@ -172,6 +179,26 @@ async function runInlineValidate(
   }
 }
 ```
+
+### Invariant chain: reconciledAt implies materializedAt
+
+`mission.close` currently checks `reconciledAt !== null` but not `materializedAt`. This RFC adds `mission.validate` as a gate, which requires `materializedAt`. The edge case of a non-materialized mission reaching close is impossible by construction:
+
+1. `mission.reconcile` requires `evidence/validation-report.json` to exist (`mission-materialization-commands.ts:614`).
+2. `validation-report.json` is created by `mission.validate`, which requires `manifest.materializedAt` (`mission-materialization-commands.ts:159`).
+3. Therefore `reconciledAt !== null` → `validation-report.json` exists → `mission.validate` ran → `materializedAt !== null`.
+
+The inline `mission.validate` in `mission.close` inherits this precondition: if `reconciledAt` is set, `materializedAt` is guaranteed to be set. No exception path is needed for non-materialized missions.
+
+### Lock scope design
+
+`mission.validate` runs `build.prepare` + `build.check` + `astro build` (2+ minutes). Running this inside the registry/system/mission locks would block all other operations on the same Sternsystem for the duration. Instead, `mission.close` runs `runInlineValidate` **before** `acquireLock` (after the `reconciledAt` check, which is also before locks). After validation passes, `mission.close` acquires the locks and re-checks `manifest.state === "open"` inside the lock before transitioning. If another process closed/aborted the mission between validation and lock acquisition, the re-check fails and `mission.close` exits with a state error.
+
+The workpiece is only accessible to the current mission (single-open-mission constraint, DNA-46), so concurrent modification of the workpiece between validation and lock acquisition is not a concern.
+
+### TOCTOU for preflightBordbuch in mission.open
+
+`preflightBordbuch` runs before lock acquisition in `mission.open`. This means bordbuch validation happens without holding any lock. If `bordbuch.repair` (RFC-0583) runs concurrently (operator-only, uses its own `system:<id>` and `bordbuch:<id>` lock scopes), the bordbuch could change between validation and lock acquisition. This is a known limitation with low risk: `bordbuch.repair` is operator-only and rarely used. The race window is small (between `validateBordbuch` return and `acquireLock` call). If the bordbuch is repaired between validation and lock acquisition, the next `mission.open` will pass — the failed attempt exits with code 1 before any side effects.
 
 ### Failure modes
 
@@ -201,7 +228,7 @@ async function runInlineValidate(
 - **Performance**: `mission.close` now runs a full build+validate (2+ minutes). This is acceptable — close is a rare operation (once per mission), and the alternative (closing with invalid content) is more expensive.
 - **False positives**: if a validator has a bug, `mission.close` will block legitimate closures. Mitigation: validators are already tested; a validator bug would also block `mission.validate` independently.
 - **Agent confusion**: agents may try to bypass the gate by editing `mission.yaml` directly. Mitigation: `mission.yaml` is a generated file (RFC-0580 auto-commit), and direct edits are already discouraged by AGENTS.md.
-- **Double build**: if the operator runs `mission.validate` manually and then `mission.close`, the build runs twice. This is acceptable — the second build confirms nothing changed between validate and close.
+- **Double build**: the standard flow is `mission.validate` (build) → `mission.reconcile` → `mission.close` (which calls `mission.validate` again → second build). The first build is the manual `mission.validate` required by `mission.reconcile`; the second is the inline gate in `mission.close`. This is a double build, not triple — `mission.reconcile` does not build. The second build confirms nothing changed between the manual validate and close. This is acceptable for a rare operation (once per mission).
 
 ## Acceptance criteria
 
@@ -212,8 +239,10 @@ async function runInlineValidate(
 - [ ] `mission.close` exits with code 1 and a descriptive error when validation fails
 - [ ] `mission.close` does not transition the mission to `closed` state when validation fails
 - [ ] `mission.close` error output includes the list of failed validators with file references
-- [ ] `AGENTS.md` updated with the new gate behavior in the mission lifecycle section
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with the new gate behavior in the mission lifecycle section (Bordbuch git synchronization / Werkstatt side-effect auto-commit sections)
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents the invariant chain: `reconciledAt` implies `materializedAt` via the validate → reconcile → close flow
 - [ ] Unit tests cover both gates (bordbuch violation blocks open, validation failure blocks close)
+- [ ] Unit test verifies `mission.close` re-checks state inside lock after out-of-lock validation
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
