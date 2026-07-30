@@ -138,26 +138,33 @@ scope:
 
 ---
 
-### Step 4. Run `build.prepare` on warpgogol-com and verify outputs
+### Step 4. Verify commands individually and via full pipeline
 
-**Goal:** Confirm the pipeline produces bordbuch and passport artifacts.
+**Goal:** Confirm the two new commands work in isolation and in the full pipeline context.
 
 **Agent actions:**
 
-- Run `pnpm exec site-kernel run build.prepare --site warpgogol-com` (6-minute budget, non-blocking).
+**4a. Individual command verification:**
+
+- Run `pnpm exec site-kernel run bordbuch.generate --site warpgogol-com`.
 - Verify `systems/warpgogol-com/public/.well-known/bordbuch.json` exists.
 - Verify `systems/warpgogol-com/public/.well-known/bordbuch/index.html` exists.
+- Run `pnpm exec site-kernel run passport.key.ensure --site warpgogol-com`.
 - Verify `public/.well-known/cosmic-passport-key.json` exists in the build workspace.
+
+**4b. Full pipeline verification:**
+
+- Run `pnpm exec site-kernel run build.prepare --site warpgogol-com` (6-minute budget, non-blocking).
 - Verify `generated.files.validate` passes with no missing-output errors for bordbuch or passport.
 - Verify `generated.stale.validate` does not flag bordbuch or passport files as stale.
 
 **Validation:**
 
+- Individual commands exit 0 and produce expected output files.
 - `build.prepare` exits 0.
-- All three output files exist.
 - `generated.files.validate` and `generated.stale.validate` pass.
 
-**Completion criterion:** All output files exist after `build.prepare`; validators pass.
+**Completion criterion:** Both commands work individually; full `build.prepare` passes including validators.
 
 **Human review:** no
 
@@ -169,9 +176,9 @@ scope:
 
 **Agent actions:**
 
-- Capture `git log --oneline -1` in `systems/warpgogol-com/` before running `build.prepare`.
-- Run `build.prepare` (Step 4).
-- Capture `git log --oneline -1` in `systems/warpgogol-com/` after running `build.prepare`.
+- Capture `git log --oneline -1` in `systems/warpgogol-com/` before running `bordbuch.generate`.
+- Run `pnpm exec site-kernel run bordbuch.generate --site warpgogol-com` (isolated, not full pipeline).
+- Capture `git log --oneline -1` in `systems/warpgogol-com/` after running.
 - Confirm the HEAD SHA is unchanged (no new commits from `bordbuch.generate`).
 - Read `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts` — confirm it uses `writeFileIfChanged` (line 214-216) and does NOT call `appendBordbuchEntry` or `commitAndPushBordbuch`.
 
@@ -252,7 +259,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Pipeline ordering — commands must run after all generation commands | Step 2 places them after `warpgogol.check-hints.generate` and before validators |
 | Dev-mode exclusion — developers may expect bordbuch/passport artifacts in local `public/` | Step 2 explicitly excludes them from `SITES_BUILD_PREPARE_DEV_PIPELINE`; RFC nonGoals document this |
 | Concurrent execution — `bordbuch.generate` acquires Werkstatt locks | `bordbuch.generate` already handles locks (acquire/release); pipeline context is acceptable |
