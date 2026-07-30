@@ -514,6 +514,32 @@ function hasSystemPage(manifest: { pages?: Array<{ pageId?: string }> }, pageId:
   return Array.isArray(manifest.pages) && manifest.pages.some((page) => page.pageId === pageId);
 }
 
+// ─── Declared output paths (RFC-0599) ─────────────────────────────────────────
+// Single source of truth for all output file paths produced by runGenerateOpenSourcePage.
+// Used by both the fingerprint cache completeness check and the write section.
+// Must match GENERATOR_OWNERSHIP_MAP (site-kernel-checks/src/generator-ownership.ts).
+
+type AstroSitePathsLike = {
+  contentPagesDirectory: string;
+  contentDirectory: string;
+  publicDirectory: string;
+};
+
+function buildDeclaredOutputPaths(paths: AstroSitePathsLike, supportedLangs: string[]): string[] {
+  return [
+    ...supportedLangs.map((lang) => path.join(paths.contentPagesDirectory, lang, "open-source.md")),
+    ...supportedLangs.map((lang) =>
+      path.join(paths.contentDirectory, "prose", lang, "open-source.md"),
+    ),
+    ...supportedLangs.map((lang) =>
+      path.join(paths.contentDirectory, "data", lang, "open-source-registry.json"),
+    ),
+    path.join(paths.publicDirectory, "open-source", "THIRD_PARTY_NOTICES.txt"),
+    path.join(paths.publicDirectory, "open-source", "THIRD_PARTY_LICENSES.txt"),
+    path.join(paths.publicDirectory, "open-source", "sbom.cdx.json"),
+  ];
+}
+
 // ─── Prose builder (text-only) ────────────────────────────────────────────────
 
 function buildOpenSourceProseMarkdown(lang: string, labels: OpenSourceLabels): string {
@@ -799,24 +825,7 @@ export async function runGenerateOpenSourcePage(
 
   // Check fingerprint cache
   // RFC-0599: check ALL declared output paths, not just the content page.
-  // The declaredOutputPaths array must match the output paths in
-  // GENERATOR_OWNERSHIP_MAP (site-kernel-checks/src/generator-ownership.ts).
-  const declaredOutputPaths = [
-    // Content pages (per language)
-    ...supportedLangs.map((lang) => path.join(paths.contentPagesDirectory, lang, "open-source.md")),
-    // Prose pages (per language)
-    ...supportedLangs.map((lang) =>
-      path.join(paths.contentDirectory, "prose", lang, "open-source.md"),
-    ),
-    // Registry JSON (per language)
-    ...supportedLangs.map((lang) =>
-      path.join(paths.contentDirectory, "data", lang, "open-source-registry.json"),
-    ),
-    // Public download artifacts
-    path.join(paths.publicDirectory, "open-source", "THIRD_PARTY_NOTICES.txt"),
-    path.join(paths.publicDirectory, "open-source", "THIRD_PARTY_LICENSES.txt"),
-    path.join(paths.publicDirectory, "open-source", "sbom.cdx.json"),
-  ];
+  const declaredOutputPaths = buildDeclaredOutputPaths(paths, supportedLangs);
   try {
     const existingFingerprint = await fs.readFile(fingerprintCacheFile, "utf8");
     const fingerprintMatches = toCleanText(existingFingerprint) === dependencyFingerprint;

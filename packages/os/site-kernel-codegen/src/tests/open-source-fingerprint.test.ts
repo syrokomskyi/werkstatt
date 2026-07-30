@@ -388,3 +388,73 @@ test("RFC-0599: regenerates when prose page is missing but fingerprint matches",
     await fs.rm(workspaceRoot, { recursive: true, force: true });
   }
 });
+
+test("RFC-0599: regenerates when THIRD_PARTY_NOTICES.txt is missing but fingerprint matches", async () => {
+  const { runGenerateOpenSourcePage } = await import("../open-source-page.ts");
+  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ws-root-"));
+  const { appDir, cleanup } = await createTestWorkspace({
+    withAllOutputs: true,
+    missingArtifact: "THIRD_PARTY_NOTICES.txt",
+  });
+
+  try {
+    await fs.writeFile(path.join(workspaceRoot, "pnpm-lock.yaml"), "lockfileVersion: 6\n", "utf8");
+
+    const fingerprint = await computeFingerprint(appDir, workspaceRoot);
+    await writeFingerprintCache(appDir, fingerprint);
+
+    let result: { summary?: string } | undefined;
+    try {
+      result = (await runGenerateOpenSourcePage(input, makeContext(appDir, workspaceRoot))) as {
+        summary?: string;
+      };
+    } catch {
+      // Expected: regeneration path fails on missing mock output files
+    }
+
+    if (result?.summary) {
+      expect(result.summary).not.toContain("up to date");
+    }
+    expect(mockExecFileSync).toHaveBeenCalled();
+  } finally {
+    await cleanup();
+    await fs.rm(workspaceRoot, { recursive: true, force: true });
+  }
+});
+
+test("RFC-0599: completeness check runs in dryRun mode — missing output triggers regeneration", async () => {
+  const { runGenerateOpenSourcePage } = await import("../open-source-page.ts");
+  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "ws-root-"));
+  const { appDir, cleanup } = await createTestWorkspace({
+    withAllOutputs: true,
+    missingArtifact: "sbom.cdx.json",
+  });
+
+  try {
+    await fs.writeFile(path.join(workspaceRoot, "pnpm-lock.yaml"), "lockfileVersion: 6\n", "utf8");
+
+    const fingerprint = await computeFingerprint(appDir, workspaceRoot);
+    await writeFingerprintCache(appDir, fingerprint);
+
+    const dryRunContext = makeContext(appDir, workspaceRoot);
+    (dryRunContext as unknown as { dryRun: boolean }).dryRun = true;
+
+    let result: { summary?: string } | undefined;
+    try {
+      result = (await runGenerateOpenSourcePage(input, dryRunContext)) as { summary?: string };
+    } catch {
+      // Expected: regeneration path fails on missing mock output files
+    }
+
+    // In dryRun mode, the check still detects missing outputs and enters
+    // the regeneration path (execFileSync is called). The dryRun flag only
+    // affects whether files are actually written, not whether the check runs.
+    if (result?.summary) {
+      expect(result.summary).not.toContain("up to date");
+    }
+    expect(mockExecFileSync).toHaveBeenCalled();
+  } finally {
+    await cleanup();
+    await fs.rm(workspaceRoot, { recursive: true, force: true });
+  }
+});
