@@ -1,7 +1,7 @@
 ---
 id: RFC-0610
 title: "Add command.args.validate enforcement command"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,7 +12,8 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
@@ -144,7 +145,7 @@ interface CommandArgsViolation {
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-checks/src/command-args-validate.ts` | New module — implements `runCommandArgsValidate` |
-| `packages/os/site-kernel-checks/src/command-tables/governance-checks.ts` | Register command |
+| `packages/os/site-kernel-checks/src/command-tables/07-structure-naming.ts` | Register command (alongside `kernel.flags.lint` and `kernel.io.lint`) |
 | `packages/os/site-kernel-checks/src/pipelines/packages-check.ts` | Add command to `PACKAGES_CHECK_PIPELINE` |
 | `packages/forge/os/**/*.module.ts` | Scanned for command registrations (flags schema) |
 | `packages/os/site-kernel-checks/src/command-tables/*.ts` | Scanned for command registrations (data-driven `CheckCommandEntry[]` tables) |
@@ -203,7 +204,7 @@ interface CommandArgsViolation {
 
 ## Acceptance criteria
 
-- [ ] `command.args.validate` command registered in `governance-checks.ts` with `scope: workspace`
+- [ ] `command.args.validate` command registered in `07-structure-naming.ts` with `scope: workspace`
 - [ ] `runCommandArgsValidate` implemented in `packages/os/site-kernel-checks/src/command-args-validate.ts`
 - [ ] ARG-COMPLIANCE-01 detects handler source files that reference `input.args`
 - [ ] ARG-COMPLIANCE-02 detects command registrations with `flags: {}` whose handler reads a named flag
