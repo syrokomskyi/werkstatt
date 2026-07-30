@@ -17,7 +17,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { join, dirname } from "node:path";
+import { join, dirname, relative } from "node:path";
 import { readFile } from "node:fs/promises";
 import type {
   CheckResult,
@@ -74,6 +74,24 @@ export async function runAiGenerate(
   const fullOutput = body;
 
   const aiPath = join(paths.publicDirectory, "ai.txt");
+
+  // RFC-0601: return rendered content in dryRun mode for drift validation.
+  if (context.dryRun) {
+    const relPath = relative(context.workspaceRoot, aiPath).replace(/\\/g, "/");
+    return {
+      data: {
+        command: "ai.generate",
+        status: "pass",
+        site: context.site?.name,
+        file: aiPath,
+        byteCount: body.length,
+        providers: (policy.providers ?? []).map((p) => p.name),
+        renderedFiles: { [relPath]: fullOutput },
+      },
+      exitCode: 0,
+      summary: `ai.generate: dry-run — ${body.length} bytes (would write ai.txt)`,
+    };
+  }
 
   // RFC-0267: routed through context.io — see robots.generate for the same pattern.
   // RFC-0375: ai.txt is Category B — no marker check, always overwrite.

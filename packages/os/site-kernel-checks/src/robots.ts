@@ -16,7 +16,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { join, dirname } from "node:path";
+import { join, dirname, relative } from "node:path";
 import { readFile } from "node:fs/promises";
 import type {
   CheckResult,
@@ -73,6 +73,28 @@ export async function runRobotsGenerate(
 
   const robotsTxt = buildRobotsTxt(policy);
   const robotsPath = join(paths.publicDirectory, "robots.txt");
+
+  // RFC-0601: return rendered content in dryRun mode for drift validation.
+  if (context.dryRun) {
+    const relPath = relative(context.workspaceRoot, robotsPath).replace(/\\/g, "/");
+    return {
+      data: {
+        command: "robots.generate",
+        status: "pass",
+        site: context.site?.name,
+        file: robotsPath,
+        byteCount: robotsTxt.length,
+        hasDefaultPolicy: !!policy.defaultPolicy,
+        allowlistCount: policy.crawlerAllowlist?.length ?? 0,
+        blocklistCount: policy.crawlerBlocklist?.length ?? 0,
+        customRuleCount: policy.customRules?.length ?? 0,
+        sitemapRef: policy.sitemap ?? "/sitemap.xml",
+        renderedFiles: { [relPath]: robotsTxt },
+      },
+      exitCode: 0,
+      summary: `robots.generate: dry-run — ${robotsTxt.length} bytes (would write robots.txt)`,
+    };
+  }
 
   // RFC-0267: routed through context.io — the executor supplies a recording
   // adapter under --dry-run (this block runs unconditionally; writeFile is

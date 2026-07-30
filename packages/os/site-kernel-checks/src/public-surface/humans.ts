@@ -32,7 +32,22 @@ export async function runHumansGenerate(
 ): Promise<KernelCommandResult> {
   const app = await loadPublicContext(context);
   const humansPath = join(app.publicDirectory, "humans.txt");
-  const status = await writeGeneratedTextFile(context, humansPath, buildHumansTxt(app));
+  const content = buildHumansTxt(app);
+  const relPath = workspaceRel(context, humansPath);
+
+  if (context.dryRun) {
+    return {
+      data: {
+        status: "dry-run",
+        file: humansPath,
+        renderedFiles: { [relPath]: content },
+      },
+      exitCode: 0,
+      summary: `humans.generate: dry-run — ${content.length} bytes (would write humans.txt)`,
+    };
+  }
+
+  const status = await writeGeneratedTextFile(context, humansPath, content);
   return {
     data: { status, file: humansPath },
     exitCode: 0,
