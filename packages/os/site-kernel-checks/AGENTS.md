@@ -94,6 +94,7 @@ A federated **`visual` domain** over the RFC-0203 Diagnostic model that catches 
 - `naming.suffixes.lint` enforces RFC-0020 suffix contract across three layers: `.astro` (components), `.css` (styles/components), and `.md` (content/components). `layout.md` is a Class-4 singleton exempt from the `-component` rule.
 - `naming.layouts.lint` enforces the RFC-0020 singleton contract: `src/layouts/` may only contain `layout.astro` as a file-level entry. Subdirectories are not checked.
 - **SVG logo components are excluded from Compass scaffolding** — Files in `src/components/logo/` (e.g., `telegram.astro`, `whatsapp.astro`) contain only static SVG markup and do not require `MODULE_CONTRACT`, `MODULE_MAP`, or `CHANGE_SUMMARY` headers. These are pure presentational components with no business logic.
+- **Always run `command.manifest.generate` and `docs.commands.generate` together.** `docs/COMMANDS.md` is generated from `docs/command-manifest.generated.yaml` (RFC-0266). Regenerating only one leaves the manifest and COMMANDS.md out of sync. After adding or changing a command registration, run both: `pnpm exec site-kernel run command.manifest.generate` then `pnpm exec site-kernel run docs.commands.generate`. Never edit `docs/COMMANDS.md` directly — it is a generated file.
 
 ## Onboarding a new app
 
