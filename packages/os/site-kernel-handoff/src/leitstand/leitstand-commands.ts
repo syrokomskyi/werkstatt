@@ -913,8 +913,11 @@ export async function runLeitstandRollback(
           rolledBackManifest.state = "published";
         }
         await writeReleaseYaml(workspaceRoot, currentRelease, rolledBackManifest);
-      } catch {
+      } catch (err) {
         // Release manifest may not exist for very old releases — non-fatal
+        if (err instanceof Error && !err.message.includes("not found")) {
+          throw err;
+        }
       }
     }
 
