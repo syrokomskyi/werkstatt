@@ -1,7 +1,7 @@
 ---
 id: RFC-0608
 title: "Enforce alt-to-main deployment promotion chain with release state machine and public build identity verification"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
@@ -335,22 +335,22 @@ All failures exit non-zero. In `--json` mode, the error is in the `error` field 
 
 ## Acceptance criteria
 
-- [ ] `releaseStateSchema` in `packages/ontology/src/operations/release.ts` includes `alt-deployed` and `promoted` states
-- [ ] `release.prepare` writes `/.well-known/build-identity.json` into `dist/client/` with all release hashes
-- [ ] `open-source-page.ts` sources `deploymentMetadata` from `build-identity.json` instead of `resolveDeploymentMetadata`
-- [ ] `leitstand.propagate` no longer accepts `--channel` flag; always deploys to alt
-- [ ] `leitstand.propagate` transitions release state from `published` to `alt-deployed` on success
-- [ ] `leitstand.promote` command is registered and requires release state `alt-deployed`
-- [ ] `leitstand.promote` fetches and verifies `build-identity.json` from alt URL before deploying to main
-- [ ] `leitstand.promote` runs live health checks against alt deployment before deploying to main
-- [ ] `leitstand.promote` transitions release state from `alt-deployed` to `promoted` on success
-- [ ] `leitstand.rollback --channel main` transitions release state to `rolled-back`
-- [ ] `leitstand.rollback --channel alt` transitions release state back to `published`
-- [ ] `leitstand.propagate --channel alt` throws a clear error directing to the new command surface
-- [ ] `docs/COMMANDS.md` and `packages/os/site-kernel-handoff/AGENTS.md` document the new state machine and command surface
-- [ ] `docs/architecture-dna.md` DNA-49 entry includes `leitstand.promote` in the enforcement command list
-- [ ] `release.prepare` writes `build-identity.json` into `dist/client/.well-known/` and the open-source page fetches it at request time (SSR)
-- [ ] `rfc.validate` passes on this file
+- [x] `releaseStateSchema` in `packages/ontology/src/operations/release.ts` includes `alt-deployed` and `promoted` states (evidence: packages/ontology/src/operations/release.ts:21-22)
+- [x] `release.prepare` writes `/.well-known/build-identity.json` into `dist/client/` with all release hashes (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:370-390)
+- [x] `open-source-page.ts` sources `deploymentMetadata` from `build-identity.json` instead of `resolveDeploymentMetadata` (evidence: packages/os/site-kernel-codegen/src/open-source-page.ts:11, packages/ui/src/sections/open-source-registry/open-source-registry-section.astro:54-74)
+- [x] `leitstand.propagate` no longer accepts `--channel` flag; always deploys to alt (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:322-326)
+- [x] `leitstand.propagate` transitions release state from `published` to `alt-deployed` on success (evidence: packages/os/site-kernel-handoff/src/tests/leitstand-0608-propagate-channel-removed.test.ts:140-154)
+- [x] `leitstand.promote` command is registered and requires release state `alt-deployed` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:523-526, packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts:58-74)
+- [x] `leitstand.promote` fetches and verifies `build-identity.json` from alt URL before deploying to main (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:556-591)
+- [x] `leitstand.promote` runs live health checks against alt deployment before deploying to main (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:594-608)
+- [x] `leitstand.promote` transitions release state from `alt-deployed` to `promoted` on success (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:717, packages/os/site-kernel-handoff/src/tests/leitstand-0608-promote.test.ts:273-340)
+- [x] `leitstand.rollback --channel main` transitions release state to `rolled-back` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:910-911, packages/os/site-kernel-handoff/src/tests/leitstand-0608-rollback-state.test.ts:137-163)
+- [x] `leitstand.rollback --channel alt` transitions release state back to `published` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:912-913, packages/os/site-kernel-handoff/src/tests/leitstand-0608-rollback-state.test.ts:166-191)
+- [x] `leitstand.propagate --channel alt` throws a clear error directing to the new command surface (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:322-326, packages/os/site-kernel-handoff/src/tests/leitstand-0608-propagate-channel-removed.test.ts:124-138)
+- [x] `docs/COMMANDS.md` and `packages/os/site-kernel-handoff/AGENTS.md` document the new state machine and command surface (evidence: docs/COMMANDS.md:372-374, packages/os/site-kernel-handoff/AGENTS.md:26-33)
+- [x] `docs/architecture-dna.md` DNA-49 entry includes `leitstand.promote` in the enforcement command list (evidence: docs/architecture-dna.md:213)
+- [x] `release.prepare` writes `build-identity.json` into `dist/client/.well-known/` and the open-source page fetches it at request time (SSR) (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:370-390, packages/ui/src/sections/open-source-registry/open-source-registry-section.astro:63)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate run below)
 
 ## Implementation notes for agents
 
