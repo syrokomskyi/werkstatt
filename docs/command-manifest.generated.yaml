@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 54ee1c42494ddb8637bd8244eb33bf3c969a9ec6ee630241c746bcf1f0e6e69a
+  contentHash: 459aeb1a523a15872c2598877e020228129e83ee44d4688adb7b17bfebf941a4
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -2591,7 +2591,8 @@ commands:
       - systems/{system}/public/.well-known/bordbuch.json
       - systems/{system}/public/.well-known/bordbuch/index.html
       - systems/{system}/bordbuch/status.generated.yaml
-    pipelines: []
+    pipelines:
+      - build.prepare
   - name: bordbuch.generate
     description: Generate rich public Bordbuch projections (JSON + HTML + YAML) from
       the unified ledger (RFC-0473).
@@ -2612,7 +2613,8 @@ commands:
       - systems/{system}/public/.well-known/bordbuch.json
       - systems/{system}/public/.well-known/bordbuch/index.html
       - systems/{system}/bordbuch/status.generated.yaml
-    pipelines: []
+    pipelines:
+      - build.prepare
   - name: bordbuch.repair
     description: Repair orphan-mission-close violations by inserting missing
       mission-open events and recomputing the hash chain (RFC-0583).
@@ -13684,7 +13686,8 @@ commands:
     reads: []
     writes: &a637
       - <app>/public/.well-known/cosmic-passport-key.json
-    pipelines: []
+    pipelines:
+      - build.prepare
   - name: passport.key.ensure
     description: Ensure public/.well-known/cosmic-passport-key.json exists. Creates
       a new Ed25519 keypair if missing (no-op if exists). Never prints private
@@ -13698,7 +13701,8 @@ commands:
     flags: *a636
     reads: []
     writes: *a637
-    pipelines: []
+    pipelines:
+      - build.prepare
   - name: passport.key.rotate
     description: Generate a new Ed25519 keypair; update
       apps/<app>/public/.well-known/cosmic-passport-key.json; print private key

@@ -13,6 +13,7 @@
   <item>RFC-0571: added config.regenerate as first step before workpiece.imports.validate.</item>
   <item>RFC-0597: added SITES_BUILD_PREPARE_DEV_PIPELINE — codegen-only subset for dev-mode mission materialization.</item>
   <item>RFC-0600: added generated.stale.validate after generated.files.validate in both pipelines.</item>
+  <item>RFC-0604: added bordbuch.generate and passport.key.ensure before generated.files.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -118,6 +119,9 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "uni.registry.build" },
   // RFC-0295: generate Warpgogol check hints before generated.files.validate checks them
   { command: "warpgogol.check-hints.generate" },
+  // RFC-0604: generate bordbuch projections and ensure passport key before final validation
+  { command: "bordbuch.generate" },
+  { command: "passport.key.ensure" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
   { command: "generated.files.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
