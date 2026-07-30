@@ -58,12 +58,15 @@ afterEach(() => {
   rmSync(baseDir, { recursive: true, force: true });
 });
 
-function setupCommonAncestor(filePath: string, content: string): void {
+function setupCommonAncestor(files: Record<string, string>): void {
   gitInit(cacheCloneDir);
-  mkdirSync(join(cacheCloneDir, join(filePath, "..").replace(/^\.\//, "")), {
-    recursive: true,
-  });
-  writeFileSync(join(cacheCloneDir, filePath), content);
+  for (const [filePath, content] of Object.entries(files)) {
+    const dir = filePath.includes("/")
+      ? join(cacheCloneDir, filePath.slice(0, filePath.lastIndexOf("/")))
+      : cacheCloneDir;
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(cacheCloneDir, filePath), content);
+  }
   gitCommit(cacheCloneDir, "initial");
 
   execSync(`git clone ${JSON.stringify(cacheCloneDir)} ${JSON.stringify(workpieceDir)}`, {
@@ -71,17 +74,13 @@ function setupCommonAncestor(filePath: string, content: string): void {
   });
 }
 
-function simulateDeleteModify(
-  cacheFilePath: string,
-  workpieceFilePath: string,
-  cacheModifiedContent: string,
-): void {
+function simulateDeleteModify(filePath: string, cacheModifiedContent: string): void {
   // Modify in cache clone (ours)
-  writeFileSync(join(cacheCloneDir, cacheFilePath), cacheModifiedContent);
+  writeFileSync(join(cacheCloneDir, filePath), cacheModifiedContent);
   gitCommit(cacheCloneDir, "modify in cache");
 
   // Delete in workpiece
-  execSync(`git rm ${JSON.stringify(workpieceFilePath)}`, {
+  execSync(`git rm ${JSON.stringify(filePath)}`, {
     cwd: workpieceDir,
     stdio: "pipe",
   });
@@ -103,6 +102,34 @@ function simulateDeleteModify(
   }
 }
 
+function simulateDeleteModifyMultiple(files: Record<string, string>): void {
+  // Modify all files in cache clone (ours)
+  for (const [filePath, content] of Object.entries(files)) {
+    writeFileSync(join(cacheCloneDir, filePath), content);
+  }
+  gitCommit(cacheCloneDir, "modify in cache");
+
+  // Delete all files in workpiece
+  for (const filePath of Object.keys(files)) {
+    execSync(`git rm ${JSON.stringify(filePath)}`, { cwd: workpieceDir, stdio: "pipe" });
+  }
+  gitCommit(workpieceDir, "delete in workpiece");
+
+  // Fetch and merge — conflict expected
+  execSync(`git fetch ${JSON.stringify(workpieceDir)} HEAD`, {
+    cwd: cacheCloneDir,
+    stdio: "pipe",
+  });
+  try {
+    execSync("git merge --no-ff FETCH_HEAD -m test-merge", {
+      cwd: cacheCloneDir,
+      stdio: "pipe",
+    });
+  } catch {
+    // Expected: conflict during merge
+  }
+}
+
 function autoResolve(dir: string, paths: string[]): void {
   const pathArgs = paths.map((p) => JSON.stringify(p)).join(" ");
   execSync(`git checkout --ours -- ${pathArgs}`, { cwd: dir, stdio: "pipe" });
@@ -112,8 +139,8 @@ function autoResolve(dir: string, paths: string[]): void {
 
 test("RFC-0584 regression: bordbuch/events.ndjson delete/modify conflict is auto-resolved", () => {
   const filePath = "bordbuch/events.ndjson";
-  setupCommonAncestor(filePath, '{"event":"initial"}\n');
-  simulateDeleteModify(filePath, filePath, '{"event":"modified-by-cache"}\n');
+  setupCommonAncestor({ [filePath]: '{"event":"initial"}\n' });
+  simulateDeleteModify(filePath, '{"event":"modified-by-cache"}\n');
 
   const conflicts = conflictedPaths(cacheCloneDir);
   expect(conflicts).toContain(filePath);
@@ -138,8 +165,8 @@ test("RFC-0584 regression: bordbuch/events.ndjson delete/modify conflict is auto
 
 test("RFC-0614: public/.well-known/bordbuch.json delete/modify conflict is auto-resolved", () => {
   const filePath = "public/.well-known/bordbuch.json";
-  setupCommonAncestor(filePath, '{"status":"initial"}\n');
-  simulateDeleteModify(filePath, filePath, '{"status":"modified-by-cache"}\n');
+  setupCommonAncestor({ [filePath]: '{"status":"initial"}\n' });
+  simulateDeleteModify(filePath, '{"status":"modified-by-cache"}\n');
 
   const conflicts = conflictedPaths(cacheCloneDir);
   expect(conflicts).toContain(filePath);
@@ -156,8 +183,8 @@ test("RFC-0614: public/.well-known/bordbuch.json delete/modify conflict is auto-
 
 test("RFC-0614: public/.well-known/bordbuch/index.html delete/modify conflict is auto-resolved", () => {
   const filePath = "public/.well-known/bordbuch/index.html";
-  setupCommonAncestor(filePath, "<html>initial</html>\n");
-  simulateDeleteModify(filePath, filePath, "<html>modified-by-cache</html>\n");
+  setupCommonAncestor({ [filePath]: "<html>initial</html>\n" });
+  simulateDeleteModify(filePath, "<html>modified-by-cache</html>\n");
 
   const conflicts = conflictedPaths(cacheCloneDir);
   expect(conflicts).toContain(filePath);
@@ -174,8 +201,8 @@ test("RFC-0614: public/.well-known/bordbuch/index.html delete/modify conflict is
 
 test("RFC-0614: partial bordbuch set — only bordbuch/ conflicted, public/.well-known/bordbuch* does not exist", () => {
   const filePath = "bordbuch/events.ndjson";
-  setupCommonAncestor(filePath, '{"event":"initial"}\n');
-  simulateDeleteModify(filePath, filePath, '{"event":"modified-by-cache"}\n');
+  setupCommonAncestor({ [filePath]: '{"event":"initial"}\n' });
+  simulateDeleteModify(filePath, '{"event":"modified-by-cache"}\n');
 
   const conflicts = conflictedPaths(cacheCloneDir);
   expect(conflicts).toEqual([filePath]);
@@ -191,44 +218,16 @@ test("RFC-0614: partial bordbuch set — only bordbuch/ conflicted, public/.well
 test("RFC-0614: mixed bordbuch + non-bordbuch conflict is NOT auto-resolved", () => {
   const bordbuchPath = "bordbuch/events.ndjson";
   const contentPath = "src/content/page.md";
-  const initialBordbuch = '{"event":"initial"}\n';
-  const initialContent = "# Initial page\n";
 
-  // Setup common ancestor with both files
-  gitInit(cacheCloneDir);
-  mkdirSync(join(cacheCloneDir, "bordbuch"), { recursive: true });
-  mkdirSync(join(cacheCloneDir, "src/content"), { recursive: true });
-  writeFileSync(join(cacheCloneDir, bordbuchPath), initialBordbuch);
-  writeFileSync(join(cacheCloneDir, contentPath), initialContent);
-  gitCommit(cacheCloneDir, "initial");
-
-  execSync(`git clone ${JSON.stringify(cacheCloneDir)} ${JSON.stringify(workpieceDir)}`, {
-    stdio: "pipe",
+  setupCommonAncestor({
+    [bordbuchPath]: '{"event":"initial"}\n',
+    [contentPath]: "# Initial page\n",
   });
 
-  // Modify both in cache clone
-  writeFileSync(join(cacheCloneDir, bordbuchPath), '{"event":"modified-by-cache"}\n');
-  writeFileSync(join(cacheCloneDir, contentPath), "# Modified by cache\n");
-  gitCommit(cacheCloneDir, "modify in cache");
-
-  // Delete both in workpiece
-  execSync(`git rm ${JSON.stringify(bordbuchPath)}`, { cwd: workpieceDir, stdio: "pipe" });
-  execSync(`git rm ${JSON.stringify(contentPath)}`, { cwd: workpieceDir, stdio: "pipe" });
-  gitCommit(workpieceDir, "delete in workpiece");
-
-  // Fetch and merge — conflict expected
-  execSync(`git fetch ${JSON.stringify(workpieceDir)} HEAD`, {
-    cwd: cacheCloneDir,
-    stdio: "pipe",
+  simulateDeleteModifyMultiple({
+    [bordbuchPath]: '{"event":"modified-by-cache"}\n',
+    [contentPath]: "# Modified by cache\n",
   });
-  try {
-    execSync("git merge --no-ff FETCH_HEAD -m test-merge", {
-      cwd: cacheCloneDir,
-      stdio: "pipe",
-    });
-  } catch {
-    // Expected: conflict during merge
-  }
 
   const conflicts = conflictedPaths(cacheCloneDir);
   expect(conflicts).toContain(bordbuchPath);
