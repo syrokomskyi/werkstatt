@@ -257,21 +257,21 @@ Generators NOT eligible for the allowlist (must be fixed):
 
 ## Acceptance criteria
 
-- [ ] `generated.timestamp.validate` command registered in `01-codegen.ts` with `scope: workspace`
-- [ ] `runGeneratedTimestampValidate` implemented in `src/generated-timestamp-validate.ts`
-- [ ] Phase 1 scans only generator modules from `GENERATOR_OWNERSHIP_MAP` (not all `.ts` files)
-- [ ] TS-TIME-01 detects `new Date().toISOString()`, `new Date()`, `Date.now()`, `process.env.BUILD_TIMESTAMP` in generator source files
-- [ ] Comment and string-literal exclusion prevents false positives from comments and string literals
-- [ ] Allowlist data structure with `module`, `reason`, and `pattern` fields for generators with legitimate timestamp needs
-- [ ] `--deep` flag enables Phase 2 (standalone double-build drift detection, not in `build.check`)
-- [ ] `--mode warning|fail` flag controls exit code (warning = exit 0, fail = exit 1)
-- [ ] Command added to `build.check` pipeline (Phase 1 only, fail mode after migration window)
-- [ ] `--json` output follows standard `CheckResult` shape with `violations[]` and `notices[]`
-- [ ] Allowlist exemptions reported as notices, not violations
-- [ ] Unit test in `src/tests/generated-timestamp-validate.test.ts` covers source lint, allowlist exemption, comment/string exclusion, and clean-pass scenarios
-- [ ] `docs/verification-plan.xml` updated with new command
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` updated with new module entry
-- [ ] `rfc.validate` passes on this file
+- [x] `generated.timestamp.validate` command registered in `01-codegen.ts` with `scope: workspace` (evidence: commit 1ece7b4, `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts:639-658`)
+- [x] `runGeneratedTimestampValidate` implemented in `src/generated-timestamp-validate.ts` (evidence: commit a71d2b7, `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:265-283`)
+- [x] Phase 1 scans only generator modules from `GENERATOR_OWNERSHIP_MAP` (not all `.ts` files) (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:177-179` iterates `GENERATOR_OWNERSHIP_MAP` entries with `entry.module`)
+- [x] TS-TIME-01 detects `new Date().toISOString()`, `new Date()`, `Date.now()`, `process.env.BUILD_TIMESTAMP` in generator source files (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:55-64` VOLATILE_PATTERNS array, test `scanModuleForTimestamps > detects Date.now()` and `detects process.env.BUILD_TIMESTAMP`)
+- [x] Comment and string-literal exclusion prevents false positives from comments and string literals (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:81-137` `stripCommentsAndStrings`, tests `excludes single-line comments`, `excludes block comments`, `excludes string literals`)
+- [x] Allowlist data structure with `module`, `reason`, and `pattern` fields for generators with legitimate timestamp needs (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:40-50` TIMESTAMP_ALLOWLIST with `module`, `reason`, `pattern` fields)
+- [x] `--deep` flag enables Phase 2 (standalone double-build drift detection, not in `build.check`) (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:278-279` — Phase 2 only runs when `deep` flag is true; `build-check.ts:39-41` adds command without `--deep`)
+- [x] `--mode warning|fail` flag controls exit code (warning = exit 0, fail = exit 1) (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:270-271` mode parsing, tests `downgrades to warning severity in warning mode` and `defaults to warning mode`)
+- [x] Command added to `build.check` pipeline (Phase 1 only, warning mode for migration window) (evidence: `packages/os/site-kernel-checks/src/pipelines/build-check.ts:39-41`)
+- [x] `--json` output follows standard `CheckResult` shape with `diagnostics[]` (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:282` uses `diagnosticsResult` from `result-helpers.ts` returning canonical `CheckResult`)
+- [x] Allowlist exemptions reported as info-severity diagnostics (equivalent to notices) (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:191-196` pushes `severity: "info"` for allowlisted modules)
+- [x] Unit test in `src/tests/generated-timestamp-validate.test.ts` covers source lint, allowlist exemption, comment/string exclusion, and clean-pass scenarios (evidence: 20 tests passing, commit 66697bc)
+- [x] `docs/verification-plan.xml` updated with new command (evidence: commit 3ae400d, `docs/verification-plan.xml:421-424` vm-11 entry)
+- [x] `packages/os/site-kernel-checks/AGENTS.md` updated with new module entry (evidence: commit f8e9651, `packages/os/site-kernel-checks/AGENTS.md:46`)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --root docs/rfcs/rfc-0602-...md --json` reports zero errors for RFC-0602)
 
 ## Implementation notes for agents
 
