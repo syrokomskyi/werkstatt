@@ -240,20 +240,20 @@ The `artifactUri` and `distVerified` fields already exist in `ReleasePublishData
 
 ## Acceptance criteria
 
-- [x] `release.publish` calls `storeArtifactCore` inline BEFORE transitioning to `published` state
-- [x] `storeArtifactCore` is extracted from `runArtifactStorePut` as a lock-free helper; `runArtifactStorePut` wraps it with lock acquisition for standalone use
-- [x] `release.publish` does NOT call `runArtifactStorePut` directly (would deadlock on `release:${releaseId}` lock)
-- [x] `release.publish` resolves dist directory from `releases/<releaseId>/dist` (existing check, not new code)
-- [x] `release.yaml` is updated with `artifact` URI and `distArtifactHash` before state transition
-- [x] `release.publish` `--json` output includes `artifactUri` and `distArtifactHash` fields
-- [x] `leitstand.propagate` succeeds after `release.publish` without manual `artifact.store.put`
-- [x] Re-running `release.publish` for a `prepared` release is safe (idempotent artifact storage + state transition)
-- [x] If `storeArtifactCore` fails, the release remains `prepared` (no partial failure)
-- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated with the automatic artifact storage behavior
-- [x] `release.validate` checks that published releases have a non-null `artifact` field
-- [x] Existing `systemId` derivation bug in `artifact-store-commands.ts` is fixed (use release manifest's `systemId`, not `releaseId.split("-m")`)
-- [x] Unit tests cover: publish stores artifact before transition, publish fails on missing dist (remains prepared), artifact storage failure leaves release prepared, re-publish is idempotent, lock-free helper does not deadlock
-- [x] `rfc.validate` passes on this file
+- [x] `release.publish` calls `storeArtifactCore` inline BEFORE transitioning to `published` state (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:575-584, test: packages/os/site-kernel-handoff/src/tests/release-0596-artifact-storage.test.ts "release.publish stores artifact before state transition")
+- [x] `storeArtifactCore` is extracted from `runArtifactStorePut` as a lock-free helper; `runArtifactStorePut` wraps it with lock acquisition for standalone use (evidence: packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts:97-185, test: packages/os/site-kernel-handoff/src/tests/release-0596-artifact-storage.test.ts "storeArtifactCore does not create lock files")
+- [x] `release.publish` does NOT call `runArtifactStorePut` directly (would deadlock on `release:${releaseId}` lock) (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:48, imports storeArtifactCore not runArtifactStorePut)
+- [x] `release.publish` resolves dist directory from `releases/<releaseId>/dist` (existing check, not new code) (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:578, uses existing releaseDir variable)
+- [x] `release.yaml` is updated with `artifact` URI and `distArtifactHash` before state transition (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:587-591, single writeReleaseYaml call with artifact + distArtifactHash + state + publishedAt)
+- [x] `release.publish` `--json` output includes `artifactUri` and `distArtifactHash` fields (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:495-503,622-623, test: packages/os/site-kernel-handoff/src/tests/release-0596-artifact-storage.test.ts "release.publish output includes distArtifactHash field")
+- [x] `leitstand.propagate` succeeds after `release.publish` without manual `artifact.store.put` (evidence: release.publish now stores artifact automatically before state transition, leitstand.preflight checks dist directory which is already present)
+- [x] Re-running `release.publish` for a `prepared` release is safe (idempotent artifact storage + state transition) (evidence: packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts:140-147, findArtifactManifest removes existing manifest before writing new one, test: "storeArtifactCore is idempotent")
+- [x] If `storeArtifactCore` fails, the release remains `prepared` (no partial failure) (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:579-584, storeArtifactCore is called before writeReleaseYaml, failure throws before state change, test: "release.publish fails on missing dist — state remains prepared")
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated with the automatic artifact storage behavior (evidence: packages/os/site-kernel-handoff/AGENTS.md:40)
+- [x] `release.validate` checks that published releases have a non-null `artifact` field (evidence: packages/os/site-kernel-handoff/src/release/release-commands.ts:667-677, test: packages/os/site-kernel-handoff/src/tests/release-0596-artifact-storage.test.ts "release.validate flags published release without artifact")
+- [x] Existing `systemId` derivation bug in `artifact-store-commands.ts` is fixed (use release manifest's `systemId`, not `releaseId.split("-m")`) (evidence: packages/os/site-kernel-handoff/src/artifact-store/artifact-store-commands.ts:187-199, deriveSystemIdFromRelease reads release.yaml, test: "storeArtifactCore uses provided systemId, not releaseId.split")
+- [x] Unit tests cover: publish stores artifact before transition, publish fails on missing dist (remains prepared), artifact storage failure leaves release prepared, re-publish is idempotent, lock-free helper does not deadlock (evidence: packages/os/site-kernel-handoff/src/tests/release-0596-artifact-storage.test.ts, 9 tests all passing)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate RFC-0596 --json exitCode=0)
 
 ## Implementation notes for agents
 
