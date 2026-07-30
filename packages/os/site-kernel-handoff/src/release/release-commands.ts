@@ -14,6 +14,7 @@
   <item>RFC-0585: restore production build, behavior snapshot capture + diff, and real hash computation in release.prepare; add distTreeHash guard to release.publish.</item>
   <item>ADR-0008: run full three-phase build pipeline (build.prepare → astro build → build.post) in release.prepare fresh build path; delegate to shared runPipelinePhase and computeBuildInputHash helpers.</item>
   <item>RFC-0596: call storeArtifactCore (lock-free) inside release.publish before state transition; extend ReleasePublishData with distArtifactHash; extend release.validate to check artifact field for published releases.</item>
+  <item>RFC-0608: write build-identity.json into dist/client/.well-known/ after hash computation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -365,6 +366,28 @@ export async function runReleasePrepare(
 
       const behaviorSnapshotHash = productionResult.data.behaviorSnapshotHash;
       const readableSnapshotHash = readableResult.data.behaviorSnapshotHash;
+
+      // RFC-0608: Write build-identity.json into dist/client/.well-known/
+      const wellKnownDir = path.join(distDest, "client", ".well-known");
+      await fs.mkdir(wellKnownDir, { recursive: true });
+      const buildIdentity = {
+        releaseId,
+        systemId,
+        missionId,
+        semver,
+        distTreeHash,
+        behaviorSnapshotHash,
+        siteContentHash,
+        platformVersion,
+        platformSemanticHash,
+        commitSha: commit === "unknown" ? "0000000" : commit,
+        buildTimestamp: now,
+        targetPlatform: "cloudflare-workers",
+      };
+      await atomicWriteFile(
+        path.join(wellKnownDir, "build-identity.json"),
+        JSON.stringify(buildIdentity, null, 2) + "\n",
+      );
 
       // Write release manifest
       const releaseManifest: Record<string, unknown> = {
