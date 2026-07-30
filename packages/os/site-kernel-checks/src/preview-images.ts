@@ -10,11 +10,13 @@
 <CHANGE_SUMMARY>
   <item>RFC-0155: backfill MODULE_MAP and CHANGE_SUMMARY markers for compass.validate compliance.</item>
   <item>RFC-0235: normalize OG card text before rasterization; add --force-normalize to re-render stale committed cards whose source carries a signal.</item>
+  <item>RFC-0603: replace writeFile with writeFileIfChanged for idempotent binary writes — byte-identical PNGs skip disk writes.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
+import { access, mkdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
@@ -267,7 +269,7 @@ export async function runPreviewImagesGenerate(
         normalize,
       });
       await mkdir(join(appDir, "public"), { recursive: true });
-      await writeFile(ultimateFallbackFullPath, png);
+      await writeFileIfChanged(ultimateFallbackFullPath, png);
       items.push({
         pageId: "fallback",
         lang: "all",
@@ -306,7 +308,7 @@ export async function runPreviewImagesGenerate(
         brandAccent: palette.brand,
         normalize,
       });
-      await writeFile(ultimateFallbackFullPath, png);
+      await writeFileIfChanged(ultimateFallbackFullPath, png);
       items.push({
         pageId: "fallback",
         lang: "all",
@@ -380,7 +382,7 @@ export async function runPreviewImagesGenerate(
               brandAccent: palette.brand,
               normalize,
             });
-            await writeFile(pagePreviewFullPath, png);
+            await writeFileIfChanged(pagePreviewFullPath, png);
             items.push({
               pageId,
               lang,
@@ -437,7 +439,7 @@ export async function runPreviewImagesGenerate(
           ),
           { recursive: true },
         );
-        await writeFile(pagePreviewFullPath, png);
+        await writeFileIfChanged(pagePreviewFullPath, png);
         items.push({
           pageId,
           lang,
