@@ -1,7 +1,7 @@
 ---
 id: RFC-0601
 title: "Add generated.drift.validate command for content drift in generated files"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -16,7 +16,7 @@ reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
