@@ -117,7 +117,7 @@ test("discoverManifestPropsInfo: resolves a local propsSchema manifest", async (
 
 test("runPropsTypesGenerate: writes a generated file, updates contentTypesPath, and second run is a no-op", async () => {
   const root = await fixtureWorkspace(SAMPLE_MANIFEST, "sections", "sample-section");
-  const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+  const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: root,
     siteExplicit: false,

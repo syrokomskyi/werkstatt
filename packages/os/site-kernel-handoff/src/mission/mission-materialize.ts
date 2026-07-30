@@ -218,7 +218,6 @@ async function generateFullBoilerplate(
 
   const generatorInput: KernelCommandInput = {
     argv: [`--app=${systemId}`, `--domain=${domain}`],
-    args: [],
     flags: { app: systemId, domain },
   };
 

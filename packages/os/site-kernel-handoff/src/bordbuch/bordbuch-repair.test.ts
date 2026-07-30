@@ -38,7 +38,6 @@ function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
     commandName: "bordbuch.repair",
     flags,
-    args: [],
   } as unknown as KernelCommandInput;
 }
 

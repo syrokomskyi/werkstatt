@@ -33,12 +33,11 @@ function makeContext(workspaceRoot: string, appDir: string): KernelRuntimeContex
     workspaceRoot,
     site: { name: "test-site", directory: appDir },
     commandName: "team.cross-page.validate",
-    args: {},
     flags: {},
   } as unknown as KernelRuntimeContext;
 }
 
-const EMPTY_INPUT: KernelCommandInput = { args: {}, flags: {} } as unknown as KernelCommandInput;
+const EMPTY_INPUT: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput;
 
 const SYSTEM_MD = `---
 cosmicStar: Vega

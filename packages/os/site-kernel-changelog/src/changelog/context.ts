@@ -70,24 +70,20 @@ export interface ChangelogCtx {
 
 // START_BLOCK_HELPERS
 /**
- * Checks for a boolean flag in both input.flags and input.args.
- * npm scripts use `--` to separate args, which causes custom flags like
- * `--force` to end up in input.args instead of input.flags.
+ * Checks for a boolean flag in input.flags.
  */
 export function hasFlag(input: KernelCommandInput, name: string): boolean {
   if (input.flags[name] === true) return true;
-  return input.args.includes(`--${name}`);
+  return false;
 }
 
 /**
- * Reads a string-valued flag from input.flags or from input.args (--key=value).
+ * Reads a string-valued flag from input.flags.
  */
 export function readFlag(input: KernelCommandInput, name: string): string | undefined {
   const fromFlags = input.flags[name];
   if (typeof fromFlags === "string") return fromFlags;
-  const prefix = `--${name}=`;
-  const match = input.args.find((a) => a.startsWith(prefix));
-  return match ? match.slice(prefix.length) : undefined;
+  return undefined;
 }
 // END_BLOCK_HELPERS
 

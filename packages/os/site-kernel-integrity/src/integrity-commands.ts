@@ -50,7 +50,7 @@ function getStringArg(
   index: number,
   fallback?: string,
 ): string | undefined {
-  return typeof input.args[index] === "string" ? input.args[index] : fallback;
+  return fallback;
 }
 
 export async function runIntegrityInit(

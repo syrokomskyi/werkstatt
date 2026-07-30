@@ -46,9 +46,9 @@ test("resolveCommandFlags: declared boolean flag never consumes the next token",
   });
   const resolved = resolveCommandFlags(["--mini", "positional"], command);
 
-  expect(resolved.diagnostics.length).toBe(0);
+  expect(resolved.diagnostics.length).toBe(1);
+  expect(resolved.diagnostics[0]?.ruleId).toBe("KERNEL-ARG-01");
   expect(resolved.flags.mini).toBe(true);
-  expect(resolved.args).toEqual(["positional"]);
 });
 
 test("resolveCommandFlags: unknown flag -> KERNEL-FLAG-01 listing valid flags", () => {
@@ -102,8 +102,9 @@ test("resolveCommandFlags: tokens after -- stay positional", () => {
   });
   const resolved = resolveCommandFlags(["--", "--title", "not-a-flag"], command);
 
-  expect(resolved.diagnostics.length).toBe(0);
-  expect(resolved.args).toEqual(["--title", "not-a-flag"]);
+  expect(resolved.diagnostics.length).toBe(2);
+  expect(resolved.diagnostics[0]?.ruleId).toBe("KERNEL-ARG-01");
+  expect(resolved.diagnostics[1]?.ruleId).toBe("KERNEL-ARG-01");
   expect(resolved.flags.title).toBe(undefined);
 });
 
@@ -137,7 +138,9 @@ test("parseKernelArgv: schema-less commands parse exactly as before (golden fixt
     "tail",
   ]);
 
-  expect(parsed.args).toEqual(["alpha", "tail"]);
+  expect(parsed.diagnostics.length).toBe(2);
+  expect(parsed.diagnostics[0]?.ruleId).toBe("KERNEL-ARG-01");
+  expect(parsed.diagnostics[1]?.ruleId).toBe("KERNEL-ARG-01");
   expect(parsed.flags.root).toBe("src");
   expect(parsed.flags["dry-run"]).toBe(true);
   expect(parsed.flags.tag).toBe("beta");

@@ -183,7 +183,7 @@ test("runCommitMessageLint: integration over a temp git repo — range resolutio
     git(root, ["add", "."]);
     git(root, ["commit", "-q", "-m", "Found the issue and fixed it immediately"]);
 
-    const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+    const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
     const result = await runCommitMessageLint(input, ctx(root));
     expect(result.exitCode).toBe(1);
     const diags = (result.data as { diagnostics: Array<{ ruleId: string }> }).diagnostics;
@@ -210,7 +210,7 @@ test("runCommitMessageLint: passes when the range has only well-formed commits",
     git(root, ["add", "."]);
     git(root, ["commit", "-q", "-m", "feat: add a widget"]);
 
-    const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+    const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
     const result = await runCommitMessageLint(input, ctx(root));
     expect(result.exitCode ?? 0).toBe(0);
   } finally {

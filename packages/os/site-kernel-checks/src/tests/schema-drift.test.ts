@@ -53,7 +53,7 @@ describe("schema.drift.validate", () => {
     await writeFile(join(schemasDir, "page.ts"), PROXY_FILE);
     await writeFile(join(schemasDir, "block.ts"), PROXY_FILE);
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runSchemaDriftValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -62,7 +62,7 @@ describe("schema.drift.validate", () => {
   it("flags non-proxy Zod schema definitions", async () => {
     await writeFile(join(schemasDir, "local.ts"), ZOD_DEFINITION_FILE);
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runSchemaDriftValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(1);
@@ -71,14 +71,14 @@ describe("schema.drift.validate", () => {
   it("passes for plain TypeScript interfaces (no Zod)", async () => {
     await writeFile(join(schemasDir, "types.ts"), PLAIN_INTERFACE_FILE);
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runSchemaDriftValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
   });
 
   it("passes when schemas dir does not exist", async () => {
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runSchemaDriftValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -89,7 +89,7 @@ describe("schema.drift.validate", () => {
     await writeFile(join(schemasDir, "sub", "local.ts"), ZOD_DEFINITION_FILE);
     await writeFile(join(schemasDir, "proxy.ts"), PROXY_FILE);
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runSchemaDriftValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(1);

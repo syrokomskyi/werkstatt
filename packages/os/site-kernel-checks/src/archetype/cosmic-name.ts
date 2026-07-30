@@ -34,7 +34,7 @@ export async function runCosmicNamePick(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CosmicPickResult>> {
-  const archetypeId = String(input.flags.archetype ?? input.args[0] ?? "").trim();
+  const archetypeId = String(input.flags.archetype ?? "").trim();
   if (!archetypeId) {
     return {
       exitCode: 1,

@@ -31,7 +31,6 @@ function makeContext(workspaceRoot: string, appDir: string): KernelRuntimeContex
     workspaceRoot,
     site: { name: "test-site", directory: appDir },
     commandName: "passport.key.ensure",
-    args: {},
     flags: {},
     logger: { info: () => {}, warn: () => {}, error: () => {} },
   } as unknown as KernelRuntimeContext;
@@ -66,7 +65,7 @@ function keyFilePath(appDir: string): string {
 }
 
 test("creates key when file is missing", async () => {
-  const input: KernelCommandInput = { args: {}, flags: {} } as unknown as KernelCommandInput;
+  const input: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput;
   const result = await runPassportKeyEnsure(input, makeContext(tmpDir, appDir));
   const data = result.data as Record<string, unknown>;
 
@@ -102,7 +101,7 @@ test("no-op when key file already exists", async () => {
     JSON.stringify(existingKey, null, 2),
   );
 
-  const input: KernelCommandInput = { args: {}, flags: {} } as unknown as KernelCommandInput;
+  const input: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput;
   const result = await runPassportKeyEnsure(input, makeContext(tmpDir, appDir));
   const data = result.data as Record<string, unknown>;
 
@@ -117,7 +116,7 @@ test("no-op when key file already exists", async () => {
 test("never prints private key to stdout", async () => {
   const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-  const input: KernelCommandInput = { args: {}, flags: {} } as unknown as KernelCommandInput;
+  const input: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput;
   const result = await runPassportKeyEnsure(input, makeContext(tmpDir, appDir));
   const data = result.data as Record<string, unknown>;
 
@@ -136,7 +135,6 @@ test("never prints private key to stdout", async () => {
 test("--private-key-out writes private key with 0600 permissions", async () => {
   const privKeyPath = path.join(tmpDir, "private-key.txt");
   const input: KernelCommandInput = {
-    args: {},
     flags: { "private-key-out": privKeyPath },
   } as unknown as KernelCommandInput;
 
@@ -160,7 +158,7 @@ test("PKE-01: manifest missing → fail", async () => {
   const emptyDir = path.join(tmpDir, "empty-site");
   await fs.mkdir(emptyDir, { recursive: true });
 
-  const input: KernelCommandInput = { args: {}, flags: {} } as unknown as KernelCommandInput;
+  const input: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput;
   const result = await runPassportKeyEnsure(input, makeContext(tmpDir, emptyDir));
   const data = result.data as Record<string, unknown>;
   const violations = data.violations as string[];
@@ -189,7 +187,7 @@ test("PKE-03: all keys inactive → fail", async () => {
     JSON.stringify(allInactive, null, 2),
   );
 
-  const input: KernelCommandInput = { args: {}, flags: {} } as unknown as KernelCommandInput;
+  const input: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput;
   const result = await runPassportKeyEnsure(input, makeContext(tmpDir, appDir));
   const data = result.data as Record<string, unknown>;
   const violations = data.violations as string[];
@@ -201,7 +199,7 @@ test("PKE-03: all keys inactive → fail", async () => {
 test("PKE-03: corrupt key file → fail", async () => {
   await writeFile(appDir, "public/.well-known/cosmic-passport-key.json", "not valid json {{{");
 
-  const input: KernelCommandInput = { args: {}, flags: {} } as unknown as KernelCommandInput;
+  const input: KernelCommandInput = { flags: {} } as unknown as KernelCommandInput;
   const result = await runPassportKeyEnsure(input, makeContext(tmpDir, appDir));
   const data = result.data as Record<string, unknown>;
   const violations = data.violations as string[];
@@ -219,7 +217,6 @@ test("PKE-04: private key output path unwritable → fail", async () => {
   const impossiblePath = path.join(blockingFile, "private-key.txt");
 
   const input: KernelCommandInput = {
-    args: {},
     flags: { "private-key-out": impossiblePath },
   } as unknown as KernelCommandInput;
 

@@ -213,7 +213,6 @@ async function triggerTripReflex(
     await runAutonomyDemote(
       {
         argv: [],
-        args: [],
         flags: { scope: "pseo/narrative/de", to: "L0", reason: "breaker-trip" },
       } as unknown as KernelCommandInput,
       context,
@@ -223,7 +222,6 @@ async function triggerTripReflex(
     await runEscalationRoute(
       {
         argv: [],
-        args: [],
         flags: { reason: "anomaly", scope: "pseo/narrative/de", artifact: BREAKER_LOG_FILE },
       } as unknown as KernelCommandInput,
       context,

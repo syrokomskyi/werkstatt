@@ -36,7 +36,7 @@ async function fixtureWorkspace(): Promise<{ root: string; context: KernelRuntim
 }
 
 function input(): KernelCommandInput {
-  return { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+  return { argv: [], flags: {} } as unknown as KernelCommandInput;
 }
 
 describe("findUnsuppressedWalkDeclarations (RFC-0303)", () => {

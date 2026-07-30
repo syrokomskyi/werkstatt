@@ -73,7 +73,7 @@ function makeContext(): KernelRuntimeContext {
 }
 
 function makeInput(flags: Record<string, KernelFlagValue>): KernelCommandInput {
-  return { argv: [], args: [], flags };
+  return { argv: [], flags };
 }
 
 function mockStdin(content: string): void {

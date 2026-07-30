@@ -92,7 +92,7 @@ describe("route.topology.validate", () => {
     );
     await writeRouteFiles();
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runRouteTopologyValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -108,7 +108,7 @@ describe("route.topology.validate", () => {
     );
     await writeRouteFiles();
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runRouteTopologyValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -126,7 +126,7 @@ describe("route.topology.validate", () => {
     );
     // Don't write route files
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runRouteTopologyValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),
@@ -147,7 +147,7 @@ describe("route.topology.validate", () => {
     await mkdir(join(pagesDir, "[lang]"), { recursive: true });
     await writeFile(join(pagesDir, "[lang]", "[...slug].astro"), PREFIXED_ASTRO);
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runRouteTopologyValidate(
       input,
       makeTestSiteContext(workspaceRoot, appDir),

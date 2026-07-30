@@ -67,7 +67,6 @@ describe("compass.audit.baseline + validate round-trip", () => {
     const input: KernelCommandInput = {
       flags: { strict: true, packages: true, package: "test-pkg" },
       argv: [],
-      args: [],
     };
 
     const result = await runCompassAuditValidate(input, makeTestContext(workspaceRoot));
@@ -80,7 +79,6 @@ describe("compass.audit.baseline + validate round-trip", () => {
     const input: KernelCommandInput = {
       flags: { packages: true, package: "test-pkg" },
       argv: [],
-      args: [],
     };
 
     const result = await runCompassAuditValidate(input, makeTestContext(workspaceRoot));
@@ -93,7 +91,6 @@ describe("compass.audit.baseline + validate round-trip", () => {
     const baselineInput: KernelCommandInput = {
       flags: { packages: true, package: "test-pkg" },
       argv: [],
-      args: [],
     };
 
     const baselineResult = await runCompassAuditBaseline(
@@ -107,7 +104,6 @@ describe("compass.audit.baseline + validate round-trip", () => {
     const validateInput: KernelCommandInput = {
       flags: { strict: true, packages: true, package: "test-pkg" },
       argv: [],
-      args: [],
     };
 
     const validateResult = await runCompassAuditValidate(
@@ -123,7 +119,6 @@ describe("compass.audit.baseline + validate round-trip", () => {
     const input: KernelCommandInput = {
       flags: { packages: true, package: "test-pkg" },
       argv: [],
-      args: [],
     };
 
     const ctx = makeTestContext(workspaceRoot);
@@ -140,7 +135,6 @@ describe("compass.audit.baseline + validate round-trip", () => {
     const input: KernelCommandInput = {
       flags: { packages: true, package: "test-pkg" },
       argv: [],
-      args: [],
     };
 
     await runCompassAuditBaseline(input, makeTestContext(workspaceRoot));

@@ -27,7 +27,7 @@ export interface HandoffValidateData {
 
 function resolveBundleDir(input: KernelCommandInput, workspaceRoot: string): string {
   const flag = input.flags["bundle"];
-  const raw = typeof flag === "string" ? flag : input.args[0];
+  const raw = typeof flag === "string" ? flag : undefined;
   if (!raw) {
     throw new Error("[handoff.validate] requires --bundle <path>");
   }

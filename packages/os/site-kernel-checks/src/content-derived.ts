@@ -194,8 +194,7 @@ export async function runContentDerivedStamp(
   if (!appDir)
     return failResult(command, ["content.derived.stamp must run inside an app context."]);
 
-  const subjectArg =
-    (input.flags["subject"] as string | undefined) ?? (input.args[0] as string | undefined);
+  const subjectArg = input.flags["subject"] as string | undefined;
   if (!subjectArg) {
     return failResult(command, [
       'content.derived.stamp requires --subject "collection/[lang/]file#field"',

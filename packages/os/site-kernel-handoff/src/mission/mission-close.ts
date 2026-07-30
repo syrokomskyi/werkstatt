@@ -106,7 +106,7 @@ async function runInlineValidate(
   missionId: string,
   context: KernelRuntimeContext,
 ): Promise<{ passed: boolean; failures: string[]; report: MissionValidateData | null }> {
-  const syntheticInput: KernelCommandInput = { argv: [], args: [], flags: { mission: missionId } };
+  const syntheticInput: KernelCommandInput = { argv: [], flags: { mission: missionId } };
   const result = await runMissionValidate(syntheticInput, context);
   if (result.exitCode === 0) {
     return { passed: true, failures: [], report: result.data ?? null };

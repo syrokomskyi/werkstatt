@@ -100,7 +100,7 @@ export interface HandoffPackData {
 
 function resolveSiteName(input: KernelCommandInput): string {
   const flag = input.flags["site"];
-  const raw = typeof flag === "string" ? flag : input.args[0];
+  const raw = typeof flag === "string" ? flag : undefined;
   if (!raw) {
     throw new Error("[handoff.pack] requires the site name — use --site <name>");
   }

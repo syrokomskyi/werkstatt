@@ -2,10 +2,9 @@ import { test, expect, describe, vi } from "vitest";
 import { runAuditDeltaRun } from "../delta.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
 
-function makeInput(flags: Record<string, string> = {}, args: string[] = []): KernelCommandInput {
+function makeInput(flags: Record<string, string> = {}): KernelCommandInput {
   return {
     argv: [],
-    args,
     flags,
   };
 }
@@ -30,11 +29,8 @@ describe("runAuditDeltaRun", () => {
     expect((res.data as { status: string }).status).toBe("fail");
   });
 
-  test("reads batch from --batch= argument syntax", async () => {
-    const res = await runAuditDeltaRun(
-      makeInput({}, ["--batch=amend-001"]),
-      makeContext("test-app"),
-    );
+  test("reads batch from --batch= flag syntax", async () => {
+    const res = await runAuditDeltaRun(makeInput({ batch: "amend-001" }), makeContext("test-app"));
     expect(res.exitCode).toBe(1);
     expect((res.data as { status: string }).status).toBe("fail");
     expect((res.data as { findings: { ruleId: string }[] }).findings[0].ruleId).toBe(

@@ -149,7 +149,7 @@ function ctx(root: string): KernelRuntimeContext {
 test("runPipelineBudgetGenerate: empty history is a no-op (exit 0, writes nothing)", async () => {
   const root = await mkdtemp(join(tmpdir(), "pipeline-budgets-"));
   try {
-    const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+    const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
     const result = await runPipelineBudgetGenerate(input, ctx(root));
     expect(result.exitCode ?? 0).toBe(0);
     expect((result.data as { written: boolean }).written).toBe(false);
@@ -168,7 +168,7 @@ test("runPipelineBudgetGenerate: aggregates a real history file into the committ
     );
     await writeFile(join(historyDir, "steps.ndjson"), lines.join("\n") + "\n", "utf8");
 
-    const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+    const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
     const result = await runPipelineBudgetGenerate(input, ctx(root));
     expect(result.exitCode ?? 0).toBe(0);
     expect((result.data as { written: boolean }).written).toBe(true);

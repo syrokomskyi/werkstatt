@@ -70,7 +70,7 @@ function flagNumber(input: KernelCommandInput, key: string): number | undefined 
 }
 
 function makeInput(flags: Record<string, KernelFlagValue>): KernelCommandInput {
-  return { flags, args: [], argv: [] };
+  return { flags, argv: [] };
 }
 
 export async function createContentStub(

@@ -30,7 +30,7 @@ const logger = {
 };
 
 function input(flags: Record<string, unknown> = {}): KernelCommandInput {
-  return { argv: [], args: [], flags } as unknown as KernelCommandInput;
+  return { argv: [], flags } as unknown as KernelCommandInput;
 }
 
 async function fixture(): Promise<{ root: string; appDir: string; context: KernelRuntimeContext }> {

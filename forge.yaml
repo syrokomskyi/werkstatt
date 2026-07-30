@@ -17,8 +17,8 @@ paths:
 bindings:
   schema: forge/bindings@1
   commands:
-    validateRfc: pnpm exec site-kernel run rfc.validate {id} --json
-    validateAdr: pnpm exec site-kernel run adr.validate {id} --json
+    validateRfc: pnpm exec site-kernel run rfc.validate --id {id} --json
+    validateAdr: pnpm exec site-kernel run adr.validate --id {id} --json
     implementStamp: pnpm exec site-kernel run rfc.implement.stamp --id {id}
       --implementation-commit {commit}
     typecheck: pnpm --filter {workspace} run build:check

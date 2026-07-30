@@ -441,6 +441,28 @@ const ctaHref = ctaTarget
     let latestScrollY = window.scrollY;
     let rafPending = false;
 
+    const playLangSwitcherIcon = () => {
+      const langIcon = header.querySelector(".lang-switcher__nav-icon");
+      type LordIconElement = Element & {
+        ready?: boolean;
+        readyPromise?: Promise<void>;
+        playerInstance?: { playFromStart: () => void; playing: boolean };
+      };
+      const lordIcon = langIcon as LordIconElement | null;
+      if (!lordIcon) return;
+      const play = () => {
+        const player = lordIcon.playerInstance;
+        if (player && !player.playing) {
+          player.playFromStart();
+        }
+      };
+      if (lordIcon.ready) {
+        play();
+      } else if (lordIcon.readyPromise) {
+        lordIcon.readyPromise.then(play);
+      }
+    };
+
     const applyScrollState = () => {
       rafPending = false;
       const currentScrollY = latestScrollY;
@@ -449,7 +471,11 @@ const ctaHref = ctaTarget
       if (currentScrollY > lastScrollY && currentScrollY > SCROLL_THRESHOLD) {
         header.classList.add("site-header--hidden");
       } else {
+        const wasHidden = header.classList.contains("site-header--hidden");
         header.classList.remove("site-header--hidden");
+        if (wasHidden) {
+          playLangSwitcherIcon();
+        }
       }
 
       lastScrollY = currentScrollY;
@@ -466,5 +492,10 @@ const ctaHref = ctaTarget
       },
       { passive: true },
     );
+
+    // Play lang-switcher icon on initial page load (after lord-icon is defined)
+    customElements.whenDefined("lord-icon").then(() => {
+      playLangSwitcherIcon();
+    });
   }
 </script>

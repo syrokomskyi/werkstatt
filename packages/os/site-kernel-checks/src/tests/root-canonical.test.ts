@@ -22,7 +22,7 @@ const logger = {
   },
 };
 
-const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
 
 async function fixtureContext(
   indexAstroSource: string | undefined,

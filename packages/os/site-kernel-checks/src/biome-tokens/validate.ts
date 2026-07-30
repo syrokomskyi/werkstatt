@@ -50,10 +50,10 @@ export async function runBiomeTokensValidate(
   const uiDir = join(context.workspaceRoot, "packages", "ui", "src");
   const appsDir = join(context.workspaceRoot, "apps");
 
-  // Determine target apps from context/flags/args
+  // Determine target apps from context/flags
   let targetApps: string[] = [];
-  const appFlag = context.site?.name ?? (input.flags.site as string | undefined) ?? input.args[0];
-  const allFlag = input.flags.all === true || input.args.includes("--all");
+  const appFlag = context.site?.name ?? (input.flags.site as string | undefined);
+  const allFlag = input.flags.all === true;
 
   if (appFlag) {
     targetApps = [appFlag];

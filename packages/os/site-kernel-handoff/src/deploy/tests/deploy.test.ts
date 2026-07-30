@@ -51,7 +51,7 @@ function mockContext(workspaceRoot: string): KernelRuntimeContext {
 }
 
 function mockInput(flags: Record<string, boolean | string | string[]> = {}): KernelCommandInput {
-  return { argv: [], args: [], flags } as KernelCommandInput;
+  return { argv: [], flags } as KernelCommandInput;
 }
 
 async function createArtifact(

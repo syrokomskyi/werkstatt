@@ -794,7 +794,7 @@ export async function runMaintenanceDebtQueueValidate(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult>> {
-  const queueId = stringFlag(input, "queue") ?? input.args[0];
+  const queueId = stringFlag(input, "queue");
   const commandContext = await queueCommandContext(context.workspaceRoot);
   const diagnostics = validateDebtQueueHealth({ ...commandContext, queueId });
   return diagnosticsResult("maintenance.debt.queue.validate", diagnostics);
@@ -804,7 +804,7 @@ export async function runMaintenanceDebtQueueReport(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<DebtQueueReport>> {
-  const queueId = stringFlag(input, "queue") ?? input.args[0];
+  const queueId = stringFlag(input, "queue");
   const app = context.site?.name ?? stringFlag(input, "app");
   const documents = await readDebtQueueDocuments(context.workspaceRoot);
   const readDiagnostics = documents.flatMap((document) => document.diagnostics);

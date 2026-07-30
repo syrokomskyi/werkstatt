@@ -82,7 +82,6 @@ describe("compass.audit.record path normalization", () => {
       const input: KernelCommandInput = {
         flags: { file: "src/styles/local.css", verdict: "baseline" },
         argv: [],
-        args: [],
       };
 
       const result = await runCompassAuditRecord(input, makeContext(workspaceRoot));
@@ -101,7 +100,6 @@ describe("compass.audit.record path normalization", () => {
         verdict: "baseline",
       },
       argv: [],
-      args: [],
     };
 
     const result = await runCompassAuditRecord(input, makeContext(workspaceRoot));

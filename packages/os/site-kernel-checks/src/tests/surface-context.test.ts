@@ -22,7 +22,7 @@ const logger = {
   },
 };
 
-const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
 
 function system(frontmatter: string): string {
   return `---\napp: demo\nversion: 1.0.0\ni18n:\n  default: de\n  supported:\n    de: {}\n    uk: {}\n${frontmatter}\n---\n`;

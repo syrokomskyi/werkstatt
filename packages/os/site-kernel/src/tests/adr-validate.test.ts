@@ -45,7 +45,7 @@ function ctx(workspaceRoot: string): KernelRuntimeContext {
   };
 }
 
-const input: KernelCommandInput = { argv: [], args: [], flags: {} };
+const input: KernelCommandInput = { argv: [], flags: {} };
 
 function adr(supersededBy: string): string {
   return `---

@@ -42,7 +42,7 @@ export async function runI18nConfigValidate(
 ): Promise<KernelCommandResult<I18nValidationResult>> {
   const violations: I18nViolation[] = [];
   const workspaceRoot = context.workspaceRoot;
-  const app = input.args[0] as string | undefined;
+  const app = input.flags["app"] as string | undefined;
 
   const appsToCheck = app ? [app] : await discoverApps(workspaceRoot);
 

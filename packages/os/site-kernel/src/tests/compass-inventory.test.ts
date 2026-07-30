@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { test, expect } from "vitest";
 import { createCompassInventoryEntries } from "../compass-inventory.ts";
 
-const input = { argv: [], args: [], flags: {} };
+const input = { argv: [], flags: {} };
 
 test("createCompassInventoryEntries excludes generation templates but keeps authored neighbors", async () => {
   const root = await mkdtemp(join(tmpdir(), "compass-inventory-"));

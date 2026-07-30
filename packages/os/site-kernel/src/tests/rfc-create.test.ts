@@ -66,7 +66,6 @@ test("rfc.create emits an uppercase id/heading and passes rfc.validate cleanly",
     const title = "Add example dot command";
     const createInput: KernelCommandInput = {
       argv: [],
-      args: [],
       flags: { title, satisfies: "DNA-35" },
     };
     const created = await runRfcCreate(createInput, ctx(root));
@@ -85,7 +84,7 @@ test("rfc.create emits an uppercase id/heading and passes rfc.validate cleanly",
     expect(body).toMatch(new RegExp(`^# RFC-\\d{4}: ${title}$`, "m"));
 
     // The freshly created RFC must validate with zero violations.
-    const validateInput: KernelCommandInput = { argv: [], args: [], flags: {} };
+    const validateInput: KernelCommandInput = { argv: [], flags: {} };
     const res = await runRfcValidate(validateInput, ctx(root));
     const violations = res.data?.violations ?? [];
     expect(violations.length).toBe(0);
@@ -98,7 +97,7 @@ test("rfc.create rejects post-cutoff architecture RFCs without an explicit satis
   const root = await makeWorkspace();
   try {
     await expect(
-      runRfcCreate({ argv: [], args: [], flags: { title: "Add untraced invariant" } }, ctx(root)),
+      runRfcCreate({ argv: [], flags: { title: "Add untraced invariant" } }, ctx(root)),
     ).rejects.toThrow(/--satisfies DNA-N/);
   } finally {
     await fs.rm(root, { recursive: true, force: true });
@@ -127,7 +126,7 @@ test("rfc.create accounts for archived RFCs when determining the next number", a
     );
 
     const created = await runRfcCreate(
-      { argv: [], args: [], flags: { title: "Next after archive", satisfies: "DNA-35" } },
+      { argv: [], flags: { title: "Next after archive", satisfies: "DNA-35" } },
       ctx(root),
     );
 

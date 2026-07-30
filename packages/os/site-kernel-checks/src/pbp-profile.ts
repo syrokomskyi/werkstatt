@@ -40,7 +40,7 @@ export async function runPbpProfileValidate(
   const violations: PbpViolation[] = [];
   const workspaceRoot = context.workspaceRoot;
 
-  const siteName = context.site?.name ?? (input.args[0] as string | undefined);
+  const siteName = context.site?.name;
 
   if (!siteName) {
     context.logger.error("Usage: pbp.profile.validate --site <name>");

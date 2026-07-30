@@ -38,7 +38,7 @@ const logger = {
   },
 };
 
-const input = { argv: [], args: [], flags: { app: "test-app" } } as unknown as KernelCommandInput;
+const input = { argv: [], flags: { app: "test-app" } } as unknown as KernelCommandInput;
 
 function ctx(root: string): KernelRuntimeContext {
   return {
@@ -92,7 +92,6 @@ describe("generated.files.validate {system} expansion (RFC-0606)", () => {
 
       const sysInput = {
         argv: [],
-        args: [],
         flags: { site: "warpgogol-com" },
       } as unknown as KernelCommandInput;
       const result = await runGeneratedFilesValidate(sysInput, ctx(root));
@@ -121,7 +120,6 @@ describe("generated.files.validate {system} expansion (RFC-0606)", () => {
 
       const sysInput = {
         argv: [],
-        args: [],
         flags: { site: "warpgogol-com" },
       } as unknown as KernelCommandInput;
       const result = await runGeneratedFilesValidate(sysInput, ctx(root));
@@ -154,7 +152,6 @@ describe("generated.files.validate {system} expansion (RFC-0606)", () => {
       // No --site flag — {system} should expand to * and find files in both systems
       const noSiteInput = {
         argv: [],
-        args: [],
         flags: {},
       } as unknown as KernelCommandInput;
       const result = await runGeneratedFilesValidate(noSiteInput, ctx(root));

@@ -45,7 +45,9 @@ test("parseKernelArgv separates args and flags", () => {
     "tail",
   ]);
 
-  expect(parsed.args).toEqual(["alpha", "tail"]);
+  expect(parsed.diagnostics.length).toBe(2);
+  expect(parsed.diagnostics[0]?.ruleId).toBe("KERNEL-ARG-01");
+  expect(parsed.diagnostics[1]?.ruleId).toBe("KERNEL-ARG-01");
   expect(parsed.flags.root).toBe("src");
   expect(parsed.flags["dry-run"]).toBe(true);
   expect(parsed.flags.tag).toBe("beta");

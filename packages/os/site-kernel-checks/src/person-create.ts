@@ -47,7 +47,7 @@ export async function runPersonCreate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
   const paths = requireAstroSitePaths(context);
-  const rawSlug = String(input.flags.slug ?? input.args[0] ?? "").trim();
+  const rawSlug = String(input.flags.slug ?? "").trim();
   const name = String(input.flags.name ?? "").trim();
   const lang = String(
     input.flags.lang ?? (await readDefaultLanguageCode(join(paths.appDirectory, "src", "content"))),

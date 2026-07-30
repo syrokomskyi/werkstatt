@@ -78,7 +78,6 @@ function makeContext(workspaceRoot: string): KernelRuntimeContext {
 function makeInput(flags?: Record<string, KernelFlagValue>): KernelCommandInput {
   return {
     argv: [],
-    args: [],
     flags: flags ?? {},
   };
 }

@@ -22,7 +22,10 @@ import {
   systemManifestSchema,
   type SectionArchetypeContract,
 } from "@warpgogol/ontology";
-import { parseMarkdownFrontmatter, stringifyMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import {
+  parseMarkdownFrontmatter,
+  stringifyMarkdownFrontmatter,
+} from "@warpgogol/site-kernel-content";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -95,8 +98,8 @@ export async function runSectionScaffold(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<SectionScaffoldResult>> {
-  const slug = String(input.flags.name ?? input.flags.slug ?? input.args[0] ?? "").trim();
-  const archetypeId = String(input.flags.archetype ?? input.args[1] ?? "").trim();
+  const slug = String(input.flags.name ?? input.flags.slug ?? "").trim();
+  const archetypeId = String(input.flags.archetype ?? "").trim();
   if (!slug || !archetypeId) {
     return {
       exitCode: 1,
@@ -165,7 +168,7 @@ export async function runSectionScaffold(
     // RFC-0262: the manifest propsSchema is the only authored prop contract —
     // generate this section's types.generated.ts immediately instead of
     // hand-writing a .types.ts starter.
-    await runPropsTypesGenerate({ argv: [], args: [], flags: {} }, context);
+    await runPropsTypesGenerate({ argv: [], flags: {} }, context);
 
     filesWritten.push(astroPath, cssPath, typesPath, storyPath, manifestPath);
   }

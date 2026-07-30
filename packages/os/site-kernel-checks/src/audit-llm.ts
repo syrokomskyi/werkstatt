@@ -99,9 +99,7 @@ function normalizeFindings(
 function readFlag(input: KernelCommandInput, name: string): string | undefined {
   const direct = input.flags[name];
   if (typeof direct === "string") return direct;
-  const prefix = `--${name}=`;
-  const inline = input.args.find((arg) => arg.startsWith(prefix));
-  return inline ? inline.slice(prefix.length) : undefined;
+  return undefined;
 }
 
 function promptPathForKind(root: string, kind: AuditLlmKind): string {

@@ -156,7 +156,7 @@ test("runProbe: run — end-to-end against the real repo, exitCode matches expec
   const result = await runProbe(
     {
       probe: "run",
-      command: "site-kernel run rfc.validate rfc-0268",
+      command: "site-kernel run rfc.validate --id rfc-0268",
       expect: { exitCode: 0 },
     },
     workspaceRoot,

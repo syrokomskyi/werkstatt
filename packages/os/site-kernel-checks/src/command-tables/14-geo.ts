@@ -27,9 +27,13 @@ export const GEO_COMMANDS: CheckCommandEntry[] = [
   {
     name: "geo.slug.preview",
     description:
-      "Preview the locale-aware URL slug for a city name (RFC-0237). Usage: geo.slug.preview <name> --lang=de|uk",
+      "Preview the locale-aware URL slug for a city name (RFC-0237). Usage: geo.slug.preview --name <city-name> --lang=de|uk",
     scope: "workspace",
     flags: {
+      name: {
+        kind: "string",
+        description: "City name to preview the slug for.",
+      },
       lang: {
         kind: "string",
         description: "Language code.",

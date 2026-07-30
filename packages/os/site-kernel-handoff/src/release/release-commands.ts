@@ -310,7 +310,6 @@ export async function runReleasePrepare(
             release: releaseId,
           },
           argv: [],
-          args: [],
         },
         context,
       );
@@ -330,7 +329,6 @@ export async function runReleasePrepare(
             release: releaseId,
           },
           argv: [],
-          args: [],
         },
         context,
       );
@@ -345,7 +343,6 @@ export async function runReleasePrepare(
         {
           flags: { baseline: readableSnapshotPath, candidate: productionSnapshotPath },
           argv: [],
-          args: [],
         },
         context,
       );
@@ -417,7 +414,7 @@ export async function runReleasePrepare(
       try {
         const { runSurfaceContractValidate } = await import("../surface-contract.ts");
         const surfaceResult = await runSurfaceContractValidate(
-          { flags: { app: systemId }, argv: [], args: [] },
+          { flags: { app: systemId }, argv: [] },
           context,
         );
 

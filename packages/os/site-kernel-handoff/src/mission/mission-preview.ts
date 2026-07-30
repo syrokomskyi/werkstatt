@@ -83,10 +83,7 @@ export async function runMissionPreview(
     toolsDirectory: path.join(workpiecePath, "tools"),
   };
   try {
-    await runContentRefIndexGenerate(
-      { argv: [], args: [], flags: {} },
-      { ...context, site: workpieceSite },
-    );
+    await runContentRefIndexGenerate({ argv: [], flags: {} }, { ...context, site: workpieceSite });
   } catch (err) {
     logger.warn(
       `  [ADR-0007] content.ref-index.generate failed: ${err instanceof Error ? err.message : String(err)} — index may be stale`,

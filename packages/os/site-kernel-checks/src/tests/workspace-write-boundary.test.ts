@@ -141,7 +141,7 @@ describe("workspace.write.boundary.lint (RFC-0258)", () => {
   it("runWorkspaceWriteBoundaryLint passes cleanly against the real repo workspace", async () => {
     const workspaceRoot = join(import.meta.dirname, "..", "..", "..", "..", "..");
     const context = { workspaceRoot } as KernelRuntimeContext;
-    const result = await runWorkspaceWriteBoundaryLint({ argv: [], args: [], flags: {} }, context);
+    const result = await runWorkspaceWriteBoundaryLint({ argv: [], flags: {} }, context);
     expect(result.exitCode).toBe(0);
   });
 });

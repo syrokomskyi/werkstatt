@@ -18,7 +18,6 @@ schema.
 import type {
   Diagnostic,
   KernelCommandDefinition,
-  KernelCommandInput,
   KernelFlagSpec,
   KernelFlagValue,
 } from "../types.ts";
@@ -95,16 +94,25 @@ const KERNEL_BOOLEAN_FLAGS = new Set<string>([
   "write",
 ]);
 
-export function parseKernelArgv(argv: string[]): KernelCommandInput {
-  const args: string[] = [];
+export function parseKernelArgv(argv: string[]): {
+  argv: string[];
+  flags: Record<string, KernelFlagValue>;
+  diagnostics: Diagnostic[];
+} {
   const flags: Record<string, KernelFlagValue> = {};
+  const diagnostics: Diagnostic[] = [];
   let passthrough = false;
 
   for (let index = 0; index < argv.length; index += 1) {
     const entry = argv[index];
 
     if (passthrough) {
-      args.push(entry);
+      diagnostics.push({
+        ruleId: "KERNEL-ARG-01",
+        severity: "error",
+        message: `Unexpected positional argument "${entry}". All arguments must be passed as flags.`,
+        fixHint: `Convert "${entry}" to a flag, e.g. --id ${entry}.`,
+      });
       continue;
     }
 
@@ -114,7 +122,12 @@ export function parseKernelArgv(argv: string[]): KernelCommandInput {
     }
 
     if (!entry.startsWith("--")) {
-      args.push(entry);
+      diagnostics.push({
+        ruleId: "KERNEL-ARG-01",
+        severity: "error",
+        message: `Unexpected positional argument "${entry}". All arguments must be passed as flags.`,
+        fixHint: `Convert "${entry}" to a flag, e.g. --id ${entry}.`,
+      });
       continue;
     }
 
@@ -148,8 +161,8 @@ export function parseKernelArgv(argv: string[]): KernelCommandInput {
 
   return {
     argv: [...argv],
-    args,
     flags,
+    diagnostics,
   };
 }
 
@@ -183,19 +196,18 @@ export const KERNEL_UNIVERSAL_FLAGS: Record<string, KernelFlagSpec> = {
  * of being silently accepted as `true`.
  *
  * Passthrough semantics are unchanged: tokens after a bare `--` are never
- * flag-interpreted and are appended to `args` verbatim.
+ * flag-interpreted and produce KERNEL-ARG-01 diagnostics per RFC-0609.
  */
 export function resolveCommandFlags(
   rawArgv: string[],
   definition: KernelCommandDefinition,
-): { flags: Record<string, KernelFlagValue>; args: string[]; diagnostics: Diagnostic[] } {
+): { flags: Record<string, KernelFlagValue>; diagnostics: Diagnostic[] } {
   const schema: Record<string, KernelFlagSpec> = {
     ...KERNEL_UNIVERSAL_FLAGS,
     ...(definition.flags ?? {}),
   };
   const validFlagNames = Object.keys(schema).sort();
   const flags: Record<string, KernelFlagValue> = {};
-  const args: string[] = [];
   const diagnostics: Diagnostic[] = [];
   let passthrough = false;
 
@@ -203,7 +215,12 @@ export function resolveCommandFlags(
     const entry = rawArgv[index];
 
     if (passthrough) {
-      args.push(entry);
+      diagnostics.push({
+        ruleId: "KERNEL-ARG-01",
+        severity: "error",
+        message: `Unexpected positional argument "${entry}" for command "${definition.name}". All arguments must be passed as flags.`,
+        fixHint: `Convert "${entry}" to a flag, e.g. --id ${entry}.`,
+      });
       continue;
     }
 
@@ -213,7 +230,12 @@ export function resolveCommandFlags(
     }
 
     if (!entry.startsWith("--")) {
-      args.push(entry);
+      diagnostics.push({
+        ruleId: "KERNEL-ARG-01",
+        severity: "error",
+        message: `Unexpected positional argument "${entry}" for command "${definition.name}". All arguments must be passed as flags.`,
+        fixHint: `Convert "${entry}" to a flag, e.g. --id ${entry}.`,
+      });
       continue;
     }
 
@@ -274,5 +296,5 @@ export function resolveCommandFlags(
     }
   }
 
-  return { flags, args, diagnostics };
+  return { flags, diagnostics };
 }

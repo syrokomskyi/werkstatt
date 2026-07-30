@@ -27,8 +27,8 @@ export async function runI18nDetectImplement(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
-  // Get app name from context (if --site was passed) or from input.args
-  const siteName = context.site?.name ?? (input.args[0] as string | undefined);
+  // Get app name from context (if --site was passed)
+  const siteName = context.site?.name;
   const dryRun = context.dryRun;
 
   if (!siteName) {

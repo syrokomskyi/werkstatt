@@ -71,7 +71,7 @@ const logger = {
   },
 };
 
-const input = { argv: [], args: [], flags: { site: "test-app" } } as unknown as KernelCommandInput;
+const input = { argv: [], flags: { site: "test-app" } } as unknown as KernelCommandInput;
 
 function ctx(root: string, siteDir?: string): KernelRuntimeContext {
   const { io } = createDefaultIO();

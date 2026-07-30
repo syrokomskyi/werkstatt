@@ -22,7 +22,6 @@ const execFileAsync = promisify(execFile);
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
     flags: flags as Record<string, import("@warpgogol/site-kernel").KernelFlagValue>,
-    args: [],
     argv: [],
   };
 }

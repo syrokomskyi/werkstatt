@@ -51,7 +51,7 @@ describe("trust.rating.validate", () => {
     const ctx = makeTestSiteContext(workspaceRoot, appDir);
     ctx.site = undefined;
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runTrustRatingValidate(input, ctx);
 
     expect(result.exitCode).toBe(1);
@@ -61,7 +61,7 @@ describe("trust.rating.validate", () => {
     await writeFile(join(businessDir, "company.md"), BODENSTATION_SYSTEM);
     await writeFile(join(contentDir, "page.md"), "---\ntitle: Page\n---\n# Page\n");
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runTrustRatingValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -74,7 +74,7 @@ describe("trust.rating.validate", () => {
       "---\ntitle: Page\naggregateRating: { ratingValue: 4.5 }\n---\n# Page\n",
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runTrustRatingValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(1);
@@ -92,7 +92,7 @@ describe("trust.rating.validate", () => {
       "rating:\n  provenance: external\n  validity:\n    asOf: '2026-01-01'\n",
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runTrustRatingValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);
@@ -105,7 +105,7 @@ describe("trust.rating.validate", () => {
       "---\ntitle: Page\naggregateRating: { ratingValue: 4.5 }\n---\n# Page\n",
     );
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runTrustRatingValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(1);
@@ -115,7 +115,7 @@ describe("trust.rating.validate", () => {
     await writeFile(join(businessDir, "company.md"), STERNSYSTEM_SYSTEM);
     await writeFile(join(contentDir, "page.md"), "---\ntitle: Page\n---\n# Page\n");
 
-    const input: KernelCommandInput = { flags: {}, argv: [], args: [] };
+    const input: KernelCommandInput = { flags: {}, argv: [],  };
     const result = await runTrustRatingValidate(input, makeTestSiteContext(workspaceRoot, appDir));
 
     expect(result.exitCode).toBe(0);

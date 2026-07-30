@@ -26,7 +26,7 @@ const logger = {
   },
 };
 
-const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
 
 function context(root: string, appDirectory: string): KernelRuntimeContext {
   return {

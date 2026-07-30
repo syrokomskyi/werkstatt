@@ -37,7 +37,7 @@ function ctx(
   context: KernelRuntimeContext;
 } {
   return {
-    input: { argv: [], args: [], flags } as unknown as KernelCommandInput,
+    input: { argv: [], flags } as unknown as KernelCommandInput,
     context: {
       workspaceRoot: root,
       siteExplicit: false,

@@ -135,9 +135,7 @@ interface AmendInputValidationData {
 export function readFlag(input: KernelCommandInput, name: string): string | undefined {
   const direct = input.flags[name];
   if (typeof direct === "string") return direct;
-  const prefix = `--${name}=`;
-  const arg = input.args.find((entry) => entry.startsWith(prefix));
-  return arg ? arg.slice(prefix.length) : undefined;
+  return undefined;
 }
 
 async function pathExists(target: string): Promise<boolean> {

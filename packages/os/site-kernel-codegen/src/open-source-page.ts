@@ -65,7 +65,6 @@ type DeploymentMetadata = {
   deploymentId: string;
   commitSha: string;
   buildTimestamp: string;
-  targetPlatform: string;
 };
 
 type SbomComponent = {
@@ -95,7 +94,6 @@ export const openSourceLabelsSchema = z
     deploymentIdLabel: z.string().min(1),
     buildTimestampLabel: z.string().min(1),
     commitShaLabel: z.string().min(1),
-    targetPlatformLabel: z.string().min(1),
     scopeHeading: z.string().min(1),
     scopeIncludedLabel: z.string().min(1),
     scopeIncludedText: z.string().min(1),
@@ -133,7 +131,6 @@ export const openSourceRegistryDataSchema = z
       deploymentId: z.string(),
       buildTimestamp: z.string(),
       commitSha: z.string(),
-      targetPlatform: z.string(),
     }),
     downloads: z.array(
       z.object({
@@ -455,10 +452,7 @@ export function buildCycloneDxSbom(
         name: "warpgogol-site",
         version: metadata.deploymentId !== "—" ? metadata.deploymentId : "dev",
       },
-      properties: [
-        { name: "warpgogol:commitSha", value: metadata.commitSha },
-        { name: "warpgogol:targetPlatform", value: metadata.targetPlatform },
-      ],
+      properties: [{ name: "warpgogol:commitSha", value: metadata.commitSha }],
     },
     components: components.map((c) => ({
       type: c.type,
@@ -724,19 +718,6 @@ function resolveGitCommitSha(appDirectory: string): string {
   }
 }
 
-function inferTargetPlatform(appDirectory: string): string {
-  try {
-    const config = readFileSync(path.join(appDirectory, "astro.config.mjs"), "utf8");
-    if (config.includes("@astrojs/cloudflare")) return "cloudflare-workers";
-    if (config.includes("@astrojs/vercel")) return "vercel";
-    if (config.includes("@astrojs/netlify")) return "netlify";
-    if (config.includes("@astrojs/node")) return "node";
-    return "—";
-  } catch {
-    return "—";
-  }
-}
-
 async function resolveBuildTimestamp(cacheFile: string): Promise<string> {
   try {
     const stat = await fs.stat(cacheFile);
@@ -754,7 +735,6 @@ async function resolveDeploymentMetadata(
     deploymentId: process.env.DEPLOYMENT_ID ?? "—",
     commitSha: process.env.COMMIT_SHA ?? resolveGitCommitSha(appDirectory),
     buildTimestamp: process.env.BUILD_TIMESTAMP ?? (await resolveBuildTimestamp(cacheFile)),
-    targetPlatform: process.env.TARGET_PLATFORM ?? inferTargetPlatform(appDirectory),
   };
 }
 

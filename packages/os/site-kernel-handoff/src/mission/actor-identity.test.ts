@@ -15,7 +15,6 @@ import type { KernelCommandInput } from "@warpgogol/site-kernel";
 function makeInput(flags: Record<string, unknown>): KernelCommandInput {
   return {
     argv: [],
-    args: [],
     flags: flags as Record<string, boolean | string | string[]>,
   };
 }

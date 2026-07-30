@@ -39,7 +39,7 @@ function makeContext(workspaceRoot: string): KernelRuntimeContext {
 }
 
 function makeInput(flags: Record<string, string>): KernelCommandInput {
-  return { flags, argv: [], args: [] };
+  return { flags, argv: [],  };
 }
 
 function writeReleaseManifest(

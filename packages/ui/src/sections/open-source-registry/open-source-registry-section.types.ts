@@ -26,7 +26,6 @@ export interface OpenSourceRegistryDeploymentMetadata {
   deploymentId: string;
   buildTimestamp: string;
   commitSha: string;
-  targetPlatform: string;
 }
 
 export interface OpenSourceRegistryDownload {
@@ -69,7 +68,6 @@ export interface OpenSourceRegistrySectionContent {
     deploymentIdLabel: string;
     buildTimestampLabel: string;
     commitShaLabel: string;
-    targetPlatformLabel: string;
     downloadsHeading: string;
     noticeFileLabel: string;
     licenseFileLabel: string;

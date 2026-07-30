@@ -52,9 +52,7 @@ interface OnboardingSynthesizeData {
 function readFlag(input: KernelCommandInput, name: string): string | undefined {
   const direct = input.flags[name];
   if (typeof direct === "string") return direct;
-  const prefix = `--${name}=`;
-  const arg = input.args.find((entry) => entry.startsWith(prefix));
-  return arg ? arg.slice(prefix.length) : undefined;
+  return undefined;
 }
 
 function hashString(source: string): string {

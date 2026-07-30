@@ -76,7 +76,7 @@ async function writeRegistry(workspaceRoot: string, reg: MonitorRegistry): Promi
 }
 
 function sourceFlag(input: KernelCommandInput): string | undefined {
-  return (input.flags["source"] as string | undefined) ?? (input.args[0] as string | undefined);
+  return input.flags["source"] as string | undefined;
 }
 
 export async function runSourceMonitorTenantAdd(

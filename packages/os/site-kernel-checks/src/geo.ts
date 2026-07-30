@@ -67,10 +67,12 @@ export async function runGeoSlugPreview(
   input: KernelCommandInput,
   _context: KernelRuntimeContext,
 ): Promise<KernelCommandResult> {
-  const name = input.args[0] as string | undefined;
+  const name = input.flags["name"] as string | undefined;
   const lang = (input.flags.lang as string | undefined) ?? "de";
   if (!name) {
-    return failResult("geo.slug.preview", ["usage: geo.slug.preview <city-name> --lang=<lang>"]);
+    return failResult("geo.slug.preview", [
+      "usage: geo.slug.preview --name <city-name> --lang=<lang>",
+    ]);
   }
   const slug = citySlug(name, lang);
   return passResult("geo.slug.preview", `"${name}" → "${slug}" (lang=${lang})`);

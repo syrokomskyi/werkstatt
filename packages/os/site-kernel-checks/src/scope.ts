@@ -21,11 +21,6 @@ export function readScopeFiles(input: KernelCommandInput): Set<string> | null {
   const direct = input.flags["scope-files"];
   let raw: string | undefined;
   if (typeof direct === "string") raw = direct;
-  else {
-    const prefix = "--scope-files=";
-    const arg = input.args.find((entry) => entry.startsWith(prefix));
-    if (arg) raw = arg.slice(prefix.length);
-  }
   if (!raw) return null;
   const set = new Set(
     raw

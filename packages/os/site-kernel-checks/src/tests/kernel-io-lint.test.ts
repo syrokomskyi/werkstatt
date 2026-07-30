@@ -44,7 +44,7 @@ async function fixtureWorkspace(): Promise<{ root: string; context: KernelRuntim
 }
 
 function input(flags: Record<string, unknown> = {}): KernelCommandInput {
-  return { argv: [], args: [], flags } as unknown as KernelCommandInput;
+  return { argv: [], flags } as unknown as KernelCommandInput;
 }
 
 describe("findForbiddenIoImports (RFC-0267)", () => {

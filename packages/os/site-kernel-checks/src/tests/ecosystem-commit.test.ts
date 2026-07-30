@@ -32,7 +32,7 @@ function ctx(root: string): KernelRuntimeContext {
 }
 
 function input(flags: Record<string, unknown>): KernelCommandInput {
-  return { argv: [], args: [], flags } as unknown as KernelCommandInput;
+  return { argv: [], flags } as unknown as KernelCommandInput;
 }
 
 async function writeJson(filePath: string, value: unknown): Promise<void> {

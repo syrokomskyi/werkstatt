@@ -25,7 +25,7 @@ const ctx = (root: string) =>
     dryRun: false,
     outputFormat: "json",
   }) as unknown as KernelRuntimeContext;
-const input = { argv: [], args: [], flags: {} } as unknown as KernelCommandInput;
+const input = { argv: [], flags: {} } as unknown as KernelCommandInput;
 
 async function setup(registry: string, rfcs: Record<string, string>): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "dna-reg-"));

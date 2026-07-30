@@ -43,8 +43,8 @@ function makeContext(workspaceRoot: string): KernelRuntimeContext {
   } as unknown as KernelRuntimeContext;
 }
 
-function makeInput(flags: Record<string, unknown> = {}, args: string[] = []): KernelCommandInput {
-  return { flags, args, positional: [] } as unknown as KernelCommandInput;
+function makeInput(flags: Record<string, unknown> = {}): KernelCommandInput {
+  return { flags } as unknown as KernelCommandInput;
 }
 
 describe("runWorkpieceImportsValidate", () => {

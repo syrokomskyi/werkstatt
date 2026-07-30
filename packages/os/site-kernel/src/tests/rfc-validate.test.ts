@@ -54,7 +54,7 @@ function ctx(workspaceRoot: string): KernelRuntimeContext {
     io: createDefaultIO().io,
   };
 }
-const input: KernelCommandInput = { argv: [], args: [], flags: {} };
+const input: KernelCommandInput = { argv: [], flags: {} };
 
 interface RfcOpts {
   status?: string;
@@ -168,7 +168,7 @@ test("targeted validation finds archived RFC files by basename id", async () => 
     "archive/implemented/rfc-9006-archived.md": rfc("RFC-9006"),
   });
   try {
-    const res = await runRfcValidate({ argv: [], args: ["rfc-9006"], flags: {} }, ctx(root));
+    const res = await runRfcValidate({ argv: [], flags: {} }, ctx(root));
     expect(res.data?.count).toBe(1);
   } finally {
     await fs.rm(root, { recursive: true, force: true });

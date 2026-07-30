@@ -76,7 +76,7 @@ export async function runShareUtilityLint(
 ): Promise<KernelCommandResult<ShareUtilityLintResult>> {
   const violations: ShareUtilityViolation[] = [];
   const workspaceRoot = context.workspaceRoot;
-  const app = input.args[0] as string | undefined;
+  const app = input.flags["app"] as string | undefined;
 
   // Scan apps if --site not specified, or specific app
   const appsToCheck = app ? [app] : await discoverApps(workspaceRoot);
@@ -186,7 +186,8 @@ async function lintSharePackage(workspaceRoot: string): Promise<ShareUtilityViol
           package: "@warpgogol/share",
           file: "src/astro/content.ts",
           rule: "wrong-import-source",
-          message: "Expected astro:content imports in @warpgogol/share/astro/content.ts (RFC-0037).",
+          message:
+            "Expected astro:content imports in @warpgogol/share/astro/content.ts (RFC-0037).",
         });
       }
     } catch {

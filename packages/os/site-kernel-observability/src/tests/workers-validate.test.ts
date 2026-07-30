@@ -90,7 +90,7 @@ function contextFor(files: Record<string, string>): KernelRuntimeContext {
 
 test("observability.workers.validate accepts JSONC wrangler configs with signoz traces", async () => {
   const result = await runObservabilityWorkersValidate(
-    { argv: [], args: [], flags: {} },
+    { argv: [], flags: {} },
     contextFor({
       "services/fleet-probe-runner/wrangler.jsonc": `{
         // JSONC comments and trailing commas are allowed by Wrangler.
@@ -113,7 +113,7 @@ test("observability.workers.validate accepts JSONC wrangler configs with signoz 
 
 test("observability.workers.validate rejects deployable wrangler configs without traces enabled", async () => {
   const result = await runObservabilityWorkersValidate(
-    { argv: [], args: [], flags: {} },
+    { argv: [], flags: {} },
     contextFor({
       "services/fleet-probe-runner/wrangler.jsonc": `{
         "main": "src/index.ts",

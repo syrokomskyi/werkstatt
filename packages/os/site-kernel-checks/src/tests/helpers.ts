@@ -52,7 +52,7 @@ export function makeTestContext(workspaceRoot: string): KernelRuntimeContext {
 
 /** Standard no-arg KernelCommandInput for tests that don't test input parsing. */
 export function testInput(): KernelCommandInput {
-  return { flags: {}, argv: [], args: [] };
+  return { flags: {}, argv: [] };
 }
 
 /** Unwrap the data field from a KernelCommandResult, asserting it is present. */

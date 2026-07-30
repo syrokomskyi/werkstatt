@@ -67,7 +67,6 @@ export interface KernelLogger {
 }
 export interface KernelCommandInput {
   argv: string[];
-  args: string[];
   flags: Record<string, KernelFlagValue>;
 }
 

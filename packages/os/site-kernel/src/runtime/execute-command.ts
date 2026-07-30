@@ -100,7 +100,8 @@ export async function executeRegisteredCommand(
 
   // RFC-0260: schema-carrying commands resolve flags strictly and abort before
   // execute() runs when resolution reports an error diagnostic. Schema-less
-  // commands keep the legacy heuristic parse path unchanged.
+  // commands keep the legacy heuristic parse path, but RFC-0609 adds KERNEL-ARG-01
+  // diagnostics for positional tokens on both paths.
   let input: KernelCommandInput;
   if (command.flags) {
     const resolved = resolveCommandFlags(argv, command);
@@ -136,9 +137,42 @@ export async function executeRegisteredCommand(
         filesModified: [],
       };
     }
-    input = { argv: [...argv], args: resolved.args, flags: resolved.flags };
+    input = { argv: [...argv], flags: resolved.flags };
   } else {
-    input = parseKernelArgv(argv);
+    const parsed = parseKernelArgv(argv);
+    const errorDiagnostics = parsed.diagnostics.filter((d) => d.severity === "error");
+    if (errorDiagnostics.length > 0) {
+      const data: CheckResult = {
+        command: command.name,
+        status: "fail",
+        diagnostics: parsed.diagnostics,
+        summary: {
+          error: errorDiagnostics.length,
+          warning: parsed.diagnostics.length - errorDiagnostics.length,
+          info: 0,
+        },
+      };
+      const summary = `${command.name}: ${errorDiagnostics.length} argument error(s)`;
+      logger.error(summary);
+      for (const line of formatFailureDiagnostics(data)) {
+        logger.error(line);
+      }
+      const logs = logger.getEvents();
+      return {
+        siteName: context.site?.name,
+        commandName: command.name,
+        data,
+        exitCode: 1,
+        ok: false,
+        summary,
+        metadata: command,
+        logs,
+        logSummary: summarizeLogs(logs),
+        timing: timing(false),
+        filesModified: [],
+      };
+    }
+    input = { argv: parsed.argv, flags: parsed.flags };
   }
 
   // RFC-0267: select the WorkspaceIO adapter for this invocation. A command

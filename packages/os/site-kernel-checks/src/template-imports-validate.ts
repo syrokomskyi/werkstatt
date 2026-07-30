@@ -95,7 +95,7 @@ export function extractWorkspaceImports(source: string, filePath: string): Templ
 
 function hasFlag(input: KernelCommandInput, name: string): boolean {
   if (input.flags[name] === true) return true;
-  return input.args.includes(`--${name}`);
+  return false;
 }
 
 export async function runTemplateImportsValidate(
