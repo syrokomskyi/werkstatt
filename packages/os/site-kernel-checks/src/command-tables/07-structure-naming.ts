@@ -212,7 +212,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: [
       "packages/forge/os/**/*.ts",
-      "packages/os/site-kernel-checks/src/command-tables/*.ts",
+      "packages/os/site-kernel-checks/src/**/*.ts",
       "packages/os/site-kernel-*/src/**/*.ts",
     ],
     execute: runCommandArgsValidate,
