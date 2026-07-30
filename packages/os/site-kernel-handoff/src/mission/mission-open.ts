@@ -10,6 +10,7 @@
   <item>RFC-0477: commit and push bordbuch after appending mission-open entry.</item>
   <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
+  <item>RFC-0593: add bordbuch.validate pre-flight gate before lock acquisition.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -33,6 +34,8 @@ import {
   appendBordbuchEntry,
   deriveNextMissionNumberSafe,
   commitAndPushBordbuch,
+  validateBordbuch,
+  type BordbuchViolation,
 } from "../bordbuch/bordbuch-io.ts";
 import {
   acquireLock,
@@ -57,6 +60,14 @@ function flagString(input: KernelCommandInput, key: string): string | undefined 
   return typeof v === "string" ? v : undefined;
 }
 
+async function preflightBordbuch(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<{ passed: boolean; violations: BordbuchViolation[] }> {
+  const { violations } = await validateBordbuch(workspaceRoot, systemId);
+  return { passed: violations.length === 0, violations };
+}
+
 export async function runMissionOpen(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -68,6 +79,21 @@ export async function runMissionOpen(
 
   if (!systemId) throw new Error("[mission.open] --system is required");
   if (!brief) throw new Error("[mission.open] --brief is required");
+
+  // RFC-0593: pre-flight bordbuch validation gate — refuse to open a new mission
+  // if the system's bordbuch has any violations. This runs before lock acquisition
+  // to avoid holding locks during validation. Known TOCTOU limitation: bordbuch.repair
+  // (operator-only) could change the bordbuch concurrently — low risk, failed attempt
+  // exits with code 1 before any side effects.
+  const bordbuchCheck = await preflightBordbuch(workspaceRoot, systemId);
+  if (!bordbuchCheck.passed) {
+    const violationLines = bordbuchCheck.violations
+      .map((v) => `  ${v.rule}: ${v.message}`)
+      .join("\n");
+    throw new Error(
+      `[mission.open] bordbuch for system '${systemId}' has ${bordbuchCheck.violations.length} violation(s) — run bordbuch.repair first\n${violationLines}`,
+    );
+  }
 
   const operationId = generateOperationId();
 
