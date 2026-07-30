@@ -12,3 +12,8 @@
 */
 
 /* RFC-0103: trust-strip — list rendering owned by SectionList; no section-specific CSS. */
+@layer components {
+  .section-shell[data-slug="trust-strip"].section-shell--density-compact {
+    padding-block-start: var(--ds-space-3);
+  }
+}

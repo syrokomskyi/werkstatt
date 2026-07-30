@@ -12,3 +12,11 @@
 */
 
 /* RFC-0103: ownership-block has no content-specific CSS — list rendering owned by SectionList. */
+@layer components {
+  .section-shell--density-compact .section-header {
+    margin-bottom: var(--ds-space-3);
+  }
+  .section-shell[data-slug="ownership-block"].section-shell--density-compact {
+    padding-block-end: var(--ds-space-3);
+  }
+}

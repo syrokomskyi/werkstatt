@@ -21,6 +21,7 @@ import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionList from "@warpgogol/ui/components/section-body/list/section-list.astro";
 import type { TrustStripSectionContent } from "./trust-strip-section.types.generated.ts";
+import "./trust-strip-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const props = cast<TrustStripSectionContent>(pageOverride);

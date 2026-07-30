@@ -18,6 +18,7 @@ import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionList from "@warpgogol/ui/components/section-body/list/section-list.astro";
 import type { OwnershipBlockSectionContent } from "./ownership-block-section.types.generated.ts";
+import "./ownership-block-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "ownership");
