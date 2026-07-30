@@ -220,7 +220,8 @@ export function parseMarkdownTwinFrontmatter(
       } else {
         currentKey = "";
         currentList = null;
-        frontmatter[key] = value.replace(/^["']|["']$/g, "");
+        const stripped = value.replace(/^["']|["']$/g, "");
+        frontmatter[key] = stripped === "null" ? null : stripped;
       }
     }
   }

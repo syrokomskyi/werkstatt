@@ -15,7 +15,8 @@
   <item>RFC-0375: initial implementation.</item>
 </CHANGE_SUMMARY>
 */
-import { join, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
 import type {
   CheckResult,
   Diagnostic,
@@ -25,6 +26,7 @@ import type {
   WorkspaceIO,
 } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
+import { parse as yamlParse } from "yaml";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 
@@ -75,6 +77,53 @@ export function hasGlobPattern(path: string): boolean {
 
 async function checkFileExists(io: WorkspaceIO, filePath: string): Promise<boolean> {
   return io.exists(filePath);
+}
+
+interface RegistryMirror {
+  path: string;
+  storageType?: string;
+}
+
+interface RegistrySystem {
+  id: string;
+  mirrors?: RegistryMirror[];
+}
+
+interface RegistryFile {
+  systems?: RegistrySystem[];
+}
+
+async function resolveCacheClonePath(
+  workspaceRoot: string,
+  systemId: string,
+): Promise<string | null> {
+  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
+  try {
+    const raw = await readFile(registryPath, "utf8");
+    const registry = yamlParse(raw) as RegistryFile;
+    const entry = registry.systems?.find((s) => s.id === systemId);
+    if (!entry?.mirrors?.[0]?.path) return null;
+    return resolve(workspaceRoot, entry.mirrors[0].path);
+  } catch {
+    return null;
+  }
+}
+
+async function resolveAllCacheClonePaths(workspaceRoot: string): Promise<Map<string, string>> {
+  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
+  const result = new Map<string, string>();
+  try {
+    const raw = await readFile(registryPath, "utf8");
+    const registry = yamlParse(raw) as RegistryFile;
+    for (const entry of registry.systems ?? []) {
+      if (entry.mirrors?.[0]?.path) {
+        result.set(entry.id, resolve(workspaceRoot, entry.mirrors[0].path));
+      }
+    }
+  } catch {
+    // no registry — return empty map
+  }
+  return result;
 }
 
 export async function expandGlob(
@@ -161,6 +210,9 @@ export async function runGeneratedFilesValidate(
   const app = input.flags.site as string | undefined;
   const diagnostics: Diagnostic[] = [];
 
+  const systemsPrefix = "systems/";
+  const allCacheClones = await resolveAllCacheClonePaths(context.workspaceRoot);
+
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
     const isWorkspaceAbs = isWorkspaceAbsolute(entry.path);
 
@@ -173,7 +225,65 @@ export async function runGeneratedFilesValidate(
     }
 
     const posixPath = toPosix(entry.path);
-    const expandedPath = posixPath.replace(/\{system\}/g, app ?? "*");
+    const expandedPath = posixPath
+      .replace(/\{system\}/g, app ?? "*")
+      .replace(/\{app\}/g, app ?? "*")
+      .replace(/\{lang\}/g, "*")
+      .replace(/\{route\}/g, "*")
+      .replace(/\{slug\}/g, "*")
+      .replace(/\{id\}/g, "*")
+      .replace(/\{category\}/g, "*");
+
+    if (isWorkspaceAbs && expandedPath.startsWith(systemsPrefix)) {
+      const restAfterSystems = expandedPath.slice(systemsPrefix.length);
+      const systemId = restAfterSystems.split("/")[0]!;
+      const restAfterSystemId = restAfterSystems.slice(systemId.length + 1);
+
+      if (systemId === "*") {
+        let foundAny = false;
+        for (const [sid, cachePath] of allCacheClones) {
+          const resolvedPath = join(cachePath, restAfterSystemId);
+          const exists = await checkFileExists(context.io, resolvedPath);
+          if (exists) {
+            foundAny = true;
+          } else {
+            diagnostics.push({
+              ruleId: "GEN-FILES-01",
+              severity: "error",
+              file: toPosix(relative(context.workspaceRoot, resolvedPath)),
+              message: `Registry-declared generated file for system "${sid}" (owner: ${entry.command}) does not exist on disk at ${resolvedPath}.`,
+              fixHint: `Run \`pnpm exec site-kernel run ${entry.command} --system ${sid}\` to regenerate it.`,
+            });
+          }
+        }
+        if (!foundAny && allCacheClones.size === 0) {
+          diagnostics.push({
+            ruleId: "GEN-FILES-01",
+            severity: "warning",
+            message: `No systems found matching glob "${entry.path}" for command "${entry.command}".`,
+          });
+        }
+        continue;
+      }
+
+      const cachePath =
+        allCacheClones.get(systemId) ??
+        (await resolveCacheClonePath(context.workspaceRoot, systemId));
+      if (cachePath) {
+        const resolvedPath = join(cachePath, restAfterSystemId);
+        const exists = await checkFileExists(context.io, resolvedPath);
+        if (!exists) {
+          diagnostics.push({
+            ruleId: "GEN-FILES-01",
+            severity: "error",
+            file: `systems/${systemId}/${restAfterSystemId}`,
+            message: `Registry-declared generated file "systems/${systemId}/${restAfterSystemId}" (owner: ${entry.command}) does not exist on disk.`,
+            fixHint: `Run \`pnpm exec site-kernel run ${entry.command} --system ${systemId}\` to regenerate it.`,
+          });
+        }
+        continue;
+      }
+    }
 
     if (hasGlobPattern(expandedPath)) {
       try {

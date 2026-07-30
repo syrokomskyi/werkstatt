@@ -555,9 +555,9 @@ export async function runPageMarkdownValidate(
       "sourceKind",
     ];
 
-    // MDMETA-02: Missing required field
+    // MDMETA-02: Missing required field (lastModified may be null per RFC-0602)
     for (const field of requiredFields) {
-      if (!(field in frontmatter) || !frontmatter[field]) {
+      if (!(field in frontmatter) || (frontmatter[field] == null && field !== "lastModified")) {
         errors.push(`MDMETA-02: ${abs}: missing required field "${field}"`);
       }
     }
@@ -568,9 +568,13 @@ export async function runPageMarkdownValidate(
       errors.push(`MDMETA-03: ${abs}: canonical is not an absolute URL: ${canonical}`);
     }
 
-    // MDMETA-04: lastModified is missing or not source-backed (check format)
+    // MDMETA-04: lastModified format (null is valid per RFC-0602 determinism)
     const lastModified = frontmatter.lastModified;
-    if (typeof lastModified === "string" && !/^\d{4}-\d{2}-\d{2}$/.test(lastModified)) {
+    if (
+      lastModified != null &&
+      typeof lastModified === "string" &&
+      !/^\d{4}-\d{2}-\d{2}$/.test(lastModified)
+    ) {
       errors.push(
         `MDMETA-04: ${abs}: lastModified is not a valid YYYY-MM-DD date: ${lastModified}`,
       );

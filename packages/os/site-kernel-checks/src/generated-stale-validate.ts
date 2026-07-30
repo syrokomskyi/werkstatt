@@ -73,20 +73,30 @@ export async function runGeneratedStaleValidate(
     const isWorkspaceAbs = isWorkspaceAbsolute(entry.path);
     if (!isWorkspaceAbs && !app && !context.site?.directory) continue;
 
+    const posixPath = toPosix(entry.path);
+    if (posixPath.startsWith(PREVIEW_DIR)) continue;
+
+    const expandedPath = posixPath
+      .replace(/\{app\}/g, app ?? "*")
+      .replace(/\{lang\}/g, "*")
+      .replace(/\{route\}/g, "*")
+      .replace(/\{slug\}/g, "*")
+      .replace(/\{id\}/g, "*")
+      .replace(/\{category\}/g, "*");
+
     const resolvedPath = resolveEntryPath(
-      entry,
+      { ...entry, path: expandedPath },
       app,
       context.workspaceRoot,
       context.site?.directory,
     );
-    const posixPath = toPosix(entry.path);
 
-    if (hasGlobPattern(posixPath)) {
+    if (hasGlobPattern(expandedPath)) {
       try {
         const basePath = isWorkspaceAbs
           ? context.workspaceRoot
           : (context.site?.directory ?? join(context.workspaceRoot, "apps", app!));
-        const files = await expandGlob(basePath, posixPath, context.workspaceRoot);
+        const files = await expandGlob(basePath, expandedPath, context.workspaceRoot);
         for (const f of files) {
           expectedPaths.add(toPosix(f));
         }
@@ -115,6 +125,7 @@ export async function runGeneratedStaleValidate(
       const slug = filename.replace(/\.png$/, "");
       const parts = relToSite.split("/");
       // Expected structure: public/preview/{lang}/{slug}.png → parts = ["public", "preview", lang, slug.png]
+      // Also supports subdirs: public/preview/{lang}/cosmic/{slug}.png → parts = ["public", "preview", lang, "cosmic", slug.png]
       const lang = parts.length >= 4 ? (parts[2] ?? "") : "";
       if (!lang) {
         diagnostics.push({
@@ -127,7 +138,18 @@ export async function runGeneratedStaleValidate(
         continue;
       }
 
-      const contentPagePath = join(siteDir, "src", "content", "pages", lang, `${slug}.md`);
+      // For nested preview paths (e.g. public/preview/de/cosmic/passport.png),
+      // the content page is at src/content/pages/{lang}/{subdir}/{slug}.md
+      const previewParts = parts.slice(3, -1); // e.g. ["cosmic"] or []
+      const contentPagePath = join(
+        siteDir,
+        "src",
+        "content",
+        "pages",
+        lang,
+        ...previewParts,
+        `${slug}.md`,
+      );
       const contentPageExists = await context.io.exists(contentPagePath);
       if (contentPageExists) continue;
     }

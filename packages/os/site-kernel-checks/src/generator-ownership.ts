@@ -220,9 +220,15 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-checks/src/entitlements.ts",
   },
 
-  // RFC-0165: RSS feed.
+  // RFC-0165: RSS feed + RFC-0317 JSON Feed.
   {
     path: "public/feed.xml",
+    command: "feed.generate",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-checks/src/feed.ts",
+  },
+  {
+    path: "public/feed.json",
     command: "feed.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/feed.ts",
@@ -319,9 +325,15 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-checks/src/robots.ts",
   },
 
-  // sitemap.generate — RFC-0049 sitemap.xml generation
+  // sitemap.generate — RFC-0049 sitemap.xml index + sub-sitemaps
   {
     path: "public/sitemap.xml",
+    command: "sitemap.generate",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-checks/src/sitemap.ts",
+  },
+  {
+    path: "public/sitemap-{category}.xml",
     command: "sitemap.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-checks/src/sitemap.ts",

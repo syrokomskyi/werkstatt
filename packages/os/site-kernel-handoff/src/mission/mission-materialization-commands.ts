@@ -786,22 +786,29 @@ export async function runMissionReconcile(
           // git status failed — fall through to existing error
         }
 
-        const allBordbuch =
-          conflictedPaths.length > 0 && conflictedPaths.every((p) => p.startsWith("bordbuch/"));
+        const isBordbuchPath = (p: string) =>
+          p.startsWith("bordbuch/") || p.startsWith("public/.well-known/bordbuch");
+        const allBordbuch = conflictedPaths.length > 0 && conflictedPaths.every(isBordbuchPath);
 
         if (allBordbuch) {
           // Auto-resolve: keep cache clone's bordbuch (ours)
           try {
-            execSync("git checkout --ours bordbuch/", {
-              cwd: systemDir,
-              stdio: "pipe",
-              encoding: "utf-8",
-            });
-            execSync("git add bordbuch/", {
-              cwd: systemDir,
-              stdio: "pipe",
-              encoding: "utf-8",
-            });
+            execSync(
+              "git checkout --ours bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/",
+              {
+                cwd: systemDir,
+                stdio: "pipe",
+                encoding: "utf-8",
+              },
+            );
+            execSync(
+              "git add bordbuch/ public/.well-known/bordbuch.json public/.well-known/bordbuch/",
+              {
+                cwd: systemDir,
+                stdio: "pipe",
+                encoding: "utf-8",
+              },
+            );
             execSync("git commit --no-edit", {
               cwd: systemDir,
               stdio: "pipe",
