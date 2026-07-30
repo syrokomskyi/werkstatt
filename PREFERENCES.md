@@ -48,3 +48,7 @@ Before sending ANY response that claims an RFC is "complete", "done", or "implem
 - [ ] `git status` is clean (no uncommitted changes from this session).
 
 If the agent cannot check ALL items, it MUST NOT claim the RFC is complete. Instead, it MUST list the remaining items explicitly and ask the operator for guidance.
+
+## Session-end protocol (NON-NEGOTIABLE)
+
+When the operator says "Завершаем эту сессию" (or any variant: "Завершаем сессию", "Заканчиваем сессию", "End session", "Wrap up"), the agent MUST invoke the `fo-session-retro` skill via the `skill` tool BEFORE producing any closing summary. The retro skill IS the session-end protocol — do not substitute it with a manual summary. See `.windsurf/workflows/session-end.md` for the full workflow.
