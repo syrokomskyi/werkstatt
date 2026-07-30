@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -31,6 +32,7 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-5
+  - DNA-17
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -50,7 +52,6 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-checks"
-  - "@warpgogol/ui"
 successSignals:
   - "Every .css file under packages/ui/src/sections/ and packages/ui/src/components/ is imported by at least one .astro file"
   - "Every .css filename matches its colocated .astro filename (minus extension)"
@@ -85,9 +86,11 @@ The section framework (RFC-0101..0107) mandates that every section under `packag
 
 During a visual bug investigation on 2026-07-30, two sections (`ownership-block` and `trust-strip`) were found with colocated `.css` files containing real CSS rules but **no `import` statement** in their `.astro` files. The CSS was silently never loaded, causing visual spacing bugs that were invisible to all existing validators. Seven additional sections had CSS files containing only comments (placeholder files), which correctly needed no import — but nothing enforced the distinction.
 
+The missing imports in `ownership-block-section.astro` and `trust-strip-section.astro` were fixed immediately upon discovery (before this RFC was filed). However, no validator exists to prevent the same silent failure from recurring in future sections or components. This RFC introduces that validator as a preventive guardrail.
+
 ## Problem
 
-DNA-5 (Component ↔ content ↔ schema mirror) is unprotected for the CSS dimension. No existing validator checks that a colocated `.css` file is actually imported by its `.astro` companion. The existing `section.shell.contract.validate` checks that sections use `<SectionShell>`, and `tokens.colors.section-shell.lint` checks CSS token usage — but neither verifies the import link between `.astro` and `.css`.
+DNA-5 (Component ↔ content ↔ schema mirror) and DNA-17 (Mirror Quintet) are unprotected for the CSS dimension. DNA-17 explicitly adds `.css` to the package-side quintet (`.astro` + `manifest.yaml` + content schema + `.css` + content `.md`), but no existing validator checks that the colocated `.css` file is actually imported by its `.astro` companion. The existing `section.shell.contract.validate` checks that sections use `<SectionShell>`, and `tokens.colors.section-shell.lint` checks CSS token usage — but neither verifies the import link between `.astro` and `.css`.
 
 The failure mode is silent: Astro does not warn when a `.css` file exists but is never imported. The styles simply never load, causing visual regressions that are only detectable by manual visual inspection in a browser. This is exactly what happened with `ownership-block-section.css` and `trust-strip-section.css` — both contained real CSS rules (density-based padding overrides) that were never applied because the `.astro` files did not import them.
 
@@ -102,7 +105,8 @@ The kernel gains a `section.css.import.validate` command that scans every `.css`
 
 ## Architectural fit
 
-- **DNA-5 (Component ↔ content ↔ schema mirror)**: This RFC directly enforces the CSS dimension of the component quartet — the `.astro` ↔ `.css` link that DNA-5 implies but no validator currently checks.
+- **DNA-5 (Component ↔ content ↔ schema mirror)**: This RFC enforces the `.astro` ↔ `.css` link that DNA-5's component mirror implies.
+- **DNA-17 (Mirror Quintet)**: DNA-17 explicitly adds `.css` to the package-side quintet (`.astro` + `manifest.yaml` + content schema + `.css` + content `.md`). This RFC enforces the import integrity of that `.css` element — the only quintet member not currently validated for import linkage.
 - **DNA-37 (Universal Section Props Contract)**: Sections must have their CSS loaded to render correctly; missing imports silently break the visual contract.
 - **RFC-0101..0107 (Section framework)**: Complements the existing section-framework validator suite (`section.shell.contract.validate`, `section.header.contract.validate`, etc.) by closing the CSS-import gap.
 - **Site OS operator model**: `workspace` scope, registered in `08-section-framework.ts` command table, integrated into `PACKAGES_CHECK_PIPELINE`.
@@ -144,6 +148,7 @@ The validator follows the existing `CheckCommandEntry` pattern in `08-section-fr
 | `packages/os/site-kernel-checks/src/section-framework/css-import.ts` | New validator module |
 | `packages/os/site-kernel-checks/src/command-tables/08-section-framework.ts` | Command entry added |
 | `packages/os/site-kernel-checks/src/pipelines/packages-check.ts` | Pipeline entry added |
+| `packages/os/site-kernel-checks/AGENTS.md` | Module table entry added for `src/section-framework/css-import.ts` |
 
 ### Output format
 
@@ -172,13 +177,13 @@ The validator follows the existing `CheckCommandEntry` pattern in `08-section-fr
 ### Failure modes
 
 - **CSS-IMPORT-01** (error): `.css` file exists but no `.astro` file in `packages/ui/src/` contains `import "...<filename>"`. The validator searches all `.astro` files for the CSS filename (not just colocated) to allow legitimate cross-directory imports (e.g., `effect-text.css` imported by `section-header.astro`).
-- **CSS-NAME-01** (error): `.css` filename does not match colocated `.astro` filename (minus extension). If a directory contains `foo-section.astro` and `bar.css`, this is a naming violation. Directories with multiple `.css` files (e.g., `effects/` with `effect-host.css` and `effect-text.css`) are exempt when each `.css` has a matching `.astro` or is imported by an `.astro` in the same directory.
+- **CSS-NAME-01** (error): `.css` filename does not match colocated `.astro` filename (minus extension). If a directory contains `foo-section.astro` and `bar.css`, this is a naming violation. Directories with multiple `.css` files (e.g., `effects/` with `effect-host.css` and `effect-text.css`) are exempt when each `.css` has a matching `.astro` in the same directory or is imported by an `.astro` in the same directory. If no `.astro` exists in the same directory as the `.css` file, CSS-NAME-01 is skipped for that file (the file is still checked by CSS-IMPORT-01).
 - The command exits non-zero (`exitCode: 1`) when any error-level finding is present.
 - `--json` output follows the standard `KernelCommandResult` shape.
 
 ## Rollout
 
-- **Default behavior**: fail-hard from introduction. The two known violations (`ownership-block` and `trust-strip`) will be fixed in the same implementation commit that adds the validator.
+- **Default behavior**: fail-hard from introduction. The originally-identified violations (`ownership-block` and `trust-strip`) were already fixed before this RFC was filed; the validator is introduced as a preventive guardrail.
 - **Existing apps**: no migration needed — the validator checks `packages/ui`, not app workspaces. All apps automatically benefit.
 - **New apps**: automatically compliant — `section.scaffold` generates `.astro` files with CSS imports by default.
 - **Pipeline integration**: added to `PACKAGES_CHECK_PIPELINE` after `section.shell.contract.validate`.
@@ -204,7 +209,7 @@ The validator follows the existing `CheckCommandEntry` pattern in `08-section-fr
 - [ ] `runSectionCssImportValidate` implemented in `src/section-framework/css-import.ts`
 - [ ] CSS-IMPORT-01 detects `.css` files not imported by any `.astro` in `packages/ui/src/`
 - [ ] CSS-NAME-01 detects `.css` files whose name doesn't match colocated `.astro` name
-- [ ] `ownership-block-section.astro` and `trust-strip-section.astro` import their CSS (fix applied)
+- [ ] `ownership-block-section.astro` and `trust-strip-section.astro` already import their CSS (verified — no fix needed)
 - [ ] Command added to `PACKAGES_CHECK_PIPELINE`
 - [ ] `--json` output follows standard `KernelCommandResult` shape with `diagnostics[]`
 - [ ] Unit test in `src/tests/css-import-validate.test.ts` covers both rules and the cross-import exemption
@@ -216,5 +221,5 @@ The validator follows the existing `CheckCommandEntry` pattern in `08-section-fr
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The fix for `ownership-block-section.astro` and `trust-strip-section.astro` (adding the missing CSS imports) MUST be in the same commit as the validator implementation — the validator must pass on the codebase it ships in.
+- The originally-identified violations (`ownership-block-section.astro` and `trust-strip-section.astro`) were already fixed before this RFC was filed. The validator MUST pass on the current codebase at implementation time — if any new violations are discovered, they MUST be fixed in the same commit as the validator implementation.
 - Test file MUST live at `src/tests/css-import-validate.test.ts` (per vitest config in `site-kernel-checks`).
