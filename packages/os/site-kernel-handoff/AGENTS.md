@@ -115,6 +115,14 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - Commit message format: `werkstatt: <command> <missionId>`.
 - The shared `gitExec` utility lives in `werkstatt/git-exec.ts` with an `allowNonZero` option for git commands that use non-zero exit codes as signals (e.g. `git diff --cached --quiet`).
 
+## Validation gates (RFC-0593)
+
+- `mission.open` runs `bordbuch.validate` as a pre-flight gate before lock acquisition. If violations exist, `mission.open` refuses to open a new mission and directs the operator to run `bordbuch.repair` first. No side effects (directories, manifests, registry updates) are created on validation failure.
+- `mission.close` runs `mission.validate` after the `reconciledAt` check, before `acquireLock`. Validation runs outside the lock scope to avoid holding registry/system/mission locks for 2+ minutes during the build. State is re-checked inside the locks before transition — if another process aborted the mission between validation and lock acquisition, `mission.close` exits with a state error.
+- **Invariant chain:** `reconciledAt !== null` implies `materializedAt !== null` via the validate → reconcile → close flow. `mission.reconcile` requires `evidence/validation-report.json` (created by `mission.validate`, which requires `materializedAt`). No exception path is needed for non-materialized missions.
+- **TOCTOU limitation:** `preflightBordbuch` in `mission.open` runs without holding any lock. `bordbuch.repair` (operator-only, uses its own lock scopes) could change the bordbuch concurrently. Low risk — the failed attempt exits with code 1 before any side effects, and the next `mission.open` will pass.
+- **`--force` bypass flag is NOT provided.** Validation gates are hard gates, not warnings. Bypassing validation requires a code change, not a flag.
+
 ## Mission git workpiece and Layer C protection (RFC-0480)
 
 - **Edits-only-through-missions invariant:** All site edits go through mission workpieces. `sternsystem.sync` is push-only (pull/both removed). `sternsystem.validate` detects external edits via Bordbuch-vs-git-log consistency check. Systems with detected external edits should be demoted to `paused` status, which blocks `mission.materialize`.
