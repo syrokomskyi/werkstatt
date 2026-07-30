@@ -1,7 +1,7 @@
 ---
 id: RFC-0607
 title: "Establish DNA invariant for generated-file content determinism"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace

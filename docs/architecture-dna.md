@@ -243,3 +243,7 @@ Site owner content editing passes through the Studio Gate — a stdio MCP server
 ## DNA-57 · Dev/prod egress parity
 
 The Astro dev server (`astro dev`, port 4321) MUST apply the same egress text normalization (RFC-0235) that the post-build `dist/` sweep applies to production output. Dev preview is what operators and authors see before publishing; it must reflect the published artifact as closely as possible. Build-time-only transforms that alter visible output (text normalization, and future transforms of the same class) MUST have a dev-mode equivalent so that what you see in dev is what you get in production. The dev adapter is a server-only Astro middleware that runs `normalizeHtml()` over the HTML response body, gated by `isAstroDev` so it never executes in production builds. Authored sources under `src/content/` are never modified — the dev adapter transforms output strings, same as the dist sweep. Established by this RFC.
+
+## DNA-58 · Generated-file content determinism
+
+Every text-based generated file committed to git must be byte-identical to what its owning generator would produce from current source data (after line-ending normalization). Content drift — a committed file whose content diverges from its generator's current output — is a violation. Binary files (PNG, ICO, WebP, MP4, WebM, JPG, JPEG, GIF, TIFF, HEIC, HEIF, SVG) are excluded; their determinism is covered by RFC-0602 and RFC-0603. Enforcement: `generated.drift.validate` (RFC-0601). Established by RFC-0607.
