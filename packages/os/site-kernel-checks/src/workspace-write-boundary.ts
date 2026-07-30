@@ -110,20 +110,37 @@ export const SHARED_WRITE_ALLOWLIST: SharedWriteEntry[] = [
     module: "packages/forge/os/rfc/decision-log.ts",
   },
   // RFC-0352: compass-audit ledger — two writer commands, one output file
+  // RFC-0556: canonical implementation moved to @warpgogol/forge/os/compass/handlers/compass-audit-handler.ts
   {
     command: "compass.audit.record",
     outputs: ["docs/compass-audit-ledger.generated.yaml"],
-    module: "packages/os/site-kernel-checks/src/compass-audit.ts",
+    module: "packages/forge/os/compass/handlers/compass-audit-handler.ts",
   },
   {
     command: "compass.audit.baseline",
     outputs: ["docs/compass-audit-ledger.generated.yaml"],
-    module: "packages/os/site-kernel-checks/src/compass-audit.ts",
+    module: "packages/forge/os/compass/handlers/compass-audit-handler.ts",
   },
   {
     command: "gate.catalog.generate",
     outputs: ["docs/gate-catalog.generated.yaml"],
     module: "packages/os/site-kernel-checks/src/gate-catalog.ts",
+  },
+  // RFC-0604: bordbuch.generate writes to systems/{system}/public/.well-known/
+  {
+    command: "bordbuch.generate",
+    outputs: [
+      "systems/{system}/public/.well-known/bordbuch.json",
+      "systems/{system}/public/.well-known/bordbuch/index.html",
+      "systems/{system}/public/.well-known/bordbuch/status.yaml",
+    ],
+    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+  },
+  // RFC-0604/RFC-0605: passport.key.ensure writes to public/.well-known/
+  {
+    command: "passport.key.ensure",
+    outputs: ["public/.well-known/cosmic-passport-key.json"],
+    module: "packages/os/site-kernel-checks/src/passport.ts",
   },
 ];
 
