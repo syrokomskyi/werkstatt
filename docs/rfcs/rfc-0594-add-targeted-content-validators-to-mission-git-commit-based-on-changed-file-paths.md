@@ -1,7 +1,7 @@
 ---
 id: RFC-0594
 title: "Add targeted content validators to mission.git.commit based on changed file paths"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -16,7 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
