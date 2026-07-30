@@ -21,6 +21,7 @@ import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionComparison from "@warpgogol/ui/components/section-body/comparison.astro";
 import type { ComparisonCardsSectionContent } from "./comparison-cards-section.types.generated.ts";
+import "./comparison-cards-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "comparison-cards");

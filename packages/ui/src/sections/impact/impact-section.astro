@@ -20,6 +20,7 @@ import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionStats from "@warpgogol/ui/components/section-body/stats.astro";
 import type { ImpactSectionContent } from "./impact-section.types.generated.ts";
+import "./impact-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "impact");

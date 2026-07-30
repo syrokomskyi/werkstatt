@@ -21,6 +21,7 @@ import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionCardGrid from "@warpgogol/ui/components/section-body/cards.astro";
 import type { AudienceCardsSectionContent } from "./audience-cards-section.types.generated.ts";
+import "./audience-cards-section.css";
 
 const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "audience-cards");

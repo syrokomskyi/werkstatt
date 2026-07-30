@@ -22,6 +22,7 @@ import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionSplitList from "@warpgogol/ui/components/section-body/split-list.astro";
 import type { ControlledResponsibilityBlockSectionContent } from "./controlled-responsibility-block-section.types.generated.ts";
+import "./controlled-responsibility-block-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "controlled-responsibility");

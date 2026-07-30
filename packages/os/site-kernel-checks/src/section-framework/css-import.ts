@@ -23,16 +23,27 @@ import type {
 } from "@warpgogol/site-kernel";
 import { ok, fail, type Violation, type CheckResult } from "./shared.ts";
 
-const UI_SRC = join("packages", "ui", "src");
+const UI_SECTIONS = join("packages", "ui", "src", "sections");
+const UI_COMPONENTS = join("packages", "ui", "src", "components");
 
 async function collectCssFiles(workspaceRoot: string): Promise<string[]> {
-  const root = join(workspaceRoot, UI_SRC);
-  return collectFiles(root, { extensions: [".css"], ignore: () => false });
+  const sectionsRoot = join(workspaceRoot, UI_SECTIONS);
+  const componentsRoot = join(workspaceRoot, UI_COMPONENTS);
+  const [sections, components] = await Promise.all([
+    collectFiles(sectionsRoot, { extensions: [".css"], ignore: () => false }),
+    collectFiles(componentsRoot, { extensions: [".css"], ignore: () => false }),
+  ]);
+  return [...sections, ...components];
 }
 
 async function collectAstroFiles(workspaceRoot: string): Promise<string[]> {
-  const root = join(workspaceRoot, UI_SRC);
-  return collectFiles(root, { extensions: [".astro"], ignore: () => false });
+  const sectionsRoot = join(workspaceRoot, UI_SECTIONS);
+  const componentsRoot = join(workspaceRoot, UI_COMPONENTS);
+  const [sections, components] = await Promise.all([
+    collectFiles(sectionsRoot, { extensions: [".astro"], ignore: () => false }),
+    collectFiles(componentsRoot, { extensions: [".astro"], ignore: () => false }),
+  ]);
+  return [...sections, ...components];
 }
 
 function stripExt(filename: string): string {
@@ -79,9 +90,7 @@ export async function runSectionCssImportValidate(
       });
     }
 
-    const astroInSameDir = astroFiles.filter(
-      (f) => dirname(f) === cssDir && f.endsWith(".astro"),
-    );
+    const astroInSameDir = astroFiles.filter((f) => dirname(f) === cssDir && f.endsWith(".astro"));
 
     if (astroInSameDir.length > 0) {
       const cssStem = stripExt(cssBasename);
@@ -90,7 +99,15 @@ export async function runSectionCssImportValidate(
         return astroStem === cssStem;
       });
 
-      if (!hasMatchingAstro) {
+      const importedBySameDirAstro = astroContents.some((a) => {
+        if (dirname(a.file) !== cssDir) return false;
+        const importPattern = new RegExp(
+          `import\\s+["']\\.\\.?/[^"']*${cssBasename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']`,
+        );
+        return importPattern.test(a.text);
+      });
+
+      if (!hasMatchingAstro && !importedBySameDirAstro) {
         const astroRel = relative(context.workspaceRoot, astroInSameDir[0]).replace(/\\/g, "/");
         const astroBasename = basename(astroInSameDir[0]);
         violations.push({
