@@ -82,3 +82,97 @@ describe("generated.files.validate (RFC-0375)", () => {
     }
   });
 });
+
+describe("generated.files.validate {system} expansion (RFC-0606)", () => {
+  it("red: reports GEN-FILES-01 for missing bordbuch files under systems/{system}/", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-files-sys-red-"));
+    try {
+      // Create systems/warpgogol-com/ but no bordbuch files
+      await mkdir(join(root, "systems", "warpgogol-com"), { recursive: true });
+
+      const sysInput = {
+        argv: [],
+        args: [],
+        flags: { site: "warpgogol-com" },
+      } as unknown as KernelCommandInput;
+      const result = await runGeneratedFilesValidate(sysInput, ctx(root));
+      const diagnostics = (result.data?.diagnostics ?? []) as Array<{
+        message: string;
+        file?: string;
+      }>;
+
+      const bordbuchDiags = diagnostics.filter(
+        (d) => d.message.includes("bordbuch") || (d.file && d.file.includes("bordbuch")),
+      );
+      expect(bordbuchDiags.length).toBeGreaterThan(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("green: no GEN-FILES-01 for bordbuch when files exist under systems/{system}/", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-files-sys-green-"));
+    try {
+      const baseDir = join(root, "systems", "warpgogol-com", "public", ".well-known");
+      await mkdir(baseDir, { recursive: true });
+      await writeFile(join(baseDir, "bordbuch.json"), "{}", "utf8");
+      await mkdir(join(baseDir, "bordbuch"), { recursive: true });
+      await writeFile(join(baseDir, "bordbuch", "index.html"), "<html></html>", "utf8");
+
+      const sysInput = {
+        argv: [],
+        args: [],
+        flags: { site: "warpgogol-com" },
+      } as unknown as KernelCommandInput;
+      const result = await runGeneratedFilesValidate(sysInput, ctx(root));
+      const diagnostics = (result.data?.diagnostics ?? []) as Array<{
+        message: string;
+        file?: string;
+      }>;
+
+      const bordbuchDiags = diagnostics.filter(
+        (d) => d.message.includes("bordbuch") || (d.file && d.file.includes("bordbuch")),
+      );
+      expect(bordbuchDiags).toHaveLength(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("wildcard: expands {system} to * when --site is not provided", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-files-sys-wild-"));
+    try {
+      // Create two system directories with bordbuch files
+      for (const sys of ["warpgogol-com", "other-site"]) {
+        const baseDir = join(root, "systems", sys, "public", ".well-known");
+        await mkdir(baseDir, { recursive: true });
+        await writeFile(join(baseDir, "bordbuch.json"), "{}", "utf8");
+        await mkdir(join(baseDir, "bordbuch"), { recursive: true });
+        await writeFile(join(baseDir, "bordbuch", "index.html"), "<html></html>", "utf8");
+      }
+
+      // No --site flag — {system} should expand to * and find files in both systems
+      const noSiteInput = {
+        argv: [],
+        args: [],
+        flags: {},
+      } as unknown as KernelCommandInput;
+      const result = await runGeneratedFilesValidate(noSiteInput, ctx(root));
+      const diagnostics = (result.data?.diagnostics ?? []) as Array<{
+        message: string;
+        file?: string;
+        severity: string;
+      }>;
+
+      // bordbuch entries should not produce errors since files exist in both systems
+      const bordbuchErrors = diagnostics.filter(
+        (d) =>
+          (d.message.includes("bordbuch") || (d.file && d.file.includes("bordbuch"))) &&
+          d.severity === "error",
+      );
+      expect(bordbuchErrors).toHaveLength(0);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+});

@@ -36,6 +36,7 @@ export const WORKSPACE_ABSOLUTE_PREFIXES = [
   "packages/",
   "docs/",
   "apps/",
+  "systems/",
   ".gitattributes",
   ".env",
 ];
@@ -171,21 +172,16 @@ export async function runGeneratedFilesValidate(
       continue;
     }
 
-    const resolvedPath = resolveEntryPath(
-      entry,
-      app,
-      context.workspaceRoot,
-      context.site?.directory,
-    );
     const posixPath = toPosix(entry.path);
+    const expandedPath = posixPath.replace(/\{system\}/g, app ?? "*");
 
-    if (hasGlobPattern(posixPath)) {
+    if (hasGlobPattern(expandedPath)) {
       try {
         const files = await expandGlob(
           isWorkspaceAbs
             ? context.workspaceRoot
             : (context.site?.directory ?? join(context.workspaceRoot, "apps", app!)),
-          posixPath,
+          expandedPath,
           context.workspaceRoot,
         );
 
@@ -204,6 +200,12 @@ export async function runGeneratedFilesValidate(
         });
       }
     } else {
+      const resolvedPath = resolveEntryPath(
+        { ...entry, path: expandedPath },
+        app,
+        context.workspaceRoot,
+        context.site?.directory,
+      );
       const exists = await checkFileExists(context.io, resolvedPath);
       if (!exists) {
         const relPath = toPosix(relative(context.workspaceRoot, resolvedPath));
