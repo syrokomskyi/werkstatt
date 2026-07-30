@@ -1,7 +1,7 @@
 ---
 id: RFC-0613
 title: "Accept null lastModified and fix YAML null parsing in markdown twin provenance"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-07-30
-updatedAt: 2026-07-31
+updatedAt: 2026-07-30
 enhancedAt: 2026-07-31
-implementedAt:
+implementedAt: 2026-07-30
 closedAt:
 supersedes: []
 supersededBy:
