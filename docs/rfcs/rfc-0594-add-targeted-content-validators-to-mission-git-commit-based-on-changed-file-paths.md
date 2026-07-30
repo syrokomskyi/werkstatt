@@ -224,16 +224,16 @@ interface PreCommitValidationResult {
 
 ## Acceptance criteria
 
-- [ ] `mission.git.commit` runs targeted validators based on changed file paths before committing
-- [ ] Validator mapping table covers `business-profile/`, `pages/`, `faq/` content directories
-- [ ] Commit is refused with exit code 1 when any validator fails
-- [ ] Auto-staged changes remain in the git index after a validation failure (not unstaged)
-- [ ] No validators run when no content files are changed (generated artifacts, config files)
-- [ ] Unregistered validator commands are skipped with a warning (commit proceeds)
-- [ ] All validator failures are collected and reported together
-- [ ] `AGENTS.md` updated with the pre-commit validation behavior
-- [ ] Unit tests cover: validator passes → commit succeeds, validator fails → commit blocked, no content files → no validators
-- [ ] `rfc.validate` passes on this file
+- [x] `mission.git.commit` runs targeted validators based on changed file paths before committing (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:377-384`, `runPreCommitValidation` called after `git add -A` and `hasChanges` check, before commit logic)
+- [x] Validator mapping table covers `business-profile/`, `pages/`, `faq/` content directories (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:58-62`, `VALIDATOR_MAPPINGS` array with three entries)
+- [x] Commit is refused with exit code 1 when any validator fails (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:386-407`, returns `exitCode: 1` when `preCommitValidation.passed === false`; test: `mission-git-commit-validation.test.ts:236-240`)
+- [x] Auto-staged changes remain in the git index after a validation failure (not unstaged) (evidence: `mission-git-commit-validation.test.ts:275-285`, `git status --porcelain` still shows files as staged after failed validation)
+- [x] No validators run when no content files are changed (generated artifacts, config files) (evidence: `mission-git-commit-validation.test.ts:117-127`, no content files → `validatorsRun` is empty; `mission-git-commit-validation.test.ts:253-270`, integration test with `astro.config.mjs` → commit succeeds with no validators)
+- [x] Unregistered validator commands are skipped with a warning (commit proceeds) (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:119-127`, catches "not registered"/"not found" errors and continues; test: `mission-git-commit-validation.test.ts:129-141`)
+- [x] All validator failures are collected and reported together (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:91-145`, `failures` array collects all failures before returning; `mission-git-commit-validation.test.ts:143-161`)
+- [x] `AGENTS.md` updated with the pre-commit validation behavior (evidence: `AGENTS.md:201`, `packages/os/site-kernel-handoff/AGENTS.md:134`)
+- [x] Unit tests cover: validator passes → commit succeeds, validator fails → commit blocked, no content files → no validators (evidence: `mission-git-commit-validation.test.ts`, 7 tests covering all three paths plus prefix matching, unregistered validator, and staged changes preservation)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate RFC-0594 --json` → `status: pass`, 0 violations)
 
 ## Implementation notes for agents
 
