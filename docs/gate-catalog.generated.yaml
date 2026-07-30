@@ -4,29 +4,29 @@ meta:
   generatedAt: null
   sources:
     - path: packages/os/site-kernel-checks/src/command-tables/01-codegen.ts
-      hash: f48fd02a4e56b302bfbe28c1e234a8dc0463c43a005452d3287a1db391b4d52c
+      hash: d6519a7e73b2660c1e1bcc740181adce7b66df2f799c331d71ac2282aee742d7
     - path: packages/os/site-kernel-checks/src/command-tables/02-layout-cosmic.ts
-      hash: 9033e9e680988e69670b04cd93ef9477547c5328b960561ecbd6c054f4ff2f2e
+      hash: 86b97a8dd70501728c088bec65351edf590ea0845acb2ffcffcfb47edea1dd09
     - path: packages/os/site-kernel-checks/src/command-tables/03-page-runtime.ts
-      hash: 6185a10ef8d55d1c678098b76559c5cd0fbf2d119f353c3f95d838ae339feac9
+      hash: 7ae684124174c0a44b9b33ae9cf345edd65adbaa1f5364aa884d84fd41471a6c
     - path: packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts
-      hash: 444486570fae6a403ab7065a25df6c7f7984bf624509c2912139792e0ef2e2d6
+      hash: 881012ef01f60d4196e9b6758ebae794e3570a8b93c9906506a81e8e77cecd38
     - path: packages/os/site-kernel-checks/src/command-tables/05-seo-audit.ts
-      hash: d76aab1a435e26c17b786386763c92431d97f42b7965c9135fc9a4d23e8c91c1
+      hash: 93059d89fcc77a839d260cf3152e5b30eaa34fcb1204554576d998cf175cae6a
     - path: packages/os/site-kernel-checks/src/command-tables/06-growth-passport.ts
       hash: 199d1c130a24ec8afd87c7bcc98298bd98d5bca7847a0b3fe5b1f3a2e9344a10
     - path: packages/os/site-kernel-checks/src/command-tables/07-structure-naming.ts
-      hash: e2a03ee8fa708c091fc4e6f679b5375630407ca026c2187c82c4d000a7702374
+      hash: e59b4720959df235dff14adf56d76c6b8cc306466b25f0914bc6666ccebdb149
     - path: packages/os/site-kernel-checks/src/command-tables/08-section-framework.ts
-      hash: e5b8977215969a5b38086d89d067e192fdff778318e132de9e2608549dcef8cc
+      hash: 79f947fc331dd064b1204a4e9ab75539d60f8400b8173a82a4eda7193dc5d9a5
     - path: packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts
-      hash: caadc624a2c11cc1514d234703d1daa685cfc2a42c0622215a4d638220465dbc
+      hash: 2b34d72b47ead0d27d1aad51349d1c7e676159795cd486c17245ac5516e54579
     - path: packages/os/site-kernel-checks/src/command-tables/09b-build-artifacts-part2.ts
       hash: d656f45177a3fcab67c35f00e7ee08c602609229ceafd5fa1b71a899ab77cc92
     - path: packages/os/site-kernel-checks/src/command-tables/10-integration-funnel.ts
-      hash: ffe97649cae8aeb3abe210385481de339479d952a39d364bcb2ae9936127f3d5
+      hash: 93cab7fcf2d47e53e05d94594024a3473c869f60007b69d85243ff80c6b07666
     - path: packages/os/site-kernel-checks/src/command-tables/11-pipeline-composite.ts
-      hash: 177ef7852d87ab827b13b3121767cdf1a2a4c9ad012e9a59b8fa8138c07abc64
+      hash: 3b475530ddbd584dae1ec9b155ad46a6026de17687314d1f10671691457addf9
     - path: packages/os/site-kernel-checks/src/command-tables/12-visual-control.ts
       hash: f110d7ec112035d8910e9e7a1b5da7555d29131cc41b97374c3288333eddf578
     - path: packages/os/site-kernel-checks/src/command-tables/13-text-normalize.ts
@@ -38,7 +38,7 @@ meta:
     - path: packages/os/site-kernel-checks/src/command-tables/16-offer.ts
       hash: 107c5220544a9a7a62ebb79ed78ce54f2b20758bd4d66de305435813850d0de8
     - path: packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts
-      hash: 135b67500d2c103a501d7f7a6f8412d84e57440a194f7c7bfa46bbff05159054
+      hash: 11fbd0ff8a5b2661aef6dbc64b668c2ff10d9da56d74fa110e2815a5d88f4802
     - path: packages/os/site-kernel-checks/src/command-tables/22-print.ts
       hash: c3295b07c6d6c7d34094f25dd2d9696075753db1a67ba0da02e5a8771f2d905b
     - path: packages/os/site-kernel-checks/src/command-tables/26-pseo-governance.ts
@@ -46,13 +46,13 @@ meta:
     - path: packages/os/site-kernel-checks/src/command-tables/27-pseo-visibility-breaker.ts
       hash: d5131cf85f2ddc77a6515a8af60612f93d49ecfbfd1e59aff7ad5665f04feaf0
     - path: packages/os/site-kernel-checks/src/command-tables/29-agent-surface.ts
-      hash: 99d3a8e6ae25721aaa5dbab7e969c973ba3cb40fd04833879b7294e0f3fcd24e
+      hash: b386fe168c4283f3f0f1373877ef98a8d5e75554d7e675ff1609391730ea74af
     - path: packages/os/site-kernel-checks/src/command-tables/30-check-warpgogol.ts
-      hash: 7ee29c8051ddc4e8bde0fc8fac6a670368e2e658054b2d7245755ae4331c9082
+      hash: a3ee3e50bed1da54c260961a78ed82194d8ac9637c081e08b4f90a82bb537a27
     - path: packages/os/site-kernel-checks/src/command-tables/31-public-surface.ts
-      hash: 9fa594c0b3fe08d578fa5a79e96e9c1dd4b14989017b7c956e1e9edb24d39f10
+      hash: a9165b337003bd1fcf5eae3eadf96f76e074531e511589ee90ec93d4bb3583b0
     - path: packages/os/site-kernel-checks/src/command-tables/32-analytics-matomo.ts
-      hash: 9868a6f77ca5ee42cfde6149b60c33a10a72591f8c9f1592f0f8f845b0f89388
+      hash: bd1845a715b1224d496f31bf2dcd40b2ea20eae6db933d90ea005175b096b390
     - path: packages/os/site-kernel-checks/src/command-tables/build-infra.ts
       hash: f850829ac8115b71f2dc265c83ef968eb99d89f7694491568277a9cab510de3d
     - path: packages/os/site-kernel-checks/src/command-tables/fleet-bordbuch.ts
@@ -60,28 +60,28 @@ meta:
     - path: packages/os/site-kernel-checks/src/command-tables/governance-checks.ts
       hash: 49bb6eded2492966ea9b454b74959c7986af9631874c7b3c73264d901bf4f05a
     - path: packages/os/site-kernel-checks/src/command-tables/index.ts
-      hash: ba45f0d5a3c2ccd04c9efd72eacf5f87c4e0148525a0e234e65a584ddc72dfa2
+      hash: 17fd2203bf9dff2390bd9407159dcb29ebca7f5a8c683050ec6528f2d579dfbe
     - path: packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts
-      hash: 8c7896e1c47b3f165e3a8b9bffed1f5121bca603328ee4dee045368c026c2f68
+      hash: a47daef7ee6f13bd3c8790305ca65715bdb199392ca8d3c0a4cb76ebba7184f6
     - path: packages/os/site-kernel-checks/src/command-tables/types.ts
-      hash: ec740306eba7e05a0dd5d3d39caefd71126e92cfd0c92879da539f1d83aaaa96
+      hash: a8587a2c700647cd53ef1b8a99d2eab49511d22c1963a89e291884e837147ab0
     - path: packages/os/site-kernel-checks/src/gate-catalog.ts
-      hash: 5b9a80a16d192e123c42e0cce165ed4c725515157f2a21c23c45119208e65f31
+      hash: bd38378132a1519611f8dbd0f93f85c694671b956499d4634c6a4f0d8a4c9bb1
     - path: packages/os/site-kernel-checks/src/pipelines/build-check.ts
-      hash: 4e22c2d9437ec1306dae7168dbcfc1c2ff830f7db30067bef5125c238549fc29
+      hash: 798d7275384291e6a5296ea075b2bae771be9b91af69b405286321dd18a7dc6b
     - path: packages/os/site-kernel-checks/src/pipelines/mission-preflight.ts
-      hash: f5717203ea4fb24f9ce07bf923a767a89f25a358fd0edfeb84d5802a778aa46d
+      hash: 1e11420650844d74ff1c7a8dd0e488ed93582f4ddd6e0eca9fe09c717f2896d4
     - path: packages/os/site-kernel-checks/src/pipelines/packages-check.ts
-      hash: dc11eb57d3f2fe0be5f56e34e3b67e83e2fcca166b7ee08b93d3dfb948e16972
+      hash: 1db42132d71a63a302a82da2cd7be789d15cff2cb12002c01edb1ac23e43c121
     - path: packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts
-      hash: 211171e523300f49560e4faba675372bd85c3356b0abf282f82a00e40cf928ae
+      hash: 550eb257d253fc936d202d6009e9e2ab492a6cc45c9300e55b9931ff88a8e08e
     - path: packages/os/site-kernel-checks/src/pipelines/sites-check-postbuild.ts
-      hash: 5ce50aa1461e0197717433b98c8b6890351d799c58a8ab3341a3a6fc8b7a60c8
+      hash: 42530ed60299373198abdaf2096793887b9ba3781dff57d1a82e00580be6e8ca
     - path: packages/os/site-kernel/src/types.ts
-      hash: a3ee7ed1fb5db3b8d844b7dda9c6e1e4e5c63c816b009244db8cd02cedeea6ea
+      hash: 4cfe1017ca4e243d26d7e459536d98be43664e616d5dd01d2cc61315053ac4c6
     - path: tools/kernel.config.ts
-      hash: 19d36e26db1d190a12d2252fa6266f446511b89291f444c9cb91936077714e5f
-  contentHash: 925d666004d439e6a89578ee2005333f3831dc32ae35fec64283c164321648c1
+      hash: 731146ea89c2290953e51c5cd06855d1d3750c5b165b882e9d380c063e9fbed7
+  contentHash: 2268082fe034c90b9c1372a1bcafdcb05dcb30f977cb6b8a80581e337f42b98f
 gates:
   - command: adr.archive
     severity: null
@@ -135,10 +135,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: agent.capability.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: agent.environment.audit
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.environment.audit
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.gate.fixtures.run
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -166,11 +198,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: agent.knowledge.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: agent.knowledge.validate
     severity: null
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.knowledge.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.manifest.generate
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -198,10 +261,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: agent.manifest.verify
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: agent.openapi.generate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.openapi.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.openapi.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -229,6 +324,26 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: agent.routes.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.surface.sign
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: agent.surface.sign
     severity: null
     phase: null
@@ -240,6 +355,28 @@ gates:
     metadata: absent
     rfc: null
   - command: agent.surface.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.surface.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: agent.surface.verify
     severity: null
     phase: author
     pipelines:
@@ -271,7 +408,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: agents.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: ai.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ai.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ai.policy.generate
     severity: null
     phase: null
     pipelines: []
@@ -302,7 +469,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: ai.policy.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: ai.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ai.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: amend-check.author
     severity: null
     phase: null
     pipelines: []
@@ -332,7 +530,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: amend-check.postbuild
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: amend-check.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: amend-check.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: amend.atoms.merge
     severity: null
     phase: null
     pipelines: []
@@ -362,7 +590,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: amend.delta.files
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: amend.input.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: amend.input.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: amend.phase.validate
     severity: null
     phase: null
     pipelines: []
@@ -392,7 +650,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: amend.provenance.append
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: amend.provenance.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: amend.provenance.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: amend.system.merge
     severity: null
     phase: null
     pipelines: []
@@ -424,6 +712,29 @@ gates:
     blocks: null
     metadata: absent
     rfc: RFC-0305
+  - command: analytics.binding.validate
+    severity: null
+    phase: author
+    pipelines:
+      - packages-check.run
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0305
+  - command: analytics.config.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: analytics.config.validate
     severity: null
     phase: author
@@ -447,10 +758,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: RFC-0305
+  - command: analytics.messkanon.validate
+    severity: null
+    phase: author
+    pipelines:
+      - packages-check.run
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0305
   - command: api.routes.generate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: api.routes.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: app.boilerplate.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -478,11 +822,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: app.contract.full
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: app.layout.validate
     severity: null
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: app.layout.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: app.qa.validate
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -509,11 +884,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: archetype.registry.build
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: archetype.registry.validate
     severity: null
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: archetype.registry.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: article.depth.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -582,6 +989,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: asset.reference.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: assets.structure.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: assets.structure.lint
     severity: null
     phase: author
@@ -598,6 +1027,27 @@ gates:
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: astro.exports.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: audit.agent.readiness.validate
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -634,6 +1084,26 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: audit.delta.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: audit.llm.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: audit.llm.run
     severity: null
     phase: null
@@ -645,6 +1115,26 @@ gates:
     metadata: absent
     rfc: null
   - command: autonomy.demote
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: autonomy.demote
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: autonomy.level.report
     severity: null
     phase: null
     pipelines: []
@@ -675,6 +1165,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: autonomy.level.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: autonomy.promote
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: autonomy.promote
     severity: null
     phase: null
@@ -690,6 +1201,28 @@ gates:
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: b2b.model.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: barrel.size.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -737,6 +1270,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: behavior.snapshot.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: behavior.snapshot.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: behavior.snapshot.validate
     severity: null
     phase: postbuild
@@ -749,6 +1303,28 @@ gates:
     metadata: absent
     rfc: null
   - command: billing.config.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: billing.config.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: billing.secrets.validate
     severity: null
     phase: author
     pipelines:
@@ -783,6 +1359,30 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: biome.contract.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.critical
+      - packages-check.run
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: biome.coverage.hint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: biome.coverage.hint
     severity: null
     phase: author
@@ -804,7 +1404,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: biome.css.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: biome.site-background.derive
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: biome.site-background.derive
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: biome.tokens.derive
     severity: null
     phase: null
     pipelines: []
@@ -835,7 +1465,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: biome.tokens.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: blog.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: blog.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: blueprint.validate
     severity: null
     phase: author
     pipelines:
@@ -868,6 +1531,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: bodenstation.voice.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: bordbuch.append
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: bordbuch.append
     severity: null
     phase: null
@@ -887,7 +1571,27 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0473
+    rfc: null
+  - command: bordbuch.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: bordbuch.repair
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: bordbuch.status
     severity: null
     phase: null
@@ -897,7 +1601,28 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0473
+    rfc: null
+  - command: bordbuch.status
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: bordbuch.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: bordbuch.validate
     severity: null
     phase: author
@@ -920,10 +1645,11 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: brief.validate
+  - command: breadcrumb.trail.validate
     severity: null
-    phase: null
-    pipelines: []
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -935,6 +1661,68 @@ gates:
     phase: postbuild
     pipelines:
       - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: canonical.url.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: change.impact.derive
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: changelog.backfill
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: changelog.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: changelog.rebuild-index
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: chat.config.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -963,7 +1751,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: chat.metadata.drift.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check-warpgogol.app.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check-warpgogol.app.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check-warpgogol.runner.validate
     severity: null
     phase: null
     pipelines: []
@@ -993,7 +1812,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: check.accessibility.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check.action-pack.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.action-pack.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.artifact.validate
     severity: null
     phase: null
     pipelines: []
@@ -1023,7 +1872,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: check.audience.profile.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check.audience.review.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.audience.review.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.audience.review.validate
     severity: null
     phase: null
     pipelines: []
@@ -1053,7 +1932,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: check.compare
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check.content-surface.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.content-surface.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.deploy-alt.run
     severity: null
     phase: null
     pipelines: []
@@ -1083,6 +1992,26 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: check.deploy-main.gate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.deterministic.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check.deterministic.run
     severity: null
     phase: null
@@ -1094,6 +2023,26 @@ gates:
     metadata: absent
     rfc: null
   - command: check.evidence.capture
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.evidence.capture
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.evidence.validate
     severity: null
     phase: null
     pipelines: []
@@ -1124,7 +2073,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: check.fixture.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check.localization.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.localization.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.report.generate
     severity: null
     phase: null
     pipelines: []
@@ -1154,7 +2134,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: check.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check.runner.info
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.runner.info
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.safety.validate
     severity: null
     phase: null
     pipelines: []
@@ -1184,7 +2194,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: check.target.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: check.technical.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: check.technical.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ci.local.validate
     severity: null
     phase: null
     pipelines: []
@@ -1215,11 +2255,53 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: client.edit.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: client.export
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: cloudflare.assets.validate
     severity: null
     phase: postbuild
     pipelines:
       - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: cloudflare.assets.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: cloudflare.regional-services.validate
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -1247,10 +2329,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: cloudflare.residency.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: cms.schema.generate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: cms.schema.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: cms.schema.parity
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -1279,6 +2393,28 @@ gates:
     metadata: absent
     rfc: null
   - command: command.manifest.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: command.manifest.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: command.reads.validate
     severity: null
     phase: workspace
     pipelines:
@@ -1321,7 +2457,18 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: compass.annotate
+  - command: comparative.claim.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: compass.audit.baseline
     severity: null
     phase: null
     pipelines: []
@@ -1342,6 +2489,26 @@ gates:
     metadata: absent
     rfc: null
   - command: compass.audit.plan
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: compass.audit.plan
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: compass.audit.record
     severity: null
     phase: null
     pipelines: []
@@ -1376,10 +2543,26 @@ gates:
     blocks: null
     metadata: present
     rfc: null
-  - command: compass.changesummary.tidy
+  - command: compass.audit.validate
+    severity: mixed
+    phase: author
+    pipelines:
+      - sites-check.author
+      - sites-check.postbuild
+    conditional:
+      kind: flag
+      ref: --strict
+      description: Warns by default, fails with --strict
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: present
+    rfc: null
+  - command: compass.changesummary.validate
     severity: null
-    phase: null
-    pipelines: []
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -1397,17 +2580,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: compass.clear
-    severity: null
-    phase: null
-    pipelines: []
-    conditional: null
-    surfaces: null
-    rules: null
-    blocks: null
-    metadata: absent
-    rfc: null
-  - command: compass.invariant.add
+  - command: compass.inventory
     severity: null
     phase: null
     pipelines: []
@@ -1427,7 +2600,17 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: compass.markup.migrate
+  - command: compass.summary.trim
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: compass.summary.trim
     severity: null
     phase: null
     pipelines: []
@@ -1449,7 +2632,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: compass.validate
+    severity: null
+    phase: author
+    pipelines:
+      - packages-check.run
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: config.regenerate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: config.regenerate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: config.template.sync
     severity: null
     phase: null
     pipelines: []
@@ -1480,6 +2695,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: consent.activation.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: constellation.compose.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: constellation.compose.validate
     severity: null
     phase: author
@@ -1502,11 +2739,23 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: contact.form.validate
+  - command: constellation.contract.validate
     severity: null
-    phase: postbuild
+    phase: workspace
     pipelines:
-      - build.check
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content-types.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.critical
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -1536,6 +2785,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.asset.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.claim.ledger.append
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.claim.ledger.append
     severity: null
     phase: null
@@ -1556,7 +2826,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.claim.ledger.project
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.claim.ledger.query
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.claim.ledger.query
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.claim.report
     severity: null
     phase: null
     pipelines: []
@@ -1587,6 +2887,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.claim.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.coverage.delta
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.coverage.delta
     severity: null
     phase: null
@@ -1608,10 +2929,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.coverage.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.derived.stamp
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.derived.stamp
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.derived.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -1641,6 +2994,60 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.filename.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.warning
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.formula.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.formula.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.formula.migrate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.freshness.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.freshness.report
     severity: null
     phase: null
@@ -1662,10 +3069,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.freshness.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.idempotency.validate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.idempotency.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.layouts.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -1695,7 +3134,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.links.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.warning
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.plan.build
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.plan.build
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.plan.route
     severity: null
     phase: null
     pipelines: []
@@ -1725,6 +3196,48 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.plan.status
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.ref-index.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.ref-migrate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.references.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.warning
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.references.validate
     severity: null
     phase: mission
@@ -1738,6 +3251,28 @@ gates:
     metadata: absent
     rfc: null
   - command: content.source.parity
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.source.parity
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.source.validate
     severity: null
     phase: author
     pipelines:
@@ -1770,6 +3305,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.surface.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.update-stamps.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.update-stamps.validate
     severity: null
     phase: author
@@ -1791,10 +3348,44 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: content.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: content.voice.lint
     severity: null
     phase: author
     pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: content.voice.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: cosmic.catalog.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.critical
+      - packages-check.run
       - sites-check.author
     conditional: null
     surfaces: null
@@ -1826,7 +3417,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: cosmic.literals.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: cosmic.name.pick
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: cosmic.name.pick
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: cosmic.name.rename
     severity: null
     phase: null
     pipelines: []
@@ -1858,11 +3480,45 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: cosmic.name.unique
+    severity: null
+    phase: author
+    pipelines:
+      - packages-check.run
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: css.important.lint
     severity: null
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: css.important.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dedup.helper.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -1890,6 +3546,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: demand.map.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: demand.modifier.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: demand.modifier.lint
     severity: null
     phase: author
@@ -1905,6 +3582,27 @@ gates:
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: demand.signal.import
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: demand.signal.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -1933,6 +3631,77 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: demands.hierarchy.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.artifact.build
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.artifact.gc
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.artifact.verify
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.atomic.rollback
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.atomic.swap
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.preflight
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: deploy.preflight
     severity: null
     phase: null
@@ -1954,10 +3723,112 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: deploy.scripts.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.status
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: deploy.surface.parity.validate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: deploy.surface.parity.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dht.capacity.publish
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dht.lookup
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dht.node.init
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dht.placement
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dht.register
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dht.status
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: diagnostic.shape.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -1985,11 +3856,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: dispatcher.sync.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: dist.content-references.validate
     severity: null
     phase: postbuild
     pipelines:
       - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dist.content-references.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dist.generated-marker.strip
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -2017,6 +3919,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: dist.generated-marker.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dist.sitemap.images.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: dist.sitemap.images.generate
     severity: null
     phase: null
@@ -2032,6 +3955,28 @@ gates:
     phase: postbuild
     pipelines:
       - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dist.sitemap.images.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: dna.registry.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -2069,11 +4014,62 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: docs.commands.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: docs.commands.validate
     severity: null
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: docs.commands.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ecosystem.commit
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ecosystem.commit
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ecosystem.manifest.generate
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -2098,9 +4094,31 @@ gates:
     conditional: null
     surfaces: null
     rules: null
-    blocks:
+    blocks: &a1
       - release.prepare
     metadata: present
+    rfc: null
+  - command: ecosystem.manifest.validate
+    severity: error
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: *a1
+    metadata: present
+    rfc: null
+  - command: effects.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
     rfc: null
   - command: effects.contract.validate
     severity: null
@@ -2124,7 +4142,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: effects.coverage.audit
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: enrich.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: enrich.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: entitlement.module.validate
     severity: null
     phase: author
     pipelines:
@@ -2156,11 +4207,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: entitlements.resolve
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: entitlements.validate
     severity: null
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: entitlements.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: env.alt.check
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -2188,6 +4270,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: env.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: env.example.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: env.example.generate
     severity: null
     phase: null
@@ -2209,7 +4312,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: env.example.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: env.local.check
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: env.local.check
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: env.main.check
     severity: null
     phase: null
     pipelines: []
@@ -2240,7 +4374,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: escalation.budget.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: escalation.queue.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: escalation.queue.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: escalation.route
     severity: null
     phase: null
     pipelines: []
@@ -2271,10 +4436,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: family.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: family.list
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: family.list
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: faq.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -2302,7 +4499,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: feature.graph.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: feature.links.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: feature.links.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: feature.policy.validate
     severity: null
     phase: author
     pipelines:
@@ -2335,7 +4564,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: feature.projections.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: feature.references.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: feature.references.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: feature.visibility.validate
     severity: null
     phase: author
     pipelines:
@@ -2367,11 +4629,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: feed.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: feed.validate
     severity: null
     phase: postbuild
     pipelines:
       - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: feed.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: file.size.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -2399,7 +4693,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: fingerprint.calculate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: fingerprint.fixtures.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fingerprint.fixtures.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fingerprint.usage.lint
     severity: null
     phase: workspace
     pipelines:
@@ -2432,6 +4758,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: first-party-data.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fleet.agent.catalog.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: fleet.agent.catalog.generate
     severity: null
     phase: null
@@ -2443,6 +4790,26 @@ gates:
     metadata: absent
     rfc: null
   - command: fleet.agent.catalog.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fleet.agent.catalog.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fleet.killswitch
     severity: null
     phase: null
     pipelines: []
@@ -2493,7 +4860,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: fleet.schedule.plan
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: fleet.sites.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fleet.sites.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fleet.status.collect
     severity: null
     phase: null
     pipelines: []
@@ -2524,10 +4921,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: fonts.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: fonts.imports.generate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fonts.imports.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fonts.origin.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
     conditional: null
     surfaces: null
     rules: null
@@ -2556,6 +4985,17 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: footer.legal.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: forge.agents.generate
     severity: null
     phase: null
@@ -2566,7 +5006,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: forge.doctor
+  - command: forge.create
     severity: null
     phase: null
     pipelines: []
@@ -2576,7 +5016,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: forge.init
+  - command: forge.doctor
     severity: null
     phase: null
     pipelines: []
@@ -2637,6 +5077,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: forge.upgrade
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: fs.walk.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: fs.walk.lint
     severity: null
     phase: workspace
@@ -2649,6 +5110,28 @@ gates:
     metadata: absent
     rfc: null
   - command: funnel.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: funnel.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: funnel.copy.validate
     severity: null
     phase: author
     pipelines:
@@ -2681,7 +5164,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: funnel.lagebild.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: funnel.org.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: funnel.org.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: funnel.stage.validate
     severity: null
     phase: author
     pipelines:
@@ -2713,11 +5229,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: funnel.statechart.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: funnel.statechart.validate
     severity: null
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: funnel.statechart.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: gate.catalog.generate
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -2742,11 +5289,64 @@ gates:
     conditional: null
     surfaces: null
     rules: null
-    blocks:
+    blocks: &a2
       - release.prepare
     metadata: present
     rfc: null
+  - command: gate.catalog.validate
+    severity: error
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: *a2
+    metadata: present
+    rfc: null
+  - command: generated.drift.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: generated.drift.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: generated.edit.guard
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: generated.edit.guard
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: generated.file.lookup
     severity: null
     phase: null
     pipelines: []
@@ -2777,12 +5377,68 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: generated.files.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: generated.marker.validate
     severity: null
     phase: postbuild
     pipelines:
       - sites-check.author
       - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: generated.marker.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.author
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: generated.stale.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: generated.stale.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: generator.ownership.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -2811,7 +5467,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: geo.catalog.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: geo.slug.preview
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: geo.slug.preview
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: gitattributes.generate
     severity: null
     phase: null
     pipelines: []
@@ -2842,6 +5529,17 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: gitattributes.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: github.branch-protection.validate
     severity: null
     phase: null
@@ -2851,8 +5549,70 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0476
+    rfc: null
+  - command: github.branch-protection.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: gitmesh.status
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: gitmesh.sync
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: gitmesh.verify
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: growth.adapter.contract
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: growth.adapter.contract
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: growth.events.validate
     severity: null
     phase: author
     pipelines:
@@ -2885,6 +5645,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: growth.experiment.archive
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: growth.experiment.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: growth.experiment.validate
     severity: null
     phase: author
@@ -2897,6 +5679,28 @@ gates:
     metadata: absent
     rfc: null
   - command: growth.funnel.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: growth.funnel.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: growth.vendor.resolve
     severity: null
     phase: author
     pipelines:
@@ -2959,7 +5763,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: hdri.firewall.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: headers.runtime.probe
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: headers.runtime.probe
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: headers.security.generate
     severity: null
     phase: null
     pipelines: []
@@ -2990,6 +5825,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: headers.security.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: humans.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: humans.generate
     severity: null
     phase: null
@@ -3011,7 +5867,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: humans.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: i18n.config.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: i18n.config.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: i18n.detect.implement
     severity: null
     phase: null
     pipelines: []
@@ -3041,6 +5928,26 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: i18n.middleware.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: icons.clean
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: icons.generate
     severity: null
     phase: null
@@ -3051,7 +5958,77 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: icons.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: identity.bootstrap
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: identity.credential.issue
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: identity.credential.revoke
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: identity.credential.verify
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: image.format.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: image.format.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: image.variants.generate
     severity: null
     phase: null
     pipelines: []
@@ -3082,11 +6059,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: image.variants.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: import.extensions.lint
     severity: null
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: import.extensions.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: indexnow.key.generate
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -3114,6 +6123,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: indexnow.key.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: indexnow.submit
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: indexnow.submit
     severity: null
     phase: null
@@ -3135,7 +6165,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: indexnow.submit.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: infra.brief.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: infra.brief.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integration.config.validate
     severity: null
     phase: author
     pipelines:
@@ -3168,6 +6231,17 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: integration.secrets.audit
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: integration.secrets.validate
     severity: null
     phase: author
@@ -3179,7 +6253,120 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: integration.secrets.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.backfill-revisions
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.build-record
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.init
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.keys.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.sign
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.update
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.verify
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: integrity.verify-release
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: jsonld.parity
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: jsonld.parity
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: jsonld.url.validate
     severity: null
     phase: postbuild
     pipelines:
@@ -3232,11 +6419,44 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: kernel.flags.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: kernel.io.lint
     severity: null
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: kernel.io.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: kernel.result.envelope.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -3264,6 +6484,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: kernel.wire
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: labels.shape.hint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: labels.shape.hint
     severity: null
     phase: author
@@ -3276,6 +6517,26 @@ gates:
     metadata: absent
     rfc: null
   - command: lagebild.tenant.add
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: lagebild.tenant.add
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: lagebild.tenant.disable
     severity: null
     phase: null
     pipelines: []
@@ -3305,7 +6566,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: lagebild.tenant.enable
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: lagebild.tenant.rotate-secret
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: lagebild.tenant.rotate-secret
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: lagebild.tenant.status
     severity: null
     phase: null
     pipelines: []
@@ -3336,10 +6627,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: lagebild.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: lagebild.worker.deploy
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: lagebild.worker.deploy
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: layout.orchestrator.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -3368,10 +6691,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: legal.processors.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: legal.scaffold
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: legal.scaffold
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: legal.translation.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -3440,7 +6795,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: lighthouse.budget.check
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: lighthouse.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: lighthouse.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: live.media.validate
     severity: null
     phase: author
     pipelines:
@@ -3472,7 +6860,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: live.variants.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: llms.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: llms.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: llms.validate
     severity: null
     phase: null
     pipelines: []
@@ -3503,6 +6921,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: maintenance.debt.baseline.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: maintenance.debt.baseline.write
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: maintenance.debt.baseline.write
     severity: null
     phase: null
@@ -3514,6 +6953,26 @@ gates:
     metadata: absent
     rfc: null
   - command: maintenance.debt.queue.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: maintenance.debt.queue.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: maintenance.debt.queue.report
     severity: null
     phase: null
     pipelines: []
@@ -3544,7 +7003,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: maintenance.debt.queue.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: maintenance.debt.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: maintenance.debt.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: maintenance.debt.triage.report
     severity: null
     phase: null
     pipelines: []
@@ -3575,6 +7065,17 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: manifest.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: material.credits.drift.validate
     severity: null
     phase: author
@@ -3586,10 +7087,52 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: material.credits.drift.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: material.credits.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: material.credits.report
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: material.credits.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: material.credits.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -3618,7 +7161,50 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: material.metadata.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: material.metadata.write
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: matomo.export.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0305
+  - command: matomo.export.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0305
+  - command: matomo.provision.validate
     severity: null
     phase: workspace
     pipelines:
@@ -3651,7 +7237,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: RFC-0305
+  - command: matomo.proxy.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0305
   - command: matomo.silence.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0305
+  - command: matomo.silence.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0305
+  - command: matomo.smoke.validate
     severity: null
     phase: workspace
     pipelines:
@@ -3682,7 +7301,17 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0479
+    rfc: null
+  - command: mirror.quartet.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: mirror.quartet.validate
     severity: null
     phase: null
@@ -3694,6 +7323,26 @@ gates:
     metadata: absent
     rfc: null
   - command: mirror.quintet.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: mirror.quintet.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: mirror.triad.validate
     severity: null
     phase: null
     pipelines: []
@@ -3725,7 +7374,29 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: mirroring.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.warning
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: mission.abort
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: mission.archive
     severity: null
     phase: null
     pipelines: []
@@ -3754,7 +7425,7 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0480
+    rfc: null
   - command: mission.close
     severity: null
     phase: null
@@ -3784,7 +7455,7 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0480
+    rfc: null
   - command: mission.list
     severity: null
     phase: null
@@ -3814,7 +7485,7 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0479
+    rfc: null
   - command: mission.open
     severity: null
     phase: null
@@ -3878,6 +7549,29 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: naming.components.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: naming.content.lint
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.warning
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: naming.content.lint
     severity: null
     phase: mission
@@ -3902,7 +7596,41 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: naming.convention.lint
+    severity: null
+    phase: author
+    pipelines:
+      - packages-check.run
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: naming.layouts.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: naming.layouts.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: naming.pages.lint
     severity: null
     phase: author
     pipelines:
@@ -3934,7 +7662,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: naming.policy.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: naming.styles.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: naming.styles.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: naming.suffixes.lint
     severity: null
     phase: author
     pipelines:
@@ -3967,6 +7727,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: navigation.section.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: nebula.score.compute
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: nebula.score.compute
     severity: null
     phase: author
@@ -3989,10 +7771,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: need.markers.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: not-found.generate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: not-found.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: not-found.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -4147,6 +7961,17 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: offer.capacity.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: offer.provider.validate
     severity: null
     phase: author
@@ -4158,7 +7983,18 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: onboarding.checklist
+  - command: offer.provider.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: onboarding.synthesize
     severity: null
     phase: null
     pipelines: []
@@ -4168,27 +8004,7 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
-  - command: onboarding.input.validate
-    severity: null
-    phase: null
-    pipelines: []
-    conditional: null
-    surfaces: null
-    rules: null
-    blocks: null
-    metadata: absent
-    rfc: null
-  - command: onboarding.phase.validate
-    severity: null
-    phase: null
-    pipelines: []
-    conditional: null
-    surfaces: null
-    rules: null
-    blocks: null
-    metadata: absent
-    rfc: null
-  - command: onboarding.scaffold
+  - command: onboarding.synthesize
     severity: null
     phase: null
     pipelines: []
@@ -4203,6 +8019,38 @@ gates:
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: onboarding.yaml.import.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: open-source.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: open-source.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
     conditional: null
     surfaces: null
     rules: null
@@ -4230,7 +8078,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: overlay.pages.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: packages-check.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: packages-check.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: packages.check
     severity: null
     phase: null
     pipelines: []
@@ -4261,10 +8139,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: page.block.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: page.blocks.extract.validate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: page.blocks.extract.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: page.blocks.mirror.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -4292,6 +8202,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: page.markdown.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: page.markdown.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: page.markdown.validate
     severity: null
     phase: postbuild
@@ -4304,6 +8235,28 @@ gates:
     metadata: absent
     rfc: null
   - command: page.pipeline.contract
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: page.pipeline.contract
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: page.shell.validate
     severity: null
     phase: author
     pipelines:
@@ -4336,6 +8289,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: participant.ai-agent.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: participant.json.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: participant.json.validate
     severity: null
     phase: postbuild
@@ -4348,6 +8323,28 @@ gates:
     metadata: absent
     rfc: null
   - command: participant.profile.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: participant.profile.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: participant.validate
     severity: null
     phase: author
     pipelines:
@@ -4380,10 +8377,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: passport.emit
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: passport.key.rotate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: passport.key.rotate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: passport.verify
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
     conditional: null
     surfaces: null
     rules: null
@@ -4413,11 +8442,44 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: pbp.content.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.warning
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: pbp.profile.validate
     severity: null
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: pbp.profile.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: person.create
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -4454,6 +8516,26 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: pipeline.cache.parity
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: pipeline.idempotency.smoke
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: pipeline.idempotency.smoke
     severity: null
     phase: null
@@ -4465,6 +8547,28 @@ gates:
     metadata: absent
     rfc: null
   - command: pipeline.log.hygiene.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: pipeline.log.hygiene.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: pipeline.timeout.validate
     severity: null
     phase: workspace
     pipelines:
@@ -4496,10 +8600,31 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: pipeline.timing.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: plan.archive
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: planet.import-paths.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -4542,6 +8667,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: preview.images.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: preview.images.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: preview.images.validate
     severity: null
     phase: author
@@ -4554,6 +8700,28 @@ gates:
     metadata: absent
     rfc: null
   - command: print.contract.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: print.contract.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: print.layout.validate
     severity: null
     phase: postbuild
     pipelines:
@@ -4585,10 +8753,41 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: print.pdf.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: print.pdf.validate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: print.pdf.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: props.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -4616,7 +8815,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: props.types.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: pseo.experiment.plan
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: pseo.experiment.plan
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: pseo.product.validate
     severity: null
     phase: null
     pipelines: []
@@ -4647,15 +8876,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: pseo.proof.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: pseo.validate
     severity: error
     phase: author
     pipelines:
       - sites-check.author
-    conditional:
+    conditional: &a3
       kind: entitlement
       ref: pseo
       description: Only runs when pseo entitlement is active
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: present
+    rfc: null
+  - command: pseo.validate
+    severity: error
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: *a3
     surfaces: null
     rules: null
     blocks: null
@@ -4671,7 +8922,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: public.artifact.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: public.artifact.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: public.artifact.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: public.declaration.validate
     severity: null
     phase: author
     pipelines:
@@ -4703,6 +8986,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: public.icons.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: public.icons.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: public.icons.validate
     severity: null
     phase: author
@@ -4715,6 +9019,26 @@ gates:
     metadata: absent
     rfc: null
   - command: public.infrastructure.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: public.infrastructure.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: public.managed.clean
     severity: null
     phase: null
     pipelines: []
@@ -4745,10 +9069,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: public.orphans.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: public.runtime.probe
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: public.runtime.probe
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: public.surface.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -4776,6 +9132,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: pulsar.heartbeat
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: qa.independent.run
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: qa.independent.run
     severity: null
     phase: postbuild
@@ -4788,6 +9165,26 @@ gates:
     metadata: absent
     rfc: null
   - command: ratgeber.article.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ratgeber.article.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ratgeber.claim.validate
     severity: null
     phase: null
     pipelines: []
@@ -4818,6 +9215,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: ratgeber.hub.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ratgeber.policy.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: ratgeber.policy.validate
     severity: null
     phase: null
@@ -4832,6 +9250,28 @@ gates:
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ratgeber.provenance.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: redirect.map.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.author
+      - sites-check.postbuild
     conditional: null
     surfaces: null
     rules: null
@@ -4910,7 +9350,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: rfc.acceptance.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: rfc.archive
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.archive
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.check
     severity: null
     phase: null
     pipelines: []
@@ -4940,6 +9410,26 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: rfc.command-lifecycle.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.create
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: rfc.create
     severity: null
     phase: null
@@ -4951,6 +9441,26 @@ gates:
     metadata: absent
     rfc: null
   - command: rfc.decision-log.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.decision-log.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.dna.trace.generate
     severity: null
     phase: null
     pipelines: []
@@ -4981,6 +9491,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: rfc.dna.trace.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.graph
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: rfc.graph
     severity: null
     phase: null
@@ -5000,8 +9531,38 @@ gates:
     rules: null
     blocks: null
     metadata: absent
-    rfc: RFC-0476
+    rfc: null
+  - command: rfc.implement.stamp
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: rfc.index.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.index.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.index.validate
     severity: null
     phase: null
     pipelines: []
@@ -5031,7 +9592,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: rfc.list
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: rfc.next-id
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.next-id
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.pipeline.status
     severity: null
     phase: null
     pipelines: []
@@ -5061,6 +9652,26 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: rfc.supersede.propose
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: rfc.validate
     severity: null
     phase: null
@@ -5072,6 +9683,26 @@ gates:
     metadata: absent
     rfc: null
   - command: rfc.verification.emit
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: rfc.verification.emit
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: robots.generate
     severity: null
     phase: null
     pipelines: []
@@ -5102,6 +9733,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: robots.page.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: robots.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: robots.validate
     severity: null
     phase: null
@@ -5122,7 +9774,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: root.canonical.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: route.thin.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: route.thin.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: route.topology.validate
     severity: null
     phase: author
     pipelines:
@@ -5154,11 +9838,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: routes.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: runtime.context.shape
     severity: null
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: runtime.context.shape
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: runtime.warnings.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -5188,6 +9904,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: schema.drift.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.critical
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: scripts.orchestrator.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: scripts.orchestrator.generate
     severity: null
     phase: null
@@ -5209,7 +9947,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: scripts.placement.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: section.background.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.background.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.body.contract.validate
     severity: null
     phase: workspace
     pipelines:
@@ -5242,7 +10013,62 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: section.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.css.import.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0598
+  - command: section.css.import.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: RFC-0598
   - command: section.cta.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.cta.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.defaults.validate
     severity: null
     phase: workspace
     pipelines:
@@ -5275,11 +10101,44 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: section.header.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: section.image.contract.validate
     severity: null
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.image.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.motion.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -5308,6 +10167,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: section.placeholder.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.scaffold
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: section.scaffold
     severity: null
     phase: null
@@ -5329,7 +10209,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: section.shell.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: section.similarity.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: section.similarity.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: security.txt.generate
     severity: null
     phase: null
     pipelines: []
@@ -5360,12 +10271,55 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: security.txt.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: semantic.drift.validate
     severity: null
     phase: mission
     pipelines:
       - mission-preflight.warning
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: semantic.drift.validate
+    severity: null
+    phase: mission
+    pipelines:
+      - mission-preflight.warning
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: semantic.mirror.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: semantic.parity
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -5393,7 +10347,40 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: semantic.targets.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: seo.internal-linking.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: seo.internal-linking.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: seo.meta.validate
     severity: null
     phase: postbuild
     pipelines:
@@ -5426,11 +10413,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: seo.structured-data.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: seo.technical.validate
     severity: null
     phase: postbuild
     pipelines:
       - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: seo.technical.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: services.check.run
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -5458,10 +10477,82 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: services.projection.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: services.workspace.validate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: services.workspace.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: session.archive
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: session.list
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: session.save
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: session.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: share.i18n.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -5490,6 +10581,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: share.utility.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: shared-ui.thin-copy.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: shared-ui.thin-copy.validate
     severity: null
     phase: workspace
@@ -5512,10 +10625,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: shared.context.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: shared.section-props.changelog.report
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: shared.section-props.changelog.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: shared.section-props.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -5544,7 +10689,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: site.background.contract.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: sitemap.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: sitemap.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: sitemap.validate
     severity: null
     phase: null
     pipelines: []
@@ -5574,7 +10750,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: sites-check.author
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: sites-check.postbuild
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: sites-check.postbuild
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: sites-check.run
     severity: null
     phase: null
     pipelines: []
@@ -5605,7 +10811,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: source.binding.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: source.monitor.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: source.monitor.run
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: source.monitor.status
     severity: null
     phase: null
     pipelines: []
@@ -5635,7 +10872,37 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: source.monitor.tenant.add
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: source.monitor.tenant.disable
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: source.monitor.tenant.disable
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: source.monitor.tenant.enable
     severity: null
     phase: null
     pipelines: []
@@ -5679,6 +10946,17 @@ gates:
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: star-map.render
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -5778,6 +11056,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: structure.hierarchy.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: styles.global.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: styles.global.generate
     severity: null
     phase: null
@@ -5798,7 +11097,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.artifact.ready
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.breaker.evaluate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.breaker.evaluate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.context.validate
     severity: null
     phase: author
     pipelines:
@@ -5833,8 +11164,30 @@ gates:
     blocks:
       - release.prepare
     metadata: present
-    rfc: RFC-0480
+    rfc: null
   - command: surface.doorway-risk.report
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.doorway-risk.report
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.duplicate-content.report
     severity: null
     phase: author
     pipelines:
@@ -5867,6 +11220,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.duplicate.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.enrich
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.enrich
     severity: null
     phase: null
@@ -5878,6 +11252,26 @@ gates:
     metadata: absent
     rfc: null
   - command: surface.enrich.review
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.enrich.review
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.evidence.join
     severity: null
     phase: null
     pipelines: []
@@ -5908,7 +11302,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.evidence.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.freshness
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.freshness
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.generate
     severity: null
     phase: null
     pipelines: []
@@ -5933,7 +11358,32 @@ gates:
     phase: author
     pipelines:
       - sites-check.author
-    conditional:
+    conditional: &a4
+      kind: entitlement
+      ref: pseo
+      description: Only runs when pseo entitlement is active
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: present
+    rfc: null
+  - command: surface.hub.validate
+    severity: error
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: *a4
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: present
+    rfc: null
+  - command: surface.industry.validate
+    severity: warning
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: &a5
       kind: entitlement
       ref: pseo
       description: Only runs when pseo entitlement is active
@@ -5947,16 +11397,35 @@ gates:
     phase: author
     pipelines:
       - sites-check.author
-    conditional:
-      kind: entitlement
-      ref: pseo
-      description: Only runs when pseo entitlement is active
+    conditional: *a5
     surfaces: null
     rules: null
     blocks: null
     metadata: present
     rfc: null
   - command: surface.intersection.report
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.intersection.report
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.intersection.validate
     severity: null
     phase: author
     pipelines:
@@ -5989,7 +11458,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.media-leakage.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.review.calibrate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.review.calibrate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.review.run
     severity: null
     phase: null
     pipelines: []
@@ -6020,7 +11520,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.review.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.rollback.apply
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.rollback.apply
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.rollback.plan
     severity: null
     phase: null
     pipelines: []
@@ -6051,6 +11582,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.service.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.starmap
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.starmap
     severity: null
     phase: null
@@ -6062,6 +11614,26 @@ gates:
     metadata: absent
     rfc: null
   - command: surface.translation.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.translation.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.translation.glossary.generate
     severity: null
     phase: null
     pipelines: []
@@ -6092,6 +11664,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.translation.glossary.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.translation.notes.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.translation.notes.generate
     severity: null
     phase: null
@@ -6112,7 +11705,39 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.translation.notes.review
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.translation.notes.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.translation.notes.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: surface.translation.qa.validate
     severity: null
     phase: author
     pipelines:
@@ -6145,6 +11770,17 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.translation.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: surface.validate
     severity: null
     phase: author
@@ -6156,10 +11792,82 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: surface.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: swim.join
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: swim.leave
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: swim.members
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: swim.status
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: system-md.compile
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: system-md.compile
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: system.manifest.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -6188,6 +11896,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: team.cross-page.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: team.hub.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: team.hub.validate
     severity: null
     phase: author
@@ -6210,7 +11940,62 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: team.lifecycle.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: template.imports.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: template.imports.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: test.signal.policy.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: test.signal.policy.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: test.signal.validate
     severity: null
     phase: workspace
     pipelines:
@@ -6242,11 +12027,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: text.normalize.apply
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: text.normalize.report
     severity: null
     phase: author
     pipelines:
       - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: text.normalize.report
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: text.normalize.rules.list
+    severity: null
+    phase: null
+    pipelines: []
     conditional: null
     surfaces: null
     rules: null
@@ -6274,10 +12090,42 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: text.normalize.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - sites-check.postbuild
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: thin-copy.validate
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: thin-copy.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: tokens.catalog.sync
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -6306,11 +12154,44 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: tokens.colors.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: tokens.colors.section-shell.lint
     severity: null
     phase: workspace
     pipelines:
       - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: tokens.colors.section-shell.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: tokens.ds.lint
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -6339,6 +12220,28 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: tokens.section-shell.contract.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: trust.rating.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: trust.rating.validate
     severity: null
     phase: author
@@ -6351,6 +12254,28 @@ gates:
     metadata: absent
     rfc: null
   - command: tsconfig.shape.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: tsconfig.shape.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: ui.i18n.lint
     severity: null
     phase: workspace
     pipelines:
@@ -6383,10 +12308,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: ui.silent-defaults.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: uni.registry.build
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: uni.registry.build
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: uni.registry.validate
+    severity: null
+    phase: author
+    pipelines:
+      - packages-check.run
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -6415,11 +12373,43 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: video.dist.prune
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: video.ios-fallback.validate
     severity: null
     phase: postbuild
     pipelines:
       - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: video.ios-fallback.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: video.media.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
     conditional: null
     surfaces: null
     rules: null
@@ -6447,6 +12437,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: video.variants.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: video.variants.validate
+    severity: null
+    phase: postbuild
+    pipelines:
+      - build.check
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: video.variants.validate
     severity: null
     phase: postbuild
@@ -6459,6 +12470,28 @@ gates:
     metadata: absent
     rfc: null
   - command: visibility.action.plan
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: visibility.action.plan
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: visibility.expr.validate
     severity: null
     phase: author
     pipelines:
@@ -6490,6 +12523,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: visibility.import
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: visibility.reconcile
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: visibility.reconcile
     severity: null
     phase: author
@@ -6506,7 +12560,7 @@ gates:
     phase: author
     pipelines:
       - build.check
-    conditional:
+    conditional: &a6
       kind: config
       ref: system.md visual.gate
       description: VIS-BG-01/02 error, VIS-BG-03 warning
@@ -6515,7 +12569,38 @@ gates:
     blocks: null
     metadata: present
     rfc: null
+  - command: visual.contract.validate
+    severity: mixed
+    phase: author
+    pipelines:
+      - build.check
+    conditional: *a6
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: present
+    rfc: null
   - command: visual.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: visual.report
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: visual.rules.list
     severity: null
     phase: null
     pipelines: []
@@ -6546,7 +12631,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: warning.diagnostics.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: warpgogol.check-hints.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: warpgogol.check-hints.generate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: warpgogol.check-hints.validate
     severity: null
     phase: null
     pipelines: []
@@ -6577,7 +12693,38 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: werk.record.validate
+    severity: null
+    phase: author
+    pipelines:
+      - sites-check.author
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: werkstatt.lock.recover
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: werkstatt.lock.recover
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: werkstatt.lock.status
     severity: null
     phase: null
     pipelines: []
@@ -6608,10 +12755,62 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: werkstatt.operation.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: wikidata.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: wikidata.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: workflow-amend.list
     severity: null
     phase: null
     pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workflow-amend.list
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workflow.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
     conditional: null
     surfaces: null
     rules: null
@@ -6639,7 +12838,79 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: workflow.list
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workpiece.imports.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workpiece.imports.validate
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workpiece.read
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workpiece.write
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: workspace.discovery.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workspace.discovery.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: workspace.surface.validate
     severity: null
     phase: workspace
     pipelines:
@@ -6672,6 +12943,27 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: workspace.write.boundary.lint
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
+  - command: yaml.contract.lint
+    severity: null
+    phase: null
+    pipelines: []
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
   - command: yaml.contract.lint
     severity: null
     phase: null
@@ -6693,18 +12985,29 @@ gates:
     blocks: null
     metadata: absent
     rfc: null
+  - command: yaml.parse.validate
+    severity: null
+    phase: workspace
+    pipelines:
+      - packages-check.run
+    conditional: null
+    surfaces: null
+    rules: null
+    blocks: null
+    metadata: absent
+    rfc: null
 summary:
-  total: 626
-  withMetadata: 11
-  withoutMetadata: 615
+  total: 1224
+  withMetadata: 18
+  withoutMetadata: 1206
   bySeverity:
-    unknown: 615
-    mixed: 2
-    error: 8
-    warning: 1
+    unknown: 1206
+    mixed: 4
+    error: 12
+    warning: 2
   byPhase:
-    unknown: 323
-    workspace: 82
-    author: 170
-    postbuild: 39
-    mission: 12
+    unknown: 623
+    workspace: 157
+    author: 344
+    postbuild: 77
+    mission: 23
