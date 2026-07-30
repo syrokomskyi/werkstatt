@@ -5,12 +5,12 @@ title: "Require regression tests for validator bug fixes"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-07-30
-updatedAt: 2026-07-30
-implementedAt:
+updatedAt: 2026-07-31
+implementedAt: 2026-07-31
 closedAt:
 supersedes: []
 supersededBy:
@@ -19,7 +19,8 @@ related:
   - RFC-0613
   - RFC-0614
   - RFC-0615
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0011: Require regression tests for validator bug fixes
@@ -64,3 +65,13 @@ Alternatives considered:
 This decision applies to all validator bug fixes going forward. If the test suite becomes too slow, consider splitting tests into fast (unit) and slow (integration) tiers. If a validator is refactored to the point where its diagnostic codes change, update the regression tests in the same commit.
 
 The existing untested fixes from `warpgogol-com-m000022` (placeholder expansion, preview image glob leak, YAML null parsing, MDMETA-04 null acceptance, bordbuch auto-resolution) should have regression tests backfilled as part of the implementation of RFC-0612, RFC-0613, RFC-0614, and RFC-0615.
+
+## Implementation evidence
+
+All five bugs from the Context section now have regression tests:
+
+1. **Placeholder expansion gap** — `packages/os/site-kernel-checks/src/tests/adr-0011-placeholder-expansion.test.ts`: 12 tests covering all 7 placeholders (`{system}`, `{app}`, `{lang}`, `{route}`, `{slug}`, `{id}`, `{category}`) with and without app context, multiple placeholders in one path, and backslash normalization.
+2. **Preview image glob leak** — `packages/os/site-kernel-checks/src/tests/adr-0011-preview-glob-leak.test.ts`: 3 tests verifying that orphaned preview images matching the ownership glob are flagged as STALE-01 (not leaked into expectedPaths), preview images for existing content pages are not flagged, and nested preview paths for deleted content pages are flagged.
+3. **YAML null parsing** — `packages/share/src/tests/markdown-twin-provenance.test.ts`: 8 tests covering bare null, quoted "null", valid/invalid date strings, null serialization, and round-trip (added during RFC-0613 implementation).
+4. **MDMETA-04 false positive** — `packages/os/site-kernel-checks/src/tests/page-markdown.test.ts`: 5 tests covering null acceptance, valid date acceptance, invalid date rejection (MDMETA-04), missing field rejection (MDMETA-02), and quoted "null" acceptance (added during RFC-0613 implementation).
+5. **Bordbuch conflict auto-resolution** — `packages/os/site-kernel-handoff/src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts`: 5 tests covering bordbuch/ conflict, public/.well-known/bordbuch.json conflict, bordbuch/index.html conflict, partial bordbuch set, and mixed bordbuch + non-bordbuch conflict (added during RFC-0614 implementation).
