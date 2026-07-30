@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -49,6 +50,12 @@ commands:
     - adr.validate
     - session.validate
     - forge.create
+    - geo.slug.preview
+    - i18n.config.validate
+    - i18n.detect.implement
+    - share.utility.lint
+    - pbp.profile.validate
+    - section.scaffold
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -57,6 +64,7 @@ packagesImpacted:
   - "@warpgogol/forge"
   - "@warpgogol/site-kernel-handoff"
   - "@warpgogol/site-kernel-checks"
+  - "@warpgogol/site-kernel-codegen"
 successSignals:
   - "All registered commands accept entity identifiers via declared flags only — no command reads input.args[0] for an entity id."
   - "Passing --id to rfc.validate works (no KERNEL-FLAG-01 error)."
@@ -68,6 +76,7 @@ nonGoals:
   - "Do not remove the --json flag or other output-format flags — these are cross-cutting flags not related to entity identification."
   - "Do not change the KernelFlagSpec type or the resolveCommandFlags parsing logic beyond removing positional arg support."
   - "Do not address sub-command routing (e.g. rfc.validate vs rfc.acceptance.run) — that is handled by the command name, not by positional args."
+  - "Do not remove `KernelPipelineStep.args` — pipeline step args are raw argv tokens passed to `executeRegisteredCommand`, not parsed positional args. They are flag-parsed by `resolveCommandFlags` or `parseKernelArgv`. Pipeline definitions that pass positional tokens via `step.args` must migrate to flag tokens, but the `args` field on `KernelPipelineStep` itself remains as raw argv input."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -94,7 +103,11 @@ The Warpgogol monorepo has 30+ registered Site OS commands across multiple domai
 
 1. **Positional args** — 6 commands (`rfc.validate`, `rfc.command-lifecycle.validate`, `rfc.graph`, `rfc.pipeline.status`, `adr.validate`, `session.validate`) read the entity id from `input.args[0]` with `flags: {}`.
 2. **Declared flags** — 9+ commands (`rfc.implement.stamp`, `sternsystem.validate`, `sternsystem.register`, `sternsystem.pin`, `sternsystem.sync`, `sternsystem.status`, `mission.*`, `spec.*`) read the entity id from `input.flags["id"]` (or domain-specific flag like `--mission`, `--spec`) with a typed `KernelFlagSpec` schema.
-3. **Dual-path** — 9 handler files in `site-kernel-checks` and `site-kernel-handoff` accept both via `input.flags["x"] ?? input.args[0]`.
+3. **Dual-path** — 15 handler files in `site-kernel-checks` and `site-kernel-handoff` accept both via `input.flags["x"] ?? input.args[0]`.
+4. **Additional positional-only** — 5 commands in `site-kernel-checks` (`geo.slug.preview`, `i18n.config.validate`, `i18n.detect.implement`, `share.utility.lint`, `pbp.profile.validate`) read `input.args[0]` without a flag fallback.
+5. **Multi-positional** — `section.scaffold` in `site-kernel-codegen` reads `input.args[0]` (slug) and `input.args[1]` (archetype id).
+
+Both `KernelCommandInput` (in `@warpgogol/site-kernel`) and `ForgeCommandInput` (in `@warpgogol/forge`) have the `args: string[]` field. The 6 positional-only commands listed above are forge commands that use `ForgeCommandInput`; the dual-path and additional positional-only commands use `KernelCommandInput`.
 
 RFC-0260 introduced typed flag schemas (`KernelFlagSpec`) and strict flag validation (KERNEL-FLAG-01 for unknown flags, KERNEL-FLAG-03 for missing required flags). But it did not standardize positional arguments — `KernelCommandInput.args` remains an untyped `string[]` with no schema, no validation, and no self-documentation via `--help`.
 
@@ -112,7 +125,9 @@ The split between positional and flag patterns creates three concrete problems:
 
 ## Decision
 
-All Site OS commands accept entity identifiers via declared flags only. Positional arguments are removed from `KernelCommandInput`. The `args` field is deleted from the type, and `resolveCommandFlags` no longer populates it. Every command that previously read `input.args[0]` is migrated to declare the identifier in its `flags` schema and read it from `input.flags["<flag-name>"]`.
+All Site OS commands accept entity identifiers via declared flags only. Positional arguments are removed from both `KernelCommandInput` and `ForgeCommandInput`. The `args` field is deleted from both types, and `resolveCommandFlags` no longer populates it. `parseKernelArgv` (the legacy heuristic parser) also stops returning `args`. Every command that previously read `input.args[0]` is migrated to declare the identifier in its `flags` schema and read it from `input.flags["<flag-name>"]`.
+
+This RFC is not gated on RFC-0260 rollout step 4 (baseline at zero). Removing `args` from `KernelCommandInput` forces all remaining schema-less commands that read `input.args` to migrate — the TypeScript compiler flags every handler that still reads `input.args`, which serves as the migration checklist. This accelerates RFC-0260 step 4 by making the `args` field unavailable at the type level.
 
 Flag naming is domain-specific: each command domain uses the flag name already established in that domain (`--id` for rfc/adr/session, `--mission` for mission, `--spec` for spec, `--site` for sternsystem.extract, `--app` for surface.contract.validate). The standard is about flag-only vs positional, not about flag name uniformity across domains.
 
@@ -163,6 +178,35 @@ export interface KernelCommandInput {
 }
 ```
 
+`ForgeCommandInput` (in `packages/forge/src/types.ts`) loses `args` identically:
+
+```ts
+// Before
+export interface ForgeCommandInput {
+  argv: string[];
+  args: string[];                    // ← removed
+  flags: Record<string, ForgeFlagValue>;
+}
+
+// After
+export interface ForgeCommandInput {
+  argv: string[];
+  flags: Record<string, ForgeFlagValue>;
+}
+```
+
+`parseKernelArgv` (the legacy heuristic parser) return type changes — `args` is no longer returned:
+
+```ts
+// Before
+export function parseKernelArgv(argv: string[]): KernelCommandInput
+// returns { argv, args, flags }
+
+// After — parseKernelArgv stops populating args; positional tokens are dropped
+// and a KERNEL-ARG-01 diagnostic is collected (see below)
+export function parseKernelArgv(argv: string[]): { argv: string[]; flags: Record<string, KernelFlagValue>; diagnostics: Diagnostic[] }
+```
+
 `resolveCommandFlags` return type changes — `args` is no longer returned:
 
 ```ts
@@ -201,8 +245,18 @@ export interface KernelDiagnostic {
 | `adr.validate` | `input.args[0]` | `input.flags["id"]` | `--id` |
 | `session.validate` | `input.args[0]` | `input.flags["id"]` | `--id` |
 | `forge.create` | `input.args[0]` (project name) | `input.flags["name"]` | `--name` |
+| `geo.slug.preview` | `input.args[0]` (city name) | `input.flags["name"]` | `--name` |
+| `i18n.config.validate` | `input.args[0]` (app name) | `input.flags["app"]` | `--app` |
+| `i18n.detect.implement` | `input.args[0]` (site name) | `input.flags["site"]` | `--site` |
+| `share.utility.lint` | `input.args[0]` (app name) | `input.flags["app"]` | `--app` |
+| `pbp.profile.validate` | `input.args[0]` (site name) | `input.flags["site"]` | `--site` |
+| `section.scaffold` | `input.args[0]` + `input.args[1]` | `input.flags["slug"]` + `input.flags["archetype"]` | `--slug`, `--archetype` |
 
-Dual-path handlers (9 files in `site-kernel-checks` and `site-kernel-handoff`) have their `?? input.args[0]` fallback removed. The flag becomes the only source.
+Dual-path handlers (15 files in `site-kernel-checks` and `site-kernel-handoff`) have their `?? input.args[0]` fallback removed. The flag becomes the only source. The 15 files are:
+
+- `site-kernel-checks`: `i18n-detect-implement.ts`, `geo.ts`, `maintenance/maintenance-debt-queue.ts`, `person-create.ts`, `content-derived.ts`, `i18n-config-validate.ts`, `pbp-profile.ts`, `biome-tokens/validate.ts`, `archetype/cosmic-name.ts`, `source-monitor.ts`, `share-utility.ts` (11 files)
+- `site-kernel-handoff`: `handoff-validate.ts`, `handoff-pack.ts`, `handoff-absorb.ts` (3 files)
+- `site-kernel-codegen`: `section-scaffold.ts` (1 file)
 
 ### forge.yaml binding updates
 
@@ -218,7 +272,9 @@ Dual-path handlers (9 files in `site-kernel-checks` and `site-kernel-handoff`) h
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel/src/types.ts` | Remove `args` from `KernelCommandInput`; add `KERNEL-ARG-01` diagnostic type |
-| `packages/os/site-kernel/src/runtime/argv.ts` | `resolveCommandFlags` stops returning `args`; emits `KERNEL-ARG-01` for positional tokens |
+| `packages/os/site-kernel/src/runtime/argv.ts` | `resolveCommandFlags` stops returning `args`; emits `KERNEL-ARG-01` for positional tokens; `parseKernelArgv` stops returning `args` |
+| `packages/os/site-kernel/src/runtime/execute-command.ts` | Stop constructing `KernelCommandInput` with `args: resolved.args`; stop passing `args` from `parseKernelArgv` result |
+| `packages/forge/src/types.ts` | Remove `args` from `ForgeCommandInput` |
 | `packages/forge/os/rfc/rfc.module.ts` | Add `id` flag to `rfc.validate`, `rfc.command-lifecycle.validate`, `rfc.graph`, `rfc.pipeline.status` registrations |
 | `packages/forge/os/rfc/handlers/validate.ts` | Read `input.flags["id"]` instead of `input.args[0]` |
 | `packages/forge/os/rfc/handlers/lifecycle.ts` | Read `input.flags["id"]` instead of `input.args[0]` |
@@ -229,14 +285,27 @@ Dual-path handlers (9 files in `site-kernel-checks` and `site-kernel-handoff`) h
 | `packages/forge/os/session/handlers/validate.ts` | Read `input.flags["id"]` instead of `input.args[0]` |
 | `packages/forge/os/core/core.module.ts` | Add `name` flag to `forge.create` registration |
 | `packages/forge/os/core/handlers/create.ts` | Read `input.flags["name"]` instead of `input.args[0]` |
-| `packages/os/site-kernel-checks/src/*.ts` (9 files) | Remove `?? input.args[0]` fallback from dual-path handlers |
+| `packages/os/site-kernel-checks/src/*.ts` (11 files) | Remove `?? input.args[0]` fallback from dual-path handlers; migrate pure-positional handlers to flags |
 | `packages/os/site-kernel-handoff/src/handoff-*.ts` (3 files) | Remove `?? input.args[0]` fallback from dual-path handlers |
+| `packages/os/site-kernel-codegen/src/section-scaffold.ts` | Migrate `input.args[0]` + `input.args[1]` to `--slug` + `--archetype` flags |
 | `forge.yaml` | Update `validateRfc`, `validateAdr`, `specValidate` binding templates |
 | `.agents/skills/fo/*/SKILL.md` | Update command invocation examples that use positional args |
+| `AGENTS.md` (root) | Add rule: all kernel commands accept entity identifiers via flags only; positional args trigger KERNEL-ARG-01 |
 
 ### Output format
 
 No new command is introduced by this RFC. The `command.args.validate` command is defined in RFC-0610.
+
+The `KERNEL-ARG-01` diagnostic is emitted in the standard `Diagnostic[]` array returned by `resolveCommandFlags` and `parseKernelArgv`. When a command is invoked via the CLI, the diagnostic is printed in the standard diagnostics format:
+
+```json
+{
+  "ruleId": "KERNEL-ARG-01",
+  "severity": "error",
+  "message": "Unexpected positional argument \"RFC-0609\" for command \"rfc.validate\". All arguments must be passed as flags.",
+  "fixHint": "Convert \"RFC-0609\" to a flag, e.g. --id RFC-0609."
+}
+```
 
 ### Failure modes
 
@@ -266,7 +335,9 @@ No new command is introduced by this RFC. The `command.args.validate` command is
 
 - **Breaking change for agents and skills.** Any agent or skill that invokes the 6 migrated commands with positional syntax will get KERNEL-ARG-01. Mitigation: all skill files are updated in the same commit. Agents reading skill files will see the new syntax. Agents with hardcoded positional invocations will fail visibly with a clear error message and fix hint.
 - **Breaking change for external forge consumers.** Projects using `@warpgogol/forge` as an npm package that invoke commands with positional args will break. Mitigation: `@warpgogol/forge` is versioned; this is a minor breaking change (commands still exist, just the invocation syntax changes). The `forge.create` change is the most visible — documented in the changelog.
-- **KERNEL-ARG-01 false positives for multi-word values.** If a flag value contains spaces and is not quoted, `resolveCommandFlags` might interpret the second word as a positional arg. Mitigation: this is already the case with the current parser — flag values with spaces must be quoted. No regression.
+- **KERNEL-ARG-01 false positives for multi-word values.** If a flag value contains spaces and is not quoted, `resolveCommandFlags` might interpret the second word as a positional arg. Mitigation: this is already the case with the current parser — flag values with spaces must be quoted. No regression. Quoted values containing `--` (e.g. `--title "Foo -- Bar"`) are handled correctly because the shell strips quotes before the parser sees the token.
+- **Schema-less command migration.** Removing `args` from `KernelCommandInput` forces all remaining ~357 schema-less commands that read `input.args` to migrate. Mitigation: the TypeScript compiler flags every handler that reads `input.args` — this is the migration checklist. Commands that do not read `input.args` are unaffected. This accelerates RFC-0260 step 4 by making the `args` field unavailable at the type level.
+- **Pipeline step args.** Pipeline definitions that pass positional tokens via `step.args` will trigger `KERNEL-ARG-01` after migration. Mitigation: audit pipeline definitions in `tools/kernel.config.ts` and module `registerPipeline` calls for positional tokens; migrate them to flag tokens. The `KernelPipelineStep.args` field itself remains as raw argv input.
 - **Agent misinterpretation risk.** An agent might see `--id` in a skill file and assume it works for all commands, including ones not yet migrated. Mitigation: after this RFC is implemented, all commands accept `--id` (or their domain-specific flag). There are no positional-only commands left to misinterpret.
 
 ## Acceptance criteria
@@ -278,20 +349,26 @@ No new command is introduced by this RFC. The `command.args.validate` command is
 - [ ] `session.validate` accepts `--id` flag
 - [ ] `rfc.command-lifecycle.validate`, `rfc.graph`, `rfc.pipeline.status` accept `--id` flag
 - [ ] `forge.create` accepts `--name` flag and rejects positional
-- [ ] All 9 dual-path handlers in `site-kernel-checks` and `site-kernel-handoff` no longer read `input.args[0]`
+- [ ] All 15 dual-path and positional-only handlers in `site-kernel-checks`, `site-kernel-handoff`, and `site-kernel-codegen` no longer read `input.args[0]`
 - [ ] `forge.yaml` binding templates for `validateRfc`, `validateAdr`, `specValidate` use flag format
 - [ ] All `.agents/skills/fo/*/SKILL.md` files that reference positional command invocations are updated
+- [ ] `ForgeCommandInput` in `packages/forge/src/types.ts` no longer has an `args` field
+- [ ] `parseKernelArgv` no longer returns `args`; returns `{ argv, flags, diagnostics }`
+- [ ] Unit tests for `KERNEL-ARG-01` diagnostic in `packages/os/site-kernel/src/tests/` (positional token rejected, fix hint correct)
 - [ ] `rfc.validate` passes on this file
 - [ ] All affected packages pass `build:check` (typecheck)
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- The migration is mechanical: for each of the 6 positional-only commands, add `id: { kind: "string", description: "..." }` to the `flags` schema and change `input.args[0]` to `input.flags["id"]` in the handler. Two lines per command.
+- The migration is mechanical: for each positional-only command, add the appropriate flag to the `flags` schema and change `input.args[0]` to `input.flags["<flag>"]` in the handler. Two lines per command.
+- For multi-positional commands (e.g. `section.scaffold` reads `input.args[0]` + `input.args[1]`), add multiple flags (`--slug`, `--archetype`) and change each `input.args[N]` to `input.flags["<flag>"]`.
 - For dual-path handlers, remove `?? input.args[0]` — the flag becomes the only source. One line per handler.
 - For `forge.create`, add `name: { kind: "string", required: true, description: "Project name." }` to `flags` and change `input.args[0]` to `input.flags["name"]`.
-- The `args` field removal from `KernelCommandInput` is a type-level change. TypeScript will flag every handler that still reads `input.args` — use this as a migration checklist.
+- The `args` field removal from `KernelCommandInput` and `ForgeCommandInput` is a type-level change. TypeScript will flag every handler that still reads `input.args` — use this as a migration checklist.
+- `parseKernelArgv` must also stop returning `args`. Its return type changes from `KernelCommandInput` to `{ argv: string[]; flags: Record<string, KernelFlagValue>; diagnostics: Diagnostic[] }`. Positional tokens in schema-less commands trigger `KERNEL-ARG-01`.
 - `resolveCommandFlags` must emit `KERNEL-ARG-01` for any token not starting with `--` (after the command name). This includes tokens that were previously valid positional args.
+- Audit pipeline definitions (`tools/kernel.config.ts` and module `registerPipeline` calls) for `step.args` values that contain positional tokens. Migrate them to flag tokens (e.g. `step.args: ["RFC-0609"]` → `step.args: ["--id", "RFC-0609"]`).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose --id RFC-0609 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
