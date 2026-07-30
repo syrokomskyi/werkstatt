@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 0e09848151afcd5b38d7110e9f2601dd31fbb77a33c454915eb88f3af73c23ed
+  contentHash: e5f0e84412a4c135cfbc0c3ed809b67f992c7b1b3d1a48f5433941d2b9773c6a
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -3950,7 +3950,7 @@ commands:
     flags: &a197 {}
     reads: &a198
       - packages/forge/os/**/*.ts
-      - packages/os/site-kernel-checks/src/command-tables/*.ts
+      - packages/os/site-kernel-checks/src/**/*.ts
       - packages/os/site-kernel-*/src/**/*.ts
     writes: []
     pipelines:
