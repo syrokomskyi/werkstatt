@@ -92,6 +92,9 @@
   .open-source-registry__components details > summary {
     cursor: pointer;
     list-style: none;
+    display: flex;
+    align-items: baseline;
+    gap: var(--ds-space-1);
   }
 
   .open-source-registry__components details > summary::-webkit-details-marker {
@@ -106,13 +109,16 @@
   }
 
   .open-source-registry__components details > summary > h3::before {
-    content: "▸ ";
+    content: "▸";
     color: var(--ds-color-text-muted);
-    font-size: var(--ds-text-sm);
+    font-size: var(--ds-font-size-lg);
+    margin-right: var(--ds-space-2);
+    display: inline-block;
+    transform: translateY(-0.05em);
   }
 
   .open-source-registry__components details[open] > summary > h3::before {
-    content: "▾ ";
+    content: "▾";
   }
 
   .open-source-registry__table-wrap {
