@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
+enhancedAt: 2026-07-30
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,6 +25,7 @@ amendedBy: []
 related:
   - RFC-0150
   - RFC-0345
+  - RFC-0601
   - RFC-0602
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
@@ -48,7 +50,6 @@ appsImpacted:
   - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
-  - "@warpgogol/site-kernel-codegen"
   - "@warpgogol/site-kernel-checks"
 successSignals:
   - "Running preview.images.generate twice in a row produces byte-identical PNG files for the same input content."
@@ -56,7 +57,7 @@ successSignals:
   - "The rendering pipeline uses deterministic font rendering, fixed color profiles, and stable element positioning."
   - "No timestamp, build ID, or random seed is embedded in the PNG metadata or pixel data."
 nonGoals:
-  - "Do not change the visual appearance of preview images — the fix is about byte-level determinism, not design."
+  - "Do not change the visual appearance of preview images beyond the one-time font bundling change required for cross-platform determinism (see Design §Determinism strategy)."
   - "Do not switch to a different image format (e.g., SVG, WebP) — PNG is the required format for OG preview images."
   - "Do not remove the preview image generation pipeline — it is required for social media sharing."
   - "Do not address icon generation (favicon.ico, icon-192.png, etc.) — those are generated from fixed SVG sources and are already deterministic."
@@ -84,12 +85,13 @@ nonGoals:
 
 A public folder regeneration experiment on warpgogol-com (2026-07-30) revealed that 34 preview PNG files in `public/preview/` differ in byte content between consecutive regenerations, even when the source content (page title, description, brand colors) is identical. This makes `generated.drift.validate` (RFC-0601) impractical for preview images — every build would report drift on all 34 files.
 
-The current `preview.images.generate` command (RFC-0150) uses a headless browser or canvas-based rendering pipeline that introduces non-determinism through:
+The current `preview.images.generate` command (RFC-0150) already uses `sharp` with SVG input for PNG rendering (`packages/os/site-kernel-checks/src/preview-templates.ts:131-139`). The non-determinism comes from `sharp`/libvips encoding options and system font variability, not from a headless browser:
 
-1. **Font rendering**: Subpixel positioning, hinting, and antialiasing vary between runs depending on font cache state and GPU rasterization.
-2. **PNG metadata**: The encoder embeds a creation timestamp in the PNG tEXt chunk.
-3. **Color profile**: The color space may vary depending on the system's ICC profile.
-4. **Element positioning**: Sub-pixel layout differences from floating-point rounding in the rendering engine.
+1. **`adaptiveFiltering: true`** (`preview-templates.ts:137`): sharp selects different PNG row filter strategies per-row based on content analysis heuristics. While deterministic for identical input on the same libvips build, this may produce different output across libvips versions or builds.
+2. **Redundant `resize` call** (`preview-templates.ts:135-136`): The SVG is rendered at 1200×630 (its native viewBox) and then `.resize(1200, 630, { fit: "fill" })` is called — a no-op in dimensions but a second pass through the image processing pipeline that may introduce rounding differences.
+3. **System font stack** (`preview-templates.ts:93`): The SVG uses `-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif`. These fonts vary by platform and even by font cache state, producing different glyph rendering on different machines.
+4. **`writeFile` instead of `writeFileIfChanged`** (`preview-images.ts:270, 309, 383, 440`): The command always writes the PNG to disk, even when the content is byte-identical to the existing file. This creates git churn and LFS bloat on every `build.prepare` run, regardless of whether the PNG content actually changed.
+5. **PNG metadata**: The current code does NOT call `.withMetadata()`, so sharp strips metadata by default. This is already correct — no fix needed for metadata.
 
 ## Problem
 
@@ -102,7 +104,7 @@ Preview images are generated binary files (PNG) that should be deterministic —
 
 ## Decision
 
-The `preview.images.generate` rendering pipeline is made deterministic by: (1) stripping all non-deterministic PNG metadata (tEXt chunks with timestamps), (2) using a fixed color profile (sRGB), (3) disabling subpixel font positioning in the rendering engine, and (4) using a deterministic PNG encoder (e.g., `sharp` with `png: { compressionLevel: 9, palette: false }` and no metadata chunks).
+The `preview.images.generate` rendering pipeline is made deterministic by fixing `sharp` options first (disable `adaptiveFiltering`, remove the redundant `resize` call, set `palette: false`) and bundling fonts via Fontsource for cross-platform determinism. If `sharp` still produces non-deterministic output after these fixes, `@resvg/resvg-js` is added as a fallback deterministic renderer. Additionally, `writeFile` is replaced with `writeFileIfChanged` (RFC-0345) so that byte-identical output skips the disk write entirely.
 
 ## Architectural fit
 
@@ -123,37 +125,74 @@ pnpm exec site-kernel run preview.images.generate --site warpgogol-com
 
 ### Determinism strategy
 
-1. **PNG metadata stripping**: After rendering, use `sharp` to strip all metadata chunks: `sharp(imageBuffer).png({ compressionLevel: 9 }).withMetadata({ exif: false, icc: false }).toFile(outputPath)`. This removes tEXt chunks containing creation timestamps.
+**Phase 1 — Fix `sharp` options (preferred):**
 
-2. **Fixed color profile**: Convert to sRGB before encoding: `sharp(imageBuffer).toColorspace('srgb')`. This ensures the same color space regardless of the system's ICC profile.
+1. **Disable `adaptiveFiltering`**: Change `.png({ compressionLevel: 9, adaptiveFiltering: true, effort: 10 })` to `.png({ compressionLevel: 9, adaptiveFiltering: false, palette: false, effort: 10 })`. This forces a fixed PNG filter strategy instead of per-row adaptive selection.
 
-3. **Deterministic font rendering**: Use `@resvg/resvg-js` (or `sharp` with SVG input) instead of a headless browser. SVG-to-PNG rendering with `resvg` is deterministic because it uses a fixed rendering pipeline without GPU rasterization, subpixel positioning, or font cache variability.
+2. **Remove redundant `resize` call**: The SVG is already at 1200×630 (its native viewBox). The `.resize(OG_WIDTH, OG_HEIGHT, { fit: "fill" })` call is a no-op in dimensions but introduces a second image processing pass. Remove it — render the SVG directly to PNG at the native size.
 
-4. **Stable element positioning**: Use integer pixel coordinates in the SVG template. Avoid floating-point transforms that can produce different rounding on different platforms.
+3. **Bundle fonts via Fontsource**: Replace the system font stack in the SVG template with a Fontsource-bundled font (e.g., `@fontsource/inter`). This ensures the same font is used on all platforms. The SVG `font-family` attribute references the bundled font name, and the font file is loaded at render time. This is a one-time visual change — the preview images will look slightly different after this change, but subsequent renders are deterministic.
+
+4. **Fixed color profile**: Ensure the SVG uses explicit hex colors (already the case via biome palette). sharp renders SVG in sRGB by default — no explicit `.toColorspace('srgb')` call is needed unless the SVG contains ICC profile references.
+
+5. **Integer pixel coordinates**: The SVG template already uses integer coordinates for text positions, rectangles, and gradients (`preview-templates.ts:88-124`). No change needed.
+
+6. **PNG metadata**: The current code does NOT call `.withMetadata()`, so sharp strips metadata by default. No change needed. Do NOT add `.withMetadata({ exif: false, icc: false })` — `.withMetadata()` ADDS metadata, it does not strip it.
+
+7. **Replace `writeFile` with `writeFileIfChanged`**: Change all `writeFile` calls in `preview-images.ts` to `writeFileIfChanged` from `@warpgogol/site-kernel` (re-exported from `@warpgogol/forge/utils`, RFC-0345). This skips the disk write when the generated PNG is byte-identical to the existing file, eliminating git churn and LFS bloat.
+
+**Phase 2 — `@resvg/resvg-js` fallback (if sharp is still non-deterministic):**
+
+If after applying Phase 1 fixes, `preview.images.generate` still produces non-deterministic output (verified by running twice and comparing bytes), add `@resvg/resvg-js` as the SVG-to-PNG renderer. `resvg` uses a fixed rendering pipeline without libvips' adaptive filter selection, providing stronger determinism guarantees. The fallback is only activated if Phase 1 is insufficient.
+
+**Interaction with `--force-normalize`:**
+
+The existing `--force-normalize` flag (`preview-images.ts:210`) re-renders existing cards when source text carries normalization signals. The deterministic pipeline preserves this flag — `--force-normalize` still triggers re-rendering, but the output is now deterministic. The flag and the determinism fix are orthogonal.
 
 ### TypeScript contracts
 
 ```ts
+/** Options that affect PNG determinism in the sharp rendering pipeline. */
 interface PreviewRenderOptions {
   width: 1200;
   height: 630;
   format: "png";
-  deterministic: true;  // Always true after this RFC
+  /** PNG encoding options — fixed for determinism */
+  png: {
+    compressionLevel: 9;
+    adaptiveFiltering: false;  // Disabled — fixed filter strategy
+    palette: false;            // No palette quantization
+    effort: 10;
+  };
+  /** Whether to use @resvg/resvg-js instead of sharp (Phase 2 fallback) */
+  useResvg?: boolean;
 }
+
+/** writeFileIfChanged return type from @warpgogol/site-kernel (RFC-0345) */
+type WriteResult = "written" | "unchanged";
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-codegen/src/preview-images.ts` | Fix target — rendering pipeline |
-| `packages/os/site-kernel-codegen/src/templates/preview/` | SVG templates for preview images |
-| `public/preview/{lang}/{slug}.png` | Output — must be byte-identical across runs |
+| `packages/os/site-kernel-checks/src/preview-images.ts` | Fix target — replace `writeFile` with `writeFileIfChanged` |
+| `packages/os/site-kernel-checks/src/preview-templates.ts` | Fix target — sharp options, Fontsource fonts in SVG |
+| `packages/os/site-kernel-checks/src/generator-ownership.ts` | Add `public/preview/{lang}/{slug}.png` entries to `GENERATOR_OWNERSHIP_MAP` |
+| `packages/os/site-kernel-checks/package.json` | Add `@resvg/resvg-js` dependency (Phase 2 only, if needed) |
+| `public/og-image.png` | Output — ultimate fallback, must be byte-identical across runs |
+| `public/preview/{lang}/{slug}.png` | Output — per-page preview, must be byte-identical across runs |
 
 ### Failure modes
 
-- If the rendering library (`resvg` or `sharp`) produces different output on different platforms (e.g., Linux vs macOS), the preview images will differ across developer machines. Mitigation: CI runs on Linux, and the generated files are committed from CI, not from developer machines.
-- If a font is not available on the rendering system, the fallback font may produce different output. Mitigation: bundle fonts as package dependencies (Fontsource).
+- **Cross-platform output differences**: `sharp`/libvips or `resvg` may produce different output on different platforms (Linux vs macOS vs Windows). Mitigation: generated files are committed from CI (Linux), not from developer machines. Developers who run `build.prepare` locally may see preview image changes, but these are not committed.
+- **Font unavailability**: If a Fontsource font fails to load at render time, the fallback font may produce different output. Mitigation: Fontsource fonts are npm dependencies, installed via `pnpm install` — they are always available.
+- **`--force-normalize` interaction**: The `--force-normalize` flag re-renders existing cards. The deterministic pipeline preserves this flag — it triggers re-rendering, but the output is deterministic. No conflict.
+- **Biome palette missing**: If the biome YAML file is not found, `readBiomePalette` returns `{}` and the SVG uses default colors (`preview-templates.ts:43-45`). This is already deterministic — the same default colors are used every time.
+
+### Output format
+
+The `--json` output shape is unchanged from the current command. The `data.items[]` array still reports per-file status (`generated`, `skipped-existing`, `skipped-optout`, `regenerated-normalized`, `failed`). The `data.summary` object still reports `generated`, `skippedExisting`, `skippedOptout`, `failed` counts. The only behavioral change: `skipped-existing` is now reported when `writeFileIfChanged` returns `"unchanged"` (previously, the file was always overwritten and reported as `skipped-existing` only if it existed on disk).
 
 ## Rollout
 
@@ -168,33 +207,42 @@ interface PreviewRenderOptions {
 - **Gitignore preview images (don't commit them)**: Rejected by operator. Preview images must be committed to git for LFS storage and CDN caching. Non-deterministic generation would still cause LFS bloat.
 - **Perceptual hashing for drift detection**: Rejected by operator. Perceptual hashing hides real content drift (e.g., wrong page title) and adds complexity. The fix should be at the root — make rendering deterministic.
 - **Use a different image format (SVG)**: Rejected — OG preview images must be PNG (or JPEG) for social media compatibility. SVG is not supported by Open Graph.
-- **Use a headless browser with `--font-render-hinting=none`**: Rejected — headless browsers (Puppeteer, Playwright) still have non-deterministic rendering due to GPU rasterization, font cache state, and timing-dependent layout. SVG-to-PNG via `resvg` is inherently more deterministic.
+- **Use a headless browser with `--font-render-hinting=none`**: Rejected — headless browsers (Puppeteer, Playwright) have non-deterministic rendering due to GPU rasterization, font cache state, and timing-dependent layout. The current pipeline already uses SVG-to-PNG via `sharp`, which is inherently more deterministic than a headless browser.
+- **Switch to `@resvg/resvg-js` immediately**: Deferred — the current `sharp` SVG-to-PNG pipeline may achieve determinism with option fixes (disable `adaptiveFiltering`, remove redundant `resize`). `resvg` is a Phase 2 fallback only if `sharp` remains non-deterministic. This avoids adding an unnecessary dependency.
 
 ## Risks
 
-- **Cross-platform determinism**: `resvg` may produce different output on different platforms (Linux vs macOS vs Windows). Mitigation: generated files are committed from CI (Linux), not from developer machines. Developers who run `build.prepare` locally may see preview image changes, but these are not committed.
-- **Font availability**: If a font is not installed on the rendering system, the fallback font produces different output. Mitigation: bundle fonts via Fontsource as package dependencies.
-- **Visual regression**: Changing the rendering engine from headless browser to SVG-to-PNG may subtly change the visual appearance of preview images. Mitigation: compare before/after visually before merging. The visual appearance should be close but not pixel-identical to the previous output.
-- **Performance**: SVG-to-PNG via `resvg` is faster than headless browser rendering. No performance concern.
+- **Cross-platform determinism**: `sharp`/libvips or `resvg` may produce different output on different platforms (Linux vs macOS vs Windows). Mitigation: generated files are committed from CI (Linux), not from developer machines. Fontsource fonts eliminate font-level cross-platform differences.
+- **Font availability**: Fontsource fonts are npm dependencies — always available after `pnpm install`. No runtime font resolution needed.
+- **Visual regression from font change**: Switching from system font stack to Fontsource-bundled fonts will change the visual appearance of preview images. This is a one-time change accepted by the operator. Mitigation: compare before/after screenshots before merging. Subsequent renders are deterministic.
+- **Visual regression from `adaptiveFiltering` change**: Disabling `adaptiveFiltering` may slightly change PNG file size (larger files due to fixed filter strategy). This does not affect visual appearance — the pixel data is identical, only the PNG encoding differs.
+- **Performance**: Removing the redundant `resize` call slightly improves performance. No performance concern.
 
 ## Acceptance criteria
 
-- [ ] `preview.images.generate` uses SVG-to-PNG rendering via `resvg` or equivalent deterministic renderer
-- [ ] PNG metadata (tEXt chunks with timestamps) is stripped from output
-- [ ] Fixed sRGB color profile is applied to all output
-- [ ] Integer pixel coordinates used in SVG templates (no sub-pixel positioning)
-- [ ] Running `preview.images.generate` twice in a row produces byte-identical PNG files
-- [ ] `git diff` after re-running `preview.images.generate` shows zero changes to `public/preview/` when source content is unchanged
-- [ ] `writeFileIfChanged` skips writes for unchanged preview images (no LFS bloat)
-- [ ] Unit test verifies byte-level determinism for a sample preview image
+- [ ] `adaptiveFiltering` is set to `false` in `preview-templates.ts` PNG encoding options
+- [ ] Redundant `.resize()` call removed from `preview-templates.ts` (SVG rendered directly at native 1200×630)
+- [ ] SVG template uses Fontsource-bundled font instead of system font stack
+- [ ] PNG metadata is not added (`.withMetadata()` is NOT called — sharp strips metadata by default)
+- [ ] `writeFile` replaced with `writeFileIfChanged` in `preview-images.ts` for all output paths
+- [ ] `public/preview/{lang}/{slug}.png` entries added to `GENERATOR_OWNERSHIP_MAP` in `generator-ownership.ts`
+- [ ] Running `preview.images.generate` twice in a row produces byte-identical PNG files (verified by comparing file hashes)
+- [ ] `git diff` after re-running `preview.images.generate` shows zero changes to `public/preview/` and `public/og-image.png` when source content is unchanged
+- [ ] `writeFileIfChanged` returns `"unchanged"` for byte-identical preview images (no disk write, no LFS bloat)
+- [ ] Unit test in `src/tests/preview-determinism.test.ts` renders a sample preview image twice and asserts `Buffer.equals()` on the two PNG buffers
+- [ ] If Phase 1 is insufficient, `@resvg/resvg-js` is added and the same determinism test passes with `resvg` rendering
+- [ ] `--force-normalize` flag still works (re-renders existing cards with deterministic output)
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
-- The implementation MUST preserve the visual appearance of preview images as closely as possible. Compare before/after screenshots before merging.
-- If `resvg` is not already a dependency, add it to `packages/os/site-kernel-codegen/package.json`.
-- The SVG template MUST use integer pixel coordinates for all elements (text positions, rectangles, gradients).
-- Fonts MUST be loaded via Fontsource (already a project dependency) to ensure cross-platform availability.
+- The implementation MUST start with Phase 1 (fix `sharp` options). Only proceed to Phase 2 (`@resvg/resvg-js`) if Phase 1 is proven insufficient by a failed determinism test.
+- The SVG template MUST use integer pixel coordinates for all elements (text positions, rectangles, gradients). This is already the case — no change needed.
+- Fonts MUST be loaded via Fontsource (already a project dependency) to ensure cross-platform availability. This is a one-time visual change accepted by the operator.
+- `writeFileIfChanged` MUST be imported from `@warpgogol/site-kernel` (re-exported from `@warpgogol/forge/utils`, RFC-0345). Do NOT use raw `writeFile` from `node:fs/promises` for generated preview images.
+- If `@resvg/resvg-js` is needed (Phase 2), add it to `packages/os/site-kernel-checks/package.json` (NOT `site-kernel-codegen` — the preview image code lives in `site-kernel-checks`).
+- The `--force-normalize` flag MUST continue to work. The determinism fix is orthogonal to the normalization re-render trigger.
+- Unit test files MUST live under `src/tests/` in `packages/os/site-kernel-checks` (the vitest config only discovers tests under `src/tests/`).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
