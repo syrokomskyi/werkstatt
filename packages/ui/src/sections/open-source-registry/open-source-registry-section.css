@@ -85,6 +85,35 @@
     font-weight: 600;
   }
 
+  .open-source-registry__components details {
+    margin-top: var(--ds-space-3);
+  }
+
+  .open-source-registry__components details > summary {
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .open-source-registry__components details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .open-source-registry__components details > summary > h3 {
+    display: inline;
+    font-size: var(--ds-font-size-lg);
+    font-weight: 600;
+  }
+
+  .open-source-registry__components details > summary > h3::before {
+    content: "▸ ";
+    color: var(--ds-color-text-muted);
+    font-size: var(--ds-text-sm);
+  }
+
+  .open-source-registry__components details[open] > summary > h3::before {
+    content: "▾ ";
+  }
+
   .open-source-registry__table-wrap {
     overflow-x: auto;
     border: 1px solid var(--ds-color-border);
