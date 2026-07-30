@@ -14,6 +14,7 @@ import {
   SITES_CHECK_PIPELINE,
   STANDARD_COMPASS_PIPELINE,
   SITES_BUILD_PREPARE_PIPELINE,
+  SITES_BUILD_PREPARE_DEV_PIPELINE,
   SITES_BUILD_CHECK_PIPELINE,
   SITES_BUILD_POST_PIPELINE,
 } from "@warpgogol/site-kernel-checks/pipelines";
@@ -47,6 +48,7 @@ export default defineKernelConfig({
   },
   pipelines: {
     "build.prepare": [...SITES_BUILD_PREPARE_PIPELINE],
+    "build.prepare.dev": [...SITES_BUILD_PREPARE_DEV_PIPELINE],
     "build.check": [...SITES_BUILD_CHECK_PIPELINE],
     "build.post": [...SITES_BUILD_POST_PIPELINE],
     check: [...SITES_CHECK_PIPELINE],

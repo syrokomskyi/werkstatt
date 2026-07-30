@@ -11,6 +11,7 @@
   <item>RFC-0528: moved material.metadata.write from before variant generators to after live.variants.generate.</item>
   <item>RFC-0557: added workpiece.imports.validate as first step before yaml.contract.lint.</item>
   <item>RFC-0571: added config.regenerate as first step before workpiece.imports.validate.</item>
+  <item>RFC-0597: added SITES_BUILD_PREPARE_DEV_PIPELINE — codegen-only subset for dev-mode mission materialization.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -117,5 +118,56 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   // RFC-0295: generate Warpgogol check hints before generated.files.validate checks them
   { command: "warpgogol.check-hints.generate" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
+  { command: "generated.files.validate" },
+];
+
+// RFC-0597: codegen-only subset for dev-mode mission materialization.
+// Includes all generators that produce files consumed by `astro dev` (src/ files,
+// middleware, styles, surface artifacts) plus generated.files.validate as a safety net
+// and uni.registry.build for the cosmic registry needed at runtime.
+// Excludes: media transcoding (video/image/live variants), static public file generation
+// (sitemap, preview images, llms, feed, robots, ai, page.markdown, public.artifact),
+// material.metadata.write, warpgogol.check-hints.generate, and workspace-scoped
+// validators (manifest.contract.validate, mirror.quintet.validate).
+export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
+  { command: "config.regenerate" },
+  { command: "workpiece.imports.validate" },
+  { command: "yaml.contract.lint" },
+  { command: "yaml.parse.validate" },
+  { command: "content.ref-index.generate" },
+  { command: "kernel.wire" },
+  { command: "agents.generate" },
+  { command: "overlay.pages.generate" },
+  { command: "routes.generate" },
+  { command: "not-found.generate" },
+  { command: "api.routes.generate" },
+  { command: "env.example.generate" },
+  { command: "entitlements.resolve" },
+  { command: "surface.generate" },
+  { command: "surface.freshness" },
+  { command: "surface.starmap" },
+  { command: "content.freshness.validate" },
+  { command: "agent.knowledge.generate" },
+  { command: "agent.manifest.generate" },
+  { command: "agent.openapi.generate" },
+  { command: "agent.routes.generate" },
+  { command: "agent.surface.sign" },
+  { command: "styles.global.generate" },
+  { command: "scripts.orchestrator.generate" },
+  { command: "public.infrastructure.generate" },
+  { command: "security.txt.generate" },
+  { command: "indexnow.key.generate" },
+  { command: "humans.generate" },
+  { command: "public.icons.generate" },
+  { command: "headers.security.generate" },
+  { command: "open-source.generate" },
+  { command: "material.credits.generate" },
+  { command: "icons.generate" },
+  { command: "biome.css.generate" },
+  { command: "fonts.imports.generate" },
+  { command: "cms.schema.generate" },
+  { command: "archetype.registry.build" },
+  { command: "uni.registry.build" },
+  { command: "i18n.middleware.generate" },
   { command: "generated.files.validate" },
 ];

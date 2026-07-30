@@ -15,7 +15,7 @@ export { SITES_CHECK_POSTBUILD_PIPELINE } from "./sites-check-postbuild.ts";
 export { SITES_CHECK_PIPELINE } from "./sites-check.ts";
 export { PACKAGES_CHECK_PIPELINE } from "./packages-check.ts";
 export { STANDARD_COMPASS_PIPELINE } from "./standard-compass.ts";
-export { SITES_BUILD_PREPARE_PIPELINE } from "./build-prepare.ts";
+export { SITES_BUILD_PREPARE_PIPELINE, SITES_BUILD_PREPARE_DEV_PIPELINE } from "./build-prepare.ts";
 export { SITES_BUILD_CHECK_PIPELINE } from "./build-check.ts";
 export { SITES_BUILD_POST_PIPELINE } from "./build-post.ts";
 export { MISSION_PREFLIGHT_CRITICAL, MISSION_PREFLIGHT_WARNING } from "./mission-preflight.ts";
