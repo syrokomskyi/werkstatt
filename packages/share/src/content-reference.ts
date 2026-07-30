@@ -25,7 +25,7 @@ import { scanFormulas, resolveFormula } from "./formula-eval.ts";
 
 export interface ContentRefIndex {
   version: 1;
-  generatedAt: string;
+  generatedAt: string | null;
   entries: Record<string, Record<string, Record<string, unknown>>>;
   collections: string[];
 }

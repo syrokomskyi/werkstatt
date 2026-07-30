@@ -37,6 +37,7 @@ import { diagnosticsResult } from "./result-helpers.ts";
 export interface TimestampAllowlistEntry {
   module: string;
   reason: string;
+  pattern: "new Date().toISOString()" | "new Date()" | "Date.now()" | "process.env.BUILD_TIMESTAMP";
 }
 
 const TIMESTAMP_ALLOWLIST: TimestampAllowlistEntry[] = [
@@ -44,14 +45,41 @@ const TIMESTAMP_ALLOWLIST: TimestampAllowlistEntry[] = [
     module: "packages/os/site-kernel-checks/src/agent/agent-surface-sign.ts",
     reason:
       "Ed25519 signing proof `created` timestamp — deterministic per RFC-0308, not a generated file field.",
+    pattern: "new Date().toISOString()",
   },
   {
     module: "packages/os/site-kernel-checks/src/surface-breaker.ts",
     reason: "Breaker verdict `evaluatedAt` — operational state, not a generated file field.",
+    pattern: "new Date().toISOString()",
   },
   {
     module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
     reason: "process.env.BUILD_TIMESTAMP fallback — CI build metadata, not new Date().",
+    pattern: "process.env.BUILD_TIMESTAMP",
+  },
+  {
+    module: "packages/os/site-kernel-checks/src/passport.ts",
+    reason:
+      "Cryptographic key creation `createdAt` — one-time operational record, not a regenerable file field.",
+    pattern: "new Date().toISOString()",
+  },
+  {
+    module: "packages/os/site-kernel-checks/src/content-ledger.ts",
+    reason:
+      "CKL event `ts`/`asOf` — manual append command, not a regenerable generated file field.",
+    pattern: "new Date().toISOString()",
+  },
+  {
+    module: "packages/os/site-kernel-checks/src/ecosystem-commit.ts",
+    reason:
+      "Platform version log `validatedAt` — manual commit command, not a regenerable generated file field.",
+    pattern: "new Date().toISOString()",
+  },
+  {
+    module: "packages/os/site-kernel-checks/src/surface-demand.ts",
+    reason:
+      "Demand signal import `observedAt`/`importId` and `isStale` runtime utility — manual import command, not a regenerable generated file field.",
+    pattern: "new Date().toISOString()",
   },
 ];
 
@@ -159,6 +187,7 @@ export function scanModuleForTimestamps(
     for (const pattern of VOLATILE_PATTERNS) {
       if (pattern.test(stripped)) {
         violations.push({ line: i + 1, pattern: pattern.source });
+        break;
       }
     }
   }

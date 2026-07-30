@@ -182,7 +182,7 @@ export async function computeKnowledgeEnvelopes(
         // No CKL claim entries for this domain — use derived-source freshness
         // so the knowledge file passes AGK-08 (freshness metadata required).
         freshness = {
-          lastVerified: new Date().toISOString().slice(0, 10),
+          lastVerified: null,
           source: "derived-source",
           coverage: "domain",
         };
@@ -190,7 +190,7 @@ export async function computeKnowledgeEnvelopes(
     } catch {
       // no ledger yet — use derived-source freshness
       freshness = {
-        lastVerified: new Date().toISOString().slice(0, 10),
+        lastVerified: null,
         source: "derived-source",
         coverage: "domain",
       };

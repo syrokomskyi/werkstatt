@@ -346,7 +346,7 @@ export async function runAgentKnowledgeValidate(
       });
     } else {
       const fv = onDisk.freshness;
-      if (!fv.lastVerified || !/^\d{4}-\d{2}-\d{2}$/.test(fv.lastVerified)) {
+      if (fv.lastVerified !== null && !/^\d{4}-\d{2}-\d{2}$/.test(fv.lastVerified)) {
         diagnostics.push({
           ruleId: "AGK-08",
           severity: "error",

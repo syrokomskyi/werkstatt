@@ -41,7 +41,7 @@ export function isAgentKnowledgeDomain(value: string): value is AgentKnowledgeDo
 }
 
 export interface AgentKnowledgeFreshness {
-  lastVerified: string;
+  lastVerified: string | null;
   source: "ckl-claim-ledger" | "authored-verification" | "derived-source";
   coverage: "domain";
 }

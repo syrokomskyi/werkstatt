@@ -331,7 +331,7 @@ export async function runPageMarkdownGenerate(
       // No people directory — skip silently.
     }
 
-    const buildDate = new Date().toISOString().split("T")[0];
+    const buildDate = null as string | null;
     for (const slug of personSlugs) {
       const routeSlug = `${baseFor(language)}/${slug}`;
       const url = `${siteUrl.replace(/\/$/, "")}${localizeUrl(language, routeSlug, { defaultLanguage: defaultLang })}`;

@@ -106,7 +106,7 @@ export async function recordSurfaceState(
     const state: SurfaceState = {
       id,
       site: siteName,
-      createdAt: new Date().toISOString(),
+      createdAt: null,
       status: "shipped",
       pageCount: artifact.entries.length,
       indexableCount: artifact.entries.filter((entry) => entry.indexable && !entry.noindex).length,

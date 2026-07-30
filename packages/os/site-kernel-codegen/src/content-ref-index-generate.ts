@@ -127,7 +127,7 @@ export async function runContentRefIndexGenerate(
 
   const index: ContentRefIndex = {
     version: 1,
-    generatedAt: new Date().toISOString(),
+    generatedAt: null,
     entries,
     collections: [...collectionSet].sort(),
   };

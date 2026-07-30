@@ -477,6 +477,13 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "info",
   ),
 
+  // generated.timestamp.validate — RFC-0602 volatile timestamp detection in generator source.
+  "TS-TIME-01": rule(
+    "TS-TIME-01",
+    "Volatile timestamp pattern (new Date(), Date.now(), process.env.BUILD_TIMESTAMP) in generator source",
+    "generated.timestamp.validate",
+  ),
+
   // yaml.contract.lint — YAML-first workspace convention enforcement.
   "YAML-CONTRACT-01": rule(
     "YAML-CONTRACT-01",

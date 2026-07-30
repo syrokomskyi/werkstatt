@@ -472,7 +472,7 @@ export async function runSurfaceEnrich(
               pageId,
               promptId: field.promptId,
               model: result.model,
-              generatedAt: new Date().toISOString(),
+              generatedAt: null,
               approved: false,
             };
             // Narrative-kind entries carry h1/lead/tagline/bridges in frontmatter (empty body);

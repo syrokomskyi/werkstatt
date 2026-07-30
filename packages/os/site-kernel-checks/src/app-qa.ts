@@ -222,7 +222,7 @@ export async function runAppQaValidate(
     "---",
     `phase: 05-audit`,
     `derivedFromInputHash: ${JSON.stringify(phaseData?.inputHash ?? "")}`,
-    `generatedAt: ${JSON.stringify(new Date().toISOString())}`,
+    `generatedAt: null`,
     `generator: ${JSON.stringify("app.qa.validate")}`,
     "---",
     "",

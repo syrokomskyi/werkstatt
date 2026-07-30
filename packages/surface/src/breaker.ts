@@ -22,7 +22,7 @@ export const surfaceStateStatusSchema = z.enum([
 export const surfaceStateSchema = z.object({
   id: z.string().min(1),
   site: z.string().min(1),
-  createdAt: z.string().datetime(),
+  createdAt: z.string().datetime().nullable(),
   status: surfaceStateStatusSchema,
   pageCount: z.number().int().nonnegative(),
   indexableCount: z.number().int().nonnegative(),

@@ -38,7 +38,7 @@ export interface MarkdownTwinSemanticMeta {
 export interface MarkdownTwinProvenance {
   canonical: string;
   language: string;
-  lastModified: string;
+  lastModified: string | null;
   license: string;
   generator: string;
   sourceKind: string;
@@ -130,7 +130,7 @@ export function buildMarkdownTwinFrontmatter(
   const fields: string[] = [
     `canonical: "${provenance.canonical}"`,
     `language: "${provenance.language}"`,
-    `lastModified: "${provenance.lastModified}"`,
+    `lastModified: ${provenance.lastModified === null ? "null" : `"${provenance.lastModified}"`}`,
     `contentHash: "${contentHash}"`,
     `license: "${provenance.license}"`,
     `generator: "${provenance.generator}"`,
