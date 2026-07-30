@@ -26,6 +26,7 @@ related:
   - DNA-47
   - RFC-0593
   - RFC-0480
+enhancedAt: 2026-07-30
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -85,7 +86,7 @@ These errors were only discovered later when the release session ran `mission.va
 
 ## Problem
 
-`mission.git.commit` (RFC-0480) commits staged changes to the workpiece git repository without any content validation. There is no gate between `git add` and `git commit` — any file with any content can be committed. This means:
+`mission.git.commit` (RFC-0480) auto-stages all workpiece changes via `git add -A` and commits them without any content validation. There is no gate between staging and commit — any file with any content can be committed. This means:
 
 - Schema violations (wrong field names, invalid types) are committed and become part of the git history.
 - SEO drift (metaDescription length, canonical URLs) is committed silently.
@@ -93,6 +94,8 @@ These errors were only discovered later when the release session ran `mission.va
 - The errors are only discovered at `mission.validate` time — potentially much later in the lifecycle.
 
 The gap relies on manual discipline: the operator or agent must remember to run the relevant validators before committing. There is no automated pre-commit gate.
+
+Note: `mission.git.commit` auto-stages all changes with `git add -A` — there is no manual `git add` step. The operator fixes files in the workpiece and re-runs `mission.git.commit`, which re-stages and re-validates.
 
 ## Decision
 
@@ -127,13 +130,12 @@ pnpm exec site-kernel run mission.git.commit --mission warpgogol-com-m000021 --m
 interface ValidatorMapping {
   prefix: string;        // e.g. "src/content/business-profile/"
   validator: string;     // e.g. "pbp.content.validate"
-  scope: "app";          // validator scope
 }
 
 const VALIDATOR_MAPPINGS: ValidatorMapping[] = [
-  { prefix: "src/content/business-profile/", validator: "pbp.content.validate", scope: "app" },
-  { prefix: "src/content/pages/", validator: "semantic.drift.validate", scope: "app" },
-  { prefix: "src/content/faq/", validator: "faq.validate", scope: "app" },
+  { prefix: "src/content/business-profile/", validator: "pbp.content.validate" },
+  { prefix: "src/content/pages/", validator: "semantic.drift.validate" },
+  { prefix: "src/content/faq/", validator: "faq.validate" },
 ];
 
 // Pre-commit validation result
@@ -148,14 +150,18 @@ interface PreCommitValidationResult {
 }
 ```
 
+### Validator invocation mechanism
+
+`mission.git.commit` is registered as `scope: "workspace"` but the validators are `scope: "app"`. The command resolves the app context by calling `executeKernelCommand` (from `@warpgogol/site-kernel`) with `siteName: manifest.systemId` — the same pattern used by `runMissionValidate` via `executeKernelPipeline` and by `mission-materialize.ts` preflight steps. This avoids a static dependency cycle: `site-kernel-handoff` calls `site-kernel` (the runtime), which dispatches to `site-kernel-checks` validators at runtime — no direct import from `site-kernel-handoff` to `site-kernel-checks`.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts` | Add pre-commit validation step before `git commit` |
-| `packages/os/site-kernel-checks/src/pbp-content.ts` | Existing `pbp.content.validate` — called by pre-commit |
-| `packages/os/site-kernel-checks/src/semantic-drift.ts` | Existing `semantic.drift.validate` — called by pre-commit |
-| `packages/os/site-kernel-checks/src/faq.ts` | Existing `faq.validate` — called by pre-commit |
+| `packages/os/site-kernel-checks/src/content-pbp.ts` | Existing `pbp.content.validate` — invoked via `executeKernelCommand` |
+| `packages/os/site-kernel-checks/src/checks/semantic-drift.ts` | Existing `semantic.drift.validate` — invoked via `executeKernelCommand` |
+| `packages/os/site-kernel-checks/src/faq.ts` | Existing `faq.validate` — invoked via `executeKernelCommand` |
 
 ### Output format
 
@@ -184,10 +190,11 @@ interface PreCommitValidationResult {
 
 ### Failure modes
 
-- **Validator fails**: `mission.git.commit` exits with code 1 before running `git commit`. The staged changes remain staged — the operator fixes the files, re-stages them with `git add`, and re-runs `mission.git.commit`.
-- **No content files changed**: if no staged files match any validator mapping, no validators run and the commit proceeds normally (e.g., committing generated artifacts, config files).
+- **Validator fails**: `mission.git.commit` exits with code 1 before running `git commit`. The auto-staged changes remain in the git index — the operator fixes the files and re-runs `mission.git.commit` (which re-stages with `git add -A` and re-validates).
+- **No content files changed**: if no changed files match any validator mapping, no validators run and the commit proceeds normally (e.g., committing generated artifacts, config files).
 - **Validator crashes**: if a validator throws an exception, the commit is refused and the error is reported. The operator can investigate the validator crash. A `--skip-validation` flag is NOT provided.
 - **Multiple validators fail**: all failures are collected and reported together — the operator sees all issues at once, not one at a time.
+- **Validator not registered**: if a mapped validator command is not registered in the kernel (e.g., `faq.validate` when the faq package is not installed), the validator is skipped with a warning and the commit proceeds. This is safe by default — a missing validator cannot produce false positives.
 
 ## Rollout
 
@@ -207,7 +214,8 @@ interface PreCommitValidationResult {
 
 ## Risks
 
-- **Performance**: targeted validators run in seconds (no build). `pbp.content.validate` parses YAML frontmatter; `semantic.drift.validate` checks frontmatter field lengths. Acceptable for a pre-commit gate.
+- **Performance**: targeted validators run in seconds (no build). `pbp.content.validate` parses YAML frontmatter; `semantic.drift.validate` checks frontmatter field lengths. The cost is proportional to the total number of files in the matched content directory (not the number of changed files), because each validator scans its entire directory. This is acceptable for a pre-commit gate — typical content directories have 10–50 files.
+- **No `build.prepare` dependency**: the three targeted validators (`pbp.content.validate`, `semantic.drift.validate`, `faq.validate`) read markdown frontmatter directly and do not depend on `build.prepare` generated artifacts (unlike `semantic.targets.validate` which requires `surface.generated.yaml`). This is confirmed by code inspection: `content-pbp.ts` uses `collectMarkdownFilesSafe` over the business directory; `checks/semantic-drift.ts` uses `collectMarkdownFiles` over the pages directory; `faq.ts` collects FAQ records directly. No `build.prepare` step is needed before pre-commit validation.
 - **False positives**: if a validator has a bug, legitimate commits are blocked. Mitigation: validators are already tested and used in `mission.validate`. A validator bug would also block `mission.validate`.
 - **Agent confusion**: agents may try to bypass by using raw `git commit` in the workpiece directory. Mitigation: AGENTS.md already states that workpiece edits must go through `mission.git.commit`. Raw `git commit` bypasses the kernel's commit tracking.
 - **Mapping maintenance**: new content directories need new validator mappings. Mitigation: the mapping table is a single array, easy to extend. Missing mappings mean no validation for that directory — safe by default (no false positives).
@@ -218,8 +226,9 @@ interface PreCommitValidationResult {
 - [ ] `mission.git.commit` runs targeted validators based on changed file paths before committing
 - [ ] Validator mapping table covers `business-profile/`, `pages/`, `faq/` content directories
 - [ ] Commit is refused with exit code 1 when any validator fails
-- [ ] Staged changes remain staged after a validation failure (not unstaged)
+- [ ] Auto-staged changes remain in the git index after a validation failure (not unstaged)
 - [ ] No validators run when no content files are changed (generated artifacts, config files)
+- [ ] Unregistered validator commands are skipped with a warning (commit proceeds)
 - [ ] All validator failures are collected and reported together
 - [ ] `AGENTS.md` updated with the pre-commit validation behavior
 - [ ] Unit tests cover: validator passes → commit succeeds, validator fails → commit blocked, no content files → no validators
