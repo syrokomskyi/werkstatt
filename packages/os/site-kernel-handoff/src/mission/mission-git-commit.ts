@@ -1,9 +1,9 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0480: mission.git.commit — canonical operator edit commit command for mission workpiece.</purpose>
+<purpose>RFC-0480: mission.git.commit — canonical operator edit commit command for mission workpiece. RFC-0594: runs targeted content validators based on changed file paths before committing.</purpose>
 <non-goals>
   <item>Does not reconcile — use mission.reconcile for that.</item>
-  <item>Does not validate — use mission.validate for that.</item>
+  <item>Does not run full mission.validate — use mission.validate for that. Pre-commit validators are a targeted subset, not a full validation.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
@@ -12,6 +12,7 @@
   <item>RFC-0522: extend WorkpieceDirtyResult with files[] for cache clone guard error messages.</item>
   <item>RFC-0560: integrate Ed25519 signed commits via createSignedCommit when PASSPORT_SIGNING_KEY is set.</item>
   <item>RFC-0568: add investigateUntrackedFiles helper and UntrackedFileReport type for cache clone untracked file origin analysis.</item>
+  <item>RFC-0594: add pre-commit content validation via runPreCommitValidation based on changed file paths.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,6 +24,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
+import { executeKernelCommand } from "@warpgogol/site-kernel";
 import { readMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { createSignedCommit } from "./signed-commit.ts";
 import { readBordbuch } from "../bordbuch/bordbuch-io.ts";
@@ -35,6 +37,112 @@ export interface MissionGitCommitData {
   signed: boolean;
   actorId: string | null;
   signature: string | null;
+  preCommitValidation?: PreCommitValidationResult;
+}
+
+export interface ValidatorMapping {
+  prefix: string;
+  validator: string;
+}
+
+export interface PreCommitValidationResult {
+  passed: boolean;
+  validatorsRun: string[];
+  failures: Array<{
+    validator: string;
+    message: string;
+    files: string[];
+  }>;
+}
+
+export const VALIDATOR_MAPPINGS: ValidatorMapping[] = [
+  { prefix: "src/content/business-profile/", validator: "pbp.content.validate" },
+  { prefix: "src/content/pages/", validator: "semantic.drift.validate" },
+  { prefix: "src/content/faq/", validator: "faq.validate" },
+];
+
+function matchesPrefix(filePath: string, prefix: string): boolean {
+  return filePath.startsWith(prefix);
+}
+
+function selectValidators(changedFiles: string[]): string[] {
+  const validators = new Set<string>();
+  for (const file of changedFiles) {
+    for (const mapping of VALIDATOR_MAPPINGS) {
+      if (matchesPrefix(file, mapping.prefix)) {
+        validators.add(mapping.validator);
+      }
+    }
+  }
+  return [...validators];
+}
+
+export async function runPreCommitValidation(
+  workpieceDir: string,
+  changedFiles: string[],
+  systemId: string,
+  workspaceRoot: string,
+): Promise<PreCommitValidationResult> {
+  const validatorsToRun = selectValidators(changedFiles);
+  if (validatorsToRun.length === 0) {
+    return { passed: true, validatorsRun: [], failures: [] };
+  }
+
+  const failures: PreCommitValidationResult["failures"] = [];
+  const validatorsRun: string[] = [];
+
+  for (const validatorName of validatorsToRun) {
+    try {
+      const execResult = await executeKernelCommand({
+        workspaceRoot,
+        commandName: validatorName,
+        siteName: systemId,
+        siteExplicit: true,
+      });
+      const single = Array.isArray(execResult) ? execResult[0] : execResult;
+      const ok = single?.ok ?? false;
+      const exitCode = single?.exitCode ?? 1;
+      const summary = single?.summary ?? "";
+      validatorsRun.push(validatorName);
+
+      if (!ok || exitCode !== 0) {
+        failures.push({
+          validator: validatorName,
+          message: summary || `validator exited with code ${exitCode}`,
+          files: changedFiles.filter((f) =>
+            VALIDATOR_MAPPINGS.some(
+              (m) => m.validator === validatorName && matchesPrefix(f, m.prefix),
+            ),
+          ),
+        });
+      }
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (errMsg.includes("not registered") || errMsg.includes("not found")) {
+        process.stderr.write(
+          `[warn] [mission.git.commit] validator '${validatorName}' is not registered — skipping.
+`,
+        );
+        continue;
+      }
+      failures.push({
+        validator: validatorName,
+        message: `validator crashed: ${errMsg}`,
+        files: changedFiles.filter((f) =>
+          VALIDATOR_MAPPINGS.some(
+            (m) => m.validator === validatorName && matchesPrefix(f, m.prefix),
+          ),
+        ),
+      });
+      validatorsRun.push(validatorName);
+    }
+  }
+
+  return {
+    passed: failures.length === 0,
+    validatorsRun,
+    failures,
+  };
 }
 
 export interface WorkpieceDirtyResult {
@@ -266,6 +374,36 @@ export async function runMissionGitCommit(
     };
   }
 
+  // RFC-0594: run targeted content validators based on changed file paths
+  const dirtyResult = isWorkpieceDirty(workpieceDir);
+  const preCommitValidation = await runPreCommitValidation(
+    workpieceDir,
+    dirtyResult.files,
+    manifest.systemId,
+    workspaceRoot,
+  );
+
+  if (!preCommitValidation.passed) {
+    const failureLines = preCommitValidation.failures
+      .map((f) => `  ${f.validator}: ${f.message}`)
+      .join("\n");
+    process.stderr.write(`[mission.git.commit] pre-commit validation failed:\n${failureLines}\n`);
+    return {
+      exitCode: 1,
+      data: {
+        missionId,
+        commitSha: "",
+        message,
+        committedAt: new Date().toISOString(),
+        signed: false,
+        actorId: null,
+        signature: null,
+        preCommitValidation,
+      },
+      summary: `[mission.git.commit] ${missionId} pre-commit validation failed — fix issues before committing`,
+    };
+  }
+
   const signingKey = process.env["PASSPORT_SIGNING_KEY"];
   const actorId = manifest.openedBy ?? "unknown";
 
@@ -280,6 +418,7 @@ export async function runMissionGitCommit(
       signed: result.signed,
       actorId: result.actorId,
       signature: result.signature,
+      preCommitValidation,
     };
 
     return {
@@ -303,6 +442,7 @@ export async function runMissionGitCommit(
     signed: false,
     actorId: null,
     signature: null,
+    preCommitValidation,
   };
 
   return {
