@@ -20,6 +20,7 @@
   <item>RFC-0264: Add barrel.size.lint after import.extensions.lint.</item>
   <item>RFC-0266: Add command.manifest.validate before docs.commands.validate.</item>
   <item>RFC-0267: Add kernel.io.lint after kernel.flags.lint.</item>
+  <item>RFC-0610: Add command.args.validate after kernel.io.lint.</item>
   <item>RFC-0303: Add fs.walk.lint, dedup.helper.lint, file.size.lint after barrel.size.lint.</item>
   <item>RFC-0311: Add offline IndexNow submit contract validation.</item>
   <item>RFC-0364: Add fingerprint.usage.lint (warning mode) and fingerprint.fixtures.validate.</item>
@@ -138,6 +139,8 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "kernel.flags.lint" },
   // RFC-0267: command modules must receive IO from context.io, not ambient node:fs — shrink-only ratchet.
   { command: "kernel.io.lint" },
+  // RFC-0610: flag-only argument pattern enforcement — no input.args reads, no dual-path fallbacks.
+  { command: "command.args.validate" },
   // RFC-0261: shrink-only ratchet on *.validate/*.lint fixture coverage (DSL-04 rides the existing diagnostic.shape.lint step above).
   { command: "check.fixture.lint" },
   // RFC-0262: manifest propsSchema is the single authored prop contract for packages/ui.
