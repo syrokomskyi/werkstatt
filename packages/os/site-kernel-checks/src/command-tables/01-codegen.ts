@@ -47,6 +47,7 @@ import { runOnboardingYamlImportLint } from "../onboarding-yaml-import-lint.ts";
 import { runGeneratedMarkerValidate } from "../generated-marker-validate.ts";
 import { runGeneratedFileLookup } from "../generated-file-lookup.ts";
 import { runGeneratedFilesValidate } from "../generated-files-validate.ts";
+import { runGeneratedStaleValidate } from "../generated-stale-validate.ts";
 import { runPropsContractValidate } from "../props-contract.ts";
 import { runOpenSourceValidate } from "../open-source-validate.ts";
 
@@ -590,6 +591,19 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runGeneratedFilesValidate,
+  },
+  /* RFC-0600: orphaned file stale detection */
+  {
+    name: "generated.stale.validate",
+    description:
+      "Detect files in public/ not produced by any registered generator in GENERATOR_OWNERSHIP_MAP (RFC-0600).",
+    scope: "workspace",
+    flags: {
+      app: { kind: "string", description: "App id for app-scoped path resolution." },
+    },
+    supportsAllSites: true,
+    cacheable: false,
+    execute: runGeneratedStaleValidate,
   },
   /* RFC-0489: open-source SBOM registry validation */
   {

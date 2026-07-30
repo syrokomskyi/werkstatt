@@ -28,18 +28,24 @@ import { collectFiles } from "@warpgogol/share/fs";
 import { diagnosticsResult } from "./result-helpers.ts";
 import { GENERATOR_OWNERSHIP_MAP, type OwnershipEntry } from "./generator-ownership.ts";
 
-function toPosix(path: string): string {
+export function toPosix(path: string): string {
   return path.replace(/\\/g, "/");
 }
 
-const WORKSPACE_ABSOLUTE_PREFIXES = ["packages/", "docs/", "apps/", ".gitattributes", ".env"];
+export const WORKSPACE_ABSOLUTE_PREFIXES = [
+  "packages/",
+  "docs/",
+  "apps/",
+  ".gitattributes",
+  ".env",
+];
 
-function isWorkspaceAbsolute(path: string): boolean {
+export function isWorkspaceAbsolute(path: string): boolean {
   const posixPath = toPosix(path);
   return WORKSPACE_ABSOLUTE_PREFIXES.some((prefix) => posixPath.startsWith(prefix));
 }
 
-function resolveEntryPath(
+export function resolveEntryPath(
   entry: OwnershipEntry,
   app: string | undefined,
   workspaceRoot: string,
@@ -62,7 +68,7 @@ function resolveEntryPath(
   return join(workspaceRoot, "apps", "*", posixPath);
 }
 
-function hasGlobPattern(path: string): boolean {
+export function hasGlobPattern(path: string): boolean {
   return path.includes("*") || path.includes("{");
 }
 
@@ -70,7 +76,7 @@ async function checkFileExists(io: WorkspaceIO, filePath: string): Promise<boole
   return io.exists(filePath);
 }
 
-async function expandGlob(
+export async function expandGlob(
   basePath: string,
   pattern: string,
   workspaceRoot: string,

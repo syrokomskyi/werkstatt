@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Extracted from module.ts to shrink the registration surface.</item>
+  <item>RFC-0600: added generated.stale.validate after generated.files.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -255,6 +256,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "generated.marker.validate", args: ["--phase=author"] },
   // RFC-0375: verify all registry-declared generated files exist on disk
   { command: "generated.files.validate" },
+  // RFC-0600: detect orphaned files in public/ not produced by any registered generator
+  { command: "generated.stale.validate" },
   // RFC-0150: content-driven OG preview image validation
   { command: "preview.images.validate" },
   // RFC-0073: content discipline validators

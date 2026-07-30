@@ -12,6 +12,7 @@
   <item>RFC-0557: added workpiece.imports.validate as first step before yaml.contract.lint.</item>
   <item>RFC-0571: added config.regenerate as first step before workpiece.imports.validate.</item>
   <item>RFC-0597: added SITES_BUILD_PREPARE_DEV_PIPELINE — codegen-only subset for dev-mode mission materialization.</item>
+  <item>RFC-0600: added generated.stale.validate after generated.files.validate in both pipelines.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -119,6 +120,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "warpgogol.check-hints.generate" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
   { command: "generated.files.validate" },
+  // RFC-0600: detect orphaned files in public/ not produced by any registered generator
+  { command: "generated.stale.validate" },
 ];
 
 // RFC-0597: codegen-only subset for dev-mode mission materialization.
@@ -170,4 +173,6 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "uni.registry.build" },
   { command: "i18n.middleware.generate" },
   { command: "generated.files.validate" },
+  // RFC-0600: detect orphaned files in public/ not produced by any registered generator
+  { command: "generated.stale.validate" },
 ];
