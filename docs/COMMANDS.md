@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 678. Raw manifest entries: 1222.
+Generated command rows: 679. Raw manifest entries: 1224.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -286,6 +286,7 @@ Generated command rows: 678. Raw manifest entries: 1222.
 | `funnel.statechart.validate` | site:warpgogol-com, workspace | workspace | no | no | Drift-guard docs/specs/visitor-funnel/state-chart.generated.md byte-for-byte against what funnel.statechart.generate would emit, and assert the trigger↔graph bijection for both the visitor funnel and the subscription lifecycle layers (RFC-0219). |
 | `gate.catalog.generate` | site:warpgogol-com, workspace | workspace | yes | no | Generate docs/gate-catalog.generated.yaml from live command registrations and gate metadata (RFC-0519). |
 | `gate.catalog.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate docs/gate-catalog.generated.yaml for drift against live command registrations and gate metadata (RFC-0519). |
+| `generated.drift.validate` | site:warpgogol-com, workspace | workspace | no | no | Detect content drift in text-based generated files by re-invoking owning generators with dryRun and comparing output (RFC-0601, DNA-58). |
 | `generated.edit.guard` | site:warpgogol-com, workspace | workspace | no | no | Fail when a file carrying GENERATED_MARKER changed without its owning generator/template changing in the same range (GEN-EDIT-01), or the marker was removed without a documented exemption (GEN-EDIT-02). Range defaults to the working tree vs HEAD; pass --range <rev-range> for CI (RFC-0336). |
 | `generated.file.lookup` | site:warpgogol-com, workspace | workspace | no | no | Resolve any file path to its generation metadata: generated, category, ownerCommand, regenerateCommand, editInstead, detectionMethod (RFC-0375). |
 | `generated.files.validate` | site:warpgogol-com, workspace | workspace | no | no | Check that every registry-declared generated file in GENERATOR_OWNERSHIP_MAP exists on disk (RFC-0375). |
