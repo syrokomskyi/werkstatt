@@ -255,6 +255,7 @@ The page's **single lead/content illustration** must be marked so the post-build
 - Keep examples and docs in English.
 - If exports or folder layout change, update `package.json`, `README.md`, and any affected AGENTS/Compass docs in the same change.
 - When authoring list-based sections, always use `StandardListItem[]` and never `string[]` or section-level icon fallbacks (RFC-0100).
+- When programmatically triggering LordIcon animations, use `readyPromise` + `playerInstance.playFromStart()`, NOT a non-existent `.play()` method. The `lord-icon` custom element exposes `ready: boolean`, `readyPromise: Promise<void>`, and `playerInstance` (with `playFromStart()` and `playing`). The old `typeof el.play === "function"` pattern silently fails — `play()` does not exist on the element.
 - Render authored images only through `<ResponsiveImage>` (RFC-0152) — never raw `<img>` (except SVG/`data:`) or Astro `<Image>`. See "Image rendering — Image Provider Port".
 
 ## Growth layer rules (RFC-0027 / DNA-27..30)
