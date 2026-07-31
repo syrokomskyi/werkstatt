@@ -1,7 +1,7 @@
 ---
 id: RFC-0624
 title: "Add post-deploy CDN cache purge for cloudflare-workers Leitstand commands"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
 enhancedAt: 2026-07-31
-implementedAt:
+implementedAt: 2026-07-31
 closedAt:
 supersedes: []
 supersededBy:
