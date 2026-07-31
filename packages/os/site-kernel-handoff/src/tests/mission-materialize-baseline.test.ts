@@ -159,7 +159,7 @@ test("RFC-0617: mission.materialize calls compass.audit.baseline with --workpiec
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {} },
   } as unknown as KernelRuntimeContext;
 
   await runMissionMaterialize(input, context);
@@ -195,7 +195,7 @@ test("RFC-0617: compass.audit.baseline failure is non-fatal (materialization suc
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {} },
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionMaterialize(input, context);

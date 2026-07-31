@@ -993,7 +993,7 @@ export async function runMissionMaterialize(
       logger.info(`  Compass audit baseline seeded for workpiece`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      logger.info(`  Warning: compass.audit.baseline failed: ${msg}`);
+      logger.warn(`  Warning: compass.audit.baseline failed: ${msg}`);
     }
 
     // Write materialization report
