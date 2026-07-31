@@ -14,6 +14,7 @@
   <item>RFC-0597: added SITES_BUILD_PREPARE_DEV_PIPELINE — codegen-only subset for dev-mode mission materialization.</item>
   <item>RFC-0600: added generated.stale.validate after generated.files.validate in both pipelines.</item>
   <item>RFC-0604: added bordbuch.generate and passport.key.ensure before generated.files.validate.</item>
+  <item>RFC-0626: added bordbuch.commit after bordbuch.generate to auto-commit bordbuch projections.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -121,6 +122,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "warpgogol.check-hints.generate" },
   // RFC-0604: generate bordbuch projections and ensure passport key before final validation
   { command: "bordbuch.generate" },
+  // RFC-0626: auto-commit bordbuch projections after bordbuch.generate
+  { command: "bordbuch.commit" },
   { command: "passport.key.ensure" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
   { command: "generated.files.validate" },
