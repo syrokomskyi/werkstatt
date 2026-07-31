@@ -58,6 +58,15 @@ vi.mock("../leitstand/adapters/cloudflare-workers.ts", () => ({
       return { maxTotalSize: 20 * 1024 * 1024 * 1024, maxFileSize: 25 * 1024 * 1024 };
     },
   }),
+  filterEnv: (env: Record<string, string | undefined>) => {
+    const result: Record<string, string> = {};
+    for (const [key, value] of Object.entries(env)) {
+      if (value !== undefined) result[key] = value;
+    }
+    return result;
+  },
+  sourceDotenv: () => ({}),
+  readBehaviorSnapshot: () => null,
 }));
 
 function makeContext(workspaceRoot: string): KernelRuntimeContext {

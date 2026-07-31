@@ -16,10 +16,7 @@ import type { RouteFact, PurgeResult } from "@warpgogol/ontology/operations";
 const BUILD_IDENTITY_PATH = "/.well-known/build-identity.json";
 const MAX_URLS_PER_BATCH = 30;
 
-export function collectPurgeUrls(
-  deploymentUrl: string,
-  routes: RouteFact[],
-): string[] {
+export function collectPurgeUrls(deploymentUrl: string, routes: RouteFact[]): string[] {
   const base = deploymentUrl.replace(/\/$/, "");
   const urls = routes.map((route) => `${base}${route.path}`);
   urls.push(`${base}${BUILD_IDENTITY_PATH}`);
@@ -43,17 +40,24 @@ export async function purgeCacheByUrls(
   let totalPurged = 0;
 
   for (const batch of batches) {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
-      {
+    let response: Response;
+    try {
+      response = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ files: batch }),
-      },
-    );
+      });
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err);
+      return {
+        success: false,
+        purgedUrls: totalPurged,
+        error: `Network error during purge: ${error}`,
+      };
+    }
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => `HTTP ${response.status}`);
