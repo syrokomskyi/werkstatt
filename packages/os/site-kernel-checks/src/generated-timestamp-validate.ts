@@ -15,6 +15,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0602: initial implementation — Phase 1 source lint + Phase 2 double-build drift detection.</item>
   <item>RFC-0602 fix: add pattern field to allowlist entries, add passport/content-ledger/ecosystem-commit/surface-demand to allowlist, fix duplicate pattern matching with break-after-first.</item>
+  <item>RFC-0626: add TS-TIME-02 allowlist parity check, refactor runPhase1 to return scan results.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -97,6 +98,7 @@ const VOLATILE_PATTERNS: RegExp[] = [
 ];
 
 const RULE_ID = "TS-TIME-01";
+const RULE_ID_PARITY = "TS-TIME-02";
 
 // ---------------------------------------------------------------------------
 // Comment / string-literal exclusion
@@ -197,8 +199,14 @@ export function scanModuleForTimestamps(
   return violations;
 }
 
-export function runPhase1(workspaceRoot: string, mode: "warning" | "fail"): Diagnostic[] {
+export interface Phase1Result {
+  diagnostics: Diagnostic[];
+  scanResults: Map<string, { line: number; pattern: string }[]>;
+}
+
+export function runPhase1(workspaceRoot: string, mode: "warning" | "fail"): Phase1Result {
   const diagnostics: Diagnostic[] = [];
+  const scanResults = new Map<string, { line: number; pattern: string }[]>();
 
   // Collect unique module paths from ownership map
   const modulePaths = new Set<string>();
@@ -213,6 +221,7 @@ export function runPhase1(workspaceRoot: string, mode: "warning" | "fail"): Diag
   for (const modulePath of modulePaths) {
     const isAllowlisted = allowlistModules.has(modulePath);
     const violations = scanModuleForTimestamps(modulePath, workspaceRoot);
+    scanResults.set(modulePath, violations);
 
     if (isAllowlisted) {
       // Report as info-severity exemption
@@ -238,6 +247,32 @@ export function runPhase1(workspaceRoot: string, mode: "warning" | "fail"): Diag
         fixHint: `Replace with a deterministic timestamp source. See RFC-0602 for guidance.`,
       });
     }
+  }
+
+  return { diagnostics, scanResults };
+}
+
+// ---------------------------------------------------------------------------
+// Phase 1b: Allowlist parity check (TS-TIME-02)
+// ---------------------------------------------------------------------------
+
+export function checkAllowlistParity(
+  scanResults: Map<string, { line: number; pattern: string }[]>,
+  allowlistModules: Set<string>,
+): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+
+  for (const [modulePath, violations] of scanResults) {
+    if (violations.length === 0) continue;
+    if (allowlistModules.has(modulePath)) continue;
+
+    const patterns = [...new Set(violations.map((v) => v.pattern))];
+    diagnostics.push({
+      ruleId: RULE_ID_PARITY,
+      severity: "error",
+      message: `Module ${modulePath} uses volatile timestamp patterns [${patterns.join(", ")}] but is missing from TIMESTAMP_ALLOWLIST. If this is runtime logic (not a generated-file field), add it to the allowlist with a reason.`,
+      file: modulePath,
+    });
   }
 
   return diagnostics;
@@ -303,7 +338,12 @@ export async function runGeneratedTimestampValidate(
   const diagnostics: Diagnostic[] = [];
 
   // Phase 1 always runs
-  diagnostics.push(...runPhase1(context.workspaceRoot, mode));
+  const { diagnostics: phase1Diagnostics, scanResults } = runPhase1(context.workspaceRoot, mode);
+  diagnostics.push(...phase1Diagnostics);
+
+  // Phase 1b: allowlist parity check (TS-TIME-02)
+  const allowlistModules = new Set(TIMESTAMP_ALLOWLIST.map((e) => e.module));
+  diagnostics.push(...checkAllowlistParity(scanResults, allowlistModules));
 
   // Phase 2 only when --deep is passed
   if (deep) {
