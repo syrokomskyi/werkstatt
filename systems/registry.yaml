@@ -11,7 +11,7 @@ systems:
         storageType: bare
     pinnedPlatform: 4.5.0
     currentMission: null
-    lastRelease: warpgogol-com-r000004
+    lastRelease: warpgogol-com-r000005
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
     deployment:
@@ -27,18 +27,18 @@ systems:
           secretsFile: env:WERKSTATT_SECRETS_MAIN
       lastPropagated:
         alt:
-          releaseId: warpgogol-com-r000004
-          at: 2026-07-31T01:35:24.366Z
+          releaseId: warpgogol-com-r000005
+          at: 2026-07-31T12:33:16.078Z
           healthy: false
           state: succeeded
-          operationId: op-ms89s34t-ormja3bl
+          operationId: op-ms8xahcv-ecepavbx
           leaseExpiresAt: null
         main:
-          releaseId: warpgogol-com-r000004
-          at: 2026-07-31T01:38:05.704Z
+          releaseId: warpgogol-com-r000005
+          at: 2026-07-31T12:38:01.723Z
           healthy: false
           state: succeeded
-          operationId: op-ms89vics-5dok42w3
+          operationId: op-ms8xfn7y-981kkz8x
           leaseExpiresAt: null
     notes: ""
 
