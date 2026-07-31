@@ -295,20 +295,20 @@ No migration path needed — no release has ever entered `dev-deployed` state in
 
 ## Acceptance criteria
 
-- [ ] `leitstand.dev-deploy` command registered in `leitstand.module.ts` with `--system` flag (workspace scope)
-- [ ] `leitstand.dev-deploy` builds workpiece, deploys to dev channel, runs Axiom, writes evidence with `commitSha`
-- [ ] `leitstand.deploy` command removed from `leitstand.module.ts` and its handler deleted
-- [ ] `releaseStateSchema` in `packages/ontology/src/operations/release.ts` no longer includes `dev-deployed`
-- [ ] `leitstand.propagate` accepts `published` state (rejects non-published with actionable error)
-- [ ] `leitstand.propagate` validates evidence by `missionId` match + `commitSha` match + `summary.errors === 0`
-- [ ] `leitstand.propagate` rejects with actionable message when evidence `commitSha` does not match release `commitSha`
-- [ ] `leitstand.rollback` auto-step chain: `promoted → alt-deployed → published` (no `dev-deployed` step)
-- [ ] `evidence-capsule.yaml` includes `commitSha` field
-- [ ] DNA-48 and DNA-49 prose in `docs/architecture-dna.md` updated to reflect three-state machine
-- [ ] Unit tests in `leitstand-0627-dev-channel.test.ts` updated for new command and gate logic
-- [ ] `command.manifest.generate` run to refresh `docs/command-manifest.generated.yaml`
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section updated for `leitstand.dev-deploy` and three-state machine
-- [ ] `rfc.validate` passes on this file
+- [x] `leitstand.dev-deploy` command registered in `leitstand.module.ts` with `--system` flag (workspace scope) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts:31-50, command.manifest.generate)
+- [x] `leitstand.dev-deploy` builds workpiece, deploys to dev channel, runs Axiom, writes evidence with `commitSha` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:375-595, leitstand-0628-dev-deploy.test.ts:14 tests pass)
+- [x] `leitstand.deploy` command removed from `leitstand.module.ts` and its handler deleted (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts — runLeitstandDeploy deleted, leitstand.module.ts:31-50 registers dev-deploy instead)
+- [x] `releaseStateSchema` in `packages/ontology/src/operations/release.ts` no longer includes `dev-deployed` (evidence: packages/ontology/src/operations/release.ts:19-25 — 5 values: prepared, published, alt-deployed, promoted, rolled-back)
+- [x] `leitstand.propagate` accepts `published` state (rejects non-published with actionable error) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:628-633, leitstand-0628-dev-deploy.test.ts:propagate-rejects-non-published)
+- [x] `leitstand.propagate` validates evidence by `missionId` match + `commitSha` match + `summary.errors === 0` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:639-704, leitstand-0628-dev-deploy.test.ts:propagate-rejects-commitSha-mismatch, propagate-rejects-missionId-mismatch, propagate-rejects-errors)
+- [x] `leitstand.propagate` rejects with actionable message when evidence `commitSha` does not match release `commitSha` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:667-671, leitstand-0628-dev-deploy.test.ts:propagate-rejects-commitSha-mismatch)
+- [x] `leitstand.rollback` auto-step chain: `promoted → alt-deployed → published` (no `dev-deployed` step) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1233-1237, leitstand-0628-dev-deploy.test.ts:rollback-promoted, rollback-alt-deployed)
+- [x] `evidence-capsule.yaml` includes `commitSha` field (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:543-569 — post-processing step writes commitSha via writeFileIfChanged)
+- [x] DNA-48 and DNA-49 prose in `docs/architecture-dna.md` updated to reflect three-state machine (evidence: docs/architecture-dna.md:209,213 — state machine is prepared→published→alt-deployed→promoted→rolled-back)
+- [x] Unit tests in `leitstand-0628-dev-deploy.test.ts` updated for new command and gate logic (evidence: packages/os/site-kernel-handoff/src/tests/leitstand-0628-dev-deploy.test.ts — 14 tests pass)
+- [x] `command.manifest.generate` run to refresh `docs/command-manifest.generated.yaml` (evidence: docs/command-manifest.generated.yaml:11058 — leitstand.dev-deploy registered, leitstand.deploy absent)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section updated for `leitstand.dev-deploy` and three-state machine (evidence: packages/os/site-kernel-handoff/AGENTS.md:27-40)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0628 — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
