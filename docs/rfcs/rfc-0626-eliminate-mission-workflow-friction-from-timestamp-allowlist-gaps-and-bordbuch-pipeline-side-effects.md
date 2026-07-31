@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -32,7 +33,6 @@ related:
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
-  - DNA-18
   - DNA-51
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
@@ -44,10 +44,10 @@ satisfies:
 versionBump: patch
 commands:
   proposed: []
-  added: []
+  added:
+    - bordbuch.commit
   changed:
     - generated.timestamp.validate
-    - bordbuch.generate
   removed: []
 appsImpacted:
   - warpgogol-com
@@ -89,7 +89,7 @@ nonGoals:
 
 Mission `warpgogol-com-m000023` (completed 2026-07-31) encountered two friction points during the `wg-mission-complete` workflow:
 
-1. **TS-TIME-01 false positive on `content-freshness.ts`**: `generated.timestamp.validate` (RFC-0602) flagged `new Date().toISOString()` at `packages/os/site-kernel-checks/src/content-freshness.ts:69` as a volatile timestamp violation. The `todayIso()` function is a runtime validator that compares claim validity windows against the current date — it is not a generated-file timestamp field. The module was registered in `GENERATOR_OWNERSHIP_MAP` (because it generates `src/freshness.generated.yaml`) but was missing from `TIMESTAMP_ALLOWLIST`. Five other modules with similar runtime timestamp usage were already allowlisted (`passport.ts`, `content-ledger.ts`, `surface-demand.ts`, `surface-breaker.ts`, `ecosystem-commit.ts`), but `content-freshness.ts` was missed during the initial RFC-0602 implementation.
+1. **TS-TIME-01 false positive on `content-freshness.ts`**: `generated.timestamp.validate` (RFC-0602) flagged `new Date().toISOString()` at `packages/os/site-kernel-checks/src/content-freshness.ts:69` as a volatile timestamp violation. The `todayIso()` function is a runtime validator that compares claim validity windows against the current date — it is not a generated-file timestamp field. The module was registered in `GENERATOR_OWNERSHIP_MAP` (because it generates `src/freshness.generated.yaml`) but was missing from `TIMESTAMP_ALLOWLIST`. Five other modules with similar runtime timestamp usage were already allowlisted (`passport.ts`, `content-ledger.ts`, `surface-demand.ts`, `surface-breaker.ts`, `ecosystem-commit.ts`), but `content-freshness.ts` was missed during the initial RFC-0602 implementation. The module has since been added to `TIMESTAMP_ALLOWLIST` manually — but the parity check proposed in this RFC would have caught this gap automatically, preventing the friction during mission completion.
 
 2. **Dirty cache clone after `build.prepare`**: `bordbuch.generate` (added to `build.prepare` by RFC-0604) writes bordbuch projection files (`bordbuch.json`, `bordbuch/index.html`, `status.generated.yaml`) directly to the cache clone via `writeFileIfChanged`. However, `build.prepare` does not commit these files, leaving the cache clone dirty after every `mission.validate`, `mission.close`, and `release.prepare` invocation. The operator must manually `git add + commit` in the cache clone before `mission.reconcile` can proceed. This breaks the "clean cache clone" invariant expected by the mission workflow.
 
@@ -124,17 +124,16 @@ RFC-0580 established the pattern of auto-committing werkstatt side-effects from 
 
 ## Decision
 
-The `generated.timestamp.validate` command gains a Phase 2 allowlist parity check (rule `TS-TIME-02`) that errors when a module in `GENERATOR_OWNERSHIP_MAP` uses a volatile timestamp pattern but is missing from `TIMESTAMP_ALLOWLIST`. The `build.prepare` pipeline gains a `bordbuch.commit` post-step after `bordbuch.generate` that auto-commits dirty bordbuch projection files in the cache clone.
+The `generated.timestamp.validate` command gains a Phase 2 allowlist parity check (rule `TS-TIME-02`) that errors when a module in `GENERATOR_OWNERSHIP_MAP` uses a volatile timestamp pattern but is missing from `TIMESTAMP_ALLOWLIST`. The `build.prepare` pipeline gains a `bordbuch.commit` step after `bordbuch.generate` — a new registered kernel command that auto-commits dirty bordbuch projection files in the cache clone.
 
 ## Architectural fit
 
-- **DNA-18 (Uni registry is the single UI index)** — The parity check ensures that all modules in `GENERATOR_OWNERSHIP_MAP` are consistently validated, maintaining the integrity of the generated-file contract that feeds the uni registry.
-- **DNA-51 (Werkstatt consistency primitives)** — The `bordbuch.commit` pipeline step extends the auto-commit pattern established by RFC-0580 (werkstatt side-effects) and RFC-0477 (bordbuch entries) to cover `build.prepare`'s bordbuch.generate side-effects, closing the last gap in git hygiene for mission workflow.
+- **DNA-51 (Werkstatt consistency primitives)** — The `bordbuch.commit` pipeline step extends the auto-commit pattern established by RFC-0580 (werkstatt side-effects) and RFC-0477 (bordbuch entries) to cover `build.prepare`'s bordbuch.generate side-effects, closing the last gap in git hygiene for mission workflow. The parity check ensures RFC-0602's timestamp determinism contract is complete by verifying no generator module using volatile timestamps is missing from the allowlist.
 - **RFC-0602 (timestamp determinism)** — The parity check is a natural extension of the existing `generated.timestamp.validate` command. It does not change Phase 1 scanning logic; it adds a Phase 2 cross-reference check between `GENERATOR_OWNERSHIP_MAP` and `TIMESTAMP_ALLOWLIST`.
 - **RFC-0604 (bordbuch.generate in build.prepare)** — The `bordbuch.commit` step complements RFC-0604 by ensuring the projections generated by `bordbuch.generate` are committed, not left as dirty working-tree state.
 - **RFC-0580 (auto-commit werkstatt side-effects)** — The `bordbuch.commit` step follows the same pattern as `commitWerkstattSideEffects` from RFC-0580: idempotent skip when no changes, specific file paths (not `git add -A`), conventional commit message.
 - **RFC-0473 (bordbuch command family)** — The `bordbuch.commit` step does not modify `bordbuch.generate` itself; it is a separate pipeline step that runs after `bordbuch.generate` completes.
-- **Site OS operator model** — Both changes are internal to existing commands/pipelines. No new CLI commands are exposed to operators.
+- **Site OS operator model** — The parity check is internal to an existing command. `bordbuch.commit` is a new registered command but is documented as an internal pipeline step — it is not intended for direct operator use and is not added to CLI documentation surfaces.
 
 ## Design
 
@@ -161,33 +160,36 @@ const RULE_ID_PARITY = "TS-TIME-02";
 interface ParityViolation {
   module: string;
   patterns: string[];
-  reason: string;
 }
 
 /**
  * Phase 2: Check that every module in GENERATOR_OWNERSHIP_MAP
  * that uses volatile timestamp patterns is present in TIMESTAMP_ALLOWLIST.
  * Modules with violations but no allowlist entry are TS-TIME-02 errors.
+ *
+ * Reuses the scan results from Phase 1 (returned via a refactored
+ * runPhase1 that exposes a Map<string, { line: number; pattern: string }[]>
+ * alongside diagnostics) — no additional file I/O.
  */
 function checkAllowlistParity(
-  modulePaths: Set<string>,
+  scanResults: Map<string, { line: number; pattern: string }[]>,
   allowlistModules: Set<string>,
-  workspaceRoot: string,
 ): Diagnostic[];
 ```
 
-The parity check runs after Phase 1 scanning. For each module in `modulePaths`:
+The `runPhase1` function is refactored to return both `Diagnostic[]` and a `Map<string, { line: number; pattern: string }[]>` of raw scan results. The parity check iterates this map — modules with non-empty violations that are NOT in `allowlistModules` produce `TS-TIME-02` errors.
 
-1. Scan for volatile timestamp patterns (reuse `scanModuleForTimestamps`).
-2. If violations found AND module is NOT in `allowlistModules` → emit `TS-TIME-02` error.
-3. If violations found AND module IS in `allowlistModules` → already reported as info in Phase 1 (no duplicate).
-4. If no violations → no diagnostic (same as Phase 1).
+The parity check runs after Phase 1 scanning, reusing the scan results returned by the refactored `runPhase1`. For each module in `scanResults`:
+
+1. If violations found AND module is NOT in `allowlistModules` → emit `TS-TIME-02` error.
+2. If violations found AND module IS in `allowlistModules` → already reported as info in Phase 1 (no duplicate).
+3. If no violations → no diagnostic (same as Phase 1).
 
 #### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts` | Modified: add Phase 2 parity check |
+| `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts` | Modified: add Phase 2 parity check, refactor `runPhase1` to expose scan results |
 | `packages/os/site-kernel-checks/src/generator-ownership.ts` | Read: source of `GENERATOR_OWNERSHIP_MAP` |
 
 #### Output format
@@ -217,7 +219,7 @@ The parity check runs after Phase 1 scanning. For each module in `modulePaths`:
 
 #### CLI surface
 
-No new CLI commands. The change is internal to the `build.prepare` pipeline:
+`bordbuch.commit` is a new registered kernel command in the bordbuch module (`@warpgogol/site-kernel-handoff`). It is primarily intended as a pipeline step, but is technically callable by operators (like all registered commands). The command is not added to any CLI documentation surface and is documented as "internal pipeline step" in its MODULE_CONTRACT.
 
 ```sh
 pnpm exec site-kernel run build.prepare --site warpgogol-com
@@ -261,15 +263,18 @@ The helper:
 5. If matching dirty files → `git add <specific paths>` + `git commit -m "chore: bordbuch projections from build.prepare"`.
 6. Returns `{ committed: true, commitSha: <sha> }`.
 
-The helper reuses `gitExec` from `bordbuch-io.ts` (the same utility used by RFC-0580's `commitWerkstattSideEffects` and RFC-0477's `commitAndPushBordbuch`).
+The helper reuses `gitExec` from `packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts` (the same utility used by RFC-0580's `commitWerkstattSideEffects` and RFC-0477's `commitAndPushBordbuch`).
 
 #### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` | Modified: add `bordbuch.commit` step to pipeline array |
-| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts` | New: `commitBordbuchProjections` helper |
+| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts` | New: `commitBordbuchProjections` helper + `runBordbuchCommit` command handler |
 | `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts` | Unchanged: remains single-responsibility |
+| `packages/os/site-kernel-handoff/src/bordbuch/index.ts` | Modified: export `runBordbuchCommit` |
+| `packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts` | Read: `gitExec` utility (reused, not modified) |
+| `packages/os/site-kernel-handoff/src/sternsystem/registry-io.ts` | Read: `resolveCachePath` (reused, not modified) |
 | `systems/<id>/bordbuch/status.generated.yaml` | Auto-committed by `bordbuch.commit` |
 | `systems/<id>/public/.well-known/bordbuch.json` | Auto-committed by `bordbuch.commit` |
 | `systems/<id>/public/.well-known/bordbuch/index.html` | Auto-committed by `bordbuch.commit` |
@@ -277,7 +282,7 @@ The helper reuses `gitExec` from `bordbuch-io.ts` (the same utility used by RFC-
 #### Failure modes
 
 - If `git commit` fails (e.g. pre-commit hook block), the step throws with a clear error message indicating which bordbuch files could not be committed.
-- If the cache clone path cannot be resolved (system not in registry), the step is skipped with a warning (not an error) — this handles non-mission `build.prepare` invocations where no cache clone exists.
+- If the cache clone path cannot be resolved (system not in registry), the command returns a no-op summary. In practice this is unreachable when `bordbuch.commit` follows `bordbuch.generate` in the pipeline (since `bordbuch.generate` already resolves the cache path and throws on failure), but the guard is retained for defensive correctness when the command is called standalone.
 - If non-bordbuch files are dirty in the cache clone, they are NOT committed by this step — the step only stages the three bordbuch projection paths. Other dirty files remain and are reported by the existing `mission.validate` dirty-cache-clone warning.
 
 ## Rollout
@@ -325,7 +330,7 @@ The helper reuses `gitExec` from `bordbuch-io.ts` (the same utility used by RFC-
 - **Agent confusion about TS-TIME-02**: Agents encountering `TS-TIME-02` might try to remove the `new Date()` call instead of adding the module to the allowlist. Mitigation: the error message explicitly says: "If this is runtime logic (not a generated-file field), add it to the allowlist with a reason."
 - **Cache clone commit conflicts**: If the cache clone has other dirty files (not bordbuch), `bordbuch.commit` only stages bordbuch files. Other dirty files remain and are still reported by `mission.validate`'s dirty-cache-clone warning. This is intentional — `bordbuch.commit` does not mask other hygiene issues.
 - **Non-mission `build.prepare`**: When `build.prepare` is run directly (not in a mission context), the cache clone may not exist or may not be relevant. Mitigation: `commitBordbuchProjections` resolves the cache path via `resolveCachePath` and skips with a warning if the path cannot be resolved.
-- **Performance**: The parity check reuses the same `scanModuleForTimestamps` results from Phase 1 — no additional file I/O. The `bordbuch.commit` step runs `git status --porcelain` (fast) and optionally `git add + commit` (only when dirty). Both have negligible performance impact.
+- **Performance**: The parity check reuses the same `scanModuleForTimestamps` results from Phase 1 — `runPhase1` is refactored to return a `Map<string, { line: number; pattern: string }[]>` alongside diagnostics, so the parity check iterates the map without additional file I/O. The `bordbuch.commit` step runs `git status --porcelain` (fast) and optionally `git add + commit` (only when dirty). Both have negligible performance impact.
 
 ## Acceptance criteria
 
@@ -346,6 +351,6 @@ The helper reuses `gitExec` from `bordbuch-io.ts` (the same utility used by RFC-
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
 - When implementing Phase 1, agents MUST reuse `scanModuleForTimestamps` and `stripCommentsAndStrings` from the existing `generated-timestamp-validate.ts` — do not duplicate scanning logic.
-- When implementing Phase 2, agents MUST reuse `gitExec` from `bordbuch-io.ts` — do not duplicate git utilities. The `commitBordbuchProjections` helper follows the same pattern as `commitWerkstattSideEffects` (RFC-0580).
-- Agents MUST NOT add `bordbuch.commit` as a registered CLI command — it is an internal pipeline step only, not callable by operators.
+- When implementing Phase 2, agents MUST reuse `gitExec` from `packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts` — do not duplicate git utilities. The `commitBordbuchProjections` helper follows the same pattern as `commitWerkstattSideEffects` (RFC-0580).
+- `bordbuch.commit` is a registered kernel command (in the bordbuch module) but is documented as an internal pipeline step. It is technically callable by operators (like all registered commands) but is not intended for direct use. Its MODULE_CONTRACT states: "Internal pipeline step — auto-commits bordbuch projections after bordbuch.generate. Not intended for direct operator invocation."
 - The `bordbuch.commit` step MUST only stage the three bordbuch projection paths (`bordbuch/status.generated.yaml`, `public/.well-known/bordbuch.json`, `public/.well-known/bordbuch/index.html`). It MUST NOT use `git add -A` or `git add .`.
