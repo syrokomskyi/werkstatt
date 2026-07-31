@@ -127,10 +127,9 @@ const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
  * ownership.sync.validate OWN-01 failures in the workpiece context.
  *
  * The ownership map uses `{system}` as a template placeholder. This function
- * resolves it to the actual system ID and returns paths relative to the cache
- * clone root (e.g. `public/.well-known/bordbuch.json`).
+ * returns paths relative to the cache clone root (e.g. `public/.well-known/bordbuch.json`).
  */
-function getWorkspaceAbsoluteGeneratedPaths(systemId: string): Set<string> {
+function getWorkspaceAbsoluteGeneratedPaths(): Set<string> {
   const prefix = "systems/{system}/";
   const paths = new Set<string>();
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
@@ -781,7 +780,7 @@ export async function runMissionMaterialize(
     // These are generated artifacts (e.g. bordbuch projections) that belong in
     // the cache clone, not the workpiece. Filtering them at copy time avoids
     // ownership.sync.validate OWN-01 failures.
-    const skipPathsGlobal = getWorkspaceAbsoluteGeneratedPaths(manifest.systemId);
+    const skipPathsGlobal = getWorkspaceAbsoluteGeneratedPaths();
 
     // Copy data set from Sternsystem
     for (const dataPath of STERNSYSTEM_DATA_PATHS) {

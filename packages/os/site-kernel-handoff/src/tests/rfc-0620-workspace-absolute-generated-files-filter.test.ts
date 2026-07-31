@@ -36,7 +36,7 @@ const mockOwnershipMap = vi.hoisted(() => [
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
   },
-  // Mock entry for test scenario 2 — a hypothetical workspace-absolute generator
+  // Mock entry — a hypothetical workspace-absolute generator
   {
     path: "systems/{system}/public/test-generated.json",
     command: "test.generate",
@@ -118,7 +118,7 @@ function setupWorkspaceWithGeneratedFiles(): string {
   return systemDir;
 }
 
-test("RFC-0620: bordbuch generated files are filtered from workpiece public/", async () => {
+async function materializeAndGetWorkpiecePublic(): Promise<string> {
   setupWorkspaceWithGeneratedFiles();
 
   const { runMissionMaterialize } = await import("../mission/mission-materialize.ts");
@@ -133,103 +133,24 @@ test("RFC-0620: bordbuch generated files are filtered from workpiece public/", a
 
   await runMissionMaterialize(input, context);
 
-  const workpiecePublic = join(
-    tmpWorkspace,
-    "missions",
-    "test-system-m000001",
-    "workpiece",
-    "public",
-  );
+  return join(tmpWorkspace, "missions", "test-system-m000001", "workpiece", "public");
+}
+
+test("RFC-0620: workspace-absolute generated files are filtered from workpiece public/", async () => {
+  const workpiecePublic = await materializeAndGetWorkpiecePublic();
 
   // Bordbuch files must NOT exist in workpiece
   expect(existsSync(join(workpiecePublic, ".well-known", "bordbuch.json"))).toBe(false);
   expect(existsSync(join(workpiecePublic, ".well-known", "bordbuch", "index.html"))).toBe(false);
-});
-
-test("RFC-0620: mock workspace-absolute generated file is filtered from workpiece", async () => {
-  setupWorkspaceWithGeneratedFiles();
-
-  const { runMissionMaterialize } = await import("../mission/mission-materialize.ts");
-
-  const input = {
-    flags: { mission: "test-system-m000001" },
-  } as unknown as KernelCommandInput;
-  const context = {
-    workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
-  } as unknown as KernelRuntimeContext;
-
-  await runMissionMaterialize(input, context);
-
-  const workpiecePublic = join(
-    tmpWorkspace,
-    "missions",
-    "test-system-m000001",
-    "workpiece",
-    "public",
-  );
-
-  // Mock generated file must NOT exist in workpiece
+  // Mock generated file must NOT exist — proves filter reads from GENERATOR_OWNERSHIP_MAP,
+  // not from a hardcoded list of bordbuch paths
   expect(existsSync(join(workpiecePublic, "test-generated.json"))).toBe(false);
 });
 
 test("RFC-0620: authored files in public/ are preserved in workpiece", async () => {
-  setupWorkspaceWithGeneratedFiles();
-
-  const { runMissionMaterialize } = await import("../mission/mission-materialize.ts");
-
-  const input = {
-    flags: { mission: "test-system-m000001" },
-  } as unknown as KernelCommandInput;
-  const context = {
-    workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
-  } as unknown as KernelRuntimeContext;
-
-  await runMissionMaterialize(input, context);
-
-  const workpiecePublic = join(
-    tmpWorkspace,
-    "missions",
-    "test-system-m000001",
-    "workpiece",
-    "public",
-  );
+  const workpiecePublic = await materializeAndGetWorkpiecePublic();
 
   // Authored files MUST exist in workpiece
   expect(existsSync(join(workpiecePublic, "textures", "logo.svg"))).toBe(true);
   expect(existsSync(join(workpiecePublic, "favicon.ico"))).toBe(true);
-});
-
-test("RFC-0620: filter is driven by ownership map, not hardcoded paths", async () => {
-  // This test verifies that the mock entry (test-generated.json) — which is NOT
-  // a bordbuch file — is also filtered. If the filter were hardcoded to only
-  // remove bordbuch paths, this file would appear in the workpiece.
-  setupWorkspaceWithGeneratedFiles();
-
-  const { runMissionMaterialize } = await import("../mission/mission-materialize.ts");
-
-  const input = {
-    flags: { mission: "test-system-m000001" },
-  } as unknown as KernelCommandInput;
-  const context = {
-    workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
-  } as unknown as KernelRuntimeContext;
-
-  await runMissionMaterialize(input, context);
-
-  const workpiecePublic = join(
-    tmpWorkspace,
-    "missions",
-    "test-system-m000001",
-    "workpiece",
-    "public",
-  );
-
-  // The mock entry proves the filter reads from GENERATOR_OWNERSHIP_MAP,
-  // not from a hardcoded list of bordbuch paths.
-  expect(existsSync(join(workpiecePublic, "test-generated.json"))).toBe(false);
-  // Bordbuch files are also filtered (sanity check)
-  expect(existsSync(join(workpiecePublic, ".well-known", "bordbuch.json"))).toBe(false);
 });
