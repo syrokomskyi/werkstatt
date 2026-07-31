@@ -779,6 +779,23 @@ export async function runMissionMaterialize(
       }
     }
 
+    // Remove generated bordbuch projection files copied from cache clone's public/.
+    // These are owned by bordbuch.generate (not in the dev pipeline) and would cause
+    // ownership.sync.validate to fail with OWN-01 in the workpiece context.
+    const bordbuchFilesToRemove = [
+      path.join(stagingDir, "public", ".well-known", "bordbuch.json"),
+      path.join(stagingDir, "public", ".well-known", "bordbuch", "index.html"),
+    ];
+    for (const bordbuchFile of bordbuchFilesToRemove) {
+      if (existsSync(bordbuchFile)) {
+        await fs.rm(bordbuchFile, { force: true });
+        const bordbuchDir = path.dirname(bordbuchFile);
+        if (bordbuchFile.endsWith("index.html") && existsSync(bordbuchDir)) {
+          await fs.rm(bordbuchDir, { recursive: true, force: true }).catch(() => {});
+        }
+      }
+    }
+
     // RFC-0597: Warm media cache from cache clone to workpiece after data-path copy
     let mediaCacheWarmed = false;
     let mediaCacheSources = 0;
@@ -864,6 +881,7 @@ export async function runMissionMaterialize(
       pipelineName: "build.prepare.dev",
       siteName: manifest.systemId,
       outputFormat: "pretty",
+      force: true,
     });
     const prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
     if (!prepareReport.ok) {
