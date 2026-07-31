@@ -979,6 +979,23 @@ export async function runMissionMaterialize(
       );
     }
 
+    // RFC-0617: Seed compass-audit ledger for workpiece files.
+    // Runs after codegen + git commit so all authored files exist and have a revision.
+    // Non-fatal: a baseline failure logs a warning but does not block materialization.
+    const workpieceRelPath = path.relative(workspaceRoot, workpieceDir);
+    logger.info(`  Running compass.audit.baseline for workpiece…`);
+    try {
+      await executeKernelCommand({
+        workspaceRoot,
+        commandName: "compass.audit.baseline",
+        argv: [`--workpiece=${workpieceRelPath}`],
+      });
+      logger.info(`  Compass audit baseline seeded for workpiece`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.info(`  Warning: compass.audit.baseline failed: ${msg}`);
+    }
+
     // Write materialization report
     const evidenceDir = path.join(missionDir, "evidence");
     await fs.mkdir(evidenceDir, { recursive: true });
