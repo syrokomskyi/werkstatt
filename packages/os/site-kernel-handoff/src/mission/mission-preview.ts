@@ -67,7 +67,7 @@ export async function runMissionPreview(
   const cmd = production ? "preview" : "dev";
 
   // Stop any existing astro dev server on this port before starting a new one
-  spawnSync("pnpm", ["exec", "astro", "dev", "stop"], {
+  spawnSync("pnpm", ["run", "stop"], {
     cwd: workpiecePath,
     stdio: "ignore",
   });

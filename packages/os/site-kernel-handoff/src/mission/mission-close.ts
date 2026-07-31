@@ -216,7 +216,7 @@ export async function runMissionClose(
     // astro dev stop silently succeeds. This frees the dev port and prevents
     // serving stale content from a closed mission.
     if (existsSync(workpieceDir)) {
-      spawnSync("pnpm", ["exec", "astro", "dev", "stop"], {
+      spawnSync("pnpm", ["run", "stop"], {
         cwd: workpieceDir,
         stdio: "ignore",
       });
