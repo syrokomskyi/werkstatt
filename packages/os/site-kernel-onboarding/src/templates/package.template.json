@@ -9,7 +9,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "start": "astro dev",
+    "start": "astro dev stop; astro dev",
     "build:check": "site-kernel pipeline build.prepare --site {{CLIENT_ID}} && site-kernel pipeline build.check --site {{CLIENT_ID}} && pnpm -s astro:check && astro build && site-kernel pipeline build.post --site {{CLIENT_ID}}",
     "build": "site-kernel pipeline build.prepare --site {{CLIENT_ID}} && pnpm -s astro:check && astro build && site-kernel pipeline build.post --site {{CLIENT_ID}}",
     "build:alt": "node -e \"process.env.PUBLIC_SITE_URL='https://alt.{{DOMAIN}}';require('child_process').spawnSync('pnpm',['run','build'],{stdio:'inherit',env:process.env})\"",
