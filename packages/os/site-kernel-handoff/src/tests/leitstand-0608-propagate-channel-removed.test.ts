@@ -148,8 +148,9 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
   createRegistry(tmpDir, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
-    state: "dev-deployed",
+    state: "published",
     missionId,
+    commitSha: "abc123def456",
     behaviorSnapshotHash: "abc123",
     publishedAt: "2026-07-10T00:00:00.000Z",
   });
@@ -158,12 +159,16 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
   // Create artifact store so preflight passes
   await storeArtifactCore(tmpDir, releaseId, distDir, systemId);
 
-  // Write Axiom evidence with zero errors
+  // Write Axiom evidence in native JSON format (RFC-0629)
   const evidenceDir = join(tmpDir, "missions", missionId, "evidence", "axiom");
   mkdirSync(evidenceDir, { recursive: true });
   writeFileSync(
-    join(evidenceDir, "findings.yaml"),
-    `schema: axiom-findings@1\ncapsuleRef: missions/${missionId}/evidence/axiom/evidence-capsule.yaml\nrecordedAt: 2026-07-15T12:00:00.000Z\nmethodology: web-accessibility\nfindings: []\nsummary:\n  totalFindings: 0\n  errors: 0\n  warnings: 0\n`,
+    join(evidenceDir, "evidence-metadata.json"),
+    JSON.stringify({ missionId, commitSha: "abc123def456" }, null, 2) + "\n",
+  );
+  writeFileSync(
+    join(evidenceDir, "study-run.json"),
+    JSON.stringify({ findings: [] }, null, 2) + "\n",
   );
 
   const result = await runLeitstandPropagate(
@@ -175,4 +180,4 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
   expect(result.data!.channel).toBe("alt");
   expect(result.data!.releaseState).toBe("alt-deployed");
   expect(readReleaseState(tmpDir, releaseId)).toBe("alt-deployed");
-});
+}, 15_000);

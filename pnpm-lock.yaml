@@ -887,6 +887,15 @@ importers:
       '@syrokomskyi/axiom-capture':
         specifier: link:../../../../pipelines/packages/axiom/axiom-capture
         version: link:../../../../pipelines/packages/axiom/axiom-capture
+      '@syrokomskyi/axiom-contracts':
+        specifier: link:../../../../pipelines/packages/axiom/axiom-contracts
+        version: link:../../../../pipelines/packages/axiom/axiom-contracts
+      '@syrokomskyi/axiom-methodology':
+        specifier: link:../../../../pipelines/packages/axiom/axiom-methodology
+        version: link:../../../../pipelines/packages/axiom/axiom-methodology
+      '@syrokomskyi/axiom-provenance':
+        specifier: link:../../../../pipelines/packages/axiom/axiom-provenance
+        version: link:../../../../pipelines/packages/axiom/axiom-provenance
       '@syrokomskyi/axiom-study':
         specifier: link:../../../../pipelines/packages/axiom/axiom-study
         version: link:../../../../pipelines/packages/axiom/axiom-study
@@ -953,6 +962,9 @@ importers:
       '@warpgogol/site-kernel-content':
         specifier: workspace:*
         version: link:../site-kernel-content
+      '@warpgogol/site-kernel-handoff':
+        specifier: workspace:*
+        version: link:../site-kernel-handoff
       '@warpgogol/site-kernel-integrity':
         specifier: workspace:*
         version: link:../site-kernel-integrity
@@ -975,8 +987,8 @@ importers:
         specifier: ^4.0.5
         version: 4.0.5
       playwright:
-        specifier: ^1.61.1
-        version: 1.61.1
+        specifier: ^1.62.1
+        version: 1.62.1
       sharp:
         specifier: ^0.35.3
         version: 0.35.3(@types/node@26.1.1)
@@ -5109,9 +5121,19 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  playwright-core@1.62.1:
+    resolution: {integrity: sha512-wPYSwEBJY9GHraISXqyqtx0na0LpO3XEX7jNDhntbex7tzUS7kLnZsOlFruFJB4Hi/rhDMjXGqHewDZ68nYZVw==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   playwright@1.61.1:
     resolution: {integrity: sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ==}
     engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.62.1:
+    resolution: {integrity: sha512-0M+L3LAD8/nm554LOla9Ayx0j0tmFZ0FBcoQ7F1VuVHpM/XpiC8RcDzBQB8W5+hA8L22THxELzeF+2WcUzvcLg==}
+    engines: {node: '>=20'}
     hasBin: true
 
   plyr@3.8.4:
@@ -10051,9 +10073,17 @@ snapshots:
 
   playwright-core@1.61.1: {}
 
+  playwright-core@1.62.1: {}
+
   playwright@1.61.1:
     dependencies:
       playwright-core: 1.61.1
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  playwright@1.62.1:
+    dependencies:
+      playwright-core: 1.62.1
     optionalDependencies:
       fsevents: 2.3.2
 

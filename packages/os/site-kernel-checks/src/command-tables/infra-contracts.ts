@@ -317,25 +317,30 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
   {
     name: "mission.check",
     description:
-      "RFC-0012: one-shot Axiom accessibility check for a mission. " +
-      "Builds workpiece, starts static server, captures evidence via Playwright + axe-core, " +
-      "runs runAccessibilityInstrument, writes findings.yaml + evidence-capsule.yaml, stops server. " +
-      "Exit codes: 0=pass, 1=violations, 2=server fail, 3=health check timeout, " +
-      "4=playwright missing, 5=axiom-study missing, 6=build failure, 7=sitemap missing.",
+      "RFC-0629: one-shot native Axiom accessibility check for a mission. " +
+      "Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, " +
+      "createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument, " +
+      "findingsForObservation, and evaluateClosure from native axiom packages. " +
+      "Writes native capsule files: staged-capsule.json, observation-bundle.json, " +
+      "study-run.json, evidence-metadata.json. External-preview only. " +
+      "Exit codes: 0=pass, 1=violations or closure blocked, 2=no pages discovered.",
     scope: "workspace",
     supportsAllSites: false,
     mutatesState: true,
     cacheable: false,
     flags: {
       mission: { kind: "string", required: true, description: "Mission id." },
-      mode: { kind: "string", description: "preview (default) | dev. MVP: only preview." },
       "external-preview": {
         kind: "boolean",
-        description: "Skip server lifecycle, connect to an existing server via --base-url.",
+        description: "Required — connect to an existing server via --base-url (no local mode).",
       },
       "base-url": {
         kind: "string",
         description: "Base URL for external preview mode (required with --external-preview).",
+      },
+      "commit-sha": {
+        kind: "string",
+        description: "Optional commit SHA embedded in evidence-metadata.json.",
       },
       json: { kind: "boolean", description: "Output JSON result." },
     },

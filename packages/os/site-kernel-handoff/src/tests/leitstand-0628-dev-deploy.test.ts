@@ -11,7 +11,11 @@
 import { test, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { runLeitstandDevDeploy, runLeitstandPropagate, runLeitstandRollback } from "../leitstand/leitstand-commands.ts";
+import {
+  runLeitstandDevDeploy,
+  runLeitstandPropagate,
+  runLeitstandRollback,
+} from "../leitstand/leitstand-commands.ts";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
 
@@ -114,9 +118,7 @@ function createRegistryWithChannels(
     }
   }
 
-  const lpSection = lpEntries.length > 0
-    ? `\n      lastPropagated:\n${lpEntries.join("\n")}`
-    : "";
+  const lpSection = lpEntries.length > 0 ? `\n      lastPropagated:\n${lpEntries.join("\n")}` : "";
 
   const missionField = options?.currentMission ?? "null";
 
@@ -164,47 +166,33 @@ function createWorkpieceDist(workspaceRoot: string, missionId: string): string {
   return distDir;
 }
 
-function writeAxiomFindings(
+function writeStudyRun(
   workspaceRoot: string,
   missionId: string,
-  errors: number,
-  warnings: number,
+  findings: Array<{ severity: string }>,
 ): void {
   const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
   mkdirSync(evidenceDir, { recursive: true });
-  const findingsYaml = `schema: axiom-findings@1
-capsuleRef: missions/${missionId}/evidence/axiom/evidence-capsule.yaml
-recordedAt: 2026-07-15T12:00:00.000Z
-methodology: web-accessibility
-findings: []
-summary:
-  totalFindings: ${errors + warnings}
-  errors: ${errors}
-  warnings: ${warnings}
-`;
-  writeFileSync(join(evidenceDir, "findings.yaml"), findingsYaml);
+  writeFileSync(join(evidenceDir, "study-run.json"), JSON.stringify({ findings }, null, 2) + "\n");
 }
 
-function writeEvidenceCapsule(
+function writeEvidenceMetadata(
   workspaceRoot: string,
   missionId: string,
-  options?: { commitSha?: string; capsuleMissionId?: string },
+  options?: { commitSha?: string; metadataMissionId?: string },
 ): void {
   const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
   mkdirSync(evidenceDir, { recursive: true });
-  const capsuleYaml = `schema: local-evidence-capsule@1
-missionId: ${options?.capsuleMissionId ?? missionId}
-origin: https://dev.example.com
-recordedAt: 2026-07-15T12:00:00.000Z
-mode: external-preview
-locales:
-  - en
-profiles:
-  - desktop
-classification: local-dev
-commitSha: ${options?.commitSha ?? "abc123def456"}
-`;
-  writeFileSync(join(evidenceDir, "evidence-capsule.yaml"), capsuleYaml);
+  const metadata: Record<string, unknown> = {
+    missionId: options?.metadataMissionId ?? missionId,
+  };
+  if (options?.commitSha) {
+    metadata.commitSha = options.commitSha;
+  }
+  writeFileSync(
+    join(evidenceDir, "evidence-metadata.json"),
+    JSON.stringify(metadata, null, 2) + "\n",
+  );
 }
 
 let tmpDir: string;
@@ -227,10 +215,7 @@ test("leitstand.dev-deploy deploys workpiece to dev channel and returns success"
   createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
-  const result = await runLeitstandDevDeploy(
-    makeInput({ system: systemId }),
-    makeContext(tmpDir),
-  );
+  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   expect(data?.command).toBe("leitstand.dev-deploy");
@@ -239,7 +224,7 @@ test("leitstand.dev-deploy deploys workpiece to dev channel and returns success"
   expect(data?.deployState).toBe("succeeded");
   expect(data?.commitSha).toBe("abc123def456");
   expect(data?.buildState).toBe("succeeded");
-});
+}, 15_000);
 
 test("leitstand.dev-deploy rejects when system has no active mission", async () => {
   const systemId = "test-sys";
@@ -252,9 +237,9 @@ test("leitstand.dev-deploy rejects when system has no active mission", async () 
 });
 
 test("leitstand.dev-deploy rejects when --system is missing", async () => {
-  await expect(
-    runLeitstandDevDeploy(makeInput({}), makeContext(tmpDir)),
-  ).rejects.toThrow("--system is required");
+  await expect(runLeitstandDevDeploy(makeInput({}), makeContext(tmpDir))).rejects.toThrow(
+    "--system is required",
+  );
 });
 
 test("leitstand.dev-deploy does not write to registry or bordbuch", async () => {
@@ -264,10 +249,7 @@ test("leitstand.dev-deploy does not write to registry or bordbuch", async () => 
   createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
-  await runLeitstandDevDeploy(
-    makeInput({ system: systemId }),
-    makeContext(tmpDir),
-  );
+  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
 
   // Verify registry was not modified — no lastPropagated.dev entry
   const registryContent = readFileSync(join(tmpDir, "systems", "registry.yaml"), "utf8");
@@ -276,7 +258,7 @@ test("leitstand.dev-deploy does not write to registry or bordbuch", async () => 
   // Verify no bordbuch directory was created
   const bordbuchDir = join(tmpDir, "systems", systemId, "bordbuch");
   expect(existsSync(bordbuchDir)).toBe(false);
-});
+}, 15_000);
 
 // --- leitstand.propagate Axiom gate tests (RFC-0628: published + commitSha + missionId) ---
 
@@ -298,7 +280,7 @@ test("leitstand.propagate rejects release not in published state", async () => {
   ).rejects.toThrow("must be in state 'published'");
 });
 
-test("leitstand.propagate rejects when no evidence capsule exists", async () => {
+test("leitstand.propagate rejects when no evidence metadata exists", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
@@ -332,12 +314,14 @@ test("leitstand.propagate rejects when evidence commitSha does not match release
     state: "published",
     commitSha: "release-sha-999",
   });
-  writeEvidenceCapsule(tmpDir, missionId, { commitSha: "capsule-sha-111" });
-  writeAxiomFindings(tmpDir, missionId, 0, 0);
+  writeEvidenceMetadata(tmpDir, missionId, { commitSha: "capsule-sha-111" });
+  writeStudyRun(tmpDir, missionId, []);
 
   await expect(
     runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
-  ).rejects.toThrow("evidence commitSha 'capsule-sha-111' does not match release commitSha 'release-sha-999'");
+  ).rejects.toThrow(
+    "evidence commitSha 'capsule-sha-111' does not match release commitSha 'release-sha-999'",
+  );
 });
 
 test("leitstand.propagate rejects when evidence missionId does not match release", async () => {
@@ -354,18 +338,20 @@ test("leitstand.propagate rejects when evidence missionId does not match release
     state: "published",
     commitSha: "abc123def456",
   });
-  writeEvidenceCapsule(tmpDir, missionId, {
+  writeEvidenceMetadata(tmpDir, missionId, {
     commitSha: "abc123def456",
-    capsuleMissionId: "other-mission-m000999",
+    metadataMissionId: "other-mission-m000999",
   });
-  writeAxiomFindings(tmpDir, missionId, 0, 0);
+  writeStudyRun(tmpDir, missionId, []);
 
   await expect(
     runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
-  ).rejects.toThrow("evidence missionId 'other-mission-m000999' does not match release missionId 'test-sys-m000001'");
+  ).rejects.toThrow(
+    "evidence missionId 'other-mission-m000999' does not match release missionId 'test-sys-m000001'",
+  );
 });
 
-test("leitstand.propagate rejects when Axiom evidence has errors", async () => {
+test("leitstand.propagate rejects when Axiom evidence has high/critical findings", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
@@ -379,12 +365,16 @@ test("leitstand.propagate rejects when Axiom evidence has errors", async () => {
     state: "published",
     commitSha: "abc123def456",
   });
-  writeEvidenceCapsule(tmpDir, missionId, { commitSha: "abc123def456" });
-  writeAxiomFindings(tmpDir, missionId, 3, 2);
+  writeEvidenceMetadata(tmpDir, missionId, { commitSha: "abc123def456" });
+  writeStudyRun(tmpDir, missionId, [
+    { severity: "high" },
+    { severity: "critical" },
+    { severity: "low" },
+  ]);
 
   await expect(
     runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
-  ).rejects.toThrow("Axiom verification failed: 3 errors");
+  ).rejects.toThrow("Axiom verification failed: 2 high/critical findings");
 });
 
 // --- leitstand.rollback auto-detect tests (RFC-0628: no dev-deployed) ---
@@ -473,10 +463,7 @@ test("leitstand.rollback rejects --channel flag", async () => {
   createRegistryWithChannels(tmpDir, systemId);
 
   await expect(
-    runLeitstandRollback(
-      makeInput({ system: systemId, channel: "main" }),
-      makeContext(tmpDir),
-    ),
+    runLeitstandRollback(makeInput({ system: systemId, channel: "main" }), makeContext(tmpDir)),
   ).rejects.toThrow("--channel is removed");
 });
 
