@@ -10,6 +10,7 @@
   <item>RFC-0379: remove cloudflare-pages/vercel from adapter enum, add null; replace flat target/credentials/lastPropagation with channel model (channels + per-channel lastPropagated with operational state).</item>
   <item>RFC-0595: add RouteFact with contentHash: string | null and optional redirectTarget.</item>
   <item>RFC-0624: add purgeResult to lastPropagatedChannelSchema, purgeResultSchema, deploymentConfigSchema, purge tracking.</item>
+  <item>RFC-0627: add channels.dev (required), make channels.alt required, add dev to lastPropagated.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -46,11 +47,13 @@ export const lastPropagatedChannelSchema = z.object({
 export const deploymentConfigSchema = z.object({
   adapter: deploymentAdapterNameSchema,
   channels: z.object({
-    alt: deploymentChannelSchema.optional(),
+    dev: deploymentChannelSchema,
+    alt: deploymentChannelSchema,
     main: deploymentChannelSchema,
   }),
   lastPropagated: z
     .object({
+      dev: lastPropagatedChannelSchema.optional(),
       alt: lastPropagatedChannelSchema.optional(),
       main: lastPropagatedChannelSchema.optional(),
     })
