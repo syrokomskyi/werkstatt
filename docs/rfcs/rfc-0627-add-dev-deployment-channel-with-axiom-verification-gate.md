@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -43,6 +44,7 @@ satisfies:
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
+breaksC: true
 commands:
   proposed:
     - leitstand.deploy
@@ -57,7 +59,6 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/ontology"
   - "@warpgogol/site-kernel-handoff"
-  - "@warpgogol/site-kernel-checks"
 successSignals:
   - "leitstand.deploy deploys to dev channel and runs mission.check automatically"
   - "leitstand.propagate rejects releases not in dev-deployed state"
@@ -68,6 +69,7 @@ nonGoals:
   - "Does not migrate existing releases to the new state machine (clean slate)"
   - "Does not add --mode dev to mission.check (external-preview mode is used instead)"
   - "Does not introduce per-page Axiom checks (sitemap-driven full-site check only)"
+  - "Does not change leitstand.promote (alt→main promotion with build-identity verification is unchanged from RFC-0608)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -157,7 +159,24 @@ pnpm exec site-kernel run leitstand.rollback --system warpgogol-com [--to-releas
 | `--to-release` | string | no | Specific release to roll back to. Auto-discovered if omitted. |
 | `--json` | boolean | no | Output JSON result. |
 
-The `--channel` flag is removed from `leitstand.rollback`. The channel is auto-detected from the release state: `promoted` → main, `alt-deployed` → alt, `dev-deployed` → dev.
+The `--channel` flag is removed from `leitstand.rollback`. The channel is auto-detected from the release state: `promoted` → main, `alt-deployed` → alt, `dev-deployed` → dev. The `rolled-back` state is kept in `releaseStateSchema` for compatibility with existing releases rolled back under RFC-0608, but is not reachable for new releases under the auto-step model — rollback always transitions one step back in the deployment chain.
+
+### `leitstand.deploy` accepted states
+
+`leitstand.deploy` accepts releases in `published` or `dev-deployed` state. A `published` release is a first deploy. A `dev-deployed` release is a re-deploy (e.g., after fixing Axiom errors from a previous run). Releases in any other state are rejected with an actionable error message.
+
+### Axiom evidence freshness check
+
+`leitstand.propagate` verifies Axiom evidence freshness by comparing `findings.yaml`'s `recordedAt` timestamp to the release's `publishedAt` timestamp. If `recordedAt` is before `publishedAt`, the evidence is stale (from a previous release of the same mission) and `leitstand.propagate` rejects with: "Axiom evidence is stale (recorded: <date>, published: <date>). Re-run leitstand.deploy for this release."
+
+### Rollback behavior change from RFC-0608
+
+RFC-0608 transitions main rollback → `rolled-back` and alt rollback → `published`. This RFC changes both:
+
+- Main rollback: `promoted` → `alt-deployed` (one step back, not `rolled-back`)
+- Alt rollback: `alt-deployed` → `dev-deployed` (one step back, not `published`)
+
+This means a rolled-back release can be re-promoted or re-propagated without re-deploying from scratch. The `rolled-back` state remains in the enum for existing releases only.
 
 ### TypeScript contracts
 
@@ -232,7 +251,8 @@ export type Channel = "dev" | "alt" | "main";
 | `packages/ontology/src/operations/leitstand.ts` | Schema: `channels.dev` added, `channels.alt` required |
 | `packages/ontology/src/operations/release.ts` | Schema: `dev-deployed` state added |
 | `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | New `runLeitstandDeploy`, modified `runLeitstandPropagate`, modified `runLeitstandRollback` |
-| `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` | `leitstand.deploy` command entry registered |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts` | `leitstand.deploy` command registered alongside existing leitstand commands |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `leitstand.status` updated to show `dev` channel; `leitstand.health` updated to accept `--channel dev` |
 
 ### Output format
 
@@ -282,19 +302,22 @@ The deploy itself succeeds (the site is live on dev), but the command exits 1 to
 | Scenario | Exit code | Release state | Behavior |
 | --- | --- | --- | --- |
 | Dev deploy succeeds, Axiom passes (0 errors) | 0 | `dev-deployed` | Normal flow. `leitstand.propagate` is unblocked. |
-| Dev deploy succeeds, Axiom fails (>0 errors) | 1 | `dev-deployed` | Release is live on dev but stuck. `leitstand.propagate` rejects it. Operator must fix errors and re-run `leitstand.deploy`. |
+| Dev deploy succeeds, Axiom fails (>0 errors) | 1 | `dev-deployed` | Release is live on dev but stuck. `leitstand.propagate` rejects it. Operator must fix errors and re-run `leitstand.deploy` (accepts `dev-deployed` state for re-deploy). |
 | Dev deploy fails (wrangler error) | 2 | `published` (unchanged) | Deploy did not succeed. Release stays published. |
-| Health check timeout on dev | 3 | `published` | Dev URL not responding. |
-| Playwright not installed | 4 | `published` | `mission.check` cannot run. Operator runs `pnpm exec playwright install chromium`. |
-| `axiom-study` package missing | 5 | `published` | Dependency resolution failure. |
+| Dev health check timeout | 3 | `published` | Dev URL not responding. |
+| Playwright not installed (passed through from `mission.check`) | 4 | `published` | `mission.check` cannot run. Operator runs `pnpm exec playwright install chromium`. |
+| `axiom-study` package missing (passed through from `mission.check`) | 5 | `published` | Dependency resolution failure. |
 | Build failure (not used — deploy uses pre-built dist) | 6 | N/A | Not applicable — `leitstand.deploy` uses the release artifact dist, not a fresh build. |
-| Sitemap missing on dev | 7 | `published` | Dev site has no sitemap.xml. Check build output. |
-| Axiom evidence stale or missing | — | blocked | `leitstand.propagate` rejects: "No Axiom evidence found for mission <id>. Run leitstand.deploy first." |
+| Sitemap missing on dev (passed through from `mission.check`) | 7 | `published` | Dev site has no sitemap.xml. Check build output. |
+| Axiom evidence stale (`recordedAt` < release `publishedAt`) | — | blocked | `leitstand.propagate` rejects: "Axiom evidence is stale (recorded: <date>, published: <date>). Re-run leitstand.deploy for this release." |
+| Axiom evidence missing | — | blocked | `leitstand.propagate` rejects: "No Axiom evidence found for mission <id>. Run leitstand.deploy first." |
 | Axiom evidence has errors | — | blocked | `leitstand.propagate` rejects: "Axiom verification failed: <N> errors. Fix and re-deploy to dev." |
+
+Exit codes 4–7 are passed through from `mission.check`. Exit codes 2–3 are `leitstand.deploy`'s own (deploy phase and dev health check phase). Exit code 1 indicates the deploy succeeded but Axiom found violations.
 
 ## Rollout
 
-**Clean slate.** No migration of existing releases. The new state machine applies to all releases created after this RFC is implemented. Existing releases in `promoted` or `alt-deployed` state remain as-is and are not affected.
+**Clean slate.** No migration of existing releases. The new state machine applies to all releases created after this RFC is implemented. Existing releases in `promoted` or `alt-deployed` state remain as-is and are not affected. Existing `alt-deployed` releases can be promoted or rolled back, but cannot be re-propagated through the new chain (they would need to be re-released via a new mission to enter the `dev-deployed` state).
 
 **Implementation order:**
 
@@ -310,15 +333,19 @@ The deploy itself succeeds (the site is live on dev), but the command exits 1 to
 
 6. **DNA updates**: Update DNA-48 and DNA-49 prose in `docs/architecture-dna.md` to reflect the three-channel model and `dev-deployed` state.
 
-7. **AGENTS.md updates**: Document the new deployment chain and Axiom gate in the relevant sections.
+7. **AGENTS.md updates**: Update `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section with the new `dev` channel, `leitstand.deploy` command, three-stage deployment chain, and auto-step rollback model. Update root `AGENTS.md` if deployment chain is documented there.
 
-8. **Env file**: Create `.env.dev` for warpgogol-com workpiece with the same secrets as `.env.alt`. Set `WERKSTATT_SECRETS_DEV` environment variable to point to `.env.dev`.
+8. **Compass XML sync**: Update `docs/verification-plan.xml` if it references the deployment chain or release state machine. Update `docs/development-plan.xml` if it tracks deployment-related milestones.
 
-9. **DNS**: Configure `dev.warpgogol.com` DNS record and Cloudflare Worker route for `dev-warpgogol-com` worker.
+9. **`leitstand.status` and `leitstand.health`**: Update both commands to support the `dev` channel. `leitstand.status` shows all three channels (`dev`, `alt`, `main`). `leitstand.health` accepts `--channel dev|alt|main`.
 
-10. **Command table**: Register `leitstand.deploy` in `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts`.
+10. **Env file**: Create `.env.dev` for warpgogol-com workpiece with the same secrets as `.env.alt`. Set `WERKSTATT_SECRETS_DEV` environment variable to point to `.env.dev`.
 
-11. **Tests**: Unit tests for `leitstand.deploy` (deploy + axiom gate), `leitstand.propagate` (dev-deployed state check + axiom evidence gate), `leitstand.rollback` (auto-step from each state).
+11. **DNS**: Configure `dev.warpgogol.com` DNS record and Cloudflare Worker route for `dev-warpgogol-com` worker.
+
+12. **Command registration**: Register `leitstand.deploy` in `packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts` alongside existing leitstand commands.
+
+13. **Tests**: Unit tests for `leitstand.deploy` (deploy + axiom gate), `leitstand.propagate` (dev-deployed state check + axiom evidence gate + freshness check), `leitstand.rollback` (auto-step from each state).
 
 ## Alternatives considered
 
