@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -51,7 +52,7 @@ packagesImpacted:
 successSignals:
   - "release.prepare no longer deadlocks when bordbuch.generate acquires the same system lock"
   - "werkstatt-lock tests cover re-entrant acquire and release by same PID"
-  - "depth field is required in werkstattLockSchema"
+  - "depth field is present (optional) in werkstattLockSchema with ?? 1 fallback in acquireLock/releaseLock"
 nonGoals:
   - "Cross-process lock re-entrancy (only same-PID re-entrancy is in scope)"
   - "Lock inheritance or child-process lock delegation"
@@ -111,7 +112,7 @@ No new CLI commands. The change is internal to `acquireLock`/`releaseLock` handl
 
 ### TypeScript contracts
 
-The `WerkstattLock` type gains a required `depth` field:
+The `WerkstattLock` type gains an optional `depth` field. It is optional to preserve forward compatibility with lock files created before this RFC — those files parse successfully and are treated as `depth=1` via `?? 1` fallbacks in `acquireLock`/`releaseLock`. New locks are created without an explicit `depth` field (it is `undefined` until a re-entrant acquire sets it to `2`).
 
 ```ts
 export const werkstattLockSchema = z.object({
@@ -124,7 +125,7 @@ export const werkstattLockSchema = z.object({
   startedAt: z.string().datetime(),
   heartbeatAt: z.string().datetime(),
   timeoutSeconds: z.number().positive(),
-  depth: z.number().int().positive(),
+  depth: z.number().int().positive().optional(),
 });
 ```
 
@@ -135,11 +136,11 @@ export const werkstattLockSchema = z.object({
 if (existsSync(lockPath)) {
   const existing = parse(raw);
   if (existing.pid === process.pid && !isLockStale(existing)) {
-    // Re-entrant: increment depth, preserve operationId + command,
-    // update heartbeatAt
+    // Re-entrant: increment depth (undefined treated as 1), preserve
+    // operationId + command, update heartbeatAt
     const updated = {
       ...existing,
-      depth: existing.depth + 1,
+      depth: (existing.depth ?? 1) + 1,
       heartbeatAt: new Date().toISOString(),
     };
     await writeFile(lockPath, JSON.stringify(updated, null, 2) + "\n");
@@ -148,9 +149,9 @@ if (existsSync(lockPath)) {
   if (!isLockStale(existing)) {
     throw new Error(`[werkstatt.lock] lock '${scope}' held by ...`);
   }
-  // stale: overwrite with depth=1
+  // stale: overwrite (no explicit depth field)
 }
-// New lock: write with depth=1
+// New lock: write without explicit depth (undefined until re-entrant acquire)
 ```
 
 `releaseLock` behavior:
@@ -158,9 +159,9 @@ if (existsSync(lockPath)) {
 ```ts
 if (existsSync(lockPath)) {
   const lock = parse(raw);
-  if (lock.pid === process.pid && lock.depth > 1) {
+  if (lock.pid === process.pid && (lock.depth ?? 1) > 1) {
     // Re-entrant release: decrement, do not delete
-    const decremented = { ...lock, depth: lock.depth - 1 };
+    const decremented = { ...lock, depth: (lock.depth ?? 1) - 1 };
     await writeFile(lockPath, JSON.stringify(decremented, null, 2) + "\n");
     return;
   }
@@ -186,20 +187,21 @@ No CLI output changes. Lock files on disk now include `depth: <N>`.
 ### Failure modes
 
 - **Different process holds lock**: `acquireLock` throws `[werkstatt.lock] lock '<scope>' held by operation '<opId>' (pid: <pid>)` — unchanged behavior.
-- **Same process re-acquires**: `acquireLock` increments `depth`, returns updated lock object. No error.
+- **Same process re-acquires**: `acquireLock` increments `depth` (treating `undefined` as `1` via `?? 1`), returns updated lock object. No error.
 - **Same process releases with depth > 1**: `releaseLock` decrements `depth`, writes updated file. Lock file remains on disk.
-- **Same process releases with depth = 1**: `releaseLock` deletes lock file.
-- **Stale lock (different PID, dead or timed out)**: `acquireLock` overwrites with a new lock at `depth=1`.
+- **Same process releases with depth = 1 or undefined**: `releaseLock` deletes lock file.
+- **Stale lock (different PID, dead or timed out)**: `acquireLock` overwrites with a new lock (no explicit `depth` field).
 - **Corrupt lock file (invalid JSON or schema)**: `acquireLock` falls through to the stale/corrupt path and overwrites.
-- **Old lock file without `depth` field**: Schema parse fails; `acquireLock` treats it as corrupt and overwrites with a new lock at `depth=1`.
+- **Old lock file without `depth` field**: Schema parse succeeds (`.optional()`); the lock is treated as valid with implicit `depth=1`. `acquireLock` handles it normally — if the PID matches, re-entrant acquire increments to `depth=2`; if the PID differs and the lock is not stale, it throws.
 
 ## Rollout
 
-- **No migration path.** Old lock files without `depth` are treated as corrupt and overwritten on next acquire. This is a forward-only monorepo — no legacy compatibility layer.
+- **No migration path.** Old lock files without `depth` parse successfully because the field is `.optional()`. They are treated as valid locks with implicit `depth=1` via `?? 1` fallbacks. No overwriting or corruption handling is needed for pre-existing locks.
 - The fix is already applied in the codebase (commit `0896e17`). This RFC documents the decision retroactively.
 - All existing tests pass with the updated schema and re-entrant behavior.
 - No pipeline changes needed — commands that already call `acquireLock`/ `releaseLock` benefit automatically.
 - `release.prepare` and `mission.reconcile` now work correctly when their pipeline sub-commands acquire the same `system:<id>` scope.
+- `heartbeatLock`, `readAllLocks`, and `removeStaleLock` all call `werkstattLockSchema.parse()` on existing lock files. Because `depth` is `.optional()`, these functions continue to work on lock files created before this RFC without throwing.
 
 ## Alternatives considered
 
@@ -212,25 +214,28 @@ No CLI output changes. Lock files on disk now include `depth: <N>`.
 ## Risks
 
 - **Unbalanced release** — If a command acquires re-entrantly but crashes before the matching `releaseLock`, the lock file remains with `depth > 1`. The stale-detection logic (`isLockStale`) still applies: if the process dies, the lock becomes stale and the next acquire overwrites it. This is the same recovery behavior as depth=1 locks.
-- **Agent confusion** — Agents might assume `acquireLock` always throws on an existing lock. The AGENTS.md rule for `packages/forge` should document the re-entrant behavior.
+- **Agent confusion** — Agents might assume `acquireLock` always throws on an existing lock. The `packages/forge/AGENTS.md` file must document the re-entrant behavior (see acceptance criteria).
 - **Schema duplication** — `werkstattLockSchema` exists in both `packages/forge/os/werkstatt/handlers/schema.ts` and `packages/ontology/src/operations/werkstatt.ts`. Both must stay in sync. This is an existing constraint from RFC-0556, not new.
+- **Concurrent re-entrant acquisition** — If the same process calls `acquireLock` concurrently (two async sub-commands running in parallel), the file read-modify-write is not atomic and one `depth` increment could be lost. This is not a realistic scenario because pipeline phases run sequentially, not in parallel. If parallel pipeline execution is introduced in the future, the lock file write must be made atomic (e.g., via temp file + rename).
 
 ## Acceptance criteria
 
-- [x] `depth` field added as required to `werkstattLockSchema` in both `packages/forge/os/werkstatt/handlers/schema.ts` and `packages/ontology/src/operations/werkstatt.ts` (evidence: commit 0896e17)
-- [x] `acquireLock` increments `depth` and preserves original `operationId`/`command` when same PID re-acquires (evidence: packages/forge/os/werkstatt/handlers/lock.ts:67-71)
-- [x] `releaseLock` decrements `depth` and only deletes the lock file at `depth=1` (evidence: packages/forge/os/werkstatt/handlers/lock.ts:107-112)
-- [x] Unit tests cover re-entrant acquire, re-entrant release, and cross-PID blocking (evidence: packages/forge/src/tests/werkstatt-lock.test.ts:128-149,208-221)
+- [x] `depth` field added as `.optional()` to `werkstattLockSchema` in both `packages/forge/os/werkstatt/handlers/schema.ts` and `packages/ontology/src/operations/werkstatt.ts` (evidence: packages/forge/os/werkstatt/handlers/schema.ts:29, packages/ontology/src/operations/werkstatt.ts:30)
+- [x] `acquireLock` increments `depth` (treating `undefined` as `1` via `?? 1`) and preserves original `operationId`/`command` when same PID re-acquires (evidence: packages/forge/os/werkstatt/handlers/lock.ts:67-75)
+- [x] `releaseLock` decrements `depth` (treating `undefined` as `1` via `?? 1`) and only deletes the lock file when `depth` is `1` or `undefined` (evidence: packages/forge/os/werkstatt/handlers/lock.ts:111-116)
+- [x] Unit tests cover re-entrant acquire, re-entrant release, and cross-PID blocking (evidence: packages/forge/src/tests/werkstatt-lock.test.ts:128-149,205-218)
 - [x] `release.prepare` completes without lock deadlock when `bordbuch.generate` runs inside `build.prepare` (evidence: warpgogol-com-r000004 release 2026-07-31)
 - [x] `pnpm --filter @warpgogol/forge test` passes — 346 tests (evidence: 2026-07-31 run)
 - [x] `pnpm --filter @warpgogol/forge build:check` passes (evidence: 2026-07-31 run)
 - [x] `pnpm --filter @warpgogol/ontology build:check` passes (evidence: 2026-07-31 run)
 - [x] `rfc.validate` passes on this file (evidence: this validation run)
+- [ ] `packages/forge/AGENTS.md` documents the re-entrant lock behavior (evidence: pending)
+- [ ] Test asserts that re-entrant acquire preserves the original `operationId` and `command` (evidence: pending)
 
 ## Implementation notes for agents
 
 - The fix is already applied in the codebase (commit `0896e17`). This RFC documents the decision retroactively and must be accepted to formalize it.
 - Agents MUST update `depth` in both schema locations (`packages/forge/os/werkstatt/handlers/schema.ts` and `packages/ontology/src/operations/werkstatt.ts`) when modifying the lock schema. They must stay in sync.
-- Agents MUST NOT add `.optional()` to the `depth` field — it is required. Old lock files without `depth` are corrupt and overwritten.
+- The `depth` field is `.optional()` — old lock files without `depth` parse successfully and are treated as `depth=1` via `?? 1` fallbacks in `acquireLock`/`releaseLock`. Agents MUST NOT remove the `?? 1` fallbacks unless they also make `depth` required and set `depth: 1` on new lock creation.
 - Agents MUST preserve the original `operationId` and `command` when incrementing `depth` in a re-entrant acquire. Do not overwrite them with the inner command's values.
 - Agents MUST NOT weaken or remove the re-entrant behavior without a new RFC that supersedes this one.
