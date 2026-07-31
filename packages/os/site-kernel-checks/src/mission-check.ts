@@ -112,27 +112,64 @@ interface DiscoveredPage {
   path: string;
 }
 
-async function discoverPagesFromSitemap(baseUrl: string): Promise<DiscoveredPage[]> {
-  const sitemapUrl = `${baseUrl}/sitemap.xml`;
+function extractPathFromUrl(rawUrl: string): string {
+  try {
+    const parsed = new URL(rawUrl);
+    return parsed.pathname + parsed.search || "/";
+  } catch {
+    return rawUrl;
+  }
+}
+
+async function fetchSitemapXml(url: string): Promise<string> {
   let response: Response;
   try {
-    response = await fetch(sitemapUrl);
+    response = await fetch(url);
   } catch {
-    throw new Error(`SITEMAP_MISSING: Could not fetch ${sitemapUrl}`);
+    throw new Error(`SITEMAP_MISSING: Could not fetch ${url}`);
   }
   if (!response.ok) {
-    throw new Error(`SITEMAP_MISSING: sitemap.xml returned ${response.status}`);
+    throw new Error(`SITEMAP_MISSING: ${url} returned ${response.status}`);
   }
+  return response.text();
+}
 
-  const xml = await response.text();
+async function discoverPagesFromSitemap(baseUrl: string): Promise<DiscoveredPage[]> {
+  const xml = await fetchSitemapXml(`${baseUrl}/sitemap.xml`);
   const urls: DiscoveredPage[] = [];
+  const seenPaths = new Set<string>();
   const urlRegex = /<loc>([^<]+)<\/loc>/g;
-  let match: RegExpExecArray | null;
-  while ((match = urlRegex.exec(xml)) !== null) {
-    const fullUrl = match[1]!.trim();
-    if (fullUrl.startsWith(baseUrl)) {
-      const pagePath = fullUrl.slice(baseUrl.length);
-      urls.push({ url: fullUrl, path: pagePath || "/" });
+  const isSitemapIndex = /<sitemapindex/i.test(xml);
+
+  if (isSitemapIndex) {
+    const subSitemapPaths: string[] = [];
+    let match: RegExpExecArray | null;
+    while ((match = urlRegex.exec(xml)) !== null) {
+      const subPath = extractPathFromUrl(match[1]!.trim());
+      subSitemapPaths.push(subPath);
+    }
+    for (const subPath of subSitemapPaths) {
+      try {
+        const subXml = await fetchSitemapXml(`${baseUrl}${subPath}`);
+        let subMatch: RegExpExecArray | null;
+        const subRegex = /<loc>([^<]+)<\/loc>/g;
+        while ((subMatch = subRegex.exec(subXml)) !== null) {
+          const pagePath = extractPathFromUrl(subMatch[1]!.trim());
+          if (seenPaths.has(pagePath)) continue;
+          seenPaths.add(pagePath);
+          urls.push({ url: `${baseUrl}${pagePath}`, path: pagePath });
+        }
+      } catch {
+        // skip sub-sitemaps that fail to fetch
+      }
+    }
+  } else {
+    let match: RegExpExecArray | null;
+    while ((match = urlRegex.exec(xml)) !== null) {
+      const pagePath = extractPathFromUrl(match[1]!.trim());
+      if (seenPaths.has(pagePath)) continue;
+      seenPaths.add(pagePath);
+      urls.push({ url: `${baseUrl}${pagePath}`, path: pagePath });
     }
   }
 
