@@ -37,6 +37,6 @@ export const SITES_BUILD_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "open-source.validate" },
   // RFC-0601: detect content drift in generated files (DNA-58)
   { command: "generated.drift.validate" },
-  // RFC-0602: enforce timestamp determinism in generator source modules
-  { command: "generated.timestamp.validate" },
+  // RFC-0602: enforce timestamp determinism in generator source modules (ADR-0013: fail mode)
+  { command: "generated.timestamp.validate", args: ["--mode", "fail"] },
 ];

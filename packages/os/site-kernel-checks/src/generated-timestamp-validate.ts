@@ -54,11 +54,6 @@ const TIMESTAMP_ALLOWLIST: TimestampAllowlistEntry[] = [
     pattern: "new Date().toISOString()",
   },
   {
-    module: "packages/os/site-kernel-codegen/src/open-source-page.ts",
-    reason: "process.env.BUILD_TIMESTAMP fallback — CI build metadata, not new Date().",
-    pattern: "process.env.BUILD_TIMESTAMP",
-  },
-  {
     module: "packages/os/site-kernel-checks/src/passport.ts",
     reason:
       "Cryptographic key creation `createdAt` — one-time operational record, not a regenerable file field.",
