@@ -140,11 +140,17 @@ interface BaselineInput {
 The `mission.materialize` handler adds a post-codegen step:
 
 ```ts
-// After codegen completes successfully
-await executeKernelCommand({
-  command: "compass.audit.baseline",
-  flags: { workpiece: workpieceDir },
-}, context);
+// After codegen + git commit completes successfully
+const workpieceRelPath = path.relative(workspaceRoot, workpieceDir);
+try {
+  await executeKernelCommand({
+    workspaceRoot,
+    commandName: "compass.audit.baseline",
+    argv: [`--workpiece=${workpieceRelPath}`],
+  });
+} catch (err) {
+  logger.warn(`  Warning: compass.audit.baseline failed: ${err instanceof Error ? err.message : String(err)}`);
+}
 ```
 
 ### File system responsibilities
@@ -175,7 +181,7 @@ No changes to `--json` output shape. The baseline command reports `seeded: <N>, 
 
 - **Workpiece path does not exist**: `compass.audit.baseline --workpiece` throws `[compass.audit.baseline] workpiece path not found: <path>`.
 - **No authored files in workpiece**: Baseline completes with `seeded=0`, no error. This is valid — some missions may not introduce new authored files.
-- **Baseline fails during mission.materialize**: The materialization fails. The operator must fix the baseline issue before re-running `mission.materialize`.
+- **Baseline fails during mission.materialize**: The baseline call is wrapped in a try/catch and logs a warning. Materialization succeeds despite baseline failure — the operator can run `compass.audit.baseline --workpiece <path>` manually later. This is non-fatal because audit baseline is a bookkeeping step, not a correctness gate.
 - **`--workpiece` and `--packages` both passed**: Throws `[compass.audit.baseline] --workpiece and --packages are mutually exclusive`.
 - **`--workpiece` and `--site` both passed**: Throws `[compass.audit.baseline] --workpiece and --site are mutually exclusive`.
 

@@ -42,9 +42,7 @@ versionBump: patch
 commands:
   proposed: []
   added: []
-  changed:
-    - acquireLock
-    - releaseLock
+  changed: []
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -96,7 +94,7 @@ DNA-51 states that Werkstatt commands use shared lock primitives. The current pr
 
 ## Decision
 
-`acquireLock` and `releaseLock` are re-entrant by PID: when the same process re-acquires a lock it already holds, `acquireLock` increments a `depth` counter instead of throwing; `releaseLock` decrements `depth` and only deletes the lock file when `depth` reaches zero. The `werkstattLockSchema` gains a required `depth: number().int().positive()` field. The original `operationId` and `command` of the outermost acquire are preserved across re-entrant acquires.
+`acquireLock` and `releaseLock` are re-entrant by PID: when the same process re-acquires a lock it already holds, `acquireLock` increments a `depth` counter instead of throwing; `releaseLock` decrements `depth` and only deletes the lock file when `depth` reaches zero. The `werkstattLockSchema` gains an optional `depth: number().int().positive().optional()` field — old lock files without `depth` parse successfully and are treated as `depth=1` via `?? 1` fallbacks. The original `operationId` and `command` of the outermost acquire are preserved across re-entrant acquires.
 
 ## Architectural fit
 
@@ -173,17 +171,17 @@ if (existsSync(lockPath)) {
 
 ### File system responsibilities
 
-| Path                                              | Role                                       |
-| ------------------------------------------------- | ------------------------------------------ |
-| `packages/forge/os/werkstatt/handlers/lock.ts`    | `acquireLock`/`releaseLock` implementation |
-| `packages/forge/os/werkstatt/handlers/schema.ts`  | Inlined `werkstattLockSchema` (RFC-0556)   |
-| `packages/ontology/src/operations/werkstatt.ts`   | Canonical `werkstattLockSchema`            |
-| `packages/forge/src/tests/werkstatt-lock.test.ts` | Unit tests for lock behavior               |
-| `.werkstatt/locks/<scope>.lock.json`              | Runtime lock file (now includes `depth`)   |
+| Path | Role |
+| --- | --- |
+| `packages/forge/os/werkstatt/handlers/lock.ts` | `acquireLock`/`releaseLock` implementation |
+| `packages/forge/os/werkstatt/handlers/schema.ts` | Inlined `werkstattLockSchema` (RFC-0556) |
+| `packages/ontology/src/operations/werkstatt.ts` | Canonical `werkstattLockSchema` |
+| `packages/forge/src/tests/werkstatt-lock.test.ts` | Unit tests for lock behavior |
+| `.werkstatt/locks/<scope>.lock.json` | Runtime lock file (includes `depth` after re-entrant acquire) |
 
 ### Output format
 
-No CLI output changes. Lock files on disk now include `depth: <N>`.
+No CLI output changes. Lock files on disk include `depth: <N>` only after a re-entrant acquire (first acquire writes no `depth` field; it appears at `depth=2` on the first re-entrant acquire).
 
 ### Failure modes
 
