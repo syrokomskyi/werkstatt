@@ -17,7 +17,8 @@ supersedes: []
 supersededBy: null
 amends:
 - RFC-0358
-amendedBy: []
+amendedBy:
+- RFC-0627
 related:
 - RFC-0358
 - RFC-0379
