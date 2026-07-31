@@ -249,7 +249,29 @@ async function runAxeInBrowser(
       throw new Error("PLAYWRIGHT_MISSING: pnpm exec playwright install chromium");
     }
 
-    const browser = await chromium.launch({ headless: true });
+    let browser: Awaited<ReturnType<typeof chromium.launch>>;
+    try {
+      browser = await chromium.launch({ headless: true });
+    } catch (launchErr) {
+      // Chromium binary not installed — auto-install and retry
+      const msg = launchErr instanceof Error ? launchErr.message : String(launchErr);
+      if (msg.includes("Executable doesn't exist") || msg.includes("playwright install")) {
+        console.log("  Chromium binary not found — auto-installing...");
+        const installResult = spawnSync("npx", ["playwright", "install", "chromium"], {
+          stdio: "inherit",
+          timeout: 120_000,
+        });
+        if (installResult.status !== 0) {
+          throw new Error(
+            `PLAYWRIGHT_MISSING: failed to auto-install Chromium — run 'pnpm exec playwright install chromium' manually`,
+          );
+        }
+        console.log("  Chromium installed — retrying launch...");
+        browser = await chromium.launch({ headless: true });
+      } else {
+        throw launchErr;
+      }
+    }
     try {
       const page = await browser.newPage();
       await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
