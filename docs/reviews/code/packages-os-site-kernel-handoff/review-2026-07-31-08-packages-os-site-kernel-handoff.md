@@ -4,7 +4,7 @@ date: 2026-07-31
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: 86105f5~1...HEAD
 filesReviewed:
   - packages/os/site-kernel-handoff/src/tests/mission-materialize-force-cache-bypass.test.ts
@@ -13,9 +13,9 @@ filesReviewed:
 
 # Code Review: 86105f5~1...HEAD
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The regression test is well-structured and correctly verifies the RFC-0619 `force: true` flag. One minor finding: test setup helpers (`gitInit`, `gitCommit`, `setupWorkspace`) are duplicated from `mission-materialize-preflight-skip.test.ts` — a Duplicated Code smell that could be extracted to a shared fixture helper.
+The regression test is well-structured and correctly verifies the RFC-0619 `force: true` flag. Finding A-1 (duplicated test setup) was resolved by extracting shared helpers to `helpers/materialize-fixture.ts`. Zero findings remain.
 
 ### Mechanical floor
 
@@ -23,7 +23,7 @@ Pass — `pnpm --filter @warpgogol/site-kernel-handoff build:check` exits 0. All
 
 ### Axis A — Structural correctness
 
-**Finding A-1 (minor): Duplicated Code — test setup helpers.** `gitInit`, `gitCommit`, `setupWorkspace` at `mission-materialize-force-cache-bypass.test.ts:66-155` are near-identical copies of the same functions in `mission-materialize-preflight-skip.test.ts:63-160`. The `setupWorkspace` function differs only in the return type (void vs string) and the absence of a state file. This is a Fowler Duplicated Code smell — the same logic shape appears in two files. Consider extracting to a shared `tests/helpers/materialize-fixture.ts` module.
+**Finding A-1 (resolved): Duplicated Code — test setup helpers.** `gitInit`, `gitCommit`, `setupWorkspace` were duplicated across `mission-materialize-force-cache-bypass.test.ts` and `mission-materialize-preflight-skip.test.ts`. **Fixed:** extracted to shared `tests/helpers/materialize-fixture.ts` — both test files now import `createMaterializeWorkspace` from the shared module.
 
 ### Axis B — DNA alignment
 
