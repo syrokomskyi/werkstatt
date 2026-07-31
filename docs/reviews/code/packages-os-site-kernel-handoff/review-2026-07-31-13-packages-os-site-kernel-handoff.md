@@ -4,7 +4,7 @@ date: 2026-07-31
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: 46eea16...HEAD
 filesReviewed:
   - packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts
@@ -14,9 +14,9 @@ filesReviewed:
 
 # Code Review: 46eea16...HEAD (RFC-0623 implementation)
 
-### Verdict: Needs revision
+### Verdict: Approved (after fix)
 
-Реализация корректна — retry-логика минимальна, типы из `CommandRunner` переиспользованы, тесты покрывают все сценарии. Одна находка: удалено error-логирование для non-transient failures в `propagate`, что снижает observability.
+Реализация корректна — retry-логика минимальна, типы из `CommandRunner` переиспользованы, тесты покрывают все сценарии. Finding E-1 (удалённое error-логирование) исправлен в commit `489c68f` — логирование восстановлено в `runWranglerDeployWithRetry` для non-transient failures и retries exhausted.
 
 ### Mechanical floor
 
@@ -40,7 +40,7 @@ No issues. Прямые `runner` вызовы заменены на `runWrangler
 
 ### Axis E — Agent-facing clarity
 
-**Finding E-1:** Удалено error-логирование для non-transient failures в `propagate`. Оригинальный код (lines 193-195) логировал exit code, stdout (last 500 chars), и stderr (last 500 chars) при неудачном deploy. Эти `console.error` вызовы были удалены при рефакторинге, но `runWranglerDeployWithRetry` логирует только transient errors перед retry — non-transient failures возвращаются без какого-либо логирования. `rollback` никогда не имел этого логирования, но `propagate` имел — это regression в observability. Рекомендуется добавить `console.error` для final failure в `runWranglerDeployWithRetry` (после исчерпания retry или для non-transient errors), или восстановить логирование в `propagate` для non-transient case.
+**Finding E-1 (FIXED):** Удалено error-логирование для non-transient failures в `propagate`. Оригинальный код (lines 193-195) логировал exit code, stdout (last 500 chars), и stderr (last 500 chars) при неудачном deploy. **Исправлено в commit `489c68f`** — логирование добавлено в `runWranglerDeployWithRetry` для обоих случаев: non-transient errors (early return, lines 58-60) и retries exhausted (final failure, lines 73-77). Теперь оба метода (`propagate` и `rollback`) имеют parity observability.
 
 ### Axis F — Pragmatism
 
@@ -65,4 +65,4 @@ No issues. Performance (90s worst case) документирован в RFC Risk
 
 ### Questions for the author
 
-1. Должно ли error-логирование для non-transient failures быть восстановлено в `propagate` (или добавлено в `runWranglerDeployWithRetry`), или это сознательное решение — caller (`leitstand-commands.ts`) обрабатывает логирование?
+1. ~~Должно ли error-логирование для non-transient failures быть восстановлено?~~ — Ответлено: да, логирование восстановлено в commit `489c68f`.
