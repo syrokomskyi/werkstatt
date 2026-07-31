@@ -56,6 +56,7 @@ vi.mock("@warpgogol/site-kernel-checks", () => ({
   runEnvExampleGenerate: vi.fn(async () => []),
   MISSION_PREFLIGHT_CRITICAL: [],
   MISSION_PREFLIGHT_WARNING: [],
+  GENERATOR_OWNERSHIP_MAP: [],
 }));
 
 function gitInit(dir: string): void {

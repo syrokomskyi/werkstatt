@@ -126,10 +126,12 @@ const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
  * authored content. They must be excluded from the data-path copy to avoid
  * ownership.sync.validate OWN-01 failures in the workpiece context.
  *
- * Returns paths relative to the cache clone root (e.g. `public/.well-known/bordbuch.json`).
+ * The ownership map uses `{system}` as a template placeholder. This function
+ * resolves it to the actual system ID and returns paths relative to the cache
+ * clone root (e.g. `public/.well-known/bordbuch.json`).
  */
 function getWorkspaceAbsoluteGeneratedPaths(systemId: string): Set<string> {
-  const prefix = `systems/${systemId}/`;
+  const prefix = "systems/{system}/";
   const paths = new Set<string>();
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
     if (entry.path.startsWith(prefix)) {
@@ -806,6 +808,20 @@ export async function runMissionMaterialize(
         }
       }
       logger.info(`  Copied ${dataPath}`);
+    }
+
+    // RFC-0620: Remove workspace-absolute generated files that entered the
+    // staging dir via git clone (RFC-0568). The clone brings all cache-clone
+    // files into the working tree; the non-data-path removal above keeps only
+    // STERNSYSTEM_DATA_PATHS, but workspace-absolute generated files within
+    // those data paths (e.g. public/.well-known/bordbuch.json) survive because
+    // they are inside a kept data path. The copy step above skips them, but
+    // the cloned copies remain. Remove them here using the ownership map.
+    for (const skipPath of skipPathsGlobal) {
+      const stagingPath = path.join(stagingDir, skipPath);
+      if (existsSync(stagingPath)) {
+        await fs.rm(stagingPath, { force: true });
+      }
     }
 
     // RFC-0479: copy system.pin.json to workpiece root so mission.migrate can read migratorCursor
