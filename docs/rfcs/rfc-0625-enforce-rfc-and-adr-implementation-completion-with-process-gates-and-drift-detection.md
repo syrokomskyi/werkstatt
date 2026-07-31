@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -105,7 +106,7 @@ The Forge governance surface gains three layers of defense against incomplete RF
 
 2. **Post-implementation gates** — `fo-idea-implement` gains step 3.11b (RFC) and step 4.10b (ADR): a verification gate that checks `status: implemented`, `implementedAt` set, and `rfc.validate` / `adr.validate` passing before the report step.
 
-3. **Drift detection rules** — `rfc.validate` gains V-32 (warning) and `adr.validate` gains V-32 (warning): if git history contains commits with `implement: RFC-XXXX` / `implement: ADR-XXXX` prefix since the document's `createdAt`, but the document status is not `implemented`, emit a warning.
+3. **Drift detection rules** — `rfc.validate` gains V-32 (warning) and `adr.validate` gains AV-16 (warning): if git history contains commits with `implement: RFC-XXXX` / `implement: ADR-XXXX` prefix since the document's `createdAt`, but the document status is not `implemented`, emit a warning.
 
 ## Architectural fit
 
@@ -127,7 +128,7 @@ pnpm exec site-kernel run rfc.validate --id RFC-XXXX --json
 pnpm exec site-kernel run adr.validate --id ADR-XXXX --json
 ```
 
-V-32 warnings appear in the `violations` array with `severity: "warning"`.
+V-32 (RFC) and AV-16 (ADR) warnings appear in the `violations` array with `severity: "warning"`.
 
 ### TypeScript contracts
 
@@ -135,9 +136,9 @@ V-32 warnings appear in the `violations` array with `severity: "warning"`.
 interface RfcValidationViolation {
   rfcId: string;
   file: string;
-  rule: string; // "V-32"
+  rule: string; // "V-32" for RFCs, "AV-16" for ADRs
   message: string;
-  severity: "error" | "warning"; // V-32 is always "warning"
+  severity: "error" | "warning"; // V-32/AV-16 is always "warning"
 }
 ```
 
@@ -157,14 +158,14 @@ Returns a V-32 warning if:
 - `currentStatus` is not `implemented` (i.e. `accepted`, `draft`, `reviewing`)
 - `git log --since="<createdAt>" --oneline` contains commits whose message starts with `implement: ` and includes the RFC id
 
-For ADRs, the same logic applies with `ADR-XXXX` id matching and `status: implemented` as the target.
+For ADRs, the same logic applies with `ADR-XXXX` id matching and `status: implemented` as the target. The ADR statuses that trigger the warning are: `proposed`, `reviewing`, `accepted` (all non-terminal, non-`implemented` statuses). The check function is `checkAdrImplementationCommitDrift`, added to `validateSingleAdr` in `packages/forge/os/adr/handlers/validate.ts`.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/forge/os/rfc/handlers/validate-rules.ts` | V-32 check for RFCs — `checkImplementationCommitDrift` |
-| `packages/forge/os/adr/handlers/validate-rules.ts` | V-32 check for ADRs — same logic, ADR id matching |
+| `packages/forge/os/adr/handlers/validate.ts` | AV-16 check for ADRs — `checkAdrImplementationCommitDrift` added to `validateSingleAdr` |
 | `packages/forge/skills/fo/fo-idea-plan/SKILL.md` | Step 4 gains step 8: "Stamp implemented" |
 | `packages/forge/skills/fo/fo-idea-implement/SKILL.md` | Step 3.11b (RFC gate) and step 4.10b (ADR gate) |
 | `.agents/skills/fo/fo-idea-plan/SKILL.md` | Synced copy of the plan skill |
@@ -190,18 +191,36 @@ V-32 warning in `rfc.validate --json` output:
 }
 ```
 
-`status: "pass"` because V-32 is a warning, not an error. The RFC validation passes with warnings.
+AV-16 warning in `adr.validate --json` output:
+
+```json
+{
+  "command": "adr.validate",
+  "status": "pass",
+  "violations": [
+    {
+      "adrId": "ADR-0008",
+      "file": "docs/adrs/adr-0008-*.md",
+      "rule": "AV-16",
+      "message": "ADR-0008 has implement: commits in git history since 2026-07-15 but status is still 'accepted'. Set status: implemented and implementedAt to complete.",
+      "severity": "warning"
+    }
+  ]
+}
+```
+
+`status: "pass"` because V-32/AV-16 are warnings, not errors. Validation passes with warnings.
 
 ### Failure modes
 
-- **V-32 false positive during in-progress implementation:** expected and safe. An agent that has committed `implement: RFC-XXXX step N` commits but has not yet reached the stamp step will see V-32 warnings. These disappear once `rfc.implement.stamp` is run and the status transitions to `implemented`.
-- **V-32 false negative from squash merges:** if `implement:` commits are squashed into a single commit with a different message, V-32 will not detect them. This is acceptable — V-32 is a safety net, not a hard gate. The plan template and skill gates are the primary defense.
+- **V-32/AV-16 false positive during in-progress implementation:** expected and safe. An agent that has committed `implement: RFC-XXXX step N` commits but not yet reached the stamp step will see V-32/AV-16 warnings. These disappear once the status transitions to `implemented`.
+- **V-32/AV-16 false negative from squash merges:** if `implement:` commits are squashed into a single commit with a different message, V-32/AV-16 will not detect them. This is acceptable — V-32/AV-16 is a safety net, not a hard gate. The plan template and skill gates are the primary defense.
 - **Git history scan performance:** `git log --since="<createdAt>" --oneline` is fast (O(commits-since-date)). For repositories with thousands of commits since the RFC's creation date, this is still sub-second.
 - **Gate step 3.11b / 4.10b failure:** if the gate detects that `status` is not `implemented`, it instructs the agent to go back to step 3.8 (stamp) / 4.10 (ADR stamp) before proceeding to the report.
 
 ## Rollout
 
-1. Add V-32 to `validate-rules.ts` in the RFC module and ADR module.
+1. Add V-32 to `validate-rules.ts` in the RFC module and AV-16 to `validate.ts` in the ADR module.
 2. Add step 3.11b and 4.10b to `fo-idea-implement/SKILL.md` and sync to `.agents/skills/`.
 3. Add step 8 to `fo-idea-plan/SKILL.md` step 4 and sync to `.agents/skills/`.
 4. Add unit tests for V-32 (both RFC and ADR variants) covering: drift detected (warning emitted), no drift (clean), status already `implemented` (no warning), no `implement:` commits (no warning).
@@ -235,9 +254,9 @@ V-32 warning in `rfc.validate --json` output:
 ## Acceptance criteria
 
 - [ ] V-32 warning emitted by `rfc.validate` when an RFC with `status: accepted` has `implement: RFC-XXXX` commits in git history since `createdAt`
-- [ ] V-32 warning emitted by `adr.validate` when an ADR with non-`implemented` status has `implement: ADR-XXXX` commits in git history since `createdAt`
-- [ ] V-32 does not emit when RFC/ADR status is already `implemented`
-- [ ] V-32 does not emit when no `implement:` commits exist since `createdAt`
+- [ ] AV-16 warning emitted by `adr.validate` when an ADR with non-`implemented` status (`proposed`, `reviewing`, `accepted`) has `implement: ADR-XXXX` commits in git history since `createdAt`
+- [ ] V-32/AV-16 does not emit when RFC/ADR status is already `implemented`
+- [ ] V-32/AV-16 does not emit when no `implement:` commits exist since `createdAt`
 - [ ] `fo-idea-plan` step 4 includes step 8: "Stamp implemented" as a separate plan step
 - [ ] `fo-idea-implement` step 3.11b verifies RFC `status: implemented`, `implementedAt` set, and `rfc.validate` passing before step 3.12 (report)
 - [ ] `fo-idea-implement` step 4.10b verifies ADR `status: implemented`, `implementedAt` set, and `adr.validate` passing before step 4.11 (report)
@@ -248,12 +267,12 @@ V-32 warning in `rfc.validate --json` output:
 ## Implementation notes for agents
 
 - Agents MAY implement this RFC only after it is accepted.
-- Agents MUST add V-32 to both `rfc.validate` and `adr.validate` validation rules.
+- Agents MUST add V-32 to `rfc.validate` validation rules and AV-16 to `adr.validate` validation rules.
 - Agents MUST add step 3.11b and 4.10b to `fo-idea-implement/SKILL.md` and sync to `.agents/skills/`.
 - Agents MUST add step 8 to `fo-idea-plan/SKILL.md` step 4 and sync to `.agents/skills/`.
 - Agents MUST NOT make V-32 an error-level rule — it is a warning.
 - Agents MUST NOT change `rfc.implement.stamp` or its preconditions — this RFC extends detection, not the stamping mechanism.
 - Agents MUST NOT add ADR stamping infrastructure — ADRs remain manually transitioned per the existing process.
 - The V-32 git history scan MUST use `--since="<createdAt>"` to limit scope.
-- The `implement:` prefix match MUST be on the commit message subject line, not the body.
+- The `implement:` prefix match MUST be on the commit message subject line, not the body. The regex pattern is `^implement: (RFC|ADR)-\d{4}\b`.
 - If implementation reveals an invariant conflict, run `rfc.supersede.propose` instead of working around it.
