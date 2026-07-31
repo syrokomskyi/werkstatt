@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -34,6 +36,7 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-48
+  - DNA-49
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -186,8 +189,8 @@ const releaseStateSchema = z.enum([
 
 | Path | Role |
 | --- | --- |
-| `missions/{mission}/workpiece/dist/` | Built by `leitstand.dev-deploy` before deploy |
-| `missions/{mission}/workpiece/.env.dev` | Secrets file for dev channel (operator-created) |
+| `missions/{mission}/workpiece/dist/` | Built by `leitstand.dev-deploy` via `pnpm build` in workpiece directory before deploy |
+| `systems/registry.yaml` `dev.secretsFile` | Secrets reference for dev channel (resolved via `resolveSecretsFilePath`, same as current `leitstand.deploy`) |
 | `missions/{mission}/evidence/axiom/findings.yaml` | Written by Axiom run during `leitstand.dev-deploy` |
 | `missions/{mission}/evidence/axiom/evidence-capsule.yaml` | Updated with `commitSha` field |
 | `systems/registry.yaml` | Read for `currentMission`, `channels.dev` config |
@@ -221,6 +224,21 @@ const releaseStateSchema = z.enum([
 }
 ```
 
+### Build and deploy sequence
+
+`leitstand.dev-deploy` executes these steps in order:
+
+1. **Resolve workpiece** — read `currentMission` from `systems/registry.yaml`, resolve to `missions/{mission}/workpiece/`.
+2. **Build** — run `pnpm build` in the workpiece directory to produce `dist/`. If build fails, exit 1 with "build failed — no dist/ directory".
+3. **Capture commitSha** — read workpiece HEAD via `git rev-parse HEAD` in the workpiece directory. This SHA is used for evidence binding. If the workpiece has uncommitted changes, the HEAD SHA is still captured — but the operator must commit and re-deploy before creating a release, because `leitstand.propagate` checks `evidence.commitSha === release.commitSha` and the release is created from a clean workpiece (after `mission.close`).
+4. **Deploy** — call `adapter.propagate()` with the workpiece `dist/` path, `dev` channel config from registry.
+5. **Purge CDN cache** — same as existing leitstand commands (RFC-0624).
+6. **Run Axiom** — invoke `mission.check --external-preview --base-url <dev-url> --mission <missionId>`. `mission.check` writes `findings.yaml` and `evidence-capsule.yaml` to `missions/{mission}/evidence/axiom/`.
+7. **Post-process evidence capsule** — read `evidence-capsule.yaml`, add `commitSha` field with the workpiece HEAD SHA captured in step 3, write back. This keeps the change in `@warpgogol/site-kernel-handoff` — `mission.check` is NOT modified.
+8. **Return result** — include `commitSha`, build/deploy/axiom status in `DevDeployResult`.
+
+`leitstand.dev-deploy` does **not** write to `systems/registry.yaml` (`lastPropagated.dev` is not updated) and does **not** append to bordbuch — dev deploys are ephemeral and untracked in the registry.
+
 ### Failure modes
 
 | Scenario | Behavior |
@@ -238,16 +256,18 @@ const releaseStateSchema = z.enum([
 
 ## Rollout
 
-1. **Remove `leitstand.deploy`** from `leitstand.module.ts` and its handler from `leitstand-commands.ts`.
-2. **Add `leitstand.dev-deploy`** to `leitstand.module.ts` with `--system` flag, workspace scope.
+1. **Remove `leitstand.deploy`** from `leitstand.module.ts` and its handler `runLeitstandDeploy` from `leitstand-commands.ts`. This removes the registry `lastPropagated.dev` write and bordbuch append for dev deploys.
+2. **Add `leitstand.dev-deploy`** to `leitstand.module.ts` with `--system` flag, workspace scope. The handler `runLeitstandDevDeploy` must NOT write to `systems/registry.yaml` or bordbuch.
 3. **Update `releaseStateSchema`** in `packages/ontology/src/operations/release.ts`: remove `dev-deployed`.
-4. **Update `leitstand.propagate`** gate logic: accept `published` state, validate evidence by `missionId` + `commitSha` + `errors === 0`.
-5. **Update `leitstand.rollback`** auto-step chain: `promoted → alt-deployed → published`.
-6. **Update `evidence-capsule.yaml`** schema to include `commitSha` field.
-7. **Update `leitstand-0627-dev-channel.test.ts`**: replace `leitstand.deploy` tests with `leitstand.dev-deploy` tests; update `leitstand.propagate` tests for new gate logic.
-8. **Update DNA-48 and DNA-49** prose in `docs/architecture-dna.md` to reflect three-state machine and workpiece-based dev deploy.
+4. **Update `leitstand.propagate`** gate logic: accept `published` state, validate evidence by `missionId` match (from `evidence-capsule.yaml`) + `commitSha` match (from `evidence-capsule.yaml` vs release manifest) + `summary.errors === 0` (from `findings.yaml`). Remove the `recordedAt >= publishedAt` freshness check.
+5. **Update `leitstand.rollback`** auto-step chain: `promoted → alt-deployed → published`. Remove `dev-deployed` from `detectChannelFromState` and `autoStepReleaseState`.
+6. **Post-process evidence capsule** in `leitstand.dev-deploy`: after `mission.check` writes `evidence-capsule.yaml`, read it, add `commitSha` field with workpiece HEAD SHA, write back. `mission.check` itself is NOT modified.
+7. **Update `leitstand-0627-dev-channel.test.ts`**: replace `leitstand.deploy` tests with `leitstand.dev-deploy` tests; update `leitstand.propagate` tests for new gate logic (published state + commitSha match + errors === 0).
+8. **Update DNA-48 and DNA-49** prose in `docs/architecture-dna.md` to reflect three-state machine (remove `dev-deployed`) and workpiece-based dev deploy.
 9. **Update `leitstand.module.ts` description** for `leitstand.propagate` to reflect `published` state requirement.
-10. **Run `command.manifest.generate`** to refresh `docs/command-manifest.generated.yaml`.
+10. **Update `packages/os/site-kernel-handoff/AGENTS.md`** Leitstand section: replace `leitstand.deploy` with `leitstand.dev-deploy` (workpiece-based, `--system` flag, no registry/bordbuch writes); update state machine description (remove `dev-deployed`); update `leitstand.propagate` gate description (published + commitSha + errors === 0); update `leitstand.rollback` auto-step (remove `dev-deployed` step).
+11. **Check Compass XML sync**: verify whether `docs/verification-plan.xml` or `docs/development-plan.xml` reference the deployment chain or `dev-deployed` state. Update if needed.
+12. **Run `command.manifest.generate`** to refresh `docs/command-manifest.generated.yaml`.
 
 No migration path needed — no release has ever entered `dev-deployed` state in production. The `dev` channel in `systems/registry.yaml` remains unchanged.
 
@@ -287,6 +307,7 @@ No migration path needed — no release has ever entered `dev-deployed` state in
 - [ ] DNA-48 and DNA-49 prose in `docs/architecture-dna.md` updated to reflect three-state machine
 - [ ] Unit tests in `leitstand-0627-dev-channel.test.ts` updated for new command and gate logic
 - [ ] `command.manifest.generate` run to refresh `docs/command-manifest.generated.yaml`
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section updated for `leitstand.dev-deploy` and three-state machine
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
@@ -296,7 +317,9 @@ No migration path needed — no release has ever entered `dev-deployed` state in
 - Agents MUST NOT bypass the Axiom gate by editing `findings.yaml` directly, running `leitstand.propagate` with modified evidence, or adding a `--skip-axiom` flag.
 - Agents MUST NOT run `leitstand.propagate` on a release whose evidence `commitSha` does not match — the operator must re-run `leitstand.dev-deploy` after workpiece changes.
 - Agents MUST NOT manually set `commitSha` in `evidence-capsule.yaml` — it is written by `leitstand.dev-deploy` during the Axiom run.
-- Agents MUST NOT add registry tracking or bordbuch entries for dev deploys — dev is ephemeral by design.
+- Agents MUST NOT add registry tracking or bordbuch entries for dev deploys — dev is ephemeral by design. The `runLeitstandDevDeploy` handler must NOT call `writeRegistry`, `appendBordbuchEntry`, or update `lastPropagated.dev`.
+- Agents MUST NOT modify `mission.check` to add `commitSha` to the evidence capsule. The `commitSha` field is added by `leitstand.dev-deploy` as a post-processing step after `mission.check` writes the capsule.
+- If the workpiece has uncommitted changes, `leitstand.dev-deploy` still captures the HEAD SHA and deploys. However, the operator MUST commit and re-deploy before creating a release — `leitstand.propagate` will reject evidence whose `commitSha` does not match the release's `commitSha` (which is derived from a clean workpiece after `mission.close`).
 - If `mission.check` fails with exit code 4 (Playwright missing), agents MAY run `pnpm exec playwright install chromium` and retry `leitstand.dev-deploy`.
 - If Axiom finds errors, agents MUST report the errors to the operator and MUST NOT attempt to suppress or filter findings.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
