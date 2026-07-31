@@ -54,7 +54,12 @@ async function runWranglerDeployWithRetry(
 
   for (let attempt = 1; attempt < totalAttempts; attempt++) {
     if (result.exitCode === 0) return result;
-    if (!isTransientError(result.stderr)) return result;
+    if (!isTransientError(result.stderr)) {
+      console.error(`[cloudflare-workers] wrangler deploy failed (exit ${result.exitCode})`);
+      console.error(`[cloudflare-workers] stdout: ${result.stdout.slice(-500)}`);
+      console.error(`[cloudflare-workers] stderr: ${result.stderr.slice(-500)}`);
+      return result;
+    }
 
     const delayMs = delaysMs[attempt - 1] ?? delaysMs[delaysMs.length - 1];
     console.error(
@@ -63,6 +68,12 @@ async function runWranglerDeployWithRetry(
     console.error(`[cloudflare-workers] Retrying in ${delayMs / 1000}s...`);
     await new Promise((resolve) => setTimeout(resolve, delayMs));
     result = await runner("npx", args, opts);
+  }
+
+  if (result.exitCode !== 0) {
+    console.error(`[cloudflare-workers] wrangler deploy failed (exit ${result.exitCode})`);
+    console.error(`[cloudflare-workers] stdout: ${result.stdout.slice(-500)}`);
+    console.error(`[cloudflare-workers] stderr: ${result.stderr.slice(-500)}`);
   }
 
   return result;
