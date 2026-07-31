@@ -1,10 +1,11 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0608: tests for leitstand.propagate —channel rejection and alt-deployed state transition.</purpose>
-  <keywords>RFC-0608, leitstand, propagate, channel-removed, state-machine, test</keywords>
+  <purpose>RFC-0608/RFC-0627: tests for leitstand.propagate —channel rejection and alt-deployed state transition with Axiom gate.</purpose>
+  <keywords>RFC-0608, RFC-0627, leitstand, propagate, channel-removed, axiom-gate, state-machine, test</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0608: add tests for leitstand.propagate --channel rejection and alt-deployed state transition.</item>
+  <item>RFC-0627: update success test for dev-deployed + Axiom evidence gate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -93,6 +94,9 @@ systems:
     deployment:
       adapter: "null"
       channels:
+        dev:
+          workerName: test-dev
+          url: https://dev.example.com
         alt:
           workerName: test-alt
           url: https://alt.example.com
@@ -127,7 +131,7 @@ test("leitstand.propagate throws when --channel flag is passed", async () => {
   createRegistry(tmpDir, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
-    state: "published",
+    state: "dev-deployed",
     missionId: "test-sys-m000001",
   });
   createDistDir(tmpDir, releaseId);
@@ -140,17 +144,27 @@ test("leitstand.propagate throws when --channel flag is passed", async () => {
 test("leitstand.propagate transitions release to alt-deployed on success", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
+  const missionId = "test-sys-m000001";
   createRegistry(tmpDir, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
-    state: "published",
-    missionId: "test-sys-m000001",
+    state: "dev-deployed",
+    missionId,
     behaviorSnapshotHash: "abc123",
+    publishedAt: "2026-07-10T00:00:00.000Z",
   });
   const distDir = createDistDir(tmpDir, releaseId);
 
   // Create artifact store so preflight passes
   await storeArtifactCore(tmpDir, releaseId, distDir, systemId);
+
+  // Write Axiom evidence with zero errors
+  const evidenceDir = join(tmpDir, "missions", missionId, "evidence", "axiom");
+  mkdirSync(evidenceDir, { recursive: true });
+  writeFileSync(
+    join(evidenceDir, "findings.yaml"),
+    `schema: axiom-findings@1\ncapsuleRef: missions/${missionId}/evidence/axiom/evidence-capsule.yaml\nrecordedAt: 2026-07-15T12:00:00.000Z\nmethodology: web-accessibility\nfindings: []\nsummary:\n  totalFindings: 0\n  errors: 0\n  warnings: 0\n`,
+  );
 
   const result = await runLeitstandPropagate(
     makeInput({ release: releaseId }),

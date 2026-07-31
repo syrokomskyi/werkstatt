@@ -1,10 +1,11 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0608: tests for leitstand.rollback release state transitions — main→rolled-back, alt→published.</purpose>
-  <keywords>RFC-0608, leitstand, rollback, state-machine, test</keywords>
+  <purpose>RFC-0608/RFC-0627: tests for leitstand.rollback release state transitions — auto-detect channel, auto-step state.</purpose>
+  <keywords>RFC-0608, RFC-0627, leitstand, rollback, state-machine, test</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0608: add tests for leitstand.rollback release state transitions.</item>
+  <item>RFC-0627: update tests for auto-detect channel and auto-step state behavior.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -98,6 +99,9 @@ systems:
     deployment:
       adapter: "null"
       channels:
+        dev:
+          workerName: test-dev
+          url: https://dev.example.com
         alt:
           workerName: test-alt
           url: https://alt.example.com
@@ -134,7 +138,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("leitstand.rollback --channel main transitions release to rolled-back", async () => {
+test("leitstand.rollback auto-detects main from promoted, steps to alt-deployed", async () => {
   const systemId = "test-sys";
   const currentRelease = "test-sys-r000002";
   const targetRelease = "test-sys-r000001";
@@ -154,15 +158,16 @@ test("leitstand.rollback --channel main transitions release to rolled-back", asy
   await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
 
   const result = await runLeitstandRollback(
-    makeInput({ system: systemId, channel: "main", "to-release": targetRelease }),
+    makeInput({ system: systemId, "to-release": targetRelease }),
     makeContext(tmpDir),
   );
 
   expect(result.data!.state).toBe("succeeded");
-  expect(readReleaseState(tmpDir, currentRelease)).toBe("rolled-back");
+  expect(result.data!.channel).toBe("main");
+  expect(readReleaseState(tmpDir, currentRelease)).toBe("alt-deployed");
 });
 
-test("leitstand.rollback --channel alt transitions release to published", async () => {
+test("leitstand.rollback auto-detects alt from alt-deployed, steps to dev-deployed", async () => {
   const systemId = "test-sys";
   const currentRelease = "test-sys-r000002";
   const targetRelease = "test-sys-r000001";
@@ -182,10 +187,11 @@ test("leitstand.rollback --channel alt transitions release to published", async 
   await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
 
   const result = await runLeitstandRollback(
-    makeInput({ system: systemId, channel: "alt", "to-release": targetRelease }),
+    makeInput({ system: systemId, "to-release": targetRelease }),
     makeContext(tmpDir),
   );
 
   expect(result.data!.state).toBe("succeeded");
-  expect(readReleaseState(tmpDir, currentRelease)).toBe("published");
+  expect(result.data!.channel).toBe("alt");
+  expect(readReleaseState(tmpDir, currentRelease)).toBe("dev-deployed");
 });
