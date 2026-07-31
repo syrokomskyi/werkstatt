@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -156,6 +157,7 @@ No `--json` output changes. The log line changes from: `Fetching build identity 
 - [ ] `leitstand.promote` appends `?cb=<timestamp>` to the `build-identity.json` fetch URL
 - [ ] First `leitstand.promote` after a fresh `leitstand.propagate` succeeds without manual retry
 - [ ] Unit test: build-identity fetch URL includes cache-buster query param
+- [ ] Unit test: health check route probe URLs do NOT include cache-buster query param
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
