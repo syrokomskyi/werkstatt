@@ -10,6 +10,7 @@
   <item>RFC-0379: channel model — replace target/credentials with channel/workerName/url/secretsFilePath; add CommandRunner type.</item>
   <item>RFC-0585: add nodeModulesBinPath to PropagateInput/RollbackInput for wrangler resolution from dist/server/.</item>
   <item>RFC-0587: add DeploymentLimits interface and getLimits() method for adapter-declared size limits.</item>
+  <item>RFC-0627: extend channel type to include "dev" for the three-channel deployment chain.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,7 +25,7 @@ export type CommandRunner = (
 export interface PropagateInput {
   systemId: string;
   releaseId: string;
-  channel: "alt" | "main";
+  channel: "dev" | "alt" | "main";
   distPath: string;
   workerName: string;
   url: string;
@@ -36,7 +37,7 @@ export interface PropagateInput {
 export interface RollbackInput {
   systemId: string;
   toReleaseId: string;
-  channel: "alt" | "main";
+  channel: "dev" | "alt" | "main";
   distPath: string;
   workerName: string;
   url: string;
@@ -46,7 +47,7 @@ export interface RollbackInput {
 
 export interface HealthInput {
   systemId: string;
-  channel: "alt" | "main";
+  channel: "dev" | "alt" | "main";
   deploymentUrl: string;
   releaseId: string;
   expectedBehaviorSnapshotHash: string;

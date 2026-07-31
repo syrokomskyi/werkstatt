@@ -9,11 +9,13 @@
   <item>RFC-0358: initial leitstand module.</item>
   <item>RFC-0379: add --channel flag to all four commands; rollback requires --channel.</item>
   <item>RFC-0608: propagate always alt (removes --channel); add leitstand.promote for alt→main with build-identity verification; rollback transitions release state.</item>
+  <item>RFC-0627: add leitstand.deploy for dev channel with Axiom gate; rollback auto-detects channel and auto-steps release state; status/health support dev channel.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { KernelModule } from "@warpgogol/site-kernel";
 import {
+  runLeitstandDeploy,
   runLeitstandPropagate,
   runLeitstandPromote,
   runLeitstandStatus,
@@ -22,6 +24,8 @@ import {
 } from "./leitstand-commands.ts";
 
 export {
+  runLeitstandDeploy,
+  type LeitstandDeployData,
   runLeitstandPropagate,
   type LeitstandPropagateData,
   runLeitstandPromote,
@@ -47,13 +51,42 @@ export function createLeitstandModule(): KernelModule {
     version: "0.1.0",
     register(registry) {
       registry.registerCommand({
-        name: "leitstand.propagate",
-        description: "Deploy a published release to the alt channel (RFC-0608). Flags: --release.",
+        name: "leitstand.deploy",
+        description:
+          "Deploy a published release to the dev channel with Axiom verification gate (RFC-0627). Flags: --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
-          release: { kind: "string", required: true, description: "Published release id." },
+          release: {
+            kind: "string",
+            required: true,
+            description: "Published or dev-deployed release id.",
+          },
+        },
+        writes: [
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+          "releases/{release}/release.yaml",
+          "missions/{mission}/evidence/axiom/**",
+        ],
+        reads: ["releases/{release}/**", "systems/registry.yaml"],
+        cacheable: false,
+        execute: runLeitstandDeploy,
+      });
+      registry.registerCommand({
+        name: "leitstand.propagate",
+        description:
+          "Deploy a dev-deployed release with verified Axiom evidence to the alt channel (RFC-0627). Flags: --release.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          release: {
+            kind: "string",
+            required: true,
+            description: "Dev-deployed release id with verified Axiom evidence.",
+          },
         },
         writes: [
           "systems/registry.yaml",
@@ -86,29 +119,27 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.status",
         description:
-          "Print deployment state for both channels (RFC-0379). Flags: --system, [--channel alt|main].",
+          "Print deployment state for all channels (RFC-0627). Flags: --system, [--channel dev|alt|main].",
         scope: "workspace",
         supportsAllSites: false,
         flags: {
           system: { kind: "string", required: true, description: "Sternsystem id." },
-          channel: { kind: "string", description: "Filter to a single channel: alt or main." },
+          channel: {
+            kind: "string",
+            description: "Filter to a single channel: dev, alt, or main.",
+          },
         },
         execute: runLeitstandStatus,
       });
       registry.registerCommand({
         name: "leitstand.rollback",
         description:
-          "Rollback a channel to the previous published release (RFC-0379). Flags: --system, --channel alt|main, [--to-release].",
+          "Rollback to the previous published release; auto-detects channel from release state and auto-steps release state (RFC-0627). Flags: --system, [--to-release].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
           system: { kind: "string", required: true, description: "Sternsystem id." },
-          channel: {
-            kind: "string",
-            required: true,
-            description: "Deployment channel: alt or main.",
-          },
           "to-release": { kind: "string", description: "Explicit target release id." },
         },
         writes: [
@@ -121,12 +152,15 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.health",
         description:
-          "Run health checks against a deployed channel (RFC-0379). Flags: --system, [--channel alt|main].",
+          "Run health checks against a deployed channel (RFC-0379). Flags: --system, [--channel dev|alt|main].",
         scope: "workspace",
         supportsAllSites: false,
         flags: {
           system: { kind: "string", required: true, description: "Sternsystem id." },
-          channel: { kind: "string", description: "Deployment channel: alt (default) or main." },
+          channel: {
+            kind: "string",
+            description: "Deployment channel: dev, alt (default), or main.",
+          },
         },
         execute: runLeitstandHealth,
       });
