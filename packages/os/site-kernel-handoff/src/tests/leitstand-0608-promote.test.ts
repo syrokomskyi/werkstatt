@@ -138,6 +138,9 @@ systems:
     deployment:
       adapter: "null"
       channels:
+        dev:
+          workerName: test-dev
+          url: https://dev.example.com
         alt:
           workerName: test-alt
           url: https://alt.example.com
@@ -167,6 +170,9 @@ systems:
     deployment:
       adapter: "cloudflare-workers"
       channels:
+        dev:
+          workerName: test-dev
+          url: https://dev.example.com
         alt:
           workerName: test-alt
           url: https://alt.example.com
