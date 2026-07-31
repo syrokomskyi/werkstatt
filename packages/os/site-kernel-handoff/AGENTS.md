@@ -23,6 +23,7 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - `handoff.absorb` detects derived-file edits before materializing: if any manifest derived entry has a hash mismatch (edited after packing), it raises a decision record and refuses without `--force`. This check is in `derived-edits.ts` / `reportDerivedEdits`. Bundles currently pack only authored entries (no `derived` kind), so the path is wired but not exercised in the current pack format; it activates if future packs carry derived snapshot entries.
 - Keep every relative import in package source on the on-disk `.ts` extension, per RFC-0092.
 - **Non-fatal warnings use `logger.warn`, not `logger.info`.** When a catch block logs a non-fatal failure (e.g., baseline failure, push failure, derived-edit detection), use `logger.warn` to distinguish it from informational output. See `sternsystem-sync.ts`, `handoff-absorb.ts`, `mission-materialization-commands.ts` for existing examples.
+- **Do not call `logger.success()` with the same text as the `summary` field.** The kernel CLI runner automatically prints the `summary` from `KernelCommandResult` — a `logger.success()` call with the same message produces duplicate output. Use `logger.info()` for intermediate progress updates and let `summary` handle the final result line.
 
 ## Leitstand (RFC-0358 / RFC-0379 / RFC-0608 / RFC-0627 / RFC-0628)
 
