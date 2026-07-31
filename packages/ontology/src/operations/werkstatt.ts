@@ -27,6 +27,7 @@ export const werkstattLockSchema = z.object({
   startedAt: z.string().datetime(),
   heartbeatAt: z.string().datetime(),
   timeoutSeconds: z.number().positive(),
+  depth: z.number().int().positive().optional(),
 });
 
 export const werkstattOperationRecordSchema = z.object({
