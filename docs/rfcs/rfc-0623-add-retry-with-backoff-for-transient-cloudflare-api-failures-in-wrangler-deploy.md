@@ -202,14 +202,14 @@ The retry logic only applies to the `wrangler deploy` step. Health checks, build
 
 ## Acceptance criteria
 
-- [ ] `runWranglerDeployWithRetry` helper implemented in `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts`
-- [ ] `propagate` method refactored to use `runWranglerDeployWithRetry` instead of direct `runner` call
-- [ ] `rollback` method refactored to use `runWranglerDeployWithRetry` instead of direct `runner` call
-- [ ] Transient error pattern matching covers 502, 503, 504, 522, "Gateway Timeout", "malformed response"
-- [ ] Non-retryable errors fail immediately without retry (verified by unit test)
-- [ ] Retry attempts and delays logged to stderr
-- [ ] Unit tests verify: retry on transient error, no retry on auth error, success after retry
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `runWranglerDeployWithRetry` helper implemented in `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts` (evidence: packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:45-69)
+- [x] `propagate` method refactored to use `runWranglerDeployWithRetry` instead of direct `runner` call (evidence: packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:228-231)
+- [x] `rollback` method refactored to use `runWranglerDeployWithRetry` instead of direct `runner` call (evidence: packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:273-276)
+- [x] Transient error pattern matching covers 502, 503, 504, 522, "Gateway Timeout", "malformed response" (evidence: packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:31-39)
+- [x] Non-retryable errors fail immediately without retry (verified by unit test) (evidence: packages/os/site-kernel-handoff/src/tests/cloudflare-workers.test.ts:202-210,244-252)
+- [x] Retry attempts and delays logged to stderr (evidence: packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts:60-63)
+- [x] Unit tests verify: retry on transient error, no retry on auth error, success after retry (evidence: packages/os/site-kernel-handoff/src/tests/cloudflare-workers.test.ts:187-275, 6 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0623 --json, status: pass)
 
 ## Implementation notes for agents
 
