@@ -13,7 +13,7 @@
 */
 
 import { createServer, type Server } from "node:http";
-import { stat, readFile as fsReadFile, writeFile, mkdir } from "node:fs/promises";
+import { stat, readFile as fsReadFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, extname, normalize } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -414,6 +414,15 @@ export async function runMissionCheck(
     }
 
     logger.info(`  Discovered ${pages.length} page(s) from sitemap`);
+
+    // Clean stale evidence from previous runs before writing new files
+    if (existsSync(evidenceDir)) {
+      logger.info(`  Cleaning stale evidence in ${evidenceDir}`);
+      await rm(join(evidenceDir, "raw"), { recursive: true, force: true });
+      await rm(join(evidenceDir, "screenshots"), { recursive: true, force: true });
+      await rm(join(evidenceDir, "evidence-capsule.yaml"), { force: true });
+      await rm(join(evidenceDir, "findings.yaml"), { force: true });
+    }
 
     // Prepare evidence directories
     await mkdir(rawDir, { recursive: true });

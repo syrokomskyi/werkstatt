@@ -409,10 +409,14 @@ export async function runLeitstandDevDeploy(
   const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
 
   // Step 1: Build workpiece
+  const t0 = Date.now();
   logger.info(`[leitstand.dev-deploy] building workpiece at ${workpiecePath}...`);
   let buildState: "succeeded" | "failed" = "succeeded";
   try {
     execSync("pnpm build", { cwd: workpiecePath, stdio: "inherit", timeout: 600_000 });
+    logger.info(
+      `[leitstand.dev-deploy] build completed in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
+    );
   } catch (err) {
     buildState = "failed";
     logger.warn(
@@ -453,6 +457,7 @@ export async function runLeitstandDevDeploy(
   }
 
   // Step 2: Capture workpiece HEAD sha
+  const t1 = Date.now();
   let commitSha = "";
   try {
     commitSha = execSync("git rev-parse HEAD", {
@@ -463,9 +468,12 @@ export async function runLeitstandDevDeploy(
   } catch {
     logger.warn("[leitstand.dev-deploy] could not read workpiece HEAD sha");
   }
-  logger.info(`[leitstand.dev-deploy] workpiece HEAD: ${commitSha}`);
+  logger.info(
+    `[leitstand.dev-deploy] workpiece HEAD: ${commitSha} (${((Date.now() - t1) / 1000).toFixed(1)}s)`,
+  );
 
   // Step 3: Deploy to dev channel via adapter
+  const t2 = Date.now();
   const serverDistPath = path.join(distPath, "server");
   const effectiveDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
 
@@ -487,8 +495,12 @@ export async function runLeitstandDevDeploy(
     expectedBehaviorSnapshotHash: "",
     nodeModulesBinPath,
   });
+  logger.info(
+    `[leitstand.dev-deploy] deploy completed in ${((Date.now() - t2) / 1000).toFixed(1)}s (state: ${result.state})`,
+  );
 
   // Step 4: Purge CDN cache (RFC-0624)
+  const t3 = Date.now();
   const purgeResult = await runPurgeStep(
     workspaceRoot,
     `workpiece-${missionId}`,
@@ -496,11 +508,13 @@ export async function runLeitstandDevDeploy(
     secretsFilePath,
     logger,
   );
-  if (purgeResult.success) {
-    await sleep(6_000);
-  }
+  await sleep(6_000);
+  logger.info(
+    `[leitstand.dev-deploy] purge + sleep completed in ${((Date.now() - t3) / 1000).toFixed(1)}s`,
+  );
 
   // Step 5: Run Axiom verification gate via mission.check --external-preview
+  const t4 = Date.now();
   let axiomStatus: "pass" | "fail" | "not-run" = "not-run";
   let axiomErrors = 0;
   let axiomWarnings = 0;
@@ -527,7 +541,7 @@ export async function runLeitstandDevDeploy(
         }
       }
       logger.info(
-        `[leitstand.dev-deploy] Axiom gate: ${axiomStatus} (exit: ${axiomExitCode}, errors: ${axiomErrors}, warnings: ${axiomWarnings})`,
+        `[leitstand.dev-deploy] Axiom gate: ${axiomStatus} (exit: ${axiomExitCode}, errors: ${axiomErrors}, warnings: ${axiomWarnings}) — ${((Date.now() - t4) / 1000).toFixed(1)}s`,
       );
     } catch (err) {
       axiomStatus = "fail";
@@ -539,6 +553,7 @@ export async function runLeitstandDevDeploy(
   }
 
   // Step 6: Post-process evidence capsule with commitSha
+  const t5 = Date.now();
   if (result.state === "succeeded" && commitSha) {
     const evidenceDir = path.join(workspaceRoot, "missions", missionId, "evidence", "axiom");
     const capsulePath = path.join(evidenceDir, "evidence-capsule.yaml");
@@ -557,6 +572,11 @@ export async function runLeitstandDevDeploy(
       }
     }
   }
+
+  logger.info(
+    `[leitstand.dev-deploy] evidence post-process: ${((Date.now() - t5) / 1000).toFixed(1)}s`,
+  );
+  logger.info(`[leitstand.dev-deploy] total: ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 
   // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
   return {
