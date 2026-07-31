@@ -155,11 +155,11 @@ No `--json` output changes. The log line changes from: `Fetching build identity 
 
 ## Acceptance criteria
 
-- [ ] `leitstand.promote` appends `?cb=<timestamp>` to the `build-identity.json` fetch URL
-- [ ] First `leitstand.promote` after a fresh `leitstand.propagate` succeeds without manual retry
-- [ ] Unit test: build-identity fetch URL includes cache-buster query param
-- [ ] Unit test: health check route probe URLs do NOT include cache-buster query param
-- [ ] `rfc.validate` passes on this file
+- [x] `leitstand.promote` appends `?cb=<timestamp>` to the `build-identity.json` fetch URL (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:557)
+- [x] First `leitstand.promote` after a fresh `leitstand.propagate` succeeds without manual retry (evidence: leitstand-0608-promote.test.ts success path test passes with cache-buster URL, 419/419 tests green)
+- [x] Unit test: build-identity fetch URL includes cache-buster query param (evidence: leitstand-0608-promote.test.ts:343, test "RFC-0618: build-identity fetch URL includes cache-buster query param")
+- [x] Unit test: health check route probe URLs do NOT include cache-buster query param (evidence: cloudflare-workers.test.ts:129, test "RFC-0618: health check route probe URLs do NOT include cache-buster query param")
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0618 --json` — zero violations)
 
 ## Implementation notes for agents
 
