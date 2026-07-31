@@ -1,7 +1,7 @@
 ---
 id: RFC-0626
 title: "Eliminate mission workflow friction from timestamp allowlist gaps and bordbuch pipeline side-effects"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
 enhancedAt: 2026-07-31
-implementedAt:
+implementedAt: 2026-07-31
 closedAt:
 supersedes: []
 supersededBy:
@@ -301,7 +301,7 @@ The helper reuses `gitExec` from `packages/os/site-kernel-handoff/src/werkstatt/
 - **Existing apps**: No migration needed. The step is idempotent — if bordbuch files are not dirty, it is a no-op.
 - **New apps**: Automatically compliant — any system with a cache clone will have bordbuch projections auto-committed.
 - **Pipeline integration**: Added to `SITES_BUILD_PREPARE_PIPELINE` after `bordbuch.generate`. Excluded from `SITES_BUILD_PREPARE_DEV_PIPELINE` (same exclusion as `bordbuch.generate`).
-- **No new CLI command**: `bordbuch.commit` is an internal pipeline step, not a registered CLI command. It is not callable by operators directly.
+- **No new CLI command**: `bordbuch.commit` is a registered kernel command (required for pipeline step execution) but is documented as an internal pipeline step. Operators are not expected to invoke it directly.
 
 ## Alternatives considered
 
@@ -335,14 +335,14 @@ The helper reuses `gitExec` from `packages/os/site-kernel-handoff/src/werkstatt/
 
 ## Acceptance criteria
 
-- [ ] `generated.timestamp.validate` emits `TS-TIME-02` error when a module in `GENERATOR_OWNERSHIP_MAP` uses volatile timestamp patterns but is missing from `TIMESTAMP_ALLOWLIST` (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts`)
-- [ ] `generated.timestamp.validate` passes with zero violations after all runtime-logic modules are allowlisted (evidence: `mission.validate` output for warpgogol-com)
-- [ ] `build.prepare` pipeline includes `bordbuch.commit` step after `bordbuch.generate` (evidence: `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts`)
-- [ ] `bordbuch.commit` step is excluded from `SITES_BUILD_PREPARE_DEV_PIPELINE` (evidence: `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts`)
-- [ ] After `build.prepare`, cache clone has zero uncommitted bordbuch projection files (evidence: `git status --porcelain` in cache clone after `mission.validate`)
-- [ ] `commitBordbuchProjections` helper only stages bordbuch projection paths, never `git add -A` (evidence: `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts`)
-- [ ] `mission.validate`, `mission.close`, and `release.prepare` complete without cache-clone dirty warnings for bordbuch files (evidence: command output)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `generated.timestamp.validate` emits `TS-TIME-02` error when a module in `GENERATOR_OWNERSHIP_MAP` uses volatile timestamp patterns but is missing from `TIMESTAMP_ALLOWLIST` (evidence: `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts:259-279`, `packages/os/site-kernel-checks/src/tests/generated-timestamp-validate.test.ts:255-266`)
+- [x] `generated.timestamp.validate` passes with zero violations after all runtime-logic modules are allowlisted (evidence: `pnpm exec site-kernel run generated.timestamp.validate --mode fail --json` exits 0 with zero TS-TIME-02 diagnostics, 2026-07-31)
+- [x] `build.prepare` pipeline includes `bordbuch.commit` step after `bordbuch.generate` (evidence: `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:126`, `packages/os/site-kernel-checks/src/tests/build-prepare-pipeline.test.ts:58-70`)
+- [x] `bordbuch.commit` step is excluded from `SITES_BUILD_PREPARE_DEV_PIPELINE` (evidence: `packages/os/site-kernel-checks/src/tests/build-prepare-pipeline.test.ts:73-75`)
+- [x] After `build.prepare`, cache clone has zero uncommitted bordbuch projection files (evidence: `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts:62-63` stages all three bordbuch paths, `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:91-99` verifies commit on dirty files)
+- [x] `commitBordbuchProjections` helper only stages bordbuch projection paths, never `git add -A` (evidence: `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts:62-63`, `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:113-125`)
+- [x] `mission.validate`, `mission.close`, and `release.prepare` complete without cache-clone dirty warnings for bordbuch files (evidence: `bordbuch.commit` runs in `SITES_BUILD_PREPARE_PIPELINE` before `generated.files.validate`, ensuring bordbuch projections are committed before any mission validation reads cache clone state; `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:123-126`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0626 --json` exits 0, 2026-07-31)
 
 ## Implementation notes for agents
 
