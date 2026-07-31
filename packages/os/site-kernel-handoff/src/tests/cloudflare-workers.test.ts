@@ -4,6 +4,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0379: initial adapter tests with stubbed CommandRunner.</item>
+  <item>RFC-0623: add retry behavior tests (transient 5xx retry, auth error no-retry, success after retry, retries exhausted, rollback retry).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -170,4 +171,105 @@ test("RFC-0618: health check route probe URLs do NOT include cache-buster query 
 
   vi.unstubAllGlobals();
   await fs.rm(tmpDir, { recursive: true, force: true });
+});
+
+function statefulRunner(
+  results: Array<{ exitCode: number; stdout: string; stderr: string }>,
+): CommandRunner {
+  let callIndex = 0;
+  return vi.fn(async () => {
+    const result = results[Math.min(callIndex, results.length - 1)];
+    callIndex++;
+    return result;
+  }) as unknown as CommandRunner;
+}
+
+test("RFC-0623: propagate retries on transient 504 Gateway Timeout then succeeds", async () => {
+  vi.useFakeTimers();
+  const runner = statefulRunner([
+    { exitCode: 1, stdout: "", stderr: "Error: 504 Gateway Timeout" },
+    { exitCode: 0, stdout: "Deployed to https://alt.test.example.com", stderr: "" },
+  ]);
+  const adapter = createCloudflareWorkersAdapter(runner);
+  const promise = adapter.propagate(basePropagateInput);
+  await vi.advanceTimersByTimeAsync(30_000);
+  const result = await promise;
+  expect(result.state).toBe("succeeded");
+  expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(2);
+  vi.useRealTimers();
+});
+
+test("RFC-0623: propagate does NOT retry on authentication error", async () => {
+  const runner = statefulRunner([
+    { exitCode: 1, stdout: "", stderr: "Authentication error: invalid API token" },
+  ]);
+  const adapter = createCloudflareWorkersAdapter(runner);
+  const result = await adapter.propagate(basePropagateInput);
+  expect(result.state).toBe("failed");
+  expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(1);
+});
+
+test("RFC-0623: propagate succeeds after retry on 522 error", async () => {
+  vi.useFakeTimers();
+  const runner = statefulRunner([
+    { exitCode: 1, stdout: "", stderr: "Error: 522 Connection timed out" },
+    { exitCode: 0, stdout: "Deployed to https://alt.test.example.com", stderr: "" },
+  ]);
+  const adapter = createCloudflareWorkersAdapter(runner);
+  const promise = adapter.propagate(basePropagateInput);
+  await vi.advanceTimersByTimeAsync(30_000);
+  const result = await promise;
+  expect(result.state).toBe("succeeded");
+  expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(2);
+  vi.useRealTimers();
+});
+
+test("RFC-0623: propagate exhausts all retries on persistent 503 then fails", async () => {
+  vi.useFakeTimers();
+  const runner = statefulRunner([
+    { exitCode: 1, stdout: "", stderr: "Error: 503 Service Unavailable" },
+    { exitCode: 1, stdout: "", stderr: "Error: 503 Service Unavailable" },
+    { exitCode: 1, stdout: "", stderr: "Error: 503 Service Unavailable" },
+  ]);
+  const adapter = createCloudflareWorkersAdapter(runner);
+  const promise = adapter.propagate(basePropagateInput);
+  await vi.advanceTimersByTimeAsync(30_000);
+  await vi.advanceTimersByTimeAsync(60_000);
+  const result = await promise;
+  expect(result.state).toBe("failed");
+  expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(3);
+  vi.useRealTimers();
+});
+
+test("RFC-0623: propagate does NOT retry on syntax error", async () => {
+  const runner = statefulRunner([
+    { exitCode: 1, stdout: "", stderr: "SyntaxError: Unexpected token in wrangler.toml" },
+  ]);
+  const adapter = createCloudflareWorkersAdapter(runner);
+  const result = await adapter.propagate(basePropagateInput);
+  expect(result.state).toBe("failed");
+  expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(1);
+});
+
+test("RFC-0623: rollback retries on transient 502 error then succeeds", async () => {
+  vi.useFakeTimers();
+  const runner = statefulRunner([
+    { exitCode: 1, stdout: "", stderr: "Error: 502 Bad Gateway" },
+    { exitCode: 0, stdout: "Deployed to https://test.example.com", stderr: "" },
+  ]);
+  const adapter = createCloudflareWorkersAdapter(runner);
+  const promise = adapter.rollback({
+    systemId: "test-system",
+    toReleaseId: "test-system-r000002",
+    channel: "main",
+    distPath: "/tmp/dist",
+    workerName: "test-system",
+    url: "https://test.example.com",
+    secretsFilePath: undefined,
+  });
+  await vi.advanceTimersByTimeAsync(30_000);
+  const result = await promise;
+  expect(result.state).toBe("succeeded");
+  expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(2);
+  vi.useRealTimers();
 });
