@@ -130,6 +130,7 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - **Media cache warming:** `mission.materialize` copies `.cache/video/` and `.cache/video-live/` from the cache clone to the workpiece after data-path copy. `mission.close` copies them back from the workpiece to the cache clone as the final step. This avoids re-encoding unchanged video sources across missions.
 - **`mission.reconcile` does NOT write the state file or copy `.cache/`** — it only transfers commits via git merge. The state file reflects "last successful close", not "last reconcile".
 - **`--json` output:** `mission.materialize` gains `preflightSkipped`, `preflightSkipReason`, `pipelineUsed`, `mediaCacheWarmed`, and `mediaCacheSources` fields.
+- **Compass audit baseline (RFC-0617):** `mission.materialize` automatically runs `compass.audit.baseline --workpiece <path>` after codegen and git commit to seed the audit ledger for workpiece files. This prevents `compass.audit.validate --strict` (in `build.post`) from failing on unbaselined files during `release.prepare`. Baseline failures are non-fatal — a warning is logged but materialization succeeds.
 
 ## Validation gates (RFC-0593)
 
