@@ -13,6 +13,7 @@
 
 import type { CheckCommandEntry } from "./types.ts";
 import { runIndependentQa } from "../independent-qa.ts";
+import { runMissionCheck } from "../mission-check.ts";
 import { runGitattributesGenerate, runGitattributesValidate } from "../gitattributes.ts";
 import { runGeneratedEditGuard } from "../generated-edit-guard.ts";
 import {
@@ -312,5 +313,34 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     cacheable: false,
     execute: runCommandReadsValidate,
+  },
+  {
+    name: "mission.check",
+    description:
+      "RFC-0012: one-shot Axiom accessibility check for a mission. " +
+      "Builds workpiece, starts static server, captures evidence via Playwright + axe-core, " +
+      "runs runAccessibilityInstrument, writes findings.yaml + evidence-capsule.yaml, stops server. " +
+      "Exit codes: 0=pass, 1=violations, 2=server fail, 3=health check timeout, " +
+      "4=playwright missing, 5=axiom-study missing, 6=build failure, 7=sitemap missing.",
+    scope: "workspace",
+    supportsAllSites: false,
+    mutatesState: true,
+    cacheable: false,
+    flags: {
+      mission: { kind: "string", required: true, description: "Mission id." },
+      mode: { kind: "string", description: "preview (default) | dev. MVP: only preview." },
+      "external-preview": {
+        kind: "boolean",
+        description: "Skip server lifecycle, connect to an existing server via --base-url.",
+      },
+      "base-url": {
+        kind: "string",
+        description: "Base URL for external preview mode (required with --external-preview).",
+      },
+      json: { kind: "boolean", description: "Output JSON result." },
+    },
+    writes: ["missions/{mission}/evidence/axiom/**"],
+    reads: ["missions/{mission}/workpiece/**", "missions/{mission}/mission.yaml"],
+    execute: runMissionCheck,
   },
 ];

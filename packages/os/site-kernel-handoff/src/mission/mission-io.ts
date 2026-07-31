@@ -67,6 +67,10 @@ export async function createMissionDirectories(
   await fs.mkdir(path.join(missionDir, "evidence"), { recursive: true });
 }
 
+export function resolveMissionEvidenceDir(workspaceRoot: string, missionId: string): string {
+  return path.join(resolveMissionDir(workspaceRoot, missionId), "evidence", "axiom");
+}
+
 export async function listMissionDirs(workspaceRoot: string, systemId?: string): Promise<string[]> {
   const missionsPath = path.join(workspaceRoot, MISSIONS_DIR);
   if (!existsSync(missionsPath)) return [];

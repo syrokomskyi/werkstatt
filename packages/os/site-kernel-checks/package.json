@@ -83,6 +83,8 @@
     "@warpgogol/star-map": "workspace:*",
     "@warpgogol/surface": "workspace:*",
     "@warpgogol/tokens": "workspace:*",
+    "@syrokomskyi/axiom-study": "link:../../../../pipelines/packages/axiom/axiom-study",
+    "@syrokomskyi/axiom-capture": "link:../../../../pipelines/packages/axiom/axiom-capture",
     "ai": "^7.0.32",
     "file-type": "^22.0.1",
     "picomatch": "^4.0.5",
