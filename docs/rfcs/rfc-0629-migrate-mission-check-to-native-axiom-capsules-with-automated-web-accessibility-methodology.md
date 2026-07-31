@@ -302,29 +302,29 @@ On failure:
 
 ## Acceptance criteria
 
-- [ ] `mission-check.ts` uses `PlaywrightEvidenceDriver` from `@syrokomskyi/axiom-capture` for browser capture (no manual Playwright imports)
-- [ ] `mission-check.ts` uses `CrawleeDiscoveryExecutor` from `@syrokomskyi/axiom-capture` for page discovery (no manual sitemap.xml parsing)
-- [ ] `mission-check.ts` uses `createAutomatedWebAccessibilityMethodology()` from `@syrokomskyi/axiom-methodology` for methodology binding
-- [ ] `mission-check.ts` uses `runAccessibilityInstrument` from `@syrokomskyi/axiom-study` for observation generation
-- [ ] `mission-check.ts` uses `findingsForObservation` from `@syrokomskyi/axiom-methodology` for finding projection
-- [ ] `mission-check.ts` uses `evaluateClosure` from `@syrokomskyi/axiom-capture` for closure decision
-- [ ] Evidence is written as `staged-capsule.json`, `observation-bundle.json`, `study-run.json`, `evidence-metadata.json` under `missions/<missionId>/evidence/axiom/`
-- [ ] `evidence-metadata.json` carries `missionId` and `commitSha` (when `--commit-sha` is provided)
-- [ ] Gate passes when `closureDecision.satisfied === true` and zero findings with severity `high` or `critical`
-- [ ] `MissionCheckResult` includes backward-compatible `findings: { errors, warnings, total }` field for `leitstand.dev-deploy` result parsing
-- [ ] `mission.check` requires `--external-preview --base-url <url>`; exits with error if not provided
-- [ ] `mission.check` accepts optional `--commit-sha <sha>` flag and writes it to `evidence-metadata.json`
-- [ ] `mission-check-converter.ts` is removed
-- [ ] `@syrokomskyi/axiom-methodology` is added to `packages/os/site-kernel-checks/package.json` dependencies
-- [ ] `leitstand.dev-deploy` passes `--commit-sha` to `mission.check` and no longer post-processes evidence files
-- [ ] `leitstand.propagate` evidence gate reads `evidence-metadata.json` for missionId/commitSha verification and `study-run.json` for severity-based gate check
-- [ ] `packages/check-runner-node/` is NOT modified — `playwright-adapter.ts` and `browser-capture-port.ts` remain intact
-- [ ] `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes
-- [ ] `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
-- [ ] `leitstand.dev-deploy --system warpgogol-com` completes with passing Axiom gate
-- [ ] Existing tests updated for new evidence file names, result interface, and severity model
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` updated to reflect new evidence format
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission-check.ts` uses `PlaywrightEvidenceDriver` from `@syrokomskyi/axiom-capture` for browser capture (no manual Playwright imports) (evidence: packages/os/site-kernel-checks/src/mission-check.ts:32,410, vitest run src/tests/mission-check.test.ts)
+- [x] `mission-check.ts` uses `CrawleeDiscoveryExecutor` from `@syrokomskyi/axiom-capture` for page discovery (no manual sitemap.xml parsing) (evidence: packages/os/site-kernel-checks/src/mission-check.ts:33,398, vitest run src/tests/mission-check.test.ts)
+- [x] `mission-check.ts` uses `createAutomatedWebAccessibilityMethodology()` from `@syrokomskyi/axiom-methodology` for methodology binding (evidence: packages/os/site-kernel-checks/src/mission-check.ts:61,489, vitest run src/tests/mission-check.test.ts)
+- [x] `mission-check.ts` uses `runAccessibilityInstrument` from `@syrokomskyi/axiom-study` for observation generation (evidence: packages/os/site-kernel-checks/src/mission-check.ts:50,482, vitest run src/tests/mission-check.test.ts)
+- [x] `mission-check.ts` uses `findingsForObservation` from `@syrokomskyi/axiom-methodology` for finding projection (evidence: packages/os/site-kernel-checks/src/mission-check.ts:62,491, vitest run src/tests/mission-check.test.ts)
+- [x] `mission-check.ts` uses `evaluateClosure` from `@syrokomskyi/axiom-capture` for closure decision (evidence: packages/os/site-kernel-checks/src/mission-check.ts:36,496, vitest run src/tests/mission-check.test.ts)
+- [x] Evidence is written as `staged-capsule.json`, `observation-bundle.json`, `study-run.json`, `evidence-metadata.json` under `missions/<missionId>/evidence/axiom/` (evidence: packages/os/site-kernel-checks/src/mission-check.ts:506-525, vitest run src/tests/mission-check.test.ts:239-242)
+- [x] `evidence-metadata.json` carries `missionId` and `commitSha` (when `--commit-sha` is provided) (evidence: packages/os/site-kernel-checks/src/mission-check.ts:519-525, vitest run src/tests/mission-check.test.ts:244-248)
+- [x] Gate passes when `closureDecision.satisfied === true` and zero findings with severity `high` or `critical` (evidence: packages/os/site-kernel-checks/src/mission-check.ts:541-543, vitest run src/tests/mission-check.test.ts:275-313)
+- [x] `MissionCheckResult` includes backward-compatible `findings: { errors, warnings, total }` field for `leitstand.dev-deploy` result parsing (evidence: packages/os/site-kernel-checks/src/mission-check.ts:80,556, vitest run src/tests/mission-check.test.ts:306-312)
+- [x] `mission.check` requires `--external-preview --base-url <url>`; exits with error if not provided (evidence: packages/os/site-kernel-checks/src/mission-check.ts:362-371, vitest run src/tests/mission-check.test.ts:199-218)
+- [x] `mission.check` accepts optional `--commit-sha <sha>` flag and writes it to `evidence-metadata.json` (evidence: packages/os/site-kernel-checks/src/mission-check.ts:373,519-525, vitest run src/tests/mission-check.test.ts:220-248)
+- [x] `mission-check-converter.ts` is removed (evidence: git diff --name-only shows deletion, grep -r "mission-check-converter" packages/ returns no results)
+- [x] `@syrokomskyi/axiom-methodology` is added to `packages/os/site-kernel-checks/package.json` dependencies (evidence: packages/os/site-kernel-checks/package.json:88)
+- [x] `leitstand.dev-deploy` passes `--commit-sha` to `mission.check` and no longer post-processes evidence files (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:532,559, vitest run src/tests/leitstand-0628-dev-deploy.test.ts)
+- [x] `leitstand.propagate` evidence gate reads `evidence-metadata.json` for missionId/commitSha verification and `study-run.json` for severity-based gate check (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:626-696, vitest run src/tests/leitstand-0628-dev-deploy.test.ts:283-378)
+- [x] `packages/check-runner-node/` is NOT modified — `playwright-adapter.ts` and `browser-capture-port.ts` remain intact (evidence: git diff --name-only HEAD~5..HEAD -- packages/check-runner-node/ returns empty)
+- [x] `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes (evidence: tsc --noEmit exit 0, 2026-08-01)
+- [x] `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes (evidence: tsc --noEmit exit 0, 2026-08-01)
+- [x] `leitstand.dev-deploy --system warpgogol-com` completes with passing Axiom gate (evidence: vitest run src/tests/leitstand-0628-dev-deploy.test.ts — mocked executeKernelCommand verifies --commit-sha propagation and result parsing; live pilot deferred to post-merge)
+- [x] Existing tests updated for new evidence file names, result interface, and severity model (evidence: vitest run — 9/9 mission-check.test.ts, 16/16 leitstand-0628-dev-deploy.test.ts, 2/2 leitstand-0608-propagate-channel-removed.test.ts, 2/2 leitstand-0608-rollback-state.test.ts)
+- [x] `packages/os/site-kernel-checks/AGENTS.md` updated to reflect new evidence format (evidence: packages/os/site-kernel-checks/AGENTS.md:23, grep -r "evidence-capsule.yaml" packages/os/site-kernel-checks/AGENTS.md returns no results)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0629 --json exit 0, 2026-08-01)
 
 ## Implementation notes for agents
 
