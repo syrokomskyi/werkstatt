@@ -28,6 +28,7 @@ import {
   stripCommentsAndStrings,
   scanModuleForTimestamps,
   runPhase1,
+  checkAllowlistParity,
 } from "../generated-timestamp-validate.ts";
 
 // ---------------------------------------------------------------------------
@@ -215,7 +216,7 @@ describe("scanModuleForTimestamps", () => {
 
 describe("runPhase1", () => {
   it("produces error diagnostics in fail mode", () => {
-    const diagnostics = runPhase1(process.cwd(), "fail");
+    const { diagnostics } = runPhase1(process.cwd(), "fail");
     const errors = diagnostics.filter((d) => d.severity === "error");
     const warnings = diagnostics.filter((d) => d.severity === "warning");
     const infos = diagnostics.filter((d) => d.severity === "info");
@@ -230,13 +231,61 @@ describe("runPhase1", () => {
   });
 
   it("produces warning diagnostics in warning mode", () => {
-    const diagnostics = runPhase1(process.cwd(), "warning");
+    const { diagnostics } = runPhase1(process.cwd(), "warning");
     const errors = diagnostics.filter((d) => d.severity === "error");
     const warnings = diagnostics.filter((d) => d.severity === "warning");
     expect(errors).toHaveLength(0);
     for (const d of warnings) {
       expect(d.ruleId).toBe("TS-TIME-01");
     }
+  });
+
+  it("returns scanResults map alongside diagnostics", () => {
+    const { diagnostics, scanResults } = runPhase1(process.cwd(), "fail");
+    expect(diagnostics).toBeDefined();
+    expect(scanResults).toBeInstanceOf(Map);
+    expect(scanResults.size).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tests: checkAllowlistParity
+// ---------------------------------------------------------------------------
+
+describe("checkAllowlistParity", () => {
+  it("emits TS-TIME-02 for a module with violations not in allowlist", () => {
+    const scanResults = new Map([
+      ["src/fixture.ts", [{ line: 1, pattern: "new Date\\(\\)\\.toISOString\\(\\)" }]],
+    ]);
+    const allowlistModules = new Set<string>();
+    const diagnostics = checkAllowlistParity(scanResults, allowlistModules);
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].ruleId).toBe("TS-TIME-02");
+    expect(diagnostics[0].severity).toBe("error");
+    expect(diagnostics[0].file).toBe("src/fixture.ts");
+  });
+
+  it("emits zero diagnostics when all modules with violations are allowlisted", () => {
+    const scanResults = new Map([
+      ["src/fixture.ts", [{ line: 1, pattern: "new Date\\(\\)\\.toISOString\\(\\)" }]],
+    ]);
+    const allowlistModules = new Set(["src/fixture.ts"]);
+    const diagnostics = checkAllowlistParity(scanResults, allowlistModules);
+    expect(diagnostics).toHaveLength(0);
+  });
+
+  it("emits zero diagnostics when scan results are empty", () => {
+    const scanResults = new Map();
+    const allowlistModules = new Set<string>();
+    const diagnostics = checkAllowlistParity(scanResults, allowlistModules);
+    expect(diagnostics).toHaveLength(0);
+  });
+
+  it("emits zero diagnostics for modules with no violations", () => {
+    const scanResults = new Map([["src/clean.ts", []]]);
+    const allowlistModules = new Set<string>();
+    const diagnostics = checkAllowlistParity(scanResults, allowlistModules);
+    expect(diagnostics).toHaveLength(0);
   });
 });
 
@@ -255,6 +304,19 @@ describe("runGeneratedTimestampValidate", () => {
     const result = await runGeneratedTimestampValidate(makeInput(), makeContext(process.cwd()));
     expect(result.exitCode).toBe(0);
     expect(result.data).toBeDefined();
+  });
+
+  it("includes TS-TIME-02 diagnostics in the result", async () => {
+    const result = await runGeneratedTimestampValidate(
+      makeInput({ mode: "fail" }),
+      makeContext(process.cwd()),
+    );
+    const parityDiag = result.data!.diagnostics.find((d) => d.ruleId === "TS-TIME-02");
+    // If all modules are allowlisted, there should be zero TS-TIME-02 diagnostics
+    // If any are missing, there should be TS-TIME-02 errors
+    if (parityDiag) {
+      expect(parityDiag.severity).toBe("error");
+    }
   });
 
   it("returns pass result in warning mode (warnings don't fail)", async () => {

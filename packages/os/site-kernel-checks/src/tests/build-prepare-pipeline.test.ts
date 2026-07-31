@@ -1,13 +1,14 @@
 /*
 <MODULE_CONTRACT>
   <purpose>
-    RFC-0604: tests for build-prepare pipeline membership — verifies bordbuch.generate
-    and passport.key.ensure are in the main pipeline before generated.files.validate
+    RFC-0604/RFC-0626: tests for build-prepare pipeline membership — verifies bordbuch.generate,
+    bordbuch.commit, and passport.key.ensure are in the main pipeline before generated.files.validate
     and absent from the dev-mode pipeline.
   </purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0604: initial pipeline membership tests.</item>
+  <item>RFC-0626: add bordbuch.commit pipeline membership tests.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -50,4 +51,25 @@ test("bordbuch.generate is NOT in SITES_BUILD_PREPARE_DEV_PIPELINE", () => {
 
 test("passport.key.ensure is NOT in SITES_BUILD_PREPARE_DEV_PIPELINE", () => {
   expect(devCommands).not.toContain("passport.key.ensure");
+});
+
+// RFC-0626: bordbuch.commit pipeline membership tests
+
+test("bordbuch.commit is in SITES_BUILD_PREPARE_PIPELINE", () => {
+  expect(mainCommands).toContain("bordbuch.commit");
+});
+
+test("bordbuch.commit appears after bordbuch.generate and before passport.key.ensure", () => {
+  const generateIdx = mainCommands.indexOf("bordbuch.generate");
+  const commitIdx = mainCommands.indexOf("bordbuch.commit");
+  const passportIdx = mainCommands.indexOf("passport.key.ensure");
+  expect(generateIdx).toBeGreaterThan(-1);
+  expect(commitIdx).toBeGreaterThan(-1);
+  expect(passportIdx).toBeGreaterThan(-1);
+  expect(commitIdx).toBeGreaterThan(generateIdx);
+  expect(commitIdx).toBeLessThan(passportIdx);
+});
+
+test("bordbuch.commit is NOT in SITES_BUILD_PREPARE_DEV_PIPELINE", () => {
+  expect(devCommands).not.toContain("bordbuch.commit");
 });
