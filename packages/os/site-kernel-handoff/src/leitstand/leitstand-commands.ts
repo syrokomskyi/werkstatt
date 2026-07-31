@@ -11,6 +11,7 @@
   <item>RFC-0379 post-review: complete preflight (artifact hash, wrangler availability, dist size limit); add artifact-store rehydration for propagate and rollback.</item>
   <item>RFC-0587: adapter-declared size limits via getLimits() passed through runPreflight to checkDistSize; remove hardcoded limit constants.</item>
   <item>RFC-0608: leitstand.propagate always deploys to alt (removes --channel); adds leitstand.promote for alt→main with build-identity verification; rollback transitions release state.</item>
+  <item>RFC-0624: add post-deploy CDN cache purge step to propagate, promote, and rollback; record purgeResult in lastPropagated; display in status.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ import type {
   DeploymentConfig,
   DeploymentChannel,
   LastPropagatedChannel,
+  PurgeResult,
 } from "@warpgogol/ontology/operations";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
@@ -41,7 +43,13 @@ import type {
   RollbackInput,
   HealthInput,
 } from "./adapter.ts";
-import { createCloudflareWorkersAdapter } from "./adapters/index.ts";
+import {
+  createCloudflareWorkersAdapter,
+  readBehaviorSnapshot,
+  sourceDotenv,
+  filterEnv,
+} from "./adapters/index.ts";
+import { collectPurgeUrls, purgeCacheByUrls, skippedPurgeResult } from "./cache-purge.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -114,6 +122,54 @@ async function resolveSecretsFilePath(
   const envValue = process.env[match[1]];
   if (!envValue) return undefined;
   return envValue;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// RFC-0624: Post-deploy CDN cache purge step. Non-blocking on failure.
+async function runPurgeStep(
+  workspaceRoot: string,
+  releaseId: string,
+  deploymentUrl: string,
+  secretsFilePath: string | undefined,
+  logger: { info: (m: string) => void; success: (m: string) => void; warn: (m: string) => void },
+): Promise<PurgeResult> {
+  const secretsEnv = secretsFilePath ? await sourceDotenv(secretsFilePath) : {};
+  const env = { ...filterEnv(process.env), ...secretsEnv };
+
+  const zoneId = env["CLOUDFLARE_ZONE_ID"];
+  const apiToken = env["CLOUDFLARE_API_TOKEN"];
+
+  if (!zoneId) {
+    logger.warn("[leitstand] CLOUDFLARE_ZONE_ID not set — skipping CDN cache purge");
+    return skippedPurgeResult("CLOUDFLARE_ZONE_ID not set");
+  }
+  if (!apiToken) {
+    logger.warn("[leitstand] CLOUDFLARE_API_TOKEN not set — skipping CDN cache purge");
+    return skippedPurgeResult("CLOUDFLARE_API_TOKEN not set");
+  }
+
+  const snapshot = await readBehaviorSnapshot(workspaceRoot, releaseId);
+  const routes = snapshot?.routes ?? [];
+  const urls = collectPurgeUrls(deploymentUrl, routes);
+
+  logger.info(`[leitstand] Purging CDN cache for ${urls.length} URLs on zone ${zoneId}...`);
+
+  try {
+    const result = await purgeCacheByUrls(zoneId, apiToken, urls);
+    if (result.success) {
+      logger.success(`[leitstand] CDN cache purged (${result.purgedUrls} URLs)`);
+    } else {
+      logger.warn(`[leitstand] CDN cache purge failed: ${result.error}`);
+    }
+    return result;
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    logger.warn(`[leitstand] CDN cache purge error: ${error}`);
+    return { success: false, purgedUrls: 0, error };
+  }
 }
 
 interface PreflightCheck {
@@ -286,6 +342,7 @@ function buildLastPropagatedEntry(
   state: LastPropagatedChannel["state"],
   healthy: boolean,
   operationId: string,
+  purgeResult?: PurgeResult,
 ): LastPropagatedChannel {
   return {
     releaseId,
@@ -294,6 +351,7 @@ function buildLastPropagatedEntry(
     state,
     operationId,
     leaseExpiresAt: null,
+    purgeResult,
   };
 }
 
@@ -307,6 +365,7 @@ export interface LeitstandPropagateData {
   startedAt: string;
   completedAt: string | null;
   preflight: { passed: boolean; checks: PreflightCheck[] };
+  purgeResult?: PurgeResult;
   health: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] };
   releaseState: "alt-deployed";
 }
@@ -425,6 +484,18 @@ export async function runLeitstandPropagate(
       nodeModulesBinPath,
     });
 
+    // RFC-0624: Purge CDN cache after deploy, before health check
+    const purgeResult = await runPurgeStep(
+      workspaceRoot,
+      releaseId,
+      channelConfig.url,
+      secretsFilePath,
+      logger,
+    );
+    if (purgeResult.success) {
+      await sleep(6_000);
+    }
+
     // Run health verification after deploy
     const healthResult = await adapter.health({
       systemId,
@@ -446,6 +517,7 @@ export async function runLeitstandPropagate(
       result.state === "succeeded" ? "succeeded" : "failed",
       healthy,
       operationId,
+      purgeResult,
     );
     entry.deployment = dep;
     await writeRegistry(workspaceRoot, registry);
@@ -489,6 +561,7 @@ export async function runLeitstandPropagate(
         startedAt: result.startedAt,
         completedAt: result.completedAt,
         preflight: { passed: preflightPassed, checks: preflightChecks },
+        purgeResult,
         health: { state: healthResult.state, checks: healthResult.checks },
         releaseState: "alt-deployed",
       },
@@ -507,6 +580,7 @@ export interface LeitstandPromoteData {
   state: "succeeded" | "failed";
   deploymentUrl: string;
   buildIdentityVerified: boolean;
+  purgeResult?: PurgeResult;
   healthState: "healthy" | "unhealthy" | "unknown";
   releaseState: "promoted";
 }
@@ -651,6 +725,18 @@ export async function runLeitstandPromote(
       nodeModulesBinPath,
     });
 
+    // RFC-0624: Purge CDN cache after main deploy, before main health check (not before alt health check)
+    const purgeResult = await runPurgeStep(
+      workspaceRoot,
+      releaseId,
+      mainConfig.url,
+      secretsFilePath,
+      logger,
+    );
+    if (purgeResult.success) {
+      await sleep(6_000);
+    }
+
     // 5. Run health check on main
     const mainHealthResult = await adapter.health({
       systemId,
@@ -670,6 +756,7 @@ export async function runLeitstandPromote(
       result.state === "succeeded" ? "succeeded" : "failed",
       result.state === "succeeded" && mainHealthResult.state === "healthy",
       operationId,
+      purgeResult,
     );
     entry.deployment = dep;
     await writeRegistry(workspaceRoot, registry);
@@ -713,6 +800,7 @@ export async function runLeitstandPromote(
         state: result.state as "succeeded" | "failed",
         deploymentUrl: result.deploymentUrl,
         buildIdentityVerified: true,
+        purgeResult,
         healthState: mainHealthResult.state,
         releaseState: "promoted",
       },
@@ -727,8 +815,20 @@ export async function runLeitstandPromote(
 export interface LeitstandStatusData {
   systemId: string;
   channels: {
-    alt?: { releaseId: string; state: string; healthy: boolean; at: string } | null;
-    main?: { releaseId: string; state: string; healthy: boolean; at: string } | null;
+    alt?: {
+      releaseId: string;
+      state: string;
+      healthy: boolean;
+      at: string;
+      purgeResult?: PurgeResult;
+    } | null;
+    main?: {
+      releaseId: string;
+      state: string;
+      healthy: boolean;
+      at: string;
+      purgeResult?: PurgeResult;
+    } | null;
   };
 }
 
@@ -754,7 +854,13 @@ export async function runLeitstandStatus(
   function channelStatus(c: Channel) {
     const e = lp?.[c];
     if (!e) return null;
-    return { releaseId: e.releaseId, state: e.state, healthy: e.healthy, at: e.at };
+    return {
+      releaseId: e.releaseId,
+      state: e.state,
+      healthy: e.healthy,
+      at: e.at,
+      purgeResult: e.purgeResult,
+    };
   }
 
   const data: LeitstandStatusData = {
@@ -767,10 +873,10 @@ export async function runLeitstandStatus(
 
   if (!channelFilter) {
     logger.info(
-      `  alt:  ${data.channels.alt?.releaseId ?? "none"} (${data.channels.alt?.state ?? "none"})`,
+      `  alt:  ${data.channels.alt?.releaseId ?? "none"} (${data.channels.alt?.state ?? "none"})${data.channels.alt?.purgeResult ? ` purge: ${data.channels.alt.purgeResult.success ? "ok" : "failed"}` : ""}`,
     );
     logger.info(
-      `  main: ${data.channels.main?.releaseId ?? "none"} (${data.channels.main?.state ?? "none"})`,
+      `  main: ${data.channels.main?.releaseId ?? "none"} (${data.channels.main?.state ?? "none"})${data.channels.main?.purgeResult ? ` purge: ${data.channels.main.purgeResult.success ? "ok" : "failed"}` : ""}`,
     );
   } else {
     const ch = channelFilter as Channel;
@@ -792,6 +898,7 @@ export interface LeitstandRollbackData {
   rolledBackTo: string;
   state: "succeeded" | "failed";
   deploymentUrl: string;
+  purgeResult?: PurgeResult;
 }
 
 export async function runLeitstandRollback(
@@ -890,6 +997,18 @@ export async function runLeitstandRollback(
       secretsFilePath,
     });
 
+    // RFC-0624: Purge CDN cache after rollback (no health check follows, no 6s delay)
+    const purgeResult = await runPurgeStep(
+      workspaceRoot,
+      targetRelease,
+      channelConfig.url,
+      secretsFilePath,
+      logger,
+    );
+    if (purgeResult.success) {
+      logger.success("[leitstand] Visitors will see rolled-back content");
+    }
+
     // Update registry — per-channel lastPropagated
     if (!dep.lastPropagated) {
       dep.lastPropagated = {};
@@ -899,6 +1018,7 @@ export async function runLeitstandRollback(
       result.state === "succeeded" ? "succeeded" : "failed",
       result.state === "succeeded",
       operationId,
+      purgeResult,
     );
     entry.deployment = dep;
     await writeRegistry(workspaceRoot, registry);
@@ -951,6 +1071,7 @@ export async function runLeitstandRollback(
         rolledBackTo: targetRelease,
         state: result.state as "succeeded" | "failed",
         deploymentUrl: result.deploymentUrl,
+        purgeResult,
       },
       summary: `[leitstand.rollback] ${systemId} ${channel}: rolled back to ${targetRelease}`,
     };
