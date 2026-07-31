@@ -19,6 +19,7 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 - Prefer plain TypeScript and framework-neutral design in core packages.
 - Framework adapters should stay thin and depend on the framework-free core, not the other way around.
 - Shared UI assets that are reused by multiple apps belong in `packages/ui`, not in app-local folders.
+- **Node-only modules (`node:fs/promises`, `node:path`, etc.) MUST NOT be re-exported from shared barrel files** (`index.ts`) that are imported by client-side code. Vite dev mode does not tree-shake barrel exports — the entire barrel is loaded, pulling Node-only modules into the client bundle and causing "Module node:fs/promises has been externalized for browser compatibility" errors. Use a dedicated subpath export (e.g. `@warpgogol/ontology/schemas/manifest-resolver`) for modules that import Node-only APIs. Node-side consumers import from the subpath; client-side consumers import pure schemas from the main barrel.
 
 ## Generated file writes
 

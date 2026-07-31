@@ -151,6 +151,10 @@ When adding a new pipeline constant to `src/pipelines/`, register it in **three*
 
 Missing (2) or (3) leaves the pipeline invisible to `pipeline.timing.report` and the Agent Control Plane manifest, causing drift between the kernel config and the ecosystem manifest.
 
+## Dev pipeline inclusion rule
+
+Generators that produce files read **synchronously** by client-side code via `import.meta.glob` (e.g. `video-manifest.generated.yaml`, `image-variants.generated.yaml`) MUST be included in `SITES_BUILD_PREPARE_DEV_PIPELINE`, not only in the full build pipeline. Without the generated manifest, components that call `loadGeneratedManifest()` receive `null` and render nothing in dev mode — the failure is silent (no error, just missing content). Generators that produce files only consumed at build time (sitemap, preview images, llms, feed) may remain excluded from the dev pipeline.
+
 ## Architecture reference
 
 → `packages/os/site-kernel/AGENTS.md` — kernel architecture table  
