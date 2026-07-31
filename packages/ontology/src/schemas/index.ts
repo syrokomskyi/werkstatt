@@ -72,7 +72,11 @@ export type { GrowthVendor } from "./system.ts";
 
 export { PageEntrySchema, BlockEntrySchema } from "./page-entry.ts";
 export type { PageEntry, BlockEntry } from "./page-entry.ts";
-export { getSectionPropsSchema } from "./manifest-resolver.ts";
+// getSectionPropsSchema is NOT re-exported here — it lives in manifest-resolver.ts
+// which imports node:fs/promises. Re-exporting it from this barrel pulls Node-only
+// modules into the Vite client bundle (growth/config.ts imports growthVendorSchema
+// from this barrel). Node-side consumers import from
+// @warpgogol/ontology/schemas/manifest-resolver directly.
 
 // RFC-0288: Agent Surface closed capability catalog record.
 export { capabilityInputOutputSchema, capabilityRecordSchema } from "./capability.ts";

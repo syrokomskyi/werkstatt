@@ -10,7 +10,8 @@ This package is the **single source of truth for all structural vocabulary** —
 | `@warpgogol/ontology/enums` | `src/enums.ts` | `Layer`, `ComponentRole`, `Industry` — closed enums + Zod schemas. `SemanticRole` is an open type alias (RFC-0084). |
 | `@warpgogol/ontology/manifest` | `src/manifest.ts` | `manifestSchema`, per-layer schemas, `KNOWN_INTENTS` |
 | `@warpgogol/ontology/cosmic` | `src/cosmic/` | `StarCatalog`, `PlanetCatalog`, `MoonCatalog` + Zod name schemas (DNA-23) |
-| `@warpgogol/ontology/schemas` | `src/schemas/` | `constellationSchema`, `biomeSchema`, `systemManifestSchema`, `PageEntrySchema`, `BlockEntrySchema`, `getSectionPropsSchema` (manifest-resolver) |
+| `@warpgogol/ontology/schemas` | `src/schemas/` | `constellationSchema`, `biomeSchema`, `systemManifestSchema`, `PageEntrySchema`, `BlockEntrySchema` (pure Zod schemas — no `node:fs/promises`) |
+| `@warpgogol/ontology/schemas/manifest-resolver` | `src/schemas/manifest-resolver.ts` | `getSectionPropsSchema` — Node-only (imports `node:fs/promises`). NOT re-exported from `./schemas` or root barrel to prevent client bundle externalization. |
 | `@warpgogol/ontology/operations` | `src/operations/` | Platform operations schemas: `handoff`, `sternsystem`, `werkstatt`, `mission`, `release`, `leitstand`, `notausgang`, `materialization`, `artifact-store`, `naming-policy` |
 | `@warpgogol/ontology/shared-section-props` | `src/shared-section-props/` | `SHARED_SECTION_PROPS`, `composeManifestPropsSchema` (RFC-0101–0103) |
 | `@warpgogol/ontology` (root) | `src/biome-token-projection.ts` | `BIOME_TO_TOKEN_MAP`, `BIOME_TOKEN_ALIASES`, `BIOME_TOKEN_DERIVED`, `projectBiomeToTokens()`, `getAllProjectedTokenNames()` — single source of truth for biome-YAML-field → `--ds-*` CSS custom property projection (RFC-0071). Consumed by codegen, contract validation, and drift detection. |

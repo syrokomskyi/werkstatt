@@ -33,7 +33,8 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { resultFromViolations } from "./result-helpers.ts";
 import { collectMarkdownFiles, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
-import { PageEntrySchema, getSectionPropsSchema } from "@warpgogol/ontology";
+import { PageEntrySchema } from "@warpgogol/ontology";
+import { getSectionPropsSchema } from "@warpgogol/ontology/schemas/manifest-resolver";
 import { systemManifestSchema } from "@warpgogol/ontology";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { normalizeBlockType } from "@warpgogol/share/page";

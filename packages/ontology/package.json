@@ -27,6 +27,10 @@
       "types": "./src/schemas/index.ts",
       "default": "./src/schemas/index.ts"
     },
+    "./schemas/manifest-resolver": {
+      "types": "./src/schemas/manifest-resolver.ts",
+      "default": "./src/schemas/manifest-resolver.ts"
+    },
     "./operations": {
       "types": "./src/operations/index.ts",
       "default": "./src/operations/index.ts"

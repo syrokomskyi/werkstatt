@@ -134,10 +134,14 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
 // Includes all generators that produce files consumed by `astro dev` (src/ files,
 // middleware, styles, surface artifacts) plus generated.files.validate as a safety net
 // and uni.registry.build for the cosmic registry needed at runtime.
-// Excludes: media transcoding (video/image/live variants), static public file generation
+// Excludes: image/live media transcoding, static public file generation
 // (sitemap, preview images, llms, feed, robots, ai, page.markdown, public.artifact),
 // material.metadata.write, warpgogol.check-hints.generate, and workspace-scoped
 // validators (manifest.contract.validate, mirror.quintet.validate).
+// NOTE: video.variants.generate IS included because the video manifest
+// (src/video-manifest.generated.yaml) is read synchronously by <Media> via
+// import.meta.glob — without it, the video section renders nothing in dev.
+// The command has a warm cache (.cache/video/) so cache-hit runs are ~300ms.
 export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "config.regenerate" },
   { command: "workpiece.imports.validate" },
@@ -178,6 +182,9 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "archetype.registry.build" },
   { command: "uni.registry.build" },
   { command: "i18n.middleware.generate" },
+  // RFC-0210: video manifest is read synchronously by <Media> via import.meta.glob;
+  // without it the video section renders nothing in dev. Warm cache makes this ~300ms.
+  { command: "video.variants.generate", expectedDurationMs: 180_000, timeoutMs: 1_200_000 },
   { command: "generated.files.validate" },
   // RFC-0612: detect registry drift between GENERATOR_OWNERSHIP_MAP and files on disk
   { command: "ownership.sync.validate" },

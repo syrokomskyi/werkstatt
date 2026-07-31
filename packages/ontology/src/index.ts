@@ -111,8 +111,10 @@ export type {
 // ---------------------------------------------------------------------------
 // Schemas — PageEntry, BlockEntry (DNA-24, RFC-0026)
 // ---------------------------------------------------------------------------
-export { PageEntrySchema, BlockEntrySchema, getSectionPropsSchema } from "./schemas/index.ts";
+export { PageEntrySchema, BlockEntrySchema } from "./schemas/index.ts";
 export type { PageEntry, BlockEntry } from "./schemas/index.ts";
+// getSectionPropsSchema is NOT re-exported from the root barrel — it imports
+// node:fs/promises. Import from @warpgogol/ontology/schemas/manifest-resolver.
 
 // ---------------------------------------------------------------------------
 // Schemas — Capability catalog (RFC-0288)
