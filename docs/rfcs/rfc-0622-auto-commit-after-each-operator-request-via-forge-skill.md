@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -100,7 +101,7 @@ The forge skill registry gains a `fo-step-commit` skill that instructs agents to
 - **RFC-0480** (mission git workpiece edits): this skill respects the `mission.git.commit` requirement for workpiece changes. Monorepo changes use `git commit` directly; workpiece changes use `mission.git.commit`.
 - **RFC-0580** (auto-commit werkstatt side-effects): RFC-0580 auto-commits side-effects from mission lifecycle _commands_ (programmatic). This RFC auto-commits after _operator requests_ (interactive). They are complementary: RFC-0580 covers command-driven commits, this RFC covers request-driven commits.
 - **RFC-0581** (session-end retro with git hygiene): the session-end retro checks for clean working trees. This skill prevents the most common cause of dirty trees — uncommitted agent changes from earlier requests.
-- **Forge skill model**: the skill uses `invocation: model` (callable by the AI agent autonomously) and `concerns: code-mutation` (it creates git commits). Other skills (e.g. `fo-idea-implement`, `fo-fix`) MAY invoke it as a final step for intermediate commits.
+- **Forge skill model**: the skill uses `invocation: model` (callable by the AI agent autonomously) and `concerns: code-mutation` (it creates git commits). This is the first forge skill with `invocation: model` — all 29 existing skills use `invocation: user`, which requires explicit operator invocation. `model` is necessary because this skill must run autonomously after every operator request without explicit instruction. The Zod schema (`skill-schema.ts:22`) allows `invocation: model`. Other skills (e.g. `fo-idea-implement`, `fo-fix`) MAY invoke it as a final step for intermediate commits.
 
 ## Design
 
@@ -137,8 +138,8 @@ The skill instructs the agent to perform the following after every operator requ
 
 ### When this skill runs
 
-- **After every operator request** (default behavior): the agent runs this skill before sending its response to the operator, if any files were changed during the request.
-- **Called by other skills**: `fo-idea-implement`, `fo-fix`, `fo-review`, and other skills MAY invoke this skill for intermediate commits during multi-step pipelines.
+- **After every standalone operator request** (default behavior): the agent runs this skill before sending its response to the operator, if any files were changed during the request. "Standalone" means the operator's message is not part of a skill pipeline (e.g. not inside `fo-idea-implement`, `fo-fix`, or another multi-step skill).
+- **Called by other skills**: `fo-idea-implement`, `fo-fix`, `fo-review`, and other skills MAY invoke this skill for intermediate commits during multi-step pipelines. During pipeline execution, only the parent skill's explicit invocations fire — the default "after every request" behavior is suppressed to avoid conflicting with the pipeline's own commit discipline.
 
 ### What this skill does NOT do
 
@@ -163,7 +164,7 @@ The skill instructs the agent to perform the following after every operator requ
 
 ## Rollout
 
-- **Day 1**: create the `fo-step-commit` skill in `packages/forge/skills/fo/fo-step-commit/SKILL.md`. The skill is immediately active for all agents that load forge skills.
+- **Day 1**: create the `fo-step-commit` skill in `packages/forge/skills/fo/fo-step-commit/SKILL.md`. Run `forge.create` to sync the skill to `.agents/skills/fo/fo-step-commit/SKILL.md`. Both copies (`packages/forge/skills/` and `.agents/skills/`) MUST be committed in the same session per the forge AGENTS.md rule. The skill is immediately active for all agents that load forge skills.
 - **AGENTS.md update**: add a short paragraph in the commit hygiene section referencing `fo-step-commit` as the default auto-commit behavior.
 - **No migration**: existing sessions continue normally. The skill only affects future requests.
 - **No deprecation**: this does not replace any existing skill or command. It adds a new default behavior layer.
