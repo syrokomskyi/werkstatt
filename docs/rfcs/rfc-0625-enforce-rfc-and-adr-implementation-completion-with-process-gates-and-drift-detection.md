@@ -254,16 +254,16 @@ AV-16 warning in `adr.validate --json` output:
 
 ## Acceptance criteria
 
-- [ ] V-32 warning emitted by `rfc.validate` when an RFC with `status: accepted` has `implement: RFC-XXXX` commits in git history since `createdAt`
-- [ ] AV-16 warning emitted by `adr.validate` when an ADR with non-`implemented` status (`proposed`, `reviewing`, `accepted`) has `implement: ADR-XXXX` commits in git history since `createdAt`
-- [ ] V-32/AV-16 does not emit when RFC/ADR status is already `implemented`
-- [ ] V-32/AV-16 does not emit when no `implement:` commits exist since `createdAt`
-- [ ] `fo-idea-plan` step 4 includes step 8: "Stamp implemented" as a separate plan step
-- [ ] `fo-idea-implement` step 3.11b verifies RFC `status: implemented`, `implementedAt` set, and `rfc.validate` passing before step 3.12 (report)
-- [ ] `fo-idea-implement` step 4.10b verifies ADR `status: implemented`, `implementedAt` set, and `adr.validate` passing before step 4.11 (report)
-- [ ] Synced copies in `.agents/skills/` match the forge skill source files
-- [ ] Unit tests cover V-32 drift detected, no drift, already implemented, no implement commits
-- [ ] `rfc.validate` passes on this file with zero errors
+- [x] V-32 warning emitted by `rfc.validate` when an RFC with `status: accepted` has `implement: RFC-XXXX` commits in git history since `createdAt` (evidence: packages/forge/os/rfc/handlers/validate-rules.ts:825-844)
+- [x] AV-16 warning emitted by `adr.validate` when an ADR with non-`implemented` status (`proposed`, `reviewing`, `accepted`) has `implement: ADR-XXXX` commits in git history since `createdAt` (evidence: packages/forge/os/adr/handlers/validate.ts:365-392)
+- [x] V-32/AV-16 does not emit when RFC/ADR status is already `implemented` (evidence: packages/forge/os/rfc/handlers/validate-rules.test.ts:361-378, packages/forge/os/adr/handlers/validate.test.ts:132-149)
+- [x] V-32/AV-16 does not emit when no `implement:` commits exist since `createdAt` (evidence: packages/forge/os/rfc/handlers/validate-rules.test.ts:381-393, packages/forge/os/adr/handlers/validate.test.ts:152-165)
+- [x] `fo-idea-plan` step 4 includes step 8: "Stamp implemented" as a separate plan step (evidence: packages/forge/skills/fo/fo-idea-plan/SKILL.md:144)
+- [x] `fo-idea-implement` step 3.11b verifies RFC `status: implemented`, `implementedAt` set, and `rfc.validate` passing before step 3.12 (report) (evidence: packages/forge/skills/fo/fo-idea-implement/SKILL.md:232-241)
+- [x] `fo-idea-implement` step 4.10b verifies ADR `status: implemented`, `implementedAt` set, and `adr.validate` passing before step 4.11 (report) (evidence: packages/forge/skills/fo/fo-idea-implement/SKILL.md:426-435)
+- [x] Synced copies in `.agents/skills/` match the forge skill source files (evidence: diff verified — zero differences)
+- [x] Unit tests cover V-32 drift detected, no drift, already implemented, no implement commits (evidence: packages/forge/os/rfc/handlers/validate-rules.test.ts:308-401, packages/forge/os/adr/handlers/validate.test.ts:101-175)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: rfc.validate --id RFC-0625 --json → status: pass, violations: [])
 
 ## Implementation notes for agents
 
