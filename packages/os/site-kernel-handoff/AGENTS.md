@@ -228,3 +228,4 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 ## Test conventions
 
 - **Await async operations before sync assertions:** When testing sync functions that inspect file state (e.g. `isWorkpieceDirty`, `existsSync`), always `await fs.writeFile()` or other async I/O before calling the sync function. Using `.then()` without awaiting creates a race condition — the assertion may execute before the file is written, causing flaky test failures.
+- **Adapter-internal behavior tests go in the adapter test file:** When a command test (e.g. `leitstand-0608-promote.test.ts`) mocks an adapter via `vi.mock`, tests about the adapter's internal behavior (e.g. health check route probe URL construction) must go in the adapter's own test file (e.g. `cloudflare-workers.test.ts`), not the command's test file. The mock prevents the real adapter code from executing, so the behavior under test never runs.
