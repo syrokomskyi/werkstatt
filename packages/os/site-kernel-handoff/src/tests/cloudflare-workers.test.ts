@@ -125,3 +125,49 @@ test("adapter: propagate passes dotenv vars via opts.env when secretsFilePath is
 
   await fs.rm(tmpDir, { recursive: true, force: true });
 });
+
+test("RFC-0618: health check route probe URLs do NOT include cache-buster query param", async () => {
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "wg-test-cb-"));
+  const releaseId = "test-system-r000001";
+  const snapshotDir = path.join(tmpDir, "releases", releaseId);
+  await fs.mkdir(snapshotDir, { recursive: true });
+  await fs.writeFile(
+    path.join(snapshotDir, "behavior-snapshot.json"),
+    JSON.stringify({
+      schemaVersion: "1.0.0",
+      releaseId,
+      capturedAt: "2026-01-01T00:00:00.000Z",
+      routes: [
+        { path: "/", contentHash: null },
+        { path: "/de", contentHash: null },
+      ],
+    }),
+  );
+
+  const mockFetch = vi.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    text: async () => "<html></html>",
+    headers: new Headers(),
+  });
+  vi.stubGlobal("fetch", mockFetch);
+
+  const adapter = createCloudflareWorkersAdapter(stubRunner(0, ""));
+  await adapter.health({
+    systemId: "test-system",
+    channel: "alt",
+    deploymentUrl: "https://alt.example.com",
+    releaseId,
+    expectedBehaviorSnapshotHash: "",
+    workspaceRoot: tmpDir,
+  });
+
+  expect(mockFetch.mock.calls.length).toBeGreaterThan(0);
+  for (const call of mockFetch.mock.calls) {
+    const url = call[0] as string;
+    expect(url).not.toContain("?cb=");
+  }
+
+  vi.unstubAllGlobals();
+  await fs.rm(tmpDir, { recursive: true, force: true });
+});
