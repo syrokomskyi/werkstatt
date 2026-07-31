@@ -111,6 +111,17 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 - **Not in any pipeline** — operator-only, never automated. Agents MUST NOT run `bordbuch.repair` proactively — only when `bordbuch.validate` reports `orphan-mission-close` violations.
 - Uses RFC-0362 lock primitives (`system:<id>` and `bordbuch:<id>` lock scopes) to prevent concurrent repair or append operations.
 
+## Bordbuch projection auto-commit (RFC-0626)
+
+`bordbuch.commit` is an internal pipeline step that auto-commits dirty bordbuch projection files in the cache clone after `bordbuch.generate` runs in `build.prepare`. It eliminates the mission workflow friction where uncommitted bordbuch projections in the cache clone blocked `mission.close` and `release.prepare`.
+
+- **Pipeline step:** registered in `SITES_BUILD_PREPARE_PIPELINE` after `bordbuch.generate` and before `passport.key.ensure`. NOT in `SITES_BUILD_PREPARE_DEV_PIPELINE`.
+- **Selective staging:** only stages the three bordbuch projection paths (`bordbuch/status.generated.yaml`, `public/.well-known/bordbuch.json`, `public/.well-known/bordbuch/index.html`). Never `git add -A`.
+- **Idempotent:** second run is a no-op when no bordbuch files are dirty.
+- **No locks:** pipeline runs sequentially — `bordbuch.generate` has already released locks by the time `bordbuch.commit` runs.
+- **Commit message:** `chore: bordbuch projections from build.prepare`.
+- **Non-mission `build.prepare`:** when `resolveCachePath` fails (no cache clone), the command is a no-op.
+
 ## Werkstatt side-effect auto-commit (RFC-0580)
 
 All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abort`, `mission.materialize`, `mission.migrate`, `mission.reconcile`) auto-commit werkstatt-level side-effect files to the monorepo working tree after updating them. The shared helper `commitWerkstattSideEffects` in `werkstatt/werkstatt-commit.ts` stages only specific file paths (never `git add -A`), is idempotent (skips when no staged changes), and throws on commit failure. The helper does NOT push — werkstatt monorepo push is a separate operator-controlled operation.
