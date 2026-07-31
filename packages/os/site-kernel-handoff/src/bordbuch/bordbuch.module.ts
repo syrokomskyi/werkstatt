@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Lazy loading refactor: extracted from bordbuch/index.ts to use dynamic imports inside async register().</item>
   <item>RFC-0583: add bordbuch.repair command registration.</item>
+  <item>RFC-0626: add bordbuch.commit command registration.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,6 +25,7 @@ export function createBordbuchModule(): KernelModule {
       const { runBordbuchStatus } = await import("./bordbuch-status.ts");
       const { runBordbuchGenerate } = await import("./bordbuch-generate.ts");
       const { runBordbuchRepair } = await import("./bordbuch-repair.ts");
+      const { runBordbuchCommit } = await import("./bordbuch-commit.ts");
       registry.registerCommand({
         name: "bordbuch.append",
         description:
@@ -126,6 +128,28 @@ export function createBordbuchModule(): KernelModule {
         reads: ["systems/{system}/bordbuch/events.ndjson"],
         cacheable: false,
         execute: runBordbuchRepair,
+      });
+      registry.registerCommand({
+        name: "bordbuch.commit",
+        description:
+          "Auto-commit dirty bordbuch projection files in the cache clone (RFC-0626). Internal pipeline step.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        flags: {
+          system: {
+            kind: "string",
+            description:
+              "Sternsystem id. Defaults to the site name when running in a site-scoped pipeline.",
+          },
+        },
+        reads: [
+          "systems/{system}/public/.well-known/bordbuch.json",
+          "systems/{system}/public/.well-known/bordbuch/index.html",
+          "systems/{system}/bordbuch/status.generated.yaml",
+        ],
+        cacheable: false,
+        execute: runBordbuchCommit,
       });
     },
   };
