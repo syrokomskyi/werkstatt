@@ -15,11 +15,13 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0628
 amendedBy: []
 related:
   - DNA-48
@@ -40,18 +42,21 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: patch
+versionBump: minor
 commands:
   proposed: []
   added: []
   changed:
     - mission.check
+    - leitstand.dev-deploy
+    - leitstand.propagate
   removed: []
 appsImpacted:
   - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-checks"
+  - "@warpgogol/site-kernel-handoff"
   - "@syrokomskyi/axiom-capture"
   - "@syrokomskyi/axiom-study"
   - "@syrokomskyi/axiom-methodology"
@@ -66,7 +71,7 @@ nonGoals:
   - "Does not change the cloudflare-workers deployment adapter"
   - "Does not add axiom-runtime as a kernel module (mission.check stays in site-kernel-checks)"
   - "Does not preserve the local build+static-server mode (removed in favor of external-preview only)"
-  - "Does not change the evidence post-processing in leitstand.dev-deploy (commitSha injection)"
+  - "Does not remove check-runner-node package — its playwright-adapter.ts and browser-capture-port.ts are consumed by check.run and check.evidence.capture commands and remain intact"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -142,12 +147,15 @@ Flags:
 - `--mission <id>` (required) — mission identifier
 - `--external-preview` (required) — must be set; local mode removed
 - `--base-url <url>` (required) — deployed URL to check
+- `--commit-sha <sha>` (optional) — commit SHA to bind evidence to source state; passed by `leitstand.dev-deploy` from workpiece HEAD
 - `--json` — output JSON instead of pretty text
 
 Removed flags:
 
 - `--mode` — no longer needed (only external-preview)
 - Implicit local mode (build + static server) — removed
+
+The `--commit-sha` flag replaces the post-processing step in `leitstand.dev-deploy` that previously injected `commitSha` into `evidence-capsule.yaml` after `mission.check` completed. Since `StagedCapsule` is a digest-backed capsule, post-hoc modification would invalidate `contractDigest`. Passing `commitSha` at invocation time allows `mission.check` to write it to a separate `evidence-metadata.json` file alongside the capsule, preserving capsule integrity.
 
 ### TypeScript contracts
 
@@ -161,6 +169,7 @@ interface MissionCheckInput {
   missionId: string;
   externalPreview: true;      // required: must be true
   baseUrl: string;            // required: deployed URL
+  commitSha?: string;         // optional: passed by leitstand.dev-deploy from workpiece HEAD
   flags: { json?: boolean };
 }
 
@@ -171,6 +180,9 @@ interface MissionCheckResult {
   capsule: StagedCapsule;
   studyRun: StudyRun;
   findingsCount: { critical: number; high: number; medium: number; low: number; info: number };
+  // Backward-compatible findings field for leitstand.dev-deploy result parsing.
+  // errors = high + critical counts; warnings = medium + low + info counts.
+  findings: { errors: number; warnings: number; total: number };
   closureDecision: { satisfied: boolean; status: string; reason: string };
   evidenceDir: string;
   summary: string;
@@ -178,7 +190,7 @@ interface MissionCheckResult {
 }
 ```
 
-The handler constructs a `LocalCaptureContract` with `origins: [baseUrl]`, uses `CrawleeDiscoveryExecutor` to discover pages within the origin, captures each page via `PlaywrightEvidenceDriver`, runs `runAccessibilityInstrument` from `axiom-study` to produce an `ObservationBundle`, projects findings via `findingsForObservation` from `axiom-methodology`, evaluates closure via `evaluateClosure`, and writes the `StagedCapsule` + `StudyRun` to `missions/<missionId>/evidence/axiom/`.
+The handler constructs a `LocalCaptureContract` with `missionId: <missionId>` and `origins: [baseUrl]`, uses `CrawleeDiscoveryExecutor` to discover pages within the origin, captures each page via `PlaywrightEvidenceDriver`, runs `runAccessibilityInstrument` from `axiom-study` to produce an `ObservationBundle`, projects findings via `findingsForObservation` from `axiom-methodology` (which maps axe-core impact `serious` → `high`, `critical` → `critical`, `moderate` → `medium`, `minor` → `low`), evaluates closure via `evaluateClosure`, and writes the `StagedCapsule` + `StudyRun` + `evidence-metadata.json` to `missions/<missionId>/evidence/axiom/`. The `evidence-metadata.json` file carries `missionId` and `commitSha` for gate verification without modifying the digest-backed capsule.
 
 ### File system responsibilities
 
@@ -186,13 +198,16 @@ The handler constructs a `LocalCaptureContract` with `origins: [baseUrl]`, uses 
 | --- | --- |
 | `packages/os/site-kernel-checks/src/mission-check.ts` | Rewritten handler — delegates to axiom components |
 | `packages/os/site-kernel-checks/src/mission-check-converter.ts` | Removed — findings projection now via `findingsForObservation` |
+| `packages/os/site-kernel-checks/package.json` | Add `@syrokomskyi/axiom-methodology` dependency |
 | `missions/<missionId>/evidence/axiom/` | Output directory for native capsule files |
-| `missions/<missionId>/evidence/axiom/staged-capsule.json` | StagedCapsule with contract, manifest, closure decision |
+| `missions/<missionId>/evidence/axiom/staged-capsule.json` | StagedCapsule with contract (includes missionId), manifest, closure decision |
 | `missions/<missionId>/evidence/axiom/observation-bundle.json` | ObservationBundle with axe-core observations |
-| `missions/<missionId>/evidence/axiom/study-run.json` | StudyRun with findings and assessments |
+| `missions/<missionId>/evidence/axiom/study-run.json` | StudyRun with findings (severity: critical/high/medium/low/info) |
+| `missions/<missionId>/evidence/axiom/evidence-metadata.json` | Metadata file with missionId and commitSha for gate verification |
 | `missions/<missionId>/evidence/axiom/raw/` | Raw evidence artifacts (HTML, screenshots, axe results) |
-| `packages/check-runner-node/src/playwright-adapter.ts` | Removed — replaced by `PlaywrightEvidenceDriver` |
-| `packages/check-runner-node/src/browser-capture-port.ts` | Removed — replaced by axiom-capture ports |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Updated: dev-deploy passes --commit-sha; propagate gate reads new format |
+
+The `check-runner-node` package (`packages/check-runner-node/`) is NOT modified by this RFC. Its `playwright-adapter.ts` and `browser-capture-port.ts` are consumed by `check.run` and `check.evidence.capture` commands and remain intact. `mission-check.ts` already imports `PlaywrightCaptureAdapter` from `@syrokomskyi/axiom-capture`, not from `check-runner-node`.
 
 ### Output format
 
@@ -215,12 +230,15 @@ The handler constructs a `LocalCaptureContract` with `origins: [baseUrl]`, uses 
     "findings": []
   },
   "findingsCount": { "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0 },
+  "findings": { "errors": 0, "warnings": 0, "total": 0 },
   "closureDecision": { "satisfied": true, "status": "seal_allowed", "reason": "..." },
   "evidenceDir": "missions/warpgogol-com-m000024/evidence/axiom",
   "summary": "Axiom gate: PASS. 0 findings. Closure: seal_allowed.",
   "nextSteps": ["Proceed with leitstand.propagate"]
 }
 ```
+
+The `findings` field is backward-compatible with `leitstand.dev-deploy`'s result parsing (`data.findings.errors` / `data.findings.warnings`). It is derived from `findingsCount`: `errors = critical + high`, `warnings = medium + low + info`, `total = sum of all`.
 
 On failure:
 
@@ -230,6 +248,7 @@ On failure:
   "status": "fail",
   "exitCode": 1,
   "findingsCount": { "critical": 0, "high": 3, "medium": 5, "low": 2, "info": 0 },
+  "findings": { "errors": 3, "warnings": 7, "total": 10 },
   "closureDecision": { "satisfied": true, "status": "seal_allowed", "reason": "..." },
   "summary": "Axiom gate: FAIL. 3 high-severity findings. Closure: seal_allowed.",
   "nextSteps": ["Fix accessibility violations and re-run leitstand.dev-deploy"]
@@ -248,12 +267,18 @@ On failure:
 ## Rollout
 
 - **Default behavior**: The rewritten `mission.check` replaces the current implementation in-place. No feature flag, no grace period — the current implementation is broken (CSP crashes, CDN dependency) and must be replaced.
-- **`leitstand.dev-deploy` integration**: No change to `leitstand.dev-deploy` command structure. It continues to call `mission.check --external-preview --base-url <dev-url>`. The evidence post-processing (commitSha injection) in `leitstand.dev-deploy` must be updated to read the new capsule format (`staged-capsule.json` instead of `evidence-capsule.yaml`).
-- **Playwright version alignment**: The werkstatt monorepo must align its `playwright` version with `@syrokomskyi/axiom-capture`'s `playwright@^1.62.1` to avoid browser binary mismatches. This is a `package.json` dependency bump, not a separate RFC.
+- **`leitstand.dev-deploy` integration**: `leitstand.dev-deploy` passes `--commit-sha <workpieceHeadSha>` to `mission.check` instead of post-processing the evidence file. The post-processing step (reading `evidence-capsule.yaml`, injecting `commitSha`, writing back) is removed. `leitstand.dev-deploy`'s result parsing (`data.findings.errors` / `data.findings.warnings`) continues to work via the backward-compatible `findings` field in `MissionCheckResult`.
+- **`leitstand.propagate` evidence gate update**: The evidence gate in `leitstand.propagate` is updated to read the new file format:
+  - `evidence-metadata.json` — verifies `missionId` matches release manifest and `commitSha` matches release commitSha (replaces `evidence-capsule.yaml` reading)
+  - `study-run.json` — verifies zero findings with severity `high` or `critical` (replaces `findings.yaml` `summary.errors === 0` check)
+  - The old `evidence-capsule.yaml` and `findings.yaml` files are no longer produced or read.
+- **`@syrokomskyi/axiom-methodology` dependency**: Add `"@syrokomskyi/axiom-methodology": "link:../../../../pipelines/packages/axiom/axiom-methodology"` to `packages/os/site-kernel-checks/package.json` dependencies.
+- **Playwright version alignment**: The werkstatt monorepo must align its `playwright` version with `@syrokomskyi/axiom-capture`'s `playwright@^1.62.1` to avoid browser binary mismatches. This is a `package.json` dependency bump, not a separate RFC. Other Playwright consumers (e.g., `independent-qa.ts`) must be verified after the bump.
 - **Evidence directory cleanup**: Old `evidence-capsule.yaml` and `findings.yaml` files in existing mission evidence directories are not migrated — they are stale artifacts from a broken implementation. New evidence is written to `evidence/axiom/`.
 - **`mission-check-converter.ts` removal**: The converter that mapped axiom observations to the old `findings.yaml` format is removed. Findings projection is now handled by `findingsForObservation` in `axiom-methodology`.
-- **`check-runner-node` package**: The `playwright-adapter.ts` and `browser-capture-port.ts` files in `packages/check-runner-node/` are removed — their functionality is fully replaced by `PlaywrightEvidenceDriver` in `axiom-capture`.
+- **`check-runner-node` package**: NOT modified by this RFC. Its `playwright-adapter.ts` and `browser-capture-port.ts` are consumed by `check.run` and `check.evidence.capture` commands and remain intact.
 - **AGENTS.md update**: `packages/os/site-kernel-checks/AGENTS.md` must be updated to reflect the new implementation and evidence format.
+- **Test updates**: Existing tests (`mission-check.test.ts`, `leitstand-0628-dev-deploy.test.ts`) must be updated for the new evidence file names, result interface, and severity model. Test helpers (`writeEvidenceCapsule`, `writeAxiomFindings`) must be replaced with helpers that write `staged-capsule.json`, `study-run.json`, and `evidence-metadata.json`.
 
 ## Alternatives considered
 
@@ -282,14 +307,21 @@ On failure:
 - [ ] `mission-check.ts` uses `runAccessibilityInstrument` from `@syrokomskyi/axiom-study` for observation generation
 - [ ] `mission-check.ts` uses `findingsForObservation` from `@syrokomskyi/axiom-methodology` for finding projection
 - [ ] `mission-check.ts` uses `evaluateClosure` from `@syrokomskyi/axiom-capture` for closure decision
-- [ ] Evidence is written as `staged-capsule.json`, `observation-bundle.json`, `study-run.json` under `missions/<missionId>/evidence/axiom/`
+- [ ] Evidence is written as `staged-capsule.json`, `observation-bundle.json`, `study-run.json`, `evidence-metadata.json` under `missions/<missionId>/evidence/axiom/`
+- [ ] `evidence-metadata.json` carries `missionId` and `commitSha` (when `--commit-sha` is provided)
 - [ ] Gate passes when `closureDecision.satisfied === true` and zero findings with severity `high` or `critical`
+- [ ] `MissionCheckResult` includes backward-compatible `findings: { errors, warnings, total }` field for `leitstand.dev-deploy` result parsing
 - [ ] `mission.check` requires `--external-preview --base-url <url>`; exits with error if not provided
+- [ ] `mission.check` accepts optional `--commit-sha <sha>` flag and writes it to `evidence-metadata.json`
 - [ ] `mission-check-converter.ts` is removed
-- [ ] `packages/check-runner-node/src/playwright-adapter.ts` and `browser-capture-port.ts` are removed
-- [ ] `leitstand.dev-deploy` evidence post-processing reads `staged-capsule.json` instead of `evidence-capsule.yaml`
+- [ ] `@syrokomskyi/axiom-methodology` is added to `packages/os/site-kernel-checks/package.json` dependencies
+- [ ] `leitstand.dev-deploy` passes `--commit-sha` to `mission.check` and no longer post-processes evidence files
+- [ ] `leitstand.propagate` evidence gate reads `evidence-metadata.json` for missionId/commitSha verification and `study-run.json` for severity-based gate check
+- [ ] `packages/check-runner-node/` is NOT modified — `playwright-adapter.ts` and `browser-capture-port.ts` remain intact
 - [ ] `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes
+- [ ] `pnpm --filter @warpgogol/site-kernel-handoff run build:check` passes
 - [ ] `leitstand.dev-deploy --system warpgogol-com` completes with passing Axiom gate
+- [ ] Existing tests updated for new evidence file names, result interface, and severity model
 - [ ] `packages/os/site-kernel-checks/AGENTS.md` updated to reflect new evidence format
 - [ ] `rfc.validate` passes on this file before merging
 
@@ -299,9 +331,13 @@ On failure:
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
-- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
 - Agents MUST NOT inject axe-core from CDN in the new implementation — use `@axe-core/playwright` local bundle via `PlaywrightEvidenceDriver`.
 - Agents MUST NOT use `page.route()` to strip CSP headers — `PlaywrightEvidenceDriver` uses `bypassCSP: true` in `browser.newContext()` which handles this natively.
 - Agents MUST bump `playwright` to `^1.62.1` in the werkstatt monorepo `package.json` to align with `@syrokomskyi/axiom-capture`.
-- Agents MUST update `leitstand.dev-deploy` evidence post-processing to read `staged-capsule.json` instead of `evidence-capsule.yaml`.
-- Agents MUST remove `mission-check-converter.ts`, `playwright-adapter.ts`, and `browser-capture-port.ts` — they are fully replaced by axiom components.
+- Agents MUST add `@syrokomskyi/axiom-methodology` to `packages/os/site-kernel-checks/package.json` dependencies.
+- Agents MUST update `leitstand.dev-deploy` to pass `--commit-sha <workpieceHeadSha>` to `mission.check` and remove the evidence post-processing step.
+- Agents MUST update `leitstand.propagate` evidence gate to read `evidence-metadata.json` (missionId/commitSha) and `study-run.json` (severity-based check) instead of `evidence-capsule.yaml` and `findings.yaml`.
+- Agents MUST remove `mission-check-converter.ts` — findings projection is now handled by `findingsForObservation` in `axiom-methodology`.
+- Agents MUST NOT remove or modify `packages/check-runner-node/src/playwright-adapter.ts` or `browser-capture-port.ts` — they are consumed by `check.run` and `check.evidence.capture` commands.
+- Agents MUST update existing tests (`mission-check.test.ts`, `leitstand-0628-dev-deploy.test.ts`) for the new evidence file names, result interface, and severity model.
