@@ -231,9 +231,17 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         env.PATH = `${input.nodeModulesBinPath}:${process.env.PATH ?? ""}`;
       }
 
-      const wranglerArgs = ["--yes", "wrangler", "deploy", "--name", input.workerName];
+      const wranglerArgs = [
+        "--yes",
+        "wrangler",
+        "deploy",
+        "--config",
+        "wrangler.json",
+        "--name",
+        input.workerName,
+      ];
       if (input.secretsFilePath) {
-        wranglerArgs.push("--secrets-file", input.secretsFilePath);
+        wranglerArgs.push("--secrets-file", path.resolve(input.secretsFilePath));
       }
 
       const result = await runWranglerDeployWithRetry(runner, wranglerArgs, {
@@ -276,9 +284,17 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         env.PATH = `${input.nodeModulesBinPath}:${process.env.PATH ?? ""}`;
       }
 
-      const wranglerArgs = ["--yes", "wrangler", "deploy", "--name", input.workerName];
+      const wranglerArgs = [
+        "--yes",
+        "wrangler",
+        "deploy",
+        "--config",
+        "wrangler.json",
+        "--name",
+        input.workerName,
+      ];
       if (input.secretsFilePath) {
-        wranglerArgs.push("--secrets-file", input.secretsFilePath);
+        wranglerArgs.push("--secrets-file", path.resolve(input.secretsFilePath));
       }
 
       const result = await runWranglerDeployWithRetry(runner, wranglerArgs, {
