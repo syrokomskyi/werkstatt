@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -129,7 +130,7 @@ No new CLI commands or flags. The change adds a filtering step to the `public/` 
 ### TypeScript contracts
 
 ```ts
-import { GENERATOR_OWNERSHIP_MAP } from "@warpgogol/site-kernel-checks/generator-ownership";
+import { GENERATOR_OWNERSHIP_MAP } from "@warpgogol/site-kernel-checks";
 
 function getWorkspaceAbsoluteGeneratedPaths(systemId: string): Set<string> {
   const prefix = `systems/${systemId}/`;
@@ -144,12 +145,14 @@ function getWorkspaceAbsoluteGeneratedPaths(systemId: string): Set<string> {
 }
 ```
 
+`GENERATOR_OWNERSHIP_MAP` must be re-exported from `packages/os/site-kernel-checks/src/index.ts` to make it importable from `@warpgogol/site-kernel-handoff` via the main entry point. This follows the existing import pattern in `mission-materialize.ts` (line 59) which already imports from `@warpgogol/site-kernel-checks`.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | Add filtering logic to the `public/` copy step |
-| `packages/os/site-kernel-checks/src/generator-ownership.ts` | Read-only — source of `GENERATOR_OWNERSHIP_MAP` |
+| `packages/os/site-kernel-checks/src/index.ts` | Re-export `GENERATOR_OWNERSHIP_MAP` and `OwnershipEntry` from the main entry point to enable cross-package import |
 | `packages/os/site-kernel-handoff/src/tests/` | Regression test verifying workspace-absolute generated files are excluded from the workpiece |
 
 ### Failure modes
