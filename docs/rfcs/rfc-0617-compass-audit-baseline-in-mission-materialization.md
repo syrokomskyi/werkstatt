@@ -202,11 +202,11 @@ No changes to `--json` output shape. The baseline command reports `seeded: <N>, 
 
 ## Acceptance criteria
 
-- [ ] `compass.audit.baseline` accepts `--workpiece <path>` flag and scans only that directory
-- [ ] `--workpiece` and `--packages` are mutually exclusive (throws on both)
-- [ ] `mission.materialize` calls `compass.audit.baseline --workpiece` after codegen
-- [ ] `release.prepare` passes `compass.audit.validate --strict` for new workpiece files without manual baseline
-- [ ] Unit test: `compass.audit.baseline --workpiece` seeds only files within the workpiece directory
+- [x] `compass.audit.baseline` accepts `--workpiece <path>` flag and scans only that directory (evidence: packages/forge/os/compass/handlers/resolve-scan-root.ts:41-48, packages/forge/os/compass/handlers/resolve-scan-root-workpiece.test.ts:33-41)
+- [x] `--workpiece` and `--packages` are mutually exclusive (throws on both) (evidence: packages/forge/os/compass/handlers/resolve-scan-root.ts:29-33, packages/forge/os/compass/handlers/resolve-scan-root-workpiece.test.ts:43-49)
+- [x] `mission.materialize` calls `compass.audit.baseline --workpiece` after codegen (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:982-997, packages/os/site-kernel-handoff/src/tests/mission-materialize-baseline.test.ts:162-175)
+- [x] `release.prepare` passes `compass.audit.validate --strict` for new workpiece files without manual baseline (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:988-992 — baseline call seeds ledger before release.prepare runs build.post)
+- [x] Unit test: `compass.audit.baseline --workpiece` seeds only files within the workpiece directory (evidence: packages/forge/os/compass/handlers/resolve-scan-root-workpiece.test.ts:33-41, packages/os/site-kernel-handoff/src/tests/mission-materialize-baseline.test.ts:162-175)
 
 ## Implementation notes for agents
 
