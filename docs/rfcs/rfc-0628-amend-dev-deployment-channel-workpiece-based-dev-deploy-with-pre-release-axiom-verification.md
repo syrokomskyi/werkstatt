@@ -1,7 +1,7 @@
 ---
 id: RFC-0628
 title: "Amend dev deployment channel: workpiece-based dev deploy with pre-release Axiom verification"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
