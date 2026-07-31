@@ -1,7 +1,7 @@
 ---
 id: RFC-0627
 title: "Add dev deployment channel with Axiom verification gate"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -12,7 +12,8 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
 enhancedAt: 2026-07-31
@@ -375,7 +376,7 @@ Exit codes 4–7 are passed through from `mission.check`. Exit codes 2–3 are `
 
 - [ ] `releaseStateSchema` in `packages/ontology/src/operations/release.ts` includes `dev-deployed`
 - [ ] `deploymentConfigSchema` in `packages/ontology/src/operations/leitstand.ts` requires `channels.dev`, `channels.alt`, and `channels.main`
-- [ ] `leitstand.deploy` command registered in `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts`
+- [ ] `leitstand.deploy` command registered in `packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts`
 - [ ] `leitstand.deploy` deploys to dev channel and automatically runs `mission.check --external-preview --base-url <dev-url>`
 - [ ] `leitstand.deploy` writes Axiom evidence to `missions/<missionId>/evidence/axiom/findings.yaml`
 - [ ] `leitstand.deploy` transitions release state to `dev-deployed` on deploy success
