@@ -5,12 +5,12 @@ title: "Harden generated timestamp validator and ownership map"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
-implementedAt:
+implementedAt: 2026-07-31
 closedAt:
 supersedes: []
 supersededBy:
