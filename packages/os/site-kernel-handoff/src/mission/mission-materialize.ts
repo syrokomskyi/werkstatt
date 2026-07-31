@@ -18,6 +18,7 @@
   <item>Run pnpm install after atomicMoveDir to link workpiece workspace deps before build.prepare (fixes workpiece.imports.validate failure on fresh workpiece).</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml, pnpm-lock.yaml) after writeMissionManifest.</item>
   <item>RFC-0597: skip preflight on unchanged cache clone HEAD, run build.prepare.dev instead of build.prepare, warm .cache/video/ and .cache/video-live/ from cache clone.</item>
+  <item>RFC-0620: replace hardcoded bordbuch file removal with ownership-map-driven filter that excludes all workspace-absolute generated files from STERNSYSTEM_DATA_PATHS copy.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -56,6 +57,7 @@ import {
   runEnvExampleGenerate,
   MISSION_PREFLIGHT_CRITICAL,
   MISSION_PREFLIGHT_WARNING,
+  GENERATOR_OWNERSHIP_MAP,
 } from "@warpgogol/site-kernel-checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import {
@@ -117,16 +119,51 @@ interface MaterializationState {
 // RFC-0597: Media cache directories to persist across missions
 const MEDIA_CACHE_DIRS = [".cache/video", ".cache/video-live"];
 
-async function copyDir(src: string, dest: string): Promise<void> {
+/**
+ * RFC-0620: Collect workspace-absolute generated paths from GENERATOR_OWNERSHIP_MAP.
+ * These are entries whose path starts with `systems/{system}/` — they represent
+ * generated artifacts written to the cache clone (e.g. bordbuch projections), not
+ * authored content. They must be excluded from the data-path copy to avoid
+ * ownership.sync.validate OWN-01 failures in the workpiece context.
+ *
+ * Returns paths relative to the cache clone root (e.g. `public/.well-known/bordbuch.json`).
+ */
+function getWorkspaceAbsoluteGeneratedPaths(systemId: string): Set<string> {
+  const prefix = `systems/${systemId}/`;
+  const paths = new Set<string>();
+  for (const entry of GENERATOR_OWNERSHIP_MAP) {
+    if (entry.path.startsWith(prefix)) {
+      const relativePath = entry.path.slice(prefix.length);
+      paths.add(relativePath);
+    }
+  }
+  return paths;
+}
+
+/**
+ * RFC-0620: Copy a directory, optionally skipping files whose relative path
+ * (relative to the copy root) is in the `skipPaths` set.
+ */
+async function copyDir(
+  src: string,
+  dest: string,
+  skipPaths?: Set<string>,
+  rootSrc?: string,
+): Promise<void> {
   if (!existsSync(src)) return;
   await fs.mkdir(dest, { recursive: true });
+  const root = rootSrc ?? src;
   const entries = await fs.readdir(src, { withFileTypes: true });
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
-      await copyDir(srcPath, destPath);
+      await copyDir(srcPath, destPath, skipPaths, root);
     } else {
+      if (skipPaths && skipPaths.size > 0) {
+        const relPath = path.relative(root, srcPath);
+        if (skipPaths.has(relPath)) continue;
+      }
       await fs.copyFile(srcPath, destPath);
     }
   }
@@ -738,6 +775,12 @@ export async function runMissionMaterialize(
       logger.info(`  Cloned cache clone git history into staging`);
     }
 
+    // RFC-0620: Build skip set of workspace-absolute generated paths.
+    // These are generated artifacts (e.g. bordbuch projections) that belong in
+    // the cache clone, not the workpiece. Filtering them at copy time avoids
+    // ownership.sync.validate OWN-01 failures.
+    const skipPathsGlobal = getWorkspaceAbsoluteGeneratedPaths(manifest.systemId);
+
     // Copy data set from Sternsystem
     for (const dataPath of STERNSYSTEM_DATA_PATHS) {
       const src = path.join(systemDir, dataPath);
@@ -745,10 +788,22 @@ export async function runMissionMaterialize(
       if (!existsSync(src)) continue;
       const stat = await fs.stat(src);
       if (stat.isDirectory()) {
-        await copyDir(src, dest);
+        // RFC-0620: filter skip set to entries within this data path,
+        // then strip the data-path prefix to get paths relative to the copy root.
+        const dataSkipPaths = new Set<string>();
+        const dataPrefix = dataPath + "/";
+        for (const skipPath of skipPathsGlobal) {
+          if (skipPath.startsWith(dataPrefix)) {
+            dataSkipPaths.add(skipPath.slice(dataPrefix.length));
+          }
+        }
+        await copyDir(src, dest, dataSkipPaths.size > 0 ? dataSkipPaths : undefined);
       } else {
-        await fs.mkdir(path.dirname(dest), { recursive: true });
-        await fs.copyFile(src, dest);
+        // Single file — skip if it matches a workspace-absolute generated path
+        if (!skipPathsGlobal.has(dataPath)) {
+          await fs.mkdir(path.dirname(dest), { recursive: true });
+          await fs.copyFile(src, dest);
+        }
       }
       logger.info(`  Copied ${dataPath}`);
     }
@@ -775,23 +830,6 @@ export async function runMissionMaterialize(
         if (!isKeepPath) {
           const entryPath = path.join(stagingDir, entry.name);
           await fs.rm(entryPath, { recursive: true, force: true });
-        }
-      }
-    }
-
-    // Remove generated bordbuch projection files copied from cache clone's public/.
-    // These are owned by bordbuch.generate (not in the dev pipeline) and would cause
-    // ownership.sync.validate to fail with OWN-01 in the workpiece context.
-    const bordbuchFilesToRemove = [
-      path.join(stagingDir, "public", ".well-known", "bordbuch.json"),
-      path.join(stagingDir, "public", ".well-known", "bordbuch", "index.html"),
-    ];
-    for (const bordbuchFile of bordbuchFilesToRemove) {
-      if (existsSync(bordbuchFile)) {
-        await fs.rm(bordbuchFile, { force: true });
-        const bordbuchDir = path.dirname(bordbuchFile);
-        if (bordbuchFile.endsWith("index.html") && existsSync(bordbuchDir)) {
-          await fs.rm(bordbuchDir, { recursive: true, force: true }).catch(() => {});
         }
       }
     }

@@ -163,3 +163,7 @@ export * from "./maintenance/maintenance-debt-queue.ts";
 // RFC-0249: autonomous package quality and CI gates
 export { runCiLocalValidate, CI_LOCAL_CHECKED_COMMANDS } from "./ci-local.ts";
 export * from "./test-signal.ts";
+
+// RFC-0620: re-export generator ownership map for cross-package import
+export { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
+export type { OwnershipEntry } from "./generator-ownership.ts";
