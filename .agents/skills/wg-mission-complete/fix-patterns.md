@@ -63,3 +63,23 @@ Error→resolution mappings for `wg-mission-complete`. Entries are reactive — 
 - **Auto-resolvable:** yes
 - **Encountered:** 2026-07-26
 - **Confirmations:** 1
+
+## EC-06: TS-TIME-01 false positive on runtime validator
+
+- **Command:** mission.validate
+- **Trigger:** "Volatile timestamp pattern "new Date().toISOString()" at packages/os/site-kernel-checks/src/<module>.ts:<line> — use deterministic timestamp"
+- **Root cause:** Module is in GENERATOR_OWNERSHIP_MAP (generates a file) but uses `new Date()` for runtime validation logic, not for generated-file timestamps. Module is missing from TIMESTAMP_ALLOWLIST in generated-timestamp-validate.ts
+- **Resolution:** Add the module to TIMESTAMP_ALLOWLIST in `packages/os/site-kernel-checks/src/generated-timestamp-validate.ts` with a `reason` explaining why the timestamp is runtime logic (e.g., "Freshness evaluation `today` — runtime validator comparing claim validity windows against current date, not a generated file field."). Commit the fix and re-validate
+- **Auto-resolvable:** yes
+- **Encountered:** 2026-07-31
+- **Confirmations:** 1
+
+## EC-07: Dirty cache clone bordbuch projections from build.prepare
+
+- **Command:** mission.validate, mission.close, release.prepare
+- **Trigger:** "cache clone for system '<id>' has N uncommitted file(s) — reconcile will fail until resolved" where dirty files are `bordbuch/status.generated.yaml`, `public/.well-known/bordbuch.json`, `public/.well-known/bordbuch/index.html`
+- **Root cause:** `bordbuch.generate` (RFC-0604, step 57/61 in build.prepare) writes projection files to cache clone via writeFileIfChanged but build.prepare does not commit them
+- **Resolution:** Commit bordbuch projections in cache clone: `git -C systems-cache/<id> add bordbuch/status.generated.yaml public/.well-known/bordbuch.json public/.well-known/bordbuch/index.html && git -C systems-cache/<id> commit -m "chore: bordbuch projections from build.prepare"`
+- **Auto-resolvable:** yes (bordbuch-only case)
+- **Encountered:** 2026-07-31
+- **Confirmations:** 1
