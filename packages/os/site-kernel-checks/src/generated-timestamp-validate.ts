@@ -77,6 +77,12 @@ const TIMESTAMP_ALLOWLIST: TimestampAllowlistEntry[] = [
       "Demand signal import `observedAt`/`importId` and `isStale` runtime utility — manual import command, not a regenerable generated file field.",
     pattern: "new Date().toISOString()",
   },
+  {
+    module: "packages/os/site-kernel-checks/src/content-freshness.ts",
+    reason:
+      "Freshness evaluation `today` — runtime validator comparing claim validity windows against current date, not a generated file field.",
+    pattern: "new Date().toISOString()",
+  },
 ];
 
 // ---------------------------------------------------------------------------
