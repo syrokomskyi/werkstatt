@@ -554,7 +554,7 @@ export async function runLeitstandPromote(
     const adapter = resolveAdapter(dep.adapter);
 
     // 1. Fetch build-identity.json from alt URL
-    const buildIdentityUrl = `${altConfig.url}/.well-known/build-identity.json`;
+    const buildIdentityUrl = `${altConfig.url}/.well-known/build-identity.json?cb=${Date.now()}`;
     logger.info(`  Fetching build identity from ${buildIdentityUrl}...`);
     const response = await fetch(buildIdentityUrl);
     if (!response.ok) {
