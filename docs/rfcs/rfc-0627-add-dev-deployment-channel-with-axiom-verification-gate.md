@@ -1,7 +1,7 @@
 ---
 id: RFC-0627
 title: "Add dev deployment channel with Axiom verification gate"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
 enhancedAt: 2026-07-31
-implementedAt:
+implementedAt: 2026-07-31
 closedAt:
 supersedes: []
 supersededBy:
@@ -374,20 +374,20 @@ Exit codes 4–7 are passed through from `mission.check`. Exit codes 2–3 are `
 
 ## Acceptance criteria
 
-- [ ] `releaseStateSchema` in `packages/ontology/src/operations/release.ts` includes `dev-deployed`
-- [ ] `deploymentConfigSchema` in `packages/ontology/src/operations/leitstand.ts` requires `channels.dev`, `channels.alt`, and `channels.main`
-- [ ] `leitstand.deploy` command registered in `packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts`
-- [ ] `leitstand.deploy` deploys to dev channel and automatically runs `mission.check --external-preview --base-url <dev-url>`
-- [ ] `leitstand.deploy` writes Axiom evidence to `missions/<missionId>/evidence/axiom/findings.yaml`
-- [ ] `leitstand.deploy` transitions release state to `dev-deployed` on deploy success
-- [ ] `leitstand.propagate` rejects releases not in `dev-deployed` state with actionable error message
-- [ ] `leitstand.propagate` reads `findings.yaml` and rejects when `summary.errors > 0`
-- [ ] `leitstand.rollback` auto-detects channel from release state without `--channel` flag
-- [ ] `leitstand.rollback` auto-step: `promoted` → main rollback → `alt-deployed`; `alt-deployed` → alt rollback → `dev-deployed`; `dev-deployed` → dev rollback → `published`
-- [ ] `systems/registry.yaml` updated with `dev` channel for warpgogol-com
-- [ ] DNA-48 and DNA-49 prose in `docs/architecture-dna.md` updated to reflect three-channel model
-- [ ] Unit tests for `leitstand.deploy`, modified `leitstand.propagate`, and modified `leitstand.rollback` pass
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `releaseStateSchema` in `packages/ontology/src/operations/release.ts` includes `dev-deployed` (evidence: packages/ontology/src/operations/release.ts:11)
+- [x] `deploymentConfigSchema` in `packages/ontology/src/operations/leitstand.ts` requires `channels.dev`, `channels.alt`, and `channels.main` (evidence: packages/ontology/src/operations/leitstand.ts:50-55)
+- [x] `leitstand.deploy` command registered in `packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand.module.ts:31-49)
+- [x] `leitstand.deploy` deploys to dev channel and automatically runs `mission.check --external-preview --base-url <dev-url>` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:535-545)
+- [x] `leitstand.deploy` writes Axiom evidence to `missions/<missionId>/evidence/axiom/findings.yaml` (evidence: packages/os/site-kernel-checks/src/mission-check.ts:540-554)
+- [x] `leitstand.deploy` transitions release state to `dev-deployed` on deploy success (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:523-525)
+- [x] `leitstand.propagate` rejects releases not in `dev-deployed` state with actionable error message (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:649-653)
+- [x] `leitstand.propagate` reads `findings.yaml` and rejects when `summary.errors > 0` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:687-691)
+- [x] `leitstand.rollback` auto-detects channel from release state without `--channel` flag (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:977-978)
+- [x] `leitstand.rollback` auto-step: `promoted` → main rollback → `alt-deployed`; `alt-deployed` → alt rollback → `dev-deployed`; `dev-deployed` → dev rollback → `published` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:921-925)
+- [x] `systems/registry.yaml` updated with `dev` channel for warpgogol-com (evidence: systems/registry.yaml:20-23)
+- [x] DNA-48 and DNA-49 prose in `docs/architecture-dna.md` updated to reflect three-channel model (evidence: docs/architecture-dna.md:209,213)
+- [x] Unit tests for `leitstand.deploy`, modified `leitstand.propagate`, and modified `leitstand.rollback` pass (evidence: packages/os/site-kernel-handoff/src/tests/leitstand-0627-dev-channel.test.ts:1-460)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate output: 0 errors)
 
 ## Implementation notes for agents
 
