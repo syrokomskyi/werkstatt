@@ -1,3 +1,16 @@
+/*
+<MODULE_CONTRACT>
+<purpose>RFC-0012: Converts DeterministicInstrumentResult observations to FindingYaml[] for findings.yaml output.</purpose>
+<non-goals>
+  <item>Does not perform finding severity escalation or filtering.</item>
+  <item>Does not write files — pure transformation only.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0012: initial implementation of observation-to-finding converter.</item>
+</CHANGE_SUMMARY>
+*/
+
 import type { DeterministicInstrumentResult } from "@syrokomskyi/axiom-study";
 
 export interface FindingYaml {

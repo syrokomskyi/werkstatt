@@ -1,5 +1,19 @@
+/*
+<MODULE_CONTRACT>
+<purpose>RFC-0012: One-shot Axiom accessibility check for a mission. Builds workpiece, starts static server, captures evidence via Playwright + axe-core, runs runAccessibilityInstrument, writes findings.yaml + evidence-capsule.yaml, stops server.</purpose>
+<non-goals>
+  <item>Does not implement --mode dev (MVP: only preview).</item>
+  <item>Does not support mobile viewport (MVP: desktop only).</item>
+  <item>Does not integrate with Observatory runtime (local-dev only).</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0012: initial implementation of mission.check command.</item>
+</CHANGE_SUMMARY>
+*/
+
 import { createServer, type Server } from "node:http";
-import { stat, readdir, readFile as fsReadFile, writeFile, mkdir } from "node:fs/promises";
+import { stat, readFile as fsReadFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, extname, normalize } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -20,7 +34,7 @@ import {
 } from "@syrokomskyi/axiom-study";
 import { PlaywrightCaptureAdapter } from "@syrokomskyi/axiom-capture";
 
-import { convertObservationsToFindings, type FindingYaml } from "./mission-check-converter.ts";
+import { convertObservationsToFindings } from "./mission-check-converter.ts";
 
 export interface MissionCheckResult {
   command: "mission.check";
@@ -146,6 +160,34 @@ async function healthCheck(baseUrl: string, timeoutMs = 30_000): Promise<void> {
   throw new Error(`HEALTH_CHECK_TIMEOUT: server did not respond within ${timeoutMs}ms`);
 }
 
+function safeNameFromPath(pagePath: string): string {
+  return pagePath.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "index";
+}
+
+function failResult(
+  missionId: string,
+  evidenceDir: string,
+  serverPort: number | undefined,
+  startTime: number,
+  exitCode: number,
+  summary: string,
+): KernelCommandResult<MissionCheckResult> {
+  return {
+    data: {
+      command: "mission.check",
+      status: "fail",
+      missionId,
+      methodology: "web-accessibility",
+      findings: { errors: 0, warnings: 0, total: 0 },
+      evidenceDir,
+      serverPort,
+      durationMs: Date.now() - startTime,
+    },
+    exitCode,
+    summary,
+  };
+}
+
 async function runAxeInBrowser(
   pageUrl: string,
   pagePath: string,
@@ -162,7 +204,7 @@ async function runAxeInBrowser(
     );
 
     // Run axe-core in the browser via Playwright
-    let chromium: any;
+    let chromium: (typeof import("playwright"))["chromium"];
     try {
       const pw = await import("playwright");
       chromium = pw.chromium;
@@ -175,19 +217,26 @@ async function runAxeInBrowser(
       const page = await browser.newPage();
       await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
 
-      // Inject and run axe-core
+      // Inject and run axe-core from CDN (requires network access)
       await page.addScriptTag({
         url: "https://unpkg.com/axe-core@4.12.1/axe.min.js",
       });
 
       const axeResults = await page.evaluate(() => {
-        return (window as any).axe.run(document, {
+        interface AxeGlobal {
+          run: (
+            context: Document,
+            options: { runOnly: { type: string; values: string[] } },
+          ) => Promise<unknown>;
+        }
+        const axe = (window as unknown as { axe: AxeGlobal }).axe;
+        return axe.run(document, {
           runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
         });
       });
 
       const html = await page.content();
-      const safeName = pagePath.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "index";
+      const safeName = safeNameFromPath(pagePath);
       const locale = captured.lang ?? "en";
 
       return {
@@ -196,7 +245,7 @@ async function runAxeInBrowser(
           locale,
           profileId: "desktop",
           logicalPath: `raw/axe-${locale}-${safeName}-desktop.json`,
-          result: axeResults,
+          result: axeResults as AxeEvidenceState["result"],
         },
         html,
       };
@@ -212,7 +261,7 @@ export async function runMissionCheck(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<MissionCheckResult>> {
-  const { workspaceRoot, logger, outputFormat } = context;
+  const { workspaceRoot, logger } = context;
   const startTime = Date.now();
 
   const missionId = input.flags["mission"] as string | undefined;
@@ -223,7 +272,6 @@ export async function runMissionCheck(
   const externalPreview =
     input.flags["external-preview"] === true || input.flags["external-preview"] === "true";
   const baseUrlFlag = input.flags["base-url"] as string | undefined;
-  const jsonOutput = input.flags["json"] === true || input.flags["json"] === "true";
 
   const missionDir = resolveMissionDir(workspaceRoot, missionId);
   const evidenceDir = join(missionDir, "evidence", "axiom");
@@ -262,35 +310,25 @@ export async function runMissionCheck(
 
       if (buildResult.status !== 0) {
         const stderr = buildResult.stderr?.toString() ?? "unknown error";
-        return {
-          data: {
-            command: "mission.check",
-            status: "fail",
-            missionId,
-            methodology: "web-accessibility",
-            findings: { errors: 0, warnings: 0, total: 0 },
-            evidenceDir,
-            durationMs: Date.now() - startTime,
-          },
-          exitCode: 6,
-          summary: `mission.check: build failure — ${stderr.slice(0, 200)}`,
-        };
+        return failResult(
+          missionId,
+          evidenceDir,
+          undefined,
+          startTime,
+          6,
+          `mission.check: build failure — ${stderr.slice(0, 200)}`,
+        );
       }
 
       if (!existsSync(distDir)) {
-        return {
-          data: {
-            command: "mission.check",
-            status: "fail",
-            missionId,
-            methodology: "web-accessibility",
-            findings: { errors: 0, warnings: 0, total: 0 },
-            evidenceDir,
-            durationMs: Date.now() - startTime,
-          },
-          exitCode: 6,
-          summary: `mission.check: build produced no dist/client at ${distDir}`,
-        };
+        return failResult(
+          missionId,
+          evidenceDir,
+          undefined,
+          startTime,
+          6,
+          `mission.check: build produced no dist/client at ${distDir}`,
+        );
       }
 
       // Start static server with auto-discovered port
@@ -308,20 +346,14 @@ export async function runMissionCheck(
       try {
         await healthCheck(baseUrl);
       } catch (err) {
-        return {
-          data: {
-            command: "mission.check",
-            status: "fail",
-            missionId,
-            methodology: "web-accessibility",
-            findings: { errors: 0, warnings: 0, total: 0 },
-            evidenceDir,
-            serverPort,
-            durationMs: Date.now() - startTime,
-          },
-          exitCode: 3,
-          summary: `mission.check: health check failed — ${err instanceof Error ? err.message : String(err)}`,
-        };
+        return failResult(
+          missionId,
+          evidenceDir,
+          serverPort,
+          startTime,
+          3,
+          `mission.check: health check failed — ${err instanceof Error ? err.message : String(err)}`,
+        );
       }
     }
 
@@ -332,20 +364,14 @@ export async function runMissionCheck(
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       if (message.startsWith("SITEMAP_MISSING")) {
-        return {
-          data: {
-            command: "mission.check",
-            status: "fail",
-            missionId,
-            methodology: "web-accessibility",
-            findings: { errors: 0, warnings: 0, total: 0 },
-            evidenceDir,
-            serverPort,
-            durationMs: Date.now() - startTime,
-          },
-          exitCode: 7,
-          summary: `mission.check: no sitemap.xml found at ${baseUrl}/sitemap.xml — generate sitemap or use --external-preview with manual page list`,
-        };
+        return failResult(
+          missionId,
+          evidenceDir,
+          serverPort,
+          startTime,
+          7,
+          `mission.check: no sitemap.xml found at ${baseUrl}/sitemap.xml — generate sitemap or use --external-preview with manual page list`,
+        );
       }
       throw err;
     }
@@ -372,47 +398,35 @@ export async function runMissionCheck(
         );
         axeStates.push(axeState);
 
-        const safeName = page.path.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "index";
+        const safeName = safeNameFromPath(page.path);
         const axeFilename = `axe-${axeState.locale}-${safeName}-desktop.json`;
         rawEvidence.push({ filename: axeFilename, data: axeState.result });
         htmlFiles.push({ filename: `html-${safeName}.html`, content: html });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         if (message.startsWith("PLAYWRIGHT_MISSING")) {
-          return {
-            data: {
-              command: "mission.check",
-              status: "fail",
-              missionId,
-              methodology: "web-accessibility",
-              findings: { errors: 0, warnings: 0, total: 0 },
-              evidenceDir,
-              serverPort,
-              durationMs: Date.now() - startTime,
-            },
-            exitCode: 4,
-            summary: `mission.check: Playwright not available — run 'pnpm exec playwright install chromium'`,
-          };
+          return failResult(
+            missionId,
+            evidenceDir,
+            serverPort,
+            startTime,
+            4,
+            `mission.check: Playwright not available — run 'pnpm exec playwright install chromium'`,
+          );
         }
         logger.warn(`  Capture failed for ${page.path}: ${message}`);
       }
     }
 
     if (axeStates.length === 0) {
-      return {
-        data: {
-          command: "mission.check",
-          status: "fail",
-          missionId,
-          methodology: "web-accessibility",
-          findings: { errors: 0, warnings: 0, total: 0 },
-          evidenceDir,
-          serverPort,
-          durationMs: Date.now() - startTime,
-        },
-        exitCode: 2,
-        summary: `mission.check: no pages could be captured`,
-      };
+      return failResult(
+        missionId,
+        evidenceDir,
+        serverPort,
+        startTime,
+        2,
+        `mission.check: no pages could be captured`,
+      );
     }
 
     // Build instrument context
@@ -456,12 +470,7 @@ export async function runMissionCheck(
         locale: s.locale,
         profileId: s.profileId,
         logicalPath: s.logicalPath,
-        htmlPath: `raw/html-${
-          s.url
-            .split("/")
-            .pop()
-            ?.replace(/[^a-z0-9]+/gi, "-") || "index"
-        }.html`,
+        htmlPath: `raw/html-${safeNameFromPath(new URL(s.url).pathname)}.html`,
         screenshotPath: `screenshots/`,
       })),
       classification: "local-dev",
@@ -508,11 +517,9 @@ export async function runMissionCheck(
       durationMs,
     };
 
-    if (outputFormat === "pretty" && !jsonOutput) {
-      logger.info(`  Findings: ${findings.length} (${errors} errors, ${warnings} warnings)`);
-      logger.info(`  Evidence: ${evidenceDir}`);
-      logger.info(`  Duration: ${durationMs}ms`);
-    }
+    logger.info(`  Findings: ${findings.length} (${errors} errors, ${warnings} warnings)`);
+    logger.info(`  Evidence: ${evidenceDir}`);
+    logger.info(`  Duration: ${durationMs}ms`);
 
     return {
       data: result,
