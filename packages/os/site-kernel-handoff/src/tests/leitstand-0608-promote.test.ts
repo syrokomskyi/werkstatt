@@ -339,3 +339,34 @@ test("leitstand.promote succeeds and transitions to promoted when all checks pas
   expect(result.data!.releaseState).toBe("promoted");
   expect(readReleaseState(tmpDir, releaseId)).toBe("promoted");
 });
+
+test("RFC-0618: build-identity fetch URL includes cache-buster query param", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+  createRegistryWithCloudflareAdapter(tmpDir, systemId);
+  writeReleaseManifest(tmpDir, releaseId, {
+    systemId,
+    state: "alt-deployed",
+    missionId: "test-sys-m000001",
+    distTreeHash: "dist-hash-123",
+    behaviorSnapshotHash: "behavior-hash-123",
+    siteContentHash: "content-hash-123",
+  });
+  createDistDir(tmpDir, releaseId);
+  await storeArtifactCore(tmpDir, releaseId, join(tmpDir, "releases", releaseId, "dist"), systemId);
+
+  const mockFetch = vi.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => VALID_BUILD_IDENTITY,
+    text: async () => JSON.stringify(VALID_BUILD_IDENTITY),
+    headers: new Headers(),
+  });
+  vi.stubGlobal("fetch", mockFetch);
+
+  await runLeitstandPromote(makeInput({ release: releaseId }), makeContext(tmpDir));
+
+  const buildIdentityCall = mockFetch.mock.calls[0];
+  const fetchUrl = buildIdentityCall[0] as string;
+  expect(fetchUrl).toMatch(/\.well-known\/build-identity\.json\?cb=\d+$/);
+});
