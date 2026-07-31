@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -95,7 +96,7 @@ The health check in the same adapter already has `fetchWithRetry` with 5 attempt
 
 ## Decision
 
-The cloudflare-workers adapter wraps `wrangler deploy` in a shared `runWranglerDeployWithRetry` helper that retries up to 2 times (3 total attempts) with 30s and 60s delays, but only when the stderr output matches transient Cloudflare API error patterns (502, 503, 504, 522, "Gateway Timeout", "malformed response"). Non-retryable errors (authentication, 4xx, syntax, build errors) fail immediately without retry. The helper is used in both `propagate` and `rollback`.
+The cloudflare-workers adapter wraps `wrangler deploy` in a shared `runWranglerDeployWithRetry` helper that retries up to 2 times (3 total attempts) with 30s and 60s delays, but only when the stderr output matches transient Cloudflare API error patterns (502, 503, 504, 522, "Gateway Timeout", "malformed response"). Non-retryable errors (authentication, 4xx, syntax, build errors) fail immediately without retry. The helper is used in the adapter's `propagate` and `rollback` methods; `leitstand.promote` benefits transitively because it calls `adapter.propagate` for the main channel deployment.
 
 ## Architectural fit
 
@@ -133,25 +134,19 @@ const TRANSIENT_ERROR_PATTERNS: readonly RegExp[] = [
   /Received a malformed response from the API/i,
 ];
 
-interface WranglerDeployOptions {
-  cwd: string;
-  env: Record<string, string>;
-}
-
-interface WranglerDeployResult {
-  exitCode: number;
-  stdout: string;
-  stderr: string;
-}
+// Reuse existing types from adapter.ts:
+//   CommandRunner opts: { cwd?: string; env?: Record<string, string> }
+//   CommandRunner return: { exitCode: number; stdout: string; stderr: string }
+// No new interfaces needed — the helper uses CommandRunner's existing types.
 
 // Shared helper used by propagate and rollback
 async function runWranglerDeployWithRetry(
   runner: CommandRunner,
   args: string[],
-  opts: WranglerDeployOptions,
+  opts: { cwd: string; env: Record<string, string> },
   maxRetries: number = 2,
   delaysMs: number[] = [30_000, 60_000],
-): Promise<WranglerDeployResult>
+): Promise<{ exitCode: number; stdout: string; stderr: string }>
 ```
 
 ### File system responsibilities
@@ -160,6 +155,7 @@ async function runWranglerDeployWithRetry(
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/leitstand/adapters/cloudflare-workers.ts` | Add `runWranglerDeployWithRetry` helper, refactor `propagate` and `rollback` to use it |
 | `packages/os/site-kernel-handoff/src/tests/cloudflare-workers.test.ts` | Add unit tests for retry behavior |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Update Leitstand section to document retry behavior for `wrangler deploy` |
 
 ### Output format
 
