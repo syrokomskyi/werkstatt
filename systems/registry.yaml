@@ -17,6 +17,10 @@ systems:
     deployment:
       adapter: cloudflare-workers
       channels:
+        dev:
+          workerName: dev-warpgogol-com
+          url: https://dev-warpgogol-com.syrokomskyi.workers.dev
+          secretsFile: env:WERKSTATT_SECRETS_DEV
         alt:
           workerName: alt-warpgogol-com
           url: https://alt-warpgogol-com.syrokomskyi.workers.dev
@@ -41,4 +45,3 @@ systems:
           operationId: op-ms8xfn7y-981kkz8x
           leaseExpiresAt: null
     notes: ""
-
