@@ -230,8 +230,8 @@ No CLI output changes. Lock files on disk now include `depth: <N>`.
 - [x] `pnpm --filter @warpgogol/forge build:check` passes (evidence: 2026-07-31 run)
 - [x] `pnpm --filter @warpgogol/ontology build:check` passes (evidence: 2026-07-31 run)
 - [x] `rfc.validate` passes on this file (evidence: this validation run)
-- [ ] `packages/forge/AGENTS.md` documents the re-entrant lock behavior (evidence: pending)
-- [ ] Test asserts that re-entrant acquire preserves the original `operationId` and `command` (evidence: pending)
+- [x] `packages/forge/AGENTS.md` documents the re-entrant lock behavior (evidence: packages/forge/AGENTS.md:68-70)
+- [x] Test asserts that re-entrant acquire preserves the original `operationId` and `command` (evidence: packages/forge/src/tests/werkstatt-lock.test.ts:135-137)
 
 ## Implementation notes for agents
 
