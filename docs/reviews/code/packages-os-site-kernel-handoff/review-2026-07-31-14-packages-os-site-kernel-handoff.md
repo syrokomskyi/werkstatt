@@ -4,7 +4,7 @@ date: 2026-07-31
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: 38824e1...HEAD
 filesReviewed:
   - packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts
@@ -22,9 +22,9 @@ filesReviewed:
 
 # Code Review: 38824e1...HEAD (RFC-0624 post-deploy CDN cache purge)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The implementation is architecturally sound and meets all RFC-0624 acceptance criteria. Two minor findings on axes A and G require attention before merging.
+The implementation is architecturally sound and meets all RFC-0624 acceptance criteria. Both findings (A1, G1) from the initial review have been fixed: the dead try/catch was removed and the zone ID was removed from the log message.
 
 ### Mechanical floor
 
@@ -32,7 +32,7 @@ Pass — `@warpgogol/ontology build:check`, `@warpgogol/site-kernel-handoff buil
 
 ### Axis A — Structural correctness
 
-**Finding A1 (minor):** `runPurgeStep` in `leitstand-commands.ts:168-171` has a redundant try/catch around `purgeCacheByUrls`. The function already catches network errors internally (cache-purge.ts:53-60) and returns a `PurgeResult` with `success: false` — it never throws. The outer catch is dead code that can never execute. Remove the try/catch and call `purgeCacheByUrls` directly, assigning the result.
+**Finding A1 (minor, RESOLVED):** `runPurgeStep` had a redundant try/catch around `purgeCacheByUrls`. The function already catches network errors internally (cache-purge.ts:53-60) and returns a `PurgeResult` with `success: false` — it never throws. **Fix applied:** Removed the dead try/catch, calling `purgeCacheByUrls` directly.
 
 ### Axis B — DNA alignment
 
@@ -56,7 +56,7 @@ No issues. No new commands — existing commands extended. `PurgeResult` type is
 
 ### Axis G — Blind spots
 
-**Finding G1 (minor):** `runPurgeStep` in `leitstand-commands.ts:158` logs the zone ID in the info message: `Purging CDN cache for ${urls.length} URLs on zone ${zoneId}...`. The zone ID is not a secret, but logging it in every deploy log is unnecessary information exposure. Consider removing the zone ID from the log message or logging only the first 8 characters for traceability.
+**Finding G1 (minor, RESOLVED):** `runPurgeStep` logged the zone ID in the info message. The zone ID is not a secret, but logging it in every deploy log is unnecessary information exposure. **Fix applied:** Removed the zone ID from the log message — URL count is sufficient context.
 
 ### Spec compliance
 

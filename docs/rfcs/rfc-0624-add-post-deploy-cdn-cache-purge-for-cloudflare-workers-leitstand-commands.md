@@ -292,7 +292,7 @@ The purge is always non-blocking. The deploy already succeeded — purge failure
 
 ## Implementation notes for agents
 
-- Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
+- Agents MAY implement code changes ONLY when this RFC has status: implemented (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
