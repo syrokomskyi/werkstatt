@@ -1,7 +1,7 @@
 ---
 id: RFC-0618
 title: "Cache-buster for leitstand.promote build-identity fetch"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
 enhancedAt: 2026-07-31
-implementedAt:
+implementedAt: 2026-07-31
 closedAt:
 supersedes: []
 supersededBy:
