@@ -412,7 +412,7 @@ export async function runLeitstandDevDeploy(
   logger.info(`[leitstand.dev-deploy] building workpiece at ${workpiecePath}...`);
   let buildState: "succeeded" | "failed" = "succeeded";
   try {
-    execSync("pnpm build", { cwd: workpiecePath, stdio: "pipe", timeout: 120_000 });
+    execSync("pnpm build", { cwd: workpiecePath, stdio: "inherit", timeout: 600_000 });
   } catch (err) {
     buildState = "failed";
     logger.warn(
@@ -559,10 +559,6 @@ export async function runLeitstandDevDeploy(
   }
 
   // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
-  logger.success(
-    `[leitstand.dev-deploy] ${systemId} deployed to dev (${result.state}, Axiom: ${axiomStatus})`,
-  );
-
   return {
     data: {
       command: "leitstand.dev-deploy",
