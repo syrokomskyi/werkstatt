@@ -167,7 +167,7 @@ test("leitstand.rollback auto-detects main from promoted, steps to alt-deployed"
   expect(readReleaseState(tmpDir, currentRelease)).toBe("alt-deployed");
 });
 
-test("leitstand.rollback auto-detects alt from alt-deployed, steps to dev-deployed", async () => {
+test("leitstand.rollback auto-detects alt from alt-deployed, steps to published", async () => {
   const systemId = "test-sys";
   const currentRelease = "test-sys-r000002";
   const targetRelease = "test-sys-r000001";
@@ -193,5 +193,5 @@ test("leitstand.rollback auto-detects alt from alt-deployed, steps to dev-deploy
 
   expect(result.data!.state).toBe("succeeded");
   expect(result.data!.channel).toBe("alt");
-  expect(readReleaseState(tmpDir, currentRelease)).toBe("dev-deployed");
+  expect(readReleaseState(tmpDir, currentRelease)).toBe("published");
 });
