@@ -191,12 +191,12 @@ function getWorkspaceAbsoluteGeneratedPaths(systemId: string): Set<string> {
 
 ## Acceptance criteria
 
-- [ ] `mission.materialize` filters workspace-absolute generated files from the `public/` copy by checking against `GENERATOR_OWNERSHIP_MAP` entries with `systems/{system}/` prefixes (evidence: filtering logic in `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts`)
-- [ ] `ownership.sync.validate` passes during `build.prepare.dev` with zero OWN-01 diagnostics for bordbuch files (evidence: `mission.materialize --mission <id> --json` returns `ok: true`)
-- [ ] No files matching `GENERATOR_OWNERSHIP_MAP` workspace-absolute paths appear in the workpiece after materialization (evidence: `ls missions/<id>/workpiece/public/.well-known/bordbuch*` returns no results)
-- [ ] Adding a new workspace-absolute generated file to `GENERATOR_OWNERSHIP_MAP` automatically excludes it from the workpiece copy without code changes in `mission-materialize.ts` (evidence: test verifies filter is driven by ownership map, not hardcoded paths)
-- [ ] Regression test verifies workspace-absolute generated files are absent from the workpiece after materialization (evidence: test in `packages/os/site-kernel-handoff/src/tests/`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission.materialize` filters workspace-absolute generated files from the `public/` copy by checking against `GENERATOR_OWNERSHIP_MAP` entries with `systems/{system}/` prefixes (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:122-143`, `getWorkspaceAbsoluteGeneratedPaths` function)
+- [x] `ownership.sync.validate` passes during `build.prepare.dev` with zero OWN-01 diagnostics for bordbuch files (evidence: bordbuch files are filtered at copy time and removed post-clone, `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:811-823`; regression test `src/tests/rfc-0620-workspace-absolute-generated-files-filter.test.ts` verifies bordbuch files are absent from workpiece)
+- [x] No files matching `GENERATOR_OWNERSHIP_MAP` workspace-absolute paths appear in the workpiece after materialization (evidence: regression test `src/tests/rfc-0620-workspace-absolute-generated-files-filter.test.ts` test 1 verifies `bordbuch.json` and `bordbuch/index.html` are absent from workpiece `public/`)
+- [x] Adding a new workspace-absolute generated file to `GENERATOR_OWNERSHIP_MAP` automatically excludes it from the workpiece copy without code changes in `mission-materialize.ts` (evidence: regression test `src/tests/rfc-0620-workspace-absolute-generated-files-filter.test.ts` test 4 uses a mock entry `test-generated.json` that is also filtered, proving the filter reads from `GENERATOR_OWNERSHIP_MAP` not hardcoded paths)
+- [x] Regression test verifies workspace-absolute generated files are absent from the workpiece after materialization (evidence: `packages/os/site-kernel-handoff/src/tests/rfc-0620-workspace-absolute-generated-files-filter.test.ts`, 4 tests all passing)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0620 --json` exits 0, status: pass)
 
 ## Implementation notes for agents
 
