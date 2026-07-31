@@ -10,6 +10,7 @@
   <item>RFC-0379: initial cloudflare-workers adapter with injectable CommandRunner, secretsFile resolution, deterministic health probes.</item>
   <item>RFC-0587: export filterEnv and sourceDotenv; add getLimits() for adapter-declared size limits.</item>
   <item>RFC-0595: verify redirect routes by HTTP status + Location header.</item>
+  <item>RFC-0623: add runWranglerDeployWithRetry helper with transient error detection for wrangler deploy.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,6 +27,46 @@ import type {
   RollbackInput,
   HealthInput,
 } from "../adapter.ts";
+
+const TRANSIENT_ERROR_PATTERNS: readonly RegExp[] = [
+  /\b502\b/,
+  /\b503\b/,
+  /\b504\b/,
+  /\b522\b/,
+  /Gateway Timeout/i,
+  /malformed response/i,
+  /Received a malformed response from the API/i,
+];
+
+function isTransientError(stderr: string): boolean {
+  return TRANSIENT_ERROR_PATTERNS.some((pattern) => pattern.test(stderr));
+}
+
+async function runWranglerDeployWithRetry(
+  runner: CommandRunner,
+  args: string[],
+  opts: { cwd: string; env: Record<string, string> },
+  maxRetries: number = 2,
+  delaysMs: number[] = [30_000, 60_000],
+): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  const totalAttempts = maxRetries + 1;
+  let result = await runner("npx", args, opts);
+
+  for (let attempt = 1; attempt < totalAttempts; attempt++) {
+    if (result.exitCode === 0) return result;
+    if (!isTransientError(result.stderr)) return result;
+
+    const delayMs = delaysMs[attempt - 1] ?? delaysMs[delaysMs.length - 1];
+    console.error(
+      `[cloudflare-workers] wrangler deploy failed (attempt ${attempt}/${totalAttempts}): transient Cloudflare API error`,
+    );
+    console.error(`[cloudflare-workers] Retrying in ${delayMs / 1000}s...`);
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    result = await runner("npx", args, opts);
+  }
+
+  return result;
+}
 
 export function filterEnv(env: Record<string, string | undefined>): Record<string, string> {
   const result: Record<string, string> = {};
@@ -184,15 +225,12 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         wranglerArgs.push("--secrets-file", input.secretsFilePath);
       }
 
-      const result = await runner("npx", wranglerArgs, {
+      const result = await runWranglerDeployWithRetry(runner, wranglerArgs, {
         cwd: input.distPath,
         env,
       });
 
       if (result.exitCode !== 0) {
-        console.error(`[cloudflare-workers] wrangler deploy failed (exit ${result.exitCode})`);
-        console.error(`[cloudflare-workers] stdout: ${result.stdout.slice(-500)}`);
-        console.error(`[cloudflare-workers] stderr: ${result.stderr.slice(-500)}`);
         return {
           systemId: input.systemId,
           releaseId: input.releaseId,
@@ -232,7 +270,7 @@ export function createCloudflareWorkersAdapter(exec?: CommandRunner): Deployment
         wranglerArgs.push("--secrets-file", input.secretsFilePath);
       }
 
-      const result = await runner("npx", wranglerArgs, {
+      const result = await runWranglerDeployWithRetry(runner, wranglerArgs, {
         cwd: input.distPath,
         env,
       });
