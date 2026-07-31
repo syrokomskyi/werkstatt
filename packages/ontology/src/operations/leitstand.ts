@@ -9,6 +9,7 @@
   <item>RFC-0358: initial leitstand schemas.</item>
   <item>RFC-0379: remove cloudflare-pages/vercel from adapter enum, add null; replace flat target/credentials/lastPropagation with channel model (channels + per-channel lastPropagated with operational state).</item>
   <item>RFC-0595: add RouteFact with contentHash: string | null and optional redirectTarget.</item>
+  <item>RFC-0624: add purgeResult to lastPropagatedChannelSchema, purgeResultSchema, deploymentConfigSchema, purge tracking.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,6 +27,12 @@ export const deploymentChannelSchema = z.object({
   secretsFile: secretRefSchema.optional(),
 });
 
+export const purgeResultSchema = z.object({
+  success: z.boolean(),
+  purgedUrls: z.number(),
+  error: z.string().optional(),
+});
+
 export const lastPropagatedChannelSchema = z.object({
   releaseId: z.string(),
   at: z.string().datetime(),
@@ -33,6 +40,7 @@ export const lastPropagatedChannelSchema = z.object({
   state: z.enum(["succeeded", "failed", "failed-stale", "in-progress"]),
   operationId: z.string(),
   leaseExpiresAt: z.string().datetime().nullable(),
+  purgeResult: purgeResultSchema.optional(),
 });
 
 export const deploymentConfigSchema = z.object({
@@ -79,6 +87,7 @@ export type DeploymentAdapterName = z.infer<typeof deploymentAdapterNameSchema>;
 export type SecretRef = z.infer<typeof secretRefSchema>;
 export type DeploymentChannel = z.infer<typeof deploymentChannelSchema>;
 export type LastPropagatedChannel = z.infer<typeof lastPropagatedChannelSchema>;
+export type PurgeResult = z.infer<typeof purgeResultSchema>;
 export type DeploymentConfig = z.infer<typeof deploymentConfigSchema>;
 export type HealthCheck = z.infer<typeof healthCheckSchema>;
 export type PropagationResult = z.infer<typeof propagationResultSchema>;
