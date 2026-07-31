@@ -22,6 +22,7 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - `tools/kernel.config.ts` and `tools/modules/` are classified by Compass as authored but **should not travel in the bundle** — `kernel.config.ts` references app-local modules that don't exist until `kernel.wire` generates them. These are already excluded by Compass's generated-marker path (the marker is absent, but the file is under `tools/kernel.config.ts` which is not in `PACK_ROOTS` or `ROOT_CONFIG`). If the partition ever picks them up, add an explicit exclusion.
 - `handoff.absorb` detects derived-file edits before materializing: if any manifest derived entry has a hash mismatch (edited after packing), it raises a decision record and refuses without `--force`. This check is in `derived-edits.ts` / `reportDerivedEdits`. Bundles currently pack only authored entries (no `derived` kind), so the path is wired but not exercised in the current pack format; it activates if future packs carry derived snapshot entries.
 - Keep every relative import in package source on the on-disk `.ts` extension, per RFC-0092.
+- **Non-fatal warnings use `logger.warn`, not `logger.info`.** When a catch block logs a non-fatal failure (e.g., baseline failure, push failure, derived-edit detection), use `logger.warn` to distinguish it from informational output. See `sternsystem-sync.ts`, `handoff-absorb.ts`, `mission-materialization-commands.ts` for existing examples.
 
 ## Leitstand (RFC-0358 / RFC-0379 / RFC-0608)
 
