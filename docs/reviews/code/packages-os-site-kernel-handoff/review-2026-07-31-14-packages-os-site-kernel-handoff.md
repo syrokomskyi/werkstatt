@@ -79,5 +79,5 @@ No issues. No new commands — existing commands extended. `PurgeResult` type is
 
 ### Questions for the author
 
-1. The outer try/catch in `runPurgeStep` (line 160-171) wraps a function that never throws — should this dead code be removed?
-2. Is logging the full zone ID in every deploy log acceptable, or should it be truncated?
+1. ~~The outer try/catch in `runPurgeStep` wraps a function that never throws — should this dead code be removed?~~ Resolved — dead code removed.
+2. ~~Is logging the full zone ID in every deploy log acceptable, or should it be truncated?~~ Resolved — zone ID removed from log.
