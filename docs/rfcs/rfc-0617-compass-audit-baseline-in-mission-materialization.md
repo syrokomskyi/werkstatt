@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -38,10 +39,10 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
-    - compass.audit.baseline --workpiece
+  proposed: []
   added: []
   changed:
+    - compass.audit.baseline
     - mission.materialize
   removed: []
 appsImpacted: []
@@ -112,7 +113,9 @@ New flag on existing command:
 pnpm exec site-kernel run compass.audit.baseline --workpiece missions/warpgogol-com-m000022/workpiece
 ```
 
-The `--workpiece <path>` flag restricts scanning to the specified workpiece directory. Only authored files within that directory are seeded into the ledger. The flag is mutually exclusive with `--packages`.
+The `--workpiece <path>` flag restricts scanning to the specified workpiece directory. Only authored files within that directory are seeded into the ledger. The flag is mutually exclusive with `--packages` and `--site`.
+
+**Why `--workpiece` instead of `--site`?** `mission.materialize` calls `compass.audit.baseline` via `executeKernelCommand` programmatically. While `--site <systemId>` could theoretically resolve to the workpiece via `registry.currentMission`, the site discovery chain adds unnecessary indirection during materialization (the mission is still being set up, and the workpiece path is already known directly as `workpieceDir`). `--workpiece <path>` bypasses site discovery and points directly to the directory, making the integration explicit and testable.
 
 `mission.materialize` calls this internally after codegen completes:
 
@@ -147,10 +150,21 @@ await executeKernelCommand({
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/os/compass/handlers/compass-audit-handler.ts` | `compass.audit.baseline` handler (add `--workpiece` flag) |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | `mission.materialize` (add post-codegen baseline call) |
+| `packages/forge/os/compass/handlers/compass-audit-handler.ts` | `compass.audit.baseline` handler (add `--workpiece` flag handling) |
+| `packages/forge/os/compass/handlers/resolve-scan-root.ts` | `resolveCompassScanRoot` (add `--workpiece` path resolution, mutual exclusivity with `--site` and `--packages`) |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | `runMissionMaterialize` (add post-codegen baseline call via `executeKernelCommand`) |
 | `docs/compass-audit-ledger.generated.yaml` | Ledger file (updated by baseline) |
 | `missions/<missionId>/workpiece/` | Workpiece directory scanned by `--workpiece` |
+
+### Revision tracking for workpiece files
+
+Workpiece files are not tracked by the integrity registry (`.integrity/index/` covers only `apps/`, `packages/`, `services/`) and exist in the workpiece's own `.git`, not the monorepo's git history. `getRevisionByPath` falls back to `getFileRevisionFromHistory` which runs `git log` in `workspaceRoot` — this returns 0 revisions for workpiece files, so `revision = 1` always.
+
+This means the audit cadence is effectively static for workpiece files: they are seeded at revision 1 and `1 - 1 = 0 < 30` → never overdue. This is acceptable because workpiece files are ephemeral — they exist only during the mission lifecycle. After reconcile and close, content changes are pushed to the Sternsystem repo. The audit cadence applies to permanent codebase files, not to temporary workpiece copies.
+
+### Inventory classification for workpiece paths
+
+`createCompassInventoryEntries` classifies files by path prefix: `apps/` → `app`, `packages/` → `package`, `services/` → `service`. Workpiece files at `missions/<id>/workpiece/` don't match any prefix, so `detectWorkspaceKind` returns `"app"` (fallback), `detectWorkspaceName` returns the mission ID (second segment), and `detectLayer` returns `"other"` (no prefix match). This classification is incorrect but cosmetic — `compass.audit.baseline` only needs `path` and `authoringStatus === "authored"`, both of which are correct. No changes to `compass-inventory.ts` are needed.
 
 ### Output format
 
@@ -162,13 +176,14 @@ No changes to `--json` output shape. The baseline command reports `seeded: <N>, 
 - **No authored files in workpiece**: Baseline completes with `seeded=0`, no error. This is valid — some missions may not introduce new authored files.
 - **Baseline fails during mission.materialize**: The materialization fails. The operator must fix the baseline issue before re-running `mission.materialize`.
 - **`--workpiece` and `--packages` both passed**: Throws `[compass.audit.baseline] --workpiece and --packages are mutually exclusive`.
+- **`--workpiece` and `--site` both passed**: Throws `[compass.audit.baseline] --workpiece and --site are mutually exclusive`.
 
 ## Rollout
 
 - **Automatic adoption**: All new missions automatically get audit baseline during materialization. No operator action required.
 - **Existing missions**: Missions that were materialized before this RFC may still have unbaselined files. The operator can run `compass.audit.baseline --workpiece <path>` manually for those.
 - **No pipeline changes**: `build.post` and `compass.audit.validate --strict` remain unchanged. They simply pass because the ledger is now seeded.
-- **Integration point**: The baseline call is added to `mission.materialize` after codegen, before the first `mission.build`.
+- **Integration point**: The baseline call is added to `runMissionMaterialize` after the `build.prepare.dev` pipeline completes and after the initial `mission.git.commit`, before the materialization report is written.
 
 ## Alternatives considered
 
@@ -196,6 +211,6 @@ No changes to `--json` output shape. The baseline command reports `seeded: <N>, 
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - The `--workpiece` flag MUST be added to the canonical handler in `packages/forge/os/compass/handlers/compass-audit-handler.ts`, not to the re-export shim in `packages/os/site-kernel-checks/src/compass-audit.ts` (RFC-0556).
-- The `mission.materialize` change MUST be in `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts`, after the codegen step and before the function returns.
+- The `mission.materialize` change MUST be in `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` (where `runMissionMaterialize` lives), after the `build.prepare.dev` pipeline and git commit, before the materialization report is written. The `mission-materialization-commands.ts` file contains `runMissionValidate`, `runMissionBuild`, `runMissionDiff`, and `runMissionReconcile` — not `runMissionMaterialize`.
 - Agents MUST NOT add `compass.audit.baseline` to `release.prepare` — it belongs in `mission.materialize` only.
 - Agents MUST NOT weaken the `--strict` flag on `compass.audit.validate` in `build.post`.
