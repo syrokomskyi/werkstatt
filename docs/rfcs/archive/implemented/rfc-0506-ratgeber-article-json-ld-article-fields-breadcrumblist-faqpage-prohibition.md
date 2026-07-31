@@ -1,71 +1,73 @@
 ---
 id: RFC-0506
-title: "Ratgeber article JSON-LD — Article fields, BreadcrumbList, and FAQPage prohibition"
+title: Ratgeber article JSON-LD — Article fields, BreadcrumbList, and FAQPage prohibition
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 implementedAt: 2026-07-23
 enhancedAt: 2026-07-23
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0498
-  - RFC-0500
+- RFC-0498
+- RFC-0500
 amendedBy: []
 related:
-  - RFC-0074
-  - RFC-0192
-  - RFC-0193
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0498
-  - RFC-0500
-  - RFC-0502
-  - RFC-0504
+- RFC-0074
+- RFC-0192
+- RFC-0193
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0498
+- RFC-0500
+- RFC-0502
+- RFC-0504
 satisfies:
-  - DNA-16
-  - DNA-24
-  - DNA-53
+- DNA-16
+- DNA-24
+- DNA-53
 breaksC: true
 versionBump: minor
 commands:
   proposed: []
   added: []
   changed:
-    - seo.structured-data.validate
-    - surface.contract.validate
+  - seo.structured-data.validate
+  - surface.contract.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/ontology"
-  - "@gogol/share"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-handoff"
+- '@gogol/ontology'
+- '@gogol/share'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-handoff'
+- '@warpgogol/ontology'
 successSignals:
-  - "Every ratgeber depth-1 article page emits Article JSON-LD with: headline, description, author, publisher, datePublished, dateModified, mainEntityOfPage."
-  - "Every ratgeber depth-1 article page emits BreadcrumbList JSON-LD reflecting the canonical URL hierarchy (RFC-0495)."
-  - "No ratgeber depth-1 article page emits FAQPage JSON-LD for rich result purposes."
-  - "The Article JSON-LD author field references the author record (RFC-0502) — not a plain string."
-  - "The Article JSON-LD datePublished is the article's first publication date; dateModified is the latest reviewedAt or changelog entry date."
-  - "The Article JSON-LD mainEntityOfPage is the canonical URL of the article page."
-  - "seo.structured-data.validate enforces the Article field policy for ratgeber depth-1 pages."
-  - "surface.contract.validate checks the updated C-contract jsonld-types.yaml for ratgeber depth-1 Article fields."
-  - "The C-contract jsonld-types.yaml Article type includes mainEntityOfPage and description in optional fields."
-  - "The C-contract jsonld-types.yaml surfacePolicy for ratgeber depth-1 prohibits FAQPage."
+- 'Every ratgeber depth-1 article page emits Article JSON-LD with: headline, description, author, publisher, datePublished, dateModified, mainEntityOfPage.'
+- Every ratgeber depth-1 article page emits BreadcrumbList JSON-LD reflecting the canonical URL hierarchy (RFC-0495).
+- No ratgeber depth-1 article page emits FAQPage JSON-LD for rich result purposes.
+- The Article JSON-LD author field references the author record (RFC-0502) — not a plain string.
+- The Article JSON-LD datePublished is the article's first publication date; dateModified is the latest reviewedAt or changelog entry date.
+- The Article JSON-LD mainEntityOfPage is the canonical URL of the article page.
+- seo.structured-data.validate enforces the Article field policy for ratgeber depth-1 pages.
+- surface.contract.validate checks the updated C-contract jsonld-types.yaml for ratgeber depth-1 Article fields.
+- The C-contract jsonld-types.yaml Article type includes mainEntityOfPage and description in optional fields.
+- The C-contract jsonld-types.yaml surfacePolicy for ratgeber depth-1 prohibits FAQPage.
 nonGoals:
-  - "Does not change JSON-LD emission for non-ratgeber surfaces — those are governed by RFC-0498."
-  - "Does not add new JSON-LD types beyond Article and BreadcrumbList — both are already in the C-contract."
-  - "Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Warpgogol does not have reviews to markup."
-  - "Does not change the ratgeber hub (depth-0) JSON-LD — that remains CollectionPage + BreadcrumbList (RFC-0500)."
-  - "Does not change the URL structure — canonical URLs are already defined by RFC-0495."
+- Does not change JSON-LD emission for non-ratgeber surfaces — those are governed by RFC-0498.
+- Does not add new JSON-LD types beyond Article and BreadcrumbList — both are already in the C-contract.
+- Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Warpgogol does not have reviews to markup.
+- Does not change the ratgeber hub (depth-0) JSON-LD — that remains CollectionPage + BreadcrumbList (RFC-0500).
+- Does not change the URL structure — canonical URLs are already defined by RFC-0495.
+
 ---
 
 # RFC-0506: Ratgeber article JSON-LD — Article fields, BreadcrumbList, and FAQPage prohibition

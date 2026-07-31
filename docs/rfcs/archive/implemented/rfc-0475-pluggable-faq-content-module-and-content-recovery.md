@@ -1,86 +1,60 @@
 ---
 id: RFC-0475
-title: "Pluggable FAQ content module and content recovery"
+title: Pluggable FAQ content module and content recovery
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-21
 updatedAt: 2026-07-21
 enhancedAt: 2026-07-21
 implementedAt: 2026-07-21
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0474
-  - RFC-0471
-  - RFC-0470
-  - RFC-0212
-  - RFC-0200
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- RFC-0474
+- RFC-0471
+- RFC-0470
+- RFC-0212
+- RFC-0200
 satisfies:
-  - DNA-1
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
-# RFC-0478: Platform versioning enforcement.
+- DNA-1
 versionBump: patch
 commands:
-  proposed:
-    - faq.validate
-  added: []
+  proposed: []
+  added:
+  - faq.validate
   changed: []
   removed: []
 appsImpacted:
-  - warpgogol-com
-# List only packages actually impacted. Leave empty if unknown.
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/faq"
-  - "@gogol/share"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-onboarding"
+- '@gogol/faq'
+- '@gogol/share'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-onboarding'
 successSignals:
-  - "@gogol/faq package exists with Zod schema, Astro collection factory, and loader"
-  - "faq.validate command in site-kernel-checks validates FAQ entries and no-ops when FAQ collection is absent"
-  - "12 FAQ files (6 DE + 6 UK) restored to systems/warpgogol-com/src/content/faq/{lang}/"
-  - "df-start.md carries governance block with fieldClaims migrated from legacy claims-sidecar"
-  - "content.config.ts template includes FAQ collection by default"
-  - "faq-list-section renders FAQ entries from the new collection"
+- '@gogol/faq package exists with Zod schema, Astro collection factory, and loader'
+- faq.validate command in site-kernel-checks validates FAQ entries and no-ops when FAQ collection is absent
+- 12 FAQ files (6 DE + 6 UK) restored to systems/warpgogol-com/src/content/faq/{lang}/
+- df-start.md carries governance block with fieldClaims migrated from legacy claims-sidecar
+- content.config.ts template includes FAQ collection by default
+- faq-list-section renders FAQ entries from the new collection
 nonGoals:
-  - "Does not create dedicated FAQ pages (/faq/) — FAQ entries are embedded in existing pages via faq-list-section"
-  - "Does not move FAQ semantic logic (JSON-LD, page builder) out of @gogol/share"
-  - "Does not create a feature flag system for content collections — FAQ collection is always registered, no-op when empty"
-  - "Does not restore the legacy @gogol/business package or business/ content directory"
-  - "Does not change PBP namespace or schemas — FAQ is not a PBP entity"
-  - "Does not add faq.routes.generate or faq.collection.register commands — content.config.ts is owned by routes.generate"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: file-exists
-#     path: "packages/faq/package.json"
-#   - probe: file-exists
-#     path: "packages/faq/src/astro.ts"
-#   - probe: file-exists
-#     path: "systems/warpgogol-com/src/content/faq/de/df-start.md"
-#   - probe: file-exists
-#     path: "systems/warpgogol-com/src/content/faq/uk/df-start.md"
+- Does not create dedicated FAQ pages (/faq/) — FAQ entries are embedded in existing pages via faq-list-section
+- Does not move FAQ semantic logic (JSON-LD, page builder) out of @gogol/share
+- Does not create a feature flag system for content collections — FAQ collection is always registered, no-op when empty
+- Does not restore the legacy @gogol/business package or business/ content directory
+- Does not change PBP namespace or schemas — FAQ is not a PBP entity
+- Does not add faq.routes.generate or faq.collection.register commands — content.config.ts is owned by routes.generate
+
 ---
 
 # RFC-0475: Pluggable FAQ content module and content recovery

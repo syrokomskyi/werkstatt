@@ -1,87 +1,90 @@
 ---
 id: RFC-0500
-title: "Ratgeber editorial knowledge hub — article collection and hub restructure"
+title: Ratgeber editorial knowledge hub — article collection and hub restructure
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 enhancedAt: 2026-07-23
 implementedAt: 2026-07-23
-closedAt:
+closedAt: null
 supersedes:
-  - RFC-0325
-supersededBy:
+- RFC-0325
+supersededBy: null
 amends:
-  - RFC-0193
-  - RFC-0498
+- RFC-0193
+- RFC-0498
 amendedBy:
-  - RFC-0501
-  - RFC-0503
-  - RFC-0504
-  - RFC-0506
-  - RFC-0507
+- RFC-0501
+- RFC-0503
+- RFC-0504
+- RFC-0506
+- RFC-0507
+- RFC-0502
 related:
-  - RFC-0192
-  - RFC-0193
-  - RFC-0325
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0490
-  - RFC-0498
-  - RFC-0501
-  - RFC-0502
-  - RFC-0503
+- RFC-0192
+- RFC-0193
+- RFC-0325
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0490
+- RFC-0498
+- RFC-0501
+- RFC-0502
+- RFC-0503
 satisfies:
-  - DNA-16
-  - DNA-24
-  - DNA-53
+- DNA-16
+- DNA-24
+- DNA-53
 breaksC: true
 versionBump: minor
 commands:
   proposed:
-    - ratgeber.hub.validate
+  - ratgeber.hub.validate
   added:
-    - ratgeber.hub.validate
+  - ratgeber.hub.validate
   changed:
-    - surface.generate
-    - surface.validate
-    - article.depth.validate
-    - seo.structured-data.validate
-    - surface.contract.validate
+  - surface.generate
+  - surface.validate
+  - article.depth.validate
+  - seo.structured-data.validate
+  - surface.contract.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/surface"
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/share"
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/ui"
+- '@gogol/surface'
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@gogol/share'
+- '@gogol/site-kernel-handoff'
+- '@gogol/ui'
+- '@warpgogol/ontology'
 successSignals:
-  - "The /ratgeber/ hub (DE) and /porady/ hub (UK) emit CollectionPage JSON-LD as the primary type — not Article, not WebPage."
-  - "The hub renders a six-block editorial layout: Hero → Aktuelle Entscheidungshilfen → Themenbereiche → So arbeitet die Redaktion → Neu → Grundlagen — with an optional seventh contact block."
-  - "Article cards on the hub show seven fields: Thema, Titel, Frage, Zusammenfassung, Typ, Lesezeit, geprüft."
-  - "A new content collection surface/articles/{lang}/*.md replaces surface/topics/{lang}/*.md."
-  - "A new content collection surface/article-categories/{lang}/*.md holds category records."
-  - "The ratgeber blueprint uses `articles` as its dataset collection."
-  - "The hub semanticType is `collection` — not `article`. Depth-1 article pages retain `semanticType: article`."
-  - "ratgeber.hub.validate enforces the hub layout, card standard, category coverage, and article status gate."
-  - "No ratgeber page renders commercial result claims — ratgeber.hub.validate checks for prohibited strings."
+- The /ratgeber/ hub (DE) and /porady/ hub (UK) emit CollectionPage JSON-LD as the primary type — not Article, not WebPage.
+- 'The hub renders a six-block editorial layout: Hero → Aktuelle Entscheidungshilfen → Themenbereiche → So arbeitet die Redaktion → Neu → Grundlagen — with an optional seventh contact block.'
+- 'Article cards on the hub show seven fields: Thema, Titel, Frage, Zusammenfassung, Typ, Lesezeit, geprüft.'
+- A new content collection surface/articles/{lang}/*.md replaces surface/topics/{lang}/*.md.
+- A new content collection surface/article-categories/{lang}/*.md holds category records.
+- The ratgeber blueprint uses `articles` as its dataset collection.
+- 'The hub semanticType is `collection` — not `article`. Depth-1 article pages retain `semanticType: article`.'
+- ratgeber.hub.validate enforces the hub layout, card standard, category coverage, and article status gate.
+- No ratgeber page renders commercial result claims — ratgeber.hub.validate checks for prohibited strings.
 nonGoals:
-  - "Does not change the URL structure — routes remain /ratgeber/ (hub) and /ratgeber/{article-slug}/ (articles)."
-  - "Does not define article types or the mandatory 10-section structure — that is RFC-0501."
-  - "Does not define authors, sources, claims, or editorial reviews — that is RFC-0502."
-  - "Does not create the /ratgeber/redaktion/ editorial policy page — that is RFC-0503."
-  - "Does not change the website-local, website-service, or website-pillar blueprints."
-  - "Does not add new block archetypes — the baker maps article fields to existing block types."
-  - "Does not change the lazy-bake policy — the ratgeber blueprint retains `bake: lazy`."
+- Does not change the URL structure — routes remain /ratgeber/ (hub) and /ratgeber/{article-slug}/ (articles).
+- Does not define article types or the mandatory 10-section structure — that is RFC-0501.
+- Does not define authors, sources, claims, or editorial reviews — that is RFC-0502.
+- Does not create the /ratgeber/redaktion/ editorial policy page — that is RFC-0503.
+- Does not change the website-local, website-service, or website-pillar blueprints.
+- Does not add new block archetypes — the baker maps article fields to existing block types.
+- 'Does not change the lazy-bake policy — the ratgeber blueprint retains `bake: lazy`.'
+
 ---
 
 # RFC-0500: Ratgeber editorial knowledge hub — article collection and hub restructure

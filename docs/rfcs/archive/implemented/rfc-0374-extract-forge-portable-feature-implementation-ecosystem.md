@@ -1,101 +1,102 @@
 ---
 id: RFC-0374
-title: "Extract @gogol/forge — portable feature implementation ecosystem"
+title: Extract @gogol/forge — portable feature implementation ecosystem
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-10
 updatedAt: 2026-07-11
 enhancedAt: 2026-07-11
 implementedAt: 2026-07-13
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0366
-  - RFC-0368
-  - RFC-0370
+- RFC-0366
+- RFC-0368
+- RFC-0370
 amendedBy:
-  - RFC-0523
-  - RFC-0556
+- RFC-0523
+- RFC-0556
 related:
-  - RFC-0047
-  - RFC-0078
-  - RFC-0221
-  - RFC-0362
-  - RFC-0364
+- RFC-0047
+- RFC-0078
+- RFC-0221
+- RFC-0362
+- RFC-0364
 satisfies:
-  - DNA-1
-  - DNA-2
+- DNA-1
+- DNA-2
 commands:
-  proposed:
+  proposed: null
   added:
-    - forge.init
-    - forge.skill.validate
-    - forge.port.validate
-    - forge.port.scaffold
+  - forge.skill.validate
+  - forge.port.validate
+  - forge.port.scaffold
   changed:
-    - rfc.list
-    - rfc.create
-    - rfc.validate
-    - rfc.command-lifecycle.validate
-    - rfc.check
-    - rfc.index.generate
-    - rfc.graph
-    - rfc.acceptance.run
-    - rfc.verification.emit
-    - rfc.dna.trace.validate
-    - rfc.dna.trace.generate
-    - rfc.decision-log.generate
-    - rfc.supersede.propose
-    - rfc.archive
-    - rfc.pipeline.status
-    - naming.convention.lint
-    - compass.annotate
-    - compass.clear
-    - compass.markup.migrate
-    - compass.invariant.add
-    - compass.inventory
-    - compass.validate
-    - compass.changesummary.validate
-    - compass.changesummary.tidy
-    - compass.audit.plan
-    - compass.audit.record
-    - compass.audit.baseline
-    - compass.audit.validate
-    - werkstatt.lock.status
-    - werkstatt.lock.recover
-    - werkstatt.operation.validate
-    - workflow.lint
-    - workflow.list
-    - workflow-amend.list
-  removed: []
+  - rfc.list
+  - rfc.create
+  - rfc.validate
+  - rfc.command-lifecycle.validate
+  - rfc.check
+  - rfc.index.generate
+  - rfc.graph
+  - rfc.acceptance.run
+  - rfc.verification.emit
+  - rfc.dna.trace.validate
+  - rfc.dna.trace.generate
+  - rfc.decision-log.generate
+  - rfc.supersede.propose
+  - rfc.archive
+  - rfc.pipeline.status
+  - naming.convention.lint
+  - compass.inventory
+  - compass.validate
+  - compass.changesummary.validate
+  - compass.audit.plan
+  - compass.audit.record
+  - compass.audit.baseline
+  - compass.audit.validate
+  - werkstatt.lock.status
+  - werkstatt.lock.recover
+  - werkstatt.operation.validate
+  - workflow.lint
+  - workflow.list
+  - workflow-amend.list
+  removed:
+  - forge.init
+  - compass.annotate
+  - compass.clear
+  - compass.markup.migrate
+  - compass.invariant.add
+  - compass.changesummary.tidy
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/forge"
-  - "@gogol/site-kernel"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/ontology"
+- '@gogol/forge'
+- '@gogol/site-kernel'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-handoff'
+- '@gogol/ontology'
 successSignals:
-  - "17 skills relocated from .agents/skills/ to packages/forge/skills/ with standardized frontmatter"
-  - "forge.skill.validate passes on all forge skills"
-  - "Generic governance commands (rfc.*, naming.*, compass.*, werkstatt.*, workflow.*) register from @gogol/forge in kernel.config.ts"
-  - "Project-specific commands (section.*, cosmic.*, content.surface.*, image.variants.*) remain in packages/os/*"
-  - "forge.init deploys forge into a fresh project: creates PREFERENCES.md, registers commands, creates docs/rfcs/ and docs/adrs/"
-  - "skill-create and port-to-forge skills produce forge-compliant skills and commands"
-  - "Existing pipelines (build.check, build.prepare) continue to pass after command migration"
+- 17 skills relocated from .agents/skills/ to packages/forge/skills/ with standardized frontmatter
+- forge.skill.validate passes on all forge skills
+- Generic governance commands (rfc.*, naming.*, compass.*, werkstatt.*, workflow.*) register from @gogol/forge in kernel.config.ts
+- Project-specific commands (section.*, cosmic.*, content.surface.*, image.variants.*) remain in packages/os/*
+- 'forge.init deploys forge into a fresh project: creates PREFERENCES.md, registers commands, creates docs/rfcs/ and docs/adrs/'
+- skill-create and port-to-forge skills produce forge-compliant skills and commands
+- Existing pipelines (build.check, build.prepare) continue to pass after command migration
 nonGoals:
-  - "Does not migrate project-specific commands (section.*, cosmic.*, content.surface.*, image.variants.*, semantic.*) out of packages/os/*"
-  - "Does not migrate third-party skills (32 skills in .agents/skills/ not listed in this RFC) into forge"
-  - "Does not change the KernelModule interface or the kernel runtime"
-  - "Does not introduce a parallel CLI — forge commands register through the existing kernel module system"
-  - "Does not define Sternsystem or mission lifecycle integration for forge — that is a future concern"
-  - "Does not extract @gogol/ontology operations (werkstatt schemas remain in ontology; forge imports them)"
+- Does not migrate project-specific commands (section.*, cosmic.*, content.surface.*, image.variants.*, semantic.*) out of packages/os/*
+- Does not migrate third-party skills (32 skills in .agents/skills/ not listed in this RFC) into forge
+- Does not change the KernelModule interface or the kernel runtime
+- Does not introduce a parallel CLI — forge commands register through the existing kernel module system
+- Does not define Sternsystem or mission lifecycle integration for forge — that is a future concern
+- Does not extract @gogol/ontology operations (werkstatt schemas remain in ontology; forge imports them)
+
 ---
 
 # RFC-0374: Extract @gogol/forge — portable feature implementation ecosystem

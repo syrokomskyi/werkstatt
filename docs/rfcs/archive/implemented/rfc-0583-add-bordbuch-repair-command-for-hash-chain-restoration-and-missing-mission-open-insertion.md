@@ -1,82 +1,53 @@
 ---
 id: RFC-0583
-title: "Add bordbuch.repair command for hash-chain restoration and missing mission-open insertion"
+title: Add bordbuch.repair command for hash-chain restoration and missing mission-open insertion
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: command
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-29
 updatedAt: 2026-07-29
 enhancedAt: 2026-07-29
-acceptedAt: 2026-07-29
 implementedAt: 2026-07-29
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0355
+- RFC-0355
 amendedBy: []
 related:
-  - DNA-51
-  - RFC-0355
-  - RFC-0362
-  - RFC-0473
-  - RFC-0477
+- DNA-51
+- RFC-0355
+- RFC-0362
+- RFC-0473
+- RFC-0477
 satisfies:
-  - DNA-51
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
-# RFC-0478: Platform versioning enforcement. Declares the SemVer delta this RFC
-# produces when implemented. Required for post-cutoff implemented RFCs (V-29).
-# Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
-# major (architectural, manually reserved). Default: patch.
+- DNA-51
 versionBump: patch
 commands:
   proposed:
-    - bordbuch.repair
+  - bordbuch.repair
   added:
-    - bordbuch.repair
+  - bordbuch.repair
   changed: []
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@warpgogol/site-kernel-handoff"
+- '@warpgogol/site-kernel-handoff'
 successSignals:
-  - "bordbuch.repair detects orphan-mission-close violations and inserts missing mission-open events"
-  - "bordbuch.repair recalculates hash chain and event-id sequence after insertion"
-  - "bordbuch.validate passes after bordbuch.repair on a previously broken bordbuch"
-  - "bordbuch.repair --dry-run shows planned changes without writing"
+- bordbuch.repair detects orphan-mission-close violations and inserts missing mission-open events
+- bordbuch.repair recalculates hash chain and event-id sequence after insertion
+- bordbuch.validate passes after bordbuch.repair on a previously broken bordbuch
+- bordbuch.repair --dry-run shows planned changes without writing
 nonGoals:
-  - "Do not remove duplicate mission-open events — that is a separate repair scenario"
-  - "Do not fix event-id gaps independently of hash-chain restoration — they are fixed together as part of chain resequencing"
-  - "Do not add bordbuch.repair to any pipeline — it is an on-demand operator command"
-  - "Do not repair bordbuch in mission workpieces — bordbuch lives only in the cache clone (mirrors[0])"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Do not remove duplicate mission-open events — that is a separate repair scenario
+- Do not fix event-id gaps independently of hash-chain restoration — they are fixed together as part of chain resequencing
+- Do not add bordbuch.repair to any pipeline — it is an on-demand operator command
+- Do not repair bordbuch in mission workpieces — bordbuch lives only in the cache clone (mirrors[0])
+
 ---
 
 # RFC-0583: Add bordbuch.repair command for hash-chain restoration and missing mission-open insertion
@@ -277,18 +248,18 @@ On dry-run, `dryRun: true`, the file is not written, and `data.orphans` is prese
 
 ## Acceptance criteria
 
-- [x] `bordbuch.repair` command registered in `bordbuch.module.ts` (`createBordbuchModule()`) with workspace scope, `mutatesState: true`, `cacheable: false`, `supportsAllSites: false`, and `writes`/`reads` paths declared
-- [x] `runBordbuchRepair` and types exported from `bordbuch/index.ts` barrel
-- [x] `computeEntryHash` exported from `bordbuch-io.ts` for reuse by the repair module
-- [x] Detects `orphan-mission-close` violations and inserts missing `mission-open` events
-- [x] Auto-derives metadata from the corresponding `mission-close` event when `--metadata` is not provided
-- [x] `--metadata` flag overrides auto-derived metadata
-- [x] Recomputes hash chain and event-id sequence after insertion
-- [x] `bordbuch.validate` passes after `bordbuch.repair` on a previously broken bordbuch
-- [x] `--dry-run` shows planned repairs without writing
-- [x] Post-repair `bordbuch.validate` is run internally; command fails if repaired bordbuch is still invalid
-- [x] Unit test covers the orphan-mission-close repair scenario
-- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated to document `bordbuch.repair`
+- [x] `bordbuch.repair` command registered in `bordbuch.module.ts` (`createBordbuchModule()`) with workspace scope, `mutatesState: true`, `cacheable: false`, `supportsAllSites: false`, and `writes`/`reads` paths declared. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch.module.ts:1)
+- [x] `runBordbuchRepair` and types exported from `bordbuch/index.ts` barrel. (evidence: packages/os/site-kernel-handoff/src/bordbuch/index.ts:1)
+- [x] `computeEntryHash` exported from `bordbuch-io.ts` for reuse by the repair module. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts:1)
+- [x] Detects `orphan-mission-close` violations and inserts missing `mission-open` events. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts:1)
+- [x] Auto-derives metadata from the corresponding `mission-close` event when `--metadata` is not provided. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts:1)
+- [x] `--metadata` flag overrides auto-derived metadata. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts:1)
+- [x] Recomputes hash chain and event-id sequence after insertion. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts:1)
+- [x] `bordbuch.validate` passes after `bordbuch.repair` on a previously broken bordbuch. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts:1)
+- [x] `--dry-run` shows planned repairs without writing. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts:1)
+- [x] Post-repair `bordbuch.validate` is run internally; command fails if repaired bordbuch is still invalid. (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-repair.ts:1)
+- [x] Unit test covers the orphan-mission-close repair scenario. (evidence: packages/os/site-kernel-handoff/src/tests/bordbuch-repair.test.ts:1)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated to document `bordbuch.repair`. (evidence: packages/os/site-kernel-handoff/AGENTS.md:1)
 
 ## Implementation notes for agents
 

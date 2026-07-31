@@ -1,54 +1,55 @@
 ---
 id: RFC-0070
-title: "Define onboarding lifecycle: .input/.output folders, 00-brief contract, phase semantics"
-status: implemented
+title: 'Define onboarding lifecycle: .input/.output folders, 00-brief contract, phase semantics'
+status: superseded
 kind: contract
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers: []
 createdAt: 2026-05-18
-updatedAt: 2026-05-18
+updatedAt: &id001 2026-05-18
 implementedAt: 2026-05-18
-closedAt:
+closedAt: *id001
 supersedes:
-  - RFC-0029
-  - RFC-0030
-supersededBy:
+- RFC-0029
+- RFC-0030
+supersededBy: RFC-0532
 related:
-  - DNA-35
-  - DNA-36
-  - RFC-0025
-  - RFC-0026
-  - RFC-0047
-  - RFC-0071
-  - RFC-0072
-  - RFC-0073
-  - RFC-0074
-  - RFC-0075
+- DNA-35
+- DNA-36
+- RFC-0025
+- RFC-0026
+- RFC-0047
+- RFC-0071
+- RFC-0072
+- RFC-0073
+- RFC-0074
+- RFC-0075
 commands:
   proposed:
-    - brief.validate
+  - brief.validate
   added:
-    - brief.validate
+  - brief.validate
   changed: []
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - os/site-kernel-onboarding
-  - os/site-kernel-checks
+- os/site-kernel-onboarding
+- os/site-kernel-checks
 successSignals:
-  - onboarding/.input/ holds the active client research bundle including a required 00-brief.md frontmatter file
-  - onboarding/.output/<NN-phase>/ holds human-readable phase artifacts that the agent writes during the build
-  - brief.validate refuses to proceed when any required brief field is missing or malformed
-  - The site is built directly under apps/<id>/ (no draft/ folder, no staging copy)
-  - After the site passes apps-check.run, the human can open it in browser via pnpm --filter <id> dev
-  - The repo never holds more than 1-3 active sites in apps/ — completed sites move out to a separate turborepo
+- onboarding/.input/ holds the active client research bundle including a required 00-brief.md frontmatter file
+- onboarding/.output/<NN-phase>/ holds human-readable phase artifacts that the agent writes during the build
+- brief.validate refuses to proceed when any required brief field is missing or malformed
+- The site is built directly under apps/<id>/ (no draft/ folder, no staging copy)
+- After the site passes apps-check.run, the human can open it in browser via pnpm --filter <id> dev
+- The repo never holds more than 1-3 active sites in apps/ — completed sites move out to a separate turborepo
 nonGoals:
-  - Carrying biome/family/constellation/passport/deploy decisions inside 00-brief.md (those are derived by the agent or always-on)
-  - Persisting client materials inside the repo after build (materials and .output/ archives live in a separate "process" project)
-  - Backward compatibility with docs/onboarding/, apps-todo/, spec/001-010/, or .agents/workflows/{plant-seed,plant-content,update-content,review}.md
-  - Replacing apps/<id>/AGENTS.md with workflow files — invariants stay in AGENTS.md, sequences stay in workflows
+- Carrying biome/family/constellation/passport/deploy decisions inside 00-brief.md (those are derived by the agent or always-on)
+- Persisting client materials inside the repo after build (materials and .output/ archives live in a separate "process" project)
+- Backward compatibility with docs/onboarding/, apps-todo/, spec/001-010/, or .agents/workflows/{plant-seed,plant-content,update-content,review}.md
+- Replacing apps/<id>/AGENTS.md with workflow files — invariants stay in AGENTS.md, sequences stay in workflows
+
 ---
 
 # RFC-0070: Define onboarding lifecycle: .input/.output folders, 00-brief contract, phase semantics

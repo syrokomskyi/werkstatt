@@ -1,87 +1,55 @@
 ---
 id: RFC-0539
-title: "Portable skill registry and forge-managed project skill packs"
+title: Portable skill registry and forge-managed project skill packs
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: contract
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-26
 updatedAt: 2026-07-26
 enhancedAt: 2026-07-26
 implementedAt: 2026-07-26
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0374
-  - RFC-0391
-  - RFC-0393
-  - RFC-0523
-  - RFC-0524
-  - ADR-0003
-  - DNA-54
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- RFC-0374
+- RFC-0391
+- RFC-0393
+- RFC-0523
+- RFC-0524
+- ADR-0003
+- DNA-54
 satisfies:
-  - DNA-54
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
-# RFC-0478: Platform versioning enforcement. Declares the SemVer delta this RFC
-# produces when implemented. Required for post-cutoff implemented RFCs (V-29).
-# Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
-# major (architectural, manually reserved). Default: patch.
+- DNA-54
 versionBump: patch
 commands:
   proposed: []
   added: []
   changed:
-    - forge.init
-    - forge.skill.validate
-    - forge.skill.list
-    - forge.doctor
-  removed: []
+  - forge.skill.validate
+  - forge.skill.list
+  - forge.doctor
+  removed:
+  - forge.init
 appsImpacted: []
-# List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
-  - forge
-  - wgogol-skills
+- forge
+- wgogol-skills
 successSignals:
-  - "FORGE_SKILLS contains only skills that run in any forge-bootstrapped project without WGogol-specific directories or commands"
-  - "forge.skill.validate validates project skill packs declared in forge.yaml, including prefix enforcement"
-  - "npm consumers never receive mission-complete, site-scan, or any other ecosystem-bound skill"
+- FORGE_SKILLS contains only skills that run in any forge-bootstrapped project without WGogol-specific directories or commands
+- forge.skill.validate validates project skill packs declared in forge.yaml, including prefix enforcement
+- npm consumers never receive mission-complete, site-scan, or any other ecosystem-bound skill
 nonGoals:
-  - "Publishing project skill packs to npm — packs are project-local by definition"
-  - "Backward-compatible aliases for renamed skills — forward-only rename"
-  - "A central marketplace or discovery mechanism for third-party skill packs"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Publishing project skill packs to npm — packs are project-local by definition
+- Backward-compatible aliases for renamed skills — forward-only rename
+- A central marketplace or discovery mechanism for third-party skill packs
+
 ---
 
 # RFC-0539: Portable skill registry and forge-managed project skill packs

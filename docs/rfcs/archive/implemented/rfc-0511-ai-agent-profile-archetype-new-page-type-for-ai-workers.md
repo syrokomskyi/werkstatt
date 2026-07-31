@@ -1,72 +1,74 @@
 ---
 id: RFC-0511
-title: "AI-agent profile archetype — new page type for AI workers"
+title: AI-agent profile archetype — new page type for AI workers
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-24
 updatedAt: 2026-07-24
 implementedAt: 2026-07-24
 enhancedAt: 2026-07-24
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0008
-  - RFC-0200
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0508
-  - RFC-0509
-  - RFC-0510
-  - RFC-0512
-  - RFC-0513
+- RFC-0008
+- RFC-0200
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0508
+- RFC-0509
+- RFC-0510
+- RFC-0512
+- RFC-0513
 satisfies:
-  - DNA-24
-  - DNA-37
-  - DNA-38
+- DNA-24
+- DNA-37
+- DNA-38
 breaksC: true
 versionBump: minor
 commands:
   proposed:
-    - participant.ai-agent.validate
+  - participant.ai-agent.validate
   added:
-    - participant.ai-agent.validate
+  - participant.ai-agent.validate
   changed:
-    - sites-check.run
-    - surface.contract.validate
+  - sites-check.run
+  - surface.contract.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/share"
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
+- '@gogol/share'
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@warpgogol/ontology'
 successSignals:
-  - "AI-agent profile pages render a seven-block structure: hero (name, purpose, autonomy level), Zweck & Funktionsumfang (purposeStatement + capabilities), Autonomie & Handlungsrechte (autonomyLevel + rightsMatrix summary), Verantwortlichkeit & Eskalation (accountableHumanId + escalationRoute), Technischer Stand (technicalStand), Bekannte Einschränkungen (knownLimitations), Kontakt (escalation CTA)."
-  - "AI-agent profile pages are only generated for participants with participantType: ai-agent, visibility: public, and aiAgent.accountableHumanId set."
-  - "The hero block displays the autonomy level badge (A0–A4) with a human-readable label — no internal model identifiers."
-  - "The rightsMatrix is rendered as a summary table (action → status) — the full ACL with dataAccess details is private and not rendered."
-  - "The accountable human is linked by name to their human profile page — not just an ID."
-  - "The technicalStand block shows model family, evaluation date, and next evaluation date — no internal agent IDs or toolset versions."
-  - "The route pattern /team/ki-agenten/[agent-slug]/ (DE) and /komanda/ki-agenty/[agent-slug]/ (UK) is registered in url-schema.yaml."
-  - "participant.ai-agent.validate enforces the seven-block structure, accountableHumanId resolution, and public/private field separation."
-  - "No AI-agent profile page exists without a linked, active human profile page for the accountable human."
+- 'AI-agent profile pages render a seven-block structure: hero (name, purpose, autonomy level), Zweck & Funktionsumfang (purposeStatement + capabilities), Autonomie & Handlungsrechte (autonomyLevel + rightsMatrix summary), Verantwortlichkeit & Eskalation (accountableHumanId + escalationRoute), Technischer Stand (technicalStand), Bekannte Einschränkungen (knownLimitations), Kontakt (escalation CTA).'
+- 'AI-agent profile pages are only generated for participants with participantType: ai-agent, visibility: public, and aiAgent.accountableHumanId set.'
+- The hero block displays the autonomy level badge (A0–A4) with a human-readable label — no internal model identifiers.
+- The rightsMatrix is rendered as a summary table (action → status) — the full ACL with dataAccess details is private and not rendered.
+- The accountable human is linked by name to their human profile page — not just an ID.
+- The technicalStand block shows model family, evaluation date, and next evaluation date — no internal agent IDs or toolset versions.
+- The route pattern /team/ki-agenten/[agent-slug]/ (DE) and /komanda/ki-agenty/[agent-slug]/ (UK) is registered in url-schema.yaml.
+- participant.ai-agent.validate enforces the seven-block structure, accountableHumanId resolution, and public/private field separation.
+- No AI-agent profile page exists without a linked, active human profile page for the accountable human.
 nonGoals:
-  - "Does not define the Participant data model — that is RFC-0508."
-  - "Does not define the team hub page — that is RFC-0509."
-  - "Does not define the human profile page structure — that is RFC-0510."
-  - "Does not define JSON endpoints or Schema.org shapes — that is RFC-0512."
-  - "Does not create AI-agent participants — this RFC defines the page archetype and route pattern. Actual AI-agent records are created by the operator when AI agents are introduced."
-  - "Does not define real-time monitoring or health checks for AI agents — the profile is a static description, not a live status dashboard."
-  - "Does not design a prose fragment extraction mechanism (`contentRef#anchor`) — separate prose files per section are used, matching RFC-0510's pattern."
-  - "Does not extend `participant.profile.validate` with AI-agent rules — AI-agent validation is structurally distinct (accountableHumanId resolution, public/private field separation) and warrants a separate command."
+- Does not define the Participant data model — that is RFC-0508.
+- Does not define the team hub page — that is RFC-0509.
+- Does not define the human profile page structure — that is RFC-0510.
+- Does not define JSON endpoints or Schema.org shapes — that is RFC-0512.
+- Does not create AI-agent participants — this RFC defines the page archetype and route pattern. Actual AI-agent records are created by the operator when AI agents are introduced.
+- Does not define real-time monitoring or health checks for AI agents — the profile is a static description, not a live status dashboard.
+- Does not design a prose fragment extraction mechanism (`contentRef#anchor`) — separate prose files per section are used, matching RFC-0510's pattern.
+- Does not extend `participant.profile.validate` with AI-agent rules — AI-agent validation is structurally distinct (accountableHumanId resolution, public/private field separation) and warrants a separate command.
+
 ---
 
 # RFC-0511: AI-agent profile archetype — new page type for AI workers

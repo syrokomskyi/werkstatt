@@ -1,24 +1,24 @@
 ---
 id: RFC-0485
-title: "Remove stale font preload for /fonts/inter-400.woff2"
+title: Remove stale font preload for /fonts/inter-400.woff2
 status: implemented
 kind: deprecation
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-22
 updatedAt: 2026-07-21
-implementedAt: 2026-07-21
+implementedAt: '2026-07-22'
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0371
+- RFC-0371
 amendedBy: []
 related:
-  - RFC-0164
-  - RFC-0371
+- RFC-0164
+- RFC-0371
 satisfies: []
 versionBump: patch
 enhancedAt: 2026-07-22
@@ -29,15 +29,16 @@ commands:
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/ui"
+- '@gogol/ui'
 successSignals:
-  - "No 404 for /fonts/inter-400.woff2 in browser network tab during dev or build"
-  - "pnpm --filter @gogol/ui build:check passes"
-  - "Inter font still renders correctly (loaded via @fontsource CSS @font-face)"
+- No 404 for /fonts/inter-400.woff2 in browser network tab during dev or build
+- pnpm --filter @gogol/ui build:check passes
+- Inter font still renders correctly (loaded via @fontsource CSS @font-face)
 nonGoals:
-  - "Does not change the @fontsource import mechanism — fonts.imports.css is correct"
-  - "Does not add a dynamic preload path — Vite's @font-face inlining is sufficient for early paint"
-  - "Does not change biome font configuration or fonts.imports.generate"
+- Does not change the @fontsource import mechanism — fonts.imports.css is correct
+- Does not add a dynamic preload path — Vite's @font-face inlining is sufficient for early paint
+- Does not change biome font configuration or fonts.imports.generate
+
 ---
 
 # RFC-0485: Remove stale font preload for /fonts/inter-400.woff2

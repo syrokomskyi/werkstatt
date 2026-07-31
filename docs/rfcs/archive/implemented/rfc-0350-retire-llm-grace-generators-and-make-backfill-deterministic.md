@@ -1,50 +1,51 @@
 ---
 id: RFC-0350
-title: "Retire LLM GRACE generators and make backfill deterministic"
+title: Retire LLM GRACE generators and make backfill deterministic
 status: implemented
 kind: command
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-07
 updatedAt: 2026-07-07
 implementedAt: 2026-07-07
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy:
-  - RFC-0353
+- RFC-0353
 related:
-  - RFC-0015
-  - RFC-0346
-  - RFC-0348
+- RFC-0015
+- RFC-0346
+- RFC-0348
 satisfies:
-  - DNA-42
+- DNA-42
 commands:
   proposed: []
   added: []
-  changed:
-    - compass.annotate
+  changed: []
   removed:
-    - grace.anchors
+  - grace.anchors
+  - compass.annotate
 appsImpacted:
-  - apps/*
+- apps/*
 packagesImpacted:
-  - packages/os/site-kernel-codegen
+- packages/os/site-kernel-codegen
 successSignals:
-  - "grace.anchors no longer exists as a command; the anchor-backfill module and the grace-anchors prompt are deleted."
-  - "grace.backfill contains no LLM call, reads no OPENAI_API_KEY, and loads no prompt file; the grace-backfill and grace-backfill-repair prompts are deleted."
-  - "grace.backfill inserts a deterministic two-block skeleton with TODO(grace) sentinels into files that lack scaffolding, and emits a work-order listing exactly which files need an author to fill the sentinels."
-  - "grace.validate treats a TODO(grace) sentinel as non-compliant, so a skeleton cannot silently pass as a real contract."
-  - "The provenance of every GRACE block is git blame — the human or agent who authored the file — with no machine-generated prose masquerading as a contract."
+- grace.anchors no longer exists as a command; the anchor-backfill module and the grace-anchors prompt are deleted.
+- grace.backfill contains no LLM call, reads no OPENAI_API_KEY, and loads no prompt file; the grace-backfill and grace-backfill-repair prompts are deleted.
+- grace.backfill inserts a deterministic two-block skeleton with TODO(grace) sentinels into files that lack scaffolding, and emits a work-order listing exactly which files need an author to fill the sentinels.
+- grace.validate treats a TODO(grace) sentinel as non-compliant, so a skeleton cannot silently pass as a real contract.
+- The provenance of every GRACE block is git blame — the human or agent who authored the file — with no machine-generated prose masquerading as a contract.
 nonGoals:
-  - "Do not change the two-block contract shape — that is RFC-0348."
-  - "Do not add a command that authors purpose/non-goals prose automatically — prose is authored by whoever writes the file."
-  - "Do not keep any LLM code path, prompt file, or API-key dependency in the codegen package for GRACE."
-  - "Do not remove @ai-invariant insertion — the deterministic helper for that is RFC-0351."
+- Do not change the two-block contract shape — that is RFC-0348.
+- Do not add a command that authors purpose/non-goals prose automatically — prose is authored by whoever writes the file.
+- Do not keep any LLM code path, prompt file, or API-key dependency in the codegen package for GRACE.
+- Do not remove @ai-invariant insertion — the deterministic helper for that is RFC-0351.
+
 ---
 
 # RFC-0350: Retire LLM GRACE generators and make backfill deterministic

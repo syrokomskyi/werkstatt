@@ -1,111 +1,78 @@
 ---
 id: RFC-0532
-title: "Modernize onboarding for Sternsystem architecture"
+title: Modernize onboarding for Sternsystem architecture
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-25
 updatedAt: 2026-07-25
 enhancedAt: 2026-07-25
 implementedAt: 2026-07-25
-closedAt:
+closedAt: null
 supersedes:
-  - RFC-0070
-  - RFC-0076
-supersededBy:
+- RFC-0070
+- RFC-0076
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - DNA-44
-  - DNA-45
-  - DNA-46
-  - DNA-47
-  - RFC-0029
-  - RFC-0071
-  - RFC-0075
-  - RFC-0354
-  - RFC-0355
-  - RFC-0356
-  - RFC-0381
-  - RFC-0389
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- DNA-44
+- DNA-45
+- DNA-46
+- DNA-47
+- RFC-0029
+- RFC-0071
+- RFC-0075
+- RFC-0354
+- RFC-0355
+- RFC-0356
+- RFC-0381
+- RFC-0389
 satisfies:
-  - DNA-44
-  - DNA-45
-  - DNA-46
-  - DNA-47
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
-# RFC-0478: Platform versioning enforcement. Declares the SemVer delta this RFC
-# produces when implemented. Required for post-cutoff implemented RFCs (V-29).
-# Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
-# major (architectural, manually reserved). Default: patch.
+- DNA-44
+- DNA-45
+- DNA-46
+- DNA-47
 versionBump: patch
 commands:
   proposed:
-    - onboarding.synthesize
-    - sternsystem.register
+  - onboarding.synthesize
   added:
-    - onboarding.synthesize
-  changed:
-    - sternsystem.register
+  - onboarding.synthesize
+  - sternsystem.register
+  changed: []
   removed:
-    - brief.validate
-    - onboarding.input.validate
-    - onboarding.phase.validate
-    - onboarding.scaffold
-    - onboarding.checklist
+  - brief.validate
+  - onboarding.input.validate
+  - onboarding.phase.validate
+  - onboarding.scaffold
+  - onboarding.checklist
 appsImpacted: []
-# List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
-  - "@gogol/site-kernel-onboarding"
-  - "@gogol/site-kernel-handoff"
+- '@gogol/site-kernel-onboarding'
+- '@gogol/site-kernel-handoff'
 successSignals:
-  - "No file under onboarding/ uses the legacy global .input/.output layout — all onboarding artifacts are namespaced under onboarding/<system-id>/."
-  - "The .agents/workflows/ directory no longer contains 00-prepare through 06-handoff phase files — onboarding orchestration is delegated to the fo-onboard forge skill."
-  - "sternsystem.register (extended in @gogol/site-kernel-handoff) creates a complete Sternsystem entry (registry + pin + initial content) and automatically opens the first mission in a single invocation."
-  - "onboarding.synthesize validates and hashes raw client materials from onboarding/<system-id>/.input/ and writes a deterministic input manifest to onboarding/<system-id>/.output/."
-  - "The fo-onboard skill orchestrates the full onboarding pipeline: brief validation → AI synthesis → sternsystem.register → first mission, with cumulative knowledge across invocations."
-  - "No code in the monorepo references apps/<id>/ in onboarding-related paths — all references use systems/<id>/ or missions/<id>/workpiece/."
-  - "Amend onboarding (fo-onboard --amend) reads new raw materials from onboarding/<system-id>/.input/amend-<N>/, runs synthesis, and calls sternsystem.register --amend to update the pin and open an amend mission."
+- No file under onboarding/ uses the legacy global .input/.output layout — all onboarding artifacts are namespaced under onboarding/<system-id>/.
+- The .agents/workflows/ directory no longer contains 00-prepare through 06-handoff phase files — onboarding orchestration is delegated to the fo-onboard forge skill.
+- sternsystem.register (extended in @gogol/site-kernel-handoff) creates a complete Sternsystem entry (registry + pin + initial content) and automatically opens the first mission in a single invocation.
+- onboarding.synthesize validates and hashes raw client materials from onboarding/<system-id>/.input/ and writes a deterministic input manifest to onboarding/<system-id>/.output/.
+- 'The fo-onboard skill orchestrates the full onboarding pipeline: brief validation → AI synthesis → sternsystem.register → first mission, with cumulative knowledge across invocations.'
+- No code in the monorepo references apps/<id>/ in onboarding-related paths — all references use systems/<id>/ or missions/<id>/workpiece/.
+- Amend onboarding (fo-onboard --amend) reads new raw materials from onboarding/<system-id>/.input/amend-<N>/, runs synthesis, and calls sternsystem.register --amend to update the pin and open an amend mission.
 nonGoals:
-  - "Does not change the mission lifecycle itself (DNA-46) — onboarding starts missions but does not modify mission.open, mission.materialize, or mission.close contracts."
-  - "Does not change the Sternsystem bundle contract (DNA-44) — sternsystem.register creates a new Sternsystem but does not alter the pin file schema or bundle structure."
-  - "Does not remove the biome.tokens.derive command (RFC-0071) — it remains useful for deterministic palette derivation during synthesis."
-  - "Does not change the scaffold template set under packages/os/site-kernel-onboarding/src/templates/ — templates are reused by mission.materialize (RFC-0389) and remain in the package."
-  - "Does not change the brief frontmatter schema (client.id, client.domain, i18n, legalJurisdiction) — the schema is preserved; only the validation command name and path change."
-  - "Does not update amend lifecycle commands (amend.input.validate, amend.system.merge, amend.delta.files, content.coverage.delta, amend.atoms.merge, amend.provenance.append, amend.provenance.validate) — these reference onboarding/.input/{batch}/ and apps/<id>/ paths that change with the per-system layout. A follow-up RFC will migrate them to onboarding/<system-id>/.input/amend-<N>/ and missions/<id>/workpiece/ paths."
-  - "Does not update config.regenerate or config.template.sync path references — config.regenerate uses <app> app-scoped paths that are replaced by mission.materialize boilerplate generation; config.template.sync already reads from systems/<app>/ paths. A follow-up RFC will clarify whether config.regenerate is redundant with mission.materialize."
-  - "Does not change biome.site-background.derive — it remains in the package alongside biome.tokens.derive."
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Does not change the mission lifecycle itself (DNA-46) — onboarding starts missions but does not modify mission.open, mission.materialize, or mission.close contracts.
+- Does not change the Sternsystem bundle contract (DNA-44) — sternsystem.register creates a new Sternsystem but does not alter the pin file schema or bundle structure.
+- Does not remove the biome.tokens.derive command (RFC-0071) — it remains useful for deterministic palette derivation during synthesis.
+- Does not change the scaffold template set under packages/os/site-kernel-onboarding/src/templates/ — templates are reused by mission.materialize (RFC-0389) and remain in the package.
+- Does not change the brief frontmatter schema (client.id, client.domain, i18n, legalJurisdiction) — the schema is preserved; only the validation command name and path change.
+- Does not update amend lifecycle commands (amend.input.validate, amend.system.merge, amend.delta.files, content.coverage.delta, amend.atoms.merge, amend.provenance.append, amend.provenance.validate) — these reference onboarding/.input/{batch}/ and apps/<id>/ paths that change with the per-system layout. A follow-up RFC will migrate them to onboarding/<system-id>/.input/amend-<N>/ and missions/<id>/workpiece/ paths.
+- Does not update config.regenerate or config.template.sync path references — config.regenerate uses <app> app-scoped paths that are replaced by mission.materialize boilerplate generation; config.template.sync already reads from systems/<app>/ paths. A follow-up RFC will clarify whether config.regenerate is redundant with mission.materialize.
+- Does not change biome.site-background.derive — it remains in the package alongside biome.tokens.derive.
+
 ---
 
 # RFC-0532: Modernize onboarding for Sternsystem architecture

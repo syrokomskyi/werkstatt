@@ -1,24 +1,24 @@
 ---
 id: RFC-0486
-title: "Suppress Vite dynamic import warning in growth provider"
+title: Suppress Vite dynamic import warning in growth provider
 status: implemented
 kind: policy
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-22
 updatedAt: 2026-07-21
-implementedAt: 2026-07-21
+implementedAt: '2026-07-22'
 enhancedAt: 2026-07-22
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0027
-  - RFC-0305
+- RFC-0027
+- RFC-0305
 satisfies: []
 versionBump: patch
 commands:
@@ -28,16 +28,17 @@ commands:
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/growth"
+- '@gogol/growth'
 successSignals:
-  - "No Vite 'Unable to analyze dynamic import' warning for @gogol/growth-adapter-matomo during dev or build"
-  - "Growth provider still loads the matomo adapter correctly at runtime"
-  - "pnpm --filter @gogol/growth build:check passes"
+- No Vite 'Unable to analyze dynamic import' warning for @gogol/growth-adapter-matomo during dev or build
+- Growth provider still loads the matomo adapter correctly at runtime
+- pnpm --filter @gogol/growth build:check passes
 nonGoals:
-  - "Does not change the adapter loader pattern — the variable specifier pattern is intentional"
-  - "Does not add static imports for adapter packages — that would create workspace cycles"
-  - "Does not change KNOWN_ADAPTER_IDS or the adapter contract"
-  - "Does not introduce a lint rule or validator to enforce the @vite-ignore convention — the policy is documented in this RFC and the packages AGENTS.md only"
+- Does not change the adapter loader pattern — the variable specifier pattern is intentional
+- Does not add static imports for adapter packages — that would create workspace cycles
+- Does not change KNOWN_ADAPTER_IDS or the adapter contract
+- Does not introduce a lint rule or validator to enforce the @vite-ignore convention — the policy is documented in this RFC and the packages AGENTS.md only
+
 ---
 
 # RFC-0486: Suppress Vite dynamic import warning in growth provider

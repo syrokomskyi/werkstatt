@@ -1,107 +1,82 @@
 ---
 id: RFC-0480
-title: "Mission git workpiece, edits-only-through-missions, and Layer C protection"
+title: Mission git workpiece, edits-only-through-missions, and Layer C protection
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-21
 updatedAt: 2026-07-24
 enhancedAt: 2026-07-21
 implementedAt: 2026-07-24
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0472
+- RFC-0472
 amendedBy:
-  - RFC-0568
+- RFC-0568
+- RFC-0522
 related:
-  - DNA-44
-  - DNA-45
-  - DNA-46
-  - DNA-47
-  - DNA-48
-  - DNA-49
-  - DNA-50
-  - DNA-53
-  - RFC-0269
-  - RFC-0354
-  - RFC-0355
-  - RFC-0356
-  - RFC-0357
-  - RFC-0358
-  - RFC-0359
-  - RFC-0472
-  - RFC-0478
-  - RFC-0479
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- DNA-44
+- DNA-45
+- DNA-46
+- DNA-47
+- DNA-48
+- DNA-49
+- DNA-50
+- DNA-53
+- RFC-0269
+- RFC-0354
+- RFC-0355
+- RFC-0356
+- RFC-0357
+- RFC-0358
+- RFC-0359
+- RFC-0472
+- RFC-0478
+- RFC-0479
 satisfies:
-  - DNA-46
-  - DNA-47
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
+- DNA-46
+- DNA-47
 commands:
-  proposed:
-    - mission.cleanup
-    - mission.git.commit
-    - surface.contract.validate
-  added: []
+  proposed: []
+  added:
+  - mission.cleanup
+  - mission.git.commit
+  - surface.contract.validate
   changed:
-    - mission.materialize
-    - mission.reconcile
-    - mission.abort
-    - mission.close
-    - mission.preview
-    - release.prepare
-    - sternsystem.sync
-    - sternsystem.validate
+  - mission.materialize
+  - mission.reconcile
+  - mission.abort
+  - mission.close
+  - mission.preview
+  - release.prepare
+  - sternsystem.sync
+  - sternsystem.validate
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/ontology"
-  - "@gogol/share"
-  - "@gogol/forge"
+- '@gogol/site-kernel-handoff'
+- '@gogol/ontology'
+- '@gogol/share'
+- '@gogol/forge'
 successSignals:
-  - "Workpiece is a fresh git repository with step-by-step commits for materialize, migrate, and operator edits"
-  - "mission.reconcile transfers workpiece commits to cache clone via git format-patch + git am"
-  - "mission.preview runs a dev server for any mission (open, closed, or aborted) for side-by-side comparison"
-  - "Edits to Sternsystem content outside a mission are detected and rejected"
-  - "Layer C surfaces (URL schema, JSON-LD, sitemaps) are protected by declarative contracts in @gogol/ontology"
+- Workpiece is a fresh git repository with step-by-step commits for materialize, migrate, and operator edits
+- mission.reconcile transfers workpiece commits to cache clone via git format-patch + git am
+- mission.preview runs a dev server for any mission (open, closed, or aborted) for side-by-side comparison
+- Edits to Sternsystem content outside a mission are detected and rejected
+- Layer C surfaces (URL schema, JSON-LD, sitemaps) are protected by declarative contracts in @gogol/ontology
 nonGoals:
-  - "Does not define migrator semantics or versioning enforcement — those are RFC-0478 and RFC-0479"
-  - "Does not replace the local bare repo as canonical origin — mirror remains a secondary backup"
-  - "Does not implement branch protection enforcement on the git hosting side — that is an operator action"
-  - "Does not define the full Layer C contract schema — initial contract covers URL patterns, JSON-LD types, and sitemap shape; extension is incremental"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Does not define migrator semantics or versioning enforcement — those are RFC-0478 and RFC-0479
+- Does not replace the local bare repo as canonical origin — mirror remains a secondary backup
+- Does not implement branch protection enforcement on the git hosting side — that is an operator action
+- Does not define the full Layer C contract schema — initial contract covers URL patterns, JSON-LD types, and sitemap shape; extension is incremental
+versionBump: patch
+
 ---
 
 # RFC-0480: Mission git workpiece, edits-only-through-missions, and Layer C protection

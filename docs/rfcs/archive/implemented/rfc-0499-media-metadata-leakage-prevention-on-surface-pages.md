@@ -1,65 +1,67 @@
 ---
 id: RFC-0499
-title: "Media metadata leakage prevention on surface pages"
+title: Media metadata leakage prevention on surface pages
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 enhancedAt: 2026-07-23
 implementedAt: 2026-07-23
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0231
+- RFC-0231
 amendedBy: []
 related:
-  - RFC-0220
-  - RFC-0231
-  - RFC-0232
-  - RFC-0488
-  - RFC-0478
-  - RFC-0480
-  - RFC-0492
+- RFC-0220
+- RFC-0231
+- RFC-0232
+- RFC-0488
+- RFC-0478
+- RFC-0480
+- RFC-0492
 satisfies:
-  - DNA-24
-  - DNA-53
+- DNA-24
+- DNA-53
 breaksC: true
 versionBump: patch
 commands:
   proposed: []
   added:
-    - surface.media-leakage.validate
+  - surface.media-leakage.validate
   changed:
-    - surface.validate
-    - surface.contract.validate
+  - surface.validate
+  - surface.contract.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/site-kernel-checks"
-  - "@gogol/share"
-  - "@gogol/ui"
-  - "@gogol/ontology"
+- '@gogol/site-kernel-checks'
+- '@gogol/share'
+- '@gogol/ui'
+- '@gogol/ontology'
+- '@warpgogol/ontology'
 successSignals:
-  - "No surface page renders visible media metadata text (Gemini, AIPlatform, Warpgogol Organization, commissioned-warpgogol-material, Copyright © 2026 Warpgogol) in the readable card body or prose blocks."
-  - "Media metadata appears only in JSON-LD script blocks (structured data) and on the dedicated /bildnachweise/ provenance registry page (RFC-0488)."
-  - "AI-generated images on surface pages display a short 'Konzeptillustration' label (or localized equivalent) and a link to the precise /bildnachweise/#... anchor — no full Bildnachweis text in the page body."
-  - "surface.media-leakage.validate scans all rendered surface page HTML for prohibited metadata strings and fails on any match."
-  - "The baker (bakePage) does not emit media metadata fields into readable block props — metadata stays in JSON-LD script blocks only."
-  - "No surface page shows internal enum values (commissioned-warpgogol-material, linked-public-source, AIPlatform, Organization) to visitors — these are mapped to localized human-readable labels by the material credits renderer (RFC-0488)."
+- No surface page renders visible media metadata text (Gemini, AIPlatform, Warpgogol Organization, commissioned-warpgogol-material, Copyright © 2026 Warpgogol) in the readable card body or prose blocks.
+- Media metadata appears only in JSON-LD script blocks (structured data) and on the dedicated /bildnachweise/ provenance registry page (RFC-0488).
+- AI-generated images on surface pages display a short 'Konzeptillustration' label (or localized equivalent) and a link to the precise /bildnachweise/#... anchor — no full Bildnachweis text in the page body.
+- surface.media-leakage.validate scans all rendered surface page HTML for prohibited metadata strings and fails on any match.
+- The baker (bakePage) does not emit media metadata fields into readable block props — metadata stays in JSON-LD script blocks only.
+- No surface page shows internal enum values (commissioned-warpgogol-material, linked-public-source, AIPlatform, Organization) to visitors — these are mapped to localized human-readable labels by the material credits renderer (RFC-0488).
 nonGoals:
-  - "Does not change the material credits page (/bildnachweise/) — that is governed by RFC-0488."
-  - "Does not change the credits sidecar schema (*.credits.yaml) — that is governed by RFC-0220."
-  - "Does not change the inline disclosure behavior on non-surface pages (RFC-0231 visibility policy is unchanged for non-surface pages)."
-  - "Does not add C2PA/IPTC/XMP embedded metadata — that remains a future RFC."
-  - "Does not remove AI-generated images from surface pages — AI images may illustrate architectural concepts when explicitly labeled as conceptual."
-  - "Does not change the image optimization or Cloudflare transformation pipeline — that is governed by the image optimization documentation."
+- Does not change the material credits page (/bildnachweise/) — that is governed by RFC-0488.
+- Does not change the credits sidecar schema (*.credits.yaml) — that is governed by RFC-0220.
+- Does not change the inline disclosure behavior on non-surface pages (RFC-0231 visibility policy is unchanged for non-surface pages).
+- Does not add C2PA/IPTC/XMP embedded metadata — that remains a future RFC.
+- Does not remove AI-generated images from surface pages — AI images may illustrate architectural concepts when explicitly labeled as conceptual.
+- Does not change the image optimization or Cloudflare transformation pipeline — that is governed by the image optimization documentation.
+
 ---
 
 # RFC-0499: Media metadata leakage prevention on surface pages

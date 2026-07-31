@@ -1,54 +1,55 @@
 ---
 id: RFC-0076
-title: "Formalize onboarding input and phase output contracts"
-status: implemented
+title: Formalize onboarding input and phase output contracts
+status: superseded
 kind: contract
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers: []
 createdAt: 2026-05-18
-updatedAt: 2026-05-18
+updatedAt: &id001 2026-05-18
 implementedAt: 2026-05-18
-closedAt:
+closedAt: *id001
 supersedes: []
-supersededBy:
+supersededBy: RFC-0532
 related:
-  - RFC-0029
-  - RFC-0030
-  - RFC-0047
-  - RFC-0070
-  - RFC-0073
-  - RFC-0074
-  - RFC-0075
+- RFC-0029
+- RFC-0030
+- RFC-0047
+- RFC-0070
+- RFC-0073
+- RFC-0074
+- RFC-0075
 commands:
   proposed:
-    - onboarding.input.validate
-    - onboarding.phase.validate
+  - onboarding.input.validate
+  - onboarding.phase.validate
   added:
-    - onboarding.input.validate
-    - onboarding.phase.validate
+  - onboarding.input.validate
+  - onboarding.phase.validate
   changed:
-    - app.contract.full
-    - app.qa.validate
-    - apps-check.run
+  - app.contract.full
+  - app.qa.validate
+  - apps-check.run
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - os/site-kernel
-  - os/site-kernel-checks
-  - os/site-kernel-content
-  - share
+- os/site-kernel
+- os/site-kernel-checks
+- os/site-kernel-content
+- share
 successSignals:
-  - onboarding/.input is treated as the read-only source bundle for client materials
-  - onboarding/.output/00-intake/input-manifest.json records normalized file inventory and content hashes for every onboarding input
-  - Every phase output declares the input manifest hash it was derived from, allowing stale phase outputs to be detected deterministically
-  - app.qa.validate refuses to declare audit success when required scaffold, compose, or author phase artifacts are missing or stale
-  - Agents have a single phase contract command to run before each onboarding phase instead of inferring readiness from prose
+- onboarding/.input is treated as the read-only source bundle for client materials
+- onboarding/.output/00-intake/input-manifest.json records normalized file inventory and content hashes for every onboarding input
+- Every phase output declares the input manifest hash it was derived from, allowing stale phase outputs to be detected deterministically
+- app.qa.validate refuses to declare audit success when required scaffold, compose, or author phase artifacts are missing or stale
+- Agents have a single phase contract command to run before each onboarding phase instead of inferring readiness from prose
 nonGoals:
-  - Replacing the workflow files introduced by RFC-0075
-  - Re-running raw research through audit validators; audit validators consume assembled apps and distilled phase outputs
-  - Introducing a full workflow engine or database-backed state machine
+- Replacing the workflow files introduced by RFC-0075
+- Re-running raw research through audit validators; audit validators consume assembled apps and distilled phase outputs
+- Introducing a full workflow engine or database-backed state machine
+
 ---
 
 # RFC-0076: Formalize onboarding input and phase output contracts

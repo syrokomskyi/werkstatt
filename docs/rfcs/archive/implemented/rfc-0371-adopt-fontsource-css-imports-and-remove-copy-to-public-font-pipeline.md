@@ -1,65 +1,60 @@
 ---
 id: RFC-0371
-title: "Adopt Fontsource CSS imports and remove the copy-to-public font pipeline"
+title: Adopt Fontsource CSS imports and remove the copy-to-public font pipeline
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335)
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-09
 updatedAt: 2026-07-09
 enhancedAt: 2026-07-09
 implementedAt: 2026-07-09
-closedAt:
+closedAt: null
 supersedes:
-  - RFC-0164
-supersededBy:
+- RFC-0164
+supersededBy: null
 amends: []
-amendedBy: []
+amendedBy:
+- RFC-0485
 related:
-  - ADR-0001
-  - RFC-0149
-  - RFC-0152
-  - RFC-0025
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
+- ADR-0001
+- RFC-0149
+- RFC-0152
+- RFC-0025
 satisfies:
-  - DNA-50
+- DNA-50
 commands:
   proposed: []
   added:
-    - fonts.imports.generate
-    - fonts.contract.validate
-    - fonts.origin.validate
+  - fonts.imports.generate
+  - fonts.contract.validate
+  - fonts.origin.validate
   changed: []
   removed:
-    - fonts.generate
-    - fonts.selfhost.validate
+  - fonts.generate
+  - fonts.selfhost.validate
 appsImpacted:
-  - apps/*
+- apps/*
 packagesImpacted:
-  - packages/ontology
-  - packages/os/site-kernel-checks
-  - packages/os/site-kernel-codegen
+- packages/ontology
+- packages/os/site-kernel-checks
+- packages/os/site-kernel-codegen
 successSignals:
-  - "No app contains font binary files (woff2, woff, ttf, otf) in public/ or src/"
-  - "All apps import at least one @fontsource/* CSS file; Vite bundles woff2 as hashed _astro/ assets"
-  - "No rendered HTML references any external font origin (Google Fonts, Typekit, Bunny)"
-  - "Font selection is biome-driven: the biome YAML fonts section is the single source of truth for self-hosted Fontsource packages"
-  - "Notausgang export includes font CSS imports that resolve from package.json; no manual font file copying"
+- No app contains font binary files (woff2, woff, ttf, otf) in public/ or src/
+- All apps import at least one @fontsource/* CSS file; Vite bundles woff2 as hashed _astro/ assets
+- No rendered HTML references any external font origin (Google Fonts, Typekit, Bunny)
+- 'Font selection is biome-driven: the biome YAML fonts section is the single source of truth for self-hosted Fontsource packages'
+- Notausgang export includes font CSS imports that resolve from package.json; no manual font file copying
 nonGoals:
-  - "Do not change the typographic design of any app — font families and weights stay as currently configured by each biome"
-  - "Do not introduce a runtime font-loading JavaScript library"
-  - "Do not use variable font files (@fontsource-variable/*) in this RFC; static weight imports remain the pattern"
-  - "Do not add font subsetting or unicode-range splitting — Fontsource packages already subset to latin and latin-ext"
-  - "Do not copy Fontsource LICENSE.txt files into public/ — NPM package availability in the repository satisfies the distribution requirement; a future RFC may tighten this"
+- Do not change the typographic design of any app — font families and weights stay as currently configured by each biome
+- Do not introduce a runtime font-loading JavaScript library
+- Do not use variable font files (@fontsource-variable/*) in this RFC; static weight imports remain the pattern
+- Do not add font subsetting or unicode-range splitting — Fontsource packages already subset to latin and latin-ext
+- Do not copy Fontsource LICENSE.txt files into public/ — NPM package availability in the repository satisfies the distribution requirement; a future RFC may tighten this
+
 ---
 
 # RFC-0371: Adopt Fontsource CSS imports and remove the copy-to-public font pipeline

@@ -1,93 +1,67 @@
 ---
 id: RFC-0479
-title: "Migrator registry and mission.migrate step"
+title: Migrator registry and mission.migrate step
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-21
 updatedAt: 2026-07-24
 enhancedAt: 2026-07-21
 implementedAt: 2026-07-24
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0221
-  - RFC-0356
+- RFC-0221
+- RFC-0356
 amendedBy: []
 related:
-  - DNA-41
-  - DNA-44
-  - DNA-46
-  - DNA-47
-  - RFC-0221
-  - RFC-0354
-  - RFC-0355
-  - RFC-0356
-  - RFC-0478
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- DNA-41
+- DNA-44
+- DNA-46
+- DNA-47
+- RFC-0221
+- RFC-0354
+- RFC-0355
+- RFC-0356
+- RFC-0478
 satisfies:
-  - DNA-44
-  - DNA-46
-  - DNA-47
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
+- DNA-44
+- DNA-46
+- DNA-47
 commands:
-  proposed:
-    - mission.migrate
-    - migrator.registry.validate
-  added: []
+  proposed: []
+  added:
+  - mission.migrate
+  - migrator.registry.validate
   changed:
-    - mission.materialize
-    - mission.reconcile
-    - sternsystem.pin
-    - sternsystem.extract
-    - handoff.pack
-    - handoff.absorb
+  - mission.materialize
+  - mission.reconcile
+  - sternsystem.pin
+  - sternsystem.extract
+  - handoff.pack
+  - handoff.absorb
   removed:
-    - migrator.validate
+  - migrator.validate
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/ontology"
+- '@gogol/site-kernel-handoff'
+- '@gogol/ontology'
 successSignals:
-  - "mission.migrate applies migrator chain to workpiece data and updates migratorCursor"
-  - "migrator.registry.validate checks migrator-RFC correspondence, id uniqueness, and test coverage"
-  - "Migrators are idempotent (PBT f(f(x)) == f(x)) and covered by snapshot tests on real data"
+- mission.migrate applies migrator chain to workpiece data and updates migratorCursor
+- migrator.registry.validate checks migrator-RFC correspondence, id uniqueness, and test coverage
+- Migrators are idempotent (PBT f(f(x)) == f(x)) and covered by snapshot tests on real data
 nonGoals:
-  - "Does not define platform versioning enforcement — that is RFC-0478"
-  - "Does not change mission lifecycle beyond adding the migrate step — lifecycle changes are RFC-0480"
-  - "Does not support reversible migrations — most breaking changes are irreversible (field deletion, schema rename)"
-  - "Does not implement migrators for past breaking changes — only establishes the system for future ones"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Does not define platform versioning enforcement — that is RFC-0478
+- Does not change mission lifecycle beyond adding the migrate step — lifecycle changes are RFC-0480
+- Does not support reversible migrations — most breaking changes are irreversible (field deletion, schema rename)
+- Does not implement migrators for past breaking changes — only establishes the system for future ones
+versionBump: patch
+
 ---
 
 # RFC-0479: Migrator registry and mission.migrate step

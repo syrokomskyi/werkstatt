@@ -1,75 +1,77 @@
 ---
 id: RFC-0509
-title: "Team hub page — /team/ root index route and participant directory"
+title: Team hub page — /team/ root index route and participant directory
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-24
 updatedAt: 2026-07-24
 implementedAt: 2026-07-24
 enhancedAt: 2026-07-24
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0200
+- RFC-0200
 amendedBy:
-  - RFC-0513
+- RFC-0513
 related:
-  - RFC-0008
-  - RFC-0024
-  - RFC-0192
-  - RFC-0200
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0508
-  - RFC-0510
-  - RFC-0511
-  - RFC-0512
-  - RFC-0513
+- RFC-0008
+- RFC-0024
+- RFC-0192
+- RFC-0200
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0508
+- RFC-0510
+- RFC-0511
+- RFC-0512
+- RFC-0513
 satisfies:
-  - DNA-24
-  - DNA-39
+- DNA-24
+- DNA-39
 breaksC: true
 versionBump: minor
 commands:
   proposed:
-    - team.hub.validate
+  - team.hub.validate
   added:
-    - team.hub.validate
+  - team.hub.validate
   changed:
-    - surface.contract.validate
-    - public.infrastructure.generate
+  - surface.contract.validate
+  - public.infrastructure.generate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-content"
-  - "@gogol/ui"
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-content'
+- '@gogol/ui'
+- '@warpgogol/ontology'
 successSignals:
-  - "The /team/ route (DE: /team/, UK: /komanda/) renders a team hub page — not a 404."
-  - "The hub page emits CollectionPage JSON-LD as the primary type with a breadcrumb trail Home → Team."
-  - "The hub renders four sections: hero (Verantwortung bei Warpgogol), Verantwortliche Personen (people section filtered to active public humans), Teams und Funktionen (organization units), KI-Agenten (AI agents)."
-  - "The hub lists only participants with visibility: public and status: active — draft, private, suspended, and former participants are excluded."
-  - "The hub uses a compact list layout with links to individual profile pages — not a large portrait grid."
-  - "The existing /team/andrii-syrokomskyi/ profile route is preserved and linked from the hub."
-  - "The founder page (/gruender/ DE, /zasnovnyk/ UK) is retired and redirects to /team/andrii-syrokomskyi/."
-  - "team.hub.validate enforces the hub layout, participant visibility filter, and section structure."
-  - "The url-schema.yaml C-contract includes the /team/ and /komanda/ route patterns."
+- 'The /team/ route (DE: /team/, UK: /komanda/) renders a team hub page — not a 404.'
+- The hub page emits CollectionPage JSON-LD as the primary type with a breadcrumb trail Home → Team.
+- 'The hub renders four sections: hero (Verantwortung bei Warpgogol), Verantwortliche Personen (people section filtered to active public humans), Teams und Funktionen (organization units), KI-Agenten (AI agents).'
+- 'The hub lists only participants with visibility: public and status: active — draft, private, suspended, and former participants are excluded.'
+- The hub uses a compact list layout with links to individual profile pages — not a large portrait grid.
+- The existing /team/andrii-syrokomskyi/ profile route is preserved and linked from the hub.
+- The founder page (/gruender/ DE, /zasnovnyk/ UK) is retired and redirects to /team/andrii-syrokomskyi/.
+- team.hub.validate enforces the hub layout, participant visibility filter, and section structure.
+- The url-schema.yaml C-contract includes the /team/ and /komanda/ route patterns.
 nonGoals:
-  - "Does not define the Participant data model — that is RFC-0508."
-  - "Does not define the human profile page structure — that is RFC-0510."
-  - "Does not define the AI-agent profile page structure — that is RFC-0511."
-  - "Does not define JSON endpoints or Schema.org for profiles — that is RFC-0512."
-  - "Does not implement search, filtering, or pagination — the participant count is small (1–20); a simple list suffices for v1."
-  - "Does not create sub-routes for organization units (/team/einheiten/) — deferred to a future RFC when units exist."
+- Does not define the Participant data model — that is RFC-0508.
+- Does not define the human profile page structure — that is RFC-0510.
+- Does not define the AI-agent profile page structure — that is RFC-0511.
+- Does not define JSON endpoints or Schema.org for profiles — that is RFC-0512.
+- Does not implement search, filtering, or pagination — the participant count is small (1–20); a simple list suffices for v1.
+- Does not create sub-routes for organization units (/team/einheiten/) — deferred to a future RFC when units exist.
+
 ---
 
 # RFC-0509: Team hub page — /team/ root index route and participant directory

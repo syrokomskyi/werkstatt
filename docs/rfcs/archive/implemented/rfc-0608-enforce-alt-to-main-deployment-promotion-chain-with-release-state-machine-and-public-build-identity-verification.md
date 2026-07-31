@@ -1,93 +1,63 @@
 ---
 id: RFC-0608
-title: "Enforce alt-to-main deployment promotion chain with release state machine and public build identity verification"
+title: Enforce alt-to-main deployment promotion chain with release state machine and public build identity verification
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-30
 updatedAt: 2026-07-30
 enhancedAt: 2026-07-30
 implementedAt: 2026-07-30
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0358
+- RFC-0358
 amendedBy: []
 related:
-  - RFC-0358
-  - RFC-0379
-  - RFC-0301
-  - RFC-0585
-  - RFC-0596
-  - RFC-0587
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- RFC-0358
+- RFC-0379
+- RFC-0301
+- RFC-0585
+- RFC-0596
+- RFC-0587
 satisfies:
-  - DNA-48
-  - DNA-49
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
-# RFC-0478: Platform versioning enforcement. Declares the SemVer delta this RFC
-# produces when implemented. Required for post-cutoff implemented RFCs (V-29).
-# Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
-# major (architectural, manually reserved). Default: patch.
+- DNA-48
+- DNA-49
 versionBump: patch
 commands:
   proposed:
-    - leitstand.promote
+  - leitstand.promote
   added:
-    - leitstand.promote
+  - leitstand.promote
   changed:
-    - leitstand.propagate
-    - leitstand.rollback
-    - release.prepare
+  - leitstand.propagate
+  - leitstand.rollback
+  - release.prepare
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@warpgogol/site-kernel-handoff"
-  - "@warpgogol/ontology"
-  - "@warpgogol/site-kernel-codegen"
-  - "@warpgogol/ui"
+- '@warpgogol/site-kernel-handoff'
+- '@warpgogol/ontology'
+- '@warpgogol/site-kernel-codegen'
+- '@warpgogol/ui'
 successSignals:
-  - "leitstand.propagate always deploys to alt; --channel flag removed for propagate"
-  - "leitstand.promote refuses when release state is not alt-deployed"
-  - "leitstand.promote fetches /.well-known/build-identity.json from alt URL and verifies hashes match the release manifest before deploying to main"
-  - "release.prepare writes /.well-known/build-identity.json into dist/client/ with all release hashes"
-  - "open-source page fetches build-identity.json at request time (SSR) for deployment metadata display"
+- leitstand.propagate always deploys to alt; --channel flag removed for propagate
+- leitstand.promote refuses when release state is not alt-deployed
+- leitstand.promote fetches /.well-known/build-identity.json from alt URL and verifies hashes match the release manifest before deploying to main
+- release.prepare writes /.well-known/build-identity.json into dist/client/ with all release hashes
+- open-source page fetches build-identity.json at request time (SSR) for deployment metadata display
 nonGoals:
-  - "Do not change leitstand.rollback --channel semantics (rollback remains per-channel)"
-  - "Do not remove the open-source page; it continues to display build metadata sourced from build-identity.json"
-  - "Do not introduce a runtime API endpoint for build identity; a static JSON file is sufficient and agent-friendly"
-  - "Do not auto-promote from alt to main without an explicit leitstand.promote invocation"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Do not change leitstand.rollback --channel semantics (rollback remains per-channel)
+- Do not remove the open-source page; it continues to display build metadata sourced from build-identity.json
+- Do not introduce a runtime API endpoint for build identity; a static JSON file is sufficient and agent-friendly
+- Do not auto-promote from alt to main without an explicit leitstand.promote invocation
+breaksC: true
+
 ---
 
 # RFC-0608: Enforce alt-to-main deployment promotion chain with release state machine and public build identity verification

@@ -1,58 +1,60 @@
 ---
 id: RFC-0487
-title: "Remove B2C widerruf routes from warpgogol-com"
+title: Remove B2C widerruf routes from warpgogol-com
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-22
 updatedAt: 2026-07-22
 enhancedAt: 2026-07-22
 implementedAt: 2026-07-22
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy:
-  - RFC-0589
+- RFC-0589
 related:
-  - RFC-0318
-  - RFC-0480
+- RFC-0318
+- RFC-0480
 satisfies:
-  - DNA-13
+- DNA-13
 breaksC: true
 versionBump: minor
 commands:
   proposed: []
   added:
-    - b2b.model.validate
+  - b2b.model.validate
   changed:
-    - public.infrastructure.generate
+  - public.infrastructure.generate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/ontology"
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-checks'
+- '@gogol/ontology'
+- '@warpgogol/ontology'
 successSignals:
-  - "/widerruf/ and /widerruf-formular/ return HTTP 410 Gone (not 200, not 404)"
-  - "/vidmova/ and /forma-vidmovy/ return HTTP 410 Gone"
-  - "No widerruf or musterWiderruf entries remain in system.md, navigation, labels, or sitemap"
-  - "No internal links to /widerruf/ or /widerruf-formular/ remain in any page"
-  - "b2b.model.validate --app warpgogol-com exits 0"
-  - "redirect.map.validate --app warpgogol-com passes with 410 entries for retired routes"
-  - "content.references.validate --app warpgogol-com exits 0 (after cross-page cleanup)"
+- /widerruf/ and /widerruf-formular/ return HTTP 410 Gone (not 200, not 404)
+- /vidmova/ and /forma-vidmovy/ return HTTP 410 Gone
+- No widerruf or musterWiderruf entries remain in system.md, navigation, labels, or sitemap
+- No internal links to /widerruf/ or /widerruf-formular/ remain in any page
+- b2b.model.validate --app warpgogol-com exits 0
+- redirect.map.validate --app warpgogol-com passes with 410 entries for retired routes
+- content.references.validate --app warpgogol-com exits 0 (after cross-page cleanup)
 nonGoals:
-  - "Does not modify AGB content — AGB consumer provision removal is a separate content task (expert file 6 session)"
-  - "Does not modify /kontakt/ — contact page B2B clarification is a separate content task (expert file 5 session)"
-  - "Does not modify /notausgang/ — notausgang Kündigung vs Widerruf distinction is a separate content task (expert file 4 session)"
-  - "Does not modify /impressum/ — impressum widerruf link removal is a separate content task (expert file 8 session)"
-  - "Does not modify /datenschutz/ — datenschutz widerruf process removal is a separate content task (expert file 7 session)"
-  - "Does not remove Git history — historical files remain in version control, just not rendered"
+- Does not modify AGB content — AGB consumer provision removal is a separate content task (expert file 6 session)
+- Does not modify /kontakt/ — contact page B2B clarification is a separate content task (expert file 5 session)
+- Does not modify /notausgang/ — notausgang Kündigung vs Widerruf distinction is a separate content task (expert file 4 session)
+- Does not modify /impressum/ — impressum widerruf link removal is a separate content task (expert file 8 session)
+- Does not modify /datenschutz/ — datenschutz widerruf process removal is a separate content task (expert file 7 session)
+- Does not remove Git history — historical files remain in version control, just not rendered
+
 ---
 
 # RFC-0487: Remove B2C widerruf routes from warpgogol-com

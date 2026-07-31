@@ -1,69 +1,70 @@
 ---
 id: RFC-0508
-title: "Participant data model — canonical Participant entity, types, statuses, and consent"
+title: Participant data model — canonical Participant entity, types, statuses, and consent
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-24
 updatedAt: 2026-07-23
-implementedAt: 2026-07-23
+implementedAt: '2026-07-24'
 enhancedAt: 2026-07-24
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0200
+- RFC-0200
 amendedBy: []
 related:
-  - RFC-0008
-  - RFC-0024
-  - RFC-0152
-  - RFC-0200
-  - RFC-0471
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0509
-  - RFC-0510
-  - RFC-0511
-  - RFC-0512
-  - RFC-0513
+- RFC-0008
+- RFC-0024
+- RFC-0152
+- RFC-0200
+- RFC-0471
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0509
+- RFC-0510
+- RFC-0511
+- RFC-0512
+- RFC-0513
 satisfies:
-  - DNA-24
-  - DNA-53
+- DNA-24
+- DNA-53
 breaksC: false
 versionBump: minor
 commands:
   proposed:
-    - participant.validate
+  - participant.validate
   added:
-    - participant.validate
+  - participant.validate
   changed:
-    - sites-check.run
+  - sites-check.run
   removed:
-    - people.validate
+  - people.validate
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/share"
-  - "@gogol/site-kernel-checks"
+- '@gogol/share'
+- '@gogol/site-kernel-checks'
 successSignals:
-  - "The people collection supports six participant types: human, ai-agent, organization-unit, external-specialist, partner-organization, service-account — each with a closed vocabulary and type-specific required fields."
-  - "Every Participant record carries: participantId, participantType, publicName, slug, status, relationshipType, and type-specific responsibility/authority/evidence fields."
-  - "service-account participants are private by default and do not appear in any public surface."
-  - "Human participants carry a consent record (consentRecordId, approvedFields, consentDate, profileReviewer) before they can be publicly visible."
-  - "AI-agent participants carry an accountableHumanId — no public AI-agent profile exists without a named responsible human."
-  - "participant.validate enforces the Participant contract, type-specific required fields, consent requirements, and public/private separation."
-  - "Existing Person records (Andrii) are migrated to participantType: human with no loss of authored content."
+- 'The people collection supports six participant types: human, ai-agent, organization-unit, external-specialist, partner-organization, service-account — each with a closed vocabulary and type-specific required fields.'
+- 'Every Participant record carries: participantId, participantType, publicName, slug, status, relationshipType, and type-specific responsibility/authority/evidence fields.'
+- service-account participants are private by default and do not appear in any public surface.
+- Human participants carry a consent record (consentRecordId, approvedFields, consentDate, profileReviewer) before they can be publicly visible.
+- AI-agent participants carry an accountableHumanId — no public AI-agent profile exists without a named responsible human.
+- participant.validate enforces the Participant contract, type-specific required fields, consent requirements, and public/private separation.
+- 'Existing Person records (Andrii) are migrated to participantType: human with no loss of authored content.'
 nonGoals:
-  - "Does not create new routes or pages — that is RFC-0509 (team hub), RFC-0510 (human profile restructure), and RFC-0511 (AI-agent profile)."
-  - "Does not define the visual presentation of participant profiles — that is RFC-0509/0510/0511."
-  - "Does not define JSON endpoints or Schema.org emission — that is RFC-0512."
-  - "Does not define lifecycle transitions or retirement workflows — that is RFC-0513."
-  - "Does not implement W3C Verifiable Credentials — the data model is forward-compatible but VC signing is out of scope."
+- Does not create new routes or pages — that is RFC-0509 (team hub), RFC-0510 (human profile restructure), and RFC-0511 (AI-agent profile).
+- Does not define the visual presentation of participant profiles — that is RFC-0509/0510/0511.
+- Does not define JSON endpoints or Schema.org emission — that is RFC-0512.
+- Does not define lifecycle transitions or retirement workflows — that is RFC-0513.
+- Does not implement W3C Verifiable Credentials — the data model is forward-compatible but VC signing is out of scope.
+
 ---
 
 # RFC-0508: Participant data model — canonical Participant entity, types, statuses, and consent

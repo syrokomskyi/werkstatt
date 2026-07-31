@@ -1,84 +1,56 @@
 ---
 id: RFC-0478
-title: "Platform versioning enforcement and RFC-id monotonicity"
+title: Platform versioning enforcement and RFC-id monotonicity
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-21
 updatedAt: 2026-07-21
 enhancedAt: 2026-07-21
 implementedAt: 2026-07-21
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy:
-  - RFC-0533
+- RFC-0533
 related:
-  - DNA-44
-  - DNA-46
-  - DNA-48
-  - DNA-53
-  - RFC-0354
-  - RFC-0356
-  - RFC-0357
-  - RFC-0476
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- DNA-44
+- DNA-46
+- DNA-48
+- DNA-53
+- RFC-0354
+- RFC-0356
+- RFC-0357
+- RFC-0476
 satisfies:
-  - DNA-44
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
-# RFC-0478: Platform versioning enforcement.
+- DNA-44
 versionBump: patch
 commands:
-  proposed:
-    - platform.consistency.validate
-  added: []
+  proposed: []
+  added:
+  - platform.consistency.validate
   changed:
-    - rfc.validate
+  - rfc.validate
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@wgogol/forge"
-  - "@gogol/site-kernel-handoff"
+- '@wgogol/forge'
+- '@gogol/site-kernel-handoff'
 successSignals:
-  - "Every RFC that changes packages/* declares versionBump in frontmatter"
-  - "platform.consistency.validate detects SemVer/hash drift between packages and package.json"
-  - "rfc.validate rejects RFC-ids lower than the current maximum (V-28)"
+- Every RFC that changes packages/* declares versionBump in frontmatter
+- platform.consistency.validate detects SemVer/hash drift between packages and package.json
+- rfc.validate rejects RFC-ids lower than the current maximum (V-28)
 nonGoals:
-  - "Does not permit major version bumps — major remains manually reserved for architectural shifts (cl-req-05)"
-  - "Does not replace SemVer with a monotonic integer — SemVer remains for npm/pnpm tooling compatibility"
-  - "Does not automate version bumping on commit — enforcement is at RFC merge and CI validation time"
-  - "Does not define migrator semantics — migrator system is RFC-0479"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Does not permit major version bumps — major remains manually reserved for architectural shifts (cl-req-05)
+- Does not replace SemVer with a monotonic integer — SemVer remains for npm/pnpm tooling compatibility
+- Does not automate version bumping on commit — enforcement is at RFC merge and CI validation time
+- Does not define migrator semantics — migrator system is RFC-0479
+
 ---
 
 # RFC-0478: Platform versioning enforcement and RFC-id monotonicity

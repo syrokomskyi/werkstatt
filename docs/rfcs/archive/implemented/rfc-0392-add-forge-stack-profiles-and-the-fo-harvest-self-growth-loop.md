@@ -1,73 +1,52 @@
 ---
 id: RFC-0392
-title: "Add forge stack profiles and the fo-harvest self-growth loop"
+title: Add forge stack profiles and the fo-harvest self-growth loop
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-19
 updatedAt: 2026-07-19
 enhancedAt: 2026-07-19
 implementedAt: 2026-07-19
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0374
-  - RFC-0391
-  - RFC-0393
-  - DNA-1
-  - DNA-2
+- RFC-0374
+- RFC-0391
+- RFC-0393
+- DNA-1
+- DNA-2
 satisfies:
-  - DNA-1
-  - DNA-2
+- DNA-1
+- DNA-2
 commands:
-  proposed:
+  proposed: null
   added:
-    - forge.scaffold
-  changed:
-    - forge.init
-  removed: []
+  - forge.scaffold
+  changed: []
+  removed:
+  - forge.init
 appsImpacted: []
 packagesImpacted:
-  - "@wgogol/forge"
+- '@wgogol/forge'
 successSignals:
-  - "forge.scaffold creates a working pnpm + Turborepo monorepo from a stack profile in an empty directory"
-  - "At least two stack profiles ship: astro-typescript-turborepo and phaser-turborepo"
-  - "fo-harvest skill exists, passes forge.skill.validate, and is deployed to .agents/skills/"
-  - "forge.init --from=<path> routes an existing project or spec folder through stack detection"
+- forge.scaffold creates a working pnpm + Turborepo monorepo from a stack profile in an empty directory
+- 'At least two stack profiles ship: astro-typescript-turborepo and phaser-turborepo'
+- fo-harvest skill exists, passes forge.skill.validate, and is deployed to .agents/skills/
+- forge.init --from=<path> routes an existing project or spec folder through stack detection
 nonGoals:
-  - "Does not support non-JS package managers or non-Turborepo monorepos — unsupported stacks are reported, not scaffolded"
-  - "Does not auto-run fo-harvest on a schedule — harvesting is operator-invoked"
-  - "Does not port any specific pattern into forge — fo-harvest defines the workflow, not its first catch"
-  - "Does not touch the bindings contract — that is RFC-0393"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Does not support non-JS package managers or non-Turborepo monorepos — unsupported stacks are reported, not scaffolded
+- Does not auto-run fo-harvest on a schedule — harvesting is operator-invoked
+- Does not port any specific pattern into forge — fo-harvest defines the workflow, not its first catch
+- Does not touch the bindings contract — that is RFC-0393
+
 ---
 
 # RFC-0392: Add forge stack profiles and the fo-harvest self-growth loop

@@ -1,85 +1,86 @@
 ---
 id: RFC-0353
-title: "Rename GRACE to Compass across the ecosystem"
+title: Rename GRACE to Compass across the ecosystem
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-08
 updatedAt: 2026-07-08
 implementedAt: 2026-07-08
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0015
-  - RFC-0017
-  - RFC-0133
-  - RFC-0155
-  - RFC-0173
-  - RFC-0345
-  - RFC-0348
-  - RFC-0349
-  - RFC-0350
-  - RFC-0351
-  - RFC-0352
+- RFC-0015
+- RFC-0017
+- RFC-0133
+- RFC-0155
+- RFC-0173
+- RFC-0345
+- RFC-0348
+- RFC-0349
+- RFC-0350
+- RFC-0351
+- RFC-0352
 amendedBy: []
 related:
-  - DNA-42
-  - DNA-43
+- DNA-42
+- DNA-43
 satisfies:
-  - DNA-42
-  - DNA-43
+- DNA-42
+- DNA-43
 commands:
   proposed:
-    - compass.landmarks
-  added:
-    - compass.annotate
+  - compass.landmarks
+  added: []
   changed:
-    - compass.inventory
-    - compass.validate
-    - compass.clear
-    - compass.markup.migrate
-    - compass.invariant.add
-    - compass.changesummary.validate
-    - compass.audit.validate
+  - compass.inventory
+  - compass.validate
+  - compass.changesummary.validate
+  - compass.audit.validate
   removed:
-    - grace.backfill
-    - grace.anchors
-    - grace.inventory
-    - grace.validate
-    - grace.clear
-    - grace.markup.migrate
-    - grace.invariant.add
-    - grace.changesummary.validate
-    - grace.audit.validate
+  - grace.backfill
+  - grace.anchors
+  - grace.inventory
+  - grace.validate
+  - grace.clear
+  - grace.markup.migrate
+  - grace.invariant.add
+  - grace.changesummary.validate
+  - grace.audit.validate
+  - compass.annotate
+  - compass.clear
+  - compass.markup.migrate
+  - compass.invariant.add
 appsImpacted:
-  - warpgogol-com
-  - nicaragua-projekt
-  - check-warpgogol-com
+- warpgogol-com
+- nicaragua-projekt
+- check-warpgogol-com
 packagesImpacted:
-  - "@gogol/site-kernel"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/share"
-  - "@gogol/business"
-  - "@gogol/ui"
+- '@gogol/site-kernel'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-handoff'
+- '@gogol/share'
+- '@gogol/business'
+- '@gogol/ui'
 successSignals:
-  - "No occurrence of the token 'grace' (case-insensitive) remains in any non-historical source file, command name, pipeline step, log message, diagnostic rule ID, file name, or documentation artifact outside of historical RFCs"
-  - "compass.inventory writes docs/compass-inventory.xml (renamed from docs/grace-inventory.xml)"
-  - "compass.validate emits COMPASS-* diagnostic rule IDs (renamed from GRACE-*)"
-  - "All build:check pipelines pass after the rename"
-  - "STANDARD_GRACE_PIPELINE constant renamed to STANDARD_COMPASS_PIPELINE"
+- No occurrence of the token 'grace' (case-insensitive) remains in any non-historical source file, command name, pipeline step, log message, diagnostic rule ID, file name, or documentation artifact outside of historical RFCs
+- compass.inventory writes docs/compass-inventory.xml (renamed from docs/grace-inventory.xml)
+- compass.validate emits COMPASS-* diagnostic rule IDs (renamed from GRACE-*)
+- All build:check pipelines pass after the rename
+- STANDARD_GRACE_PIPELINE constant renamed to STANDARD_COMPASS_PIPELINE
 nonGoals:
-  - "Do not change the semantic content or structure of MODULE_CONTRACT, CHANGE_SUMMARY, or @ai-invariant blocks — only the umbrella name changes"
-  - "Do not introduce new navigation metaphors (NEEDLE, NORTH, BEARING) inside the markup blocks"
-  - "Do not alter the validation logic, coverage modes, or file classification rules"
-  - "Do not restructure the package layout or move files between packages"
-  - "Do not touch historical RFC files (RFC-0015, RFC-0348..0352, and any RFC that mentions GRACE in its body) — they preserve the original term for archaeological traceability"
+- Do not change the semantic content or structure of MODULE_CONTRACT, CHANGE_SUMMARY, or @ai-invariant blocks — only the umbrella name changes
+- Do not introduce new navigation metaphors (NEEDLE, NORTH, BEARING) inside the markup blocks
+- Do not alter the validation logic, coverage modes, or file classification rules
+- Do not restructure the package layout or move files between packages
+- Do not touch historical RFC files (RFC-0015, RFC-0348..0352, and any RFC that mentions GRACE in its body) — they preserve the original term for archaeological traceability
+
 ---
 
 # RFC-0353: Rename GRACE to Compass across the ecosystem

@@ -1,52 +1,53 @@
 ---
 id: RFC-0519
-title: "Gate catalog generator and validator"
+title: Gate catalog generator and validator
 status: implemented
 kind: command
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-24
 updatedAt: 2026-07-24
 enhancedAt: 2026-07-24
 implementedAt: 2026-07-24
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0245
-  - RFC-0246
-  - RFC-0518
-  - RFC-0520
+- RFC-0245
+- RFC-0246
+- RFC-0518
+- RFC-0520
 satisfies:
-  - DNA-53
+- DNA-53
 versionBump: patch
 commands:
-  proposed:
-    - gate.catalog.generate
-    - gate.catalog.validate
-  added: []
+  proposed: []
+  added:
+  - gate.catalog.generate
+  - gate.catalog.validate
   changed:
-    - ecosystem.manifest.generate
+  - ecosystem.manifest.generate
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/site-kernel-checks"
+- '@gogol/site-kernel-checks'
 successSignals:
-  - "gate.catalog.generate produces docs/gate-catalog.generated.yaml from command gate metadata and pipeline placement"
-  - "gate.catalog.validate drifts when the catalog is stale relative to live command registrations"
-  - "gate.catalog.validate is wired into PACKAGES_CHECK_PIPELINE"
-  - "Agents can query docs/gate-catalog.generated.yaml to discover gate severity, phase, conditional logic, surfaces, rules, and blocking relationships"
+- gate.catalog.generate produces docs/gate-catalog.generated.yaml from command gate metadata and pipeline placement
+- gate.catalog.validate drifts when the catalog is stale relative to live command registrations
+- gate.catalog.validate is wired into PACKAGES_CHECK_PIPELINE
+- Agents can query docs/gate-catalog.generated.yaml to discover gate severity, phase, conditional logic, surfaces, rules, and blocking relationships
 nonGoals:
-  - "Does not define gate metadata on command definitions — that is RFC-0518"
-  - "Does not extract inline guards into named functions — that is RFC-0520"
-  - "Does not change pipeline execution order or validation logic"
-  - "Does not generate per-site gate catalogs — the catalog is workspace-scoped"
-  - "Does not make gate metadata required on all commands — commands without gate metadata appear in the catalog with a 'metadata: absent' marker"
+- Does not define gate metadata on command definitions — that is RFC-0518
+- Does not extract inline guards into named functions — that is RFC-0520
+- Does not change pipeline execution order or validation logic
+- Does not generate per-site gate catalogs — the catalog is workspace-scoped
+- 'Does not make gate metadata required on all commands — commands without gate metadata appear in the catalog with a ''metadata: absent'' marker'
+
 ---
 
 # RFC-0519: Gate catalog generator and validator

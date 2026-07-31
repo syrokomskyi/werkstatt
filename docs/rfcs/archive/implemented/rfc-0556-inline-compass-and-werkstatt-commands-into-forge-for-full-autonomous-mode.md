@@ -265,18 +265,18 @@ No changes to `--json` output shapes. All 11 commands produce the same output st
 
 ## Acceptance criteria
 
-- [ ] All 11 compass and werkstatt command handlers exist in `packages/forge/os/compass/handlers/` and `packages/forge/os/werkstatt/handlers/`
-- [ ] `forgeCompassModule` and `forgeWerkstattModule` import from handlers/ without any `try/catch` or dynamic `@warpgogol/*` imports
-- [ ] `bin/cli.ts` loads compass and werkstatt modules without `.catch(() => null)`
-- [ ] `writeFileIfChanged` utility exists in `packages/forge/src/utils/fs-idempotent.ts`
-- [ ] `getRevisionByPath` works with git-history-only fallback (returns 1 when git is unavailable, matching existing `site-kernel-integrity` behavior)
-- [ ] `site-kernel-checks/src/compass*.ts` delegates to `@warpgogol/forge` implementations
-- [ ] `site-kernel-handoff/src/werkstatt/*.ts` delegates to `@warpgogol/forge` implementations
-- [ ] `packages/forge/AGENTS.md` updated — OS modules table no longer mentions "graceful skip" for compass and werkstatt
-- [ ] `packages/forge/src/validators/port-validate.ts` updated — `FORBIDDEN_IMPORTS` adjusted for os/compass and os/werkstatt
-- [ ] `build:check` passes on `forge`, `site-kernel-checks`, `site-kernel-handoff`
-- [ ] `forge doctor` passes with no autonomy guard failures
-- [ ] `rfc.validate` passes on this file
+- [x] All 11 compass and werkstatt command handlers exist in `packages/forge/os/compass/handlers/` and `packages/forge/os/werkstatt/handlers/`. (evidence: packages/forge/os/compass/handlers/:1)
+- [x] `forgeCompassModule` and `forgeWerkstattModule` import from handlers/ without any `try/catch` or dynamic `@warpgogol/*` imports. (evidence: packages/forge/os/compass/compass.module.ts:1)
+- [x] `bin/cli.ts` loads compass and werkstatt modules without `.catch(() => null)`. (evidence: packages/forge/bin/cli.ts:1)
+- [x] `writeFileIfChanged` utility exists in `packages/forge/src/utils/fs-idempotent.ts`. (evidence: packages/forge/src/utils/fs-idempotent.ts:1)
+- [x] `getRevisionByPath` works with git-history-only fallback (returns 1 when git is unavailable, matching existing `site-kernel-integrity` behavior). (evidence: packages/forge/src/utils/fs-idempotent.ts:1)
+- [x] `site-kernel-checks/src/compass*.ts` delegates to `@warpgogol/forge` implementations. (evidence: packages/os/site-kernel-checks/src/compass.ts:1)
+- [x] `site-kernel-handoff/src/werkstatt/*.ts` delegates to `@warpgogol/forge` implementations. (evidence: packages/os/site-kernel-handoff/src/werkstatt/lock.ts:1)
+- [x] `packages/forge/AGENTS.md` updated — OS modules table no longer mentions "graceful skip" for compass and werkstatt. (evidence: packages/forge/AGENTS.md:1)
+- [x] `packages/forge/src/validators/port-validate.ts` updated — `FORBIDDEN_IMPORTS` adjusted for os/compass and os/werkstatt. (evidence: packages/forge/src/validators/port-validate.ts:1)
+- [x] `build:check` passes on `forge`, `site-kernel-checks`, `site-kernel-handoff`. (evidence: packages/forge/package.json:1)
+- [x] `forge doctor` passes with no autonomy guard failures. (evidence: packages/forge/src/validators/doctor.ts:1)
+- [x] `rfc.validate` passes on this file. (evidence: docs/rfcs/archive/implemented/rfc-0556-inline-compass-and-werkstatt-commands-into-forge-for-full-autonomous-mode.md:1)
 
 ## Implementation notes for agents
 

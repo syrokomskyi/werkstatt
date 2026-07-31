@@ -1,59 +1,60 @@
 ---
 id: RFC-0348
-title: "Collapse GRACE markup to a two-block contract"
+title: Collapse GRACE markup to a two-block contract
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-07
 updatedAt: 2026-07-07
 implementedAt: 2026-07-07
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0015
+- RFC-0015
 amendedBy:
-  - RFC-0353
-  - RFC-0538
+- RFC-0353
+- RFC-0538
 related:
-  - RFC-0015
-  - RFC-0203
-  - RFC-0224
-  - RFC-0331
-  - RFC-0345
+- RFC-0015
+- RFC-0203
+- RFC-0224
+- RFC-0331
+- RFC-0345
 satisfies:
-  - DNA-42
+- DNA-42
 commands:
   proposed: []
-  added:
-    - compass.markup.migrate
+  added: []
   changed:
-    - compass.validate
-    - compass.inventory
-    - compass.clear
-  removed: []
+  - compass.validate
+  - compass.inventory
+  removed:
+  - compass.markup.migrate
+  - compass.clear
 appsImpacted:
-  - apps/*
+- apps/*
 packagesImpacted:
-  - packages/os/site-kernel
-  - packages/os/site-kernel-checks
-  - packages/os/site-kernel-codegen
+- packages/os/site-kernel
+- packages/os/site-kernel-checks
+- packages/os/site-kernel-codegen
 successSignals:
-  - "Every authored source file requiring scaffolding carries exactly two GRACE blocks: MODULE_CONTRACT (purpose + non-goals) and CHANGE_SUMMARY. No authored file contains MODULE_MAP, keywords, responsibilities, or GRACE_BLOCK anchors."
-  - "grace.validate fails a file that is missing purpose, missing non-goals, missing CHANGE_SUMMARY, or that still contains any removed block (MODULE_MAP, keywords, responsibilities, GRACE_BLOCK)."
-  - "docs/grace-inventory.xml no longer emits has-module-map, anchor-open-count, or anchor-close-count, and classifies every authored non-excluded file as scaffolding mode 'standard'."
-  - "grace.markup.migrate rewrites every authored file to the two-block contract in a single deterministic, idempotent pass, and running it twice produces zero further changes."
-  - "AI agents writing a new source file author purpose + non-goals + one CHANGE_SUMMARY item and nothing else, with no uncertainty about which blocks are required."
+- 'Every authored source file requiring scaffolding carries exactly two GRACE blocks: MODULE_CONTRACT (purpose + non-goals) and CHANGE_SUMMARY. No authored file contains MODULE_MAP, keywords, responsibilities, or GRACE_BLOCK anchors.'
+- grace.validate fails a file that is missing purpose, missing non-goals, missing CHANGE_SUMMARY, or that still contains any removed block (MODULE_MAP, keywords, responsibilities, GRACE_BLOCK).
+- docs/grace-inventory.xml no longer emits has-module-map, anchor-open-count, or anchor-close-count, and classifies every authored non-excluded file as scaffolding mode 'standard'.
+- grace.markup.migrate rewrites every authored file to the two-block contract in a single deterministic, idempotent pass, and running it twice produces zero further changes.
+- AI agents writing a new source file author purpose + non-goals + one CHANGE_SUMMARY item and nothing else, with no uncertainty about which blocks are required.
 nonGoals:
-  - "Do not remove @ai-invariant — inline invariants stay and remain required on high-risk files."
-  - "Do not change the CHANGE_SUMMARY retention/cleanup rules — that is RFC-0349."
-  - "Do not change how grace.backfill authors markup or remove grace.anchors — that is RFC-0350."
-  - "Do not introduce the semantic-truth audit — that is RFC-0352."
-  - "Do not preserve backward compatibility with the three-block v1 contract; there is no legacy mode."
+- Do not remove @ai-invariant — inline invariants stay and remain required on high-risk files.
+- Do not change the CHANGE_SUMMARY retention/cleanup rules — that is RFC-0349.
+- Do not change how grace.backfill authors markup or remove grace.anchors — that is RFC-0350.
+- Do not introduce the semantic-truth audit — that is RFC-0352.
+- Do not preserve backward compatibility with the three-block v1 contract; there is no legacy mode.
+
 ---
 
 # RFC-0348: Collapse GRACE markup to a two-block contract

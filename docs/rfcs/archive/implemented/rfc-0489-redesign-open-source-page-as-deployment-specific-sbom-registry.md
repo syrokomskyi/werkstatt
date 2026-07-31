@@ -1,67 +1,68 @@
 ---
 id: RFC-0489
-title: "Redesign the open-source page as a deployment-specific SBOM registry"
+title: Redesign the open-source page as a deployment-specific SBOM registry
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-22
 updatedAt: 2026-07-22
 enhancedAt: 2026-07-22
 implementedAt: 2026-07-22
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0081
-  - RFC-0087
-  - RFC-0154
-  - RFC-0220
-  - RFC-0478
-  - RFC-0480
-  - RFC-0488
+- RFC-0081
+- RFC-0087
+- RFC-0154
+- RFC-0220
+- RFC-0478
+- RFC-0480
+- RFC-0488
 satisfies:
-  - DNA-11
+- DNA-11
 breaksC: false
 versionBump: patch
 commands:
   proposed: []
   added:
-    - open-source.validate
-  changed:
-    - open-source.generate
-  removed: []
+  - open-source.validate
+  changed: []
+  removed:
+  - open-source.generate
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/site-kernel-astro"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/ui"
+- '@gogol/site-kernel-astro'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-checks'
+- '@gogol/ui'
 successSignals:
-  - "The open-source page shows a compact summary (component count, license distribution, deployment metadata) — not 39 000+ lines of full license texts in the DOM."
-  - "Full license texts and NOTICE files are downloadable as separate artifacts (THIRD_PARTY_LICENSES.txt, THIRD_PARTY_NOTICES.txt, sbom.cdx.json), not rendered in the page HTML."
-  - "The page is generated for every supported language (de, uk), not only German — the UK page is no longer broken."
-  - "The dependency inventory reflects the actual deployment artifact, not the root workspace `pnpm licenses list --prod` output which includes build tools, type packages, and language servers."
-  - "Each component in the table has a normalized SPDX license identifier — not raw unverified strings from package.json."
-  - "Duplicate packages (same name+version) are deduplicated — the same package does not appear twice in the table."
-  - "open-source.validate fails the build when unknown or conflicting licenses are present, or when build-only packages leak into the runtime scope."
-  - "The page shows deployment metadata (deployment ID, commit SHA, build timestamp, target platform) so visitors can verify which deployment the registry belongs to."
-  - "Downloadable SBOM (CycloneDX JSON) is generated alongside the page and linked from it."
+- The open-source page shows a compact summary (component count, license distribution, deployment metadata) — not 39 000+ lines of full license texts in the DOM.
+- Full license texts and NOTICE files are downloadable as separate artifacts (THIRD_PARTY_LICENSES.txt, THIRD_PARTY_NOTICES.txt, sbom.cdx.json), not rendered in the page HTML.
+- The page is generated for every supported language (de, uk), not only German — the UK page is no longer broken.
+- The dependency inventory reflects the actual deployment artifact, not the root workspace `pnpm licenses list --prod` output which includes build tools, type packages, and language servers.
+- Each component in the table has a normalized SPDX license identifier — not raw unverified strings from package.json.
+- Duplicate packages (same name+version) are deduplicated — the same package does not appear twice in the table.
+- open-source.validate fails the build when unknown or conflicting licenses are present, or when build-only packages leak into the runtime scope.
+- The page shows deployment metadata (deployment ID, commit SHA, build timestamp, target platform) so visitors can verify which deployment the registry belongs to.
+- Downloadable SBOM (CycloneDX JSON) is generated alongside the page and linked from it.
 nonGoals:
-  - "Does not change the URL of the open-source page (/open-source/ DE and /vidkrytyy-kod/ UK are preserved)."
-  - "Does not add client-side search or filtering — the page is server-rendered with a compact table; interactive filters are a possible future enhancement."
-  - "Does not generate SPDX SBOM in addition to CycloneDX — CycloneDX is the primary format; SPDX can be added later if a consumer requires it."
-  - "Does not implement vulnerability scanning — the page answers 'what is used and under which license', not 'is it safe'. Security scanning is a separate process."
-  - "Does not implement a license policy engine with waiver management — the validator checks for unknown/conflicting licenses and blocks, but does not manage an allowed/blocked list with waiver workflows. This is a future RFC."
-  - "Does not implement historical SBOM archiving (/open-source/history/[deploymentId]/) — the page shows the current deployment only. History is a future enhancement."
-  - "Does not modify the impressum, bildnachweise, notausgang, or footer — cross-page changes mentioned by the expert are deferred to their own sessions."
-  - "Does not implement client-specific handover SBOM generation — the Übergabepaket SBOM is a future enhancement tied to the notausgang/handoff pipeline."
+- Does not change the URL of the open-source page (/open-source/ DE and /vidkrytyy-kod/ UK are preserved).
+- Does not add client-side search or filtering — the page is server-rendered with a compact table; interactive filters are a possible future enhancement.
+- Does not generate SPDX SBOM in addition to CycloneDX — CycloneDX is the primary format; SPDX can be added later if a consumer requires it.
+- Does not implement vulnerability scanning — the page answers 'what is used and under which license', not 'is it safe'. Security scanning is a separate process.
+- Does not implement a license policy engine with waiver management — the validator checks for unknown/conflicting licenses and blocks, but does not manage an allowed/blocked list with waiver workflows. This is a future RFC.
+- Does not implement historical SBOM archiving (/open-source/history/[deploymentId]/) — the page shows the current deployment only. History is a future enhancement.
+- Does not modify the impressum, bildnachweise, notausgang, or footer — cross-page changes mentioned by the expert are deferred to their own sessions.
+- Does not implement client-specific handover SBOM generation — the Übergabepaket SBOM is a future enhancement tied to the notausgang/handoff pipeline.
+
 ---
 
 # RFC-0489: Redesign the open-source page as a deployment-specific SBOM registry

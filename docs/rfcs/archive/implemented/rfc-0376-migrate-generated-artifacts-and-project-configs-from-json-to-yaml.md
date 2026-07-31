@@ -1,126 +1,127 @@
 ---
 id: RFC-0376
-title: "Migrate generated artifacts and project configs from JSON to YAML"
+title: Migrate generated artifacts and project configs from JSON to YAML
 status: implemented
 kind: policy
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-11
 updatedAt: 2026-07-12
 enhancedAt: 2026-07-12
 implementedAt: 2026-07-13
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0081
-  - RFC-0023
-  - RFC-0336
-  - RFC-0204
-  - RFC-0210
-  - RFC-0234
-  - RFC-0266
-  - RFC-0268
-  - RFC-0329
-  - RFC-0330
-  - RFC-0331
+- RFC-0081
+- RFC-0023
+- RFC-0336
+- RFC-0204
+- RFC-0210
+- RFC-0234
+- RFC-0266
+- RFC-0268
+- RFC-0329
+- RFC-0330
+- RFC-0331
 amendedBy:
-  - RFC-0493
+- RFC-0493
 related:
-  - RFC-0087
-  - RFC-0185
-  - RFC-0326
-  - RFC-0364
-  - RFC-0375
+- RFC-0087
+- RFC-0185
+- RFC-0326
+- RFC-0364
+- RFC-0375
 satisfies:
-  - DNA-18
+- DNA-18
 commands:
   proposed:
-    - yaml.contract.lint
+  - yaml.contract.lint
   added:
-    - yaml.contract.lint
+  - yaml.contract.lint
   changed:
-    - command.manifest.generate
-    - command.manifest.validate
-    - ecosystem.manifest.generate
-    - maintenance.debt.queue.generate
-    - pipeline.budget.generate
-    - rfc.dna.trace.generate
-    - rfc.decision-log.generate
-    - rfc.verification.emit
-    - compass.audit.record
-    - compass.audit.baseline
-    - image.variants.generate
-    - image.variants.validate
-    - video.variants.generate
-    - video.variants.validate
-    - live.variants.generate
-    - entitlements.resolve
-    - entitlements.validate
-    - site.bordbuch.generate
-    - agent.knowledge.generate
-    - agent.manifest.generate
-    - agent.openapi.generate
-    - feed.generate
-    - cms.schema.generate
-    - gitattributes.generate
-    - preview.images.generate
-    - props.types.generate
-    - agents.generate
-    - docs.commands.generate
-    - material.credits.generate
-    - uni.registry.build
-    - uni.registry.validate
+  - command.manifest.generate
+  - command.manifest.validate
+  - ecosystem.manifest.generate
+  - maintenance.debt.queue.generate
+  - pipeline.budget.generate
+  - rfc.dna.trace.generate
+  - rfc.decision-log.generate
+  - rfc.verification.emit
+  - compass.audit.record
+  - compass.audit.baseline
+  - image.variants.generate
+  - image.variants.validate
+  - video.variants.generate
+  - video.variants.validate
+  - live.variants.generate
+  - entitlements.resolve
+  - entitlements.validate
+  - agent.knowledge.generate
+  - agent.manifest.generate
+  - agent.openapi.generate
+  - feed.generate
+  - cms.schema.generate
+  - gitattributes.generate
+  - preview.images.generate
+  - props.types.generate
+  - agents.generate
+  - docs.commands.generate
+  - uni.registry.build
+  - uni.registry.validate
   removed:
-    - json.generated.marker.validate
+  - json.generated.marker.validate
+  - site.bordbuch.generate
+  - material.credits.generate
 appsImpacted:
-  - apps/*
+- apps/*
 packagesImpacted:
-  - "@gogol/site-kernel"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-onboarding"
-  - "@gogol/ui"
-  - "@gogol/share"
+- '@gogol/site-kernel'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-onboarding'
+- '@gogol/ui'
+- '@gogol/share'
 successSignals:
-  - "All generated artifacts use .generated.yaml extension with # comment-based advisory headers via buildGeneratedHeader(), not field-based JSON advisory objects."
-  - "All project configuration and state files (fleet, service configs, integration shards, surface states) use .yaml extension."
-  - "A single YAML library (yaml, Eemeli AY) is used for all YAML serialization and deserialization across the ecosystem."
-  - "yaml.contract.lint in build.prepare enforces the .yaml-only contract: no .json files outside the tool-mandatory whitelist, no .yml extensions, no .generated.json artifacts."
-  - "yaml-contract.whitelist.yaml in the repository root is the single source of truth for tool-mandatory JSON files."
-  - "loadGeneratedManifest() in @gogol/ui parses YAML via yaml.parse(), replacing the previous JSON.parse + // comment-strip pattern."
-  - "buildGeneratedJsonAdvisory() and its types are removed from generated-marker.ts — buildGeneratedHeader() is the single advisory mechanism for all generated files."
-  - "Onboarding templates emit .yaml file references in gitignore entries and generated file paths."
+- 'All generated artifacts use .generated.yaml extension with # comment-based advisory headers via buildGeneratedHeader(), not field-based JSON advisory objects.'
+- All project configuration and state files (fleet, service configs, integration shards, surface states) use .yaml extension.
+- A single YAML library (yaml, Eemeli AY) is used for all YAML serialization and deserialization across the ecosystem.
+- 'yaml.contract.lint in build.prepare enforces the .yaml-only contract: no .json files outside the tool-mandatory whitelist, no .yml extensions, no .generated.json artifacts.'
+- yaml-contract.whitelist.yaml in the repository root is the single source of truth for tool-mandatory JSON files.
+- loadGeneratedManifest() in @gogol/ui parses YAML via yaml.parse(), replacing the previous JSON.parse + // comment-strip pattern.
+- buildGeneratedJsonAdvisory() and its types are removed from generated-marker.ts — buildGeneratedHeader() is the single advisory mechanism for all generated files.
+- Onboarding templates emit .yaml file references in gitignore entries and generated file paths.
 nonGoals:
-  - "Do not modify tool-mandatory JSON files (package.json, tsconfig.json, turbo.json, wrangler.jsonc, .mcp.json, .vscode/*.json, .markdownlint.json, skills-lock.json)."
-  - "Do not migrate onboarding/.input/** and onboarding/.output/** JSON files — these are external input workflow files that stay JSON."
-  - "Do not introduce a second YAML library — yaml (Eemeli AY) is the sole library for all YAML operations."
-  - "Do not use YAML flow-style for arrays in generated output — block-style is the default for machine-generated YAML."
-  - "Do not create size-based exceptions for large generated registries — all generated files migrate uniformly."
-  - "Do not introduce a feature flag or dual-format transition period — migration is big-bang, forward-only."
-  - "Do not change the canonical GENERATED_MARKER string or hasGeneratedMarker semantics — only the advisory delivery mechanism changes (field-based to comment-based)."
-  - "Do not modify commands that only read Category A (whitelisted) JSON files — tsconfig.shape.lint reads tsconfig.json (whitelisted), env.contract.validate reads .env.example (not JSON). These commands are not in the changed list."
-  - "Do not add a stableYamlHash function to @gogol/fingerprint — the package already has normalizeYaml() in normalizers/yaml.ts and fingerprintFile() dispatches to it for .yaml extensions (DNA-53). No fingerprint changes are needed."
-  - "Do not modify generators that produce non-JSON output — robots.generate (.txt), sitemap.generate (.xml), routes.generate (.astro), llms.generate (.md), ai.generate (.md), humans.generate (.txt), security.txt.generate (.txt), public.infrastructure.generate (non-JSON), public.icons.generate (non-JSON), indexnow.key.generate (.txt), biome.css.generate (.css), env.example.generate (.env), open-source.generate (.md), page.markdown.generate (.md), breadcrumb.generate (content-layer .md), content.source.binding.validate (content-layer), legal.scaffold (content-layer). These commands are not in the changed list."
+- Do not modify tool-mandatory JSON files (package.json, tsconfig.json, turbo.json, wrangler.jsonc, .mcp.json, .vscode/*.json, .markdownlint.json, skills-lock.json).
+- Do not migrate onboarding/.input/** and onboarding/.output/** JSON files — these are external input workflow files that stay JSON.
+- Do not introduce a second YAML library — yaml (Eemeli AY) is the sole library for all YAML operations.
+- Do not use YAML flow-style for arrays in generated output — block-style is the default for machine-generated YAML.
+- Do not create size-based exceptions for large generated registries — all generated files migrate uniformly.
+- Do not introduce a feature flag or dual-format transition period — migration is big-bang, forward-only.
+- Do not change the canonical GENERATED_MARKER string or hasGeneratedMarker semantics — only the advisory delivery mechanism changes (field-based to comment-based).
+- Do not modify commands that only read Category A (whitelisted) JSON files — tsconfig.shape.lint reads tsconfig.json (whitelisted), env.contract.validate reads .env.example (not JSON). These commands are not in the changed list.
+- Do not add a stableYamlHash function to @gogol/fingerprint — the package already has normalizeYaml() in normalizers/yaml.ts and fingerprintFile() dispatches to it for .yaml extensions (DNA-53). No fingerprint changes are needed.
+- Do not modify generators that produce non-JSON output — robots.generate (.txt), sitemap.generate (.xml), routes.generate (.astro), llms.generate (.md), ai.generate (.md), humans.generate (.txt), security.txt.generate (.txt), public.infrastructure.generate (non-JSON), public.icons.generate (non-JSON), indexnow.key.generate (.txt), biome.css.generate (.css), env.example.generate (.env), open-source.generate (.md), page.markdown.generate (.md), breadcrumb.generate (content-layer .md), content.source.binding.validate (content-layer), legal.scaffold (content-layer). These commands are not in the changed list.
 acceptance:
-  - probe: command-registered
-    name: "yaml.contract.lint"
-  - probe: file-exists
-    path: "yaml-contract.whitelist.yaml"
-  - probe: file-contains
-    path: "packages/ui/src/generated-manifest-loader.ts"
-    pattern: "yaml.parse"
-  - probe: run
-    command: "site-kernel run yaml.contract.lint --json"
-    expect:
-      exitCode: 0
-  - probe: file-contains
-    path: "packages/os/site-kernel-checks/src/command-tables/index.ts"
-    pattern: "json.generated.marker.validate"
-    not: true
+- probe: command-registered
+  name: yaml.contract.lint
+- probe: file-exists
+  path: yaml-contract.whitelist.yaml
+- probe: file-contains
+  path: packages/ui/src/generated-manifest-loader.ts
+  pattern: yaml.parse
+- probe: run
+  command: site-kernel run yaml.contract.lint --json
+  expect:
+    exitCode: 0
+- probe: file-contains
+  path: packages/os/site-kernel-checks/src/command-tables/index.ts
+  pattern: json.generated.marker.validate
+  not: true
+
 ---
 
 # RFC-0376: Migrate generated artifacts and project configs from JSON to YAML

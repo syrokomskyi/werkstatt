@@ -1,47 +1,48 @@
 ---
 id: RFC-0351
-title: "Add grace.invariant.add helper and authoring discipline"
+title: Add grace.invariant.add helper and authoring discipline
 status: implemented
 kind: command
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-07
 updatedAt: 2026-07-07
 implementedAt: 2026-07-07
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy:
-  - RFC-0353
+- RFC-0353
 related:
-  - RFC-0015
-  - RFC-0348
-  - RFC-0350
+- RFC-0015
+- RFC-0348
+- RFC-0350
 satisfies:
-  - DNA-42
+- DNA-42
 commands:
   proposed: []
-  added:
-    - compass.invariant.add
+  added: []
   changed: []
-  removed: []
+  removed:
+  - compass.invariant.add
 appsImpacted:
-  - apps/*
+- apps/*
 packagesImpacted:
-  - packages/os/site-kernel-codegen
+- packages/os/site-kernel-codegen
 successSignals:
-  - "grace.invariant.add --file <path> --text \"…\" inserts a single // @ai-invariant line at the correct location (after imports for .ts, inside frontmatter for .astro) and is idempotent."
-  - "AI agents add an @ai-invariant whenever they write or change a blast-radius file, and the count of @ai-invariant lines in the repository grows well beyond the current 17."
-  - "The command refuses to insert a multi-line invariant and reports a clear error instead of producing malformed markup."
+- grace.invariant.add --file <path> --text "…" inserts a single // @ai-invariant line at the correct location (after imports for .ts, inside frontmatter for .astro) and is idempotent.
+- AI agents add an @ai-invariant whenever they write or change a blast-radius file, and the count of @ai-invariant lines in the repository grows well beyond the current 17.
+- The command refuses to insert a multi-line invariant and reports a clear error instead of producing malformed markup.
 nonGoals:
-  - "Do not author the invariant text — the agent supplies it; the command only places it correctly."
-  - "Do not call an LLM or read any API key."
-  - "Do not change the two-block MODULE_CONTRACT / CHANGE_SUMMARY contract — @ai-invariant is a separate inline element."
-  - "Do not remove the grace.validate rule that requires @ai-invariant on high-risk files (RFC-0348 GRACE-INVARIANT-01)."
+- Do not author the invariant text — the agent supplies it; the command only places it correctly.
+- Do not call an LLM or read any API key.
+- Do not change the two-block MODULE_CONTRACT / CHANGE_SUMMARY contract — @ai-invariant is a separate inline element.
+- Do not remove the grace.validate rule that requires @ai-invariant on high-risk files (RFC-0348 GRACE-INVARIANT-01).
+
 ---
 
 # RFC-0351: Add grace.invariant.add helper and authoring discipline

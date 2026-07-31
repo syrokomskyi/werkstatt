@@ -1,70 +1,72 @@
 ---
 id: RFC-0355
-title: "Mission lifecycle and Bordbuch"
+title: Mission lifecycle and Bordbuch
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-09
 updatedAt: 2026-07-09
 enhancedAt: 2026-07-09
 implementedAt: 2026-07-10
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0221
+- RFC-0221
 amendedBy:
-  - RFC-0362
-  - RFC-0477
-  - RFC-0560
+- RFC-0362
+- RFC-0477
+- RFC-0560
+- RFC-0583
 related:
-  - RFC-0354
-  - RFC-0356
-  - RFC-0357
-  - RFC-0353
-  - RFC-0362
-  - DNA-44
-  - DNA-45
-  - DNA-46
+- RFC-0354
+- RFC-0356
+- RFC-0357
+- RFC-0353
+- RFC-0362
+- DNA-44
+- DNA-45
+- DNA-46
 satisfies:
-  - DNA-46
+- DNA-46
 commands:
   proposed: []
   added:
-    - mission.open
-    - mission.status
-    - mission.close
-    - mission.abort
-    - mission.list
-    - bordbuch.append
-    - bordbuch.validate
+  - mission.open
+  - mission.status
+  - mission.close
+  - mission.abort
+  - mission.list
+  - bordbuch.append
+  - bordbuch.validate
   changed: []
   removed: []
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/ontology"
+- '@gogol/site-kernel-handoff'
+- '@gogol/ontology'
 successSignals:
-  - "A developer can `mission.open --system <id> --brief <text>` and a new mission directory `missions/<system>-mNNNNNN/` is created with a mission manifest and an open Bordbuch entry."
-  - "`mission.status --mission <id>` prints the mission's system, state, openedAt, brief, and Bordbuch entries."
-  - "`mission.close --mission <id>` verifies that `mission.reconcile` (defined in RFC-0356) has completed before allowing the mission to close."
-  - "`mission.close --mission <id>` transitions the reconciled mission to `closed`, appends a closing Bordbuch entry, and updates `systems/registry.yaml` `currentMission` to null."
-  - "`mission.abort --mission <id>` transitions the mission to `aborted`, appends an abort Bordbuch entry, and discards the mission Werkstück and local Distribution."
-  - "`bordbuch.validate --system <id>` verifies the Bordbuch NDJSON hash-chain, errata, sensitive-payload guard, and mission lifecycle pairs."
-  - "Mission IDs are kebab-case, lowercase, latin-only: `<system-id>-m<NNNNNN>`."
+- A developer can `mission.open --system <id> --brief <text>` and a new mission directory `missions/<system>-mNNNNNN/` is created with a mission manifest and an open Bordbuch entry.
+- '`mission.status --mission <id>` prints the mission''s system, state, openedAt, brief, and Bordbuch entries.'
+- '`mission.close --mission <id>` verifies that `mission.reconcile` (defined in RFC-0356) has completed before allowing the mission to close.'
+- '`mission.close --mission <id>` transitions the reconciled mission to `closed`, appends a closing Bordbuch entry, and updates `systems/registry.yaml` `currentMission` to null.'
+- '`mission.abort --mission <id>` transitions the mission to `aborted`, appends an abort Bordbuch entry, and discards the mission Werkstück and local Distribution.'
+- '`bordbuch.validate --system <id>` verifies the Bordbuch NDJSON hash-chain, errata, sensitive-payload guard, and mission lifecycle pairs.'
+- 'Mission IDs are kebab-case, lowercase, latin-only: `<system-id>-m<NNNNNN>`.'
 nonGoals:
-  - "Does not define materialization (how a mission Werkstück is built) — that is RFC-0356."
-  - "Does not define release discipline — that is RFC-0357."
-  - "Does not define agent orchestration or multi-agent coordination within a mission — that is a future RFC wave."
-  - "Does not define mission templates or brief schemas beyond the minimal contract — richer brief schemas are a future concern."
-  - "Does not define cloud storage for mission Werkstücke or Distributions beyond the local directory contract — cloud storage is out of scope."
-  - "Does not define Bordbuch archival, rotation, or retention policy — the Bordbuch is append-only and grows indefinitely for MVP. A future RFC will address sharding or archival if it becomes a bottleneck."
-  - "Does not define Bordbuch schema evolution or migration policy beyond the per-entry `schemaVersion` field. Old entries retain their original schema version; readers must handle multiple versions. A future RFC will address formal schema migration if breaking changes are needed."
-  - "Does not define `mission.reconcile` — that command is defined in RFC-0356 (Mission materialization). This RFC defines `mission.close` which depends on reconcile as a precondition."
+- Does not define materialization (how a mission Werkstück is built) — that is RFC-0356.
+- Does not define release discipline — that is RFC-0357.
+- Does not define agent orchestration or multi-agent coordination within a mission — that is a future RFC wave.
+- Does not define mission templates or brief schemas beyond the minimal contract — richer brief schemas are a future concern.
+- Does not define cloud storage for mission Werkstücke or Distributions beyond the local directory contract — cloud storage is out of scope.
+- Does not define Bordbuch archival, rotation, or retention policy — the Bordbuch is append-only and grows indefinitely for MVP. A future RFC will address sharding or archival if it becomes a bottleneck.
+- Does not define Bordbuch schema evolution or migration policy beyond the per-entry `schemaVersion` field. Old entries retain their original schema version; readers must handle multiple versions. A future RFC will address formal schema migration if breaking changes are needed.
+- Does not define `mission.reconcile` — that command is defined in RFC-0356 (Mission materialization). This RFC defines `mission.close` which depends on reconcile as a precondition.
+
 ---
 
 # RFC-0355: Mission lifecycle and Bordbuch

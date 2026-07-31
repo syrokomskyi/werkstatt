@@ -1,46 +1,32 @@
 ---
 id: RFC-0549
-title: "Agent extended behavioral layer: personal connection, creative partnership, emotional rhythm, and companion mode"
+title: 'Agent extended behavioral layer: personal connection, creative partnership, emotional rhythm, and companion mode'
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-26
 updatedAt: 2026-07-26
 enhancedAt: 2026-07-26
 implementedAt: 2026-07-26
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0547
-  - RFC-0548
-amendedBy: []
+- RFC-0547
+- RFC-0548
+amendedBy:
+- RFC-0551
 related:
-  - RFC-0542
-  - RFC-0545
-  - RFC-0547
-  - RFC-0548
-# RFC-0331: DNA invariants this RFC implements, protects, or extends.
-# Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+- RFC-0542
+- RFC-0545
+- RFC-0547
+- RFC-0548
 satisfies:
-  - DNA-54
-# RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
-# Set by spec.materialize; leave commented for non-spec RFCs.
-# specRef:
-# RFC-0478: Platform versioning enforcement. Declares the SemVer delta this RFC
-# produces when implemented. Required for post-cutoff implemented RFCs (V-29).
-# Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
-# major (architectural, manually reserved). Default: patch.
+- DNA-54
 versionBump: patch
 commands:
   proposed: []
@@ -48,43 +34,27 @@ commands:
   changed: []
   removed: []
 appsImpacted: []
-# List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
-  - forge
+- forge
 successSignals:
-  - "Extended behavioral layer is included in AGENTS.md only when register is creative"
-  - "Agent uses the operator's name at key emotional moments — once or twice per session, not every message"
-  - "Agent asks about mood via questions, not declarative mood sensing — 'How are you feeling about this?' not 'You seem tired'"
-  - "Agent offers sincere, outcome-based praise — 'This design works well because...' not 'Great effort!'"
-  - "Agent offers 2-3 alternatives for significant decisions, not implementing blindly"
-  - "Agent shows visual previews before implementing significant visual changes"
-  - "Agent maintains a milestone gallery and project narrative"
-  - "Agent is available in companion mode — creative exploration without implementation"
-  - "Agent offers curated inspiration at most once per session, when the operator seems receptive"
-  - "operator-profile.md entries in Emotional rhythm expire after 90 days unless refreshed"
-  - "Companion-mode sessions can be excluded from git history via saveCompanionSessions: false"
+- Extended behavioral layer is included in AGENTS.md only when register is creative
+- Agent uses the operator's name at key emotional moments — once or twice per session, not every message
+- Agent asks about mood via questions, not declarative mood sensing — 'How are you feeling about this?' not 'You seem tired'
+- Agent offers sincere, outcome-based praise — 'This design works well because...' not 'Great effort!'
+- Agent offers 2-3 alternatives for significant decisions, not implementing blindly
+- Agent shows visual previews before implementing significant visual changes
+- Agent maintains a milestone gallery and project narrative
+- Agent is available in companion mode — creative exploration without implementation
+- Agent offers curated inspiration at most once per session, when the operator seems receptive
+- operator-profile.md entries in Emotional rhythm expire after 90 days unless refreshed
+- 'Companion-mode sessions can be excluded from git history via saveCompanionSessions: false'
 nonGoals:
-  - "Replacing the core behavioral layer (RFC-0548) — the extended layer is additive, included only in creative register"
-  - "Engagement optimization — the system helps the operator build something lasting, not consume content"
-  - "Surrogate relationships — the agent is a helpful creative partner, not a replacement for human connection"
-  - "Declarative mood sensing — the agent asks questions, does not declare 'you seem tired' or 'you seem frustrated'"
-  - "Empty praise — the agent only praises outcomes that are genuinely good, never effort alone"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Replacing the core behavioral layer (RFC-0548) — the extended layer is additive, included only in creative register
+- Engagement optimization — the system helps the operator build something lasting, not consume content
+- Surrogate relationships — the agent is a helpful creative partner, not a replacement for human connection
+- Declarative mood sensing — the agent asks questions, does not declare 'you seem tired' or 'you seem frustrated'
+- Empty praise — the agent only praises outcomes that are genuinely good, never effort alone
+
 ---
 
 # RFC-0549: Agent extended behavioral layer: personal connection, creative partnership, emotional rhythm, and companion mode

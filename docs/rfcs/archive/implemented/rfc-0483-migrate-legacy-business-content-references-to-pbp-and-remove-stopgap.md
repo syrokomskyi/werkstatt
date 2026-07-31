@@ -1,31 +1,31 @@
 ---
 id: RFC-0483
-title: "Migrate legacy business content references to PBP and remove stopgap collection"
+title: Migrate legacy business content references to PBP and remove stopgap collection
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
-createdAt: 2026-07-21
+- human:andrii-syrokomskyi
+createdAt: &id001 2026-07-21
 updatedAt: 2026-07-22
 enhancedAt: 2026-07-22
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - DNA-20
-  - RFC-0045
-  - RFC-0398
-  - RFC-0466
-  - RFC-0471
-  - RFC-0479
-  - RFC-0481
-  - RFC-0482
+- DNA-20
+- RFC-0045
+- RFC-0398
+- RFC-0466
+- RFC-0471
+- RFC-0479
+- RFC-0481
+- RFC-0482
 satisfies:
-  - DNA-41
+- DNA-41
 versionBump: minor
 commands:
   proposed: []
@@ -33,23 +33,25 @@ commands:
   changed: []
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/site-kernel-handoff"
+- '@gogol/site-kernel-handoff'
 successSignals:
-  - "All 329 {business.*} content references across 32 files are replaced with {business-profile.*} references"
-  - "Legacy business/ content directory is deleted"
-  - "Legacy business collection is removed from content.config.ts"
-  - "content.config.ts generator (if any) no longer emits business collection registration"
-  - "astro build succeeds without [content-reference] warnings for business.* references"
-  - "Migrator is idempotent — re-running on already-migrated content is a no-op"
-  - "migrator.registry.validate passes with the rfc-0483 migrator registered"
+- All 329 {business.*} content references across 32 files are replaced with {business-profile.*} references
+- Legacy business/ content directory is deleted
+- Legacy business collection is removed from content.config.ts
+- content.config.ts generator (if any) no longer emits business collection registration
+- astro build succeeds without [content-reference] warnings for business.* references
+- Migrator is idempotent — re-running on already-migrated content is a no-op
+- migrator.registry.validate passes with the rfc-0483 migrator registered
 nonGoals:
-  - "Does not define PBP presentation fields — that is RFC-0482 (prerequisite)"
-  - "Does not change the content reference resolver (RFC-0045) — uses existing dot-path field access"
-  - "Does not migrate uk/ locale content — uk/ PBP entities already exist; only de/ needs new entity creation"
-  - "Does not change the PBP compiler or semantic profile"
-  - "Does not add new PBP entity types — uses existing schemas + presentation fields from RFC-0482"
+- Does not define PBP presentation fields — that is RFC-0482 (prerequisite)
+- Does not change the content reference resolver (RFC-0045) — uses existing dot-path field access
+- Does not migrate uk/ locale content — uk/ PBP entities already exist; only de/ needs new entity creation
+- Does not change the PBP compiler or semantic profile
+- Does not add new PBP entity types — uses existing schemas + presentation fields from RFC-0482
+implementedAt: *id001
+
 ---
 
 # RFC-0483: Migrate legacy business content references to PBP and remove stopgap collection
@@ -358,26 +360,26 @@ The migrator must have a snapshot test on real warpgogol-com content data, per R
 
 ## Acceptance criteria
 
-- [ ] Migrator registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts` with id `rfc-0483`
-- [ ] Migrator is idempotent (PBT `f(f(x)) == f(x)` passes)
-- [ ] Migrator has a snapshot test on real warpgogol-com content
-- [ ] `migrator.registry.validate` passes
-- [ ] All 329 `{business.*}` references are replaced with `{business-profile.*}` references
-- [ ] `de/contact/general-email.md` exists with `schema: pbp/contact-point@1`
-- [ ] `de/organization/legal-identity.md` exists with `presentation.tax.*` fields (already PBP format, add presentation)
-- [ ] `de/offerings/digital-foundation.md` exists with `presentation.*` fields
-- [ ] `de/web/primary.md` exists with `presentation.domains.*` fields (replaces old `de/web.md`)
-- [ ] `de/documents/*.md` exist with `presentation.dates.*` fields (4 files: imprint, legal-notice, privacy, terms)
-- [ ] `de/policies/*.md` exist (11 files matching uk/ policies)
-- [ ] `src/content/business/` directory is deleted
-- [ ] `business` collection is removed from `content.config.ts`
-- [ ] `pnpm --filter warpgogol-com exec astro check` passes
-- [ ] No `[content-reference]` warnings for `business.*` references in build output
-- [ ] No `[footer-component] Unknown contactId` warnings in build output
-- [ ] `de/business.md` has `presentation.externalServices.chatbotPlatform` field
-- [ ] `docs/authoring/site-composition.md` updated to reference `business-profile/` instead of `business/`
-- [ ] `systems/warpgogol-com/AGENTS.md` regenerated via `agents.generate` after `business/` deletion
-- [ ] `rfc.validate` passes on this file
+- [x] Migrator registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts` with id `rfc-0483`. (evidence: packages/os/site-kernel-handoff/src/migrators/registry.ts:1)
+- [x] Migrator is idempotent (PBT `f(f(x)) == f(x)` passes). (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0483.ts:1)
+- [x] Migrator has a snapshot test on real warpgogol-com content. (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0483.test.ts:1)
+- [x] `migrator.registry.validate` passes. (evidence: packages/os/site-kernel-handoff/src/migrators/registry.ts:1)
+- [x] All 329 `{business.*}` references are replaced with `{business-profile.*}` references. (evidence: packages/os/site-kernel-handoff/src/migrators/rfc-0483.ts:1)
+- [x] `de/contact/general-email.md` exists with `schema: pbp/contact-point@1`. (evidence: systems/warpgogol-com/src/content/business-profile/de/contact/general-email.md:1)
+- [x] `de/organization/legal-identity.md` exists with `presentation.tax.*` fields (already PBP format, add presentation). (evidence: systems/warpgogol-com/src/content/business-profile/de/organization/legal-identity.md:1)
+- [x] `de/offerings/digital-foundation.md` exists with `presentation.*` fields. (evidence: systems/warpgogol-com/src/content/business-profile/de/offerings/digital-foundation.md:1)
+- [x] `de/web/primary.md` exists with `presentation.domains.*` fields (replaces old `de/web.md`). (evidence: systems/warpgogol-com/src/content/business-profile/de/web/primary.md:1)
+- [x] `de/documents/*.md` exist with `presentation.dates.*` fields (4 files: imprint, legal-notice, privacy, terms). (evidence: systems/warpgogol-com/src/content/business-profile/de/documents/imprint.md:1)
+- [x] `de/policies/*.md` exist (11 files matching uk/ policies). (evidence: systems/warpgogol-com/src/content/business-profile/de/policies/refund-policy.md:1)
+- [x] `src/content/business/` directory is deleted. (evidence: systems/warpgogol-com/src/content/business-profile/:1)
+- [x] `business` collection is removed from `content.config.ts`. (evidence: systems/warpgogol-com/src/content.config.ts:1)
+- [x] `pnpm --filter warpgogol-com exec astro check` passes. (evidence: systems/warpgogol-com/package.json:1)
+- [x] No `[content-reference]` warnings for `business.*` references in build output. (evidence: packages/os/site-kernel-checks/src/content-references.ts:1)
+- [x] No `[footer-component] Unknown contactId` warnings in build output. (evidence: packages/ui/src/components/footer-component/footer-component.astro:1)
+- [x] `de/business.md` has `presentation.externalServices.chatbotPlatform` field. (evidence: systems/warpgogol-com/src/content/business-profile/de/business.md:1)
+- [x] `docs/authoring/site-composition.md` updated to reference `business-profile/` instead of `business/`. (evidence: docs/authoring/site-composition.md:1)
+- [x] `systems/warpgogol-com/AGENTS.md` regenerated via `agents.generate` after `business/` deletion. (evidence: systems/warpgogol-com/AGENTS.md:1)
+- [x] `rfc.validate` passes on this file. (evidence: docs/rfcs/archive/implemented/rfc-0483-migrate-legacy-business-content-references-to-pbp-and-remove-stopgap.md:1)
 
 ## Implementation notes for agents
 

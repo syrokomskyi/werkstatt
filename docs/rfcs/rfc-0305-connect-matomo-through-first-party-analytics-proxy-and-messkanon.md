@@ -1,121 +1,123 @@
 ---
 id: RFC-0305
-title: "Connect Matomo through a first-party analytics proxy and Messkanon"
+title: Connect Matomo through a first-party analytics proxy and Messkanon
 status: accepted
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers: []
 createdAt: 2026-07-05
 updatedAt: 2026-07-06
-implementedAt:
-closedAt:
+implementedAt: null
+closedAt: null
 supersedes:
-  - RFC-0170
-supersededBy:
+- RFC-0170
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0027
-  - RFC-0047
-  - RFC-0074
-  - RFC-0081
-  - RFC-0087
-  - RFC-0176
-  - RFC-0177
-  - RFC-0181
-  - RFC-0211
-  - RFC-0266
-  - RFC-0268
-  - RFC-0282
-  - RFC-0284
-  - RFC-0304
+- RFC-0027
+- RFC-0047
+- RFC-0074
+- RFC-0081
+- RFC-0087
+- RFC-0176
+- RFC-0177
+- RFC-0181
+- RFC-0211
+- RFC-0266
+- RFC-0268
+- RFC-0282
+- RFC-0284
+- RFC-0304
 commands:
   proposed:
-    - analytics.messkanon.validate
-    - analytics.binding.validate
-    - matomo.proxy.validate
-    - matomo.provision.validate
-    - matomo.smoke.validate
-    - matomo.silence.validate
-    - matomo.export.validate
+  - analytics.messkanon.validate
+  - analytics.binding.validate
+  - matomo.proxy.validate
+  - matomo.provision.validate
+  - matomo.smoke.validate
+  - matomo.silence.validate
+  - matomo.export.validate
   added:
-    - analytics.messkanon.validate
-    - analytics.binding.validate
-    - matomo.proxy.validate
-    - matomo.provision.validate
-    - matomo.smoke.validate
-    - matomo.silence.validate
-    - matomo.export.validate
+  - analytics.messkanon.validate
+  - analytics.binding.validate
+  - matomo.proxy.validate
+  - matomo.provision.validate
+  - matomo.smoke.validate
+  - matomo.silence.validate
+  - matomo.export.validate
   changed:
-    - analytics.config.validate
-    - growth.events.validate
-    - growth.adapter.contract
-    - growth.vendor.resolve
-    - backs.workspace.validate
-    - backs-check.run
-    - legal.processors.validate
-    - consent.activation.validate
-    - env.example.validate
+  - analytics.config.validate
+  - growth.events.validate
+  - growth.adapter.contract
+  - growth.vendor.resolve
+  - backs.workspace.validate
+  - backs-check.run
+  - legal.processors.validate
+  - consent.activation.validate
+  - env.example.validate
   removed: []
 appsImpacted:
-  - apps/*
+- apps/*
 packagesImpacted:
-  - "@warpgogol/growth"
-  - "@warpgogol/growth-adapter-matomo"
-  - "@warpgogol/ontology"
-  - "@warpgogol/share"
-  - "@warpgogol/site-kernel"
-  - "@warpgogol/site-kernel-checks"
-  - "@warpgogol/site-kernel-codegen"
-  - "@warpgogol/site-kernel-onboarding"
+- '@warpgogol/growth'
+- '@warpgogol/growth-adapter-matomo'
+- '@warpgogol/ontology'
+- '@warpgogol/share'
+- '@warpgogol/site-kernel'
+- '@warpgogol/site-kernel-checks'
+- '@warpgogol/site-kernel-codegen'
+- '@warpgogol/site-kernel-onboarding'
 successSignals:
-  - "Every production thin site can send the same small Messkanon event vocabulary to Matomo without app-local analytics code."
-  - "All browser requests for matomo.js and matomo.php use a first-party proxy endpoint owned by a backs/* worker, while the upstream Matomo Cloud host stays server-side configuration."
-  - "The tracker is banner-free by design: cookies disabled, browser feature detection disabled, IP anonymization required at the Matomo instance, Do Not Track respected, and no heatmaps/session recording enabled."
-  - "Client Zero (warpgogol-com) is provisioned by code, smoke-tested, visible in the fleet registry, covered by silence detection, and exportable through a tested Notausgang package."
-  - "Legacy generic growth-to-Matomo mapping is gone: no compatibility mode maps arbitrary closed growth events to trackEvent('growth', name, payloadJson)."
+- Every production thin site can send the same small Messkanon event vocabulary to Matomo without app-local analytics code.
+- All browser requests for matomo.js and matomo.php use a first-party proxy endpoint owned by a backs/* worker, while the upstream Matomo Cloud host stays server-side configuration.
+- 'The tracker is banner-free by design: cookies disabled, browser feature detection disabled, IP anonymization required at the Matomo instance, Do Not Track respected, and no heatmaps/session recording enabled.'
+- Client Zero (warpgogol-com) is provisioned by code, smoke-tested, visible in the fleet registry, covered by silence detection, and exportable through a tested Notausgang package.
+- 'Legacy generic growth-to-Matomo mapping is gone: no compatibility mode maps arbitrary closed growth events to trackEvent(''growth'', name, payloadJson).'
 nonGoals:
-  - "Do not implement a cookie-based consent banner analytics mode."
-  - "Do not use Matomo Tag Manager for the thin-site analytics baseline."
-  - "Do not create Matomo sites, goals, dimensions, or users manually in the Matomo UI."
-  - "Do not give client users direct Matomo logins as the default access model."
-  - "Do not add heatmaps, session recordings, ecommerce tracking, heartbeat pings, content tracking, or broad behavioral tracking to v1."
-  - "Do not preserve RFC-0170 vendor option compatibility where it conflicts with this RFC."
+- Do not implement a cookie-based consent banner analytics mode.
+- Do not use Matomo Tag Manager for the thin-site analytics baseline.
+- Do not create Matomo sites, goals, dimensions, or users manually in the Matomo UI.
+- Do not give client users direct Matomo logins as the default access model.
+- Do not add heatmaps, session recordings, ecommerce tracking, heartbeat pings, content tracking, or broad behavioral tracking to v1.
+- Do not preserve RFC-0170 vendor option compatibility where it conflicts with this RFC.
 acceptance:
-  - probe: file-exists
-    path: "docs/rfcs/rfc-0305-connect-matomo-through-first-party-analytics-proxy-and-messkanon.md"
-  - probe: file-exists
-    path: "packages/ontology/analytics/messkanon.yaml"
-  - probe: file-exists
-    path: "packages/ontology/analytics/matomo-binding.yaml"
-  - probe: file-exists
-    path: "backs/matomo-proxy/back.config.json"
-  - probe: file-exists
-    path: "backs/matomo-proxy/src/worker.ts"
-  - probe: command-registered
-    name: "analytics.messkanon.validate"
-  - probe: command-registered
-    name: "analytics.binding.validate"
-  - probe: command-registered
-    name: "matomo.proxy.validate"
-  - probe: command-registered
-    name: "matomo.provision.validate"
-  - probe: command-registered
-    name: "matomo.smoke.validate"
-  - probe: command-registered
-    name: "matomo.silence.validate"
-  - probe: command-registered
-    name: "matomo.export.validate"
-  - probe: run
-    command: "site-kernel run backs-check.run --json"
-    expect:
-      exitCode: 0
-  - probe: run
-    command: "site-kernel run analytics.messkanon.validate --json"
-    expect:
-      exitCode: 0
+- probe: file-exists
+  path: docs/rfcs/rfc-0305-connect-matomo-through-first-party-analytics-proxy-and-messkanon.md
+- probe: file-exists
+  path: packages/ontology/analytics/messkanon.yaml
+- probe: file-exists
+  path: packages/ontology/analytics/matomo-binding.yaml
+- probe: file-exists
+  path: backs/matomo-proxy/back.config.json
+- probe: file-exists
+  path: backs/matomo-proxy/src/worker.ts
+- probe: command-registered
+  name: analytics.messkanon.validate
+- probe: command-registered
+  name: analytics.binding.validate
+- probe: command-registered
+  name: matomo.proxy.validate
+- probe: command-registered
+  name: matomo.provision.validate
+- probe: command-registered
+  name: matomo.smoke.validate
+- probe: command-registered
+  name: matomo.silence.validate
+- probe: command-registered
+  name: matomo.export.validate
+- probe: run
+  command: site-kernel run backs-check.run --json
+  expect:
+    exitCode: 0
+- probe: run
+  command: site-kernel run analytics.messkanon.validate --json
+  expect:
+    exitCode: 0
+breaksC: true
+
 ---
 
 # RFC-0305: Connect Matomo through a first-party analytics proxy and Messkanon

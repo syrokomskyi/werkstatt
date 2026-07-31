@@ -1,56 +1,56 @@
 ---
 id: RFC-0325
-title: "Upgrade Ratgeber articles to substantive dated editorial content"
-status: implemented
+title: Upgrade Ratgeber articles to substantive dated editorial content
+status: superseded
 kind: contract
 scope: app
 owners:
-  - architecture
+- architecture
 reviewers: []
 createdAt: 2026-07-05
-updatedAt: 2026-07-06
+updatedAt: &id001 2026-07-06
 implementedAt: 2026-07-06
-closedAt:
+closedAt: *id001
 supersedes: []
-supersededBy:
-  - RFC-0500
+supersededBy: RFC-0500
 amends: []
 amendedBy: []
 related:
-  - RFC-0167
-  - RFC-0317
-  - RFC-0320
+- RFC-0167
+- RFC-0317
+- RFC-0320
 commands:
   proposed: []
   added:
-    - article.depth.validate
+  - article.depth.validate
   changed:
-    - blog.validate
-    - feed.generate
-    - feed.validate
-    - page.markdown.generate
-    - page.markdown.validate
+  - blog.validate
+  - feed.generate
+  - feed.validate
+  - page.markdown.generate
+  - page.markdown.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/share"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-content"
-  - "@gogol/surface"
-  - "@gogol/ontology"
-  - "@gogol/ui"
+- '@gogol/share'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-content'
+- '@gogol/surface'
+- '@gogol/ontology'
+- '@gogol/ui'
 successSignals:
-  - "Ratgeber pages are dated editorial articles with enough substance for their genre, not teaser stubs."
-  - "Website-cost and local-visibility articles use the site's own transparent offer math as concrete examples."
-  - "Dated articles appear in RSS/JSON feeds and Markdown twins with published/updated provenance."
+- Ratgeber pages are dated editorial articles with enough substance for their genre, not teaser stubs.
+- Website-cost and local-visibility articles use the site's own transparent offer math as concrete examples.
+- Dated articles appear in RSS/JSON feeds and Markdown twins with published/updated provenance.
 nonGoals:
-  - "Do not implement this RFC while it is draft."
-  - "Do not pad articles with generic SEO filler to satisfy a word count."
-  - "Do not rewrite Ukrainian article translations in this RFC unless a later owner decision expands scope."
+- Do not implement this RFC while it is draft.
+- Do not pad articles with generic SEO filler to satisfy a word count.
+- Do not rewrite Ukrainian article translations in this RFC unless a later owner decision expands scope.
 acceptance:
-  - probe: command-registered
-    name: "article.depth.validate"
+- probe: command-registered
+  name: article.depth.validate
+
 ---
 
 # RFC-0325: Upgrade Ratgeber articles to substantive dated editorial content

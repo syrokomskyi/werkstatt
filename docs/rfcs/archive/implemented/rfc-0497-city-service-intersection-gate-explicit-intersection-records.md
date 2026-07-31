@@ -1,75 +1,77 @@
 ---
 id: RFC-0497
-title: "City×service intersection gate — explicit intersection records"
+title: City×service intersection gate — explicit intersection records
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 enhancedAt: 2026-07-23
 implementedAt: 2026-07-23
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0238
+- RFC-0238
 amendedBy: []
 related:
-  - RFC-0192
-  - RFC-0193
-  - RFC-0238
-  - RFC-0478
-  - RFC-0480
-  - RFC-0492
-  - RFC-0494
-  - RFC-0495
-  - RFC-0496
+- RFC-0192
+- RFC-0193
+- RFC-0238
+- RFC-0478
+- RFC-0480
+- RFC-0492
+- RFC-0494
+- RFC-0495
+- RFC-0496
 satisfies:
-  - DNA-24
-  - DNA-53
+- DNA-24
+- DNA-53
 breaksC: true
 versionBump: minor
 commands:
   proposed:
-    - surface.intersection.validate
-    - surface.intersection.report
+  - surface.intersection.validate
+  - surface.intersection.report
   added:
-    - surface.intersection.validate
-    - surface.intersection.report
+  - surface.intersection.validate
+  - surface.intersection.report
   changed:
-    - surface.generate
-    - surface.validate
-    - surface.doorway-risk.report
+  - surface.generate
+  - surface.validate
+  - surface.doorway-risk.report
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/surface"
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-handoff"
+- '@gogol/surface'
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-handoff'
+- '@warpgogol/ontology'
 successSignals:
-  - "Depth-5 demand pages (city×service intersections) are only emitted when an explicit intersection record exists in surface/intersections/{lang}/{industry}-{city}-{service}.md — no Cartesian generation from industry × city × service registries."
-  - "Each intersection record carries structured fields: intersectionId, industryId, cityId, serviceId, localServiceQuestions, localServiceConstraints, localBookingContext, localEvidence, uniqueContentBlocks, officialSources, expertSources, reviewedAt, reviewedBy, publicationDecision."
-  - "surface.intersection.validate enforces a minimum intersection gate: 3 local-service questions, 2 intersection-specific scenarios, 2 verifiable local facts, 1 unique information architecture, 1 unique booking or location workflow, 3 unique FAQ, 1 source set, 1 manual editorial approval."
-  - "surface.intersection.validate enforces similarity thresholds: similarityToIndustryPage, similarityToCityPage, similarityToServicePage, and similarityToOtherIntersections must each be below a configured threshold (default 0.70)."
-  - "Intersection pages that fail the gate are not emitted — no noindex stub, no sitemap entry, no internal link. Absence of record means absence of page."
-  - "surface.intersection.report generates a build-time scaling report: industry pages, city pages, service pages, city-service intersections, indexable intersections, noindex intersections, missing evidence, duplicate similarity, doorway risk."
-  - "Release blocks on: indexable intersection without approval, intersection without sources, intersection duplicates parent, intersection only substitutes place name, intersection contains unsupported result claims."
-  - "The existing demand record collection (surface/demands/{lang}/{industry}/{city}.md) is preserved as the data source for intersection records — the intersection record adds the gate-specific fields that the demand record lacks."
-  - "Inherited prose may not be rendered twice — the intersection page baker does not re-render industry, city, or service prose blocks. Only intersection-specific blocks are emitted."
-  - "The 'substance remains after removing city name, key phrase, CTA, and AI image' test is enforced by surface.intersection.validate — if the page loses meaning without these, it fails the gate."
+- Depth-5 demand pages (city×service intersections) are only emitted when an explicit intersection record exists in surface/intersections/{lang}/{industry}-{city}-{service}.md — no Cartesian generation from industry × city × service registries.
+- 'Each intersection record carries structured fields: intersectionId, industryId, cityId, serviceId, localServiceQuestions, localServiceConstraints, localBookingContext, localEvidence, uniqueContentBlocks, officialSources, expertSources, reviewedAt, reviewedBy, publicationDecision.'
+- 'surface.intersection.validate enforces a minimum intersection gate: 3 local-service questions, 2 intersection-specific scenarios, 2 verifiable local facts, 1 unique information architecture, 1 unique booking or location workflow, 3 unique FAQ, 1 source set, 1 manual editorial approval.'
+- 'surface.intersection.validate enforces similarity thresholds: similarityToIndustryPage, similarityToCityPage, similarityToServicePage, and similarityToOtherIntersections must each be below a configured threshold (default 0.70).'
+- Intersection pages that fail the gate are not emitted — no noindex stub, no sitemap entry, no internal link. Absence of record means absence of page.
+- 'surface.intersection.report generates a build-time scaling report: industry pages, city pages, service pages, city-service intersections, indexable intersections, noindex intersections, missing evidence, duplicate similarity, doorway risk.'
+- 'Release blocks on: indexable intersection without approval, intersection without sources, intersection duplicates parent, intersection only substitutes place name, intersection contains unsupported result claims.'
+- The existing demand record collection (surface/demands/{lang}/{industry}/{city}.md) is preserved as the data source for intersection records — the intersection record adds the gate-specific fields that the demand record lacks.
+- Inherited prose may not be rendered twice — the intersection page baker does not re-render industry, city, or service prose blocks. Only intersection-specific blocks are emitted.
+- The 'substance remains after removing city name, key phrase, CTA, and AI image' test is enforced by surface.intersection.validate — if the page loses meaning without these, it fails the gate.
 nonGoals:
-  - "Does not create service dossier pages — that is RFC-0496. This RFC depends on RFC-0496 for the service parent page that intersection pages redirect to when they fail the gate."
-  - "Does not change the URL structure — that is RFC-0495. This RFC uses the URLs defined by RFC-0495."
-  - "Does not change structured data — that is RFC-0498."
-  - "Does not change the demand record schema — the demand record remains the source of localDemandContext, searchedAs, neededPage, trustProofs, leadLosingMistakes, howSolved, localFacts, citySpecificQa. The intersection record adds gate-specific fields on top."
-  - "Does not remove the demand axis from the blueprint — the demand axis remains as the universe for intersection records. The change is that depth-5 pages require an intersection record, not just a demand record."
-  - "Does not create industry×city or industry×service intersection records — those are handled by the existing depth-4 (city) and depth-1.5 (service) levels. Only the three-way city×service intersection is gated by this RFC."
+- Does not create service dossier pages — that is RFC-0496. This RFC depends on RFC-0496 for the service parent page that intersection pages redirect to when they fail the gate.
+- Does not change the URL structure — that is RFC-0495. This RFC uses the URLs defined by RFC-0495.
+- Does not change structured data — that is RFC-0498.
+- Does not change the demand record schema — the demand record remains the source of localDemandContext, searchedAs, neededPage, trustProofs, leadLosingMistakes, howSolved, localFacts, citySpecificQa. The intersection record adds gate-specific fields on top.
+- Does not remove the demand axis from the blueprint — the demand axis remains as the universe for intersection records. The change is that depth-5 pages require an intersection record, not just a demand record.
+- Does not create industry×city or industry×service intersection records — those are handled by the existing depth-4 (city) and depth-1.5 (service) levels. Only the three-way city×service intersection is gated by this RFC.
+
 ---
 
 # RFC-0497: City×service intersection gate — explicit intersection records

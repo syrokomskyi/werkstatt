@@ -1,49 +1,50 @@
 ---
 id: RFC-0349
-title: "Govern CHANGE_SUMMARY retention and protect decision lines"
+title: Govern CHANGE_SUMMARY retention and protect decision lines
 status: implemented
 kind: contract
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-07
 updatedAt: 2026-07-07
 implementedAt: 2026-07-07
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy:
-  - RFC-0353
+- RFC-0353
 related:
-  - RFC-0015
-  - RFC-0329
-  - RFC-0348
+- RFC-0015
+- RFC-0329
+- RFC-0348
 satisfies:
-  - DNA-42
+- DNA-42
 commands:
   proposed: []
   added:
-    - compass.changesummary.validate
-    - compass.changesummary.tidy
+  - compass.changesummary.validate
   changed: []
-  removed: []
+  removed:
+  - compass.changesummary.tidy
 appsImpacted:
-  - apps/*
+- apps/*
 packagesImpacted:
-  - packages/os/site-kernel-checks
+- packages/os/site-kernel-checks
 successSignals:
-  - "Every CHANGE_SUMMARY item that references an RFC id or an internal code (RFC-XXXX, DNA-NN, AP-N, V-NN, VIS-BG-NN, or any UPPER-token-…-digits id) is preserved forever; no command or agent removes it."
-  - "grace.changesummary.tidy removes backfill boilerplate items and caps the number of unprotected items to the newest 3, never touching a protected item."
-  - "grace.changesummary.validate fails when an authored file's CHANGE_SUMMARY contains a known boilerplate item or more than 3 unprotected items."
-  - "The accumulated CHANGE_SUMMARY of a long-lived file reads as a decision log of RFC-referenced changes, not a pile of 'Backfill GRACE scaffolding' lines."
+- Every CHANGE_SUMMARY item that references an RFC id or an internal code (RFC-XXXX, DNA-NN, AP-N, V-NN, VIS-BG-NN, or any UPPER-token-…-digits id) is preserved forever; no command or agent removes it.
+- grace.changesummary.tidy removes backfill boilerplate items and caps the number of unprotected items to the newest 3, never touching a protected item.
+- grace.changesummary.validate fails when an authored file's CHANGE_SUMMARY contains a known boilerplate item or more than 3 unprotected items.
+- The accumulated CHANGE_SUMMARY of a long-lived file reads as a decision log of RFC-referenced changes, not a pile of 'Backfill GRACE scaffolding' lines.
 nonGoals:
-  - "Do not change which blocks are required — that is RFC-0348 (CHANGE_SUMMARY remains one of the two required blocks)."
-  - "Do not audit the truthfulness of CHANGE_SUMMARY against code — that is RFC-0352."
-  - "Do not delete protected (RFC/code-referencing) items under any circumstance, even if they also look like boilerplate."
-  - "Do not attempt to reconstruct removed history from git — CHANGE_SUMMARY is a curated decision log, not a mirror of git log."
+- Do not change which blocks are required — that is RFC-0348 (CHANGE_SUMMARY remains one of the two required blocks).
+- Do not audit the truthfulness of CHANGE_SUMMARY against code — that is RFC-0352.
+- Do not delete protected (RFC/code-referencing) items under any circumstance, even if they also look like boilerplate.
+- Do not attempt to reconstruct removed history from git — CHANGE_SUMMARY is a curated decision log, not a mirror of git log.
+
 ---
 
 # RFC-0349: Govern CHANGE_SUMMARY retention and protect decision lines

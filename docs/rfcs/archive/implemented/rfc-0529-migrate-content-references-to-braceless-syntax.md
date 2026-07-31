@@ -1,58 +1,59 @@
 ---
 id: RFC-0529
-title: "Migrate all content references to braceless syntax and remove legacy resolver"
+title: Migrate all content references to braceless syntax and remove legacy resolver
 status: implemented
 kind: policy
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-25
 updatedAt: 2026-07-25
 enhancedAt: 2026-07-25
 implementedAt: 2026-07-25
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0045
-  - RFC-0138
+- RFC-0045
+- RFC-0138
 amendedBy: []
 related:
-  - RFC-0527
-  - RFC-0045
-  - RFC-0479
+- RFC-0527
+- RFC-0045
+- RFC-0479
 satisfies: []
 packagesImpacted:
-  - "@gogol/share"
-  - "@gogol/site-kernel-content"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/ui"
-  - "@gogol/pbp"
+- '@gogol/share'
+- '@gogol/site-kernel-content'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-handoff'
+- '@gogol/ui'
+- '@gogol/pbp'
 appsImpacted: []
 versionBump: minor
 commands:
   proposed:
-    - content.ref-migrate
-  added:
-    - content.ref-migrate
+  - content.ref-migrate
+  added: []
   changed:
-    - content.references.validate
-    - dist.content-references.validate
+  - content.references.validate
+  - dist.content-references.validate
   removed:
-    - content-reference.resolve-astro
+  - content-reference.resolve-astro
+  - content.ref-migrate
 successSignals:
-  - "No file under src/content/ contains brace-delimited {collection.file.field} references — all references use braceless syntax."
-  - "All consumers (semantic-loader, prose-pipeline, section-rich, content-assets, material.metadata.write, pbp/semantic-model, share/astro/page-handler, share/astro/content) resolve references through the unified index-based resolver from RFC-0527."
-  - "The Astro-dependent resolver in @gogol/share/content-reference.ts is removed — no code in the monorepo imports astro:content for reference resolution."
-  - "content.references.validate and dist.content-references.validate detect both unresolved braceless references and any residual brace-delimited tokens."
+- No file under src/content/ contains brace-delimited {collection.file.field} references — all references use braceless syntax.
+- All consumers (semantic-loader, prose-pipeline, section-rich, content-assets, material.metadata.write, pbp/semantic-model, share/astro/page-handler, share/astro/content) resolve references through the unified index-based resolver from RFC-0527.
+- The Astro-dependent resolver in @gogol/share/content-reference.ts is removed — no code in the monorepo imports astro:content for reference resolution.
+- content.references.validate and dist.content-references.validate detect both unresolved braceless references and any residual brace-delimited tokens.
 nonGoals:
-  - "Does not build the content reference index — that is RFC-0527."
-  - "Does not embed metadata into media files — that is RFC-0528."
-  - "Does not change the reference syntax specification — RFC-0527 defines braceless syntax; this RFC migrates existing content to it."
+- Does not build the content reference index — that is RFC-0527.
+- Does not embed metadata into media files — that is RFC-0528.
+- Does not change the reference syntax specification — RFC-0527 defines braceless syntax; this RFC migrates existing content to it.
+
 ---
 
 # RFC-0529: Migrate all content references to braceless syntax and remove legacy resolver

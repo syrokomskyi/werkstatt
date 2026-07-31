@@ -1,74 +1,75 @@
 ---
 id: RFC-0488
-title: "Redesign the material credits page as a provenance registry"
+title: Redesign the material credits page as a provenance registry
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-22
 updatedAt: 2026-07-22
 enhancedAt: 2026-07-22
 implementedAt: 2026-07-22
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0220
-  - RFC-0232
+- RFC-0220
+- RFC-0232
 amendedBy: []
 related:
-  - RFC-0220
-  - RFC-0223
-  - RFC-0227
-  - RFC-0228
-  - RFC-0231
-  - RFC-0232
-  - RFC-0141
-  - RFC-0152
-  - RFC-0204
-  - RFC-0210
-  - RFC-0480
+- RFC-0220
+- RFC-0223
+- RFC-0227
+- RFC-0228
+- RFC-0231
+- RFC-0232
+- RFC-0141
+- RFC-0152
+- RFC-0204
+- RFC-0210
+- RFC-0480
 satisfies:
-  - DNA-4
-  - DNA-5
+- DNA-4
+- DNA-5
 breaksC: false
 versionBump: minor
 commands:
   proposed: []
   added:
-    - material.credits.validate
-    - material.credits.generate
-    - material.credits.report
+  - material.credits.validate
+  - material.credits.report
   changed: []
-  removed: []
+  removed:
+  - material.credits.generate
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/share"
-  - "@gogol/ui"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-handoff"
+- '@gogol/share'
+- '@gogol/ui'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-handoff'
 successSignals:
-  - "The credits page shows each material as a card with preview, type badge, human-readable source status, usage locations, AI participation details, and a stable anchor — not a flat text list with raw enum values."
-  - "Internal enum values (commissioned-warpgogol-material, linked-public-source, AIPlatform, Organization) are never shown to visitors; they are mapped to localized human-readable labels."
-  - "AI-generated materials display a nuanced copyright status instead of automatically claiming 'Copyright © Warpgogol. All rights reserved.'"
-  - "Third-party materials (Stuttgart Marathon photo, Komoot screenshot) either have a verified usageBasis or are removed from the site."
-  - "Each material card has a stable URL anchor (/bildnachweise/#warpgogol-promo-video) that deep-links from other pages."
-  - "Repetitive copyright boilerplate is replaced by per-material usage status; a single explanatory text appears once at the bottom."
-  - "Broken previews (single-letter placeholders, orphan 'Image' entry) are eliminated; build fails on missing previews for active records."
-  - "material.credits.validate enforces: every active record has a preview, every third-party record has a usageBasis, Organization is never the author of a human-made work, AI-generated works don't auto-claim copyright."
+- The credits page shows each material as a card with preview, type badge, human-readable source status, usage locations, AI participation details, and a stable anchor — not a flat text list with raw enum values.
+- Internal enum values (commissioned-warpgogol-material, linked-public-source, AIPlatform, Organization) are never shown to visitors; they are mapped to localized human-readable labels.
+- AI-generated materials display a nuanced copyright status instead of automatically claiming 'Copyright © Warpgogol. All rights reserved.'
+- Third-party materials (Stuttgart Marathon photo, Komoot screenshot) either have a verified usageBasis or are removed from the site.
+- Each material card has a stable URL anchor (/bildnachweise/#warpgogol-promo-video) that deep-links from other pages.
+- Repetitive copyright boilerplate is replaced by per-material usage status; a single explanatory text appears once at the bottom.
+- Broken previews (single-letter placeholders, orphan 'Image' entry) are eliminated; build fails on missing previews for active records.
+- 'material.credits.validate enforces: every active record has a preview, every third-party record has a usageBasis, Organization is never the author of a human-made work, AI-generated works don''t auto-claim copyright.'
 nonGoals:
-  - "Does not create a new top-level content domain — credits sidecars stay beside their owning content assets (RFC-0047)."
-  - "Does not write C2PA/IPTC/XMP embedded metadata — that remains a future RFC."
-  - "Does not change the URL of the credits page (/bildnachweise/ is preserved)."
-  - "Does not change the inline disclosure behavior on non-credits pages (RFC-0231 visibility policy is unchanged)."
-  - "Does not modify the homepage, impressum, datenschutz, or footer — cross-page changes are deferred to their own expert-file sessions."
-  - "Does not add client-side filtering or interactive search — the page is server-rendered; filters are a possible future enhancement."
-  - "Does not introduce `contentHash`, `verifiedAt`, or `verifiedBy` fields — these are deferred to a future RFC that also adds validation rules using them. No current validator or renderer consumes them."
+- Does not create a new top-level content domain — credits sidecars stay beside their owning content assets (RFC-0047).
+- Does not write C2PA/IPTC/XMP embedded metadata — that remains a future RFC.
+- Does not change the URL of the credits page (/bildnachweise/ is preserved).
+- Does not change the inline disclosure behavior on non-credits pages (RFC-0231 visibility policy is unchanged).
+- Does not modify the homepage, impressum, datenschutz, or footer — cross-page changes are deferred to their own expert-file sessions.
+- Does not add client-side filtering or interactive search — the page is server-rendered; filters are a possible future enhancement.
+- Does not introduce `contentHash`, `verifiedAt`, or `verifiedBy` fields — these are deferred to a future RFC that also adds validation rules using them. No current validator or renderer consumes them.
+
 ---
 
 # RFC-0488: Redesign the material credits page as a provenance registry

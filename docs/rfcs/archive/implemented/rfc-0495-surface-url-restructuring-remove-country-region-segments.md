@@ -1,79 +1,81 @@
 ---
 id: RFC-0495
-title: "Surface URL restructuring — remove country/region segments from canonical URLs"
+title: Surface URL restructuring — remove country/region segments from canonical URLs
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 enhancedAt: 2026-07-23
 implementedAt: 2026-07-23
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0238
+- RFC-0238
 amendedBy: []
 related:
-  - RFC-0192
-  - RFC-0193
-  - RFC-0238
-  - RFC-0478
-  - RFC-0480
-  - RFC-0492
-  - RFC-0494
-  - RFC-0496
-  - RFC-0497
+- RFC-0192
+- RFC-0193
+- RFC-0238
+- RFC-0478
+- RFC-0480
+- RFC-0492
+- RFC-0494
+- RFC-0496
+- RFC-0497
 satisfies:
-  - DNA-16
-  - DNA-39
+- DNA-16
+- DNA-39
 breaksC: true
 versionBump: minor
 commands:
   proposed: []
   added: []
   changed:
-    - surface.generate
-    - surface.validate
-    - public.infrastructure.generate
-    - redirect.map.validate
+  - surface.generate
+  - surface.validate
+  - public.infrastructure.generate
+  - redirect.map.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/surface"
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-handoff"
-  - "@gogol/share"
+- '@gogol/surface'
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-handoff'
+- '@gogol/share'
+- '@warpgogol/ontology'
 successSignals:
-  - "Canonical URLs for depth-4 city pages no longer include country/region segments: /website/{industry}/{city}/ (DE) and /sait/{industry}/{city}/ (UK) instead of /website/{industry}/{country}/{region}/{city}/."
-  - "Canonical URLs for depth-5 demand pages no longer include country/region segments: /website/{industry}/{city}/{demand}/ (DE) and /sait/{industry}/{city}/{demand}/ (UK) instead of /website/{industry}/{country}/{region}/{city}/{demand}/."
-  - "Old URLs with /deu/bw/ segments return 301 redirects to the new canonical URLs — no 200 responses on old patterns."
-  - "Depth-2 (country) and depth-3 (region) levels remain as virtual navigation hubs with noindex and no sitemap inclusion — their URLs are preserved as /website/{industry}/{country}/ and /website/{industry}/{country}/{region}/ for internal navigation only."
-  - "The sitemap contains only the new canonical URLs — no old /deu/bw/ URLs remain."
-  - "public.infrastructure.generate emits reversed redirect entries in public/_redirects: old /website/{industry}/{country}/{region}/{city}/ → new /website/{industry}/{city}/ (301)."
-  - "redirect.map.validate confirms the _redirects file carries the generated marker and all old surface URLs have 301 entries to the correct new URLs."
-  - "surface.generate emits pages at the new URL slugs."
-  - "No broken internal links — all cross-references between surface pages use the new URL pattern."
-  - "url-schema.yaml C-contract is updated with depth-4 and depth-5 route patterns matching the new slug templates."
-  - "A migrator is registered in the migrator registry (RFC-0479) with id rfc-0495; it is a no-op on authored data (URLs are derived from blueprint + geo, not authored) but advances the migratorCursor."
+- 'Canonical URLs for depth-4 city pages no longer include country/region segments: /website/{industry}/{city}/ (DE) and /sait/{industry}/{city}/ (UK) instead of /website/{industry}/{country}/{region}/{city}/.'
+- 'Canonical URLs for depth-5 demand pages no longer include country/region segments: /website/{industry}/{city}/{demand}/ (DE) and /sait/{industry}/{city}/{demand}/ (UK) instead of /website/{industry}/{country}/{region}/{city}/{demand}/.'
+- Old URLs with /deu/bw/ segments return 301 redirects to the new canonical URLs — no 200 responses on old patterns.
+- Depth-2 (country) and depth-3 (region) levels remain as virtual navigation hubs with noindex and no sitemap inclusion — their URLs are preserved as /website/{industry}/{country}/ and /website/{industry}/{country}/{region}/ for internal navigation only.
+- The sitemap contains only the new canonical URLs — no old /deu/bw/ URLs remain.
+- 'public.infrastructure.generate emits reversed redirect entries in public/_redirects: old /website/{industry}/{country}/{region}/{city}/ → new /website/{industry}/{city}/ (301).'
+- redirect.map.validate confirms the _redirects file carries the generated marker and all old surface URLs have 301 entries to the correct new URLs.
+- surface.generate emits pages at the new URL slugs.
+- No broken internal links — all cross-references between surface pages use the new URL pattern.
+- url-schema.yaml C-contract is updated with depth-4 and depth-5 route patterns matching the new slug templates.
+- A migrator is registered in the migrator registry (RFC-0479) with id rfc-0495; it is a no-op on authored data (URLs are derived from blueprint + geo, not authored) but advances the migratorCursor.
 nonGoals:
-  - "Does not add or remove depth levels from the blueprint — the six-level cascade (depth 0–5) is preserved. Only the slug templates for depth-4 and depth-5 change."
-  - "Does not change the content of any surface page — this RFC is purely about URL structure and redirects."
-  - "Does not add a service level — that is RFC-0496."
-  - "Does not change the intersection gate — that is RFC-0497."
-  - "Does not change structured data — that is RFC-0498."
-  - "Does not change the country/region navigation hub pages themselves — they remain as noindex navigation pages at their existing URLs."
-  - "Does not remove the country and region axes from the blueprint — they remain as universe axes for eligibility and navigation. Only the slug templates drop them from the canonical URL path."
-  - "Does not add cross-country city slug disambiguation to @gogol/geo — the current dataset only covers Germany (country: deu), so no disambiguation is needed. Cross-country slug collisions are a future @gogol/geo concern when the dataset expands beyond one country."
-  - "Does not change the locale prefix strategy — the optional-prefix strategy in url-schema.yaml is unaffected by the slug template change."
-  - "Does not introduce runtime HTTP probing for redirect verification — redirect.map.validate is a static check of the generated _redirects file, not a live URL probe."
+- Does not add or remove depth levels from the blueprint — the six-level cascade (depth 0–5) is preserved. Only the slug templates for depth-4 and depth-5 change.
+- Does not change the content of any surface page — this RFC is purely about URL structure and redirects.
+- Does not add a service level — that is RFC-0496.
+- Does not change the intersection gate — that is RFC-0497.
+- Does not change structured data — that is RFC-0498.
+- Does not change the country/region navigation hub pages themselves — they remain as noindex navigation pages at their existing URLs.
+- Does not remove the country and region axes from the blueprint — they remain as universe axes for eligibility and navigation. Only the slug templates drop them from the canonical URL path.
+- 'Does not add cross-country city slug disambiguation to @gogol/geo — the current dataset only covers Germany (country: deu), so no disambiguation is needed. Cross-country slug collisions are a future @gogol/geo concern when the dataset expands beyond one country.'
+- Does not change the locale prefix strategy — the optional-prefix strategy in url-schema.yaml is unaffected by the slug template change.
+- Does not introduce runtime HTTP probing for redirect verification — redirect.map.validate is a static check of the generated _redirects file, not a live URL probe.
+
 ---
 
 # RFC-0495: Surface URL restructuring — remove country/region segments from canonical URLs

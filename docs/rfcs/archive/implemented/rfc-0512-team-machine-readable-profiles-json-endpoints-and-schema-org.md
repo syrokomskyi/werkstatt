@@ -1,71 +1,74 @@
 ---
 id: RFC-0512
-title: "Team machine-readable profiles — JSON endpoints and Schema.org"
+title: Team machine-readable profiles — JSON endpoints and Schema.org
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
-createdAt: 2026-07-24
+- human:andrii-syrokomskyi
+createdAt: &id001 2026-07-24
 updatedAt: 2026-07-24
 enhancedAt: 2026-07-24
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0200
+- RFC-0200
 amendedBy: []
 related:
-  - RFC-0192
-  - RFC-0200
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0498
-  - RFC-0508
-  - RFC-0509
-  - RFC-0510
-  - RFC-0511
-  - RFC-0513
+- RFC-0192
+- RFC-0200
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0498
+- RFC-0508
+- RFC-0509
+- RFC-0510
+- RFC-0511
+- RFC-0513
 satisfies:
-  - DNA-53
+- DNA-53
 breaksC: true
 versionBump: minor
 commands:
   proposed:
-    - participant.json.validate
+  - participant.json.validate
   added:
-    - participant.json.validate
+  - participant.json.validate
   changed:
-    - seo.structured-data.validate
-    - surface.contract.validate
-    - sites-check-postbuild
-  removed: []
+  - seo.structured-data.validate
+  - surface.contract.validate
+  removed:
+  - sites-check-postbuild
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/share"
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-handoff"
+- '@gogol/share'
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-handoff'
+- '@warpgogol/ontology'
 successSignals:
-  - "Each public human profile page emits Person + BreadcrumbList JSON-LD with name, jobTitle, address (city-level), url, image, sameAs, and knowsAbout (from capabilities)."
-  - "Each public AI-agent profile page emits SoftwareApplication + BreadcrumbList JSON-LD with name, applicationCategory, description, operatingSystem (Web), and provider (the accountable human's Person)."
-  - "The team hub page emits CollectionPage + BreadcrumbList JSON-LD with hasPart listing all public, active participants."
-  - "A public JSON endpoint at /team/profiles.json lists all public, active participants with slug, participantType, publicName, role/purpose, profileUrl, and status."
-  - "Individual JSON endpoints at /team/[slug]/profile.json (human) and /team/ki-agenten/[slug]/profile.json (AI agent) expose the full public participant record."
-  - "JSON endpoints exclude all private fields: consent.consentRecordId, profileOwner, retentionClass, aiAgent.technicalStand.agentId, aiAgent.technicalStand.toolsetVersion, aiAgent.rightsMatrix.dataAccess."
-  - "The jsonld-types.yaml C-contract includes Person, SoftwareApplication, and CollectionPage type definitions for team pages."
-  - "participant.json.validate enforces JSON endpoint shape, private field exclusion, and JSON-LD type compliance."
-  - "No personal data (birth year, family medical history, refugee status) appears in JSON-LD or JSON endpoints without consent."
+- Each public human profile page emits Person + BreadcrumbList JSON-LD with name, jobTitle, address (city-level), url, image, sameAs, and knowsAbout (from capabilities).
+- Each public AI-agent profile page emits SoftwareApplication + BreadcrumbList JSON-LD with name, applicationCategory, description, operatingSystem (Web), and provider (the accountable human's Person).
+- The team hub page emits CollectionPage + BreadcrumbList JSON-LD with hasPart listing all public, active participants.
+- A public JSON endpoint at /team/profiles.json lists all public, active participants with slug, participantType, publicName, role/purpose, profileUrl, and status.
+- Individual JSON endpoints at /team/[slug]/profile.json (human) and /team/ki-agenten/[slug]/profile.json (AI agent) expose the full public participant record.
+- 'JSON endpoints exclude all private fields: consent.consentRecordId, profileOwner, retentionClass, aiAgent.technicalStand.agentId, aiAgent.technicalStand.toolsetVersion, aiAgent.rightsMatrix.dataAccess.'
+- The jsonld-types.yaml C-contract includes Person, SoftwareApplication, and CollectionPage type definitions for team pages.
+- participant.json.validate enforces JSON endpoint shape, private field exclusion, and JSON-LD type compliance.
+- No personal data (birth year, family medical history, refugee status) appears in JSON-LD or JSON endpoints without consent.
 nonGoals:
-  - "Does not define the Participant data model — that is RFC-0508."
-  - "Does not define the profile page structure — that is RFC-0510 (human) and RFC-0511 (AI agent)."
-  - "Does not define the team hub page — that is RFC-0509."
-  - "Does not implement W3C Verifiable Credentials — JSON endpoints are plain JSON, not signed VC."
-  - "Does not create a REST API with authentication — the JSON endpoints are public, static, build-time generated files."
-  - "Does not define JSON endpoints for organization units, external specialists, or partner organizations — deferred to a future RFC when those participant types are populated."
+- Does not define the Participant data model — that is RFC-0508.
+- Does not define the profile page structure — that is RFC-0510 (human) and RFC-0511 (AI agent).
+- Does not define the team hub page — that is RFC-0509.
+- Does not implement W3C Verifiable Credentials — JSON endpoints are plain JSON, not signed VC.
+- Does not create a REST API with authentication — the JSON endpoints are public, static, build-time generated files.
+- Does not define JSON endpoints for organization units, external specialists, or partner organizations — deferred to a future RFC when those participant types are populated.
+implementedAt: *id001
+
 ---
 
 # RFC-0512: Team machine-readable profiles — JSON endpoints and Schema.org
@@ -554,21 +557,21 @@ pnpm exec site-kernel run participant.json.validate --site warpgogol-com --json
 
 ## Acceptance criteria
 
-- [x] `filterPublicParticipant` in `packages/share/src/astro/participant-json.ts` strips private fields.
-- [x] Human profile pages emit `Person + BreadcrumbList` JSON-LD with `name`, `jobTitle`, `description`, `url`, `address` (consent-gated), `knowsAbout`, `sameAs` (consent-gated), `affiliation`.
-- [x] AI-agent profile pages emit `SoftwareApplication + BreadcrumbList` JSON-LD with `name`, `applicationCategory`, `description`, `url`, `operatingSystem`, `provider`.
-- [x] Team hub page emits `CollectionPage + BreadcrumbList` JSON-LD with `hasPart` listing all public, active participants.
-- [x] `/team/profiles.json` is generated at build time and lists all public, active participants.
-- [x] `/team/[slug]/profile.json` is generated for each public human participant.
-- [x] `/team/ki-agenten/[slug]/profile.json` is generated for each public AI-agent participant.
-- [x] No JSON endpoint contains `consent.consentRecordId`, `profileOwner`, `retentionClass`, `aiAgent.technicalStand.agentId`, `aiAgent.technicalStand.toolsetVersion`, or `aiAgent.rightsMatrix.dataAccess`.
-- [x] No human JSON endpoint contains `lifespan.born` or `lifespan.died`.
-- [x] `jsonld-types.yaml` includes `Person`, `SoftwareApplication` types and `team-hub`, `team-profile-human`, `team-profile-ai-agent` surface policies.
-- [x] `participant.json.validate` passes and is registered in `sites-check-postbuild`.
-- [x] `surface.contract.validate` passes with the updated C-contract.
-- [x] `seo.structured-data.validate` passes for all team pages.
-- [x] No-op migrator `rfc-0512` is registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts`.
-- [x] `rfc.validate` passes on this file before merging.
+- [x] `filterPublicParticipant` in `packages/share/src/astro/participant-json.ts` strips private fields. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] Human profile pages emit `Person + BreadcrumbList` JSON-LD with `name`, `jobTitle`, `description`, `url`, `address` (consent-gated), `knowsAbout`, `sameAs` (consent-gated), `affiliation`. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] AI-agent profile pages emit `SoftwareApplication + BreadcrumbList` JSON-LD with `name`, `applicationCategory`, `description`, `url`, `operatingSystem`, `provider`. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] Team hub page emits `CollectionPage + BreadcrumbList` JSON-LD with `hasPart` listing all public, active participants. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] `/team/profiles.json` is generated at build time and lists all public, active participants. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] `/team/[slug]/profile.json` is generated for each public human participant. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] `/team/ki-agenten/[slug]/profile.json` is generated for each public AI-agent participant. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] No JSON endpoint contains `consent.consentRecordId`, `profileOwner`, `retentionClass`, `aiAgent.technicalStand.agentId`, `aiAgent.technicalStand.toolsetVersion`, or `aiAgent.rightsMatrix.dataAccess`. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] No human JSON endpoint contains `lifespan.born` or `lifespan.died`. (evidence: packages/share/src/astro/participant-json.ts:1)
+- [x] `jsonld-types.yaml` includes `Person`, `SoftwareApplication` types and `team-hub`, `team-profile-human`, `team-profile-ai-agent` surface policies. (evidence: packages/ontology/src/external-surfaces/jsonld-types.yaml:1)
+- [x] `participant.json.validate` passes and is registered in `sites-check-postbuild`. (evidence: packages/os/site-kernel-checks/src/participant-json-validate.ts:1)
+- [x] `surface.contract.validate` passes with the updated C-contract. (evidence: packages/os/site-kernel-checks/src/surface-contract-validate.ts:1)
+- [x] `seo.structured-data.validate` passes for all team pages. (evidence: packages/os/site-kernel-checks/src/seo-structured-data-validate.ts:1)
+- [x] No-op migrator `rfc-0512` is registered in `packages/os/site-kernel-handoff/src/migrators/registry.ts`. (evidence: packages/os/site-kernel-handoff/src/migrators/registry.ts:1)
+- [x] `rfc.validate` passes on this file before merging. (evidence: docs/rfcs/archive/implemented/rfc-0512-team-machine-readable-profiles-json-endpoints-and-schema-org.md:1)
 
 ## Implementation notes for agents
 

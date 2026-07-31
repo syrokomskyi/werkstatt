@@ -1,54 +1,55 @@
 ---
 id: RFC-0527
-title: "Content reference index — unified indexing and resolution contour"
+title: Content reference index — unified indexing and resolution contour
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-25
 updatedAt: 2026-07-25
 enhancedAt: 2026-07-25
 implementedAt: 2026-07-25
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0045
+- RFC-0045
 amendedBy: []
 related:
-  - RFC-0045
-  - RFC-0226
-  - RFC-0220
+- RFC-0045
+- RFC-0226
+- RFC-0220
 satisfies:
-  - DNA-4
-  - DNA-22
+- DNA-4
+- DNA-22
 versionBump: minor
 commands:
   proposed:
-    - content.ref-index.generate
-  added:
-    - content.ref-index.generate
+  - content.ref-index.generate
+  added: []
   changed:
-    - content.references.validate
-  removed: []
+  - content.references.validate
+  removed:
+  - content.ref-index.generate
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/share"
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/site-kernel-content"
+- '@gogol/share'
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-checks'
+- '@gogol/site-kernel-content'
 successSignals:
-  - "A single content reference index is built once at the start of build-prepare and consumed by all downstream generators, validators, and Astro components."
-  - "Any YAML or Markdown file under src/content/ can reference any field of any other content file using braceless collection.file.field syntax, resolved through the index."
-  - "Missing references are caught at build-time with clear diagnostics identifying the source file, the unresolved reference, and the closest matching entry in the index."
+- A single content reference index is built once at the start of build-prepare and consumed by all downstream generators, validators, and Astro components.
+- Any YAML or Markdown file under src/content/ can reference any field of any other content file using braceless collection.file.field syntax, resolved through the index.
+- Missing references are caught at build-time with clear diagnostics identifying the source file, the unresolved reference, and the closest matching entry in the index.
 nonGoals:
-  - "Does not migrate existing brace-delimited references — that is RFC-0529."
-  - "Does not embed metadata into media files — that is RFC-0528."
-  - "Does not index markdown body content — only frontmatter fields and YAML object keys are indexed."
-  - "Does not support references to files outside src/content/."
+- Does not migrate existing brace-delimited references — that is RFC-0529.
+- Does not embed metadata into media files — that is RFC-0528.
+- Does not index markdown body content — only frontmatter fields and YAML object keys are indexed.
+- Does not support references to files outside src/content/.
+
 ---
 
 # RFC-0527: Content reference index — unified indexing and resolution contour

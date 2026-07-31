@@ -1,63 +1,65 @@
 ---
 id: RFC-0503
-title: "Ratgeber editorial policy page and article status workflow"
+title: Ratgeber editorial policy page and article status workflow
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 enhancedAt: 2026-07-23
 implementedAt: 2026-07-23
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0500
+- RFC-0500
 amendedBy: []
 related:
-  - RFC-0193
-  - RFC-0325
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0500
-  - RFC-0501
-  - RFC-0502
+- RFC-0193
+- RFC-0325
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0500
+- RFC-0501
+- RFC-0502
 satisfies:
-  - DNA-16
-  - DNA-24
-  - DNA-53
+- DNA-16
+- DNA-24
+- DNA-53
 breaksC: true
 versionBump: minor
 commands:
   proposed:
-    - ratgeber.policy.validate
+  - ratgeber.policy.validate
   added:
-    - ratgeber.policy.validate
+  - ratgeber.policy.validate
   changed: []
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@warpgogol/ontology'
 successSignals:
-  - "The /ratgeber/redaktion/ page (DE) and /porady/redaktsiya/ page (UK) render an editorial policy page with editorial standards, review cadence, author profiles, and source policy."
-  - "The editorial policy page is a static page — not a surface-generated page. It lives at src/content/prose/{lang}/ratgeber-redaktion.md."
-  - "Article status workflow has three states: draft → review-required → published. Transitions are manual via frontmatter edits."
-  - "ratgeber.policy.validate checks that the editorial policy page exists and contains required sections."
-  - "The hub links to the editorial policy page in the 'So arbeitet die Redaktion' block (RFC-0500)."
-  - "Articles with status: draft or review-required are excluded from the sitemap, feed, and surface artifact (RFC-0500 statusGate)."
+- The /ratgeber/redaktion/ page (DE) and /porady/redaktsiya/ page (UK) render an editorial policy page with editorial standards, review cadence, author profiles, and source policy.
+- The editorial policy page is a static page — not a surface-generated page. It lives at src/content/prose/{lang}/ratgeber-redaktion.md.
+- 'Article status workflow has three states: draft → review-required → published. Transitions are manual via frontmatter edits.'
+- ratgeber.policy.validate checks that the editorial policy page exists and contains required sections.
+- The hub links to the editorial policy page in the 'So arbeitet die Redaktion' block (RFC-0500).
+- 'Articles with status: draft or review-required are excluded from the sitemap, feed, and surface artifact (RFC-0500 statusGate).'
 nonGoals:
-  - "Does not create an automated review workflow tool — status transitions are manual frontmatter edits."
-  - "Does not create a CMS or editing interface — authors edit markdown files directly."
-  - "Does not add the editorial policy page as a surface-generated page — it is a static prose page."
-  - "Does not change the article collection schema — that is RFC-0500."
-  - "Does not change surface.validate or surface.contract.validate code — the url-schema.yaml extension is C-contract documentation only; surface.contract.validate reads it dynamically and the editorial policy page is authored (not in surface.generated.json)."
+- Does not create an automated review workflow tool — status transitions are manual frontmatter edits.
+- Does not create a CMS or editing interface — authors edit markdown files directly.
+- Does not add the editorial policy page as a surface-generated page — it is a static prose page.
+- Does not change the article collection schema — that is RFC-0500.
+- Does not change surface.validate or surface.contract.validate code — the url-schema.yaml extension is C-contract documentation only; surface.contract.validate reads it dynamically and the editorial policy page is authored (not in surface.generated.json).
+
 ---
 
 # RFC-0503: Ratgeber editorial policy page and article status workflow

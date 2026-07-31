@@ -1,69 +1,74 @@
 ---
 id: RFC-0200
-title: "Add a People module: canonical person records, an embeddable People section, and gated per-member profile pages"
+title: 'Add a People module: canonical person records, an embeddable People section, and gated per-member profile pages'
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers: []
 createdAt: 2026-06-17
 updatedAt: 2026-06-17
 implementedAt: 2026-06-17
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0115
+- RFC-0115
 amendedBy:
-  - RFC-0513
+- RFC-0513
+- RFC-0508
+- RFC-0509
+- RFC-0510
+- RFC-0512
 related:
-  - RFC-0008
-  - RFC-0024
-  - RFC-0048
-  - RFC-0112
-  - RFC-0115
-  - RFC-0143
-  - RFC-0148
-  - RFC-0152
-  - RFC-0163
-  - RFC-0167
-  - RFC-0169
-  - RFC-0192
-  - RFC-0199
+- RFC-0008
+- RFC-0024
+- RFC-0048
+- RFC-0112
+- RFC-0115
+- RFC-0143
+- RFC-0148
+- RFC-0152
+- RFC-0163
+- RFC-0167
+- RFC-0169
+- RFC-0192
+- RFC-0199
 commands:
   proposed:
-    - people.validate
-    - person.create
+  - people.validate
+  - person.create
   added:
-    - people.validate
-    - person.create
+  - people.validate
+  - person.create
   changed:
-    - apps-check.run
-    - entitlements.validate
-    - section.scaffold
+  - apps-check.run
+  - entitlements.validate
+  - section.scaffold
   removed: []
 appsImpacted:
-  - apps/nicaragua-projekt
-  - apps/warpgogol-com
-  - apps/*
+- apps/nicaragua-projekt
+- apps/warpgogol-com
+- apps/*
 packagesImpacted:
-  - packages/business
-  - packages/ui
-  - packages/share
-  - packages/ontology
-  - packages/os/site-kernel-checks
-  - packages/os/site-kernel-codegen
+- packages/business
+- packages/ui
+- packages/share
+- packages/ontology
+- packages/os/site-kernel-checks
+- packages/os/site-kernel-codegen
 successSignals:
-  - "A site describes each human once (one Person record per language) and that single record feeds the People section, the optional dedicated team page, the optional per-member profile page, and all Person/Organization JSON-LD — with no inline duplication and no per-app route glue."
-  - "An author (human or AI agent) can place a People section on ANY page, pick specific members by slug (e.g. who built this product / whom to contact), and visitors click through to a member's profile page when one exists."
-  - "Per-member profile pages are a sellable upsell gated by the `team.profiles` entitlement; the People section, the team page, and all people JSON-LD remain in the free baseline."
-  - "people.validate enforces the Person contract and join apps-check.run, so agent-authored people content is machine-checkable and self-correcting."
+- A site describes each human once (one Person record per language) and that single record feeds the People section, the optional dedicated team page, the optional per-member profile page, and all Person/Organization JSON-LD — with no inline duplication and no per-app route glue.
+- An author (human or AI agent) can place a People section on ANY page, pick specific members by slug (e.g. who built this product / whom to contact), and visitors click through to a member's profile page when one exists.
+- Per-member profile pages are a sellable upsell gated by the `team.profiles` entitlement; the People section, the team page, and all people JSON-LD remain in the free baseline.
+- people.validate enforces the Person contract and join apps-check.run, so agent-authored people content is machine-checkable and self-correcting.
 nonGoals:
-  - "Do not gate the People section, the dedicated team page, or any Person/Organization JSON-LD behind an entitlement — only per-member profile pages are paid."
-  - "Do not keep any legacy people surface: the `team` section, the `founder-trust-card` section, inline `members[]` block props, the route-level bio-merge hack, and `company.brand.founders`/`company.boardMembers` are removed (no backward compatibility)."
-  - "Do not author one .md file per member profile page — profile pages are virtual routes materialized from the Person records (the route-source pattern, RFC-0192)."
-  - "Do not build org-chart, hierarchy, vCard export, or per-member blogs in the first cut."
+- Do not gate the People section, the dedicated team page, or any Person/Organization JSON-LD behind an entitlement — only per-member profile pages are paid.
+- 'Do not keep any legacy people surface: the `team` section, the `founder-trust-card` section, inline `members[]` block props, the route-level bio-merge hack, and `company.brand.founders`/`company.boardMembers` are removed (no backward compatibility).'
+- Do not author one .md file per member profile page — profile pages are virtual routes materialized from the Person records (the route-source pattern, RFC-0192).
+- Do not build org-chart, hierarchy, vCard export, or per-member blogs in the first cut.
+
 ---
 
 # RFC-0200: Add a People module: canonical person records, an embeddable People section, and gated per-member profile pages

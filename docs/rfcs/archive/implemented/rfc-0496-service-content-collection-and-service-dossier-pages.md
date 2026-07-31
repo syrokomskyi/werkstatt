@@ -1,78 +1,80 @@
 ---
 id: RFC-0496
-title: "Service content collection and service dossier pages"
+title: Service content collection and service dossier pages
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 enhancedAt: 2026-07-23
 implementedAt: 2026-07-23
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0238
+- RFC-0238
 amendedBy: []
 related:
-  - RFC-0192
-  - RFC-0193
-  - RFC-0238
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0490
-  - RFC-0492
-  - RFC-0494
-  - RFC-0495
-  - RFC-0497
+- RFC-0192
+- RFC-0193
+- RFC-0238
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0490
+- RFC-0492
+- RFC-0494
+- RFC-0495
+- RFC-0497
 satisfies:
-  - DNA-24
-  - DNA-53
+- DNA-24
+- DNA-53
 breaksC: true
 versionBump: minor
 commands:
   proposed:
-    - surface.service.validate
+  - surface.service.validate
   added:
-    - surface.service.validate
+  - surface.service.validate
   changed:
-    - surface.generate
-    - surface.validate
+  - surface.generate
+  - surface.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/surface"
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/share"
-  - "@gogol/site-kernel-handoff"
+- '@gogol/surface'
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@gogol/share'
+- '@gogol/site-kernel-handoff'
+- '@warpgogol/ontology'
 successSignals:
-  - "A new content collection surface/services/{lang}/*.md holds service dossier records — one per industry×service tuple (e.g., friseur/strizhka, elektriker/elektroinstallation)."
-  - "A new blueprint website-service.yaml generates service pages at /website/{industry}/{service}/ (DE) and /sait/{industry}/{service}/ (UK) — a separate surface from website-local, with axes industry × service and integer depths."
-  - "Each service record carries structured fields: serviceId, industryId, name, slug, summary, servicePurpose, customerQuestions, serviceVariants, pricePresentationModels, durationPresentation, consultationRequirements, bookingRequirements, preparationInformation, aftercareInformation, teamRelation, portfolioRequirements, evidenceRequirements, contactJourney, recommendedComponents, recommendedPageStructure, claimRestrictions, faq, sources, reviewStatus, publicationStatus."
-  - "The baker (bakePage) generates service pages from the structured fields — hero from summary/servicePurpose, variants block from serviceVariants, price model block from pricePresentationModels, duration block from durationPresentation, booking block from bookingRequirements/contactJourney, FAQ block from faq."
-  - "Service pages do not publish fabricated prices, durations, or availability — pricePresentationModels and durationPresentation describe how a client should present these, not fictional values."
-  - "Service pages do not represent Warpgogol as the service provider — the page explains how a client should structure the service on their own site."
-  - "surface.service.validate enforces a publication gate: minimum 3 service variants, 3 customer questions, 3 price presentation models, 5 FAQ entries, 1 recommended page structure. Pages failing the gate are not emitted."
-  - "surface.service.validate enforces claim restrictions — no unfulfillable commercial promises ('mehr Anfragen', 'mehr Buchungen', 'besser gefunden') in any service record text field."
-  - "Service pages are linked from their parent industry page (depth-1) via a service catalog block."
-  - "content.references.validate and content.voice.lint pass for all service records."
+- A new content collection surface/services/{lang}/*.md holds service dossier records — one per industry×service tuple (e.g., friseur/strizhka, elektriker/elektroinstallation).
+- A new blueprint website-service.yaml generates service pages at /website/{industry}/{service}/ (DE) and /sait/{industry}/{service}/ (UK) — a separate surface from website-local, with axes industry × service and integer depths.
+- 'Each service record carries structured fields: serviceId, industryId, name, slug, summary, servicePurpose, customerQuestions, serviceVariants, pricePresentationModels, durationPresentation, consultationRequirements, bookingRequirements, preparationInformation, aftercareInformation, teamRelation, portfolioRequirements, evidenceRequirements, contactJourney, recommendedComponents, recommendedPageStructure, claimRestrictions, faq, sources, reviewStatus, publicationStatus.'
+- The baker (bakePage) generates service pages from the structured fields — hero from summary/servicePurpose, variants block from serviceVariants, price model block from pricePresentationModels, duration block from durationPresentation, booking block from bookingRequirements/contactJourney, FAQ block from faq.
+- Service pages do not publish fabricated prices, durations, or availability — pricePresentationModels and durationPresentation describe how a client should present these, not fictional values.
+- Service pages do not represent Warpgogol as the service provider — the page explains how a client should structure the service on their own site.
+- 'surface.service.validate enforces a publication gate: minimum 3 service variants, 3 customer questions, 3 price presentation models, 5 FAQ entries, 1 recommended page structure. Pages failing the gate are not emitted.'
+- surface.service.validate enforces claim restrictions — no unfulfillable commercial promises ('mehr Anfragen', 'mehr Buchungen', 'besser gefunden') in any service record text field.
+- Service pages are linked from their parent industry page (depth-1) via a service catalog block.
+- content.references.validate and content.voice.lint pass for all service records.
 nonGoals:
-  - "Does not change the URL structure of depth-4 city pages or depth-5 demand pages — that is governed by RFC-0495."
-  - "Does not create city×service intersection pages — that is RFC-0497."
-  - "Does not change structured data emission — that is RFC-0498."
-  - "Does not change the industry dossier model (RFC-0492) — service records are a new collection, not a modification of industry records."
-  - "Does not add new block archetypes — the baker maps service fields to existing block types (hero, cardGrid, listCards, md, ctaBlock). If a field requires a new block type, a separate RFC is needed."
-  - "Does not create profiles of team members or specialists — the teamRelation field describes the relation model, not actual people."
-  - "Does not publish AI images as portfolio results — portfolioRequirements describes what evidence is needed, not fabricated results."
-  - "Does not add a service axis to the website-local blueprint — the service axis lives in the new website-service blueprint. The website-local axis order (industry × country × region × city × demand) is unchanged."
-  - "Does not change the depth numbering of the website-local blueprint — service pages are depth-1 in the website-service blueprint, not depth-1.5 in website-local."
+- Does not change the URL structure of depth-4 city pages or depth-5 demand pages — that is governed by RFC-0495.
+- Does not create city×service intersection pages — that is RFC-0497.
+- Does not change structured data emission — that is RFC-0498.
+- Does not change the industry dossier model (RFC-0492) — service records are a new collection, not a modification of industry records.
+- Does not add new block archetypes — the baker maps service fields to existing block types (hero, cardGrid, listCards, md, ctaBlock). If a field requires a new block type, a separate RFC is needed.
+- Does not create profiles of team members or specialists — the teamRelation field describes the relation model, not actual people.
+- Does not publish AI images as portfolio results — portfolioRequirements describes what evidence is needed, not fabricated results.
+- Does not add a service axis to the website-local blueprint — the service axis lives in the new website-service blueprint. The website-local axis order (industry × country × region × city × demand) is unchanged.
+- Does not change the depth numbering of the website-local blueprint — service pages are depth-1 in the website-service blueprint, not depth-1.5 in website-local.
+
 ---
 
 # RFC-0496: Service content collection and service dossier pages

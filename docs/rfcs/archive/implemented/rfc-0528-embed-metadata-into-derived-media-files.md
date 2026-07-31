@@ -1,57 +1,58 @@
 ---
 id: RFC-0528
-title: "Embed metadata into derived media files from semantic profiles and material credits"
+title: Embed metadata into derived media files from semantic profiles and material credits
 status: implemented
 kind: command
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-25
 updatedAt: 2026-07-25
 enhancedAt: 2026-07-25
 implementedAt: 2026-07-25
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0226
-  - RFC-0210
-  - RFC-0234
-  - RFC-0525
+- RFC-0226
+- RFC-0210
+- RFC-0234
+- RFC-0525
 amendedBy: []
 related:
-  - RFC-0226
-  - RFC-0220
-  - RFC-0527
-  - RFC-0529
+- RFC-0226
+- RFC-0220
+- RFC-0527
+- RFC-0529
 satisfies: []
 versionBump: minor
 commands:
   proposed: []
   added: []
   changed:
-    - material.metadata.write
-    - material.metadata.validate
-  removed: []
+  - material.metadata.validate
+  removed:
+  - material.metadata.write
 appsImpacted: []
 packagesImpacted:
-  - "@gogol/site-kernel-codegen"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/share"
+- '@gogol/site-kernel-codegen'
+- '@gogol/site-kernel-checks'
+- '@gogol/share'
 successSignals:
-  - "Every derived media file in public/_video/ and public/_img/ carries embedded metadata (copyright, creator, title, license URL) sourced from MaterialCredit sidecars and SemanticSiteProfile fallback — no second source of truth."
-  - "material.metadata.write runs after all variant generators in build-prepare and finds derived files through variant manifests, not by scanning dist/."
-  - "material.metadata.validate confirms embedded metadata presence in public/ files before Astro build copies them to dist/."
-  - "Credits sidecars use content references (braceless, via RFC-0527) to pull names and legal data from PBP entities — zero duplication."
+- Every derived media file in public/_video/ and public/_img/ carries embedded metadata (copyright, creator, title, license URL) sourced from MaterialCredit sidecars and SemanticSiteProfile fallback — no second source of truth.
+- material.metadata.write runs after all variant generators in build-prepare and finds derived files through variant manifests, not by scanning dist/.
+- material.metadata.validate confirms embedded metadata presence in public/ files before Astro build copies them to dist/.
+- Credits sidecars use content references (braceless, via RFC-0527) to pull names and legal data from PBP entities — zero duplication.
 nonGoals:
-  - "Does not build the content reference index — that is RFC-0527."
-  - "Does not migrate content references — that is RFC-0529."
-  - "Does not change video/image encoding pipelines — metadata is embedded post-encoding, not during encoding."
-  - "Does not embed metadata into HLS segments, caption files, or authored source masters."
-  - "Does not change runtime playback, URL schema, or JSON-LD output."
-  - "Does not create an audio encoding pipeline — audio support is reserved for when a pipeline exists."
+- Does not build the content reference index — that is RFC-0527.
+- Does not migrate content references — that is RFC-0529.
+- Does not change video/image encoding pipelines — metadata is embedded post-encoding, not during encoding.
+- Does not embed metadata into HLS segments, caption files, or authored source masters.
+- Does not change runtime playback, URL schema, or JSON-LD output.
+- Does not create an audio encoding pipeline — audio support is reserved for when a pipeline exists.
+
 ---
 
 # RFC-0528: Embed metadata into derived media files from semantic profiles and material credits

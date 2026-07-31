@@ -1,60 +1,62 @@
 ---
 id: RFC-0345
-title: "Make generated file writes idempotent and content-deterministic"
+title: Make generated file writes idempotent and content-deterministic
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
-reviewers: ["human:andrii-syrokomskyi"]
+- architecture
+reviewers:
+- human:andrii-syrokomskyi
 createdAt: 2026-07-07
 updatedAt: 2026-07-07
 implementedAt: 2026-07-07
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy:
-  - RFC-0353
-  - RFC-0364
+- RFC-0353
+- RFC-0364
 related:
-  - RFC-0081
-  - RFC-0087
-  - RFC-0192
-  - RFC-0258
-  - RFC-0276
+- RFC-0081
+- RFC-0087
+- RFC-0192
+- RFC-0258
+- RFC-0276
 satisfies:
-  - DNA-18
-  - DNA-39
+- DNA-18
+- DNA-39
 commands:
   proposed: []
   added: []
   changed:
-    - surface.generate
-    - site.bordbuch.generate
-    - uni.registry.build
-    - content.plan.build
-    - content.claim.ledger.project
-    - compass.inventory
-    - entitlements.resolve
-  removed: []
+  - surface.generate
+  - uni.registry.build
+  - content.plan.build
+  - content.claim.ledger.project
+  - compass.inventory
+  - entitlements.resolve
+  removed:
+  - site.bordbuch.generate
 appsImpacted:
-  - warpgogol-com
-  - nicaragua-projekt
-  - check-warpgogol-com
+- warpgogol-com
+- nicaragua-projekt
+- check-warpgogol-com
 packagesImpacted:
-  - "@gogol/site-kernel"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/surface"
+- '@gogol/site-kernel'
+- '@gogol/site-kernel-checks'
+- '@gogol/surface'
 successSignals:
-  - "pnpm build run twice in a row produces zero git-tracked changes to generated files"
-  - "No new surface-*.state.json files created when content is unchanged"
-  - "No generated JSON/XML file rewritten when its content is byte-identical"
+- pnpm build run twice in a row produces zero git-tracked changes to generated files
+- No new surface-*.state.json files created when content is unchanged
+- No generated JSON/XML file rewritten when its content is byte-identical
 nonGoals:
-  - "Do not remove or weaken the GENERATED marker governance (RFC-0081)"
-  - "Do not change the shape or semantics of generated file content — only the write decision"
-  - "Do not add build-time content hashing of source files — the existing artifact/manifest hashes are sufficient"
-  - "Do not address files under dist/ or public/ that Astro writes during SSG — those are Astro's responsibility"
+- Do not remove or weaken the GENERATED marker governance (RFC-0081)
+- Do not change the shape or semantics of generated file content — only the write decision
+- Do not add build-time content hashing of source files — the existing artifact/manifest hashes are sufficient
+- Do not address files under dist/ or public/ that Astro writes during SSG — those are Astro's responsibility
+
 ---
 
 # RFC-0345: Make generated file writes idempotent and content-deterministic

@@ -1,76 +1,55 @@
 ---
 id: RFC-0391
-title: "Complete forge autonomy with forge.yaml project config and portable init"
+title: Complete forge autonomy with forge.yaml project config and portable init
 status: implemented
-# kind options: architecture | contract | command | policy | deprecation
 kind: architecture
-# scope options: app | workspace
 scope: workspace
 owners:
-  - architecture
-# Set by the deciding human together with the status change (RFC-0335).
-# Draft scaffolds must keep this empty; do not prefill a default identity.
-# Format: human:<handle> (agent:<id> reserved — see RFC-0335).
-# Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-19
 updatedAt: 2026-07-19
 enhancedAt: 2026-07-19
 implementedAt: 2026-07-19
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends: []
 amendedBy: []
 related:
-  - RFC-0374
-  - RFC-0376
-  - RFC-0392
-  - RFC-0393
-  - DNA-1
-  - DNA-2
+- RFC-0374
+- RFC-0376
+- RFC-0392
+- RFC-0393
+- DNA-1
+- DNA-2
 satisfies:
-  - DNA-1
-  - DNA-2
+- DNA-1
+- DNA-2
 commands:
-  proposed:
+  proposed: null
   added:
-    - forge.agents.generate
+  - forge.agents.generate
   changed:
-    - forge.init
-    - forge.doctor
-  removed: []
+  - forge.doctor
+  removed:
+  - forge.init
 appsImpacted: []
 packagesImpacted:
-  - "@wgogol/forge"
-  - "@gogol/site-kernel"
+- '@wgogol/forge'
+- '@gogol/site-kernel'
 successSignals:
-  - "forge.yaml exists at the WGogol repository root and validates against the forge config schema"
-  - "forge.init creates forge.yaml + AGENTS.md + PREFERENCES.md + docs/{rfcs,adrs,plans,audits}/ in a fresh empty directory without any @gogol/* package present"
-  - "forge.agents.generate regenerates AGENTS.md deterministically from forge.yaml and the skill registry"
-  - "packages/os/site-kernel/src/rfc/ is deleted and all kernel RFC commands still register from @wgogol/forge"
+- forge.yaml exists at the WGogol repository root and validates against the forge config schema
+- forge.init creates forge.yaml + AGENTS.md + PREFERENCES.md + docs/{rfcs,adrs,plans,audits}/ in a fresh empty directory without any @gogol/* package present
+- forge.agents.generate regenerates AGENTS.md deterministically from forge.yaml and the skill registry
+- packages/os/site-kernel/src/rfc/ is deleted and all kernel RFC commands still register from @wgogol/forge
 nonGoals:
-  - "Does not define the bindings section of forge.yaml (paths/commands adaptation) — that is RFC-0393"
-  - "Does not add stack profiles or monorepo scaffolding — that is RFC-0392"
-  - "Does not publish @wgogol/forge to the public npm registry — publication mechanics are an operational task, not an architecture decision"
-  - "Does not change the KernelModule interface or the kernel runtime"
-# RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
-# via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
-# automatically inside build pipelines). Closed probe vocabulary — see
-# docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
-# acceptance:
-#   - probe: run
-#     command: "site-kernel run some.command.validate --app warpgogol-com"
-#     expect:
-#       exitCode: 0
-#   - probe: file-exists
-#     path: "packages/share/src/some-new-module.ts"
-#   - probe: command-registered
-#     name: "some.new.command"
-#   - probe: file-contains
-#     path: "AGENTS.md"
-#     pattern: "Some new governance paragraph"
+- Does not define the bindings section of forge.yaml (paths/commands adaptation) — that is RFC-0393
+- Does not add stack profiles or monorepo scaffolding — that is RFC-0392
+- Does not publish @wgogol/forge to the public npm registry — publication mechanics are an operational task, not an architecture decision
+- Does not change the KernelModule interface or the kernel runtime
+
 ---
 
 # RFC-0391: Complete forge autonomy with forge.yaml project config and portable init

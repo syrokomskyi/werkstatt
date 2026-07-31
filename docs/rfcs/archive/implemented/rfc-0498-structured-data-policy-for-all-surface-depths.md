@@ -1,80 +1,82 @@
 ---
 id: RFC-0498
-title: "Structured data policy for all surface depths"
+title: Structured data policy for all surface depths
 status: implemented
 kind: architecture
 scope: workspace
 owners:
-  - architecture
+- architecture
 reviewers:
-  - human:andrii-syrokomskyi
+- human:andrii-syrokomskyi
 createdAt: 2026-07-23
 updatedAt: 2026-07-23
 enhancedAt: 2026-07-23
 implementedAt: 2026-07-23
-closedAt:
+closedAt: null
 supersedes: []
-supersededBy:
+supersededBy: null
 amends:
-  - RFC-0238
-  - RFC-0492
+- RFC-0238
+- RFC-0492
 amendedBy:
-  - RFC-0500
-  - RFC-0506
+- RFC-0500
+- RFC-0506
 related:
-  - RFC-0074
-  - RFC-0192
-  - RFC-0193
-  - RFC-0238
-  - RFC-0432
-  - RFC-0478
-  - RFC-0479
-  - RFC-0480
-  - RFC-0492
-  - RFC-0495
-  - RFC-0496
-  - RFC-0497
+- RFC-0074
+- RFC-0192
+- RFC-0193
+- RFC-0238
+- RFC-0432
+- RFC-0478
+- RFC-0479
+- RFC-0480
+- RFC-0492
+- RFC-0495
+- RFC-0496
+- RFC-0497
 satisfies:
-  - DNA-16
-  - DNA-24
-  - DNA-53
+- DNA-16
+- DNA-24
+- DNA-53
 breaksC: true
 versionBump: minor
 commands:
   proposed: []
   added: []
   changed:
-    - surface.validate
-    - seo.structured-data.validate
-    - surface.contract.validate
+  - surface.validate
+  - seo.structured-data.validate
+  - surface.contract.validate
   removed: []
 appsImpacted:
-  - warpgogol-com
+- warpgogol-com
 packagesImpacted:
-  - "@gogol/surface"
-  - "@gogol/ontology"
-  - "@gogol/site-kernel-checks"
-  - "@gogol/share"
-  - "@gogol/pbp"
+- '@gogol/surface'
+- '@gogol/ontology'
+- '@gogol/site-kernel-checks'
+- '@gogol/share'
+- '@gogol/pbp'
+- '@warpgogol/ontology'
 successSignals:
-  - "Every surface page emits JSON-LD with @type WebPage as the primary type — never LocalBusiness, Electrician, HairSalon, or any trade-specific business type."
-  - "Depth-1 industry pages (website-local) emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry}, audience={industry})."
-  - "website-service depth-1 service pages emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry} — {service}, audience={industry})."
-  - "Depth-4 city pages emit WebPage + BreadcrumbList (no Service, no LocalBusiness — the city page is a navigation hub, not a service offering)."
-  - "Depth-5 intersection pages emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry} — {service}, areaServed={city}, audience={industry}) — only when the intersection gate (RFC-0497) passes."
-  - "No surface page emits Offer, BookAction, PriceSpecification, or QuantitativeValue with fabricated values — Warpgogol does not sell haircuts or electrical installations."
-  - "No surface page emits LocalBusiness, Electrician, HairSalon, or any schema.org business type — Warpgogol is not a local business."
-  - "The Service JSON-LD on surface pages always has provider: { @type: Organization, name: Warpgogol } — never a fabricated business."
-  - "BreadcrumbList JSON-LD reflects the canonical URL hierarchy (RFC-0495) — no /deu/bw/ segments in breadcrumb URLs."
-  - "seo.structured-data.validate (RFC-0074) enforces the per-depth type policy for surface pages: required types present, prohibited types absent, Service provider.name is Warpgogol, no fabricated Offer/PriceSpecification."
-  - "surface.validate checks BreadcrumbList URLs in generated surface artifacts against the canonical URL hierarchy (no /deu/bw/ segments)."
-  - "surface.contract.validate includes per-depth JSON-LD type policy checks against the C-contract."
+- Every surface page emits JSON-LD with @type WebPage as the primary type — never LocalBusiness, Electrician, HairSalon, or any trade-specific business type.
+- Depth-1 industry pages (website-local) emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry}, audience={industry}).
+- website-service depth-1 service pages emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry} — {service}, audience={industry}).
+- Depth-4 city pages emit WebPage + BreadcrumbList (no Service, no LocalBusiness — the city page is a navigation hub, not a service offering).
+- Depth-5 intersection pages emit WebPage + BreadcrumbList + Service (provider=Warpgogol, serviceType=Digitales Fundament für {industry} — {service}, areaServed={city}, audience={industry}) — only when the intersection gate (RFC-0497) passes.
+- No surface page emits Offer, BookAction, PriceSpecification, or QuantitativeValue with fabricated values — Warpgogol does not sell haircuts or electrical installations.
+- No surface page emits LocalBusiness, Electrician, HairSalon, or any schema.org business type — Warpgogol is not a local business.
+- 'The Service JSON-LD on surface pages always has provider: { @type: Organization, name: Warpgogol } — never a fabricated business.'
+- BreadcrumbList JSON-LD reflects the canonical URL hierarchy (RFC-0495) — no /deu/bw/ segments in breadcrumb URLs.
+- 'seo.structured-data.validate (RFC-0074) enforces the per-depth type policy for surface pages: required types present, prohibited types absent, Service provider.name is Warpgogol, no fabricated Offer/PriceSpecification.'
+- surface.validate checks BreadcrumbList URLs in generated surface artifacts against the canonical URL hierarchy (no /deu/bw/ segments).
+- surface.contract.validate includes per-depth JSON-LD type policy checks against the C-contract.
 nonGoals:
-  - "Does not change the JSON-LD emission for non-surface pages (home, legal, pricing, blog, etc.) — those are governed by their own RFCs and system.md declarations."
-  - "Does not add new JSON-LD types beyond WebPage, BreadcrumbList, and Service — FAQPage, Organization, etc. are already handled by existing structured data emission."
-  - "Does not change the structured data audit validator (RFC-0074) beyond updating it to enforce the surface per-depth policy — the validator's core logic is preserved."
-  - "Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Warpgogol does not have reviews to markup."
-  - "Does not emit Event, Product, or Offer JSON-LD on surface pages — the surface is not an e-commerce or event surface."
+- Does not change the JSON-LD emission for non-surface pages (home, legal, pricing, blog, etc.) — those are governed by their own RFCs and system.md declarations.
+- Does not add new JSON-LD types beyond WebPage, BreadcrumbList, and Service — FAQPage, Organization, etc. are already handled by existing structured data emission.
+- Does not change the structured data audit validator (RFC-0074) beyond updating it to enforce the surface per-depth policy — the validator's core logic is preserved.
+- Does not emit Review, AggregateRating, or other reputation-type JSON-LD — Warpgogol does not have reviews to markup.
+- Does not emit Event, Product, or Offer JSON-LD on surface pages — the surface is not an e-commerce or event surface.
+
 ---
 
 # RFC-0498: Structured data policy for all surface depths
