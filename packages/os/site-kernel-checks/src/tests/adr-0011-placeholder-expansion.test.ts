@@ -31,9 +31,12 @@ import { expandOwnershipPlaceholders } from "../generated-files-validate.ts";
 
 describe("ADR-0011: expandOwnershipPlaceholders — all placeholders expanded", () => {
   it("{system} expands to app name when provided", () => {
-    expect(expandOwnershipPlaceholders("systems/{system}/public/.well-known/bordbuch.json", "warpgogol-com")).toBe(
-      "systems/warpgogol-com/public/.well-known/bordbuch.json",
-    );
+    expect(
+      expandOwnershipPlaceholders(
+        "systems/{system}/public/.well-known/bordbuch.json",
+        "warpgogol-com",
+      ),
+    ).toBe("systems/warpgogol-com/public/.well-known/bordbuch.json");
   });
 
   it("{system} expands to * when no app provided", () => {
@@ -49,9 +52,7 @@ describe("ADR-0011: expandOwnershipPlaceholders — all placeholders expanded", 
   });
 
   it("{app} expands to * when no app provided", () => {
-    expect(expandOwnershipPlaceholders("public/{app}-indexnow.txt")).toBe(
-      "public/*-indexnow.txt",
-    );
+    expect(expandOwnershipPlaceholders("public/{app}-indexnow.txt")).toBe("public/*-indexnow.txt");
   });
 
   it("{lang} expands to *", () => {
@@ -61,9 +62,7 @@ describe("ADR-0011: expandOwnershipPlaceholders — all placeholders expanded", 
   });
 
   it("{route} expands to *", () => {
-    expect(expandOwnershipPlaceholders("public/{route}.md", "test-app")).toBe(
-      "public/*.md",
-    );
+    expect(expandOwnershipPlaceholders("public/{route}.md", "test-app")).toBe("public/*.md");
   });
 
   it("{slug} expands to *", () => {
@@ -73,9 +72,9 @@ describe("ADR-0011: expandOwnershipPlaceholders — all placeholders expanded", 
   });
 
   it("{id} expands to *", () => {
-    expect(expandOwnershipPlaceholders("packages/ui/src/sections/{id}/{id}.types.generated.ts")).toBe(
-      "packages/ui/src/sections/*/*.types.generated.ts",
-    );
+    expect(
+      expandOwnershipPlaceholders("packages/ui/src/sections/{id}/{id}.types.generated.ts"),
+    ).toBe("packages/ui/src/sections/*/*.types.generated.ts");
   });
 
   it("{category} expands to *", () => {
@@ -84,12 +83,12 @@ describe("ADR-0011: expandOwnershipPlaceholders — all placeholders expanded", 
     );
   });
 
-  it("multiple placeholders in a single path are all expanded", () => {
-    expect(expandOwnershipPlaceholders("public/preview/{lang}/{slug}.png", "test-app")).toBe(
-      "public/preview/*/*.png",
+  it("multiple different placeholders in a single path are all expanded", () => {
+    expect(expandOwnershipPlaceholders("src/content/pages/{lang}/{slug}.md", "test-app")).toBe(
+      "src/content/pages/*/*.md",
     );
-    expect(expandOwnershipPlaceholders("packages/ui/src/sections/{id}/{id}.types.generated.ts", "test-app")).toBe(
-      "packages/ui/src/sections/*/*.types.generated.ts",
+    expect(expandOwnershipPlaceholders("public/sitemap-{lang}-{category}.xml", "test-app")).toBe(
+      "public/sitemap-*-*.xml",
     );
   });
 
@@ -100,8 +99,8 @@ describe("ADR-0011: expandOwnershipPlaceholders — all placeholders expanded", 
   });
 
   it("backslash paths are normalized to posix", () => {
-    expect(expandOwnershipPlaceholders("src\\content\\pages\\{lang}\\impressum.md", "test-app")).toBe(
-      "src/content/pages/*/impressum.md",
-    );
+    expect(
+      expandOwnershipPlaceholders("src\\content\\pages\\{lang}\\impressum.md", "test-app"),
+    ).toBe("src/content/pages/*/impressum.md");
   });
 });
