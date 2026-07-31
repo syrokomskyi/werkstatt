@@ -140,7 +140,7 @@ interface BehaviorSnapshot {
   routes: RouteFact[];
 }
 
-async function readBehaviorSnapshot(
+export async function readBehaviorSnapshot(
   workspaceRoot: string,
   releaseId: string,
 ): Promise<BehaviorSnapshot | null> {
