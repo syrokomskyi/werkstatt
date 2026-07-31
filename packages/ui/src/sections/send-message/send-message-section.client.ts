@@ -93,6 +93,15 @@ function getChecklistElements(form: HTMLFormElement): ChecklistElements {
 function updateChecklistItem(item: HTMLElement | null, checked: boolean): void {
   if (!item) return;
   item.dataset.checklistState = checked ? "checked" : "unchecked";
+  const pending = item.querySelector<HTMLElement>(
+    "[data-send-message-checklist-indicator-pending]",
+  );
+  const checkedEl = item.querySelector<HTMLElement>(
+    "[data-send-message-checklist-indicator-checked]",
+  );
+  if (pending) pending.hidden = checked;
+  if (checkedEl) checkedEl.hidden = !checked;
+  if (checked) playChecklistIcon(checkedEl);
 }
 
 function highlightItem(item: HTMLElement | null): void {

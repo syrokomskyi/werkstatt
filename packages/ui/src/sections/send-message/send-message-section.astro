@@ -22,6 +22,8 @@ import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import TodoListIcon from "../../icons/gen/lordicon/doodle-outline/t/to-do-list-hover-icon.astro";
 import ApprovedCheckedIcon from "../../icons/gen/lordicon/doodle-outline/a/approved-checked-hover-icon.astro";
+import RectangleIcon from "../../icons/gen/lordicon/doodle-outline/r/rectangle-hover-icon.astro";
+import ApproveCheckedSimpleIcon from "../../icons/gen/lordicon/doodle-outline/a/approve-checked-simple-hover-icon.astro";
 import type { SendMessageSectionContent } from "./send-message-section.types.generated.ts";
 import "./send-message-section.css";
 
@@ -160,14 +162,30 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
         </div>
         <ul class="send-message__checklist-items">
           <li class="send-message__checklist-item" data-send-message-checklist-item="length">
-            <span class="send-message__checklist-indicator" data-send-message-checklist-indicator
-            ></span>
+            <span
+              class="send-message__checklist-indicator send-message__checklist-indicator--pending"
+              data-send-message-checklist-indicator-pending
+              ><RectangleIcon size={24} trigger="in" stroke="regular" /></span
+            >
+            <span
+              class="send-message__checklist-indicator send-message__checklist-indicator--checked"
+              data-send-message-checklist-indicator-checked
+              hidden><ApproveCheckedSimpleIcon size={24} trigger="in" stroke="regular" /></span
+            >
             <span class="send-message__checklist-text" data-send-message-checklist-text="length"
             ></span>
           </li>
           <li class="send-message__checklist-item" data-send-message-checklist-item="contact">
-            <span class="send-message__checklist-indicator" data-send-message-checklist-indicator
-            ></span>
+            <span
+              class="send-message__checklist-indicator send-message__checklist-indicator--pending"
+              data-send-message-checklist-indicator-pending
+              ><RectangleIcon size={24} trigger="in" stroke="regular" /></span
+            >
+            <span
+              class="send-message__checklist-indicator send-message__checklist-indicator--checked"
+              data-send-message-checklist-indicator-checked
+              hidden><ApproveCheckedSimpleIcon size={24} trigger="in" stroke="regular" /></span
+            >
             <span class="send-message__checklist-text" data-send-message-checklist-text="contact">
               {resolveLabel("checklistContactLabel", "")}
             </span>
