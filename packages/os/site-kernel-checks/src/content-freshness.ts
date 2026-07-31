@@ -197,7 +197,6 @@ async function computeFreshness(context: KernelRuntimeContext): Promise<Freshnes
   for (const e of entries) summary[e.state] += 1;
 
   const ledger: AuthoredFreshnessLedger = {
-    generatedAt: today,
     site: siteName,
     entries,
     summary,

@@ -88,8 +88,6 @@ export type EntitlementSource = "stripe" | "override" | "none";
 export interface ResolvedEntitlements {
   customerId: string | null;
   features: EntitledFeature[];
-  /** ISO-8601 provenance timestamp. */
-  resolvedAt: string;
   source: EntitlementSource;
   /**
    * RFC-0196: Programmatic Surface tier. `indexBudget` caps the number of indexable generated
@@ -123,9 +121,7 @@ export function resolveEntitlements(input: {
   pseoRegionalUnlocked?: boolean;
   /** RFC-0240: raw Stripe lookup keys (Stripe mode only) — used to derive the regional-tier unlock. */
   stripeLookupKeys?: string[];
-  now?: string;
 }): ResolvedEntitlements {
-  const resolvedAt = input.now ?? new Date().toISOString();
   const dedupe = (values: string[]): EntitledFeature[] =>
     Array.from(new Set(values.filter(isValidFeature)));
   const regionalUnlocked =
@@ -142,7 +138,6 @@ export function resolveEntitlements(input: {
     return {
       customerId: input.customerId,
       features: dedupe(input.override),
-      resolvedAt,
       source: "override",
       ...pseo,
     };
@@ -151,12 +146,11 @@ export function resolveEntitlements(input: {
     return {
       customerId: input.customerId,
       features: dedupe(input.stripeFeatures),
-      resolvedAt,
       source: "stripe",
       ...pseo,
     };
   }
-  return { customerId: input.customerId, features: [], resolvedAt, source: "none", ...pseo };
+  return { customerId: input.customerId, features: [], source: "none", ...pseo };
 }
 
 /** Reader used by build gates (which modules compile) and runtime endpoints. */

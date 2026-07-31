@@ -117,7 +117,6 @@ export interface FreshnessLedgerEntry {
 
 /** The deterministic per-app authored Freshness Ledger (mirrors the surface ledger shape). */
 export interface AuthoredFreshnessLedger {
-  generatedAt: string;
   site: string;
   entries: FreshnessLedgerEntry[];
   summary: Record<FreshnessState, number>;

@@ -15,7 +15,6 @@ import { z } from "zod";
 export const warpgogolCheckHintsSchema = z.object({
   schemaVersion: z.literal(1),
   siteId: z.string().min(1),
-  generatedAt: z.string().datetime(),
   baseUrl: z.string().url().optional(),
   languages: z.object({
     default: z.string().min(1),

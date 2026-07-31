@@ -422,10 +422,8 @@ export function buildCycloneDxSbom(components: SbomComponent[]): string {
   const bom = {
     bomFormat: "CycloneDX",
     specVersion: "1.5",
-    serialNumber: `urn:uuid:${crypto.randomUUID()}`,
     version: 1,
     metadata: {
-      timestamp: new Date().toISOString(),
       tools: [
         {
           vendor: "Warpgogol",

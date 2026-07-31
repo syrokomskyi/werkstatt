@@ -109,7 +109,6 @@ export function buildHintsFromManifest(
   return {
     schemaVersion: 1,
     siteId: typeof record.app === "string" ? record.app : fallbackSiteId,
-    generatedAt: new Date().toISOString(),
     baseUrl: typeof record.url === "string" ? record.url : undefined,
     languages: {
       default: i18n?.default ?? supported[0] ?? "de",
