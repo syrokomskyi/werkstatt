@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Lazy loading refactor: extracted from leitstand/index.ts to use dynamic imports inside async register().</item>
   <item>RFC-0627: add leitstand.deploy; update rollback (auto-detect channel); update status/health for dev channel.</item>
+  <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; propagate gate checks published + commitSha + missionId; rollback auto-step removes dev-deployed.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,7 +21,7 @@ export function createLeitstandModule(): KernelModule {
     version: "0.1.0",
     async register(registry) {
       const {
-        runLeitstandDeploy,
+        runLeitstandDevDeploy,
         runLeitstandPropagate,
         runLeitstandPromote,
         runLeitstandStatus,
@@ -28,33 +29,28 @@ export function createLeitstandModule(): KernelModule {
         runLeitstandHealth,
       } = await import("./leitstand-commands.ts");
       registry.registerCommand({
-        name: "leitstand.deploy",
+        name: "leitstand.dev-deploy",
         description:
-          "Deploy a published release to the dev channel with Axiom verification gate (RFC-0627). Flags: --release.",
+          "Deploy workpiece to dev channel with Axiom verification gate (RFC-0628). Flags: --system.",
         scope: "workspace",
         supportsAllSites: false,
-        mutatesState: true,
+        mutatesState: false,
         flags: {
-          release: {
+          system: {
             kind: "string",
             required: true,
-            description: "Published or dev-deployed release id.",
+            description: "Sternsystem id with an active mission.",
           },
         },
-        writes: [
-          "systems/registry.yaml",
-          "systems/{system}/bordbuch/events.ndjson",
-          "releases/{release}/release.yaml",
-          "missions/{mission}/evidence/axiom/**",
-        ],
-        reads: ["releases/{release}/**", "systems/registry.yaml"],
+        writes: ["missions/{mission}/evidence/axiom/**"],
+        reads: ["systems/registry.yaml", "missions/{mission}/workpiece/**"],
         cacheable: false,
-        execute: runLeitstandDeploy,
+        execute: runLeitstandDevDeploy,
       });
       registry.registerCommand({
         name: "leitstand.propagate",
         description:
-          "Deploy a dev-deployed release with verified Axiom evidence to the alt channel (RFC-0627). Flags: --release.",
+          "Deploy a published release with verified Axiom evidence to the alt channel (RFC-0628). Flags: --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -62,7 +58,8 @@ export function createLeitstandModule(): KernelModule {
           release: {
             kind: "string",
             required: true,
-            description: "Dev-deployed release id with verified Axiom evidence.",
+            description:
+              "Published release id with verified Axiom evidence (commitSha + missionId match).",
           },
         },
         writes: [
@@ -117,7 +114,7 @@ export function createLeitstandModule(): KernelModule {
       registry.registerCommand({
         name: "leitstand.rollback",
         description:
-          "Rollback to the previous published release; auto-detects channel from release state and auto-steps release state (RFC-0627). Flags: --system, [--to-release].",
+          "Rollback to the previous published release; auto-detects channel from release state and auto-steps release state (RFC-0628). Flags: --system, [--to-release].",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,

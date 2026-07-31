@@ -9,6 +9,7 @@
   <item>RFC-0357: initial release and behavior snapshot schemas.</item>
   <item>RFC-0608: extend releaseStateSchema with alt-deployed and promoted; add buildIdentitySchema.</item>
   <item>RFC-0627: add dev-deployed state (precedes alt-deployed in the three-channel deployment chain).</item>
+  <item>RFC-0628: remove dev-deployed state (workpiece-based dev deploy does not enter the release state machine).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,7 +20,6 @@ import { releaseArtifactRefSchema as artifactRefSchema } from "./artifact-store.
 export const releaseStateSchema = z.enum([
   "prepared",
   "published",
-  "dev-deployed",
   "alt-deployed",
   "promoted",
   "rolled-back",

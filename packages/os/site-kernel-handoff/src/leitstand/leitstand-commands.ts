@@ -13,6 +13,7 @@
   <item>RFC-0608: leitstand.propagate always deploys to alt (removes --channel); adds leitstand.promote for alt→main with build-identity verification; rollback transitions release state.</item>
   <item>RFC-0624: add post-deploy CDN cache purge step to propagate, promote, and rollback; record purgeResult in lastPropagated; display in status.</item>
   <item>RFC-0627: add dev channel, leitstand.deploy command, Axiom evidence gate in propagate, auto-step rollback.</item>
+  <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; remove dev-deployed state; propagate gate checks published + commitSha + missionId + errors===0; rollback auto-step removes dev-deployed.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -52,7 +53,9 @@ import {
 } from "./adapters/index.ts";
 import { collectPurgeUrls, purgeCacheByUrls, skippedPurgeResult } from "./cache-purge.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
-import { parse as parseYaml } from "yaml";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import { execSync } from "node:child_process";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -352,19 +355,15 @@ function buildLastPropagatedEntry(
   };
 }
 
-// §5.0: leitstand.deploy (RFC-0627: deploy to dev channel with Axiom verification gate)
-export interface LeitstandDeployData {
+// §5.0: leitstand.dev-deploy (RFC-0628: workpiece-based dev deploy with Axiom verification gate)
+export interface DevDeployResult {
+  command: "leitstand.dev-deploy";
   systemId: string;
-  releaseId: string;
-  channel: "dev";
-  state: "succeeded" | "failed" | "failed-stale" | "in-progress";
+  missionId: string;
+  commitSha: string;
+  buildState: "succeeded" | "failed";
+  deployState: "succeeded" | "failed" | "failed-stale" | "in-progress";
   deploymentUrl: string;
-  startedAt: string;
-  completedAt: string | null;
-  preflight: { passed: boolean; checks: PreflightCheck[] };
-  purgeResult?: PurgeResult;
-  health: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] };
-  releaseState: "dev-deployed";
   axiom: {
     status: "pass" | "fail" | "not-run";
     errors: number;
@@ -373,249 +372,219 @@ export interface LeitstandDeployData {
   };
 }
 
-export async function runLeitstandDeploy(
+export async function runLeitstandDevDeploy(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
-): Promise<KernelCommandResult<LeitstandDeployData>> {
+): Promise<KernelCommandResult<DevDeployResult>> {
   const { workspaceRoot, logger } = context;
-  const releaseId = flagString(input, "release");
-  if (!releaseId) throw new Error("[leitstand.deploy] --release is required");
+  const systemId = flagString(input, "system");
+  if (!systemId) throw new Error("[leitstand.dev-deploy] --system is required");
 
   const channel: Channel = "dev";
 
-  const releaseManifest = await readReleaseManifest(workspaceRoot, releaseId);
-  const releaseState = releaseManifest.state as string;
-  if (releaseState !== "published" && releaseState !== "dev-deployed") {
-    throw new Error(
-      `[leitstand.deploy] release '${releaseId}' must be in state 'published' or 'dev-deployed' (state: ${releaseState})`,
-    );
+  // Read registry to resolve currentMission and dev channel config
+  const registry = await readRegistry(workspaceRoot);
+  const entry = findEntry(registry, systemId);
+  if (!entry) {
+    throw new Error(`[leitstand.dev-deploy] system '${systemId}' not found in registry`);
   }
 
-  const systemId = releaseManifest.systemId as string;
-  const missionId = releaseManifest.missionId as string;
-  const operationId = generateOperationId();
+  const missionId = entry.currentMission as string | undefined;
+  if (!missionId) {
+    throw new Error(`[leitstand.dev-deploy] system '${systemId}' has no active mission`);
+  }
 
-  await acquireLock(
-    workspaceRoot,
-    `deployment:${systemId}`,
-    operationId,
-    "leitstand.deploy",
-    "agent",
-  );
+  const workpiecePath = path.join(workspaceRoot, "missions", missionId, "workpiece");
+  if (!existsSync(workpiecePath)) {
+    throw new Error(`[leitstand.dev-deploy] workpiece not found at '${workpiecePath}'`);
+  }
 
+  const dep = entry.deployment as DeploymentConfig;
+  if (!dep) {
+    throw new Error(`[leitstand.dev-deploy] system '${systemId}' has no deployment config`);
+  }
+
+  const channelConfig = getChannelConfig(dep, channel);
+  const adapter = resolveAdapter(dep.adapter);
+  const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
+
+  // Step 1: Build workpiece
+  logger.info(`[leitstand.dev-deploy] building workpiece at ${workpiecePath}...`);
+  let buildState: "succeeded" | "failed" = "succeeded";
   try {
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, systemId);
-    if (!entry) {
-      throw new Error(`[leitstand.deploy] system '${systemId}' not found in registry`);
-    }
-
-    const dep = entry.deployment as DeploymentConfig;
-    if (!dep) {
-      throw new Error(`[leitstand.deploy] system '${systemId}' has no deployment config`);
-    }
-
-    const channelConfig = getChannelConfig(dep, channel);
-    const adapter = resolveAdapter(dep.adapter);
-    const distPath = path.join(workspaceRoot, "releases", releaseId, "dist");
-    const serverDistPath = path.join(distPath, "server");
-    const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
-    const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
-
-    // Preflight
-    const preflightChecks = await runPreflight(
-      workspaceRoot,
-      releaseId,
-      dep,
-      channel,
-      channelConfig,
-      adapter,
-      missionId,
+    execSync("pnpm build", { cwd: workpiecePath, stdio: "pipe", timeout: 120_000 });
+  } catch (err) {
+    buildState = "failed";
+    logger.warn(
+      `[leitstand.dev-deploy] build failed: ${err instanceof Error ? err.message : String(err)}`,
     );
-    const preflightPassed = preflightChecks.every((c) => c.passed);
-    if (!preflightPassed) {
-      const failed = preflightChecks
-        .filter((c) => !c.passed)
-        .map((c) => c.name)
-        .join(", ");
-      throw new Error(`[leitstand.deploy] preflight failed: ${failed}`);
-    }
-
-    // Rehydrate dist from artifact store if missing
-    let effectiveDistPath = distPath;
-    if (!existsSync(distPath)) {
-      logger.info(`  Dist missing locally — rehydrating from artifact store...`);
-      const rehydrated = await artifactStoreRehydrate(workspaceRoot, releaseId, distPath);
-      effectiveDistPath = rehydrated.output;
-      logger.info(`  Rehydrated to ${effectiveDistPath}`);
-    }
-
-    logger.info(
-      `  Adapter: ${adapter.name}, channel: ${channel}, worker: ${channelConfig.workerName}`,
-    );
-
-    // Resolve workpiece node_modules/.bin for wrangler binary resolution
-    let nodeModulesBinPath: string | undefined;
-    if (missionId) {
-      const workpieceBin = path.join(
-        workspaceRoot,
-        "missions",
-        missionId,
-        "workpiece",
-        "node_modules",
-        ".bin",
-      );
-      if (existsSync(workpieceBin)) {
-        nodeModulesBinPath = workpieceBin;
-      }
-    }
-
-    const result = await adapter.propagate({
-      systemId,
-      releaseId,
-      channel,
-      distPath: existsSync(serverDistPath) ? effectiveServerDistPath : effectiveDistPath,
-      workerName: channelConfig.workerName,
-      url: channelConfig.url,
-      secretsFilePath,
-      expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
-      nodeModulesBinPath,
-    });
-
-    // RFC-0624: Purge CDN cache after deploy, before health check
-    const purgeResult = await runPurgeStep(
-      workspaceRoot,
-      releaseId,
-      channelConfig.url,
-      secretsFilePath,
-      logger,
-    );
-    if (purgeResult.success) {
-      await sleep(6_000);
-    }
-
-    // Run health verification after deploy
-    const healthResult = await adapter.health({
-      systemId,
-      channel,
-      deploymentUrl: channelConfig.url,
-      releaseId,
-      expectedBehaviorSnapshotHash: releaseManifest.behaviorSnapshotHash as string,
-      workspaceRoot,
-    });
-
-    const healthy = result.state === "succeeded" && healthResult.state === "healthy";
-
-    // Update registry — per-channel lastPropagated
-    if (!dep.lastPropagated) {
-      dep.lastPropagated = {};
-    }
-    dep.lastPropagated[channel] = buildLastPropagatedEntry(
-      releaseId,
-      result.state === "succeeded" ? "succeeded" : "failed",
-      healthy,
-      operationId,
-      purgeResult,
-    );
-    entry.deployment = dep;
-    await writeRegistry(workspaceRoot, registry);
-
-    // Transition release state to dev-deployed on success
-    if (result.state === "succeeded") {
-      releaseManifest.state = "dev-deployed";
-      await writeReleaseYaml(workspaceRoot, releaseId, releaseManifest);
-    }
-
-    // RFC-0627: Run Axiom verification gate via mission.check --external-preview
-    let axiomStatus: "pass" | "fail" | "not-run" = "not-run";
-    let axiomErrors = 0;
-    let axiomWarnings = 0;
-    let axiomExitCode = 0;
-
-    if (result.state === "succeeded" && missionId) {
-      try {
-        const { executeKernelCommand } = await import("@warpgogol/site-kernel");
-        const axiomResult = (await executeKernelCommand({
-          workspaceRoot,
-          commandName: "mission.check",
-          argv: [`--mission=${missionId}`, "--external-preview", `--base-url=${channelConfig.url}`],
-        })) as { exitCode?: number; data?: Record<string, unknown> };
-        axiomExitCode = axiomResult.exitCode ?? 0;
-        if (axiomExitCode === 0) {
-          axiomStatus = "pass";
-        } else {
-          axiomStatus = "fail";
-          const data = axiomResult.data;
-          if (data?.findings && typeof data.findings === "object") {
-            const findings = data.findings as { errors?: number; warnings?: number };
-            axiomErrors = findings.errors ?? 0;
-            axiomWarnings = findings.warnings ?? 0;
-          }
-        }
-        logger.info(
-          `[leitstand.deploy] Axiom gate: ${axiomStatus} (exit: ${axiomExitCode}, errors: ${axiomErrors}, warnings: ${axiomWarnings})`,
-        );
-      } catch (err) {
-        axiomStatus = "fail";
-        axiomExitCode = 2;
-        logger.warn(
-          `[leitstand.deploy] Axiom gate failed to run: ${err instanceof Error ? err.message : String(err)}`,
-        );
-      }
-    }
-
-    // Append Bordbuch
-    await appendBordbuchEntry(
-      workspaceRoot,
-      systemId,
-      "deployment",
-      `Release ${releaseId} deployed to ${channel} (Axiom: ${axiomStatus})`,
-      "agent",
-      {
-        writerRole: "leitstand",
-        metadata: {
-          releaseId,
-          channel,
-          state: result.state,
-          healthState: healthResult.state,
-          operationId,
-          axiom: { status: axiomStatus, errors: axiomErrors, warnings: axiomWarnings },
-        },
-      },
-    );
-
-    logger.success(
-      `[leitstand.deploy] ${releaseId} deployed to ${channel} (${result.state}, health: ${healthResult.state}, Axiom: ${axiomStatus})`,
-    );
-
     return {
       data: {
+        command: "leitstand.dev-deploy",
         systemId,
-        releaseId,
-        channel,
-        state: result.state,
-        deploymentUrl: result.deploymentUrl,
-        startedAt: result.startedAt,
-        completedAt: result.completedAt,
-        preflight: { passed: preflightPassed, checks: preflightChecks },
-        purgeResult,
-        health: { state: healthResult.state, checks: healthResult.checks },
-        releaseState: "dev-deployed",
-        axiom: {
-          status: axiomStatus,
-          errors: axiomErrors,
-          warnings: axiomWarnings,
-          exitCode: axiomExitCode,
-        },
+        missionId,
+        commitSha: "",
+        buildState: "failed",
+        deployState: "failed",
+        deploymentUrl: channelConfig.url,
+        axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0 },
       },
-      summary: `[leitstand.deploy] ${releaseId} deployed to ${channel} (${result.state}, health: ${healthResult.state}, Axiom: ${axiomStatus})`,
+      exitCode: 1,
+      summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
     };
-  } finally {
-    await releaseLock(workspaceRoot, `deployment:${systemId}`);
   }
+
+  const distPath = path.join(workpiecePath, "dist");
+  if (!existsSync(distPath)) {
+    return {
+      data: {
+        command: "leitstand.dev-deploy",
+        systemId,
+        missionId,
+        commitSha: "",
+        buildState: "failed",
+        deployState: "failed",
+        deploymentUrl: channelConfig.url,
+        axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0 },
+      },
+      exitCode: 1,
+      summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
+    };
+  }
+
+  // Step 2: Capture workpiece HEAD sha
+  let commitSha = "";
+  try {
+    commitSha = execSync("git rev-parse HEAD", {
+      cwd: workpiecePath,
+      encoding: "utf-8",
+      stdio: "pipe",
+    }).trim();
+  } catch {
+    logger.warn("[leitstand.dev-deploy] could not read workpiece HEAD sha");
+  }
+  logger.info(`[leitstand.dev-deploy] workpiece HEAD: ${commitSha}`);
+
+  // Step 3: Deploy to dev channel via adapter
+  const serverDistPath = path.join(distPath, "server");
+  const effectiveDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
+
+  // Resolve workpiece node_modules/.bin for wrangler binary resolution
+  let nodeModulesBinPath: string | undefined;
+  const workpieceBin = path.join(workpiecePath, "node_modules", ".bin");
+  if (existsSync(workpieceBin)) {
+    nodeModulesBinPath = workpieceBin;
+  }
+
+  const result = await adapter.propagate({
+    systemId,
+    releaseId: `workpiece-${missionId}`,
+    channel,
+    distPath: effectiveDistPath,
+    workerName: channelConfig.workerName,
+    url: channelConfig.url,
+    secretsFilePath,
+    expectedBehaviorSnapshotHash: "",
+    nodeModulesBinPath,
+  });
+
+  // Step 4: Purge CDN cache (RFC-0624)
+  const purgeResult = await runPurgeStep(
+    workspaceRoot,
+    `workpiece-${missionId}`,
+    channelConfig.url,
+    secretsFilePath,
+    logger,
+  );
+  if (purgeResult.success) {
+    await sleep(6_000);
+  }
+
+  // Step 5: Run Axiom verification gate via mission.check --external-preview
+  let axiomStatus: "pass" | "fail" | "not-run" = "not-run";
+  let axiomErrors = 0;
+  let axiomWarnings = 0;
+  let axiomExitCode = 0;
+
+  if (result.state === "succeeded") {
+    try {
+      const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+      const axiomResult = (await executeKernelCommand({
+        workspaceRoot,
+        commandName: "mission.check",
+        argv: [`--mission=${missionId}`, "--external-preview", `--base-url=${channelConfig.url}`],
+      })) as { exitCode?: number; data?: Record<string, unknown> };
+      axiomExitCode = axiomResult.exitCode ?? 0;
+      if (axiomExitCode === 0) {
+        axiomStatus = "pass";
+      } else {
+        axiomStatus = "fail";
+        const data = axiomResult.data;
+        if (data?.findings && typeof data.findings === "object") {
+          const findings = data.findings as { errors?: number; warnings?: number };
+          axiomErrors = findings.errors ?? 0;
+          axiomWarnings = findings.warnings ?? 0;
+        }
+      }
+      logger.info(
+        `[leitstand.dev-deploy] Axiom gate: ${axiomStatus} (exit: ${axiomExitCode}, errors: ${axiomErrors}, warnings: ${axiomWarnings})`,
+      );
+    } catch (err) {
+      axiomStatus = "fail";
+      axiomExitCode = 2;
+      logger.warn(
+        `[leitstand.dev-deploy] Axiom gate failed to run: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  // Step 6: Post-process evidence capsule with commitSha
+  if (result.state === "succeeded" && commitSha) {
+    const evidenceDir = path.join(workspaceRoot, "missions", missionId, "evidence", "axiom");
+    const capsulePath = path.join(evidenceDir, "evidence-capsule.yaml");
+    if (existsSync(capsulePath)) {
+      try {
+        const capsuleContent = await fs.readFile(capsulePath, "utf-8");
+        const capsule = parseYaml(capsuleContent) as Record<string, unknown>;
+        capsule.commitSha = commitSha;
+        const updatedYaml = stringifyYaml(capsule);
+        await writeFileIfChanged(capsulePath, updatedYaml + "\n");
+        logger.info(`[leitstand.dev-deploy] evidence capsule updated with commitSha: ${commitSha}`);
+      } catch (err) {
+        logger.warn(
+          `[leitstand.dev-deploy] failed to update evidence capsule: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+  }
+
+  // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
+  logger.success(
+    `[leitstand.dev-deploy] ${systemId} deployed to dev (${result.state}, Axiom: ${axiomStatus})`,
+  );
+
+  return {
+    data: {
+      command: "leitstand.dev-deploy",
+      systemId,
+      missionId,
+      commitSha,
+      buildState,
+      deployState: result.state,
+      deploymentUrl: result.deploymentUrl,
+      axiom: {
+        status: axiomStatus,
+        errors: axiomErrors,
+        warnings: axiomWarnings,
+        exitCode: axiomExitCode,
+      },
+    },
+    exitCode: axiomStatus === "fail" ? 1 : 0,
+    summary: `[leitstand.dev-deploy] ${systemId} deployed to dev (${result.state}, Axiom: ${axiomStatus})`,
+  };
 }
 
-// §5.1: leitstand.propagate (RFC-0627: requires dev-deployed + Axiom evidence gate)
+// §5.1: leitstand.propagate (RFC-0628: requires published + Axiom evidence gate with commitSha+missionId match)
 export interface LeitstandPropagateData {
   systemId: string;
   releaseId: string;
@@ -647,17 +616,52 @@ export async function runLeitstandPropagate(
   const channel: Channel = "alt";
 
   const releaseManifest = await readReleaseManifest(workspaceRoot, releaseId);
-  if (releaseManifest.state !== "dev-deployed") {
+  if (releaseManifest.state !== "published") {
     throw new Error(
-      `[leitstand.propagate] release '${releaseId}' must be in state 'dev-deployed' (state: ${releaseManifest.state}). Run leitstand.deploy first.`,
+      `[leitstand.propagate] release '${releaseId}' must be in state 'published' (state: ${releaseManifest.state}). Run leitstand.dev-deploy first, then release.publish.`,
     );
   }
 
   const systemId = releaseManifest.systemId as string;
   const missionId = releaseManifest.missionId as string;
+  const releaseCommitSha = releaseManifest.commitSha as string;
 
-  // RFC-0627: Axiom evidence gate — verify findings.yaml exists and has zero errors
-  const evidencePath = path.join(
+  // RFC-0628: Axiom evidence gate — verify evidence-capsule.yaml exists with matching missionId + commitSha
+  const capsulePath = path.join(
+    workspaceRoot,
+    "missions",
+    missionId,
+    "evidence",
+    "axiom",
+    "evidence-capsule.yaml",
+  );
+  if (!existsSync(capsulePath)) {
+    throw new Error(
+      `[leitstand.propagate] no Axiom evidence found for mission '${missionId}'. Run leitstand.dev-deploy first.`,
+    );
+  }
+
+  // Parse evidence-capsule.yaml for missionId + commitSha verification
+  const capsuleContent = await fs.readFile(capsulePath, "utf-8");
+  const capsule = parseYaml(capsuleContent) as {
+    missionId?: string;
+    commitSha?: string;
+  };
+
+  if (capsule.missionId && capsule.missionId !== missionId) {
+    throw new Error(
+      `[leitstand.propagate] evidence missionId '${capsule.missionId}' does not match release missionId '${missionId}'.`,
+    );
+  }
+
+  if (capsule.commitSha && releaseCommitSha && capsule.commitSha !== releaseCommitSha) {
+    throw new Error(
+      `[leitstand.propagate] evidence commitSha '${capsule.commitSha}' does not match release commitSha '${releaseCommitSha}' — re-run leitstand.dev-deploy after workpiece changes.`,
+    );
+  }
+
+  // RFC-0628: Verify findings.yaml exists and has zero errors
+  const findingsPath = path.join(
     workspaceRoot,
     "missions",
     missionId,
@@ -665,16 +669,14 @@ export async function runLeitstandPropagate(
     "axiom",
     "findings.yaml",
   );
-  if (!existsSync(evidencePath)) {
+  if (!existsSync(findingsPath)) {
     throw new Error(
-      `[leitstand.propagate] no Axiom evidence found for mission '${missionId}'. Run leitstand.deploy first.`,
+      `[leitstand.propagate] no Axiom findings found for mission '${missionId}'. Run leitstand.dev-deploy first.`,
     );
   }
 
-  // Parse findings.yaml
-  const findingsContent = await fs.readFile(evidencePath, "utf-8");
+  const findingsContent = await fs.readFile(findingsPath, "utf-8");
   const findings = parseYaml(findingsContent) as {
-    recordedAt?: string;
     summary?: { errors?: number; warnings?: number };
   };
 
@@ -689,19 +691,6 @@ export async function runLeitstandPropagate(
     throw new Error(
       `[leitstand.propagate] Axiom verification failed: ${axiomErrors} errors. Fix and re-deploy to dev.`,
     );
-  }
-
-  // Check evidence freshness: recordedAt must be >= release publishedAt
-  const publishedAt = releaseManifest.publishedAt as string | null;
-  const recordedAt = findings.recordedAt;
-  if (publishedAt && recordedAt) {
-    const recordedTime = new Date(recordedAt).getTime();
-    const publishedTime = new Date(publishedAt).getTime();
-    if (recordedTime < publishedTime) {
-      throw new Error(
-        `[leitstand.propagate] Axiom evidence is stale (recorded: ${recordedAt}, published: ${publishedAt}). Re-run leitstand.deploy for this release.`,
-      );
-    }
   }
 
   const operationId = generateOperationId();
@@ -1226,16 +1215,14 @@ export interface LeitstandRollbackData {
 function detectChannelFromState(releaseState: string): Channel {
   if (releaseState === "promoted") return "main";
   if (releaseState === "alt-deployed") return "alt";
-  if (releaseState === "dev-deployed") return "dev";
   throw new Error(
-    `[leitstand.rollback] cannot rollback release in state '${releaseState}' — expected 'promoted', 'alt-deployed', or 'dev-deployed'`,
+    `[leitstand.rollback] cannot rollback release in state '${releaseState}' — expected 'promoted' or 'alt-deployed'`,
   );
 }
 
 function autoStepReleaseState(currentState: string): string {
   if (currentState === "promoted") return "alt-deployed";
-  if (currentState === "alt-deployed") return "dev-deployed";
-  if (currentState === "dev-deployed") return "published";
+  if (currentState === "alt-deployed") return "published";
   return "published";
 }
 
