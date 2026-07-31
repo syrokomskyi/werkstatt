@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-07-31
 updatedAt: 2026-07-31
+enhancedAt: 2026-07-31
 implementedAt:
 closedAt:
 supersedes: []
@@ -47,6 +48,8 @@ commands:
   changed:
     - leitstand.propagate
     - leitstand.promote
+    - leitstand.rollback
+    - leitstand.status
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -60,6 +63,8 @@ nonGoals:
   - "Purge everything (zone-level) — only URL-level purge is supported"
   - "Changing health check content hash comparison logic"
   - "Changing RFC-0618 cache-buster for build-identity fetch"
+  - "Adaptive delay — fixed 6s delay only, no polling or dynamic wait"
+  - "Purging alt URLs during leitstand.promote — alt was already purged during leitstand.propagate"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -103,11 +108,17 @@ There is no post-deploy CDN cache purge mechanism in the Leitstand command flow.
 
 ## Decision
 
-The `leitstand.propagate` and `leitstand.promote` commands purge CDN cache by URL after `adapter.propagate` succeeds and before running health checks. The purge sends `POST /zones/{zoneId}/purge_cache` with `{"files": [...]}` containing all behavior snapshot route URLs plus `/.well-known/build-identity.json`. A fixed 6-second delay follows the purge to allow CDN propagation. Purge failures are non-blocking warnings — the command logs the error and continues to health check. The `CLOUDFLARE_ZONE_ID` env var is read from the existing secretsFile mechanism (same .env file that provides `CLOUDFLARE_API_TOKEN`).
+The `leitstand.propagate`, `leitstand.promote`, and `leitstand.rollback` commands purge CDN cache by URL after `adapter.propagate` (or `adapter.rollback`) succeeds and before running health checks (where applicable). The purge sends `POST /zones/{zoneId}/purge_cache` with `{"files": [...]}` containing all behavior snapshot route URLs plus `/.well-known/build-identity.json`. URLs are batched in chunks of max 30 per API call (Cloudflare limit). A fixed 6-second delay follows the purge to allow CDN propagation. Purge failures are non-blocking warnings — the command logs the error and continues to health check. The `CLOUDFLARE_ZONE_ID` env var is read from the existing secretsFile mechanism (same .env file that provides `CLOUDFLARE_API_TOKEN`).
+
+In `leitstand.promote`, the purge runs only before the **main** health check (after main deploy, step 5). The alt health check (step 3) runs against a deployment that was already purged during the prior `leitstand.propagate` call — no second alt purge is needed.
+
+`leitstand.rollback` also purges after `adapter.rollback` succeeds. Rollback deploys a previous release but does not run health checks; the purge ensures visitors see the rolled-back content immediately rather than waiting for natural cache expiry.
+
+The `purgeResult` (success/failure/skipped) is recorded in the per-channel `lastPropagated` registry entry and displayed by `leitstand.status`.
 
 ## Architectural fit
 
-- **DNA-49 (Fleet propagation):** This RFC completes the propagation contract by ensuring the CDN serves fresh content after deploy, enabling accurate health verification.
+- **DNA-49 (Fleet propagation):** This RFC does not modify DNA-49. The purge is an implementation detail of the existing health verification contract — DNA-49 states that health checks "bind the live site to the behavior snapshot" and the purge ensures that binding sees fresh content. No DNA-49 text update is needed.
 - **RFC-0358 / RFC-0379:** The Leitstand and cloudflare-workers adapter RFCs established the deploy + health check flow. This RFC inserts a purge step between deploy and health check.
 - **RFC-0608:** Enforced the alt-to-main promotion chain with build-identity verification. This RFC ensures route-level content verification also sees fresh content.
 - **RFC-0618:** Added cache-buster for build-identity fetch in `leitstand.promote`. This RFC complements it by purging route URLs so health check probes (which must NOT use cache-busters per RFC-0618) see fresh content.
@@ -123,6 +134,7 @@ No new commands. No new flags. The purge is internal to the leitstand command fl
 ```sh
 pnpm exec site-kernel run leitstand.propagate --release warpgogol-com-r000005
 pnpm exec site-kernel run leitstand.promote --release warpgogol-com-r000005
+pnpm exec site-kernel run leitstand.rollback --system warpgogol-com --channel main
 ```
 
 The operator observes new log lines:
@@ -131,6 +143,13 @@ The operator observes new log lines:
 [leitstand] Purging CDN cache for 15 URLs on zone abc123...
 [leitstand] CDN cache purged. Waiting 6s for propagation...
 [leitstand] Running health checks...
+```
+
+For rollback (no health check):
+
+```
+[leitstand] Purging CDN cache for 15 URLs on zone abc123...
+[leitstand] CDN cache purged. Visitors will see rolled-back content.
 ```
 
 ### TypeScript contracts
@@ -155,24 +174,23 @@ function collectPurgeUrls(
 ): string[]
 
 // Calls POST https://api.cloudflare.com/client/v4/zones/{zoneId}/purge_cache
+// Batches URLs internally in chunks of max 30 per API call.
+// Returns aggregated result across all batch calls.
 async function purgeCacheByUrls(
   input: PurgeInput,
 ): Promise<PurgeResult>
-
-// Orchestrates: deploy → purge → 6s delay → health check
-// Used by leitstand.propagate and leitstand.promote command handlers
-async function deployWithPurgeAndHealth(
-  ...
-): Promise<PropagationResult & { purgeResult?: PurgeResult }>
 ```
+
+The purge step is inlined directly in each command handler (`runLeitstandPropagate`, `runLeitstandPromote`, `runLeitstandRollback`) between `adapter.propagate` (or `adapter.rollback`) and `adapter.health` (where applicable). No shared orchestration function is introduced — the three handlers have different deploy flows (propagate: single deploy→health; promote: alt health→main deploy→main health; rollback: deploy only, no health) and inlining the purge step in each is simpler and clearer than abstracting over all three shapes.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Add purge step in `runLeitstandPropagate` and `runLeitstandPromote` after adapter.propagate, before health check |
-| `packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts` | New file: `collectPurgeUrls`, `purgeCacheByUrls` helpers |
-| `packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts` | New file: unit tests for purge URL collection and API call |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Add purge step in `runLeitstandPropagate`, `runLeitstandPromote`, and `runLeitstandRollback` after adapter.propagate/rollback, before health check (where applicable) |
+| `packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts` | New file: `collectPurgeUrls`, `purgeCacheByUrls` helpers with internal batching |
+| `packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts` | New file: unit tests for purge URL collection, batching, and API call |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Add Leitstand section bullet documenting purge step, placement, non-blocking behavior, `CLOUDFLARE_ZONE_ID` requirement |
 | `.env.example` | Add `CLOUDFLARE_ZONE_ID` with comment |
 
 ### Output format
@@ -196,6 +214,21 @@ The `--json` output gains a `purgeResult` field in the command result data:
 
 When purge fails, `purgeResult.success` is `false` with an `error` message, but `status` remains `"ok"` (non-blocking).
 
+When `CLOUDFLARE_ZONE_ID` is missing, `purgeResult` is `{ success: false, purgedUrls: 0, error: "CLOUDFLARE_ZONE_ID not set" }` and `status` remains `"ok"`.
+
+The `purgeResult` is also stored in the per-channel `lastPropagated` registry entry as `purgeResult`, and `leitstand.status` displays it:
+
+```json
+{
+  "channel": "main",
+  "lastPropagated": {
+    "releaseId": "warpgogol-com-r000005",
+    "healthy": true,
+    "purgeResult": { "success": true, "purgedUrls": 15 }
+  }
+}
+```
+
 ### Failure modes
 
 | Scenario | Behavior |
@@ -204,9 +237,10 @@ When purge fails, `purgeResult.success` is `false` with an `error` message, but 
 | Purge API returns 5xx | Non-blocking warning logged, health check proceeds with stale cache risk |
 | Purge API returns 4xx (auth, invalid zone) | Non-blocking warning logged, health check proceeds |
 | Network timeout on purge API | Non-blocking warning logged, health check proceeds |
-| `CLOUDFLARE_ZONE_ID` not set | Purge step skipped entirely, warning logged, health check proceeds |
+| `CLOUDFLARE_ZONE_ID` not set | Purge step skipped, warning logged, `purgeResult: { success: false, purgedUrls: 0 }` recorded, health check proceeds |
 | Behavior snapshot has no routes | Purge only `/.well-known/build-identity.json` |
 | 6s delay completes | Health check runs normally |
+| Rollback (no health check) | Purge runs after adapter.rollback, 6s delay skipped (no health check to wait for) |
 
 The purge is always non-blocking. The deploy already succeeded — purge failure means the health check might see stale cache, but the release is deployed. The operator can manually purge later if needed.
 
@@ -218,7 +252,8 @@ The purge is always non-blocking. The deploy already succeeded — purge failure
 - **New apps:** Automatically get purge on first deployment if `CLOUDFLARE_ZONE_ID` is set.
 - **`.env.example` update:** Add `CLOUDFLARE_ZONE_ID=` with a comment explaining how to obtain it (Cloudflare Dashboard → Overview → Zone ID).
 - **No deprecation:** This extends existing behavior, does not replace any command.
-- **Pipeline integration:** No changes to `build.check`. Purge is runtime-only, affecting `leitstand.propagate` and `leitstand.promote`.
+- **Pipeline integration:** No changes to `build.check`. Purge is runtime-only, affecting `leitstand.propagate`, `leitstand.promote`, and `leitstand.rollback`.
+- **Compass sync:** No `docs/*.xml` update needed. `CLOUDFLARE_ZONE_ID` is a deployment runtime secret read from the existing secretsFile mechanism, not a repository-wide requirement or technology declaration. It does not appear in `docs/technology.xml` or `docs/requirements.xml`.
 
 ## Alternatives considered
 
@@ -242,11 +277,15 @@ The purge is always non-blocking. The deploy already succeeded — purge failure
 - [ ] `collectPurgeUrls` helper implemented in `packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts`
 - [ ] `purgeCacheByUrls` helper implemented with URL batching (max 30 per API call)
 - [ ] `runLeitstandPropagate` calls purge after `adapter.propagate` succeeds, before health check
-- [ ] `runLeitstandPromote` calls purge after adapter deploy succeeds, before health check
-- [ ] 6-second delay between purge and health check
+- [ ] `runLeitstandPromote` calls purge after main `adapter.propagate` succeeds, before main health check (not before alt health check)
+- [ ] `runLeitstandRollback` calls purge after `adapter.rollback` succeeds (no health check follows)
+- [ ] 6-second delay between purge and health check (propagate and promote only; rollback has no health check)
 - [ ] Purge failure is non-blocking (warning logged, health check proceeds)
 - [ ] Missing `CLOUDFLARE_ZONE_ID` skips purge with warning
+- [ ] `purgeResult` recorded in per-channel `lastPropagated` registry entry
+- [ ] `leitstand.status` displays `purgeResult` per channel
 - [ ] `.env.example` updated with `CLOUDFLARE_ZONE_ID` entry
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with purge step documentation
 - [ ] Unit tests verify: URL collection, batching, non-blocking failure, missing zone ID skip
 - [ ] `rfc.validate` passes on this file before merging
 
@@ -257,8 +296,9 @@ The purge is always non-blocking. The deploy already succeeded — purge failure
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
 - The purge logic MUST be at the command level (leitstand-commands.ts), NOT in the cloudflare-workers adapter. Agents MUST NOT add purge logic to `adapter.propagate` or `adapter.rollback`.
+- In `leitstand.promote`, the purge MUST run only before the main health check (after main deploy). The alt health check (step 3) must NOT trigger a purge — alt was already purged during `leitstand.propagate`.
 - The `CLOUDFLARE_ZONE_ID` env var MUST be read from the existing secretsFile mechanism — agents MUST NOT add new registry fields or new env var patterns.
-- URL batching: Cloudflare purge API accepts max 30 URLs per call. Agents MUST batch URLs in chunks of 30 and make sequential API calls.
+- URL batching: Cloudflare purge API accepts max 30 URLs per call. Agents MUST batch URLs in chunks of 30 and make sequential API calls. Batching is internal to `purgeCacheByUrls` — the caller passes all URLs and the helper chunks them.
 - The 6-second delay MUST be a fixed `await sleep(6_000)` — agents MUST NOT make it configurable or adaptive.
 - Purge failures MUST be non-blocking warnings. Agents MUST NOT throw or return `state: "failed"` on purge failure.
 - Unit tests MUST mock `fetch` for the purge API call — agents MUST NOT make real API calls in tests.
