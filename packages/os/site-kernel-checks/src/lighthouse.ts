@@ -21,6 +21,11 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { collectFiles } from "@warpgogol/share/fs";
 import { getLineColumn } from "@warpgogol/share/text-position";
+import {
+  runPerformanceVitalsInstrument,
+  type PerformanceVitalsState,
+  toDeterministicContext,
+} from "@syrokomskyi/axiom-study";
 interface Finding {
   filePath: string;
   line: number;
@@ -314,7 +319,9 @@ async function readBudgetIgnorePatterns(appDirectory: string): Promise<string[]>
 export async function runLighthouseBudgetCheck(
   _input: KernelCommandInput,
   context: KernelRuntimeContext,
-): Promise<KernelCommandResult<{ totalSize: number; violations: number }>> {
+): Promise<
+  KernelCommandResult<{ totalSize: number; violations: number; instrumentRunId?: string }>
+> {
   const paths = requireAstroSitePaths(context);
   const distDir = join(paths.appDirectory, "dist");
 
@@ -368,8 +375,42 @@ export async function runLighthouseBudgetCheck(
 
   const totalSizeKb = totalSize / 1024;
 
+  // RFC-0016: call axiom-study performance-vitals instrument
+  let instrumentRunId: string | undefined;
+  try {
+    const instrumentCtx = toDeterministicContext({
+      origin: "build-time",
+      recordedAt: new Date().toISOString(),
+      missionId: "lighthouse.budget.check",
+      environment: {},
+    });
+    const states: PerformanceVitalsState[] = [
+      {
+        url: "https://build.local/",
+        locale: "de",
+        profileId: context.site?.name ?? "site",
+        logicalPath: "dist/",
+        lcp: 0,
+        cls: 0,
+        inp: 0,
+        fcp: 0,
+        tbt: 0,
+        resourceCount: jsFiles.length,
+        transferSize: totalSize,
+        renderBlockingResources: findings.map((f) => ({
+          url: f.filePath,
+          type: "script",
+        })),
+      },
+    ];
+    const instrumentResult = runPerformanceVitalsInstrument({ context: instrumentCtx, states });
+    instrumentRunId = instrumentResult.instrumentRun.instrumentRunId;
+  } catch {
+    // Instrument failure must not break the gate
+  }
+
   return {
-    data: { totalSize, violations },
+    data: { totalSize, violations, instrumentRunId },
     exitCode: violations > 0 ? 1 : 0,
     summary:
       violations === 0

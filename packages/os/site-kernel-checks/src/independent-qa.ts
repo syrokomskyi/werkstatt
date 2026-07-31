@@ -30,6 +30,11 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { RFC_DIR } from "@warpgogol/site-kernel";
+import {
+  runRuntimeFunctionalHealthInstrument,
+  type RuntimeHealthState,
+  toDeterministicContext,
+} from "@syrokomskyi/axiom-study";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -48,6 +53,7 @@ export interface IndependentQaResult {
   probeCount: number;
   executions: PageProbeExecution[];
   diagnostics: Diagnostic[];
+  instrumentRunId?: string;
 }
 
 // ─── Static server ───────────────────────────────────────────────────────────
@@ -390,6 +396,40 @@ export async function runIndependentQa(
     const failedCount = diagnostics.filter((d) => d.severity === "error").length;
     const status: IndependentQaResult["status"] = failedCount > 0 ? "fail" : "pass";
 
+    // RFC-0016: call axiom-study runtime-health instrument
+    let instrumentRunId: string | undefined;
+    if (executions.length > 0) {
+      try {
+        const instrumentCtx = toDeterministicContext({
+          origin: baseUrl,
+          recordedAt: new Date().toISOString(),
+          missionId: "qa.independent.run",
+          environment: {},
+        });
+        const states: RuntimeHealthState[] = executions.map((exec) => ({
+          url: `${baseUrl}${exec.probe.path}`,
+          locale: "de",
+          profileId: siteName,
+          logicalPath: exec.rfcId,
+          consoleErrors: exec.failures
+            .filter((f) => f.assertion === "console")
+            .map((f) => ({ type: "error" as const, text: f.actual })),
+          hydrationErrors: [],
+          brokenLinks: exec.failures
+            .filter((f) => f.assertion === "status")
+            .map((f) => ({ url: exec.probe.path, statusCode: parseInt(f.actual) || 500 })),
+          httpStatus: exec.ok ? 200 : 500,
+        }));
+        const instrumentResult = runRuntimeFunctionalHealthInstrument({
+          context: instrumentCtx,
+          states,
+        });
+        instrumentRunId = instrumentResult.instrumentRun.instrumentRunId;
+      } catch {
+        // Instrument failure must not break the gate
+      }
+    }
+
     return {
       data: {
         command: "qa.independent.run",
@@ -398,6 +438,7 @@ export async function runIndependentQa(
         probeCount: collected.length,
         executions,
         diagnostics,
+        instrumentRunId,
       },
       exitCode: failedCount > 0 ? 1 : 0,
       summary: `qa.independent.run: ${collected.length} probe(s), ${failedCount} failed`,

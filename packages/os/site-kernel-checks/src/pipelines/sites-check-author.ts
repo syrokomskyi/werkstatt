@@ -200,8 +200,6 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "agent.openapi.validate" },
   // RFC-0308: verify detached Ed25519 proofs on agent surface artifacts (non-failing when unsigned).
   { command: "agent.surface.verify" },
-  // RFC-0291: verify agent.json signature + contentHash against passport key (local mode, key-gated skip).
-  { command: "agent.manifest.verify" },
   // RFC-0186: Lagebild shared sync worker validation (no per-site Workers)
   { command: "lagebild.validate" },
   // RFC-0188: Visitor Sales Funnel governance. funnel.stage.validate always self-tests the

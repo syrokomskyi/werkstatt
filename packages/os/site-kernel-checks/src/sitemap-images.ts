@@ -35,6 +35,11 @@ import {
 } from "@warpgogol/share/semantic";
 import { passResult, failResult, resultFromViolations } from "./result-helpers.ts";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
+import {
+  runSeoTechnicalRuntimeInstrument,
+  type SeoRuntimeState,
+  toDeterministicContext,
+} from "@syrokomskyi/axiom-study";
 
 const IMAGE_SITEMAP_FILENAME = "sitemap-images.xml";
 
@@ -194,11 +199,45 @@ export async function runSitemapImagesValidate(
     }
   }
 
-  if (violations.length === 0) {
-    return passResult(
-      "dist.sitemap.images.validate",
-      `dist.sitemap.images.validate: OK — ${entries.length} content image(s) across ${htmlFiles.length} page(s)`,
-    );
+  // RFC-0016: call axiom-study seo-runtime instrument
+  let instrumentRunId: string | undefined;
+  if (entries.length > 0) {
+    try {
+      const instrumentCtx = toDeterministicContext({
+        origin: "build-time",
+        recordedAt: new Date().toISOString(),
+        missionId: "dist.sitemap.images.validate",
+        environment: {},
+      });
+      const states: SeoRuntimeState[] = entries.map((entry) => ({
+        url: entry.loc,
+        locale: "de",
+        profileId: context.site?.name ?? "site",
+        logicalPath: entry.loc,
+        title: entry.title ?? "untitled",
+        jsonLd: [],
+        ogTags: {},
+        sitemapUrls: entries.map((e) => e.loc),
+        renderedUrl: entry.loc,
+      }));
+      const instrumentResult = runSeoTechnicalRuntimeInstrument({ context: instrumentCtx, states });
+      instrumentRunId = instrumentResult.instrumentRun.instrumentRunId;
+    } catch {
+      // Instrument failure must not break the gate
+    }
   }
-  return resultFromViolations("dist.sitemap.images.validate", violations);
+
+  const baseResult =
+    violations.length === 0
+      ? passResult(
+          "dist.sitemap.images.validate",
+          `dist.sitemap.images.validate: OK — ${entries.length} content image(s) across ${htmlFiles.length} page(s)`,
+        )
+      : resultFromViolations("dist.sitemap.images.validate", violations);
+
+  if (instrumentRunId && baseResult.data) {
+    (baseResult.data as unknown as Record<string, unknown>).instrumentRunId = instrumentRunId;
+  }
+
+  return baseResult;
 }

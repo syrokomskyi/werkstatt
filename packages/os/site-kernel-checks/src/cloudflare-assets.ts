@@ -28,6 +28,11 @@ import type {
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { fileExists } from "./lib/file-exists.ts";
 import { collectFiles } from "@warpgogol/share/fs";
+import {
+  runRuntimeFunctionalHealthInstrument,
+  type RuntimeHealthState,
+  toDeterministicContext,
+} from "@syrokomskyi/axiom-study";
 
 /** Matches an `_astro/<file>.<imgext>` origin path anywhere (after any /cdn-cgi/image/ prefix). */
 const ASTRO_ASSET_RE = /_astro\/[A-Za-z0-9._-]+\.(?:webp|avif|jpg|jpeg|png|gif|svg)/gi;
@@ -79,6 +84,39 @@ export async function runCloudflareAssetsValidate(
     }
   }
 
+  // RFC-0016: call axiom-study runtime-health instrument
+  let instrumentRunId: string | undefined;
+  try {
+    const instrumentCtx = toDeterministicContext({
+      origin: "build-time",
+      recordedAt: new Date().toISOString(),
+      missionId: "cloudflare.assets.validate",
+      environment: {},
+    });
+    const states: RuntimeHealthState[] = [
+      {
+        url: "https://build.local/",
+        locale: "de",
+        profileId: ctx.site?.name ?? "site",
+        logicalPath: "dist/client/",
+        consoleErrors: [],
+        hydrationErrors: [],
+        brokenLinks: [...missing.keys()].map((origin) => ({
+          url: `/${origin}`,
+          statusCode: 404,
+        })),
+        httpStatus: 200,
+      },
+    ];
+    const instrumentResult = runRuntimeFunctionalHealthInstrument({
+      context: instrumentCtx,
+      states,
+    });
+    instrumentRunId = instrumentResult.instrumentRun.instrumentRunId;
+  } catch {
+    // Instrument failure must not break the gate
+  }
+
   if (missing.size > 0) {
     const violations = [...missing.entries()].map(
       ([origin, files]) =>
@@ -87,14 +125,20 @@ export async function runCloudflareAssetsValidate(
         })`,
     );
     return {
-      data: { command, status: "fail", violations, checkedReferences: references },
+      data: { command, status: "fail", violations, checkedReferences: references, instrumentRunId },
       exitCode: 1,
       summary: `${command}: ${missing.size} missing /_astro asset(s)`,
     };
   }
 
   return {
-    data: { command, status: "pass", violations: [], checkedReferences: references },
+    data: {
+      command,
+      status: "pass",
+      violations: [],
+      checkedReferences: references,
+      instrumentRunId,
+    },
     exitCode: 0,
     summary: `${command}: OK (${references} refs across ${htmlFiles.length} pages)`,
   };

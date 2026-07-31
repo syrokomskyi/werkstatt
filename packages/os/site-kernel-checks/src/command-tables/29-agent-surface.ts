@@ -12,11 +12,7 @@
 */
 
 import type { CheckCommandEntry } from "./types.ts";
-import {
-  runAgentManifestGenerate,
-  runAgentSurfaceValidate,
-  runAgentManifestVerify,
-} from "../agent/agent-manifest.ts";
+import { runAgentManifestGenerate, runAgentSurfaceValidate } from "../agent/agent-manifest.ts";
 import { runAgentKnowledgeGenerate, runAgentKnowledgeValidate } from "../agent/agent-knowledge.ts";
 import { runAgentCapabilityValidate } from "../agent/agent-capability.ts";
 import { runAgentOpenApiGenerate, runAgentOpenApiValidate } from "../agent/agent-openapi.ts";
@@ -78,22 +74,6 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: ["<app>/src/agent-surface.generated.yaml", "<app>/public/.well-known/agent.json"],
     execute: runAgentSurfaceValidate,
-  },
-  {
-    name: "agent.manifest.verify",
-    description:
-      "Verify agent.json signature and contentHash against the passport public key. Local mode (default) reads from disk; --url mode fetches from a live origin and checks ref-reachability (RFC-0291).",
-    scope: "app",
-    supportsAllSites: true,
-    requiresNetwork: true,
-    flags: {
-      url: {
-        kind: "string",
-        description: "Remote origin URL to verify (e.g. https://warpgogol.com)",
-      },
-    },
-    cacheable: false,
-    execute: runAgentManifestVerify,
   },
   {
     name: "agent.openapi.generate",

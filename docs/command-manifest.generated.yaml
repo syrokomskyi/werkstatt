@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 7442c84532257685d9268a0628bca78765596a517a969c06358ad9dfb0d95f80
+  contentHash: c8ce26110ad7149f12438c2ae4fd4471e654b5a52493f67bc483f0cc50fe8a04
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -219,23 +219,6 @@ commands:
     writes:
       - <app>/src/agent-surface.generated.yaml
       - <app>/public/.well-known/agent.json
-    pipelines: []
-  - name: agent.manifest.verify
-    description: Verify agent.json signature and contentHash against the passport
-      public key. Local mode (default) reads from disk; --url mode fetches from
-      a live origin and checks ref-reachability (RFC-0291).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: true
-    timeoutMs: null
-    flags:
-      url:
-        kind: string
-        description: Remote origin URL to verify (e.g. https://warpgogol.com)
-    reads: []
-    writes: []
     pipelines: []
   - name: agent.openapi.generate
     description: Generate the OpenAPI 3.1 projection of the Agent Surface Manifest
@@ -1444,6 +1427,26 @@ commands:
       - systems/{system}/bordbuch/events.ndjson
     writes:
       - systems/{system}/bordbuch/events.ndjson
+    pipelines: []
+  - name: bordbuch.commit
+    description: Auto-commit dirty bordbuch projection files in the cache clone
+      (RFC-0626). Internal pipeline step.
+    scope: workspace
+    provider: workspace
+    module: bordbuch
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Sternsystem id. Defaults to the site name when running in a
+          site-scoped pipeline.
+    reads:
+      - systems/{system}/public/.well-known/bordbuch.json
+      - systems/{system}/public/.well-known/bordbuch/index.html
+      - systems/{system}/bordbuch/status.generated.yaml
+    writes: []
     pipelines: []
   - name: bordbuch.generate
     description: Generate rich public Bordbuch projections (JSON + HTML + YAML) from
@@ -3355,22 +3358,6 @@ commands:
       - .werkstatt/artifacts/platform/current
       - .werkstatt/artifacts/platform/previous
       - .werkstatt/artifacts/platform/{hash}/manifest.json
-    writes: []
-    pipelines: []
-  - name: deploy.surface.parity.validate
-    description: Compare deployed sitemap with the generated local sitemap when
-      --base-url is supplied; skips offline by default (RFC-0318).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: true
-    timeoutMs: null
-    flags:
-      base-url:
-        kind: string
-        description: Deployed origin URL to compare against the local generated sitemap.
-    reads: []
     writes: []
     pipelines: []
   - name: dht.capacity.publish
@@ -5287,22 +5274,6 @@ commands:
     reads:
       - <app>/src/content/system.md
       - <app>/src/content/**/*.md
-    writes: []
-    pipelines: []
-  - name: headers.runtime.probe
-    description: Probe deployed HTTP security headers when --base-url is supplied;
-      skips offline by default (RFC-0315).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: true
-    timeoutMs: null
-    flags:
-      base-url:
-        kind: string
-        description: Deployed origin URL to probe for runtime headers.
-    reads: []
     writes: []
     pipelines: []
   - name: headers.security.generate
@@ -8381,22 +8352,6 @@ commands:
     flags: {}
     reads:
       - <app>/public/**
-    writes: []
-    pipelines: []
-  - name: public.runtime.probe
-    description: Probe deployed public artifact endpoints when --base-url is
-      supplied; skips offline by default (RFC-0307).
-    scope: app
-    provider: workspace
-    module: check
-    mutatesState: false
-    requiresNetwork: true
-    timeoutMs: null
-    flags:
-      base-url:
-        kind: string
-        description: Deployed origin URL to probe, e.g. https://example.com.
-    reads: []
     writes: []
     pipelines: []
   - name: public.surface.lint

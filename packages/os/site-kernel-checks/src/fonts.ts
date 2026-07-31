@@ -24,9 +24,14 @@ import type {
 } from "@warpgogol/site-kernel";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { createRequire } from "node:module";
 import { collectFiles } from "@warpgogol/share/fs";
+import {
+  runSeoTechnicalRuntimeInstrument,
+  type SeoRuntimeState,
+  toDeterministicContext,
+} from "@syrokomskyi/axiom-study";
 
 const EXTERNAL_FONT_ORIGIN =
   /(fonts\.googleapis\.com|fonts\.gstatic\.com|use\.typekit\.net|fonts\.bunny\.net)/i;
@@ -189,11 +194,48 @@ export async function runFontsOriginValidate(
   const violations: Array<{ file: string; match: string }> = [];
 
   const htmlFiles = await collectFiles(distDir, { extensions: [".html"], ignore: () => false });
+  const seoStates: SeoRuntimeState[] = [];
   for (const abs of htmlFiles) {
     const html = await readFile(abs, "utf8");
     const match = html.match(EXTERNAL_FONT_ORIGIN);
     if (match) {
       violations.push({ file: abs, match: match[0] });
+    }
+    const relPath = relative(app.directory, abs).replace(/\\/g, "/");
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const langMatch = html.match(/<html[^>]*\slang=["']([^"']+)["']/i);
+    const canonicalMatch = html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+    seoStates.push({
+      url: `https://build.local/${relPath}`,
+      locale: langMatch?.[1] ?? "de",
+      profileId: app.name ?? "site",
+      logicalPath: relPath,
+      title: titleMatch?.[1] ?? "untitled",
+      jsonLd: [],
+      ogTags: {},
+      sitemapUrls: [],
+      renderedUrl: `https://build.local/${relPath}`,
+      ...(canonicalMatch?.[1] ? { canonicalUrl: canonicalMatch[1] } : {}),
+    });
+  }
+
+  // RFC-0016: call axiom-study seo-runtime instrument
+  let instrumentRunId: string | undefined;
+  if (seoStates.length > 0) {
+    try {
+      const instrumentCtx = toDeterministicContext({
+        origin: "build-time",
+        recordedAt: new Date().toISOString(),
+        missionId: "fonts.origin.validate",
+        environment: {},
+      });
+      const instrumentResult = runSeoTechnicalRuntimeInstrument({
+        context: instrumentCtx,
+        states: seoStates,
+      });
+      instrumentRunId = instrumentResult.instrumentRun.instrumentRunId;
+    } catch {
+      // Instrument failure must not break the gate
     }
   }
 
@@ -201,12 +243,12 @@ export async function runFontsOriginValidate(
     return {
       exitCode: 0,
       summary: "fonts.origin.validate: ok (no external font origins in dist)",
-      data: { violations: [] },
+      data: { violations: [], instrumentRunId },
     };
   }
   return {
     exitCode: 1,
     summary: `fonts.origin.validate: ${violations.length} external font reference(s) found`,
-    data: { violations },
+    data: { violations, instrumentRunId },
   };
 }

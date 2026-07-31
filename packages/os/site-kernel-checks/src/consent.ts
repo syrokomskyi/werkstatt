@@ -16,7 +16,7 @@ processor/recipient disclosure + a DPA reference in the Datenschutz/Privacy Poli
 </CHANGE_SUMMARY>
 */
 
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { readFile, readdir } from "node:fs/promises";
 import type {
   KernelCommandInput,
@@ -28,6 +28,11 @@ import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { passResult, resultFromViolations } from "./result-helpers.ts";
 import { collectFiles } from "@warpgogol/share/fs";
 import { chatAdapterVendorOrigins } from "@warpgogol/chat";
+import {
+  runPrivacyConsentComplianceInstrument,
+  type PrivacyConsentState,
+  toDeterministicContext,
+} from "@syrokomskyi/axiom-study";
 
 interface IntegrationsConfig {
   chat?: { adapter?: string; options?: Record<string, string> };
@@ -120,12 +125,53 @@ export async function runConsentActivationValidate(
     }
   }
 
-  return violations.length === 0
-    ? passResult(
-        "consent.activation.validate",
-        `consent.activation.validate: ok (no pre-activation ${adapter} origin in dist)`,
-      )
-    : resultFromViolations("consent.activation.validate", violations);
+  // RFC-0016: call axiom-study privacy-consent instrument
+  let instrumentRunId: string | undefined;
+  if (htmlFiles.length > 0) {
+    try {
+      const instrumentCtx = toDeterministicContext({
+        origin: "build-time",
+        recordedAt: new Date().toISOString(),
+        missionId: "consent.activation.validate",
+        environment: {},
+      });
+      const states: PrivacyConsentState[] = htmlFiles.map((abs) => {
+        const relPath = relative(appDir, abs).replace(/\\/g, "/");
+        return {
+          url: `https://build.local/${relPath}`,
+          locale: "de",
+          profileId: adapter ?? "site",
+          logicalPath: relPath,
+          hasConsentBanner: true,
+          thirdPartyRequestsBeforeConsent: violations
+            .filter((v) => v.includes(abs))
+            .map(() => ({ domain: origins[0] ?? "unknown", type: "resource" })),
+          blockingScriptsBeforeConsent: [],
+        };
+      });
+      const instrumentResult = runPrivacyConsentComplianceInstrument({
+        context: instrumentCtx,
+        states,
+      });
+      instrumentRunId = instrumentResult.instrumentRun.instrumentRunId;
+    } catch {
+      // Instrument failure must not break the gate
+    }
+  }
+
+  const baseResult =
+    violations.length === 0
+      ? passResult(
+          "consent.activation.validate",
+          `consent.activation.validate: ok (no pre-activation ${adapter} origin in dist)`,
+        )
+      : resultFromViolations("consent.activation.validate", violations);
+
+  if (instrumentRunId && baseResult.data) {
+    (baseResult.data as unknown as Record<string, unknown>).instrumentRunId = instrumentRunId;
+  }
+
+  return baseResult;
 }
 
 // ---------------------------------------------------------------------------

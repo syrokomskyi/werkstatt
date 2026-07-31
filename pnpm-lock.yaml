@@ -739,6 +739,12 @@ importers:
       '@astrojs/compiler':
         specifier: ^4.0.0
         version: 4.0.0
+      '@syrokomskyi/axiom-capture':
+        specifier: link:../../../../pipelines/packages/axiom/axiom-capture
+        version: link:../../../../pipelines/packages/axiom/axiom-capture
+      '@syrokomskyi/axiom-study':
+        specifier: link:../../../../pipelines/packages/axiom/axiom-study
+        version: link:../../../../pipelines/packages/axiom/axiom-study
       '@warpgogol/agent-gate':
         specifier: workspace:*
         version: link:../../agent-gate

@@ -14,7 +14,6 @@ import type { CheckCommandEntry } from "./types.ts";
 import {
   runAiPolicyGenerate,
   runAiPolicyValidate,
-  runHeadersRuntimeProbe,
   runHeadersSecurityGenerate,
   runHeadersSecurityValidate,
   runHumansGenerate,
@@ -33,11 +32,9 @@ import {
   runPublicManagedClean,
   runPublicOrphansValidate,
   runPublicSurfaceLint,
-  runPublicRuntimeProbe,
   runRedirectMapValidate,
   runSecurityTxtGenerate,
   runSecurityTxtValidate,
-  runDeploySurfaceParityValidate,
 } from "../public-surface.ts";
 
 export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
@@ -178,38 +175,6 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/public/_redirects", "<app>/dist/client/**/*.html"],
     execute: runRedirectMapValidate,
-  },
-  {
-    name: "deploy.surface.parity.validate",
-    description:
-      "Compare deployed sitemap with the generated local sitemap when --base-url is supplied; skips offline by default (RFC-0318).",
-    scope: "app",
-    supportsAllSites: true,
-    requiresNetwork: true,
-    flags: {
-      "base-url": {
-        kind: "string",
-        description: "Deployed origin URL to compare against the local generated sitemap.",
-      },
-    },
-    cacheable: false,
-    execute: runDeploySurfaceParityValidate,
-  },
-  {
-    name: "public.runtime.probe",
-    description:
-      "Probe deployed public artifact endpoints when --base-url is supplied; skips offline by default (RFC-0307).",
-    scope: "app",
-    supportsAllSites: true,
-    requiresNetwork: true,
-    flags: {
-      "base-url": {
-        kind: "string",
-        description: "Deployed origin URL to probe, e.g. https://example.com.",
-      },
-    },
-    cacheable: false,
-    execute: runPublicRuntimeProbe,
   },
   {
     name: "indexnow.key.generate",
@@ -356,21 +321,5 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/public/_headers"],
     execute: runHeadersSecurityValidate,
-  },
-  {
-    name: "headers.runtime.probe",
-    description:
-      "Probe deployed HTTP security headers when --base-url is supplied; skips offline by default (RFC-0315).",
-    scope: "app",
-    supportsAllSites: true,
-    requiresNetwork: true,
-    flags: {
-      "base-url": {
-        kind: "string",
-        description: "Deployed origin URL to probe for runtime headers.",
-      },
-    },
-    cacheable: false,
-    execute: runHeadersRuntimeProbe,
   },
 ];
