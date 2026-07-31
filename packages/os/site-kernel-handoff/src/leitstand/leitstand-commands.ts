@@ -155,21 +155,15 @@ async function runPurgeStep(
   const routes = snapshot?.routes ?? [];
   const urls = collectPurgeUrls(deploymentUrl, routes);
 
-  logger.info(`[leitstand] Purging CDN cache for ${urls.length} URLs on zone ${zoneId}...`);
+  logger.info(`[leitstand] Purging CDN cache for ${urls.length} URLs...`);
 
-  try {
-    const result = await purgeCacheByUrls(zoneId, apiToken, urls);
-    if (result.success) {
-      logger.success(`[leitstand] CDN cache purged (${result.purgedUrls} URLs)`);
-    } else {
-      logger.warn(`[leitstand] CDN cache purge failed: ${result.error}`);
-    }
-    return result;
-  } catch (err) {
-    const error = err instanceof Error ? err.message : String(err);
-    logger.warn(`[leitstand] CDN cache purge error: ${error}`);
-    return { success: false, purgedUrls: 0, error };
+  const result = await purgeCacheByUrls(zoneId, apiToken, urls);
+  if (result.success) {
+    logger.success(`[leitstand] CDN cache purged (${result.purgedUrls} URLs)`);
+  } else {
+    logger.warn(`[leitstand] CDN cache purge failed: ${result.error}`);
   }
+  return result;
 }
 
 interface PreflightCheck {
