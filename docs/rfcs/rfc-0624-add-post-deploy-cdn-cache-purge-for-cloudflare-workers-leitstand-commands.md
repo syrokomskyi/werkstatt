@@ -275,20 +275,20 @@ The purge is always non-blocking. The deploy already succeeded — purge failure
 
 ## Acceptance criteria
 
-- [ ] `collectPurgeUrls` helper implemented in `packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts`
-- [ ] `purgeCacheByUrls` helper implemented with URL batching (max 30 per API call)
-- [ ] `runLeitstandPropagate` calls purge after `adapter.propagate` succeeds, before health check
-- [ ] `runLeitstandPromote` calls purge after main `adapter.propagate` succeeds, before main health check (not before alt health check)
-- [ ] `runLeitstandRollback` calls purge after `adapter.rollback` succeeds (no health check follows)
-- [ ] 6-second delay between purge and health check (propagate and promote only; rollback has no health check)
-- [ ] Purge failure is non-blocking (warning logged, health check proceeds)
-- [ ] Missing `CLOUDFLARE_ZONE_ID` skips purge with warning
-- [ ] `purgeResult` recorded in per-channel `lastPropagated` registry entry
-- [ ] `leitstand.status` displays `purgeResult` per channel
-- [ ] `.env.example` updated with `CLOUDFLARE_ZONE_ID` entry
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with purge step documentation
-- [ ] Unit tests verify: URL collection, batching, non-blocking failure, missing zone ID skip
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `collectPurgeUrls` helper implemented in `packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts` (evidence: packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts:19)
+- [x] `purgeCacheByUrls` helper implemented with URL batching (max 30 per API call) (evidence: packages/os/site-kernel-handoff/src/leitstand/cache-purge.ts:26, packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts:46)
+- [x] `runLeitstandPropagate` calls purge after `adapter.propagate` succeeds, before health check (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:487-498)
+- [x] `runLeitstandPromote` calls purge after main `adapter.propagate` succeeds, before main health check (not before alt health check) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:728-740)
+- [x] `runLeitstandRollback` calls purge after `adapter.rollback` succeeds (no health check follows) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1000-1010)
+- [x] 6-second delay between purge and health check (propagate and promote only; rollback has no health check) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:496, packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:737)
+- [x] Purge failure is non-blocking (warning logged, health check proceeds) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:160-166, packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts:92)
+- [x] Missing `CLOUDFLARE_ZONE_ID` skips purge with warning (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:145-147, packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts:127)
+- [x] `purgeResult` recorded in per-channel `lastPropagated` registry entry (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:345-354, packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:520)
+- [x] `leitstand.status` displays `purgeResult` per channel (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:862, packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:876-879)
+- [x] `.env.example` updated with `CLOUDFLARE_ZONE_ID` entry (evidence: .env.example:13-15)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated with purge step documentation (evidence: packages/os/site-kernel-handoff/AGENTS.md:48)
+- [x] Unit tests verify: URL collection, batching, non-blocking failure, missing zone ID skip (evidence: packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts:19, packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts:46, packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts:92, packages/os/site-kernel-handoff/src/tests/cache-purge.test.ts:127)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0624 --json exit 0)
 
 ## Implementation notes for agents
 
