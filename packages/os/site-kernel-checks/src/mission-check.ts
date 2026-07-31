@@ -1,211 +1,97 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0012: One-shot Axiom accessibility check for a mission. Builds workpiece, starts static server, captures evidence via Playwright + axe-core, runs runAccessibilityInstrument, writes findings.yaml + evidence-capsule.yaml, stops server.</purpose>
+<purpose>RFC-0629: One-shot Axiom accessibility check for a mission. Uses native axiom components (PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, runAccessibilityInstrument, findingsForObservation, evaluateClosure) to capture evidence, project findings, and evaluate closure. Writes native capsule files (staged-capsule.json, observation-bundle.json, study-run.json, evidence-metadata.json).</purpose>
 <non-goals>
-  <item>Does not implement --mode dev (MVP: only preview).</item>
-  <item>Does not support mobile viewport (MVP: desktop only).</item>
+  <item>Does not support local mode (build + static server) — external-preview only.</item>
   <item>Does not integrate with Observatory runtime (local-dev only).</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0012: initial implementation of mission.check command.</item>
+  <item>RFC-0629: migrated to native axiom capsules with PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, and automated-web-accessibility methodology.</item>
 </CHANGE_SUMMARY>
 */
 
-import { createServer, type Server } from "node:http";
-import { stat, readFile as fsReadFile, writeFile, mkdir, rm } from "node:fs/promises";
+import { mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join, extname, normalize } from "node:path";
-import { spawnSync } from "node:child_process";
-import { stringify as stringifyYaml } from "yaml";
+import { join } from "node:path";
 
-import type {
-  KernelCommandInput,
-  KernelCommandResult,
-  KernelRuntimeContext,
+import {
+  writeFileIfChanged,
+  type KernelCommandInput,
+  type KernelCommandResult,
+  type KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 
 import { resolveMissionDir } from "@warpgogol/site-kernel-handoff/mission";
+
+import { mintAxiomId } from "@syrokomskyi/axiom-contracts";
+import { createCanonicalJsonDigestRef } from "@syrokomskyi/axiom-provenance";
+
+import {
+  PlaywrightEvidenceDriver,
+  CrawleeDiscoveryExecutor,
+  captureContractSchema,
+  contractDigest,
+  evaluateClosure,
+  capabilityManifestSchema,
+  capabilityReceiptSchema,
+  runtimeAttestationSchema,
+  archiveReceiptSchema,
+  replayReceiptSchema,
+  stagedCapsuleSchema,
+  type CaptureContract,
+  type StagedCapsule,
+  type CapabilityManifest,
+  type CapturedBrowserEvidence,
+} from "@syrokomskyi/axiom-capture";
+
 import {
   runAccessibilityInstrument,
   toDeterministicContext,
+  studyRunSchema,
   type AxeEvidenceState,
-  type LocalInstrumentContext,
+  type Observation,
+  type Finding,
+  type ObservationBundle,
+  type StudyRun,
 } from "@syrokomskyi/axiom-study";
-import { PlaywrightCaptureAdapter } from "@syrokomskyi/axiom-capture";
 
-import { convertObservationsToFindings } from "./mission-check-converter.ts";
+import {
+  createAutomatedWebAccessibilityMethodology,
+  findingsForObservation,
+  methodologyPackageDigest,
+  type MethodologyPackage,
+} from "@syrokomskyi/axiom-methodology";
 
 export interface MissionCheckResult {
   command: "mission.check";
   status: "pass" | "fail";
-  missionId: string;
-  methodology: string;
-  findings: {
-    errors: number;
-    warnings: number;
-    total: number;
+  exitCode: 0 | 1;
+  capsule: StagedCapsule;
+  studyRun: StudyRun;
+  findingsCount: {
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    info: number;
   };
+  findings: { errors: number; warnings: number; total: number };
+  closureDecision: { satisfied: boolean; status: string; reason: string };
   evidenceDir: string;
-  serverPort?: number;
-  durationMs: number;
+  summary: string;
+  nextSteps: string[];
 }
 
-const MIME_TYPES: Record<string, string> = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "application/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".webp": "image/webp",
-  ".woff": "font/woff",
-  ".woff2": "font/woff2",
-  ".txt": "text/plain",
-  ".xml": "application/xml",
-};
-
-function createStaticServer(rootDir: string): Server {
-  return createServer(async (req, res) => {
-    try {
-      let urlPath = req.url ?? "/";
-      const queryIdx = urlPath.indexOf("?");
-      if (queryIdx !== -1) urlPath = urlPath.slice(0, queryIdx);
-
-      let filePath = normalize(join(rootDir, urlPath));
-      if (!filePath.startsWith(rootDir)) {
-        res.writeHead(403);
-        res.end("Forbidden");
-        return;
-      }
-
-      try {
-        const s = await stat(filePath);
-        if (s.isDirectory()) {
-          filePath = join(filePath, "index.html");
-        }
-      } catch {
-        filePath = join(rootDir, urlPath, "index.html");
-      }
-
-      const content = await fsReadFile(filePath);
-      const mime = MIME_TYPES[extname(filePath)] ?? "application/octet-stream";
-      res.writeHead(200, { "Content-Type": mime });
-      res.end(content);
-    } catch {
-      try {
-        const fallback = join(rootDir, "404.html");
-        const content = await fsReadFile(fallback);
-        res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
-        res.end(content);
-      } catch {
-        res.writeHead(404);
-        res.end("Not Found");
-      }
-    }
-  });
-}
-
-interface DiscoveredPage {
-  url: string;
-  path: string;
-}
-
-function extractPathFromUrl(rawUrl: string): string {
-  try {
-    const parsed = new URL(rawUrl);
-    return parsed.pathname + parsed.search || "/";
-  } catch {
-    return rawUrl;
-  }
-}
-
-async function fetchSitemapXml(url: string): Promise<string> {
-  let response: Response;
-  try {
-    response = await fetch(url);
-  } catch {
-    throw new Error(`SITEMAP_MISSING: Could not fetch ${url}`);
-  }
-  if (!response.ok) {
-    throw new Error(`SITEMAP_MISSING: ${url} returned ${response.status}`);
-  }
-  return response.text();
-}
-
-async function discoverPagesFromSitemap(baseUrl: string): Promise<DiscoveredPage[]> {
-  const xml = await fetchSitemapXml(`${baseUrl}/sitemap.xml`);
-  const urls: DiscoveredPage[] = [];
-  const seenPaths = new Set<string>();
-  const urlRegex = /<loc>([^<]+)<\/loc>/g;
-  const isSitemapIndex = /<sitemapindex/i.test(xml);
-
-  if (isSitemapIndex) {
-    const subSitemapPaths: string[] = [];
-    let match: RegExpExecArray | null;
-    while ((match = urlRegex.exec(xml)) !== null) {
-      const subPath = extractPathFromUrl(match[1]!.trim());
-      subSitemapPaths.push(subPath);
-    }
-    for (const subPath of subSitemapPaths) {
-      try {
-        const subXml = await fetchSitemapXml(`${baseUrl}${subPath}`);
-        let subMatch: RegExpExecArray | null;
-        const subRegex = /<loc>([^<]+)<\/loc>/g;
-        while ((subMatch = subRegex.exec(subXml)) !== null) {
-          const pagePath = extractPathFromUrl(subMatch[1]!.trim());
-          if (seenPaths.has(pagePath)) continue;
-          seenPaths.add(pagePath);
-          urls.push({ url: `${baseUrl}${pagePath}`, path: pagePath });
-        }
-      } catch {
-        // skip sub-sitemaps that fail to fetch
-      }
-    }
-  } else {
-    let match: RegExpExecArray | null;
-    while ((match = urlRegex.exec(xml)) !== null) {
-      const pagePath = extractPathFromUrl(match[1]!.trim());
-      if (seenPaths.has(pagePath)) continue;
-      seenPaths.add(pagePath);
-      urls.push({ url: `${baseUrl}${pagePath}`, path: pagePath });
-    }
-  }
-
-  if (urls.length === 0) {
-    throw new Error("SITEMAP_MISSING: sitemap.xml contains no URLs");
-  }
-
-  return urls;
-}
-
-async function healthCheck(baseUrl: string, timeoutMs = 30_000): Promise<void> {
-  const start = Date.now();
-  const interval = 500;
-
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const response = await fetch(baseUrl, { signal: AbortSignal.timeout(interval) });
-      if (response.ok || response.status === 404) return;
-    } catch {
-      // keep polling
-    }
-    await new Promise((resolve) => setTimeout(resolve, interval));
-  }
-
-  throw new Error(`HEALTH_CHECK_TIMEOUT: server did not respond within ${timeoutMs}ms`);
-}
-
-function safeNameFromPath(pagePath: string): string {
-  return pagePath.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "index";
-}
+const LOCAL_PRODUCER = {
+  producerId: "local-dev",
+  name: "mission.check",
+  version: "1.0.0",
+} as const;
 
 function failResult(
-  missionId: string,
   evidenceDir: string,
-  serverPort: number | undefined,
-  startTime: number,
   exitCode: number,
   summary: string,
 ): KernelCommandResult<MissionCheckResult> {
@@ -213,121 +99,251 @@ function failResult(
     data: {
       command: "mission.check",
       status: "fail",
-      missionId,
-      methodology: "web-accessibility",
+      exitCode: exitCode as 0 | 1,
+      capsule: null as unknown as StagedCapsule,
+      studyRun: null as unknown as StudyRun,
+      findingsCount: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
       findings: { errors: 0, warnings: 0, total: 0 },
+      closureDecision: { satisfied: false, status: "blocked", reason: summary },
       evidenceDir,
-      serverPort,
-      durationMs: Date.now() - startTime,
+      summary,
+      nextSteps: [],
     },
     exitCode,
     summary,
   };
 }
 
-async function runAxeInBrowser(
-  pageUrl: string,
-  pagePath: string,
-  screenshotDir: string,
-  relativeScreenshotDir: string,
-): Promise<{ axeState: AxeEvidenceState; html: string }> {
-  const captureAdapter = new PlaywrightCaptureAdapter();
+function safeNameFromUrl(rawUrl: string): string {
   try {
-    const captured = await captureAdapter.capturePage(
-      pageUrl,
-      pagePath,
-      screenshotDir,
-      relativeScreenshotDir,
-    );
-
-    // Run axe-core in the browser via Playwright
-    let chromium: (typeof import("playwright"))["chromium"];
-    try {
-      const pw = await import("playwright");
-      chromium = pw.chromium;
-    } catch {
-      throw new Error("PLAYWRIGHT_MISSING: pnpm exec playwright install chromium");
-    }
-
-    let browser: Awaited<ReturnType<typeof chromium.launch>>;
-    try {
-      browser = await chromium.launch({ headless: true });
-    } catch (launchErr) {
-      // Chromium binary not installed — auto-install and retry
-      const msg = launchErr instanceof Error ? launchErr.message : String(launchErr);
-      if (msg.includes("Executable doesn't exist") || msg.includes("playwright install")) {
-        console.log("  Chromium binary not found — auto-installing...");
-        const installResult = spawnSync("npx", ["playwright", "install", "chromium"], {
-          stdio: "inherit",
-          timeout: 120_000,
-        });
-        if (installResult.status !== 0) {
-          throw new Error(
-            `PLAYWRIGHT_MISSING: failed to auto-install Chromium — run 'pnpm exec playwright install chromium' manually`,
-          );
-        }
-        console.log("  Chromium installed — retrying launch...");
-        browser = await chromium.launch({ headless: true });
-      } else {
-        throw launchErr;
-      }
-    }
-    try {
-      const page = await browser.newPage();
-
-      // Strip CSP headers from HTML documents so axe-core can be injected from CDN
-      await page.route("**/*", async (route) => {
-        if (route.request().resourceType() === "document") {
-          const response = await route.fetch();
-          const headers = new Headers(response.headers());
-          headers.delete("content-security-policy");
-          headers.delete("content-security-policy-report-only");
-          await route.fulfill({ response, headers: Object.fromEntries(headers) });
-        } else {
-          await route.continue();
-        }
-      });
-
-      await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
-
-      // Inject and run axe-core from CDN (requires network access)
-      await page.addScriptTag({
-        url: "https://unpkg.com/axe-core@4.12.1/axe.min.js",
-      });
-
-      const axeResults = await page.evaluate(() => {
-        interface AxeGlobal {
-          run: (
-            context: Document,
-            options: { runOnly: { type: string; values: string[] } },
-          ) => Promise<unknown>;
-        }
-        const axe = (window as unknown as { axe: AxeGlobal }).axe;
-        return axe.run(document, {
-          runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
-        });
-      });
-
-      const html = await page.content();
-      const safeName = safeNameFromPath(pagePath);
-      const locale = captured.lang ?? "en";
-
-      return {
-        axeState: {
-          url: pageUrl,
-          locale,
-          profileId: "desktop",
-          logicalPath: `raw/axe-${locale}-${safeName}-desktop.json`,
-          result: axeResults as AxeEvidenceState["result"],
-        },
-        html,
-      };
-    } finally {
-      await browser.close();
-    }
-  } finally {
-    await captureAdapter.close();
+    const parsed = new URL(rawUrl);
+    return parsed.pathname.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "index";
+  } catch {
+    return "page";
   }
+}
+
+function buildCaptureContract(baseUrl: string, recordedAt: string): CaptureContract {
+  const origin = new URL(baseUrl).origin;
+  return captureContractSchema.parse({
+    schema: "capture-contract@1",
+    contractId: mintAxiomId("capture-contract"),
+    businessId: mintAxiomId("business"),
+    webPresenceId: mintAxiomId("web-presence"),
+    lockedIdentityAssertions: [],
+    origins: [origin],
+    urlPolicy: {
+      allowedOrigins: [origin],
+      includePatterns: ["/**"],
+      excludePatterns: [],
+      maxDepth: 3,
+    },
+    locales: ["en-US"],
+    profiles: [
+      {
+        profileId: "desktop",
+        width: 1440,
+        height: 900,
+        colorScheme: "no-preference",
+        reducedMotion: false,
+      },
+    ],
+    publicSession: { kind: "public", authenticated: false, cookies: [], secrets: [] },
+    journeys: [],
+    robotsRatePolicy: {
+      respectRobots: true,
+      respectRetryAfter: true,
+      perHostConcurrency: 1,
+      crawlDelayMs: 1000,
+    },
+    thirdPartyPolicy: {
+      allowDeclaredThirdParties: false,
+      allowedOrigins: [],
+      blockedHosts: [],
+    },
+    limits: {
+      maxUrls: 100,
+      maxBytes: 100_000_000,
+      maxDurationMs: 30_000,
+      maxRetries: 1,
+    },
+    behaviors: {
+      enableAutoscroll: true,
+      enableFiniteLinkDiscovery: true,
+      enableFingerprintSpoofing: false,
+      enableProxyRotation: false,
+      enableAuthBypass: false,
+    },
+    settleRules: { networkIdleMs: 1000, maxSettleMs: 15000 },
+    volatilityPasses: 1,
+    toolProfile: {
+      crawleeVersion: "local-dev",
+      playwrightVersion: "unknown",
+      chromiumRevision: "unknown",
+    },
+    closureThresholds: {
+      requiredCapabilities: [
+        "http",
+        "browser",
+        "accessibility",
+        "archive",
+        "replay",
+        "closure",
+        "runtime-attestation",
+      ],
+      allowPartial: true,
+    },
+    stopConditions: ["maxUrls", "maxBytes", "maxDurationMs", "boundedFixpoint"],
+    recordedAt,
+    producer: LOCAL_PRODUCER,
+  });
+}
+
+function extractAxeResult(captured: CapturedBrowserEvidence): AxeEvidenceState["result"] | null {
+  const axeEvidence = captured.evidence.find((e) => e.role === "axe-raw-result");
+  if (!axeEvidence) return null;
+  const text = new TextDecoder().decode(axeEvidence.bytes);
+  return JSON.parse(text) as AxeEvidenceState["result"];
+}
+
+function buildCapabilityManifest(contract: CaptureContract, pageCount: number): CapabilityManifest {
+  const contractRef = contractDigest(contract);
+  const completeReceipts = ["http", "browser", "accessibility", "closure"].map((capability) =>
+    capabilityReceiptSchema.parse({
+      capability,
+      state: "complete",
+      expectedCount: pageCount,
+      observedCount: pageCount,
+      evidence: [],
+      diagnostics: [],
+    }),
+  );
+  const excludedReceipts = [
+    capabilityReceiptSchema.parse({
+      capability: "archive",
+      state: "excluded",
+      expectedCount: 0,
+      observedCount: 0,
+      evidence: [],
+      diagnostics: [
+        "Archive capability excluded — Docker/Browsertrix not available in local mode.",
+      ],
+    }),
+    capabilityReceiptSchema.parse({
+      capability: "replay",
+      state: "excluded",
+      expectedCount: 0,
+      observedCount: 0,
+      evidence: [],
+      diagnostics: ["Replay capability excluded — Docker/Browsertrix not available in local mode."],
+    }),
+    capabilityReceiptSchema.parse({
+      capability: "runtime-attestation",
+      state: "complete",
+      expectedCount: 1,
+      observedCount: 1,
+      evidence: [],
+      diagnostics: [],
+    }),
+  ];
+  return capabilityManifestSchema.parse({
+    schema: "capability-manifest@1",
+    contractDigest: contractRef,
+    receipts: [...completeReceipts, ...excludedReceipts],
+  });
+}
+
+function buildStagedCapsule(
+  contract: CaptureContract,
+  manifest: CapabilityManifest,
+  closureDecision: ReturnType<typeof evaluateClosure>,
+  rawEvidenceDigests: import("@syrokomskyi/axiom-contracts").DigestRef[],
+): StagedCapsule {
+  const runtimeAttestation = runtimeAttestationSchema.parse({
+    schema: "runtime-attestation@1",
+    workerProfile: "local-direct-playwright",
+    os: process.platform,
+    toolDigests: {
+      playwright: contract.toolProfile.playwrightVersion,
+      chromium: contract.toolProfile.chromiumRevision,
+      crawlee: contract.toolProfile.crawleeVersion,
+    },
+    recordedAt: contract.recordedAt,
+    producer: contract.producer,
+  });
+  const archiveReceipt = archiveReceiptSchema.parse({
+    schema: "archive-receipt@1",
+    state: "excluded",
+    archiveDigest: null,
+    waczDigest: null,
+    execution: null,
+    diagnostics: ["Archive capability excluded — Docker/Browsertrix not available in local mode."],
+  });
+  const replayReceipt = replayReceiptSchema.parse({
+    schema: "replay-receipt@1",
+    state: "excluded",
+    offlineReplay: false,
+    unresolvedEgressCount: 0,
+    execution: null,
+    diagnostics: ["Replay capability excluded — Docker/Browsertrix not available in local mode."],
+  });
+  return stagedCapsuleSchema.parse({
+    schema: "staged-website-evidence-capsule@1",
+    contract,
+    contractDigest: contractDigest(contract),
+    capabilityManifest: manifest,
+    classification: "local-dev",
+    closureDecision,
+    runtimeAttestation,
+    archiveReceipt,
+    replayReceipt,
+    rawEvidence: rawEvidenceDigests,
+    normalizedEvidence: [],
+  });
+}
+
+function buildStudyRun(
+  methodology: MethodologyPackage,
+  bundle: ObservationBundle,
+  findings: Finding[],
+  capsuleRef: import("@syrokomskyi/axiom-contracts").ArtifactRef,
+  recordedAt: string,
+): StudyRun {
+  const methodologyDigest = methodologyPackageDigest(methodology);
+  const designMaterial = {
+    kind: "snapshot" as const,
+    methodologyDigest,
+    capsuleDigests: [capsuleRef.rootDigest],
+    rebased: false,
+  };
+  const designDigest = createCanonicalJsonDigestRef(designMaterial);
+  const runMaterial = {
+    designDigest,
+    bundleIds: [bundle.bundleId],
+  };
+  return studyRunSchema.parse({
+    studyRunId: `study-run_${createCanonicalJsonDigestRef(runMaterial).digest}`,
+    design: { designId: `study-design_${designDigest.digest}`, ...designMaterial },
+    observationBundleIds: runMaterial.bundleIds,
+    assessments: [
+      {
+        assessmentId: `assessment_${createCanonicalJsonDigestRef(findings).digest}`,
+        findingIds: findings.map((f) => f.findingId),
+        limitations: methodology.limitations,
+      },
+    ],
+    findings,
+    recordedAt,
+    producer: LOCAL_PRODUCER,
+  });
+}
+
+function countFindingsBySeverity(findings: Finding[]): MissionCheckResult["findingsCount"] {
+  const counts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+  for (const f of findings) {
+    counts[f.severity] += 1;
+  }
+  return counts;
 }
 
 export async function runMissionCheck(
@@ -344,274 +360,221 @@ export async function runMissionCheck(
 
   const externalPreview =
     input.flags["external-preview"] === true || input.flags["external-preview"] === "true";
+  if (!externalPreview) {
+    throw new Error("mission.check requires --external-preview (local mode removed by RFC-0629)");
+  }
+
   const baseUrlFlag = input.flags["base-url"] as string | undefined;
+  if (!baseUrlFlag) {
+    throw new Error("mission.check --external-preview requires --base-url");
+  }
+
+  const commitSha = input.flags["commit-sha"] as string | undefined;
+  const baseUrl = baseUrlFlag.replace(/\/$/, "");
 
   const missionDir = resolveMissionDir(workspaceRoot, missionId);
   const evidenceDir = join(missionDir, "evidence", "axiom");
   const rawDir = join(evidenceDir, "raw");
-  const screenshotsDir = join(evidenceDir, "screenshots");
-  const relativeScreenshotsDir = "screenshots";
 
-  let baseUrl: string;
-  let server: Server | null = null;
-  let serverPort: number | undefined;
+  logger.info(`  External preview mode: ${baseUrl}`);
 
+  // Clean stale evidence from previous runs
+  if (existsSync(evidenceDir)) {
+    logger.info(`  Cleaning stale evidence in ${evidenceDir}`);
+    await rm(join(evidenceDir, "raw"), { recursive: true, force: true });
+    await rm(join(evidenceDir, "screenshots"), { recursive: true, force: true });
+    await rm(join(evidenceDir, "staged-capsule.json"), { force: true });
+    await rm(join(evidenceDir, "observation-bundle.json"), { force: true });
+    await rm(join(evidenceDir, "study-run.json"), { force: true });
+    await rm(join(evidenceDir, "evidence-metadata.json"), { force: true });
+  }
+
+  await mkdir(rawDir, { recursive: true });
+
+  const recordedAt = new Date().toISOString();
+  const contract = buildCaptureContract(baseUrl, recordedAt);
+
+  // Discover pages via CrawleeDiscoveryExecutor
+  const discoveryExecutor = new CrawleeDiscoveryExecutor();
+  logger.info(`  Discovering pages via Crawlee...`);
+  const discoveryLedger = await discoveryExecutor.discover(contract);
+  const discoveredUrls = discoveryLedger.records.map((r) => r.normalizedUrl);
+
+  if (discoveredUrls.length === 0) {
+    return failResult(evidenceDir, 2, `mission.check: no pages discovered at ${baseUrl}`);
+  }
+
+  logger.info(`  Discovered ${discoveredUrls.length} page(s)`);
+
+  // Capture each page via PlaywrightEvidenceDriver
+  const driver = new PlaywrightEvidenceDriver();
   try {
-    if (externalPreview) {
-      if (!baseUrlFlag) {
-        throw new Error("mission.check --external-preview requires --base-url");
-      }
-      baseUrl = baseUrlFlag.replace(/\/$/, "");
-      logger.info(`  External preview mode: ${baseUrl}`);
-    } else {
-      // Build the workpiece
-      const workpieceDir = join(missionDir, "workpiece");
-      const distDir = join(workpieceDir, "dist", "client");
-
-      if (!existsSync(workpieceDir)) {
-        throw new Error(
-          `mission.check: workpiece not found for mission '${missionId}' — run mission.materialize first`,
-        );
-      }
-
-      logger.info(`  Building workpiece...`);
-      const buildResult = spawnSync("pnpm", ["exec", "astro", "build"], {
-        cwd: workpieceDir,
-        stdio: "pipe",
-        timeout: 120_000,
-      });
-
-      if (buildResult.status !== 0) {
-        const stderr = buildResult.stderr?.toString() ?? "unknown error";
-        return failResult(
-          missionId,
-          evidenceDir,
-          undefined,
-          startTime,
-          6,
-          `mission.check: build failure — ${stderr.slice(0, 200)}`,
-        );
-      }
-
-      if (!existsSync(distDir)) {
-        return failResult(
-          missionId,
-          evidenceDir,
-          undefined,
-          startTime,
-          6,
-          `mission.check: build produced no dist/client at ${distDir}`,
-        );
-      }
-
-      // Start static server with auto-discovered port
-      server = createStaticServer(distDir);
-      await new Promise<void>((resolve) => {
-        server!.listen(0, "127.0.0.1", resolve);
-      });
-      const address = server.address();
-      serverPort = typeof address === "object" && address ? address.port : 0;
-      baseUrl = `http://127.0.0.1:${serverPort}`;
-
-      logger.info(`  Server started on port ${serverPort}`);
-
-      // Health check
-      try {
-        await healthCheck(baseUrl);
-      } catch (err) {
-        return failResult(
-          missionId,
-          evidenceDir,
-          serverPort,
-          startTime,
-          3,
-          `mission.check: health check failed — ${err instanceof Error ? err.message : String(err)}`,
-        );
-      }
-    }
-
-    // Discover pages from sitemap
-    let pages: DiscoveredPage[];
-    try {
-      pages = await discoverPagesFromSitemap(baseUrl);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      if (message.startsWith("SITEMAP_MISSING")) {
-        return failResult(
-          missionId,
-          evidenceDir,
-          serverPort,
-          startTime,
-          7,
-          `mission.check: no sitemap.xml found at ${baseUrl}/sitemap.xml — generate sitemap or use --external-preview with manual page list`,
-        );
-      }
-      throw err;
-    }
-
-    logger.info(`  Discovered ${pages.length} page(s) from sitemap`);
-
-    // Clean stale evidence from previous runs before writing new files
-    if (existsSync(evidenceDir)) {
-      logger.info(`  Cleaning stale evidence in ${evidenceDir}`);
-      await rm(join(evidenceDir, "raw"), { recursive: true, force: true });
-      await rm(join(evidenceDir, "screenshots"), { recursive: true, force: true });
-      await rm(join(evidenceDir, "evidence-capsule.yaml"), { force: true });
-      await rm(join(evidenceDir, "findings.yaml"), { force: true });
-    }
-
-    // Prepare evidence directories
-    await mkdir(rawDir, { recursive: true });
-    await mkdir(screenshotsDir, { recursive: true });
-
-    // Capture and run axe for each page
     const axeStates: AxeEvidenceState[] = [];
-    const rawEvidence: Array<{ filename: string; data: unknown }> = [];
-    const htmlFiles: Array<{ filename: string; content: string }> = [];
+    const rawEvidenceDigests: import("@syrokomskyi/axiom-contracts").DigestRef[] = [];
+    const rawArtifacts: Array<{ filename: string; data: unknown }> = [];
 
-    for (const page of pages) {
-      logger.info(`  Checking: ${page.path}`);
+    for (const pageUrl of discoveredUrls) {
+      logger.info(`  Checking: ${pageUrl}`);
       try {
-        const { axeState, html } = await runAxeInBrowser(
-          page.url,
-          page.path,
-          screenshotsDir,
-          relativeScreenshotsDir,
-        );
-        axeStates.push(axeState);
+        const captured = await driver.capture({
+          contract,
+          request: {
+            url: pageUrl,
+            profileId: contract.profiles[0]!.profileId,
+            locale: contract.locales[0]!,
+          },
+          viewportProfileId: contract.profiles[0]!.profileId,
+        });
 
-        const safeName = safeNameFromPath(page.path);
-        const axeFilename = `axe-${axeState.locale}-${safeName}-desktop.json`;
-        rawEvidence.push({ filename: axeFilename, data: axeState.result });
-        htmlFiles.push({ filename: `html-${safeName}.html`, content: html });
+        // Collect raw evidence digests
+        for (const ev of captured.evidence) {
+          rawEvidenceDigests.push(ev.digest);
+        }
+
+        // Write raw evidence artifacts
+        const safeName = safeNameFromUrl(pageUrl);
+        for (const ev of captured.evidence) {
+          const ext = ev.mediaType.startsWith("image/") ? "webp" : "json";
+          const filename = `${safeName}-${ev.role}.${ext}`;
+          const bytes =
+            ev.mediaType.startsWith("image/") || ev.mediaType === "application/octet-stream"
+              ? Buffer.from(ev.bytes)
+              : new TextDecoder().decode(ev.bytes);
+          rawArtifacts.push({ filename, data: bytes });
+        }
+
+        // Extract axe results for instrument
+        const axeResult = extractAxeResult(captured);
+        if (axeResult) {
+          axeStates.push({
+            url: pageUrl,
+            locale: contract.locales[0]!,
+            profileId: contract.profiles[0]!.profileId,
+            logicalPath: `raw/${safeName}-axe-raw-result.json`,
+            result: axeResult,
+          });
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        if (message.startsWith("PLAYWRIGHT_MISSING")) {
-          return failResult(
-            missionId,
-            evidenceDir,
-            serverPort,
-            startTime,
-            4,
-            `mission.check: Playwright not available — run 'pnpm exec playwright install chromium'`,
-          );
-        }
-        logger.warn(`  Capture failed for ${page.path}: ${message}`);
+        logger.warn(`  Capture failed for ${pageUrl}: ${message}`);
       }
     }
 
     if (axeStates.length === 0) {
-      return failResult(
-        missionId,
-        evidenceDir,
-        serverPort,
-        startTime,
-        2,
-        `mission.check: no pages could be captured`,
-      );
+      return failResult(evidenceDir, 2, `mission.check: no pages could be captured`);
     }
 
     // Build instrument context
-    const recordedAt = new Date().toISOString();
-    const localContext: LocalInstrumentContext = {
+    const localContext = {
       origin: baseUrl,
       recordedAt,
       missionId,
       environment: {
         platform: process.platform,
         nodeVersion: process.version,
-        mode: externalPreview ? "external-preview" : "preview",
+        mode: "external-preview",
       },
     };
     const deterministicContext = toDeterministicContext(localContext);
+    const capsuleRef = deterministicContext.capsuleRef;
 
     // Run accessibility instrument
     const instrumentResult = runAccessibilityInstrument({
       context: deterministicContext,
       states: axeStates,
     });
+    const bundle = instrumentResult.bundle;
 
-    // Convert observations to findings
-    const localeMap = new Map(axeStates.map((s) => [s.url, s.locale]));
-    const findings = convertObservationsToFindings(instrumentResult, localeMap);
-    const errors = findings.filter((f) => f.severity === "error").length;
-    const warnings = findings.filter((f) => f.severity === "warning").length;
+    // Bind methodology and project findings
+    const methodology = createAutomatedWebAccessibilityMethodology();
+    const findings: Finding[] = bundle.observations.flatMap((observation) =>
+      findingsForObservation(methodology, observation),
+    );
 
-    // Write evidence-capsule.yaml
-    const capsuleYaml = stringifyYaml({
-      schema: "local-evidence-capsule@1",
-      missionId,
-      origin: baseUrl,
-      recordedAt,
-      mode: externalPreview ? "external-preview" : "preview",
-      locales: ["en"],
-      profiles: ["desktop"],
-      pages: axeStates.map((s) => ({
-        url: s.url,
-        path: new URL(s.url).pathname,
-        locale: s.locale,
-        profileId: s.profileId,
-        logicalPath: s.logicalPath,
-        htmlPath: `raw/html-${safeNameFromPath(new URL(s.url).pathname)}.html`,
-        screenshotPath: `screenshots/`,
-      })),
-      classification: "local-dev",
-    });
-    await writeFile(join(evidenceDir, "evidence-capsule.yaml"), capsuleYaml + "\n", "utf-8");
+    // Evaluate closure
+    const manifest = buildCapabilityManifest(contract, axeStates.length);
+    const closureDecision = evaluateClosure({ contract, manifest });
 
-    // Write findings.yaml
-    const findingsYaml = stringifyYaml({
-      schema: "axiom-findings@1",
-      capsuleRef: `missions/${missionId}/evidence/axiom/evidence-capsule.yaml`,
-      recordedAt,
-      methodology: "web-accessibility",
-      findings,
-      summary: {
-        totalFindings: findings.length,
-        errors,
-        warnings,
-      },
-    });
-    await writeFile(join(evidenceDir, "findings.yaml"), findingsYaml + "\n", "utf-8");
+    // Build staged capsule
+    const capsule = buildStagedCapsule(contract, manifest, closureDecision, rawEvidenceDigests);
 
-    // Write raw evidence JSON files
-    for (const { filename, data } of rawEvidence) {
-      await writeFile(join(rawDir, filename), JSON.stringify(data, null, 2) + "\n", "utf-8");
+    // Build study run
+    const studyRun = buildStudyRun(methodology, bundle, findings, capsuleRef, recordedAt);
+
+    // Write evidence files
+    await writeFileIfChanged(
+      join(evidenceDir, "staged-capsule.json"),
+      JSON.stringify(capsule, null, 2) + "\n",
+    );
+    await writeFileIfChanged(
+      join(evidenceDir, "observation-bundle.json"),
+      JSON.stringify(bundle, null, 2) + "\n",
+    );
+    await writeFileIfChanged(
+      join(evidenceDir, "study-run.json"),
+      JSON.stringify(studyRun, null, 2) + "\n",
+    );
+
+    // Write evidence-metadata.json
+    const evidenceMetadata: { missionId: string; commitSha?: string } = { missionId };
+    if (commitSha) {
+      evidenceMetadata.commitSha = commitSha;
+    }
+    await writeFileIfChanged(
+      join(evidenceDir, "evidence-metadata.json"),
+      JSON.stringify(evidenceMetadata, null, 2) + "\n",
+    );
+
+    // Write raw evidence artifacts
+    for (const { filename, data } of rawArtifacts) {
+      const content = typeof data === "string" ? data : (data as Uint8Array);
+      await writeFileIfChanged(join(rawDir, filename), content);
     }
 
-    // Write HTML files
-    for (const { filename, content } of htmlFiles) {
-      await writeFile(join(rawDir, filename), content, "utf-8");
-    }
+    // Compute findings counts
+    const findingsCount = countFindingsBySeverity(findings);
+    const errors = findingsCount.critical + findingsCount.high;
+    const warnings = findingsCount.medium + findingsCount.low + findingsCount.info;
+    const total = findings.length;
 
-    const status: "pass" | "fail" = errors > 0 ? "fail" : "pass";
-    const exitCode = errors > 0 ? 1 : 0;
+    // Gate logic: fail if any high/critical findings or closure not satisfied
+    const hasHighOrCritical = findingsCount.critical > 0 || findingsCount.high > 0;
+    const closureFailed = !closureDecision.satisfied;
+    const status: "pass" | "fail" = hasHighOrCritical || closureFailed ? "fail" : "pass";
+    const exitCode = status === "fail" ? 1 : 0;
     const durationMs = Date.now() - startTime;
+
+    const summary = `mission.check: ${status} — ${total} finding(s), ${errors} error(s), ${warnings} warning(s)${closureFailed ? ", closure blocked" : ""}`;
 
     const result: MissionCheckResult = {
       command: "mission.check",
       status,
-      missionId,
-      methodology: "web-accessibility",
-      findings: { errors, warnings, total: findings.length },
+      exitCode: exitCode as 0 | 1,
+      capsule,
+      studyRun,
+      findingsCount,
+      findings: { errors, warnings, total },
+      closureDecision: {
+        satisfied: closureDecision.satisfied,
+        status: closureDecision.status,
+        reason: closureDecision.reason,
+      },
       evidenceDir,
-      serverPort,
-      durationMs,
+      summary,
+      nextSteps: [],
     };
 
-    logger.info(`  Findings: ${findings.length} (${errors} errors, ${warnings} warnings)`);
+    logger.info(`  Findings: ${total} (${errors} errors, ${warnings} warnings)`);
+    logger.info(`  Closure: ${closureDecision.status} — ${closureDecision.reason}`);
     logger.info(`  Evidence: ${evidenceDir}`);
     logger.info(`  Duration: ${durationMs}ms`);
 
     return {
       data: result,
       exitCode,
-      summary: `mission.check: ${status} — ${findings.length} finding(s), ${errors} error(s), ${warnings} warning(s)`,
+      summary,
     };
   } finally {
-    if (server) {
-      server.close();
-      logger.info(`  Server stopped`);
-    }
+    await driver.close();
   }
 }

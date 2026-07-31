@@ -1,135 +1,415 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
-import { mkdtemp, rm, writeFile, mkdir, readFile } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { createServer, type Server } from "node:http";
 
 import { runMissionCheck } from "../mission-check.ts";
 import { makeTestContext, testInput } from "./helpers.ts";
 
+const mockDigestRef = {
+  digest: "sha256:mock-digest",
+  algorithm: "sha256" as const,
+  size: 42,
+  mediaType: "application/json",
+};
+const mockArtifactRef = {
+  artifactId: "axiom_artifact_mock",
+  rootDigest: mockDigestRef,
+  schema: "local-evidence-capsule@1" as const,
+};
+
+vi.mock("@syrokomskyi/axiom-contracts", () => ({
+  mintAxiomId: vi.fn(() => "axiom_id_mock"),
+}));
+
+vi.mock("@syrokomskyi/axiom-provenance", () => ({
+  createCanonicalJsonDigestRef: vi.fn(() => mockDigestRef),
+}));
+
+vi.mock("@syrokomskyi/axiom-capture", () => {
+  const identitySchema = { parse: (v: unknown) => v };
+  return {
+    PlaywrightEvidenceDriver: vi.fn().mockImplementation(function () {
+      return {
+        capture: vi.fn().mockResolvedValue({
+          receipt: {
+            schema: "browser-receipt@1",
+            taskKey: "mock-task-key",
+            state: "complete",
+            finalUrl: "http://example.com/",
+            statusCode: 200,
+            htmlDigest: mockDigestRef,
+            screenshotDigest: mockDigestRef,
+            domSnapshotDigest: mockDigestRef,
+            accessibilityTreeDigest: mockDigestRef,
+            axeDigest: mockDigestRef,
+            diagnostics: [],
+          },
+          evidence: [
+            {
+              role: "axe-raw-result",
+              mediaType: "application/json",
+              bytes: new TextEncoder().encode(
+                JSON.stringify({ violations: [], incomplete: [], passes: [] }),
+              ),
+              digest: mockDigestRef,
+            },
+          ],
+        }),
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+    }),
+    CrawleeDiscoveryExecutor: vi.fn().mockImplementation(function () {
+      return {
+        discover: vi.fn().mockResolvedValue({
+          records: [{ normalizedUrl: "http://example.com/", depth: 0, discoveredFrom: null }],
+          omissions: [],
+          reachedFixpoint: true,
+        }),
+      };
+    }),
+    captureContractSchema: identitySchema,
+    contractDigest: vi.fn(() => mockDigestRef),
+    evaluateClosure: vi.fn(() => ({
+      schema: "closure-decision@1",
+      status: "seal_allowed",
+      satisfied: true,
+      missingCapabilities: [],
+      partialCapabilities: [],
+      blockedCapabilities: [],
+      reason: "All required evidence capabilities completed.",
+    })),
+    capabilityManifestSchema: identitySchema,
+    capabilityReceiptSchema: identitySchema,
+    runtimeAttestationSchema: identitySchema,
+    archiveReceiptSchema: identitySchema,
+    replayReceiptSchema: identitySchema,
+    stagedCapsuleSchema: identitySchema,
+  };
+});
+
+vi.mock("@syrokomskyi/axiom-study", () => {
+  const identitySchema = { parse: (v: unknown) => v };
+  return {
+    runAccessibilityInstrument: vi.fn(() => ({
+      instrumentRun: {
+        instrumentRunId: "instrument-run_mock",
+        instrumentId: "accessibility-axe",
+        instrumentVersion: "1.0.0",
+        startedAt: "2026-01-01T00:00:00.000Z",
+        finishedAt: "2026-01-01T00:00:01.000Z",
+        state: "complete",
+        context: {},
+        observations: [],
+      },
+      bundle: {
+        bundleId: "observation-bundle_mock",
+        observations: [
+          {
+            observationId: "obs_mock",
+            instrumentRunId: "instrument-run_mock",
+            subjectId: "http://example.com/",
+            predicate: "accessibility.axe.violation",
+            value: {},
+            evidence: [],
+            recordedAt: "2026-01-01T00:00:00.000Z",
+          },
+        ],
+        rootDigest: mockDigestRef,
+      },
+    })),
+    toDeterministicContext: vi.fn(() => ({
+      capsuleRef: mockArtifactRef,
+      producer: { producerId: "local-dev", name: "mission.check", version: "1.0.0" },
+      recordedAt: "2026-01-01T00:00:00.000Z",
+      validTimeStart: "2026-01-01T00:00:00.000Z",
+      environment: {},
+    })),
+    studyRunSchema: identitySchema,
+  };
+});
+
+vi.mock("@syrokomskyi/axiom-methodology", () => ({
+  createAutomatedWebAccessibilityMethodology: vi.fn(() => ({
+    schema: "methodology-package@1",
+    methodologyId: "automated-web-accessibility",
+    semver: "1.0.0",
+    maturity: "VALIDATED",
+    authors: [],
+    licenses: [],
+    researchQuestion: "test",
+    nonClaims: [],
+    types: [],
+    unitsOfAnalysis: [],
+    applicability: { jurisdictions: [], languages: [], archetypes: [], exclusions: [] },
+    evidenceRequirements: [],
+    dependencies: [],
+    limitations: [],
+    digest: mockDigestRef,
+  })),
+  findingsForObservation: vi.fn(() => []),
+  methodologyPackageDigest: vi.fn(() => mockDigestRef),
+}));
+
 async function createMockMission(workspaceRoot: string, missionId: string): Promise<string> {
   const missionDir = join(workspaceRoot, "missions", missionId);
-  const workpieceDir = join(missionDir, "workpiece");
-  const distDir = join(workpieceDir, "dist", "client");
-
-  await mkdir(distDir, { recursive: true });
   await mkdir(join(missionDir, "evidence"), { recursive: true });
-
-  // Minimal HTML page
-  await writeFile(
-    join(distDir, "index.html"),
-    "<html><head></head><body><h1>Test Page</h1></body></html>",
-    "utf-8",
-  );
-
-  // Sitemap
-  await writeFile(
-    join(distDir, "sitemap.xml"),
-    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<url><loc>{BASE_URL}/</loc></url>\n</urlset>',
-    "utf-8",
-  );
-
-  // Mission manifest
   await writeFile(
     join(missionDir, "mission.yaml"),
     `missionId: ${missionId}\nsystemId: test-system\nstate: open\noperationId: op-1\n`,
     "utf-8",
   );
-
   return missionDir;
 }
 
-async function startTempServer(rootDir: string): Promise<{ server: Server; baseUrl: string }> {
-  const server = createServer(async (req, res) => {
-    try {
-      const urlPath = req.url ?? "/";
-      const filePath = join(rootDir, urlPath === "/" ? "index.html" : urlPath);
-      const content = await readFile(filePath);
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end(content);
-    } catch {
-      res.writeHead(404);
-      res.end("Not Found");
-    }
-  });
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const addr = server.address();
-  const port = typeof addr === "object" && addr ? addr.port : 0;
-  return { server, baseUrl: `http://127.0.0.1:${port}` };
-}
+// Import after mocks are set up
+import { findingsForObservation } from "@syrokomskyi/axiom-methodology";
+import { evaluateClosure } from "@syrokomskyi/axiom-capture";
 
-describe("mission.check", () => {
-  it("returns exit code 7 when sitemap.xml is missing", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-test-"));
-    const missionId = "test-m000001";
-    const missionDir = await createMockMission(workspaceRoot, missionId);
-    const distDir = join(missionDir, "workpiece", "dist", "client");
+describe("mission.check (RFC-0629)", () => {
+  let workspaceRoot: string;
 
-    // Remove sitemap to trigger exit code 7
-    await rm(join(distDir, "sitemap.xml"));
-
-    // Start a temp server serving dist without sitemap
-    const { server, baseUrl } = await startTempServer(distDir);
-    try {
-      const result = await runMissionCheck(
-        { flags: { mission: missionId, "external-preview": true, "base-url": baseUrl }, argv: [] },
-        makeTestContext(workspaceRoot),
-      );
-
-      expect(result.exitCode).toBe(7);
-      expect(result.summary).toContain("sitemap");
-    } finally {
-      server.close();
-      await rm(workspaceRoot, { recursive: true, force: true });
-    }
+  beforeEach(async () => {
+    workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-test-"));
+    // Reset only specific mock return values — do NOT clearAllMocks
+    // because that would wipe factory mock implementations
+    vi.mocked(findingsForObservation).mockReturnValue([]);
+    vi.mocked(evaluateClosure).mockReturnValue({
+      schema: "closure-decision@1",
+      status: "seal_allowed",
+      satisfied: true,
+      missingCapabilities: [],
+      partialCapabilities: [],
+      blockedCapabilities: [],
+      reason: "All required evidence capabilities completed.",
+    });
   });
 
-  it("returns exit code 6 when workpiece dist is missing", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-test-"));
-    try {
-      const missionId = "test-m000002";
-      const missionDir = await createMockMission(workspaceRoot, missionId);
-
-      // Remove dist to trigger build failure path
-      await rm(join(missionDir, "workpiece", "dist"), { recursive: true, force: true });
-
-      const result = await runMissionCheck(
-        { flags: { mission: missionId }, argv: [] },
-        makeTestContext(workspaceRoot),
-      );
-
-      // Build will fail since there's no astro project
-      expect(result.exitCode).toBe(6);
-    } finally {
-      await rm(workspaceRoot, { recursive: true, force: true });
-    }
+  afterEach(async () => {
+    await rm(workspaceRoot, { recursive: true, force: true });
   });
 
   it("throws when --mission is missing", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-test-"));
-    try {
-      await expect(runMissionCheck(testInput(), makeTestContext(workspaceRoot))).rejects.toThrow(
-        "mission",
-      );
-    } finally {
-      await rm(workspaceRoot, { recursive: true, force: true });
-    }
+    await expect(runMissionCheck(testInput(), makeTestContext(workspaceRoot))).rejects.toThrow(
+      "mission",
+    );
+  });
+
+  it("throws when --external-preview is not set (local mode removed)", async () => {
+    const missionId = "test-m000001";
+    await createMockMission(workspaceRoot, missionId);
+
+    await expect(
+      runMissionCheck({ flags: { mission: missionId }, argv: [] }, makeTestContext(workspaceRoot)),
+    ).rejects.toThrow("--external-preview");
   });
 
   it("throws when --external-preview is set without --base-url", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-test-"));
-    try {
-      const missionId = "test-m000003";
-      await createMockMission(workspaceRoot, missionId);
+    const missionId = "test-m000002";
+    await createMockMission(workspaceRoot, missionId);
 
-      await expect(
-        runMissionCheck(
-          { flags: { mission: missionId, "external-preview": true }, argv: [] },
-          makeTestContext(workspaceRoot),
-        ),
-      ).rejects.toThrow("base-url");
-    } finally {
-      await rm(workspaceRoot, { recursive: true, force: true });
-    }
+    await expect(
+      runMissionCheck(
+        { flags: { mission: missionId, "external-preview": true }, argv: [] },
+        makeTestContext(workspaceRoot),
+      ),
+    ).rejects.toThrow("base-url");
+  });
+
+  it("writes native capsule files and evidence-metadata.json with commitSha", async () => {
+    const missionId = "test-m000003";
+    await createMockMission(workspaceRoot, missionId);
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+          "commit-sha": "abc123def456",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
+
+    expect(existsSync(join(evidenceDir, "staged-capsule.json"))).toBe(true);
+    expect(existsSync(join(evidenceDir, "observation-bundle.json"))).toBe(true);
+    expect(existsSync(join(evidenceDir, "study-run.json"))).toBe(true);
+    expect(existsSync(join(evidenceDir, "evidence-metadata.json"))).toBe(true);
+
+    const metadata = JSON.parse(
+      await readFile(join(evidenceDir, "evidence-metadata.json"), "utf-8"),
+    );
+    expect(metadata.missionId).toBe(missionId);
+    expect(metadata.commitSha).toBe("abc123def456");
+  });
+
+  it("writes evidence-metadata.json without commitSha when flag is absent", async () => {
+    const missionId = "test-m000004";
+    await createMockMission(workspaceRoot, missionId);
+
+    await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
+    const metadata = JSON.parse(
+      await readFile(join(evidenceDir, "evidence-metadata.json"), "utf-8"),
+    );
+    expect(metadata.missionId).toBe(missionId);
+    expect(metadata.commitSha).toBeUndefined();
+  });
+
+  it("passes when no high/critical findings and closure is satisfied", async () => {
+    const missionId = "test-m000005";
+    await createMockMission(workspaceRoot, missionId);
+
+    vi.mocked(findingsForObservation).mockReturnValue([
+      {
+        findingId: "finding_low_1",
+        semanticFingerprint: mockDigestRef,
+        methodologyId: "automated-web-accessibility",
+        ruleId: "color-contrast",
+        affectedSubjectId: "http://example.com/",
+        title: "Low contrast",
+        severity: "low",
+        evidence: [],
+        uncertainty: [],
+        extension: {},
+      },
+    ]);
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.data?.status).toBe("pass");
+    expect(result.data?.findingsCount.high).toBe(0);
+    expect(result.data?.findingsCount.critical).toBe(0);
+    expect(result.data?.findingsCount.low).toBe(1);
+    expect(result.data?.findings.total).toBe(1);
+    expect(result.data?.findings.warnings).toBe(1);
+    expect(result.data?.findings.errors).toBe(0);
+  });
+
+  it("fails when high severity findings are present", async () => {
+    const missionId = "test-m000006";
+    await createMockMission(workspaceRoot, missionId);
+
+    vi.mocked(findingsForObservation).mockReturnValue([
+      {
+        findingId: "finding_high_1",
+        semanticFingerprint: mockDigestRef,
+        methodologyId: "automated-web-accessibility",
+        ruleId: "aria-valid-id",
+        affectedSubjectId: "http://example.com/",
+        title: "ARIA ID not unique",
+        severity: "high",
+        evidence: [],
+        uncertainty: [],
+        extension: {},
+      },
+    ]);
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.data?.status).toBe("fail");
+    expect(result.exitCode).toBe(1);
+    expect(result.data?.findingsCount.high).toBe(1);
+    expect(result.data?.findings.errors).toBe(1);
+  });
+
+  it("fails when closure decision is not satisfied", async () => {
+    const missionId = "test-m000007";
+    await createMockMission(workspaceRoot, missionId);
+
+    vi.mocked(evaluateClosure).mockReturnValue({
+      schema: "closure-decision@1",
+      status: "blocked",
+      satisfied: false,
+      missingCapabilities: ["browser"],
+      partialCapabilities: [],
+      blockedCapabilities: ["browser"],
+      reason: "Required evidence capabilities are blocked or missing.",
+    });
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.data?.status).toBe("fail");
+    expect(result.exitCode).toBe(1);
+    expect(result.data?.closureDecision.satisfied).toBe(false);
+    expect(result.summary).toContain("closure blocked");
+  });
+
+  it("returns exit code 2 when no pages are discovered", async () => {
+    const missionId = "test-m000008";
+    await createMockMission(workspaceRoot, missionId);
+
+    const { CrawleeDiscoveryExecutor } = await import("@syrokomskyi/axiom-capture");
+    vi.mocked(CrawleeDiscoveryExecutor).mockImplementationOnce(function () {
+      return {
+        discover: vi.fn().mockResolvedValue({
+          records: [],
+          omissions: [],
+          reachedFixpoint: true,
+        }),
+      };
+    });
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.exitCode).toBe(2);
+    expect(result.data?.exitCode).toBe(2);
+    expect(result.summary).toContain("no pages discovered");
   });
 });

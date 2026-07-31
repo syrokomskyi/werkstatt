@@ -53,9 +53,7 @@ import {
 } from "./adapters/index.ts";
 import { collectPurgeUrls, purgeCacheByUrls, skippedPurgeResult } from "./cache-purge.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
-import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { execSync } from "node:child_process";
-import { writeFileIfChanged } from "@warpgogol/site-kernel";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -526,7 +524,12 @@ export async function runLeitstandDevDeploy(
       const axiomResult = (await executeKernelCommand({
         workspaceRoot,
         commandName: "mission.check",
-        argv: [`--mission=${missionId}`, "--external-preview", `--base-url=${channelConfig.url}`],
+        argv: [
+          `--mission=${missionId}`,
+          "--external-preview",
+          `--base-url=${channelConfig.url}`,
+          `--commit-sha=${commitSha}`,
+        ],
       })) as { exitCode?: number; data?: Record<string, unknown> };
       axiomExitCode = axiomResult.exitCode ?? 0;
       if (axiomExitCode === 0) {
@@ -552,30 +555,7 @@ export async function runLeitstandDevDeploy(
     }
   }
 
-  // Step 6: Post-process evidence capsule with commitSha
-  const t5 = Date.now();
-  if (result.state === "succeeded" && commitSha) {
-    const evidenceDir = path.join(workspaceRoot, "missions", missionId, "evidence", "axiom");
-    const capsulePath = path.join(evidenceDir, "evidence-capsule.yaml");
-    if (existsSync(capsulePath)) {
-      try {
-        const capsuleContent = await fs.readFile(capsulePath, "utf-8");
-        const capsule = parseYaml(capsuleContent) as Record<string, unknown>;
-        capsule.commitSha = commitSha;
-        const updatedYaml = stringifyYaml(capsule);
-        await writeFileIfChanged(capsulePath, updatedYaml + "\n");
-        logger.info(`[leitstand.dev-deploy] evidence capsule updated with commitSha: ${commitSha}`);
-      } catch (err) {
-        logger.warn(
-          `[leitstand.dev-deploy] failed to update evidence capsule: ${err instanceof Error ? err.message : String(err)}`,
-        );
-      }
-    }
-  }
-
-  logger.info(
-    `[leitstand.dev-deploy] evidence post-process: ${((Date.now() - t5) / 1000).toFixed(1)}s`,
-  );
+  // RFC-0629: No evidence post-processing — mission.check writes commitSha to evidence-metadata.json directly via --commit-sha flag
   logger.info(`[leitstand.dev-deploy] total: ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 
   // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
@@ -642,70 +622,81 @@ export async function runLeitstandPropagate(
   const missionId = releaseManifest.missionId as string;
   const releaseCommitSha = releaseManifest.commitSha as string;
 
-  // RFC-0628: Axiom evidence gate — verify evidence-capsule.yaml exists with matching missionId + commitSha
-  const capsulePath = path.join(
+  // RFC-0629: Axiom evidence gate — verify evidence-metadata.json exists with matching missionId + commitSha
+  const metadataPath = path.join(
     workspaceRoot,
     "missions",
     missionId,
     "evidence",
     "axiom",
-    "evidence-capsule.yaml",
+    "evidence-metadata.json",
   );
-  if (!existsSync(capsulePath)) {
+  if (!existsSync(metadataPath)) {
     throw new Error(
       `[leitstand.propagate] no Axiom evidence found for mission '${missionId}'. Run leitstand.dev-deploy first.`,
     );
   }
 
-  // Parse evidence-capsule.yaml for missionId + commitSha verification
-  const capsuleContent = await fs.readFile(capsulePath, "utf-8");
-  const capsule = parseYaml(capsuleContent) as {
-    missionId?: string;
-    commitSha?: string;
-  };
-
-  if (capsule.missionId && capsule.missionId !== missionId) {
+  // Parse evidence-metadata.json for missionId + commitSha verification
+  const metadataContent = await fs.readFile(metadataPath, "utf-8");
+  let metadata: { missionId?: string; commitSha?: string };
+  try {
+    metadata = JSON.parse(metadataContent) as { missionId?: string; commitSha?: string };
+  } catch {
     throw new Error(
-      `[leitstand.propagate] evidence missionId '${capsule.missionId}' does not match release missionId '${missionId}'.`,
+      `[leitstand.propagate] Axiom evidence malformed: evidence-metadata.json is not valid JSON for mission '${missionId}'.`,
     );
   }
 
-  if (capsule.commitSha && releaseCommitSha && capsule.commitSha !== releaseCommitSha) {
+  if (metadata.missionId && metadata.missionId !== missionId) {
     throw new Error(
-      `[leitstand.propagate] evidence commitSha '${capsule.commitSha}' does not match release commitSha '${releaseCommitSha}' — re-run leitstand.dev-deploy after workpiece changes.`,
+      `[leitstand.propagate] evidence missionId '${metadata.missionId}' does not match release missionId '${missionId}'.`,
     );
   }
 
-  // RFC-0628: Verify findings.yaml exists and has zero errors
-  const findingsPath = path.join(
+  if (metadata.commitSha && releaseCommitSha && metadata.commitSha !== releaseCommitSha) {
+    throw new Error(
+      `[leitstand.propagate] evidence commitSha '${metadata.commitSha}' does not match release commitSha '${releaseCommitSha}' — re-run leitstand.dev-deploy after workpiece changes.`,
+    );
+  }
+
+  // RFC-0629: Verify study-run.json exists and has no high/critical findings
+  const studyRunPath = path.join(
     workspaceRoot,
     "missions",
     missionId,
     "evidence",
     "axiom",
-    "findings.yaml",
+    "study-run.json",
   );
-  if (!existsSync(findingsPath)) {
+  if (!existsSync(studyRunPath)) {
     throw new Error(
-      `[leitstand.propagate] no Axiom findings found for mission '${missionId}'. Run leitstand.dev-deploy first.`,
+      `[leitstand.propagate] no Axiom study-run found for mission '${missionId}'. Run leitstand.dev-deploy first.`,
     );
   }
 
-  const findingsContent = await fs.readFile(findingsPath, "utf-8");
-  const findings = parseYaml(findingsContent) as {
-    summary?: { errors?: number; warnings?: number };
-  };
-
-  if (!findings?.summary) {
+  const studyRunContent = await fs.readFile(studyRunPath, "utf-8");
+  let studyRun: { findings?: Array<{ severity?: string }> };
+  try {
+    studyRun = JSON.parse(studyRunContent) as { findings?: Array<{ severity?: string }> };
+  } catch {
     throw new Error(
-      `[leitstand.propagate] Axiom evidence malformed: missing summary in findings.yaml`,
+      `[leitstand.propagate] Axiom evidence malformed: study-run.json is not valid JSON for mission '${missionId}'.`,
     );
   }
 
-  const axiomErrors = findings.summary.errors ?? 0;
-  if (axiomErrors > 0) {
+  if (!studyRun.findings || !Array.isArray(studyRun.findings)) {
     throw new Error(
-      `[leitstand.propagate] Axiom verification failed: ${axiomErrors} errors. Fix and re-deploy to dev.`,
+      `[leitstand.propagate] Axiom evidence malformed: missing findings array in study-run.json`,
+    );
+  }
+
+  const highOrCritical = studyRun.findings.filter(
+    (f) => f.severity === "high" || f.severity === "critical",
+  );
+  if (highOrCritical.length > 0) {
+    throw new Error(
+      `[leitstand.propagate] Axiom verification failed: ${highOrCritical.length} high/critical findings. Fix and re-deploy to dev.`,
     );
   }
 
