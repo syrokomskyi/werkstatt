@@ -274,6 +274,20 @@ async function runAxeInBrowser(
     }
     try {
       const page = await browser.newPage();
+
+      // Strip CSP headers from HTML documents so axe-core can be injected from CDN
+      await page.route("**/*", async (route) => {
+        if (route.request().resourceType() === "document") {
+          const response = await route.fetch();
+          const headers = new Headers(response.headers());
+          headers.delete("content-security-policy");
+          headers.delete("content-security-policy-report-only");
+          await route.fulfill({ response, headers: Object.fromEntries(headers) });
+        } else {
+          await route.continue();
+        }
+      });
+
       await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
 
       // Inject and run axe-core from CDN (requires network access)
