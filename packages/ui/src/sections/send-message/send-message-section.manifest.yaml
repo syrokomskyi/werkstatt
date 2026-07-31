@@ -129,6 +129,18 @@ propsSchema:
     contactRequirementMessage:
       type: string
       minLength: 1
+    checklistTitle:
+      type: string
+      minLength: 1
+    checklistReadyLabel:
+      type: string
+      minLength: 1
+    checklistLengthLabel:
+      type: string
+      minLength: 1
+    checklistContactLabel:
+      type: string
+      minLength: 1
     referrerField:
       type: object
       additionalProperties: false

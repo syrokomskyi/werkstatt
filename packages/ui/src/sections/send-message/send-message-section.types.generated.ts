@@ -108,6 +108,10 @@ export interface SendMessageSectionContent {
   fallbackBodyLabel?: string;
   copyMessageLabel?: string;
   contactRequirementMessage?: string;
+  checklistTitle?: string;
+  checklistReadyLabel?: string;
+  checklistLengthLabel?: string;
+  checklistContactLabel?: string;
   referrerField?: {
     enabled: boolean;
     required: boolean;

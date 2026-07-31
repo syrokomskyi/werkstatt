@@ -1,7 +1,7 @@
 ---
 /*
 <MODULE_CONTRACT>
-<purpose>Render a send-message section with a single textarea for message-embedded contact extraction and runtime channel submission.</purpose>
+<purpose>Render a send-message section with a single textarea, real-time validation checklist, and runtime channel submission.</purpose>
 <non-goals>
   <item>Do not perform server-side transport logic in the section itself.</item>
   <item>Do not store submitted visitor messages in the browser.</item>
@@ -11,6 +11,7 @@
   <item>Introduce a new shared send-message section with one-field lead capture UX and extensible channel badges.</item>
   <item>RFC-0514: add structured emailField (required) and phoneField (optional) inputs; remove contactRequirementMessage.</item>
   <item>RFC-0572: revert to single-textarea — remove email/phone inputs, re-add contactRequirementMessage.</item>
+  <item>Add real-time validation checklist with Lord Icons: to-do-list (pending) and approved-checked (ready).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,6 +20,8 @@ import type { SectionProps } from "@warpgogol/share/page";
 import { cast, need, resolveSectionAnchor, getSiteSectionLabels } from "@warpgogol/share";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import TodoListIcon from "../../icons/gen/lordicon/doodle-outline/t/to-do-list-hover-icon.astro";
+import ApprovedCheckedIcon from "../../icons/gen/lordicon/doodle-outline/a/approved-checked-hover-icon.astro";
 import type { SendMessageSectionContent } from "./send-message-section.types.generated.ts";
 import "./send-message-section.css";
 
@@ -104,6 +107,10 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
       data-referrer-field-required={String(props.referrerField?.required ?? false)}
       data-referrer-field-label={resolveLabel("referrerFieldLabel", "")}
       data-referrer-field-placeholder={resolveLabel("referrerFieldPlaceholder", "")}
+      data-checklist-title={resolveLabel("checklistTitle", "")}
+      data-checklist-ready-label={resolveLabel("checklistReadyLabel", "")}
+      data-checklist-length-label={resolveLabel("checklistLengthLabel", "")}
+      data-checklist-contact-label={resolveLabel("checklistContactLabel", "")}
     >
       {
         props.referrerField?.enabled && (
@@ -131,6 +138,42 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
           placeholder={resolveLabel("placeholder", "")}
           aria-describedby="send-message-hint"></textarea>
       </label>
+
+      <div class="send-message__checklist" data-send-message-checklist>
+        <div class="send-message__checklist-header" data-send-message-checklist-header>
+          <span
+            class="send-message__checklist-icon send-message__checklist-icon--pending"
+            data-send-message-checklist-icon-pending
+          >
+            <TodoListIcon size={28} trigger="in" stroke="regular" />
+          </span>
+          <span
+            class="send-message__checklist-icon send-message__checklist-icon--ready"
+            data-send-message-checklist-icon-ready
+            hidden
+          >
+            <ApprovedCheckedIcon size={28} trigger="in" stroke="regular" />
+          </span>
+          <span class="send-message__checklist-title" data-send-message-checklist-title>
+            {resolveLabel("checklistTitle", "")}
+          </span>
+        </div>
+        <ul class="send-message__checklist-items">
+          <li class="send-message__checklist-item" data-send-message-checklist-item="length">
+            <span class="send-message__checklist-indicator" data-send-message-checklist-indicator
+            ></span>
+            <span class="send-message__checklist-text" data-send-message-checklist-text="length"
+            ></span>
+          </li>
+          <li class="send-message__checklist-item" data-send-message-checklist-item="contact">
+            <span class="send-message__checklist-indicator" data-send-message-checklist-indicator
+            ></span>
+            <span class="send-message__checklist-text" data-send-message-checklist-text="contact">
+              {resolveLabel("checklistContactLabel", "")}
+            </span>
+          </li>
+        </ul>
+      </div>
 
       <div
         class="send-message__hint"

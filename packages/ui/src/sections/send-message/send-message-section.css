@@ -10,6 +10,7 @@
   <item>RFC-0140: Backfill Compass scaffolding for the send-message section CSS.</item>
   <item>RFC-0514: Add styles for structured email/phone input fields.</item>
   <item>RFC-0572: Remove styles for structured email/phone input fields (reverted to single-textarea).</item>
+  <item>Add real-time validation checklist with Lord Icons, indicator dots, and submit highlight.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -103,6 +104,132 @@
   outline: 2px solid transparent;
   border-color: var(--ds-color-accent, #d97706);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-color-accent, #d97706) 22%, transparent);
+}
+
+.send-message__checklist {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 auto;
+  width: min(100%, 52rem);
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--ds-color-surface, rgba(248, 248, 248, 0.72));
+  border: 1px solid var(--ds-color-border-strong, rgba(17, 24, 39, 0.1));
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.send-message__checklist[data-checklist-state="ready"] {
+  border-color: var(--ds-color-success, #166534);
+  background: color-mix(
+    in srgb,
+    var(--ds-color-success, #166534) 6%,
+    var(--ds-color-surface, rgba(248, 248, 248, 0.72))
+  );
+}
+
+.send-message__checklist-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.send-message__checklist-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.send-message__checklist-icon--ready {
+  color: var(--ds-color-success, #166534);
+}
+
+.send-message__checklist-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ds-color-text, #111827);
+  transition: color 0.3s ease;
+}
+
+.send-message__checklist[data-checklist-state="ready"] .send-message__checklist-title {
+  color: var(--ds-color-success, #166534);
+}
+
+.send-message__checklist-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.send-message__checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+.send-message__checklist-item[data-checklist-highlight="true"] {
+  background: color-mix(in srgb, var(--ds-color-danger, #b91c1c) 10%, transparent);
+  animation: send-message-checklist-flash 0.6s ease;
+}
+
+@keyframes send-message-checklist-flash {
+  0% {
+    background: color-mix(in srgb, var(--ds-color-danger, #b91c1c) 18%, transparent);
+  }
+  100% {
+    background: color-mix(in srgb, var(--ds-color-danger, #b91c1c) 10%, transparent);
+  }
+}
+
+.send-message__checklist-indicator {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--ds-color-border-strong, rgba(17, 24, 39, 0.18));
+  background: transparent;
+  position: relative;
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.send-message__checklist-item[data-checklist-state="checked"] .send-message__checklist-indicator {
+  border-color: var(--ds-color-success, #166534);
+  background: var(--ds-color-success, #166534);
+}
+
+.send-message__checklist-item[data-checklist-state="checked"]
+  .send-message__checklist-indicator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.375rem;
+  height: 0.625rem;
+  border: solid var(--ds-color-surface-raised, #ffffff);
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -65%) rotate(45deg);
+}
+
+.send-message__checklist-text {
+  font-size: 0.9rem;
+  color: var(--ds-color-text-muted, rgba(31, 41, 55, 0.82));
+  transition: color 0.3s ease;
+}
+
+.send-message__checklist-item[data-checklist-state="checked"] .send-message__checklist-text {
+  color: var(--ds-color-text, #111827);
 }
 
 .send-message__hint {
