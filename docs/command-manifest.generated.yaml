@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 4051e4fa61a4f69c928d45556473f7c3e1e4ade5e1eeea6a4620bd99cf3ce7b1
+  contentHash: fad48299e4af7d1ec36a0c91aeacb86eea0da604d3f4cb342410daf30788fb5f
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -12123,13 +12123,14 @@ commands:
       - missions/{mission}/evidence/build-report.json
     pipelines: []
   - name: mission.check
-    description: "RFC-0629: one-shot native Axiom accessibility check for a mission.
-      Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor,
+    description: "RFC-0629/RFC-0630: one-shot native Axiom accessibility check for a
+      mission. Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor,
       createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument,
       findingsForObservation, and evaluateClosure from native axiom packages.
       Writes native capsule files: staged-capsule.json, observation-bundle.json,
       study-run.json, evidence-metadata.json. External-preview only. Exit codes:
-      0=pass, 1=violations or closure blocked, 2=no pages discovered."
+      0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium
+      not installed."
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -12143,13 +12144,27 @@ commands:
         description: Mission id.
       external-preview:
         kind: boolean
-        description: Required — connect to an existing server via --base-url (no local mode).
+        description: Required — connect to an existing server via --base-url (no local
+          mode).
       base-url:
         kind: string
         description: Base URL for external preview mode (required with --external-preview).
       commit-sha:
         kind: string
         description: Optional commit SHA embedded in evidence-metadata.json.
+      max-duration:
+        kind: string
+        description: Override discovery deadline in ms (default 120000).
+      max-urls:
+        kind: string
+        description: Override max URLs to discover (default 100).
+      max-depth:
+        kind: string
+        description: Override max crawl depth (default 3).
+      locales:
+        kind: string
+        description: Comma-separated BCP 47 locales (e.g., 'de-DE,uk-UA'). Overrides
+          i18n auto-detection from workpiece.
       json:
         kind: boolean
         description: Output JSON result.
@@ -12160,13 +12175,14 @@ commands:
       - missions/{mission}/evidence/axiom/**
     pipelines: []
   - name: mission.check
-    description: "RFC-0629: one-shot native Axiom accessibility check for a mission.
-      Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor,
+    description: "RFC-0629/RFC-0630: one-shot native Axiom accessibility check for a
+      mission. Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor,
       createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument,
       findingsForObservation, and evaluateClosure from native axiom packages.
       Writes native capsule files: staged-capsule.json, observation-bundle.json,
       study-run.json, evidence-metadata.json. External-preview only. Exit codes:
-      0=pass, 1=violations or closure blocked, 2=no pages discovered."
+      0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium
+      not installed."
     scope: workspace
     provider: workspace
     module: check
