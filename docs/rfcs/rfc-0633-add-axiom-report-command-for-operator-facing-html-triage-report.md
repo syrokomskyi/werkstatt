@@ -274,15 +274,15 @@ The HTML file is self-contained (Tailwind CDN + Mermaid CDN) and contains:
 
 ## Acceptance criteria
 
-- [ ] `axiom.report` command registered in `site-kernel-checks` command table with correct name, flags, and scope
-- [ ] `renderAxiomReportHtml` pure function implemented in `site-kernel-checks` with TypeScript types from `@syrokomskyi/axiom-study` and `@syrokomskyi/axiom-capture`
-- [ ] HTML report includes all 9 sections: header, severity dashboard, Mermaid pie chart, closure decision, capability manifest, findings by severity, findings by page, tool profile, footer
-- [ ] `--json` output format matches `AxiomReportData` interface and is documented in the RFC
-- [ ] `dryRun` mode (RFC-0601) returns HTML in `data.renderedFiles` without writing to disk
-- [ ] Failure modes implemented: `AXIOM-REPORT-01` through `AXIOM-REPORT-05` with correct exit codes
-- [ ] `leitstand.dev-deploy` in `site-kernel-handoff` auto-invokes `axiom.report` after `mission.check` (best-effort, non-blocking)
-- [ ] Unit tests in `site-kernel-checks` cover: successful report generation, missing evidence directory, missing individual JSON files, dryRun mode, HTML contains expected sections
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `axiom.report` command registered in `site-kernel-checks` command table with correct name, flags, and scope (evidence: packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:369-392)
+- [x] `renderAxiomReportHtml` pure function implemented in `site-kernel-checks` with TypeScript types from `@syrokomskyi/axiom-study` and `@syrokomskyi/axiom-capture` (evidence: packages/os/site-kernel-checks/src/axiom-report.ts:29-33,182-187)
+- [x] HTML report includes all 9 sections: header, severity dashboard, Mermaid pie chart, closure decision, capability manifest, findings by severity, findings by page, tool profile, footer (evidence: packages/os/site-kernel-checks/src/axiom-report.ts:300-370, src/tests/axiom-report.test.ts:341-368)
+- [x] `--json` output format matches `AxiomReportData` interface and is documented in the RFC (evidence: packages/os/site-kernel-checks/src/axiom-report.ts:43-57, docs/rfcs/rfc-0633:206-222)
+- [x] `dryRun` mode (RFC-0601) returns HTML in `data.renderedFiles` without writing to disk (evidence: packages/os/site-kernel-checks/src/axiom-report.ts:417-419,447-449, src/tests/axiom-report.test.ts:324-338)
+- [x] Failure modes implemented: `AXIOM-REPORT-01` through `AXIOM-REPORT-05` with correct exit codes (evidence: packages/os/site-kernel-checks/src/axiom-report.ts:393-415, src/tests/axiom-report.test.ts:258-322)
+- [x] `leitstand.dev-deploy` in `site-kernel-handoff` auto-invokes `axiom.report` after `mission.check` (best-effort, non-blocking) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:561-575)
+- [x] Unit tests in `site-kernel-checks` cover: successful report generation, missing evidence directory, missing individual JSON files, dryRun mode, HTML contains expected sections (evidence: packages/os/site-kernel-checks/src/tests/axiom-report.test.ts:10 tests, pnpm --filter @warpgogol/site-kernel-checks run test — 741 passed)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0633 — exit 0)
 
 ## Implementation notes for agents
 
