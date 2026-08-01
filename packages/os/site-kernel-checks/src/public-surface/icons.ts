@@ -78,11 +78,27 @@ function buildIconSvg(app: AppPublicContext, maskable = false): string {
   const fg = app.biomePalette?.brand ?? hashColor(`${app.appId}:${biome}`, 42);
   const inset = maskable ? 14 : 6;
   const radius = maskable ? 22 : 26;
+  const s = maskable ? 0.87 : 1;
+  const cx = 256;
+  const cornerSize = Math.round(72 * s);
+  const hubSize = Math.round(124 * s);
+  const cornerOffset = Math.round(128 * s);
+  const cornerPos = cx - cornerOffset - Math.round(cornerSize / 2);
+  const cornerPos2 = cx + cornerOffset - Math.round(cornerSize / 2);
+  const hubPos = cx - Math.round(hubSize / 2);
+  const connectorStart = cx - cornerOffset;
+  const connectorEnd = cx + cornerOffset;
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">`,
     `  <rect width="512" height="512" fill="${bg}"/>`,
     `  <rect x="${inset}" y="${inset}" width="${512 - inset * 2}" height="${512 - inset * 2}" rx="${radius}" fill="${fg}" opacity="0.14"/>`,
-    `  <text x="256" y="278" fill="${fg}" font-family="Inter, Arial, sans-serif" font-size="236" font-weight="800" text-anchor="middle" dominant-baseline="middle">${iconInitial(app)}</text>`,
+    `  <line x1="${cx}" y1="${connectorStart}" x2="${cx}" y2="${connectorEnd}" stroke="${fg}" stroke-width="8" stroke-dasharray="20 20" stroke-opacity="0.6"/>`,
+    `  <line x1="${connectorStart}" y1="${cx}" x2="${connectorEnd}" y2="${cx}" stroke="${fg}" stroke-width="8" stroke-dasharray="20 20" stroke-opacity="0.6"/>`,
+    `  <rect x="${cornerPos}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
+    `  <rect x="${cornerPos2}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
+    `  <rect x="${cornerPos}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
+    `  <rect x="${cornerPos2}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
+    `  <rect x="${hubPos}" y="${hubPos}" width="${hubSize}" height="${hubSize}" rx="26" fill="${fg}"/>`,
     `</svg>`,
     "",
   ].join("\n");
