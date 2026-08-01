@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted icon commands from public-surface.ts into public-surface/icons.ts.</item>
   <item>RFC-0631: add resolveIconSvg helper for site-authored favicon SVG source with buildIconSvg fallback; add ICON-SRC-01/02/03 validation diagnostics; add sharp conversion failure fallback.</item>
+  <item>RFC-0632: add wrapMaskableSvg helper for auto-wrapping maskable icons with Android 80% safe-zone; remove favicon-maskable.svg support; replace ICON-SRC-03 with ICON-SRC-04 warning.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -34,6 +35,11 @@ import {
 
 const SVG_ROOT_RE = /<svg\b[^>]*>/i;
 const SVG_VIEWBOX_RE = /\bviewBox\s*=\s*["']([^"']*)["']/i;
+const SVG_INNER_RE = /<svg\b[^>]*>([\s\S]*)<\/svg\s*>/i;
+const RECT_RE = /<rect\b[^>]*>/gi;
+const ATTR_WIDTH_RE = /\bwidth\s*=\s*["'](512|100%)["']/i;
+const ATTR_HEIGHT_RE = /\bheight\s*=\s*["'](512|100%)["']/i;
+const ATTR_FILL_RE = /\bfill\s*=\s*["']([^"']*)["']/i;
 
 type IconDiagnosticMessage = {
   ruleId: string;
@@ -159,25 +165,44 @@ function buildWebManifest(app: AppPublicContext): string {
   )}\n`;
 }
 
+export function wrapMaskableSvg(svg: string): string {
+  const innerMatch = SVG_INNER_RE.exec(svg);
+  if (!innerMatch) return svg;
+  const innerContent = innerMatch[1];
+
+  const rootTagMatch = SVG_ROOT_RE.exec(svg);
+  if (!rootTagMatch) return svg;
+  const rootTag = rootTagMatch[0];
+
+  let bgColor = "#ffffff";
+  let contentWithoutBg = innerContent;
+
+  const rects = [...innerContent.matchAll(RECT_RE)];
+  for (const rectMatch of rects) {
+    const rect = rectMatch[0];
+    if (ATTR_WIDTH_RE.test(rect) && ATTR_HEIGHT_RE.test(rect)) {
+      const fillMatch = ATTR_FILL_RE.exec(rect);
+      if (fillMatch) bgColor = fillMatch[1];
+      contentWithoutBg = innerContent.replace(rect, "");
+      break;
+    }
+  }
+
+  if (contentWithoutBg.trim().length === 0) return svg;
+
+  return `${rootTag}\n  <rect width="512" height="512" fill="${bgColor}"/>\n  <g transform="translate(51.2, 51.2) scale(0.8)">\n${contentWithoutBg}\n  </g>\n</svg>`;
+}
+
 export async function resolveIconSvg(
   app: AppPublicContext,
   context: KernelRuntimeContext,
   maskable: boolean,
 ): Promise<string> {
+  const regularSource = await readTextIfExists(context, join(app.contentDirectory, "favicon.svg"));
   if (maskable) {
-    const maskableSource = await readTextIfExists(
-      context,
-      join(app.contentDirectory, "favicon-maskable.svg"),
-    );
-    if (maskableSource) return maskableSource;
-    const regularSource = await readTextIfExists(
-      context,
-      join(app.contentDirectory, "favicon.svg"),
-    );
-    if (regularSource) return regularSource;
+    if (regularSource) return wrapMaskableSvg(regularSource);
     return buildIconSvg(app, true);
   }
-  const regularSource = await readTextIfExists(context, join(app.contentDirectory, "favicon.svg"));
   return regularSource ?? buildIconSvg(app, false);
 }
 
@@ -365,13 +390,19 @@ export async function runPublicIconsValidate(
     "ICON-SRC-02",
     messages,
   );
-  await validateSourceSvg(
-    context,
-    join(app.contentDirectory, "favicon-maskable.svg"),
-    "ICON-SRC-03",
-    "ICON-SRC-02",
-    messages,
-  );
+
+  const sourceSvgExists = await context.io.exists(join(app.contentDirectory, "favicon.svg"));
+  if (sourceSvgExists) {
+    messages.push({
+      ruleId: "ICON-SRC-04",
+      severity: "warning",
+      file: workspaceRel(context, join(app.contentDirectory, "favicon.svg")),
+      message:
+        "Maskable icons are auto-wrapped with 80% safe-zone from favicon.svg. Visually verify maskable PNGs on Android.",
+      fixHint:
+        "Check public/icon-maskable-512.png — adjust favicon.svg if edge elements are clipped.",
+    });
+  }
 
   return diagnosticsResult(
     "public.icons.validate",
