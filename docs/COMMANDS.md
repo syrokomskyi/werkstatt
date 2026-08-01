@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 683. Raw manifest entries: 1231.
+Generated command rows: 684. Raw manifest entries: 1233.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -72,6 +72,7 @@ Generated command rows: 683. Raw manifest entries: 1231.
 | `autonomy.level.report` | site:warpgogol-com, workspace | app | yes | no | Project current PSEO autonomy levels from module context into src/surface/autonomy.state.yaml (RFC-0278). |
 | `autonomy.level.validate` | site:warpgogol-com, workspace | app | no | no | Validate PSEO autonomy scopes, ceilings, typed approval authority, and calibration-backed levels (RFC-0278). |
 | `autonomy.promote` | site:warpgogol-com, workspace | app | yes | no | Promote a PSEO autonomy scope only when calibration evidence meets the requested level bar (RFC-0278). |
+| `axiom.report` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0633: reads Axiom evidence JSON files (study-run.json, staged-capsule.json, observation-bundle.json, evidence-metadata.json) from missions/{mission}/evidence/axiom/ and writes a self-contained HTML triage report. Pure renderAxiomReportHtml with HTML escaping. Supports --dry-run (RFC-0601). Exit 0 on success regardless of finding severity (renderer, not gate). Failure modes: AXIOM-REPORT-01..05. |
 | `b2b.model.validate` | site:warpgogol-com, workspace | app | no | no | When businessModel: b2b-only is declared in system.md, validate no B2C-specific page IDs, route slugs, navigation labels, or consumer-law prose references (§ 312g/312j, Verbraucher-Widerrufsrecht) exist (RFC-0487). No-op when businessModel is absent. |
 | `barrel.size.lint` | site:warpgogol-com, workspace | workspace | no | no | Guard the @warpgogol/share barrel split: BARREL-01 fails when a package's root src/index.ts exceeds the export-line threshold (error for @warpgogol/share, warning elsewhere); BARREL-02 fails when a symbol is exported from both the root barrel and a declared subpath (RFC-0264). |
 | `behavior.snapshot.capture` | workspace | workspace | no | no | Capture a behavior snapshot from a build output directory (RFC-0357). Flags: --dist, --system, --build-kind, [--release]. |
