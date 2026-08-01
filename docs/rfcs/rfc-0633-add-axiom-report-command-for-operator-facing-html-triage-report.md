@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-01
 updatedAt: 2026-08-01
+enhancedAt: 2026-08-01
 implementedAt:
 closedAt:
 supersedes: []
@@ -149,7 +150,6 @@ interface AxiomReportInput {
 interface EvidenceMetadata {
   missionId: string;
   commitSha?: string;
-  recordedAt: string;
 }
 
 interface AxiomReportData {
@@ -174,6 +174,7 @@ interface AxiomReportResult {
   data: AxiomReportData;
   exitCode: 0 | 1;
   summary: string;
+  nextSteps: string[];
 }
 
 // Pure rendering function (no I/O)
@@ -224,7 +225,7 @@ The command does not modify any evidence JSON files. It only reads them and writ
 
 The HTML file is self-contained (Tailwind CDN + Mermaid CDN) and contains:
 
-1. **Header** — mission ID, commit SHA, timestamp, evidence directory path.
+1. **Header** — mission ID, commit SHA, `StudyRun.recordedAt` timestamp (evidence freshness indicator), evidence directory path.
 2. **Severity dashboard** — five badge cards (critical/high/medium/low/info) with counts and color coding.
 3. **Mermaid pie chart** — severity distribution as a visual pie chart.
 4. **Closure decision** — satisfied/blocked status badge with reason text.
@@ -292,3 +293,6 @@ The HTML file is self-contained (Tailwind CDN + Mermaid CDN) and contains:
 - **`axiom.report` is a renderer, not a gate.** It exits 0 when evidence files are present and valid, regardless of finding severity. The gate logic lives in `mission.check` and `leitstand.propagate`. Agents MUST NOT add gate logic to `axiom.report`.
 - **Pipeline integration is best-effort.** If `axiom.report` fails inside `leitstand.dev-deploy`, the pipeline continues with a warning. Agents MUST NOT make `axiom.report` a hard gate in the pipeline.
 - **Use `writeFileIfChanged`** from `@warpgogol/site-kernel` for writing `report.html`, not raw `writeFile`.
+- **HTML-escape all string content.** `renderAxiomReportHtml` must escape all user-provided content (finding titles, rule IDs, URLs, diagnostics) to prevent XSS in the self-contained HTML report. Follow the `escapeHtml` pattern from `@warpgogol/check-core/src/report.ts`.
+- **Populate `nextSteps`.** The result must include actionable `nextSteps` (e.g., "Review N high-severity findings at missions/<mid>/evidence/axiom/report.html" or "Fix critical findings and re-run mission.check --external-preview").
+- **Update AGENTS.md files.** `packages/os/site-kernel-checks/AGENTS.md` should reference the new `axiom.report` command. `packages/os/site-kernel-handoff/AGENTS.md` should note the `leitstand.dev-deploy` auto-invocation change.
