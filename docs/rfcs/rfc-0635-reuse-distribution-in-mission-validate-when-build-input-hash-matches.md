@@ -178,7 +178,7 @@ When `distributionReused: false` (hash mismatch or `--force`):
 // Phase 3: build.post (text.normalize.apply, passport.emit, etc.)
 ```
 
-The `build.check` phase in `mission.build` uses `executeKernelPipeline` directly (not `runPipelinePhase`) to provide step-level error reporting consistent with `mission.validate`'s `build.check` execution. `runPipelinePhase` throws on failure without step-level diagnostics; `executeKernelPipeline` returns a report with per-step status, allowing the build manifest to record which validators failed.
+The `build.check` phase in `mission.build` uses `runPipelinePhase` (same as `build.prepare` and `build.post`) for consistency. On failure, `runPipelinePhase` throws with the failed step names; `runMissionBuild` catches the error and records it in the build report.
 
 ### File system responsibilities
 
