@@ -35,7 +35,7 @@ import "./hero-section.css";
 import { contentAssetCredits, contentAssetImages } from "../../content-assets.ts";
 const images = contentAssetImages;
 
-const { lang, defaultLanguageCode, pageOverride } = Astro.props as SectionProps;
+const { lang, defaultLanguageCode, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "hero");
 const props = cast<HeroSectionContent>(pageOverride);
 
@@ -103,6 +103,7 @@ const portraitImageClass = [
 <SectionShell
   slug="hero"
   sectionId={sectionId}
+  sectionNumber={sectionNumber}
   ariaLabelledBy="hero-title"
   background={props.background ?? { kind: "transparent" }}
   density={props.density}
@@ -151,7 +152,7 @@ const portraitImageClass = [
     <div class="hero__content">
       {props.tagline && <p class="hero__tagline">{props.tagline}</p>}
       <SectionHeader
-        sectionNumber=""
+        sectionNumber={sectionNumber}
         heading={need("header.heading", props.header?.heading)}
         subheading={props.header?.subheading ?? props.subheading}
         align={props.header?.align ?? "left"}

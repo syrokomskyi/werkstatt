@@ -39,6 +39,8 @@ export const sectionShellPropsSchema = z
     slug: z.string().min(1),
     /** Anchor id (resolved by resolveSectionAnchor upstream). */
     sectionId: z.string().optional(),
+    /** Zero-padded section index — used to generate unique ARIA IDs per section instance. */
+    sectionNumber: z.string().optional(),
     ariaLabel: z.string().optional(),
     ariaLabelledBy: z.string().optional(),
     background: sectionBackgroundSchema.optional(),

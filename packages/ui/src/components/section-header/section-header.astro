@@ -49,6 +49,7 @@ const segments: Array<{ text: string; tone: string }> = Array.isArray(heading)
   : [{ text: heading as string, tone: "default" }];
 
 const HeadingTag = `h${level}` as "h1" | "h2";
+const uniqueId = id && sectionNumber ? `${sectionNumber}-${id}` : id;
 ---
 
 <header
@@ -69,7 +70,7 @@ const HeadingTag = `h${level}` as "h1" | "h2";
     }
     <HeadingTag
       class:list={["section-header__title", "effect-text", ...headingPresentation.classes]}
-      id={id}
+      id={uniqueId}
       style={headingEffectStyle}
     >
       {

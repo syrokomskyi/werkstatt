@@ -82,6 +82,7 @@ const decisionCardAriaLabel = need(
 
 <SectionShell
   slug="hero-decision-card"
+  sectionNumber={sectionNumber}
   ariaLabelledBy="hero-decision-card-title"
   background={props.background ?? { kind: "transparent" }}
   effects={props.effects}
@@ -127,7 +128,7 @@ const decisionCardAriaLabel = need(
         )
       }
       <SectionHeader
-        sectionNumber=""
+        sectionNumber={sectionNumber}
         heading={need("header.heading", props.header?.heading)}
         eyebrow={props.header?.eyebrow}
         subheading={props.header?.subheading ?? props.tagline}

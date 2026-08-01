@@ -30,6 +30,7 @@ type Props = SectionShellProps & { lang?: string };
 const {
   slug,
   sectionId,
+  sectionNumber,
   ariaLabel,
   ariaLabelledBy,
   background,
@@ -127,7 +128,11 @@ const inlineStyle =
   data-motion-stagger-child={staggerChild}
   id={sectionId}
   aria-label={ariaLabel}
-  aria-labelledby={ariaLabelledBy}
+  aria-labelledby={ariaLabelledBy
+    ? sectionNumber
+      ? `${sectionNumber}-${ariaLabelledBy}`
+      : ariaLabelledBy
+    : undefined}
   style={inlineStyle}
 >
   {

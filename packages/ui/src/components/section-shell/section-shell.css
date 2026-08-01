@@ -52,6 +52,7 @@
     width: 100%;
     margin: 0 auto;
     padding-inline: var(--ds-size-section-padding-x);
+    background-color: inherit;
   }
   .section-shell--container-default .section-shell__container {
     max-width: min(var(--ds-size-container-max), var(--ds-size-section-content-max));
