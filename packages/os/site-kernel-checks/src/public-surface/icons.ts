@@ -76,30 +76,15 @@ function buildIconSvg(app: AppPublicContext, maskable = false): string {
   const biome = asString(asRecord(app.manifest.identity)?.biome) ?? app.appId;
   const bg = app.biomePalette?.surface ?? hashColor(`${biome}:${app.appId}`, 17);
   const fg = app.biomePalette?.brand ?? hashColor(`${app.appId}:${biome}`, 42);
-  const cx = 256;
-  const margin = maskable ? 56 : 28;
-  const cornerSize = maskable ? 80 : 92;
-  const hubSize = maskable ? 120 : 140;
-  const cornerPos = margin;
-  const cornerPos2 = 512 - margin - cornerSize;
-  const hubPos = cx - Math.round(hubSize / 2);
-  const connectorStart = margin;
-  const connectorEnd = 512 - margin;
-  const cornerRx = Math.round(cornerSize * 0.18);
-  const hubRx = Math.round(hubSize * 0.19);
-  const strokeW = maskable ? 7 : 8;
-  const visibleSegment = hubPos - (margin + cornerSize);
-  const dash = Math.round(visibleSegment / 4);
+  const inset = maskable ? 6 : 6;
+  const overlaySize = 512 - inset * 2;
+  const overlayRx = Math.round(overlaySize * 0.052);
+  const fontSize = maskable ? 200 : 236;
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">`,
     `  <rect width="512" height="512" fill="${bg}"/>`,
-    `  <line x1="${cx}" y1="${connectorStart}" x2="${cx}" y2="${connectorEnd}" stroke="${fg}" stroke-width="${strokeW}" stroke-dasharray="${dash} ${dash}"/>`,
-    `  <line x1="${connectorStart}" y1="${cx}" x2="${connectorEnd}" y2="${cx}" stroke="${fg}" stroke-width="${strokeW}" stroke-dasharray="${dash} ${dash}"/>`,
-    `  <rect x="${cornerPos}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
-    `  <rect x="${cornerPos2}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
-    `  <rect x="${cornerPos}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
-    `  <rect x="${cornerPos2}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
-    `  <rect x="${hubPos}" y="${hubPos}" width="${hubSize}" height="${hubSize}" rx="${hubRx}" fill="${fg}"/>`,
+    `  <rect x="${inset}" y="${inset}" width="${overlaySize}" height="${overlaySize}" rx="${overlayRx}" fill="${fg}" opacity="0.14"/>`,
+    `  <text x="256" y="278" fill="${fg}" font-family="Inter, Arial, sans-serif" font-size="${fontSize}" font-weight="800" text-anchor="middle" dominant-baseline="middle">${iconInitial(app)}</text>`,
     `</svg>`,
     "",
   ].join("\n");
