@@ -199,6 +199,8 @@ let tmpDir: string;
 
 beforeEach(() => {
   tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0628-"));
+  // RFC-0634: computeBuildInputHash calls resolveCurrentEcosystem which reads workspaceRoot/package.json
+  writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
 });
 
 afterEach(() => {

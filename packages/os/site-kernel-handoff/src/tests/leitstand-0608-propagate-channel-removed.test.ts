@@ -25,6 +25,35 @@ vi.mock("node:child_process", () => ({
   ) => cb(null, "3.99.0", ""),
 }));
 
+// RFC-0634: mock fetch for dev build-identity.json verification
+const mockBuildIdentity = {
+  releaseId: "workpiece-test-sys-m000001",
+  systemId: "test-sys",
+  missionId: "test-sys-m000001",
+  semver: "0.0.0-workpiece",
+  distTreeHash: "sha256:abc123",
+  behaviorSnapshotHash: "",
+  siteContentHash: "sha256:content-hash",
+  platformVersion: "1.0.0",
+  platformSemanticHash: "sha256:platform-hash",
+  commitSha: "abc123def456",
+  buildTimestamp: "2026-01-01T00:00:00.000Z",
+  targetPlatform: "cloudflare-workers",
+};
+vi.stubGlobal(
+  "fetch",
+  vi.fn(async (url: string) => {
+    if (url.includes("build-identity.json")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => mockBuildIdentity,
+      } as Response;
+    }
+    return { ok: false, status: 404 } as Response;
+  }),
+);
+
 function makeContext(workspaceRoot: string): KernelRuntimeContext {
   return {
     workspaceRoot,
@@ -118,6 +147,8 @@ let tmpDir: string;
 
 beforeEach(() => {
   tmpDir = mkdtempSync(join(process.cwd(), "tmp-leitstand-0608-prop-"));
+  // RFC-0634: computeBuildInputHash calls resolveCurrentEcosystem which reads workspaceRoot/package.json
+  writeFileSync(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
 });
 
 afterEach(() => {
@@ -152,6 +183,8 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
     missionId,
     commitSha: "abc123def456",
     behaviorSnapshotHash: "abc123",
+    distTreeHash: "sha256:abc123",
+    siteContentHash: "sha256:content-hash",
     publishedAt: "2026-07-10T00:00:00.000Z",
   });
   const distDir = createDistDir(tmpDir, releaseId);
