@@ -217,14 +217,14 @@ Diagnostic rules:
 
 ## Acceptance criteria
 
-- [ ] `resolveIconSvg` helper reads `src/content/favicon.svg` when present, falls back to `buildIconSvg` otherwise (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
-- [ ] `resolveIconSvg` reads `src/content/favicon-maskable.svg` for maskable variant when present, falls back to regular source SVG (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
-- [ ] `public.icons.validate` reports `ICON-SRC-01` when source SVG has wrong viewBox (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
-- [ ] `public.icons.validate` reports `ICON-SRC-02` when source SVG is invalid XML (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
-- [ ] `public.icons.validate` reports `ICON-SRC-03` when maskable source SVG has wrong viewBox (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
-- [ ] Generator falls back to `buildIconSvg` when `sharp` throws during PNG/ICO conversion of a valid-XML source SVG (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
-- [ ] Sites without `src/content/favicon.svg` are unaffected — `buildIconSvg` fallback produces identical output to pre-RFC behavior (evidence: `public.icons.generate` output hash comparison)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `resolveIconSvg` helper reads `src/content/favicon.svg` when present, falls back to `buildIconSvg` otherwise (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:154`, `src/tests/icons-source-svg.test.ts:62`)
+- [x] `resolveIconSvg` reads `src/content/favicon-maskable.svg` for maskable variant when present, falls back to regular source SVG (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:154-174`, `src/tests/icons-source-svg.test.ts:80`)
+- [x] `public.icons.validate` reports `ICON-SRC-01` when source SVG has wrong viewBox (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:356-361`, `src/tests/icons-source-svg.test.ts:97`)
+- [x] `public.icons.validate` reports `ICON-SRC-02` when source SVG is invalid XML (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:386-413`, `src/tests/icons-source-svg.test.ts:108`)
+- [x] `public.icons.validate` reports `ICON-SRC-03` when maskable source SVG has wrong viewBox (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:363-368`, `src/tests/icons-source-svg.test.ts:119`)
+- [x] Generator falls back to `buildIconSvg` when `sharp` throws during PNG/ICO conversion of a valid-XML source SVG (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:201-207`, `src/tests/icons-source-svg.test.ts:135`)
+- [x] Sites without `src/content/favicon.svg` are unaffected — `buildIconSvg` fallback produces identical output to pre-RFC behavior (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:169-173`, `src/tests/icons-source-svg.test.ts:71`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0631 --json` → status: pass, violations: [])
 
 ## Implementation notes for agents
 
