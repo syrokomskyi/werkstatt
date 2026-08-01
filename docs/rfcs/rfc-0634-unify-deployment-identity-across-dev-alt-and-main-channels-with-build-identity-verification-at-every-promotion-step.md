@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-01
 updatedAt: 2026-08-01
+enhancedAt: 2026-08-01
 implementedAt:
 closedAt:
 supersedes: []
@@ -56,6 +57,7 @@ appsImpacted: []
 packagesImpacted:
   - '@warpgogol/site-kernel-handoff'
   - '@warpgogol/ui'
+  - '@warpgogol/ontology'
 successSignals:
   - dev-deploy writes build-identity.json into workpiece public/.well-known/ before build and dist/client/.well-known/ after hash computation
   - open-source page reads build-identity.json locally from public/.well-known/ (not fetch from Astro.url.origin)
@@ -66,9 +68,10 @@ nonGoals:
   - Do not change leitstand.promote (alt→main verification is already correct from RFC-0608)
   - Do not change the release state machine (prepared → published → alt-deployed → promoted → rolled-back)
   - Do not make dev-deploy create a release — dev remains workpiece-based and ephemeral (RFC-0628)
-  - Do not add a workpieceId field to buildIdentitySchema — workpiece uses releaseId: workpiece-<missionId>
+  - Do not add a workpieceId field to buildIdentitySchema — workpiece uses releaseId: workpiece-<missionId> with a loosened regex
   - Do not change the Axiom verification gate — it remains part of dev-deploy and propagate evidence check
   - Do not change the open-source page layout or SBOM data — only the build-identity reading mechanism changes
+  - Do not address the distribution-reuse path in release.prepare — when canReuseDistribution is true, the workpiece is not rebuilt and the preliminary build-identity.json is not written. The reused distribution's open-source page retains whatever metadata it was built with. This is a known limitation documented in the Design section.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -158,7 +161,7 @@ The `build-identity.json` file goes through two phases:
 
 2. **Final** — written to `dist/client/.well-known/build-identity.json` after `fingerprintTree` computes `distTreeHash`. Contains the real `distTreeHash`, `behaviorSnapshotHash` (empty for workpiece), `siteContentHash`, `platformVersion`, `platformSemanticHash`. Promotion gates fetch this version from the source channel URL.
 
-The `distTreeHash` computation excludes `build-identity.json` because the file is not present in `dist/` at hash time — it is written afterward. This is the same sequencing `release.prepare` already uses (hash at line 362, write at line 370).
+The `distTreeHash` computation excludes `build-identity.json` because the final file is not present in `dist/` at hash time — it is written afterward. However, the preliminary file written to `public/.well-known/` before the build is copied into `dist/client/.well-known/build-identity.json` by Astro's build. Both `dev-deploy` and `release.prepare` MUST remove this copied preliminary file from `dist/client/.well-known/build-identity.json` before computing `distTreeHash` via `fingerprintTree`. After hashing, the final `build-identity.json` is written to the same path. This three-step sequence (preliminary → remove from dist → hash → write final) ensures `distTreeHash` is deterministic.
 
 ### Workpiece build-identity (dev-deploy)
 
@@ -181,7 +184,7 @@ The `distTreeHash` computation excludes `build-identity.json` because the file i
 }
 ```
 
-`behaviorSnapshotHash` is an empty string for workpiece identity — behavior snapshots are only computed by `release.prepare`. `semver` is `0.0.0-workpiece` since no release exists.
+`behaviorSnapshotHash` is an empty string for workpiece identity — behavior snapshots are only computed by `release.prepare`. `semver` is `0.0.0-workpiece` since no release exists. The `commitSha` is captured from the workpiece git repository (`git rev-parse HEAD` at the workpiece path), not the monorepo git repository. This is critical for `leitstand.propagate` verification: the release manifest's `commitSha` must also be captured from the workpiece git HEAD, not the monorepo HEAD (see Rollout step 2).
 
 ### Release build-identity (release.prepare)
 
@@ -199,9 +202,9 @@ to local file read:
 
 ```astro
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
-const wellKnownPath = fileURLToPath(new URL("../../public/.well-known/build-identity.json", import.meta.url));
+const wellKnownPath = join(process.cwd(), "public", ".well-known", "build-identity.json");
 let deploymentMetadata = { deploymentId: "—", buildTimestamp: "—", commitSha: "—" };
 try {
   const raw = readFileSync(wellKnownPath, "utf8");
@@ -216,58 +219,52 @@ try {
 }
 ```
 
+The path is resolved via `process.cwd()` which points to the workpiece root during `pnpm build` (Astro runs from the workpiece directory). The `import.meta.url` approach does not work because the component lives in `packages/ui/src/sections/open-source-registry/` but `public/` is in the workpiece root — a relative path from the component would resolve to `packages/ui/src/public/` which does not exist.
+
 This works for both SSG (prerender) and SSR. Each channel's build includes its own `public/.well-known/build-identity.json`, so the prerendered HTML embeds the correct metadata.
 
 ### leitstand.propagate build-identity verification (dev→alt)
 
 `leitstand.propagate` gains a build-identity verification step before deploying to alt, mirroring `leitstand.promote`:
 
-1. Fetch `/.well-known/build-identity.json` from the dev channel URL (with cache-buster query parameter, RFC-0618).
-2. Parse and validate against `buildIdentitySchema`.
-3. Verify `commitSha` matches the release manifest's `commitSha`.
-4. Verify `siteContentHash` matches the release manifest's `siteContentHash`.
-5. Verify `distTreeHash` matches the release manifest's `distTreeHash`.
-6. If any check fails, reject with an actionable error message.
+1. Resolve the dev channel config via `getChannelConfig(dep, "dev")` to obtain the dev channel URL. The deployment config is read from the registry entry as `entry.deployment`.
+2. Fetch `/.well-known/build-identity.json` from the dev channel URL (with cache-buster query parameter, RFC-0618).
+3. Parse and validate against `buildIdentitySchema`. The `releaseId` field regex is loosened to accept both release IDs (`<system-id>-r<NNNNNN>`) and workpiece IDs (`workpiece-<missionId>`) — see TypeScript contracts below.
+4. Verify `missionId` matches the release manifest's `missionId`.
+5. Verify `commitSha` matches the release manifest's `commitSha`. Both values are captured from the workpiece git HEAD (see Workpiece build-identity section).
+6. Verify `siteContentHash` matches the release manifest's `siteContentHash`.
+7. Verify `distTreeHash` matches the release manifest's `distTreeHash`.
+8. If any check fails, reject with an actionable error message.
 
 `behaviorSnapshotHash` is NOT verified for dev→alt because the workpiece build-identity has an empty string for this field (behavior snapshots are only computed by `release.prepare`). The alt deployment's `build-identity.json` (written by `release.prepare`) will have the real `behaviorSnapshotHash`, which is then verified by `leitstand.promote` for alt→main.
 
 ### TypeScript contracts
 
 ```ts
-// No schema changes — buildIdentitySchema is unchanged.
+// Schema change: buildIdentitySchema.releaseId regex is loosened to accept
+// both release IDs (<system-id>-r<NNNNNN>) and workpiece IDs (workpiece-<missionId>).
+// The new regex: /^(workpiece-)?[a-z0-9]+(-[a-z0-9]+)*(-r\d{6}|-m\d{6})$/
+// This is the only schema change. All other fields remain unchanged.
 // Workpiece build-identity uses empty string for behaviorSnapshotHash.
 
-// New: leitstand.propagate result gains build-identity verification fields
+// Additive: leitstand.propagate result gains build-identity verification fields
+// Existing fields (systemId, releaseId, channel, state, deploymentUrl, startedAt,
+// completedAt, preflight, purgeResult, health, releaseState) are preserved.
 interface LeitstandPropagateData {
-  releaseId: string;
-  systemId: string;
-  channel: "alt";
-  previousState: "published";
-  newState: "alt-deployed";
+  // ... existing fields preserved ...
   devBuildIdentityVerified: boolean;  // NEW
-  axiomEvidenceVerified: boolean;
-  deployedAt: string;
+  axiomEvidenceVerified: boolean;     // NEW (explicit flag, was implicit)
 }
 
-// New: dev-deploy result gains build-identity fields
+// Additive: dev-deploy result gains buildIdentity field
+// Existing fields (command, systemId, missionId, commitSha, buildState, deployState,
+// deploymentUrl, axiom) are preserved.
 interface DevDeployResult {
-  systemId: string;
-  missionId: string;
-  state: "succeeded" | "failed";
-  deploymentUrl: string;
-  commitSha: string;
-  buildIdentity: {
-    releaseId: string;       // "workpiece-<missionId>"
-    written: boolean;        // true if build-identity.json was written
-    path: string;            // "dist/client/.well-known/build-identity.json"
-  };
-  build: { succeeded: boolean; durationMs: number };
-  deploy: { succeeded: boolean; workerName: string };
-  axiom: {
-    status: "pass" | "fail" | "not-run";
-    errors: number;
-    warnings: number;
-    exitCode: number;
+  // ... existing fields preserved ...
+  buildIdentity: {                   // NEW
+    releaseId: string;               // "workpiece-<missionId>"
+    written: boolean;                // true if build-identity.json was written
+    path: string;                    // "dist/client/.well-known/build-identity.json"
   };
 }
 ```
@@ -278,50 +275,51 @@ interface DevDeployResult {
 | --- | --- |
 | `missions/{mission}/workpiece/public/.well-known/build-identity.json` | Written by `dev-deploy` (preliminary) and `release.prepare` (preliminary) before build. Read by the open-source page component at build time. |
 | `missions/{mission}/workpiece/dist/client/.well-known/build-identity.json` | Written by `dev-deploy` (final) and `release.prepare` (final) after hash computation. Served as a static public file. Fetched by promotion gates. |
-| `packages/ui/src/sections/open-source-registry/open-source-registry-section.astro` | Changed from runtime `fetch(Astro.url.origin)` to local `readFileSync(public/.well-known/build-identity.json)` |
+| `packages/ui/src/sections/open-source-registry/open-source-registry-section.astro` | Changed from runtime `fetch(Astro.url.origin)` to local `readFileSync(join(process.cwd(), "public", ".well-known", "build-identity.json"))` |
 | `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `runLeitstandDevDeploy` gains build-identity write steps; `runLeitstandPropagate` gains dev-URL build-identity verification |
-| `packages/os/site-kernel-handoff/src/release/release-commands.ts` | `runReleasePrepare` gains preliminary build-identity write to `workpiece/public/.well-known/` before build |
+| `packages/os/site-kernel-handoff/src/release/release-commands.ts` | `runReleasePrepare` gains preliminary build-identity write to `workpiece/public/.well-known/` before build; `commitSha` source changes from monorepo HEAD to workpiece HEAD |
+| `packages/ontology/src/operations/release.ts` | `buildIdentitySchema.releaseId` regex loosened to accept `workpiece-<missionId>` prefix |
 
 ### Output format
 
-`leitstand.dev-deploy --json` (changed — gains `buildIdentity` field):
+`leitstand.dev-deploy --json` (additive — gains `buildIdentity` field, existing fields preserved):
 
 ```json
 {
   "commandName": "leitstand.dev-deploy",
   "data": {
+    "command": "leitstand.dev-deploy",
     "systemId": "warpgogol-com",
     "missionId": "warpgogol-com-m000024",
-    "state": "succeeded",
-    "deploymentUrl": "https://dev-warpgogol-com.syrokomskyi.workers.dev",
     "commitSha": "d3759f7e635d3c2fad7738fa3adaf7f4e8d36b0c",
+    "buildState": "succeeded",
+    "deployState": "succeeded",
+    "deploymentUrl": "https://dev-warpgogol-com.syrokomskyi.workers.dev",
     "buildIdentity": {
       "releaseId": "workpiece-warpgogol-com-m000024",
       "written": true,
       "path": "dist/client/.well-known/build-identity.json"
     },
-    "build": { "succeeded": true, "durationMs": 75000 },
-    "deploy": { "succeeded": true, "workerName": "dev-warpgogol-com" },
     "axiom": { "status": "pass", "errors": 0, "warnings": 42, "exitCode": 0 }
   },
-  "summary": "[leitstand.dev-deploy] deployed to dev (succeeded), Axiom: pass"
+  "summary": "[leitstand.dev-deploy] warpgogol-com deployed to dev (succeeded, Axiom: pass)"
 }
 ```
 
-`leitstand.propagate --json` (changed — gains `devBuildIdentityVerified` field):
+`leitstand.propagate --json` (additive — gains `devBuildIdentityVerified` and `axiomEvidenceVerified` fields, existing fields preserved):
 
 ```json
 {
   "command": "leitstand.propagate",
   "data": {
-    "releaseId": "warpgogol-com-r000006",
     "systemId": "warpgogol-com",
+    "releaseId": "warpgogol-com-r000006",
     "channel": "alt",
-    "previousState": "published",
-    "newState": "alt-deployed",
+    "state": "succeeded",
+    "deploymentUrl": "https://alt.warpgogol.com",
+    "releaseState": "alt-deployed",
     "devBuildIdentityVerified": true,
-    "axiomEvidenceVerified": true,
-    "deployedAt": "2026-08-01T19:00:00.000Z"
+    "axiomEvidenceVerified": true
   },
   "summary": "[leitstand.propagate] warpgogol-com-r000006 deployed to alt"
 }
@@ -332,34 +330,37 @@ interface DevDeployResult {
 | Condition | Behavior |
 | --- | --- |
 | `build-identity.json` not found at dev URL during `leitstand.propagate` | Throws: "build-identity.json not served by dev deployment — run leitstand.dev-deploy first" |
+| `buildIdentitySchema` validation fails on dev build-identity | `leitstand.propagate` throws: "build-identity.json schema validation failed: <error>" — indicates the dev deployment is serving a malformed or outdated build-identity.json |
 | Hash mismatch between dev build-identity and release manifest | `leitstand.propagate` throws with the specific field that mismatched |
 | `commitSha` mismatch between dev build-identity and release manifest | `leitstand.propagate` throws: "dev build-identity commitSha '<x>' does not match release commitSha '<y>' — re-run leitstand.dev-deploy after workpiece changes" |
 | Network error fetching build-identity.json from dev URL | `leitstand.propagate` throws: "cannot reach dev deployment at <url>" |
 | Dev deployment serving a different mission's build-identity | `leitstand.propagate` throws: "build-identity.json missionId mismatch: expected <missionId>, got <actual>" |
 | `public/.well-known/build-identity.json` missing during build | Open-source page shows placeholder `—` values. Non-fatal — the build succeeds. |
-| `distTreeHash` includes `build-identity.json` (hash non-determinism) | Prevented by sequencing: hash is computed before the final `build-identity.json` is written. The preliminary file in `public/` is overwritten by the final file after hashing. |
+| `distTreeHash` includes `build-identity.json` (hash non-determinism) | Prevented by sequencing: the preliminary file copied by Astro's build is removed from `dist/client/.well-known/` before `fingerprintTree` runs. The final file is written after hashing. |
 
 ## Rollout
 
-1. **`leitstand.dev-deploy` build-identity write** (`packages/os/site-kernel-handoff`): Add preliminary `build-identity.json` write to `workpiece/public/.well-known/` before `pnpm build`. After build, remove any `build-identity.json` from `dist/client/.well-known/`, compute `distTreeHash` via `fingerprintTree`, then write final `build-identity.json` with real hashes. Clean up the preliminary file from `workpiece/public/.well-known/` after the build (or leave it — it is overwritten by the next deploy or by `release.prepare`).
+1. **`leitstand.dev-deploy` build-identity write** (`packages/os/site-kernel-handoff`): Add preliminary `build-identity.json` write to `workpiece/public/.well-known/` before `pnpm build`. After build, remove the copied preliminary file from `dist/client/.well-known/build-identity.json`, compute `distTreeHash` via `fingerprintTree`, then write final `build-identity.json` with real hashes. Clean up the preliminary file from `workpiece/public/.well-known/` after the build — this is mandatory, not optional, to avoid stale metadata in the workpiece.
 
-2. **`release.prepare` preliminary build-identity** (`packages/os/site-kernel-handoff`): Add a preliminary `build-identity.json` write to `workpiece/public/.well-known/` before the build, with `releaseId` set to the release ID (e.g., `warpgogol-com-r000006`). This ensures the alt and main open-source pages show the release ID, not a stale workpiece ID. The final write to `dist/client/.well-known/` (line 370) is unchanged.
+2. **`release.prepare` preliminary build-identity and commitSha source** (`packages/os/site-kernel-handoff`): Add a preliminary `build-identity.json` write to `workpiece/public/.well-known/` before the build, with `releaseId` set to the release ID (e.g., `warpgogol-com-r000006`). This ensures the alt and main open-source pages show the release ID, not a stale workpiece ID. After build, remove the copied preliminary file from `dist/client/.well-known/build-identity.json` before computing `distTreeHash` — the existing final write at line 370 is unchanged. Additionally, change the `commitSha` source from `resolveCurrentEcosystem(workspaceRoot)` (monorepo HEAD) to `git rev-parse HEAD` at the workpiece path — this ensures the release manifest's `commitSha` matches the dev build-identity's `commitSha` for `leitstand.propagate` verification. When `canReuseDistribution` is true (distribution reuse path), the workpiece is not rebuilt and the preliminary write is skipped — the reused distribution retains whatever metadata it was built with. This is a known limitation (see nonGoals).
 
-3. **Open-source page component** (`packages/ui`): Replace `fetch(Astro.url.origin)` with local `readFileSync` from `public/.well-known/build-identity.json`. Remove the SSR fetch comment. Update the CHANGE_SUMMARY in the component header.
+3. **Open-source page component** (`packages/ui`): Replace `fetch(Astro.url.origin)` with local `readFileSync(join(process.cwd(), "public", ".well-known", "build-identity.json"))`. Remove the SSR fetch comment. Update the CHANGE_SUMMARY in the component header.
 
-4. **`leitstand.propagate` dev-URL verification** (`packages/os/site-kernel-handoff`): Add a build-identity fetch from the dev channel URL (with cache-buster, RFC-0618) before the existing Axiom evidence check. Verify `commitSha`, `distTreeHash`, and `siteContentHash` against the release manifest. Skip `behaviorSnapshotHash` (empty for workpiece). Add `devBuildIdentityVerified` to the command result.
+4. **`buildIdentitySchema` regex change** (`packages/ontology`): Loosen the `releaseId` field regex in `buildIdentitySchema` from `RELEASE_ID_REGEX` to `/^(workpiece-)?[a-z0-9]+(-[a-z0-9]+)*(-r\d{6}|-m\d{6})$/` to accept both release IDs (`<system-id>-r<NNNNNN>`) and workpiece IDs (`workpiece-<missionId>`). Update the existing `buildIdentitySchema` test in `packages/os/site-kernel-handoff/src/tests/release-0608-build-identity.test.ts` to verify workpiece IDs pass validation.
 
-5. **`leitstand.promote`**: No changes — alt→main verification is already correct (RFC-0608).
+5. **`leitstand.propagate` dev-URL verification** (`packages/os/site-kernel-handoff`): Add a build-identity fetch from the dev channel URL (resolved via `getChannelConfig(dep, "dev")`) with cache-buster (RFC-0618) before the existing Axiom evidence check. Verify `missionId`, `commitSha`, `distTreeHash`, and `siteContentHash` against the release manifest. Skip `behaviorSnapshotHash` (empty for workpiece). Add `devBuildIdentityVerified` and `axiomEvidenceVerified` to the command result.
 
-6. **AGENTS.md updates**: Update `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section: `dev-deploy` now writes build-identity; `propagate` now verifies build-identity from dev URL. Update `packages/ui/AGENTS.md` if the open-source registry security rule references the fetch mechanism.
+6. **`leitstand.promote`**: No changes — alt→main verification is already correct (RFC-0608).
 
-7. **DNA updates**: Update DNA-49 prose in `docs/architecture-dna.md` to reflect that all promotion steps (dev→alt, alt→main) verify build-identity from the source channel URL.
+7. **AGENTS.md updates**: Update `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section: `dev-deploy` now writes build-identity (preliminary + final with dist cleanup); `propagate` now verifies build-identity from dev URL; `release.prepare` now uses workpiece HEAD for `commitSha`. Update `packages/ui/AGENTS.md` to document the `readFileSync(join(process.cwd(), ...))` pattern for build-time file reads in shared UI components.
 
-8. **Tests**: Unit tests for `dev-deploy` build-identity write (preliminary + final, hash exclusion), `propagate` dev-URL verification (success, hash mismatch, missing file, network error), and the open-source component local read.
+8. **DNA updates**: Update DNA-49 prose in `docs/architecture-dna.md` to reflect that all promotion steps (dev→alt, alt→main) verify build-identity from the source channel URL. Proposed prose addition: "Build-identity verification is required at every promotion step: `leitstand.propagate` fetches `build-identity.json` from the dev channel URL and verifies `missionId`, `commitSha`, `distTreeHash`, and `siteContentHash` against the release manifest before deploying to alt; `leitstand.promote` fetches from the alt channel URL and verifies `releaseId`, `distTreeHash`, `behaviorSnapshotHash`, and `siteContentHash` before deploying to main."
 
-9. **Existing releases**: No migration needed — existing releases already have `build-identity.json` in `dist/client/.well-known/`. The preliminary write to `public/.well-known/` is new but only affects future builds.
+9. **Tests**: Unit tests for `dev-deploy` build-identity write (preliminary + final, hash exclusion), `propagate` dev-URL verification (success, hash mismatch, missing file, network error), and the open-source component local read.
 
-10. **New sites**: Automatically comply from day one — `dev-deploy` writes build-identity, `release.prepare` writes preliminary + final, and the open-source component reads locally.
+10. **Existing releases**: No migration needed — existing releases already have `build-identity.json` in `dist/client/.well-known/`. The preliminary write to `public/.well-known/` is new but only affects future builds.
+
+11. **New sites**: Automatically comply from day one — `dev-deploy` writes build-identity, `release.prepare` writes preliminary + final, and the open-source component reads locally.
 
 ## Alternatives considered
 
@@ -367,7 +368,7 @@ interface DevDeployResult {
 
 - **Make the open-source page SSR (not prerendered).** Rejected: would require changing `output: "static"` or adding `export const prerender = false` to the open-source page. This adds runtime cost (Worker execution for every request) for a page that is fundamentally static. The local file read solves the problem without changing the rendering strategy.
 
-- **Add a `workpieceId` field to `buildIdentitySchema`.** Rejected: the schema already has `releaseId` which can hold `workpiece-<missionId>` for workpiece identity. Adding a field complicates the schema and the verification logic. The operator confirmed: use the same schema, `releaseId` doubles as workpiece identifier.
+- **Add a `workpieceId` field to `buildIdentitySchema`.** Rejected: the schema already has `releaseId` which can hold `workpiece-<missionId>` for workpiece identity. Adding a field complicates the schema and the verification logic. Instead, the `releaseId` regex is loosened to accept both release IDs and workpiece IDs. The operator confirmed: use the same schema, `releaseId` doubles as workpiece identifier.
 
 - **Verify `behaviorSnapshotHash` for dev→alt.** Rejected: workpiece build-identity does not have a behavior snapshot (only `release.prepare` computes one). Verifying an empty string against a real hash would always fail. The `behaviorSnapshotHash` verification remains alt→main only (where both sides have real values from `release.prepare`).
 
@@ -377,7 +378,7 @@ interface DevDeployResult {
 
 - **Preliminary build-identity stale in `public/.well-known/`.** If a build fails after the preliminary write but before cleanup, the stale file remains in `workpiece/public/.well-known/`. Mitigated: the next `dev-deploy` or `release.prepare` overwrites it. The preliminary file has placeholder hashes — it is only used for display, not verification.
 
-- **`distTreeHash` non-determinism if sequencing is broken.** If `build-identity.json` is present in `dist/` when `fingerprintTree` runs, the hash includes the `buildTimestamp` and changes on every build. Mitigated: the RFC explicitly requires writing the final file after hash computation, mirroring `release.prepare`'s existing pattern (line 362 vs 370). Unit tests must verify that `distTreeHash` is stable across rebuilds.
+- **`distTreeHash` non-determinism if sequencing is broken.** If `build-identity.json` is present in `dist/` when `fingerprintTree` runs, the hash includes the `buildTimestamp` and changes on every build. The preliminary file written to `public/.well-known/` is copied to `dist/client/.well-known/` by Astro's build — it MUST be removed before hashing. Mitigated: the RFC explicitly requires removing the copied preliminary file from `dist/client/.well-known/` before computing `distTreeHash`, then writing the final file after hashing. Unit tests must verify that `distTreeHash` is stable across rebuilds.
 
 - **Dev URL unreachable during propagate.** `leitstand.propagate` fetches `build-identity.json` from the dev URL. If dev is down or the URL is misconfigured, propagation is blocked. Mitigated: this is the intended behavior — propagation should be blocked if dev is not verifiable. The operator explicitly wants this guarantee.
 
@@ -385,26 +386,31 @@ interface DevDeployResult {
 
 - **Agent misinterpretation.** Agents might expect `build-identity.json` to be in `dist/` before hashing. The AGENTS.md update must clearly state: preliminary in `public/` before build, final in `dist/` after hash. Agents might also try to verify `behaviorSnapshotHash` for dev→alt — the AGENTS.md must state this field is empty for workpiece and skipped.
 
-- **Open-source component `readFileSync` in Astro frontmatter.** Using `node:fs` in an Astro component frontmatter is safe during SSG (build time) and SSR (Worker runtime). The path is resolved via `import.meta.url` relative to the component file. Mitigated: this is a common Astro pattern for reading local files at build time.
+- **Open-source component `readFileSync` in Astro frontmatter.** Using `node:fs` in an Astro component frontmatter is safe during SSG (build time) and SSR (Worker runtime). The path is resolved via `process.cwd()` which points to the workpiece root during `pnpm build`. Mitigated: this is a common Astro pattern for reading local files at build time.
 
 ## Acceptance criteria
 
 - [ ] `leitstand.dev-deploy` writes preliminary `build-identity.json` to `workpiece/public/.well-known/` before build and final to `dist/client/.well-known/` after hash computation
+- [ ] `leitstand.dev-deploy` removes the copied preliminary `build-identity.json` from `dist/client/.well-known/` before computing `distTreeHash`
 - [ ] `leitstand.dev-deploy` `distTreeHash` is deterministic — `build-identity.json` is not present in `dist/` during `fingerprintTree` computation
-- [ ] `leitstand.dev-deploy` result includes `buildIdentity` field with `releaseId`, `written`, and `path`
+- [ ] `leitstand.dev-deploy` cleans up the preliminary `build-identity.json` from `workpiece/public/.well-known/` after the build
+- [ ] `leitstand.dev-deploy` result includes `buildIdentity` field with `releaseId`, `written`, and `path` (additive to existing fields)
 - [ ] `release.prepare` writes preliminary `build-identity.json` to `workpiece/public/.well-known/` before build with the release ID
-- [ ] Open-source page component reads `build-identity.json` locally from `public/.well-known/` via `readFileSync`, not via `fetch(Astro.url.origin)`
+- [ ] `release.prepare` removes the copied preliminary `build-identity.json` from `dist/client/.well-known/` before computing `distTreeHash`
+- [ ] `release.prepare` captures `commitSha` from the workpiece git HEAD (`git rev-parse HEAD` at workpiece path), not the monorepo HEAD
+- [ ] `buildIdentitySchema` in `packages/ontology/src/operations/release.ts` has a loosened `releaseId` regex that accepts both `<system-id>-r<NNNNNN>` and `workpiece-<missionId>` formats
+- [ ] Open-source page component reads `build-identity.json` locally from `public/.well-known/` via `readFileSync(join(process.cwd(), ...))`, not via `fetch(Astro.url.origin)`
 - [ ] Dev open-source page displays `workpiece-<missionId>` and the real `commitSha` after `leitstand.dev-deploy`
 - [ ] Alt open-source page displays the release ID (e.g., `warpgogol-com-r000006`) after `leitstand.propagate`
-- [ ] `leitstand.propagate` fetches `/.well-known/build-identity.json` from the dev channel URL with cache-buster before deploying to alt
-- [ ] `leitstand.propagate` verifies `commitSha`, `distTreeHash`, and `siteContentHash` from dev build-identity against the release manifest
-- [ ] `leitstand.propagate` rejects with actionable error when dev build-identity is missing, unreachable, or hash-mismatched
-- [ ] `leitstand.propagate` result includes `devBuildIdentityVerified: boolean`
+- [ ] `leitstand.propagate` resolves the dev channel config via `getChannelConfig(dep, "dev")` and fetches `/.well-known/build-identity.json` from the dev channel URL with cache-buster
+- [ ] `leitstand.propagate` verifies `missionId`, `commitSha`, `distTreeHash`, and `siteContentHash` from dev build-identity against the release manifest
+- [ ] `leitstand.propagate` rejects with actionable error when dev build-identity is missing, unreachable, schema-invalid, or hash-mismatched
+- [ ] `leitstand.propagate` result includes `devBuildIdentityVerified: boolean` and `axiomEvidenceVerified: boolean` (additive to existing fields)
 - [ ] `leitstand.promote` is unchanged — alt→main verification remains as defined in RFC-0608
-- [ ] `buildIdentitySchema` in `packages/ontology/src/operations/release.ts` is unchanged (no new fields)
 - [ ] DNA-49 prose in `docs/architecture-dna.md` updated to reflect build-identity verification at every promotion step
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section updated for dev-deploy build-identity and propagate dev-URL verification
-- [ ] Unit tests for dev-deploy build-identity write, propagate dev-URL verification, and open-source component local read pass
+- [ ] `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section updated for dev-deploy build-identity, propagate dev-URL verification, and release.prepare commitSha source
+- [ ] `packages/ui/AGENTS.md` updated to document the `readFileSync(join(process.cwd(), ...))` pattern for build-time file reads
+- [ ] Unit tests for dev-deploy build-identity write, propagate dev-URL verification, schema regex change, and open-source component local read pass
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
@@ -412,9 +418,10 @@ interface DevDeployResult {
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove the build-identity verification at any promotion step without a new RFC that supersedes this RFC.
-- Agents MUST NOT write `build-identity.json` into `dist/` before `fingerprintTree` computes `distTreeHash` — the file must be written after hashing to keep hashes deterministic.
+- Agents MUST NOT write `build-identity.json` into `dist/` before `fingerprintTree` computes `distTreeHash` — the preliminary file copied by Astro's build MUST be removed from `dist/client/.well-known/` before hashing, and the final file written afterward.
 - Agents MUST NOT verify `behaviorSnapshotHash` for dev→alt propagation — this field is empty for workpiece build-identity and only has a real value after `release.prepare`.
-- Agents MUST NOT change `buildIdentitySchema` — the schema is unchanged. Workpiece identity uses `releaseId: workpiece-<missionId>` and `behaviorSnapshotHash: ""`.
-- Agents MUST clean up the preliminary `build-identity.json` from `workpiece/public/.well-known/` after the build if the build fails, to avoid stale metadata in the workpiece.
+- Agents MUST change `buildIdentitySchema.releaseId` regex to accept `workpiece-<missionId>` format. The regex is loosened from `RELEASE_ID_REGEX` to `/^(workpiece-)?[a-z0-9]+(-[a-z0-9]+)*(-r\d{6}|-m\d{6})$/`. No other schema fields change.
+- Agents MUST clean up the preliminary `build-identity.json` from `workpiece/public/.well-known/` after the build, to avoid stale metadata in the workpiece.
+- Agents MUST capture `commitSha` from the workpiece git HEAD in both `dev-deploy` and `release.prepare` — not the monorepo HEAD. This ensures `leitstand.propagate` verification succeeds.
 - If the open-source page component cannot read `public/.well-known/build-identity.json` (file missing), it MUST display placeholder `—` values — never throw or fail the build.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).

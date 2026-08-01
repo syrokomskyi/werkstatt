@@ -23,7 +23,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0627
-amendedBy: []
+amendedBy:
+  - RFC-0634
 related:
   - DNA-48
   - DNA-49
