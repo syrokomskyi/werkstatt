@@ -22,7 +22,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0632
 related:
   - DNA-4
   - RFC-0309

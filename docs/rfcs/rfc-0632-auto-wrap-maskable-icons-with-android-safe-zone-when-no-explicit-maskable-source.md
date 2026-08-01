@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-01
 updatedAt: 2026-08-01
+enhancedAt: 2026-08-01
 implementedAt:
 closedAt:
 supersedes: []
@@ -126,10 +127,12 @@ No new flags. The auto-wrap is unconditional when `favicon.svg` exists — there
  * Wraps a regular favicon SVG into an Android-compliant maskable SVG.
  *
  * Extracts the inner content of the source <svg>, removes the original
- * background <rect>, wraps the remaining elements in a <g> with
- * translate(51.2, 51.2) scale(0.8) (80% safe zone), and prepends a
- * full-canvas <rect> with the extracted background color (or #ffffff
- * if no background is found).
+ * background <rect> (identified as the first <rect> with width="512"
+ * height="512" or width="100%" height="100%"), wraps the remaining
+ * elements (including <defs> blocks) in a <g> with
+ * translate(51.2, 51.2) scale(0.8) (80% safe zone, centered), and
+ * prepends a full-canvas <rect> with the extracted background fill
+ * (or #ffffff if no background rect is found).
  *
  * @param svg - The source SVG string (must have viewBox="0 0 512 512")
  * @returns A new SVG string with safe-zone transform applied
@@ -193,7 +196,7 @@ Diagnostic rules after this RFC:
 - **Source SVG missing** — generator falls back to `buildIconSvg` for both regular and maskable variants. `buildIconSvg(app, true)` already has maskable-aware padding. No auto-wrap, no ICON-SRC-04.
 - **Source SVG invalid XML** — generator falls back to `buildIconSvg`, validator reports ICON-SRC-02 (error). No auto-wrap.
 - **Source SVG wrong viewBox** — validator reports ICON-SRC-01 (error). Generator may still attempt auto-wrap, but the transform assumes 512×512 coordinates; the result may be visually incorrect. Fix ICON-SRC-01 first.
-- **Auto-wrap fails to extract background** — `wrapMaskableSvg` falls back to `#ffffff` as the maskable background. ICON-SRC-04 still fires as a warning.
+- **Auto-wrap fails to extract background** — `wrapMaskableSvg` identifies the background rect as the first `<rect>` with `width="512" height="512"` (or `width="100%" height="100%"`). If no such rect is found, the maskable background defaults to `#ffffff`. ICON-SRC-04 still fires as a warning. If the background rect uses a gradient/pattern fill (`fill="url(#...)"`), the URL reference is preserved in the new background rect — `<defs>` blocks are included in the wrapped content, so gradient/pattern references remain intact.
 - **Auto-wrap fails to parse inner content** — if the SVG has no recognizable inner elements (e.g., only a `<defs>` block with no visible shapes), `wrapMaskableSvg` returns the original SVG as-is. ICON-SRC-04 fires, prompting visual verification.
 - **Sharp conversion failure** — if `sharp` throws during PNG/ICO conversion, the generator catches the error and falls back to `buildIconSvg` for both variants (unchanged from RFC-0631).
 - **`favicon-maskable.svg` still present on disk** — the generator and validator ignore it. No error, no warning. The file is inert. Operators may delete it at their convenience.
