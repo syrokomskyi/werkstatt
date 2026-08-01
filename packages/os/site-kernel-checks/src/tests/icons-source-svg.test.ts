@@ -239,6 +239,15 @@ describe("RFC-0632 wrapMaskableSvg", () => {
     expect(result).toContain('fill="#1a1a2e"');
     expect(result).toContain("translate(51.2, 51.2) scale(0.8)");
   });
+
+  it("handles non-self-closing <rect> tags without leaving orphaned </rect>", () => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#1a1a2e"></rect><circle cx="256" cy="256" r="200"/></svg>`;
+    const result = wrapMaskableSvg(svg);
+
+    expect(result).toContain('fill="#1a1a2e"');
+    expect(result).toContain("translate(51.2, 51.2) scale(0.8)");
+    expect(result).not.toContain("</rect>");
+  });
 });
 
 describe("RFC-0632 ICON-SRC-04 warning", () => {

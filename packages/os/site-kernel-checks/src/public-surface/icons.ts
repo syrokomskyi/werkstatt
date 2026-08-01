@@ -36,7 +36,7 @@ import {
 const SVG_ROOT_RE = /<svg\b[^>]*>/i;
 const SVG_VIEWBOX_RE = /\bviewBox\s*=\s*["']([^"']*)["']/i;
 const SVG_INNER_RE = /<svg\b[^>]*>([\s\S]*)<\/svg\s*>/i;
-const RECT_RE = /<rect\b[^>]*>/gi;
+const RECT_RE = /<rect\b[^>]*>(?:\s*<\/rect\s*>)?/gi;
 const ATTR_WIDTH_RE = /\bwidth\s*=\s*["'](512|100%)["']/i;
 const ATTR_HEIGHT_RE = /\bheight\s*=\s*["'](512|100%)["']/i;
 const ATTR_FILL_RE = /\bfill\s*=\s*["']([^"']*)["']/i;
