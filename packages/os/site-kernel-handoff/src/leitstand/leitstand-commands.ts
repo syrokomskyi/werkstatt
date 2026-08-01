@@ -557,6 +557,24 @@ export async function runLeitstandDevDeploy(
   }
 
   // RFC-0629: No evidence post-processing — mission.check writes commitSha to evidence-metadata.json directly via --commit-sha flag
+
+  // RFC-0633: Auto-invoke axiom.report after mission.check (best-effort, non-blocking)
+  try {
+    const { executeKernelCommand: executeReport } = await import("@warpgogol/site-kernel");
+    const reportResult = (await executeReport({
+      workspaceRoot,
+      commandName: "axiom.report",
+      argv: [`--mission=${missionId}`],
+    })) as { exitCode?: number; summary?: string };
+    logger.info(
+      `[leitstand.dev-deploy] axiom.report: ${reportResult.summary ?? "done"} (exit: ${reportResult.exitCode ?? 0})`,
+    );
+  } catch (reportErr) {
+    logger.warn(
+      `[leitstand.dev-deploy] axiom.report failed (non-blocking): ${reportErr instanceof Error ? reportErr.message : String(reportErr)}`,
+    );
+  }
+
   logger.info(`[leitstand.dev-deploy] total: ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 
   // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
