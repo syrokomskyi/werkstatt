@@ -15,6 +15,7 @@
   <item>RFC-0627: add dev channel, leitstand.deploy command, Axiom evidence gate in propagate, auto-step rollback.</item>
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; remove dev-deployed state; propagate gate checks published + commitSha + missionId + errors===0; rollback auto-step removes dev-deployed.</item>
   <item>RFC-0629: propagate gate reads evidence-metadata.json + study-run.json (native Axiom format); dev-deploy passes --commit-sha to mission.check (no evidence post-processing); JSON.parse wrapped with error handling.</item>
+  <item>RFC-0634: dev-deploy writes preliminary + final build-identity.json (preliminary in public/.well-known/ before build, final in dist/client/.well-known/ after hash computation with dist cleanup); propagate verifies dev build-identity before deploying to alt; release.prepare uses workpiece HEAD for commitSha.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -55,6 +56,9 @@ import {
 import { collectPurgeUrls, purgeCacheByUrls, skippedPurgeResult } from "./cache-purge.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
+import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { atomicWriteFile } from "../werkstatt/atomic.ts";
+import { computeBuildInputHash } from "../build-pipeline-helpers.ts";
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -363,6 +367,11 @@ export interface DevDeployResult {
   buildState: "succeeded" | "failed";
   deployState: "succeeded" | "failed" | "failed-stale" | "in-progress";
   deploymentUrl: string;
+  buildIdentity: {
+    releaseId: string;
+    written: boolean;
+    path: string;
+  };
   axiom: {
     status: "pass" | "fail" | "not-run";
     errors: number;
@@ -407,6 +416,49 @@ export async function runLeitstandDevDeploy(
   const adapter = resolveAdapter(dep.adapter);
   const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
 
+  // RFC-0634: Capture workpiece HEAD sha before build (needed for preliminary build-identity)
+  let commitSha = "";
+  try {
+    commitSha = execSync("git rev-parse HEAD", {
+      cwd: workpiecePath,
+      encoding: "utf-8",
+      stdio: "pipe",
+    }).trim();
+  } catch {
+    logger.warn("[leitstand.dev-deploy] could not read workpiece HEAD sha");
+  }
+
+  // RFC-0634: Compute platform info for build-identity
+  const { workpieceTreeHash, platformVersion, platformSemanticHash } = await computeBuildInputHash(
+    workspaceRoot,
+    workpiecePath,
+  );
+
+  // RFC-0634: Write preliminary build-identity.json to workpiece/public/.well-known/ before build
+  const publicWellKnownDir = path.join(workpiecePath, "public", ".well-known");
+  await fs.mkdir(publicWellKnownDir, { recursive: true });
+  const preliminaryBuildIdentity = {
+    releaseId: `workpiece-${missionId}`,
+    systemId,
+    missionId,
+    semver: "0.0.0-workpiece",
+    distTreeHash: "",
+    behaviorSnapshotHash: "",
+    siteContentHash: workpieceTreeHash,
+    platformVersion,
+    platformSemanticHash,
+    commitSha,
+    buildTimestamp: new Date().toISOString(),
+    targetPlatform: "cloudflare-workers",
+  };
+  await atomicWriteFile(
+    path.join(publicWellKnownDir, "build-identity.json"),
+    JSON.stringify(preliminaryBuildIdentity, null, 2) + "\n",
+  );
+  logger.info(
+    `[leitstand.dev-deploy] wrote preliminary build-identity.json to public/.well-known/`,
+  );
+
   // Step 1: Build workpiece
   const t0 = Date.now();
   logger.info(`[leitstand.dev-deploy] building workpiece at ${workpiecePath}...`);
@@ -421,6 +473,8 @@ export async function runLeitstandDevDeploy(
     logger.warn(
       `[leitstand.dev-deploy] build failed: ${err instanceof Error ? err.message : String(err)}`,
     );
+    // RFC-0634: Clean up preliminary build-identity on build failure
+    await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
     return {
       data: {
         command: "leitstand.dev-deploy",
@@ -430,6 +484,7 @@ export async function runLeitstandDevDeploy(
         buildState: "failed",
         deployState: "failed",
         deploymentUrl: channelConfig.url,
+        buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
         axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0 },
       },
       exitCode: 1,
@@ -439,6 +494,8 @@ export async function runLeitstandDevDeploy(
 
   const distPath = path.join(workpiecePath, "dist");
   if (!existsSync(distPath)) {
+    // RFC-0634: Clean up preliminary build-identity
+    await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
     return {
       data: {
         command: "leitstand.dev-deploy",
@@ -448,6 +505,7 @@ export async function runLeitstandDevDeploy(
         buildState: "failed",
         deployState: "failed",
         deploymentUrl: channelConfig.url,
+        buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
         axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0 },
       },
       exitCode: 1,
@@ -455,21 +513,55 @@ export async function runLeitstandDevDeploy(
     };
   }
 
-  // Step 2: Capture workpiece HEAD sha
-  const t1 = Date.now();
-  let commitSha = "";
-  try {
-    commitSha = execSync("git rev-parse HEAD", {
-      cwd: workpiecePath,
-      encoding: "utf-8",
-      stdio: "pipe",
-    }).trim();
-  } catch {
-    logger.warn("[leitstand.dev-deploy] could not read workpiece HEAD sha");
-  }
-  logger.info(
-    `[leitstand.dev-deploy] workpiece HEAD: ${commitSha} (${((Date.now() - t1) / 1000).toFixed(1)}s)`,
+  // RFC-0634: Remove preliminary build-identity.json from dist/client/.well-known/ before hashing
+  const distClientWellKnownPath = path.join(
+    distPath,
+    "client",
+    ".well-known",
+    "build-identity.json",
   );
+  if (existsSync(distClientWellKnownPath)) {
+    await fs.rm(distClientWellKnownPath, { force: true });
+    logger.info(
+      `[leitstand.dev-deploy] removed preliminary build-identity.json from dist/ before hashing`,
+    );
+  }
+
+  // RFC-0634: Compute distTreeHash via fingerprintTree (deterministic — build-identity.json excluded)
+  const distTreeResult = await fingerprintTree(distPath, { mode: "byte" });
+  const distTreeHash = distTreeResult.value;
+
+  // RFC-0634: Write final build-identity.json to dist/client/.well-known/ with real hashes
+  const distWellKnownDir = path.join(distPath, "client", ".well-known");
+  await fs.mkdir(distWellKnownDir, { recursive: true });
+  const finalBuildIdentity = {
+    releaseId: `workpiece-${missionId}`,
+    systemId,
+    missionId,
+    semver: "0.0.0-workpiece",
+    distTreeHash,
+    behaviorSnapshotHash: "",
+    siteContentHash: workpieceTreeHash,
+    platformVersion,
+    platformSemanticHash,
+    commitSha,
+    buildTimestamp: new Date().toISOString(),
+    targetPlatform: "cloudflare-workers",
+  };
+  await atomicWriteFile(
+    path.join(distWellKnownDir, "build-identity.json"),
+    JSON.stringify(finalBuildIdentity, null, 2) + "\n",
+  );
+  logger.info(`[leitstand.dev-deploy] wrote final build-identity.json to dist/client/.well-known/`);
+
+  // RFC-0634: Clean up preliminary build-identity.json from workpiece/public/.well-known/
+  await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
+  logger.info(
+    `[leitstand.dev-deploy] cleaned up preliminary build-identity.json from public/.well-known/`,
+  );
+
+  // Step 2: Log workpiece HEAD sha
+  logger.info(`[leitstand.dev-deploy] workpiece HEAD: ${commitSha}`);
 
   // Step 3: Deploy to dev channel via adapter
   const t2 = Date.now();
@@ -587,6 +679,11 @@ export async function runLeitstandDevDeploy(
       buildState,
       deployState: result.state,
       deploymentUrl: result.deploymentUrl,
+      buildIdentity: {
+        releaseId: `workpiece-${missionId}`,
+        written: true,
+        path: "dist/client/.well-known/build-identity.json",
+      },
       axiom: {
         status: axiomStatus,
         errors: axiomErrors,
