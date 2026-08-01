@@ -23,17 +23,50 @@
     },
     "warpgogol-com#build": {
       "dependsOn": ["^build", "//#registry:build"],
-      "cache": false,
+      "inputs": [
+        "src/content/**",
+        "src/pages/**",
+        "src/styles/**",
+        "src/scripts/**",
+        "public/**",
+        "src/system.md",
+        "astro.config.*",
+        "tsconfig.json",
+        "package.json",
+        "tools/kernel.config.ts"
+      ],
       "outputs": ["dist/**", ".astro/**"]
     },
     "nicaragua-projekt#build": {
       "dependsOn": ["^build", "//#registry:build"],
-      "cache": false,
+      "inputs": [
+        "src/content/**",
+        "src/pages/**",
+        "src/styles/**",
+        "src/scripts/**",
+        "public/**",
+        "src/system.md",
+        "astro.config.*",
+        "tsconfig.json",
+        "package.json",
+        "tools/kernel.config.ts"
+      ],
       "outputs": ["dist/**", ".astro/**"]
     },
     "check-warpgogol-com#build": {
       "dependsOn": ["^build", "//#registry:build"],
-      "cache": false,
+      "inputs": [
+        "src/content/**",
+        "src/pages/**",
+        "src/styles/**",
+        "src/scripts/**",
+        "public/**",
+        "src/system.md",
+        "astro.config.*",
+        "tsconfig.json",
+        "package.json",
+        "tools/kernel.config.ts"
+      ],
       "outputs": ["dist/**", ".astro/**"]
     },
     "build:check": {
@@ -42,17 +75,50 @@
     },
     "warpgogol-com#build:check": {
       "dependsOn": ["^build:check", "//#registry:build"],
-      "cache": false,
+      "inputs": [
+        "src/content/**",
+        "src/pages/**",
+        "src/styles/**",
+        "src/scripts/**",
+        "public/**",
+        "src/system.md",
+        "astro.config.*",
+        "tsconfig.json",
+        "package.json",
+        "tools/kernel.config.ts"
+      ],
       "outputs": []
     },
     "nicaragua-projekt#build:check": {
       "dependsOn": ["^build:check", "//#registry:build"],
-      "cache": false,
+      "inputs": [
+        "src/content/**",
+        "src/pages/**",
+        "src/styles/**",
+        "src/scripts/**",
+        "public/**",
+        "src/system.md",
+        "astro.config.*",
+        "tsconfig.json",
+        "package.json",
+        "tools/kernel.config.ts"
+      ],
       "outputs": []
     },
     "check-warpgogol-com#build:check": {
       "dependsOn": ["^build:check", "//#registry:build"],
-      "cache": false,
+      "inputs": [
+        "src/content/**",
+        "src/pages/**",
+        "src/styles/**",
+        "src/scripts/**",
+        "public/**",
+        "src/system.md",
+        "astro.config.*",
+        "tsconfig.json",
+        "package.json",
+        "tools/kernel.config.ts"
+      ],
       "outputs": []
     },
     "dev": {
