@@ -118,6 +118,42 @@ describe("computeModuleHash", () => {
     const h = await computeModuleHash(path.join(os.tmpdir(), "nonexistent-dir-xyz"));
     expect(h).toBeTruthy();
   });
+
+  test("RFC-0637: with modulePaths hashes only listed paths", async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "mod-hash-"));
+    await fs.writeFile(path.join(dir, "a.ts"), "export const x = 1;");
+    await fs.writeFile(path.join(dir, "b.ts"), "export const y = 1;");
+    const h1 = await computeModuleHash(dir, ["a.ts"]);
+    await fs.writeFile(path.join(dir, "b.ts"), "export const y = 2;");
+    const h2 = await computeModuleHash(dir, ["a.ts"]);
+    expect(h1).toBe(h2);
+  });
+
+  test("RFC-0637: without modulePaths hashes full src/ (existing behavior)", async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "mod-hash-"));
+    await fs.writeFile(path.join(dir, "a.ts"), "export const x = 1;");
+    await fs.writeFile(path.join(dir, "b.ts"), "export const y = 1;");
+    const h1 = await computeModuleHash(dir);
+    await fs.writeFile(path.join(dir, "b.ts"), "export const y = 2;");
+    const h2 = await computeModuleHash(dir);
+    expect(h1).not.toBe(h2);
+  });
+
+  test("RFC-0637: different modulePaths values produce different hashes", async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "mod-hash-"));
+    await fs.writeFile(path.join(dir, "a.ts"), "export const x = 1;");
+    await fs.writeFile(path.join(dir, "b.ts"), "export const y = 1;");
+    const h1 = await computeModuleHash(dir, ["a.ts"]);
+    const h2 = await computeModuleHash(dir, ["b.ts"]);
+    expect(h1).not.toBe(h2);
+  });
+
+  test("RFC-0637: non-existent path in modulePaths is silently skipped", async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "mod-hash-"));
+    await fs.writeFile(path.join(dir, "a.ts"), "export const x = 1;");
+    const h = await computeModuleHash(dir, ["nonexistent.ts"]);
+    expect(h).toBeTruthy();
+  });
 });
 
 describe("getCachedCommandResult / setCachedCommandResult", () => {

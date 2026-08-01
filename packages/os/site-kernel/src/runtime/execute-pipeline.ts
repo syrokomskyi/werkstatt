@@ -14,6 +14,7 @@ producing a KernelPipelineReport with a timing summary (slowest steps, timeout c
   <item>RFC-0326: pass fileIntents from createDefaultIO() to step contexts; aggregate filesModified across step reports into KernelPipelineReport.</item>
   <item>Add stderr progress lines for every pipeline step (start + finish + duration) so operators see live progress even in --json mode.</item>
   <item>RFC-0390: integrate command-result cache — skip re-execution on cache hit, store only ok:true results, respect --force and --dry-run.</item>
+  <item>RFC-0637: moduleHashCache key includes modulePaths; computeModuleHash receives command.modulePaths for granular per-command hashing.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -205,10 +206,13 @@ async function tryCacheRead(
   const reads = command.reads ?? [];
   const inputsHash = await computeInputsHash(reads, baseDir, workspaceRoot);
 
-  let moduleHash = moduleHashCache.get(moduleSrcDir);
+  // RFC-0637: moduleHashCache key includes modulePaths so commands with
+  // different modulePaths get independent cache entries.
+  const moduleHashCacheKey = `${moduleSrcDir}:${command.modulePaths?.join(",") ?? ""}`;
+  let moduleHash = moduleHashCache.get(moduleHashCacheKey);
   if (!moduleHash) {
-    moduleHash = await computeModuleHash(moduleSrcDir);
-    moduleHashCache.set(moduleSrcDir, moduleHash);
+    moduleHash = await computeModuleHash(moduleSrcDir, command.modulePaths);
+    moduleHashCache.set(moduleHashCacheKey, moduleHash);
   }
 
   const key: CommandResultCacheKey = {
@@ -246,10 +250,13 @@ async function tryCacheWrite(
   const reads = command.reads ?? [];
   const inputsHash = await computeInputsHash(reads, baseDir, workspaceRoot);
 
-  let moduleHash = moduleHashCache.get(moduleSrcDir);
+  // RFC-0637: moduleHashCache key includes modulePaths so commands with
+  // different modulePaths get independent cache entries.
+  const moduleHashCacheKey = `${moduleSrcDir}:${command.modulePaths?.join(",") ?? ""}`;
+  let moduleHash = moduleHashCache.get(moduleHashCacheKey);
   if (!moduleHash) {
-    moduleHash = await computeModuleHash(moduleSrcDir);
-    moduleHashCache.set(moduleSrcDir, moduleHash);
+    moduleHash = await computeModuleHash(moduleSrcDir, command.modulePaths);
+    moduleHashCache.set(moduleHashCacheKey, moduleHash);
   }
 
   const key: CommandResultCacheKey = {

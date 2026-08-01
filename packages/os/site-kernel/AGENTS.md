@@ -92,7 +92,8 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - `--force` flag bypasses cache reads but still writes successful results (refreshing entries). `dryRun` mode bypasses the cache entirely (no read, no write).
 - RFC-0635: the `--force` flag is now passed through to `executeKernelCommand` for individual command invocations (previously only pipeline execution). Command handlers read it from `input.flags.force`.
 - `cacheable: false` on a command opts out of caching entirely — the command always executes and is never stored or retrieved from the cache.
-- `computeModuleHash` is cached per-package per-pipeline-run in a `Map<string, string>` to avoid re-hashing the same `src/` directory for every command in a package.
+- `computeModuleHash` is cached per-package per-pipeline-run in a `Map<string, string>` to avoid re-hashing the same `src/` directory for every command in a package. RFC-0637: the cache key now includes `command.modulePaths` (joined by `,`) so commands with different `modulePaths` get independent cache entries.
+- RFC-0637: `KernelCommandDefinition` has an optional `modulePaths?: string[]` field. When present, `computeModuleHash` fingerprints only the listed paths (files and/or directories relative to the module's `src/` directory) instead of the full `src/` directory. When absent or empty, the full `src/` fingerprint is used (permanent backward-compatible fallback). Non-existent paths are silently skipped.
 - `command.reads.validate` (in `@warpgogol/site-kernel-checks`) enforces that every registered command declares `reads` or `cacheable: false` (CRC-01) and that `reads` patterns are valid picomatch syntax (CRC-02).
 
 ## Change impact (RFC-0332)

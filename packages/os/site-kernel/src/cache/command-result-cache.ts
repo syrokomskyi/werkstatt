@@ -14,10 +14,12 @@ helpers for storing and retrieving KernelExecutionReport objects in the
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0390: initial implementation — COMMAND_RESULT_CACHE_NAMESPACE, CommandResultCacheKey, buildCommandResultCacheKey, computeInputsHash, computeModuleHash, getCachedCommandResult, setCachedCommandResult.</item>
+  <item>RFC-0637: add modulePaths parameter to computeModuleHash for granular per-command module hashing.</item>
 </CHANGE_SUMMARY>
 */
 
-import { readdir } from "node:fs/promises";
+import { readdir, stat } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import type { Dirent } from "node:fs";
 import picomatch from "picomatch";
@@ -133,8 +135,36 @@ export async function computeInputsHash(
  * Compute a deterministic hash of a command module's source directory.
  * Uses @warpgogol/fingerprint fingerprintTree in semantic mode.
  * The caller should cache this per-package per-pipeline-run.
+ *
+ * RFC-0637: when `modulePaths` is provided and non-empty, fingerprints only
+ * the listed paths (files and/or directories relative to `moduleSrcDir`)
+ * instead of the full `src/` directory. Non-existent paths are silently
+ * skipped. When `modulePaths` is absent or empty, falls back to full `src/`
+ * directory fingerprint (backward compatible).
  */
-export async function computeModuleHash(moduleSrcDir: string): Promise<string> {
+export async function computeModuleHash(
+  moduleSrcDir: string,
+  modulePaths?: string[],
+): Promise<string> {
+  if (modulePaths && modulePaths.length > 0) {
+    const hashes: string[] = [];
+    for (const p of modulePaths) {
+      const abs = join(moduleSrcDir, p);
+      if (!existsSync(abs)) continue;
+      const s = await stat(abs);
+      if (s.isDirectory()) {
+        const result = await fingerprintTree(abs, {
+          mode: "semantic",
+          ignore: ["__tests__", "node_modules", "dist"],
+        });
+        hashes.push(`${p}:${result.value}`);
+      } else {
+        const result = await fingerprintFile(abs, { mode: "semantic" });
+        hashes.push(`${p}:${result.hash}`);
+      }
+    }
+    return stableJsonHash({ paths: hashes });
+  }
   try {
     const result = await fingerprintTree(moduleSrcDir, {
       mode: "semantic",

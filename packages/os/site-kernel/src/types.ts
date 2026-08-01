@@ -263,6 +263,14 @@ export interface KernelCommandDefinition<TData = unknown> extends KernelCommandM
    * be non-empty whenever `mutatesState` is true (CMD-MAN-02).
    */
   writes?: string[];
+  /**
+   * RFC-0637: paths (files and/or directories) relative to the module's src/
+   * directory that this command's execute() depends on. When present,
+   * computeModuleHash fingerprints only these paths instead of the full src/.
+   * When absent, the full src/ directory is fingerprinted (backward compatible).
+   * Paths use POSIX forward slashes. Directories are fingerprinted recursively.
+   */
+  modulePaths?: string[];
   execute(
     input: KernelCommandInput,
     context: KernelRuntimeContext,
