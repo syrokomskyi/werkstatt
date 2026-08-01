@@ -17,6 +17,7 @@ import { mkdir, rm } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createRequire } from "node:module";
+import { execSync } from "node:child_process";
 
 import {
   writeFileIfChanged,
@@ -105,6 +106,7 @@ function resolveToolProfile(chromiumRevision: string): RuntimeToolProfile {
 }
 
 async function runPreflightCheck(): Promise<PreflightResult> {
+  // First, try to launch chromium
   try {
     const { chromium } = await import("playwright");
     const browser = await chromium.launch({ headless: true });
@@ -112,10 +114,35 @@ async function runPreflightCheck(): Promise<PreflightResult> {
     await browser.close();
     return { ok: true, chromiumRevision: revision };
   } catch {
+    // Launch failed — try auto-install
+  }
+
+  // Auto-install chromium
+  try {
+    execSync("pnpm exec playwright install chromium", {
+      cwd: process.cwd(),
+      stdio: ["pipe", "pipe", "pipe"],
+      timeout: 120_000,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     return {
       ok: false,
-      error:
-        "mission.check: Playwright chromium not installed. Run 'npx playwright install chromium' and retry.",
+      error: `mission.check: Playwright chromium not installed. Auto-install failed: ${msg}. Run 'pnpm exec playwright install chromium' manually and retry.`,
+    };
+  }
+
+  // Retry launch after install
+  try {
+    const { chromium } = await import("playwright");
+    const browser = await chromium.launch({ headless: true });
+    const revision = browser.version();
+    await browser.close();
+    return { ok: true, chromiumRevision: revision };
+  } catch (err) {
+    return {
+      ok: false,
+      error: `mission.check: chromium launch failed after install: ${err instanceof Error ? err.message : String(err)}`,
     };
   }
 }
@@ -719,18 +746,27 @@ export async function runMissionCheck(
 
     // Compute findings counts
     const findingsCount = countFindingsBySeverity(findings);
-    const errors = findingsCount.critical + findingsCount.high;
     const warnings = findingsCount.medium + findingsCount.low + findingsCount.info;
     const total = findings.length;
 
-    // Gate logic: fail if any high/critical findings or closure not satisfied
-    const hasHighOrCritical = findingsCount.critical > 0 || findingsCount.high > 0;
+    // Gate logic: fail only on actual axe *violations* (not incomplete results).
+    // axe "incomplete" means the rule could not determine a result (e.g. background
+    // color obscured by pseudo elements, images, gradients) — these are tool
+    // limitations, not confirmed accessibility failures.
+    const violationFindings = findings.filter(
+      (f) =>
+        (f.extension as Record<string, unknown>)?.["automated-web-accessibility"]?.predicate ===
+        "accessibility.axe.violation",
+    );
+    const violationCounts = countFindingsBySeverity(violationFindings);
+    const errors = violationCounts.critical + violationCounts.high;
+    const hasHighOrCritical = violationCounts.critical > 0 || violationCounts.high > 0;
     const closureFailed = !closureDecision.satisfied;
     const status: "pass" | "fail" = hasHighOrCritical || closureFailed ? "fail" : "pass";
     const exitCode = status === "fail" ? 1 : 0;
     const durationMs = Date.now() - startTime;
 
-    const summary = `mission.check: ${status} — ${total} finding(s), ${errors} error(s), ${warnings} warning(s)${closureFailed ? ", closure blocked" : ""}`;
+    const summary = `mission.check: ${status} — ${total} finding(s) (${violationFindings.length} violation(s), ${total - violationFindings.length} incomplete), ${errors} error(s), ${warnings} warning(s)${closureFailed ? ", closure blocked" : ""}`;
 
     const result: MissionCheckResult = {
       command: "mission.check",

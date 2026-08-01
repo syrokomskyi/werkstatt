@@ -695,9 +695,19 @@ export async function runLeitstandPropagate(
   }
 
   const studyRunContent = await fs.readFile(studyRunPath, "utf-8");
-  let studyRun: { findings?: Array<{ severity?: string }> };
+  let studyRun: {
+    findings?: Array<{
+      severity?: string;
+      extension?: Record<string, unknown>;
+    }>;
+  };
   try {
-    studyRun = JSON.parse(studyRunContent) as { findings?: Array<{ severity?: string }> };
+    studyRun = JSON.parse(studyRunContent) as {
+      findings?: Array<{
+        severity?: string;
+        extension?: Record<string, unknown>;
+      }>;
+    };
   } catch {
     throw new Error(
       `[leitstand.propagate] Axiom evidence malformed: study-run.json is not valid JSON for mission '${missionId}'.`,
@@ -710,12 +720,17 @@ export async function runLeitstandPropagate(
     );
   }
 
-  const highOrCritical = studyRun.findings.filter(
-    (f) => f.severity === "high" || f.severity === "critical",
-  );
-  if (highOrCritical.length > 0) {
+  // Gate: fail only on actual axe *violations* (not incomplete results).
+  // axe "incomplete" means the rule could not determine a result — these are
+  // tool limitations, not confirmed accessibility failures.
+  const highOrCriticalViolations = studyRun.findings.filter((f) => {
+    if (f.severity !== "high" && f.severity !== "critical") return false;
+    const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
+    return ext?.["automated-web-accessibility"]?.predicate === "accessibility.axe.violation";
+  });
+  if (highOrCriticalViolations.length > 0) {
     throw new Error(
-      `[leitstand.propagate] Axiom verification failed: ${highOrCritical.length} high/critical findings. Fix and re-deploy to dev.`,
+      `[leitstand.propagate] Axiom verification failed: ${highOrCriticalViolations.length} high/critical violation(s). Fix and re-deploy to dev.`,
     );
   }
 

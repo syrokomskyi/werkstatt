@@ -169,7 +169,7 @@ function createWorkpieceDist(workspaceRoot: string, missionId: string): string {
 function writeStudyRun(
   workspaceRoot: string,
   missionId: string,
-  findings: Array<{ severity: string }>,
+  findings: Array<{ severity: string; extension?: Record<string, unknown> }>,
 ): void {
   const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
   mkdirSync(evidenceDir, { recursive: true });
@@ -351,7 +351,7 @@ test("leitstand.propagate rejects when evidence missionId does not match release
   );
 });
 
-test("leitstand.propagate rejects when Axiom evidence has high/critical findings", async () => {
+test("leitstand.propagate rejects when Axiom evidence has high/critical violations", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
@@ -367,14 +367,61 @@ test("leitstand.propagate rejects when Axiom evidence has high/critical findings
   });
   writeEvidenceMetadata(tmpDir, missionId, { commitSha: "abc123def456" });
   writeStudyRun(tmpDir, missionId, [
-    { severity: "high" },
-    { severity: "critical" },
+    {
+      severity: "high",
+      extension: {
+        "automated-web-accessibility": { predicate: "accessibility.axe.violation" },
+      },
+    },
+    {
+      severity: "critical",
+      extension: {
+        "automated-web-accessibility": { predicate: "accessibility.axe.violation" },
+      },
+    },
     { severity: "low" },
   ]);
 
   await expect(
     runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
-  ).rejects.toThrow("Axiom verification failed: 2 high/critical findings");
+  ).rejects.toThrow("Axiom verification failed: 2 high/critical violation(s)");
+});
+
+test("leitstand.propagate passes when Axiom evidence has only incomplete findings", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+  const missionId = "test-sys-m000001";
+
+  createRegistryWithChannels(tmpDir, systemId);
+  writeReleaseManifest(tmpDir, releaseId, {
+    schemaVersion: "1.0.0",
+    releaseId,
+    systemId,
+    missionId,
+    state: "published",
+    commitSha: "abc123def456",
+  });
+  writeEvidenceMetadata(tmpDir, missionId, { commitSha: "abc123def456" });
+  writeStudyRun(tmpDir, missionId, [
+    {
+      severity: "high",
+      extension: {
+        "automated-web-accessibility": { predicate: "accessibility.axe.incomplete" },
+      },
+    },
+    {
+      severity: "critical",
+      extension: {
+        "automated-web-accessibility": { predicate: "accessibility.axe.incomplete" },
+      },
+    },
+  ]);
+
+  // Should NOT throw "Axiom verification failed" — incomplete findings are tool limitations.
+  // It will fail at a later step (no dist directory), but the Axiom gate itself passes.
+  await expect(
+    runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
+  ).rejects.not.toThrow("Axiom verification failed");
 });
 
 // --- leitstand.rollback auto-detect tests (RFC-0628: no dev-deployed) ---

@@ -19,7 +19,7 @@ systems:
       channels:
         dev:
           workerName: dev-warpgogol-com
-          url: https://dev-warpgogol-com.syrokomskyi.workers.dev
+          url: https://dev.warpgogol.com
           secretsFile: env:WERKSTATT_SECRETS_DEV
         alt:
           workerName: alt-warpgogol-com

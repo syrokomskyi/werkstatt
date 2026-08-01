@@ -162,6 +162,17 @@ vi.mock("playwright", () => ({
   },
 }));
 
+// Mock execSync to prevent real chromium install during tests
+vi.mock("node:child_process", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:child_process")>();
+  return {
+    ...actual,
+    execSync: vi.fn().mockImplementation(() => {
+      throw new Error("mocked: install not available in test");
+    }),
+  };
+});
+
 async function createMockMission(
   workspaceRoot: string,
   missionId: string,
@@ -350,7 +361,9 @@ describe("mission.check (RFC-0629)", () => {
         severity: "high",
         evidence: [],
         uncertainty: [],
-        extension: {},
+        extension: {
+          "automated-web-accessibility": { predicate: "accessibility.axe.violation" },
+        },
       },
     ]);
 
@@ -442,10 +455,7 @@ describe("mission.check (RFC-0629)", () => {
     await createMockMission(workspaceRoot, missionId);
 
     const { chromium } = await import("playwright");
-    vi.mocked(chromium.launch).mockResolvedValueOnce({
-      version: vi.fn(),
-      close: vi.fn().mockRejectedValue(new Error("chromium not found")),
-    } as never);
+    vi.mocked(chromium.launch).mockRejectedValueOnce(new Error("chromium not found"));
 
     const result = await runMissionCheck(
       {
