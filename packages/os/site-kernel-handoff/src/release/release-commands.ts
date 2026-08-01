@@ -38,7 +38,6 @@ import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/inde
 import { atomicWriteFile, atomicMoveDir, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
-import { resolveCurrentEcosystem } from "../bundle-io.ts";
 import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
 import { evaluateCSurfaceGate } from "./c-surface-guard.ts";
 import { checkBreaksCDeclaration } from "./breaks-c-helper.ts";
@@ -211,7 +210,7 @@ export async function runReleasePrepare(
       const distDest = path.join(stagingDir, "dist");
       let buildReused = false;
 
-      const { commit } = await resolveCurrentEcosystem(workspaceRoot);
+      // RFC-0634: commitSha is now captured from workpiece git HEAD (see below, before build)
 
       // RFC-0585: Compute build input hash for reuse decision
       const { buildInputHash, workpieceTreeHash, platformVersion, platformSemanticHash } =
@@ -229,6 +228,41 @@ export async function runReleasePrepare(
             return false;
           }
         })());
+
+      // RFC-0634: Capture commitSha from workpiece git HEAD (not monorepo HEAD)
+      let commitSha = "unknown";
+      try {
+        commitSha = execSync("git rev-parse HEAD", {
+          cwd: workpieceDir,
+          encoding: "utf-8",
+          stdio: "pipe",
+        }).trim();
+      } catch {
+        logger.warn("[release.prepare] could not read workpiece HEAD sha");
+      }
+
+      // RFC-0634: Write preliminary build-identity.json to workpiece/public/.well-known/ before build
+      const publicWellKnownDir = path.join(workpieceDir, "public", ".well-known");
+      await fs.mkdir(publicWellKnownDir, { recursive: true });
+      const preliminaryBuildIdentity = {
+        releaseId,
+        systemId,
+        missionId,
+        semver,
+        distTreeHash: "",
+        behaviorSnapshotHash: "",
+        siteContentHash: workpieceTreeHash,
+        platformVersion,
+        platformSemanticHash,
+        commitSha: commitSha === "unknown" ? "0000000" : commitSha,
+        buildTimestamp: new Date().toISOString(),
+        targetPlatform: "cloudflare-workers",
+      };
+      await atomicWriteFile(
+        path.join(publicWellKnownDir, "build-identity.json"),
+        JSON.stringify(preliminaryBuildIdentity, null, 2) + "\n",
+      );
+      logger.info(`  Wrote preliminary build-identity.json to workpiece/public/.well-known/`);
 
       if (canReuseDistribution) {
         await fs.mkdir(distDest, { recursive: true });
@@ -290,6 +324,21 @@ export async function runReleasePrepare(
           `[release.prepare] no workpiece or distribution found for mission '${missionId}'`,
         );
       }
+
+      // RFC-0634: Remove preliminary build-identity.json from dist/client/.well-known/ before hashing
+      const distClientBuildIdentityPath = path.join(
+        distDest,
+        "client",
+        ".well-known",
+        "build-identity.json",
+      );
+      if (existsSync(distClientBuildIdentityPath)) {
+        await fs.rm(distClientBuildIdentityPath, { force: true });
+        logger.info(`  Removed preliminary build-identity.json from dist/ before hashing`);
+      }
+
+      // RFC-0634: Clean up preliminary from workpiece/public/.well-known/
+      await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
 
       const now = new Date().toISOString();
 
@@ -380,7 +429,7 @@ export async function runReleasePrepare(
         siteContentHash,
         platformVersion,
         platformSemanticHash,
-        commitSha: commit === "unknown" ? "0000000" : commit,
+        commitSha: commitSha === "unknown" ? "0000000" : commitSha,
         buildTimestamp: now,
         targetPlatform: "cloudflare-workers",
       };
@@ -400,7 +449,7 @@ export async function runReleasePrepare(
         createdAt: now,
         publishedAt: null,
         state: "prepared",
-        commitSha: commit === "unknown" ? "0000000" : commit,
+        commitSha: commitSha === "unknown" ? "0000000" : commitSha,
         platformSemanticHash,
         siteContentHash,
         distTreeHash,
