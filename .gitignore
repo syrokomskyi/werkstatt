@@ -284,3 +284,5 @@ docs/sessions/.raw/
 # RFC-0564: SWIM membership and CRDT genome — workshop-local state files
 werkstatt.swim.json
 werkstatt.genome.log
+
+storage/
