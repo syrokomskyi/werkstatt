@@ -755,8 +755,10 @@ export async function runMissionCheck(
     // limitations, not confirmed accessibility failures.
     const violationFindings = findings.filter(
       (f) =>
-        (f.extension as Record<string, unknown>)?.["automated-web-accessibility"]?.predicate ===
-        "accessibility.axe.violation",
+        (
+          (f.extension as Record<string, unknown>)?.["automated-web-accessibility"] as
+            Record<string, unknown> | undefined
+        )?.predicate === "accessibility.axe.violation",
     );
     const violationCounts = countFindingsBySeverity(violationFindings);
     const errors = violationCounts.critical + violationCounts.high;
