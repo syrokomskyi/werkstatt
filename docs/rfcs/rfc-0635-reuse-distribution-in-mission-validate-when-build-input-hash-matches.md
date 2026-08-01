@@ -272,18 +272,18 @@ This is desirable: if the distribution is current, there is no reason to rebuild
 
 ## Acceptance criteria
 
-- [ ] `runMissionValidate` checks `distribution/build-input-hash.json` before running the build cycle and skips it when the hash matches
-- [ ] `runMissionValidate` copies `distribution/dist/` to `workpiece/dist/` when the latter is missing and the hash matches
-- [ ] `runMissionValidate` accepts `--force` flag to bypass the hash check and always run the full cycle
-- [ ] `runMissionBuild` runs `build.check` pipeline between `build.prepare` and `astro build`
-- [ ] `mission.validate --json` output includes `distributionReused: boolean` and `buildInputHash: string | null`
-- [ ] Unit test: hash match → build cycle skipped, `distributionReused: true`
-- [ ] Unit test: hash mismatch → full build cycle runs, `distributionReused: false`
-- [ ] Unit test: `--force` → full build cycle runs regardless of hash match
-- [ ] Unit test: `mission.build` includes `build.check` pipeline step
-- [ ] Existing test files (`mission-validate-dist-cleanup.test.ts`, `mission-validate-snapshot-auto-regen.test.ts`, `mission-validate-cache-clone-warning.test.ts`) updated to account for distribution reuse path
-- [ ] `mission.validate` command registration in `mission.module.ts` declares `cacheable: false` for consistency with `mission.build` (both depend on external state: file system, build tools, git)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `runMissionValidate` checks `distribution/build-input-hash.json` before running the build cycle and skips it when the hash matches (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:175-284, mission-validate-distribution-reuse.test.ts test 1)
+- [x] `runMissionValidate` copies `distribution/dist/` to `workpiece/dist/` when the latter is missing and the hash matches (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:207-212, mission-validate-distribution-reuse.test.ts test 7)
+- [x] `runMissionValidate` accepts `--force` flag to bypass the hash check and always run the full cycle (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:177, mission-validate-distribution-reuse.test.ts test 3)
+- [x] `runMissionBuild` runs `build.check` pipeline between `build.prepare` and `astro build` (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:633-645, mission-build-check-phase.test.ts test 1)
+- [x] `mission.validate --json` output includes `distributionReused: boolean` and `buildInputHash: string | null` (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:72-81, mission-validate-distribution-reuse.test.ts tests 1-2)
+- [x] Unit test: hash match → build cycle skipped, `distributionReused: true` (evidence: mission-validate-distribution-reuse.test.ts test 1)
+- [x] Unit test: hash mismatch → full build cycle runs, `distributionReused: false` (evidence: mission-validate-distribution-reuse.test.ts test 2)
+- [x] Unit test: `--force` → full build cycle runs regardless of hash match (evidence: mission-validate-distribution-reuse.test.ts test 3)
+- [x] Unit test: `mission.build` includes `build.check` pipeline step (evidence: mission-build-check-phase.test.ts test 1)
+- [x] Existing test files (`mission-validate-dist-cleanup.test.ts`, `mission-validate-snapshot-auto-regen.test.ts`, `mission-validate-cache-clone-warning.test.ts`) updated to account for distribution reuse path (evidence: existing tests use result.summary/exitCode not result.data, no assertion changes needed — all 488 tests pass)
+- [x] `mission.validate` command registration in `mission.module.ts` declares `cacheable: false` for consistency with `mission.build` (both depend on external state: file system, build tools, git) (evidence: packages/os/site-kernel-handoff/src/mission/mission.module.ts:202)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0635` → status: pass, violations: [])
 
 ## Implementation notes for agents
 
