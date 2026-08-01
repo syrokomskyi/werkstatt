@@ -166,6 +166,10 @@ Generators that produce files read **synchronously** by client-side code via `im
 
 The Axiom gate in `mission.check` and `leitstand.propagate` MUST only fail on actual axe **violations** (predicate `accessibility.axe.violation` in `finding.extension["automated-web-accessibility"].predicate`). Axe **incomplete** results (predicate `accessibility.axe.incomplete`) are tool limitations — axe could not determine a result (e.g. background color obscured by pseudo-elements, gradients, or images) — and MUST NOT block the deployment gate. Incomplete findings are still recorded in evidence and reported, but they do not count toward the high/critical error total.
 
+## Dependency direction rule
+
+`@warpgogol/site-kernel-checks` MUST NOT depend on `@warpgogol/site-kernel-handoff`. The dependency direction is `handoff → checks` only (for `MISSION_PREFLIGHT_CRITICAL`, `MISSION_PREFLIGHT_WARNING`, `GENERATOR_OWNERSHIP_MAP`). Shared utilities needed by both packages (`parseSemver`, `isPlatformScope`, `extractTrailer`, `resolveMissionDir`, `resolvePlatformSemanticHash`) live in `@warpgogol/site-kernel`. `site-kernel-handoff` re-exports them for backward compat.
+
 ## Architecture reference
 
 → `packages/os/site-kernel/AGENTS.md` — kernel architecture table  
