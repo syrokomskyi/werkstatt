@@ -226,6 +226,8 @@ The agent auto-commits after each standalone operator request via `fo-step-commi
 
 This rule is complementary to RFC-0480's per-response `git status` verification, not a replacement. RFC-0480 checks before each response; RFC-0581 is a final safety net at session end. Together with RFC-0575 (session-start pre-flight), they form a bracket: check at start → commit during → verify at end.
 
+**Session-retro language discipline (NON-NEGOTIABLE):** All `fo-session-retro` output — the insight triage table, the `ask_user_question` confirmation prompt, the final summary report, and any inline commentary — MUST be written in `PREFERENCES.md` `aiLanguage`. English templates in the skill are structural placeholders only; the agent MUST translate all headings, column names, labels, and prose to `aiLanguage` before presenting output. Only identifiers (file paths, skill names, RFC/ADR ids, commit hashes) stay untranslated. If `aiLanguage` is `ru`, the triage table heading is «Сортировка инсайтов сессии», not «Session Insight Triage».
+
 ## HDRI identity firewall, image resolution, material credits, responsive variants, derived artifact invalidation, silent UI text, behavior snapshot
 
 See [`docs/policies/content-contracts.md`](docs/policies/content-contracts.md) for the full text of these contracts:

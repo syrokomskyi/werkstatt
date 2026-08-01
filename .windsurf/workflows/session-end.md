@@ -21,6 +21,10 @@ When the operator says any of the following, invoke the `fo-session-retro` skill
 2. **Wait for the retro to complete** — it will categorize insights, route them, commit, and produce its own summary.
 3. **Do not duplicate** — the retro skill's report is the session-end output. Do not add a separate "session complete" message.
 
+## Language discipline (NON-NEGOTIABLE)
+
+All `fo-session-retro` output — the insight triage table, the `ask_user_question` confirmation prompt, the final summary report, and any inline commentary — MUST be written in `PREFERENCES.md` `aiLanguage`. English templates in the skill are structural placeholders only. If `aiLanguage` is `ru`, the triage table heading is «Сортировка инсайтов сессии», not «Session Insight Triage». Only identifiers (file paths, skill names, RFC/ADR ids, commit hashes) stay untranslated.
+
 ## Why this workflow exists
 
 Without an explicit trigger, agents interpret "Завершаем эту сессию" as a request for a summary, not as a skill invocation. This workflow ensures `fo-session-retro` runs deterministically on session-end commands.
