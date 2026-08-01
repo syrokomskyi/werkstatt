@@ -452,6 +452,15 @@ Defaults are `{ index: true, follow: true }`, so existing pages are unaffected. 
 - `src/styles/tokens-override.css` must not exist. `app.layout.validate` fails if it is present.
 - `src/content/` must exist (feature-first layout contract).
 
+### Favicon SVG source override (RFC-0631)
+
+By default, `public.icons.generate` programmatically generates favicon SVGs via `buildIconSvg` using the site's biome palette and initial. A site may override the source SVG by authoring:
+
+- `src/content/favicon.svg` — overrides the regular favicon SVG source
+- `src/content/favicon-maskable.svg` — overrides the maskable favicon SVG source (falls back to `favicon.svg` if absent, then to `buildIconSvg`)
+
+The source SVG must have `viewBox="0 0 512 512"` on the root `<svg>` element. `public.icons.validate` reports `ICON-SRC-01` (wrong viewBox on `favicon.svg`), `ICON-SRC-02` (invalid XML), and `ICON-SRC-03` (wrong viewBox on `favicon-maskable.svg`) when source SVGs are present but malformed. Sites without source SVGs are unaffected — `buildIconSvg` remains the default.
+
 ### Build prepare pipeline (`SITES_BUILD_PREPARE_PIPELINE`)
 
 The canonical build sequence is:
