@@ -88,7 +88,8 @@ function buildIconSvg(app: AppPublicContext, maskable = false): string {
   const cornerRx = Math.round(cornerSize * 0.18);
   const hubRx = Math.round(hubSize * 0.19);
   const strokeW = maskable ? 7 : 8;
-  const dash = maskable ? 18 : 20;
+  const connectorLen = connectorEnd - connectorStart;
+  const dash = Math.round(connectorLen / 4);
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">`,
     `  <rect width="512" height="512" fill="${bg}"/>`,
