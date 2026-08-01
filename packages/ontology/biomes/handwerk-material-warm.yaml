@@ -24,15 +24,15 @@ axes:
   cornerRadius: 2px
   borderWeight: 1px
 palette:
-  brand: "#C0780A"
-  brandHover: "#A06008"
-  brandContrast: "#17191D"
-  accent: "#C0780A"
+  brand: "#8B5406"
+  brandHover: "#6B4205"
+  brandContrast: "#FFFFFF"
+  accent: "#8B5406"
   surface: "#F4F2EE"
   surfaceMuted: "#E4E2DE"
   ink: "#1B1D22"
   inkSoft: "#373A40"
-  inkMuted: "#6C747B"
+  inkMuted: "#5C646B"
   divider: "#C9C9C4"
   success: "#3E7456"
   warning: "#D9951B"
@@ -49,12 +49,12 @@ components:
   sectionAltLink: "#7A4D12"
   sectionAltLinkHover: "#5E3909"
   sectionAltLinkVisited: "#6A4E5E"
-  sectionAltAccent: "#C0780A"
+  sectionAltAccent: "#8B5406"
   cardBg: "#F8F7F4"
   cardBorder: "#C9C9C4"
-  cta: "#C0780A"
-  ctaHover: "#C87D14"
-  ctaText: "#17191D"
+  cta: "#8B5406"
+  ctaHover: "#9D6208"
+  ctaText: "#FFFFFF"
   surfaceAlt: "#EFEDE8"
   textSoftOnDark: rgb(55 58 64 / 0.94)
   textInverse84: rgb(27 29 34 / 0.84)
@@ -82,7 +82,7 @@ motion:
   reduceMotionRespect: true
 geometry:
   diagramLineWeight: 1px
-  diagramAccentColor: "#C0780A"
+  diagramAccentColor: "#8B5406"
   decorativeAllowed: false
 shadows:
   sm: 0 1px 3px rgb(27 29 34 / 0.08)
@@ -94,8 +94,8 @@ shadows:
   header: 0 8px 28px rgb(27 29 34 / 0.12)
   appeal: 0 18px 42px rgb(27 29 34 / 0.16)
 gradients:
-  accent: "linear-gradient(135deg, #D89018 0%, #B07008 100%)"
-  primary: "linear-gradient(135deg, #C0780A 0%, #A06008 100%)"
+  accent: "linear-gradient(135deg, #A0620E 0%, #6B4205 100%)"
+  primary: "linear-gradient(135deg, #8B5406 0%, #6B4205 100%)"
   vignetteDark: radial-gradient(circle at center, transparent 0%, rgb(27 29 34 / 0.34) 100%)
 siteBackground:
   layers:
