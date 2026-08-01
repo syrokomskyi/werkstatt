@@ -1,7 +1,7 @@
 ---
 id: RFC-0630
 title: "Harden mission.check capture contract and reliability for production pilot"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-01
 updatedAt: 2026-08-01
 enhancedAt: 2026-08-01
-implementedAt:
+implementedAt: 2026-08-01
 closedAt:
 supersedes: []
 supersededBy:
