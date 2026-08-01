@@ -324,6 +324,8 @@ RFC (Request for Comments) is the formal lifecycle for architectural decisions i
 
 **RFC-0491:** Agents MUST use `rfc.create` to scaffold new RFC files. Agents MUST NOT create RFC files by manually copying the template and determining the number. Agents MAY use `rfc.next-id` for read-only number queries (e.g. when referencing a future RFC number in a document or plan). Agents MUST NOT determine RFC numbers by running `ls`, `find`, `grep`, or any manual file-listing command. V-28, V-02, and V-31 are post-hoc safety nets, not substitutes for calling the command.
 
+**RFC review discipline:** When reviewing or finalizing an RFC with TypeScript contracts (interface definitions in the design section), verify that interface names, field names, field types, and field presence/absence match the actual implementation. Mismatches between RFC TypeScript contracts and code are a documentation defect — fix the RFC to match the code, not the other way around.
+
 ## ADR governance protocol
 
 ADR (Architectural Decision Record) is the lightweight decision log for local technical choices. See [`docs/policies/adr-governance.md`](docs/policies/adr-governance.md) for the full protocol: when to use an ADR, lifecycle, agent permissions, and transition rules.
