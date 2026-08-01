@@ -115,7 +115,7 @@ describe("RFC-0631 resolveIconSvg", () => {
     expect(result).toBe(buildIconSvg(mockApp, false));
   });
 
-  it("returns maskable SVG when src/content/favicon-maskable.svg exists", async () => {
+  it("auto-wraps maskable SVG from favicon.svg when maskable=true", async () => {
     // RFC-0632: favicon-maskable.svg is no longer read; auto-wrap from favicon.svg instead
     const regularSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#1a1a2e"/><circle cx="256" cy="256" r="200"/></svg>`;
     mockFiles.set(join(CONTENT_DIR, "favicon.svg"), regularSvg);
