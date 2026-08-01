@@ -406,7 +406,7 @@
 
 .markdown-section__content th {
   background: var(--ds-color-primary);
-  color: var(--ds-color-hero-text);
+  color: var(--ds-color-cta-text, var(--ds-color-text-inverse));
   padding: var(--ds-space-4) var(--ds-space-5);
   text-align: left;
   font-weight: 600;

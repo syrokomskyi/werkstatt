@@ -167,6 +167,7 @@ const shouldShowLanguageLabels = showLanguageColumns && showLanguageLabels;
 
 <SectionShell
   slug="markdown"
+  sectionNumber={sectionNumber}
   ariaLabelledBy={heading ? "markdown-section-title" : undefined}
   background={background ?? { kind: "color" }}
   effects={effects}
@@ -237,3 +238,9 @@ const shouldShowLanguageLabels = showLanguageColumns && showLanguageLabels;
     }
   </div>
 </SectionShell>
+
+<script>
+  document.querySelectorAll(".markdown-section__content table").forEach((table) => {
+    if (!table.hasAttribute("tabindex")) table.setAttribute("tabindex", "0");
+  });
+</script>

@@ -48,13 +48,17 @@ function injectHeadingIds(html: string): string {
   });
 }
 
+function addTableTabindex(html: string): string {
+  return html.replace(/<table>/g, '<table tabindex="0">');
+}
+
 function renderMarkdownGfm(text: string, allowDangerousHtml: boolean): string {
   const html = micromark(text, {
     allowDangerousHtml,
     extensions: [gfm()],
     htmlExtensions: [gfmHtml()],
   });
-  return injectHeadingIds(html);
+  return addTableTabindex(injectHeadingIds(html));
 }
 
 export interface ProsePipelineOptions {

@@ -77,7 +77,7 @@ const BINDING_LINE =
   (showNotice || showIndicator) && (
     <div class="translation-chrome">
       {showIndicator && (
-        <div class="translation-indicator" tabindex="0" aria-label={copy.hint}>
+        <div class="translation-indicator" tabindex="0" role="status" aria-label={copy.hint}>
           <span class="translation-indicator__dot" aria-hidden="true" />
           <span>{copy.badge}</span>
           <span class="translation-indicator__hint" role="tooltip">
