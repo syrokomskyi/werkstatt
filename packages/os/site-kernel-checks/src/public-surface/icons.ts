@@ -77,7 +77,7 @@ function siteDisplayName(app: AppPublicContext): string {
   );
 }
 
-function buildIconSvg(app: AppPublicContext, maskable = false): string {
+export function buildIconSvg(app: AppPublicContext, maskable = false): string {
   const biome = asString(asRecord(app.manifest.identity)?.biome) ?? app.appId;
   const bg = app.biomePalette?.surface ?? hashColor(`${biome}:${app.appId}`, 17);
   const fg = app.biomePalette?.brand ?? hashColor(`${app.appId}:${biome}`, 42);
