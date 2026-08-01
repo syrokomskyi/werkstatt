@@ -11,12 +11,15 @@
   <item>RFC-0489: New UI section for deployment-specific SBOM registry with semantic HTML and accessibility.</item>
   <item>Fix: resolve dataRef at build time — load registry JSON via import.meta.glob and merge with openSource labels from the site collection.</item>
   <item>RFC-0608: fetch /.well-known/build-identity.json at request time (SSR) for deployment metadata display.</item>
+  <item>RFC-0634: replace runtime fetch with local readFileSync from public/.well-known/build-identity.json for per-channel build-time metadata embedding.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { SectionProps } from "@warpgogol/share/page";
 import { cast, resolveSectionAnchor } from "@warpgogol/share";
 import { getEntry } from "astro:content";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import type { OpenSourceRegistrySectionContent } from "./open-source-registry-section.types.ts";
@@ -51,30 +54,30 @@ const openSourceLabels = (labelsEntry?.data as Record<string, unknown>)?.openSou
 
 const registryJson = props.dataRef ? resolveRegistryData(props.dataRef, lang) : undefined;
 
-// RFC-0608: Fetch build-identity.json at request time (SSR)
-// On Cloudflare Workers, static assets are served before Worker code executes,
-// so a same-origin fetch works for this file.
+// RFC-0634: Read build-identity.json locally from public/.well-known/ at build time
+// This ensures each channel's prerendered HTML embeds its own metadata, not the
+// main domain's. The path is resolved via process.cwd() which points to the
+// workpiece root during pnpm build.
 let deploymentMetadata = {
   deploymentId: "—",
   buildTimestamp: "—",
   commitSha: "—",
 };
 try {
-  const response = await fetch(`${Astro.url.origin}/.well-known/build-identity.json`);
-  if (response.ok) {
-    const buildIdentity = (await response.json()) as {
-      releaseId?: string;
-      buildTimestamp?: string;
-      commitSha?: string;
-    };
-    deploymentMetadata = {
-      deploymentId: buildIdentity.releaseId ?? "—",
-      buildTimestamp: buildIdentity.buildTimestamp ?? "—",
-      commitSha: buildIdentity.commitSha ?? "—",
-    };
-  }
+  const wellKnownPath = join(process.cwd(), "public", ".well-known", "build-identity.json");
+  const raw = readFileSync(wellKnownPath, "utf8");
+  const buildIdentity = JSON.parse(raw) as {
+    releaseId?: string;
+    buildTimestamp?: string;
+    commitSha?: string;
+  };
+  deploymentMetadata = {
+    deploymentId: buildIdentity.releaseId ?? "—",
+    buildTimestamp: buildIdentity.buildTimestamp ?? "—",
+    commitSha: buildIdentity.commitSha ?? "—",
+  };
 } catch {
-  // File not found (e.g., local dev before release.prepare) — keep placeholders
+  // File not found (e.g., local dev before any deploy) — keep placeholders
 }
 
 const data = {
