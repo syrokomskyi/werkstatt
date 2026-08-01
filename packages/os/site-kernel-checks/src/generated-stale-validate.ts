@@ -70,8 +70,6 @@ export async function runGeneratedStaleValidate(
 
   const expectedPaths = new Set<string>();
   for (const entry of GENERATOR_OWNERSHIP_MAP) {
-    if (entry.conditional) continue;
-
     const isWorkspaceAbs = isWorkspaceAbsolute(entry.path);
     if (!isWorkspaceAbs && !app && !context.site?.directory) continue;
 

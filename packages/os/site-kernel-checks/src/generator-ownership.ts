@@ -514,6 +514,17 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-check-warpgogol/src/commands/hints.ts",
   },
 
+  // RFC-0634: Preliminary build-identity.json written by leitstand.dev-deploy
+  // and release.prepare to public/.well-known/ before build. Conditional — the
+  // file only exists transiently during builds and is cleaned up afterward.
+  {
+    path: "public/.well-known/build-identity.json",
+    command: "release.prepare",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-handoff/src/release/release-commands.ts",
+    conditional: true,
+  },
+
   // RFC-0028: Cosmic passport key — owned by passport.key.ensure (RFC-0605).
   {
     path: "public/.well-known/cosmic-passport-key.json",
