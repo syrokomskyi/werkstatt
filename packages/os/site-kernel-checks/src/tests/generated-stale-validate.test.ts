@@ -101,12 +101,17 @@ describe("generated.stale.validate (RFC-0600)", () => {
       await mkdir(join(appDir, "public", "preview", "de"), { recursive: true });
       await mkdir(join(appDir, "src", "content", "pages", "de"), { recursive: true });
       await writeFile(join(appDir, "public", "preview", "de", "founder.png"), "png", "utf8");
-      await writeFile(join(appDir, "src", "content", "pages", "de", "founder.md"), "# Founder", "utf8");
+      await writeFile(
+        join(appDir, "src", "content", "pages", "de", "founder.md"),
+        "# Founder",
+        "utf8",
+      );
 
       const result = await runGeneratedStaleValidate(input, ctx(root));
-      const staleDiags = result.data?.diagnostics.filter(
-        (d) => d.ruleId === "STALE-01" && d.file === "public/preview/de/founder.png",
-      ) ?? [];
+      const staleDiags =
+        result.data?.diagnostics.filter(
+          (d) => d.ruleId === "STALE-01" && d.file === "public/preview/de/founder.png",
+        ) ?? [];
       expect(staleDiags.length).toBe(0);
     } finally {
       await rm(root, { recursive: true, force: true });
@@ -140,9 +145,10 @@ describe("generated.stale.validate (RFC-0600)", () => {
       await writeFile(join(appDir, "public", "preview", "de", "-founder.png"), "png", "utf8");
 
       const result = await runGeneratedStaleValidate(input, ctx(root));
-      const staleDiags = result.data?.diagnostics.filter(
-        (d) => d.ruleId === "STALE-01" && d.file === "public/preview/de/-founder.png",
-      ) ?? [];
+      const staleDiags =
+        result.data?.diagnostics.filter(
+          (d) => d.ruleId === "STALE-01" && d.file === "public/preview/de/-founder.png",
+        ) ?? [];
       expect(staleDiags.length).toBe(0);
     } finally {
       await rm(root, { recursive: true, force: true });
@@ -174,6 +180,28 @@ describe("generated.stale.validate (RFC-0600)", () => {
         (d) => d.ruleId === "STALE-01" && d.file === "public/webgogol-com-indexnow.txt",
       );
       expect(staleDiags.length).toBe(1);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("green: conditional ownership entry covers file on disk (no STALE-01)", async () => {
+    const root = await mkdtemp(join(tmpdir(), "gen-stale-conditional-"));
+    try {
+      const appDir = await createAppDir(root);
+      await mkdir(join(appDir, "public", ".well-known"), { recursive: true });
+      await writeFile(
+        join(appDir, "public", ".well-known", "build-identity.json"),
+        '{"releaseId":"test"}',
+        "utf8",
+      );
+
+      const result = await runGeneratedStaleValidate(input, ctx(root));
+      const staleDiags =
+        result.data?.diagnostics.filter(
+          (d) => d.ruleId === "STALE-01" && d.file === "public/.well-known/build-identity.json",
+        ) ?? [];
+      expect(staleDiags.length).toBe(0);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
