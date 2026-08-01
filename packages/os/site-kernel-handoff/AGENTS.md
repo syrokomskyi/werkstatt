@@ -24,6 +24,7 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - Keep every relative import in package source on the on-disk `.ts` extension, per RFC-0092.
 - **Non-fatal warnings use `logger.warn`, not `logger.info`.** When a catch block logs a non-fatal failure (e.g., baseline failure, push failure, derived-edit detection), use `logger.warn` to distinguish it from informational output. See `sternsystem-sync.ts`, `handoff-absorb.ts`, `mission-materialization-commands.ts` for existing examples.
 - **Do not call `logger.success()` with the same text as the `summary` field.** The kernel CLI runner automatically prints the `summary` from `KernelCommandResult` — a `logger.success()` call with the same message produces duplicate output. Use `logger.info()` for intermediate progress updates and let `summary` handle the final result line.
+- **Wrap `JSON.parse` in try/catch when reading evidence or manifest files.** Bare `JSON.parse` on file contents produces an unreadable `SyntaxError` when the file is corrupted or truncated. Always wrap with a try/catch that throws a descriptive error including the file name and context (e.g. `[leitstand.propagate] Axiom evidence malformed: evidence-metadata.json is not valid JSON for mission '<id>'.`). See `leitstand-commands.ts` propagate gate (RFC-0629) for the pattern.
 
 ## Leitstand (RFC-0358 / RFC-0379 / RFC-0608 / RFC-0627 / RFC-0628)
 
