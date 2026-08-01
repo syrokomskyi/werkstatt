@@ -173,13 +173,12 @@ interface MissionCheckOverrides {
   maxDuration?: number;    // --max-duration 180000
   maxUrls?: number;        // --max-urls 200
   maxDepth?: number;       // --max-depth 5
-  locales?: string[];      // --locales de-DE,uk-UA → ["de-DE", "uk-UA"]
 }
 
 // i18n locale resolution from mission workpiece system.md
-interface ResolvedLocale {
-  locale: string;          // e.g., "de-DE"
-  pathSegment: string;     // e.g., "de" (first URL path segment)
+interface LocaleMapping {
+  segmentToLocale: Map<string, string>; // e.g., "de" → "de-DE", "uk" → "uk-UA"
+  defaultLocale: string;                // fallback locale from i18n.default hreflang
 }
 
 // toolProfile populated at runtime via createRequire(import.meta.url)
@@ -192,7 +191,8 @@ interface RuntimeToolProfile {
 // Pre-flight check result
 interface PreflightResult {
   ok: boolean;
-  error?: string;  // actionable message if browser not installed
+  error?: string;           // actionable message if browser not installed
+  chromiumRevision?: string; // browser.version() — passed to resolveToolProfile
 }
 ```
 

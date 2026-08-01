@@ -80,7 +80,6 @@ interface MissionCheckOverrides {
   maxDuration?: number;
   maxUrls?: number;
   maxDepth?: number;
-  locales?: string[];
 }
 
 interface PreflightResult {
@@ -173,7 +172,7 @@ function resolveLocaleForUrl(url: string, mapping: LocaleMapping): string {
 export interface MissionCheckResult {
   command: "mission.check";
   status: "pass" | "fail";
-  exitCode: 0 | 1;
+  exitCode: 0 | 1 | 2;
   capsule: StagedCapsule;
   studyRun: StudyRun;
   findingsCount: {
@@ -205,7 +204,7 @@ function failResult(
     data: {
       command: "mission.check",
       status: "fail",
-      exitCode: exitCode as 0 | 1,
+      exitCode: exitCode as 0 | 1 | 2,
       capsule: null as unknown as StagedCapsule,
       studyRun: null as unknown as StudyRun,
       findingsCount: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
@@ -520,6 +519,11 @@ export async function runMissionCheck(
       );
     }
     explicitLocales = parsed;
+    if (parsed.length > 1) {
+      logger.warn(
+        `  --locales has ${parsed.length} values; only '${parsed[0]}' will be used for all pages (multi-locale per-page matching requires i18n config from workpiece)`,
+      );
+    }
   }
 
   const missionDir = resolveMissionDir(workspaceRoot, missionId);
@@ -731,7 +735,7 @@ export async function runMissionCheck(
     const result: MissionCheckResult = {
       command: "mission.check",
       status,
-      exitCode: exitCode as 0 | 1,
+      exitCode: exitCode as 0 | 1 | 2,
       capsule,
       studyRun,
       findingsCount,
