@@ -1,7 +1,7 @@
 ---
 id: RFC-0636
 title: "Formalize conditional flag semantics in GENERATOR_OWNERSHIP_MAP"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
