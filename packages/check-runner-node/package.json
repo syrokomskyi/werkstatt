@@ -20,7 +20,7 @@
   "dependencies": {
     "@warpgogol/check-core": "workspace:*",
     "@warpgogol/fingerprint": "workspace:*",
-    "playwright": "^1.61.1"
+    "playwright": "^1.62.1"
   },
   "devDependencies": {
     "happy-dom": "^20.11.0",
