@@ -81,7 +81,11 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/manifest.webmanifest",
       "<app>/src/pages/favicon.ico.ts",
     ],
-    reads: ["<app>/src/content/system.md"],
+    reads: [
+      "<app>/src/content/system.md",
+      "<app>/src/content/favicon.svg",
+      "<app>/src/content/favicon-maskable.svg",
+    ],
     execute: runPublicIconsGenerate,
   },
   {
@@ -95,6 +99,8 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/favicon.svg",
       "<app>/public/manifest.webmanifest",
       "<app>/public/icon-*.png",
+      "<app>/src/content/favicon.svg",
+      "<app>/src/content/favicon-maskable.svg",
     ],
     execute: runPublicIconsValidate,
   },

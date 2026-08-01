@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: extracted icon commands from public-surface.ts into public-surface/icons.ts.</item>
+  <item>RFC-0631: add resolveIconSvg helper for site-authored favicon SVG source with buildIconSvg fallback; add ICON-SRC-01/02/03 validation diagnostics; add sharp conversion failure fallback.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -19,16 +20,20 @@ import type {
 } from "@warpgogol/site-kernel";
 import { hasGeneratedMarker } from "@warpgogol/site-kernel-codegen";
 import sharp from "sharp";
+import { diagnosticsResult } from "../result-helpers.ts";
+import type { Diagnostic } from "@warpgogol/site-kernel";
 import {
   type AppPublicContext,
   appRel,
   asRecord,
   asString,
-  diagnostics,
   loadPublicContext,
   readTextIfExists,
   workspaceRel,
 } from "./shared.ts";
+
+const SVG_ROOT_RE = /<svg\b[^>]*>/i;
+const SVG_VIEWBOX_RE = /\bviewBox\s*=\s*["']([^"']*)["']/i;
 
 function hashColor(seed: string, offset: number): string {
   let hash = offset;
@@ -146,14 +151,34 @@ function buildWebManifest(app: AppPublicContext): string {
   )}\n`;
 }
 
-export async function runPublicIconsGenerate(
-  _input: KernelCommandInput,
+export async function resolveIconSvg(
+  app: AppPublicContext,
   context: KernelRuntimeContext,
-): Promise<KernelCommandResult> {
-  const app = await loadPublicContext(context);
-  const svg = buildIconSvg(app);
-  const maskableSvg = buildIconSvg(app, true);
-  const writes: Array<[string, string | Uint8Array]> = [
+  maskable: boolean,
+): Promise<string> {
+  if (maskable) {
+    const maskableSource = await readTextIfExists(
+      context,
+      join(app.contentDirectory, "favicon-maskable.svg"),
+    );
+    if (maskableSource) return maskableSource;
+    const regularSource = await readTextIfExists(
+      context,
+      join(app.contentDirectory, "favicon.svg"),
+    );
+    if (regularSource) return regularSource;
+    return buildIconSvg(app, true);
+  }
+  const regularSource = await readTextIfExists(context, join(app.contentDirectory, "favicon.svg"));
+  return regularSource ?? buildIconSvg(app, false);
+}
+
+async function buildIconWrites(
+  app: AppPublicContext,
+  svg: string,
+  maskableSvg: string,
+): Promise<Array<[string, string | Uint8Array]>> {
+  return [
     [join(app.publicDirectory, "favicon.svg"), svg],
     [join(app.publicDirectory, "favicon.ico"), await icoFromSvg(svg)],
     [join(app.publicDirectory, "apple-touch-icon.png"), await pngFromSvg(svg, 180)],
@@ -163,6 +188,23 @@ export async function runPublicIconsGenerate(
     [join(app.publicDirectory, "icon-maskable-512.png"), await pngFromSvg(maskableSvg, 512)],
     [join(app.publicDirectory, "manifest.webmanifest"), buildWebManifest(app)],
   ];
+}
+
+export async function runPublicIconsGenerate(
+  _input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult> {
+  const app = await loadPublicContext(context);
+  const svg = await resolveIconSvg(app, context, false);
+  const maskableSvg = await resolveIconSvg(app, context, true);
+  let writes: Array<[string, string | Uint8Array]>;
+  try {
+    writes = await buildIconWrites(app, svg, maskableSvg);
+  } catch {
+    const fallbackSvg = buildIconSvg(app);
+    const fallbackMaskableSvg = buildIconSvg(app, true);
+    writes = await buildIconWrites(app, fallbackSvg, fallbackMaskableSvg);
+  }
   for (const [filePath, content] of writes) {
     await context.io.writeFile(filePath, content);
   }
@@ -186,6 +228,7 @@ export async function runPublicIconsValidate(
 ): Promise<KernelCommandResult<CheckResult>> {
   const app = await loadPublicContext(context);
   const messages: Array<{
+    ruleId: string;
     severity: "error" | "warning" | "info";
     message: string;
     file?: string;
@@ -205,6 +248,7 @@ export async function runPublicIconsValidate(
     const filePath = join(app.publicDirectory, name);
     if (!(await context.io.exists(filePath))) {
       messages.push({
+        ruleId: "public.icons.validate",
         severity: "error",
         file: workspaceRel(context, filePath),
         message: `Missing generated icon artifact ${name}.`,
@@ -225,6 +269,7 @@ export async function runPublicIconsValidate(
       const meta = await sharp(Buffer.from(await context.io.readFileBytes(filePath))).metadata();
       if (meta.width !== size || meta.height !== size) {
         messages.push({
+          ruleId: "public.icons.validate",
           severity: "error",
           file: workspaceRel(context, filePath),
           message: `${name} must be ${size}x${size}px, got ${meta.width}x${meta.height}.`,
@@ -250,6 +295,7 @@ export async function runPublicIconsValidate(
       ]) {
         if (!iconMap.has(src)) {
           messages.push({
+            ruleId: "public.icons.validate",
             severity: "error",
             file: workspaceRel(context, manifestPath),
             message: `manifest.webmanifest is missing icon entry ${src}.`,
@@ -260,6 +306,7 @@ export async function runPublicIconsValidate(
       for (const src of ["/icon-maskable-192.png", "/icon-maskable-512.png"]) {
         if (iconMap.get(src)?.purpose !== "maskable") {
           messages.push({
+            ruleId: "public.icons.validate",
             severity: "error",
             file: workspaceRel(context, manifestPath),
             message: `${src} must have purpose: "maskable" in manifest.webmanifest.`,
@@ -269,6 +316,7 @@ export async function runPublicIconsValidate(
       }
     } catch (error) {
       messages.push({
+        ruleId: "public.icons.validate",
         severity: "error",
         file: workspaceRel(context, manifestPath),
         message: `manifest.webmanifest is invalid JSON: ${(error as Error).message}`,
@@ -296,6 +344,7 @@ export async function runPublicIconsValidate(
   ]) {
     if (!layout?.includes(needle)) {
       messages.push({
+        ruleId: "public.icons.validate",
         severity: "error",
         file: workspaceRel(context, layoutPath),
         message: `Shared head is missing icon declaration ${needle}.`,
@@ -304,5 +353,72 @@ export async function runPublicIconsValidate(
     }
   }
 
-  return diagnostics("public.icons.validate", messages);
+  await validateSourceSvg(
+    context,
+    join(app.contentDirectory, "favicon.svg"),
+    "ICON-SRC-01",
+    "ICON-SRC-02",
+    messages,
+  );
+  await validateSourceSvg(
+    context,
+    join(app.contentDirectory, "favicon-maskable.svg"),
+    "ICON-SRC-03",
+    "ICON-SRC-02",
+    messages,
+  );
+
+  return diagnosticsResult(
+    "public.icons.validate",
+    messages.map(
+      (item) =>
+        ({
+          ruleId: item.ruleId,
+          severity: item.severity,
+          message: item.message,
+          file: item.file,
+          fixHint: item.fixHint,
+        }) satisfies Diagnostic,
+    ),
+  );
+}
+
+async function validateSourceSvg(
+  context: KernelRuntimeContext,
+  filePath: string,
+  viewBoxRuleId: string,
+  xmlRuleId: string,
+  messages: Array<{
+    ruleId: string;
+    severity: "error" | "warning" | "info";
+    message: string;
+    file?: string;
+    fixHint?: string;
+  }>,
+): Promise<void> {
+  const content = await readTextIfExists(context, filePath);
+  if (!content) return;
+  const rootMatch = SVG_ROOT_RE.exec(content);
+  if (!rootMatch) {
+    messages.push({
+      ruleId: xmlRuleId,
+      severity: "error",
+      file: workspaceRel(context, filePath),
+      message: `Source SVG does not contain a root <svg> element.`,
+      fixHint: `Fix the root element in src/content/${filePath.split("/").pop()} to be <svg>.`,
+    });
+    return;
+  }
+  const rootTag = rootMatch[0];
+  const viewBoxMatch = SVG_VIEWBOX_RE.exec(rootTag);
+  const viewBox = viewBoxMatch?.[1];
+  if (viewBox !== "0 0 512 512") {
+    messages.push({
+      ruleId: viewBoxRuleId,
+      severity: "error",
+      file: workspaceRel(context, filePath),
+      message: `Source SVG viewBox is "${viewBox ?? "(missing)"}", expected "0 0 512 512".`,
+      fixHint: `Set viewBox="0 0 512 512" on the root <svg> element in src/content/${filePath.split("/").pop()}.`,
+    });
+  }
 }
