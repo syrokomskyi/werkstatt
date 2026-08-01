@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-01
 updatedAt: 2026-08-01
+enhancedAt: 2026-08-01
 implementedAt:
 closedAt:
 supersedes: []
@@ -41,13 +42,11 @@ versionBump: patch
 commands:
   proposed: []
   added: []
-  changed:
-    - command-result cache (computeModuleHash)
+  changed: []
   removed: []
 appsImpacted: []
 packagesImpacted:
   - packages/os/site-kernel
-  - packages/os/site-kernel-checks
 successSignals:
   - Cache hit rate improves for commands whose source files haven't changed
   - Changing one command's source no longer invalidates all other commands' caches
@@ -199,8 +198,9 @@ if (!moduleHash) {
 | --- | --- |
 | `packages/os/site-kernel/src/types.ts` | `KernelCommandDefinition` interface — add `modulePaths` field |
 | `packages/os/site-kernel/src/cache/command-result-cache.ts` | `computeModuleHash` — add `modulePaths` parameter |
-| `packages/os/site-kernel/src/runtime/execute-pipeline.ts` | `moduleHashCache` key — include `modulePaths` |
-| `packages/os/site-kernel-checks/src/command-tables/*.ts` | Commands declare `modulePaths` during incremental migration |
+| `packages/os/site-kernel/src/runtime/execute-pipeline.ts` | `moduleHashCache` key — include `modulePaths` (both `tryCacheRead` and `tryCacheWrite` in both `executePipelineForSite` and `executePipelineForWorkspace`) |
+| `packages/os/site-kernel/AGENTS.md` | Update "Command-result cache (RFC-0390)" section to document `modulePaths` parameter and cache key change |
+| `packages/os/site-kernel-checks/src/command-tables/*.ts` | Commands declare `modulePaths` during incremental migration (Phase 2, not part of this RFC's acceptance criteria) |
 
 ### Output format
 
