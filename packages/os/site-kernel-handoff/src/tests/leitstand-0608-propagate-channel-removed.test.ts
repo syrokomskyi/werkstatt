@@ -6,6 +6,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0608: add tests for leitstand.propagate --channel rejection and alt-deployed state transition.</item>
   <item>RFC-0627: update success test for dev-deployed + Axiom evidence gate.</item>
+  <item>RFC-0634: add fetch mock for dev build-identity.json verification; add package.json and hash fields to test fixtures.</item>
 </CHANGE_SUMMARY>
 */
 

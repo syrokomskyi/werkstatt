@@ -5,6 +5,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0628: replace leitstand.deploy tests with leitstand.dev-deploy tests; update propagate gate tests (published + commitSha + missionId); update rollback auto-step tests (remove dev-deployed).</item>
+  <item>RFC-0634: add package.json to temp workspace for computeBuildInputHash compatibility.</item>
 </CHANGE_SUMMARY>
 */
 
