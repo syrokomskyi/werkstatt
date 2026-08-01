@@ -76,29 +76,29 @@ function buildIconSvg(app: AppPublicContext, maskable = false): string {
   const biome = asString(asRecord(app.manifest.identity)?.biome) ?? app.appId;
   const bg = app.biomePalette?.surface ?? hashColor(`${biome}:${app.appId}`, 17);
   const fg = app.biomePalette?.brand ?? hashColor(`${app.appId}:${biome}`, 42);
-  const inset = maskable ? 14 : 6;
-  const radius = maskable ? 22 : 26;
-  const s = maskable ? 0.87 : 1;
   const cx = 256;
-  const cornerSize = Math.round(72 * s);
-  const hubSize = Math.round(124 * s);
-  const cornerOffset = Math.round(128 * s);
-  const cornerPos = cx - cornerOffset - Math.round(cornerSize / 2);
-  const cornerPos2 = cx + cornerOffset - Math.round(cornerSize / 2);
+  const margin = maskable ? 56 : 28;
+  const cornerSize = maskable ? 80 : 92;
+  const hubSize = maskable ? 120 : 140;
+  const cornerPos = margin;
+  const cornerPos2 = 512 - margin - cornerSize;
   const hubPos = cx - Math.round(hubSize / 2);
-  const connectorStart = cx - cornerOffset;
-  const connectorEnd = cx + cornerOffset;
+  const connectorStart = margin + cornerSize;
+  const connectorEnd = 512 - margin - cornerSize;
+  const cornerRx = Math.round(cornerSize * 0.18);
+  const hubRx = Math.round(hubSize * 0.19);
+  const strokeW = maskable ? 7 : 8;
+  const dash = maskable ? 18 : 20;
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">`,
     `  <rect width="512" height="512" fill="${bg}"/>`,
-    `  <rect x="${inset}" y="${inset}" width="${512 - inset * 2}" height="${512 - inset * 2}" rx="${radius}" fill="${fg}" opacity="0.14"/>`,
-    `  <line x1="${cx}" y1="${connectorStart}" x2="${cx}" y2="${connectorEnd}" stroke="${fg}" stroke-width="8" stroke-dasharray="20 20" stroke-opacity="0.6"/>`,
-    `  <line x1="${connectorStart}" y1="${cx}" x2="${connectorEnd}" y2="${cx}" stroke="${fg}" stroke-width="8" stroke-dasharray="20 20" stroke-opacity="0.6"/>`,
-    `  <rect x="${cornerPos}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
-    `  <rect x="${cornerPos2}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
-    `  <rect x="${cornerPos}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
-    `  <rect x="${cornerPos2}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="16" fill="${fg}" opacity="0.5"/>`,
-    `  <rect x="${hubPos}" y="${hubPos}" width="${hubSize}" height="${hubSize}" rx="26" fill="${fg}"/>`,
+    `  <line x1="${cx}" y1="${connectorStart}" x2="${cx}" y2="${connectorEnd}" stroke="${fg}" stroke-width="${strokeW}" stroke-dasharray="${dash} ${dash}"/>`,
+    `  <line x1="${connectorStart}" y1="${cx}" x2="${connectorEnd}" y2="${cx}" stroke="${fg}" stroke-width="${strokeW}" stroke-dasharray="${dash} ${dash}"/>`,
+    `  <rect x="${cornerPos}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
+    `  <rect x="${cornerPos2}" y="${cornerPos}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
+    `  <rect x="${cornerPos}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
+    `  <rect x="${cornerPos2}" y="${cornerPos2}" width="${cornerSize}" height="${cornerSize}" rx="${cornerRx}" fill="${fg}"/>`,
+    `  <rect x="${hubPos}" y="${hubPos}" width="${hubSize}" height="${hubSize}" rx="${hubRx}" fill="${fg}"/>`,
     `</svg>`,
     "",
   ].join("\n");
