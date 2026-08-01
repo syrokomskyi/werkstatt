@@ -90,6 +90,7 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - The `command_results` namespace stores full `KernelExecutionReport` objects keyed by schema version + command name + site name + inputs hash + module hash.
 - Pipeline executors (`executePipelineForSite`, `executePipelineForWorkspace`) check the cache before executing a command. On hit, the cached report is returned with `cached: true` and `durationMs: 0`. On miss, the command executes; only `ok: true` results are stored.
 - `--force` flag bypasses cache reads but still writes successful results (refreshing entries). `dryRun` mode bypasses the cache entirely (no read, no write).
+- RFC-0635: the `--force` flag is now passed through to `executeKernelCommand` for individual command invocations (previously only pipeline execution). Command handlers read it from `input.flags.force`.
 - `cacheable: false` on a command opts out of caching entirely — the command always executes and is never stored or retrieved from the cache.
 - `computeModuleHash` is cached per-package per-pipeline-run in a `Map<string, string>` to avoid re-hashing the same `src/` directory for every command in a package.
 - `command.reads.validate` (in `@warpgogol/site-kernel-checks`) enforces that every registered command declares `reads` or `cacheable: false` (CRC-01) and that `reads` patterns are valid picomatch syntax (CRC-02).
