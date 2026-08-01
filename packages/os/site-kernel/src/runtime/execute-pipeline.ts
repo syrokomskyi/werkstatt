@@ -184,6 +184,25 @@ function isCommandCacheable(command: KernelCommandDefinition): boolean {
 }
 
 /**
+ * RFC-0637: Resolve the module hash from the per-pipeline-run cache, computing
+ * it on miss. The cache key includes `command.modulePaths` so commands with
+ * different `modulePaths` get independent cache entries.
+ */
+async function getOrComputeModuleHash(
+  moduleSrcDir: string,
+  command: KernelCommandDefinition,
+  moduleHashCache: Map<string, string>,
+): Promise<string> {
+  const moduleHashCacheKey = `${moduleSrcDir}:${command.modulePaths?.join(",") ?? ""}`;
+  let moduleHash = moduleHashCache.get(moduleHashCacheKey);
+  if (!moduleHash) {
+    moduleHash = await computeModuleHash(moduleSrcDir, command.modulePaths);
+    moduleHashCache.set(moduleHashCacheKey, moduleHash);
+  }
+  return moduleHash;
+}
+
+/**
  * RFC-0390: Attempt to read a cached result for the given command.
  * Returns the cached report (with `cached: true`) or null on miss.
  * Skips cache when `dryRun` or `force` is set, or when cache is unavailable.
@@ -206,14 +225,7 @@ async function tryCacheRead(
   const reads = command.reads ?? [];
   const inputsHash = await computeInputsHash(reads, baseDir, workspaceRoot);
 
-  // RFC-0637: moduleHashCache key includes modulePaths so commands with
-  // different modulePaths get independent cache entries.
-  const moduleHashCacheKey = `${moduleSrcDir}:${command.modulePaths?.join(",") ?? ""}`;
-  let moduleHash = moduleHashCache.get(moduleHashCacheKey);
-  if (!moduleHash) {
-    moduleHash = await computeModuleHash(moduleSrcDir, command.modulePaths);
-    moduleHashCache.set(moduleHashCacheKey, moduleHash);
-  }
+  const moduleHash = await getOrComputeModuleHash(moduleSrcDir, command, moduleHashCache);
 
   const key: CommandResultCacheKey = {
     schemaVersion: COMMAND_RESULT_CACHE_SCHEMA_VERSION,
@@ -250,14 +262,7 @@ async function tryCacheWrite(
   const reads = command.reads ?? [];
   const inputsHash = await computeInputsHash(reads, baseDir, workspaceRoot);
 
-  // RFC-0637: moduleHashCache key includes modulePaths so commands with
-  // different modulePaths get independent cache entries.
-  const moduleHashCacheKey = `${moduleSrcDir}:${command.modulePaths?.join(",") ?? ""}`;
-  let moduleHash = moduleHashCache.get(moduleHashCacheKey);
-  if (!moduleHash) {
-    moduleHash = await computeModuleHash(moduleSrcDir, command.modulePaths);
-    moduleHashCache.set(moduleHashCacheKey, moduleHash);
-  }
+  const moduleHash = await getOrComputeModuleHash(moduleSrcDir, command, moduleHashCache);
 
   const key: CommandResultCacheKey = {
     schemaVersion: COMMAND_RESULT_CACHE_SCHEMA_VERSION,
