@@ -14,6 +14,7 @@
 .brand-label {
   text-decoration: none;
   color: var(--ds-color-text);
+  background-color: inherit;
   display: inline-flex;
   flex-direction: column;
   position: relative;

@@ -212,6 +212,7 @@
 }
 
 .footer__tagline {
+  background-color: inherit;
   color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
   font-size: var(--ds-text-1);
   line-height: 1.5;
@@ -250,6 +251,7 @@
 
 .footer__nav-group {
   min-width: 0;
+  background-color: inherit;
 }
 
 .footer__nav-title {
@@ -259,6 +261,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
+  background-color: inherit;
   margin-bottom: var(--ds-space-4);
 }
 
@@ -278,6 +281,7 @@
   gap: var(--ds-space-2);
   text-decoration: none;
   color: var(--ds-color-footer-text, var(--ds-color-text));
+  background-color: inherit;
   font-size: var(--ds-text-0);
   font-weight: 500;
   transition: color 0.2s var(--ds-ease-smooth);
@@ -326,11 +330,14 @@
   display: flex;
   align-items: center;
   gap: var(--ds-space-2);
+  background-color: inherit;
 }
 
 .footer__email {
   color: var(--ds-color-footer-text, var(--ds-color-text));
-  font-size: var(--ds-text-0);
+  background-color: inherit;
+  font-weight: 500;
+  word-break: break-all;
 }
 
 .footer__copy-btn {
@@ -376,6 +383,7 @@
 
 .footer__motto {
   color: var(--ds-color-footer-text-muted, var(--ds-color-text-muted));
+  background-color: inherit;
   font-weight: 500;
   font-size: var(--ds-text-sm);
   margin: 0;

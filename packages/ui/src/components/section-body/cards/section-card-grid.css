@@ -75,10 +75,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--ds-space-3);
+    background-color: inherit;
   }
   .section-card-grid__badge {
     align-self: flex-start;
     color: var(--ds-color-accent);
+    background-color: inherit;
     font-size: var(--ds-text-sm-80);
     font-family: var(--ds-font-mono);
     text-transform: uppercase;
@@ -99,10 +101,12 @@
     font-size: var(--ds-text-3);
     font-weight: var(--ds-font-weight-bold);
     color: var(--ds-color-text);
+    background-color: inherit;
   }
   .section-card-grid__description {
     margin: 0;
     color: var(--ds-color-text);
+    background-color: inherit;
     line-height: var(--ds-line-height-lg);
   }
 

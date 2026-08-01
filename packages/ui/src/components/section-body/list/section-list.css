@@ -16,6 +16,7 @@
 @layer components {
   .section-list-wrap {
     max-width: var(--ds-size-container-narrow);
+    background-color: inherit;
   }
   .section-list-wrap--align-left {
     margin-inline: 0 auto;

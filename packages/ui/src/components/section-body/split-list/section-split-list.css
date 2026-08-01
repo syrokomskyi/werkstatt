@@ -48,10 +48,12 @@
   .section-split-list__column--primary {
     border-left: var(--ds-border-3) solid
       var(--section-split-list-line-color, var(--ds-color-success));
+    background-color: inherit;
   }
   .section-split-list__column--secondary {
     border-left: var(--ds-border-3) solid
       var(--section-split-list-line-color, var(--ds-color-danger));
+    background-color: inherit;
   }
   .section-split-list__column[data-line-color="primary"] {
     --section-split-list-line-color: var(--ds-color-primary);

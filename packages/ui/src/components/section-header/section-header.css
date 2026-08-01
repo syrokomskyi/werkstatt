@@ -114,7 +114,7 @@
 }
 
 .section-header__title-segment {
-  /* Each segment renders inline; container <h{level}> already wraps lines. */
+  background-color: inherit;
 }
 .section-header__title-segment--default {
 }

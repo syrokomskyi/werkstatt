@@ -18,6 +18,7 @@
     margin-inline: 0;
     padding: var(--ds-space-6);
     background: var(--ds-color-card-bg);
+    background-color: var(--ds-color-card-bg);
     border: 1px solid var(--ds-color-card-border);
     border-radius: var(--ds-radius-2);
     box-shadow: var(--ds-shadow-md);

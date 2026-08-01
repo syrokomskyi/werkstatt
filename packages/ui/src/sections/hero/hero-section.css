@@ -297,6 +297,7 @@
   .hero__inline-frame {
     display: block;
     width: 100%;
+    background-color: inherit;
   }
   .hero__inline-frame img,
   .hero__inline-image {
@@ -339,6 +340,7 @@
   .hero__tagline {
     margin: 0;
     color: var(--ds-color-hero-text);
+    background-color: inherit;
     font-family: var(--ds-font-mono);
     letter-spacing: var(--ds-tracking-md);
     text-transform: uppercase;
@@ -358,6 +360,7 @@
   .hero__description {
     margin: 0;
     color: var(--ds-color-text-soft-on-dark);
+    background-color: inherit;
     line-height: var(--ds-line-height-xl);
   }
 

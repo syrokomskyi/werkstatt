@@ -19,6 +19,7 @@
   flex-direction: column;
   align-items: center;
   color: var(--ds-color-text);
+  background-color: inherit;
   text-decoration: none;
   font-family: var(--ds-font-heading);
   font-size: 0.75rem;
@@ -38,6 +39,7 @@
   line-height: 1;
   position: relative;
   z-index: 1;
+  background-color: inherit;
 }
 
 .lang-switcher__nav-icon {

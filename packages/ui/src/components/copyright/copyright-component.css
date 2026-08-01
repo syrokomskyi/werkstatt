@@ -15,6 +15,7 @@
 .copyright {
   font-size: 0.9rem;
   color: var(--ds-color-footer-text-muted);
+  background-color: inherit;
   margin: 0;
 }
 
@@ -26,6 +27,7 @@
 
 .copyright__holder {
   white-space: normal;
+  background-color: inherit;
 }
 
 .copyright__year-separator {

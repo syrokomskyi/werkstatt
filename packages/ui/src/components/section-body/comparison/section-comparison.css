@@ -56,6 +56,7 @@
   .section-comparison__cell {
     padding: var(--ds-space-4);
     color: var(--ds-color-text);
+    background-color: inherit;
     line-height: var(--ds-line-height-lg);
   }
   .section-comparison__cell--left {

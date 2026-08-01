@@ -57,12 +57,14 @@
 
   .material-credit__label {
     color: var(--ds-color-text);
+    background-color: inherit;
     font-weight: var(--ds-font-weight-bold);
   }
 
   .material-credit__line {
     min-width: 0;
     color: var(--ds-color-text-muted);
+    background-color: inherit;
   }
 
   .material-credit__details {
