@@ -35,6 +35,14 @@ import {
 const SVG_ROOT_RE = /<svg\b[^>]*>/i;
 const SVG_VIEWBOX_RE = /\bviewBox\s*=\s*["']([^"']*)["']/i;
 
+type IconDiagnosticMessage = {
+  ruleId: string;
+  severity: "error" | "warning" | "info";
+  message: string;
+  file?: string;
+  fixHint?: string;
+};
+
 function hashColor(seed: string, offset: number): string {
   let hash = offset;
   for (let i = 0; i < seed.length; i++) {
@@ -200,7 +208,10 @@ export async function runPublicIconsGenerate(
   let writes: Array<[string, string | Uint8Array]>;
   try {
     writes = await buildIconWrites(app, svg, maskableSvg);
-  } catch {
+  } catch (error) {
+    context.logger.warn(
+      `public.icons.generate: sharp conversion failed for source SVG, falling back to buildIconSvg: ${(error as Error).message}`,
+    );
     const fallbackSvg = buildIconSvg(app);
     const fallbackMaskableSvg = buildIconSvg(app, true);
     writes = await buildIconWrites(app, fallbackSvg, fallbackMaskableSvg);
@@ -227,13 +238,7 @@ export async function runPublicIconsValidate(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<CheckResult>> {
   const app = await loadPublicContext(context);
-  const messages: Array<{
-    ruleId: string;
-    severity: "error" | "warning" | "info";
-    message: string;
-    file?: string;
-    fixHint?: string;
-  }> = [];
+  const messages: Array<IconDiagnosticMessage> = [];
   const required = [
     "favicon.svg",
     "favicon.ico",
@@ -388,13 +393,7 @@ async function validateSourceSvg(
   filePath: string,
   viewBoxRuleId: string,
   xmlRuleId: string,
-  messages: Array<{
-    ruleId: string;
-    severity: "error" | "warning" | "info";
-    message: string;
-    file?: string;
-    fixHint?: string;
-  }>,
+  messages: Array<IconDiagnosticMessage>,
 ): Promise<void> {
   const content = await readTextIfExists(context, filePath);
   if (!content) return;
