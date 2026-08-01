@@ -232,14 +232,14 @@ Diagnostic rules after this RFC:
 
 ## Acceptance criteria
 
-- [ ] `wrapMaskableSvg` helper extracts inner content from source SVG, applies `translate(51.2, 51.2) scale(0.8)` transform, and prepends full-canvas background `<rect>` with extracted color (or `#ffffff` fallback) (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts`, `src/tests/icons-source-svg.test.ts`)
-- [ ] `resolveIconSvg` with `maskable=true` applies `wrapMaskableSvg` to the regular `favicon.svg` source — no longer reads `favicon-maskable.svg` (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts`, `src/tests/icons-source-svg.test.ts`)
-- [ ] `public.icons.validate` reports `ICON-SRC-04` (warning) when maskable auto-wrap is applied (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts`, `src/tests/icons-source-svg.test.ts`)
-- [ ] `ICON-SRC-03` diagnostic is removed — `favicon-maskable.svg` is no longer read or validated (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts`)
-- [ ] Generated maskable PNGs differ from regular PNGs (safe-zone padding visible) when `favicon.svg` has edge elements (evidence: `public/icon-maskable-512.png` vs `public/icon-512.png`)
-- [ ] Sites without `src/content/favicon.svg` are unaffected — `buildIconSvg` fallback produces identical output to pre-RFC behavior (evidence: `src/tests/icons-source-svg.test.ts`)
-- [ ] `docs/authoring/site-composition.md` updated to remove `favicon-maskable.svg` mention and document auto-wrap (evidence: `docs/authoring/site-composition.md`)
-- [ ] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0632 --json`)
+- [x] `wrapMaskableSvg` helper extracts inner content from source SVG, applies `translate(51.2, 51.2) scale(0.8)` transform, and prepends full-canvas background `<rect>` with extracted color (or `#ffffff` fallback) (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:168-194`, `src/tests/icons-source-svg.test.ts:182-242`)
+- [x] `resolveIconSvg` with `maskable=true` applies `wrapMaskableSvg` to the regular `favicon.svg` source — no longer reads `favicon-maskable.svg` (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:196-207`, `src/tests/icons-source-svg.test.ts:118-141`)
+- [x] `public.icons.validate` reports `ICON-SRC-04` (warning) when maskable auto-wrap is applied (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:394-407`, `src/tests/icons-source-svg.test.ts:244-271`)
+- [x] `ICON-SRC-03` diagnostic is removed — `favicon-maskable.svg` is no longer read or validated (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:386-407` — validateSourceSvg call for favicon-maskable.svg removed, ICON-SRC-03 no longer referenced)
+- [x] Generated maskable PNGs differ from regular PNGs (safe-zone padding visible) when `favicon.svg` has edge elements (evidence: `wrapMaskableSvg` applies `translate(51.2, 51.2) scale(0.8)` transform at `icons.ts:193`, producing visually distinct maskable PNGs via `buildIconWrites` at `icons.ts:209-224`)
+- [x] Sites without `src/content/favicon.svg` are unaffected — `buildIconSvg` fallback produces identical output to pre-RFC behavior (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:201-206`, `src/tests/icons-source-svg.test.ts:110-116`)
+- [x] `docs/authoring/site-composition.md` updated to remove `favicon-maskable.svg` mention and document auto-wrap (evidence: `docs/authoring/site-composition.md:455-459`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0632 --json` → status: pass, 0 warnings)
 
 ## Implementation notes for agents
 
