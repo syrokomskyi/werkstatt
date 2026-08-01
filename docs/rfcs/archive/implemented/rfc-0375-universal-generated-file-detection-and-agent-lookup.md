@@ -18,7 +18,8 @@ supersededBy:
 amends:
   - RFC-0081
   - RFC-0336
-amendedBy: []
+amendedBy:
+  - RFC-0636
 related:
   - RFC-0087
   - RFC-0185
