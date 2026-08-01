@@ -19,6 +19,7 @@ amends:
 - RFC-0358
 amendedBy:
 - RFC-0627
+- RFC-0634
 related:
 - RFC-0358
 - RFC-0379
