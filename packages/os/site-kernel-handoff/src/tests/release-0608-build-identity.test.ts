@@ -49,3 +49,31 @@ test("buildIdentitySchema accepts any string for targetPlatform", () => {
     expect(result.success).toBe(true);
   }
 });
+
+// RFC-0634: releaseId regex loosened to accept workpiece IDs
+test("RFC-0634: buildIdentitySchema accepts workpiece releaseId format", () => {
+  const workpieceIdentity = {
+    ...VALID_BUILD_IDENTITY,
+    releaseId: "workpiece-test-sys-m000001",
+  };
+  const result = buildIdentitySchema.safeParse(workpieceIdentity);
+  expect(result.success).toBe(true);
+});
+
+test("RFC-0634: buildIdentitySchema accepts standard release ID format", () => {
+  const releaseIdentity = {
+    ...VALID_BUILD_IDENTITY,
+    releaseId: "warpgogol-com-r000006",
+  };
+  const result = buildIdentitySchema.safeParse(releaseIdentity);
+  expect(result.success).toBe(true);
+});
+
+test("RFC-0634: buildIdentitySchema rejects invalid releaseId characters", () => {
+  const invalidIdentity = {
+    ...VALID_BUILD_IDENTITY,
+    releaseId: "WORKPIECE-Test-Sys-m000001",
+  };
+  const result = buildIdentitySchema.safeParse(invalidIdentity);
+  expect(result.success).toBe(false);
+});
