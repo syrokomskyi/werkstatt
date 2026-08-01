@@ -199,6 +199,7 @@ export function createMissionModule(): KernelModule {
           mission: { kind: "string", required: true, description: "Mission id." },
         },
         reads: ["missions/{mission}/**"],
+        cacheable: false,
         execute: runMissionValidate,
         gate: {
           severity: "error",

@@ -21,6 +21,7 @@
   <item>RFC-0579: populate nextSteps in mission.validate for pass, fail, and dirty-workpiece states.</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml) after writeMissionManifest in mission.reconcile.</item>
   <item>ADR-0008: run full three-phase build pipeline (build.prepare → astro build → build.post) in mission.build and mission.validate; write build-input-hash.json in mission.build; delegate to shared runPipelinePhase and computeBuildInputHash helpers.</item>
+  <item>RFC-0635: reuse distribution in mission.validate when build-input-hash matches — skip build cycle, copy dist/ from distribution, add distributionReused/buildInputHash/fullBuildRan to MissionValidateData; add build.check phase to mission.build.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -74,6 +75,9 @@ export interface MissionValidateData {
   contractFull: { passed: boolean; validators: Array<Record<string, unknown>> };
   build: { succeeded: boolean; routeCount: number; sitemapHash: string; error?: string };
   diagnostics?: Diagnostic[];
+  distributionReused: boolean;
+  buildInputHash: string | null;
+  fullBuildRan: boolean;
   validatedAt: string;
 }
 
@@ -166,7 +170,117 @@ export async function runMissionValidate(
   const missionDir = resolveMissionDir(workspaceRoot, missionId);
   const workpieceDir = path.join(missionDir, "workpiece");
   const evidenceDir = path.join(missionDir, "evidence");
+  const distributionDir = path.join(missionDir, "distribution");
   await fs.mkdir(evidenceDir, { recursive: true });
+
+  // RFC-0635: check if distribution can be reused by comparing build-input-hash.
+  // If the hash matches and distribution/dist/ exists, skip the entire build cycle.
+  const force = input.flags.force === true;
+  if (!force) {
+    const distributionMetaPath = path.join(distributionDir, "build-input-hash.json");
+    const distributionDistDir = path.join(distributionDir, "dist");
+    if (existsSync(distributionMetaPath) && existsSync(distributionDistDir)) {
+      let canReuse = false;
+      let storedHash: string | null = null;
+      try {
+        const meta = JSON.parse(await fs.readFile(distributionMetaPath, "utf8"));
+        storedHash = meta.buildInputHash ?? null;
+      } catch {
+        // Corrupt or unreadable — fall through to full build
+      }
+      if (storedHash) {
+        try {
+          const { buildInputHash: computedHash } = await computeBuildInputHash(
+            workspaceRoot,
+            workpieceDir,
+          );
+          if (storedHash === computedHash) {
+            canReuse = true;
+          }
+        } catch {
+          // Hash computation failed — fall through to full build
+        }
+      }
+      if (canReuse && storedHash) {
+        logger.info(`  Distribution reuse: build-input-hash matched — skipping build cycle`);
+        // Copy distribution/dist/ to workpiece/dist/ if missing
+        const workpieceDistDir = path.join(workpieceDir, "dist");
+        if (!existsSync(workpieceDistDir)) {
+          logger.info(`  Copying distribution/dist/ to workpiece/dist/…`);
+          await copyDir(distributionDistDir, workpieceDistDir);
+        }
+
+        // Read build-manifest.json for routeCount and sitemapHash if available
+        let reusedRouteCount = 0;
+        let reusedSitemapHash = "sha256:reused";
+        try {
+          const buildManifestPath = path.join(distributionDir, "build-manifest.json");
+          if (existsSync(buildManifestPath)) {
+            const manifestData = JSON.parse(await fs.readFile(buildManifestPath, "utf8"));
+            reusedRouteCount = manifestData.routeCount ?? 0;
+            reusedSitemapHash = manifestData.sitemapHash ?? "sha256:reused";
+          }
+        } catch {
+          // Manifest missing or corrupt — use defaults
+        }
+
+        const now = new Date().toISOString();
+        const reusedReport = {
+          schemaVersion: "1.0.0",
+          missionId,
+          contractFull: { passed: true, validators: [] },
+          build: {
+            succeeded: true,
+            routeCount: reusedRouteCount,
+            sitemapHash: reusedSitemapHash,
+          },
+          distributionReused: true,
+          buildInputHash: storedHash,
+          fullBuildRan: false,
+          validatedAt: now,
+        };
+        await atomicWriteFile(
+          path.join(evidenceDir, "validation-report.json"),
+          JSON.stringify(reusedReport, null, 2) + "\n",
+        );
+
+        const dirtyCheck = isWorkpieceDirty(workpieceDir);
+        if (dirtyCheck.dirty) {
+          logger.warn(
+            `[mission.validate] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`git status\` to review, then \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` to commit.`,
+          );
+        }
+
+        const reuseNextSteps: KernelNextStep[] = dirtyCheck.dirty
+          ? [
+              {
+                action: `Commit uncommitted changes: pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"`,
+                kind: "required",
+              },
+              {
+                action: `Then run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+                kind: "optional",
+              },
+            ]
+          : [
+              {
+                action: `Run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+                kind: "optional",
+              },
+              {
+                action: `Then run: pnpm exec site-kernel run mission.close --mission ${missionId}`,
+                kind: "optional",
+              },
+            ];
+
+        return {
+          data: reusedReport as unknown as MissionValidateData,
+          summary: `[mission.validate] ${missionId} validation passed (distribution reused, build-input-hash matched)`,
+          nextSteps: reuseNextSteps,
+        };
+      }
+    }
+  }
 
   // RFC-0356 §2: run build.prepare then build.check against the workpiece.
   // build.prepare generates derived artifacts (surface.generated.yaml, etc.)
@@ -203,6 +317,9 @@ export async function runMissionValidate(
         sitemapHash: "sha256:failed",
         failedSteps: failedPrepareSteps,
       },
+      distributionReused: false,
+      buildInputHash: null,
+      fullBuildRan: true,
       validatedAt: now,
     };
     await atomicWriteFile(
@@ -392,6 +509,9 @@ export async function runMissionValidate(
       failedSteps,
     },
     ...(buildDiagnostics.length > 0 ? { diagnostics: buildDiagnostics } : {}),
+    distributionReused: false,
+    buildInputHash: null,
+    fullBuildRan: true,
     validatedAt: now,
   };
 
@@ -508,6 +628,20 @@ export async function runMissionBuild(
   } catch (err) {
     buildError = err instanceof Error ? err.message : String(err);
     logger.info(`  build.prepare failed: ${buildError}`);
+  }
+
+  // Phase 1b: build.check (content validators) — RFC-0635
+  // Ensures distributions have passed all content validators before being
+  // reused by mission.validate. build-input-hash.json is only written when
+  // all phases including build.check succeed.
+  if (!buildError) {
+    logger.info(`  Running build.check pipeline for ${manifest.systemId}…`);
+    try {
+      await runPipelinePhase(workspaceRoot, "build.check", manifest.systemId);
+    } catch (err) {
+      buildError = err instanceof Error ? err.message : String(err);
+      logger.info(`  build.check failed: ${buildError}`);
+    }
   }
 
   // Phase 2: astro build
