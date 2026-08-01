@@ -56,13 +56,6 @@ export interface AxiomReportData {
   renderedFiles?: { [path: string]: string };
 }
 
-export interface AxiomReportResult {
-  data: AxiomReportData;
-  exitCode: 0 | 1;
-  summary: string;
-  nextSteps: KernelNextStep[];
-}
-
 const SEVERITY_ORDER: Finding["severity"][] = ["critical", "high", "medium", "low", "info"];
 
 const SEVERITY_COLORS: Record<Finding["severity"], string> = {
@@ -71,14 +64,6 @@ const SEVERITY_COLORS: Record<Finding["severity"], string> = {
   medium: "bg-yellow-100 text-yellow-800 border-yellow-300",
   low: "bg-blue-100 text-blue-800 border-blue-300",
   info: "bg-gray-100 text-gray-800 border-gray-300",
-};
-
-const SEVERITY_PIE_COLORS: Record<Finding["severity"], string> = {
-  critical: "#dc2626",
-  high: "#ea580c",
-  medium: "#ca8a04",
-  low: "#2563eb",
-  info: "#6b7280",
 };
 
 function escapeHtml(value: string): string {
