@@ -56,6 +56,7 @@ Content validation and Compass scaffolding inventory for all Astro sites in `app
 
 - **`expandOwnershipPlaceholders`** (in `src/generated-files-validate.ts`) is the single canonical utility for expanding `{system}`, `{app}`, `{lang}`, `{route}`, `{slug}`, `{id}`, `{category}` placeholders in `GENERATOR_OWNERSHIP_MAP` entry paths. New validators that process ownership entries MUST import and use this function — do not duplicate the `.replace()` chain inline. `generated-files-validate.ts`, `generated-stale-validate.ts`, and `ownership-sync-validate.ts` all use it.
 - **`--json` flag** is handled by the kernel output formatting layer, not by individual command handlers. Command handlers return `KernelCommandResult<CheckResult>` and the kernel serializes it as JSON when `--json` is passed. No handler needs to read `input.flags.json`.
+- **Numeric flag parsing**: `input.flags` values are typed as `string | boolean | string[]`. To parse a numeric flag, use `Number(input.flags["flag-name"])` — do NOT cast with `as number` (TS will reject `boolean | string[]` → `number`). Command table flag `kind` supports only `"string" | "boolean" | "string[]"` (no `"number"`); declare numeric flags as `kind: "string"` and convert in the handler.
 
 ## Check commands
 

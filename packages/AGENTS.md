@@ -20,6 +20,7 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 - Framework adapters should stay thin and depend on the framework-free core, not the other way around.
 - Shared UI assets that are reused by multiple apps belong in `packages/ui`, not in app-local folders.
 - **Node-only modules (`node:fs/promises`, `node:path`, etc.) MUST NOT be re-exported from shared barrel files** (`index.ts`) that are imported by client-side code. Vite dev mode does not tree-shake barrel exports — the entire barrel is loaded, pulling Node-only modules into the client bundle and causing "Module node:fs/promises has been externalized for browser compatibility" errors. Use a dedicated subpath export (e.g. `@warpgogol/ontology/schemas/manifest-resolver`) for modules that import Node-only APIs. Node-side consumers import from the subpath; client-side consumers import pure schemas from the main barrel.
+- **`createRequire(import.meta.url)` under pnpm strict isolation**: when using `createRequire(import.meta.url)` to read a dependency's `package.json` (e.g., `playwright/package.json`, `crawlee/package.json`), that dependency MUST be declared as a direct dependency in the package's `package.json`. pnpm's strict dependency isolation prevents `createRequire` from resolving transitively-available packages, even if they are installed in `node_modules`. Add the dependency (version `*` is acceptable for metadata-only reads) before using `createRequire` to read its `package.json`.
 
 ## Generated file writes
 
