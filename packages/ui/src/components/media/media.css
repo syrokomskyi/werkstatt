@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0210: introduced media presentation styles.</item>
+  <item>Feature player posters now cover the frame without exposing Plyr's black background at fractional sizes.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -47,5 +48,12 @@
     inline-size: 100%;
     block-size: 100%;
     border-radius: var(--ds-radius-lg, 0.75rem);
+  }
+
+  /* Plyr defaults to `contain` over a black background. Fractional 16:9 frame sizes can then
+     expose a one-pixel seam before playback, so keep its generated poster aligned with the
+     Media primitive's cover behavior. `!important` is required because Plyr CSS is unlayered. */
+  .media--feature .plyr__poster {
+    background-size: cover !important;
   }
 }
