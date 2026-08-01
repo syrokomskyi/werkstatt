@@ -55,6 +55,7 @@ packages/ui/
 ### Open-source registry security rule
 
 - **Never display exact dependency versions on public open-source pages.** Showing exact version numbers exposes the deployment to targeted attacks against known vulnerabilities in specific package versions. Version data remains in the downloadable SBOM (`sbom.cdx.json`) for those who need it. The component table shows package name, license, scope, and source link only.
+- RFC-0634: The open-source registry section reads `build-identity.json` locally via `readFileSync(join(process.cwd(), "public", ".well-known", "build-identity.json"))` at build time, not via runtime `fetch(Astro.url.origin)`. This ensures each channel's prerendered HTML embeds its own deployment metadata. Use `process.cwd()` (not `import.meta.url`) for path resolution because the component lives in `packages/ui` but `public/` is in the workpiece root.
 
 ### Generated icons (new pattern — RFC-0016)
 
