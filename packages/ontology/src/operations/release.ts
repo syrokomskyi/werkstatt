@@ -72,7 +72,7 @@ export const behaviorSnapshotDiffSchema = z.object({
 });
 
 export const buildIdentitySchema = z.object({
-  releaseId: z.string().regex(RELEASE_ID_REGEX),
+  releaseId: z.string().regex(/^(workpiece-)?[a-z0-9]+(-[a-z0-9]+)*(-r\d{6}|-m\d{6})$/),
   systemId: z.string().regex(STERNSYSTEM_ID_REGEX),
   missionId: z.string().regex(MISSION_ID_REGEX),
   semver: z.string(),
