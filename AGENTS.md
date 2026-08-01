@@ -88,6 +88,11 @@ This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX envir
 - Keep `.agents/**` as reference or historical documentation, not as the primary active instruction layer.
 - Keep operational discipline rules (commit hygiene, template-first fixes, skill invocation tracking) in this `AGENTS.md` — not in `PREFERENCES.md`. `PREFERENCES.md` (RFC-0370) is for operator-facing preferences (language, form of address, register, session saving) only.
 
+## RFC frontmatter conventions
+
+- **`related` MUST NOT duplicate `amends` or `satisfies` entries.** The `related` field lists RFCs/DNA invariants that are relevant but not formally amended or satisfied. Entries already in `amends` or `satisfies` are implicitly related and must not be repeated.
+- **`commands.changed` MUST only list commands whose source code actually changed.** Commands whose behavior is formally documented or clarified without a code change (e.g. "already correct, no change needed") MUST NOT be listed in `commands.changed`. Use the RFC body to document the formal contract instead.
+
 ## Operator preferences (RFC-0370)
 
 Before starting an interactive skill, read `PREFERENCES.md` at the repository root. If it is missing, ask the operator for the relevant language preference and create it using the `my-preferences` skill.
