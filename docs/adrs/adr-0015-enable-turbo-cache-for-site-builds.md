@@ -1,12 +1,12 @@
 ---
 id: ADR-0015
 title: "Enable Turbo cache for site-specific builds with declared inputs"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-01
-updatedAt: 2026-08-01
-implementedAt:
+updatedAt: 2026-08-02
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:
