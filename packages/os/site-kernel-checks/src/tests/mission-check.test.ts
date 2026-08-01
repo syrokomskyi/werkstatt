@@ -152,7 +152,21 @@ vi.mock("@syrokomskyi/axiom-methodology", () => ({
   methodologyPackageDigest: vi.fn(() => mockDigestRef),
 }));
 
-async function createMockMission(workspaceRoot: string, missionId: string): Promise<string> {
+// RFC-0630: Mock playwright for pre-flight check
+vi.mock("playwright", () => ({
+  chromium: {
+    launch: vi.fn().mockResolvedValue({
+      version: vi.fn().mockReturnValue("131.0.6778.87"),
+      close: vi.fn().mockResolvedValue(undefined),
+    }),
+  },
+}));
+
+async function createMockMission(
+  workspaceRoot: string,
+  missionId: string,
+  options?: { withI18n?: boolean },
+): Promise<string> {
   const missionDir = join(workspaceRoot, "missions", missionId);
   await mkdir(join(missionDir, "evidence"), { recursive: true });
   await writeFile(
@@ -160,6 +174,15 @@ async function createMockMission(workspaceRoot: string, missionId: string): Prom
     `missionId: ${missionId}\nsystemId: test-system\nstate: open\noperationId: op-1\n`,
     "utf-8",
   );
+  if (options?.withI18n) {
+    const contentDir = join(missionDir, "workpiece", "src", "content");
+    await mkdir(contentDir, { recursive: true });
+    await writeFile(
+      join(contentDir, "system.md"),
+      `---\ni18n:\n  default: de\n  supported:\n    de:\n      name: Deutsch\n      hreflang: de-DE\n    uk:\n      name: Українська\n      hreflang: uk-UA\n---\n\n# System\n`,
+      "utf-8",
+    );
+  }
   return missionDir;
 }
 
@@ -411,5 +434,272 @@ describe("mission.check (RFC-0629)", () => {
     expect(result.exitCode).toBe(2);
     expect(result.data?.exitCode).toBe(2);
     expect(result.summary).toContain("no pages discovered");
+  });
+
+  // RFC-0630: Pre-flight check tests
+  it("returns exit code 2 when chromium pre-flight check fails", async () => {
+    const missionId = "test-m000009";
+    await createMockMission(workspaceRoot, missionId);
+
+    const { chromium } = await import("playwright");
+    vi.mocked(chromium.launch).mockResolvedValueOnce({
+      version: vi.fn(),
+      close: vi.fn().mockRejectedValue(new Error("chromium not found")),
+    } as never);
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.exitCode).toBe(2);
+    expect(result.summary).toContain("chromium not installed");
+  });
+
+  // RFC-0630: --locales flag validation
+  it("returns exit code 2 when --locales format is invalid", async () => {
+    const missionId = "test-m000010";
+    await createMockMission(workspaceRoot, missionId);
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+          locales: "invalid",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.exitCode).toBe(2);
+    expect(result.summary).toContain("Invalid --locales format");
+  });
+
+  it("accepts valid --locales flag with BCP 47 tags", async () => {
+    const missionId = "test-m000011";
+    await createMockMission(workspaceRoot, missionId);
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+          locales: "de-DE,uk-UA",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.exitCode).toBe(0);
+  });
+
+  // RFC-0630: Page-language matching
+  it("resolves locale from URL path segment using workpiece i18n config", async () => {
+    const missionId = "test-m000012";
+    await createMockMission(workspaceRoot, missionId, { withI18n: true });
+
+    const { CrawleeDiscoveryExecutor } = await import("@syrokomskyi/axiom-capture");
+    const { PlaywrightEvidenceDriver } = await import("@syrokomskyi/axiom-capture");
+
+    vi.mocked(CrawleeDiscoveryExecutor).mockImplementationOnce(function () {
+      return {
+        discover: vi.fn().mockResolvedValue({
+          records: [
+            { normalizedUrl: "http://example.com/de/leistungen", depth: 0, discoveredFrom: null },
+            { normalizedUrl: "http://example.com/uk/kontakty", depth: 0, discoveredFrom: null },
+          ],
+          omissions: [],
+          reachedFixpoint: true,
+        }),
+      };
+    });
+
+    const captureMock = vi.fn().mockResolvedValue({
+      receipt: {
+        schema: "browser-receipt@1",
+        taskKey: "mock-task-key",
+        state: "complete",
+        finalUrl: "http://example.com/",
+        statusCode: 200,
+        htmlDigest: mockDigestRef,
+        screenshotDigest: mockDigestRef,
+        domSnapshotDigest: mockDigestRef,
+        accessibilityTreeDigest: mockDigestRef,
+        axeDigest: mockDigestRef,
+        diagnostics: [],
+      },
+      evidence: [
+        {
+          role: "axe-raw-result",
+          mediaType: "application/json",
+          bytes: new TextEncoder().encode(
+            JSON.stringify({ violations: [], incomplete: [], passes: [] }),
+          ),
+          digest: mockDigestRef,
+        },
+      ],
+    });
+
+    vi.mocked(PlaywrightEvidenceDriver).mockImplementationOnce(function () {
+      return {
+        capture: captureMock,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+    });
+
+    await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(captureMock).toHaveBeenCalledTimes(2);
+    const firstCall = captureMock.mock.calls[0]!;
+    expect(firstCall[0].request.locale).toBe("de-DE");
+    const secondCall = captureMock.mock.calls[1]!;
+    expect(secondCall[0].request.locale).toBe("uk-UA");
+  });
+
+  it("falls back to default locale when URL has no recognizable path segment", async () => {
+    const missionId = "test-m000013";
+    await createMockMission(workspaceRoot, missionId, { withI18n: true });
+
+    const { CrawleeDiscoveryExecutor } = await import("@syrokomskyi/axiom-capture");
+    const { PlaywrightEvidenceDriver } = await import("@syrokomskyi/axiom-capture");
+
+    vi.mocked(CrawleeDiscoveryExecutor).mockImplementationOnce(function () {
+      return {
+        discover: vi.fn().mockResolvedValue({
+          records: [
+            { normalizedUrl: "http://example.com/impressum", depth: 0, discoveredFrom: null },
+          ],
+          omissions: [],
+          reachedFixpoint: true,
+        }),
+      };
+    });
+
+    const captureMock = vi.fn().mockResolvedValue({
+      receipt: {
+        schema: "browser-receipt@1",
+        taskKey: "mock-task-key",
+        state: "complete",
+        finalUrl: "http://example.com/",
+        statusCode: 200,
+        htmlDigest: mockDigestRef,
+        screenshotDigest: mockDigestRef,
+        domSnapshotDigest: mockDigestRef,
+        accessibilityTreeDigest: mockDigestRef,
+        axeDigest: mockDigestRef,
+        diagnostics: [],
+      },
+      evidence: [
+        {
+          role: "axe-raw-result",
+          mediaType: "application/json",
+          bytes: new TextEncoder().encode(
+            JSON.stringify({ violations: [], incomplete: [], passes: [] }),
+          ),
+          digest: mockDigestRef,
+        },
+      ],
+    });
+
+    vi.mocked(PlaywrightEvidenceDriver).mockImplementationOnce(function () {
+      return {
+        capture: captureMock,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+    });
+
+    await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(captureMock).toHaveBeenCalledTimes(1);
+    const call = captureMock.mock.calls[0]!;
+    expect(call[0].request.locale).toBe("de-DE");
+  });
+
+  it("falls back to en-US when workpiece has no i18n config", async () => {
+    const missionId = "test-m000014";
+    await createMockMission(workspaceRoot, missionId);
+
+    const { PlaywrightEvidenceDriver } = await import("@syrokomskyi/axiom-capture");
+
+    const captureMock = vi.fn().mockResolvedValue({
+      receipt: {
+        schema: "browser-receipt@1",
+        taskKey: "mock-task-key",
+        state: "complete",
+        finalUrl: "http://example.com/",
+        statusCode: 200,
+        htmlDigest: mockDigestRef,
+        screenshotDigest: mockDigestRef,
+        domSnapshotDigest: mockDigestRef,
+        accessibilityTreeDigest: mockDigestRef,
+        axeDigest: mockDigestRef,
+        diagnostics: [],
+      },
+      evidence: [
+        {
+          role: "axe-raw-result",
+          mediaType: "application/json",
+          bytes: new TextEncoder().encode(
+            JSON.stringify({ violations: [], incomplete: [], passes: [] }),
+          ),
+          digest: mockDigestRef,
+        },
+      ],
+    });
+
+    vi.mocked(PlaywrightEvidenceDriver).mockImplementationOnce(function () {
+      return {
+        capture: captureMock,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+    });
+
+    await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(captureMock).toHaveBeenCalledTimes(1);
+    const call = captureMock.mock.calls[0]!;
+    expect(call[0].request.locale).toBe("en-US");
   });
 });

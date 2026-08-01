@@ -90,6 +90,7 @@
     "@syrokomskyi/axiom-contracts": "link:../../../../pipelines/packages/axiom/axiom-contracts",
     "@syrokomskyi/axiom-provenance": "link:../../../../pipelines/packages/axiom/axiom-provenance",
     "ai": "^7.0.32",
+    "crawlee": "3.17.0",
     "file-type": "^22.0.1",
     "picomatch": "^4.0.5",
     "playwright": "^1.62.1",

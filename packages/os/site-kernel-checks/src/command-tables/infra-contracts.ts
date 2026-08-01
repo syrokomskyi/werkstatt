@@ -317,13 +317,13 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
   {
     name: "mission.check",
     description:
-      "RFC-0629: one-shot native Axiom accessibility check for a mission. " +
+      "RFC-0629/RFC-0630: one-shot native Axiom accessibility check for a mission. " +
       "Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, " +
       "createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument, " +
       "findingsForObservation, and evaluateClosure from native axiom packages. " +
       "Writes native capsule files: staged-capsule.json, observation-bundle.json, " +
       "study-run.json, evidence-metadata.json. External-preview only. " +
-      "Exit codes: 0=pass, 1=violations or closure blocked, 2=no pages discovered.",
+      "Exit codes: 0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium not installed.",
     scope: "workspace",
     supportsAllSites: false,
     mutatesState: true,
@@ -341,6 +341,23 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
       "commit-sha": {
         kind: "string",
         description: "Optional commit SHA embedded in evidence-metadata.json.",
+      },
+      "max-duration": {
+        kind: "string",
+        description: "Override discovery deadline in ms (default 120000).",
+      },
+      "max-urls": {
+        kind: "string",
+        description: "Override max URLs to discover (default 100).",
+      },
+      "max-depth": {
+        kind: "string",
+        description: "Override max crawl depth (default 3).",
+      },
+      locales: {
+        kind: "string",
+        description:
+          "Comma-separated BCP 47 locales (e.g., 'de-DE,uk-UA'). Overrides i18n auto-detection from workpiece.",
       },
       json: { kind: "boolean", description: "Output JSON result." },
     },

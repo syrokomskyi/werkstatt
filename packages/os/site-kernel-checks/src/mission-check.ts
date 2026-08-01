@@ -9,12 +9,14 @@
 <CHANGE_SUMMARY>
   <item>RFC-0012: initial implementation of mission.check command.</item>
   <item>RFC-0629: migrated to native axiom capsules with PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, and automated-web-accessibility methodology.</item>
+  <item>RFC-0630: hardened capture contract — runtime toolProfile via createRequire, page-language matching from workpiece i18n, pre-flight chromium check, configurable contract via CLI flags.</item>
 </CHANGE_SUMMARY>
 */
 
 import { mkdir, rm } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { createRequire } from "node:module";
 
 import {
   writeFileIfChanged,
@@ -63,6 +65,110 @@ import {
   methodologyPackageDigest,
   type MethodologyPackage,
 } from "@syrokomskyi/axiom-methodology";
+
+import { parse as parseYaml } from "yaml";
+
+const esmRequire = createRequire(import.meta.url);
+
+interface RuntimeToolProfile {
+  crawleeVersion: string;
+  playwrightVersion: string;
+  chromiumRevision: string;
+}
+
+interface MissionCheckOverrides {
+  maxDuration?: number;
+  maxUrls?: number;
+  maxDepth?: number;
+  locales?: string[];
+}
+
+interface PreflightResult {
+  ok: boolean;
+  error?: string;
+  chromiumRevision?: string;
+}
+
+function resolveToolProfile(chromiumRevision: string): RuntimeToolProfile {
+  let playwrightVersion = "unknown";
+  let crawleeVersion = "unknown";
+  try {
+    playwrightVersion = esmRequire("playwright/package.json").version ?? "unknown";
+  } catch {
+    // Fallback — provenance improvement, not correctness requirement
+  }
+  try {
+    crawleeVersion = esmRequire("crawlee/package.json").version ?? "unknown";
+  } catch {
+    // Fallback — provenance improvement, not correctness requirement
+  }
+  return { crawleeVersion, playwrightVersion, chromiumRevision };
+}
+
+async function runPreflightCheck(): Promise<PreflightResult> {
+  try {
+    const { chromium } = await import("playwright");
+    const browser = await chromium.launch({ headless: true });
+    const revision = browser.version();
+    await browser.close();
+    return { ok: true, chromiumRevision: revision };
+  } catch {
+    return {
+      ok: false,
+      error:
+        "mission.check: Playwright chromium not installed. Run 'npx playwright install chromium' and retry.",
+    };
+  }
+}
+
+interface LocaleMapping {
+  segmentToLocale: Map<string, string>;
+  defaultLocale: string;
+}
+
+function resolveLocaleMapping(missionDir: string): LocaleMapping {
+  const systemMdPath = join(missionDir, "workpiece", "src", "content", "system.md");
+  try {
+    const content = readFileSync(systemMdPath, "utf-8");
+    const match = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!match) return fallbackLocaleMapping();
+    const yamlContent = match[1];
+    const frontmatter = parseYaml(yamlContent) as Record<string, unknown>;
+    const i18n = frontmatter?.i18n as
+      { default?: string; supported?: Record<string, { hreflang?: string }> } | undefined;
+    if (!i18n?.supported || !i18n.default) return fallbackLocaleMapping();
+    const segmentToLocale = new Map<string, string>();
+    for (const [segment, config] of Object.entries(i18n.supported)) {
+      if (config?.hreflang) {
+        segmentToLocale.set(segment, config.hreflang);
+      }
+    }
+    const defaultConfig = i18n.supported[i18n.default];
+    const defaultLocale = defaultConfig?.hreflang ?? "en-US";
+    return { segmentToLocale, defaultLocale };
+  } catch {
+    return fallbackLocaleMapping();
+  }
+}
+
+function fallbackLocaleMapping(): LocaleMapping {
+  return { segmentToLocale: new Map(), defaultLocale: "en-US" };
+}
+
+function resolveLocaleForUrl(url: string, mapping: LocaleMapping): string {
+  try {
+    const parsed = new URL(url);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length > 0) {
+      const firstSegment = segments[0]!;
+      const locale = mapping.segmentToLocale.get(firstSegment);
+      if (locale) return locale;
+    }
+  } catch {
+    // Invalid URL — fall through to default
+  }
+  return mapping.defaultLocale;
+}
 
 export interface MissionCheckResult {
   command: "mission.check";
@@ -123,7 +229,13 @@ function safeNameFromUrl(rawUrl: string): string {
   }
 }
 
-function buildCaptureContract(baseUrl: string, recordedAt: string): CaptureContract {
+function buildCaptureContract(
+  baseUrl: string,
+  recordedAt: string,
+  toolProfile: RuntimeToolProfile,
+  overrides?: MissionCheckOverrides,
+  locales?: string[],
+): CaptureContract {
   const origin = new URL(baseUrl).origin;
   return captureContractSchema.parse({
     schema: "capture-contract@1",
@@ -136,9 +248,9 @@ function buildCaptureContract(baseUrl: string, recordedAt: string): CaptureContr
       allowedOrigins: [origin],
       includePatterns: ["/**"],
       excludePatterns: [],
-      maxDepth: 3,
+      maxDepth: overrides?.maxDepth ?? 3,
     },
-    locales: ["en-US"],
+    locales: locales ?? ["en-US"],
     profiles: [
       {
         profileId: "desktop",
@@ -162,9 +274,9 @@ function buildCaptureContract(baseUrl: string, recordedAt: string): CaptureContr
       blockedHosts: [],
     },
     limits: {
-      maxUrls: 100,
+      maxUrls: overrides?.maxUrls ?? 100,
       maxBytes: 100_000_000,
-      maxDurationMs: 30_000,
+      maxDurationMs: overrides?.maxDuration ?? 120_000,
       maxRetries: 1,
     },
     behaviors: {
@@ -177,9 +289,9 @@ function buildCaptureContract(baseUrl: string, recordedAt: string): CaptureContr
     settleRules: { networkIdleMs: 1000, maxSettleMs: 15000 },
     volatilityPasses: 1,
     toolProfile: {
-      crawleeVersion: "local-dev",
-      playwrightVersion: "unknown",
-      chromiumRevision: "unknown",
+      crawleeVersion: toolProfile.crawleeVersion,
+      playwrightVersion: toolProfile.playwrightVersion,
+      chromiumRevision: toolProfile.chromiumRevision,
     },
     closureThresholds: {
       requiredCapabilities: [
@@ -372,11 +484,69 @@ export async function runMissionCheck(
   const commitSha = input.flags["commit-sha"] as string | undefined;
   const baseUrl = baseUrlFlag.replace(/\/$/, "");
 
+  // RFC-0630: Parse optional override flags
+  const overrides: MissionCheckOverrides = {};
+  const maxDurationRaw = input.flags["max-duration"];
+  if (maxDurationRaw !== undefined) {
+    const n = Number(maxDurationRaw);
+    if (!Number.isNaN(n)) overrides.maxDuration = n;
+  }
+  const maxUrlsRaw = input.flags["max-urls"];
+  if (maxUrlsRaw !== undefined) {
+    const n = Number(maxUrlsRaw);
+    if (!Number.isNaN(n)) overrides.maxUrls = n;
+  }
+  const maxDepthRaw = input.flags["max-depth"];
+  if (maxDepthRaw !== undefined) {
+    const n = Number(maxDepthRaw);
+    if (!Number.isNaN(n)) overrides.maxDepth = n;
+  }
+
+  let explicitLocales: string[] | undefined;
+  const localesRaw = input.flags["locales"];
+  const localesFlag = typeof localesRaw === "string" ? localesRaw : undefined;
+  if (localesFlag) {
+    const parsed = localesFlag
+      .split(",")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const bcp47Pattern = /^[a-z]{2}-[A-Z]{2}$/;
+    const invalid = parsed.find((l) => !bcp47Pattern.test(l));
+    if (invalid) {
+      return failResult(
+        "",
+        2,
+        `mission.check: Invalid --locales format '${invalid}'. Expected comma-separated BCP 47 tags, e.g., 'de-DE,uk-UA'.`,
+      );
+    }
+    explicitLocales = parsed;
+  }
+
   const missionDir = resolveMissionDir(workspaceRoot, missionId);
   const evidenceDir = join(missionDir, "evidence", "axiom");
   const rawDir = join(evidenceDir, "raw");
 
   logger.info(`  External preview mode: ${baseUrl}`);
+
+  // RFC-0630: Pre-flight check — verify chromium is installed before discovery
+  logger.info(`  Pre-flight: checking chromium installation...`);
+  const preflight = await runPreflightCheck();
+  if (!preflight.ok) {
+    return failResult(evidenceDir, 2, preflight.error!);
+  }
+  logger.info(`  Pre-flight: chromium ${preflight.chromiumRevision} OK`);
+
+  // RFC-0630: Resolve i18n locale mapping from mission workpiece system.md
+  const localeMapping = resolveLocaleMapping(missionDir);
+  if (localeMapping.segmentToLocale.size === 0 && !explicitLocales) {
+    logger.warn(`  No i18n config found in workpiece, falling back to en-US locale`);
+  }
+
+  // RFC-0630: Build contract locales — explicit override or all from i18n mapping
+  const contractLocales = explicitLocales ?? Array.from(localeMapping.segmentToLocale.values());
+  if (contractLocales.length === 0) {
+    contractLocales.push(localeMapping.defaultLocale);
+  }
 
   // Clean stale evidence from previous runs
   if (existsSync(evidenceDir)) {
@@ -391,8 +561,16 @@ export async function runMissionCheck(
 
   await mkdir(rawDir, { recursive: true });
 
+  // RFC-0630: Resolve runtime toolProfile with real versions
   const recordedAt = new Date().toISOString();
-  const contract = buildCaptureContract(baseUrl, recordedAt);
+  const toolProfile = resolveToolProfile(preflight.chromiumRevision ?? "unknown");
+  const contract = buildCaptureContract(
+    baseUrl,
+    recordedAt,
+    toolProfile,
+    overrides,
+    contractLocales,
+  );
 
   // Discover pages via CrawleeDiscoveryExecutor
   const discoveryExecutor = new CrawleeDiscoveryExecutor();
@@ -415,13 +593,17 @@ export async function runMissionCheck(
 
     for (const pageUrl of discoveredUrls) {
       logger.info(`  Checking: ${pageUrl}`);
+      // RFC-0630: Page-language matching — resolve browser locale from URL path segment
+      const pageLocale = explicitLocales
+        ? explicitLocales[0]!
+        : resolveLocaleForUrl(pageUrl, localeMapping);
       try {
         const captured = await driver.capture({
           contract,
           request: {
             url: pageUrl,
             profileId: contract.profiles[0]!.profileId,
-            locale: contract.locales[0]!,
+            locale: pageLocale,
           },
           viewportProfileId: contract.profiles[0]!.profileId,
         });
@@ -448,7 +630,7 @@ export async function runMissionCheck(
         if (axeResult) {
           axeStates.push({
             url: pageUrl,
-            locale: contract.locales[0]!,
+            locale: pageLocale,
             profileId: contract.profiles[0]!.profileId,
             logicalPath: `raw/${safeName}-axe-raw-result.json`,
             result: axeResult,
