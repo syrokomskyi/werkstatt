@@ -709,6 +709,8 @@ export interface LeitstandPropagateData {
   purgeResult?: PurgeResult;
   health: { state: "healthy" | "unhealthy" | "unknown"; checks: HealthCheck[] };
   releaseState: "alt-deployed";
+  devBuildIdentityVerified: boolean;
+  axiomEvidenceVerified: boolean;
 }
 
 export async function runLeitstandPropagate(
@@ -828,6 +830,88 @@ export async function runLeitstandPropagate(
   if (highOrCriticalViolations.length > 0) {
     throw new Error(
       `[leitstand.propagate] Axiom verification failed: ${highOrCriticalViolations.length} high/critical violation(s). Fix and re-deploy to dev.`,
+    );
+  }
+
+  // RFC-0634: Verify dev build-identity.json before deploying to alt
+  // Fetch build-identity.json from the dev channel URL and verify against release manifest
+  const registryForDev = await readRegistry(workspaceRoot);
+  const entryForDev = findEntry(registryForDev, systemId);
+  if (!entryForDev) {
+    throw new Error(`[leitstand.propagate] system '${systemId}' not found in registry`);
+  }
+  const depForDev = entryForDev.deployment as DeploymentConfig;
+  if (!depForDev) {
+    throw new Error(`[leitstand.propagate] system '${systemId}' has no deployment config`);
+  }
+  const devChannelConfig = getChannelConfig(depForDev, "dev");
+  const devBuildIdentityUrl = `${devChannelConfig.url}/.well-known/build-identity.json?cb=${Date.now()}`;
+  logger.info(`  Fetching dev build-identity from ${devBuildIdentityUrl}...`);
+  let devBuildIdentityVerified = false;
+  try {
+    const devResponse = await fetch(devBuildIdentityUrl);
+    if (!devResponse.ok) {
+      throw new Error(
+        `[leitstand.propagate] build-identity.json not served by dev deployment (${devResponse.status}). Run leitstand.dev-deploy first.`,
+      );
+    }
+    const rawDevBuildIdentity = await devResponse.json();
+    const devParseResult = buildIdentitySchema.safeParse(rawDevBuildIdentity);
+    if (!devParseResult.success) {
+      throw new Error(
+        `[leitstand.propagate] dev build-identity.json schema validation failed: ${devParseResult.error.message}`,
+      );
+    }
+    const devBuildIdentity = devParseResult.data;
+
+    // Verify missionId matches
+    if (devBuildIdentity.missionId !== missionId) {
+      throw new Error(
+        `[leitstand.propagate] build-identity.json missionId mismatch: expected '${missionId}', got '${devBuildIdentity.missionId}'.`,
+      );
+    }
+
+    // Verify commitSha matches release manifest
+    if (
+      devBuildIdentity.commitSha !== releaseCommitSha &&
+      devBuildIdentity.commitSha !== "0000000" &&
+      releaseCommitSha !== "0000000"
+    ) {
+      throw new Error(
+        `[leitstand.propagate] dev build-identity commitSha '${devBuildIdentity.commitSha}' does not match release commitSha '${releaseCommitSha}' — re-run leitstand.dev-deploy after workpiece changes.`,
+      );
+    }
+
+    // Verify distTreeHash matches
+    const releaseDistTreeHash = releaseManifest.distTreeHash as string;
+    if (
+      releaseDistTreeHash &&
+      devBuildIdentity.distTreeHash &&
+      devBuildIdentity.distTreeHash !== releaseDistTreeHash
+    ) {
+      throw new Error(
+        `[leitstand.propagate] dev build-identity distTreeHash mismatch: manifest='${releaseDistTreeHash}', identity='${devBuildIdentity.distTreeHash}'.`,
+      );
+    }
+
+    // Verify siteContentHash matches
+    const releaseSiteContentHash = releaseManifest.siteContentHash as string;
+    if (
+      releaseSiteContentHash &&
+      devBuildIdentity.siteContentHash &&
+      devBuildIdentity.siteContentHash !== releaseSiteContentHash
+    ) {
+      throw new Error(
+        `[leitstand.propagate] dev build-identity siteContentHash mismatch: manifest='${releaseSiteContentHash}', identity='${devBuildIdentity.siteContentHash}'.`,
+      );
+    }
+
+    // behaviorSnapshotHash is NOT verified for dev→alt (empty for workpiece)
+    devBuildIdentityVerified = true;
+    logger.info(`  Dev build-identity verified for ${releaseId}`);
+  } catch (verifyErr) {
+    throw new Error(
+      `[leitstand.propagate] dev build-identity verification failed: ${verifyErr instanceof Error ? verifyErr.message : String(verifyErr)}`,
     );
   }
 
@@ -1001,6 +1085,8 @@ export async function runLeitstandPropagate(
         purgeResult,
         health: { state: healthResult.state, checks: healthResult.checks },
         releaseState: "alt-deployed",
+        devBuildIdentityVerified,
+        axiomEvidenceVerified: true,
       },
       summary: `[leitstand.propagate] ${releaseId} deployed to ${channel} (${result.state}, health: ${healthResult.state})`,
     };
