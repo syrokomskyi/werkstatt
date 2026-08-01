@@ -14,6 +14,7 @@
 import type { CheckCommandEntry } from "./types.ts";
 import { runIndependentQa } from "../independent-qa.ts";
 import { runMissionCheck } from "../mission-check.ts";
+import { runAxiomReport } from "../axiom-report.ts";
 import { runGitattributesGenerate, runGitattributesValidate } from "../gitattributes.ts";
 import { runGeneratedEditGuard } from "../generated-edit-guard.ts";
 import {
@@ -364,5 +365,29 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     writes: ["missions/{mission}/evidence/axiom/**"],
     reads: ["missions/{mission}/workpiece/**", "missions/{mission}/mission.yaml"],
     execute: runMissionCheck,
+  },
+  {
+    name: "axiom.report",
+    description:
+      "RFC-0633: reads Axiom evidence JSON files (study-run.json, staged-capsule.json, " +
+      "observation-bundle.json, evidence-metadata.json) from missions/{mission}/evidence/axiom/ " +
+      "and writes a self-contained HTML triage report. Pure renderAxiomReportHtml with HTML escaping. " +
+      "Supports --dry-run (RFC-0601). Exit 0 on success regardless of finding severity (renderer, not gate). " +
+      "Failure modes: AXIOM-REPORT-01..05.",
+    scope: "workspace",
+    supportsAllSites: false,
+    mutatesState: true,
+    cacheable: false,
+    flags: {
+      mission: { kind: "string", required: true, description: "Mission id." },
+      "dry-run": {
+        kind: "boolean",
+        description: "RFC-0601 dryRun mode: return HTML in data.renderedFiles, skip file write.",
+      },
+      json: { kind: "boolean", description: "Output JSON result." },
+    },
+    writes: ["missions/{mission}/evidence/axiom/report.html"],
+    reads: ["missions/{mission}/evidence/axiom/**"],
+    execute: runAxiomReport,
   },
 ];
