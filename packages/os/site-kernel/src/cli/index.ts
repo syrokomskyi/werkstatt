@@ -192,7 +192,7 @@ async function main() {
   }
 
   if (subcommand === "run") {
-    const { siteName, allSites, dryRun, outputFormat, remaining } = consumeCommonFlags(rest);
+    const { siteName, allSites, dryRun, force, outputFormat, remaining } = consumeCommonFlags(rest);
     const [commandName, ...argv] = remaining;
     if (!commandName) {
       printUsage();
@@ -212,6 +212,7 @@ async function main() {
       siteExplicit: siteName !== undefined,
       allSites,
       dryRun,
+      force,
       outputFormat,
       argv,
     });

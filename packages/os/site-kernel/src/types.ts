@@ -218,6 +218,8 @@ export interface KernelRuntimeContext {
   siteExplicit: boolean;
   logger: KernelLogger;
   dryRun: boolean;
+  /** RFC-0635: when true, injected into input.flags.force by executeRegisteredCommand. */
+  force?: boolean;
   outputFormat: KernelOutputFormat;
   /**
    * RFC-0267: the WorkspaceIO port. The executor selects the adapter:
@@ -375,6 +377,8 @@ export interface ExecuteKernelCommandOptions {
   allSites?: boolean;
   argv?: string[];
   dryRun?: boolean;
+  /** RFC-0635: when true, bypasses distribution reuse check in mission.validate. Injected into input.flags.force by the executor. */
+  force?: boolean;
   outputFormat?: KernelOutputFormat;
   /** Set to true when siteName was derived from an explicit --site flag, not cwd inference. */
   siteExplicit?: boolean;

@@ -14,6 +14,7 @@ resolves a workspace-scoped or app-scoped command from CLI options and runs it.
   <item>RFC-0303: split out of runtime.ts (Phase 3 file-size split, hot-path file 8/8).</item>
   <item>RFC-0326: extract intents from createDefaultIO() and surface as filesModified on the execution report for both real and dry runs.</item>
   <item>RFC-0579: propagate nextSteps from KernelCommandResult to KernelExecutionReport and render as "Next steps:" block in pretty mode.</item>
+  <item>RFC-0635: inject force from context into input.flags.force so command handlers can read --force without declaring it in their flag schema.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -175,6 +176,12 @@ export async function executeRegisteredCommand(
     input = { argv: parsed.argv, flags: parsed.flags };
   }
 
+  // RFC-0635: inject force from context into input.flags so command handlers
+  // can read input.flags.force without declaring it in their flag schema.
+  if (context.force) {
+    input.flags.force = true;
+  }
+
   // RFC-0267: select the WorkspaceIO adapter for this invocation. A command
   // declaring mutatesState: false always gets a throwing read-only adapter,
   // regardless of --dry-run, so the metadata is provably trustworthy. A
@@ -317,6 +324,7 @@ const EXECUTE_KERNEL_COMMAND_OPTION_KEYS = [
   "allSites",
   "argv",
   "dryRun",
+  "force",
   "outputFormat",
   "siteExplicit",
 ];
@@ -381,6 +389,7 @@ export async function executeKernelCommand(
           siteExplicit: false,
           logger,
           dryRun: options.dryRun ?? false,
+          force: options.force ?? false,
           outputFormat,
           io,
           fileIntents: intents,
@@ -428,6 +437,7 @@ export async function executeKernelCommand(
         siteExplicit: options.siteExplicit ?? false,
         logger,
         dryRun: options.dryRun ?? false,
+        force: options.force ?? false,
         outputFormat,
         io,
         fileIntents: intents,
@@ -485,6 +495,7 @@ export async function executeKernelCommand(
       siteExplicit: options.siteExplicit ?? false,
       logger,
       dryRun: options.dryRun ?? false,
+      force: options.force ?? false,
       outputFormat,
       io,
       fileIntents: intents,
