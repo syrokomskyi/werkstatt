@@ -286,18 +286,18 @@ Pre-flight failure output (exit code 2):
 
 ## Acceptance criteria
 
-- [ ] `mission-check.ts` `toolProfile` carries real `playwrightVersion` (from `playwright/package.json`), `chromiumRevision` (from `browser.version()`), and `crawleeVersion` (from `crawlee/package.json`) instead of `"unknown"`/`"local-dev"` (evidence: `staged-capsule.json` `runtimeAttestation.toolDigests`, vitest run `src/tests/mission-check.test.ts`)
-- [ ] `mission-check.ts` default `maxDurationMs` is 120000 (evidence: `buildCaptureContract` default, vitest run)
-- [ ] `mission-check.ts` accepts `--max-duration`, `--max-urls`, `--max-depth`, `--locales` flags that override capture contract defaults (evidence: `input.flags` parsing, vitest run)
-- [ ] `mission-check.ts` resolves browser locale per-page from URL path segment using i18n config from mission workpiece `system.md` (evidence: i18n resolution function, vitest run)
-- [ ] `mission-check.ts` accepts `--locales de-DE,uk-UA` as explicit override (evidence: flag parsing, vitest run)
-- [ ] `mission-check.ts` pre-flight check launches chromium and exits with code 2 + actionable message if browser is not installed (evidence: pre-flight function, vitest run)
-- [ ] `mission-check.ts` uses `createRequire(import.meta.url)` for ESM-compatible `require` of `playwright/package.json` and `crawlee/package.json` (evidence: source code, vitest run)
-- [ ] `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes
-- [ ] Existing tests updated for new flags, pre-flight mock, and page-language matching (evidence: vitest run)
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` documents new flags (evidence: grep `--max-duration\|--locales` in AGENTS.md)
-- [ ] `command.manifest.generate` and `docs.commands.generate` regenerated after flag changes (evidence: `docs/command-manifest.generated.yaml` contains new flags)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission-check.ts` `toolProfile` carries real `playwrightVersion` (from `playwright/package.json`), `chromiumRevision` (from `browser.version()`), and `crawleeVersion` (from `crawlee/package.json`) instead of `"unknown"`/`"local-dev"` (evidence: `mission-check.ts:90-103` `resolveToolProfile`, vitest run `src/tests/mission-check.test.ts`)
+- [x] `mission-check.ts` default `maxDurationMs` is 120000 (evidence: `mission-check.ts:279` `overrides?.maxDuration ?? 120_000`, vitest run)
+- [x] `mission-check.ts` accepts `--max-duration`, `--max-urls`, `--max-depth`, `--locales` flags that override capture contract defaults (evidence: `mission-check.ts:487-519` flag parsing, vitest run)
+- [x] `mission-check.ts` resolves browser locale per-page from URL path segment using i18n config from mission workpiece `system.md` (evidence: `mission-check.ts:129-171` `resolveLocaleMapping` + `resolveLocaleForUrl`, vitest run `resolves locale from URL path segment`)
+- [x] `mission-check.ts` accepts `--locales de-DE,uk-UA` as explicit override (evidence: `mission-check.ts:505-519` flag parsing, vitest run `accepts valid --locales flag`)
+- [x] `mission-check.ts` pre-flight check launches chromium and exits with code 2 + actionable message if browser is not installed (evidence: `mission-check.ts:106-119` `runPreflightCheck`, vitest run `returns exit code 2 when chromium pre-flight check fails`)
+- [x] `mission-check.ts` uses `createRequire(import.meta.url)` for ESM-compatible `require` of `playwright/package.json` and `crawlee/package.json` (evidence: `mission-check.ts:19,69,94,99`, vitest run)
+- [x] `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes
+- [x] Existing tests updated for new flags, pre-flight mock, and page-language matching (evidence: vitest run 15/15 tests pass)
+- [x] `packages/os/site-kernel-checks/AGENTS.md` documents new flags (evidence: `grep -E '--max-duration|--locales' packages/os/site-kernel-checks/AGENTS.md`)
+- [x] `command.manifest.generate` and `docs.commands.generate` regenerated after flag changes (evidence: `docs/command-manifest.generated.yaml` contains new flags under `mission.check`)
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
