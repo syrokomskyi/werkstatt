@@ -24,7 +24,7 @@ import {
   type KernelNextStep,
 } from "@warpgogol/site-kernel";
 
-import { resolveMissionDir } from "@warpgogol/site-kernel-handoff/mission";
+import { resolveMissionDir } from "@warpgogol/site-kernel";
 
 import type { StudyRun, Finding, ObservationBundle } from "@syrokomskyi/axiom-study";
 import type {

@@ -26,7 +26,7 @@ import {
   type KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 
-import { resolveMissionDir } from "@warpgogol/site-kernel-handoff/mission";
+import { resolveMissionDir } from "@warpgogol/site-kernel";
 
 import { mintAxiomId } from "@syrokomskyi/axiom-contracts";
 import { createCanonicalJsonDigestRef } from "@syrokomskyi/axiom-provenance";

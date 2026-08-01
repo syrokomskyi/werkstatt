@@ -23,9 +23,11 @@ import {
   type HandoffManifest,
 } from "@warpgogol/ontology/operations";
 import { byteHash } from "@warpgogol/fingerprint";
-import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { resolvePlatformSemanticHash } from "@warpgogol/site-kernel";
 import type { RegistryView } from "./types.ts";
 import type { ValidationPack } from "./validation-pack.ts";
+
+export { resolvePlatformSemanticHash };
 
 const execFileAsync = promisify(execFile);
 
@@ -99,44 +101,6 @@ export async function resolvePackagesHash(workspaceRoot: string): Promise<string
   } catch {
     return `sha256:${"0".repeat(64)}`;
   }
-}
-
-/**
- * RFC-0364: Semantic fingerprint of the recipient's platform tree.
- *
- * Uses @warpgogol/fingerprint to produce a parser-backed semantic hash that is
- * invariant under formatting-only and comment-only changes. This is the
- * platform drift signal for new Sternsystem/release surfaces.
- *
- * RFC-0533: extended to cover packages/, integrations/, and services/ —
- * the full platform scope. Non-existent directories are skipped gracefully.
- */
-export async function resolvePlatformSemanticHash(workspaceRoot: string): Promise<string> {
-  const ignore = ["node_modules", ".turbo", "dist", ".astro"];
-  const scopeDirs = ["packages", "integrations", "services"];
-  const allResults: { rel: string; hash: string }[] = [];
-
-  for (const dir of scopeDirs) {
-    const absDir = path.join(workspaceRoot, dir);
-    try {
-      await fs.access(absDir);
-    } catch {
-      continue;
-    }
-    const result = await fingerprintTree(absDir, {
-      mode: "semantic",
-      root: workspaceRoot,
-      ignore,
-    });
-    for (const file of result.files ?? []) {
-      const rel = path.relative(workspaceRoot, file.path);
-      allResults.push({ rel, hash: file.hash });
-    }
-  }
-
-  allResults.sort((a, b) => a.rel.localeCompare(b.rel));
-  const combinedInput = allResults.map((r) => `${r.rel}\n${r.hash}`).join("\n");
-  return byteHash(combinedInput);
 }
 
 interface UniRegistryEntry {

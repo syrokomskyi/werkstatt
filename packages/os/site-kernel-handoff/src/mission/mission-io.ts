@@ -16,20 +16,11 @@ import path from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { missionManifestSchema, type MissionManifest } from "@warpgogol/ontology/operations";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
+import { resolveMissionDir } from "@warpgogol/site-kernel";
+
+export { resolveMissionDir };
 
 const MISSIONS_DIR = "missions";
-
-export function resolveMissionDir(workspaceRoot: string, missionId: string): string {
-  const primary = path.join(workspaceRoot, MISSIONS_DIR, missionId);
-  if (existsSync(primary)) return primary;
-
-  for (const state of ["closed", "aborted"]) {
-    const archived = path.join(workspaceRoot, MISSIONS_DIR, "archive", state, missionId);
-    if (existsSync(archived)) return archived;
-  }
-
-  return primary;
-}
 
 export function resolveMissionManifestPath(workspaceRoot: string, missionId: string): string {
   return path.join(resolveMissionDir(workspaceRoot, missionId), "mission.yaml");

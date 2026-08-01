@@ -173,6 +173,25 @@ export type {
   GitMeshVerifyResult,
 } from "./gitmesh/types.ts";
 
+// ADR-0015: Shared utilities extracted from site-kernel-handoff to break cyclic dependency
+export {
+  parseSemver,
+  compareSemver,
+  ltSemver,
+  gtSemver,
+  eqSemver,
+  inOpenClosedRange,
+} from "./semver.ts";
+export {
+  PLATFORM_SCOPE_PREFIXES,
+  isPlatformScope,
+  hasPlatformScopeFiles,
+  extractTrailer,
+  hasTrailer,
+} from "./platform-scope.ts";
+export { resolveMissionDir } from "./mission-resolver.ts";
+export { resolvePlatformSemanticHash } from "./platform-hash.ts";
+
 // RFC-0564: SWIM membership and CRDT genome
 export { swimModule } from "./swim/swim-module.ts";
 export type {

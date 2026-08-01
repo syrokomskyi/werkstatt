@@ -11,12 +11,6 @@ import type { KernelCommandInput } from "@warpgogol/site-kernel";
 import type { StudyRun, Finding, ObservationBundle } from "@syrokomskyi/axiom-study";
 import type { StagedCapsule } from "@syrokomskyi/axiom-capture";
 
-vi.mock("@warpgogol/site-kernel-handoff/mission", () => ({
-  resolveMissionDir: vi.fn((workspaceRoot: string, missionId: string) =>
-    join(workspaceRoot, "missions", missionId),
-  ),
-}));
-
 const mockDigestRef = {
   digest: "sha256:mock-digest",
   algorithm: "sha256" as const,

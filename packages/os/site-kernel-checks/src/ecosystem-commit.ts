@@ -29,7 +29,7 @@ import {
   parseSemver,
   isPlatformScope,
   extractTrailer,
-} from "@warpgogol/site-kernel-handoff";
+} from "@warpgogol/site-kernel";
 
 const execFileAsync = promisify(execFile);
 

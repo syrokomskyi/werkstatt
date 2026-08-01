@@ -79,7 +79,6 @@
     "@warpgogol/site-kernel-check-warpgogol": "workspace:*",
     "@warpgogol/site-kernel-codegen": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",
-    "@warpgogol/site-kernel-handoff": "workspace:*",
     "@warpgogol/site-kernel-integrity": "workspace:*",
     "@warpgogol/star-map": "workspace:*",
     "@warpgogol/surface": "workspace:*",
