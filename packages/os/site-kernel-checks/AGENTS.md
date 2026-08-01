@@ -161,6 +161,10 @@ Missing (2) or (3) leaves the pipeline invisible to `pipeline.timing.report` and
 
 Generators that produce files read **synchronously** by client-side code via `import.meta.glob` (e.g. `video-manifest.generated.yaml`, `image-variants.generated.yaml`) MUST be included in `SITES_BUILD_PREPARE_DEV_PIPELINE`, not only in the full build pipeline. Without the generated manifest, components that call `loadGeneratedManifest()` receive `null` and render nothing in dev mode — the failure is silent (no error, just missing content). Generators that produce files only consumed at build time (sitemap, preview images, llms, feed) may remain excluded from the dev pipeline.
 
+## Axiom gate severity rule
+
+The Axiom gate in `mission.check` and `leitstand.propagate` MUST only fail on actual axe **violations** (predicate `accessibility.axe.violation` in `finding.extension["automated-web-accessibility"].predicate`). Axe **incomplete** results (predicate `accessibility.axe.incomplete`) are tool limitations — axe could not determine a result (e.g. background color obscured by pseudo-elements, gradients, or images) — and MUST NOT block the deployment gate. Incomplete findings are still recorded in evidence and reported, but they do not count toward the high/critical error total.
+
 ## Architecture reference
 
 → `packages/os/site-kernel/AGENTS.md` — kernel architecture table  
