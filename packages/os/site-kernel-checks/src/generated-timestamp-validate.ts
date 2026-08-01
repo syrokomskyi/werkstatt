@@ -84,6 +84,12 @@ const TIMESTAMP_ALLOWLIST: TimestampAllowlistEntry[] = [
       "Freshness evaluation `today` — runtime validator comparing claim validity windows against current date, not a generated file field.",
     pattern: "new Date().toISOString()",
   },
+  {
+    module: "packages/os/site-kernel-handoff/src/release/release-commands.ts",
+    reason:
+      "Release lifecycle operational timestamps (build-identity, release.publish, release.rollback) — one-time operational records written by manual commands, not regenerable generated file fields.",
+    pattern: "new Date().toISOString()",
+  },
 ];
 
 // ---------------------------------------------------------------------------
