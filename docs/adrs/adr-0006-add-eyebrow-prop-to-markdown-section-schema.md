@@ -5,13 +5,13 @@ title: "Add eyebrow prop to markdown section schema"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-07-28
-updatedAt: 2026-07-28
-implementedAt:
-closedAt:
+updatedAt: 2026-08-02
+implementedAt: 2026-08-02
+closedAt: 2026-08-02
 supersedes: []
 supersededBy:
 related:

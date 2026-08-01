@@ -5,18 +5,19 @@ title: "Add form-of-address preference to onboarding (ty/vy)"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: implemented
 scope: workspace
 decider: architecture
 createdAt: 2026-07-27
-updatedAt: 2026-07-27
-implementedAt:
-closedAt:
+updatedAt: 2026-08-02
+implementedAt: 2026-08-02
+closedAt: 2026-08-02
 supersedes: []
 supersededBy:
 related:
   - RFC-0547
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0004: Add form-of-address preference to onboarding (ty/vy)

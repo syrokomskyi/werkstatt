@@ -1,12 +1,13 @@
 ---
 id: ADR-0003
 title: "Separate package for Warpgogol-specific skills"
-status: accepted
+status: superseded
 scope: package
 decider: architecture
 createdAt: 2026-07-26
-updatedAt: 2026-07-27
+updatedAt: 2026-08-02
 implementedAt:
+closedAt: 2026-08-02
 supersedes: []
 supersededBy:
   - RFC-0539

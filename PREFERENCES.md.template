@@ -6,6 +6,7 @@
 aiLanguage: en
 documentationLanguage: en
 register: business
+formOfAddress: formal
 createdAt: 2026-07-09
 updatedAt: 2026-07-09
 ---
@@ -19,6 +20,7 @@ This file stores operator-level preferences that AI agents read at the start of 
 - **aiLanguage** — language the AI uses for **all** communication with the operator in this session: questions, responses, summaries, reports, status updates, and any other chat output.
 - **documentationLanguage** — default language for newly generated RFCs, ADRs, READMEs, and other project documentation.
 - **register** — communication register (`business` | `creative`). Business = core behavioral layer only, professional and efficient. Creative = core + extended behavioral layer (RFC-0549) with creative partnership and emotional support.
+- **formOfAddress** — form of address (`formal` | `informal`). Formal = "vy"/"Sie" in languages with a formal/informal distinction. Informal = "ty"/"du". Defaults to formal.
 
 ## Changing preferences
 
