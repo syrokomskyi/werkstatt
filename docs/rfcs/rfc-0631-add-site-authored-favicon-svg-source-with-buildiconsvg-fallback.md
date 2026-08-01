@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-01
 updatedAt: 2026-08-01
+enhancedAt: 2026-08-01
 implementedAt:
 closedAt:
 supersedes: []
@@ -185,6 +186,7 @@ Diagnostic rules:
 - **Source SVG missing** — generator falls back to `buildIconSvg` silently (no warning). This is the default for sites without a custom logo.
 - **Source SVG invalid XML** — generator falls back to `buildIconSvg` and validator reports `ICON-SRC-02` (error). Generation does not fail; the fallback ensures the site always has valid icons.
 - **Source SVG wrong viewBox** — generator uses the source as-is (sharp may handle non-512 viewBoxes by scaling), but validator reports `ICON-SRC-01` (error). The error must be fixed for visual correctness.
+- **Sharp conversion failure** — if `sharp` throws during PNG/ICO conversion of a source SVG that is valid XML but not a valid SVG document (e.g., root element is not `<svg>`, or SVG references unsupported features), the generator catches the error and falls back to `buildIconSvg`. The validator does not report a separate diagnostic for this case — the fallback ensures the site always has valid icons. The operator should fix the source SVG and re-run `public.icons.generate`.
 - **Maskable source missing** — generator uses the regular source SVG for maskable variants. No diagnostic.
 - **Both sources missing** — `buildIconSvg` generates both regular and maskable variants as before.
 
@@ -195,6 +197,7 @@ Diagnostic rules:
 - **New apps**: automatically get the `buildIconSvg` fallback. They can opt in to a custom favicon by adding the source file.
 - **No flag day**: the change is backward-compatible. No existing generated artifact changes unless a site adds a source SVG.
 - **Pipeline integration**: `public.icons.validate` is already part of `build.check`; the new diagnostics (`ICON-SRC-*`) will surface there for sites with source SVGs.
+- **Documentation update**: `docs/authoring/site-composition.md` should be updated to mention `src/content/favicon.svg` and `src/content/favicon-maskable.svg` as site-authored content files, so agents discover the override mechanism without reading this RFC.
 
 ## Alternatives considered
 
@@ -217,6 +220,8 @@ Diagnostic rules:
 - [ ] `resolveIconSvg` reads `src/content/favicon-maskable.svg` for maskable variant when present, falls back to regular source SVG (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
 - [ ] `public.icons.validate` reports `ICON-SRC-01` when source SVG has wrong viewBox (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
 - [ ] `public.icons.validate` reports `ICON-SRC-02` when source SVG is invalid XML (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
+- [ ] `public.icons.validate` reports `ICON-SRC-03` when maskable source SVG has wrong viewBox (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
+- [ ] Generator falls back to `buildIconSvg` when `sharp` throws during PNG/ICO conversion of a valid-XML source SVG (evidence: `packages/os/site-kernel-checks/src/public-surface/icons.ts:<line>`)
 - [ ] Sites without `src/content/favicon.svg` are unaffected — `buildIconSvg` fallback produces identical output to pre-RFC behavior (evidence: `public.icons.generate` output hash comparison)
 - [ ] `rfc.validate` passes on this file before merging
 
