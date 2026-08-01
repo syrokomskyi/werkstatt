@@ -239,15 +239,15 @@ No output format changes. The command-result cache operates internally. The `ker
 
 ## Acceptance criteria
 
-- [ ] `KernelCommandDefinition` has optional `modulePaths?: string[]` field
-- [ ] `computeModuleHash` accepts optional `modulePaths` parameter and fingerprints only listed paths when present
-- [ ] `execute-pipeline.ts` `moduleHashCache` key includes `modulePaths` value
-- [ ] Commands without `modulePaths` fall back to full `src/` fingerprint (backward compatible)
-- [ ] Unit test: `computeModuleHash` with `modulePaths` hashes only listed paths
-- [ ] Unit test: `computeModuleHash` without `modulePaths` hashes full `src/` (existing behavior)
-- [ ] Unit test: `moduleHashCache` keys are distinct for different `modulePaths` values
-- [ ] Unit test: non-existent path in `modulePaths` is silently skipped
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `KernelCommandDefinition` has optional `modulePaths?: string[]` field (evidence: packages/os/site-kernel/src/types.ts:273)
+- [x] `computeModuleHash` accepts optional `modulePaths` parameter and fingerprints only listed paths when present (evidence: packages/os/site-kernel/src/cache/command-result-cache.ts:145-166)
+- [x] `execute-pipeline.ts` `moduleHashCache` key includes `modulePaths` value (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:211,255)
+- [x] Commands without `modulePaths` fall back to full `src/` fingerprint (backward compatible) (evidence: packages/os/site-kernel/src/cache/command-result-cache.ts:167-176, command-result-cache.test.ts:132-140)
+- [x] Unit test: `computeModuleHash` with `modulePaths` hashes only listed paths (evidence: packages/os/site-kernel/src/cache/**tests**/command-result-cache.test.ts:122-130)
+- [x] Unit test: `computeModuleHash` without `modulePaths` hashes full `src/` (existing behavior) (evidence: packages/os/site-kernel/src/cache/**tests**/command-result-cache.test.ts:132-140)
+- [x] Unit test: `moduleHashCache` keys are distinct for different `modulePaths` values (evidence: packages/os/site-kernel/src/cache/**tests**/command-result-cache.test.ts:142-149)
+- [x] Unit test: non-existent path in `modulePaths` is silently skipped (evidence: packages/os/site-kernel/src/cache/**tests**/command-result-cache.test.ts:151-156)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0637` → status: pass, violations: [])
 
 ## Implementation notes for agents
 
