@@ -4,72 +4,82 @@ date: 2026-07-30
 reviewer:
   skill: fo-review
   model: unknown
-verdict: approved
-diffRange: c1e5430...HEAD
+verdict: needs-revision
+diffRange: f213cf2...HEAD
 filesReviewed:
+  - packages/os/site-kernel/src/types.ts
+  - packages/os/site-kernel/src/cli/index.ts
+  - packages/os/site-kernel/src/runtime/execute-command.ts
   - packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts
-  - packages/os/site-kernel-handoff/src/tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts
+  - packages/os/site-kernel-handoff/src/mission/mission.module.ts
+  - packages/os/site-kernel-handoff/src/tests/mission-validate-distribution-reuse.test.ts
+  - packages/os/site-kernel-handoff/src/tests/mission-build-check-phase.test.ts
+  - packages/os/site-kernel/AGENTS.md
   - packages/os/site-kernel-handoff/AGENTS.md
-  - docs/rfcs/rfc-0614-expand-bordbuch-conflict-auto-resolution-to-include-public-well-known-bordbuch-paths-in-mission-reconcile.md
-  - docs/rfcs/archive/implemented/rfc-0584-auto-resolve-bordbuch-delete-modify-conflicts-in-mission-reconcile.md
+  - docs/rfcs/rfc-0635-reuse-distribution-in-mission-validate-when-build-input-hash-matches.md
 ---
 
-# Code Review: c1e5430...HEAD (RFC-0614 implementation)
+# Code Review: f213cf2...HEAD (RFC-0635 implementation)
 
-### Verdict: Approved
+## Verdict: Needs revision
 
-The implementation is minimal and correct. Both Axis A findings (duplicated setup logic, unnecessary two-parameter signature) were resolved in the fix commit. All 412 tests pass, build:check passes, rfc.validate passes with zero violations.
+The implementation is architecturally sound and well-tested, but has two findings: a data contract mismatch in the reuse path (reading fields that don't exist in `build-manifest.json`) and a duplicated dirty-check/nextSteps pattern.
 
-### Mechanical floor
+## Mechanical floor
 
-Pass — `pnpm --filter @warpgogol/site-kernel-handoff build:check` passes, `pnpm --filter @warpgogol/site-kernel-handoff test -- --run` passes (412 tests, 0 failures).
+Pass — `pnpm --filter @warpgogol/site-kernel run build:check` and `pnpm --filter @warpgogol/site-kernel-handoff run build:check` both pass. All 488 unit tests pass. `rfc.validate --id RFC-0635` passes.
 
-### Axis A — Structural correctness
+## Axis A — Structural correctness
 
-No issues (after fix). Both findings resolved:
+**Finding A-1: Data contract mismatch in distribution reuse path.**
+`mission-materialization-commands.ts:214-226` reads `routeCount` and `sitemapHash` from `distribution/build-manifest.json`, but `runMissionBuild` (line 695-702) writes only `builtAt`, `missionId`, `systemId`, `succeeded`, and optionally `error` to that file — `routeCount` and `sitemapHash` are never written. The fallback values (`0`, `"sha256:reused"`) mask the missing fields, but the code suggests a data contract that doesn't exist. Either add `routeCount` and `sitemapHash` to the `build-manifest.json` writer in `runMissionBuild`, or remove the read attempt and use the fallback values directly.
 
-- `setupCommonAncestor` generalized to accept `Record<string, string>` — test case 5 now reuses it.
-- `simulateDeleteModify` simplified to single `filePath` parameter; `simulateDeleteModifyMultiple` extracted for multi-file scenario.
+**Finding A-2: Duplicated dirty-check + nextSteps pattern.**
+The `dirtyCheck` + `nextSteps` construction is duplicated between the reuse path (lines 248-275) and the normal path (lines 547-567). Both blocks construct the same `KernelNextStep[]` based on `dirtyCheck.dirty`. Extract a helper like `buildValidateNextSteps(missionId, dirtyCheck)` to eliminate the duplication.
 
-### Axis B — DNA alignment
+## Axis B — DNA alignment
 
-No issues. The diff satisfies DNA-51 (Werkstatt consistency primitives) — it expands the bordbuch conflict auto-resolution scope without weakening any existing invariant. No DNA invariants are amended or introduced.
+No issues. The change respects ADR-0008 (full three-phase build pipeline), DNA-47 (workpiece materialized from pinned bundle), and the mission lifecycle invariants. `computeBuildInputHash` is reused from `build-pipeline-helpers.ts` per DNA-53 (fingerprint governance).
 
-### Axis C — Ecosystem fit
+## Axis C — Ecosystem fit
 
-No issues. `AGENTS.md` for `packages/os/site-kernel-handoff` is updated (line 158) to reflect the expanded scope. RFC-0584's `amendedBy` field is updated for V-19 bidirectional integrity. No new commands, no pipeline changes, no package boundary changes.
+No issues. Package boundaries are correct (`site-kernel-handoff` imports from `site-kernel`). `build.check` is placed in the correct pipeline position. `mission.validate` registration now declares `cacheable: false`. AGENTS.md files are updated for both packages.
 
-### Axis D — Forward-only compliance
+## Axis D — Forward-only compliance
 
-No issues. The hardcoded path literals are replaced (not kept alongside) by the dynamic `conflictedPaths` approach. No dual-paths or compatibility shims.
+No issues. No compatibility shims or legacy paths. The `--force` flag injection is a new capability, not a bridge.
 
-### Axis E — Agent-facing clarity
+## Axis E — Agent-facing clarity
 
-No issues. The test file carries `MODULE_CONTRACT` and `CHANGE_SUMMARY` Compass scaffolding. The RFC comment on line 759 is updated to reference both RFC-0584 and RFC-0614. Variable names (`pathArgs`, `conflictedPaths`, `isBordbuchPath`) are self-documenting.
+No issues. New test files carry `MODULE_CONTRACT` and `CHANGE_SUMMARY`. Comments reference RFC-0635. The `as unknown as MissionValidateData` cast is an existing pattern in the file (used by all report construction sites) — not ideal but consistent.
 
-### Axis F — Pragmatism
+## Axis F — Pragmatism
 
-No issues. The change is minimal — 12 insertions, 17 deletions in the source file. No new commands, no new abstractions. The dynamic path approach is simpler than the hardcoded version it replaces.
+No issues. The `--force` flag delivery via `KernelRuntimeContext` is minimal and non-intrusive. The `build.check` phase in `mission.build` uses the existing `runPipelinePhase` helper. No new commands or speculative generality.
 
-### Axis G — Blind spots
+## Axis G — Blind spots
 
-- **Edge case — empty `conflictedPaths` after `git status` failure:** If `git status --porcelain` fails (line 785-786), `conflictedPaths` remains `[]`. The `allBordbuch` check (`conflictedPaths.length > 0 && ...`) correctly prevents auto-resolution in this case, falling through to the abort path. This is handled correctly.
-- **Edge case — paths with spaces:** The `JSON.stringify(p)` in `pathArgs` construction correctly quotes paths containing spaces. No issue.
-- **Test edge case — `setupCommonAncestor` mkdir:** The helper uses `join(filePath, "..").replace(/^\.\//, "")` to create parent directories. For `bordbuch/events.ndjson`, this produces `bordbuch` — correct. For `public/.well-known/bordbuch.json`, this produces `public/.well-known` — correct. For `public/.well-known/bordbuch/index.html`, this produces `public/.well-known/bordbuch` — correct. No issue, but the `replace(/^\.\//, "")` is defensive against a leading `./` that never appears in the test inputs. Minor dead code.
+**Finding G-1: Empty `distribution/dist/` edge case.**
+`existsSync(distributionDistDir)` returns `true` for an empty directory. If `distribution/dist/` exists but is empty (e.g., from a partially failed `mission.build` that wrote the hash but not the dist), the reuse path would copy an empty directory to `workpiece/dist/`. In practice, `mission.build` only writes `build-input-hash.json` when `buildSucceeded` is true, and a successful build always produces a non-empty `dist/`. This is a low-risk edge case but worth documenting.
 
-### Spec compliance
+## Spec compliance
 
-| Requirement from RFC-0614 | Status | Evidence |
+| Requirement from RFC-0635 | Status | Evidence |
 | --- | --- | --- |
-| `isBordbuchPath` matches `bordbuch/` and `public/.well-known/bordbuch*` | Done | `mission-materialization-commands.ts:789-790` — unchanged, already matched |
-| `git checkout --ours`/`git add` use dynamic `conflictedPaths` | Done | `mission-materialization-commands.ts:796-806` |
-| Auto-resolves `public/.well-known/bordbuch*` delete/modify conflicts | Done | Test cases 2-3 pass |
-| Aborts on non-bordbuch conflicts | Done | Test case 5 passes |
-| Regression test covers both RFC-0584 and RFC-0614 scenarios | Done | Test cases 1-3 |
-| RFC-0584 `amendedBy` updated | Done | `docs/rfcs/archive/implemented/rfc-0584-*.md:25-26` |
+| Check `build-input-hash.json` before build cycle | Done | mission-materialization-commands.ts:175-284 |
+| Copy `distribution/dist/` to `workpiece/dist/` when missing | Done | mission-materialization-commands.ts:207-212 |
+| `--force` bypasses hash check | Done | mission-materialization-commands.ts:177 |
+| `build.check` in `mission.build` between `build.prepare` and `astro build` | Done | mission-materialization-commands.ts:633-645 |
+| `MissionValidateData` includes `distributionReused`, `buildInputHash`, `fullBuildRan` | Done | mission-materialization-commands.ts:72-81 |
+| Unit test: hash match → skip, `distributionReused: true` | Done | mission-validate-distribution-reuse.test.ts test 1 |
+| Unit test: hash mismatch → full build, `distributionReused: false` | Done | mission-validate-distribution-reuse.test.ts test 2 |
+| Unit test: `--force` → full build regardless | Done | mission-validate-distribution-reuse.test.ts test 3 |
+| Unit test: `mission.build` includes `build.check` | Done | mission-build-check-phase.test.ts test 1 |
+| Existing tests updated for reuse path | Done | No assertion changes needed — all 488 tests pass |
+| `cacheable: false` on `mission.validate` | Done | mission.module.ts:202 |
 | `rfc.validate` passes | Done | status: pass, violations: [] |
 
-### Questions for the author
+## Questions for the author
 
-1. The `simulateDeleteModify` function takes both `cacheFilePath` and `workpieceFilePath` but they are always identical — was the two-parameter signature intentional for future flexibility, or can it be simplified to a single `filePath`?
-2. Test case 5 ("mixed conflict") inlines the setup logic instead of reusing `setupCommonAncestor` — would generalizing the helper to accept multiple files be cleaner?
+1. Should `build-manifest.json` in `runMissionBuild` be extended to include `routeCount` and `sitemapHash`, or should the reuse path stop reading them from there and use fixed fallback values?
+2. Is the empty `distribution/dist/` edge case (G-1) worth adding a guard for, or is it sufficiently mitigated by `mission.build` only writing the hash on success?

@@ -147,6 +147,33 @@ export function buildFailureDiagnostics(buildError: string): Diagnostic[] {
   ];
 }
 
+function buildValidateNextSteps(
+  missionId: string,
+  dirtyCheck: { dirty: boolean; fileCount: number },
+): KernelNextStep[] {
+  return dirtyCheck.dirty
+    ? [
+        {
+          action: `Commit uncommitted changes: pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"`,
+          kind: "required",
+        },
+        {
+          action: `Then run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+          kind: "optional",
+        },
+      ]
+    : [
+        {
+          action: `Run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
+          kind: "optional",
+        },
+        {
+          action: `Then run: pnpm exec site-kernel run mission.close --mission ${missionId}`,
+          kind: "optional",
+        },
+      ];
+}
+
 export async function runMissionValidate(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -251,27 +278,7 @@ export async function runMissionValidate(
           );
         }
 
-        const reuseNextSteps: KernelNextStep[] = dirtyCheck.dirty
-          ? [
-              {
-                action: `Commit uncommitted changes: pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"`,
-                kind: "required",
-              },
-              {
-                action: `Then run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
-                kind: "optional",
-              },
-            ]
-          : [
-              {
-                action: `Run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
-                kind: "optional",
-              },
-              {
-                action: `Then run: pnpm exec site-kernel run mission.close --mission ${missionId}`,
-                kind: "optional",
-              },
-            ];
+        const reuseNextSteps = buildValidateNextSteps(missionId, dirtyCheck);
 
         return {
           data: reusedReport as unknown as MissionValidateData,
@@ -557,27 +564,7 @@ export async function runMissionValidate(
   }
 
   // RFC-0579: populate nextSteps based on workpiece dirty state
-  const passNextSteps: KernelNextStep[] = dirtyCheck.dirty
-    ? [
-        {
-          action: `Commit uncommitted changes: pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"`,
-          kind: "required",
-        },
-        {
-          action: `Then run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
-          kind: "optional",
-        },
-      ]
-    : [
-        {
-          action: `Run: pnpm exec site-kernel run mission.reconcile --mission ${missionId}`,
-          kind: "optional",
-        },
-        {
-          action: `Then run: pnpm exec site-kernel run mission.close --mission ${missionId}`,
-          kind: "optional",
-        },
-      ];
+  const passNextSteps = buildValidateNextSteps(missionId, dirtyCheck);
 
   return {
     data: report as unknown as MissionValidateData,
@@ -645,15 +632,27 @@ export async function runMissionBuild(
   }
 
   // Phase 2: astro build
+  let buildRouteCount = 0;
+  let buildSitemapHash = "sha256:no-sitemap";
   if (!buildError) {
     logger.info(`  Running astro build in ${workpieceDir}…`);
     try {
-      execSync("pnpm exec astro build", {
+      const buildOutput = execSync("pnpm exec astro build", {
         cwd: workpieceDir,
         stdio: "pipe",
         timeout: 300_000,
         encoding: "utf-8",
       });
+      const routeMatches = buildOutput.match(/\d+ page\(s\)/g);
+      if (routeMatches) {
+        const nums = routeMatches.map((m) => parseInt(m, 10));
+        buildRouteCount = Math.max(...nums, 0);
+      }
+      const sitemapPath = path.join(workpieceDir, "dist", "sitemap-index.xml");
+      if (existsSync(sitemapPath)) {
+        const { byteHashFile } = await import("@warpgogol/fingerprint");
+        buildSitemapHash = await byteHashFile(sitemapPath);
+      }
     } catch (err) {
       buildError = err instanceof Error ? err.message : String(err);
       logger.info(`  Astro build failed: ${buildError}`);
@@ -698,6 +697,8 @@ export async function runMissionBuild(
     missionId,
     systemId: manifest.systemId,
     succeeded: buildSucceeded,
+    routeCount: buildRouteCount,
+    sitemapHash: buildSitemapHash,
     ...(buildError ? { error: buildError } : {}),
   };
   await atomicWriteFile(
