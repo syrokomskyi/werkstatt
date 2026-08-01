@@ -293,11 +293,11 @@ Pre-flight failure output (exit code 2):
 - [x] `mission-check.ts` accepts `--locales de-DE,uk-UA` as explicit override (evidence: `mission-check.ts:505-519` flag parsing, vitest run `accepts valid --locales flag`)
 - [x] `mission-check.ts` pre-flight check launches chromium and exits with code 2 + actionable message if browser is not installed (evidence: `mission-check.ts:106-119` `runPreflightCheck`, vitest run `returns exit code 2 when chromium pre-flight check fails`)
 - [x] `mission-check.ts` uses `createRequire(import.meta.url)` for ESM-compatible `require` of `playwright/package.json` and `crawlee/package.json` (evidence: `mission-check.ts:19,69,94,99`, vitest run)
-- [x] `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes
+- [x] `pnpm --filter @warpgogol/site-kernel-checks run build:check` passes (evidence: exit code 0, 0 type errors)
 - [x] Existing tests updated for new flags, pre-flight mock, and page-language matching (evidence: vitest run 15/15 tests pass)
 - [x] `packages/os/site-kernel-checks/AGENTS.md` documents new flags (evidence: `grep -E '--max-duration|--locales' packages/os/site-kernel-checks/AGENTS.md`)
 - [x] `command.manifest.generate` and `docs.commands.generate` regenerated after flag changes (evidence: `docs/command-manifest.generated.yaml` contains new flags under `mission.check`)
-- [x] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: 0 violations, 0 warnings)
 
 ## Implementation notes for agents
 
