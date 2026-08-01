@@ -51,8 +51,16 @@ export interface OwnershipEntry {
    */
   module?: string;
   /**
-   * When true, the file is only generated under certain conditions (e.g. cms-git adapter).
-   * `generated.files.validate` will skip existence checks for conditional entries.
+   * When true, the file is only generated under certain conditions (e.g. cms-git adapter,
+   * preliminary build-identity.json).
+   *
+   * Semantics (RFC-0636): "skip absence checks, not coverage checks."
+   * - Conditional entries ALWAYS contribute to the expected-path set in all
+   *   three validators (generated.files.validate, ownership.sync.validate,
+   *   generated.stale.validate). Files on disk that match a conditional entry
+   *   are covered and do not trigger OWN-01 or STALE-01.
+   * - Conditional entries do NOT produce phantom diagnostics (OWN-02,
+   *   GEN-FILES-01) when the file is absent from disk.
    */
   conditional?: boolean;
 }
