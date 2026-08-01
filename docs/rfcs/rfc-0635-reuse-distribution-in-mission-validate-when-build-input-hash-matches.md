@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-01
 updatedAt: 2026-08-01
+enhancedAt: 2026-08-01
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,11 +25,13 @@ amendedBy: []
 related:
   - DNA-46
   - DNA-47
+  - DNA-53
   - RFC-0390
   - RFC-0585
   - RFC-0597
   - RFC-0615
   - RFC-0619
+  - RFC-0628
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -52,6 +55,7 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - packages/os/site-kernel-handoff
+  - packages/os/site-kernel
 successSignals:
   - mission.validate completes in <10s when build-input-hash matches
   - mission.build includes build.check pipeline
@@ -126,20 +130,43 @@ pnpm exec site-kernel run mission.validate --site warpgogol-com --force
 pnpm exec site-kernel run mission.validate --site warpgogol-com --json
 ```
 
-The `--force` flag is already accepted by the kernel CLI and passed through to `ExecuteKernelPipelineOptions.force`. `mission.validate` reads it from `input.flags.force`.
+The `--force` flag is currently accepted by the kernel CLI's `consumeCommonFlags` for pipeline execution (`executeKernelPipeline`), but it is NOT passed through to `executeKernelCommand` for individual command invocations. The CLI's command path at `packages/os/site-kernel/src/cli/index.ts` destructures `force` from `consumeCommonFlags` but does not forward it to `executeKernelCommand`.
+
+To deliver `--force` to `runMissionValidate`, this RFC requires a CLI-level change in `packages/os/site-kernel`:
+
+1. In the command path of `cli/index.ts`, destructure `force` from the `consumeCommonFlags` result and pass it to `executeKernelCommand`.
+2. Add `force?: boolean` to `ExecuteKernelCommandOptions` and `EXECUTE_KERNEL_COMMAND_OPTION_KEYS` in `runtime/execute-command.ts`.
+3. In `executeRegisteredCommand`, inject `options.force ?? false` into `input.flags.force` before calling the handler.
+4. The `mission.validate` handler reads `input.flags.force` — no flag schema declaration needed in `mission.module.ts` since the flag is injected by the executor, not parsed from argv by the command's flag parser.
+
+This approach keeps `--force` as a CLI-level concern (stripped from argv by `consumeCommonFlags`) while making it available to command handlers via `input.flags`.
 
 ### TypeScript contracts
 
 ```ts
 interface MissionValidateData {
-  systemId: string;
+  // Existing fields (retained from current interface):
   missionId: string;
-  distributionReused: boolean;
-  buildInputHash: string | null; // present when reused, null when full build ran
-  fullBuildRan: boolean;
-  // existing fields (build.prepare result, build.check result, etc.) retained
+  contractFull: { passed: boolean; validators: Array<Record<string, unknown>> };
+  build: { succeeded: boolean; routeCount: number; sitemapHash: string; error?: string };
+
+  // New fields added by this RFC:
+  distributionReused: boolean;      // true when build cycle was skipped via hash match
+  buildInputHash: string | null;   // present when reused, null when full build ran
+  fullBuildRan: boolean;            // false when distribution was reused
 }
 ```
+
+When `distributionReused: true`:
+
+- `contractFull.passed` is `true` (the distribution was validated by `mission.build` which now includes `build.check`).
+- `build.succeeded` is `true`, `build.routeCount` and `build.sitemapHash` are populated from the reused distribution's metadata (read from `distribution/build-manifest.json` if available, otherwise `0` and `sha256:reused` respectively).
+- `fullBuildRan` is `false`.
+
+When `distributionReused: false` (hash mismatch or `--force`):
+
+- All existing fields are populated from the fresh build cycle as before.
+- `fullBuildRan` is `true`.
 
 `runMissionBuild` adds `build.check` pipeline execution between `build.prepare` and `astro build`:
 
@@ -149,6 +176,8 @@ interface MissionValidateData {
 // Phase 2: astro build
 // Phase 3: build.post (text.normalize.apply, passport.emit, etc.)
 ```
+
+The `build.check` phase in `mission.build` uses `executeKernelPipeline` directly (not `runPipelinePhase`) to provide step-level error reporting consistent with `mission.validate`'s `build.check` execution. `runPipelinePhase` throws on failure without step-level diagnostics; `executeKernelPipeline` returns a report with per-step status, allowing the build manifest to record which validators failed.
 
 ### File system responsibilities
 
@@ -201,6 +230,8 @@ When the hash does not match or `--force` is set:
 - **`distribution/dist/` missing but hash matches:** Warning logged, full build runs (cannot copy dist/).
 - **`build.check` fails during `mission.build`:** `mission.build` fails with the check error. `distribution/` is not created, so `mission.validate` will run the full cycle.
 - **`--force` flag set:** Hash check skipped entirely, full build cycle always runs.
+- **`build-input-hash.json` only written on successful builds:** `runMissionBuild` writes `build-input-hash.json` only when `buildSucceeded` is `true` (including the new `build.check` phase). A failed `mission.build` leaves no `build-input-hash.json`, so `mission.validate` correctly falls back to the full cycle.
+- **Gate metadata unchanged:** The `mission.validate` gate metadata in `mission.module.ts` (`gate: { severity: "error", phase: "mission", blocks: ["mission.close", "release.prepare"] }`) remains unchanged. Distribution reuse does not alter the gate semantics — `mission.validate` still blocks `mission.close` and `release.prepare` regardless of whether the build was reused or run fresh.
 
 ## Rollout
 
@@ -218,9 +249,22 @@ When the hash does not match or `--force` is set:
 
 - **No `--force` flag, delete `build-input-hash.json` manually:** Rejected as poor UX. The `--force` pattern is already established in the kernel cache (RFC-0390) and is the expected operator escape hatch.
 
+## Interactions
+
+### Interaction with `mission.close` inline validation
+
+`mission.close` calls `runMissionValidate` internally via `runInlineValidate` (`mission-close.ts:106-130`) with a synthetic input that does NOT include `force: true`. This means distribution reuse is active during `mission.close` — if the hash matches, the build cycle is skipped, and `mission.close` proceeds to reconciliation and Bordbuch commit without a fresh build.
+
+This is desirable: if the distribution is current, there is no reason to rebuild during close. If the operator wants a guaranteed fresh build before closing, they can run `mission.validate --force` manually before `mission.close`.
+
+### Interaction with dev-deploy (RFC-0628)
+
+`leitstand.dev-deploy` builds the workpiece directly via `pnpm build` and deploys to the dev channel, bypassing `mission.validate` entirely. Distribution reuse in `mission.validate` does not affect the dev-deploy workflow. The optimization only shortens the `mission.validate` → `mission.close` path and the `mission.validate` → `release.prepare` path.
+
 ## Risks
 
 - **Stale distribution risk:** If `build-input-hash` doesn't capture a relevant input (e.g., a platform package change not reflected in `platformSemanticHash`), `mission.validate` could reuse a stale distribution. Mitigated by `computeBuildInputHash` already including `platformVersion` and `platformSemanticHash` in the hash.
+- **Non-content file changes not captured:** `computeBuildInputHash` hashes only `workpiece/src/content/` via `fingerprintTree` with `mode: "semantic"`. Changes to files outside `src/content/` (e.g., `src/pages/`, `astro.config.mjs`, `package.json`) would NOT change the hash. For mission workpieces, these files are generated by `build.prepare` from the platform, so `platformSemanticHash` captures them. However, if an operator manually edits a non-content file in the workpiece, the hash would not change. This is acceptable — manual edits to non-content files in the workpiece are already discouraged by the mission lifecycle (DNA-47: the workpiece is materialized from the pinned bundle, not hand-edited outside `src/content/`).
 - **`mission.build` now fails on content errors:** Adding `build.check` to `mission.build` means operators may hit validation errors earlier in the workflow. This is by design — a distribution that hasn't passed content validation should not be reused — but it changes the operator experience.
 - **Agent confusion:** Agents may not expect `mission.validate` to skip the build. The `distributionReused` field in the JSON output and the summary line make the skip visible. Agents MUST check `distributionReused` before assuming a full build ran.
 - **`workpiece/dist/` divergence:** If an operator manually modifies `workpiece/dist/` after `mission.build`, `mission.validate` with hash match would not detect the modification. This is acceptable — `workpiece/dist/` is a generated artifact, and manual modifications to generated files are already discouraged by RFC-0601 (generated drift).
@@ -236,6 +280,8 @@ When the hash does not match or `--force` is set:
 - [ ] Unit test: hash mismatch → full build cycle runs, `distributionReused: false`
 - [ ] Unit test: `--force` → full build cycle runs regardless of hash match
 - [ ] Unit test: `mission.build` includes `build.check` pipeline step
+- [ ] Existing test files (`mission-validate-dist-cleanup.test.ts`, `mission-validate-snapshot-auto-regen.test.ts`, `mission-validate-cache-clone-warning.test.ts`) updated to account for distribution reuse path
+- [ ] `mission.validate` command registration in `mission.module.ts` declares `cacheable: false` for consistency with `mission.build` (both depend on external state: file system, build tools, git)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
