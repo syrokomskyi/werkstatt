@@ -27,9 +27,7 @@ amends:
 amendedBy: []
 enhancedAt: 2026-08-01
 related:
-  - DNA-58
   - RFC-0087
-  - RFC-0375
   - RFC-0634
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
@@ -207,7 +205,7 @@ The fix is already applied and committed. No migration path is needed — the bu
 
 - **Add a separate `coverageExempt` flag.** Introduce a new boolean field for entries that should be excluded from coverage checks. Rejected because it adds unnecessary complexity. The current fix (removing the `continue` in `generated.stale.validate`) is a one-line change that aligns the validator with the already-correct behavior of `ownership.sync.validate`. The `conditional` flag's semantics are clear once documented: skip absence checks, not coverage checks.
 
-- **Document the contract in AGENTS.md only, without an RFC.** Rejected because `GENERATOR_OWNERSHIP_MAP` is a cross-workspace contract used by all sites. An AGENTS.md paragraph lacks the formality and traceability of an RFC, and does not amend the existing RFCs (RFC-0600, RFC-0612) that define the validators.
+- **Document the contract in AGENTS.md only, without an RFC.** Rejected because `GENERATOR_OWNERSHIP_MAP` is a cross-workspace contract used by all sites. An AGENTS.md paragraph lacks the formality and traceability of an RFC, and does not amend the existing RFCs (RFC-0600, RFC-0612, RFC-0375) that define the validators.
 
 ## Risks
 
