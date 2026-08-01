@@ -1,7 +1,7 @@
 ---
 id: ADR-0015
 title: "Enable Turbo cache for site-specific builds with declared inputs"
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-01
@@ -13,7 +13,8 @@ supersededBy:
 related:
   - RFC-0585
   - RFC-0635
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0015: Enable Turbo cache for site-specific builds with declared inputs
@@ -23,6 +24,7 @@ reviewers: []
 `turbo.json` declares `cache: false` for all site-specific build tasks (`warpgogol-com#build`, `nicaragua-projekt#build`, `check-warpgogol-com#build`, and their `build:check` variants). This means Turbo never caches build outputs — every `turbo build` invocation runs the full build pipeline from scratch, even when no inputs have changed.
 
 Site build scripts (e.g., `missions/warpgogol-com-m000024/workpiece/package.json:15`) run:
+
 ```
 site-kernel pipeline build.prepare --site warpgogol-com && pnpm -s astro:check && astro build && site-kernel pipeline build.post --site warpgogol-com
 ```
