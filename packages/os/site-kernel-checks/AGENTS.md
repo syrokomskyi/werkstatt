@@ -144,6 +144,7 @@ Every registered kernel command MUST declare either `reads: string[]` (non-empty
 - **CRC-02** — `reads` pattern is invalid picomatch syntax → error.
 - Network-dependent commands (Cloudflare API, Matomo API, Stripe API, Supabase) MUST be marked `cacheable: false`.
 - Commands that depend on external binaries (exiftool, c2patool) SHOULD be marked `cacheable: false` unless the binary version is included in the cache key.
+- **When a command handler stops reading or writing a file, update the corresponding `reads`/`writes` entry in `src/command-tables/*.ts`.** The `reads`/`writes` arrays are a documentation surface — stale entries cause incorrect cache keys and mislead agents about file dependencies. `fo-doc-audit` does not check command-tables; the implementer is responsible.
 
 ## Pipeline registration (three-place rule)
 
