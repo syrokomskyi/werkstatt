@@ -75,16 +75,12 @@ const balancedTag = fc
 const htmlSegment = fc.oneof(textSegment, commentWithoutMarker, balancedTag);
 
 const htmlWithMarkerComment = fc
-  .array(htmlSegment, { minLength: 0, maxLength: 5 })
-  .chain((segments) => {
-    return fc
-      .tuple(
-        fc.array(htmlSegment, { minLength: 0, maxLength: 3 }),
-        generatedHeaderHtml,
-        fc.array(htmlSegment, { minLength: 0, maxLength: 3 }),
-      )
-      .map(([before, header, after]) => [...segments, ...before, header, ...after].join("\n"));
-  });
+  .tuple(
+    fc.array(htmlSegment, { minLength: 0, maxLength: 8 }),
+    generatedHeaderHtml,
+    fc.array(htmlSegment, { minLength: 0, maxLength: 3 }),
+  )
+  .map(([before, header, after]) => [...before, header, ...after].join("\n"));
 
 const htmlWithMultipleComments = fc
   .tuple(
