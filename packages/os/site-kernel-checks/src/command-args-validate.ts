@@ -17,6 +17,7 @@ source code for three violation rules:
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0610: initial implementation.</item>
+  <item>RFC-0645: inlined stripCommentsAndStrings (moved from generated-timestamp-validate.ts before deletion).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,7 +32,6 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { listRegisteredKernelCommands } from "@warpgogol/site-kernel";
-import { stripCommentsAndStrings } from "./generated-timestamp-validate.ts";
 import { diagnosticsResult } from "./result-helpers.ts";
 import {
   collectTsFiles,
@@ -39,6 +39,68 @@ import {
   extractFunctionBody,
   indexFunctionSources,
 } from "./lib/command-table-tracing.ts";
+
+// ---------------------------------------------------------------------------
+// Comment / string-literal exclusion (inlined from generated-timestamp-validate.ts, RFC-0645)
+// ---------------------------------------------------------------------------
+
+/**
+ * Strip comments and string literals from a line so that patterns
+ * inside them are not flagged. Handles:
+ * - Single-line comments (// ...)
+ * - Block comment state (tracked across lines via `inBlockComment`)
+ * - String literals ('...', "...", `...`)
+ */
+function stripCommentsAndStrings(line: string, state: { inBlockComment: boolean }): string {
+  let result = "";
+  let i = 0;
+  const len = line.length;
+
+  while (i < len) {
+    if (state.inBlockComment) {
+      if (line[i] === "*" && i + 1 < len && line[i + 1] === "/") {
+        state.inBlockComment = false;
+        i += 2;
+        continue;
+      }
+      i++;
+      continue;
+    }
+
+    if (line[i] === "/" && i + 1 < len && line[i + 1] === "/") {
+      break;
+    }
+
+    if (line[i] === "/" && i + 1 < len && line[i + 1] === "*") {
+      state.inBlockComment = true;
+      i += 2;
+      continue;
+    }
+
+    const ch = line[i];
+    if (ch === "'" || ch === '"' || ch === "`") {
+      i++;
+      while (i < len) {
+        if (line[i] === "\\") {
+          i += 2;
+          continue;
+        }
+        if (line[i] === ch) {
+          i++;
+          break;
+        }
+        i++;
+      }
+      result += " ";
+      continue;
+    }
+
+    result += line[i];
+    i++;
+  }
+
+  return result;
+}
 
 // ---------------------------------------------------------------------------
 // Scan configuration
