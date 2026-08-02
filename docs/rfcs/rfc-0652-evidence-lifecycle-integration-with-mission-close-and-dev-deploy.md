@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -54,7 +55,6 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
-  - "@warpgogol/site-kernel-checks"
 successSignals:
   - "mission.close invokes evidence.sync as mandatory step before writing close-report.json"
   - "leitstand.dev-deploy invokes evidence.sync after axiom.report (best-effort, non-blocking)"
@@ -68,6 +68,8 @@ nonGoals:
   - "Does not make evidence.sync blocking in leitstand.dev-deploy — sync is best-effort, non-blocking"
   - "Does not delete local evidence after sync — local evidence is cleaned by mission.cleanup based on age threshold"
   - "Does not integrate evidence.sync into mission.abort — aborted missions do not produce final evidence"
+  - "Does not clean non-Axiom evidence artifacts (close-report.json, workpiece.git-bundle) — those are preserved unconditionally by mission.cleanup as permanent audit artifacts"
+  - "Does not resolve concurrent evidence.sync from leitstand.dev-deploy and mission.close — R2 PutObject is idempotent (last writer wins); duplicate Iceberg rows are possible but non-fatal"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -94,7 +96,7 @@ RFC-0650 defined the R2 archive topology. RFC-0651 defined the `evidence.sync` a
 
 - `mission.close` (`mission-close.ts`) writes `close-report.json` to `evidence/` and creates a `workpiece.git-bundle`, but does not sync Axiom evidence to R2. If the operator forgets to run `evidence.sync` manually, the mission's Axiom evidence is lost when `mission.cleanup` removes the mission directory.
 - `leitstand.dev-deploy` (`leitstand-commands.ts`) runs `mission.check --external-preview` and `axiom.report`, but does not sync the evidence to R2. Each dev deploy produces Axiom evidence that is ephemeral — overwritten by the next deploy.
-- `mission.cleanup` (`mission-cleanup.ts`) preserves the `evidence/` directory (line 79: `skipped.push("evidence (preserved)")`), but never cleans it. Over time, local evidence accumulates indefinitely, consuming disk space.
+- `mission.cleanup` (`mission-cleanup.ts`) preserves the `evidence/` directory (line 80: `skipped.push("evidence (preserved)")`), but never cleans it. Over time, local evidence accumulates indefinitely, consuming disk space.
 
 The result: R2 archive exists, sync commands exist, but nothing wires them into the lifecycle. The operator must remember to run `evidence.sync` manually, which is unreliable.
 
@@ -106,7 +108,7 @@ DNA-46 (Mission lifecycle) defines the mission as an ephemeral container with ev
 
 2. **No auto-sync after dev deploy**: `leitstand.dev-deploy` runs `mission.check` and `axiom.report` but does not sync evidence to R2. Each dev deploy's Axiom results are ephemeral — the operator cannot compare results across deploys. This defeats the purpose of the R2 archive for the most frequent evidence-producing workflow.
 
-3. **No local evidence retention policy**: `mission.cleanup` preserves evidence indefinitely (line 79). Over time, local evidence directories accumulate: 172 MB per run × multiple missions × multiple runs = significant disk usage. There is no age-based cleanup policy for local evidence, relying on R2 as the durable archive.
+3. **No local evidence retention policy**: `mission.cleanup` preserves evidence indefinitely (line 80). Over time, local evidence directories accumulate: 172 MB per run × multiple missions × multiple runs = significant disk usage. There is no age-based cleanup policy for local evidence, relying on R2 as the durable archive.
 
 ## Decision
 
@@ -115,13 +117,13 @@ DNA-46 (Mission lifecycle) defines the mission as an ephemeral container with ev
 ## Architectural fit
 
 - **DNA-46 (Mission lifecycle)**: `mission.close` is the terminal state of a mission. Adding mandatory `evidence.sync` ensures that no mission closes without its evidence being archived. This extends DNA-46 by making evidence preservation a close precondition, not a manual step.
-- **DNA-49 (Fleet propagation / Leitstand)**: `leitstand.dev-deploy` runs the Axiom gate (RFC-0649). Adding best-effort `evidence.sync` after `axiom.report` ensures that every dev deploy's Axiom results are preserved in R2, enabling cross-deploy comparison and regression tracking.
-- **DNA-59 (Evidence preservation)**: Established by RFC-0650. This RFC makes the preservation contract operational by wiring it into the lifecycle.
+- **DNA-49 (Fleet propagation / Leitstand)**: `leitstand.dev-deploy` runs the Axiom gate (RFC-0649) as a blocking quality gate. Adding best-effort `evidence.sync` after `axiom.report` extends DNA-49 by ensuring that every dev deploy's Axiom results — the verification record that gates deployment decisions — are preserved in R2 as durable history. This enables cross-deploy comparison and regression tracking, which the current ephemeral evidence model cannot provide. The sync is non-blocking because the Axiom gate is the quality gate; evidence sync is a post-hoc archival step that must not interfere with the deploy workflow.
+- **DNA-59 (Evidence preservation)**: Established by RFC-0650. This RFC makes the preservation contract operational by wiring it into the lifecycle. After RFC-0650 is accepted and DNA-59 is appended to `docs/architecture-dna.md`, this RFC should add `DNA-59` to `satisfies[]` — it directly extends the invariant by making preservation a lifecycle-enforced behavior.
 - **RFC-0650 (R2 archive topology)**: Defines the storage contract. This RFC defines when the storage is written to.
 - **RFC-0651 (evidence.sync and evidence.fetch)**: Defines the sync and fetch commands. This RFC invokes those commands from lifecycle hooks.
 - **RFC-0628 (dev deploy with Axiom gate)**: Integrated `mission.check` into `leitstand.dev-deploy`. This RFC adds `evidence.sync` as a post-step.
 - **RFC-0649 (Axiom gate freshness)**: Made CDN freshness verification mandatory before the Axiom gate. This RFC preserves the gate's results after it runs.
-- **Site OS operator model**: Changes are in `packages/os/site-kernel-handoff` (`mission-close.ts`, `mission-cleanup.ts`) and `packages/os/site-kernel-checks` (`leitstand-commands.ts`). No new commands — only integration points.
+- **Site OS operator model**: Changes are in `packages/os/site-kernel-handoff` (`mission-close.ts`, `mission-cleanup.ts`, `leitstand-commands.ts`). No new commands — only integration points.
 
 ## Design
 
@@ -160,42 +162,60 @@ In `mission-close.ts`, before writing `close-report.json` (currently at line 363
 
 ```ts
 // 1. Sync evidence to R2 (mandatory)
+const evidenceSynced = false;
+let evidenceSyncResult: { r2KeyPrefix: string; uploadedFiles: number } | null = null;
 if (!skipEvidenceSync) {
   const evidenceDir = path.join(missionDir, "evidence", "axiom");
-  if (existsSync(evidenceDir)) {
+  const metadataPath = path.join(evidenceDir, "evidence-metadata.json");
+  if (existsSync(evidenceDir) && existsSync(metadataPath)) {
     try {
-      await executeKernelCommand("evidence.sync", {
-        flags: { mission: missionId },
-        cwd: context.cwd,
+      const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+      const syncResult = await executeKernelCommand({
+        workspaceRoot,
+        commandName: "evidence.sync",
+        argv: [`--mission=${missionId}`],
       });
+      evidenceSynced = true;
+      evidenceSyncResult = (syncResult as { data?: { r2KeyPrefix?: string; uploadedFiles?: number[] } }).data
+        ? { r2KeyPrefix: (syncResult as any).data.r2KeyPrefix, uploadedFiles: (syncResult as any).data.uploadedFiles?.length ?? 0 }
+        : null;
       logger.info("  Evidence synced to R2");
     } catch (syncError) {
       logger.error("  Evidence sync failed — mission cannot close without archiving evidence");
-      throw new Error(`EVIDENCE_SYNC_FAILED: ${syncError.message}`);
+      throw new Error(`EVIDENCE_SYNC_FAILED: ${syncError instanceof Error ? syncError.message : String(syncError)}`);
     }
+  } else if (existsSync(evidenceDir)) {
+    // evidence/axiom/ exists but no evidence-metadata.json — mission never ran mission.check
+    logger.warn("  Evidence directory exists but evidence-metadata.json is missing — skipping sync (no Axiom evidence to archive)");
   }
 }
 // 2. Write close-report.json (existing code continues)
 ```
 
-The `--skip-evidence-sync` flag is an escape hatch for offline close (e.g., no R2 credentials available). It logs a warning: "Evidence sync skipped — local evidence will be lost when mission.cleanup runs".
+The `--skip-evidence-sync` flag is an escape hatch for offline close (e.g., no R2 credentials available). It logs a warning: "Evidence sync skipped — local evidence will be lost when mission.cleanup runs". When `--skip-evidence-sync` is used, `mission.close` appends a `mission-close-evidence-skipped` entry to the Bordbuch to make the escape hatch auditable — the operator can see which missions were closed without evidence archival.
 
 #### leitstand.dev-deploy
 
-In `leitstand-commands.ts`, after `axiom.report` completes:
+In `leitstand-commands.ts`, after `axiom.report` completes (currently at line 820):
 
 ```ts
 // After axiom.report, sync evidence to R2 (best-effort, non-blocking)
+let evidenceSynced = false;
+let evidenceSyncError: string | null = null;
 if (!skipEvidenceSync) {
   try {
-    await executeKernelCommand("evidence.sync", {
-      flags: { mission: missionId },
-      cwd: context.cwd,
+    const { executeKernelCommand: executeSync } = await import("@warpgogol/site-kernel");
+    await executeSync({
+      workspaceRoot,
+      commandName: "evidence.sync",
+      argv: [`--mission=${missionId}`],
     });
+    evidenceSynced = true;
     logger.info("  Evidence synced to R2 (best-effort)");
   } catch (syncError) {
     // Non-fatal — deploy succeeds even if sync fails
-    logger.warn(`  Evidence sync failed (non-blocking): ${syncError.message}`);
+    evidenceSyncError = syncError instanceof Error ? syncError.message : String(syncError);
+    logger.warn(`  Evidence sync failed (non-blocking): ${evidenceSyncError}`);
   }
 }
 ```
@@ -204,7 +224,7 @@ Sync failure does not fail the deploy. The operator can manually run `evidence.s
 
 #### mission.cleanup
 
-In `mission-cleanup.ts`, replace the current evidence preservation logic (line 79: `skipped.push("evidence (preserved)")`) with age-based cleanup:
+In `mission-cleanup.ts`, replace the current evidence preservation logic (line 80: `skipped.push("evidence (preserved)")`) with age-based cleanup. This applies to both `--mission` mode (single mission) and `--older-than` mode (batch cleanup). Non-Axiom evidence artifacts (`close-report.json`, `workpiece.git-bundle` in `evidence/`) are preserved unconditionally — only `evidence/axiom/` is subject to age-based cleanup.
 
 ```ts
 const evidenceDir = path.join(missionDir, "evidence", "axiom");
@@ -221,7 +241,7 @@ if (existsSync(evidenceDir)) {
       const runTime = new Date(metadata.runTimestamp).getTime();
       if (runTime < cutoff) {
         await rm(evidenceDir, { recursive: true, force: true });
-        cleaned.push("evidence (older than {retentionDays} days)");
+        cleaned.push(`evidence (older than ${retentionDays} days)`);
       } else {
         skipped.push("evidence (within retention period)");
       }
@@ -229,7 +249,10 @@ if (existsSync(evidenceDir)) {
       skipped.push("evidence (no metadata — preserved)");
     }
   }
+} else {
+  skipped.push("evidence/axiom (not present)");
 }
+// Non-Axiom evidence (close-report.json, workpiece.git-bundle) is always preserved
 ```
 
 ### TypeScript contracts
@@ -260,7 +283,7 @@ interface LeitstandDevDeployInput {
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | Invokes `evidence.sync` before `close-report.json` |
 | `packages/os/site-kernel-handoff/src/mission/mission-cleanup.ts` | Age-based evidence cleanup instead of unconditional preservation |
-| `packages/os/site-kernel-checks/src/leitstand/leitstand-commands.ts` | Invokes `evidence.sync` after `axiom.report` (best-effort) |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Invokes `evidence.sync` after `axiom.report` (best-effort) |
 | `packages/os/site-kernel-handoff/src/command-tables/infra-contracts.ts` | Documents `mission.close` writes (evidence.sync invocation), `mission.cleanup` writes (evidence cleanup), `leitstand.dev-deploy` writes (evidence.sync invocation) |
 | `packages/os/site-kernel-handoff/AGENTS.md` | Documents evidence sync integration points |
 | `AGENTS.md` | Documents that `mission.close` mandates evidence sync |
@@ -308,20 +331,26 @@ No `--json` output format changes. The existing `mission.close`, `mission.cleanu
 | --- | --- |
 | `evidence.sync` fails during `mission.close` | `mission.close` exits 1 with `EVIDENCE_SYNC_FAILED` diagnostic. Mission remains open. Operator must fix R2 credentials or use `--skip-evidence-sync`. |
 | `evidence.sync` fails during `leitstand.dev-deploy` | Logs warning, deploy continues. `evidenceSynced: false`, `evidenceSyncError: "..."` in JSON output. Non-fatal. |
-| `--skip-evidence-sync` on `mission.close` | Logs warning: "Evidence sync skipped — local evidence will be lost when mission.cleanup runs". Close proceeds. |
+| `--skip-evidence-sync` on `mission.close` | Logs warning: "Evidence sync skipped — local evidence will be lost when mission.cleanup runs". Appends `mission-close-evidence-skipped` entry to Bordbuch. Close proceeds. |
 | `--skip-evidence-sync` on `leitstand.dev-deploy` | No sync attempted. No warning — this is an explicit operator choice. |
 | `mission.cleanup` with `--evidence-retention-days 0` | Evidence preserved unconditionally (current behavior). No cleanup. |
 | `mission.cleanup` — evidence-metadata.json missing | Evidence preserved. `skipped: "evidence (no metadata — preserved)"`. Cannot determine age without metadata. |
+| `mission.cleanup` — non-Axiom evidence (close-report.json, git-bundle) | Always preserved unconditionally. Not subject to age-based cleanup. |
+| `mission.close` — `evidence/axiom/` exists but `evidence-metadata.json` missing | Sync skipped with warning: "Evidence directory exists but evidence-metadata.json is missing — skipping sync". Close proceeds — mission never ran `mission.check`. |
 | R2 credentials not set | `evidence.sync` fails with `MISSING_ENV`. In `mission.close`: fatal. In `leitstand.dev-deploy`: non-fatal warning. |
+| Concurrent `evidence.sync` from `leitstand.dev-deploy` and `mission.close` | R2 PutObject is idempotent (last writer wins). Duplicate Iceberg rows possible but non-fatal — R2 objects are the primary store. |
 
 ## Rollout
 
+- **Dependency**: This RFC cannot be accepted or implemented until RFC-0650 (R2 archive topology) and RFC-0651 (evidence.sync and evidence.fetch) are both `accepted` (or `implemented`). Without `evidence.sync` (RFC-0651) and `runTimestamp` in `evidence-metadata.json` (RFC-0650), this RFC has nothing to invoke.
 - **Default behavior**: `mission.close` mandates `evidence.sync`. `leitstand.dev-deploy` auto-syncs evidence (best-effort). `mission.cleanup` cleans evidence older than 30 days.
 - **Grace period**: The `--skip-evidence-sync` flag on `mission.close` and `leitstand.dev-deploy` allows the operator to opt out during the initial rollout (e.g., before R2 bucket is set up). This is a temporary escape hatch, not a permanent workflow.
 - **R2 bucket prerequisite**: The operator must have created the R2 bucket and set credentials (RFC-0650, RFC-0651). If credentials are not set, `mission.close` fails with `EVIDENCE_SYNC_FAILED` — the operator must either set credentials or use `--skip-evidence-sync`.
 - **Existing missions**: Missions opened before implementation are not affected — `mission.close` only syncs if `evidence/axiom/evidence-metadata.json` exists with `runTimestamp`. Missions with old-format evidence (no `runTimestamp`) are skipped with a warning.
 - **New missions**: Automatically compliant — `mission.check` writes `runTimestamp` (RFC-0650), `mission.close` syncs to R2, `mission.cleanup` cleans old local evidence.
-- `mission.cleanup` retention: Default 30 days. Configurable per-cleanup via `--evidence-retention-days`. The operator can set `0` to preserve all (backward compatible with current behavior).
+- `mission.cleanup` retention: Default 30 days. Configurable per-cleanup via `--evidence-retention-days`. The operator can set `0` to preserve all (backward compatible with current behavior). Applies to both `--mission` mode (single mission) and `--older-than` mode (batch cleanup).
+- **`--older-than` mode**: `mission.cleanup --older-than <N>d` removes workpiece and distribution for closed missions older than the threshold. After this RFC, it also applies age-based evidence cleanup using `--evidence-retention-days` (default 30d). `--older-than` determines which missions to clean; `--evidence-retention-days` determines which evidence within those missions to clean.
+- **Non-Axiom evidence**: `close-report.json` and `workpiece.git-bundle` in `evidence/` (not `evidence/axiom/`) are preserved unconditionally by `mission.cleanup` — they are permanent audit artifacts, not subject to age-based cleanup.
 - **No deprecation**: `mission.cleanup`'s unconditional preservation is replaced with age-based cleanup, but `--evidence-retention-days 0` restores the old behavior.
 - **AGENTS.md**: Updated to document that `mission.close` mandates evidence sync and `mission.cleanup` cleans old evidence.
 
@@ -341,6 +370,8 @@ No `--json` output format changes. The existing `mission.close`, `mission.cleanu
 
 - **mission.close blocked by R2 outage**: If R2 is unavailable when `mission.close` runs, the close fails with `EVIDENCE_SYNC_FAILED`. Risk: the operator cannot close a mission during an R2 outage. Mitigation: `--skip-evidence-sync` allows offline close. The operator can sync manually later via `evidence.sync`.
 
+- **mission.close latency increase**: 172 MB upload (~17 seconds on a typical home internet connection) is now a mandatory blocking step in `mission.close`. Risk: `mission.close` already takes time for validation, bordbuch commit, and materialization state writes. Adding ~17 seconds for evidence upload increases the total close time. Mitigation: the upload is proportional to evidence size — if `mission.check` was not run (no Axiom evidence), the sync is skipped entirely. The operator should be aware that the first `mission.close` after implementation will take longer.
+
 - **Upload time in leitstand.dev-deploy**: 172 MB upload (~17 seconds) adds latency to every dev deploy. Risk: acceptable — sync is non-blocking, and the deploy result is already available before sync starts. The operator does not wait for sync to complete.
 
 - **mission.cleanup deletes evidence too aggressively**: If `--evidence-retention-days` is set too low (e.g., 1), evidence is deleted before the operator has a chance to review it. Mitigation: default is 30 days. The operator must explicitly set a low value.
@@ -349,22 +380,27 @@ No `--json` output format changes. The existing `mission.close`, `mission.cleanu
 
 - **Backward compatibility**: `mission.cleanup` currently preserves evidence unconditionally. After implementation, it deletes evidence older than 30 days. Risk: operators with existing missions may lose evidence they expected to be preserved. Mitigation: `--evidence-retention-days 0` restores the old behavior. The default 30-day window gives operators time to adjust.
 
+- **Concurrent evidence.sync**: If `leitstand.dev-deploy` is running its best-effort sync while `mission.close` is invoked for the same mission, both attempt to upload to the same R2 key prefix. R2 PutObject is idempotent for the same key (last writer wins), so the final R2 state is consistent. However, the Iceberg table may receive duplicate rows. Mitigation: duplicate Iceberg rows are non-fatal — R2 objects are the primary store, and the Iceberg table is a query index. A future RFC can add deduplication if needed.
+
 - **Circular dependency**: `mission.close` invokes `evidence.sync`, which reads from `evidence/axiom/`. `evidence.sync` does not invoke `mission.close`. No circular dependency — `evidence.sync` is a leaf command that only reads files and uploads to R2.
 
 ## Acceptance criteria
 
 - [ ] `mission.close` invokes `evidence.sync` before writing `close-report.json` (evidence: `mission-close.ts` integration code)
 - [ ] `mission.close` exits 1 with `EVIDENCE_SYNC_FAILED` diagnostic when `evidence.sync` fails (evidence: unit test)
-- [ ] `mission.close --skip-evidence-sync` skips sync and logs warning (evidence: unit test)
+- [ ] `mission.close --skip-evidence-sync` skips sync, logs warning, and appends `mission-close-evidence-skipped` entry to Bordbuch (evidence: unit test)
+- [ ] `mission.close` skips sync with warning when `evidence/axiom/` exists but `evidence-metadata.json` is missing (evidence: unit test)
 - [ ] `mission.close --json` includes `evidenceSynced` and `evidenceSyncResult` fields (evidence: unit test asserting JSON structure)
 - [ ] `leitstand.dev-deploy` invokes `evidence.sync` after `axiom.report` (evidence: `leitstand-commands.ts` integration code)
 - [ ] `leitstand.dev-deploy` does not fail when `evidence.sync` fails (evidence: unit test with mocked sync failure)
 - [ ] `leitstand.dev-deploy --json` includes `evidenceSynced` and `evidenceSyncError` fields (evidence: unit test)
 - [ ] `leitstand.dev-deploy --skip-evidence-sync` skips sync silently (evidence: unit test)
-- [ ] `mission.cleanup` removes evidence older than 30 days by default (evidence: unit test with mock filesystem)
+- [ ] `mission.cleanup` removes evidence older than 30 days by default in `--mission` mode (evidence: unit test with mock filesystem)
 - [ ] `mission.cleanup --evidence-retention-days 7` removes evidence older than 7 days (evidence: unit test)
 - [ ] `mission.cleanup --evidence-retention-days 0` preserves all evidence (evidence: unit test, backward compatibility)
 - [ ] `mission.cleanup` preserves evidence when `evidence-metadata.json` is missing (evidence: unit test)
+- [ ] `mission.cleanup` preserves non-Axiom evidence (`close-report.json`, `workpiece.git-bundle`) unconditionally (evidence: unit test)
+- [ ] `mission.cleanup --older-than <N>d` applies age-based evidence cleanup using `--evidence-retention-days` (evidence: unit test)
 - [ ] `mission.cleanup --json` includes `evidenceCleaned` and `evidenceRetentionDays` fields (evidence: unit test)
 - [ ] `packages/os/site-kernel-handoff/src/command-tables/infra-contracts.ts` documents evidence.sync invocations in `mission.close` and `leitstand.dev-deploy` writes (evidence: `infra-contracts.ts`)
 - [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents evidence sync integration points (evidence: `AGENTS.md` section)
@@ -375,6 +411,7 @@ No `--json` output format changes. The existing `mission.close`, `mission.cleanu
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
+- Agents MUST NOT implement this RFC until RFC-0650 and RFC-0651 are both `accepted` (or `implemented`). Without `evidence.sync` (RFC-0651) and `runTimestamp` in `evidence-metadata.json` (RFC-0650), this RFC has nothing to invoke.
 - Agents MUST NOT use `--skip-evidence-sync` routinely — it is an escape hatch for offline scenarios (no R2 credentials), not a regular workflow. Agents MUST NOT use it unless `evidence.sync` fails with `MISSING_ENV`.
 - Agents MUST NOT invoke `evidence.sync` independently after `mission.check` — it is invoked by `mission.close` (mandatory) and `leitstand.dev-deploy` (best-effort) per this RFC. Agents MAY invoke `evidence.sync` manually when explicitly asked by the operator.
 - Agents MUST NOT set `--evidence-retention-days` to 0 in `mission.cleanup` unless explicitly asked by the operator — the default 30-day retention is the policy.
