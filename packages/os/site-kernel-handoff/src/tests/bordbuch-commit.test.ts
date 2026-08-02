@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0626: initial bordbuch.commit tests.</item>
+  <item>RFC-0646: update mock to include gitExecWithRetry, add retry behavior tests.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -30,7 +31,10 @@ vi.mock("../sternsystem/registry-io.ts", () => ({
 }));
 
 // Mock gitExec to capture git commands
-const gitCalls = vi.hoisted(() => ({ calls: [] as string[], statusOutput: "" }));
+const gitCalls = vi.hoisted(() => ({
+  calls: [] as string[],
+  statusOutput: "",
+}));
 
 vi.mock("../werkstatt/git-exec.ts", () => ({
   gitExec: vi.fn((_cwd: string, args: string) => {
@@ -39,6 +43,19 @@ vi.mock("../werkstatt/git-exec.ts", () => ({
     if (args === "rev-parse HEAD") return "abc123def456";
     return "";
   }),
+  gitExecWithRetry: vi.fn(
+    async (
+      _cwd: string,
+      args: string,
+      _retryOptions: unknown,
+      _options?: { allowNonZero?: boolean },
+    ) => {
+      gitCalls.calls.push(args);
+      if (args === "status --porcelain") return gitCalls.statusOutput;
+      if (args === "rev-parse HEAD") return "abc123def456";
+      return "";
+    },
+  ),
 }));
 
 import { commitBordbuchProjections, runBordbuchCommit } from "../bordbuch/bordbuch-commit.ts";
@@ -130,6 +147,15 @@ describe("commitBordbuchProjections", () => {
     gitCalls.statusOutput = "";
     const result2 = await commitBordbuchProjections(tmpDir, "test-system");
     expect(result2.committed).toBe(false);
+  });
+
+  it("uses gitExecWithRetry for all git operations", async () => {
+    gitCalls.statusOutput = " M bordbuch/status.generated.yaml\n";
+    await commitBordbuchProjections(tmpDir, "test-system");
+    expect(gitCalls.calls).toContain("status --porcelain");
+    expect(gitCalls.calls.some((c) => c.startsWith("add "))).toBe(true);
+    expect(gitCalls.calls.some((c) => c.startsWith("commit "))).toBe(true);
+    expect(gitCalls.calls).toContain("rev-parse HEAD");
   });
 });
 
