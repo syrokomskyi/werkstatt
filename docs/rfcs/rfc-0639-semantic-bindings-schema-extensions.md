@@ -255,16 +255,16 @@ No command output — this RFC is a schema extension only. `resolveTerminology()
 
 ## Acceptance criteria
 
-- [ ] `ForgeBindingsCommands` interface extended with `validate`, `produce`, `verify`, `preview`, `lint` optional keys
-- [ ] Zod schema in `forge-config.ts` extended with five new optional nullable string fields
-- [ ] `resolveTerminology(config, terminology, key)` exported from `@warpgogol/forge/config` — accepts `Record<string, string> | undefined` as second parameter (not `StackProfile`)
-- [ ] `UNIVERSAL_TERMINOLOGY` constant exported with default terms
-- [ ] `applyCliBindingDefaults` updated to initialize 5 new semantic keys with `null`
-- [ ] Unit tests verify: semantic keys parse, null defaults work, terminology resolution chain returns correct values at each tier, `applyCliBindingDefaults` includes 5 new keys
-- [ ] `terminology` schema changed from `.optional()` to `.default({})` in Zod and `ForgeBindings` interface
-- [ ] Existing forge.yaml files (software domain) parse without changes
-- [ ] `packages/forge/AGENTS.md` updated with semantic key and terminology documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `ForgeBindingsCommands` interface extended with `validate`, `produce`, `verify`, `preview`, `lint` optional keys (evidence: packages/forge/src/config/forge-config.ts:76-81)
+- [x] Zod schema in `forge-config.ts` extended with five new optional nullable string fields (evidence: packages/forge/src/config/forge-config.ts:42-47)
+- [x] `resolveTerminology(config, terminology, key)` exported from `@warpgogol/forge/config` — accepts `Record<string, string> | undefined` as second parameter (not `StackProfile`) (evidence: packages/forge/src/config/forge-config.ts:418-430, packages/forge/src/index.ts:76)
+- [x] `UNIVERSAL_TERMINOLOGY` constant exported with default terms — reused `TERMINOLOGY_DEFAULTS` from `profile-schema.ts` (RFC-0638) to avoid duplication (evidence: packages/forge/src/profiles/profile-schema.ts:30-38, packages/forge/src/config/forge-config.ts:26)
+- [x] `applyCliBindingDefaults` updated to initialize 5 new semantic keys with `null` (evidence: packages/forge/src/config/forge-config.ts:234-239)
+- [x] Unit tests verify: semantic keys parse, null defaults work, terminology resolution chain returns correct values at each tier, `applyCliBindingDefaults` includes 5 new keys (evidence: packages/forge/src/tests/bindings-schema.test.ts, 14 tests pass)
+- [x] `terminology` schema changed from `.optional()` to `.default({})` in Zod and `ForgeBindings` interface (evidence: packages/forge/src/config/forge-config.ts:56, packages/forge/src/config/forge-config.ts:90)
+- [x] Existing forge.yaml files (software domain) parse without changes (evidence: packages/forge/src/tests/bindings-schema.test.ts:69-92, existing forge.yaml at repo root parses)
+- [x] `packages/forge/AGENTS.md` updated with semantic key and terminology documentation (evidence: packages/forge/AGENTS.md:127-149)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0639 --json` — status: pass)
 
 ## Implementation notes for agents
 
