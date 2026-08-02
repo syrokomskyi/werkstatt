@@ -400,14 +400,12 @@ describe("axiom.report", () => {
     expect(html).toContain("Capability Manifest");
     expect(html).toContain("Violations by Severity");
     expect(html).toContain("Violations by Page");
-    expect(html).toContain("Incomplete by Severity");
-    expect(html).toContain("Incomplete by Page");
     expect(html).toContain("Tool Profile");
   });
 
   it("HTML escapes user-provided content to prevent XSS", () => {
     const findings = [
-      makeFinding({
+      makeViolationFinding({
         title: '<script>alert("xss")</script>',
         ruleId: "<img src=x onerror=alert(1)>",
         affectedSubjectId: 'https://example.com/" onmouseover="alert(1)',

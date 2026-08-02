@@ -278,7 +278,6 @@ export function renderAxiomReportHtml(
   const violationFindings = findings.filter(isViolationFinding);
   const incompleteFindings = findings.filter((f) => !isViolationFinding(f));
   const violationCounts = countFindingsBySeverity(violationFindings);
-  const incompleteCounts = countFindingsBySeverity(incompleteFindings);
   const total = findings.length;
   const closure = capsule.closureDecision;
   const recordedAt = studyRun.recordedAt;
@@ -310,15 +309,19 @@ export function renderAxiomReportHtml(
 <section class="mb-6">
   <h2 class="text-xl font-bold mb-3">Severity Dashboard</h2>
   ${renderFindingsTypeDashboard("Violations", violationCounts, violationFindings.length)}
-  ${renderFindingsTypeDashboard("Incomplete", incompleteCounts, incompleteFindings.length)}
+  ${
+    incompleteFindings.length > 0
+      ? `<div class="mt-4 text-sm text-gray-500">
+    <strong>Incomplete:</strong> ${incompleteFindings.length} finding(s) — axe could not determine the background color automatically (e.g. text over images, overlapping elements). Requires manual review.
+  </div>`
+      : ""
+  }
 </section>
 
 <section class="mb-6">
   <h2 class="text-xl font-bold mb-3">Severity Distribution</h2>
   <h3 class="text-lg font-semibold mb-2">Violations</h3>
   ${renderMermaidPie(violationCounts, "Violations by Severity")}
-  <h3 class="text-lg font-semibold mb-2 mt-4">Incomplete</h3>
-  ${renderMermaidPie(incompleteCounts, "Incomplete by Severity")}
 </section>
 
 <section class="mb-6">
@@ -339,16 +342,6 @@ export function renderAxiomReportHtml(
 <section class="mb-6">
   <h2 class="text-xl font-bold mb-3">Violations by Page</h2>
   ${renderFindingsByPage(violationFindings, "violation")}
-</section>
-
-<section class="mb-6">
-  <h2 class="text-xl font-bold mb-3">Incomplete by Severity</h2>
-  ${renderFindingsBySeverity(incompleteFindings, "incomplete")}
-</section>
-
-<section class="mb-6">
-  <h2 class="text-xl font-bold mb-3">Incomplete by Page</h2>
-  ${renderFindingsByPage(incompleteFindings, "incomplete")}
 </section>
 
 <section class="mb-6">
