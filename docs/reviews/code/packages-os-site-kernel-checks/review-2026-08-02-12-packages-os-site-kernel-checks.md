@@ -4,7 +4,7 @@ date: 2026-08-02
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: d98c8417...HEAD
 filesReviewed:
   - packages/os/site-kernel-checks/src/mission-check.ts
@@ -20,9 +20,9 @@ filesReviewed:
 
 # Code Review: d98c8417...HEAD (RFC-0650 implementation)
 
-## Verdict: Needs revision
+## Verdict: Approved
 
-One finding on Axis E (agent-facing clarity): the new test file `mission-check-rfc-0650.test.ts` lacks `MODULE_CONTRACT` and `CHANGE_SUMMARY` Compass scaffolding required for non-trivial new source files. All other axes pass.
+All findings resolved. Finding E1 (missing Compass scaffolding on test file) was fixed in commit c11c0337 — `MODULE_CONTRACT` and `CHANGE_SUMMARY` added to `mission-check-rfc-0650.test.ts`.
 
 ## Mechanical floor
 
@@ -46,22 +46,7 @@ No issues. The `runTimestamp` field is always present after implementation — n
 
 ## Axis E — Agent-facing clarity
 
-**Finding E1**: The new test file `packages/os/site-kernel-checks/src/tests/mission-check-rfc-0650.test.ts` (293 lines) does not carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` Compass scaffolding. The existing `mission-check.test.ts` also lacks this scaffolding, but the project's invariants file (`docs/architecture-dna.md`) and `packages/AGENTS.md` require it for non-trivial new source files. The test helpers file (`helpers.ts`) has the correct pattern:
-
-```
-/*
-<MODULE_CONTRACT>
-<purpose>
-  ...
-</purpose>
-</MODULE_CONTRACT>
-<CHANGE_SUMMARY>
-  <item>Initial extraction: ...</item>
-</CHANGE_SUMMARY>
-*/
-```
-
-The new test file should carry the same scaffolding at the top.
+**Finding E1 (FIXED)**: The new test file `packages/os/site-kernel-checks/src/tests/mission-check-rfc-0650.test.ts` (293 lines) did not carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` Compass scaffolding. **Fixed in commit c11c0337** — scaffolding added at the top of the file.
 
 ## Axis F — Pragmatism
 
@@ -86,4 +71,4 @@ No issues. The `runTimestamp` field has negligible performance impact (one strin
 
 ## Questions for the author
 
-1. Should the test file `mission-check-rfc-0650.test.ts` carry `MODULE_CONTRACT` and `CHANGE_SUMMARY` Compass scaffolding, consistent with the project's invariant requirement for non-trivial new source files?
+None — all findings resolved.
