@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0357: initial release module.</item>
+  <item>RFC-0655: add release.state.validate command for release pipeline consistency checks.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -17,6 +18,7 @@ import {
   runReleaseValidate,
   runReleaseList,
   runReleaseRollback,
+  runReleaseStateValidate,
 } from "./release-commands.ts";
 
 export {
@@ -30,6 +32,9 @@ export {
   type ReleaseListData,
   runReleaseRollback,
   type ReleaseRollbackData,
+  runReleaseStateValidate,
+  type ReleaseStateValidateData,
+  type ReleaseStateCheck,
 } from "./release-commands.ts";
 
 export function createReleaseModule(): KernelModule {
@@ -100,6 +105,29 @@ export function createReleaseModule(): KernelModule {
         },
         writes: ["releases/{release}/release.yaml", "systems/{system}/bordbuch/events.ndjson"],
         execute: runReleaseRollback,
+      });
+      registry.registerCommand({
+        name: "release.state.validate",
+        description:
+          "Validate release pipeline consistency between mission.yaml, close-report.json, release.yaml, bordbuch, and registry.yaml (RFC-0655). Flags: --mission, --release, --system.",
+        scope: "workspace",
+        supportsAllSites: false,
+        flags: {
+          mission: { kind: "string", description: "Mission id to validate." },
+          release: { kind: "string", description: "Release id to validate." },
+          system: {
+            kind: "string",
+            description: "System id — validates all releases for the system.",
+          },
+        },
+        reads: [
+          "missions/{mission}/mission.yaml",
+          "missions/{mission}/evidence/close-report.json",
+          "releases/{release}/release.yaml",
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+        ],
+        execute: runReleaseStateValidate,
       });
     },
   };

@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Lazy loading refactor: extracted from release/index.ts to use dynamic imports inside async register().</item>
+  <item>RFC-0655: add release.state.validate command for release pipeline consistency checks.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -24,6 +25,7 @@ export function createReleaseModule(): KernelModule {
         runReleaseValidate,
         runReleaseList,
         runReleaseRollback,
+        runReleaseStateValidate,
       } = await import("./release-commands.ts");
       registry.registerCommand({
         name: "release.prepare",
@@ -96,6 +98,29 @@ export function createReleaseModule(): KernelModule {
         reads: ["releases/{release}/**", "systems/registry.yaml"],
         cacheable: false,
         execute: runReleaseRollback,
+      });
+      registry.registerCommand({
+        name: "release.state.validate",
+        description:
+          "Validate release pipeline consistency between mission.yaml, close-report.json, release.yaml, bordbuch, and registry.yaml (RFC-0655). Flags: --mission, --release, --system.",
+        scope: "workspace",
+        supportsAllSites: false,
+        flags: {
+          mission: { kind: "string", description: "Mission id to validate." },
+          release: { kind: "string", description: "Release id to validate." },
+          system: {
+            kind: "string",
+            description: "System id — validates all releases for the system.",
+          },
+        },
+        reads: [
+          "missions/{mission}/mission.yaml",
+          "missions/{mission}/evidence/close-report.json",
+          "releases/{release}/release.yaml",
+          "systems/registry.yaml",
+          "systems/{system}/bordbuch/events.ndjson",
+        ],
+        execute: runReleaseStateValidate,
       });
     },
   };

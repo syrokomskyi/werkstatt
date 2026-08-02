@@ -888,3 +888,314 @@ export async function runReleaseRollback(
     await releaseLock(workspaceRoot, `system:${systemId}`);
   }
 }
+
+// §6.8: release.state.validate (RFC-0655)
+export interface ReleaseStateCheck {
+  rule: string;
+  status: "pass" | "warn" | "fail";
+  message: string;
+}
+
+export interface ReleaseStateValidateData {
+  missionId: string | null;
+  releaseId: string | null;
+  systemId: string | null;
+  releaseState: "prepared" | "published" | "alt-deployed" | "promoted" | "rolled-back" | "missing";
+  checks: ReleaseStateCheck[];
+  summary: string;
+}
+
+export async function runReleaseStateValidate(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<ReleaseStateValidateData>> {
+  const { workspaceRoot, logger } = context;
+  const missionIdFlag = flagString(input, "mission");
+  const releaseIdFlag = flagString(input, "release");
+  const systemFlag = flagString(input, "system");
+
+  if (!missionIdFlag && !releaseIdFlag && !systemFlag) {
+    throw new Error(
+      "[release.state.validate] at least one of --mission, --release, or --system is required",
+    );
+  }
+
+  // Resolve the list of (missionId, releaseId, systemId) tuples to validate
+  const targets: Array<{
+    missionId: string | null;
+    releaseId: string | null;
+    systemId: string | null;
+  }> = [];
+
+  if (missionIdFlag) {
+    const manifest = await readMissionManifest(workspaceRoot, missionIdFlag);
+    const rid = (manifest.releaseId as string | null) ?? null;
+    const sid = (manifest.systemId as string | null) ?? null;
+    targets.push({ missionId: missionIdFlag, releaseId: rid, systemId: sid });
+  } else if (releaseIdFlag) {
+    const manifest = await readReleaseManifest(workspaceRoot, releaseIdFlag);
+    const sid = (manifest.systemId as string | null) ?? null;
+    const mid = (manifest.missionId as string | null) ?? null;
+    targets.push({ missionId: mid, releaseId: releaseIdFlag, systemId: sid });
+  } else if (systemFlag) {
+    // Validate all releases for the system
+    const releaseIds = await listReleaseIds(workspaceRoot);
+    for (const rid of releaseIds) {
+      try {
+        const manifest = await readReleaseManifest(workspaceRoot, rid);
+        const sid = manifest.systemId as string;
+        if (sid !== systemFlag) continue;
+        const mid = (manifest.missionId as string | null) ?? null;
+        targets.push({ missionId: mid, releaseId: rid, systemId: sid });
+      } catch {
+        // skip unreadable
+      }
+    }
+  }
+
+  const allChecks: ReleaseStateCheck[] = [];
+  let hasError = false;
+
+  for (const target of targets) {
+    const checks = await validateReleaseState(workspaceRoot, target, logger);
+    allChecks.push(...checks);
+    if (checks.some((c) => c.status === "fail")) {
+      hasError = true;
+    }
+  }
+
+  // Determine overall release state from the first target (for single-target invocations)
+  let overallReleaseState: ReleaseStateValidateData["releaseState"] = "missing";
+  if (targets.length > 0 && targets[0]!.releaseId) {
+    try {
+      const manifest = await readReleaseManifest(workspaceRoot, targets[0]!.releaseId);
+      overallReleaseState = manifest.state as ReleaseStateValidateData["releaseState"];
+    } catch {
+      overallReleaseState = "missing";
+    }
+  }
+
+  const firstTarget = targets[0];
+  const summary = hasError
+    ? `[release.state.validate] ${allChecks.filter((c) => c.status === "fail").length} error(s) found`
+    : `[release.state.validate] all checks passed${allChecks.some((c) => c.status === "warn") ? ` (${allChecks.filter((c) => c.status === "warn").length} warning(s))` : ""}`;
+
+  if (hasError) {
+    logger.warn(`[release.state.validate] ${summary}`);
+  } else {
+    logger.info(`[release.state.validate] ${summary}`);
+  }
+
+  return {
+    data: {
+      missionId: firstTarget?.missionId ?? null,
+      releaseId: firstTarget?.releaseId ?? null,
+      systemId: firstTarget?.systemId ?? null,
+      releaseState: overallReleaseState,
+      checks: allChecks,
+      summary,
+    },
+    summary,
+  };
+}
+
+async function validateReleaseState(
+  workspaceRoot: string,
+  target: { missionId: string | null; releaseId: string | null; systemId: string | null },
+  logger: { warn: (msg: string) => void; info: (msg: string) => void },
+): Promise<ReleaseStateCheck[]> {
+  const checks: ReleaseStateCheck[] = [];
+  const { missionId, releaseId, systemId } = target;
+
+  // Read mission.yaml if missionId is available
+  let missionReleaseId: string | null = null;
+  if (missionId) {
+    try {
+      const manifest = await readMissionManifest(workspaceRoot, missionId);
+      missionReleaseId = (manifest.releaseId as string | null) ?? null;
+    } catch {
+      // mission.yaml not found — skip mission-based checks
+    }
+  }
+
+  // Check 1: mission-yaml-release-id-exists
+  if (missionReleaseId) {
+    const releaseDir = path.join(workspaceRoot, "releases", missionReleaseId);
+    const releaseYaml = path.join(releaseDir, "release.yaml");
+    if (!existsSync(releaseDir) || !existsSync(releaseYaml)) {
+      checks.push({
+        rule: "mission-yaml-release-id-exists",
+        status: "fail",
+        message: `mission.yaml references releaseId '${missionReleaseId}' but release directory or release.yaml does not exist`,
+      });
+    } else {
+      checks.push({
+        rule: "mission-yaml-release-id-exists",
+        status: "pass",
+        message: `release directory for '${missionReleaseId}' exists`,
+      });
+    }
+  } else if (missionId) {
+    checks.push({
+      rule: "mission-yaml-release-id-exists",
+      status: "pass",
+      message: `mission '${missionId}' has no releaseId in mission.yaml — nothing to validate`,
+    });
+  }
+
+  // Check 2: close-report-release-id-consistent
+  if (missionId) {
+    const closeReportPath = path.join(
+      resolveMissionDir(workspaceRoot, missionId),
+      "evidence",
+      "close-report.json",
+    );
+    if (!existsSync(closeReportPath)) {
+      checks.push({
+        rule: "close-report-release-id-consistent",
+        status: "warn",
+        message: `close-report.json not found for mission '${missionId}' (mission may have been closed before RFC-0477) — skipping check`,
+      });
+    } else {
+      try {
+        const raw = await fs.readFile(closeReportPath, "utf8");
+        const report = JSON.parse(raw) as Record<string, unknown>;
+        const closeReportReleaseId = (report.releaseId as string | null) ?? null;
+        if (missionReleaseId && closeReportReleaseId !== missionReleaseId) {
+          checks.push({
+            rule: "close-report-release-id-consistent",
+            status: "fail",
+            message: `close-report.json releaseId '${closeReportReleaseId}' does not match mission.yaml releaseId '${missionReleaseId}'`,
+          });
+        } else {
+          checks.push({
+            rule: "close-report-release-id-consistent",
+            status: "pass",
+            message: `close-report.json releaseId is consistent with mission.yaml`,
+          });
+        }
+      } catch (err) {
+        checks.push({
+          rule: "close-report-release-id-consistent",
+          status: "warn",
+          message: `failed to parse close-report.json: ${err instanceof Error ? err.message : String(err)}`,
+        });
+      }
+    }
+  }
+
+  // Check 3: release-state-progressed
+  const effectiveReleaseId = releaseId ?? missionReleaseId;
+  if (effectiveReleaseId) {
+    try {
+      const manifest = await readReleaseManifest(workspaceRoot, effectiveReleaseId);
+      const state = manifest.state as string;
+      if (state === "prepared") {
+        checks.push({
+          rule: "release-state-progressed",
+          status: "warn",
+          message: `release '${effectiveReleaseId}' is in 'prepared' state (orphaned — not yet published)`,
+        });
+      } else {
+        checks.push({
+          rule: "release-state-progressed",
+          status: "pass",
+          message: `release '${effectiveReleaseId}' state is '${state}'`,
+        });
+      }
+
+      // Check 5: registry-last-release-consistent
+      if (state === "promoted" && systemId) {
+        try {
+          const registry = await readRegistry(workspaceRoot);
+          const entry = findEntry(registry, systemId);
+          const lastRelease = entry?.lastRelease as string | null | undefined;
+          if (!lastRelease) {
+            checks.push({
+              rule: "registry-last-release-consistent",
+              status: "warn",
+              message: `release '${effectiveReleaseId}' is promoted but registry.yaml has no lastRelease for system '${systemId}'`,
+            });
+          } else if (lastRelease !== effectiveReleaseId) {
+            checks.push({
+              rule: "registry-last-release-consistent",
+              status: "warn",
+              message: `registry.yaml lastRelease '${lastRelease}' does not match promoted release '${effectiveReleaseId}'`,
+            });
+          } else {
+            checks.push({
+              rule: "registry-last-release-consistent",
+              status: "pass",
+              message: `registry.yaml lastRelease is consistent`,
+            });
+          }
+        } catch {
+          checks.push({
+            rule: "registry-last-release-consistent",
+            status: "warn",
+            message: `failed to read registry.yaml for system '${systemId}'`,
+          });
+        }
+      }
+    } catch {
+      checks.push({
+        rule: "release-state-progressed",
+        status: "fail",
+        message: `release '${effectiveReleaseId}' not found or unreadable`,
+      });
+    }
+  }
+
+  // Check 4: bordbuch-release-id-consistent
+  if (systemId && missionId) {
+    try {
+      const { readBordbuch } = await import("../bordbuch/bordbuch-io.ts");
+      const entries = await readBordbuch(workspaceRoot, systemId);
+      const missionCloseEntries = entries.filter(
+        (e) => e.kind === "mission-close" && e.missionId === missionId,
+      );
+      if (missionCloseEntries.length === 0) {
+        checks.push({
+          rule: "bordbuch-release-id-consistent",
+          status: "warn",
+          message: `no mission-close bordbuch entry found for mission '${missionId}'`,
+        });
+      } else {
+        const latestClose = missionCloseEntries[missionCloseEntries.length - 1]!;
+        const bordbuchReleaseId = latestClose.releaseId;
+        // The bordbuch releaseId reflects the state at close time.
+        // If release.prepare wrote a new releaseId to mission.yaml after close,
+        // the bordbuch correctly reflects the close-time state — not a mismatch.
+        // We only flag a mismatch if the bordbuch has a releaseId that differs
+        // from what mission.yaml had at close time (which we can't know post-prepare).
+        // So we check: if bordbuch has a non-null releaseId, it should match
+        // mission.yaml's current releaseId (since release.prepare doesn't change
+        // bordbuch). If bordbuch has null and mission.yaml has non-null, that's
+        // expected when release.prepare ran after close.
+        if (bordbuchReleaseId && missionReleaseId && bordbuchReleaseId !== missionReleaseId) {
+          checks.push({
+            rule: "bordbuch-release-id-consistent",
+            status: "fail",
+            message: `bordbuch mission-close releaseId '${bordbuchReleaseId}' does not match mission.yaml releaseId '${missionReleaseId}'`,
+          });
+        } else {
+          checks.push({
+            rule: "bordbuch-release-id-consistent",
+            status: "pass",
+            message: bordbuchReleaseId
+              ? `bordbuch releaseId '${bordbuchReleaseId}' is consistent`
+              : `bordbuch releaseId is null (mission closed before release.prepare — expected)`,
+          });
+        }
+      }
+    } catch {
+      checks.push({
+        rule: "bordbuch-release-id-consistent",
+        status: "warn",
+        message: `failed to read bordbuch for system '${systemId}'`,
+      });
+    }
+  }
+
+  return checks;
+}
