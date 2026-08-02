@@ -1,10 +1,11 @@
 /*
 <MODULE_CONTRACT>
-  <purpose>RFC-0649: tests for leitstand.dev-deploy freshness guarantee — null adapter skip, purge fatal, freshness mismatch, freshness verified.</purpose>
-  <keywords>RFC-0649, leitstand, dev-deploy, freshness, purge, null-adapter, cdn, test</keywords>
+  <purpose>RFC-0649 / RFC-0657: tests for leitstand.dev-deploy freshness guarantee — null adapter skip, purge fatal, freshness mismatch, freshness verified, retry-then-success, all-attempts-fail.</purpose>
+  <keywords>RFC-0649, RFC-0657, leitstand, dev-deploy, freshness, purge, null-adapter, cdn, retry, exponential-backoff, test</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0649: add tests for null adapter skip, cloudflare-workers purge fatal, freshness hash mismatch, freshness verified, --json output freshness field.</item>
+  <item>RFC-0657: update hash mismatch test for 5-attempt retry; add retry-then-success, all-attempts-fail (HTTP 404), all-attempts-fail (hash mismatch), network-error-retried tests; use fake timers for retry delay avoidance.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -177,6 +178,7 @@ afterEach(() => {
   rmSync(tmpDir, { recursive: true, force: true });
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
   delete process.env.CLOUDFLARE_SECRETS_FILE;
   delete process.env.CLOUDFLARE_ZONE_ID;
   delete process.env.CLOUDFLARE_API_TOKEN;
@@ -237,7 +239,7 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
   createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
   createWorkpieceDist(tmpDir, missionId);
 
-  // Mock fetch: purge API returns success, build-identity returns mismatched hash
+  // Mock fetch: purge API returns success, build-identity returns mismatched hash on all attempts
   mockFetch.mockImplementation(async (url: string) => {
     if (url.includes("purge_cache")) {
       return { ok: true, status: 200, json: async () => ({ success: true }) } as Response;
@@ -252,7 +254,12 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
     return { ok: false, status: 404 } as Response;
   });
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  // RFC-0657: Use fake timers to avoid real-time backoff delays (3s+6s+12s+24s = 45s)
+  vi.useFakeTimers();
+  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  // Advance through all backoff delays (total 45s)
+  await vi.advanceTimersByTimeAsync(50_000);
+  const result = await resultPromise;
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -263,6 +270,8 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
   expect(freshness?.verified).toBe(false);
   expect(freshness?.error).toContain("distTreeHash mismatch");
   expect(freshness?.cdnDistTreeHash).toBe("sha256:STALE_HASH");
+  // RFC-0657: verifyFreshness should have been called 5 times (all attempts failed)
+  expect(freshness?.attempts).toBe(5);
 }, 15_000);
 
 test("RFC-0649: cloudflare-workers adapter with freshness verified — normal flow, Axiom runs", async () => {
@@ -340,4 +349,179 @@ test("RFC-0649: --json output includes freshness object with required fields", a
   expect(freshness).toHaveProperty("verified");
   expect(freshness).toHaveProperty("cdnDistTreeHash");
   expect(freshness).toHaveProperty("localDistTreeHash");
+  expect(freshness).toHaveProperty("attempts");
+}, 15_000);
+
+// --- RFC-0657 retry tests ---
+
+test("RFC-0657: retry-then-success — first attempt stale, second attempt fresh", async () => {
+  const systemId = "test-sys";
+  const missionId = "test-sys-m000001";
+
+  const secretsDir = join(tmpDir, "secrets");
+  mkdirSync(secretsDir, { recursive: true });
+  const secretsPath = join(secretsDir, "dev.env");
+  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
+  createWorkpieceDist(tmpDir, missionId);
+
+  // Mock fetch: purge API returns success.
+  // build-identity.json: first call returns stale hash, second call returns fresh hash.
+  let buildIdentityCallCount = 0;
+  mockFetch.mockImplementation(async (url: string) => {
+    if (url.includes("purge_cache")) {
+      return { ok: true, status: 200, json: async () => ({ success: true }) } as Response;
+    }
+    if (url.includes("build-identity.json")) {
+      buildIdentityCallCount++;
+      if (buildIdentityCallCount === 1) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ distTreeHash: "sha256:STALE_HASH" }),
+        } as Response;
+      }
+      // Second call: return the real local hash
+      const fs = await import("node:fs/promises");
+      const localPath = join(
+        tmpDir,
+        "missions",
+        missionId,
+        "workpiece",
+        "dist",
+        "client",
+        ".well-known",
+        "build-identity.json",
+      );
+      try {
+        const localContent = await fs.readFile(localPath, "utf-8");
+        const localJson = JSON.parse(localContent);
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ distTreeHash: localJson.distTreeHash }),
+        } as Response;
+      } catch {
+        return { ok: false, status: 404 } as Response;
+      }
+    }
+    return { ok: false, status: 404 } as Response;
+  });
+
+  vi.useFakeTimers();
+  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  // Advance through the first backoff delay (3s)
+  await vi.advanceTimersByTimeAsync(5_000);
+  const result = await resultPromise;
+
+  const data = result.data as Record<string, unknown> | undefined;
+  const axiom = data?.axiom as Record<string, unknown> | undefined;
+  const freshness = axiom?.freshness as Record<string, unknown> | undefined;
+
+  expect(result.exitCode).toBe(0);
+  expect(axiom?.status).toBe("pass");
+  expect(freshness?.verified).toBe(true);
+  expect(freshness?.attempts).toBe(2);
+}, 15_000);
+
+test("RFC-0657: all-attempts-fail with HTTP 404 — exit 1, Axiom not run", async () => {
+  const systemId = "test-sys";
+  const missionId = "test-sys-m000001";
+
+  const secretsDir = join(tmpDir, "secrets");
+  mkdirSync(secretsDir, { recursive: true });
+  const secretsPath = join(secretsDir, "dev.env");
+  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
+  createWorkpieceDist(tmpDir, missionId);
+
+  // Mock fetch: purge API returns success, build-identity returns 404 on all attempts
+  mockFetch.mockImplementation(async (url: string) => {
+    if (url.includes("purge_cache")) {
+      return { ok: true, status: 200, json: async () => ({ success: true }) } as Response;
+    }
+    return { ok: false, status: 404 } as Response;
+  });
+
+  vi.useFakeTimers();
+  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await vi.advanceTimersByTimeAsync(50_000);
+  const result = await resultPromise;
+
+  const data = result.data as Record<string, unknown> | undefined;
+  const axiom = data?.axiom as Record<string, unknown> | undefined;
+  const freshness = axiom?.freshness as Record<string, unknown> | undefined;
+
+  expect(result.exitCode).toBe(1);
+  expect(axiom?.status).toBe("not-run");
+  expect(freshness?.verified).toBe(false);
+  expect(freshness?.attempts).toBe(5);
+  expect(freshness?.error).toContain("HTTP 404");
+}, 15_000);
+
+test("RFC-0657: network error retried — first attempt throws, second succeeds", async () => {
+  const systemId = "test-sys";
+  const missionId = "test-sys-m000001";
+
+  const secretsDir = join(tmpDir, "secrets");
+  mkdirSync(secretsDir, { recursive: true });
+  const secretsPath = join(secretsDir, "dev.env");
+  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
+  createWorkpieceDist(tmpDir, missionId);
+
+  // Mock fetch: purge API returns success.
+  // build-identity.json: first call throws (network error), second call returns fresh hash.
+  let buildIdentityCallCount = 0;
+  mockFetch.mockImplementation(async (url: string) => {
+    if (url.includes("purge_cache")) {
+      return { ok: true, status: 200, json: async () => ({ success: true }) } as Response;
+    }
+    if (url.includes("build-identity.json")) {
+      buildIdentityCallCount++;
+      if (buildIdentityCallCount === 1) {
+        throw new Error("ECONNREFUSED");
+      }
+      const fs = await import("node:fs/promises");
+      const localPath = join(
+        tmpDir,
+        "missions",
+        missionId,
+        "workpiece",
+        "dist",
+        "client",
+        ".well-known",
+        "build-identity.json",
+      );
+      try {
+        const localContent = await fs.readFile(localPath, "utf-8");
+        const localJson = JSON.parse(localContent);
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ distTreeHash: localJson.distTreeHash }),
+        } as Response;
+      } catch {
+        return { ok: false, status: 404 } as Response;
+      }
+    }
+    return { ok: false, status: 404 } as Response;
+  });
+
+  vi.useFakeTimers();
+  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await vi.advanceTimersByTimeAsync(5_000);
+  const result = await resultPromise;
+
+  const data = result.data as Record<string, unknown> | undefined;
+  const axiom = data?.axiom as Record<string, unknown> | undefined;
+  const freshness = axiom?.freshness as Record<string, unknown> | undefined;
+
+  expect(result.exitCode).toBe(0);
+  expect(axiom?.status).toBe("pass");
+  expect(freshness?.verified).toBe(true);
+  expect(freshness?.attempts).toBe(2);
 }, 15_000);
