@@ -262,18 +262,18 @@ Old releases retain their byte-mode hash in `release.yaml` and are not re-verifi
 
 ## Acceptance criteria
 
-- [ ] `fingerprintTree` supports `mode: "stable"` with normalizers for PDF, source map, and JSON file types
-- [ ] `FingerprintOptions.mode` type is `"byte" | "semantic" | "stable"` (existing modes retained)
-- [ ] `dist.determinism.validate` command registered in `release.module.ts` with `--release` and `--mission` flags
-- [ ] `dist.determinism.validate --mission` reads `workpiece/dist/` if present, falls back to `distribution/dist/`
-- [ ] `dist.determinism.validate` reports non-deterministic files with reasons
-- [ ] `dist.determinism.validate` exits 1 with an error message on empty or missing dist directory
-- [ ] `release.prepare` uses `mode: "stable"` for `fingerprintTree` call
-- [ ] `leitstand.dev-deploy` uses `mode: "stable"` for `fingerprintTree` call
-- [ ] Two builds from the same commit produce identical `distTreeHash` in stable mode
-- [ ] Unit tests cover each normalizer (PDF, source map, JSON) with pass/fail scenarios
-- [ ] `pdf-lib` (or equivalent) added to `packages/fingerprint/package.json` dependencies
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `fingerprintTree` supports `mode: "stable"` with normalizers for PDF, source map, and JSON file types (evidence: `packages/fingerprint/src/fingerprint.ts:36-71`, `packages/fingerprint/src/normalizers/stable.ts`, `packages/fingerprint/src/normalizers/pdf.ts`, `packages/fingerprint/src/normalizers/sourcemap.ts`, `packages/fingerprint/src/normalizers/json-stable.ts`)
+- [x] `FingerprintOptions.mode` type is `"byte" | "semantic" | "stable"` (existing modes retained) (evidence: `packages/fingerprint/src/types.ts:14-18`)
+- [x] `dist.determinism.validate` command registered in `release.module.ts` with `--release` and `--mission` flags (evidence: `packages/os/site-kernel-handoff/src/release/release.module.ts:127-140`)
+- [x] `dist.determinism.validate --mission` reads `workpiece/dist/` if present, falls back to `distribution/dist/` (evidence: `packages/os/site-kernel-handoff/src/release/release-commands.ts:1240-1260`)
+- [x] `dist.determinism.validate` reports non-deterministic files with reasons (evidence: `packages/os/site-kernel-handoff/src/release/release-commands.ts:1281-1296`)
+- [x] `dist.determinism.validate` exits 1 with an error message on empty or missing dist directory (evidence: `packages/os/site-kernel-handoff/src/release/release-commands.ts:1248-1276`)
+- [x] `release.prepare` uses `mode: "stable"` for `fingerprintTree` call (evidence: `packages/os/site-kernel-handoff/src/release/release-commands.ts:412-413`)
+- [x] `leitstand.dev-deploy` uses `mode: "stable"` for `fingerprintTree` call (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:674-675`)
+- [x] Two builds from the same commit produce identical `distTreeHash` in stable mode (evidence: `packages/fingerprint/src/tests/stable-normalizers.test.ts:155-180` — "fingerprintTree stable: two builds with different timestamps produce identical distTreeHash")
+- [x] Unit tests cover each normalizer (PDF, source map, JSON) with pass/fail scenarios (evidence: `packages/fingerprint/src/tests/stable-normalizers.test.ts:39-107`, `packages/os/site-kernel-handoff/src/tests/dist-determinism-validate.test.ts`)
+- [x] `pdf-lib` (or equivalent) added to `packages/fingerprint/package.json` dependencies (evidence: `packages/fingerprint/package.json:28-31`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `forge rfc.validate --id RFC-0656` exit code 0)
 
 ## Implementation notes for agents
 
