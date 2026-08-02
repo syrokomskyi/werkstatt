@@ -13,6 +13,7 @@
   <item>RFC-0560: integrate Ed25519 signed commits via createSignedCommit when PASSPORT_SIGNING_KEY is set.</item>
   <item>RFC-0568: add investigateUntrackedFiles helper and UntrackedFileReport type for cache clone untracked file origin analysis.</item>
   <item>RFC-0594: add pre-commit content validation via runPreCommitValidation based on changed file paths.</item>
+  <item>RFC-0644: add commitWorkpieceIfDirty helper for auto-committing dirty workpiece before mission.reconcile.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -275,6 +276,42 @@ export function countOperatorCommits(
     commitCount: operatorCommits.length,
     commits: operatorCommits,
   };
+}
+
+export interface WorkpieceCommitResult {
+  committed: boolean;
+  commitSha: string | null;
+}
+
+export function commitWorkpieceIfDirty(
+  workpieceDir: string,
+  missionId: string,
+): WorkpieceCommitResult {
+  const dirtyCheck = isWorkpieceDirty(workpieceDir);
+  if (!dirtyCheck.dirty) {
+    return { committed: false, commitSha: null };
+  }
+
+  execSync("git add -A", {
+    cwd: workpieceDir,
+    stdio: ["pipe", "pipe", "pipe"],
+    encoding: "utf-8",
+  });
+
+  const commitMessage = `workpiece: auto-commit before reconcile ${missionId}`;
+  execSync(`git commit --no-verify -m ${JSON.stringify(commitMessage)}`, {
+    cwd: workpieceDir,
+    stdio: ["pipe", "pipe", "pipe"],
+    encoding: "utf-8",
+  });
+
+  const commitSha = execSync("git rev-parse HEAD", {
+    cwd: workpieceDir,
+    stdio: ["pipe", "pipe", "pipe"],
+    encoding: "utf-8",
+  }).trim();
+
+  return { committed: true, commitSha };
 }
 
 export function isWorkpieceDirty(workpieceDir: string): WorkpieceDirtyResult {

@@ -22,6 +22,7 @@
   <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml) after writeMissionManifest in mission.reconcile.</item>
   <item>ADR-0008: run full three-phase build pipeline (build.prepare → astro build → build.post) in mission.build and mission.validate; write build-input-hash.json in mission.build; delegate to shared runPipelinePhase and computeBuildInputHash helpers.</item>
   <item>RFC-0635: reuse distribution in mission.validate when build-input-hash matches — skip build cycle, copy dist/ from distribution, add distributionReused/buildInputHash/fullBuildRan to MissionValidateData; add build.check phase to mission.build.</item>
+  <item>RFC-0644: replace isWorkpieceDirty blocking guard with commitWorkpieceIfDirty auto-commit call before git fetch; add workpieceAutoCommitted/workpieceCommitSha to MissionReconcileData; update mission.validate dirty warnings.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -41,7 +42,11 @@ import { executeKernelCommand, executeKernelPipeline } from "@warpgogol/site-ker
 import { collectFiles } from "@warpgogol/share/fs";
 import { runPipelinePhase, computeBuildInputHash } from "../build-pipeline-helpers.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
-import { isWorkpieceDirty, investigateUntrackedFiles } from "./mission-git-commit.ts";
+import {
+  isWorkpieceDirty,
+  investigateUntrackedFiles,
+  commitWorkpieceIfDirty,
+} from "./mission-git-commit.ts";
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
@@ -274,7 +279,7 @@ export async function runMissionValidate(
         const dirtyCheck = isWorkpieceDirty(workpieceDir);
         if (dirtyCheck.dirty) {
           logger.warn(
-            `[mission.validate] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`git status\` to review, then \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` to commit.`,
+            `[mission.validate] workpiece has ${dirtyCheck.fileCount} uncommitted file(s) — reconcile will auto-commit these before merge. Run \`git status\` to review.`,
           );
         }
 
@@ -548,7 +553,7 @@ export async function runMissionValidate(
   const dirtyCheck = isWorkpieceDirty(workpieceDir);
   if (dirtyCheck.dirty) {
     logger.warn(
-      `[mission.validate] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`git status\` to review, then \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` to commit.`,
+      `[mission.validate] workpiece has ${dirtyCheck.fileCount} uncommitted file(s) — reconcile will auto-commit these before merge. Run \`git status\` to review.`,
     );
   }
 
@@ -803,6 +808,8 @@ export interface MissionReconcileData {
   preReconcileSha: string | null;
   reconciledAt: string;
   autoResolvedPaths?: string[];
+  workpieceAutoCommitted: boolean;
+  workpieceCommitSha: string | null;
 }
 
 // RFC-0584: shared merge-abort helper — attempts git merge --abort, silently catches failure
@@ -890,10 +897,10 @@ export async function runMissionReconcile(
       );
     }
 
-    const dirtyCheck = isWorkpieceDirty(workpieceDir);
-    if (dirtyCheck.dirty) {
-      throw new Error(
-        `[mission.reconcile] workpiece has ${dirtyCheck.fileCount} uncommitted file(s). Run \`pnpm exec site-kernel run mission.git.commit --mission ${missionId} --message "<msg>"\` first, then re-run reconcile.`,
+    const workpieceCommit = commitWorkpieceIfDirty(workpieceDir, missionId);
+    if (workpieceCommit.committed) {
+      logger.info(
+        `  Auto-committed dirty workpiece (${workpieceCommit.commitSha?.slice(0, 8)}) before reconcile`,
       );
     }
 
@@ -1174,8 +1181,10 @@ export async function runMissionReconcile(
         preReconcileSha,
         reconciledAt: now,
         ...(autoResolvedPaths.length > 0 ? { autoResolvedPaths } : {}),
+        workpieceAutoCommitted: workpieceCommit.committed,
+        workpieceCommitSha: workpieceCommit.commitSha,
       },
-      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix})`,
+      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix}${workpieceCommit.committed ? `, workpiece auto-committed ${workpieceCommit.commitSha?.slice(0, 8)}` : ""})`,
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);
