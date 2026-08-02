@@ -1,7 +1,7 @@
 ---
 id: RFC-0651
 title: "Evidence sync and fetch commands with S3-compatible R2 client"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
 enhancedAt: 2026-08-02
-implementedAt:
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:
