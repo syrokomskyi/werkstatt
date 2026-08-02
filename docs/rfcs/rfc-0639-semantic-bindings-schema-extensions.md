@@ -1,7 +1,7 @@
 ---
 id: RFC-0639
 title: "Semantic Bindings Schema Extensions"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: contract
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-01
 updatedAt: 2026-08-02
 enhancedAt: 2026-08-02
-implementedAt:
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:
