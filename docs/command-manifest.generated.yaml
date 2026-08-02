@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 73c4386aec417c510254fc76fabd9939b535014edf321ad80bcf779ed2b4e259
+  contentHash: 5a030dcd58ff79b93e98f2c2f184332854593436c3812fa5de1011a81e2759df
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -12157,9 +12157,10 @@ commands:
       createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument,
       findingsForObservation, and evaluateClosure from native axiom packages.
       Writes native capsule files: staged-capsule.json, observation-bundle.json,
-      study-run.json, evidence-metadata.json. External-preview only. Exit codes:
-      0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium
-      not installed."
+      study-run.json, evidence-metadata.json. External-preview only. RFC-0650:
+      writes runTimestamp to evidence-metadata.json. Exit codes: 0=pass,
+      1=violations or closure blocked, 2=no pages discovered or chromium not
+      installed."
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -12181,6 +12182,11 @@ commands:
       commit-sha:
         kind: string
         description: Optional commit SHA embedded in evidence-metadata.json.
+      run-timestamp:
+        kind: string
+        description: "RFC-0650: Explicit run timestamp in YYYY-MM-DDTHH-MM-SS-mmmZ
+          format (ISO 8601 UTC with colons replaced by hyphens). Defaults to
+          current time if not provided. Embedded in evidence-metadata.json."
       max-duration:
         kind: string
         description: Override discovery deadline in ms (default 120000).
@@ -12209,9 +12215,10 @@ commands:
       createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument,
       findingsForObservation, and evaluateClosure from native axiom packages.
       Writes native capsule files: staged-capsule.json, observation-bundle.json,
-      study-run.json, evidence-metadata.json. External-preview only. Exit codes:
-      0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium
-      not installed."
+      study-run.json, evidence-metadata.json. External-preview only. RFC-0650:
+      writes runTimestamp to evidence-metadata.json. Exit codes: 0=pass,
+      1=violations or closure blocked, 2=no pages discovered or chromium not
+      installed."
     scope: workspace
     provider: workspace
     module: check
