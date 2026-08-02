@@ -30,19 +30,13 @@ vi.mock("../sternsystem/registry-io.ts", () => ({
   resolveCachePath: vi.fn(async () => mockCachePath.value),
 }));
 
-// Mock gitExec to capture git commands
+// Mock gitExecWithRetry to capture git commands
 const gitCalls = vi.hoisted(() => ({
   calls: [] as string[],
   statusOutput: "",
 }));
 
 vi.mock("../werkstatt/git-exec.ts", () => ({
-  gitExec: vi.fn((_cwd: string, args: string) => {
-    gitCalls.calls.push(args);
-    if (args === "status --porcelain") return gitCalls.statusOutput;
-    if (args === "rev-parse HEAD") return "abc123def456";
-    return "";
-  }),
   gitExecWithRetry: vi.fn(
     async (
       _cwd: string,
