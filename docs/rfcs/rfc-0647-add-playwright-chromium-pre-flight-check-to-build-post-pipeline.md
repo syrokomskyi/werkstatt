@@ -3,7 +3,7 @@ id: RFC-0647
 title: "Add Playwright Chromium pre-flight check to build.post pipeline"
 status: draft
 # kind options: architecture | contract | command | policy | deprecation
-kind: architecture
+kind: command
 # scope options: app | workspace
 scope: workspace
 owners:
@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -26,9 +27,8 @@ related:
   - RFC-0646
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
-# Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies:
-  - DNA-51
+# Not required for command/policy kind RFCs.
+satisfies: []
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -42,11 +42,9 @@ commands:
     - playwright.chromium.ensure
   added:
     - playwright.chromium.ensure
-  changed:
-    - print.pdf.generate
+  changed: []
   removed: []
-appsImpacted:
-  - warpgogol-com
+appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-checks"
@@ -101,9 +99,9 @@ The kernel gains a `playwright.chromium.ensure` command that checks for Playwrig
 
 ## Architectural fit
 
-- **DNA-51 (Werkstatt consistency primitives)** — Extends pipeline resilience by ensuring Playwright dependencies are present before Playwright-dependent pipeline steps run, closing the gap between `mission.check`/`mission.materialize` pre-flight checks and `build.post`.
+- **No DNA invariant extended** — This RFC is an operational resilience fix, not a state-mutation primitive. DNA-51 (Werkstatt consistency primitives) covers lock/idempotency/atomic staging for registry/mission/release/bordbuch state mutations; Chromium dependency management is outside that scope.
 - **RFC-0630 (mission.check pre-flight)** — The `runPreflightCheck` pattern in `mission-check.ts` is the model for the new `playwright.chromium.ensure` command. The new command generalizes it for pipeline use.
-- **RFC-0646 (bordbuch.commit retry)** — Companion RFC addressing a different pipeline resilience gap. Both RFCs improve mission workflow reliability under DNA-51.
+- **RFC-0646 (bordbuch.commit retry)** — Companion RFC addressing a different pipeline resilience gap. Both RFCs improve mission workflow reliability.
 - **Site OS operator model** — `playwright.chromium.ensure` is an internal pipeline step, not intended for direct operator use. It is registered as a kernel command for composability and visibility in `command.manifest.generate`.
 
 ## Design
@@ -113,10 +111,10 @@ The kernel gains a `playwright.chromium.ensure` command that checks for Playwrig
 The new command is an internal pipeline step, but can be invoked directly:
 
 ```sh
-pnpm exec site-kernel run playwright.chromium.ensure --site warpgogol-com
+pnpm exec site-kernel run playwright.chromium.ensure
 ```
 
-Flags: `--system` (optional, defaults to `context.site.name`). Scope: `workspace`. No `--json` output beyond the standard kernel result envelope.
+No site-specific flags. Scope: `workspace`. The command operates on the global Playwright cache (`~/.cache/ms-playwright/`), not on any specific site. No `--json` output beyond the standard kernel result envelope.
 
 ### TypeScript contracts
 
@@ -135,7 +133,7 @@ export async function runPlaywrightChromiumEnsure(
 ): Promise<KernelCommandResult<PlaywrightChromiumEnsureResult>>;
 ```
 
-The `ensurePlaywrightChromium` function from `mission-materialize.ts` is extracted into this module and reused. `mission.materialize` calls `runPlaywrightChromiumEnsure` instead of the inline function.
+The `ensurePlaywrightChromium` function from `mission-materialize.ts` is extracted into this module and reused. `mission.materialize` calls `runPlaywrightChromiumEnsure` wrapped in a try/catch to preserve its existing non-fatal behavior (logs the error and continues). `build.post` calls it as a pipeline step — failure is fatal (exit 1).
 
 ### File system responsibilities
 
@@ -143,7 +141,7 @@ The `ensurePlaywrightChromium` function from `mission-materialize.ts` is extract
 | --- | --- |
 | `packages/os/site-kernel-checks/src/playwright-chromium-ensure.ts` | New command handler |
 | `packages/os/site-kernel-checks/src/pipelines/build-post.ts` | `playwright.chromium.ensure` step added before `print.pdf.generate` |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | `ensurePlaywrightChromium` replaced with call to `runPlaywrightChromiumEnsure` |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | `ensurePlaywrightChromium` replaced with call to `runPlaywrightChromiumEnsure` (wrapped in try/catch to preserve non-fatal behavior) |
 | `packages/os/site-kernel-checks/src/mission-check.ts` | `runPreflightCheck` may delegate to shared logic (optional refactor) |
 
 ### Output format
@@ -172,6 +170,10 @@ When Chromium is already present: `{ "installed": false, "chromiumRevision": "..
 | Launch fails after install | Step fails with exit code 1 and message: `Chromium launch failed after install: <error>` |
 | `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var set | Step skips auto-install and fails if Chromium is missing (respects CI environment opt-out). |
 
+**Note on behavioral upgrade:** The existing `ensurePlaywrightChromium` in `mission-materialize.ts` checks only for the presence of a `chromium*` directory in `~/.cache/ms-playwright/` — it does not launch the browser. The new command upgrades this to a launch verification (matching the `mission.check` pre-flight pattern), catching corrupt or partial installations that pass the directory check but fail on launch.
+
+**Note on non-fatal vs fatal semantics:** When called from `mission.materialize`, the command is wrapped in a try/catch that logs the error and continues (preserving existing non-fatal behavior). When called from the `build.post` pipeline step, failure is fatal (exit 1) — the pipeline stops because downstream steps (`print.pdf.generate`, `qa.independent.run`) require Chromium.
+
 ## Rollout
 
 - **Default behavior**: `build.post` pipeline includes `playwright.chromium.ensure` as the first step, before any Playwright-dependent step. No opt-in flag.
@@ -179,6 +181,7 @@ When Chromium is already present: `{ "installed": false, "chromiumRevision": "..
 - **New apps**: Automatically benefit from the pre-flight check.
 - **CI environments**: The ensure command respects `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` — if set, it skips auto-install and fails only if Chromium is actually missing (not just because the env var is set).
 - **Pipeline integration**: `playwright.chromium.ensure` is added as step 0 in `SITES_BUILD_POST_PIPELINE` before `passport.emit`. It runs unconditionally — even if `print.pdf.generate` is disabled for a site, the ensure step is cheap (skip when Chromium is present).
+- **appsImpacted**: Left empty because the `build.post` pipeline runs for all sites. The ensure step is transparent — sites without Playwright-dependent features pay only the skip cost.
 - **Unit tests**: Add tests for `runPlaywrightChromiumEnsure` (skip when present, install when missing, fail on install error, respect env var).
 
 ## Alternatives considered
@@ -193,6 +196,7 @@ When Chromium is already present: `{ "installed": false, "chromiumRevision": "..
 - **Pipeline latency**: First run with missing Chromium adds ~30-60s for download. Subsequent runs skip (Chromium already present). Acceptable because the alternative is a hard pipeline failure.
 - **CI environment conflict**: Some CI setups pre-install Chromium via their own mechanism. The `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var respects this — the ensure command skips auto-install and only verifies launch.
 - **Agent misinterpretation**: Agents might add `playwright.chromium.ensure` to other pipelines. The RFC scopes it to `build.post` only; other pipelines (e.g. `build.prepare`) do not need it.
+- **Concurrent builds**: Two simultaneous `build.post` runs may both trigger `pnpm exec playwright install chromium`. `playwright install` is idempotent — concurrent installs do not corrupt the cache. Minor wasted I/O in the rare concurrent case; not worth a lock file.
 
 ## Acceptance criteria
 
