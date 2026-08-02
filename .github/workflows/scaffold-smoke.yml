@@ -10,6 +10,7 @@ on:
     paths:
       - "packages/os/site-kernel-onboarding/**"
       - "packages/os/site-kernel-checks/**"
+      - "packages/forge/**"
       - "apps/nicaragua-projekt/**"
   workflow_dispatch:
 

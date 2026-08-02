@@ -37,6 +37,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Workflow lint (actionlint)
+        run: |
+          curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest /usr/local/bin
+          actionlint -color
+
       - name: Local CI contract
         run: pnpm exec site-kernel run ci.local.validate --json
 
