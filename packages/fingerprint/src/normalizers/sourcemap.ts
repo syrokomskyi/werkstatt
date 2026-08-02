@@ -14,6 +14,8 @@ import path from "node:path";
 
 import { stableJsonHash } from "../primitives.ts";
 
+const NON_DETERMINISTIC_KEYS = new Set(["createdAt", "buildTimestamp", "generatedAt"]);
+
 interface SourceMap {
   version: number;
   sources?: string[];
@@ -23,6 +25,18 @@ interface SourceMap {
   mappings?: string;
   file?: string;
   [key: string]: unknown;
+}
+
+function stripTimestamps(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stripTimestamps);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([key]) => !NON_DETERMINISTIC_KEYS.has(key))
+        .map(([key, nested]) => [key, stripTimestamps(nested)]),
+    );
+  }
+  return value;
 }
 
 export function normalizeSourceMap(content: string, distRoot?: string): string {
@@ -40,7 +54,7 @@ export function normalizeSourceMap(content: string, distRoot?: string): string {
     });
   }
 
-  return stableJsonHash(map);
+  return stableJsonHash(stripTimestamps(map));
 }
 
 function normalizePathSep(p: string): string {
