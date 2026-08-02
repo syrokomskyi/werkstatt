@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -166,8 +167,10 @@ The fallback change in `sternsystem.status` and `mission.close`:
 | `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-status.ts` | Change fallback `"master"` → `"main"` (line ~124) |
 | `packages/os/site-kernel-handoff/src/mission/mission-close.ts` | Change fallback `"master"` → `"main"` (line ~301) |
 | `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` | Update comments referencing `origin/master` (lines ~341, ~367) |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` (line ~1002) | Change non-git cache clone fallback `git init` → `git init -b main` |
 | `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-sync-integration.test.ts` | Update test: `git init --bare -b main`, push to `origin main` |
 | `packages/os/site-kernel-handoff/src/tests/helpers/materialize-fixture.ts` | Update `gitInit` helper: `git init -b main` |
+| All test files with local `gitInit` helpers | Update to `git init -b main` — see list below |
 | `packages/os/site-kernel-handoff/AGENTS.md` | Document the `main` branch convention |
 
 ### Output format
@@ -211,7 +214,19 @@ The `sternsystem.validate --json` output gains violations with `rule: "branch-co
   The external GitHub mirror (`git@github.com:syrokomskyi/warpgogol-com.git`) must also be renamed via the GitHub UI or `git push origin main && git push origin --delete master`.
 - **New systems:** `sternsystem.register` creates the cache clone directory but does not `git init` — the bare repo is created manually by the operator. The AGENTS.md rule will instruct operators to use `git init --bare -b main` when creating bare repos. `mission.materialize` clones from the bare repo, so the cache clone inherits `main` automatically.
 - **Pipeline integration:** `sternsystem.validate` is not currently in any build pipeline. It is run manually by the operator. No pipeline changes needed.
-- **Test fixtures:** All test helpers that call `git init` must be updated to `git init -b main` to avoid creating `master`-branch repos in tests.
+- **Test fixtures:** All test helpers that call `git init` must be updated to `git init -b main` to avoid creating `master`-branch repos in tests. The following test files have local `gitInit` helpers that need updating:
+  - `tests/helpers/materialize-fixture.ts`
+  - `tests/mission-validate-snapshot-auto-regen.test.ts`
+  - `tests/mission-materialize-baseline.test.ts`
+  - `tests/mission-validate-distribution-reuse.test.ts`
+  - `tests/rfc-0614-public-well-known-bordbuch-conflict.test.ts`
+  - `tests/werkstatt-commit.test.ts`
+  - `tests/mission-build-check-phase.test.ts`
+  - `tests/mission-validate-cache-clone-warning.test.ts`
+  - `tests/mission-dirty-guard.test.ts`
+  - `tests/mission-close-state-file.test.ts`
+  - `tests/mission-open-clean-tree.test.ts`
+- **Command manifest:** After implementation, run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml` with the changed commands (RFC-CMD-02).
 
 ## Alternatives considered
 
@@ -234,9 +249,11 @@ The `sternsystem.validate --json` output gains violations with `rule: "branch-co
 - [ ] `sternsystem.status` fallback branch changed from `"master"` to `"main"` (evidence: `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-status.ts:124`)
 - [ ] `mission.close` fallback branch changed from `"master"` to `"main"` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:301`)
 - [ ] `mission-materialize.ts` comments updated from `origin/master` to `origin/main` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:341,367`)
-- [ ] Test helpers updated: `gitInit` uses `git init -b main`; `sternsystem-sync-integration.test.ts` uses `git init --bare -b main` and pushes to `origin main`
+- [ ] Test helpers updated: `gitInit` uses `git init -b main`; `sternsystem-sync-integration.test.ts` uses `git init --bare -b main` and pushes to `origin main`; all 11 local `gitInit` helpers across the test suite updated
+- [ ] `mission-materialize.ts:1002` non-git cache clone fallback changed to `git init -b main` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:1002`)
 - [ ] `sternsystem.validate --id warpgogol-com --json` reports 0 `branch-convention` violations after migration
 - [ ] `AGENTS.md` documents the `main` branch convention for Sternsystem repos
+- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
