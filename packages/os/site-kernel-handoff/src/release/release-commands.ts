@@ -17,6 +17,7 @@
   <item>RFC-0608: write build-identity.json into dist/client/.well-known/ after hash computation.</item>
   <item>RFC-0655: sync close-report.json releaseId after writing mission.yaml; add release.state.validate command.</item>
   <item>RFC-0656: add dist.determinism.validate command; switch release.prepare distTreeHash to mode: "stable".</item>
+  <item>Fix: correct resolveStagingDir call to use workspaceRoot instead of releasesBase; write release.yaml directly into stagingDir and remove redundant re-write after atomicMoveDir.</item>
 </CHANGE_SUMMARY>
 */
 
