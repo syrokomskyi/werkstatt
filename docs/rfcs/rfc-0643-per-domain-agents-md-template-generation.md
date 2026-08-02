@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-01
-updatedAt: 2026-08-01
+updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -80,7 +81,7 @@ nonGoals:
 
 ## Context
 
-`forge.agents.generate` (RFC-0611) generates `AGENTS.md` files for the project root and nested workspace directories. It uses hardcoded templates with software-domain language: "app", "service", "package", "operator", "build", "typecheck". The templates are defined in `packages/forge/os/core/handlers/agents-generate.ts`.
+`forge.agents.generate` (RFC-0611) generates `AGENTS.md` files for the project root and nested workspace directories. It uses hardcoded templates with software-domain language: "app", "service", "package", "operator", "build", "typecheck". The root AGENTS.md content is built inline in `packages/forge/src/onboarding/agents-generate.ts` (`runAgentsGenerate`). Nested templates are built in `packages/forge/src/onboarding/nested-agents-templates.ts` (`buildNestedAgentsMd`). The command is registered in `packages/forge/os/core/core.module.ts` via dynamic import from `src/onboarding/`.
 
 RFC-0638 extends profiles with `terminology` and `workspaceTypes`. RFC-0640 extends `forge.agents.generate` to use `workspaceTypes` for detection. This RFC extends the template generation to use profile terminology in the generated AGENTS.md content.
 
@@ -121,10 +122,9 @@ The command has no mechanism to:
 ```sh
 # Generate AGENTS.md with domain-aware terminology
 forge agents.generate
-
-# Force regeneration of all AGENTS.md files
-forge agents.generate --force
 ```
+
+No new flags are introduced. The existing `--json` and `--dry-run` flags continue to work as before.
 
 ### TypeScript contracts
 
@@ -138,26 +138,29 @@ interface TemplateContext {
 }
 
 function substituteTemplate(
-  template: string,
-  context: TemplateContext,
+  content: string,
+  terminology: Record<string, string>,
 ): string {
-  return template.replace(
-    /\{\{terminature\.(\w+)\}\}/g,
-    (_, key) => context.terminology[key] ?? key,
+  return content.replace(
+    /\{\{terminology\.(\w+)\}\}/g,
+    (_, key) => terminology[key] ?? key,
   );
 }
 
-// Root AGENTS.md template selection
+// Root AGENTS.md: static prose template selected by register.
+// Dynamic sections (skills table, capabilities, behavioral layer) are
+// injected at runtime — they are NOT part of the template file.
 function selectRootTemplate(
   register: "business" | "creative",
 ): string {
   if (register === "creative") {
     return CREATIVE_ROOT_TEMPLATE;
   }
-  return BUSINESS_ROOT_TEMPLATE;  // existing template
+  return BUSINESS_ROOT_TEMPLATE;  // existing inline content extracted to file
 }
 
-// Nested AGENTS.md template selection
+// Nested AGENTS.md template selection.
+// agentsMdTemplate path is relative to the profile YAML directory.
 function selectNestedTemplate(
   workspaceType: ProfileWorkspaceType | undefined,
   fallback: string,
@@ -173,36 +176,44 @@ function selectNestedTemplate(
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/os/core/handlers/agents-generate.ts` | Extended: terminology substitution, template selection |
-| `packages/forge/os/core/templates/root-agents-creative.md` | New: creative register root template |
-| `packages/forge/os/core/templates/root-agents-business.md` | Existing business template extracted to file |
-| `packages/forge/src/tests/agents-generate-domain.test.ts` | New test: terminology substitution, register selection |
+| `packages/forge/src/onboarding/agents-generate.ts` | Extended: terminology substitution on final content, template selection |
+| `packages/forge/src/onboarding/nested-agents-templates.ts` | Extended: profile-driven nested template selection |
+| `packages/forge/src/onboarding/templates/root-agents-creative.md` | New: creative register root template (static prose only) |
+| `packages/forge/src/onboarding/templates/root-agents-business.md` | New: business register root template (static prose extracted from inline) |
+| `packages/forge/src/tests/agents-generate-domain.test.ts` | New test: terminology substitution, register selection, fallback, path traversal rejection |
+
+Note: RFC-0640 also modifies `forge.agents.generate` for workspace detection. The two RFCs compose: RFC-0640 changes _which_ workspaces are detected; RFC-0643 changes _what content_ is generated for them. Implement RFC-0640 first (detection), then RFC-0643 (templates).
 
 ### Output format
 
 ```json
 {
   "command": "forge.agents.generate",
-  "status": "ok",
-  "generated": [
+  "status": "pass",
+  "generated": ["AGENTS.md", "compositions/my-video/AGENTS.md"],
+  "details": [
     { "path": "AGENTS.md", "domain": "video", "register": "creative" },
     { "path": "compositions/my-video/AGENTS.md", "workspaceType": "composition" }
   ]
 }
 ```
 
+The `generated` field remains `string[]` for backward compatibility with existing consumers (`forge.doctor`, `forge.upgrade`). A new `details` field carries per-file domain metadata.
+
 ### Failure modes
 
 - **Template file not found**: If a workspace type's `agentsMdTemplate` points to a non-existent file, `forge.agents.generate` reports a warning and falls back to the hardcoded template.
 - **Unknown terminology placeholder**: If a template contains `{{terminology.unknown}}` and the key is not in the resolved terminology, the placeholder is replaced with the key name itself (e.g. `unknown`). No error.
 - **No profile loaded**: If no profile is loaded (e.g. forge.yaml has no matching profile), the command falls back to the existing business-register hardcoded templates.
+- **Template path resolution**: `agentsMdTemplate` paths are resolved relative to the profile YAML directory. Absolute paths and parent-directory traversal (`..`) are rejected with a warning.
 
 ## Rollout
 
 - **Backward compatibility**: When no profile is loaded or the profile has no domain fields, the command produces identical output to the current implementation. No regression for existing projects.
 - **New profiles**: New profiles (e.g. `editframe-html` in RFC-0641) provide terminology and workspace-type templates. `forge.agents.generate` uses them automatically.
 - **Existing profiles upgrade**: Existing profiles MAY add `terminology` maps. Once added, `forge.agents.generate` uses the terminology in generated AGENTS.md files.
-- **Template extraction**: The existing hardcoded business template is extracted to a template file (`root-agents-business.md`). This is a refactoring — the generated output is identical.
+- **Template extraction**: The existing inline business root content is extracted to a template file (`root-agents-business.md`). This is a refactoring — the generated output is identical. The template file contains only static prose (header, project section, paths section, conventions). Dynamic sections (skills table, capabilities, behavioral layer) remain inline in `runAgentsGenerate` and are appended at runtime.
+- **Terminology substitution scope**: `substituteTemplate` runs on the final assembled content (after dynamic sections are appended). This means the behavioral layer's fixed policy text also receives terminology substitution — "build" becomes "render" in a video project, "app" becomes "composition". This ensures domain-appropriate language throughout the entire AGENTS.md.
 
 ## Alternatives considered
 
@@ -218,14 +229,16 @@ function selectNestedTemplate(
 
 ## Acceptance criteria
 
-- [ ] `forge.agents.generate` uses `resolveTerminology()` for placeholder substitution in templates
-- [ ] Root AGENTS.md template uses `{{terminology.key}}` placeholders
+- [ ] `forge.agents.generate` uses `resolveTerminology()` for placeholder substitution on final assembled content
+- [ ] Root AGENTS.md static prose extracted to template files with `{{terminology.key}}` placeholders
 - [ ] Creative register root template (`root-agents-creative.md`) created
 - [ ] Business register root template extracted to file (`root-agents-business.md`)
+- [ ] Dynamic sections (skills table, capabilities, behavioral layer) remain inline, appended at runtime
 - [ ] Nested AGENTS.md templates use `workspaceTypes[].agentsMdTemplate` when present
 - [ ] Fallback to existing hardcoded templates when profile has no domain fields
-- [ ] `--json` output includes `domain`, `register`, and `workspaceType` per generated file
-- [ ] Unit tests: terminology substitution, register selection, nested template, fallback
+- [ ] `--json` output adds `details` field with `domain`, `register`, and `workspaceType` per file; `generated` remains `string[]`
+- [ ] Template path resolution: `agentsMdTemplate` relative to profile directory, no traversal
+- [ ] Unit tests: terminology substitution, register selection, nested template, fallback, path traversal rejection
 - [ ] Existing software-domain projects generate identical AGENTS.md (no regression)
 - [ ] `packages/forge/AGENTS.md` updated
 - [ ] `rfc.validate` passes on this file before merging
