@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-01
-updatedAt: 2026-08-01
+updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -43,23 +44,26 @@ versionBump: patch
 commands:
   proposed: []
   added: []
-  changed: []
+  changed:
+    - forge.skill.validate
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - packages/forge
 successSignals:
-  - All 33 fo-* skill files audited for domain-specific language
-  - Skills that reference software-specific terms (typecheck, build, test, package) use semantic binding keys or terminology resolution instead
-  - `forge.skill.validate` enforces SKILL-18: skill bodies must not contain hardcoded domain-specific terms in instruction lines
+  - All 26 fo-* skill files audited for domain-specific language
+  - Skills that reference software-specific binding keys (typecheck, scopedBuild, test) in instruction lines use semantic binding keys (validate, produce, verify) instead
+  - `forge.skill.validate` enforces SKILL-18: skill instruction lines must not reference software-specific binding keys
   - Skills work correctly in both software and video domain projects
+  - Prose terminology migration uses `ref(bindings.terminology.artifact)` where applicable (blocked on RFC-0639 `resolveTerminology()` implementation)
 nonGoals:
   - Do not define the profile schema in this RFC — that is RFC-0638
   - Do not define the bindings schema in this RFC — that is RFC-0639
   - Do not change forge.create or forge.doctor behavior in this RFC — that is RFC-0640
   - Do not add Editframe-specific profiles in this RFC — that is RFC-0641
   - Do not create new skills — this RFC audits and migrates existing skill language only
+  - Do not implement `resolveTerminology()` — that is RFC-0639. This RFC consumes it.
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -103,24 +107,24 @@ A skill that says `Run ref(bindings.commands.typecheck) to verify types` works i
 
 Two changes are made:
 
-1. **SKILL-18 validation rule**: `forge.skill.validate` enforces a new rule SKILL-18: canonical skill bodies (`packages/forge/skills/**/*.md`) must not reference software-specific binding keys (`typecheck`, `scopedBuild`, `test`) in instruction lines. Skills must reference semantic keys (`validate`, `produce`, `verify`) instead. Software-specific keys remain valid in forge.yaml and in code blocks / `run:` directives — the restriction is on instruction prose only, same scope as SKILL-11.
+1. **SKILL-18 validation rule**: `forge.skill.validate` enforces a new rule SKILL-18: canonical forge skill bodies (`packages/forge/skills/fo/**/*.md`) must not reference software-specific binding keys (`bindings.commands.typecheck`, `bindings.commands.scopedBuild`, `bindings.commands.test`) in instruction lines (code blocks and `run:` directives — same scope as SKILL-11). Skills must reference semantic keys (`bindings.commands.validate`, `bindings.commands.produce`, `bindings.commands.verify`) instead. The check uses `extractInstructionLines` (same as SKILL-11): it scans lines inside fenced code blocks and `run:` directive lines. Software-specific keys remain valid in `forge.yaml` itself and in narrative prose outside code blocks.
 
-2. **Skill language migration**: All 33 fo-* skills are audited and migrated:
-   - `ref(bindings.commands.typecheck)` → `ref(bindings.commands.validate)`
-   - `ref(bindings.commands.scopedBuild)` → `ref(bindings.commands.produce)`
-   - `ref(bindings.commands.test)` → `ref(bindings.commands.verify)`
-   - Hardcoded "app", "service", "package" in instruction prose → `ref(bindings.terminology.artifact)` or domain-neutral phrasing
-   - Skills that are inherently software-specific (e.g. `fo-add-tests`) are exempted with `<!-- skill-lint-disable SKILL-18 -->` and documented as software-domain skills.
+2. **Skill language migration**: All 26 fo-* skills are audited and migrated:
+   - `ref(bindings.commands.typecheck)` → `ref(bindings.commands.validate)` in instruction lines (code blocks and `run:` directives)
+   - `ref(bindings.commands.scopedBuild)` → `ref(bindings.commands.produce)` in instruction lines
+   - `ref(bindings.commands.test)` → `ref(bindings.commands.verify)` in instruction lines
+   - Hardcoded "app", "service", "package" in narrative prose → `ref(bindings.terminology.artifact)` or domain-neutral phrasing (blocked on RFC-0639 `resolveTerminology()` implementation)
+   - Skills that are inherently software-specific (e.g. `fo-add-tests`) use the `<!-- skill-lint-disable SKILL-18 -->` escape hatch with a documentation comment explaining why the skill is software-domain-specific.
 
-The `<!-- skill-lint-disable SKILL-18 -->` escape hatch is available, same as SKILL-11 and SKILL-17.
+The `<!-- skill-lint-disable SKILL-18 -->` escape hatch is available, same as SKILL-11 and SKILL-17. No hardcoded exempt set is maintained — the escape hatch is the sole exemption mechanism, keeping the validator decoupled from specific skill names.
 
 ## Architectural fit
 
 - **DNA-54 (Forge bindings contract)**: SKILL-18 extends the de-hardcoding principle from project-specific values (SKILL-11) and platform-specific values (SKILL-17) to domain-specific values. The three rules form a complete de-hardcoding lattice: SKILL-11 (no hardcoded commands), SKILL-17 (no platform names), SKILL-18 (no domain-specific binding keys).
 - **RFC-0393 (Bindings contract)**: Skills reference semantic keys from RFC-0639 instead of software-specific keys. The degradation contract applies: if a semantic key is null, the skill degrades gracefully.
 - **RFC-0523 (Skill concerns taxonomy)**: SKILL-18 applies to all concern levels — `read-only`, `document-only`, `content-mutation`, `code-mutation`.
-- **RFC-0639 (Semantic bindings)**: This RFC consumes the semantic keys defined by RFC-0639.
-- **Skill packs (RFC-0539)**: SKILL-18 applies to forge skills only (`fo-*` prefix). Pack skills are validated with SKILL-01..17 but not SKILL-18 — pack skills are domain-specific by design.
+- **RFC-0639 (Semantic bindings)**: This RFC consumes the semantic keys (`validate`, `produce`, `verify`) and `resolveTerminology()` defined by RFC-0639. Implementation of RFC-0642 is blocked until RFC-0639 is implemented — without semantic keys in the bindings schema, `ref(bindings.commands.validate)` resolves to `null`.
+- **Skill packs (RFC-0539)**: SKILL-18 applies to forge skills only (`fo-*` prefix). Pack skills are validated with SKILL-01..17 but not SKILL-18 — pack skills are domain-specific by design. SKILL-18 is added to the forge-skill validation path only (after SKILL-11, before SKILL-13), not to the pack-skill validation path.
 
 ## Design
 
@@ -129,23 +133,23 @@ The `<!-- skill-lint-disable SKILL-18 -->` escape hatch is available, same as SK
 ```sh
 # Validate skills including SKILL-18
 forge skill.validate --json
-
-# List skills with SKILL-18 status
-forge skill.list --json
 ```
+
+`forge.skill.list` output is unchanged — SKILL-18 violations appear in `forge.skill.validate` output only.
 
 ### TypeScript contracts
 
 ```ts
 // SKILL-18: domain-specific binding key prohibition
-// Checks instruction lines (not code blocks, not run: directives)
+// Checks instruction lines (code blocks and run: directives — same scope as SKILL-11)
 // for references to software-specific binding keys.
+// Uses extractInstructionLines() from the existing validator.
 
-const SOFTWARE_SPECIFIC_BINDING_KEYS = [
-  "bindings.commands.typecheck",
-  "bindings.commands.scopedBuild",
-  "bindings.commands.test",
-] as const;
+const SKILL18_PATTERNS: RegExp[] = [
+  /bindings\.commands\.typecheck/gi,
+  /bindings\.commands\.scopedBuild/gi,
+  /bindings\.commands\.test/gi,
+];
 
 const SEMANTIC_REPLACEMENTS: Record<string, string> = {
   "bindings.commands.typecheck": "bindings.commands.validate",
@@ -153,20 +157,19 @@ const SEMANTIC_REPLACEMENTS: Record<string, string> = {
   "bindings.commands.test": "bindings.commands.verify",
 };
 
-// Skills exempted from SKILL-18 (inherently software-domain)
-const SKILL_18_EXEMPT = new Set([
-  "fo-add-tests",       // tests are a software concept
-  "fo-architecture",    // codebase architecture is software-specific
-]);
+// No hardcoded exempt set — the <!-- skill-lint-disable SKILL-18 -->
+// escape hatch is the sole exemption mechanism.
+// Skills that are inherently software-specific (e.g. fo-add-tests)
+// add the escape hatch with a documentation comment.
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/skills/fo/*/SKILL.md` | All 33 skill files audited and migrated |
-| `packages/forge/src/skill-validator.ts` | SKILL-18 rule added to validator |
-| `packages/forge/src/tests/skill-validate.test.ts` | Tests for SKILL-18 (pass, fail, escape hatch, exempt) |
+| `packages/forge/skills/fo/*/SKILL.md` | All 26 fo-* skill files audited and migrated |
+| `packages/forge/src/validators/skill-validate.ts` | SKILL-18 rule added to validator (forge-skill path only) |
+| `packages/forge/src/tests/skill-validate.test.ts` | Tests for SKILL-18 (pass, fail, escape hatch) |
 | `.agents/skills/fo/*/SKILL.md` | Synced copies updated |
 
 ### Output format
@@ -189,12 +192,14 @@ const SKILL_18_EXEMPT = new Set([
 ### Failure modes
 
 - **SKILL-18 violation**: `forge.skill.validate` exits non-zero with per-skill error details. The `<!-- skill-lint-disable SKILL-18 -->` escape hatch suppresses the check for a specific skill.
-- **Exempt skills**: Skills in the `SKILL_18_EXEMPT` set are skipped. Their exemption is documented in the skill file with a comment.
-- **Code blocks and run: directives**: SKILL-18 only checks instruction lines, not code blocks or `run:` directives. Software-specific keys in code blocks are allowed (they may be legitimate examples for software-domain projects).
+- **Escape hatch usage**: Skills that are inherently software-specific (e.g. `fo-add-tests`) add `<!-- skill-lint-disable SKILL-18 -->` with a documentation comment explaining why the skill is software-domain-specific. No hardcoded exempt set is maintained.
+- **Narrative prose**: SKILL-18 does not check narrative prose (lines outside code blocks and `run:` directives). Software-specific terms in prose are migrated to `ref(bindings.terminology.artifact)` or domain-neutral phrasing as part of the prose migration, but this is not enforced by SKILL-18.
+- **Semantic binding is null**: When a skill references `ref(bindings.commands.validate)` and the binding is `null` (not configured in forge.yaml), the degradation contract applies: required → skill refuses to start; optional → step skipped with `Degraded:` line in report.
 
 ## Rollout
 
-- **SKILL-18 enforcement**: The new validation rule is added to `forge.skill.validate`. Existing skills that violate SKILL-18 are migrated in the same implementation. After migration, `forge.skill.validate` passes.
+- **SKILL-18 enforcement**: The new validation rule is added to `forge.skill.validate` (forge-skill validation path only, not pack-skill path). Existing skills that violate SKILL-18 are migrated in the same implementation. After migration, `forge.skill.validate` passes.
+- **Dependency on RFC-0639**: Implementation of the binding-key migration (`typecheck` → `validate`) and prose migration (`app` → `ref(bindings.terminology.artifact)`) is blocked until RFC-0639 is implemented. RFC-0639 adds semantic keys to the bindings schema and exports `resolveTerminology()`. Without RFC-0639, `ref(bindings.commands.validate)` resolves to `null` and `ref(bindings.terminology.artifact)` is not resolvable.
 - **Grace period**: None needed — all skills are migrated before the rule is enforced. If a skill is missed, the escape hatch (`<!-- skill-lint-disable SKILL-18 -->`) provides a temporary workaround.
 - **Skill packs**: Pack skills are not affected by SKILL-18. They are domain-specific by design and use their own terminology.
 - **Synced copies**: `.agents/skills/` copies are updated in the same commit as `packages/forge/skills/` changes.
@@ -207,19 +212,18 @@ const SKILL_18_EXEMPT = new Set([
 
 ## Risks
 
-- **Skill behavior change**: Migrating from `typecheck` to `validate` changes which binding key is resolved. In software projects, `validate` might be null while `typecheck` is set. Mitigation: `forge.create` (RFC-0640) writes both keys for software profiles. Existing forge.yaml files may need to add semantic keys — `forge doctor` reports this as a `defaultable-binding-null` notice.
-- **Exempt skill list maintenance**: The `SKILL_18_EXEMPT` set must be maintained as new skills are added. Mitigation: the set is small and well-documented. New skills that are software-specific must be explicitly exempted.
-- **False positives**: SKILL-18 might flag legitimate uses of software-specific terms in code examples. Mitigation: the rule only checks instruction lines, not code blocks.
+- **Skill behavior change**: Migrating from `typecheck` to `validate` changes which binding key is resolved. In software projects, `validate` might be null while `typecheck` is set. Mitigation: `forge.create` (RFC-0640) writes both keys for software profiles. Existing forge.yaml files may need to add semantic keys — `forge doctor` reports this as a `defaultable-binding-null` notice. When `validate` is null, the degradation contract applies (optional → step skipped with `Degraded:` line).
+- **False positives**: SKILL-18 flags `ref(bindings.commands.typecheck)` in code blocks, not the bare word "typecheck" or "test" in prose. The regex matches `bindings.commands.typecheck` specifically. Narrative prose is not checked by SKILL-18.
 
 ## Acceptance criteria
 
-- [ ] SKILL-18 rule implemented in `forge.skill.validate`
-- [ ] SKILL-18 checks instruction lines for `bindings.commands.typecheck`, `bindings.commands.scopedBuild`, `bindings.commands.test`
+- [ ] SKILL-18 rule implemented in `forge.skill.validate` (forge-skill validation path only)
+- [ ] SKILL-18 checks instruction lines (code blocks and `run:` directives) for `bindings.commands.typecheck`, `bindings.commands.scopedBuild`, `bindings.commands.test`
 - [ ] `<!-- skill-lint-disable SKILL-18 -->` escape hatch works
-- [ ] All 33 fo-* skills audited and migrated to semantic keys where applicable
-- [ ] Software-specific skills (`fo-add-tests`, `fo-architecture`) exempted with documentation
+- [ ] All 26 fo-* skills audited and migrated to semantic keys where applicable
+- [ ] Software-specific skills use escape hatch with documentation comment (no hardcoded exempt set)
 - [ ] `.agents/skills/` synced copies updated
-- [ ] Unit tests for SKILL-18: pass case, fail case, escape hatch, exempt skill
+- [ ] Unit tests for SKILL-18: pass case, fail case, escape hatch
 - [ ] `packages/forge/AGENTS.md` updated with SKILL-18 documentation
 - [ ] `rfc.validate` passes on this file before merging
 
@@ -230,12 +234,11 @@ const SKILL_18_EXEMPT = new Set([
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
-- For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run
-  `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file
-  in the same commit (RFC-0330 amended transition precondition).
-- Agents MUST NOT weaken or remove enforcement rules established by this RFC
-  without a new RFC that supersedes it.
-- If implementation reveals an invariant conflict, run
-  `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"`
-  instead of working around it (RFC-0334).
--->
+- **Implementation is blocked on RFC-0639.** The binding-key migration and prose migration both depend on RFC-0639's semantic keys and `resolveTerminology()`. Do not implement RFC-0642 until RFC-0639 is `implemented`.
+- SKILL-18 is added to the forge-skill validation path only (after SKILL-11, before SKILL-13 in `packages/forge/src/validators/skill-validate.ts`). Do not add it to the pack-skill validation path.
+- SKILL-18 uses `extractInstructionLines()` (same as SKILL-11) to scan code-block and `run:` directive lines. It does not scan narrative prose.
+- No hardcoded exempt set. Software-specific skills use `<!-- skill-lint-disable SKILL-18 -->` with a documentation comment.
+
+- For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
+- Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
+- If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334). -->
