@@ -36,6 +36,7 @@
   <entry key="spec.*">Registers workspace spec vendoring commands: spec.validate, spec.status, spec.materialize (RFC-0394..0397).</entry>
   <entry key="dht.*">Registers workspace DHT commands: dht.node.init, dht.lookup, dht.register, dht.placement, dht.status, dht.capacity.publish (RFC-0565).</entry>
   <entry key="deploy.*">Registers workspace deploy commands: deploy.artifact.build, deploy.artifact.verify, deploy.atomic.swap, deploy.atomic.rollback, deploy.artifact.gc, deploy.status (RFC-0566).</entry>
+  <entry key="evidence.*">Registers workspace evidence commands: evidence.sync, evidence.fetch (RFC-0651).</entry>
 </MODULE_MAP>
 <CHANGE_SUMMARY>
   <item>Initial workspace-level kernel configuration.</item>
@@ -59,6 +60,7 @@
   <item>RFC-0565: Register dhtModule for dht.node.init, dht.lookup, dht.register, dht.placement, dht.status, dht.capacity.publish.</item>
   <item>RFC-0564: Register swimModule for swim.join, swim.leave, swim.members, swim.status.</item>
   <item>RFC-0566: Register deployModule for deploy.artifact.build, deploy.artifact.verify, deploy.atomic.swap, deploy.atomic.rollback, deploy.artifact.gc, deploy.status.</item>
+  <item>RFC-0651: Register evidenceModule for evidence.sync, evidence.fetch.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -131,6 +133,8 @@ export default defineKernelConfig({
     swim: async () => (await import("@warpgogol/site-kernel/swim-module")).swimModule,
     deploy: async () =>
       (await import("@warpgogol/site-kernel-handoff/deploy-module")).createDeployModule(),
+    evidence: async () =>
+      (await import("@warpgogol/site-kernel-handoff/evidence-module")).createEvidenceModule(),
   },
   pipelines: {
     // Workspace-level pipelines
