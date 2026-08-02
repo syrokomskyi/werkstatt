@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0472: sternsystem.sync — synchronize a Sternsystem's local bare repo with an external mirror.</purpose>
 <non-goals>
-  <item>Do not automate sync after mission.reconcile — sync is a manual operator action.</item>
+  <item>Sync is an automatic pipeline step invoked after mission.reconcile — not a manual operator action.</item>
   <item>Do not add retry logic — fail-fast on network errors.</item>
   <item>Do not use git push --mirror — it deletes remote branches not present locally.</item>
 </non-goals>
