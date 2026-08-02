@@ -120,6 +120,13 @@ const proseResult = await renderProse({
   creditsSiteDefault,
 });
 
+// Add tabindex="0" to all <table> elements at build time so scrollable tables
+// are keyboard-accessible (axe scrollable-region-focusable). The client-side
+// script at the bottom of this file is a fallback for dynamically loaded content.
+if (proseResult.kind === "html" && proseResult.html) {
+  proseResult.html = proseResult.html.replace(/<table(?=\s|>)/g, '<table tabindex="0"');
+}
+
 const normalizedLanguages = Array.from(
   new Set(
     languages

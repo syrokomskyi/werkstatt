@@ -143,7 +143,7 @@ function bakePillarHub(
 
   // 2. Adaptation — markdown block with dimensions as body subsections.
   const adaptationBody = p.adaptation.dimensions
-    .map((d) => `### ${pillarLang(d.heading, lang, dl)}\n\n${pillarLang(d.body, lang, dl)}`)
+    .map((d) => `## ${pillarLang(d.heading, lang, dl)}\n\n${pillarLang(d.body, lang, dl)}`)
     .join("\n\n");
   const adaptationBlock = md(pillarLang(p.adaptation.heading, lang, dl), "", adaptationBody);
 

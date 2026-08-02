@@ -133,13 +133,13 @@ const fallbackEmail = props.fallbackEmail ?? businessEmail ?? "";
       }
 
       <label class="send-message__field">
+        <span class="sr-only">{resolveLabel("placeholder", "")}</span>
         <textarea
           class="send-message__textarea"
           name="contact-message"
           autocomplete="off"
           data-send-message-textarea
           placeholder={resolveLabel("placeholder", "")}
-          aria-label={resolveLabel("placeholder", "")}
           aria-describedby="send-message-hint"></textarea>
       </label>
 

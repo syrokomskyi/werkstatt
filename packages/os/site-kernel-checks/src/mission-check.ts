@@ -605,6 +605,7 @@ export async function runMissionCheck(
     await rm(join(evidenceDir, "observation-bundle.json"), { force: true });
     await rm(join(evidenceDir, "study-run.json"), { force: true });
     await rm(join(evidenceDir, "evidence-metadata.json"), { force: true });
+    await rm(join(evidenceDir, "report.html"), { force: true });
   }
 
   await mkdir(rawDir, { recursive: true });
