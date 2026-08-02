@@ -17,6 +17,7 @@ import {
   runDistGeneratedMarkerStrip,
   runDistGeneratedMarkerValidate,
 } from "../dist-generated-marker.ts";
+import { runDistHtmlStructureValidate } from "../dist-html-structure.ts";
 import { runBlogValidate } from "../blog.ts";
 import { runArticleDepthValidate } from "../article-depth.ts";
 import { runParticipantValidate } from "../participant.ts";
@@ -129,6 +130,23 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/dist/client/**"],
     execute: runDistGeneratedMarkerValidate,
+  },
+  /* RFC-0654: post-build HTML structural integrity validation */
+  {
+    name: "dist.html-structure.validate",
+    description:
+      "Post-build guard: check tag balance for structural non-void HTML elements in dist/client. Fails on mismatched open/close counts (RFC-0654).",
+    scope: "app",
+    flags: {
+      app: {
+        kind: "string",
+        description: "App name to use when no app context is active.",
+      },
+    },
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**"],
+    cacheable: true,
+    execute: runDistHtmlStructureValidate,
   },
   /* RFC-0167: sellable blog/article module contract */
   {

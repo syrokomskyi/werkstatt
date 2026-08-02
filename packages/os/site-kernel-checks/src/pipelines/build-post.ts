@@ -30,6 +30,10 @@ export const SITES_BUILD_POST_PIPELINE: KernelPipelineStep[] = [
   // Runs after every dist generation/mutation above and before the postbuild
   // validators, so they validate the normalized public output.
   { command: "text.normalize.apply", expectedDurationMs: 30_000, timeoutMs: 300_000 },
+  // RFC-0654: structural integrity guard — runs after all post-build mutators
+  // and before the postbuild validation pipeline to catch tag imbalance caused
+  // by regex-based mutators (e.g. stripGeneratedMarker removing <main>).
+  { command: "dist.html-structure.validate" },
   // RFC-0074: the full postbuild validation pipeline runs here so every
   // dist-scanning check validates the just-built dist — making build:check the
   // comprehensive build gate. behavior.snapshot.validate (inside this array)
