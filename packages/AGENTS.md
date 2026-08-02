@@ -197,6 +197,7 @@ pnpm exec site-kernel run compass.invariant.add --file <path> --text "<invariant
 - All test files **must** live in `src/tests/` inside each package — never at the package root or alongside source files.
 - Unit test files use the `.test.ts` suffix; property-based test files use the `.pbt.test.ts` suffix.
 - Each package with tests has a `vitest.config.ts` at its root specifying `environment: "node"` and `include: ["src/**/*.test.ts"]`.
+- **Mock hygiene:** when replacing an import in source code, check that test mocks do not still mock the old function. `fo-review` flags dead mock entries as a structural finding (Axis A — Duplicated Code / dead code). Remove mock factory entries for functions that are no longer imported by the module under test.
 
 ### Test scripts and dependencies
 
