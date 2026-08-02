@@ -35,7 +35,10 @@ import { runYamlContractLint } from "../yaml-contract-lint.ts";
 import { runYamlParseValidate } from "../yaml-parse-validate.ts";
 import { runCommandReadsValidate } from "../command-reads-validate.ts";
 import { runPlaywrightChromiumEnsure } from "../playwright-chromium-ensure.ts";
-import { runEvidenceSync, runEvidenceFetch } from "@warpgogol/site-kernel-handoff/evidence";
+
+// Note: evidence.sync and evidence.fetch are registered by createEvidenceModule
+// in @warpgogol/site-kernel-handoff/src/evidence/evidence-module.ts (RFC-0651).
+// They are NOT included in INFRA_CONTRACTS_COMMANDS to avoid duplicate registration.
 
 export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
   {
@@ -406,80 +409,6 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
       "Used by build.post pipeline (step 0) and mission.materialize.",
     scope: "workspace",
     supportsAllSites: false,
-    mutatesState: true,
-    cacheable: false,
-    flags: {},
     execute: runPlaywrightChromiumEnsure,
-  },
-  {
-    name: "evidence.sync",
-    description:
-      "RFC-0651: upload all evidence artifacts from missions/{mission}/evidence/axiom/ to R2 " +
-      "under {systemId}/{missionId}/{runTimestamp}/ key prefix. Reads runTimestamp from " +
-      "evidence-metadata.json (or --run-timestamp flag). Supports --dry-run. " +
-      "Failure modes: MISSING_ENV, NOT_FOUND, INVALID_EVIDENCE, R2_UPLOAD_ERROR.",
-    scope: "workspace",
-    supportsAllSites: false,
-    mutatesState: false,
-    cacheable: false,
-    flags: {
-      mission: {
-        kind: "string",
-        required: true,
-        description: "Mission id (e.g. warpgogol-com-m000025).",
-      },
-      "run-timestamp": {
-        kind: "string",
-        description:
-          "Explicit run timestamp (YYYY-MM-DDTHH-MM-SS-mmmZ). Defaults to evidence-metadata.json runTimestamp.",
-      },
-      "dry-run": {
-        kind: "boolean",
-        description: "Report what would be uploaded without making R2 API calls.",
-      },
-      json: { kind: "boolean", description: "Output JSON result." },
-    },
-    reads: ["missions/{mission}/evidence/axiom/**", "systems/registry.yaml"],
-    writes: [],
-    execute: runEvidenceSync,
-  },
-  {
-    name: "evidence.fetch",
-    description:
-      "RFC-0651: download a historical evidence run from R2 to a local directory, " +
-      "or list available runs via ListObjectsV2. Uses --run-timestamp to select a run, " +
-      "--output-dir to specify the download location, --no-raw to skip raw/ artifacts, " +
-      "--list to list available runs. Failure modes: MISSING_ENV, NOT_FOUND, R2_LIST_ERROR.",
-    scope: "workspace",
-    supportsAllSites: false,
-    mutatesState: false,
-    cacheable: false,
-    flags: {
-      mission: {
-        kind: "string",
-        required: true,
-        description: "Mission id (e.g. warpgogol-com-m000025).",
-      },
-      "run-timestamp": {
-        kind: "string",
-        description: "Run timestamp to fetch (YYYY-MM-DDTHH-MM-SS-mmmZ). Required unless --list.",
-      },
-      "output-dir": {
-        kind: "string",
-        description: "Local directory to download evidence to. Required unless --list.",
-      },
-      "no-raw": {
-        kind: "boolean",
-        description: "Skip raw/ artifacts — download only structured JSON and report.html.",
-      },
-      list: {
-        kind: "boolean",
-        description: "List available runs for the mission instead of fetching.",
-      },
-      json: { kind: "boolean", description: "Output JSON result." },
-    },
-    reads: ["systems/registry.yaml"],
-    writes: ["{--output-dir}/**"],
-    execute: runEvidenceFetch,
   },
 ];

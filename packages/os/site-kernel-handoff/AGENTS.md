@@ -66,6 +66,17 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 - All hashing must use `@warpgogol/fingerprint` (DNA-53). Do not use `crypto.createHash` directly — `fingerprint.usage.lint` enforces this invariant.
 - Export artifacts are YAML-only per RFC-0376, except Bordbuch NDJSON which remains NDJSON.
 
+## Evidence (RFC-0651)
+
+- `evidence.sync` uploads all evidence artifacts from `missions/{mission}/evidence/axiom/` to Cloudflare R2 under `{systemId}/{missionId}/{runTimestamp}/` key prefix. Uses `@aws-sdk/client-s3` with R2's S3-compatible endpoint. Reads `runTimestamp` from `evidence-metadata.json` (or `--run-timestamp` flag). Supports `--dry-run` (reports what would be uploaded without R2 API calls). Failure modes: `MISSING_ENV` (R2 env vars not set), `NOT_FOUND` (evidence directory missing), `INVALID_EVIDENCE` (evidence-metadata.json missing or invalid), `R2_UPLOAD_ERROR` (PutObject API error).
+- `evidence.fetch` downloads a historical evidence run from R2 to a local directory, or lists available runs via `ListObjectsV2`. Uses `--run-timestamp` to select a run, `--output-dir` for download location, `--no-raw` to skip `raw/` artifacts, `--list` to list available runs. In `--list` mode, downloads `evidence-metadata.json` per run to extract `commitSha`. Failure modes: `MISSING_ENV`, `NOT_FOUND`, `R2_LIST_ERROR`.
+- Environment variables: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (documented in `.env.example`).
+- R2 bucket prerequisite: the operator must have created the `axiom-evidence` R2 bucket (RFC-0650 rollout).
+- Agents MUST NOT invoke `evidence.sync` automatically after `mission.check` — sync is invoked by `mission.close` (mandatory) and `leitstand.dev-deploy` (best-effort) per RFC-0652. Agents MAY invoke `evidence.sync` manually when explicitly asked by the operator.
+- Agents MUST NOT create R2 API tokens automatically — token creation is a manual operator action in the Cloudflare dashboard.
+- Agents MUST NOT hardcode R2 credentials in source files — credentials are read from environment variables only.
+- Iceberg REST catalog support is deferred to a future RFC — `ListObjectsV2` is the primary listing mechanism.
+
 ## Validation
 
 Run from the repository root:
