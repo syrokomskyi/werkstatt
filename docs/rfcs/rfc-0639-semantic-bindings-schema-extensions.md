@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-01
-updatedAt: 2026-08-01
+updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -100,17 +101,17 @@ The `forge/bindings@1` schema is extended with five optional semantic command ke
 4. **`commands.preview`** — semantic key for the project's preview command (e.g. dev server, live preview). Optional, defaults to `null`.
 5. **`commands.lint`** — semantic key for the project's linting command. Optional, defaults to `null`.
 
-The `terminology` field is promoted from `optional` to a first-class bindings section with a default empty record. `resolveBinding()` is extended to resolve terminology keys (e.g. `terminology.artifact` → `"composition"`).
+The `terminology` field schema changes from `z.record(z.string(), z.string()).optional()` to `z.record(z.string(), z.string()).default({})` — making it non-optional in the `ForgeBindings` interface (`terminology: Record<string, string>` instead of `terminology?: Record<string, string>`). `defaultForgeConfig` already sets `terminology: {}`, so no existing consumer breaks. `resolveBinding()` already resolves terminology keys via its generic dot-path traversal — no change needed to `resolveBinding()` itself.
 
 Existing software-specific keys (`typecheck`, `test`, `scopedBuild`) remain in the schema as optional. They are not removed — software projects continue to use them. The semantic keys are additive.
 
-A `resolveTerminology(config, key)` helper is exported from `@warpgogol/forge/config`. It resolves a terminology key from bindings, falling back to the profile's terminology map (RFC-0638), falling back to the universal default term.
+A `resolveTerminology(config, terminology, key)` helper is exported from `@warpgogol/forge/config`. It resolves a terminology key from bindings (tier 1), falling back to the caller-provided terminology map (tier 2, typically from the profile's `terminology` field per RFC-0638), falling back to the universal default term (tier 3). The `terminology` parameter is `Record<string, string> | undefined` — a separate parameter, not embedded in `StackProfile` — so the function compiles and works whether or not RFC-0638 is implemented.
 
 ## Architectural fit
 
 - **DNA-54 (Forge bindings contract)**: This RFC extends the bindings schema with semantic keys that work across all domains. Skills reference `ref(bindings.commands.produce)` instead of `ref(bindings.commands.scopedBuild)` — the same skill body works for software (produce = build) and video (produce = render).
 - **RFC-0393 (Bindings contract)**: This RFC extends the existing bindings schema with new optional fields. It does not create a v2 schema.
-- **RFC-0638 (Profile schema extensions)**: The terminology resolution chain (bindings → profile → universal default) connects the two schemas. Bindings take precedence (per-project overrides), profile terminology is the domain default, universal defaults are the fallback.
+- **RFC-0638 (Profile schema extensions)**: The terminology resolution chain (bindings → profile terminology → universal default) connects the two schemas. Bindings take precedence (per-project overrides), profile terminology is the domain default, universal defaults are the fallback. RFC-0638 is a **soft prerequisite**: `resolveTerminology` accepts the terminology map as a separate `Record<string, string> | undefined` parameter, so it compiles and works without RFC-0638 — tier 2 simply remains `undefined` and the function falls back to universal defaults. When RFC-0638 is implemented, callers pass `profile.terminology` as the second argument.
 - **Degradation contract**: The existing degradation contract (required binding unresolvable → skill refuses; optional absent → step skipped) applies to the new semantic keys identically.
 
 ## Design
@@ -170,24 +171,35 @@ export interface ForgeBindingsCommands {
   lint: string | null;           // domain-neutral
 }
 
-// Terminology resolution chain: bindings → profile → universal default
+// Terminology resolution chain: bindings → caller-provided terminology → universal default
+// The `terminology` parameter is a separate Record (not StackProfile) to decouple
+// from RFC-0638. Callers pass `profile.terminology` when RFC-0638 is implemented;
+// until then, pass `undefined` and tier 2 is skipped.
 
 export function resolveTerminology(
   config: ForgeConfig,
-  profile: StackProfile | undefined,
+  terminology: Record<string, string> | undefined,
   key: string,
 ): string {
   // 1. Per-project override in bindings.terminology
   if (config.bindings?.terminology?.[key]) {
     return config.bindings.terminology[key];
   }
-  // 2. Per-domain default in profile.terminology
-  if (profile?.terminology?.[key]) {
-    return profile.terminology[key];
+  // 2. Per-domain default (caller-provided, typically from profile.terminology)
+  if (terminology?.[key]) {
+    return terminology[key];
   }
   // 3. Universal default
   return UNIVERSAL_TERMINOLOGY[key] ?? key;
 }
+
+// Universal default terms — derived from the vocabulary used in existing fo-skill
+// instruction lines and generated AGENTS.md content. These 7 keys cover the
+// domain-neutral concepts that skills and generated content reference:
+// artifact/artifactPlural (what the project produces), module (structural unit),
+// source (input file), output (production result), verify (verification action),
+// operator (the person running the project). Skills reference these via
+// `ref(bindings.terminology.<key>)`; if unresolvable, the key itself is returned.
 
 export const UNIVERSAL_TERMINOLOGY: Record<string, string> = {
   artifact: "artifact",
@@ -204,9 +216,9 @@ export const UNIVERSAL_TERMINOLOGY: Record<string, string> = {
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/src/config/forge-config.ts` | Schema extended with semantic keys, `resolveTerminology` added |
-| `packages/forge/src/tests/bindings-schema.test.ts` | New test: semantic keys parse, terminology resolution chain works |
-| `packages/forge/AGENTS.md` | Updated with semantic key documentation |
+| `packages/forge/src/config/forge-config.ts` | Schema extended with 5 semantic keys; `terminology` changed from `.optional()` to `.default({})`; `ForgeBindingsCommands` interface extended; `resolveTerminology` and `UNIVERSAL_TERMINOLOGY` added; `applyCliBindingDefaults` updated to initialize 5 new keys with `null` |
+| `packages/forge/src/tests/bindings-schema.test.ts` | New test: semantic keys parse, null defaults work, terminology resolution chain returns correct values at each tier, `applyCliBindingDefaults` includes 5 new keys |
+| `packages/forge/AGENTS.md` | Updated with semantic key and terminology documentation |
 
 ### Output format
 
@@ -215,13 +227,16 @@ No command output — this RFC is a schema extension only. `resolveTerminology()
 ### Failure modes
 
 - **Semantic key is null**: If a skill references `ref(bindings.commands.produce)` and the binding is `null`, the skill's degradation contract applies: required → skill refuses to start; optional → step skipped with `Degraded:` line.
-- **Terminology key not found**: `resolveTerminology()` falls back to the universal default term. No error.
+- **Terminology key not found**: `resolveTerminology()` falls back to the universal default term. If the key is not in `UNIVERSAL_TERMINOLOGY` either, the key itself is returned. No error.
 - **Both semantic and software keys set**: Both can coexist. Skills choose which to reference. No conflict.
+- **`forge.doctor` behavior**: The 5 semantic keys are **not** added to `BINDING_COMMAND_KEYS` in `doctor.ts`. `forge.doctor` validates only forge-CLI-backed and software-domain keys. Semantic keys are opt-in per-domain — reporting them as `absent` for projects that intentionally leave them `null` would be noise, not signal. `forge.doctor` may be extended in RFC-0640 to validate semantic keys when a profile declares them as expected.
 
 ## Rollout
 
-- **Backward compatibility**: All new keys are optional with `null` defaults. Existing forge.yaml files parse without changes.
-- **forge.create defaults**: `forge.create` writes `null` for semantic keys (same as `typecheck`, `test`, `scopedBuild`). The profile (RFC-0638) may provide domain-specific defaults in follow-up RFC-0640.
+- **Backward compatibility**: All new keys are optional with `null` defaults. Existing forge.yaml files parse without changes. The `terminology` schema change (`.optional()` → `.default({})`) is backward-compatible: existing YAML files without `terminology` now get `{}` instead of `undefined`, and `defaultForgeConfig` already sets `terminology: {}`.
+- **`applyCliBindingDefaults`**: Updated to initialize the 5 new semantic keys with `null` (same as `typecheck`, `test`, `scopedBuild`). Semantic keys are stack-dependent, not CLI-backed — `forge.create` writes `null`, not a default command. The profile (RFC-0638) may provide domain-specific defaults in follow-up RFC-0640.
+- **`forge.doctor` validation**: Semantic keys are not added to `BINDING_COMMAND_KEYS`. Doctor validation is limited to forge-CLI-backed and software-domain keys. This prevents false `absent` reports for projects that intentionally leave semantic keys `null`.
+- **RFC-0638 soft dependency**: `resolveTerminology` accepts `terminology: Record<string, string> | undefined` as a separate parameter. When RFC-0638 is not yet implemented, callers pass `undefined` and tier 2 is skipped. When RFC-0638 is implemented, callers pass `profile.terminology`.
 - **Skill migration**: Skills are updated to reference semantic keys in RFC-0642. Until then, skills that reference `typecheck`/`test`/`scopedBuild` continue to work.
 - **No flag day**: The schema extension is purely additive.
 
@@ -241,9 +256,11 @@ No command output — this RFC is a schema extension only. `resolveTerminology()
 
 - [ ] `ForgeBindingsCommands` interface extended with `validate`, `produce`, `verify`, `preview`, `lint` optional keys
 - [ ] Zod schema in `forge-config.ts` extended with five new optional nullable string fields
-- [ ] `resolveTerminology(config, profile, key)` exported from `@warpgogol/forge/config`
+- [ ] `resolveTerminology(config, terminology, key)` exported from `@warpgogol/forge/config` — accepts `Record<string, string> | undefined` as second parameter (not `StackProfile`)
 - [ ] `UNIVERSAL_TERMINOLOGY` constant exported with default terms
-- [ ] Unit tests verify: semantic keys parse, null defaults work, terminology resolution chain returns correct values at each tier
+- [ ] `applyCliBindingDefaults` updated to initialize 5 new semantic keys with `null`
+- [ ] Unit tests verify: semantic keys parse, null defaults work, terminology resolution chain returns correct values at each tier, `applyCliBindingDefaults` includes 5 new keys
+- [ ] `terminology` schema changed from `.optional()` to `.default({})` in Zod and `ForgeBindings` interface
 - [ ] Existing forge.yaml files (software domain) parse without changes
 - [ ] `packages/forge/AGENTS.md` updated with semantic key and terminology documentation
 - [ ] `rfc.validate` passes on this file before merging
