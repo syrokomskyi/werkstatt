@@ -242,7 +242,7 @@ The `generated` field remains `string[]` for backward compatibility with existin
 - [x] Unit tests: terminology substitution, register selection, nested template, fallback, path traversal rejection (evidence: `packages/forge/src/tests/agents-generate-domain.test.ts`)
 - [x] Existing software-domain projects generate identical AGENTS.md (no regression) (evidence: `packages/forge/src/tests/agents-generate-domain.test.ts:259-267` golden fixture comparison)
 - [x] `packages/forge/AGENTS.md` updated (evidence: `packages/forge/AGENTS.md:127-136`)
-- [x] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0643` passed on 2026-08-02)
 
 ## Implementation notes for agents
 
