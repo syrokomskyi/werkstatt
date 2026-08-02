@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0626: initial bordbuch.commit command handler.</item>
+  <item>RFC-0646: replace all gitExec calls with gitExecWithRetry for transient-failure resilience.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -17,7 +18,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { gitExec } from "../werkstatt/git-exec.ts";
+import { gitExecWithRetry, type RetryOptions } from "../werkstatt/git-exec.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
 const BORDBUCH_PROJECTION_PATHS = [
@@ -25,6 +26,10 @@ const BORDBUCH_PROJECTION_PATHS = [
   "public/.well-known/bordbuch.json",
   "public/.well-known/bordbuch/index.html",
 ];
+
+const BORDBUCH_RETRY_OPTIONS: RetryOptions = {
+  backoffMs: [12_000, 60_000],
+};
 
 export interface BordbuchCommitResult {
   committed: boolean;
@@ -49,7 +54,9 @@ export async function commitBordbuchProjections(
     return { committed: false, commitSha: null, systemId, filesCommitted: [] };
   }
 
-  const status = gitExec(cachePath, "status --porcelain", { allowNonZero: true });
+  const status = await gitExecWithRetry(cachePath, "status --porcelain", BORDBUCH_RETRY_OPTIONS, {
+    allowNonZero: true,
+  });
   if (!status) {
     return { committed: false, commitSha: null, systemId, filesCommitted: [] };
   }
@@ -68,11 +75,15 @@ export async function commitBordbuchProjections(
   }
 
   const addArgs = bordbuchDirty.map((f) => `-- ${f}`).join(" ");
-  gitExec(cachePath, `add ${addArgs}`);
+  await gitExecWithRetry(cachePath, `add ${addArgs}`, BORDBUCH_RETRY_OPTIONS);
 
-  gitExec(cachePath, 'commit -m "chore: bordbuch projections from build.prepare"');
+  await gitExecWithRetry(
+    cachePath,
+    'commit -m "chore: bordbuch projections from build.prepare"',
+    BORDBUCH_RETRY_OPTIONS,
+  );
 
-  const sha = gitExec(cachePath, "rev-parse HEAD");
+  const sha = await gitExecWithRetry(cachePath, "rev-parse HEAD", BORDBUCH_RETRY_OPTIONS);
 
   return { committed: true, commitSha: sha, systemId, filesCommitted: bordbuchDirty };
 }
