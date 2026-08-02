@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 9e51dc00cdfb76b820037a2f56938e872aa7a249d08507d487bfda38f39facd0
+  contentHash: b07261a25eb7359ca4336fa7604874612fd3e60df57d0d1b48da18f9b0525c30
   sources:
     - path: docs/architecture-dna.md
       hash: 1fdfe04df7d8a7f45cf561f8a8576f80ff733e2bd8f30108969d7d65a64e1ccd
@@ -25,7 +25,7 @@ meta:
     - path: missions/warpgogol-com-m000024/workpiece/package.json
       hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
     - path: package.json
-      hash: abbe24f532aa1883eabd3a6b72473afd2bffee523270d186919b8ab9b489c356
+      hash: 73b48d8b7ad714562fcf7df93db6ee6d6a20affc2350f3ae83acf3f5772473c5
     - path: packages/agent-gate/package.json
       hash: 1ae0595ee068d5f5eb6f42bac46b4b85b80935d858bdb0e685c871e166a2f14d
     - path: packages/chat-adapter-null/package.json
@@ -85,7 +85,7 @@ meta:
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts
       hash: b6871526182bb140326d402fc69a26b345370b06677621e2636ecf5e360468f2
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts
-      hash: 3251075ad1c437c4387deeca46de7ac25d5feaa43f6b090dd12855e122680dc3
+      hash: bdb2b891134a926d69a8e21643a91f08b11fe7ad23c8a557c78fa389f6976294
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/governance.ts
       hash: d2b0dc10d6fb1245adb2b1e5b9305cb1ad4cc5735a55927c648cf0e8b62291fb
     - path: packages/os/site-kernel-checks/src/diagnostics/rules/ops-fleet.ts
@@ -160,7 +160,7 @@ meta:
       hash: 731146ea89c2290953e51c5cd06855d1d3750c5b165b882e9d380c063e9fbed7
 workspace:
   name: warpgogol-platform
-  version: 4.5.1
+  version: 4.5.3
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -3059,13 +3059,6 @@ commands:
       - site
       - workspace
   - name: generated.stale.validate
-    scope: workspace
-    mutatesState: false
-    supportsAllSites: true
-    providers:
-      - site
-      - workspace
-  - name: generated.timestamp.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: true
@@ -6220,7 +6213,6 @@ pipelines:
       - services.projection.validate
       - open-source.validate
       - generated.drift.validate
-      - generated.timestamp.validate
     executableFromRoot: false
   - name: build.post
     scope: app
@@ -7315,8 +7307,8 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 7
-  implemented: 3
+  accepted: 3
+  implemented: 7
   draft: 3
   reviewing: 0
 baseline:
@@ -7338,14 +7330,34 @@ baseline:
       kind: command
       scope: workspace
       dnaRefs: []
+    - id: RFC-0641
+      implementedAt: 2026-08-02
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-54
+    - id: RFC-0642
+      implementedAt: 2026-08-02
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-54
+    - id: RFC-0643
+      implementedAt: 2026-08-02
+      kind: command
+      scope: workspace
+      dnaRefs: []
+    - id: RFC-0644
+      implementedAt: 2026-08-02
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-46
+        - DNA-51
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0641
-      - RFC-0642
-      - RFC-0643
-      - RFC-0644
       - RFC-0645
     draft:
       - RFC-0383
