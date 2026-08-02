@@ -17,10 +17,10 @@ When the operator says any of the following, invoke the `fo-session-retro` skill
 
 ## Steps
 
-1. **Clean up test temp directories** — remove leftover `tmp-*` and `tmp/` directories created by unit tests:
+1. **Clean up test temp directories** — remove leftover `tmp-*` and `tmp/` directories created by unit tests anywhere in the repo:
    ```bash
-   find packages -maxdepth 2 -type d -name 'tmp-*' -exec rm -rf {} + 2>/dev/null; \
-   find packages -maxdepth 2 -type d -name 'tmp' -exec rm -rf {} + 2>/dev/null
+   find . -type d -name 'tmp-*' -not -path './.git/*' -exec rm -rf {} + 2>/dev/null; \
+   find . -type d -name 'tmp' -not -path './.git/*' -not -path './node_modules/*' -exec rm -rf {} + 2>/dev/null
    ```
    This is safe to auto-run (`// turbo`).
 2. **Invoke `fo-session-retro`** via the `skill` tool. Do NOT produce a closing summary first — the retro skill IS the closing protocol.

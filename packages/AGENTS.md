@@ -225,6 +225,7 @@ pnpm exec site-kernel run compass.invariant.add --file <path> --text "<invariant
 - Use `fc.anything()` cautiously — `stableStringify` and similar utilities may not handle `undefined`/`NaN`/functions.
 - PBT tests should verify universal properties (determinism, bounds, invariants, round-trip) rather than specific cases.
 - If a package change affects app consumers, validate the package first and then the affected apps.
+- **Test temp directories:** Unit tests that create temp directories (via `mkdtemp`/`mkdtempSync`) MUST use the `tmp-*` naming pattern (e.g. `tmp-leitstand-XXXX-`, `tmp-close-evidence-XXXX-`). These directories are gitignored via `tmp-*/` in `.gitignore`. Agents MUST clean up `tmp-*` directories they create during a session — the session-end workflow automates this, but agents should also clean up manually if a session is not formally closed.
 - **RFC-0189 `ui.i18n.lint`:** Shared UI components in `packages/ui/src/{sections,components}/` must not contain hardcoded human-readable strings. The validator scans `.astro` and `.ts` files for:
   - `I18N-01` — string literals with spaces and letters that are not routed through `resolveLabel`, `props`, or `siteLabels`.
   - `I18N-02` — `resolveLabel` fallbacks that contain full sentences (>3 words or sentence punctuation).

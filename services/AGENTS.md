@@ -12,6 +12,7 @@ Rules:
 - Keep service workspaces thin and deployment-oriented.
 - Files with the generated marker are generator-owned outputs.
 - Add reusable runtime contracts to packages before using them from a service.
+- **Test temp directories:** Unit tests that create temp directories (via `mkdtemp`/`mkdtempSync`) MUST use the `tmp-*` naming pattern (e.g. `tmp-runner-XXXX-`). These directories are gitignored via `tmp-*/` in `.gitignore`. Agents MUST clean up `tmp-*` directories they create during a session — the session-end workflow automates this, but agents should also clean up manually if a session is not formally closed.
 
 ## Env-and-deploy contract (RFC-0388 / DNA-40)
 
