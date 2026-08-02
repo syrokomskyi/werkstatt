@@ -188,7 +188,11 @@ export async function runReleasePrepare(
       const releasesBase = path.join(workspaceRoot, "releases");
       await fs.mkdir(releasesBase, { recursive: true });
 
-      const stagingDir = resolveStagingDir(releasesBase, releaseId, operationId);
+      const stagingDir = resolveStagingDir(
+        workspaceRoot,
+        path.join(releasesBase, releaseId),
+        operationId,
+      );
       if (existsSync(stagingDir)) {
         await fs.rm(stagingDir, { recursive: true, force: true });
       }
