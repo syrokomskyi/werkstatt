@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -32,8 +33,8 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-53
-  - DNA-58
   - DNA-48
+  - DNA-49
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -102,7 +103,7 @@ The root cause is that `fingerprintTree` (in `packages/fingerprint/src/fingerpri
 
 ## Problem
 
-DNA-53 requires that all project hashes use the shared `@warpgogol/fingerprint` package and be deterministic. DNA-58 requires generated files to be byte-identical across runs. But `fingerprintTree` with `mode: "byte"` hashes raw file bytes — any non-determinism in build output propagates directly to the `distTreeHash`.
+DNA-53 requires that all project hashes use the shared `@warpgogol/fingerprint` package and be deterministic. But `fingerprintTree` with `mode: "byte"` hashes raw file bytes — any non-determinism in build output propagates directly to the `distTreeHash`.
 
 DNA-48 (release discipline) depends on `distTreeHash` for build-identity verification at every promotion step (dev → alt → main). When the hash is non-deterministic, `leitstand.propagate` fails with a mismatch even though the content is semantically identical. This forces manual wrangler deploys and breaks the canonical release flow.
 
@@ -115,10 +116,10 @@ The `@warpgogol/fingerprint` package gains a `mode: "stable"` option for `finger
 ## Architectural fit
 
 - **DNA-53** (semantic fingerprint governance): Extends `@warpgogol/fingerprint` with a new normalization mode, keeping all hashing within the shared package.
-- **DNA-58** (generated-file content determinism): The stable mode enforces deterministic output by normalizing non-deterministic fields before hashing.
+- **DNA-58** (generated-file content determinism): Related — stable mode does not enforce byte-identical output (that is DNA-58's domain for committed generated files). Instead, stable mode makes the dist tree hash deterministic despite non-deterministic build artifacts, enabling reliable drift detection for dist content.
 - **DNA-48** (release discipline): Stable `distTreeHash` enables reliable build-identity verification across the release state machine.
 - **DNA-49** (fleet propagation): `leitstand.propagate` and `leitstand.promote` can trust `distTreeHash` comparisons without manual workarounds.
-- **Site OS operator model**: `dist.determinism.validate` is a workspace-scope command in the `release` module, callable standalone or integrated into `build.check`.
+- **Site OS operator model**: `dist.determinism.validate` is a workspace-scope command registered in `packages/os/site-kernel-handoff/src/release/release.module.ts` alongside `release.prepare` and `release.publish`. Callable standalone or integrated into `build.check`.
 
 ## Design
 
@@ -137,22 +138,24 @@ Flags: `--release` (string) or `--mission` (string). Exactly one required. Scope
 ### TypeScript contracts
 
 ```ts
-// New option in @warpgogol/fingerprint
+// Extended option in @warpgogol/fingerprint (existing mode: "byte" | "semantic" retained)
 interface FingerprintOptions {
-  mode: "byte" | "stable";
+  mode: "byte" | "semantic" | "stable";
+  root?: string;
   ignore?: string[];
 }
 
 // Stable mode normalizers (applied per file type before hashing):
-// - PDF: strip /CreationDate, /ModDate, /ID fields from PDF metadata
-// - Source maps (.js.map, .mjs.map): normalize `sources` paths to relative, strip `sourceRoot`
-// - JSON: sort keys, remove `createdAt`, `buildTimestamp`, `generatedAt` fields
-// - HTML: strip generated comment headers (already handled by buildGeneratedHeader)
+// - PDF (.pdf): strip /CreationDate, /ModDate, /ID fields from PDF metadata via pdf-lib
+// - Source maps (.js.map, .mjs.map): normalize `sources` paths to relative (relative to dist root), strip `sourceRoot`
+// - JSON (.json): sort keys, remove `createdAt`, `buildTimestamp`, `generatedAt` fields
+// - HTML (.html): strip generated comment headers (already handled by buildGeneratedHeader)
+// - All other file types: raw byte hash (same as mode: "byte")
 
+// Dist determinism check result (per non-deterministic file)
 interface DeterminismCheck {
   file: string;
   reason: string;
-  stable: boolean;
 }
 
 interface DistDeterminismValidateData {
@@ -166,15 +169,30 @@ interface DistDeterminismValidateData {
 }
 ```
 
+### Stable vs semantic mode distinction
+
+`mode: "semantic"` and `mode: "stable"` serve different purposes:
+
+- **`semantic`** — replaces the entire file hash with an AST-based normalized hash via the normalizer registry (`normalizers/index.ts`). The hash is based on parsed structure (TypeScript AST, CSS AST, etc.), not raw bytes. This loses byte-level change detection for parseable files: two files with different whitespace but the same AST produce the same hash.
+
+- **`stable`** — byte-hashes all files (like `mode: "byte"`), but applies targeted normalization only to known non-deterministic file types (PDF, source maps, JSON with timestamps). For all other files, raw byte hashing is used. This preserves change detection for file content while normalizing only volatile metadata.
+
+The distinction matters because `distTreeHash` must detect content changes in binary files (PNGs, fonts) and in text files that don't have non-deterministic metadata. `semantic` mode would normalize away whitespace and formatting changes in source files; `stable` mode preserves them.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/fingerprint/src/fingerprint.ts` | Extended — add `mode: "stable"` with per-type normalizers |
-| `releases/{release}/dist/` | Read — hashed by `dist.determinism.validate` |
-| `missions/{mission}/workpiece/dist/` | Read — hashed by `dist.determinism.validate` |
-| `packages/os/site-kernel-handoff/src/release/release-commands.ts` | Changed — use `mode: "stable"` for `fingerprintTree` call |
-| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Changed — use `mode: "stable"` for `fingerprintTree` call |
+| `packages/fingerprint/src/normalizers/pdf.ts` | New — PDF metadata stripping normalizer |
+| `packages/fingerprint/src/normalizers/sourcemap.ts` | New — source map path normalization |
+| `packages/fingerprint/package.json` | Changed — add `pdf-lib` dependency for PDF metadata manipulation |
+| `packages/os/site-kernel-handoff/src/release/release.module.ts` | Changed — register `dist.determinism.validate` command |
+| `packages/os/site-kernel-handoff/src/release/release-commands.ts` | Changed — add `runDistDeterminismValidate` handler; use `mode: "stable"` for `fingerprintTree` call in `release.prepare` |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Changed — use `mode: "stable"` for `fingerprintTree` call in `leitstand.dev-deploy` |
+| `releases/{release}/dist/` | Read — hashed by `dist.determinism.validate --release` |
+| `missions/{mission}/workpiece/dist/` | Read — hashed by `dist.determinism.validate --mission` (preferred if exists) |
+| `missions/{mission}/distribution/dist/` | Read — hashed by `dist.determinism.validate --mission` (fallback if workpiece dist absent) |
 
 ### Output format
 
@@ -186,13 +204,11 @@ interface DistDeterminismValidateData {
   "nonDeterministicFiles": [
     {
       "file": "_print/de/index.pdf",
-      "reason": "PDF /CreationDate differs between builds",
-      "stable": false
+      "reason": "PDF /CreationDate differs between builds"
     },
     {
       "file": "chunks/server_BHURFrqS.mjs.map",
-      "reason": "Source map contains absolute path in sources[]",
-      "stable": false
+      "reason": "Source map contains absolute path in sources[]"
     }
   ],
   "stableHash": "sha256:abc123...",
@@ -206,39 +222,56 @@ interface DistDeterminismValidateData {
 
 - `dist.determinism.validate` exits 0 if all files are deterministic (stable hash equals byte hash).
 - Exits 1 if non-deterministic files are detected. The `--json` output lists each file and reason.
+- Exits 1 with an error message if the dist directory is empty or missing.
 - If a normalizer fails (e.g., corrupt PDF), the file falls back to byte hashing with a warning.
 - `fingerprintTree` with `mode: "stable"` never throws for normalization failures — it falls back to byte hashing per file and records a warning.
 
 ## Rollout
 
-- `fingerprintTree` gains `mode: "stable"` as an opt-in option. `mode: "byte"` remains the default for backward compatibility.
-- `release.prepare` and `leitstand.dev-deploy` switch to `mode: "stable"` immediately — this is a backward-compatible change because the stable hash is computed from the same file set, just with normalization.
+- `fingerprintTree` gains `mode: "stable"` as an opt-in option. `mode: "byte"` remains the default — it is the correct mode for raw binary hashing where no normalization is desired (e.g., artifact store integrity checks). `mode: "semantic"` remains for source content hashing. `mode: "stable"` is for dist tree hashing where non-deterministic build artifacts are expected.
+- `release.prepare` and `leitstand.dev-deploy` switch to `mode: "stable"` immediately. The stable hash is computed from the same file set with targeted normalization — content changes are still detected, only non-deterministic metadata is normalized.
 - `dist.determinism.validate` is introduced as a standalone command for diagnosing hash mismatches.
 - After a grace period, `dist.determinism.validate` is integrated into `build.check` as a warn-level validator.
 - Existing releases with byte-mode hashes are not re-hashed — the transition happens on the next `release.prepare`.
+
+### Transition sequence for cross-mode hash mismatch
+
+When a new stable-mode release is promoted against an existing byte-mode dev deployment, `leitstand.propagate` will fail because the dev `build-identity.json` has a byte-mode `distTreeHash` while the release manifest has a stable-mode `distTreeHash`. The transition happens within a single release cycle:
+
+1. Prepare the new release with `mode: "stable"` → release manifest has stable `distTreeHash`.
+2. Re-deploy the same commit to dev via `leitstand.dev-deploy` (which now uses `mode: "stable"`) → dev `build-identity.json` has the same stable `distTreeHash`.
+3. `leitstand.propagate` verifies dev `build-identity.json` against the release manifest — both stable, match.
+4. Promote to alt, then main.
+
+Old releases retain their byte-mode hash in `release.yaml` and are not re-verified. The mismatch only occurs when comparing a new stable-mode release against an old byte-mode dev deployment — re-deploying dev with the same release resolves it.
 
 ## Alternatives considered
 
 - **Exclude non-deterministic files from the hash entirely**: Rejected — PDFs and source maps are part of the deployed artifact and should contribute to the identity. Excluding them weakens integrity verification.
 - **Make the build itself deterministic (reproducible builds)**: Rejected as out of scope — Astro, Playwright PDF generation, and bundler chunk naming are third-party tools with their own non-determinism. Normalizing at the hash level is more practical.
-- **Use semantic fingerprint mode for all files**: Rejected — `mode: "semantic"` already exists for source files but does not handle PDF metadata or source map paths. A new `mode: "stable"` combines byte hashing with targeted normalization.
+- **Use semantic fingerprint mode for all files**: Rejected — `mode: "semantic"` replaces the entire hash with an AST-based normalized hash via the normalizer registry, losing byte-level change detection for parseable files. `mode: "stable"` preserves byte hashing for all files except known non-deterministic types, applying targeted normalization only to volatile metadata (PDF timestamps, source map paths, JSON timestamp fields). See "Stable vs semantic mode distinction" above.
 
 ## Risks
 
 - **Normalizer correctness**: A buggy PDF normalizer could strip meaningful content, making two different PDFs hash the same. Mitigation: normalizers only strip known non-deterministic metadata fields (CreationDate, ModDate, ID), not content.
 - **Performance**: Normalization requires parsing each file (PDF header scan, JSON parse, source map parse). For large dist directories (2000+ files), this adds ~1-2s. Acceptable for release.prepare which runs once per release.
 - **False negatives**: Some non-deterministic artifacts may not be covered by the initial normalizers. `dist.determinism.validate` makes them visible so they can be added incrementally.
-- **Hash migration**: Switching from byte to stable mode changes all existing `distTreeHash` values. `leitstand.propagate` comparisons between old (byte) and new (stable) releases will mismatch. Mitigation: the transition happens per-release — new releases use stable mode, old releases retain their byte-mode hash in `release.yaml`.
+- **Hash migration**: Switching from byte to stable mode changes all existing `distTreeHash` values. `leitstand.propagate` comparisons between old (byte) and new (stable) releases will mismatch. Mitigation: the transition happens per-release within a single release cycle — re-deploy dev with the same stable-mode release before propagating. See "Transition sequence" above.
+- **pdf-lib dependency weight**: `pdf-lib` is a full PDF library (~2MB). For stripping `/CreationDate`, `/ModDate`, `/ID` from PDF metadata, it is proportionate because PDF metadata is embedded in a complex binary structure that is error-prone to parse with regex. The dependency must be added to `packages/fingerprint/package.json`. If a lighter approach is found during implementation (e.g., targeted regex on PDF trailer dictionaries), it may be used instead — the RFC mandates the result (stripped metadata), not the specific library.
 
 ## Acceptance criteria
 
 - [ ] `fingerprintTree` supports `mode: "stable"` with normalizers for PDF, source map, and JSON file types
-- [ ] `dist.determinism.validate` command registered with `--release` and `--mission` flags
+- [ ] `FingerprintOptions.mode` type is `"byte" | "semantic" | "stable"` (existing modes retained)
+- [ ] `dist.determinism.validate` command registered in `release.module.ts` with `--release` and `--mission` flags
+- [ ] `dist.determinism.validate --mission` reads `workpiece/dist/` if present, falls back to `distribution/dist/`
 - [ ] `dist.determinism.validate` reports non-deterministic files with reasons
+- [ ] `dist.determinism.validate` exits 1 with an error message on empty or missing dist directory
 - [ ] `release.prepare` uses `mode: "stable"` for `fingerprintTree` call
 - [ ] `leitstand.dev-deploy` uses `mode: "stable"` for `fingerprintTree` call
 - [ ] Two builds from the same commit produce identical `distTreeHash` in stable mode
 - [ ] Unit tests cover each normalizer (PDF, source map, JSON) with pass/fail scenarios
+- [ ] `pdf-lib` (or equivalent) added to `packages/fingerprint/package.json` dependencies
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
