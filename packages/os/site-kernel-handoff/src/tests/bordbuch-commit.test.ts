@@ -151,6 +151,22 @@ describe("commitBordbuchProjections", () => {
     expect(gitCalls.calls.some((c) => c.startsWith("commit "))).toBe(true);
     expect(gitCalls.calls).toContain("rev-parse HEAD");
   });
+
+  it("regression: git add uses single -- separator for multiple files", async () => {
+    gitCalls.statusOutput =
+      " M bordbuch/status.generated.yaml\n" +
+      " M public/.well-known/bordbuch.json\n" +
+      " M public/.well-known/bordbuch/index.html\n";
+    await commitBordbuchProjections(tmpDir, "test-system");
+    const addCall = gitCalls.calls.find((c) => c.startsWith("add "));
+    expect(addCall).toBeDefined();
+    const parts = addCall!.split(" ");
+    const dashDashCount = parts.filter((p) => p === "--").length;
+    expect(dashDashCount).toBe(1);
+    expect(addCall).toBe(
+      "add -- bordbuch/status.generated.yaml public/.well-known/bordbuch.json public/.well-known/bordbuch/index.html",
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------
