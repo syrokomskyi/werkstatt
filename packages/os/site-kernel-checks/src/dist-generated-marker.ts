@@ -13,6 +13,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0185: initial implementation.</item>
+  <item>ADR-0018: .html files now use parse5-based stripping via stripHtmlGeneratedMarker; other file types remain regex-based.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -30,6 +31,11 @@ import {
 } from "@warpgogol/site-kernel";
 import { passResult, failResult } from "./result-helpers.ts";
 import { collectFiles } from "@warpgogol/share/fs";
+import { stripHtmlGeneratedMarker } from "./strip-html-generated-marker.ts";
+
+function isHtmlFile(filePath: string): boolean {
+  return filePath.toLowerCase().endsWith(".html");
+}
 
 async function walkTextFiles(dir: string): Promise<string[]> {
   const files = await collectFiles(dir, { ignore: () => false });
@@ -76,7 +82,11 @@ export async function runDistGeneratedMarkerStrip(
       continue;
     }
 
-    const { changed, content: next } = stripGeneratedMarker(content);
+    // ADR-0018: use parse5-based stripping for .html files to avoid regex
+    // cross-comment swallowing bugs. Other file types use regex-based stripping.
+    const { changed, content: next } = isHtmlFile(file)
+      ? stripHtmlGeneratedMarker(content)
+      : stripGeneratedMarker(content);
     if (changed && !context.dryRun) {
       await writeFile(file, next, "utf-8");
     }
