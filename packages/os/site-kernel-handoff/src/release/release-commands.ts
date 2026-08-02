@@ -15,6 +15,7 @@
   <item>ADR-0008: run full three-phase build pipeline (build.prepare → astro build → build.post) in release.prepare fresh build path; delegate to shared runPipelinePhase and computeBuildInputHash helpers.</item>
   <item>RFC-0596: call storeArtifactCore (lock-free) inside release.publish before state transition; extend ReleasePublishData with distArtifactHash; extend release.validate to check artifact field for published releases.</item>
   <item>RFC-0608: write build-identity.json into dist/client/.well-known/ after hash computation.</item>
+  <item>RFC-0655: sync close-report.json releaseId after writing mission.yaml; add release.state.validate command.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -480,6 +481,26 @@ export async function runReleasePrepare(
       const missionManifest = await readMissionManifest(workspaceRoot, missionId);
       missionManifest.releaseId = releaseId;
       await writeMissionManifest(workspaceRoot, missionManifest);
+
+      // RFC-0655: sync close-report.json releaseId after writing mission.yaml
+      const closeReportPath = path.join(missionDir, "evidence", "close-report.json");
+      if (existsSync(closeReportPath)) {
+        try {
+          const closeReportRaw = await fs.readFile(closeReportPath, "utf8");
+          const closeReport = JSON.parse(closeReportRaw) as Record<string, unknown>;
+          closeReport.releaseId = releaseId;
+          await atomicWriteFile(closeReportPath, JSON.stringify(closeReport, null, 2) + "\n");
+          logger.info(`  Synced close-report.json releaseId to ${releaseId}`);
+        } catch (err) {
+          logger.warn(
+            `[release.prepare] failed to sync close-report.json: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      } else {
+        logger.warn(
+          `[release.prepare] close-report.json not found for mission '${missionId}' — skipping releaseId sync (mission may have been closed before RFC-0477)`,
+        );
+      }
 
       // RFC-0520: C-surface regression check delegated to evaluateCSurfaceGate
       let cSurfaceVerdict: "pass" | "fail" | "skipped" = "skipped";
