@@ -5,7 +5,7 @@ title: "Preserve background-color inherit in CSS minification"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: workspace
 decider: architecture
 createdAt: 2026-08-02
@@ -16,7 +16,8 @@ supersedes: []
 supersededBy:
 related:
   - RFC-0649
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0017: Preserve background-color inherit in CSS minification
@@ -31,10 +32,11 @@ During the Axiom gate session on 2026-08-02, 2637 incomplete color-contrast find
 
 ## Decision
 
-The Astro build pipeline configures lightningcss to preserve `background-color: inherit` declarations during CSS minification.
+The Astro build pipeline uses esbuild instead of lightningcss for CSS minification, preserving `background-color: inherit` declarations in production output.
 
-- Applies to all sites in the monorepo via the shared Astro build configuration.
-- Uses lightningcss's `targets` or `errorRecovery` option to disable the `inherit` → `transparent` simplification.
+- Applies to all sites in the monorepo via the shared Astro build configuration template (`astro.config.template.mjs`).
+- Sets `vite.build.cssMinify: 'esbuild'` in the Vite config. esbuild does not strip `inherit` declarations because it does not perform the "remove default property sub-values" optimization that lightningcss does.
+- JS minification continues to use terser (unchanged). Only the CSS minifier changes.
 
 ## Justification
 
@@ -48,6 +50,7 @@ Alternatives considered:
 2. **Use a CSS custom property (`--bg-color: inherit`)**: Adds complexity and does not help axe, which reads computed styles, not custom properties.
 3. **Disable CSS minification entirely**: Increases CSS bundle size by ~30%. Unacceptable for production.
 4. **Post-build Axiom check on production CSS**: Already done via `leitstand.dev-deploy` Axiom gate, but the gate cannot fix the CSS — it only reports findings. The fix must be at the build level.
+5. **Configure lightningcss to preserve `inherit`**: lightningcss has no option to selectively preserve `inherit` declarations. Its `targets` option controls browser compatibility transforms, and `errorRecovery` only prevents crashes on parse errors. Neither prevents the "remove default property sub-values" minification pass. The visitor API transforms values but cannot prevent minification removal. Switching to esbuild is the simplest reliable solution.
 
 ## Consequences
 
