@@ -4,7 +4,7 @@ date: 2026-08-02
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: 445f920...HEAD
 filesReviewed:
   - packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts
@@ -16,9 +16,9 @@ filesReviewed:
 
 # Code Review: 445f920...HEAD (RFC-0646)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-One minor finding: the `gitExec` mock in `bordbuch-commit.test.ts` is now dead code since `bordbuch-commit.ts` no longer imports `gitExec`. The implementation itself is sound — retry logic, error classification, and test coverage are all correct.
+Finding A1 (dead `gitExec` mock in `bordbuch-commit.test.ts`) has been fixed in commit 9d645c3. The implementation is sound — retry logic, error classification, and test coverage are all correct. Zero findings remain.
 
 ### Mechanical floor
 
@@ -26,7 +26,7 @@ Pass — `tsc --noEmit` clean, 499 tests pass, `rfc.validate` clean.
 
 ### Axis A — Structural correctness
 
-**Finding A1.** The `gitExec` mock in `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:40-45` is dead code. `bordbuch-commit.ts` no longer imports `gitExec` (only `gitExecWithRetry`), so the mock factory entry for `gitExec` is unused. Remove it to keep the mock focused on the actual dependency.
+**Finding A1 (fixed).** The `gitExec` mock in `packages/os/site-kernel-handoff/src/tests/bordbuch-commit.test.ts:40-45` was dead code. Fixed in commit 9d645c3 — the mock factory now only provides `gitExecWithRetry`.
 
 ### Axis B — DNA alignment
 
@@ -58,4 +58,4 @@ No spec available — skipped. RFC-0646 acceptance criteria are the de facto spe
 
 ### Questions for the author
 
-1. The `gitExec` mock in `bordbuch-commit.test.ts` is unused — should it be removed to keep the mock focused on `gitExecWithRetry` only?
+None — all findings resolved.
