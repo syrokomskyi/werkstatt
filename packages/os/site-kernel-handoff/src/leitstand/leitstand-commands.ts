@@ -19,6 +19,7 @@
   <item>RFC-0649: dev-deploy treats CDN purge as fatal for cloudflare-workers adapter (checks purgeResult.success); adds verifyFreshness function that fetches build-identity.json from CDN URL and compares distTreeHash; skips purge + freshness check for null adapter; freshness mismatch stops pipeline before Axiom gate.</item>
   <item>RFC-0653: dev-deploy implements build-skip cache — skips pnpm build when commitSha + platformVersion + platformSemanticHash match .dev-deploy-build-cache.json and dist/ exists. --force-build bypasses the cache. buildSkipped field added to DevDeployResult.</item>
   <item>RFC-0652: best-effort evidence.sync after axiom.report; --skip-evidence-sync flag; evidenceSynced/evidenceSyncError in output.</item>
+  <item>RFC-0656: switch distTreeHash from mode: "byte" to mode: "stable" for deterministic hashing of non-deterministic build artifacts.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -671,8 +672,8 @@ export async function runLeitstandDevDeploy(
     );
   }
 
-  // RFC-0634: Compute distTreeHash via fingerprintTree (deterministic — build-identity.json excluded)
-  const distTreeResult = await fingerprintTree(distPath, { mode: "byte" });
+  // RFC-0656: Compute deterministic distTreeHash via stable mode (normalizes PDFs, source maps, JSON timestamps)
+  const distTreeResult = await fingerprintTree(distPath, { mode: "stable", root: distPath });
   const distTreeHash = distTreeResult.value;
 
   // RFC-0634: Write final build-identity.json to dist/client/.well-known/ with real hashes

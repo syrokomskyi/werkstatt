@@ -16,6 +16,7 @@
   <item>RFC-0596: call storeArtifactCore (lock-free) inside release.publish before state transition; extend ReleasePublishData with distArtifactHash; extend release.validate to check artifact field for published releases.</item>
   <item>RFC-0608: write build-identity.json into dist/client/.well-known/ after hash computation.</item>
   <item>RFC-0655: sync close-report.json releaseId after writing mission.yaml; add release.state.validate command.</item>
+  <item>RFC-0656: add dist.determinism.validate command; switch release.prepare distTreeHash to mode: "stable".</item>
 </CHANGE_SUMMARY>
 */
 
@@ -408,8 +409,8 @@ export async function runReleasePrepare(
         );
       }
 
-      // RFC-0585: Compute real hashes via @warpgogol/fingerprint
-      const distTreeResult = await fingerprintTree(distDest, { mode: "byte" });
+      // RFC-0656: Compute deterministic distTreeHash via stable mode (normalizes PDFs, source maps, JSON timestamps)
+      const distTreeResult = await fingerprintTree(distDest, { mode: "stable", root: distDest });
       const distTreeHash = distTreeResult.value;
 
       const siteContentHash = workpieceTreeHash;
@@ -1198,4 +1199,115 @@ async function validateReleaseState(
   }
 
   return checks;
+}
+
+// §6.9: dist.determinism.validate (RFC-0656)
+export interface NonDeterministicFile {
+  path: string;
+  normalizer: string;
+  reason: string;
+}
+
+export interface DistDeterminismValidateData {
+  distPath: string;
+  stableHash: string;
+  byteHash: string;
+  hashesMatch: boolean;
+  nonDeterministicFiles: NonDeterministicFile[];
+  totalFiles: number;
+}
+
+export async function runDistDeterminismValidate(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<DistDeterminismValidateData>> {
+  const { workspaceRoot } = context;
+  const releaseId = flagString(input, "release");
+  const missionId = flagString(input, "mission");
+
+  if (!releaseId && !missionId) {
+    throw new Error("[dist.determinism.validate] either --release or --mission is required");
+  }
+  if (releaseId && missionId) {
+    throw new Error("[dist.determinism.validate] --release and --mission are mutually exclusive");
+  }
+
+  let distPath: string;
+  if (releaseId) {
+    distPath = path.join(workspaceRoot, "releases", releaseId, "dist");
+  } else {
+    const missionDir = resolveMissionDir(workspaceRoot, missionId!);
+    const workpieceDist = path.join(missionDir, "workpiece", "dist");
+    const distributionDist = path.join(missionDir, "distribution", "dist");
+    if (existsSync(workpieceDist)) {
+      distPath = workpieceDist;
+    } else if (existsSync(distributionDist)) {
+      distPath = distributionDist;
+    } else {
+      return {
+        data: {
+          distPath: "",
+          stableHash: "",
+          byteHash: "",
+          hashesMatch: false,
+          nonDeterministicFiles: [],
+          totalFiles: 0,
+        },
+        exitCode: 1,
+        summary: `[dist.determinism.validate] no dist directory found for mission '${missionId}'`,
+      };
+    }
+  }
+
+  if (!existsSync(distPath)) {
+    return {
+      data: {
+        distPath,
+        stableHash: "",
+        byteHash: "",
+        hashesMatch: false,
+        nonDeterministicFiles: [],
+        totalFiles: 0,
+      },
+      exitCode: 1,
+      summary: `[dist.determinism.validate] dist directory does not exist: ${distPath}`,
+    };
+  }
+
+  const stableResult = await fingerprintTree(distPath, { mode: "stable", root: distPath });
+  const byteResult = await fingerprintTree(distPath, { mode: "byte" });
+
+  const nonDeterministicFiles: NonDeterministicFile[] = [];
+  const stableByPath = new Map<string, (typeof stableResult.files)[number]>();
+  for (const f of stableResult.files) {
+    stableByPath.set(f.path, f);
+  }
+
+  for (const byteFile of byteResult.files) {
+    const stableFile = stableByPath.get(byteFile.path);
+    if (stableFile && stableFile.hash !== byteFile.hash) {
+      nonDeterministicFiles.push({
+        path: byteFile.path,
+        normalizer: stableFile.normalizer,
+        reason: `${stableFile.normalizer} normalization changed hash`,
+      });
+    }
+  }
+
+  const hashesMatch = nonDeterministicFiles.length === 0;
+
+  return {
+    data: {
+      distPath,
+      stableHash: stableResult.value,
+      byteHash: byteResult.value,
+      hashesMatch,
+      nonDeterministicFiles,
+      totalFiles: stableResult.files.length,
+    },
+    exitCode: hashesMatch ? undefined : 1,
+    summary: hashesMatch
+      ? `[dist.determinism.validate] all ${stableResult.files.length} files are deterministic`
+      : `[dist.determinism.validate] ${nonDeterministicFiles.length}/${stableResult.files.length} files are non-deterministic`,
+  };
 }

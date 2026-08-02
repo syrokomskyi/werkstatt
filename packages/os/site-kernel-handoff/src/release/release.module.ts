@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Lazy loading refactor: extracted from release/index.ts to use dynamic imports inside async register().</item>
   <item>RFC-0655: add release.state.validate command for release pipeline consistency checks.</item>
+  <item>RFC-0656: add dist.determinism.validate command for non-deterministic build artifact detection.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,6 +27,7 @@ export function createReleaseModule(): KernelModule {
         runReleaseList,
         runReleaseRollback,
         runReleaseStateValidate,
+        runDistDeterminismValidate,
       } = await import("./release-commands.ts");
       registry.registerCommand({
         name: "release.prepare",
@@ -121,6 +123,27 @@ export function createReleaseModule(): KernelModule {
           "systems/{system}/bordbuch/events.ndjson",
         ],
         execute: runReleaseStateValidate,
+      });
+      registry.registerCommand({
+        name: "dist.determinism.validate",
+        description:
+          "Report non-deterministic files in a dist directory by comparing stable vs byte hashes (RFC-0656). Flags: --release, --mission.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: false,
+        flags: {
+          release: { kind: "string", description: "Release id whose dist to validate." },
+          mission: {
+            kind: "string",
+            description: "Mission id whose workpiece/dist or distribution/dist to validate.",
+          },
+        },
+        reads: [
+          "releases/{release}/dist/**",
+          "missions/{mission}/workpiece/dist/**",
+          "missions/{mission}/distribution/dist/**",
+        ],
+        execute: runDistDeterminismValidate,
       });
     },
   };
