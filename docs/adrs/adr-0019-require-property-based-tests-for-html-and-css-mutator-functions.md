@@ -5,7 +5,7 @@ title: "Require property-based tests for HTML and CSS mutator functions"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-02
