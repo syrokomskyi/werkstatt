@@ -64,6 +64,14 @@ export function createLeitstandModule(): KernelModule {
             required: true,
             description: "Sternsystem id with an active mission.",
           },
+          "skip-evidence-sync": {
+            kind: "boolean",
+            description: "RFC-0652: Skip best-effort evidence.sync to R2 after axiom.report.",
+          },
+          "force-build": {
+            kind: "boolean",
+            description: "RFC-0653: Force pnpm build even when build-skip cache matches.",
+          },
         },
         writes: ["missions/{mission}/evidence/axiom/**"],
         reads: ["systems/registry.yaml", "missions/{mission}/workpiece/**"],

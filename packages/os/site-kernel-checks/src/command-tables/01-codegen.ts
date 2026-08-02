@@ -210,7 +210,12 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       },
     },
     supportsAllSites: true,
-    cacheable: false,
+    reads: [
+      "<app>/src/content/system.md",
+      "<app>/src/content/**/*.md",
+      "packages/ontology/biomes/**/*.yaml",
+    ],
+    writes: ["<app>/public/preview/**", "<app>/public/og-image.png"],
     execute: runPreviewImagesGenerate,
   },
   {

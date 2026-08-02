@@ -12,7 +12,7 @@
 
 import type { CheckCommandEntry } from "./types.ts";
 import { runPrintContractValidate, runPrintLayoutValidate } from "../print.ts";
-import { runPrintPdfGenerate, runPrintPdfValidate } from "../print-pdf.ts";
+import { runPrintPdfGenerate, runPrintPdfCopy, runPrintPdfValidate } from "../print-pdf.ts";
 
 export const PRINT_COMMANDS: CheckCommandEntry[] = [
   /* RFC-0257: print contract validation */
@@ -37,18 +37,35 @@ export const PRINT_COMMANDS: CheckCommandEntry[] = [
     reads: ["packages/ui/src/**/*.css", "packages/ui/src/**/*.scss"],
     execute: runPrintLayoutValidate,
   },
-  /* RFC-0257: PDF generation via Playwright */
+  /* RFC-0257 / RFC-0653: PDF generation via Playwright — writes to .cache/pdf/ */
   {
     name: "print.pdf.generate",
     description:
-      "Generate PDFs from the built static site using Playwright Chromium. Writes to dist/client/_print/<lang>/<path>.pdf. Skips existing PDFs unless --force. Exits early when output.printPdf is not true (RFC-0257).",
+      "Generate PDFs from the built static site using Playwright Chromium. Writes to .cache/pdf/<hash>/ (RFC-0653). Use print.pdf.copy to copy PDFs into dist/client/_print/. Exits early when output.printPdf is not true (RFC-0257).",
     scope: "app",
     flags: {},
     supportsAllSites: true,
     mutatesState: true,
-    writes: ["<app>/dist/client/_print/{lang}/{route}.pdf"],
-    cacheable: false,
+    reads: [
+      "<app>/src/content/system.md",
+      "<app>/src/content/**/*.md",
+      "<app>/dist/client/**/*.html",
+    ],
+    writes: ["<app>/.cache/pdf/**"],
     execute: runPrintPdfGenerate,
+  },
+  /* RFC-0653: copy PDFs from .cache/pdf/ to dist/client/_print/ */
+  {
+    name: "print.pdf.copy",
+    description:
+      "Copy generated PDFs from .cache/pdf/ to dist/client/_print/. Runs in build.post after print.pdf.generate. Not cacheable — always executes to restore PDFs into freshly-built dist/.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    cacheable: false,
+    reads: ["<app>/.cache/pdf/**/*.pdf"],
+    writes: ["<app>/dist/client/_print/**"],
+    execute: runPrintPdfCopy,
   },
   /* RFC-0257: PDF validation */
   {

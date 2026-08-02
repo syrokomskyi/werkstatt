@@ -42,7 +42,8 @@ export const SITES_BUILD_POST_PIPELINE: KernelPipelineStep[] = [
   // only becomes part of history if a human/agent reviews the diff and commits
   // it — this step never auto-commits.
   { command: "behavior.snapshot.generate" },
-  // RFC-0257: generate PDFs from the built static site and validate them
+  // RFC-0257/RFC-0653: generate PDFs to .cache/pdf/, copy to dist/, then validate
   { command: "print.pdf.generate", expectedDurationMs: 120_000, timeoutMs: 900_000 },
+  { command: "print.pdf.copy" },
   { command: "print.pdf.validate" },
 ];

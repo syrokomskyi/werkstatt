@@ -17,6 +17,7 @@
   <item>RFC-0629: propagate gate reads evidence-metadata.json + study-run.json (native Axiom format); dev-deploy passes --commit-sha to mission.check (no evidence post-processing); JSON.parse wrapped with error handling.</item>
   <item>RFC-0634: dev-deploy writes preliminary + final build-identity.json (preliminary in public/.well-known/ before build, final in dist/client/.well-known/ after hash computation with dist cleanup); propagate verifies dev build-identity before deploying to alt; release.prepare uses workpiece HEAD for commitSha.</item>
   <item>RFC-0649: dev-deploy treats CDN purge as fatal for cloudflare-workers adapter (checks purgeResult.success); adds verifyFreshness function that fetches build-identity.json from CDN URL and compares distTreeHash; skips purge + freshness check for null adapter; freshness mismatch stops pipeline before Axiom gate.</item>
+  <item>RFC-0653: dev-deploy implements build-skip cache — skips pnpm build when commitSha + platformVersion + platformSemanticHash match .dev-deploy-build-cache.json and dist/ exists. --force-build bypasses the cache. buildSkipped field added to DevDeployResult.</item>
   <item>RFC-0652: best-effort evidence.sync after axiom.report; --skip-evidence-sync flag; evidenceSynced/evidenceSyncError in output.</item>
 </CHANGE_SUMMARY>
 */
@@ -423,6 +424,7 @@ export interface DevDeployResult {
   missionId: string;
   commitSha: string;
   buildState: "succeeded" | "failed";
+  buildSkipped: boolean;
   deployState: "succeeded" | "failed" | "failed-stale" | "in-progress";
   deploymentUrl: string;
   buildIdentity: {
@@ -450,6 +452,7 @@ export async function runLeitstandDevDeploy(
   if (!systemId) throw new Error("[leitstand.dev-deploy] --system is required");
   const skipEvidenceSync =
     input.flags["skip-evidence-sync"] === true || input.flags["skip-evidence-sync"] === "true";
+  const forceBuild = input.flags["force-build"] === true || input.flags["force-build"] === "true";
 
   const channel: Channel = "dev";
 
@@ -497,75 +500,126 @@ export async function runLeitstandDevDeploy(
     workpiecePath,
   );
 
-  // RFC-0634: Write preliminary build-identity.json to workpiece/public/.well-known/ before build
-  const publicWellKnownDir = path.join(workpiecePath, "public", ".well-known");
-  await fs.mkdir(publicWellKnownDir, { recursive: true });
-  const preliminaryBuildIdentity = {
-    releaseId: `workpiece-${missionId}`,
-    systemId,
+  // RFC-0653: Build-skip cache — skip pnpm build when cache key matches and dist/ exists
+  const buildCachePath = path.join(
+    workspaceRoot,
+    "missions",
     missionId,
-    semver: "0.0.0-workpiece",
-    distTreeHash: "",
-    behaviorSnapshotHash: "",
-    siteContentHash: workpieceTreeHash,
-    platformVersion,
-    platformSemanticHash,
-    commitSha,
-    buildTimestamp: new Date().toISOString(),
-    targetPlatform: "cloudflare-workers",
-  };
-  await atomicWriteFile(
-    path.join(publicWellKnownDir, "build-identity.json"),
-    JSON.stringify(preliminaryBuildIdentity, null, 2) + "\n",
+    ".dev-deploy-build-cache.json",
   );
-  logger.info(
-    `[leitstand.dev-deploy] wrote preliminary build-identity.json to public/.well-known/`,
-  );
+  let buildSkipped = false;
+  if (!forceBuild && existsSync(buildCachePath)) {
+    try {
+      const cacheRaw = await fs.readFile(buildCachePath, "utf-8");
+      const cache = JSON.parse(cacheRaw) as {
+        commitSha: string;
+        platformVersion: string;
+        platformSemanticHash: string;
+      };
+      const distPath = path.join(workpiecePath, "dist");
+      if (
+        cache.commitSha === commitSha &&
+        cache.platformVersion === platformVersion &&
+        cache.platformSemanticHash === platformSemanticHash &&
+        existsSync(distPath)
+      ) {
+        buildSkipped = true;
+        logger.info(
+          `[leitstand.dev-deploy] build skipped (cache hit: commitSha=${commitSha.slice(0, 8)}, platform=${platformVersion})`,
+        );
+      }
+    } catch (err) {
+      logger.warn(
+        `[leitstand.dev-deploy] build cache read failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
 
-  // Step 1: Build workpiece
-  const t0 = Date.now();
-  logger.info(`[leitstand.dev-deploy] building workpiece at ${workpiecePath}...`);
-  let buildState: "succeeded" | "failed" = "succeeded";
-  try {
-    execSync("pnpm build", { cwd: workpiecePath, stdio: "inherit", timeout: 600_000 });
-    logger.info(
-      `[leitstand.dev-deploy] build completed in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
-    );
-  } catch (err) {
-    buildState = "failed";
-    logger.warn(
-      `[leitstand.dev-deploy] build failed: ${err instanceof Error ? err.message : String(err)}`,
-    );
-    // RFC-0634: Clean up preliminary build-identity on build failure
-    await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
-    return {
-      data: {
-        command: "leitstand.dev-deploy",
-        systemId,
-        missionId,
-        commitSha: "",
-        buildState: "failed",
-        deployState: "failed",
-        deploymentUrl: channelConfig.url,
-        buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
-        axiom: {
-          status: "not-run",
-          errors: 0,
-          warnings: 0,
-          exitCode: 0,
-          freshness: {
-            verified: false,
-            cdnDistTreeHash: null,
-            localDistTreeHash: "",
-            error: "build failed",
-          },
-        },
-        evidenceSynced: false,
-        evidenceSyncError: null,
-      },
-      exitCode: 1,
-      summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
+  // RFC-0634: Write preliminary build-identity.json to workpiece/public/.well-known/ before build
+  // RFC-0653: Skip preliminary write when build is skipped (dist/ already has final build-identity)
+  const publicWellKnownDir = path.join(workpiecePath, "public", ".well-known");
+  if (!buildSkipped) {
+    await fs.mkdir(publicWellKnownDir, { recursive: true });
+    const preliminaryBuildIdentity = {
+      releaseId: `workpiece-${missionId}`,
+      systemId,
+      missionId,
+      semver: "0.0.0-workpiece",
+      distTreeHash: "",
+      behaviorSnapshotHash: "",
+      siteContentHash: workpieceTreeHash,
+      platformVersion,
+      platformSemanticHash,
+      commitSha,
+      buildTimestamp: new Date().toISOString(),
+      targetPlatform: "cloudflare-workers",
     };
+    await atomicWriteFile(
+      path.join(publicWellKnownDir, "build-identity.json"),
+      JSON.stringify(preliminaryBuildIdentity, null, 2) + "\n",
+    );
+    logger.info(
+      `[leitstand.dev-deploy] wrote preliminary build-identity.json to public/.well-known/`,
+    );
+  }
+
+  // Step 1: Build workpiece (RFC-0653: skip when cache hit)
+  const t0 = Date.now();
+  let buildState: "succeeded" | "failed" = "succeeded";
+  if (buildSkipped) {
+    logger.info(`[leitstand.dev-deploy] using cached dist/ (build skipped)`);
+  } else {
+    logger.info(`[leitstand.dev-deploy] building workpiece at ${workpiecePath}...`);
+    try {
+      execSync("pnpm build", { cwd: workpiecePath, stdio: "inherit", timeout: 600_000 });
+      logger.info(
+        `[leitstand.dev-deploy] build completed in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
+      );
+      // RFC-0653: Write build-skip cache after successful build
+      const buildCache = {
+        commitSha,
+        platformVersion,
+        platformSemanticHash,
+        writtenAt: new Date().toISOString(),
+      };
+      await fs.writeFile(buildCachePath, JSON.stringify(buildCache, null, 2) + "\n");
+    } catch (err) {
+      buildState = "failed";
+      logger.warn(
+        `[leitstand.dev-deploy] build failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+      // RFC-0634: Clean up preliminary build-identity on build failure
+      await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
+      return {
+        data: {
+          command: "leitstand.dev-deploy",
+          systemId,
+          missionId,
+          commitSha: "",
+          buildState: "failed",
+          buildSkipped: false,
+          deployState: "failed",
+          deploymentUrl: channelConfig.url,
+          buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
+          axiom: {
+            status: "not-run",
+            errors: 0,
+            warnings: 0,
+            exitCode: 0,
+            freshness: {
+              verified: false,
+              cdnDistTreeHash: null,
+              localDistTreeHash: "",
+              error: "build failed",
+            },
+          },
+          evidenceSynced: false,
+          evidenceSyncError: null,
+        },
+        exitCode: 1,
+        summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
+      };
+    }
   }
 
   const distPath = path.join(workpiecePath, "dist");
@@ -579,6 +633,7 @@ export async function runLeitstandDevDeploy(
         missionId,
         commitSha: "",
         buildState: "failed",
+        buildSkipped: false,
         deployState: "failed",
         deploymentUrl: channelConfig.url,
         buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
@@ -591,7 +646,7 @@ export async function runLeitstandDevDeploy(
             verified: false,
             cdnDistTreeHash: null,
             localDistTreeHash: "",
-            error: "build failed — no dist/ directory",
+            error: "dist/ not found after build",
           },
         },
         evidenceSynced: false,
@@ -715,6 +770,7 @@ export async function runLeitstandDevDeploy(
           missionId,
           commitSha,
           buildState,
+          buildSkipped,
           deployState: result.state,
           deploymentUrl: result.deploymentUrl,
           buildIdentity: {
@@ -749,6 +805,7 @@ export async function runLeitstandDevDeploy(
           missionId,
           commitSha,
           buildState,
+          buildSkipped,
           deployState: result.state,
           deploymentUrl: result.deploymentUrl,
           buildIdentity: {
@@ -866,6 +923,7 @@ export async function runLeitstandDevDeploy(
       missionId,
       commitSha,
       buildState,
+      buildSkipped,
       deployState: result.state,
       deploymentUrl: result.deploymentUrl,
       buildIdentity: {

@@ -13,16 +13,19 @@ print.pdf.validate verifies that all expected PDFs exist and are non-empty.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0257: Initial creation — PDF generation and validation commands.</item>
+  <item>RFC-0653: print.pdf.generate writes to .cache/pdf/<hash>/ with .done marker + manifest.json; add print.pdf.copy command.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { KernelCommandResult, KernelRuntimeContext } from "@warpgogol/site-kernel";
+import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { existsSync, mkdirSync, statSync } from "node:fs";
-import { writeFile, readFile } from "node:fs/promises";
+import { writeFile, readFile, copyFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { createServer } from "node:http";
 import { loadSystemManifest, parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import { pageIdToContentFileSlug } from "@warpgogol/share/content";
+import { stableJsonHash, byteHash } from "@warpgogol/fingerprint";
 import type { PrintPdfGenerateResult } from "@warpgogol/share/schemas/print";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
@@ -88,8 +91,9 @@ export async function runPrintPdfGenerate(
 
   interface PageTarget {
     route: string;
+    routeSlug: string;
     lang: string;
-    pdfPath: string;
+    htmlPath: string;
     printCfg: Record<string, unknown> | undefined;
   }
 
@@ -116,37 +120,64 @@ export async function runPrintPdfGenerate(
       const isDefaultLang = lang === defaultLanguageFromManifest(manifest);
       const routePath = isDefaultLang ? `/${routeSlug}` : `/${lang}/${routeSlug}`;
 
-      // PDF path: dist/client/_print/<lang>/<path>.pdf
-      const pdfPath = join(distDir, "_print", lang, `${routeSlug || "index"}.pdf`);
+      // HTML source path for hash computation
+      const htmlPath = isDefaultLang
+        ? join(distDir, routeSlug || "", "index.html")
+        : join(distDir, lang, routeSlug || "", "index.html");
 
-      targets.push({ route: routePath, lang, pdfPath, printCfg });
+      targets.push({ route: routePath, routeSlug: routeSlug || "index", lang, htmlPath, printCfg });
     }
   }
 
-  // 4. Filter out existing PDFs (idempotent) unless --force
-  const toGenerate: PageTarget[] = [];
-  let skipped = 0;
+  // 4. Compute composite hash from HTML files + print config (RFC-0653)
+  const hashInputs: Array<{ route: string; lang: string; htmlHash: string; printCfg: unknown }> =
+    [];
   for (const target of targets) {
-    if (!force && existsSync(target.pdfPath) && statSync(target.pdfPath).size > 0) {
-      skipped++;
-    } else {
-      toGenerate.push(target);
+    let htmlHash = "missing";
+    if (existsSync(target.htmlPath)) {
+      const htmlContent = await readFile(target.htmlPath, "utf-8");
+      htmlHash = byteHash(htmlContent);
     }
+    hashInputs.push({
+      route: target.route,
+      lang: target.lang,
+      htmlHash,
+      printCfg: target.printCfg,
+    });
   }
+  const compositeHash = stableJsonHash({ pages: hashInputs }).replace(/^sha256:/, "");
+  const cacheBaseDir = join(appDir, ".cache", "pdf");
+  const cacheDir = join(cacheBaseDir, compositeHash);
+  const doneMarker = join(cacheDir, ".done");
 
-  if (toGenerate.length === 0) {
+  // 5. Check .done marker for internal cache hit (unless --force)
+  if (!force && existsSync(doneMarker)) {
+    // Write manifest with current cache dir
+    const manifestEntries = targets.map((t) => ({
+      lang: t.lang,
+      routeSlug: t.routeSlug,
+      cacheDir: relative(appDir, cacheDir),
+      pdfFile: `${t.routeSlug}.pdf`,
+    }));
+    await writeFileIfChanged(
+      join(cacheBaseDir, "manifest.json"),
+      JSON.stringify({ entries: manifestEntries }, null, 2) + "\n",
+    );
     return {
       exitCode: 0,
-      summary: `No PDFs to generate. ${skipped} skipped, ${targets.length - skipped} disabled.`,
+      summary: `PDF cache hit (hash: ${compositeHash.slice(0, 12)}). ${targets.length} PDFs in cache.`,
       data: {
         generated: 0,
-        skipped,
-        disabled: targets.length - skipped - 0,
+        skipped: targets.length,
+        disabled: 0,
         errors: [],
-        outputDir: join(distDir, "_print"),
-      } satisfies PrintPdfGenerateResult,
+        outputDir: relative(appDir, cacheDir),
+        cacheHit: true,
+      } satisfies PrintPdfGenerateResult & { cacheHit: boolean },
     };
   }
+
+  const toGenerate = targets;
 
   // 5. Start a static HTTP server over dist/client
   const server = createServer(async (req, res) => {
@@ -255,10 +286,11 @@ export async function runPrintPdfGenerate(
           preferCSSPageSize: true,
         });
 
-        // Ensure parent directory exists
-        const parentDir = join(target.pdfPath, "..");
+        // Ensure parent directory exists in cache
+        const pdfPath = join(cacheDir, target.lang, `${target.routeSlug}.pdf`);
+        const parentDir = join(pdfPath, "..");
         mkdirSync(parentDir, { recursive: true });
-        await writeFile(target.pdfPath, pdfBuffer);
+        await writeFileIfChanged(pdfPath, Buffer.from(pdfBuffer));
         generated++;
         await page.close();
       } catch (err: any) {
@@ -271,10 +303,10 @@ export async function runPrintPdfGenerate(
       summary: `Playwright error: ${err.message ?? String(err)}. Ensure Playwright Chromium is installed (pnpm exec playwright install chromium).`,
       data: {
         generated,
-        skipped,
+        skipped: 0,
         disabled: 0,
         errors,
-        outputDir: join(distDir, "_print"),
+        outputDir: relative(appDir, cacheDir),
       } satisfies PrintPdfGenerateResult,
     };
   } finally {
@@ -282,29 +314,143 @@ export async function runPrintPdfGenerate(
     server.close();
   }
 
+  // 7. Write .done marker and manifest (RFC-0653)
+  await writeFileIfChanged(doneMarker, new Date().toISOString() + "\n");
+  const manifestEntries = targets.map((t) => ({
+    lang: t.lang,
+    routeSlug: t.routeSlug,
+    cacheDir: relative(appDir, cacheDir),
+    pdfFile: `${t.routeSlug}.pdf`,
+  }));
+  await writeFileIfChanged(
+    join(cacheBaseDir, "manifest.json"),
+    JSON.stringify({ entries: manifestEntries }, null, 2) + "\n",
+  );
+
   const result: PrintPdfGenerateResult = {
     generated,
-    skipped,
-    disabled:
-      targets.length - toGenerate.length - skipped > 0
-        ? targets.length - toGenerate.length - skipped
-        : 0,
+    skipped: 0,
+    disabled: 0,
     errors,
-    outputDir: join(distDir, "_print"),
+    outputDir: relative(appDir, cacheDir),
   };
 
   if (errors.length > 0) {
     return {
       exitCode: 1,
-      summary: `Generated ${generated} PDFs, skipped ${skipped}, ${errors.length} error${errors.length === 1 ? "" : "s"}.`,
+      summary: `Generated ${generated} PDFs, ${errors.length} error${errors.length === 1 ? "" : "s"}.`,
       data: result,
     };
   }
 
   return {
     exitCode: 0,
-    summary: `Generated ${generated} PDFs, skipped ${skipped}.`,
+    summary: `Generated ${generated} PDFs to .cache/pdf/${compositeHash.slice(0, 12)}/.`,
     data: result,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// print.pdf.copy (RFC-0653)
+// ---------------------------------------------------------------------------
+
+export async function runPrintPdfCopy(
+  _input: any,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult> {
+  const app = context.site;
+  if (!app) {
+    return {
+      exitCode: 1,
+      summary: "This command must be run inside an app context.",
+    };
+  }
+
+  const appDir = app.directory;
+  const cacheBaseDir = join(appDir, ".cache", "pdf");
+  const manifestPath = join(cacheBaseDir, "manifest.json");
+  const distPrintDir = join(appDir, "dist", "client", "_print");
+
+  if (!existsSync(manifestPath)) {
+    return {
+      exitCode: 0,
+      summary: "No PDF manifest found at .cache/pdf/manifest.json. Nothing to copy.",
+      data: {
+        command: "print.pdf.copy",
+        status: "pass",
+        copied: 0,
+        outputDir: "dist/client/_print",
+      },
+    };
+  }
+
+  let manifest: {
+    entries: Array<{ lang: string; routeSlug: string; cacheDir: string; pdfFile: string }>;
+  };
+  try {
+    const raw = await readFile(manifestPath, "utf-8");
+    manifest = JSON.parse(raw);
+  } catch (err: any) {
+    return {
+      exitCode: 1,
+      summary: `Failed to read PDF manifest: ${err.message ?? String(err)}`,
+      data: {
+        command: "print.pdf.copy",
+        status: "fail",
+        copied: 0,
+        outputDir: "dist/client/_print",
+      },
+    };
+  }
+
+  if (!manifest.entries || manifest.entries.length === 0) {
+    return {
+      exitCode: 0,
+      summary: "PDF manifest is empty. Nothing to copy.",
+      data: {
+        command: "print.pdf.copy",
+        status: "pass",
+        copied: 0,
+        outputDir: "dist/client/_print",
+      },
+    };
+  }
+
+  let copied = 0;
+  const missing: string[] = [];
+
+  for (const entry of manifest.entries) {
+    const srcPath = join(appDir, entry.cacheDir, entry.lang, entry.pdfFile);
+    const destPath = join(distPrintDir, entry.lang, entry.pdfFile);
+
+    if (!existsSync(srcPath)) {
+      missing.push(relative(appDir, srcPath));
+      continue;
+    }
+
+    mkdirSync(join(destPath, ".."), { recursive: true });
+    await copyFile(srcPath, destPath);
+    copied++;
+  }
+
+  if (missing.length > 0) {
+    return {
+      exitCode: 1,
+      summary: `Copied ${copied} PDFs, ${missing.length} missing in cache.`,
+      data: {
+        command: "print.pdf.copy",
+        status: "fail",
+        copied,
+        outputDir: "dist/client/_print",
+        missing,
+      },
+    };
+  }
+
+  return {
+    exitCode: 0,
+    summary: `Copied ${copied} PDFs to dist/client/_print/.`,
+    data: { command: "print.pdf.copy", status: "pass", copied, outputDir: "dist/client/_print" },
   };
 }
 
