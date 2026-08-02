@@ -17,6 +17,7 @@
   <item>RFC-0597: write .materialization-state.json and copy .cache/ from workpiece to cache clone as final step.</item>
   <item>ADR-0010: stop any running dev/preview server for the workpiece before closing the mission.</item>
   <item>RFC-0652: mandatory evidence.sync to R2 before writing close-report.json; --skip-evidence-sync escape hatch with Bordbuch audit entry.</item>
+  <item>RFC-0655: add releaseId to CloseReport interface; pass releaseId as top-level option to appendBordbuchEntry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -84,6 +85,7 @@ export interface CloseReportReconcile {
 }
 
 export interface CloseReport {
+  releaseId: string | null;
   git: CloseReportGit;
   mirror: CloseReportMirror;
   reconcile: CloseReportReconcile;
@@ -265,6 +267,7 @@ export async function runMissionClose(
       actor,
       {
         missionId,
+        releaseId,
         writerRole: "mission",
         metadata: releaseId ? { releaseId } : undefined,
       },
@@ -350,6 +353,7 @@ export async function runMissionClose(
     }
 
     const closeReport: CloseReport = {
+      releaseId,
       git: {
         commitSha: bordbuchResult.commitSha,
         pushed: bordbuchResult.pushed,
