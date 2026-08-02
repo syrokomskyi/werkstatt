@@ -18,7 +18,8 @@ onboarding.scaffold always emit current versions.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { access } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { parse as parseYaml } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -33,6 +34,39 @@ async function pathExists(target: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+interface RegistryMirror {
+  path: string;
+  storageType: string;
+}
+
+interface RegistrySystem {
+  id: string;
+  mirrors?: RegistryMirror[];
+}
+
+interface RegistryFile {
+  systems?: RegistrySystem[];
+}
+
+async function resolveAppDir(workspaceRoot: string, app: string): Promise<string | null> {
+  const directPath = join(workspaceRoot, "systems", app);
+  if (await pathExists(directPath)) return directPath;
+
+  try {
+    const registryRaw = readFileSync(join(workspaceRoot, "systems", "registry.yaml"), "utf8");
+    const registry = parseYaml(registryRaw) as RegistryFile;
+    const entry = registry.systems?.find((s) => s.id === app);
+    const cacheMirrorPath = entry?.mirrors?.[0]?.path;
+    if (!cacheMirrorPath) return null;
+    const resolved = resolve(workspaceRoot, cacheMirrorPath);
+    if (await pathExists(resolved)) return resolved;
+  } catch {
+    // registry unreadable or entry not found
+  }
+
+  return null;
 }
 
 function readJsonIfExists(target: string): Record<string, unknown> | null {
@@ -117,12 +151,12 @@ export async function runConfigTemplateSync(
     };
   }
 
-  const appDir = join(context.workspaceRoot, "systems", app);
-  if (!(await pathExists(appDir))) {
+  const appDir = await resolveAppDir(context.workspaceRoot, app);
+  if (!appDir) {
     return {
       data: { command: "config.template.sync", app, synced: [], skipped: [] },
       exitCode: 1,
-      summary: `config.template.sync: systems/${app} does not exist`,
+      summary: `config.template.sync: could not resolve working tree for '${app}' (checked systems/${app} and registry mirrors[0])`,
     };
   }
 
