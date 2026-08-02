@@ -68,6 +68,7 @@ const pillarSchema = z.object({
   adaptation: pillarAdaptationSchema,
   productPrice: pillarProductPriceSchema,
   finalCta: pillarFinalCtaSchema,
+  catalogHeading: localizedString.optional(),
 });
 
 // RFC-0492: dossier configuration for depth-1 industry pages.

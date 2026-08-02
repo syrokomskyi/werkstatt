@@ -67,6 +67,7 @@ export interface BlueprintPillar {
   adaptation: BlueprintPillarAdaptation;
   productPrice: BlueprintPillarProductPrice;
   finalCta: BlueprintPillarFinalCta;
+  catalogHeading?: LocalizedString;
 }
 
 export interface ServicePublicationGate {

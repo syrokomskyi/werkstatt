@@ -166,7 +166,7 @@ function bakePillarHub(
       };
     });
   const catalogBlock = linkedCardGrid(
-    pillarLang(p.adaptation.heading, lang, dl),
+    pillarLang(p.catalogHeading ?? p.adaptation.heading, lang, dl),
     industryCards,
     "industry-catalog",
   );

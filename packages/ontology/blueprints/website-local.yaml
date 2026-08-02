@@ -94,6 +94,9 @@ levels:
             body:
               de: "Welche Angaben helfen, den Betrieb einzuschätzen: Qualifikationen, Meisterbetrieb, Fotos, Bewertungen, Öffnungszeiten."
               uk: "Які відомості допомагають оцінити бізнес: кваліфікації, майстерність, фото, відгуки, години роботи."
+      catalogHeading:
+        de: "Gewerbe auswählen"
+        uk: "Обрати галузь"
       productPrice:
         heading:
           de: "Gleiche Grundlage, angepasste Struktur"
