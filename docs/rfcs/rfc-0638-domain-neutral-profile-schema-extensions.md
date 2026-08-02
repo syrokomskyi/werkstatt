@@ -50,9 +50,9 @@ appsImpacted: []
 packagesImpacted:
   - packages/forge
 successSignals:
-  - Stack profile YAML files can declare `domain`, `terminology`, `artifacts`, `workspaceTypes`, `invariants`, and `register` fields
-  - Existing v1 profiles (astro-typescript-turborepo, phaser-turborepo, forge-shell) parse without changes
-  - `forge.doctor` reports domain information from the active profile
+  - "Stack profile YAML files can declare `domain`, `terminology`, `artifacts`, `workspaceTypes`, `invariants`, and `register` fields"
+  - "Existing v1 profiles (astro-typescript-turborepo, phaser-turborepo, forge-shell) parse without changes"
+  - "`forge.doctor` reports domain information from the active profile"
 nonGoals:
   - Do not add Editframe-specific profiles in this RFC — that is RFC-0641
   - Do not change the bindings schema in this RFC — that is RFC-0639
