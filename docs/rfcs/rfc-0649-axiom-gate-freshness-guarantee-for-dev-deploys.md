@@ -283,13 +283,13 @@ All fatal modes produce `axiom.status: "not-run"` and `exitCode: 1`. The `--json
 
 ## Acceptance criteria
 
-- [ ] `runLeitstandDevDeploy` checks `purgeResult.success === false` and stops pipeline with `exitCode: 1` and `axiom.status: "not-run"` when purge fails for `cloudflare-workers` adapter (evidence: `leitstand-commands.ts:runLeitstandDevDeploy` early return)
-- [ ] `runLeitstandDevDeploy` skips purge and freshness check for `null` adapter — Axiom gate runs normally (evidence: `leitstand-commands.ts:runLeitstandDevDeploy` adapter check)
-- [ ] After purge + sleep, pipeline fetches `/.well-known/build-identity.json` from CDN URL and compares `distTreeHash` against local build-identity (evidence: `leitstand-commands.ts:verifyFreshness` function)
-- [ ] Freshness hash mismatch produces `exitCode: 1`, `axiom.status: "not-run"`, and `freshness.verified: false` in `--json` output (evidence: unit test `leitstand-0649-freshness-mismatch.test.ts`)
-- [ ] Missing `CLOUDFLARE_ZONE_ID` produces `exitCode: 1`, `axiom.status: "not-run"`, and descriptive `freshness.error` (evidence: unit test `leitstand-0649-missing-zone-id.test.ts`)
-- [ ] `--json` output includes `freshness` object with `verified`, `cdnDistTreeHash`, `localDistTreeHash`, and optional `error` fields (evidence: `DevDeployResult` type definition)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `runLeitstandDevDeploy` checks `purgeResult.success === false` and stops pipeline with `exitCode: 1` and `axiom.status: "not-run"` when purge fails for `cloudflare-workers` adapter (evidence: `leitstand-commands.ts:690-717`, unit test `leitstand-0649-freshness.test.ts: missing CLOUDFLARE_ZONE_ID`)
+- [x] `runLeitstandDevDeploy` skips purge and freshness check for `null` adapter — Axiom gate runs normally (evidence: `leitstand-commands.ts:673-679`, unit test `leitstand-0649-freshness.test.ts: null adapter skips purge`)
+- [x] After purge + sleep, pipeline fetches `/.well-known/build-identity.json` from CDN URL and compares `distTreeHash` against local build-identity (evidence: `leitstand-commands.ts:725-749` `verifyFreshness` call, `leitstand-commands.ts:146-182` `verifyFreshness` function)
+- [x] Freshness hash mismatch produces `exitCode: 1`, `axiom.status: "not-run"`, and `freshness.verified: false` in `--json` output (evidence: unit test `leitstand-0649-freshness.test.ts: freshness hash mismatch`)
+- [x] Missing `CLOUDFLARE_ZONE_ID` produces `exitCode: 1`, `axiom.status: "not-run"`, and descriptive `freshness.error` (evidence: unit test `leitstand-0649-freshness.test.ts: missing CLOUDFLARE_ZONE_ID`)
+- [x] `--json` output includes `freshness` object with `verified`, `cdnDistTreeHash`, `localDistTreeHash`, and optional `error` fields (evidence: `DevDeployResult` type definition `leitstand-commands.ts:406-432`, unit test `leitstand-0649-freshness.test.ts: --json output includes freshness object`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0649 --json` → 0 errors, 0 warnings, 0 notices)
 
 ## Implementation notes for agents
 
