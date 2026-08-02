@@ -27,7 +27,8 @@ The package has a split public API to keep lightweight consumers from transitive
 - `src/index.ts` — thin re-export entry point for the primitives API.
 - `src/types.ts` — `FingerprintOptions`, `FingerprintFileResult`, `FingerprintResult`.
 - `src/normalizers/index.ts` — dispatcher that selects the correct normalizer by file extension.
-- `src/normalizers/*.ts` — per-format normalizers (TypeScript, Astro, CSS, JSON, JSONC, YAML, Markdown, text, binary).
+- `src/normalizers/stable.ts` — RFC-0656 stable-mode dispatcher for PDF, source map, and JSON timestamp normalization.
+- `src/normalizers/*.ts` — per-format normalizers (TypeScript, Astro, CSS, JSON, JSONC, YAML, Markdown, text, binary, PDF, source map, JSON-stable).
 
 ## Normalizer behavior
 
@@ -42,6 +43,17 @@ Each normalizer produces a `sha256:`-prefixed hex hash:
 - **Markdown** — strip HTML comments outside code fences → `unified`/`remark-parse` AST (no position data) → `byteHash`.
 - **text** — normalize line endings → `byteHash`.
 - **binary** — `byteHash` of raw bytes.
+
+## Stable mode (RFC-0656)
+
+`mode: "stable"` provides deterministic hashing of build artifacts by normalizing non-deterministic file types before hashing. Unhandled file types fall back to byte hashing.
+
+- **PDF** — `pdf-lib` load → strip `/CreationDate`, `/ModDate`, `/ID` → `byteHash` of re-saved bytes.
+- **Source map** (`.map`) — strip `sourceRoot`, normalize `sources` paths to relative, strip timestamp fields (`createdAt`, `buildTimestamp`, `generatedAt`) → `stableJsonHash`.
+- **JSON** (`.json`, `.well-known/build-identity.json`) — strip timestamp fields (`createdAt`, `buildTimestamp`, `generatedAt`) → `stableJsonHash`.
+- **Other extensions** — `byteHash` of raw bytes (same as `mode: "byte"`).
+
+`fingerprintTree` with `mode: "stable"` accepts an optional `root` option to resolve relative source map paths.
 
 ## fingerprintTree error handling
 
