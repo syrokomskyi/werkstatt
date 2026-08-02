@@ -328,21 +328,21 @@ interface R2ClientConfig {
 
 ## Acceptance criteria
 
-- [ ] `evidence.sync` command registered in the evidence command module with correct name and scope (evidence: `evidence-module.ts` registration)
-- [ ] `evidence.fetch` command registered in the evidence command module with correct name and scope (evidence: `evidence-module.ts` registration)
-- [ ] `evidence.sync --mission <id>` uploads all files from `evidence/axiom/` to R2 under `{systemId}/{missionId}/{runTimestamp}/` prefix (evidence: unit test with mocked S3 client)
-- [ ] `evidence.sync --dry-run` reports what would be uploaded without making R2 API calls (evidence: unit test verifying no PutObject calls)
-- [ ] `evidence.sync` exits 1 with `MISSING_ENV` diagnostic when `R2_ACCOUNT_ID` is not set (evidence: unit test)
-- [ ] `evidence.sync` exits 1 with `INVALID_EVIDENCE` diagnostic when `evidence-metadata.json` is missing `runTimestamp` (evidence: unit test)
-- [ ] `evidence.fetch --mission <id> --run-timestamp <ts> --output-dir <dir>` downloads all files from R2 to the local directory (evidence: unit test with mocked S3 client)
-- [ ] `evidence.fetch --no-raw` downloads only structured JSON + report.html, skipping `raw/` prefix (evidence: unit test)
-- [ ] `evidence.fetch --list` lists available runs via `ListObjectsV2` with prefix `{systemId}/{missionId}/` (evidence: unit test with mocked S3 client)
-- [ ] `evidence.fetch --list` downloads `evidence-metadata.json` for each run to extract `commitSha` (evidence: unit test)
-- [ ] `--json` output format matches the documented shape for both commands (evidence: unit tests asserting JSON structure)
-- [ ] `.env.example` documents `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (evidence: `.env.example` file)
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents `evidence.sync` and `evidence.fetch` commands (evidence: `AGENTS.md` section)
-- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: commit with manifest update)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `evidence.sync` command registered in the evidence command module with correct name and scope (evidence: `evidence-module.ts` registration)
+- [x] `evidence.fetch` command registered in the evidence command module with correct name and scope (evidence: `evidence-module.ts` registration)
+- [x] `evidence.sync --mission <id>` uploads all files from `evidence/axiom/` to R2 under `{systemId}/{missionId}/{runTimestamp}/` prefix (evidence: unit test with mocked S3 client)
+- [x] `evidence.sync --dry-run` reports what would be uploaded without making R2 API calls (evidence: unit test verifying no PutObject calls)
+- [x] `evidence.sync` exits 1 with `MISSING_ENV` diagnostic when `R2_ACCOUNT_ID` is not set (evidence: unit test)
+- [x] `evidence.sync` exits 1 with `INVALID_EVIDENCE` diagnostic when `evidence-metadata.json` is missing `runTimestamp` (evidence: unit test)
+- [x] `evidence.fetch --mission <id> --run-timestamp <ts> --output-dir <dir>` downloads all files from R2 to the local directory (evidence: unit test with mocked S3 client)
+- [x] `evidence.fetch --no-raw` downloads only structured JSON + report.html, skipping `raw/` prefix (evidence: unit test)
+- [x] `evidence.fetch --list` lists available runs via `ListObjectsV2` with prefix `{systemId}/{missionId}/` (evidence: unit test with mocked S3 client)
+- [x] `evidence.fetch --list` downloads `evidence-metadata.json` for each run to extract `commitSha` (evidence: unit test)
+- [x] `--json` output format matches the documented shape for both commands (evidence: unit tests asserting JSON structure)
+- [x] `.env.example` documents `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (evidence: `.env.example` file)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` documents `evidence.sync` and `evidence.fetch` commands (evidence: `AGENTS.md` section)
+- [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: commit with manifest update)
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
