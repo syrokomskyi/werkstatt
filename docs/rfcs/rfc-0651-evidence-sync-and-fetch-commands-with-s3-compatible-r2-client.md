@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -53,19 +54,20 @@ commands:
 appsImpacted: []
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
+  - "@warpgogol/site-kernel-checks"
 successSignals:
-  - "evidence.sync uploads all evidence artifacts to R2 and appends a row to the Iceberg table"
+  - "evidence.sync uploads all evidence artifacts to R2 under timestamped key prefix"
   - "evidence.fetch downloads a historical run from R2 to a local directory"
   - "evidence.sync --dry-run reports what would be uploaded without making any R2 API calls"
-  - "R2 SQL query SELECT * FROM axiom_evidence_runs returns rows for synced runs"
+  - "evidence.fetch --list lists available runs via ListObjectsV2 with run timestamps and commit SHAs"
 nonGoals:
   - "Does not define the R2 bucket layout or lifecycle rules — those are RFC-0650"
   - "Does not integrate evidence.sync into mission.close or leitstand.dev-deploy — that is RFC-0652"
   - "Does not implement content-addressed deduplication — rejected for simplicity (RFC-0650)"
-  - "Does not implement a custom Cloudflare Worker for Iceberg writes — uses the Iceberg REST catalog API directly from Node.js"
+  - "Does not implement R2 Data Catalog (Iceberg) support — ListObjectsV2 is the primary listing mechanism. Iceberg SQL queryability is deferred to a future RFC"
   - "Does not support partial sync (uploading only some files) — sync is all-or-nothing per run"
   - "Does not support resumable uploads — if sync fails mid-way, the operator re-runs the command"
-  - "Does not implement a TUI or dashboard for browsing evidence history — R2 SQL in the Cloudflare dashboard is the query interface"
+  - "Does not implement a TUI or dashboard for browsing evidence history — evidence.fetch --list is the CLI interface"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -90,7 +92,7 @@ nonGoals:
 
 RFC-0650 established the R2 archive topology: timestamped keys, lifecycle rules, and R2 Data Catalog for queryable metadata. The `mission.check` command now writes a `runTimestamp` field to `evidence-metadata.json`. However, no command exists to upload evidence to R2 or download historical runs from R2. The operator has the storage contract (RFC-0650) but no tools to interact with it.
 
-The workshop already uses S3-compatible APIs for Cloudflare R2 in the `lagebild-sync-worker` service, but that is a service-level integration, not a Site OS command. Evidence sync needs to be a Site OS command — callable from `leitstand.dev-deploy` (RFC-0652), `mission.close` (RFC-0652), and manually by the operator.
+Evidence sync needs to be a Site OS command — callable from `leitstand.dev-deploy` (RFC-0652), `mission.close` (RFC-0652), and manually by the operator.
 
 ## Problem
 
@@ -98,26 +100,24 @@ RFC-0650 defines the R2 bucket layout and Data Catalog schema, but there is no S
 
 1. **Upload evidence to R2**: After `mission.check` runs, the evidence sits in `missions/{mission}/evidence/axiom/` locally. Without an upload command, the R2 archive remains empty.
 
-2. **Write Iceberg table rows**: The `axiom_evidence_runs` Iceberg table in R2 Data Catalog needs rows appended for each synced run. Without a command that writes to the Iceberg REST catalog API, the table stays empty and R2 SQL queries return nothing.
+2. **Download historical runs**: If the operator needs to inspect a past run's evidence (e.g., compare findings, view screenshots), there is no command to fetch it from R2. The operator would need to use `wrangler r2 object get` manually for each file.
 
-3. **Download historical runs**: If the operator needs to inspect a past run's evidence (e.g., compare findings, view screenshots), there is no command to fetch it from R2. The operator would need to use `wrangler r2 object get` manually for each file.
-
-4. **List available runs**: There is no command to list runs stored in R2 for a given mission or system. The operator would need to use `wrangler r2 object list` with prefix filtering and parse the keys manually.
+3. **List available runs**: There is no command to list runs stored in R2 for a given mission or system. The operator would need to use `wrangler r2 object list` with prefix filtering and parse the keys manually.
 
 Without these commands, the R2 archive topology from RFC-0650 is an unused contract — the infrastructure exists but nothing writes to or reads from it.
 
 ## Decision
 
-The kernel gains two new Site OS commands: `evidence.sync` and `evidence.fetch`. `evidence.sync` uploads all evidence artifacts from a mission's local `evidence/axiom/` directory to R2 under the timestamped key prefix defined in RFC-0650, and appends a row to the `axiom_evidence_runs` Iceberg table via the R2 Data Catalog REST API. `evidence.fetch` downloads a historical run from R2 to a local directory. Both commands use the `@aws-sdk/client-s3` package with R2's S3-compatible endpoint, configured via `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY` environment variables.
+The kernel gains two new Site OS commands: `evidence.sync` and `evidence.fetch`. `evidence.sync` uploads all evidence artifacts from a mission's local `evidence/axiom/` directory to R2 under the timestamped key prefix defined in RFC-0650. `evidence.fetch` downloads a historical run from R2 to a local directory, and lists available runs via `ListObjectsV2` with prefix filtering. Both commands use the `@aws-sdk/client-s3` package with R2's S3-compatible endpoint, configured via `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY` environment variables. R2 Data Catalog (Iceberg) support is deferred to a future RFC — the initial implementation uses `ListObjectsV2` as the primary listing mechanism.
 
 ## Architectural fit
 
 - **DNA-52 (Release artifact store)**: `evidence.sync` follows the same pattern as `artifact.store.put` — durable, content-tracked records in external storage. The difference is the storage backend (R2 vs local artifact store) and the content type (evidence vs release dist).
-- **DNA-59 (Evidence preservation)**: Established by RFC-0650. This RFC implements the commands that make the preservation contract operational.
+- **DNA-59 (Evidence preservation)**: Established by RFC-0650 (forward reference — DNA-59 will be appended to `docs/architecture-dna.md` when RFC-0650 is accepted; the V-18 validation warning is expected until then). This RFC implements the commands that make the preservation contract operational.
 - **RFC-0650 (R2 archive topology)**: Defines the bucket layout, key structure, lifecycle rules, and Data Catalog schema. This RFC implements the commands that write to and read from that topology.
 - **RFC-0652 (Evidence lifecycle integration)**: Will integrate `evidence.sync` into `mission.close` (mandatory) and `leitstand.dev-deploy` (best-effort auto-sync). This RFC defines the commands; RFC-0652 wires them into the lifecycle.
 - **Site OS operator model**: Two new commands in `packages/os/site-kernel-handoff`, registered in the `evidence` command module. Both are standalone commands — not pipeline steps. They are invoked manually or by other commands (RFC-0652).
-- **Existing R2 usage**: The `lagebild-sync-worker` service already uses S3-compatible APIs for R2. This RFC brings the same pattern into the Site OS command layer, using `@aws-sdk/client-s3` which is already a dependency in the monorepo.
+- **New R2 dependency**: `@aws-sdk/client-s3` is not currently a direct dependency in any workspace package. This RFC adds it to `packages/os/site-kernel-handoff` as a new direct dependency. The package exists transitively in `node_modules/.pnpm/` via `wrangler` and `miniflare`, but pnpm strict isolation requires a direct dependency declaration.
 
 ## Design
 
@@ -142,7 +142,7 @@ pnpm exec site-kernel run evidence.fetch --mission warpgogol-com-m000025 --run-t
 # Fetch only structured JSON (skip raw/ artifacts — faster, less data)
 pnpm exec site-kernel run evidence.fetch --mission warpgogol-com-m000025 --run-timestamp 2026-08-02T13-46-00-000Z --no-raw --output-dir /tmp/evidence-review
 
-# List available runs for a mission (queries Iceberg table)
+# List available runs for a mission (lists R2 objects with prefix)
 pnpm exec site-kernel run evidence.fetch --mission warpgogol-com-m000025 --list
 
 # List with JSON output
@@ -165,7 +165,6 @@ interface EvidenceSyncResult {
   r2KeyPrefix: string;
   uploadedFiles: string[];
   skippedFiles: string[]; // files that already exist in R2 with same content
-  icebergRowWritten: boolean;
   totalBytes: number;
   durationMs: number;
 }
@@ -192,10 +191,6 @@ interface EvidenceListResult {
   runs: Array<{
     runTimestamp: string;
     commitSha: string | null;
-    findingsCount: number;
-    errorsCount: number;
-    warningsCount: number;
-    closureSatisfied: boolean;
     r2KeyPrefix: string;
   }>;
 }
@@ -208,12 +203,12 @@ interface R2ClientConfig {
   bucketName: string; // default: "axiom-evidence"
 }
 
-// Iceberg REST catalog client (for axiom_evidence_runs table)
-interface IcebergCatalogConfig {
-  catalogUri: string; // from wrangler r2 bucket catalog info
-  warehouse: string; // from wrangler r2 bucket catalog info
-  tableName: string; // "axiom_evidence_runs"
-}
+// Iceberg REST catalog config — deferred to a future RFC
+// interface IcebergCatalogConfig {
+//   catalogUri: string;
+//   warehouse: string;
+//   tableName: string; // "axiom_evidence_runs"
+// }
 ```
 
 ### File system responsibilities
@@ -223,9 +218,8 @@ interface IcebergCatalogConfig {
 | `packages/os/site-kernel-handoff/src/evidence/evidence-sync.ts` | `evidence.sync` command handler |
 | `packages/os/site-kernel-handoff/src/evidence/evidence-fetch.ts` | `evidence.fetch` command handler |
 | `packages/os/site-kernel-handoff/src/evidence/r2-client.ts` | S3-compatible R2 client wrapper (PutObject, GetObject, ListObjectsV2) |
-| `packages/os/site-kernel-handoff/src/evidence/iceberg-client.ts` | Iceberg REST catalog client (append row to `axiom_evidence_runs`) |
 | `packages/os/site-kernel-handoff/src/evidence/evidence-module.ts` | Command module registration (evidence.sync, evidence.fetch) |
-| `packages/os/site-kernel-handoff/src/command-tables/infra-contracts.ts` | Command contracts for evidence.sync and evidence.fetch |
+| `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` | Command contracts for evidence.sync and evidence.fetch |
 | `missions/{mission}/evidence/axiom/` | Read by evidence.sync, written by evidence.fetch |
 | `.env.example` | Documents R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY |
 | `packages/os/site-kernel-handoff/AGENTS.md` | Documents evidence.sync and evidence.fetch commands |
@@ -252,7 +246,6 @@ interface IcebergCatalogConfig {
       "raw/page-1-screenshot.webp"
     ],
     "skippedFiles": [],
-    "icebergRowWritten": true,
     "totalBytes": 180355123,
     "durationMs": 4523
   },
@@ -272,10 +265,6 @@ interface IcebergCatalogConfig {
       {
         "runTimestamp": "2026-08-02T13-46-00-000Z",
         "commitSha": "abc123...",
-        "findingsCount": 964,
-        "errorsCount": 0,
-        "warningsCount": 46,
-        "closureSatisfied": true,
         "r2KeyPrefix": "warpgogol-com/warpgogol-com-m000025/2026-08-02T13-46-00-000Z/"
       }
     ]
@@ -294,19 +283,17 @@ interface IcebergCatalogConfig {
 | Evidence directory does not exist | `evidence.sync` exits 1 with `NOT_FOUND` diagnostic: "evidence/axiom/ directory not found for mission {id}" |
 | `evidence-metadata.json` missing or invalid | `evidence.sync` exits 1 with `INVALID_EVIDENCE` diagnostic: "evidence-metadata.json missing runTimestamp field — run mission.check first" |
 | R2 PutObject API error | `evidence.sync` exits 1 with `R2_UPLOAD_ERROR` diagnostic including API response |
-| Iceberg REST catalog API error | `evidence.sync` logs warning, continues — files are uploaded to R2 but Iceberg row is not written. `icebergRowWritten: false` in output. Non-fatal because R2 objects are the primary store; Iceberg is the query index. |
 | `--dry-run` | No R2 API calls made. Output reports what would be uploaded. `exitCode: 0` always. |
 | `evidence.fetch` run not found in R2 | Exits 1 with `NOT_FOUND` diagnostic: "no evidence found for mission {id} run {timestamp}" |
-| `evidence.fetch --list` Iceberg query error | Falls back to `ListObjectsV2` with prefix `{systemId}/{missionId}/` and parses timestamps from keys. Logs warning about Iceberg unavailability. |
+| `evidence.fetch --list` R2 API error | Exits 1 with `R2_LIST_ERROR` diagnostic including API response. No fallback — `ListObjectsV2` is the primary mechanism. |
 | Network timeout | Both commands exit 1 with `NETWORK_ERROR` diagnostic. No retry — the operator re-runs the command. |
 
 ## Rollout
 
 - **Default behavior**: `evidence.sync` and `evidence.fetch` are standalone commands, not pipeline steps. They are invoked manually or by other commands (RFC-0652). No fail-hard integration — the operator chooses when to sync.
-- **Dependency**: `@aws-sdk/client-s3` must be added to `packages/os/site-kernel-handoff` dependencies. It is already in the monorepo's `pnpm-lock.yaml` via `lagebild-sync-worker`.
+- **Dependency**: `@aws-sdk/client-s3` must be added as a new direct dependency to `packages/os/site-kernel-handoff`. It is not currently a direct dependency in any workspace package — it exists only transitively via `wrangler` and `miniflare` in `node_modules/.pnpm/`. pnpm strict isolation requires a direct dependency declaration.
 - **Environment variables**: The operator must set `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY` in the local `.env` file. The `.env.example` file is updated to document these.
-- **R2 bucket prerequisite**: The operator must have created the `axiom-evidence` R2 bucket and enabled Data Catalog (RFC-0650 rollout). `evidence.sync` fails with a clear error if the bucket does not exist.
-- **Iceberg table creation**: The `axiom_evidence_runs` table is created automatically by `evidence.sync` on first run if it does not exist. The table schema is defined in RFC-0650.
+- **R2 bucket prerequisite**: The operator must have created the `axiom-evidence` R2 bucket (RFC-0650 rollout). `evidence.sync` fails with a clear error if the bucket does not exist. R2 Data Catalog (Iceberg) is not required for the initial implementation.
 - **Existing missions**: No migration — `evidence.sync` only syncs runs that have `runTimestamp` in `evidence-metadata.json` (produced by `mission.check` after RFC-0650 implementation).
 - **New missions**: Automatically supported — `mission.check` writes `runTimestamp`, then `evidence.sync` uploads to R2.
 - **Pipeline integration**: None in this RFC. RFC-0652 integrates `evidence.sync` into `mission.close` and `leitstand.dev-deploy`.
@@ -314,11 +301,11 @@ interface IcebergCatalogConfig {
 
 ## Alternatives considered
 
-1. **Cloudflare Worker for Iceberg writes**: Deploy a Worker that receives evidence metadata via HTTP and writes to the Iceberg REST catalog. Rejected because it adds a deployment dependency — the Worker must be deployed and maintained. The Iceberg REST catalog API is HTTP-based and can be called directly from Node.js using `fetch`. If the REST API proves too complex, a Worker can be introduced in a future RFC.
+1. **R2 Data Catalog (Iceberg) for listing**: Use the Iceberg REST catalog API to write run metadata rows to the `axiom_evidence_runs` table and query them via R2 SQL. Rejected for the initial implementation because there is no official Node.js Iceberg client library, the REST catalog API has undocumented constraints, and the operator chose `ListObjectsV2` as the primary mechanism to reduce implementation risk. Iceberg support can be added in a future RFC when the REST catalog API is better understood.
 
-2. **wrangler r2 CLI instead of S3 SDK**: Use `wrangler r2 object put` via `execSync` instead of `@aws-sdk/client-s3`. Rejected because `execSync` with `wrangler` is slower (process spawn per file), does not support streaming for large files, and requires `wrangler` to be installed in the execution environment. The S3 SDK is already a monorepo dependency and provides proper streaming, error handling, and retry logic.
+2. **wrangler r2 CLI instead of S3 SDK**: Use `wrangler r2 object put` via `execSync` instead of `@aws-sdk/client-s3`. Rejected because `execSync` with `wrangler` is slower (process spawn per file), does not support streaming for large files, and requires `wrangler` to be installed in the execution environment. The S3 SDK provides proper streaming, error handling, and retry logic.
 
-3. **R2 custom metadata + ListObjectsV2 (no Iceberg)**: Store run metadata as R2 custom metadata on the `evidence-metadata.json` object. List runs via `ListObjectsV2` with prefix filtering. Rejected because the operator specifically requested R2 Data Catalog for SQL queryability (RFC-0650). However, `evidence.fetch --list` includes a fallback to `ListObjectsV2` if the Iceberg table is unavailable.
+3. **R2 custom metadata on objects**: Store run metadata (findings count, errors count) as R2 custom metadata on the `evidence-metadata.json` object. List runs via `ListObjectsV2` + `HeadObject` per object. Rejected because `HeadObject` per run adds N API calls, and the initial `--list` only needs `runTimestamp` and `commitSha` (available from the 43-byte `evidence-metadata.json` via `GetObject`). Full metadata (findings, errors, warnings) requires downloading `study-run.json` (~6 MB) which is too expensive for a listing operation.
 
 4. **Single command with subcommands**: `evidence sync`, `evidence fetch`, `evidence list` as subcommands of a single `evidence` command. Rejected because the Site OS command model uses flat `domain.command` names (e.g., `mission.check`, `mission.close`, `bordbuch.generate`). Subcommands are not the established pattern.
 
@@ -326,7 +313,7 @@ interface IcebergCatalogConfig {
 
 ## Risks
 
-- **Iceberg REST catalog API complexity**: There is no official Node.js Iceberg client library. The implementation must use the REST catalog HTTP API directly. Risk: undocumented API constraints, auth flow complexity, or schema evolution issues. Mitigation: Iceberg row write is non-fatal — if it fails, R2 objects are still uploaded successfully. The `evidence.fetch --list` command falls back to `ListObjectsV2`.
+- **No SQL queryability in initial implementation**: The initial implementation uses `ListObjectsV2` for listing runs, which does not support SQL queries (aggregation, filtering by findings count, regression trends). Risk: the operator cannot run ad-hoc analytical queries against evidence history. Mitigation: a future RFC can add R2 Data Catalog (Iceberg) support for SQL queryability. The `ListObjectsV2` listing provides basic run discovery (timestamp + commit SHA per run).
 
 - **R2 credentials management**: `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` are long-lived credentials stored in `.env` (gitignored). Risk: credential leakage if `.env` is accidentally committed. Mitigation: `.env` is in `.gitignore:128`. R2 tokens can be scoped to a single bucket with read/write permissions only.
 
@@ -336,7 +323,7 @@ interface IcebergCatalogConfig {
 
 - **Cost of R2 Class A operations**: PutObject calls are Class A operations ($4.50/million). 7 files + ~50 raw files = ~57 PutObject calls per run. 10 runs/day = 570 calls/day = ~17,000 calls/month. Cost: ~$0.08/month. Negligible.
 
-- **SDK bundle size**: `@aws-sdk/client-s3` adds ~2 MB to the package's dependency tree. Acceptable — it is already in the monorepo via `lagebild-sync-worker`.
+- **SDK bundle size**: `@aws-sdk/client-s3` adds ~2 MB to the package's dependency tree. Acceptable for a Node.js-only package that is not bundled into client-side code.
 
 ## Acceptance criteria
 
@@ -344,13 +331,12 @@ interface IcebergCatalogConfig {
 - [ ] `evidence.fetch` command registered in the evidence command module with correct name and scope (evidence: `evidence-module.ts` registration)
 - [ ] `evidence.sync --mission <id>` uploads all files from `evidence/axiom/` to R2 under `{systemId}/{missionId}/{runTimestamp}/` prefix (evidence: unit test with mocked S3 client)
 - [ ] `evidence.sync --dry-run` reports what would be uploaded without making R2 API calls (evidence: unit test verifying no PutObject calls)
-- [ ] `evidence.sync` appends a row to the `axiom_evidence_runs` Iceberg table via REST catalog API (evidence: unit test with mocked Iceberg client)
 - [ ] `evidence.sync` exits 1 with `MISSING_ENV` diagnostic when `R2_ACCOUNT_ID` is not set (evidence: unit test)
 - [ ] `evidence.sync` exits 1 with `INVALID_EVIDENCE` diagnostic when `evidence-metadata.json` is missing `runTimestamp` (evidence: unit test)
 - [ ] `evidence.fetch --mission <id> --run-timestamp <ts> --output-dir <dir>` downloads all files from R2 to the local directory (evidence: unit test with mocked S3 client)
 - [ ] `evidence.fetch --no-raw` downloads only structured JSON + report.html, skipping `raw/` prefix (evidence: unit test)
-- [ ] `evidence.fetch --list` queries the Iceberg table and returns available runs (evidence: unit test with mocked Iceberg client)
-- [ ] `evidence.fetch --list` falls back to `ListObjectsV2` when Iceberg table is unavailable (evidence: unit test)
+- [ ] `evidence.fetch --list` lists available runs via `ListObjectsV2` with prefix `{systemId}/{missionId}/` (evidence: unit test with mocked S3 client)
+- [ ] `evidence.fetch --list` downloads `evidence-metadata.json` for each run to extract `commitSha` (evidence: unit test)
 - [ ] `--json` output format matches the documented shape for both commands (evidence: unit tests asserting JSON structure)
 - [ ] `.env.example` documents `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (evidence: `.env.example` file)
 - [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents `evidence.sync` and `evidence.fetch` commands (evidence: `AGENTS.md` section)
@@ -364,6 +350,5 @@ interface IcebergCatalogConfig {
 - Agents MUST NOT invoke `evidence.sync` automatically after `mission.check` — sync is invoked by `mission.close` (mandatory) and `leitstand.dev-deploy` (best-effort) per RFC-0652. Agents MAY invoke `evidence.sync` manually when explicitly asked by the operator.
 - Agents MUST NOT create R2 API tokens automatically — token creation is a manual operator action in the Cloudflare dashboard. Agents MAY recommend the dashboard URL.
 - Agents MUST NOT hardcode R2 credentials in source files — credentials are read from environment variables only.
-- Agents MUST NOT weaken or remove the Iceberg row write — it is non-fatal but must be attempted on every sync.
-- If the Iceberg REST catalog API proves too complex to implement, agents MAY implement the `ListObjectsV2` fallback as the primary listing mechanism and document the deviation in the implementation commit. A future RFC can add Iceberg support.
+- Agents MUST NOT add Iceberg REST catalog support in this RFC — it is deferred to a future RFC. The initial implementation uses `ListObjectsV2` as the primary listing mechanism.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
