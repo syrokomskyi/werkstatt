@@ -11,6 +11,7 @@
   <item>Split from primitives: byteHash/stableStringify/stableJsonHash moved to primitives.ts. This module now imports byteHash from there.</item>
   <item>Fix silent error swallowing in fingerprintTree: emit warnings when falling back to byte hash on parse failure.</item>
   <item>RFC-0380: fingerprintTree combined input uses paths relative to tree root, making hashes portable across machines.</item>
+  <item>RFC-0656: add mode: "stable" — byte hashing with targeted normalization for PDF, source map, and JSON timestamp fields.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,6 +21,7 @@ import path from "node:path";
 import { byteHash } from "./primitives.ts";
 import type { FingerprintFileResult, FingerprintOptions, FingerprintResult } from "./types.ts";
 import { normalizeFile } from "./normalizers/index.ts";
+import { normalizeFileStable } from "./normalizers/stable.ts";
 import { normalizePathSep, shouldIgnore } from "./path-matcher.ts";
 
 export async function fingerprintFile(
@@ -33,6 +35,25 @@ export async function fingerprintFile(
     return {
       path: normalizePathSep(absPath),
       mode: "byte",
+      normalizer: "binary",
+      hash: byteHash(bytes),
+    };
+  }
+
+  if (options.mode === "stable") {
+    const distRoot = options.root ? path.resolve(options.root) : undefined;
+    const stableResult = await normalizeFileStable(absPath, bytes, distRoot);
+    if (stableResult) {
+      return {
+        path: normalizePathSep(absPath),
+        mode: "stable",
+        normalizer: stableResult.normalizer,
+        hash: stableResult.hash,
+      };
+    }
+    return {
+      path: normalizePathSep(absPath),
+      mode: "stable",
       normalizer: "binary",
       hash: byteHash(bytes),
     };
@@ -80,7 +101,7 @@ export async function fingerprintTree(
     } catch (err) {
       const relPath = normalizePathSep(path.relative(absRoot, file));
       const message = (err as Error).message?.slice(0, 200) ?? String(err);
-      const warning = `fingerprintTree: semantic normalization failed for ${relPath} (${message}); falling back to byte hash`;
+      const warning = `fingerprintTree: ${options.mode} normalization failed for ${relPath} (${message}); falling back to byte hash`;
       console.warn(warning);
       warnings.push(warning);
       const bytes = await readFile(file);
