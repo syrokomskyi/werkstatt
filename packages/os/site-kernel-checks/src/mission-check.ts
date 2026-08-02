@@ -303,8 +303,8 @@ function buildCaptureContract(
     publicSession: { kind: "public", authenticated: false, cookies: [], secrets: [] },
     journeys: [],
     robotsRatePolicy: {
-      respectRobots: !dev,
-      respectRetryAfter: !dev,
+      respectRobots: true,
+      respectRetryAfter: true,
       perHostConcurrency: dev ? 4 : 1,
       crawlDelayMs: dev ? 0 : 1000,
     },

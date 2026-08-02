@@ -26,7 +26,11 @@ interface Props {
   as?: "div" | "article" | "aside" | "section" | "a";
   class?: string;
   href?: string;
+  id?: string;
+  style?: string;
   "aria-label"?: string;
+  "aria-labelledby"?: string;
+  [key: `data-${string}`]: string | undefined | null;
 }
 
 const { effects = [], as: Tag = "div", class: extraClass = "", ...rest } = Astro.props as Props;
