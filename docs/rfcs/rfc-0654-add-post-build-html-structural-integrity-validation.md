@@ -231,15 +231,15 @@ The command is inserted into `SITES_BUILD_POST_PIPELINE` after all mutators and 
 
 ## Acceptance criteria
 
-- [ ] `dist.html-structure.validate` command registered in `packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts` with `reads: ["<app>/dist/client/**"]` and `cacheable: true`
-- [ ] Command handler implemented in `packages/os/site-kernel-checks/src/dist-html-structure.ts` with `runDistHtmlStructureValidate` function
-- [ ] Command checks tag balance for structural non-void elements: `<main>`, `<header>`, `<nav>`, `<footer>`, `<section>`, `<article>`, `<aside>`, `<body>`, `<head>`, `<form>`, `<figure>`, `<details>`, `<dialog>`, `<template>`
-- [ ] HTML comments are stripped before counting to avoid false positives from `<tag>`-like strings inside comments
-- [ ] Command integrated into `SITES_BUILD_POST_PIPELINE` after `text.normalize.apply` and before `SITES_CHECK_POSTBUILD_PIPELINE`
-- [ ] `--json` output shape matches `HtmlStructureValidateResult` interface with `violations[]` containing `file`, `rule`, `tag`, `openCount`, `closeCount`, `message`
-- [ ] Unit tests in `packages/os/site-kernel-checks/src/tests/dist-html-structure.test.ts` cover: balanced HTML passes, missing opening tag fails, missing closing tag fails, void elements ignored, HTML comments with tag-like strings do not cause false positives
-- [ ] Existing apps pass `dist.html-structure.validate` on a clean build without changes
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `dist.html-structure.validate` command registered in `packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts` with `reads: ["<app>/dist/client/**"]` and `cacheable: true` (evidence: packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts:134-150)
+- [x] Command handler implemented in `packages/os/site-kernel-checks/src/dist-html-structure.ts` with `runDistHtmlStructureValidate` function (evidence: packages/os/site-kernel-checks/src/dist-html-structure.ts:96-180)
+- [x] Command checks tag balance for structural non-void elements: `<main>`, `<header>`, `<nav>`, `<footer>`, `<section>`, `<article>`, `<aside>`, `<body>`, `<head>`, `<form>`, `<figure>`, `<details>`, `<dialog>`, `<template>` (evidence: packages/os/site-kernel-checks/src/dist-html-structure.ts:31-46, test 'multiple structural tags checked')
+- [x] HTML comments are stripped before counting to avoid false positives from `<tag>`-like strings inside comments (evidence: packages/os/site-kernel-checks/src/dist-html-structure.ts:53, test 'HTML comments with tag-like strings do not cause false positives')
+- [x] Command integrated into `SITES_BUILD_POST_PIPELINE` after `text.normalize.apply` and before `SITES_CHECK_POSTBUILD_PIPELINE` (evidence: packages/os/site-kernel-checks/src/pipelines/build-post.ts:33-36)
+- [x] `--json` output shape matches `HtmlStructureValidateResult` interface with `violations[]` containing `file`, `rule`, `tag`, `openCount`, `closeCount`, `message` (evidence: packages/os/site-kernel-checks/src/dist-html-structure.ts:57-63, test '--json output shape matches HtmlStructureValidateResult interface')
+- [x] Unit tests in `packages/os/site-kernel-checks/src/tests/dist-html-structure.test.ts` cover: balanced HTML passes, missing opening tag fails, missing closing tag fails, void elements ignored, HTML comments with tag-like strings do not cause false positives (evidence: packages/os/site-kernel-checks/src/tests/dist-html-structure.test.ts, 12 tests passing)
+- [x] Existing apps pass `dist.html-structure.validate` on a clean build without changes (evidence: warpgogol-com workpiece, 151 files scanned, 0 violations, exit 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0654 --json, 0 errors)
 
 ## Implementation notes for agents
 
