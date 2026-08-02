@@ -387,26 +387,26 @@ No `--json` output format changes. The existing `mission.close`, `mission.cleanu
 
 ## Acceptance criteria
 
-- [ ] `mission.close` invokes `evidence.sync` before writing `close-report.json` (evidence: `mission-close.ts` integration code)
-- [ ] `mission.close` exits 1 with `EVIDENCE_SYNC_FAILED` diagnostic when `evidence.sync` fails (evidence: unit test)
-- [ ] `mission.close --skip-evidence-sync` skips sync, logs warning, and appends `mission-close-evidence-skipped` entry to Bordbuch (evidence: unit test)
-- [ ] `mission.close` skips sync with warning when `evidence/axiom/` exists but `evidence-metadata.json` is missing (evidence: unit test)
-- [ ] `mission.close --json` includes `evidenceSynced` and `evidenceSyncResult` fields (evidence: unit test asserting JSON structure)
-- [ ] `leitstand.dev-deploy` invokes `evidence.sync` after `axiom.report` (evidence: `leitstand-commands.ts` integration code)
-- [ ] `leitstand.dev-deploy` does not fail when `evidence.sync` fails (evidence: unit test with mocked sync failure)
-- [ ] `leitstand.dev-deploy --json` includes `evidenceSynced` and `evidenceSyncError` fields (evidence: unit test)
-- [ ] `leitstand.dev-deploy --skip-evidence-sync` skips sync silently (evidence: unit test)
-- [ ] `mission.cleanup` removes evidence older than 30 days by default in `--mission` mode (evidence: unit test with mock filesystem)
-- [ ] `mission.cleanup --evidence-retention-days 7` removes evidence older than 7 days (evidence: unit test)
-- [ ] `mission.cleanup --evidence-retention-days 0` preserves all evidence (evidence: unit test, backward compatibility)
-- [ ] `mission.cleanup` preserves evidence when `evidence-metadata.json` is missing (evidence: unit test)
-- [ ] `mission.cleanup` preserves non-Axiom evidence (`close-report.json`, `workpiece.git-bundle`) unconditionally (evidence: unit test)
-- [ ] `mission.cleanup --older-than <N>d` applies age-based evidence cleanup using `--evidence-retention-days` (evidence: unit test)
-- [ ] `mission.cleanup --json` includes `evidenceCleaned` and `evidenceRetentionDays` fields (evidence: unit test)
-- [ ] `packages/os/site-kernel-handoff/src/command-tables/infra-contracts.ts` documents evidence.sync invocations in `mission.close` and `leitstand.dev-deploy` writes (evidence: `infra-contracts.ts`)
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` documents evidence sync integration points (evidence: `AGENTS.md` section)
-- [ ] `AGENTS.md` documents that `mission.close` mandates evidence sync and `--skip-evidence-sync` is an escape hatch (evidence: `AGENTS.md` section)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `mission.close` invokes `evidence.sync` before writing `close-report.json` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:372-443`)
+- [x] `mission.close` exits 1 with `EVIDENCE_SYNC_FAILED` diagnostic when `evidence.sync` fails (evidence: `src/tests/rfc-0652-mission-close-evidence-sync.test.ts` test "mission.close throws EVIDENCE_SYNC_FAILED when evidence.sync fails")
+- [x] `mission.close --skip-evidence-sync` skips sync, logs warning, and appends `mission-close-evidence-skipped` entry to Bordbuch (evidence: `src/tests/rfc-0652-mission-close-evidence-sync.test.ts` test "mission.close --skip-evidence-sync skips sync and does not call evidence.sync")
+- [x] `mission.close` skips sync with warning when `evidence/axiom/` exists but `evidence-metadata.json` is missing (evidence: `src/tests/rfc-0652-mission-close-evidence-sync.test.ts` test "mission.close skips sync with warning when evidence/axiom/ exists but metadata missing")
+- [x] `mission.close --json` includes `evidenceSynced` and `evidenceSyncResult` fields (evidence: `src/tests/rfc-0652-mission-close-evidence-sync.test.ts` test "mission.close --json includes evidenceSynced and evidenceSyncResult fields")
+- [x] `leitstand.dev-deploy` invokes `evidence.sync` after `axiom.report` (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:835-857`)
+- [x] `leitstand.dev-deploy` does not fail when `evidence.sync` fails (evidence: `src/tests/rfc-0652-leitstand-dev-deploy-evidence-sync.test.ts` test "leitstand.dev-deploy does not fail when evidence.sync fails")
+- [x] `leitstand.dev-deploy --json` includes `evidenceSynced` and `evidenceSyncError` fields (evidence: `src/tests/rfc-0652-leitstand-dev-deploy-evidence-sync.test.ts` test "leitstand.dev-deploy --json includes evidenceSynced and evidenceSyncError fields")
+- [x] `leitstand.dev-deploy --skip-evidence-sync` skips sync silently (evidence: `src/tests/rfc-0652-leitstand-dev-deploy-evidence-sync.test.ts` test "leitstand.dev-deploy --skip-evidence-sync skips sync silently")
+- [x] `mission.cleanup` removes evidence older than 30 days by default in `--mission` mode (evidence: `src/tests/rfc-0652-mission-cleanup-evidence-retention.test.ts` test "mission.cleanup removes evidence older than 30 days by default in --mission mode")
+- [x] `mission.cleanup --evidence-retention-days 7` removes evidence older than 7 days (evidence: `src/tests/rfc-0652-mission-cleanup-evidence-retention.test.ts` test "mission.cleanup --evidence-retention-days 7 removes evidence older than 7 days")
+- [x] `mission.cleanup --evidence-retention-days 0` preserves all evidence (evidence: `src/tests/rfc-0652-mission-cleanup-evidence-retention.test.ts` test "mission.cleanup --evidence-retention-days 0 preserves all evidence")
+- [x] `mission.cleanup` preserves evidence when `evidence-metadata.json` is missing (evidence: `src/tests/rfc-0652-mission-cleanup-evidence-retention.test.ts` test "mission.cleanup preserves evidence when evidence-metadata.json is missing")
+- [x] `mission.cleanup` preserves non-Axiom evidence (`close-report.json`, `workpiece.git-bundle`) unconditionally (evidence: `src/tests/rfc-0652-mission-cleanup-evidence-retention.test.ts` test "mission.cleanup preserves non-Axiom evidence (close-report.json)")
+- [x] `mission.cleanup --older-than <N>d` applies age-based evidence cleanup using `--evidence-retention-days` (evidence: `src/tests/rfc-0652-mission-cleanup-evidence-retention.test.ts` test "mission.cleanup --older-than applies age-based evidence cleanup")
+- [x] `mission.cleanup --json` includes `evidenceCleaned` and `evidenceRetentionDays` fields (evidence: `src/tests/rfc-0652-mission-cleanup-evidence-retention.test.ts` test "mission.cleanup --json includes evidenceCleaned and evidenceRetentionDays fields")
+- [x] `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` documents evidence.sync invocations in `mission.close` and `leitstand.dev-deploy` writes (evidence: `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:39-44`)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` documents evidence sync integration points (evidence: `packages/os/site-kernel-handoff/AGENTS.md:34,115,118`)
+- [x] `AGENTS.md` documents that `mission.close` mandates evidence sync and `--skip-evidence-sync` is an escape hatch (evidence: `AGENTS.md:222-223`)
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 

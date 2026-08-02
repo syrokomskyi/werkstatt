@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 561c8cd331368238311632b0071ee34b17a7d4db941cd7786cc6f9cae63bf24a
+  contentHash: d871d9c94fdec862b738da12d94e2139ddf20186ea8e98252996973628468d31
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -11168,6 +11168,9 @@ commands:
         kind: string
         required: true
         description: Sternsystem id with an active mission.
+      skip-evidence-sync:
+        kind: boolean
+        description: "RFC-0652: Skip best-effort evidence.sync to R2 after axiom.report."
     reads:
       - systems/registry.yaml
       - missions/{mission}/workpiece/**
@@ -12315,11 +12318,16 @@ commands:
       older-than:
         kind: string
         description: Age threshold (e.g. '30d') for batch cleanup.
+      evidence-retention-days:
+        kind: string
+        description: "RFC-0652: Retention period in days for local Axiom evidence
+          cleanup (default: 30). Set to 0 to preserve all evidence."
     reads:
       - missions/*/mission.yaml
     writes:
       - missions/{mission}/workpiece/**
       - missions/{mission}/distribution/**
+      - missions/{mission}/evidence/axiom/**
     pipelines: []
   - name: mission.close
     description: Close an open mission (RFC-0355).
@@ -12345,11 +12353,17 @@ commands:
       release:
         kind: string
         description: Release id produced by this mission.
+      skip-evidence-sync:
+        kind: boolean
+        description: "RFC-0652: Skip mandatory evidence.sync to R2. Escape hatch for
+          offline close only — local evidence will be lost when mission.cleanup
+          runs."
     reads:
       - missions/{mission}/mission.yaml
       - systems/registry.yaml
     writes:
       - missions/{mission}/mission.yaml
+      - missions/{mission}/evidence/close-report.json
       - systems/registry.yaml
       - systems/{system}/bordbuch/events.ndjson
     pipelines: []
