@@ -55,6 +55,8 @@ Each normalizer produces a `sha256:`-prefixed hex hash:
 
 `fingerprintTree` with `mode: "stable"` accepts an optional `root` option to resolve relative source map paths.
 
+**Stable normalizers must recursively strip timestamp fields** (`createdAt`, `buildTimestamp`, `generatedAt`) from all JSON-like formats (source maps, JSON files), not just from top-level keys. Source maps and build-identity JSON often embed timestamps at nested levels. Use a recursive `stripTimestamps` helper that traverses arrays and objects, filtering known non-deterministic keys at every depth before hashing.
+
 ## fingerprintTree error handling
 
 `fingerprintTree` catches per-file normalization errors and falls back to a byte hash. When this happens:
