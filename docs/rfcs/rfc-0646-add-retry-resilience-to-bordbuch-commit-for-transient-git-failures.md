@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -94,11 +95,11 @@ The gap: RFC-0626 established the auto-commit pattern but did not add resilience
 
 ## Decision
 
-The `gitExec` helper in `packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts` gains a `gitExecWithRetry` companion function that retries transient git failures with configurable backoff. The `bordbuch.commit` command handler uses `gitExecWithRetry` for `git add` and `git commit` operations with 2 retries at 12s and 60s intervals. If all retries are exhausted, the pipeline step fails as before — the failure is not silenced.
+The `gitExec` helper in `packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts` gains a `gitExecWithRetry` companion function that retries transient git failures with configurable backoff. The `bordbuch.commit` command handler uses `gitExecWithRetry` for all git operations (`git status`, `git add`, `git commit`, `git rev-parse HEAD`) with 2 retries at 12s and 60s intervals. If all retries are exhausted, the pipeline step fails as before — the failure is not silenced.
 
 ## Architectural fit
 
-- **DNA-51 (Werkstatt consistency primitives)** — Extends the auto-commit pattern established by RFC-0580 (werkstatt side-effects) and RFC-0626 (bordbuch projections) with retry resilience, closing the transient-failure gap in git hygiene for mission workflow.
+- **DNA-51 (Werkstatt consistency primitives)** — Extends the consistency primitive family with retry resilience. DNA-51 defines lock, idempotency, and atomic staging as the existing primitives; retry complements these by recovering from transient git failures that locks cannot prevent (concurrent process conflicts) and that atomic staging cannot absorb (lock file contention). Together, lock-based mutual exclusion + atomic staging + retry form a more complete consistency guarantee for werkstatt git operations.
 - **RFC-0626 (bordbuch.commit)** — This RFC amends the `bordbuch.commit` command handler to use `gitExecWithRetry` instead of bare `gitExec` for mutation operations. The command's contract (auto-commit dirty bordbuch projection files) is unchanged.
 - **RFC-0580 (auto-commit werkstatt side-effects)** — The `gitExecWithRetry` helper is available for reuse by `commitWerkstattSideEffects` and other git-based auto-commit patterns if needed in the future.
 - **Site OS operator model** — `bordbuch.commit` remains an internal pipeline step, not a direct operator command. The retry behavior is transparent to the operator — they only see the final success or failure after retries are exhausted.
@@ -115,12 +116,12 @@ No new CLI commands. The change is internal to the existing `bordbuch.commit` pi
 // packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts
 
 interface RetryOptions {
-  retries: number;
   backoffMs: number[];
 }
 
 /**
  * Retries gitExec on transient failures (non-zero exit, timeout).
+ * The number of retries is derived from backoffMs.length.
  * Throws the last error if all retries are exhausted.
  */
 export function gitExecWithRetry(
@@ -133,7 +134,6 @@ export function gitExecWithRetry(
 // packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts
 
 const BORDBUCH_RETRY_OPTIONS: RetryOptions = {
-  retries: 2,
   backoffMs: [12_000, 60_000],
 };
 ```
@@ -143,7 +143,7 @@ const BORDBUCH_RETRY_OPTIONS: RetryOptions = {
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts` | `gitExecWithRetry` helper added |
-| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts` | `gitExec` calls replaced with `gitExecWithRetry` for `git add` and `git commit` |
+| `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts` | All `gitExec` calls replaced with `gitExecWithRetry` (status, add, commit, rev-parse) |
 
 ### Output format
 
@@ -164,6 +164,15 @@ No change to `bordbuch.commit` output format. The `BordbuchCommitResult` interfa
 
 On retry, the command handler logs each retry attempt via `logger.warn` before the final result.
 
+### Retry scope
+
+All `gitExec` calls in `commitBordbuchProjections` are replaced with `gitExecWithRetry`:
+
+1. `git status --porcelain` — retried to avoid silent-skip when `allowNonZero` masks a transient failure. Without retry, a transient `git status` failure returns empty string, causing the function to silently return `committed: false` and leaving dirty bordbuch files uncommitted.
+2. `git add <paths>` — retried to handle transient lock contention during staging.
+3. `git commit -m "..."` — retried to handle transient lock contention during commit.
+4. `git rev-parse HEAD` — retried to handle transient failure after a successful commit. Without retry, a transient `rev-parse` failure would throw, causing the pipeline step to fail even though the commit already succeeded. On pipeline retry, `git status` would show no dirty files, causing the function to return `committed: false` — the commit succeeded but the result reports no commit.
+
 ### Failure modes
 
 | Failure | Behavior |
@@ -174,7 +183,7 @@ On retry, the command handler logs each retry attempt via `logger.warn` before t
 | Non-transient git failure (missing repo, permissions) | `gitExecWithRetry` throws immediately (no retry for non-transient errors) |
 | No dirty bordbuch files | Returns `{ committed: false }` — no change |
 
-The retry logic distinguishes transient from non-transient failures by inspecting the error: timeouts and lock-file errors are retried; missing-repo and permission errors are not.
+The retry logic distinguishes transient from non-transient failures by inspecting the error: timeouts and lock-file errors are retried; missing-repo and permission errors are not. The number of retries is derived from `backoffMs.length` — no separate `retries` field is needed.
 
 ## Rollout
 
@@ -182,7 +191,8 @@ The retry logic distinguishes transient from non-transient failures by inspectin
 - **Existing apps**: No migration needed — the retry behavior is transparent. Apps that previously encountered transient `bordbuch.commit` failures will now self-heal.
 - **New apps**: Automatically benefit from retry resilience.
 - **Pipeline integration**: No pipeline changes — `bordbuch.commit` remains at its current position in `build.prepare` after `bordbuch.generate`.
-- **Unit tests**: Add tests for `gitExecWithRetry` (retry on transient, no retry on non-transient, backoff timing) and update `bordbuch-commit.test.ts` to verify retry behavior.
+- **Unit tests**: Add tests for `gitExecWithRetry` (retry on transient, no retry on non-transient, backoff timing, exhaustion throws) and update `bordbuch-commit.test.ts` to verify retry behavior.
+- **AGENTS.md**: Update `packages/os/site-kernel-handoff/AGENTS.md` Bordbuch section to note that `bordbuch.commit` retries transient git failures with 2 retries at 12s/60s backoff before failing the pipeline step.
 
 ## Alternatives considered
 
@@ -202,7 +212,7 @@ The retry logic distinguishes transient from non-transient failures by inspectin
 
 - [ ] `gitExecWithRetry` helper implemented in `packages/os/site-kernel-handoff/src/werkstatt/git-exec.ts` with `RetryOptions` interface
 - [ ] `gitExecWithRetry` retries only on transient errors (timeout, lock-file) and throws immediately on non-transient errors
-- [ ] `bordbuch.commit` uses `gitExecWithRetry` for `git add` and `git commit` with 2 retries at 12s/60s backoff
+- [ ] `bordbuch.commit` uses `gitExecWithRetry` for all `gitExec` calls (status, add, commit, rev-parse) with 2 retries at 12s/60s backoff
 - [ ] Unit tests for `gitExecWithRetry` cover: retry on transient, no retry on non-transient, backoff timing, exhaustion throws
 - [ ] `bordbuch-commit.test.ts` updated to verify retry behavior
 - [ ] `mission.validate` completes without `bordbuch.commit` failing on transient git lock contention
