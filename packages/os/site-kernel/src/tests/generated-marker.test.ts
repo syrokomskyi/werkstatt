@@ -131,6 +131,34 @@ test("stripGeneratedMarker still strips the legacy plain single-line marker", ()
   expect(stripped).toBe("const x = 1;\n");
 });
 
+test("stripGeneratedMarker does not swallow content between separate HTML comments", () => {
+  const header = buildGeneratedHeader({
+    filePath: "public/index.md",
+    ownerCommand: "page.markdown.generate",
+  });
+  const content = `<!--\n  GrowthProvider injects two things.\n-->\n<main id="main-content">${header}<p>Body</p></main>\n`;
+  const { changed, content: stripped } = stripGeneratedMarker(content);
+  expect(changed).toBe(true);
+  expect(hasGeneratedMarker(stripped)).toBe(false);
+  expect(stripped).toContain('<main id="main-content">');
+  expect(stripped).toContain("<p>Body</p></main>");
+  expect(stripped).toContain("GrowthProvider injects two things.");
+});
+
+test("stripGeneratedMarker does not swallow content between separate CSS comments", () => {
+  const header = buildGeneratedHeader({
+    filePath: "src/styles/biome.generated.css",
+    ownerCommand: "biome.css.generate",
+  });
+  const content = `/* unrelated comment */\n:root { --color: red; }\n${header}.foo { color: blue; }\n`;
+  const { changed, content: stripped } = stripGeneratedMarker(content);
+  expect(changed).toBe(true);
+  expect(hasGeneratedMarker(stripped)).toBe(false);
+  expect(stripped).toContain("unrelated comment");
+  expect(stripped).toContain(":root { --color: red; }");
+  expect(stripped).toContain(".foo { color: blue; }");
+});
+
 test("buildGeneratedHeader without templatePath names the owner command as the edit target", () => {
   const header = buildGeneratedHeader({
     filePath: "src/pages/api/mcp.ts",

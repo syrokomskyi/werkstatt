@@ -69,8 +69,14 @@ export function stripGeneratedMarker(content: string): StripGeneratedMarkerResul
   // marker plus DO NOT EDIT / Owner command / Edit instead / Regenerate lines,
   // all wrapped in one <!-- --> or /* */ comment.
   applyAll([
-    new RegExp(`<!--[ \\t]*\\n[\\s\\S]*?${escapeRegex(raw)}[\\s\\S]*?-->\\n?`, "g"),
-    new RegExp(`/\\*[ \\t]*\\n[\\s\\S]*?${escapeRegex(raw)}[\\s\\S]*?\\*/\\n?`, "g"),
+    new RegExp(
+      `<!--[ \\t]*\\n(?:(?!-->)[\\s\\S])*?${escapeRegex(raw)}(?:(?!-->)[\\s\\S])*?-->\\n?`,
+      "g",
+    ),
+    new RegExp(
+      `/\\*[ \\t]*\\n(?:(?!\\*/)[\\s\\S])*?${escapeRegex(raw)}(?:(?!\\*/)[\\s\\S])*?\\*/\\n?`,
+      "g",
+    ),
   ]);
 
   // RFC-0336: strip the line-comment advisory header (// or #) — the marker
