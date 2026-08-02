@@ -1,7 +1,7 @@
 ---
 id: RFC-0655
 title: "Release pipeline atomicity — mission.close must not pre-assign releaseId"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
 enhancedAt: 2026-08-02
-implementedAt:
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:
@@ -250,15 +250,15 @@ Checks performed:
 
 ## Acceptance criteria
 
-- [ ] `release.state.validate` command registered in the `release` module with `--mission`, `--release`, `--system` flags
-- [ ] `release.state.validate` detects: missing release directory, close-report/mission.yaml releaseId mismatch, orphaned prepared releases, bordbuch releaseId mismatch, registry lastRelease inconsistency
-- [ ] `release.prepare` updates `close-report.json` `releaseId` field after writing to `mission.yaml` (warns and skips if close-report.json does not exist)
-- [ ] `mission.close` adds `releaseId` as a first-class field on `CloseReport` interface, written to `close-report.json`
-- [ ] `mission.close` passes `releaseId` as a top-level option to `appendBordbuchEntry` (not only in `metadata`)
-- [ ] `--json` output format documented and stable
-- [ ] Unit tests cover all five checks with both pass and fail scenarios
-- [ ] Unit tests cover edge cases: missing close-report.json, re-opened mission, release.prepare after close
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `release.state.validate` command registered in the `release` module with `--mission`, `--release`, `--system` flags (evidence: `packages/os/site-kernel-handoff/src/release/release.module.ts:102-128`, `packages/os/site-kernel-handoff/src/release/index.ts:109-128`)
+- [x] `release.state.validate` detects: missing release directory, close-report/mission.yaml releaseId mismatch, orphaned prepared releases, bordbuch releaseId mismatch, registry lastRelease inconsistency (evidence: `packages/os/site-kernel-handoff/src/release/release-commands.ts:892-1198`)
+- [x] `release.prepare` updates `close-report.json` `releaseId` field after writing to `mission.yaml` (warns and skips if close-report.json does not exist) (evidence: `packages/os/site-kernel-handoff/src/release/release-commands.ts:485-503`)
+- [x] `mission.close` adds `releaseId` as a first-class field on `CloseReport` interface, written to `close-report.json` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:19-20,88`)
+- [x] `mission.close` passes `releaseId` as a top-level option to `appendBordbuchEntry` (not only in `metadata`) (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:356`)
+- [x] `--json` output format documented and stable (evidence: `release.state.validate` returns `KernelCommandResult<ReleaseStateValidateData>` with `checks: ReleaseStateCheck[]` — standard kernel JSON output)
+- [x] Unit tests cover all five checks with both pass and fail scenarios (evidence: `packages/os/site-kernel-handoff/src/tests/release-state-validate.test.ts`)
+- [x] Unit tests cover edge cases: missing close-report.json, re-opened mission, release.prepare after close (evidence: `packages/os/site-kernel-handoff/src/tests/release-state-validate.test.ts:257-278,462-523,571-593`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0655` exit code 0)
 
 ## Implementation notes for agents
 
