@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -49,6 +50,8 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - site-kernel-handoff
+# @warpgogol/ontology is NOT impacted — the `fatal` behavior is a caller-side
+# decision in leitstand-commands.ts, not a purgeResultSchema field addition.
 successSignals: []
 nonGoals:
   - Does not change leitstand.propagate or leitstand.promote — they already verify build-identity.json (RFC-0634).
@@ -141,6 +144,21 @@ When freshness check fails, `axiom.status` is `"not-run"` and `axiom.freshness.v
 
 ### TypeScript contracts
 
+The existing `PurgeResult` type from `@warpgogol/ontology/operations` is unchanged:
+
+```ts
+// Existing — NOT modified by this RFC
+export const purgeResultSchema = z.object({
+  success: z.boolean(),
+  purgedUrls: z.number(),
+  error: z.string().optional(),
+});
+```
+
+The `fatal` behavior is a caller-side decision in `runLeitstandDevDeploy`, not a schema field. The caller checks `purgeResult.success === false` and treats it as fatal for `leitstand.dev-deploy` only. `leitstand.propagate` and `leitstand.promote` continue to treat purge failures as non-blocking warnings — their behavior is unchanged.
+
+New types added to `DevDeployResult`:
+
 ```ts
 interface FreshnessResult {
   verified: boolean;
@@ -149,22 +167,26 @@ interface FreshnessResult {
   error?: string;
 }
 
-// runPurgeStep return type extended:
-interface PurgeResult {
-  purged: boolean;
-  error?: string;
-  // NEW: fatal flag — when true, caller MUST stop the pipeline
-  fatal: boolean;
+// DevDeployResult.axiom gains freshness field:
+interface DevDeployResult {
+  // ... existing fields preserved ...
+  axiom: {
+    status: "pass" | "fail" | "not-run";
+    errors: number;
+    warnings: number;
+    exitCode: number;
+    freshness: FreshnessResult;  // NEW
+  };
 }
 ```
-
-`runPurgeStep` gains a `fatal` flag: `true` when `CLOUDFLARE_ZONE_ID` is missing or the purge API returns a non-200 response. The caller (`runLeitstandDevDeploy`) checks `fatal` and returns early with `deployState: "failed"` and `axiom.status: "not-run"`.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `runLeitstandDevDeploy` + `runPurgeStep` — purge fatal, freshness check |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `runLeitstandDevDeploy` — adapter check before purge, purge fatal, freshness check; `runPurgeStep` unchanged |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Leitstand section updated: `leitstand.dev-deploy` purge is fatal, freshness check added |
+| `docs/architecture-dna.md` | DNA-49 prose updated: `leitstand.dev-deploy` verifies CDN freshness before Axiom gate |
 | `missions/{mission}/evidence/axiom/**` | Axiom evidence — only written when freshness verified |
 
 ### Output format
@@ -221,8 +243,10 @@ When freshness check fails (hash mismatch):
 
 | Failure | Behavior |
 | --- | --- |
-| `CLOUDFLARE_ZONE_ID` not set | Fatal: `exitCode: 1`, Axiom not run, `freshness.error` explains missing env var |
-| Purge API non-200 | Fatal: `exitCode: 1`, Axiom not run, `freshness.error` includes API response |
+| Null adapter (`adapter: "null"`) | Purge and freshness check skipped — no CDN to invalidate. Normal flow: Axiom gate runs. |
+| `CLOUDFLARE_ZONE_ID` not set (cloudflare-workers adapter) | Fatal: `exitCode: 1`, Axiom not run, `freshness.error` explains missing env var |
+| Purge API non-200 (cloudflare-workers adapter) | Fatal: `exitCode: 1`, Axiom not run, `freshness.error` includes API response |
+| Freshness fetch returns non-200 | Fatal: `exitCode: 1`, Axiom not run, `freshness.error` includes HTTP status |
 | Freshness hash mismatch | Fatal: `exitCode: 1`, Axiom not run, `freshness.error` explains stale CDN |
 | Freshness fetch network error | Fatal: `exitCode: 1`, Axiom not run, `freshness.error` includes fetch error |
 | Purge success + freshness verified | Normal flow: Axiom gate runs, result depends on gate outcome |
@@ -232,7 +256,11 @@ All fatal modes produce `axiom.status: "not-run"` and `exitCode: 1`. The `--json
 ## Rollout
 
 - **Default behavior**: Fail-hard from first introduction. No grace period, no opt-in flag. The first `leitstand.dev-deploy` after implementation either succeeds with freshness verified or fails with a clear error.
-- **Existing apps**: No migration needed — `leitstand.dev-deploy` already requires `CLOUDFLARE_ZONE_ID` in the env file. Apps without CDN configuration (null adapter) are unaffected because purge is only invoked for `cloudflare-workers` adapter.
+- **Null adapter**: `runLeitstandDevDeploy` checks `dep.adapter` before calling `runPurgeStep`. When the adapter is `null`, purge and freshness check are skipped entirely — there is no CDN to invalidate. The Axiom gate runs normally. This avoids breaking null-adapter dev deploys (used in tests and systems without a real deployment target).
+- **Existing apps**: No migration needed — `leitstand.dev-deploy` already requires `CLOUDFLARE_ZONE_ID` in the env file for `cloudflare-workers` adapter.
+- **AGENTS.md update**: `packages/os/site-kernel-handoff/AGENTS.md` Leitstand section must be updated: the current text states "Purge failures are non-blocking warnings" — this RFC makes purge failures fatal for `leitstand.dev-deploy` only. `leitstand.propagate` and `leitstand.promote` purge behavior remains non-blocking.
+- **DNA-49 prose update**: `docs/architecture-dna.md` DNA-49 prose must be updated to reflect that `leitstand.dev-deploy` verifies CDN freshness (purge + `build-identity.json` `distTreeHash` comparison) before running the Axiom gate.
+- **RFC-0628 amendedBy**: The implementation must add `RFC-0649` to RFC-0628's `amendedBy` frontmatter field (V-19 warning resolution).
 - **New apps**: Automatically compliant — the freshness check runs as part of `leitstand.dev-deploy` with no additional configuration.
 - **Deprecation**: None — this RFC amends RFC-0628 behavior, no command is removed.
 - **Pipeline integration**: No pipeline changes. The freshness check runs inside `leitstand.dev-deploy` between purge and Axiom gate, not as a separate pipeline step.
@@ -254,8 +282,8 @@ All fatal modes produce `axiom.status: "not-run"` and `exitCode: 1`. The `--json
 
 ## Acceptance criteria
 
-- [ ] `runPurgeStep` returns `fatal: true` when `CLOUDFLARE_ZONE_ID` is missing or purge API returns non-200 (evidence: `leitstand-commands.ts:runPurgeStep` return value)
-- [ ] `runLeitstandDevDeploy` stops pipeline with `exitCode: 1` and `axiom.status: "not-run"` when purge is fatal (evidence: `leitstand-commands.ts:runLeitstandDevDeploy` early return)
+- [ ] `runLeitstandDevDeploy` checks `purgeResult.success === false` and stops pipeline with `exitCode: 1` and `axiom.status: "not-run"` when purge fails for `cloudflare-workers` adapter (evidence: `leitstand-commands.ts:runLeitstandDevDeploy` early return)
+- [ ] `runLeitstandDevDeploy` skips purge and freshness check for `null` adapter — Axiom gate runs normally (evidence: `leitstand-commands.ts:runLeitstandDevDeploy` adapter check)
 - [ ] After purge + sleep, pipeline fetches `/.well-known/build-identity.json` from CDN URL and compares `distTreeHash` against local build-identity (evidence: `leitstand-commands.ts:verifyFreshness` function)
 - [ ] Freshness hash mismatch produces `exitCode: 1`, `axiom.status: "not-run"`, and `freshness.verified: false` in `--json` output (evidence: unit test `leitstand-0649-freshness-mismatch.test.ts`)
 - [ ] Missing `CLOUDFLARE_ZONE_ID` produces `exitCode: 1`, `axiom.status: "not-run"`, and descriptive `freshness.error` (evidence: unit test `leitstand-0649-missing-zone-id.test.ts`)
@@ -271,4 +299,5 @@ All fatal modes produce `axiom.status: "not-run"` and `exitCode: 1`. The `--json
 - Agents MUST NOT add a Worker URL fallback for the Axiom gate — the gate always uses the CDN URL.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N" instead of working around it (RFC-0334).
 - The `verifyFreshness` function MUST use a single HTTP fetch without retry — retry is explicitly rejected by this RFC.
-- The `runPurgeStep` function MUST set `fatal: true` for both missing `CLOUDFLARE_ZONE_ID` and purge API failure — no silent skip.
+- The `runPurgeStep` function is NOT modified — the `fatal` behavior is a caller-side decision in `runLeitstandDevDeploy` that checks `purgeResult.success === false`. `PurgeResult` in `@warpgogol/ontology/operations` is unchanged.
+- `runLeitstandDevDeploy` MUST check `dep.adapter` before calling `runPurgeStep` — skip purge and freshness check for `null` adapter.
