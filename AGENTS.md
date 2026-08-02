@@ -92,6 +92,8 @@ This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX envir
 
 - **`related` MUST NOT duplicate `amends` or `satisfies` entries.** The `related` field lists RFCs/DNA invariants that are relevant but not formally amended or satisfied. Entries already in `amends` or `satisfies` are implicitly related and must not be repeated.
 - **`commands.changed` MUST only list commands whose source code actually changed.** Commands whose behavior is formally documented or clarified without a code change (e.g. "already correct, no change needed") MUST NOT be listed in `commands.changed`. Use the RFC body to document the formal contract instead.
+- **Acceptance criteria evidence line numbers MUST be verified against actual code.** When marking criteria `[x]` with `(evidence: <file:line>)`, open the file and confirm the lines point to the implementation being verified — not to nearby unrelated fields or statements. Discovered in RFC-0644 where evidence for `workpieceAutoCommitted` pointed to `commitSha`/`preReconcileSha` lines instead.
+- **RFC output examples MUST match actual TypeScript interfaces.** JSON examples in the Design section must use field names from the real interface, not invented names. Discovered in RFC-0644 where the example used `cacheCloneHead`/`commitsMerged`/`bordbuchConflictsAutoResolved` — none of which exist in `MissionReconcileData`.
 
 ## Operator preferences (RFC-0370)
 
