@@ -140,6 +140,10 @@ export const checkModule = createStandardCheckModule({
 });
 ```
 
+## Command result type and passResult constraint
+
+`passResult` and `failResult` from `src/result-helpers.ts` return `KernelCommandResult<CheckResult>`. When a command handler declares a custom result type (e.g. `HtmlStructureValidateResult` with `filesScanned`, `violations[]`), these helpers will not type-check. Construct the result object manually with the custom `data` shape. See `src/dist-html-structure.ts` (RFC-0654) for the pattern: skip case returns a hand-built `{ data: { command, status, filesScanned }, exitCode: 0, summary }`.
+
 ## Command reads/cacheable contract (RFC-0390)
 
 Every registered kernel command MUST declare either `reads: string[]` (non-empty, valid picomatch globs) or `cacheable: false`. The `command.reads.validate` command enforces this contract and is a step in `PACKAGES_CHECK_PIPELINE`.
