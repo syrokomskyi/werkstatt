@@ -11,6 +11,7 @@
   <item>RFC-0629: migrated to native axiom capsules with PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, and automated-web-accessibility methodology.</item>
   <item>RFC-0630: hardened capture contract — runtime toolProfile via createRequire, page-language matching from workpiece i18n, pre-flight chromium check, configurable contract via CLI flags.</item>
   <item>Auto-generate report.html (RFC-0633) after evidence files are written, so the operator gets an HTML triage report without running axiom.report separately.</item>
+  <item>Auto-detect dev channel (*.workers.dev or dev.* subdomain) and use fast crawl settings: no crawl delay, 4x concurrency, shorter settle wait.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -258,6 +259,15 @@ function safeNameFromUrl(rawUrl: string): string {
   }
 }
 
+function isDevChannel(baseUrl: string): boolean {
+  try {
+    const host = new URL(baseUrl).hostname;
+    return host.endsWith(".workers.dev") || host.startsWith("dev.");
+  } catch {
+    return false;
+  }
+}
+
 function buildCaptureContract(
   baseUrl: string,
   recordedAt: string,
@@ -266,6 +276,7 @@ function buildCaptureContract(
   locales?: string[],
 ): CaptureContract {
   const origin = new URL(baseUrl).origin;
+  const dev = isDevChannel(baseUrl);
   return captureContractSchema.parse({
     schema: "capture-contract@1",
     contractId: mintAxiomId("capture-contract"),
@@ -292,10 +303,10 @@ function buildCaptureContract(
     publicSession: { kind: "public", authenticated: false, cookies: [], secrets: [] },
     journeys: [],
     robotsRatePolicy: {
-      respectRobots: true,
-      respectRetryAfter: true,
-      perHostConcurrency: 1,
-      crawlDelayMs: 1000,
+      respectRobots: !dev,
+      respectRetryAfter: !dev,
+      perHostConcurrency: dev ? 4 : 1,
+      crawlDelayMs: dev ? 0 : 1000,
     },
     thirdPartyPolicy: {
       allowDeclaredThirdParties: false,
@@ -315,7 +326,9 @@ function buildCaptureContract(
       enableProxyRotation: false,
       enableAuthBypass: false,
     },
-    settleRules: { networkIdleMs: 1000, maxSettleMs: 15000 },
+    settleRules: dev
+      ? { networkIdleMs: 200, maxSettleMs: 5000 }
+      : { networkIdleMs: 1000, maxSettleMs: 15000 },
     volatilityPasses: 1,
     toolProfile: {
       crawleeVersion: toolProfile.crawleeVersion,
@@ -625,6 +638,10 @@ export async function runMissionCheck(
   );
 
   // Discover pages via CrawleeDiscoveryExecutor
+  const devChannel = isDevChannel(baseUrl);
+  if (devChannel) {
+    logger.info(`  Dev channel detected — fast crawl settings (no delay, 4x concurrency)`);
+  }
   const discoveryExecutor = new CrawleeDiscoveryExecutor();
   logger.info(`  Discovering pages via Crawlee...`);
   const discoveryLedger = await discoveryExecutor.discover(contract);
