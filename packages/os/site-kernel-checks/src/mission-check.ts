@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0629: One-shot Axiom accessibility check for a mission. Uses native axiom components (PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, runAccessibilityInstrument, findingsForObservation, evaluateClosure) to capture evidence, project findings, and evaluate closure. Writes native capsule files (staged-capsule.json, observation-bundle.json, study-run.json, evidence-metadata.json).</purpose>
+<purpose>RFC-0629: One-shot Axiom accessibility check for a mission. Uses native axiom components (PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, runAccessibilityInstrument, findingsForObservation, evaluateClosure) to capture evidence, project findings, and evaluate closure. Writes native capsule files (staged-capsule.json, observation-bundle.json, study-run.json, evidence-metadata.json) and auto-generates report.html (RFC-0633) for operator triage.</purpose>
 <non-goals>
   <item>Does not support local mode (build + static server) — external-preview only.</item>
   <item>Does not integrate with Observatory runtime (local-dev only).</item>
@@ -10,6 +10,7 @@
   <item>RFC-0012: initial implementation of mission.check command.</item>
   <item>RFC-0629: migrated to native axiom capsules with PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, and automated-web-accessibility methodology.</item>
   <item>RFC-0630: hardened capture contract — runtime toolProfile via createRequire, page-language matching from workpiece i18n, pre-flight chromium check, configurable contract via CLI flags.</item>
+  <item>Auto-generate report.html (RFC-0633) after evidence files are written, so the operator gets an HTML triage report without running axiom.report separately.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -66,6 +67,8 @@ import {
   methodologyPackageDigest,
   type MethodologyPackage,
 } from "@syrokomskyi/axiom-methodology";
+
+import { renderAxiomReportHtml, type EvidenceMetadata } from "./axiom-report.ts";
 
 import { parse as parseYaml } from "yaml";
 
@@ -763,6 +766,21 @@ export async function runMissionCheck(
     for (const { filename, data } of rawArtifacts) {
       const content = typeof data === "string" ? data : (data as Uint8Array);
       await writeFileIfChanged(join(rawDir, filename), content);
+    }
+
+    // Auto-generate report.html (RFC-0633) so the operator gets an HTML triage
+    // report without needing to run axiom.report separately after mission.check.
+    try {
+      const reportHtml = renderAxiomReportHtml(studyRun, capsule, bundle, {
+        missionId,
+        ...(commitSha ? { commitSha } : {}),
+      });
+      await writeFileIfChanged(join(evidenceDir, "report.html"), reportHtml);
+      logger.info(`  Report: ${join(evidenceDir, "report.html")}`);
+    } catch (reportErr) {
+      logger.warn(
+        `  Report generation failed (non-blocking): ${reportErr instanceof Error ? reportErr.message : String(reportErr)}`,
+      );
     }
 
     // Compute findings counts

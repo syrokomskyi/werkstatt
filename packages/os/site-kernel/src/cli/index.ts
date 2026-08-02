@@ -12,6 +12,7 @@
 </CHANGE_SUMMARY>
 */
 
+import "dotenv/config";
 import process from "node:process";
 import {
   buildCommandManifest,
