@@ -134,6 +134,7 @@ export { createReleaseModule } from "./release/index.ts";
 export { createLeitstandModule } from "./leitstand/index.ts";
 export { createNotausgangModule } from "./notausgang/index.ts";
 export { createDeployModule } from "./deploy/index.ts";
+export { createEvidenceModule } from "./evidence/index.ts";
 export { createPlatformModule } from "./platform-module.ts";
 export {
   runPlatformConsistencyValidate,
