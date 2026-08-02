@@ -228,6 +228,20 @@ This rule is complementary to RFC-0480's per-response `git status` verification,
 
 **Session-retro language discipline (NON-NEGOTIABLE):** All `fo-session-retro` output — the insight triage table, the `ask_user_question` confirmation prompt, the final summary report, and any inline commentary — MUST be written in `PREFERENCES.md` `aiLanguage`. English templates in the skill are structural placeholders only; the agent MUST translate all headings, column names, labels, and prose to `aiLanguage` before presenting output. Only identifiers (file paths, skill names, RFC/ADR ids, commit hashes) stay untranslated. If `aiLanguage` is `ru`, the triage table heading is «Сортировка инсайтов сессии», not «Session Insight Triage».
 
+## RFC stamping completion discipline (RFC-0646)
+
+**RFC implementation is not complete until stamped (NON-NEGOTIABLE):** When a session implements an RFC (writes code, adds tests, updates docs), the session MUST NOT end without completing all of the following:
+
+1. **Mark acceptance criteria** — every `[ ]` must be `[x]` with inline `(evidence: <file:line>)` annotations (V-26/V-27).
+2. **Regenerate command manifest** — if the RFC added or changed commands, run `pnpm exec site-kernel run command.manifest.generate` and commit `docs/command-manifest.generated.yaml`. A stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`.
+3. **Stamp implemented** — run `rfc.implement.stamp --id RFC-XXXX --implementation-commit <sha>` and commit the stamped RFC file.
+4. **Validate** — run `rfc.validate --id RFC-XXXX` and confirm zero errors.
+5. **Commit** — all changes must be committed before session end.
+
+A session that writes implementation code but leaves the RFC in `accepted` status with unchecked criteria is **incomplete**. The `fo-session-retro` git hygiene check (RFC-0581) will catch uncommitted changes, but it does not verify RFC completion — that is the agent's responsibility throughout the session, not just at the end.
+
+If the session is interrupted before stamping, the next session MUST resume from step 3.6 (Check acceptance criteria) of the `fo-idea-implement` pipeline — not from the beginning.
+
 ## HDRI identity firewall, image resolution, material credits, responsive variants, derived artifact invalidation, silent UI text, behavior snapshot
 
 See [`docs/policies/content-contracts.md`](docs/policies/content-contracts.md) for the full text of these contracts:

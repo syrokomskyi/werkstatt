@@ -26,4 +26,23 @@ if [ -n "$PLATFORM_FILES" ]; then
   exit 1
 fi
 
+# Command manifest staleness check (RFC-0646)
+# Warn when command-registration files change without manifest regeneration.
+COMMAND_FILES=$(git diff --cached --name-only -- 'packages/forge/os/core/' 'packages/forge/os/*/core.module.ts' 'tools/kernel.config.ts' || true)
+MANIFEST_STAGED=$(git diff --cached --name-only -- 'docs/command-manifest.generated.yaml' || true)
+
+if [ -n "$COMMAND_FILES" ] && [ -z "$MANIFEST_STAGED" ]; then
+  echo "WARNING: Command-registration files are staged but docs/command-manifest.generated.yaml is not." >&2
+  echo "" >&2
+  echo "Staged command files:" >&2
+  echo "$COMMAND_FILES" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "If these changes add, remove, or modify commands, regenerate the manifest:" >&2
+  echo "  pnpm exec site-kernel run command.manifest.generate" >&2
+  echo "Then stage and commit docs/command-manifest.generated.yaml." >&2
+  echo "" >&2
+  echo "If this commit does not change the command surface, you may proceed." >&2
+  echo "" >&2
+fi
+
 exit 0
