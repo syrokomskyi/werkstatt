@@ -20,11 +20,24 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>ADR-0018: initial implementation — parse5-based HTML comment removal.</item>
+  <item>ADR-0018 review fix: typed DefaultTreeNode instead of any, try/catch on parse() for malformed HTML, removed unused sourceCodeLocationInfo.</item>
 </CHANGE_SUMMARY>
 */
 
-import { parse, serialize } from "parse5";
+import { parse, serialize, type DefaultTreeAdapterMap } from "parse5";
 import { GENERATED_MARKER } from "@warpgogol/site-kernel";
+
+type TreeNode = DefaultTreeAdapterMap["node"];
+type TreeParentNode = DefaultTreeAdapterMap["parentNode"];
+type TreeCommentNode = DefaultTreeAdapterMap["commentNode"];
+
+function isCommentNode(node: TreeNode): node is TreeCommentNode {
+  return node.nodeName === "#comment";
+}
+
+function hasChildNodes(node: TreeNode): node is TreeParentNode {
+  return "childNodes" in node;
+}
 
 export interface StripHtmlGeneratedMarkerResult {
   changed: boolean;
@@ -46,21 +59,26 @@ export function stripHtmlGeneratedMarker(content: string): StripHtmlGeneratedMar
     return { changed: false, content };
   }
 
-  const document = parse(content, { sourceCodeLocationInfo: true });
+  let document: TreeParentNode;
+  try {
+    document = parse(content);
+  } catch {
+    return { changed: false, content };
+  }
 
   let removed = false;
 
-  function removeMarkerComments(node: any): void {
+  function removeMarkerComments(node: TreeParentNode): void {
     const children = node.childNodes;
     if (!children) return;
 
     const toRemove: number[] = [];
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
-      if (child.nodeName === "#comment" && child.data?.includes(GENERATED_MARKER)) {
+      if (isCommentNode(child) && child.data?.includes(GENERATED_MARKER)) {
         toRemove.push(i);
         removed = true;
-      } else {
+      } else if (hasChildNodes(child)) {
         removeMarkerComments(child);
       }
     }
