@@ -1,7 +1,7 @@
 ---
 id: RFC-0645
 title: "Eliminate TIMESTAMP_ALLOWLIST and source-scanning timestamp validator"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
 enhancedAt: 2026-08-02
-implementedAt:
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:
