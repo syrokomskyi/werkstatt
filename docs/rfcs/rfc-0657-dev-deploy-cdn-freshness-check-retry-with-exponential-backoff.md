@@ -191,13 +191,13 @@ No output format change. The `FreshnessResult` in `--json` output gains an `atte
 
 ## Acceptance criteria
 
-- [ ] `verifyFreshness` makes 5 attempts: first immediate, then 4 retries with exponential backoff (3s, 6s, 12s, 24s)
-- [ ] `FreshnessResult` includes `attempts` field
-- [ ] `leitstand.dev-deploy` proceeds to Axiom gate when freshness is verified on any attempt
-- [ ] `leitstand.dev-deploy` exits 1 with clear error when all attempts fail
-- [ ] `null` adapter skips freshness check (unchanged)
-- [ ] Unit tests cover: first-attempt success, retry-then-success, all-attempts-fail, null adapter skip
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `verifyFreshness` makes 5 attempts: first immediate, then 4 retries with exponential backoff (3s, 6s, 12s, 24s) (evidence: `leitstand-commands.ts` lines 159-218, `FRESHNESS_MAX_ATTEMPTS = 5`, `FRESHNESS_BACKOFF_DELAYS_MS = [3_000, 6_000, 12_000, 24_000]`)
+- [x] `FreshnessResult` includes `attempts` field (evidence: `leitstand-commands.ts` line 155, `attempts: number` in interface)
+- [x] `leitstand.dev-deploy` proceeds to Axiom gate when freshness is verified on any attempt (evidence: test "RFC-0657: retry-then-success" — `freshness.attempts === 2`, `axiom.status === "pass"`)
+- [x] `leitstand.dev-deploy` exits 1 with clear error when all attempts fail (evidence: test "RFC-0657: all-attempts-fail with HTTP 404" — `exitCode === 1`, `freshness.attempts === 5`; test "RFC-0649: hash mismatch" — `exitCode === 1`, `freshness.attempts === 5`)
+- [x] `null` adapter skips freshness check (unchanged) (evidence: test "RFC-0649: null adapter skips purge and freshness check" — `freshness.attempts === 0`, `mockFetch not called`)
+- [x] Unit tests cover: first-attempt success, retry-then-success, all-attempts-fail, null adapter skip (evidence: `leitstand-0649-freshness.test.ts` — 8 tests, all passing)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0657 --json` — exit 0)
 
 ## Implementation notes for agents
 
