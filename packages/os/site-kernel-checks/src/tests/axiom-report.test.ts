@@ -44,6 +44,17 @@ function makeFinding(overrides: Partial<Finding> = {}): Finding {
   };
 }
 
+function makeViolationFinding(overrides: Partial<Finding> = {}): Finding {
+  return makeFinding({
+    extension: {
+      "automated-web-accessibility": {
+        predicate: "accessibility.axe.violation",
+      },
+    },
+    ...overrides,
+  });
+}
+
 function makeStudyRun(findings: Finding[] = []): StudyRun {
   return {
     studyRunId: "study-run_mock",
@@ -281,8 +292,8 @@ describe("axiom.report", () => {
     const missionId = "test-mission-m000001";
     const evidenceDir = setupEvidenceDir(tmpDir, missionId);
     const findings = [
-      makeFinding({ severity: "high", findingId: "f1", title: "High severity issue" }),
-      makeFinding({ severity: "medium", findingId: "f2", title: "Medium severity issue" }),
+      makeViolationFinding({ severity: "high", findingId: "f1", title: "High severity issue" }),
+      makeViolationFinding({ severity: "medium", findingId: "f2", title: "Medium severity issue" }),
     ];
     writeEvidenceFiles(evidenceDir, { studyRun: makeStudyRun(findings) });
 
@@ -290,6 +301,7 @@ describe("axiom.report", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.summary).toContain("2 finding(s)");
+    expect(result.summary).toContain("2 violations");
     expect(result.data!.findingsCount.high).toBe(1);
     expect(result.data!.findingsCount.medium).toBe(1);
     expect(result.data!.closureSatisfied).toBe(true);
@@ -381,11 +393,15 @@ describe("axiom.report", () => {
     expect(html).toContain("Axiom Triage Report");
     expect(html).toContain("Severity Dashboard");
     expect(html).toContain("Severity Distribution");
+    expect(html).toContain("Violations");
+    expect(html).toContain("Incomplete");
     expect(html).toContain("mermaid");
     expect(html).toContain("Closure Decision");
     expect(html).toContain("Capability Manifest");
-    expect(html).toContain("Findings by Severity");
-    expect(html).toContain("Findings by Page");
+    expect(html).toContain("Violations by Severity");
+    expect(html).toContain("Violations by Page");
+    expect(html).toContain("Incomplete by Severity");
+    expect(html).toContain("Incomplete by Page");
     expect(html).toContain("Tool Profile");
   });
 
@@ -410,12 +426,12 @@ describe("axiom.report", () => {
     expect(html).toContain("&quot;");
   });
 
-  it("populates nextSteps with actionable guidance for high-severity findings", async () => {
+  it("populates nextSteps with actionable guidance for high-severity violations", async () => {
     const missionId = "test-mission-m000007";
     const evidenceDir = setupEvidenceDir(tmpDir, missionId);
     const findings = [
-      makeFinding({ severity: "critical", findingId: "f1" }),
-      makeFinding({ severity: "high", findingId: "f2" }),
+      makeViolationFinding({ severity: "critical", findingId: "f1" }),
+      makeViolationFinding({ severity: "high", findingId: "f2" }),
     ];
     writeEvidenceFiles(evidenceDir, { studyRun: makeStudyRun(findings) });
 
@@ -423,7 +439,7 @@ describe("axiom.report", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.nextSteps!.length).toBe(2);
-    expect(result.nextSteps![0].action).toContain("2 high-severity findings");
-    expect(result.nextSteps![1].action).toContain("Fix critical/high findings");
+    expect(result.nextSteps![0].action).toContain("2 high-severity violation");
+    expect(result.nextSteps![1].action).toContain("Fix critical/high violation");
   });
 });

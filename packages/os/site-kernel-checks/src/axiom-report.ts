@@ -10,6 +10,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0633: initial implementation of axiom.report command and renderAxiomReportHtml pure function.</item>
+  <item>Split findings into violations vs incomplete in dashboard and chart; Mermaid pie colors match severity badge colors.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -66,6 +67,23 @@ const SEVERITY_COLORS: Record<Finding["severity"], string> = {
   info: "bg-gray-100 text-gray-800 border-gray-300",
 };
 
+const SEVERITY_HEX: Record<Finding["severity"], string> = {
+  critical: "#ef4444",
+  high: "#f97316",
+  medium: "#eab308",
+  low: "#3b82f6",
+  info: "#6b7280",
+};
+
+function isViolationFinding(f: Finding): boolean {
+  return (
+    (
+      (f.extension as Record<string, unknown> | undefined)?.["automated-web-accessibility"] as
+        Record<string, unknown> | undefined
+    )?.predicate === "accessibility.axe.violation"
+  );
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -96,7 +114,11 @@ function groupFindingsByPage(findings: Finding[]): Map<string, Finding[]> {
   return groups;
 }
 
-function renderSeverityDashboard(counts: AxiomReportData["findingsCount"]): string {
+function renderFindingsTypeDashboard(
+  label: string,
+  counts: AxiomReportData["findingsCount"],
+  total: number,
+): string {
   const cards = SEVERITY_ORDER.map((sev) => {
     const count = counts[sev];
     const colorClass = SEVERITY_COLORS[sev];
@@ -105,18 +127,26 @@ function renderSeverityDashboard(counts: AxiomReportData["findingsCount"]): stri
       <div class="text-sm uppercase mt-1">${escapeHtml(sev)}</div>
     </div>`;
   }).join("\n");
-  return `<div class="grid grid-cols-5 gap-3 mb-6">${cards}</div>`;
+  return `<div class="mb-6">
+    <h3 class="text-lg font-semibold mb-2">${escapeHtml(label)} <span class="text-sm font-normal text-gray-500">(${total})</span></h3>
+    <div class="grid grid-cols-5 gap-3">${cards}</div>
+  </div>`;
 }
 
-function renderMermaidPie(counts: AxiomReportData["findingsCount"]): string {
-  const segments = SEVERITY_ORDER.filter((sev) => counts[sev] > 0)
-    .map((sev) => `  "${sev} (${counts[sev]})" : ${counts[sev]}`)
-    .join("\n");
-  if (!segments) {
+function renderMermaidPie(counts: AxiomReportData["findingsCount"], title: string): string {
+  const activeSeverities = SEVERITY_ORDER.filter((sev) => counts[sev] > 0);
+  if (activeSeverities.length === 0) {
     return `<p class="text-gray-500 italic">No findings to chart.</p>`;
   }
+  const segments = activeSeverities
+    .map((sev) => `  "${sev} (${counts[sev]})" : ${counts[sev]}`)
+    .join("\n");
+  const themeVars = activeSeverities
+    .map((sev, i) => `"pie${i + 1}": "${SEVERITY_HEX[sev]}"`)
+    .join(", ");
   return `<pre class="mermaid">
-pie title Findings by Severity
+%%{init: {"theme": "base", "themeVariables": {${themeVars}}}%%
+pie title ${escapeHtml(title)}
 ${segments}
 </pre>`;
 }
@@ -163,7 +193,7 @@ function renderCapabilityManifest(manifest: CapabilityManifest): string {
   </table>`;
 }
 
-function renderFindingsBySeverity(findings: Finding[]): string {
+function renderFindingsBySeverity(findings: Finding[], typeLabel: string): string {
   const sections = SEVERITY_ORDER.filter((sev) => findings.some((f) => f.severity === sev))
     .map((sev) => {
       const sevFindings = findings.filter((f) => f.severity === sev);
@@ -188,10 +218,10 @@ function renderFindingsBySeverity(findings: Finding[]): string {
     </details>`;
     })
     .join("\n");
-  return sections || `<p class="text-gray-500 italic">No findings.</p>`;
+  return sections || `<p class="text-gray-500 italic">No ${typeLabel} findings.</p>`;
 }
 
-function renderFindingsByPage(findings: Finding[]): string {
+function renderFindingsByPage(findings: Finding[], typeLabel: string): string {
   const groups = groupFindingsByPage(findings);
   const sections = Array.from(groups.entries())
     .map(([page, pageFindings]) => {
@@ -216,7 +246,7 @@ function renderFindingsByPage(findings: Finding[]): string {
     </details>`;
     })
     .join("\n");
-  return sections || `<p class="text-gray-500 italic">No findings.</p>`;
+  return sections || `<p class="text-gray-500 italic">No ${typeLabel} findings.</p>`;
 }
 
 function renderToolProfile(capsule: StagedCapsule): string {
@@ -245,7 +275,10 @@ export function renderAxiomReportHtml(
   metadata: EvidenceMetadata,
 ): string {
   const findings = studyRun.findings;
-  const counts = countFindingsBySeverity(findings);
+  const violationFindings = findings.filter(isViolationFinding);
+  const incompleteFindings = findings.filter((f) => !isViolationFinding(f));
+  const violationCounts = countFindingsBySeverity(violationFindings);
+  const incompleteCounts = countFindingsBySeverity(incompleteFindings);
   const total = findings.length;
   const closure = capsule.closureDecision;
   const recordedAt = studyRun.recordedAt;
@@ -276,12 +309,16 @@ export function renderAxiomReportHtml(
 
 <section class="mb-6">
   <h2 class="text-xl font-bold mb-3">Severity Dashboard</h2>
-  ${renderSeverityDashboard(counts)}
+  ${renderFindingsTypeDashboard("Violations", violationCounts, violationFindings.length)}
+  ${renderFindingsTypeDashboard("Incomplete", incompleteCounts, incompleteFindings.length)}
 </section>
 
 <section class="mb-6">
   <h2 class="text-xl font-bold mb-3">Severity Distribution</h2>
-  ${renderMermaidPie(counts)}
+  <h3 class="text-lg font-semibold mb-2">Violations</h3>
+  ${renderMermaidPie(violationCounts, "Violations by Severity")}
+  <h3 class="text-lg font-semibold mb-2 mt-4">Incomplete</h3>
+  ${renderMermaidPie(incompleteCounts, "Incomplete by Severity")}
 </section>
 
 <section class="mb-6">
@@ -295,13 +332,23 @@ export function renderAxiomReportHtml(
 </section>
 
 <section class="mb-6">
-  <h2 class="text-xl font-bold mb-3">Findings by Severity</h2>
-  ${renderFindingsBySeverity(findings)}
+  <h2 class="text-xl font-bold mb-3">Violations by Severity</h2>
+  ${renderFindingsBySeverity(violationFindings, "violation")}
 </section>
 
 <section class="mb-6">
-  <h2 class="text-xl font-bold mb-3">Findings by Page</h2>
-  ${renderFindingsByPage(findings)}
+  <h2 class="text-xl font-bold mb-3">Violations by Page</h2>
+  ${renderFindingsByPage(violationFindings, "violation")}
+</section>
+
+<section class="mb-6">
+  <h2 class="text-xl font-bold mb-3">Incomplete by Severity</h2>
+  ${renderFindingsBySeverity(incompleteFindings, "incomplete")}
+</section>
+
+<section class="mb-6">
+  <h2 class="text-xl font-bold mb-3">Incomplete by Page</h2>
+  ${renderFindingsByPage(incompleteFindings, "incomplete")}
 </section>
 
 <section class="mb-6">
@@ -311,7 +358,7 @@ export function renderAxiomReportHtml(
 
 <footer class="border-t border-gray-300 pt-4 text-sm text-gray-500">
   <div>Generated at: ${escapeHtml(new Date().toISOString())}</div>
-  <div>Total findings: ${total}</div>
+  <div>Total findings: ${total} (${violationFindings.length} violations, ${incompleteFindings.length} incomplete)</div>
 </footer>
 
 <script>mermaid.initialize({ startOnLoad: true });</script>
@@ -404,31 +451,33 @@ export async function runAxiomReport(
   }
 
   const findings = studyRun.findings;
-  const counts = countFindingsBySeverity(findings);
+  const violationFindings = findings.filter(isViolationFinding);
+  const incompleteFindings = findings.filter((f) => !isViolationFinding(f));
+  const violationCounts = countFindingsBySeverity(violationFindings);
   const total = findings.length;
   const closureSatisfied = capsule.closureDecision.satisfied;
-  const errors = counts.critical + counts.high;
+  const errors = violationCounts.critical + violationCounts.high;
 
   const nextSteps: KernelNextStep[] =
     errors > 0
       ? [
           {
-            action: `Review ${errors} high-severity findings at ${relativeReportPath}`,
+            action: `Review ${errors} high-severity violation(s) at ${relativeReportPath}`,
             kind: "optional",
           },
           {
-            action: `Fix critical/high findings and re-run mission.check --external-preview`,
+            action: `Fix critical/high violations and re-run mission.check --external-preview`,
             kind: "required",
           },
         ]
       : [
           {
-            action: `Report generated at ${relativeReportPath} — no high-severity findings`,
+            action: `Report generated at ${relativeReportPath} — ${violationFindings.length} violation(s), ${incompleteFindings.length} incomplete`,
             kind: "optional",
           },
         ];
 
-  const summary = `axiom.report: ${dryRun ? "dry-run" : "generated"} report.html — ${total} finding(s) (${counts.critical} critical, ${counts.high} high, ${counts.medium} medium, ${counts.low} low, ${counts.info} info), closure ${closureSatisfied ? "satisfied" : "blocked"}`;
+  const summary = `axiom.report: ${dryRun ? "dry-run" : "generated"} report.html — ${total} finding(s) (${violationFindings.length} violations: ${violationCounts.critical} critical, ${violationCounts.high} high, ${violationCounts.medium} medium, ${violationCounts.low} low, ${violationCounts.info} info; ${incompleteFindings.length} incomplete), closure ${closureSatisfied ? "satisfied" : "blocked"}`;
 
   const data: AxiomReportData = {
     command: "axiom.report",
@@ -436,7 +485,7 @@ export async function runAxiomReport(
     missionId,
     evidenceDir,
     reportPath: relativeReportPath,
-    findingsCount: counts,
+    findingsCount: violationCounts,
     totalFindings: total,
     closureSatisfied,
   };
