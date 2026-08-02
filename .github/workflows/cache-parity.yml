@@ -7,10 +7,16 @@ on:
     - cron: "0 3 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   cache-parity:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     name: Cold vs warm build parity
+    env:
+      TZ: UTC
     strategy:
       matrix:
         app: [nicaragua-projekt]

@@ -6,10 +6,20 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
 jobs:
   commit-message-lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     name: commit.message.lint
+    env:
+      TZ: UTC
 
     steps:
       - name: Checkout

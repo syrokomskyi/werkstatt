@@ -9,10 +9,20 @@ on:
       - "packages/os/site-kernel*/**"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
 jobs:
   rfc-validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     name: RFC validate
+    env:
+      TZ: UTC
 
     steps:
       - name: Checkout

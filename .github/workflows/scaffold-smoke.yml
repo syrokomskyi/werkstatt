@@ -13,10 +13,20 @@ on:
       - "apps/nicaragua-projekt/**"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
 jobs:
   scaffold-smoke:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     name: Scaffold smoke test
+    env:
+      TZ: UTC
 
     steps:
       - name: Checkout
