@@ -247,3 +247,7 @@ The Astro dev server (`astro dev`, port 4321) MUST apply the same egress text no
 ## DNA-58 · Generated-file content determinism
 
 Every text-based generated file committed to git must be byte-identical to what its owning generator would produce from current source data (after line-ending normalization). Content drift — a committed file whose content diverges from its generator's current output — is a violation. Binary files (PNG, ICO, WebP, MP4, WebM, JPG, JPEG, GIF, TIFF, HEIC, HEIF, SVG) are excluded; their determinism is covered by RFC-0602 and RFC-0603. Enforcement: `generated.drift.validate` (RFC-0601). Established by RFC-0607.
+
+## DNA-59 · Evidence preservation
+
+Axiom evidence from `mission.check` is preserved as an append-only archive in S3-compatible storage (Cloudflare R2) with timestamped keys. Raw artifacts are subject to lifecycle-based storage tier transition. The archive is queryable via R2 Data Catalog. Local evidence is ephemeral (latest run only); R2 is the durable history. Established by RFC-0650.

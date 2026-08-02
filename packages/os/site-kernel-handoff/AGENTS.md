@@ -257,6 +257,42 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - **`release.publish`:** Refuses to publish any release whose `distTreeHash` is `sha256:pending` or missing, or whose `dist/` directory does not exist. The guard is fail-hard from the first run — no opt-in, no grace period.
 - **Forward-only:** Existing releases with `sha256:pending` hashes must be deleted manually by the operator before running the new `release.prepare`. No migration path is provided.
 
+## Evidence preservation (RFC-0650)
+
+Axiom evidence from `mission.check` is preserved as an append-only archive in Cloudflare R2 (S3-compatible object storage) with timestamped keys. This RFC establishes DNA-59 (Evidence preservation).
+
+- **R2 bucket:** `axiom-evidence` (single shared bucket, created by operator).
+- **Key structure:** `{systemId}/{missionId}/{runTimestamp}/{filename}`
+- **Timestamp format:** `YYYY-MM-DDTHH-MM-SS-mmmZ` (ISO 8601 UTC with colons and dots replaced by hyphens, milliseconds included). Filesystem-safe and lexicographically sortable.
+- **`evidence-metadata.json`:** Now includes `runTimestamp` field (always present, written by `mission.check`). The `--run-timestamp` flag allows explicit timestamp specification (used by `evidence.sync` in RFC-0651 to ensure key consistency). When not provided, `mission.check` auto-generates from `new Date().toISOString()` with `[:.]` replaced by `-`.
+- **R2 lifecycle rules:**
+
+  | Prefix pattern | Transition | After | Rationale |
+  | --- | --- | --- | --- |
+  | `*/raw/*` | Standard → Infrequent Access | 7 days | Raw artifacts (screenshots, axe JSON) rarely accessed after first week. |
+  | `*/raw/*` | Infrequent Access → delete | 365 days | After 1 year, raw screenshots have no forensic value. |
+  | `*` (all other objects) | No transition | — | Structured JSON and report.html are small (~19 MB total) and retained indefinitely. |
+
+- **R2 Data Catalog:** Managed Apache Iceberg table `axiom_evidence_runs` on the `axiom-evidence` bucket. Schema:
+
+  | Column              | Type      | Description                                   |
+  | ------------------- | --------- | --------------------------------------------- |
+  | `system_id`         | string    | Sternsystem ID                                |
+  | `mission_id`        | string    | Mission ID                                    |
+  | `run_timestamp`     | timestamp | Run timestamp (ISO 8601 UTC)                  |
+  | `commit_sha`        | string    | Git commit SHA from evidence-metadata.json    |
+  | `findings_count`    | int       | Total findings from study-run.json            |
+  | `errors_count`      | int       | Error-level findings                          |
+  | `warnings_count`    | int       | Warning-level findings                        |
+  | `closure_satisfied` | boolean   | Whether staged-capsule.json indicates closure |
+  | `r2_key_prefix`     | string    | R2 key prefix for this run                    |
+
+  The Iceberg table is written by `evidence.sync` (RFC-0651), not by this RFC. Partitioned by `system_id`.
+
+- **Operator-only setup:** R2 bucket creation, Data Catalog enablement, and lifecycle rule configuration are **manual operator actions**. Agents MUST NOT run `wrangler r2 bucket create`, `wrangler r2 bucket catalog enable`, or `wrangler r2 bucket lifecycle` without explicit operator approval.
+- **`evidence.sync` and `evidence.fetch`** are defined in RFC-0651, not this RFC. Integration into `mission.close` and `leitstand.dev-deploy` is defined in RFC-0652.
+- **Local evidence remains ephemeral** (latest run only). R2 is the durable history.
+
 ## Test conventions
 
 - **Await async operations before sync assertions:** When testing sync functions that inspect file state (e.g. `isWorkpieceDirty`, `existsSync`), always `await fs.writeFile()` or other async I/O before calling the sync function. Using `.then()` without awaiting creates a race condition — the assertion may execute before the file is written, causing flaky test failures.
