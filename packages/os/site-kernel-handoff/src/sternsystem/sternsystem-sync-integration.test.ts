@@ -65,8 +65,8 @@ beforeEach(async () => {
   externalDir = join(tmpDir, "external.git");
 
   // Create bare repos
-  git(tmpDir, `init --bare "${bareDir}"`);
-  git(tmpDir, `init --bare "${externalDir}"`);
+  git(tmpDir, `init --bare -b main "${bareDir}"`);
+  git(tmpDir, `init --bare -b main "${externalDir}"`);
 
   // Create cache clone with initial content
   git(tmpDir, `clone "${bareDir}" "${cacheDir}"`);
@@ -78,7 +78,7 @@ beforeEach(async () => {
   await writeFile(join(cacheDir, "bordbuch/events.ndjson"), "");
   git(cacheDir, "add -A");
   git(cacheDir, 'commit -m "initial"');
-  git(cacheDir, "push origin master");
+  git(cacheDir, "push origin main");
 
   // Minimal workspace setup for validate
   await mkdir(join(workspaceRoot, "docs", "rfcs"), { recursive: true });

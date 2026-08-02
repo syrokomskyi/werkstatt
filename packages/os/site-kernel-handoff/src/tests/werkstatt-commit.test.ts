@@ -15,7 +15,7 @@ import { execSync } from "node:child_process";
 import { commitWerkstattSideEffects } from "../werkstatt/werkstatt-commit.ts";
 
 function gitInit(dir: string): void {
-  execSync("git init", { cwd: dir, stdio: "pipe" });
+  execSync("git init -b main", { cwd: dir, stdio: "pipe" });
   execSync("git config user.email test@test.com", { cwd: dir, stdio: "pipe" });
   execSync("git config user.name Test", { cwd: dir, stdio: "pipe" });
 }
@@ -95,11 +95,7 @@ test("throw on commit failure — pre-commit hook blocks", async () => {
   writeFileSync(join(tmpDir, "systems", "registry.yaml"), "modified\n");
 
   await expect(
-    commitWerkstattSideEffects(
-      tmpDir,
-      ["systems/registry.yaml"],
-      "werkstatt: test",
-    ),
+    commitWerkstattSideEffects(tmpDir, ["systems/registry.yaml"], "werkstatt: test"),
   ).rejects.toThrow();
 });
 
@@ -113,10 +109,7 @@ test("non-existent file — skipped silently via allowNonZero", async () => {
 
   const result = await commitWerkstattSideEffects(
     tmpDir,
-    [
-      "systems/registry.yaml",
-      "does/not/exist.yaml",
-    ],
+    ["systems/registry.yaml", "does/not/exist.yaml"],
     "werkstatt: test",
   );
 
@@ -133,11 +126,7 @@ test("commit message format — passed correctly", async () => {
   writeFileSync(join(tmpDir, "missions", "mission.yaml"), "modified\n");
 
   const message = "werkstatt: mission.open test-m000001";
-  const result = await commitWerkstattSideEffects(
-    tmpDir,
-    ["missions/mission.yaml"],
-    message,
-  );
+  const result = await commitWerkstattSideEffects(tmpDir, ["missions/mission.yaml"], message);
 
   expect(result.committed).toBe(true);
 

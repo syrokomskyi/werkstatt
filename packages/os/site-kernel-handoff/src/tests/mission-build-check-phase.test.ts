@@ -29,11 +29,28 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
     executeKernelPipeline: vi.fn(async (opts: { pipelineName: string }) => {
       mock.pipelineCalls.push(opts.pipelineName);
       if (opts.pipelineName === "build.prepare")
-        return [{ ok: mock.prepareOk, steps: [{ ok: true, commandName: "config.regenerate", exitCode: 0 }] }] as never;
+        return [
+          {
+            ok: mock.prepareOk,
+            steps: [{ ok: true, commandName: "config.regenerate", exitCode: 0 }],
+          },
+        ] as never;
       if (opts.pipelineName === "build.check")
-        return [{ ok: mock.checkOk, steps: [{ ok: mock.checkOk, commandName: "content.validate", exitCode: mock.checkOk ? 0 : 1 }] }] as never;
+        return [
+          {
+            ok: mock.checkOk,
+            steps: [
+              { ok: mock.checkOk, commandName: "content.validate", exitCode: mock.checkOk ? 0 : 1 },
+            ],
+          },
+        ] as never;
       if (opts.pipelineName === "build.post")
-        return [{ ok: mock.postOk, steps: [{ ok: true, commandName: "text.normalize.apply", exitCode: 0 }] }] as never;
+        return [
+          {
+            ok: mock.postOk,
+            steps: [{ ok: true, commandName: "text.normalize.apply", exitCode: 0 }],
+          },
+        ] as never;
       return [{ ok: true, steps: [] }] as never;
     }),
     executeKernelCommand: vi.fn(async () => [{ ok: true, exitCode: 0, summary: "" }] as never),
@@ -81,7 +98,7 @@ vi.mock("../build-pipeline-helpers.ts", async (importOriginal) => {
 });
 
 function gitInit(dir: string): void {
-  execSync("git init", { cwd: dir, stdio: "pipe" });
+  execSync("git init -b main", { cwd: dir, stdio: "pipe" });
   execSync("git config user.email test@test.com", { cwd: dir, stdio: "pipe" });
   execSync("git config user.name Test", { cwd: dir, stdio: "pipe" });
 }

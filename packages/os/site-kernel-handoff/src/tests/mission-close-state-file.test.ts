@@ -34,7 +34,7 @@ vi.mock("../mission/mission-materialization-commands.ts", () => ({
 }));
 
 function gitInit(dir: string): void {
-  execSync("git init", { cwd: dir, stdio: "pipe" });
+  execSync("git init -b main", { cwd: dir, stdio: "pipe" });
   execSync("git config user.email test@test.com", { cwd: dir, stdio: "pipe" });
   execSync("git config user.name Test", { cwd: dir, stdio: "pipe" });
 }

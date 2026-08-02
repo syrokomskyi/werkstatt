@@ -129,7 +129,7 @@ vi.mock("../mission/mission-git-commit.ts", async (importOriginal) => {
 });
 
 function gitInit(dir: string): void {
-  execSync("git init", { cwd: dir, stdio: "pipe" });
+  execSync("git init -b main", { cwd: dir, stdio: "pipe" });
   execSync("git config user.email test@test.com", { cwd: dir, stdio: "pipe" });
   execSync("git config user.name Test", { cwd: dir, stdio: "pipe" });
 }
