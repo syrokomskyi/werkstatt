@@ -1,3 +1,15 @@
+/*
+<MODULE_CONTRACT>
+<purpose>
+  Unit tests for RFC-0650 runTimestamp behavior in mission.check. Verifies
+  auto-generation, explicit --run-timestamp override, invalid format rejection,
+  and that runTimestamp is always present in evidence-metadata.json.
+</purpose>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Initial: 4 test cases covering runTimestamp auto-generation, explicit override, invalid format rejection, and always-present invariant.</item>
+</CHANGE_SUMMARY>
+*/
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
 import { mkdtemp, rm, mkdir, readFile, writeFile } from "node:fs/promises";
