@@ -25,6 +25,7 @@
 <CHANGE_SUMMARY>
   <item>Annotate Compass scaffolding to enhance navigability and maintainability of the configuration file.</item>
   <item>RFC-0569: add dev-only smartypants: false for egress parity.</item>
+  <item>ADR-0017: use esbuild for CSS minification to preserve background-color: inherit declarations.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -156,6 +157,11 @@ export default defineConfig({
     build: {
       target: "esnext",
       minify: "terser",
+      // [ADR-0017] Use esbuild for CSS minification instead of lightningcss.
+      // lightningcss strips background-color: inherit ("remove default property
+      // sub-values" optimization), which breaks axe color-contrast checks in
+      // the Axiom gate. esbuild preserves inherit declarations.
+      cssMinify: "esbuild",
       rollupOptions: {
         output: {
           manualChunks: (id) => {
