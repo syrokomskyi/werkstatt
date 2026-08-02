@@ -230,19 +230,19 @@ The `generated` field remains `string[]` for backward compatibility with existin
 
 ## Acceptance criteria
 
-- [ ] `forge.agents.generate` uses `resolveTerminology()` for placeholder substitution on final assembled content
-- [ ] Root AGENTS.md static prose extracted to template files with `{{terminology.key}}` placeholders
-- [ ] Creative register root template (`root-agents-creative.md`) created
-- [ ] Business register root template extracted to file (`root-agents-business.md`)
-- [ ] Dynamic sections (skills table, capabilities, behavioral layer) remain inline, appended at runtime
-- [ ] Nested AGENTS.md templates use `workspaceTypes[].agentsMdTemplate` when present
-- [ ] Fallback to existing hardcoded templates when profile has no domain fields
-- [ ] `--json` output adds `details` field with `domain`, `register`, and `workspaceType` per file; `generated` remains `string[]`
-- [ ] Template path resolution: `agentsMdTemplate` relative to profile directory, no traversal
-- [ ] Unit tests: terminology substitution, register selection, nested template, fallback, path traversal rejection
-- [ ] Existing software-domain projects generate identical AGENTS.md (no regression)
-- [ ] `packages/forge/AGENTS.md` updated
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `forge.agents.generate` uses `resolveTerminology()` for placeholder substitution on final assembled content (evidence: `packages/forge/src/onboarding/agents-generate.ts:519-521`)
+- [x] Root AGENTS.md static prose extracted to template files with `{{terminology.key}}` placeholders (evidence: `packages/forge/src/onboarding/templates/root-agents-business.md`)
+- [x] Creative register root template (`root-agents-creative.md`) created (evidence: `packages/forge/src/onboarding/templates/root-agents-creative.md`)
+- [x] Business register root template extracted to file (`root-agents-business.md`) (evidence: `packages/forge/src/onboarding/templates/root-agents-business.md`)
+- [x] Dynamic sections (skills table, capabilities, behavioral layer) remain inline, appended at runtime (evidence: `packages/forge/src/onboarding/agents-generate.ts:441-508`)
+- [x] Nested AGENTS.md templates use `workspaceTypes[].agentsMdTemplate` when present (evidence: `packages/forge/src/onboarding/nested-agents-templates.ts:131-165`)
+- [x] Fallback to existing hardcoded templates when profile has no domain fields (evidence: `packages/forge/src/onboarding/nested-agents-templates.ts:137-139`)
+- [x] `--json` output adds `details` field with `domain`, `register`, and `workspaceType` per file; `generated` remains `string[]` (evidence: `packages/forge/src/onboarding/agents-generate.ts:375,525-530,593`)
+- [x] Template path resolution: `agentsMdTemplate` relative to profile directory, no traversal (evidence: `packages/forge/src/onboarding/nested-agents-templates.ts:143-156`)
+- [x] Unit tests: terminology substitution, register selection, nested template, fallback, path traversal rejection (evidence: `packages/forge/src/tests/agents-generate-domain.test.ts`)
+- [x] Existing software-domain projects generate identical AGENTS.md (no regression) (evidence: `packages/forge/src/tests/agents-generate-domain.test.ts:259-267` golden fixture comparison)
+- [x] `packages/forge/AGENTS.md` updated (evidence: `packages/forge/AGENTS.md:127-136`)
+- [x] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
