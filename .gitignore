@@ -212,6 +212,9 @@ uni.registry.json
 # Local scratch output. Durable review reports belong under docs/audits/.
 tmp/
 
+# Test temp directories (mkdtemp patterns like tmp-close-evidence-*, tmp-leitstand-*)
+tmp-*/
+
 ### Generated archetype registry
 
 

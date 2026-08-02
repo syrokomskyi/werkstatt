@@ -17,9 +17,15 @@ When the operator says any of the following, invoke the `fo-session-retro` skill
 
 ## Steps
 
-1. **Invoke `fo-session-retro`** via the `skill` tool. Do NOT produce a closing summary first — the retro skill IS the closing protocol.
-2. **Wait for the retro to complete** — it will categorize insights, route them, commit, and produce its own summary.
-3. **Do not duplicate** — the retro skill's report is the session-end output. Do not add a separate "session complete" message.
+1. **Clean up test temp directories** — remove leftover `tmp-*` and `tmp/` directories created by unit tests:
+   ```bash
+   find packages -maxdepth 2 -type d -name 'tmp-*' -exec rm -rf {} + 2>/dev/null; \
+   find packages -maxdepth 2 -type d -name 'tmp' -exec rm -rf {} + 2>/dev/null
+   ```
+   This is safe to auto-run (`// turbo`).
+2. **Invoke `fo-session-retro`** via the `skill` tool. Do NOT produce a closing summary first — the retro skill IS the closing protocol.
+3. **Wait for the retro to complete** — it will categorize insights, route them, commit, and produce its own summary.
+4. **Do not duplicate** — the retro skill's report is the session-end output. Do not add a separate "session complete" message.
 
 ## Language discipline (NON-NEGOTIABLE)
 
