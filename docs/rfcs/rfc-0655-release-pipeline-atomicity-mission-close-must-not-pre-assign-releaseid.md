@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -50,11 +51,15 @@ commands:
     - mission.close
     - release.prepare
   removed: []
+  # Note: no new bordbuch event kind is added. The existing mission-close entry
+  # already has a top-level releaseId field in the schema — the fix is to populate it.
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - packages/os/site-kernel-handoff
 successSignals:
+  - CloseReport interface includes releaseId as a first-class field, written to close-report.json
+  - mission.close passes releaseId as a top-level option to appendBordbuchEntry (not only in metadata)
   - mission.close close-report.json releaseId field is never null when mission.yaml releaseId is set
   - release.state.validate detects orphaned releaseIds (prepared but never published)
   - No phantom release numbers reserved without corresponding release artifacts
@@ -108,12 +113,12 @@ DNA-51 (Werkstatt consistency primitives) provides locks and atomic staging, but
 
 ## Decision
 
-The kernel gains a `release.state.validate` command that checks consistency between `mission.yaml`, `close-report.json`, `release.yaml`, and `registry.yaml` for a given mission or release. Additionally, `release.prepare` updates `close-report.json` after writing `releaseId` to `mission.yaml`, and `mission.close` appends a `release-associated` bordbuch entry when `releaseId` is already present in the manifest at close time.
+The kernel gains a `release.state.validate` command that checks consistency between `mission.yaml`, `close-report.json`, `release.yaml`, and `registry.yaml` for a given mission or release. Additionally, `release.prepare` updates `close-report.json` after writing `releaseId` to `mission.yaml`, and `mission.close` is fixed to: (1) add `releaseId` as a first-class field on `CloseReport` (and thus in `close-report.json`), and (2) pass `releaseId` as a top-level option to `appendBordbuchEntry` instead of only in `metadata`. No new bordbuch event kind is introduced — the existing `mission-close` entry already has a top-level `releaseId` field in the schema that is simply not being populated by the current calling code.
 
 ## Architectural fit
 
 - **DNA-48** (Release discipline): `release.state.validate` enforces that a `releaseId` in `mission.yaml` points to a release that has progressed through the state machine, not an abandoned `prepared` release.
-- **DNA-46** (Mission lifecycle): `release.prepare` updates `close-report.json` to keep it in sync with `mission.yaml`, ensuring the bordbuch and evidence trail are consistent.
+- **DNA-46** (Mission lifecycle): `release.prepare` updates `close-report.json` to keep it in sync with `mission.yaml`. `mission.close` populates the bordbuch `mission-close` entry's top-level `releaseId` field (already in the schema) instead of burying it in `metadata`, ensuring the bordbuch and evidence trail are consistent.
 - **DNA-51** (Werkstatt consistency primitives): The new validator extends the existing consistency primitive family (`werkstatt.lock.status`, `werkstatt.operation.validate`) to cover the release pipeline.
 - **Site OS operator model**: `release.state.validate` is a workspace-scope command in the `release` module, callable standalone or integrated into `build.check` as a warn-level validator.
 
@@ -162,9 +167,9 @@ interface ReleaseStateValidateData {
 Checks performed:
 
 1. `mission-yaml-release-id-exists` — if `mission.yaml` has a `releaseId`, the release directory and `release.yaml` must exist.
-2. `close-report-release-id-consistent` — `close-report.json` releaseId (if present) must match `mission.yaml` releaseId.
+2. `close-report-release-id-consistent` — `close-report.json` `releaseId` field (if the file exists) must match `mission.yaml` `releaseId`. If `close-report.json` does not exist (mission closed before RFC-0477), this check is skipped with a warning.
 3. `release-state-progressed` — if release exists, its state must be at least `published` (warn if `prepared`).
-4. `bordbuch-release-id-consistent` — the latest `mission-close` bordbuch event's `releaseId` must match `mission.yaml`.
+4. `bordbuch-release-id-consistent` — the latest `mission-close` bordbuch event's top-level `releaseId` field must match the `releaseId` that was known at close time (i.e., `mission.yaml` `releaseId` at close, not after a subsequent `release.prepare` update). If `release.prepare` writes a new `releaseId` to `mission.yaml` after close, the bordbuch correctly reflects the state at close time — this is not a mismatch.
 5. `registry-last-release-consistent` — if release state is `promoted`, `registry.yaml.lastRelease` must point to this release or a newer one.
 
 ### File system responsibilities
@@ -177,7 +182,11 @@ Checks performed:
 | `systems/registry.yaml`                         | Read — check lastRelease consistency       |
 | `systems/{system}/bordbuch/events.ndjson`       | Read — check mission-close event releaseId |
 
-`release.prepare` additionally writes to: | `missions/{mission}/evidence/close-report.json` | Updated — releaseId field set after prepare |
+`release.prepare` additionally writes to:
+
+| Path | Role |
+| --- | --- |
+| `missions/{mission}/evidence/close-report.json` | Updated — `releaseId` field set after prepare. If the file does not exist (mission closed before RFC-0477), warn and skip — do not create a new close-report. |
 
 ### Output format
 
@@ -220,8 +229,8 @@ Checks performed:
 ## Rollout
 
 - `release.state.validate` is introduced as a standalone command, not yet integrated into `build.check`.
-- `release.prepare` is updated to write `releaseId` to `close-report.json` after writing it to `mission.yaml`. This is a backward-compatible change — existing close-reports with `releaseId: null` are not modified retroactively.
-- `mission.close` is updated to append a `release-associated` bordbuch entry when `manifest.releaseId` is already set at close time (e.g., from a prior `release.prepare` on a re-opened mission).
+- `release.prepare` is updated to read, update, and write back `close-report.json` after writing `releaseId` to `mission.yaml`. If `close-report.json` does not exist (mission closed before RFC-0477), `release.prepare` emits a warning and skips the update — it does not create a new close-report. This is a non-retroactive change — existing close-reports with `releaseId: null` (or no `releaseId` field) are not modified retroactively.
+- `mission.close` is updated in two ways: (1) `releaseId` is added as a first-class field on the `CloseReport` interface, so `close-report.json` carries it directly; (2) `releaseId` is passed as a top-level option to `appendBordbuchEntry` (not only in `metadata`), so the bordbuch `mission-close` entry's top-level `releaseId` field is correctly populated. No new bordbuch event kind is added — the existing `mission-close` kind already has a `releaseId` field in the schema that was simply not being populated.
 - After a grace period, `release.state.validate` is integrated into `build.check` as a warn-level validator.
 
 ## Alternatives considered
@@ -233,6 +242,8 @@ Checks performed:
 ## Risks
 
 - **False positives for re-opened missions**: A mission that was closed, re-opened, and closed again may have a stale `releaseId` from the first close. The validator must account for this by checking the latest bordbuch `mission-close` event, not any earlier one.
+- **Re-opened mission + release.prepare race**: If a mission is re-opened and closed again after `release.prepare` has already written a `releaseId` to `close-report.json`, the second `mission.close` will overwrite `close-report.json` with a new report. If the second close has no `releaseId`, the new `close-report.json` will have `releaseId: null` — which is correct for the second close's state. The validator should compare `close-report.json` `releaseId` against `mission.yaml` `releaseId` at close time, not after a subsequent `release.prepare`.
+- **Missing close-report.json**: Missions closed before RFC-0477 have no `close-report.json`. The validator (check 2) and `release.prepare`'s update logic must handle this gracefully — warn, not error.
 - **Performance**: `release.state.validate` reads multiple files across `missions/`, `releases/`, `systems/`, and bordbuch. For large fleets, validating all releases for a system may be slow. Mitigation: validate by mission or release ID, not system-wide, by default.
 - **Agent confusion**: Agents may interpret `release.state.validate` failures as blocking when they are advisory. The command exits 1 only for error-level checks; agents should treat warnings as informational.
 
@@ -240,10 +251,12 @@ Checks performed:
 
 - [ ] `release.state.validate` command registered in the `release` module with `--mission`, `--release`, `--system` flags
 - [ ] `release.state.validate` detects: missing release directory, close-report/mission.yaml releaseId mismatch, orphaned prepared releases, bordbuch releaseId mismatch, registry lastRelease inconsistency
-- [ ] `release.prepare` updates `close-report.json` releaseId field after writing to `mission.yaml`
-- [ ] `mission.close` appends `release-associated` bordbuch entry when releaseId is present at close time
+- [ ] `release.prepare` updates `close-report.json` `releaseId` field after writing to `mission.yaml` (warns and skips if close-report.json does not exist)
+- [ ] `mission.close` adds `releaseId` as a first-class field on `CloseReport` interface, written to `close-report.json`
+- [ ] `mission.close` passes `releaseId` as a top-level option to `appendBordbuchEntry` (not only in `metadata`)
 - [ ] `--json` output format documented and stable
 - [ ] Unit tests cover all five checks with both pass and fail scenarios
+- [ ] Unit tests cover edge cases: missing close-report.json, re-opened mission, release.prepare after close
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
