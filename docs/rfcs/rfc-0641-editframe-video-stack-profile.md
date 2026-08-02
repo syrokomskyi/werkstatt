@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-01
-updatedAt: 2026-08-01
+updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -60,6 +61,7 @@ nonGoals:
   - Do not change forge.create or forge.doctor behavior in this RFC — that is RFC-0640
   - Do not create Editframe-specific skills in this RFC — that is RFC-0642
   - Do not add React or Next.js Editframe profile variants — only the HTML composition profile is added in this RFC
+  - Do not define Editframe CLI installation verification or runtime health checks — that is forge.doctor's responsibility (RFC-0640)
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -108,7 +110,7 @@ A new stack profile `editframe-html` is added at `packages/forge/profiles/editfr
 
 ## Architectural fit
 
-- **DNA-54 (Forge bindings contract)**: The profile uses semantic binding keys (`produce`, `validate`, `verify`, `preview`, `lint`) from RFC-0639 instead of software-specific keys. Skills reference these keys and work across domains.
+- **DNA-54 (Forge bindings contract)**: The profile is the first concrete consumer of the domain-neutral schema extensions from RFC-0638 and the semantic binding keys from RFC-0639. By providing domain-specific default values (`editframe render`, `editframe check`) that `forge.create` (RFC-0640) writes into `forge.yaml` bindings, the profile enables skills to remain domain-agnostic — they reference `ref(bindings.commands.produce)` instead of hardcoding tool-specific commands. This is how DNA-54's de-hardcoding principle extends to non-software domains: the profile supplies the values, bindings carry them, skills reference them by key.
 - **RFC-0392 (Stack profiles)**: The profile follows the existing stack profile schema (`forge/stack-profile@1`) extended with domain fields from RFC-0638.
 - **RFC-0640 (Domain-aware bootstrapping)**: `forge create --profile editframe-html` uses the domain fields to write appropriate forge.yaml, PREFERENCES.md, and AGENTS.md.
 - **Editframe CLI**: The profile references Editframe CLI commands (`editframe render`, `editframe check`, `editframe preview`) as binding values. These are resolved at runtime — forge does not depend on Editframe.
@@ -125,9 +127,13 @@ forge create --profile editframe-html
 forge profile.validate --id editframe-html
 ```
 
+Both commands are defined by RFC-0640. This RFC only adds the profile YAML that makes them usable for the Editframe domain.
+
 ### TypeScript contracts
 
 No new TypeScript types — the profile is a YAML file consumed by the schema from RFC-0638. The profile's structure matches `StackProfileDomainFields`.
+
+The profile YAML includes the required `detect.anyOf` field (for `detectStack` compatibility) with marker `editframe.config.*`, consistent with existing profiles (`astro.config.*`, `phaser.config.*`).
 
 ### File system responsibilities
 
@@ -138,17 +144,22 @@ No new TypeScript types — the profile is a YAML file consumed by the schema fr
 | `packages/forge/profiles/editframe-html-templates/composition-agents.md` | AGENTS.md template for composition workspaces |
 | `packages/forge/src/tests/editframe-profile.test.ts` | New test: profile parses, domain fields valid |
 
+All paths are inside `packages/forge/profiles/` and are included in the npm package via the `files: ["profiles/"]` entry in `packages/forge/package.json`.
+
 ### Output format
 
 No command output — this RFC adds a profile YAML file. `forge profile.validate --id editframe-html` reports validation results.
 
 ### Failure modes
 
-- **Editframe CLI not installed**: The profile references `editframe` commands in bindings. If the operator has not installed `@editframe/cli`, `forge doctor` reports the binding as unresolved but does not fail — the binding is `null` until the operator installs Editframe.
-- **Composition workspace not detected**: If a directory has no `.html` files containing `ef-timegroup`, it is not detected as a composition workspace. `forge agents.generate` skips it.
+- **Editframe CLI not installed**: The profile references `editframe` commands in bindings. If the operator has not installed `@editframe/cli`, `forge doctor` reports the binding as unresolved (warning, exit code 0) — the binding is `null` until the operator installs Editframe. `forge doctor --strict` elevates this to an error (exit code 1).
+- **Composition workspace not detected**: If a directory has no `.html` files containing `ef-timegroup`, it is not detected as a composition workspace. `forge agents.generate` skips it with an info-level log, exit code 0.
+- **Profile schema invalid**: `forge.profile.validate` exits non-zero (exit code 1) with per-profile error details when the profile YAML fails schema validation.
+- **Multiple profiles with `domain: video`**: If a future `editframe-react` profile is added, `detectStack` uses `detect.anyOf` markers to disambiguate. `editframe-html` uses `editframe.config.*`; a React variant would use a different marker (e.g. `editframe.react.config.*`). No conflict — first match wins, consistent with existing `detectStack` behavior.
 
 ## Rollout
 
+- **Implementation order**: This RFC is the fourth in a series and depends on the prior three: RFC-0638 (schema extensions) must be implemented first so the profile YAML parses; RFC-0639 (semantic bindings) must be implemented so the profile's binding defaults are valid; RFC-0640 (domain-aware commands) must be implemented so `forge create --profile editframe-html` and `forge.profile.validate` work. Implementation order: RFC-0638 → RFC-0639 → RFC-0640 → RFC-0641.
 - **New profile**: The profile is added to `packages/forge/profiles/` and shipped with the npm package. Operators install `@warpgogol/forge` and run `forge create --profile editframe-html`.
 - **No migration**: This is a new profile — no existing projects are affected.
 - **Profile validation**: `forge.profile.validate` (RFC-0640) validates the profile on every `forge doctor` run.
@@ -165,19 +176,22 @@ No command output — this RFC adds a profile YAML file. `forge profile.validate
 - **Editframe API changes**: Editframe's CLI commands or composition elements might change. Mitigation: the profile references commands via bindings — operators update binding values in their forge.yaml without profile changes.
 - **Profile staleness**: If Editframe adds new features, the profile might not reflect them. Mitigation: the profile is a starting point, not a complete Editframe integration. Operators customize bindings and invariants per project.
 - **VIDEO invariant subjectivity**: Invariants like "scene durations use contain mode by default" are domain-specific quality guidelines. Mitigation: they are warnings by default, errors with `--strict`.
+- **Agent misinterpretation**: Agents unfamiliar with the video domain may misapply VIDEO invariants (e.g. checking VIDEO-02 contain mode on non-scene elements). Mitigation: invariant rule text is explicit and scoped to composition files; `forge.doctor` reports invariant id and rule in diagnostics for operator review.
+- **False-positive rate**: VIDEO-01 (kebab-case filenames) may produce false positives for composition files with non-ASCII names (e.g. Ukrainian filenames). Mitigation: the invariant checks filename format only, not content; operators can suppress individual warnings via `forge.doctor` output.
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/profiles/editframe-html.yaml` exists and passes `forge.profile.validate`
+- [ ] `packages/forge/profiles/editframe-html.yaml` exists and passes `forge.profile.validate` (requires RFC-0640 implemented)
 - [ ] Profile declares `domain: video`, `register: creative`
 - [ ] Profile declares terminology map with artifact → composition, module → scene, operator → director
 - [ ] Profile declares artifacts with composition extensions and Editframe CLI commands
-- [ ] Profile declares workspaceTypes with composition detection markers
+- [ ] Profile declares workspaceTypes with composition detection markers (`glob: *.html`, `contains: ef-timegroup`, `packageJsonDep: @editframe/cli`)
+- [ ] Profile declares `detect.anyOf` with marker `editframe.config.*`
 - [ ] Profile declares at least 3 VIDEO-* invariants
 - [ ] Profile includes workspace layout with `compositions/` directory
 - [ ] Profile includes first workspace template with sample HTML composition
-- [ ] `forge create --profile editframe-html` scaffolds a working project structure
-- [ ] Unit test verifies profile parses against extended schema
+- [ ] `forge create --profile editframe-html` scaffolds a working project structure (requires RFC-0640 implemented)
+- [ ] Unit test verifies profile parses against extended schema (requires RFC-0638 implemented)
 - [ ] `packages/forge/AGENTS.md` updated with Editframe profile documentation
 - [ ] `rfc.validate` passes on this file before merging
 
