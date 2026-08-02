@@ -24,6 +24,9 @@ bindings:
     typecheck: pnpm --filter {workspace} run build:check
     test: pnpm --filter {workspace} run test
     scopedBuild: pnpm --filter {workspace} run build
+    validate: pnpm --filter {workspace} run build:check
+    produce: pnpm --filter {workspace} run build
+    verify: pnpm --filter {workspace} run test
     specValidate: pnpm exec site-kernel run spec.validate --spec={id} --json
     sessionSave: pnpm exec site-kernel run session.save --json
   paths:
