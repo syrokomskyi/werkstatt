@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -47,8 +48,7 @@ commands:
     - dist.html-structure.validate
   changed: []
   removed: []
-appsImpacted:
-  - apps/*
+appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - packages/os/site-kernel-checks
@@ -60,6 +60,8 @@ nonGoals:
   - "Does not compare pre-mutator and post-mutator state (final-state check only)"
   - "Does not validate non-HTML files (JSON, XML, CSS, SVG)"
   - "Does not parse HTML with a full parser — uses lightweight tag counting"
+  - "Does not detect duplicate structural tags (e.g. two <main> elements) — targets tag imbalance from mutator damage, not tag duplication"
+  - "Does not include <html> in the structural tag list — regex mutators operate within page body, not the root element"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -147,11 +149,12 @@ Void elements (`<br>`, `<img>`, `<input>`, etc.) and self-closing elements are e
 
 For each `.html` file in `dist/client/`:
 
-1. Count opening tags: `<tag` followed by optional attributes and `>` (not `</tag>` and not self-closing `<tag ... />`).
+0. Strip HTML comments (`<!-- ... -->`) from the file content before counting. This prevents false positives from `<tag>`-like strings inside comments.
+1. Count opening tags: `<tag` followed by optional attributes and `>` (not `</tag>`).
 2. Count closing tags: `</tag>`.
 3. If `openCount !== closeCount` for any structural tag, emit a violation.
 
-The algorithm uses a regex per tag: `<tag\b[^>]*>` for openings (excluding `</tag>` and `<tag ... />`), `</tag>` for closings. This is deliberately lightweight — no DOM parsing, no tree construction.
+The algorithm uses a regex per tag: `<tag\b[^>]*>` for openings (excluding `</tag>`), `</tag>` for closings. This is deliberately lightweight — no DOM parsing, no tree construction. Self-closing variants (`<tag ... />`) of non-void structural elements do not appear in valid HTML5 and are counted as opening tags — this is correct behavior since browsers treat `<main />` as `<main>` (opening tag).
 
 ### File system responsibilities
 
@@ -161,6 +164,7 @@ The algorithm uses a regex per tag: `<tag\b[^>]*>` for openings (excluding `</ta
 | `packages/os/site-kernel-checks/src/dist-html-structure.ts` | Command handler |
 | `packages/os/site-kernel-checks/src/command-tables/09-build-artifacts.ts` | Command registration |
 | `packages/os/site-kernel-checks/src/pipelines/build-post.ts` | Pipeline integration |
+| `packages/os/site-kernel-checks/AGENTS.md` | Module table entry for `src/dist-html-structure.ts` |
 
 ### Pipeline integration
 
@@ -219,6 +223,7 @@ The command is inserted into `SITES_BUILD_POST_PIPELINE` after all mutators and 
 ## Risks
 
 - **False positives**: HTML comments containing `<tag>`-like strings could be counted as opening tags. Mitigation: the tag-counting regex requires `<tag\b` (word boundary after tag name) and ignores content inside HTML comments by stripping comments before counting.
+- **False positives from attribute values**: tag-like strings inside attribute values (e.g. `<div data-content="<main>">`) could be counted as opening tags. Mitigation: this is extremely unlikely in practice — attribute values rarely contain structural tag names. The regex-based approach accepts this trade-off over a full HTML parser (see Alternatives considered).
 - **Performance**: scanning 1518 HTML files with regex per tag. Mitigation: the regex operations are O(n) per file and the structural tag list is small (~13 tags). Expected total time: <1s for a typical site.
 - **Agent misinterpretation**: agents might think this command validates accessibility landmarks. It does not — it only checks tag balance. Accessibility validation is Axiom's responsibility.
 - **Maintenance burden**: low. The structural tag list is stable (HTML5 structural elements rarely change). New void elements or structural elements would require updating the list, but this is a rare event.
