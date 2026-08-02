@@ -5,12 +5,12 @@ title: "Migrate stripGeneratedMarker to parser-based comment removal in site-ker
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
-implementedAt:
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:
