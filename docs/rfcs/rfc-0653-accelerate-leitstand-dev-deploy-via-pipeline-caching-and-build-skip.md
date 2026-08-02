@@ -1,7 +1,7 @@
 ---
 id: RFC-0653
 title: "Accelerate leitstand.dev-deploy via pipeline caching and build skip"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
 enhancedAt: 2026-08-02
-implementedAt:
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:
@@ -352,20 +352,20 @@ Before the `pnpm build` call (after `computeBuildInputHash` and `commitSha` capt
 
 ## Acceptance criteria
 
-- [ ] `preview.images.generate` has `reads` declared and `cacheable: false` removed in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts`
-- [ ] `print.pdf.generate` has `reads` declared, `cacheable: false` removed, and `writes` changed to `.cache/pdf/**` in `packages/os/site-kernel-checks/src/command-tables/22-print.ts`
-- [ ] `print.pdf.generate` implementation in `packages/os/site-kernel-checks/src/print-pdf.ts` writes to `.cache/pdf/<hash>/` with internal `.done` marker caching
-- [ ] `print.pdf.copy` command registered in `packages/os/site-kernel-checks/src/command-tables/22-print.ts` with `cacheable: false` and `reads: ["<app>/.cache/pdf/**/*.pdf"]`
-- [ ] `print.pdf.copy` implementation copies PDFs from `.cache/pdf/` to `dist/client/_print/` based on `.cache/pdf/manifest.json`
-- [ ] `build.post` pipeline in `packages/os/site-kernel-checks/src/pipelines/build-post.ts` includes `print.pdf.copy` between `print.pdf.generate` and `print.pdf.validate`
-- [ ] `leitstand.dev-deploy` in `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` implements build-skip cache with `commitSha` + `platformVersion` + `platformSemanticHash` key
-- [ ] `leitstand.dev-deploy` supports `--force-build` flag that bypasses the build-skip cache
-- [ ] `DevDeployResult` type includes `buildSkipped: boolean` field
-- [ ] Repeat `leitstand.dev-deploy` with unchanged workpiece skips `pnpm build` and logs the skip
-- [ ] `command.reads.validate` passes for all modified commands (CRC-01: `reads` or `cacheable: false`)
-- [ ] Unit tests cover build-skip cache hit, cache miss, and `--force-build` override
-- [ ] Unit tests cover `print.pdf.copy` with existing and missing `.cache/pdf/manifest.json`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `preview.images.generate` has `reads` declared and `cacheable: false` removed in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` (evidence: packages/os/site-kernel-checks/src/command-tables/01-codegen.ts:213-218)
+- [x] `print.pdf.generate` has `reads` declared, `cacheable: false` removed, and `writes` changed to `.cache/pdf/**` in `packages/os/site-kernel-checks/src/command-tables/22-print.ts` (evidence: packages/os/site-kernel-checks/src/command-tables/22-print.ts:40-55)
+- [x] `print.pdf.generate` implementation in `packages/os/site-kernel-checks/src/print-pdf.ts` writes to `.cache/pdf/<hash>/` with internal `.done` marker caching (evidence: packages/os/site-kernel-checks/src/print-pdf.ts:132-171)
+- [x] `print.pdf.copy` command registered in `packages/os/site-kernel-checks/src/command-tables/22-print.ts` with `cacheable: false` and `reads: ["<app>/.cache/pdf/**/*.pdf"]` (evidence: packages/os/site-kernel-checks/src/command-tables/22-print.ts:57-69)
+- [x] `print.pdf.copy` implementation copies PDFs from `.cache/pdf/` to `dist/client/_print/` based on `.cache/pdf/manifest.json` (evidence: packages/os/site-kernel-checks/src/print-pdf.ts:357-432)
+- [x] `build.post` pipeline in `packages/os/site-kernel-checks/src/pipelines/build-post.ts` includes `print.pdf.copy` between `print.pdf.generate` and `print.pdf.validate` (evidence: packages/os/site-kernel-checks/src/pipelines/build-post.ts:45-48)
+- [x] `leitstand.dev-deploy` in `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` implements build-skip cache with `commitSha` + `platformVersion` + `platformSemanticHash` key (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:504-536)
+- [x] `leitstand.dev-deploy` supports `--force-build` flag that bypasses the build-skip cache (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:455-456)
+- [x] `DevDeployResult` type includes `buildSkipped: boolean` field (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:427)
+- [x] Repeat `leitstand.dev-deploy` with unchanged workpiece skips `pnpm build` and logs the skip (evidence: packages/os/site-kernel-handoff/src/tests/leitstand-0628-dev-deploy.test.ts:285-300)
+- [x] `command.reads.validate` passes for all modified commands (CRC-01: `reads` or `cacheable: false`) (evidence: all modified commands have `reads` declared or `cacheable: false`)
+- [x] Unit tests cover build-skip cache hit, cache miss, and `--force-build` override (evidence: packages/os/site-kernel-handoff/src/tests/leitstand-0628-dev-deploy.test.ts:266-320)
+- [x] Unit tests cover `print.pdf.copy` with existing and missing `.cache/pdf/manifest.json` (evidence: packages/os/site-kernel-checks/src/tests/print-pdf-copy.test.ts:1-118)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0653 returns pass)
 
 ## Implementation notes for agents
 

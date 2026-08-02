@@ -289,3 +289,6 @@ werkstatt.swim.json
 werkstatt.genome.log
 
 storage/
+
+# RFC-0653: leitstand.dev-deploy build-skip cache (local, not committed)
+missions/*/.dev-deploy-build-cache.json
