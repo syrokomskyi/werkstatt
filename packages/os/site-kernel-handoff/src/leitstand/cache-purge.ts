@@ -13,7 +13,7 @@
 
 import type { RouteFact, PurgeResult } from "@warpgogol/ontology/operations";
 
-const BUILD_IDENTITY_PATH = "/.well-known/build-identity.json";
+export const BUILD_IDENTITY_PATH = "/.well-known/build-identity.json";
 const MAX_URLS_PER_BATCH = 30;
 
 export function collectPurgeUrls(deploymentUrl: string, routes: RouteFact[]): string[] {

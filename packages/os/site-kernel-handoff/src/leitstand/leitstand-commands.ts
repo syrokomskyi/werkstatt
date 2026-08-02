@@ -16,6 +16,7 @@
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; remove dev-deployed state; propagate gate checks published + commitSha + missionId + errors===0; rollback auto-step removes dev-deployed.</item>
   <item>RFC-0629: propagate gate reads evidence-metadata.json + study-run.json (native Axiom format); dev-deploy passes --commit-sha to mission.check (no evidence post-processing); JSON.parse wrapped with error handling.</item>
   <item>RFC-0634: dev-deploy writes preliminary + final build-identity.json (preliminary in public/.well-known/ before build, final in dist/client/.well-known/ after hash computation with dist cleanup); propagate verifies dev build-identity before deploying to alt; release.prepare uses workpiece HEAD for commitSha.</item>
+  <item>RFC-0649: dev-deploy treats CDN purge as fatal for cloudflare-workers adapter (checks purgeResult.success); adds verifyFreshness function that fetches build-identity.json from CDN URL and compares distTreeHash; skips purge + freshness check for null adapter; freshness mismatch stops pipeline before Axiom gate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -53,7 +54,12 @@ import {
   sourceDotenv,
   filterEnv,
 } from "./adapters/index.ts";
-import { collectPurgeUrls, purgeCacheByUrls, skippedPurgeResult } from "./cache-purge.ts";
+import {
+  collectPurgeUrls,
+  purgeCacheByUrls,
+  skippedPurgeResult,
+  BUILD_IDENTITY_PATH,
+} from "./cache-purge.ts";
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
@@ -135,6 +141,49 @@ async function resolveSecretsFilePath(
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// RFC-0649: Verify CDN freshness by fetching build-identity.json from the CDN URL
+// and comparing distTreeHash against the local build-identity. Single fetch, no retry.
+async function verifyFreshness(
+  deploymentUrl: string,
+  localDistTreeHash: string,
+): Promise<FreshnessResult> {
+  const base = deploymentUrl.replace(/\/$/, "");
+  const url = `${base}${BUILD_IDENTITY_PATH}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      return {
+        verified: false,
+        cdnDistTreeHash: null,
+        localDistTreeHash,
+        error: `CDN freshness fetch returned HTTP ${response.status} for ${url}`,
+      };
+    }
+    const cdnBuildIdentity = (await response.json()) as { distTreeHash?: string };
+    const cdnDistTreeHash = cdnBuildIdentity.distTreeHash ?? null;
+    if (cdnDistTreeHash !== localDistTreeHash) {
+      return {
+        verified: false,
+        cdnDistTreeHash,
+        localDistTreeHash,
+        error: `CDN serving stale content: distTreeHash mismatch (cdn: ${cdnDistTreeHash}, local: ${localDistTreeHash})`,
+      };
+    }
+    return {
+      verified: true,
+      cdnDistTreeHash,
+      localDistTreeHash,
+    };
+  } catch (err) {
+    return {
+      verified: false,
+      cdnDistTreeHash: null,
+      localDistTreeHash,
+      error: `CDN freshness fetch failed: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
 }
 
 // RFC-0624: Post-deploy CDN cache purge step. Non-blocking on failure.
@@ -359,6 +408,13 @@ function buildLastPropagatedEntry(
 }
 
 // §5.0: leitstand.dev-deploy (RFC-0628: workpiece-based dev deploy with Axiom verification gate)
+export interface FreshnessResult {
+  verified: boolean;
+  cdnDistTreeHash: string | null;
+  localDistTreeHash: string;
+  error?: string;
+}
+
 export interface DevDeployResult {
   command: "leitstand.dev-deploy";
   systemId: string;
@@ -377,6 +433,7 @@ export interface DevDeployResult {
     errors: number;
     warnings: number;
     exitCode: number;
+    freshness: FreshnessResult;
   };
 }
 
@@ -485,7 +542,18 @@ export async function runLeitstandDevDeploy(
         deployState: "failed",
         deploymentUrl: channelConfig.url,
         buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
-        axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0 },
+        axiom: {
+          status: "not-run",
+          errors: 0,
+          warnings: 0,
+          exitCode: 0,
+          freshness: {
+            verified: false,
+            cdnDistTreeHash: null,
+            localDistTreeHash: "",
+            error: "build failed",
+          },
+        },
       },
       exitCode: 1,
       summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
@@ -506,7 +574,18 @@ export async function runLeitstandDevDeploy(
         deployState: "failed",
         deploymentUrl: channelConfig.url,
         buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
-        axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0 },
+        axiom: {
+          status: "not-run",
+          errors: 0,
+          warnings: 0,
+          exitCode: 0,
+          freshness: {
+            verified: false,
+            cdnDistTreeHash: null,
+            localDistTreeHash: "",
+            error: "build failed — no dist/ directory",
+          },
+        },
       },
       exitCode: 1,
       summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
@@ -590,19 +669,91 @@ export async function runLeitstandDevDeploy(
     `[leitstand.dev-deploy] deploy completed in ${((Date.now() - t2) / 1000).toFixed(1)}s (state: ${result.state})`,
   );
 
-  // Step 4: Purge CDN cache (RFC-0624)
-  const t3 = Date.now();
-  const purgeResult = await runPurgeStep(
-    workspaceRoot,
-    `workpiece-${missionId}`,
-    channelConfig.url,
-    secretsFilePath,
-    logger,
-  );
-  await sleep(6_000);
-  logger.info(
-    `[leitstand.dev-deploy] purge + sleep completed in ${((Date.now() - t3) / 1000).toFixed(1)}s`,
-  );
+  // Step 4: Purge CDN cache (RFC-0624) + freshness verification (RFC-0649)
+  const isNullAdapter = dep.adapter === "null";
+  let freshness: FreshnessResult;
+
+  if (isNullAdapter) {
+    // RFC-0649: Skip purge + freshness check for null adapter — no CDN to invalidate.
+    freshness = { verified: true, cdnDistTreeHash: null, localDistTreeHash: distTreeHash };
+    logger.info("[leitstand.dev-deploy] null adapter — skipping CDN purge and freshness check");
+  } else {
+    const t3 = Date.now();
+    const purgeResult = await runPurgeStep(
+      workspaceRoot,
+      `workpiece-${missionId}`,
+      channelConfig.url,
+      secretsFilePath,
+      logger,
+    );
+
+    // RFC-0649: Purge failure is fatal for leitstand.dev-deploy — stop before Axiom gate.
+    if (!purgeResult.success) {
+      freshness = {
+        verified: false,
+        cdnDistTreeHash: null,
+        localDistTreeHash: distTreeHash,
+        error: `CDN purge failed: ${purgeResult.error ?? "unknown error"}`,
+      };
+      logger.error(
+        `[leitstand.dev-deploy] CDN purge failed — Axiom gate not run: ${purgeResult.error ?? "unknown error"}`,
+      );
+      return {
+        data: {
+          command: "leitstand.dev-deploy",
+          systemId,
+          missionId,
+          commitSha,
+          buildState,
+          deployState: result.state,
+          deploymentUrl: result.deploymentUrl,
+          buildIdentity: {
+            releaseId: `workpiece-${missionId}`,
+            written: true,
+            path: "dist/client/.well-known/build-identity.json",
+          },
+          axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0, freshness },
+        },
+        exitCode: 1,
+        summary: `[leitstand.dev-deploy] ${systemId}: CDN purge failed — Axiom gate not run`,
+      };
+    }
+
+    await sleep(6_000);
+    logger.info(
+      `[leitstand.dev-deploy] purge + sleep completed in ${((Date.now() - t3) / 1000).toFixed(1)}s`,
+    );
+
+    // RFC-0649: Verify CDN freshness — fetch build-identity.json from CDN URL and compare distTreeHash.
+    freshness = await verifyFreshness(channelConfig.url, distTreeHash);
+    if (!freshness.verified) {
+      logger.error(
+        `[leitstand.dev-deploy] freshness check failed — Axiom gate not run: ${freshness.error}`,
+      );
+      return {
+        data: {
+          command: "leitstand.dev-deploy",
+          systemId,
+          missionId,
+          commitSha,
+          buildState,
+          deployState: result.state,
+          deploymentUrl: result.deploymentUrl,
+          buildIdentity: {
+            releaseId: `workpiece-${missionId}`,
+            written: true,
+            path: "dist/client/.well-known/build-identity.json",
+          },
+          axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0, freshness },
+        },
+        exitCode: 1,
+        summary: `[leitstand.dev-deploy] ${systemId}: freshness check failed — Axiom gate not run`,
+      };
+    }
+    logger.info(
+      `[leitstand.dev-deploy] freshness verified (distTreeHash: ${distTreeHash.slice(0, 12)}...)`,
+    );
+  }
 
   // Step 5: Run Axiom verification gate via mission.check --external-preview
   const t4 = Date.now();
@@ -689,6 +840,7 @@ export async function runLeitstandDevDeploy(
         errors: axiomErrors,
         warnings: axiomWarnings,
         exitCode: axiomExitCode,
+        freshness,
       },
     },
     exitCode: axiomStatus === "fail" ? 1 : 0,
