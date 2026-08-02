@@ -325,6 +325,7 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
       "findingsForObservation, and evaluateClosure from native axiom packages. " +
       "Writes native capsule files: staged-capsule.json, observation-bundle.json, " +
       "study-run.json, evidence-metadata.json. External-preview only. " +
+      "RFC-0650: writes runTimestamp to evidence-metadata.json. " +
       "Exit codes: 0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium not installed.",
     scope: "workspace",
     supportsAllSites: false,
@@ -343,6 +344,11 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
       "commit-sha": {
         kind: "string",
         description: "Optional commit SHA embedded in evidence-metadata.json.",
+      },
+      "run-timestamp": {
+        kind: "string",
+        description:
+          "RFC-0650: Explicit run timestamp in YYYY-MM-DDTHH-MM-SS-mmmZ format (ISO 8601 UTC with colons replaced by hyphens). Defaults to current time if not provided. Embedded in evidence-metadata.json.",
       },
       "max-duration": {
         kind: "string",

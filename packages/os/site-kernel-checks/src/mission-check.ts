@@ -510,6 +510,23 @@ export async function runMissionCheck(
   const commitSha = input.flags["commit-sha"] as string | undefined;
   const baseUrl = baseUrlFlag.replace(/\/$/, "");
 
+  // RFC-0650: Parse --run-timestamp flag (optional, ISO 8601 UTC filesystem-safe format)
+  const runTimestampFlag = input.flags["run-timestamp"] as string | undefined;
+  let runTimestamp: string;
+  if (runTimestampFlag !== undefined) {
+    const tsPattern = /^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z$/;
+    if (!tsPattern.test(runTimestampFlag)) {
+      return failResult(
+        "",
+        1,
+        `mission.check: Invalid --run-timestamp format '${runTimestampFlag}'. Expected YYYY-MM-DDTHH-MM-SS-mmmZ (ISO 8601 UTC with colons replaced by hyphens).`,
+      );
+    }
+    runTimestamp = runTimestampFlag;
+  } else {
+    runTimestamp = new Date().toISOString().replace(/:/g, "-");
+  }
+
   // RFC-0630: Parse optional override flags
   const overrides: MissionCheckOverrides = {};
   const maxDurationRaw = input.flags["max-duration"];
@@ -728,8 +745,11 @@ export async function runMissionCheck(
       JSON.stringify(studyRun, null, 2) + "\n",
     );
 
-    // Write evidence-metadata.json
-    const evidenceMetadata: { missionId: string; commitSha?: string } = { missionId };
+    // Write evidence-metadata.json (RFC-0650: includes runTimestamp)
+    const evidenceMetadata: { missionId: string; commitSha?: string; runTimestamp: string } = {
+      missionId,
+      runTimestamp,
+    };
     if (commitSha) {
       evidenceMetadata.commitSha = commitSha;
     }
