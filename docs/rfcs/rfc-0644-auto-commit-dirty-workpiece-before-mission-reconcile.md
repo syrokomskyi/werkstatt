@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -82,16 +83,16 @@ nonGoals:
 
 Mission workpieces (`missions/<missionId>/workpiece/`) are separate git repositories cloned from the Sternsystem cache clone (RFC-0568). `mission.reconcile` fetches commits from the workpiece into the cache clone via `git fetch` + `git merge`. Git fetch only transfers committed objects — uncommitted changes in the workpiece working tree are invisible to the fetch and remain behind.
 
-During mission `warpgogol-com-m000024`, the workpiece had 9 uncommitted generated files (icons, open-source SBOM, biome.generated.css, manifest) after a `build.prepare` run. `mission.reconcile` would have silently merged the stale HEAD without these changes, causing them to be lost or require manual recovery.
+During mission `warpgogol-com-m000024`, the workpiece had 9 uncommitted generated files (icons, open-source SBOM, biome.generated.css, manifest) after a `build.prepare` run. The current `mission.reconcile` handler blocks with a descriptive error (`workpiece has N uncommitted file(s). Run mission.git.commit first`), requiring the operator to manually commit before re-running reconcile.
 
 RFC-0580 auto-commits werkstatt-level side-effects (`registry.yaml`, `mission.yaml`, `pnpm-lock.yaml`) from mission lifecycle commands. RFC-0626 auto-commits bordbuch projection files in the cache clone after `build.prepare`. But neither covers the workpiece working tree — a separate git repository that requires its own commit hygiene.
 
 ## Problem
 
-`mission.reconcile` relies on manual discipline to ensure the workpiece working tree is clean before reconcile. This creates:
+`mission.reconcile` currently blocks with a hard error when the workpiece has uncommitted changes (`isWorkpieceDirty` guard at `mission-materialization-commands.ts:893-898`). The error directs the operator to run `mission.git.commit` manually, then re-run reconcile. This creates:
 
-1. **Silent data loss** — uncommitted generated files (icons, SBOM, biome CSS, manifest) are invisible to `git fetch` and are left behind in the workpiece after reconcile. The cache clone receives the stale HEAD without the latest generated artifacts.
-2. **Manual commit burden** — the operator or agent must manually `git add -A && git commit` in the workpiece before running reconcile, with no enforcement or reminder.
+1. **Manual commit burden** — the operator or agent must manually run `mission.git.commit` in the workpiece before running reconcile, then re-run reconcile. This is a two-step workflow for a common case (generated files from `build.prepare` are dirty).
+2. **Workflow friction** — the blocking guard prevents reconcile from proceeding until the operator commits. For generated files (icons, SBOM, biome CSS) that are deterministic outputs of `build.prepare`, requiring manual commit adds friction without value — the operator knows these files are safe to commit.
 3. **Inconsistency with RFC-0580** — werkstatt-level side-effects and bordbuch projections are auto-committed, but workpiece generated files are not, creating an asymmetry in lifecycle hygiene.
 
 DNA-46 (Mission lifecycle) requires reliable state transitions. DNA-51 (Werkstatt consistency primitives) requires automated primitives for state mutations. The absence of auto-commit for the workpiece working tree is a gap in both invariants.
@@ -138,18 +139,38 @@ async function commitWorkpieceIfDirty(
 ): Promise<{ committed: boolean; commitSha: string | null }>;
 ```
 
-The helper uses `execSync` (or `gitExec` from `bordbuch-io.ts`) to run `git add -A` followed by `git commit --no-verify -m "workpiece: auto-commit before reconcile <missionId>"`. The `--no-verify` flag skips pre-commit hooks because the workpiece is a generated-file-heavy repo where hooks may not be configured. If `git status --porcelain` returns empty, the helper returns `{ committed: false, commitSha: null }` without running any git commands.
+A new helper is needed rather than reusing `mission.git.commit` because `mission.git.commit` is a CLI command handler that requires a `KernelCommandInput` and `KernelRuntimeContext` — it is designed for CLI invocation, not for programmatic calls from within `runMissionReconcile`. Additionally, `mission.git.commit` runs pre-commit content validators (RFC-0594) which are unnecessary for auto-generated files and would add latency. The `commitWorkpieceIfDirty` helper is a plain function, consistent with the `commitWerkstattSideEffects` pattern from RFC-0580.
 
-The call goes at the beginning of `runMissionReconcile`, before `git fetch` from the workpiece into the cache clone.
+The helper uses `execSync` (or `gitExec` from `bordbuch-io.ts`) to run `git add -A` followed by `git commit --no-verify -m "workpiece: auto-commit before reconcile <missionId>"`. The `--no-verify` flag skips pre-commit hooks because the workpiece is a clone of the cache clone — hooks are not copied by `git clone` unless explicitly configured. If `git status --porcelain` returns empty, the helper returns `{ committed: false, commitSha: null }` without running any git commands.
+
+`git add -A` is used instead of selective staging (as RFC-0580's `commitWerkstattSideEffects` does) because the workpiece is a single-agent ephemeral repo — unlike the shared monorepo working tree where concurrent sessions could introduce foreign changes, the workpiece is only modified by the operator/agent working on the current mission. Selective staging would require maintaining a file list that duplicates `STERNSYSTEM_DATA_PATHS` and is fragile when new generated file types are added.
+
+The call replaces the existing `isWorkpieceDirty` block-and-throw guard at `mission-materialization-commands.ts:893-898`. It goes **after lock acquisition** (lines 843-856: `system:<id>` and `mission:<id>` locks) and **after the validation evidence check** (lines 834-870), but before `git fetch` from the workpiece into the cache clone. This ensures the auto-commit is serialized with other lifecycle commands and only runs for validated missions.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `missions/<missionId>/workpiece/` | Workpiece git repository — auto-committed before reconcile |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modified: `runMissionReconcile` calls `commitWorkpieceIfDirty` before fetch |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modified: `runMissionReconcile` replaces `isWorkpieceDirty` guard with `commitWorkpieceIfDirty` call before fetch |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Updated: "Reconcile dirty cache clone guard" section updated to document workpiece auto-commit behavior |
 
 ### Output format
+
+The existing `MissionReconcileData` interface is extended with two new fields:
+
+```ts
+export interface MissionReconcileData {
+  missionId: string;
+  systemId: string;
+  commitSha: string | null;
+  preReconcileSha: string | null;
+  reconciledAt: string;
+  autoResolvedPaths?: string[];
+  workpieceAutoCommitted: boolean;
+  workpieceCommitSha: string | null;
+}
+```
 
 The reconcile command output includes the auto-commit result:
 
@@ -181,7 +202,8 @@ When the workpiece was clean:
 
 - **Git commit failure** (e.g. disk full, permissions): the helper throws, reconcile aborts with a descriptive error. The operator must resolve the git issue manually.
 - **Workpiece directory missing**: the helper throws `ENOENT`, reconcile aborts. This indicates a corrupted mission state.
-- **Pre-existing merge conflicts in workpiece**: `git commit` fails because there is no merge in progress. The helper detects this via `git status --porcelain` and skips the commit, letting reconcile proceed (the fetch will handle the state).
+- **Pre-existing merge conflicts in workpiece**: `git status --porcelain` shows `UU` entries (unmerged paths). `isWorkpieceDirty` detects this as dirty, `git add -A` stages the conflicted files, but `git commit --no-verify` **fails** because the conflicts are not resolved. The helper throws, reconcile aborts. The operator must resolve the conflicts in the workpiece (or abort the merge) before re-running reconcile.
+- **Bypass of RFC-0594 pre-commit content validators**: `--no-verify` skips git hooks, and the helper does not invoke `mission.git.commit`'s content validators (`pbp.content.validate`, `semantic.drift.validate`, `faq.validate`). This means content edits in the workpiece bypass validation at auto-commit time. Mitigation: `mission.validate` runs all content validators before reconcile is allowed — the validation gate at lines 834-870 ensures the workpiece has already passed `app.contract.full` before the auto-commit runs. The auto-commit only captures files that have already been validated.
 
 ## Rollout
 
@@ -192,7 +214,7 @@ When the workpiece was clean:
 
 ## Alternatives considered
 
-1. **Block reconcile on dirty workpiece** — refuse to proceed with an error message directing the operator to commit manually. Rejected: relies on manual discipline, the same class of problem this RFC eliminates. The operator explicitly chose auto-commit over blocking.
+1. **Block reconcile on dirty workpiece** — this is the **current behavior** (`isWorkpieceDirty` guard at lines 893-898). Rejected: relies on manual discipline and creates workflow friction for the common case of generated files from `build.prepare`. The operator explicitly chose auto-commit over blocking.
 
 2. **Auto-commit only generated files** — commit only files matching `GENERATOR_OWNERSHIP_MAP` paths, leaving manual edits dirty. Rejected: partial commit creates a confusing state where some changes are committed and others are left behind. The operator explicitly chose `git add -A` (all changes).
 
