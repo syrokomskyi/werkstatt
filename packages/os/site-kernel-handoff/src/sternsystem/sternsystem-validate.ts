@@ -10,6 +10,7 @@
   <item>RFC-0480: add Bordbuch-vs-git-log consistency check for external edit detection.</item>
   <item>RFC-0520: extract Bordbuch-vs-git-log check into evaluateExternalEditGate pure function.</item>
   <item>RFC-0561: add owner-format-invalid check and missing-owner notice warning.</item>
+  <item>RFC-0648: add branch-convention rule enforcing main as default branch for cache clone and bare repo.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -287,6 +288,62 @@ export async function runSternsystemValidate(
             systemId: entry.id,
             rule: "mirror-credentials",
             message: `external mirror URL contains embedded credentials — use SSH URL instead`,
+          });
+        }
+      }
+    }
+
+    // RFC-0648: branch-convention rule — cache clone and bare repo must use 'main' branch
+    const cacheGitDir = path.join(cacheDir, ".git");
+    if (existsSync(cacheGitDir)) {
+      try {
+        const cacheBranch = execSync("git symbolic-ref HEAD", {
+          cwd: cacheDir,
+          encoding: "utf-8",
+          stdio: ["pipe", "pipe", "pipe"],
+        })
+          .replace("refs/heads/", "")
+          .trim();
+        if (cacheBranch !== "main") {
+          violations.push({
+            systemId: entry.id,
+            rule: "branch-convention",
+            message: `cache clone branch is '${cacheBranch}', expected 'main' — run: git -C ${cacheDir} branch -m ${cacheBranch} main`,
+          });
+        }
+      } catch {
+        violations.push({
+          systemId: entry.id,
+          rule: "branch-convention",
+          message: `cache clone at ${cacheDir} has no resolvable HEAD (detached or corrupt) — expected branch 'main'`,
+        });
+      }
+    }
+
+    if (entry.mirrors.length > 1) {
+      const bareMirror = entry.mirrors[1];
+      const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
+      if (existsSync(bareRepoPath)) {
+        try {
+          const bareBranch = execSync("git symbolic-ref HEAD", {
+            cwd: bareRepoPath,
+            encoding: "utf-8",
+            stdio: ["pipe", "pipe", "pipe"],
+          })
+            .replace("refs/heads/", "")
+            .trim();
+          if (bareBranch !== "main") {
+            violations.push({
+              systemId: entry.id,
+              rule: "branch-convention",
+              message: `bare repo branch is '${bareBranch}', expected 'main' — run: git -C ${bareRepoPath} symbolic-ref HEAD refs/heads/main`,
+            });
+          }
+        } catch {
+          violations.push({
+            systemId: entry.id,
+            rule: "branch-convention",
+            message: `bare repo at ${bareRepoPath} has no resolvable HEAD (detached or corrupt) — expected branch 'main'`,
           });
         }
       }

@@ -298,7 +298,7 @@ export async function runMissionClose(
           try {
             branch = gitExec(bareRepoPath, "symbolic-ref HEAD").replace("refs/heads/", "");
           } catch {
-            branch = "master";
+            branch = "main";
           }
           try {
             originSha = gitExec(bareRepoPath, `rev-parse ${branch}`);

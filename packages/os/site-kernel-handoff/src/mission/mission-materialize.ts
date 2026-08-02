@@ -338,7 +338,7 @@ async function generateFullBoilerplate(
 
 /**
  * RFC-0356 §1.1 step 2: sync the cache clone (mirrors[0]) from the bare repo (mirrors[1]).
- * If the cache clone has a .git directory, fetch + reset to origin/master.
+ * If the cache clone has a .git directory, fetch + reset to origin/main.
  * If not but a bare mirror exists, clone it. If no bare mirror, skip (offline mode).
  */
 async function syncCacheClone(
@@ -364,7 +364,7 @@ async function syncCacheClone(
   const bareRepoPath = resolveMirrorPath(workspaceRoot, gitMirrors[0].path);
 
   if (existsSync(gitDir)) {
-    // Cache clone exists — fetch and reset to origin/master
+    // Cache clone exists — fetch and reset to origin/main
     logger.info(`  Fetching latest from ${bareRepoPath}…`);
     try {
       execSync("git fetch origin", { cwd: cachePath, stdio: "pipe", timeout: 30_000 });
@@ -999,7 +999,8 @@ export async function runMissionMaterialize(
       logger.info(`  Git commit created in workpiece (data-only, on top of cloned history)`);
     } else {
       // RFC-0568: Non-git cache clone fallback — use git init (no shared history)
-      execSync("git init", { cwd: workpieceDir, stdio: ["pipe", "pipe", "pipe"] });
+      // RFC-0648: use -b main to enforce main branch convention
+      execSync("git init -b main", { cwd: workpieceDir, stdio: ["pipe", "pipe", "pipe"] });
       const dataPathsToAdd = [...STERNSYSTEM_DATA_PATHS, "system.pin.json"];
       for (const dataPath of dataPathsToAdd) {
         const fullPath = path.join(workpieceDir, dataPath);
