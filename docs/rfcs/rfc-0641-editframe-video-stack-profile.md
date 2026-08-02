@@ -52,10 +52,10 @@ appsImpacted: []
 packagesImpacted:
   - packages/forge
 successSignals:
-  - `packages/forge/profiles/editframe-html.yaml` exists and passes `forge.profile.validate`
-  - `forge create --profile editframe-html` scaffolds a working Editframe video project with compositions/ directory
-  - The profile declares domain: video, register: creative, video-specific terminology, artifacts, workspaceTypes, and invariants
-  - `forge doctor` on an Editframe project reports domain: video and checks VIDEO-* invariants
+  - "`packages/forge/profiles/editframe-html.yaml` exists and passes `forge.profile.validate`"
+  - "`forge create --profile editframe-html` scaffolds a working Editframe video project with compositions/ directory"
+  - "The profile declares domain: video, register: creative, video-specific terminology, artifacts, workspaceTypes, and invariants"
+  - "`forge doctor` on an Editframe project reports domain: video and checks VIDEO-* invariants"
 nonGoals:
   - Do not define the profile schema in this RFC — that is RFC-0638
   - Do not define the bindings schema in this RFC — that is RFC-0639

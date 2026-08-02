@@ -1,7 +1,7 @@
 ---
 id: RFC-0640
 title: "Domain-Aware Project Bootstrapping and Health Checks"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-01
 updatedAt: 2026-08-02
 enhancedAt: 2026-08-02
-implementedAt:
+implementedAt: 2026-08-02
 closedAt:
 supersedes: []
 supersededBy:

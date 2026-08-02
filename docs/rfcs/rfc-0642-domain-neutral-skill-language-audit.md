@@ -55,9 +55,9 @@ packagesImpacted:
 successSignals:
   - All 26 fo-* skill files audited for domain-specific language
   - Skills that reference software-specific binding keys (typecheck, scopedBuild, test) in instruction lines use semantic binding keys (validate, produce, verify) instead
-  - `forge.skill.validate` enforces SKILL-18: skill instruction lines must not reference software-specific binding keys
+  - "`forge.skill.validate` enforces SKILL-18: skill instruction lines must not reference software-specific binding keys"
   - Skills work correctly in both software and video domain projects
-  - Prose terminology migration uses `ref(bindings.terminology.artifact)` where applicable (blocked on RFC-0639 `resolveTerminology()` implementation)
+  - "Prose terminology migration uses `ref(bindings.terminology.artifact)` where applicable (blocked on RFC-0639 `resolveTerminology()` implementation)"
 nonGoals:
   - Do not define the profile schema in this RFC — that is RFC-0638
   - Do not define the bindings schema in this RFC — that is RFC-0639

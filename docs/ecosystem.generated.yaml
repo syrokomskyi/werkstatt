@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 466107cfc15d7069248d0c40e579d6cd9f9ef6836d1c98dfcbb805cb41aa837b
+  contentHash: 9e51dc00cdfb76b820037a2f56938e872aa7a249d08507d487bfda38f39facd0
   sources:
     - path: docs/architecture-dna.md
-      hash: a39731f4d1255faea2683de2b5b9c948e57e32564e4a74feee0aaa8863a24460
+      hash: 1fdfe04df7d8a7f45cf561f8a8576f80ff733e2bd8f30108969d7d65a64e1ccd
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -22,16 +22,10 @@ meta:
       hash: ce321ba5b7b9f18c4c2c108bc00ec054bfacccdf552bfb1bee58c21213c241cc
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: ad4b6dfdedcc73c92a956a485248f76cd5ca18d544537efa11913d8b14125791
-    - path: missions/warpgogol-com-m000019/workpiece/package.json
-      hash: b881b770783f5cbc029627661d581b82eba1d33311a092bc284e636d261cc51d
-    - path: missions/warpgogol-com-m000020/workpiece/package.json
-      hash: b881b770783f5cbc029627661d581b82eba1d33311a092bc284e636d261cc51d
-    - path: missions/warpgogol-com-m000021/workpiece/package.json
-      hash: b881b770783f5cbc029627661d581b82eba1d33311a092bc284e636d261cc51d
-    - path: missions/warpgogol-com-m000022/workpiece/package.json
-      hash: b881b770783f5cbc029627661d581b82eba1d33311a092bc284e636d261cc51d
+    - path: missions/warpgogol-com-m000024/workpiece/package.json
+      hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
     - path: package.json
-      hash: 58a9ee7a8764269e890e83591d0c66f8fadddbfb587f43e493934e4e94aaad2c
+      hash: abbe24f532aa1883eabd3a6b72473afd2bffee523270d186919b8ab9b489c356
     - path: packages/agent-gate/package.json
       hash: 1ae0595ee068d5f5eb6f42bac46b4b85b80935d858bdb0e685c871e166a2f14d
     - path: packages/chat-adapter-null/package.json
@@ -43,7 +37,7 @@ meta:
     - path: packages/check-core/package.json
       hash: fdf01768d35658051a86973f3213f3403cb5224827b225757f3a9679f0855f1f
     - path: packages/check-runner-node/package.json
-      hash: a5b8b5f7d7fe6430e30d40ad7a338d32281fa39c1df8d4cfcbf85b1ec037ee54
+      hash: 9e35e332a54b4a42e0d6efe6635a3871d8e3c5d364eebb60e783c16573ae6e02
     - path: packages/content-source/package.json
       hash: 35f8492c53e8640514d12b5b784ba8199e167eb804497319d667c548cf2a6d7e
     - path: packages/faq/package.json
@@ -51,7 +45,7 @@ meta:
     - path: packages/fingerprint/package.json
       hash: a4514b6afac4ed0d360cf62e743fc56ccdc0f3302acbe010adc2a1fc70a38bde
     - path: packages/forge/package.json
-      hash: 15d1b24e9aeee6f4ee85d7c06e2e28df16c83e621fea81e27c66c72ac84aa7e8
+      hash: 9ebc5d2ffcdade42979bb53bac32a235621de1d3a74eabb9b8f0217cbdaa3667
     - path: packages/geo/package.json
       hash: 6aa800488d6c38a5666738d686eb69d30815e3fe8a7cb9ce4777715fa2627aa2
     - path: packages/growth-adapter-matomo/package.json
@@ -69,7 +63,7 @@ meta:
     - path: packages/observability/package.json
       hash: 9d4a17ab41bdbc604edc8110d4ad07c6aa86392243efa47a00e4c3a4448e25f5
     - path: packages/ontology/package.json
-      hash: 1e1dc9bf699771b0defb72dfd2a22fba4d24a31fc4158da661e1e9fcc55e769b
+      hash: 0bf3ceb05502971f570918cfc5e1f4adfd63d1ce813906d46c114a5e6b911425
     - path: packages/os/site-kernel-astro/package.json
       hash: da9d5601badf4aec074941374460623e596e5217591e20a29c745bdc361990a7
     - path: packages/os/site-kernel-audit/package.json
@@ -79,7 +73,7 @@ meta:
     - path: packages/os/site-kernel-check-warpgogol/package.json
       hash: 8513da0519bfbd39d129152595f85c9494f0d90a9de4660b88831694e1f7048e
     - path: packages/os/site-kernel-checks/package.json
-      hash: 6af5bc84c92b4d0684c12c66deb9f206e6748e183bf4a92ea533c4c02354ad20
+      hash: 0483b38341c212997445c612ad359d9e63d7d91d4635b401fbfb47f747f4c732
     - path: packages/os/site-kernel-checks/src/ci-local.ts
       hash: 4fae56dd7e925f001b43a93e79196b5e33efefcb574add4fae98255e0667cfd0
     - path: packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts
@@ -123,7 +117,7 @@ meta:
     - path: packages/os/site-kernel-observability/package.json
       hash: 2ea95680a669aa13ed17cc3d04d7bde159dcb0be82d31a1f87e60316ebee4ead
     - path: packages/os/site-kernel-onboarding/package.json
-      hash: b8e2e019eefda430c4b45b28f4a6c674819481334a53910f8ef71cd6ef9e1689
+      hash: 906968908bfe0b3700e0c5c34719c24e71585616988bffb9161e2ef859d2d90d
     - path: packages/os/site-kernel/package.json
       hash: f11a4fd2bffa3ed897c20c5ecb7aa1904ff299b6cb62e793fab56297193b741c
     - path: packages/os/site-kernel/src/runtime.ts
@@ -166,7 +160,7 @@ meta:
       hash: 731146ea89c2290953e51c5cd06855d1d3750c5b165b882e9d380c063e9fbed7
 workspace:
   name: warpgogol-platform
-  version: 4.5.0
+  version: 4.5.1
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -175,36 +169,20 @@ workspace:
     - services/*
 apps:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000022/workpiece
+    directory: missions/warpgogol-com-m000024/workpiece
     packageName: warpgogol-com
 sternsystems:
   - id: warpgogol-com
-    currentMission: warpgogol-com-m000022
+    currentMission: warpgogol-com-m000024
     registeredAt: 2026-07-13T00:00:00.000Z
 missions:
-  - id: warpgogol-com-m000018
+  - id: warpgogol-com-m000024
     sternsystem: ""
     status: open
-    workpiecePath: null
-  - id: warpgogol-com-m000019
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000019/workpiece
-  - id: warpgogol-com-m000020
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000020/workpiece
-  - id: warpgogol-com-m000021
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000021/workpiece
-  - id: warpgogol-com-m000022
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000022/workpiece
+    workpiecePath: missions/warpgogol-com-m000024/workpiece
 packages:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000019/workpiece
+    directory: missions/warpgogol-com-m000024/workpiece
     workspacePattern: missions/*/workpiece
     kind: mission
     dependencies:
@@ -245,166 +223,7 @@ packages:
       - zod
     testSignal:
       packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000019/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000020/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-handoff"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/site-kernel-onboarding"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000020/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000021/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-handoff"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/site-kernel-onboarding"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000021/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000022/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-handoff"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/site-kernel-onboarding"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000022/workpiece
+      directory: missions/warpgogol-com-m000024/workpiece
       signal: skipped
       evidence: App author/build checks currently cover the deployable site; direct
         app unit tests are deferred until an app-level smoke-test harness lands.
@@ -819,6 +638,11 @@ packages:
       - "@ai-sdk/anthropic"
       - "@ai-sdk/openai"
       - "@astrojs/compiler"
+      - "@syrokomskyi/axiom-capture"
+      - "@syrokomskyi/axiom-contracts"
+      - "@syrokomskyi/axiom-methodology"
+      - "@syrokomskyi/axiom-provenance"
+      - "@syrokomskyi/axiom-study"
       - "@warpgogol/agent-gate"
       - "@warpgogol/chat"
       - "@warpgogol/check-core"
@@ -845,6 +669,7 @@ packages:
       - "@warpgogol/surface"
       - "@warpgogol/tokens"
       - ai
+      - crawlee
       - file-type
       - picomatch
       - playwright
@@ -982,7 +807,6 @@ packages:
       - "@warpgogol/share"
       - "@warpgogol/site-kernel"
       - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-checks"
       - "@warpgogol/site-kernel-codegen"
       - "@warpgogol/site-kernel-content"
       - gray-matter
@@ -1305,7 +1129,7 @@ quality:
     real: 31
     noop: 0
     absent: 1
-    skipped: 20
+    skipped: 17
   testSignalPolicy:
     hasErrors: true
     errorCount: 1
@@ -1379,13 +1203,6 @@ commands:
   - name: agent.manifest.generate
     scope: app
     mutatesState: true
-    supportsAllSites: true
-    providers:
-      - site
-      - workspace
-  - name: agent.manifest.verify
-    scope: app
-    mutatesState: false
     supportsAllSites: true
     providers:
       - site
@@ -1714,6 +1531,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: axiom.report
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
   - name: b2b.model.validate
     scope: app
     mutatesState: false
@@ -1838,6 +1662,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: bordbuch.commit
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
   - name: bordbuch.generate
     scope: workspace
     mutatesState: true
@@ -1850,6 +1681,7 @@ commands:
     mutatesState: true
     supportsAllSites: false
     providers:
+      - site
       - workspace
   - name: bordbuch.status
     scope: workspace
@@ -2619,13 +2451,6 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
-  - name: deploy.surface.parity.validate
-    scope: app
-    mutatesState: false
-    supportsAllSites: true
-    providers:
-      - site
-      - workspace
   - name: dht.capacity.publish
     scope: workspace
     mutatesState: false
@@ -3093,6 +2918,12 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
+  - name: forge.profile.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: forge.scaffold
     scope: workspace
     mutatesState: false
@@ -3362,13 +3193,6 @@ commands:
     providers:
       - workspace
   - name: hdri.firewall.validate
-    scope: app
-    mutatesState: false
-    supportsAllSites: true
-    providers:
-      - site
-      - workspace
-  - name: headers.runtime.probe
     scope: app
     mutatesState: false
     supportsAllSites: true
@@ -3731,6 +3555,12 @@ commands:
     providers:
       - site
       - workspace
+  - name: leitstand.dev-deploy
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: leitstand.health
     scope: workspace
     mutatesState: false
@@ -3985,6 +3815,13 @@ commands:
     mutatesState: true
     supportsAllSites: false
     providers:
+      - workspace
+  - name: mission.check
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - site
       - workspace
   - name: mission.cleanup
     scope: workspace
@@ -4632,13 +4469,6 @@ commands:
       - site
       - workspace
   - name: public.orphans.validate
-    scope: app
-    mutatesState: false
-    supportsAllSites: true
-    providers:
-      - site
-      - workspace
-  - name: public.runtime.probe
     scope: app
     mutatesState: false
     supportsAllSites: true
@@ -6040,12 +5870,6 @@ commands:
       - site
       - workspace
 commandProvenance:
-  - command: adr.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
   - command: analytics.binding.validate
     proposedBy:
       - RFC-0305
@@ -6066,26 +5890,6 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: behavior.snapshot.capture
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0592
-      - RFC-0595
-    removedBy: []
-  - command: behavior.snapshot.generate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0595
-    removedBy: []
-  - command: command.args.validate
-    proposedBy:
-      - RFC-0610
-    addedBy:
-      - RFC-0610
-    changedBy: []
-    removedBy: []
   - command: consent.activation.validate
     proposedBy: []
     addedBy: []
@@ -6102,59 +5906,45 @@ commandProvenance:
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0611
+      - RFC-0640
+      - RFC-0643
     removedBy: []
   - command: forge.create
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0609
+      - RFC-0640
     removedBy: []
   - command: forge.doctor
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0611
+      - RFC-0640
     removedBy: []
-  - command: forge.upgrade
+  - command: forge.profile.validate
+    proposedBy: []
+    addedBy:
+      - RFC-0640
+    changedBy: []
+    removedBy: []
+  - command: forge.skill.validate
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0611
+      - RFC-0642
     removedBy: []
   - command: generated.drift.validate
-    proposedBy:
-      - RFC-0601
-    addedBy:
-      - RFC-0601
-    changedBy: []
-    removedBy: []
-  - command: generated.files.validate
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0606
-    removedBy: []
-  - command: generated.stale.validate
-    proposedBy:
-      - RFC-0600
-    addedBy:
-      - RFC-0600
-    changedBy: []
+      - RFC-0645
     removedBy: []
   - command: generated.timestamp.validate
-    proposedBy:
-      - RFC-0602
-    addedBy:
-      - RFC-0602
-    changedBy: []
-    removedBy: []
-  - command: geo.slug.preview
     proposedBy: []
     addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
+    changedBy: []
+    removedBy:
+      - RFC-0645
   - command: growth.adapter.contract
     proposedBy: []
     addedBy: []
@@ -6173,18 +5963,6 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
-  - command: i18n.config.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: i18n.detect.implement
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
   - command: integration.config.validate
     proposedBy: []
     addedBy: []
@@ -6196,25 +5974,6 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0305
-    removedBy: []
-  - command: leitstand.promote
-    proposedBy:
-      - RFC-0608
-    addedBy:
-      - RFC-0608
-    changedBy: []
-    removedBy: []
-  - command: leitstand.propagate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0608
-    removedBy: []
-  - command: leitstand.rollback
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0608
     removedBy: []
   - command: matomo.export.validate
     proposedBy:
@@ -6251,153 +6010,17 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: mission.close
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0593
-      - RFC-0597
-    removedBy: []
-  - command: mission.git.commit
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0594
-    removedBy: []
-  - command: mission.materialize
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0597
-    removedBy: []
-  - command: mission.open
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0593
-    removedBy: []
   - command: mission.reconcile
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0614
-    removedBy: []
-  - command: mission.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0615
-    removedBy: []
-  - command: open-source.generate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0599
-    removedBy: []
-  - command: ownership.sync.validate
-    proposedBy:
-      - RFC-0612
-    addedBy:
-      - RFC-0612
-    changedBy: []
-    removedBy: []
-  - command: page.markdown.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0613
-    removedBy: []
-  - command: passport.key.ensure
-    proposedBy: []
-    addedBy:
-      - RFC-0605
-    changedBy: []
-    removedBy: []
-  - command: pbp.profile.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: preview.images.generate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0603
-    removedBy: []
-  - command: release.prepare
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0590
-      - RFC-0608
-    removedBy: []
-  - command: release.publish
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0596
-    removedBy: []
-  - command: rfc.command-lifecycle.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: rfc.graph
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: rfc.pipeline.status
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: rfc.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: section.css.import.validate
-    proposedBy:
-      - RFC-0598
-    addedBy:
-      - RFC-0598
-    changedBy: []
-    removedBy: []
-  - command: section.scaffold
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: session.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
-    removedBy: []
-  - command: share.utility.lint
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0609
+      - RFC-0644
     removedBy: []
   - command: surface.generate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0384
-    removedBy: []
-  - command: video.variants.generate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0591
     removedBy: []
 pipelines:
   - name: build.check
@@ -6511,7 +6134,6 @@ pipelines:
       - agent.surface.validate
       - agent.openapi.validate
       - agent.surface.verify
-      - agent.manifest.verify
       - lagebild.validate
       - funnel.contract.validate
       - funnel.stage.validate
@@ -6702,6 +6324,7 @@ pipelines:
       - uni.registry.build
       - warpgogol.check-hints.generate
       - bordbuch.generate
+      - bordbuch.commit
       - passport.key.ensure
       - generated.files.validate
       - ownership.sync.validate
@@ -6749,6 +6372,7 @@ pipelines:
       - archetype.registry.build
       - uni.registry.build
       - i18n.middleware.generate
+      - video.variants.generate
       - generated.files.validate
       - ownership.sync.validate
       - generated.stale.validate
@@ -7068,7 +6692,6 @@ pipelines:
       - agent.surface.validate
       - agent.openapi.validate
       - agent.surface.verify
-      - agent.manifest.verify
       - lagebild.validate
       - funnel.contract.validate
       - funnel.stage.validate
@@ -7291,7 +6914,6 @@ pipelines:
       - agent.surface.validate
       - agent.openapi.validate
       - agent.surface.verify
-      - agent.manifest.verify
       - lagebild.validate
       - funnel.contract.validate
       - funnel.stage.validate
@@ -7444,6 +7066,11 @@ generatedOwnership:
     command: agent.openapi.generate
     markerPolicy: registry-only
     module: packages/os/site-kernel-checks/src/agent-openapi.ts
+  - path: public/.well-known/build-identity.json
+    command: release.prepare
+    markerPolicy: registry-only
+    module: packages/os/site-kernel-handoff/src/release/release-commands.ts
+    conditional: true
   - path: public/.well-known/cosmic-passport-key.json
     command: passport.key.ensure
     markerPolicy: registry-only
@@ -7637,6 +7264,9 @@ generatedOwnership:
   - path: src/env.schema.generated.mjs
     command: api.routes.generate
     module: packages/os/site-kernel-codegen/src/api-routes.ts
+  - path: src/freshness.generated.yaml
+    command: content.freshness.validate
+    module: packages/os/site-kernel-checks/src/content-freshness.ts
   - path: src/middleware.ts
     command: routes.generate
     module: packages/os/site-kernel-codegen/src/app-boilerplate.ts
@@ -7685,153 +7315,26 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 4
-  implemented: 22
-  draft: 5
+  accepted: 7
+  implemented: 3
+  draft: 3
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0590
-      implementedAt: 2026-07-29
+    - id: RFC-0638
+      implementedAt: 2026-08-02
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-54
+    - id: RFC-0639
+      implementedAt: 2026-08-02
       kind: contract
       scope: workspace
       dnaRefs:
-        - DNA-46
-        - DNA-48
-    - id: RFC-0591
-      implementedAt: 2026-07-29
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-41
-    - id: RFC-0592
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-48
-        - DNA-49
-    - id: RFC-0593
-      implementedAt: 2026-07-30
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-46
-        - DNA-47
-        - DNA-48
-    - id: RFC-0594
-      implementedAt: 2026-07-30
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-46
-        - DNA-47
-    - id: RFC-0595
-      implementedAt: 2026-07-30
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-49
-        - DNA-53
-    - id: RFC-0596
-      implementedAt: 2026-07-30
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-48
-        - DNA-52
-    - id: RFC-0597
-      implementedAt: 2026-07-30
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-46
-        - DNA-47
-    - id: RFC-0598
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-5
-        - DNA-17
-        - DNA-37
-    - id: RFC-0599
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs: []
-    - id: RFC-0600
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-18
-    - id: RFC-0601
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-18
-        - DNA-58
-    - id: RFC-0602
-      implementedAt: 2026-07-30
-      kind: policy
-      scope: workspace
-      dnaRefs:
-        - DNA-18
-        - DNA-35
-        - DNA-53
-    - id: RFC-0603
-      implementedAt: 2026-07-30
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-18
-    - id: RFC-0604
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs: []
-    - id: RFC-0605
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-34
-    - id: RFC-0606
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs: []
-    - id: RFC-0607
-      implementedAt: 2026-07-30
-      kind: policy
-      scope: workspace
-      dnaRefs:
-        - DNA-18
-        - DNA-57
-        - DNA-58
-    - id: RFC-0608
-      implementedAt: 2026-07-30
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-48
-        - DNA-49
-    - id: RFC-0609
-      implementedAt: 2026-07-30
-      kind: policy
-      scope: workspace
-      dnaRefs:
         - DNA-54
-    - id: RFC-0610
-      implementedAt: 2026-07-30
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0611
-      implementedAt: 2026-07-30
+    - id: RFC-0640
+      implementedAt: 2026-08-02
       kind: command
       scope: workspace
       dnaRefs: []
@@ -7839,14 +7342,15 @@ baseline:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0612
-      - RFC-0614
+      - RFC-0641
+      - RFC-0642
+      - RFC-0643
+      - RFC-0644
+      - RFC-0645
     draft:
       - RFC-0383
       - RFC-0384
       - RFC-0387
-      - RFC-0613
-      - RFC-0615
     reviewing: []
     superseded: []
     rejected: []

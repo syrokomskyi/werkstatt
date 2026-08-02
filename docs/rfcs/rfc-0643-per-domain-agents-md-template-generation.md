@@ -51,10 +51,10 @@ appsImpacted: []
 packagesImpacted:
   - packages/forge
 successSignals:
-  - `forge.agents.generate` produces domain-appropriate AGENTS.md files using profile terminology
-  - Root AGENTS.md for a video project says "composition" instead of "app", "director" instead of "operator"
-  - Nested AGENTS.md files use workspace-type-specific templates from the profile
-  - Existing software-domain projects generate identical AGENTS.md as before (no regression)
+  - "`forge.agents.generate` produces domain-appropriate AGENTS.md files using profile terminology"
+  - "Root AGENTS.md for a video project says \"composition\" instead of \"app\", \"director\" instead of \"operator\""
+  - "Nested AGENTS.md files use workspace-type-specific templates from the profile"
+  - "Existing software-domain projects generate identical AGENTS.md as before (no regression)"
 nonGoals:
   - Do not define the profile schema in this RFC — that is RFC-0638
   - Do not change forge.create or forge.doctor behavior in this RFC — that is RFC-0640

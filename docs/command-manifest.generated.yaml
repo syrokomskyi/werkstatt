@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 5fc8f1a639495cf14f3b1df1320962ba5463c4fc1b3868b0e329b6d6d5ab61b8
+  contentHash: f1207c7402e6e4928fa0bbf53cd8a54b9064ecba80c13f5093eac89cfd48511f
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -8320,7 +8320,10 @@ commands:
     mutatesState: false
     requiresNetwork: false
     timeoutMs: null
-    flags: {}
+    flags:
+      strict:
+        kind: boolean
+        description: Elevate domain invariant warnings to errors (RFC-0640).
     reads: []
     writes: []
     pipelines: []
@@ -8358,6 +8361,23 @@ commands:
     reads:
       - packages/forge/src/**/*.ts
       - packages/forge/os/**/*.ts
+    writes: []
+    pipelines: []
+  - name: forge.profile.validate
+    description: Validate profile YAML files under packages/forge/profiles/ against
+      the stack-profile schema (RFC-0640).
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      id:
+        kind: string
+        description: Validate only the profile with this id.
+    reads:
+      - packages/forge/profiles/*.yaml
     writes: []
     pipelines: []
   - name: forge.scaffold
