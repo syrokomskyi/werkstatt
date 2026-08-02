@@ -1,13 +1,14 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0480: mission.cleanup — explicit workpiece cleanup with age-based option.</purpose>
+<purpose>RFC-0480: mission.cleanup — explicit workpiece cleanup with age-based option. RFC-0652: age-based Axiom evidence cleanup.</purpose>
 <non-goals>
-  <item>Does not remove evidence bundles — those are permanent audit artifacts.</item>
+  <item>Does not remove non-Axiom evidence bundles (close-report.json, workpiece.git-bundle) — those are permanent audit artifacts.</item>
   <item>Does not abort missions — use mission.abort for that.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0480: initial mission.cleanup command handler.</item>
+  <item>RFC-0652: replace unconditional evidence preservation with age-based Axiom evidence cleanup; add --evidence-retention-days flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,11 +26,23 @@ export interface MissionCleanupData {
   missionId: string;
   removedPaths: string[];
   skipped: string[];
+  evidenceCleaned: boolean;
+  evidenceRetentionDays: number;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
   return typeof v === "string" ? v : undefined;
+}
+
+function flagNumber(input: KernelCommandInput, key: string, defaultValue: number): number {
+  const v = input.flags[key];
+  if (typeof v === "number") return v;
+  if (typeof v === "string") {
+    const n = parseInt(v, 10);
+    if (!Number.isNaN(n) && n >= 0) return n;
+  }
+  return defaultValue;
 }
 
 function parseOlderThan(value: string): number | null {
@@ -45,6 +58,7 @@ export async function runMissionCleanup(
   const { workspaceRoot, logger } = context;
   const missionId = flagString(input, "mission");
   const olderThan = flagString(input, "older-than");
+  const evidenceRetentionDays = flagNumber(input, "evidence-retention-days", 30);
 
   if (!missionId && !olderThan) {
     throw new Error("[mission.cleanup] either --mission or --older-than is required");
@@ -52,6 +66,7 @@ export async function runMissionCleanup(
 
   const removedPaths: string[] = [];
   const skipped: string[] = [];
+  let evidenceCleaned = false;
 
   if (missionId) {
     const manifest = await readMissionManifest(workspaceRoot, missionId);
@@ -76,11 +91,50 @@ export async function runMissionCleanup(
       logger.info(`  Removed distribution for mission '${missionId}'`);
     }
 
-    // Evidence directory is preserved — git bundles and reports are permanent audit artifacts
-    skipped.push("evidence (preserved)");
+    // RFC-0652: Age-based Axiom evidence cleanup.
+    // Non-Axiom evidence (close-report.json, workpiece.git-bundle) is always preserved.
+    // Only evidence/axiom/ is eligible for cleanup, and only if evidence-metadata.json
+    // exists with a runTimestamp older than the retention period.
+    const axiomEvidenceDir = path.join(missionDir, "evidence", "axiom");
+    if (evidenceRetentionDays === 0) {
+      skipped.push("evidence/axiom (preserved — retention=0)");
+    } else if (existsSync(axiomEvidenceDir)) {
+      const metadataPath = path.join(axiomEvidenceDir, "evidence-metadata.json");
+      if (!existsSync(metadataPath)) {
+        skipped.push("evidence/axiom (no metadata — preserved)");
+      } else {
+        try {
+          const raw = await fs.readFile(metadataPath, "utf8");
+          const meta = JSON.parse(raw) as { runTimestamp?: string };
+          if (!meta.runTimestamp) {
+            skipped.push("evidence/axiom (no runTimestamp — preserved)");
+          } else {
+            const runTime = new Date(meta.runTimestamp).getTime();
+            const cutoff = Date.now() - evidenceRetentionDays * 24 * 60 * 60 * 1000;
+            if (runTime < cutoff) {
+              await fs.rm(axiomEvidenceDir, { recursive: true, force: true });
+              removedPaths.push("evidence/axiom");
+              evidenceCleaned = true;
+              logger.info(
+                `  Removed evidence/axiom for mission '${missionId}' (older than ${evidenceRetentionDays}d)`,
+              );
+            } else {
+              skipped.push("evidence/axiom (within retention period)");
+            }
+          }
+        } catch (err) {
+          skipped.push("evidence/axiom (metadata read error — preserved)");
+          logger.warn(
+            `  Warning: failed to read evidence-metadata.json for mission '${missionId}': ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
+    } else {
+      skipped.push("evidence/axiom (not present)");
+    }
 
     return {
-      data: { missionId, removedPaths, skipped },
+      data: { missionId, removedPaths, skipped, evidenceCleaned, evidenceRetentionDays },
       summary: `[mission.cleanup] ${missionId} removed: ${removedPaths.join(", ") || "nothing"}`,
     };
   }
@@ -95,7 +149,7 @@ export async function runMissionCleanup(
     const missionsDir = path.join(workspaceRoot, "missions");
     if (!existsSync(missionsDir)) {
       return {
-        data: { missionId: "*", removedPaths, skipped },
+        data: { missionId: "*", removedPaths, skipped, evidenceCleaned, evidenceRetentionDays },
         summary: `[mission.cleanup] no missions directory found`,
       };
     }
@@ -137,6 +191,29 @@ export async function runMissionCleanup(
           await fs.rm(distributionDir, { recursive: true, force: true });
           removedPaths.push(`${entry.name}/distribution`);
         }
+
+        // RFC-0652: Age-based Axiom evidence cleanup in --older-than mode
+        const axiomEvidenceDir = path.join(missionDir, "evidence", "axiom");
+        if (evidenceRetentionDays > 0 && existsSync(axiomEvidenceDir)) {
+          const metadataPath = path.join(axiomEvidenceDir, "evidence-metadata.json");
+          if (existsSync(metadataPath)) {
+            try {
+              const raw = await fs.readFile(metadataPath, "utf8");
+              const meta = JSON.parse(raw) as { runTimestamp?: string };
+              if (meta.runTimestamp) {
+                const runTime = new Date(meta.runTimestamp).getTime();
+                const cutoff = Date.now() - evidenceRetentionDays * 24 * 60 * 60 * 1000;
+                if (runTime < cutoff) {
+                  await fs.rm(axiomEvidenceDir, { recursive: true, force: true });
+                  removedPaths.push(`${entry.name}/evidence/axiom`);
+                  evidenceCleaned = true;
+                }
+              }
+            } catch {
+              // metadata read error — preserve evidence
+            }
+          }
+        }
       } catch {
         skipped.push(`${entry.name} (no manifest)`);
       }
@@ -146,7 +223,7 @@ export async function runMissionCleanup(
   }
 
   return {
-    data: { missionId: "*", removedPaths, skipped },
+    data: { missionId: "*", removedPaths, skipped, evidenceCleaned, evidenceRetentionDays },
     summary: `[mission.cleanup] removed: ${removedPaths.length}, skipped: ${skipped.length}`,
   };
 }

@@ -17,6 +17,7 @@
   <item>RFC-0629: propagate gate reads evidence-metadata.json + study-run.json (native Axiom format); dev-deploy passes --commit-sha to mission.check (no evidence post-processing); JSON.parse wrapped with error handling.</item>
   <item>RFC-0634: dev-deploy writes preliminary + final build-identity.json (preliminary in public/.well-known/ before build, final in dist/client/.well-known/ after hash computation with dist cleanup); propagate verifies dev build-identity before deploying to alt; release.prepare uses workpiece HEAD for commitSha.</item>
   <item>RFC-0649: dev-deploy treats CDN purge as fatal for cloudflare-workers adapter (checks purgeResult.success); adds verifyFreshness function that fetches build-identity.json from CDN URL and compares distTreeHash; skips purge + freshness check for null adapter; freshness mismatch stops pipeline before Axiom gate.</item>
+  <item>RFC-0652: best-effort evidence.sync after axiom.report; --skip-evidence-sync flag; evidenceSynced/evidenceSyncError in output.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -436,6 +437,8 @@ export interface DevDeployResult {
     exitCode: number;
     freshness: FreshnessResult;
   };
+  evidenceSynced: boolean;
+  evidenceSyncError: string | null;
 }
 
 export async function runLeitstandDevDeploy(
@@ -445,6 +448,8 @@ export async function runLeitstandDevDeploy(
   const { workspaceRoot, logger } = context;
   const systemId = flagString(input, "system");
   if (!systemId) throw new Error("[leitstand.dev-deploy] --system is required");
+  const skipEvidenceSync =
+    input.flags["skip-evidence-sync"] === true || input.flags["skip-evidence-sync"] === "true";
 
   const channel: Channel = "dev";
 
@@ -555,6 +560,8 @@ export async function runLeitstandDevDeploy(
             error: "build failed",
           },
         },
+        evidenceSynced: false,
+        evidenceSyncError: null,
       },
       exitCode: 1,
       summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
@@ -587,6 +594,8 @@ export async function runLeitstandDevDeploy(
             error: "build failed — no dist/ directory",
           },
         },
+        evidenceSynced: false,
+        evidenceSyncError: null,
       },
       exitCode: 1,
       summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
@@ -714,6 +723,8 @@ export async function runLeitstandDevDeploy(
             path: "dist/client/.well-known/build-identity.json",
           },
           axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0, freshness },
+          evidenceSynced: false,
+          evidenceSyncError: null,
         },
         exitCode: 1,
         summary: `[leitstand.dev-deploy] ${systemId}: CDN purge failed — Axiom gate not run`,
@@ -746,6 +757,8 @@ export async function runLeitstandDevDeploy(
             path: "dist/client/.well-known/build-identity.json",
           },
           axiom: { status: "not-run", errors: 0, warnings: 0, exitCode: 0, freshness },
+          evidenceSynced: false,
+          evidenceSyncError: null,
         },
         exitCode: 1,
         summary: `[leitstand.dev-deploy] ${systemId}: freshness check failed — Axiom gate not run`,
@@ -819,6 +832,30 @@ export async function runLeitstandDevDeploy(
     );
   }
 
+  // RFC-0652: Best-effort evidence.sync to R2 after axiom.report (non-blocking).
+  // If evidence.sync fails, the deploy still succeeds — the operator can run evidence.sync manually.
+  // The --skip-evidence-sync flag skips this step entirely.
+  let evidenceSynced = false;
+  let evidenceSyncError: string | null = null;
+
+  if (!skipEvidenceSync) {
+    try {
+      const { executeKernelCommand: executeSync } = await import("@warpgogol/site-kernel");
+      await executeSync({
+        workspaceRoot,
+        commandName: "evidence.sync",
+        argv: [`--mission=${missionId}`],
+      });
+      evidenceSynced = true;
+      logger.info(`[leitstand.dev-deploy] evidence.sync: uploaded to R2`);
+    } catch (syncErr) {
+      evidenceSyncError = syncErr instanceof Error ? syncErr.message : String(syncErr);
+      logger.warn(
+        `[leitstand.dev-deploy] evidence.sync failed (non-blocking): ${evidenceSyncError}`,
+      );
+    }
+  }
+
   logger.info(`[leitstand.dev-deploy] total: ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 
   // RFC-0628: No registry write, no bordbuch write — dev deploys are ephemeral
@@ -843,6 +880,8 @@ export async function runLeitstandDevDeploy(
         exitCode: axiomExitCode,
         freshness,
       },
+      evidenceSynced,
+      evidenceSyncError,
     },
     exitCode: axiomStatus === "fail" ? 1 : 0,
     summary: `[leitstand.dev-deploy] ${systemId} deployed to dev (${result.state}, Axiom: ${axiomStatus})`,

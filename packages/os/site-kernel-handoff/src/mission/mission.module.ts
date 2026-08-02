@@ -92,9 +92,15 @@ export function createMissionModule(): KernelModule {
               "Read actor identity from WERKSTATT_ACTOR_ID env var set by Studio Gate auth.",
           },
           release: { kind: "string", description: "Release id produced by this mission." },
+          "skip-evidence-sync": {
+            kind: "boolean",
+            description:
+              "RFC-0652: Skip mandatory evidence.sync to R2. Escape hatch for offline close only — local evidence will be lost when mission.cleanup runs.",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",
+          "missions/{mission}/evidence/close-report.json",
           "systems/registry.yaml",
           "systems/{system}/bordbuch/events.ndjson",
         ],
@@ -308,8 +314,17 @@ export function createMissionModule(): KernelModule {
             kind: "string",
             description: "Age threshold (e.g. '30d') for batch cleanup.",
           },
+          "evidence-retention-days": {
+            kind: "string",
+            description:
+              "RFC-0652: Retention period in days for local Axiom evidence cleanup (default: 30). Set to 0 to preserve all evidence.",
+          },
         },
-        writes: ["missions/{mission}/workpiece/**", "missions/{mission}/distribution/**"],
+        writes: [
+          "missions/{mission}/workpiece/**",
+          "missions/{mission}/distribution/**",
+          "missions/{mission}/evidence/axiom/**",
+        ],
         reads: ["missions/*/mission.yaml"],
         cacheable: false,
         execute: runMissionCleanup,

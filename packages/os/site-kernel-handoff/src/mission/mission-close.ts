@@ -16,6 +16,7 @@
   <item>RFC-0593: add mission.validate inline gate before lock acquisition; re-check state inside locks.</item>
   <item>RFC-0597: write .materialization-state.json and copy .cache/ from workpiece to cache clone as final step.</item>
   <item>ADR-0010: stop any running dev/preview server for the workpiece before closing the mission.</item>
+  <item>RFC-0652: mandatory evidence.sync to R2 before writing close-report.json; --skip-evidence-sync escape hatch with Bordbuch audit entry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -96,11 +97,18 @@ export interface MissionCloseData {
   closedAt: string;
   releaseId: string | null;
   closeReport: CloseReport;
+  evidenceSynced: boolean;
+  evidenceSyncResult: { r2KeyPrefix: string; uploadedFiles: number } | null;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
   return typeof v === "string" ? v : undefined;
+}
+
+function flagBoolean(input: KernelCommandInput, key: string): boolean {
+  const v = input.flags[key];
+  return v === true || v === "true";
 }
 
 async function runInlineValidate(
@@ -146,6 +154,7 @@ export async function runMissionClose(
   const missionId = flagString(input, "mission");
   const actor = resolveActor(input);
   const releaseIdFlag = flagString(input, "release");
+  const skipEvidenceSync = flagBoolean(input, "skip-evidence-sync");
 
   if (!missionId) throw new Error("[mission.close] --mission is required");
 
@@ -360,6 +369,73 @@ export async function runMissionClose(
       warnings,
     };
 
+    // RFC-0652: Mandatory evidence.sync to R2 before writing close-report.json.
+    // If evidence.sync fails, mission.close exits 1 with EVIDENCE_SYNC_FAILED — the mission
+    // cannot close without archiving evidence to R2. The --skip-evidence-sync flag is an
+    // escape hatch for offline close (e.g., no R2 credentials available).
+    let evidenceSynced = false;
+    let evidenceSyncResult: { r2KeyPrefix: string; uploadedFiles: number } | null = null;
+
+    if (skipEvidenceSync) {
+      logger.warn(
+        `  Evidence sync skipped — local evidence will be lost when mission.cleanup runs`,
+      );
+      // Append Bordbuch entry to make the escape hatch auditable
+      try {
+        await appendBordbuchEntry(
+          workspaceRoot,
+          manifest.systemId,
+          "mission-close",
+          `mission-close-evidence-skipped: ${missionId}`,
+          actor,
+          {
+            missionId,
+            writerRole: "mission",
+            metadata: { evidenceSyncSkipped: true, reason: "operator-used-skip-evidence-sync" },
+          },
+        );
+      } catch (bordbuchErr) {
+        logger.warn(
+          `  Warning: failed to append evidence-skipped Bordbuch entry: ${bordbuchErr instanceof Error ? bordbuchErr.message : String(bordbuchErr)}`,
+        );
+      }
+    } else {
+      const axiomEvidenceDir = path.join(missionDir, "evidence", "axiom");
+      const metadataPath = path.join(axiomEvidenceDir, "evidence-metadata.json");
+      if (existsSync(axiomEvidenceDir) && existsSync(metadataPath)) {
+        try {
+          const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+          const syncResult = (await executeKernelCommand({
+            workspaceRoot,
+            commandName: "evidence.sync",
+            argv: [`--mission=${missionId}`],
+          })) as {
+            data?: { r2KeyPrefix?: string; uploadedFiles?: string[] };
+            exitCode?: number;
+          };
+          evidenceSynced = true;
+          const syncData = syncResult.data;
+          if (syncData) {
+            evidenceSyncResult = {
+              r2KeyPrefix: syncData.r2KeyPrefix ?? "",
+              uploadedFiles: syncData.uploadedFiles?.length ?? 0,
+            };
+          }
+          logger.info(`  Evidence synced to R2`);
+        } catch (syncError) {
+          logger.error(`  Evidence sync failed — mission cannot close without archiving evidence`);
+          throw new Error(
+            `EVIDENCE_SYNC_FAILED: ${syncError instanceof Error ? syncError.message : String(syncError)}`,
+          );
+        }
+      } else if (existsSync(axiomEvidenceDir)) {
+        // evidence/axiom/ exists but no evidence-metadata.json — mission never ran mission.check
+        logger.warn(
+          `  Evidence directory exists but evidence-metadata.json is missing — skipping sync (no Axiom evidence to archive)`,
+        );
+      }
+    }
+
     // Write close-report.json to evidence directory
     const evidencePath = path.join(missionDir, "evidence", "close-report.json");
     await atomicWriteFile(evidencePath, JSON.stringify(closeReport, null, 2) + "\n");
@@ -444,6 +520,8 @@ export async function runMissionClose(
         closedAt: now,
         releaseId,
         closeReport,
+        evidenceSynced,
+        evidenceSyncResult,
       },
       summary: `[mission.close] closed mission ${missionId}`,
     };
