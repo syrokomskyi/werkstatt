@@ -201,6 +201,30 @@ Transition the RFC to `implemented` using the `rfc.implement.stamp` command. Dir
 
    Stage only the RFC file. The implementation commit and the stamp commit MUST be separate.
 
+#### 3.8b. Regenerate command manifest (MANDATORY)
+
+If the RFC added, changed, or removed commands (check `commands.added`, `commands.changed`, `commands.removed` in the RFC frontmatter), regenerate the command manifest so that `rfc.validate` does not report `RFC-CMD-02` (command listed but not registered):
+
+1. Run:
+
+   ```sh
+   pnpm exec site-kernel run command.manifest.generate
+   ```
+
+2. Commit the regenerated manifest:
+
+   ```txt
+   docs: regenerate command manifest for RFC-XXXX
+
+   Update docs/command-manifest.generated.yaml after RFC-XXXX command changes.
+   ```
+
+   Stage only `docs/command-manifest.generated.yaml`.
+
+If the RFC has no `commands.*` changes (e.g. it only changes schemas, docs, or internal logic), skip this step.
+
+This step is MANDATORY for any RFC with `commands.added`, `commands.changed`, or `commands.removed`. A stale manifest causes `RFC-CMD-02` violations that block `rfc.validate` for all implemented RFCs.
+
 #### 3.9. Documentation audit (fo-doc-audit)
 
 After implementation is complete and all checks pass, invoke `fo-doc-audit` via the `skill` tool. It analyzes the session's changes, checks all documentation surfaces (AGENTS.md, README, Compass XML, architecture-dna.md, templates, generated artifacts, COMMANDS.md/PACKAGE_GRAPH.md), applies needed updates, and commits them separately. Wait for it to complete.
@@ -228,6 +252,17 @@ If `fo-review` (step 3.10) reported **any** findings (even cosmetic ones on axes
 4. If findings persist after 3 iterations, stop and report to the operator.
 
 If `fo-review` reported truly zero findings (the report explicitly states "No issues." on every axis), skip this step. An `approved` verdict with any finding text on any axis does NOT qualify as zero findings.
+
+#### 3.11b. Implementation status gate (RFC)
+
+Before reporting completion, verify the RFC has been stamped as `implemented`:
+
+1. Read the RFC frontmatter — confirm `status: implemented` and `implementedAt` is set.
+2. Run `ref(forge.yaml bindings.commands.validateRfc) --id RFC-XXXX --json` — confirm zero errors.
+3. If status is not `implemented`, go back to step 3.8 (Stamp implemented) and run the stamp command.
+4. If `rfc.validate` reports errors, fix them before proceeding.
+
+This gate is MANDATORY. Do not proceed to step 3.12 (report) until the RFC is `implemented`.
 
 #### 3.12. RFC report
 
@@ -411,6 +446,17 @@ After all checks pass and documentation is updated, transition the ADR to `imple
    ```
 
    Stage only the ADR file.
+
+#### 4.10b. Implementation status gate (ADR)
+
+Before reporting completion, verify the ADR has been transitioned to `implemented`:
+
+1. Read the ADR frontmatter — confirm `status: implemented` and `implementedAt` is set.
+2. Run `ref(forge.yaml bindings.commands.validateAdr) --id ADR-XXXX --json` — confirm zero errors.
+3. If status is not `implemented`, go back to step 4.10 (Stamp implemented) and set `status: implemented`, `implementedAt`, `updatedAt`.
+4. If `adr.validate` reports errors, fix them before proceeding.
+
+This gate is MANDATORY. Do not proceed to step 4.11 (report) until the ADR is `implemented`.
 
 #### 4.11. Report
 
