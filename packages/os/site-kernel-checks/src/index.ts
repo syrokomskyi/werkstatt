@@ -167,3 +167,9 @@ export * from "./test-signal.ts";
 // RFC-0620: re-export generator ownership map for cross-package import
 export { GENERATOR_OWNERSHIP_MAP } from "./generator-ownership.ts";
 export type { OwnershipEntry } from "./generator-ownership.ts";
+
+// RFC-0647: re-export ensureChromium for cross-package import by mission.materialize
+export {
+  ensureChromium,
+  type PlaywrightChromiumEnsureResult,
+} from "./playwright-chromium-ensure.ts";

@@ -13,7 +13,7 @@
   <item>RFC-0517: add preflight content quality gate between atomicMoveDir and git init.</item>
   <item>Run build.prepare pipeline after atomicMoveDir to generate all derived artifacts (surface, sitemap, video/image variants, etc.) before git init.</item>
   <item>Set PUBLIC_IMAGE_PROVIDER=build-portable in workpiece .env files so image.variants.generate produces responsive variants.</item>
-  <item>Auto-install Playwright Chromium during materialization (idempotent) — ensures build.post print.pdf.generate and independent-qa work without manual intervention.</item>
+  <item>RFC-0647: replace inline ensurePlaywrightChromium with ensureChromium from @warpgogol/site-kernel-checks (launch verification + PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD support).</item>
   <item>RFC-0568: replace git init with git clone from cache clone; stage only data paths in materialize commit (DNA-44 compliance).</item>
   <item>Run pnpm install after atomicMoveDir to link workpiece workspace deps before build.prepare (fixes workpiece.imports.validate failure on fresh workpiece).</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml, pnpm-lock.yaml) after writeMissionManifest.</item>
@@ -58,6 +58,7 @@ import {
   MISSION_PREFLIGHT_CRITICAL,
   MISSION_PREFLIGHT_WARNING,
   GENERATOR_OWNERSHIP_MAP,
+  ensureChromium,
 } from "@warpgogol/site-kernel-checks";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import {
@@ -560,41 +561,7 @@ async function runPreflightGate(
   return report;
 }
 
-async function ensurePlaywrightChromium(
-  workspaceRoot: string,
-  logger: { info: (msg: string) => void },
-): Promise<void> {
-  const home = process.env["HOME"] ?? "/tmp";
-  const playwrightCache = path.join(home, ".cache", "ms-playwright");
-  let chromiumFound = false;
-  if (existsSync(playwrightCache)) {
-    try {
-      const entries = await fs.readdir(playwrightCache);
-      chromiumFound = entries.some((e) => e.startsWith("chromium"));
-    } catch {
-      chromiumFound = false;
-    }
-  }
-  if (chromiumFound) {
-    logger.info(`  Playwright Chromium: already installed`);
-    return;
-  }
-  logger.info(`  Playwright Chromium: not found — installing…`);
-  try {
-    execSync("pnpm exec playwright install chromium", {
-      cwd: workspaceRoot,
-      stdio: ["pipe", "pipe", "pipe"],
-      timeout: 120_000,
-    });
-    logger.info(`  Playwright Chromium: installed`);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    logger.info(
-      `  Playwright Chromium: install failed (non-fatal) — ${msg}. ` +
-        `Run 'pnpm exec playwright install chromium' manually before build:check.`,
-    );
-  }
-}
+// RFC-0647: ensurePlaywrightChromium extracted to @warpgogol/site-kernel-checks as ensureChromium.
 
 export async function runMissionMaterialize(
   input: KernelCommandInput,
@@ -923,9 +890,18 @@ export async function runMissionMaterialize(
       );
     }
 
-    // Ensure Playwright Chromium is installed (needed by build.post → print.pdf.generate
-    // and independent-qa). Idempotent — skips if browsers are already present.
-    await ensurePlaywrightChromium(workspaceRoot, logger);
+    // RFC-0647: Ensure Playwright Chromium is installed (needed by build.post → print.pdf.generate
+    // and independent-qa). Idempotent — skips if Chromium is already launchable.
+    // Non-fatal: log and continue if install fails.
+    try {
+      await ensureChromium(workspaceRoot, logger);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.warn(
+        `  Playwright Chromium: ensure failed (non-fatal) — ${msg}. ` +
+          `Run 'pnpm exec playwright install chromium' manually before build:check.`,
+      );
+    }
 
     // RFC-0597: Run build.prepare.dev pipeline (codegen-only) instead of build.prepare.full
     logger.info(`  Running build.prepare.dev pipeline for ${manifest.systemId}…`);

@@ -34,6 +34,7 @@ import { runAgentEnvironmentAudit } from "../agent/agent-environment-audit.ts";
 import { runYamlContractLint } from "../yaml-contract-lint.ts";
 import { runYamlParseValidate } from "../yaml-parse-validate.ts";
 import { runCommandReadsValidate } from "../command-reads-validate.ts";
+import { runPlaywrightChromiumEnsure } from "../playwright-chromium-ensure.ts";
 
 export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
   {
@@ -389,5 +390,18 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     writes: ["missions/{mission}/evidence/axiom/report.html"],
     reads: ["missions/{mission}/evidence/axiom/**"],
     execute: runAxiomReport,
+  },
+  {
+    name: "playwright.chromium.ensure",
+    description:
+      "RFC-0647: Ensure Playwright Chromium is installed. Launches Chromium to verify; " +
+      "auto-installs if missing and PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is not set. " +
+      "Used by build.post pipeline (step 0) and mission.materialize.",
+    scope: "workspace",
+    supportsAllSites: false,
+    mutatesState: true,
+    cacheable: false,
+    flags: {},
+    execute: runPlaywrightChromiumEnsure,
   },
 ];

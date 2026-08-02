@@ -16,6 +16,10 @@ import { SITES_CHECK_POSTBUILD_PIPELINE } from "./sites-check-postbuild.ts";
 // Generation steps first — they produce artifacts the postbuild validators
 // read (sitemap-images.xml, passport, generated-marker stripping).
 export const SITES_BUILD_POST_PIPELINE: KernelPipelineStep[] = [
+  // RFC-0647: ensure Playwright Chromium is installed before any Playwright-dependent
+  // steps (print.pdf.generate, qa.independent.run) execute. Idempotent — skips if
+  // Chromium is already launchable. Respects PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD.
+  { command: "playwright.chromium.ensure" },
   { command: "passport.emit" },
   { command: "dist.sitemap.images.generate" },
   // RFC-0210: drop bundled feature/background source videos (served from public/_video) so
