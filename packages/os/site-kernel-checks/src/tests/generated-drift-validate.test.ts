@@ -157,7 +157,7 @@ describe("generated.drift.validate (RFC-0601)", () => {
     }
   });
 
-  it("green: DRIFT-02 info when generator lacks renderedFiles", async () => {
+  it("green: DRIFT-02 error when generator lacks renderedFiles", async () => {
     const root = await mkdtemp(join(tmpdir(), "gen-drift-no-render-"));
     try {
       const appDir = join(root, "apps", "test-app");
@@ -171,9 +171,9 @@ describe("generated.drift.validate (RFC-0601)", () => {
       mockState.renderedFiles = undefined;
 
       const result = await runGeneratedDriftValidate(input, ctx(root, appDir));
-      const infoDiags = result.data?.diagnostics.filter((d) => d.ruleId === "DRIFT-02") ?? [];
-      expect(infoDiags.length).toBeGreaterThanOrEqual(1);
-      expect(infoDiags.every((d) => d.severity === "info")).toBe(true);
+      const errorDiags = result.data?.diagnostics.filter((d) => d.ruleId === "DRIFT-02") ?? [];
+      expect(errorDiags.length).toBeGreaterThanOrEqual(1);
+      expect(errorDiags.every((d) => d.severity === "error")).toBe(true);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
