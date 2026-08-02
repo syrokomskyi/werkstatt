@@ -5,7 +5,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0649: add tests for null adapter skip, cloudflare-workers purge fatal, freshness hash mismatch, freshness verified, --json output freshness field.</item>
-  <item>RFC-0657: update hash mismatch test for 5-attempt retry; add retry-then-success, all-attempts-fail (HTTP 404), all-attempts-fail (hash mismatch), network-error-retried tests; use fake timers for retry delay avoidance.</item>
+  <item>RFC-0657: update hash mismatch test for 5-attempt retry; add retry-then-success, all-attempts-fail (HTTP 404), all-attempts-fail (hash mismatch), network-error-retried tests; use setTimeout stub for retry delay avoidance.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -178,7 +178,6 @@ afterEach(() => {
   rmSync(tmpDir, { recursive: true, force: true });
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-  vi.useRealTimers();
   delete process.env.CLOUDFLARE_SECRETS_FILE;
   delete process.env.CLOUDFLARE_ZONE_ID;
   delete process.env.CLOUDFLARE_API_TOKEN;
