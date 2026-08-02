@@ -218,15 +218,15 @@ const SEMANTIC_REPLACEMENTS: Record<string, string> = {
 
 ## Acceptance criteria
 
-- [ ] SKILL-18 rule implemented in `forge.skill.validate` (forge-skill validation path only)
-- [ ] SKILL-18 checks instruction lines (code blocks and `run:` directives) for `bindings.commands.typecheck`, `bindings.commands.scopedBuild`, `bindings.commands.test`
-- [ ] `<!-- skill-lint-disable SKILL-18 -->` escape hatch works
-- [ ] All 26 fo-* skills audited and migrated to semantic keys where applicable
-- [ ] Software-specific skills use escape hatch with documentation comment (no hardcoded exempt set)
-- [ ] `.agents/skills/` synced copies updated
-- [ ] Unit tests for SKILL-18: pass case, fail case, escape hatch
-- [ ] `packages/forge/AGENTS.md` updated with SKILL-18 documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] SKILL-18 rule implemented in `forge.skill.validate` (forge-skill validation path only) (evidence: packages/forge/src/validators/skill-validate.ts:188-196)
+- [x] SKILL-18 checks instruction lines (code blocks and `run:` directives) for `bindings.commands.typecheck`, `bindings.commands.scopedBuild`, `bindings.commands.test` (evidence: packages/forge/src/validators/skill-validate.ts:483-487)
+- [x] `<!-- skill-lint-disable SKILL-18 -->` escape hatch works (evidence: packages/forge/src/validators/skill-validate.ts:489, packages/forge/src/tests/skill-validate.test.ts:177-199)
+- [x] All 26 fo-* skills audited and migrated to semantic keys where applicable (evidence: forge.skill.validate reports zero SKILL-18 violations; fo-idea-implement, fo-doc-audit, forge-bootstrap migrated)
+- [x] Software-specific skills use escape hatch with documentation comment (no hardcoded exempt set) (evidence: no skills required escape hatch — zero SKILL-18 violations after migration)
+- [x] `.agents/skills/` synced copies updated (evidence: .agents/skills/fo/fo-idea-implement/SKILL.md, .agents/skills/fo/fo-doc-audit/SKILL.md, .agents/skills/forge-bootstrap/SKILL.md, .agents/skills/fo-idea-implement/SKILL.md, .agents/skills/fo-doc-audit/SKILL.md all synced)
+- [x] Unit tests for SKILL-18: pass case, fail case, escape hatch (evidence: packages/forge/src/tests/skill-validate.test.ts:146-200, 420 tests pass)
+- [x] `packages/forge/AGENTS.md` updated with SKILL-18 documentation (evidence: packages/forge/AGENTS.md:133)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0642 status=pass)
 
 ## Implementation notes for agents
 
