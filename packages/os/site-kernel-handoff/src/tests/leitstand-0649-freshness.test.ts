@@ -184,6 +184,19 @@ afterEach(() => {
   delete process.env.CLOUDFLARE_API_TOKEN;
 });
 
+// RFC-0657: Helper to make sleep() a no-op by stubbing setTimeout to fire immediately.
+// This avoids real-time delays (45s total for 5 attempts) without interfering with
+// other async operations the way vi.useFakeTimers() does.
+function skipSleep(): void {
+  vi.stubGlobal(
+    "setTimeout",
+    vi.fn((cb: () => void) => {
+      cb();
+      return 0 as unknown as NodeJS.Timeout;
+    }),
+  );
+}
+
 // --- Null adapter tests ---
 
 test("RFC-0649: null adapter skips purge and freshness check — Axiom runs normally", async () => {
@@ -254,12 +267,9 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
     return { ok: false, status: 404 } as Response;
   });
 
-  // RFC-0657: Use fake timers to avoid real-time backoff delays (3s+6s+12s+24s = 45s)
-  vi.useFakeTimers();
-  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
-  // Advance through all backoff delays (total 45s)
-  await vi.advanceTimersByTimeAsync(50_000);
-  const result = await resultPromise;
+  // RFC-0657: Stub setTimeout to make sleep() a no-op (avoids 45s of real backoff delays)
+  skipSleep();
+  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -409,11 +419,8 @@ test("RFC-0657: retry-then-success — first attempt stale, second attempt fresh
     return { ok: false, status: 404 } as Response;
   });
 
-  vi.useFakeTimers();
-  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
-  // Advance through the first backoff delay (3s)
-  await vi.advanceTimersByTimeAsync(5_000);
-  const result = await resultPromise;
+  skipSleep();
+  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -445,10 +452,8 @@ test("RFC-0657: all-attempts-fail with HTTP 404 — exit 1, Axiom not run", asyn
     return { ok: false, status: 404 } as Response;
   });
 
-  vi.useFakeTimers();
-  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
-  await vi.advanceTimersByTimeAsync(50_000);
-  const result = await resultPromise;
+  skipSleep();
+  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -511,10 +516,8 @@ test("RFC-0657: network error retried — first attempt throws, second succeeds"
     return { ok: false, status: 404 } as Response;
   });
 
-  vi.useFakeTimers();
-  const resultPromise = runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
-  await vi.advanceTimersByTimeAsync(5_000);
-  const result = await resultPromise;
+  skipSleep();
+  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
