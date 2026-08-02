@@ -470,7 +470,21 @@ export async function runReleasePrepare(
         versionCompareVerdict: "in-sync",
       };
 
-      await writeReleaseYaml(workspaceRoot, releaseId + ".staging-" + operationId, releaseManifest);
+      // Write release.yaml directly into stagingDir — atomicMoveDir will carry it
+      // to the final location, avoiding a redundant re-write after the move.
+      const manifestLines: string[] = [];
+      for (const [key, value] of Object.entries(releaseManifest)) {
+        if (value === null) {
+          manifestLines.push(`${key}: null`);
+        } else if (typeof value === "string") {
+          manifestLines.push(`${key}: ${value}`);
+        } else if (typeof value === "boolean" || typeof value === "number") {
+          manifestLines.push(`${key}: ${value}`);
+        } else {
+          manifestLines.push(`${key}: ${JSON.stringify(value)}`);
+        }
+      }
+      await atomicWriteFile(path.join(stagingDir, "release.yaml"), manifestLines.join("\n") + "\n");
 
       // Atomic rename
       const finalDir = path.join(releasesBase, releaseId);
@@ -478,9 +492,6 @@ export async function runReleasePrepare(
         await fs.rm(finalDir, { recursive: true, force: true });
       }
       await atomicMoveDir(stagingDir, finalDir);
-
-      // Re-write manifest at final location
-      await writeReleaseYaml(workspaceRoot, releaseId, releaseManifest);
 
       // RFC-0522: write releaseId to mission manifest for mission-to-release association
       const missionManifest = await readMissionManifest(workspaceRoot, missionId);
