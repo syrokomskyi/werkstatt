@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 684. Raw manifest entries: 1232.
+Generated command rows: 685. Raw manifest entries: 1234.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -406,7 +406,7 @@ Generated command rows: 684. Raw manifest entries: 1232.
 | `mission.abort` | workspace | workspace | yes | no | Abort an open mission and discard Werkstück/Distribution (RFC-0355). |
 | `mission.archive` | workspace | workspace | yes | no | Move terminal-state mission directories (state: closed or aborted in mission.yaml) into missions/archive/<state>/<missionId>/ subdirectories. Bidirectional: moves open missions found in archive subdirectories back to missions/. Use --dry-run to preview. Use --status to filter to a single terminal status (closed, aborted). Prefer the docs.archive umbrella command unless you need to archive only missions. |
 | `mission.build` | workspace | workspace | yes | no | Build the Werkstück into a local Distribution (RFC-0356). |
-| `mission.check` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0629/RFC-0630: one-shot native Axiom accessibility check for a mission. Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument, findingsForObservation, and evaluateClosure from native axiom packages. Writes native capsule files: staged-capsule.json, observation-bundle.json, study-run.json, evidence-metadata.json. External-preview only. Exit codes: 0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium not installed. |
+| `mission.check` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0629/RFC-0630: one-shot native Axiom accessibility check for a mission. Uses PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, createAutomatedWebAccessibilityMethodology, runAccessibilityInstrument, findingsForObservation, and evaluateClosure from native axiom packages. Writes native capsule files: staged-capsule.json, observation-bundle.json, study-run.json, evidence-metadata.json. External-preview only. RFC-0650: writes runTimestamp to evidence-metadata.json. Exit codes: 0=pass, 1=violations or closure blocked, 2=no pages discovered or chromium not installed. |
 | `mission.cleanup` | workspace | workspace | yes | no | Remove workpiece/distribution for a closed or aborted mission, or clean old missions by age (RFC-0480). |
 | `mission.close` | workspace | workspace | yes | no | Close an open mission (RFC-0355). |
 | `mission.diff` | workspace | workspace | no | no | Compute the data-set diff between Werkstück and pinned state (RFC-0356). |
@@ -481,6 +481,7 @@ Generated command rows: 684. Raw manifest entries: 1232.
 | `plan.archive` | workspace | workspace | yes | no | Move plan files whose parent RFC has terminal status (implemented, rejected, superseded) into docs/plans/archive/<status>/ subdirectories. Bidirectional: moves non-terminal files found in subdirectories back to root. Use --dry-run to preview. Use --status to filter to a single terminal status. Prefer the docs.archive umbrella command unless you need to archive only plans. |
 | `planet.import-paths.lint` | site:warpgogol-com, workspace | workspace | no | no | Validate derived planetImportPaths and blockTypeToCosmicName in the archetype registry against on-disk UI manifest files (RFC-0091). |
 | `platform.consistency.validate` | workspace | workspace | no | no | Validate that platformSemanticHash drift is accompanied by a version bump, and that versionBump RFCs correspond to actual version changes (RFC-0478). |
+| `playwright.chromium.ensure` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0647: Ensure Playwright Chromium is installed. Launches Chromium to verify; auto-installs if missing and PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is not set. Used by build.post pipeline (step 0) and mission.materialize. |
 | `preview.images.generate` | site:warpgogol-com, workspace | app | no | no | Generate build-time static PNG OG preview images for missing pages, using preset template layouts from site-kernel-checks. |
 | `preview.images.validate` | site:warpgogol-com, workspace | app | no | no | Validate every routable page resolves an OG preview image, using page-specific output or fallbacks, ensuring public/og-image.png is present. |
 | `print.contract.validate` | site:warpgogol-com, workspace | app | no | no | Validate page print frontmatter and site print labels against the RFC-0257 content contract (PRINT-CONTRACT-01..07). |
