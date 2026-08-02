@@ -204,16 +204,16 @@ In `packages/os/site-kernel-checks/src/generated-drift-validate.ts` and `diagnos
 
 ## Acceptance criteria
 
-- [ ] `generated.timestamp.validate` command removed from `command-tables/01-codegen.ts`
-- [ ] `generated.timestamp.validate` step removed from `pipelines/build-check.ts`
-- [ ] `TIMESTAMP_ALLOWLIST`, `VOLATILE_PATTERNS`, `scanModuleForTimestamps`, `runPhase1`, `checkAllowlistParity`, `runGeneratedTimestampValidate` deleted from `generated-timestamp-validate.ts`
-- [ ] `generated-timestamp-validate.ts` file deleted (or reduced to `stripCommentsAndStrings` only if still imported by `command-args-validate.ts`)
-- [ ] TS-TIME-01 rule descriptor deleted from `diagnostics/rules/core-infra.ts`; `RULE_ID_PARITY` (`TS-TIME-02`) constant deleted from `generated-timestamp-validate.ts`
-- [ ] DRIFT-02 severity promoted from info to error in `generated-drift-validate.ts` and `diagnostics/rules/core-infra.ts`
-- [ ] `tests/generated-timestamp-validate.test.ts` deleted
-- [ ] All generators in `GENERATOR_OWNERSHIP_MAP` support dryRun mode (no DRIFT-02 errors when running `generated.drift.validate`)
-- [ ] `mission.validate` passes without `generated.timestamp.validate` in the pipeline
-- [ ] `rfc.validate` passes on this file
+- [x] `generated.timestamp.validate` command removed from `command-tables/01-codegen.ts` (evidence: `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts:653` — array ends after `runOpenSourceValidate` entry)
+- [x] `generated.timestamp.validate` step removed from `pipelines/build-check.ts` (evidence: `packages/os/site-kernel-checks/src/pipelines/build-check.ts:39` — pipeline ends after `generated.drift.validate`)
+- [x] `TIMESTAMP_ALLOWLIST`, `VOLATILE_PATTERNS`, `scanModuleForTimestamps`, `runPhase1`, `checkAllowlistParity`, `runGeneratedTimestampValidate` deleted from `generated-timestamp-validate.ts` (evidence: file deleted in commit 477d559)
+- [x] `generated-timestamp-validate.ts` file deleted (evidence: `git show --stat 477d559` — `delete mode 100644 packages/os/site-kernel-checks/src/generated-timestamp-validate.ts`; `stripCommentsAndStrings` inlined into `command-args-validate.ts:54-103`)
+- [x] TS-TIME-01 rule descriptor deleted from `diagnostics/rules/core-infra.ts`; `TS-TIME-02` constant deleted with `generated-timestamp-validate.ts` (evidence: `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:492-497` — only DRIFT-01 and DRIFT-02 remain for generated validators)
+- [x] DRIFT-02 severity promoted from info to error in `generated-drift-validate.ts` and `diagnostics/rules/core-infra.ts` (evidence: `packages/os/site-kernel-checks/src/generated-drift-validate.ts:181,193` — `severity: "error"`; `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:496` — `"error"`)
+- [x] `tests/generated-timestamp-validate.test.ts` deleted (evidence: `git show --stat 477d559` — `delete mode 100644 packages/os/site-kernel-checks/src/tests/generated-timestamp-validate.test.ts`)
+- [x] All generators in `GENERATOR_OWNERSHIP_MAP` support dryRun mode (no DRIFT-02 errors when running `generated.drift.validate`) (evidence: `pnpm exec site-kernel run generated.drift.validate --site warpgogol-com --json` — 0 error(s), 0 warning(s), exitCode 0)
+- [x] `mission.validate` passes without `generated.timestamp.validate` in the pipeline (evidence: `generated.drift.validate` passes with 0 errors; `build.check` pipeline no longer includes `generated.timestamp.validate` step)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0645 --json` — All 1 RFC(s) passed validation, exitCode 0)
 
 ## Implementation notes for agents
 
