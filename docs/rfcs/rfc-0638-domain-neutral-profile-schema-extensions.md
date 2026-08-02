@@ -288,13 +288,13 @@ This RFC defines the `invariants` schema only. Enforcement — how `fo-review` r
 
 ## Acceptance criteria
 
-- [ ] `StackProfileDomainFields` interface and Zod schema defined in `packages/forge/src/profiles/profile-schema.ts`
-- [ ] Schema extension loaded and validated in `packages/forge/src/profiles/stack-profile.ts` (imports and spreads domain fields into `stackProfileSchema`)
-- [ ] New types exported from `@warpgogol/forge` via `packages/forge/src/index.ts`
-- [ ] Existing profiles (`astro-typescript-turborepo`, `phaser-turborepo`, `forge-shell`) parse without changes
-- [ ] Unit tests verify: new fields parse correctly, absent fields default to undefined, invalid invariant ids fail validation
-- [ ] `packages/forge/AGENTS.md` updated with domain fields documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `StackProfileDomainFields` interface and Zod schema defined in `packages/forge/src/profiles/profile-schema.ts` (evidence: packages/forge/src/profiles/profile-schema.ts:96-116)
+- [x] Schema extension loaded and validated in `packages/forge/src/profiles/stack-profile.ts` (imports and spreads domain fields into `stackProfileSchema`) (evidence: packages/forge/src/profiles/stack-profile.ts:19-22,57-63)
+- [x] New types exported from `@warpgogol/forge` via `packages/forge/src/index.ts` (evidence: packages/forge/src/index.ts:98-110)
+- [x] Existing profiles (`astro-typescript-turborepo`, `phaser-turborepo`, `forge-shell`) parse without changes (evidence: packages/forge/src/tests/profile-schema.test.ts:120-131, pnpm --filter @warpgogol/forge run test passes)
+- [x] Unit tests verify: new fields parse correctly, absent fields default to undefined, invalid invariant ids fail validation (evidence: packages/forge/src/tests/profile-schema.test.ts:1-191, 14 test cases pass)
+- [x] `packages/forge/AGENTS.md` updated with domain fields documentation (evidence: packages/forge/AGENTS.md:97-108)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0638 --json, status: pass)
 
 ## Implementation notes for agents
 
