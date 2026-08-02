@@ -74,8 +74,8 @@ export async function commitBordbuchProjections(
     return { committed: false, commitSha: null, systemId, filesCommitted: [] };
   }
 
-  const addArgs = bordbuchDirty.map((f) => `-- ${f}`).join(" ");
-  await gitExecWithRetry(cachePath, `add ${addArgs}`, BORDBUCH_RETRY_OPTIONS);
+  const addArgs = bordbuchDirty.map((f) => `"${f}"`).join(" ");
+  await gitExecWithRetry(cachePath, `add -- ${addArgs}`, BORDBUCH_RETRY_OPTIONS);
 
   await gitExecWithRetry(
     cachePath,
