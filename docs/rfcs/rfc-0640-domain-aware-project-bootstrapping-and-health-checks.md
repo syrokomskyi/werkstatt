@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-01
-updatedAt: 2026-08-01
+updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -53,7 +54,7 @@ packagesImpacted:
   - packages/forge
 successSignals:
   - forge.create reads domain fields from the selected profile and writes them into forge.yaml and PREFERENCES.md
-  - forge.doctor reports domain information, checks domain invariants from the profile, and resolves terminology
+  - forge.doctor reports domain information, lists domain invariants from the profile, and resolves terminology
   - forge.agents.generate uses workspaceTypes from the profile for per-domain workspace detection
   - forge.profile.validate checks profile YAML files for schema compliance including domain fields
 nonGoals:
@@ -109,11 +110,11 @@ Three existing commands are extended to be domain-aware, and one new command is 
 
 1. **`forge.create`** is extended to read domain fields from the selected profile (RFC-0638) and write them into `forge.yaml` and `PREFERENCES.md`. When the profile declares `register: creative`, `forge.create` writes `register: creative` into `PREFERENCES.md`. When the profile declares semantic binding defaults (e.g. `produce: "npx editframe render"`), `forge.create` writes them into the bindings section.
 
-2. **`forge.doctor`** is extended to: (a) report the active profile's domain, (b) check domain invariants from the profile's `invariants[]` array, (c) resolve terminology via the three-tier chain (RFC-0639), (d) skip software-specific checks (`package.json`, `tsconfig.json`) when the profile's `domain` is not `software`.
+2. **`forge.doctor`** is extended to: (a) report the active profile's domain, (b) list domain invariants from the profile's `invariants[]` array (reported-only, not automatically checked — automatic checking is delegated to domain-specific skills referenced in `workspaceTypes[].skills`), (c) resolve terminology via the three-tier chain (RFC-0639), (d) skip software-specific checks (`package.json`, `tsconfig.json`) when the profile's `domain` is not `software`.
 
 3. **`forge.agents.generate`** is extended to use `workspaceTypes[]` from the profile for workspace detection. When `workspaceTypes` is declared, the command uses the profile's detection markers instead of hardcoded software markers. When `workspaceTypes` is absent, the existing software-specific detection is used as fallback.
 
-4. **`forge.profile.validate`** (new command) validates profile YAML files under `packages/forge/profiles/` against the extended schema (RFC-0638). Checks: schema version, required fields, domain field format, invariant id format, workspace type detection markers.
+4. **`forge.profile.validate`** (new command) validates profile YAML files under `packages/forge/profiles/` against the extended schema (RFC-0638). Checks: schema version, required fields, domain field format, invariant id format, workspace type detection markers. This command is the profile analogue of `forge.skill.validate` — both validate forge-internal YAML artifacts against their respective Zod schemas. Like `forge.skill.validate`, it is a CLI command (not just a unit test) because it also runs as an advisory check inside `forge.doctor` and supports standalone execution during profile development.
 
 ## Architectural fit
 
@@ -121,7 +122,8 @@ Three existing commands are extended to be domain-aware, and one new command is 
 - **RFC-0392 (Stack profiles)**: `forge.doctor` already validates forge.yaml against the profile. This RFC extends it to also check domain invariants.
 - **RFC-0638 (Profile schema extensions)**: This RFC consumes the domain fields declared by RFC-0638.
 - **RFC-0639 (Bindings schema extensions)**: `forge.create` writes semantic binding defaults from the profile; `forge.doctor` resolves terminology via the three-tier chain.
-- **Site OS operator model**: All commands remain workspace-scoped. `forge.profile.validate` is workspace-scoped (validates profile files in the forge package, not in the consuming project).
+- **Site OS operator model**: All commands remain workspace-scoped. `forge.profile.validate` is workspace-scoped — it validates forge's shipped profile YAML files under `packages/forge/profiles/`, not consumer project artifacts. Consumers do not declare custom profiles; profile authoring is a forge-internal concern. The command runs both standalone (for forge developers) and as an advisory check inside `forge.doctor` (for consumers, to detect malformed shipped profiles).
+- **Compass documents**: No `docs/*.xml` Compass documents are affected. Forge command behavior is not described in Compass XML files — those documents cover site composition, requirements, technology, and verification plans. The `packages/forge/AGENTS.md` file is the single documentation artifact that needs updating.
 
 ## Design
 
@@ -129,14 +131,21 @@ Three existing commands are extended to be domain-aware, and one new command is 
 
 ```sh
 # New command
+# Validate all shipped profiles:
 forge profile.validate --json
+# Validate a single profile by id:
 forge profile.validate --id editframe-html --json
 
 # Changed commands (existing flags, new behavior)
 forge create --profile editframe-html
 forge doctor --json
+forge doctor --json --strict   # domain invariant violations become errors
 forge agents.generate
 ```
+
+The `--strict` flag is a new flag for `forge.doctor` that elevates domain invariant warnings to errors. Without `--strict`, invariant violations are reported as `warn` status (advisory). With `--strict`, they are reported as `fail` status (gating). The flag is declared in the command registration in `core.module.ts`.
+
+The `--id` flag for `forge.profile.validate` is optional. When present, only the profile with the matching `id` field is validated. When absent, all profiles under `packages/forge/profiles/` are validated.
 
 ### TypeScript contracts
 
@@ -165,10 +174,8 @@ interface CreateDomainContext {
 interface DoctorDomainReport {
   domain: string | null;
   register: "business" | "creative" | null;
-  invariantsChecked: number;
-  invariantsPassed: number;
-  invariantsFailed: Array<{ id: string; rule: string; severity: string }>;
-  terminology: Record<string, string>;  // resolved terminology
+  invariants: Array<{ id: string; rule: string; severity: "error" | "warning" }>;  // reported-only, not automatically checked
+  terminology: Record<string, string>;  // resolved terminology — all keys from UNIVERSAL_TERMINOLOGY (RFC-0639)
 }
 ```
 
@@ -176,11 +183,13 @@ interface DoctorDomainReport {
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/os/core/handlers/create.ts` | Extended: reads domain fields from profile |
-| `packages/forge/os/core/handlers/doctor.ts` | Extended: domain checks, terminology resolution |
-| `packages/forge/os/core/handlers/agents-generate.ts` | Extended: workspaceTypes detection |
-| `packages/forge/os/core/handlers/profile-validate.ts` | New: validates profile YAML files |
-| `packages/forge/os/core/core.module.ts` | Register `forge.profile.validate` |
+| `packages/forge/src/onboarding/create.ts` | Extended: reads domain fields from profile |
+| `packages/forge/src/onboarding/doctor.ts` | Extended: domain reporting, terminology resolution |
+| `packages/forge/src/onboarding/agents-generate.ts` | Extended: workspaceTypes detection |
+| `packages/forge/src/onboarding/workspace-discovery.ts` | Extended: profile-driven workspace type detection |
+| `packages/forge/src/onboarding/profile-validate.ts` | New: validates profile YAML files |
+| `packages/forge/src/config/forge-config.ts` | Extended: forge.yaml schema gains optional `domain` and `terminology` fields |
+| `packages/forge/os/core/core.module.ts` | Register `forge.profile.validate`, add `--strict` flag to `forge.doctor` |
 | `packages/forge/profiles/*.yaml` | Read by `forge.profile.validate` |
 | `packages/forge/src/tests/profile-validate.test.ts` | New test |
 
@@ -210,9 +219,10 @@ interface DoctorDomainReport {
   "domain": {
     "domain": "video",
     "register": "creative",
-    "invariantsChecked": 3,
-    "invariantsPassed": 3,
-    "invariantsFailed": [],
+    "invariants": [
+      { "id": "VIDEO-01", "rule": "Compositions use kebab-case filenames", "severity": "error" },
+      { "id": "VIDEO-02", "rule": "Scene durations use contain mode by default", "severity": "warning" }
+    ],
     "terminology": {
       "artifact": "composition",
       "module": "scene",
@@ -225,23 +235,26 @@ interface DoctorDomainReport {
 ### Failure modes
 
 - **Profile not found**: `forge.create --profile editframe-html` fails with a clear error listing available profiles.
-- **Domain invariant violation**: `forge.doctor` reports domain invariant failures as warnings (not errors) by default. With `--strict` flag, they become errors. This allows gradual adoption.
-- **workspaceTypes detection ambiguity**: If multiple workspace types match the same directory, `forge.agents.generate` reports a warning and uses the first match.
-- **Profile schema invalid**: `forge.profile.validate` exits non-zero with per-profile error details.
+- **Domain invariant reporting**: `forge.doctor` lists domain invariants from the profile's `invariants[]` array as advisory information. Invariants are not automatically checked — automatic checking is delegated to domain-specific skills (e.g. `ef-composition-review` for video). The `--strict` flag does not affect invariant reporting because invariants are not checked; it is reserved for future use when automatic checking is added.
+- **workspaceTypes detection ambiguity**: If multiple workspace types match the same directory, `forge.agents.generate` reports a warning and uses the first match (order = `workspaceTypes[]` array order in the profile).
+- **workspaceTypes detection fallback**: When the profile has no `workspaceTypes[]` field, the existing hardcoded detection is used (app > service > package precedence). When `workspaceTypes[]` is present, it fully replaces the hardcoded detection — directories matching no profile-declared workspace type are not classified and do not get a nested `AGENTS.md`.
+- **Profile schema invalid**: `forge.profile.validate` exits non-zero with per-profile error details. When run as an advisory check inside `forge.doctor`, profile validation failures are reported as `warn` status (not `fail`), since shipped profiles are forge-internal artifacts not under the consumer's control.
 
 ## Rollout
 
+- **Dependency ordering**: RFC-0638 (profile schema extensions) and RFC-0639 (bindings schema extensions) must be implemented before this RFC. This RFC consumes the schema fields they define — without them, there are no domain fields to read and no semantic keys to write.
 - **Backward compatibility**: When a profile has no domain fields (existing profiles), all three commands fall back to current software-domain behavior. No changes for existing projects.
 - **New profiles**: New profiles (e.g. `editframe-html` in RFC-0641) declare domain fields and get domain-aware behavior from day one.
 - **Existing profiles upgrade**: Existing profiles MAY add `domain: software` in follow-up PRs. `forge.doctor` will then report the domain but skip no checks (software domain is the default).
-- **Domain invariant enforcement**: Domain invariants are warnings by default, errors with `--strict`. This allows projects to adopt gradually.
-- **`forge.profile.validate`**: New command, no deprecation path. Added to `forge.doctor` as an advisory check (not gating).
+- **Domain invariant reporting**: Domain invariants are reported-only (listed in doctor output). Automatic checking is delegated to domain-specific skills referenced in `workspaceTypes[].skills`.
+- **`forge.profile.validate`**: New command, no deprecation path. Added to `forge.doctor` as an advisory check with `warn` status on failure (not gating).
 
 ## Alternatives considered
 
 - **Domain-specific forge.create variants (e.g. `forge.create.video`)**: Rejected. This couples forge to specific domains. The profile-driven approach keeps forge domain-agnostic.
 - **Separate doctor command per domain (e.g. `forge.doctor.video`)**: Rejected. Same reason — forge stays domain-agnostic, the profile drives behavior.
 - **Hardcoded domain detection in doctor**: Rejected. Hardcoding detection logic in the command handler couples forge to specific domains.
+- **Unit test instead of CLI command for `forge.profile.validate`**: Rejected. While a unit test in `packages/forge/src/tests/` could validate profiles against the Zod schema, `forge.skill.validate` sets the precedent for forge-internal validation as a CLI command. The command also runs as an advisory check inside `forge.doctor` and supports standalone execution during profile development, which a unit test cannot do.
 
 ## Risks
 
@@ -255,11 +268,13 @@ interface DoctorDomainReport {
 - [ ] `forge.create` reads `register` from profile and writes it to `PREFERENCES.md`
 - [ ] `forge.create` writes semantic binding defaults from profile `artifacts[]` when present
 - [ ] `forge.doctor` reports domain information when profile has `domain` field
-- [ ] `forge.doctor` checks domain invariants from profile `invariants[]`
+- [ ] `forge.doctor` reports domain invariants from profile `invariants[]` (reported-only, not automatically checked)
 - [ ] `forge.doctor` resolves terminology via three-tier chain (bindings → profile → default)
 - [ ] `forge.doctor` skips software-specific checks when `domain !== "software"`
-- [ ] `forge.agents.generate` uses `workspaceTypes[]` for detection when present
+- [ ] `forge.agents.generate` uses `workspaceTypes[]` for detection when present, replacing hardcoded detection
 - [ ] All three commands fall back to existing behavior when profile has no domain fields
+- [ ] `forge.doctor` `--strict` flag declared in command registration
+- [ ] `forge.profile.validate` `--id` flag filters to a single profile when present
 - [ ] Unit tests for each command's domain-aware and fallback paths
 - [ ] `packages/forge/AGENTS.md` updated
 - [ ] `rfc.validate` passes on this file before merging
