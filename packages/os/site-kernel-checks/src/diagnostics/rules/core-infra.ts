@@ -491,7 +491,7 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
   ),
   "DRIFT-02": rule(
     "DRIFT-02",
-    "Generator does not support dryRun mode; skipped",
+    "Generator does not support dryRun mode; cannot verify determinism",
     "generated.drift.validate",
     "error",
   ),

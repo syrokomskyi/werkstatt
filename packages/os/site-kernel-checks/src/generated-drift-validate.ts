@@ -180,7 +180,7 @@ export async function runGeneratedDriftValidate(
           ruleId: "DRIFT-02",
           severity: "error",
           file: relPath,
-          message: `Generator "${entry.command}" does not support dryRun mode; skipped.`,
+          message: `Generator "${entry.command}" does not support dryRun mode; cannot verify determinism.`,
           data: { generator: entry.command },
         });
         continue;
@@ -192,7 +192,7 @@ export async function runGeneratedDriftValidate(
           ruleId: "DRIFT-02",
           severity: "error",
           file: relPath,
-          message: `Generator "${entry.command}" did not render "${relPath}" in dryRun output; skipped.`,
+          message: `Generator "${entry.command}" did not render "${relPath}" in dryRun output; cannot verify determinism.`,
           data: { generator: entry.command },
         });
         continue;
