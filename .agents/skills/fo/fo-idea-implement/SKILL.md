@@ -107,7 +107,7 @@ After **all** plan steps are complete, run the heavy validation suite in order:
 2. **Package-level build checks** for each impacted package:
 
    ```sh
-   ref(forge.yaml bindings.commands.typecheck) --workspace=<package>
+   ref(forge.yaml bindings.commands.validate) --workspace=<package>
    ```
 
 3. **App-level checks** for each impacted app:
@@ -200,6 +200,30 @@ Transition the RFC to `implemented` using the `rfc.implement.stamp` command. Dir
    ```
 
    Stage only the RFC file. The implementation commit and the stamp commit MUST be separate.
+
+#### 3.8b. Regenerate command manifest (MANDATORY)
+
+If the RFC added, changed, or removed commands (check `commands.added`, `commands.changed`, `commands.removed` in the RFC frontmatter), regenerate the command manifest so that `rfc.validate` does not report `RFC-CMD-02` (command listed but not registered):
+
+1. Run:
+
+   ```sh
+   pnpm exec site-kernel run command.manifest.generate
+   ```
+
+2. Commit the regenerated manifest:
+
+   ```txt
+   docs: regenerate command manifest for RFC-XXXX
+
+   Update docs/command-manifest.generated.yaml after RFC-XXXX command changes.
+   ```
+
+   Stage only `docs/command-manifest.generated.yaml`.
+
+If the RFC has no `commands.*` changes (e.g. it only changes schemas, docs, or internal logic), skip this step.
+
+This step is MANDATORY for any RFC with `commands.added`, `commands.changed`, or `commands.removed`. A stale manifest causes `RFC-CMD-02` violations that block `rfc.validate` for all implemented RFCs.
 
 #### 3.9. Documentation audit (fo-doc-audit)
 
@@ -321,7 +345,7 @@ After implementation is complete, run heavy checks for the impacted workspaces o
 2. Determine impacted packages/apps from the ADR's `scope` and the files touched during implementation. Build only those workspaces:
 
    ```sh
-   ref(forge.yaml bindings.commands.typecheck) --workspace=<package>
+   ref(forge.yaml bindings.commands.validate) --workspace=<package>
    ```
 
    Or for apps:
