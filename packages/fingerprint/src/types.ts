@@ -8,25 +8,26 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0364: initial type definitions for fingerprint options and results.</item>
+  <item>RFC-0656: add mode: "stable" for deterministic dist tree hashing with targeted normalization.</item>
 </CHANGE_SUMMARY>
 */
 
 export interface FingerprintOptions {
-  mode: "byte" | "semantic";
+  mode: "byte" | "semantic" | "stable";
   root?: string;
   ignore?: string[];
 }
 
 export interface FingerprintFileResult {
   path: string;
-  mode: "byte" | "semantic";
+  mode: "byte" | "semantic" | "stable";
   normalizer: string;
   hash: string;
 }
 
 export interface FingerprintResult {
   algorithm: "sha256";
-  mode: "byte" | "semantic";
+  mode: "byte" | "semantic" | "stable";
   value: string;
   files: FingerprintFileResult[];
   warnings?: string[];

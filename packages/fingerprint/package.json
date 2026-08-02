@@ -26,6 +26,7 @@
     "@warpgogol/share": "workspace:*",
     "@typescript-eslint/typescript-estree": "^8.65.0",
     "jsonc-parser": "^3.3.1",
+    "pdf-lib": "^1.17.1",
     "postcss": "^8.5.20",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx": "^3.1.1",
