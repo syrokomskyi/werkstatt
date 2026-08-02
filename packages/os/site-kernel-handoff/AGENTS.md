@@ -211,6 +211,14 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 - **Noop case:** If the system-id already exists without `--amend`, the command fails with an explicit error. With `--amend`, it fails if the system-id does not exist.
 - The `onboard` skill orchestrates the full pipeline: brief validation → `onboarding.synthesize` → AI synthesis → `sternsystem.register` → handoff.
 
+## Branch convention (RFC-0648)
+
+- All Sternsystem cache clones (mirrors[0]) and bare mirror repos (mirrors[1]) MUST use `main` as their default branch, not `master`. Enforced by `sternsystem.validate` (`branch-convention` rule).
+- When creating new Sternsystem bare repos, use `git init --bare -b main` (or `git init -b main` for non-bare repos) to ensure compliance from creation.
+- Agents MUST NOT rename branches automatically. Branch renaming (`git branch -m master main`) is a manual operator action that affects all mirrors simultaneously. Agents MAY recommend the rename commands but MUST NOT execute them without explicit operator approval.
+- The fallback branch name in `sternsystem.status` and `mission.close` is `"main"` — if `git symbolic-ref HEAD` fails (detached HEAD), the code falls back to `"main"`.
+- `mission.materialize` uses `git init -b main` for the non-git cache clone fallback to ensure workpieces start on `main`.
+
 ## Identity model (RFC-0558)
 
 - **`identity/` module:** `identity-module.ts` registers 4 commands: `identity.bootstrap`, `identity.credential.issue`, `identity.credential.verify`, `identity.credential.revoke`. Shared I/O helpers in `identity/identity-io.ts`.
