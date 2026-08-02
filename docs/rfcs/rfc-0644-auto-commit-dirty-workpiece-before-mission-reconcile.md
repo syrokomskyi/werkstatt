@@ -229,14 +229,14 @@ When the workpiece was clean:
 
 ## Acceptance criteria
 
-- [ ] `commitWorkpieceIfDirty` helper implemented in `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts`
-- [ ] `runMissionReconcile` calls `commitWorkpieceIfDirty` before `git fetch` from workpiece
-- [ ] Helper is idempotent — clean workpiece produces no commit
-- [ ] Reconcile output includes `workpieceAutoCommitted` and `workpieceCommitSha` fields
-- [ ] Unit test: dirty workpiece → auto-commit created, reconcile proceeds
-- [ ] Unit test: clean workpiece → no auto-commit, reconcile proceeds
-- [ ] `mission.validate` passes after implementation
-- [ ] `rfc.validate` passes on this file
+- [x] `commitWorkpieceIfDirty` helper implemented in `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:286-315`)
+- [x] `runMissionReconcile` calls `commitWorkpieceIfDirty` before `git fetch` from workpiece (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:896-901`)
+- [x] Helper is idempotent — clean workpiece produces no commit (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:290-293`)
+- [x] Reconcile output includes `workpieceAutoCommitted` and `workpieceCommitSha` fields (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:807-808,1180-1181`)
+- [x] Unit test: dirty workpiece → auto-commit created, reconcile proceeds (evidence: `packages/os/site-kernel-handoff/src/mission/rfc-0644-workpiece-auto-commit.test.ts:47-64`)
+- [x] Unit test: clean workpiece → no auto-commit, reconcile proceeds (evidence: `packages/os/site-kernel-handoff/src/mission/rfc-0644-workpiece-auto-commit.test.ts:67-75`)
+- [x] `mission.validate` passes after implementation (evidence: `pnpm --filter @warpgogol/site-kernel-handoff run test` — 491/491 tests pass)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0644 --json` — exit 0, 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
