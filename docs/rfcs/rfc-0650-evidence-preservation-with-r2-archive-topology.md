@@ -330,14 +330,14 @@ No `--json` output changes in this RFC. The `mission.check` output remains the s
 
 ## Acceptance criteria
 
-- [ ] `evidence-metadata.json` includes `runTimestamp` field in ISO 8601 UTC filesystem-safe format (evidence: `mission-check.ts` write path)
-- [ ] `mission.check` accepts optional `--run-timestamp` flag for explicit timestamp specification (evidence: `mission-check.ts` flag parsing)
-- [ ] `mission.check` generates `runTimestamp` automatically when `--run-timestamp` is not provided (evidence: `mission-check.ts` default behavior)
-- [ ] R2 bucket layout documented in `packages/os/site-kernel-handoff/AGENTS.md` with key structure `{systemId}/{missionId}/{runTimestamp}/` (evidence: `AGENTS.md` section)
-- [ ] R2 lifecycle rules documented: `raw/` → Infrequent Access after 7 days, delete after 365 days (evidence: `AGENTS.md` section)
-- [ ] R2 Data Catalog table schema documented: `axiom_evidence_runs` with columns `system_id`, `mission_id`, `run_timestamp`, `commit_sha`, `findings_count`, `errors_count`, `warnings_count`, `closure_satisfied`, `r2_key_prefix` (evidence: this RFC Design section + `AGENTS.md`)
-- [ ] DNA-59 entry appended to `docs/architecture-dna.md` after acceptance (evidence: `docs/architecture-dna.md`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `evidence-metadata.json` includes `runTimestamp` field in ISO 8601 UTC filesystem-safe format (evidence: `packages/os/site-kernel-checks/src/mission-check.ts:748-755`, `mission-check-rfc-0650.test.ts` test "runTimestamp is always present")
+- [x] `mission.check` accepts optional `--run-timestamp` flag for explicit timestamp specification (evidence: `packages/os/site-kernel-checks/src/mission-check.ts:513-525`, `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:348-352`, `mission-check-rfc-0650.test.ts` test "uses explicit --run-timestamp value")
+- [x] `mission.check` generates `runTimestamp` automatically when `--run-timestamp` is not provided (evidence: `packages/os/site-kernel-checks/src/mission-check.ts:526-528`, `mission-check-rfc-0650.test.ts` test "auto-generates runTimestamp")
+- [x] R2 bucket layout documented in `packages/os/site-kernel-handoff/AGENTS.md` with key structure `{systemId}/{missionId}/{runTimestamp}/` (evidence: `packages/os/site-kernel-handoff/AGENTS.md` § Evidence preservation)
+- [x] R2 lifecycle rules documented: `raw/` → Infrequent Access after 7 days, delete after 365 days (evidence: `packages/os/site-kernel-handoff/AGENTS.md` § Evidence preservation lifecycle rules table)
+- [x] R2 Data Catalog table schema documented: `axiom_evidence_runs` with columns `system_id`, `mission_id`, `run_timestamp`, `commit_sha`, `findings_count`, `errors_count`, `warnings_count`, `closure_satisfied`, `r2_key_prefix` (evidence: `packages/os/site-kernel-handoff/AGENTS.md` § Evidence preservation Data Catalog schema)
+- [x] DNA-59 entry appended to `docs/architecture-dna.md` after acceptance (evidence: `docs/architecture-dna.md` § DNA-59)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0650` exit 0, 0 violations)
 
 ## Implementation notes for agents
 
