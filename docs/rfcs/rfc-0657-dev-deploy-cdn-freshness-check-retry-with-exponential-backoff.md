@@ -15,11 +15,13 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0649
 amendedBy: []
 related:
   - DNA-49
@@ -57,6 +59,8 @@ nonGoals:
   - Changing the CDN purge mechanism itself (RFC-0624)
   - Adding retry to leitstand.propagate or leitstand.promote — those verify build-identity from an already-fresh alt channel
   - Making freshness check asynchronous or background-scheduled
+  - Making retry constants configurable per-site — hardcoded constants are sufficient for a dev-only command
+  - Interacting with --force-build (RFC-0653) — the retry loop runs after build, --force-build only affects build-skip cache
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -91,7 +95,9 @@ This creates a gap: the Worker is deployed successfully, but no Axiom evidence i
 
 ## Decision
 
-The `verifyFreshness` function in `leitstand.dev-deploy` is changed from a single-fetch check to a retry loop with exponential backoff. The loop polls the CDN URL up to 5 times with delays of 3s, 6s, 12s, 24s (total max wait ~45s). If freshness is verified on any attempt, the pipeline proceeds to the Axiom gate. If all attempts fail, the pipeline stops with exit 1 and a clear error message.
+The `verifyFreshness` function in `leitstand.dev-deploy` is changed from a single-fetch check to a retry loop with exponential backoff. The loop makes up to 5 attempts: the first attempt is immediate (no delay) after CDN purge, and subsequent attempts are separated by exponential backoff delays of 3s, 6s, 12s, 24s (total max wait ~45s). If freshness is verified on any attempt, the pipeline proceeds to the Axiom gate. If all 5 attempts fail, the pipeline stops with exit 1 and a clear error message.
+
+This RFC amends RFC-0649, which explicitly prohibited retry in its implementation notes and nonGoals. The production experience on 2026-08-02 showed that a single fetch after a fixed 6s sleep is insufficient — CDN propagation can take 10-30s. The retry loop replaces the fixed sleep with adaptive polling that exits early when the CDN is fresh.
 
 ## Architectural fit
 
@@ -109,19 +115,14 @@ No CLI surface change. The `leitstand.dev-deploy --system <id>` command is uncha
 ### TypeScript contracts
 
 ```ts
-// RFC-0657: Retry configuration for verifyFreshness
-interface FreshnessRetryConfig {
-  maxAttempts: number;       // default: 5
-  initialDelayMs: number;    // default: 3000
-  backoffMultiplier: number; // default: 2
-  maxDelayMs: number;        // default: 30000
-}
+// RFC-0657: Retry constants for verifyFreshness (hardcoded — no caller customization needed)
+const FRESHNESS_MAX_ATTEMPTS = 5;
+const FRESHNESS_BACKOFF_DELAYS_MS = [3_000, 6_000, 12_000, 24_000]; // delays between attempts
 
-// Updated verifyFreshness signature
+// Updated verifyFreshness signature (no config parameter — constants are internal)
 async function verifyFreshness(
   deploymentUrl: string,
   localDistTreeHash: string,
-  retryConfig?: FreshnessRetryConfig,
 ): Promise<FreshnessResult>;
 
 // FreshnessResult gains attempts field
@@ -134,11 +135,15 @@ interface FreshnessResult {
 }
 ```
 
+The retry loop uses `FRESHNESS_BACKOFF_DELAYS_MS` as inter-attempt delays: attempt 1 is immediate, then `delays[0]` before attempt 2, `delays[1]` before attempt 3, etc. The `FRESHNESS_MAX_ATTEMPTS` constant equals `delays.length + 1`.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Changed — `verifyFreshness` gains retry loop |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Changed — `verifyFreshness` gains retry loop; `sleep(6_000)` after purge removed |
+| `packages/os/site-kernel-handoff/src/tests/leitstand-0649-freshness.test.ts` | Changed — existing tests updated for retry behavior (hash mismatch test expects multiple fetch calls; freshness verified test unchanged) |
+| `packages/os/site-kernel-handoff/AGENTS.md` | Changed — Leitstand section updated: freshness check uses retry with exponential backoff |
 
 ### Output format
 
@@ -157,7 +162,7 @@ No output format change. The `FreshnessResult` in `--json` output gains an `atte
 
 ### Failure modes
 
-- If all retry attempts fail, `leitstand.dev-deploy` exits 1 with `freshness.verified: false` and `freshness.attempts: 5`. The Axiom gate is not run.
+- If all retry attempts fail, `leitstand.dev-deploy` exits 1 with `freshness.verified: false` and `freshness.attempts: 5`. The Axiom gate is not run. The operator should verify CDN configuration (purge API credentials, zone ID) and re-run `leitstand.dev-deploy`. If the CDN is persistently stale despite a successful purge response, the Cloudflare zone may need manual cache purge via the dashboard.
 - If the CDN returns a non-200 status on all attempts, the error message includes the last HTTP status code.
 - If the CDN returns 200 but the `distTreeHash` mismatches on all attempts, the error message includes both hashes.
 - Network errors (DNS, timeout, connection refused) are retried like any other failure.
@@ -166,8 +171,9 @@ No output format change. The `FreshnessResult` in `--json` output gains an `atte
 ## Rollout
 
 - The retry loop replaces the single-fetch check in `verifyFreshness`. No flag or opt-in is needed — the behavior is strictly better (success on first attempt if CDN is fresh, retry if not).
-- The existing 6-second sleep after purge (RFC-0624) is replaced by the retry loop's initial delay of 3 seconds. This reduces total wait time when the CDN is fresh on the first retry attempt.
+- The existing 6-second sleep after purge (RFC-0624) is removed. The first freshness attempt is immediate after purge completes. If the first attempt fails, the retry loop's first backoff delay (3s) provides the CDN propagation window. This reduces total wait time when the CDN is fresh immediately after purge.
 - The `attempts` field is added to `FreshnessResult` for observability. Existing consumers of the `--json` output that do not read `attempts` are unaffected.
+- Existing unit tests in `leitstand-0649-freshness.test.ts` require modification: the hash mismatch test must expect multiple `fetch` calls (5 attempts) instead of one; the freshness verified test remains unchanged (first attempt succeeds). New tests are added for retry-then-success and all-attempts-fail scenarios. Tests exercising the retry loop should use `vi.useFakeTimers()` to avoid real-time delays in the test suite.
 
 ## Alternatives considered
 
@@ -184,7 +190,7 @@ No output format change. The `FreshnessResult` in `--json` output gains an `atte
 
 ## Acceptance criteria
 
-- [ ] `verifyFreshness` retries up to 5 times with exponential backoff (3s, 6s, 12s, 24s)
+- [ ] `verifyFreshness` makes 5 attempts: first immediate, then 4 retries with exponential backoff (3s, 6s, 12s, 24s)
 - [ ] `FreshnessResult` includes `attempts` field
 - [ ] `leitstand.dev-deploy` proceeds to Axiom gate when freshness is verified on any attempt
 - [ ] `leitstand.dev-deploy` exits 1 with clear error when all attempts fail
