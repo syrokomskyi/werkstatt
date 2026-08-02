@@ -67,6 +67,17 @@ This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX envir
 
 **Exception:** `@warpgogol/forge` (published to npm) must remain cross-platform — it ships skills and command modules that consumers may run on Windows or Linux. Forge source and skills must not assume a POSIX-only environment.
 
+## GitHub Actions CI reliability patterns
+
+All `.github/workflows/*.yml` in this monorepo MUST include these baseline reliability patterns:
+
+- **`concurrency`** — cancel superseded PR runs to save CI minutes and prevent cache thrashing. Set `cancel-in-progress: ${{ github.event_name == 'pull_request' }}`.
+- **`permissions: contents: read`** at the workflow level — GitHub Actions defaults to `contents: write`. Escalate to `write` per-job only where needed (e.g. changelog commit).
+- **`timeout-minutes`** per job — the default 6-hour timeout can exhaust CI limits on a hung install or test. Use 10–15 for lint/validate, 20–30 for build/test.
+- **`env: TZ: UTC`** per job — tests using `new Date()` produce different results depending on the runner's timezone. `TZ: UTC` makes timestamps deterministic across runs.
+- **`actions/checkout@v5`** and **`actions/setup-node@v5`** — use the latest action versions with Node 24 runtime. Older versions (`@v4` and below) run on the deprecated Node 20 runtime.
+- **Windows CI** — only add Windows to the matrix where the product genuinely supports or ships Windows artifacts. If Windows is included, set `core.longpaths` via `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0` env **before** the checkout step. Do not pin to `windows-latest` — use a specific image version (e.g. `windows-2022`) if native compilation is critical.
+
 ## Active instruction model
 
 - **Skill invocation tracking (NON-NEGOTIABLE):** When the operator invokes a fo-skill (e.g. `fo-idea-i-just-want-to-see-the-result`, `fo-idea-implement`, `fo-fix`, `fo-review`) in the first message of a session, the agent MUST follow that skill's full pipeline to completion. Do NOT fall back to a manual step-by-step plan. The skill's pipeline (audit → enhance → plan → implement → review → fix) exists for a reason — skipping phases produces lower-quality results. The operator's invocation IS the instruction to run the entire pipeline autonomously. See `PREFERENCES.md` § Skill invocation tracking for details.
