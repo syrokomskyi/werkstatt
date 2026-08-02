@@ -78,6 +78,7 @@ Each discovered insight is categorized into exactly one of six types. The catego
 - Session-local: relevant to the current task or current state, not a durable rule.
 - Not worth a version-controlled file (too specific, too ephemeral).
 - Useful for the next agent picking up this work area.
+- **Recurring**: describes a pattern or behavior that will happen again, not a one-off completed action.
 
 **Operator** — the insight is:
 
@@ -102,7 +103,13 @@ Review the current session to identify discoveries. Use in priority order:
 2. **Session conversation** — scan for debugging discoveries, non-obvious behaviors, convention realizations, and "we always do X" moments.
 3. **Git diff** — run `git diff HEAD` and `git log --oneline -10` to see what changed; changes may reveal patterns worth recording.
 
-For each candidate, ask: "Would another agent working in this area benefit from knowing this?" If no, drop it. If yes, proceed to categorization.
+For each candidate, apply **three filter questions** in order. Drop the candidate at the first "no":
+
+1. **Future-relevance** — "Would another agent working in this area benefit from knowing this?" If no, drop.
+2. **Repeatability** — "Is this insight about a pattern or behavior that will recur?" If the insight describes a one-off completed action that won't happen again (e.g. "we renamed branch X to Y in repo Z"), drop it. The insight must describe a reusable pattern, a recurring trap, or a durable convention — not a finished migration step.
+3. **Non-obviousness** — "Is this already documented or enforced by a command?" If yes, drop — the existing doc or check is sufficient.
+
+If all three pass, proceed to categorization.
 
 ### 3. Categorize and present
 
