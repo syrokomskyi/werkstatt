@@ -524,7 +524,7 @@ export async function runMissionCheck(
     }
     runTimestamp = runTimestampFlag;
   } else {
-    runTimestamp = new Date().toISOString().replace(/:/g, "-");
+    runTimestamp = new Date().toISOString().replace(/[:.]/g, "-");
   }
 
   // RFC-0630: Parse optional override flags
