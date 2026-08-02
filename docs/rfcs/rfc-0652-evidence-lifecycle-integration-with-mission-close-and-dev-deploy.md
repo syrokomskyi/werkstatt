@@ -406,7 +406,7 @@ No `--json` output format changes. The existing `mission.close`, `mission.cleanu
 - [x] `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` documents evidence.sync invocations in `mission.close` and `leitstand.dev-deploy` writes (evidence: `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:39-44`)
 - [x] `packages/os/site-kernel-handoff/AGENTS.md` documents evidence sync integration points (evidence: `packages/os/site-kernel-handoff/AGENTS.md:34,115,118`)
 - [x] `AGENTS.md` documents that `mission.close` mandates evidence sync and `--skip-evidence-sync` is an escape hatch (evidence: `AGENTS.md:222-223`)
-- [x] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0652` exit 0)
 
 ## Implementation notes for agents
 
