@@ -419,8 +419,8 @@
       <expectation>Run `pnpm --filter @warpgogol/forge build:check` and `pnpm --filter @warpgogol/forge test`; run `pnpm exec site-kernel run forge.skill.validate --json` to verify SKILL-17 (no specific platform RFC/ADR ids or platform names in skill files); run `grep -rnE 'RFC-[0-9]{4}|ADR-[0-9]{4}' packages/forge/skills/` to confirm zero specific platform id matches.</expectation>
     </entry>
     <entry id="vm-11">
-      <change-type>Generated file timestamp determinism changes (RFC-0602)</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/site-kernel-checks build:check` and `pnpm --filter @warpgogol/site-kernel-checks test`; run `pnpm exec site-kernel run generated.timestamp.validate` to verify Phase 1 source lint; run `pnpm exec site-kernel run generator.ownership.lint` to verify ownership map integrity.</expectation>
+      <change-type>Generated file determinism changes (RFC-0601, RFC-0645)</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/site-kernel-checks build:check` and `pnpm --filter @warpgogol/site-kernel-checks test`; run `pnpm exec site-kernel run generated.drift.validate --site <site-id>` to verify content drift detection (DRIFT-01 error + DRIFT-02 error for missing dryRun); run `pnpm exec site-kernel run generator.ownership.lint` to verify ownership map integrity.</expectation>
     </entry>
   </change-validation-matrix>
 </verification-plan>
