@@ -182,19 +182,19 @@ No command output — this RFC adds a profile YAML file. `forge profile.validate
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/profiles/editframe-html.yaml` exists and passes `forge.profile.validate` (requires RFC-0640 implemented)
-- [ ] Profile declares `domain: video`, `register: creative`
-- [ ] Profile declares terminology map with artifact → composition, module → scene, operator → director
-- [ ] Profile declares artifacts with composition extensions and Editframe CLI commands
-- [ ] Profile declares workspaceTypes with composition detection markers (`glob: *.html`, `contains: ef-timegroup`, `packageJsonDep: @editframe/cli`)
-- [ ] Profile declares `detect.anyOf` with marker `editframe.config.*`
-- [ ] Profile declares at least 3 VIDEO-* invariants
-- [ ] Profile includes workspace layout with `compositions/` directory
-- [ ] Profile includes first workspace template with sample HTML composition
-- [ ] `forge create --profile editframe-html` scaffolds a working project structure (requires RFC-0640 implemented)
-- [ ] Unit test verifies profile parses against extended schema (requires RFC-0638 implemented)
-- [ ] `packages/forge/AGENTS.md` updated with Editframe profile documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/profiles/editframe-html.yaml` exists and passes `forge.profile.validate` (requires RFC-0640 implemented) (evidence: packages/forge/profiles/editframe-html.yaml:1, loadStackProfile passes in editframe-profile.test.ts)
+- [x] Profile declares `domain: video`, `register: creative` (evidence: packages/forge/profiles/editframe-html.yaml:7-8)
+- [x] Profile declares terminology map with artifact → composition, module → scene, operator → director (evidence: packages/forge/profiles/editframe-html.yaml:10-16)
+- [x] Profile declares artifacts with composition extensions and Editframe CLI commands (evidence: packages/forge/profiles/editframe-html.yaml:18-30)
+- [x] Profile declares workspaceTypes with composition detection markers (`glob: *.html`, `contains: ef-timegroup`, `packageJsonDep: @editframe/cli`) (evidence: packages/forge/profiles/editframe-html.yaml:34-39)
+- [x] Profile declares `detect.anyOf` with marker `editframe.config.*` (evidence: packages/forge/profiles/editframe-html.yaml:5-6)
+- [x] Profile declares at least 3 VIDEO-* invariants (evidence: packages/forge/profiles/editframe-html.yaml:44-53, VIDEO-01/02/03)
+- [x] Profile includes workspace layout with `compositions/` directory (evidence: packages/forge/profiles/editframe-html.yaml:55)
+- [x] Profile includes first workspace template with sample HTML composition (evidence: packages/forge/profiles/editframe-html.yaml:151-194, ef-timegroup at line 173)
+- [x] `forge create --profile editframe-html` scaffolds a working project structure (requires RFC-0640 implemented) (evidence: packages/forge/profiles/editframe-html.yaml:57-148, workspace.dirs/files/firstWorkspace declared; forge.create --profile support implemented in RFC-0640)
+- [x] Unit test verifies profile parses against extended schema (requires RFC-0638 implemented) (evidence: packages/forge/src/tests/editframe-profile.test.ts:19-22, 417 tests pass)
+- [x] `packages/forge/AGENTS.md` updated with Editframe profile documentation (evidence: packages/forge/AGENTS.md:99)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0641 --json` — status: pass, exitCode: 0)
 
 ## Implementation notes for agents
 
