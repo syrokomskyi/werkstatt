@@ -7,7 +7,7 @@
   DNA-58 (generated-file content determinism).
 </purpose>
 <non-goals>
-  <item>Do not check binary files — their determinism is covered by RFC-0602/RFC-0603.</item>
+  <item>Do not check binary files — their determinism is covered by RFC-0603.</item>
   <item>Do not check file existence — that is the domain of generated.files.validate (RFC-0375).</item>
   <item>Do not check for stale files — that is the domain of generated.stale.validate (RFC-0600).</item>
   <item>Do not auto-fix drift — the command is read-only; operators must re-run the generator.</item>
@@ -15,6 +15,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0601: initial implementation.</item>
+  <item>RFC-0645: promote DRIFT-02 from info to error — generators without dryRun support now fail validation.</item>
 </CHANGE_SUMMARY>
 */
 import { join, relative } from "node:path";
@@ -177,7 +178,7 @@ export async function runGeneratedDriftValidate(
       if (!renderedFiles) {
         diagnostics.push({
           ruleId: "DRIFT-02",
-          severity: "info",
+          severity: "error",
           file: relPath,
           message: `Generator "${entry.command}" does not support dryRun mode; skipped.`,
           data: { generator: entry.command },
@@ -189,7 +190,7 @@ export async function runGeneratedDriftValidate(
       if (rendered === undefined) {
         diagnostics.push({
           ruleId: "DRIFT-02",
-          severity: "info",
+          severity: "error",
           file: relPath,
           message: `Generator "${entry.command}" did not render "${relPath}" in dryRun output; skipped.`,
           data: { generator: entry.command },

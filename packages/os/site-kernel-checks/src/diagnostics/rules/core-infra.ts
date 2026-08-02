@@ -9,8 +9,8 @@
   <item>RFC-0303 Phase 3: extracted from diagnostics/rules.ts as part of the domain split.</item>
   <item>Register environment/deploy, fingerprint, JSON marker, and DNA registry rule ids.</item>
   <item>Register analytics and chat metadata drift rule ids.</item>
-  <item>RFC-0601: register DRIFT-01 (error) and DRIFT-02 (info) for generated.drift.validate.</item>
-  <item>RFC-0602: register TS-TIME-01 for generated.timestamp.validate.</item>
+  <item>RFC-0601: register DRIFT-01 (error) and DRIFT-02 for generated.drift.validate.</item>
+  <item>RFC-0645: promote DRIFT-02 from info to error; remove TS-TIME-01 (generated.timestamp.validate deleted).</item>
   <item>RFC-0610: register ARG-COMPLIANCE-01/02/03 for command.args.validate.</item>
 </CHANGE_SUMMARY>
 */
@@ -493,14 +493,7 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "DRIFT-02",
     "Generator does not support dryRun mode; skipped",
     "generated.drift.validate",
-    "info",
-  ),
-
-  // generated.timestamp.validate — RFC-0602 volatile timestamp detection in generator source.
-  "TS-TIME-01": rule(
-    "TS-TIME-01",
-    "Volatile timestamp pattern (new Date(), Date.now(), process.env.BUILD_TIMESTAMP) in generator source",
-    "generated.timestamp.validate",
+    "error",
   ),
 
   // yaml.contract.lint — YAML-first workspace convention enforcement.
