@@ -16,7 +16,9 @@
       "default": "./src/astro.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -27,7 +29,7 @@
     "@warpgogol/integration": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
     "@warpgogol/share": "workspace:*",
-    "astro": "^7.1.3"
+    "astro": "^7.1.6"
   },
   "devDependencies": {
     "fast-check": "^4.9.0",

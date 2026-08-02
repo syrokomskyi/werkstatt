@@ -12,7 +12,10 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["src", "dist"],
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -21,17 +24,17 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@warpgogol/ontology": "workspace:*",
+    "@warpgogol/passport": "workspace:*",
     "@warpgogol/site-kernel": "workspace:*",
     "@warpgogol/site-kernel-handoff": "workspace:*",
-    "@warpgogol/passport": "workspace:*",
-    "@warpgogol/ontology": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.0.0",
-    "yaml": "^2.7.0"
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "fast-check": "^4.9.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.7.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   }
 }

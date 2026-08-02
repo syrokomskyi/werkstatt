@@ -8,7 +8,7 @@
     "deploy": "site-kernel run deploy.preflight --service telegram-alert-bridge && wrangler deploy --secrets-file .env"
   },
   "devDependencies": {
-    "wrangler": "^4.112.0"
+    "wrangler": "^4.118.0"
   },
   "gogol": {
     "testSignal": {

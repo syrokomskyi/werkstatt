@@ -11,7 +11,10 @@
       "default": "./src/index.ts"
     }
   },
-  "files": ["src", "prompts"],
+  "files": [
+    "src",
+    "prompts"
+  ],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -19,10 +22,10 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.16",
-    "@ai-sdk/openai": "^4.0.16",
+    "@ai-sdk/anthropic": "^4.0.27",
+    "@ai-sdk/openai": "^4.0.27",
     "@warpgogol/site-kernel": "workspace:*",
-    "ai": "^7.0.32",
+    "ai": "^7.0.47",
     "p-limit": "^7.3.1",
     "semver": "^7.8.5",
     "simple-git": "^3.36.0",

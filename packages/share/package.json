@@ -272,7 +272,9 @@
       "default": "./src/css-value-normalize.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "echo 'No build step required — TypeScript sources consumed directly'",
     "build:check": "tsc --noEmit",
@@ -284,7 +286,7 @@
     "@warpgogol/content-source": "workspace:*",
     "@warpgogol/ontology": "workspace:*",
     "ajv": "^8.20.0",
-    "astro": "^7.1.3",
+    "astro": "^7.1.6",
     "expr-eval": "^2.0.2",
     "hls.js": "^1.6.16",
     "lenis": "^1.3.25",

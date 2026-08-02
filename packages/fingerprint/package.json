@@ -23,11 +23,11 @@
   },
   "dependencies": {
     "@astrojs/compiler": "^4.0.0",
-    "@warpgogol/share": "workspace:*",
     "@typescript-eslint/typescript-estree": "^8.65.0",
+    "@warpgogol/share": "workspace:*",
     "jsonc-parser": "^3.3.1",
     "pdf-lib": "^1.17.1",
-    "postcss": "^8.5.20",
+    "postcss": "^8.5.25",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx": "^3.1.1",
     "remark-parse": "^11.0.0",

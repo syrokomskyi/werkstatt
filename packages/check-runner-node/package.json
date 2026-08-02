@@ -23,7 +23,7 @@
     "playwright": "^1.62.1"
   },
   "devDependencies": {
-    "happy-dom": "^20.11.0",
+    "happy-dom": "^20.11.1",
     "vitest": "^4.1.10"
   },
   "gogol": {
