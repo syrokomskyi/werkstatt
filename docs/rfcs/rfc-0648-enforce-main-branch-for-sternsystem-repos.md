@@ -246,16 +246,16 @@ The `sternsystem.validate --json` output gains violations with `rule: "branch-co
 
 ## Acceptance criteria
 
-- [ ] `sternsystem.validate` includes a `branch-convention` rule that checks cache clone and bare repo branch name is `main`
-- [ ] `sternsystem.status` fallback branch changed from `"master"` to `"main"` (evidence: `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-status.ts:124`)
-- [ ] `mission.close` fallback branch changed from `"master"` to `"main"` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:301`)
-- [ ] `mission-materialize.ts` comments updated from `origin/master` to `origin/main` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:341,367`)
-- [ ] Test helpers updated: `gitInit` uses `git init -b main`; `sternsystem-sync-integration.test.ts` uses `git init --bare -b main` and pushes to `origin main`; all 11 local `gitInit` helpers across the test suite updated
-- [ ] `mission-materialize.ts:1002` non-git cache clone fallback changed to `git init -b main` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:1002`)
-- [ ] `sternsystem.validate --id warpgogol-com --json` reports 0 `branch-convention` violations after migration
-- [ ] `AGENTS.md` documents the `main` branch convention for Sternsystem repos
-- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `sternsystem.validate` includes a `branch-convention` rule that checks cache clone and bare repo branch name is `main` (evidence: `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-validate.ts:296-350`)
+- [x] `sternsystem.status` fallback branch changed from `"master"` to `"main"` (evidence: `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-status.ts:124`)
+- [x] `mission.close` fallback branch changed from `"master"` to `"main"` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:301`)
+- [x] `mission-materialize.ts` comments updated from `origin/master` to `origin/main` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:341,367`)
+- [x] Test helpers updated: `gitInit` uses `git init -b main`; `sternsystem-sync-integration.test.ts` uses `git init --bare -b main` and pushes to `origin main`; all 11 local `gitInit` helpers across the test suite updated (evidence: `packages/os/site-kernel-handoff/src/tests/helpers/materialize-fixture.ts:16` + 10 other test files)
+- [x] `mission-materialize.ts:1002` non-git cache clone fallback changed to `git init -b main` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:1003`)
+- [x] `sternsystem.validate --id warpgogol-com --json` reports 0 `branch-convention` violations after migration (evidence: operator renamed branches — `git -C ../systems-cache/warpgogol-com branch -m master main` + `git -C ../systems-git/warpgogol-com symbolic-ref HEAD refs/heads/main`; `sternsystem.validate --id warpgogol-com --json` reports 0 `branch-convention` violations)
+- [x] `AGENTS.md` documents the `main` branch convention for Sternsystem repos (evidence: `packages/os/site-kernel-handoff/AGENTS.md:214-220`)
+- [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: commit `2b047eeb`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0648 --json` — 0 violations)
 
 ## Implementation notes for agents
 
