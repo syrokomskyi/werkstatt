@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: c9279bb0f049543330db972002af11787548579075055d15a92286227cc0618b
+  contentHash: 896ccc6bccf678480a149053b667e14197f18fbd9000869f4ceeaa1d1a4b4859
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -3556,6 +3556,28 @@ commands:
         description: Regex pattern for allowed dist content references.
     reads:
       - <app>/dist/client/**/*.html
+    writes: []
+    pipelines: []
+  - name: dist.determinism.validate
+    description: "Report non-deterministic files in a dist directory by comparing
+      stable vs byte hashes (RFC-0656). Flags: --release, --mission."
+    scope: workspace
+    provider: workspace
+    module: release
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      release:
+        kind: string
+        description: Release id whose dist to validate.
+      mission:
+        kind: string
+        description: Mission id whose workpiece/dist or distribution/dist to validate.
+    reads:
+      - releases/{release}/dist/**
+      - missions/{mission}/workpiece/dist/**
+      - missions/{mission}/distribution/dist/**
     writes: []
     pipelines: []
   - name: dist.generated-marker.strip
