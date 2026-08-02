@@ -26,6 +26,41 @@ if [ -n "$PLATFORM_FILES" ]; then
   exit 1
 fi
 
+# ENV-CONTRACT-06: blank line between variable blocks in .env.example files
+ENV_EXAMPLE_FILES=$(git diff --cached --name-only -- '*.env.example' '.env.example' '**/.env.example' || true)
+if [ -n "$ENV_EXAMPLE_FILES" ]; then
+  ENV_ERRORS=""
+  for f in $ENV_EXAMPLE_FILES; do
+    if [ ! -f "$f" ]; then continue; fi
+    # Check: every variable block (except the first) must be preceded by a blank line
+    # A "block" is a comment line(s) followed by a KEY= line
+    while IFS= read -r line_num; do
+      [ -z "$line_num" ] && continue
+      ENV_ERRORS="$ENV_ERRORS\n  $f:$line_num — missing blank line before variable block (ENV-CONTRACT-06)"
+    done < <(awk '
+      /^[A-Z][A-Z0-9_]*=/ {
+        if (prev_was_var && !blank_seen) {
+          print NR
+        }
+        prev_was_var = 1
+        blank_seen = 0
+        next
+      }
+      /^$/ { blank_seen = 1; next }
+      /^#/ { next }
+      { prev_was_var = 0; blank_seen = 0 }
+    ' "$f")
+  done
+  if [ -n "$ENV_ERRORS" ]; then
+    echo "ERROR: .env.example ENV-CONTRACT-06 violations detected:" >&2
+    echo -e "$ENV_ERRORS" >&2
+    echo "" >&2
+    echo "Every variable block (except the first) must be preceded by an empty line (RFC-0388 Rule 3)." >&2
+    echo "Fix: add a blank line above the comment block for each flagged variable." >&2
+    exit 1
+  fi
+fi
+
 # Command manifest staleness check (RFC-0646)
 # Warn when command-registration files change without manifest regeneration.
 COMMAND_FILES=$(git diff --cached --name-only -- 'packages/forge/os/core/' 'packages/forge/os/*/core.module.ts' 'tools/kernel.config.ts' || true)

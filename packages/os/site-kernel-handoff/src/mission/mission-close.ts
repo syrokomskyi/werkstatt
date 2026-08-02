@@ -481,6 +481,17 @@ export async function runMissionClose(
           JSON.stringify(stateFile, null, 2) + "\n",
         );
         logger.info(`  Wrote .materialization-state.json (HEAD: ${cacheCloneHead.slice(0, 12)})`);
+        // Commit .materialization-state.json to prevent dirty cache clone (RFC-0597 fix)
+        try {
+          gitExec(systemDir, "add .materialization-state.json");
+          gitExec(
+            systemDir,
+            `commit -m ${JSON.stringify(`chore: update materialization state for ${missionId}`)}`,
+          );
+          logger.info(`  Committed .materialization-state.json to cache clone`);
+        } catch {
+          // Nothing to commit or git not available — non-fatal
+        }
       }
 
       // Copy .cache/video/ and .cache/video-live/ from workpiece to cache clone

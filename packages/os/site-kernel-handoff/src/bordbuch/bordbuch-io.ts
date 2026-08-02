@@ -323,9 +323,18 @@ export async function commitAndPushBordbuch(
   message: string,
 ): Promise<CommitAndPushResult> {
   const bordbuchPath = path.join("bordbuch", "events.ndjson");
+  const statusPath = path.join("bordbuch", "status.generated.yaml");
 
   try {
     gitExec(systemDir, `add ${bordbuchPath}`);
+    // Also commit bordbuch/status.generated.yaml if it exists (RFC-0597 fix: prevent dirty cache clone)
+    if (existsSync(path.join(systemDir, statusPath))) {
+      try {
+        gitExec(systemDir, `add ${statusPath}`);
+      } catch {
+        // status.generated.yaml may not exist or may be gitignored — non-fatal
+      }
+    }
   } catch {
     return { commitSha: null, pushed: false, error: null };
   }
