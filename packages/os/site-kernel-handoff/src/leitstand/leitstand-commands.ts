@@ -20,6 +20,7 @@
   <item>RFC-0653: dev-deploy implements build-skip cache — skips pnpm build when commitSha + platformVersion + platformSemanticHash match .dev-deploy-build-cache.json and dist/ exists. --force-build bypasses the cache. buildSkipped field added to DevDeployResult.</item>
   <item>RFC-0652: best-effort evidence.sync after axiom.report; --skip-evidence-sync flag; evidenceSynced/evidenceSyncError in output.</item>
   <item>RFC-0656: switch distTreeHash from mode: "byte" to mode: "stable" for deterministic hashing of non-deterministic build artifacts.</item>
+  <item>RFC-0657: replace single-fetch verifyFreshness with retry loop (5 attempts, exponential backoff 3s/6s/12s/24s); remove fixed 6s sleep after purge; add attempts field to FreshnessResult.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -146,55 +147,75 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// RFC-0649: Result of CDN freshness verification.
+// RFC-0649 / RFC-0657: Result of CDN freshness verification.
 export interface FreshnessResult {
   verified: boolean;
   cdnDistTreeHash: string | null;
   localDistTreeHash: string;
+  attempts: number;
   error?: string;
 }
 
-// RFC-0649: Verify CDN freshness by fetching build-identity.json from the CDN URL
-// and comparing distTreeHash against the local build-identity. Single fetch, no retry.
+// RFC-0657: Retry constants for verifyFreshness (hardcoded — no caller customization needed).
+const FRESHNESS_MAX_ATTEMPTS = 5;
+const FRESHNESS_BACKOFF_DELAYS_MS = [3_000, 6_000, 12_000, 24_000];
+
+// RFC-0649 / RFC-0657: Verify CDN freshness by fetching build-identity.json from the CDN URL
+// and comparing distTreeHash against the local build-identity. Retries up to 5 times with
+// exponential backoff (3s, 6s, 12s, 24s). First attempt is immediate; subsequent attempts
+// are separated by the backoff delays.
 async function verifyFreshness(
   deploymentUrl: string,
   localDistTreeHash: string,
+  logger: { info: (m: string) => void },
 ): Promise<FreshnessResult> {
   const base = deploymentUrl.replace(/\/$/, "");
   const url = `${base}${BUILD_IDENTITY_PATH}`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      return {
-        verified: false,
-        cdnDistTreeHash: null,
-        localDistTreeHash,
-        error: `CDN freshness fetch returned HTTP ${response.status} for ${url}`,
-      };
+  let lastCdnDistTreeHash: string | null = null;
+  let lastError = "";
+
+  for (let attempt = 1; attempt <= FRESHNESS_MAX_ATTEMPTS; attempt++) {
+    if (attempt > 1) {
+      const delayMs = FRESHNESS_BACKOFF_DELAYS_MS[attempt - 2];
+      logger.info(
+        `[leitstand.dev-deploy] freshness retry ${attempt}/${FRESHNESS_MAX_ATTEMPTS} after ${delayMs / 1000}s...`,
+      );
+      await sleep(delayMs);
     }
-    const cdnBuildIdentity = (await response.json()) as { distTreeHash?: string };
-    const cdnDistTreeHash = cdnBuildIdentity.distTreeHash ?? null;
-    if (cdnDistTreeHash !== localDistTreeHash) {
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        lastCdnDistTreeHash = null;
+        lastError = `CDN freshness fetch returned HTTP ${response.status} for ${url}`;
+        continue;
+      }
+      const cdnBuildIdentity = (await response.json()) as { distTreeHash?: string };
+      const cdnDistTreeHash = cdnBuildIdentity.distTreeHash ?? null;
+      lastCdnDistTreeHash = cdnDistTreeHash;
+      if (cdnDistTreeHash !== localDistTreeHash) {
+        lastError = `CDN serving stale content: distTreeHash mismatch (cdn: ${cdnDistTreeHash}, local: ${localDistTreeHash})`;
+        continue;
+      }
       return {
-        verified: false,
+        verified: true,
         cdnDistTreeHash,
         localDistTreeHash,
-        error: `CDN serving stale content: distTreeHash mismatch (cdn: ${cdnDistTreeHash}, local: ${localDistTreeHash})`,
+        attempts: attempt,
       };
+    } catch (err) {
+      lastCdnDistTreeHash = null;
+      lastError = `CDN freshness fetch failed: ${err instanceof Error ? err.message : String(err)}`;
     }
-    return {
-      verified: true,
-      cdnDistTreeHash,
-      localDistTreeHash,
-    };
-  } catch (err) {
-    return {
-      verified: false,
-      cdnDistTreeHash: null,
-      localDistTreeHash,
-      error: `CDN freshness fetch failed: ${err instanceof Error ? err.message : String(err)}`,
-    };
   }
+
+  return {
+    verified: false,
+    cdnDistTreeHash: lastCdnDistTreeHash,
+    localDistTreeHash,
+    attempts: FRESHNESS_MAX_ATTEMPTS,
+    error: lastError,
+  };
 }
 
 // RFC-0624: Post-deploy CDN cache purge step. Non-blocking on failure.
@@ -611,6 +632,7 @@ export async function runLeitstandDevDeploy(
               verified: false,
               cdnDistTreeHash: null,
               localDistTreeHash: "",
+              attempts: 0,
               error: "build failed",
             },
           },
@@ -647,6 +669,7 @@ export async function runLeitstandDevDeploy(
             verified: false,
             cdnDistTreeHash: null,
             localDistTreeHash: "",
+            attempts: 0,
             error: "dist/ not found after build",
           },
         },
@@ -741,7 +764,12 @@ export async function runLeitstandDevDeploy(
 
   if (isNullAdapter) {
     // RFC-0649: Skip purge + freshness check for null adapter — no CDN to invalidate.
-    freshness = { verified: true, cdnDistTreeHash: null, localDistTreeHash: distTreeHash };
+    freshness = {
+      verified: true,
+      cdnDistTreeHash: null,
+      localDistTreeHash: distTreeHash,
+      attempts: 0,
+    };
     logger.info("[leitstand.dev-deploy] null adapter — skipping CDN purge and freshness check");
   } else {
     const t3 = Date.now();
@@ -759,6 +787,7 @@ export async function runLeitstandDevDeploy(
         verified: false,
         cdnDistTreeHash: null,
         localDistTreeHash: distTreeHash,
+        attempts: 0,
         error: `CDN purge failed: ${purgeResult.error ?? "unknown error"}`,
       };
       logger.warn(
@@ -788,13 +817,13 @@ export async function runLeitstandDevDeploy(
       };
     }
 
-    await sleep(6_000);
     logger.info(
-      `[leitstand.dev-deploy] purge + sleep completed in ${((Date.now() - t3) / 1000).toFixed(1)}s`,
+      `[leitstand.dev-deploy] purge completed in ${((Date.now() - t3) / 1000).toFixed(1)}s`,
     );
 
-    // RFC-0649: Verify CDN freshness — fetch build-identity.json from CDN URL and compare distTreeHash.
-    freshness = await verifyFreshness(channelConfig.url, distTreeHash);
+    // RFC-0649 / RFC-0657: Verify CDN freshness — fetch build-identity.json from CDN URL and compare
+    // distTreeHash. Retries up to 5 times with exponential backoff (3s, 6s, 12s, 24s).
+    freshness = await verifyFreshness(channelConfig.url, distTreeHash, logger);
     if (!freshness.verified) {
       logger.warn(
         `[leitstand.dev-deploy] freshness check failed — Axiom gate not run: ${freshness.error}`,
