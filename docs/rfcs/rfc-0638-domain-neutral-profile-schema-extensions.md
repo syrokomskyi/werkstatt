@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-01
-updatedAt: 2026-08-01
+updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -102,14 +103,14 @@ The `forge/stack-profile@1` schema is extended with six optional fields that all
 2. **`terminology`** — a map of universal concept keys to domain-specific terms (e.g. `artifact: "composition"`, `module: "scene"`, `operator: "director"`). Used by generated content and skill language resolution.
 3. **`artifacts`** — an array of artifact definitions, each declaring extensions, produce command, validate command, and determinism properties. Used by `forge.doctor` for domain-specific health checks.
 4. **`workspaceTypes`** — an array of workspace type definitions, each with detection markers, associated skills, and AGENTS.md template reference. Used by `forge.agents.generate` for per-domain workspace detection.
-5. **`invariants`** — an array of domain-specific invariant definitions, each with an id, rule text, and severity. Used by `fo-review` and `forge.doctor` for domain-specific quality enforcement.
+5. **`invariants`** — an array of domain-specific invariant definitions, each with an id, rule text, and severity. Schema only in this RFC; enforcement is deferred to follow-up RFCs.
 6. **`register`** — a string selecting the default behavioral register (`business` or `creative`). Used by `forge.create` when writing `PREFERENCES.md`.
 
 All six fields are optional. Existing profiles without these fields continue to parse and function identically.
 
 ## Architectural fit
 
-- **DNA-54 (Forge bindings contract)**: This RFC extends the same de-hardcoding principle from skill bodies to profile schemas. Just as skills reference bindings by key instead of hardcoding values, profiles declare terminology and artifact models that generated content resolves dynamically.
+- **DNA-54 (Forge bindings contract)**: This RFC extends the same de-hardcoding principle from skill bodies to profile schemas. Just as skills reference bindings by key instead of hardcoding values, profiles declare terminology and artifact models that generated content resolves dynamically. The connection is analogical: DNA-54 governs skill bodies, this RFC governs profile schemas — both serve the same de-hardcoding goal at different layers.
 - **RFC-0392 (Stack profiles)**: This RFC extends the existing profile schema with new optional fields. It does not create a v2 schema — all existing profiles remain valid.
 - **RFC-0393 (Bindings contract)**: The `terminology` field in profiles is the profile-level analogue of the `terminology` field in bindings. They serve the same purpose at different layers: bindings are per-project, profile terminology is per-domain.
 - **RFC-0549 (Extended behavioral layer)**: The `register` field allows profiles to declare a default behavioral register, enabling creative domains to get the extended behavioral layer by default.
@@ -220,14 +221,44 @@ export interface StackProfileDomainFields {
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/src/config/forge-config.ts` | Schema extended with domain fields |
-| `packages/forge/src/config/profile-schema.ts` | New file: `StackProfileDomainFields` types and Zod schema |
+| `packages/forge/src/profiles/profile-schema.ts` | New file: `StackProfileDomainFields` types, Zod sub-schemas, and universal terminology key catalog |
+| `packages/forge/src/profiles/stack-profile.ts` | Existing schema extended — imports and spreads domain fields into `stackProfileSchema` |
+| `packages/forge/src/index.ts` | Exports `StackProfileDomainFields`, `ProfileArtifact`, `ProfileWorkspaceType`, `ProfileInvariant` from `@warpgogol/forge` |
 | `packages/forge/profiles/*.yaml` | Existing profiles unchanged; new profiles use new fields |
 | `packages/forge/src/tests/profile-schema.test.ts` | New test: domain fields parse correctly, v1 profiles still valid |
 
 ### Output format
 
 No command output — this RFC is a schema extension only. The schema is consumed by commands in follow-up RFCs.
+
+### Terminology key catalog
+
+The `terminology` field uses an **open vocabulary** — new domains may introduce new keys without schema changes. The following universal keys are recognized by generated content and have built-in defaults (the key itself):
+
+| Key              | Default       | Used by                         |
+| ---------------- | ------------- | ------------------------------- |
+| `artifact`       | `artifact`    | AGENTS.md, doctor output        |
+| `artifactPlural` | `artifacts`   | AGENTS.md, doctor output        |
+| `module`         | `module`      | AGENTS.md workspace type labels |
+| `source`         | `source file` | AGENTS.md, doctor output        |
+| `output`         | `output`      | Doctor health checks            |
+| `verify`         | `verify`      | Doctor health checks            |
+| `operator`       | `operator`    | AGENTS.md, PREFERENCES.md       |
+
+Profiles that declare a subset of these keys get defaults for the rest. Profiles may declare additional keys for domain-specific use — generated content that references an unknown key falls back to the key itself.
+
+### Register conflict resolution
+
+The `register` field provides a **default for new projects only**. `forge.create` writes `PREFERENCES.md` when it does not exist yet — if `PREFERENCES.md` already exists, `forge.create` skips it (same pattern as `forge.yaml` in `init.ts`). Therefore:
+
+- **New project**: profile `register` value is written to `PREFERENCES.md`.
+- **Existing project**: `PREFERENCES.md` is never overwritten — the operator's existing `register` value always wins.
+
+This means `register` in a profile is a one-time default, not an ongoing enforcement. Operators can change `register` in `PREFERENCES.md` at any time without profile changes.
+
+### Invariants enforcement scope
+
+This RFC defines the `invariants` schema only. Enforcement — how `fo-review` reads profile invariants, how `forge.doctor` scans files against invariant rules — is **fully deferred to follow-up RFCs** (RFC-0640 and beyond). The acceptance criteria in this RFC test parsing and validation only, not enforcement. The `invariants` array is stored in the parsed profile and available for consumption by future commands, but no existing command reads it yet.
 
 ### Failure modes
 
@@ -256,8 +287,9 @@ No command output — this RFC is a schema extension only. The schema is consume
 
 ## Acceptance criteria
 
-- [ ] `StackProfileDomainFields` interface and Zod schema defined in `packages/forge/src/config/profile-schema.ts`
-- [ ] Schema extension loaded and validated in `packages/forge/src/config/forge-config.ts`
+- [ ] `StackProfileDomainFields` interface and Zod schema defined in `packages/forge/src/profiles/profile-schema.ts`
+- [ ] Schema extension loaded and validated in `packages/forge/src/profiles/stack-profile.ts` (imports and spreads domain fields into `stackProfileSchema`)
+- [ ] New types exported from `@warpgogol/forge` via `packages/forge/src/index.ts`
 - [ ] Existing profiles (`astro-typescript-turborepo`, `phaser-turborepo`, `forge-shell`) parse without changes
 - [ ] Unit tests verify: new fields parse correctly, absent fields default to undefined, invalid invariant ids fail validation
 - [ ] `packages/forge/AGENTS.md` updated with domain fields documentation
