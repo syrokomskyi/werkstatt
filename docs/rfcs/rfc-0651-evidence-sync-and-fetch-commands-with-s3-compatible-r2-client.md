@@ -342,7 +342,7 @@ interface R2ClientConfig {
 - [x] `.env.example` documents `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (evidence: `.env.example` file)
 - [x] `packages/os/site-kernel-handoff/AGENTS.md` documents `evidence.sync` and `evidence.fetch` commands (evidence: `AGENTS.md` section)
 - [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: commit with manifest update)
-- [x] `rfc.validate` passes on this file before merging
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0651` exits 0)
 
 ## Implementation notes for agents
 
