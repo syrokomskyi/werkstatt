@@ -265,20 +265,20 @@ interface DoctorDomainReport {
 
 ## Acceptance criteria
 
-- [ ] `forge.profile.validate` command registered in `forgeCoreModule`
-- [ ] `forge.create` reads `register` from profile and writes it to `PREFERENCES.md`
-- [ ] `forge.create` writes semantic binding defaults from profile `artifacts[]` when present
-- [ ] `forge.doctor` reports domain information when profile has `domain` field
-- [ ] `forge.doctor` reports domain invariants from profile `invariants[]` (reported-only, not automatically checked)
-- [ ] `forge.doctor` resolves terminology via three-tier chain (bindings → profile → default)
-- [ ] `forge.doctor` skips software-specific checks when `domain !== "software"`
-- [ ] `forge.agents.generate` uses `workspaceTypes[]` for detection when present, replacing hardcoded detection
-- [ ] All three commands fall back to existing behavior when profile has no domain fields
-- [ ] `forge.doctor` `--strict` flag declared in command registration
-- [ ] `forge.profile.validate` `--id` flag filters to a single profile when present
-- [ ] Unit tests for each command's domain-aware and fallback paths
-- [ ] `packages/forge/AGENTS.md` updated
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `forge.profile.validate` command registered in `forgeCoreModule` (evidence: packages/forge/os/core/core.module.ts:292-293)
+- [x] `forge.create` reads `register` from profile and writes it to `PREFERENCES.md` (evidence: packages/forge/src/onboarding/create.ts:53,205, packages/forge/src/onboarding/init.ts:173,177)
+- [x] `forge.create` writes semantic binding defaults from profile `artifacts[]` when present (evidence: packages/forge/src/onboarding/create.ts:53-88)
+- [x] `forge.doctor` reports domain information when profile has `domain` field (evidence: packages/forge/src/onboarding/doctor.ts:466-508,536-555)
+- [x] `forge.doctor` reports domain invariants from profile `invariants[]` (reported-only, not automatically checked) (evidence: packages/forge/src/onboarding/doctor.ts:641-648)
+- [x] `forge.doctor` resolves terminology via three-tier chain (bindings → profile → default) (evidence: packages/forge/src/onboarding/doctor.ts:447-464)
+- [x] `forge.doctor` skips software-specific checks when `domain !== "software"` (evidence: packages/forge/src/onboarding/doctor.ts:684-702)
+- [x] `forge.agents.generate` uses `workspaceTypes[]` for detection when present, replacing hardcoded detection (evidence: packages/forge/src/onboarding/agents-generate.ts:483-499, packages/forge/src/onboarding/workspace-discovery.ts:47-57)
+- [x] All three commands fall back to existing behavior when profile has no domain fields (evidence: packages/forge/src/onboarding/workspace-discovery.ts:59-76, packages/forge/src/onboarding/create.ts:53-88, packages/forge/src/onboarding/doctor.ts:502-514)
+- [x] `forge.doctor` `--strict` flag declared in command registration (evidence: packages/forge/os/core/core.module.ts:153-156)
+- [x] `forge.profile.validate` `--id` flag filters to a single profile when present (evidence: packages/forge/src/onboarding/profile-validate.ts:40,83)
+- [x] Unit tests for each command's domain-aware and fallback paths (evidence: packages/forge/src/tests/profile-validate.test.ts, packages/forge/src/tests/workspace-discovery-domain.test.ts, packages/forge/src/tests/doctor-domain.test.ts — 16 tests, 405 total pass)
+- [x] `packages/forge/AGENTS.md` updated (evidence: packages/forge/AGENTS.md:16,114-121)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0640` — OK, 1 RFC passed)
 
 ## Implementation notes for agents
 
