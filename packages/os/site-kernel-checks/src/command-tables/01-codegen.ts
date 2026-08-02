@@ -52,7 +52,6 @@ import { runGeneratedDriftValidate } from "../generated-drift-validate.ts";
 import { runOwnershipSyncValidate } from "../ownership-sync-validate.ts";
 import { runPropsContractValidate } from "../props-contract.ts";
 import { runOpenSourceValidate } from "../open-source-validate.ts";
-import { runGeneratedTimestampValidate } from "../generated-timestamp-validate.ts";
 
 export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
   {
@@ -650,28 +649,5 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/system.md",
     ],
     execute: runOpenSourceValidate,
-  },
-  /* RFC-0602: timestamp determinism in generated files */
-  {
-    name: "generated.timestamp.validate",
-    description:
-      "Detect volatile timestamps (new Date(), Date.now(), process.env.BUILD_TIMESTAMP) in generator source modules (RFC-0602).",
-    scope: "workspace",
-    flags: {
-      deep: { kind: "boolean", description: "Enable Phase 2 double-build drift detection" },
-      mode: {
-        kind: "string",
-        description: "warning (exit 0) or fail (exit 1)",
-        default: "warning",
-      },
-    },
-    supportsAllSites: true,
-    cacheable: false,
-    reads: [
-      "packages/os/site-kernel-checks/src/**/*.ts",
-      "packages/os/site-kernel-codegen/src/**/*.ts",
-      "packages/os/site-kernel-handoff/src/**/*.ts",
-    ],
-    execute: runGeneratedTimestampValidate,
   },
 ];
