@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -36,6 +37,7 @@ related:
 satisfies:
   - DNA-46
   - DNA-52
+  - DNA-59
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -55,10 +57,9 @@ packagesImpacted:
   - "@warpgogol/site-kernel-checks"
   - "@warpgogol/site-kernel-handoff"
 successSignals:
-  - "R2 bucket axiom-evidence contains timestamped run objects for every mission.check execution"
-  - "R2 Data Catalog table axiom_evidence_runs is queryable via R2 SQL"
-  - "evidence-metadata.json includes runTimestamp field"
-  - "Lifecycle rule transitions raw/ objects to Infrequent Access after 7 days"
+  - "evidence-metadata.json includes runTimestamp field in ISO 8601 UTC filesystem-safe format"
+  - "mission.check accepts optional --run-timestamp flag for explicit timestamp specification"
+  - "R2 bucket layout, lifecycle rules, and Data Catalog schema documented in packages/os/site-kernel-handoff/AGENTS.md"
 nonGoals:
   - "Does not define the evidence.sync or evidence.fetch commands — those are RFC-0651"
   - "Does not integrate evidence sync into mission.close or leitstand.dev-deploy — that is RFC-0652"
@@ -89,7 +90,7 @@ nonGoals:
 
 ## Context
 
-`mission.check` (RFC-0629, RFC-0630) generates Axiom evidence artifacts in `missions/{mission}/evidence/axiom/` on each run: `study-run.json` (~6 MB), `observation-bundle.json` (~7 MB), `staged-capsule.json` (~60 KB), `evidence-metadata.json` (~43 B), `report.html` (~5 MB), and `raw/` (~153 MB screenshots + axe JSON). Total per run: ~172 MB.
+`mission.check` (RFC-0629, RFC-0630) generates Axiom evidence artifacts in `missions/{mission}/evidence/axiom/` on each run: `study-run.json` (~6 MB), `observation-bundle.json` (~7 MB), `staged-capsule.json` (~60 KB), `evidence-metadata.json` (~43 B), and `raw/` (~153 MB screenshots + axe JSON). Additionally, `axiom.report` (RFC-0633) generates `report.html` (~5 MB) in the same directory after `mission.check` completes — `leitstand.dev-deploy` auto-invokes it. Total per run: ~172 MB.
 
 These artifacts are **ephemeral**:
 
