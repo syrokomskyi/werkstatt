@@ -117,7 +117,7 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 - **Not in any pipeline** — operator-only, never automated. Agents MUST NOT run `bordbuch.repair` proactively — only when `bordbuch.validate` reports `orphan-mission-close` violations.
 - Uses RFC-0362 lock primitives (`system:<id>` and `bordbuch:<id>` lock scopes) to prevent concurrent repair or append operations.
 
-## Bordbuch projection auto-commit (RFC-0626)
+## Bordbuch projection auto-commit (RFC-0626, RFC-0646)
 
 `bordbuch.commit` is an internal pipeline step that auto-commits dirty bordbuch projection files in the cache clone after `bordbuch.generate` runs in `build.prepare`. It eliminates the mission workflow friction where uncommitted bordbuch projections in the cache clone blocked `mission.close` and `release.prepare`.
 
@@ -127,6 +127,7 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 - **No locks:** pipeline runs sequentially — `bordbuch.generate` has already released locks by the time `bordbuch.commit` runs.
 - **Commit message:** `chore: bordbuch projections from build.prepare`.
 - **Non-mission `build.prepare`:** when `resolveCachePath` fails (no cache clone), the command is a no-op.
+- **Retry resilience (RFC-0646):** `bordbuch.commit` retries transient git failures (lock contention, timeout) up to 2 times with 12s and 60s backoff before failing the pipeline step. All `gitExec` calls in `commitBordbuchProjections` use `gitExecWithRetry` from `werkstatt/git-exec.ts`. Non-transient errors (missing repo, permissions) throw immediately without retry.
 
 ## Werkstatt side-effect auto-commit (RFC-0580)
 
