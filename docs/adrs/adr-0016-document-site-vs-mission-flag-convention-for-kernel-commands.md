@@ -5,13 +5,13 @@ title: "Document --site vs --mission flag convention for kernel commands"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: implemented
 scope: workspace
 decider: architecture
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
-implementedAt:
-closedAt:
+implementedAt: 2026-08-02
+closedAt: 2026-08-02
 supersedes: []
 supersededBy:
 related:
