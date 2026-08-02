@@ -143,6 +143,14 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// RFC-0649: Result of CDN freshness verification.
+export interface FreshnessResult {
+  verified: boolean;
+  cdnDistTreeHash: string | null;
+  localDistTreeHash: string;
+  error?: string;
+}
+
 // RFC-0649: Verify CDN freshness by fetching build-identity.json from the CDN URL
 // and comparing distTreeHash against the local build-identity. Single fetch, no retry.
 async function verifyFreshness(
@@ -408,13 +416,6 @@ function buildLastPropagatedEntry(
 }
 
 // §5.0: leitstand.dev-deploy (RFC-0628: workpiece-based dev deploy with Axiom verification gate)
-export interface FreshnessResult {
-  verified: boolean;
-  cdnDistTreeHash: string | null;
-  localDistTreeHash: string;
-  error?: string;
-}
-
 export interface DevDeployResult {
   command: "leitstand.dev-deploy";
   systemId: string;
@@ -695,7 +696,7 @@ export async function runLeitstandDevDeploy(
         localDistTreeHash: distTreeHash,
         error: `CDN purge failed: ${purgeResult.error ?? "unknown error"}`,
       };
-      logger.error(
+      logger.warn(
         `[leitstand.dev-deploy] CDN purge failed — Axiom gate not run: ${purgeResult.error ?? "unknown error"}`,
       );
       return {
@@ -727,7 +728,7 @@ export async function runLeitstandDevDeploy(
     // RFC-0649: Verify CDN freshness — fetch build-identity.json from CDN URL and compare distTreeHash.
     freshness = await verifyFreshness(channelConfig.url, distTreeHash);
     if (!freshness.verified) {
-      logger.error(
+      logger.warn(
         `[leitstand.dev-deploy] freshness check failed — Axiom gate not run: ${freshness.error}`,
       );
       return {
