@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-02
 updatedAt: 2026-08-02
+enhancedAt: 2026-08-02
 implementedAt:
 closedAt:
 supersedes: []
@@ -154,7 +155,7 @@ pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --force-bu
   reads: [
     "<app>/src/content/system.md",
     "<app>/src/content/**/*.md",
-    "packages/ontology/site-families/**/*.yaml",
+    "packages/ontology/biomes/**/*.yaml",
   ],
   writes: [
     "<app>/public/preview/**",
@@ -228,7 +229,9 @@ interface DevDeployBuildCache {
 | `<app>/public/og-image.png` | Ultimate fallback OG image — written by `preview.images.generate` |
 | `<app>/.cache/pdf/` | PDF content-addressed cache — written by `print.pdf.generate`, persists between builds |
 | `<app>/dist/client/_print/` | PDF deployment target — written by `print.pdf.copy`, wiped by `astro build` |
-| `missions/<missionId>/.dev-deploy-build-cache.json` | Build-skip cache for `leitstand.dev-deploy` |
+| `missions/<missionId>/.dev-deploy-build-cache.json` | Build-skip cache for `leitstand.dev-deploy` (gitignored, ephemeral) |
+| `.gitignore` (monorepo root) | Add `missions/*/.dev-deploy-build-cache.json` entry |
+| `<app>/.gitignore` | Add `.cache/pdf/` entry (workpiece-level) |
 | `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` | `preview.images.generate` metadata |
 | `packages/os/site-kernel-checks/src/command-tables/22-print.ts` | `print.pdf.generate` + `print.pdf.copy` metadata |
 | `packages/os/site-kernel-checks/src/print-pdf.ts` | `print.pdf.generate` implementation (output dir change) |
@@ -339,10 +342,12 @@ Before the `pnpm build` call (after `computeBuildInputHash` and `commitSha` capt
 - **Stale `dist/` on skip-build**: If `dist/` is modified externally between dev-deploy runs, the skip uses the stale `dist/`. Mitigation: `--force-build` flag; Axiom gate and CDN freshness check run after deploy.
 - **`preview.images.generate` cache hit with deleted PNGs**: RFC-0390 cache skips the command when content is unchanged, even if PNGs were manually deleted. Mitigation: `--force` on pipeline; same risk profile as existing cacheable media commands.
 - **`print.pdf.generate` cache hit with deleted `.cache/pdf/`**: Same pattern — cache skips, `print.pdf.copy` finds nothing to copy. Mitigation: `--force` on pipeline.
-- **`dist/client/**/*.html` non-determinism**: If `astro build` produces non-deterministic HTML (e.g., randomized IDs, timestamps in HTML), `print.pdf.generate` cache would always miss. In practice, Astro produces deterministic HTML from deterministic content — asset hashes are content-derived.
+- **`dist/client/**/*.html` non-determinism**: If `astro build` produces non-deterministic HTML (e.g., randomized IDs, timestamps in HTML), `print.pdf.generate` cache would always miss. In practice, Astro produces deterministic HTML from deterministic content — asset hashes are content-derived. This pattern is already used by `behavior.snapshot.generate`, `sitemap.generate`, `fonts.origin.validate`, and many other cacheable commands that read `dist/client/**/*.html`.
 - **Agent misinterpretation**: Agents might assume `print.pdf.generate` writes directly to `dist/client/_print/` (as it did before this RFC). The `writes` metadata and command description must clearly state the `.cache/pdf/` output directory. `print.pdf.copy` is the bridge to `dist/`.
 - **Performance**: `print.pdf.copy` adds ~1s to `build.post` on every run. This is negligible compared to the ~120s saved by skipping `print.pdf.generate` on cache hits.
 - **Maintenance burden**: One new command (`print.pdf.copy`) and one new pipeline step. The `.cache/pdf/` directory follows the same pattern as `.cache/video/` — no new maintenance patterns.
+- **`GENERATOR_OWNERSHIP_MAP`**: `print.pdf.generate` and `print.pdf.copy` do NOT need entries in `GENERATOR_OWNERSHIP_MAP`. The ownership registry tracks `public/` files; `.cache/pdf/` and `dist/client/_print/` are outside `public/` and are not scanned by `ownership.sync.validate` or `generated.stale.validate`.
+- **`--force-build` vs `--force` interaction**: `--force-build` bypasses ONLY the build-skip cache in `leitstand.dev-deploy`. It does NOT bypass the RFC-0390 pipeline cache for `preview.images.generate` and `print.pdf.generate` (those run inside `pnpm build` → `astro build` → kernel pipeline). To force a fully fresh build with no RFC-0390 caching, the operator must run `site-kernel pipeline build.prepare --force` and `site-kernel pipeline build.post --force` separately, or clear the cache via `kernel.cache.clear --namespace command_results`.
 
 ## Acceptance criteria
 
