@@ -180,13 +180,16 @@ The reconcile command output includes the auto-commit result:
   "command": "mission.reconcile",
   "status": "ok",
   "data": {
-    "cacheCloneHead": "9d34a6b5",
-    "commitsMerged": 11,
-    "bordbuchConflictsAutoResolved": 3,
+    "missionId": "warpgogol-com-m000024",
+    "systemId": "warpgogol-com",
+    "commitSha": "9d34a6b5",
+    "preReconcileSha": "7c12a3f0",
+    "reconciledAt": "2026-08-02T10:00:00.000Z",
+    "autoResolvedPaths": ["bordbuch/release.json"],
     "workpieceAutoCommitted": true,
     "workpieceCommitSha": "8d25d61"
   },
-  "summary": "[mission.reconcile] <missionId> reconciled (9d34a6b5, 11 commits merged, 3 bordbuch conflicts auto-resolved, workpiece auto-committed 8d25d61)"
+  "summary": "[mission.reconcile] warpgogol-com-m000024 reconciled (9d34a6b5, 11 commits merged, 1 bordbuch conflict auto-resolved, workpiece auto-committed 8d25d61)"
 }
 ```
 
@@ -230,9 +233,9 @@ When the workpiece was clean:
 ## Acceptance criteria
 
 - [x] `commitWorkpieceIfDirty` helper implemented in `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts` (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:286-315`)
-- [x] `runMissionReconcile` calls `commitWorkpieceIfDirty` before `git fetch` from workpiece (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:896-901`)
+- [x] `runMissionReconcile` calls `commitWorkpieceIfDirty` before `git fetch` from workpiece (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:900-905`)
 - [x] Helper is idempotent — clean workpiece produces no commit (evidence: `packages/os/site-kernel-handoff/src/mission/mission-git-commit.ts:290-293`)
-- [x] Reconcile output includes `workpieceAutoCommitted` and `workpieceCommitSha` fields (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:807-808,1180-1181`)
+- [x] Reconcile output includes `workpieceAutoCommitted` and `workpieceCommitSha` fields (evidence: `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:811-812,1184-1185`)
 - [x] Unit test: dirty workpiece → auto-commit created, reconcile proceeds (evidence: `packages/os/site-kernel-handoff/src/mission/rfc-0644-workpiece-auto-commit.test.ts:47-64`)
 - [x] Unit test: clean workpiece → no auto-commit, reconcile proceeds (evidence: `packages/os/site-kernel-handoff/src/mission/rfc-0644-workpiece-auto-commit.test.ts:67-75`)
 - [x] `mission.validate` passes after implementation (evidence: `pnpm --filter @warpgogol/site-kernel-handoff run test` — 491/491 tests pass)
