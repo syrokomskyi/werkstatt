@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 685. Raw manifest entries: 1234.
+Generated command rows: 689. Raw manifest entries: 1240.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -216,6 +216,7 @@ Generated command rows: 685. Raw manifest entries: 1234.
 | `dist.content-references.validate` | site:warpgogol-com, workspace | app | no | no | Scan every .html under apps/<id>/dist for residual {collection.file.field} brace tokens that were not resolved at render time (RFC-0187). |
 | `dist.generated-marker.strip` | site:warpgogol-com, workspace | app | yes | no | Post-build cleanup: remove the RFC-0081 GENERATED_MARKER from every text artifact under apps/<id>/dist/client (RFC-0185). |
 | `dist.generated-marker.validate` | site:warpgogol-com, workspace | app | no | no | Post-build guard: fail if any text artifact under apps/<id>/dist/client still contains the RFC-0081 GENERATED_MARKER (RFC-0185). |
+| `dist.html-structure.validate` | site:warpgogol-com, workspace | app | no | no | Post-build guard: check tag balance for structural non-void HTML elements in dist/client. Fails on mismatched open/close counts (RFC-0654). |
 | `dist.sitemap.images.generate` | site:warpgogol-com, workspace | app | no | no | Harvest rendered dist/client HTML for each page's lead/content image and write dist/client/sitemap-images.xml. Post-build (RFC-0172). |
 | `dist.sitemap.images.validate` | site:warpgogol-com, workspace | app | no | no | Validate the content-image contract over rendered HTML: exactly one content image per page, absolute URLs, no synthetic previews, and an up-to-date sitemap-images.xml (RFC-0172). |
 | `dna.registry.validate` | site:warpgogol-com, workspace | workspace | no | no | Keep the canonical DNA registry (docs/architecture-dna.md) in sync with the RFCs that establish invariants (RFC-0158). |
@@ -240,6 +241,8 @@ Generated command rows: 685. Raw manifest entries: 1234.
 | `escalation.budget.validate` | site:warpgogol-com, workspace | app | no | no | Validate escalation budget exhaustion, mandatory feedback, and near-zero L4 human-minute constraints (RFC-0285). |
 | `escalation.queue.report` | site:warpgogol-com, workspace | app | yes | no | Report open human escalations and human-minutes-per-1000-pages KPI (RFC-0285). |
 | `escalation.route` | site:warpgogol-com, workspace | app | yes | no | Route a typed human escalation into the append-only escalation queue (RFC-0285). |
+| `evidence.fetch` | workspace | workspace | no | no | RFC-0651: download a historical evidence run from R2 to a local directory, or list available runs via ListObjectsV2. Uses --run-timestamp to select a run, --output-dir to specify the download location, --no-raw to skip raw/ artifacts, --list to list available runs. Failure modes: MISSING_ENV, NOT_FOUND, R2_LIST_ERROR. |
+| `evidence.sync` | workspace | workspace | no | no | RFC-0651: upload all evidence artifacts from missions/{mission}/evidence/axiom/ to R2 under {systemId}/{missionId}/{runTimestamp}/ key prefix. Reads runTimestamp from evidence-metadata.json (or --run-timestamp flag). Supports --dry-run. Failure modes: MISSING_ENV, NOT_FOUND, INVALID_EVIDENCE, R2_UPLOAD_ERROR. |
 | `family.contract.validate` | site:warpgogol-com, workspace | workspace | no | no | Validate packages/ontology/site-families/<id>/family.yaml contracts, companion files, and recipe references (RFC-0071). |
 | `family.list` | site:warpgogol-com, workspace | workspace | no | no | List all site-family entries and their detection signals for onboarding workflows (RFC-0071). |
 | `faq.validate` | site:warpgogol-com, workspace | app | no | no | Validate the canonical FAQ entry contract (slug, question, answer, order, tags, governance). No-op pass when the app has no FAQ directory (RFC-0475). |
@@ -481,12 +484,13 @@ Generated command rows: 685. Raw manifest entries: 1234.
 | `plan.archive` | workspace | workspace | yes | no | Move plan files whose parent RFC has terminal status (implemented, rejected, superseded) into docs/plans/archive/<status>/ subdirectories. Bidirectional: moves non-terminal files found in subdirectories back to root. Use --dry-run to preview. Use --status to filter to a single terminal status. Prefer the docs.archive umbrella command unless you need to archive only plans. |
 | `planet.import-paths.lint` | site:warpgogol-com, workspace | workspace | no | no | Validate derived planetImportPaths and blockTypeToCosmicName in the archetype registry against on-disk UI manifest files (RFC-0091). |
 | `platform.consistency.validate` | workspace | workspace | no | no | Validate that platformSemanticHash drift is accompanied by a version bump, and that versionBump RFCs correspond to actual version changes (RFC-0478). |
-| `playwright.chromium.ensure` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0647: Ensure Playwright Chromium is installed. Launches Chromium to verify; auto-installs if missing and PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is not set. Used by build.post pipeline (step 0) and mission.materialize. |
+| `playwright.chromium.ensure` | site:warpgogol-com, workspace | workspace | no | no | RFC-0647: Ensure Playwright Chromium is installed. Launches Chromium to verify; auto-installs if missing and PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is not set. Used by build.post pipeline (step 0) and mission.materialize. |
 | `preview.images.generate` | site:warpgogol-com, workspace | app | no | no | Generate build-time static PNG OG preview images for missing pages, using preset template layouts from site-kernel-checks. |
 | `preview.images.validate` | site:warpgogol-com, workspace | app | no | no | Validate every routable page resolves an OG preview image, using page-specific output or fallbacks, ensuring public/og-image.png is present. |
 | `print.contract.validate` | site:warpgogol-com, workspace | app | no | no | Validate page print frontmatter and site print labels against the RFC-0257 content contract (PRINT-CONTRACT-01..07). |
 | `print.layout.validate` | site:warpgogol-com, workspace | app | no | no | Static analysis of shared UI CSS for print-blocking patterns (PRINT-LAYOUT-01..06). Runs in build.check. |
-| `print.pdf.generate` | site:warpgogol-com, workspace | app | yes | no | Generate PDFs from the built static site using Playwright Chromium. Writes to dist/client/_print/<lang>/<path>.pdf. Skips existing PDFs unless --force. Exits early when output.printPdf is not true (RFC-0257). |
+| `print.pdf.copy` | site:warpgogol-com, workspace | app | no | no | Copy generated PDFs from .cache/pdf/ to dist/client/_print/. Runs in build.post after print.pdf.generate. Not cacheable — always executes to restore PDFs into freshly-built dist/. |
+| `print.pdf.generate` | site:warpgogol-com, workspace | app | yes | no | Generate PDFs from the built static site using Playwright Chromium. Writes to .cache/pdf/<hash>/ (RFC-0653). Use print.pdf.copy to copy PDFs into dist/client/_print/. Exits early when output.printPdf is not true (RFC-0257). |
 | `print.pdf.validate` | site:warpgogol-com, workspace | app | no | no | Verify that every expected PDF file exists and is non-empty in dist/client/_print/ (PRINT-PDF-01..02). Runs in build.post after generation. |
 | `props.contract.validate` | site:warpgogol-com, workspace | workspace | no | no | RFC-0262: validate every packages/ui manifest's generated types file is present, marker-carrying, and fresh (PROPS-01); validate any manifest `example` block against its own propsSchema (PROPS-02). |
 | `props.types.generate` | site:warpgogol-com, workspace | workspace | yes | no | RFC-0262: generate <id>.types.generated.ts next to every packages/ui manifest with a propsSchema/propsSchemaCompose (marker + sourceHash, idempotent). The manifest propsSchema is the only authored prop contract. |
