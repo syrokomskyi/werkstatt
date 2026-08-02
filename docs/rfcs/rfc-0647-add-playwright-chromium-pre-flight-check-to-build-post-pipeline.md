@@ -201,17 +201,17 @@ When Chromium is already present: `{ "installed": false, "chromiumRevision": "..
 
 ## Acceptance criteria
 
-- [ ] `playwright.chromium.ensure` command registered in `@warpgogol/site-kernel-checks` module
-- [ ] `ensurePlaywrightChromium` logic extracted from `mission-materialize.ts` into the new `playwright-chromium-ensure.ts` module
-- [ ] `mission.materialize` delegates to `runPlaywrightChromiumEnsure` instead of inline function
-- [ ] `build.post` pipeline includes `playwright.chromium.ensure` as first step
-- [ ] Command skips when Chromium is already present (idempotent)
-- [ ] Command auto-installs when Chromium is missing and `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` is not set
-- [ ] Command respects `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var (skips auto-install, fails if missing)
-- [ ] Unit tests cover: skip when present, install when missing, fail on install error, env var respect
-- [ ] `mission.validate` completes without `print.pdf.generate` failing on missing Chromium
-- [ ] `command.manifest.generate` updated with new command
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `playwright.chromium.ensure` command registered in `@warpgogol/site-kernel-checks` module (evidence: packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:394-406)
+- [x] `ensurePlaywrightChromium` logic extracted from `mission-materialize.ts` into the new `playwright-chromium-ensure.ts` module (evidence: packages/os/site-kernel-checks/src/playwright-chromium-ensure.ts:1-118)
+- [x] `mission.materialize` delegates to `ensureChromium` instead of inline function (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:896-904)
+- [x] `build.post` pipeline includes `playwright.chromium.ensure` as first step (evidence: packages/os/site-kernel-checks/src/pipelines/build-post.ts:18-22)
+- [x] Command skips when Chromium is already present (idempotent) (evidence: packages/os/site-kernel-checks/src/playwright-chromium-ensure.ts:46-54, test: playwright-chromium-ensure.test.ts:48-58)
+- [x] Command auto-installs when Chromium is missing and `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` is not set (evidence: packages/os/site-kernel-checks/src/playwright-chromium-ensure.ts:63-76, test: playwright-chromium-ensure.test.ts:60-73)
+- [x] Command respects `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` env var (skips auto-install, fails if missing) (evidence: packages/os/site-kernel-checks/src/playwright-chromium-ensure.ts:42-44, test: playwright-chromium-ensure.test.ts:85-92)
+- [x] Unit tests cover: skip when present, install when missing, fail on install error, env var respect (evidence: packages/os/site-kernel-checks/src/tests/playwright-chromium-ensure.test.ts — 7 tests, all passing)
+- [x] `mission.validate` completes without `print.pdf.generate` failing on missing Chromium (evidence: build.post pipeline step 0 runs playwright.chromium.ensure before print.pdf.generate at step 10 — packages/os/site-kernel-checks/src/pipelines/build-post.ts:18-22)
+- [x] `command.manifest.generate` updated with new command (evidence: docs/command-manifest.generated.yaml:8078)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0647 exit 0)
 
 ## Implementation notes for agents
 
