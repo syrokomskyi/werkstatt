@@ -263,6 +263,62 @@ test("leitstand.dev-deploy does not write to registry or bordbuch", async () => 
   expect(existsSync(bordbuchDir)).toBe(false);
 }, 15_000);
 
+// --- RFC-0653: build-skip cache tests ---
+
+test("RFC-0653: leitstand.dev-deploy writes build-skip cache after successful build", async () => {
+  const systemId = "test-sys";
+  const missionId = "test-sys-m000001";
+
+  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createWorkpieceDist(tmpDir, missionId);
+
+  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+
+  const cachePath = join(tmpDir, "missions", missionId, ".dev-deploy-build-cache.json");
+  expect(existsSync(cachePath)).toBe(true);
+  const cache = JSON.parse(readFileSync(cachePath, "utf-8"));
+  expect(cache.commitSha).toBe("abc123def456");
+  expect(cache.platformVersion).toBeDefined();
+  expect(cache.platformSemanticHash).toBeDefined();
+}, 15_000);
+
+test("RFC-0653: leitstand.dev-deploy skips build on cache hit", async () => {
+  const systemId = "test-sys";
+  const missionId = "test-sys-m000001";
+
+  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createWorkpieceDist(tmpDir, missionId);
+
+  // First run — writes cache
+  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+
+  // Second run — should skip build
+  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const data = result.data as Record<string, unknown> | undefined;
+  expect(data?.buildSkipped).toBe(true);
+  expect(data?.buildState).toBe("succeeded");
+}, 15_000);
+
+test("RFC-0653: leitstand.dev-deploy --force-build bypasses cache", async () => {
+  const systemId = "test-sys";
+  const missionId = "test-sys-m000001";
+
+  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  createWorkpieceDist(tmpDir, missionId);
+
+  // First run — writes cache
+  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+
+  // Second run with --force-build — should NOT skip
+  const result = await runLeitstandDevDeploy(
+    makeInput({ system: systemId, "force-build": "true" }),
+    makeContext(tmpDir),
+  );
+  const data = result.data as Record<string, unknown> | undefined;
+  expect(data?.buildSkipped).toBe(false);
+  expect(data?.buildState).toBe("succeeded");
+}, 15_000);
+
 // --- leitstand.propagate Axiom gate tests (RFC-0628: published + commitSha + missionId) ---
 
 test("leitstand.propagate rejects release not in published state", async () => {
