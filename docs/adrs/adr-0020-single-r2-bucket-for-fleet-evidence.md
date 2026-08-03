@@ -1,12 +1,12 @@
 ---
 id: ADR-0020
 title: "Use a single R2 bucket for fleet-wide evidence archiving"
-status: proposed
+status: implemented
 scope: workspace
 decider: architecture
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
-implementedAt:
+implementedAt: 2026-08-03
 closedAt:
 supersedes: []
 supersededBy:
