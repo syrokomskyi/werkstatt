@@ -51,12 +51,14 @@ commands:
   changed:
     - mission.check
     - leitstand.propagate
-    - leitstand.dev-deploy
     - axiom.report
   removed: []
 appsImpacted:
   - warpgogol-com
 # List only packages actually impacted. Leave empty if unknown.
+# NOTE: @syrokomskyi/* are external npm packages, not Werkstatt packages/*
+# workspaces. They require a coordinated upstream release of runActiveMethodologies
+# before this RFC can be fully implemented. Listed for traceability only.
 packagesImpacted:
   - "@warpgogol/site-kernel-checks"
   - "@warpgogol/site-kernel-handoff"
@@ -118,7 +120,7 @@ Additionally, `mission-check.ts` violates the separation of concerns between Wer
 
 ## Decision
 
-The Werkstatt gains a workspace-level methodologies configuration file (`systems/methodologies.md`) with three frontmatter sections — `instruments`, `methodologies`, and `gate` — that declares all active Axiom methodologies, their instrument parameters, and the gate aggregation rule. `mission.check` reads this config and delegates capture + instrument execution + finding projection to the external Axiom package, receiving a combined study-run. `leitstand.propagate` enforces a per-methodology gate: each methodology declares `blockOn` severity levels, and the gate fails if any active methodology has violations at or above its `blockOn` threshold. A new `methodologies.validate` command validates the config file and runs in `build.check`.
+The Werkstatt gains a workspace-level methodologies configuration file (`systems/methodologies.md`) with three frontmatter sections — `instruments`, `methodologies`, and `gate` — that declares all active Axiom methodologies, their instrument parameters, and the gate aggregation rule. `mission.check` reads this config and delegates capture + instrument execution + finding projection to the external Axiom package, receiving a combined study-run. `leitstand.propagate` enforces a per-methodology gate: each methodology declares `blockOn` severity levels, and the gate fails if any active methodology has violations at or above its `blockOn` threshold. A new `methodologies.validate` command validates the config file and runs in the workspace-scoped `packages-check.run` pipeline.
 
 ## Architectural fit
 
@@ -128,6 +130,7 @@ The Werkstatt gains a workspace-level methodologies configuration file (`systems
 - **RFC-0627**: Established the dev-deploy → Axiom gate → propagate pipeline. This RFC extends the gate to be multi-methodology.
 - **RFC-0633**: `axiom.report` generates HTML triage reports. This RFC extends the report to show a gate summary (pass/fail per methodology) and group findings by methodology.
 - **Site OS operator model**: `methodologies.validate` is a workspace-scoped command in `site-kernel-checks`. `mission.check` and `leitstand.propagate` are existing commands that gain config-reading behavior. The config file lives at `systems/methodologies.md` alongside `systems/registry.yaml`.
+- **`leitstand.dev-deploy`**: No code change needed — `dev-deploy` calls `mission.check` via `executeKernelCommand` (`packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:869-877`). When `mission.check` reads the config internally, `dev-deploy` automatically benefits. Listed in `commands.changed` in earlier drafts but removed: the contract boundary is `mission.check` owns config reading; `dev-deploy` is a caller.
 
 ## Design
 
@@ -356,13 +359,13 @@ export async function runActiveMethodologies(
 
 ### Gate logic in `leitstand.propagate`
 
-1. Read `evidence-metadata.json` — extract `methodologies[]` array.
+1. Read `evidence-metadata.json` — extract `methodologies[]` array. If `methodologies[]` is absent (pre-RFC-0665 evidence), reject with `"Evidence predates RFC-0665 (no methodologies[] field). Re-run leitstand.dev-deploy to generate current evidence."` Exit code 1.
 2. For each methodology in `methodologies[]`:
    - Filter `study-run.json` findings where `finding.methodologyId === methodology.id`.
    - Filter findings where `finding.severity` is in `methodology.blockOn`.
    - If any findings remain, gate fails with `"Axiom verification failed: methodology '{id}' has {N} block-on violation(s)"`.
 3. If `gate.requireEvidence` is true, verify each active methodology has at least one finding or one observation in the study-run.
-4. If `gate.minCoverage < 1.0`, verify the ratio of covered pages to discovered pages meets the threshold per methodology.
+4. If `gate.minCoverage < 1.0`, verify the ratio of covered pages to discovered pages meets the threshold per methodology. Coverage formula: `coveredPages / discoveredPages` where `coveredPages` is the count of discovered URLs that produced at least one observation for the methodology. `discoveredPages` is the total count from the capture contract's discovery ledger.
 5. Incomplete findings (e.g., `accessibility.axe.incomplete`) do not block the gate — they are instrument limitations, not confirmed violations.
 
 ### Failure modes
@@ -377,12 +380,14 @@ export async function runActiveMethodologies(
 ## Rollout
 
 - **Config is mandatory**: `systems/methodologies.md` must exist for `mission.check` to run. No silent default.
-- **Migration for warpgogol-com**: Create `systems/methodologies.md` with all 8 methodologies, `visual-regression` set to `active: false` (requires baseline screenshots not yet available). Other 7 set to `active: true` with appropriate `blockOn` thresholds.
-- **External Axiom package**: `runActiveMethodologies` function added to `@syrokomskyi/axiom-methodology` (or a new orchestration package). This is an external package change, not a Werkstatt change — the RFC defines the contract.
+- **Migration for existing systems**: As part of implementation, create `systems/methodologies.md` for each existing system (warpgogol-com, nicaragua-projekt, etc.) with all 8 methodologies, `visual-regression` set to `active: false` (requires baseline screenshots not yet available). Other 7 set to `active: true` with appropriate `blockOn` thresholds. Use `methodologies.validate` to verify each config before committing.
+- **External Axiom package**: `runActiveMethodologies` function added to `@syrokomskyi/axiom-methodology` (or a new orchestration package). This is an external package change, not a Werkstatt change — the RFC defines the contract. The external package must ship before Werkstatt implementation lands. Staging: (1) external package releases `runActiveMethodologies`, (2) Werkstatt implementation lands in a single PR.
 - **mission.check refactoring**: Remove direct imports of `extractAxeResult`, `runAccessibilityInstrument`, `createAutomatedWebAccessibilityMethodology`, `findingsForObservation`. Replace with `runActiveMethodologies` call.
-- **methodologies.validate**: Added to `build.check` pipeline for all systems.
-- **axiom.report**: Extended to read `methodologies[]` from `evidence-metadata.json` and render gate summary + per-methodology sections.
-- **New sites**: `onboarding.scaffold` creates `systems/methodologies.md` with all 8 methodologies (visual-regression `active: false` by default).
+- **methodologies.validate**: Workspace-scoped command. Added to the `packages-check.run` pipeline (workspace-scoped), NOT to the site-scoped `build.check` pipeline. Invoked via `site-kernel pipeline packages-check.run` or as a standalone `site-kernel run methodologies.validate`.
+- **axiom.report**: Extended to read `methodologies[]` from `evidence-metadata.json` and render gate summary + per-methodology sections. If `methodologies[]` is absent (pre-RFC-0665 evidence), the report gracefully degrades to the old single-methodology format with a warning.
+- **New sites**: `onboarding.scaffold` checks if `systems/methodologies.md` already exists. If it exists, skip creation (workshop-level config is shared across all systems). If it does not exist (first system), create it with all 8 methodologies (visual-regression `active: false` by default).
+- **Backward compatibility for existing evidence**: Releases published before this RFC have evidence files without `methodologies[]`. `leitstand.propagate` rejects pre-RFC-0665 evidence with a clear message directing the operator to re-run `leitstand.dev-deploy`. This is forward-only — old evidence is not silently accepted.
+- **Phased activation recommendation**: Activating 7 methodologies simultaneously may surface many new findings. Operators are advised to start with 2-3 methodologies (accessibility + runtime-health + security-headers) and add more as findings are resolved. The config file allows per-methodology `active: false` during transition. No `warn-only` mode is added — the gate is binary (pass/fail) by design.
 
 ## Alternatives considered
 
@@ -408,7 +413,7 @@ export async function runActiveMethodologies(
 
 - [ ] `systems/methodologies.md` exists with `instruments`, `methodologies`, and `gate` sections
 - [ ] `methodologies.validate` command registered and passes on the config file
-- [ ] `methodologies.validate` integrated into `build.check` pipeline
+- [ ] `methodologies.validate` integrated into the `packages-check.run` pipeline (workspace-scoped)
 - [ ] `mission.check` reads `systems/methodologies.md` and delegates to `runActiveMethodologies`
 - [ ] `mission.check` no longer imports `extractAxeResult`, `runAccessibilityInstrument`, `createAutomatedWebAccessibilityMethodology`, or `findingsForObservation` directly
 - [ ] `evidence-metadata.json` contains `methodologies[]` with `id`, `digest`, and `blockOn` for each active methodology
@@ -416,7 +421,9 @@ export async function runActiveMethodologies(
 - [ ] `leitstand.propagate` fails with a clear message when an active methodology has violations at or above its `blockOn` threshold
 - [ ] `leitstand.propagate` does not fail on `incomplete` findings (instrument limitations)
 - [ ] `axiom.report` renders gate summary (pass/fail per methodology) followed by findings grouped by methodology
-- [ ] `onboarding.scaffold` creates `systems/methodologies.md` with all 8 methodologies (visual-regression `active: false`)
+- [ ] `onboarding.scaffold` creates `systems/methodologies.md` if it does not exist (first system), skips if it exists (workshop-level config)
+- [ ] `leitstand.propagate` rejects pre-RFC-0665 evidence (missing `methodologies[]`) with a clear message
+- [ ] `axiom.report` gracefully degrades to old format when `methodologies[]` is absent
 - [ ] `AGENTS.md` updated to document `systems/methodologies.md` and the per-methodology gate
 - [ ] `rfc.validate` passes on this file before merging
 
