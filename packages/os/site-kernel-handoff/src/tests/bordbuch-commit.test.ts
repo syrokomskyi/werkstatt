@@ -164,7 +164,7 @@ describe("commitBordbuchProjections", () => {
     const dashDashCount = parts.filter((p) => p === "--").length;
     expect(dashDashCount).toBe(1);
     expect(addCall).toBe(
-      "add -- bordbuch/status.generated.yaml public/.well-known/bordbuch.json public/.well-known/bordbuch/index.html",
+      'add -- "bordbuch/status.generated.yaml" "public/.well-known/bordbuch.json" "public/.well-known/bordbuch/index.html"',
     );
   });
 });

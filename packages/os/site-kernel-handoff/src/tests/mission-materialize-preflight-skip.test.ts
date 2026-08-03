@@ -106,7 +106,7 @@ test("preflight is skipped when state file HEAD matches cache clone HEAD", async
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionMaterialize(input, context);
@@ -127,7 +127,7 @@ test("preflight runs normally when state file is missing", async () => {
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionMaterialize(input, context);
@@ -161,7 +161,7 @@ test("preflight runs normally when state file HEAD does not match", async () => 
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionMaterialize(input, context);
@@ -183,7 +183,7 @@ test("preflight runs normally when state file is corrupt", async () => {
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionMaterialize(input, context);
@@ -218,7 +218,7 @@ test("--skip-preflight flag takes precedence over state file and does not consul
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionMaterialize(input, context);

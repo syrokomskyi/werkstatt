@@ -128,7 +128,7 @@ async function materializeAndGetWorkpiecePublic(): Promise<string> {
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
   } as unknown as KernelRuntimeContext;
 
   await runMissionMaterialize(input, context);
