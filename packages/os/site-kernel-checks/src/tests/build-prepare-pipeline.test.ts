@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0604: initial pipeline membership tests.</item>
   <item>RFC-0626: add bordbuch.commit pipeline membership tests.</item>
+  <item>RFC-0658: add bordbuch.validate pipeline membership tests.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -72,4 +73,25 @@ test("bordbuch.commit appears after bordbuch.generate and before passport.key.en
 
 test("bordbuch.commit is NOT in SITES_BUILD_PREPARE_DEV_PIPELINE", () => {
   expect(devCommands).not.toContain("bordbuch.commit");
+});
+
+// RFC-0658: bordbuch.validate pipeline membership tests
+
+test("bordbuch.validate is in SITES_BUILD_PREPARE_PIPELINE", () => {
+  expect(mainCommands).toContain("bordbuch.validate");
+});
+
+test("bordbuch.validate appears after bordbuch.generate and before bordbuch.commit", () => {
+  const generateIdx = mainCommands.indexOf("bordbuch.generate");
+  const validateIdx = mainCommands.indexOf("bordbuch.validate");
+  const commitIdx = mainCommands.indexOf("bordbuch.commit");
+  expect(generateIdx).toBeGreaterThan(-1);
+  expect(validateIdx).toBeGreaterThan(-1);
+  expect(commitIdx).toBeGreaterThan(-1);
+  expect(validateIdx).toBeGreaterThan(generateIdx);
+  expect(validateIdx).toBeLessThan(commitIdx);
+});
+
+test("bordbuch.validate is NOT in SITES_BUILD_PREPARE_DEV_PIPELINE", () => {
+  expect(devCommands).not.toContain("bordbuch.validate");
 });

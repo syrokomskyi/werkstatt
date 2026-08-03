@@ -1,0 +1,215 @@
+/*
+<MODULE_CONTRACT>
+  <purpose>RFC-0658: unit test verifying mission.close validates bordbuch before appending close event.</purpose>
+  <keywords>RFC-0658, mission.close, bordbuch, validate, defense-in-depth</keywords>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0658: initial test for bordbuch validation in mission.close.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { test, expect, beforeEach, afterEach, vi } from "vitest";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { execSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
+
+const mockState = vi.hoisted(() => ({
+  validateResult: {
+    data: null as Record<string, unknown> | null,
+    exitCode: 0,
+    summary: "",
+  },
+}));
+
+vi.mock("../mission/mission-materialization-commands.ts", () => ({
+  runMissionValidate: vi.fn(async () => mockState.validateResult),
+  runMissionMaterialize: vi.fn(),
+  runMissionMigrate: vi.fn(),
+  runMissionReconcile: vi.fn(),
+}));
+
+function gitInit(dir: string): void {
+  execSync("git init", { cwd: dir, stdio: "pipe" });
+  execSync("git config user.email test@test.com", { cwd: dir, stdio: "pipe" });
+  execSync("git config user.name Test", { cwd: dir, stdio: "pipe" });
+}
+
+function gitCommit(dir: string, msg: string): void {
+  execSync("git add -A", { cwd: dir, stdio: "pipe" });
+  execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd: dir, stdio: "pipe" });
+}
+
+let tmpWorkspace: string;
+
+beforeEach(() => {
+  tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-close-bordbuch-validate-"));
+  mockState.validateResult = {
+    data: {
+      missionId: "test-system-m000001",
+      contractFull: { passed: true, validators: [] },
+      build: { succeeded: true, routeCount: 5, sitemapHash: "abc" },
+    },
+    exitCode: 0,
+    summary: "Validation passed",
+  };
+});
+
+afterEach(() => {
+  rmSync(tmpWorkspace, { recursive: true, force: true });
+});
+
+function setupWorkspace(): void {
+  gitInit(tmpWorkspace);
+  writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
+  gitCommit(tmpWorkspace, "initial");
+
+  mkdirSync(join(tmpWorkspace, "systems"), { recursive: true });
+  const registryContent = `schemaVersion: "1.0.0"
+systems:
+  - id: test-system
+    cosmicStar: Vega
+    mirrors:
+      - path: "./systems/test-system"
+        storageType: non-bare
+    pinnedPlatform: "4.5.0"
+    currentMission: test-system-m000001
+    lastRelease: null
+    status: active
+    registeredAt: "2026-01-01T00:00:00Z"
+    notes: ""
+`;
+  writeFileSync(join(tmpWorkspace, "systems", "registry.yaml"), registryContent);
+  gitCommit(tmpWorkspace, "add registry");
+
+  mkdirSync(join(tmpWorkspace, "systems", "test-system"), { recursive: true });
+  writeFileSync(
+    join(tmpWorkspace, "systems", "test-system", "system.pin.json"),
+    JSON.stringify({ platform: { version: "1.0.0" } }, null, 2) + "\n",
+  );
+
+  mkdirSync(join(tmpWorkspace, "systems", "test-system", "bordbuch"), { recursive: true });
+  gitCommit(tmpWorkspace, "add system");
+
+  const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
+  mkdirSync(missionDir, { recursive: true });
+  mkdirSync(join(missionDir, "workpiece"), { recursive: true });
+  mkdirSync(join(missionDir, "evidence"), { recursive: true });
+
+  const manifest = {
+    schemaVersion: "1.0.0",
+    missionId: "test-system-m000001",
+    systemId: "test-system",
+    state: "open",
+    brief: "Test mission",
+    openedAt: "2026-07-30T00:00:00.000Z",
+    openedBy: "test-agent",
+    closedAt: null,
+    closedBy: null,
+    pinAtOpen: "1.0.0",
+    materializedAt: "2026-07-30T01:00:00.000Z",
+    migratedAt: null,
+    reconciledAt: "2026-07-30T02:00:00.000Z",
+    releaseId: null,
+    rfcId: null,
+    operationId: "op-001",
+  };
+  writeFileSync(join(missionDir, "mission.yaml"), JSON.stringify(manifest, null, 2) + "\n");
+
+  gitCommit(tmpWorkspace, "add mission");
+}
+
+function computeHash(entry: Record<string, unknown>): string {
+  const stable = JSON.stringify(entry, Object.keys(entry).sort());
+  return `sha256:${createHash("sha256").update(stable).digest("hex")}`;
+}
+
+function makeBordbuchEntry(opts: {
+  id: string;
+  kind: string;
+  systemId: string;
+  summary: string;
+  actor: string;
+  missionId?: string | null;
+  previousHash?: string | null;
+}): string {
+  const { id, kind, systemId, summary, actor, missionId = null, previousHash = null } = opts;
+  const entryWithoutHash = {
+    schemaVersion: "1.0.0",
+    id,
+    systemId,
+    occurredAt: "2026-07-30T00:00:00.000Z",
+    kind,
+    status: "done",
+    missionId,
+    releaseId: null,
+    actor,
+    summary,
+    previousHash,
+  };
+  const hash = computeHash(entryWithoutHash);
+  return JSON.stringify({ ...entryWithoutHash, hash });
+}
+
+test("mission.close fails when bordbuch has orphan-mission-close violation", async () => {
+  setupWorkspace();
+
+  // Write a bordbuch with an orphan mission-close (no preceding mission-open)
+  const bordbuchPath = join(tmpWorkspace, "systems", "test-system", "bordbuch", "events.ndjson");
+  const orphanLine = makeBordbuchEntry({
+    id: "event-000001",
+    kind: "mission-close",
+    systemId: "test-system",
+    summary: "Mission closed without open",
+    actor: "test-agent",
+    missionId: "test-system-m000099",
+  });
+  writeFileSync(bordbuchPath, orphanLine + "\n");
+
+  const { runMissionClose } = await import("../mission/mission-close.ts");
+
+  const input = {
+    flags: { mission: "test-system-m000001", actor: "test-agent" },
+  } as unknown as KernelCommandInput;
+  const context = {
+    workspaceRoot: tmpWorkspace,
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
+  } as unknown as KernelRuntimeContext;
+
+  await expect(runMissionClose(input, context)).rejects.toThrow(
+    /bordbuch for system 'test-system' has.*violation.*run bordbuch.repair/,
+  );
+});
+
+test("mission.close succeeds when bordbuch is valid", async () => {
+  setupWorkspace();
+
+  // Write a valid bordbuch with a mission-open event for this mission
+  const bordbuchPath = join(tmpWorkspace, "systems", "test-system", "bordbuch", "events.ndjson");
+  const openLine = makeBordbuchEntry({
+    id: "event-000001",
+    kind: "mission-open",
+    systemId: "test-system",
+    summary: "Mission test-system-m000001 opened",
+    actor: "test-agent",
+    missionId: "test-system-m000001",
+  });
+  writeFileSync(bordbuchPath, openLine + "\n");
+
+  const { runMissionClose } = await import("../mission/mission-close.ts");
+
+  const input = {
+    flags: { mission: "test-system-m000001", actor: "test-agent", "skip-evidence-sync": true },
+  } as unknown as KernelCommandInput;
+  const context = {
+    workspaceRoot: tmpWorkspace,
+    logger: { info: () => {}, warn: () => {}, error: () => {}, success: () => {} },
+  } as unknown as KernelRuntimeContext;
+
+  const result = await runMissionClose(input, context);
+
+  expect(result.data!.bordbuchValidation).toBeDefined();
+  expect(result.data!.bordbuchValidation.checked).toBe(true);
+  expect(result.data!.bordbuchValidation.violations).toHaveLength(0);
+});
