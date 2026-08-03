@@ -1,7 +1,7 @@
 ---
 id: RFC-0666
 title: "Replace secretsFile env-var indirection with convention-based .env.alt/.env.main paths in Leitstand"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
