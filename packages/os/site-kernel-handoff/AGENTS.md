@@ -140,6 +140,19 @@ All four commands that mutate `bordbuch/events.ndjson` (`mission.open`, `mission
 - **Not in any pipeline** — operator-only, never automated. Agents MUST NOT run `bordbuch.repair` proactively — only when `bordbuch.validate` reports `orphan-mission-close` violations.
 - Uses RFC-0362 lock primitives (`system:<id>` and `bordbuch:<id>` lock scopes) to prevent concurrent repair or append operations.
 
+## Bordbuch integrity protection (RFC-0658)
+
+Three defense-in-depth measures protect `bordbuch/events.ndjson` from accidental deletion and corruption in the cache clone:
+
+1. **Pre-commit hook** — `mission.materialize` installs a pre-commit hook at `<cache-clone>/.git/hooks/pre-commit` that rejects any commit staging a deletion of `bordbuch/events.ndjson` (`diff-filter=D`). The hook is installed transparently during every materialization. Non-git cache clones skip hook installation silently. `git commit --no-verify` bypasses the hook — agents MUST NOT use `--no-verify` (see RFC-0658 implementation notes).
+
+2. **`bordbuch.validate` in `build.prepare`** — The full `SITES_BUILD_PREPARE_PIPELINE` includes `bordbuch.validate` between `bordbuch.generate` and `bordbuch.commit`. This catches hash-chain corruption, lifecycle pairing violations, and sensitive payloads before the build proceeds. NOT in `SITES_BUILD_PREPARE_DEV_PIPELINE` (dev pipeline excludes bordbuch steps).
+
+3. **`mission.close` bordbuch validation** — Before appending the close event, `mission.close` calls `validateBordbuch` and throws on any violations. This is defense-in-depth for the distribution-reuse skip path (RFC-0635) where `mission.validate` skips `build.prepare` (and thus `bordbuch.validate`). The `MissionCloseData` interface includes `bordbuchValidation: { violations, checked }`.
+
+- **Hook scope:** The pre-commit hook is installed in the cache clone only. Workpiece clones do not inherit it (git clone does not copy hooks). The `build.prepare` and `mission.close` validation steps cover workpiece paths.
+- **`bordbuch.repair` is not blocked** by the pre-commit hook — it rewrites `events.ndjson` but does not delete it (`diff-filter=D` only triggers on deletion).
+
 ## Bordbuch projection auto-commit (RFC-0626, RFC-0646)
 
 `bordbuch.commit` is an internal pipeline step that auto-commits dirty bordbuch projection files in the cache clone after `bordbuch.generate` runs in `build.prepare`. It eliminates the mission workflow friction where uncommitted bordbuch projections in the cache clone blocked `mission.close` and `release.prepare`.
