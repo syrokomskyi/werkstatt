@@ -260,14 +260,14 @@ pnpm exec site-kernel run forge.doctor --json             # adds knowledge budge
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/src/knowledge/budgets.ts` exports `computeLayerBudgets` and `resolveKnowledgeBudgets`; sizes count only `status: active` entries via RFC-0660's parser
-- [ ] `forge.skill.validate` enforces SKILL-21 as warnings for hot (default 4096) and warm (default 8192) layers; warnings never change the exit code
-- [ ] `forge.doctor` validates `bindings.knowledge.budgets` override shape and prints the knowledge-budget summary table
-- [ ] `writing-great-skills` documents the hot/warm/cold reading discipline as the canonical pattern
-- [ ] Knowledge-adopting forge skills state the read discipline in one line (hot always, warm on pointer, cold append-only)
-- [ ] All current forge skills validate within default budgets at introduction
-- [ ] Unit tests cover: budget override resolution, active-only counting (stale/superseded/archived excluded), warning content, and skip-on-parse-failure
-- [ ] `rfc.validate` passes on this file
+- [x] `packages/forge/src/knowledge/budgets.ts` exports `computeLayerBudgets` and `resolveKnowledgeBudgets`; sizes count only `status: active` entries via RFC-0660's parser (evidence: `packages/forge/src/knowledge/budgets.ts:62-96`, `packages/forge/src/tests/budgets.test.ts:75-82`)
+- [x] `forge.skill.validate` enforces SKILL-21 as warnings for hot (default 4096) and warm (default 8192) layers; warnings never change the exit code (evidence: `packages/forge/src/validators/skill-validate.ts:248-268`, `packages/forge/src/tests/skill-validate.test.ts:209-219`)
+- [x] `forge.doctor` validates `bindings.knowledge.budgets` override shape and prints the knowledge-budget summary table (evidence: `packages/forge/src/onboarding/doctor.ts:347-457`, `packages/forge/src/onboarding/doctor.ts:878-880`)
+- [x] `writing-great-skills` documents the hot/warm/cold reading discipline as the canonical pattern (evidence: `packages/forge/skills/shared/writing-great-skills/SKILL.md:172-178`)
+- [x] Knowledge-adopting forge skills state the read discipline in one line (hot always, warm on pointer, cold append-only) (evidence: `packages/forge/skills/shared/grilling/SKILL.md:16`, `packages/forge/skills/fo/fo-memory-sync/SKILL.md:67`, `packages/forge/skills/fo/fo-session-save/SKILL.md:38`)
+- [x] All current forge skills validate within default budgets at introduction (evidence: `packages/forge/src/tests/skill-validate.test.ts:233-237` — zero SKILL-21 warnings)
+- [x] Unit tests cover: budget override resolution, active-only counting (stale/superseded/archived excluded), warning content, and skip-on-parse-failure (evidence: `packages/forge/src/tests/budgets.test.ts:32-57`, `packages/forge/src/tests/budgets.test.ts:75-82`, `packages/forge/src/tests/budgets.test.ts:120-132`, `packages/forge/src/tests/skill-validate.test.ts:202-238`)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0661 --json` → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
