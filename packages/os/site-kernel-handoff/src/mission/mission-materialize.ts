@@ -581,9 +581,10 @@ async function runPreflightGate(
 
 // RFC-0647: ensurePlaywrightChromium extracted to @warpgogol/site-kernel-checks as ensureChromium.
 
-// RFC-0659: Artifact cache directory and state file paths
+// RFC-0659: Artifact cache directory and state file paths.
+// The state file lives inside .cache/ so it is automatically gitignored.
 const ARTIFACT_CACHE_DIR = ".cache/materialization";
-const ARTIFACT_CACHE_STATE_FILE = ".materialization-cache-state.json";
+const ARTIFACT_CACHE_STATE_FILE = ".cache/materialization-state.json";
 
 /**
  * RFC-0659: Compute the artifact cache key from cacheCloneHead, platformVersion,
@@ -659,17 +660,22 @@ async function copyDirExcluding(
 
 /**
  * RFC-0659: Write the artifact cache state file and ensure .cache/ is gitignored
- * in the cache clone. Commits both the state file and .gitignore update.
+ * in the cache clone. The state file lives inside .cache/ so it is automatically
+ * gitignored. The .gitignore update is written but NOT committed — committing
+ * would change the cache clone HEAD and invalidate the cache key on the next run.
  */
 async function writeArtifactCacheState(
   systemDir: string,
   state: MaterializationCacheState,
-  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+  _logger: { info: (msg: string) => void; warn: (msg: string) => void },
 ): Promise<void> {
   const statePath = path.join(systemDir, ARTIFACT_CACHE_STATE_FILE);
+  await fs.mkdir(path.dirname(statePath), { recursive: true });
   await atomicWriteFile(statePath, JSON.stringify(state, null, 2) + "\n");
 
-  // RFC-0659: Ensure .cache/ is in the cache clone's .gitignore
+  // RFC-0659: Ensure .cache/ is in the cache clone's .gitignore.
+  // Written but not committed — committing would change the cache clone HEAD
+  // and invalidate the cache key on the next materialization.
   const gitignorePath = path.join(systemDir, ".gitignore");
   let gitignoreContent = "";
   if (existsSync(gitignorePath)) {
@@ -681,32 +687,6 @@ async function writeArtifactCacheState(
         ? gitignoreContent + ".cache/\n"
         : gitignoreContent + "\n.cache/\n";
     await atomicWriteFile(gitignorePath, newContent);
-  }
-
-  // Commit state file and .gitignore to cache clone
-  if (existsSync(path.join(systemDir, ".git"))) {
-    try {
-      execSync(`git add -- ${JSON.stringify(ARTIFACT_CACHE_STATE_FILE)} .gitignore`, {
-        cwd: systemDir,
-        stdio: ["pipe", "pipe", "pipe"],
-      });
-      execSync(`git commit -m "artifact cache state: ${state.cacheKey.slice(0, 12)}"`, {
-        cwd: systemDir,
-        stdio: ["pipe", "pipe", "pipe"],
-        env: {
-          ...process.env,
-          GIT_AUTHOR_NAME: "mission.materialize",
-          GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
-          GIT_COMMITTER_NAME: "mission.materialize",
-          GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
-        },
-      });
-      logger.info(`  Artifact cache state committed to cache clone`);
-    } catch (err) {
-      logger.warn(
-        `  Failed to commit artifact cache state: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
   }
 }
 
