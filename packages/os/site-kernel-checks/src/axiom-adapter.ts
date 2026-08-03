@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Migrated from duplicated mission-check.ts + axiom-report.ts to @syrokomskyi/axiom-factory-app programmatic API.</item>
+  <item>Review fix: removed capsule/studyRun fields from MissionCheckResult (AxiomCheckResult does not provide them); added --no-report flag for optional report.html generation.</item>
 </CHANGE_SUMMARY>
 */
 

@@ -8,6 +8,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0665: initial implementation of methodologies config schema and loader.</item>
+  <item>Migrated isBlockingFinding to re-export from @syrokomskyi/axiom-factory-app/run/report.</item>
 </CHANGE_SUMMARY>
 */
 

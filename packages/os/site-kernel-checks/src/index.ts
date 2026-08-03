@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0348: updated header to v2 two-block contract.</item>
   <item>RFC-0264 cleanup: replace long root export groups with module-level re-export delegation.</item>
+  <item>Added axiom-adapter re-exports: renderAxiomReportHtml, EvidenceMetadata, MissionCheckResult, AxiomReportData.</item>
 </CHANGE_SUMMARY>
 */
 
