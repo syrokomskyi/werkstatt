@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -50,6 +51,7 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - site-kernel-handoff
+  - site-kernel-checks
 successSignals:
   - "mission.close fails with bordbuch validation error when bordbuch is corrupted"
   - "Pre-commit hook in cache clone rejects commits that delete bordbuch/events.ndjson"
@@ -58,6 +60,8 @@ nonGoals:
   - "Does not add bordbuch.validate to leitstand.dev-deploy directly — build.prepare covers it"
   - "Does not modify commitBordbuchProjections — pre-commit hook covers deletion prevention"
   - "Does not protect against bordbuch content truncation (only full deletion is blocked by the hook)"
+  - "Does not add bordbuch.validate to SITES_BUILD_PREPARE_DEV_PIPELINE — the dev pipeline is codegen-only for fast materialization; bordbuch.validate is full-pipeline-only, consistent with bordbuch.generate and bordbuch.commit placement"
+  - "Does not install the pre-commit hook in workpiece clones — git clone does not copy hooks; the hook targets cache clone mutations only"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -90,9 +94,9 @@ Three gaps in bordbuch integrity enforcement exist:
 
 1. **No deletion guard in cache clone.** The cache clone (`mirrors[0]`) is a non-bare git repo where operators and agents can make commits. Nothing prevents a `git add -A` from staging the deletion of `bordbuch/events.ndjson`. RFC-0584 auto-resolves bordbuch delete-modify conflicts during `mission.reconcile` merges, but this only covers the merge path — manual commits bypass it entirely.
 
-2. **No bordbuch validation in `mission.close`.** `mission.open` validates bordbuch before proceeding (rejecting if violations exist), but `mission.close` does not. A close event can be appended to a corrupted bordbuch, producing orphan-mission-close violations that are only discovered on the next `mission.open`.
+2. **No direct bordbuch validation in `mission.close`.** `mission.close` runs `mission.validate` inline (RFC-0593), which runs `build.prepare`. However, RFC-0635 allows `mission.validate` to skip the build cycle (including `build.prepare`) when the build-input-hash matches (distribution reuse). In that skip path, bordbuch is not validated. A close event can be appended to a corrupted bordbuch, producing orphan-mission-close violations that are only discovered on the next `mission.open`.
 
-3. **No bordbuch validation in the build pipeline.** `build.prepare` runs 30+ validation steps but does not include `bordbuch.validate`. A corrupted bordbuch is not detected until `mission.open` or `mission.validate` — which may be much later than the corruption event.
+3. **No bordbuch validation in the `build.prepare` pipeline.** `bordbuch.validate` exists in the `sites-check-author` pipeline (`packages/os/site-kernel-checks/src/pipelines/sites-check-author.ts`), which runs after `astro build`. But `build.prepare` — which runs before `astro build` and is the first pipeline to execute during `mission.validate` and `mission.build` — does not include `bordbuch.validate`. A corrupted bordbuch is not detected until `sites-check-author` or `mission.open`, which may be much later than the corruption event.
 
 ## Decision
 
@@ -123,15 +127,17 @@ if git diff --cached --name-status --diff-filter=D | grep -q 'bordbuch/events.nd
 fi
 ```
 
-The hook is idempotent — `mission.materialize` overwrites it on each materialization, ensuring it stays current even if the cache clone is recreated.
+The hook is idempotent — `mission.materialize` overwrites it on each materialization, ensuring it stays current even if the cache clone is recreated. The hook is installed only in the cache clone (`mirrors[0]`), not in workpiece clones — `git clone` (used by `mission.materialize` to create the workpiece, RFC-0568) does not copy hooks. This is correct behavior: the hook targets cache clone mutations where manual `git add -A` can occur. Workpiece clones are ephemeral and reconciled via `mission.reconcile`.
 
 ### bordbuch.validate step in build.prepare
 
-A new pipeline step `bordbuch.validate` is added to the `build.prepare` pipeline, after `bordbuch.generate` and before `bordbuch.commit`. It calls the existing `validateBordbuch` function from `bordbuch-io.ts` and fails the pipeline on any violation.
+A new pipeline step `bordbuch.validate` is added to `SITES_BUILD_PREPARE_PIPELINE` (full pipeline only), after `bordbuch.generate` and before `bordbuch.commit`. It is NOT added to `SITES_BUILD_PREPARE_DEV_PIPELINE` — the dev pipeline is codegen-only and excludes bordbuch steps for fast materialization. The step calls the existing `validateBordbuch` function from `bordbuch-io.ts` and fails the pipeline on any violation.
+
+Note: `bordbuch.validate` validates `events.ndjson` (the raw hash-chained ledger), not the generated projections. The ordering relative to `bordbuch.generate` and `bordbuch.commit` is not significant for correctness — `bordbuch.validate` reads `events.ndjson` which is not modified by either of those steps. The step is placed between them for logical grouping with other bordbuch steps.
 
 ### bordbuch validation in mission.close
 
-`runMissionClose` calls `validateBordbuch` before appending the `mission-close` event. If violations are found, it returns an error result with `exitCode: 1` and a summary listing the violations. The operator must run `bordbuch.repair` first.
+`runMissionClose` calls `validateBordbuch` directly before appending the `mission-close` event. This is needed because `mission.close` already runs `mission.validate` inline (RFC-0593), but RFC-0635 allows `mission.validate` to skip `build.prepare` when the build-input-hash matches (distribution reuse). In that skip path, the `bordbuch.validate` pipeline step is not executed. The direct `validateBordbuch` call provides defense-in-depth for the distribution-reuse skip path. If violations are found, it returns an error result with `exitCode: 1` and a summary listing the violations. The operator must run `bordbuch.repair` first.
 
 ### CLI surface
 
@@ -163,8 +169,8 @@ async function installBordbuchPreCommitHook(
   systemId: string,
 ): Promise<BordbuchHookResult>;
 
-// mission.close validation addition
-interface MissionCloseResult {
+// mission.close validation addition (added to existing MissionCloseData interface)
+interface MissionCloseData {
   // ... existing fields ...
   bordbuchValidation: {
     violations: BordbuchViolation[];
@@ -248,7 +254,7 @@ const bordbuchValidateStep: PipelineStep = {
 - **Existing cache clones:** The pre-commit hook is installed on the next `mission.materialize`. Until then, `bordbuch.validate` in `build.prepare` and `mission.close` provide defense-in-depth.
 - **New Sternsystems:** The hook is installed during the first `mission.materialize` for any new Sternsystem.
 - **No migration path needed:** The `validateBordbuch` function and `bordbuch.repair` command already exist. This RFC adds call sites, not new validation logic.
-- **Pipeline integration:** `bordbuch.validate` is added to `build.prepare` after `bordbuch.generate` and before `bordbuch.commit`. This ensures projections are fresh before validation and committed only if validation passes.
+- **Pipeline integration:** `bordbuch.validate` is added to `SITES_BUILD_PREPARE_PIPELINE` (full pipeline only) alongside `bordbuch.generate` and `bordbuch.commit`. It is NOT added to `SITES_BUILD_PREPARE_DEV_PIPELINE` — the dev pipeline excludes bordbuch steps for fast materialization.
 
 ## Alternatives considered
 
