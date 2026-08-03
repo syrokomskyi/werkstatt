@@ -748,15 +748,9 @@ importers:
       '@syrokomskyi/axiom-capture':
         specifier: link:../../../../pipelines/packages/axiom/axiom-capture
         version: link:../../../../pipelines/packages/axiom/axiom-capture
-      '@syrokomskyi/axiom-contracts':
-        specifier: link:../../../../pipelines/packages/axiom/axiom-contracts
-        version: link:../../../../pipelines/packages/axiom/axiom-contracts
-      '@syrokomskyi/axiom-methodology':
-        specifier: link:../../../../pipelines/packages/axiom/axiom-methodology
-        version: link:../../../../pipelines/packages/axiom/axiom-methodology
-      '@syrokomskyi/axiom-provenance':
-        specifier: link:../../../../pipelines/packages/axiom/axiom-provenance
-        version: link:../../../../pipelines/packages/axiom/axiom-provenance
+      '@syrokomskyi/axiom-factory-app':
+        specifier: link:../../../../pipelines/apps/axiom/factory
+        version: link:../../../../pipelines/apps/axiom/factory
       '@syrokomskyi/axiom-study':
         specifier: link:../../../../pipelines/packages/axiom/axiom-study
         version: link:../../../../pipelines/packages/axiom/axiom-study
@@ -955,6 +949,12 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1101.0
         version: 3.1101.0
+      '@syrokomskyi/axiom-factory-app':
+        specifier: link:../../../../pipelines/apps/axiom/factory
+        version: link:../../../../pipelines/apps/axiom/factory
+      '@syrokomskyi/axiom-study':
+        specifier: link:../../../../pipelines/packages/axiom/axiom-study
+        version: link:../../../../pipelines/packages/axiom/axiom-study
       '@warpgogol/fingerprint':
         specifier: workspace:*
         version: link:../../fingerprint

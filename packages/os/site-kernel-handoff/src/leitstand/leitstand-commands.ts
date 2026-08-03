@@ -68,7 +68,8 @@ import {
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
-import { isBlockingFinding } from "@warpgogol/site-kernel-checks/methodologies-config";
+import { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";
+import type { Finding } from "@syrokomskyi/axiom-study";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../build-pipeline-helpers.ts";
 
@@ -1157,21 +1158,9 @@ export async function runLeitstandPropagate(
   }
 
   const studyRunContent = await fs.readFile(studyRunPath, "utf-8");
-  let studyRun: {
-    findings?: Array<{
-      severity?: string;
-      methodologyId?: string;
-      extension?: Record<string, unknown>;
-    }>;
-  };
+  let studyRun: { findings?: Finding[] };
   try {
-    studyRun = JSON.parse(studyRunContent) as {
-      findings?: Array<{
-        severity?: string;
-        methodologyId?: string;
-        extension?: Record<string, unknown>;
-      }>;
-    };
+    studyRun = JSON.parse(studyRunContent) as { findings?: Finding[] };
   } catch {
     throw new Error(
       `[leitstand.propagate] Axiom evidence malformed: study-run.json is not valid JSON for mission '${missionId}'.`,

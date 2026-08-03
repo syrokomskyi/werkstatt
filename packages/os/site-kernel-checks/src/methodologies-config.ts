@@ -110,26 +110,6 @@ export function tryLoadMethodologiesConfig(
   }
 }
 
-/**
- * RFC-0665: Shared helper — determines if a finding is a blocking violation
- * for a given methodology. Incomplete findings (predicate ending in .incomplete)
- * are never blocking — they are instrument limitations, not confirmed violations.
- *
- * Used by both renderGateSummary (axiom-report.ts) and leitstand.propagate gate.
- */
-export function isBlockingFinding(
-  finding: {
-    severity?: string;
-    methodologyId?: string;
-    extension?: Record<string, unknown>;
-  },
-  methodologyId: string,
-  blockOn: string[],
-): boolean {
-  const blockOnSet = new Set(blockOn);
-  if (!finding.severity || !blockOnSet.has(finding.severity)) return false;
-  const ext = finding.extension as Record<string, Record<string, unknown>> | undefined;
-  const predicate = ext?.[methodologyId]?.predicate;
-  if (typeof predicate === "string" && predicate.endsWith(".incomplete")) return false;
-  return true;
-}
+// isBlockingFinding is now imported from @syrokomskyi/axiom-factory-app/run/report
+// and re-exported for downstream consumers (leitstand-commands.ts, etc.)
+export { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";

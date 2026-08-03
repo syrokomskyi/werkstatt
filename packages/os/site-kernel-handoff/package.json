@@ -103,9 +103,7 @@
       "default": "./src/evidence/evidence-module.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",
@@ -114,6 +112,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0",
+    "@syrokomskyi/axiom-factory-app": "link:../../../../pipelines/apps/axiom/factory",
+    "@syrokomskyi/axiom-study": "link:../../../../pipelines/packages/axiom/axiom-study",
     "@warpgogol/fingerprint": "workspace:*",
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/ontology": "workspace:*",

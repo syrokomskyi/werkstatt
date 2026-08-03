@@ -1,0 +1,445 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Thin adapter that delegates to @syrokomskyi/axiom-factory-app programmatic API (runAxiomCheck, renderAxiomReportHtml). Replaces ~1000 lines of duplicated Axiom logic (mission-check.ts, axiom-report.ts).</purpose>
+<non-goals>
+  <item>Does not implement Axiom capture, instruments, or finding projection — that lives in the Axiom CLI package.</item>
+  <item>Does not define evidence file formats or gate logic — delegated to runAxiomCheck().</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Migrated from duplicated mission-check.ts + axiom-report.ts to @syrokomskyi/axiom-factory-app programmatic API.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
+
+import {
+  writeFileIfChanged,
+  resolveMissionDir,
+  type KernelCommandInput,
+  type KernelCommandResult,
+  type KernelRuntimeContext,
+  type KernelNextStep,
+} from "@warpgogol/site-kernel";
+
+import {
+  runAxiomCheck,
+  type AxiomCheckResult,
+  type MethodologiesConfig as AxiomMethodologiesConfig,
+} from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
+import {
+  renderAxiomReportHtml,
+  type EvidenceMetadata,
+} from "@syrokomskyi/axiom-factory-app/run/report";
+
+import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
+
+import type { StagedCapsule } from "@syrokomskyi/axiom-capture";
+import type { StudyRun, ObservationBundle } from "@syrokomskyi/axiom-study";
+import { parse as parseYaml } from "yaml";
+
+// ─── Re-exports for downstream consumers ───────────────────────────────────
+
+export { renderAxiomReportHtml, type EvidenceMetadata };
+
+// ─── Types ─────────────────────────────────────────────────────────────────
+
+export interface MissionCheckResult {
+  command: "mission.check";
+  status: "pass" | "fail";
+  exitCode: 0 | 1 | 2;
+  findingsCount: {
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    info: number;
+  };
+  findings: { errors: number; warnings: number; total: number };
+  closureDecision: { satisfied: boolean; status: string; reason: string };
+  evidenceDir: string;
+  summary: string;
+  nextSteps: string[];
+}
+
+export interface AxiomReportData {
+  command: "axiom.report";
+  status: "pass" | "fail";
+  missionId: string;
+  evidenceDir: string;
+  reportPath: string;
+  findingsCount: {
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    info: number;
+  };
+  totalFindings: number;
+  closureSatisfied: boolean;
+  renderedFiles?: { [path: string]: string };
+}
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+
+function resolveLocales(missionDir: string, explicit?: string[]): string[] {
+  if (explicit && explicit.length > 0) return explicit;
+
+  const systemMdPath = join(missionDir, "workpiece", "src", "content", "system.md");
+  try {
+    const content = readFileSync(systemMdPath, "utf-8");
+    const match = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!match) return ["en-US"];
+    const frontmatter = parseYaml(match[1]) as Record<string, unknown>;
+    const i18n = frontmatter?.i18n as
+      { default?: string; supported?: Record<string, { hreflang?: string }> } | undefined;
+    if (!i18n?.supported || !i18n.default) return ["en-US"];
+
+    const locales = Object.values(i18n.supported)
+      .map((c) => c?.hreflang)
+      .filter((l): l is string => typeof l === "string");
+    return locales.length > 0 ? locales : ["en-US"];
+  } catch {
+    return ["en-US"];
+  }
+}
+
+function mapMethodologiesConfig(
+  werkstattConfig: ReturnType<typeof tryLoadMethodologiesConfig>,
+): AxiomMethodologiesConfig | undefined {
+  if (!werkstattConfig.ok) return undefined;
+  return {
+    methodologies: werkstattConfig.config.methodologies.map((m) => ({
+      id: m.id,
+      active: m.active,
+      blockOn: m.blockOn,
+    })),
+  };
+}
+
+function missionCheckFailResult(
+  evidenceDir: string,
+  exitCode: number,
+  summary: string,
+): KernelCommandResult<MissionCheckResult> {
+  return {
+    data: {
+      command: "mission.check",
+      status: "fail",
+      exitCode: exitCode as 0 | 1 | 2,
+      findingsCount: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
+      findings: { errors: 0, warnings: 0, total: 0 },
+      closureDecision: { satisfied: false, status: "blocked", reason: summary },
+      evidenceDir,
+      summary,
+      nextSteps: [],
+    },
+    exitCode,
+    summary,
+  };
+}
+
+// ─── mission.check adapter ─────────────────────────────────────────────────
+
+export async function runMissionCheck(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<MissionCheckResult>> {
+  const { workspaceRoot, logger } = context;
+
+  const missionId = input.flags["mission"] as string | undefined;
+  if (!missionId) {
+    throw new Error("mission.check requires --mission <mission-id>");
+  }
+
+  const externalPreview =
+    input.flags["external-preview"] === true || input.flags["external-preview"] === "true";
+  if (!externalPreview) {
+    throw new Error("mission.check requires --external-preview (local mode removed by RFC-0629)");
+  }
+
+  const baseUrlFlag = input.flags["base-url"] as string | undefined;
+  if (!baseUrlFlag) {
+    throw new Error("mission.check --external-preview requires --base-url");
+  }
+
+  const commitSha = input.flags["commit-sha"] as string | undefined;
+  const baseUrl = baseUrlFlag.replace(/\/$/, "");
+
+  const runTimestampFlag = input.flags["run-timestamp"] as string | undefined;
+  let runTimestamp: string;
+  if (runTimestampFlag !== undefined) {
+    const tsPattern = /^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z$/;
+    if (!tsPattern.test(runTimestampFlag)) {
+      return missionCheckFailResult(
+        "",
+        1,
+        `mission.check: Invalid --run-timestamp format '${runTimestampFlag}'. Expected YYYY-MM-DDTHH-MM-SS-mmmZ (ISO 8601 UTC with colons replaced by hyphens).`,
+      );
+    }
+    runTimestamp = runTimestampFlag;
+  } else {
+    runTimestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  }
+
+  let locales: string[] | undefined;
+  const localesRaw = input.flags["locales"];
+  const localesFlag = typeof localesRaw === "string" ? localesRaw : undefined;
+  let explicitLocales: string[] | undefined;
+  if (localesFlag) {
+    const parsed = localesFlag
+      .split(",")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const bcp47Pattern = /^[a-z]{2}-[A-Z]{2}$/;
+    const invalid = parsed.find((l) => !bcp47Pattern.test(l));
+    if (invalid) {
+      return missionCheckFailResult(
+        "",
+        2,
+        `mission.check: Invalid --locales format '${invalid}'. Expected comma-separated BCP 47 tags, e.g., 'de-DE,uk-UA'.`,
+      );
+    }
+    explicitLocales = parsed;
+  }
+
+  const missionDir = resolveMissionDir(workspaceRoot, missionId);
+  const evidenceDir = join(missionDir, "evidence", "axiom");
+
+  logger.info(`  External preview mode: ${baseUrl}`);
+
+  const resolvedLocales = resolveLocales(missionDir, explicitLocales);
+  if (resolvedLocales.length === 1 && resolvedLocales[0] === "en-US" && !explicitLocales) {
+    logger.warn(`  No i18n config found in workpiece, falling back to en-US locale`);
+  }
+  locales = resolvedLocales;
+
+  const methodologiesConfig = tryLoadMethodologiesConfig(workspaceRoot);
+  const axiomMethodologiesConfig = mapMethodologiesConfig(methodologiesConfig);
+
+  const noReport = input.flags["no-report"] === true || input.flags["no-report"] === "true";
+
+  const maxDurationRaw = input.flags["max-duration"];
+  const maxUrlsRaw = input.flags["max-urls"];
+  const maxDepthRaw = input.flags["max-depth"];
+
+  let result: AxiomCheckResult;
+  try {
+    result = await runAxiomCheck({
+      baseUrl,
+      missionId,
+      outputDir: evidenceDir,
+      locales,
+      ...(axiomMethodologiesConfig ? { methodologiesConfig: axiomMethodologiesConfig } : {}),
+      ...(commitSha ? { commitSha } : {}),
+      runTimestamp,
+      ...(maxDurationRaw !== undefined && !Number.isNaN(Number(maxDurationRaw))
+        ? { maxDurationMs: Number(maxDurationRaw) }
+        : {}),
+      ...(maxUrlsRaw !== undefined && !Number.isNaN(Number(maxUrlsRaw))
+        ? { maxUrls: Number(maxUrlsRaw) }
+        : {}),
+      ...(maxDepthRaw !== undefined && !Number.isNaN(Number(maxDepthRaw))
+        ? { maxDepth: Number(maxDepthRaw) }
+        : {}),
+      report: !noReport,
+      quiet: false,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return missionCheckFailResult(evidenceDir, 2, `mission.check: ${msg}`);
+  }
+
+  const summary = `mission.check: ${result.status} — ${result.findings.total} finding(s), ${result.findings.errors} blocking, ${result.findings.warnings} warning(s)${!result.closureDecision.satisfied ? ", closure blocked" : ""}`;
+
+  const checkResult: MissionCheckResult = {
+    command: "mission.check",
+    status: result.status,
+    exitCode: result.exitCode,
+    findingsCount: result.findingsCount,
+    findings: result.findings,
+    closureDecision: result.closureDecision,
+    evidenceDir,
+    summary,
+    nextSteps: [],
+  };
+
+  logger.info(
+    `  Findings: ${result.findings.total} (${result.findings.errors} blocking, ${result.findings.warnings} warnings)`,
+  );
+  logger.info(`  Closure: ${result.closureDecision.status} — ${result.closureDecision.reason}`);
+  logger.info(`  Evidence: ${evidenceDir}`);
+  logger.info(`  Duration: ${result.durationMs}ms`);
+
+  return {
+    data: checkResult,
+    exitCode: result.exitCode,
+    summary,
+  };
+}
+
+// ─── axiom.report adapter ──────────────────────────────────────────────────
+
+export async function runAxiomReport(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<AxiomReportData>> {
+  const { workspaceRoot, logger } = context;
+
+  const missionId = input.flags["mission"] as string | undefined;
+  if (!missionId) {
+    throw new Error("axiom.report requires --mission <mission-id>");
+  }
+
+  const dryRun = input.flags["dry-run"] === true || input.flags["dry-run"] === "true";
+
+  const missionDir = resolveMissionDir(workspaceRoot, missionId);
+  const evidenceDir = join(missionDir, "evidence", "axiom");
+
+  if (!existsSync(evidenceDir)) {
+    return axiomReportFailResult(
+      evidenceDir,
+      1,
+      `AXIOM-REPORT-01: evidence directory not found at ${evidenceDir}. Run mission.check first.`,
+    );
+  }
+
+  const studyRunPath = join(evidenceDir, "study-run.json");
+  let studyRun: StudyRun;
+  try {
+    studyRun = JSON.parse(readFileSync(studyRunPath, "utf-8"));
+  } catch {
+    return axiomReportFailResult(
+      evidenceDir,
+      1,
+      `AXIOM-REPORT-02: cannot read study-run.json at ${studyRunPath}.`,
+    );
+  }
+
+  const capsulePath = join(evidenceDir, "staged-capsule.json");
+  let capsule: StagedCapsule;
+  try {
+    capsule = JSON.parse(readFileSync(capsulePath, "utf-8"));
+  } catch {
+    return axiomReportFailResult(
+      evidenceDir,
+      1,
+      `AXIOM-REPORT-03: cannot read staged-capsule.json at ${capsulePath}.`,
+    );
+  }
+
+  const bundlePath = join(evidenceDir, "observation-bundle.json");
+  let bundle: ObservationBundle;
+  try {
+    bundle = JSON.parse(readFileSync(bundlePath, "utf-8"));
+  } catch {
+    return axiomReportFailResult(
+      evidenceDir,
+      1,
+      `AXIOM-REPORT-04: cannot read observation-bundle.json at ${bundlePath}.`,
+    );
+  }
+
+  const metadataPath = join(evidenceDir, "evidence-metadata.json");
+  let metadata: EvidenceMetadata = { missionId };
+  if (existsSync(metadataPath)) {
+    try {
+      metadata = JSON.parse(readFileSync(metadataPath, "utf-8"));
+    } catch {
+      logger.warn(
+        `AXIOM-REPORT-05: cannot read evidence-metadata.json at ${metadataPath}. Using "unknown" for missing fields.`,
+      );
+    }
+  } else {
+    logger.warn(
+      `AXIOM-REPORT-05: evidence-metadata.json not found at ${metadataPath}. Using "unknown" for missing fields.`,
+    );
+  }
+
+  const html = renderAxiomReportHtml(studyRun, capsule, bundle, metadata);
+  const reportPath = join(evidenceDir, "report.html");
+  const relativeReportPath = `missions/${missionId}/evidence/axiom/report.html`;
+
+  if (!dryRun) {
+    await writeFileIfChanged(reportPath, html);
+  }
+
+  const findings = studyRun.findings;
+  const total = findings.length;
+  const closureSatisfied = capsule.closureDecision.satisfied;
+
+  const findingsCount = {
+    critical: findings.filter((f) => f.severity === "critical").length,
+    high: findings.filter((f) => f.severity === "high").length,
+    medium: findings.filter((f) => f.severity === "medium").length,
+    low: findings.filter((f) => f.severity === "low").length,
+    info: findings.filter((f) => f.severity === "info").length,
+  };
+  const errors = findingsCount.critical + findingsCount.high;
+
+  const nextSteps: KernelNextStep[] =
+    errors > 0
+      ? [
+          {
+            action: `Review ${errors} high-severity violation(s) at ${relativeReportPath}`,
+            kind: "optional",
+          },
+          {
+            action: `Fix critical/high violations and re-run mission.check --external-preview`,
+            kind: "required",
+          },
+        ]
+      : [
+          {
+            action: `Report generated at ${relativeReportPath} — ${total} finding(s)`,
+            kind: "optional",
+          },
+        ];
+
+  const summary = `axiom.report: ${dryRun ? "dry-run" : "generated"} report.html — ${total} finding(s), closure ${closureSatisfied ? "satisfied" : "blocked"}`;
+
+  const data: AxiomReportData = {
+    command: "axiom.report",
+    status: "pass",
+    missionId,
+    evidenceDir,
+    reportPath: relativeReportPath,
+    findingsCount,
+    totalFindings: total,
+    closureSatisfied,
+  };
+
+  if (dryRun) {
+    data.renderedFiles = { [relativeReportPath]: html };
+  }
+
+  return {
+    data,
+    exitCode: 0,
+    summary,
+    nextSteps,
+  };
+}
+
+function axiomReportFailResult(
+  evidenceDir: string,
+  exitCode: 0 | 1,
+  summary: string,
+): KernelCommandResult<AxiomReportData> {
+  return {
+    data: {
+      command: "axiom.report",
+      status: "fail",
+      missionId: "",
+      evidenceDir,
+      reportPath: "",
+      findingsCount: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
+      totalFindings: 0,
+      closureSatisfied: false,
+    },
+    exitCode,
+    summary,
+    nextSteps: [],
+  };
+}

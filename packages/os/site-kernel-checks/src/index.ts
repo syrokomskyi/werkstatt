@@ -173,3 +173,11 @@ export {
   ensureChromium,
   type PlaywrightChromiumEnsureResult,
 } from "./playwright-chromium-ensure.ts";
+
+// Axiom adapter: re-export report renderer and types for downstream consumers
+export {
+  renderAxiomReportHtml,
+  type EvidenceMetadata,
+  type MissionCheckResult,
+  type AxiomReportData,
+} from "./axiom-adapter.ts";

@@ -14,10 +14,9 @@ vi.mock("playwright", () => ({
   },
 }));
 
-// Mock child_process.execSync
-const mockExecSync = vi.fn();
-vi.mock("node:child_process", () => ({
-  execSync: (...args: unknown[]) => mockExecSync(...args),
+// Mock preflightChromium from axiom-factory-app
+vi.mock("@syrokomskyi/axiom-factory-app/run/axiom-cli", () => ({
+  preflightChromium: vi.fn().mockResolvedValue(undefined),
 }));
 
 function makeBrowser() {
@@ -33,7 +32,6 @@ describe("ensureChromium", () => {
   beforeEach(() => {
     mockLaunch.mockReset();
     mockClose.mockReset();
-    mockExecSync.mockReset();
     mockVersion.mockReset();
     mockVersion.mockReturnValue("131.0.6778.87");
     delete process.env["PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"];
@@ -52,58 +50,36 @@ describe("ensureChromium", () => {
     expect(result.installed).toBe(true);
     expect(result.skipped).toBe(true);
     expect(result.chromiumRevision).toBe("131.0.6778.87");
-    expect(mockExecSync).not.toHaveBeenCalled();
     expect(mockClose).toHaveBeenCalled();
   });
 
-  it("installs when Chromium launch fails and env var is not set", async () => {
+  it("installs via preflightChromium when launch fails", async () => {
     const browser = makeBrowser();
     mockLaunch
       .mockRejectedValueOnce(new Error("Executable not found"))
       .mockResolvedValueOnce(browser);
-    mockExecSync.mockReturnValueOnce(undefined);
 
     const result = await ensureChromium(workspaceRoot, testLogger);
 
     expect(result.installed).toBe(true);
     expect(result.skipped).toBe(false);
     expect(result.chromiumRevision).toBe("131.0.6778.87");
-    expect(mockExecSync).toHaveBeenCalledWith(
-      "pnpm exec playwright install chromium",
-      expect.objectContaining({ cwd: workspaceRoot, timeout: 120_000 }),
-    );
   });
 
-  it("throws on install failure", async () => {
-    mockLaunch.mockRejectedValueOnce(new Error("Executable not found"));
-    mockExecSync.mockImplementationOnce(() => {
-      throw new Error("Network error");
-    });
-
-    await expect(ensureChromium(workspaceRoot, testLogger)).rejects.toThrow(
-      /install failed.*Network error/,
-    );
-  });
-
-  it("throws when launch fails and PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is set", async () => {
-    process.env["PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"] = "1";
+  it("throws when preflightChromium fails", async () => {
+    const { preflightChromium } = await import("@syrokomskyi/axiom-factory-app/run/axiom-cli");
+    vi.mocked(preflightChromium).mockRejectedValueOnce(new Error("Network error"));
     mockLaunch.mockRejectedValueOnce(new Error("Executable not found"));
 
-    await expect(ensureChromium(workspaceRoot, testLogger)).rejects.toThrow(
-      /PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD/,
-    );
-    expect(mockExecSync).not.toHaveBeenCalled();
+    await expect(ensureChromium(workspaceRoot, testLogger)).rejects.toThrow(/Network error/);
   });
 
-  it("throws when launch fails after install", async () => {
+  it("throws when launch fails after preflightChromium", async () => {
     mockLaunch
       .mockRejectedValueOnce(new Error("Executable not found"))
       .mockRejectedValueOnce(new Error("Still broken"));
-    mockExecSync.mockReturnValueOnce(undefined);
 
-    await expect(ensureChromium(workspaceRoot, testLogger)).rejects.toThrow(
-      /launch failed after install/,
-    );
+    await expect(ensureChromium(workspaceRoot, testLogger)).rejects.toThrow(/Still broken/);
   });
 });
 
@@ -111,7 +87,6 @@ describe("runPlaywrightChromiumEnsure", () => {
   beforeEach(() => {
     mockLaunch.mockReset();
     mockClose.mockReset();
-    mockExecSync.mockReset();
     mockVersion.mockReset();
     mockVersion.mockReturnValue("131.0.6778.87");
     delete process.env["PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"];
@@ -134,12 +109,13 @@ describe("runPlaywrightChromiumEnsure", () => {
   });
 
   it("returns exitCode 1 on failure", async () => {
-    process.env["PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD"] = "1";
-    mockLaunch.mockRejectedValueOnce(new Error("Not installed"));
+    const { preflightChromium } = await import("@syrokomskyi/axiom-factory-app/run/axiom-cli");
+    vi.mocked(preflightChromium).mockRejectedValueOnce(new Error("Not installed"));
+    mockLaunch.mockRejectedValueOnce(new Error("Executable not found"));
 
     const result = await runPlaywrightChromiumEnsure(testInput(), makeTestContext(workspaceRoot));
 
     expect(result.exitCode).toBe(1);
-    expect(result.summary).toContain("PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD");
+    expect(result.summary).toContain("Not installed");
   });
 });

@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  renderAxiomReportHtml,
-  type EvidenceMetadata,
-  type MethodologyEvidenceEntry,
-} from "../axiom-report.ts";
+import { renderAxiomReportHtml, type EvidenceMetadata } from "../axiom-adapter.ts";
+import type { MethodologyEvidenceEntry } from "@syrokomskyi/axiom-factory-app/run/report";
 
 function makeFinding(partial: Record<string, unknown>): unknown {
   return {
@@ -102,7 +99,7 @@ describe("renderAxiomReportHtml — RFC-0665 gate summary", () => {
       makeBundle() as never,
       metadata,
     );
-    expect(html).toContain("Gate Summary (RFC-0665)");
+    expect(html).toContain("Gate Summary");
     expect(html).toContain("automated-web-accessibility");
     expect(html).toContain("PASS");
   });
@@ -138,7 +135,8 @@ describe("renderAxiomReportHtml — RFC-0665 gate summary", () => {
       makeBundle() as never,
       metadata,
     );
-    expect(html).toContain("pre-RFC-0665 evidence");
+    expect(html).toContain("Gate Summary");
+    expect(html).toContain("No violations.");
   });
 
   it("does not block on incomplete findings", () => {

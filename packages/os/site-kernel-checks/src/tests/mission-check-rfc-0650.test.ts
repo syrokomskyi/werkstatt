@@ -12,175 +12,41 @@
 */
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
-import { mkdtemp, rm, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 
-import { runMissionCheck } from "../mission-check.ts";
-import { makeTestContext, testInput } from "./helpers.ts";
+import { runMissionCheck } from "../axiom-adapter.ts";
+import { makeTestContext } from "./helpers.ts";
 
-const mockDigestRef = {
-  digest: "sha256:mock-digest",
-  algorithm: "sha256" as const,
-  size: 42,
-  mediaType: "application/json",
-};
-const mockArtifactRef = {
-  artifactId: "axiom_artifact_mock",
-  rootDigest: mockDigestRef,
-  schema: "local-evidence-capsule@1" as const,
-};
-
-vi.mock("@syrokomskyi/axiom-contracts", () => ({
-  mintAxiomId: vi.fn(() => "axiom_id_mock"),
+vi.mock("@syrokomskyi/axiom-factory-app/run/axiom-cli", () => ({
+  runAxiomCheck: vi.fn(),
+  preflightChromium: vi.fn(),
 }));
 
-vi.mock("@syrokomskyi/axiom-provenance", () => ({
-  createCanonicalJsonDigestRef: vi.fn(() => mockDigestRef),
-}));
+import { runAxiomCheck } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
+import type { AxiomCheckResult } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
 
-vi.mock("@syrokomskyi/axiom-capture", () => {
-  const identitySchema = { parse: (v: unknown) => v };
+function makeAxiomCheckResult(): AxiomCheckResult {
   return {
-    PlaywrightEvidenceDriver: vi.fn().mockImplementation(function () {
-      return {
-        capture: vi.fn().mockResolvedValue({
-          receipt: {
-            schema: "browser-receipt@1",
-            taskKey: "mock-task-key",
-            state: "complete",
-            finalUrl: "http://example.com/",
-            statusCode: 200,
-            htmlDigest: mockDigestRef,
-            screenshotDigest: mockDigestRef,
-            domSnapshotDigest: mockDigestRef,
-            accessibilityTreeDigest: mockDigestRef,
-            axeDigest: mockDigestRef,
-            diagnostics: [],
-          },
-          evidence: [
-            {
-              role: "axe-raw-result",
-              mediaType: "application/json",
-              bytes: new TextEncoder().encode(
-                JSON.stringify({ violations: [], incomplete: [], passes: [] }),
-              ),
-              digest: mockDigestRef,
-            },
-          ],
-        }),
-        close: vi.fn().mockResolvedValue(undefined),
-      };
-    }),
-    CrawleeDiscoveryExecutor: vi.fn().mockImplementation(function () {
-      return {
-        discover: vi.fn().mockResolvedValue({
-          records: [{ normalizedUrl: "http://example.com/", depth: 0, discoveredFrom: null }],
-          omissions: [],
-          reachedFixpoint: true,
-        }),
-      };
-    }),
-    captureContractSchema: identitySchema,
-    contractDigest: vi.fn(() => mockDigestRef),
-    evaluateClosure: vi.fn(() => ({
-      schema: "closure-decision@1",
-      status: "seal_allowed",
+    command: "axiom.check",
+    status: "pass",
+    exitCode: 0,
+    missionId: "test-mission",
+    studyRunId: "study-run_mock",
+    findingsCount: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
+    findings: { errors: 0, warnings: 0, total: 0 },
+    closureDecision: {
       satisfied: true,
-      missingCapabilities: [],
-      partialCapabilities: [],
-      blockedCapabilities: [],
+      status: "seal_allowed",
       reason: "All required evidence capabilities completed.",
-    })),
-    capabilityManifestSchema: identitySchema,
-    capabilityReceiptSchema: identitySchema,
-    runtimeAttestationSchema: identitySchema,
-    archiveReceiptSchema: identitySchema,
-    replayReceiptSchema: identitySchema,
-    stagedCapsuleSchema: identitySchema,
+    },
+    methodologyResults: [],
+    evidenceFiles: [],
+    cacheHits: 0,
+    cacheMisses: 0,
+    durationMs: 1000,
   };
-});
-
-vi.mock("@syrokomskyi/axiom-study", () => {
-  const identitySchema = { parse: (v: unknown) => v };
-  return {
-    runAccessibilityInstrument: vi.fn(() => ({
-      instrumentRun: {
-        instrumentRunId: "instrument-run_mock",
-        instrumentId: "accessibility-axe",
-        instrumentVersion: "1.0.0",
-        startedAt: "2026-01-01T00:00:00.000Z",
-        finishedAt: "2026-01-01T00:00:01.000Z",
-        state: "complete",
-        context: {},
-        observations: [],
-      },
-      bundle: {
-        bundleId: "observation-bundle_mock",
-        observations: [
-          {
-            observationId: "obs_mock",
-            instrumentRunId: "instrument-run_mock",
-            subjectId: "http://example.com/",
-            predicate: "accessibility.axe.violation",
-            value: {},
-            evidence: [],
-            recordedAt: "2026-01-01T00:00:00.000Z",
-          },
-        ],
-        rootDigest: mockDigestRef,
-      },
-    })),
-    toDeterministicContext: vi.fn(() => ({
-      capsuleRef: mockArtifactRef,
-      producer: { producerId: "local-dev", name: "mission.check", version: "1.0.0" },
-      recordedAt: "2026-01-01T00:00:00.000Z",
-      validTimeStart: "2026-01-01T00:00:00.000Z",
-      environment: {},
-    })),
-    studyRunSchema: identitySchema,
-  };
-});
-
-vi.mock("@syrokomskyi/axiom-methodology", () => ({
-  createAutomatedWebAccessibilityMethodology: vi.fn(() => ({
-    schema: "methodology-package@1",
-    methodologyId: "automated-web-accessibility",
-    semver: "1.0.0",
-    maturity: "VALIDATED",
-    authors: [],
-    licenses: [],
-    researchQuestion: "test",
-    nonClaims: [],
-    types: [],
-    unitsOfAnalysis: [],
-    applicability: { jurisdictions: [], languages: [], archetypes: [], exclusions: [] },
-    evidenceRequirements: [],
-    dependencies: [],
-    limitations: [],
-    digest: mockDigestRef,
-  })),
-  findingsForObservation: vi.fn(() => []),
-  methodologyPackageDigest: vi.fn(() => mockDigestRef),
-}));
-
-vi.mock("playwright", () => ({
-  chromium: {
-    launch: vi.fn().mockResolvedValue({
-      version: vi.fn().mockReturnValue("131.0.6778.87"),
-      close: vi.fn().mockResolvedValue(undefined),
-    }),
-  },
-}));
-
-vi.mock("node:child_process", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("node:child_process")>();
-  return {
-    ...actual,
-    execSync: vi.fn().mockImplementation(() => {
-      throw new Error("mocked: install not available in test");
-    }),
-  };
-});
+}
 
 async function createMockMission(workspaceRoot: string, missionId: string): Promise<string> {
   const missionDir = join(workspaceRoot, "missions", missionId);
@@ -200,6 +66,8 @@ describe("mission.check RFC-0650 — runTimestamp", () => {
 
   beforeEach(async () => {
     workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-rfc-0650-"));
+    vi.mocked(runAxiomCheck).mockClear();
+    vi.mocked(runAxiomCheck).mockResolvedValue(makeAxiomCheckResult());
   });
 
   afterEach(async () => {
@@ -222,12 +90,9 @@ describe("mission.check RFC-0650 — runTimestamp", () => {
       makeTestContext(workspaceRoot),
     );
 
-    const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
-    const metadata = JSON.parse(
-      await readFile(join(evidenceDir, "evidence-metadata.json"), "utf-8"),
-    );
-    expect(metadata.runTimestamp).toBeDefined();
-    expect(tsPattern.test(metadata.runTimestamp)).toBe(true);
+    const callArgs = vi.mocked(runAxiomCheck).mock.calls[0]![0];
+    expect(callArgs.runTimestamp).toBeDefined();
+    expect(tsPattern.test(callArgs.runTimestamp!)).toBe(true);
   });
 
   it("uses explicit --run-timestamp value when provided", async () => {
@@ -248,11 +113,8 @@ describe("mission.check RFC-0650 — runTimestamp", () => {
       makeTestContext(workspaceRoot),
     );
 
-    const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
-    const metadata = JSON.parse(
-      await readFile(join(evidenceDir, "evidence-metadata.json"), "utf-8"),
-    );
-    expect(metadata.runTimestamp).toBe(explicitTs);
+    const callArgs = vi.mocked(runAxiomCheck).mock.calls[0]![0];
+    expect(callArgs.runTimestamp).toBe(explicitTs);
   });
 
   it("returns exit code 1 for invalid --run-timestamp format", async () => {
@@ -276,7 +138,7 @@ describe("mission.check RFC-0650 — runTimestamp", () => {
     expect(result.summary).toContain("Invalid --run-timestamp format");
   });
 
-  it("runTimestamp is always present (not optional) in evidence-metadata.json", async () => {
+  it("runTimestamp is always present (not optional) in runAxiomCheck call", async () => {
     const missionId = "test-m000004";
     await createMockMission(workspaceRoot, missionId);
 
@@ -293,13 +155,9 @@ describe("mission.check RFC-0650 — runTimestamp", () => {
       makeTestContext(workspaceRoot),
     );
 
-    const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
-    const metadata = JSON.parse(
-      await readFile(join(evidenceDir, "evidence-metadata.json"), "utf-8"),
-    );
-    expect(metadata.runTimestamp).toBeDefined();
-    expect(typeof metadata.runTimestamp).toBe("string");
-    expect(metadata.missionId).toBe(missionId);
-    expect(metadata.commitSha).toBe("abc123");
+    const callArgs = vi.mocked(runAxiomCheck).mock.calls[0]![0];
+    expect(callArgs.runTimestamp).toBeDefined();
+    expect(typeof callArgs.runTimestamp).toBe("string");
+    expect(callArgs.commitSha).toBe("abc123");
   });
 });

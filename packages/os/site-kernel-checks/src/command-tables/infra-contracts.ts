@@ -13,8 +13,7 @@
 
 import type { CheckCommandEntry } from "./types.ts";
 import { runIndependentQa } from "../independent-qa.ts";
-import { runMissionCheck } from "../mission-check.ts";
-import { runAxiomReport } from "../axiom-report.ts";
+import { runMissionCheck, runAxiomReport } from "../axiom-adapter.ts";
 import { runGitattributesGenerate, runGitattributesValidate } from "../gitattributes.ts";
 import { runGeneratedEditGuard } from "../generated-edit-guard.ts";
 import {

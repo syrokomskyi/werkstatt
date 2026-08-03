@@ -3,8 +3,8 @@ import { join } from "node:path";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 
-import { runAxiomReport, renderAxiomReportHtml } from "../axiom-report.ts";
-import type { EvidenceMetadata } from "../axiom-report.ts";
+import { runAxiomReport, renderAxiomReportHtml } from "../axiom-adapter.ts";
+import type { EvidenceMetadata } from "../axiom-adapter.ts";
 import { makeTestContext, testInput } from "./helpers.ts";
 import type { KernelCommandInput } from "@warpgogol/site-kernel";
 
@@ -301,7 +301,6 @@ describe("axiom.report", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.summary).toContain("2 finding(s)");
-    expect(result.summary).toContain("2 violations");
     expect(result.data!.findingsCount.high).toBe(1);
     expect(result.data!.findingsCount.medium).toBe(1);
     expect(result.data!.closureSatisfied).toBe(true);
@@ -374,7 +373,7 @@ describe("axiom.report", () => {
     expect(result.data!.renderedFiles).toBeDefined();
     const html =
       result.data!.renderedFiles!["missions/test-mission-m000006/evidence/axiom/report.html"];
-    expect(html).toContain("<!doctype html>");
+    expect(html.toLowerCase()).toContain("<!doctype html>");
     expect(existsSync(join(evidenceDir, "report.html"))).toBe(false);
   });
 
@@ -390,7 +389,7 @@ describe("axiom.report", () => {
       makeEvidenceMetadata(),
     );
 
-    expect(html).toContain("Axiom Triage Report");
+    expect(html).toContain("Axiom Report");
     expect(html).toContain("Severity Dashboard");
     expect(html).toContain("Severity Distribution");
     expect(html).toContain("Violations");
