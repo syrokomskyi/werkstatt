@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0358/RFC-0379: Zod schemas for deployment config, secret references, channel model, and propagation results.</purpose>
+<purpose>RFC-0358/RFC-0379/RFC-0666: Zod schemas for deployment config, channel model, and propagation results. secretsFile field kept as z.string().optional() for detection (sternsystem.validate rejects any value); secretRefSchema removed as dead code.</purpose>
 <non-goals>
   <item>Do not introduce app-specific runtime composition or deployment behavior into this reusable package source file.</item>
 </non-goals>
@@ -11,6 +11,7 @@
   <item>RFC-0595: add RouteFact with contentHash: string | null and optional redirectTarget.</item>
   <item>RFC-0624: add purgeResult to lastPropagatedChannelSchema, purgeResultSchema, deploymentConfigSchema, purge tracking.</item>
   <item>RFC-0627: add channels.dev (required), make channels.alt required, add dev to lastPropagated.</item>
+  <item>RFC-0666: remove secretRefSchema and SecretRef (dead code); change secretsFile field to z.string().optional() for detection (sternsystem.validate rejects any value).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -18,14 +19,12 @@ import { z } from "zod";
 
 export const deploymentAdapterNameSchema = z.enum(["cloudflare-workers", "netlify", "null"]);
 
-export const secretRefSchema = z
-  .string()
-  .regex(/^(env|github-secret|cloudflare-secret):[A-Z0-9_]+$/);
-
 export const deploymentChannelSchema = z.object({
   workerName: z.string(),
   url: z.string().url(),
-  secretsFile: secretRefSchema.optional(),
+  // RFC-0666: secretsFile kept as z.string().optional() for detection — sternsystem.validate rejects any value.
+  // secretRefSchema removed (dead code — env vars were never set).
+  secretsFile: z.string().optional(),
 });
 
 export const purgeResultSchema = z.object({
@@ -87,7 +86,6 @@ export const routeFactSchema = z.object({
 });
 
 export type DeploymentAdapterName = z.infer<typeof deploymentAdapterNameSchema>;
-export type SecretRef = z.infer<typeof secretRefSchema>;
 export type DeploymentChannel = z.infer<typeof deploymentChannelSchema>;
 export type LastPropagatedChannel = z.infer<typeof lastPropagatedChannelSchema>;
 export type PurgeResult = z.infer<typeof purgeResultSchema>;

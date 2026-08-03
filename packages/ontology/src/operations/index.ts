@@ -116,7 +116,6 @@ export type {
 // RFC-0358/RFC-0379: Leitstand fleet propagation schemas.
 export {
   deploymentAdapterNameSchema,
-  secretRefSchema,
   deploymentChannelSchema,
   lastPropagatedChannelSchema,
   purgeResultSchema,
@@ -127,7 +126,6 @@ export {
 } from "./leitstand.ts";
 export type {
   DeploymentAdapterName,
-  SecretRef,
   DeploymentChannel,
   LastPropagatedChannel,
   PurgeResult,
