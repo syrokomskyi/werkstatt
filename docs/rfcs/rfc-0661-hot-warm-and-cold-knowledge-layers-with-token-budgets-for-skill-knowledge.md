@@ -1,7 +1,7 @@
 ---
 id: RFC-0661
 title: "Hot, warm, and cold knowledge layers with token budgets for skill knowledge"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
 enhancedAt: 2026-08-03
-implementedAt:
+implementedAt: 2026-08-03
 closedAt:
 supersedes: []
 supersededBy:
