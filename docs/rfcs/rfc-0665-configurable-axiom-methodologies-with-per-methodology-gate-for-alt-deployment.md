@@ -1,7 +1,7 @@
 ---
 id: RFC-0665
 title: "Configurable Axiom methodologies with per-methodology gate for alt deployment"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -16,7 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
-implementedAt:
+implementedAt: 2026-08-03
 closedAt:
 supersedes: []
 supersededBy:
