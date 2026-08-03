@@ -21,6 +21,7 @@
   <item>RFC-0652: best-effort evidence.sync after axiom.report; --skip-evidence-sync flag; evidenceSynced/evidenceSyncError in output.</item>
   <item>RFC-0656: switch distTreeHash from mode: "byte" to mode: "stable" for deterministic hashing of non-deterministic build artifacts.</item>
   <item>RFC-0657: replace single-fetch verifyFreshness with retry loop (5 attempts, exponential backoff 3s/6s/12s/24s); remove fixed 6s sleep after purge; add attempts field to FreshnessResult.</item>
+  <item>RFC-0665: add methodologies.validate pre-flight to dev-deploy; fail fast on invalid methodologies config before build+deploy cycle.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -504,6 +505,60 @@ export async function runLeitstandDevDeploy(
   const channelConfig = getChannelConfig(dep, channel);
   const adapter = resolveAdapter(dep.adapter);
   const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
+
+  // RFC-0665: Pre-flight — validate methodologies config before building, so
+  // invalid configs fail fast instead of after a long build+deploy cycle.
+  try {
+    const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
+    const validateResult = (await executeValidate({
+      workspaceRoot,
+      commandName: "methodologies.validate",
+      argv: [],
+      siteName: undefined,
+      siteExplicit: false,
+      allSites: false,
+      dryRun: false,
+      force: false,
+      outputFormat: "json",
+    })) as { ok?: boolean; exitCode?: number; summary?: string };
+    if (!validateResult.ok || validateResult.exitCode !== 0) {
+      return {
+        data: {
+          command: "leitstand.dev-deploy",
+          systemId,
+          missionId,
+          commitSha: "",
+          buildState: "failed",
+          buildSkipped: false,
+          deployState: "failed",
+          deploymentUrl: channelConfig.url,
+          buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
+          axiom: {
+            status: "not-run",
+            errors: 0,
+            warnings: 0,
+            exitCode: 0,
+            freshness: {
+              verified: false,
+              cdnDistTreeHash: null,
+              localDistTreeHash: "",
+              attempts: 0,
+              error: "methodologies.validate failed",
+            },
+          },
+          evidenceSynced: false,
+          evidenceSyncError: null,
+        },
+        exitCode: 1,
+        summary: `[leitstand.dev-deploy] ${systemId}: methodologies.validate failed — ${validateResult.summary ?? "config invalid"}`,
+      };
+    }
+  } catch (err) {
+    // methodologies.validate not registered or not available — non-fatal, continue
+    logger.warn(
+      `[leitstand.dev-deploy] methodologies.validate pre-flight skipped: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 
   // RFC-0634: Capture workpiece HEAD sha before build (needed for preliminary build-identity)
   let commitSha = "";

@@ -11,6 +11,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0633: initial implementation of axiom.report command and renderAxiomReportHtml pure function.</item>
   <item>Split findings into violations vs incomplete in dashboard and chart; Mermaid pie colors match severity badge colors.</item>
+  <item>RFC-0665: renderGateSummary marks pending-phase2 methodologies with PENDING status and em-dash findings counts.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -281,6 +282,7 @@ function renderGateSummary(methodologies: MethodologyEvidenceEntry[], findings: 
   const rows = methodologies
     .map((m) => {
       const blockOn = m.blockOn ?? ["high", "critical"];
+      const isPendingPhase2 = m.digest?.startsWith("pending-phase2:");
       const methodologyFindings = findings.filter((f) => {
         const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
         return ext?.[m.id]?.predicate !== undefined;
@@ -288,16 +290,20 @@ function renderGateSummary(methodologies: MethodologyEvidenceEntry[], findings: 
       const blockingCount = methodologyFindings.filter((f) =>
         isBlockingFinding(f, m.id, blockOn),
       ).length;
-      const passed = blockingCount === 0;
-      const statusClass = passed
-        ? "bg-green-100 text-green-800 border-green-300"
-        : "bg-red-100 text-red-800 border-red-300";
-      const statusText = passed ? "PASS" : "FAIL";
+      const passed = isPendingPhase2 ? false : blockingCount === 0;
+      const statusClass = isPendingPhase2
+        ? "bg-gray-100 text-gray-600 border-gray-300"
+        : passed
+          ? "bg-green-100 text-green-800 border-green-300"
+          : "bg-red-100 text-red-800 border-red-300";
+      const statusText = isPendingPhase2 ? "PENDING" : passed ? "PASS" : "FAIL";
+      const findingsCount = isPendingPhase2 ? "—" : String(methodologyFindings.length);
+      const blockingDisplay = isPendingPhase2 ? "—" : String(blockingCount);
       return `<tr>
   <td class="border px-3 py-2 font-mono text-sm">${escapeHtml(m.id)}</td>
   <td class="border px-3 py-2 text-sm">${escapeHtml(blockOn.join(", "))}</td>
-  <td class="border px-3 py-2 text-sm">${methodologyFindings.length}</td>
-  <td class="border px-3 py-2 text-sm">${blockingCount}</td>
+  <td class="border px-3 py-2 text-sm">${findingsCount}</td>
+  <td class="border px-3 py-2 text-sm">${blockingDisplay}</td>
   <td class="border px-3 py-2 text-center font-bold ${statusClass}">${statusText}</td>
 </tr>`;
     })

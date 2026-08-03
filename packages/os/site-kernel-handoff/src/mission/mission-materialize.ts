@@ -20,6 +20,7 @@
   <item>RFC-0597: skip preflight on unchanged cache clone HEAD, run build.prepare.dev instead of build.prepare, warm .cache/video/ and .cache/video-live/ from cache clone.</item>
   <item>RFC-0620: replace hardcoded bordbuch file removal with ownership-map-driven filter that excludes all workspace-absolute generated files from STERNSYSTEM_DATA_PATHS copy.</item>
   <item>RFC-0659: add workpiece artifact cache — skip codegen on repeated materialization when cache key (cacheCloneHead + platformVersion + platformSemanticHash) matches.</item>
+  <item>Preserve operator-filled .env/.env.main/.env.alt from old workpiece before atomicMoveDir and restore after — prevents secret loss (CLOUDFLARE_API_TOKEN, R2 keys) on re-materialization.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -1062,24 +1063,52 @@ export async function runMissionMaterialize(
       );
     } // end if (!artifactCacheHit) — RFC-0659 artifact cache branch
 
+    // Preserve operator-filled .env files from the old workpiece before
+    // atomicMoveDir replaces it. Without this, re-materialization destroys
+    // secrets (CLOUDFLARE_API_TOKEN, R2_ACCESS_KEY_ID, etc.) that the operator
+    // manually filled in. The new workpiece gets empty .env files from
+    // .env.example — we restore the old values after the move.
+    const envFilesToPreserve = [".env", ".env.main", ".env.alt"];
+    const preservedEnv: Record<string, string> = {};
+    for (const envFile of envFilesToPreserve) {
+      const oldEnvPath = path.join(workpieceDir, envFile);
+      if (existsSync(oldEnvPath)) {
+        try {
+          preservedEnv[envFile] = await fs.readFile(oldEnvPath, "utf8");
+        } catch {
+          // Read failed — skip preservation for this file
+        }
+      }
+    }
+
     // Commit staging → workpiece via atomic rename (replace: true handles
     // the old workpiece via rename-to-trash, avoiding EBUSY on Windows).
     await atomicMoveDir(stagingDir, workpieceDir, { replace: true });
 
-    // Set PUBLIC_IMAGE_PROVIDER=build-portable in workpiece .env files so
-    // image.variants.generate produces responsive variants during build.prepare.
+    // Restore preserved .env files, merging operator-filled values over the
+    // empty .env.example template. Then set PUBLIC_IMAGE_PROVIDER=build-portable.
     // Also set process.env so the kernel command sees it without Astro's dotenv.
     const envFiles = [".env", ".env.main", ".env.alt"];
     for (const envFile of envFiles) {
       const envPath = path.join(workpieceDir, envFile);
-      if (existsSync(envPath)) {
-        let envContent = await fs.readFile(envPath, "utf8");
-        envContent = envContent.replace(
-          /^PUBLIC_IMAGE_PROVIDER=.*$/m,
-          "PUBLIC_IMAGE_PROVIDER=build-portable",
-        );
-        await fs.writeFile(envPath, envContent, "utf8");
+      let envContent: string;
+      if (preservedEnv[envFile]) {
+        // Operator had filled-in values — restore them
+        envContent = preservedEnv[envFile];
+      } else if (existsSync(envPath)) {
+        envContent = await fs.readFile(envPath, "utf8");
+      } else {
+        continue;
       }
+      envContent = envContent.replace(
+        /^PUBLIC_IMAGE_PROVIDER=.*$/m,
+        "PUBLIC_IMAGE_PROVIDER=build-portable",
+      );
+      await fs.writeFile(envPath, envContent, "utf8");
+    }
+    const preservedCount = Object.keys(preservedEnv).length;
+    if (preservedCount > 0) {
+      logger.info(`  Preserved ${preservedCount} .env file(s) from previous workpiece`);
     }
     process.env["PUBLIC_IMAGE_PROVIDER"] = "build-portable";
     logger.info(`  PUBLIC_IMAGE_PROVIDER set to build-portable in .env files`);
