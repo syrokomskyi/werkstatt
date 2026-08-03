@@ -487,6 +487,20 @@ export async function runReleasePrepare(
       }
       await atomicWriteFile(path.join(stagingDir, "release.yaml"), manifestLines.join("\n") + "\n");
 
+      // RFC-0666: Copy .env.alt and .env.main from workpiece to release directory
+      for (const envFile of [".env.alt", ".env.main"]) {
+        const srcEnv = path.join(workpieceDir, envFile);
+        const destEnv = path.join(stagingDir, envFile);
+        if (existsSync(srcEnv)) {
+          await fs.copyFile(srcEnv, destEnv);
+          logger.info(`  Copied ${envFile} to release`);
+        } else {
+          logger.warn(
+            `  ${envFile} not found in workpiece — propagate/promote will use process.env fallback`,
+          );
+        }
+      }
+
       // Atomic rename
       const finalDir = path.join(releasesBase, releaseId);
       if (existsSync(finalDir)) {
