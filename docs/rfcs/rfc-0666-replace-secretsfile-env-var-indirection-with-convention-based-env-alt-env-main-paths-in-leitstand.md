@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -56,7 +58,9 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/ontology"
   - "@warpgogol/site-kernel-handoff"
-successSignals: []
+successSignals:
+  - "wrangler deploy succeeds with convention-based .env.alt/.env.main paths, no WERKSTATT_SECRETS_* env vars set"
+  - "sternsystem.validate rejects registries containing secretsFile fields with a clear error referencing RFC-0666"
 nonGoals:
   - Does not change how wrangler deploy uses secrets — the --secrets-file flag and sourceDotenv mechanism remain.
   - Does not introduce a new .env.dev file — dev and alt share .env.alt.
@@ -144,12 +148,17 @@ pnpm kernel leitstand.promote --system=warpgogol-com --release=warpgogol-com-r00
 // REMOVED — dead code after secretsFile deletion
 export const secretRefSchema = z.string().regex(...);
 export type SecretRef = z.infer<typeof secretRefSchema>;
+```
 
-// deploymentChannelSchema — secretsFile field removed
+**Changed** in `packages/ontology/src/operations/leitstand.ts`:
+
+```ts
+// deploymentChannelSchema — secretsFile kept as z.string().optional() for detection
+// (secretRefSchema removed; sternsystem.validate post-parse rule rejects any value)
 export const deploymentChannelSchema = z.object({
   workerName: z.string(),
   url: z.string().url(),
-  // secretsFile: secretRefSchema.optional(),  // REMOVED
+  secretsFile: z.string().optional(), // kept for detection — sternsystem.validate rejects
 });
 ```
 
@@ -183,12 +192,14 @@ async function resolveSecretsFilePath(secretsFileRef: string | undefined): Promi
 | `releases/<releaseId>/.env.alt` | Read by `leitstand.propagate` and `leitstand.rollback` (alt channel) |
 | `releases/<releaseId>/.env.main` | Read by `leitstand.promote` and `leitstand.rollback` (main channel) |
 | `systems/registry.yaml` | `secretsFile` fields removed from all channel configs |
-| `packages/ontology/src/operations/leitstand.ts` | `secretRefSchema`, `SecretRef`, `secretsFile` field removed |
+| `packages/ontology/src/operations/leitstand.ts` | `secretRefSchema`, `SecretRef` removed; `secretsFile` kept as `z.string().optional()` for detection |
 | `packages/ontology/src/operations/index.ts` | `secretRefSchema`, `SecretRef` exports removed |
 | `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `resolveSecretsFilePath` removed, `resolveConventionSecretsPath` added |
 | `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Preflight `secretsFile` reference-syntax check replaced with info-level `.env.alt`/`.env.main` existence check |
+| `packages/os/site-kernel-handoff/src/sternsystem/sternsystem-validate.ts` | New post-parse validation rule: rejects channels with `secretsFile` set (rule `secretsFile-removed`) |
+| `packages/os/site-kernel-handoff/src/release/release-commands.ts` | `release.prepare` gains `.env.alt`/`.env.main` copy step from workpiece to release directory |
 
-`release.prepare` gains a new step: copy `.env.alt` and `.env.main` from the workpiece to `releases/<releaseId>/` alongside `dist/`. This ensures propagate/promote have stable convention paths regardless of whether the mission workpiece still exists.
+`release.prepare` gains a new step: copy `.env.alt` and `.env.main` from `missions/<missionId>/workpiece/` to `releases/<releaseId>/` alongside `dist/`. Source paths: `missions/<missionId>/workpiece/.env.alt` → `releases/<releaseId>/.env.alt`, `missions/<missionId>/workpiece/.env.main` → `releases/<releaseId>/.env.main`. This ensures propagate/promote have stable convention paths regardless of whether the mission workpiece still exists.
 
 ### Output format
 
@@ -198,12 +209,12 @@ No output format changes. The `secretsFilePath` field in `PropagateInput` / `Rol
 
 - **Convention file not found:** Not an error. The adapter falls back to `filterEnv(process.env)`. `sternsystem.validate` preflight reports this as an info-level check ("`.env.alt` not found — using process.env fallback"), not a failure.
 - **`release.prepare` cannot find `.env.alt`/`.env.main` in workpiece:** Warning, not error. The release is created without env files — propagate/promote will use `process.env` fallback. This is the same behavior as today.
-- **Registry still contains `secretsFile`:** `sternsystem.validate` fails with a clear error: "`secretsFile` is no longer a valid field — remove it from the channel config. See RFC-0666." This ensures forward-only cleanup.
+- **Registry still contains `secretsFile`:** `sternsystem.validate` fails with a clear error: "`secretsFile` is no longer a valid field — remove it from the channel config. See RFC-0666." This is a post-parse validation rule in `sternsystem-validate.ts` (not a Zod schema rejection) — `secretsFile` remains in `deploymentChannelSchema` as `z.string().optional()` so the field is parseable for detection. Removing it from the schema entirely would cause Zod to silently strip the field, making detection impossible. This ensures forward-only cleanup with a descriptive operator-facing message.
 
 ## Rollout
 
-- **Schema change:** `deploymentChannelSchema` drops `secretsFile`. `sternsystem.validate` rejects registries that still contain `secretsFile` fields. This is a hard break — there is no grace period because the field was never used (env vars were never set).
-- **Registry cleanup:** Remove `secretsFile: env:WERKSTATT_SECRETS_*` lines from all channel configs in `systems/registry.yaml`.
+- **Schema change:** `deploymentChannelSchema` keeps `secretsFile` as `z.string().optional()` for detection (removing it entirely would cause Zod to silently strip the field). `secretRefSchema` and `SecretRef` are removed (dead code). `sternsystem.validate` adds a post-parse validation rule that rejects any channel with `secretsFile` set. This is a hard break — there is no grace period because the field was never used (env vars were never set).
+- **Registry cleanup:** Remove `secretsFile: env:WERKSTATT_SECRETS_*` lines from all channel configs in `systems/registry.yaml`. This is an atomic cleanup — if the registry has multiple systems, all must be cleaned simultaneously because `sternsystem.validate` rejects any `secretsFile` field in any system.
 - **`release.prepare` update:** Add `.env.alt` and `.env.main` copy step. Existing releases without these files are unaffected — propagate/promote use `process.env` fallback.
 - **New systems:** Automatically comply — `mission.materialize` already creates `.env.alt`/`.env.main`, and the convention paths work without any operator configuration.
 - **No env-var setup required:** Operators no longer need to set `WERKSTATT_SECRETS_DEV/ALT/MAIN`. The convention paths work out of the box.
@@ -227,14 +238,15 @@ No output format changes. The `secretsFilePath` field in `PropagateInput` / `Rol
 ## Acceptance criteria
 
 - [ ] `secretRefSchema` and `SecretRef` removed from `packages/ontology/src/operations/leitstand.ts` and `index.ts`
-- [ ] `secretsFile` field removed from `deploymentChannelSchema`
+- [ ] `secretsFile` field changed to `z.string().optional()` in `deploymentChannelSchema` (kept for detection)
+- [ ] `secretRefSchema` removed from `deploymentChannelSchema` (replaced by `z.string().optional()`)
 - [ ] `resolveSecretsFilePath` removed from `leitstand-commands.ts`
 - [ ] `resolveConventionSecretsPath` added to `leitstand-commands.ts`
 - [ ] `leitstand.dev-deploy` resolves `.env.alt` from workpiece path
 - [ ] `leitstand.propagate` resolves `.env.alt` from release path
 - [ ] `leitstand.promote` resolves `.env.main` from release path
 - [ ] `release.prepare` copies `.env.alt` and `.env.main` to `releases/<releaseId>/`
-- [ ] `sternsystem.validate` rejects registries with `secretsFile` fields
+- [ ] `sternsystem.validate` rejects registries with `secretsFile` fields via post-parse validation rule (rule `secretsFile-removed`)
 - [ ] `sternsystem.validate` preflight reports info-level `.env.alt`/`.env.main` existence check
 - [ ] `systems/registry.yaml` cleaned — all `secretsFile` lines removed
 - [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with convention-based secret resolution rules
@@ -251,5 +263,7 @@ No output format changes. The `secretsFilePath` field in `PropagateInput` / `Rol
 - `resolveConventionSecretsPath` MUST return `undefined` when the convention file does not exist — the adapter falls back to `filterEnv(process.env)`.
 - `release.prepare` MUST copy `.env.alt` and `.env.main` from the workpiece to the release directory. If the files do not exist, it MUST NOT fail — it logs a warning and continues.
 - `sternsystem.validate` MUST reject registries that still contain `secretsFile` fields with a clear error referencing this RFC.
+- `leitstand.rollback` passes the auto-detected channel (`promoted` → `main`, `alt-deployed` → `alt`) to `resolveConventionSecretsPath` as the `channel` parameter.
+- `breaksC` is NOT declared because this RFC modifies `packages/ontology/src/operations/` (the `@warpgogol/ontology/operations` subpath), not `packages/ontology/src/external-surfaces/` (the Layer C C-contract, RFC-0480). V-30 is a conditional warning — it fires because `@warpgogol/ontology` is in `packagesImpacted`, but the RFC does not touch `external-surfaces/`.
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
