@@ -40,6 +40,7 @@ import {
   resolveMirrors,
   resolveMirrorPath,
 } from "../sternsystem/registry-io.ts";
+import { installBordbuchPreCommitHook } from "../bordbuch/bordbuch-hook.ts";
 import {
   runGenerateAgentsDocs,
   runGenerateApiRoutes,
@@ -90,6 +91,7 @@ export interface MissionMaterializeData {
   pipelineUsed: string;
   mediaCacheWarmed: boolean;
   mediaCacheSources: number;
+  bordbuchHookInstalled: boolean;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -613,6 +615,22 @@ export async function runMissionMaterialize(
     // RFC-0356 §1.1 step 2: fetch the latest remote state into the cache clone.
     await syncCacheClone(workspaceRoot, manifest.systemId, logger);
 
+    // RFC-0658: Install bordbuch pre-commit hook in cache clone to prevent
+    // accidental deletion of bordbuch/events.ndjson via git add -A + commit.
+    // Non-fatal: non-git cache clones skip hook installation silently.
+    let bordbuchHookInstalled = false;
+    try {
+      const hookResult = await installBordbuchPreCommitHook(systemDir, manifest.systemId);
+      bordbuchHookInstalled = hookResult.installed;
+      if (hookResult.installed) {
+        logger.info(`  Installed bordbuch pre-commit hook in cache clone`);
+      }
+    } catch (err) {
+      logger.warn(
+        `  Failed to install bordbuch pre-commit hook: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
     const pinPath = path.join(systemDir, "system.pin.json");
 
     if (!existsSync(pinPath)) {
@@ -668,6 +686,7 @@ export async function runMissionMaterialize(
           pipelineUsed: "build.prepare.dev",
           mediaCacheWarmed: false,
           mediaCacheSources: 0,
+          bordbuchHookInstalled: false,
         },
         summary: `[mission.materialize] ${missionId} report-only: ${verdict}`,
       };
@@ -1066,6 +1085,7 @@ export async function runMissionMaterialize(
       pipelineUsed: "build.prepare.dev",
       mediaCacheWarmed,
       mediaCacheSources,
+      bordbuchHookInstalled,
       materializedAt: now,
     };
     await atomicWriteFile(
