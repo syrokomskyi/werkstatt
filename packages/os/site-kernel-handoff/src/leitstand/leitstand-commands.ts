@@ -135,15 +135,13 @@ function getChannelConfig(dep: DeploymentConfig, channel: Channel): DeploymentCh
   return channelConfig;
 }
 
-async function resolveSecretsFilePath(
-  secretsFileRef: string | undefined,
-): Promise<string | undefined> {
-  if (!secretsFileRef) return undefined;
-  const match = secretsFileRef.match(/^env:([A-Z0-9_]+)$/);
-  if (!match) return undefined;
-  const envValue = process.env[match[1]];
-  if (!envValue) return undefined;
-  return envValue;
+function resolveConventionSecretsPath(
+  basePath: string,
+  channel: "dev" | "alt" | "main",
+): string | undefined {
+  const envFile = channel === "main" ? ".env.main" : ".env.alt";
+  const filePath = path.join(basePath, envFile);
+  return existsSync(filePath) ? filePath : undefined;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -505,7 +503,7 @@ export async function runLeitstandDevDeploy(
 
   const channelConfig = getChannelConfig(dep, channel);
   const adapter = resolveAdapter(dep.adapter);
-  const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
+  const secretsFilePath = resolveConventionSecretsPath(workpiecePath, channel);
 
   // RFC-0665: Pre-flight — validate methodologies config before building, so
   // invalid configs fail fast instead of after a long build+deploy cycle.
@@ -1308,7 +1306,10 @@ export async function runLeitstandPropagate(
     const distPath = path.join(workspaceRoot, "releases", releaseId, "dist");
     const serverDistPath = path.join(distPath, "server");
     const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
-    const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
+    const secretsFilePath = resolveConventionSecretsPath(
+      path.join(workspaceRoot, "releases", releaseId),
+      channel,
+    );
 
     // Preflight
     const preflightChecks = await runPreflight(
@@ -1574,7 +1575,10 @@ export async function runLeitstandPromote(
     const distPath = path.join(workspaceRoot, "releases", releaseId, "dist");
     const serverDistPath = path.join(distPath, "server");
     const effectiveServerDistPath = existsSync(serverDistPath) ? serverDistPath : distPath;
-    const secretsFilePath = await resolveSecretsFilePath(mainConfig.secretsFile);
+    const secretsFilePath = resolveConventionSecretsPath(
+      path.join(workspaceRoot, "releases", releaseId),
+      "main",
+    );
 
     // Rehydrate dist from artifact store if missing
     let effectiveDistPath = distPath;
@@ -1902,7 +1906,10 @@ export async function runLeitstandRollback(
     const channelConfig = getChannelConfig(dep, channel);
     const adapter = resolveAdapter(dep.adapter);
     const distPath = path.join(workspaceRoot, "releases", targetRelease, "dist");
-    const secretsFilePath = await resolveSecretsFilePath(channelConfig.secretsFile);
+    const secretsFilePath = resolveConventionSecretsPath(
+      path.join(workspaceRoot, "releases", targetRelease),
+      channel,
+    );
 
     // Rehydrate dist from artifact store if missing
     let effectiveDistPath = distPath;
