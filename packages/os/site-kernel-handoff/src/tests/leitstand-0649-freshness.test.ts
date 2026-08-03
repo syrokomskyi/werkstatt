@@ -51,6 +51,7 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
   return {
     ...original,
     executeKernelCommand: vi.fn(async () => ({
+      ok: true,
       exitCode: 0,
       data: { findings: { errors: 0, warnings: 0 } },
       summary: "mission.check: pass",
@@ -119,11 +120,9 @@ function createRegistryWithCloudflareAdapter(
   workspaceRoot: string,
   systemId: string,
   currentMission: string,
-  secretsFilePath?: string,
 ): void {
   const registryDir = join(workspaceRoot, "systems");
   mkdirSync(registryDir, { recursive: true });
-  const secretsLine = secretsFilePath ? `\n          secretsFile: env:CLOUDFLARE_SECRETS_FILE` : "";
   const registryContent = `schemaVersion: "1.0.0"
 systems:
   - id: ${systemId}
@@ -142,7 +141,7 @@ systems:
       channels:
         dev:
           workerName: test-dev
-          url: https://dev.example.com${secretsLine}
+          url: https://dev.example.com
         alt:
           workerName: test-alt
           url: https://alt.example.com
@@ -151,16 +150,20 @@ systems:
           url: https://main.example.com
 `;
   writeFileSync(join(registryDir, "registry.yaml"), registryContent);
-  if (secretsFilePath) {
-    process.env.CLOUDFLARE_SECRETS_FILE = secretsFilePath;
-  }
 }
 
-function createWorkpieceDist(workspaceRoot: string, missionId: string): string {
+function createWorkpieceDist(
+  workspaceRoot: string,
+  missionId: string,
+  envAltContent?: string,
+): string {
   const workpieceDir = join(workspaceRoot, "missions", missionId, "workpiece");
   const distDir = join(workpieceDir, "dist");
   mkdirSync(distDir, { recursive: true });
   writeFileSync(join(distDir, "index.html"), "<html><body>Workpiece</body></html>");
+  if (envAltContent) {
+    writeFileSync(join(workpieceDir, ".env.alt"), envAltContent);
+  }
   return distDir;
 }
 
@@ -242,14 +245,11 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  // Write a secrets file with CLOUDFLARE_ZONE_ID so purge doesn't skip
-  const secretsDir = join(tmpDir, "secrets");
-  mkdirSync(secretsDir, { recursive: true });
-  const secretsPath = join(secretsDir, "dev.env");
-  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+  // Write .env.alt with CLOUDFLARE_ZONE_ID so purge doesn't skip
+  const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
-  createWorkpieceDist(tmpDir, missionId);
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success, build-identity returns mismatched hash on all attempts
   mockFetch.mockImplementation(async (url: string) => {
@@ -287,14 +287,11 @@ test("RFC-0649: cloudflare-workers adapter with freshness verified — normal fl
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  // Write secrets file
-  const secretsDir = join(tmpDir, "secrets");
-  mkdirSync(secretsDir, { recursive: true });
-  const secretsPath = join(secretsDir, "dev.env");
-  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+  // Write .env.alt
+  const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
-  createWorkpieceDist(tmpDir, missionId);
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success, build-identity returns matching hash.
   // The local distTreeHash is computed by fingerprintTree from the dist directory.
@@ -367,13 +364,10 @@ test("RFC-0657: retry-then-success — first attempt stale, second attempt fresh
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  const secretsDir = join(tmpDir, "secrets");
-  mkdirSync(secretsDir, { recursive: true });
-  const secretsPath = join(secretsDir, "dev.env");
-  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+  const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
-  createWorkpieceDist(tmpDir, missionId);
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success.
   // build-identity.json: first call returns stale hash, second call returns fresh hash.
@@ -435,13 +429,10 @@ test("RFC-0657: all-attempts-fail with HTTP 404 — exit 1, Axiom not run", asyn
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  const secretsDir = join(tmpDir, "secrets");
-  mkdirSync(secretsDir, { recursive: true });
-  const secretsPath = join(secretsDir, "dev.env");
-  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+  const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
-  createWorkpieceDist(tmpDir, missionId);
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success, build-identity returns 404 on all attempts
   mockFetch.mockImplementation(async (url: string) => {
@@ -469,13 +460,10 @@ test("RFC-0657: network error retried — first attempt throws, second succeeds"
   const systemId = "test-sys";
   const missionId = "test-sys-m000001";
 
-  const secretsDir = join(tmpDir, "secrets");
-  mkdirSync(secretsDir, { recursive: true });
-  const secretsPath = join(secretsDir, "dev.env");
-  writeFileSync(secretsPath, "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n");
+  const envAltContent = "CLOUDFLARE_ZONE_ID=test-zone-id\nCLOUDFLARE_API_TOKEN=test-token\n";
 
-  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId, secretsPath);
-  createWorkpieceDist(tmpDir, missionId);
+  createRegistryWithCloudflareAdapter(tmpDir, systemId, missionId);
+  createWorkpieceDist(tmpDir, missionId, envAltContent);
 
   // Mock fetch: purge API returns success.
   // build-identity.json: first call throws (network error), second call returns fresh hash.

@@ -237,22 +237,22 @@ No output format changes. The `secretsFilePath` field in `PropagateInput` / `Rol
 
 ## Acceptance criteria
 
-- [ ] `secretRefSchema` and `SecretRef` removed from `packages/ontology/src/operations/leitstand.ts` and `index.ts`
-- [ ] `secretsFile` field changed to `z.string().optional()` in `deploymentChannelSchema` (kept for detection)
-- [ ] `secretRefSchema` removed from `deploymentChannelSchema` (replaced by `z.string().optional()`)
-- [ ] `resolveSecretsFilePath` removed from `leitstand-commands.ts`
-- [ ] `resolveConventionSecretsPath` added to `leitstand-commands.ts`
-- [ ] `leitstand.dev-deploy` resolves `.env.alt` from workpiece path
-- [ ] `leitstand.propagate` resolves `.env.alt` from release path
-- [ ] `leitstand.promote` resolves `.env.main` from release path
-- [ ] `release.prepare` copies `.env.alt` and `.env.main` to `releases/<releaseId>/`
-- [ ] `sternsystem.validate` rejects registries with `secretsFile` fields via post-parse validation rule (rule `secretsFile-removed`)
-- [ ] `sternsystem.validate` preflight reports info-level `.env.alt`/`.env.main` existence check
-- [ ] `systems/registry.yaml` cleaned — all `secretsFile` lines removed
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated with convention-based secret resolution rules
-- [ ] Scoped typecheck passes on `@warpgogol/ontology` and `@warpgogol/site-kernel-handoff`
-- [ ] All existing leitstand tests pass (with updated fixtures)
-- [ ] `rfc.validate` passes on this file
+- [x] (evidence: commit 745b6d68) `secretRefSchema` and `SecretRef` removed from `packages/ontology/src/operations/leitstand.ts` and `index.ts`
+- [x] (evidence: commit 745b6d68) `secretsFile` field changed to `z.string().optional()` in `deploymentChannelSchema` (kept for detection)
+- [x] (evidence: commit 745b6d68) `secretRefSchema` removed from `deploymentChannelSchema` (replaced by `z.string().optional()`)
+- [x] (evidence: commit c35308d3) `resolveSecretsFilePath` removed from `leitstand-commands.ts`
+- [x] (evidence: commit c35308d3) `resolveConventionSecretsPath` added to `leitstand-commands.ts`
+- [x] (evidence: commit c35308d3) `leitstand.dev-deploy` resolves `.env.alt` from workpiece path
+- [x] (evidence: commit c35308d3) `leitstand.propagate` resolves `.env.alt` from release path
+- [x] (evidence: commit c35308d3) `leitstand.promote` resolves `.env.main` from release path
+- [x] (evidence: commit 36f89ff3) `release.prepare` copies `.env.alt` and `.env.main` to `releases/<releaseId>/`
+- [x] (evidence: commit 2c09ddb9) `sternsystem.validate` rejects registries with `secretsFile` fields via post-parse validation rule (rule `secretsFile-removed`)
+- [x] (evidence: commit 301ebf03) `sternsystem.validate` preflight reports info-level `.env.alt`/`.env.main` existence check
+- [x] (evidence: commit 009c6ed0) `systems/registry.yaml` cleaned — all `secretsFile` lines removed
+- [x] (evidence: commit a62ea7e5) `packages/os/site-kernel-handoff/AGENTS.md` updated with convention-based secret resolution rules
+- [x] (evidence: commit e3950c52) Scoped typecheck passes on `@warpgogol/ontology` and `@warpgogol/site-kernel-handoff`
+- [x] (evidence: commit e3950c52) All existing leitstand tests pass (with updated fixtures)
+- [x] (evidence: commit e3950c52) `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 

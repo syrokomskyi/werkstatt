@@ -45,6 +45,7 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
             throw new Error("R2_UPLOAD_ERROR: failed to upload");
           }
           return {
+            ok: true,
             exitCode: 0,
             data: {
               missionId: "test-sys-m000001",
@@ -56,6 +57,7 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
           };
         }
         return {
+          ok: true,
           exitCode: 0,
           data: { findings: { errors: 0, warnings: 0 } },
           summary: "ok",

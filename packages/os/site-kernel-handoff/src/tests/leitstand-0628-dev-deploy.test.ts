@@ -38,6 +38,7 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
   return {
     ...original,
     executeKernelCommand: vi.fn(async () => ({
+      ok: true,
       exitCode: 0,
       data: { findings: { errors: 0, warnings: 0 } },
       summary: "mission.check: pass",
