@@ -29,6 +29,7 @@ bindings:
     verify: pnpm --filter {workspace} run test
     specValidate: pnpm exec site-kernel run spec.validate --spec={id} --json
     sessionSave: pnpm exec site-kernel run session.save --json
+    manifestGenerate: pnpm exec site-kernel run command.manifest.generate
   paths:
     invariantsFile: docs/architecture-dna.md
     compassDocs:
