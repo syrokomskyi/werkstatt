@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -30,6 +31,10 @@ related:
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
+# DNA-60 is proposed by the RFC-0660..0664 series but not yet established in
+# docs/architecture-dna.md. Once RFC-0660 implementation adds DNA-60, this RFC
+# should list it in satisfies[]. Cannot list it now — rfc.validate rejects
+# satisfies entries absent from the DNA registry.
 satisfies: []
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
@@ -45,6 +50,7 @@ commands:
   changed:
     - forge.doctor
     - forge.create
+    - forge.upgrade
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -105,13 +111,14 @@ Forge gains a **shared knowledge layer**: `packages/forge/skills/shared/knowledg
 - **RFC-0661:** the shared layer is hot and counts toward a shared budget (default 4096, same as skill-local hot; `bindings.knowledge.budgets.shared` override) — promotion reduces total hot cost by replacing N copies with one.
 - **RFC-0662:** `fo-knowledge-distill` executes promotions; the compact command treats pointer entries (`promotedTo` set) as supersession-archive candidates, keeping skill-local files lean.
 - **fo-harvest analogy:** same governance shape — detection is deterministic, the decision is the operator's, execution is a skill with grilling. No silent knowledge movement.
-- **DNA-60 (proposed by this series):** this RFC is the "audited promotion" clause.
+- **DNA-60 (proposed by this series, not yet established):** this RFC is the "audited promotion" clause. DNA-60 will be added to `docs/architecture-dna.md` by RFC-0660's implementation. Once established, this RFC should list `DNA-60` in `satisfies[]`. The `satisfies[]` field is empty now because `rfc.validate` rejects entries absent from the DNA registry — and DNA-60 does not exist yet.
 
 ## Design
 
 ### Shared layer location and format
 
-- Path: `packages/forge/skills/shared/knowledge/learned-principles.md` (source of truth), synced by `forge.create` to `.agents/skills/shared-knowledge/learned-principles.md` for npm consumers.
+- Path: `packages/forge/skills/shared/knowledge/learned-principles.md` (source of truth), synced to `.agents/skills/shared-knowledge/learned-principles.md` for npm consumers.
+- **Sync mechanism:** `forge.create` (via `runInit` in `init.ts`) and `forge.upgrade` (via `syncForgeSkills` in `upgrade.ts`) currently sync only files belonging to skill directories that contain a `SKILL.md`. The `shared/knowledge/` directory has no `SKILL.md` — it is not a skill. Both functions must be extended with a dedicated `syncSharedKnowledge()` step that copies `packages/forge/skills/shared/knowledge/learned-principles.md` to `.agents/skills/shared-knowledge/learned-principles.md` (creating the directory on demand). This is the `forge.create` and `forge.upgrade` delta that justifies listing both in `commands.changed`.
 - Format: RFC-0660 structured entries. Layer marker: `<!-- knowledge-layer: L2 -->`. Entry ids are allocated as `K-NNNN` within the file; citations use the `shared/K-NNNN` form (matching RFC-0660's `promotedTo` pattern `^shared/K-\d{4}$`).
 - Metadata deltas for shared entries: `confirmations` carries the _sum_ of confirmations the principle had across skills at promotion time (preserving earned trust); an additional optional field `promotedFrom: ["<skill>/K-NNNN", ...]` records provenance. `promotedFrom` is shared-layer-only; SKILL-19 treats it as forbidden outside the shared file.
 
@@ -121,7 +128,7 @@ Deterministic, zero-LLM:
 
 1. Parse every skill's L2 file via `parseKnowledgeFile` (forge skills + pack skills + the shared layer).
 2. Normalize each active entry's title: lowercase, strip punctuation and emoji, collapse whitespace, drop stop-words (`the`, `a`, `always`, `never` kept — they carry meaning; only pure punctuation/casing normalized).
-3. Report pairs where normalized titles are identical, plus pairs where one normalized title is a substring of the other (near-duplicates), excluding pairs already linked by `promotedTo`/`supersedes`.
+3. Report pairs where normalized titles are identical (**exact**), plus pairs where one normalized title is a substring of the other (**containment**), excluding pairs already linked by `promotedTo`/`supersedes`. Containment matching is bounded: the shorter normalized title must be at least 20 characters long AND at least 60% of the longer title's length. This prevents short generic titles (e.g. "verify", "redact") from matching every principle that mentions them.
 
 Output: informational warnings (`type: knowledge-duplicate`) naming both skills, both entry ids, the normalized title, and a `fixHint`: "run fo-knowledge-distill to promote to the shared layer". Never affects doctor's exit status.
 
@@ -184,6 +191,8 @@ Promotion runs inside the `fo-knowledge-distill` skill (RFC-0662), not a CLI com
 | `packages/forge/src/knowledge/promote.ts` | Duplicate detection + promotion planning (pure) |
 | `packages/forge/os/core/handlers/doctor.ts` | `knowledge-duplicate` informational warnings |
 | `packages/forge/skills/shared/knowledge/learned-principles.md` | Shared layer (source of truth) |
+| `packages/forge/src/onboarding/init.ts` | `syncSharedKnowledge()` step in `runInit` |
+| `packages/forge/src/onboarding/upgrade.ts` | `syncSharedKnowledge()` step in `syncForgeSkills` |
 | `packages/forge/skills/fo/fo-knowledge-distill/SKILL.md` | Promotion protocol steps (extends RFC-0662 skill) |
 | `packages/forge/skills/**/learned-principles.md` | Pointer entries after promotion |
 | `packages/forge/skills/shared/writing-great-skills/SKILL.md` | Documents the shared layer as the fourth tier |
