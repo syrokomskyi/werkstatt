@@ -11,7 +11,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type {
   CheckResult,
@@ -51,7 +51,6 @@ export async function runMethodologiesValidate(
 
   let config: MethodologiesConfig;
   try {
-    const { readFileSync } = await import("node:fs");
     const content = readFileSync(configPath, "utf-8");
     config = parseMethodologiesConfig(content);
   } catch (err) {

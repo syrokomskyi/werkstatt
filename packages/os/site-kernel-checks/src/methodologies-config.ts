@@ -51,24 +51,10 @@ export const methodologiesConfigSchema = z.object({
   gate: gateConfigSchema,
 });
 
-export const methodologyEvidenceSchema = z.object({
-  id: z.string().min(1),
-  digest: z.string().min(1),
-  blockOn: z.array(z.enum(["low", "medium", "high", "critical"])),
-});
-
-export const evidenceMetadataSchema = z.object({
-  missionId: z.string().min(1),
-  commitSha: z.string().optional(),
-  runTimestamp: z.string().min(1),
-  methodologies: z.array(methodologyEvidenceSchema),
-});
-
 export type InstrumentConfig = z.infer<typeof instrumentConfigSchema>;
 export type MethodologyConfig = z.infer<typeof methodologyConfigSchema>;
 export type GateConfig = z.infer<typeof gateConfigSchema>;
 export type MethodologiesConfig = z.infer<typeof methodologiesConfigSchema>;
-export type MethodologyEvidence = z.infer<typeof methodologyEvidenceSchema>;
 
 export const METHODOLOGIES_CONFIG_PATH = "systems/methodologies.md";
 
@@ -122,4 +108,28 @@ export function tryLoadMethodologiesConfig(
       error: err instanceof Error ? err.message : String(err),
     };
   }
+}
+
+/**
+ * RFC-0665: Shared helper — determines if a finding is a blocking violation
+ * for a given methodology. Incomplete findings (predicate ending in .incomplete)
+ * are never blocking — they are instrument limitations, not confirmed violations.
+ *
+ * Used by both renderGateSummary (axiom-report.ts) and leitstand.propagate gate.
+ */
+export function isBlockingFinding(
+  finding: {
+    severity?: string;
+    methodologyId?: string;
+    extension?: Record<string, unknown>;
+  },
+  methodologyId: string,
+  blockOn: string[],
+): boolean {
+  const blockOnSet = new Set(blockOn);
+  if (!finding.severity || !blockOnSet.has(finding.severity)) return false;
+  const ext = finding.extension as Record<string, Record<string, unknown>> | undefined;
+  const predicate = ext?.[methodologyId]?.predicate;
+  if (typeof predicate === "string" && predicate.endsWith(".incomplete")) return false;
+  return true;
 }

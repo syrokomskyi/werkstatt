@@ -67,6 +67,7 @@ import {
 import { artifactStorePreflight, artifactStoreRehydrate } from "../artifact-store/index.ts";
 import { execSync } from "node:child_process";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
+import { isBlockingFinding } from "@warpgogol/site-kernel-checks/methodologies-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../build-pipeline-helpers.ts";
 
@@ -1134,7 +1135,7 @@ export async function runLeitstandPropagate(
   // Incomplete findings (e.g., accessibility.axe.incomplete) do not block — they are
   // instrument limitations, not confirmed violations.
   for (const methodology of metadata.methodologies ?? []) {
-    const blockOnSet = new Set(methodology.blockOn ?? ["high", "critical"]);
+    const blockOn = methodology.blockOn ?? ["high", "critical"];
     const methodologyFindings = studyRun.findings.filter((f) => {
       // Match by methodologyId if present
       if (f.methodologyId) {
@@ -1144,14 +1145,9 @@ export async function runLeitstandPropagate(
       const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
       return ext?.[methodology.id]?.predicate !== undefined;
     });
-    const blockingFindings = methodologyFindings.filter((f) => {
-      if (!f.severity || !blockOnSet.has(f.severity)) return false;
-      // Exclude incomplete findings — they are instrument limitations, not violations
-      const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
-      const predicate = ext?.[methodology.id]?.predicate;
-      if (typeof predicate === "string" && predicate.endsWith(".incomplete")) return false;
-      return true;
-    });
+    const blockingFindings = methodologyFindings.filter((f) =>
+      isBlockingFinding(f, methodology.id, blockOn),
+    );
     if (blockingFindings.length > 0) {
       throw new Error(
         `[leitstand.propagate] Axiom verification failed: methodology '${methodology.id}' has ${blockingFindings.length} block-on violation(s). Fix and re-deploy to dev.`,

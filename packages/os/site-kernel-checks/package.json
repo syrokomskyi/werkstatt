@@ -30,6 +30,10 @@
       "types": "./src/maintenance-debt-queue.ts",
       "default": "./src/maintenance-debt-queue.ts"
     },
+    "./methodologies-config": {
+      "types": "./src/methodologies-config.ts",
+      "default": "./src/methodologies-config.ts"
+    },
     "./module": {
       "types": "./src/module.ts",
       "default": "./src/module.ts"
@@ -47,9 +51,7 @@
       "default": "./src/result-helpers.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json --noEmit",
     "build:check": "pnpm exec tsc -p tsconfig.json --noEmit",

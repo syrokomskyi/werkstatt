@@ -27,6 +27,7 @@ import {
 
 import { resolveMissionDir } from "@warpgogol/site-kernel";
 
+import { isBlockingFinding } from "./methodologies-config.ts";
 import type { StudyRun, Finding, ObservationBundle } from "@syrokomskyi/axiom-study";
 import type {
   StagedCapsule,
@@ -279,18 +280,14 @@ function renderToolProfile(capsule: StagedCapsule): string {
 function renderGateSummary(methodologies: MethodologyEvidenceEntry[], findings: Finding[]): string {
   const rows = methodologies
     .map((m) => {
-      const blockOnSet = new Set(m.blockOn ?? ["high", "critical"]);
+      const blockOn = m.blockOn ?? ["high", "critical"];
       const methodologyFindings = findings.filter((f) => {
         const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
         return ext?.[m.id]?.predicate !== undefined;
       });
-      const blockingCount = methodologyFindings.filter((f) => {
-        if (!f.severity || !blockOnSet.has(f.severity)) return false;
-        const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
-        const predicate = ext?.[m.id]?.predicate;
-        if (typeof predicate === "string" && predicate.endsWith(".incomplete")) return false;
-        return true;
-      }).length;
+      const blockingCount = methodologyFindings.filter((f) =>
+        isBlockingFinding(f, m.id, blockOn),
+      ).length;
       const passed = blockingCount === 0;
       const statusClass = passed
         ? "bg-green-100 text-green-800 border-green-300"
@@ -298,7 +295,7 @@ function renderGateSummary(methodologies: MethodologyEvidenceEntry[], findings: 
       const statusText = passed ? "PASS" : "FAIL";
       return `<tr>
   <td class="border px-3 py-2 font-mono text-sm">${escapeHtml(m.id)}</td>
-  <td class="border px-3 py-2 text-sm">${escapeHtml((m.blockOn ?? ["high", "critical"]).join(", "))}</td>
+  <td class="border px-3 py-2 text-sm">${escapeHtml(blockOn.join(", "))}</td>
   <td class="border px-3 py-2 text-sm">${methodologyFindings.length}</td>
   <td class="border px-3 py-2 text-sm">${blockingCount}</td>
   <td class="border px-3 py-2 text-center font-bold ${statusClass}">${statusText}</td>
