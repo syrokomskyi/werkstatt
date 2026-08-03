@@ -27,6 +27,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 - Keep errors actionable and tied to the current workspace or app context.
 - Avoid leaking app-specific directory assumptions beyond clearly named adapter surfaces.
+- **Reserved CLI flags:** `consumeCommonFlags` in `src/cli/index.ts` consumes `--site`, `--all`, `--dry-run`, `--force`, and `--json` before a command executes — a command-level flag with one of these names silently never reaches the handler. When a command needs "all" semantics for its own domain, use a distinct name (e.g. `--all-skills` in `forge.skill.knowledge.compact`).
 - When adding flags or command semantics, keep parsing stable and backward-conscious.
 - **RFC-0086 — surface fail diagnostics, do not just count them.** When a kernel command returns `{ exitCode > 0, data }`, populate one of the recognized arrays so the text-mode printer can emit each item: `data.diagnostics: string[]`, `data.violations: object[]`, `data.findings: object[]` (RFC-0074 audit shape), or `data.details: object[]`. The runtime printer picks the first match (precedence in that order), formats each as `[ERROR]   <ruleId-or-severity> · <file-or-target> · <message>`, and caps at 50 lines with a `… and N more` footer. Agents reading text output no longer need to re-run with `--json` to learn what failed.
 
