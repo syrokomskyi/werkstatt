@@ -18,6 +18,7 @@
   <item>ADR-0010: stop any running dev/preview server for the workpiece before closing the mission.</item>
   <item>RFC-0652: mandatory evidence.sync to R2 before writing close-report.json; --skip-evidence-sync escape hatch with Bordbuch audit entry.</item>
   <item>RFC-0655: add releaseId to CloseReport interface; pass releaseId as top-level option to appendBordbuchEntry.</item>
+  <item>RFC-0658: validate bordbuch before appending close event (defense-in-depth for distribution-reuse skip path).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -39,7 +40,12 @@ import {
 } from "../sternsystem/registry-io.ts";
 import { readMissionManifest, writeMissionManifest, resolveMissionDir } from "./mission-io.ts";
 import { isWorkpieceDirty } from "./mission-git-commit.ts";
-import { appendBordbuchEntry, commitAndPushBordbuch } from "../bordbuch/bordbuch-io.ts";
+import {
+  appendBordbuchEntry,
+  commitAndPushBordbuch,
+  validateBordbuch,
+  type BordbuchViolation,
+} from "../bordbuch/bordbuch-io.ts";
 import {
   runMissionValidate,
   type MissionValidateData,
@@ -101,6 +107,7 @@ export interface MissionCloseData {
   closeReport: CloseReport;
   evidenceSynced: boolean;
   evidenceSyncResult: { r2KeyPrefix: string; uploadedFiles: number } | null;
+  bordbuchValidation: { violations: BordbuchViolation[]; checked: boolean };
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -258,6 +265,19 @@ export async function runMissionClose(
     manifest.releaseId = releaseId;
 
     await writeMissionManifest(workspaceRoot, manifest);
+
+    // RFC-0658: Validate bordbuch integrity before appending the close event.
+    // This is defense-in-depth for the distribution-reuse skip path (RFC-0635)
+    // where mission.validate skips build.prepare (and thus bordbuch.validate).
+    const bordbuchCheck = await validateBordbuch(workspaceRoot, manifest.systemId);
+    if (bordbuchCheck.violations.length > 0) {
+      const violationLines = bordbuchCheck.violations
+        .map((v) => `  [${v.rule}] ${v.message}`)
+        .join("\n");
+      throw new Error(
+        `[mission.close] bordbuch for system '${manifest.systemId}' has ${bordbuchCheck.violations.length} violation(s) — run bordbuch.repair first\n${violationLines}`,
+      );
+    }
 
     await appendBordbuchEntry(
       workspaceRoot,
@@ -537,6 +557,7 @@ export async function runMissionClose(
         closeReport,
         evidenceSynced,
         evidenceSyncResult,
+        bordbuchValidation: { violations: [], checked: true },
       },
       summary: `[mission.close] closed mission ${missionId}`,
     };
