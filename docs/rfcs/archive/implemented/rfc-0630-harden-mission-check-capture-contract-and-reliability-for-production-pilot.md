@@ -23,7 +23,8 @@ supersedes: []
 supersededBy:
 amends:
   - RFC-0629
-amendedBy: []
+amendedBy:
+  - RFC-0667
 related:
   - RFC-0629
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
