@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-03
-updatedAt: 2026-08-03
+updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,8 +25,10 @@ amends:
 amendedBy: []
 related:
   - DNA-48
+  - DNA-49
   - RFC-0627
   - RFC-0630
+  - RFC-0647
   - RFC-0649
   - RFC-0665
   - RFC-0667
@@ -34,6 +37,7 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-48
+  - DNA-49
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -63,6 +67,7 @@ nonGoals:
   - "Does not add retry or timeout to leitstand.propagate — propagate only reads evidence, no captures"
   - "Does not parallelize the capture loop — sequential captures with rate limiting remain"
   - "Does not change the external Axiom CLI capture logic — only werkstatt's invocation wrapper"
+  - "Does not change the external Axiom CLI internal maxDurationMs default — leitstand.dev-deploy passes --max-duration explicitly; the Axiom CLI default is fixed separately by the Axiom expert"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -112,10 +117,12 @@ Concrete gaps:
 
 ## Architectural fit
 
-- **DNA-48 (Release discipline)**: The dev → alt pipeline must be reliable. Infrastructure errors should not block the pipeline permanently — retry is appropriate. Content violations should block — retry is not appropriate.
+- **DNA-48 (Release discipline)**: The dev → alt pipeline must be reliable. Infrastructure errors should not block the pipeline permanently — retry is appropriate. Content violations should block — retry is not appropriate. A reliable dev pipeline is a prerequisite for reliable releases.
+- **DNA-49 (Fleet propagation)**: Directly governs `leitstand.dev-deploy` — the dev deployment pipeline including CDN purge, freshness verification, and Axiom gate. This RFC hardens the Axiom gate step with timeout, retry, and Chromium pre-flight, making the pipeline defined by DNA-49 production-resilient.
 - **RFC-0628**: Amended — `leitstand.dev-deploy` now includes timeout and retry logic for the `mission.check` step.
 - **RFC-0627**: Related — original dev deployment channel with Axiom verification gate.
 - **RFC-0630**: Related — hardening mission.check capture contract.
+- **RFC-0647**: Related — `ensureChromium` utility in `playwright-chromium-ensure.ts`. This RFC reuses it for the pre-flight check instead of creating a duplicate.
 - **RFC-0649**: Related — Axiom gate freshness guarantee.
 - **RFC-0665**: Related — configurable methodologies with per-methodology gate.
 - **RFC-0667**: Related — audit ID boundary contract (this RFC depends on mission.check producing valid evidence).
@@ -147,67 +154,124 @@ pnpm exec site-kernel run mission.check --mission warpgogol-com-m000027 --extern
 
 ### TypeScript contracts
 
+The retry logic wraps the existing `executeKernelCommand` call in `leitstand-commands.ts`. `executeKernelCommand` returns a result object `{ exitCode, data, summary }` — it does **not** throw on non-zero exit codes. The wrapper checks `result.exitCode` on the returned result, not on a caught error.
+
+`withTimeout` is a new utility function implemented inline in `leitstand-commands.ts`. It races the async call against a timer and rejects with `TimeoutError` if the timer wins. On timeout, the wrapper cannot kill the child process directly (the Axiom CLI runs in-process via `executeKernelCommand`, not as a spawned child) — instead, the timeout rejects the promise and the pipeline continues. The Axiom CLI's internal `maxDurationMs` handles process-level cleanup.
+
+The timeout applies **per-attempt**. With `MAX_RETRIES = 1`, the worst-case total time is 30 minutes (15 min per attempt). This is acceptable because infrastructure errors typically fail fast (seconds), not after 15 minutes.
+
 ```ts
 // packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts
 
-const MISSION_CHECK_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+const MISSION_CHECK_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes, per-attempt
 const MAX_RETRIES = 1;
 
+class TimeoutError extends Error {
+  constructor(ms: number) {
+    super(`mission.check timed out after ${ms}ms`);
+    this.name = "TimeoutError";
+  }
+}
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new TimeoutError(ms)), ms),
+    ),
+  ]);
+}
+
 async function runMissionCheckWithResilience(
-  input: MissionCheckInput,
-  context: CommandContext,
-): Promise<MissionCheckResult> {
-  let lastError: Error | undefined;
+  workspaceRoot: string,
+  missionId: string,
+  channelUrl: string,
+  commitSha: string,
+  logger: { info: (m: string) => void; warn: (m: string) => void },
+): Promise<{ exitCode: number; data?: Record<string, unknown> }> {
+  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
       const result = await withTimeout(
-        executeKernelCommand("mission.check", input, context),
+        executeKernelCommand({
+          workspaceRoot,
+          commandName: "mission.check",
+          argv: [
+            `--mission=${missionId}`,
+            "--external-preview",
+            `--base-url=${channelUrl}`,
+            `--commit-sha=${commitSha}`,
+            `--max-duration=${MISSION_CHECK_TIMEOUT_MS}`,
+          ],
+        }) as { exitCode?: number; data?: Record<string, unknown> },
         MISSION_CHECK_TIMEOUT_MS,
       );
-      return result; // exit 0 or exit 1 — return to caller
-    } catch (err) {
-      if (err instanceof TimeoutError) {
-        throw new Error(`mission.check timed out after ${MISSION_CHECK_TIMEOUT_MS}ms`);
+
+      const exitCode = result.exitCode ?? 0;
+
+      // Exit 0 = pass, exit 1 = content violations — return to caller, no retry
+      if (exitCode === 0 || exitCode === 1) {
+        return { exitCode, data: result.data };
       }
-      // exit code 2 = infrastructure error — retry once
-      if (err.exitCode === 2 && attempt < MAX_RETRIES) {
-        context.logger.info(`mission.check infrastructure error (attempt ${attempt + 1}), retrying...`);
-        lastError = err;
+
+      // Exit 2 = infrastructure error — retry once
+      // Any other non-zero exit (3+, 137 signal kill, null) is also treated as infrastructure error
+      if (attempt < MAX_RETRIES) {
+        logger.info(
+          `[leitstand.dev-deploy] mission.check infrastructure error (exit ${exitCode}, attempt ${attempt + 1}/${MAX_RETRIES + 1}), retrying...`,
+        );
         continue;
       }
-      throw err; // exit 1 (violations) or exit 2 after retry exhausted
+
+      // Retry exhausted
+      return { exitCode, data: result.data };
+    } catch (err) {
+      if (err instanceof TimeoutError) {
+        // Timeout is not retryable — a hung process indicates a deeper issue
+        throw err;
+      }
+      // Unexpected throw from executeKernelCommand — treat as infrastructure error, retry once
+      if (attempt < MAX_RETRIES) {
+        logger.info(
+          `[leitstand.dev-deploy] mission.check threw (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retrying...`,
+        );
+        continue;
+      }
+      throw err;
     }
   }
-  throw lastError ?? new Error("mission.check failed after retry");
+
+  throw new Error("mission.check failed after retry");
 }
 ```
 
 ### Chromium pre-flight check
 
-`mission.check` MUST verify Chromium exists before starting captures:
+`mission.check` MUST verify Chromium exists before starting captures. This reuses the existing `ensureChromium` function from `packages/os/site-kernel-checks/src/playwright-chromium-ensure.ts` (RFC-0647), which is already used by `build.post` pipeline (step 0) and `mission.materialize`. `ensureChromium` launches Chromium to verify and delegates to `preflightChromium` from `@syrokomskyi/axiom-factory-app` for auto-install if the launch fails. It handles `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` transparently.
 
 ```ts
 // packages/os/site-kernel-checks/src/axiom-adapter.ts
 
-async function preflightChromium(): Promise<void> {
-  const chromiumPath = path.join(
-    os.homedir(),
-    ".cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell",
-  );
-  if (!fs.existsSync(chromiumPath)) {
-    // Auto-install is acceptable, but must happen before captures start
-    await execAsync("pnpm exec playwright install chromium");
-  }
-}
+import { ensureChromium } from "./playwright-chromium-ensure.ts";
+
+// Inside runMissionCheck, before runAxiomCheck call:
+await ensureChromium();
+logger.info("  Chromium pre-flight: verified");
 ```
+
+The auto-install step (`playwright install chromium`) downloads ~100 MB. The outer 15-minute `MISSION_CHECK_TIMEOUT_MS` covers this — if the download hangs, the timeout fires and the pipeline fails. No separate timeout is needed for the pre-flight.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | `leitstand.dev-deploy`: wraps `mission.check` with timeout and retry |
-| `packages/os/site-kernel-checks/src/axiom-adapter.ts` | `mission.check` adapter: pre-flight Chromium check before captures |
+| `packages/os/site-kernel-checks/src/axiom-adapter.ts` | `mission.check` adapter: calls `ensureChromium` before captures |
+| `packages/os/site-kernel-checks/src/playwright-chromium-ensure.ts` | Existing `ensureChromium` utility (RFC-0647) — reused, not duplicated |
 | `~/.cache/ms-playwright/chromium_headless_shell-*/` | Playwright Chromium executable (checked by pre-flight) |
 
 ### Failure modes
@@ -218,14 +282,19 @@ async function preflightChromium(): Promise<void> {
 
 3. **Content violations (exit 1)**: `leitstand.dev-deploy` does not retry. The pipeline fails with the Axiom report path so the operator can review findings.
 
-4. **Chromium missing**: `mission.check` pre-flight detects missing Chromium and auto-installs before starting captures. If auto-install fails, `mission.check` exits with code 2 (infrastructure error), triggering retry.
+4. **Chromium missing**: `mission.check` pre-flight (`ensureChromium`) detects missing Chromium and auto-installs before starting captures. If auto-install fails, `mission.check` exits with code 2 (infrastructure error), triggering retry.
+
+5. **Unexpected exit code (3+, 137 signal kill, null)**: Any exit code that is not 0 or 1 is treated as infrastructure error and retried once. This covers signal kills, unexpected crashes, and any future exit codes the Axiom CLI may introduce.
+
+6. **Chromium auto-install hangs**: If `playwright install chromium` hangs (slow network, proxy), the outer 15-minute `MISSION_CHECK_TIMEOUT_MS` fires and the pipeline fails with a timeout error. No separate timeout is needed for the pre-flight step.
 
 ## Rollout
 
-- **Timeout**: Add `MISSION_CHECK_TIMEOUT_MS = 15 * 60 * 1000` constant in `leitstand-commands.ts`. Wrap `executeKernelCommand("mission.check", ...)` with `withTimeout`. No flag needed — timeout is always active.
-- **Retry**: Add `MAX_RETRIES = 1` constant. Retry loop checks `err.exitCode === 2`. No flag needed — retry is always active for infrastructure errors.
-- **Chromium pre-flight**: Add `preflightChromium()` call at the start of `runAxiomCheck` in `axiom-adapter.ts`, before discovery and captures. Auto-install if missing.
-- **Exit code semantics**: Document in `apps/axiom/AGENTS.md` and `packages/os/site-kernel-handoff/AGENTS.md`.
+- **Timeout**: Add `MISSION_CHECK_TIMEOUT_MS = 15 * 60 * 1000` constant in `leitstand-commands.ts`. Wrap `executeKernelCommand("mission.check", ...)` with `withTimeout`. The timeout is **per-attempt** — with `MAX_RETRIES = 1`, worst-case total is 30 minutes. No flag needed — timeout is always active.
+- **Retry**: Add `MAX_RETRIES = 1` constant. Retry loop checks `result.exitCode` on the returned result object (not on a caught error). Any non-0, non-1 exit code triggers retry. No flag needed — retry is always active for infrastructure errors.
+- **maxDurationMs**: `leitstand.dev-deploy` passes `--max-duration=${MISSION_CHECK_TIMEOUT_MS}` to `mission.check`, ensuring the Axiom CLI's internal capture deadline matches the outer timeout. This addresses the Problem section gap about insufficient `maxDurationMs` defaults.
+- **Chromium pre-flight**: Call `ensureChromium()` from `playwright-chromium-ensure.ts` (RFC-0647) at the start of `runMissionCheck` in `axiom-adapter.ts`, before `runAxiomCheck`. Reuse existing utility — do not create a duplicate.
+- **Exit code semantics**: Document in `packages/os/site-kernel-checks/AGENTS.md` (where `mission.check` lives) and `packages/os/site-kernel-handoff/AGENTS.md` (where `leitstand.dev-deploy` lives).
 - **No migration**: All changes are internal to the pipeline — no evidence file format changes, no new commands.
 
 ## Alternatives considered
@@ -245,7 +314,7 @@ async function preflightChromium(): Promise<void> {
 - **15-minute timeout too short for very large sites**: Sites with 500+ URLs × multiple locales may need more than 15 minutes. Mitigation: the timeout is a safety net, not a deadline. If `maxDurationMs` is set appropriately in the external Axiom CLI, captures complete within the timeout. If a site genuinely needs more time, the operator can increase the timeout constant.
 - **Retry masks recurring infrastructure issues**: If Chromium is consistently missing, retry will always fail after the second attempt. Mitigation: the error message after retry exhaustion should clearly indicate infrastructure issues, not content issues.
 - **Exit code 2 semantics not enforced by external Axiom CLI**: The external Axiom CLI (pipelines/) must cooperate by returning exit 2 for infrastructure errors. If it returns exit 1 for everything, retry will never trigger. Mitigation: this is documented in the RFC and communicated to the Axiom expert.
-- **Chromium pre-flight path hardcoded**: The pre-flight checks a specific Playwright version path. If Playwright upgrades, the path changes. Mitigation: use `playwright.executablePath()` API instead of hardcoding, or check `~/.cache/ms-playwright/chromium_headless_shell-*` glob.
+- **Chromium pre-flight path hardcoded**: Resolved. The RFC reuses `ensureChromium` from RFC-0647, which delegates to `preflightChromium` from `@syrokomskyi/axiom-factory-app` — no hardcoded paths in werkstatt code.
 - **Agent confusion**: Agents might think retry is for content violations. The exit code table and implementation notes clarify this.
 
 ## Acceptance criteria
@@ -255,6 +324,7 @@ async function preflightChromium(): Promise<void> {
 - [ ] `mission.check` performs a Chromium pre-flight check before starting captures, auto-installs if missing
 - [ ] Exit code semantics documented: 0 = pass, 1 = violations, 2 = infrastructure error
 - [ ] `AGENTS.md` for `packages/os/site-kernel-handoff` documents the timeout and retry behavior
+- [ ] `AGENTS.md` for `packages/os/site-kernel-checks` documents the exit code semantics (0 = pass, 1 = violations, 2 = infrastructure error) and Chromium pre-flight via `ensureChromium`
 - [ ] Unit test: `leitstand.dev-deploy` retries on exit code 2 and succeeds on second attempt
 - [ ] Unit test: `leitstand.dev-deploy` does not retry on exit code 1
 - [ ] Unit test: `leitstand.dev-deploy` fails with timeout error after 15 minutes
@@ -267,7 +337,7 @@ async function preflightChromium(): Promise<void> {
 - Agents MUST NOT retry on exit code 1 (content violations) — only exit code 2 (infrastructure error) is retryable.
 - Agents MUST NOT increase the timeout beyond 15 minutes without operator approval — a longer timeout masks hangs.
 - Agents MUST NOT remove the Chromium pre-flight check — it prevents wasting 5+ minutes on discovery before failing.
-- When implementing the retry loop, agents MUST check `err.exitCode === 2` specifically, not just `err !== null`.
-- The `withTimeout` wrapper MUST kill the child process on timeout, not just reject the promise — otherwise orphaned Chromium processes accumulate.
+- When implementing the retry loop, agents MUST check `result.exitCode` on the returned result object from `executeKernelCommand`. `executeKernelCommand` returns `{ exitCode, data }` — it does NOT throw on non-zero exit codes. Any non-0, non-1 exit code triggers retry (exit 2 = infrastructure error, 3+ = unexpected, 137 = signal kill, null = process vanished).
+- The `withTimeout` wrapper rejects the promise on timeout. The Axiom CLI runs in-process via `executeKernelCommand` (not as a spawned child process), so there is no child process to kill. The Axiom CLI's internal `maxDurationMs` (passed via `--max-duration`) handles process-level cleanup and aborts captures.
 - If the external Axiom CLI does not return exit code 2 for infrastructure errors, agents MUST coordinate with the Axiom expert to fix the exit code convention — do not work around it by retrying on all errors.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
