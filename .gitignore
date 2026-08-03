@@ -292,3 +292,7 @@ storage/
 
 # RFC-0653: leitstand.dev-deploy build-skip cache (local, not committed)
 missions/*/.dev-deploy-build-cache.json
+
+# forge-agent-memory
+.agents/memory/daily/
+# /forge-agent-memory
