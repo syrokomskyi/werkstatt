@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -47,6 +48,7 @@ commands:
     - forge.create
     - forge.upgrade
     - forge.doctor
+    - forge.agents.generate
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -102,8 +104,10 @@ Forge projects gain a **file-based agent memory layer** at `.agents/memory/`: a 
 
 ## Architectural fit
 
-- **DNA-54 (Forge bindings contract):** the layer adds no hardcoded project literals — paths (`.agents/memory/`) are forge-level conventions identical for every project, and gitignore scaffolding lives in `forge.create` templates.
+- **DNA-54 (Forge bindings contract):** the layer adds no hardcoded project literals — paths (`.agents/memory/`) are forge-level conventions identical for every project, and gitignore scaffolding lives in `forge.create` templates. A new binding key `bindings.memory.budget` (default 4096) declares the MEMORY.md hot budget; it is distinct from `bindings.knowledge.budgets.hot` (RFC-0661) because project memory and skill knowledge are independent budgets with different write rates.
+- **`.agents/**` convention:** root AGENTS.md currently states «Keep `.agents/**` as reference or historical documentation, not as the primary active instruction layer.» This RFC adds `.agents/memory/` as an active, frequently-written context directory — not reference, not historical, not instruction. The rule is amended (in the Rollout section) to recognise `.agents/memory/` as an active context store alongside the existing exceptions (`.agents/skills/` synced by forge, `.agents/operator-profile.md` written by `fo-session-retro`). `fo-session-retro`'s constraint «`.agents/**` is reference/historical only» is similarly amended.
 - **RFC-0524 / RFC-0660..0663:** the memory layer is _project_ knowledge, deliberately distinct from _skill_ knowledge (which lives in skills and stays portable). It borrows the hot/cold discipline (RFC-0661) but not the entry schema — memory entries are dated bullets, not K-id records, because their write rate (multiple per session) must stay cheaper than their read value.
+- **Boundary with `docs/sessions/`:** `docs/sessions/` holds structured session records imported by `fo-memory-sync` from external tools (Codex, Claude Code). `.agents/memory/daily/` holds agent-written Context bullets from `fo-session-retro` during the current session. Different sources, different formats, different consumers. Both stay; neither is deprecated.
 - **fo-session-retro:** exactly one routing-table cell changes (Context → `.agents/memory/`); the other five destinations are untouched.
 - **operator-profile.md:** unchanged and complementary — private operator knowledge stays in its git-ignored file; project context goes to the memory layer. The two never merge.
 - **OpenClaw alignment:** adopting the proven `MEMORY.md` + daily-log shape means agents arriving from that ecosystem (and humans) already know how to read it.
@@ -134,16 +138,16 @@ Forge projects gain a **file-based agent memory layer** at `.agents/memory/`: a 
 # /forge-agent-memory
 ```
 
-`forge.doctor` warns when: the gitignore block is missing while daily files exist (privacy leak risk), or `MEMORY.md` exceeds its hot budget.
+`forge.doctor` warns when: the gitignore block is missing while daily files exist (privacy leak risk), or `MEMORY.md` exceeds its hot budget (`bindings.memory.budget`, default 4096). All memory-layer warnings are **advisory** — `forge.doctor` never changes its exit code for memory-layer issues, matching RFC-0661's warn-never-fail semantics.
 
 ### Write contract
 
-- **Daily logs** — append-only, one file per day (`daily/YYYY-MM-DD.md`), entries are dated bullets grouped under `## HH:MM` or thematic headings, written by `fo-session-retro` (Context insights), `fo-handoff` (pointers), or any agent noting session state. Never edited after the day ends except to redact.
+- **Daily logs** — append-only, one file per day (`daily/YYYY-MM-DD.md`), entries are dated bullets grouped under `## HH:MM` or thematic headings, written by `fo-session-retro` (Context insights), `fo-handoff` (pointers), or any agent noting session state. Never edited after the day ends except to redact. **Redaction discipline:** any agent appending to a daily log MUST redact API keys, passwords, and PII before writing — the same redaction pattern that `fo-handoff` applies. Daily logs are local-only (git-ignored), but redaction prevents sensitive material from persisting on disk indefinitely.
 - **MEMORY.md** — curated; entries are concise bullets under stable section headings. Promotion from daily to MEMORY.md happens inside `fo-session-retro` with the same operator confirmation as every other route. `MEMORY.md` is a hot file with a 4096-character budget (RFC-0661 semantics; `forge.doctor` warns, never fails). Over-budget pressure resolves by distilling or dropping lines during retro — no separate compaction command (the volume is human-scale).
 
 ### Read discipline (agent session start)
 
-Agents read, in order: `MEMORY.md` (always), `daily/<today>.md` and `daily/<yesterday>.md` (if present). Older daily files are cold — reached via grep when a task references past context. This discipline lands as an AGENTS.md agent rule and in the relevant skill bodies (`fo-session-retro`, `fo-handoff`, `fo-memory-sync`).
+Agents read, in order: `MEMORY.md` (always), `daily/<today>.md` and `daily/<yesterday>.md` (if present). Older daily files are cold — reached via grep when a task references past context. This discipline lands as an AGENTS.md agent rule and in the relevant skill bodies (`fo-session-retro`, `fo-handoff`, `fo-memory-sync`). The read discipline is **purely advisory** — no mechanical enforcement (no hook, no doctor check for read compliance). It follows the same enforcement model as all other AGENTS.md rules: agent compliance is expected, not verified. Adding mechanical enforcement would over-engineer a human-scale convention.
 
 ### Routing table change (`fo-session-retro`)
 
@@ -155,7 +159,7 @@ All other categories unchanged. The skill's confirmation prompt gains a per-insi
 
 ### Tool-specific memory APIs as adapters
 
-When the running agent's runtime offers a native memory store, the agent MAY mirror Context entries there for its own recall — but the files are the source of truth, and a fresh agent must be able to reconstruct context from files alone. `fo-memory-sync` gains the memory layer as a first-class import/export source (daily logs are exactly the cross-agent handoff material it already moves).
+When the running agent's runtime offers a native memory store, the agent MAY mirror Context entries there for its own recall — but the files are the source of truth, and a fresh agent must be able to reconstruct context from files alone. `fo-memory-sync` gains the memory layer as a first-class **import source** — daily logs are material that `fo-memory-sync` reads and presents to the operator for import decisions, same direction as Codex memories today. No bidirectional sync is introduced; the word «export» is avoided to prevent implying a new write direction.
 
 ### TypeScript contracts
 
@@ -235,14 +239,14 @@ With a leak risk:
 
 ### Failure modes
 
-- **MEMORY.md hand-edited into a mess** → no schema to violate (dated bullets); doctor budget warning is the only guard. Curation pressure is the retro's job.
+- **MEMORY.md hand-edited into a mess** → no schema to violate (dated bullets); doctor budget warning is the only guard (advisory, never fails the exit code). Curation pressure is the retro's job.
 - **Daily file for today already exists** → append, never rewrite.
 - **Project opted to version daily logs** (operator removes the gitignore block deliberately) → doctor stays silent: the block's absence with zero daily files, or a deliberate removal, is not a violation — the warning fires only when untracked daily files exist AND gitignore lacks coverage.
-- **Multiple agents writing the same daily file concurrently** → last-write-wins on append is the accepted risk at human scale; entries are bullets, conflicts merge cleanly in practice.
+- **Multiple agents writing the same daily file concurrently** → at human scale, the realistic scenario is sequential appends within a single session or across sessions on the same day. Last-write-wins on append is the accepted risk; entries are bullets, conflicts merge cleanly in practice. Truly simultaneous writes (two agents appending at the same millisecond) are extremely rare and may lose an entry — accepted because daily logs are a warm stream (not source of truth) and MEMORY.md is curated separately.
 
 ## Rollout
 
-- **Phase 1 (this RFC's implementation):** scaffold logic in `forge.create`/`forge.upgrade`, doctor checks, routing change in `fo-session-retro`, pointer in `fo-handoff`, sync source in `fo-memory-sync`, AGENTS.md read rule (via `forge.agents.generate` template for generated files; hand-written note for this monorepo).
+- **Phase 1 (this RFC's implementation):** scaffold logic in `forge.create`/`forge.upgrade`, doctor checks, routing change in `fo-session-retro`, pointer in `fo-handoff`, sync source in `fo-memory-sync`, AGENTS.md read rule (via `forge.agents.generate` template for generated files; hand-written note for this monorepo). Root AGENTS.md and `fo-session-retro` constraint text are amended to recognise `.agents/memory/` as an active context store (not «reference/historical only»).
 - **Existing projects:** `forge.upgrade` adds the layer without touching existing content; Context insights start flowing to files from the next retro onward. Historical Memory DB entries stay where they are; `fo-memory-sync` can import them on demand.
 - **New projects:** the layer exists from day one via `forge.create` / `forge-bootstrap`.
 - **No pipeline integration:** the memory layer is agent-facing state, never build input.
@@ -282,4 +286,5 @@ With a leak risk:
 - Agents MUST NOT write to `MEMORY.md` outside the operator-confirmed flows (retro curation); daily logs accept direct appends.
 - Agents MUST NOT commit daily logs — the gitignore block is the privacy boundary; removing it is an operator decision.
 - Agents MUST NOT move private operator knowledge into the memory layer — that stays in operator-profile.md.
+- Agents MUST redact API keys, passwords, and PII before appending to daily logs — same redaction discipline as `fo-handoff`.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id RFC-0664 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
