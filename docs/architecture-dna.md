@@ -251,3 +251,7 @@ Every text-based generated file committed to git must be byte-identical to what 
 ## DNA-59 · Evidence preservation
 
 Axiom evidence from `mission.check` is preserved as an append-only archive in S3-compatible storage (Cloudflare R2) with timestamped keys. Raw artifacts are subject to lifecycle-based storage tier transition. The archive is queryable via R2 Data Catalog. Local evidence is ephemeral (latest run only); R2 is the durable history. Established by RFC-0650.
+
+## DNA-60 · Knowledge entry schema and lifecycle contract
+
+Knowledge files declared in skill `knowledge:` frontmatter use a structured entry format: each entry is a `### K-NNNN: title` heading followed by a `knowledge-entry` YAML metadata block and a markdown body. Metadata fields are layer-specific (L0/L1 forbid `confirmations`/`lastConfirmedAt`; L2 requires them). Entry identifiers (`K-NNNN`) are unique within a file; `supersedes` references resolve within the same file; `promotedTo` matches `shared/K-NNNN`. Knowledge-adjacent files (no `K-NNNN` headings, no layer preamble) are exempt. Enforced by `forge.skill.validate` (SKILL-19: schema validity, SKILL-20: identifier uniqueness) and `forge.doctor` (legacy-section counts). Established by RFC-0660.
