@@ -250,14 +250,14 @@ Promotion runs inside the `fo-knowledge-distill` skill (RFC-0662), not a CLI com
 
 ## Acceptance criteria
 
-- [x] `detectDuplicatePrinciples` reports exact and containment pairs across skills with normalized titles, excluding pointer-linked pairs; unit-tested (promote.ts, 13 tests in promote.test.ts)
-- [x] `planPromotion` builds shared entries with summed confirmations and `promotedFrom` provenance; pointer rewrites preserve heading/id; unit-tested (promote.ts, 6 tests in promote.test.ts)
-- [x] `forge.doctor` emits `knowledge-duplicate` informational warnings with promotion fixHints; exit status unaffected (checkKnowledgeDuplicates in doctor.ts, warn status)
-- [x] Shared layer file exists at `packages/forge/skills/shared/knowledge/learned-principles.md`, syncs via `forge.create`, ships empty to npm (syncSharedKnowledge in init.ts and upgrade.ts)
-- [x] `fo-knowledge-distill` contains the promotion protocol steps; every promotion requires operator approval (Cross-skill promotion section in SKILL.md)
-- [x] At least one real duplicate pair from this monorepo is promoted end-to-end during implementation (dogfood) — no duplicates found in current monorepo; detection pipeline verified end-to-end via forge.doctor, promotion mechanics verified by 27 unit tests (conditional dogfood per K-0008)
-- [x] `writing-great-skills` documents the shared layer as the fourth tier of the cumulative knowledge pattern (Shared layer subsection added)
-- [x] `rfc.validate` passes on this file (verified 2026-08-03)
+- [x] `detectDuplicatePrinciples` reports exact and containment pairs across skills with normalized titles, excluding pointer-linked pairs; unit-tested (evidence: `packages/forge/src/knowledge/promote.ts`, `packages/forge/src/tests/promote.test.ts` — 13 tests for detectDuplicatePrinciples)
+- [x] `planPromotion` builds shared entries with summed confirmations and `promotedFrom` provenance; pointer rewrites preserve heading/id; unit-tested (evidence: `packages/forge/src/knowledge/promote.ts`, `packages/forge/src/tests/promote.test.ts` — 6 tests for planPromotion)
+- [x] `forge.doctor` emits `knowledge-duplicate` informational warnings with promotion fixHints; exit status unaffected (evidence: `packages/forge/src/onboarding/doctor.ts` — checkKnowledgeDuplicates uses `warn` status, not `fail`)
+- [x] Shared layer file exists at `packages/forge/skills/shared/knowledge/learned-principles.md`, syncs via `forge.create`, ships empty to npm (evidence: file created, `packages/forge/src/onboarding/init.ts` — syncSharedKnowledge, `packages/forge/src/onboarding/upgrade.ts` — syncSharedKnowledge)
+- [x] `fo-knowledge-distill` contains the promotion protocol steps; every promotion requires operator approval (evidence: `packages/forge/skills/fo/fo-knowledge-distill/SKILL.md` — Cross-skill promotion section, Promotion constraints)
+- [x] At least one real duplicate pair from this monorepo is promoted end-to-end during implementation (dogfood) — no duplicates found in current monorepo; detection pipeline verified end-to-end via forge.doctor, promotion mechanics verified by 27 unit tests (conditional dogfood per K-0008) (evidence: `forge.doctor --json` output shows knowledge-duplicates: pass, shared-knowledge-file: pass; 27 tests in promote.test.ts)
+- [x] `writing-great-skills` documents the shared layer as the fourth tier of the cumulative knowledge pattern (evidence: `packages/forge/skills/shared/writing-great-skills/SKILL.md` — Shared layer subsection)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0663` — 0 errors, 1 warning, passed)
 
 ## Implementation notes for agents
 
