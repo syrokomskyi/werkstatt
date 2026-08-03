@@ -1,7 +1,7 @@
 ---
 id: RFC-0663
 title: "Cross-skill knowledge promotion from skill-local to shared layer"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -18,7 +18,7 @@ createdAt: 2026-08-03
 updatedAt: 2026-08-03
 enhancedAt: 2026-08-03
 acceptedAt: 2026-08-03
-implementedAt:
+implementedAt: 2026-08-03
 closedAt:
 supersedes: []
 supersededBy:
