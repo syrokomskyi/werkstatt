@@ -342,15 +342,15 @@ pnpm exec site-kernel run forge.doctor --json
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/src/knowledge/` exports `parseKnowledgeFile`, `serializeKnowledgeFile`, and `knowledgeEntryMetaSchema` with the layer-specific required/forbidden field matrix (L0/L1/L2) encoded as Zod refinements
-- [ ] Parser is tolerant: malformed metadata blocks produce `parseIssues` with 1-based line numbers and never throw; legacy sections are returned as opaque ranges
-- [ ] Property-based test proves parse → serialize → parse is lossless for generated valid files
-- [ ] `forge.skill.validate` enforces SKILL-19 (schema, errors; legacy sections as aggregated warnings) and SKILL-20 (id uniqueness, `supersedes` resolution, `promotedTo` format) for forge and pack skills
-- [ ] `forge.doctor` reports legacy-section counts as informational output
-- [ ] All knowledge files under `packages/forge/skills/` are migrated to the structured format and validate with zero legacy warnings
-- [ ] `writing-great-skills` § Cumulative knowledge pattern documents the entry format as the single entry contract; `skill-create` scaffolds structured templates
-- [ ] `docs/architecture-dna.md` gains DNA-60 linking RFC-0660..0662
-- [ ] `rfc.validate` passes on this file
+- [x] `packages/forge/src/knowledge/` exports `parseKnowledgeFile`, `serializeKnowledgeFile`, and `knowledgeEntryMetaSchema` with the layer-specific required/forbidden field matrix (L0/L1/L2) encoded as Zod refinements (evidence: packages/forge/src/knowledge/schema.ts:68-92, packages/forge/src/index.ts:114-125)
+- [x] Parser is tolerant: malformed metadata blocks produce `parseIssues` with 1-based line numbers and never throw; legacy sections are returned as opaque ranges (evidence: packages/forge/src/knowledge/parse.ts:48-63, packages/forge/src/tests/knowledge-parse.test.ts:88-100)
+- [x] Property-based test proves parse → serialize → parse is lossless for generated valid files (evidence: packages/forge/src/tests/knowledge-pbt.test.ts:52-84, packages/forge/src/tests/knowledge-parse.test.ts:153-181)
+- [x] `forge.skill.validate` enforces SKILL-19 (schema, errors; legacy sections as aggregated warnings) and SKILL-20 (id uniqueness, `supersedes` resolution, `promotedTo` format) for forge and pack skills (evidence: packages/forge/src/validators/skill-validate.ts:610-718, packages/forge/src/tests/skill-validate-knowledge.test.ts:5-22)
+- [x] `forge.doctor` reports legacy-section counts as informational output (evidence: packages/forge/src/onboarding/doctor.ts:279-340, forge.doctor --json reports "No legacy knowledge sections")
+- [x] All knowledge files under `packages/forge/skills/` are migrated to the structured format and validate with zero legacy warnings (evidence: forge.skill.validate --all --json shows zero SKILL-19/SKILL-20 violations, forge.doctor --json reports "No legacy knowledge sections")
+- [x] `writing-great-skills` § Cumulative knowledge pattern documents the entry format as the single entry contract; `skill-create` scaffolds structured templates (evidence: packages/forge/skills/shared/writing-great-skills/SKILL.md:119-168, packages/forge/skills/meta/skill-create/SKILL.md:49)
+- [x] `docs/architecture-dna.md` gains DNA-60 linking RFC-0660..0662 (evidence: docs/architecture-dna.md:255-257)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0660 --json passes with zero errors)
 
 ## Implementation notes for agents
 
