@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -32,6 +33,7 @@ related:
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
 satisfies:
   - DNA-54
+  - DNA-60
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -46,7 +48,6 @@ commands:
   changed:
     - forge.skill.validate
     - forge.doctor
-    - forge.create
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -108,7 +109,7 @@ All cumulative skill knowledge files (L0 `qa-log.md`, L1 `fix-patterns.md`, L2 `
 - **DNA-54 (Forge bindings contract):** this RFC extends the same validation surface (`forge.skill.validate`) and the same portability constraint — the entry schema is domain-neutral (no software-specific fields), so knowledge files remain portable to any project type. Budget overrides land in `forge.yaml` bindings (RFC-0661), following the bindings pattern rather than hardcoded literals.
 - **RFC-0524 (Cumulative knowledge system):** extends, does not replace. The three-layer pattern, the `knowledge:` frontmatter field, SKILL-13, the source-of-truth mutation contract, and npm empty-template shipping are unchanged. This RFC adds the missing per-entry contract underneath them.
 - **Forward-only:** the structured format becomes the single entry format. Legacy freeform entries are migrated; no parallel format persists after the migration window.
-- **Site OS operator model:** no new commands. `forge.skill.validate` gains SKILL-19/SKILL-20; `forge.doctor` surfaces legacy-section counts; `forge.create` scaffolds new knowledge files from structured templates. Lifecycle mutations stay in RFC-0662's explicit command — nothing here runs automatically in pipelines.
+- **Site OS operator model:** no new commands. `forge.skill.validate` gains SKILL-19/SKILL-20; `forge.doctor` surfaces legacy-section counts; knowledge file templates shipped in `packages/forge/skills/` are structured-empty (preamble + zero entries) and `forge.create` copies them as-is during project initialization. Lifecycle mutations stay in RFC-0662's explicit command — nothing here runs automatically in pipelines.
 - **DNA-60 (proposed, established by this series):** "Cumulative skill knowledge has a schema-backed lifecycle — structured entries, budgeted layers, explicit compaction, and audited promotion." This RFC establishes the schema half; RFC-0661 and RFC-0662 establish the lifecycle half. The implementing change adds DNA-60 to `docs/architecture-dna.md` and links RFC-0660..0662.
 
 ## Design
@@ -181,6 +182,8 @@ Layer-specific rules:
 
 File-layer mapping is conventional: file named `qa-log.md` → L0, `fix-patterns.md` → L1, `learned-principles.md` → L2. Skills declaring custom knowledge file names record the layer in the file preamble comment (`<!-- knowledge-layer: L1 -->`); the parser falls back to the file name mapping.
 
+**Knowledge-adjacent files:** files declared in `knowledge:` that contain no `### K-NNNN` headings and no `<!-- knowledge-layer: -->` preamble are _knowledge-adjacent files_ (templates, reference docs) — they are synced by `forge.create` and checked for existence by SKILL-13, but are exempt from SKILL-19/SKILL-20. This covers cases like `forge-bootstrap`'s `forge-about.md` and `operator-profile-template.md`, which are static templates rather than cumulative knowledge entries.
+
 ### Legacy sections
 
 Any markdown content after the preamble that does not match the entry grammar is a **legacy section**. The parser returns legacy sections as opaque text ranges so the RFC-0662 compact command can present them for operator-approved migration. Legacy sections never fail parsing; they produce SKILL-19 warnings with `severity: warning` during the migration window.
@@ -244,7 +247,9 @@ New rules in `packages/forge/src/validators/skill-validate.ts`, applied to every
 - **SKILL-19 (entry schema):** every structured entry's metadata block parses and satisfies `knowledgeEntryMetaSchema` with the layer-specific refinements. Violations: error. Legacy sections: one aggregated warning per file ("N legacy sections predate RFC-0660 — run the knowledge compaction command to migrate") during the migration window; after the window closes (separate follow-up decision), the warning becomes an error.
 - **SKILL-20 (identifier uniqueness):** entry ids are unique within a file and match `^K-\d{4}$`; `supersedes` references resolve to entries in the same file; `promotedTo` matches `^shared/K-\d{4}$`. Violations: error.
 
-`forge.doctor` gains an informational count of legacy sections across all knowledge files (no failure). `forge.create` scaffolds new skills' knowledge files from structured templates (preamble + zero entries), and `skill-create` documents the format for skill authors.
+`forge.doctor` gains an informational count of legacy sections across all knowledge files (no failure). Knowledge file templates in `packages/forge/skills/` are structured-empty (preamble + zero entries); `forge.create` copies them as-is during project initialization. `skill-create` documents the format for skill authors.
+
+**Performance:** the parser runs as part of `forge.skill.validate`, which already scans all skill files. Currently 4 skills declare knowledge files (11 files total). The parser is linear in file size; incremental cost over the existing SKILL-13 existence check is negligible (~11 small markdown files, typically <10 KB each).
 
 ### CLI surface
 
@@ -266,6 +271,7 @@ pnpm exec site-kernel run forge.doctor --json
 | `packages/forge/skills/**/{qa-log,fix-patterns,learned-principles}.md` | Migrated to structured format (via RFC-0662 compact with operator approval) |
 | `packages/forge/skills/shared/writing-great-skills/SKILL.md` | § Cumulative knowledge pattern updated with the entry format contract |
 | `packages/forge/skills/meta/skill-create/SKILL.md` | Authoring guidance for knowledge files |
+| `packages/forge/AGENTS.md` | Skills section updated to document SKILL-19/SKILL-20 alongside SKILL-13 |
 
 ### Output format
 
@@ -317,7 +323,7 @@ pnpm exec site-kernel run forge.doctor --json
 - **Phase 2 (RFC-0661/0662):** budgets and the compact command build on `parseKnowledgeFile`. Pack skills adopt via their next knowledge mutation; nothing forces a flag day.
 - **New skills:** `skill-create` scaffolds structured knowledge files from day one; the format is the only documented one in `writing-great-skills`.
 - **npm consumers:** knowledge files continue to ship as empty templates — now structured-empty (preamble only, zero entries), which is valid by construction.
-- **Migration window close:** promoting the legacy-section warning to an error is a separate follow-up decision, taken after at least one full compaction cycle (RFC-0662) has run on this monorepo.
+- **Migration window close:** promoting the legacy-section warning to an error is a separate follow-up decision, taken after `forge.doctor` reports zero legacy sections across all knowledge files — a deterministic trigger that confirms the compaction cycle (RFC-0662) has migrated all legacy content.
 
 ## Alternatives considered
 
