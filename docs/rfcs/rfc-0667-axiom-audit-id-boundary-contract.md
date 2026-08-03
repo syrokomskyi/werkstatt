@@ -1,7 +1,7 @@
 ---
 id: RFC-0667
 title: "Axiom Audit ID Boundary Contract"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: contract
 # scope options: app | workspace
@@ -15,9 +15,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-03
-updatedAt: 2026-08-04
+updatedAt: 2026-08-03
 enhancedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-03
 closedAt:
 supersedes: []
 supersededBy:
