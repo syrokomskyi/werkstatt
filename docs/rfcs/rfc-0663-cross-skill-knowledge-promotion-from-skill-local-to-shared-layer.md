@@ -1,7 +1,7 @@
 ---
 id: RFC-0663
 title: "Cross-skill knowledge promotion from skill-local to shared layer"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -12,10 +12,12 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
 enhancedAt: 2026-08-03
+acceptedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
