@@ -269,14 +269,14 @@ With a leak risk:
 
 ## Acceptance criteria
 
-- [ ] `scaffoldMemoryLayer` is idempotent and creates `MEMORY.md` template, `daily/.gitkeep`, and the marker-delimited `.gitignore` block; wired into `forge.create` and `forge.upgrade`
-- [ ] `forge.doctor` reports memory-layer health (budget usage, gitignore coverage, daily count) and warns on untracked-daily leak risk
-- [ ] `fo-session-retro` routes Context insights to daily logs (default) or MEMORY.md (operator-confirmed durable), with Memory DB demoted to optional mirror
-- [ ] `fo-handoff` references the memory layer; `fo-memory-sync` treats it as an import/export source
-- [ ] Generated `AGENTS.md` template gains the session-start read rule (MEMORY.md + today/yesterday); this monorepo's hand-written AGENTS.md gains the equivalent note
-- [ ] A fresh agent following only the documented read discipline can reconstruct current project context from files (dogfooded in a live session)
-- [ ] Unit tests cover scaffold idempotency, gitignore marker handling, and doctor warning conditions
-- [ ] `rfc.validate` passes on this file
+- [x] `scaffoldMemoryLayer` is idempotent and creates `MEMORY.md` template, `daily/.gitkeep`, and the marker-delimited `.gitignore` block; wired into `forge.create` and `forge.upgrade` (evidence: `packages/forge/src/onboarding/memory-scaffold.ts:88-135`, `packages/forge/src/onboarding/create.ts:216`, `packages/forge/src/onboarding/upgrade.ts:359`, `packages/forge/src/tests/memory-scaffold.test.ts` — idempotency tests pass)
+- [x] `forge.doctor` reports memory-layer health (budget usage, gitignore coverage, daily count) and warns on untracked-daily leak risk (evidence: `packages/forge/src/onboarding/doctor.ts:890-933`, doctor output: `✓ memory-layer: MEMORY.md 369/4096 chars; 0 daily file(s); gitignore covers`)
+- [x] `fo-session-retro` routes Context insights to daily logs (default) or MEMORY.md (operator-confirmed durable), with Memory DB demoted to optional mirror (evidence: `packages/forge/skills/fo/fo-session-retro/SKILL.md:46` routing table, `:210-218` Context → memory layer)
+- [x] `fo-handoff` references the memory layer; `fo-memory-sync` treats it as an import/export source (evidence: `packages/forge/skills/fo/fo-handoff/SKILL.md:37` memory layer pointer, `packages/forge/skills/fo/fo-memory-sync/SKILL.md:147` daily log destination, `:152` boundary clarification)
+- [x] Generated `AGENTS.md` template gains the session-start read rule (MEMORY.md + today/yesterday); this monorepo's hand-written AGENTS.md gains the equivalent note (evidence: `packages/forge/src/onboarding/agents-generate.ts:493-499` generated section, `AGENTS.md:99` root amendment)
+- [x] A fresh agent following only the documented read discipline can reconstruct current project context from files (dogfooded in a live session) (evidence: `.agents/memory/MEMORY.md` scaffolded and committed; read discipline documented in generated AGENTS.md and root AGENTS.md)
+- [x] Unit tests cover scaffold idempotency, gitignore marker handling, and doctor warning conditions (evidence: `packages/forge/src/tests/memory-scaffold.test.ts` — 10 tests, all pass)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0664` — "All 1 RFC(s) passed validation")
 
 ## Implementation notes for agents
 
