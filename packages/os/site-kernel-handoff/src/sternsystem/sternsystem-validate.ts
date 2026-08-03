@@ -226,6 +226,19 @@ export async function runSternsystemValidate(
       });
     }
 
+    // RFC-0666: secretsFile field is removed — reject if still present in any channel
+    if (entry.deployment?.channels) {
+      for (const [ch, chConfig] of Object.entries(entry.deployment.channels)) {
+        if (chConfig?.secretsFile) {
+          violations.push({
+            systemId: entry.id,
+            rule: "secretsFile-removed",
+            message: `channel '${ch}' still contains 'secretsFile' field — remove it. See RFC-0666.`,
+          });
+        }
+      }
+    }
+
     // RFC-0574: validate mirror topology — mirrors[0] is cache, mirrors[1] is bare, mirrors[2+] are external
     if (entry.mirrors.length < 1) {
       violations.push({
