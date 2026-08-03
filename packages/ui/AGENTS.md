@@ -362,6 +362,12 @@ Section numbering is controlled by the `numbered` field in each section's manife
 - `blocks-renderer.astro` discovers unnumbered sections dynamically at build time by scanning all `*.manifest.yaml` files — no hardcoded sets.
 - To add a new unnumbered section, add `numbered: false` to its manifest. No renderer edit needed.
 
+## Anchor link contract
+
+- **Section `id` MUST be the bare `sectionId`** — never prefix with `sectionNumber` (e.g. `id="price-comparison"`, NOT `id="01-price-comparison"`). The `aria-labelledby` attribute already uses the `${sectionNumber}-${id}` pattern for ARIA uniqueness; the `id` attribute must NOT duplicate this prefix. Anchor links (`#price-comparison`) reference the bare `anchorId` and will fail to resolve if the `id` is prefixed.
+- **`.section-shell` MUST have `scroll-margin-top: var(--ds-size-header-height, 80px)`** so that native scroll-to-anchor and CSS scroll-to-anchor respect the fixed header height. This is a CSS-level fix that works even without JavaScript.
+- **`section-cta.astro` MUST handle `kind: "anchor"` explicitly** — it produces `href="#${target.anchor}"`. The CTA schema (`@warpgogol/share/schemas/section-cta`) expects the field name `anchor` (NOT `anchorId`) for `kind: anchor` targets. Content authors must use `anchor: send-message`, not `anchorId: send-message`.
+
 ## Consumer guidance
 
 - App `tsconfig.json` files should map `@warpgogol/ui` to `../../packages/ui/src/index.ts` and `@warpgogol/ui/*` to `../../packages/ui/src/*`.
