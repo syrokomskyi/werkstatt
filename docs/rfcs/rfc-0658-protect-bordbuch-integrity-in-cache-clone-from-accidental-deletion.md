@@ -281,16 +281,16 @@ const bordbuchValidateStep: PipelineStep = {
 
 ## Acceptance criteria
 
-- [ ] `installBordbuchPreCommitHook` function exists and writes a valid pre-commit hook to `<cache-clone>/.git/hooks/pre-commit`
-- [ ] `mission.materialize` calls `installBordbuchPreCommitHook` after cache clone synchronization
-- [ ] Pre-commit hook rejects `git rm bordbuch/events.ndjson` + `git commit` with a clear error message
-- [ ] `mission.close` calls `validateBordbuch` before appending the close event and returns `exitCode: 1` on violations
-- [ ] `build.prepare` pipeline includes a `bordbuch.validate` step that fails on hash-chain or lifecycle violations
-- [ ] Unit test: pre-commit hook blocks deletion of `bordbuch/events.ndjson`
-- [ ] Unit test: `mission.close` fails when bordbuch has `orphan-mission-close` violation
-- [ ] Unit test: `build.prepare` fails when bordbuch hash chain is broken
-- [ ] `bordbuch.repair` is not blocked by the pre-commit hook (it rewrites, not deletes)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `installBordbuchPreCommitHook` function exists and writes a valid pre-commit hook to `<cache-clone>/.git/hooks/pre-commit` (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-hook.ts:46, bordbuch-hook.test.ts:32)
+- [x] `mission.materialize` calls `installBordbuchPreCommitHook` after cache clone synchronization (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialize.ts:622)
+- [x] Pre-commit hook rejects `git rm bordbuch/events.ndjson` + `git commit` with a clear error message (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-hook.ts:28, hook script uses diff-filter=D + exit 1)
+- [x] `mission.close` calls `validateBordbuch` before appending the close event and returns `exitCode: 1` on violations (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:272, rfc-0658-mission-close-bordbuch-validate.test.ts:155)
+- [x] `build.prepare` pipeline includes a `bordbuch.validate` step that fails on hash-chain or lifecycle violations (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:127, build-prepare-pipeline.test.ts:80)
+- [x] Unit test: pre-commit hook blocks deletion of `bordbuch/events.ndjson` (evidence: packages/os/site-kernel-handoff/src/tests/bordbuch-hook.test.ts, 6 tests pass)
+- [x] Unit test: `mission.close` fails when bordbuch has `orphan-mission-close` violation (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0658-mission-close-bordbuch-validate.test.ts:155)
+- [x] Unit test: `build.prepare` fails when bordbuch hash chain is broken (evidence: packages/os/site-kernel-checks/src/tests/build-prepare-pipeline.test.ts:80, bordbuch.validate step in pipeline catches hash-chain violations via validateBordbuch)
+- [x] `bordbuch.repair` is not blocked by the pre-commit hook (it rewrites, not deletes) (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-hook.ts:28, hook script uses diff-filter=D which only triggers on deletion, not modification)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0658 --json exits 0 with 0 violations)
 
 ## Implementation notes for agents
 
