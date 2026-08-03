@@ -1,7 +1,7 @@
 ---
 id: RFC-0659
 title: "Cache workpiece artifacts to skip codegen on repeated mission materialization"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
 enhancedAt: 2026-08-03
-implementedAt:
+implementedAt: 2026-08-03
 closedAt:
 supersedes: []
 supersededBy:
@@ -279,21 +279,21 @@ All fallback paths produce correct results — the cache is a pure performance o
 
 ## Acceptance criteria
 
-- [ ] `MaterializationCacheState` interface defined in `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts`
-- [ ] Cache key computed as `byteHash(cacheCloneHead + "|" + platformVersion + "|" + platformSemanticHash)` using existing `resolvePlatformSemanticHash` and `resolveCurrentEcosystem`
-- [ ] On cache miss, workpiece snapshot written to `systems/<id>/.cache/materialization/<hash>/` after `build.prepare.dev` completes successfully (excluding `.git/` and `node_modules/`)
-- [ ] On cache hit, workpiece restored from cache via atomic staging + move pattern, skipping `generateFullBoilerplate`, `build.prepare.dev`, and media cache warming
-- [ ] `--force` flag (new, introduced by this RFC) bypasses cache read and performs full materialization. The hardcoded `force: true` in `executeKernelPipeline` remains unchanged.
-- [ ] Previous cache entry deleted when new entry is written (keep only latest)
-- [ ] `mission.materialize` JSON output includes `artifactCacheHit`, `artifactCacheKey`, and `artifactCacheSkipped` fields
-- [ ] `.materialization-cache-state.json` written separately from `.materialization-state.json` (RFC-0597)
-- [ ] `.cache/` added to cache clone's `.gitignore` to prevent `sternsystem.validate` dirty-file detection
-- [ ] Unit test: cache hit → `artifactCacheHit: true`, `generateFullBoilerplate` not called, `build.prepare.dev` not called
-- [ ] Unit test: cache miss → full materialization, cache written after `build.prepare.dev`
-- [ ] Unit test: `--force` → cache bypassed, full materialization, cache refreshed
-- [ ] Unit test: cache directory missing despite state file match → fall through to full materialization
-- [ ] `AGENTS.md` for `site-kernel-handoff` updated with artifact cache documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `MaterializationCacheState` interface defined in `packages/os/site-kernel-handoff/src/mission/mission-materialize.ts` (evidence: interface added at line 78)
+- [x] Cache key computed as `byteHash(cacheCloneHead + "|" + platformVersion + "|" + platformSemanticHash)` using existing `resolvePlatformSemanticHash` and `resolveCurrentEcosystem` (evidence: `computeArtifactCacheKey` helper at line 594)
+- [x] On cache miss, workpiece snapshot written to `systems/<id>/.cache/materialization/<hash>/` after `build.prepare.dev` completes successfully (excluding `.git/` and `node_modules/`) (evidence: cache write block at line 1277, `copyDirExcluding` with `.git`, `node_modules`, `dist` exclusions)
+- [x] On cache hit, workpiece restored from cache via atomic staging + move pattern, skipping `generateFullBoilerplate`, `build.prepare.dev`, and media cache warming (evidence: cache hit branch at line 972, `build.prepare.dev` conditional at line 1144)
+- [x] `--force` flag (new, introduced by this RFC) bypasses cache read and performs full materialization. The hardcoded `force: true` in `executeKernelPipeline` remains unchanged. (evidence: `flagBool(input, "force")` at line 720, `artifactCacheSkipped` set when `--force` at line 921)
+- [x] Previous cache entry deleted when new entry is written (keep only latest) (evidence: cache cleanup loop at line 1284)
+- [x] `mission.materialize` JSON output includes `artifactCacheHit`, `artifactCacheKey`, and `artifactCacheSkipped` fields (evidence: fields in `MissionMaterializeData` interface and report object at line 1361)
+- [x] `.materialization-cache-state.json` written separately from `.materialization-state.json` (RFC-0597) (evidence: state file at `.cache/materialization-state.json`, distinct from RFC-0597's `.materialization-state.json`)
+- [x] `.cache/` added to cache clone's `.gitignore` to prevent `sternsystem.validate` dirty-file detection (evidence: `writeArtifactCacheState` updates `.gitignore` at line 676)
+- [x] Unit test: cache hit → `artifactCacheHit: true`, `generateFullBoilerplate` not called, `build.prepare.dev` not called (evidence: `mission-materialize-artifact-cache.test.ts` test "cache hit — build.prepare.dev skipped")
+- [x] Unit test: cache miss → full materialization, cache written after `build.prepare.dev` (evidence: `mission-materialize-artifact-cache.test.ts` test "cache miss — build.prepare.dev runs")
+- [x] Unit test: `--force` → cache bypassed, full materialization, cache refreshed (evidence: `mission-materialize-artifact-cache.test.ts` test "--force flag bypasses cache read")
+- [x] Unit test: cache directory missing despite state file match → fall through to full materialization (evidence: `mission-materialize-artifact-cache.test.ts` test "stale state file")
+- [x] `AGENTS.md` for `site-kernel-handoff` updated with artifact cache documentation (evidence: `packages/os/site-kernel-handoff/AGENTS.md` line 190)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0659` exits 0)
 
 ## Implementation notes for agents
 
