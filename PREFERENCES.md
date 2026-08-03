@@ -51,4 +51,11 @@ If the agent cannot check ALL items, it MUST NOT claim the RFC is complete. Inst
 
 ## Session-end protocol (NON-NEGOTIABLE)
 
-When the operator says "Завершаем эту сессию" (or any variant: "Завершаем сессию", "Заканчиваем сессию", "End session", "Wrap up"), the agent MUST invoke the `fo-session-retro` skill via the `skill` tool BEFORE producing any closing summary. The retro skill IS the session-end protocol — do not substitute it with a manual summary. See `.windsurf/workflows/session-end.md` for the full workflow.
+When the operator says "Завершаем эту сессию" (or any variant: "Завершаем сессию", "Заканчиваем сессию", "End session", "Wrap up"), the agent MUST:
+
+1. **Verify clean working tree** — check `git status` in werkstatt root and all active mission workpieces. Commit any uncommitted changes made during this session (distinguish from changes by other parallel agents by reviewing conversation history). Report remaining dirty files to the operator without touching them. See `.windsurf/workflows/session-end.md` step 2 for the full procedure.
+2. **Invoke `fo-session-retro`** via the `skill` tool BEFORE producing any closing summary. The retro skill IS the session-end protocol — do not substitute it with a manual summary.
+
+## Context routing discipline
+
+When routing insights during `fo-session-retro`, the Context category must only capture knowledge that is useful for future agents working on the project. Transient observations — such as "previous session left uncommitted changes" — are NOT useful context. They describe a one-time state that has been resolved and will not help the next agent. When in doubt, drop the insight rather than cluttering the memory layer.
