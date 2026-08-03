@@ -15,6 +15,7 @@
   <item>RFC-0600: added generated.stale.validate after generated.files.validate in both pipelines.</item>
   <item>RFC-0604: added bordbuch.generate and passport.key.ensure before generated.files.validate.</item>
   <item>RFC-0626: added bordbuch.commit after bordbuch.generate to auto-commit bordbuch projections.</item>
+  <item>RFC-0658: added bordbuch.validate after bordbuch.generate and before bordbuch.commit to validate hash-chain integrity before build proceeds.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -122,6 +123,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "warpgogol.check-hints.generate" },
   // RFC-0604: generate bordbuch projections and ensure passport key before final validation
   { command: "bordbuch.generate" },
+  // RFC-0658: validate bordbuch hash-chain integrity before build proceeds
+  { command: "bordbuch.validate" },
   // RFC-0626: auto-commit bordbuch projections after bordbuch.generate
   { command: "bordbuch.commit" },
   { command: "passport.key.ensure" },
