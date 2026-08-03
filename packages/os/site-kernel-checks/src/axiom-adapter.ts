@@ -346,7 +346,13 @@ export async function runAxiomReport(
   let metadata: EvidenceMetadata = { auditId: missionId };
   if (existsSync(metadataPath)) {
     try {
-      metadata = JSON.parse(readFileSync(metadataPath, "utf-8"));
+      const raw = JSON.parse(readFileSync(metadataPath, "utf-8"));
+      metadata = {
+        auditId: raw.auditId ?? raw.missionId ?? missionId,
+        commitSha: raw.commitSha,
+        runTimestamp: raw.runTimestamp,
+        methodologies: raw.methodologies,
+      };
     } catch {
       logger.warn(
         `AXIOM-REPORT-05: cannot read evidence-metadata.json at ${metadataPath}. Using "unknown" for missing fields.`,
