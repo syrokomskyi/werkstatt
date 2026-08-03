@@ -19,6 +19,7 @@
   <item>RFC-0580: auto-commit werkstatt side-effects (mission.yaml, pnpm-lock.yaml) after writeMissionManifest.</item>
   <item>RFC-0597: skip preflight on unchanged cache clone HEAD, run build.prepare.dev instead of build.prepare, warm .cache/video/ and .cache/video-live/ from cache clone.</item>
   <item>RFC-0620: replace hardcoded bordbuch file removal with ownership-map-driven filter that excludes all workspace-absolute generated files from STERNSYSTEM_DATA_PATHS copy.</item>
+  <item>RFC-0659: add workpiece artifact cache — skip codegen on repeated materialization when cache key (cacheCloneHead + platformVersion + platformSemanticHash) matches.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -70,6 +71,8 @@ import {
 } from "../werkstatt/index.ts";
 import { atomicMoveDir, atomicWriteFile, resolveStagingDir } from "../werkstatt/atomic.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { resolveCurrentEcosystem, resolvePlatformSemanticHash } from "../bundle-io.ts";
+import { byteHash } from "@warpgogol/fingerprint";
 import type { KernelPipelineStep } from "@warpgogol/site-kernel";
 
 export interface MissionMaterializeData {
@@ -92,6 +95,19 @@ export interface MissionMaterializeData {
   mediaCacheWarmed: boolean;
   mediaCacheSources: number;
   bordbuchHookInstalled: boolean;
+  artifactCacheHit: boolean;
+  artifactCacheKey: string | null;
+  artifactCacheSkipped: boolean;
+}
+
+// RFC-0659: Artifact cache state file at systems/<id>/.materialization-cache-state.json
+interface MaterializationCacheState {
+  systemId: string;
+  cacheKey: string;
+  cacheCloneHead: string;
+  platformVersion: string;
+  platformSemanticHash: string;
+  writtenAt: string;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -565,6 +581,135 @@ async function runPreflightGate(
 
 // RFC-0647: ensurePlaywrightChromium extracted to @warpgogol/site-kernel-checks as ensureChromium.
 
+// RFC-0659: Artifact cache directory and state file paths
+const ARTIFACT_CACHE_DIR = ".cache/materialization";
+const ARTIFACT_CACHE_STATE_FILE = ".materialization-cache-state.json";
+
+/**
+ * RFC-0659: Compute the artifact cache key from cacheCloneHead, platformVersion,
+ * and platformSemanticHash. Returns the hash and the individual components for
+ * writing to the cache state file.
+ */
+async function computeArtifactCacheKey(
+  workspaceRoot: string,
+  cacheCloneHead: string,
+): Promise<{ cacheKey: string; platformVersion: string; platformSemanticHash: string }> {
+  const { version: platformVersion } = await resolveCurrentEcosystem(workspaceRoot);
+  const platformSemanticHash = await resolvePlatformSemanticHash(workspaceRoot);
+  const cacheKey = byteHash(`${cacheCloneHead}|${platformVersion}|${platformSemanticHash}`);
+  return { cacheKey, platformVersion, platformSemanticHash };
+}
+
+/**
+ * RFC-0659: Resolve the current cache clone HEAD. Returns null if HEAD cannot
+ * be resolved (non-git cache clone, empty repo).
+ */
+function resolveCacheCloneHead(systemDir: string): string | null {
+  try {
+    return execSync("git rev-parse HEAD", {
+      cwd: systemDir,
+      stdio: "pipe",
+      encoding: "utf-8",
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * RFC-0659: Read the artifact cache state file. Returns null if the file does
+ * not exist or is corrupt.
+ */
+async function readArtifactCacheState(
+  systemDir: string,
+): Promise<MaterializationCacheState | null> {
+  const statePath = path.join(systemDir, ARTIFACT_CACHE_STATE_FILE);
+  if (!existsSync(statePath)) return null;
+  try {
+    const raw = await fs.readFile(statePath, "utf8");
+    return JSON.parse(raw) as MaterializationCacheState;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * RFC-0659: Copy a directory tree, excluding specified top-level entries.
+ * Used to snapshot the workpiece (excluding .git/ and node_modules/) to the cache.
+ */
+async function copyDirExcluding(
+  src: string,
+  dest: string,
+  excludeTopLevel: Set<string>,
+): Promise<void> {
+  if (!existsSync(src)) return;
+  await fs.mkdir(dest, { recursive: true });
+  const entries = await fs.readdir(src, { withFileTypes: true });
+  for (const entry of entries) {
+    if (excludeTopLevel.has(entry.name)) continue;
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      await copyDir(srcPath, destPath);
+    } else {
+      await fs.copyFile(srcPath, destPath);
+    }
+  }
+}
+
+/**
+ * RFC-0659: Write the artifact cache state file and ensure .cache/ is gitignored
+ * in the cache clone. Commits both the state file and .gitignore update.
+ */
+async function writeArtifactCacheState(
+  systemDir: string,
+  state: MaterializationCacheState,
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
+): Promise<void> {
+  const statePath = path.join(systemDir, ARTIFACT_CACHE_STATE_FILE);
+  await atomicWriteFile(statePath, JSON.stringify(state, null, 2) + "\n");
+
+  // RFC-0659: Ensure .cache/ is in the cache clone's .gitignore
+  const gitignorePath = path.join(systemDir, ".gitignore");
+  let gitignoreContent = "";
+  if (existsSync(gitignorePath)) {
+    gitignoreContent = await fs.readFile(gitignorePath, "utf8");
+  }
+  if (!gitignoreContent.includes(".cache/")) {
+    const newContent =
+      gitignoreContent.endsWith("\n") || gitignoreContent === ""
+        ? gitignoreContent + ".cache/\n"
+        : gitignoreContent + "\n.cache/\n";
+    await atomicWriteFile(gitignorePath, newContent);
+  }
+
+  // Commit state file and .gitignore to cache clone
+  if (existsSync(path.join(systemDir, ".git"))) {
+    try {
+      execSync(`git add -- ${JSON.stringify(ARTIFACT_CACHE_STATE_FILE)} .gitignore`, {
+        cwd: systemDir,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      execSync(`git commit -m "artifact cache state: ${state.cacheKey.slice(0, 12)}"`, {
+        cwd: systemDir,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          GIT_AUTHOR_NAME: "mission.materialize",
+          GIT_AUTHOR_EMAIL: "mission@warpgogol.local",
+          GIT_COMMITTER_NAME: "mission.materialize",
+          GIT_COMMITTER_EMAIL: "mission@warpgogol.local",
+        },
+      });
+      logger.info(`  Artifact cache state committed to cache clone`);
+    } catch (err) {
+      logger.warn(
+        `  Failed to commit artifact cache state: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+}
+
 export async function runMissionMaterialize(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -573,6 +718,7 @@ export async function runMissionMaterialize(
   const missionId = flagString(input, "mission");
   const reportOnly = flagBool(input, "report-only");
   const skipPreflight = flagBool(input, "skip-preflight");
+  const force = flagBool(input, "force");
 
   if (!missionId) throw new Error("[mission.materialize] --mission is required");
 
@@ -687,6 +833,9 @@ export async function runMissionMaterialize(
           mediaCacheWarmed: false,
           mediaCacheSources: 0,
           bordbuchHookInstalled: false,
+          artifactCacheHit: false,
+          artifactCacheKey: null,
+          artifactCacheSkipped: false,
         },
         summary: `[mission.materialize] ${missionId} report-only: ${verdict}`,
       };
@@ -722,6 +871,60 @@ export async function runMissionMaterialize(
           }
         } catch {
           // Corrupt state file — fail safe, run preflight
+        }
+      }
+    }
+
+    // RFC-0659: Compute artifact cache key and check for cache hit.
+    // The cache key combines cacheCloneHead, platformVersion, and platformSemanticHash.
+    // On cache hit, the workpiece is restored from cache — skipping codegen and build.prepare.dev.
+    // The --force flag bypasses cache read but still writes a fresh cache entry after full materialization.
+    let artifactCacheHit = false;
+    let artifactCacheKey: string | null = null;
+    let artifactCacheSkipped = false;
+    let cacheCloneHead: string | null = null;
+    let artifactCacheKeyComponents: {
+      platformVersion: string;
+      platformSemanticHash: string;
+    } | null = null;
+
+    if (!reportOnly) {
+      cacheCloneHead = resolveCacheCloneHead(systemDir);
+      if (cacheCloneHead) {
+        try {
+          const keyResult = await computeArtifactCacheKey(workspaceRoot, cacheCloneHead);
+          artifactCacheKey = keyResult.cacheKey;
+          artifactCacheKeyComponents = {
+            platformVersion: keyResult.platformVersion,
+            platformSemanticHash: keyResult.platformSemanticHash,
+          };
+
+          if (!force) {
+            const cacheState = await readArtifactCacheState(systemDir);
+            if (cacheState && cacheState.cacheKey === artifactCacheKey) {
+              const cacheDir = path.join(systemDir, ARTIFACT_CACHE_DIR, artifactCacheKey);
+              if (existsSync(cacheDir)) {
+                artifactCacheHit = true;
+                logger.info(`  Artifact cache hit (key: ${artifactCacheKey.slice(0, 12)})`);
+              } else {
+                logger.warn(
+                  `  Artifact cache: state file exists but cache directory missing — falling through to full materialization`,
+                );
+                try {
+                  await fs.unlink(path.join(systemDir, ARTIFACT_CACHE_STATE_FILE));
+                } catch {
+                  // ignore
+                }
+              }
+            }
+          } else {
+            artifactCacheSkipped = true;
+            logger.info(`  Artifact cache: bypassed (--force)`);
+          }
+        } catch (err) {
+          logger.warn(
+            `  Artifact cache: key computation failed — ${err instanceof Error ? err.message : String(err)}`,
+          );
         }
       }
     }
@@ -762,110 +965,122 @@ export async function runMissionMaterialize(
       logger.info(`  Cloned cache clone git history into staging`);
     }
 
-    // RFC-0620: Build skip set of workspace-absolute generated paths.
-    // These are generated artifacts (e.g. bordbuch projections) that belong in
-    // the cache clone, not the workpiece. Filtering them at copy time avoids
-    // ownership.sync.validate OWN-01 failures.
-    const skipPathsGlobal = getWorkspaceAbsoluteGeneratedPaths();
-
-    // Copy data set from Sternsystem
-    for (const dataPath of STERNSYSTEM_DATA_PATHS) {
-      const src = path.join(systemDir, dataPath);
-      const dest = path.join(stagingDir, dataPath);
-      if (!existsSync(src)) continue;
-      const stat = await fs.stat(src);
-      if (stat.isDirectory()) {
-        // RFC-0620: filter skip set to entries within this data path,
-        // then strip the data-path prefix to get paths relative to the copy root.
-        const dataSkipPaths = new Set<string>();
-        const dataPrefix = dataPath + "/";
-        for (const skipPath of skipPathsGlobal) {
-          if (skipPath.startsWith(dataPrefix)) {
-            dataSkipPaths.add(skipPath.slice(dataPrefix.length));
-          }
-        }
-        await copyDir(src, dest, dataSkipPaths.size > 0 ? dataSkipPaths : undefined);
-      } else {
-        // Single file — skip if it matches a workspace-absolute generated path
-        if (!skipPathsGlobal.has(dataPath)) {
-          await fs.mkdir(path.dirname(dest), { recursive: true });
-          await fs.copyFile(src, dest);
-        }
-      }
-      logger.info(`  Copied ${dataPath}`);
-    }
-
-    // RFC-0620: Remove workspace-absolute generated files that entered the
-    // staging dir via git clone (RFC-0568). The clone brings all cache-clone
-    // files into the working tree; the non-data-path removal above keeps only
-    // STERNSYSTEM_DATA_PATHS, but workspace-absolute generated files within
-    // those data paths (e.g. public/.well-known/bordbuch.json) survive because
-    // they are inside a kept data path. The copy step above skips them, but
-    // the cloned copies remain. Remove them here using the ownership map.
-    for (const skipPath of skipPathsGlobal) {
-      const stagingPath = path.join(stagingDir, skipPath);
-      if (existsSync(stagingPath)) {
-        await fs.rm(stagingPath, { force: true });
-      }
-    }
-
-    // RFC-0479: copy system.pin.json to workpiece root so mission.migrate can read migratorCursor
-    const pinFileSrc = path.join(systemDir, "system.pin.json");
-    if (existsSync(pinFileSrc)) {
-      await fs.copyFile(pinFileSrc, path.join(stagingDir, "system.pin.json"));
-      logger.info(`  Copied system.pin.json`);
-    }
-
-    // RFC-0568: After clone, remove ALL non-data-path files from the working tree.
-    // The clone brought cache-clone-local files (bordbuch/, etc.) that must not
-    // enter the workpiece. Only keep STERNSYSTEM_DATA_PATHS + system.pin.json.
-    // The .git directory is preserved (it's in .git/, not in the working tree).
-    if (clonedGitDir) {
-      const keepPaths = new Set([...STERNSYSTEM_DATA_PATHS, "system.pin.json", ".git"]);
-      const stagingEntries = await fs.readdir(stagingDir, { withFileTypes: true });
-      for (const entry of stagingEntries) {
-        // Check if entry name is an exact match OR a parent directory of any keep path
-        // (e.g. "src" is the parent of "src/content")
-        const isKeepPath =
-          keepPaths.has(entry.name) || [...keepPaths].some((kp) => kp.startsWith(`${entry.name}/`));
-        if (!isKeepPath) {
-          const entryPath = path.join(stagingDir, entry.name);
-          await fs.rm(entryPath, { recursive: true, force: true });
-        }
-      }
-    }
-
-    // RFC-0597: Warm media cache from cache clone to workpiece after data-path copy
+    // RFC-0659: On cache hit, restore the workpiece from the artifact cache directory.
+    // On cache miss (or --force), run the full data-path copy + boilerplate generation flow.
+    let regeneratedFiles: string[] = [];
     let mediaCacheWarmed = false;
     let mediaCacheSources = 0;
-    for (const cacheDir of MEDIA_CACHE_DIRS) {
-      const srcCache = path.join(systemDir, cacheDir);
-      if (existsSync(srcCache)) {
-        const destCache = path.join(stagingDir, cacheDir);
-        try {
-          // Replace (not merge) — stale entries from failed runs do not persist
-          if (existsSync(destCache)) {
-            await fs.rm(destCache, { recursive: true, force: true });
+
+    if (artifactCacheHit && artifactCacheKey) {
+      const cacheDir = path.join(systemDir, ARTIFACT_CACHE_DIR, artifactCacheKey);
+      // Restore cached workpiece into staging (excluding .git/ — already provided by clone)
+      await copyDirExcluding(cacheDir, stagingDir, new Set([".git"]));
+      logger.info(`  Restored workpiece from artifact cache`);
+    } else {
+      // RFC-0620: Build skip set of workspace-absolute generated paths.
+      // These are generated artifacts (e.g. bordbuch projections) that belong in
+      // the cache clone, not the workpiece. Filtering them at copy time avoids
+      // ownership.sync.validate OWN-01 failures.
+      const skipPathsGlobal = getWorkspaceAbsoluteGeneratedPaths();
+
+      // Copy data set from Sternsystem
+      for (const dataPath of STERNSYSTEM_DATA_PATHS) {
+        const src = path.join(systemDir, dataPath);
+        const dest = path.join(stagingDir, dataPath);
+        if (!existsSync(src)) continue;
+        const stat = await fs.stat(src);
+        if (stat.isDirectory()) {
+          // RFC-0620: filter skip set to entries within this data path,
+          // then strip the data-path prefix to get paths relative to the copy root.
+          const dataSkipPaths = new Set<string>();
+          const dataPrefix = dataPath + "/";
+          for (const skipPath of skipPathsGlobal) {
+            if (skipPath.startsWith(dataPrefix)) {
+              dataSkipPaths.add(skipPath.slice(dataPrefix.length));
+            }
           }
-          await copyDir(srcCache, destCache);
-          mediaCacheWarmed = true;
-          mediaCacheSources++;
-          logger.info(`  Warmed ${cacheDir} from cache clone`);
-        } catch (err) {
-          logger.info(
-            `  Warning: failed to warm ${cacheDir} from cache clone: ${err instanceof Error ? err.message : String(err)}`,
-          );
+          await copyDir(src, dest, dataSkipPaths.size > 0 ? dataSkipPaths : undefined);
+        } else {
+          // Single file — skip if it matches a workspace-absolute generated path
+          if (!skipPathsGlobal.has(dataPath)) {
+            await fs.mkdir(path.dirname(dest), { recursive: true });
+            await fs.copyFile(src, dest);
+          }
+        }
+        logger.info(`  Copied ${dataPath}`);
+      }
+
+      // RFC-0620: Remove workspace-absolute generated files that entered the
+      // staging dir via git clone (RFC-0568). The clone brings all cache-clone
+      // files into the working tree; the non-data-path removal above keeps only
+      // STERNSYSTEM_DATA_PATHS, but workspace-absolute generated files within
+      // those data paths (e.g. public/.well-known/bordbuch.json) survive because
+      // they are inside a kept data path. The copy step above skips them, but
+      // the cloned copies remain. Remove them here using the ownership map.
+      for (const skipPath of skipPathsGlobal) {
+        const stagingPath = path.join(stagingDir, skipPath);
+        if (existsSync(stagingPath)) {
+          await fs.rm(stagingPath, { force: true });
         }
       }
-    }
 
-    // Generate full runtime boilerplate from onboarding templates and codegen generators (RFC-0389)
-    const regeneratedFiles = await generateFullBoilerplate(
-      stagingDir,
-      manifest.systemId,
-      context,
-      logger,
-    );
+      // RFC-0479: copy system.pin.json to workpiece root so mission.migrate can read migratorCursor
+      const pinFileSrc = path.join(systemDir, "system.pin.json");
+      if (existsSync(pinFileSrc)) {
+        await fs.copyFile(pinFileSrc, path.join(stagingDir, "system.pin.json"));
+        logger.info(`  Copied system.pin.json`);
+      }
+
+      // RFC-0568: After clone, remove ALL non-data-path files from the working tree.
+      // The clone brought cache-clone-local files (bordbuch/, etc.) that must not
+      // enter the workpiece. Only keep STERNSYSTEM_DATA_PATHS + system.pin.json.
+      // The .git directory is preserved (it's in .git/, not in the working tree).
+      if (clonedGitDir) {
+        const keepPaths = new Set([...STERNSYSTEM_DATA_PATHS, "system.pin.json", ".git"]);
+        const stagingEntries = await fs.readdir(stagingDir, { withFileTypes: true });
+        for (const entry of stagingEntries) {
+          // Check if entry name is an exact match OR a parent directory of any keep path
+          // (e.g. "src" is the parent of "src/content")
+          const isKeepPath =
+            keepPaths.has(entry.name) ||
+            [...keepPaths].some((kp) => kp.startsWith(`${entry.name}/`));
+          if (!isKeepPath) {
+            const entryPath = path.join(stagingDir, entry.name);
+            await fs.rm(entryPath, { recursive: true, force: true });
+          }
+        }
+      }
+
+      // RFC-0597: Warm media cache from cache clone to workpiece after data-path copy
+      for (const cacheDir of MEDIA_CACHE_DIRS) {
+        const srcCache = path.join(systemDir, cacheDir);
+        if (existsSync(srcCache)) {
+          const destCache = path.join(stagingDir, cacheDir);
+          try {
+            // Replace (not merge) — stale entries from failed runs do not persist
+            if (existsSync(destCache)) {
+              await fs.rm(destCache, { recursive: true, force: true });
+            }
+            await copyDir(srcCache, destCache);
+            mediaCacheWarmed = true;
+            mediaCacheSources++;
+            logger.info(`  Warmed ${cacheDir} from cache clone`);
+          } catch (err) {
+            logger.info(
+              `  Warning: failed to warm ${cacheDir} from cache clone: ${err instanceof Error ? err.message : String(err)}`,
+            );
+          }
+        }
+      }
+
+      // Generate full runtime boilerplate from onboarding templates and codegen generators (RFC-0389)
+      regeneratedFiles = await generateFullBoilerplate(
+        stagingDir,
+        manifest.systemId,
+        context,
+        logger,
+      );
+    } // end if (!artifactCacheHit) — RFC-0659 artifact cache branch
 
     // Commit staging → workpiece via atomic rename (replace: true handles
     // the old workpiece via rename-to-trash, avoiding EBUSY on Windows).
@@ -922,25 +1137,38 @@ export async function runMissionMaterialize(
       );
     }
 
-    // RFC-0597: Run build.prepare.dev pipeline (codegen-only) instead of build.prepare.full
-    logger.info(`  Running build.prepare.dev pipeline for ${manifest.systemId}…`);
-    const prepareResult = await executeKernelPipeline({
-      workspaceRoot,
-      pipelineName: "build.prepare.dev",
-      siteName: manifest.systemId,
-      outputFormat: "pretty",
-      force: true,
-    });
-    const prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
-    if (!prepareReport.ok) {
-      const failedSteps = prepareReport.steps
-        .filter((s) => !s.ok)
-        .map((s) => `${s.commandName} (exit ${s.exitCode})`);
-      throw new Error(
-        `[mission.materialize] build.prepare pipeline FAILED — ${failedSteps.length} step(s) failed:\n` +
-          failedSteps.map((s) => `  - ${s}`).join("\n") +
-          `\n\nWorkpiece preserved at ${workpieceDir} (no git init).`,
-      );
+    // RFC-0597/RFC-0659: Run build.prepare.dev pipeline (codegen-only) on cache miss.
+    // On cache hit, build.prepare.dev is skipped — the cached workpiece already has all generated artifacts.
+    let prepareReport: {
+      ok: boolean;
+      steps: Array<{ ok: boolean; commandName: string; exitCode: number }>;
+    };
+
+    if (artifactCacheHit) {
+      // RFC-0659: Cache hit — build.prepare.dev is skipped. Construct a synthetic report
+      // indicating the pipeline was skipped due to artifact cache hit.
+      prepareReport = { ok: true, steps: [] };
+      logger.info(`  build.prepare.dev skipped (artifact cache hit)`);
+    } else {
+      logger.info(`  Running build.prepare.dev pipeline for ${manifest.systemId}…`);
+      const prepareResult = await executeKernelPipeline({
+        workspaceRoot,
+        pipelineName: "build.prepare.dev",
+        siteName: manifest.systemId,
+        outputFormat: "pretty",
+        force: true,
+      });
+      prepareReport = Array.isArray(prepareResult) ? prepareResult[0] : prepareResult;
+      if (!prepareReport.ok) {
+        const failedSteps = prepareReport.steps
+          .filter((s) => !s.ok)
+          .map((s) => `${s.commandName} (exit ${s.exitCode})`);
+        throw new Error(
+          `[mission.materialize] build.prepare pipeline FAILED — ${failedSteps.length} step(s) failed:\n` +
+            failedSteps.map((s) => `  - ${s}`).join("\n") +
+            `\n\nWorkpiece preserved at ${workpieceDir} (no git init).`,
+        );
+      }
     }
     logger.info(
       `  build.prepare completed (${prepareReport.steps.length} steps, ${prepareReport.steps.filter((s) => s.ok).length} OK)`,
@@ -1046,6 +1274,50 @@ export async function runMissionMaterialize(
       );
     }
 
+    // RFC-0659: Write workpiece to artifact cache on cache miss (or --force).
+    // The cache snapshot excludes .git/ and node_modules/ to keep it lean.
+    // Previous cache entries are deleted (keep only latest).
+    if (!artifactCacheHit && artifactCacheKey && cacheCloneHead && artifactCacheKeyComponents) {
+      try {
+        const cacheBaseDir = path.join(systemDir, ARTIFACT_CACHE_DIR);
+        // Clean previous cache entries
+        if (existsSync(cacheBaseDir)) {
+          const entries = await fs.readdir(cacheBaseDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.name !== artifactCacheKey) {
+              await fs.rm(path.join(cacheBaseDir, entry.name), { recursive: true, force: true });
+            }
+          }
+        }
+        // Write new cache entry
+        const newCacheDir = path.join(cacheBaseDir, artifactCacheKey);
+        await copyDirExcluding(
+          workpieceDir,
+          newCacheDir,
+          new Set([".git", "node_modules", "dist"]),
+        );
+        logger.info(`  Artifact cache: wrote entry (${artifactCacheKey.slice(0, 12)})`);
+
+        // Write state file
+        await writeArtifactCacheState(
+          systemDir,
+          {
+            systemId: manifest.systemId,
+            cacheKey: artifactCacheKey,
+            cacheCloneHead,
+            platformVersion: artifactCacheKeyComponents.platformVersion,
+            platformSemanticHash: artifactCacheKeyComponents.platformSemanticHash,
+            writtenAt: new Date().toISOString(),
+          },
+          logger,
+        );
+      } catch (err) {
+        logger.warn(
+          `  Artifact cache: write failed (non-fatal) — ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
     // RFC-0617: Seed compass-audit ledger for workpiece files.
     // Runs after codegen + git commit so all authored files exist and have a revision.
     // Non-fatal: a baseline failure logs a warning but does not block materialization.
@@ -1086,6 +1358,9 @@ export async function runMissionMaterialize(
       mediaCacheWarmed,
       mediaCacheSources,
       bordbuchHookInstalled,
+      artifactCacheHit,
+      artifactCacheKey,
+      artifactCacheSkipped,
       materializedAt: now,
     };
     await atomicWriteFile(
