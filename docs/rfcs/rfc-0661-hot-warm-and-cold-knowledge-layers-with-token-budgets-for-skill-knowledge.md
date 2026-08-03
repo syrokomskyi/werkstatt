@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -30,7 +31,8 @@ related:
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
-satisfies: []
+satisfies:
+  - DNA-54
 # RFC-0396: Traceability to a vendored spec node: "<spec-id>/<node-id>", e.g. "pbp/RFC-PBP-020".
 # Set by spec.materialize; leave commented for non-spec RFCs.
 # specRef:
@@ -105,7 +107,7 @@ Forge adopts a **hot/warm/cold reading discipline with character budgets** for c
 - **RFC-0660:** depends on it directly — budget accounting uses `parseKnowledgeFile` and counts only `active` entries, so archived/superseded content stops costing immediately after compaction.
 - **RFC-0662 / RFC-0663:** SKILL-21 warnings are the trigger signal for compaction and promotion runs. This RFC deliberately creates the pressure valve indicator; the valves themselves are the next two RFCs.
 - **writing-great-skills:** the hot/warm/cold discipline joins the information-hierarchy vocabulary — a knowledge file's layer is its rank on the ladder, and the budget is the pruning discipline for that rank.
-- **DNA-60 (proposed by this series):** this RFC is the "budgeted layers" clause of the invariant.
+- **DNA-60 (proposed by this series):** this RFC is the "budgeted layers" clause of the invariant. DNA-60 does not yet exist in `docs/architecture-dna.md` (the registry currently ends at DNA-59); its establishment is gated on RFC-0660's implementation, which adds the DNA-60 entry linking RFC-0660..0662.
 
 ## Design
 
@@ -138,6 +140,14 @@ bindings:
 ```
 
 `forge.doctor` validates the override shape (positive integers, `hot <= warm` recommended but not enforced) and reports the effective budgets. Absent the override, defaults apply. Pack skills inherit project budgets.
+
+### Layer resolution for custom-named files
+
+Skills may declare custom knowledge file names (not `qa-log.md`, `fix-patterns.md`, or `learned-principles.md`). RFC-0660's `parseKnowledgeFile` returns a `ParsedKnowledgeFile` with a `layer: KnowledgeLayer` field, resolved from the `<!-- knowledge-layer: LN -->` preamble comment or the file-name mapping fallback. `computeLayerBudgets` uses this `layer` field — not the file name directly — to determine which budget applies. Files whose layer cannot be determined (no preamble, no conventional name) are skipped for budget enforcement with an informational note in the doctor summary.
+
+### Performance
+
+SKILL-21 runs `parseKnowledgeFile` on every hot/warm knowledge file of every skill (forge + pack) during `forge.skill.validate`. At current scale (4 skills with knowledge files, 11 files total, typically <10 KB each), the incremental cost over the existing SKILL-13 existence check is negligible. As knowledge files grow and more skills adopt the pattern, the parser cost is linear in total knowledge file size. Validation is operator-invoked, not pipeline-integrated — the cost is paid on explicit runs, not on every build.
 
 ### Enforcement
 
@@ -187,7 +197,8 @@ pnpm exec site-kernel run forge.doctor --json             # adds knowledge budge
 | Path | Role |
 | --- | --- |
 | `packages/forge/src/knowledge/budgets.ts` | `computeLayerBudgets`, `resolveKnowledgeBudgets` |
-| `packages/forge/src/validators/skill-validate.ts` | SKILL-21 rule |
+| `packages/forge/src/config/forge-config.ts` | Extend `forgeBindingsSchema` with optional `knowledge.budgets` field |
+| `packages/forge/src/validators/skill-validate.ts` | SKILL-21 rule; add `warnings` field to `SkillValidateResult` |
 | `packages/forge/os/core/handlers/doctor.ts` | Budget summary + override shape validation |
 | `packages/forge/skills/shared/writing-great-skills/SKILL.md` | Canonical hot/warm/cold discipline documentation |
 | `packages/forge/skills/**/SKILL.md` (adopting skills) | One-line read-discipline statements replacing "read the knowledge files" |
@@ -215,6 +226,8 @@ pnpm exec site-kernel run forge.doctor --json             # adds knowledge budge
   ]
 }
 ```
+
+**Output shape coordination:** SKILL-21 warnings go in a separate `warnings` array, not inside `violations` with `severity: "warning"`. This is because the current `SkillValidateResult` interface sets `status: "fail"` when `violations.length > 0` — mixing warnings into `violations` would incorrectly fail validation for warnings-only runs. RFC-0660's output format (which puts legacy-section warnings inside `violations` with `severity: "warning"`) should be updated to match this pattern during RFC-0660's enhancement: errors in `violations` (status: fail), warnings in `warnings` (status: pass). The `SkillValidateResult` interface gains a `warnings: Warning[]` field and the `Violation` interface gains `file`, `line`, and `fixHint` optional fields (shared with RFC-0660's SKILL-19/SKILL-20 needs).
 
 ### Failure modes
 
