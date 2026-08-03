@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -143,9 +144,12 @@ pnpm exec site-kernel run mission.materialize --mission <missionId> --force
 
 # Report-only mode (unchanged, does not touch cache)
 pnpm exec site-kernel run mission.materialize --mission <missionId> --report-only
+
+# Skip preflight gate (unchanged, RFC-0597)
+pnpm exec site-kernel run mission.materialize --mission <missionId> --skip-preflight
 ```
 
-The `--force` flag already exists and is already passed to `executeKernelPipeline` for `build.prepare.dev`. This RFC extends its semantics: when `--force` is set, the artifact cache is bypassed in addition to the existing behavior.
+The `--force` flag is **introduced by this RFC** as a new flag on `mission.materialize`. It does not exist in the current command. The existing `force: true` passed to `executeKernelPipeline` for `build.prepare.dev` is hardcoded (RFC-0619 — a fresh workpiece starts empty, so the command-result cache must be bypassed to ensure all generated files are written). This hardcoded `force: true` remains unchanged and is not controlled by the `--force` flag. The new `--force` flag controls **only** the artifact cache bypass: when set, the cache is not read and full materialization runs, refreshing the cache entry after `build.prepare.dev` completes.
 
 ### TypeScript contracts
 
@@ -183,6 +187,8 @@ The cache key is computed using the same primitives as `computeBuildInputHash` (
 | `systems/<id>/.cache/materialization/<hash>/` | Cached workpiece snapshot (excluding .git/ and node_modules/) |
 | `systems/<id>/.materialization-cache-state.json` | Cache key state file (separate from RFC-0597's .materialization-state.json) |
 | `missions/<missionId>/workpiece/` | Restored from cache on hit, or generated from scratch on miss |
+
+**Cache clone gitignore:** The `.cache/` directory lives inside the cache clone (a non-bare git repo at `mirrors[0].path`). The implementation MUST add `.cache/` to the cache clone's `.gitignore` file. Without gitignoring, `sternsystem.validate`'s dirty-file detection would flag the cache directory as untracked external edits. The existing `.materialization-state.json` (RFC-0597) is committed to the cache clone, but `.cache/materialization/` is a local artifact cache and must not be tracked.
 
 **Cache exclusions** (not included in the cached workpiece snapshot):
 
@@ -229,7 +235,7 @@ On cache miss, the output is unchanged from the current format with `artifactCac
 - **Cache directory missing despite state file match:** Fall through to full materialization. Delete stale state file. Log warning.
 - **Cache directory corrupt or partially written:** Fall through to full materialization. Delete stale cache directory and state file. Log warning.
 - **Cache restore I/O error (disk full, permissions):** Abort materialization with error. Workpiece staging dir is left for inspection.
-- **`--force` flag set:** Bypass cache read. Perform full materialization. Write new cache entry after successful build.prepare.dev.
+- **`--force` flag set:** Bypass cache read. Perform full materialization. Write new cache entry after successful build.prepare.dev. The hardcoded `force: true` in `executeKernelPipeline` remains unchanged (RFC-0619).
 - **`--report-only` flag set:** Do not read or write cache. Return report only.
 - **Platform semantic hash computation fails:** Fall through to full materialization (fail-safe, same as RFC-0597 preflight skip logic).
 - **Cache clone HEAD cannot be resolved:** Fall through to full materialization (fail-safe).
@@ -240,11 +246,13 @@ All fallback paths produce correct results — the cache is a pure performance o
 
 - **Default behavior:** The artifact cache is active by default. No opt-in flag needed.
 - **First materialization:** Cache miss (no state file, no cache directory). Full materialization runs. After `build.prepare.dev` completes, the workpiece is snapshotted to `systems/<id>/.cache/materialization/<hash>/` and the state file is written.
-- **Subsequent materializations with unchanged inputs:** Cache hit. Workpiece restored from cache. `generateFullBoilerplate`, `build.prepare.dev`, and media cache warming are skipped. `pnpm install` and `git clone` still run.
+- **Subsequent materializations with unchanged inputs:** Cache hit. Workpiece restored from cache. The following steps are skipped: data-path copy, media cache warming, `generateFullBoilerplate`, `build.prepare.dev`. The following steps still run: `syncCacheClone`, `git clone` (needed for reconcile), cache restore (atomic staging + move), `pnpm install` (links workpiece into workspace), `ensureChromium` (idempotent, needed for later `build.post`), preflight gate (RFC-0597, independent), git commit (commits restored workpiece), `compass.audit.baseline` (seeds audit ledger for the new workpiece directory).
 - **Subsequent materializations with changed inputs:** Cache miss (hash differs). Full materialization runs. New cache entry written. Previous cache entry deleted (keep only latest).
 - **Existing systems:** No migration needed. The cache is populated on the first materialization after this RFC is implemented.
 - **`--force` bypass:** Operators can always force full materialization with `--force`. This refreshes the cache entry.
 - **No pipeline integration:** The artifact cache is internal to `mission.materialize` and does not affect `build.check`, `mission.validate`, or other pipelines.
+- **Reconcile invalidation:** `mission.reconcile` transfers commits from the workpiece to the cache clone via `git merge --no-ff`, changing the cache clone HEAD. This invalidates the artifact cache for the next materialization (the cache key includes `cacheCloneHead`). This is correct behavior — after reconcile, the data content may have changed and the cache must not be reused.
+- **Concurrent materialization:** The existing `system:<id>` lock (acquired in `runMissionMaterialize`) serializes materialization calls for the same system. Two concurrent `mission.materialize` calls for different missions of the same system are prevented by the lock. No additional cache-level locking is needed.
 
 ## Alternatives considered
 
@@ -260,7 +268,7 @@ All fallback paths produce correct results — the cache is a pure performance o
 
 - **Stale cache after manual cache clone edit:** If an operator manually edits files in the cache clone without committing (dirty working tree), `git rev-parse HEAD` returns the committed HEAD, not the working tree state. The cache key would match, but the data paths copied from the cache clone would differ. **Mitigation:** This is the same risk as RFC-0597's preflight skip. The cache clone is a non-bare git repo, and manual edits without commits are an operator error. `sternsystem.validate` detects dirty cache clones.
 
-- **Cache directory grows large:** The cache includes media files (.cache/video, .cache/video-live) and all data paths. For systems with large video content, this could be significant. **Mitigation:** Only the latest cache entry is kept (previous entries deleted on new write). The cache lives in `systems/<id>/.cache/` which is outside the git-tracked content.
+- **Cache directory grows large:** The cache includes media files (.cache/video, .cache/video-live) and all data paths. For systems with video content (e.g. warpgogol-com), the cache snapshot can be 1-5 GB. For systems without video, it is typically 10-50 MB. **Mitigation:** Only the latest cache entry is kept (previous entries deleted on new write). The cache lives in `systems/<id>/.cache/` which is outside the git-tracked content and is gitignored (see File system responsibilities).
 
 - **Agent misinterpretation:** Agents might assume the artifact cache guarantees fresh content. **Mitigation:** The cache key includes all three input dimensions (HEAD, platform version, platform semantic hash). If any changes, the cache is invalidated. The `--force` flag provides an explicit escape hatch.
 
@@ -274,10 +282,11 @@ All fallback paths produce correct results — the cache is a pure performance o
 - [ ] Cache key computed as `byteHash(cacheCloneHead + "|" + platformVersion + "|" + platformSemanticHash)` using existing `resolvePlatformSemanticHash` and `resolveCurrentEcosystem`
 - [ ] On cache miss, workpiece snapshot written to `systems/<id>/.cache/materialization/<hash>/` after `build.prepare.dev` completes successfully (excluding `.git/` and `node_modules/`)
 - [ ] On cache hit, workpiece restored from cache via atomic staging + move pattern, skipping `generateFullBoilerplate`, `build.prepare.dev`, and media cache warming
-- [ ] `--force` flag bypasses cache read and performs full materialization
+- [ ] `--force` flag (new, introduced by this RFC) bypasses cache read and performs full materialization. The hardcoded `force: true` in `executeKernelPipeline` remains unchanged.
 - [ ] Previous cache entry deleted when new entry is written (keep only latest)
 - [ ] `mission.materialize` JSON output includes `artifactCacheHit`, `artifactCacheKey`, and `artifactCacheSkipped` fields
 - [ ] `.materialization-cache-state.json` written separately from `.materialization-state.json` (RFC-0597)
+- [ ] `.cache/` added to cache clone's `.gitignore` to prevent `sternsystem.validate` dirty-file detection
 - [ ] Unit test: cache hit → `artifactCacheHit: true`, `generateFullBoilerplate` not called, `build.prepare.dev` not called
 - [ ] Unit test: cache miss → full materialization, cache written after `build.prepare.dev`
 - [ ] Unit test: `--force` → cache bypassed, full materialization, cache refreshed
@@ -297,4 +306,6 @@ All fallback paths produce correct results — the cache is a pure performance o
 - Agents MUST write the cache snapshot AFTER `build.prepare.dev` completes successfully, not before — the cache must capture the post-codegen state.
 - Agents MUST delete previous cache entries when writing a new one — only the latest entry is kept.
 - Agents MUST NOT use the RFC-0390 command-result cache for the artifact cache — they are different mechanisms with different semantics (file-level snapshot vs. result-level cache).
-- The `--force` flag bypasses both the artifact cache (this RFC) and the command-result cache for `build.prepare.dev` (RFC-0619). This is intentional — `--force` means "redo everything from scratch."
+- The `--force` flag is **introduced by this RFC**. It does not exist in the current `mission.materialize` command. It controls only the artifact cache bypass. The hardcoded `force: true` in `executeKernelPipeline` (RFC-0619) remains always-true and is not controlled by `--force`.
+- Agents MUST run `compass.audit.baseline` on cache hit — the audit ledger is per-workpiece directory and must be seeded for the restored workpiece.
+- Agents MUST run the git commit step on cache hit — the restored workpiece must be committed in the workpiece git repo (data-only staging, same as cache miss).
