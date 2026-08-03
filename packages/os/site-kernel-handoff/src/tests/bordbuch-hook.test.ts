@@ -56,7 +56,7 @@ test("hook script content matches RFC-0658 spec", async () => {
 
   expect(content).toContain("#!/bin/sh");
   expect(content).toContain("RFC-0658");
-  expect(content).toContain("bordbuch/events.ndjson");
+  expect(content).toContain("bordbuch/events.ndjson$");
   expect(content).toContain("diff-filter=D");
   expect(content).toContain("exit 1");
   expect(content).toContain("bordbuch.repair");

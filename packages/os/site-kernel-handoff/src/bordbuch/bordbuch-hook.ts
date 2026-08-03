@@ -25,7 +25,7 @@ export interface BordbuchHookResult {
 const HOOK_SCRIPT = `#!/bin/sh
 # Warpgogol bordbuch integrity guard (RFC-0658)
 # Rejects commits that delete bordbuch/events.ndjson
-if git diff --cached --name-status --diff-filter=D | grep -q 'bordbuch/events.ndjson'; then
+if git diff --cached --name-status --diff-filter=D | grep -q 'bordbuch/events.ndjson$'; then
   echo "ERROR: refusing to delete bordbuch/events.ndjson (RFC-0658)" >&2
   echo "If you need to reset bordbuch, use bordbuch.repair instead." >&2
   exit 1
