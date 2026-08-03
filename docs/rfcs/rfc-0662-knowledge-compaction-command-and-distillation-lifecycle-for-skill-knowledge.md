@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
+enhancedAt: 2026-08-03
 implementedAt:
 closedAt:
 supersedes: []
@@ -133,11 +134,25 @@ Scope: `workspace`. Flags:
 | `--retention-days <n>` | 90 | L0 entries with `created` older than this are archived. Overridable via `bindings.knowledge.retentionDays`. |
 | `--stale-days <n>` | 90 | L2 entries with `lastConfirmedAt` older than this become `status: stale`. Overridable via `bindings.knowledge.staleDays`. |
 
+Override configuration in `forge.yaml` (unified under `bindings.knowledge`, alongside RFC-0661 budgets):
+
+```yaml
+bindings:
+  knowledge:
+    budgets:          # RFC-0661
+      hot: 4096
+      warm: 8192
+    retentionDays: 90 # RFC-0662 — L0 archival window
+    staleDays: 90     # RFC-0662 — L2 staleness window
+```
+
 Exactly one of `--skill` / `--all` is required (KERNEL-ARG error otherwise).
 
 ### Command operations
 
 Applied per skill, per knowledge file, in order. Every operation is computed from `parseKnowledgeFile` and applied via `serializeKnowledgeFile`; the command exits non-zero and writes nothing if any target file has SKILL-19/SKILL-20 parse issues (compacting a malformed file would entrench the corruption).
+
+**Archive companion strategy.** Archive companions (`qa-log.archive.md`, `fix-patterns.archive.md`, `learned-principles.archive.md`) are structured knowledge files in RFC-0660 format. When an archive companion already exists, the command parses it, appends new archived entries to the parsed entry list, and re-serializes the merged file. The RFC-0660 round-trip guarantee (parse → serialize → parse ≡ identity, enforced by PBT) ensures existing archive entries are preserved byte-identically — the serializer does not reformat or rewrite them. "Append-merge" means new entries are added to the end of the entry list; existing entries' metadata, headings, and bodies are untouched by the round-trip.
 
 1. **Expiry archive (all layers).** Entries with `expiresAt < today` move to the file's archive companion: `qa-log.archive.md`, `fix-patterns.archive.md`, `learned-principles.archive.md` (created on demand with a preamble noting RFC-0662 provenance). Moved entries keep their metadata with `status` rewritten to `archived`.
 2. **Supersession archive (L1, L2).** Entries whose `status` is `superseded` (set when a newer entry lists them in `supersedes`) move to the archive companion, preserving the `supersedes` chain for archaeology.
@@ -254,13 +269,14 @@ Command handler `packages/forge/os/core/handlers/knowledge-compact.ts` wraps the
 - **Target file has SKILL-19/SKILL-20 parse issues** → command exits 1, names the file and issue, writes nothing (refuses to compact malformed files).
 - **Neither `--skill` nor `--all`** → argument error, exit 1.
 - **`--skill` names a skill without knowledge files** → pass with an explicit "nothing to compact" summary, exit 0.
-- **Archive companion exists with hand edits** → append-merge only; the command never rewrites existing archive content.
+- **Archive companion exists with hand edits** → append-merge via parse + append + re-serialize; the RFC-0660 round-trip guarantee preserves existing archive entries byte-identically. If the archive companion itself has SKILL-19/SKILL-20 parse issues, the command exits 1 and writes nothing (same refusal as for live files).
+- **Concurrent compaction runs** → no lock file; two simultaneous runs could produce overlapping archive appends. Low-risk (compaction is operator-invoked and rare); if this becomes a problem, a werkstatt lock (RFC-0362) can be added in a follow-up. Operators should not run two compact sessions on the same repository simultaneously.
 - **Mid-run I/O failure** → per-file atomic write (staging + rename); already-processed files stay consistent, unprocessed files untouched, non-zero exit with per-file status in the report.
 
 ## Rollout
 
 - **Phase 1 (this RFC's implementation):** `compact.ts` + handler + `fo-knowledge-distill` skill. First real run: `--all --dry-run` on this monorepo, operator review, then the live run — which also performs the RFC-0660 legacy migration via the distill skill, closing the migration window on forge's own files.
-- **Trigger discipline (documented, not automated):** run compact when (a) a SKILL-21 budget warning appears, (b) a session-end retro notices knowledge growth, or (c) roughly monthly on long-lived projects. `forge.doctor` prints "last compact: never/N days ago" once compaction state is observable from file mtimes — informational only.
+- **Trigger discipline (documented, not automated):** run compact when (a) a SKILL-21 budget warning appears, (b) a session-end retro notices knowledge growth, or (c) roughly monthly on long-lived projects. `forge.doctor` does not track "last compact" timestamp — file mtimes are unreliable in git workflows (reset by every `git checkout` and `git pull`). SKILL-21 budget warnings are the primary trigger signal; operator cadence is the fallback.
 - **New projects:** `forge.create` needs nothing new — empty knowledge files compact to a no-op report.
 - **No pipeline integration:** the command is never wired into `build.check` or CI gates. Operators may add it to their own maintenance scripts; forge does not prescribe cadence.
 
