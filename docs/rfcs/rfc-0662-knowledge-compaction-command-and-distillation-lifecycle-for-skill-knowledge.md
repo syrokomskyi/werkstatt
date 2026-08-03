@@ -1,7 +1,7 @@
 ---
 id: RFC-0662
 title: "Knowledge compaction command and distillation lifecycle for skill knowledge"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
