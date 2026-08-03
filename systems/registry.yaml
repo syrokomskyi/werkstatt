@@ -20,15 +20,12 @@ systems:
         dev:
           workerName: dev-warpgogol-com
           url: https://dev.warpgogol.com
-          secretsFile: env:WERKSTATT_SECRETS_DEV
         alt:
           workerName: alt-warpgogol-com
           url: https://alt-warpgogol-com.syrokomskyi.workers.dev
-          secretsFile: env:WERKSTATT_SECRETS_ALT
         main:
           workerName: warpgogol-com
           url: https://warpgogol.com
-          secretsFile: env:WERKSTATT_SECRETS_MAIN
       lastPropagated:
         alt:
           releaseId: warpgogol-com-r000008
@@ -51,4 +48,3 @@ systems:
             success: true
             purgedUrls: 101
     notes: ""
-
