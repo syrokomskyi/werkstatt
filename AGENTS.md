@@ -367,6 +367,7 @@ RFC (Request for Comments) is the formal lifecycle for architectural decisions i
 ADR (Architectural Decision Record) is the lightweight decision log for local technical choices. See [`docs/policies/adr-governance.md`](docs/policies/adr-governance.md) for the full protocol: when to use an ADR, lifecycle, agent permissions, and transition rules.
 
 - **ADR status consistency:** When an ADR has `supersededBy` set in frontmatter, its `status` MUST be `superseded`, `closedAt` MUST be populated, and the file MUST be moved to `docs/adrs/archive/superseded/`. An ADR with `supersededBy` but `status: accepted` is an inconsistency — fix it immediately when discovered.
+- **Post-hoc ADRs must be stamped `implemented`:** When creating an ADR for a decision that has already been made and is already in production (post-hoc ADR), set `status: implemented` and `implementedAt: <date>` from the start. Do not leave it as `proposed` — the decision is not awaiting acceptance. The `fo-idea-create-adr` skill defaults to `proposed` for forward-looking decisions; post-hoc ADRs skip directly to `implemented`.
 
 ## Architectural arc: RFC-0025 → RFC-0029 + extensions
 
