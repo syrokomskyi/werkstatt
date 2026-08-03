@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
 enhancedAt: 2026-08-03
-implementedAt:
+implementedAt: 2026-08-03
 closedAt:
 supersedes: []
 supersededBy:
@@ -42,9 +42,9 @@ satisfies: []
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - forge.skill.knowledge.compact
-  added: []
   changed: []
   removed: []
 appsImpacted: []
