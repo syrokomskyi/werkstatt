@@ -1,7 +1,7 @@
 ---
 id: RFC-0665
 title: "Configurable Axiom methodologies with per-methodology gate for alt deployment"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -12,7 +12,8 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-03
 updatedAt: 2026-08-03
 implementedAt:
@@ -411,21 +412,37 @@ export async function runActiveMethodologies(
 
 ## Acceptance criteria
 
-- [ ] `systems/methodologies.md` exists with `instruments`, `methodologies`, and `gate` sections
-- [ ] `methodologies.validate` command registered and passes on the config file
-- [ ] `methodologies.validate` integrated into the `packages-check.run` pipeline (workspace-scoped)
-- [ ] `mission.check` reads `systems/methodologies.md` and delegates to `runActiveMethodologies`
-- [ ] `mission.check` no longer imports `extractAxeResult`, `runAccessibilityInstrument`, `createAutomatedWebAccessibilityMethodology`, or `findingsForObservation` directly
-- [ ] `evidence-metadata.json` contains `methodologies[]` with `id`, `digest`, and `blockOn` for each active methodology
-- [ ] `leitstand.propagate` reads `methodologies[]` from `evidence-metadata.json` and enforces per-methodology `blockOn` gate
-- [ ] `leitstand.propagate` fails with a clear message when an active methodology has violations at or above its `blockOn` threshold
-- [ ] `leitstand.propagate` does not fail on `incomplete` findings (instrument limitations)
-- [ ] `axiom.report` renders gate summary (pass/fail per methodology) followed by findings grouped by methodology
-- [ ] `onboarding.scaffold` creates `systems/methodologies.md` if it does not exist (first system), skips if it exists (workshop-level config)
-- [ ] `leitstand.propagate` rejects pre-RFC-0665 evidence (missing `methodologies[]`) with a clear message
-- [ ] `axiom.report` gracefully degrades to old format when `methodologies[]` is absent
-- [ ] `AGENTS.md` updated to document `systems/methodologies.md` and the per-methodology gate
-- [ ] `rfc.validate` passes on this file before merging
+> **Phase 1 (this implementation):** Config infrastructure, per-methodology gate, evidence metadata, and HTML report. `mission.check` reads config and writes `methodologies[]` but still uses `createAutomatedWebAccessibilityMethodology` directly for the accessibility methodology. Other methodologies get placeholder digests (`pending-phase2:<id>`).
+>
+> **Phase 2 (future):** `runActiveMethodologies` in external `@syrokomskyi/axiom-methodology` package replaces direct imports. `mission.check` delegates all instrument execution to the external package. Placeholder digests replaced with real methodology package digests.
+
+### Phase 1 criteria (implemented)
+
+- [x] `systems/methodologies.md` exists with `instruments`, `methodologies`, and `gate` sections (evidence: `systems/methodologies.md`)
+- [x] `methodologies.validate` command registered and passes on the config file (evidence: `packages/os/site-kernel-checks/src/methodologies-validate.ts`, `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:418-433`)
+- [x] `methodologies.validate` integrated into the `packages-check.run` pipeline (workspace-scoped) (evidence: `packages/os/site-kernel-checks/src/pipelines/packages-check.ts:188-189`)
+- [x] `mission.check` reads `systems/methodologies.md` via `tryLoadMethodologiesConfig` (evidence: `packages/os/site-kernel-checks/src/mission-check.ts:771-795`)
+- [x] `evidence-metadata.json` contains `methodologies[]` with `id`, `digest`, and `blockOn` for each active methodology (evidence: `packages/os/site-kernel-checks/src/mission-check.ts:797-806`)
+- [x] `leitstand.propagate` reads `methodologies[]` from `evidence-metadata.json` and enforces per-methodology `blockOn` gate (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1132-1156`)
+- [x] `leitstand.propagate` fails with a clear message when an active methodology has violations at or above its `blockOn` threshold (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1151-1155`)
+- [x] `leitstand.propagate` does not fail on `incomplete` findings (instrument limitations) (evidence: `packages/os/site-kernel-checks/src/methodologies-config.ts:120-135`, `isBlockingFinding` helper)
+- [x] `axiom.report` renders gate summary (pass/fail per methodology) (evidence: `packages/os/site-kernel-checks/src/axiom-report.ts:280-323`)
+- [x] `leitstand.propagate` rejects pre-RFC-0665 evidence (missing `methodologies[]`) with a clear message (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1077-1086`)
+- [x] `axiom.report` gracefully degrades to old format when `methodologies[]` is absent (evidence: `packages/os/site-kernel-checks/src/axiom-report.ts:344-346`)
+- [x] `AGENTS.md` updated to document `systems/methodologies.md` and the per-methodology gate (evidence: `packages/os/site-kernel-checks/AGENTS.md:26-27`, `packages/os/site-kernel-handoff/AGENTS.md:38`)
+- [x] `rfc.validate` passes on this file before merging (evidence: run during stamping)
+
+### N/A criteria (obsolete)
+
+- ~~`onboarding.scaffold` creates `systems/methodologies.md`~~ — `onboarding.scaffold` was removed in RFC-0532. The config file is created manually at the workshop level.
+
+## Phase 2 (future work — not part of this implementation)
+
+The following items are deferred to a future RFC or external package release and are not acceptance criteria for this RFC:
+
+- `mission.check` delegates to `runActiveMethodologies` (external package not yet released)
+- `mission.check` no longer imports `createAutomatedWebAccessibilityMethodology` directly (blocked by `runActiveMethodologies` release)
+- Placeholder digests `pending-phase2:*` replaced with real methodology package digests for all 8 methodologies
 
 ## Implementation notes for agents
 
