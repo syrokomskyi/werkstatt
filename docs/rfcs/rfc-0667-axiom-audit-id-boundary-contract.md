@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-03
-updatedAt: 2026-08-03
+updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -64,6 +65,7 @@ nonGoals:
   - "Does not rename missionId to auditId in internal werkstatt interfaces — missionId remains the internal identifier"
   - "Does not change the external Axiom CLI (pipelines/) — that project has its own governance"
   - "Does not add new Site OS commands — only changes the contract of existing ones"
+  - "Does not address the validTimeStart format violation — that bug is in the external Axiom study pipeline (buildInstrumentContext in @syrokomskyi/axiom-study), not in werkstatt code. Werkstatt check modules correctly pass recordedAt: new Date().toISOString() to toDeterministicContext."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -109,7 +111,7 @@ The boundary between werkstatt's internal `missionId` identifier and the externa
 
 3. **Instrument context type mismatch**: All check modules called `toDeterministicContext({ missionId: "..." })`, but the external `LocalInstrumentContext` type from `@syrokomskyi/axiom-study` was renamed to expect `auditId`. This caused TypeScript build failures.
 
-4. **ValidTimeStart format violation**: `buildInstrumentContext` in `orchestrator.ts` set `validTimeStart` to `git:${commitSha}` when a commit SHA was provided. The Zod schema `utcTimestampSchema` requires `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$`. All 7 instruments failed validation, producing 0 observations, which cascaded to `observationBundleIds: too_small` in `studyRunSchema.parse`.
+4. **ValidTimeStart format violation** (external Axiom CLI): `buildInstrumentContext` in the external `@syrokomskyi/axiom-study` package set `validTimeStart` to `git:${commitSha}` instead of an ISO 8601 UTC timestamp. The Zod schema `utcTimestampSchema` requires `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$`. All 7 instruments failed validation, producing 0 observations, which cascaded to `observationBundleIds: too_small` in `studyRunSchema.parse`. This bug was fixed in the external Axiom CLI, not in werkstatt code. Werkstatt check modules correctly pass `recordedAt: new Date().toISOString()` to `toDeterministicContext`.
 
 ## Decision
 
@@ -143,9 +145,9 @@ The `missionId` ↔ `auditId` mapping follows a strict boundary adapter pattern:
 No new CLI commands. Existing commands changed:
 
 ```sh
-# mission.check — passes --mission <missionId> to external Axiom CLI
+# mission.check — passes --mission <missionId> to external Axiom CLI as auditId
 # External CLI writes auditId to evidence-metadata.json
-pnpm exec site-kernel run mission.check --mission warpgogol-com-m000027 --external-preview
+pnpm exec site-kernel run mission.check --mission warpgogol-com-m000027 --external-preview --base-url https://dev.warpgogol.com
 
 # axiom.report — reads evidence-metadata.json, maps auditId ↔ missionId
 pnpm exec site-kernel run axiom.report --mission warpgogol-com-m000027
@@ -158,41 +160,39 @@ pnpm exec site-kernel run leitstand.propagate --system warpgogol-com
 
 ```ts
 // packages/os/site-kernel-checks/src/axiom-adapter.ts
+// EvidenceMetadata is imported from the external package, not defined locally:
+import { type EvidenceMetadata } from "@syrokomskyi/axiom-factory-app/run/report";
+// The external type defines: { auditId: string, commitSha?: string, runTimestamp?: string, methodologies?: ... }
 
-// Internal EvidenceMetadata (boundary file schema)
-interface EvidenceMetadata {
-  auditId: string;         // external identifier (was missionId)
-  commitSha?: string;
-  runTimestamp?: string;
-  methodologies?: Array<{ id: string; digest?: string | DigestRef | null; blockOn?: string[] }>;
-}
-
-// Boundary mapping in runAxiomReport
-function readEvidenceMetadata(evidenceDir: string, missionId: string): EvidenceMetadata {
-  const raw = JSON.parse(readFileSync(join(evidenceDir, "evidence-metadata.json"), "utf-8"));
-  return {
-    auditId: raw.auditId ?? raw.missionId ?? missionId,  // resilient fallback
-    commitSha: raw.commitSha,
-    runTimestamp: raw.runTimestamp,
-    methodologies: raw.methodologies,
-  };
-}
+// Boundary mapping in runAxiomReport (inline, not a separate function):
+const raw = JSON.parse(readFileSync(join(evidenceDir, "evidence-metadata.json"), "utf-8"));
+const metadata: EvidenceMetadata = {
+  auditId: raw.auditId ?? raw.missionId ?? missionId,  // resilient fallback
+  commitSha: raw.commitSha,
+  runTimestamp: raw.runTimestamp,
+  methodologies: raw.methodologies,
+};
 
 // packages/os/site-kernel-handoff/src/evidence/evidence-fetch.ts
 // packages/os/site-kernel-handoff/src/evidence/evidence-sync.ts
+// Both define a local interface with optional auditId (read from JSON, may be absent):
 interface EvidenceMetadata {
-  auditId: string;  // not missionId — matches external Axiom format
-  commitSha?: string;
+  auditId?: string;  // optional — matches external Axiom format when present
   runTimestamp?: string;
-  methodologies?: unknown[];
+  commitSha?: string;
 }
 
 // packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts
-// leitstand.propagate reads auditId, compares to release.missionId
-const evidenceAuditId = metadata.auditId ?? metadata.missionId;
-if (evidenceAuditId !== release.missionId) {
-  throw new Error(`evidence auditId mismatch: ${evidenceAuditId} !== ${release.missionId}`);
+// leitstand.propagate reads auditId, compares to release.missionId only when present:
+if (metadata.auditId && metadata.auditId !== missionId) {
+  throw new Error(
+    `[leitstand.propagate] evidence auditId '${metadata.auditId}' does not match release missionId '${missionId}'.`,
+  );
 }
+// Note: when auditId is absent, the check is skipped — the RFC-0665 methodologies gate
+// (requires methodologies[] to be present and non-empty) provides the primary validation.
+// This leniency is intentional: it allows pre-auditId evidence files to pass the gate
+// while still enforcing the stronger methodologies[] check added by RFC-0665.
 ```
 
 ### Check modules and toDeterministicContext
@@ -218,11 +218,13 @@ The `auditId` value in check modules is an **instrument-specific identifier** (e
 
 2. **Missing evidence-metadata.json**: The adapter defaults to `{ auditId: missionId }` using the provided mission ID. This allows `axiom.report` to generate even if the metadata file is missing.
 
-3. **`auditId` mismatch in `leitstand.propagate`**: If `evidence-metadata.json` contains `auditId` that does not match the release's `missionId`, propagate fails with a clear error message indicating the mismatch.
+3. **`auditId` mismatch in `leitstand.propagate`**: If `evidence-metadata.json` contains `auditId` that does not match the release's `missionId`, propagate fails with a clear error message indicating the mismatch. When `auditId` is absent, the check is skipped — the RFC-0665 methodologies gate provides primary validation.
+
+4. **Silent fallback on external `auditId` rename**: If the external Axiom CLI renames `auditId` to a different field name, the adapter's fallback chain (`raw.auditId ?? raw.missionId ?? missionId`) would silently fall back to `missionId` without any warning. Mitigation: the RFC-0665 methodologies gate (requires `methodologies[]` to be present) catches evidence files from Axiom versions that predate the current schema. Agents investigating stale evidence should check `evidence-metadata.json` field names when debugging propagation failures.
 
 ## Rollout
 
-- **Already implemented**: All code changes are in place — `axiom-adapter.ts`, `evidence-fetch.ts`, `evidence-sync.ts`, `leitstand-commands.ts`, and all check modules use `auditId`.
+- **Post-hoc RFC**: This RFC formalizes an existing implementation. All code changes were made during the Axiom CLI adaptation and are already in place — `axiom-adapter.ts`, `evidence-fetch.ts`, `evidence-sync.ts`, `leitstand-commands.ts`, and all check modules use `auditId`. The RFC documents the boundary contract retroactively.
 - **Test fixtures updated**: All test files that write mock `evidence-metadata.json` now use `auditId` instead of `missionId`.
 - **Backward compatibility**: The adapter's `raw.auditId ?? raw.missionId ?? missionId` fallback ensures old evidence files still work.
 - **No migration needed**: Existing evidence files with `missionId` are handled by the fallback chain.
@@ -240,7 +242,7 @@ The `auditId` value in check modules is an **instrument-specific identifier** (e
 
 - **Stale fallback**: The `raw.missionId` fallback in the adapter could mask a real missing-`auditId` bug in the external Axiom CLI. Mitigation: the fallback chain is `raw.auditId ?? raw.missionId ?? missionId` — if `auditId` is missing, `missionId` is used, which is the same value. No data loss.
 - **External Axiom changes `auditId` again**: If the external Axiom CLI renames `auditId` to something else, the adapter will need updating. This is expected — the boundary adapter is the single point of change.
-- **Agent confusion**: Agents reading check modules might wonder why `auditId` is used instead of `missionId`. The `nonGoals` section and this RFC's Design section explain the boundary pattern.
+- **Agent confusion**: Agents reading check modules might wonder why `auditId` is used instead of `missionId`. The `nonGoals` section and this RFC's Design section explain the boundary pattern. The boundary rule should also be recorded in `packages/os/site-kernel-checks/AGENTS.md` and `packages/os/site-kernel-handoff/AGENTS.md` so agents discover it without reading this RFC.
 - **Test fixture drift**: Test files that write mock `evidence-metadata.json` must use `auditId`. If agents write new tests with `missionId`, the fallback will handle it, but tests should use the current format.
 
 ## Acceptance criteria
