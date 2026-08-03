@@ -1037,9 +1037,25 @@ export async function runLeitstandPropagate(
 
   // Parse evidence-metadata.json for missionId + commitSha verification
   const metadataContent = await fs.readFile(metadataPath, "utf-8");
-  let metadata: { missionId?: string; commitSha?: string };
+  let metadata: {
+    missionId?: string;
+    commitSha?: string;
+    methodologies?: Array<{
+      id: string;
+      digest?: string;
+      blockOn?: string[];
+    }>;
+  };
   try {
-    metadata = JSON.parse(metadataContent) as { missionId?: string; commitSha?: string };
+    metadata = JSON.parse(metadataContent) as {
+      missionId?: string;
+      commitSha?: string;
+      methodologies?: Array<{
+        id: string;
+        digest?: string;
+        blockOn?: string[];
+      }>;
+    };
   } catch {
     throw new Error(
       `[leitstand.propagate] Axiom evidence malformed: evidence-metadata.json is not valid JSON for mission '${missionId}'.`,
@@ -1055,6 +1071,17 @@ export async function runLeitstandPropagate(
   if (metadata.commitSha && releaseCommitSha && metadata.commitSha !== releaseCommitSha) {
     throw new Error(
       `[leitstand.propagate] evidence commitSha '${metadata.commitSha}' does not match release commitSha '${releaseCommitSha}' — re-run leitstand.dev-deploy after workpiece changes.`,
+    );
+  }
+
+  // RFC-0665: Per-methodology gate — reject pre-RFC-0665 evidence (missing methodologies[])
+  if (
+    !metadata.methodologies ||
+    !Array.isArray(metadata.methodologies) ||
+    metadata.methodologies.length === 0
+  ) {
+    throw new Error(
+      `[leitstand.propagate] Evidence predates RFC-0665 (no methodologies[] field). Re-run leitstand.dev-deploy to generate current evidence.`,
     );
   }
 
@@ -1077,6 +1104,7 @@ export async function runLeitstandPropagate(
   let studyRun: {
     findings?: Array<{
       severity?: string;
+      methodologyId?: string;
       extension?: Record<string, unknown>;
     }>;
   };
@@ -1084,6 +1112,7 @@ export async function runLeitstandPropagate(
     studyRun = JSON.parse(studyRunContent) as {
       findings?: Array<{
         severity?: string;
+        methodologyId?: string;
         extension?: Record<string, unknown>;
       }>;
     };
@@ -1099,18 +1128,35 @@ export async function runLeitstandPropagate(
     );
   }
 
-  // Gate: fail only on actual axe *violations* (not incomplete results).
-  // axe "incomplete" means the rule could not determine a result — these are
-  // tool limitations, not confirmed accessibility failures.
-  const highOrCriticalViolations = studyRun.findings.filter((f) => {
-    if (f.severity !== "high" && f.severity !== "critical") return false;
-    const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
-    return ext?.["automated-web-accessibility"]?.predicate === "accessibility.axe.violation";
-  });
-  if (highOrCriticalViolations.length > 0) {
-    throw new Error(
-      `[leitstand.propagate] Axiom verification failed: ${highOrCriticalViolations.length} high/critical violation(s). Fix and re-deploy to dev.`,
-    );
+  // RFC-0665: Per-methodology gate — each methodology declares its own blockOn severity levels.
+  // Findings are matched by methodologyId (falling back to extension-based predicate for
+  // backward compat with findings that don't carry methodologyId yet).
+  // Incomplete findings (e.g., accessibility.axe.incomplete) do not block — they are
+  // instrument limitations, not confirmed violations.
+  for (const methodology of metadata.methodologies ?? []) {
+    const blockOnSet = new Set(methodology.blockOn ?? ["high", "critical"]);
+    const methodologyFindings = studyRun.findings.filter((f) => {
+      // Match by methodologyId if present
+      if (f.methodologyId) {
+        return f.methodologyId === methodology.id;
+      }
+      // Fallback: match by extension predicate for pre-RFC-0665 finding format
+      const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
+      return ext?.[methodology.id]?.predicate !== undefined;
+    });
+    const blockingFindings = methodologyFindings.filter((f) => {
+      if (!f.severity || !blockOnSet.has(f.severity)) return false;
+      // Exclude incomplete findings — they are instrument limitations, not violations
+      const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
+      const predicate = ext?.[methodology.id]?.predicate;
+      if (typeof predicate === "string" && predicate.endsWith(".incomplete")) return false;
+      return true;
+    });
+    if (blockingFindings.length > 0) {
+      throw new Error(
+        `[leitstand.propagate] Axiom verification failed: methodology '${methodology.id}' has ${blockingFindings.length} block-on violation(s). Fix and re-deploy to dev.`,
+      );
+    }
   }
 
   // RFC-0634: Verify dev build-identity.json before deploying to alt

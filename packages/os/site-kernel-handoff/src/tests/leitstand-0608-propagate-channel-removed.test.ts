@@ -198,7 +198,21 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
   mkdirSync(evidenceDir, { recursive: true });
   writeFileSync(
     join(evidenceDir, "evidence-metadata.json"),
-    JSON.stringify({ missionId, commitSha: "abc123def456" }, null, 2) + "\n",
+    JSON.stringify(
+      {
+        missionId,
+        commitSha: "abc123def456",
+        methodologies: [
+          {
+            id: "automated-web-accessibility",
+            digest: "sha256:mock",
+            blockOn: ["high", "critical"],
+          },
+        ],
+      },
+      null,
+      2,
+    ) + "\n",
   );
   writeFileSync(
     join(evidenceDir, "study-run.json"),

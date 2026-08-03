@@ -185,4 +185,6 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "command.reads.validate" },
   // RFC-0493: parse-check all .yaml files for syntax errors and duplicate keys.
   { command: "yaml.parse.validate" },
+  // RFC-0665: validate workshop-level methodologies config (systems/methodologies.md).
+  { command: "methodologies.validate" },
 ];

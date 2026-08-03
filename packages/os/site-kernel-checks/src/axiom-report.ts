@@ -34,9 +34,17 @@ import type {
   ClosureDecision,
 } from "@syrokomskyi/axiom-capture";
 
+export interface MethodologyEvidenceEntry {
+  id: string;
+  digest?: string;
+  blockOn?: string[];
+}
+
 export interface EvidenceMetadata {
   missionId: string;
   commitSha?: string;
+  runTimestamp?: string;
+  methodologies?: MethodologyEvidenceEntry[];
 }
 
 export interface AxiomReportData {
@@ -268,6 +276,52 @@ function renderToolProfile(capsule: StagedCapsule): string {
   </table>`;
 }
 
+function renderGateSummary(methodologies: MethodologyEvidenceEntry[], findings: Finding[]): string {
+  const rows = methodologies
+    .map((m) => {
+      const blockOnSet = new Set(m.blockOn ?? ["high", "critical"]);
+      const methodologyFindings = findings.filter((f) => {
+        const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
+        return ext?.[m.id]?.predicate !== undefined;
+      });
+      const blockingCount = methodologyFindings.filter((f) => {
+        if (!f.severity || !blockOnSet.has(f.severity)) return false;
+        const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
+        const predicate = ext?.[m.id]?.predicate;
+        if (typeof predicate === "string" && predicate.endsWith(".incomplete")) return false;
+        return true;
+      }).length;
+      const passed = blockingCount === 0;
+      const statusClass = passed
+        ? "bg-green-100 text-green-800 border-green-300"
+        : "bg-red-100 text-red-800 border-red-300";
+      const statusText = passed ? "PASS" : "FAIL";
+      return `<tr>
+  <td class="border px-3 py-2 font-mono text-sm">${escapeHtml(m.id)}</td>
+  <td class="border px-3 py-2 text-sm">${escapeHtml((m.blockOn ?? ["high", "critical"]).join(", "))}</td>
+  <td class="border px-3 py-2 text-sm">${methodologyFindings.length}</td>
+  <td class="border px-3 py-2 text-sm">${blockingCount}</td>
+  <td class="border px-3 py-2 text-center font-bold ${statusClass}">${statusText}</td>
+</tr>`;
+    })
+    .join("\n");
+
+  return `<table class="w-full border-collapse text-sm">
+<thead>
+<tr>
+  <th class="border px-3 py-2 text-left">Methodology</th>
+  <th class="border px-3 py-2 text-left">Block On</th>
+  <th class="border px-3 py-2 text-left">Findings</th>
+  <th class="border px-3 py-2 text-left">Blocking</th>
+  <th class="border px-3 py-2 text-center">Status</th>
+</tr>
+</thead>
+<tbody>
+${rows}
+</tbody>
+</table>`;
+}
+
 export function renderAxiomReportHtml(
   studyRun: StudyRun,
   capsule: StagedCapsule,
@@ -283,6 +337,13 @@ export function renderAxiomReportHtml(
   const recordedAt = studyRun.recordedAt;
   const commitSha = metadata.commitSha ?? "unknown";
   const missionId = metadata.missionId;
+
+  // RFC-0665: Gate summary — pass/fail per methodology
+  const methodologies = metadata.methodologies ?? [];
+  const hasMethodologies = methodologies.length > 0;
+  const gateSummaryHtml = hasMethodologies
+    ? renderGateSummary(methodologies, findings)
+    : `<div class="text-sm text-gray-500">No methodologies[] in evidence-metadata.json — pre-RFC-0665 evidence (legacy report format).</div>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -305,6 +366,11 @@ export function renderAxiomReportHtml(
     <div><strong>Observation bundle:</strong> <code>${escapeHtml(bundle.bundleId)}</code></div>
   </div>
 </header>
+
+<section class="mb-6">
+  <h2 class="text-xl font-bold mb-3">Gate Summary (RFC-0665)</h2>
+  ${gateSummaryHtml}
+</section>
 
 <section class="mb-6">
   <h2 class="text-xl font-bold mb-3">Severity Dashboard</h2>

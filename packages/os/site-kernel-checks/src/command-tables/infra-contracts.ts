@@ -35,6 +35,7 @@ import { runYamlContractLint } from "../yaml-contract-lint.ts";
 import { runYamlParseValidate } from "../yaml-parse-validate.ts";
 import { runCommandReadsValidate } from "../command-reads-validate.ts";
 import { runPlaywrightChromiumEnsure } from "../playwright-chromium-ensure.ts";
+import { runMethodologiesValidate } from "../methodologies-validate.ts";
 
 // Note: evidence.sync and evidence.fetch are registered by createEvidenceModule
 // in @warpgogol/site-kernel-handoff/src/evidence/evidence-module.ts (RFC-0651).
@@ -413,5 +414,21 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     supportsAllSites: false,
     execute: runPlaywrightChromiumEnsure,
+  },
+  {
+    name: "methodologies.validate",
+    description:
+      "RFC-0665: validates the workshop-level methodologies config at systems/methodologies.md. " +
+      "Checks schema (instruments, methodologies, gate), known methodology IDs, instrument references, " +
+      "and gate aggregation. Diagnostics: METH-VAL-01 (file not found), METH-VAL-02 (schema violation), " +
+      "METH-VAL-03 (unknown methodology id), METH-VAL-04 (unknown instrument ref). " +
+      "Exit codes: 0=pass, 1=violations.",
+    scope: "workspace",
+    supportsAllSites: false,
+    mutatesState: false,
+    cacheable: false,
+    reads: ["systems/methodologies.md"],
+    flags: {},
+    execute: runMethodologiesValidate,
   },
 ];

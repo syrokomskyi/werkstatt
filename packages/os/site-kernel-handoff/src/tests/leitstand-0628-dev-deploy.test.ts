@@ -180,12 +180,19 @@ function writeStudyRun(
 function writeEvidenceMetadata(
   workspaceRoot: string,
   missionId: string,
-  options?: { commitSha?: string; metadataMissionId?: string },
+  options?: {
+    commitSha?: string;
+    metadataMissionId?: string;
+    methodologies?: Array<{ id: string; digest?: string; blockOn?: string[] }>;
+  },
 ): void {
   const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
   mkdirSync(evidenceDir, { recursive: true });
   const metadata: Record<string, unknown> = {
     missionId: options?.metadataMissionId ?? missionId,
+    methodologies: options?.methodologies ?? [
+      { id: "automated-web-accessibility", digest: "sha256:mock", blockOn: ["high", "critical"] },
+    ],
   };
   if (options?.commitSha) {
     metadata.commitSha = options.commitSha;
@@ -443,7 +450,9 @@ test("leitstand.propagate rejects when Axiom evidence has high/critical violatio
 
   await expect(
     runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
-  ).rejects.toThrow("Axiom verification failed: 2 high/critical violation(s)");
+  ).rejects.toThrow(
+    "Axiom verification failed: methodology 'automated-web-accessibility' has 2 block-on violation(s)",
+  );
 });
 
 test("leitstand.propagate passes when Axiom evidence has only incomplete findings", async () => {

@@ -70,6 +70,7 @@ import {
 } from "@syrokomskyi/axiom-methodology";
 
 import { renderAxiomReportHtml, type EvidenceMetadata } from "./axiom-report.ts";
+import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
 
 import { parse as parseYaml } from "yaml";
 
@@ -766,14 +767,39 @@ export async function runMissionCheck(
       JSON.stringify(studyRun, null, 2) + "\n",
     );
 
-    // Write evidence-metadata.json (RFC-0650: includes runTimestamp)
-    const evidenceMetadata: { missionId: string; commitSha?: string; runTimestamp: string } = {
+    // Write evidence-metadata.json (RFC-0650: includes runTimestamp, RFC-0665: includes methodologies[])
+    const methodologiesConfig = tryLoadMethodologiesConfig(context.workspaceRoot);
+    const methodologiesEvidence: Array<{ id: string; digest: string; blockOn: string[] }> = [];
+    if (methodologiesConfig.ok) {
+      for (const m of methodologiesConfig.config.methodologies.filter((m) => m.active)) {
+        // For Phase 1, only automated-web-accessibility has a real methodology package.
+        // Other methodologies will get their digests from the external package in Phase 2.
+        if (m.id === "automated-web-accessibility") {
+          const methodology = createAutomatedWebAccessibilityMethodology();
+          const digestResult = methodologyPackageDigest(methodology);
+          methodologiesEvidence.push({
+            id: m.id,
+            digest: digestResult.digest,
+            blockOn: m.blockOn,
+          });
+        } else {
+          // Phase 1: placeholder digest for non-accessibility methodologies.
+          // Phase 2 will replace this with real methodology package digests.
+          methodologiesEvidence.push({
+            id: m.id,
+            digest: `pending-phase2:${m.id}`,
+            blockOn: m.blockOn,
+          });
+        }
+      }
+    }
+
+    const evidenceMetadata: EvidenceMetadata = {
       missionId,
       runTimestamp,
+      ...(commitSha ? { commitSha } : {}),
+      ...(methodologiesEvidence.length > 0 ? { methodologies: methodologiesEvidence } : {}),
     };
-    if (commitSha) {
-      evidenceMetadata.commitSha = commitSha;
-    }
     await writeFileIfChanged(
       join(evidenceDir, "evidence-metadata.json"),
       JSON.stringify(evidenceMetadata, null, 2) + "\n",
@@ -788,10 +814,7 @@ export async function runMissionCheck(
     // Auto-generate report.html (RFC-0633) so the operator gets an HTML triage
     // report without needing to run axiom.report separately after mission.check.
     try {
-      const reportHtml = renderAxiomReportHtml(studyRun, capsule, bundle, {
-        missionId,
-        ...(commitSha ? { commitSha } : {}),
-      });
+      const reportHtml = renderAxiomReportHtml(studyRun, capsule, bundle, evidenceMetadata);
       await writeFileIfChanged(join(evidenceDir, "report.html"), reportHtml);
       logger.info(`  Report: ${join(evidenceDir, "report.html")}`);
     } catch (reportErr) {
