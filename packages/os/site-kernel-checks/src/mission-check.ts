@@ -1,24 +1,25 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0629: One-shot Axiom accessibility check for a mission. Uses native axiom components (PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, runAccessibilityInstrument, findingsForObservation, evaluateClosure) to capture evidence, project findings, and evaluate closure. Writes native capsule files (staged-capsule.json, observation-bundle.json, study-run.json, evidence-metadata.json) and auto-generates report.html (RFC-0633) for operator triage.</purpose>
+<purpose>RFC-0629: One-shot Axiom check for a mission. Delegates to runActiveMethodologies() from @syrokomskyi/axiom-methodology — the external utility orchestrates capture, discovery, instrument execution, and finding projection. Writes native capsule files (staged-capsule.json, observation-bundles.json, study-run.json, evidence-metadata.json) and auto-generates report.html (RFC-0633) for operator triage.</purpose>
 <non-goals>
   <item>Does not support local mode (build + static server) — external-preview only.</item>
-  <item>Does not integrate with Observatory runtime (local-dev only).</item>
+  <item>Does not orchestrate capture, instruments, or finding projection — that lives in runActiveMethodologies().</item>
+  <item>Does not write raw evidence artifacts — the orchestrator returns digests, not bytes.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0012: initial implementation of mission.check command.</item>
-  <item>RFC-0629: migrated to native axiom capsules with PlaywrightEvidenceDriver, CrawleeDiscoveryExecutor, and automated-web-accessibility methodology.</item>
-  <item>RFC-0630: hardened capture contract — runtime toolProfile via createRequire, page-language matching from workpiece i18n, pre-flight chromium check, configurable contract via CLI flags.</item>
-  <item>Auto-generate report.html (RFC-0633) after evidence files are written, so the operator gets an HTML triage report without running axiom.report separately.</item>
-  <item>Auto-detect dev channel (*.workers.dev or dev.* subdomain) and use fast crawl settings: no crawl delay, 4x concurrency, shorter settle wait.</item>
+  <item>RFC-0629: migrated to native axiom capsules.</item>
+  <item>RFC-0630: hardened capture contract, pre-flight chromium check, i18n locale mapping.</item>
+  <item>RFC-0633: auto-generate report.html after evidence files are written.</item>
+  <item>RFC-0665: multi-methodology gate via systems/methodologies.md config.</item>
+  <item>Refactored to use runActiveMethodologies() orchestrator — removed all duplicated pipeline code (contract builder, capture loop, instrument runner, capsule/study-run builders, raw evidence writer, dev channel detection, tool profile resolver).</item>
 </CHANGE_SUMMARY>
 */
 
-import { mkdir, rm } from "node:fs/promises";
+import { rm, mkdir } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { createRequire } from "node:module";
 import { execSync } from "node:child_process";
 
 import {
@@ -30,99 +31,33 @@ import {
 
 import { resolveMissionDir } from "@warpgogol/site-kernel";
 
-import { mintAxiomId } from "@syrokomskyi/axiom-contracts";
-import { createCanonicalJsonDigestRef } from "@syrokomskyi/axiom-provenance";
-
+import type { StagedCapsule } from "@syrokomskyi/axiom-capture";
+import type { Finding, ObservationBundle, StudyRun } from "@syrokomskyi/axiom-study";
 import {
-  PlaywrightEvidenceDriver,
-  CrawleeDiscoveryExecutor,
-  captureContractSchema,
-  contractDigest,
-  evaluateClosure,
-  capabilityManifestSchema,
-  capabilityReceiptSchema,
-  runtimeAttestationSchema,
-  archiveReceiptSchema,
-  replayReceiptSchema,
-  stagedCapsuleSchema,
-  type CaptureContract,
-  type StagedCapsule,
-  type CapabilityManifest,
-  type CapturedBrowserEvidence,
-} from "@syrokomskyi/axiom-capture";
-
-import {
-  runAccessibilityInstrument,
-  toDeterministicContext,
-  studyRunSchema,
-  type AxeEvidenceState,
-  type Observation,
-  type Finding,
-  type ObservationBundle,
-  type StudyRun,
-} from "@syrokomskyi/axiom-study";
-
-import {
-  createAutomatedWebAccessibilityMethodology,
-  findingsForObservation,
-  methodologyPackageDigest,
-  type MethodologyPackage,
+  runActiveMethodologies,
+  type RunActiveMethodologiesInput,
 } from "@syrokomskyi/axiom-methodology";
 
 import { renderAxiomReportHtml, type EvidenceMetadata } from "./axiom-report.ts";
-import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
+import { tryLoadMethodologiesConfig, isBlockingFinding } from "./methodologies-config.ts";
 
 import { parse as parseYaml } from "yaml";
-
-const esmRequire = createRequire(import.meta.url);
-
-interface RuntimeToolProfile {
-  crawleeVersion: string;
-  playwrightVersion: string;
-  chromiumRevision: string;
-}
-
-interface MissionCheckOverrides {
-  maxDuration?: number;
-  maxUrls?: number;
-  maxDepth?: number;
-}
 
 interface PreflightResult {
   ok: boolean;
   error?: string;
-  chromiumRevision?: string;
-}
-
-function resolveToolProfile(chromiumRevision: string): RuntimeToolProfile {
-  let playwrightVersion = "unknown";
-  let crawleeVersion = "unknown";
-  try {
-    playwrightVersion = esmRequire("playwright/package.json").version ?? "unknown";
-  } catch {
-    // Fallback — provenance improvement, not correctness requirement
-  }
-  try {
-    crawleeVersion = esmRequire("crawlee/package.json").version ?? "unknown";
-  } catch {
-    // Fallback — provenance improvement, not correctness requirement
-  }
-  return { crawleeVersion, playwrightVersion, chromiumRevision };
 }
 
 async function runPreflightCheck(): Promise<PreflightResult> {
-  // First, try to launch chromium
   try {
     const { chromium } = await import("playwright");
     const browser = await chromium.launch({ headless: true });
-    const revision = browser.version();
     await browser.close();
-    return { ok: true, chromiumRevision: revision };
+    return { ok: true };
   } catch {
     // Launch failed — try auto-install
   }
 
-  // Auto-install chromium
   try {
     execSync("pnpm exec playwright install chromium", {
       cwd: process.cwd(),
@@ -137,13 +72,11 @@ async function runPreflightCheck(): Promise<PreflightResult> {
     };
   }
 
-  // Retry launch after install
   try {
     const { chromium } = await import("playwright");
     const browser = await chromium.launch({ headless: true });
-    const revision = browser.version();
     await browser.close();
-    return { ok: true, chromiumRevision: revision };
+    return { ok: true };
   } catch (err) {
     return {
       ok: false,
@@ -152,53 +85,26 @@ async function runPreflightCheck(): Promise<PreflightResult> {
   }
 }
 
-interface LocaleMapping {
-  segmentToLocale: Map<string, string>;
-  defaultLocale: string;
-}
+function resolveLocales(missionDir: string, explicit?: string[]): string[] {
+  if (explicit && explicit.length > 0) return explicit;
 
-function resolveLocaleMapping(missionDir: string): LocaleMapping {
   const systemMdPath = join(missionDir, "workpiece", "src", "content", "system.md");
   try {
     const content = readFileSync(systemMdPath, "utf-8");
     const match = content.match(/^---\n([\s\S]*?)\n---/);
-    if (!match) return fallbackLocaleMapping();
-    const yamlContent = match[1];
-    const frontmatter = parseYaml(yamlContent) as Record<string, unknown>;
+    if (!match) return ["en-US"];
+    const frontmatter = parseYaml(match[1]) as Record<string, unknown>;
     const i18n = frontmatter?.i18n as
       { default?: string; supported?: Record<string, { hreflang?: string }> } | undefined;
-    if (!i18n?.supported || !i18n.default) return fallbackLocaleMapping();
-    const segmentToLocale = new Map<string, string>();
-    for (const [segment, config] of Object.entries(i18n.supported)) {
-      if (config?.hreflang) {
-        segmentToLocale.set(segment, config.hreflang);
-      }
-    }
-    const defaultConfig = i18n.supported[i18n.default];
-    const defaultLocale = defaultConfig?.hreflang ?? "en-US";
-    return { segmentToLocale, defaultLocale };
-  } catch {
-    return fallbackLocaleMapping();
-  }
-}
+    if (!i18n?.supported || !i18n.default) return ["en-US"];
 
-function fallbackLocaleMapping(): LocaleMapping {
-  return { segmentToLocale: new Map(), defaultLocale: "en-US" };
-}
-
-function resolveLocaleForUrl(url: string, mapping: LocaleMapping): string {
-  try {
-    const parsed = new URL(url);
-    const segments = parsed.pathname.split("/").filter(Boolean);
-    if (segments.length > 0) {
-      const firstSegment = segments[0]!;
-      const locale = mapping.segmentToLocale.get(firstSegment);
-      if (locale) return locale;
-    }
+    const locales = Object.values(i18n.supported)
+      .map((c) => c?.hreflang)
+      .filter((l): l is string => typeof l === "string");
+    return locales.length > 0 ? locales : ["en-US"];
   } catch {
-    // Invalid URL — fall through to default
+    return ["en-US"];
   }
-  return mapping.defaultLocale;
 }
 
 export interface MissionCheckResult {
@@ -220,12 +126,6 @@ export interface MissionCheckResult {
   summary: string;
   nextSteps: string[];
 }
-
-const LOCAL_PRODUCER = {
-  producerId: "local-dev",
-  name: "mission.check",
-  version: "1.0.0",
-} as const;
 
 function failResult(
   evidenceDir: string,
@@ -251,254 +151,44 @@ function failResult(
   };
 }
 
-function safeNameFromUrl(rawUrl: string): string {
-  try {
-    const parsed = new URL(rawUrl);
-    return parsed.pathname.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "index";
-  } catch {
-    return "page";
-  }
-}
-
-function isDevChannel(baseUrl: string): boolean {
-  try {
-    const host = new URL(baseUrl).hostname;
-    return host.endsWith(".workers.dev") || host.startsWith("dev.");
-  } catch {
-    return false;
-  }
-}
-
-function buildCaptureContract(
-  baseUrl: string,
-  recordedAt: string,
-  toolProfile: RuntimeToolProfile,
-  overrides?: MissionCheckOverrides,
-  locales?: string[],
-): CaptureContract {
-  const origin = new URL(baseUrl).origin;
-  const dev = isDevChannel(baseUrl);
-  return captureContractSchema.parse({
-    schema: "capture-contract@1",
-    contractId: mintAxiomId("capture-contract"),
-    businessId: mintAxiomId("business"),
-    webPresenceId: mintAxiomId("web-presence"),
-    lockedIdentityAssertions: [],
-    origins: [origin],
-    urlPolicy: {
-      allowedOrigins: [origin],
-      includePatterns: ["/**"],
-      excludePatterns: [],
-      maxDepth: overrides?.maxDepth ?? 3,
-    },
-    locales: locales ?? ["en-US"],
-    profiles: [
-      {
-        profileId: "desktop",
-        width: 1440,
-        height: 900,
-        colorScheme: "no-preference",
-        reducedMotion: false,
-      },
-    ],
-    publicSession: { kind: "public", authenticated: false, cookies: [], secrets: [] },
-    journeys: [],
-    robotsRatePolicy: {
-      respectRobots: true,
-      respectRetryAfter: true,
-      perHostConcurrency: dev ? 4 : 1,
-      crawlDelayMs: dev ? 0 : 1000,
-    },
-    thirdPartyPolicy: {
-      allowDeclaredThirdParties: false,
-      allowedOrigins: [],
-      blockedHosts: [],
-    },
-    limits: {
-      maxUrls: overrides?.maxUrls ?? 100,
-      maxBytes: 100_000_000,
-      maxDurationMs: overrides?.maxDuration ?? 120_000,
-      maxRetries: 1,
-    },
-    behaviors: {
-      enableAutoscroll: true,
-      enableFiniteLinkDiscovery: true,
-      enableFingerprintSpoofing: false,
-      enableProxyRotation: false,
-      enableAuthBypass: false,
-    },
-    settleRules: dev
-      ? { networkIdleMs: 200, maxSettleMs: 5000 }
-      : { networkIdleMs: 1000, maxSettleMs: 15000 },
-    volatilityPasses: 1,
-    toolProfile: {
-      crawleeVersion: toolProfile.crawleeVersion,
-      playwrightVersion: toolProfile.playwrightVersion,
-      chromiumRevision: toolProfile.chromiumRevision,
-    },
-    closureThresholds: {
-      requiredCapabilities: [
-        "http",
-        "browser",
-        "accessibility",
-        "archive",
-        "replay",
-        "closure",
-        "runtime-attestation",
-      ],
-      allowPartial: true,
-    },
-    stopConditions: ["maxUrls", "maxBytes", "maxDurationMs", "boundedFixpoint"],
-    recordedAt,
-    producer: LOCAL_PRODUCER,
-  });
-}
-
-function extractAxeResult(captured: CapturedBrowserEvidence): AxeEvidenceState["result"] | null {
-  const axeEvidence = captured.evidence.find((e) => e.role === "axe-raw-result");
-  if (!axeEvidence) return null;
-  const text = new TextDecoder().decode(axeEvidence.bytes);
-  return JSON.parse(text) as AxeEvidenceState["result"];
-}
-
-function buildCapabilityManifest(contract: CaptureContract, pageCount: number): CapabilityManifest {
-  const contractRef = contractDigest(contract);
-  const completeReceipts = ["http", "browser", "accessibility", "closure"].map((capability) =>
-    capabilityReceiptSchema.parse({
-      capability,
-      state: "complete",
-      expectedCount: pageCount,
-      observedCount: pageCount,
-      evidence: [],
-      diagnostics: [],
-    }),
-  );
-  const excludedReceipts = [
-    capabilityReceiptSchema.parse({
-      capability: "archive",
-      state: "excluded",
-      expectedCount: 0,
-      observedCount: 0,
-      evidence: [],
-      diagnostics: [
-        "Archive capability excluded — Docker/Browsertrix not available in local mode.",
-      ],
-    }),
-    capabilityReceiptSchema.parse({
-      capability: "replay",
-      state: "excluded",
-      expectedCount: 0,
-      observedCount: 0,
-      evidence: [],
-      diagnostics: ["Replay capability excluded — Docker/Browsertrix not available in local mode."],
-    }),
-    capabilityReceiptSchema.parse({
-      capability: "runtime-attestation",
-      state: "complete",
-      expectedCount: 1,
-      observedCount: 1,
-      evidence: [],
-      diagnostics: [],
-    }),
-  ];
-  return capabilityManifestSchema.parse({
-    schema: "capability-manifest@1",
-    contractDigest: contractRef,
-    receipts: [...completeReceipts, ...excludedReceipts],
-  });
-}
-
-function buildStagedCapsule(
-  contract: CaptureContract,
-  manifest: CapabilityManifest,
-  closureDecision: ReturnType<typeof evaluateClosure>,
-  rawEvidenceDigests: import("@syrokomskyi/axiom-contracts").DigestRef[],
-): StagedCapsule {
-  const runtimeAttestation = runtimeAttestationSchema.parse({
-    schema: "runtime-attestation@1",
-    workerProfile: "local-direct-playwright",
-    os: process.platform,
-    toolDigests: {
-      playwright: contract.toolProfile.playwrightVersion,
-      chromium: contract.toolProfile.chromiumRevision,
-      crawlee: contract.toolProfile.crawleeVersion,
-    },
-    recordedAt: contract.recordedAt,
-    producer: contract.producer,
-  });
-  const archiveReceipt = archiveReceiptSchema.parse({
-    schema: "archive-receipt@1",
-    state: "excluded",
-    archiveDigest: null,
-    waczDigest: null,
-    execution: null,
-    diagnostics: ["Archive capability excluded — Docker/Browsertrix not available in local mode."],
-  });
-  const replayReceipt = replayReceiptSchema.parse({
-    schema: "replay-receipt@1",
-    state: "excluded",
-    offlineReplay: false,
-    unresolvedEgressCount: 0,
-    execution: null,
-    diagnostics: ["Replay capability excluded — Docker/Browsertrix not available in local mode."],
-  });
-  return stagedCapsuleSchema.parse({
-    schema: "staged-website-evidence-capsule@1",
-    contract,
-    contractDigest: contractDigest(contract),
-    capabilityManifest: manifest,
-    classification: "local-dev",
-    closureDecision,
-    runtimeAttestation,
-    archiveReceipt,
-    replayReceipt,
-    rawEvidence: rawEvidenceDigests,
-    normalizedEvidence: [],
-  });
-}
-
-function buildStudyRun(
-  methodology: MethodologyPackage,
-  bundle: ObservationBundle,
-  findings: Finding[],
-  capsuleRef: import("@syrokomskyi/axiom-contracts").ArtifactRef,
-  recordedAt: string,
-): StudyRun {
-  const methodologyDigest = methodologyPackageDigest(methodology);
-  const designMaterial = {
-    kind: "snapshot" as const,
-    methodologyDigest,
-    capsuleDigests: [capsuleRef.rootDigest],
-    rebased: false,
-  };
-  const designDigest = createCanonicalJsonDigestRef(designMaterial);
-  const runMaterial = {
-    designDigest,
-    bundleIds: [bundle.bundleId],
-  };
-  return studyRunSchema.parse({
-    studyRunId: `study-run_${createCanonicalJsonDigestRef(runMaterial).digest}`,
-    design: { designId: `study-design_${designDigest.digest}`, ...designMaterial },
-    observationBundleIds: runMaterial.bundleIds,
-    assessments: [
-      {
-        assessmentId: `assessment_${createCanonicalJsonDigestRef(findings).digest}`,
-        findingIds: findings.map((f) => f.findingId),
-        limitations: methodology.limitations,
-      },
-    ],
-    findings,
-    recordedAt,
-    producer: LOCAL_PRODUCER,
-  });
-}
-
 function countFindingsBySeverity(findings: Finding[]): MissionCheckResult["findingsCount"] {
   const counts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
   for (const f of findings) {
     counts[f.severity] += 1;
   }
   return counts;
+}
+
+function buildMethodologiesInput(
+  config:
+    | { ok: true; config: import("./methodologies-config.ts").MethodologiesConfig }
+    | { ok: false; error: string },
+): RunActiveMethodologiesInput["methodologies"] {
+  if (!config.ok) return [];
+  return config.config.methodologies.map((m) => ({
+    methodologyId: m.id,
+    active: m.active,
+  }));
+}
+
+function buildMethodologiesEvidence(
+  config:
+    | { ok: true; config: import("./methodologies-config.ts").MethodologiesConfig }
+    | { ok: false; error: string },
+  orchestratorDigests: {
+    methodologyId: string;
+    digest: import("@syrokomskyi/axiom-contracts").DigestRef;
+  }[],
+): Array<{ id: string; digest: string; blockOn: string[] }> {
+  if (!config.ok) return [];
+  const digestMap = new Map(orchestratorDigests.map((d) => [d.methodologyId, d.digest.digest]));
+  return config.config.methodologies
+    .filter((m) => m.active)
+    .map((m) => ({
+      id: m.id,
+      digest: digestMap.get(m.id) ?? `pending-phase2:${m.id}`,
+      blockOn: m.blockOn,
+    }));
 }
 
 export async function runMissionCheck(
@@ -527,7 +217,7 @@ export async function runMissionCheck(
   const commitSha = input.flags["commit-sha"] as string | undefined;
   const baseUrl = baseUrlFlag.replace(/\/$/, "");
 
-  // RFC-0650: Parse --run-timestamp flag (optional, ISO 8601 UTC filesystem-safe format)
+  // RFC-0650: Parse --run-timestamp flag
   const runTimestampFlag = input.flags["run-timestamp"] as string | undefined;
   let runTimestamp: string;
   if (runTimestampFlag !== undefined) {
@@ -544,22 +234,17 @@ export async function runMissionCheck(
     runTimestamp = new Date().toISOString().replace(/[:.]/g, "-");
   }
 
-  // RFC-0630: Parse optional override flags
-  const overrides: MissionCheckOverrides = {};
+  // Parse optional override flags for orchestrator limits
+  const limits: { maxUrls?: number; maxDurationMs?: number } = {};
   const maxDurationRaw = input.flags["max-duration"];
   if (maxDurationRaw !== undefined) {
     const n = Number(maxDurationRaw);
-    if (!Number.isNaN(n)) overrides.maxDuration = n;
+    if (!Number.isNaN(n)) limits.maxDurationMs = n;
   }
   const maxUrlsRaw = input.flags["max-urls"];
   if (maxUrlsRaw !== undefined) {
     const n = Number(maxUrlsRaw);
-    if (!Number.isNaN(n)) overrides.maxUrls = n;
-  }
-  const maxDepthRaw = input.flags["max-depth"];
-  if (maxDepthRaw !== undefined) {
-    const n = Number(maxDepthRaw);
-    if (!Number.isNaN(n)) overrides.maxDepth = n;
+    if (!Number.isNaN(n)) limits.maxUrls = n;
   }
 
   let explicitLocales: string[] | undefined;
@@ -580,38 +265,30 @@ export async function runMissionCheck(
       );
     }
     explicitLocales = parsed;
-    if (parsed.length > 1) {
-      logger.warn(
-        `  --locales has ${parsed.length} values; only '${parsed[0]}' will be used for all pages (multi-locale per-page matching requires i18n config from workpiece)`,
-      );
-    }
   }
 
   const missionDir = resolveMissionDir(workspaceRoot, missionId);
   const evidenceDir = join(missionDir, "evidence", "axiom");
-  const rawDir = join(evidenceDir, "raw");
 
   logger.info(`  External preview mode: ${baseUrl}`);
 
-  // RFC-0630: Pre-flight check — verify chromium is installed before discovery
+  // Pre-flight check — verify chromium is installed
   logger.info(`  Pre-flight: checking chromium installation...`);
   const preflight = await runPreflightCheck();
   if (!preflight.ok) {
     return failResult(evidenceDir, 2, preflight.error!);
   }
-  logger.info(`  Pre-flight: chromium ${preflight.chromiumRevision} OK`);
+  logger.info(`  Pre-flight: chromium OK`);
 
-  // RFC-0630: Resolve i18n locale mapping from mission workpiece system.md
-  const localeMapping = resolveLocaleMapping(missionDir);
-  if (localeMapping.segmentToLocale.size === 0 && !explicitLocales) {
+  // Resolve locales from workpiece i18n config or explicit override
+  const locales = resolveLocales(missionDir, explicitLocales);
+  if (locales.length === 1 && locales[0] === "en-US" && !explicitLocales) {
     logger.warn(`  No i18n config found in workpiece, falling back to en-US locale`);
   }
 
-  // RFC-0630: Build contract locales — explicit override or all from i18n mapping
-  const contractLocales = explicitLocales ?? Array.from(localeMapping.segmentToLocale.values());
-  if (contractLocales.length === 0) {
-    contractLocales.push(localeMapping.defaultLocale);
-  }
+  // Load methodologies config
+  const methodologiesConfig = tryLoadMethodologiesConfig(workspaceRoot);
+  const methodologiesInput = buildMethodologiesInput(methodologiesConfig);
 
   // Clean stale evidence from previous runs
   if (existsSync(evidenceDir)) {
@@ -625,259 +302,139 @@ export async function runMissionCheck(
     await rm(join(evidenceDir, "report.html"), { force: true });
   }
 
-  await mkdir(rawDir, { recursive: true });
+  await mkdir(evidenceDir, { recursive: true });
 
-  // RFC-0630: Resolve runtime toolProfile with real versions
-  const recordedAt = new Date().toISOString();
-  const toolProfile = resolveToolProfile(preflight.chromiumRevision ?? "unknown");
-  const contract = buildCaptureContract(
-    baseUrl,
-    recordedAt,
-    toolProfile,
-    overrides,
-    contractLocales,
+  // Delegate to runActiveMethodologies() — the external utility orchestrates
+  // capture, discovery, instrument execution, and finding projection.
+  logger.info(`  Running active methodologies via orchestrator...`);
+  let orchestratorResult;
+  try {
+    orchestratorResult = await runActiveMethodologies({
+      methodologies: methodologiesInput,
+      baseUrl,
+      missionId,
+      ...(commitSha ? { commitSha } : {}),
+      locales,
+      ...(Object.keys(limits).length > 0
+        ? {
+            limits: {
+              maxUrls: limits.maxUrls ?? 100,
+              maxDurationMs: limits.maxDurationMs ?? 120_000,
+              maxBytes: 100_000_000,
+            },
+          }
+        : {}),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return failResult(evidenceDir, 2, `mission.check: orchestrator failed: ${msg}`);
+  }
+
+  const { studyRun, stagedCapsule, observationBundles, findings, methodologyDigests } =
+    orchestratorResult;
+
+  if (findings.length === 0 && observationBundles.length === 0) {
+    return failResult(evidenceDir, 2, `mission.check: no pages could be captured at ${baseUrl}`);
+  }
+
+  // Write evidence files
+  await writeFileIfChanged(
+    join(evidenceDir, "staged-capsule.json"),
+    JSON.stringify(stagedCapsule, null, 2) + "\n",
+  );
+  // Write the first observation bundle (accessibility is primary)
+  const primaryBundle = observationBundles[0]!;
+  await writeFileIfChanged(
+    join(evidenceDir, "observation-bundle.json"),
+    JSON.stringify(primaryBundle, null, 2) + "\n",
+  );
+  await writeFileIfChanged(
+    join(evidenceDir, "study-run.json"),
+    JSON.stringify(studyRun, null, 2) + "\n",
   );
 
-  // Discover pages via CrawleeDiscoveryExecutor
-  const devChannel = isDevChannel(baseUrl);
-  if (devChannel) {
-    logger.info(`  Dev channel detected — fast crawl settings (no delay, 4x concurrency)`);
-  }
-  const discoveryExecutor = new CrawleeDiscoveryExecutor();
-  logger.info(`  Discovering pages via Crawlee...`);
-  const discoveryLedger = await discoveryExecutor.discover(contract);
-  const discoveredUrls = discoveryLedger.records.map((r) => r.normalizedUrl);
+  // Build evidence-metadata.json with methodologies from orchestrator digests
+  const methodologiesEvidence = buildMethodologiesEvidence(methodologiesConfig, methodologyDigests);
+  const evidenceMetadata: EvidenceMetadata = {
+    missionId,
+    runTimestamp,
+    ...(commitSha ? { commitSha } : {}),
+    ...(methodologiesEvidence.length > 0 ? { methodologies: methodologiesEvidence } : {}),
+  };
+  await writeFileIfChanged(
+    join(evidenceDir, "evidence-metadata.json"),
+    JSON.stringify(evidenceMetadata, null, 2) + "\n",
+  );
 
-  if (discoveredUrls.length === 0) {
-    return failResult(evidenceDir, 2, `mission.check: no pages discovered at ${baseUrl}`);
-  }
-
-  logger.info(`  Discovered ${discoveredUrls.length} page(s)`);
-
-  // Capture each page via PlaywrightEvidenceDriver
-  const driver = new PlaywrightEvidenceDriver();
+  // Auto-generate report.html (RFC-0633)
   try {
-    const axeStates: AxeEvidenceState[] = [];
-    const rawEvidenceDigests: import("@syrokomskyi/axiom-contracts").DigestRef[] = [];
-    const rawArtifacts: Array<{ filename: string; data: unknown }> = [];
-
-    for (const pageUrl of discoveredUrls) {
-      logger.info(`  Checking: ${pageUrl}`);
-      // RFC-0630: Page-language matching — resolve browser locale from URL path segment
-      const pageLocale = explicitLocales
-        ? explicitLocales[0]!
-        : resolveLocaleForUrl(pageUrl, localeMapping);
-      try {
-        const captured = await driver.capture({
-          contract,
-          request: {
-            url: pageUrl,
-            profileId: contract.profiles[0]!.profileId,
-            locale: pageLocale,
-          },
-          viewportProfileId: contract.profiles[0]!.profileId,
-        });
-
-        // Collect raw evidence digests
-        for (const ev of captured.evidence) {
-          rawEvidenceDigests.push(ev.digest);
-        }
-
-        // Write raw evidence artifacts
-        const safeName = safeNameFromUrl(pageUrl);
-        for (const ev of captured.evidence) {
-          const ext = ev.mediaType.startsWith("image/") ? "webp" : "json";
-          const filename = `${safeName}-${ev.role}.${ext}`;
-          const bytes =
-            ev.mediaType.startsWith("image/") || ev.mediaType === "application/octet-stream"
-              ? Buffer.from(ev.bytes)
-              : new TextDecoder().decode(ev.bytes);
-          rawArtifacts.push({ filename, data: bytes });
-        }
-
-        // Extract axe results for instrument
-        const axeResult = extractAxeResult(captured);
-        if (axeResult) {
-          axeStates.push({
-            url: pageUrl,
-            locale: pageLocale,
-            profileId: contract.profiles[0]!.profileId,
-            logicalPath: `raw/${safeName}-axe-raw-result.json`,
-            result: axeResult,
-          });
-        }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        logger.warn(`  Capture failed for ${pageUrl}: ${message}`);
-      }
-    }
-
-    if (axeStates.length === 0) {
-      return failResult(evidenceDir, 2, `mission.check: no pages could be captured`);
-    }
-
-    // Build instrument context
-    const localContext = {
-      origin: baseUrl,
-      recordedAt,
-      missionId,
-      environment: {
-        platform: process.platform,
-        nodeVersion: process.version,
-        mode: "external-preview",
-      },
-    };
-    const deterministicContext = toDeterministicContext(localContext);
-    const capsuleRef = deterministicContext.capsuleRef;
-
-    // Run accessibility instrument
-    const instrumentResult = runAccessibilityInstrument({
-      context: deterministicContext,
-      states: axeStates,
-    });
-    const bundle = instrumentResult.bundle;
-
-    // Bind methodology and project findings
-    const methodology = createAutomatedWebAccessibilityMethodology();
-    const findings: Finding[] = bundle.observations.flatMap((observation) =>
-      findingsForObservation(methodology, observation),
-    );
-
-    // Evaluate closure
-    const manifest = buildCapabilityManifest(contract, axeStates.length);
-    const closureDecision = evaluateClosure({ contract, manifest });
-
-    // Build staged capsule
-    const capsule = buildStagedCapsule(contract, manifest, closureDecision, rawEvidenceDigests);
-
-    // Build study run
-    const studyRun = buildStudyRun(methodology, bundle, findings, capsuleRef, recordedAt);
-
-    // Write evidence files
-    await writeFileIfChanged(
-      join(evidenceDir, "staged-capsule.json"),
-      JSON.stringify(capsule, null, 2) + "\n",
-    );
-    await writeFileIfChanged(
-      join(evidenceDir, "observation-bundle.json"),
-      JSON.stringify(bundle, null, 2) + "\n",
-    );
-    await writeFileIfChanged(
-      join(evidenceDir, "study-run.json"),
-      JSON.stringify(studyRun, null, 2) + "\n",
-    );
-
-    // Write evidence-metadata.json (RFC-0650: includes runTimestamp, RFC-0665: includes methodologies[])
-    const methodologiesConfig = tryLoadMethodologiesConfig(context.workspaceRoot);
-    const methodologiesEvidence: Array<{ id: string; digest: string; blockOn: string[] }> = [];
-    if (methodologiesConfig.ok) {
-      for (const m of methodologiesConfig.config.methodologies.filter((m) => m.active)) {
-        // For Phase 1, only automated-web-accessibility has a real methodology package.
-        // Other methodologies will get their digests from the external package in Phase 2.
-        if (m.id === "automated-web-accessibility") {
-          const methodology = createAutomatedWebAccessibilityMethodology();
-          const digestResult = methodologyPackageDigest(methodology);
-          methodologiesEvidence.push({
-            id: m.id,
-            digest: digestResult.digest,
-            blockOn: m.blockOn,
-          });
-        } else {
-          // Phase 1: placeholder digest for non-accessibility methodologies.
-          // Phase 2 will replace this with real methodology package digests.
-          methodologiesEvidence.push({
-            id: m.id,
-            digest: `pending-phase2:${m.id}`,
-            blockOn: m.blockOn,
-          });
-        }
-      }
-    }
-
-    const evidenceMetadata: EvidenceMetadata = {
-      missionId,
-      runTimestamp,
-      ...(commitSha ? { commitSha } : {}),
-      ...(methodologiesEvidence.length > 0 ? { methodologies: methodologiesEvidence } : {}),
-    };
-    await writeFileIfChanged(
-      join(evidenceDir, "evidence-metadata.json"),
-      JSON.stringify(evidenceMetadata, null, 2) + "\n",
-    );
-
-    // Write raw evidence artifacts
-    for (const { filename, data } of rawArtifacts) {
-      const content = typeof data === "string" ? data : (data as Uint8Array);
-      await writeFileIfChanged(join(rawDir, filename), content);
-    }
-
-    // Auto-generate report.html (RFC-0633) so the operator gets an HTML triage
-    // report without needing to run axiom.report separately after mission.check.
-    try {
-      const reportHtml = renderAxiomReportHtml(studyRun, capsule, bundle, evidenceMetadata);
-      await writeFileIfChanged(join(evidenceDir, "report.html"), reportHtml);
-      logger.info(`  Report: ${join(evidenceDir, "report.html")}`);
-    } catch (reportErr) {
-      logger.warn(
-        `  Report generation failed (non-blocking): ${reportErr instanceof Error ? reportErr.message : String(reportErr)}`,
-      );
-    }
-
-    // Compute findings counts
-    const findingsCount = countFindingsBySeverity(findings);
-    const warnings = findingsCount.medium + findingsCount.low + findingsCount.info;
-    const total = findings.length;
-
-    // Gate logic: fail only on actual axe *violations* (not incomplete results).
-    // axe "incomplete" means the rule could not determine a result (e.g. background
-    // color obscured by pseudo elements, images, gradients) — these are tool
-    // limitations, not confirmed accessibility failures.
-    const violationFindings = findings.filter(
-      (f) =>
-        (
-          (f.extension as Record<string, unknown>)?.["automated-web-accessibility"] as
-            Record<string, unknown> | undefined
-        )?.predicate === "accessibility.axe.violation",
-    );
-    const violationCounts = countFindingsBySeverity(violationFindings);
-    const errors = violationCounts.critical + violationCounts.high;
-    const hasHighOrCritical = violationCounts.critical > 0 || violationCounts.high > 0;
-    const closureFailed = !closureDecision.satisfied;
-    const status: "pass" | "fail" = hasHighOrCritical || closureFailed ? "fail" : "pass";
-    const exitCode = status === "fail" ? 1 : 0;
-    const durationMs = Date.now() - startTime;
-
-    const summary = `mission.check: ${status} — ${total} finding(s) (${violationFindings.length} violation(s), ${total - violationFindings.length} incomplete), ${errors} error(s), ${warnings} warning(s)${closureFailed ? ", closure blocked" : ""}`;
-
-    const result: MissionCheckResult = {
-      command: "mission.check",
-      status,
-      exitCode: exitCode as 0 | 1 | 2,
-      capsule,
+    const reportHtml = renderAxiomReportHtml(
       studyRun,
-      findingsCount,
-      findings: { errors, warnings, total },
-      closureDecision: {
-        satisfied: closureDecision.satisfied,
-        status: closureDecision.status,
-        reason: closureDecision.reason,
-      },
-      evidenceDir,
-      summary,
-      nextSteps: [],
-    };
-
-    logger.info(`  Findings: ${total} (${errors} errors, ${warnings} warnings)`);
-    logger.info(`  Closure: ${closureDecision.status} — ${closureDecision.reason}`);
-    logger.info(`  Evidence: ${evidenceDir}`);
-    logger.info(`  Duration: ${durationMs}ms`);
-
-    return {
-      data: result,
-      exitCode,
-      summary,
-    };
-  } finally {
-    await driver.close();
+      stagedCapsule,
+      primaryBundle,
+      evidenceMetadata,
+    );
+    await writeFileIfChanged(join(evidenceDir, "report.html"), reportHtml);
+    logger.info(`  Report: ${join(evidenceDir, "report.html")}`);
+  } catch (reportErr) {
+    logger.warn(
+      `  Report generation failed (non-blocking): ${reportErr instanceof Error ? reportErr.message : String(reportErr)}`,
+    );
   }
+
+  // Compute findings counts
+  const findingsCount = countFindingsBySeverity(findings);
+  const warnings = findingsCount.medium + findingsCount.low + findingsCount.info;
+  const total = findings.length;
+
+  // Gate logic: use isBlockingFinding from methodologies-config for multi-methodology gate
+  const closureDecision = stagedCapsule.closureDecision;
+  const closureFailed = !closureDecision.satisfied;
+
+  let blockingCount = 0;
+  if (methodologiesConfig.ok) {
+    for (const m of methodologiesConfig.config.methodologies.filter((m) => m.active)) {
+      for (const f of findings) {
+        if (isBlockingFinding(f, m.id, m.blockOn)) blockingCount++;
+      }
+    }
+  } else {
+    // Fallback: count high/critical severity findings
+    blockingCount = findingsCount.critical + findingsCount.high;
+  }
+
+  const status: "pass" | "fail" = blockingCount > 0 || closureFailed ? "fail" : "pass";
+  const exitCode = status === "fail" ? 1 : 0;
+  const durationMs = Date.now() - startTime;
+
+  const summary = `mission.check: ${status} — ${total} finding(s), ${blockingCount} blocking, ${warnings} warning(s)${closureFailed ? ", closure blocked" : ""}`;
+
+  const result: MissionCheckResult = {
+    command: "mission.check",
+    status,
+    exitCode: exitCode as 0 | 1 | 2,
+    capsule: stagedCapsule,
+    studyRun,
+    findingsCount,
+    findings: { errors: blockingCount, warnings, total },
+    closureDecision: {
+      satisfied: closureDecision.satisfied,
+      status: closureDecision.status,
+      reason: closureDecision.reason,
+    },
+    evidenceDir,
+    summary,
+    nextSteps: [],
+  };
+
+  logger.info(`  Findings: ${total} (${blockingCount} blocking, ${warnings} warnings)`);
+  logger.info(`  Closure: ${closureDecision.status} — ${closureDecision.reason}`);
+  logger.info(`  Evidence: ${evidenceDir}`);
+  logger.info(`  Duration: ${durationMs}ms`);
+
+  return {
+    data: result,
+    exitCode,
+    summary,
+  };
 }

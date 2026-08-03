@@ -86,12 +86,19 @@ const SEVERITY_HEX: Record<Finding["severity"], string> = {
 };
 
 function isViolationFinding(f: Finding): boolean {
-  return (
-    (
-      (f.extension as Record<string, unknown> | undefined)?.["automated-web-accessibility"] as
-        Record<string, unknown> | undefined
-    )?.predicate === "accessibility.axe.violation"
-  );
+  const ext = f.extension as Record<string, Record<string, unknown>> | undefined;
+  if (!ext) return false;
+  for (const methodologyId of Object.keys(ext)) {
+    const predicate = ext[methodologyId]?.predicate;
+    if (typeof predicate === "string" && !predicate.endsWith(".incomplete")) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getMethodologyId(f: Finding): string {
+  return f.methodologyId ?? "unknown";
 }
 
 function escapeHtml(value: string): string {
@@ -381,7 +388,7 @@ export function renderAxiomReportHtml(
   ${
     incompleteFindings.length > 0
       ? `<div class="mt-4 text-sm text-gray-500">
-    <strong>Incomplete:</strong> ${incompleteFindings.length} finding(s) — axe could not determine the background color automatically (e.g. text over images, overlapping elements). Requires manual review.
+    <strong>Incomplete:</strong> ${incompleteFindings.length} finding(s) — instrument could not determine a definitive result. Requires manual review.
   </div>`
       : ""
   }

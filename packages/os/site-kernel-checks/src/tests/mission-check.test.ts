@@ -13,146 +13,97 @@ const mockDigestRef = {
   size: 42,
   mediaType: "application/json",
 };
-const mockArtifactRef = {
-  artifactId: "axiom_artifact_mock",
-  rootDigest: mockDigestRef,
-  schema: "local-evidence-capsule@1" as const,
+
+const mockClosureAllowed = {
+  schema: "closure-decision@1",
+  status: "seal_allowed",
+  satisfied: true,
+  missingCapabilities: [],
+  partialCapabilities: [],
+  blockedCapabilities: [],
+  reason: "All required evidence capabilities completed.",
 };
 
-vi.mock("@syrokomskyi/axiom-contracts", () => ({
-  mintAxiomId: vi.fn(() => "axiom_id_mock"),
-}));
+const mockClosureBlocked = {
+  schema: "closure-decision@1",
+  status: "blocked",
+  satisfied: false,
+  missingCapabilities: ["browser"],
+  partialCapabilities: [],
+  blockedCapabilities: ["browser"],
+  reason: "Required evidence capabilities are blocked or missing.",
+};
 
-vi.mock("@syrokomskyi/axiom-provenance", () => ({
-  createCanonicalJsonDigestRef: vi.fn(() => mockDigestRef),
-}));
+const mockStudyRun = {
+  studyRunId: "study-run_mock",
+  design: {
+    designId: "study-design_mock",
+    kind: "snapshot" as const,
+    methodologyDigest: mockDigestRef,
+    capsuleDigests: [mockDigestRef],
+    rebased: false,
+  },
+  observationBundleIds: ["observation-bundle_mock"],
+  assessments: [],
+  findings: [] as Array<Record<string, unknown>>,
+  recordedAt: "2026-01-01T00:00:00.000Z",
+  producer: { producerId: "local-dev", name: "mission.check", version: "1.0.0" },
+};
 
-vi.mock("@syrokomskyi/axiom-capture", () => {
-  const identitySchema = { parse: (v: unknown) => v };
+const mockCapsule = {
+  schema: "staged-website-evidence-capsule@1" as const,
+  contract: {},
+  contractDigest: mockDigestRef,
+  capabilityManifest: {
+    schema: "capability-manifest@1" as const,
+    contractDigest: mockDigestRef,
+    receipts: [],
+  },
+  classification: "local-dev" as const,
+  closureDecision: mockClosureAllowed,
+  runtimeAttestation: {},
+  archiveReceipt: {},
+  replayReceipt: {},
+  rawEvidence: [],
+  normalizedEvidence: [],
+};
+
+const mockBundle = {
+  bundleId: "observation-bundle_mock",
+  observations: [],
+  rootDigest: mockDigestRef,
+};
+
+function makeOrchestratorResult(overrides?: {
+  findings?: Array<Record<string, unknown>>;
+  closureDecision?: Record<string, unknown>;
+}): Awaited<ReturnType<typeof runActiveMethodologies>> {
   return {
-    PlaywrightEvidenceDriver: vi.fn().mockImplementation(function () {
-      return {
-        capture: vi.fn().mockResolvedValue({
-          receipt: {
-            schema: "browser-receipt@1",
-            taskKey: "mock-task-key",
-            state: "complete",
-            finalUrl: "http://example.com/",
-            statusCode: 200,
-            htmlDigest: mockDigestRef,
-            screenshotDigest: mockDigestRef,
-            domSnapshotDigest: mockDigestRef,
-            accessibilityTreeDigest: mockDigestRef,
-            axeDigest: mockDigestRef,
-            diagnostics: [],
-          },
-          evidence: [
-            {
-              role: "axe-raw-result",
-              mediaType: "application/json",
-              bytes: new TextEncoder().encode(
-                JSON.stringify({ violations: [], incomplete: [], passes: [] }),
-              ),
-              digest: mockDigestRef,
-            },
-          ],
-        }),
-        close: vi.fn().mockResolvedValue(undefined),
-      };
-    }),
-    CrawleeDiscoveryExecutor: vi.fn().mockImplementation(function () {
-      return {
-        discover: vi.fn().mockResolvedValue({
-          records: [{ normalizedUrl: "http://example.com/", depth: 0, discoveredFrom: null }],
-          omissions: [],
-          reachedFixpoint: true,
-        }),
-      };
-    }),
-    captureContractSchema: identitySchema,
-    contractDigest: vi.fn(() => mockDigestRef),
-    evaluateClosure: vi.fn(() => ({
-      schema: "closure-decision@1",
-      status: "seal_allowed",
-      satisfied: true,
-      missingCapabilities: [],
-      partialCapabilities: [],
-      blockedCapabilities: [],
-      reason: "All required evidence capabilities completed.",
-    })),
-    capabilityManifestSchema: identitySchema,
-    capabilityReceiptSchema: identitySchema,
-    runtimeAttestationSchema: identitySchema,
-    archiveReceiptSchema: identitySchema,
-    replayReceiptSchema: identitySchema,
-    stagedCapsuleSchema: identitySchema,
-  };
-});
-
-vi.mock("@syrokomskyi/axiom-study", () => {
-  const identitySchema = { parse: (v: unknown) => v };
-  return {
-    runAccessibilityInstrument: vi.fn(() => ({
-      instrumentRun: {
-        instrumentRunId: "instrument-run_mock",
-        instrumentId: "accessibility-axe",
-        instrumentVersion: "1.0.0",
-        startedAt: "2026-01-01T00:00:00.000Z",
-        finishedAt: "2026-01-01T00:00:01.000Z",
-        state: "complete",
-        context: {},
-        observations: [],
-      },
-      bundle: {
-        bundleId: "observation-bundle_mock",
-        observations: [
-          {
-            observationId: "obs_mock",
-            instrumentRunId: "instrument-run_mock",
-            subjectId: "http://example.com/",
-            predicate: "accessibility.axe.violation",
-            value: {},
-            evidence: [],
-            recordedAt: "2026-01-01T00:00:00.000Z",
-          },
-        ],
-        rootDigest: mockDigestRef,
-      },
-    })),
-    toDeterministicContext: vi.fn(() => ({
-      capsuleRef: mockArtifactRef,
-      producer: { producerId: "local-dev", name: "mission.check", version: "1.0.0" },
-      recordedAt: "2026-01-01T00:00:00.000Z",
-      validTimeStart: "2026-01-01T00:00:00.000Z",
-      environment: {},
-    })),
-    studyRunSchema: identitySchema,
-  };
-});
+    studyRun: {
+      ...mockStudyRun,
+      findings: overrides?.findings ?? [],
+    },
+    stagedCapsule: {
+      ...mockCapsule,
+      closureDecision: overrides?.closureDecision ?? mockClosureAllowed,
+    },
+    observationBundles: [mockBundle],
+    methodologyDigests: [{ methodologyId: "automated-web-accessibility", digest: mockDigestRef }],
+    findings: overrides?.findings ?? [],
+    methodologyResults: [],
+  } as unknown as Awaited<ReturnType<typeof runActiveMethodologies>>;
+}
 
 vi.mock("@syrokomskyi/axiom-methodology", () => ({
-  createAutomatedWebAccessibilityMethodology: vi.fn(() => ({
-    schema: "methodology-package@1",
-    methodologyId: "automated-web-accessibility",
-    semver: "1.0.0",
-    maturity: "VALIDATED",
-    authors: [],
-    licenses: [],
-    researchQuestion: "test",
-    nonClaims: [],
-    types: [],
-    unitsOfAnalysis: [],
-    applicability: { jurisdictions: [], languages: [], archetypes: [], exclusions: [] },
-    evidenceRequirements: [],
-    dependencies: [],
-    limitations: [],
-    digest: mockDigestRef,
-  })),
-  findingsForObservation: vi.fn(() => []),
-  methodologyPackageDigest: vi.fn(() => mockDigestRef),
+  runActiveMethodologies: vi.fn(),
 }));
 
-// RFC-0630: Mock playwright for pre-flight check
+vi.mock("@syrokomskyi/axiom-capture", () => ({}));
+vi.mock("@syrokomskyi/axiom-study", () => ({}));
+vi.mock("@syrokomskyi/axiom-contracts", () => ({}));
+vi.mock("@syrokomskyi/axiom-provenance", () => ({}));
+
+// Mock playwright for pre-flight check
 vi.mock("playwright", () => ({
   chromium: {
     launch: vi.fn().mockResolvedValue({
@@ -198,26 +149,15 @@ async function createMockMission(
 }
 
 // Import after mocks are set up
-import { findingsForObservation } from "@syrokomskyi/axiom-methodology";
-import { evaluateClosure } from "@syrokomskyi/axiom-capture";
+import { runActiveMethodologies } from "@syrokomskyi/axiom-methodology";
 
 describe("mission.check (RFC-0629)", () => {
   let workspaceRoot: string;
 
   beforeEach(async () => {
     workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-test-"));
-    // Reset only specific mock return values — do NOT clearAllMocks
-    // because that would wipe factory mock implementations
-    vi.mocked(findingsForObservation).mockReturnValue([]);
-    vi.mocked(evaluateClosure).mockReturnValue({
-      schema: "closure-decision@1",
-      status: "seal_allowed",
-      satisfied: true,
-      missingCapabilities: [],
-      partialCapabilities: [],
-      blockedCapabilities: [],
-      reason: "All required evidence capabilities completed.",
-    });
+    vi.mocked(runActiveMethodologies).mockClear();
+    vi.mocked(runActiveMethodologies).mockResolvedValue(makeOrchestratorResult());
   });
 
   afterEach(async () => {
@@ -280,6 +220,7 @@ describe("mission.check (RFC-0629)", () => {
     );
     expect(metadata.missionId).toBe(missionId);
     expect(metadata.commitSha).toBe("abc123def456");
+    expect(result.exitCode).toBe(0);
   });
 
   it("writes evidence-metadata.json without commitSha when flag is absent", async () => {
@@ -306,24 +247,30 @@ describe("mission.check (RFC-0629)", () => {
     expect(metadata.commitSha).toBeUndefined();
   });
 
-  it("passes when no high/critical findings and closure is satisfied", async () => {
+  it("passes when no blocking findings and closure is satisfied", async () => {
     const missionId = "test-m000005";
     await createMockMission(workspaceRoot, missionId);
 
-    vi.mocked(findingsForObservation).mockReturnValue([
-      {
-        findingId: "finding_low_1",
-        semanticFingerprint: mockDigestRef,
-        methodologyId: "automated-web-accessibility",
-        ruleId: "color-contrast",
-        affectedSubjectId: "http://example.com/",
-        title: "Low contrast",
-        severity: "low",
-        evidence: [],
-        uncertainty: [],
-        extension: {},
-      },
-    ]);
+    vi.mocked(runActiveMethodologies).mockResolvedValue(
+      makeOrchestratorResult({
+        findings: [
+          {
+            findingId: "finding_low_1",
+            semanticFingerprint: mockDigestRef,
+            methodologyId: "automated-web-accessibility",
+            ruleId: "color-contrast",
+            affectedSubjectId: "http://example.com/",
+            title: "Low contrast",
+            severity: "low",
+            evidence: [],
+            uncertainty: [],
+            extension: {
+              "automated-web-accessibility": { predicate: "accessibility.axe.violation" },
+            },
+          },
+        ],
+      }),
+    );
 
     const result = await runMissionCheck(
       {
@@ -338,8 +285,6 @@ describe("mission.check (RFC-0629)", () => {
     );
 
     expect(result.data?.status).toBe("pass");
-    expect(result.data?.findingsCount.high).toBe(0);
-    expect(result.data?.findingsCount.critical).toBe(0);
     expect(result.data?.findingsCount.low).toBe(1);
     expect(result.data?.findings.total).toBe(1);
     expect(result.data?.findings.warnings).toBe(1);
@@ -350,22 +295,26 @@ describe("mission.check (RFC-0629)", () => {
     const missionId = "test-m000006";
     await createMockMission(workspaceRoot, missionId);
 
-    vi.mocked(findingsForObservation).mockReturnValue([
-      {
-        findingId: "finding_high_1",
-        semanticFingerprint: mockDigestRef,
-        methodologyId: "automated-web-accessibility",
-        ruleId: "aria-valid-id",
-        affectedSubjectId: "http://example.com/",
-        title: "ARIA ID not unique",
-        severity: "high",
-        evidence: [],
-        uncertainty: [],
-        extension: {
-          "automated-web-accessibility": { predicate: "accessibility.axe.violation" },
-        },
-      },
-    ]);
+    vi.mocked(runActiveMethodologies).mockResolvedValue(
+      makeOrchestratorResult({
+        findings: [
+          {
+            findingId: "finding_high_1",
+            semanticFingerprint: mockDigestRef,
+            methodologyId: "automated-web-accessibility",
+            ruleId: "aria-valid-id",
+            affectedSubjectId: "http://example.com/",
+            title: "ARIA ID not unique",
+            severity: "high",
+            evidence: [],
+            uncertainty: [],
+            extension: {
+              "automated-web-accessibility": { predicate: "accessibility.axe.violation" },
+            },
+          },
+        ],
+      }),
+    );
 
     const result = await runMissionCheck(
       {
@@ -389,15 +338,11 @@ describe("mission.check (RFC-0629)", () => {
     const missionId = "test-m000007";
     await createMockMission(workspaceRoot, missionId);
 
-    vi.mocked(evaluateClosure).mockReturnValue({
-      schema: "closure-decision@1",
-      status: "blocked",
-      satisfied: false,
-      missingCapabilities: ["browser"],
-      partialCapabilities: [],
-      blockedCapabilities: ["browser"],
-      reason: "Required evidence capabilities are blocked or missing.",
-    });
+    vi.mocked(runActiveMethodologies).mockResolvedValue(
+      makeOrchestratorResult({
+        closureDecision: mockClosureBlocked,
+      }),
+    );
 
     const result = await runMissionCheck(
       {
@@ -417,20 +362,18 @@ describe("mission.check (RFC-0629)", () => {
     expect(result.summary).toContain("closure blocked");
   });
 
-  it("returns exit code 2 when no pages are discovered", async () => {
+  it("returns exit code 2 when orchestrator returns no findings and no bundles", async () => {
     const missionId = "test-m000008";
     await createMockMission(workspaceRoot, missionId);
 
-    const { CrawleeDiscoveryExecutor } = await import("@syrokomskyi/axiom-capture");
-    vi.mocked(CrawleeDiscoveryExecutor).mockImplementationOnce(function () {
-      return {
-        discover: vi.fn().mockResolvedValue({
-          records: [],
-          omissions: [],
-          reachedFixpoint: true,
-        }),
-      };
-    });
+    vi.mocked(runActiveMethodologies).mockResolvedValue({
+      studyRun: { ...mockStudyRun, findings: [] },
+      stagedCapsule: mockCapsule,
+      observationBundles: [],
+      methodologyDigests: [],
+      findings: [],
+      methodologyResults: [],
+    } as unknown as Awaited<ReturnType<typeof runActiveMethodologies>>);
 
     const result = await runMissionCheck(
       {
@@ -446,12 +389,34 @@ describe("mission.check (RFC-0629)", () => {
 
     expect(result.exitCode).toBe(2);
     expect(result.data?.exitCode).toBe(2);
-    expect(result.summary).toContain("no pages discovered");
+    expect(result.summary).toContain("no pages could be captured");
   });
 
-  // RFC-0630: Pre-flight check tests
-  it("returns exit code 2 when chromium pre-flight check fails", async () => {
+  it("returns exit code 2 when orchestrator throws", async () => {
     const missionId = "test-m000009";
+    await createMockMission(workspaceRoot, missionId);
+
+    vi.mocked(runActiveMethodologies).mockRejectedValue(new Error("orchestrator crashed"));
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.exitCode).toBe(2);
+    expect(result.summary).toContain("orchestrator failed");
+  });
+
+  // Pre-flight check tests
+  it("returns exit code 2 when chromium pre-flight check fails", async () => {
+    const missionId = "test-m000010";
     await createMockMission(workspaceRoot, missionId);
 
     const { chromium } = await import("playwright");
@@ -473,9 +438,9 @@ describe("mission.check (RFC-0629)", () => {
     expect(result.summary).toContain("chromium not installed");
   });
 
-  // RFC-0630: --locales flag validation
+  // --locales flag validation
   it("returns exit code 2 when --locales format is invalid", async () => {
-    const missionId = "test-m000010";
+    const missionId = "test-m000011";
     await createMockMission(workspaceRoot, missionId);
 
     const result = await runMissionCheck(
@@ -496,7 +461,7 @@ describe("mission.check (RFC-0629)", () => {
   });
 
   it("accepts valid --locales flag with BCP 47 tags", async () => {
-    const missionId = "test-m000011";
+    const missionId = "test-m000012";
     await createMockMission(workspaceRoot, missionId);
 
     const result = await runMissionCheck(
@@ -515,131 +480,10 @@ describe("mission.check (RFC-0629)", () => {
     expect(result.exitCode).toBe(0);
   });
 
-  // RFC-0630: Page-language matching
-  it("resolves locale from URL path segment using workpiece i18n config", async () => {
-    const missionId = "test-m000012";
-    await createMockMission(workspaceRoot, missionId, { withI18n: true });
-
-    const { CrawleeDiscoveryExecutor } = await import("@syrokomskyi/axiom-capture");
-    const { PlaywrightEvidenceDriver } = await import("@syrokomskyi/axiom-capture");
-
-    vi.mocked(CrawleeDiscoveryExecutor).mockImplementationOnce(function () {
-      return {
-        discover: vi.fn().mockResolvedValue({
-          records: [
-            { normalizedUrl: "http://example.com/de/leistungen", depth: 0, discoveredFrom: null },
-            { normalizedUrl: "http://example.com/uk/kontakty", depth: 0, discoveredFrom: null },
-          ],
-          omissions: [],
-          reachedFixpoint: true,
-        }),
-      };
-    });
-
-    const captureMock = vi.fn().mockResolvedValue({
-      receipt: {
-        schema: "browser-receipt@1",
-        taskKey: "mock-task-key",
-        state: "complete",
-        finalUrl: "http://example.com/",
-        statusCode: 200,
-        htmlDigest: mockDigestRef,
-        screenshotDigest: mockDigestRef,
-        domSnapshotDigest: mockDigestRef,
-        accessibilityTreeDigest: mockDigestRef,
-        axeDigest: mockDigestRef,
-        diagnostics: [],
-      },
-      evidence: [
-        {
-          role: "axe-raw-result",
-          mediaType: "application/json",
-          bytes: new TextEncoder().encode(
-            JSON.stringify({ violations: [], incomplete: [], passes: [] }),
-          ),
-          digest: mockDigestRef,
-        },
-      ],
-    });
-
-    vi.mocked(PlaywrightEvidenceDriver).mockImplementationOnce(function () {
-      return {
-        capture: captureMock,
-        close: vi.fn().mockResolvedValue(undefined),
-      };
-    });
-
-    await runMissionCheck(
-      {
-        flags: {
-          mission: missionId,
-          "external-preview": true,
-          "base-url": "http://example.com",
-        },
-        argv: [],
-      },
-      makeTestContext(workspaceRoot),
-    );
-
-    expect(captureMock).toHaveBeenCalledTimes(2);
-    const firstCall = captureMock.mock.calls[0]!;
-    expect(firstCall[0].request.locale).toBe("de-DE");
-    const secondCall = captureMock.mock.calls[1]!;
-    expect(secondCall[0].request.locale).toBe("uk-UA");
-  });
-
-  it("falls back to default locale when URL has no recognizable path segment", async () => {
+  it("passes locales from i18n config to orchestrator", async () => {
     const missionId = "test-m000013";
     await createMockMission(workspaceRoot, missionId, { withI18n: true });
 
-    const { CrawleeDiscoveryExecutor } = await import("@syrokomskyi/axiom-capture");
-    const { PlaywrightEvidenceDriver } = await import("@syrokomskyi/axiom-capture");
-
-    vi.mocked(CrawleeDiscoveryExecutor).mockImplementationOnce(function () {
-      return {
-        discover: vi.fn().mockResolvedValue({
-          records: [
-            { normalizedUrl: "http://example.com/impressum", depth: 0, discoveredFrom: null },
-          ],
-          omissions: [],
-          reachedFixpoint: true,
-        }),
-      };
-    });
-
-    const captureMock = vi.fn().mockResolvedValue({
-      receipt: {
-        schema: "browser-receipt@1",
-        taskKey: "mock-task-key",
-        state: "complete",
-        finalUrl: "http://example.com/",
-        statusCode: 200,
-        htmlDigest: mockDigestRef,
-        screenshotDigest: mockDigestRef,
-        domSnapshotDigest: mockDigestRef,
-        accessibilityTreeDigest: mockDigestRef,
-        axeDigest: mockDigestRef,
-        diagnostics: [],
-      },
-      evidence: [
-        {
-          role: "axe-raw-result",
-          mediaType: "application/json",
-          bytes: new TextEncoder().encode(
-            JSON.stringify({ violations: [], incomplete: [], passes: [] }),
-          ),
-          digest: mockDigestRef,
-        },
-      ],
-    });
-
-    vi.mocked(PlaywrightEvidenceDriver).mockImplementationOnce(function () {
-      return {
-        capture: captureMock,
-        close: vi.fn().mockResolvedValue(undefined),
-      };
-    });
-
     await runMissionCheck(
       {
         flags: {
@@ -652,50 +496,16 @@ describe("mission.check (RFC-0629)", () => {
       makeTestContext(workspaceRoot),
     );
 
-    expect(captureMock).toHaveBeenCalledTimes(1);
-    const call = captureMock.mock.calls[0]!;
-    expect(call[0].request.locale).toBe("de-DE");
+    expect(runActiveMethodologies).toHaveBeenCalledTimes(1);
+    const callArgs = vi.mocked(runActiveMethodologies).mock.calls[0]![0];
+    expect(callArgs.locales).toContain("de-DE");
+    expect(callArgs.locales).toContain("uk-UA");
   });
 
   it("falls back to en-US when workpiece has no i18n config", async () => {
     const missionId = "test-m000014";
     await createMockMission(workspaceRoot, missionId);
 
-    const { PlaywrightEvidenceDriver } = await import("@syrokomskyi/axiom-capture");
-
-    const captureMock = vi.fn().mockResolvedValue({
-      receipt: {
-        schema: "browser-receipt@1",
-        taskKey: "mock-task-key",
-        state: "complete",
-        finalUrl: "http://example.com/",
-        statusCode: 200,
-        htmlDigest: mockDigestRef,
-        screenshotDigest: mockDigestRef,
-        domSnapshotDigest: mockDigestRef,
-        accessibilityTreeDigest: mockDigestRef,
-        axeDigest: mockDigestRef,
-        diagnostics: [],
-      },
-      evidence: [
-        {
-          role: "axe-raw-result",
-          mediaType: "application/json",
-          bytes: new TextEncoder().encode(
-            JSON.stringify({ violations: [], incomplete: [], passes: [] }),
-          ),
-          digest: mockDigestRef,
-        },
-      ],
-    });
-
-    vi.mocked(PlaywrightEvidenceDriver).mockImplementationOnce(function () {
-      return {
-        capture: captureMock,
-        close: vi.fn().mockResolvedValue(undefined),
-      };
-    });
-
     await runMissionCheck(
       {
         flags: {
@@ -708,8 +518,30 @@ describe("mission.check (RFC-0629)", () => {
       makeTestContext(workspaceRoot),
     );
 
-    expect(captureMock).toHaveBeenCalledTimes(1);
-    const call = captureMock.mock.calls[0]!;
-    expect(call[0].request.locale).toBe("en-US");
+    expect(runActiveMethodologies).toHaveBeenCalledTimes(1);
+    const callArgs = vi.mocked(runActiveMethodologies).mock.calls[0]![0];
+    expect(callArgs.locales).toEqual(["en-US"]);
+  });
+
+  it("passes explicit --locales override to orchestrator", async () => {
+    const missionId = "test-m000015";
+    await createMockMission(workspaceRoot, missionId, { withI18n: true });
+
+    await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+          locales: "fr-FR",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(runActiveMethodologies).toHaveBeenCalledTimes(1);
+    const callArgs = vi.mocked(runActiveMethodologies).mock.calls[0]![0];
+    expect(callArgs.locales).toEqual(["fr-FR"]);
   });
 });
