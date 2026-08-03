@@ -96,7 +96,7 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - Put shared backend runtime rules in `services/AGENTS.md`.
 - Put shared package rules in `packages/AGENTS.md`.
 - Put site-specific rules in the site's own `AGENTS.md`.
-- Keep `.agents/**` as reference or historical documentation, not as the primary active instruction layer.
+- Keep `.agents/**` as reference or historical documentation, not as the primary active instruction layer — except `.agents/memory/` (active agent context store, RFC-0664), `.agents/skills/` (synced by forge), and `.agents/operator-profile.md` (operator preferences).
 - Keep operational discipline rules (commit hygiene, template-first fixes, skill invocation tracking) in this `AGENTS.md` — not in `PREFERENCES.md`. `PREFERENCES.md` (RFC-0370) is for operator-facing preferences (language, form of address, register, session saving) only.
 
 ## RFC frontmatter conventions
