@@ -200,7 +200,7 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
     join(evidenceDir, "evidence-metadata.json"),
     JSON.stringify(
       {
-        missionId,
+        auditId: missionId,
         commitSha: "abc123def456",
         methodologies: [
           {

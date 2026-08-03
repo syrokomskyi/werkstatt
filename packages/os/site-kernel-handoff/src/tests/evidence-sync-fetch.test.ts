@@ -158,7 +158,7 @@ function listData(result: { data?: unknown }): EvidenceListResult {
 }
 
 function evidenceMeta(runTimestamp: string, commitSha?: string): string {
-  const meta: Record<string, string> = { missionId: "warpgogol-com-m000025", runTimestamp };
+  const meta: Record<string, string> = { auditId: "warpgogol-com-m000025", runTimestamp };
   if (commitSha) meta.commitSha = commitSha;
   return JSON.stringify(meta);
 }
@@ -245,7 +245,7 @@ describe("evidence.sync (RFC-0651)", () => {
 
   it("exits 1 with INVALID_EVIDENCE when evidence-metadata.json is missing runTimestamp", async () => {
     await createEvidenceDir(tmpDir, "warpgogol-com-m000025", {
-      "evidence-metadata.json": JSON.stringify({ missionId: "warpgogol-com-m000025" }),
+      "evidence-metadata.json": JSON.stringify({ auditId: "warpgogol-com-m000025" }),
       "study-run.json": "{}",
     });
 

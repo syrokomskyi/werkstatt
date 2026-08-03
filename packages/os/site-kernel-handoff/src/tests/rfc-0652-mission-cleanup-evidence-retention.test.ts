@@ -69,24 +69,26 @@ function writeMissionManifest(
   writeFileSync(join(missionDir, "mission.yaml"), JSON.stringify(manifest, null, 2) + "\n");
 }
 
-function writeAxiomEvidence(
-  workspaceRoot: string,
-  missionId: string,
-  runTimestamp: string,
-): void {
+function writeAxiomEvidence(workspaceRoot: string, missionId: string, runTimestamp: string): void {
   const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
   mkdirSync(evidenceDir, { recursive: true });
   writeFileSync(
     join(evidenceDir, "evidence-metadata.json"),
-    JSON.stringify({ missionId, runTimestamp }, null, 2) + "\n",
+    JSON.stringify({ auditId: missionId, runTimestamp }, null, 2) + "\n",
   );
-  writeFileSync(join(evidenceDir, "study-run.json"), JSON.stringify({ findings: [] }, null, 2) + "\n");
+  writeFileSync(
+    join(evidenceDir, "study-run.json"),
+    JSON.stringify({ findings: [] }, null, 2) + "\n",
+  );
 }
 
 function writeNonAxiomEvidence(workspaceRoot: string, missionId: string): void {
   const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence");
   mkdirSync(evidenceDir, { recursive: true });
-  writeFileSync(join(evidenceDir, "close-report.json"), JSON.stringify({ git: {} }, null, 2) + "\n");
+  writeFileSync(
+    join(evidenceDir, "close-report.json"),
+    JSON.stringify({ git: {} }, null, 2) + "\n",
+  );
 }
 
 function createWorkpiece(workspaceRoot: string, missionId: string): void {
@@ -177,7 +179,9 @@ test("mission.cleanup preserves non-Axiom evidence (close-report.json)", async (
   await runMissionCleanup(makeInput({ mission: missionId }), makeContext());
 
   expect(existsSync(join(tmpDir, "missions", missionId, "evidence", "axiom"))).toBe(false);
-  expect(existsSync(join(tmpDir, "missions", missionId, "evidence", "close-report.json"))).toBe(true);
+  expect(existsSync(join(tmpDir, "missions", missionId, "evidence", "close-report.json"))).toBe(
+    true,
+  );
 });
 
 test("mission.cleanup --older-than applies age-based evidence cleanup", async () => {

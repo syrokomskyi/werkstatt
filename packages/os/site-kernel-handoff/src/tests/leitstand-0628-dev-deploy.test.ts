@@ -183,14 +183,14 @@ function writeEvidenceMetadata(
   missionId: string,
   options?: {
     commitSha?: string;
-    metadataMissionId?: string;
+    metadataAuditId?: string;
     methodologies?: Array<{ id: string; digest?: string; blockOn?: string[] }>;
   },
 ): void {
   const evidenceDir = join(workspaceRoot, "missions", missionId, "evidence", "axiom");
   mkdirSync(evidenceDir, { recursive: true });
   const metadata: Record<string, unknown> = {
-    missionId: options?.metadataMissionId ?? missionId,
+    auditId: options?.metadataAuditId ?? missionId,
     methodologies: options?.methodologies ?? [
       { id: "automated-web-accessibility", digest: "sha256:mock", blockOn: ["high", "critical"] },
     ],
@@ -391,7 +391,7 @@ test("leitstand.propagate rejects when evidence commitSha does not match release
   );
 });
 
-test("leitstand.propagate rejects when evidence missionId does not match release", async () => {
+test("leitstand.propagate rejects when evidence auditId does not match release", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
   const missionId = "test-sys-m000001";
@@ -407,14 +407,14 @@ test("leitstand.propagate rejects when evidence missionId does not match release
   });
   writeEvidenceMetadata(tmpDir, missionId, {
     commitSha: "abc123def456",
-    metadataMissionId: "other-mission-m000999",
+    metadataAuditId: "other-mission-m000999",
   });
   writeStudyRun(tmpDir, missionId, []);
 
   await expect(
     runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
   ).rejects.toThrow(
-    "evidence missionId 'other-mission-m000999' does not match release missionId 'test-sys-m000001'",
+    "evidence auditId 'other-mission-m000999' does not match release missionId 'test-sys-m000001'",
   );
 });
 

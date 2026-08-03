@@ -226,7 +226,7 @@ export async function runFontsOriginValidate(
       const instrumentCtx = toDeterministicContext({
         origin: "build-time",
         recordedAt: new Date().toISOString(),
-        missionId: "fonts.origin.validate",
+        auditId: "fonts.origin.validate",
         environment: {},
       });
       const instrumentResult = runSeoTechnicalRuntimeInstrument({

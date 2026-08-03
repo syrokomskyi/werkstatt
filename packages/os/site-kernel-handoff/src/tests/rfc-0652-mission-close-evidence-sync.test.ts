@@ -53,20 +53,18 @@ vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
   const original = await importOriginal<typeof import("@warpgogol/site-kernel")>();
   return {
     ...original,
-    executeKernelCommand: vi.fn(async (opts: {
-      workspaceRoot: string;
-      commandName: string;
-      argv?: string[];
-    }) => {
-      if (opts.commandName === "evidence.sync") {
-        mockState.syncCalled = true;
-        if (mockState.syncShouldFail) {
-          throw new Error("R2_UPLOAD_ERROR: failed to upload");
+    executeKernelCommand: vi.fn(
+      async (opts: { workspaceRoot: string; commandName: string; argv?: string[] }) => {
+        if (opts.commandName === "evidence.sync") {
+          mockState.syncCalled = true;
+          if (mockState.syncShouldFail) {
+            throw new Error("R2_UPLOAD_ERROR: failed to upload");
+          }
+          return mockState.syncResult;
         }
-        return mockState.syncResult;
-      }
-      return { exitCode: 0, data: {}, summary: "ok" };
-    }),
+        return { exitCode: 0, data: {}, summary: "ok" };
+      },
+    ),
   };
 });
 
@@ -94,7 +92,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function setupWorkspace(options?: { withAxiomEvidence?: boolean; withAxiomDirOnly?: boolean }): string {
+function setupWorkspace(options?: {
+  withAxiomEvidence?: boolean;
+  withAxiomDirOnly?: boolean;
+}): string {
   gitInit(tmpWorkspace);
   writeFileSync(join(tmpWorkspace, "README.md"), "# test\n");
   gitCommit(tmpWorkspace, "initial");
@@ -138,7 +139,7 @@ systems:
     writeFileSync(
       join(axiomDir, "evidence-metadata.json"),
       JSON.stringify(
-        { missionId: "test-system-m000001", runTimestamp: "2026-08-02T00:00:00.000Z" },
+        { auditId: "test-system-m000001", runTimestamp: "2026-08-02T00:00:00.000Z" },
         null,
         2,
       ) + "\n",
@@ -193,7 +194,10 @@ test("mission.close invokes evidence.sync when evidence/axiom/ with metadata exi
   setupWorkspace({ withAxiomEvidence: true });
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
-  await runMissionClose(makeInput({ mission: "test-system-m000001", actor: "test-agent" }), makeContext());
+  await runMissionClose(
+    makeInput({ mission: "test-system-m000001", actor: "test-agent" }),
+    makeContext(),
+  );
 
   expect(mockState.syncCalled).toBe(true);
 });
@@ -204,7 +208,10 @@ test("mission.close throws EVIDENCE_SYNC_FAILED when evidence.sync fails", async
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
   await expect(
-    runMissionClose(makeInput({ mission: "test-system-m000001", actor: "test-agent" }), makeContext()),
+    runMissionClose(
+      makeInput({ mission: "test-system-m000001", actor: "test-agent" }),
+      makeContext(),
+    ),
   ).rejects.toThrow("EVIDENCE_SYNC_FAILED");
 });
 
@@ -224,7 +231,10 @@ test("mission.close skips sync with warning when evidence/axiom/ exists but meta
   setupWorkspace({ withAxiomDirOnly: true });
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
-  await runMissionClose(makeInput({ mission: "test-system-m000001", actor: "test-agent" }), makeContext());
+  await runMissionClose(
+    makeInput({ mission: "test-system-m000001", actor: "test-agent" }),
+    makeContext(),
+  );
 
   expect(mockState.syncCalled).toBe(false);
 });
@@ -233,7 +243,10 @@ test("mission.close skips sync silently when evidence/axiom/ does not exist", as
   setupWorkspace();
   const { runMissionClose } = await import("../mission/mission-close.ts");
 
-  await runMissionClose(makeInput({ mission: "test-system-m000001", actor: "test-agent" }), makeContext());
+  await runMissionClose(
+    makeInput({ mission: "test-system-m000001", actor: "test-agent" }),
+    makeContext(),
+  );
 
   expect(mockState.syncCalled).toBe(false);
 });

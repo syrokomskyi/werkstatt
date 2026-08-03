@@ -90,7 +90,7 @@ describe("renderAxiomReportHtml — RFC-0665 gate summary", () => {
       { id: "automated-web-accessibility", digest: "sha256:abc", blockOn: ["high", "critical"] },
     ];
     const metadata: EvidenceMetadata = {
-      missionId: "test-mission",
+      auditId: "test-mission",
       methodologies,
     };
     const html = renderAxiomReportHtml(
@@ -115,7 +115,7 @@ describe("renderAxiomReportHtml — RFC-0665 gate summary", () => {
       },
     });
     const metadata: EvidenceMetadata = {
-      missionId: "test-mission",
+      auditId: "test-mission",
       methodologies,
     };
     const html = renderAxiomReportHtml(
@@ -128,7 +128,7 @@ describe("renderAxiomReportHtml — RFC-0665 gate summary", () => {
   });
 
   it("renders legacy message when methodologies[] is absent", () => {
-    const metadata: EvidenceMetadata = { missionId: "test-mission" };
+    const metadata: EvidenceMetadata = { auditId: "test-mission" };
     const html = renderAxiomReportHtml(
       makeStudyRun([]) as never,
       makeCapsule() as never,
@@ -150,7 +150,7 @@ describe("renderAxiomReportHtml — RFC-0665 gate summary", () => {
       },
     });
     const metadata: EvidenceMetadata = {
-      missionId: "test-mission",
+      auditId: "test-mission",
       methodologies,
     };
     const html = renderAxiomReportHtml(

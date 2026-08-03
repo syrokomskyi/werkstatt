@@ -28,11 +28,7 @@ import type {
 } from "@warpgogol/site-kernel";
 import { resolveMissionDir } from "@warpgogol/site-kernel";
 import { readRegistry, findEntry } from "../sternsystem/registry-io.ts";
-import {
-  createR2Client,
-  resolveR2ConfigFromEnv,
-  MissingEnvError,
-} from "./r2-client.ts";
+import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "./r2-client.ts";
 
 export interface EvidenceFetchResult {
   missionId: string;
@@ -53,7 +49,7 @@ export interface EvidenceListResult {
 }
 
 interface EvidenceMetadata {
-  missionId?: string;
+  auditId?: string;
   runTimestamp?: string;
   commitSha?: string;
 }
@@ -68,10 +64,7 @@ function flagBool(input: KernelCommandInput, key: string): boolean {
   return v === true || v === "true";
 }
 
-async function resolveSystemId(
-  workspaceRoot: string,
-  missionId: string,
-): Promise<string> {
+async function resolveSystemId(workspaceRoot: string, missionId: string): Promise<string> {
   const registry = await readRegistry(workspaceRoot);
   for (const entry of registry.systems) {
     if (entry.currentMission === missionId) {
@@ -174,9 +167,7 @@ export async function runEvidenceFetch(
     );
   }
   if (!outputDir) {
-    throw new Error(
-      "evidence.fetch requires --output-dir <dir> when fetching a run",
-    );
+    throw new Error("evidence.fetch requires --output-dir <dir> when fetching a run");
   }
 
   const runPrefix = `${systemId}/${missionId}/${runTimestamp}/`;

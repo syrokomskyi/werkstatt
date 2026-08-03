@@ -403,7 +403,7 @@ export async function runIndependentQa(
         const instrumentCtx = toDeterministicContext({
           origin: baseUrl,
           recordedAt: new Date().toISOString(),
-          missionId: "qa.independent.run",
+          auditId: "qa.independent.run",
           environment: {},
         });
         const states: RuntimeHealthState[] = executions.map((exec) => ({

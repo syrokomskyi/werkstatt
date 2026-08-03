@@ -30,11 +30,7 @@ import type {
 import { resolveMissionDir } from "@warpgogol/site-kernel";
 import { collectFiles } from "@warpgogol/share/fs";
 import { readRegistry, findEntry } from "../sternsystem/registry-io.ts";
-import {
-  createR2Client,
-  resolveR2ConfigFromEnv,
-  MissingEnvError,
-} from "./r2-client.ts";
+import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "./r2-client.ts";
 
 export interface EvidenceSyncResult {
   missionId: string;
@@ -48,7 +44,7 @@ export interface EvidenceSyncResult {
 }
 
 interface EvidenceMetadata {
-  missionId?: string;
+  auditId?: string;
   runTimestamp?: string;
   commitSha?: string;
 }
@@ -97,19 +93,14 @@ async function readEvidenceMetadata(
   return parsed;
 }
 
-async function resolveSystemId(
-  workspaceRoot: string,
-  missionId: string,
-): Promise<string> {
+async function resolveSystemId(workspaceRoot: string, missionId: string): Promise<string> {
   const registry = await readRegistry(workspaceRoot);
   for (const entry of registry.systems) {
     if (entry.currentMission === missionId) {
       return entry.id;
     }
   }
-  const systemId = missionId.includes("-m")
-    ? missionId.split("-m")[0]
-    : missionId;
+  const systemId = missionId.includes("-m") ? missionId.split("-m")[0] : missionId;
   return systemId;
 }
 

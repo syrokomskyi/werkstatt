@@ -229,7 +229,7 @@ export async function runMissionCheck(
   try {
     result = await runAxiomCheck({
       baseUrl,
-      missionId,
+      auditId: missionId,
       outputDir: evidenceDir,
       locales,
       ...(axiomMethodologiesConfig ? { methodologiesConfig: axiomMethodologiesConfig } : {}),
@@ -343,7 +343,7 @@ export async function runAxiomReport(
   }
 
   const metadataPath = join(evidenceDir, "evidence-metadata.json");
-  let metadata: EvidenceMetadata = { missionId };
+  let metadata: EvidenceMetadata = { auditId: missionId };
   if (existsSync(metadataPath)) {
     try {
       metadata = JSON.parse(readFileSync(metadataPath, "utf-8"));
@@ -403,7 +403,7 @@ export async function runAxiomReport(
   const data: AxiomReportData = {
     command: "axiom.report",
     status: "pass",
-    missionId,
+    missionId: metadata.auditId ?? missionId,
     evidenceDir,
     reportPath: relativeReportPath,
     findingsCount,

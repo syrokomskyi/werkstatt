@@ -90,7 +90,7 @@ export async function runCloudflareAssetsValidate(
     const instrumentCtx = toDeterministicContext({
       origin: "build-time",
       recordedAt: new Date().toISOString(),
-      missionId: "cloudflare.assets.validate",
+      auditId: "cloudflare.assets.validate",
       environment: {},
     });
     const states: RuntimeHealthState[] = [

@@ -31,7 +31,7 @@ function makeAxiomCheckResult(): AxiomCheckResult {
     command: "axiom.check",
     status: "pass",
     exitCode: 0,
-    missionId: "test-mission",
+    auditId: "test-mission",
     studyRunId: "study-run_mock",
     findingsCount: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
     findings: { errors: 0, warnings: 0, total: 0 },
@@ -42,7 +42,7 @@ function makeAxiomCheckResult(): AxiomCheckResult {
     },
     methodologyResults: [],
     evidenceFiles: [],
-    cacheHits: 0,
+    cacheHits: [],
     cacheMisses: 0,
     durationMs: 1000,
   };

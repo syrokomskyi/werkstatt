@@ -381,7 +381,7 @@ export async function runLighthouseBudgetCheck(
     const instrumentCtx = toDeterministicContext({
       origin: "build-time",
       recordedAt: new Date().toISOString(),
-      missionId: "lighthouse.budget.check",
+      auditId: "lighthouse.budget.check",
       environment: {},
     });
     const states: PerformanceVitalsState[] = [

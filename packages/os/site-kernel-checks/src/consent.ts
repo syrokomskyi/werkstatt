@@ -132,7 +132,7 @@ export async function runConsentActivationValidate(
       const instrumentCtx = toDeterministicContext({
         origin: "build-time",
         recordedAt: new Date().toISOString(),
-        missionId: "consent.activation.validate",
+        auditId: "consent.activation.validate",
         environment: {},
       });
       const states: PrivacyConsentState[] = htmlFiles.map((abs) => {

@@ -1074,7 +1074,8 @@ export async function runLeitstandPropagate(
   const missionId = releaseManifest.missionId as string;
   const releaseCommitSha = releaseManifest.commitSha as string;
 
-  // RFC-0629: Axiom evidence gate — verify evidence-metadata.json exists with matching missionId + commitSha
+  // RFC-0629: Axiom evidence gate — verify evidence-metadata.json exists with matching auditId + commitSha
+  // RFC-0041 (Axiom): missionId renamed to auditId in evidence-metadata.json
   const metadataPath = path.join(
     workspaceRoot,
     "missions",
@@ -1089,10 +1090,11 @@ export async function runLeitstandPropagate(
     );
   }
 
-  // Parse evidence-metadata.json for missionId + commitSha verification
+  // Parse evidence-metadata.json for auditId + commitSha verification
+  // RFC-0041: Axiom writes auditId (was missionId)
   const metadataContent = await fs.readFile(metadataPath, "utf-8");
   let metadata: {
-    missionId?: string;
+    auditId?: string;
     commitSha?: string;
     methodologies?: Array<{
       id: string;
@@ -1102,7 +1104,7 @@ export async function runLeitstandPropagate(
   };
   try {
     metadata = JSON.parse(metadataContent) as {
-      missionId?: string;
+      auditId?: string;
       commitSha?: string;
       methodologies?: Array<{
         id: string;
@@ -1116,9 +1118,9 @@ export async function runLeitstandPropagate(
     );
   }
 
-  if (metadata.missionId && metadata.missionId !== missionId) {
+  if (metadata.auditId && metadata.auditId !== missionId) {
     throw new Error(
-      `[leitstand.propagate] evidence missionId '${metadata.missionId}' does not match release missionId '${missionId}'.`,
+      `[leitstand.propagate] evidence auditId '${metadata.auditId}' does not match release missionId '${missionId}'.`,
     );
   }
 

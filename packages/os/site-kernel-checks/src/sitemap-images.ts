@@ -206,7 +206,7 @@ export async function runSitemapImagesValidate(
       const instrumentCtx = toDeterministicContext({
         origin: "build-time",
         recordedAt: new Date().toISOString(),
-        missionId: "dist.sitemap.images.validate",
+        auditId: "dist.sitemap.images.validate",
         environment: {},
       });
       const states: SeoRuntimeState[] = entries.map((entry) => ({

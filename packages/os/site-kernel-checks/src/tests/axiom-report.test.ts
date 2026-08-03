@@ -226,7 +226,7 @@ function makeObservationBundle(): ObservationBundle {
 
 function makeEvidenceMetadata(overrides: Partial<EvidenceMetadata> = {}): EvidenceMetadata {
   return {
-    missionId: "test-mission-m000001",
+    auditId: "test-mission-m000001",
     commitSha: "abc1234",
     ...overrides,
   };

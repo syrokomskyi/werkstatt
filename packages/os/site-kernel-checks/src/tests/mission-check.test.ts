@@ -20,7 +20,7 @@ function makeAxiomCheckResult(overrides?: Partial<AxiomCheckResult>): AxiomCheck
     command: "axiom.check",
     status: "pass",
     exitCode: 0,
-    missionId: "test-mission",
+    auditId: "test-mission",
     studyRunId: "study-run_mock",
     findingsCount: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
     findings: { errors: 0, warnings: 0, total: 0 },
@@ -31,7 +31,7 @@ function makeAxiomCheckResult(overrides?: Partial<AxiomCheckResult>): AxiomCheck
     },
     methodologyResults: [],
     evidenceFiles: [],
-    cacheHits: 0,
+    cacheHits: [],
     cacheMisses: 0,
     durationMs: 1000,
     ...overrides,
@@ -123,7 +123,7 @@ describe("mission.check (axiom-adapter)", () => {
     const callArgs = vi.mocked(runAxiomCheck).mock.calls[0]![0];
     expect(callArgs.commitSha).toBe("abc123def456");
     expect(callArgs.baseUrl).toBe("http://example.com");
-    expect(callArgs.missionId).toBe(missionId);
+    expect(callArgs.auditId).toBe(missionId);
     expect(callArgs.report).toBe(true);
     expect(result.exitCode).toBe(0);
   });

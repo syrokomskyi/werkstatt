@@ -59,7 +59,7 @@ async function createTestEvidence(workspaceRoot: string): Promise<void> {
   await writeFile(
     join(evidenceDir, "evidence-metadata.json"),
     JSON.stringify({
-      missionId: MISSION_ID,
+      auditId: MISSION_ID,
       runTimestamp: RUN_TIMESTAMP,
       commitSha: "integration-test-sha",
     }),
