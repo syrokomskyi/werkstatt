@@ -52,7 +52,7 @@ appsImpacted: []
 packagesImpacted:
   - forge
 successSignals:
-  - "`forge.skill.knowledge.compact --all --dry-run --json` reports archivable, expirable, and stale-markable entries with per-file counts and modifies nothing"
+  - "`forge.skill.knowledge.compact --all-skills --dry-run --json` reports archivable, expirable, and stale-markable entries with per-file counts and modifies nothing"
   - "A compact run moves aged L0 entries to qa-log.archive.md, marks unconfirmed L2 entries stale, and leaves active knowledge byte-identical"
   - "`forge skill fo-knowledge-distill` distills an L0 log into operator-approved L1/L2 candidates and bumps confirmations on re-confirmed principles"
 nonGoals:
@@ -115,21 +115,21 @@ Forge gains a deterministic command **`forge.skill.knowledge.compact`** that com
 
 ```sh
 # Preview everything that would change — the default first run
-pnpm exec site-kernel run forge.skill.knowledge.compact --all --dry-run --json
+pnpm exec site-kernel run forge.skill.knowledge.compact --all-skills --dry-run --json
 
 # Compact one skill's knowledge files
 pnpm exec site-kernel run forge.skill.knowledge.compact --skill grilling
 
 # Compact all skills (forge + pack) with custom windows
-pnpm exec site-kernel run forge.skill.knowledge.compact --all --retention-days 120 --stale-days 90
+pnpm exec site-kernel run forge.skill.knowledge.compact --all-skills --retention-days 120 --stale-days 90
 ```
 
 Scope: `workspace`. Flags:
 
 | Flag | Default | Meaning |
 | --- | --- | --- |
-| `--skill <name>` | — | Compact a single skill's declared knowledge files. Mutually exclusive with `--all`. |
-| `--all` | — | Compact all forge and pack skills declaring `knowledge:` files. |
+| `--skill <name>` | — | Compact a single skill's declared knowledge files. Mutually exclusive with `--all-skills`. |
+| `--all-skills` | — | Compact all forge and pack skills declaring `knowledge:` files. Named `--all-skills` because the site-kernel CLI reserves `--all` for site fan-out (implementation deviation from the draft CLI surface). |
 | `--dry-run` | off | Report planned mutations; write nothing. |
 | `--json` | off | Machine-readable report. |
 | `--retention-days <n>` | 90 | L0 entries with `created` older than this are archived. Overridable via `bindings.knowledge.retentionDays`. |
@@ -147,7 +147,7 @@ bindings:
     staleDays: 90     # RFC-0662 — L2 staleness window
 ```
 
-Exactly one of `--skill` / `--all` is required (KERNEL-ARG error otherwise).
+Exactly one of `--skill` / `--all-skills` is required (KERNEL-ARG error otherwise).
 
 ### Command operations
 
@@ -268,7 +268,7 @@ Command handler `packages/forge/os/core/handlers/knowledge-compact.ts` wraps the
 ### Failure modes
 
 - **Target file has SKILL-19/SKILL-20 parse issues** → command exits 1, names the file and issue, writes nothing (refuses to compact malformed files).
-- **Neither `--skill` nor `--all`** → argument error, exit 1.
+- **Neither `--skill` nor `--all-skills`** → argument error, exit 1.
 - **`--skill` names a skill without knowledge files** → pass with an explicit "nothing to compact" summary, exit 0.
 - **Archive companion exists with hand edits** → append-merge via parse + append + re-serialize; the RFC-0660 round-trip guarantee preserves existing archive entries byte-identically. If the archive companion itself has SKILL-19/SKILL-20 parse issues, the command exits 1 and writes nothing (same refusal as for live files).
 - **Concurrent compaction runs** → no lock file; two simultaneous runs could produce overlapping archive appends. Low-risk (compaction is operator-invoked and rare); if this becomes a problem, a werkstatt lock (RFC-0362) can be added in a follow-up. Operators should not run two compact sessions on the same repository simultaneously.
@@ -276,7 +276,7 @@ Command handler `packages/forge/os/core/handlers/knowledge-compact.ts` wraps the
 
 ## Rollout
 
-- **Phase 1 (this RFC's implementation):** `compact.ts` + handler + `fo-knowledge-distill` skill. First real run: `--all --dry-run` on this monorepo, operator review, then the live run — which also performs the RFC-0660 legacy migration via the distill skill, closing the migration window on forge's own files.
+- **Phase 1 (this RFC's implementation):** `compact.ts` + handler + `fo-knowledge-distill` skill. First real run: `--all-skills --dry-run` on this monorepo, operator review, then the live run — which also performs the RFC-0660 legacy migration via the distill skill, closing the migration window on forge's own files.
 - **Trigger discipline (documented, not automated):** run compact when (a) a SKILL-21 budget warning appears, (b) a session-end retro notices knowledge growth, or (c) roughly monthly on long-lived projects. `forge.doctor` does not track "last compact" timestamp — file mtimes are unreliable in git workflows (reset by every `git checkout` and `git pull`). SKILL-21 budget warnings are the primary trigger signal; operator cadence is the fallback.
 - **New projects:** `forge.create` needs nothing new — empty knowledge files compact to a no-op report.
 - **No pipeline integration:** the command is never wired into `build.check` or CI gates. Operators may add it to their own maintenance scripts; forge does not prescribe cadence.
@@ -297,14 +297,14 @@ Command handler `packages/forge/os/core/handlers/knowledge-compact.ts` wraps the
 
 ## Acceptance criteria
 
-- [ ] `planCompaction` is pure and unit-tested: expiry, supersession, L0 retention, and L2 staleness each produce the documented action kinds with correct reasons
-- [ ] `executeCompaction` round-trips active entries byte-identically (guarded by PBT), writes per-layer archive companions on demand, and uses per-file atomic writes
-- [ ] `forge.skill.knowledge.compact` is registered in `forgeCoreModule` with `--skill`/`--all`/`--dry-run`/`--json`/`--retention-days`/`--stale-days`; missing scope flag exits 1
-- [ ] The command refuses (exit 1, no writes) when any target file has SKILL-19/SKILL-20 parse issues
-- [ ] `fo-knowledge-distill` skill exists with the documented process; every mutation path asks for operator approval; concerns: document-only; validated by `forge.skill.validate`
-- [ ] A full `--all --dry-run` on this monorepo reports current state accurately, and the subsequent live run + distill pass leaves `forge.skill.validate` at zero legacy-section warnings
-- [ ] `docs/command-manifest.generated.yaml` regenerated via `command.manifest.generate`
-- [ ] `rfc.validate` passes on this file
+- [x] `planCompaction` is pure and unit-tested: expiry, supersession, L0 retention, and L2 staleness each produce the documented action kinds with correct reasons (evidence: `packages/forge/src/knowledge/compact.ts`, `packages/forge/src/tests/compact.test.ts`)
+- [x] `executeCompaction` round-trips active entries byte-identically (guarded by PBT), writes per-layer archive companions on demand, and uses per-file atomic writes (evidence: `packages/forge/src/knowledge/compact.ts`, `packages/forge/src/tests/compact.test.ts`, PBT in `packages/forge/src/tests/knowledge-pbt.test.ts`)
+- [x] `forge.skill.knowledge.compact` is registered in `forgeCoreModule` with `--skill`/`--all-skills`/`--dry-run`/`--json`/`--retention-days`/`--stale-days`; missing scope flag exits 1 (evidence: `packages/forge/os/core/core.module.ts:312-356`, handler flag guard `packages/forge/os/core/handlers/knowledge-compact.ts:119-147`; `--all` renamed to `--all-skills` because the site-kernel CLI consumes `--all` in `consumeCommonFlags`)
+- [x] The command refuses (exit 1, no writes) when any target file has SKILL-19/SKILL-20 parse issues (evidence: refusal path tested in `packages/forge/src/tests/compact.test.ts`)
+- [x] `fo-knowledge-distill` skill exists with the documented process; every mutation path asks for operator approval; concerns: document-only; validated by `forge.skill.validate` (evidence: `packages/forge/skills/fo/fo-knowledge-distill/SKILL.md`)
+- [x] A full `--all-skills --dry-run` on this monorepo reports current state accurately, and the subsequent live run + distill pass leaves `forge.skill.validate` at zero legacy-section warnings (evidence: run on 2026-08-03 — 7 skills discovered (forge + wg pack), 0 actions, 0 legacy files; `forge.skill.validate --all --json` reports zero SKILL-19 legacy warnings per RFC-0660 evidence)
+- [x] `docs/command-manifest.generated.yaml` regenerated via `command.manifest.generate` (evidence: manifest regenerated 2026-08-03, contains `forge.skill.knowledge.compact` with `--all-skills` flag)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0662 --json` — pass, 0 violations)
 
 ## Implementation notes for agents
 
