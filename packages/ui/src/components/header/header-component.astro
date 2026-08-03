@@ -233,28 +233,31 @@ const ctaHref = ctaTarget
               e.preventDefault();
               toggle.setAttribute("aria-expanded", "false");
               nav.hidden = true;
-              // We're on the home page, just scroll to the anchor
-              setTimeout(() => {
+              // Use Lenis if available for consistent smooth scrolling
+              const lenis = (window as any).wgLenis;
+              if (lenis) {
                 const targetElement = document.getElementById(anchorId);
                 if (targetElement) {
-                  targetElement.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
+                  lenis.scrollTo(targetElement, { offset: -80 });
                 }
-              }, 120);
+              } else {
+                setTimeout(() => {
+                  const targetElement = document.getElementById(anchorId);
+                  if (targetElement) {
+                    targetElement.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                }, 120);
+              }
             } else {
-              // For cross-page anchors, remove hash and navigate
-              e.preventDefault();
-              const cleanUrl = href.split("#")[0];
+              // For cross-page anchors, close the menu and navigate with hash intact.
+              // The lenis.ts page-load handler or native scroll + scroll-margin-top CSS
+              // will handle scrolling on the new page.
               toggle.setAttribute("aria-expanded", "false");
               nav.hidden = true;
-
-              // Store anchor for post-load scrolling
-              sessionStorage.setItem("mobileAnchorTarget", anchorId);
-
-              // Navigate to clean URL
-              window.location.href = cleanUrl;
+              // Allow default navigation with hash
             }
           }
         } else {
@@ -268,19 +271,25 @@ const ctaHref = ctaTarget
 
   // Handle anchor scrolling after page load for mobile navigation
   document.addEventListener("DOMContentLoaded", () => {
+    // Check sessionStorage (legacy cross-page anchor storage)
     const mobileAnchorTarget = sessionStorage.getItem("mobileAnchorTarget");
+    const hashTarget = mobileAnchorTarget || window.location.hash?.replace("#", "");
 
-    if (mobileAnchorTarget) {
+    if (hashTarget) {
       sessionStorage.removeItem("mobileAnchorTarget");
 
       setTimeout(() => {
-        const targetElement = document.getElementById(mobileAnchorTarget);
-
+        const targetElement = document.getElementById(hashTarget);
         if (targetElement) {
-          targetElement.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
+          const lenis = (window as any).wgLenis;
+          if (lenis) {
+            lenis.scrollTo(targetElement, { offset: -80 });
+          } else {
+            targetElement.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
         }
       }, 300);
     }

@@ -50,11 +50,13 @@ if (target.kind === "internal") {
   href = target.href;
   rel = target.rel ?? "noopener noreferrer";
   externalAttrs = { target: "_blank" };
+} else if (target.kind === "anchor") {
+  href = `#${target.anchor}`;
 } else {
   console.warn(
-    `[section-cta] Unexpected target.kind: "${(target as any).kind}". Expected: internal, external.`,
+    `[section-cta] Unexpected target.kind: "${(target as any).kind}". Expected: internal, external, anchor.`,
   );
-  href = `#${target.anchor}`;
+  href = `#${(target as any).anchor ?? ""}`;
 }
 
 const Icon = icon ? await loadVendorIcon(icon) : null;

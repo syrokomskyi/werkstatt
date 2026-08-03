@@ -25,6 +25,9 @@
     background: var(--shell-bg-color, var(--ds-color-bg));
     /* density default: normal */
     padding-block: var(--shell-padding-y, var(--ds-size-section-padding-y));
+    /* Offset anchor scroll targets so sections aren't hidden behind the fixed header.
+       Respected by both native scrollIntoView and CSS scroll-to-anchor. */
+    scroll-margin-top: var(--ds-size-header-height, 80px);
   }
 
   /* Edge-to-edge shell backgrounds must never have rounded corners */

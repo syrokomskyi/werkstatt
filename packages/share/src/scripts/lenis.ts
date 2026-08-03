@@ -84,6 +84,20 @@ export async function initLenis(
     }
   });
 
+  // Scroll to hash target on page load (cross-page anchor navigation)
+  if (window.location.hash) {
+    const hashTarget = document.querySelector(window.location.hash);
+    if (hashTarget && !hashTarget.classList.contains("wl-modal")) {
+      // Defer until after the browser's initial scroll attempt
+      requestAnimationFrame(() => {
+        activeLenis.scrollTo(hashTarget as HTMLElement, {
+          offset: -headerOffset,
+          immediate: prefersReducedMotion,
+        });
+      });
+    }
+  }
+
   function raf(time: number) {
     activeLenis.raf(time);
     requestAnimationFrame(raf);
