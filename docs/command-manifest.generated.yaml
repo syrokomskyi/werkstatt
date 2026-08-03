@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: b10860ba118203e6f9de85faa889a9f50825a12401acad5e0c05d7a18434ecc0
+  contentHash: 0943149536c294cdd83095ba1724cb220b7e48902a1e1c377dcb4e841bd46f78
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -8544,7 +8544,7 @@ commands:
     pipelines: []
   - name: forge.skill.validate
     description: Validate all forge skills against frontmatter contract and
-      invariants SKILL-01..SKILL-13.
+      invariants SKILL-01..SKILL-20.
     scope: workspace
     provider: workspace
     module: forge-core
