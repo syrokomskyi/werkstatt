@@ -271,6 +271,7 @@ async function runPreflight(
   channelConfig: DeploymentChannel,
   adapter: DeploymentAdapter,
   missionId?: string,
+  basePath?: string,
 ): Promise<PreflightCheck[]> {
   const checks: PreflightCheck[] = [];
 
@@ -289,19 +290,17 @@ async function runPreflight(
     detail: channelConfig ? `Channel '${channel}' configured` : `Channel '${channel}' not defined`,
   });
 
-  // 3. Credential reference syntax
-  if (channelConfig.secretsFile) {
-    const refMatch = channelConfig.secretsFile.match(
-      /^(env|github-secret|cloudflare-secret):[A-Z0-9_]+$/,
-    );
-    checks.push({
-      name: "credential-ref-syntax",
-      passed: !!refMatch,
-      detail: refMatch
-        ? "Secret reference syntax valid"
-        : `Invalid secret reference: ${channelConfig.secretsFile}`,
-    });
-  }
+  // 3. Convention env file existence (RFC-0666)
+  const envFile = channel === "main" ? ".env.main" : ".env.alt";
+  const envPath = basePath ? path.join(basePath, envFile) : "";
+  checks.push({
+    name: "convention-env-exists",
+    passed: true, // info-level — always passed
+    detail:
+      basePath && existsSync(envPath)
+        ? `${envFile} found at ${envPath}`
+        : `${envFile} not found — using process.env fallback`,
+  });
 
   // 4. Dist directory exists and artifact hash verifies
   const distPath = path.join(workspaceRoot, "releases", releaseId, "dist");
@@ -1320,6 +1319,7 @@ export async function runLeitstandPropagate(
       channelConfig,
       adapter,
       releaseManifest.missionId as string | undefined,
+      path.join(workspaceRoot, "releases", releaseId),
     );
     const preflightPassed = preflightChecks.every((c) => c.passed);
     if (!preflightPassed) {
