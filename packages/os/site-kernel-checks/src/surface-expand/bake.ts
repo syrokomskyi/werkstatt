@@ -314,7 +314,7 @@ function bakeIndustryDossier(
 
   // 6. Evidence requirements — listCards.
   const evidenceReqs = stringList(valuesDeepFirst, "evidenceRequirements");
-  if (evidenceReqs.length) blocks.push(listCards(lbl.trust, evidenceReqs));
+  if (evidenceReqs.length) blocks.push(listCards(lbl.evidence, evidenceReqs));
 
   // 7. Service area model — md block.
   const serviceArea = firstString(valuesDeepFirst.map((d) => d.serviceAreaModel));
@@ -746,7 +746,7 @@ export function bakePage(
   const trustBlock = trustCues.length ? listCards(lbl.trust, trustCues) : null;
   const practicalBlock = practical.length ? listCards(lbl.practical, practical) : null;
   const localFactBlock = localFacts.length ? listCards(lbl.localFacts, localFacts) : null;
-  const localEvidenceBlock = localEvidence.length ? listCards(lbl.localFacts, localEvidence) : null;
+  const localEvidenceBlock = localEvidence.length ? listCards(lbl.evidence, localEvidence) : null;
   const citySpecificQaBlocks = citySpecificQa.map((item) => md(item.question, item.answer));
   const uniqueFaqBlocks = uniqueFaq.map((item) => md(item.question, item.answer));
   const faqBlocks = faqs.map((f) => md(f.question, f.answer));

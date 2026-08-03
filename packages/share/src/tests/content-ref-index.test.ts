@@ -221,3 +221,33 @@ test("resolveReferencesInString — overlapping prefix references do not corrupt
   );
   expect(out).toBe("Elly-Heuss-Knapp-Weg 29 71522 Backnang");
 });
+
+test("resolveReferencesInString — trailing period from sentence punctuation is not included in reference", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "Bei Fragen wenden Sie sich an business.legal.companyName.",
+    "de",
+    "de",
+  );
+  expect(out).toBe("Bei Fragen wenden Sie sich an Warpgogol GmbH.");
+});
+
+test("resolveReferencesInString — reference followed by comma resolves correctly", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "Preis: business.offer.price.monthly, jährlich.",
+    "de",
+    "de",
+  );
+  expect(out).toBe("Preis: 70 €/Monat, jährlich.");
+});
+
+test("resolveReferencesInString — reference at end of line without trailing punctuation resolves", () => {
+  const out = resolveReferencesInString(
+    TEST_INDEX,
+    "Kontakt: business.legal.companyName",
+    "de",
+    "de",
+  );
+  expect(out).toBe("Kontakt: Warpgogol GmbH");
+});

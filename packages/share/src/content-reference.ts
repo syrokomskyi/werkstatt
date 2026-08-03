@@ -38,8 +38,12 @@ export interface ResolveReferenceResult {
 }
 
 const REF_PATTERN = /^([a-z][a-z-]*)\.([a-z0-9-/]+)\.(.+)$/;
-const PURE_REF_PATTERN = /^[a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+$/;
-const BRACELESS_SCAN_PATTERN = /[a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+/g;
+const FIELD_PATH_PATTERN = /[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*/;
+const PURE_REF_PATTERN = new RegExp(`^[a-z][a-z-]*\\.[a-z0-9-/]+\\.${FIELD_PATH_PATTERN.source}$`);
+const BRACELESS_SCAN_PATTERN = new RegExp(
+  `[a-z][a-z-]*\\.[a-z0-9-/]+\\.${FIELD_PATH_PATTERN.source}`,
+  "g",
+);
 const DEFAULT_INDEX_PATH = "src/content-ref-index.generated.yaml";
 
 export const EMPTY_CONTENT_REF_INDEX: ContentRefIndex = {
