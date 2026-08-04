@@ -366,19 +366,19 @@ suppressions:
 
 ## Acceptance criteria
 
-- [ ] `suppressions-config.ts` module exists in `@warpgogol/site-kernel-checks` with Zod schemas, loader, merger, and `applySuppressions` function
-- [ ] `suppressions.validate` command registered and passes on `systems/axiom-suppressions.yaml`
-- [ ] `systems/axiom-suppressions.yaml` exists with default rules for all four categories
-- [ ] `mission.check` accepts `--channel` flag and applies suppressions after `runAxiomCheck`
-- [ ] `mission.check` output includes `suppressionSummary` when suppressions are applied
-- [ ] Suppressed findings in evidence files are marked `suppressed: true` with `suppressedBy` reference
-- [ ] `leitstand.propagate` applies suppressions when evaluating gate decision from `study-run.json`
-- [ ] `axiom.report` renders suppressed findings separately from active findings
-- [ ] `leitstand.dev-deploy` passes `--channel dev` to `mission.check`
-- [ ] `suppressions.validate` integrated into `mission.validate` pipeline
-- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
-- [ ] `AGENTS.md` for `@warpgogol/site-kernel-checks` documents the suppression layer
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `suppressions-config.ts` module exists in `@warpgogol/site-kernel-checks` with Zod schemas, loader, merger, and `applySuppressions` function (evidence: `packages/os/site-kernel-checks/src/suppressions-config.ts`, commit 2fe30273)
+- [x] `suppressions.validate` command registered and passes on `systems/axiom-suppressions.yaml` (evidence: `packages/os/site-kernel-checks/src/suppressions-validate.ts`, `src/command-tables/infra-contracts.ts`, commit f6a35536)
+- [x] `systems/axiom-suppressions.yaml` exists with default rules for all four categories (evidence: `systems/axiom-suppressions.yaml`, commit 4654218b)
+- [x] `mission.check` accepts `--channel` flag and applies suppressions after `runAxiomCheck` (evidence: `packages/os/site-kernel-checks/src/axiom-adapter.ts:185-194,307-319`, commit ae6bcda1)
+- [x] `mission.check` output includes `suppressionSummary` when suppressions are applied (evidence: `packages/os/site-kernel-checks/src/axiom-adapter.ts:59-62,326`, commit ae6bcda1)
+- [x] Suppressed findings in evidence files are marked `suppressed: true` with `suppressedBy` reference (evidence: `packages/os/site-kernel-checks/src/suppressions-config.ts:156-170`, commit 2fe30273)
+- [x] `leitstand.propagate` applies suppressions when evaluating gate decision from `study-run.json` (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1270-1280`, commit 877be0c5)
+- [x] `axiom.report` renders suppressed findings separately from active findings (evidence: `packages/os/site-kernel-checks/src/axiom-adapter.ts:397-459`, commit 0009aabb)
+- [x] `leitstand.dev-deploy` passes `--channel dev` to `mission.check` (evidence: `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:204`, commit 877be0c5)
+- [x] `suppressions.validate` integrated into `mission.validate` pipeline (evidence: `packages/os/site-kernel-checks/src/pipelines/packages-check.ts:190-191`, commit bd964b54)
+- [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: `docs/command-manifest.generated.yaml`, commit 10941884)
+- [x] `AGENTS.md` for `@warpgogol/site-kernel-checks` documents the suppression layer (evidence: `packages/os/site-kernel-checks/AGENTS.md:27-28`, commit 10941884)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0684` exit 0, 2026-08-04)
 
 ## Implementation notes for agents
 
