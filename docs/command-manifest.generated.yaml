@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 781cb44dc5b599cdd52b59e57a1578960e7c53d090177b69e7ca68fbf6cb7470
+  contentHash: 6b9f2837224b613f40d004e7207427e85ada4a372a0184c6f1491638e53a3240
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -4643,9 +4643,6 @@ commands:
       dry-run:
         kind: boolean
         description: Print resolved produce commands without executing.
-      json:
-        kind: boolean
-        description: Output structured JSON with per-artifact results.
       profile:
         kind: string
         description: Override the active profile id.
@@ -4691,9 +4688,6 @@ commands:
       dry-run:
         kind: boolean
         description: Print the resolved dev server command without executing.
-      json:
-        kind: boolean
-        description: Output structured JSON with resolved command and exit code.
       profile:
         kind: string
         description: Override the active profile id.
@@ -4899,9 +4893,6 @@ commands:
       dry-run:
         kind: boolean
         description: Print resolved validate commands without executing.
-      json:
-        kind: boolean
-        description: Output structured JSON with per-artifact results.
       profile:
         kind: string
         description: Override the active profile id.
