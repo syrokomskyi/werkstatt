@@ -37,5 +37,5 @@ const { svg, hash } = await emitStarMap(input, "dist/.well-known/cosmic-star-map
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/star-map build:check
+rtk pnpm --filter @warpgogol/star-map build:check
 ```

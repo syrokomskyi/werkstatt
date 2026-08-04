@@ -71,7 +71,7 @@ import { ArrowUpIcon, UserProfileIcon } from "@warpgogol/ui/icons";
 Regenerate derived icon components after changing JSON sources:
 
 ```bash
-pnpm exec site-kernel run icons.generate
+rtk pnpm exec site-kernel run icons.generate
 ```
 
 The command:

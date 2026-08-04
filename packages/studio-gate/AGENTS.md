@@ -72,6 +72,6 @@ Authenticated actor id is injected via `--_authActor` CLI flag (not `--actor`, w
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/studio-gate build:check
-pnpm --filter @warpgogol/studio-gate test
+rtk pnpm --filter @warpgogol/studio-gate build:check
+rtk pnpm --filter @warpgogol/studio-gate test
 ```

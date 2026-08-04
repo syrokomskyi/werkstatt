@@ -48,5 +48,5 @@ await emitPassport(signed, "./dist");
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/passport build:check
+rtk pnpm --filter @warpgogol/passport build:check
 ```

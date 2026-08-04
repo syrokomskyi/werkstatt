@@ -48,11 +48,11 @@ const passportScores = toPassportScores(ciScore);
 ## Testing
 
 ```sh
-pnpm --filter @warpgogol/nebula test
+rtk pnpm --filter @warpgogol/nebula test
 ```
 
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/nebula build:check
+rtk pnpm --filter @warpgogol/nebula build:check
 ```

@@ -51,5 +51,5 @@ The package has three layers:
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/integration-adapter-supabase-crm build:check
+rtk pnpm --filter @warpgogol/integration-adapter-supabase-crm build:check
 ```

@@ -24,5 +24,5 @@ No-op `ChatWidgetAdapter` for development, testing, and unentitled sites (RFC-01
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/chat-adapter-null build:check
+rtk pnpm --filter @warpgogol/chat-adapter-null build:check
 ```

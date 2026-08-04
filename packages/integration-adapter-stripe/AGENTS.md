@@ -33,8 +33,8 @@ RFC-0191 Stripe webhook adapter: a first-party **source** (webhook verify + mapp
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/integration-adapter-stripe build:check
-pnpm --filter @warpgogol/integration-adapter-stripe test
+rtk pnpm --filter @warpgogol/integration-adapter-stripe build:check
+rtk pnpm --filter @warpgogol/integration-adapter-stripe test
 ```
 
 Governance commands (run per app): `billing.config.validate`, `billing.secrets.validate` (RFC-0191).

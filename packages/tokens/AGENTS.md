@@ -56,5 +56,5 @@ import { TOKEN_NAMES, TOKEN_NAME_SET } from "@warpgogol/tokens";
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/tokens build:check
+rtk pnpm --filter @warpgogol/tokens build:check
 ```

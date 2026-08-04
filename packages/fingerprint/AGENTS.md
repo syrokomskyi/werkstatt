@@ -74,6 +74,6 @@ Each normalizer produces a `sha256:`-prefixed hex hash:
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/fingerprint build:check
-pnpm --filter @warpgogol/fingerprint test
+rtk pnpm --filter @warpgogol/fingerprint build:check
+rtk pnpm --filter @warpgogol/fingerprint test
 ```

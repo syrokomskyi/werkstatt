@@ -28,5 +28,5 @@ Override via `options.scriptUrl` for custom UChat deployments.
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/chat-adapter-uchat build:check
+rtk pnpm --filter @warpgogol/chat-adapter-uchat build:check
 ```

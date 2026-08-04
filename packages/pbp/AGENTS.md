@@ -156,8 +156,8 @@ PBP content files live under `src/content/business-profile/{lang}/`:
 ### Validation
 
 ```sh
-pnpm --filter @warpgogol/pbp build:check
-pnpm --filter @warpgogol/pbp test
+rtk pnpm --filter @warpgogol/pbp build:check
+rtk pnpm --filter @warpgogol/pbp test
 ```
 
 ## Presentation fields (RFC-0482)

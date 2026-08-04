@@ -50,5 +50,5 @@ The `MatomoTransport` seam abstracts browser delivery (`_paq` queue, script inje
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/growth-adapter-matomo build:check
+rtk pnpm --filter @warpgogol/growth-adapter-matomo build:check
 ```

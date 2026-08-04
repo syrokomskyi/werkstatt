@@ -45,7 +45,7 @@ Section manifests compose them via `propsSchemaCompose` instead of duplicating J
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/ontology build:check
+rtk pnpm --filter @warpgogol/ontology build:check
 ```
 
 ## Architecture: schemas vs operations split (2026-07-10)

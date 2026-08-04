@@ -98,29 +98,29 @@ This file applies to `packages/os/site-kernel-handoff`. Follow the root `AGENTS.
 Run from the repository root:
 
 ```sh
-pnpm --filter @warpgogol/site-kernel-handoff build:check
-pnpm --filter @warpgogol/site-kernel-handoff test
-pnpm exec site-kernel run migrator.registry.validate
+rtk pnpm --filter @warpgogol/site-kernel-handoff build:check
+rtk pnpm --filter @warpgogol/site-kernel-handoff test
+rtk pnpm exec site-kernel run migrator.registry.validate
 ```
 
 When a bundle fixture or real bundle is involved, also run:
 
 ```sh
-pnpm exec site-kernel run handoff.validate --bundle <bundle-dir>
-pnpm exec site-kernel run handoff.absorb --bundle <bundle-dir> --report-only
+rtk pnpm exec site-kernel run handoff.validate --bundle <bundle-dir>
+rtk pnpm exec site-kernel run handoff.absorb --bundle <bundle-dir> --report-only
 ```
 
 To exercise materialization non-destructively, absorb under a throwaway app name and delete it after:
 
 ```sh
-pnpm exec site-kernel run handoff.absorb --bundle <bundle-dir> --as zz-selftest
-rm -rf apps/zz-selftest
+rtk pnpm exec site-kernel run handoff.absorb --bundle <bundle-dir> --as zz-selftest
+rtk rm -rf apps/zz-selftest
 ```
 
 For Notausgang validation:
 
 ```sh
-pnpm exec site-kernel run notausgang.validate --path <export-dir>
+rtk pnpm exec site-kernel run notausgang.validate --path <export-dir>
 ```
 
 ## Bordbuch git synchronization (RFC-0477)

@@ -70,5 +70,5 @@ The optional `accepts` field is an allow-list of event names the adapter handles
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/growth build:check
+rtk pnpm --filter @warpgogol/growth build:check
 ```

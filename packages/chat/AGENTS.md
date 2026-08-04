@@ -57,5 +57,5 @@ interface ChatWidgetAdapter {
 ## Validation
 
 ```sh
-pnpm --filter @warpgogol/chat build:check
+rtk pnpm --filter @warpgogol/chat build:check
 ```
