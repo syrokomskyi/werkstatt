@@ -1,7 +1,7 @@
 ---
 id: RFC-0690
 title: "Add build-time duplicate section heading check for surface pages"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
