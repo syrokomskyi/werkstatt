@@ -4,7 +4,7 @@ date: 2026-08-04
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: fca4728b...HEAD
 filesReviewed:
   - packages/forge/src/profiles/profile-schema.ts
