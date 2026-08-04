@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -171,7 +172,7 @@ All command blocks in the following files are updated to use `rtk` prefix:
 | File category | Example files | Change |
 | --- | --- | --- |
 | Root instructions | `AGENTS.md`, `.windsurfrules`, `PREFERENCES.md` | Add `rtk` prefix to all command blocks |
-| Forge skills | `packages/forge/skills/**/*.SKILL.md` | Add `rtk` prefix to direct commands; leave `ref()` references unchanged |
+| Forge skills | `packages/forge/skills/**/*.SKILL.md` | Add `rtk` prefix to direct commands; leave `ref()` references unchanged; exempt RTK's own install/init/diagnostic commands (see below) |
 | Nested AGENTS.md | `packages/*/AGENTS.md`, `services/*/AGENTS.md` | Add `rtk` prefix to all command blocks |
 | Authoring docs | `docs/authoring/*.md` | Add `rtk` prefix to all command blocks |
 | Spec docs | `docs/specs/**/*.md` | Add `rtk` prefix to all command blocks |
@@ -180,13 +181,30 @@ All command blocks in the following files are updated to use `rtk` prefix:
 
 **Excluded:** `missions/archive/**`, `docs/rfcs/archive/**`, `docs/audits/**`, `docs/reviews/**` — archived and historical files are not updated.
 
+### RTK's own commands exemption
+
+Commands that install, initialize, or diagnose RTK itself are **exempt** from the `rtk` prefix rule. These commands are either RTK commands already (`rtk --version`, `rtk init`, `rtk gain`) or are commands that run before RTK is available (`curl | sh`, `cargo install`, `Invoke-WebRequest`). Prefixing them with `rtk` is paradoxical or redundant.
+
+Exempt command patterns:
+
+- `rtk --version` — RTK detection command (already an `rtk` command)
+- `rtk init` — RTK initialization (already an `rtk` command)
+- `rtk gain` — RTK diagnostics (already an `rtk` command)
+- `curl -fsSL ... | sh` — RTK install script (runs before RTK is available)
+- `cargo install --git ...` — RTK install via Cargo (runs before RTK is available)
+- `Invoke-WebRequest ... -OutFile rtk.exe` — RTK install on Windows (runs before RTK is available)
+
+These commands appear in `forge-bootstrap` SKILL.md §6.10 and must not be prefixed with `rtk`.
+
 ### Forge skill note
 
 Forge skills that contain command blocks add a brief note at the top of the first command block:
 
 ```markdown
-> Commands below assume RTK is installed. If `rtk --version` fails, run commands
-> without the `rtk` prefix.
+> Commands below assume RTK is installed. To check, run `rtk --version` (this is
+> the detection command — it is not prefixed with `rtk` because it IS an `rtk` command).
+> If `rtk --version` fails, RTK is not installed — run all commands without the
+> `rtk` prefix.
 ```
 
 This note appears once per skill file, not per command block.
