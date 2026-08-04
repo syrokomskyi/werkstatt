@@ -16,6 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -128,10 +129,17 @@ export async function runSurfaceHeadingUniquenessValidate(
 ): Promise<KernelCommandResult<CheckResult>>;
 
 // Core logic:
-// 1. Read dist/client/ HTML files for surface routes (identified by surface.generate output)
-// 2. For each page, extract all <section> elements and their heading text (first <h2> or <h3> child)
-// 3. Group by normalized heading text (trim, lowercase, collapse whitespace)
-// 4. Report HEADING-UNIQ-01 for each heading text that appears more than once on the same page
+// 1. Load the surface artifact (src/surface.generated.yaml) to identify surface route entries
+//    — follows the same pattern as surface-media-leakage-validate.ts (ARTIFACT_FILE from surface/shared.ts)
+// 2. For each surface VirtualRouteEntry, find the corresponding dist/client/*.html file
+// 3. Parse each HTML file with parse5 (already a dependency, used by strip-html-generated-marker.ts)
+// 4. For each <section> element, extract the first <h2> or <h3> child's text content
+// 5. Group by normalized heading text (trim, lowercase, collapse whitespace)
+// 6. Emit HEADING-UNIQ-01 diagnostic (via diagnosticsResult from result-helpers.ts)
+//    for each heading text that appears more than once on the same page
+//
+// Rule registration: HEADING-UNIQ-01 must be registered in src/diagnostics/rules.ts
+// (DSL-02 fails on unregistered ruleId literals in diagnosticsResult calls)
 ```
 
 ### File system responsibilities
@@ -139,11 +147,14 @@ export async function runSurfaceHeadingUniquenessValidate(
 | Path | Role |
 | --- | --- |
 | `packages/os/site-kernel-checks/src/surface-heading-uniqueness.ts` | New: `surface.heading-uniqueness.validate` command handler |
-| `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` | Modified: register `surface.heading-uniqueness.validate` command |
-| `packages/os/site-kernel-checks/src/pipelines/build-post.ts` | Modified: add `surface.heading-uniqueness.validate` step after HTML generation, before Axiom gate |
-| `dist/client/**/*.html` | Scanned for duplicate section headings |
+| `packages/os/site-kernel-checks/src/diagnostics/rules.ts` | Modified: register `HEADING-UNIQ-01` rule id |
+| `packages/os/site-kernel-checks/src/command-tables/09b-build-artifacts-part2.ts` | Modified: register command next to other surface validators |
+| `packages/os/site-kernel-checks/src/pipelines/sites-check-postbuild.ts` | Modified: add step to `SITES_CHECK_POSTBUILD_PIPELINE` after `surface.media-leakage.validate` |
+| `dist/client/**/*.html` | Scanned for duplicate section headings (surface routes only) |
 
 ### Output format
+
+Uses the canonical `Diagnostic[]` shape from RFC-0203 (via `diagnosticsResult` from `result-helpers.ts`):
 
 ```json
 {
@@ -151,10 +162,11 @@ export async function runSurfaceHeadingUniquenessValidate(
   "status": "fail",
   "diagnostics": [
     {
-      "id": "HEADING-UNIQ-01",
+      "ruleId": "HEADING-UNIQ-01",
       "severity": "error",
       "message": "Duplicate section heading \"Що справді важливо\" appears 3 times on /uk/sait/perukar/",
-      "fix": "Use distinct labels for each block in bakeIndustryDossier — see SURFACE_LABELS in bake-helpers.ts"
+      "file": "dist/client/uk/sait/perukar/index.html",
+      "fixHint": "Use distinct labels for each block in bakeIndustryDossier — see SURFACE_LABELS in bake-helpers.ts"
     }
   ],
   "summary": { "error": 1, "warning": 0, "info": 0 }
@@ -166,14 +178,19 @@ export async function runSurfaceHeadingUniquenessValidate(
 - **HEADING-UNIQ-01 (error):** Duplicate heading text on the same page. Exits non-zero, blocks the pipeline.
 - **No surface pages found:** If no surface routes exist (e.g. a site without surface expand), the command is a no-op and exits 0.
 - **dist/client/ does not exist:** Exits 0 with a warning. This check only runs after a successful build.
-- **Heading extraction fails (malformed HTML):** Warns and skips the page. Does not block the pipeline for HTML parsing errors — those are caught by `dist.html-structure.validate`.
+- **Heading extraction fails (malformed HTML):** parse5 parse errors are caught with try/catch per file (following the `strip-html-generated-marker.ts` pattern). Warns and skips the page. Does not block the pipeline for HTML parsing errors — those are caught by `dist.html-structure.validate`.
+- **Sections without a heading:** Sections that have no `<h2>` or `<h3>` child are skipped — they do not participate in the uniqueness check. This avoids false positives from structural wrapper sections.
 
 ## Rollout
 
 - **Default behavior on introduction:** `surface.heading-uniqueness.validate` is added to `build.post` pipeline. It runs after HTML generation and before the Axiom gate. Duplicate headings block the pipeline.
 - **Backward compatibility:** Sites without surface pages are unaffected (no-op).
 - **No migration required:** Existing sites with unique headings pass immediately. Sites with duplicate headings fail — which is the intended behavior (the duplicates would have been caught by Axiom anyway, just 10 minutes later).
-- **Pipeline integration:** Added to `build.post` pipeline after `dist.html-structure.validate` (step 7) and before `behavior.snapshot.validate` (step 33). Suggested position: step 8.
+- **Pipeline integration:** Added to `SITES_CHECK_POSTBUILD_PIPELINE` in `sites-check-postbuild.ts`, after `surface.media-leakage.validate` (the last surface-specific postbuild validator). This pipeline is spread into `SITES_BUILD_POST_PIPELINE` in `build-post.ts` after `dist.html-structure.validate` and before `behavior.snapshot.generate`.
+
+### Command naming justification
+
+The command uses the `surface.` prefix (not `dist.`) following the precedent of `surface.media-leakage.validate` — another post-build validator that scans `dist/client/**/*.html` but checks a surface-specific concern. The heading uniqueness check is also surface-specific: it only applies to pages generated by bake functions (`bakeIndustryDossier`, `bakeServiceDossier`), not to all dist HTML files. The `dist.` prefix family (`dist.html-structure.validate`, `dist.generated-marker.validate`) checks structural/marker concerns on ALL dist files; this check targets surface pages only.
 
 ## Alternatives considered
 
@@ -185,9 +202,10 @@ export async function runSurfaceHeadingUniquenessValidate(
 
 ## Risks
 
-- **False positives from intentionally repeated headings:** Some pages may intentionally repeat heading text (e.g. a FAQ page where each question is an `<h3>` inside a `<section>`). Mitigation: the check only looks at `<section>` headings (the first `<h2>` or `<h3>` child), not all headings. FAQ questions are typically `<h3>` inside `<section>` elements that already have a unique `<h2>` heading.
-- **Performance:** Scanning ~150 HTML files for section headings is fast (<1 second). No performance risk.
+- **False positives from intentionally repeated headings:** Some surface pages may have multiple `<section>` elements with the same heading text by design (e.g. repeated CTA sections with "Kontakt" heading). Mitigation: the check only looks at the first `<h2>` or `<h3>` child of each `<section>`, and only on surface pages (identified by the surface artifact). Surface pages are composed by bake functions that should use distinct labels — repeated headings indicate a bake function bug, not an intentional design. If a genuine false positive is found, the suppression layer (RFC-0684) can suppress the Axiom `landmark-unique` finding, but this build-time check should be fixed at the bake function level.
+- **Performance:** Scanning ~150 HTML files with parse5 for section heading extraction is fast (~2-3 seconds). parse5 is already a dependency and used by `strip-html-generated-marker.ts`. No performance risk.
 - **Multilingual pages:** The check runs on all language variants. A heading that is unique in DE but duplicate in UK is caught. This is the intended behavior — both languages must have unique headings.
+- **parse5 parse errors:** Malformed HTML in dist/client could cause parse5 to throw. The handler wraps each file parse in try/catch (following the `strip-html-generated-marker.ts` pattern) and skips the file with a warning. Structural HTML issues are caught by `dist.html-structure.validate` which runs earlier in the pipeline.
 
 ## Acceptance criteria
 
