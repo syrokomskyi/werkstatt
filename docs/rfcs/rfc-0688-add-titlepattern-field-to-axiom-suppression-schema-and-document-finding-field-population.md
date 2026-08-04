@@ -1,7 +1,7 @@
 ---
 id: RFC-0688
 title: "Add titlePattern field to Axiom suppression schema and document Finding field population"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
