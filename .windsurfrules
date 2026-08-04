@@ -37,7 +37,30 @@ Use legacy `.agents/**` folders only as reference material when a task needs dee
 
 ## Rule
 
-Always prefix shell commands with `rtk` to minimize token consumption.
+Always prefix shell commands with `rtk` to minimize token consumption. If RTK
+is not installed (check once at session start via `rtk --version`), run commands
+without the `rtk` prefix — RTK is an optimization, not a dependency.
+
+## Session-start check
+
+At the start of each session, run `rtk --version` once. If it succeeds, use
+`rtk` as a prefix for all subsequent shell commands. If it fails, proceed
+without `rtk` for the entire session.
+
+## ref() bindings
+
+When a skill instruction uses `ref(forge.yaml bindings.commands.<key>)`, do not
+prefix the `ref()` with `rtk`. Instead, add `rtk` after the binding is resolved
+to a concrete command. Example: `ref(forge.yaml bindings.commands.validateRfc)`
+resolves to `pnpm exec site-kernel run rfc.validate` — run as
+`rtk pnpm exec site-kernel run rfc.validate`.
+
+## RTK's own commands exemption
+
+Commands that install, initialize, or diagnose RTK itself are exempt from the
+`rtk` prefix rule: `rtk --version`, `rtk init`, `rtk gain`, `curl | sh`,
+`cargo install --git`, `Invoke-WebRequest` for RTK install. These are either
+already `rtk` commands or run before RTK is available.
 
 Examples:
 

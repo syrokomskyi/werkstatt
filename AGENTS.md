@@ -201,20 +201,20 @@ Two commit paths depending on what was edited:
 **Mission workpiece edits** — use `mission.git.commit`, not direct `git commit`:
 
 ```sh
-pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "<descriptive message>"
+rtk pnpm exec site-kernel run mission.git.commit --mission <missionId> --message "<descriptive message>"
 ```
 
 **Platform/package edits** (files under `packages/*`, `docs/*`, root config, etc.) — use `ecosystem.commit` (RFC-0533) for platform-scope changes (`packages/**`, `integrations/**`, `services/**`):
 
 ```sh
-pnpm exec site-kernel run ecosystem.commit --message "<imperative clause>" [--rfc RFC-XXXX] [--dry-run]
+rtk pnpm exec site-kernel run ecosystem.commit --message "<imperative clause>" [--rfc RFC-XXXX] [--dry-run]
 ```
 
 For non-platform changes (`docs/rfcs/**`, `missions/**`, root config files), use `git add <specific files> && git commit`:
 
 ```sh
-git add packages/os/site-kernel-handoff/src/mission/mission-materialize.ts
-git commit -m "fix: <imperative clause>"
+rtk git add packages/os/site-kernel-handoff/src/mission/mission-materialize.ts
+rtk git commit -m "fix: <imperative clause>"
 ```
 
 Rules:
@@ -252,7 +252,7 @@ This rule is complementary to RFC-0480's per-response `git status` verification,
 **RFC implementation is not complete until stamped (NON-NEGOTIABLE):** When a session implements an RFC (writes code, adds tests, updates docs), the session MUST NOT end without completing all of the following:
 
 1. **Mark acceptance criteria** — every `[ ]` must be `[x]` with inline `(evidence: <file:line>)` annotations (V-26/V-27).
-2. **Regenerate command manifest** — if the RFC added or changed commands, run `pnpm exec site-kernel run command.manifest.generate` and commit `docs/command-manifest.generated.yaml`. A stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`.
+2. **Regenerate command manifest** — if the RFC added or changed commands, run `rtk pnpm exec site-kernel run command.manifest.generate` and commit `docs/command-manifest.generated.yaml`. A stale manifest causes `RFC-CMD-02` violations on the next `rfc.validate`.
 3. **Stamp implemented** — run `rfc.implement.stamp --id RFC-XXXX --implementation-commit <sha>` and commit the stamped RFC file.
 4. **Validate** — run `rfc.validate --id RFC-XXXX` and confirm zero errors.
 5. **Commit** — all changes must be committed before session end.
@@ -260,6 +260,16 @@ This rule is complementary to RFC-0480's per-response `git status` verification,
 A session that writes implementation code but leaves the RFC in `accepted` status with unchecked criteria is **incomplete**. The `fo-session-retro` git hygiene check (RFC-0581) will catch uncommitted changes, but it does not verify RFC completion — that is the agent's responsibility throughout the session, not just at the end.
 
 If the session is interrupted before stamping, the next session MUST resume from step 3.6 (Check acceptance criteria) of the `fo-idea-implement` pipeline — not from the beginning.
+
+## RTK usage (token optimization, RFC-0683)
+
+All shell commands in agent instructions should be prefixed with `rtk` to minimize token consumption. If RTK is not installed, commands run without the `rtk` prefix — RTK is an optimization, not a dependency.
+
+At the start of each session, check once: `rtk --version`. If it succeeds, use `rtk` as a prefix for all subsequent shell commands. If it fails, proceed without `rtk` for the entire session.
+
+When a skill instruction uses `ref(forge.yaml bindings.commands.<key>)`, add `rtk` after the binding is resolved to a concrete command — do not prefix the `ref()` reference itself.
+
+Commands that install, initialize, or diagnose RTK itself are exempt from the `rtk` prefix rule: `rtk --version`, `rtk init`, `rtk gain`, `curl | sh`, `cargo install --git`, `Invoke-WebRequest` for RTK install.
 
 ## HDRI identity firewall, image resolution, material credits, responsive variants, derived artifact invalidation, silent UI text, behavior snapshot
 
@@ -412,10 +422,10 @@ The manifest `propsSchema` (with `propsSchemaCompose` fragments resolved) is the
 
 ```sh
 # Regenerate every <id>.types.generated.ts next to its manifest (mutates state)
-pnpm exec site-kernel run props.types.generate
+rtk pnpm exec site-kernel run props.types.generate
 
 # Validate every generated file is present, marker-carrying, and fresh (workspace-scoped, part of packages.check)
-pnpm exec site-kernel run props.contract.validate
+rtk pnpm exec site-kernel run props.contract.validate
 ```
 
 - **Agents MUST NOT hand-edit a `*.types.generated.ts` file.** Fix the manifest `propsSchema` and run `props.types.generate` — the file carries the RFC-0081 `GENERATED_MARKER` plus a `sourceHash` line, and `props.contract.validate` (`PROPS-01`) fails on drift or a missing marker.
@@ -429,10 +439,10 @@ The workspace-level `uni.registry.yaml` at the repository root is the machine-re
 
 ```sh
 # Regenerate (mutates state — run after adding/moving manifests)
-pnpm exec site-kernel run uni.registry.build
+rtk pnpm exec site-kernel run uni.registry.build
 
 # Validate freshness (read-only, fails if on-disk manifests differ from registry)
-pnpm exec site-kernel run uni.registry.validate
+rtk pnpm exec site-kernel run uni.registry.validate
 ```
 
 `uni.registry.validate` is a Wave-0 step in `APPS_CHECK_PIPELINE`. The registry is rebuilt automatically by `APPS_BUILD_PREPARE_PIPELINE` before `astro check`. Workspace-scoped contracts (archetypes, biomes, families, constellations) live in `PACKAGES_CHECK_PIPELINE` and are driven by `packages-check.run`.
