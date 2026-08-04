@@ -35,6 +35,7 @@ import { runYamlParseValidate } from "../yaml-parse-validate.ts";
 import { runCommandReadsValidate } from "../command-reads-validate.ts";
 import { runPlaywrightChromiumEnsure } from "../playwright-chromium-ensure.ts";
 import { runMethodologiesValidate } from "../methodologies-validate.ts";
+import { runSuppressionsValidate } from "../suppressions-validate.ts";
 
 // Note: evidence.sync and evidence.fetch are registered by createEvidenceModule
 // in @warpgogol/site-kernel-handoff/src/evidence/evidence-module.ts (RFC-0651).
@@ -417,6 +418,24 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
     writes: ["missions/{mission}/evidence/axiom/report.html"],
     reads: ["missions/{mission}/evidence/axiom/**"],
     execute: runAxiomReport,
+  },
+  {
+    name: "suppressions.validate",
+    description:
+      "RFC-0684: validates the workshop-level Axiom suppression config at systems/axiom-suppressions.yaml. " +
+      "Checks schema, conflicting rules (same ruleId + same conditions), broad patterns, and unknown rule IDs (from evidence). " +
+      "Diagnostics: SUPPRESS-VAL-01 (file not found, warning), SUPPRESS-VAL-02 (schema violation), " +
+      "SUPPRESS-VAL-03 (conflicting rules), SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId, warning).",
+    scope: "workspace",
+    supportsAllSites: false,
+    mutatesState: false,
+    cacheable: true,
+    flags: {
+      json: { kind: "boolean", description: "Output JSON result." },
+    },
+    writes: [],
+    reads: ["systems/axiom-suppressions.yaml", "missions/*/evidence/axiom/study-run.json"],
+    execute: runSuppressionsValidate,
   },
   {
     name: "playwright.chromium.ensure",
