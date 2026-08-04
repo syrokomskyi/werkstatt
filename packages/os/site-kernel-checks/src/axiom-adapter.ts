@@ -37,6 +37,7 @@ import {
   renderAxiomReportHtml,
   type EvidenceMetadata,
 } from "@syrokomskyi/axiom-factory-app/run/report";
+import type { Finding } from "@syrokomskyi/axiom-study";
 
 import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
 import {
@@ -384,6 +385,79 @@ export async function runMissionCheck(
 
 // ─── axiom.report adapter ──────────────────────────────────────────────────
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function injectSuppressedSection(
+  html: string,
+  suppressedFindings: Array<
+    Finding & {
+      suppressed?: boolean;
+      suppressedBy?: { ruleId: string; category: string; reason: string };
+    }
+  >,
+  activeCount: number,
+): string {
+  const byCategory: Record<string, number> = {};
+  for (const f of suppressedFindings) {
+    const cat = f.suppressedBy?.category ?? "unknown";
+    byCategory[cat] = (byCategory[cat] ?? 0) + 1;
+  }
+
+  const categorySummary = Object.entries(byCategory)
+    .map(([cat, count]) => `<li>${escapeHtml(cat)}: ${count}</li>`)
+    .join("");
+
+  const findingRows = suppressedFindings
+    .map(
+      (f) => `
+      <tr class="text-gray-400">
+        <td class="px-2 py-1">${escapeHtml(f.severity)}</td>
+        <td class="px-2 py-1">${escapeHtml(f.ruleId)}</td>
+        <td class="px-2 py-1">${escapeHtml(f.title)}</td>
+        <td class="px-2 py-1">${escapeHtml(f.suppressedBy?.category ?? "")}</td>
+        <td class="px-2 py-1 text-xs text-gray-500">${escapeHtml(f.suppressedBy?.reason ?? "")}</td>
+      </tr>`,
+    )
+    .join("");
+
+  const suppressedSection = `
+  <section class="mb-8">
+    <details>
+      <summary class="cursor-pointer text-gray-500 font-semibold mb-2">
+        Suppressed Findings (${suppressedFindings.length}) — collapsed by default
+      </summary>
+      <div class="bg-gray-50 border border-gray-200 rounded p-4">
+        <p class="text-sm text-gray-500 mb-2">${activeCount} active finding(s) shown above. ${suppressedFindings.length} suppressed finding(s) excluded from gate decision.</p>
+        <ul class="text-sm text-gray-500 mb-3 list-disc list-inside">${categorySummary}</ul>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-400 border-b border-gray-200">
+              <th class="px-2 py-1">Severity</th>
+              <th class="px-2 py-1">Rule ID</th>
+              <th class="px-2 py-1">Title</th>
+              <th class="px-2 py-1">Category</th>
+              <th class="px-2 py-1">Reason</th>
+            </tr>
+          </thead>
+          <tbody>${findingRows}</tbody>
+        </table>
+      </div>
+    </details>
+  </section>`;
+
+  // Inject before closing </body> tag
+  const bodyCloseIndex = html.lastIndexOf("</body>");
+  if (bodyCloseIndex === -1) return html + suppressedSection;
+  return html.slice(0, bodyCloseIndex) + suppressedSection + html.slice(bodyCloseIndex);
+}
+
 export async function runAxiomReport(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -470,18 +544,35 @@ export async function runAxiomReport(
   };
 
   const html = renderAxiomReportHtml(studyRun, capsule, bundle, metadata);
+
+  // RFC-0684: Post-process HTML to inject suppressed findings section.
+  // renderAxiomReportHtml from the external package does not support a separate
+  // suppressed section. We partition findings and inject a collapsible section.
+  const allFindings = studyRun.findings as Array<
+    Finding & {
+      suppressed?: boolean;
+      suppressedBy?: { ruleId: string; category: string; reason: string };
+    }
+  >;
+  const suppressedFindings = allFindings.filter((f) => f.suppressed);
+  const activeFindings = allFindings.filter((f) => !f.suppressed);
+
+  let finalHtml = html;
+  if (suppressedFindings.length > 0) {
+    finalHtml = injectSuppressedSection(html, suppressedFindings, activeFindings.length);
+  }
+
   const reportPath = join(evidenceDir, "report.html");
   const relativeReportPath = `missions/${missionId}/evidence/axiom/report.html`;
 
   if (!dryRun) {
-    await writeFileIfChanged(reportPath, html);
+    await writeFileIfChanged(reportPath, finalHtml);
   }
 
-  const findings = studyRun.findings;
-  const total = findings.length;
+  const total = activeFindings.length;
   const closureSatisfied = capsule.closureDecision.satisfied;
 
-  const findingsCount = countFindingsBySeverity(findings);
+  const findingsCount = countFindingsBySeverity(activeFindings);
   const errors = findingsCount.critical + findingsCount.high;
 
   const nextSteps: KernelNextStep[] =
@@ -517,7 +608,7 @@ export async function runAxiomReport(
   };
 
   if (dryRun) {
-    data.renderedFiles = { [relativeReportPath]: html };
+    data.renderedFiles = { [relativeReportPath]: finalHtml };
   }
 
   return {
