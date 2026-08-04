@@ -187,4 +187,6 @@ export const PACKAGES_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "yaml.parse.validate" },
   // RFC-0665: validate workshop-level methodologies config (systems/methodologies.md).
   { command: "methodologies.validate" },
+  // RFC-0684: validate workshop-level Axiom suppression config (systems/axiom-suppressions.yaml).
+  { command: "suppressions.validate" },
 ];
