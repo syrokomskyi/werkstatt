@@ -1,7 +1,7 @@
 ---
 id: RFC-0691
 title: "Add html-attribute-pattern check kind and Editframe time model invariants"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
