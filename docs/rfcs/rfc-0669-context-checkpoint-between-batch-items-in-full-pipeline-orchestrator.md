@@ -242,14 +242,14 @@ A new Site OS command (e.g., `session.checkpoint`) that tracks context usage and
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Context checkpoint between batch items section
-- [ ] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` Process section (step 1) references the checkpoint convention
-- [ ] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit
-- [ ] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit
-- [ ] Checkpoint block format documented with YAML example (completed, status, commits, lessons, dependencies, next)
-- [ ] Resume logic documented: scan for `--- checkpoint ---` markers, verify via git log
-- [ ] `forge.doctor` passes with zero stale skill copies after sync
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Context checkpoint between batch items section (evidence: packages/forge/skills/_shared/fo-pipeline-conventions.md:121)
+- [x] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` Process section (step 1) references the checkpoint convention (evidence: packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md:57)
+- [x] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit (evidence: commit c507455, .agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md:57)
+- [x] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit (evidence: commit c507455, .agents/skills/_shared/fo-pipeline-conventions.md:121)
+- [x] Checkpoint block format documented with YAML example (completed, status, commits, lessons, dependencies, next) (evidence: docs/rfcs/rfc-0669-context-checkpoint-between-batch-items-in-full-pipeline-orchestrator.md:168-182)
+- [x] Resume logic documented: scan for `--- checkpoint ---` markers, verify via git log (evidence: docs/rfcs/rfc-0669-context-checkpoint-between-batch-items-in-full-pipeline-orchestrator.md:185-193)
+- [x] `forge.doctor` passes with zero stale skill copies after sync (evidence: forge.doctor output — 0 fail, 2 warn, exitCode: 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0669 — status: pass, 0 violations)
 
 ## Implementation notes for agents
 
