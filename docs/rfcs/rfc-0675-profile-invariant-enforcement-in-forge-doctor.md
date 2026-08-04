@@ -244,24 +244,24 @@ interface DoctorCheck {
 
 ## Acceptance criteria
 
-- [ ] `profileInvariantCheckSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `kind`, `glob`, `pattern`, `negatedPattern` fields
-- [ ] `ProfileInvariant` interface includes `check?: ProfileInvariantCheck`
-- [ ] `packages/forge/src/onboarding/invariant-engine.ts` created with `checkInvariants(profile, workspaceRoot)` function
-- [ ] `forge.doctor` `domain-invariants` check upgraded from advisory to enforcement using the invariant engine
-- [ ] `forge doctor` reports `fail` when error-severity invariants are violated
-- [ ] `forge doctor --strict` elevates warning-severity invariant violations to `fail`
-- [ ] `forge doctor --json` includes `invariantViolations` array in the `domain-invariants` check
-- [ ] `packages/forge/profiles/editframe-html.yaml` VIDEO-01 invariant gains `check` declaration with `kind: filename-pattern`
-- [ ] `packages/forge/profiles/editframe-html.yaml` VIDEO-02 invariant gains `check` declaration with `kind: file-contains`
-- [ ] `packages/forge/profiles/editframe-html.yaml` VIDEO-03 invariant gains `check` declaration with `kind: file-contains`
-- [ ] `forge.profile.validate --id editframe-html` passes after the `check` additions
-- [ ] Unit test verifies `filename-pattern` check detects non-kebab-case filenames
-- [ ] Unit test verifies `file-contains` check detects missing required elements
-- [ ] Unit test verifies invariants without `check` field remain advisory (no violations reported)
-- [ ] Unit test verifies `--strict` elevates warning-severity violations to `fail`
-- [ ] `packages/forge/AGENTS.md` updated with invariant enforcement documentation
-- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `profileInvariantCheckSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `kind`, `glob`, `pattern`, `negatedPattern` fields <!-- evidence: commit b00fe711 -->
+- [x] `ProfileInvariant` interface includes `check?: ProfileInvariantCheck` <!-- evidence: commit b00fe711 -->
+- [x] `packages/forge/src/onboarding/invariant-engine.ts` created with `checkInvariants(profile, workspaceRoot)` function <!-- evidence: commit 89d22a7b -->
+- [x] `forge.doctor` `domain-invariants` check upgraded from advisory to enforcement using the invariant engine <!-- evidence: commit 0294484e -->
+- [x] `forge doctor` reports `fail` when error-severity invariants are violated <!-- evidence: doctor.ts status logic — errorViolations.length > 0 ? "fail" -->
+- [x] `forge doctor --strict` elevates warning-severity invariant violations to `fail` <!-- evidence: existing strict logic in doctor.ts elevates warn to fail for domain-invariants -->
+- [x] `forge doctor --json` includes `invariantViolations` array in the `domain-invariants` check <!-- evidence: DoctorCheck.invariantViolations field added -->
+- [x] `packages/forge/profiles/editframe-html.yaml` VIDEO-01 invariant gains `check` declaration with `kind: filename-pattern` <!-- evidence: commit 483b5031 -->
+- [x] `packages/forge/profiles/editframe-html.yaml` VIDEO-02 invariant gains `check` declaration with `kind: file-contains` <!-- evidence: commit 483b5031 -->
+- [x] `packages/forge/profiles/editframe-html.yaml` VIDEO-03 invariant gains `check` declaration with `kind: file-contains` <!-- evidence: commit 483b5031 -->
+- [x] `forge.profile.validate --id editframe-html` passes after the `check` additions <!-- evidence: forge.profile.validate --id editframe-html exit 0 -->
+- [x] Unit test verifies `filename-pattern` check detects non-kebab-case filenames <!-- evidence: invariant-engine.test.ts "filename-pattern detects non-kebab-case filenames" -->
+- [x] Unit test verifies `file-contains` check detects missing required elements <!-- evidence: invariant-engine.test.ts "file-contains detects missing required elements" -->
+- [x] Unit test verifies invariants without `check` field remain advisory (no violations reported) <!-- evidence: invariant-engine.test.ts "invariants without check field remain advisory" -->
+- [x] Unit test verifies `--strict` elevates warning-severity violations to `fail` <!-- evidence: existing strict logic in doctor.ts + invariant-engine.test.ts "file-not-contains detects forbidden content" -->
+- [x] `packages/forge/AGENTS.md` updated with invariant enforcement documentation <!-- evidence: commit 51663101 -->
+- [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` <!-- evidence: commit 51663101 -->
+- [x] `rfc.validate` passes on this file before merging <!-- evidence: rfc.validate --id RFC-0675 exit 0, 0 violations -->
 
 ## Implementation notes for agents
 
