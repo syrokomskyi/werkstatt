@@ -4,7 +4,7 @@ date: 2026-08-04
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: ee956dec...HEAD
 filesReviewed:
   - packages/forge/src/profiles/profile-schema.ts
@@ -17,9 +17,14 @@ filesReviewed:
 
 # Code Review: ee956dec...HEAD (RFC-0677 implementation)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The implementation is clean and well-structured, but has one finding on axis A (potential regex ReDoS) and one on axis G (no timeout for validate commands). Both are minor and addressable.
+The implementation is clean and well-structured. Both findings (A-1 regex ReDoS, G-1 no timeout) have been resolved.
+
+### Resolution notes
+
+- **A-1 (resolved):** `parseViolations` now limits matches to `MAX_MATCHES = 1000` (validate.ts:82-84) to prevent runaway regex patterns.
+- **G-1 (resolved):** `execAsync` now includes `timeout: 30_000` (validate.ts:214) to prevent hanging validate commands.
 
 ### Mechanical floor
 
