@@ -1,7 +1,7 @@
 ---
 id: RFC-0692
 title: "Editframe composition skill pack: ef-composition-review and ef-render-verify"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
