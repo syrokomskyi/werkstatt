@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>Migrated from duplicated mission-check.ts + axiom-report.ts to @syrokomskyi/axiom-factory-app programmatic API.</item>
   <item>Review fix: removed capsule/studyRun fields from MissionCheckResult (AxiomCheckResult does not provide them); added --no-report flag for optional report.html generation.</item>
+  <item>RFC-0668: add Chromium pre-flight check via ensureChromium (RFC-0647) before runAxiomCheck to fail fast on missing browser instead of wasting capture time.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -35,6 +36,7 @@ import {
 } from "@syrokomskyi/axiom-factory-app/run/report";
 
 import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
+import { ensureChromium } from "./playwright-chromium-ensure.ts";
 
 import type { StagedCapsule } from "@syrokomskyi/axiom-capture";
 import type { StudyRun, ObservationBundle } from "@syrokomskyi/axiom-study";
@@ -227,6 +229,11 @@ export async function runMissionCheck(
 
   let result: AxiomCheckResult;
   try {
+    // RFC-0668: Chromium pre-flight check — verify browser is installed before
+    // starting captures. Reuses ensureChromium from RFC-0647. If auto-install
+    // fails, the catch block below returns exitCode 2 (infrastructure error).
+    await ensureChromium(workspaceRoot, logger);
+
     result = await runAxiomCheck({
       baseUrl,
       auditId: missionId,

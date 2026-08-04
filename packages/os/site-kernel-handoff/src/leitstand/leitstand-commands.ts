@@ -22,6 +22,7 @@
   <item>RFC-0656: switch distTreeHash from mode: "byte" to mode: "stable" for deterministic hashing of non-deterministic build artifacts.</item>
   <item>RFC-0657: replace single-fetch verifyFreshness with retry loop (5 attempts, exponential backoff 3s/6s/12s/24s); remove fixed 6s sleep after purge; add attempts field to FreshnessResult.</item>
   <item>RFC-0665: add methodologies.validate pre-flight to dev-deploy; fail fast on invalid methodologies config before build+deploy cycle.</item>
+  <item>RFC-0668: wrap mission.check call with 15-min per-attempt timeout (MISSION_CHECK_TIMEOUT_MS) and one-time retry on infrastructure errors (exit 2 or any non-0/non-1); pass --max-duration to mission.check; worst-case total 30 min with retry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -146,6 +147,91 @@ function resolveConventionSecretsPath(
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// RFC-0668: Timeout and retry resilience for mission.check in leitstand.dev-deploy.
+const MISSION_CHECK_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes, per-attempt
+const MISSION_CHECK_MAX_RETRIES = 1;
+
+class MissionCheckTimeoutError extends Error {
+  constructor(ms: number) {
+    super(`mission.check timed out after ${ms}ms`);
+    this.name = "MissionCheckTimeoutError";
+  }
+}
+
+async function withMissionCheckTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new MissionCheckTimeoutError(ms)), ms),
+    ),
+  ]);
+}
+
+// RFC-0668: Wrap mission.check with per-attempt timeout and one-time retry on
+// infrastructure errors (exit code 2 or any non-0/non-1). Content violations
+// (exit 1) are not retried — they indicate real site issues.
+async function runMissionCheckWithResilience(
+  workspaceRoot: string,
+  missionId: string,
+  channelUrl: string,
+  commitSha: string,
+  logger: { info: (m: string) => void; warn: (m: string) => void },
+): Promise<{ exitCode: number; data?: Record<string, unknown> }> {
+  const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+
+  for (let attempt = 0; attempt <= MISSION_CHECK_MAX_RETRIES; attempt++) {
+    try {
+      const result = (await withMissionCheckTimeout(
+        executeKernelCommand({
+          workspaceRoot,
+          commandName: "mission.check",
+          argv: [
+            `--mission=${missionId}`,
+            "--external-preview",
+            `--base-url=${channelUrl}`,
+            `--commit-sha=${commitSha}`,
+            `--max-duration=${MISSION_CHECK_TIMEOUT_MS}`,
+          ],
+        }),
+        MISSION_CHECK_TIMEOUT_MS,
+      )) as { exitCode?: number; data?: Record<string, unknown> };
+
+      const exitCode = result.exitCode ?? 0;
+
+      // Exit 0 = pass, exit 1 = content violations — return to caller, no retry
+      if (exitCode === 0 || exitCode === 1) {
+        return { exitCode, data: result.data };
+      }
+
+      // Exit 2 = infrastructure error, 3+ = unexpected, 137 = signal kill — retry once
+      if (attempt < MISSION_CHECK_MAX_RETRIES) {
+        logger.info(
+          `[leitstand.dev-deploy] mission.check infrastructure error (exit ${exitCode}, attempt ${attempt + 1}/${MISSION_CHECK_MAX_RETRIES + 1}), retrying...`,
+        );
+        continue;
+      }
+
+      // Retry exhausted
+      return { exitCode, data: result.data };
+    } catch (err) {
+      if (err instanceof MissionCheckTimeoutError) {
+        // Timeout is not retryable — a hung process indicates a deeper issue
+        throw err;
+      }
+      // Unexpected throw from executeKernelCommand — treat as infrastructure error, retry once
+      if (attempt < MISSION_CHECK_MAX_RETRIES) {
+        logger.info(
+          `[leitstand.dev-deploy] mission.check threw (attempt ${attempt + 1}/${MISSION_CHECK_MAX_RETRIES + 1}), retrying...`,
+        );
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  throw new Error("mission.check failed after retry");
 }
 
 // RFC-0649 / RFC-0657: Result of CDN freshness verification.
@@ -919,18 +1005,17 @@ export async function runLeitstandDevDeploy(
 
   if (result.state === "succeeded") {
     try {
-      const { executeKernelCommand } = await import("@warpgogol/site-kernel");
-      const axiomResult = (await executeKernelCommand({
+      // RFC-0668: Wrap mission.check with 15-min per-attempt timeout and one-time retry
+      // on infrastructure errors (exit 2 or any non-0/non-1). Content violations (exit 1)
+      // are not retried.
+      const axiomResult = await runMissionCheckWithResilience(
         workspaceRoot,
-        commandName: "mission.check",
-        argv: [
-          `--mission=${missionId}`,
-          "--external-preview",
-          `--base-url=${channelConfig.url}`,
-          `--commit-sha=${commitSha}`,
-        ],
-      })) as { exitCode?: number; data?: Record<string, unknown> };
-      axiomExitCode = axiomResult.exitCode ?? 0;
+        missionId,
+        channelConfig.url,
+        commitSha,
+        logger,
+      );
+      axiomExitCode = axiomResult.exitCode;
       if (axiomExitCode === 0) {
         axiomStatus = "pass";
       } else {
