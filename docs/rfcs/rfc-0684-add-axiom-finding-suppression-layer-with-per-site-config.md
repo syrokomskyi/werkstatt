@@ -70,7 +70,6 @@ nonGoals:
   - "Does not modify Axiom CLI internals — suppression is a post-filter in the Werkstatt adapter, not in the external tool"
   - "Does not suppress findings from methodologies that are inactive via methodologies config (RFC-0665 handles that)"
   - "Does not introduce a new DNA invariant — satisfies existing DNA-49 and DNA-59"
-  - "Does not re-apply suppressions in leitstand.propagate — it only respects the `suppressed: true` flag already in evidence. Pre-suppression evidence requires re-running leitstand.dev-deploy."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -125,7 +124,7 @@ The Werkstatt gains a two-level Axiom finding suppression layer: a post-filter i
 
 ## Architectural fit
 
-- **DNA-49 (Fleet propagation):** `leitstand.propagate` and `leitstand.dev-deploy` rely on the Axiom gate. This RFC ensures the gate is not blocked by false positives, making the propagation gate meaningful rather than noisy. Suppressions are applied consistently in both `mission.check` and `leitstand.propagate`.
+- **DNA-49 (Fleet propagation):** `leitstand.propagate` and `leitstand.dev-deploy` rely on the Axiom gate. This RFC ensures the gate is not blocked by false positives, making the propagation gate meaningful rather than noisy. Suppressions are applied in `mission.check` (post-filter after `runAxiomCheck`) and re-applied in `leitstand.propagate` when reading `study-run.json` — this handles pre-suppression evidence that lacks `suppressed` flags without requiring a re-run of `leitstand.dev-deploy`.
 - **DNA-59 (Evidence preservation):** Suppressed findings are NOT removed from evidence files. They are marked `suppressed: true` with a reference to the matching rule. The append-only archive remains complete; the suppression layer only affects gate decisions and counts.
 - **RFC-0665 (Methodologies config):** Orthogonal. Methodologies config controls which instruments are active and their `blockOn` severity thresholds. Suppressions control which findings from active instruments are false positives for the pipeline context. A methodology can be active and still have some of its findings suppressed.
 - **RFC-0667 (Boundary adapter pattern):** The suppression post-filter lives in the same `axiom-adapter.ts` boundary layer, between `runAxiomCheck()` and the finding count/closure evaluation. It does not modify the external Axiom CLI.
@@ -150,7 +149,7 @@ pnpm exec site-kernel run mission.check \
 `--channel` accepts `dev | alt | main`. Callers that already know the channel pass it explicitly:
 
 - `leitstand.dev-deploy` passes `--channel dev` to `mission.check` (it calls `mission.check` via `executeKernelCommand`)
-- `leitstand.propagate` does NOT call `mission.check` — it reads `study-run.json` directly. It skips findings already marked `suppressed: true` when evaluating `isBlockingFinding`. No `--channel` flag needed on `leitstand.propagate` itself.
+- `leitstand.propagate` does NOT call `mission.check` — it reads `study-run.json` directly. It re-applies suppressions via `applySuppressions` (imported from `@warpgogol/site-kernel-checks/suppressions-config` subpath export) to handle pre-suppression evidence, then skips findings marked `suppressed: true` when evaluating `isBlockingFinding`. No `--channel` flag needed on `leitstand.propagate` itself — the channel is determined from the release context (`alt` for propagate, `main` for promote).
 - Manual invocations default to `main` if omitted (backward compatibility)
 
 ### TypeScript contracts
@@ -233,7 +232,8 @@ export async function runSuppressionsValidate(
 | `packages/os/site-kernel-checks/src/suppressions-config.ts` | Zod schemas, loader, merger, post-filter function |
 | `packages/os/site-kernel-checks/src/suppressions-validate.ts` | `suppressions.validate` command handler |
 | `packages/os/site-kernel-checks/src/axiom-adapter.ts` | Modified: calls `applySuppressions` after `runAxiomCheck`, adds `--channel` flag |
-| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Modified: `leitstand.propagate` applies suppressions when reading study-run.json |
+| `packages/os/site-kernel-checks/package.json` | Modified: add subpath export `./suppressions-config` for cross-package import from `@warpgogol/site-kernel-handoff` |
+| `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Modified: `leitstand.propagate` re-applies suppressions via `applySuppressions` when reading `study-run.json`; `leitstand.dev-deploy` passes `--channel dev` to `mission.check` |
 | `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` | Modified: add `--channel` flag to mission.check command table entry |
 
 ### Output format
@@ -332,14 +332,14 @@ suppressions:
 - **`mission.check` with invalid suppression config** logs a warning and proceeds without suppressions (fail-open). This prevents a config error from blocking the pipeline.
 - **`mission.check` without `--channel`** defaults to `main` — suppression rules with `channelNot: main` do not fire. This is backward-compatible behavior.
 - **Per-site suppressions complement workshop defaults** — if a per-site file exists, its rules are merged after workshop rules. Per-site rules can ADD new suppressions (for ruleIds or conditions not covered by workshop rules) but cannot REMOVE workshop-level suppressions. A per-site rule with the same `ruleId` + conditions as a workshop rule is a no-op (already suppressed). A per-site rule with different conditions can only suppress additional findings.
-- **Pre-suppression evidence** — `leitstand.propagate` rejects evidence that predates RFC-0665 (missing `methodologies[]` field). The same pattern applies here: if `study-run.json` findings lack `suppressed` flags, they are treated as active. Operators must re-run `leitstand.dev-deploy` (which calls `mission.check` with suppressions) to produce current evidence. This is forward-only — no re-application of suppressions in `leitstand.propagate`.
+- **Pre-suppression evidence** — `leitstand.propagate` re-applies suppressions when reading `study-run.json`: it imports `applySuppressions` from `@warpgogol/site-kernel-checks/suppressions-config` via subpath export, loads workshop + workpiece suppression configs, and marks findings as `suppressed: true` before evaluating `isBlockingFinding`. This handles old evidence that lacks `suppressed` flags without requiring a re-run of `leitstand.dev-deploy`.
 - **`axiom.report` rendering** — suppressed findings are rendered in a separate collapsible "Suppressed Findings" section, visually de-emphasized (greyed out). The report header includes a suppression summary count. Active findings are rendered as before. This does not change the exit code (axiom.report always exits 0).
 
 ## Rollout
 
 - **Default behavior on introduction:** `systems/axiom-suppressions.yaml` is created with the four default rules. `mission.check` applies suppressions automatically when the config file exists. No opt-in flag required.
 - **Backward compatibility:** `mission.check` without `--channel` defaults to `main`. Existing callers that do not pass `--channel` will not trigger channel-based suppressions (e.g. `channelNot: main` rules do not fire on `main`). This preserves current behavior for production deployments.
-- **Caller updates:** `leitstand.dev-deploy` is updated to pass `--channel dev` to `mission.check` in the same implementation commit. `leitstand.propagate` is updated to skip findings marked `suppressed: true` when evaluating `isBlockingFinding` — it does not call `mission.check` and does not need a `--channel` flag. No grace period needed.
+- **Caller updates:** `leitstand.dev-deploy` is updated to pass `--channel dev` to `mission.check` in the same implementation commit. `leitstand.propagate` is updated to re-apply suppressions via `applySuppressions` imported from `@warpgogol/site-kernel-checks/suppressions-config` (subpath export) when reading `study-run.json` — this handles pre-suppression evidence without requiring a re-run. No grace period needed.
 - **`suppressions.validate` in pipeline:** Added to `mission.validate` pipeline (after `methodologies.validate`). This catches config errors before mission close.
 - **New sites:** Automatically benefit from workshop-level defaults. Per-site overrides are optional and only needed when a site has unique false-positive patterns.
 - **No deprecation:** This RFC does not deprecate or supersede any existing command. It adds a new command and modifies existing ones additively.
