@@ -1,14 +1,16 @@
 ---
 id: RFC-0682
 title: "Cross-platform test fixes in packages/forge"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -63,6 +65,7 @@ Running `pnpm test` in `packages/forge` on Windows fails because:
 `execSync("git add . && git commit -m 'initial'")` fails on Windows `cmd.exe` — `&&` is not a valid command separator. Node.js `execSync` uses `cmd.exe` as the default shell on Windows.
 
 **Affected files:**
+
 - `src/tests/migration-adapters.test.ts` — lines 283, 343
 
 ### Inline env vars
@@ -70,6 +73,7 @@ Running `pnpm test` in `packages/forge` on Windows fails because:
 `execSync('GIT_AUTHOR_DATE="..." GIT_COMMITTER_DATE="..." git commit ...')` fails on Windows — inline env var assignment before a command is POSIX shell syntax, not `cmd.exe` syntax.
 
 **Affected files:**
+
 - `os/adr/handlers/validate.test.ts` — lines 58-61
 - `os/rfc/handlers/validate-rules.test.ts` — lines 315-318
 
@@ -78,6 +82,7 @@ Running `pnpm test` in `packages/forge` on Windows fails because:
 Tests use `"/tmp/test/..."` as mock path values. On Windows, `path.join` and `path.dirname` produce backslash-separated paths, causing assertions like `expect(result).toBe("/tmp/test/file.archive.md")` to fail.
 
 **Affected files:**
+
 - `os/rfc/handlers/validate-rules.test.ts` — lines 117, 237, 257, 280, 300, 395
 - `os/rfc/handlers/lifecycle.test.ts` — lines 45, 65, 85, 105, 125, 145
 - `src/tests/promote.test.ts` — line 52
@@ -103,11 +108,13 @@ All three categories of POSIX-only patterns are replaced with cross-platform equ
 ### Pattern 1: Shell chaining → separate calls
 
 Before:
+
 ```ts
 execSync("git add . && git commit -m 'initial'", { cwd: sourceDir, stdio: "pipe" });
 ```
 
 After:
+
 ```ts
 execSync("git add .", { cwd: sourceDir, stdio: "pipe" });
 execSync("git commit -m initial", { cwd: sourceDir, stdio: "pipe" });
@@ -116,6 +123,7 @@ execSync("git commit -m initial", { cwd: sourceDir, stdio: "pipe" });
 ### Pattern 2: Inline env vars → execFileSync with env option
 
 Before:
+
 ```ts
 execSync(
   `GIT_AUTHOR_DATE="${c.date}" GIT_COMMITTER_DATE="${c.date}" git commit --allow-empty -m "${c.message}"`,
@@ -124,6 +132,7 @@ execSync(
 ```
 
 After:
+
 ```ts
 execFileSync(
   "git",
@@ -140,6 +149,7 @@ execFileSync(
 ### Pattern 3: Hardcoded `/tmp/` → os.tmpdir() + path.join
 
 Before:
+
 ```ts
 path: "/tmp/test/learned-principles.md",
 // ...
@@ -147,6 +157,7 @@ expect(plans[0].archiveFile).toBe("/tmp/test/qa-log.archive.md");
 ```
 
 After:
+
 ```ts
 import { tmpdir } from "node:os";
 const testDir = join(tmpdir(), "test");
@@ -159,11 +170,13 @@ expect(plans[0].archiveFile).toBe(join(testDir, "qa-log.archive.md"));
 For workspace root placeholders in validation tests (where the path is used as a string label, not for file I/O):
 
 Before:
+
 ```ts
 const violations = await runValidateInDir(parsed, "/tmp/test-workspace");
 ```
 
 After:
+
 ```ts
 const violations = await runValidateInDir(parsed, join(tmpdir(), "test-workspace"));
 ```
@@ -188,18 +201,18 @@ const violations = await runValidateInDir(parsed, join(tmpdir(), "test-workspace
 
 ## Acceptance criteria
 
-- [ ] No `execSync` call in `packages/forge` tests uses `&&` shell chaining
-- [ ] No `execSync` call in `packages/forge` tests uses inline env var assignment (`VAR="value" command`)
-- [ ] No test file in `packages/forge` hardcodes `/tmp/` as a path prefix
-- [ ] `os/adr/handlers/validate.test.ts` uses `execFileSync` with `env` option for `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`
-- [ ] `os/rfc/handlers/validate-rules.test.ts` uses `execFileSync` with `env` option for `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE`
-- [ ] `src/tests/migration-adapters.test.ts` splits `git add . && git commit` into separate calls
-- [ ] `src/tests/compact.test.ts` uses `os.tmpdir()` and `path.join()` for mock paths and assertions
-- [ ] `src/tests/budgets.test.ts` uses `os.tmpdir()` and `path.join()` for mock paths and assertions
-- [ ] `src/tests/promote.test.ts` uses `os.tmpdir()` and `path.join()` for mock paths
-- [ ] `os/rfc/handlers/lifecycle.test.ts` uses `os.tmpdir()` for workspace root placeholders
-- [ ] `pnpm --filter @warpgogol/forge test` passes on Linux (regression check)
-- [ ] `rfc.validate` passes on this RFC
+- [x] No `execSync` call in `packages/forge` tests uses `&&` shell chaining (evidence: grep search — no results)
+- [x] No `execSync` call in `packages/forge` tests uses inline env var assignment (`VAR="value" command`) (evidence: grep search — no results)
+- [x] No test file in `packages/forge` hardcodes `/tmp/` as a path prefix (evidence: grep search — no results)
+- [x] `os/adr/handlers/validate.test.ts` uses `execFileSync` with `env` option for `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` (evidence: validate.test.ts:58-63)
+- [x] `os/rfc/handlers/validate-rules.test.ts` uses `execFileSync` with `env` option for `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` (evidence: validate-rules.test.ts:317-322)
+- [x] `src/tests/migration-adapters.test.ts` splits `git add . && git commit` into separate calls (evidence: grep — no `&&` found)
+- [x] `src/tests/compact.test.ts` uses `os.tmpdir()` and `path.join()` for mock paths and assertions (evidence: grep — no `/tmp/` found)
+- [x] `src/tests/budgets.test.ts` uses `os.tmpdir()` and `path.join()` for mock paths and assertions (evidence: grep — no `/tmp/` found)
+- [x] `src/tests/promote.test.ts` uses `os.tmpdir()` and `path.join()` for mock paths (evidence: grep — no `/tmp/` found)
+- [x] `os/rfc/handlers/lifecycle.test.ts` uses `os.tmpdir()` for workspace root placeholders (evidence: lifecycle.test.ts:8)
+- [x] `pnpm --filter @warpgogol/forge test` passes on Linux (regression check) (evidence: 610 tests passed)
+- [x] `rfc.validate` passes on this RFC (evidence: rfc.validate — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
