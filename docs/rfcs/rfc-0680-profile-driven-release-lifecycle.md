@@ -1,7 +1,7 @@
 ---
 id: RFC-0680
 title: "Profile-driven release lifecycle"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -151,17 +153,20 @@ export const stackProfileDomainFieldsSchema = z.object({
 forge release prepare
 forge release prepare --dry-run
 forge release prepare --json
+forge release prepare --profile editframe-html
 
 # Publish a prepared release to the declared target
 forge release publish
 forge release publish --dry-run
 forge release publish --json
+forge release publish --profile editframe-html
 ```
 
 ### TypeScript contracts
 
 ```ts
 interface ReleaseManifest {
+  schemaVersion: string;
   releaseId: string;
   profileId: string;
   version: string;
@@ -196,9 +201,9 @@ interface ForgeReleasePublishResult {
 ### Release preparation algorithm
 
 1. Resolve the active profile from `forge.yaml`.
-2. Run `forge.validate.artifacts` (RFC-0677) — if any error-severity violations, abort.
+2. Run `forge.validate` (RFC-0677) — if any error-severity violations, abort.
 3. Run `forge.determinism.check` (RFC-0678) — record `determinismChecked` and per-artifact `deterministic` status.
-4. For each artifact in `release.includeArtifacts` (or all artifacts if not declared): a. Locate the built output file(s) matching `artifacts[].extensions`. b. Hash the output file(s) using `@warpgogol/fingerprint` `byteHashFile`. c. Record path, hash, size in the manifest.
+4. For each artifact in `release.includeArtifacts` (or all artifacts with `produce.output` if not declared): a. Locate the built output file(s) matching `artifacts[].extensions`. b. Hash the output file(s) using `@warpgogol/fingerprint` `byteHashFile`. c. Record path, hash, size in the manifest.
 5. Generate `releaseId` as `<profileId>-<timestamp>-<shortHash>`.
 6. Write `release-manifest.json` to `release.outputDir`.
 7. Copy artifact files to `release.outputDir`.
@@ -208,8 +213,8 @@ interface ForgeReleasePublishResult {
 1. Read `release-manifest.json` from `release.outputDir`.
 2. Based on `release.target`:
    - `local`: copy files to `release.outputDir/published/` (no-op if already there).
-   - `r2`: upload files to R2 using `@warpgogol/fingerprint` R2 client (requires `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` env vars).
-   - `s3`: upload files to S3 (requires `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` env vars).
+   - `r2`: upload files to R2 using `@aws-sdk/client-s3` (R2 is S3-compatible; requires `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` env vars).
+   - `s3`: upload files to S3 using `@aws-sdk/client-s3` (requires `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_ENDPOINT` env vars).
 3. Upload the manifest file last.
 4. Report published file paths.
 
@@ -235,6 +240,7 @@ interface ForgeReleasePublishResult {
   "profileId": "editframe-html",
   "releaseDir": "release",
   "manifest": {
+    "schemaVersion": "1",
     "releaseId": "editframe-html-20260804-abc123",
     "profileId": "editframe-html",
     "version": "1.0.0",
@@ -289,13 +295,17 @@ interface ForgeReleasePublishResult {
 ## Acceptance criteria
 
 - [ ] `profileReleaseSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `target`, `outputDir`, `manifestName`, `includeArtifacts`, `r2` fields
+- [ ] `release` field added to `stackProfileDomainFieldsSchema` and `StackProfileDomainFields` interface
+- [ ] `@aws-sdk/client-s3` declared as dependency in `packages/forge/package.json` for R2/S3 uploads
 - [ ] `forge.release.prepare` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags
 - [ ] `forge.release.publish` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags
-- [ ] `ReleaseManifest`, `ForgeReleasePrepareResult`, `ForgeReleasePublishResult` interfaces defined
+- [ ] `ReleaseManifest`, `ForgeReleasePrepareResult`, `ForgeReleasePublishResult` interfaces defined with `schemaVersion` field
 - [ ] `forge release prepare --dry-run` prints the resolved release steps without executing
 - [ ] `forge release prepare --json` reports artifact hashes, validation status, and determinism status
 - [ ] `forge release prepare` aborts when validation fails (error-severity violations)
+- [ ] `forge release prepare` reads `version` from `package.json` `version` field
 - [ ] `forge release prepare` records `determinismChecked` and per-artifact `deterministic` status
+- [ ] `forge release prepare` includes `schemaVersion: "1"` in manifest
 - [ ] `forge release publish --dry-run` prints the resolved publish target and file list
 - [ ] `forge release publish --json` reports published file paths
 - [ ] `forge release publish` exits 1 when R2/S3 env vars are missing
