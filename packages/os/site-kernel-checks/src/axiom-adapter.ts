@@ -39,6 +39,13 @@ import {
 } from "@syrokomskyi/axiom-factory-app/run/report";
 
 import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
+import {
+  loadWorkshopSuppressions,
+  loadWorkpieceSuppressions,
+  mergeSuppressions,
+  applySuppressions,
+  countSuppressedByCategory,
+} from "./suppressions-config.ts";
 import { ensureChromium } from "./playwright-chromium-ensure.ts";
 
 import { parse as parseYaml } from "yaml";
@@ -48,6 +55,11 @@ import { parse as parseYaml } from "yaml";
 export { renderAxiomReportHtml, type EvidenceMetadata };
 
 // ─── Types ─────────────────────────────────────────────────────────────────
+
+export interface SuppressionSummary {
+  totalSuppressed: number;
+  byCategory: Record<string, number>;
+}
 
 export interface MissionCheckResult {
   command: "mission.check";
@@ -65,6 +77,7 @@ export interface MissionCheckResult {
   evidenceDir: string;
   summary: string;
   nextSteps: string[];
+  suppressionSummary?: SuppressionSummary;
 }
 
 export interface AxiomReportData {
@@ -144,8 +157,6 @@ function missionCheckFailResult(
   };
 }
 
-// ─── mission.check adapter ─────────────────────────────────────────────────
-
 export async function runMissionCheck(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -170,6 +181,17 @@ export async function runMissionCheck(
 
   const commitSha = input.flags["commit-sha"] as string | undefined;
   const baseUrl = baseUrlFlag.replace(/\/$/, "");
+
+  // RFC-0684: --channel flag for suppression context
+  const channelRaw = input.flags["channel"] as string | undefined;
+  const channel = channelRaw ?? "main";
+  if (channel !== "dev" && channel !== "alt" && channel !== "main") {
+    return missionCheckFailResult(
+      "",
+      1,
+      `mission.check: Invalid --channel value '${channel}'. Expected 'dev', 'alt', or 'main'.`,
+    );
+  }
 
   const runTimestampFlag = input.flags["run-timestamp"] as string | undefined;
   let runTimestamp: string;
@@ -264,30 +286,98 @@ export async function runMissionCheck(
     return missionCheckFailResult(evidenceDir, 2, `mission.check: ${msg}`);
   }
 
-  const summary = `mission.check: ${result.status} — ${result.findings.total} finding(s), ${result.findings.errors} blocking, ${result.findings.warnings} warning(s)${!result.closureDecision.satisfied ? ", closure blocked" : ""}`;
+  // RFC-0684: Apply suppression post-filter after runAxiomCheck writes evidence files.
+  // Read study-run.json, apply suppressions, write it back with suppressed flags,
+  // then recalculate counts excluding suppressed findings.
+  let suppressionSummary: SuppressionSummary | undefined;
+  let activeFindingsCount = result.findingsCount;
+  let activeFindingsTotals = result.findings;
+  let activeClosureDecision = result.closureDecision;
+
+  const studyRunPath = join(evidenceDir, "study-run.json");
+  if (existsSync(studyRunPath)) {
+    try {
+      const studyRunContent = readFileSync(studyRunPath, "utf-8");
+      const studyRun = JSON.parse(studyRunContent) as {
+        findings?: Array<Record<string, unknown>>;
+      };
+
+      if (studyRun.findings && Array.isArray(studyRun.findings)) {
+        const workshopSuppressions = loadWorkshopSuppressions(workspaceRoot);
+        const workpieceSuppressions = loadWorkpieceSuppressions(missionDir);
+        const mergedRules = mergeSuppressions(workshopSuppressions, workpieceSuppressions);
+
+        if (mergedRules.length > 0) {
+          const suppressedFindings = applySuppressions(studyRun.findings as never[], mergedRules, {
+            channel,
+          });
+
+          // Write updated study-run.json with suppressed flags
+          const updatedStudyRun = { ...studyRun, findings: suppressedFindings };
+          await writeFileIfChanged(studyRunPath, JSON.stringify(updatedStudyRun, null, 2));
+
+          // Calculate suppression summary
+          suppressionSummary = countSuppressedByCategory(suppressedFindings as never[]);
+
+          // Recalculate counts excluding suppressed findings
+          const activeFindings = suppressedFindings.filter(
+            (f) => !(f as { suppressed?: boolean }).suppressed,
+          );
+          activeFindingsCount = countFindingsBySeverity(activeFindings as never[]);
+          const activeErrors = activeFindingsCount.critical + activeFindingsCount.high;
+          const activeWarnings = activeFindingsCount.medium + activeFindingsCount.low;
+          activeFindingsTotals = {
+            errors: activeErrors,
+            warnings: activeWarnings,
+            total: activeFindings.length,
+          };
+
+          // Recalculate closure decision on active findings only
+          activeClosureDecision = {
+            ...result.closureDecision,
+            satisfied: activeErrors === 0 ? result.closureDecision.satisfied : false,
+          };
+
+          if (suppressionSummary.totalSuppressed > 0) {
+            logger.info(
+              `  Suppressions: ${suppressionSummary.totalSuppressed} finding(s) suppressed across ${Object.keys(suppressionSummary.byCategory).length} category(s)`,
+            );
+          }
+        }
+      }
+    } catch (err) {
+      // Fail-open: log warning and proceed without suppressions
+      logger.warn(
+        `  Suppression post-filter failed: ${err instanceof Error ? err.message : String(err)}. Proceeding without suppressions.`,
+      );
+    }
+  }
+
+  const summary = `mission.check: ${result.status} — ${activeFindingsTotals.total} finding(s)${suppressionSummary ? `, ${suppressionSummary.totalSuppressed} suppressed` : ""}, ${activeFindingsTotals.errors} blocking, ${activeFindingsTotals.warnings} warning(s)${!activeClosureDecision.satisfied ? ", closure blocked" : ""}`;
 
   const checkResult: MissionCheckResult = {
     command: "mission.check",
-    status: result.status,
-    exitCode: result.exitCode,
-    findingsCount: result.findingsCount,
-    findings: result.findings,
-    closureDecision: result.closureDecision,
+    status: activeFindingsTotals.errors > 0 ? "fail" : result.status,
+    exitCode: activeFindingsTotals.errors > 0 ? 1 : result.exitCode,
+    findingsCount: activeFindingsCount,
+    findings: activeFindingsTotals,
+    closureDecision: activeClosureDecision,
     evidenceDir,
     summary,
     nextSteps: [],
+    ...(suppressionSummary ? { suppressionSummary } : {}),
   };
 
   logger.info(
-    `  Findings: ${result.findings.total} (${result.findings.errors} blocking, ${result.findings.warnings} warnings)`,
+    `  Findings: ${activeFindingsTotals.total} (${activeFindingsTotals.errors} blocking, ${activeFindingsTotals.warnings} warnings)`,
   );
-  logger.info(`  Closure: ${result.closureDecision.status} — ${result.closureDecision.reason}`);
+  logger.info(`  Closure: ${activeClosureDecision.status} — ${activeClosureDecision.reason}`);
   logger.info(`  Evidence: ${evidenceDir}`);
   logger.info(`  Duration: ${result.durationMs}ms`);
 
   return {
     data: checkResult,
-    exitCode: result.exitCode,
+    exitCode: checkResult.exitCode,
     summary,
   };
 }

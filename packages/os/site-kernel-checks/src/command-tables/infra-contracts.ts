@@ -380,6 +380,11 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
         description:
           "Skip report.html generation (axiom.report is auto-invoked separately in leitstand.dev-deploy).",
       },
+      channel: {
+        kind: "string",
+        description:
+          "RFC-0684: Deployment channel for suppression context (dev|alt|main). Defaults to main. Controls which suppression rules fire (e.g. channelNot: main rules only fire on non-main channels).",
+      },
       "cache-dir": {
         kind: "string",
         description:
