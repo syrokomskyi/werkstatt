@@ -1,7 +1,7 @@
 ---
 id: RFC-0689
 title: "Invalidate Axiom cache and regenerate behavior snapshot in leitstand.dev-deploy"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
