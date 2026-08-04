@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 5dc69b0d925068e705c7ecd8cd5cf6225d2d914ee24958d1e553d2dadec56dbb
+  contentHash: 27f56858ce982b2a92e57fa9b6f0bee6673261d8663d241b8203ae88bfac19d3
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -4841,6 +4841,52 @@ commands:
     reads:
       - packages/forge/profiles/*.yaml
     writes: []
+    pipelines: []
+  - name: forge.release.prepare
+    description: Bundle built artifacts into a release package with a manifest. Use
+      --dry-run to preview without writing.
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      dry-run:
+        kind: boolean
+        description: Print the resolved release steps without executing.
+      profile:
+        kind: string
+        description: Override the active profile id.
+    reads:
+      - forge.yaml
+      - packages/forge/profiles/*.yaml
+      - dist/**
+    writes:
+      - release/**
+    pipelines: []
+  - name: forge.release.publish
+    description: Publish a prepared release to the declared target (local, R2, S3).
+      Use --dry-run to preview without uploading.
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      dry-run:
+        kind: boolean
+        description: Print the resolved publish target and file list without uploading.
+      profile:
+        kind: string
+        description: Override the active profile id.
+    reads:
+      - forge.yaml
+      - packages/forge/profiles/*.yaml
+      - release/**
+    writes:
+      - release/published/**
     pipelines: []
   - name: forge.scaffold
     description: Create a working pnpm + Turborepo monorepo from a stack profile in

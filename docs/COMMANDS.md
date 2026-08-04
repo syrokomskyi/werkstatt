@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 677. Raw manifest entries: 677.
+Generated command rows: 679. Raw manifest entries: 679.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -275,6 +275,8 @@ Generated command rows: 677. Raw manifest entries: 677.
 | `forge.port.scaffold` | workspace | workspace | no | no | Generate a skeleton for a new forge skill or command. |
 | `forge.port.validate` | workspace | workspace | no | no | Validate a single ported skill or command for compliance with forge contracts. |
 | `forge.profile.validate` | workspace | workspace | no | no | Validate profile YAML files under packages/forge/profiles/ against the stack-profile schema (RFC-0640). |
+| `forge.release.prepare` | workspace | workspace | no | no | Bundle built artifacts into a release package with a manifest. Use --dry-run to preview without writing. |
+| `forge.release.publish` | workspace | workspace | no | no | Publish a prepared release to the declared target (local, R2, S3). Use --dry-run to preview without uploading. |
 | `forge.scaffold` | workspace | workspace | no | no | Create a working pnpm + Turborepo monorepo from a stack profile in an empty directory. |
 | `forge.skill.knowledge.compact` | workspace | workspace | no | no | Compact skill knowledge files: archive expired/superseded/aged L0 entries, mark stale L2 principles. Usage: forge.skill.knowledge.compact --all-skills [--dry-run] [--json] \| --skill <name> [--dry-run] [--json] |
 | `forge.skill.list` | workspace | workspace | no | no | List all registered forge skills. |
