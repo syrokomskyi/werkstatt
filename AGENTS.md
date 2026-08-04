@@ -26,6 +26,10 @@ This repository uses **Git LFS** for media files. Ensure `git lfs install` has b
 
 Tracked patterns (legacy from `apps/**`, retained for historical content): `apps/**/*.mp4`, `apps/**/*.webm`, `apps/**/*.png`, `apps/**/*.jpg`, `apps/**/*.jpeg`, `apps/**/*.webp`. New site media should be colocated under `missions/*/workpiece/public/**` or `systems/<id>/public/**`.
 
+## .gitignore anchoring
+
+When adding a `.gitignore` pattern that targets a **top-level** directory or file (e.g. `agents/`, `missions/`, `notausgang-*`), always anchor it with a leading `/` (e.g. `/agents/`, `/notausgang-*`). Without the leading `/`, git treats the pattern as matching any path component at any depth — so `agents/` blocks `docs/agents/` and `packages/os/site-kernel-changelog/src/changelog/agents/` too. This caused 11 source files to be silently excluded from commits (discovered 2026-08-04).
+
 ## Forge project configuration (RFC-0391)
 
 `forge.yaml` at the repository root is the machine-readable project configuration for `@warpgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects.
