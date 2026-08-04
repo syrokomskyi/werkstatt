@@ -1,0 +1,32 @@
+suppressions:
+  # Category A: Dev vs Prod canonical/sitemap (226 findings)
+  - ruleId: seo-runtime.canonical-mismatch
+    category: channel-mismatch
+    channelNot: main
+    reason: "Canonical URL points to production domain; scanning non-production channel"
+  - ruleId: seo-runtime.missing-from-sitemap
+    category: channel-mismatch
+    channelNot: main
+    reason: "Sitemap entries point to production domain; scanning non-production channel"
+
+  # Category B: Non-HTML resources (4 findings)
+  - ruleId: seo-runtime.meta-missing
+    category: non-html-resource
+    contentType: [".json", ".txt"]
+    reason: "Non-HTML resource checked for HTML metadata"
+  - ruleId: seo-runtime.structured-data-missing
+    category: non-html-resource
+    contentType: [".json", ".txt"]
+    reason: "Non-HTML resource checked for structured data"
+
+  # Category C: Browser deprecation warnings (448 findings)
+  - ruleId: runtime-health.console-error
+    category: browser-deprecation
+    messagePattern: "Deprecated API for given entry type"
+    reason: "Chromium Performance API deprecation warning, not site code"
+
+  # Category D: Render-blocking CSS (112 findings)
+  - ruleId: performance-vitals.render-blocking
+    category: render-blocking-css
+    descriptionPattern: "preload"
+    reason: "Standard Astro CSS preload pattern, not a real render-blocking issue"

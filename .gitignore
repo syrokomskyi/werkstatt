@@ -267,6 +267,7 @@ apps/*/src/agent-capabilities.generated.yaml
 systems/*
 !systems/registry.yaml
 !systems/methodologies.md
+!systems/axiom-suppressions.yaml
 missions/
 releases/
 /agents/
