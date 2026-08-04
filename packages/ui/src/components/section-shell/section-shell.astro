@@ -126,7 +126,7 @@ const inlineStyle =
   data-motion-stagger={staggerDelay !== undefined ? "true" : undefined}
   data-motion-stagger-delay={staggerDelay !== undefined ? String(staggerDelay) : undefined}
   data-motion-stagger-child={staggerChild}
-  id={sectionId}
+  id={sectionId ? (sectionNumber ? `${sectionNumber}-${sectionId}` : sectionId) : undefined}
   aria-label={ariaLabel}
   aria-labelledby={ariaLabelledBy
     ? sectionNumber

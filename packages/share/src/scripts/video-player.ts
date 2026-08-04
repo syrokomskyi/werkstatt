@@ -18,6 +18,8 @@
 </CHANGE_SUMMARY>
 */
 
+import "plyr/dist/plyr.css";
+
 export interface VideoPlayersOptions {
   prefersReducedMotion?: boolean;
 }
@@ -68,7 +70,6 @@ async function upgrade(video: HTMLVideoElement): Promise<void> {
   // Brand the UI with Plyr (the native controls remain the fallback if this fails).
   try {
     const { default: Plyr } = await import("plyr");
-    await import("plyr/dist/plyr.css");
     const player = new Plyr(video, {
       controls: [
         "play-large",
