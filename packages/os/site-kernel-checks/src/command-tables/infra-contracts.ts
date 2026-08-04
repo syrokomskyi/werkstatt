@@ -370,6 +370,11 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
         kind: "string",
         description: "Override max crawl depth (default 3).",
       },
+      "per-host-concurrency": {
+        kind: "string",
+        description:
+          "Max concurrent page captures per host (1-8, default 8). Axiom enforces a hard cap of 8.",
+      },
       locales: {
         kind: "string",
         description:

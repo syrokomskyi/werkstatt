@@ -252,6 +252,7 @@ export async function runMissionCheck(
   const maxDurationRaw = input.flags["max-duration"];
   const maxUrlsRaw = input.flags["max-urls"];
   const maxDepthRaw = input.flags["max-depth"];
+  const perHostConcurrencyRaw = input.flags["per-host-concurrency"];
 
   let result: AxiomCheckResult;
   try {
@@ -277,6 +278,9 @@ export async function runMissionCheck(
       ...(maxDepthRaw !== undefined && !Number.isNaN(Number(maxDepthRaw))
         ? { maxDepth: Number(maxDepthRaw) }
         : {}),
+      ...(perHostConcurrencyRaw !== undefined && !Number.isNaN(Number(perHostConcurrencyRaw))
+        ? { perHostConcurrency: Number(perHostConcurrencyRaw) }
+        : { perHostConcurrency: 8 }),
       ...(cacheDirRaw ? { cacheDir: String(cacheDirRaw) } : {}),
       ...(noCache ? { noCache: true } : {}),
       report: !noReport,
