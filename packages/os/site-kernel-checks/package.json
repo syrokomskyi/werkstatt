@@ -49,6 +49,10 @@
     "./result-helpers": {
       "types": "./src/result-helpers.ts",
       "default": "./src/result-helpers.ts"
+    },
+    "./suppressions-config": {
+      "types": "./src/suppressions-config.ts",
+      "default": "./src/suppressions-config.ts"
     }
   },
   "files": ["src"],
