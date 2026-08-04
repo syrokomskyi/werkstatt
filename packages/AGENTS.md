@@ -172,10 +172,10 @@ Compass source-file markup (`MODULE_CONTRACT` + `CHANGE_SUMMARY`, two-block cont
 Use these commands to apply or remove Compass markup across packages (RFC-0015):
 
 ```sh
-pnpm exec site-kernel run compass.annotate --packages
-pnpm exec site-kernel run compass.clear --packages
-pnpm exec site-kernel run compass.markup.migrate --packages   # v1 → v2 migration (RFC-0348)
-pnpm exec site-kernel run compass.invariant.add --file <path> --text "<invariant>"  # RFC-0351
+rtk pnpm exec site-kernel run compass.annotate --packages
+rtk pnpm exec site-kernel run compass.clear --packages
+rtk pnpm exec site-kernel run compass.markup.migrate --packages   # v1 → v2 migration (RFC-0348)
+rtk pnpm exec site-kernel run compass.invariant.add --file <path> --text "<invariant>"  # RFC-0351
 ```
 
 `compass.annotate` is now deterministic (RFC-0350): it inserts `TODO(compass)` sentinel skeletons, not LLM-generated content. Fill the sentinels manually or via an agent. `compass.landmarks` has been removed (RFC-0350).
