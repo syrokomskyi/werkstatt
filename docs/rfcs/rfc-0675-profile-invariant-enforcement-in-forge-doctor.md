@@ -1,7 +1,7 @@
 ---
 id: RFC-0675
 title: "Profile invariant enforcement in forge.doctor"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -223,7 +225,7 @@ interface DoctorCheck {
 
 - **Changed command**: `forge.doctor` — the `domain-invariants` check is upgraded from advisory to enforcement.
 - **Backward compatibility**: invariants without a `check` field remain advisory. Existing profiles without `check` declarations are unaffected — `forge.doctor` continues to list them as `pass`.
-- **`editframe-html` profile update**: VIDEO-01 gains `check: { kind: "filename-pattern", glob: "compositions/**/*.html", pattern: "^[a-z0-9-]+\\.html$" }`. VIDEO-02 and VIDEO-03 gain appropriate `file-contains` checks.
+- **`editframe-html` profile update**: VIDEO-01 gains `check: { kind: "filename-pattern", glob: "compositions/**/*.{html,tsx}", pattern: "^[a-z0-9-]+\\.(html|tsx)$" }`. VIDEO-02 and VIDEO-03 gain appropriate `file-contains` checks.
 - **No migration**: existing Forge consumers without profile invariants are unaffected.
 - **Integration**: `forge.doctor` remains a standalone diagnostic command — it is NOT automatically added to any pipeline.
 
@@ -250,6 +252,7 @@ interface DoctorCheck {
 - [ ] `forge doctor --strict` elevates warning-severity invariant violations to `fail`
 - [ ] `forge doctor --json` includes `invariantViolations` array in the `domain-invariants` check
 - [ ] `packages/forge/profiles/editframe-html.yaml` VIDEO-01 invariant gains `check` declaration with `kind: filename-pattern`
+- [ ] `packages/forge/profiles/editframe-html.yaml` VIDEO-02 invariant gains `check` declaration with `kind: file-contains`
 - [ ] `packages/forge/profiles/editframe-html.yaml` VIDEO-03 invariant gains `check` declaration with `kind: file-contains`
 - [ ] `forge.profile.validate --id editframe-html` passes after the `check` additions
 - [ ] Unit test verifies `filename-pattern` check detects non-kebab-case filenames
@@ -261,6 +264,10 @@ interface DoctorCheck {
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
+
+### Testability
+
+The invariant engine (`checkInvariants`) is a pure function taking a `StackProfile` and `workspaceRoot` string. Unit tests create temp directories with sample files (e.g. `My Video.html` for kebab-case violations) and verify violations are detected. The `filename-pattern` and `file-contains` check kinds use Node.js `fs.readdirSync` and `fs.readFileSync` — no mocking needed, just temp directory setup/teardown. Invariants without a `check` field produce no violations, verified by omitting `check` from test profile data.
 
 <!-- Rules that govern how AI agents interact with this RFC.
      Be explicit. Agents read this section for behavioral policy.
