@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -62,9 +63,10 @@ successSignals:
 nonGoals:
   - "Hardcoding any domain-specific command names (editframe, remotion, ffmpeg) in Forge source"
   - "Profile invariant enforcement (deferred to RFC-0675)"
-  - "Determinism verification (deferred to RFC-0677)"
-  - "Asset management (deferred to RFC-0678)"
-  - "Release lifecycle (deferred to RFC-0679)"
+  - "Artifact validation structured reporting (deferred to RFC-0677)"
+  - "Determinism verification (deferred to RFC-0678)"
+  - "Asset management (deferred to RFC-0679)"
+  - "Release lifecycle (deferred to RFC-0680)"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -232,7 +234,7 @@ interface ForgeValidateResult {
 | `packages/forge/os/core/core.module.ts` | Registers `forge.dev`, `forge.build`, `forge.validate` |
 | `packages/forge/os/core/handlers/dev.ts` | New — `forge.dev` handler |
 | `packages/forge/os/core/handlers/build.ts` | New — `forge.build` handler |
-| `packages/forge/os/core/handlers/validate-artifacts.ts` | New — `forge.validate` handler |
+| `packages/forge/os/core/handlers/validate.ts` | New — `forge.validate` handler |
 | `packages/forge/profiles/editframe-html.yaml` | Updated with `devServer` declaration |
 
 ### Output format
@@ -273,7 +275,7 @@ interface ForgeValidateResult {
 - **Profile has no `artifacts`**: `forge build` on a profile without `artifacts` → exit 1 with message "Profile <id> does not declare any artifacts".
 - **Artifact has no `produce` command**: `forge build` skips artifacts without `produce` and logs a warning.
 - **Command execution fails**: child process exits non-zero → `forge build`/`forge.validate` exits with the same code, reports stderr in `--json` output.
-- **`forge dev` is long-running**: the command starts the dev server and streams stdout/stderr to the terminal. Ctrl+C terminates the child process. `--json` output is emitted only on exit.
+- **`forge dev` is long-running**: the command starts the dev server and streams stdout/stderr to the terminal. Ctrl+C (SIGINT) terminates the child process with exit code 130 (128 + SIGINT(2), standard Unix convention). `--json` output is emitted only on exit.
 
 ## Rollout
 
@@ -316,6 +318,10 @@ interface ForgeValidateResult {
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
+
+### Testability
+
+Lifecycle handlers use `child_process.exec` (or `spawn`) for command execution. Unit tests mock `node:child_process` via `vi.mock("node:child_process", ...)` — the same pattern used in `os/rfc/acceptance.ts` tests. The `--dry-run` flag provides a test path that never invokes child processes, so dry-run tests can verify command resolution without mocking.
 
 <!-- Rules that govern how AI agents interact with this RFC.
      Be explicit. Agents read this section for behavioral policy.
