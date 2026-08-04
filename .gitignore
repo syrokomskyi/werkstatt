@@ -269,11 +269,11 @@ systems/*
 !systems/methodologies.md
 missions/
 releases/
-agents/
+/agents/
 .werkstatt/
 
 # RFC-0381: Notausgang export packages are artifacts, not source code
-notausgang-*
+/notausgang-*
 
 # RFC lock state (local operator state, not shared)
 .rfc-locks
