@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -51,6 +52,7 @@ commands:
   changed:
     - mission.check
     - axiom.report
+    - leitstand.dev-deploy
     - leitstand.propagate
   removed: []
 appsImpacted: []
@@ -67,6 +69,7 @@ nonGoals:
   - "Does not modify Axiom CLI internals — suppression is a post-filter in the Werkstatt adapter, not in the external tool"
   - "Does not suppress findings from methodologies that are inactive via methodologies config (RFC-0665 handles that)"
   - "Does not introduce a new DNA invariant — satisfies existing DNA-49 and DNA-59"
+  - "Does not re-apply suppressions in leitstand.propagate — it only respects the `suppressed: true` flag already in evidence. Pre-suppression evidence requires re-running leitstand.dev-deploy."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -145,8 +148,8 @@ pnpm exec site-kernel run mission.check \
 
 `--channel` accepts `dev | alt | main`. Callers that already know the channel pass it explicitly:
 
-- `leitstand.dev-deploy` passes `--channel dev`
-- `leitstand.propagate` passes `--channel alt` or `--channel main`
+- `leitstand.dev-deploy` passes `--channel dev` to `mission.check` (it calls `mission.check` via `executeKernelCommand`)
+- `leitstand.propagate` does NOT call `mission.check` — it reads `study-run.json` directly. It skips findings already marked `suppressed: true` when evaluating `isBlockingFinding`. No `--channel` flag needed on `leitstand.propagate` itself.
 - Manual invocations default to `main` if omitted (backward compatibility)
 
 ### TypeScript contracts
@@ -156,6 +159,7 @@ pnpm exec site-kernel run mission.check \
 
 export const suppressionRuleSchema = z.object({
   ruleId: z.string().min(1),
+  category: z.string().min(1),
   // Mutually exclusive condition fields — at least one must be present
   channel: z.enum(["dev", "alt", "main"]).optional(),
   channelNot: z.enum(["dev", "alt", "main"]).optional(),
@@ -183,12 +187,7 @@ export function mergeSuppressions(
   workpiece: SuppressionsConfig | undefined,
 ): SuppressionRule[];
 
-// Post-filter function — marks findings in-place
-export interface SuppressionMatch {
-  ruleIndex: number;
-  rule: SuppressionRule;
-}
-
+// Post-filter function — returns a new array with suppressed findings marked
 export function applySuppressions(
   findings: Finding[],
   rules: SuppressionRule[],
@@ -197,15 +196,21 @@ export function applySuppressions(
 ```
 
 ```ts
-// Finding shape after suppression (in evidence files)
+// New fields added to the existing Finding type from @syrokomskyi/axiom-factory-app
+// These are added by applySuppressions() — the existing fields are untouched.
+interface SuppressedBy {
+  ruleIndex: number;
+  ruleId: string;
+  category: string;
+  reason: string;
+}
+
+// Augmented Finding shape (suppressed + suppressedBy are optional, added only
+// when a suppression rule matches)
 interface Finding {
-  // ... existing fields ...
+  // ... all existing fields from AxiomCheckResult.findings[] ...
   suppressed?: boolean;
-  suppressedBy?: {
-    ruleIndex: number;
-    ruleId: string;
-    reason: string;
-  };
+  suppressedBy?: SuppressedBy;
 }
 ```
 
@@ -289,43 +294,51 @@ The RFC ships `systems/axiom-suppressions.yaml` with these defaults:
 suppressions:
   # Category A: Dev vs Prod canonical/sitemap (226 findings)
   - ruleId: seo-runtime.canonical-mismatch
+    category: channel-mismatch
     channelNot: main
     reason: "Canonical URL points to production domain; scanning non-production channel"
   - ruleId: seo-runtime.missing-from-sitemap
+    category: channel-mismatch
     channelNot: main
     reason: "Sitemap entries point to production domain; scanning non-production channel"
 
   # Category B: Non-HTML resources (4 findings)
   - ruleId: seo-runtime.meta-missing
+    category: non-html-resource
     contentType: [".json", ".txt"]
     reason: "Non-HTML resource checked for HTML metadata"
   - ruleId: seo-runtime.structured-data-missing
+    category: non-html-resource
     contentType: [".json", ".txt"]
     reason: "Non-HTML resource checked for structured data"
 
   # Category C: Browser deprecation warnings (448 findings)
   - ruleId: runtime-health.console-error
+    category: browser-deprecation
     messagePattern: "Deprecated API for given entry type"
     reason: "Chromium Performance API deprecation warning, not site code"
 
   # Category D: Render-blocking CSS (112 findings)
   - ruleId: performance-vitals.render-blocking
+    category: render-blocking-css
     descriptionPattern: "preload"
     reason: "Standard Astro CSS preload pattern, not a real render-blocking issue"
 ```
 
 ### Failure modes
 
-- **`suppressions.validate` exits 1** on schema violations, unknown ruleId patterns (warns), invalid regex in patterns, or conflicting rules (same ruleId + same conditions). Warnings do not block.
+- **`suppressions.validate` exits 1** on schema violations, invalid regex in patterns, or conflicting rules (same ruleId + same conditions). Warns on unknown ruleId patterns — the list of known rule IDs is collected from the most recent `study-run.json` in any mission evidence directory. If no evidence exists, rule ID validation is skipped.
 - **`mission.check` with invalid suppression config** logs a warning and proceeds without suppressions (fail-open). This prevents a config error from blocking the pipeline.
 - **`mission.check` without `--channel`** defaults to `main` — suppression rules with `channelNot: main` do not fire. This is backward-compatible behavior.
-- **Per-site suppressions override workshop defaults** — if a per-site file exists, its rules are merged after workshop rules. Per-site rules can narrow but not widen workshop suppressions (a per-site rule cannot un-suppress what the workshop suppresses).
+- **Per-site suppressions complement workshop defaults** — if a per-site file exists, its rules are merged after workshop rules. Per-site rules can ADD new suppressions (for ruleIds or conditions not covered by workshop rules) but cannot REMOVE workshop-level suppressions. A per-site rule with the same `ruleId` + conditions as a workshop rule is a no-op (already suppressed). A per-site rule with different conditions can only suppress additional findings.
+- **Pre-suppression evidence** — `leitstand.propagate` rejects evidence that predates RFC-0665 (missing `methodologies[]` field). The same pattern applies here: if `study-run.json` findings lack `suppressed` flags, they are treated as active. Operators must re-run `leitstand.dev-deploy` (which calls `mission.check` with suppressions) to produce current evidence. This is forward-only — no re-application of suppressions in `leitstand.propagate`.
+- **`axiom.report` rendering** — suppressed findings are rendered in a separate collapsible "Suppressed Findings" section, visually de-emphasized (greyed out). The report header includes a suppression summary count. Active findings are rendered as before. This does not change the exit code (axiom.report always exits 0).
 
 ## Rollout
 
 - **Default behavior on introduction:** `systems/axiom-suppressions.yaml` is created with the four default rules. `mission.check` applies suppressions automatically when the config file exists. No opt-in flag required.
 - **Backward compatibility:** `mission.check` without `--channel` defaults to `main`. Existing callers that do not pass `--channel` will not trigger channel-based suppressions (e.g. `channelNot: main` rules do not fire on `main`). This preserves current behavior for production deployments.
-- **Caller updates:** `leitstand.dev-deploy` and `leitstand.propagate` are updated to pass `--channel` in the same implementation commit. No grace period needed — the flag defaults to `main` which is the correct value for existing production deployments.
+- **Caller updates:** `leitstand.dev-deploy` is updated to pass `--channel dev` to `mission.check` in the same implementation commit. `leitstand.propagate` is updated to skip findings marked `suppressed: true` when evaluating `isBlockingFinding` — it does not call `mission.check` and does not need a `--channel` flag. No grace period needed.
 - **`suppressions.validate` in pipeline:** Added to `mission.validate` pipeline (after `methodologies.validate`). This catches config errors before mission close.
 - **New sites:** Automatically benefit from workshop-level defaults. Per-site overrides are optional and only needed when a site has unique false-positive patterns.
 - **No deprecation:** This RFC does not deprecate or supersede any existing command. It adds a new command and modifies existing ones additively.
