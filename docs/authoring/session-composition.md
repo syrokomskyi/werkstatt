@@ -83,6 +83,7 @@ Moves session files older than `--max-age-days` (default 7) to `docs/sessions/ar
 ### `session.validate`
 
 Checks session files for:
+
 - **SES-01:** Required frontmatter fields present (`id`, `date`, `types`)
 - **SES-02:** `id` matches filename
 - **SES-03:** `relatedRfcs` reference existing RFC files
@@ -92,6 +93,7 @@ Checks session files for:
 ### `session.list`
 
 Lists all session files (active + archived) with filtering:
+
 - `--date-from YYYY-MM-DD`, `--date-to YYYY-MM-DD`
 - `--rfc RFC-NNNN`
 - `--type <type>`
@@ -111,9 +113,16 @@ After exporting, run `session.save` to convert the raw file to structured markdo
 pnpm exec site-kernel run session.save
 ```
 
+### Windsurf (Cascade) sessions
+
+Windsurf does not have a `devin --export` CLI equivalent. Instead, the `fo-session-retro` skill (Step 0) constructs a raw ATIF file from the agent's context window and writes it to `docs/sessions/.raw/` before running `session.save`. This is a best-effort reconstruction — the agent includes as much of the conversation as it can recall from its context, with sensitive information redacted and long tool outputs truncated.
+
+The session-end sequence for Windsurf is: `fo-doc-audit` → `fo-session-retro` (includes Step 0: transcript save) → `fo-handoff`.
+
 ## fo-session-save skill
 
 The `fo-session-save` skill (in `packages/forge/skills/fo/fo-session-save/`) provides intelligent annotation:
+
 - Generates semantic `summary`, `decisions`, and `relatedArtifacts`
 - Refines auto-detected `types`
 - Verifies auto-extracted metadata and fixes false positives
