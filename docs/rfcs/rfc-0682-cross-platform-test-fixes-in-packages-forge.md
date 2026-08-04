@@ -1,7 +1,7 @@
 ---
 id: RFC-0682
 title: "Cross-platform test fixes in packages/forge"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
 enhancedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
