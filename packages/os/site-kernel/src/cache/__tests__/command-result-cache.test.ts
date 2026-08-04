@@ -14,6 +14,7 @@ import {
 } from "../command-result-cache.ts";
 import { NoopCacheLayer } from "../noop-cache-layer.ts";
 import type { KernelExecutionReport } from "../../types.ts";
+import { buildWorkspaceTreeIndex, filterTreeIndex } from "../workspace-tree-index.ts";
 
 function makeReport(overrides: Partial<KernelExecutionReport> = {}): KernelExecutionReport {
   return {
@@ -70,7 +71,7 @@ describe("computeInputsHash", () => {
     const ws = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
     const h1 = await computeInputsHash([], ws, ws);
     const h2 = await computeInputsHash([], ws, ws);
-    expect(h1).toBe(h2);
+    expect(h1.hash).toBe(h2.hash);
   });
 
   test("hash changes when file content changes", async () => {
@@ -80,7 +81,7 @@ describe("computeInputsHash", () => {
     const h1 = await computeInputsHash(["input.md"], ws, ws);
     await fs.writeFile(filePath, "content v2");
     const h2 = await computeInputsHash(["input.md"], ws, ws);
-    expect(h1).not.toBe(h2);
+    expect(h1.hash).not.toBe(h2.hash);
   });
 
   test("hash is stable for unchanged content", async () => {
@@ -89,7 +90,7 @@ describe("computeInputsHash", () => {
     await fs.writeFile(filePath, "stable content");
     const h1 = await computeInputsHash(["input.md"], ws, ws);
     const h2 = await computeInputsHash(["input.md"], ws, ws);
-    expect(h1).toBe(h2);
+    expect(h1.hash).toBe(h2.hash);
   });
 
   test("glob patterns match multiple files", async () => {
@@ -97,10 +98,10 @@ describe("computeInputsHash", () => {
     await fs.writeFile(path.join(ws, "a.md"), "a");
     await fs.writeFile(path.join(ws, "b.md"), "b");
     const h1 = await computeInputsHash(["*.md"], ws, ws);
-    expect(h1).toBeTruthy();
+    expect(h1.hash).toBeTruthy();
     await fs.writeFile(path.join(ws, "c.md"), "c");
     const h2 = await computeInputsHash(["*.md"], ws, ws);
-    expect(h1).not.toBe(h2);
+    expect(h1.hash).not.toBe(h2.hash);
   });
 });
 

@@ -15,6 +15,7 @@ helpers for storing and retrieving KernelExecutionReport objects in the
 <CHANGE_SUMMARY>
   <item>RFC-0390: initial implementation — COMMAND_RESULT_CACHE_NAMESPACE, CommandResultCacheKey, buildCommandResultCacheKey, computeInputsHash, computeModuleHash, getCachedCommandResult, setCachedCommandResult.</item>
   <item>RFC-0637: add modulePaths parameter to computeModuleHash for granular per-command module hashing.</item>
+  <item>RFC-0685: add tree index support to expandGlobs, byte-mode selection per extension in computeInputsHash, inputsMetadata sidecar in cache entries, wrapper format for getCachedCommandResult/setCachedCommandResult.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,6 +30,8 @@ import { fingerprintFile, fingerprintTree } from "@warpgogol/fingerprint/semanti
 
 import type { CacheLayer } from "./cache-layer.ts";
 import type { KernelExecutionReport } from "../types.ts";
+import type { WorkspaceTreeIndex } from "./workspace-tree-index.ts";
+import { filterTreeIndex } from "./workspace-tree-index.ts";
 
 export const COMMAND_RESULT_CACHE_NAMESPACE = "command_results";
 export const COMMAND_RESULT_CACHE_SCHEMA_VERSION = 1;
@@ -39,6 +42,28 @@ export interface CommandResultCacheKey {
   siteName: string | null;
   inputsHash: string;
   moduleHash: string;
+}
+
+export interface InputsMetadataEntry {
+  path: string;
+  mtimeMs: number;
+  size: number;
+}
+
+export interface CachedCommandResultEntry {
+  report: KernelExecutionReport;
+  inputsMetadata?: InputsMetadataEntry[];
+  inputsHash?: string;
+}
+
+const BYTE_MODE_EXTENSIONS = new Set([".md", ".yaml", ".yml", ".json", ".jsonc", ".txt"]);
+
+const SEMANTIC_MODE_EXTENSIONS = new Set([".ts", ".tsx", ".astro", ".css", ".js", ".mjs"]);
+
+function selectFingerprintMode(absPath: string): "byte" | "semantic" {
+  const ext = absPath.slice(absPath.lastIndexOf(".")).toLowerCase();
+  if (SEMANTIC_MODE_EXTENSIONS.has(ext)) return "semantic";
+  return "byte";
 }
 
 /**
@@ -69,13 +94,19 @@ function resolvePattern(pattern: string, baseDir: string, workspaceRoot: string)
 
 /**
  * Expand picomatch globs relative to the workspace root and return matching
- * absolute file paths.
+ * absolute file paths. When a tree index is provided, filters in-memory
+ * instead of walking the filesystem (RFC-0685).
  */
 async function expandGlobs(
   patterns: string[],
   baseDir: string,
   workspaceRoot: string,
+  treeIndex?: WorkspaceTreeIndex,
 ): Promise<string[]> {
+  if (treeIndex) {
+    return filterTreeIndex(treeIndex, patterns, baseDir, workspaceRoot);
+  }
+
   const resolvedPatterns = patterns.map((p) => resolvePattern(p, baseDir, workspaceRoot));
   const isMatch = picomatch(resolvedPatterns, { dot: true, nocase: false });
   const matched = new Set<string>();
@@ -106,8 +137,9 @@ async function expandGlobs(
 
 /**
  * Compute a deterministic hash of all files matching the declared `reads`
- * patterns. Uses @warpgogol/fingerprint semantic mode for supported file types
- * and byte mode for others. Returns a stable composite hash.
+ * patterns. Uses @warpgogol/fingerprint semantic mode for source file types
+ * and byte mode for content files. Returns a stable composite hash and
+ * the metadata array for mtime fast path (RFC-0685).
  *
  * Returns a constant hash for empty `reads` (should not be called with empty
  * reads in practice — the pipeline executor checks cacheable/reads first).
@@ -116,19 +148,25 @@ export async function computeInputsHash(
   reads: string[],
   baseDir: string,
   workspaceRoot: string,
-): Promise<string> {
+  treeIndex?: WorkspaceTreeIndex,
+): Promise<{ hash: string; metadata: InputsMetadataEntry[] }> {
   if (reads.length === 0) {
-    return stableJsonHash({ reads: [] });
+    return { hash: stableJsonHash({ reads: [] }), metadata: [] };
   }
 
-  const files = await expandGlobs(reads, baseDir, workspaceRoot);
+  const files = await expandGlobs(reads, baseDir, workspaceRoot, treeIndex);
   const hashes: { path: string; hash: string }[] = [];
+  const metadata: InputsMetadataEntry[] = [];
   for (const abs of files) {
     const rel = toPosix(relative(workspaceRoot, abs));
-    const result = await fingerprintFile(abs, { mode: "semantic" });
+    const mode = selectFingerprintMode(abs);
+    const result = await fingerprintFile(abs, { mode });
     hashes.push({ path: rel, hash: result.hash });
+    const s = await stat(abs);
+    metadata.push({ path: rel, mtimeMs: s.mtimeMs, size: s.size });
   }
-  return stableJsonHash({ files: hashes });
+  metadata.sort((a, b) => a.path.localeCompare(b.path));
+  return { hash: stableJsonHash({ files: hashes }), metadata };
 }
 
 /**
@@ -179,40 +217,67 @@ export async function computeModuleHash(
 /**
  * Retrieve a cached command result. Returns null on miss, unavailable cache,
  * or schema version mismatch. Sets `cached: true` on the returned report.
+ *
+ * RFC-0685: the cache data payload may be a wrapper
+ * { report, inputsMetadata, inputsHash } or a legacy bare KernelExecutionReport.
+ * The wrapper is detected by checking for the `report` field.
  */
 export async function getCachedCommandResult(
   cache: CacheLayer,
   key: CommandResultCacheKey,
-): Promise<KernelExecutionReport | null> {
+): Promise<CachedCommandResultEntry | null> {
   if (!cache.available) return null;
 
   const cacheKey = buildCommandResultCacheKey(key);
   const entry = await cache.get(COMMAND_RESULT_CACHE_NAMESPACE, cacheKey);
   if (!entry) return null;
 
-  const report = entry.data as KernelExecutionReport;
-  if (!report || typeof report !== "object") return null;
+  const data = entry.data;
+  if (!data || typeof data !== "object") return null;
 
-  return { ...report, cached: true };
+  // RFC-0685: detect wrapper format vs legacy bare report.
+  if ("report" in data && typeof data.report === "object") {
+    const wrapped = data as CachedCommandResultEntry;
+    if (!wrapped.report || typeof wrapped.report !== "object") return null;
+    return {
+      report: { ...wrapped.report, cached: true },
+      inputsMetadata: wrapped.inputsMetadata,
+      inputsHash: wrapped.inputsHash,
+    };
+  }
+
+  // Legacy: bare KernelExecutionReport.
+  const report = data as KernelExecutionReport;
+  if (!report.commandName) return null;
+  return { report: { ...report, cached: true } };
 }
 
 /**
  * Store a command result in the cache. Only called for successful (ok: true)
  * results — the pipeline executor must not call this for failed commands.
+ *
+ * RFC-0685: stores a wrapper { report, inputsMetadata, inputsHash } in the
+ * cache data payload to support the mtime fast path on subsequent reads.
  */
 export async function setCachedCommandResult(
   cache: CacheLayer,
   key: CommandResultCacheKey,
   report: KernelExecutionReport,
+  inputsMetadata?: InputsMetadataEntry[],
 ): Promise<void> {
   if (!cache.available) return;
 
   const cacheKey = buildCommandResultCacheKey(key);
   const mtime = Date.now();
+  const wrapper: CachedCommandResultEntry = {
+    report,
+    inputsMetadata,
+    inputsHash: key.inputsHash,
+  };
   const contentHash = stableJsonHash({
     commandName: report.commandName,
     ok: report.ok,
     exitCode: report.exitCode,
   });
-  await cache.set(COMMAND_RESULT_CACHE_NAMESPACE, cacheKey, report, mtime, contentHash);
+  await cache.set(COMMAND_RESULT_CACHE_NAMESPACE, cacheKey, wrapper, mtime, contentHash);
 }

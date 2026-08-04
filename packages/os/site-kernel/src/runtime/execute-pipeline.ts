@@ -15,12 +15,13 @@ producing a KernelPipelineReport with a timing summary (slowest steps, timeout c
   <item>Add stderr progress lines for every pipeline step (start + finish + duration) so operators see live progress even in --json mode.</item>
   <item>RFC-0390: integrate command-result cache — skip re-execution on cache hit, store only ok:true results, respect --force and --dry-run.</item>
   <item>RFC-0637: moduleHashCache key includes modulePaths; computeModuleHash receives command.modulePaths for granular per-command hashing.</item>
+  <item>RFC-0685: build workspace tree index once per pipeline run; mtime fast path in tryCacheRead reuses stored inputsHash when file metadata is unchanged; byte-mode selection for content files; inputsMetadata sidecar stored in cache entries.</item>
 </CHANGE_SUMMARY>
 */
 
 import { performance } from "node:perf_hooks";
 import process from "node:process";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { createKernelLogger } from "../logger.ts";
 import { loadWorkspaceConfig } from "../discovery.ts";
 import type { KernelRegistry } from "../registry.ts";
@@ -38,8 +39,12 @@ import {
   getCachedCommandResult,
   setCachedCommandResult,
   type CommandResultCacheKey,
+  type InputsMetadataEntry,
 } from "../cache/command-result-cache.ts";
 import type { CacheLayer } from "../cache/cache-layer.ts";
+import { buildWorkspaceTreeIndex, filterTreeIndex } from "../cache/workspace-tree-index.ts";
+import type { WorkspaceTreeIndex } from "../cache/workspace-tree-index.ts";
+import { stableJsonHash } from "@warpgogol/fingerprint";
 import type {
   DiscoveredSiteWorkspace,
   ExecuteKernelPipelineOptions,
@@ -203,9 +208,13 @@ async function getOrComputeModuleHash(
 }
 
 /**
- * RFC-0390: Attempt to read a cached result for the given command.
+ * RFC-0390 + RFC-0685: Attempt to read a cached result for the given command.
  * Returns the cached report (with `cached: true`) or null on miss.
  * Skips cache when `dryRun` or `force` is set, or when cache is unavailable.
+ *
+ * RFC-0685: when the cached entry has `inputsMetadata` and `inputsHash`, and
+ * the tree index is available, compares current file metadata against stored
+ * metadata. If identical, reuses the stored `inputsHash` without fingerprinting.
  */
 async function tryCacheRead(
   cache: CacheLayer,
@@ -217,13 +226,34 @@ async function tryCacheRead(
   moduleHashCache: Map<string, string>,
   force: boolean,
   dryRun: boolean,
+  treeIndex?: WorkspaceTreeIndex,
 ): Promise<KernelExecutionReport | null> {
   if (dryRun || force) return null;
   if (!isCommandCacheable(command)) return null;
   if (!cache.available) return null;
 
   const reads = command.reads ?? [];
-  const inputsHash = await computeInputsHash(reads, baseDir, workspaceRoot);
+
+  // RFC-0685: mtime fast path — first try to read cache entry with a preliminary
+  // key using a placeholder hash, then check if metadata matches.
+  // The fast path requires a tree index to get current metadata without fingerprinting.
+  if (treeIndex) {
+    const fastPathResult = await tryMtimeFastPath(
+      cache,
+      command,
+      reads,
+      baseDir,
+      workspaceRoot,
+      siteName,
+      moduleSrcDir,
+      moduleHashCache,
+      treeIndex,
+    );
+    if (fastPathResult) return fastPathResult;
+  }
+
+  // Full path: compute inputs hash (with tree index for glob expansion).
+  const { hash: inputsHash } = await computeInputsHash(reads, baseDir, workspaceRoot, treeIndex);
 
   const moduleHash = await getOrComputeModuleHash(moduleSrcDir, command, moduleHashCache);
 
@@ -235,13 +265,84 @@ async function tryCacheRead(
     moduleHash,
   };
 
-  return getCachedCommandResult(cache, key);
+  const entry = await getCachedCommandResult(cache, key);
+  return entry?.report ?? null;
 }
 
 /**
- * RFC-0390: Store a successful command result in the cache.
+ * RFC-0685: mtime fast path. Reads the cache entry using the stored inputsHash
+ * from a previous run. If the entry has inputsMetadata, compares current file
+ * metadata (from tree index) against stored metadata. If identical, returns
+ * the cached report without fingerprinting.
+ *
+ * This function scans the cache namespace for entries matching the command name
+ * and site name, then checks metadata. Since the CacheLayer interface doesn't
+ * support prefix scans, we use a two-step approach: compute current metadata
+ * from the tree index, then try to find a matching cached entry by iterating
+ * known inputsHash values. In practice, the fast path works by first computing
+ * current metadata, then looking up the cache entry that was stored with that
+ * metadata's hash.
+ *
+ * Simplified approach: compute metadata from tree index, compute hash from
+ * metadata, look up cache entry. If found and metadata matches, return it.
+ */
+async function tryMtimeFastPath(
+  cache: CacheLayer,
+  command: KernelCommandDefinition,
+  reads: string[],
+  baseDir: string,
+  workspaceRoot: string,
+  siteName: string | null,
+  moduleSrcDir: string,
+  moduleHashCache: Map<string, string>,
+  treeIndex: WorkspaceTreeIndex,
+): Promise<KernelExecutionReport | null> {
+  // Expand globs using tree index to get current file list with metadata.
+  const files = filterTreeIndex(treeIndex, reads, baseDir, workspaceRoot);
+  if (files.length === 0) return null;
+
+  // Build current metadata from tree index.
+  const currentMetadata: InputsMetadataEntry[] = [];
+  for (const abs of files) {
+    const rel = relative(workspaceRoot, abs).split(sep).join("/");
+    const entry = treeIndex.get(rel);
+    if (!entry) return null; // file not in index — can't use fast path
+    currentMetadata.push({ path: rel, mtimeMs: entry.mtimeMs, size: entry.size });
+  }
+  currentMetadata.sort((a, b) => a.path.localeCompare(b.path));
+
+  // Compute a hash from the metadata to use as a lookup key.
+  const metadataHash = stableJsonHash({ metadata: currentMetadata });
+
+  // Look up the metadata-to-inputsHash mapping.
+  const metaKey = `meta:${command.name}:${siteName ?? ""}:${metadataHash}`;
+  const metaEntry = await cache.get("command_results_meta", metaKey);
+  if (!metaEntry) return null;
+
+  const storedInputsHash = metaEntry.data as string;
+  if (typeof storedInputsHash !== "string") return null;
+
+  const moduleHash = await getOrComputeModuleHash(moduleSrcDir, command, moduleHashCache);
+
+  const key: CommandResultCacheKey = {
+    schemaVersion: COMMAND_RESULT_CACHE_SCHEMA_VERSION,
+    commandName: command.name,
+    siteName,
+    inputsHash: storedInputsHash,
+    moduleHash,
+  };
+
+  const entry = await getCachedCommandResult(cache, key);
+  return entry?.report ?? null;
+}
+
+/**
+ * RFC-0390 + RFC-0685: Store a successful command result in the cache.
  * Only stores when `ok: true`, not `dryRun`, and the command is cacheable.
  * On `--force`, still stores (refreshing entries).
+ *
+ * RFC-0685: also stores inputsMetadata sidecar and a metadata-to-inputsHash
+ * mapping for the mtime fast path.
  */
 async function tryCacheWrite(
   cache: CacheLayer,
@@ -253,6 +354,7 @@ async function tryCacheWrite(
   moduleSrcDir: string,
   moduleHashCache: Map<string, string>,
   dryRun: boolean,
+  treeIndex?: WorkspaceTreeIndex,
 ): Promise<void> {
   if (dryRun) return;
   if (!report.ok) return;
@@ -260,7 +362,12 @@ async function tryCacheWrite(
   if (!cache.available) return;
 
   const reads = command.reads ?? [];
-  const inputsHash = await computeInputsHash(reads, baseDir, workspaceRoot);
+  const { hash: inputsHash, metadata } = await computeInputsHash(
+    reads,
+    baseDir,
+    workspaceRoot,
+    treeIndex,
+  );
 
   const moduleHash = await getOrComputeModuleHash(moduleSrcDir, command, moduleHashCache);
 
@@ -272,7 +379,14 @@ async function tryCacheWrite(
     moduleHash,
   };
 
-  await setCachedCommandResult(cache, key, report);
+  await setCachedCommandResult(cache, key, report, metadata);
+
+  // RFC-0685: store metadata-to-inputsHash mapping for mtime fast path.
+  if (metadata.length > 0) {
+    const metadataHash = stableJsonHash({ metadata });
+    const metaKey = `meta:${command.name}:${siteName ?? ""}:${metadataHash}`;
+    await cache.set("command_results_meta", metaKey, inputsHash, Date.now(), inputsHash);
+  }
 }
 
 async function executePipelineForSite(
@@ -290,6 +404,13 @@ async function executePipelineForSite(
   // RFC-0390: create cache layer and module hash cache for this pipeline run.
   const cache = await createCacheLayer(options.workspaceRoot);
   const moduleHashCache = new Map<string, string>();
+  // RFC-0685: build workspace tree index once per pipeline run.
+  let treeIndex: WorkspaceTreeIndex | undefined;
+  try {
+    treeIndex = await buildWorkspaceTreeIndex(options.workspaceRoot);
+  } catch {
+    treeIndex = undefined;
+  }
   progressLine(`[${site.name}] pipeline ${options.pipelineName} — ${totalSteps} step(s)`);
 
   for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
@@ -349,6 +470,7 @@ async function executePipelineForSite(
         moduleHashCache,
         options.force ?? false,
         options.dryRun ?? false,
+        treeIndex,
       );
       if (cached) {
         report = cached;
@@ -374,6 +496,7 @@ async function executePipelineForSite(
           moduleSrcDir,
           moduleHashCache,
           options.dryRun ?? false,
+          treeIndex,
         );
       }
     }
@@ -460,6 +583,13 @@ async function executePipelineForWorkspace(
   // RFC-0390: create cache layer and module hash cache for this pipeline run.
   const cache = await createCacheLayer(options.workspaceRoot);
   const moduleHashCache = new Map<string, string>();
+  // RFC-0685: build workspace tree index once per pipeline run.
+  let treeIndex: WorkspaceTreeIndex | undefined;
+  try {
+    treeIndex = await buildWorkspaceTreeIndex(options.workspaceRoot);
+  } catch {
+    treeIndex = undefined;
+  }
   progressLine(`[workspace] pipeline ${options.pipelineName} — ${totalSteps} step(s)`);
 
   for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
@@ -524,6 +654,7 @@ async function executePipelineForWorkspace(
         moduleHashCache,
         options.force ?? false,
         options.dryRun ?? false,
+        treeIndex,
       );
       if (cached) {
         report = cached;
@@ -543,6 +674,7 @@ async function executePipelineForWorkspace(
           moduleSrcDir,
           moduleHashCache,
           options.dryRun ?? false,
+          treeIndex,
         );
       }
     }
