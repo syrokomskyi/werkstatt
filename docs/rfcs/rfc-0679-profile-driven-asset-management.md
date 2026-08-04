@@ -1,7 +1,7 @@
 ---
 id: RFC-0679
 title: "Profile-driven asset management"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -143,7 +145,7 @@ export const stackProfileDomainFieldsSchema = z.object({
 - `dir` — the root assets directory (e.g. `assets`)
 - `types[].id` — asset type id (e.g. `video`, `audio`, `image`, `font`)
 - `types[].extensions` — file extensions for this type (e.g. `[".mp4", ".webm"]`)
-- `types[].referencePattern` — regex to extract asset references from composition files (e.g. `src="([^"]+\.mp4)"`)
+- `types[].referencePattern` — regex to extract asset references from composition files (e.g. `src="([^"]+\.mp4)"`). Applied to raw file content. Captured groups are treated as asset paths relative to the workspace root. Composition files are discovered via `artifacts[].extensions`.
 
 ### CLI surface
 
@@ -152,11 +154,13 @@ export const stackProfileDomainFieldsSchema = z.object({
 forge assets list
 forge assets list --json
 forge assets list --type video
+forge assets list --dry-run
 
 # Check for missing, orphaned, and unreferenced assets
 forge assets check
 forge assets check --json
 forge assets check --strict
+forge assets check --dry-run
 ```
 
 ### TypeScript contracts
@@ -173,7 +177,6 @@ interface AssetEntry {
 interface AssetCheckResult {
   missing: Array<{ path: string; referencedBy: string[] }>;
   orphaned: Array<{ path: string; type: string }>;
-  hashMismatches: Array<{ path: string; expectedHash: string; actualHash: string }>;
 }
 
 interface ForgeAssetsListResult {
@@ -194,13 +197,14 @@ interface ForgeAssetsCheckResult {
 
 | Path | Role |
 | --- | --- |
-| `packages/forge/src/profiles/profile-schema.ts` | Extended with `profileAssetSchema` |
+| `packages/forge/src/profiles/profile-schema.ts` | Extended with `profileAssetSchema` and `assets` field in `stackProfileDomainFieldsSchema` |
 | `packages/forge/os/core/core.module.ts` | Registers `forge.assets.list`, `forge.assets.check` |
+| `packages/forge/os/core/handlers/assets-helpers.ts` | New — shared asset scanning and reference extraction logic |
 | `packages/forge/os/core/handlers/assets-list.ts` | New — asset listing handler |
 | `packages/forge/os/core/handlers/assets-check.ts` | New — asset checking handler |
 | `packages/forge/profiles/editframe-html.yaml` | Updated with `assets` declaration |
 | `assets/**` | Scanned for asset files |
-| `compositions/**/*.html` | Scanned for asset references |
+| `compositions/**/*.html` | Scanned for asset references (files matching `artifacts[].extensions`) |
 
 ### Output format
 
@@ -235,7 +239,6 @@ interface ForgeAssetsCheckResult {
     "orphaned": [
       { "path": "assets/audio/unused.mp3", "type": "audio" }
     ],
-    "hashMismatches": []
   },
   "allOk": false
 }
@@ -247,7 +250,7 @@ interface ForgeAssetsCheckResult {
 - **Profile has no `assets` declaration**: exit 0 with message "Profile <id> does not declare assets — nothing to check".
 - **Missing assets**: `forge.assets.check` reports `fail` (exit 1) for missing assets.
 - **Orphaned assets**: `forge.assets.check` reports `warn` by default, `fail` with `--strict`.
-- **Hash mismatches**: `forge.assets.check` reports `fail` (exit 1). Hash mismatches require a stored hash file (`.asset-hashes.json`) — if no hash file exists, this check is skipped.
+- **Hash mismatches**: deferred to a future RFC. The initial implementation does not include hash mismatch detection. The `AssetCheckResult` interface has `missing` and `orphaned` only.
 - **Composition parsing fails**: the file is skipped with a warning.
 
 ## Rollout
@@ -273,11 +276,15 @@ interface ForgeAssetsCheckResult {
 ## Acceptance criteria
 
 - [ ] `profileAssetSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `dir`, `types` fields
-- [ ] `forge.assets.list` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--type`, `--profile` flags
-- [ ] `forge.assets.check` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--strict`, `--profile` flags
+- [ ] `assets` field added to `stackProfileDomainFieldsSchema` and `StackProfileDomainFields` interface
+- [ ] `forge.assets.list` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--type`, `--profile`, `--dry-run` flags
+- [ ] `forge.assets.check` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--strict`, `--profile`, `--dry-run` flags
 - [ ] `AssetEntry`, `AssetCheckResult`, `ForgeAssetsListResult`, `ForgeAssetsCheckResult` interfaces defined
 - [ ] `forge assets list --json` lists all assets with type, size, hash, and referencedBy
-- [ ] `forge assets check --json` reports missing, orphaned, and hash mismatch results
+- [ ] `forge assets list --type <type>` filters assets by type
+- [ ] `forge assets list --dry-run` skips hashing and lists files without computing hashes
+- [ ] `forge assets check --json` reports missing and orphaned results
+- [ ] `forge assets check --dry-run` skips hashing and only checks file existence
 - [ ] `forge assets check` exits non-zero when missing assets are found
 - [ ] `forge assets check --strict` exits non-zero when orphaned assets are found
 - [ ] `packages/forge/profiles/editframe-html.yaml` updated with `assets` declaration
@@ -285,6 +292,8 @@ interface ForgeAssetsCheckResult {
 - [ ] Unit test verifies `forge.assets.list` lists assets grouped by type
 - [ ] Unit test verifies `forge.assets.check` detects missing assets referenced by compositions
 - [ ] Unit test verifies `forge.assets.check` detects orphaned assets not referenced by any composition
+- [ ] Unit test verifies `forge.assets.list --dry-run` skips hashing
+- [ ] Unit test verifies `forge.assets.check --dry-run` only checks file existence
 - [ ] `packages/forge/AGENTS.md` updated with asset management documentation
 - [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
 - [ ] `rfc.validate` passes on this file before merging
