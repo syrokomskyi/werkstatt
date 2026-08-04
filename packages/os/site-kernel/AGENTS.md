@@ -97,6 +97,19 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - RFC-0637: `KernelCommandDefinition` has an optional `modulePaths?: string[]` field. When present, `computeModuleHash` fingerprints only the listed paths (files and/or directories relative to the module's `src/` directory) instead of the full `src/` directory. When absent or empty, the full `src/` fingerprint is used (permanent backward-compatible fallback). Non-existent paths are silently skipped.
 - `command.reads.validate` (in `@warpgogol/site-kernel-checks`) enforces that every registered command declares `reads` or `cacheable: false` (CRC-01) and that `reads` patterns are valid picomatch syntax (CRC-02).
 
+## Workspace tree index and mtime fast path (RFC-0685)
+
+- `src/cache/workspace-tree-index.ts` — `WorkspaceTreeIndex` (Map from POSIX-relative file paths to `{ mtimeMs, size }`), `buildWorkspaceTreeIndex` (single directory walk excluding `.git/` and `node_modules/`), `filterTreeIndex` (in-memory picomatch glob filtering against the index).
+- Pipeline executors (`executePipelineForSite`, `executePipelineForWorkspace`) build the tree index once per pipeline run via `buildWorkspaceTreeIndex(options.workspaceRoot)` and pass it to `tryCacheRead` and `tryCacheWrite`.
+- `computeInputsHash` accepts an optional `treeIndex` parameter. When provided, `expandGlobs` filters the index in-memory instead of walking the filesystem — replacing N directory walks with one walk + N in-memory filters.
+- `computeInputsHash` returns `{ hash, metadata }` where `metadata` is an array of `InputsMetadataEntry` (`{ path, mtimeMs, size }`) sorted by path. The metadata is used by the mtime fast path.
+- Byte-mode fingerprinting: `selectFingerprintMode` picks `"byte"` for content extensions (`.md`, `.yaml`, `.yml`, `.json`, `.jsonc`, `.txt`) and `"semantic"` for source extensions (`.ts`, `.tsx`, `.astro`, `.css`, `.js`, `.mjs`). Semantic normalization on content files offers no benefit and wastes CPU.
+- Cache entry wrapper format: `getCachedCommandResult` returns `CachedCommandResultEntry` (`{ report, inputsMetadata?, inputsHash? }`). Legacy bare `KernelExecutionReport` entries are detected by absence of the `report` field and unwrapped. `setCachedCommandResult` stores the wrapper including `inputsMetadata` and `inputsHash`.
+- Mtime fast path in `tryCacheRead`: when a tree index is available, `tryMtimeFastPath` builds current metadata from the tree index, hashes it via `stableJsonHash`, and looks up a `command_results_meta` namespace entry mapping the metadata hash to the previously stored `inputsHash`. If found, the cached result is retrieved using that `inputsHash` — skipping all file content reads and fingerprinting.
+- `tryCacheWrite` stores the metadata-to-inputsHash mapping in `command_results_meta` after a successful cache write, enabling future mtime fast path hits.
+- The `command_results_meta` namespace uses the same `CacheLayer` interface as `command_results`. Keys are `meta:<commandName>:<siteName>:<metadataHash>`.
+- Tree index construction failures are non-fatal — the pipeline falls back to per-command filesystem walks when `treeIndex` is `undefined`.
+
 ## Change impact (RFC-0332)
 
 - `src/change-impact.ts` — pure classifier (`classifyPaths`), app derivation (`deriveImpactedApps`), profile recommender (`recommendProfile`), and command handler (`runChangeImpactDerive`).
