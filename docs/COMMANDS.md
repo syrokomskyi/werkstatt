@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 675. Raw manifest entries: 675.
+Generated command rows: 677. Raw manifest entries: 677.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -265,6 +265,8 @@ Generated command rows: 675. Raw manifest entries: 675.
 | `fonts.origin.validate` | workspace | app | no | no | Postbuild validator (RFC-0371): fail if any rendered HTML references an external font origin (fonts.googleapis.com, etc.). |
 | `footer.legal.validate` | workspace | app | no | no | For DE/AT/CH locales, verify footer.legalIds in site/<lang>/labels.md is non-empty (Impressum + Datenschutz are legally required by § 5 TMG and DSGVO). RFC-0095. |
 | `forge.agents.generate` | workspace | workspace | no | no | Regenerate AGENTS.md deterministically from forge.yaml and the skill registry. |
+| `forge.assets.check` | workspace | workspace | no | no | Check for missing, orphaned, and unreferenced assets. Use --strict to fail on orphaned assets, --dry-run to skip hashing. |
+| `forge.assets.list` | workspace | workspace | no | no | List all assets declared in the active stack profile, grouped by type. Use --dry-run to skip hashing, --type to filter by asset type. |
 | `forge.build` | workspace | workspace | no | no | Execute produce commands for all artifacts declared in the active stack profile. Use --dry-run to print resolved commands. |
 | `forge.create` | workspace | workspace | no | no | Create a new forge project in one command: scaffold + init + binding defaults. Usage: forge create --name <name> [--profile forge-shell] [--package-manager pnpm] |
 | `forge.determinism.check` | workspace | workspace | no | no | Verify artifact determinism by building twice and comparing output hashes. Reads determinism.inputs glob patterns from the active stack profile. Use --dry-run to print resolved inputs, --artifact to check a single artifact. |

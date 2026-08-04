@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 124056acc6567ddd4598844d1da357528d99acab0f4ec8a81162373fee220fda
+  contentHash: 5dc69b0d925068e705c7ecd8cd5cf6225d2d914ee24958d1e553d2dadec56dbb
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -4628,6 +4628,56 @@ commands:
     timeoutMs: null
     flags: {}
     reads: []
+    writes: []
+    pipelines: []
+  - name: forge.assets.check
+    description: Check for missing, orphaned, and unreferenced assets. Use --strict
+      to fail on orphaned assets, --dry-run to skip hashing.
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      dry-run:
+        kind: boolean
+        description: Check file existence without computing hashes.
+      strict:
+        kind: boolean
+        description: Exit non-zero when orphaned assets are found.
+      profile:
+        kind: string
+        description: Override the active profile id.
+    reads:
+      - forge.yaml
+      - packages/forge/profiles/*.yaml
+      - assets/**
+    writes: []
+    pipelines: []
+  - name: forge.assets.list
+    description: List all assets declared in the active stack profile, grouped by
+      type. Use --dry-run to skip hashing, --type to filter by asset type.
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      dry-run:
+        kind: boolean
+        description: List assets without computing hashes.
+      profile:
+        kind: string
+        description: Override the active profile id.
+      type:
+        kind: string
+        description: Filter assets by type id (e.g. video, audio, image).
+    reads:
+      - forge.yaml
+      - packages/forge/profiles/*.yaml
+      - assets/**
     writes: []
     pipelines: []
   - name: forge.build
