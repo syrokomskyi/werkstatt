@@ -309,22 +309,24 @@ export async function runMissionCheck(
         const mergedRules = mergeSuppressions(workshopSuppressions, workpieceSuppressions);
 
         if (mergedRules.length > 0) {
-          const suppressedFindings = applySuppressions(studyRun.findings as never[], mergedRules, {
-            channel,
-          });
+          const suppressedFindings = applySuppressions(
+            studyRun.findings as unknown as Finding[],
+            mergedRules,
+            {
+              channel,
+            },
+          );
 
           // Write updated study-run.json with suppressed flags
           const updatedStudyRun = { ...studyRun, findings: suppressedFindings };
           await writeFileIfChanged(studyRunPath, JSON.stringify(updatedStudyRun, null, 2));
 
           // Calculate suppression summary
-          suppressionSummary = countSuppressedByCategory(suppressedFindings as never[]);
+          suppressionSummary = countSuppressedByCategory(suppressedFindings);
 
           // Recalculate counts excluding suppressed findings
-          const activeFindings = suppressedFindings.filter(
-            (f) => !(f as { suppressed?: boolean }).suppressed,
-          );
-          activeFindingsCount = countFindingsBySeverity(activeFindings as never[]);
+          const activeFindings = suppressedFindings.filter((f) => !f.suppressed);
+          activeFindingsCount = countFindingsBySeverity(activeFindings as unknown as Finding[]);
           const activeErrors = activeFindingsCount.critical + activeFindingsCount.high;
           const activeWarnings = activeFindingsCount.medium + activeFindingsCount.low;
           activeFindingsTotals = {

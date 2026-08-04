@@ -28,5 +28,5 @@ suppressions:
   # Category D: Render-blocking CSS (112 findings)
   - ruleId: performance-vitals.render-blocking
     category: render-blocking-css
-    descriptionPattern: "preload"
+    descriptionPattern: "preload stylesheet"
     reason: "Standard Astro CSS preload pattern, not a real render-blocking issue"

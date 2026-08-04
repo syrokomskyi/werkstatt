@@ -44,6 +44,11 @@ export interface SuppressedBy {
   reason: string;
 }
 
+export type SuppressedFinding = Finding & {
+  suppressed?: boolean;
+  suppressedBy?: SuppressedBy;
+};
+
 export const WORKSHOP_SUPPRESSIONS_PATH = "systems/axiom-suppressions.yaml";
 export const WORKPIECE_SUPPRESSIONS_PATH = "axiom-suppressions.yaml";
 
@@ -52,18 +57,14 @@ export function parseSuppressionsConfig(content: string): SuppressionsConfig {
   return suppressionsConfigSchema.parse(raw);
 }
 
-export function loadWorkshopSuppressions(
-  workspaceRoot: string,
-): SuppressionsConfig | undefined {
+export function loadWorkshopSuppressions(workspaceRoot: string): SuppressionsConfig | undefined {
   const absPath = join(workspaceRoot, WORKSHOP_SUPPRESSIONS_PATH);
   if (!existsSync(absPath)) return undefined;
   const content = readFileSync(absPath, "utf-8");
   return parseSuppressionsConfig(content);
 }
 
-export function loadWorkpieceSuppressions(
-  missionDir: string,
-): SuppressionsConfig | undefined {
+export function loadWorkpieceSuppressions(missionDir: string): SuppressionsConfig | undefined {
   const absPath = join(missionDir, "workpiece", WORKPIECE_SUPPRESSIONS_PATH);
   if (!existsSync(absPath)) return undefined;
   const content = readFileSync(absPath, "utf-8");
@@ -122,8 +123,7 @@ function matchesCondition(
   // descriptionPattern: suppress if the finding's description contains the pattern (substring match)
   if (rule.descriptionPattern !== undefined) {
     const description = extractDescription(finding);
-    if (description === undefined || !description.includes(rule.descriptionPattern))
-      return false;
+    if (description === undefined || !description.includes(rule.descriptionPattern)) return false;
   }
 
   return true;
@@ -145,10 +145,10 @@ export function applySuppressions(
   findings: Finding[],
   rules: SuppressionRule[],
   context: { channel: string },
-): Finding[] {
+): SuppressedFinding[] {
   return findings.map((finding) => {
     // If already suppressed, keep as-is
-    if ((finding as Finding & { suppressed?: boolean }).suppressed) return finding;
+    if ((finding as SuppressedFinding).suppressed) return finding;
 
     for (let i = 0; i < rules.length; i++) {
       const rule = rules[i];
@@ -162,7 +162,7 @@ export function applySuppressions(
             category: rule.category,
             reason: rule.reason,
           },
-        } as Finding & { suppressed: boolean; suppressedBy: SuppressedBy };
+        } as SuppressedFinding;
       }
     }
 
@@ -170,9 +170,10 @@ export function applySuppressions(
   });
 }
 
-export function countSuppressedByCategory(
-  findings: Array<Finding & { suppressed?: boolean; suppressedBy?: SuppressedBy }>,
-): { totalSuppressed: number; byCategory: Record<string, number> } {
+export function countSuppressedByCategory(findings: SuppressedFinding[]): {
+  totalSuppressed: number;
+  byCategory: Record<string, number>;
+} {
   let totalSuppressed = 0;
   const byCategory: Record<string, number> = {};
 

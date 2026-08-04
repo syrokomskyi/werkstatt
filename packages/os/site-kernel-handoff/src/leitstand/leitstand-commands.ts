@@ -77,6 +77,7 @@ import {
   loadWorkpieceSuppressions,
   mergeSuppressions,
   applySuppressions,
+  type SuppressedFinding,
 } from "@warpgogol/site-kernel-checks/suppressions-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../build-pipeline-helpers.ts";
@@ -1274,7 +1275,7 @@ export async function runLeitstandPropagate(
   const workshopSuppressions = loadWorkshopSuppressions(workspaceRoot);
   const workpieceSuppressions = loadWorkpieceSuppressions(missionDir);
   const mergedRules = mergeSuppressions(workshopSuppressions, workpieceSuppressions);
-  const findingsWithSuppressions =
+  const findingsAfterSuppression: SuppressedFinding[] =
     mergedRules.length > 0
       ? applySuppressions(studyRun.findings, mergedRules, { channel: "alt" })
       : studyRun.findings;
@@ -1287,9 +1288,9 @@ export async function runLeitstandPropagate(
   // RFC-0684: Skip findings marked suppressed: true.
   for (const methodology of metadata.methodologies ?? []) {
     const blockOn = methodology.blockOn ?? ["high", "critical"];
-    const methodologyFindings = findingsWithSuppressions.filter((f) => {
+    const methodologyFindings = findingsAfterSuppression.filter((f) => {
       // Skip suppressed findings (RFC-0684)
-      if ((f as { suppressed?: boolean }).suppressed) return false;
+      if (f.suppressed) return false;
       // Match by methodologyId if present
       if (f.methodologyId) {
         return f.methodologyId === methodology.id;

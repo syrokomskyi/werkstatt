@@ -1,6 +1,9 @@
 /*
 <MODULE_CONTRACT>
 <purpose>RFC-0684: validates the workshop-level suppression config at systems/axiom-suppressions.yaml. Checks schema, conflicting rules, broad patterns, and unknown rule IDs (from evidence). Workspace-scoped command.</purpose>
+<performance>
+  <item>collectKnownRuleIdsFromEvidence scans all mission evidence directories for study-run.json files. Cost is O(N) where N = number of missions with evidence. Each file is read and JSON-parsed once. Acceptable for workspace-scoped validation (typically fewer than 50 missions).</item>
+</performance>
 <non-goals>
   <item>Does not apply suppressions — only validates the config file.</item>
   <item>Does not check external package availability.</item>
