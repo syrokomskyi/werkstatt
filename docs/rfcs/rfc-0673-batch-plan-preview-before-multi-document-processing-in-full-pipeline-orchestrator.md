@@ -1,7 +1,7 @@
 ---
 id: RFC-0673
 title: "Batch plan preview before multi-document processing in full-pipeline orchestrator"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 enhancedAt: 2026-08-04
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
@@ -209,15 +209,15 @@ Use a tool to automatically resolve dependencies between RFCs and determine the 
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Batch plan preview section
-- [ ] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` references the batch plan preview convention
-- [ ] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit
-- [ ] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit
-- [ ] Preview format documented with table example (order, id, type, complexity, dependencies, notes)
-- [ ] Preview text uses `aiLanguage` per language policy
-- [ ] Directive specifies the preview is informational, not a gate
-- [ ] `forge.doctor` passes with zero stale skill copies after sync
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Batch plan preview section (evidence: packages/forge/skills/_shared/fo-pipeline-conventions.md:178)
+- [x] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` references the batch plan preview convention (evidence: packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md:59)
+- [x] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md:59)
+- [x] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/_shared/fo-pipeline-conventions.md:178)
+- [x] Preview format documented with table example (order, id, type, complexity, dependencies, notes) (evidence: docs/rfcs/rfc-0673-batch-plan-preview-before-multi-document-processing-in-full-pipeline-orchestrator.md:117-128)
+- [x] Preview text uses `aiLanguage` per language policy (evidence: docs/rfcs/rfc-0673-batch-plan-preview-before-multi-document-processing-in-full-pipeline-orchestrator.md:100)
+- [x] Directive specifies the preview is informational, not a gate (evidence: docs/rfcs/rfc-0673-batch-plan-preview-before-multi-document-processing-in-full-pipeline-orchestrator.md:98)
+- [x] `forge.doctor` passes with zero stale skill copies after sync (evidence: forge.doctor output — 0 fail, 2 warn, exitCode: 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0673 — status: pass, 0 violations)
 
 ## Implementation notes for agents
 

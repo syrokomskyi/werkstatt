@@ -1,7 +1,7 @@
 ---
 id: RFC-0671
 title: "Progress beacon after each pipeline step in full-pipeline orchestrator"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 enhancedAt: 2026-08-04
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
@@ -202,14 +202,14 @@ Rely on commit messages to indicate pipeline progress.
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Progress beacon section
-- [ ] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` references the beacon convention
-- [ ] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit
-- [ ] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit
-- [ ] Beacon format documented with examples (success and failure variants)
-- [ ] Beacon text uses `aiLanguage` per language policy
-- [ ] `forge.doctor` passes with zero stale skill copies after sync
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Progress beacon section (evidence: packages/forge/skills/_shared/fo-pipeline-conventions.md:158)
+- [x] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` references the beacon convention (evidence: packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md:61)
+- [x] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md:61)
+- [x] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/_shared/fo-pipeline-conventions.md:158)
+- [x] Beacon format documented with examples (success and failure variants) (evidence: docs/rfcs/rfc-0671-progress-beacon-after-each-pipeline-step-in-full-pipeline-orchestrator.md:115-123)
+- [x] Beacon text uses `aiLanguage` per language policy (evidence: docs/rfcs/rfc-0671-progress-beacon-after-each-pipeline-step-in-full-pipeline-orchestrator.md:98)
+- [x] `forge.doctor` passes with zero stale skill copies after sync (evidence: forge.doctor output — 0 fail, 2 warn, exitCode: 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0671 — status: pass, 0 violations)
 
 ## Implementation notes for agents
 

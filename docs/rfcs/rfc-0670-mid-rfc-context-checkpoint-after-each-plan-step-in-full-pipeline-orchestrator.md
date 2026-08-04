@@ -1,7 +1,7 @@
 ---
 id: RFC-0670
 title: "Mid-RFC context checkpoint after each plan step in full-pipeline orchestrator"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 enhancedAt: 2026-08-04
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
@@ -229,14 +229,14 @@ Split large RFCs into smaller RFCs so each has fewer plan steps.
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Step-level context checkpoint during implementation section
-- [ ] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` step 4 references the step checkpoint convention
-- [ ] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit
-- [ ] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit
-- [ ] Step-checkpoint block format documented with YAML example (rfc, step, title, commit, decisions, errors, nextStep)
-- [ ] Resume logic documented: scan for `--- step checkpoint ---` markers, verify via git log
-- [ ] `forge.doctor` passes with zero stale skill copies after sync
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Step-level context checkpoint during implementation section (evidence: packages/forge/skills/_shared/fo-pipeline-conventions.md:139)
+- [x] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` step 4 references the step checkpoint convention (evidence: packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md:89)
+- [x] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md:89)
+- [x] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/_shared/fo-pipeline-conventions.md:139)
+- [x] Step-checkpoint block format documented with YAML example (rfc, step, title, commit, decisions, errors, nextStep) (evidence: docs/rfcs/rfc-0670-mid-rfc-context-checkpoint-after-each-plan-step-in-full-pipeline-orchestrator.md:161-172)
+- [x] Resume logic documented: scan for `--- step checkpoint ---` markers, verify via git log (evidence: docs/rfcs/rfc-0670-mid-rfc-context-checkpoint-after-each-plan-step-in-full-pipeline-orchestrator.md:177-182)
+- [x] `forge.doctor` passes with zero stale skill copies after sync (evidence: forge.doctor output — 0 fail, 2 warn, exitCode: 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0670 — status: pass, 0 violations)
 
 ## Implementation notes for agents
 

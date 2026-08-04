@@ -1,7 +1,7 @@
 ---
 id: RFC-0672
 title: "Structured error checkpoint for pipeline step failures in full-pipeline orchestrator"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 enhancedAt: 2026-08-04
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
@@ -233,15 +233,15 @@ Write the error checkpoint to a file (e.g., `docs/errors/error-<rfc-id>.yaml`) i
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Error checkpoint for pipeline step failures section
-- [ ] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` references the error checkpoint convention
-- [ ] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit
-- [ ] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit
-- [ ] Error checkpoint block format documented with YAML example (rfc, step, planStep, error, partialState, resumePoint)
-- [ ] Resume logic documented: scan for `--- error checkpoint ---` markers, verify state, resume from resumePoint
-- [ ] Directive specifies 2-attempt threshold before emitting error checkpoint
-- [ ] `forge.doctor` passes with zero stale skill copies after sync
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Error checkpoint for pipeline step failures section (evidence: packages/forge/skills/_shared/fo-pipeline-conventions.md:168)
+- [x] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` references the error checkpoint convention (evidence: packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md:91)
+- [x] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md:91)
+- [x] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit (evidence: commit 4623da5, .agents/skills/_shared/fo-pipeline-conventions.md:168)
+- [x] Error checkpoint block format documented with YAML example (rfc, step, planStep, error, partialState, resumePoint) (evidence: docs/rfcs/rfc-0672-structured-error-checkpoint-for-pipeline-step-failures-in-full-pipeline-orchestrator.md:119-137)
+- [x] Resume logic documented: scan for `--- error checkpoint ---` markers, verify state, resume from resumePoint (evidence: docs/rfcs/rfc-0672-structured-error-checkpoint-for-pipeline-step-failures-in-full-pipeline-orchestrator.md:175-180)
+- [x] Directive specifies 2-attempt threshold before emitting error checkpoint (evidence: docs/rfcs/rfc-0672-structured-error-checkpoint-for-pipeline-step-failures-in-full-pipeline-orchestrator.md:144)
+- [x] `forge.doctor` passes with zero stale skill copies after sync (evidence: forge.doctor output — 0 fail, 2 warn, exitCode: 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0672 — status: pass, 0 violations)
 
 ## Implementation notes for agents
 
