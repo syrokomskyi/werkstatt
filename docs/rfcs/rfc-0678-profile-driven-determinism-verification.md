@@ -1,7 +1,7 @@
 ---
 id: RFC-0678
 title: "Profile-driven determinism verification"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -12,9 +12,11 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -87,6 +89,8 @@ The `editframe-html` profile (RFC-0641) declares the `composition` artifact with
 
 However, no Forge command verifies this. `forge.build` (RFC-0674) produces the output but does not check if a second build produces identical bytes. The platform has a precedent for determinism verification: RFC-0602 (timestamp determinism) and RFC-0603 (PNG determinism) for site builds. Video output determinism is the analogous concept for video projects.
 
+**Schema note:** The `determinism.inputs` field in the current `editframe-html` profile uses human-readable labels (e.g. `"composition files"`, `"assets"`). This RFC updates the profile schema to accept glob patterns instead, and updates the `editframe-html` profile accordingly. The `determinism.inputs` field becomes `string[]` of glob patterns (e.g. `"compositions/**/*.html"`), resolved relative to the workspace root.
+
 ## Problem
 
 Video rendering (Editframe's headless Chrome frame capture) is not guaranteed to produce byte-identical MP4 output across runs. Sources of non-determinism include:
@@ -156,15 +160,18 @@ interface ForgeDeterminismCheckResult {
 
 For each artifact with `determinism.hashable: true`:
 
-1. Compute the input hash: hash all files matching `determinism.inputs` glob patterns, sorted by path.
-2. Run `forge.build --artifact <id>` (first build).
-3. Hash the output file(s) matching `artifacts[].extensions`.
-4. Run `forge.build --artifact <id>` again (second build).
-5. Hash the output file(s) again.
-6. Compare first and second build hashes.
+1. Compute the input hash: hash all files matching `determinism.inputs` glob patterns (resolved relative to workspace root), sorted by path. Uses `@warpgogol/fingerprint` `byteHashFile` for streaming file hashing.
+2. Check `dist/.determinism-cache.json` for a cached entry with the same input hash and produce command. If found, skip to step 7 with `cached: true`.
+3. Execute `artifact.produce.command` via `execAsync` (first build).
+4. Hash the output file at `artifact.produce.output` path using `byteHashFile`.
+5. Execute `artifact.produce.command` again (second build).
+6. Hash the output file again. Compare first and second build hashes.
 7. Report `deterministic: true` if hashes match, `false` otherwise.
+8. Update the cache file with the input hash, produce command, and output hash.
 
-If the input hash is the same as a previously recorded input hash (stored in `dist/.determinism-cache.json`), the command skips the double-build and reports the cached result.
+**Note:** The handler executes `produce.command` directly rather than calling `forge.build`, because `forge.build` does not have an `--artifact` flag. This keeps the command self-contained.
+
+**Cache file:** `dist/.determinism-cache.json` — the handler creates `dist/` if it does not exist before writing the cache. The cache key includes the input hash and the produce command string (to invalidate when the build tool version changes).
 
 ### File system responsibilities
 
@@ -210,9 +217,9 @@ If the input hash is the same as a previously recorded input hash (stored in `di
 ## Rollout
 
 - **New command**: `forge.determinism.check` — no existing commands affected.
-- **No profile schema changes**: `determinism` field already exists (RFC-0638).
-- **`editframe-html` profile**: already declares `determinism` on the composition artifact. No changes needed.
-- **No migration**: existing Forge consumers without hashable artifacts are unaffected.
+- **Profile schema change**: `determinism.inputs` semantics updated from human-readable labels to glob patterns. The `editframe-html.yaml` profile is updated to use glob patterns.
+- **`editframe-html` profile**: `determinism.inputs` updated from labels to glob patterns (`compositions/**/*.html`, `assets/**`).
+- **No migration**: existing Forge consumers without hashable artifacts are unaffected. Consumers with `determinism.inputs` using labels must update to glob patterns.
 - **Integration**: standalone command — not automatically added to any pipeline. Consumers wire it into CI or pre-release checks.
 - **Cache file**: `dist/.determinism-cache.json` is gitignored (it lives in `dist/`).
 
@@ -232,13 +239,17 @@ If the input hash is the same as a previously recorded input hash (stored in `di
 
 ## Acceptance criteria
 
+- [ ] `determinism.inputs` in `profileArtifactSchema` updated to accept glob patterns (string[] of glob patterns, resolved relative to workspace root)
+- [ ] `editframe-html.yaml` profile updated to use glob patterns in `determinism.inputs` (e.g. `compositions/**/*.html`, `assets/**`)
 - [ ] `forge.determinism.check` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile`, `--artifact` flags
 - [ ] `DeterminismCheckResult` and `ForgeDeterminismCheckResult` interfaces defined in the handler
 - [ ] `forge determinism check --dry-run` prints the resolved determinism inputs from the active profile
 - [ ] `forge determinism check --json` reports per-artifact hash comparison results
 - [ ] `forge determinism check --artifact composition` checks only the specified artifact
-- [ ] `dist/.determinism-cache.json` cache file implemented with input-hash-based cache hits
-- [ ] Unit test verifies double-build hash comparison detects non-deterministic output
+- [ ] `dist/.determinism-cache.json` cache file implemented with input-hash-based cache hits (handler creates `dist/` if missing)
+- [ ] Cache key includes produce command string for tool-version invalidation
+- [ ] Unit test verifies double-build hash comparison detects non-deterministic output (using mock produce command)
+- [ ] Unit test verifies output hash targets `produce.output` path, not `extensions`
 - [ ] Unit test verifies cache hit skips double-build
 - [ ] Unit test verifies `--dry-run` does not execute any build
 - [ ] Unit test verifies artifacts without `determinism.hashable: true` are skipped
