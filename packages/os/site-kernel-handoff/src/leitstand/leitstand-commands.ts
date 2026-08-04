@@ -172,7 +172,7 @@ async function withMissionCheckTimeout<T>(promise: Promise<T>, ms: number): Prom
 // RFC-0668: Wrap mission.check with per-attempt timeout and one-time retry on
 // infrastructure errors (exit code 2 or any non-0/non-1). Content violations
 // (exit 1) are not retried — they indicate real site issues.
-async function runMissionCheckWithResilience(
+export async function runMissionCheckWithResilience(
   workspaceRoot: string,
   missionId: string,
   channelUrl: string,

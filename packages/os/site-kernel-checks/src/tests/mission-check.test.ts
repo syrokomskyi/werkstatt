@@ -11,9 +11,16 @@ vi.mock("@syrokomskyi/axiom-factory-app/run/axiom-cli", () => ({
   preflightChromium: vi.fn(),
 }));
 
+vi.mock("../playwright-chromium-ensure.ts", () => ({
+  ensureChromium: vi.fn(async () => {
+    return { installed: true, chromiumRevision: "mock-revision", skipped: true };
+  }),
+}));
+
 // Import after mocks are set up
 import { runAxiomCheck } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
 import type { AxiomCheckResult } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
+import { ensureChromium } from "../playwright-chromium-ensure.ts";
 
 function makeAxiomCheckResult(overrides?: Partial<AxiomCheckResult>): AxiomCheckResult {
   return {
@@ -69,6 +76,7 @@ describe("mission.check (axiom-adapter)", () => {
     workspaceRoot = await mkdtemp(join(tmpdir(), "mission-check-test-"));
     vi.mocked(runAxiomCheck).mockClear();
     vi.mocked(runAxiomCheck).mockResolvedValue(makeAxiomCheckResult());
+    vi.mocked(ensureChromium).mockClear();
   });
 
   afterEach(async () => {
@@ -372,5 +380,49 @@ describe("mission.check (axiom-adapter)", () => {
     expect(runAxiomCheck).toHaveBeenCalledTimes(1);
     const callArgs = vi.mocked(runAxiomCheck).mock.calls[0]![0];
     expect(callArgs.locales).toEqual(["fr-FR"]);
+  });
+
+  // RFC-0668: Chromium pre-flight check via ensureChromium
+  it("calls ensureChromium before runAxiomCheck (RFC-0668 pre-flight)", async () => {
+    const missionId = "test-m000020";
+    await createMockMission(workspaceRoot, missionId);
+
+    await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(ensureChromium).toHaveBeenCalledTimes(1);
+    expect(runAxiomCheck).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns exit code 2 when ensureChromium throws (RFC-0668 pre-flight failure)", async () => {
+    const missionId = "test-m000021";
+    await createMockMission(workspaceRoot, missionId);
+
+    vi.mocked(ensureChromium).mockRejectedValue(new Error("chromium install failed"));
+
+    const result = await runMissionCheck(
+      {
+        flags: {
+          mission: missionId,
+          "external-preview": true,
+          "base-url": "http://example.com",
+        },
+        argv: [],
+      },
+      makeTestContext(workspaceRoot),
+    );
+
+    expect(result.exitCode).toBe(2);
+    expect(result.summary).toContain("chromium install failed");
+    expect(runAxiomCheck).not.toHaveBeenCalled();
   });
 });
