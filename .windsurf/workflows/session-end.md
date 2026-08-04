@@ -58,6 +58,28 @@ When the operator says any of the following, invoke the `fo-session-retro` skill
 5. **Wait for the retro to complete** — it will categorize insights, route them, commit, and produce its own summary.
 6. **Do not duplicate** — the retro skill's report is the session-end output. Do not add a separate "session complete" message.
 
+## Insight filtering guidance
+
+When gathering session insights for `fo-session-retro`, not every observation deserves to be saved. Apply this filter before presenting the triage table:
+
+**Save as insight** — the observation is:
+
+- A convention or rule that other agents would benefit from following (Rule).
+- An architectural choice with rationale worth preserving (Decision).
+- A cross-workspace invariant that could warrant DNA status (Invariant).
+- A reusable code pattern worth porting (Pattern).
+- A preference or behavioral insight about the operator (Operator).
+- Session-local context useful for the next agent picking up this work area (Context).
+
+**Do NOT save** — the observation is:
+
+- A one-off fact with no future impact (e.g. "RFC-0676 was skipped due to a duplicate"). These are historical events, not knowledge. They do not help future agents work better.
+- A tool quirk already documented elsewhere (check `AGENTS.md` and existing memories first).
+- A transient state that will be irrelevant by the next session (e.g. "file X was dirty at session end").
+- A bug that was found and fixed in the same session with no broader lesson.
+
+When in doubt, ask: "Would another agent working in this area make a different decision if they knew this?" If the answer is no, drop it.
+
 ## Language discipline (NON-NEGOTIABLE)
 
 All `fo-session-retro` output — the insight triage table, the `ask_user_question` confirmation prompt, the final summary report, and any inline commentary — MUST be written in `PREFERENCES.md` `aiLanguage`. English templates in the skill are structural placeholders only. If `aiLanguage` is `ru`, the triage table heading is «Сортировка инсайтов сессии», not «Session Insight Triage». Only identifiers (file paths, skill names, RFC/ADR ids, commit hashes) stay untranslated.
