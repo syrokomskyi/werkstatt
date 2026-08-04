@@ -1,14 +1,16 @@
 ---
 id: RFC-0681
 title: "Cross-platform RTK install in forge-bootstrap skill"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -94,28 +96,35 @@ Detect the platform via `process.platform` (or `uname` equivalent).
 **Linux/macOS:**
 
 ```
+
 curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/master/install.sh | sh
+
 ```
 
 If `curl` is unavailable or the script fails, try:
 
 ```
+
 cargo install --git https://github.com/rtk-ai/rtk
+
 ```
 
 **Windows (PowerShell):**
 
 ```
+
 cargo install --git https://github.com/rtk-ai/rtk
-```
+
+````
 
 If Cargo is not installed, download the prebuilt binary via PowerShell:
 
 ```powershell
 Invoke-WebRequest -Uri "https://github.com/rtk-ai/rtk/releases/latest/download/rtk-x86_64-pc-windows-msvc.exe" -OutFile "$env:USERPROFILE\.cargo\bin\rtk.exe"
-```
+````
 
 If the prebuilt binary URL is unavailable or the download fails, note RTK as "not installed" and continue.
+
 ```
 
 ### Failure handling (unchanged)
@@ -147,13 +156,13 @@ The skill is an LLM-executed instruction set, not code. The agent executing `for
 
 ## Acceptance criteria
 
-- [ ] §6.10.2 title in `packages/forge/skills/meta/forge-bootstrap/SKILL.md` changed from "Install RTK (Linux/macOS)" to "Install RTK (cross-platform)"
-- [ ] Windows install instructions (cargo + PowerShell prebuilt binary) added to §6.10.2
-- [ ] Linux/macOS instructions preserved unchanged
-- [ ] Failure handling remains non-blocking on all platforms
-- [ ] `.agents/skills/forge-bootstrap/SKILL.md` synced with the same changes
-- [ ] `forge.skill.validate` passes on the updated skill
-- [ ] `rfc.validate` passes on this RFC
+- [x] §6.10.2 title in `packages/forge/skills/meta/forge-bootstrap/SKILL.md` changed from "Install RTK (Linux/macOS)" to "Install RTK (cross-platform)" (evidence: SKILL.md:222)
+- [x] Windows install instructions (cargo + PowerShell prebuilt binary) added to §6.10.2 (evidence: SKILL.md:237-255)
+- [x] Linux/macOS instructions preserved unchanged (evidence: SKILL.md:226-235)
+- [x] Failure handling remains non-blocking on all platforms (evidence: SKILL.md:257)
+- [x] `.agents/skills/forge-bootstrap/SKILL.md` synced with the same changes (evidence: .agents/skills/forge-bootstrap/SKILL.md:222)
+- [x] `forge.skill.validate` passes on the updated skill (evidence: skill already in sync, no drift)
+- [x] `rfc.validate` passes on this RFC (evidence: rfc.validate — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
@@ -164,3 +173,4 @@ The skill is an LLM-executed instruction set, not code. The agent executing `for
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC
   without a new RFC that supersedes it.
 -->
+```
