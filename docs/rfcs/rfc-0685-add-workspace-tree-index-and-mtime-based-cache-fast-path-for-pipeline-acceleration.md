@@ -234,7 +234,7 @@ export async function computeInputsHash(
 - **Byte-mode hash divergence**: switching from semantic to byte mode for content files changes `inputsHash` values, causing a one-time cache flush. This is expected and not a risk — it's a one-time cost on first run after implementation.
 - **Agent misinterpretation**: agents might think this RFC changes the cache schema or requires cache migration. It does not — the schema version stays at 1, and old entries are transparently upgraded.
 - **Memory usage**: the tree index for a ~10,000-file workspace uses ~1–2MB of memory (Map of string→{number, number}). This is negligible and freed after the pipeline run.
-- **Exclusion list drift**: if new top-level directories are added to the workspace that should be excluded (e.g. `.cache/`), they must be added to the exclusion list. The default exclusion set covers `.git/`, `node_modules/`, and `dist/`.
+- **Exclusion list drift**: if new top-level directories are added to the workspace that should be excluded (e.g. `.cache/`), they must be added to the exclusion list. The default exclusion set covers `.git/` and `node_modules/` only — `dist/` and `missions/` are intentionally included because commands read from them.
 
 ## Acceptance criteria
 
