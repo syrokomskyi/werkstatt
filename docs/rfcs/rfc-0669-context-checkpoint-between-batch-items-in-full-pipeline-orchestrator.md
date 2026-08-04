@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
+enhancedAt: 2026-08-04
 implementedAt:
 closedAt:
 supersedes: []
@@ -99,6 +100,8 @@ There is no explicit instruction telling the LLM to release detailed context fro
 
 The `fo-idea-i-just-want-to-see-the-result` orchestrator skill performs a **context checkpoint** between batch items (when processing >=2 documents): after completing one RFC/ADR and before starting the next, the agent emits a structured YAML checkpoint block in conversation output and explicitly releases detailed context from the completed item, retaining only the RFC ID, status, commit SHAs, cross-RFC dependency notes, and lessons learned.
 
+The checkpoint directive applies only to the orchestrator because it runs the full pipeline (audit, enhance, plan, implement, review, fix) per document — generating 5-10x more context per RFC than any standalone batch skill. Standalone batch skills (`fo-idea-audit`, `fo-idea-enhance`, `fo-idea-plan`, `fo-idea-implement`) process one step per document and accumulate context at a lower rate; the orchestrator's full-pipeline-per-document loop is the primary context saturation risk.
+
 ## Architectural fit
 
 This RFC is a **policy change** in the skill pipeline, not a new command or architectural invariant.
@@ -137,8 +140,9 @@ context checkpoint after completing one document and before starting the next:
 2. **Release context** — explicitly treat all detailed context from the
    completed document as no longer actionable: file contents, search results,
    edit operations, intermediate reasoning. Retain only the checkpoint block.
-3. **Fresh start** — begin the next document with a fresh read phase (step 3.2
-   of the implementation flow: read the RFC fully and all related documents).
+3. **Fresh start** — begin the next document with a fresh read phase: re-read
+   the RFC file and all related documents (amends, supersedes, related RFCs,
+   DNA invariants, AGENTS.md sections).
 
 The checkpoint block doubles as a resume marker: when resuming an interrupted
 batch, scan conversation output for the last checkpoint block, extract completed
@@ -151,7 +155,7 @@ start.
 
 #### Orchestrator skill reference (added to `fo-idea-i-just-want-to-see-the-result/SKILL.md`)
 
-In the batch processing section, after the existing "without pauses between pipeline steps" directive, add:
+In the **Process** section (step 1), after the existing "For each document, run the full pipeline inline" line (line 55), add a new subsection:
 
 ```markdown
 **Between batch items:** After completing one document's pipeline and before
@@ -181,18 +185,21 @@ next: RFC-0671
 
 ### Resume behavior
 
-When the orchestrator detects an interrupted batch (step 3 of the existing skill), it scans conversation output for `--- checkpoint ---` markers. The last checkpoint block identifies the most recently completed document. The agent then:
+When the orchestrator detects an interrupted batch (step 3 of the existing skill), it uses checkpoint markers as a **primary** resume signal, with the existing git-log-and-file-inspection approach as a **fallback**:
 
-1. Extracts `completed` id and `status` from the last checkpoint.
-2. Verifies the completed document's status via git log and file inspection.
-3. Continues with the `next` document, or if `next` is null, checks if any documents in the original batch list remain unprocessed.
+1. **Scan for checkpoint markers** — search conversation output for `--- checkpoint ---` markers. If found, extract `completed` id and `status` from the last checkpoint block.
+2. **Verify via git log** — regardless of whether a checkpoint was found, verify the completed document's status via git log (`git log --oneline` for `audit:`, `enhance:`, `plan:`, `implement:` commits) and file inspection (RFC frontmatter `status` field, audit/plan file existence).
+3. **Reconcile** — if the checkpoint says `implemented` but the RFC file shows `draft` (e.g., stamp failed silently), re-process the document from the first incomplete step.
+4. **Continue** — proceed with the `next` document from the checkpoint, or if `next` is null, check if any documents in the original batch list remain unprocessed.
+5. **No checkpoint markers** — if no `--- checkpoint ---` markers are found in conversation output (e.g., new session, IDE restarted, interruption before the first checkpoint was emitted), fall back to the existing resume logic: inspect git log, audit/plan files, and RFC frontmatter status to determine progress.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
 | `packages/forge/skills/_shared/fo-pipeline-conventions.md` | New §Context checkpoint section added |
-| `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` | Batch processing section references checkpoint convention |
+| `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` | Process section (step 1) references checkpoint convention |
+| `packages/forge/AGENTS.md` | No change needed — documents skill infrastructure, not individual skill behavior |
 | `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` | Synced copy updated in same commit |
 | `.agents/skills/_shared/fo-pipeline-conventions.md` | Synced copy updated in same commit |
 
@@ -235,7 +242,7 @@ A new Site OS command (e.g., `session.checkpoint`) that tracks context usage and
 ## Acceptance criteria
 
 - [ ] `packages/forge/skills/_shared/fo-pipeline-conventions.md` contains a new §Context checkpoint between batch items section
-- [ ] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` batch processing section references the checkpoint convention
+- [ ] `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` Process section (step 1) references the checkpoint convention
 - [ ] `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` synced copy updated in same commit
 - [ ] `.agents/skills/_shared/fo-pipeline-conventions.md` synced copy updated in same commit
 - [ ] Checkpoint block format documented with YAML example (completed, status, commits, lessons, dependencies, next)
