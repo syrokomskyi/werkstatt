@@ -1,7 +1,7 @@
 ---
 id: RFC-0675
 title: "Profile invariant enforcement in forge.doctor"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
 enhancedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
