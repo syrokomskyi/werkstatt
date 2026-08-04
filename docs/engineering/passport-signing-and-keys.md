@@ -31,10 +31,10 @@ pulsar.heartbeat       →  POSTs a heartbeat to heartbeatUrl (optional)
 Run all commands via:
 
 ```bash
-pnpm kernel nebula.score.compute --appDir apps/<app>
-pnpm kernel star-map.render --appDir apps/<app>
-pnpm kernel passport.emit --appDir apps/<app>
-pnpm kernel passport.verify --appDir apps/<app>
+rtk pnpm kernel nebula.score.compute --appDir apps/<app>
+rtk pnpm kernel star-map.render --appDir apps/<app>
+rtk pnpm kernel passport.emit --appDir apps/<app>
+rtk pnpm kernel passport.verify --appDir apps/<app>
 ```
 
 ---
@@ -84,7 +84,7 @@ The private key is **never written to disk** — only the public key enters vers
 ### Key rotation
 
 ```bash
-pnpm kernel passport.key.rotate --appDir apps/<app>
+rtk pnpm kernel passport.key.rotate --appDir apps/<app>
 ```
 
 1. Generates a new Ed25519 keypair.

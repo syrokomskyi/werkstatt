@@ -55,7 +55,7 @@ The dev channel must **never** be cached at the CDN edge. Stale cache on dev mak
 **Setup via API (Page Rule):**
 
 ```sh
-curl -X POST "https://api.cloudflare.com/client/v4/zones/<zone_id>/pagerules" \
+rtk curl -X POST "https://api.cloudflare.com/client/v4/zones/<zone_id>/pagerules" \
   -H "Authorization: Bearer <api_token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -82,7 +82,7 @@ These are read from `.env` (see below).
 Each worker is deployed with `wrangler deploy --name <worker-name>`. The custom domain is enabled via:
 
 ```sh
-npx wrangler deployments tail --name <worker-name>
+rtk npx wrangler deployments tail --name <worker-name>
 ```
 
 Or via the Cloudflare dashboard → Workers & Pages → `<worker>` → **Triggers** → **Custom Domains** → Add `dev.<domain>` / `alt.<domain>` / `<domain>`.
@@ -111,7 +111,7 @@ The site-kernel CLI automatically loads `.env` from the workspace root via `impo
 See `.env.example` at the workspace root for the full template. Copy it to `.env` and fill in values:
 
 ```sh
-cp .env.example .env
+rtk cp .env.example .env
 # Edit .env with your values
 ```
 

@@ -61,8 +61,8 @@ To roll back to safe passthrough, unset the flag and rebuild — no code change 
 
 ```bash
 asset="_astro/hero-bg.<hash>.webp"
-curl -sI "https://<zone>/$asset"                                        # raw origin → should be 200
-curl -sI "https://<zone>/cdn-cgi/image/width=320,format=webp/$asset"    # transform → 200 only if enabled
+rtk curl -sI "https://<zone>/$asset"                                        # raw origin → should be 200
+rtk curl -sI "https://<zone>/cdn-cgi/image/width=320,format=webp/$asset"    # transform → 200 only if enabled
 ```
 
 If raw is `200` and transform is `404` → Transformations are off (expected on the safe default; enable them for resize). If raw is `404` → wrong/old build deployed, or wrong zone.

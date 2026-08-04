@@ -272,11 +272,11 @@ export default defineConfig({
 
 ```bash
 # Test with curl
-curl -H "Accept-Language: es-ES" -I http://localhost:4321/
+rtk curl -H "Accept-Language: es-ES" -I http://localhost:4321/
 # Expect: 302 Redirect to /es/
 
 # Test Accept-Language priority
-curl -H "Accept-Language: en-US,en;q=0.9,de;q=0.8" -I http://localhost:4321/
+rtk curl -H "Accept-Language: en-US,en;q=0.9,de;q=0.8" -I http://localhost:4321/
 # Expect: 302 Redirect to /en/
 ```
 

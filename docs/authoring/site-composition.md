@@ -188,7 +188,7 @@ A person is described **once** as a canonical record; the People section, the op
 **1. Author a Person record** at `src/content/people/<lang>/<slug>.md` (default-language anchor required; other languages overlay it per RFC-0008 — typically only `role` + `bio` differ). Scaffold one with `person.create`:
 
 ```sh
-pnpm exec site-kernel run person.create --site <id> --slug andrii-syrokomskyi --name "Andrii Syrokomskyi" --page
+rtk pnpm exec site-kernel run person.create --site <id> --slug andrii-syrokomskyi --name "Andrii Syrokomskyi" --page
 ```
 
 ```yaml
@@ -285,7 +285,7 @@ Agents **MUST NOT** run root `pnpm build` or `turbo run build` during fix, revie
 **Scoped typecheck verification** is the correct substitute for touched sites:
 
 ```sh
-pnpm --filter <site-name> exec astro check
+rtk pnpm --filter <site-name> exec astro check
 ```
 
 This runs Astro's typecheck (`.astro` + `.ts` files) without SSG build. For touched `packages/*` dependencies, run `pnpm --filter <package-name> run build:check` (`tsc --noEmit`).

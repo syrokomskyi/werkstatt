@@ -120,14 +120,14 @@ license:
 Run the focused validator after adding or changing materials:
 
 ```sh
-pnpm exec site-kernel run material.credits.validate --site <app>
+rtk pnpm exec site-kernel run material.credits.validate --site <app>
 ```
 
 For full app readiness, run the app author gate or build check:
 
 ```sh
-pnpm exec site-kernel run sites-check.author --site <app>
-pnpm --filter <app> build:check
+rtk pnpm exec site-kernel run sites-check.author --site <app>
+rtk pnpm --filter <app> build:check
 ```
 
 Missing credits, duplicate targets, invalid sidecars, and unresolved rights placeholders are deploy-blocking.

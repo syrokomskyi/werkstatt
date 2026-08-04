@@ -27,13 +27,13 @@ This step is done once per workshop. The bucket `axiom-evidence` is shared acros
 **Via wrangler CLI:**
 
 ```bash
-pnpm dlx wrangler r2 bucket create axiom-evidence --location eu-central-1
+rtk pnpm dlx wrangler r2 bucket create axiom-evidence --location eu-central-1
 ```
 
 **Via Cloudflare API:**
 
 ```bash
-curl -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/r2/buckets" \
+rtk curl -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/r2/buckets" \
   -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{"name":"axiom-evidence","locationHint":"eu-central-1"}'
@@ -68,7 +68,7 @@ R2_SECRET_ACCESS_KEY=<Secret Access Key from step 2>
 ## Step 4: Verify
 
 ```bash
-pnpm exec site-kernel run evidence.sync --mission <mission-id> --dry-run
+rtk pnpm exec site-kernel run evidence.sync --mission <mission-id> --dry-run
 ```
 
 If credentials are correct, the dry-run reports files that would be uploaded. If credentials are missing or invalid, the command returns `MISSING_ENV` or `R2_UPLOAD_ERROR`.

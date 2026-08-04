@@ -154,7 +154,7 @@ To run the extraction-parity check manually:
 
 ```bash
 # (when the test suite is wired up — RFC-0030 Phase B)
-pnpm --filter @warpgogol/site-kernel-onboarding test
+rtk pnpm --filter @warpgogol/site-kernel-onboarding test
 ```
 
 ---
@@ -177,7 +177,7 @@ To add a new file to the scaffold output:
 The root `upgrade-packages` script automatically invokes `config.template.sync` after `pnpm up --latest` so that templates stay current without manual steps:
 
 ```sh
-pnpm run upgrade-packages
+rtk pnpm run upgrade-packages
 ```
 
 This runs `config.template.sync --site warpgogol-com` automatically, which blindly overwrites:
@@ -188,7 +188,7 @@ This runs `config.template.sync --site warpgogol-com` automatically, which blind
 To run the sync manually (e.g. after a selective app-only upgrade):
 
 ```sh
-pnpm exec site-kernel run config.template.sync --site <reference-app>
+rtk pnpm exec site-kernel run config.template.sync --site <reference-app>
 ```
 
 Use `--dry-run` to preview changes without writing. See RFC-0137 for the full contract.
@@ -201,15 +201,15 @@ The scaffold output should always pass `app.contract.full`. The CI smoke test ru
 
 ```bash
 # Run locally:
-node packages/os/site-kernel/bin/site-kernel.mjs run onboarding.scaffold \
+rtk node packages/os/site-kernel/bin/site-kernel.mjs run onboarding.scaffold \
   --client __scaffold-test__ \
   --domain scaffold-test.example.de \
   --biome nonprofit-trust \
   --constellation nonprofit-donation-funnel
 
-pnpm install
-pnpm --filter __scaffold-test__ build.prepare
-node packages/os/site-kernel/bin/site-kernel.mjs run app.contract.full \
+rtk pnpm install
+rtk pnpm --filter __scaffold-test__ build.prepare
+rtk node packages/os/site-kernel/bin/site-kernel.mjs run app.contract.full \
   --site __scaffold-test__
 
 # Inspect results, then clean up:

@@ -30,8 +30,8 @@ This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX envir
 Agents **MAY** run `agent.environment.audit` at the start of any session and **SHOULD** include the result in the system prompt. The command is read-only, advisory, and never gates build pipelines.
 
 ```sh
-pnpm exec site-kernel run agent.environment.audit --json
-pnpm exec site-kernel run agent.environment.audit --emit-prompt
+rtk pnpm exec site-kernel run agent.environment.audit --json
+rtk pnpm exec site-kernel run agent.environment.audit --emit-prompt
 ```
 
 The `--emit-prompt` flag appends a `systemPromptSnippet` field and prints a plain-text snippet suitable for pasting into an agent system prompt. Missing tools include actionable `installHint` values with apt commands.
@@ -45,12 +45,12 @@ The monorepo has ~38 TypeScript packages plus Astro sites. On Linux, the main re
 The default `max_user_watches=8192` is too small for this monorepo. The current machine has `max_user_watches=524288`, `max_user_instances=1024`, `max_queued_events=65536`. If experiencing watcher exhaustion (IDE losing track of file changes, build tools reporting ENOSPC), raise `max_user_watches` to `1048576`:
 
 ```bash
-sudo tee /etc/sysctl.d/40-inotify.conf >/dev/null <<'EOF'
+rtk sudo tee /etc/sysctl.d/40-inotify.conf >/dev/null <<'EOF'
 fs.inotify.max_user_watches=1048576
 fs.inotify.max_user_instances=1024
 fs.inotify.max_queued_events=65536
 EOF
-sudo sysctl --system
+rtk sudo sysctl --system
 ```
 
 Each watch costs ~1080 bytes of kernel memory on 64-bit Linux. With 1M watches, worst case is ~1 GB non-swappable kernel memory — acceptable on a dev machine with ≥16 GB RAM.
@@ -66,12 +66,12 @@ Each watch costs ~1080 bytes of kernel memory on 64-bit Linux. With 1M watches, 
 For high file I/O workloads (massive builds, `pnpm install`):
 
 ```bash
-sudo tee /etc/sysctl.d/40-dev-vm.conf >/dev/null <<'EOF'
+rtk sudo tee /etc/sysctl.d/40-dev-vm.conf >/dev/null <<'EOF'
 vm.swappiness = 10
 vm.dirty_ratio = 15
 vm.dirty_background_ratio = 5
 EOF
-sudo sysctl --system
+rtk sudo sysctl --system
 ```
 
 - `swappiness=10` reduces swap aggression when RAM is plentiful.
@@ -82,8 +82,8 @@ sudo sysctl --system
 For dev machines doing heavy TypeScript builds, Playwright runs, and `ffmpeg` work, the `performance` governor keeps CPU at max frequency and reduces latency spikes:
 
 ```bash
-sudo apt install -y linux-tools-common linux-tools-$(uname -r)
-sudo cpupower frequency-set -g performance
+rtk sudo apt install -y linux-tools-common linux-tools-$(uname -r)
+rtk sudo cpupower frequency-set -g performance
 ```
 
 Verify with `cpupower frequency-info`. On laptops where battery life matters, use `schedutil` or `ondemand` instead. This setting does not persist across reboots by default — add it to a systemd service or `/etc/rc.local` if persistence is needed.
@@ -93,9 +93,9 @@ Verify with `cpupower frequency-info`. On laptops where battery life matters, us
 Mounting `/tmp` and `/var/tmp` as tmpfs (RAM-backed) eliminates disk I/O for temporary files — speeds up `ffmpeg` intermediates, browser caches, Playwright temp dirs, and build artifacts that land in temp:
 
 ```bash
-echo 'tmpfs /tmp tmpfs defaults,noatime,mode=1777 0 0' | sudo tee -a /etc/fstab
-echo 'tmpfs /var/tmp tmpfs defaults,noatime,mode=1777 0 0' | sudo tee -a /etc/fstab
-mount /tmp && mount /var/tmp
+rtk echo 'tmpfs /tmp tmpfs defaults,noatime,mode=1777 0 0' | sudo tee -a /etc/fstab
+rtk echo 'tmpfs /var/tmp tmpfs defaults,noatime,mode=1777 0 0' | sudo tee -a /etc/fstab
+rtk mount /tmp && mount /var/tmp
 ```
 
 Size is dynamically allocated (defaults to half of RAM). Check with `df -h /tmp`. If RAM is limited (< 16 GB), skip `/var/tmp` or set an explicit `size=2G` option.
@@ -105,7 +105,7 @@ Size is dynamically allocated (defaults to half of RAM). Check with `df -h /tmp`
 When running `ffmpeg` (used by `print.pdf.generate`) or Playwright alongside IDE and dev server, lower their CPU/IO priority so the UI stays responsive:
 
 ```bash
-nice -n 10 ionice -c2 -n7 ffmpeg ...
+rtk nice -n 10 ionice -c2 -n7 ffmpeg ...
 ```
 
 - `nice -n 10` — lower CPU scheduling priority (range -20 to 19, higher = lower priority).
@@ -118,15 +118,15 @@ Use `htop` with `IO_READ_RATE` / `IO_WRITE_RATE` columns to identify disk-bound 
 Keep the system and drivers current — kernel, Mesa, and runtime updates often bring real performance improvements:
 
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt autoremove -y
+rtk sudo apt update && sudo apt upgrade -y
+rtk sudo apt autoremove -y
 ```
 
 Periodically review snap packages and remove unused ones to reduce background service activity:
 
 ```bash
-snap list
-sudo snap remove <unused-package>
+rtk snap list
+rtk sudo snap remove <unused-package>
 ```
 
 ## Terminal quality-of-life

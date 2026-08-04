@@ -76,14 +76,14 @@ STRIPE_PRICE_SETUP
 Run these for `webgogol-com`; all must pass before launch:
 
 ```sh
-pnpm exec site-kernel run funnel.contract.validate  --site webgogol-com --json
-pnpm exec site-kernel run funnel.stage.validate     --site webgogol-com --json
-pnpm exec site-kernel run funnel.copy.validate      --site webgogol-com --json
-pnpm exec site-kernel run funnel.lagebild.validate  --site webgogol-com --json
-pnpm exec site-kernel run integration.config.validate --site webgogol-com --json
-pnpm exec site-kernel run integration.secrets.validate --site webgogol-com --json
-pnpm exec site-kernel run consent.activation.validate  --site webgogol-com --json   # click-to-load guarantee
-pnpm exec site-kernel run legal.processors.validate    --site webgogol-com --json   # UChat/Stripe named in privacy policy
+rtk pnpm exec site-kernel run funnel.contract.validate  --site webgogol-com --json
+rtk pnpm exec site-kernel run funnel.stage.validate     --site webgogol-com --json
+rtk pnpm exec site-kernel run funnel.copy.validate      --site webgogol-com --json
+rtk pnpm exec site-kernel run funnel.lagebild.validate  --site webgogol-com --json
+rtk pnpm exec site-kernel run integration.config.validate --site webgogol-com --json
+rtk pnpm exec site-kernel run integration.secrets.validate --site webgogol-com --json
+rtk pnpm exec site-kernel run consent.activation.validate  --site webgogol-com --json   # click-to-load guarantee
+rtk pnpm exec site-kernel run legal.processors.validate    --site webgogol-com --json   # UChat/Stripe named in privacy policy
 ```
 
 - `funnel.contract.validate` will now run real checks (the `funnel` block exists): version match, source catalog, **zero Make.com references**.

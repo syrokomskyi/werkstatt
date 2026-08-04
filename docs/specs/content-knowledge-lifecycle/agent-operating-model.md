@@ -22,14 +22,14 @@ Editing a fact's value is a **transaction** — all four steps must land in the 
 
 ```sh
 # 1. Edit the value in the record, then keep the seams in sync:
-pnpm exec site-kernel run content.claim.ledger.append \
+rtk pnpm exec site-kernel run content.claim.ledger.append \
   --site <name> --subject "<S>" --value "<V>" \
   --provenance <p> --event verify-update --actor <handle> --as-of <date>
 
-pnpm exec site-kernel run content.derived.stamp \
+rtk pnpm exec site-kernel run content.derived.stamp \
   --site <name> --subject "<derivative-of-S>"   # if derivatives exist
 
-pnpm exec site-kernel run sites-check.author --site <name>
+rtk pnpm exec site-kernel run sites-check.author --site <name>
 ```
 
 - Creating a translation/copy sets `provenance: derived`, `derivedFrom`, and a `sourceHash` stamp.

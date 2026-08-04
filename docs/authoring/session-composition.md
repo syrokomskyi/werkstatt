@@ -104,13 +104,13 @@ Lists all session files (active + archived) with filtering:
 `scripts/devin-export.sh` exports the current Devin CLI session as an ATIF file to `docs/sessions/.raw/`:
 
 ```bash
-./scripts/devin-export.sh
+rtk ./scripts/devin-export.sh
 ```
 
 After exporting, run `session.save` to convert the raw file to structured markdown:
 
 ```bash
-pnpm exec site-kernel run session.save
+rtk pnpm exec site-kernel run session.save
 ```
 
 ### Windsurf (Cascade) sessions
