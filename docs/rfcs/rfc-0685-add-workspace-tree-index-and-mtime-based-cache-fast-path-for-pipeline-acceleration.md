@@ -1,7 +1,7 @@
 ---
 id: RFC-0685
 title: "Add workspace tree index and mtime-based cache fast path for pipeline acceleration"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-04
 updatedAt: 2026-08-05
 enhancedAt: 2026-08-05
-implementedAt:
+implementedAt: 2026-08-05
 closedAt:
 supersedes: []
 supersededBy:
@@ -238,17 +238,17 @@ export async function computeInputsHash(
 
 ## Acceptance criteria
 
-- [ ] `WorkspaceTreeIndex` type and `buildWorkspaceTreeIndex` function defined in `packages/os/site-kernel/src/cache/workspace-tree-index.ts`
-- [ ] `expandGlobs` in `command-result-cache.ts` accepts a `WorkspaceTreeIndex` parameter and filters in-memory instead of walking the filesystem
-- [ ] `executePipelineForSite` and `executePipelineForWorkspace` in `execute-pipeline.ts` build the tree index once per pipeline run and pass it to `tryCacheRead`/`tryCacheWrite`
-- [ ] `computeInputsHash` uses byte-mode fingerprinting for `.md`, `.yaml`, `.yml`, `.json`, `.jsonc`, `.txt` files and semantic mode for source files
-- [ ] `setCachedCommandResult` stores `inputsMetadata` sidecar (sorted `{ path, mtimeMs, size }` array) alongside the cache entry
-- [ ] `tryCacheRead` compares current file metadata against stored `inputsMetadata` and reuses the stored `inputsHash` when unchanged, skipping fingerprint computation
-- [ ] Unit tests verify: (a) tree index produces same glob matches as filesystem walk, (b) mtime fast path reuses hash on unchanged files, (c) byte-mode selection per extension, (d) fallback to full fingerprint on mtime change
-- [ ] `build:check` passes on `@warpgogol/site-kernel`
+- [x] `WorkspaceTreeIndex` type and `buildWorkspaceTreeIndex` function defined in `packages/os/site-kernel/src/cache/workspace-tree-index.ts`
+- [x] `expandGlobs` in `command-result-cache.ts` accepts a `WorkspaceTreeIndex` parameter and filters in-memory instead of walking the filesystem
+- [x] `executePipelineForSite` and `executePipelineForWorkspace` in `execute-pipeline.ts` build the tree index once per pipeline run and pass it to `tryCacheRead`/`tryCacheWrite`
+- [x] `computeInputsHash` uses byte-mode fingerprinting for `.md`, `.yaml`, `.yml`, `.json`, `.jsonc`, `.txt` files and semantic mode for source files
+- [x] `setCachedCommandResult` stores `inputsMetadata` sidecar (sorted `{ path, mtimeMs, size }` array) alongside the cache entry
+- [x] `tryCacheRead` compares current file metadata against stored `inputsMetadata` and reuses the stored `inputsHash` when unchanged, skipping fingerprint computation
+- [x] Unit tests verify: (a) tree index produces same glob matches as filesystem walk, (b) mtime fast path reuses hash on unchanged files, (c) byte-mode selection per extension, (d) fallback to full fingerprint on mtime change
+- [x] `build:check` passes on `@warpgogol/site-kernel`
 - [ ] Pipeline cache-check time is measured before and after implementation on a full `build.prepare` run, demonstrating >50% reduction for cacheable commands on unchanged inputs
-- [ ] `packages/os/site-kernel/AGENTS.md` § "Command-result cache (RFC-0390)" is updated with mtime fast path, byte-mode selection, and tree index documentation
-- [ ] `rfc.validate` passes on this file
+- [x] `packages/os/site-kernel/AGENTS.md` § "Command-result cache (RFC-0390)" is updated with mtime fast path, byte-mode selection, and tree index documentation
+- [x] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
