@@ -15,12 +15,13 @@ producing a KernelPipelineReport with a timing summary (slowest steps, timeout c
   <item>Add stderr progress lines for every pipeline step (start + finish + duration) so operators see live progress even in --json mode.</item>
   <item>RFC-0390: integrate command-result cache — skip re-execution on cache hit, store only ok:true results, respect --force and --dry-run.</item>
   <item>RFC-0637: moduleHashCache key includes modulePaths; computeModuleHash receives command.modulePaths for granular per-command hashing.</item>
-  <item>RFC-0685: build workspace tree index once per pipeline run; mtime fast path in tryCacheRead reuses stored inputsHash when file metadata is unchanged; byte-mode selection for content files; inputsMetadata sidecar stored in cache entries.</item>
+  <item>RFC-0686: refactor executePipelineForSite and executePipelineForWorkspace to use pipeline-scheduler for dependency-aware parallel execution; add telemetry mutex; add summedDurationMs to timing summary; --concurrency 1 activates full sequential mode.</item>
 </CHANGE_SUMMARY>
 */
 
 import { performance } from "node:perf_hooks";
 import process from "node:process";
+import os from "node:os";
 import { join, relative, sep } from "node:path";
 import { createKernelLogger } from "../logger.ts";
 import { loadWorkspaceConfig } from "../discovery.ts";
@@ -59,6 +60,7 @@ import type {
 import { executeRegisteredCommand } from "./execute-command.ts";
 import { assertKnownOptionKeys, summarizeLogs } from "./shared.ts";
 import { buildRegistry, ensureTargetSites, loadAppRuntime } from "./registry.ts";
+import { buildSchedule, executeScheduledSteps, type ScheduledStep } from "./pipeline-scheduler.ts";
 
 const PIPELINE_TIMING_SUMMARY_THRESHOLD_MS = 30_000;
 
@@ -112,12 +114,20 @@ function pipelineTimingSummary(
   stepTimings: PipelineStepTiming[],
   siteName?: string,
 ): KernelPipelineTimingSummary {
-  const totalDurationMs = stepTimings.reduce((sum, step) => sum + step.durationMs, 0);
+  const summedDurationMs = stepTimings.reduce((sum, step) => sum + step.durationMs, 0);
+  // RFC-0686: wall-clock total = min(startedAt) to max(endedAt) across all steps.
+  const minStart =
+    stepTimings.length > 0 ? Math.min(...stepTimings.map((s) => s.startedAtMonotonicMs)) : 0;
+  const maxEnd =
+    stepTimings.length > 0 ? Math.max(...stepTimings.map((s) => s.endedAtMonotonicMs)) : 0;
+  const totalDurationMs =
+    stepTimings.length > 0 ? Math.max(0, maxEnd - minStart) : summedDurationMs;
   const failed = reports.find((report) => !report.ok);
   return {
     pipeline: pipelineName,
     ...(siteName ? { site: siteName } : {}),
     totalDurationMs,
+    summedDurationMs,
     stepCount: stepTimings.length,
     slowestSteps: [...stepTimings].sort((a, b) => b.durationMs - a.durationMs).slice(0, 6),
     timeoutCount: stepTimings.filter((step) => step.exceededTimeout).length,
@@ -150,7 +160,7 @@ function printPipelineTimingSummary(
     : `workspace: ${summary.pipeline}`;
   logger.section(`${target} timing`);
   logger.info(
-    `[OK] total ${formatDuration(summary.totalDurationMs)}, ${summary.stepCount} step(s), ${summary.timeoutCount} timeout(s)`,
+    `[OK] wall-clock ${formatDuration(summary.totalDurationMs)}, summed ${formatDuration(summary.summedDurationMs ?? summary.totalDurationMs)}, ${summary.stepCount} step(s), ${summary.timeoutCount} timeout(s)`,
   );
   if (summary.slowestSteps.length > 0) {
     logger.info("slowest:");
@@ -175,6 +185,29 @@ function aggregateFilesModified(reports: KernelExecutionReport[]): string[] {
     }
   }
   return result;
+}
+
+/**
+ * RFC-0686: Telemetry mutex — serializes appendStepTelemetry calls via a
+ * promise-chain. The mutex does NOT block step execution — it only prevents
+ * concurrent read-modify-write cycles on the telemetry NDJSON file.
+ */
+class TelemetryMutex {
+  private chain: Promise<void> = Promise.resolve();
+
+  async run(task: () => Promise<void>): Promise<void> {
+    this.chain = this.chain.then(task).catch(() => {});
+    await this.chain;
+  }
+}
+
+/**
+ * RFC-0686: Resolve concurrency from options or default to min(availableParallelism, 8).
+ */
+function resolveConcurrency(options: ExecuteKernelPipelineOptions): number {
+  if (options.concurrency !== undefined) return options.concurrency;
+  const available = os.availableParallelism?.() ?? 4;
+  return Math.min(available, 8);
 }
 
 /**
@@ -395,8 +428,6 @@ async function executePipelineForSite(
   options: ExecuteKernelPipelineOptions,
   steps: KernelPipelineStep[],
 ): Promise<KernelPipelineReport> {
-  const reports: KernelExecutionReport[] = [];
-  const stepTimings: PipelineStepTiming[] = [];
   // RFC-0270: a generated budget entry, when present, wins over the inline
   // expectedDurationMs — the inline value stays as the cold-start fallback.
   const budgets = await loadPipelineBudgets(options.workspaceRoot);
@@ -411,149 +442,170 @@ async function executePipelineForSite(
   } catch {
     treeIndex = undefined;
   }
-  progressLine(`[${site.name}] pipeline ${options.pipelineName} — ${totalSteps} step(s)`);
+  const concurrency = resolveConcurrency(options);
+  // RFC-0686: telemetry mutex serializes appendStepTelemetry calls.
+  const telemetryMutex = new TelemetryMutex();
+  progressLine(
+    `[${site.name}] pipeline ${options.pipelineName} — ${totalSteps} step(s), concurrency ${concurrency}`,
+  );
 
-  for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
-    const step = steps[stepIndex]!;
-    const command = registry.getCommand(step.command);
-    if (!command) {
-      throw new Error(
-        `Kernel pipeline step \`${step.command}\` is not registered for site \`${site.name}\`.`,
-      );
-    }
+  const scheduled = buildSchedule(steps);
+  const moduleSrcDir = join(options.workspaceRoot, "packages", "os", "site-kernel-checks", "src");
 
-    const logger = createKernelLogger(options.outputFormat ?? "pretty");
-    const { io, intents } = createDefaultIO();
-    const context: KernelRuntimeContext = {
-      workspaceRoot: options.workspaceRoot,
-      site,
-      siteExplicit: false,
-      logger,
-      dryRun: options.dryRun ?? false,
-      outputFormat: options.outputFormat ?? "pretty",
-      io,
-      fileIntents: intents,
-    };
+  const stepTimings: Map<number, PipelineStepTiming> = new Map();
 
-    const stepLabel = `[${stepIndex + 1}/${totalSteps}]`;
-    if (options.outputFormat !== "json") {
-      logger.section(`${site.name}: ${options.pipelineName} -> ${step.command}`);
-    }
-    progressLine(`${stepLabel} ${step.command} …`);
+  const results = await executeScheduledSteps(
+    scheduled,
+    concurrency,
+    async (sStep: ScheduledStep) => {
+      const { step, stepIndex } = sStep;
+      const command = registry.getCommand(step.command);
+      if (!command) {
+        throw new Error(
+          `Kernel pipeline step \`${step.command}\` is not registered for site \`${site.name}\`.`,
+        );
+      }
 
-    const budgetedExpectedDurationMs = lookupExpectedDurationMs(
-      budgets,
-      options.pipelineName,
-      step.command,
-      site.name,
-    );
-    const startedAtMonotonicMs = Math.round(performance.now());
-    let report: KernelExecutionReport;
-    if (step.skip) {
-      report = skippedExecutionReport(command, context, step.skipReason);
-    } else {
-      // RFC-0390: try cache read before executing.
-      const moduleSrcDir = join(
-        options.workspaceRoot,
-        "packages",
-        "os",
-        "site-kernel-checks",
-        "src",
-      );
-      const cached = await tryCacheRead(
-        cache,
-        command,
-        site.directory,
-        options.workspaceRoot,
+      const logger = createKernelLogger(options.outputFormat ?? "pretty");
+      const { io, intents } = createDefaultIO();
+      const context: KernelRuntimeContext = {
+        workspaceRoot: options.workspaceRoot,
+        site,
+        siteExplicit: false,
+        logger,
+        dryRun: options.dryRun ?? false,
+        outputFormat: options.outputFormat ?? "pretty",
+        io,
+        fileIntents: intents,
+      };
+
+      const stepLabel = `[${stepIndex + 1}/${totalSteps}]`;
+      if (options.outputFormat !== "json") {
+        logger.section(`${site.name}: ${options.pipelineName} -> ${step.command}`);
+      }
+      progressLine(`${stepLabel} ${step.command} …`);
+
+      const budgetedExpectedDurationMs = lookupExpectedDurationMs(
+        budgets,
+        options.pipelineName,
+        step.command,
         site.name,
-        moduleSrcDir,
-        moduleHashCache,
-        options.force ?? false,
-        options.dryRun ?? false,
-        treeIndex,
       );
-      if (cached) {
-        report = cached;
+      const startedAtMonotonicMs = Math.round(performance.now());
+      let report: KernelExecutionReport;
+      if (step.skip) {
+        report = skippedExecutionReport(command, context, step.skipReason);
       } else {
-        // Inject --site for workspace-scoped commands so they receive the site
-        // name from the pipeline context (mirrors executeKernelCommand logic).
-        const stepArgs = [...(step.args ?? [])];
-        if (command.scope === "workspace" && !stepArgs.includes("--site") && site.name) {
-          stepArgs.push("--site", site.name);
-        }
-        report = await executeRegisteredCommand(command, context, stepArgs, {
-          timeoutMs: step.timeoutMs,
-          expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,
-        });
-        // RFC-0390: store successful results in cache.
-        await tryCacheWrite(
+        // RFC-0390: try cache read before executing.
+        const cached = await tryCacheRead(
           cache,
           command,
-          report,
           site.directory,
           options.workspaceRoot,
           site.name,
           moduleSrcDir,
           moduleHashCache,
+          options.force ?? false,
           options.dryRun ?? false,
           treeIndex,
         );
+        if (cached) {
+          report = cached;
+        } else {
+          // Inject --site for workspace-scoped commands so they receive the site
+          // name from the pipeline context (mirrors executeKernelCommand logic).
+          const stepArgs = [...(step.args ?? [])];
+          if (command.scope === "workspace" && !stepArgs.includes("--site") && site.name) {
+            stepArgs.push("--site", site.name);
+          }
+          report = await executeRegisteredCommand(command, context, stepArgs, {
+            timeoutMs: step.timeoutMs,
+            expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,
+          });
+          // RFC-0390: store successful results in cache.
+          await tryCacheWrite(
+            cache,
+            command,
+            report,
+            site.directory,
+            options.workspaceRoot,
+            site.name,
+            moduleSrcDir,
+            moduleHashCache,
+            options.dryRun ?? false,
+            treeIndex,
+          );
+        }
       }
-    }
-    const endedAtMonotonicMs = Math.round(performance.now());
-    progressLine(
-      `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
-    );
-    if (!step.skip && !report.cached) {
-      await appendStepTelemetry(options.workspaceRoot, {
+      const endedAtMonotonicMs = Math.round(performance.now());
+      progressLine(
+        `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
+      );
+      if (!step.skip && !report.cached) {
+        await telemetryMutex.run(() =>
+          appendStepTelemetry(options.workspaceRoot, {
+            pipeline: options.pipelineName,
+            command: step.command,
+            app: site.name,
+            durationMs: report.timing.durationMs,
+            timedOut: report.timing.exceededTimeout,
+            recordedAt: new Date().toISOString(),
+          }),
+        );
+      }
+      stepTimings.set(stepIndex, {
         pipeline: options.pipelineName,
         command: step.command,
         app: site.name,
+        packageName: site.packageName,
+        status: stepStatus(report),
+        startedAtMonotonicMs,
+        endedAtMonotonicMs,
         durationMs: report.timing.durationMs,
-        timedOut: report.timing.exceededTimeout,
-        recordedAt: new Date().toISOString(),
+        ...(report.timing.timeoutMs !== undefined ? { timeoutMs: report.timing.timeoutMs } : {}),
+        ...(report.timing.expectedDurationMs !== undefined
+          ? { expectedDurationMs: report.timing.expectedDurationMs }
+          : {}),
+        exceededTimeout: report.timing.exceededTimeout,
       });
-    }
-    reports.push(report);
-    stepTimings.push({
-      pipeline: options.pipelineName,
-      command: step.command,
-      app: site.name,
-      packageName: site.packageName,
-      status: stepStatus(report),
-      startedAtMonotonicMs,
-      endedAtMonotonicMs,
-      durationMs: report.timing.durationMs,
-      ...(report.timing.timeoutMs !== undefined ? { timeoutMs: report.timing.timeoutMs } : {}),
-      ...(report.timing.expectedDurationMs !== undefined
-        ? { expectedDurationMs: report.timing.expectedDurationMs }
-        : {}),
-      exceededTimeout: report.timing.exceededTimeout,
-    });
 
-    if (!report.ok) {
-      const timing = pipelineTimingSummary(options.pipelineName, reports, stepTimings, site.name);
-      if (options.outputFormat !== "json") printPipelineTimingSummary(context.logger, timing);
-      progressLine(
-        `[${site.name}] pipeline ${options.pipelineName} — FAILED at step ${step.command} (${formatDuration(timing.totalDurationMs)})`,
-      );
-      return {
-        siteName: site.name,
-        pipelineName: options.pipelineName,
-        exitCode: report.exitCode,
-        ok: false,
-        steps: reports,
-        timing,
-        filesModified: aggregateFilesModified(reports),
-      };
-    }
-  }
+      return report;
+    },
+  );
 
-  const timing = pipelineTimingSummary(options.pipelineName, reports, stepTimings, site.name);
+  // Sort results by stepIndex (declaration order).
+  const sortedResults = [...results].sort((a, b) => a.stepIndex - b.stepIndex);
+  const reports = sortedResults.map((r) => r.report);
+  const orderedStepTimings = scheduled.map((s) => stepTimings.get(s.stepIndex)!).filter(Boolean);
+
+  const failed = reports.find((report) => !report.ok);
+  const timing = pipelineTimingSummary(
+    options.pipelineName,
+    reports,
+    orderedStepTimings,
+    site.name,
+  );
+
   if (options.outputFormat !== "json") {
     const logger = createKernelLogger(options.outputFormat ?? "pretty");
     printPipelineTimingSummary(logger, timing);
   }
+
+  if (failed) {
+    progressLine(
+      `[${site.name}] pipeline ${options.pipelineName} — FAILED at step ${failed.commandName} (${formatDuration(timing.totalDurationMs)})`,
+    );
+    return {
+      siteName: site.name,
+      pipelineName: options.pipelineName,
+      exitCode: failed.exitCode,
+      ok: false,
+      steps: reports,
+      timing,
+      filesModified: aggregateFilesModified(reports),
+    };
+  }
+
   progressLine(
     `[${site.name}] pipeline ${options.pipelineName} — DONE ${formatDuration(timing.totalDurationMs)} (${timing.stepCount} step(s), ${timing.timeoutCount} timeout(s))`,
   );
@@ -574,8 +626,6 @@ async function executePipelineForWorkspace(
   options: ExecuteKernelPipelineOptions,
   steps: KernelPipelineStep[],
 ): Promise<KernelPipelineReport> {
-  const reports: KernelExecutionReport[] = [];
-  const stepTimings: PipelineStepTiming[] = [];
   // RFC-0270: a generated budget entry, when present, wins over the inline
   // expectedDurationMs — the inline value stays as the cold-start fallback.
   const budgets = await loadPipelineBudgets(options.workspaceRoot);
@@ -590,145 +640,160 @@ async function executePipelineForWorkspace(
   } catch {
     treeIndex = undefined;
   }
-  progressLine(`[workspace] pipeline ${options.pipelineName} — ${totalSteps} step(s)`);
+  const concurrency = resolveConcurrency(options);
+  const telemetryMutex = new TelemetryMutex();
+  progressLine(
+    `[workspace] pipeline ${options.pipelineName} — ${totalSteps} step(s), concurrency ${concurrency}`,
+  );
 
-  for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
-    const step = steps[stepIndex]!;
-    const command = registry.getCommand(step.command);
-    if (!command) {
-      throw new Error(
-        `Kernel pipeline step \`${step.command}\` is not registered for workspace pipeline \`${options.pipelineName}\`.`,
-      );
-    }
-    if (command.scope !== "workspace") {
-      throw new Error(
-        `Workspace pipeline \`${options.pipelineName}\` cannot execute app-scoped step \`${step.command}\` without an app target.`,
-      );
-    }
+  const scheduled = buildSchedule(steps);
+  const moduleSrcDir = join(options.workspaceRoot, "packages", "os", "site-kernel-checks", "src");
 
-    const logger = createKernelLogger(options.outputFormat ?? "pretty");
-    const { io, intents } = createDefaultIO();
-    const context: KernelRuntimeContext = {
-      workspaceRoot: options.workspaceRoot,
-      site: undefined,
-      siteExplicit: false,
-      logger,
-      dryRun: options.dryRun ?? false,
-      outputFormat: options.outputFormat ?? "pretty",
-      io,
-      fileIntents: intents,
-    };
+  const stepTimings: Map<number, PipelineStepTiming> = new Map();
 
-    const stepLabel = `[${stepIndex + 1}/${totalSteps}]`;
-    if (options.outputFormat !== "json") {
-      logger.section(`workspace: ${options.pipelineName} -> ${step.command}`);
-    }
-    progressLine(`${stepLabel} ${step.command} …`);
+  const results = await executeScheduledSteps(
+    scheduled,
+    concurrency,
+    async (sStep: ScheduledStep) => {
+      const { step, stepIndex } = sStep;
+      const command = registry.getCommand(step.command);
+      if (!command) {
+        throw new Error(
+          `Kernel pipeline step \`${step.command}\` is not registered for workspace pipeline \`${options.pipelineName}\`.`,
+        );
+      }
+      if (command.scope !== "workspace") {
+        throw new Error(
+          `Workspace pipeline \`${options.pipelineName}\` cannot execute app-scoped step \`${step.command}\` without an app target.`,
+        );
+      }
 
-    const budgetedExpectedDurationMs = lookupExpectedDurationMs(
-      budgets,
-      options.pipelineName,
-      step.command,
-      null,
-    );
-    const startedAtMonotonicMs = Math.round(performance.now());
-    let report: KernelExecutionReport;
-    if (step.skip) {
-      report = skippedExecutionReport(command, context, step.skipReason);
-    } else {
-      // RFC-0390: try cache read before executing.
-      const moduleSrcDir = join(
-        options.workspaceRoot,
-        "packages",
-        "os",
-        "site-kernel-checks",
-        "src",
-      );
-      const cached = await tryCacheRead(
-        cache,
-        command,
-        options.workspaceRoot,
-        options.workspaceRoot,
+      const logger = createKernelLogger(options.outputFormat ?? "pretty");
+      const { io, intents } = createDefaultIO();
+      const context: KernelRuntimeContext = {
+        workspaceRoot: options.workspaceRoot,
+        site: undefined,
+        siteExplicit: false,
+        logger,
+        dryRun: options.dryRun ?? false,
+        outputFormat: options.outputFormat ?? "pretty",
+        io,
+        fileIntents: intents,
+      };
+
+      const stepLabel = `[${stepIndex + 1}/${totalSteps}]`;
+      if (options.outputFormat !== "json") {
+        logger.section(`workspace: ${options.pipelineName} -> ${step.command}`);
+      }
+      progressLine(`${stepLabel} ${step.command} …`);
+
+      const budgetedExpectedDurationMs = lookupExpectedDurationMs(
+        budgets,
+        options.pipelineName,
+        step.command,
         null,
-        moduleSrcDir,
-        moduleHashCache,
-        options.force ?? false,
-        options.dryRun ?? false,
-        treeIndex,
       );
-      if (cached) {
-        report = cached;
+      const startedAtMonotonicMs = Math.round(performance.now());
+      let report: KernelExecutionReport;
+      if (step.skip) {
+        report = skippedExecutionReport(command, context, step.skipReason);
       } else {
-        report = await executeRegisteredCommand(command, context, step.args ?? [], {
-          timeoutMs: step.timeoutMs,
-          expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,
-        });
-        // RFC-0390: store successful results in cache.
-        await tryCacheWrite(
+        // RFC-0390: try cache read before executing.
+        const cached = await tryCacheRead(
           cache,
           command,
-          report,
           options.workspaceRoot,
           options.workspaceRoot,
           null,
           moduleSrcDir,
           moduleHashCache,
+          options.force ?? false,
           options.dryRun ?? false,
           treeIndex,
         );
+        if (cached) {
+          report = cached;
+        } else {
+          report = await executeRegisteredCommand(command, context, step.args ?? [], {
+            timeoutMs: step.timeoutMs,
+            expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,
+          });
+          // RFC-0390: store successful results in cache.
+          await tryCacheWrite(
+            cache,
+            command,
+            report,
+            options.workspaceRoot,
+            options.workspaceRoot,
+            null,
+            moduleSrcDir,
+            moduleHashCache,
+            options.dryRun ?? false,
+            treeIndex,
+          );
+        }
       }
-    }
-    const endedAtMonotonicMs = Math.round(performance.now());
-    progressLine(
-      `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
-    );
-    if (!step.skip && !report.cached) {
-      await appendStepTelemetry(options.workspaceRoot, {
+      const endedAtMonotonicMs = Math.round(performance.now());
+      progressLine(
+        `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
+      );
+      if (!step.skip && !report.cached) {
+        await telemetryMutex.run(() =>
+          appendStepTelemetry(options.workspaceRoot, {
+            pipeline: options.pipelineName,
+            command: step.command,
+            app: null,
+            durationMs: report.timing.durationMs,
+            timedOut: report.timing.exceededTimeout,
+            recordedAt: new Date().toISOString(),
+          }),
+        );
+      }
+      stepTimings.set(stepIndex, {
         pipeline: options.pipelineName,
         command: step.command,
-        app: null,
+        status: stepStatus(report),
+        startedAtMonotonicMs,
+        endedAtMonotonicMs,
         durationMs: report.timing.durationMs,
-        timedOut: report.timing.exceededTimeout,
-        recordedAt: new Date().toISOString(),
+        ...(report.timing.timeoutMs !== undefined ? { timeoutMs: report.timing.timeoutMs } : {}),
+        ...(report.timing.expectedDurationMs !== undefined
+          ? { expectedDurationMs: report.timing.expectedDurationMs }
+          : {}),
+        exceededTimeout: report.timing.exceededTimeout,
       });
-    }
-    reports.push(report);
-    stepTimings.push({
-      pipeline: options.pipelineName,
-      command: step.command,
-      status: stepStatus(report),
-      startedAtMonotonicMs,
-      endedAtMonotonicMs,
-      durationMs: report.timing.durationMs,
-      ...(report.timing.timeoutMs !== undefined ? { timeoutMs: report.timing.timeoutMs } : {}),
-      ...(report.timing.expectedDurationMs !== undefined
-        ? { expectedDurationMs: report.timing.expectedDurationMs }
-        : {}),
-      exceededTimeout: report.timing.exceededTimeout,
-    });
 
-    if (!report.ok) {
-      const timing = pipelineTimingSummary(options.pipelineName, reports, stepTimings);
-      if (options.outputFormat !== "json") printPipelineTimingSummary(context.logger, timing);
-      progressLine(
-        `[workspace] pipeline ${options.pipelineName} — FAILED at step ${step.command} (${formatDuration(timing.totalDurationMs)})`,
-      );
-      return {
-        pipelineName: options.pipelineName,
-        exitCode: report.exitCode,
-        ok: false,
-        steps: reports,
-        timing,
-        filesModified: aggregateFilesModified(reports),
-      };
-    }
-  }
+      return report;
+    },
+  );
 
-  const timing = pipelineTimingSummary(options.pipelineName, reports, stepTimings);
+  // Sort results by stepIndex (declaration order).
+  const sortedResults = [...results].sort((a, b) => a.stepIndex - b.stepIndex);
+  const reports = sortedResults.map((r) => r.report);
+  const orderedStepTimings = scheduled.map((s) => stepTimings.get(s.stepIndex)!).filter(Boolean);
+
+  const failed = reports.find((report) => !report.ok);
+  const timing = pipelineTimingSummary(options.pipelineName, reports, orderedStepTimings);
+
   if (options.outputFormat !== "json") {
     const logger = createKernelLogger(options.outputFormat ?? "pretty");
     printPipelineTimingSummary(logger, timing);
   }
+
+  if (failed) {
+    progressLine(
+      `[workspace] pipeline ${options.pipelineName} — FAILED at step ${failed.commandName} (${formatDuration(timing.totalDurationMs)})`,
+    );
+    return {
+      pipelineName: options.pipelineName,
+      exitCode: failed.exitCode,
+      ok: false,
+      steps: reports,
+      timing,
+      filesModified: aggregateFilesModified(reports),
+    };
+  }
+
   progressLine(
     `[workspace] pipeline ${options.pipelineName} — DONE ${formatDuration(timing.totalDurationMs)} (${timing.stepCount} step(s), ${timing.timeoutCount} timeout(s))`,
   );

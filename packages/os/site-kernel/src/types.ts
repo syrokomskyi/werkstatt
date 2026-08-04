@@ -377,7 +377,10 @@ export interface PipelineStepTiming extends KernelCommandTiming {
 export interface KernelPipelineTimingSummary {
   pipeline: string;
   app?: string;
+  /** Wall-clock duration: min(startedAt) to max(endedAt) across all steps. */
   totalDurationMs: number;
+  /** Sum of per-step durationMs — equals totalDurationMs for sequential execution, exceeds it for parallel. */
+  summedDurationMs?: number;
   stepCount: number;
   slowestSteps: PipelineStepTiming[];
   timeoutCount: number;
