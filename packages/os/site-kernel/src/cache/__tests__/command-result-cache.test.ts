@@ -172,6 +172,85 @@ describe("getCachedCommandResult / setCachedCommandResult", () => {
   });
 });
 
+describe("RFC-0685: computeInputsHash with tree index", () => {
+  test("tree index produces same hash as filesystem walk", async () => {
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
+    await fs.writeFile(path.join(ws, "a.md"), "content a");
+    await fs.writeFile(path.join(ws, "b.md"), "content b");
+    const treeIndex = await buildWorkspaceTreeIndex(ws);
+    const withoutTree = await computeInputsHash(["*.md"], ws, ws);
+    const withTree = await computeInputsHash(["*.md"], ws, ws, treeIndex);
+    expect(withTree.hash).toBe(withoutTree.hash);
+  });
+
+  test("tree index produces same metadata as filesystem walk", async () => {
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
+    await fs.writeFile(path.join(ws, "a.md"), "content a");
+    const treeIndex = await buildWorkspaceTreeIndex(ws);
+    const withoutTree = await computeInputsHash(["a.md"], ws, ws);
+    const withTree = await computeInputsHash(["a.md"], ws, ws, treeIndex);
+    expect(withTree.metadata).toHaveLength(1);
+    expect(withTree.metadata[0]!.path).toBe(withoutTree.metadata[0]!.path);
+    expect(withTree.metadata[0]!.size).toBe(withoutTree.metadata[0]!.size);
+  });
+
+  test("metadata entries have path, mtimeMs, and size", async () => {
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
+    await fs.writeFile(path.join(ws, "input.md"), "test content");
+    const result = await computeInputsHash(["input.md"], ws, ws);
+    expect(result.metadata).toHaveLength(1);
+    const entry = result.metadata[0]!;
+    expect(entry.path).toBe("input.md");
+    expect(typeof entry.mtimeMs).toBe("number");
+    expect(entry.size).toBe(12);
+  });
+
+  test("metadata is sorted by path", async () => {
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
+    await fs.writeFile(path.join(ws, "c.md"), "c");
+    await fs.writeFile(path.join(ws, "a.md"), "a");
+    await fs.writeFile(path.join(ws, "b.md"), "b");
+    const result = await computeInputsHash(["*.md"], ws, ws);
+    expect(result.metadata.map((m) => m.path)).toEqual(["a.md", "b.md", "c.md"]);
+  });
+});
+
+describe("RFC-0685: byte-mode fingerprint selection", () => {
+  test("md files use byte mode (hash changes with content only)", async () => {
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
+    await fs.writeFile(path.join(ws, "doc.md"), "hello");
+    const h1 = await computeInputsHash(["doc.md"], ws, ws);
+    await fs.writeFile(path.join(ws, "doc.md"), "world");
+    const h2 = await computeInputsHash(["doc.md"], ws, ws);
+    expect(h1.hash).not.toBe(h2.hash);
+  });
+
+  test("ts files use semantic mode (whitespace-insensitive)", async () => {
+    const ws = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
+    await fs.writeFile(path.join(ws, "mod.ts"), "export const x = 1;");
+    const h1 = await computeInputsHash(["mod.ts"], ws, ws);
+    await fs.writeFile(path.join(ws, "mod.ts"), "export   const   x   =   1;");
+    const h2 = await computeInputsHash(["mod.ts"], ws, ws);
+    expect(h1.hash).toBe(h2.hash);
+  });
+});
+
+describe("RFC-0685: getCachedCommandResult wrapper format", () => {
+  test("returns null on noop cache", async () => {
+    const cache = new NoopCacheLayer("/tmp/test.db", "test");
+    const result = await getCachedCommandResult(cache, makeKey());
+    expect(result).toBeNull();
+  });
+
+  test("noop cache does not store wrapper", async () => {
+    const cache = new NoopCacheLayer("/tmp/test.db", "test");
+    const metadata = [{ path: "input.md", mtimeMs: Date.now(), size: 100 }];
+    await setCachedCommandResult(cache, makeKey(), makeReport(), metadata);
+    const result = await getCachedCommandResult(cache, makeKey());
+    expect(result).toBeNull();
+  });
+});
+
 describe("COMMAND_RESULT_CACHE_NAMESPACE", () => {
   test("is command_results", () => {
     expect(COMMAND_RESULT_CACHE_NAMESPACE).toBe("command_results");
