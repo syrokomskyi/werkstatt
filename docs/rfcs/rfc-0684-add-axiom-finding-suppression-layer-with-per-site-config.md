@@ -148,7 +148,7 @@ pnpm exec site-kernel run mission.check \
 
 `--channel` accepts `dev | alt | main`. Callers that already know the channel pass it explicitly:
 
-- `leitstand.dev-deploy` passes `--channel dev` to `mission.check` (it calls `mission.check` via `executeKernelCommand`)
+- `leitstand.dev-deploy` passes `--channel dev` to `mission.check` (it calls `mission.check` via `executeKernelCommand` in `runMissionCheckWithResilience`). This ensures dev-channel suppression rules (e.g. `channelNot: main`) fire during the Axiom verification gate. The `--channel dev` flag is added to the `argv` array alongside `--external-preview`, `--base-url`, `--commit-sha`, `--max-duration`, and `--no-report`.
 - `leitstand.propagate` does NOT call `mission.check` — it reads `study-run.json` directly. It re-applies suppressions via `applySuppressions` (imported from `@warpgogol/site-kernel-checks/suppressions-config` subpath export) to handle pre-suppression evidence, then skips findings marked `suppressed: true` when evaluating `isBlockingFinding`. No `--channel` flag needed on `leitstand.propagate` itself — the channel is determined from the release context (`alt` for propagate, `main` for promote).
 - Manual invocations default to `main` if omitted (backward compatibility)
 
@@ -322,7 +322,7 @@ suppressions:
   # Category D: Render-blocking CSS (112 findings)
   - ruleId: performance-vitals.render-blocking
     category: render-blocking-css
-    descriptionPattern: "preload"
+    descriptionPattern: "preload" # Combined with ruleId AND logic — only matches render-blocking findings mentioning preload
     reason: "Standard Astro CSS preload pattern, not a real render-blocking issue"
 ```
 
