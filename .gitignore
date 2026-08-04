@@ -266,6 +266,7 @@ apps/*/src/agent-capabilities.generated.yaml
 # RFC-0354: Sternsystem cache clones, missions, releases, agents, and werkstatt state
 systems/*
 !systems/registry.yaml
+!systems/methodologies.md
 missions/
 releases/
 agents/
