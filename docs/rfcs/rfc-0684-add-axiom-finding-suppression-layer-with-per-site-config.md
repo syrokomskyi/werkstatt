@@ -1,7 +1,7 @@
 ---
 id: RFC-0684
 title: "Add Axiom finding suppression layer with per-site config"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
 enhancedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
