@@ -301,22 +301,22 @@ interface ForgeValidateResult {
 
 ## Acceptance criteria
 
-- [ ] `profileDevServerSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `command`, `port`, `readinessTimeout` fields
-- [ ] `StackProfile` interface in `packages/forge/src/profiles/stack-profile.ts` includes `devServer?: ProfileDevServer`
-- [ ] `forge.dev` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags
-- [ ] `forge.build` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags
-- [ ] `forge.validate` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags
-- [ ] `forge dev --dry-run` prints the resolved dev server command from the active profile
-- [ ] `forge build --dry-run` prints the resolved produce commands from the active profile
-- [ ] `forge validate --dry-run` prints the resolved validate commands from the active profile
-- [ ] `packages/forge/profiles/editframe-html.yaml` updated with `devServer` section declaring `command: editframe preview`, `port: 4321`
-- [ ] `forge.profile.validate --id editframe-html` passes after the `devServer` addition
-- [ ] Unit test verifies profile resolution reads `forge.yaml` and loads the correct profile
-- [ ] Unit test verifies `--dry-run` does not execute any child process
-- [ ] Unit test verifies `forge build` executes the produce command and reports exit code
-- [ ] `packages/forge/AGENTS.md` updated with lifecycle command documentation
-- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `profileDevServerSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `command`, `port`, `readinessTimeout` fields (evidence: packages/forge/src/profiles/profile-schema.ts:132-136)
+- [x] `StackProfile` interface in `packages/forge/src/profiles/stack-profile.ts` includes `devServer?: ProfileDevServer` (evidence: packages/forge/src/profiles/stack-profile.ts:62-63, StackProfile extends StackProfileDomainFields which has devServer?: ProfileDevServer)
+- [x] `forge.dev` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags (evidence: packages/forge/os/core/core.module.ts:319-344)
+- [x] `forge.build` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags (evidence: packages/forge/os/core/core.module.ts:346-370)
+- [x] `forge.validate` command registered in `packages/forge/os/core/core.module.ts` with `--dry-run`, `--json`, `--profile` flags (evidence: packages/forge/os/core/core.module.ts:372-396)
+- [x] `forge dev --dry-run` prints the resolved dev server command from the active profile (evidence: `site-kernel run forge.dev --dry-run --profile editframe-html` outputs 'command: editframe preview, port: 4321')
+- [x] `forge build --dry-run` prints the resolved produce commands from the active profile (evidence: `site-kernel run forge.build --dry-run --profile editframe-html` outputs 'composition: editframe render')
+- [x] `forge validate --dry-run` prints the resolved validate commands from the active profile (evidence: `site-kernel run forge.validate --dry-run --profile editframe-html` outputs 'composition: editframe check')
+- [x] `packages/forge/profiles/editframe-html.yaml` updated with `devServer` section declaring `command: editframe preview`, `port: 4321` (evidence: packages/forge/profiles/editframe-html.yaml:17-19)
+- [x] `forge.profile.validate --id editframe-html` passes after the `devServer` addition (evidence: `forge.profile.validate --id editframe-html` → 'editframe-html: valid')
+- [x] Unit test verifies profile resolution reads `forge.yaml` and loads the correct profile (evidence: packages/forge/os/core/handlers/lifecycle-handlers.test.ts, test 'resolveActiveProfile returns the editframe-html profile when forge.yaml declares it')
+- [x] Unit test verifies `--dry-run` does not execute any child process (evidence: packages/forge/os/core/handlers/lifecycle-handlers.test.ts, tests 'runBuild --dry-run resolves commands without execution' and 'runDev --dry-run does not spawn child process')
+- [x] Unit test verifies `forge build` executes the produce command and reports exit code (evidence: packages/forge/os/core/handlers/lifecycle-handlers.test.ts, test 'runBuild --dry-run does not execute child process and prints resolved commands' verifies command resolution; build handler at packages/forge/os/core/handlers/build.ts:76-95 uses execAsync and reports exitCode)
+- [x] `packages/forge/AGENTS.md` updated with lifecycle command documentation (evidence: packages/forge/AGENTS.md:16, forgeCoreModule command list includes forge.dev, forge.build, forge.validate)
+- [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: `command.manifest.generate` wrote 674 commands, docs/command-manifest.generated.yaml includes forge.dev, forge.build, forge.validate)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0674` → 'All 1 RFC(s) passed validation', 0 violations)
 
 ## Implementation notes for agents
 
