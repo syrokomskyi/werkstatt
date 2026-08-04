@@ -59,6 +59,36 @@ if [ -n "$ENV_EXAMPLE_FILES" ]; then
     echo "Fix: add a blank line above the comment block for each flagged variable." >&2
     exit 1
   fi
+
+  # ENV-CONTRACT-05: every variable must have a "# How to obtain:" line in its comment block
+  ENV05_ERRORS=""
+  for f in $ENV_EXAMPLE_FILES; do
+    if [ ! -f "$f" ]; then continue; fi
+    while IFS= read -r line_num; do
+      [ -z "$line_num" ] && continue
+      VAR_NAME=$(sed -n "${line_num}p" "$f" | sed 's/=.*//')
+      ENV05_ERRORS="$ENV05_ERRORS\n  $f:$line_num — variable \"$VAR_NAME\" missing \"# How to obtain:\" instruction (ENV-CONTRACT-05)"
+    done < <(awk '
+      /^[A-Z][A-Z0-9_]*=/ {
+        if (!has_how_to) {
+          print NR
+        }
+        has_how_to = 0
+        next
+      }
+      /^#[[:space:]]*[Hh]ow to obtain:/ { has_how_to = 1 }
+      /^#/ { next }
+      /^$/ { has_how_to = 0 }
+    ' "$f")
+  done
+  if [ -n "$ENV05_ERRORS" ]; then
+    echo "ERROR: .env.example ENV-CONTRACT-05 violations detected:" >&2
+    echo -e "$ENV05_ERRORS" >&2
+    echo "" >&2
+    echo "Every variable in .env.example must include a \"# How to obtain:\" instruction line (RFC-0388 Rule 3)." >&2
+    echo "Fix: add a \"# How to obtain: <instructions>\" line above each flagged variable." >&2
+    exit 1
+  fi
 fi
 
 # Command manifest staleness check (RFC-0646)
