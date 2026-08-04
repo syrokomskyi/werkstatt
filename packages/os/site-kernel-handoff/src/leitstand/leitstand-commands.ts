@@ -72,6 +72,12 @@ import { execSync } from "node:child_process";
 import { fingerprintTree } from "@warpgogol/fingerprint/semantic";
 import { isBlockingFinding } from "@syrokomskyi/axiom-factory-app/run/report";
 import type { Finding } from "@syrokomskyi/axiom-study";
+import {
+  loadWorkshopSuppressions,
+  loadWorkpieceSuppressions,
+  mergeSuppressions,
+  applySuppressions,
+} from "@warpgogol/site-kernel-checks/suppressions-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../build-pipeline-helpers.ts";
 
@@ -195,6 +201,7 @@ export async function runMissionCheckWithResilience(
             `--base-url=${channelUrl}`,
             `--commit-sha=${commitSha}`,
             `--max-duration=${MISSION_CHECK_TIMEOUT_MS}`,
+            "--channel=dev",
             ...(noReport ? ["--no-report"] : []),
           ],
         }),
@@ -1260,14 +1267,29 @@ export async function runLeitstandPropagate(
     );
   }
 
+  // RFC-0684: Re-apply suppressions to handle pre-suppression evidence that lacks
+  // suppressed flags. This ensures old study-run.json files (produced before this RFC)
+  // are correctly filtered without requiring a re-run of leitstand.dev-deploy.
+  const missionDir = path.join(workspaceRoot, "missions", missionId);
+  const workshopSuppressions = loadWorkshopSuppressions(workspaceRoot);
+  const workpieceSuppressions = loadWorkpieceSuppressions(missionDir);
+  const mergedRules = mergeSuppressions(workshopSuppressions, workpieceSuppressions);
+  const findingsWithSuppressions =
+    mergedRules.length > 0
+      ? applySuppressions(studyRun.findings, mergedRules, { channel: "alt" })
+      : studyRun.findings;
+
   // RFC-0665: Per-methodology gate — each methodology declares its own blockOn severity levels.
   // Findings are matched by methodologyId (falling back to extension-based predicate for
   // backward compat with findings that don't carry methodologyId yet).
   // Incomplete findings (e.g., accessibility.axe.incomplete) do not block — they are
   // instrument limitations, not confirmed violations.
+  // RFC-0684: Skip findings marked suppressed: true.
   for (const methodology of metadata.methodologies ?? []) {
     const blockOn = methodology.blockOn ?? ["high", "critical"];
-    const methodologyFindings = studyRun.findings.filter((f) => {
+    const methodologyFindings = findingsWithSuppressions.filter((f) => {
+      // Skip suppressed findings (RFC-0684)
+      if ((f as { suppressed?: boolean }).suppressed) return false;
       // Match by methodologyId if present
       if (f.methodologyId) {
         return f.methodologyId === methodology.id;
