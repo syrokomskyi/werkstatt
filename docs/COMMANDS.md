@@ -11,7 +11,7 @@ This file is generated from docs/command-manifest.generated.yaml (RFC-0266), the
 command manifest. Regenerate both with `pnpm exec site-kernel run command.manifest.generate` then
 `pnpm exec site-kernel run docs.commands.generate`.
 
-Generated command rows: 674. Raw manifest entries: 674.
+Generated command rows: 675. Raw manifest entries: 675.
 
 | Command | Provider | Scope | Mutates | Network | Description |
 | --- | --- | --- | --- | --- |
@@ -267,6 +267,7 @@ Generated command rows: 674. Raw manifest entries: 674.
 | `forge.agents.generate` | workspace | workspace | no | no | Regenerate AGENTS.md deterministically from forge.yaml and the skill registry. |
 | `forge.build` | workspace | workspace | no | no | Execute produce commands for all artifacts declared in the active stack profile. Use --dry-run to print resolved commands. |
 | `forge.create` | workspace | workspace | no | no | Create a new forge project in one command: scaffold + init + binding defaults. Usage: forge create --name <name> [--profile forge-shell] [--package-manager pnpm] |
+| `forge.determinism.check` | workspace | workspace | no | no | Verify artifact determinism by building twice and comparing output hashes. Reads determinism.inputs glob patterns from the active stack profile. Use --dry-run to print resolved inputs, --artifact to check a single artifact. |
 | `forge.dev` | workspace | workspace | no | no | Start the dev/preview server declared in the active stack profile. Use --dry-run to print the resolved command without executing. |
 | `forge.doctor` | workspace | workspace | no | no | Diagnose forge state in an existing project. |
 | `forge.port.scaffold` | workspace | workspace | no | no | Generate a skeleton for a new forge skill or command. |

@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 07d6683881dadcd8fbc771258adc2b2141ec48570f4096f71760dc323adac898
+  contentHash: 124056acc6567ddd4598844d1da357528d99acab0f4ec8a81162373fee220fda
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -4674,6 +4674,34 @@ commands:
         description: "Package manager to write into forge.yaml (default: pnpm)."
     reads: []
     writes: []
+    pipelines: []
+  - name: forge.determinism.check
+    description: Verify artifact determinism by building twice and comparing output
+      hashes. Reads determinism.inputs glob patterns from the active stack
+      profile. Use --dry-run to print resolved inputs, --artifact to check a
+      single artifact.
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      dry-run:
+        kind: boolean
+        description: Print resolved determinism inputs without executing builds.
+      profile:
+        kind: string
+        description: Override the active profile id.
+      artifact:
+        kind: string
+        description: Check only the specified artifact id.
+    reads:
+      - forge.yaml
+      - packages/forge/profiles/*.yaml
+      - dist/.determinism-cache.json
+    writes:
+      - dist/.determinism-cache.json
     pipelines: []
   - name: forge.dev
     description: Start the dev/preview server declared in the active stack profile.
