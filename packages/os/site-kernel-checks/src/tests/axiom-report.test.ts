@@ -362,6 +362,46 @@ describe("axiom.report", () => {
     expect(existsSync(join(evidenceDir, "report.html"))).toBe(true);
   });
 
+  it("RFC-0667: uses raw.missionId fallback when auditId is absent", async () => {
+    const missionId = "test-mission-m000008";
+    const evidenceDir = setupEvidenceDir(tmpDir, missionId);
+    // Write evidence-metadata.json with missionId but no auditId
+    writeFileSync(
+      join(evidenceDir, "evidence-metadata.json"),
+      JSON.stringify({ missionId: "legacy-mission-name", commitSha: "abc123" }, null, 2),
+    );
+    writeEvidenceFiles(evidenceDir, {
+      skipMetadata: true,
+      studyRun: makeStudyRun(),
+    });
+
+    const result = await runAxiomReport(makeReportInput(missionId), makeTestContext(tmpDir));
+
+    expect(result.exitCode).toBe(0);
+    // RFC-0667 fallback chain: raw.auditId ?? raw.missionId ?? missionId
+    // auditId absent → use raw.missionId ("legacy-mission-name")
+    expect(result.data!.missionId).toBe("legacy-mission-name");
+  });
+
+  it("RFC-0667: uses command-line missionId when metadata has neither auditId nor missionId", async () => {
+    const missionId = "test-mission-m000009";
+    const evidenceDir = setupEvidenceDir(tmpDir, missionId);
+    // Write evidence-metadata.json with neither auditId nor missionId
+    writeFileSync(
+      join(evidenceDir, "evidence-metadata.json"),
+      JSON.stringify({ commitSha: "abc123" }, null, 2),
+    );
+    writeEvidenceFiles(evidenceDir, {
+      skipMetadata: true,
+      studyRun: makeStudyRun(),
+    });
+
+    const result = await runAxiomReport(makeReportInput(missionId), makeTestContext(tmpDir));
+
+    expect(result.exitCode).toBe(0);
+    expect(result.data!.missionId).toBe(missionId);
+  });
+
   it("dryRun mode returns HTML in renderedFiles without writing to disk", async () => {
     const missionId = "test-mission-m000006";
     const evidenceDir = setupEvidenceDir(tmpDir, missionId);

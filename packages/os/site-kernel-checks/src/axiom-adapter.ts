@@ -10,6 +10,7 @@
   <item>Migrated from duplicated mission-check.ts + axiom-report.ts to @syrokomskyi/axiom-factory-app programmatic API.</item>
   <item>Review fix: removed capsule/studyRun fields from MissionCheckResult (AxiomCheckResult does not provide them); added --no-report flag for optional report.html generation.</item>
   <item>RFC-0668: add Chromium pre-flight check via ensureChromium (RFC-0647) before runAxiomCheck to fail fast on missing browser instead of wasting capture time.</item>
+  <item>Replaced manual evidence file reading with readEvidenceFiles() and manual severity counting with countFindingsBySeverity() from external package. Preserved RFC-0667 fallback chain (raw.auditId ?? raw.missionId ?? missionId) by reading evidence-metadata.json separately for the intermediate missionId fallback.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,6 +28,8 @@ import {
 
 import {
   runAxiomCheck,
+  readEvidenceFiles,
+  countFindingsBySeverity,
   type AxiomCheckResult,
   type MethodologiesConfig as AxiomMethodologiesConfig,
 } from "@syrokomskyi/axiom-factory-app/run/axiom-cli";
@@ -38,8 +41,6 @@ import {
 import { tryLoadMethodologiesConfig } from "./methodologies-config.ts";
 import { ensureChromium } from "./playwright-chromium-ensure.ts";
 
-import type { StagedCapsule } from "@syrokomskyi/axiom-capture";
-import type { StudyRun, ObservationBundle } from "@syrokomskyi/axiom-study";
 import { parse as parseYaml } from "yaml";
 
 // ─── Re-exports for downstream consumers ───────────────────────────────────
@@ -314,34 +315,23 @@ export async function runAxiomReport(
   }
 
   const studyRunPath = join(evidenceDir, "study-run.json");
-  let studyRun: StudyRun;
-  try {
-    studyRun = JSON.parse(readFileSync(studyRunPath, "utf-8"));
-  } catch {
+  if (!existsSync(studyRunPath)) {
     return axiomReportFailResult(
       evidenceDir,
       1,
       `AXIOM-REPORT-02: cannot read study-run.json at ${studyRunPath}.`,
     );
   }
-
   const capsulePath = join(evidenceDir, "staged-capsule.json");
-  let capsule: StagedCapsule;
-  try {
-    capsule = JSON.parse(readFileSync(capsulePath, "utf-8"));
-  } catch {
+  if (!existsSync(capsulePath)) {
     return axiomReportFailResult(
       evidenceDir,
       1,
       `AXIOM-REPORT-03: cannot read staged-capsule.json at ${capsulePath}.`,
     );
   }
-
   const bundlePath = join(evidenceDir, "observation-bundle.json");
-  let bundle: ObservationBundle;
-  try {
-    bundle = JSON.parse(readFileSync(bundlePath, "utf-8"));
-  } catch {
+  if (!existsSync(bundlePath)) {
     return axiomReportFailResult(
       evidenceDir,
       1,
@@ -350,26 +340,40 @@ export async function runAxiomReport(
   }
 
   const metadataPath = join(evidenceDir, "evidence-metadata.json");
-  let metadata: EvidenceMetadata = { auditId: missionId };
-  if (existsSync(metadataPath)) {
-    try {
-      const raw = JSON.parse(readFileSync(metadataPath, "utf-8"));
-      metadata = {
-        auditId: raw.auditId ?? raw.missionId ?? missionId,
-        commitSha: raw.commitSha,
-        runTimestamp: raw.runTimestamp,
-        methodologies: raw.methodologies,
-      };
-    } catch {
-      logger.warn(
-        `AXIOM-REPORT-05: cannot read evidence-metadata.json at ${metadataPath}. Using "unknown" for missing fields.`,
-      );
-    }
-  } else {
+  if (!existsSync(metadataPath)) {
     logger.warn(
-      `AXIOM-REPORT-05: evidence-metadata.json not found at ${metadataPath}. Using "unknown" for missing fields.`,
+      `AXIOM-REPORT-05: evidence-metadata.json not found at ${metadataPath}. Using "${missionId}" for missing fields.`,
     );
   }
+
+  let evidence: Awaited<ReturnType<typeof readEvidenceFiles>>;
+  try {
+    evidence = await readEvidenceFiles(evidenceDir);
+  } catch {
+    return identifyCorruptEvidenceFile(evidenceDir, studyRunPath, capsulePath, bundlePath);
+  }
+
+  const { studyRun, capsule, bundle } = evidence;
+  // RFC-0667: fallback chain raw.auditId ?? raw.missionId ?? missionId.
+  // readEvidenceFiles() only reads raw.auditId (falls back to "unknown").
+  // Read evidence-metadata.json separately to preserve the intermediate missionId fallback.
+  let auditId = missionId;
+  if (evidence.metadata.auditId !== "unknown") {
+    auditId = evidence.metadata.auditId;
+  } else if (existsSync(metadataPath)) {
+    try {
+      const raw = JSON.parse(readFileSync(metadataPath, "utf-8")) as Record<string, unknown>;
+      if (typeof raw.missionId === "string" && raw.missionId) {
+        auditId = raw.missionId;
+      }
+    } catch {
+      // Already warned above about AXIOM-REPORT-05
+    }
+  }
+  const metadata: EvidenceMetadata = {
+    ...evidence.metadata,
+    auditId,
+  };
 
   const html = renderAxiomReportHtml(studyRun, capsule, bundle, metadata);
   const reportPath = join(evidenceDir, "report.html");
@@ -383,13 +387,7 @@ export async function runAxiomReport(
   const total = findings.length;
   const closureSatisfied = capsule.closureDecision.satisfied;
 
-  const findingsCount = {
-    critical: findings.filter((f) => f.severity === "critical").length,
-    high: findings.filter((f) => f.severity === "high").length,
-    medium: findings.filter((f) => f.severity === "medium").length,
-    low: findings.filter((f) => f.severity === "low").length,
-    info: findings.filter((f) => f.severity === "info").length,
-  };
+  const findingsCount = countFindingsBySeverity(findings);
   const errors = findingsCount.critical + findingsCount.high;
 
   const nextSteps: KernelNextStep[] =
@@ -416,7 +414,7 @@ export async function runAxiomReport(
   const data: AxiomReportData = {
     command: "axiom.report",
     status: "pass",
-    missionId: metadata.auditId ?? missionId,
+    missionId: metadata.auditId,
     evidenceDir,
     reportPath: relativeReportPath,
     findingsCount,
@@ -434,6 +432,41 @@ export async function runAxiomReport(
     summary,
     nextSteps,
   };
+}
+
+function identifyCorruptEvidenceFile(
+  evidenceDir: string,
+  studyRunPath: string,
+  capsulePath: string,
+  bundlePath: string,
+): KernelCommandResult<AxiomReportData> {
+  const tryParse = (p: string): boolean => {
+    try {
+      JSON.parse(readFileSync(p, "utf-8"));
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  if (!tryParse(studyRunPath)) {
+    return axiomReportFailResult(
+      evidenceDir,
+      1,
+      `AXIOM-REPORT-02: cannot read study-run.json at ${studyRunPath}.`,
+    );
+  }
+  if (!tryParse(capsulePath)) {
+    return axiomReportFailResult(
+      evidenceDir,
+      1,
+      `AXIOM-REPORT-03: cannot read staged-capsule.json at ${capsulePath}.`,
+    );
+  }
+  return axiomReportFailResult(
+    evidenceDir,
+    1,
+    `AXIOM-REPORT-04: cannot read observation-bundle.json at ${bundlePath}.`,
+  );
 }
 
 function axiomReportFailResult(

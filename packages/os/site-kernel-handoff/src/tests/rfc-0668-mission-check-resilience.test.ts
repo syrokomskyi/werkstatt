@@ -229,3 +229,50 @@ test("RFC-0668: passes --max-duration to mission.check argv", async () => {
   const value = Number(maxDurationArg!.split("=")[1]);
   expect(value).toBe(15 * 60 * 1000);
 });
+
+test("RFC-0668: passes --no-report by default to prevent double report.html generation", async () => {
+  vi.mocked(executeKernelCommand).mockResolvedValue({
+    ok: true,
+    exitCode: 0,
+    data: { findings: { errors: 0, warnings: 0 } },
+    summary: "mission.check: pass",
+  } as never);
+
+  const logger = makeLogger();
+  await runMissionCheckWithResilience(
+    "/tmp/test",
+    "test-mission",
+    "http://example.com",
+    "abc123",
+    logger,
+  );
+
+  const callArgs = vi.mocked(executeKernelCommand).mock.calls[0]![0] as {
+    argv: string[];
+  };
+  expect(callArgs.argv).toContain("--no-report");
+});
+
+test("RFC-0668: omits --no-report when noReport=false", async () => {
+  vi.mocked(executeKernelCommand).mockResolvedValue({
+    ok: true,
+    exitCode: 0,
+    data: { findings: { errors: 0, warnings: 0 } },
+    summary: "mission.check: pass",
+  } as never);
+
+  const logger = makeLogger();
+  await runMissionCheckWithResilience(
+    "/tmp/test",
+    "test-mission",
+    "http://example.com",
+    "abc123",
+    logger,
+    false,
+  );
+
+  const callArgs = vi.mocked(executeKernelCommand).mock.calls[0]![0] as {
+    argv: string[];
+  };
+  expect(callArgs.argv).not.toContain("--no-report");
+});

@@ -178,6 +178,7 @@ export async function runMissionCheckWithResilience(
   channelUrl: string,
   commitSha: string,
   logger: { info: (m: string) => void; warn: (m: string) => void },
+  noReport = true,
 ): Promise<{ exitCode: number; data?: Record<string, unknown> }> {
   const { executeKernelCommand } = await import("@warpgogol/site-kernel");
 
@@ -193,6 +194,7 @@ export async function runMissionCheckWithResilience(
             `--base-url=${channelUrl}`,
             `--commit-sha=${commitSha}`,
             `--max-duration=${MISSION_CHECK_TIMEOUT_MS}`,
+            ...(noReport ? ["--no-report"] : []),
           ],
         }),
         MISSION_CHECK_TIMEOUT_MS,
