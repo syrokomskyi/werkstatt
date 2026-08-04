@@ -23,6 +23,7 @@
   <item>RFC-0657: replace single-fetch verifyFreshness with retry loop (5 attempts, exponential backoff 3s/6s/12s/24s); remove fixed 6s sleep after purge; add attempts field to FreshnessResult.</item>
   <item>RFC-0665: add methodologies.validate pre-flight to dev-deploy; fail fast on invalid methodologies config before build+deploy cycle.</item>
   <item>RFC-0668: wrap mission.check call with 15-min per-attempt timeout (MISSION_CHECK_TIMEOUT_MS) and one-time retry on infrastructure errors (exit 2 or any non-0/non-1); pass --max-duration to mission.check; worst-case total 30 min with retry.</item>
+  <item>Add --no-report flag (default true) to runMissionCheckWithResilience to suppress report.html generation in mission.check; axiom.report is auto-invoked separately in leitstand.dev-deploy, preventing double-write.</item>
 </CHANGE_SUMMARY>
 */
 
