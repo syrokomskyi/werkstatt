@@ -277,7 +277,7 @@ Generated command rows: 674. Raw manifest entries: 674.
 | `forge.skill.list` | workspace | workspace | no | no | List all registered forge skills. |
 | `forge.skill.validate` | workspace | workspace | no | no | Validate all forge skills against frontmatter contract and invariants SKILL-01..SKILL-20. |
 | `forge.upgrade` | workspace | workspace | no | no | Additive sync for npm consumers: refresh .agents/skills/ from installed forge, add missing binding defaults, update forge.syncedVersion, run doctor. |
-| `forge.validate` | workspace | workspace | no | no | Execute validate commands for all artifacts declared in the active stack profile. Use --dry-run to print resolved commands. |
+| `forge.validate` | workspace | workspace | no | no | Execute validate commands for all artifacts declared in the active stack profile. Use --dry-run to print resolved commands. Use --artifact to validate a single artifact. |
 | `fs.walk.lint` | workspace | workspace | no | no | WALK-01: fails when a packages/** source file declares its own nested recursive readdir walker instead of importing collectFiles from @warpgogol/share/fs (RFC-0303). |
 | `funnel.contract.validate` | workspace | app | no | no | Validate the configured funnel version + event sources against the closed catalog, and fail on ANY Make.com reference in the funnel content path. No-op pass when no integrations.funnel block is declared (RFC-0188). |
 | `funnel.copy.validate` | workspace | app | no | no | Validate localized funnel copy: required locale coverage (de+uk for warpgogol-com), cross-locale file parity, and no retired 39 € tariff copy. No-op pass when no src/content/funnel/ domain exists (RFC-0188). |

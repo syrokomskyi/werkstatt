@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 6b9f2837224b613f40d004e7207427e85ada4a372a0184c6f1491638e53a3240
+  contentHash: 07d6683881dadcd8fbc771258adc2b2141ec48570f4096f71760dc323adac898
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -4882,7 +4882,8 @@ commands:
     pipelines: []
   - name: forge.validate
     description: Execute validate commands for all artifacts declared in the active
-      stack profile. Use --dry-run to print resolved commands.
+      stack profile. Use --dry-run to print resolved commands. Use --artifact to
+      validate a single artifact.
     scope: workspace
     provider: workspace
     module: forge-core
@@ -4896,6 +4897,9 @@ commands:
       profile:
         kind: string
         description: Override the active profile id.
+      artifact:
+        kind: string
+        description: Validate only the specified artifact id.
     reads:
       - forge.yaml
       - packages/forge/profiles/*.yaml
