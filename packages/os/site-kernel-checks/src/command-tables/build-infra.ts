@@ -19,6 +19,7 @@ import {
   runPipelineTimeoutValidate,
 } from "../pipeline/pipeline-telemetry.ts";
 import { runPipelineCacheParity } from "../pipeline/pipeline-cache-parity.ts";
+import { runPipelineDependenciesValidate } from "../pipeline/pipeline-dependencies-validate.ts";
 import { runBehaviorSnapshotGenerate, runBehaviorSnapshotValidate } from "../behavior-snapshot.ts";
 
 export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
@@ -67,6 +68,15 @@ export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: ["packages/os/site-kernel-checks/src/**/*.ts", "packages/os/site-kernel/src/**/*.ts"],
     execute: runPipelineTimeoutValidate,
+  },
+  {
+    name: "pipeline.dependencies.validate",
+    description:
+      "RFC-0686: validate dependsOn fields in all standard pipelines — checks for missing references, forward references, duplicate command names, and circular dependencies.",
+    scope: "workspace",
+    flags: {},
+    reads: ["packages/os/site-kernel-checks/src/**/*.ts", "packages/os/site-kernel/src/**/*.ts"],
+    execute: runPipelineDependenciesValidate,
   },
   {
     name: "pipeline.cache.parity",
