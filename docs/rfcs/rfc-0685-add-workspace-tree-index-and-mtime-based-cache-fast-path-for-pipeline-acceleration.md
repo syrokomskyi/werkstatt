@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-04
-updatedAt: 2026-08-04
+updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -24,6 +25,7 @@ amendedBy: []
 related:
   - RFC-0390
   - RFC-0637
+  - RFC-0686
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -102,7 +104,7 @@ This makes the cache check itself a significant fraction of pipeline wall time, 
 
 ## Decision
 
-The command-result cache layer gains three internal optimizations: (1) a per-pipeline workspace tree index that replaces N independent directory walks with one, (2) an mtime+size fast path that skips semantic fingerprinting when file metadata is unchanged since the last cache write, and (3) byte-mode fingerprinting for non-source file types (`.md`, `.yaml`, `.json`, `.txt`) where semantic normalization provides no benefit. No new commands are added — the optimizations are transparent to pipeline callers and do not change the cache schema version.
+The command-result cache layer gains an internal acceleration path comprising three optimizations: (1) a per-pipeline workspace tree index that replaces N independent directory walks with one, (2) an mtime+size fast path that skips semantic fingerprinting when file metadata is unchanged since the last cache write, and (3) byte-mode fingerprinting for non-source file types (`.md`, `.yaml`, `.json`, `.txt`) where semantic normalization provides no benefit. No new commands are added — the optimizations are transparent to pipeline callers and do not change the cache schema version. No CLI surface changes — all optimizations are internal to the cache layer. No `--json` output format changes — command results retain the same `KernelExecutionReport` shape.
 
 ## Architectural fit
 
@@ -116,22 +118,22 @@ The command-result cache layer gains three internal optimizations: (1) a per-pip
 
 ### Workspace tree index
 
-The pipeline executor builds an in-memory `WorkspaceTreeIndex` once at the start of each pipeline run (in `executePipelineForSite` and `executePipelineForWorkspace`). The index is a `Map<posixPath, { mtimeMs, size }>` covering all files under `workspaceRoot`, excluding `.git/`, `node_modules/`, and `dist/` directories.
+The pipeline executor builds an in-memory `WorkspaceTreeIndex` once at the start of each pipeline run (in `executePipelineForSite` and `executePipelineForWorkspace`). The index is a `Map<posixPath, { mtimeMs, size }>` covering all files under `workspaceRoot`, excluding only `.git/` and `node_modules/` directories. The `dist/` directory is **not** excluded because some commands (e.g. behavior snapshot validation) declare `reads` patterns matching `dist/client/**/*.html`. The `missions/` directory is not excluded because site-scoped commands read from workpiece source files via `<app>` token resolution. Excluding `dist/` or `missions/` would break commands that read from those directories.
 
 `expandGlobs` is refactored to accept the index instead of walking the filesystem. It filters the in-memory map against picomatch patterns, returning matched absolute paths. This replaces N directory walks with one.
 
-The index is built using `readdir` with `withFileTypes: true`, skipping directories matching the exclusion set. For a ~10,000-file workspace, the single walk takes ~50–100ms; the current 40 walks take ~2–4s.
+The index is built using `readdir` with `withFileTypes: true` for directory traversal, plus a `stat()` call per file to collect `mtimeMs` and `size`. `Dirent` from `readdir` does not carry mtime/size — these must be fetched separately. For a ~10,000-file workspace, the single walk plus stat calls takes ~100–150ms; the current 40 walks take ~2–4s. The stat calls add ~50ms on Linux ext4 (inode cache hot).
 
 ### mtime-based fast path
 
-The cache entry stored by `setCachedCommandResult` gains an auxiliary `inputsMetadata` sidecar: a sorted array of `{ path, mtimeMs, size }` for all files that were fingerprinted. On the next `tryCacheRead`, before computing `computeInputsHash`, the executor checks:
+The cache entry stored by `setCachedCommandResult` gains an auxiliary `inputsMetadata` sidecar: a sorted array of `{ path, mtimeMs, size }` for all files that were fingerprinted. The sidecar is embedded inside the existing `data` payload of the `CacheLayer` entry — the `data` field changes from a bare `KernelExecutionReport` to a wrapper `{ report: KernelExecutionReport, inputsMetadata?: InputsMetadataEntry[] }`. This approach requires no `CacheLayer` interface changes and no SQLite schema changes. On the next `tryCacheRead`, before computing `computeInputsHash`, the executor checks:
 
 1. Expand globs using the tree index to get the current file list.
 2. Compare the current `{ path, mtimeMs, size }` array against the stored `inputsMetadata`.
 3. If identical (same files, same mtimes, same sizes), reuse the stored `inputsHash` without fingerprinting.
 4. If any file differs, fall back to full `computeInputsHash`.
 
-The sidecar is stored in the same SQLite cache namespace, keyed by the same cache key, in a separate column. On cache miss, no sidecar is read.
+Old cache entries (stored before this RFC) have `data` as a bare `KernelExecutionReport` without the wrapper — the executor detects this by checking for the `inputsMetadata` field. If absent, the entry is treated as a legacy entry: the fast path is skipped, a full `computeInputsHash` is performed, and on cache write the entry is overwritten with the new wrapper format. This is a transparent upgrade — no schema migration, no dual-path.
 
 ### Byte-mode for content files
 
@@ -200,19 +202,21 @@ export async function computeInputsHash(
 | `packages/os/site-kernel/src/cache/workspace-tree-index.ts` | New module: tree index builder and filter |
 | `packages/os/site-kernel/src/cache/command-result-cache.ts` | Modified: accepts tree index, mtime fast path, byte-mode selection |
 | `packages/os/site-kernel/src/runtime/execute-pipeline.ts` | Modified: builds tree index once per pipeline run, passes to cache functions |
-| `packages/os/site-kernel/src/cache/cache-layer.ts` | Modified: stores/retrieves `inputsMetadata` sidecar |
+| `packages/os/site-kernel/src/cache/cache-layer.ts` | Unchanged — the `inputsMetadata` sidecar is embedded in the existing `data` payload, no interface change |
 
 ### Failure modes
 
 - **Tree index build failure**: if `readdir` fails on the workspace root, the executor falls back to the current per-command `expandGlobs` behavior. The pipeline does not fail due to index build issues.
+- **Concurrent pipeline runs**: two pipeline runs in parallel (e.g. two agents in different sessions) share the same SQLite cache DB (WAL mode, 5s busy_timeout). The tree index is in-memory per pipeline run — no sharing concern. The mtime fast path increases cache write frequency (writing `inputsMetadata` alongside results), which may increase SQLite contention. This is an existing risk (not introduced by this RFC) and is mitigated by WAL mode and busy_timeout.
 - **mtime collision**: if two different file contents share the same mtime+size (extremely rare with nanosecond-resolution mtimes on Linux), the cache returns a stale entry. This is the same risk as any mtime-based cache and is acceptable because the next `--force` run recomputes.
 - **Byte-mode hash mismatch**: if a content file (`.md`, `.yaml`) is normalized by a preprocessor before fingerprinting, byte mode may produce a different hash than semantic mode. This is not a problem because the cache key includes both `inputsHash` and `moduleHash` — a switch from semantic to byte mode produces a new `inputsHash`, causing a cache miss (not a false hit). The first run after implementation recomputes all caches.
 
 ## Rollout
 
 - **Default behavior**: the tree index, mtime fast path, and byte-mode selection are enabled by default. No opt-in flag is needed — the optimizations are transparent and produce identical cache hit/miss decisions.
+- **AGENTS.md update**: `packages/os/site-kernel/AGENTS.md` § "Command-result cache (RFC-0390)" must be updated to document the mtime fast path, byte-mode selection, and tree index. This is part of the implementation, not a separate RFC.
 - **First run after implementation**: all existing cache entries are misses because `inputsHash` values change (byte mode produces different hashes than semantic mode for content files). The first pipeline run repopulates the cache. This is a one-time cost.
-- **No cache schema migration**: the `inputsMetadata` sidecar is stored in a new SQLite column. Old entries without the sidecar simply trigger a full `computeInputsHash` on the next read, then are updated with the sidecar.
+- **No cache schema migration**: the `inputsMetadata` sidecar is embedded inside the existing `data` JSON payload. Old entries (bare `KernelExecutionReport` without the wrapper) trigger a full `computeInputsHash` on the next read, then are overwritten with the new wrapper format on cache write.
 - **No pipeline changes**: `build.prepare`, `build.check`, and `build.post` step definitions are unchanged. The optimizations are internal to the cache layer.
 - **`--force` flag**: bypasses all cache reads as before. The tree index is still built (it's needed for glob expansion), but the mtime fast path is not used.
 
@@ -241,6 +245,8 @@ export async function computeInputsHash(
 - [ ] `tryCacheRead` compares current file metadata against stored `inputsMetadata` and reuses the stored `inputsHash` when unchanged, skipping fingerprint computation
 - [ ] Unit tests verify: (a) tree index produces same glob matches as filesystem walk, (b) mtime fast path reuses hash on unchanged files, (c) byte-mode selection per extension, (d) fallback to full fingerprint on mtime change
 - [ ] `build:check` passes on `@warpgogol/site-kernel`
+- [ ] Pipeline cache-check time is measured before and after implementation on a full `build.prepare` run, demonstrating >50% reduction for cacheable commands on unchanged inputs
+- [ ] `packages/os/site-kernel/AGENTS.md` § "Command-result cache (RFC-0390)" is updated with mtime fast path, byte-mode selection, and tree index documentation
 - [ ] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
@@ -249,6 +255,6 @@ export async function computeInputsHash(
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- The tree index exclusion set MUST include at minimum: `.git/`, `node_modules/`, `dist/`. Additional exclusions MAY be added but MUST be documented in the `buildWorkspaceTreeIndex` function.
+- The tree index exclusion set MUST include at minimum: `.git/`, `node_modules/`. The `dist/` directory MUST NOT be excluded because some commands declare `reads` patterns matching files in `dist/`. The `missions/` directory MUST NOT be excluded because site-scoped commands read from workpiece source files. Additional exclusions MAY be added but MUST be documented in the `buildWorkspaceTreeIndex` function and MUST NOT break any existing `reads` pattern.
 - The mtime fast path MUST NOT be used when `--force` is set — `--force` bypasses all cache reads.
 - The byte-mode selection table is closed: adding new extensions to the semantic-mode set requires a new RFC. Adding extensions to the byte-mode set is allowed without RFC if the file type has no semantic normalizer in `@warpgogol/fingerprint`.
