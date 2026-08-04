@@ -14,7 +14,8 @@ owners:
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
 reviewers: []
 createdAt: 2026-08-04
-updatedAt: 2026-08-04
+updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -23,6 +24,7 @@ amends: []
 amendedBy: []
 related:
   - RFC-0390
+  - RFC-0382
   - RFC-0685
   - RFC-0686
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
@@ -49,15 +51,18 @@ packagesImpacted:
   - "@warpgogol/site-kernel"
   - "@warpgogol/site-kernel-checks"
 successSignals:
-  - "Validators skip execution when all their upstream generators were cache hits and the validator's own inputs are unchanged"
-  - "Pipeline wall time for build.check drops significantly on cache-hit runs (no code changed since last build)"
+  - "Cacheable validators skip execution when all their upstream generators were cache hits — no reads[] hash computation needed"
+  - "Cross-pipeline skip works: build.check validators skip when build.prepare generators were cached in the same build session"
+  - "Pipeline wall time for build.check drops on cache-hit runs (no code changed since last build)"
   - "Cache skip is transitive — a validator at the end of a chain skips if all upstream generators and intermediate validators were cache hits"
-  - "No validation false-negatives — a cache miss in any upstream step forces full re-validation"
+  - "generated.drift.validate (cacheable: false) always runs and catches manual edits to generated files"
 nonGoals:
   - "Does not change the command-result cache schema (RFC-0390) — reuses existing cache entries"
-  - "Does not skip validators on cache misses — only skips when upstream generators were cache hits"
+  - "Does not skip `cacheable: false` validators — they always execute (e.g. generated.drift.validate, generated.files.validate, generated.stale.validate)"
   - "Does not remove validators from the pipeline — skipped validators still appear in the pipeline report with a skip reason"
-  - "Does not apply to non-validator commands (generators, transformers) — only to read-only validators that declare `validatesOutputs`"
+  - "Does not apply to non-validator commands (generators, transformers) — only to cacheable read-only validators that declare `validatesOutputs`"
+  - "Does not compute reads[] hash for transitive-skip decisions — the skip is based solely on upstream cache-hit status"
+  - "Does not merge build.prepare and build.check into a single pipeline — they remain separate pipeline runs connected by a persisted cache-hit file"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -82,47 +87,89 @@ nonGoals:
 
 RFC-0390 caches command results by hashing declared `reads[]` inputs. When a generator's inputs are unchanged, the cache hit means the generator's output files are identical to the previous run. Validators that check those output files will also produce identical results — yet they re-run because the cache only skips the generator, not downstream validators.
 
-The `build.check` pipeline runs after `build.prepare`. Many validators in `build.check` validate outputs produced by generators in `build.prepare`. When `build.prepare` was fully cached (all generators were cache hits), the validators in `build.check` are guaranteed to produce the same results as the last run — but they still execute because the cache is per-command, not transitive.
+Within `build.prepare`, validators like `mirror.quintet.validate` run after generators like `manifest.contract.validate`. When the generator was a cache hit, the validator's inputs are guaranteed unchanged — but the validator still executes, re-hashing its `reads[]` and re-running its check logic.
 
-For example: `generated.drift.validate` checks that generated files match their generators' current output. If all generators were cache hits, the generated files are unchanged, and `generated.drift.validate` will pass — but it still runs, reading and comparing every generated file.
+The `build.check` pipeline runs after `build.prepare` as a separate pipeline invocation. Validators in `build.check` that check outputs from `build.prepare` generators cannot benefit from `build.prepare`'s cache hits because `cacheHitCommands` is per-pipeline-run — there is no mechanism to propagate cache-hit status across pipeline boundaries.
+
+For example: `mirror.quintet.validate` reads `packages/ui/src/{sections,components,pages}/**/*.astro` and validates that each has a colocated manifest. If `manifest.contract.validate` (which reads the same manifests) was a cache hit, the manifests are unchanged, and `mirror.quintet.validate` will pass — but it still runs, re-hashing and re-checking every file.
 
 ## Problem
 
-The command-result cache (RFC-0390) is per-command: each command checks its own `reads[]` hash against the cache. There is no mechanism to propagate cache-hit status across commands. This means:
+The command-result cache (RFC-0390) is per-command: each command checks its own `reads[]` hash against the cache. There is no mechanism to propagate cache-hit status across commands or across pipeline boundaries. This means:
 
-1. A validator that reads only generated files must re-hash and re-validate even when all generators that produced those files were cache hits.
-2. The `build.check` pipeline re-runs all validators on every invocation, even when `build.prepare` was fully cached and nothing changed.
+1. A cacheable validator that reads only generated files must re-hash and re-validate even when all generators that produced those files were cache hits in the same pipeline run.
+2. Validators in `build.check` cannot benefit from `build.prepare`'s cache hits because the two are separate pipeline runs with no shared state.
 3. The pipeline wall time for a no-op `build.check` (nothing changed) is the sum of all validator durations, not near-zero.
 
-This is particularly costly for validators that read large generated trees (e.g. `generated.drift.validate` reads all generated files, `mirror.quintet.validate` reads all manifests and schemas).
+This is particularly costly for validators that read large file trees (e.g. `mirror.quintet.validate` reads all `.astro` files in `packages/ui/src/`).
+
+Note: `cacheable: false` validators (e.g. `generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`) are NOT affected by this problem — they always execute by design, which is correct because they check filesystem state not captured by `reads[]` alone (file existence, directory contents, generator re-execution). The transitive skip targets only cacheable validators whose results are fully determined by their declared `reads[]`.
 
 ## Decision
 
-The `KernelCommandDefinition` type gains an optional `validatesOutputs?: string[]` field declaring which commands' outputs this validator checks. When a validator's `validatesOutputs` list is fully satisfied by cache-hit generators (all listed commands were cache hits in the current pipeline run), and the validator's own `reads[]` hash also matches the cache, the validator is skipped with `skipReason: "transitive-cache-skip: upstream generators cached"`. The skip is transitive: if validator A validates outputs of generator G, and validator B validates outputs of validator A (rare but possible), B is skipped if both G and A were cache hits.
+The `KernelCommandDefinition` type gains an optional `validatesOutputs?: string[]` field declaring which commands' outputs this validator checks. When a validator's `validatesOutputs` list is fully satisfied by cache-hit generators (all listed commands were cache hits in the current pipeline run or imported from a previous pipeline run via the persisted cache-hit file), the validator is skipped with `skipReason: "transitive-cache-skip: upstream generators cached"`. No `reads[]` hash computation is performed for the transitive-skip decision — the skip is based solely on upstream cache-hit status.
+
+The skip is transitive: if validator A validates outputs of generator G, and validator B validates outputs of validator A (rare but possible), B is skipped if both G and A were cache hits. A validator that was transitively skipped is also added to `cacheHitCommands`, enabling downstream transitive skips.
+
+Cross-pipeline propagation: after each pipeline run, the `cacheHitCommands` set is persisted to `.cache/pipeline-cache-hits.json`. The next pipeline run loads this file and merges imported cache hits into its own `cacheHitCommands`. This enables `build.check` validators to skip when `build.prepare` generators were cached in the same build session. Stale entries (older than 30 minutes) are ignored to avoid false skips across unrelated build sessions.
+
+Safety net: `generated.drift.validate` (`cacheable: false`) always runs and detects manual edits to generated files. The transitive skip does NOT apply to `cacheable: false` validators — they are the safety layer that catches filesystem state changes the cache cannot capture.
 
 ## Architectural fit
 
-- **DNA-35 (`app.contract.full`):** The canonical readiness signal benefits from transitive cache skip because a no-op `build.check` (nothing changed) completes near-instantly. The gate still exits zero only if all validators pass — a skipped validator is one that would have passed (its inputs are identical to the last run where it did pass).
-- **DNA-53 (Semantic fingerprint governance):** The transitive skip uses existing cache entries and the existing `reads[]` hash mechanism. No new hashing is introduced.
+- **DNA-35 (`app.contract.full`):** The canonical readiness signal benefits from transitive cache skip because a no-op build (nothing changed) completes near-instantly. The gate still exits zero only if all validators pass — a skipped validator is one whose upstream generators were cached, meaning their outputs are identical to the last run where the validator did pass. The `cacheable: false` validators (`generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`) always run and provide the filesystem-state safety net.
+- **DNA-53 (Semantic fingerprint governance):** The transitive skip uses existing cache entries and the existing `reads[]` hash mechanism for normal cache checks. No new hashing is introduced. The transitive-skip decision itself does NOT compute hashes — it relies on the upstream cache-hit signal.
 - **RFC-0390 (Command-result cache):** This RFC extends RFC-0390 with a new metadata field (`validatesOutputs`) and a new skip reason. The cache schema is unchanged — the skip decision is made at the pipeline executor level, not the cache layer.
-- **RFC-0685 (Workspace tree index):** The tree index and mtime fast path make the validator's own `reads[]` hash check faster, which is used as a secondary confirmation before applying the transitive skip.
-- **RFC-0686 (Pipeline dependency graph):** The `validatesOutputs` field is complementary to `dependsOn`. `dependsOn` controls execution order; `validatesOutputs` controls transitive cache skip. A validator can declare `dependsOn: ["generator.x"]` for ordering and `validatesOutputs: ["generator.x"]` for cache skip.
-- **Site OS operator model:** No new commands. The `validatesOutputs` field is metadata on existing command definitions in `packages/os/site-kernel-checks/src/commands/`.
+- **RFC-0382 (Kernel cache):** The persisted cache-hit file (`.cache/pipeline-cache-hits.json`) lives in the same `.cache/` directory as the SQLite kernel cache. It is gitignored. `--force` clears the file.
+- **RFC-0685 (Workspace tree index):** The tree index and mtime fast path benefit the normal cache check path (RFC-0390). The transitive-skip path bypasses hash computation entirely, so RFC-0685 does not directly affect the transitive skip — but it benefits the non-transitive-skip path when upstream is not cached.
+- **RFC-0686 (Pipeline dependency graph):** The `validatesOutputs` field is complementary to `dependsOn`. `dependsOn` controls execution order; `validatesOutputs` controls transitive cache skip. A validator can declare `dependsOn: ["generator.x"]` for ordering and `validatesOutputs: ["generator.x"]` for cache skip. If RFC-0686 introduces parallel step execution, `cacheHitCommands` must be updated after all parallel steps in a wave complete, before the next wave checks transitive skip.
+- **Site OS operator model:** No new commands. The `validatesOutputs` field is metadata on existing command definitions in `packages/os/site-kernel-checks/src/command-tables/`.
+- **Compass sync:** `docs/verification-plan.xml` may need updating to document the new `validatesOutputs` field and the transitive-skip behavior. `packages/os/site-kernel/AGENTS.md` § Command-result cache (RFC-0390) must be updated to document the new field and the `.cache/pipeline-cache-hits.json` file.
+- **Command manifest:** `buildCommandManifest` in `packages/os/site-kernel/src/command-manifest.ts` must include `validatesOutputs` in the manifest entry. `KernelRegisteredCommandInfo` in `types.ts` and `commandInfo()` in `registry.ts` must propagate the field.
 
 ## Design
 
 ### Transitive skip algorithm
 
-The pipeline executor tracks a `cacheHitCommands: Set<string>` per pipeline run. After each step, if the step was a cache hit (the command's `reads[]` hash matched a cached entry and the command was not executed), the command name is added to the set.
+The pipeline executor tracks a `cacheHitCommands: Set<string>` per pipeline run. Before the run starts, it loads `.cache/pipeline-cache-hits.json` and merges non-stale entries (written within the last 30 minutes) from previous pipeline runs into `cacheHitCommands`. After each step, if the step was a cache hit (the command's `reads[]` hash matched a cached entry and the command was not executed) OR the step was transitively skipped, the command name is added to the set. After the run completes, the set is persisted back to the file.
 
 Before executing a validator step, the executor checks:
 
 1. Does the command have `validatesOutputs` declared? If not, proceed with normal cache check.
-2. Are all commands in `validatesOutputs` in the `cacheHitCommands` set? If not, proceed with normal cache check.
-3. Does the validator's own `reads[]` hash match the cache? If yes, skip the validator with `skipReason: "transitive-cache-skip"`.
-4. If the validator's own `reads[]` hash does not match the cache, execute the validator normally (the validator's inputs may have changed even if the generator's were cached — e.g. manual edits to generated files).
+2. Is the command `cacheable` (not `cacheable: false`)? If not, proceed with normal execution — transitive skip does not apply to `cacheable: false` validators.
+3. Are all commands in `validatesOutputs` in the `cacheHitCommands` set? If not, proceed with normal cache check.
+4. If all upstream commands are cached, skip the validator with `skipReason: "transitive-cache-skip"`. No `reads[]` hash computation is performed.
 
-The skip is transitive because a validator that was cache-hit (via transitive skip or normal cache hit) is also added to `cacheHitCommands`, enabling downstream validators to skip transitively.
+The skip is transitive because a validator that was transitively skipped is also added to `cacheHitCommands`, enabling downstream validators to skip transitively.
+
+`--force` flag: clears `.cache/pipeline-cache-hits.json` before the run starts and skips all transitive-skip checks. `cacheHitCommands` remains empty for the entire run.
+
+### Cross-pipeline cache-hit persistence
+
+The `.cache/pipeline-cache-hits.json` file has the following structure:
+
+```json
+{
+  "pipelines": {
+    "build.prepare": {
+      "commands": ["manifest.contract.validate", "routes.generate", ...],
+      "writtenAt": "2026-08-05T14:30:00.000Z"
+    },
+    "build.check": {
+      "commands": ["biome.tokens.validate", ...],
+      "writtenAt": "2026-08-05T14:31:00.000Z"
+    }
+  }
+}
+```
+
+Before a pipeline run starts, the executor loads this file and merges all non-stale entries (written within the last 30 minutes) from ALL other pipelines into `cacheHitCommands`. This enables `build.check` to see `build.prepare`'s cache hits.
+
+After a pipeline run completes, the executor writes its own `cacheHitCommands` set back to the file under its pipeline name, replacing any previous entry for that pipeline.
+
+Staleness: entries older than 30 minutes are ignored. This prevents false skips across unrelated build sessions (e.g., a `build.prepare` from the morning and a `build.check` in the afternoon).
+
+`--force` clears the entire file before the run starts, ensuring no imported cache hits are used.
 
 ### TypeScript contracts
 
@@ -134,11 +181,21 @@ export interface KernelCommandDefinition<TData = unknown>
   // ... existing fields ...
   /**
    * RFC-0687: command names whose outputs this validator checks. When all
-   * listed commands were cache hits in the current pipeline run, and this
-   * validator's own reads[] hash also matches the cache, the validator is
-   * skipped with skipReason "transitive-cache-skip". Only meaningful for
-   * read-only validators (mutatesState: false). Ignored for generators.
+   * listed commands were cache hits in the current pipeline run (or imported
+   * from a previous pipeline run via .cache/pipeline-cache-hits.json), the
+   * validator is skipped with skipReason "transitive-cache-skip". No reads[]
+   * hash computation is performed for the transitive-skip decision.
+   * Only meaningful for cacheable read-only validators (mutatesState: false,
+   * cacheable: true). Ignored for generators and cacheable: false validators.
    */
+  validatesOutputs?: string[];
+}
+
+// packages/os/site-kernel/src/types.ts (modified — propagate to registered info)
+
+export interface KernelRegisteredCommandInfo extends KernelCommandMetadata {
+  // ... existing fields ...
+  /** RFC-0687: propagated from KernelCommandDefinition for manifest exposure. */
   validatesOutputs?: string[];
 }
 ```
@@ -148,13 +205,14 @@ export interface KernelCommandDefinition<TData = unknown>
 
 interface PipelineRunState {
   cacheHitCommands: Set<string>;
-  // ... existing fields ...
+  pipelineName: string;
 }
 
 function shouldTransitiveSkip(
   command: KernelCommandDefinition,
   runState: PipelineRunState,
 ): boolean {
+  if (command.cacheable === false) return false;
   if (!command.validatesOutputs || command.validatesOutputs.length === 0) {
     return false;
   }
@@ -162,30 +220,94 @@ function shouldTransitiveSkip(
     runState.cacheHitCommands.has(name),
   );
 }
+
+// Cross-pipeline cache-hit persistence
+
+const PIPELINE_CACHE_HITS_PATH = ".cache/pipeline-cache-hits.json";
+const PIPELINE_CACHE_HITS_STALENESS_MS = 30 * 60 * 1000; // 30 minutes
+
+interface PipelineCacheHitsFile {
+  pipelines: Record<string, {
+    commands: string[];
+    writtenAt: string;
+  }>;
+}
+
+async function loadImportedCacheHits(
+  workspaceRoot: string,
+  currentPipelineName: string,
+): Promise<Set<string>> {
+  // Load .cache/pipeline-cache-hits.json, merge non-stale entries from
+  // pipelines other than currentPipelineName.
+}
+
+async function persistCacheHits(
+  workspaceRoot: string,
+  pipelineName: string,
+  cacheHitCommands: Set<string>,
+): Promise<void> {
+  // Write cacheHitCommands under pipelineName in .cache/pipeline-cache-hits.json.
+}
+```
+
+```ts
+// packages/os/site-kernel/src/runtime/registry.ts (modified — propagate field)
+
+function commandInfo(
+  command: KernelCommandDefinition,
+  provider: KernelRegisteredCommandInfo["provider"],
+  siteName?: string,
+  moduleName?: string,
+): KernelRegisteredCommandInfo {
+  return {
+    // ... existing fields ...
+    ...(command.validatesOutputs ? { validatesOutputs: command.validatesOutputs } : {}),
+    provider,
+    siteName,
+  };
+}
+```
+
+```ts
+// packages/os/site-kernel/src/command-manifest.ts (modified — include in manifest)
+
+const entries: CommandManifestEntry[] = commands.map((command) => ({
+  // ... existing fields ...
+  validatesOutputs: command.validatesOutputs ?? [],
+  pipelines: [...(pipelinesByCommand.get(command.name) ?? [])].sort(),
+}));
 ```
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel/src/types.ts` | Modified: add `validatesOutputs` to `KernelCommandDefinition` |
-| `packages/os/site-kernel/src/runtime/execute-pipeline.ts` | Modified: track `cacheHitCommands`, check transitive skip before execution |
-| `packages/os/site-kernel-checks/src/commands/*.ts` | Modified: add `validatesOutputs` to validator command definitions |
+| `packages/os/site-kernel/src/types.ts` | Modified: add `validatesOutputs` to `KernelCommandDefinition` and `KernelRegisteredCommandInfo` |
+| `packages/os/site-kernel/src/runtime/execute-pipeline.ts` | Modified: track `cacheHitCommands`, load/persist `.cache/pipeline-cache-hits.json`, check transitive skip before execution |
+| `packages/os/site-kernel/src/runtime/registry.ts` | Modified: propagate `validatesOutputs` in `commandInfo()` |
+| `packages/os/site-kernel/src/command-manifest.ts` | Modified: include `validatesOutputs` in manifest entries |
+| `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` | Modified: add `validatesOutputs` to `mirror.quintet.validate` command definition |
+| `.cache/pipeline-cache-hits.json` | New: persisted cache-hit file (gitignored, lives in `.cache/` per RFC-0382) |
+| `packages/os/site-kernel/AGENTS.md` | Modified: document `validatesOutputs` field and `.cache/pipeline-cache-hits.json` in § Command-result cache |
 
 ### Failure modes
 
-- **Stale transitive skip**: if a generator was a cache hit but a manual edit changed its output files (bypassing the pipeline), the validator's own `reads[]` hash will not match the cache, and the validator will execute normally. The transitive skip only applies when both the upstream generators were cached AND the validator's own inputs match the cache.
+- **Stale transitive skip (manual edits)**: if a generator was a cache hit but a manual edit changed its output files (bypassing the pipeline), the transitive skip would fire and miss the drift. Mitigation: `generated.drift.validate` (`cacheable: false`) always runs and detects manual edits to generated files. The transitive skip does NOT apply to `cacheable: false` validators. Additionally, the staleness TTL (30 minutes) prevents cross-session false skips.
 - **Missing `validatesOutputs` declaration**: validators without `validatesOutputs` are never transitively skipped — they always go through the normal cache check. This is the default and is safe.
-- **Incorrect `validatesOutputs` declaration**: if a validator declares `validatesOutputs: ["generator.x"]` but actually also reads files from `generator.y`, the transitive skip may fire when `generator.y` changed but `generator.x` was cached. This is a command definition bug. Mitigation: the `reads[]` hash check (step 3 of the algorithm) catches this — if `generator.y` changed the validator's inputs, the `reads[]` hash won't match, and the validator executes normally.
-- **`--force` flag**: bypasses all cache reads, so `cacheHitCommands` is always empty, and transitive skip never fires.
+- **Incorrect `validatesOutputs` declaration**: if a validator declares `validatesOutputs: ["generator.x"]` but actually also reads files from `generator.y`, the transitive skip may fire when `generator.y` changed but `generator.x` was cached. This is a command definition bug. Mitigation: the `cacheable: false` validators (`generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`) always run and catch missing or stale files regardless of transitive skip.
+- **`--force` flag**: clears `.cache/pipeline-cache-hits.json` and bypasses all cache reads, so `cacheHitCommands` is always empty, and transitive skip never fires.
+- **Stale `.cache/pipeline-cache-hits.json`**: if the file contains entries older than 30 minutes, they are ignored. If the file is corrupt or missing, the executor falls back to empty `cacheHitCommands` (no transitive skip, normal cache check only).
+- **Concurrent pipeline runs**: if two pipeline runs execute concurrently (e.g., two agents), they may both read and write `.cache/pipeline-cache-hits.json` causing a race. Mitigation: the file is per-pipeline-name keyed, so concurrent runs of different pipelines do not conflict. Concurrent runs of the same pipeline are not supported by the pipeline executor (it is sequential per site).
 
 ## Rollout
 
-- **Default behavior**: transitive cache skip is enabled by default. No opt-in flag is needed — the skip is transparent and only fires when all preconditions are met (upstream cached + validator's own inputs cached).
-- **Gradual adoption**: validators are annotated with `validatesOutputs` incrementally. Validators without the field are never transitively skipped. Priority candidates: `generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`, `mirror.quintet.validate`, `ownership.sync.validate`.
-- **No pipeline changes**: `build.check` step definitions are unchanged. The `validatesOutputs` field is on command definitions, not pipeline steps.
-- **`--force` flag**: bypasses all cache reads, so transitive skip never fires.
+- **Default behavior**: transitive cache skip is enabled by default. No opt-in flag is needed — the skip is transparent and only fires when all preconditions are met (cacheable validator, `validatesOutputs` declared, all upstream commands cached).
+- **Gradual adoption**: validators are annotated with `validatesOutputs` incrementally. Validators without the field are never transitively skipped. Priority candidate: `mirror.quintet.validate` (cacheable, has `reads[]`, validates `manifest.contract.validate` output). Additional candidates will be annotated as they are verified to be cacheable and their upstream generators identified.
+- **`cacheable: false` exclusion**: `generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`, and `ownership.sync.validate` are `cacheable: false` and are NOT candidates for transitive skip. They always run and provide the filesystem-state safety net.
+- **No pipeline changes**: `build.check` and `build.prepare` step definitions are unchanged. The `validatesOutputs` field is on command definitions, not pipeline steps.
+- **`--force` flag**: clears `.cache/pipeline-cache-hits.json` and bypasses all cache reads, so transitive skip never fires.
 - **Pipeline report**: skipped validators appear in the report with `skipReason: "transitive-cache-skip"` and `ok: true`, making it clear they were skipped due to transitive cache, not a failure.
+- **Empty state**: a new site with no generated files — validators with `validatesOutputs` would have no upstream cache hits (generators produce nothing on first run), so the transitive skip would not fire. This is correct behavior — the first run always executes all validators.
 
 ## Alternatives considered
 
@@ -193,26 +315,36 @@ function shouldTransitiveSkip(
 - **Output-hash-based skip**: after a generator runs, hash its output files and store the hash. Validators skip if the output hash matches. Rejected because it duplicates the `reads[]` hash mechanism — the validator's `reads[]` already covers the generated files. The transitive skip adds the "upstream was cached" signal on top of the existing `reads[]` check.
 - **Declarative `skipIfCached` flag**: a boolean on validators that says "skip if all reads are cached." Rejected because it doesn't capture the transitive dependency — a validator might read both generated files and authored files. The `validatesOutputs` field specifically tracks which generators' outputs are being validated, making the skip decision precise.
 - **Separate `build.check.cached` pipeline**: a minimal pipeline that runs only when `build.prepare` was fully cached. Rejected because it duplicates the pipeline definition and requires manual maintenance to keep the two pipelines in sync.
+- **Keep `reads[]` hash check as safety net (audit finding)**: the original RFC design required step 3 (`reads[]` hash check) as a NON-NEGOTIABLE safety net before applying transitive skip. Rejected because (a) it provides zero performance benefit over RFC-0390's per-command cache — the hash computation is the same cost, and the validator's own cache check would already produce a cache hit; (b) it makes the transitive skip impossible for `cacheable: false` validators whose `reads[]` hash is never stored. The revised design skips without hash check and relies on `generated.drift.validate` (always runs, `cacheable: false`) as the safety net for manual edits.
+- **In-memory process-level cache-hit passing**: pass `cacheHitCommands` between pipeline runs via a process-level variable or singleton. Rejected because `build.prepare` and `build.check` may run in separate processes (e.g., `pnpm run build:prepare` followed by `pnpm run build:check`). The JSON file persistence works across processes and is simpler.
 
 ## Risks
 
-- **False-negative on manual edits**: if someone manually edits a generated file (bypassing the pipeline), the generator's cache is still a hit (its `reads[]` didn't change), but the generated file is different. The validator's `reads[]` hash will not match the cache (it reads the generated file), so the validator will execute and catch the drift. This is the correct behavior — the `reads[]` check is the safety net.
-- **Incorrect `validatesOutputs` declaration**: if a validator declares `validatesOutputs: ["generator.x"]` but actually reads files from `generator.y` too, and `generator.y` changed while `generator.x` was cached, the transitive skip would fire incorrectly. Mitigation: the validator's own `reads[]` hash includes all files it reads (including `generator.y`'s output), so the `reads[]` check catches this. The `validatesOutputs` field is an optimization hint, not a correctness mechanism.
-- **Agent misinterpretation**: agents might think `validatesOutputs` replaces `reads[]`. It does not — `reads[]` is still the functional cache input declaration (RFC-0390). `validatesOutputs` is an additional optimization layer that enables transitive skip.
-- **Maintenance burden**: each validator must keep its `validatesOutputs` list in sync with the generators it actually validates. If a validator starts reading a new generator's output, `validatesOutputs` must be updated. This is a documentation burden, not a correctness risk (the `reads[]` check is the safety net).
+- **False-negative on manual edits**: if someone manually edits a generated file (bypassing the pipeline), the generator's cache is still a hit (its `reads[]` didn't change), but the generated file is different. The transitive skip would fire and miss the drift. Mitigation: `generated.drift.validate` (`cacheable: false`) always runs and detects manual edits. The transitive skip does NOT apply to `cacheable: false` validators. The `generated.drift.validate` validator is specifically designed to catch this case by re-running generators in dryRun mode and comparing output.
+- **Incorrect `validatesOutputs` declaration**: if a validator declares `validatesOutputs: ["generator.x"]` but actually reads files from `generator.y` too, and `generator.y` changed while `generator.x` was cached, the transitive skip would fire incorrectly. Mitigation: the `cacheable: false` validators (`generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`) always run and catch missing or stale files regardless of transitive skip. The `validatesOutputs` field is an optimization hint, not a correctness mechanism.
+- **Agent misinterpretation**: agents might think `validatesOutputs` replaces `reads[]`. It does not — `reads[]` is still the functional cache input declaration (RFC-0390). `validatesOutputs` is an additional optimization layer that enables transitive skip. Agents MUST NOT remove `reads[]` from validators that have `validatesOutputs`.
+- **Maintenance burden**: each validator must keep its `validatesOutputs` list in sync with the generators it actually validates. If a validator starts reading a new generator's output, `validatesOutputs` must be updated. This is a documentation burden, not a correctness risk (the `cacheable: false` validators are the safety net).
+- **Stale `.cache/pipeline-cache-hits.json`**: if the file contains entries from a previous build session that are within the 30-minute TTL but the filesystem has changed since, the transitive skip may fire incorrectly. Mitigation: the TTL is conservative (30 minutes), and `generated.drift.validate` catches manual edits. In practice, `build.prepare` and `build.check` run seconds apart in the same build session.
+- **RFC-0686 concurrent execution**: if RFC-0686 is implemented and steps run in parallel, `cacheHitCommands` must be updated after all parallel steps in a wave complete, before the next wave checks transitive skip. The current sequential executor does not have this issue.
 
 ## Acceptance criteria
 
 - [ ] `validatesOutputs?: string[]` field added to `KernelCommandDefinition` in `packages/os/site-kernel/src/types.ts`
-- [ ] `PipelineRunState` interface in `execute-pipeline.ts` tracks `cacheHitCommands: Set<string>`
-- [ ] `shouldTransitiveSkip` function in `execute-pipeline.ts` checks all `validatesOutputs` entries are in `cacheHitCommands`
-- [ ] Validator is skipped with `skipReason: "transitive-cache-skip"` when transitive skip conditions are met
-- [ ] Validator's own `reads[]` hash is still checked before applying transitive skip (safety net)
-- [ ] Transitive skip does not fire when `--force` is set
-- [ ] At least 3 validators in `site-kernel-checks` annotated with `validatesOutputs` (e.g. `generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`)
-- [ ] Unit tests verify: (a) transitive skip fires when all upstream cached + own reads match, (b) no skip when upstream cache miss, (c) no skip when own reads don't match, (d) transitive skip through a chain of 2 validators, (e) `--force` disables transitive skip
+- [ ] `validatesOutputs?: string[]` field added to `KernelRegisteredCommandInfo` in `packages/os/site-kernel/src/types.ts`
+- [ ] `commandInfo()` in `packages/os/site-kernel/src/runtime/registry.ts` propagates `validatesOutputs`
+- [ ] `buildCommandManifest` in `packages/os/site-kernel/src/command-manifest.ts` includes `validatesOutputs` in manifest entries
+- [ ] `PipelineRunState` interface in `execute-pipeline.ts` tracks `cacheHitCommands: Set<string>` and `pipelineName: string`
+- [ ] `shouldTransitiveSkip` function in `execute-pipeline.ts` checks: (a) command is not `cacheable: false`, (b) `validatesOutputs` is non-empty, (c) all entries are in `cacheHitCommands`
+- [ ] Validator is skipped with `skipReason: "transitive-cache-skip"` when transitive skip conditions are met — no `reads[]` hash computation performed
+- [ ] `loadImportedCacheHits` function loads `.cache/pipeline-cache-hits.json` and merges non-stale entries (within 30-minute TTL) from other pipelines
+- [ ] `persistCacheHits` function writes `cacheHitCommands` to `.cache/pipeline-cache-hits.json` after pipeline run completes
+- [ ] Transitive skip does not fire when `--force` is set (file is cleared, `cacheHitCommands` is empty)
+- [ ] Transitive skip does not fire for `cacheable: false` validators (step 2 of algorithm)
+- [ ] `mirror.quintet.validate` in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` annotated with `validatesOutputs: ["manifest.contract.validate"]`
+- [ ] Unit tests verify: (a) transitive skip fires when all upstream cached, (b) no skip when upstream cache miss, (c) no skip for `cacheable: false` validators, (d) transitive skip through a chain of 2 validators, (e) `--force` disables transitive skip, (f) stale `.cache/pipeline-cache-hits.json` entries (>30 min) are ignored, (g) cross-pipeline skip works when `build.prepare` cache hits are loaded by `build.check`
 - [ ] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks`
 - [ ] `rfc.validate` passes on this file
+- [ ] `packages/os/site-kernel/AGENTS.md` § Command-result cache updated to document `validatesOutputs` and `.cache/pipeline-cache-hits.json`
 
 ## Implementation notes for agents
 
@@ -220,7 +352,10 @@ function shouldTransitiveSkip(
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- When annotating a validator with `validatesOutputs`, agents MUST ensure the list includes ALL generators whose outputs the validator reads. Missing a generator means the transitive skip could fire when that generator's output changed — but the `reads[]` hash check is the safety net.
-- `validatesOutputs` MUST only be set on read-only validators (`mutatesState: false`). Setting it on a generator has no effect and is a command definition bug.
-- The `reads[]` hash check (step 3 of the algorithm) is NON-NEGOTIABLE — it must always run before applying the transitive skip. Without it, manual edits to generated files would go undetected.
-- Agents MUST NOT use `validatesOutputs` as a replacement for `reads[]`. `reads[]` is the functional cache input declaration (RFC-0390); `validatesOutputs` is an optimization hint for transitive skip.
+- When annotating a validator with `validatesOutputs`, agents MUST ensure the list includes ALL generators whose outputs the validator reads. Missing a generator means the transitive skip could fire when that generator's output changed — but the `cacheable: false` validators (`generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`) are the safety net.
+- `validatesOutputs` MUST only be set on cacheable read-only validators (`mutatesState: false`, `cacheable: true` or unset). Setting it on `cacheable: false` validators has no effect (the algorithm checks `cacheable !== false`). Setting it on a generator has no effect and is a command definition bug.
+- The transitive skip does NOT compute `reads[]` hash — the skip is based solely on upstream cache-hit status. The safety net against manual edits is `generated.drift.validate` (always runs, `cacheable: false`), NOT the `reads[]` hash check.
+- Agents MUST NOT use `validatesOutputs` as a replacement for `reads[]`. `reads[]` is the functional cache input declaration (RFC-0390); `validatesOutputs` is an optimization hint for transitive skip. Validators with `validatesOutputs` MUST still declare `reads[]`.
+- The `.cache/pipeline-cache-hits.json` file is gitignored and lives in `.cache/` per RFC-0382. It is not a cache schema change — it is a pipeline-executor-level state file.
+- `--force` clears `.cache/pipeline-cache-hits.json` before the run starts. Agents MUST NOT manually edit this file.
+- If RFC-0686 (parallel step execution) is implemented, agents MUST update `cacheHitCommands` after all parallel steps in a wave complete, before the next wave checks transitive skip.
