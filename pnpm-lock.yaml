@@ -255,6 +255,12 @@ importers:
 
   packages/forge:
     dependencies:
+      '@warpgogol/fingerprint':
+        specifier: workspace:*
+        version: link:../fingerprint
+      '@warpgogol/share':
+        specifier: workspace:*
+        version: link:../share
       yaml:
         specifier: ^2.9.0
         version: 2.9.0
