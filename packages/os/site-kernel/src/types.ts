@@ -14,6 +14,7 @@
   <item>RFC-0390: add cacheable to KernelCommandMetadata; add cached to KernelExecutionReport; add force to ExecuteKernelPipelineOptions; update reads JSDoc.</item>
   <item>RFC-0518: add GateMetadata, GateSeverity, GatePhase, GateConditional types and optional gate field to KernelCommandMetadata.</item>
   <item>RFC-0579: add KernelNextStep interface and optional nextSteps field to KernelCommandResult and KernelExecutionReport.</item>
+  <item>RFC-0686: add dependsOn to KernelPipelineStep and concurrency to ExecuteKernelPipelineOptions for parallel step execution.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -283,6 +284,12 @@ export interface KernelPipelineStep {
   expectedDurationMs?: number;
   skip?: boolean;
   skipReason?: string;
+  /**
+   * RFC-0686: command names that must complete before this step starts.
+   * When absent, the step depends on the previous non-skipped step (backward compatible).
+   * When empty ([]), the step has no dependencies and may start immediately.
+   */
+  dependsOn?: string[];
 }
 
 export interface KernelModuleRegistry {
@@ -403,6 +410,8 @@ export interface ExecuteKernelPipelineOptions {
   force?: boolean;
   /** Pre-resolved site workspace — bypasses site discovery when provided (e.g. for closed-mission workpieces). */
   siteWorkspace?: DiscoveredSiteWorkspace;
+  /** RFC-0686: maximum number of steps to run concurrently. Default: Math.min(os.availableParallelism(), 8). When 1, full sequential mode (ignores dependsOn, abort-on-failure). */
+  concurrency?: number;
 }
 
 export interface SiteWorkspacesListResult {

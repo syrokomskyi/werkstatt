@@ -752,6 +752,7 @@ const EXECUTE_KERNEL_PIPELINE_OPTION_KEYS = [
   "force",
   "outputFormat",
   "siteWorkspace",
+  "concurrency",
 ];
 
 export async function executeKernelPipeline(
