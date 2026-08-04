@@ -53,7 +53,7 @@ If the agent cannot check ALL items, it MUST NOT claim the RFC is complete. Inst
 
 When the operator says "Завершаем эту сессию" (or any variant: "Завершаем сессию", "Заканчиваем сессию", "End session", "Wrap up"), the agent MUST:
 
-1. **Verify clean working tree** — check `git status` in werkstatt root and all active mission workpieces. Commit any uncommitted changes made during this session (distinguish from changes by other parallel agents by reviewing conversation history). Report remaining dirty files to the operator without touching them. See `fo-session-retro` skill § Pre-retro steps for the full procedure.
+1. **Verify clean working tree** — check `rtk git status` in werkstatt root and all active mission workpieces. Commit any uncommitted changes made during this session (distinguish from changes by other parallel agents by reviewing conversation history). Report remaining dirty files to the operator without touching them. See `fo-session-retro` skill § Pre-retro steps for the full procedure.
 2. **Verify RFC implementation status** — if any RFC was worked on during this session, verify each is stamped as `implemented` OR obtain explicit operator acknowledgment to leave it in a non-terminal status. See `fo-session-retro` skill § Step 4 for the full procedure.
 3. **Invoke `fo-session-retro`** via the `skill` tool BEFORE producing any closing summary. The retro skill IS the session-end protocol — do not substitute it with a manual summary.
 
