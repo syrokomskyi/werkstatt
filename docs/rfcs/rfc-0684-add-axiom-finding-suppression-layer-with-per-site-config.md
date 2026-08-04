@@ -47,9 +47,9 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - suppressions.validate
-  added: []
   changed:
     - mission.check
     - axiom.report
