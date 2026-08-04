@@ -257,17 +257,17 @@ This note appears once per skill file, not per command block.
 
 ## Acceptance criteria
 
-- [ ] `.windsurfrules` RTK section updated with graceful degradation rule and `ref()` clarification
-- [ ] Root `AGENTS.md` has a new "RTK usage" section with graceful degradation and `ref()` rules
-- [ ] `PREFERENCES.md` command references updated with `rtk` prefix
-- [ ] All `packages/forge/skills/**/*.SKILL.md` command blocks updated with `rtk` prefix (direct commands only; `ref()` references unchanged)
-- [ ] All `.agents/skills/**/*.SKILL.md` synced with the same changes
-- [ ] Forge skill files include the RTK-optional note at the first command block
-- [ ] All nested `packages/*/AGENTS.md` and `services/*/AGENTS.md` command blocks updated with `rtk` prefix
-- [ ] `docs/authoring/*.md`, `docs/specs/**/*.md`, `docs/implementation/*.md`, `docs/policies/*.md` command blocks updated with `rtk` prefix
-- [ ] Archived files (`missions/archive/**`, `docs/rfcs/archive/**`, `docs/audits/**`, `docs/reviews/**`) are NOT updated
-- [ ] `forge.skill.validate` passes on all updated skills
-- [ ] `rfc.validate` passes on this RFC
+- [x] `.windsurfrules` RTK section updated with graceful degradation rule and `ref()` clarification (evidence: .windsurfrules:40-56)
+- [x] Root `AGENTS.md` has a new "RTK usage" section with graceful degradation and `ref()` rules (evidence: AGENTS.md:264-280)
+- [x] `PREFERENCES.md` command references updated with `rtk` prefix (evidence: PREFERENCES.md:56)
+- [x] All `packages/forge/skills/**/*.SKILL.md` command blocks updated with `rtk` prefix (direct commands only; `ref()` references unchanged) (evidence: 14 skill files updated, forge.skill.validate passes)
+- [x] All `.agents/skills/**/*.SKILL.md` synced with the same changes (evidence: 14 synced copies in .agents/skills/)
+- [x] Forge skill files include the RTK-optional note at the first command block (evidence: 14 skill files with note)
+- [x] All nested `packages/*/AGENTS.md` and `services/*/AGENTS.md` command blocks updated with `rtk` prefix (evidence: 16 package AGENTS.md files updated, 0 service AGENTS.md files had command blocks)
+- [x] `docs/authoring/*.md`, `docs/specs/**/*.md`, `docs/implementation/*.md`, `docs/policies/*.md` command blocks updated with `rtk` prefix (evidence: 18 docs files updated across authoring, specs, policies, implementation, engineering)
+- [x] Archived files (`missions/archive/**`, `docs/rfcs/archive/**`, `docs/audits/**`, `docs/reviews/**`) are NOT updated (evidence: git diff shows no archived files modified)
+- [x] `forge.skill.validate` passes on all updated skills (evidence: forge.skill.validate --json returns status: pass, zero violations)
+- [x] `rfc.validate` passes on this RFC (evidence: rfc.validate --id RFC-0683 --json returns status: pass, zero violations)
 
 ## Implementation notes for agents
 
