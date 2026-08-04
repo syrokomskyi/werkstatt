@@ -223,6 +223,8 @@ export async function runMissionCheck(
   const axiomMethodologiesConfig = mapMethodologiesConfig(methodologiesConfig);
 
   const noReport = input.flags["no-report"] === true || input.flags["no-report"] === "true";
+  const cacheDirRaw = input.flags["cache-dir"];
+  const noCache = input.flags["no-cache"] === true || input.flags["no-cache"] === "true";
 
   const maxDurationRaw = input.flags["max-duration"];
   const maxUrlsRaw = input.flags["max-urls"];
@@ -252,6 +254,8 @@ export async function runMissionCheck(
       ...(maxDepthRaw !== undefined && !Number.isNaN(Number(maxDepthRaw))
         ? { maxDepth: Number(maxDepthRaw) }
         : {}),
+      ...(cacheDirRaw ? { cacheDir: String(cacheDirRaw) } : {}),
+      ...(noCache ? { noCache: true } : {}),
       report: !noReport,
       quiet: false,
     });

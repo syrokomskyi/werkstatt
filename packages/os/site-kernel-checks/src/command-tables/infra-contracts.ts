@@ -379,9 +379,18 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
         description:
           "Skip report.html generation (axiom.report is auto-invoked separately in leitstand.dev-deploy).",
       },
+      "cache-dir": {
+        kind: "string",
+        description:
+          "Override browser evidence cache directory (default: missions/{mission}/evidence/axiom/.cache/).",
+      },
+      "no-cache": {
+        kind: "boolean",
+        description: "Bypass browser evidence cache entirely (force full re-capture).",
+      },
       json: { kind: "boolean", description: "Output JSON result." },
     },
-    writes: ["missions/{mission}/evidence/axiom/**"],
+    writes: ["missions/{mission}/evidence/axiom/**", "missions/{mission}/evidence/axiom/.cache/**"],
     reads: ["missions/{mission}/workpiece/**", "missions/{mission}/mission.yaml"],
     execute: runMissionCheck,
   },
