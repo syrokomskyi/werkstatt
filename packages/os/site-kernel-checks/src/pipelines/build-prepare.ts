@@ -70,9 +70,9 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "styles.global.generate" },
   { command: "scripts.orchestrator.generate" },
   { command: "public.infrastructure.generate" },
-  { command: "security.txt.generate" },
-  { command: "indexnow.key.generate" },
-  { command: "humans.generate" },
+  { command: "security.txt.generate", dependsOn: [] },
+  { command: "indexnow.key.generate", dependsOn: [] },
+  { command: "humans.generate", dependsOn: [] },
   { command: "public.icons.generate" },
   { command: "headers.security.generate" },
   { command: "open-source.generate" },
@@ -100,11 +100,11 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   // RFC-0165: RSS feed from dated article pages into public/
   { command: "feed.generate" },
   // RFC-0051: generate ai.txt into public/ before Astro build
-  { command: "ai.generate" },
-  { command: "ai.policy.generate" },
+  { command: "ai.generate", dependsOn: [] },
+  { command: "ai.policy.generate", dependsOn: [] },
   // RFC-0052: generate robots.txt into public/ before Astro build
-  { command: "robots.generate" },
-  { command: "public.artifact.generate" },
+  { command: "robots.generate", dependsOn: [] },
+  { command: "public.artifact.generate", dependsOn: [] },
   // RFC-0204: generate responsive image variants from content assets before Astro build
   { command: "image.variants.generate", expectedDurationMs: 60_000, timeoutMs: 600_000 },
   // RFC-0210: derive per-profile video delivery formats (HLS/MP4/WebM/poster) before Astro build

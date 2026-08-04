@@ -17,6 +17,8 @@ import { SITES_CHECK_AUTHOR_PIPELINE } from "./sites-check-author.ts";
 // SITES_BUILD_PREPARE_PIPELINE only — they are NOT repeated here. build.prepare
 // always runs before build.check, so duplicating them produced redundant output.
 export const SITES_BUILD_CHECK_PIPELINE: KernelPipelineStep[] = [
+  // RFC-0686: validate pipeline dependency graphs before running any checks.
+  { command: "pipeline.dependencies.validate", dependsOn: [] },
   ...SITES_CHECK_AUTHOR_PIPELINE,
   // RFC-0201: validate CSS token usage against the active biome after codegen
   { command: "biome.tokens.validate" },
