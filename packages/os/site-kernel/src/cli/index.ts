@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Return a JSON error envelope for top-level CLI exceptions when --json is requested.</item>
+  <item>RFC-0686: add --concurrency flag for pipeline execution.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -59,6 +60,7 @@ function consumeCommonFlags(argv: string[]) {
   let allSites = false;
   let dryRun = false;
   let force = false;
+  let concurrency: number | undefined;
   let outputFormat: "pretty" | "json" = "pretty";
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -95,6 +97,24 @@ function consumeCommonFlags(argv: string[]) {
       continue;
     }
 
+    if (entry === "--concurrency") {
+      const value = argv[index + 1];
+      const parsed = Number.parseInt(value ?? "", 10);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        concurrency = parsed;
+        index += 1;
+      }
+      continue;
+    }
+
+    if (entry.startsWith("--concurrency=")) {
+      const parsed = Number.parseInt(entry.slice("--concurrency=".length), 10);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        concurrency = parsed;
+      }
+      continue;
+    }
+
     remaining.push(entry);
   }
 
@@ -103,6 +123,7 @@ function consumeCommonFlags(argv: string[]) {
     allSites,
     dryRun,
     force,
+    concurrency,
     outputFormat,
     remaining,
   };
@@ -113,7 +134,9 @@ function printUsage() {
   console.log(
     "site-kernel run <command> [--site <name>] [--all] [--dry-run] [--json] [-- ...args]",
   );
-  console.log("site-kernel pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--json]");
+  console.log(
+    "site-kernel pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--concurrency N] [--json]",
+  );
 }
 
 function argvRequestsJson(argv: string[]): boolean {
@@ -239,6 +262,7 @@ async function main() {
       allSites,
       dryRun,
       force,
+      concurrency,
       outputFormat,
       remaining: pipelineRemaining,
     } = consumeCommonFlags(rest);
@@ -256,6 +280,7 @@ async function main() {
       dryRun,
       force,
       outputFormat,
+      ...(concurrency !== undefined ? { concurrency } : {}),
     });
 
     if (outputFormat === "json") {
