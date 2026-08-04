@@ -12,7 +12,7 @@ owners:
 # Draft scaffolds must keep this empty; do not prefill a default identity.
 # Format: human:<handle> (agent:<id> reserved — see RFC-0335).
 # Default reviewer when none is specified by the operator: human:andrii-syrokomskyi
-reviewers: []
+enhancedAt: 2026-08-04
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
 implementedAt:
@@ -35,7 +35,7 @@ satisfies: []
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: patch
+versionBump: none
 commands:
   proposed: []
   added: []
@@ -163,6 +163,7 @@ The beacon is informational — it does not pause the pipeline.
 | `packages/forge/skills/fo/fo-idea-i-just-want-to-see-the-result/SKILL.md` | References beacon convention |
 | `.agents/skills/_shared/fo-pipeline-conventions.md` | Synced copy updated in same commit |
 | `.agents/skills/fo-idea-i-just-want-to-see-the-result/SKILL.md` | Synced copy updated in same commit |
+| `packages/forge/AGENTS.md` | No change needed — documents skill infrastructure, not individual skill behavior |
 
 ### Failure modes
 
