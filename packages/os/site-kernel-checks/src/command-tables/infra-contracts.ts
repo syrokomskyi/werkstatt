@@ -374,6 +374,11 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
         description:
           "Comma-separated BCP 47 locales (e.g., 'de-DE,uk-UA'). Overrides i18n auto-detection from workpiece.",
       },
+      "no-report": {
+        kind: "boolean",
+        description:
+          "Skip report.html generation (axiom.report is auto-invoked separately in leitstand.dev-deploy).",
+      },
       json: { kind: "boolean", description: "Output JSON result." },
     },
     writes: ["missions/{mission}/evidence/axiom/**"],
