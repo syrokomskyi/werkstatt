@@ -16,6 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -79,7 +80,7 @@ nonGoals:
 
 ## Context
 
-RFC-0684 introduced the Axiom finding suppression layer with a schema supporting `messagePattern` and `descriptionPattern` fields for substring matching against Finding `message` and `description` fields. During the first real deployment of warpgogol-com (mission m000028, 2026-08-05), three of five default suppression rules failed to match because the Axiom Finding data model populates `message` and `description` as empty strings (`""`). The actual error text is stored in evidence artifact files, not in the finding itself.
+RFC-0684 introduced the Axiom finding suppression layer with a schema supporting `messagePattern` and `descriptionPattern` fields for substring matching against Finding `message` and `description` fields. During the first real deployment of warpgogol-com (mission m000028, 2026-08-05), two of five default suppression rules failed to match because the Axiom Finding data model does not have `message` or `description` fields at all. The `Finding` type (defined in `@syrokomskyi/axiom-study/src/contracts.ts`) has: `findingId`, `semanticFingerprint`, `methodologyId`, `ruleId`, `affectedSubjectId`, `title`, `severity`, `evidence`, `uncertainty`, `extension`. The `extension` field is a freeform `Record<string, unknown>` populated by Axiom with `{ observationId, predicate }` — it does not contain `message` or `description` keys. The `extractMessage` and `extractDescription` helpers in `suppressions-config.ts` read from `finding.extension.message` and `finding.extension.description`, which are always `undefined`, causing the pattern match to fail silently.
 
 The populated fields on an Axiom Finding are:
 
@@ -91,16 +92,16 @@ The populated fields on an Axiom Finding are:
 | `severity` | yes | `low` |
 | `evidence[]` | yes | references to evidence artifact files |
 | `extension` | yes | `{ observationId, predicate }` |
-| `message` | **no** (always `""`) | — |
-| `description` | **no** (always `""`) | — |
+| `message` | **does not exist** | — |
+| `description` | **does not exist** | — |
 
-The `title` field is always populated and contains the ruleId plus a short description, making it the most reliable text field for pattern-based suppression matching.
+The `title` field is always populated (Zod schema enforces `z.string().min(1)`) and contains the ruleId plus a short description, making it the most reliable text field for pattern-based suppression matching.
 
 ## Problem
 
 Two concrete gaps in RFC-0684:
 
-1. **`messagePattern` and `descriptionPattern` are non-functional.** Suppression rules that rely on these fields silently fail to match any finding. The default rules for Category C (browser deprecation, `messagePattern: "Deprecated API for given entry type"`) and Category D (render-blocking CSS, `descriptionPattern: "preload"`) in `systems/axiom-suppressions.yaml` never fire. This was discovered when 560 findings from these categories remained active after the suppression layer was applied.
+1. **`messagePattern` and `descriptionPattern` are non-functional.** Suppression rules that rely on these fields silently fail to match any finding because the `Finding` type does not have `message` or `description` fields. The `extractMessage`/`extractDescription` helpers in `suppressions-config.ts` read from `finding.extension.message` / `finding.extension.description`, which are always `undefined`. The original default rules for Category C (browser deprecation, `messagePattern: "Deprecated API for given entry type"`) and Category D (render-blocking CSS, `descriptionPattern: "preload"`) in `systems/axiom-suppressions.yaml` never fired. This was discovered when 560 findings from these categories remained active after the suppression layer was applied. The default rules have since been fixed by replacing `messagePattern` with `channelNot: main` (Category C) and `descriptionPattern` with `urlPattern: "\\.css$"` (Category D) — see Rollout.
 
 2. **No documented Finding field population contract.** Agents writing suppression rules have no way to know which fields are populated vs empty. The schema in `suppressions-config.ts` defines `messagePattern` and `descriptionPattern` as optional string fields without documenting that they match against always-empty fields.
 
@@ -150,17 +151,21 @@ Matching priority (updated, inserting `titlePattern` before `messagePattern`):
 3. `contentType` — suppress if URL ends with one of the listed extensions
 4. `urlPattern` — suppress if URL matches the regex
 5. `titlePattern` — suppress if `finding.title` contains the pattern (substring match)
-6. `messagePattern` — suppress if `finding.message` contains the pattern (substring match)
-7. `descriptionPattern` — suppress if `finding.description` contains the pattern (substring match)
+6. `messagePattern` — suppress if `finding.extension.message` contains the pattern (always `undefined` — field does not exist on `Finding`)
+7. `descriptionPattern` — suppress if `finding.extension.description` contains the pattern (always `undefined` — field does not exist on `Finding`)
+
+The `extractMessage` and `extractDescription` helpers in `suppressions-config.ts` are kept as-is. They read from `finding.extension.message` / `finding.extension.description` and return `undefined` when the keys are absent. This is the correct behavior: the match fails, the rule does not fire, and SUPPRESS-VAL-06 warns the rule author to switch to `titlePattern`.
 
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-checks/src/suppressions-config.ts` | Modified: add `titlePattern` to schema, update `applySuppressions` matching logic |
-| `packages/os/site-kernel-checks/src/suppressions-validate.ts` | Modified: add SUPPRESS-VAL-06 warning for rules using `messagePattern`/`descriptionPattern` without `titlePattern` |
-| `systems/axiom-suppressions.yaml` | Modified: replace `messagePattern` and `descriptionPattern` in default rules with `titlePattern` |
+| `packages/os/site-kernel-checks/src/suppressions-config.ts` | Modified: add `titlePattern` to schema, add `titlePattern` matching in `matchesCondition` (position 5, before `messagePattern`) |
+| `packages/os/site-kernel-checks/src/suppressions-validate.ts` | Modified: add SUPPRESS-VAL-06 warning for rules using `messagePattern`/`descriptionPattern` without `titlePattern`; add `titlePattern` to `ruleSignature` for conflict detection (SUPPRESS-VAL-03); extend `isBroadPattern` check to `titlePattern` (SUPPRESS-VAL-04) |
+| `systems/axiom-suppressions.yaml` | Already modified: default rules for Categories C and D were fixed by replacing `messagePattern` with `channelNot: main` and `descriptionPattern` with `urlPattern: "\\.css$"` (not `titlePattern`). No default rule currently uses `titlePattern` — it is primarily for per-site rules where text-based matching is needed |
 | `packages/os/site-kernel-checks/AGENTS.md` | Modified: document Finding field population and recommend `titlePattern` over `messagePattern`/`descriptionPattern` |
+| `packages/os/site-kernel-checks/src/tests/suppressions-config.test.ts` | Modified: add test for `titlePattern` matching |
+| `packages/os/site-kernel-checks/src/tests/suppressions-validate.test.ts` | Modified: add test for SUPPRESS-VAL-06 warning |
 
 ### Output format
 
@@ -169,13 +174,14 @@ Matching priority (updated, inserting `titlePattern` before `messagePattern`):
 ```json
 {
   "command": "suppressions.validate",
-  "status": "pass",
+  "status": "warn",
   "diagnostics": [
     {
-      "id": "SUPPRESS-VAL-06",
+      "ruleId": "SUPPRESS-VAL-06",
       "severity": "warning",
-      "message": "Rule 'browser-deprecation' uses messagePattern but not titlePattern — messagePattern matches against an always-empty field",
-      "fix": "Replace messagePattern with titlePattern, or add titlePattern as a fallback"
+      "file": "systems/axiom-suppressions.yaml",
+      "message": "Rule at index 0 (ruleId: runtime-health.console-error) uses messagePattern without titlePattern — messagePattern matches against a non-existent Finding field",
+      "fixHint": "Replace messagePattern with titlePattern, or add titlePattern as a fallback"
     }
   ],
   "summary": { "error": 0, "warning": 1, "info": 0 }
@@ -185,14 +191,16 @@ Matching priority (updated, inserting `titlePattern` before `messagePattern`):
 ### Failure modes
 
 - **SUPPRESS-VAL-06 (warning, not error):** A rule using `messagePattern` or `descriptionPattern` without `titlePattern` does not fail validation. It produces a warning because the rule may still work if a future Axiom version populates these fields.
-- **Default rules updated:** The shipped default rules in `systems/axiom-suppressions.yaml` are updated to use `titlePattern` instead of `messagePattern`/`descriptionPattern`. Existing per-site rules that use `messagePattern` continue to function (they just never match) and receive a warning.
+- **Default rules already fixed:** The default rules in `systems/axiom-suppressions.yaml` for Categories C and D were already fixed by replacing `messagePattern` with `channelNot: main` (Category C) and `descriptionPattern` with `urlPattern: "\\.css$"` (Category D). No default rule currently uses `titlePattern` — it is primarily for per-site rules where text-based matching against the `title` field is needed. Existing per-site rules that use `messagePattern` continue to function (they just never match) and receive a SUPPRESS-VAL-06 warning.
 
 ## Rollout
 
-- **Default behavior on introduction:** `titlePattern` is added to the schema. `applySuppressions` checks `titlePattern` before `messagePattern`/`descriptionPattern`. Default rules are updated.
+- **Default behavior on introduction:** `titlePattern` is added to the schema. `applySuppressions` checks `titlePattern` before `messagePattern`/`descriptionPattern`. Default rules were already fixed by other means (`channelNot`/`urlPattern`), not by `titlePattern`.
 - **Backward compatibility:** `messagePattern` and `descriptionPattern` remain in the schema. Existing rules that use them are not broken — they still compile and run, they just receive a SUPPRESS-VAL-06 warning.
 - **No migration required:** Sites with per-site suppression files using `messagePattern` do not need to change anything immediately. The warning guides them to switch to `titlePattern`.
 - **Pipeline integration:** `suppressions.validate` in `mission.validate` pipeline will emit warnings for rules using `messagePattern`/`descriptionPattern` without `titlePattern`.
+- **`ruleSignature` update:** The `ruleSignature` function in `suppressions-validate.ts` is updated to include `titlePattern` in the conflict-detection signature (SUPPRESS-VAL-03). Two rules that differ only in `titlePattern` are now correctly detected as distinct (not conflicting).
+- **`isBroadPattern` extension:** The broad-pattern check (SUPPRESS-VAL-04) is extended to `titlePattern`. A `titlePattern` that is a single word or shorter than 10 characters triggers a broad-pattern warning, same as `messagePattern` and `descriptionPattern`.
 
 ## Alternatives considered
 
@@ -213,9 +221,12 @@ Matching priority (updated, inserting `titlePattern` before `messagePattern`):
 - [ ] `titlePattern` field added to `suppressionRuleSchema` in `suppressions-config.ts`
 - [ ] `applySuppressions` checks `titlePattern` (position 5, before `messagePattern`)
 - [ ] SUPPRESS-VAL-06 warning emitted by `suppressions.validate` for rules using `messagePattern`/`descriptionPattern` without `titlePattern`
-- [ ] Default rules in `systems/axiom-suppressions.yaml` updated to use `titlePattern` instead of `messagePattern`/`descriptionPattern`
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` documents Finding field population (which fields are populated vs empty)
-- [ ] `suppressions.validate` passes on updated `systems/axiom-suppressions.yaml` with zero warnings
+- [ ] Default rules in `systems/axiom-suppressions.yaml` no longer use `messagePattern` or `descriptionPattern` (already done — Categories C and D use `channelNot`/`urlPattern`)
+- [ ] `ruleSignature` in `suppressions-validate.ts` includes `titlePattern` in conflict-detection signature
+- [ ] `isBroadPattern` check in `suppressions-validate.ts` extended to `titlePattern` (SUPPRESS-VAL-04)
+- [ ] `packages/os/site-kernel-checks/AGENTS.md` documents Finding field population (which fields exist vs do not exist)
+- [ ] Unit tests added for `titlePattern` matching in `suppressions-config.test.ts` and SUPPRESS-VAL-06 warning in `suppressions-validate.test.ts`
+- [ ] `suppressions.validate` passes on `systems/axiom-suppressions.yaml` with zero warnings (no SUPPRESS-VAL-06 since no default rule uses `messagePattern`/`descriptionPattern`)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -224,6 +235,6 @@ Matching priority (updated, inserting `titlePattern` before `messagePattern`):
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT remove `messagePattern` or `descriptionPattern` from the schema — they are kept for forward compatibility.
-- Agents MUST update default suppression rules in `systems/axiom-suppressions.yaml` to use `titlePattern` instead of `messagePattern`/`descriptionPattern`.
+- Agents MUST ensure default suppression rules in `systems/axiom-suppressions.yaml` do not use `messagePattern` or `descriptionPattern` (Categories C and D were already fixed with `channelNot`/`urlPattern`). If a future default rule needs text-based matching, use `titlePattern`.
 - Agents MUST document the Finding field population contract in `packages/os/site-kernel-checks/AGENTS.md` so future rule authors know which fields to match against.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
