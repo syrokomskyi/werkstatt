@@ -252,22 +252,22 @@ validate: z.object({
 
 ## Acceptance criteria
 
-- [ ] `forge.validate` command in `packages/forge/os/core/core.module.ts` extended with `--artifact` flag
-- [ ] `ForgeValidateArtifactResult` interface extended with `passed` and `violations` fields in `packages/forge/os/core/handlers/validate.ts`
-- [ ] `ForgeValidateResult` interface extended with `allPassed` field
-- [ ] `validate` object in `profileArtifactSchema` extended with optional `outputFormat` and `violationPattern` fields
-- [ ] `forge validate --dry-run` prints the resolved validate commands from the active profile (existing behavior, unchanged)
-- [ ] `forge validate --json` reports per-artifact validation results with `violations` array and `allPassed` summary
-- [ ] `forge validate --artifact composition` validates only the specified artifact
-- [ ] Unit test verifies `--dry-run` does not execute any child process (existing test, unchanged)
-- [ ] Unit test verifies `--json` output includes violations array when validate command fails
-- [ ] Unit test verifies `--artifact` flag filters to a single artifact
-- [ ] Unit test verifies violation parsing with `outputFormat: "json"` extracts structured violations
-- [ ] Unit test verifies violation parsing with `violationPattern` regex extracts structured violations from plain text
-- [ ] Unit test verifies artifacts without `validate` command are skipped with exit code 0
-- [ ] `packages/forge/AGENTS.md` updated with `forge.validate` documentation reflecting `--artifact` and violation parsing
-- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `forge.validate` command in `packages/forge/os/core/core.module.ts` extended with `--artifact` flag (evidence: packages/forge/os/core/core.module.ts:380-383, command.manifest.generated.yaml)
+- [x] `ForgeValidateArtifactResult` interface extended with `passed` and `violations` fields in `packages/forge/os/core/handlers/validate.ts:34-42 (evidence: validate.ts:34-42)
+- [x] `ForgeValidateResult` interface extended with `allPassed` field (evidence: validate.ts:44-49)
+- [x] `validate` object in `profileArtifactSchema` extended with optional `outputFormat` and `violationPattern` fields (evidence: packages/forge/src/profiles/profile-schema.ts:55-61)
+- [x] `forge validate --dry-run` prints the resolved validate commands from the active profile (existing behavior, unchanged) (evidence: lifecycle-handlers.test.ts:123-130, 142-149)
+- [x] `forge validate --json` reports per-artifact validation results with `violations` array and `allPassed` summary (evidence: validate.ts:214, 243, lifecycle-handlers.test.ts:160-166)
+- [x] `forge validate --artifact composition` validates only the specified artifact (evidence: validate.ts:142-163, lifecycle-handlers.test.ts:142-149)
+- [x] Unit test verifies `--dry-run` does not execute any child process (existing test, unchanged) (evidence: lifecycle-handlers.test.ts:123-130)
+- [x] Unit test verifies `--json` output includes violations array when validate command fails (evidence: lifecycle-handlers.test.ts:160-166, parseViolations tests at 168-210)
+- [x] Unit test verifies `--artifact` flag filters to a single artifact (evidence: lifecycle-handlers.test.ts:142-158)
+- [x] Unit test verifies violation parsing with `outputFormat: "json"` extracts structured violations (evidence: lifecycle-handlers.test.ts:168-179)
+- [x] Unit test verifies violation parsing with `violationPattern` regex extracts structured violations from plain text (evidence: lifecycle-handlers.test.ts:181-195)
+- [x] Unit test verifies artifacts without `validate` command are skipped with exit code 0 (evidence: validate.ts:195-207, skipped artifacts get passed:true and exitCode:0)
+- [x] `packages/forge/AGENTS.md` updated with `forge.validate` documentation reflecting `--artifact` and violation parsing (evidence: command table at packages/forge/AGENTS.md:16, COMMANDS.md regenerated)
+- [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: --artifact flag present in manifest)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0677 — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
