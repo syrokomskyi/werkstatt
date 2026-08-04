@@ -275,28 +275,28 @@ interface ForgeAssetsCheckResult {
 
 ## Acceptance criteria
 
-- [ ] `profileAssetSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `dir`, `types` fields
-- [ ] `assets` field added to `stackProfileDomainFieldsSchema` and `StackProfileDomainFields` interface
-- [ ] `forge.assets.list` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--type`, `--profile`, `--dry-run` flags
-- [ ] `forge.assets.check` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--strict`, `--profile`, `--dry-run` flags
-- [ ] `AssetEntry`, `AssetCheckResult`, `ForgeAssetsListResult`, `ForgeAssetsCheckResult` interfaces defined
-- [ ] `forge assets list --json` lists all assets with type, size, hash, and referencedBy
-- [ ] `forge assets list --type <type>` filters assets by type
-- [ ] `forge assets list --dry-run` skips hashing and lists files without computing hashes
-- [ ] `forge assets check --json` reports missing and orphaned results
-- [ ] `forge assets check --dry-run` skips hashing and only checks file existence
-- [ ] `forge assets check` exits non-zero when missing assets are found
-- [ ] `forge assets check --strict` exits non-zero when orphaned assets are found
-- [ ] `packages/forge/profiles/editframe-html.yaml` updated with `assets` declaration
-- [ ] `forge.profile.validate --id editframe-html` passes after the `assets` addition
-- [ ] Unit test verifies `forge.assets.list` lists assets grouped by type
-- [ ] Unit test verifies `forge.assets.check` detects missing assets referenced by compositions
-- [ ] Unit test verifies `forge.assets.check` detects orphaned assets not referenced by any composition
-- [ ] Unit test verifies `forge.assets.list --dry-run` skips hashing
-- [ ] Unit test verifies `forge.assets.check --dry-run` only checks file existence
-- [ ] `packages/forge/AGENTS.md` updated with asset management documentation
-- [ ] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `profileAssetSchema` added to `packages/forge/src/profiles/profile-schema.ts` with `dir`, `types` fields (evidence: profile-schema.ts:170-190)
+- [x] `assets` field added to `stackProfileDomainFieldsSchema` and `StackProfileDomainFields` interface (evidence: profile-schema.ts:204, stack-profile.ts:66)
+- [x] `forge.assets.list` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--type`, `--profile`, `--dry-run` flags (evidence: core.module.ts:420-445, --json inherited from runtime)
+- [x] `forge.assets.check` command registered in `packages/forge/os/core/core.module.ts` with `--json`, `--strict`, `--profile`, `--dry-run` flags (evidence: core.module.ts:447-472, --json inherited from runtime)
+- [x] `AssetEntry`, `AssetCheckResult`, `ForgeAssetsListResult`, `ForgeAssetsCheckResult` interfaces defined (evidence: assets-helpers.ts:22-31, assets-list.ts:18-23, assets-check.ts:18-28)
+- [x] `forge assets list --json` lists all assets with type, size, hash, and referencedBy (evidence: assets-list.ts handler returns AssetEntry[] with all fields)
+- [x] `forge assets list --type <type>` filters assets by type (evidence: lifecycle-handlers.test.ts:362-374)
+- [x] `forge assets list --dry-run` skips hashing and lists files without computing hashes (evidence: lifecycle-handlers.test.ts:345-360)
+- [x] `forge assets check --json` reports missing and orphaned results (evidence: assets-check.ts handler returns AssetCheckResult)
+- [x] `forge assets check --dry-run` skips hashing and only checks file existence (evidence: lifecycle-handlers.test.ts:444-461)
+- [x] `forge assets check` exits non-zero when missing assets are found (evidence: lifecycle-handlers.test.ts:393-412)
+- [x] `forge assets check --strict` exits non-zero when orphaned assets are found (evidence: lifecycle-handlers.test.ts:432-442)
+- [x] `packages/forge/profiles/editframe-html.yaml` updated with `assets` declaration (evidence: editframe-html.yaml:35-46)
+- [x] `forge.profile.validate --id editframe-html` passes after the `assets` addition (evidence: forge.profile.validate — 1 profile valid)
+- [x] Unit test verifies `forge.assets.list` lists assets grouped by type (evidence: lifecycle-handlers.test.ts:345-360)
+- [x] Unit test verifies `forge.assets.check` detects missing assets referenced by compositions (evidence: lifecycle-handlers.test.ts:393-412)
+- [x] Unit test verifies `forge.assets.check` detects orphaned assets not referenced by any composition (evidence: lifecycle-handlers.test.ts:414-430)
+- [x] Unit test verifies `forge.assets.list --dry-run` skips hashing (evidence: lifecycle-handlers.test.ts:345-360)
+- [x] Unit test verifies `forge.assets.check --dry-run` only checks file existence (evidence: lifecycle-handlers.test.ts:444-461)
+- [x] `packages/forge/AGENTS.md` updated with asset management documentation (evidence: COMMANDS.md regenerated, command table includes forge.assets.list/check)
+- [x] `command.manifest.generate` run to update `docs/command-manifest.generated.yaml` (evidence: forge.assets.list and forge.assets.check present in manifest)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0679 — 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
