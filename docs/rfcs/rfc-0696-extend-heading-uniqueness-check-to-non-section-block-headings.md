@@ -1,7 +1,7 @@
 ---
 id: RFC-0696
 title: "Extend heading uniqueness check to non-section block headings"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
