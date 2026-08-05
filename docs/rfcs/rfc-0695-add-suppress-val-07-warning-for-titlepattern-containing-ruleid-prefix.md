@@ -1,7 +1,7 @@
 ---
 id: RFC-0695
 title: "Add SUPPRESS-VAL-07 warning for titlePattern containing ruleId prefix"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
 enhancedAt: 2026-08-05
-implementedAt:
+implementedAt: 2026-08-05
 closedAt:
 supersedes: []
 supersededBy:
