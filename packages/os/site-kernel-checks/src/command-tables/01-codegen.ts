@@ -192,6 +192,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/og-image.png", "<app>/src/content/system.md"],
+    modulePaths: ["preview-images.ts", "preview-templates.ts", "lib/i18n.ts"],
     execute: runPreviewImagesValidate,
   },
   {
@@ -216,6 +217,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "packages/ontology/biomes/**/*.yaml",
     ],
     writes: ["<app>/public/preview/**", "<app>/public/og-image.png"],
+    modulePaths: ["preview-images.ts", "preview-templates.ts", "lib/i18n.ts"],
     execute: runPreviewImagesGenerate,
   },
   {
@@ -238,6 +240,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/**", "<app>/package.json"],
+    modulePaths: ["fonts.ts"],
     execute: runFontsContractValidate,
   },
   {
@@ -248,6 +251,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html"],
+    modulePaths: ["fonts.ts"],
     execute: runFontsOriginValidate,
   },
   {
@@ -258,6 +262,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/ui/src/{sections,components,pages}/**/*.manifest.yaml"],
+    modulePaths: ["manifest.ts"],
     execute: runManifestContractValidate,
   },
   {
@@ -268,6 +273,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/ui/src/{sections,components,pages}/**/*.astro"],
+    modulePaths: ["manifest.ts"],
     execute: runMirrorQuintetValidate,
   },
   {
@@ -283,6 +289,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "packages/ui/src/{sections,components,pages}/**/*.manifest.yaml",
       "<app>/src/content/system.md",
     ],
+    modulePaths: ["registry.ts"],
     execute: runUniRegistryBuild,
   },
   {
@@ -293,6 +300,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["uni.registry.yaml", "packages/ui/src/{sections,components,pages}/**/*.manifest.yaml"],
+    modulePaths: ["registry.ts"],
     execute: runUniRegistryValidate,
   },
   {
@@ -303,6 +311,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/os/site-kernel-checks/src/**/*.ts", "packages/os/site-kernel/src/**/*.ts"],
+    modulePaths: ["onboarding-yaml-import-lint.ts"],
     execute: runOnboardingYamlImportLint,
   },
   {
@@ -315,6 +324,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     writes: ["packages/ontology/archetypes/index.yaml"],
     reads: ["packages/ontology/archetypes/**/*.yaml"],
+    modulePaths: ["archetype.ts", "archetype/registry-build.ts", "archetype/shared.ts"],
     execute: runArchetypeRegistryBuild,
   },
   {
@@ -329,6 +339,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "packages/ontology/archetypes/**/*.yaml",
       "packages/ui/src/{sections,components}/**/*.manifest.yaml",
     ],
+    modulePaths: ["archetype.ts", "archetype/registry-build.ts", "archetype/shared.ts"],
     execute: runArchetypeRegistryValidate,
   },
   {
@@ -388,6 +399,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/ui/src/sections/**"],
+    modulePaths: ["archetype.ts", "archetype/section-contract.ts", "archetype/shared.ts"],
     execute: runSectionContractValidate,
   },
   {
@@ -408,6 +420,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/ontology/constellations/**/*.yaml", "packages/ontology/archetypes/**/*.yaml"],
+    modulePaths: ["archetype.ts", "archetype/constellation.ts", "archetype/shared.ts"],
     execute: runConstellationContractValidate,
   },
   {
@@ -476,6 +489,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "packages/ontology/archetypes/**/*.yaml",
       "packages/ui/src/sections/**/*.manifest.yaml",
     ],
+    modulePaths: ["archetype.ts", "archetype/registry-build.ts", "archetype/shared.ts"],
     execute: runPlanetImportPathsLint,
   },
   {
@@ -546,6 +560,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "packages/ui/src/{sections,components}/**/*.manifest.yaml",
       "packages/ui/src/{sections,components}/**/*.types.generated.ts",
     ],
+    modulePaths: ["props-contract.ts", "result-helpers.ts"],
     execute: runPropsContractValidate,
   },
   {
@@ -653,6 +668,7 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/open-source/THIRD_PARTY_LICENSES.txt",
       "<app>/src/content/system.md",
     ],
+    modulePaths: ["open-source-validate.ts", "result-helpers.ts", "lib/file-exists.ts"],
     execute: runOpenSourceValidate,
   },
 ];

@@ -31,6 +31,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     writes: ["<app>/public/api/agent/v1/*.json"],
     flags: {},
     reads: ["<app>/src/content/system.md", "<app>/src/content/business-profile/**/*.md"],
+    modulePaths: ["agent/agent-knowledge.ts"],
     execute: runAgentKnowledgeGenerate,
   },
   {
@@ -41,6 +42,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: ["<app>/public/api/agent/v1/*.json", "<app>/src/content/system.md"],
+    modulePaths: ["agent/agent-knowledge.ts"],
     execute: runAgentKnowledgeValidate,
   },
   {
@@ -51,6 +53,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: ["packages/ontology/capabilities/**/*.yaml", "<app>/src/content/system.md"],
+    modulePaths: ["agent/agent-capability.ts"],
     execute: runAgentCapabilityValidate,
   },
   {
@@ -63,6 +66,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     writes: ["<app>/src/agent-surface.generated.yaml", "<app>/public/.well-known/agent.json"],
     flags: {},
     reads: ["<app>/src/content/system.md", "<app>/public/api/agent/v1/*.json"],
+    modulePaths: ["agent/agent-manifest.ts"],
     execute: runAgentManifestGenerate,
   },
   {
@@ -73,6 +77,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: ["<app>/src/agent-surface.generated.yaml", "<app>/public/.well-known/agent.json"],
+    modulePaths: ["agent/agent-manifest.ts"],
     execute: runAgentSurfaceValidate,
   },
   {
@@ -85,6 +90,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     writes: ["<app>/public/.well-known/agent.openapi.json"],
     flags: {},
     reads: ["<app>/src/agent-surface.generated.yaml"],
+    modulePaths: ["agent/agent-openapi.ts"],
     execute: runAgentOpenApiGenerate,
   },
   {
@@ -98,6 +104,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/.well-known/agent.openapi.json",
       "<app>/src/agent-surface.generated.yaml",
     ],
+    modulePaths: ["agent/agent-openapi.ts"],
     execute: runAgentOpenApiValidate,
   },
   {
@@ -114,6 +121,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     ],
     flags: {},
     reads: ["<app>/src/agent-surface.generated.yaml"],
+    modulePaths: ["agent/agent-routes.ts"],
     execute: runAgentRoutesGenerate,
   },
   {
@@ -146,6 +154,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/api/agent/v1/*.json",
       "<app>/public/.well-known/cosmic-passport-key.json",
     ],
+    modulePaths: ["agent/agent-surface-sign.ts"],
     execute: runAgentSurfaceVerify,
   },
   {
@@ -155,6 +164,7 @@ export const AGENT_SURFACE_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     reads: ["packages/agent-gate/src/**/*.ts"],
+    modulePaths: ["agent/agent-gate-fixtures.ts"],
     execute: runAgentGateFixturesRun,
   },
 ];

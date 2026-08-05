@@ -59,6 +59,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/pages/404.astro"],
+    modulePaths: ["public-surface/not-found.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runNotFoundValidate,
   },
   {
@@ -82,6 +83,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/pages/favicon.ico.ts",
     ],
     reads: ["<app>/src/content/system.md", "<app>/src/content/favicon.svg"],
+    modulePaths: ["public-surface/icons.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runPublicIconsGenerate,
   },
   {
@@ -97,6 +99,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/icon-*.png",
       "<app>/src/content/favicon.svg",
     ],
+    modulePaths: ["public-surface/icons.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runPublicIconsValidate,
   },
   {
@@ -117,6 +120,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/**"],
+    modulePaths: ["public-surface/aggregate.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runPublicArtifactValidate,
   },
   {
@@ -127,6 +131,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/**"],
+    modulePaths: ["public-surface/aggregate.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runPublicDeclarationValidate,
   },
   {
@@ -137,6 +142,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/**"],
+    modulePaths: ["public-surface/aggregate.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runPublicSurfaceLint,
   },
   {
@@ -166,6 +172,11 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/public/**"],
     execute: runPublicOrphansValidate,
+    modulePaths: [
+      "public-surface/managed-public.ts",
+      "public-surface/shared.ts",
+      "result-helpers.ts",
+    ],
   },
   {
     name: "redirect.map.validate",
@@ -175,6 +186,11 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/_redirects", "<app>/dist/client/**/*.html"],
+    modulePaths: [
+      "public-surface/managed-public.ts",
+      "public-surface/shared.ts",
+      "result-helpers.ts",
+    ],
     execute: runRedirectMapValidate,
   },
   {
@@ -197,6 +213,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/*-indexnow.txt"],
+    modulePaths: ["public-surface/indexnow.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runIndexNowKeyValidate,
   },
   {
@@ -236,6 +253,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/os/site-kernel-checks/src/**/*.ts"],
+    modulePaths: ["public-surface/indexnow.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runIndexNowSubmitValidate,
   },
   {
@@ -258,6 +276,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/humans.txt"],
+    modulePaths: ["public-surface/humans.ts", "public-surface/shared.ts"],
     execute: runHumansValidate,
   },
   {
@@ -280,6 +299,12 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/ai.txt", "<app>/public/robots.txt"],
+    modulePaths: [
+      "public-surface/security.ts",
+      "ai.ts",
+      "public-surface/shared.ts",
+      "result-helpers.ts",
+    ],
     execute: runAiPolicyValidate,
   },
   {
@@ -302,6 +327,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/.well-known/security.txt"],
+    modulePaths: ["public-surface/security.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runSecurityTxtValidate,
   },
   {
@@ -321,6 +347,7 @@ export const PUBLIC_SURFACE_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/_headers"],
+    modulePaths: ["public-surface/security.ts", "public-surface/shared.ts", "result-helpers.ts"],
     execute: runHeadersSecurityValidate,
   },
 ];

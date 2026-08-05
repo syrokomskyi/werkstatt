@@ -35,6 +35,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "packages/ontology/growth/**/*.yaml"],
+    modulePaths: ["growth-events.ts"],
     execute: runGrowthEventsValidate,
   },
   {
@@ -45,6 +46,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "packages/ontology/growth/funnels/**/*.yaml"],
+    modulePaths: ["growth-funnel.ts"],
     execute: runGrowthFunnelValidate,
   },
   {
@@ -55,6 +57,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "packages/ontology/growth/experiments/**/*.yaml"],
+    modulePaths: ["growth-experiment.ts"],
     execute: runGrowthExperimentValidate,
   },
   {
@@ -65,6 +68,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "packages/ontology/growth/experiments/**/*.yaml"],
+    modulePaths: ["growth-experiment.ts"],
     execute: runGrowthExperimentArchive,
   },
   {
@@ -75,6 +79,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/growth-adapters/*/src/**/*.ts"],
+    modulePaths: ["growth-adapter.ts"],
     execute: runGrowthAdapterContract,
   },
   {
@@ -85,6 +90,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md"],
+    modulePaths: ["growth-adapter.ts"],
     execute: runGrowthVendorResolve,
   },
   /* Wave 0 (RFC-0028): Cosmic Passport */
@@ -111,6 +117,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "uni.registry.yaml"],
+    modulePaths: ["passport.ts"],
     execute: runStarMapRender,
   },
   {
@@ -137,6 +144,7 @@ export const GROWTH_PASSPORT_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/.well-known/cosmic-passport-key.json",
       "<app>/src/content/system.md",
     ],
+    modulePaths: ["passport.ts"],
     execute: runPassportVerify,
   },
   {

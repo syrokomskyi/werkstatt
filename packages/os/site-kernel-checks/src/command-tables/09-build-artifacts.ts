@@ -60,6 +60,13 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/sitemap.xml", "<app>/public/sitemap-*.xml"],
     reads: ["<app>/src/content/system.md", "<app>/dist/client/**/*.html"],
+    modulePaths: [
+      "sitemap.ts",
+      "sitemap-helpers.ts",
+      "result-helpers.ts",
+      "lib/astro-site-url.ts",
+      "lib/i18n.ts",
+    ],
     execute: runSitemapGenerate,
   },
   {
@@ -73,6 +80,13 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
       "<app>/dist/client/sitemap*.xml",
       "<app>/dist/client/**/*.html",
       "<app>/src/content/system.md",
+    ],
+    modulePaths: [
+      "sitemap.ts",
+      "sitemap-helpers.ts",
+      "result-helpers.ts",
+      "lib/astro-site-url.ts",
+      "lib/i18n.ts",
     ],
     execute: runSitemapValidate,
   },
@@ -96,6 +110,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/dist/client/sitemap-images.xml"],
+    modulePaths: ["sitemap-images.ts", "result-helpers.ts", "lib/astro-site-url.ts"],
     execute: runSitemapImagesValidate,
   },
   /* RFC-0185: strip generated markers from dist/client */
@@ -114,6 +129,11 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/dist/client/**"],
     reads: ["<app>/dist/client/**"],
+    modulePaths: [
+      "dist-generated-marker.ts",
+      "result-helpers.ts",
+      "strip-html-generated-marker.ts",
+    ],
     execute: runDistGeneratedMarkerStrip,
   },
   {
@@ -129,6 +149,11 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/dist/client/**"],
+    modulePaths: [
+      "dist-generated-marker.ts",
+      "result-helpers.ts",
+      "strip-html-generated-marker.ts",
+    ],
     execute: runDistGeneratedMarkerValidate,
   },
   /* RFC-0654: post-build HTML structural integrity validation */
@@ -146,6 +171,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/dist/client/**"],
     cacheable: true,
+    modulePaths: ["dist-html-structure.ts"],
     execute: runDistHtmlStructureValidate,
   },
   /* RFC-0167: sellable blog/article module contract */
@@ -157,6 +183,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: ["blog.ts", "result-helpers.ts", "lib/surface-articles.ts"],
     execute: runBlogValidate,
   },
   /* RFC-0325: dated editorial article substance contract (generic, semanticType-driven) */
@@ -168,6 +195,13 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: [
+      "article-depth.ts",
+      "result-helpers.ts",
+      "lib/astro-site-url.ts",
+      "lib/i18n.ts",
+      "lib/surface-articles.ts",
+    ],
     execute: runArticleDepthValidate,
   },
   /* RFC-0508: canonical Participant record contract (replaces people.validate) */
@@ -179,6 +213,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/people/**/*.md"],
+    modulePaths: ["participant.ts", "result-helpers.ts"],
     execute: runParticipantValidate,
   },
   /* RFC-0509: team hub page structure and founder retirement validation */
@@ -194,6 +229,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/pages/**/*.md",
       "<app>/src/content/navigation/**/*.md",
     ],
+    modulePaths: ["team-hub.ts", "result-helpers.ts"],
     execute: runTeamHubValidate,
   },
   /* RFC-0510: human profile page structure validation */
@@ -209,6 +245,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/prose/**/*.md",
       "<app>/src/content/system.md",
     ],
+    modulePaths: ["participant-profile.ts", "result-helpers.ts"],
     execute: runParticipantProfileValidate,
   },
   /* RFC-0511: AI-agent profile page structure validation */
@@ -224,6 +261,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/prose/**/*.md",
       "<app>/src/content/system.md",
     ],
+    modulePaths: ["participant-ai-agent.ts", "result-helpers.ts"],
     execute: runParticipantAiAgentValidate,
   },
   /* RFC-0512: team JSON endpoint validation (private field exclusion, shape, consent gating) */
@@ -235,6 +273,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/team/**/*.json"],
+    modulePaths: ["participant-json.ts", "result-helpers.ts"],
     execute: runParticipantJsonValidate,
   },
   /* RFC-0513: team lifecycle validation (status transitions, CTA removal, review cadence) */
@@ -246,6 +285,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/people/**/*.md"],
+    modulePaths: ["team-lifecycle.ts", "result-helpers.ts"],
     execute: runTeamLifecycleValidate,
   },
   /* RFC-0513: cross-page alignment validation (hub ↔ profile ↔ home ↔ navigation ↔ JSON) */
@@ -263,6 +303,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/navigation/**/*.md",
       "<app>/dist/team/**/*.json",
     ],
+    modulePaths: ["team-cross-page.ts", "result-helpers.ts"],
     execute: runTeamCrossPageValidate,
   },
   /* RFC-0475: canonical FAQ entry contract */
@@ -274,6 +315,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/faq/**/*.md"],
+    modulePaths: ["faq.ts", "result-helpers.ts"],
     execute: runFaqValidate,
   },
   /* RFC-0202: living-photos media contract */
@@ -285,6 +327,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/public/**"],
+    modulePaths: ["live-media.ts", "result-helpers.ts", "lib/file-exists.ts", "lib/i18n.ts"],
     execute: runLiveMediaValidate,
   },
   /* RFC-0210: unified media contract — explicit-source (feature/background) governance */
@@ -296,6 +339,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/video-manifest.generated.yaml"],
+    modulePaths: ["video/video-media.ts"],
     execute: runVideoMediaValidate,
   },
   /* RFC-0234: refuse to publish a site whose videos lack an iOS-playable delivery format */
@@ -310,6 +354,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/video-manifest.generated.yaml",
       "<app>/src/live-video-manifest.generated.yaml",
     ],
+    modulePaths: ["video/video-fallback.ts"],
     execute: runVideoIosFallbackValidate,
   },
   /* RFC-0220: material credits / provenance governance */
@@ -321,6 +366,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.credits.yaml", "<app>/src/content/system.md"],
+    modulePaths: ["material-credits.ts", "result-helpers.ts", "lib/i18n.ts"],
     execute: runMaterialCreditsValidate,
   },
   /* RFC-0236: generated-file drift guard */
@@ -332,6 +378,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.credits.yaml", "<app>/src/content/prose/**/credits.md"],
+    modulePaths: ["material-credits.ts", "result-helpers.ts", "lib/i18n.ts"],
     execute: runMaterialCreditsDriftValidate,
   },
   {
@@ -394,6 +441,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/pages/index.astro", "<app>/src/content/system.md"],
+    modulePaths: ["root-canonical.ts", "result-helpers.ts"],
     execute: runRootCanonicalValidate,
   },
   /* RFC-0160 */
@@ -405,6 +453,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/pages/**/*.astro"],
+    modulePaths: ["route-topology.ts", "result-helpers.ts", "lib/i18n.ts"],
     execute: runRouteTopologyValidate,
   },
   /* RFC-0050: llms.txt */
@@ -418,6 +467,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/llms.txt", "<app>/public/llms-full.txt"],
     reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
+    modulePaths: ["llms.ts", "result-helpers.ts", "lib/astro-site-url.ts", "lib/i18n.ts"],
     execute: runLlmsGenerate,
   },
   {
@@ -428,6 +478,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/llms.txt", "<app>/public/llms-full.txt"],
+    modulePaths: ["llms.ts", "result-helpers.ts", "lib/astro-site-url.ts", "lib/i18n.ts"],
     execute: runLlmsValidate,
   },
   /* RFC-0166 */
@@ -441,6 +492,13 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/index.md", "<app>/public/{route}.md"],
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: [
+      "page-markdown.ts",
+      "result-helpers.ts",
+      "lib/astro-site-url.ts",
+      "lib/i18n.ts",
+      "lib/surface-articles.ts",
+    ],
     execute: runPageMarkdownGenerate,
   },
   {
@@ -451,6 +509,13 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/public/**/*.md"],
+    modulePaths: [
+      "page-markdown.ts",
+      "result-helpers.ts",
+      "lib/astro-site-url.ts",
+      "lib/i18n.ts",
+      "lib/surface-articles.ts",
+    ],
     execute: runPageMarkdownValidate,
   },
   /* RFC-0208 / RFC-0372 */
@@ -462,6 +527,12 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: [
+      "page-blocks-validate.ts",
+      "result-helpers.ts",
+      "lib/astro-site-url.ts",
+      "lib/i18n.ts",
+    ],
     execute: runPageBlocksValidate,
   },
   /* RFC-0169 */
@@ -485,6 +556,7 @@ export const BUILD_ARTIFACT_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/entitlements.generated.yaml", "packages/ontology/entitlements/**/*.yaml"],
+    modulePaths: ["entitlements.ts", "result-helpers.ts"],
     execute: runEntitlementsValidate,
   },
 ];

@@ -84,6 +84,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.md", "<app>/src/content/schemas/**/*.ts"],
+    modulePaths: ["structure/mirror-triad.ts", "structure/shared.ts"],
     execute: runMirrorTriadValidation,
   },
   {
@@ -98,6 +99,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/**/*.md",
       "<app>/src/content/schemas/**/*.ts",
     ],
+    modulePaths: ["structure/quartet-mirror.ts", "structure/shared.ts", "lib/route-constants.ts"],
     execute: runQuartetMirrorValidation,
   },
   {
@@ -107,6 +109,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.md", "<app>/src/content/schemas/**/*.ts"],
+    modulePaths: ["structure/dispatcher-sync.ts", "structure/shared.ts"],
     execute: runDispatcherSyncValidation,
   },
   // naming.convention.lint migrated to @warpgogol/forge — see packages/forge/os/naming/
@@ -126,6 +129,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: false,
     reads: ["systems/registry.yaml", "systems/*/system.pin.json", "fleet/fleet.sites.yaml"],
+    modulePaths: ["structure/naming-policy.ts"],
     execute: runNamingPolicyValidate,
   },
   /* RFC-0030 */
@@ -253,6 +257,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/pages/**/*.astro"],
+    modulePaths: ["semantic.ts", "lib/route-constants.ts"],
     execute: runRouteSlimValidation,
   },
   {
@@ -263,6 +268,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/**"],
     execute: runFeaturePolicyValidate,
+    modulePaths: ["feature-policy.ts"],
   },
   {
     name: "feature.visibility.validate",
@@ -271,6 +277,12 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/**"],
+    modulePaths: [
+      "semantic.ts",
+      "feature-policy.ts",
+      "semantic-mirror.ts",
+      "lib/route-constants.ts",
+    ],
     execute: runFeatureVisibilityValidation,
   },
   {
@@ -280,6 +292,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/**"],
+    modulePaths: ["feature-graph.ts"],
     execute: runFeatureGraphValidate,
   },
   {
@@ -290,6 +303,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/**"],
+    modulePaths: ["feature-policy.ts"],
     execute: runFeatureReferencesValidate,
   },
   {
@@ -299,6 +313,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.md"],
+    modulePaths: ["feature-graph.ts"],
     execute: runFeatureLinksValidate,
   },
   {
@@ -308,6 +323,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/**"],
+    modulePaths: ["feature-graph.ts"],
     execute: runFeatureProjectionsValidate,
   },
   /* Wave 3.5: RFC-0019 */
@@ -324,6 +340,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/src/pages/**/*.astro", "packages/ui/src/sections/navigation-section/**/*.astro"],
+    modulePaths: ["structure-hierarchy.ts"],
     execute: runStructureHierarchyValidate,
   },
   {
@@ -339,6 +356,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: ["navigation-section.ts", "structure-hierarchy.ts"],
     execute: runNavigationSectionValidate,
   },
   /* Wave 4: layer-specific naming */
@@ -350,6 +368,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/pages/**/*.astro"],
+    modulePaths: ["naming/pages.ts", "naming/shared.ts", "lib/route-constants.ts"],
     execute: runNamingPagesLint,
   },
   /* Wave 4.5: RFC-0020 */
@@ -361,6 +380,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/components/**", "<app>/src/pages/**", "<app>/src/styles/**"],
+    modulePaths: ["naming/suffixes.ts", "naming/shared.ts"],
     execute: runNamingSuffixesLint,
   },
   {
@@ -371,6 +391,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/layouts/**"],
+    modulePaths: ["naming/pages.ts", "naming/shared.ts"],
     execute: runNamingLayoutsLint,
   },
   /* Wave 4.6: RFC-0021 */
@@ -382,6 +403,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/layouts/**", "<app>/src/content/schemas/layouts/**"],
+    modulePaths: ["checks/content-layouts.ts"],
     execute: runContentLayoutsValidation,
   },
   /* Wave 5: layer-specific placement */
@@ -393,6 +415,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/pages/**/*.astro", "<app>/src/components/**/*.astro"],
+    modulePaths: ["scripts-placement.ts"],
     execute: runScriptsPlacementValidation,
   },
   {
@@ -403,6 +426,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/components/**"],
+    modulePaths: ["naming/components.ts", "naming/shared.ts"],
     execute: runNamingComponentsLint,
   },
   {
@@ -413,6 +437,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/styles/**"],
+    modulePaths: ["naming/styles.ts", "naming/shared.ts"],
     execute: runNamingStylesLint,
   },
   {
@@ -423,6 +448,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/assets/images/**"],
+    modulePaths: ["naming/assets.ts", "naming/shared.ts"],
     execute: runAssetsStructureLint,
   },
   /* RFC-0033 */
@@ -434,6 +460,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/schemas/**/*.ts"],
+    modulePaths: ["schema-drift.ts"],
     execute: runSchemaDriftValidate,
   },
   /* RFC-0034 */
@@ -474,6 +501,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md"],
+    modulePaths: ["i18n-config-validate.ts"],
     execute: runI18nConfigValidate,
   },
   /* RFC-0038 Wave 4 */
@@ -487,6 +515,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/src/middleware/language-detect.ts", "<app>/src/scripts/language-persist.ts"],
     reads: ["<app>/src/content/system.md"],
+    modulePaths: ["i18n-detect-implement.ts"],
     execute: runI18nDetectImplement,
   },
   /* RFC-0024 */
@@ -498,6 +527,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: false,
     reads: ["<app>/src/content/business-profile/**/*.md", "packages/pbp/src/**/*.ts"],
+    modulePaths: ["pbp-profile.ts"],
     execute: runPbpProfileValidate,
   },
   /* RFC-0204 */
@@ -519,6 +549,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
       "<app>/public/**/*.{png,jpg,jpeg,webp,avif,gif}",
     ],
     execute: runImageVariantsGenerate,
+    modulePaths: ["image-variants.ts"],
   },
   {
     name: "image.variants.validate",
@@ -528,6 +559,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/image-variants.generated.yaml", "<app>/public/_img/**"],
+    modulePaths: ["image-variants.ts"],
     execute: runImageVariantsValidate,
   },
   /* RFC-0210 */
@@ -549,6 +581,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     ],
     reads: ["<app>/src/content/system.md", "<app>/public/**/*.{mp4,webm,mov}"],
     execute: runVideoVariantsGenerate,
+    modulePaths: ["video/video-variants.ts"],
   },
   /* RFC-0234 */
   {
@@ -569,6 +602,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     ],
     reads: ["<app>/src/content/system.md", "<app>/public/**/*.{mp4,webm,mov}"],
     execute: runLiveVariantsGenerate,
+    modulePaths: ["live-variants.ts", "lib/i18n.ts"],
   },
   {
     name: "video.variants.validate",
@@ -578,6 +612,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/video-manifest.generated.yaml", "<app>/public/_video/**"],
+    modulePaths: ["video/video-variants.ts"],
     execute: runVideoVariantsValidate,
   },
   {
@@ -592,6 +627,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     timeoutMs: 300_000,
     writes: ["<app>/dist/client/_astro/**"],
     reads: ["<app>/dist/client/**/*.html", "<app>/src/video-manifest.generated.yaml"],
+    modulePaths: ["video/video-variants.ts"],
     execute: runVideoDistPrune,
   },
   /* RFC-0152 */
@@ -603,6 +639,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/dist/client/_astro/**"],
+    modulePaths: ["cloudflare-assets.ts"],
     execute: runCloudflareAssetsValidate,
   },
   /* RFC-0181 */
@@ -614,6 +651,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/wrangler.jsonc", "<app>/src/content/system.md"],
+    modulePaths: ["cloudflare-residency.ts"],
     execute: runCloudflareResidencyValidate,
   },
   /* RFC-0182 */
@@ -638,6 +676,7 @@ export const STRUCTURE_NAMING_COMMANDS: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/src/middleware/language-redirect.ts"],
     reads: ["<app>/src/content/system.md"],
+    modulePaths: ["i18n-detect-implement.ts"],
     execute: runI18nDetectImplement,
   },
 ];

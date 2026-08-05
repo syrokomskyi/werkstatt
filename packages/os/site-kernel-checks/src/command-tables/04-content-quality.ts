@@ -72,6 +72,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/pages/**/*.md", "<app>/src/content/system.md"],
+    modulePaths: ["checks/page-content.ts"],
     execute: runPageContentValidation,
   },
   {
@@ -81,6 +82,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/pages/**/*.astro"],
+    modulePaths: ["checks/thin-copy.ts"],
     execute: runThinCopyValidation,
   },
   {
@@ -91,6 +93,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/ui/src/sections/**/*.astro"],
+    modulePaths: ["checks/thin-copy.ts"],
     execute: runSharedUiThinCopyValidation,
   },
   {
@@ -101,6 +104,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<site>/src/content/business-profile/**/*.md"],
+    modulePaths: ["content-pbp.ts"],
     execute: runPbpContentValidate,
   },
   {
@@ -122,6 +126,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.md"],
+    modulePaths: ["content-references.ts"],
     execute: runContentReferencesValidate,
   },
   {
@@ -137,6 +142,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/prose/**/*.md",
       "<app>/src/content/pages/**/*.md",
     ],
+    modulePaths: ["b2b-model.ts"],
     execute: runB2bModelValidate,
   },
   {
@@ -147,6 +153,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: ["effects-contract.ts"],
     execute: runEffectsContractValidate,
   },
   {
@@ -156,6 +163,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     reads: ["packages/ui/src/{sections,components}/**/*.astro"],
+    modulePaths: ["effects-contract.ts"],
     execute: runEffectsCoverageAudit,
   },
   {
@@ -166,6 +174,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.md", "packages/ontology/site-families/**/*.yaml"],
+    modulePaths: ["content-voice.ts"],
     execute: runContentVoiceLint,
   },
   {
@@ -176,6 +185,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/onboarding/.input/**/*.yaml", "<app>/src/content/**/*.md"],
+    modulePaths: ["content-coverage.ts"],
     execute: runContentCoverageValidate,
   },
   /* Styling */
@@ -186,6 +196,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/styles/**/*.css"],
+    modulePaths: ["checks/tokens.ts"],
     execute: runDesignSystemTokenLint,
   },
   {
@@ -195,6 +206,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/styles/**/*.css"],
+    modulePaths: ["checks/tokens.ts"],
     execute: runHardcodedColorLint,
   },
   {
@@ -205,6 +217,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/styles/**/*.css"],
+    modulePaths: ["css-important-lint.ts"],
     execute: runCssImportantLint,
   },
   /* RFC-0071 */
@@ -215,6 +228,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: ["checks/tokens.ts"],
     execute: runBiomeCoverageHint,
   },
   /* RFC-0087 */
@@ -226,6 +240,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/os/site-kernel-checks/src/**/*.ts", "packages/os/site-kernel/src/**/*.ts"],
+    modulePaths: ["generator-ownership.ts"],
     execute: runGeneratorOwnershipLint,
   },
   /* RFC-0089 */
@@ -237,6 +252,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/*/package.json", "packages/ui/src/{sections,components,pages}/**/*.astro"],
+    modulePaths: ["astro-exports.ts"],
     execute: runAstroExportsLint,
   },
   /* RFC-0092 */
@@ -248,6 +264,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    modulePaths: ["import-extensions.ts"],
     execute: runImportExtensionsLint,
   },
   /* RFC-0264 */
@@ -259,6 +276,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: ["packages/*/src/index.ts", "packages/*/package.json"],
+    modulePaths: ["barrel-size-lint.ts"],
     execute: runBarrelSizeLint,
   },
   /* RFC-0303 */
@@ -270,6 +288,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    modulePaths: ["fs-walk-lint.ts"],
     execute: runFsWalkLint,
   },
   {
@@ -280,6 +299,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     flags: {},
     reads: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    modulePaths: ["dedup-helper-lint.ts"],
     execute: runDedupHelperLint,
   },
   {
@@ -295,6 +315,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
       },
     },
     reads: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    modulePaths: ["file-size-lint.ts"],
     execute: runFileSizeLint,
   },
   {
@@ -305,6 +326,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["packages/*/tsconfig.json", "tsconfig/*.json"],
+    modulePaths: ["tsconfig-shape.ts"],
     execute: runTsconfigShapeLint,
   },
   /* RFC-0222 */
@@ -324,6 +346,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     scope: "workspace",
     flags: {},
     reads: ["docs/COMMANDS.md", "packages/os/site-kernel-checks/src/command-tables/**/*.ts"],
+    modulePaths: ["docs-commands.ts"],
     execute: runDocsCommandsValidate,
   },
   /* RFC-0095 */
@@ -335,6 +358,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/site/*/labels.md"],
+    modulePaths: ["labels-shape.ts"],
     execute: runLabelsShapeHint,
   },
   /* RFC-0189 */
@@ -351,6 +375,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["packages/ui/src/{sections,components}/**/*.astro"],
+    modulePaths: ["ui-i18n.ts"],
     execute: runUiI18nLint,
   },
   /* RFC-0230 */
@@ -367,6 +392,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["packages/share/src/**/*.ts"],
+    modulePaths: ["share-i18n.ts"],
     execute: runShareI18nLint,
   },
   /* RFC-0206 */
@@ -378,6 +404,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.md"],
+    modulePaths: ["content-links.ts"],
     execute: runContentLinksValidate,
   },
   /* RFC-0205 */
@@ -394,6 +421,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["packages/ui/src/{sections,components}/**/*.astro"],
+    modulePaths: ["ui-silent-defaults.ts"],
     execute: runUiSilentDefaultsLint,
   },
   /* RFC-0095: DE/EU locale legal-page guard */
@@ -405,6 +433,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/site/*/labels.md", "<app>/src/content/system.md"],
+    modulePaths: ["footer-legal.ts"],
     execute: runFooterLegalValidate,
   },
   /* RFC-0174 */
@@ -416,6 +445,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/pages/**/*.md"],
+    modulePaths: ["legal-translation.ts"],
     execute: runLegalTranslationValidate,
   },
   /* Content naming */
@@ -426,6 +456,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/pages/**/*.md"],
+    modulePaths: ["checks/page-content.ts"],
     execute: runNamingContentLint,
   },
   /* SEO */
@@ -436,6 +467,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/pages/**/*.md"],
+    modulePaths: ["checks/semantic-drift.ts"],
     execute: runSemanticDriftValidation,
   },
   // compass.* migrated to @warpgogol/forge — see packages/forge/os/compass/
@@ -448,6 +480,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.claims.yaml"],
+    modulePaths: ["content-claims.ts"],
     execute: runContentClaimValidate,
   },
   {
@@ -458,6 +491,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.claims.yaml"],
+    modulePaths: ["comparative-claims.ts"],
     execute: runComparativeClaimValidate,
   },
   {
@@ -478,6 +512,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.claims.yaml"],
+    modulePaths: ["content-freshness.ts"],
     execute: runContentFreshnessValidate,
   },
   {
@@ -497,6 +532,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.md", "<app>/src/content/**/*.claims.yaml"],
+    modulePaths: ["content-derived.ts"],
     execute: runContentDerivedValidate,
   },
   {
@@ -579,6 +615,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     },
     supportsAllSites: false,
     reads: ["<app>/src/content/ledger/claims.ndjson"],
+    modulePaths: ["content-ledger.ts"],
     execute: runClaimLedgerQuery,
   },
   {
@@ -589,6 +626,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/ledger/claims.ndjson"],
+    modulePaths: ["content-ledger.ts"],
     execute: runClaimLedgerProject,
   },
   /* RFC-0216: maintenance planner */
@@ -600,6 +638,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/**/*.claims.yaml", "<app>/src/content/ledger/claims.ndjson"],
+    modulePaths: ["content-plan.ts"],
     execute: runContentPlanBuild,
   },
   {
@@ -631,6 +670,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["integrations/truth-sources/*.yaml", "<app>/src/content/**/*.claims.yaml"],
+    modulePaths: ["content-source-binding.ts"],
     execute: runSourceBindingValidate,
   },
   {

@@ -77,6 +77,17 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
       "<app>/.surface-cache/**",
     ],
     reads: ["<app>/src/content/system.md", "<app>/src/surface/**/*.yaml"],
+    modulePaths: [
+      "surface.ts",
+      "surface/generate.ts",
+      "surface/shared.ts",
+      "surface-expand.ts",
+      "surface-expand/blueprints.ts",
+      "surface-expand/expand.ts",
+      "surface/service-catalog-links.ts",
+      "pseo/pseo-module-context.ts",
+      "result-helpers.ts",
+    ],
     execute: runSurfaceGenerate,
   },
   {
@@ -87,6 +98,14 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/surface.generated.yaml", "<app>/src/content/system.md"],
+    modulePaths: [
+      "surface.ts",
+      "surface/validate.ts",
+      "surface/shared.ts",
+      "surface-expand.ts",
+      "surface-enrich.ts",
+      "result-helpers.ts",
+    ],
     execute: runSurfaceValidate,
   },
   {
@@ -97,6 +116,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/surface.generated.yaml", "packages/ontology/blueprints/*.yaml"],
+    modulePaths: ["surface-hub-validate.ts"],
     execute: runSurfaceHubValidate,
     gate: {
       severity: "error",
@@ -116,6 +136,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/surface/industries/**/*.md", "packages/ontology/blueprints/*.yaml"],
+    modulePaths: ["surface-industry-validate.ts"],
     execute: runSurfaceIndustryValidate,
     gate: {
       severity: "warning",
@@ -135,6 +156,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/surface/services/**/*.md", "packages/ontology/blueprints/*.yaml"],
+    modulePaths: ["surface-service-validate.ts"],
     execute: runSurfaceServiceValidate,
   },
   {
@@ -148,6 +170,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
       "<app>/src/content/surface/intersections/**/*.md",
       "packages/ontology/blueprints/*.yaml",
     ],
+    modulePaths: ["surface-intersection-validate.ts"],
     execute: runSurfaceIntersectionValidate,
   },
   {
@@ -171,6 +194,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/src/surface.generated.yaml"],
+    modulePaths: ["surface-media-leakage-validate.ts"],
     execute: runSurfaceMediaLeakageValidate,
   },
   {
@@ -181,6 +205,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/src/surface.generated.yaml"],
+    modulePaths: ["surface-heading-uniqueness.ts"],
     execute: runSurfaceHeadingUniquenessValidate,
   },
   {
@@ -289,6 +314,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/surface/**/*.yaml"],
+    modulePaths: ["pseo/pseo-module-context.ts", "result-helpers.ts"],
     execute: runSurfaceContextValidate,
   },
   /* RFC-0193 */
@@ -300,6 +326,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/surface/**/*.yaml", "<app>/src/content/system.md"],
+    modulePaths: ["blueprint.ts"],
     execute: runBlueprintValidate,
   },
   /* RFC-0198 */
@@ -313,6 +340,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/.well-known/pseo-star-map.svg"],
     reads: ["<app>/src/surface.generated.yaml"],
+    modulePaths: ["surface.ts", "surface/starmap.ts"],
     execute: runSurfaceStarmap,
   },
   /* RFC-0196 */
@@ -340,6 +368,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
       },
     },
     reads: ["<app>/src/surface.generated.yaml", "<app>/src/surface/**/*.yaml"],
+    modulePaths: ["surface-quality.ts"],
     execute: runSurfaceEvidenceValidate,
   },
   {
@@ -355,6 +384,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
       },
     },
     reads: ["<app>/src/surface.generated.yaml"],
+    modulePaths: ["surface-quality.ts"],
     execute: runSurfaceDuplicateValidate,
   },
   /* RFC-0194 */
@@ -366,6 +396,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/surface.generated.yaml", "<app>/src/content/system.md"],
+    modulePaths: ["pseo/pseo.ts"],
     execute: runPseoValidate,
     gate: {
       severity: "error",
@@ -390,6 +421,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
       },
     },
     reads: ["<app>/src/surface.generated.yaml", "<app>/src/surface/**/*.yaml"],
+    modulePaths: ["pseo/pseo-proof.ts"],
     execute: runPseoProofValidate,
   },
   /* RFC-0277 */
@@ -406,6 +438,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/surface/**/*.yaml"],
+    modulePaths: ["pseo/pseo-product.ts"],
     execute: runPseoExperimentPlan,
   },
   {
@@ -416,6 +449,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/surface/**/*.yaml"],
+    modulePaths: ["pseo/pseo-product.ts"],
     execute: runPseoProductValidate,
   },
   /* RFC-0229 */
@@ -427,6 +461,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md", "<app>/src/surface.generated.yaml"],
+    modulePaths: ["breadcrumb.ts"],
     execute: runBreadcrumbTrailValidate,
   },
   /* RFC-0197 */
@@ -506,6 +541,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/enriched/**/*.md"],
+    modulePaths: ["surface-translation.ts"],
     execute: runSurfaceTranslationValidate,
   },
   {
@@ -516,6 +552,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/enriched/**/*.md"],
+    modulePaths: ["surface-translation.ts"],
     execute: runSurfaceTranslationQaValidate,
   },
   {
@@ -564,6 +601,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/src/content/enriched/_translation-notes/**/*.md"],
+    modulePaths: ["surface-translation.ts"],
     execute: runSurfaceTranslationNotesValidate,
   },
   {
@@ -600,6 +638,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     },
     supportsAllSites: true,
     reads: ["<app>/src/content/enriched/**/*.glossary.yaml"],
+    modulePaths: ["surface-translation.ts"],
     execute: runSurfaceTranslationGlossaryValidate,
   },
   {
@@ -610,6 +649,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/enriched/**/*.md"],
+    modulePaths: ["surface-enrich.ts"],
     execute: runEnrichValidate,
   },
   /* RFC-0207 */
@@ -645,6 +685,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/feed.xml", "<app>/public/feed.json"],
     reads: ["<app>/src/content/system.md", "<app>/src/content/pages/**/*.md"],
+    modulePaths: ["feed.ts"],
     execute: runFeedGenerate,
   },
   {
@@ -654,6 +695,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/feed.xml", "<app>/public/feed.json"],
+    modulePaths: ["feed.ts"],
     execute: runFeedValidate,
   },
   /* RFC-0317: canonical URL parity and update-stamp validation */
@@ -670,6 +712,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
       "<app>/public/feed.*",
       "<app>/public/llms*.txt",
     ],
+    modulePaths: ["canonical-url.ts"],
     execute: runCanonicalUrlValidate,
   },
   {
@@ -680,6 +723,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/dist/client/sitemap*.xml", "<app>/src/content/pages/**/*.md"],
+    modulePaths: ["canonical-url.ts"],
     execute: runContentUpdateStampsValidate,
   },
   /* RFC-0171 */
@@ -691,6 +735,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/src/content/system.md"],
+    modulePaths: ["content-source-adapter.ts"],
     execute: runContentSourceValidate,
   },
   {
@@ -703,6 +748,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/admin/config.yml", "<app>/public/admin/index.html"],
     reads: ["<app>/src/content/system.md", "<app>/src/content/schemas/**/*.ts"],
+    modulePaths: ["cms.ts"],
     execute: runCmsSchemaGenerate,
   },
   {
@@ -713,6 +759,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/admin/config.yml", "<app>/src/content/schemas/**/*.ts"],
+    modulePaths: ["cms.ts"],
     execute: runCmsSchemaParity,
   },
   /* RFC-0051 */
@@ -725,6 +772,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/ai.txt"],
     reads: ["<app>/src/content/system.md"],
+    modulePaths: ["ai.ts", "lib/astro-site-url.ts", "result-helpers.ts"],
     execute: runAiGenerate,
   },
   {
@@ -735,6 +783,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/ai.txt"],
+    modulePaths: ["ai.ts", "lib/astro-site-url.ts", "result-helpers.ts"],
     execute: runAiValidate,
   },
   /* RFC-0052 */
@@ -748,6 +797,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/public/robots.txt"],
     reads: ["<app>/src/content/system.md"],
+    modulePaths: ["robots.ts"],
     execute: runRobotsGenerate,
   },
   {
@@ -758,6 +808,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/public/robots.txt"],
+    modulePaths: ["robots.ts"],
     execute: runRobotsValidate,
   },
   /* RFC-0168 (Session C) */
@@ -771,6 +822,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     mutatesState: true,
     writes: ["<app>/.env.example"],
     reads: ["<app>/src/content/system.md", "<app>/src/env.schema.generated.mjs"],
+    modulePaths: ["env/env-example.ts", "result-helpers.ts"],
     execute: runEnvExampleGenerate,
   },
   {
@@ -781,6 +833,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     flags: {},
     supportsAllSites: true,
     reads: ["<app>/.env.example"],
+    modulePaths: ["env/env-example.ts", "result-helpers.ts"],
     execute: runEnvExampleValidate,
   },
 ];
