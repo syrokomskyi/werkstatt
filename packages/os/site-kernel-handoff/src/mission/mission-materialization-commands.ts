@@ -24,6 +24,7 @@
   <item>RFC-0635: reuse distribution in mission.validate when build-input-hash matches — skip build cycle, copy dist/ from distribution, add distributionReused/buildInputHash/fullBuildRan to MissionValidateData; add build.check phase to mission.build.</item>
   <item>RFC-0644: replace isWorkpieceDirty blocking guard with commitWorkpieceIfDirty auto-commit call before git fetch; add workpieceAutoCommitted/workpieceCommitSha to MissionReconcileData; update mission.validate dirty warnings.</item>
   <item>RFC-0689: extract shared autoRegenerateSnapshotOnSnap01 helper into snapshot-auto-regen.ts for reuse by leitstand.dev-deploy.</item>
+  <item>RFC-0697: refactor mission.validate SNAP-01 path to use shared orchestrateSnap01Recovery helper; dirtyBeforeBuildPost check remains caller-side.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -52,7 +53,7 @@ import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werksta
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
-import { detectSnap01, autoRegenerateSnapshotOnSnap01 } from "./snapshot-auto-regen.ts";
+import { orchestrateSnap01Recovery } from "./snapshot-auto-regen.ts";
 
 const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
 
@@ -444,7 +445,8 @@ export async function runMissionValidate(
       }
     }
 
-    // RFC-0615: auto-regenerate behavior snapshot on SNAP-01 when workpiece was clean
+    // RFC-0615/RFC-0697: auto-regenerate behavior snapshot on SNAP-01 when workpiece was clean.
+    // The dirtyBeforeBuildPost check is caller-side (mission.validate-specific pre-condition).
     if (
       postPipelineReport &&
       !postPipelineReport.ok &&
@@ -455,42 +457,40 @@ export async function runMissionValidate(
         (s) => s.commandName === "behavior.snapshot.validate",
       );
 
-      if (detectSnap01(snapshotStep?.data)) {
-        const regenResult = await autoRegenerateSnapshotOnSnap01({
-          workspaceRoot,
-          systemId: manifest.systemId,
-          missionId,
-          logger,
-        });
-
-        if (regenResult.regenerated) {
+      const snapResult = await orchestrateSnap01Recovery({
+        workspaceRoot,
+        systemId: manifest.systemId,
+        missionId,
+        logger,
+        validateFn: async () => snapshotStep?.data,
+        rebuildFn: async () => {
           logger.info(`  Re-running build.post after snapshot regeneration…`);
-          try {
-            const revalidateResult = await executeKernelPipeline({
-              workspaceRoot,
-              pipelineName: "build.post",
-              siteName: manifest.systemId,
-              outputFormat: "pretty",
-            });
-            const revalidateReport = Array.isArray(revalidateResult)
-              ? revalidateResult[0]
-              : revalidateResult;
-
-            if (revalidateReport.ok) {
-              buildSucceeded = true;
-              buildError = undefined;
-              logger.info(`  build.post passed after snapshot regeneration`);
-            } else {
-              buildError = `build.post still failing after snapshot regeneration: ${revalidateReport.timing.failedStep ?? "unknown"}`;
-              logger.info(`  ${buildError}`);
-            }
-          } catch (revalErr) {
-            buildError = `build.post re-run failed after snapshot regeneration: ${revalErr instanceof Error ? revalErr.message : String(revalErr)}`;
-            logger.info(`  ${buildError}`);
+          const revalidateResult = await executeKernelPipeline({
+            workspaceRoot,
+            pipelineName: "build.post",
+            siteName: manifest.systemId,
+            outputFormat: "pretty",
+          });
+          const revalidateReport = Array.isArray(revalidateResult)
+            ? revalidateResult[0]
+            : revalidateResult;
+          if (!revalidateReport.ok) {
+            throw new Error(
+              `build.post still failing after snapshot regeneration: ${revalidateReport.timing.failedStep ?? "unknown"}`,
+            );
           }
-        } else {
-          buildError = regenResult.error ?? "snapshot auto-regeneration failed";
-        }
+        },
+      });
+
+      if (snapResult.regenerated && snapResult.rebuildSucceeded) {
+        buildSucceeded = true;
+        buildError = undefined;
+        logger.info(`  build.post passed after snapshot regeneration`);
+      } else if (snapResult.regenerated && !snapResult.rebuildSucceeded) {
+        buildError = snapResult.error ?? "build.post still failing after snapshot regeneration";
+        logger.info(`  ${buildError}`);
+      } else if (snapResult.error) {
+        buildError = snapResult.error;
       }
     }
   }
