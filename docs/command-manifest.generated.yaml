@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: b049e13ae8bbba00ef3c7696dc2fe3867aedbe41c53b00866e61740734eef1fe
+  contentHash: ec91ccbc147da07eb17c973fea240c35ec420419587306230b23601f109575bd
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -20050,7 +20050,8 @@ commands:
       evidence). Diagnostics: SUPPRESS-VAL-01 (file not found, warning),
       SUPPRESS-VAL-02 (schema violation), SUPPRESS-VAL-03 (conflicting rules),
       SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId,
-      warning)."
+      warning), SUPPRESS-VAL-06 (messagePattern/descriptionPattern without
+      titlePattern, warning)."
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -20075,7 +20076,8 @@ commands:
       evidence). Diagnostics: SUPPRESS-VAL-01 (file not found, warning),
       SUPPRESS-VAL-02 (schema violation), SUPPRESS-VAL-03 (conflicting rules),
       SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId,
-      warning)."
+      warning), SUPPRESS-VAL-06 (messagePattern/descriptionPattern without
+      titlePattern, warning)."
     scope: workspace
     provider: workspace
     module: check
