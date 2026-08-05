@@ -88,6 +88,14 @@ function stepStatus(report: KernelExecutionReport): PipelineStepTiming["status"]
   return "pass";
 }
 
+/**
+ * RFC-0687: Check whether a report was skipped by transitive cache skip.
+ * Used to exclude transitive-cache-skip reports from telemetry.
+ */
+function isTransitiveSkip(report: KernelExecutionReport): boolean {
+  return report.summary?.startsWith("Skipped: transitive-cache-skip") ?? false;
+}
+
 function skippedExecutionReport(
   command: KernelCommandDefinition,
   context: KernelRuntimeContext,
@@ -701,11 +709,7 @@ async function executePipelineForSite(
       progressLine(
         `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
       );
-      if (
-        !step.skip &&
-        !report.cached &&
-        !report.summary?.startsWith("Skipped: transitive-cache-skip")
-      ) {
+      if (!step.skip && !report.cached && !isTransitiveSkip(report)) {
         await telemetryMutex.run(() =>
           appendStepTelemetry(options.workspaceRoot, {
             pipeline: options.pipelineName,
@@ -919,11 +923,7 @@ async function executePipelineForWorkspace(
       progressLine(
         `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
       );
-      if (
-        !step.skip &&
-        !report.cached &&
-        !report.summary?.startsWith("Skipped: transitive-cache-skip")
-      ) {
+      if (!step.skip && !report.cached && !isTransitiveSkip(report)) {
         await telemetryMutex.run(() =>
           appendStepTelemetry(options.workspaceRoot, {
             pipeline: options.pipelineName,
