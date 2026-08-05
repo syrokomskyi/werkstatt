@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 38fe426955008e623298a3bb32fdd8ef9ce6895b56318f75ff2ad9c5eb11c2d4
+  contentHash: 406ccccc39bdde38c218e49ad43264b970b330ec3f321e39176dac5a712086c6
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -8987,6 +8987,9 @@ commands:
       package-manager:
         kind: string
         description: "Package manager to write into forge.yaml (default: pnpm)."
+      template:
+        kind: string
+        description: Template id for multi-template profiles (e.g. react, html).
     reads: []
     writes: []
     validatesOutputs: []
@@ -9180,6 +9183,10 @@ commands:
         kind: string
         required: true
         description: Project name (kebab-case).
+      template:
+        kind: string
+        required: false
+        description: Template id for multi-template profiles (e.g. react, html).
     reads: []
     writes: []
     validatesOutputs: []
@@ -20051,7 +20058,8 @@ commands:
       SUPPRESS-VAL-02 (schema violation), SUPPRESS-VAL-03 (conflicting rules),
       SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId,
       warning), SUPPRESS-VAL-06 (messagePattern/descriptionPattern without
-      titlePattern, warning)."
+      titlePattern, warning), SUPPRESS-VAL-07 (titlePattern containing ruleId
+      prefix, warning, RFC-0695)."
     scope: workspace
     provider: site:warpgogol-com
     module: check
@@ -20077,7 +20085,8 @@ commands:
       SUPPRESS-VAL-02 (schema violation), SUPPRESS-VAL-03 (conflicting rules),
       SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId,
       warning), SUPPRESS-VAL-06 (messagePattern/descriptionPattern without
-      titlePattern, warning)."
+      titlePattern, warning), SUPPRESS-VAL-07 (titlePattern containing ruleId
+      prefix, warning, RFC-0695)."
     scope: workspace
     provider: workspace
     module: check
