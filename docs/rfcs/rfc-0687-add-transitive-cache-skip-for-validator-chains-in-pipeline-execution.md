@@ -287,7 +287,7 @@ const entries: CommandManifestEntry[] = commands.map((command) => ({
 | `packages/os/site-kernel/src/runtime/execute-pipeline.ts` | Modified: track `cacheHitCommands`, load/persist `.cache/pipeline-cache-hits.json`, check transitive skip before execution |
 | `packages/os/site-kernel/src/runtime/registry.ts` | Modified: propagate `validatesOutputs` in `commandInfo()` |
 | `packages/os/site-kernel/src/command-manifest.ts` | Modified: include `validatesOutputs` in manifest entries |
-| `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` | Modified: add `validatesOutputs` to `mirror.quintet.validate` command definition |
+| `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` | No changes in this RFC — no validators annotated with `validatesOutputs` (infrastructure-only) |
 | `.cache/pipeline-cache-hits.json` | New: persisted cache-hit file (gitignored, lives in `.cache/` per RFC-0382) |
 | `packages/os/site-kernel/AGENTS.md` | Modified: document `validatesOutputs` field and `.cache/pipeline-cache-hits.json` in § Command-result cache |
 
@@ -303,8 +303,8 @@ const entries: CommandManifestEntry[] = commands.map((command) => ({
 ## Rollout
 
 - **Default behavior**: transitive cache skip is enabled by default. No opt-in flag is needed — the skip is transparent and only fires when all preconditions are met (cacheable validator, `validatesOutputs` declared, all upstream commands cached).
-- **Gradual adoption**: validators are annotated with `validatesOutputs` incrementally. Validators without the field are never transitively skipped. Priority candidate: `mirror.quintet.validate` (cacheable, has `reads[]`, validates `manifest.contract.validate` output). Additional candidates will be annotated as they are verified to be cacheable and their upstream generators identified.
-- **`cacheable: false` exclusion**: `generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`, and `ownership.sync.validate` are `cacheable: false` and are NOT candidates for transitive skip. They always run and provide the filesystem-state safety net.
+- **Gradual adoption**: validators are annotated with `validatesOutputs` incrementally. Validators without the field are never transitively skipped. No validators are annotated in this RFC — the mechanism is infrastructure-only. The first `validatesOutputs` annotation will be added when a suitable cacheable generator→cacheable validator pair is identified. Current cacheable validators (e.g. `biome.tokens.validate`, `mirror.quintet.validate`) read authored files, not generated files, so they are not candidates. Current generators that produce files checked by cacheable validators (e.g. `open-source.generate`) are `cacheable: false`, so they never appear in `cacheHitCommands`.
+- **`cacheable: false` exclusion**: `generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`, `ownership.sync.validate`, `open-source.generate`, `bordbuch.generate` are `cacheable: false` and are NOT candidates for transitive skip. They always run and provide the filesystem-state safety net.
 - **No pipeline changes**: `build.check` and `build.prepare` step definitions are unchanged. The `validatesOutputs` field is on command definitions, not pipeline steps.
 - **`--force` flag**: clears `.cache/pipeline-cache-hits.json` and bypasses all cache reads, so transitive skip never fires.
 - **Pipeline report**: skipped validators appear in the report with `skipReason: "transitive-cache-skip"` and `ok: true`, making it clear they were skipped due to transitive cache, not a failure.
@@ -341,8 +341,8 @@ const entries: CommandManifestEntry[] = commands.map((command) => ({
 - [ ] `persistCacheHits` function writes `cacheHitCommands` to `.cache/pipeline-cache-hits.json` after pipeline run completes
 - [ ] Transitive skip does not fire when `--force` is set (file is cleared, `cacheHitCommands` is empty)
 - [ ] Transitive skip does not fire for `cacheable: false` validators (step 2 of algorithm)
-- [ ] `mirror.quintet.validate` in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` annotated with `validatesOutputs: ["manifest.contract.validate"]`
-- [ ] Unit tests verify: (a) transitive skip fires when all upstream cached, (b) no skip when upstream cache miss, (c) no skip for `cacheable: false` validators, (d) transitive skip through a chain of 2 validators, (e) `--force` disables transitive skip, (f) stale `.cache/pipeline-cache-hits.json` entries (>30 min) are ignored, (g) cross-pipeline skip works when `build.prepare` cache hits are loaded by `build.check`
+- [ ] `mirror.quintet.validate` in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` NOT annotated — no validators are annotated in this RFC (infrastructure-only)
+- [ ] Unit tests verify: (a) transitive skip fires when all upstream cached, (b) no skip when upstream cache miss, (c) no skip for `cacheable: false` validators, (d) transitive skip through a chain of 2 validators, (e) `--force` disables transitive skip, (f) stale `.cache/pipeline-cache-hits.json` entries (>30 min) are ignored, (g) cross-pipeline skip works when `build.prepare` cache hits are loaded by `build.check`, (h) no skip when `validatesOutputs` is empty or undefined, (i) corrupt `.cache/pipeline-cache-hits.json` falls back to empty set, (j) `persistCacheHits` preserves entries for other pipelines
 - [ ] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks`
 - [ ] `rfc.validate` passes on this file
 - [ ] `packages/os/site-kernel/AGENTS.md` § Command-result cache updated to document `validatesOutputs` and `.cache/pipeline-cache-hits.json`
