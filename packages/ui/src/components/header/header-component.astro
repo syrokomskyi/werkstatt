@@ -479,6 +479,7 @@ const ctaHref = ctaTarget
 
       if (currentScrollY > lastScrollY && currentScrollY > SCROLL_THRESHOLD) {
         header.classList.add("site-header--hidden");
+        closeOverflowMenu();
       } else {
         const wasHidden = header.classList.contains("site-header--hidden");
         header.classList.remove("site-header--hidden");
