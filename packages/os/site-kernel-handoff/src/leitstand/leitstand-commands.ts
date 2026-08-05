@@ -925,6 +925,15 @@ export async function runLeitstandDevDeploy(
     };
   }
 
+  // RFC-0634: Clean up preliminary build-identity.json from workpiece/public/.well-known/
+  // before auto-commit so the deletion is captured in the auto-commit and the workpiece
+  // is clean afterwards. This prevents the release commitSha from diverging from the dev
+  // site's build-identity commitSha.
+  await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
+  logger.info(
+    `[leitstand.dev-deploy] cleaned up preliminary build-identity.json from public/.well-known/`,
+  );
+
   // RFC-0698: Auto-commit workpiece after build completes, before distTreeHash computation.
   // Uses mission.git.commit via executeKernelCommand for PASSPORT signing (RFC-0560) and
   // pre-commit content validation (RFC-0594). If the commit fails, abort with fatal error.
