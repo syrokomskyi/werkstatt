@@ -992,22 +992,32 @@ export async function runMissionReconcile(
       } catch (err) {
         // Check if all conflicts are bordbuch-only (delete/modify)
         let conflictedPaths: string[] = [];
+        let bordbuchDeletedPaths: string[] = [];
         try {
           const statusOutput = execSync("git status --porcelain", {
             cwd: systemDir,
             stdio: "pipe",
             encoding: "utf-8",
           });
-          conflictedPaths = statusOutput
-            .split("\n")
-            .filter(
-              (l) =>
-                l.startsWith("DU") ||
-                l.startsWith("UD") ||
-                l.startsWith("AA") ||
-                l.startsWith("UU"),
-            )
-            .map((l) => l.slice(3).trim());
+          for (const line of statusOutput.split("\n")) {
+            if (!line) continue;
+            const status = line.slice(0, 2);
+            const filePath = line.slice(3).trim();
+            if (!filePath) continue;
+            if (
+              status.startsWith("DU") ||
+              status.startsWith("UD") ||
+              status.startsWith("AA") ||
+              status.startsWith("UU")
+            ) {
+              conflictedPaths.push(filePath);
+            } else if (status === "D ") {
+              const isBordbuchPath =
+                filePath.startsWith("bordbuch/") ||
+                filePath.startsWith("public/.well-known/bordbuch");
+              if (isBordbuchPath) bordbuchDeletedPaths.push(filePath);
+            }
+          }
         } catch {
           // git status failed — fall through to existing error
         }
@@ -1019,8 +1029,22 @@ export async function runMissionReconcile(
         if (allBordbuch) {
           // Auto-resolve: keep cache clone's bordbuch (ours)
           try {
+            // Restore bordbuch files that git auto-resolved as deletions (RFC-0658 guard blocks deletion)
+            if (bordbuchDeletedPaths.length > 0) {
+              const delPathArgs = bordbuchDeletedPaths.map((p) => JSON.stringify(p)).join(" ");
+              execSync(`git checkout HEAD -- ${delPathArgs}`, {
+                cwd: systemDir,
+                stdio: "pipe",
+                encoding: "utf-8",
+              });
+              execSync(`git add -- ${delPathArgs}`, {
+                cwd: systemDir,
+                stdio: "pipe",
+                encoding: "utf-8",
+              });
+            }
             const pathArgs = conflictedPaths.map((p) => JSON.stringify(p)).join(" ");
-            execSync(`git checkout --ours -- ${pathArgs}`, {
+            execSync(`git checkout HEAD -- ${pathArgs}`, {
               cwd: systemDir,
               stdio: "pipe",
               encoding: "utf-8",

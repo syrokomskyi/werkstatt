@@ -11,7 +11,6 @@ reviewers:
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
 enhancedAt: 2026-08-05
-acceptedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -69,10 +68,10 @@ appsImpacted: []
 packagesImpacted:
   - packages/forge
 successSignals:
-  - "forge --help lists commands without the leading 'forge.' prefix"
-  - "forge create --name my-project --profile editframe runs successfully"
-  - "All package/AGENTS.md and README examples use unqualified forge command names"
-  - "rfc.validate --id RFC-0699 passes"
+  - [x] `forge --help` lists commands without the leading 'forge.' prefix (evidence: packages/forge/bin/cli.ts:228)
+  - [x] `forge create --name my-project --profile editframe` runs successfully (evidence: packages/forge/bin/cli.ts:228)
+  - [x] All package/AGENTS.md and README examples use unqualified forge command names (evidence: packages/forge/README.md:450)
+  - [x] `rfc.validate --id RFC-0699` passes (evidence: packages/forge/bin/cli.ts:1)
 nonGoals:
   - "Rename the 'forge' binary"
   - "Change non-forge command namespaces (rfc.*, compass.*, workflow.*, naming.*, session.*, werkstatt.*, etc.)"

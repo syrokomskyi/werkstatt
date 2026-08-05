@@ -11,7 +11,7 @@ systems:
         storageType: bare
     pinnedPlatform: 4.5.0
     currentMission: null
-    lastRelease: warpgogol-com-r000010
+    lastRelease: warpgogol-com-r000011
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
     deployment:

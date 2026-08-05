@@ -59,7 +59,7 @@ export function injectServiceCatalogLinks(entries: VirtualRouteEntry[], defaultL
       injectServiceBlock(page, services, lang, defaultLang);
     }
 
-    if (industryPage.page) {
+    if (industryPage.page && industryPage.page !== industryPage.pages?.[defaultLang]) {
       injectServiceBlock(industryPage.page, services, defaultLang, defaultLang);
     }
   }

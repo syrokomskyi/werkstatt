@@ -25,15 +25,12 @@ import {
 } from "@warpgogol/site-kernel";
 import { stringify as yamlStringify } from "yaml";
 import {
-  includeInTwins,
-  renderTwin,
   type Blueprint,
   type SurfaceArtifact,
   type SurfaceCounts,
   type SurfaceManifest,
   type VirtualRouteEntry,
 } from "@warpgogol/surface";
-import { markdownTwinRelPath } from "@warpgogol/share/semantic";
 import { diagnosticsResult, failResult } from "../result-helpers.ts";
 import {
   loadSurfaceBlueprints,
@@ -45,7 +42,6 @@ import { loadSurfaceModuleContexts } from "../pseo/pseo-module-context.ts";
 import {
   ARTIFACT_FILE,
   MANIFEST_FILE,
-  cleanupOldTwins,
   countFor,
   pageIdToFile,
   readEntitledFeatures,
@@ -100,7 +96,6 @@ export async function runSurfaceGenerate(
     oldArtifact = null;
   }
   if (!context.dryRun && oldArtifact) {
-    await cleanupOldTwins(appDir, oldArtifact, defaultLang, supportedLangs);
     const cacheDir = join(appDir, ".surface-cache");
     if (existsSync(cacheDir)) {
       try {
@@ -113,7 +108,6 @@ export async function runSurfaceGenerate(
 
   const allEntries: VirtualRouteEntry[] = [];
   const surfaces: SurfaceCounts[] = [];
-  let twinCount = 0;
   let lazyPages = 0;
   for (const blueprint of blueprints) {
     try {
@@ -126,25 +120,6 @@ export async function runSurfaceGenerate(
         supportedLangs,
         io: context.io,
       });
-
-      if (!context.dryRun) {
-        for (const entry of entries) {
-          if (!includeInTwins(entry)) continue;
-          for (const [lang, slug] of Object.entries(entry.routes)) {
-            const page = entry.pages?.[lang] ?? entry.page;
-            if (!page) continue;
-            const prefix = lang === defaultLang ? "" : `${lang}/`;
-            const dest = join(
-              appDir,
-              "public",
-              markdownTwinRelPath(`/${prefix}${slug}`, { supportedLangs }),
-            );
-            await mkdir(dirname(dest), { recursive: true });
-            await writeFile(dest, renderTwin(page, `/${prefix}${slug}`), "utf8");
-            twinCount += 1;
-          }
-        }
-      }
 
       surfaces.push(countFor(blueprint.id, entries));
 
@@ -213,7 +188,7 @@ export async function runSurfaceGenerate(
   const indexable = surfaces.reduce((sum, s) => sum + s.indexable, 0);
   return {
     exitCode: 0,
-    summary: `surface.generate: ${blueprints.length} blueprint(s), ${allEntries.length} route(s), ${indexable} indexable, ${twinCount} twin(s), ${lazyPages} lazy`,
-    data: { surfaces, total: allEntries.length, twins: twinCount, lazyPages },
+    summary: `surface.generate: ${blueprints.length} blueprint(s), ${allEntries.length} route(s), ${indexable} indexable, ${lazyPages} lazy`,
+    data: { surfaces, total: allEntries.length, lazyPages },
   };
 }
