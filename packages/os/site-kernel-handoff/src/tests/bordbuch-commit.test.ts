@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0626: initial bordbuch.commit tests.</item>
   <item>RFC-0646: update mock to include gitExecWithRetry, add retry behavior tests.</item>
+  <item>RFC-0702: add tests for resilient try/catch path and runBordbuchCommit warning on git failure.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -34,6 +35,7 @@ vi.mock("../sternsystem/registry-io.ts", () => ({
 const gitCalls = vi.hoisted(() => ({
   calls: [] as string[],
   statusOutput: "",
+  throwOn: null as string | null,
 }));
 
 vi.mock("../werkstatt/git-exec.ts", () => ({
@@ -45,6 +47,9 @@ vi.mock("../werkstatt/git-exec.ts", () => ({
       _options?: { allowNonZero?: boolean },
     ) => {
       gitCalls.calls.push(args);
+      if (gitCalls.throwOn && args.startsWith(gitCalls.throwOn)) {
+        throw new Error(`git error: ${gitCalls.throwOn} failed after retries`);
+      }
       if (args === "status --porcelain") return gitCalls.statusOutput;
       if (args === "rev-parse HEAD") return "abc123def456";
       return "";
@@ -89,6 +94,7 @@ describe("commitBordbuchProjections", () => {
     mockCachePath.value = tmpDir;
     gitCalls.calls = [];
     gitCalls.statusOutput = "";
+    gitCalls.throwOn = null;
   });
 
   afterEach(async () => {
@@ -167,6 +173,54 @@ describe("commitBordbuchProjections", () => {
       'add -- "bordbuch/status.generated.yaml" "public/.well-known/bordbuch.json" "public/.well-known/bordbuch/index.html"',
     );
   });
+
+  // RFC-0702: resilient try/catch tests
+
+  it("returns error result when status --porcelain throws", async () => {
+    gitCalls.throwOn = "status";
+    gitCalls.statusOutput = " M bordbuch/status.generated.yaml\n";
+    const result = await commitBordbuchProjections(tmpDir, "test-system");
+    expect(result.committed).toBe(false);
+    expect(result.commitSha).toBeNull();
+    expect(result.filesCommitted).toHaveLength(0);
+    expect(result.error).toContain("git error");
+  });
+
+  it("returns error result when git add throws", async () => {
+    gitCalls.throwOn = "add";
+    gitCalls.statusOutput = " M bordbuch/status.generated.yaml\n";
+    const result = await commitBordbuchProjections(tmpDir, "test-system");
+    expect(result.committed).toBe(false);
+    expect(result.commitSha).toBeNull();
+    expect(result.filesCommitted).toHaveLength(0);
+    expect(result.error).toContain("git error");
+  });
+
+  it("returns error result when git commit throws", async () => {
+    gitCalls.throwOn = "commit";
+    gitCalls.statusOutput = " M bordbuch/status.generated.yaml\n";
+    const result = await commitBordbuchProjections(tmpDir, "test-system");
+    expect(result.committed).toBe(false);
+    expect(result.commitSha).toBeNull();
+    expect(result.filesCommitted).toHaveLength(0);
+    expect(result.error).toContain("git error");
+  });
+
+  it("returns error result when rev-parse HEAD throws", async () => {
+    gitCalls.throwOn = "rev-parse";
+    gitCalls.statusOutput = " M bordbuch/status.generated.yaml\n";
+    const result = await commitBordbuchProjections(tmpDir, "test-system");
+    expect(result.committed).toBe(false);
+    expect(result.commitSha).toBeNull();
+    expect(result.filesCommitted).toHaveLength(0);
+    expect(result.error).toContain("git error");
+  });
+
+  it("does not throw — returns error result for any git failure", async () => {
+    gitCalls.throwOn = "add";
+    gitCalls.statusOutput = " M bordbuch/status.generated.yaml\n";
+    await expect(commitBordbuchProjections(tmpDir, "test-system")).resolves.not.toThrow();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -181,6 +235,7 @@ describe("runBordbuchCommit", () => {
     mockCachePath.value = tmpDir;
     gitCalls.calls = [];
     gitCalls.statusOutput = "";
+    gitCalls.throwOn = null;
   });
 
   afterEach(async () => {
@@ -214,5 +269,58 @@ describe("runBordbuchCommit", () => {
     const result = await runBordbuchCommit(makeInput(), ctx);
     expect(result.data).toBeDefined();
     expect(result.data!.systemId).toBe("context-system");
+  });
+
+  // RFC-0702: logger.warn on git failure
+
+  it("logs logger.warn when committed is false and error is set", async () => {
+    gitCalls.throwOn = "add";
+    gitCalls.statusOutput = " M bordbuch/status.generated.yaml\n";
+    const warnCalls: string[] = [];
+    const { io } = createDefaultIO();
+    const ctx = {
+      workspaceRoot: tmpDir,
+      io,
+      logger: {
+        info: () => {},
+        warn: (msg: string) => warnCalls.push(msg),
+        error: () => {},
+        debug: () => {},
+        success: () => {},
+      },
+      site: undefined,
+      siteName: undefined,
+      fileIntents: [],
+    } as unknown as KernelRuntimeContext;
+    const result = await runBordbuchCommit(makeInput({ system: "test-system" }), ctx);
+    expect(result.data!.committed).toBe(false);
+    expect(result.data!.error).toContain("git error");
+    expect(warnCalls).toHaveLength(1);
+    expect(warnCalls[0]).toContain("git operation failed");
+    expect(warnCalls[0]).toContain("test-system");
+  });
+
+  it("does not log warn when committed is false and no error (no dirty files)", async () => {
+    gitCalls.statusOutput = "";
+    const warnCalls: string[] = [];
+    const { io } = createDefaultIO();
+    const ctx = {
+      workspaceRoot: tmpDir,
+      io,
+      logger: {
+        info: () => {},
+        warn: (msg: string) => warnCalls.push(msg),
+        error: () => {},
+        debug: () => {},
+        success: () => {},
+      },
+      site: undefined,
+      siteName: undefined,
+      fileIntents: [],
+    } as unknown as KernelRuntimeContext;
+    const result = await runBordbuchCommit(makeInput({ system: "test-system" }), ctx);
+    expect(result.data!.committed).toBe(false);
+    expect(result.data!.error).toBeUndefined();
+    expect(warnCalls).toHaveLength(0);
   });
 });

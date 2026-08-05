@@ -5,6 +5,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0635: initial tests for distribution reuse paths in mission.validate.</item>
+  <item>RFC-0702: add test verifying commitBordbuchProjections is called in the reuse path.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -63,6 +64,27 @@ vi.mock("../build-pipeline-helpers.ts", async (importOriginal) => {
   };
 });
 
+const bordbuchCommitMock = vi.hoisted(() => ({
+  called: false,
+  result: {
+    committed: false as boolean,
+    commitSha: null as string | null,
+    systemId: "test-system" as string,
+    filesCommitted: [] as string[],
+  },
+}));
+
+vi.mock("../bordbuch/bordbuch-commit.ts", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../bordbuch/bordbuch-commit.ts")>();
+  return {
+    ...actual,
+    commitBordbuchProjections: vi.fn(async () => {
+      bordbuchCommitMock.called = true;
+      return bordbuchCommitMock.result;
+    }),
+  };
+});
+
 function gitInit(dir: string): void {
   execSync("git init -b main", { cwd: dir, stdio: "pipe" });
   execSync("git config user.email test@test.com", { cwd: dir, stdio: "pipe" });
@@ -80,6 +102,13 @@ beforeEach(() => {
   tmpWorkspace = mkdtempSync(join(process.cwd(), "tmp-validate-reuse-"));
   mockPipeline.execSyncCalled = false;
   mockPipeline.computeHash = "sha256:matching-hash";
+  bordbuchCommitMock.called = false;
+  bordbuchCommitMock.result = {
+    committed: false,
+    commitSha: null,
+    systemId: "test-system",
+    filesCommitted: [],
+  } as const;
 });
 
 afterEach(() => {
@@ -303,4 +332,64 @@ test("hash match copies distribution/dist/ to workpiece/dist/ when missing", asy
   await runMissionValidate(makeInput(), makeContext());
 
   expect(existsSync(join(workpieceDir, "dist", "client", "index.html"))).toBe(true);
+});
+
+// RFC-0702: reuse path calls commitBordbuchProjections for cleanup
+
+test("reuse path calls commitBordbuchProjections for bordbuch cleanup", async () => {
+  setupWorkspace();
+  const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
+  writeDistributionHash(missionDir, "sha256:matching-hash");
+  writeDistributionDist(missionDir, 5);
+
+  const { runMissionValidate } = await import("../mission/mission-materialization-commands.ts");
+  await runMissionValidate(makeInput(), makeContext());
+
+  expect(bordbuchCommitMock.called).toBe(true);
+});
+
+test("reuse path logs bordbuch cleanup when commitBordbuchProjections commits files", async () => {
+  setupWorkspace();
+  const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
+  writeDistributionHash(missionDir, "sha256:matching-hash");
+  writeDistributionDist(missionDir, 5);
+  bordbuchCommitMock.result = {
+    committed: true,
+    commitSha: "abc123",
+    systemId: "test-system",
+    filesCommitted: ["bordbuch/status.generated.yaml"],
+  };
+
+  const infoCalls: unknown[] = [];
+  const ctx = {
+    workspaceRoot: tmpWorkspace,
+    logger: {
+      info: (...args: unknown[]) => infoCalls.push(args.join(" ")),
+      warn: () => {},
+      error: () => {},
+    },
+  } as unknown as KernelRuntimeContext;
+
+  const { runMissionValidate } = await import("../mission/mission-materialization-commands.ts");
+  await runMissionValidate(makeInput(), ctx);
+
+  expect(bordbuchCommitMock.called).toBe(true);
+  expect(infoCalls.some((m) => String(m).includes("Bordbuch cleanup"))).toBe(true);
+});
+
+test("reuse path continues when commitBordbuchProjections throws", async () => {
+  setupWorkspace();
+  const missionDir = join(tmpWorkspace, "missions", "test-system-m000001");
+  writeDistributionHash(missionDir, "sha256:matching-hash");
+  writeDistributionDist(missionDir, 5);
+
+  vi.mocked(
+    await import("../bordbuch/bordbuch-commit.ts").then((m) => m.commitBordbuchProjections),
+  ).mockRejectedValueOnce(new Error("unexpected git failure"));
+
+  const { runMissionValidate } = await import("../mission/mission-materialization-commands.ts");
+  const result = await runMissionValidate(makeInput(), makeContext());
+
+  expect(result.summary).toContain("distribution reused");
+  expect(result.summary).toContain("passed");
 });
