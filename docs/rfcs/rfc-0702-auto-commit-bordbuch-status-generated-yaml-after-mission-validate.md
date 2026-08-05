@@ -1,6 +1,6 @@
 ---
 id: RFC-0702
-title: "Auto-commit bordbuch status.generated.yaml after mission.validate"
+title: "Make bordbuch.commit resilient and cover distribution reuse path in mission.validate"
 status: draft
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -25,6 +26,7 @@ related:
   - RFC-0477
   - RFC-0584
   - RFC-0597
+  - RFC-0626
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -41,6 +43,7 @@ commands:
   proposed: []
   added: []
   changed:
+    - bordbuch.commit
     - mission.validate
   removed: []
 appsImpacted: []
@@ -48,7 +51,8 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
 successSignals: []
-nonGoals: []
+nonGoals:
+  - "Adding push to bordbuch.commit — bordbuch.commit commits locally only; push is handled by sternsystem.sync and commitAndPushBordbuch in mission lifecycle commands. Push is out of scope for this RFC."
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -67,34 +71,66 @@ nonGoals: []
 #     pattern: "Some new governance paragraph"
 ---
 
-# RFC-0702: Auto-commit bordbuch status.generated.yaml after mission.validate
+# RFC-0702: Make bordbuch.commit resilient and cover distribution reuse path in mission.validate
 
 ## Context
 
-`mission.validate` runs validation checks on a mission workpiece and generates `bordbuch/status.generated.yaml` as a side effect. The AGENTS.md rule (RFC-0477) states: _"`commitAndPushBordbuch` must commit `bordbuch/status.generated.yaml` alongside `bordbuch/events.ndjson`"_. However, `mission.validate` does not call `commitAndPushBordbuch` — it generates the status file but leaves it uncommitted in the cache clone.
+`mission.validate` runs `build.prepare` which includes `bordbuch.generate` (step 125) and `bordbuch.commit` (step 129, added by RFC-0626). `bordbuch.commit` calls `commitBordbuchProjections` in `packages/os/site-kernel-handoff/src/bordbuch/bordbuch-commit.ts`, which stages and commits `bordbuch/status.generated.yaml`, `public/.well-known/bordbuch.json`, and `public/.well-known/bordbuch/index.html` to the cache clone using `gitExecWithRetry` with `[12_000, 60_000]` backoff (RFC-0646).
 
-This causes `mission.validate` to emit a warning: `cache clone has 1 uncommitted file(s)` — specifically `bordbuch/status.generated.yaml`. The next `mission.reconcile` then encounters a dirty cache clone, which can trigger bordbuch conflict auto-resolution (RFC-0584) or block reconciliation.
+Two gaps remain:
+
+1. **`commitBordbuchProjections` throws on git failure.** If `gitExecWithRetry` for `add` or `commit` exhausts retries (e.g. persistent git lock conflict), the function throws. The pipeline step `bordbuch.commit` fails, which causes `build.prepare` to report a failure, which causes `mission.validate` to fail entirely — even though the bordbuch commit is a non-critical side effect.
+
+2. **Distribution reuse path skips `build.prepare` entirely.** When `build-input-hash` matches (`mission-materialization-commands.ts:214-297`), `mission.validate` skips `build.prepare` and copies `dist/` from the distribution directory. Neither `bordbuch.generate` nor `bordbuch.commit` runs. If a previous run left the cache clone dirty (e.g. `bordbuch.commit` failed), the dirty state persists. The existing dirty cache clone warning at lines 557-565 fires, but no cleanup is attempted.
 
 ## Problem
 
-`bordbuch/status.generated.yaml` is generated during `mission.validate` but not committed to the cache clone. This leaves the cache clone dirty, causing warnings and potential conflicts during `mission.reconcile`. Operators must manually run `bordbuch.commit` after `mission.validate` to clean up, which is easily forgotten.
+### Gap 1: bordbuch.commit failure crashes mission.validate
 
-The gap is in `packages/os/site-kernel-handoff/src/mission/mission-validate.ts` — the command generates the status file but does not commit it.
+`commitBordbuchProjections` (`bordbuch-commit.ts:46-89`) wraps `resolveCachePath` in try/catch but does NOT wrap the `gitExecWithRetry` calls for `status --porcelain`, `add`, `commit`, and `rev-parse`. If any of these throw after retry exhaustion, the exception propagates through `runBordbuchCommit` (no try/catch) into the pipeline executor, marking `bordbuch.commit` as failed. Since `bordbuch.commit` is a step in `build.prepare`, `mission.validate` sees `prepareReport.ok === false` and returns `exitCode: 1` — even if all validation checks would have passed.
+
+The bordbuch commit is a non-critical side effect: `status.generated.yaml` is a projection file that can be regenerated. It should not block validation.
+
+### Gap 2: distribution reuse path has no bordbuch cleanup
+
+When `mission.validate` reuses a distribution (lines 214-297), `build.prepare` is skipped. If a previous `mission.validate` run left the cache clone dirty (e.g. `bordbuch.commit` failed), the dirty state persists through the reuse path. The dirty cache clone warning at lines 557-565 fires, but no cleanup is attempted. The next `mission.reconcile` then encounters a dirty cache clone, which can trigger bordbuch conflict auto-resolution (RFC-0584) or block reconciliation.
 
 ## Decision
 
-`mission.validate` auto-commits `bordbuch/status.generated.yaml` to the cache clone after generating it, using the existing `commitAndPushBordbuch` helper.
+### Fix 1: Make `commitBordbuchProjections` resilient
 
-- The commit includes both `bordbuch/events.ndjson` (if modified) and `bordbuch/status.generated.yaml`.
-- The commit is non-fatal: if the commit fails (e.g. git lock conflict), `mission.validate` logs a warning and continues — validation results are not affected.
-- The push is best-effort: if the push fails (e.g. network issue), a warning is logged.
+Wrap the `gitExecWithRetry` calls for `add`, `commit`, and `rev-parse` in `commitBordbuchProjections` (`bordbuch-commit.ts`) in a try/catch. On failure, return `{ committed: false, commitSha: null, systemId, filesCommitted: [], error: <message> }` instead of throwing. Add an `error?: string` field to `BordbuchCommitResult`.
+
+In `runBordbuchCommit` (the kernel handler), log `logger.warn` when `result.committed === false && result.error` — distinguishing git failures from the no-dirty-files case.
+
+### Fix 2: Call `commitBordbuchProjections` in the distribution reuse path
+
+In `mission.validate` (`mission-materialization-commands.ts`), after the distribution reuse check succeeds (around line 297, before the `return` at line 291), call `commitBordbuchProjections(workspaceRoot, manifest.systemId)` to clean up any dirty bordbuch files from a previous run. Wrap in try/catch with `logger.warn` on failure.
+
+```ts
+// In mission-materialization-commands.ts, inside the distribution reuse path
+// (canReuse && storedHash), before the return at line 291:
+try {
+  const bordbuchResult = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
+  if (bordbuchResult.committed) {
+    logger.info(`  Bordbuch cleanup: committed ${bordbuchResult.filesCommitted.length} file(s) from previous run`);
+  }
+} catch (err) {
+  logger.warn(`  Bordbuch cleanup failed (non-fatal) — ${(err as Error).message}`);
+}
+```
+
+### No push
+
+`bordbuch.commit` commits locally only. Push is handled by `sternsystem.sync` and `commitAndPushBordbuch` in mission lifecycle commands (`mission.open`, `mission.close`, `mission.abort`). Adding push to `bordbuch.commit` is out of scope — see `nonGoals`.
 
 ## Architectural fit
 
-- **RFC-0477**: aligns with the existing AGENTS.md rule that `commitAndPushBordbuch` must commit `status.generated.yaml` alongside `events.ndjson`.
-- **RFC-0584**: reduces bordbuch conflict auto-resolution triggers by keeping the cache clone clean after validation.
-- **RFC-0597**: `mission.close` already commits `.materialization-state.json` after writing it. This RFC applies the same pattern to `mission.validate` for `status.generated.yaml`.
-- **Site OS operator model**: `mission.validate` is a read-only validation command, but it generates status files as a side effect. Committing those side effects keeps the cache clone clean without requiring a separate manual step.
+- **RFC-0626**: this RFC fixes a resilience bug in the command introduced by RFC-0626 and extends its coverage to the reuse path. `bordbuch.commit` remains a pipeline step in `build.prepare`.
+- **RFC-0477**: aligns with the AGENTS.md rule that bordbuch projections must be committed to keep the cache clone clean.
+- **RFC-0584**: reduces bordbuch conflict auto-resolution triggers by cleaning the cache clone in the reuse path.
+- **RFC-0597**: `mission.close` commits `.materialization-state.json` after writing it. This RFC applies the same "commit side effects" pattern to the reuse path in `mission.validate`.
+- **RFC-0646**: `commitBordbuchProjections` already uses `gitExecWithRetry` with `[12_000, 60_000]` backoff. This RFC adds a try/catch around those calls — it does NOT change the retry configuration.
 
 ## Design
 
@@ -103,22 +139,70 @@ The gap is in `packages/os/site-kernel-handoff/src/mission/mission-validate.ts` 
 No CLI surface changes. The command flags remain the same:
 
 ```sh
-pnpm exec site-kernel run mission.validate --system warpgogol-com
+pnpm exec site-kernel run mission.validate --mission <missionId>
 ```
 
 ### TypeScript contracts
 
-No new types. The existing `commitAndPushBordbuch` function from `packages/os/site-kernel-handoff/src/bordbuch/` is called after status file generation.
+`BordbuchCommitResult` gains an optional `error` field:
 
 ```ts
-// In mission-validate.ts, after bordbuch.generate:
+// In bordbuch-commit.ts
+export interface BordbuchCommitResult {
+  committed: boolean;
+  commitSha: string | null;
+  systemId: string;
+  filesCommitted: string[];
+  error?: string; // NEW: present when committed === false due to git failure
+}
+```
+
+`commitBordbuchProjections` wraps git operations in try/catch:
+
+```ts
+// In bordbuch-commit.ts, commitBordbuchProjections:
+// After determining bordbuchDirty.length > 0:
 try {
-  await commitAndPushBordbuch(cacheCloneDir, systemId, {
-    message: `mission.validate: update bordbuch status for ${missionId}`,
-    push: true,
-  });
+  const addArgs = bordbuchDirty.map((f) => `"${f}"`).join(" ");
+  await gitExecWithRetry(cachePath, `add -- ${addArgs}`, BORDBUCH_RETRY_OPTIONS);
+  await gitExecWithRetry(
+    cachePath,
+    'commit -m "chore: bordbuch projections from build.prepare"',
+    BORDBUCH_RETRY_OPTIONS,
+  );
+  const sha = await gitExecWithRetry(cachePath, "rev-parse HEAD", BORDBUCH_RETRY_OPTIONS);
+  return { committed: true, commitSha: sha, systemId, filesCommitted: bordbuchDirty };
 } catch (err) {
-  logger.warn(`mission.validate: bordbuch commit failed (non-fatal) — ${msg}`);
+  return {
+    committed: false,
+    commitSha: null,
+    systemId,
+    filesCommitted: [],
+    error: err instanceof Error ? err.message : String(err),
+  };
+}
+```
+
+`runBordbuchCommit` logs a warning on git failure:
+
+```ts
+// In bordbuch-commit.ts, runBordbuchCommit:
+if (!result.committed && result.error) {
+  logger.warn(`[bordbuch.commit] git operation failed for ${systemId}: ${result.error}`);
+}
+```
+
+`mission.validate` calls `commitBordbuchProjections` in the reuse path:
+
+```ts
+// In mission-materialization-commands.ts, inside the canReuse block, before return:
+try {
+  const bordbuchResult = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
+  if (bordbuchResult.committed) {
+    logger.info(`  Bordbuch cleanup: committed ${bordbuchResult.filesCommitted.length} file(s) from previous run`);
+  }
+} catch {
+  // Non-fatal — reuse path continues regardless
 }
 ```
 
@@ -126,64 +210,61 @@ try {
 
 | Path | Role |
 | --- | --- |
-| `missions/<id>/workpiece/bordbuch/status.generated.yaml` | Generated by `bordbuch.generate`, committed by this RFC |
-| `missions/<id>/workpiece/bordbuch/events.ndjson` | Committed alongside status file if modified |
-| Cache clone `bordbuch/` directory | Git add + commit target |
+| Cache clone `bordbuch/status.generated.yaml` | Generated by `bordbuch.generate`, committed by `bordbuch.commit` (pipeline step) and by `commitBordbuchProjections` (reuse path cleanup) |
+| Cache clone `bordbuch/events.ndjson` | Not touched by `commitBordbuchProjections` — only bordbuch projection files are committed |
+| Cache clone `public/.well-known/bordbuch.json` | Bordbuch projection, committed by `commitBordbuchProjections` |
+| Cache clone `public/.well-known/bordbuch/index.html` | Bordbuch projection, committed by `commitBordbuchProjections` |
 
 ### Output format
 
-No output format changes. The `--json` output remains the same. A new `bordbuchCommitted: boolean` field is added to indicate whether the commit succeeded.
-
-```json
-{
-  "command": "mission.validate",
-  "status": "pass",
-  "bordbuchCommitted": true,
-  "...": "..."
-}
-```
+No output format changes. The `--json` output of `mission.validate` remains the same. The `bordbuch.commit` pipeline step result is already visible in the `build.prepare` step report. No new fields are added to `MissionValidateData`.
 
 ### Failure modes
 
-- `bordbuch.generate` fails: existing behavior (validation continues without status file).
-- `commitAndPushBordbuch` commit fails: **warning** — validation results are not affected. `bordbuchCommitted: false`.
-- `commitAndPushBordbuch` push fails: **warning** — commit succeeded but push did not. `bordbuchCommitted: true` (commit succeeded), push error logged.
-- Validation itself fails: existing behavior (exit 1 with violations). Bordbuch commit still runs before returning.
+- `commitBordbuchProjections` git add/commit fails (retry exhausted): **non-fatal** — `committed: false`, `error` set, `logger.warn` emitted. Pipeline step `bordbuch.commit` returns ok (exitCode 0) instead of throwing. `build.prepare` continues. `mission.validate` continues.
+- `commitBordbuchProjections` in reuse path fails: **non-fatal** — `logger.warn` emitted, reuse path continues, `mission.validate` returns success.
+- `commitBordbuchProjections` finds no dirty bordbuch files: existing behavior — `committed: false`, no `error`, no warning. This is the normal case when `bordbuch.commit` already cleaned up during `build.prepare`.
+- Validation itself fails: existing behavior (exit 1 with violations). Bordbuch commit resilience does not affect validation results.
 
 ## Rollout
 
-- **Default behavior**: auto-commit is the new default. No opt-in flag needed.
-- **Existing apps**: no changes needed. The behavior change is backward-compatible — the only observable difference is that `mission.validate` no longer leaves `status.generated.yaml` uncommitted.
-- **No migration path needed**: the change is additive — a new commit step after existing validation logic.
-- **Pipeline integration**: `mission.validate` is called during `leitstand.dev-deploy` and as a standalone command. Both paths benefit from the auto-commit.
+- **Default behavior**: `bordbuch.commit` is resilient by default — no opt-in flag needed. The reuse path cleanup is also default.
+- **Existing apps**: no changes needed. The behavior change is backward-compatible — the only observable difference is that `bordbuch.commit` no longer crashes `mission.validate` on git failure, and the reuse path cleans up stale dirty state.
+- **No migration path needed**: the change is a bug fix to existing logic, not a new feature.
+- **Pipeline integration**: `bordbuch.commit` remains a pipeline step in `build.prepare`. The reuse path cleanup is a direct call in `mission.validate`.
 
 ## Alternatives considered
 
-- **Call `bordbuch.commit` as a separate pipeline step after `mission.validate`**: rejected — requires changing every caller of `mission.validate` to add the commit step. The auto-commit inside `mission.validate` is simpler and guarantees the cleanup always happens.
-- **Make `bordbuch.generate` commit automatically**: rejected — `bordbuch.generate` is a standalone command that may be called in contexts where a commit is not desired (e.g. dry-run, report-only). The commit belongs in `mission.validate`, which is the validation context.
-- **Suppress the dirty-cache warning instead of committing**: rejected — the warning exists because the dirty state is a real problem for `mission.reconcile`. Suppressing the warning hides the issue without fixing it.
+- **Add a separate `commitAndPushBordbuch` call after `build.prepare` in `mission.validate`**: rejected — `bordbuch.commit` already runs inside `build.prepare` and commits the same files. A separate call would produce redundant commits and use `gitExec` (without retry), which is less resilient than `gitExecWithRetry` used by `bordbuch.commit`.
+- **Move bordbuch cleanup to `mission.reconcile`**: rejected — the dirty cache clone warning fires during `mission.validate`, and operators expect `mission.validate` to leave a clean state. Deferring cleanup to `mission.reconcile` adds an unnecessary failure surface.
+- **Suppress the dirty-cache warning instead of cleaning up**: rejected — the warning exists because the dirty state is a real problem for `mission.reconcile`. Suppressing the warning hides the issue without fixing it.
+- **Make `bordbuch.commit` push in addition to committing**: rejected — push is handled by `sternsystem.sync` and `commitAndPushBordbuch` in mission lifecycle commands. Adding push to a `build.prepare` pipeline step would couple build validation to network operations, increasing failure surface. See `nonGoals`.
 
 ## Risks
 
-- **Git lock conflict**: if another process holds the git lock in the cache clone, the commit will fail. Mitigation: non-fatal warning, validation results are not affected.
-- **Extra commits in bordbuch history**: each `mission.validate` run adds a commit. This is acceptable — the bordbuch is an append-only event log, and status updates are meaningful events.
-- **Agent confusion**: agents might expect `mission.validate` to be purely read-only. Mitigation: the `bordbuchCommitted` field in the output makes the side effect visible.
+- **Silent git failures**: making `bordbuch.commit` non-throwing means git failures are logged as warnings but do not block the pipeline. If the operator ignores warnings, the cache clone stays dirty. Mitigation: the existing dirty cache clone warning at lines 557-565 still fires, providing a second signal.
+- **Concurrent execution**: if two `mission.validate` runs execute concurrently for the same system, both could trigger `commitBordbuchProjections` in the reuse path, causing git lock conflicts. Mitigation: `gitExecWithRetry` has `[12_000, 60_000]` backoff. The try/catch ensures the loser does not crash.
+- **Stale dirty state from failed previous run**: the reuse path cleanup handles this — `commitBordbuchProjections` checks `git status --porcelain` and commits any dirty bordbuch files regardless of when they were modified.
 
 ## Acceptance criteria
 
-- [ ] `mission.validate` calls `commitAndPushBordbuch` after generating `status.generated.yaml`
-- [ ] Commit includes both `events.ndjson` (if modified) and `status.generated.yaml`
-- [ ] Commit failure is non-fatal (warning logged, validation continues)
-- [ ] Push failure is non-fatal (warning logged, commit retained)
-- [ ] `--json` output includes `bordbuchCommitted` field
-- [ ] Cache clone is clean after `mission.validate` completes successfully
-- [ ] Unit test covers the auto-commit path in `mission-validate.ts`
+- [ ] `commitBordbuchProjections` wraps `gitExecWithRetry` calls for `add`, `commit`, and `rev-parse` in try/catch
+- [ ] `BordbuchCommitResult` has an optional `error?: string` field for git failure cases
+- [ ] `runBordbuchCommit` logs `logger.warn` when `committed === false && error` is set
+- [ ] `bordbuch.commit` pipeline step returns exitCode 0 (not throw) when git operations fail after retry exhaustion
+- [ ] `mission.validate` distribution reuse path calls `commitBordbuchProjections` before returning success
+- [ ] Reuse path cleanup is non-fatal (try/catch with `logger.warn`)
+- [ ] Cache clone is clean after `mission.validate` completes successfully via the reuse path (when dirty state was from bordbuch files)
+- [ ] Unit test covers `commitBordbuchProjections` try/catch path (git failure returns error instead of throwing)
+- [ ] Unit test covers reuse path cleanup call in `mission.validate`
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
 
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
-- Agents MUST NOT make the bordbuch commit fatal — validation results must always be returned regardless of commit success.
-- Agents MUST NOT skip the commit when `status.generated.yaml` is unchanged — `commitAndPushBordbuch` should handle the no-op case (no changes to commit).
+- Agents MUST NOT make the bordbuch commit failure fatal to `mission.validate` — validation results must always be returned regardless of commit success.
+- Agents MUST NOT change the `gitExecWithRetry` backoff configuration (`[12_000, 60_000]`) — that is owned by RFC-0646.
+- Agents MUST NOT add push to `bordbuch.commit` — push is out of scope (see `nonGoals`).
+- Agents MUST NOT call `commitAndPushBordbuch` from `mission.validate` — that function commits `events.ndjson` (not modified by `mission.validate`) and uses `gitExec` without retry. Use `commitBordbuchProjections` instead.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id RFC-0702 --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
