@@ -15,8 +15,8 @@ This file defines the repository-wide instruction layer for this Turborepo. Pref
 ## External mirror sync (RFC-0472, RFC-0574)
 
 - Each Sternsystem declares a `mirrors[]` array in `systems/registry.yaml`. `mirrors[0]` is the non-bare cache clone, `mirrors[1]` is the bare repo, and `mirrors[2+]` are external mirrors (git remotes, backup endpoints).
-- `sternsystem.sync --id <id>` synchronizes all mirrors via star topology through `mirrors[0]` (cache clone). It pushes from cache to bare, then from bare to external git mirrors. Per-mirror failures are non-fatal. It is an **automatic pipeline step** — agents MUST run it after `mission.reconcile` completes successfully when external mirrors are configured.
-- Agents MUST invoke `sternsystem.sync --id <id>` automatically after a successful `mission.reconcile` if the system's `mirrors[]` array contains external mirrors (indices 2+).
+- `sternsystem.sync --id <id>` synchronizes all mirrors via star topology through `mirrors[0]` (cache clone). It pushes from cache to bare, then from bare to external git mirrors. Per-mirror failures are non-fatal. It is an **automatic pipeline step** — `mission.reconcile` calls it automatically after pushing to the bare repo when external mirrors are configured (RFC-0705).
+- `mission.reconcile` enforces `sternsystem.sync` automatically (RFC-0705): after `git push origin` to the bare repo, reconcile calls `sternsystem.sync --id <id>` via `executeKernelCommand` when `mirrors[2+]` exist. Sync failure is non-fatal (`logger.warn`). `mission.close` blocks before state transition if external mirrors are out of sync (`mirrorInSync === false` and `mirrors.length > 2`). The manual `sternsystem.sync` invocation remains available for ad-hoc sync needs.
 - `sternsystem.validate` enforces mirror topology rules: `mirrors[0]` must be non-bare, mirror paths must exist, `bundle` storageType must not use git protocols, and no embedded credentials.
 - Agents MUST NEVER edit any Sternsystem mirror directly — only through mission workpieces.
 
