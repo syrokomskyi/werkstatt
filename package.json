@@ -26,10 +26,11 @@
     "compass:inventory": "node packages/os/site-kernel/bin/site-kernel.mjs run compass.inventory",
     "lint:packages": "eslint \"packages/**/*.ts\"",
     "lint:yaml": "eslint --config eslint.config.js \"**/*.yaml\"",
-    "git-add-force": "git rm -r --cached . && git add ."
+    "git-add-force": "git rm -r --cached . && git add .",
+    "postinstall": "playwright install chromium"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "1.62.1",
     "@types/node": "^26.1.2",
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/observability": "workspace:*",
@@ -45,7 +46,7 @@
     "@warpgogol/site-kernel-onboarding": "workspace:*",
     "eslint": "^10.8.0",
     "eslint-plugin-yml": "^1.19.1",
-    "playwright": "^1.62.1",
+    "playwright": "1.62.1",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "rimraf": "^6.1.3",
