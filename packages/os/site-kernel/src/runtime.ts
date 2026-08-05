@@ -9,6 +9,7 @@ execution, registry assembly, argv parsing, and RFC-0086 diagnostic formatting.<
 <CHANGE_SUMMARY>
   <item>RFC-0303: split into runtime/{argv,registry,execute-command,execute-pipeline,diagnostics,shared}.ts; this file is now a thin re-export shim so every existing "./runtime.ts" import keeps working unchanged.</item>
   <item>RFC-0686: export buildSchedule, executeScheduledSteps, ScheduledStep, ScheduleError from runtime/pipeline-scheduler.ts.</item>
+  <item>ADR-0022: export registry cache control functions (getOrBuildRegistry, getOrBuildWorkspaceRegistry, clearRegistryCache, setRegistryCacheEnabled, isRegistryCacheEnabled) from runtime/registry-cache.ts.</item>
 </CHANGE_SUMMARY>
 */
 // @ai-invariant: Kernel runtime must surface command diagnostics without hiding non-zero command results.
@@ -30,3 +31,10 @@ export {
   ScheduleError,
 } from "./runtime/pipeline-scheduler.ts";
 export { formatFailureDiagnostics } from "./runtime/diagnostics.ts";
+export {
+  getOrBuildRegistry,
+  getOrBuildWorkspaceRegistry,
+  clearRegistryCache,
+  setRegistryCacheEnabled,
+  isRegistryCacheEnabled,
+} from "./runtime/registry-cache.ts";

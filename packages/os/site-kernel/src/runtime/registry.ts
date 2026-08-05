@@ -11,13 +11,15 @@ discovered app, and resolve which app(s) a CLI invocation targets.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: split out of runtime.ts (Phase 3 file-size split, hot-path file 8/8).</item>
+  <item>ADR-0022: loadAppRuntime and list functions now use process-lifetime registry cache from registry-cache.ts.</item>
 </CHANGE_SUMMARY>
 */
 
 import path from "node:path";
 import process from "node:process";
-import { discoverSiteWorkspaces, loadKernelAppConfig, loadWorkspaceConfig } from "../discovery.ts";
+import { discoverSiteWorkspaces, loadKernelAppConfig } from "../discovery.ts";
 import { KernelRegistry } from "../registry.ts";
+import { getOrBuildRegistry, getOrBuildWorkspaceRegistry } from "./registry-cache.ts";
 import type {
   DiscoveredSiteWorkspace,
   KernelAppConfig,
@@ -90,7 +92,8 @@ export async function buildRegistryForModule(
 
 export async function loadAppRuntime(workspaceRoot: string, site: DiscoveredSiteWorkspace) {
   const config = await loadKernelAppConfig(site);
-  const registry = await buildRegistry(config);
+  const cacheKey = `site:${site.configPath}`;
+  const registry = await getOrBuildRegistry(cacheKey, config);
   return { config, registry };
 }
 
@@ -148,10 +151,9 @@ export async function ensureTargetSites(
 
 export async function listRegisteredKernelCommandNames(workspaceRoot: string): Promise<string[]> {
   const names = new Set<string>();
-  const workspaceConfig = await loadWorkspaceConfig(workspaceRoot);
-  if (workspaceConfig) {
-    const registry = await buildRegistry(workspaceConfig);
-    for (const commandName of registry.listCommandNames()) names.add(commandName);
+  const wsRegistry = await getOrBuildWorkspaceRegistry(workspaceRoot);
+  if (wsRegistry) {
+    for (const commandName of wsRegistry.listCommandNames()) names.add(commandName);
   }
 
   const sites = await discoverSiteWorkspaces(workspaceRoot);
@@ -196,15 +198,14 @@ export async function listRegisteredKernelCommands(
 ): Promise<KernelRegisteredCommandInfo[]> {
   const byKey = new Map<string, KernelRegisteredCommandInfo>();
 
-  const workspaceConfig = await loadWorkspaceConfig(workspaceRoot);
-  if (workspaceConfig) {
-    const registry = await buildRegistry(workspaceConfig);
-    for (const commandName of registry.listCommandNames()) {
-      const command = registry.getCommand(commandName);
+  const wsRegistry = await getOrBuildWorkspaceRegistry(workspaceRoot);
+  if (wsRegistry) {
+    for (const commandName of wsRegistry.listCommandNames()) {
+      const command = wsRegistry.getCommand(commandName);
       if (command)
         byKey.set(
           `workspace:${commandName}`,
-          commandInfo(command, "workspace", undefined, registry.commandModules.get(commandName)),
+          commandInfo(command, "workspace", undefined, wsRegistry.commandModules.get(commandName)),
         );
     }
   }
@@ -241,10 +242,9 @@ export async function listRegisteredKernelPipelines(
 ): Promise<Record<string, string[]>> {
   const pipelines: Record<string, string[]> = {};
 
-  const workspaceConfig = await loadWorkspaceConfig(workspaceRoot);
-  if (workspaceConfig) {
-    const registry = await buildRegistry(workspaceConfig);
-    for (const [name, steps] of registry.pipelines) {
+  const wsRegistry = await getOrBuildWorkspaceRegistry(workspaceRoot);
+  if (wsRegistry) {
+    for (const [name, steps] of wsRegistry.pipelines) {
       pipelines[name] = steps.map((step) => step.command);
     }
   }

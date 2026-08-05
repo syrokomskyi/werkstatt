@@ -17,6 +17,7 @@ producing a KernelPipelineReport with a timing summary (slowest steps, timeout c
   <item>RFC-0637: moduleHashCache key includes modulePaths; computeModuleHash receives command.modulePaths for granular per-command hashing.</item>
   <item>RFC-0686: refactor executePipelineForSite and executePipelineForWorkspace to use pipeline-scheduler for dependency-aware parallel execution; add telemetry mutex; add summedDurationMs to timing summary; --concurrency 1 activates full sequential mode.</item>
   <item>RFC-0687: add transitive cache skip for validator chains — shouldTransitiveSkip checks validatesOutputs against cacheHitCommands; cross-pipeline persistence via .cache/pipeline-cache-hits.json with 30-minute TTL.</item>
+  <item>ADR-0022: workspace registry now uses process-lifetime cache via getOrBuildWorkspaceRegistry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -26,7 +27,6 @@ import os from "node:os";
 import { join, relative, sep } from "node:path";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { createKernelLogger } from "../logger.ts";
-import { loadWorkspaceConfig } from "../discovery.ts";
 import type { KernelRegistry } from "../registry.ts";
 import {
   appendStepTelemetry,
@@ -61,7 +61,8 @@ import type {
 } from "../types.ts";
 import { executeRegisteredCommand } from "./execute-command.ts";
 import { assertKnownOptionKeys, summarizeLogs } from "./shared.ts";
-import { buildRegistry, ensureTargetSites, loadAppRuntime } from "./registry.ts";
+import { ensureTargetSites, loadAppRuntime } from "./registry.ts";
+import { getOrBuildWorkspaceRegistry } from "./registry-cache.ts";
 import { buildSchedule, executeScheduledSteps, type ScheduledStep } from "./pipeline-scheduler.ts";
 
 const PIPELINE_TIMING_SUMMARY_THRESHOLD_MS = 30_000;
@@ -1037,10 +1038,9 @@ export async function executeKernelPipeline(
   }
 
   if (!options.siteName && !(options.allSites ?? false)) {
-    const workspaceConfig = await loadWorkspaceConfig(options.workspaceRoot);
-    if (workspaceConfig) {
+    const wsRegistry = await getOrBuildWorkspaceRegistry(options.workspaceRoot);
+    if (wsRegistry) {
       progressLine(`pipeline ${options.pipelineName} — loading workspace registry …`);
-      const wsRegistry = await buildRegistry(workspaceConfig);
       const wsSteps = wsRegistry.getPipeline(options.pipelineName);
       if (wsSteps) {
         progressLine(`pipeline ${options.pipelineName} — workspace registry ready`);

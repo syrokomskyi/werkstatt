@@ -15,6 +15,7 @@ resolves a workspace-scoped or app-scoped command from CLI options and runs it.
   <item>RFC-0326: extract intents from createDefaultIO() and surface as filesModified on the execution report for both real and dry runs.</item>
   <item>RFC-0579: propagate nextSteps from KernelCommandResult to KernelExecutionReport and render as "Next steps:" block in pretty mode.</item>
   <item>RFC-0635: inject force from context into input.flags.force so command handlers can read --force without declaring it in their flag schema.</item>
+  <item>ADR-0022: workspace registry now uses process-lifetime cache via getOrBuildWorkspaceRegistry.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -41,12 +42,8 @@ import { parse as yamlParse } from "yaml";
 import { parseKernelArgv, resolveCommandFlags } from "./argv.ts";
 import { formatFailureDiagnostics } from "./diagnostics.ts";
 import { assertKnownOptionKeys, summarizeLogs } from "./shared.ts";
-import {
-  buildRegistry,
-  buildRegistryForModule,
-  ensureTargetSites,
-  loadAppRuntime,
-} from "./registry.ts";
+import { buildRegistryForModule, ensureTargetSites, loadAppRuntime } from "./registry.ts";
+import { getOrBuildWorkspaceRegistry } from "./registry-cache.ts";
 import { getFactoryTelemetryPusher, recordCommandTelemetry } from "./telemetry.ts";
 import { manifestFilePath, type CommandManifest } from "../command-manifest.ts";
 
@@ -376,8 +373,8 @@ export async function executeKernelCommand(
       }
 
       if (!wsCommand) {
-        wsRegistry = await buildRegistry(workspaceConfig);
-        wsCommand = wsRegistry.getCommand(options.commandName);
+        wsRegistry = await getOrBuildWorkspaceRegistry(options.workspaceRoot);
+        wsCommand = wsRegistry?.getCommand(options.commandName);
       }
 
       if (wsCommand && wsCommand.scope === "workspace") {

@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>Return a JSON error envelope for top-level CLI exceptions when --json is requested.</item>
   <item>RFC-0686: add --concurrency flag for pipeline execution.</item>
+  <item>ADR-0022: add --no-registry-cache flag to disable process-lifetime registry cache.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -22,6 +23,7 @@ import {
   findWorkspaceRoot,
   listSiteWorkspaces,
 } from "../index.ts";
+import { setRegistryCacheEnabled } from "../runtime/registry-cache.ts";
 import { flushFactoryTelemetry } from "../runtime/telemetry.ts";
 // @ai-invariant: CLI execution must route through registered kernel commands and preserve typed flag parsing.
 
@@ -60,6 +62,7 @@ function consumeCommonFlags(argv: string[]) {
   let allSites = false;
   let dryRun = false;
   let force = false;
+  let noRegistryCache = false;
   let concurrency: number | undefined;
   let outputFormat: "pretty" | "json" = "pretty";
 
@@ -89,6 +92,15 @@ function consumeCommonFlags(argv: string[]) {
 
     if (entry === "--force" || entry === "--force=true" || entry === "--force=1") {
       force = true;
+      continue;
+    }
+
+    if (
+      entry === "--no-registry-cache" ||
+      entry === "--no-registry-cache=true" ||
+      entry === "--no-registry-cache=1"
+    ) {
+      noRegistryCache = true;
       continue;
     }
 
@@ -123,6 +135,7 @@ function consumeCommonFlags(argv: string[]) {
     allSites,
     dryRun,
     force,
+    noRegistryCache,
     concurrency,
     outputFormat,
     remaining,
@@ -132,10 +145,10 @@ function consumeCommonFlags(argv: string[]) {
 function printUsage() {
   console.log("site-kernel sites list [--json]");
   console.log(
-    "site-kernel run <command> [--site <name>] [--all] [--dry-run] [--json] [-- ...args]",
+    "site-kernel run <command> [--site <name>] [--all] [--dry-run] [--no-registry-cache] [--json] [-- ...args]",
   );
   console.log(
-    "site-kernel pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--concurrency N] [--json]",
+    "site-kernel pipeline <name> [--site <name>] [--all] [--dry-run] [--force] [--no-registry-cache] [--concurrency N] [--json]",
   );
 }
 
@@ -187,6 +200,19 @@ async function main() {
   const workspaceRoot = await findWorkspaceRoot();
   const [subcommand, ...rest] = process.argv.slice(2);
 
+  // ADR-0022: --no-registry-cache disables the process-lifetime registry cache.
+  // Must be set before any registry-building call.
+  if (
+    rest.some(
+      (entry) =>
+        entry === "--no-registry-cache" ||
+        entry === "--no-registry-cache=true" ||
+        entry === "--no-registry-cache=1",
+    )
+  ) {
+    setRegistryCacheEnabled(false);
+  }
+
   if (!subcommand) {
     printUsage();
     process.exitCode = 1;
@@ -216,7 +242,9 @@ async function main() {
   }
 
   if (subcommand === "run") {
-    const { siteName, allSites, dryRun, force, outputFormat, remaining } = consumeCommonFlags(rest);
+    const { siteName, allSites, dryRun, force, noRegistryCache, outputFormat, remaining } =
+      consumeCommonFlags(rest);
+    if (noRegistryCache) setRegistryCacheEnabled(false);
     const [commandName, ...argv] = remaining;
     if (!commandName) {
       printUsage();
@@ -262,16 +290,19 @@ async function main() {
       allSites,
       dryRun,
       force,
+      noRegistryCache,
       concurrency,
       outputFormat,
       remaining: pipelineRemaining,
     } = consumeCommonFlags(rest);
+    if (noRegistryCache) setRegistryCacheEnabled(false);
     const [pipelineName] = pipelineRemaining;
     if (!pipelineName) {
       printUsage();
       process.exitCode = 1;
       return;
     }
+
     const result = await executeKernelPipeline({
       workspaceRoot,
       pipelineName,
