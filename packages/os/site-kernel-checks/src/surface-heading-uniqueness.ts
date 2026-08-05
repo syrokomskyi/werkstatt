@@ -21,9 +21,9 @@ bake function label reuse before the Axiom gate.
 
 import { join, relative } from "node:path";
 import { existsSync } from "node:fs";
-import { readFile, readdir } from "node:fs/promises";
-import type { Dirent } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { parse as yamlParse } from "yaml";
+import { collectFiles } from "@warpgogol/share/fs";
 import { parse, type DefaultTreeAdapterMap } from "parse5";
 import type {
   CheckResult,
@@ -142,25 +142,6 @@ export function extractSectionHeadings(html: string): Map<string, number> {
   return counts;
 }
 
-async function collectHtmlFiles(dir: string): Promise<string[]> {
-  const results: string[] = [];
-  let entries: Dirent[];
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return results;
-  }
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...(await collectHtmlFiles(fullPath)));
-    } else if (entry.name.endsWith(".html")) {
-      results.push(fullPath);
-    }
-  }
-  return results;
-}
-
 function routeFromHtmlPath(distClientDir: string, htmlPath: string): string {
   const rel = relative(distClientDir, htmlPath).replace(/\\/g, "/");
   const withoutIndex = rel.replace(/index\.html$/, "").replace(/\.html$/, "/");
@@ -225,7 +206,10 @@ export async function runSurfaceHeadingUniquenessValidate(
     );
   }
 
-  const htmlFiles = await collectHtmlFiles(distClientDir);
+  const htmlFiles = await collectFiles(distClientDir, {
+    extensions: [".html"],
+    ignore: () => false,
+  });
   const diagnostics: Diagnostic[] = [];
 
   for (const htmlFile of htmlFiles) {
