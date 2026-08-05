@@ -248,16 +248,16 @@ invariants:
 
 ## Acceptance criteria
 
-- [ ] `profileInvariantCheckSchema` accepts `html-attribute-pattern` as a check kind with optional `element` and `attribute` fields
-- [ ] `invariant-engine.ts` implements `html-attribute-pattern` check: extracts elements by tag name, reads attribute, validates against pattern
-- [ ] `editframe-html.yaml` declares VIDEO-04 through VIDEO-09 invariants
-- [ ] `forge doctor` on an Editframe project checks VIDEO-04..09 and reports violations
-- [ ] Unit test verifies `html-attribute-pattern` with valid attribute values (no violations)
-- [ ] Unit test verifies `html-attribute-pattern` with invalid attribute values (violations reported)
-- [ ] Unit test verifies `html-attribute-pattern` skips elements without the declared attribute
-- [ ] Unit test verifies `editframe-html.yaml` declares at least 9 VIDEO-* invariants
-- [ ] `packages/forge/AGENTS.md` updated with `html-attribute-pattern` documentation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `profileInvariantCheckSchema` accepts `html-attribute-pattern` as a check kind with optional `element` and `attribute` fields (evidence: packages/forge/src/profiles/profile-schema.ts:120-142, forge.profile.validate --id editframe-html pass)
+- [x] `invariant-engine.ts` implements `html-attribute-pattern` check: extracts elements by tag name, reads attribute, validates against pattern (evidence: packages/forge/src/onboarding/invariant-engine.ts:175-218, 5 unit tests pass)
+- [x] `editframe-html.yaml` declares VIDEO-04 through VIDEO-09 invariants (evidence: packages/forge/profiles/editframe-html.yaml:83-132, forge.profile.validate pass)
+- [x] `forge doctor` on an Editframe project checks VIDEO-04..09 and reports violations (evidence: doctor.ts:1048-1051 calls checkInvariants which processes all 9 invariants; invariant-engine.test.ts confirms checkInvariants behavior)
+- [x] Unit test verifies `html-attribute-pattern` with valid attribute values (no violations) (evidence: packages/forge/os/core/handlers/invariant-engine.test.ts:246-274, "html-attribute-pattern passes valid attribute values")
+- [x] Unit test verifies `html-attribute-pattern` with invalid attribute values (violations reported) (evidence: packages/forge/os/core/handlers/invariant-engine.test.ts:213-244, "html-attribute-pattern detects invalid attribute values")
+- [x] Unit test verifies `html-attribute-pattern` skips elements without the declared attribute (evidence: packages/forge/os/core/handlers/invariant-engine.test.ts:276-304, "html-attribute-pattern skips elements without the declared attribute")
+- [x] Unit test verifies `editframe-html.yaml` declares at least 9 VIDEO-* invariants (evidence: packages/forge/src/tests/editframe-profile.test.ts:79, toBeGreaterThanOrEqual(9))
+- [x] `packages/forge/AGENTS.md` updated with `html-attribute-pattern` documentation (evidence: packages/forge/AGENTS.md:142, html-attribute-pattern documented in forge.doctor section)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0691 --json, 0 violations)
 
 ### Performance
 
