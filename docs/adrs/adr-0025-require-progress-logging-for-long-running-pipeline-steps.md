@@ -5,7 +5,7 @@ title: "Require progress logging for long-running pipeline steps"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: workspace
 decider: architecture
 createdAt: 2026-08-05
@@ -17,7 +17,8 @@ supersededBy:
 related:
   - RFC-0628
   - RFC-0689
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0025: Require progress logging for long-running pipeline steps
