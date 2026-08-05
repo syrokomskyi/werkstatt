@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -110,8 +111,8 @@ DNA-46 (Mission lifecycle) requires reliable state transitions. DNA-51 (Werkstat
 - **DNA-46 (Mission lifecycle)** — dev-deploy is part of the mission dev iteration loop. Auto-commit ensures the workpiece git state is clean and consistent after each dev-deploy, preventing dirty-tree failures during `mission.validate` and `mission.close`.
 - **DNA-51 (Werkstatt consistency primitives)** — extends the auto-commit pattern established by RFC-0580 (werkstatt side-effects) and RFC-0626 (bordbuch projections) to cover the workpiece working tree after dev-deploy builds.
 - **RFC-0628** — introduced `leitstand.dev-deploy` as a workpiece-based dev deployment flow. This RFC amends RFC-0628 by adding the auto-commit step.
-- **RFC-0644** — established the `commitWorkpieceIfDirty` pattern for `mission.reconcile`. This RFC applies the same pattern to `leitstand.dev-deploy`.
-- **RFC-0653** — build-skip cache remains based on pre-build `commitSha`. Auto-commit does not invalidate the cache because the cache key tracks source changes (commitSha + platform semantic hash), not generated file changes.
+- **RFC-0644** — established the `commitWorkpieceIfDirty` helper for `mission.reconcile`, which uses direct `git add -A` + `git commit --no-verify` (no PASSPORT signing, no pre-commit validation). This RFC intentionally diverges from that pattern by using `mission.git.commit` via `executeKernelCommand`, which provides PASSPORT signing (RFC-0560) and pre-commit content validation (RFC-0594). The divergence ensures all workpiece commits — including auto-committed generated artifacts — have consistent provenance and pass the same validation as operator-authored commits. See Alternatives considered §3 for the rejection of the direct `git commit` approach.
+- **RFC-0653** — build-skip cache is written after the auto-commit with the post-commit `commitSha` (see Design §Build-skip cache interaction). This prevents the auto-commit from invalidating the cache and causing an extra rebuild on the next dev-deploy.
 
 ## Design
 
@@ -150,6 +151,14 @@ commitSha = execSync("git rev-parse HEAD", { cwd: workpiecePath, encoding: "utf-
 ```
 
 No new TypeScript interfaces are needed. The `DevDeployResult` type already has `commitSha: string` — it now reflects the post-commit HEAD.
+
+### Build-skip cache interaction
+
+The build-skip cache (RFC-0653) is written **after** the auto-commit with the post-commit `commitSha`, not before. This prevents the cache from being invalidated by the auto-commit itself: on the next `leitstand.dev-deploy` without source changes, the new `commitSha` matches the cached `commitSha`, the build is skipped, and no extra rebuild occurs. The cache key semantics change from "pre-build commit" to "post-commit commit", but this is correct because generated files are build outputs (not inputs) — the build inputs (`src/content/`, `system.md`, etc.) are identical before and after the auto-commit.
+
+### Pre-commit validation behavior
+
+`mission.git.commit` runs `runPreCommitValidation` (RFC-0594) which selects validators based on changed file path prefixes. Generated files (`.generated.yaml`, `THIRD_PARTY_NOTICES.txt`, `sbom.cdx.json`, etc.) do not match any validator prefix (`src/content/business-profile/`, `src/content/pages/`, `src/content/faq/`), so no validators are invoked for auto-committed generated artifacts. The pre-commit validation step is fast (file path scanning only) and does not add measurable latency to the dev-deploy cycle.
 
 ### File system responsibilities
 
@@ -219,7 +228,7 @@ The `--json` output shape is unchanged. The `commitSha` field in `DevDeployResul
 
 3. **Agent confusion** — agents may not expect the workpiece HEAD to change during dev-deploy. Mitigation: the `commitSha` in `DevDeployResult` reflects the post-commit HEAD, and the log clearly states when an auto-commit is created.
 
-4. **Build-skip cache staleness** — the build-skip cache (RFC-0653) uses pre-build `commitSha`. After auto-commit, the workpiece HEAD changes, but the cache key (commitSha + platform semantic hash) still matches because the cache was written before the auto-commit. On the next dev-deploy, the cache will miss (commitSha changed) and a rebuild will occur. This is correct behavior — the cache should miss after any commit.
+4. **Build-skip cache interaction** — the build-skip cache (RFC-0653) is written after the auto-commit with the post-commit `commitSha` (see Design §Build-skip cache interaction). This prevents cache invalidation from the auto-commit itself. If the cache were written before the auto-commit (with the pre-build `commitSha`), every auto-commit event would invalidate the cache and cause one extra rebuild on the next dev-deploy — even with no source changes. Writing the cache after the auto-commit avoids this penalty entirely.
 
 ## Acceptance criteria
 
@@ -229,6 +238,7 @@ The `--json` output shape is unchanged. The `commitSha` field in `DevDeployResul
 - [ ] If `mission.git.commit` fails, `leitstand.dev-deploy` returns `exitCode: 1` and does not proceed to deploy (evidence: leitstand-commands.ts)
 - [ ] If the workpiece is clean after build, no commit is created (idempotent skip) (evidence: unit test)
 - [ ] Auto-commit works when build is skipped (cache hit) but snapshot was regenerated (evidence: unit test)
+- [ ] Build-skip cache is written after the auto-commit with the post-commit `commitSha` (evidence: leitstand-commands.ts)
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
