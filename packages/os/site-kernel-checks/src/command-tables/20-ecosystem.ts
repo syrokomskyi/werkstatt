@@ -15,6 +15,7 @@
   <item>RFC-0519: register gate.catalog.generate and gate.catalog.validate.</item>
   <item>RFC-0533: register ecosystem.commit command.</item>
   <item>RFC-0557: register template.imports.validate and workpiece.imports.validate.</item>
+  <item>RFC-0703: register platform.commit.discipline.validate.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -45,6 +46,7 @@ import { runWorkspaceWriteBoundaryLint } from "../workspace-write-boundary.ts";
 import { runGateCatalogGenerate, runGateCatalogValidate } from "../gate-catalog.ts";
 import { runTemplateImportsValidate } from "../template-imports-validate.ts";
 import { runWorkpieceImportsValidate } from "../workpiece-imports-validate.ts";
+import { runPlatformCommitDisciplineValidate } from "../platform-commit-discipline.ts";
 
 export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
   {
@@ -335,5 +337,26 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
     writes: ["package.json", "docs/platform-version-log.generated.yaml"],
     reads: ["package.json", "docs/rfcs/**/*.md", "packages/**", "integrations/**", "services/**"],
     execute: runEcosystemCommit,
+  },
+  {
+    name: "platform.commit.discipline.validate",
+    description:
+      "Per-PR CI gate: check that every platform-scope commit (packages/**, integrations/**, services/**) in the --base..HEAD range has an X-Platform-Bump trailer (RFC-0703).",
+    scope: "workspace",
+    flags: {
+      base: {
+        kind: "string",
+        required: true,
+        description: "Base git ref for the commit range (e.g. origin/main).",
+      },
+    },
+    reads: [".git", "packages/**", "integrations/**", "services/**"],
+    cacheable: false,
+    execute: runPlatformCommitDisciplineValidate,
+    gate: {
+      severity: "error",
+      phase: "workspace",
+      blocks: ["release.prepare"],
+    },
   },
 ];

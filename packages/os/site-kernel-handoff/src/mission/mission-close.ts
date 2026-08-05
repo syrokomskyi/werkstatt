@@ -19,6 +19,7 @@
   <item>RFC-0652: mandatory evidence.sync to R2 before writing close-report.json; --skip-evidence-sync escape hatch with Bordbuch audit entry.</item>
   <item>RFC-0655: add releaseId to CloseReport interface; pass releaseId as top-level option to appendBordbuchEntry.</item>
   <item>RFC-0658: validate bordbuch before appending close event (defense-in-depth for distribution-reuse skip path).</item>
+  <item>RFC-0703: auto-pin platform version via sternsystem.pin after registry update, before werkstatt commit.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -467,6 +468,47 @@ export async function runMissionClose(
     if (entry && entry.currentMission === missionId) {
       entry.currentMission = null;
       await writeRegistry(workspaceRoot, registry);
+    }
+
+    // RFC-0703: Auto-pin platform version on mission close.
+    // Called within the existing lock scope (registry, system, mission locks held).
+    // sternsystem.pin reads/writes the registry without acquiring locks — safe here.
+    // Pin's writeRegistry overwrites the registry with both currentMission: null AND pinnedPlatform updated.
+    // commitWerkstattSideEffects then commits the combined registry change in one commit.
+    try {
+      const { executeKernelCommand } = await import("@warpgogol/site-kernel");
+      const pinResult = (await executeKernelCommand({
+        workspaceRoot,
+        commandName: "sternsystem.pin",
+        argv: [`--id=${manifest.systemId}`],
+      })) as {
+        exitCode?: number;
+        summary?: string;
+      };
+      const pinExitCode = pinResult.exitCode ?? 0;
+      if (pinExitCode !== 0) {
+        throw new Error(
+          `sternsystem.pin failed with exitCode ${pinExitCode}: ${pinResult.summary ?? "no summary"}`,
+        );
+      }
+      logger.info(`  Auto-pinned platform version for ${manifest.systemId}`);
+    } catch (pinError) {
+      throw new Error(
+        `[mission.close] sternsystem.pin failed for '${manifest.systemId}': ${pinError instanceof Error ? pinError.message : String(pinError)}`,
+      );
+    }
+
+    // RFC-0703: Commit system.pin.json to cache clone after pin
+    try {
+      const systemDir = await resolveCachePath(workspaceRoot, manifest.systemId);
+      gitExec(systemDir, "add system.pin.json");
+      gitExec(
+        systemDir,
+        `commit -m ${JSON.stringify(`chore: auto-pin platform version for ${missionId}`)}`,
+      );
+      logger.info(`  Committed system.pin.json to cache clone`);
+    } catch {
+      // Nothing to commit or git not available — non-fatal
     }
 
     // RFC-0580: auto-commit werkstatt side-effects

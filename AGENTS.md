@@ -82,6 +82,13 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - **`actions/checkout@v5`** and **`actions/setup-node@v5`** — use the latest action versions with Node 24 runtime. Older versions (`@v4` and below) run on the deprecated Node 20 runtime.
 - **Windows CI** — only add Windows to the matrix where the product genuinely supports or ships Windows artifacts. If Windows is included, set `core.longpaths` via `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0` env **before** the checkout step. Do not pin to `windows-latest` — use a specific image version (e.g. `windows-2022`) if native compilation is critical.
 
+## Platform-scope commit discipline (RFC-0703)
+
+- Agents MUST use `ecosystem.commit` for all changes to `packages/**`, `integrations/**`, `services/**`. Direct `git commit` for these paths is blocked by the pre-commit hook (`hooks/pre-commit`) and the CI gate (`platform.commit.discipline.validate`).
+- The pre-commit hook is activated via `git config core.hooksPath hooks` (one-time per clone). New clones need this activation.
+- `ecosystem.commit` sets `ECOSYSTEM_COMMIT=1` env var to bypass the hook — this is the only sanctioned bypass.
+- `mission.close` auto-pins the platform version by calling `sternsystem.pin` after successful close (RFC-0703).
+
 ## Active instruction model
 
 - **Skill invocation tracking (NON-NEGOTIABLE):** When the operator invokes a fo-skill (e.g. `fo-idea-i-just-want-to-see-the-result`, `fo-idea-implement`, `fo-fix`, `fo-review`) in the first message of a session, the agent MUST follow that skill's full pipeline to completion. Do NOT fall back to a manual step-by-step plan. The skill's pipeline (audit → enhance → plan → implement → review → fix) exists for a reason — skipping phases produces lower-quality results. The operator's invocation IS the instruction to run the entire pipeline autonomously. See `PREFERENCES.md` § Skill invocation tracking for details.

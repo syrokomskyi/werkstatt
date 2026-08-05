@@ -75,6 +75,12 @@ jobs:
       - name: Maintenance debt baseline validation
         run: pnpm exec site-kernel run maintenance.debt.baseline.validate --json
 
+      - name: Platform consistency validate
+        run: pnpm exec site-kernel run platform.consistency.validate --check --json
+
+      - name: Platform commit discipline validate
+        run: pnpm exec site-kernel run platform.commit.discipline.validate --base origin/introduce-axiom-system --json
+
   forge-windows:
     runs-on: windows-2022
     timeout-minutes: 20
