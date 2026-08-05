@@ -11,6 +11,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0684: initial implementation of suppressions.validate command.</item>
+  <item>RFC-0688: add SUPPRESS-VAL-06 warning for rules using messagePattern/descriptionPattern without titlePattern. Add titlePattern to ruleSignature for conflict detection. Extend isBroadPattern check to titlePattern.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -38,6 +39,7 @@ function ruleSignature(rule: SuppressionRule): string {
     channelNot: rule.channelNot,
     contentType: rule.contentType,
     urlPattern: rule.urlPattern,
+    titlePattern: rule.titlePattern,
     messagePattern: rule.messagePattern,
     descriptionPattern: rule.descriptionPattern,
   });
@@ -162,6 +164,29 @@ export async function runSuppressionsValidate(
         severity: "warning",
         file: WORKSHOP_SUPPRESSIONS_PATH,
         message: `Rule at index ${i} (ruleId: ${rule.ruleId}) has a broad descriptionPattern: "${rule.descriptionPattern}". Broad patterns may suppress real findings. Use a more specific pattern.`,
+      });
+    }
+    if (rule.titlePattern && isBroadPattern(rule.titlePattern)) {
+      diagnostics.push({
+        ruleId: "SUPPRESS-VAL-04",
+        severity: "warning",
+        file: WORKSHOP_SUPPRESSIONS_PATH,
+        message: `Rule at index ${i} (ruleId: ${rule.ruleId}) has a broad titlePattern: "${rule.titlePattern}". Broad patterns may suppress real findings. Use a more specific pattern.`,
+      });
+    }
+  }
+
+  // Warn on messagePattern/descriptionPattern without titlePattern (SUPPRESS-VAL-06)
+  for (let i = 0; i < config.suppressions.length; i++) {
+    const rule = config.suppressions[i];
+    if ((rule.messagePattern || rule.descriptionPattern) && !rule.titlePattern) {
+      const field = rule.messagePattern ? "messagePattern" : "descriptionPattern";
+      diagnostics.push({
+        ruleId: "SUPPRESS-VAL-06",
+        severity: "warning",
+        file: WORKSHOP_SUPPRESSIONS_PATH,
+        message: `Rule at index ${i} (ruleId: ${rule.ruleId}) uses ${field} without titlePattern — ${field} matches against a non-existent Finding field and will never fire. Use titlePattern to match against finding.title.`,
+        fixHint: `Replace ${field} with titlePattern, or add titlePattern as a fallback.`,
       });
     }
   }

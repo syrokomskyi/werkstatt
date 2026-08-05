@@ -435,7 +435,8 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
       "RFC-0684: validates the workshop-level Axiom suppression config at systems/axiom-suppressions.yaml. " +
       "Checks schema, conflicting rules (same ruleId + same conditions), broad patterns, and unknown rule IDs (from evidence). " +
       "Diagnostics: SUPPRESS-VAL-01 (file not found, warning), SUPPRESS-VAL-02 (schema violation), " +
-      "SUPPRESS-VAL-03 (conflicting rules), SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId, warning).",
+      "SUPPRESS-VAL-03 (conflicting rules), SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId, warning), " +
+      "SUPPRESS-VAL-06 (messagePattern/descriptionPattern without titlePattern, warning).",
     scope: "workspace",
     supportsAllSites: false,
     mutatesState: false,
