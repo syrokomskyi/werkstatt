@@ -145,6 +145,8 @@ export interface KernelRegisteredCommandInfo extends KernelCommandMetadata {
   /** RFC-0266: declared IO globs, when the command opts in. */
   reads?: string[];
   writes?: string[];
+  /** RFC-0687: propagated from KernelCommandDefinition for manifest and registry. */
+  validatesOutputs?: string[];
 }
 
 export interface KernelNextStep {
@@ -272,6 +274,15 @@ export interface KernelCommandDefinition<TData = unknown> extends KernelCommandM
    * Paths use POSIX forward slashes. Directories are fingerprinted recursively.
    */
   modulePaths?: string[];
+  /**
+   * RFC-0687: command names whose outputs this validator checks. When all
+   * listed commands were cache hits in the current or a recent pipeline run,
+   * this validator is transitively skipped (no reads[] hash computation).
+   * Only valid on cacheable, read-only validators. MUST NOT be set on
+   * `cacheable: false` commands. Not a replacement for `reads[]` — it is
+   * an additional skip signal on top of the existing cache mechanism.
+   */
+  validatesOutputs?: string[];
   execute(
     input: KernelCommandInput,
     context: KernelRuntimeContext,

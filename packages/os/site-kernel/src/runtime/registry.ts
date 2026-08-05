@@ -185,6 +185,7 @@ function commandInfo(
     ...(command.writes ? { writes: command.writes } : {}),
     ...(command.cacheable !== undefined ? { cacheable: command.cacheable } : {}),
     ...(command.gate ? { gate: command.gate } : {}),
+    ...(command.validatesOutputs ? { validatesOutputs: command.validatesOutputs } : {}),
     provider,
     siteName,
   };

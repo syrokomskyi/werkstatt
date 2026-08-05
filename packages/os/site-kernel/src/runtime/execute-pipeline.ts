@@ -16,6 +16,7 @@ producing a KernelPipelineReport with a timing summary (slowest steps, timeout c
   <item>RFC-0390: integrate command-result cache — skip re-execution on cache hit, store only ok:true results, respect --force and --dry-run.</item>
   <item>RFC-0637: moduleHashCache key includes modulePaths; computeModuleHash receives command.modulePaths for granular per-command hashing.</item>
   <item>RFC-0686: refactor executePipelineForSite and executePipelineForWorkspace to use pipeline-scheduler for dependency-aware parallel execution; add telemetry mutex; add summedDurationMs to timing summary; --concurrency 1 activates full sequential mode.</item>
+  <item>RFC-0687: add transitive cache skip for validator chains — shouldTransitiveSkip checks validatesOutputs against cacheHitCommands; cross-pipeline persistence via .cache/pipeline-cache-hits.json with 30-minute TTL.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -23,6 +24,7 @@ import { performance } from "node:perf_hooks";
 import process from "node:process";
 import os from "node:os";
 import { join, relative, sep } from "node:path";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { createKernelLogger } from "../logger.ts";
 import { loadWorkspaceConfig } from "../discovery.ts";
 import type { KernelRegistry } from "../registry.ts";
@@ -219,6 +221,149 @@ function isCommandCacheable(command: KernelCommandDefinition): boolean {
   if (command.cacheable === false) return false;
   const reads = command.reads ?? [];
   return reads.length > 0;
+}
+
+// ---------------------------------------------------------------------------
+// RFC-0687: Transitive cache skip for validator chains
+// ---------------------------------------------------------------------------
+
+/**
+ * Tracks which commands were cache hits during a pipeline run, plus the
+ * pipeline name for cross-pipeline persistence.
+ */
+interface PipelineRunState {
+  cacheHitCommands: Set<string>;
+  pipelineName: string;
+}
+
+/**
+ * RFC-0687: Determine whether a command should be transitively skipped.
+ *
+ * The algorithm has 3 steps:
+ * 1. If the command is `cacheable: false`, never skip — it must always run.
+ * 2. If the command has no `validatesOutputs`, never skip — it is not a
+ *    validator that checks another command's output.
+ * 3. If all entries in `validatesOutputs` are in `cacheHitCommands`, skip —
+ *    the validator's upstream generators were all cache hits, so their
+ *    outputs are unchanged.
+ *
+ * No `reads[]` hash computation is performed — the skip is based solely on
+ * the upstream cache-hit status. The safety net is `cacheable: false`
+ * validators (e.g. `generated.drift.validate`) which always run and catch
+ * manual edits to generated files.
+ */
+function shouldTransitiveSkip(
+  command: KernelCommandDefinition,
+  runState: PipelineRunState,
+): boolean {
+  if (command.cacheable === false) return false;
+  const validatesOutputs = command.validatesOutputs;
+  if (!validatesOutputs || validatesOutputs.length === 0) return false;
+  return validatesOutputs.every((cmd) => runState.cacheHitCommands.has(cmd));
+}
+
+const PIPELINE_CACHE_HITS_DIR = ".cache";
+const PIPELINE_CACHE_HITS_FILENAME = "pipeline-cache-hits.json";
+const PIPELINE_CACHE_HITS_STALENESS_MS = 30 * 60 * 1000; // 30 minutes
+
+/**
+ * Shape of the persisted cache-hit file. Each pipeline name maps to an
+ * array of command names that were cache hits, plus a timestamp.
+ */
+interface PipelineCacheHitsFile {
+  pipelines: Record<string, { commands: string[]; writtenAt: number }>;
+}
+
+/**
+ * RFC-0687: Load cache-hit commands from other pipeline runs.
+ *
+ * Reads `.cache/pipeline-cache-hits.json` and merges entries from pipelines
+ * other than `currentPipelineName` that are within the 30-minute TTL.
+ *
+ * Handles missing, corrupt, or stale files gracefully — returns an empty
+ * set on any error.
+ */
+async function loadImportedCacheHits(
+  workspaceRoot: string,
+  currentPipelineName: string,
+): Promise<Set<string>> {
+  const filePath = join(workspaceRoot, PIPELINE_CACHE_HITS_DIR, PIPELINE_CACHE_HITS_FILENAME);
+  let raw: string;
+  try {
+    raw = await readFile(filePath, "utf8");
+  } catch {
+    return new Set();
+  }
+  let data: PipelineCacheHitsFile;
+  try {
+    data = JSON.parse(raw) as PipelineCacheHitsFile;
+  } catch {
+    return new Set();
+  }
+  if (!data.pipelines || typeof data.pipelines !== "object") return new Set();
+
+  const now = Date.now();
+  const merged = new Set<string>();
+  for (const [pipelineName, entry] of Object.entries(data.pipelines)) {
+    if (pipelineName === currentPipelineName) continue;
+    if (!entry || !Array.isArray(entry.commands)) continue;
+    if (now - (entry.writtenAt ?? 0) > PIPELINE_CACHE_HITS_STALENESS_MS) continue;
+    for (const cmd of entry.commands) {
+      merged.add(cmd);
+    }
+  }
+  return merged;
+}
+
+/**
+ * RFC-0687: Persist cache-hit commands for the current pipeline run.
+ *
+ * Writes `cacheHitCommands` under `pipelineName` in
+ * `.cache/pipeline-cache-hits.json`, replacing any previous entry for that
+ * pipeline. Preserves entries for other pipelines.
+ */
+async function persistCacheHits(
+  workspaceRoot: string,
+  pipelineName: string,
+  cacheHitCommands: Set<string>,
+): Promise<void> {
+  const dir = join(workspaceRoot, PIPELINE_CACHE_HITS_DIR);
+  const filePath = join(dir, PIPELINE_CACHE_HITS_FILENAME);
+
+  let existing: PipelineCacheHitsFile = { pipelines: {} };
+  try {
+    const raw = await readFile(filePath, "utf8");
+    existing = JSON.parse(raw) as PipelineCacheHitsFile;
+    if (!existing.pipelines || typeof existing.pipelines !== "object") {
+      existing = { pipelines: {} };
+    }
+  } catch {
+    // File missing or corrupt — start fresh.
+  }
+
+  existing.pipelines[pipelineName] = {
+    commands: [...cacheHitCommands].sort(),
+    writtenAt: Date.now(),
+  };
+
+  try {
+    await mkdir(dir, { recursive: true });
+    await writeFile(filePath, JSON.stringify(existing, null, 2) + "\n", "utf8");
+  } catch {
+    // Non-fatal — persistence is best-effort.
+  }
+}
+
+/**
+ * RFC-0687: Clear the pipeline cache-hits file. Called when `--force` is set.
+ */
+async function clearPipelineCacheHits(workspaceRoot: string): Promise<void> {
+  const filePath = join(workspaceRoot, PIPELINE_CACHE_HITS_DIR, PIPELINE_CACHE_HITS_FILENAME);
+  try {
+    await writeFile(filePath, JSON.stringify({ pipelines: {} }, null, 2) + "\n", "utf8");
+  } catch {
+    // Non-fatal — clear is best-effort.
+  }
 }
 
 /**
@@ -449,6 +594,16 @@ async function executePipelineForSite(
     `[${site.name}] pipeline ${options.pipelineName} — ${totalSteps} step(s), concurrency ${concurrency}`,
   );
 
+  // RFC-0687: load cross-pipeline cache hits and set up run state.
+  if (options.force ?? false) {
+    await clearPipelineCacheHits(options.workspaceRoot);
+  }
+  const importedHits = await loadImportedCacheHits(options.workspaceRoot, options.pipelineName);
+  const runState: PipelineRunState = {
+    cacheHitCommands: importedHits,
+    pipelineName: options.pipelineName,
+  };
+
   const scheduled = buildSchedule(steps);
   const moduleSrcDir = join(options.workspaceRoot, "packages", "os", "site-kernel-checks", "src");
 
@@ -495,6 +650,9 @@ async function executePipelineForSite(
       let report: KernelExecutionReport;
       if (step.skip) {
         report = skippedExecutionReport(command, context, step.skipReason);
+      } else if (shouldTransitiveSkip(command, runState)) {
+        // RFC-0687: transitive cache skip — all upstream commands were cache hits.
+        report = skippedExecutionReport(command, context, "transitive-cache-skip");
       } else {
         // RFC-0390: try cache read before executing.
         const cached = await tryCacheRead(
@@ -541,7 +699,11 @@ async function executePipelineForSite(
       progressLine(
         `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
       );
-      if (!step.skip && !report.cached) {
+      if (
+        !step.skip &&
+        !report.cached &&
+        !report.summary?.startsWith("Skipped: transitive-cache-skip")
+      ) {
         await telemetryMutex.run(() =>
           appendStepTelemetry(options.workspaceRoot, {
             pipeline: options.pipelineName,
@@ -585,6 +747,9 @@ async function executePipelineForSite(
     orderedStepTimings,
     site.name,
   );
+
+  // RFC-0687: persist cache hits for cross-pipeline transitive skip.
+  await persistCacheHits(options.workspaceRoot, options.pipelineName, runState.cacheHitCommands);
 
   if (options.outputFormat !== "json") {
     const logger = createKernelLogger(options.outputFormat ?? "pretty");
@@ -646,6 +811,16 @@ async function executePipelineForWorkspace(
     `[workspace] pipeline ${options.pipelineName} — ${totalSteps} step(s), concurrency ${concurrency}`,
   );
 
+  // RFC-0687: load cross-pipeline cache hits and set up run state.
+  if (options.force ?? false) {
+    await clearPipelineCacheHits(options.workspaceRoot);
+  }
+  const importedHits = await loadImportedCacheHits(options.workspaceRoot, options.pipelineName);
+  const runState: PipelineRunState = {
+    cacheHitCommands: importedHits,
+    pipelineName: options.pipelineName,
+  };
+
   const scheduled = buildSchedule(steps);
   const moduleSrcDir = join(options.workspaceRoot, "packages", "os", "site-kernel-checks", "src");
 
@@ -697,6 +872,9 @@ async function executePipelineForWorkspace(
       let report: KernelExecutionReport;
       if (step.skip) {
         report = skippedExecutionReport(command, context, step.skipReason);
+      } else if (shouldTransitiveSkip(command, runState)) {
+        // RFC-0687: transitive cache skip — all upstream commands were cache hits.
+        report = skippedExecutionReport(command, context, "transitive-cache-skip");
       } else {
         // RFC-0390: try cache read before executing.
         const cached = await tryCacheRead(
@@ -713,6 +891,8 @@ async function executePipelineForWorkspace(
         );
         if (cached) {
           report = cached;
+          // RFC-0687: track cache hits for transitive skip.
+          runState.cacheHitCommands.add(step.command);
         } else {
           report = await executeRegisteredCommand(command, context, step.args ?? [], {
             timeoutMs: step.timeoutMs,
@@ -737,7 +917,11 @@ async function executePipelineForWorkspace(
       progressLine(
         `${stepLabel} ${step.command} — ${stepStatusLabel(report)} ${formatDuration(report.timing.durationMs)}`,
       );
-      if (!step.skip && !report.cached) {
+      if (
+        !step.skip &&
+        !report.cached &&
+        !report.summary?.startsWith("Skipped: transitive-cache-skip")
+      ) {
         await telemetryMutex.run(() =>
           appendStepTelemetry(options.workspaceRoot, {
             pipeline: options.pipelineName,
@@ -774,6 +958,9 @@ async function executePipelineForWorkspace(
 
   const failed = reports.find((report) => !report.ok);
   const timing = pipelineTimingSummary(options.pipelineName, reports, orderedStepTimings);
+
+  // RFC-0687: persist cache hits for cross-pipeline transitive skip.
+  await persistCacheHits(options.workspaceRoot, options.pipelineName, runState.cacheHitCommands);
 
   if (options.outputFormat !== "json") {
     const logger = createKernelLogger(options.outputFormat ?? "pretty");

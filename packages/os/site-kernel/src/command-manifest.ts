@@ -48,6 +48,7 @@ export interface CommandManifestEntry {
   flags: Record<string, KernelFlagSpec>;
   reads: string[];
   writes: string[];
+  validatesOutputs: string[];
   pipelines: string[];
 }
 
@@ -147,6 +148,7 @@ export async function buildCommandManifest(workspaceRoot: string): Promise<Comma
     flags: command.flags ?? {},
     reads: command.reads ?? [],
     writes: command.writes ?? [],
+    validatesOutputs: command.validatesOutputs ?? [],
     pipelines: [...(pipelinesByCommand.get(command.name) ?? [])].sort(),
   }));
 
