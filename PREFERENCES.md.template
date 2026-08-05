@@ -25,3 +25,14 @@ This file stores operator-level preferences that AI agents read at the start of 
 ## Changing preferences
 
 Run the `my-preferences` skill or edit this file directly. When an agent asks you to choose a language, your answer is saved here for future sessions.
+
+## Plan confirmation vs implementation command (NON-NEGOTIABLE)
+
+Confirming a plan or design during grilling/discussion means the operator agrees with the approach — it is NOT a command to start implementation. The agent MUST wait for an explicit implementation command ("implement", "go ahead", "реализуй", "начинай") before writing any code beyond the RFC/ADR document itself.
+
+- **RFC creation** → agent creates the RFC file in `draft` status. No code changes.
+- **Plan confirmation** → agent stops. No status change, no implementation, no todo list items moved to `in_progress`.
+- **RFC status changes (draft → accepted)** — this is the operator's decision. The agent MUST NOT change RFC status from `draft` to `accepted` without an explicit command.
+- **Implementation command** → only now does the agent begin coding, register commands, write tests, etc.
+
+If the agent is unsure whether the operator's message is a confirmation or a command to implement, the agent MUST ask for clarification before proceeding.

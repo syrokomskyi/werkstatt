@@ -57,6 +57,17 @@ When the operator says "Завершаем эту сессию" (or any variant:
 2. **Verify RFC implementation status** — if any RFC was worked on during this session, verify each is stamped as `implemented` OR obtain explicit operator acknowledgment to leave it in a non-terminal status. See `fo-session-retro` skill § Step 4 for the full procedure.
 3. **Invoke `fo-session-retro`** via the `skill` tool BEFORE producing any closing summary. The retro skill IS the session-end protocol — do not substitute it with a manual summary.
 
+## Plan confirmation vs implementation command (NON-NEGOTIABLE)
+
+Confirming a plan or design during grilling/discussion means the operator agrees with the approach — it is NOT a command to start implementation. The agent MUST wait for an explicit implementation command ("реализуй", "начинай", "implement", "go ahead") before writing any code beyond the RFC/ADR document itself.
+
+- **RFC creation** → agent creates the RFC file in `draft` status. No code changes.
+- **Plan confirmation** → agent stops. No status change, no implementation, no todo list items moved to `in_progress`.
+- **RFC status changes (draft → accepted)** — this is the operator's decision. The agent MUST NOT change RFC status from `draft` to `accepted` without an explicit command.
+- **Implementation command** → only now does the agent begin coding, register commands, write tests, etc.
+
+If the agent is unsure whether the operator's message is a confirmation or a command to implement, the agent MUST ask for clarification before proceeding.
+
 ## Context routing discipline
 
 When routing insights during `fo-session-retro`, the Context category must only capture knowledge that is useful for future agents working on the project. Transient observations — such as "previous session left uncommitted changes" — are NOT useful context. They describe a one-time state that has been resolved and will not help the next agent. When in doubt, drop the insight rather than cluttering the memory layer.
