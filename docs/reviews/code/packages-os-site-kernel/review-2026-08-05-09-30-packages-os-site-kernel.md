@@ -4,7 +4,7 @@ date: 2026-08-05
 reviewer:
   skill: fo-review
   model: unknown
-verdict: needs-revision
+verdict: approved
 diffRange: 5d99ff2f...HEAD
 filesReviewed:
   - packages/os/site-kernel/src/runtime/registry-cache.ts
@@ -19,9 +19,9 @@ filesReviewed:
 
 # Code Review: ADR-0022 registry cache (5d99ff2f...HEAD)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The implementation is clean and minimal, but there is one finding: the early `--no-registry-cache` detection in `main()` is redundant with the per-subcommand handling, and the per-subcommand `setRegistryCacheEnabled(false)` calls are dead code because the early detection already handles the flag before any subcommand dispatch.
+The implementation is clean and minimal. The sole finding (redundant `setRegistryCacheEnabled(false)` calls) was fixed in commit `cbb72fd` — the early detection in `main()` is now the single handler.
 
 ### Mechanical floor
 
@@ -29,7 +29,7 @@ Pass — `pnpm --filter @warpgogol/site-kernel build:check` and `pnpm --filter @
 
 ### Axis A — Structural correctness
 
-- **Duplicated logic**: The `--no-registry-cache` flag is parsed and `setRegistryCacheEnabled(false)` is called in three places: (1) early in `main()` before subcommand dispatch (`cli/index.ts:203-214`), (2) in the `run` subcommand block (`cli/index.ts:239-241`), and (3) in the `pipeline` subcommand block (`cli/index.ts:294-296`). The early detection in `main()` already covers all subcommands, making the per-subcommand calls dead code. Remove the per-subcommand calls or remove the early detection and rely on per-subcommand parsing only.
+No issues. The `--no-registry-cache` flag is parsed once in `consumeCommonFlags` (to strip it from argv) and handled once in `main()` early detection (to call `setRegistryCacheEnabled(false)` before any registry-building call). The `noRegistryCache` return field from `consumeCommonFlags` is currently unused by subcommand destructuring but is retained for potential future use.
 
 ### Axis B — DNA alignment
 
@@ -67,4 +67,4 @@ No issues. The cache is minimal — a `Map<string, KernelRegistry>` with three s
 
 ### Questions for the author
 
-1. Should the redundant `setRegistryCacheEnabled(false)` calls in the `run` and `pipeline` subcommand blocks be removed, or should the early detection in `main()` be removed instead? Pick one approach.
+None — all findings resolved.
