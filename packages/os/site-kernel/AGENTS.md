@@ -27,7 +27,7 @@ This file defines the package-specific instruction layer for `packages/os/site-k
 
 - Keep errors actionable and tied to the current workspace or app context.
 - Avoid leaking app-specific directory assumptions beyond clearly named adapter surfaces.
-- **Reserved CLI flags:** `consumeCommonFlags` in `src/cli/index.ts` consumes `--site`, `--all`, `--dry-run`, `--force`, and `--json` before a command executes — a command-level flag with one of these names silently never reaches the handler. When a command needs "all" semantics for its own domain, use a distinct name (e.g. `--all-skills` in `forge.skill.knowledge.compact`).
+- **Reserved CLI flags:** `consumeCommonFlags` in `src/cli/index.ts` consumes `--site`, `--all`, `--dry-run`, `--force`, `--no-registry-cache`, and `--json` before a command executes — a command-level flag with one of these names silently never reaches the handler. When a command needs "all" semantics for its own domain, use a distinct name (e.g. `--all-skills` in `forge.skill.knowledge.compact`).
 - When adding flags or command semantics, keep parsing stable and backward-conscious.
 - **RFC-0086 — surface fail diagnostics, do not just count them.** When a kernel command returns `{ exitCode > 0, data }`, populate one of the recognized arrays so the text-mode printer can emit each item: `data.diagnostics: string[]`, `data.violations: object[]`, `data.findings: object[]` (RFC-0074 audit shape), or `data.details: object[]`. The runtime printer picks the first match (precedence in that order), formats each as `[ERROR]   <ruleId-or-severity> · <file-or-target> · <message>`, and caps at 50 lines with a `… and N more` footer. Agents reading text output no longer need to re-run with `--json` to learn what failed.
 
@@ -132,6 +132,17 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - `TelemetryMutex` serializes `appendStepTelemetry` calls via a promise-chain to prevent concurrent read-modify-write on the NDJSON telemetry file.
 - CLI: `--concurrency N` flag on `site-kernel pipeline <name>` sets the concurrency limit.
 - `pipeline.dependencies.validate` command (in `@warpgogol/site-kernel-checks`) validates all standard leaf pipelines for missing references, forward references, duplicate command names, and circular dependencies.
+
+## Registry cache (ADR-0022)
+
+- `src/runtime/registry-cache.ts` — process-lifetime singleton cache for `KernelRegistry` instances. Exports `getOrBuildRegistry`, `getOrBuildWorkspaceRegistry`, `clearRegistryCache`, `setRegistryCacheEnabled`, `isRegistryCacheEnabled`.
+- Cache is a module-level `Map<string, KernelRegistry>` keyed by config source path (`workspace:<root>` or `site:<configPath>`).
+- `loadAppRuntime` uses `getOrBuildRegistry` with `site:<configPath>` key — avoids rebuilding the registry when `executeKernelPipeline` is called multiple times for the same site in one process (e.g. build.check → build.post → re-run).
+- `executeKernelPipeline` and `executeKernelCommand` use `getOrBuildWorkspaceRegistry` for workspace-scoped registry resolution.
+- `listRegisteredKernelCommandNames`, `listRegisteredKernelCommands`, and `listRegisteredKernelPipelines` also use the cache.
+- `--no-registry-cache` CLI flag disables the cache (calls `setRegistryCacheEnabled(false)`) and clears any existing entries — use for debugging or when a fresh registry is needed.
+- Cache is process-lifetime only — not persisted to disk. Each process starts with an empty cache.
+- `buildRegistryForModule` (manifest-driven single-module loading) is NOT cached — it builds a fresh registry for a specific module.
 
 ## Change impact (RFC-0332)
 
