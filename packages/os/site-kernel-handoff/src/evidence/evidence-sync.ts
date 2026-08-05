@@ -181,6 +181,7 @@ export async function runEvidenceSync(
       lastProgressIndex = uploadedFiles.length;
     }, 30_000);
 
+    let uploadFailed = false;
     try {
       for (const relPath of relativeFiles) {
         const fullPath = path.join(evidenceDir, relPath);
@@ -193,6 +194,7 @@ export async function runEvidenceSync(
           });
           uploadedFiles.push(relPath);
         } catch (err) {
+          uploadFailed = true;
           return {
             data: {
               missionId,
@@ -211,7 +213,7 @@ export async function runEvidenceSync(
       }
     } finally {
       clearInterval(heartbeat);
-      if (uploadedFiles.length > lastProgressIndex) {
+      if (!uploadFailed && uploadedFiles.length > lastProgressIndex) {
         context.logger.info(
           `[evidence.sync] upload loop complete — ${uploadedFiles.length}/${relativeFiles.length} files`,
         );
