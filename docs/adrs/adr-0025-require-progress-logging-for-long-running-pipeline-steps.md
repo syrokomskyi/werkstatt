@@ -5,12 +5,12 @@ title: "Require progress logging for long-running pipeline steps"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: workspace
 decider: architecture
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
-implementedAt:
+implementedAt: 2026-08-05
 closedAt:
 supersedes: []
 supersededBy:
