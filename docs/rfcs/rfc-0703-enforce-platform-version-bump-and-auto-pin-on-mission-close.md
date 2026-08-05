@@ -170,19 +170,19 @@ interface PlatformCommitDisciplineResult {
 
 ## Acceptance criteria
 
-- [ ] `platform.commit.discipline.validate` command implemented in `packages/os/site-kernel-checks`
-- [ ] Command registered in `tools/kernel.config.ts`
-- [ ] `--base` flag required, no default
-- [ ] Command fails hard when base ref cannot be resolved
-- [ ] Command checks only platform-scope commits for `X-Platform-Bump` trailer presence
-- [ ] CI step added to `ci.yml` in the `autonomous-quality` job
-- [ ] Command added to `ci.local.validate` pipeline
-- [ ] `mission.close` calls `sternsystem.pin` after successful close
-- [ ] Pre-commit hook activated via `git config core.hooksPath hooks`
-- [ ] Unit tests for `platform.commit.discipline.validate` (pass, fail, base-not-found, no-platform-commits)
-- [ ] Unit test for `mission.close` auto-pin behavior
-- [ ] `AGENTS.md` updated with platform-scope commit discipline rule
-- [ ] `rfc.validate` passes on this file
+- [x] `platform.commit.discipline.validate` command implemented in `packages/os/site-kernel-checks` (evidence: packages/os/site-kernel-checks/src/platform-commit-discipline.ts)
+- [x] Command registered in `tools/kernel.config.ts` (evidence: packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts:341-361 — registered via ECOSYSTEM_COMMANDS, auto-registered by createStandardCheckModule)
+- [x] `--base` flag required, no default (evidence: packages/os/site-kernel-checks/src/platform-commit-discipline.ts:106-111 — throws if --base missing)
+- [x] Command fails hard when base ref cannot be resolved (evidence: packages/os/site-kernel-checks/src/platform-commit-discipline.ts:67-69 — throws Error)
+- [x] Command checks only platform-scope commits for `X-Platform-Bump` trailer presence (evidence: packages/os/site-kernel-checks/src/platform-commit-discipline.ts:118-121 — hasPlatformScopeFiles + hasTrailer)
+- [x] CI step added to `ci.yml` in the `autonomous-quality` job (evidence: .github/workflows/ci.yml:81-82)
+- [x] Command added to `ci.local.validate` pipeline (evidence: packages/os/site-kernel-checks/src/ci-local.ts:41)
+- [x] `mission.close` calls `sternsystem.pin` after successful close (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:473-496)
+- [x] Pre-commit hook activated via `git config core.hooksPath hooks` (evidence: git config core.hooksPath = hooks)
+- [x] Unit tests for `platform.commit.discipline.validate` (pass, fail, base-not-found, no-platform-commits) (evidence: packages/os/site-kernel-checks/src/tests/platform-commit-discipline.test.ts)
+- [x] Unit test for `mission.close` auto-pin behavior (evidence: packages/os/site-kernel-handoff/src/tests/mission-close-auto-pin.test.ts)
+- [x] `AGENTS.md` updated with platform-scope commit discipline rule (evidence: AGENTS.md:85-90)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0703 exitCode 0)
 
 ## Implementation notes for agents
 
