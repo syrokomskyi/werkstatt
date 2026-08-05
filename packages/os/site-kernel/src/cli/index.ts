@@ -242,9 +242,7 @@ async function main() {
   }
 
   if (subcommand === "run") {
-    const { siteName, allSites, dryRun, force, noRegistryCache, outputFormat, remaining } =
-      consumeCommonFlags(rest);
-    if (noRegistryCache) setRegistryCacheEnabled(false);
+    const { siteName, allSites, dryRun, force, outputFormat, remaining } = consumeCommonFlags(rest);
     const [commandName, ...argv] = remaining;
     if (!commandName) {
       printUsage();
@@ -290,12 +288,10 @@ async function main() {
       allSites,
       dryRun,
       force,
-      noRegistryCache,
       concurrency,
       outputFormat,
       remaining: pipelineRemaining,
     } = consumeCommonFlags(rest);
-    if (noRegistryCache) setRegistryCacheEnabled(false);
     const [pipelineName] = pipelineRemaining;
     if (!pipelineName) {
       printUsage();
