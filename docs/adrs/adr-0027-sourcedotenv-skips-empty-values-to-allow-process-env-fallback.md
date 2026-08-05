@@ -5,7 +5,7 @@ title: "sourceDotenv skips empty values to allow process.env fallback"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-05
