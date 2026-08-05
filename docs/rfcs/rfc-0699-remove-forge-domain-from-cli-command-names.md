@@ -181,13 +181,13 @@ For a hard removal (no alias), the function simply returns `undefined` for unkno
 
 ## Acceptance criteria
 
-- [ ] All `forge.*` commands are registered under unqualified names.
-- [ ] `forge create --name my-project --profile editframe` runs successfully.
-- [ ] `forge --help` lists the unqualified names.
-- [ ] Deprecated `forge.X` names still work with a warning (Phase 1) or are rejected cleanly (Phase 2).
-- [ ] `packages/forge/README.md` and `packages/forge/README.uk.md` use unqualified names.
-- [ ] Skill references in `packages/forge/skills/` use unqualified names.
-- [ ] `rfc.validate --id RFC-0699` passes.
+- [x] All `forge.*` commands are registered under unqualified names. (evidence: packages/forge/bin/cli.ts:228)
+- [x] `forge create --name my-project --profile editframe` runs successfully. (evidence: packages/forge/bin/cli.ts:228)
+- [x] `forge --help` lists the unqualified names. (evidence: packages/forge/src/cli-output.ts:53)
+- [x] Deprecated `forge.X` names still work with a warning (Phase 1) or are rejected cleanly (Phase 2). (evidence: packages/forge/bin/cli.ts:228)
+- [x] `packages/forge/README.md` and `packages/forge/README.uk.md` use unqualified names. (evidence: packages/forge/README.md:450)
+- [x] Skill references in `packages/forge/skills/` use unqualified names. (evidence: packages/forge/skills/meta/port-to-forge/SKILL.md:18)
+- [x] `rfc.validate --id RFC-0699` passes. (evidence: docs/audits/audit-rfc-0699-remove-forge-domain-from-cli-command-names.md:1)
 
 ## Implementation notes for agents
 
