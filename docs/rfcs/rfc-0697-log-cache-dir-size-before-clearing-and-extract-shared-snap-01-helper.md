@@ -16,6 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -43,7 +44,7 @@ commands:
   added: []
   changed:
     - leitstand.dev-deploy
-    - mission.materialize
+    - mission.validate
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -51,7 +52,7 @@ packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
 successSignals:
   - "leitstand.dev-deploy logs cache directory file count and total size before clearing"
-  - "SNAP-01 detection and auto-regeneration logic is shared between leitstand.dev-deploy and mission.materialize via a single helper"
+  - "SNAP-01 detection and auto-regeneration logic is shared between leitstand.dev-deploy and mission.validate via a single helper"
   - "No duplicated SNAP-01 detection code between the two callers"
 nonGoals:
   - "Does not change the cache clearing logic itself — only adds logging before clearing"
@@ -85,13 +86,13 @@ During the RFC-0689 implementation audit (2026-08-05), two improvement opportuni
 
 1. **Cache clearing logs no size information.** The current log message is `"Cleared Axiom browser evidence cache before mission.check"` — it does not indicate how many files were in the cache or the total size. This makes it impossible to determine whether the cache was unusually large (indicating a problem) or empty (indicating a first run).
 
-2. **SNAP-01 detection logic is duplicated.** `leitstand.dev-deploy` in `leitstand-commands.ts` and `mission.materialize` in `mission-materialization-commands.ts` both implement SNAP-01 detection, auto-regeneration, and re-build logic. The `autoRegenerateSnapshotOnSnap01` helper is already extracted to `snapshot-auto-regen.ts`, but the surrounding detection + re-build orchestration is duplicated.
+2. **SNAP-01 detection logic is duplicated.** `leitstand.dev-deploy` in `leitstand-commands.ts` and `mission.validate` in `mission-materialization-commands.ts` both implement SNAP-01 detection, auto-regeneration, and re-build logic. The `autoRegenerateSnapshotOnSnap01` helper is already extracted to `snapshot-auto-regen.ts`, but the surrounding detection + re-build orchestration is duplicated.
 
 ## Problem
 
 1. **No cache size logging:** When the Axiom cache is cleared, operators cannot determine if the cache was stale (large) or fresh (small/empty). This limits debugging when `mission.check` produces unexpected results after a cache clear.
 
-2. **Duplicated SNAP-01 orchestration:** Both `leitstand.dev-deploy` and `mission.materialize` have their own SNAP-01 detection + re-build logic. Changes to one caller must be manually replicated in the other. The duplication is a maintenance burden and a source of drift.
+2. **Duplicated SNAP-01 orchestration:** Both `leitstand.dev-deploy` and `mission.validate` have their own SNAP-01 detection + re-build logic. Changes to one caller must be manually replicated in the other. The duplication is a maintenance burden and a source of drift.
 
 ## Decision
 
@@ -99,19 +100,19 @@ Two changes:
 
 1. `leitstand.dev-deploy` logs the cache directory file count and total size before clearing it.
 
-2. The SNAP-01 detection + auto-regeneration + re-build orchestration is extracted into a shared helper in `snapshot-auto-regen.ts`, used by both `leitstand.dev-deploy` and `mission.materialize`.
+2. The SNAP-01 detection + auto-regeneration + re-build orchestration is extracted into a shared helper in `snapshot-auto-regen.ts`, used by both `leitstand.dev-deploy` and `mission.validate`.
 
 ## Architectural fit
 
 - **RFC-0689 (amended):** This RFC improves the implementation of RFC-0689 without changing its behavior. The cache clearing and snapshot auto-regeneration logic are unchanged.
-- **RFC-0615 (mission.materialize):** `mission.materialize` already uses `autoRegenerateSnapshotOnSnap01` from `snapshot-auto-regen.ts`. This RFC extends the shared module to include the full orchestration loop.
+- **RFC-0615 (mission.validate):** `mission.validate` already uses `autoRegenerateSnapshotOnSnap01` from `snapshot-auto-regen.ts`. This RFC extends the shared module to include the full orchestration loop.
 - **RFC-0628 (leitstand.dev-deploy):** The deploy command uses the shared helper instead of inline logic.
 
 ## Design
 
 ### CLI surface
 
-No new CLI commands. `leitstand.dev-deploy` and `mission.materialize` behavior is unchanged.
+No new CLI commands. `leitstand.dev-deploy` and `mission.validate` behavior is unchanged.
 
 ### TypeScript contracts
 
@@ -128,15 +129,16 @@ export interface Snap01OrchestrationOptions {
   systemId: string;
   missionId: string;
   logger: { info: (msg: string) => void; warn?: (msg: string) => void };
-  /** Function to re-run the build after snapshot regeneration. */
-  rebuildFn: () => Promise<void>;
   /** Function to validate the snapshot (returns data with diagnostics). */
   validateFn: () => Promise<unknown>;
+  /** Function to re-run the build after snapshot regeneration. Optional — omitted for build-skip case (RFC-0653) where no rebuild is needed. */
+  rebuildFn?: () => Promise<void>;
 }
 
 export interface Snap01OrchestrationResult {
   regenerated: boolean;
-  rebuildSucceeded: boolean;
+  /** undefined when rebuildFn was not provided (build-skip case). */
+  rebuildSucceeded?: boolean;
   error?: string;
 }
 
@@ -177,7 +179,7 @@ function logCacheDirSize(cacheDir: string, logger: { info: (msg: string) => void
 | --- | --- |
 | `packages/os/site-kernel-handoff/src/mission/snapshot-auto-regen.ts` | Modified: add `orchestrateSnap01Recovery` shared helper |
 | `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts` | Modified: use shared helper, add cache size logging |
-| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modified: use shared helper instead of inline SNAP-01 logic |
+| `packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts` | Modified: `mission.validate` handler uses shared helper instead of inline SNAP-01 logic. Caller checks `dirtyBeforeBuildPost` before invoking the helper. |
 | `packages/os/site-kernel-handoff/src/tests/leitstand-0689-cache-snapshot.test.ts` | Modified: add test for cache size logging |
 
 ### Output format
@@ -189,10 +191,20 @@ Log output (not JSON — these are logger.info messages):
 [leitstand.dev-deploy] Cleared Axiom browser evidence cache before mission.check
 ```
 
+### Caller responsibilities
+
+The shared helper is caller-agnostic via dependency injection. Each caller is responsible for:
+
+- **Constructing `validateFn`:** `mission.validate` extracts SNAP-01 from `postPipelineReport.steps` data (already available from `executeKernelPipeline`). `leitstand.dev-deploy` runs `behavior.snapshot.validate` separately via `executeKernelCommand` (because `pnpm build` is opaque).
+- **Pre-conditions:** `mission.validate` checks `isWorkpieceDirty(workpieceDir)` before calling the helper — if the workpiece is dirty, regeneration is skipped entirely (the helper is not invoked).
+- **Providing `rebuildFn`:** Required for build-failure path (re-run `pnpm build` or `executeKernelPipeline`). Omitted for build-skip path (RFC-0653) where only regeneration is needed.
+- **Post-regeneration handling:** Each caller interprets `Snap01OrchestrationResult` according to its own state model (`mission.validate` sets `buildSucceeded`/`buildError`; `leitstand.dev-deploy` sets `buildState`/`snapshotRegenerated` and writes build-skip cache).
+
 ### Failure modes
 
 - **Cache size logging failure:** If `readdirSync` or `statSync` fails (permissions, race condition), the error is swallowed and no size is logged. The cache clearing proceeds normally.
 - **Shared helper failure:** If `orchestrateSnap01Recovery` throws, the caller catches it and logs a warning (same as current behavior).
+- **Build-skip without rebuildFn:** When `rebuildFn` is omitted, the helper regenerates the snapshot and returns `{ regenerated: true }` without attempting a rebuild. The caller continues with the existing dist/.
 
 ## Rollout
 
@@ -218,8 +230,8 @@ Log output (not JSON — these are logger.info messages):
 
 - [ ] `leitstand.dev-deploy` logs cache file count and total size before clearing
 - [ ] `orchestrateSnap01Recovery` shared helper exists in `snapshot-auto-regen.ts`
-- [ ] `leitstand.dev-deploy` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic
-- [ ] `mission.materialize` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic
+- [ ] `leitstand.dev-deploy` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic (all 3 paths: build failure, build-skip, build-skip stale check)
+- [ ] `mission.validate` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic (caller checks `dirtyBeforeBuildPost` before invoking)
 - [ ] No duplicated SNAP-01 detection + re-build code between the two callers
 - [ ] Existing tests pass (leitstand-0689-cache-snapshot.test.ts)
 - [ ] New test case for cache size logging
@@ -231,6 +243,8 @@ Log output (not JSON — these are logger.info messages):
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST use `readdirSync` + `statSync` for cache size logging (not async — the cache dir is small and this is a one-time read before `rm -rf`).
 - Agents MUST swallow errors from `readdirSync`/`statSync` — cache size logging is non-fatal.
-- Agents MUST use dependency injection (`rebuildFn`, `validateFn`) in `orchestrateSnap01Recovery` to keep the helper caller-agnostic.
+- Agents MUST use dependency injection (`validateFn`, optional `rebuildFn`) in `orchestrateSnap01Recovery` to keep the helper caller-agnostic.
+- Agents MUST make `rebuildFn` optional — the build-skip path (RFC-0653) regenerates without re-building.
+- Agents MUST keep the `dirtyBeforeBuildPost` check in `mission.validate` (caller-side), not in the shared helper — it is a `mission.validate`-specific pre-condition.
 - Agents MUST NOT change the cache clearing logic or the snapshot regeneration behavior.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
