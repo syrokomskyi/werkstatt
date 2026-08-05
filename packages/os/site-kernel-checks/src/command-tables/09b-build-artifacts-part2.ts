@@ -200,7 +200,7 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
   {
     name: "surface.heading-uniqueness.validate",
     description:
-      "RFC-0690: scan rendered surface page HTML for duplicate section heading text (first <h2>/<h3> child of each <section>). Fails on duplicates to catch bake function label reuse before the Axiom gate.",
+      "RFC-0690, RFC-0696: scan rendered surface page HTML for duplicate block heading text (first <h2>/<h3> of each <section> or <div>/<article>/<aside> with aria-labelledby). Fails on duplicates to catch bake function label reuse before the Axiom gate.",
     scope: "app",
     flags: {},
     supportsAllSites: true,

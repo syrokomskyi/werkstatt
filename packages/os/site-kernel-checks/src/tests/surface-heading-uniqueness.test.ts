@@ -1,12 +1,13 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Unit tests for surface.heading-uniqueness.validate (RFC-0690) — pure function extractSectionHeadings and kernel handler runSurfaceHeadingUniquenessValidate.</purpose>
+<purpose>Unit tests for surface.heading-uniqueness.validate (RFC-0690, RFC-0696) — pure function extractBlockHeadings and kernel handler runSurfaceHeadingUniquenessValidate.</purpose>
 <non-goals>
   <item>Do not test Axiom landmark-unique — that is Axiom's responsibility.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0690: initial test suite.</item>
+  <item>RFC-0696: update import to extractBlockHeadings; add test cases for non-section block headings and nested block double-counting prevention.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -15,7 +16,7 @@ import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
-  extractSectionHeadings,
+  extractBlockHeadings,
   runSurfaceHeadingUniquenessValidate,
 } from "../surface-heading-uniqueness.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
@@ -54,7 +55,7 @@ function extractDiagnostics(result: { data?: unknown }): Array<{
   return data?.diagnostics ?? [];
 }
 
-describe("extractSectionHeadings (pure function)", () => {
+describe("extractBlockHeadings (pure function)", () => {
   it("unique headings — no duplicates", () => {
     const html = `
       <html><body>
@@ -63,7 +64,7 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h2>Gamma</h2><p>content</p></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("alpha")).toBe(1);
     expect(counts.get("beta")).toBe(1);
     expect(counts.get("gamma")).toBe(1);
@@ -76,7 +77,7 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h2>Focus</h2><p>content</p></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("focus")).toBe(2);
   });
 
@@ -88,7 +89,7 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h3>Practical</h3></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("practical")).toBe(3);
   });
 
@@ -99,7 +100,7 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h2>Only One</h2></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.size).toBe(1);
     expect(counts.get("only one")).toBe(1);
   });
@@ -110,7 +111,7 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h3>Subheading</h3></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("subheading")).toBe(1);
   });
 
@@ -123,7 +124,7 @@ describe("extractSectionHeadings (pure function)", () => {
         </section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("primary")).toBe(1);
     expect(counts.has("secondary")).toBe(false);
   });
@@ -135,7 +136,7 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h2>Hello World</h2></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("hello world")).toBe(2);
   });
 
@@ -146,12 +147,12 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h2>heading</h2></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("heading")).toBe(2);
   });
 
   it("empty HTML string — no violations", () => {
-    const counts = extractSectionHeadings("");
+    const counts = extractBlockHeadings("");
     expect(counts.size).toBe(0);
   });
 
@@ -164,7 +165,7 @@ describe("extractSectionHeadings (pure function)", () => {
         </section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("outer")).toBe(1);
     expect(counts.get("inner")).toBe(1);
   });
@@ -176,8 +177,81 @@ describe("extractSectionHeadings (pure function)", () => {
         <section><h2>Contact Us</h2></section>
       </body></html>
     `;
-    const counts = extractSectionHeadings(html);
+    const counts = extractBlockHeadings(html);
     expect(counts.get("contact us")).toBe(2);
+  });
+
+  it("non-section block with aria-labelledby — heading counted", () => {
+    const html = `
+      <html><body>
+        <div aria-labelledby="lbl-1"><h2>Overview</h2></div>
+        <div aria-labelledby="lbl-2"><h2>Details</h2></div>
+      </body></html>
+    `;
+    const counts = extractBlockHeadings(html);
+    expect(counts.get("overview")).toBe(1);
+    expect(counts.get("details")).toBe(1);
+  });
+
+  it("duplicate heading in non-section blocks with aria-labelledby — count is 2", () => {
+    const html = `
+      <html><body>
+        <div aria-labelledby="lbl-1"><h2>Focus</h2></div>
+        <div aria-labelledby="lbl-2"><h2>Focus</h2></div>
+      </body></html>
+    `;
+    const counts = extractBlockHeadings(html);
+    expect(counts.get("focus")).toBe(2);
+  });
+
+  it("div without aria-labelledby — heading not counted", () => {
+    const html = `
+      <html><body>
+        <div><h2>Ignored</h2></div>
+        <section><h2>Counted</h2></section>
+      </body></html>
+    `;
+    const counts = extractBlockHeadings(html);
+    expect(counts.has("ignored")).toBe(false);
+    expect(counts.get("counted")).toBe(1);
+  });
+
+  it("article and aside with aria-labelledby — headings counted", () => {
+    const html = `
+      <html><body>
+        <article aria-labelledby="lbl-1"><h2>Article Title</h2></article>
+        <aside aria-labelledby="lbl-2"><h2>Aside Title</h2></aside>
+      </body></html>
+    `;
+    const counts = extractBlockHeadings(html);
+    expect(counts.get("article title")).toBe(1);
+    expect(counts.get("aside title")).toBe(1);
+  });
+
+  it("nested block double-counting prevention — section heading not double-counted via child div", () => {
+    const html = `
+      <html><body>
+        <section>
+          <div aria-labelledby="lbl-1"><h2>Inner Heading</h2></div>
+        </section>
+      </body></html>
+    `;
+    const counts = extractBlockHeadings(html);
+    expect(counts.get("inner heading")).toBe(1);
+  });
+
+  it("section and child div with different headings — both counted independently", () => {
+    const html = `
+      <html><body>
+        <section>
+          <h2>Outer Heading</h2>
+          <div aria-labelledby="lbl-1"><h2>Inner Heading</h2></div>
+        </section>
+      </body></html>
+    `;
+    const counts = extractBlockHeadings(html);
+    expect(counts.get("outer heading")).toBe(1);
+    expect(counts.get("inner heading")).toBe(1);
   });
 });
 
@@ -253,6 +327,8 @@ describe("runSurfaceHeadingUniquenessValidate (handler)", () => {
     expect(diags[0].severity).toBe("error");
     expect(diags[0].message).toContain("focus");
     expect(diags[0].message).toContain("3 times");
+    expect(diags[0].message).toContain("block heading");
+    expect(diags[0].fixHint).toContain("aria-labelledby");
   });
 
   it("unique headings on surface page — pass", async () => {

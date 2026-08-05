@@ -1,21 +1,22 @@
 /*
 <MODULE_CONTRACT>
 <purpose>
-RFC-0690: surface.heading-uniqueness.validate — scan rendered surface page HTML
-for duplicate section heading text. For each <section> element, extracts the first
-<h2> or <h3> child's text content, normalizes it, and reports HEADING-UNIQ-01 when
-the same normalized heading text appears more than once on the same page. Catches
-bake function label reuse before the Axiom gate.
+RFC-0690, RFC-0696: surface.heading-uniqueness.validate — scan rendered surface page HTML
+for duplicate block heading text. For each <section> element or <div>/<article>/<aside>
+with aria-labelledby, extracts the first <h2> or <h3> descendant's text content,
+normalizes it, and reports HEADING-UNIQ-01 when the same normalized heading text appears
+more than once on the same page. Catches bake function label reuse before the Axiom gate.
 </purpose>
 <non-goals>
   <item>Do not validate non-surface pages — only routes with a surfaceId in the surface artifact are checked.</item>
   <item>Do not check heading hierarchy (h1-h6 order) — that is a separate accessibility concern.</item>
   <item>Do not modify HTML — this is a read-only validator.</item>
-  <item>Do not check non-section headings — only the first h2/h3 child of each section participates.</item>
+  <item>Do not check headings outside block-level elements with aria-labelledby — only headings inside <section> or <div>/<article>/<aside> with aria-labelledby participate.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0690: initial — duplicate section heading validator using parse5 and surface artifact route identification.</item>
+  <item>RFC-0696: extend scan to non-section blocks with aria-labelledby; add findFirstHeadingSkippingChildBlocks for nested block double-counting prevention; rename extractSectionHeadings → extractBlockHeadings.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -43,6 +44,7 @@ type TreeTextNode = DefaultTreeAdapterMap["textNode"];
 
 const DIST_CLIENT_DIR = "dist/client";
 const HEADING_TAGS = new Set(["h2", "h3"]);
+const BLOCK_TAGS = new Set(["section", "div", "article", "aside"]);
 
 function isElementNode(node: TreeNode): node is TreeElementNode {
   return "tagName" in node;
@@ -92,20 +94,62 @@ function findFirstDescendantByTag(
 }
 
 /**
- * Find all <section> elements in the document tree (depth-first).
+ * Check if an element is a block-level element that participates in heading uniqueness:
+ * <section> (always) or <div>/<article>/<aside> with aria-labelledby.
  */
-function findAllSections(node: TreeParentNode, results: TreeElementNode[] = []): TreeElementNode[] {
+function isBlockElement(node: TreeNode): node is TreeElementNode {
+  if (!isElementNode(node) || !BLOCK_TAGS.has(node.tagName)) return false;
+  if (node.tagName === "section") return true;
+  const attrs = node.attrs ?? [];
+  return attrs.some((a) => a.name === "aria-labelledby");
+}
+
+/**
+ * Find all block-level elements that participate in heading uniqueness (depth-first):
+ * all <section> elements (always) + <div>/<article>/<aside> with aria-labelledby.
+ */
+function findBlockElementsWithAriaLabelledby(
+  node: TreeParentNode,
+  results: TreeElementNode[] = [],
+): TreeElementNode[] {
   const children = node.childNodes;
   if (!children) return results;
   for (const child of children) {
-    if (isElementNode(child) && child.tagName === "section") {
+    if (isBlockElement(child)) {
       results.push(child);
     }
     if (hasChildNodes(child)) {
-      findAllSections(child, results);
+      findBlockElementsWithAriaLabelledby(child, results);
     }
   }
   return results;
+}
+
+/**
+ * Find the first descendant heading element (h2/h3) using depth-first search,
+ * skipping child block elements to prevent nested block double-counting.
+ * Without the skip, the same heading element would be found from both a parent
+ * <section> and a child <div aria-labelledby>, counting it twice.
+ */
+function findFirstHeadingSkippingChildBlocks(
+  node: TreeParentNode,
+  tagNames: Set<string>,
+): TreeElementNode | null {
+  const children = node.childNodes;
+  if (!children) return null;
+  for (const child of children) {
+    if (isElementNode(child) && tagNames.has(child.tagName)) {
+      return child;
+    }
+    if (isBlockElement(child)) {
+      continue;
+    }
+    if (hasChildNodes(child)) {
+      const found = findFirstHeadingSkippingChildBlocks(child, tagNames);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 /**
@@ -116,11 +160,11 @@ function normalizeHeadingText(text: string): string {
 }
 
 /**
- * Extract section headings from HTML content.
+ * Extract block headings from HTML content.
  * Returns a map of normalized heading text → count of occurrences.
- * Sections without an <h2> or <h3> descendant are skipped.
+ * Block elements without an <h2> or <h3> descendant are skipped.
  */
-export function extractSectionHeadings(html: string): Map<string, number> {
+export function extractBlockHeadings(html: string): Map<string, number> {
   const counts = new Map<string, number>();
   let document: TreeParentNode;
   try {
@@ -129,9 +173,9 @@ export function extractSectionHeadings(html: string): Map<string, number> {
     return counts;
   }
 
-  const sections = findAllSections(document);
-  for (const section of sections) {
-    const heading = findFirstDescendantByTag(section, HEADING_TAGS);
+  const blocks = findBlockElementsWithAriaLabelledby(document);
+  for (const block of blocks) {
+    const heading = findFirstHeadingSkippingChildBlocks(block, HEADING_TAGS);
     if (!heading) continue;
     const rawText = collectTextContent(heading);
     const normalized = normalizeHeadingText(rawText);
@@ -223,17 +267,17 @@ export async function runSurfaceHeadingUniquenessValidate(
       continue;
     }
 
-    const headingCounts = extractSectionHeadings(rawHtml);
+    const headingCounts = extractBlockHeadings(rawHtml);
 
     for (const [headingText, count] of headingCounts) {
       if (count > 1) {
         diagnostics.push({
           ruleId: "HEADING-UNIQ-01",
           severity: "error" as const,
-          message: `Duplicate section heading "${headingText}" appears ${count} times on ${route}`,
+          message: `Duplicate block heading "${headingText}" appears ${count} times on ${route}`,
           file: relative(app.directory, htmlFile).replace(/\\/g, "/"),
           fixHint:
-            "Use distinct labels for each block in the bake function — see SURFACE_LABELS in bake-helpers.ts",
+            "Use distinct heading text for each block-level element with aria-labelledby on this page",
         });
       }
     }

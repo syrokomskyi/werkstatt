@@ -12,6 +12,7 @@
   <item>RFC-0576: Register LINK-01..03, MIRROR-MISSING, MIRROR-01..03 for content.links.validate, mirroring.validate, page.blocks.mirror.validate.</item>
   <item>RFC-0576 review fix: Register MIRROR-CONFIG for config/setup errors in page.blocks.mirror.validate.</item>
   <item>RFC-0690: register HEADING-UNIQ-01 for surface.heading-uniqueness.validate.</item>
+  <item>RFC-0696: update HEADING-UNIQ-01 description from section to block heading.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -539,10 +540,10 @@ export const CONTENT_SURFACE_RULES: Record<string, RuleDescriptor> = {
     "Page blocks mirror validator could not resolve site paths (missing astro config)",
     "page.blocks.mirror.validate",
   ),
-  // surface.heading-uniqueness.validate (RFC-0690) — duplicate section heading text on surface pages.
+  // surface.heading-uniqueness.validate (RFC-0690, RFC-0696) — duplicate block heading text on surface pages.
   "HEADING-UNIQ-01": rule(
     "HEADING-UNIQ-01",
-    "Duplicate section heading text on the same surface page",
+    "Duplicate block heading text on the same surface page",
     "surface.heading-uniqueness.validate",
   ),
 };
