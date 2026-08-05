@@ -35,7 +35,7 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 | Package | Responsibility |
 | --- | --- |
 | `site-kernel` | Framework-free runtime, discovery, registry, and CLI primitives |
-| `forge` | Portable governance skills and command modules (RFC-0374). `src/` is portable (no kernel imports); `os/compass/` and `os/werkstatt/` are fully autonomous (RFC-0556 — handlers inlined, no `@warpgogol/*` imports); other `os/` modules may use dynamic kernel imports. Exports `forgeRfcModule`, `forgeWorkflowModule`, `forgeNamingModule`, `forgeCompassModule`, `forgeWerkstattModule`, `forgeCoreModule`, `forgeSessionModule`, `forgeMissionModule` and 36 skills. |
+| `forge` | Portable governance skills and command modules (RFC-0374). `src/` is portable (no kernel imports); `os/compass/` and `os/werkstatt/` are fully autonomous (RFC-0556 — handlers inlined, no `@warpgogol/*` imports); other `os/` modules may use dynamic kernel imports. Exports `forgeRfcModule`, `forgeWorkflowModule`, `forgeNamingModule`, `forgeCompassModule`, `forgeWerkstattModule`, `forgeCoreModule`, `forgeSessionModule`, `forgeMissionModule` and 42 skills. |
 | `site-kernel-astro` | Astro-specific path conventions (thin adapter) |
 | `site-kernel-content` | Markdown file collection, YAML frontmatter parsing, and semantic site model loading. Content reference resolution uses the RFC-0527 index-based resolver from `@warpgogol/share/content-reference` (RFC-0529). |
 | `site-kernel-checks` | Content validation, Compass scaffolding inventory, and the `createStandardCheckModule` factory for zero-boilerplate app onboarding. See `packages/os/site-kernel-checks/docs/check-module-guide.md` for wiring instructions. |

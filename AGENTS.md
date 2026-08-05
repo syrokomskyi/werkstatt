@@ -475,7 +475,7 @@ Every package under `packages/*` has its own `AGENTS.md` with full API reference
 | `@warpgogol/site-kernel-onboarding` | `onboarding.scaffold` CLI — generates RFC-compliant `apps/<id>/`. Never copy an app folder |
 | `@warpgogol/ui` | Shared icons (LordIcon), sections, shell components. Import icons from `@warpgogol/ui/icons`. See `packages/ui/AGENTS.md` |
 | `@warpgogol/content-source` | RFC-0141 Content Source Provider port: the single named seam for where content and assets come from. Ships the `ContentSourceProvider` / `AssetRef` / `ResolvedAsset` contracts and the reference filesystem adapter. |
-| `@warpgogol/forge` | RFC-0374 Portable governance ecosystem: 30 skills (fo/shared/meta), generic OS command modules (rfc._, naming.convention.lint, compass._, werkstatt._, workflow._), skill registry, validators, `forge.create` onboarding, `forge.scaffold` stack profiles, and `fo-harvest` self-growth loop. Skills live in `packages/forge/skills/`; `.agents/skills/` is a generated copy synced by `forge.create`. **See `packages/forge/AGENTS.md`.** |
+| `@warpgogol/forge` | RFC-0374 Portable governance ecosystem: 42 skills (fo/shared/meta), generic OS command modules (rfc._, naming.convention.lint, compass._, werkstatt._, workflow._), skill registry, validators, `forge.create` onboarding, `forge.scaffold` stack profiles, and `fo-harvest` self-growth loop. Skills live in `packages/forge/skills/`; `.agents/skills/` is a generated copy synced by `forge.create`. **See `packages/forge/AGENTS.md`.** |
 
 ## Content Source Provider seam (RFC-0141)
 
