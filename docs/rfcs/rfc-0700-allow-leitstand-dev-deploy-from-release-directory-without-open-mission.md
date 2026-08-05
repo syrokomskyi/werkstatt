@@ -15,18 +15,18 @@ owners:
 reviewers: []
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
 supersededBy:
-amends: []
+amends:
+  - RFC-0628
 amendedBy: []
 related:
   - RFC-0628
   - RFC-0666
   - RFC-0698
-  - ADR-0026
-  - ADR-0027
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -49,8 +49,15 @@ appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
-successSignals: []
-nonGoals: []
+successSignals:
+  - "Operator can deploy an existing release to dev without opening a new mission"
+  - "leitstand.dev-deploy --release <id> deploys from releases/<id>/dist/ and exits 0"
+  - "leitstand.dev-deploy without --release behaves exactly as before (requires open mission)"
+nonGoals:
+  - "Does not change leitstand.propagate, leitstand.promote, or leitstand.rollback"
+  - "Does not change the release state machine or Axiom evidence gate"
+  - "Does not add registry tracking or bordbuch entries for dev deploys (same as RFC-0628)"
+  - "Does not run Axiom checks in the release path — the release was already validated during release.prepare"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -95,9 +102,11 @@ The gap is in `packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.
 ## Architectural fit
 
 - **Site OS operator model**: extends `leitstand.dev-deploy` with a new flag rather than introducing a separate command. The dev channel gains parity with `leitstand.propagate` (alt/main) and `leitstand.rollback` — both deploy from release directories without open missions.
-- **RFC-0628**: amends the dev deployment channel to support release-based deployment alongside the existing workpiece-based path.
-- **RFC-0666**: convention-based `.env.alt`/`.env.main` paths are reused for secrets resolution.
+- **RFC-0628**: amends the dev deployment channel to support release-based deployment alongside the existing workpiece-based path. The `amends: [RFC-0628]` frontmatter field formalises this relationship.
+- **RFC-0666**: convention-based `.env.alt`/`.env.main` paths are reused for secrets resolution. The release path uses `releases/<id>/.env.alt` (dev channel maps to `.env.alt` per RFC-0666).
 - **RFC-0698**: auto-commit logic is only relevant for the workpiece path; the release path skips it since the dist is already committed.
+- **DNA-48 (Release discipline)**: not affected — the release state machine is unchanged. The release remains an immutable artifact; this RFC only deploys its pre-built dist to an additional channel.
+- **DNA-49 (Fleet propagation)**: not affected — `leitstand.propagate` and `leitstand.promote` gates are unchanged. This RFC adds a dev-channel deploy path that bypasses the Axiom gate (the release was already validated during `release.prepare`).
 
 ## Design
 
@@ -114,26 +123,43 @@ pnpm exec site-kernel run leitstand.dev-deploy --system warpgogol-com --release 
 Flags:
 
 - `--system` (required) — Sternsystem id.
-- `--release` (optional) — Release id. When present, deploys from `releases/<id>/dist/` without requiring an open mission.
-- `--force-build` (existing, ignored when `--release` is set).
-- `--skip-evidence-sync` (existing, ignored when `--release` is set).
+- `--release` (optional) — Release id. When present, deploys from `releases/<id>/dist/` without requiring an open mission. The release's `systemId` in `release.yaml` must match `--system`; mismatch exits 1 with `[leitstand.dev-deploy] release '<id>' does not belong to system '<system>'`.
+- `--force-build` (existing, ignored when `--release` is set — a warning is logged: `[leitstand.dev-deploy] --force-build ignored because --release is set`).
+- `--skip-evidence-sync` (existing, ignored when `--release` is set — evidence sync is already skipped in the release path).
 
 ### TypeScript contracts
 
-```ts
-interface DevDeployInput {
-  system: string;
-  release?: string; // NEW: when set, deploy from releases/<id>/dist/
-  forceBuild?: boolean;
-  skipEvidenceSync?: boolean;
-}
+The existing `DevDeployResult` interface in `leitstand-commands.ts:563-586` gains one new optional field:
 
-interface DevDeployResult {
-  // existing fields...
-  releaseDeployed?: string; // NEW: set when --release is used
-  buildSkipped: boolean;     // true when --release is used
+```ts
+export interface DevDeployResult {
+  command: "leitstand.dev-deploy";
+  systemId: string;
+  missionId: string;          // from releaseManifest.missionId when --release is set
+  commitSha: string;           // from releaseManifest.commitSha when --release is set
+  buildState: "succeeded" | "failed";
+  buildSkipped: boolean;       // true when --release is set (no build step)
+  deployState: "succeeded" | "failed" | "failed-stale" | "in-progress";
+  deploymentUrl: string;
+  buildIdentity: {
+    releaseId: string;
+    written: boolean;          // false when --release is set (no new build-identity)
+    path: string;
+  };
+  axiom: {
+    status: "pass" | "fail" | "not-run";  // "not-run" when --release is set
+    errors: number;
+    warnings: number;
+    exitCode: number;
+    freshness: FreshnessResult;
+  };
+  evidenceSynced: boolean;     // false when --release is set
+  evidenceSyncError: string | null;
+  releaseDeployed?: string;    // NEW: set to the release id when --release is used
 }
 ```
+
+No new `DevDeployInput` interface is needed — the `--release` flag is read via `flagString(input, "release")` in the handler, same as existing flags.
 
 ### File system responsibilities
 
@@ -142,19 +168,73 @@ interface DevDeployResult {
 | `releases/<id>/dist/` | Source dist when `--release` is set |
 | `missions/<id>/workpiece/dist/` | Source dist when `--release` is not set (current behavior) |
 | `systems/registry.yaml` | Read for system config; `currentMission` not required when `--release` is set |
-| `releases/<id>/release.yaml` | Read for release manifest (commitSha, distTreeHash) |
+| `releases/<id>/release.yaml` | Read for release manifest (`missionId`, `commitSha`, `systemId`, `distTreeHash`) |
+| `releases/<id>/.env.alt` | Secrets for dev channel (resolved via `resolveConventionSecretsPath`, same convention as propagate) |
+| `node_modules/.bin/` (workspace root) | Wrangler binary fallback when release dir has no `node_modules/` |
+
+### Module registration update
+
+The `leitstand.dev-deploy` command registration in `leitstand.module.ts` must add `releases/{release}/**` to `reads`:
+
+```ts
+reads: ["systems/registry.yaml", "missions/{mission}/workpiece/**", "releases/{release}/**"],
+```
+
+### Release path: field resolution
+
+When `--release` is set, the handler reads `releases/<id>/release.yaml` via `readReleaseManifest` and populates:
+
+- `missionId` ← `releaseManifest.missionId`
+- `commitSha` ← `releaseManifest.commitSha`
+- `systemId` ← verified against `releaseManifest.systemId` (mismatch exits 1)
+- `axiom.status` ← `"not-run"` (all counts zero, freshness not verified)
+- `buildIdentity.written` ← `false` (release dist already contains `build-identity.json`)
+- `evidenceSynced` ← `false` (no evidence to sync)
+- `buildSkipped` ← `true`
+
+### Wrangler binary resolution
+
+The release directory does not contain `node_modules/`. The handler resolves `wrangler` from the workspace root `node_modules/.bin/` (where `wrangler` is installed as a devDependency). If the workspace root bin path does not exist, `nodeModulesBinPath` is `undefined` and the adapter falls back to `PATH` resolution (same as `leitstand.propagate` when workpiece `node_modules/.bin` is missing).
+
+### No registry or bordbuch writes
+
+The release path does NOT write to `systems/registry.yaml` (`lastPropagated.dev` is not updated) and does NOT append to bordbuch — same as the workpiece path per RFC-0628. Dev deploys are ephemeral and untracked.
 
 ### Output format
+
+When `--release` is used, the `--json` output includes all existing `DevDeployResult` fields with release-path values:
 
 ```json
 {
   "command": "leitstand.dev-deploy",
-  "status": "ok",
-  "releaseDeployed": "warpgogol-com-r000012",
+  "systemId": "warpgogol-com",
+  "missionId": "warpgogol-com-m000030",
+  "commitSha": "abc123def456",
+  "buildState": "succeeded",
   "buildSkipped": true,
-  "url": "https://dev.warpgogol.com",
-  "cdnPurged": true,
-  "healthCheckPassed": true
+  "deployState": "succeeded",
+  "deploymentUrl": "https://dev.warpgogol.com",
+  "buildIdentity": {
+    "releaseId": "warpgogol-com-r000012",
+    "written": false,
+    "path": ""
+  },
+  "axiom": {
+    "status": "not-run",
+    "errors": 0,
+    "warnings": 0,
+    "exitCode": 0,
+    "freshness": {
+      "verified": false,
+      "cdnDistTreeHash": null,
+      "localDistTreeHash": "",
+      "attempts": 0,
+      "error": "release path — axiom skipped"
+    }
+  },
+  "evidenceSynced": false,
+  "evidenceSyncError": null,
+  "releaseDeployed": "warpgogol-com-r000012"
 }
 ```
 
@@ -162,6 +242,7 @@ interface DevDeployResult {
 
 - `--release <id>` not found in `releases/`: exit 1 with `[leitstand.dev-deploy] release '<id>' not found`.
 - `releases/<id>/dist/` missing or empty: exit 1 with `[leitstand.dev-deploy] release '<id>' has no dist directory`.
+- `releaseManifest.systemId` does not match `--system`: exit 1 with `[leitstand.dev-deploy] release '<id>' does not belong to system '<system>'`.
 - Deploy fails: exit 1 (same as current behavior).
 - CDN purge fails: warning (same as current behavior for cloudflare-workers adapter).
 - Health check fails: exit 1 (same as current behavior).
@@ -193,8 +274,9 @@ interface DevDeployResult {
 - [ ] When `--release` is not provided, command behaves exactly as before (requires open mission)
 - [ ] CDN purge runs after release-based deploy (same as workpiece path)
 - [ ] Health check runs after release-based deploy (same as workpiece path)
-- [ ] `--json` output includes `releaseDeployed` and `buildSkipped` fields when `--release` is used
-- [ ] Unit test covers the `--release` path in `leitstand-commands.ts`
+- [ ] `--json` output includes `releaseDeployed` and `buildSkipped` fields when `--release` is used, with `axiom.status: "not-run"` and `buildIdentity.written: false`
+- [ ] Unit test covers the `--release` path in `leitstand-commands.ts` (release found, system mismatch, dist missing)
+- [ ] `leitstand.module.ts` `reads` updated to include `releases/{release}/**`
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
