@@ -68,22 +68,18 @@ function getGitLogRange(workspaceRoot: string, base: string): GitCommitInfo[] {
     throw new Error(`Could not resolve base ref '${base}'. Ensure the ref exists.`);
   }
 
-  try {
-    const shaOutput = gitExec(workspaceRoot, `log --format=%H --no-merges "${range}"`);
-    const shas = shaOutput.split("\n").filter((l) => l.trim().length > 0);
-    const commits: GitCommitInfo[] = [];
-    for (const sha of shas) {
-      const message = gitExec(workspaceRoot, `log --format=%B -n 1 ${sha}`);
-      const filesOutput = gitExec(workspaceRoot, `diff-tree --no-commit-id --name-only -r ${sha}`);
-      const files = filesOutput.split("\n").filter((l) => l.trim().length > 0);
-      const parentsStr = gitExec(workspaceRoot, `log --format=%P -n 1 ${sha}`);
-      const parents = parentsStr ? parentsStr.split(" ").filter(Boolean) : [];
-      commits.push({ sha, parents, message, files });
-    }
-    return commits;
-  } catch {
-    return [];
+  const shaOutput = gitExec(workspaceRoot, `log --format=%H --no-merges "${range}"`);
+  const shas = shaOutput.split("\n").filter((l) => l.trim().length > 0);
+  const commits: GitCommitInfo[] = [];
+  for (const sha of shas) {
+    const message = gitExec(workspaceRoot, `log --format=%B -n 1 ${sha}`);
+    const filesOutput = gitExec(workspaceRoot, `diff-tree --no-commit-id --name-only -r ${sha}`);
+    const files = filesOutput.split("\n").filter((l) => l.trim().length > 0);
+    const parentsStr = gitExec(workspaceRoot, `log --format=%P -n 1 ${sha}`);
+    const parents = parentsStr ? parentsStr.split(" ").filter(Boolean) : [];
+    commits.push({ sha, parents, message, files });
   }
+  return commits;
 }
 
 export async function runPlatformCommitDisciplineValidate(

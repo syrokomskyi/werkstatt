@@ -507,8 +507,10 @@ export async function runMissionClose(
         `commit -m ${JSON.stringify(`chore: auto-pin platform version for ${missionId}`)}`,
       );
       logger.info(`  Committed system.pin.json to cache clone`);
-    } catch {
-      // Nothing to commit or git not available — non-fatal
+    } catch (pinCommitError) {
+      logger.warn(
+        `  Could not commit system.pin.json to cache clone: ${pinCommitError instanceof Error ? pinCommitError.message : String(pinCommitError)}`,
+      );
     }
 
     // RFC-0580: auto-commit werkstatt side-effects

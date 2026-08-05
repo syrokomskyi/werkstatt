@@ -38,7 +38,7 @@ export const CI_LOCAL_CHECKED_COMMANDS = [
   "pnpm exec site-kernel run maintenance.debt.baseline.validate --json",
   "pnpm exec site-kernel run github.branch-protection.validate --json",
   "pnpm exec site-kernel run platform.consistency.validate --check --json",
-  "pnpm exec site-kernel run platform.commit.discipline.validate --base origin/introduce-axiom-system --json",
+  "pnpm exec site-kernel run platform.commit.discipline.validate --base origin/main --json",
 ] as const;
 
 const GENERAL_CI_WORKFLOW = ".github/workflows/ci.yml";
