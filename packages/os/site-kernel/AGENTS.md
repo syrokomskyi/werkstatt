@@ -97,6 +97,17 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - RFC-0637: `KernelCommandDefinition` has an optional `modulePaths?: string[]` field. When present, `computeModuleHash` fingerprints only the listed paths (files and/or directories relative to the module's `src/` directory) instead of the full `src/` directory. When absent or empty, the full `src/` fingerprint is used (permanent backward-compatible fallback). Non-existent paths are silently skipped.
 - `command.reads.validate` (in `@warpgogol/site-kernel-checks`) enforces that every registered command declares `reads` or `cacheable: false` (CRC-01) and that `reads` patterns are valid picomatch syntax (CRC-02).
 
+## Transitive cache skip for validator chains (RFC-0687)
+
+- `KernelCommandDefinition` has an optional `validatesOutputs?: string[]` field. When present, it declares which commands' outputs this validator checks. The pipeline executor uses this to transitively skip the validator when all listed commands were cache hits — no `reads[]` hash computation is performed.
+- **Only valid on cacheable, read-only validators.** MUST NOT be set on `cacheable: false` commands — they always run and provide the filesystem-state safety net.
+- **Not a replacement for `reads[]`.** The `reads[]` field is still the primary cache key input. `validatesOutputs` is an additional skip signal on top of the existing cache mechanism.
+- The algorithm has 3 steps: (1) if `cacheable: false`, never skip; (2) if no `validatesOutputs`, never skip; (3) if all entries in `validatesOutputs` are in `cacheHitCommands`, skip with `skipReason: "transitive-cache-skip"`.
+- **Cross-pipeline persistence**: cache hits are persisted to `.cache/pipeline-cache-hits.json` (gitignored, lives in `.cache/` per RFC-0382) after each pipeline run. The next pipeline run loads entries from other pipelines within a 30-minute TTL and merges them into `cacheHitCommands`. This enables `build.check` validators to skip when `build.prepare` generators were cached.
+- `--force` flag clears `.cache/pipeline-cache-hits.json` and bypasses all cache reads, so `cacheHitCommands` is always empty and transitive skip never fires.
+- **Infrastructure-only**: no validators are annotated with `validatesOutputs` in RFC-0687. The mechanism is available for future cacheable generator→cacheable validator pairs. Current cacheable validators read authored files (not generated), and current generators that produce files checked by cacheable validators are `cacheable: false`.
+- Safety net: `cacheable: false` validators (`generated.drift.validate`, `generated.files.validate`, `generated.stale.validate`, `ownership.sync.validate`) always run and catch manual edits to generated files regardless of transitive skip.
+
 ## Workspace tree index and mtime fast path (RFC-0685)
 
 - `src/cache/workspace-tree-index.ts` — `WorkspaceTreeIndex` (Map from POSIX-relative file paths to `{ mtimeMs, size }`), `buildWorkspaceTreeIndex` (single directory walk excluding `.git/` and `node_modules/`), `filterTreeIndex` (in-memory picomatch glob filtering against the index).
