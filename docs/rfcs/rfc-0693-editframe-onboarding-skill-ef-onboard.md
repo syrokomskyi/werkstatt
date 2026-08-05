@@ -1,7 +1,7 @@
 ---
 id: RFC-0693
 title: "Editframe onboarding skill: ef-onboard"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
