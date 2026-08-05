@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -40,11 +41,14 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: patch
+versionBump: minor
 commands:
   proposed: []
   added: []
-  changed: []
+  changed:
+    - forge.create
+    - forge.doctor
+    - forge.profile.validate
   removed: []
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
@@ -84,10 +88,13 @@ nonGoals:
 
 ## Context
 
-Forge added Editframe support through a series of RFCs: RFC-0641 (stack profile `editframe-html`), RFC-0691 (time model invariants with `html-attribute-pattern` check kind), RFC-0692 (ef-composition-review and ef-render-verify skills), RFC-0693 (ef-onboard skill). The current state:
+ADR-0021 established Editframe as the video composition framework for the Warpgogol ecosystem. Forge added Editframe support through a series of RFCs: RFC-0641 (stack profile `editframe-html`), RFC-0691 (time model invariants with `html-attribute-pattern` check kind), RFC-0692 (ef-composition-review and ef-render-verify skills), RFC-0693 (ef-onboard skill). The current state:
 
 - **HTML-only template**: The profile scaffolds an HTML composition (`composition.html` with `<ef-timegroup>` custom elements). React is mentioned in `ef-onboard` as a discovery question, but the operator must manually run `npm create @editframe` to get a React project — Forge does not scaffold it.
-- **External domain skills**: `ef-onboard` instructs the agent to install Editframe domain skills via `npm create @editframe` (which copies 6 skills into `.claude/skills/` and `.agents/skills/`). This creates a runtime dependency on Editframe's scaffolding tool and an external network call. If `npm create @editframe` fails or is offline, the operator has no domain knowledge.
+- **External domain skills**: `ef-onboard` instructs the agent to install Editframe domain skills via `npm create @editframe` (which copies 6 skills into `.agents/skills/editframe-*/`). This creates a runtime dependency on Editframe's scaffolding tool and an external network call. If `npm create @editframe` fails or is offline, the operator has no domain knowledge.
+
+> **Reversal of RFC-0693 nonGoal**: RFC-0693 explicitly listed "Do not vendor Editframe skills into forge — they are installed by `npm create @editframe` or referenced online" as a nonGoal. This RFC reverses that decision because the runtime dependency on `npm create @editframe` proved fragile: it requires a network call during onboarding, produces divergent project structures, and leaves the operator without domain knowledge if the command fails. Bundling the skills with `@warpgogol/forge` eliminates the external dependency and ensures domain knowledge is always available.
+
 - **HTML-specific invariants**: VIDEO-04 through VIDEO-09 use `html-attribute-pattern` check kind, which searches for HTML custom elements (`<ef-timegroup duration="5s">`). React compositions use JSX components (`<Timegroup duration="5s">`) — the current checker cannot validate them.
 - **Single workspace type**: `composition` detects `*.html` files containing `ef-timegroup`. React compositions (`.tsx` with `TimelineRoot`) are not detected.
 
@@ -206,15 +213,17 @@ Six skills are vendored from `https://editframe.com/skills/*.md` into `packages/
 | `ef-dev-server` | `editframe.com/skills/dev-server.md` | Vite plugin setup, on-demand transcoding, local asset serving |
 | `ef-editor-gui` | `editframe.com/skills/editor-gui.md` | Editor toolkit: timeline, scrubber, canvas, preview controls |
 | `ef-webhooks` | `editframe.com/skills/webhooks.md` | Webhook notifications for render completion and file processing |
-| `ef-brand-video-generator` | (bundled with `npm create @editframe`) | Brand video generation template |
-| `ef-motion-design` | (bundled with `npm create @editframe`) | Motion design patterns |
+| `ef-brand-video-generator` | `editframe.com/skills/brand-video-generator.md` (fallback: `npm create @editframe` output) | Brand video generation template |
+| `ef-motion-design` | `editframe.com/skills/motion-design.md` (fallback: `npm create @editframe` output) | Motion design patterns |
 
 Each skill is adapted:
 
-- **Frontmatter**: `name`, `description`, `invocation: user`, `category: fo`, `concerns: read-only`, `dependsOn: []`, `languagePolicy: ref(PREFERENCES.md)`
+- **Frontmatter**: `name`, `description`, `invocation: user`, `category: fo`, `concerns`, `dependsOn: []`, `languagePolicy: ref(PREFERENCES.md)`, `triggers`
+- **`concerns`**: `read-only` for reference skills (`ef-dev-server`, `ef-editor-gui`, `ef-webhooks`, `ef-motion-design`); `content-mutation` for skills that guide operators to create composition files (`ef-composition`, `ef-brand-video-generator`)
+- **`triggers`**: Each skill declares trigger phrases for intent-to-skill routing (e.g. `ef-composition` → "create a video composition", `ef-dev-server` → "set up editframe dev server")
 - **SKILL-17**: `<!-- skill-lint-disable SKILL-17 -->` added — skills reference Editframe-specific concepts
 - **SKILL-11**: Instruction lines that hardcode commands are rewritten to use `ref()` bindings where applicable. Element names, hook names, and package names are factual domain knowledge — retained.
-- **SKILL-12**: `concerns: read-only` for all 6 skills
+- **SKILL-12**: `concerns` field uses the four-level taxonomy (`read-only` or `content-mutation` per skill)
 
 ### ef-onboard skill updates
 
@@ -253,6 +262,7 @@ Each skill is adapted:
 | `packages/forge/skills/fo/ef-onboard/SKILL.md` | Updated — remove `npm create @editframe`, remove stack question |
 | `packages/forge/skills/fo/ef-composition-review/SKILL.md` | Updated — React support |
 | `packages/forge/skills/fo/ef-render-verify/SKILL.md` | Updated — React support |
+| `packages/forge/package.json` | No change — `files: ["profiles/"]` already covers the renamed `editframe-templates/` directory |
 
 ### Output format
 
@@ -322,7 +332,7 @@ No command output changes — `forge doctor` and `forge profile.validate` produc
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- When vendoring Editframe skills, agents MUST fetch the latest content from `https://editframe.com/skills/<name>.md` and adapt frontmatter to Forge skill schema. Do not copy content from `npm create @editframe` output — use the canonical source URLs.
+- When vendoring Editframe skills, agents MUST fetch the latest content from `https://editframe.com/skills/<name>.md` for skills with canonical URLs (`ef-composition`, `ef-dev-server`, `ef-editor-gui`, `ef-webhooks`). For skills without a confirmed canonical URL (`ef-brand-video-generator`, `ef-motion-design`), agents MUST first try `https://editframe.com/skills/<name>.md`; if the URL is unavailable, use `npm create @editframe` output as the source. In all cases, adapt frontmatter to Forge skill schema.
 - When adapting skills for SKILL-11, agents MUST distinguish between project-specific literals (commands, paths — must use `ref()` bindings) and domain knowledge (element names, hook names, package names — retained as factual content). Element names like `ef-timegroup`, `Timegroup`, `TimelineRoot` are domain knowledge, not project-specific literals.
 - The profile rename from `editframe-html` to `editframe` is a file-level rename. Agents MUST use `git mv` to preserve history.
-- The `html-attribute-pattern` → `attribute-pattern` change is a breaking schema change within `forge/stack-profile@1`. This is acceptable because the only consumer (`editframe-html.yaml`) is being replaced in the same RFC. Agents MUST NOT add backward compatibility for `html-attribute-pattern`.
+- The `html-attribute-pattern` → `attribute-pattern` change is a breaking schema change within `forge/stack-profile@1`. The `versionBump` is `minor` (Breaks-B) because external npm consumers who created profiles using `html-attribute-pattern` (published in RFC-0691) will experience a breaking change. Agents MUST NOT add backward compatibility for `html-attribute-pattern`.
