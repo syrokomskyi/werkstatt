@@ -235,11 +235,11 @@ if (existsSync(axiomCacheDir)) {
 
 ## Acceptance criteria
 
-- [ ] `leitstand.dev-deploy` clears Axiom cache directory before `mission.check`
-- [ ] `leitstand.dev-deploy` auto-regenerates behavior snapshot when `behavior.snapshot.validate` fails with SNAP-01
-- [ ] `leitstand.dev-deploy` re-validates behavior snapshot after regeneration and blocks if re-validation fails
-- [ ] No manual `--no-cache` flag or `behavior.snapshot.generate` invocation needed after code changes affecting baked pages
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `leitstand.dev-deploy` clears Axiom cache directory before `mission.check` (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1010-1022, test: leitstand-0689-cache-snapshot.test.ts "clears Axiom browser evidence cache before mission.check")
+- [x] `leitstand.dev-deploy` auto-regenerates behavior snapshot when `behavior.snapshot.validate` fails with SNAP-01 (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:769-816, test: leitstand-0689-cache-snapshot.test.ts "auto-regenerates snapshot and re-runs build when SNAP-01 detected on build failure")
+- [x] `leitstand.dev-deploy` re-validates behavior snapshot after regeneration and blocks if re-validation fails (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:791-849 — re-runs pnpm build; if re-build fails, snapshotRegenerated stays false and early return blocks pipeline)
+- [x] No manual `--no-cache` flag or `behavior.snapshot.generate` invocation needed after code changes affecting baked pages (evidence: cache clearing is automatic at leitstand-commands.ts:1010-1022; snapshot regeneration is automatic at leitstand-commands.ts:769-816 and 747-777)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0689 --json returned zero violations on 2026-08-05)
 
 ## Implementation notes for agents
 
