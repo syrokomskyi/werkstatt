@@ -24,6 +24,7 @@
   <item>RFC-0665: add methodologies.validate pre-flight to dev-deploy; fail fast on invalid methodologies config before build+deploy cycle.</item>
   <item>RFC-0668: wrap mission.check call with 15-min per-attempt timeout (MISSION_CHECK_TIMEOUT_MS) and one-time retry on infrastructure errors (exit 2 or any non-0/non-1); pass --max-duration to mission.check; worst-case total 30 min with retry.</item>
   <item>Add --no-report flag (default true) to runMissionCheckWithResilience to suppress report.html generation in mission.check; axiom.report is auto-invoked separately in leitstand.dev-deploy, preventing double-write.</item>
+  <item>RFC-0689: clear Axiom browser evidence cache before mission.check; auto-regenerate behavior snapshot on SNAP-01 when pnpm build fails; check stale snapshot when build is skipped (RFC-0653).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -1005,6 +1006,29 @@ export async function runLeitstandDevDeploy(
     logger.info(
       `[leitstand.dev-deploy] freshness verified (distTreeHash: ${distTreeHash.slice(0, 12)}...)`,
     );
+  }
+
+  // RFC-0689: Clear Axiom browser evidence cache before mission.check to ensure
+  // fresh Playwright captures from the current deploy (not stale cached pages).
+  const axiomCacheDir = path.join(
+    workspaceRoot,
+    "missions",
+    missionId,
+    "evidence",
+    "axiom",
+    ".cache",
+  );
+  if (existsSync(axiomCacheDir)) {
+    try {
+      await fs.rm(axiomCacheDir, { recursive: true, force: true });
+      logger.info(
+        "[leitstand.dev-deploy] Cleared Axiom browser evidence cache before mission.check",
+      );
+    } catch (cacheErr) {
+      logger.warn(
+        `[leitstand.dev-deploy] Axiom cache clearing failed (non-fatal): ${cacheErr instanceof Error ? cacheErr.message : String(cacheErr)}`,
+      );
+    }
   }
 
   // Step 5: Run Axiom verification gate via mission.check --external-preview
