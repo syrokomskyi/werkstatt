@@ -25,6 +25,7 @@
   <item>RFC-0644: replace isWorkpieceDirty blocking guard with commitWorkpieceIfDirty auto-commit call before git fetch; add workpieceAutoCommitted/workpieceCommitSha to MissionReconcileData; update mission.validate dirty warnings.</item>
   <item>RFC-0689: extract shared autoRegenerateSnapshotOnSnap01 helper into snapshot-auto-regen.ts for reuse by leitstand.dev-deploy.</item>
   <item>RFC-0697: refactor mission.validate SNAP-01 path to use shared orchestrateSnap01Recovery helper; dirtyBeforeBuildPost check remains caller-side.</item>
+  <item>RFC-0702: add commitBordbuchProjections cleanup call in distribution reuse path to clean dirty bordbuch files from previous runs.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -54,6 +55,7 @@ import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 import { orchestrateSnap01Recovery } from "./snapshot-auto-regen.ts";
+import { commitBordbuchProjections } from "../bordbuch/bordbuch-commit.ts";
 
 const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
 
@@ -284,6 +286,20 @@ export async function runMissionValidate(
           logger.warn(
             `[mission.validate] workpiece has ${dirtyCheck.fileCount} uncommitted file(s) — reconcile will auto-commit these before merge. Run \`git status\` to review.`,
           );
+        }
+
+        // RFC-0702: clean up dirty bordbuch files from a previous run.
+        // The reuse path skips build.prepare, so bordbuch.commit does not run.
+        // Call commitBordbuchProjections directly to keep the cache clone clean.
+        try {
+          const bordbuchResult = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
+          if (bordbuchResult.committed) {
+            logger.info(
+              `  Bordbuch cleanup: committed ${bordbuchResult.filesCommitted.length} file(s) from previous run`,
+            );
+          }
+        } catch {
+          // Non-fatal — reuse path continues regardless
         }
 
         const reuseNextSteps = buildValidateNextSteps(missionId, dirtyCheck);

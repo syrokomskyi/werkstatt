@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0626: initial bordbuch.commit command handler.</item>
   <item>RFC-0646: replace all gitExec calls with gitExecWithRetry for transient-failure resilience.</item>
+  <item>RFC-0702: wrap all gitExecWithRetry calls in try/catch — git failures return error result instead of throwing; add error field to BordbuchCommitResult; add logger.warn in runBordbuchCommit on git failure.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -36,6 +37,7 @@ export interface BordbuchCommitResult {
   commitSha: string | null;
   systemId: string;
   filesCommitted: string[];
+  error?: string;
 }
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
@@ -54,38 +56,48 @@ export async function commitBordbuchProjections(
     return { committed: false, commitSha: null, systemId, filesCommitted: [] };
   }
 
-  const status = await gitExecWithRetry(cachePath, "status --porcelain", BORDBUCH_RETRY_OPTIONS, {
-    allowNonZero: true,
-  });
-  if (!status) {
-    return { committed: false, commitSha: null, systemId, filesCommitted: [] };
+  try {
+    const status = await gitExecWithRetry(cachePath, "status --porcelain", BORDBUCH_RETRY_OPTIONS, {
+      allowNonZero: true,
+    });
+    if (!status) {
+      return { committed: false, commitSha: null, systemId, filesCommitted: [] };
+    }
+
+    const dirtyFiles = status
+      .split("\n")
+      .filter((line) => line.trim().length > 0)
+      .map((line) => line.slice(3).trim());
+
+    const bordbuchDirty = dirtyFiles.filter((f) =>
+      BORDBUCH_PROJECTION_PATHS.some((p) => f === p || f.startsWith(p)),
+    );
+
+    if (bordbuchDirty.length === 0) {
+      return { committed: false, commitSha: null, systemId, filesCommitted: [] };
+    }
+
+    const addArgs = bordbuchDirty.map((f) => `"${f}"`).join(" ");
+    await gitExecWithRetry(cachePath, `add -- ${addArgs}`, BORDBUCH_RETRY_OPTIONS);
+
+    await gitExecWithRetry(
+      cachePath,
+      'commit -m "chore: bordbuch projections from build.prepare"',
+      BORDBUCH_RETRY_OPTIONS,
+    );
+
+    const sha = await gitExecWithRetry(cachePath, "rev-parse HEAD", BORDBUCH_RETRY_OPTIONS);
+
+    return { committed: true, commitSha: sha, systemId, filesCommitted: bordbuchDirty };
+  } catch (err) {
+    return {
+      committed: false,
+      commitSha: null,
+      systemId,
+      filesCommitted: [],
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
-
-  const dirtyFiles = status
-    .split("\n")
-    .filter((line) => line.trim().length > 0)
-    .map((line) => line.slice(3).trim());
-
-  const bordbuchDirty = dirtyFiles.filter((f) =>
-    BORDBUCH_PROJECTION_PATHS.some((p) => f === p || f.startsWith(p)),
-  );
-
-  if (bordbuchDirty.length === 0) {
-    return { committed: false, commitSha: null, systemId, filesCommitted: [] };
-  }
-
-  const addArgs = bordbuchDirty.map((f) => `"${f}"`).join(" ");
-  await gitExecWithRetry(cachePath, `add -- ${addArgs}`, BORDBUCH_RETRY_OPTIONS);
-
-  await gitExecWithRetry(
-    cachePath,
-    'commit -m "chore: bordbuch projections from build.prepare"',
-    BORDBUCH_RETRY_OPTIONS,
-  );
-
-  const sha = await gitExecWithRetry(cachePath, "rev-parse HEAD", BORDBUCH_RETRY_OPTIONS);
-
-  return { committed: true, commitSha: sha, systemId, filesCommitted: bordbuchDirty };
 }
 
 export async function runBordbuchCommit(
@@ -110,6 +122,14 @@ export async function runBordbuchCommit(
     return {
       data: result,
       summary: `[bordbuch.commit] committed ${result.filesCommitted.length} bordbuch projection files for ${systemId}`,
+    };
+  }
+
+  if (!result.committed && result.error) {
+    logger.warn(`[bordbuch.commit] git operation failed for ${systemId}: ${result.error}`);
+    return {
+      data: result,
+      summary: `[bordbuch.commit] git operation failed for ${systemId}: ${result.error}`,
     };
   }
 
