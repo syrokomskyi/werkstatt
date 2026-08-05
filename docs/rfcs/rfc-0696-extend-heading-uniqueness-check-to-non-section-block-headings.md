@@ -16,6 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -142,6 +143,38 @@ function findBlockElementsWithAriaLabelledby(
   }
   return results;
 }
+
+// Heading extraction must skip child block elements to prevent
+// double-counting the same heading element. See "Nested block
+// double-counting" in Failure modes.
+function findFirstHeadingSkippingChildBlocks(
+  node: TreeParentNode,
+  tagNames: Set<string>,
+): TreeElementNode | null {
+  const children = node.childNodes;
+  if (!children) return null;
+  for (const child of children) {
+    if (isElementNode(child) && tagNames.has(child.tagName)) {
+      return child;
+    }
+    // Skip child block elements (section, div, article, aside with
+    // aria-labelledby) — their headings are counted separately.
+    if (isElementNode(child) && BLOCK_TAGS.has(child.tagName)) {
+      const attrs = child.attrs ?? [];
+      const hasAriaLabelledby = attrs.some(
+        (a) => a.name === "aria-labelledby",
+      );
+      if (hasAriaLabelledby || child.tagName === "section") {
+        continue;
+      }
+    }
+    if (hasChildNodes(child)) {
+      const found = findFirstHeadingSkippingChildBlocks(child, tagNames);
+      if (found) return found;
+    }
+  }
+  return null;
+}
 ```
 
 The existing `findAllSections` function is replaced by `findBlockElementsWithAriaLabelledby`, which includes:
@@ -149,22 +182,26 @@ The existing `findAllSections` function is replaced by `findBlockElementsWithAri
 - All `<section>` elements (always checked, regardless of `aria-labelledby`)
 - `<div>`, `<article>`, `<aside>` elements with `aria-labelledby` attribute
 
+The exported `extractSectionHeadings` function is renamed to `extractBlockHeadings` to reflect the broader scan scope. The test file imports `extractSectionHeadings` by name — the import must be updated to `extractBlockHeadings`.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-checks/src/surface-heading-uniqueness.ts` | Modified: extend scan to non-section blocks with `aria-labelledby` |
-| `packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts` | Modified: add test cases for non-section block headings |
+| `packages/os/site-kernel-checks/src/surface-heading-uniqueness.ts` | Modified: extend scan to non-section blocks with `aria-labelledby`; rename `extractSectionHeadings` → `extractBlockHeadings`; replace `findAllSections` with `findBlockElementsWithAriaLabelledby`; add `findFirstHeadingSkippingChildBlocks` to prevent nested block double-counting; update `MODULE_CONTRACT` non-goal from "Do not check non-section headings" to "Do not check headings outside block-level elements with `aria-labelledby`"; update diagnostic message from "section heading" to "block heading"; update `fixHint` to be context-neutral |
+| `packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts` | Modified: update import from `extractSectionHeadings` to `extractBlockHeadings`; add test cases for non-section block headings (duplicate, unique, no `aria-labelledby`, nested block double-counting prevention) |
+| `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts` | Modified: update `HEADING-UNIQ-01` rule description from "Duplicate section heading text on the same surface page" to "Duplicate block heading text on the same surface page" |
 
 ### Output format
 
-Unchanged. Same HEADING-UNIQ-01 diagnostic with the same fields.
+Same `Diagnostic[]` shape as RFC-0690. The diagnostic message text is updated from `Duplicate section heading "${headingText}" appears ${count} times on ${route}` to `Duplicate block heading "${headingText}" appears ${count} times on ${route}` to reflect the broader scan scope. The `fixHint` is updated from `"Use distinct labels for each block in the bake function — see SURFACE_LABELS in bake-helpers.ts"` to `"Use distinct heading text for each block-level element with aria-labelledby on this page"` — the original fixHint assumed bake function labels, but non-section blocks may come from custom HTML, not bake functions.
 
 ### Failure modes
 
 - **HEADING-UNIQ-01 (error):** Same as RFC-0690 — duplicate heading text in block-level elements with `aria-labelledby` is an error.
 - **False positive — card grid titles:** A card grid may have multiple cards with the same title inside `<div>` wrappers. However, card titles are typically `<h3>` or `<h4>` inside individual card components, not the first heading of a block with `aria-labelledby`. The `aria-labelledby` requirement filters out most non-landmark blocks.
-- **Nested blocks:** If a `<section>` contains a `<div>` with `aria-labelledby`, both are scanned. The `<section>` heading is counted first, then the `<div>` heading. If they share the same text, HEADING-UNIQ-01 fires.
+- **Nested block double-counting (prevented):** If a `<section>` contains a `<div>` with `aria-labelledby`, both are scanned as separate blocks. However, `findFirstHeadingSkippingChildBlocks` skips child block elements during heading extraction — the `<section>` heading is extracted from non-child-block descendants, and the `<div>` heading is extracted independently. Without this skip, `findFirstDescendantByTag` (DFS) would find the same heading element from both the section and the div, counting it twice and creating a false positive. The skip ensures each heading is counted exactly once, attributed to its nearest ancestor block.
+- **Nested blocks with shared text:** If a `<section>` and its child `<div aria-labelledby>` each have their own heading with the same normalized text, HEADING-UNIQ-01 fires — this is a real violation (two landmarks with the same accessible name), not a false positive.
 
 ## Rollout
 
@@ -201,5 +238,11 @@ Unchanged. Same HEADING-UNIQ-01 diagnostic with the same fields.
 - Agents MUST use `BLOCK_TAGS = new Set(["section", "div", "article", "aside"])` for the scan.
 - Agents MUST require `aria-labelledby` attribute on non-section block elements.
 - Agents MUST NOT scan `<div>` elements without `aria-labelledby` — they are layout wrappers, not landmarks.
-- Agents MUST add test cases for non-section blocks in `surface-heading-uniqueness.test.ts`.
+- Agents MUST use `findFirstHeadingSkippingChildBlocks` (not `findFirstDescendantByTag`) for heading extraction to prevent nested block double-counting.
+- Agents MUST rename `extractSectionHeadings` to `extractBlockHeadings` and update all imports in the test file.
+- Agents MUST update the `MODULE_CONTRACT` non-goal in `surface-heading-uniqueness.ts` from "Do not check non-section headings" to "Do not check headings outside block-level elements with `aria-labelledby`".
+- Agents MUST update the `HEADING-UNIQ-01` rule description in `content-surface.ts` from "section heading" to "block heading".
+- Agents MUST update the diagnostic message text from "section heading" to "block heading".
+- Agents MUST update the `fixHint` to be context-neutral (not bake-function-specific).
+- Agents MUST add test cases for non-section blocks in `surface-heading-uniqueness.test.ts`, including a nested block double-counting prevention test.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).

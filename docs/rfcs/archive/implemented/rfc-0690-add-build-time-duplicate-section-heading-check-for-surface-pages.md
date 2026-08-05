@@ -22,7 +22,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0696
 related:
   - RFC-0494
   - RFC-0496
