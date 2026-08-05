@@ -5,6 +5,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0379: initial adapter tests with stubbed CommandRunner.</item>
   <item>RFC-0623: add retry behavior tests (transient 5xx retry, auth error no-retry, success after retry, retries exhausted, rollback retry).</item>
+  <item>ADR-0027: add sourceDotenv empty-value skip tests.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -12,7 +13,10 @@ import { test, expect, vi, beforeEach, afterEach } from "vitest";
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { createCloudflareWorkersAdapter } from "../leitstand/adapters/cloudflare-workers.ts";
+import {
+  createCloudflareWorkersAdapter,
+  sourceDotenv,
+} from "../leitstand/adapters/cloudflare-workers.ts";
 import type { CommandRunner } from "../leitstand/adapter.ts";
 
 function stubRunner(exitCode: number, stdout: string, stderr: string = ""): CommandRunner {
@@ -272,4 +276,56 @@ test("RFC-0623: rollback retries on transient 502 error then succeeds", async ()
   expect(result.state).toBe("succeeded");
   expect((runner as unknown as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(2);
   vi.useRealTimers();
+});
+
+test("ADR-0027: sourceDotenv skips entries with empty values", async () => {
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "wg-test-adr27-"));
+  const envFile = path.join(tmpDir, ".env.alt");
+  await fs.writeFile(
+    envFile,
+    [
+      "CLOUDFLARE_ZONE_ID=",
+      "CLOUDFLARE_API_TOKEN=real-token",
+      "EMPTY_QUOTED=''",
+      'EMPTY_DOUBLE_QUOTED=""',
+      "# COMMENT_KEY=should-not-appear",
+      "ANOTHER_EMPTY=",
+      "REAL_VALUE=hello",
+    ].join("\n") + "\n",
+  );
+
+  const result = await sourceDotenv(envFile);
+
+  expect(result["CLOUDFLARE_API_TOKEN"]).toBe("real-token");
+  expect(result["REAL_VALUE"]).toBe("hello");
+  expect(result).not.toHaveProperty("CLOUDFLARE_ZONE_ID");
+  expect(result).not.toHaveProperty("EMPTY_QUOTED");
+  expect(result).not.toHaveProperty("EMPTY_DOUBLE_QUOTED");
+  expect(result).not.toHaveProperty("ANOTHER_EMPTY");
+  expect(result).not.toHaveProperty("COMMENT_KEY");
+
+  await fs.rm(tmpDir, { recursive: true, force: true });
+});
+
+test("ADR-0027: sourceDotenv empty-value skip allows process.env fallback in merge order", async () => {
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "wg-test-adr27-merge-"));
+  const envFile = path.join(tmpDir, ".env.alt");
+  await fs.writeFile(envFile, "CLOUDFLARE_ZONE_ID=\nCLOUDFLARE_API_TOKEN=from-dotenv\n");
+
+  const originalZoneId = process.env.CLOUDFLARE_ZONE_ID;
+  process.env.CLOUDFLARE_ZONE_ID = "from-process-env";
+
+  const secretsEnv = await sourceDotenv(envFile);
+  const { filterEnv } = await import("../leitstand/adapters/cloudflare-workers.ts");
+  const merged = { ...filterEnv(process.env), ...secretsEnv };
+
+  expect(merged["CLOUDFLARE_ZONE_ID"]).toBe("from-process-env");
+  expect(merged["CLOUDFLARE_API_TOKEN"]).toBe("from-dotenv");
+
+  if (originalZoneId !== undefined) {
+    process.env.CLOUDFLARE_ZONE_ID = originalZoneId;
+  } else {
+    delete process.env.CLOUDFLARE_ZONE_ID;
+  }
+  await fs.rm(tmpDir, { recursive: true, force: true });
 });

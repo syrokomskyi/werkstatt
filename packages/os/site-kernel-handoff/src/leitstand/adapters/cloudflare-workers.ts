@@ -11,6 +11,7 @@
   <item>RFC-0587: export filterEnv and sourceDotenv; add getLimits() for adapter-declared size limits.</item>
   <item>RFC-0595: verify redirect routes by HTTP status + Location header.</item>
   <item>RFC-0623: add runWranglerDeployWithRetry helper with transient error detection for wrangler deploy.</item>
+  <item>ADR-0027: sourceDotenv skips empty values to allow process.env fallback for placeholder entries.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -126,6 +127,7 @@ export async function sourceDotenv(filePath: string): Promise<Record<string, str
       .slice(eqIdx + 1)
       .trim()
       .replace(/^["']|["']$/g, "");
+    if (value === "") continue;
     env[key] = value;
   }
   return env;
