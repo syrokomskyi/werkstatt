@@ -801,14 +801,6 @@ export async function runLeitstandDevDeploy(
       logger.info(
         `[leitstand.dev-deploy] build completed in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
       );
-      // RFC-0653: Write build-skip cache after successful build
-      const buildCache = {
-        commitSha,
-        platformVersion,
-        platformSemanticHash,
-        writtenAt: new Date().toISOString(),
-      };
-      await fs.writeFile(buildCachePath, JSON.stringify(buildCache, null, 2) + "\n");
     } catch (err) {
       buildState = "failed";
       logger.warn(
@@ -850,14 +842,6 @@ export async function runLeitstandDevDeploy(
           logger.info(
             `[leitstand.dev-deploy] build passed after snapshot regeneration in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
           );
-          // RFC-0653: Write build-skip cache after successful re-build
-          const buildCache = {
-            commitSha,
-            platformVersion,
-            platformSemanticHash,
-            writtenAt: new Date().toISOString(),
-          };
-          await fs.writeFile(buildCachePath, JSON.stringify(buildCache, null, 2) + "\n");
         } else if (snapResult.regenerated && !snapResult.rebuildSucceeded) {
           logger.warn(
             `[leitstand.dev-deploy] build still failing after snapshot regeneration: ${snapResult.error ?? "unknown"}`,
@@ -938,6 +922,116 @@ export async function runLeitstandDevDeploy(
       exitCode: 1,
       summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
     };
+  }
+
+  // RFC-0698: Auto-commit workpiece after build completes, before distTreeHash computation.
+  // Uses mission.git.commit via executeKernelCommand for PASSPORT signing (RFC-0560) and
+  // pre-commit content validation (RFC-0594). If the commit fails, abort with fatal error.
+  try {
+    const { executeKernelCommand: executeCommit } = await import("@warpgogol/site-kernel");
+    const commitResult = (await executeCommit({
+      workspaceRoot,
+      commandName: "mission.git.commit",
+      argv: [
+        `--mission=${missionId}`,
+        "--message=chore: regenerate artifacts from dev-deploy build.prepare",
+      ],
+    })) as { exitCode?: number; summary?: string; data?: { committed?: boolean } };
+    if (commitResult.exitCode !== 0) {
+      // Fatal: abort deploy — do not proceed with stale commitSha
+      await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
+      return {
+        data: {
+          command: "leitstand.dev-deploy",
+          systemId,
+          missionId,
+          commitSha,
+          buildState,
+          buildSkipped,
+          deployState: "failed",
+          deploymentUrl: channelConfig.url,
+          buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
+          axiom: {
+            status: "not-run",
+            errors: 0,
+            warnings: 0,
+            exitCode: 0,
+            freshness: {
+              verified: false,
+              cdnDistTreeHash: null,
+              localDistTreeHash: "",
+              attempts: 0,
+              error: "auto-commit failed",
+            },
+          },
+          evidenceSynced: false,
+          evidenceSyncError: null,
+        },
+        exitCode: 1,
+        summary: `[leitstand.dev-deploy] ${systemId}: auto-commit failed — ${commitResult.summary ?? "mission.git.commit exited non-zero"}`,
+      };
+    }
+    // Re-read commitSha from workpiece HEAD after auto-commit
+    const preCommitSha = commitSha;
+    try {
+      commitSha = execSync("git rev-parse HEAD", {
+        cwd: workpiecePath,
+        encoding: "utf-8",
+        stdio: "pipe",
+      }).trim();
+    } catch {
+      logger.warn("[leitstand.dev-deploy] could not re-read workpiece HEAD sha after auto-commit");
+    }
+    if (commitSha !== preCommitSha) {
+      logger.info(`[leitstand.dev-deploy] auto-committed workpiece (${commitSha.slice(0, 8)})`);
+    } else {
+      logger.info(`[leitstand.dev-deploy] workpiece clean — no auto-commit needed`);
+    }
+  } catch (commitErr) {
+    // mission.git.commit not registered or crashed — fatal
+    await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
+    return {
+      data: {
+        command: "leitstand.dev-deploy",
+        systemId,
+        missionId,
+        commitSha,
+        buildState,
+        buildSkipped,
+        deployState: "failed",
+        deploymentUrl: channelConfig.url,
+        buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
+        axiom: {
+          status: "not-run",
+          errors: 0,
+          warnings: 0,
+          exitCode: 0,
+          freshness: {
+            verified: false,
+            cdnDistTreeHash: null,
+            localDistTreeHash: "",
+            attempts: 0,
+            error: "auto-commit crashed",
+          },
+        },
+        evidenceSynced: false,
+        evidenceSyncError: null,
+      },
+      exitCode: 1,
+      summary: `[leitstand.dev-deploy] ${systemId}: auto-commit crashed — ${commitErr instanceof Error ? commitErr.message : String(commitErr)}`,
+    };
+  }
+
+  // RFC-0653/RFC-0698: Write build-skip cache after auto-commit with post-commit commitSha.
+  // This prevents the auto-commit from invalidating the cache on the next dev-deploy.
+  if (buildState === "succeeded") {
+    const buildCache = {
+      commitSha,
+      platformVersion,
+      platformSemanticHash,
+      writtenAt: new Date().toISOString(),
+    };
+    await fs.writeFile(buildCachePath, JSON.stringify(buildCache, null, 2) + "\n");
   }
 
   // RFC-0634: Remove preliminary build-identity.json from dist/client/.well-known/ before hashing
