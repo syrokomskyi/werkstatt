@@ -183,7 +183,7 @@ test("RFC-0698: auto-commit failure aborts deploy with fatal error", async () =>
   createWorkpieceDist(tmpDir, missionId);
 
   commitMockExitCode = 1;
-  commitMockSummary = "mission.git.commit: nothing to commit";
+  commitMockSummary = "mission.git.commit: pre-commit validation failed";
 
   const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;

@@ -927,6 +927,39 @@ export async function runLeitstandDevDeploy(
   // RFC-0698: Auto-commit workpiece after build completes, before distTreeHash computation.
   // Uses mission.git.commit via executeKernelCommand for PASSPORT signing (RFC-0560) and
   // pre-commit content validation (RFC-0594). If the commit fails, abort with fatal error.
+  const makeAutoCommitError = (
+    errorType: string,
+    summary: string,
+  ): KernelCommandResult<DevDeployResult> => ({
+    data: {
+      command: "leitstand.dev-deploy",
+      systemId,
+      missionId,
+      commitSha,
+      buildState,
+      buildSkipped,
+      deployState: "failed",
+      deploymentUrl: channelConfig.url,
+      buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
+      axiom: {
+        status: "not-run",
+        errors: 0,
+        warnings: 0,
+        exitCode: 0,
+        freshness: {
+          verified: false,
+          cdnDistTreeHash: null,
+          localDistTreeHash: "",
+          attempts: 0,
+          error: errorType,
+        },
+      },
+      evidenceSynced: false,
+      evidenceSyncError: null,
+    },
+    exitCode: 1,
+    summary,
+  });
   try {
     const { executeKernelCommand: executeCommit } = await import("@warpgogol/site-kernel");
     const commitResult = (await executeCommit({
@@ -940,36 +973,10 @@ export async function runLeitstandDevDeploy(
     if (commitResult.exitCode !== 0) {
       // Fatal: abort deploy — do not proceed with stale commitSha
       await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
-      return {
-        data: {
-          command: "leitstand.dev-deploy",
-          systemId,
-          missionId,
-          commitSha,
-          buildState,
-          buildSkipped,
-          deployState: "failed",
-          deploymentUrl: channelConfig.url,
-          buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
-          axiom: {
-            status: "not-run",
-            errors: 0,
-            warnings: 0,
-            exitCode: 0,
-            freshness: {
-              verified: false,
-              cdnDistTreeHash: null,
-              localDistTreeHash: "",
-              attempts: 0,
-              error: "auto-commit failed",
-            },
-          },
-          evidenceSynced: false,
-          evidenceSyncError: null,
-        },
-        exitCode: 1,
-        summary: `[leitstand.dev-deploy] ${systemId}: auto-commit failed — ${commitResult.summary ?? "mission.git.commit exited non-zero"}`,
-      };
+      return makeAutoCommitError(
+        "auto-commit failed",
+        `[leitstand.dev-deploy] ${systemId}: auto-commit failed — ${commitResult.summary ?? "mission.git.commit exited non-zero"}`,
+      );
     }
     // Re-read commitSha from workpiece HEAD after auto-commit
     const preCommitSha = commitSha;
@@ -990,36 +997,10 @@ export async function runLeitstandDevDeploy(
   } catch (commitErr) {
     // mission.git.commit not registered or crashed — fatal
     await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
-    return {
-      data: {
-        command: "leitstand.dev-deploy",
-        systemId,
-        missionId,
-        commitSha,
-        buildState,
-        buildSkipped,
-        deployState: "failed",
-        deploymentUrl: channelConfig.url,
-        buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
-        axiom: {
-          status: "not-run",
-          errors: 0,
-          warnings: 0,
-          exitCode: 0,
-          freshness: {
-            verified: false,
-            cdnDistTreeHash: null,
-            localDistTreeHash: "",
-            attempts: 0,
-            error: "auto-commit crashed",
-          },
-        },
-        evidenceSynced: false,
-        evidenceSyncError: null,
-      },
-      exitCode: 1,
-      summary: `[leitstand.dev-deploy] ${systemId}: auto-commit crashed — ${commitErr instanceof Error ? commitErr.message : String(commitErr)}`,
-    };
+    return makeAutoCommitError(
+      "auto-commit crashed",
+      `[leitstand.dev-deploy] ${systemId}: auto-commit crashed — ${commitErr instanceof Error ? commitErr.message : String(commitErr)}`,
+    );
   }
 
   // RFC-0653/RFC-0698: Write build-skip cache after auto-commit with post-commit commitSha.
