@@ -16,6 +16,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0651: initial evidence.sync command handler.</item>
+  <item>ADR-0025: add periodic progress logging (30s heartbeat) during R2 upload loop.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -166,31 +167,54 @@ export async function runEvidenceSync(
 
     const client = createR2Client(r2Config);
 
-    for (const relPath of relativeFiles) {
-      const fullPath = path.join(evidenceDir, relPath);
-      const body = await fs.readFile(fullPath);
-      totalBytes += body.byteLength;
-      try {
-        await client.putObject({
-          key: r2KeyPrefix + relPath,
-          body: new Uint8Array(body),
-        });
-        uploadedFiles.push(relPath);
-      } catch (err) {
-        return {
-          data: {
-            missionId,
-            systemId,
-            runTimestamp,
-            r2KeyPrefix,
-            uploadedFiles,
-            skippedFiles,
-            totalBytes,
-            durationMs: Date.now() - startTime,
-          },
-          exitCode: 1,
-          summary: `[evidence.sync] R2_UPLOAD_ERROR: failed to upload '${relPath}': ${err}`,
-        };
+    context.logger.info(
+      `[evidence.sync] uploading ${relativeFiles.length} files to R2 prefix ${r2KeyPrefix}`,
+    );
+
+    // ADR-0025: progress heartbeat — log every 30s during silent upload loops.
+    let lastProgressIndex = 0;
+    const heartbeat = setInterval(() => {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(0);
+      context.logger.info(
+        `[evidence.sync] still uploading — ${uploadedFiles.length}/${relativeFiles.length} files done (${elapsed}s elapsed)`,
+      );
+      lastProgressIndex = uploadedFiles.length;
+    }, 30_000);
+
+    try {
+      for (const relPath of relativeFiles) {
+        const fullPath = path.join(evidenceDir, relPath);
+        const body = await fs.readFile(fullPath);
+        totalBytes += body.byteLength;
+        try {
+          await client.putObject({
+            key: r2KeyPrefix + relPath,
+            body: new Uint8Array(body),
+          });
+          uploadedFiles.push(relPath);
+        } catch (err) {
+          return {
+            data: {
+              missionId,
+              systemId,
+              runTimestamp,
+              r2KeyPrefix,
+              uploadedFiles,
+              skippedFiles,
+              totalBytes,
+              durationMs: Date.now() - startTime,
+            },
+            exitCode: 1,
+            summary: `[evidence.sync] R2_UPLOAD_ERROR: failed to upload '${relPath}': ${err}`,
+          };
+        }
+      }
+    } finally {
+      clearInterval(heartbeat);
+      if (uploadedFiles.length > lastProgressIndex) {
+        context.logger.info(
+          `[evidence.sync] upload loop complete — ${uploadedFiles.length}/${relativeFiles.length} files`,
+        );
       }
     }
   } else {
