@@ -110,6 +110,18 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - The `command_results_meta` namespace uses the same `CacheLayer` interface as `command_results`. Keys are `meta:<commandName>:<siteName>:<metadataHash>`.
 - Tree index construction failures are non-fatal — the pipeline falls back to per-command filesystem walks when `treeIndex` is `undefined`.
 
+## Pipeline dependency graph (RFC-0686)
+
+- `src/runtime/pipeline-scheduler.ts` — dependency-aware pipeline scheduler. Exports `buildSchedule`, `executeScheduledSteps`, `ScheduledStep`, `StepExecutionResult`, `ScheduleError`.
+- `KernelPipelineStep` has an optional `dependsOn?: string[]` field. When absent, the step depends on the previous non-skipped step (backward-compatible sequential behavior). When `[]`, the step has no dependencies and may start immediately. When `["cmd.a", "cmd.b"]`, the step waits for those commands to complete.
+- `ExecuteKernelPipelineOptions` has an optional `concurrency?: number` field. Default: `Math.min(os.availableParallelism(), 8)`. When `1`, full sequential mode (ignores `dependsOn`, abort-on-failure).
+- `buildSchedule` throws `ScheduleError` on forward references, missing references, duplicate command names, and circular dependencies.
+- `executeScheduledSteps` runs steps concurrently up to the concurrency limit. Failed steps cause transitive dependents to be skipped with `dependencySkipped: true`. Results are sorted by `stepIndex` (declaration order).
+- `KernelPipelineTimingSummary` includes both `totalDurationMs` (wall-clock) and `summedDurationMs` (sum of per-step durations). For sequential execution they are equal; for parallel execution `summedDurationMs` > `totalDurationMs`.
+- `TelemetryMutex` serializes `appendStepTelemetry` calls via a promise-chain to prevent concurrent read-modify-write on the NDJSON telemetry file.
+- CLI: `--concurrency N` flag on `site-kernel pipeline <name>` sets the concurrency limit.
+- `pipeline.dependencies.validate` command (in `@warpgogol/site-kernel-checks`) validates all standard leaf pipelines for missing references, forward references, duplicate command names, and circular dependencies.
+
 ## Change impact (RFC-0332)
 
 - `src/change-impact.ts` — pure classifier (`classifyPaths`), app derivation (`deriveImpactedApps`), profile recommender (`recommendProfile`), and command handler (`runChangeImpactDerive`).
