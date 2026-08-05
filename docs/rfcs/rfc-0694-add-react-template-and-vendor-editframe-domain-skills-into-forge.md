@@ -304,27 +304,27 @@ No command output changes — `forge doctor` and `forge profile.validate` produc
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/profiles/editframe.yaml` exists with `id: editframe`, `displayName: Editframe Video`, React template in `firstWorkspace`
-- [ ] `packages/forge/profiles/editframe-html.yaml` is deleted
-- [ ] `packages/forge/profiles/editframe-templates/composition.tsx` exists with `TimelineRoot`, `Timegroup`, `Video`, `Text`, `Audio`, `Captions` from `@editframe/react`
-- [ ] `packages/forge/profiles/editframe-templates/composition-agents.md` references React components and `@editframe/react`
-- [ ] `profileInvariantCheckSchema` includes `attribute-pattern` in the enum and `elements: z.array(z.string()).optional()` field; `html-attribute-pattern` is removed
-- [ ] `ProfileInvariantCheck` interface uses `elements?: string[]` instead of `element?: string`
-- [ ] `invariant-engine.ts` implements `attribute-pattern` case that iterates `elements` array and builds element name alternation regex
-- [ ] `invariant-engine.ts` no longer has `html-attribute-pattern` case
-- [ ] All VIDEO-01..09 invariants in `editframe.yaml` use `compositions/**/*.tsx` glob and `elements: [ef-timegroup, Timegroup]` where applicable
-- [ ] 6 new skill directories exist: `ef-composition/`, `ef-dev-server/`, `ef-editor-gui/`, `ef-webhooks/`, `ef-brand-video-generator/`, `ef-motion-design/` — each with `SKILL.md` passing `forge.skill.validate`
-- [ ] `ef-onboard/SKILL.md` does not contain `npm create @editframe`
-- [ ] `ef-onboard/SKILL.md` does not contain a stack preference question
-- [ ] `ef-composition-review/SKILL.md` references `.tsx` files and React components
-- [ ] `ef-render-verify/SKILL.md` references `compositions/**/*.tsx` for determinism inputs
-- [ ] `editframe-profile.test.ts` updated to load `editframe.yaml` and verify React template fields
-- [ ] `invariant-engine.test.ts` updated with `attribute-pattern` test cases using `elements` array
-- [ ] `invariant-engine.test.ts` has a test case for JSX syntax (`<Timegroup duration="5s">`) passing `attribute-pattern` check
-- [ ] `packages/forge/AGENTS.md` updated to reference `editframe` profile
-- [ ] `forge build:check` passes for `packages/forge`
-- [ ] `forge test` passes for `packages/forge`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/profiles/editframe.yaml` exists with `id: editframe`, `displayName: Editframe Video`, React template in `firstWorkspace` (evidence: packages/forge/profiles/editframe.yaml:2-3,325-369)
+- [x] `packages/forge/profiles/editframe-html.yaml` is deleted (evidence: git mv in commit 2d067084, file absent)
+- [x] `packages/forge/profiles/editframe-templates/composition.tsx` exists with `TimelineRoot`, `Timegroup`, `Video`, `Text`, `Audio`, `Captions` from `@editframe/react` (evidence: packages/forge/profiles/editframe-templates/composition.tsx:12)
+- [x] `packages/forge/profiles/editframe-templates/composition-agents.md` references React components and `@editframe/react` (evidence: packages/forge/profiles/editframe-templates/composition-agents.md)
+- [x] `profileInvariantCheckSchema` includes `attribute-pattern` in the enum and `elements: z.array(z.string()).optional()` field; `html-attribute-pattern` is removed (evidence: packages/forge/src/profiles/profile-schema.ts:123,127)
+- [x] `ProfileInvariantCheck` interface uses `elements?: string[]` instead of `element?: string` (evidence: packages/forge/src/profiles/profile-schema.ts:145)
+- [x] `invariant-engine.ts` implements `attribute-pattern` case that iterates `elements` array and builds element name alternation regex (evidence: packages/forge/src/onboarding/invariant-engine.ts:180-194)
+- [x] `invariant-engine.ts` no longer has `html-attribute-pattern` case (evidence: no occurrences in source, only in CHANGE_SUMMARY comment)
+- [x] All VIDEO-01..09 invariants in `editframe.yaml` use `compositions/**/*.tsx` glob and `elements: [ef-timegroup, Timegroup]` where applicable (evidence: packages/forge/profiles/editframe.yaml:67,74,81,88,95-98,106-109,117-120,128,134-138)
+- [x] 6 new skill directories exist: `ef-composition/`, `ef-dev-server/`, `ef-editor-gui/`, `ef-webhooks/`, `ef-brand-video-generator/`, `ef-motion-design/` — each with `SKILL.md` passing `forge.skill.validate` (evidence: forge.skill.validate reports 0 violations)
+- [x] `ef-onboard/SKILL.md` does not contain `npm create @editframe` (evidence: grep returns 0 matches in ef-onboard/SKILL.md)
+- [x] `ef-onboard/SKILL.md` does not contain a stack preference question (evidence: removed in commit a26db18d)
+- [x] `ef-composition-review/SKILL.md` references `.tsx` files and React components (evidence: packages/forge/skills/fo/ef-composition-review/SKILL.md:21,27,33)
+- [x] `ef-render-verify/SKILL.md` references `compositions/**/*.tsx` for determinism inputs (evidence: packages/forge/skills/fo/ef-render-verify/SKILL.md:21)
+- [x] `editframe-profile.test.ts` updated to load `editframe.yaml` and verify React template fields (evidence: packages/forge/src/tests/editframe-profile.test.ts:16,18-20)
+- [x] `invariant-engine.test.ts` updated with `attribute-pattern` test cases using `elements` array (evidence: packages/forge/os/core/handlers/invariant-engine.test.ts)
+- [x] `invariant-engine.test.ts` has a test case for JSX syntax (`<Timegroup duration="5s">`) passing `attribute-pattern` check (evidence: packages/forge/os/core/handlers/invariant-engine.test.ts JSX test case)
+- [x] `packages/forge/AGENTS.md` updated to reference `editframe` profile (evidence: packages/forge/AGENTS.md:120)
+- [x] `forge build:check` passes for `packages/forge` (evidence: tsc --noEmit exit 0, 2026-08-05)
+- [x] `forge test` passes for `packages/forge` (evidence: 626/626 tests pass, 2026-08-05)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0694 exit 0, 2026-08-05)
 
 ## Implementation notes for agents
 
