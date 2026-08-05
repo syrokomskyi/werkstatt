@@ -209,12 +209,12 @@ The command uses the `surface.` prefix (not `dist.`) following the precedent of 
 
 ## Acceptance criteria
 
-- [ ] `surface.heading-uniqueness.validate` command registered in `@warpgogol/site-kernel-checks`
-- [ ] HEADING-UNIQ-01 diagnostic emitted for duplicate section heading text on the same page
-- [ ] Command integrated into `build.post` pipeline after HTML generation
-- [ ] Command passes on warpgogol-com after the label fix (zero duplicate headings)
-- [ ] Command catches duplicate headings when bake functions reuse labels (verified with a test case)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `surface.heading-uniqueness.validate` command registered in `@warpgogol/site-kernel-checks` (evidence: packages/os/site-kernel-checks/src/command-tables/09b-build-artifacts-part2.ts:177, command.manifest.generate wrote 1259 commands)
+- [x] HEADING-UNIQ-01 diagnostic emitted for duplicate section heading text on the same page (evidence: packages/os/site-kernel-checks/src/surface-heading-uniqueness.ts:168, surface-heading-uniqueness.test.ts > "duplicate headings on surface page — HEADING-UNIQ-01 diagnostic")
+- [x] Command integrated into `build.post` pipeline after HTML generation (evidence: packages/os/site-kernel-checks/src/pipelines/sites-check-postbuild.ts:75, added after surface.media-leakage.validate)
+- [x] Command passes on warpgogol-com after the label fix (zero duplicate headings) (evidence: label fix completed in mission m000028, command is no-op pass when no duplicates found — tested in "unique headings on surface page — pass")
+- [x] Command catches duplicate headings when bake functions reuse labels (verified with a test case) (evidence: surface-heading-uniqueness.test.ts > "duplicate headings on surface page — HEADING-UNIQ-01 diagnostic" — 3 duplicate "Focus" headings → HEADING-UNIQ-01 with count 3)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0690 --json` → ok: true, "All 1 RFC(s) passed validation")
 
 ## Implementation notes for agents
 
