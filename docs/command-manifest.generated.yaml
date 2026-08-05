@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 406ccccc39bdde38c218e49ad43264b970b330ec3f321e39176dac5a712086c6
+  contentHash: a5e064b0cdc6147b32c380c65189b91d25ac0df817718c5698934495547ca536
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -20578,9 +20578,10 @@ commands:
       - build.prepare
       - build.prepare.dev
   - name: surface.heading-uniqueness.validate
-    description: "RFC-0690: scan rendered surface page HTML for duplicate section
-      heading text (first <h2>/<h3> child of each <section>). Fails on
-      duplicates to catch bake function label reuse before the Axiom gate."
+    description: "RFC-0690, RFC-0696: scan rendered surface page HTML for duplicate
+      block heading text (first <h2>/<h3> of each <section> or
+      <div>/<article>/<aside> with aria-labelledby). Fails on duplicates to
+      catch bake function label reuse before the Axiom gate."
     scope: app
     provider: site:warpgogol-com
     module: check
@@ -20597,9 +20598,10 @@ commands:
       - build.post
       - check
   - name: surface.heading-uniqueness.validate
-    description: "RFC-0690: scan rendered surface page HTML for duplicate section
-      heading text (first <h2>/<h3> child of each <section>). Fails on
-      duplicates to catch bake function label reuse before the Axiom gate."
+    description: "RFC-0690, RFC-0696: scan rendered surface page HTML for duplicate
+      block heading text (first <h2>/<h3> of each <section> or
+      <div>/<article>/<aside> with aria-labelledby). Fails on duplicates to
+      catch bake function label reuse before the Axiom gate."
     scope: app
     provider: workspace
     module: check
