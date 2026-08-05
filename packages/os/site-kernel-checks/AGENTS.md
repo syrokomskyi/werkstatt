@@ -190,6 +190,10 @@ Root `.env.example` (at the werkstatt repository root) is hand-maintained — NO
 2. **Add the variable to the `HOW_TO_OBTAIN` map** in `src/env/env-example.ts` — this ensures the generator produces correct instructions if the variable ever appears in a generated site `.env.example`.
 3. **The pre-commit hook** in `hooks/pre-commit` checks ENV-CONTRACT-05 compliance for all staged `.env.example` files — violations block the commit.
 
+## modulePaths annotation convention (ADR-0024)
+
+When annotating commands with `modulePaths` for granular module hashing, trace handler imports through re-export shims to the actual handler file. For example, `src/structure.ts` is a thin re-export shim over `src/structure/{mirror-triad,dispatcher-sync,...}.ts` — `modulePaths` must reference the actual handler file (e.g. `"structure/mirror-triad.ts"`), not the shim (e.g. `"structure.ts"`). This ensures `computeModuleHash` fingerprints only the files that contain the handler logic.
+
 ## Architecture reference
 
 → `packages/os/site-kernel/AGENTS.md` — kernel architecture table  
