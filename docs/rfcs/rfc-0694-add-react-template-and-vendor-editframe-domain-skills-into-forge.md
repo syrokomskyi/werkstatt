@@ -23,6 +23,7 @@ amends: []
 amendedBy: []
 related:
   - DNA-54
+  - ADR-0021
   - RFC-0641
   - RFC-0691
   - RFC-0692

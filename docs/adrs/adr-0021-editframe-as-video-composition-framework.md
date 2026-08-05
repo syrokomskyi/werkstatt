@@ -1,11 +1,11 @@
 ---
 id: ADR-0021
 title: "Profile-driven video lifecycle — Editframe as first profile"
-status: proposed
+status: accepted
 scope: workspace
 decider: architecture
 createdAt: 2026-08-04
-updatedAt: 2026-08-04
+updatedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -18,11 +18,13 @@ related:
   - RFC-0642
   - RFC-0674
   - RFC-0675
-  - RFC-0676
   - RFC-0677
   - RFC-0678
   - RFC-0679
-reviewers: []
+  - RFC-0680
+  - RFC-0694
+reviewers:
+  - human:andrii-syrokomskyi
 ---
 
 # ADR-0021: Profile-driven video lifecycle — Editframe as first profile
@@ -66,4 +68,4 @@ Forge gains **profile-driven lifecycle commands** that are fully generic — the
 - If a profile needs lifecycle behavior that the generic commands cannot express (e.g. multi-stage render pipelines), a new RFC extends the profile schema with the needed fields.
 - If Editframe introduces breaking changes to its CLI or composition format, only the `editframe-html.yaml` profile file changes — no Forge source modifications.
 - If a future domain (e.g. audio production) requires lifecycle concepts not covered by the generic commands, a superseding ADR extends the lifecycle command set.
-- Related RFCs: RFC-0674 (profile-driven lifecycle commands), RFC-0675 (invariant enforcement), RFC-0676 (artifact validation), RFC-0677 (determinism verification), RFC-0678 (asset management), RFC-0679 (release lifecycle).
+- Related RFCs: RFC-0674 (profile-driven lifecycle commands), RFC-0675 (invariant enforcement), RFC-0677 (artifact validation), RFC-0678 (determinism verification), RFC-0679 (asset management), RFC-0680 (release lifecycle), RFC-0694 (React template + domain skill vendoring).
