@@ -1,7 +1,7 @@
 ---
 id: RFC-0703
 title: "Enforce platform version bump discipline and auto-pin on mission close"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
 enhancedAt: 2026-08-05
-implementedAt:
+implementedAt: 2026-08-05
 closedAt:
 supersedes: []
 supersededBy:
