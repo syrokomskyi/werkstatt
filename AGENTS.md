@@ -233,7 +233,7 @@ Rules:
 
 ## Session-end discipline (RFC-0581)
 
-**Session-end retro with git hygiene check (NON-NEGOTIABLE, RFC-0581):** When the operator signals session end ("we're done", "на этом всё", "that's it", "мы закончили", "das war's", "wir sind fertig", or similar), the agent MUST invoke `fo-session-retro`. Before the retro's insight triage begins, the agent performs a git hygiene check:
+**Session-end retro with git hygiene check (NON-NEGOTIABLE, RFC-0581):** When the operator signals session end ("we're done", "на этом всё", "that's it", "мы закончили", "das war's", "wir sind fertig", "Завершаем сессию", or similar), the agent MUST invoke `fo-session-retro` via the `skill` tool BEFORE producing any closing summary. Do NOT write a session summary first and then offer to run the retro — the retro skill IS the closing protocol. The skill's report is the session-end output.
 
 1. Run `git status --short` in the werkstatt root and in each active mission workpiece (if any).
 2. If uncommitted changes are found, report them to the operator and ask whether to commit.
