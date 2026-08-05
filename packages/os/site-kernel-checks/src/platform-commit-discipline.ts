@@ -68,27 +68,16 @@ function getGitLogRange(workspaceRoot: string, base: string): GitCommitInfo[] {
     throw new Error(`Could not resolve base ref '${base}'. Ensure the ref exists.`);
   }
 
-  const format = "%H%n%P%n__FILES__%n";
   try {
-    const output = gitExec(
-      workspaceRoot,
-      `log --format=${format} --name-only --no-merges "${range}"`,
-    );
+    const shaOutput = gitExec(workspaceRoot, `log --format=%H --no-merges "${range}"`);
+    const shas = shaOutput.split("\n").filter((l) => l.trim().length > 0);
     const commits: GitCommitInfo[] = [];
-    const blocks = output.split("\n\n");
-    for (const block of blocks) {
-      const trimmed = block.trim();
-      if (!trimmed) continue;
-      const lines = trimmed.split("\n");
-      const sha = lines[0]?.trim();
-      if (!sha) continue;
-      const parentsStr = lines[1]?.trim() ?? "";
+    for (const sha of shas) {
+      const message = gitExec(workspaceRoot, `log --format=%B -n 1 ${sha}`);
+      const filesOutput = gitExec(workspaceRoot, `diff-tree --no-commit-id --name-only -r ${sha}`);
+      const files = filesOutput.split("\n").filter((l) => l.trim().length > 0);
+      const parentsStr = gitExec(workspaceRoot, `log --format=%P -n 1 ${sha}`);
       const parents = parentsStr ? parentsStr.split(" ").filter(Boolean) : [];
-      const filesStartIdx = lines.indexOf("__FILES__");
-      const messageEnd = filesStartIdx >= 0 ? filesStartIdx : lines.length;
-      const message = lines.slice(2, messageEnd).join("\n").trim();
-      const files =
-        filesStartIdx >= 0 ? lines.slice(filesStartIdx + 1).filter((l) => l.trim().length > 0) : [];
       commits.push({ sha, parents, message, files });
     }
     return commits;

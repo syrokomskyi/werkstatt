@@ -30,6 +30,23 @@ vi.mock("../mission/mission-materialization-commands.ts", () => ({
   runMissionReconcile: vi.fn(),
 }));
 
+vi.mock("@warpgogol/site-kernel", async (importOriginal) => {
+  const original = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...original,
+    executeKernelCommand: vi.fn(async (args: { commandName: string }) => {
+      if (args.commandName === "sternsystem.pin") {
+        return {
+          exitCode: 0,
+          data: { systemId: "test-system", pinnedVersion: "1.0.0" },
+          summary: "pinned",
+        };
+      }
+      return { exitCode: 0, data: {}, summary: "ok" };
+    }),
+  };
+});
+
 function gitInit(dir: string): void {
   execSync("git init", { cwd: dir, stdio: "pipe" });
   execSync("git config user.email test@test.com", { cwd: dir, stdio: "pipe" });
