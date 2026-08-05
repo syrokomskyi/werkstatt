@@ -10,6 +10,7 @@
   <item>Lazy loading refactor: extracted from leitstand/index.ts to use dynamic imports inside async register().</item>
   <item>RFC-0627: add leitstand.deploy; update rollback (auto-detect channel); update status/health for dev channel.</item>
   <item>RFC-0628: replace leitstand.deploy with workpiece-based leitstand.dev-deploy; propagate gate checks published + commitSha + missionId; rollback auto-step removes dev-deployed.</item>
+  <item>RFC-0700: add --release flag to leitstand.dev-deploy for deploying existing releases to dev without open mission; update reads to include releases/{release}/**.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -41,6 +42,11 @@ export function createLeitstandModule(): KernelModule {
             required: true,
             description: "Sternsystem id with an active mission.",
           },
+          release: {
+            kind: "string",
+            description:
+              "RFC-0700: Deploy an existing release to dev without open mission. When set, deploys from releases/<id>/dist/.",
+          },
           "skip-evidence-sync": {
             kind: "boolean",
             description: "RFC-0652: Skip best-effort evidence.sync to R2 after axiom.report.",
@@ -51,7 +57,11 @@ export function createLeitstandModule(): KernelModule {
           },
         },
         writes: ["missions/{mission}/evidence/axiom/**"],
-        reads: ["systems/registry.yaml", "missions/{mission}/workpiece/**"],
+        reads: [
+          "systems/registry.yaml",
+          "missions/{mission}/workpiece/**",
+          "releases/{release}/**",
+        ],
         cacheable: false,
         execute: runLeitstandDevDeploy,
       });
