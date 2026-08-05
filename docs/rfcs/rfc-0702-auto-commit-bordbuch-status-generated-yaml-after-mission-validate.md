@@ -249,16 +249,16 @@ No output format changes. The `--json` output of `mission.validate` remains the 
 
 ## Acceptance criteria
 
-- [ ] `commitBordbuchProjections` wraps all `gitExecWithRetry` calls (`status --porcelain`, `add`, `commit`, `rev-parse`) in try/catch
-- [ ] `BordbuchCommitResult` has an optional `error?: string` field for git failure cases
-- [ ] `runBordbuchCommit` logs `logger.warn` when `committed === false && error` is set
-- [ ] `bordbuch.commit` pipeline step returns exitCode 0 (not throw) when git operations fail after retry exhaustion
-- [ ] `mission.validate` distribution reuse path calls `commitBordbuchProjections` before returning success
-- [ ] Reuse path cleanup is non-fatal (try/catch with `logger.warn`)
-- [ ] Cache clone is clean after `mission.validate` completes successfully via the reuse path (when dirty state was from bordbuch files)
-- [ ] Unit test covers `commitBordbuchProjections` try/catch path (git failure returns error instead of throwing)
-- [ ] Unit test covers reuse path cleanup call in `mission.validate`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `commitBordbuchProjections` wraps all `gitExecWithRetry` calls (`status --porcelain`, `add`, `commit`, `rev-parse`) in try/catch — (evidence: `bordbuch-commit.ts:59-100`, `bordbuch-commit.test.ts:179-223`)
+- [x] `BordbuchCommitResult` has an optional `error?: string` field for git failure cases — (evidence: `bordbuch-commit.ts:40`, `bordbuch-commit.test.ts:186`)
+- [x] `runBordbuchCommit` logs `logger.warn` when `committed === false && error` is set — (evidence: `bordbuch-commit.ts:128-134`, `bordbuch-commit.test.ts:276-301`)
+- [x] `bordbuch.commit` pipeline step returns exitCode 0 (not throw) when git operations fail after retry exhaustion — (evidence: `bordbuch-commit.ts:92-100` returns error result, `runBordbuchCommit` returns summary without throwing, `bordbuch-commit.test.ts:219-223`)
+- [x] `mission.validate` distribution reuse path calls `commitBordbuchProjections` before returning success — (evidence: `mission-materialization-commands.ts:290-302`, `mission-validate-distribution-reuse.test.ts:329-339`)
+- [x] Reuse path cleanup is non-fatal (try/catch with `logger.warn`) — (evidence: `mission-materialization-commands.ts:293-302` try/catch block, `mission-validate-distribution-reuse.test.ts:382-393`)
+- [x] Cache clone is clean after `mission.validate` completes successfully via the reuse path (when dirty state was from bordbuch files) — (evidence: `commitBordbuchProjections` commits dirty bordbuch files, `mission-validate-distribution-reuse.test.ts:341-379` verifies cleanup log)
+- [x] Unit test covers `commitBordbuchProjections` try/catch path (git failure returns error instead of throwing) — (evidence: `bordbuch-commit.test.ts:179-223`, 5 tests covering status/add/commit/rev-parse + does-not-throw)
+- [x] Unit test covers reuse path cleanup call in `mission.validate` — (evidence: `mission-validate-distribution-reuse.test.ts:329-393`, 3 tests covering call, log, and throw-resilience)
+- [x] `rfc.validate` passes on this file before merging — (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0702` exit 0)
 
 ## Implementation notes for agents
 
