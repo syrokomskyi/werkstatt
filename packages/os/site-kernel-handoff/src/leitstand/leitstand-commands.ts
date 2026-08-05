@@ -25,12 +25,13 @@
   <item>RFC-0668: wrap mission.check call with 15-min per-attempt timeout (MISSION_CHECK_TIMEOUT_MS) and one-time retry on infrastructure errors (exit 2 or any non-0/non-1); pass --max-duration to mission.check; worst-case total 30 min with retry.</item>
   <item>Add --no-report flag (default true) to runMissionCheckWithResilience to suppress report.html generation in mission.check; axiom.report is auto-invoked separately in leitstand.dev-deploy, preventing double-write.</item>
   <item>RFC-0689: clear Axiom browser evidence cache before mission.check; auto-regenerate behavior snapshot on SNAP-01 when pnpm build fails; check stale snapshot when build is skipped (RFC-0653).</item>
+  <item>RFC-0697: log cache dir file count and total size before clearing; extract shared orchestrateSnap01Recovery helper for SNAP-01 detect → regenerate → (optional) rebuild orchestration.</item>
 </CHANGE_SUMMARY>
 */
 
 import fs from "node:fs/promises";
-import { existsSync } from "node:fs";
-import path from "node:path";
+import { existsSync, readdirSync, statSync } from "node:fs";
+import path, { join } from "node:path";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -48,7 +49,7 @@ import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/inde
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
 import { readReleaseManifest, writeReleaseYaml } from "../release/release-commands.ts";
-import { detectSnap01, autoRegenerateSnapshotOnSnap01 } from "../mission/snapshot-auto-regen.ts";
+import { orchestrateSnap01Recovery } from "../mission/snapshot-auto-regen.ts";
 import { buildIdentitySchema } from "@warpgogol/ontology/operations";
 import type {
   DeploymentAdapter,
@@ -83,6 +84,25 @@ import {
 } from "@warpgogol/site-kernel-checks/suppressions-config";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { computeBuildInputHash } from "../build-pipeline-helpers.ts";
+
+function logCacheDirSize(cacheDir: string, logger: { info: (msg: string) => void }): void {
+  try {
+    const entries = readdirSync(cacheDir, { withFileTypes: true });
+    let totalSize = 0;
+    let fileCount = 0;
+    for (const entry of entries) {
+      if (entry.isFile()) {
+        fileCount++;
+        totalSize += statSync(join(cacheDir, entry.name)).size;
+      }
+    }
+    logger.info(
+      `[leitstand.dev-deploy] Axiom cache: ${fileCount} file(s), ${(totalSize / 1024 / 1024).toFixed(1)} MiB — clearing…`,
+    );
+  } catch {
+    // Non-fatal — log nothing if we can't read the directory
+  }
+}
 
 function flagString(input: KernelCommandInput, key: string): string | undefined {
   const v = input.flags[key];
@@ -744,35 +764,30 @@ export async function runLeitstandDevDeploy(
   if (buildSkipped) {
     logger.info(`[leitstand.dev-deploy] using cached dist/ (build skipped)`);
 
-    // RFC-0689: When build is skipped, build.post (which runs behavior.snapshot.validate)
+    // RFC-0689/RFC-0697: When build is skipped, build.post (which runs behavior.snapshot.validate)
     // doesn't execute. Check for stale snapshot separately and regenerate if SNAP-01.
     try {
       const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
-      const validateResult = await executeValidate({
+      const snapResult = await orchestrateSnap01Recovery({
         workspaceRoot,
-        commandName: "behavior.snapshot.validate",
-        siteName: systemId,
+        systemId,
+        missionId,
+        logger,
+        validateFn: async () => {
+          const validateResult = await executeValidate({
+            workspaceRoot,
+            commandName: "behavior.snapshot.validate",
+            siteName: systemId,
+          });
+          return Array.isArray(validateResult) ? validateResult[0]?.data : validateResult.data;
+        },
       });
-      const validateData = Array.isArray(validateResult)
-        ? validateResult[0]?.data
-        : validateResult.data;
-      if (detectSnap01(validateData)) {
-        logger.info(
-          `[leitstand.dev-deploy] SNAP-01 detected during build-skip — regenerating behavior snapshot…`,
+      if (snapResult.regenerated) {
+        logger.info(`[leitstand.dev-deploy] behavior snapshot regenerated during build-skip`);
+      } else if (snapResult.error) {
+        logger.warn(
+          `[leitstand.dev-deploy] behavior snapshot regeneration failed during build-skip: ${snapResult.error}`,
         );
-        const regenResult = await autoRegenerateSnapshotOnSnap01({
-          workspaceRoot,
-          systemId,
-          missionId,
-          logger,
-        });
-        if (regenResult.regenerated) {
-          logger.info(`[leitstand.dev-deploy] behavior snapshot regenerated during build-skip`);
-        } else {
-          logger.warn(
-            `[leitstand.dev-deploy] behavior snapshot regeneration failed during build-skip: ${regenResult.error ?? "unknown"}`,
-          );
-        }
       }
     } catch (validateErr) {
       logger.warn(
@@ -802,53 +817,51 @@ export async function runLeitstandDevDeploy(
       // RFC-0634: Clean up preliminary build-identity on build failure
       await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
 
-      // RFC-0689: Check if build failed due to SNAP-01 (stale behavior snapshot).
+      // RFC-0689/RFC-0697: Check if build failed due to SNAP-01 (stale behavior snapshot).
       // Since pnpm build runs via execSync (opaque), run behavior.snapshot.validate
       // separately to detect SNAP-01 diagnostics. If detected, auto-regenerate the
       // snapshot and re-run the build.
       let snapshotRegenerated = false;
       try {
         const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
-        const validateResult = await executeValidate({
+        const snapResult = await orchestrateSnap01Recovery({
           workspaceRoot,
-          commandName: "behavior.snapshot.validate",
-          siteName: systemId,
-        });
-        const validateData = Array.isArray(validateResult)
-          ? validateResult[0]?.data
-          : validateResult.data;
-        if (detectSnap01(validateData)) {
-          const regenResult = await autoRegenerateSnapshotOnSnap01({
-            workspaceRoot,
-            systemId,
-            missionId,
-            logger,
-          });
-          if (regenResult.regenerated) {
+          systemId,
+          missionId,
+          logger,
+          validateFn: async () => {
+            const validateResult = await executeValidate({
+              workspaceRoot,
+              commandName: "behavior.snapshot.validate",
+              siteName: systemId,
+            });
+            return Array.isArray(validateResult) ? validateResult[0]?.data : validateResult.data;
+          },
+          rebuildFn: async () => {
             logger.info(
               `[leitstand.dev-deploy] re-running pnpm build after snapshot regeneration…`,
             );
-            try {
-              execSync("pnpm build", { cwd: workpiecePath, stdio: "inherit", timeout: 600_000 });
-              buildState = "succeeded";
-              snapshotRegenerated = true;
-              logger.info(
-                `[leitstand.dev-deploy] build passed after snapshot regeneration in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
-              );
-              // RFC-0653: Write build-skip cache after successful re-build
-              const buildCache = {
-                commitSha,
-                platformVersion,
-                platformSemanticHash,
-                writtenAt: new Date().toISOString(),
-              };
-              await fs.writeFile(buildCachePath, JSON.stringify(buildCache, null, 2) + "\n");
-            } catch (rebuildErr) {
-              logger.warn(
-                `[leitstand.dev-deploy] build still failing after snapshot regeneration: ${rebuildErr instanceof Error ? rebuildErr.message : String(rebuildErr)}`,
-              );
-            }
-          }
+            execSync("pnpm build", { cwd: workpiecePath, stdio: "inherit", timeout: 600_000 });
+          },
+        });
+        if (snapResult.regenerated && snapResult.rebuildSucceeded) {
+          buildState = "succeeded";
+          snapshotRegenerated = true;
+          logger.info(
+            `[leitstand.dev-deploy] build passed after snapshot regeneration in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
+          );
+          // RFC-0653: Write build-skip cache after successful re-build
+          const buildCache = {
+            commitSha,
+            platformVersion,
+            platformSemanticHash,
+            writtenAt: new Date().toISOString(),
+          };
+          await fs.writeFile(buildCachePath, JSON.stringify(buildCache, null, 2) + "\n");
+        } else if (snapResult.regenerated && !snapResult.rebuildSucceeded) {
+          logger.warn(
+            `[leitstand.dev-deploy] build still failing after snapshot regeneration: ${snapResult.error ?? "unknown"}`,
+          );
         }
       } catch (validateErr) {
         logger.warn(
@@ -1113,6 +1126,7 @@ export async function runLeitstandDevDeploy(
     ".cache",
   );
   if (existsSync(axiomCacheDir)) {
+    logCacheDirSize(axiomCacheDir, logger);
     try {
       await fs.rm(axiomCacheDir, { recursive: true, force: true });
       logger.info(
