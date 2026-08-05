@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -163,7 +164,7 @@ For a hard removal (no alias), the function simply returns `undefined` for unkno
 ## Rollout
 
 1. **Phase 1 (this RFC):** Register all `forge.*` commands under unqualified names and make `bin/cli.ts` accept them. Keep `forge.*` as deprecated aliases. Update README/AGENTS.md/skill references. Release as `minor` because command names change, but aliases keep existing scripts working.
-2. **Phase 2 (future RFC or major):** Remove the deprecated `forge.*` aliases entirely.
+2. **Phase 2 (future RFC or major, before the next `major` version):** Remove the deprecated `forge.*` aliases entirely. The deprecation window is exactly one `minor` release; the superseding RFC that removes the aliases must be filed and accepted before the next `major` bump.
 
 ## Alternatives considered
 
@@ -192,3 +193,4 @@ For a hard removal (no alias), the function simply returns `undefined` for unkno
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MUST update all `README.md`, `README.uk.md`, and `SKILL.md` command references in the same commit that renames the commands.
 - If implementation reveals that `rfc.*`, `compass.*`, or other namespaced commands collide with the unqualified `forge` names, agents MUST NOT weaken the rule; instead, run `rfc.supersede.propose` with the invariant that is in conflict.
+- The `commands.proposed` entries in this RFC are new alias keys registered for existing command handlers, not new command implementations; `commands.changed` lists the existing qualified names that now also accept the new unqualified aliases.
