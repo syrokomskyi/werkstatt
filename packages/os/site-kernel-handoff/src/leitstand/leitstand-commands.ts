@@ -618,6 +618,7 @@ export async function runLeitstandDevDeploy(
 
   // RFC-0700: Release path — deploy from releases/<id>/dist/ without open mission
   if (releaseId) {
+    logger.info(`[leitstand.dev-deploy] Deploying release ${releaseId} for ${systemId}...`);
     if (forceBuild) {
       logger.warn("[leitstand.dev-deploy] --force-build ignored because --release is set");
     }
@@ -733,9 +734,9 @@ export async function runLeitstandDevDeploy(
       workspaceRoot,
     });
 
-    const healthy = deployResult.state === "succeeded" && healthResult.state === "healthy";
     const releaseMissionId = (releaseManifest.missionId as string) ?? "";
     const releaseCommitSha = (releaseManifest.commitSha as string) ?? "";
+    const healthy = deployResult.state === "succeeded" && healthResult.state === "healthy";
 
     return {
       data: {

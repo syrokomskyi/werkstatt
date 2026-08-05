@@ -270,10 +270,7 @@ test("RFC-0700: --release with missing dist throws error", async () => {
   // No dist directory created
 
   await expect(
-    runLeitstandDevDeploy(
-      makeInput({ system: systemId, release: releaseId }),
-      makeContext(tmpDir),
-    ),
+    runLeitstandDevDeploy(makeInput({ system: systemId, release: releaseId }), makeContext(tmpDir)),
   ).rejects.toThrow("no dist directory");
 }, 15_000);
 
@@ -300,4 +297,38 @@ test("RFC-0700: without --release, releaseDeployed is undefined in result", asyn
   const data = result.data as Record<string, unknown> | undefined;
   expect(data?.releaseDeployed).toBeUndefined();
   expect(data?.buildSkipped).toBeDefined();
+}, 15_000);
+
+test("RFC-0700: --force-build warning is logged when --release is set", async () => {
+  const systemId = "test-sys";
+  const releaseId = "test-sys-r000001";
+  const missionId = "test-sys-m000001";
+
+  createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
+  writeReleaseManifest(tmpDir, releaseId, {
+    systemId,
+    missionId,
+    commitSha: "abc123def456",
+    state: "published",
+    distTreeHash: "sha256:abc",
+  });
+  createDistDir(tmpDir, releaseId);
+
+  const warnCalls: string[] = [];
+  const context = {
+    ...makeContext(tmpDir),
+    logger: {
+      ...makeContext(tmpDir).logger,
+      warn: (msg: string) => warnCalls.push(msg),
+    },
+  } as unknown as KernelRuntimeContext;
+
+  await runLeitstandDevDeploy(
+    makeInput({ system: systemId, release: releaseId, "force-build": "true" }),
+    context,
+  );
+
+  expect(warnCalls).toContain(
+    "[leitstand.dev-deploy] --force-build ignored because --release is set",
+  );
 }, 15_000);
