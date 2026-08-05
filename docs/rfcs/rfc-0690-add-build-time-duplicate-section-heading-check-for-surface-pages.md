@@ -40,9 +40,9 @@ satisfies: []
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - surface.heading-uniqueness.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []

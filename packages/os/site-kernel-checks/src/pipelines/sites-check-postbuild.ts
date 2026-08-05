@@ -71,4 +71,6 @@ export const SITES_CHECK_POSTBUILD_PIPELINE: KernelPipelineStep[] = [
   { command: "text.normalize.validate" },
   // RFC-0499: media metadata leakage prevention on surface pages.
   { command: "surface.media-leakage.validate" },
+  // RFC-0690: duplicate section heading check on surface pages.
+  { command: "surface.heading-uniqueness.validate" },
 ];

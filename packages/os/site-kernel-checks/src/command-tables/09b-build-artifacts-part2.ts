@@ -23,6 +23,7 @@ import { runSurfaceServiceValidate } from "../surface-service-validate.ts";
 import { runSurfaceIntersectionValidate } from "../surface-intersection-validate.ts";
 import { runSurfaceIntersectionReport } from "../surface-intersection-report.ts";
 import { runSurfaceMediaLeakageValidate } from "../surface-media-leakage-validate.ts";
+import { runSurfaceHeadingUniquenessValidate } from "../surface-heading-uniqueness.ts";
 import { runRatgeberHubValidate } from "../ratgeber-hub-validate.ts";
 import { runRatgeberArticleValidate } from "../ratgeber-article-validate.ts";
 import { runRatgeberProvenanceValidate } from "../ratgeber-provenance-validate.ts";
@@ -171,6 +172,16 @@ export const BUILD_ARTIFACT_COMMANDS_PART2: CheckCommandEntry[] = [
     supportsAllSites: true,
     reads: ["<app>/dist/client/**/*.html", "<app>/src/surface.generated.yaml"],
     execute: runSurfaceMediaLeakageValidate,
+  },
+  {
+    name: "surface.heading-uniqueness.validate",
+    description:
+      "RFC-0690: scan rendered surface page HTML for duplicate section heading text (first <h2>/<h3> child of each <section>). Fails on duplicates to catch bake function label reuse before the Axiom gate.",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: ["<app>/dist/client/**/*.html", "<app>/src/surface.generated.yaml"],
+    execute: runSurfaceHeadingUniquenessValidate,
   },
   {
     name: "ratgeber.hub.validate",
