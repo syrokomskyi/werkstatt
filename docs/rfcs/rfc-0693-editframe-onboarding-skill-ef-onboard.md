@@ -256,16 +256,16 @@ The existing "Skill usage" section (lines 41–46 of the current template) is fu
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/skills/fo/ef-onboard/SKILL.md` exists with valid frontmatter
-- [ ] `forge.skill.validate` passes on the skill
-- [ ] `forge.skill.list` includes `ef-onboard`
-- [ ] `editframe-html.yaml` declares `ef-onboard` in `workspaceTypes[].skills`
-- [ ] Skill includes prerequisites check (Node.js 18+, FFmpeg)
-- [ ] Skill includes discovery flow (project type, assets, stack preference)
-- [ ] Skill references `https://editframe.com/llms.txt` and `editframe-composition` skill
-- [ ] Skill instructs agent to read `editframe-composition` before building
-- [ ] `composition-agents.md` template includes onboarding reference and external resources
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/skills/fo/ef-onboard/SKILL.md` exists with valid frontmatter (evidence: packages/forge/skills/fo/ef-onboard/SKILL.md:1-9, forge.skill.validate passes)
+- [x] `forge.skill.validate` passes on the skill (evidence: packages/forge/src/tests/skill-validate.test.ts:297-301, zero violations for ef-onboard)
+- [x] `forge.skill.list` includes `ef-onboard` (evidence: packages/forge/src/tests/skill-validate.test.ts:260-264, FORGE_SKILLS registry includes ef-onboard)
+- [x] `editframe-html.yaml` declares `ef-onboard` in `workspaceTypes[].skills` (evidence: packages/forge/profiles/editframe-html.yaml:57-60, ef-onboard is first entry)
+- [x] Skill includes prerequisites check (Node.js 18+, FFmpeg) (evidence: packages/forge/skills/fo/ef-onboard/SKILL.md:18-22, Step 1 Prerequisites check)
+- [x] Skill includes discovery flow (project type, assets, stack preference) (evidence: packages/forge/skills/fo/ef-onboard/SKILL.md:24-42, Step 2 Discovery)
+- [x] Skill references `https://editframe.com/llms.txt` and `editframe-composition` skill (evidence: packages/forge/skills/fo/ef-onboard/SKILL.md:56-57, Step 5 Read domain knowledge)
+- [x] Skill instructs agent to read `editframe-composition` before building (evidence: packages/forge/skills/fo/ef-onboard/SKILL.md:54, 'the agent MUST read the editframe-composition skill')
+- [x] `composition-agents.md` template includes onboarding reference and external resources (evidence: packages/forge/profiles/editframe-html-templates/composition-agents.md:41-51, Skills + External resources sections)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0693 --json, status: pass, 0 violations)
 
 ## Implementation notes for agents
 
