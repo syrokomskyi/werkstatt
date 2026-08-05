@@ -414,4 +414,38 @@ status: accepted
       await rm(root, { recursive: true, force: true });
     }
   });
+
+  it("RFC-0704: --amend works with skip-bump mode", async () => {
+    const root = await setupWorkspaceWithIndependentPkg();
+    try {
+      // First commit via ecosystem.commit (skip-bump)
+      await stageFile(root, "packages/forge/src/index.ts", "export const x = 2;\n");
+      const result1 = await runEcosystemCommit(input({ message: "feat: update forge" }), ctx(root));
+      expect(result1.exitCode).toBe(0);
+      expect(result1.data?.skipPlatformBump).toBe(true);
+
+      // Amend the skip-bump commit
+      await stageFile(root, "packages/forge/src/index.ts", "export const x = 3;\n");
+      const result2 = await runEcosystemCommit(
+        input({ message: "feat: update forge v2", amend: true }),
+        ctx(root),
+      );
+      expect(result2.exitCode).toBe(0);
+      expect(result2.data?.skipPlatformBump).toBe(true);
+      expect(result2.data?.status).toBe("ok");
+
+      // Verify the commit message was amended (not a new commit)
+      const { stdout: logOut } = await execFileAsync("git", ["log", "--oneline"], { cwd: root });
+      const lines = logOut.trim().split("\n");
+      // Should have: initial, add forge pkg, and 1 ecosystem.commit (amended)
+      expect(lines.length).toBe(3);
+      // Verify the amended message
+      const { stdout: msgOut } = await execFileAsync("git", ["log", "-1", "--format=%B"], {
+        cwd: root,
+      });
+      expect(msgOut).toContain("feat: update forge v2");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
 });

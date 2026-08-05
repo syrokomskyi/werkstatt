@@ -317,7 +317,10 @@ export async function runEcosystemCommit(
     }
 
     // Commit with just the operator's message — no platform trailers
-    await execFileAsync("git", ["commit", "-m", message!], {
+    const skipCommitArgs = amend
+      ? ["commit", "--amend", "-m", message!]
+      : ["commit", "-m", message!];
+    await execFileAsync("git", skipCommitArgs, {
       cwd: workspaceRoot,
       env: { ...process.env, ECOSYSTEM_COMMIT: "1" },
     });
