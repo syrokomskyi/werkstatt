@@ -28,6 +28,7 @@ amendedBy:
   - RFC-0649
   - RFC-0668
   - RFC-0698
+  - RFC-0700
 related:
   - DNA-48
   - DNA-49
