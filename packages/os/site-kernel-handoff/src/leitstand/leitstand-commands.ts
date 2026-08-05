@@ -48,6 +48,7 @@ import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/inde
 import { readRegistry, writeRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
 import { readReleaseManifest, writeReleaseYaml } from "../release/release-commands.ts";
+import { detectSnap01, autoRegenerateSnapshotOnSnap01 } from "../mission/snapshot-auto-regen.ts";
 import { buildIdentitySchema } from "@warpgogol/ontology/operations";
 import type {
   DeploymentAdapter,
@@ -742,6 +743,42 @@ export async function runLeitstandDevDeploy(
   let buildState: "succeeded" | "failed" = "succeeded";
   if (buildSkipped) {
     logger.info(`[leitstand.dev-deploy] using cached dist/ (build skipped)`);
+
+    // RFC-0689: When build is skipped, build.post (which runs behavior.snapshot.validate)
+    // doesn't execute. Check for stale snapshot separately and regenerate if SNAP-01.
+    try {
+      const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
+      const validateResult = await executeValidate({
+        workspaceRoot,
+        commandName: "behavior.snapshot.validate",
+        siteName: systemId,
+      });
+      const validateData = Array.isArray(validateResult)
+        ? validateResult[0]?.data
+        : validateResult.data;
+      if (detectSnap01(validateData)) {
+        logger.info(
+          `[leitstand.dev-deploy] SNAP-01 detected during build-skip — regenerating behavior snapshot…`,
+        );
+        const regenResult = await autoRegenerateSnapshotOnSnap01({
+          workspaceRoot,
+          systemId,
+          missionId,
+          logger,
+        });
+        if (regenResult.regenerated) {
+          logger.info(`[leitstand.dev-deploy] behavior snapshot regenerated during build-skip`);
+        } else {
+          logger.warn(
+            `[leitstand.dev-deploy] behavior snapshot regeneration failed during build-skip: ${regenResult.error ?? "unknown"}`,
+          );
+        }
+      }
+    } catch (validateErr) {
+      logger.warn(
+        `[leitstand.dev-deploy] stale snapshot check failed during build-skip (non-fatal): ${validateErr instanceof Error ? validateErr.message : String(validateErr)}`,
+      );
+    }
   } else {
     logger.info(`[leitstand.dev-deploy] building workpiece at ${workpiecePath}...`);
     try {
@@ -764,36 +801,93 @@ export async function runLeitstandDevDeploy(
       );
       // RFC-0634: Clean up preliminary build-identity on build failure
       await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
-      return {
-        data: {
-          command: "leitstand.dev-deploy",
-          systemId,
-          missionId,
-          commitSha: "",
-          buildState: "failed",
-          buildSkipped: false,
-          deployState: "failed",
-          deploymentUrl: channelConfig.url,
-          buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
-          axiom: {
-            status: "not-run",
-            errors: 0,
-            warnings: 0,
-            exitCode: 0,
-            freshness: {
-              verified: false,
-              cdnDistTreeHash: null,
-              localDistTreeHash: "",
-              attempts: 0,
-              error: "build failed",
+
+      // RFC-0689: Check if build failed due to SNAP-01 (stale behavior snapshot).
+      // Since pnpm build runs via execSync (opaque), run behavior.snapshot.validate
+      // separately to detect SNAP-01 diagnostics. If detected, auto-regenerate the
+      // snapshot and re-run the build.
+      let snapshotRegenerated = false;
+      try {
+        const { executeKernelCommand: executeValidate } = await import("@warpgogol/site-kernel");
+        const validateResult = await executeValidate({
+          workspaceRoot,
+          commandName: "behavior.snapshot.validate",
+          siteName: systemId,
+        });
+        const validateData = Array.isArray(validateResult)
+          ? validateResult[0]?.data
+          : validateResult.data;
+        if (detectSnap01(validateData)) {
+          const regenResult = await autoRegenerateSnapshotOnSnap01({
+            workspaceRoot,
+            systemId,
+            missionId,
+            logger,
+          });
+          if (regenResult.regenerated) {
+            logger.info(
+              `[leitstand.dev-deploy] re-running pnpm build after snapshot regeneration…`,
+            );
+            try {
+              execSync("pnpm build", { cwd: workpiecePath, stdio: "inherit", timeout: 600_000 });
+              buildState = "succeeded";
+              snapshotRegenerated = true;
+              logger.info(
+                `[leitstand.dev-deploy] build passed after snapshot regeneration in ${((Date.now() - t0) / 1000).toFixed(1)}s`,
+              );
+              // RFC-0653: Write build-skip cache after successful re-build
+              const buildCache = {
+                commitSha,
+                platformVersion,
+                platformSemanticHash,
+                writtenAt: new Date().toISOString(),
+              };
+              await fs.writeFile(buildCachePath, JSON.stringify(buildCache, null, 2) + "\n");
+            } catch (rebuildErr) {
+              logger.warn(
+                `[leitstand.dev-deploy] build still failing after snapshot regeneration: ${rebuildErr instanceof Error ? rebuildErr.message : String(rebuildErr)}`,
+              );
+            }
+          }
+        }
+      } catch (validateErr) {
+        logger.warn(
+          `[leitstand.dev-deploy] behavior.snapshot.validate check failed (non-fatal): ${validateErr instanceof Error ? validateErr.message : String(validateErr)}`,
+        );
+      }
+
+      if (!snapshotRegenerated) {
+        return {
+          data: {
+            command: "leitstand.dev-deploy",
+            systemId,
+            missionId,
+            commitSha: "",
+            buildState: "failed",
+            buildSkipped: false,
+            deployState: "failed",
+            deploymentUrl: channelConfig.url,
+            buildIdentity: { releaseId: `workpiece-${missionId}`, written: false, path: "" },
+            axiom: {
+              status: "not-run",
+              errors: 0,
+              warnings: 0,
+              exitCode: 0,
+              freshness: {
+                verified: false,
+                cdnDistTreeHash: null,
+                localDistTreeHash: "",
+                attempts: 0,
+                error: "build failed",
+              },
             },
+            evidenceSynced: false,
+            evidenceSyncError: null,
           },
-          evidenceSynced: false,
-          evidenceSyncError: null,
-        },
-        exitCode: 1,
-        summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
-      };
+          exitCode: 1,
+          summary: `[leitstand.dev-deploy] ${systemId}: build failed — no dist/ directory`,
+        };
+      }
     }
   }
 
