@@ -240,7 +240,7 @@ export async function runSternsystemSync(
   const systemDir = await resolveCachePath(workspaceRoot, id);
   await commitAndPushBordbuch(systemDir, `Bordbuch: mirror-sync ${id}`);
 
-  logger.success(
+  logger.info(
     `[sternsystem.sync] ${id} mirrored (${direction}, branch: ${syncAll ? "*" : branchName})`,
   );
 
