@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0684: initial implementation of suppression config schema, loaders, merger, and applySuppressions post-filter.</item>
+  <item>RFC-0688: add titlePattern field to match against finding.title (always populated). messagePattern/descriptionPattern kept for forward compatibility but match against non-existent Finding fields.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -25,6 +26,7 @@ export const suppressionRuleSchema = z.object({
   channelNot: z.enum(["dev", "alt", "main"]).optional(),
   contentType: z.array(z.string()).optional(),
   urlPattern: z.string().optional(),
+  titlePattern: z.string().optional(),
   messagePattern: z.string().optional(),
   descriptionPattern: z.string().optional(),
   reason: z.string().min(1),
@@ -112,6 +114,11 @@ function matchesCondition(
     } catch {
       return false;
     }
+  }
+
+  // titlePattern: suppress if the finding's title contains the pattern (substring match)
+  if (rule.titlePattern !== undefined) {
+    if (!finding.title.includes(rule.titlePattern)) return false;
   }
 
   // messagePattern: suppress if the finding's message contains the pattern (substring match)
