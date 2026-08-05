@@ -74,3 +74,37 @@ jobs:
 
       - name: Maintenance debt baseline validation
         run: pnpm exec site-kernel run maintenance.debt.baseline.validate --json
+
+  forge-windows:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    name: Forge tests on Windows
+    env:
+      TZ: UTC
+      GIT_CONFIG_COUNT: 1
+      GIT_CONFIG_KEY_0: core.longpaths
+      GIT_CONFIG_VALUE_0: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          lfs: true
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build forge
+        run: pnpm --filter @warpgogol/forge run build
+
+      - name: Forge tests
+        run: pnpm --filter @warpgogol/forge run test
