@@ -5,11 +5,11 @@ title: "Adopt modulePaths on top kernel commands for granular module hashing"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: accepted
 scope: package
 decider: architecture
 createdAt: 2026-08-04
-updatedAt: 2026-08-04
+updatedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
