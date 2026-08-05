@@ -41,9 +41,9 @@ satisfies:
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - pipeline.dependencies.validate
-  added: []
   changed: []
   removed: []
 appsImpacted: []
