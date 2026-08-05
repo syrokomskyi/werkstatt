@@ -217,15 +217,15 @@ No `docs/*.xml` sync needed. This RFC changes `ecosystem.commit` behavior but do
 
 ## Acceptance criteria
 
-- [ ] `forge.yaml` schema accepts `independentVersionPackages` field (evidence: `packages/forge/src/config/forge-config.ts`)
-- [ ] `independentVersionPackages: [packages/forge]` declared in `forge.yaml` (evidence: `forge.yaml`)
-- [ ] `ecosystem.commit` skips root version bump and version log write when all staged platform files are in `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts`)
-- [ ] `ecosystem.commit` performs normal bump when at least one staged file is outside `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts`)
-- [ ] `ecosystem.commit` emits warning for invalid paths in `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts`)
-- [ ] `forge.doctor` validates `independentVersionPackages` paths exist (evidence: `packages/forge/src/onboarding/doctor.ts`)
-- [ ] Root `AGENTS.md` documents the independent version package contract and agent behavior in the "Platform-scope commit discipline" section (evidence: `AGENTS.md`)
-- [ ] Unit tests cover skip-bump, mixed-files, and invalid-path scenarios (evidence: `packages/os/site-kernel-checks/src/tests/ecosystem-commit.test.ts`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `forge.yaml` schema accepts `independentVersionPackages` field (evidence: `packages/forge/src/config/forge-config.ts:208-209`, `pnpm --filter @warpgogol/forge run build:check` pass)
+- [x] `independentVersionPackages: [packages/forge]` declared in `forge.yaml` (evidence: `forge.yaml:67-68`)
+- [x] `ecosystem.commit` skips root version bump and version log write when all staged platform files are in `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts:261-337`, test "RFC-0704: skips platform bump when all staged files are in independentVersionPackages" pass)
+- [x] `ecosystem.commit` performs normal bump when at least one staged file is outside `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts:267-268`, test "RFC-0704: normal bump when staged files are in both independent and non-independent packages" pass)
+- [x] `ecosystem.commit` emits warning for invalid paths in `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts:263-266`, test "RFC-0704: warns and proceeds with normal bump when independentVersionPackages has invalid path" pass)
+- [x] `forge.doctor` validates `independentVersionPackages` paths exist (evidence: `packages/forge/src/onboarding/doctor.ts:618-657`, `pnpm --filter @warpgogol/forge run build:check` pass)
+- [x] Root `AGENTS.md` documents the independent version package contract and agent behavior in the "Platform-scope commit discipline" section (evidence: `AGENTS.md:92-99`)
+- [x] Unit tests cover skip-bump, mixed-files, and invalid-path scenarios (evidence: `packages/os/site-kernel-checks/src/tests/ecosystem-commit.test.ts:246-417`, `pnpm --filter @warpgogol/site-kernel-checks run test` — 856 tests pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0704 --json` — status: pass, 0 violations)
 
 ## Implementation notes for agents
 
