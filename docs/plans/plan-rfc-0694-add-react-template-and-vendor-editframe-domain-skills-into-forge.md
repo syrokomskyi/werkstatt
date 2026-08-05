@@ -1,10 +1,10 @@
 ---
 rfcId: RFC-0694
 planId: PLAN-RFC-0694-01
-status: draft
+status: implemented
 owner: architecture
 createdAt: 2026-08-05
-updatedAt:
+updatedAt: 2026-08-05
 scope:
   apps: []
   packages:
@@ -18,12 +18,12 @@ scope:
 
 ## 1. Objectives
 
-- [ ] O1 — Replace `html-attribute-pattern` check kind with `attribute-pattern` (elements array) in profile schema and invariant engine — maps to acceptance criteria [5], [6], [7], [8]
-- [ ] O2 — Rename `editframe-html` profile to `editframe` with React + TypeScript + Vite template — maps to acceptance criteria [1], [2], [3], [4]
-- [ ] O3 — Vendor 6 Editframe domain skills into `packages/forge/skills/fo/` — maps to acceptance criterion [9]
-- [ ] O4 — Update `ef-onboard`, `ef-composition-review`, `ef-render-verify` skills for React — maps to acceptance criteria [10], [11], [12], [13]
-- [ ] O5 — Update tests for React template and `attribute-pattern` check kind — maps to acceptance criteria [14], [15], [16]
-- [ ] O6 — Update `packages/forge/AGENTS.md` and validate — maps to acceptance criteria [17], [18], [19], [20]
+- [x] O1 — Replace `html-attribute-pattern` check kind with `attribute-pattern` (elements array) in profile schema and invariant engine — maps to acceptance criteria [5], [6], [7], [8]
+- [x] O2 — Rename `editframe-html` profile to `editframe` with React + TypeScript + Vite template — maps to acceptance criteria [1], [2], [3], [4]
+- [x] O3 — Vendor 6 Editframe domain skills into `packages/forge/skills/fo/` — maps to acceptance criterion [9]
+- [x] O4 — Update `ef-onboard`, `ef-composition-review`, `ef-render-verify` skills for React — maps to acceptance criteria [10], [11], [12], [13]
+- [x] O5 — Update tests for React template and `attribute-pattern` check kind — maps to acceptance criteria [14], [15], [16]
+- [x] O6 — Update `packages/forge/AGENTS.md` and validate — maps to acceptance criteria [17], [18], [19], [20]
 
 ## 2. Affected artifacts
 
