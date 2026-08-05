@@ -251,21 +251,21 @@ A new `pipeline.dependencies.validate` check (added to `build.check`) verifies:
 
 ## Acceptance criteria
 
-- [x] `dependsOn?: string[]` field added to `KernelPipelineStep` in `packages/os/site-kernel/src/types.ts`
-- [x] `pipeline-scheduler.ts` module created in `packages/os/site-kernel/src/runtime/` with `buildSchedule` and `executeScheduledSteps` functions
-- [x] `executePipelineForSite` and `executePipelineForWorkspace` in `execute-pipeline.ts` use the scheduler instead of a sequential for-loop
-- [x] Steps without `dependsOn` retain sequential behavior (implicit dependency on previous non-skipped step)
-- [x] Steps with `dependsOn: []` start immediately at pipeline start
-- [x] Steps with `dependsOn: ["cmd.a", "cmd.b"]` wait for both named steps to complete before starting
-- [x] Failed step causes all transitive dependents to be skipped with clear `skipReason`
-- [x] `--concurrency` flag controls the parallel execution limit; default is `Math.min(os.availableParallelism(), 8)`
-- [x] `pipeline.dependencies.validate` command added to `build.check` pipeline, detecting cycles, missing dependencies, forward references, and duplicate command names
-- [x] At least 5 steps in `build-prepare.ts` annotated with `dependsOn: []` and verified to run in parallel
-- [x] Unit tests verify: (a) backward-compatible sequential behavior, (b) parallel execution of independent steps, (c) dependency waiting, (d) failure propagation to dependents, (e) cycle detection, (f) telemetry writes are not corrupted or lost under parallel execution, (g) `steps[]` array in pipeline report is in declaration order not completion order, (h) explicit skip (`step.skip === true`) does not block dependents, (i) dependency-failure skip DOES block dependents transitively
-- [x] `--concurrency` flag added to `ExecuteKernelPipelineOptions` and parsed from CLI
-- [x] Timing summary reports both `totalDurationMs` (wall clock) and `summedDurationMs` (sum of per-step)
-- [x] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks`
-- [x] `rfc.validate` passes on this file
+- [x] `dependsOn?: string[]` field added to `KernelPipelineStep` in `packages/os/site-kernel/src/types.ts` (evidence: types.ts:292)
+- [x] `pipeline-scheduler.ts` module created in `packages/os/site-kernel/src/runtime/` with `buildSchedule` and `executeScheduledSteps` functions (evidence: pipeline-scheduler.ts:54,182)
+- [x] `executePipelineForSite` and `executePipelineForWorkspace` in `execute-pipeline.ts` use the scheduler instead of a sequential for-loop (evidence: execute-pipeline.ts:450-461,649-654)
+- [x] Steps without `dependsOn` retain sequential behavior (implicit dependency on previous non-skipped step) (evidence: pipeline-scheduler.ts:89-99, test (a))
+- [x] Steps with `dependsOn: []` start immediately at pipeline start (evidence: pipeline-scheduler.ts:73-74, test (b))
+- [x] Steps with `dependsOn: ["cmd.a", "cmd.b"]` wait for both named steps to complete before starting (evidence: pipeline-scheduler.ts:75-88, test (c))
+- [x] Failed step causes all transitive dependents to be skipped with clear `skipReason` (evidence: pipeline-scheduler.ts:241-250, test (d),(i))
+- [x] `--concurrency` flag controls the parallel execution limit; default is `Math.min(os.availableParallelism(), 8)` (evidence: execute-pipeline.ts:205-209, cli/index.ts)
+- [x] `pipeline.dependencies.validate` command added to `build.check` pipeline, detecting cycles, missing dependencies, forward references, and duplicate command names (evidence: build-check.ts:21, build-infra.ts:72-79)
+- [x] At least 5 steps in `build-prepare.ts` annotated with `dependsOn: []` and verified to run in parallel (evidence: build-prepare.ts:73-75,103-107 — 7 steps annotated)
+- [x] Unit tests verify: (a) backward-compatible sequential behavior, (b) parallel execution of independent steps, (c) dependency waiting, (d) failure propagation to dependents, (e) cycle detection, (f) telemetry writes are not corrupted or lost under parallel execution, (g) `steps[]` array in pipeline report is in declaration order not completion order, (h) explicit skip (`step.skip === true`) does not block dependents, (i) dependency-failure skip DOES block dependents transitively (evidence: pipeline-scheduler.test.ts — 15 tests, pipeline-dependencies-validate.test.ts — 4 tests)
+- [x] `--concurrency` flag added to `ExecuteKernelPipelineOptions` and parsed from CLI (evidence: types.ts:413, cli/index.ts)
+- [x] Timing summary reports both `totalDurationMs` (wall clock) and `summedDurationMs` (sum of per-step) (evidence: types.ts:381-383, execute-pipeline.ts:117-127)
+- [x] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks` (evidence: tsc --noEmit exit 0 on both packages)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0686 exit 0)
 
 ## Implementation notes for agents
 
