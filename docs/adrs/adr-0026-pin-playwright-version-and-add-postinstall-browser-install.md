@@ -30,7 +30,7 @@ reviewers:
 
 Pin the Playwright dependency to an exact version (no caret) and add a `postinstall` script that runs `playwright install chromium` in the root `package.json`.
 
-- Pin applies to `playwright` in `packages/check-runner-node/package.json` (the only workspace that declares it as a direct dependency).
+- Pin applies to `playwright` in all workspaces that declare it as a direct dependency: `packages/check-runner-node/package.json`, `packages/os/site-kernel-checks/package.json`, and the root `package.json` (devDependency). The root `package.json` also pins `@playwright/test` to the same exact version.
 - The `postinstall` script lives in the root `package.json` so it runs once after every `pnpm install` at the monorepo root.
 
 ## Justification
