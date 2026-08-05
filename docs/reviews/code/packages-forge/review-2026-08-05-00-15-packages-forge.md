@@ -4,7 +4,7 @@ date: 2026-08-05
 reviewer:
   skill: fo-review
   model: claude-sonnet-4-20250514
-verdict: needs-revision
+verdict: approved
 diffRange: 35a43cda...HEAD
 filesReviewed:
   - packages/forge/src/profiles/profile-schema.ts
@@ -17,17 +17,17 @@ filesReviewed:
 
 # Code Review: 35a43cda...HEAD (RFC-0691 implementation)
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-Implementation корректно расширяет invariant engine четвёртым check kind и добавляет 6 domain-specific инвариантов. Однако `.refine()` в schema не проверяет `pattern` как обязательное поле для `html-attribute-pattern`, что позволяет silent false negatives. Также отсутствует тест для defensive check (missing `element`/`attribute`).
+Implementation корректно расширяет invariant engine четвёртым check kind и добавляет 6 domain-specific инвариантов. После fixes (A1: pattern required in .refine(), E1: defensive check test added) все findings устранены. 616/616 tests pass.
 
 ### Mechanical floor
 
-Pass — `pnpm --filter @warpgogol/forge run build:check` и `pnpm --filter @warpgogol/forge run test` (615/615) проходят без ошибок.
+Pass — `pnpm --filter @warpgogol/forge run build:check` и `pnpm --filter @warpgogol/forge run test` (616/616) проходят без ошибок.
 
 ### Axis A — Structural correctness
 
-- **Finding A1**: `.refine()` в `profileInvariantCheckSchema` проверяет только `element` и `attribute` для `html-attribute-pattern`, но не проверяет `pattern`. Если profile объявляет `kind: html-attribute-pattern` с `element` и `attribute`, но без `pattern`, `runCheck` молча возвращает `[]` (строка 113: `if (!pattern) return []`). Это silent false negative — check объявлен, но никогда не выполняется. `.refine()` должен также требовать `pattern` для `html-attribute-pattern`.
+- **Finding A1 (FIXED)**: `.refine()` теперь требует `pattern` для `html-attribute-pattern`. Fix: profile-schema.ts:136-137 добавлен `v.pattern != null` в refine condition.
 
 ### Axis B — DNA alignment
 
@@ -43,7 +43,7 @@ No issues. Additive extension — нет compatibility shims, нет dual paths,
 
 ### Axis E — Agent-facing clarity
 
-- **Finding E1**: Нет теста для defensive check (missing `element`/`attribute`). Строки 178-186 в `invariant-engine.ts` содержат defensive warning violation для случая когда `element` или `attribute` undefined, но этот path не покрыт тестами. Добавить тест: `html-attribute-pattern with missing element/attribute produces warning violation`.
+- **Finding E1 (FIXED)**: Добавлен тест `html-attribute-pattern with missing element/attribute produces warning violation` (invariant-engine.test.ts:367-391). Тест проверяет что defensive check path возвращает warning violation когда element/attribute отсутствуют.
 
 ### Axis F — Pragmatism
 
@@ -55,20 +55,20 @@ No issues. RFC документирует performance (O(n_files × n_elements_p
 
 ### Spec compliance
 
-| Requirement from RFC | Status | Evidence |
-| --- | --- | --- |
-| `html-attribute-pattern` check kind in schema | Done | profile-schema.ts:120-142 |
-| Element extraction and attribute validation | Done | invariant-engine.ts:175-218 |
-| VIDEO-04..09 invariants in profile | Done | editframe-html.yaml:83-132 |
-| `forge.doctor` checks VIDEO-04..09 | Done | doctor.ts calls checkInvariants |
-| Unit test: valid attribute values | Done | invariant-engine.test.ts:246-274 |
-| Unit test: invalid attribute values | Done | invariant-engine.test.ts:213-244 |
-| Unit test: absent attribute | Done | invariant-engine.test.ts:276-304 |
-| Unit test: 9 VIDEO-* invariants | Done | editframe-profile.test.ts:79 |
-| AGENTS.md updated | Done | packages/forge/AGENTS.md:142 |
-| rfc.validate passes | Done | 0 violations |
+| Requirement from RFC                          | Status | Evidence                         |
+| --------------------------------------------- | ------ | -------------------------------- |
+| `html-attribute-pattern` check kind in schema | Done   | profile-schema.ts:120-142        |
+| Element extraction and attribute validation   | Done   | invariant-engine.ts:175-218      |
+| VIDEO-04..09 invariants in profile            | Done   | editframe-html.yaml:83-132       |
+| `forge.doctor` checks VIDEO-04..09            | Done   | doctor.ts calls checkInvariants  |
+| Unit test: valid attribute values             | Done   | invariant-engine.test.ts:246-274 |
+| Unit test: invalid attribute values           | Done   | invariant-engine.test.ts:213-244 |
+| Unit test: absent attribute                   | Done   | invariant-engine.test.ts:276-304 |
+| Unit test: 9 VIDEO-* invariants               | Done   | editframe-profile.test.ts:79     |
+| AGENTS.md updated                             | Done   | packages/forge/AGENTS.md:142     |
+| rfc.validate passes                           | Done   | 0 violations                     |
 
 ### Questions for the author
 
-1. Должен ли `.refine()` также требовать `pattern` для `html-attribute-pattern`? Без этого check молча возвращает `[]` если `pattern` отсутствует.
-2. Нужно ли добавить тест для defensive check path (missing `element`/`attribute`)?
+1. ~~Должен ли `.refine()` также требовать `pattern` для `html-attribute-pattern`?~~ Fixed — `.refine()` теперь требует `pattern`.
+2. ~~Нужно ли добавить тест для defensive check path?~~ Fixed — тест добавлен.
