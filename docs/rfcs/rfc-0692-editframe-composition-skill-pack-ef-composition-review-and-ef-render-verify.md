@@ -192,14 +192,14 @@ The `composition-agents.md` template is enriched with:
 
 ## Acceptance criteria
 
-- [ ] `packages/forge/skills/ef-composition-review/SKILL.md` exists with valid frontmatter
-- [ ] `packages/forge/skills/ef-render-verify/SKILL.md` exists with valid frontmatter
-- [ ] `forge.skill.validate` passes on both skills
-- [ ] `forge.skill.list` includes both skills
-- [ ] `composition-agents.md` template includes time model concepts, invariant reference, and skill usage
-- [ ] Unit test verifies both skills pass `validateSkill` schema validation
-- [ ] `packages/forge/AGENTS.md` updated with new skill count
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `packages/forge/skills/ef-composition-review/SKILL.md` exists with valid frontmatter (evidence: `packages/forge/skills/fo/ef-composition-review/SKILL.md` created, passes `forge.skill.validate`)
+- [x] `packages/forge/skills/ef-render-verify/SKILL.md` exists with valid frontmatter (evidence: `packages/forge/skills/fo/ef-render-verify/SKILL.md` created, passes `forge.skill.validate`)
+- [x] `forge.skill.validate` passes on both skills (evidence: zero violations for both skills in validation run)
+- [x] `forge.skill.list` includes both skills (evidence: both skills appear in `forge.skill.list` output)
+- [x] `composition-agents.md` template includes time model concepts, invariant reference, and skill usage (evidence: template enriched with Time model concepts, Quality invariants table, Skill usage, and updated Workflow sections)
+- [x] Unit test verifies both skills pass `validateSkill` schema validation (evidence: 4 tests added in `packages/forge/src/tests/skill-validate.test.ts`, all pass)
+- [x] `packages/forge/AGENTS.md` updated with new skill count (evidence: updated from 33 to 35 skills, 26 to 28 fo skills)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0692` returns ok: true)
 
 ## Implementation notes for agents
 
