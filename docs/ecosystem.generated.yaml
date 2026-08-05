@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: aa3f1ef4952888908fe1f7e41b596cf04863a7c621f4e32b2031e4ca995d6a08
+  contentHash: 3462d64cd595c4889717f8b3b545e6c7ffa65cb62c200dafe6cae8af3160edb7
   sources:
     - path: docs/architecture-dna.md
-      hash: e0956d39f1a49011d2e96813d35a8dc92c80b1ba41e8d27613bcc6699d3a6989
+      hash: cea89080be8a76a0ce1a15331b711b0fc79122ebec09f6f5fd7c886d033ef213
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -22,42 +22,40 @@ meta:
       hash: ce321ba5b7b9f18c4c2c108bc00ec054bfacccdf552bfb1bee58c21213c241cc
     - path: docs/maintenance-debt/queues/surface-substance-assets-and-narratives.yaml
       hash: ad4b6dfdedcc73c92a956a485248f76cd5ca18d544537efa11913d8b14125791
-    - path: missions/warpgogol-com-m000024/workpiece/package.json
-      hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
-    - path: missions/warpgogol-com-m000025/workpiece/package.json
+    - path: missions/warpgogol-com-m000028/workpiece/package.json
       hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
     - path: package.json
-      hash: 73b48d8b7ad714562fcf7df93db6ee6d6a20affc2350f3ae83acf3f5772473c5
+      hash: 996d93f4734cb560f4aa90c681f2cf3a4875002d12511718418646af28926e8b
     - path: packages/agent-gate/package.json
-      hash: 1ae0595ee068d5f5eb6f42bac46b4b85b80935d858bdb0e685c871e166a2f14d
+      hash: 7aa535e0de15b4cc8659f7dfe1b8e000ccc4fdc3ab40ab0b37f3fea4b285af30
     - path: packages/chat-adapter-null/package.json
       hash: fbfd72ba75e08e0143136c4c77323bb4573bcdcbb573ecffb4d36176ee840307
     - path: packages/chat-adapter-uchat/package.json
-      hash: 756ff533781884b6608dc3ec42af31ca47c816bec25933669362f329d7dfee9a
+      hash: 67d1f1463c8dc6280495e87a1aea03d89316a74bd11766a9fd3d909221f1dfdf
     - path: packages/chat/package.json
       hash: 25c97c40bd67daf3dea1b6d4a9f846576fa1af20fc71d86f70b2fbc97a6130a3
     - path: packages/check-core/package.json
       hash: fdf01768d35658051a86973f3213f3403cb5224827b225757f3a9679f0855f1f
     - path: packages/check-runner-node/package.json
-      hash: 9e35e332a54b4a42e0d6efe6635a3871d8e3c5d364eebb60e783c16573ae6e02
+      hash: 44541512005ea29cffcda597bbccf616d6cc0704ec223b2247e10fb7e1dd2bb3
     - path: packages/content-source/package.json
-      hash: 35f8492c53e8640514d12b5b784ba8199e167eb804497319d667c548cf2a6d7e
+      hash: ba3485d943e08cd28ced1874bc15bf74751265b4cc474b6427978057bea8fb20
     - path: packages/faq/package.json
-      hash: 0155b63afac554c6535483b4ce8c1b33da5a9353c139ec3f8f46209420f82be0
+      hash: 7a88632493f2dc2a31812c7f75de6ed58cdd3d3a7e8a8867a44e9ff82be5846b
     - path: packages/fingerprint/package.json
-      hash: a4514b6afac4ed0d360cf62e743fc56ccdc0f3302acbe010adc2a1fc70a38bde
+      hash: 95dd61ea33fe31cc54dfc6c54d0504ee1be86b7591129eee47252be2c2a12ce8
     - path: packages/forge/package.json
-      hash: 9ebc5d2ffcdade42979bb53bac32a235621de1d3a74eabb9b8f0217cbdaa3667
+      hash: 8cfbff20a633b5227430be051087d5b8c996f8089fef4cbf3b43895a6c77611e
     - path: packages/geo/package.json
       hash: 6aa800488d6c38a5666738d686eb69d30815e3fe8a7cb9ce4777715fa2627aa2
     - path: packages/growth-adapter-matomo/package.json
       hash: 4e61621ed86cf68b663ce1243853b08394a606e37f7fcbeca61fb7adcb2b8f14
     - path: packages/growth/package.json
-      hash: bb197e266cb650a0448a77d53a79fe34234ff0dba4609e48558b15c5635052c7
+      hash: 0b92db6562020bf02b630a0e3b77931c679c5e10e9f0a9662e84785041ad11ae
     - path: packages/integration-adapter-stripe/package.json
       hash: 73b641b0c050a0743b1599b9d7fe7b61f60ecee5782f81189c2f3e6cd894d53a
     - path: packages/integration-adapter-supabase-crm/package.json
-      hash: 022411b3f021d118cd226323848de3f68ad39fb2cb0080ef8c5729d97d191647
+      hash: 2150689a28b72df983f4cfd4987ee101dc90476d77e84b43d3808be85425a496
     - path: packages/integration/package.json
       hash: c2b3d252d5f8c6004f1622fb036993d79a4cdbc2238b1e8bbbe8a9de5f736991
     - path: packages/nebula/package.json
@@ -71,11 +69,11 @@ meta:
     - path: packages/os/site-kernel-audit/package.json
       hash: 593670cfe08e9df23fd4366fc7d86112d289e8b50330979ff0cca403b91ab2e1
     - path: packages/os/site-kernel-changelog/package.json
-      hash: 508763ac52502eddc24576a981f01acfc7290dd9e55a79c0be482dae54eaced8
+      hash: 35ca0e11ba5dc6c8b97f6938b8e7273a9eabf67ec7ae3b97a8dba8e88af15bb2
     - path: packages/os/site-kernel-check-warpgogol/package.json
       hash: 8513da0519bfbd39d129152595f85c9494f0d90a9de4660b88831694e1f7048e
     - path: packages/os/site-kernel-checks/package.json
-      hash: 0483b38341c212997445c612ad359d9e63d7d91d4635b401fbfb47f747f4c732
+      hash: 6635086002abfe05fa67ffc88b67f1dd0e5b65090b430c20b9b3a34cc0cc1fde
     - path: packages/os/site-kernel-checks/src/ci-local.ts
       hash: 4fae56dd7e925f001b43a93e79196b5e33efefcb574add4fae98255e0667cfd0
     - path: packages/os/site-kernel-checks/src/command-tables/20-ecosystem.ts
@@ -103,17 +101,17 @@ meta:
     - path: packages/os/site-kernel-checks/src/module.ts
       hash: 7cb608a816393e36d1cf3cc4082d2e177d003f75a79aff35147a3cb26a218483
     - path: packages/os/site-kernel-checks/src/pipelines/packages-check.ts
-      hash: e0bd84ffe2594513dda10288ec7b3857f2250e4fd04dab14460d544ea3517d32
+      hash: d53a15e173b700c8ac4975c0c2afb7a182d07540c3b1025061660cf717cc4645
     - path: packages/os/site-kernel-checks/src/test-signal.ts
       hash: bb22b88b465a6cda6c52d505e0ed0e99975fb9b4e3e15cc7bddc567523dba058
     - path: packages/os/site-kernel-codegen/package.json
-      hash: 52f52e2559c7f83003f5dd69a4fd8331f6ea4d6f6a9210b5e8aaafaad2dfbffd
+      hash: 25c0a807ff7305688f348586a39d8a44b86689246c3f93c60213bfe55e1990f1
     - path: packages/os/site-kernel-content/package.json
-      hash: 97d28c3124881689fe2a0c49470b425bfc9a1f48906474dcb0fa96e8be82b128
+      hash: fc7b63d16d4574e5e5292ff515805c543c8b0dc9e217aa74722daf9c6cb32221
     - path: packages/os/site-kernel-deploy/package.json
       hash: cbeef164c4f63e290e723450ddde430c6c4836c9a3912df08885878b575118ed
     - path: packages/os/site-kernel-handoff/package.json
-      hash: 10014c4ce6059e5fadab195ee98dccb581b19f1d9d3efd8c46b761f998966359
+      hash: fc21ca0f2c3014bdd81819c86699cceadea13469dbc27ad56a3828cb5e8fb723
     - path: packages/os/site-kernel-integrity/package.json
       hash: 1335fa81d5170aa34b844154e6d050e37605bbd6ea2a8ba19138f46bbf84f1ab
     - path: packages/os/site-kernel-observability/package.json
@@ -121,27 +119,27 @@ meta:
     - path: packages/os/site-kernel-onboarding/package.json
       hash: 906968908bfe0b3700e0c5c34719c24e71585616988bffb9161e2ef859d2d90d
     - path: packages/os/site-kernel/package.json
-      hash: cdd52d78a0b0ee75fa64ee31c66dabfc5a1a554bc32f01ece45bb7a1f571bb09
+      hash: 8c57a10bce5e00ca027dde09166f5cfabe4212130dc59546224e565293d88dbf
     - path: packages/os/site-kernel/src/runtime.ts
-      hash: ff42e55bbd43d760def255b5f0ba4557bac7d4fb1f4cafd303c9d06b8f2771a4
+      hash: e46590ab87680a6d9076d973b605990231b1e7c5c83c9749b049edf4f35c8c42
     - path: packages/passport/package.json
       hash: ed6e7f915821a41f35320b52ac4a12d9aa9d6e324d5b1759bad053a87c624349
     - path: packages/pbp/package.json
-      hash: 428c64af164fa15e1ad8ce2f2f47dd5326b62cb54ceb5f26a3b917c3aec9434a
+      hash: 72a8d43e26c58b7666453d2711b3488d7716964f5d030c3db9bbcefd74cc2220
     - path: packages/share/package.json
-      hash: 6cb707a990e17b75ce6a138af22cb0c7dde4b6997f2c8569f66e6c22a3a485bf
+      hash: 84e3ee4150af58f753a1b15714bf2190ba803e0988f491d9184b01f10a02c07c
     - path: packages/star-map/package.json
       hash: e907d326f9024ab5695a8eb3a4b3459725119d5448c130dc70811f49b2116fd7
     - path: packages/studio-gate/package.json
-      hash: a7ba63b6ace7340feec38b958dd581572b977eaa4ea802546333cdb12751017d
+      hash: 407c0e23fca5b77134873afbdbbc1d852f9258ede7b32ccf5972939747defaf5
     - path: packages/surface/package.json
       hash: 1443f51082f320df6e4bf2dd3dee328d63f52f89ebac30da4163d6da6532b87b
     - path: packages/tokens/package.json
-      hash: 9d66afb9097510e178a4a475c8573fd76c8e3f66722a3b3a7d61c5fc20dc9b37
+      hash: c83eb649f8783b95f5535c5912835af77bb25cb15f3a2a7926133fa8478c7a40
     - path: packages/ui/package.json
-      hash: b7f6b35179434da181c77ecb9485fd70445c5cff29a2215f4aeb5f89c091b057
+      hash: e018c9e1fbbbfff4a65b574a36b1d84b7a0279ed6064c46547ccd290319ca02c
     - path: packages/warpgogol-skills/package.json
-      hash: cc7f8653664f860321e3cf2376dd2c411a88dce92dc9e6dc9384b104c2e80caf
+      hash: faae287a3bd3b3272987730838981df1518e6716638d78cb0469ba6879b7f818
     - path: pnpm-workspace.yaml
       hash: cbc447972e2ad03356938f6d6294e8d88d8ba156a6424a5ee12e657a920569bd
     - path: services/cf-analytics-poller/package.json
@@ -151,18 +149,18 @@ meta:
     - path: services/fleet-probe-runner/package.json
       hash: dd82245b2ef543c422368f3c2497254edeba1c24bb790cbccd44d63d67889af8
     - path: services/lagebild-sync-worker/package.json
-      hash: 01e7d94f2641419b1847028033182c33c88bba5588471ae6dd541d9c83f33ff2
+      hash: 17fd8d692ec1e26a4c1f0325c739f700e88929b062efd46c58c39cc2a5aec3c7
     - path: services/matomo-proxy/package.json
-      hash: 4b4d3c1df3646c5bb15c3f60dee51296e2faa67528792113975f75d6bac3b144
+      hash: 1c1d3bdc0601a01380701aa39b73c79f110634c67b01894d3f8b515c58f5e98f
     - path: services/observability-stack/package.json
       hash: 64661f54607b3e5c9e97c6a618f0deb1d0eed30976d420b0d5ecaf4b6032158a
     - path: services/telegram-alert-bridge/package.json
-      hash: 228295f8b0883facdd44d9d237a1d7bec9e1680f74e7ee5b7b94c0ccb41a050a
+      hash: e4749c6d48db87f6bd987327c3919eb4f756ca257f3792d2dcd8e774fb2ed831
     - path: tools/kernel.config.ts
       hash: 1b7e92edb1ccf18fc34d6a88483b15d2718785900e9dc6fccdf88afcdc6fe965
 workspace:
   name: warpgogol-platform
-  version: 4.5.3
+  version: 4.5.4
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -171,24 +169,20 @@ workspace:
     - services/*
 apps:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000025/workpiece
+    directory: missions/warpgogol-com-m000028/workpiece
     packageName: warpgogol-com
 sternsystems:
   - id: warpgogol-com
-    currentMission: warpgogol-com-m000025
+    currentMission: warpgogol-com-m000028
     registeredAt: 2026-07-13T00:00:00.000Z
 missions:
-  - id: warpgogol-com-m000024
+  - id: warpgogol-com-m000028
     sternsystem: ""
     status: open
-    workpiecePath: missions/warpgogol-com-m000024/workpiece
-  - id: warpgogol-com-m000025
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000025/workpiece
+    workpiecePath: missions/warpgogol-com-m000028/workpiece
 packages:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000024/workpiece
+    directory: missions/warpgogol-com-m000028/workpiece
     workspacePattern: missions/*/workpiece
     kind: mission
     dependencies:
@@ -229,60 +223,7 @@ packages:
       - zod
     testSignal:
       packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000024/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000025/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-handoff"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/site-kernel-onboarding"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000025/workpiece
+      directory: missions/warpgogol-com-m000028/workpiece
       signal: skipped
       evidence: App author/build checks currently cover the deployable site; direct
         app unit tests are deferred until an app-level smoke-test harness lands.
@@ -433,6 +374,7 @@ packages:
       - "@typescript-eslint/typescript-estree"
       - "@warpgogol/share"
       - jsonc-parser
+      - pdf-lib
       - postcss
       - remark-frontmatter
       - remark-mdx
@@ -450,6 +392,10 @@ packages:
     workspacePattern: packages/*
     kind: package
     dependencies:
+      - "@aws-sdk/client-s3"
+      - "@warpgogol/fingerprint"
+      - "@warpgogol/share"
+      - trash
       - yaml
       - zod
     testSignal:
@@ -699,9 +645,7 @@ packages:
       - "@ai-sdk/openai"
       - "@astrojs/compiler"
       - "@syrokomskyi/axiom-capture"
-      - "@syrokomskyi/axiom-contracts"
-      - "@syrokomskyi/axiom-methodology"
-      - "@syrokomskyi/axiom-provenance"
+      - "@syrokomskyi/axiom-factory-app"
       - "@syrokomskyi/axiom-study"
       - "@warpgogol/agent-gate"
       - "@warpgogol/chat"
@@ -731,6 +675,7 @@ packages:
       - ai
       - crawlee
       - file-type
+      - parse5
       - picomatch
       - playwright
       - sharp
@@ -803,6 +748,8 @@ packages:
     kind: os-package
     dependencies:
       - "@aws-sdk/client-s3"
+      - "@syrokomskyi/axiom-factory-app"
+      - "@syrokomskyi/axiom-study"
       - "@warpgogol/fingerprint"
       - "@warpgogol/forge"
       - "@warpgogol/ontology"
@@ -1190,7 +1137,7 @@ quality:
     real: 31
     noop: 0
     absent: 1
-    skipped: 18
+    skipped: 17
   testSignalPolicy:
     hasErrors: true
     errorCount: 1
@@ -2569,6 +2516,12 @@ commands:
     providers:
       - site
       - workspace
+  - name: dist.determinism.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: dist.generated-marker.strip
     scope: app
     mutatesState: true
@@ -2974,7 +2927,37 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
+  - name: forge.assets.check
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.assets.list
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.build
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: forge.create
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.determinism.check
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.dev
     scope: workspace
     mutatesState: false
     supportsAllSites: false
@@ -3004,7 +2987,25 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
+  - name: forge.release.prepare
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.release.publish
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
   - name: forge.scaffold
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.skill.knowledge.compact
     scope: workspace
     mutatesState: false
     supportsAllSites: false
@@ -3023,6 +3024,12 @@ commands:
     providers:
       - workspace
   - name: forge.upgrade
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: forge.validate
     scope: workspace
     mutatesState: false
     supportsAllSites: false
@@ -3837,6 +3844,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: methodologies.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
   - name: migrator.registry.validate
     scope: workspace
     mutatesState: false
@@ -4345,6 +4359,13 @@ commands:
     providers:
       - site
       - workspace
+  - name: pipeline.dependencies.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
   - name: pipeline.idempotency.smoke
     scope: app
     mutatesState: false
@@ -4646,6 +4667,12 @@ commands:
   - name: release.rollback
     scope: workspace
     mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: release.state.validate
+    scope: workspace
+    mutatesState: false
     supportsAllSites: false
     providers:
       - workspace
@@ -5279,6 +5306,13 @@ commands:
     scope: app
     mutatesState: true
     supportsAllSites: true
+    providers:
+      - site
+      - workspace
+  - name: suppressions.validate
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
     providers:
       - site
       - workspace
@@ -5977,24 +6011,11 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: bordbuch.commit
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0646
-    removedBy: []
   - command: consent.activation.validate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0305
-    removedBy: []
-  - command: dist.html-structure.validate
-    proposedBy:
-      - RFC-0654
-    addedBy:
-      - RFC-0654
-    changedBy: []
     removedBy: []
   - command: env.example.validate
     proposedBy: []
@@ -6002,63 +6023,6 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
-  - command: evidence.fetch
-    proposedBy:
-      - RFC-0651
-    addedBy:
-      - RFC-0651
-    changedBy: []
-    removedBy: []
-  - command: evidence.sync
-    proposedBy:
-      - RFC-0651
-    addedBy:
-      - RFC-0651
-    changedBy: []
-    removedBy: []
-  - command: forge.agents.generate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0640
-      - RFC-0643
-    removedBy: []
-  - command: forge.create
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0640
-    removedBy: []
-  - command: forge.doctor
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0640
-    removedBy: []
-  - command: forge.profile.validate
-    proposedBy: []
-    addedBy:
-      - RFC-0640
-    changedBy: []
-    removedBy: []
-  - command: forge.skill.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0642
-    removedBy: []
-  - command: generated.drift.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0645
-    removedBy: []
-  - command: generated.timestamp.validate
-    proposedBy: []
-    addedBy: []
-    changedBy: []
-    removedBy:
-      - RFC-0645
   - command: growth.adapter.contract
     proposedBy: []
     addedBy: []
@@ -6093,9 +6057,7 @@ commandProvenance:
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0649
-      - RFC-0652
-      - RFC-0653
+      - RFC-0689
     removedBy: []
   - command: matomo.export.validate
     proposedBy:
@@ -6132,67 +6094,11 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: mission.check
+  - command: suppressions.validate
     proposedBy: []
     addedBy: []
     changedBy:
-      - RFC-0650
-    removedBy: []
-  - command: mission.cleanup
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0652
-    removedBy: []
-  - command: mission.close
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0648
-      - RFC-0652
-    removedBy: []
-  - command: mission.reconcile
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0644
-    removedBy: []
-  - command: playwright.chromium.ensure
-    proposedBy:
-      - RFC-0647
-    addedBy:
-      - RFC-0647
-    changedBy: []
-    removedBy: []
-  - command: preview.images.generate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0653
-    removedBy: []
-  - command: print.pdf.copy
-    proposedBy:
-      - RFC-0653
-    addedBy: []
-    changedBy: []
-    removedBy: []
-  - command: print.pdf.generate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0653
-    removedBy: []
-  - command: sternsystem.status
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0648
-    removedBy: []
-  - command: sternsystem.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0648
+      - RFC-0688
     removedBy: []
   - command: surface.generate
     proposedBy: []
@@ -6204,6 +6110,7 @@ pipelines:
   - name: build.check
     scope: app
     commands:
+      - pipeline.dependencies.validate
       - uni.registry.validate
       - app.layout.validate
       - system.manifest.validate
@@ -6504,6 +6411,7 @@ pipelines:
       - uni.registry.build
       - warpgogol.check-hints.generate
       - bordbuch.generate
+      - bordbuch.validate
       - bordbuch.commit
       - passport.key.ensure
       - generated.files.validate
@@ -6664,6 +6572,8 @@ pipelines:
       - chat.metadata.drift.validate
       - command.reads.validate
       - yaml.parse.validate
+      - methodologies.validate
+      - suppressions.validate
     executableFromRoot: true
   - name: packages.check
     scope: workspace
@@ -6760,6 +6670,8 @@ pipelines:
       - chat.metadata.drift.validate
       - command.reads.validate
       - yaml.parse.validate
+      - methodologies.validate
+      - suppressions.validate
     executableFromRoot: true
   - name: sites-check.author
     scope: app
@@ -7495,126 +7407,30 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 2
-  implemented: 17
-  draft: 3
+  accepted: 3
+  implemented: 2
+  draft: 5
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0638
-      implementedAt: 2026-08-02
+    - id: RFC-0688
+      implementedAt: 2026-08-05
       kind: architecture
       scope: workspace
       dnaRefs:
-        - DNA-54
-    - id: RFC-0639
-      implementedAt: 2026-08-02
-      kind: contract
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0640
-      implementedAt: 2026-08-02
+        - DNA-49
+    - id: RFC-0689
+      implementedAt: 2026-08-05
       kind: command
       scope: workspace
       dnaRefs: []
-    - id: RFC-0641
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0642
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-54
-    - id: RFC-0643
-      implementedAt: 2026-08-02
-      kind: command
-      scope: workspace
-      dnaRefs: []
-    - id: RFC-0644
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-46
-        - DNA-51
-    - id: RFC-0645
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-58
-    - id: RFC-0646
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-51
-    - id: RFC-0647
-      implementedAt: 2026-08-02
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-51
-    - id: RFC-0648
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-44
-        - DNA-45
-    - id: RFC-0649
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-49
-    - id: RFC-0650
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-46
-        - DNA-49
-        - DNA-52
-        - DNA-59
-    - id: RFC-0651
-      implementedAt: 2026-08-02
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-52
-        - DNA-59
-    - id: RFC-0652
-      implementedAt: 2026-08-02
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-46
-        - DNA-49
-        - DNA-59
-    - id: RFC-0653
-      implementedAt: 2026-08-02
-      kind: architecture
-      scope: workspace
-      dnaRefs:
-        - DNA-49
-    - id: RFC-0654
-      implementedAt: 2026-08-02
-      kind: command
-      scope: workspace
-      dnaRefs:
-        - DNA-8
-        - DNA-35
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
+      - RFC-0690
     draft:
+      - RFC-0000
       - RFC-0383
       - RFC-0384
       - RFC-0387
@@ -7916,4 +7732,9 @@ baseline:
       title: Evidence preservation
       provenance: rfc
       establishingRfc: RFC-0650
+      status: active
+    - id: DNA-60
+      title: Knowledge entry schema and lifecycle contract
+      provenance: rfc
+      establishingRfc: RFC-0660
       status: active
