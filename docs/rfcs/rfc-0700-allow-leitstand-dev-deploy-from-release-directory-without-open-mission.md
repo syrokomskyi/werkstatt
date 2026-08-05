@@ -270,15 +270,15 @@ When `--release` is used, the `--json` output includes all existing `DevDeployRe
 
 ## Acceptance criteria
 
-- [ ] `--release` flag accepted by `leitstand.dev-deploy` command registration
-- [ ] When `--release` is provided, command deploys from `releases/<id>/dist/` without requiring `entry.currentMission`
-- [ ] When `--release` is not provided, command behaves exactly as before (requires open mission)
-- [ ] CDN purge runs after release-based deploy (same as workpiece path)
-- [ ] Health check runs after release-based deploy (same as workpiece path)
-- [ ] `--json` output includes `releaseDeployed` and `buildSkipped` fields when `--release` is used, with `axiom.status: "not-run"` and `buildIdentity.written: false`
-- [ ] Unit test covers the `--release` path in `leitstand-commands.ts` (release found, system mismatch, dist missing)
-- [ ] `leitstand.module.ts` `reads` updated to include `releases/{release}/**`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `--release` flag accepted by `leitstand.dev-deploy` command registration (evidence: `leitstand.module.ts:44-48`, `command.manifest.generate` passed)
+- [x] When `--release` is provided, command deploys from `releases/<id>/dist/` without requiring `entry.currentMission` (evidence: `leitstand-commands.ts:618-772`, test `--release succeeds without currentMission`)
+- [x] When `--release` is not provided, command behaves exactly as before (requires open mission) (evidence: `leitstand-commands.ts:774-785`, test `without --release, workpiece path is unchanged`)
+- [x] CDN purge runs after release-based deploy (same as workpiece path) (evidence: `leitstand-commands.ts:713-724`, `runPurgeStep` called in release path)
+- [x] Health check runs after release-based deploy (same as workpiece path) (evidence: `leitstand-commands.ts:727-735`, `adapter.health` called in release path)
+- [x] `--json` output includes `releaseDeployed` and `buildSkipped` fields when `--release` is used, with `axiom.status: "not-run"` and `buildIdentity.written: false` (evidence: `leitstand-commands.ts:741-768`, test `--release deploys from releases/<id>/dist/ and returns success`)
+- [x] Unit test covers the `--release` path in `leitstand-commands.ts` (release found, system mismatch, dist missing) (evidence: `leitstand-0700-release-dev-deploy.test.ts`, 7 tests pass)
+- [x] `leitstand.module.ts` `reads` updated to include `releases/{release}/**` (evidence: `leitstand.module.ts:59-63`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0700 --json` → 0 errors)
 
 ## Implementation notes for agents
 
