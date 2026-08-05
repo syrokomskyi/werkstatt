@@ -228,10 +228,10 @@ function isCommandCacheable(command: KernelCommandDefinition): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Tracks which commands were cache hits during a pipeline run, plus the
+ * RFC-0687: Tracks which commands were cache hits during a pipeline run, plus the
  * pipeline name for cross-pipeline persistence.
  */
-interface PipelineRunState {
+export interface PipelineRunState {
   cacheHitCommands: Set<string>;
   pipelineName: string;
 }
@@ -252,7 +252,7 @@ interface PipelineRunState {
  * validators (e.g. `generated.drift.validate`) which always run and catch
  * manual edits to generated files.
  */
-function shouldTransitiveSkip(
+export function shouldTransitiveSkip(
   command: KernelCommandDefinition,
   runState: PipelineRunState,
 ): boolean {
@@ -283,7 +283,7 @@ interface PipelineCacheHitsFile {
  * Handles missing, corrupt, or stale files gracefully — returns an empty
  * set on any error.
  */
-async function loadImportedCacheHits(
+export async function loadImportedCacheHits(
   workspaceRoot: string,
   currentPipelineName: string,
 ): Promise<Set<string>> {
@@ -322,7 +322,7 @@ async function loadImportedCacheHits(
  * `.cache/pipeline-cache-hits.json`, replacing any previous entry for that
  * pipeline. Preserves entries for other pipelines.
  */
-async function persistCacheHits(
+export async function persistCacheHits(
   workspaceRoot: string,
   pipelineName: string,
   cacheHitCommands: Set<string>,
@@ -357,9 +357,11 @@ async function persistCacheHits(
 /**
  * RFC-0687: Clear the pipeline cache-hits file. Called when `--force` is set.
  */
-async function clearPipelineCacheHits(workspaceRoot: string): Promise<void> {
-  const filePath = join(workspaceRoot, PIPELINE_CACHE_HITS_DIR, PIPELINE_CACHE_HITS_FILENAME);
+export async function clearPipelineCacheHits(workspaceRoot: string): Promise<void> {
+  const dir = join(workspaceRoot, PIPELINE_CACHE_HITS_DIR);
+  const filePath = join(dir, PIPELINE_CACHE_HITS_FILENAME);
   try {
+    await mkdir(dir, { recursive: true });
     await writeFile(filePath, JSON.stringify({ pipelines: {} }, null, 2) + "\n", "utf8");
   } catch {
     // Non-fatal — clear is best-effort.
