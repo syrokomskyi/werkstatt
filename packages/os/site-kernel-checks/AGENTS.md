@@ -194,6 +194,10 @@ Root `.env.example` (at the werkstatt repository root) is hand-maintained — NO
 
 When annotating commands with `modulePaths` for granular module hashing, trace handler imports through re-export shims to the actual handler file. For example, `src/structure.ts` is a thin re-export shim over `src/structure/{mirror-triad,dispatcher-sync,...}.ts` — `modulePaths` must reference the actual handler file (e.g. `"structure/mirror-triad.ts"`), not the shim (e.g. `"structure.ts"`). This ensures `computeModuleHash` fingerprints only the files that contain the handler logic.
 
+## pipeline.dependencies.validate leaf-only rule (RFC-0686)
+
+`pipeline.dependencies.validate` MUST only validate **leaf** pipelines, not composite ones. Composite pipelines (e.g. `SITES_CHECK_PIPELINE` = `SITES_CHECK_AUTHOR_PIPELINE` + `SITES_CHECK_POSTBUILD_PIPELINE`) concatenate multiple leaf pipelines and naturally contain duplicate command names by construction. `buildSchedule` rejects duplicate command names, so including composites in the validator would produce false positives. When adding a new pipeline to the validator's `standardPipelines()` list, verify it is a leaf pipeline — if it spreads other pipeline constants, it is composite and must be excluded.
+
 ## Architecture reference
 
 → `packages/os/site-kernel/AGENTS.md` — kernel architecture table  
