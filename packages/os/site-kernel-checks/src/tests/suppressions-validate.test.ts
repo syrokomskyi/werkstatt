@@ -138,4 +138,79 @@ describe("runSuppressionsValidate", () => {
       rmSync(tmpDir, { recursive: true });
     }
   });
+
+  it("warns SUPPRESS-VAL-06 when messagePattern used without titlePattern", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "supp-val-test-"));
+    try {
+      mkdirSync(join(tmpDir, "systems"), { recursive: true });
+      writeFileSync(
+        join(tmpDir, "systems/axiom-suppressions.yaml"),
+        `suppressions:\n  - ruleId: test-rule\n    category: test\n    messagePattern: "some specific pattern here"\n    reason: "deprecated field"\n`,
+      );
+      const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));
+      expect(result.data?.diagnostics.some((d) => d.ruleId === "SUPPRESS-VAL-06")).toBe(true);
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it("warns SUPPRESS-VAL-06 when descriptionPattern used without titlePattern", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "supp-val-test-"));
+    try {
+      mkdirSync(join(tmpDir, "systems"), { recursive: true });
+      writeFileSync(
+        join(tmpDir, "systems/axiom-suppressions.yaml"),
+        `suppressions:\n  - ruleId: test-rule\n    category: test\n    descriptionPattern: "some specific pattern here"\n    reason: "deprecated field"\n`,
+      );
+      const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));
+      expect(result.data?.diagnostics.some((d) => d.ruleId === "SUPPRESS-VAL-06")).toBe(true);
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it("does not warn SUPPRESS-VAL-06 when messagePattern used with titlePattern", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "supp-val-test-"));
+    try {
+      mkdirSync(join(tmpDir, "systems"), { recursive: true });
+      writeFileSync(
+        join(tmpDir, "systems/axiom-suppressions.yaml"),
+        `suppressions:\n  - ruleId: test-rule\n    category: test\n    messagePattern: "some specific pattern here"\n    titlePattern: "specific title pattern"\n    reason: "has fallback"\n`,
+      );
+      const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));
+      expect(result.data?.diagnostics.some((d) => d.ruleId === "SUPPRESS-VAL-06")).toBe(false);
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it("does not warn SUPPRESS-VAL-06 when neither messagePattern nor descriptionPattern used", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "supp-val-test-"));
+    try {
+      mkdirSync(join(tmpDir, "systems"), { recursive: true });
+      writeFileSync(
+        join(tmpDir, "systems/axiom-suppressions.yaml"),
+        `suppressions:\n  - ruleId: test-rule\n    category: test\n    titlePattern: "specific title pattern"\n    reason: "titlePattern only"\n`,
+      );
+      const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));
+      expect(result.data?.diagnostics.some((d) => d.ruleId === "SUPPRESS-VAL-06")).toBe(false);
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it("warns SUPPRESS-VAL-04 on broad titlePattern (single word)", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "supp-val-test-"));
+    try {
+      mkdirSync(join(tmpDir, "systems"), { recursive: true });
+      writeFileSync(
+        join(tmpDir, "systems/axiom-suppressions.yaml"),
+        `suppressions:\n  - ruleId: test-rule\n    category: test\n    titlePattern: "error"\n    reason: "broad titlePattern"\n`,
+      );
+      const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));
+      expect(result.data?.diagnostics.some((d) => d.ruleId === "SUPPRESS-VAL-04")).toBe(true);
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
 });

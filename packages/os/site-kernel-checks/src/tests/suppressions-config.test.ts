@@ -337,6 +337,58 @@ describe("applySuppressions", () => {
     expect((result[0] as { suppressed?: boolean }).suppressed).toBe(true);
   });
 
+  it("titlePattern condition — suppress when title contains pattern", () => {
+    const findings = [
+      makeFinding({ title: "runtime-health.console-error: Deprecated API detected" }),
+    ];
+    const rules: SuppressionRule[] = [
+      {
+        ruleId: "seo-runtime.canonical-mismatch",
+        category: "deprecation",
+        titlePattern: "Deprecated API",
+        reason: "browser deprecation",
+      },
+    ];
+    const result = applySuppressions(findings, rules, { channel: "dev" });
+    expect((result[0] as { suppressed?: boolean }).suppressed).toBe(true);
+  });
+
+  it("titlePattern condition — does not suppress when title does not contain pattern", () => {
+    const findings = [
+      makeFinding({ title: "runtime-health.console-error: Console error detected" }),
+    ];
+    const rules: SuppressionRule[] = [
+      {
+        ruleId: "seo-runtime.canonical-mismatch",
+        category: "deprecation",
+        titlePattern: "Deprecated API",
+        reason: "browser deprecation",
+      },
+    ];
+    const result = applySuppressions(findings, rules, { channel: "dev" });
+    expect((result[0] as { suppressed?: boolean }).suppressed).toBeUndefined();
+  });
+
+  it("titlePattern is checked before messagePattern (position 5)", () => {
+    const findings = [
+      makeFinding({
+        title: "runtime-health.console-error: Deprecated API detected",
+        extension: { message: "Deprecated API for given entry type" },
+      }),
+    ];
+    const rules: SuppressionRule[] = [
+      {
+        ruleId: "seo-runtime.canonical-mismatch",
+        category: "deprecation",
+        titlePattern: "Deprecated API",
+        messagePattern: "nonexistent-in-title",
+        reason: "titlePattern takes priority",
+      },
+    ];
+    const result = applySuppressions(findings, rules, { channel: "dev" });
+    expect((result[0] as { suppressed?: boolean }).suppressed).toBeUndefined();
+  });
+
   it("AND logic — all conditions must match", () => {
     const findings = [makeFinding({ affectedSubjectId: "https://example.com/page" })];
     const rules: SuppressionRule[] = [
