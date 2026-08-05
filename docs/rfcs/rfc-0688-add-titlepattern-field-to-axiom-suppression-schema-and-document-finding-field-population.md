@@ -218,16 +218,16 @@ The `extractMessage` and `extractDescription` helpers in `suppressions-config.ts
 
 ## Acceptance criteria
 
-- [ ] `titlePattern` field added to `suppressionRuleSchema` in `suppressions-config.ts`
-- [ ] `applySuppressions` checks `titlePattern` (position 5, before `messagePattern`)
-- [ ] SUPPRESS-VAL-06 warning emitted by `suppressions.validate` for rules using `messagePattern`/`descriptionPattern` without `titlePattern`
-- [ ] Default rules in `systems/axiom-suppressions.yaml` no longer use `messagePattern` or `descriptionPattern` (already done — Categories C and D use `channelNot`/`urlPattern`)
-- [ ] `ruleSignature` in `suppressions-validate.ts` includes `titlePattern` in conflict-detection signature
-- [ ] `isBroadPattern` check in `suppressions-validate.ts` extended to `titlePattern` (SUPPRESS-VAL-04)
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` documents Finding field population (which fields exist vs do not exist)
-- [ ] Unit tests added for `titlePattern` matching in `suppressions-config.test.ts` and SUPPRESS-VAL-06 warning in `suppressions-validate.test.ts`
-- [ ] `suppressions.validate` passes on `systems/axiom-suppressions.yaml` with zero warnings (no SUPPRESS-VAL-06 since no default rule uses `messagePattern`/`descriptionPattern`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `titlePattern` field added to `suppressionRuleSchema` in `suppressions-config.ts` (evidence: `packages/os/site-kernel-checks/src/suppressions-config.ts:29`)
+- [x] `applySuppressions` checks `titlePattern` (position 5, before `messagePattern`) (evidence: `packages/os/site-kernel-checks/src/suppressions-config.ts:119-122`)
+- [x] SUPPRESS-VAL-06 warning emitted by `suppressions.validate` for rules using `messagePattern`/`descriptionPattern` without `titlePattern` (evidence: `packages/os/site-kernel-checks/src/suppressions-validate.ts:179-192`, test in `suppressions-validate.test.ts:142-155`)
+- [x] Default rules in `systems/axiom-suppressions.yaml` no longer use `messagePattern` or `descriptionPattern` (already done — Categories C and D use `channelNot`/`urlPattern`) (evidence: `suppressions.validate --json` passes with 0 warnings on 7 rules)
+- [x] `ruleSignature` in `suppressions-validate.ts` includes `titlePattern` in conflict-detection signature (evidence: `packages/os/site-kernel-checks/src/suppressions-validate.ts:42`)
+- [x] `isBroadPattern` check in `suppressions-validate.ts` extended to `titlePattern` (SUPPRESS-VAL-04) (evidence: `packages/os/site-kernel-checks/src/suppressions-validate.ts:169-176`, test in `suppressions-validate.test.ts:202-214`)
+- [x] `packages/os/site-kernel-checks/AGENTS.md` documents Finding field population (which fields exist vs do not exist) (evidence: `packages/os/site-kernel-checks/AGENTS.md:27`)
+- [x] Unit tests added for `titlePattern` matching in `suppressions-config.test.ts` and SUPPRESS-VAL-06 warning in `suppressions-validate.test.ts` (evidence: `suppressions-config.test.ts:340-390`, `suppressions-validate.test.ts:142-214`)
+- [x] `suppressions.validate` passes on `systems/axiom-suppressions.yaml` with zero warnings (no SUPPRESS-VAL-06 since no default rule uses `messagePattern`/`descriptionPattern`) (evidence: `suppressions.validate --json` → status: pass, 0 warnings)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0688 --json` → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
