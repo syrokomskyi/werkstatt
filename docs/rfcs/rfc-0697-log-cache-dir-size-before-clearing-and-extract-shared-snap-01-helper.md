@@ -1,7 +1,7 @@
 ---
 id: RFC-0697
 title: "Log cache dir size before clearing and extract shared SNAP-01 helper"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
