@@ -5,13 +5,13 @@ title: "Cache kernel registry across pipeline runs within a process"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-04
 updatedAt: 2026-08-05
-implementedAt:
-closedAt:
+implementedAt: 2026-08-05
+closedAt: 2026-08-05
 supersedes: []
 supersededBy:
 related:
@@ -59,3 +59,12 @@ Alternatives considered:
 If a watch mode or persistent daemon is introduced (currently not planned), the registry cache would need invalidation on source file changes. At that point, a file-watcher-based invalidation strategy would replace the process-lifetime singleton.
 
 If the number of command modules grows significantly (>100), lazy module loading may become necessary to avoid loading unused commands. The singleton cache would be replaced with a lazy-loading proxy that loads modules on first access.
+
+## Code trace
+
+- `packages/os/site-kernel/src/runtime/registry-cache.ts` — process-lifetime singleton cache (`getOrBuildRegistry`, `getOrBuildWorkspaceRegistry`, `clearRegistryCache`, `setRegistryCacheEnabled`, `isRegistryCacheEnabled`).
+- `packages/os/site-kernel/src/runtime/registry.ts` — `loadAppRuntime` and `listRegisteredKernel*` functions use `getOrBuildRegistry` / `getOrBuildWorkspaceRegistry` instead of `buildRegistry`.
+- `packages/os/site-kernel/src/runtime/execute-pipeline.ts` — `executeKernelPipeline` uses `getOrBuildWorkspaceRegistry` for workspace-scoped pipelines.
+- `packages/os/site-kernel/src/runtime/execute-command.ts` — `executeKernelCommand` uses `getOrBuildWorkspaceRegistry` for workspace-scoped command resolution.
+- `packages/os/site-kernel/src/cli/index.ts` — `--no-registry-cache` CLI flag calls `setRegistryCacheEnabled(false)` before any registry-building call.
+- `packages/os/site-kernel/src/tests/registry-cache.test.ts` — unit tests for cache hit/miss, disable, and clear behavior.
