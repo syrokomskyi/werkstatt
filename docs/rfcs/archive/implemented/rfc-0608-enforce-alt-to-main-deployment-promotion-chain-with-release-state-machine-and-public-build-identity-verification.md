@@ -20,6 +20,7 @@ amends:
 amendedBy:
 - RFC-0627
 - RFC-0634
+- RFC-0701
 related:
 - RFC-0358
 - RFC-0379
