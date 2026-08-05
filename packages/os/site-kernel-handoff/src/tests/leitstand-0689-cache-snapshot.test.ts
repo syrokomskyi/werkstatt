@@ -5,6 +5,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0689: add tests for cache clearing before mission.check, SNAP-01 auto-regeneration on build failure, non-SNAP-01 build failure, build-skip stale snapshot, and missing cache directory.</item>
+  <item>RFC-0697: add test for cache size logging before clearing; verify orchestrateSnap01Recovery is used via behavior.snapshot.generate calls.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -343,4 +344,37 @@ test("RFC-0689: does not error when Axiom cache directory does not exist", async
   // Deploy should succeed — no error from missing cache
   expect(data?.deployState).toBe("succeeded");
   expect(data?.buildState).toBe("succeeded");
+}, 15_000);
+
+// --- Test 6: Cache size logging before clearing (RFC-0697) ---
+
+test("RFC-0697: logs cache file count and total size before clearing", async () => {
+  const systemId = "test-sys";
+  const missionId = "test-sys-m000001";
+
+  createRegistryWithDevChannel(tmpDir, systemId, missionId);
+  createWorkpieceWithDist(tmpDir, missionId);
+
+  const cacheDir = join(tmpDir, "missions", missionId, "evidence", "axiom", ".cache");
+  mkdirSync(cacheDir, { recursive: true });
+  // Create cache files of known sizes
+  writeFileSync(join(cacheDir, "capture-1.json"), '{"id":1}');
+  writeFileSync(join(cacheDir, "capture-2.json"), '{"id":2,"data":"extra"}');
+  writeFileSync(join(cacheDir, "capture-3.json"), '{"id":3}');
+
+  const infoMessages: string[] = [];
+  const context = makeContext(tmpDir);
+  context.logger.info = (msg: string) => {
+    infoMessages.push(msg);
+  };
+
+  await runLeitstandDevDeploy(makeInput({ system: systemId }), context);
+
+  // Verify cache size was logged before clearing
+  const cacheSizeLog = infoMessages.find((m) => m.includes("Axiom cache:"));
+  expect(cacheSizeLog).toBeDefined();
+  expect(cacheSizeLog).toContain("3 file(s)");
+  expect(cacheSizeLog).toContain("MiB");
+  // Verify the clearing message still appears
+  expect(infoMessages.some((m) => m.includes("Cleared Axiom browser evidence cache"))).toBe(true);
 }, 15_000);
