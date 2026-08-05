@@ -5,12 +5,12 @@ title: "Optimize pipeline executor I/O and object reuse across steps"
 #   proposed → reviewing → accepted → implemented
 #   any → superseded (requires supersededBy)
 #   any → rejected
-status: proposed
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-04
 updatedAt: 2026-08-04
-implementedAt:
+implementedAt: 2026-08-04
 closedAt:
 supersedes: []
 supersededBy:
