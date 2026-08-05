@@ -330,22 +330,22 @@ const entries: CommandManifestEntry[] = commands.map((command) => ({
 
 ## Acceptance criteria
 
-- [ ] `validatesOutputs?: string[]` field added to `KernelCommandDefinition` in `packages/os/site-kernel/src/types.ts`
-- [ ] `validatesOutputs?: string[]` field added to `KernelRegisteredCommandInfo` in `packages/os/site-kernel/src/types.ts`
-- [ ] `commandInfo()` in `packages/os/site-kernel/src/runtime/registry.ts` propagates `validatesOutputs`
-- [ ] `buildCommandManifest` in `packages/os/site-kernel/src/command-manifest.ts` includes `validatesOutputs` in manifest entries
-- [ ] `PipelineRunState` interface in `execute-pipeline.ts` tracks `cacheHitCommands: Set<string>` and `pipelineName: string`
-- [ ] `shouldTransitiveSkip` function in `execute-pipeline.ts` checks: (a) command is not `cacheable: false`, (b) `validatesOutputs` is non-empty, (c) all entries are in `cacheHitCommands`
-- [ ] Validator is skipped with `skipReason: "transitive-cache-skip"` when transitive skip conditions are met — no `reads[]` hash computation performed
-- [ ] `loadImportedCacheHits` function loads `.cache/pipeline-cache-hits.json` and merges non-stale entries (within 30-minute TTL) from other pipelines
-- [ ] `persistCacheHits` function writes `cacheHitCommands` to `.cache/pipeline-cache-hits.json` after pipeline run completes
-- [ ] Transitive skip does not fire when `--force` is set (file is cleared, `cacheHitCommands` is empty)
-- [ ] Transitive skip does not fire for `cacheable: false` validators (step 2 of algorithm)
-- [ ] `mirror.quintet.validate` in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` NOT annotated — no validators are annotated in this RFC (infrastructure-only)
-- [ ] Unit tests verify: (a) transitive skip fires when all upstream cached, (b) no skip when upstream cache miss, (c) no skip for `cacheable: false` validators, (d) transitive skip through a chain of 2 validators, (e) `--force` disables transitive skip, (f) stale `.cache/pipeline-cache-hits.json` entries (>30 min) are ignored, (g) cross-pipeline skip works when `build.prepare` cache hits are loaded by `build.check`, (h) no skip when `validatesOutputs` is empty or undefined, (i) corrupt `.cache/pipeline-cache-hits.json` falls back to empty set, (j) `persistCacheHits` preserves entries for other pipelines
-- [ ] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks`
-- [ ] `rfc.validate` passes on this file
-- [ ] `packages/os/site-kernel/AGENTS.md` § Command-result cache updated to document `validatesOutputs` and `.cache/pipeline-cache-hits.json`
+- [x] `validatesOutputs?: string[]` field added to `KernelCommandDefinition` in `packages/os/site-kernel/src/types.ts` (evidence: packages/os/site-kernel/src/types.ts:283, `validatesOutputs?: string[]`)
+- [x] `validatesOutputs?: string[]` field added to `KernelRegisteredCommandInfo` in `packages/os/site-kernel/src/types.ts` (evidence: packages/os/site-kernel/src/types.ts:149, `validatesOutputs?: string[]`)
+- [x] `commandInfo()` in `packages/os/site-kernel/src/runtime/registry.ts` propagates `validatesOutputs` (evidence: packages/os/site-kernel/src/runtime/registry.ts:188, `...(command.validatesOutputs ? { validatesOutputs: command.validatesOutputs } : {})`)
+- [x] `buildCommandManifest` in `packages/os/site-kernel/src/command-manifest.ts` includes `validatesOutputs` in manifest entries (evidence: packages/os/site-kernel/src/command-manifest.ts:51, `validatesOutputs: string[]` in interface; line 151, `validatesOutputs: command.validatesOutputs ?? []`)
+- [x] `PipelineRunState` interface in `execute-pipeline.ts` tracks `cacheHitCommands: Set<string>` and `pipelineName: string` (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:234-237)
+- [x] `shouldTransitiveSkip` function in `execute-pipeline.ts` checks: (a) command is not `cacheable: false`, (b) `validatesOutputs` is non-empty, (c) all entries are in `cacheHitCommands` (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:255-262)
+- [x] Validator is skipped with `skipReason: "transitive-cache-skip"` when transitive skip conditions are met — no `reads[]` hash computation performed (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:654-655, `skippedExecutionReport(command, context, "transitive-cache-skip")`)
+- [x] `loadImportedCacheHits` function loads `.cache/pipeline-cache-hits.json` and merges non-stale entries (within 30-minute TTL) from other pipelines (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:286-316, `PIPELINE_CACHE_HITS_STALENESS_MS = 30 * 60 * 1000`)
+- [x] `persistCacheHits` function writes `cacheHitCommands` to `.cache/pipeline-cache-hits.json` after pipeline run completes (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:325-355, called at line 748 and 959)
+- [x] Transitive skip does not fire when `--force` is set (file is cleared, `cacheHitCommands` is empty) (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:598-599, `clearPipelineCacheHits` on `--force`; test case (e) in transitive-skip.test.ts)
+- [x] Transitive skip does not fire for `cacheable: false` validators (step 2 of algorithm) (evidence: packages/os/site-kernel/src/runtime/execute-pipeline.ts:259, `if (command.cacheable === false) return false`; test case (c))
+- [x] `mirror.quintet.validate` in `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` NOT annotated — no validators are annotated in this RFC (infrastructure-only) (evidence: no `validatesOutputs` field added to any command definition in 01-codegen.ts)
+- [x] Unit tests verify: (a) transitive skip fires when all upstream cached, (b) no skip when upstream cache miss, (c) no skip for `cacheable: false` validators, (d) transitive skip through a chain of 2 validators, (e) `--force` disables transitive skip, (f) stale `.cache/pipeline-cache-hits.json` entries (>30 min) are ignored, (g) cross-pipeline skip works when `build.prepare` cache hits are loaded by `build.check`, (h) no skip when `validatesOutputs` is empty or undefined, (i) corrupt `.cache/pipeline-cache-hits.json` falls back to empty set, (j) `persistCacheHits` preserves entries for other pipelines (evidence: packages/os/site-kernel/src/tests/transitive-skip.test.ts, 16 tests, all pass)
+- [x] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks` (evidence: `pnpm --filter @warpgogol/site-kernel run build:check` exit 0; `pnpm --filter @warpgogol/site-kernel-checks run build:check` exit 0)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0687 --json` exit 0)
+- [x] `packages/os/site-kernel/AGENTS.md` § Command-result cache updated to document `validatesOutputs` and `.cache/pipeline-cache-hits.json` (evidence: packages/os/site-kernel/AGENTS.md:100-109, § Transitive cache skip for validator chains (RFC-0687))
 
 ## Implementation notes for agents
 
