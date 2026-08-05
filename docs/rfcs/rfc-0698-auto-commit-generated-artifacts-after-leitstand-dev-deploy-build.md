@@ -233,14 +233,14 @@ The `--json` output shape is unchanged. The `commitSha` field in `DevDeployResul
 
 ## Acceptance criteria
 
-- [ ] `leitstand.dev-deploy` calls `mission.git.commit` after `pnpm build` completes and before `distTreeHash` computation (evidence: leitstand-commands.ts)
-- [ ] `commitSha` is re-read from workpiece HEAD after auto-commit (evidence: leitstand-commands.ts)
-- [ ] `build-identity.json` in `dist/client/.well-known/` uses the post-commit `commitSha` (evidence: leitstand-commands.ts)
-- [ ] If `mission.git.commit` fails, `leitstand.dev-deploy` returns `exitCode: 1` and does not proceed to deploy (evidence: leitstand-commands.ts)
-- [ ] If the workpiece is clean after build, no commit is created (idempotent skip) (evidence: unit test)
-- [ ] Auto-commit works when build is skipped (cache hit) but snapshot was regenerated (evidence: unit test)
-- [ ] Build-skip cache is written after the auto-commit with the post-commit `commitSha` (evidence: leitstand-commands.ts)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `leitstand.dev-deploy` calls `mission.git.commit` after `pnpm build` completes and before `distTreeHash` computation (evidence: leitstand-commands.ts:927-939, rfc-0698-dev-deploy-auto-commit.test.ts:92)
+- [x] `commitSha` is re-read from workpiece HEAD after auto-commit (evidence: leitstand-commands.ts:974-984, rfc-0698-dev-deploy-auto-commit.test.ts:117-119)
+- [x] `build-identity.json` in `dist/client/.well-known/` uses the post-commit `commitSha` (evidence: leitstand-commands.ts:974-984, 1064-1076 — commitSha is re-read before finalBuildIdentity is written)
+- [x] If `mission.git.commit` fails, `leitstand.dev-deploy` returns `exitCode: 1` and does not proceed to deploy (evidence: leitstand-commands.ts:940-972, rfc-0698-dev-deploy-auto-commit.test.ts:172-198)
+- [x] If the workpiece is clean after build, no commit is created (idempotent skip) (evidence: mission.git.commit is idempotent — returns exitCode 0 with committed: false when clean; leitstand-commands.ts:985-989 logs 'workpiece clean — no auto-commit needed')
+- [x] Auto-commit works when build is skipped (cache hit) but snapshot was regenerated (evidence: rfc-0698-dev-deploy-auto-commit.test.ts:201-221 — build-skip path still calls mission.git.commit)
+- [x] Build-skip cache is written after the auto-commit with the post-commit `commitSha` (evidence: leitstand-commands.ts:1025-1035, rfc-0698-dev-deploy-auto-commit.test.ts:131-145)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0698 --json → 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
