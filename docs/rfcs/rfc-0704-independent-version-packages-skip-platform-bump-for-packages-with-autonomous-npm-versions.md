@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -139,7 +140,7 @@ When at least one staged platform file is outside `independentVersionPackages`, 
 ### TypeScript contracts
 
 ```ts
-// forge.yaml schema extension (in forge/config@1)
+// forge.yaml schema extension (packages/forge/src/config/forge-config.ts)
 interface ForgeConfig {
   // ... existing fields ...
   independentVersionPackages?: string[]; // paths relative to workspace root
@@ -149,6 +150,7 @@ interface ForgeConfig {
 interface EcosystemCommitResult {
   // ... existing fields ...
   skipPlatformBump?: boolean; // true when all staged files are in independentVersionPackages
+  bumpType: "patch" | "minor" | "major" | "none"; // "none" added for skip case
 }
 ```
 
@@ -158,7 +160,7 @@ interface EcosystemCommitResult {
 | --- | --- |
 | `forge.yaml` | Declares `independentVersionPackages` list |
 | `packages/os/site-kernel-checks/src/ecosystem-commit.ts` | Reads config, checks staged files, skips bump when applicable |
-| `packages/forge/src/forge-config.ts` | Schema validation for `independentVersionPackages` field |
+| `packages/forge/src/config/forge-config.ts` | Schema validation for `independentVersionPackages` field |
 | `docs/platform-version-log.generated.yaml` | NOT written when skip is active |
 | `package.json` (root) | NOT modified when skip is active |
 
@@ -179,17 +181,23 @@ interface EcosystemCommitResult {
 
 ### Failure modes
 
-- **Invalid path in `independentVersionPackages`:** `ecosystem.commit` emits a warning and proceeds with normal bump behavior. The invalid path does not block the commit.
-- **`forge.yaml` missing or unreadable:** `ecosystem.commit` proceeds with normal bump behavior (backward compatible).
-- **Mixed staged files (some in independent packages, some not):** Normal bump occurs — the platform version increments because at least one file is outside the independent list.
+- **Invalid path in `independentVersionPackages`:** `ecosystem.commit` emits a warning (exitCode 0, status `"ok"`) and proceeds with normal bump behavior. The invalid path does not block the commit.
+- **`forge.yaml` missing or unreadable:** `ecosystem.commit` proceeds with normal bump behavior (exitCode 0, status `"ok"`). Backward compatible — no behavior change.
+- **Mixed staged files (some in independent packages, some not):** Normal bump occurs (exitCode 0, status `"ok"`) — the platform version increments because at least one file is outside the independent list. This is the expected path, not a warning.
+- **Path matching:** To prevent false positives, a staged file belongs to an independent package only if `stagedFile.startsWith(pkgPath + "/")`. For example, `packages/forge/index.ts` matches `packages/forge`, but `packages/forge-os/index.ts` does NOT match `packages/forge`.
+
+## Compass XML sync
+
+No `docs/*.xml` sync needed. This RFC changes `ecosystem.commit` behavior but does not alter the GRACE semantic layer, source markup contracts, or verification plan. The platform versioning discipline is already documented in root `AGENTS.md`.
 
 ## Rollout
 
 - **Default behavior:** The `independentVersionPackages` field is optional. If absent in `forge.yaml`, `ecosystem.commit` behaves exactly as before (RFC-0533). No flag day.
 - **Adoption:** Add `independentVersionPackages: [packages/forge]` to `forge.yaml` in the same commit that implements this RFC. From that point on, commits touching only `packages/forge/**` will skip the platform bump.
 - **New packages:** If a future package gets published to npm with its own version, add its path to the list.
-- **`forge.doctor` integration:** `forge.doctor` validates that each path in `independentVersionPackages` exists and contains a `package.json`. Stale entries are reported as warnings.
+- **`forge.doctor` integration:** `forge.doctor` validates that each path in `independentVersionPackages` exists and contains a `package.json`. Stale entries are reported as warnings. The check is added to `packages/forge/src/onboarding/doctor.ts`.
 - **No pipeline integration needed:** This change only affects `ecosystem.commit` behavior. No `build.check` or `build.prepare` pipeline changes required.
+- **Performance:** The independent-package check is O(n*m) where n = staged files count and m = `independentVersionPackages` count. For current scale (1 independent package, ~10-50 staged files per commit), this is negligible — one string-prefix comparison per staged file per independent package.
 
 ## Alternatives considered
 
@@ -204,17 +212,17 @@ interface EcosystemCommitResult {
 - **Agent misinterpretation:** Agents might think ALL `packages/forge` changes skip the platform bump, even when they also touch `packages/os/**` (which is platform scope). The mixed-files rule (at least one file outside the list → normal bump) must be clearly documented in AGENTS.md.
 - **Stale list entries:** If a package is removed from the monorepo but stays in `independentVersionPackages`, `ecosystem.commit` emits a warning but does not block. `forge.doctor` should catch this.
 - **Future publishable packages:** If a second package becomes independently versioned, someone must remember to add it to the list. This is a low-frequency event and the list is self-documenting.
-- **PC-02/PC-03 interaction:** `platform.consistency.validate` compares the semantic hash in `platform-version-log.generated.yaml` against the current hash. Skipping the log write means the log stays at the last real platform version — which is correct, since no platform code changed.
+- **PC-02/PC-03 interaction:** `platform.consistency.validate` compares the semantic hash in `platform-version-log.generated.yaml` against the current hash. Skipping the log write means the log stays at the last real platform version — which is correct, since no platform code changed. If the log is already stale (hash mismatch from a previous skipped commit), the next real platform bump will refresh it — this is not a new problem, it exists in the current `ecosystem.commit` behavior.
 
 ## Acceptance criteria
 
-- [ ] `forge.yaml` schema accepts `independentVersionPackages` field (evidence: `packages/forge/src/forge-config.ts`)
+- [ ] `forge.yaml` schema accepts `independentVersionPackages` field (evidence: `packages/forge/src/config/forge-config.ts`)
 - [ ] `independentVersionPackages: [packages/forge]` declared in `forge.yaml` (evidence: `forge.yaml`)
 - [ ] `ecosystem.commit` skips root version bump and version log write when all staged platform files are in `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts`)
 - [ ] `ecosystem.commit` performs normal bump when at least one staged file is outside `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts`)
 - [ ] `ecosystem.commit` emits warning for invalid paths in `independentVersionPackages` (evidence: `packages/os/site-kernel-checks/src/ecosystem-commit.ts`)
-- [ ] `forge.doctor` validates `independentVersionPackages` paths exist (evidence: `packages/forge/os/core/handlers/doctor.ts`)
-- [ ] `AGENTS.md` documents the independent version package contract and agent behavior (evidence: `AGENTS.md`)
+- [ ] `forge.doctor` validates `independentVersionPackages` paths exist (evidence: `packages/forge/src/onboarding/doctor.ts`)
+- [ ] Root `AGENTS.md` documents the independent version package contract and agent behavior in the "Platform-scope commit discipline" section (evidence: `AGENTS.md`)
 - [ ] Unit tests cover skip-bump, mixed-files, and invalid-path scenarios (evidence: `packages/os/site-kernel-checks/src/tests/ecosystem-commit.test.ts`)
 - [ ] `rfc.validate` passes on this file before merging
 
@@ -233,3 +241,4 @@ interface EcosystemCommitResult {
 - If a commit touches files in BOTH `packages/forge/**` AND `packages/os/**` (or any other non-independent package), the platform version IS bumped. Only commits where ALL staged platform files are in `independentVersionPackages` skip the bump.
 - Agents MUST NOT manually set `ECOSYSTEM_COMMIT=1` and run `git commit` directly for `packages/forge` changes — always use `ecosystem.commit`.
 - To publish an independent-version package to npm, use `pnpm --filter <name> publish` after `ecosystem.commit`. The package's own `package.json` version is managed manually (or by the operator).
+- Path matching uses `startsWith(pkgPath + "/")` — `packages/forge` matches `packages/forge/**` but NOT `packages/forge-os/**`.
