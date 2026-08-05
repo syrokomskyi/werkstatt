@@ -249,7 +249,7 @@ No output format changes. The `--json` output of `mission.validate` remains the 
 
 ## Acceptance criteria
 
-- [ ] `commitBordbuchProjections` wraps `gitExecWithRetry` calls for `add`, `commit`, and `rev-parse` in try/catch
+- [ ] `commitBordbuchProjections` wraps all `gitExecWithRetry` calls (`status --porcelain`, `add`, `commit`, `rev-parse`) in try/catch
 - [ ] `BordbuchCommitResult` has an optional `error?: string` field for git failure cases
 - [ ] `runBordbuchCommit` logs `logger.warn` when `committed === false && error` is set
 - [ ] `bordbuch.commit` pipeline step returns exitCode 0 (not throw) when git operations fail after retry exhaustion
