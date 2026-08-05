@@ -251,21 +251,21 @@ A new `pipeline.dependencies.validate` check (added to `build.check`) verifies:
 
 ## Acceptance criteria
 
-- [ ] `dependsOn?: string[]` field added to `KernelPipelineStep` in `packages/os/site-kernel/src/types.ts`
-- [ ] `pipeline-scheduler.ts` module created in `packages/os/site-kernel/src/runtime/` with `buildSchedule` and `executeScheduledSteps` functions
-- [ ] `executePipelineForSite` and `executePipelineForWorkspace` in `execute-pipeline.ts` use the scheduler instead of a sequential for-loop
-- [ ] Steps without `dependsOn` retain sequential behavior (implicit dependency on previous non-skipped step)
-- [ ] Steps with `dependsOn: []` start immediately at pipeline start
-- [ ] Steps with `dependsOn: ["cmd.a", "cmd.b"]` wait for both named steps to complete before starting
-- [ ] Failed step causes all transitive dependents to be skipped with clear `skipReason`
-- [ ] `--concurrency` flag controls the parallel execution limit; default is `Math.min(os.availableParallelism(), 8)`
-- [ ] `pipeline.dependencies.validate` command added to `build.check` pipeline, detecting cycles, missing dependencies, forward references, and duplicate command names
-- [ ] At least 5 steps in `build-prepare.ts` annotated with `dependsOn: []` and verified to run in parallel
-- [ ] Unit tests verify: (a) backward-compatible sequential behavior, (b) parallel execution of independent steps, (c) dependency waiting, (d) failure propagation to dependents, (e) cycle detection, (f) telemetry writes are not corrupted or lost under parallel execution, (g) `steps[]` array in pipeline report is in declaration order not completion order, (h) explicit skip (`step.skip === true`) does not block dependents, (i) dependency-failure skip DOES block dependents transitively
-- [ ] `--concurrency` flag added to `ExecuteKernelPipelineOptions` and parsed from CLI
-- [ ] Timing summary reports both `totalDurationMs` (wall clock) and `summedDurationMs` (sum of per-step)
-- [ ] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks`
-- [ ] `rfc.validate` passes on this file
+- [x] `dependsOn?: string[]` field added to `KernelPipelineStep` in `packages/os/site-kernel/src/types.ts`
+- [x] `pipeline-scheduler.ts` module created in `packages/os/site-kernel/src/runtime/` with `buildSchedule` and `executeScheduledSteps` functions
+- [x] `executePipelineForSite` and `executePipelineForWorkspace` in `execute-pipeline.ts` use the scheduler instead of a sequential for-loop
+- [x] Steps without `dependsOn` retain sequential behavior (implicit dependency on previous non-skipped step)
+- [x] Steps with `dependsOn: []` start immediately at pipeline start
+- [x] Steps with `dependsOn: ["cmd.a", "cmd.b"]` wait for both named steps to complete before starting
+- [x] Failed step causes all transitive dependents to be skipped with clear `skipReason`
+- [x] `--concurrency` flag controls the parallel execution limit; default is `Math.min(os.availableParallelism(), 8)`
+- [x] `pipeline.dependencies.validate` command added to `build.check` pipeline, detecting cycles, missing dependencies, forward references, and duplicate command names
+- [x] At least 5 steps in `build-prepare.ts` annotated with `dependsOn: []` and verified to run in parallel
+- [x] Unit tests verify: (a) backward-compatible sequential behavior, (b) parallel execution of independent steps, (c) dependency waiting, (d) failure propagation to dependents, (e) cycle detection, (f) telemetry writes are not corrupted or lost under parallel execution, (g) `steps[]` array in pipeline report is in declaration order not completion order, (h) explicit skip (`step.skip === true`) does not block dependents, (i) dependency-failure skip DOES block dependents transitively
+- [x] `--concurrency` flag added to `ExecuteKernelPipelineOptions` and parsed from CLI
+- [x] Timing summary reports both `totalDurationMs` (wall clock) and `summedDurationMs` (sum of per-step)
+- [x] `build:check` passes on `@warpgogol/site-kernel` and `@warpgogol/site-kernel-checks`
+- [x] `rfc.validate` passes on this file
 
 ## Implementation notes for agents
 
