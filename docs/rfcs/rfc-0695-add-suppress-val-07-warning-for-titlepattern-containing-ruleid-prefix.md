@@ -186,14 +186,14 @@ if (titlePatternContainsRuleId(rule)) {
 
 ## Acceptance criteria
 
-- [ ] SUPPRESS-VAL-07 warning emitted by `suppressions.validate` when `titlePattern` contains `ruleId`
-- [ ] Warning severity is `warning` (not `error`)
-- [ ] `fixHint` explains the redundancy and suggests removing the ruleId from `titlePattern`
-- [ ] No default rule in `systems/axiom-suppressions.yaml` triggers SUPPRESS-VAL-07
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` documents SUPPRESS-VAL-07
-- [ ] `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` command table description includes SUPPRESS-VAL-07
-- [ ] Unit test added in `suppressions-validate.test.ts` for SUPPRESS-VAL-07 warning
-- [ ] `rfc.validate` passes on this file before merging
+- [x] SUPPRESS-VAL-07 warning emitted by `suppressions.validate` when `titlePattern` contains `ruleId` (evidence: `packages/os/site-kernel-checks/src/suppressions-validate.ts:195-207`, test in `suppressions-validate.test.ts:217-230`)
+- [x] Warning severity is `warning` (not `error`) (evidence: `packages/os/site-kernel-checks/src/suppressions-validate.ts:201`)
+- [x] `fixHint` explains the redundancy and suggests removing the ruleId from `titlePattern` (evidence: `packages/os/site-kernel-checks/src/suppressions-validate.ts:204`)
+- [x] No default rule in `systems/axiom-suppressions.yaml` triggers SUPPRESS-VAL-07 (evidence: `suppressions.validate --json` → status: pass, 0 warnings)
+- [x] `packages/os/site-kernel-checks/AGENTS.md` documents SUPPRESS-VAL-07 (evidence: `packages/os/site-kernel-checks/AGENTS.md:28`)
+- [x] `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` command table description includes SUPPRESS-VAL-07 (evidence: `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts:439-440`)
+- [x] Unit test added in `suppressions-validate.test.ts` for SUPPRESS-VAL-07 warning (evidence: `packages/os/site-kernel-checks/src/tests/suppressions-validate.test.ts:217-245`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `rfc.validate --id RFC-0695 --json` → status: pass, 0 violations)
 
 ## Implementation notes for agents
 
