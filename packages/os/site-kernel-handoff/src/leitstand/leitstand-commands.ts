@@ -1066,12 +1066,6 @@ export async function runLeitstandDevDeploy(
   );
   logger.info(`[leitstand.dev-deploy] wrote final build-identity.json to dist/client/.well-known/`);
 
-  // RFC-0634: Clean up preliminary build-identity.json from workpiece/public/.well-known/
-  await fs.rm(path.join(publicWellKnownDir, "build-identity.json"), { force: true });
-  logger.info(
-    `[leitstand.dev-deploy] cleaned up preliminary build-identity.json from public/.well-known/`,
-  );
-
   // Step 2: Log workpiece HEAD sha
   logger.info(`[leitstand.dev-deploy] workpiece HEAD: ${commitSha}`);
 
