@@ -17,6 +17,7 @@ prefers a budget-file entry over the inline expectedDurationMs when both exist.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0270: initial implementation.</item>
+  <item>ADR-0023: add batchAppendStepTelemetry for batched telemetry writes at pipeline completion.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -108,6 +109,50 @@ export async function appendStepTelemetry(
         lines.shift();
       }
       next = lines.join("\n") + "\n";
+    }
+
+    await writeFileRaw(filePath, next, "utf8");
+  } catch {
+    // Telemetry is best-effort; never let a persistence failure surface to the caller.
+  }
+}
+
+/**
+ * ADR-0023: Batch-append multiple telemetry records in a single read-modify-write
+ * cycle. Replaces N per-step appendStepTelemetry calls (each doing its own
+ * read+write) with a single read+write at pipeline completion.
+ *
+ * Never throws — a telemetry write failure must never break a real pipeline run.
+ * FIFO-caps the file at MAX_HISTORY_BYTES by dropping the oldest whole lines
+ * once the cap would be exceeded.
+ */
+export async function batchAppendStepTelemetry(
+  workspaceRoot: string,
+  records: StepTelemetryRecord[],
+): Promise<void> {
+  if (records.length === 0) return;
+  try {
+    const filePath = telemetryPath(workspaceRoot);
+    await mkdir(dirname(filePath), { recursive: true });
+    const lines = records.map((r) => JSON.stringify(r)).join("\n") + "\n";
+
+    let existing = "";
+    try {
+      existing = await readFile(filePath, "utf8");
+    } catch {
+      existing = "";
+    }
+
+    let next = existing + lines;
+    if (Buffer.byteLength(next, "utf8") > MAX_HISTORY_BYTES) {
+      const allLines = next.split("\n").filter((l) => l.length > 0);
+      while (
+        allLines.length > 1 &&
+        Buffer.byteLength(allLines.join("\n") + "\n", "utf8") > MAX_HISTORY_BYTES
+      ) {
+        allLines.shift();
+      }
+      next = allLines.join("\n") + "\n";
     }
 
     await writeFileRaw(filePath, next, "utf8");

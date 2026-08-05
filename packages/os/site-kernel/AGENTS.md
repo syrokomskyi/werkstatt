@@ -129,7 +129,7 @@ Cross-site architectural standards used by all apps are documented in `docs/`:
 - `buildSchedule` throws `ScheduleError` on forward references, missing references, duplicate command names, and circular dependencies.
 - `executeScheduledSteps` runs steps concurrently up to the concurrency limit. Failed steps cause transitive dependents to be skipped with `dependencySkipped: true`. Results are sorted by `stepIndex` (declaration order).
 - `KernelPipelineTimingSummary` includes both `totalDurationMs` (wall-clock) and `summedDurationMs` (sum of per-step durations). For sequential execution they are equal; for parallel execution `summedDurationMs` > `totalDurationMs`.
-- `TelemetryMutex` serializes `appendStepTelemetry` calls via a promise-chain to prevent concurrent read-modify-write on the NDJSON telemetry file.
+- ADR-0023: per-step telemetry is batched in-memory and written via `batchAppendStepTelemetry` in a single I/O operation at pipeline completion. The previous `TelemetryMutex` promise-chain is removed. `CacheLayer.close()` is called in a `finally` block after each pipeline run to release the SQLite connection.
 - CLI: `--concurrency N` flag on `site-kernel pipeline <name>` sets the concurrency limit.
 - `pipeline.dependencies.validate` command (in `@warpgogol/site-kernel-checks`) validates all standard leaf pipelines for missing references, forward references, duplicate command names, and circular dependencies.
 

@@ -13,6 +13,7 @@ Self-healing: corrupt DB is deleted and recreated on open error.
 <CHANGE_SUMMARY>
   <item>RFC-0382: initial implementation — SqliteCacheLayer with WAL mode, busy timeout, self-healing.</item>
   <item>RFC-0382 post-review: remove staleEntries placeholder from status() output.</item>
+  <item>ADR-0023: add close() method for explicit SQLite connection cleanup after pipeline completion.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -218,5 +219,9 @@ export class SqliteCacheLayer implements CacheLayer {
          ON CONFLICT(namespace, key) DO UPDATE SET misses = misses + 1`,
       )
       .run(namespace, key);
+  }
+
+  async close(): Promise<void> {
+    this.db.close();
   }
 }

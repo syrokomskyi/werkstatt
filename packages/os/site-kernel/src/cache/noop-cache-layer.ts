@@ -11,6 +11,7 @@ get() always returns null. Commands continue to work by parsing files directly.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0382: initial implementation — NoopCacheLayer fallback.</item>
+  <item>ADR-0023: add close() no-op for CacheLayer interface parity.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -52,5 +53,9 @@ export class NoopCacheLayer implements CacheLayer {
       dbSizeBytes: 0,
       namespaces: [],
     };
+  }
+
+  async close(): Promise<void> {
+    // no-op — no resources to release
   }
 }

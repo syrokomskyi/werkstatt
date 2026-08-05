@@ -15,6 +15,7 @@ and falls back to NoopCacheLayer when the native module is unavailable.
 <CHANGE_SUMMARY>
   <item>RFC-0382: initial implementation — CacheLayer interface, CacheEntry, CacheStatus, createCacheLayer factory.</item>
   <item>RFC-0382 post-review: remove unused staleEntries placeholder from CacheNamespaceStatus.</item>
+  <item>ADR-0023: add close() method for explicit resource cleanup after pipeline completion.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -55,6 +56,7 @@ export interface CacheLayer {
   ): Promise<void>;
   clear(namespace?: string): Promise<void>;
   status(): Promise<CacheStatus>;
+  close(): Promise<void>;
 }
 
 export const CACHE_DB_RELATIVE_PATH = join(".cache", "kernel-cache.db");

@@ -68,29 +68,3 @@ status: active
 ```
 
 API keys, passwords, PII must be removed from the transcript. Same redaction pattern as `fo-handoff`.
-
-### K-0006: SKILL-17 escape hatch placement — after frontmatter, not before
-
-```knowledge-entry
-id: K-0006
-layer: L2
-created: 2026-08-05
-lastConfirmedAt: 2026-08-05
-confirmations: 1
-status: active
-```
-
-The `<!-- skill-lint-disable SKILL-17 -->` comment must be placed **after** the YAML frontmatter `---` block, not before it. If placed before `---`, the frontmatter parser (`/^---\r?\n([\s\S]*?)\r?\n---/`) fails to match, and `discoverForgeSkills` does not register the skill — producing a SKILL-01 "no registry entry" violation. The escape hatch is a markdown comment, not a YAML directive.
-
-### K-0007: process.cwd() in tests resolves to package dir, not workspace root
-
-```knowledge-entry
-id: K-0007
-layer: L2
-created: 2026-08-05
-lastConfirmedAt: 2026-08-05
-confirmations: 1
-status: active
-```
-
-When running tests via `pnpm --filter <package> run test`, `process.cwd()` resolves to the package directory (e.g. `packages/forge/`), not the monorepo root. Code that constructs paths like `path.join(workspaceRoot, "packages", "forge")` will produce a doubled path (`packages/forge/packages/forge`) and fail to find files. Use `path.resolve(import.meta.dirname, "..", "..", "..", "..")` to compute the workspace root from the test file's location instead.
