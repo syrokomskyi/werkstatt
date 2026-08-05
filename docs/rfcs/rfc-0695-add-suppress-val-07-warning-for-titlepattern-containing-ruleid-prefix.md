@@ -16,6 +16,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
+enhancedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
@@ -135,9 +136,10 @@ if (titlePatternContainsRuleId(rule)) {
 
 | Path | Role |
 | --- | --- |
-| `packages/os/site-kernel-checks/src/suppressions-validate.ts` | Modified: add SUPPRESS-VAL-07 check |
+| `packages/os/site-kernel-checks/src/suppressions-validate.ts` | Modified: add SUPPRESS-VAL-07 check after SUPPRESS-VAL-06 loop |
+| `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` | Modified: add SUPPRESS-VAL-07 to the string enumeration of diagnostics in the `suppressions.validate` command table entry |
 | `packages/os/site-kernel-checks/AGENTS.md` | Modified: document SUPPRESS-VAL-07 in suppressions-validate.ts entry |
-| `packages/os/site-kernel-checks/src/diagnostics/rules/content-surface.ts` | Modified: register SUPPRESS-VAL-07 diagnostic rule |
+| `packages/os/site-kernel-checks/src/tests/suppressions-validate.test.ts` | Modified: add unit test for SUPPRESS-VAL-07 warning |
 
 ### Output format
 
@@ -189,6 +191,8 @@ if (titlePatternContainsRuleId(rule)) {
 - [ ] `fixHint` explains the redundancy and suggests removing the ruleId from `titlePattern`
 - [ ] No default rule in `systems/axiom-suppressions.yaml` triggers SUPPRESS-VAL-07
 - [ ] `packages/os/site-kernel-checks/AGENTS.md` documents SUPPRESS-VAL-07
+- [ ] `packages/os/site-kernel-checks/src/command-tables/infra-contracts.ts` command table description includes SUPPRESS-VAL-07
+- [ ] Unit test added in `suppressions-validate.test.ts` for SUPPRESS-VAL-07 warning
 - [ ] `rfc.validate` passes on this file before merging
 
 ## Implementation notes for agents
@@ -196,6 +200,6 @@ if (titlePatternContainsRuleId(rule)) {
 - Agents MAY implement code changes ONLY when this RFC has status: accepted (or implemented).
 - Agents MAY transition this RFC from `accepted` to `implemented` per RFC-0224 preconditions; reference this RFC ID in commits.
 - Agents MUST use `includes` (not `startsWith`) for the ruleId-in-titlePattern check to catch all positions.
-- Agents MUST register SUPPRESS-VAL-07 in `diagnostics/rules/content-surface.ts`.
 - Agents MUST NOT make this an error — it is a warning.
+- Agents MUST update the command table description in `infra-contracts.ts` to include SUPPRESS-VAL-07 in the string enumeration.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
