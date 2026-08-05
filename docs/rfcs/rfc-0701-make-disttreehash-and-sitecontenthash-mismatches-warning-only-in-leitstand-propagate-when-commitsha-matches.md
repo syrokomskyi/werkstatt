@@ -182,13 +182,13 @@ No output format changes. Warnings are logged via `logger.warn` and do not appea
 
 ## Acceptance criteria
 
-- [ ] `distTreeHash` mismatch with matching `commitSha` produces a warning, not an error
-- [ ] `siteContentHash` mismatch with matching `commitSha` produces a warning, not an error
-- [ ] `commitSha` mismatch remains a hard error
-- [ ] Warning message includes both manifest and identity hash values
-- [ ] Propagation succeeds when only secondary hashes mismatch and `commitSha` matches
-- [ ] Unit test covers the warning-only path in `leitstand-commands.ts`
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `distTreeHash` mismatch with matching `commitSha` produces a warning, not an error — (evidence: `leitstand-commands.ts:1740`, `rfc-0701-propagate-warning-only.test.ts`)
+- [x] `siteContentHash` mismatch with matching `commitSha` produces a warning, not an error — (evidence: `leitstand-commands.ts:1752`, `rfc-0701-propagate-warning-only.test.ts`)
+- [x] `commitSha` mismatch remains a hard error — (evidence: `leitstand-commands.ts:1727`, `rfc-0701-propagate-warning-only.test.ts`)
+- [x] Warning message includes both manifest and identity hash values — (evidence: `leitstand-commands.ts:1740-1741`, `rfc-0701-propagate-warning-only.test.ts`)
+- [x] Propagation succeeds when only secondary hashes mismatch and `commitSha` matches — (evidence: `rfc-0701-propagate-warning-only.test.ts`)
+- [x] Unit test covers the warning-only path in `leitstand-commands.ts` — (evidence: `rfc-0701-propagate-warning-only.test.ts`)
+- [x] `rfc.validate` passes on this file before merging — (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0701`)
 
 ## Implementation notes for agents
 
