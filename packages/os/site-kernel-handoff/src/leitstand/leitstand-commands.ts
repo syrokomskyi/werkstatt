@@ -26,6 +26,7 @@
   <item>Add --no-report flag (default true) to runMissionCheckWithResilience to suppress report.html generation in mission.check; axiom.report is auto-invoked separately in leitstand.dev-deploy, preventing double-write.</item>
   <item>RFC-0689: clear Axiom browser evidence cache before mission.check; auto-regenerate behavior snapshot on SNAP-01 when pnpm build fails; check stale snapshot when build is skipped (RFC-0653).</item>
   <item>RFC-0697: log cache dir file count and total size before clearing; extract shared orchestrateSnap01Recovery helper for SNAP-01 detect → regenerate → (optional) rebuild orchestration.</item>
+  <item>RFC-0698: auto-commit workpiece via mission.git.commit after pnpm build completes and before distTreeHash computation; re-read commitSha from workpiece HEAD after auto-commit; fatal abort on commit failure; move build-skip cache write to after auto-commit with post-commit commitSha.</item>
 </CHANGE_SUMMARY>
 */
 
