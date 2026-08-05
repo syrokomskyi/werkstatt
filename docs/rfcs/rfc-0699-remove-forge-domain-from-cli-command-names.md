@@ -1,15 +1,17 @@
 ---
 id: RFC-0699
 title: "Remove forge. domain from CLI command names"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-05
 updatedAt: 2026-08-05
 enhancedAt: 2026-08-05
+acceptedAt: 2026-08-05
 implementedAt:
 closedAt:
 supersedes: []
