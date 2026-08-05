@@ -9,6 +9,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0647: extracted ensurePlaywrightChromium from mission-materialize.ts, upgraded to launch verification, added PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD support.</item>
   <item>Migrated to thin wrapper around preflightChromium from @syrokomskyi/axiom-factory-app — removed duplicated launch-verify-install-retry logic.</item>
+  <item>ADR-0026: Playwright version is pinned to exact 1.62.1 across all workspaces; root postinstall script runs `playwright install chromium` after every pnpm install, making the fallback path below a safety net rather than the common path.</item>
 </CHANGE_SUMMARY>
 */
 
