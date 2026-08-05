@@ -23,6 +23,7 @@
   <item>ADR-0008: run full three-phase build pipeline (build.prepare → astro build → build.post) in mission.build and mission.validate; write build-input-hash.json in mission.build; delegate to shared runPipelinePhase and computeBuildInputHash helpers.</item>
   <item>RFC-0635: reuse distribution in mission.validate when build-input-hash matches — skip build cycle, copy dist/ from distribution, add distributionReused/buildInputHash/fullBuildRan to MissionValidateData; add build.check phase to mission.build.</item>
   <item>RFC-0644: replace isWorkpieceDirty blocking guard with commitWorkpieceIfDirty auto-commit call before git fetch; add workpieceAutoCommitted/workpieceCommitSha to MissionReconcileData; update mission.validate dirty warnings.</item>
+  <item>RFC-0689: extract shared autoRegenerateSnapshotOnSnap01 helper into snapshot-auto-regen.ts for reuse by leitstand.dev-deploy.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -51,6 +52,7 @@ import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werksta
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { detectSnap01, autoRegenerateSnapshotOnSnap01 } from "./snapshot-auto-regen.ts";
 
 const STERNSYSTEM_DATA_PATHS = ["src/content", "public", "provenance"];
 
@@ -452,48 +454,42 @@ export async function runMissionValidate(
       const snapshotStep = postPipelineReport.steps.find(
         (s) => s.commandName === "behavior.snapshot.validate",
       );
-      const snap01Diagnostics =
-        (
-          snapshotStep?.data as { diagnostics?: { ruleId: string }[] } | undefined
-        )?.diagnostics?.filter((d) => d.ruleId === "SNAP-01") ?? [];
 
-      if (snap01Diagnostics.length > 0) {
-        logger.info(`  SNAP-01 detected — auto-regenerating behavior snapshot…`);
-        try {
-          await executeKernelCommand({
-            workspaceRoot,
-            commandName: "behavior.snapshot.generate",
-            siteName: manifest.systemId,
-          });
+      if (detectSnap01(snapshotStep?.data)) {
+        const regenResult = await autoRegenerateSnapshotOnSnap01({
+          workspaceRoot,
+          systemId: manifest.systemId,
+          missionId,
+          logger,
+        });
 
-          await executeKernelCommand({
-            workspaceRoot,
-            commandName: "mission.git.commit",
-            argv: [`--mission=${missionId}`, "--message=chore: auto-regenerate behavior snapshot"],
-          });
-
+        if (regenResult.regenerated) {
           logger.info(`  Re-running build.post after snapshot regeneration…`);
-          const revalidateResult = await executeKernelPipeline({
-            workspaceRoot,
-            pipelineName: "build.post",
-            siteName: manifest.systemId,
-            outputFormat: "pretty",
-          });
-          const revalidateReport = Array.isArray(revalidateResult)
-            ? revalidateResult[0]
-            : revalidateResult;
+          try {
+            const revalidateResult = await executeKernelPipeline({
+              workspaceRoot,
+              pipelineName: "build.post",
+              siteName: manifest.systemId,
+              outputFormat: "pretty",
+            });
+            const revalidateReport = Array.isArray(revalidateResult)
+              ? revalidateResult[0]
+              : revalidateResult;
 
-          if (revalidateReport.ok) {
-            buildSucceeded = true;
-            buildError = undefined;
-            logger.info(`  build.post passed after snapshot regeneration`);
-          } else {
-            buildError = `build.post still failing after snapshot regeneration: ${revalidateReport.timing.failedStep ?? "unknown"}`;
+            if (revalidateReport.ok) {
+              buildSucceeded = true;
+              buildError = undefined;
+              logger.info(`  build.post passed after snapshot regeneration`);
+            } else {
+              buildError = `build.post still failing after snapshot regeneration: ${revalidateReport.timing.failedStep ?? "unknown"}`;
+              logger.info(`  ${buildError}`);
+            }
+          } catch (revalErr) {
+            buildError = `build.post re-run failed after snapshot regeneration: ${revalErr instanceof Error ? revalErr.message : String(revalErr)}`;
             logger.info(`  ${buildError}`);
           }
-        } catch (regenErr) {
-          buildError = `snapshot auto-regeneration failed: ${regenErr instanceof Error ? regenErr.message : String(regenErr)}`;
-          logger.info(`  ${buildError}`);
+        } else {
+          buildError = regenResult.error ?? "snapshot auto-regeneration failed";
         }
       }
     }
