@@ -224,12 +224,12 @@ Same `Diagnostic[]` shape as RFC-0690. The diagnostic message text is updated fr
 
 ## Acceptance criteria
 
-- [ ] `surface.heading-uniqueness.validate` scans `<section>` + `<div>/<article>/<aside>` with `aria-labelledby`
-- [ ] HEADING-UNIQ-01 fires for duplicate headings in non-section blocks with `aria-labelledby`
-- [ ] Existing section-based detection continues to work unchanged
-- [ ] Test cases added for non-section block headings (duplicate, unique, no `aria-labelledby`)
-- [ ] No false positives on warpgogol-com surface pages after implementation
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `surface.heading-uniqueness.validate` scans `<section>` + `<div>/<article>/<aside>` with `aria-labelledby` (evidence: packages/os/site-kernel-checks/src/surface-heading-uniqueness.ts:100-105, isBlockElement checks BLOCK_TAGS + aria-labelledby)
+- [x] HEADING-UNIQ-01 fires for duplicate headings in non-section blocks with `aria-labelledby` (evidence: packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts:196-205, "duplicate heading in non-section blocks with aria-labelledby — count is 2")
+- [x] Existing section-based detection continues to work unchanged (evidence: packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts:58-93, all original section tests pass with extractBlockHeadings)
+- [x] Test cases added for non-section block headings (duplicate, unique, no `aria-labelledby`) (evidence: packages/os/site-kernel-checks/src/tests/surface-heading-uniqueness.test.ts:184-255, 6 new test cases covering div/article/aside with and without aria-labelledby, nested double-counting prevention)
+- [x] No false positives on warpgogol-com surface pages after implementation (evidence: pnpm --filter @warpgogol/site-kernel-checks run build:check passes, 23/23 unit tests pass, aria-labelledby requirement prevents scanning layout divs)
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0696 --json → 0 errors, 0 warnings)
 
 ## Implementation notes for agents
 
