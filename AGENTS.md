@@ -89,6 +89,15 @@ All `.github/workflows/*.yml` in this monorepo MUST include these baseline relia
 - `ecosystem.commit` sets `ECOSYSTEM_COMMIT=1` env var to bypass the hook — this is the only sanctioned bypass.
 - `mission.close` auto-pins the platform version by calling `sternsystem.pin` after successful close (RFC-0703).
 
+### Independent version packages (RFC-0704)
+
+- `independentVersionPackages` in `forge.yaml` declares packages with autonomous npm versions (e.g. `packages/forge`). `ecosystem.commit` automatically skips the platform version bump when ALL staged platform files belong to these packages.
+- Agents do NOT need to pass any flag — `ecosystem.commit` detects the skip case automatically based on `forge.yaml` and the staged files.
+- If a commit touches files in BOTH an independent package AND a non-independent package (e.g. `packages/forge/**` + `packages/os/**`), the platform version IS bumped. Only commits where ALL staged platform files are in `independentVersionPackages` skip the bump.
+- Agents MUST still use `ecosystem.commit` for ALL `packages/**` changes, including independent packages — never manually set `ECOSYSTEM_COMMIT=1` and run `git commit` directly.
+- Path matching uses `startsWith(pkgPath + "/")` — `packages/forge` matches `packages/forge/**` but NOT `packages/forge-os/**`.
+- `forge.doctor` validates that each path in `independentVersionPackages` exists and contains a `package.json`. Stale entries are reported as warnings.
+
 ## Active instruction model
 
 - **Skill invocation tracking (NON-NEGOTIABLE):** When the operator invokes a fo-skill (e.g. `fo-idea-i-just-want-to-see-the-result`, `fo-idea-implement`, `fo-fix`, `fo-review`) in the first message of a session, the agent MUST follow that skill's full pipeline to completion. Do NOT fall back to a manual step-by-step plan. The skill's pipeline (audit → enhance → plan → implement → review → fix) exists for a reason — skipping phases produces lower-quality results. The operator's invocation IS the instruction to run the entire pipeline autonomously. See `PREFERENCES.md` § Skill invocation tracking for details.

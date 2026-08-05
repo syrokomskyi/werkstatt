@@ -64,3 +64,5 @@ skillPacks:
     dir: packages/warpgogol-skills/skills
 forge:
   syncedVersion: 0.13.0
+independentVersionPackages:
+  - packages/forge

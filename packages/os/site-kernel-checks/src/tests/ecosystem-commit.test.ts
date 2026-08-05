@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, writeFile, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFile } from "node:child_process";
@@ -238,6 +238,178 @@ status: accepted
       const { stdout } = await execFileAsync("git", ["log", "-1", "--format=%B"], { cwd: root });
       expect(stdout).toContain("X-Platform-Bump: patch");
       expect(stdout).toContain("X-Platform-Version: 1.0.1");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  // RFC-0704: Independent version packages — skip-bump tests
+
+  async function setupWorkspaceWithIndependentPkg(): Promise<string> {
+    const root = await setupWorkspace();
+    // Create packages/forge with a package.json
+    await mkdir(join(root, "packages", "forge", "src"), { recursive: true });
+    await writeJson(join(root, "packages", "forge", "package.json"), {
+      name: "@warpgogol/forge",
+      version: "0.1.0",
+    });
+    await writeFile(
+      join(root, "packages", "forge", "src", "index.ts"),
+      "export const x = 1;\n",
+      "utf8",
+    );
+    // Write forge.yaml with independentVersionPackages
+    await writeFile(
+      join(root, "forge.yaml"),
+      "schema: forge/config@1\nproject:\n  name: test\n  stack: []\n  packageManager: pnpm\nindependentVersionPackages:\n  - packages/forge\n",
+      "utf8",
+    );
+    // Commit the new files so git is clean
+    await execFileAsync("git", ["add", "."], { cwd: root });
+    await execFileAsync("git", ["commit", "-m", "add forge pkg"], { cwd: root });
+    return root;
+  }
+
+  it("RFC-0704: skips platform bump when all staged files are in independentVersionPackages", async () => {
+    const root = await setupWorkspaceWithIndependentPkg();
+    try {
+      await stageFile(root, "packages/forge/src/index.ts", "export const x = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: update forge", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("dry-run");
+      expect(result.data?.skipPlatformBump).toBe(true);
+      expect(result.data?.bumpType).toBe("none");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0704: actual commit with skip-bump does not write trailers or bump version", async () => {
+    const root = await setupWorkspaceWithIndependentPkg();
+    try {
+      await stageFile(root, "packages/forge/src/index.ts", "export const x = 2;\n");
+      const result = await runEcosystemCommit(input({ message: "feat: update forge" }), ctx(root));
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("ok");
+      expect(result.data?.skipPlatformBump).toBe(true);
+      expect(result.data?.bumpType).toBe("none");
+      expect(result.data?.commitSha).toBeTruthy();
+      // Verify commit message does NOT have platform trailers
+      const { stdout } = await execFileAsync("git", ["log", "-1", "--format=%B"], { cwd: root });
+      expect(stdout).not.toContain("X-Platform-Bump");
+      expect(stdout).not.toContain("X-Platform-Version");
+      // Verify package.json version was NOT bumped
+      const pkgContent = await readFile(join(root, "package.json"), "utf8");
+      const pkg = JSON.parse(pkgContent) as { version: string };
+      expect(pkg.version).toBe("1.0.0");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0704: normal bump when staged files are in both independent and non-independent packages", async () => {
+    const root = await setupWorkspaceWithIndependentPkg();
+    try {
+      await stageFile(root, "packages/forge/src/index.ts", "export const x = 2;\n");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 3;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: update both", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("dry-run");
+      expect(result.data?.skipPlatformBump).toBeUndefined();
+      expect(result.data?.bumpType).toBe("patch");
+      expect(result.data?.newVersion).toBe("1.0.1");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0704: warns and proceeds with normal bump when independentVersionPackages has invalid path", async () => {
+    const root = await setupWorkspace();
+    try {
+      // Write forge.yaml with an invalid independent package path
+      await writeFile(
+        join(root, "forge.yaml"),
+        "schema: forge/config@1\nproject:\n  name: test\n  stack: []\n  packageManager: pnpm\nindependentVersionPackages:\n  - packages/nonexistent\n",
+        "utf8",
+      );
+      await execFileAsync("git", ["add", "forge.yaml"], { cwd: root });
+      await execFileAsync("git", ["commit", "-m", "add forge.yaml"], { cwd: root });
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: update dummy", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.skipPlatformBump).toBeUndefined();
+      expect(result.data?.bumpType).toBe("patch");
+      expect(result.data?.warnings).toBeDefined();
+      expect(result.data?.warnings?.some((w) => w.includes("packages/nonexistent"))).toBe(true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0704: path matching — packages/forge does NOT match packages/forge-os", async () => {
+    const root = await setupWorkspace();
+    try {
+      // Create packages/forge-os with a package.json
+      await mkdir(join(root, "packages", "forge-os", "src"), { recursive: true });
+      await writeJson(join(root, "packages", "forge-os", "package.json"), {
+        name: "@warpgogol/forge-os",
+        version: "0.1.0",
+      });
+      await writeFile(
+        join(root, "packages", "forge-os", "src", "index.ts"),
+        "export const x = 1;\n",
+        "utf8",
+      );
+      // Write forge.yaml with packages/forge as independent (NOT packages/forge-os)
+      await writeFile(
+        join(root, "forge.yaml"),
+        "schema: forge/config@1\nproject:\n  name: test\n  stack: []\n  packageManager: pnpm\nindependentVersionPackages:\n  - packages/forge\n",
+        "utf8",
+      );
+      await execFileAsync("git", ["add", "."], { cwd: root });
+      await execFileAsync("git", ["commit", "-m", "add forge-os"], { cwd: root });
+      // Stage a file in packages/forge-os — should NOT trigger skip-bump
+      await stageFile(root, "packages/forge-os/src/index.ts", "export const x = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: update forge-os", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.skipPlatformBump).toBeUndefined();
+      expect(result.data?.bumpType).toBe("patch");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("RFC-0704: normal bump when no independentVersionPackages in forge.yaml (backward compatible)", async () => {
+    const root = await setupWorkspace();
+    try {
+      // Write forge.yaml without independentVersionPackages
+      await writeFile(
+        join(root, "forge.yaml"),
+        "schema: forge/config@1\nproject:\n  name: test\n  stack: []\n  packageManager: pnpm\n",
+        "utf8",
+      );
+      await execFileAsync("git", ["add", "forge.yaml"], { cwd: root });
+      await execFileAsync("git", ["commit", "-m", "add forge.yaml"], { cwd: root });
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "feat: update dummy", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.skipPlatformBump).toBeUndefined();
+      expect(result.data?.bumpType).toBe("patch");
     } finally {
       await rm(root, { recursive: true, force: true });
     }

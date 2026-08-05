@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0533: initial ecosystem.commit command handler.</item>
+  <item>RFC-0704: added independentVersionPackages skip-bump logic — when all staged platform files belong to independent packages, skips root version bump, version log write, and platform trailers.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -49,13 +50,13 @@ export interface EcosystemCommitResult {
   status: "ok" | "blocked" | "dry-run";
   previousVersion: string;
   newVersion: string;
-  bumpType: "patch" | "minor" | "major";
+  bumpType: "patch" | "minor" | "major" | "none";
   rfcId: string | null;
   platformSemanticHash: string;
   commitSha: string | null;
   trailers: {
-    "X-Platform-Bump": string;
-    "X-Platform-Version": string;
+    "X-Platform-Bump"?: string;
+    "X-Platform-Version"?: string;
     "X-RFC"?: string;
   };
   pcForecast?: {
@@ -63,6 +64,8 @@ export interface EcosystemCommitResult {
     pc03: "pass" | "error";
   };
   violations?: EcosystemCommitViolation[];
+  skipPlatformBump?: boolean;
+  warnings?: string[];
 }
 
 export interface EcosystemCommitViolation {
@@ -191,6 +194,37 @@ function buildCommitMessage(
   return `${message}\n\n${trailers.join("\n")}`;
 }
 
+function isIndependentPackage(filePath: string, independentPackages: string[]): boolean {
+  return independentPackages.some((pkgPath) => filePath.startsWith(pkgPath + "/"));
+}
+
+async function loadIndependentVersionPackages(
+  workspaceRoot: string,
+): Promise<{ packages: string[]; invalidPaths: string[] }> {
+  const forgeYamlPath = path.join(workspaceRoot, "forge.yaml");
+  try {
+    const content = await fs.readFile(forgeYamlPath, "utf-8");
+    const parsed = yamlParse(content) as Record<string, unknown>;
+    const list = parsed["independentVersionPackages"];
+    if (!Array.isArray(list)) return { packages: [], invalidPaths: [] };
+    const packages: string[] = [];
+    const invalidPaths: string[] = [];
+    for (const pkgPath of list) {
+      if (typeof pkgPath !== "string") continue;
+      const pkgJsonPath = path.join(workspaceRoot, pkgPath, "package.json");
+      try {
+        await fs.access(pkgJsonPath);
+        packages.push(pkgPath);
+      } catch {
+        invalidPaths.push(pkgPath);
+      }
+    }
+    return { packages, invalidPaths };
+  } catch {
+    return { packages: [], invalidPaths: [] };
+  }
+}
+
 export async function runEcosystemCommit(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
@@ -224,22 +258,89 @@ export async function runEcosystemCommit(
     });
   }
 
-  // EC-02: package.json already staged
-  if (stagedFiles.includes(PACKAGE_JSON_PATH)) {
-    violations.push({
-      code: "EC-02",
-      message: "package.json is already staged by the operator.",
-      fixHint: "Unstage package.json — ecosystem.commit manages it exclusively.",
-    });
+  // RFC-0704: Check if all staged platform files belong to independent version packages
+  const { packages: independentPackages, invalidPaths } =
+    await loadIndependentVersionPackages(workspaceRoot);
+  const warnings: string[] = [];
+  for (const invalidPath of invalidPaths) {
+    warnings.push(
+      `independentVersionPackages path "${invalidPath}" does not exist or has no package.json — proceeding with normal bump`,
+    );
+  }
+  const allInIndependent =
+    independentPackages.length > 0 &&
+    platformStaged.length > 0 &&
+    platformStaged.every((f) => isIndependentPackage(f, independentPackages));
+  const skipPlatformBump = allInIndependent && invalidPaths.length === 0;
+
+  // In skip mode, EC-02 and EC-03 do not apply — ecosystem.commit does not touch package.json or the version log
+  if (!skipPlatformBump) {
+    // EC-02: package.json already staged
+    if (stagedFiles.includes(PACKAGE_JSON_PATH)) {
+      violations.push({
+        code: "EC-02",
+        message: "package.json is already staged by the operator.",
+        fixHint: "Unstage package.json — ecosystem.commit manages it exclusively.",
+      });
+    }
+
+    // EC-03: version log already staged
+    if (stagedFiles.includes(VERSION_LOG_PATH)) {
+      violations.push({
+        code: "EC-03",
+        message: "platform-version-log.generated.yaml is already staged by the operator.",
+        fixHint: "Unstage the log file — ecosystem.commit manages it exclusively.",
+      });
+    }
   }
 
-  // EC-03: version log already staged
-  if (stagedFiles.includes(VERSION_LOG_PATH)) {
-    violations.push({
-      code: "EC-03",
-      message: "platform-version-log.generated.yaml is already staged by the operator.",
-      fixHint: "Unstage the log file — ecosystem.commit manages it exclusively.",
+  // Skip-bump path: commit without version bump, version log, or platform trailers
+  if (skipPlatformBump && violations.length === 0) {
+    if (dryRun) {
+      return {
+        data: {
+          command: "ecosystem.commit",
+          status: "dry-run",
+          previousVersion: "",
+          newVersion: "",
+          bumpType: "none",
+          rfcId: rfcId ?? null,
+          platformSemanticHash: "",
+          commitSha: null,
+          trailers: {},
+          skipPlatformBump: true,
+          warnings: warnings.length > 0 ? warnings : undefined,
+        },
+        exitCode: 0,
+        summary: `Dry-run: skip platform bump (all staged files in independentVersionPackages)`,
+      };
+    }
+
+    // Commit with just the operator's message — no platform trailers
+    await execFileAsync("git", ["commit", "-m", message!], {
+      cwd: workspaceRoot,
+      env: { ...process.env, ECOSYSTEM_COMMIT: "1" },
     });
+
+    const commitSha = await getHeadCommitSha(workspaceRoot);
+
+    return {
+      data: {
+        command: "ecosystem.commit",
+        status: "ok",
+        previousVersion: "",
+        newVersion: "",
+        bumpType: "none",
+        rfcId: rfcId ?? null,
+        platformSemanticHash: "",
+        commitSha,
+        trailers: {},
+        skipPlatformBump: true,
+        warnings: warnings.length > 0 ? warnings : undefined,
+      },
+      exitCode: 0,
+      summary: `Committed independent-package change (skip platform bump)`,
+    };
   }
 
   // Determine bump type
@@ -331,6 +432,7 @@ export async function runEcosystemCommit(
           "X-Platform-Version": currentVersion,
         },
         violations,
+        warnings: warnings.length > 0 ? warnings : undefined,
       },
       exitCode: 1,
       summary: `ecosystem.commit blocked: ${violations.map((v) => v.code).join(", ")}`,
@@ -376,6 +478,7 @@ export async function runEcosystemCommit(
           pc02: pc02 as "pass" | "warning",
           pc03: pc03 as "pass" | "error",
         },
+        warnings: warnings.length > 0 ? warnings : undefined,
       },
       exitCode: 0,
       summary: `Dry-run: ${amend ? previousVersion : currentVersion} → ${newVersion} (${bumpType}${resolvedRfcId ? `, ${resolvedRfcId}` : ""})`,
@@ -420,6 +523,7 @@ export async function runEcosystemCommit(
       platformSemanticHash,
       commitSha,
       trailers,
+      warnings: warnings.length > 0 ? warnings : undefined,
     },
     exitCode: 0,
     summary: `Committed platform change: ${amend ? previousVersion : currentVersion} → ${newVersion} (${bumpType})`,
