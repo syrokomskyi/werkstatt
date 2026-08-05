@@ -228,14 +228,14 @@ The shared helper is caller-agnostic via dependency injection. Each caller is re
 
 ## Acceptance criteria
 
-- [ ] `leitstand.dev-deploy` logs cache file count and total size before clearing
-- [ ] `orchestrateSnap01Recovery` shared helper exists in `snapshot-auto-regen.ts`
-- [ ] `leitstand.dev-deploy` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic (all 3 paths: build failure, build-skip, build-skip stale check)
-- [ ] `mission.validate` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic (caller checks `dirtyBeforeBuildPost` before invoking)
-- [ ] No duplicated SNAP-01 detection + re-build code between the two callers
-- [ ] Existing tests pass (leitstand-0689-cache-snapshot.test.ts)
-- [ ] New test case for cache size logging
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `leitstand.dev-deploy` logs cache file count and total size before clearing (evidence: leitstand-commands.ts:88 logCacheDirSize, leitstand-commands.ts:1129 logCacheDirSize call before fs.rm)
+- [x] `orchestrateSnap01Recovery` shared helper exists in `snapshot-auto-regen.ts` (evidence: snapshot-auto-regen.ts:83, Snap01OrchestrationOptions/Result interfaces at :68/:77)
+- [x] `leitstand.dev-deploy` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic (all 3 paths: build failure, build-skip, build-skip stale check) (evidence: leitstand-commands.ts:771 build-skip path, leitstand-commands.ts:827 build-failure path)
+- [x] `mission.validate` uses `orchestrateSnap01Recovery` instead of inline SNAP-01 logic (caller checks `dirtyBeforeBuildPost` before invoking) (evidence: mission-materialization-commands.ts:414 dirtyBeforeBuildPost check, :460 orchestrateSnap01Recovery call)
+- [x] No duplicated SNAP-01 detection + re-build code between the two callers (evidence: both callers import only orchestrateSnap01Recovery from snapshot-auto-regen.ts; detectSnap01/autoRegenerateSnapshotOnSnap01 no longer imported directly)
+- [x] Existing tests pass (leitstand-0689-cache-snapshot.test.ts) (evidence: pnpm --filter @warpgogol/site-kernel-handoff run test — 599 passed, 2 skipped)
+- [x] New test case for cache size logging (evidence: leitstand-0689-cache-snapshot.test.ts:351 "RFC-0697: logs cache file count and total size before clearing")
+- [x] `rfc.validate` passes on this file before merging (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0697 — 0 errors, 1 expected warning V-19)
 
 ## Implementation notes for agents
 
