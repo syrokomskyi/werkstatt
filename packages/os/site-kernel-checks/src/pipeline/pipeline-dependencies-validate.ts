@@ -32,7 +32,6 @@ import {
   SITES_BUILD_PREPARE_PIPELINE,
   SITES_BUILD_PREPARE_DEV_PIPELINE,
   SITES_CHECK_AUTHOR_PIPELINE,
-  SITES_CHECK_PIPELINE,
   SITES_CHECK_POSTBUILD_PIPELINE,
   PACKAGES_CHECK_PIPELINE,
   STANDARD_COMPASS_PIPELINE,
@@ -45,7 +44,8 @@ interface PipelineDescriptor {
 
 function standardPipelines(): PipelineDescriptor[] {
   return [
-    { name: "sites-check.run", steps: SITES_CHECK_PIPELINE },
+    // Leaf pipelines only — composite pipelines (sites-check.run) concatenate
+    // author + postbuild and naturally contain duplicate command names.
     { name: "sites-check.author", steps: SITES_CHECK_AUTHOR_PIPELINE },
     { name: "sites-check.postbuild", steps: SITES_CHECK_POSTBUILD_PIPELINE },
     { name: "build.prepare", steps: SITES_BUILD_PREPARE_PIPELINE },
