@@ -26,6 +26,7 @@
   <item>RFC-0689: extract shared autoRegenerateSnapshotOnSnap01 helper into snapshot-auto-regen.ts for reuse by leitstand.dev-deploy.</item>
   <item>RFC-0697: refactor mission.validate SNAP-01 path to use shared orchestrateSnap01Recovery helper; dirtyBeforeBuildPost check remains caller-side.</item>
   <item>RFC-0702: add commitBordbuchProjections cleanup call in distribution reuse path to clean dirty bordbuch files from previous runs.</item>
+  <item>RFC-0705: add non-fatal sternsystem.sync call after git push origin in reconcile when external mirrors exist; add mirrorSync to MissionReconcileData and reconciliation-report.json.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -53,7 +54,7 @@ import {
 import { acquireLock, releaseLock, commitWerkstattSideEffects } from "../werkstatt/index.ts";
 import { atomicWriteFile } from "../werkstatt/atomic.ts";
 import { resolveActor } from "./actor-identity.ts";
-import { resolveCachePath } from "../sternsystem/registry-io.ts";
+import { resolveCachePath, readRegistry, findEntry } from "../sternsystem/registry-io.ts";
 import { orchestrateSnap01Recovery } from "./snapshot-auto-regen.ts";
 import { commitBordbuchProjections } from "../bordbuch/bordbuch-commit.ts";
 
@@ -822,6 +823,11 @@ export interface MissionReconcileData {
   autoResolvedPaths?: string[];
   workpieceAutoCommitted: boolean;
   workpieceCommitSha: string | null;
+  mirrorSync?: {
+    attempted: boolean;
+    succeeded: boolean;
+    error: string | null;
+  };
 }
 
 // RFC-0584: shared merge-abort helper — attempts git merge --abort, silently catches failure
@@ -902,6 +908,12 @@ export async function runMissionReconcile(
     let transferredCommits = 0;
     const copiedPaths: string[] = [];
     let autoResolvedPaths: string[] = [];
+    // RFC-0705: mirror sync status — populated inside the git branch, used in report and return data
+    let mirrorSync: { attempted: boolean; succeeded: boolean; error: string | null } = {
+      attempted: false,
+      succeeded: false,
+      error: null,
+    };
 
     if (!existsSync(path.join(workpieceDir, ".git"))) {
       throw new Error(
@@ -1159,6 +1171,44 @@ export async function runMissionReconcile(
           `  Push failed after ${pushBackoffMs.length} attempts (non-fatal) — next sync will catch up`,
         );
       }
+
+      // RFC-0705: Best-effort sternsystem.sync to push from bare to external mirrors.
+      // Only called when external mirrors are configured (mirrors.length > 2).
+      // Non-fatal: sync failure logs a warning but does not block reconcile.
+      try {
+        const registry = await readRegistry(workspaceRoot);
+        const entry = findEntry(registry, manifest.systemId);
+        if (entry && entry.mirrors.length > 2) {
+          mirrorSync.attempted = true;
+          logger.info(`  Syncing external mirrors via sternsystem.sync…`);
+          try {
+            const syncResult = (await executeKernelCommand({
+              workspaceRoot,
+              commandName: "sternsystem.sync",
+              argv: [`--id=${manifest.systemId}`],
+            })) as { exitCode?: number; summary?: string };
+            const syncExitCode = syncResult.exitCode ?? 0;
+            if (syncExitCode !== 0) {
+              mirrorSync.succeeded = false;
+              mirrorSync.error =
+                syncResult.summary ?? `sternsystem.sync exited with code ${syncExitCode}`;
+              logger.warn(`  External mirror sync failed (non-fatal): ${mirrorSync.error}`);
+            } else {
+              mirrorSync.succeeded = true;
+              logger.info(`  External mirrors synced`);
+            }
+          } catch (syncError) {
+            mirrorSync.succeeded = false;
+            mirrorSync.error = syncError instanceof Error ? syncError.message : String(syncError);
+            logger.warn(`  External mirror sync failed (non-fatal): ${mirrorSync.error}`);
+          }
+        }
+      } catch (registryError) {
+        // Registry read failed — skip sync, non-fatal
+        logger.warn(
+          `  Could not read registry for mirror sync: ${registryError instanceof Error ? registryError.message : String(registryError)}`,
+        );
+      }
     } else {
       // No git in system dir — fall back to copyDir for non-git Sternsystems
       for (const dataPath of STERNSYSTEM_DATA_PATHS) {
@@ -1187,6 +1237,7 @@ export async function runMissionReconcile(
       message,
       copiedPaths,
       autoResolvedPaths,
+      mirrorSync: mirrorSync.attempted ? mirrorSync : undefined,
     };
 
     await atomicWriteFile(
@@ -1209,6 +1260,12 @@ export async function runMissionReconcile(
         ? `, ${autoResolvedPaths.length} bordbuch conflict${autoResolvedPaths.length > 1 ? "s" : ""} auto-resolved`
         : "";
 
+    const mirrorSyncSuffix = mirrorSync.attempted
+      ? mirrorSync.succeeded
+        ? ", mirrors synced"
+        : ", mirror sync failed — non-fatal"
+      : "";
+
     return {
       data: {
         missionId,
@@ -1219,8 +1276,9 @@ export async function runMissionReconcile(
         ...(autoResolvedPaths.length > 0 ? { autoResolvedPaths } : {}),
         workpieceAutoCommitted: workpieceCommit.committed,
         workpieceCommitSha: workpieceCommit.commitSha,
+        ...(mirrorSync.attempted ? { mirrorSync } : {}),
       },
-      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix}${workpieceCommit.committed ? `, workpiece auto-committed ${workpieceCommit.commitSha?.slice(0, 8)}` : ""})`,
+      summary: `[mission.reconcile] ${missionId} reconciled (${commitSha ? `${commitSha.slice(0, 8)}, ${transferredCommits} commits merged` : "no git"}${autoResolveSuffix}${workpieceCommit.committed ? `, workpiece auto-committed ${workpieceCommit.commitSha?.slice(0, 8)}` : ""}${mirrorSyncSuffix})`,
     };
   } finally {
     await releaseLock(workspaceRoot, `mission:${missionId}`);

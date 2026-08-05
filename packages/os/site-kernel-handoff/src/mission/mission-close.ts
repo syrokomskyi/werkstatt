@@ -20,6 +20,7 @@
   <item>RFC-0655: add releaseId to CloseReport interface; pass releaseId as top-level option to appendBordbuchEntry.</item>
   <item>RFC-0658: validate bordbuch before appending close event (defense-in-depth for distribution-reuse skip path).</item>
   <item>RFC-0703: auto-pin platform version via sternsystem.pin after registry update, before werkstatt commit.</item>
+  <item>RFC-0705: move mirror status gathering before state transition; add blocking check when external mirrors are desynced.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -260,6 +261,66 @@ export async function runMissionClose(
       }
     }
 
+    // RFC-0705: Gather mirror status BEFORE state transition and block if external
+    // mirrors are out of sync. This ensures a mirror desync blocks before any
+    // irreversible close actions (state transition, bordbuch entry, evidence sync).
+    let originSha: string | null = null;
+    let mirrorSha: string | null = null;
+    let mirrorInSync = false;
+    let recommendation: string | null = null;
+
+    const registry = await readRegistry(workspaceRoot);
+    const entry = findEntry(registry, manifest.systemId);
+
+    if (entry && entry.mirrors.length > 1) {
+      const bareMirror = entry.mirrors[1];
+      const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
+      if (existsSync(bareRepoPath)) {
+        try {
+          let branch: string;
+          try {
+            branch = gitExec(bareRepoPath, "symbolic-ref HEAD").replace("refs/heads/", "");
+          } catch {
+            branch = "main";
+          }
+          try {
+            originSha = gitExec(bareRepoPath, `rev-parse ${branch}`);
+          } catch {
+            originSha = null;
+          }
+          if (entry.mirrors.length > 2) {
+            try {
+              mirrorSha = gitExec(bareRepoPath, `rev-parse refs/mirror/${branch}`);
+            } catch {
+              mirrorSha = null;
+            }
+          }
+        } catch {
+          // bare repo not accessible
+        }
+      }
+    }
+
+    if (originSha && mirrorSha && originSha !== mirrorSha) {
+      mirrorInSync = false;
+      recommendation = `Mirror is behind origin. Run: sternsystem.sync --id ${manifest.systemId}`;
+    } else if (originSha && mirrorSha && originSha === mirrorSha) {
+      mirrorInSync = true;
+    } else if (entry && entry.mirrors.length > 2 && !mirrorSha) {
+      mirrorInSync = false;
+      recommendation = `Mirror ref not found in bare repo. Run: sternsystem.sync --id ${manifest.systemId}`;
+    } else {
+      mirrorInSync = true;
+    }
+
+    // RFC-0705: Block close if external mirrors are configured and out of sync.
+    if (entry && entry.mirrors.length > 2 && !mirrorInSync) {
+      throw new Error(
+        `[mission.close] external mirrors are out of sync for system '${manifest.systemId}'. ` +
+          `${recommendation ?? "Run: sternsystem.sync --id " + manifest.systemId}`,
+      );
+    }
+
     manifest.state = "closed";
     manifest.closedAt = now;
     manifest.closedBy = actor;
@@ -311,56 +372,6 @@ export async function runMissionClose(
         .map((l) => l.slice(3));
     } catch {
       dirtyFiles = [];
-    }
-
-    // Gather mirror status from bare repo
-    let originSha: string | null = null;
-    let mirrorSha: string | null = null;
-    let mirrorInSync = false;
-    let recommendation: string | null = null;
-
-    const registry = await readRegistry(workspaceRoot);
-    const entry = findEntry(registry, manifest.systemId);
-
-    if (entry && entry.mirrors.length > 1) {
-      const bareMirror = entry.mirrors[1];
-      const bareRepoPath = resolveMirrorPath(workspaceRoot, bareMirror.path);
-      if (existsSync(bareRepoPath)) {
-        try {
-          let branch: string;
-          try {
-            branch = gitExec(bareRepoPath, "symbolic-ref HEAD").replace("refs/heads/", "");
-          } catch {
-            branch = "main";
-          }
-          try {
-            originSha = gitExec(bareRepoPath, `rev-parse ${branch}`);
-          } catch {
-            originSha = null;
-          }
-          if (entry.mirrors.length > 2) {
-            try {
-              mirrorSha = gitExec(bareRepoPath, `rev-parse refs/mirror/${branch}`);
-            } catch {
-              mirrorSha = null;
-            }
-          }
-        } catch {
-          // bare repo not accessible
-        }
-      }
-    }
-
-    if (originSha && mirrorSha && originSha !== mirrorSha) {
-      mirrorInSync = false;
-      recommendation = `Mirror is behind origin. Run: sternsystem.sync --id ${manifest.systemId}`;
-    } else if (originSha && mirrorSha && originSha === mirrorSha) {
-      mirrorInSync = true;
-    } else if (entry && entry.mirrors.length > 2 && !mirrorSha) {
-      mirrorInSync = false;
-      recommendation = `Mirror ref not found in bare repo. Run: sternsystem.sync --id ${manifest.systemId}`;
-    } else {
-      mirrorInSync = true;
     }
 
     // RFC-0522: build warnings array for null releaseId
