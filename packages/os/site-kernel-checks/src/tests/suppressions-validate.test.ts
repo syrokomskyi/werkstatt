@@ -213,4 +213,34 @@ describe("runSuppressionsValidate", () => {
       rmSync(tmpDir, { recursive: true });
     }
   });
+
+  it("warns SUPPRESS-VAL-07 when titlePattern contains ruleId", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "supp-val-test-"));
+    try {
+      mkdirSync(join(tmpDir, "systems"), { recursive: true });
+      writeFileSync(
+        join(tmpDir, "systems/axiom-suppressions.yaml"),
+        `suppressions:\n  - ruleId: runtime-health.console-error\n    category: test\n    titlePattern: "runtime-health.console-error: some descriptive text"\n    reason: "redundant ruleId in titlePattern"\n`,
+      );
+      const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));
+      expect(result.data?.diagnostics.some((d) => d.ruleId === "SUPPRESS-VAL-07")).toBe(true);
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it("does not warn SUPPRESS-VAL-07 when titlePattern does not contain ruleId", async () => {
+    const tmpDir = mkdtempSync(join(tmpdir(), "supp-val-test-"));
+    try {
+      mkdirSync(join(tmpDir, "systems"), { recursive: true });
+      writeFileSync(
+        join(tmpDir, "systems/axiom-suppressions.yaml"),
+        `suppressions:\n  - ruleId: runtime-health.console-error\n    category: test\n    titlePattern: "some descriptive text without ruleId"\n    reason: "clean titlePattern"\n`,
+      );
+      const result = await runSuppressionsValidate(dummyInput, makeContext(tmpDir));
+      expect(result.data?.diagnostics.some((d) => d.ruleId === "SUPPRESS-VAL-07")).toBe(false);
+    } finally {
+      rmSync(tmpDir, { recursive: true });
+    }
+  });
 });

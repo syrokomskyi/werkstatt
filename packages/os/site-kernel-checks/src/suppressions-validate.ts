@@ -12,6 +12,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0684: initial implementation of suppressions.validate command.</item>
   <item>RFC-0688: add SUPPRESS-VAL-06 warning for rules using messagePattern/descriptionPattern without titlePattern. Add titlePattern to ruleSignature for conflict detection. Extend isBroadPattern check to titlePattern.</item>
+  <item>RFC-0695: add SUPPRESS-VAL-07 warning for titlePattern containing the ruleId prefix.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -187,6 +188,20 @@ export async function runSuppressionsValidate(
         file: WORKSHOP_SUPPRESSIONS_PATH,
         message: `Rule at index ${i} (ruleId: ${rule.ruleId}) uses ${field} without titlePattern — ${field} matches against a non-existent Finding field and will never fire. Use titlePattern to match against finding.title.`,
         fixHint: `Replace ${field} with titlePattern, or add titlePattern as a fallback.`,
+      });
+    }
+  }
+
+  // Warn on titlePattern containing the ruleId prefix (SUPPRESS-VAL-07)
+  for (let i = 0; i < config.suppressions.length; i++) {
+    const rule = config.suppressions[i];
+    if (rule.titlePattern && rule.ruleId && rule.titlePattern.includes(rule.ruleId)) {
+      diagnostics.push({
+        ruleId: "SUPPRESS-VAL-07",
+        severity: "warning",
+        file: WORKSHOP_SUPPRESSIONS_PATH,
+        message: `Rule at index ${i} (ruleId: ${rule.ruleId}) has a titlePattern containing the ruleId "${rule.ruleId}". The ruleId is already matched exactly — titlePattern should match the descriptive part of the title only.`,
+        fixHint: `Remove "${rule.ruleId}" from titlePattern and keep only the descriptive text.`,
       });
     }
   }

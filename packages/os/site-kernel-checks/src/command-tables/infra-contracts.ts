@@ -436,7 +436,8 @@ export const INFRA_CONTRACTS_COMMANDS: CheckCommandEntry[] = [
       "Checks schema, conflicting rules (same ruleId + same conditions), broad patterns, and unknown rule IDs (from evidence). " +
       "Diagnostics: SUPPRESS-VAL-01 (file not found, warning), SUPPRESS-VAL-02 (schema violation), " +
       "SUPPRESS-VAL-03 (conflicting rules), SUPPRESS-VAL-04 (broad pattern, warning), SUPPRESS-VAL-05 (unknown ruleId, warning), " +
-      "SUPPRESS-VAL-06 (messagePattern/descriptionPattern without titlePattern, warning).",
+      "SUPPRESS-VAL-06 (messagePattern/descriptionPattern without titlePattern, warning), " +
+      "SUPPRESS-VAL-07 (titlePattern containing ruleId prefix, warning, RFC-0695).",
     scope: "workspace",
     supportsAllSites: false,
     mutatesState: false,
