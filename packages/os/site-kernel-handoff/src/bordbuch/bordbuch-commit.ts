@@ -125,7 +125,7 @@ export async function runBordbuchCommit(
     };
   }
 
-  if (!result.committed && result.error) {
+  if (result.error) {
     logger.warn(`[bordbuch.commit] git operation failed for ${systemId}: ${result.error}`);
     return {
       data: result,
