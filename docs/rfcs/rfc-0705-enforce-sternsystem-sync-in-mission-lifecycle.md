@@ -268,19 +268,19 @@ Mirror is behind origin. Run: sternsystem.sync --id warpgogol-com
 
 ## Acceptance criteria
 
-- [ ] `MissionReconcileData` interface includes optional `mirrorSync` field with `attempted`, `succeeded`, `error`
-- [ ] `mission.reconcile` calls `sternsystem.sync --id <systemId>` after successful `git push origin` to bare repo
-- [ ] `mission.reconcile` catches sync failures non-fatally (logger.warn, continues, mission stays open)
-- [ ] `mission.reconcile` summary includes mirror sync status when external mirrors are configured
-- [ ] `mission.close` throws when `closeReport.mirror.inSync === false` and `mirrors.length > 2`
-- [ ] `mission.close` does NOT throw when no external mirrors are configured (`mirrors.length <= 2`)
-- [ ] `mission.close` error message includes the `sternsystem.sync` command to run
-- [ ] Unit test: reconcile with successful sync → `mirrorSync.succeeded === true`
-- [ ] Unit test: reconcile with sync failure → `mirrorSync.succeeded === false`, reconcile completes
-- [ ] Unit test: close with desynced mirrors → throws with actionable error message
-- [ ] Unit test: close with no external mirrors → does not throw
-- [ ] `AGENTS.md` updated: rule transitions from conventional to enforced
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `MissionReconcileData` interface includes optional `mirrorSync` field with `attempted`, `succeeded`, `error` (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:826-830, build:check passes)
+- [x] `mission.reconcile` calls `sternsystem.sync --id <systemId>` after successful `git push origin` to bare repo (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:1175-1211, rfc-0705-mirror-sync.test.ts test 1)
+- [x] `mission.reconcile` catches sync failures non-fatally (logger.warn, continues, mission stays open) (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:1200-1204, rfc-0705-mirror-sync.test.ts test 2)
+- [x] `mission.reconcile` summary includes mirror sync status when external mirrors are configured (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:1263-1267, rfc-0705-mirror-sync.test.ts test 1 summary contains "mirrors synced")
+- [x] `mission.close` throws when `closeReport.mirror.inSync === false` and `mirrors.length > 2` (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:316-322, rfc-0705-mirror-sync.test.ts test 3)
+- [x] `mission.close` does NOT throw when no external mirrors are configured (`mirrors.length <= 2`) (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:317, rfc-0705-mirror-sync.test.ts test 4)
+- [x] `mission.close` error message includes the `sternsystem.sync` command to run (evidence: packages/os/site-kernel-handoff/src/mission/mission-close.ts:320, rfc-0705-mirror-sync.test.ts test 3 matches /sternsystem.sync/)
+- [x] Unit test: reconcile with successful sync → `mirrorSync.succeeded === true` (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0705-mirror-sync.test.ts test 1, vitest run passes)
+- [x] Unit test: reconcile with sync failure → `mirrorSync.succeeded === false`, reconcile completes (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0705-mirror-sync.test.ts test 2, vitest run passes)
+- [x] Unit test: close with desynced mirrors → throws with actionable error message (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0705-mirror-sync.test.ts test 3, vitest run passes)
+- [x] Unit test: close with no external mirrors → does not throw (evidence: packages/os/site-kernel-handoff/src/tests/rfc-0705-mirror-sync.test.ts test 4, vitest run passes)
+- [x] `AGENTS.md` updated: rule transitions from conventional to enforced (evidence: AGENTS.md:18-19, packages/os/site-kernel-handoff/AGENTS.md:37-38)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0705 --json` — 0 errors)
 
 ## Implementation notes for agents
 
