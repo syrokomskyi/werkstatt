@@ -300,7 +300,7 @@ function bakeIndustryDossier(
 
   // 4. Service taxonomy — cardGrid.
   const taxonomy = taxonomyList(valuesDeepFirst, "serviceTaxonomy");
-  if (taxonomy.length) blocks.push(cardGrid(lbl.focus, taxonomy));
+  if (taxonomy.length) blocks.push(cardGrid(lbl.taxonomy, taxonomy));
 
   // 5. Trust signals — listCards. Falls back to deprecated proofSignals.
   const trustSignals = stringList(valuesDeepFirst, "trustSignals");
@@ -318,19 +318,19 @@ function bakeIndustryDossier(
 
   // 7. Service area model — md block.
   const serviceArea = firstString(valuesDeepFirst.map((d) => d.serviceAreaModel));
-  if (serviceArea) blocks.push(md(lbl.practical, serviceArea));
+  if (serviceArea) blocks.push(md(lbl.serviceArea, serviceArea));
 
   // 8. Recommended architecture — cardGrid.
   const architecture = architectureList(valuesDeepFirst, "recommendedArchitecture");
-  if (architecture.length) blocks.push(cardGrid(lbl.focus, architecture));
+  if (architecture.length) blocks.push(cardGrid(lbl.architecture, architecture));
 
   // 9. Suitable modules — cardGrid.
   const modules = moduleList(valuesDeepFirst, "suitableModules");
-  if (modules.length) blocks.push(cardGrid(lbl.focus, modules));
+  if (modules.length) blocks.push(cardGrid(lbl.modules, modules));
 
   // 10. Contact modes — listCards.
   const contactModes = stringList(valuesDeepFirst, "contactModes");
-  if (contactModes.length) blocks.push(listCards(lbl.practical, contactModes));
+  if (contactModes.length) blocks.push(listCards(lbl.contactModes, contactModes));
 
   // 11. Industry FAQ — md blocks. Falls back to deprecated faqs.
   const industryFaqs = (
@@ -418,14 +418,14 @@ function bakeServiceDossier(
   );
 
   // 2. Service purpose — md block.
-  if (purpose) blocks.push(md(lbl.focus, purpose));
+  if (purpose) blocks.push(md(lbl.purpose, purpose));
 
   // 3. Customer questions — cardGrid.
   const questions = stringList(valuesDeepFirst, "customerQuestions");
   if (questions.length)
     blocks.push(
       cardGrid(
-        lbl.focus,
+        lbl.questions,
         questions.map((q) => ({ title: q })),
       ),
     );
@@ -436,35 +436,35 @@ function bakeServiceDossier(
 
   // 5. Price presentation models — listCards.
   const priceModels = stringList(valuesDeepFirst, "pricePresentationModels");
-  if (priceModels.length) blocks.push(listCards(lbl.practical, priceModels));
+  if (priceModels.length) blocks.push(listCards(lbl.priceModels, priceModels));
 
   // 6. Duration presentation — listCards.
   const durationModels = stringList(valuesDeepFirst, "durationPresentation");
-  if (durationModels.length) blocks.push(listCards(lbl.practical, durationModels));
+  if (durationModels.length) blocks.push(listCards(lbl.duration, durationModels));
 
   // 7. Booking requirements — cardGrid.
   const bookingReqs = bookingRequirementList(valuesDeepFirst, "bookingRequirements");
-  if (bookingReqs.length) blocks.push(cardGrid(lbl.focus, bookingReqs));
+  if (bookingReqs.length) blocks.push(cardGrid(lbl.booking, bookingReqs));
 
   // 8. Consultation requirements — md block.
   const consultation = firstString(valuesDeepFirst.map((d) => d.consultationRequirements));
-  if (consultation) blocks.push(md(lbl.practical, consultation));
+  if (consultation) blocks.push(md(lbl.consultation, consultation));
 
   // 9. Team relation — md block.
   const teamRelation = firstString(valuesDeepFirst.map((d) => d.teamRelation));
-  if (teamRelation) blocks.push(md(lbl.trust, teamRelation));
+  if (teamRelation) blocks.push(md(lbl.teamRelation, teamRelation));
 
   // 10. Portfolio requirements — md block.
   const portfolioReqs = firstString(valuesDeepFirst.map((d) => d.portfolioRequirements));
-  if (portfolioReqs) blocks.push(md(lbl.trust, portfolioReqs));
+  if (portfolioReqs) blocks.push(md(lbl.portfolio, portfolioReqs));
 
   // 11. Evidence requirements — listCards.
   const evidenceReqs = stringList(valuesDeepFirst, "evidenceRequirements");
-  if (evidenceReqs.length) blocks.push(listCards(lbl.trust, evidenceReqs));
+  if (evidenceReqs.length) blocks.push(listCards(lbl.evidence, evidenceReqs));
 
   // 12. Recommended page structure — cardGrid.
   const pageStructure = pageStructureList(valuesDeepFirst, "recommendedPageStructure");
-  if (pageStructure.length) blocks.push(cardGrid(lbl.focus, pageStructure));
+  if (pageStructure.length) blocks.push(cardGrid(lbl.pageStructure, pageStructure));
 
   // 13. FAQ — md blocks.
   const serviceFaqs = (firstArray<FaqLike>(valuesDeepFirst.map((d) => d.faq)) ?? []).filter(

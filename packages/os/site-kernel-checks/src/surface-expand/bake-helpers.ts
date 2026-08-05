@@ -131,6 +131,19 @@ interface SurfaceLabels {
   bookingContext: string;
   evidence: string;
   uniqueContent: string;
+  taxonomy: string;
+  architecture: string;
+  modules: string;
+  serviceArea: string;
+  contactModes: string;
+  purpose: string;
+  priceModels: string;
+  duration: string;
+  booking: string;
+  consultation: string;
+  teamRelation: string;
+  portfolio: string;
+  pageStructure: string;
 }
 const SURFACE_LABELS: Record<string, SurfaceLabels> = {
   de: {
@@ -154,6 +167,19 @@ const SURFACE_LABELS: Record<string, SurfaceLabels> = {
     bookingContext: "Lokaler Buchungskontext",
     evidence: "Lokale Evidenz",
     uniqueContent: "Einzigartige Inhalte",
+    taxonomy: "Leistungen und Spezialisierungen",
+    architecture: "Empfohlene Seitenstruktur",
+    modules: "Passende Module",
+    serviceArea: "Servicegebiet",
+    contactModes: "Kontaktwege",
+    purpose: "Zweck der Leistung",
+    priceModels: "Preispräsentation",
+    duration: "Dauerpräsentation",
+    booking: "Buchungsvoraussetzungen",
+    consultation: "Beratungsvoraussetzungen",
+    teamRelation: "Team und Spezialisierung",
+    portfolio: "Portfolio-Anforderungen",
+    pageStructure: "Empfohlene Seitenstruktur",
   },
   uk: {
     cta: "Описати ситуацію",
@@ -176,6 +202,19 @@ const SURFACE_LABELS: Record<string, SurfaceLabels> = {
     bookingContext: "Локальний контекст бронювання",
     evidence: "Локальні докази",
     uniqueContent: "Унікальний контент",
+    taxonomy: "Послуги та спеціалізації",
+    architecture: "Рекомендована структура сторінок",
+    modules: "Підходящі модулі",
+    serviceArea: "Зона обслуговування",
+    contactModes: "Способи контакту",
+    purpose: "Призначення послуги",
+    priceModels: "Подання цін",
+    duration: "Подання тривалості",
+    booking: "Умови бронювання",
+    consultation: "Умови консультації",
+    teamRelation: "Команда та спеціалізація",
+    portfolio: "Вимоги до портфоліо",
+    pageStructure: "Рекомендована структура сторінок",
   },
 };
 export function labelsFor(lang: string): SurfaceLabels {
