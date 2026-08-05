@@ -232,7 +232,7 @@ export async function runEcosystemCommit(
   const { workspaceRoot } = context;
   const message = flagString(input, "message");
   const rfcId = flagString(input, "rfc");
-  const dryRun = flagBoolean(input, "dry-run");
+  const dryRun = context.dryRun || flagBoolean(input, "dry-run");
   const amend = flagBoolean(input, "amend");
 
   const violations: EcosystemCommitViolation[] = [];
