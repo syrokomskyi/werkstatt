@@ -1,12 +1,13 @@
 ---
 id: RFC-0709
 title: "Formalize NEEDS CLARIFICATION markers in RFC drafts"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
