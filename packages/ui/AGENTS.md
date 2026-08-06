@@ -19,6 +19,7 @@ Apply this guide when working in `packages/ui/**`.
 - If the component is shell-invoked via `system.md pages[].shell.*`, register its `cosmicName` in `MOON_IMPORT_PATHS` in `packages/share/src/page.ts` in the same change.
 - AI agents MUST treat a new component without its manifest as an incomplete change and add the manifest before considering the task done.
 - Header desktop navigation must preserve readable full labels. When labels do not fit, keep the adaptive overflow disclosure in the shared header component rather than truncating every label or adding app-local header overrides.
+- **Prop propagation across composing components:** When adding or changing a prop on a component that is rendered by another component (e.g. `nachweis-card` rendered by `nachweis-list` and `nachweis-detail`), update the prop interface in ALL composing components. Components that spread props (`{...record}`) silently accept new fields but components that pass props explicitly (`slug={slug} ...`) silently drop them. Always check both patterns when modifying a component's Props interface.
 
 ## Section archetype contract (RFC-0072)
 
