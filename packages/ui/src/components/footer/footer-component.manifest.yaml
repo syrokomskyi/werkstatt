@@ -64,6 +64,8 @@ propsSchema:
               type: string
             transparencyTitle:
               type: string
+            trustTitle:
+              type: string
         navigationLinks:
           type: array
           items:
@@ -135,6 +137,43 @@ propsSchema:
           items:
             type: string
         transparencyLinks:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - label
+            properties:
+              label:
+                type: string
+              href:
+                type: string
+              external:
+                type: boolean
+              featureFlag:
+                type: string
+              semanticTarget:
+                type: object
+                additionalProperties: false
+                required:
+                  - kind
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                      - internal
+                      - external
+                  pageId:
+                    type: string
+                  anchor:
+                    type: string
+                  href:
+                    type: string
+        trustIds:
+          type: array
+          items:
+            type: string
+        trustLinks:
           type: array
           items:
             type: object

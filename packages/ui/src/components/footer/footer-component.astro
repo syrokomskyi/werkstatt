@@ -158,6 +158,10 @@ const transparencyLinks = (
   await Promise.all((content.transparencyLinks ?? []).map((link) => resolveFooterLink(link)))
 ).filter((link): link is FooterLink => link !== null);
 
+const trustLinks = (
+  await Promise.all((content.trustLinks ?? []).map((link) => resolveFooterLink(link)))
+).filter((link): link is FooterLink => link !== null);
+
 // Copyright content from copyright.md
 const copyrightContent = await getResolvedComponentContent<CopyrightComponentContent>({
   componentPath: "copyright",
@@ -300,6 +304,19 @@ const backgroundImageMeta = content.backgroundImage
                     <div class="footer__nav-title">{content.navGroups.transparencyTitle}</div>
                     <ul role="list">
                       {transparencyLinks.map((link) => (
+                        <li>
+                          <a href={resolveFooterHref(link)}>{link.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {trustLinks.length > 0 && (
+                  <div class="footer__nav-group">
+                    <div class="footer__nav-title">{content.navGroups.trustTitle}</div>
+                    <ul role="list">
+                      {trustLinks.map((link) => (
                         <li>
                           <a href={resolveFooterHref(link)}>{link.label}</a>
                         </li>
