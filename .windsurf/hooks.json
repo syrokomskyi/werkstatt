@@ -1,5 +1,11 @@
 {
   "hooks": {
+    "pre_user_prompt": [
+      {
+        "command": "bash $ROOT_WORKSPACE_PATH/hooks/pre-user-prompt.sh",
+        "show_output": false
+      }
+    ],
     "post_setup_worktree": [
       {
         "command": "bash $ROOT_WORKSPACE_PATH/hooks/setup-worktree.sh",

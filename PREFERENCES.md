@@ -14,6 +14,31 @@ formOfAddress: ty
 - `register`: business — communication register (business | creative). Business = core behavioral layer only, professional and efficient. Creative = core + extended behavioral layer (RFC-0549) with creative partnership and emotional support.
 - `formOfAddress`: ty — обращение на «ты» (неформальное). AI использует «ты» во всех обращениях к оператору.
 
+## Session-end protocol (NON-NEGOTIABLE — BLOCKED GATE — READ THIS FIRST)
+
+**This is the highest-priority rule in PREFERENCES.md. If the operator says any session-end phrase, you MUST invoke `fo-session-retro` before producing any other output. No exceptions.**
+
+When the operator says "Завершаем эту сессию" (or any variant: "Завершаем сессию", "Заканчиваем сессию", "Завершить сессию", "End session", "Wrap up", "Session end"), the agent's response is **BLOCKED** — no closing summary, no "сессия завершена", no ad-hoc output is permitted until the full protocol below completes.
+
+**The agent MUST NOT produce any session-end output (summary, closing block, "сессия завершена" message) before this protocol is fully executed. Producing a closing summary without running this protocol is a CONTRACT VIOLATION.**
+
+### Protocol steps (execute in order, no skipping)
+
+1. **Verify clean working tree** — check `rtk git status` in werkstatt root and all active mission workpieces. Commit any uncommitted changes made during this session (distinguish from changes by other parallel agents by reviewing conversation history). Report remaining dirty files to the operator without touching them. See `fo-session-retro` skill § Pre-retro steps for the full procedure.
+2. **Verify RFC implementation status** — if any RFC was worked on during this session, verify each is stamped as `implemented` OR obtain explicit operator acknowledgment to leave it in a non-terminal status. See `fo-session-retro` skill § Step 4 for the full procedure.
+3. **Invoke `fo-session-retro`** via the `skill` tool — this is the core session-end step. The retro skill runs the full protocol: transcript save, temp cleanup, docs.archive, clean tree check, RFC verification, insight triage, and closing block. Do NOT substitute it with a manual summary. Do NOT produce a closing block yourself — the retro skill produces it.
+4. **The closing block comes from `fo-session-retro`** — after the retro skill completes, its report IS the session-end output. Do not add a separate "сессия завершена" message after it.
+
+### Self-check before any session-end output
+
+Before sending ANY message that could be interpreted as a session closing (summary, "сессия завершена", closing block), verify:
+
+- [ ] `fo-session-retro` was invoked via the `skill` tool in this response cycle
+- [ ] The retro skill's report was produced and presented to the operator
+- [ ] No ad-hoc closing summary was produced before the retro skill ran
+
+If ANY item is unchecked, STOP and invoke `fo-session-retro` now.
+
 ## Skill invocation tracking (NON-NEGOTIABLE)
 
 When the operator invokes a fo-skill (e.g. `fo-idea-i-just-want-to-see-the-result`, `fo-idea-implement`, `fo-fix`, `fo-review`) in the first message of a session, the agent MUST follow that skill's full pipeline to completion. Do NOT fall back to a manual step-by-step plan. The skill's pipeline (audit → enhance → plan → implement → review → fix) exists for a reason — skipping phases produces lower-quality results.
@@ -48,29 +73,6 @@ Before sending ANY response that claims an RFC is "complete", "done", or "implem
 - [ ] `git status` is clean (no uncommitted changes from this session).
 
 If the agent cannot check ALL items, it MUST NOT claim the RFC is complete. Instead, it MUST list the remaining items explicitly and ask the operator for guidance.
-
-## Session-end protocol (NON-NEGOTIABLE — BLOCKED GATE)
-
-When the operator says "Завершаем эту сессию" (or any variant: "Завершаем сессию", "Заканчиваем сессию", "Завершить сессию", "End session", "Wrap up", "Session end"), the agent's response is **BLOCKED** — no closing summary, no "сессия завершена", no ad-hoc output is permitted until the full protocol below completes.
-
-**The agent MUST NOT produce any session-end output (summary, closing block, "сессия завершена" message) before this protocol is fully executed. Producing a closing summary without running this protocol is a CONTRACT VIOLATION.**
-
-### Protocol steps (execute in order, no skipping)
-
-1. **Verify clean working tree** — check `rtk git status` in werkstatt root and all active mission workpieces. Commit any uncommitted changes made during this session (distinguish from changes by other parallel agents by reviewing conversation history). Report remaining dirty files to the operator without touching them. See `fo-session-retro` skill § Pre-retro steps for the full procedure.
-2. **Verify RFC implementation status** — if any RFC was worked on during this session, verify each is stamped as `implemented` OR obtain explicit operator acknowledgment to leave it in a non-terminal status. See `fo-session-retro` skill § Step 4 for the full procedure.
-3. **Invoke `fo-session-retro`** via the `skill` tool — this is the core session-end step. The retro skill runs the full protocol: transcript save, temp cleanup, docs.archive, clean tree check, RFC verification, insight triage, and closing block. Do NOT substitute it with a manual summary. Do NOT produce a closing block yourself — the retro skill produces it.
-4. **The closing block comes from `fo-session-retro`** — after the retro skill completes, its report IS the session-end output. Do not add a separate "сессия завершена" message after it.
-
-### Self-check before any session-end output
-
-Before sending ANY message that could be interpreted as a session closing (summary, "сессия завершена", closing block), verify:
-
-- [ ] `fo-session-retro` was invoked via the `skill` tool in this response cycle
-- [ ] The retro skill's report was produced and presented to the operator
-- [ ] No ad-hoc closing summary was produced before the retro skill ran
-
-If ANY item is unchecked, STOP and invoke `fo-session-retro` now.
 
 ## Plan confirmation vs implementation command (NON-NEGOTIABLE)
 
