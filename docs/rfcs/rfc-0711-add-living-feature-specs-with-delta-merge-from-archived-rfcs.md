@@ -54,14 +54,6 @@ nonGoals:
   - "Does not auto-generate living specs for past RFCs — initial population is manual or on-demand"
   - "Does not introduce a new file format — living specs are markdown with YAML frontmatter"
 acceptance:
-  - probe: command-registered
-    name: "spec.live.merge"
-  - probe: command-registered
-    name: "spec.live.list"
-  - probe: command-registered
-    name: "spec.live.show"
-  - probe: command-registered
-    name: "spec.live.validate"
   - probe: run
     command: "site-kernel run spec.live.list --json"
     expect:
@@ -71,6 +63,10 @@ acceptance:
     expect:
       exitCode: 0
   - probe: run
+    command: "site-kernel run spec.live.show --domain forge --json"
+    expect:
+      exitCode: 1
+  - probe: run
     command: "site-kernel run rfc.validate --id RFC-0711 --json"
     expect:
       exitCode: 0
@@ -79,6 +75,9 @@ acceptance:
     pattern: "liveSpec"
   - probe: file-contains
     path: "packages/forge/os/core/core.module.ts"
+    pattern: "spec.live.merge"
+  - probe: file-contains
+    path: "packages/forge/os/spec/spec.module.ts"
     pattern: "spec.live.merge"
 ---
 
