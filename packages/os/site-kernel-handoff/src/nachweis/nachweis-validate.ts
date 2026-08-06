@@ -255,7 +255,9 @@ export async function runNachweisValidate(
       (e) =>
         ((e.data as Record<string, unknown>).slug as string | undefined) === slug || e.id === slug,
     );
-    const consentRecord = consents.find((c) => (c.data as Record<string, unknown>).slug === slug);
+    const consentRecord = consents.find(
+      (c) => (c.data as Record<string, unknown>).slug === slug || c.id === slug,
+    );
     const gate = evaluateGate(slug, evidenceRecord, consentRecord, nachweisEntries);
     gateResults.push(gate);
 
