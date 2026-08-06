@@ -1,12 +1,13 @@
 ---
 id: RFC-0710
 title: "Add explore mode for pre-specification idea exploration"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
