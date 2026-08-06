@@ -27,7 +27,6 @@ amendedBy: []
 related:
   - RFC-0707
   - RFC-0706
-  - RFC-0713
 # RFC-0331: DNA invariants this RFC implements, protects, or extends.
 # Required for architecture/contract RFCs created on or after 2026-07-07.
 # Entries must match ^DNA-\d+$ and exist in docs/architecture-dna.md.
@@ -108,7 +107,7 @@ The Nachweis kernel module gains two new commands:
 
 - **Site OS operator model** — both commands are registered in the `nachweis` kernel module alongside existing commands.
 - **Bordbuch audit trail** — `nachweis.approve` appends a `nachweis-record` Bordbuch entry with structured metadata, maintaining the hash-chain.
-- **R2 storage** — `nachweis.public-derivative` uploads to the same `nachweis` bucket under a `public/` path prefix. Credentials are resolved from `R2_*` env vars (current behavior). RFC-0713 (draft) proposes per-bucket `R2_NACHWEIS_*` isolation — when implemented, the nachweis module will switch to prefixed vars. This RFC does not depend on RFC-0713.
+- **R2 storage** — `nachweis.public-derivative` uploads to the same `nachweis` bucket under a `public/` path prefix. Credentials are resolved from `R2_NACHWEIS_*` env vars (per-bucket isolation, implemented in `nachweis-io.ts` via `envPrefix` parameter to `resolveR2ConfigFromEnv`).
 - **PBP entity model** — `nachweis.public-derivative` updates the evidence-source entity's `items[].storage` field from `private` to `public`.
 
 ## Design

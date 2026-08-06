@@ -33,6 +33,7 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolvePbpEntityDir,
   type NachweisManifest,
   type NachweisManifestEntry,
 } from "./nachweis-io.ts";
@@ -63,13 +64,16 @@ export async function runNachweisManifestGenerate(
 
   const entitled = await isNachweisEntitled(workspaceRoot, systemId);
   if (!entitled) {
-    return makeSkipResult("nachweis.manifest.generate", systemId) as unknown as KernelCommandResult<NachweisManifest>;
+    return makeSkipResult(
+      "nachweis.manifest.generate",
+      systemId,
+    ) as unknown as KernelCommandResult<NachweisManifest>;
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
   const lang = "de";
 
-  const evidenceDir = path.join(cachePath, "src", "content", "business-profile", lang, "evidence-source");
+  const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const records: NachweisManifestEntry[] = [];
 
   if (existsSync(evidenceDir)) {
@@ -132,7 +136,9 @@ export async function runNachweisManifestGenerate(
   const manifestJson = JSON.stringify(manifest, null, 2) + "\n";
   await writeFileIfChanged(outputPath, manifestJson);
 
-  logger.info(`[nachweis.manifest.generate] wrote ${records.length} record(s) to ${MANIFEST_OUTPUT_DIR}/${MANIFEST_OUTPUT_FILE}`);
+  logger.info(
+    `[nachweis.manifest.generate] wrote ${records.length} record(s) to ${MANIFEST_OUTPUT_DIR}/${MANIFEST_OUTPUT_FILE}`,
+  );
 
   return {
     data: manifest,

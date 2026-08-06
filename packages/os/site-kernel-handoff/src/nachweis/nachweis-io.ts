@@ -175,6 +175,17 @@ export function isMissingEnvError(err: unknown): err is MissingEnvError {
   return err instanceof MissingEnvError;
 }
 
+const PBP_ENTITY_DIR_MAP: Record<string, string> = {
+  "evidence-source": "trust/evidence",
+  consent: "trust/consents",
+  claim: "trust/claims",
+};
+
+export function resolvePbpEntityDir(cachePath: string, lang: string, entityType: string): string {
+  const subDir = PBP_ENTITY_DIR_MAP[entityType] ?? entityType;
+  return path.join(cachePath, "src", "content", "business-profile", lang, subDir);
+}
+
 export async function resolveNachweisCachePath(
   workspaceRoot: string,
   systemId: string,

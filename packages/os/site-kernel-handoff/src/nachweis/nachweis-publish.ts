@@ -39,6 +39,7 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolvePbpEntityDir,
   type NachweisPublicationGate,
   type NachweisPublishResult,
 } from "./nachweis-io.ts";
@@ -77,14 +78,7 @@ export async function runNachweisPublish(
   const lang = "de";
 
   // Read EvidenceSource entity
-  const evidenceDir = path.join(
-    cachePath,
-    "src",
-    "content",
-    "business-profile",
-    lang,
-    "evidence-source",
-  );
+  const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const evidenceFile = path.join(evidenceDir, `${slug}.md`);
 
   if (!existsSync(evidenceFile)) {
@@ -97,7 +91,7 @@ export async function runNachweisPublish(
   const { data: evidenceData, content: evidenceContent } = parseMarkdownFrontmatter(rawEvidence);
 
   // Read Consent entity
-  const consentDir = path.join(cachePath, "src", "content", "business-profile", lang, "consent");
+  const consentDir = resolvePbpEntityDir(cachePath, lang, "consent");
   const consentFile = path.join(consentDir, `${slug}.md`);
   let consentData: Record<string, unknown> | undefined;
   if (existsSync(consentFile)) {

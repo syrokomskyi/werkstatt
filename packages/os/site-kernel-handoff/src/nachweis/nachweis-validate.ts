@@ -36,6 +36,7 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolvePbpEntityDir,
   type NachweisPublicationGate,
   type NachweisValidateResult,
   type NachweisViolation,
@@ -66,7 +67,7 @@ async function readPbpEntitiesByType(
   entityType: string,
   lang: string,
 ): Promise<PbpEntityRecord[]> {
-  const dir = path.join(cachePath, "src", "content", "business-profile", lang, entityType);
+  const dir = resolvePbpEntityDir(cachePath, lang, entityType);
   if (!existsSync(dir)) return [];
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const records: PbpEntityRecord[] = [];

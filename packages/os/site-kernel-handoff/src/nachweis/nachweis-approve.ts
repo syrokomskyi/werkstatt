@@ -33,6 +33,7 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolvePbpEntityDir,
   type NachweisApproveResult,
 } from "./nachweis-io.ts";
 
@@ -89,14 +90,7 @@ export async function runNachweisApprove(
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
   const lang = "de";
-  const evidenceDir = path.join(
-    cachePath,
-    "src",
-    "content",
-    "business-profile",
-    lang,
-    "evidence-source",
-  );
+  const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const evidenceFile = path.join(evidenceDir, `${slug}.md`);
 
   if (!existsSync(evidenceFile)) {

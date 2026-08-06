@@ -28,13 +28,17 @@ import type {
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
 import { executeKernelCommand } from "@warpgogol/site-kernel";
-import { parseMarkdownFrontmatter, stringifyMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
+import {
+  parseMarkdownFrontmatter,
+  stringifyMarkdownFrontmatter,
+} from "@warpgogol/site-kernel-content";
 import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolvePbpEntityDir,
   type NachweisWithdrawResult,
 } from "./nachweis-io.ts";
 
@@ -57,25 +61,31 @@ export async function runNachweisWithdraw(
 
   const entitled = await isNachweisEntitled(workspaceRoot, systemId);
   if (!entitled) {
-    return makeSkipResult("nachweis.withdraw", systemId) as unknown as KernelCommandResult<NachweisWithdrawResult>;
+    return makeSkipResult(
+      "nachweis.withdraw",
+      systemId,
+    ) as unknown as KernelCommandResult<NachweisWithdrawResult>;
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
   const lang = "de";
 
   // Read EvidenceSource entity
-  const evidenceDir = path.join(cachePath, "src", "content", "business-profile", lang, "evidence-source");
+  const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const evidenceFile = path.join(evidenceDir, `${slug}.md`);
 
   if (!existsSync(evidenceFile)) {
-    throw new Error(`[nachweis.withdraw] NOT_FOUND: evidence-source '${slug}' not found at ${evidenceFile}`);
+    throw new Error(
+      `[nachweis.withdraw] NOT_FOUND: evidence-source '${slug}' not found at ${evidenceFile}`,
+    );
   }
 
   const rawEvidence = await fs.readFile(evidenceFile, "utf8");
   const { data: evidenceData, content: evidenceContent } = parseMarkdownFrontmatter(rawEvidence);
 
   // Check if already withdrawn (idempotent)
-  const currentRecordStatus = (evidenceData as Record<string, unknown>).recordStatus as string | undefined;
+  const currentRecordStatus = (evidenceData as Record<string, unknown>).recordStatus as
+    string | undefined;
   if (currentRecordStatus === "withdrawn") {
     return {
       data: {
@@ -92,7 +102,9 @@ export async function runNachweisWithdraw(
 
   // Update EvidenceSource: set record_status and publication.visibility
   (evidenceData as Record<string, unknown>).recordStatus = "withdrawn";
-  const publication = ((evidenceData as Record<string, unknown>).publication as Record<string, unknown> | undefined) ?? {};
+  const publication =
+    ((evidenceData as Record<string, unknown>).publication as
+      Record<string, unknown> | undefined) ?? {};
   publication.visibility = "private";
   (evidenceData as Record<string, unknown>).publication = publication;
 
@@ -100,7 +112,7 @@ export async function runNachweisWithdraw(
   await fs.writeFile(evidenceFile, updatedContent, "utf8");
 
   // Update Consent entity if it exists
-  const consentDir = path.join(cachePath, "src", "content", "business-profile", lang, "consent");
+  const consentDir = resolvePbpEntityDir(cachePath, lang, "consent");
   const consentFile = path.join(consentDir, `${slug}.md`);
   if (existsSync(consentFile)) {
     const rawConsent = await fs.readFile(consentFile, "utf8");
@@ -113,7 +125,13 @@ export async function runNachweisWithdraw(
   // Append Bordbuch entries
   const operationId = generateOperationId();
   await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "nachweis.withdraw", "agent");
-  await acquireLock(workspaceRoot, `bordbuch:${systemId}`, operationId, "nachweis.withdraw", "agent");
+  await acquireLock(
+    workspaceRoot,
+    `bordbuch:${systemId}`,
+    operationId,
+    "nachweis.withdraw",
+    "agent",
+  );
 
   const bordbuchEventIds: string[] = [];
   try {

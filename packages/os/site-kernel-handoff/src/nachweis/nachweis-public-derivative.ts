@@ -39,6 +39,7 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolvePbpEntityDir,
   resolveNachweisPublicR2Path,
   computeSourceSha256,
   uploadToR2,
@@ -79,14 +80,7 @@ export async function runNachweisPublicDerivative(
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
   const lang = "de";
-  const evidenceDir = path.join(
-    cachePath,
-    "src",
-    "content",
-    "business-profile",
-    lang,
-    "evidence-source",
-  );
+  const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const evidenceFile = path.join(evidenceDir, `${slug}.md`);
 
   if (!existsSync(evidenceFile)) {
@@ -96,9 +90,7 @@ export async function runNachweisPublicDerivative(
   }
 
   if (!existsSync(filePath)) {
-    throw new Error(
-      `[nachweis.public-derivative] NOT_FOUND: file '${filePath}' not found`,
-    );
+    throw new Error(`[nachweis.public-derivative] NOT_FOUND: file '${filePath}' not found`);
   }
 
   const rawEvidence = await fs.readFile(evidenceFile, "utf8");

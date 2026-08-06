@@ -120,13 +120,20 @@ async function writeBordbuch(cachePath: string, entries: unknown[]): Promise<voi
   await writeFile(join(dir, "events.ndjson"), lines);
 }
 
+const PBP_ENTITY_DIR_MAP: Record<string, string> = {
+  "evidence-source": "trust/evidence",
+  consent: "trust/consents",
+  claim: "trust/claims",
+};
+
 async function writePbpEntity(
   cachePath: string,
   entityType: string,
   slug: string,
   data: Record<string, unknown>,
 ): Promise<void> {
-  const dir = join(cachePath, "src", "content", "business-profile", "de", entityType);
+  const subDir = PBP_ENTITY_DIR_MAP[entityType] ?? entityType;
+  const dir = join(cachePath, "src", "content", "business-profile", "de", subDir);
   await mkdir(dir, { recursive: true });
   const frontmatter = Object.entries(data)
     .map(([k, v]) => `${k}: ${typeof v === "string" ? JSON.stringify(v) : JSON.stringify(v)}`)
@@ -513,7 +520,7 @@ describe("RFC-0707: nachweis.consent.update", () => {
       "content",
       "business-profile",
       "de",
-      "consent",
+      "trust/consents",
       "test-consent.md",
     );
     const raw = await readFile(consentFile, "utf8");
@@ -648,7 +655,7 @@ describe("RFC-0707: nachweis.withdraw", () => {
       "content",
       "business-profile",
       "de",
-      "evidence-source",
+      "trust/evidence",
       "test-record.md",
     );
     const raw = await readFile(evidenceFile, "utf8");
@@ -931,7 +938,7 @@ describe("RFC-0714: nachweis.public-derivative", () => {
       "content",
       "business-profile",
       "de",
-      "evidence-source",
+      "trust/evidence",
       "test-record.md",
     );
     const raw = await readFile(evidenceFile, "utf8");
