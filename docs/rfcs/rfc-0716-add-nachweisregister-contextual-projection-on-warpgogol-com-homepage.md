@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
+enhancedAt: 2026-08-06
 implementedAt:
 closedAt:
 supersedes: []
@@ -124,7 +125,7 @@ Add a `nachweis-reference` transparency block in the transparency section, linki
 
 ### Team page (`team.md`, UK + DE)
 
-Add a `nachweis-reference` transparency block after the team lists, linking team experience to the Nachweisregister.
+Add a `nachweis-reference` transparency block after the team lists, linking team experience to the Nachweisregister. The team page's `planets[]` in `system.md` must be extended with `Tethys` (pin 1.3.0) — it is not currently pinned for this page, and `page.block.validate` (rule B-02) will reject the `transparency` block without it.
 
 ### Notausgang page (`notausgang.md`, UK + DE)
 
@@ -151,8 +152,8 @@ All projections use existing block types from the archetype registry. No new arc
   type: trust-strip
   props:
     header:
-      heading: "Nachweisregister"
-      subheading: "Dokumentierte Projektbestätigungen mit kryptographischer Verifikation."
+      heading: "Реєстр доказів"
+      subheading: "Документовані підтвердження проєктів з криптографічною верифікацією."
     background:
       kind: transparent
     body:
@@ -160,13 +161,15 @@ All projections use existing block types from the archetype registry. No new arc
       iconColor: primary
       align: center
       items:
-        - text: "SHA-256-Hash — unabhängige Überprüfung der Dokumentintegrität"
-        - text: "Operator-Signatur (Ed25519) — Garantie, dass der Eintrag von Warpgogol stammt"
-        - text: "Qualifizierter Zeitstempel (RFC 3161) — unveränderliche Fixierung des Veröffentlichungszeitpunkts"
+        - text: "SHA-256-хеш — незалежна перевірка цілісності документа"
+        - text: "Підпис оператора (Ed25519) — гарантія, що запис походить від Warpgogol"
+        - text: "Кваліфікована мітка часу (RFC 3161) — незмінна фіксація часу публікації"
     cta:
-      label: "Nachweise ansehen"
+      label: "Переглянути докази"
       target: nachweise
 ```
+
+> Note: The homepage already has a `trust-strip` block (`id: promo`). The new `nachweis-register` block has a distinct heading ("Реєстр доказів" / "Nachweisregister") to satisfy axe landmark-unique — both unique IDs and unique accessible names are required.
 
 #### Service pages `nachweis-reference` block
 
@@ -175,18 +178,20 @@ All projections use existing block types from the archetype registry. No new arc
   type: transparency
   props:
     header:
-      heading: "Projektnachweise"
-      subheading: "Dokumentierte Bestätigungen für durchgeführte Projekte."
+      heading: "Проєктні докази"
+      subheading: "Документовані підтвердження для виконаних проєктів."
     background:
       kind: transparent
     body:
       kind: paragraphs
       paragraphs:
-        - "Warpgogol dokumentiert Projektergebnisse mit kryptographischer Verifikation."
+        - "Warpgogol документує результати проєктів з криптографічною верифікацією."
     cta:
-      label: "Nachweise ansehen"
+      label: "Переглянути докази"
       target: nachweise
 ```
+
+> Examples show UK text as source of truth. DE translation maintains semantic parity.
 
 ### File system responsibilities
 
@@ -202,6 +207,7 @@ All projections use existing block types from the archetype registry. No new arc
 | `missions/warpgogol-com-m000033/workpiece/src/content/pages/de/team.md` | Team DE — add nachweis-reference block |
 | `missions/warpgogol-com-m000033/workpiece/src/content/pages/uk/notausgang.md` | Notausgang UK — add nachweis-reference block |
 | `missions/warpgogol-com-m000033/workpiece/src/content/pages/de/notausgang.md` | Notausgang DE — add nachweis-reference block |
+| `missions/warpgogol-com-m000033/workpiece/src/content/system.md` | Add Tethys (pin 1.3.0) to team page `planets[]` |
 
 ## Rollout
 
