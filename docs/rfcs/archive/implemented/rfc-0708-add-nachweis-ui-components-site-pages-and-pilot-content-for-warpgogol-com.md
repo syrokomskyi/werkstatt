@@ -15,7 +15,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0717
 related:
   - ADR-0028
   - RFC-0706
