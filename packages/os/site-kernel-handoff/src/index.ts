@@ -121,6 +121,7 @@ export {
   type WorkpieceWriteResult,
 } from "./workpiece/index.ts";
 export { createBordbuchModule } from "./bordbuch/index.ts";
+export { createNachweisModule } from "./nachweis/index.ts";
 export {
   appendBordbuchEntry,
   readBordbuch,

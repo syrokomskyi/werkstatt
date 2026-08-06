@@ -43,6 +43,8 @@ export default defineKernelConfig({
     "change-impact": async () => (await import("@warpgogol/site-kernel")).changeImpactModule,
     bordbuch: async () =>
       (await import("@warpgogol/site-kernel-handoff")).createBordbuchModule(),
+    nachweis: async () =>
+      (await import("@warpgogol/site-kernel-handoff")).createNachweisModule(),
     onboarding: async () =>
       (await import("@warpgogol/site-kernel-onboarding")).createOnboardingModule(),
   },
