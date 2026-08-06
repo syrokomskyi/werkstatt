@@ -1,12 +1,13 @@
 ---
 id: RFC-0707
 title: "Add Nachweis kernel module with R2 storage and Bordbuch lifecycle"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
