@@ -1,12 +1,13 @@
 ---
 id: RFC-0712
 title: "Add multi-persona design summit skill for complex RFC review"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
