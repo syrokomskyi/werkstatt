@@ -401,6 +401,19 @@ For each context insight, choose the destination with the operator:
 
 Both daily-log and MEMORY.md edits require operator confirmation. Files are the source of truth; Memory DB is a mirror.
 
+#### 4g. Memory DB distill threshold (advisory)
+
+If this session created **more than 5** Memory DB entries (via `create_memory`), recommend running `fo-knowledge-distill --source=memory-db` to review whether any of the new entries deserve promotion to a durable Forge artifact (skill instruction, AGENTS.md rule, DNA invariant).
+
+Present the recommendation via `ask_user_question` (in `aiLanguage`):
+
+| Option | Description |
+| --- | --- |
+| Run distill now | Invoke `fo-knowledge-distill --source=memory-db` immediately to review this session's memories for promotion. |
+| Later | Skip for now. The operator can run distill in a future session when memories are auto-retrieved. |
+
+If the operator declines, note it in the session summary. Do not auto-invoke the skill — the operator must explicitly choose to run it.
+
 ### 5. Commit
 
 Commit rule edits to `AGENTS.md` files separately from any delegated skill output (ADRs, RFCs, forge ports — those skills commit their own files).

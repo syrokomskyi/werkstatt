@@ -182,14 +182,14 @@ The `markers` field is added to the existing `RfcValidationResult` type as `mark
 
 ## Acceptance criteria
 
-- [ ] V-NC-01 validation rule implemented in `rfc.validate` (warn for draft, error for reviewing+)
-- [ ] `rfc.validate --json` output includes `markers` field with line numbers and severity
-- [ ] `fo-idea-create-rfc` skill instructions include guidance to use markers instead of guessing
-- [ ] `fo-idea-audit` skill instructions include marker inventory in axis E report
-- [ ] `fo-idea-enhance` skill instructions include NC finding category with resolution flow
-- [ ] Code blocks are excluded from marker detection
-- [ ] Existing RFCs in `reviewing`+ status are exempt from retroactive checks
-- [ ] `rfc.validate` passes on this file before merging
+- [x] V-NC-01 validation rule implemented in `rfc.validate` (warn for draft, error for reviewing+) (evidence: packages/forge/os/rfc/handlers/validate-rules.ts:878-888)
+- [x] `rfc.validate --json` output includes `markers` field with line numbers and severity (evidence: packages/forge/os/rfc/handlers/validate.ts:154, packages/forge/os/rfc/types.ts:307-318)
+- [x] `fo-idea-create-rfc` skill instructions include guidance to use markers instead of guessing (evidence: packages/forge/skills/fo/fo-idea-create-rfc/SKILL.md:93)
+- [x] `fo-idea-audit` skill instructions include marker inventory in axis E report (evidence: packages/forge/skills/fo/fo-idea-audit/SKILL.md:128)
+- [x] `fo-idea-enhance` skill instructions include NC finding category with resolution flow (evidence: packages/forge/skills/fo/fo-idea-enhance/SKILL.md:89)
+- [x] Code blocks are excluded from marker detection (evidence: packages/forge/os/rfc/handlers/validate-rules.ts:172-176)
+- [x] Existing RFCs in `reviewing`+ status are exempt from retroactive checks (evidence: packages/forge/os/rfc/handlers/validate-rules.ts:155,163)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0709 --json returned 0 violations)
 
 ## Implementation notes for agents
 
