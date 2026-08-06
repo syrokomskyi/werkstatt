@@ -32,7 +32,7 @@
 }
 
 .nachweis-list__empty {
-  font-size: var(--ds-font-size-base);
+  font-size: var(--ds-text-2);
   color: var(--ds-color-text-secondary);
   text-align: center;
   padding: var(--ds-space-8) var(--ds-space-4);

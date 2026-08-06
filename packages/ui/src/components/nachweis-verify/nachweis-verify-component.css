@@ -37,13 +37,13 @@
 
 .nachweis-verify__entry dt {
   font-weight: 600;
-  font-size: var(--ds-font-size-sm);
+  font-size: var(--ds-text-sm);
   color: var(--ds-color-text-secondary);
   margin-bottom: var(--ds-space-1);
 }
 
 .nachweis-verify__entry dd {
-  font-size: var(--ds-font-size-sm);
+  font-size: var(--ds-text-sm);
   color: var(--ds-color-text-primary);
   margin: 0;
   line-height: 1.5;
@@ -52,7 +52,7 @@
 
 .nachweis-verify__hash {
   font-family: ui-monospace, monospace;
-  font-size: var(--ds-font-size-xs);
+  font-size: var(--ds-text-xs);
   background: var(--ds-color-surface-elevated);
   padding: 0.125em 0.375em;
   border-radius: var(--ds-radius-sm);

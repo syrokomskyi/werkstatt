@@ -569,6 +569,33 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
   },
+  // RFC-0707: Bordbuch raw event log and status (nachweis workflow artifacts).
+  {
+    path: "public/.well-known/bordbuch/events.ndjson",
+    command: "bordbuch.append",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts",
+  },
+  {
+    path: "public/.well-known/bordbuch/status.generated.yaml",
+    command: "bordbuch.generate",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+  },
+  // RFC-0715: Nachweis public key JSON (N3 cryptographic verification).
+  {
+    path: "public/.well-known/nachweis-pubkey.json",
+    command: "nachweis.key.ensure",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-handoff/src/nachweis/nachweis-key-ensure.ts",
+  },
+  // RFC-0707: Nachweis manifest (public index of published records).
+  {
+    path: "public/nachweise/manifest.json",
+    command: "nachweis.manifest.generate",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-handoff/src/nachweis/nachweis-manifest.ts",
+  },
 
   // RFC-0171: Decap CMS admin config (conditional — only for cms-git adapter sites).
   {
