@@ -39,7 +39,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 
 - `PbpBusiness` — Business entity (RFC-0403)
 - `PbpProduct`, `PbpProductKind` — Product entity with kind vocabulary (RFC-0404)
-- `PbpClaim`, `PbpClaimClass`, `PbpClaimKind` — Claim entity with class/kind vocabularies (RFC-0405, RFC-0706: optional `statementLang` field)
+- `PbpClaim`, `PbpClaimClass`, `PbpClaimKind`, `PbpVerificationLevel` — Claim entity with class/kind vocabularies (RFC-0405, RFC-0706: optional `statementLang` field, ADR-0028: optional `verificationLevel` field N0–N3)
 - `PbpLegalIdentity` — LegalIdentity entity with public/private boundary (RFC-0409)
 - `PbpBrand` — Brand entity (RFC-0410)
 - `PbpPlace`, `PbpPlaceKind` — Place entity with kind vocabulary (RFC-0411)
