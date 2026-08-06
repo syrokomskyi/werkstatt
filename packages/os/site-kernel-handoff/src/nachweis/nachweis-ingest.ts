@@ -169,7 +169,7 @@ export async function runNachweisIngest(
       workspaceRoot,
       systemId,
       "nachweis-record",
-      `Ingested ${recordId} (${recordType})`,
+      `Ingested nachweis record (type: ${recordType}, slug: ${slug})`,
       "agent",
       {
         writerRole: "nachweis",
