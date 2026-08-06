@@ -23,9 +23,11 @@
  * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
  */
 
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast } from "@warpgogol/share";
 import "./nachweis-verify-component.css";
 
-interface Props {
+interface NachweisVerifyContent {
   slug: string;
   version: string;
   sourceSha256: string;
@@ -37,6 +39,7 @@ interface Props {
   verificationLevel?: string;
 }
 
+const { pageOverride } = Astro.props as SectionProps;
 const {
   slug,
   version,
@@ -47,7 +50,7 @@ const {
   operatorSignature,
   qualifiedTimestamp,
   verificationLevel,
-} = Astro.props;
+} = cast<NachweisVerifyContent>(pageOverride);
 
 const headingId = `nachweis-verify-${slug}-${version}-title`;
 ---
@@ -62,43 +65,63 @@ const headingId = `nachweis-verify-${slug}-${version}-title`;
       <dt>Quell-Hash (SHA-256)</dt>
       <dd><code class="nachweis-verify__hash">{sourceSha256}</code></dd>
     </div>
-    {publicDerivativeSha256 && (
-      <div class="nachweis-verify__entry">
-        <dt>Öffentliche Ableitung (SHA-256)</dt>
-        <dd><code class="nachweis-verify__hash">{publicDerivativeSha256}</code></dd>
-      </div>
-    )}
-    {recordPayloadSha256 && (
-      <div class="nachweis-verify__entry">
-        <dt>Datensatz-Hash (SHA-256)</dt>
-        <dd><code class="nachweis-verify__hash">{recordPayloadSha256}</code></dd>
-      </div>
-    )}
-    {envelopeSha256 && (
-      <div class="nachweis-verify__entry">
-        <dt>Umschlag-Hash (SHA-256)</dt>
-        <dd><code class="nachweis-verify__hash">{envelopeSha256}</code></dd>
-      </div>
-    )}
-    {verificationLevel && (
-      <div class="nachweis-verify__entry">
-        <dt>Prüfungsniveau</dt>
-        <dd>{verificationLevel}</dd>
-      </div>
-    )}
-    {qualifiedTimestamp && (
-      <div class="nachweis-verify__entry">
-        <dt>Qualifizierter Zeitstempel</dt>
-        <dd>
-          <time datetime={qualifiedTimestamp}>{qualifiedTimestamp}</time>
-        </dd>
-      </div>
-    )}
-    {operatorSignature && (
-      <div class="nachweis-verify__entry">
-        <dt>Operator-Signatur</dt>
-        <dd><code class="nachweis-verify__hash">{operatorSignature}</code></dd>
-      </div>
-    )}
+    {
+      publicDerivativeSha256 && (
+        <div class="nachweis-verify__entry">
+          <dt>Öffentliche Ableitung (SHA-256)</dt>
+          <dd>
+            <code class="nachweis-verify__hash">{publicDerivativeSha256}</code>
+          </dd>
+        </div>
+      )
+    }
+    {
+      recordPayloadSha256 && (
+        <div class="nachweis-verify__entry">
+          <dt>Datensatz-Hash (SHA-256)</dt>
+          <dd>
+            <code class="nachweis-verify__hash">{recordPayloadSha256}</code>
+          </dd>
+        </div>
+      )
+    }
+    {
+      envelopeSha256 && (
+        <div class="nachweis-verify__entry">
+          <dt>Umschlag-Hash (SHA-256)</dt>
+          <dd>
+            <code class="nachweis-verify__hash">{envelopeSha256}</code>
+          </dd>
+        </div>
+      )
+    }
+    {
+      verificationLevel && (
+        <div class="nachweis-verify__entry">
+          <dt>Prüfungsniveau</dt>
+          <dd>{verificationLevel}</dd>
+        </div>
+      )
+    }
+    {
+      qualifiedTimestamp && (
+        <div class="nachweis-verify__entry">
+          <dt>Qualifizierter Zeitstempel</dt>
+          <dd>
+            <time datetime={qualifiedTimestamp}>{qualifiedTimestamp}</time>
+          </dd>
+        </div>
+      )
+    }
+    {
+      operatorSignature && (
+        <div class="nachweis-verify__entry">
+          <dt>Operator-Signatur</dt>
+          <dd>
+            <code class="nachweis-verify__hash">{operatorSignature}</code>
+          </dd>
+        </div>
+      )
+    }
   </dl>
 </section>

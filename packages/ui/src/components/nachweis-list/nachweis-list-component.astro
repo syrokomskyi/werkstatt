@@ -21,6 +21,8 @@
  * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
  */
 
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast } from "@warpgogol/share";
 import NachweisCard from "../nachweis-card/nachweis-card-component.astro";
 import "./nachweis-list-component.css";
 
@@ -41,13 +43,15 @@ interface NachweisRecord {
   verifiedDate?: string;
 }
 
-interface Props {
+interface NachweisListContent {
   records?: NachweisRecord[];
   emptyMessage?: string;
 }
 
-const { records = [], emptyMessage = "Weitere Nachweise werden derzeit vorbereitet." } =
-  Astro.props;
+const { pageOverride } = Astro.props as SectionProps;
+const props = cast<NachweisListContent>(pageOverride);
+const records = props.records ?? [];
+const emptyMessage = props.emptyMessage ?? "Weitere Nachweise werden derzeit vorbereitet.";
 ---
 
 <section class="nachweis-list" data-component="nachweis-list">

@@ -21,6 +21,8 @@
  * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
  */
 
+import type { SectionProps } from "@warpgogol/share/page";
+import { cast } from "@warpgogol/share";
 import NachweisCard from "../nachweis-card/nachweis-card-component.astro";
 import "./nachweis-detail-component.css";
 
@@ -34,7 +36,7 @@ interface Sichtpass {
   verificationLevel?: string;
 }
 
-interface Props {
+interface NachweisDetailContent {
   slug: string;
   title: string;
   result: string;
@@ -52,6 +54,7 @@ interface Props {
   sichtpass?: Sichtpass;
 }
 
+const { pageOverride } = Astro.props as SectionProps;
 const {
   slug,
   title,
@@ -68,7 +71,7 @@ const {
   verifiedByLabel,
   verifiedDate,
   sichtpass,
-} = Astro.props;
+} = cast<NachweisDetailContent>(pageOverride);
 
 const sichtpassHeadingId = `nachweis-detail-${slug}-sichtpass`;
 ---
