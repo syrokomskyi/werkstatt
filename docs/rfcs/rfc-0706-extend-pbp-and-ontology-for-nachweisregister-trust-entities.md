@@ -1,7 +1,7 @@
 ---
 id: RFC-0706
 title: "Extend PBP and Ontology for Nachweisregister trust entities"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
