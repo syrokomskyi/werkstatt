@@ -570,30 +570,37 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
   },
   // RFC-0473: Bordbuch public projections (site-relative — committed to workpiece by bordbuch.commit).
+  // conditional: true — these files only exist in the workpiece context, not in every site directory.
+  // ownership.sync.validate still uses them to match files on disk; generated.files.validate skips them.
   {
     path: "public/.well-known/bordbuch.json",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    conditional: true,
   },
   {
     path: "public/.well-known/bordbuch/index.html",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    conditional: true,
   },
   // RFC-0707: Bordbuch raw event log and status (nachweis workflow artifacts).
+  // conditional: true — these files only exist in the workpiece/cache context.
   {
     path: "public/.well-known/bordbuch/events.ndjson",
     command: "bordbuch.append",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts",
+    conditional: true,
   },
   {
     path: "public/.well-known/bordbuch/status.generated.yaml",
     command: "bordbuch.generate",
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+    conditional: true,
   },
   // RFC-0715: Nachweis public key JSON (N3 cryptographic verification).
   {
