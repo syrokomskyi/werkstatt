@@ -235,16 +235,16 @@ Unlike RFC-0709, RFC-0710, and RFC-0711, this RFC does **not** introduce new Sit
 
 ## Acceptance criteria
 
-- [ ] `fo-design-summit` skill created in `packages/forge/skills/fo/fo-design-summit/` with SKILL.md
-- [ ] `fo-design-summit` synced to `.agents/skills/fo-design-summit/SKILL.md`
-- [ ] `docs/summits/` directory created with a README explaining the purpose
-- [ ] Skill implements 5 personas (architect, security, QA, PM, developer advocate) with distinct review focuses
-- [ ] Summit report includes consensus findings (2+ personas) and unique findings (1 persona)
-- [ ] Summit report persisted to `docs/summits/summit-<rfc-id>.md`
-- [ ] `fo-idea-plan` skill instructions updated with summit suggestion (step 5b)
-- [ ] `fo-idea-i-just-want-to-see-the-result` does NOT invoke summit by default
-- [ ] `skill.validate` passes on `fo-design-summit` SKILL.md
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `fo-design-summit` skill created in `packages/forge/skills/fo/fo-design-summit/` with SKILL.md (evidence: packages/forge/skills/fo/fo-design-summit/SKILL.md:1)
+- [x] `fo-design-summit` synced to `.agents/skills/fo-design-summit/SKILL.md` (evidence: .agents/skills/fo-design-summit/SKILL.md:1)
+- [x] `docs/summits/` directory created with a README explaining the purpose (evidence: docs/summits/README.md:1)
+- [x] Skill implements 5 personas (architect, security, QA, PM, developer advocate) with distinct review focuses (evidence: packages/forge/skills/fo/fo-design-summit/SKILL.md:68)
+- [x] Summit report includes consensus findings (2+ personas) and unique findings (1 persona) (evidence: packages/forge/skills/fo/fo-design-summit/SKILL.md:127)
+- [x] Summit report persisted to `docs/summits/summit-<rfc-id>.md` (evidence: packages/forge/skills/fo/fo-design-summit/SKILL.md:135)
+- [x] `fo-idea-plan` skill instructions updated with summit suggestion (step 5b) (evidence: packages/forge/skills/fo/fo-idea-plan/SKILL.md:171)
+- [x] `fo-idea-i-just-want-to-see-the-result` does NOT invoke summit by default (evidence: grep search for "design-summit" in fo-idea-i-just-want-to-see-the-result/SKILL.md returned no matches)
+- [x] `skill.validate` passes on `fo-design-summit` SKILL.md (evidence: forge.skill.validate --skill fo-design-summit — 0 violations for fo-design-summit)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0712 — All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
