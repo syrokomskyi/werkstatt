@@ -1,7 +1,7 @@
 ---
 id: RFC-0722
 title: "Enforce RFC and ADR directory structure convention"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: policy
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
-implementedAt:
+implementedAt: 2026-08-06
 closedAt:
 supersedes: []
 supersededBy:
