@@ -131,6 +131,9 @@
     "@warpgogol/site-kernel-integrity": "workspace:*",
     "@warpgogol/site-kernel-onboarding": "workspace:*",
     "@warpgogol/surface": "workspace:*",
+    "@noble/ed25519": "^3.1.0",
+    "asn1js": "^3.0.10",
+    "pkijs": "^3.3.3",
     "tar": "^7.5.22",
     "yaml": "^2.9.0"
   },

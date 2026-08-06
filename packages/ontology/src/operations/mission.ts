@@ -13,6 +13,7 @@
   <item>RFC-0480: add rfcId to mission manifest for C-surface regression check traceability.</item>
   <item>RFC-0517: add preflight-skipped kind for preflight gate bypass audit trail.</item>
   <item>RFC-0706: add nachweis-record and nachweis-consent kinds for Nachweisregister trust lifecycle (ADR-0028).</item>
+  <item>RFC-0715: add nachweis-signed and nachweis-timestamped kinds for N3 cryptographic verification.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -62,6 +63,9 @@ export const bordbuchEntryKindSchema = z.enum([
   // RFC-0706 / ADR-0028: Nachweisregister trust lifecycle
   "nachweis-record",
   "nachweis-consent",
+  // RFC-0715: N3 cryptographic verification (operator signature + RFC 3161 timestamp)
+  "nachweis-signed",
+  "nachweis-timestamped",
 ]);
 
 export const bordbuchEntryStatusSchema = z.enum(["done", "failed", "waiting", "escalated"]);

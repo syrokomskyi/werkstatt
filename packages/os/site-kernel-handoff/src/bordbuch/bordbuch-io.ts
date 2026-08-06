@@ -13,6 +13,7 @@
   <item>RFC-0580: extract gitExec into shared werkstatt/git-exec.ts with allowNonZero option.</item>
   <item>RFC-0583: export computeEntryHash for reuse by bordbuch.repair.</item>
   <item>RFC-0706: add nachweis writer-role for nachweis-record and nachweis-consent kinds (ADR-0028).</item>
+  <item>RFC-0715: add nachweis-signed and nachweis-timestamped to nachweis writer-role for N3 crypto verification.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -48,7 +49,8 @@ const WRITER_ROLE_KINDS: Record<string, BordbuchEntryKind[]> = {
   operator: ["operator-note", "erratum"],
   runtime: ["pseo", "indexnow.submit"],
   // RFC-0706 / ADR-0028: Nachweisregister trust lifecycle
-  nachweis: ["nachweis-record", "nachweis-consent"],
+  // RFC-0715: N3 cryptographic verification (operator signature + RFC 3161 timestamp)
+  nachweis: ["nachweis-record", "nachweis-consent", "nachweis-signed", "nachweis-timestamped"],
 };
 
 export function validateWriterRole(writerRole: string, kind: BordbuchEntryKind): boolean {
