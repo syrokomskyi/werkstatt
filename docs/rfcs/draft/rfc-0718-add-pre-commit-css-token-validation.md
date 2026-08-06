@@ -1,7 +1,7 @@
 ---
 id: RFC-0718
 title: "Add pre-commit CSS design token validation for staged .css files"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
