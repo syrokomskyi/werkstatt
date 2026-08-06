@@ -11,6 +11,7 @@
   <item>RFC-0560: use resolveActor(input) for actor resolution with --actor-from-auth flag.</item>
   <item>RFC-0580: auto-commit werkstatt side-effects (registry.yaml, mission.yaml) after writeRegistry.</item>
   <item>RFC-0593: add bordbuch.validate pre-flight gate before lock acquisition.</item>
+  <item>ADR-0030: verify commitAndPushBordbuch succeeded — throw on commit failure (commitSha null) and push failure (pushed false) with distinct error messages.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -178,9 +179,25 @@ export async function runMissionOpen(
       metadata: { brief, pinAtOpen },
     });
 
-    // Commit and push bordbuch to system git repo (RFC-0477)
+    // Commit and push bordbuch to system git repo (RFC-0477, ADR-0030)
     const systemDir = await resolveCachePath(workspaceRoot, systemId);
-    await commitAndPushBordbuch(systemDir, `Bordbuch: mission-open ${missionId}`);
+    const pushResult = await commitAndPushBordbuch(
+      systemDir,
+      `Bordbuch: mission-open ${missionId}`,
+    );
+    if (pushResult.commitSha === null) {
+      throw new Error(
+        `[mission.open] bordbuch commit failed for system '${systemId}' — mission-open event was not committed. ` +
+          `Check git state in the cache clone and re-run mission.open.`,
+      );
+    }
+    if (!pushResult.pushed) {
+      throw new Error(
+        `[mission.open] bordbuch push failed for system '${systemId}' — mission-open event was committed but not persisted to the bare repo. ` +
+          `Error: ${pushResult.error ?? "unknown"}. ` +
+          `Check git remote connectivity and re-run mission.open.`,
+      );
+    }
 
     // Update registry
     entry.currentMission = missionId;

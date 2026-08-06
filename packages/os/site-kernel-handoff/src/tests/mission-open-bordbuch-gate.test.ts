@@ -23,6 +23,17 @@ function gitInit(dir: string): void {
   execSync("git config user.name Test", { cwd: dir, stdio: "pipe" });
 }
 
+function setupBareOrigin(workspaceDir: string): string {
+  const bareDir = join(workspaceDir, "..", "bare-origin.git");
+  execSync(`git init --bare ${JSON.stringify(bareDir)}`, { stdio: "pipe" });
+  execSync(`git remote add origin ${JSON.stringify(bareDir)}`, {
+    cwd: workspaceDir,
+    stdio: "pipe",
+  });
+  execSync("git push -u origin HEAD:main", { cwd: workspaceDir, stdio: "pipe" });
+  return bareDir;
+}
+
 function gitCommit(dir: string, msg: string): void {
   execSync("git add -A", { cwd: dir, stdio: "pipe" });
   execSync(`git commit -m ${JSON.stringify(msg)}`, { cwd: dir, stdio: "pipe" });
@@ -99,6 +110,9 @@ systems:
 
   mkdirSync(join(tmpWorkspace, "systems", "test-system", "bordbuch"), { recursive: true });
   gitCommit(tmpWorkspace, "add system");
+
+  // ADR-0030: commitAndPushBordbuch now verifies push succeeded — set up bare origin
+  setupBareOrigin(tmpWorkspace);
 }
 
 test("mission.open refuses when bordbuch has orphan-mission-close violation", async () => {
