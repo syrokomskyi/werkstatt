@@ -151,14 +151,14 @@ test("leitstand.rollback auto-detects main from promoted, steps to alt-deployed"
   });
   writeReleaseManifest(tmpDir, targetRelease, {
     systemId,
-    state: "published",
+    state: "ready",
     missionId: "test-sys-m000001",
   });
   const distDir = createDistDir(tmpDir, targetRelease);
   await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
 
   const result = await runLeitstandRollback(
-    makeInput({ system: systemId, "to-release": targetRelease }),
+    makeInput({ site: systemId, "to-release": targetRelease }),
     makeContext(tmpDir),
   );
 
@@ -180,18 +180,18 @@ test("leitstand.rollback auto-detects alt from alt-deployed, steps to published"
   });
   writeReleaseManifest(tmpDir, targetRelease, {
     systemId,
-    state: "published",
+    state: "ready",
     missionId: "test-sys-m000001",
   });
   const distDir = createDistDir(tmpDir, targetRelease);
   await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
 
   const result = await runLeitstandRollback(
-    makeInput({ system: systemId, "to-release": targetRelease }),
+    makeInput({ site: systemId, "to-release": targetRelease }),
     makeContext(tmpDir),
   );
 
   expect(result.data!.state).toBe("succeeded");
   expect(result.data!.channel).toBe("alt");
-  expect(readReleaseState(tmpDir, currentRelease)).toBe("published");
+  expect(readReleaseState(tmpDir, currentRelease)).toBe("ready");
 });

@@ -149,7 +149,7 @@ test("RFC-0698: leitstand.dev-deploy calls mission.git.commit after build", asyn
   createRegistryWithChannels(tmpDir, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
 
   expect(data?.command).toBe("leitstand.dev-deploy");
@@ -165,7 +165,7 @@ test("RFC-0698: build-skip cache is written with post-commit commitSha", async (
   createRegistryWithChannels(tmpDir, systemId, missionId);
   createWorkpieceDist(tmpDir, missionId);
 
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const cachePath = join(tmpDir, "missions", missionId, ".dev-deploy-build-cache.json");
   expect(existsSync(cachePath)).toBe(true);
@@ -185,7 +185,7 @@ test("RFC-0698: auto-commit failure aborts deploy with fatal error", async () =>
   commitMockExitCode = 1;
   commitMockSummary = "mission.git.commit: pre-commit validation failed";
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
 
   expect(result.exitCode).toBe(1);
@@ -206,12 +206,12 @@ test("RFC-0698: auto-commit runs during build-skip (cache hit) path", async () =
   createWorkpieceDist(tmpDir, missionId);
 
   // First run — writes cache with post-commit sha
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   // Second run — build should be skipped (cache hit: pre-build sha matches cached post-commit sha).
   // Do NOT reset gitRevParseCallCount — the counter is at 2 after the first run, so the
   // second run's pre-build git rev-parse call (#3) returns postCommitSha, matching the cache.
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
 
   expect(data?.buildSkipped).toBe(true);

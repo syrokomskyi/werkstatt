@@ -208,7 +208,7 @@ test("RFC-0649: null adapter skips purge and freshness check — Axiom runs norm
   createRegistry(tmpDir, systemId, "null", missionId);
   createWorkpieceDist(tmpDir, missionId);
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -229,7 +229,7 @@ test("RFC-0649: cloudflare-workers adapter with missing CLOUDFLARE_ZONE_ID — f
   createWorkpieceDist(tmpDir, missionId);
 
   // No secrets file → no CLOUDFLARE_ZONE_ID → purge skips with warning → fatal
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -268,7 +268,7 @@ test("RFC-0649: cloudflare-workers adapter with freshness hash mismatch — fata
 
   // RFC-0657: Stub setTimeout to make sleep() a no-op (avoids 45s of real backoff delays)
   skipSleep();
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -327,7 +327,7 @@ test("RFC-0649: cloudflare-workers adapter with freshness verified — normal fl
     return { ok: false, status: 404 } as Response;
   });
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -345,7 +345,7 @@ test("RFC-0649: --json output includes freshness object with required fields", a
   createRegistry(tmpDir, systemId, "null", missionId);
   createWorkpieceDist(tmpDir, missionId);
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -413,7 +413,7 @@ test("RFC-0657: retry-then-success — first attempt stale, second attempt fresh
   });
 
   skipSleep();
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -443,7 +443,7 @@ test("RFC-0657: all-attempts-fail with HTTP 404 — exit 1, Axiom not run", asyn
   });
 
   skipSleep();
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;
@@ -504,7 +504,7 @@ test("RFC-0657: network error retried — first attempt throws, second succeeds"
   });
 
   skipSleep();
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   const axiom = data?.axiom as Record<string, unknown> | undefined;

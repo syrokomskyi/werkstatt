@@ -226,7 +226,7 @@ test("leitstand.dev-deploy deploys workpiece to dev channel and returns success"
   createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   expect(data?.command).toBe("leitstand.dev-deploy");
@@ -243,13 +243,13 @@ test("leitstand.dev-deploy rejects when system has no active mission", async () 
   createRegistryWithChannels(tmpDir, systemId);
 
   await expect(
-    runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir)),
+    runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir)),
   ).rejects.toThrow("no active mission");
 });
 
-test("leitstand.dev-deploy rejects when --system is missing", async () => {
+test("leitstand.dev-deploy rejects when --site is missing", async () => {
   await expect(runLeitstandDevDeploy(makeInput({}), makeContext(tmpDir))).rejects.toThrow(
-    "--system is required",
+    "--site is required",
   );
 });
 
@@ -260,7 +260,7 @@ test("leitstand.dev-deploy does not write to registry or bordbuch", async () => 
   createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   // Verify registry was not modified — no lastPropagated.dev entry
   const registryContent = readFileSync(join(tmpDir, "systems", "registry.yaml"), "utf8");
@@ -280,7 +280,7 @@ test("RFC-0653: leitstand.dev-deploy writes build-skip cache after successful bu
   createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const cachePath = join(tmpDir, "missions", missionId, ".dev-deploy-build-cache.json");
   expect(existsSync(cachePath)).toBe(true);
@@ -298,10 +298,10 @@ test("RFC-0653: leitstand.dev-deploy skips build on cache hit", async () => {
   createWorkpieceDist(tmpDir, missionId);
 
   // First run — writes cache
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   // Second run — should skip build
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
   expect(data?.buildSkipped).toBe(true);
   expect(data?.buildState).toBe("succeeded");
@@ -315,11 +315,11 @@ test("RFC-0653: leitstand.dev-deploy --force-build bypasses cache", async () => 
   createWorkpieceDist(tmpDir, missionId);
 
   // First run — writes cache
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   // Second run with --force-build — should NOT skip
   const result = await runLeitstandDevDeploy(
-    makeInput({ system: systemId, "force-build": "true" }),
+    makeInput({ site: systemId, "force-build": "true" }),
     makeContext(tmpDir),
   );
   const data = result.data as Record<string, unknown> | undefined;
@@ -327,9 +327,9 @@ test("RFC-0653: leitstand.dev-deploy --force-build bypasses cache", async () => 
   expect(data?.buildState).toBe("succeeded");
 }, 15_000);
 
-// --- leitstand.propagate Axiom gate tests (RFC-0628: published + commitSha + missionId) ---
+// --- leitstand.propagate Axiom gate tests (RFC-0628: ready + commitSha + missionId) ---
 
-test("leitstand.propagate rejects release not in published state", async () => {
+test("leitstand.propagate rejects release not in ready state", async () => {
   const systemId = "test-sys";
   const releaseId = "test-sys-r000001";
 
@@ -344,7 +344,7 @@ test("leitstand.propagate rejects release not in published state", async () => {
 
   await expect(
     runLeitstandPropagate(makeInput({ release: releaseId }), makeContext(tmpDir)),
-  ).rejects.toThrow("must be in state 'published'");
+  ).rejects.toThrow("must be in state 'ready'");
 });
 
 test("leitstand.propagate rejects when no evidence metadata exists", async () => {
@@ -358,7 +358,7 @@ test("leitstand.propagate rejects when no evidence metadata exists", async () =>
     releaseId,
     systemId,
     missionId,
-    state: "published",
+    state: "ready",
     commitSha: "abc123def456",
   });
 
@@ -378,7 +378,7 @@ test("leitstand.propagate rejects when evidence commitSha does not match release
     releaseId,
     systemId,
     missionId,
-    state: "published",
+    state: "ready",
     commitSha: "release-sha-999",
   });
   writeEvidenceMetadata(tmpDir, missionId, { commitSha: "capsule-sha-111" });
@@ -402,7 +402,7 @@ test("leitstand.propagate rejects when evidence auditId does not match release",
     releaseId,
     systemId,
     missionId,
-    state: "published",
+    state: "ready",
     commitSha: "abc123def456",
   });
   writeEvidenceMetadata(tmpDir, missionId, {
@@ -429,7 +429,7 @@ test("leitstand.propagate rejects when Axiom evidence has high/critical violatio
     releaseId,
     systemId,
     missionId,
-    state: "published",
+    state: "ready",
     commitSha: "abc123def456",
   });
   writeEvidenceMetadata(tmpDir, missionId, { commitSha: "abc123def456" });
@@ -467,7 +467,7 @@ test("leitstand.propagate passes when Axiom evidence has only incomplete finding
     releaseId,
     systemId,
     missionId,
-    state: "published",
+    state: "ready",
     commitSha: "abc123def456",
   });
   writeEvidenceMetadata(tmpDir, missionId, { commitSha: "abc123def456" });
@@ -517,13 +517,13 @@ test("leitstand.rollback auto-detects main channel from promoted state", async (
     releaseId: targetRelease,
     systemId,
     missionId: "test-sys-m000001",
-    state: "published",
+    state: "ready",
   });
   const distDir = createDistDir(tmpDir, targetRelease);
   await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
 
   const result = await runLeitstandRollback(
-    makeInput({ system: systemId, "to-release": targetRelease }),
+    makeInput({ site: systemId, "to-release": targetRelease }),
     makeContext(tmpDir),
   );
 
@@ -556,21 +556,21 @@ test("leitstand.rollback auto-detects alt channel and steps to published", async
     releaseId: targetRelease,
     systemId,
     missionId: "test-sys-m000001",
-    state: "published",
+    state: "ready",
   });
   const distDir = createDistDir(tmpDir, targetRelease);
   await storeArtifactCore(tmpDir, targetRelease, distDir, systemId);
 
   const result = await runLeitstandRollback(
-    makeInput({ system: systemId, "to-release": targetRelease }),
+    makeInput({ site: systemId, "to-release": targetRelease }),
     makeContext(tmpDir),
   );
 
   const data = result.data as Record<string, unknown> | undefined;
   expect(data?.state).toBe("succeeded");
   expect(data?.channel).toBe("alt");
-  expect(data?.releaseState).toBe("published");
-  expect(readReleaseState(tmpDir, currentRelease)).toBe("published");
+  expect(data?.releaseState).toBe("ready");
+  expect(readReleaseState(tmpDir, currentRelease)).toBe("ready");
 });
 
 test("leitstand.rollback rejects --channel flag", async () => {
@@ -579,7 +579,7 @@ test("leitstand.rollback rejects --channel flag", async () => {
   createRegistryWithChannels(tmpDir, systemId);
 
   await expect(
-    runLeitstandRollback(makeInput({ system: systemId, channel: "main" }), makeContext(tmpDir)),
+    runLeitstandRollback(makeInput({ site: systemId, channel: "main" }), makeContext(tmpDir)),
   ).rejects.toThrow("--channel is removed");
 });
 
@@ -589,7 +589,7 @@ test("leitstand.rollback rejects when no previous release found", async () => {
   createRegistryWithChannels(tmpDir, systemId);
 
   await expect(
-    runLeitstandRollback(makeInput({ system: systemId }), makeContext(tmpDir)),
+    runLeitstandRollback(makeInput({ site: systemId }), makeContext(tmpDir)),
   ).rejects.toThrow("no previous release found");
 });
 
@@ -607,10 +607,10 @@ test("leitstand.rollback rejects when release is in non-deployed state", async (
     releaseId: currentRelease,
     systemId,
     missionId: "test-sys-m000001",
-    state: "published",
+    state: "ready",
   });
 
   await expect(
-    runLeitstandRollback(makeInput({ system: systemId }), makeContext(tmpDir)),
-  ).rejects.toThrow("cannot rollback release in state 'published'");
+    runLeitstandRollback(makeInput({ site: systemId }), makeContext(tmpDir)),
+  ).rejects.toThrow("cannot rollback release in state 'ready'");
 });

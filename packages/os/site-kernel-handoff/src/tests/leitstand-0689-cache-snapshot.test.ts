@@ -152,7 +152,7 @@ test("RFC-0689: clears Axiom browser evidence cache before mission.check", async
   // Verify cache exists before deploy
   expect(existsSync(cacheDir)).toBe(true);
 
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   // Cache directory should be cleared (removed) by the deploy
   expect(existsSync(cacheDir)).toBe(false);
@@ -205,7 +205,7 @@ test("RFC-0689: auto-regenerates snapshot and re-runs build when SNAP-01 detecte
     };
   });
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
 
   // Build should have been called twice (first fail, second succeed)
@@ -255,7 +255,7 @@ test("RFC-0689: does not regenerate snapshot when build fails for non-SNAP-01 re
     };
   });
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
 
   // Build state should be failed
@@ -278,7 +278,7 @@ test("RFC-0689: checks stale snapshot and regenerates when build is skipped (RFC
   createWorkpieceWithDist(tmpDir, missionId);
 
   // First run — writes build-skip cache with real platformSemanticHash
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   // Reset mocks for second run
   mockExecSync.mockClear();
@@ -314,7 +314,7 @@ test("RFC-0689: checks stale snapshot and regenerates when build is skipped (RFC
     };
   });
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
 
   // Build should have been skipped
@@ -338,7 +338,7 @@ test("RFC-0689: does not error when Axiom cache directory does not exist", async
   const cacheDir = join(tmpDir, "missions", missionId, "evidence", "axiom", ".cache");
   expect(existsSync(cacheDir)).toBe(false);
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
   const data = result.data as Record<string, unknown> | undefined;
 
   // Deploy should succeed — no error from missing cache
@@ -368,7 +368,7 @@ test("RFC-0697: logs cache file count and total size before clearing", async () 
     infoMessages.push(msg);
   };
 
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), context);
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), context);
 
   // Verify cache size was logged before clearing
   const cacheSizeLog = infoMessages.find((m) => m.includes("Axiom cache:"));

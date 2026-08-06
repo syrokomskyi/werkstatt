@@ -163,7 +163,7 @@ describe("release.state.validate", () => {
     it("throws if no flag is provided", async () => {
       await expect(
         runReleaseStateValidate(makeInput({}), makeContext(workspaceRoot)),
-      ).rejects.toThrow("at least one of --mission, --release, or --system is required");
+      ).rejects.toThrow("at least one of --mission, --release, or --site is required");
     });
   });
 
@@ -177,7 +177,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
 
       const result = await runReleaseStateValidate(
@@ -232,7 +232,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
       await writeCloseReport(workspaceRoot, "test-sys-m000001", {
         releaseId: "test-sys-r000001",
@@ -256,7 +256,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
       await writeCloseReport(workspaceRoot, "test-sys-m000001", {
         releaseId: "test-sys-r000002",
@@ -280,7 +280,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
 
       const result = await runReleaseStateValidate(
@@ -295,11 +295,11 @@ describe("release.state.validate", () => {
   });
 
   describe("check 3: release-state-progressed", () => {
-    it("passes when release is published", async () => {
+    it("passes when release is ready", async () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
 
       const result = await runReleaseStateValidate(
@@ -355,7 +355,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
       await writeBordbuch(workspaceRoot, "test-sys", [
         {
@@ -398,7 +398,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
       await writeBordbuch(workspaceRoot, "test-sys", [
         {
@@ -442,7 +442,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
       await writeBordbuch(workspaceRoot, "test-sys", [
         {
@@ -485,7 +485,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
       await writeBordbuch(workspaceRoot, "test-sys", [
         {
@@ -594,7 +594,7 @@ describe("release.state.validate", () => {
       await writeReleaseManifest(workspaceRoot, "test-sys-r000001", {
         systemId: "test-sys",
         missionId: "test-sys-m000001",
-        state: "published",
+        state: "ready",
       });
 
       const result = await runReleaseStateValidate(

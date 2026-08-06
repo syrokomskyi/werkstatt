@@ -161,13 +161,13 @@ test("RFC-0700: --release deploys from releases/<id>/dist/ and returns success",
     systemId,
     missionId,
     commitSha: "abc123def456",
-    state: "published",
+    state: "ready",
     distTreeHash: "sha256:abc",
   });
   createDistDir(tmpDir, releaseId);
 
   const result = await runLeitstandDevDeploy(
-    makeInput({ system: systemId, release: releaseId }),
+    makeInput({ site: systemId, release: releaseId }),
     makeContext(tmpDir),
   );
 
@@ -201,13 +201,13 @@ test("RFC-0700: --release succeeds without currentMission (no open mission requi
     systemId,
     missionId,
     commitSha: "abc123def456",
-    state: "published",
+    state: "ready",
     distTreeHash: "sha256:abc",
   });
   createDistDir(tmpDir, releaseId);
 
   const result = await runLeitstandDevDeploy(
-    makeInput({ system: systemId, release: releaseId }),
+    makeInput({ site: systemId, release: releaseId }),
     makeContext(tmpDir),
   );
 
@@ -226,13 +226,13 @@ test("RFC-0700: --release with system mismatch returns exitCode 1", async () => 
     systemId: "other-sys",
     missionId,
     commitSha: "abc123def456",
-    state: "published",
+    state: "ready",
     distTreeHash: "sha256:abc",
   });
   createDistDir(tmpDir, releaseId);
 
   const result = await runLeitstandDevDeploy(
-    makeInput({ system: systemId, release: releaseId }),
+    makeInput({ site: systemId, release: releaseId }),
     makeContext(tmpDir),
   );
 
@@ -248,7 +248,7 @@ test("RFC-0700: --release not found throws error", async () => {
 
   await expect(
     runLeitstandDevDeploy(
-      makeInput({ system: systemId, release: "nonexistent-r000001" }),
+      makeInput({ site: systemId, release: "nonexistent-r000001" }),
       makeContext(tmpDir),
     ),
   ).rejects.toThrow("release 'nonexistent-r000001' not found");
@@ -264,13 +264,13 @@ test("RFC-0700: --release with missing dist throws error", async () => {
     systemId,
     missionId,
     commitSha: "abc123def456",
-    state: "published",
+    state: "ready",
     distTreeHash: "sha256:abc",
   });
   // No dist directory created
 
   await expect(
-    runLeitstandDevDeploy(makeInput({ system: systemId, release: releaseId }), makeContext(tmpDir)),
+    runLeitstandDevDeploy(makeInput({ site: systemId, release: releaseId }), makeContext(tmpDir)),
   ).rejects.toThrow("no dist directory");
 }, 15_000);
 
@@ -281,7 +281,7 @@ test("RFC-0700: without --release, workpiece path is unchanged (requires open mi
   createRegistryWithChannels(tmpDir, systemId);
 
   await expect(
-    runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir)),
+    runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir)),
   ).rejects.toThrow("no active mission");
 }, 15_000);
 
@@ -292,7 +292,7 @@ test("RFC-0700: without --release, releaseDeployed is undefined in result", asyn
   createRegistryWithChannels(tmpDir, systemId, { currentMission: missionId });
   createWorkpieceDist(tmpDir, missionId);
 
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   expect(data?.releaseDeployed).toBeUndefined();
@@ -309,7 +309,7 @@ test("RFC-0700: --force-build warning is logged when --release is set", async ()
     systemId,
     missionId,
     commitSha: "abc123def456",
-    state: "published",
+    state: "ready",
     distTreeHash: "sha256:abc",
   });
   createDistDir(tmpDir, releaseId);
@@ -324,7 +324,7 @@ test("RFC-0700: --force-build warning is logged when --release is set", async ()
   } as unknown as KernelRuntimeContext;
 
   await runLeitstandDevDeploy(
-    makeInput({ system: systemId, release: releaseId, "force-build": "true" }),
+    makeInput({ site: systemId, release: releaseId, "force-build": "true" }),
     context,
   );
 

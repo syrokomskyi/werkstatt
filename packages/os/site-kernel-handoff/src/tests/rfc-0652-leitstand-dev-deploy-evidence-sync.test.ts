@@ -152,7 +152,7 @@ test("leitstand.dev-deploy invokes evidence.sync after axiom.report", async () =
   createWorkpieceDist(tmpDir, missionId);
 
   const { runLeitstandDevDeploy } = await import("../leitstand/leitstand-commands.ts");
-  await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   expect(mockState.syncCalled).toBe(true);
 }, 15_000);
@@ -166,7 +166,7 @@ test("leitstand.dev-deploy does not fail when evidence.sync fails", async () => 
   mockState.syncShouldFail = true;
 
   const { runLeitstandDevDeploy } = await import("../leitstand/leitstand-commands.ts");
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   expect(mockState.syncCalled).toBe(true);
   const data = result.data as Record<string, unknown> | undefined;
@@ -182,7 +182,7 @@ test("leitstand.dev-deploy --json includes evidenceSynced and evidenceSyncError 
   createWorkpieceDist(tmpDir, missionId);
 
   const { runLeitstandDevDeploy } = await import("../leitstand/leitstand-commands.ts");
-  const result = await runLeitstandDevDeploy(makeInput({ system: systemId }), makeContext(tmpDir));
+  const result = await runLeitstandDevDeploy(makeInput({ site: systemId }), makeContext(tmpDir));
 
   const data = result.data as Record<string, unknown> | undefined;
   expect(data?.evidenceSynced).toBe(true);
@@ -198,7 +198,7 @@ test("leitstand.dev-deploy --skip-evidence-sync skips sync silently", async () =
 
   const { runLeitstandDevDeploy } = await import("../leitstand/leitstand-commands.ts");
   const result = await runLeitstandDevDeploy(
-    makeInput({ system: systemId, "skip-evidence-sync": true }),
+    makeInput({ site: systemId, "skip-evidence-sync": true }),
     makeContext(tmpDir),
   );
 
