@@ -1,12 +1,13 @@
 ---
 id: RFC-0726
 title: "Unify CLI flag --site across all leitstand and release commands, remove --system"
-status: draft
+status: accepted
 kind: contract
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:operator
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
