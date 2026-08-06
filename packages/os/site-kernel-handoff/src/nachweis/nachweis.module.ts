@@ -1,9 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0707/RFC-0714: Nachweis kernel module — registers 8 nachweis.* commands with lazy-loaded handlers.</purpose>
+<purpose>RFC-0707/RFC-0714/RFC-0715: Nachweis kernel module — registers 12 nachweis.* commands with lazy-loaded handlers.</purpose>
 <keywords>nachweis, module, kernel, commands, registration</keywords>
 <responsibilities>
   <item>Registers nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw, nachweis.approve, nachweis.public-derivative.</item>
+  <item>RFC-0715: Registers nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature.</item>
   <item>Uses dynamic imports for lazy loading (same pattern as evidence-module.ts and bordbuch.module.ts).</item>
   <item>Declares correct scopes, flags, reads/writes for each command.</item>
 </responsibilities>
@@ -14,6 +15,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis kernel module with 6 command registrations.</item>
   <item>RFC-0714: add nachweis.approve and nachweis.public-derivative command registrations.</item>
+  <item>RFC-0715: add nachweis.key.ensure, nachweis.sign, nachweis.timestamp, nachweis.verify-signature. Remove --pilot-n2-exception from nachweis.publish.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -32,6 +34,10 @@ export function createNachweisModule(): KernelModule {
       const { runNachweisWithdraw } = await import("./nachweis-withdraw.ts");
       const { runNachweisApprove } = await import("./nachweis-approve.ts");
       const { runNachweisPublicDerivative } = await import("./nachweis-public-derivative.ts");
+      const { runNachweisKeyEnsure } = await import("./nachweis-key-ensure.ts");
+      const { runNachweisSign } = await import("./nachweis-sign.ts");
+      const { runNachweisTimestamp } = await import("./nachweis-timestamp.ts");
+      const { runNachweisVerifySignature } = await import("./nachweis-verify-signature.ts");
 
       registry.registerCommand({
         name: "nachweis.ingest",
@@ -126,7 +132,7 @@ export function createNachweisModule(): KernelModule {
       registry.registerCommand({
         name: "nachweis.publish",
         description:
-          "RFC-0707: Enforce publication gate and transition record to published. Accepts --pilot-n2-exception for N2 pilot.",
+          "RFC-0707: Enforce publication gate and transition record to published. Requires N3 verification level.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -134,10 +140,6 @@ export function createNachweisModule(): KernelModule {
         flags: {
           system: { kind: "string", description: "Target system ID" },
           slug: { kind: "string", required: true, description: "Record slug to publish" },
-          "pilot-n2-exception": {
-            kind: "boolean",
-            description: "Accept N2 verification level (temporary, removed when N3 implemented)",
-          },
           json: { kind: "boolean", description: "Output JSON result." },
         },
         reads: [],
@@ -222,6 +224,92 @@ export function createNachweisModule(): KernelModule {
         reads: [],
         writes: [],
         execute: runNachweisPublicDerivative,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.key.ensure",
+        description:
+          "RFC-0715: Generate an Ed25519 keypair for Nachweis operator signatures. Writes private key to file, publishes public key JSON.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          "key-file": {
+            kind: "string",
+            required: true,
+            description:
+              "Path to write the private key (hex). Should be outside the repo, e.g. ~/.warpgogol/nachweis-signing.key",
+          },
+          force: { kind: "boolean", description: "Overwrite existing key file" },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisKeyEnsure,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.sign",
+        description:
+          "RFC-0715: Sign a Nachweis record with an Ed25519 operator key. Appends nachweis-signed Bordbuch entry. Idempotent.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: { kind: "string", required: true, description: "Record slug to sign" },
+          "key-file": {
+            kind: "string",
+            required: true,
+            description: "Path to the Ed25519 private key file (hex)",
+          },
+          "dry-run": { kind: "boolean", description: "Skip Bordbuch write" },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisSign,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.timestamp",
+        description:
+          "RFC-0715: Obtain an RFC 3161 timestamp token for a signed Nachweis record. Requires nachweis.sign to have run first. Idempotent.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: { kind: "string", required: true, description: "Record slug to timestamp" },
+          "tsa-url": { kind: "string", description: "Custom TSA URL (default: freetsa.org/tsr)" },
+          "dry-run": { kind: "boolean", description: "Skip TSA query and Bordbuch write" },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisTimestamp,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.verify-signature",
+        description:
+          "RFC-0715: Verify the Ed25519 operator signature and RFC 3161 timestamp for a Nachweis record. Read-only.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: false,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: { kind: "string", required: true, description: "Record slug to verify" },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisVerifySignature,
       });
     },
   };

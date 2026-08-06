@@ -298,3 +298,8 @@ missions/*/.dev-deploy-build-cache.json
 # forge-agent-memory
 .agents/memory/daily/
 # /forge-agent-memory
+
+# RFC-0715: Nachweis Ed25519 signing keys (never commit private keys)
+nachweis-signing.key
+nachweis-signing.key.pub
+*.nachweis-key

@@ -18,6 +18,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.validate command handler.</item>
+  <item>RFC-0715: add N3 artifact check — verify nachweis-signed and nachweis-timestamped entries exist for N3 records.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -232,7 +233,11 @@ export async function runNachweisValidate(
   // Publication gate evaluation per record
   const bordbuchEntries = await readBordbuch(workspaceRoot, systemId);
   const nachweisEntries = bordbuchEntries.filter(
-    (e) => e.kind === "nachweis-record" || e.kind === "nachweis-consent",
+    (e) =>
+      e.kind === "nachweis-record" ||
+      e.kind === "nachweis-consent" ||
+      e.kind === "nachweis-signed" ||
+      e.kind === "nachweis-timestamped",
   );
 
   const gateResults: NachweisPublicationGate[] = [];
@@ -262,6 +267,30 @@ export async function runNachweisValidate(
         message: `Record '${slug}' is published but gate conditions not met (consent: ${gate.consentGranted}, integrity: ${gate.sourceIntegrityVerified}, approved: ${gate.recordApproved}, verification: ${gate.verificationLevelMet}, derivative: ${gate.publicDerivativeReady}, legal: ${gate.legalContentCheckPassed})`,
         recordId: slug,
       });
+    }
+
+    // RFC-0715: N3 artifact check — published N3 records must have nachweis-signed and nachweis-timestamped entries
+    if (isPublished && gate.verificationLevelMet) {
+      const hasSigned = nachweisEntries.some(
+        (e) => e.kind === "nachweis-signed" && e.metadata?.slug === slug,
+      );
+      const hasTimestamped = nachweisEntries.some(
+        (e) => e.kind === "nachweis-timestamped" && e.metadata?.slug === slug,
+      );
+      if (!hasSigned) {
+        violations.push({
+          rule: "n3-missing-signature",
+          message: `Record '${slug}' is published at N3 but has no nachweis-signed Bordbuch entry. Run nachweis.sign first.`,
+          recordId: slug,
+        });
+      }
+      if (!hasTimestamped) {
+        violations.push({
+          rule: "n3-missing-timestamp",
+          message: `Record '${slug}' is published at N3 but has no nachweis-timestamped Bordbuch entry. Run nachweis.timestamp first.`,
+          recordId: slug,
+        });
+      }
     }
   }
 

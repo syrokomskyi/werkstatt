@@ -4,7 +4,7 @@
 <keywords>nachweis, publish, gate, public, bordbuch</keywords>
 <responsibilities>
   <item>Checks publication gate preconditions (consent, integrity, approval, verification level, derivative, legal).</item>
-  <item>Accepts N2 with --pilot-n2-exception flag (temporary, removed when N3 is implemented).</item>
+  <item>Requires N3 verification level (RFC-0715: --pilot-n2-exception removed, N2 grandfathering for existing records).</item>
   <item>Sets publication.visibility: public on EvidenceSource entity.</item>
   <item>Appends nachweis-record Bordbuch entry.</item>
   <item>Calls nachweis.manifest.generate to regenerate manifest.</item>
@@ -17,6 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis.publish command handler.</item>
+  <item>RFC-0715: remove --pilot-n2-exception flag, require N3 only. N2 grandfathering: existing N2-published records remain valid.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -61,7 +62,6 @@ export async function runNachweisPublish(
   const { workspaceRoot, logger } = context;
   const systemId = flagString(input, "system") ?? context.site?.name;
   const slug = flagString(input, "slug");
-  const pilotN2Exception = flagBool(input, "pilot-n2-exception");
 
   if (!systemId) throw new Error("[nachweis.publish] --system is required");
   if (!slug) throw new Error("[nachweis.publish] --slug is required");
@@ -118,15 +118,9 @@ export async function runNachweisPublish(
     recordApproved: nachweisEntries.some(
       (e) => e.kind === "nachweis-record" && e.summary.includes("approved"),
     ),
-    verificationLevelMet: pilotN2Exception
-      ? nachweisEntries.some(
-          (e) =>
-            e.kind === "nachweis-record" &&
-            (e.metadata?.verificationLevel === "N2" || e.metadata?.verificationLevel === "N3"),
-        )
-      : nachweisEntries.some(
-          (e) => e.kind === "nachweis-record" && e.metadata?.verificationLevel === "N3",
-        ),
+    verificationLevelMet: nachweisEntries.some(
+      (e) => e.kind === "nachweis-record" && e.metadata?.verificationLevel === "N3",
+    ),
     publicDerivativeReady:
       items != null && Object.values(items).some((item) => item.storage === "public"),
     legalContentCheckPassed: nachweisEntries.some(
@@ -187,8 +181,7 @@ export async function runNachweisPublish(
         writerRole: "nachweis",
         metadata: {
           slug,
-          verificationLevel: pilotN2Exception ? "N2" : "N3",
-          pilotN2Exception,
+          verificationLevel: "N3",
           publishedAt: publication.publishedAt,
         },
       },
