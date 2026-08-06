@@ -35,14 +35,10 @@ import {
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
+  flagString,
   type NachweisVerifySignatureResult,
 } from "./nachweis-n3-types.ts";
 import { canonicalRecordPayload, type NachweisRecordPayload } from "./nachweis-sign.ts";
-
-function flagString(input: KernelCommandInput, key: string): string | undefined {
-  const v = input.flags[key];
-  return typeof v === "string" ? v : undefined;
-}
 
 export async function runNachweisVerifySignature(
   input: KernelCommandInput,

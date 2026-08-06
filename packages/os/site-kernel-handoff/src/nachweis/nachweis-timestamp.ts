@@ -32,19 +32,11 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  flagString,
+  flagBool,
   type NachweisTimestampResult,
 } from "./nachweis-n3-types.ts";
-import { FreeTsaAdapter, type TsaAdapter } from "./tsa-adapter.ts";
-
-function flagString(input: KernelCommandInput, key: string): string | undefined {
-  const v = input.flags[key];
-  return typeof v === "string" ? v : undefined;
-}
-
-function flagBool(input: KernelCommandInput, key: string): boolean {
-  const v = input.flags[key];
-  return v === true || v === "true";
-}
+import { FreeTsaAdapter, HttpTsaAdapter, type TsaAdapter } from "./tsa-adapter.ts";
 
 export async function runNachweisTimestamp(
   input: KernelCommandInput,
@@ -90,9 +82,7 @@ export async function runNachweisTimestamp(
 
   // Idempotency: check for existing nachweis-timestamped entry
   const existingTimestamped = bordbuchEntries.find(
-    (e) =>
-      e.kind === "nachweis-timestamped" &&
-      e.metadata?.slug === slug,
+    (e) => e.kind === "nachweis-timestamped" && e.metadata?.slug === slug,
   );
   if (existingTimestamped) {
     return {
@@ -109,9 +99,7 @@ export async function runNachweisTimestamp(
     };
   }
 
-  const adapter: TsaAdapter = tsaUrl
-    ? { name: "custom", url: tsaUrl, timestamp: createCustomTsaAdapter(tsaUrl).timestamp }
-    : new FreeTsaAdapter();
+  const adapter: TsaAdapter = tsaUrl ? new HttpTsaAdapter("custom", tsaUrl) : FreeTsaAdapter;
 
   if (dryRun) {
     return {
@@ -132,7 +120,13 @@ export async function runNachweisTimestamp(
   const timestampTokenBase64 = Buffer.from(timestampTokenBytes).toString("base64");
 
   const operationId = generateOperationId();
-  await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "nachweis.timestamp", "agent");
+  await acquireLock(
+    workspaceRoot,
+    `system:${systemId}`,
+    operationId,
+    "nachweis.timestamp",
+    "agent",
+  );
   await acquireLock(
     workspaceRoot,
     `bordbuch:${systemId}`,
@@ -176,26 +170,5 @@ export async function runNachweisTimestamp(
     },
     exitCode: 0,
     summary: `[nachweis.timestamp] ${systemId}: timestamped '${slug}' via ${adapter.name} (bordbuch: ${bordbuchEventId})`,
-  };
-}
-
-function createCustomTsaAdapter(url: string): TsaAdapter {
-  return {
-    name: "custom",
-    url,
-    async timestamp(message: Uint8Array): Promise<Uint8Array> {
-      const { encodeTimestampReq } = await import("./tsa-adapter.ts");
-      const reqBytes = await encodeTimestampReq(message);
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/timestamp-query" },
-        body: Buffer.from(reqBytes),
-      });
-      if (!response.ok) {
-        throw new Error(`[custom TSA] HTTP ${response.status}: ${response.statusText}`);
-      }
-      const respBuffer = await response.arrayBuffer();
-      return new Uint8Array(respBuffer);
-    },
   };
 }

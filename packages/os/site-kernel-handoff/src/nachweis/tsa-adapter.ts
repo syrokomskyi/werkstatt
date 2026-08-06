@@ -19,7 +19,7 @@
 </CHANGE_SUMMARY>
 */
 
-import { createHash } from "node:crypto";
+import { byteHash } from "@warpgogol/fingerprint";
 
 export interface TsaAdapter {
   readonly name: string;
@@ -27,9 +27,14 @@ export interface TsaAdapter {
   timestamp(message: Uint8Array): Promise<Uint8Array>;
 }
 
-export class FreeTsaAdapter implements TsaAdapter {
-  readonly name = "FreeTSA";
-  readonly url = "https://freetsa.org/tsr";
+export class HttpTsaAdapter implements TsaAdapter {
+  readonly name: string;
+  readonly url: string;
+
+  constructor(name: string, url: string) {
+    this.name = name;
+    this.url = url;
+  }
 
   async timestamp(message: Uint8Array): Promise<Uint8Array> {
     const reqBytes = await encodeTimestampReq(message);
@@ -42,7 +47,7 @@ export class FreeTsaAdapter implements TsaAdapter {
 
     if (!response.ok) {
       throw new Error(
-        `[FreeTsaAdapter] TSA returned HTTP ${response.status}: ${response.statusText}`,
+        `[${this.name}] TSA returned HTTP ${response.status}: ${response.statusText}`,
       );
     }
 
@@ -51,15 +56,14 @@ export class FreeTsaAdapter implements TsaAdapter {
   }
 }
 
+export const FreeTsaAdapter = new HttpTsaAdapter("FreeTSA", "https://freetsa.org/tsr");
+
 export async function encodeTimestampReq(message: Uint8Array): Promise<Uint8Array> {
   const { default: pkijs } = await import("pkijs");
   const { default: asn1js } = await import("asn1js");
 
-  const hashBytes = createHash("sha256").update(message).digest();
-  const hashBuffer = hashBytes.buffer.slice(
-    hashBytes.byteOffset,
-    hashBytes.byteOffset + hashBytes.byteLength,
-  );
+  const hashHex = byteHash(message).replace("sha256:", "");
+  const hashBuffer = Buffer.from(hashHex, "hex").buffer;
 
   const messageImprint = new pkijs.MessageImprint({
     hashAlgorithm: new pkijs.AlgorithmIdentifier({

@@ -24,7 +24,7 @@ import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import * as ed from "@noble/ed25519";
-import { stableStringify } from "@warpgogol/fingerprint";
+import { stableStringify, byteHash } from "@warpgogol/fingerprint";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -38,18 +38,10 @@ import {
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
+  flagString,
+  flagBool,
   type NachweisSignResult,
 } from "./nachweis-n3-types.ts";
-
-function flagString(input: KernelCommandInput, key: string): string | undefined {
-  const v = input.flags[key];
-  return typeof v === "string" ? v : undefined;
-}
-
-function flagBool(input: KernelCommandInput, key: string): boolean {
-  const v = input.flags[key];
-  return v === true || v === "true";
-}
 
 export interface NachweisRecordPayload {
   recordId: string;
@@ -170,13 +162,7 @@ export async function runNachweisSign(
 
   const operationId = generateOperationId();
   await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "nachweis.sign", "agent");
-  await acquireLock(
-    workspaceRoot,
-    `bordbuch:${systemId}`,
-    operationId,
-    "nachweis.sign",
-    "agent",
-  );
+  await acquireLock(workspaceRoot, `bordbuch:${systemId}`, operationId, "nachweis.sign", "agent");
 
   let bordbuchEventId: string;
   try {
@@ -192,13 +178,7 @@ export async function runNachweisSign(
           slug,
           signatureHex,
           publicKeyHex,
-          payloadHash: Buffer.from(
-            new Uint8Array(
-              await import("node:crypto").then((c) =>
-                c.createHash("sha256").update(canonicalBytes).digest(),
-              ),
-            ),
-          ).toString("hex"),
+          payloadHash: byteHash(canonicalBytes).replace("sha256:", ""),
         },
       },
     );

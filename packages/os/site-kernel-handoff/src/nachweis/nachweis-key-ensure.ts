@@ -31,6 +31,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
+import { flagString, flagBool } from "./nachweis-n3-types.ts";
 
 export interface NachweisKeyEnsureResult {
   keyFilePath: string;
@@ -44,16 +45,6 @@ export interface NachweisPublicKeyEntry {
   publicKeyHex: string;
   status: "current" | "retired";
   createdAt: string;
-}
-
-function flagString(input: KernelCommandInput, key: string): string | undefined {
-  const v = input.flags[key];
-  return typeof v === "string" ? v : undefined;
-}
-
-function flagBool(input: KernelCommandInput, key: string): boolean {
-  const v = input.flags[key];
-  return v === true || v === "true";
 }
 
 export async function ensureNachweisKey(

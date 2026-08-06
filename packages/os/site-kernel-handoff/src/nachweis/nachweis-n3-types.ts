@@ -15,12 +15,24 @@
 </CHANGE_SUMMARY>
 */
 
+import type { KernelCommandInput } from "@warpgogol/site-kernel";
+
 export {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
 } from "./nachweis-io.ts";
+
+export function flagString(input: KernelCommandInput, key: string): string | undefined {
+  const v = input.flags[key];
+  return typeof v === "string" ? v : undefined;
+}
+
+export function flagBool(input: KernelCommandInput, key: string): boolean {
+  const v = input.flags[key];
+  return v === true || v === "true";
+}
 
 export interface NachweisSignResult {
   slug: string;
