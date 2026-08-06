@@ -13,6 +13,9 @@ import { runPageBlockValidate } from "../page-block.ts";
     Tests the full integration path: fixture manifest YAML → composed schema → B-07 check.
     Covers: kind match, kind mismatch, composite skip, missing body.
   </purpose>
+  <CHANGE_SUMMARY>
+    <item>RFC-0719: Initial creation — 4 test cases for B-07 body.kind validation.</item>
+  </CHANGE_SUMMARY>
 </MODULE_CONTRACT>
 */
 
@@ -62,8 +65,6 @@ pages:
     cosmicStar: Vega
     planets:
       - cosmicPlanet: Tethys
-        pin: latest
-      - cosmicPlanet: Dione
         pin: latest
       - cosmicPlanet: Europa
         pin: latest
