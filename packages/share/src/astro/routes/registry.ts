@@ -80,8 +80,9 @@ async function readEntitledFeatures(): Promise<string[] | null> {
   try {
     const { readFile } = await import("node:fs/promises");
     const { join } = await import("node:path");
+    const { parse: yamlParse } = await import("yaml");
     const raw = await readFile(join(process.cwd(), "src", "entitlements.generated.yaml"), "utf8");
-    const parsed = JSON.parse(raw) as { features?: unknown };
+    const parsed = yamlParse(raw) as { features?: unknown };
     return Array.isArray(parsed.features) ? parsed.features.map(String) : null;
   } catch {
     return null;

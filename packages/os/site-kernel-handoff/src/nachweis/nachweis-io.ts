@@ -25,6 +25,7 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { parse as yamlParse } from "yaml";
 import { byteHashFile } from "@warpgogol/fingerprint";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
@@ -200,7 +201,7 @@ export async function readEntitledFeaturesFromCache(cachePath: string): Promise<
   }
   try {
     const raw = await fs.readFile(entitlementsPath, "utf8");
-    const parsed = JSON.parse(raw) as { features?: unknown };
+    const parsed = yamlParse(raw) as { features?: unknown };
     return Array.isArray(parsed.features) ? parsed.features.map(String) : null;
   } catch {
     return null;

@@ -359,7 +359,7 @@ The Nachweis kernel module registers 12 commands for managing evidence records w
 - **`nachweis.validate` (RFC-0715):** Extended with N3 artifact checks — published N3 records must have `nachweis-signed` and `nachweis-timestamped` Bordbuch entries. Missing entries produce `n3-missing-signature` and `n3-missing-timestamp` violations.
 - **TSA adapter:** `TsaAdapter` interface with `FreeTsaAdapter` implementation targeting `https://freetsa.org/tsr`. Uses `pkijs` + `asn1js` for RFC 3161 DER encoding. No retry logic — caller handles transient failures.
 - **`rfc.implement.stamp` requires inline `(evidence: ...)` on every `[x]` acceptance criterion.** Without it, stamping fails with `RFC-IMP-02` ("checked criteria lack inline (evidence: ...) annotation"). This is V-27 in PREFERENCES.md. Always add evidence annotations before running `rfc.implement.stamp`.
-- **`entitlements.generated.yaml` is read via `JSON.parse`, not a YAML parser.** Despite the `.yaml` extension, the file contains JSON. Tests that write YAML-format entitlements will silently get skip-results (entitlement not resolved). Always write `JSON.stringify({ features: [...] })` in test fixtures. See `nachweis-commands.test.ts:113` and `nachweis-n3.test.ts:114` for the pattern.
+- **`entitlements.generated.yaml` is a YAML file and MUST be parsed with a YAML parser (`yaml` package `parse`), not `JSON.parse`.** The generator (`entitlements.resolve` in `site-kernel-checks`) writes YAML via `yamlStringify`. All readers MUST use `yamlParse`. Tests that write entitlement fixtures MUST use `yamlStringify`, not `JSON.stringify`. Mixing JSON into `.yaml` files is a bug — file extension must match content format.
 
 ## Test conventions
 

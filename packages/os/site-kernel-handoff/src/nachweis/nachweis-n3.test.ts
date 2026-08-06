@@ -111,8 +111,12 @@ async function writeEntitlements(): Promise<void> {
   const cacheDir = path.join(tmpDir, "cache", systemId);
   const srcDir = path.join(cacheDir, "src");
   if (!existsSync(srcDir)) mkdirSync(srcDir, { recursive: true });
-  const json = JSON.stringify({ features: ["nachweis"] });
-  await fs.writeFile(path.join(srcDir, "entitlements.generated.yaml"), json, "utf8");
+  const { stringify: yamlStringify } = await import("yaml");
+  await fs.writeFile(
+    path.join(srcDir, "entitlements.generated.yaml"),
+    yamlStringify({ features: ["nachweis"] }),
+    "utf8",
+  );
 }
 
 async function writeEvidenceSource(

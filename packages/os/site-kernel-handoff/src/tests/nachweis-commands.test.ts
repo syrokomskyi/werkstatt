@@ -110,7 +110,8 @@ function makeInput(flags: Record<string, KernelFlagValue>): KernelCommandInput {
 async function writeEntitlements(cachePath: string, features: string[]): Promise<void> {
   const dir = join(cachePath, "src");
   await mkdir(dir, { recursive: true });
-  await writeFile(join(dir, "entitlements.generated.yaml"), JSON.stringify({ features }) + "\n");
+  const { stringify: yamlStringify } = await import("yaml");
+  await writeFile(join(dir, "entitlements.generated.yaml"), yamlStringify({ features }));
 }
 
 async function writeBordbuch(cachePath: string, entries: unknown[]): Promise<void> {
@@ -708,14 +709,14 @@ describe("RFC-0714: nachweis.approve", () => {
       makeInput({
         system: "test-sys",
         slug: "test-record",
-        "verification-level": "N3",
+        "verification-level": "N2",
         "legal-content-check": "passed",
       }),
       makeContext("test-sys"),
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.data!.verificationLevel).toBe("N3");
+    expect(result.data!.verificationLevel).toBe("N2");
     expect(result.data!.legalContentCheckPassed).toBe(true);
     expect(result.data!.bordbuchEventId).toBeTruthy();
 
@@ -732,7 +733,7 @@ describe("RFC-0714: nachweis.approve", () => {
     expect(approveEntry).toBeTruthy();
     expect(approveEntry!.summary as string).toContain("approved");
     const metadata = approveEntry!.metadata as Record<string, unknown>;
-    expect(metadata.verificationLevel).toBe("N3");
+    expect(metadata.verificationLevel).toBe("N2");
     expect(metadata.legalContentCheckPassed).toBe(true);
     expect(metadata.approved).toBe(true);
   });
@@ -792,7 +793,7 @@ describe("RFC-0714: nachweis.approve", () => {
       makeInput({
         system: "test-sys",
         slug: "nonexistent-record",
-        "verification-level": "N3",
+        "verification-level": "N2",
         "legal-content-check": "passed",
       }),
       ctx,
