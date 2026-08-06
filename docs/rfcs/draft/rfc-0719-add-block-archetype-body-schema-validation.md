@@ -1,7 +1,7 @@
 ---
 id: RFC-0719
 title: "Add block archetype body.kind schema validation to page.block.validate"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
