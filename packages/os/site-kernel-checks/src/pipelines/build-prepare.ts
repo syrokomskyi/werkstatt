@@ -17,6 +17,7 @@
   <item>RFC-0626: added bordbuch.commit after bordbuch.generate to auto-commit bordbuch projections.</item>
   <item>RFC-0658: added bordbuch.validate after bordbuch.generate and before bordbuch.commit to validate hash-chain integrity before build proceeds.</item>
   <item>RFC-0707: added nachweis.manifest.generate after bordbuch.commit, before passport.key.ensure.</item>
+  <item>RFC-0721: added behavior.snapshot.staleness.check to both SITES_BUILD_PREPARE_PIPELINE and SITES_BUILD_PREPARE_DEV_PIPELINE.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -201,4 +202,6 @@ export const SITES_BUILD_PREPARE_DEV_PIPELINE: KernelPipelineStep[] = [
   { command: "ownership.sync.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
   { command: "generated.stale.validate" },
+  // RFC-0721: warn when system.md routes don't match committed behavior snapshot
+  { command: "behavior.snapshot.staleness.check" },
 ];
