@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
+enhancedAt: 2026-08-06
 implementedAt:
 closedAt:
 supersedes: []
@@ -54,13 +55,14 @@ commands:
   added: []
   changed:
     - nachweis.approve
+    - nachweis.validate
+    - nachweis.publish
   removed: []
 appsImpacted:
   - warpgogol-com
 packagesImpacted:
   - "@warpgogol/site-kernel-handoff"
-  - "@warpgogol/pbp"
-  - "@warpgogol/ui"
+  - "@warpgogol/ontology"
 successSignals:
   - "nachweis.key.ensure generates an Ed25519 keypair and writes it to a key file outside the repository"
   - "nachweis.sign produces a detached Ed25519 signature over the record payload hash and records it in Bordbuch"
@@ -151,28 +153,28 @@ pnpm exec site-kernel run nachweis.key.ensure \
 
 # Sign a record (after ingest, before approve)
 pnpm exec site-kernel run nachweis.sign \
-  --mission warpgogol-com-m000033 \
-  --record nicaragua-projekt \
+  --system warpgogol-com \
+  --slug nicaragua-projekt \
   --key-file ~/.warpgogol/nachweis-signing.key
 
 # Timestamp a record (after sign, before approve)
 pnpm exec site-kernel run nachweis.timestamp \
-  --mission warpgogol-com-m000033 \
-  --record nicaragua-projekt \
+  --system warpgogol-com \
+  --slug nicaragua-projekt \
   --tsa-url https://freetsa.org/tsr
 
 # Verify a signature (any time, read-only)
 pnpm exec site-kernel run nachweis.verify-signature \
-  --mission warpgogol-com-m000033 \
-  --record nicaragua-projekt \
+  --system warpgogol-com \
+  --slug nicaragua-projekt \
   --public-key-file ~/.warpgogol/nachweis-signing.pub
 
 # Approve with N3 gate (amended)
 pnpm exec site-kernel run nachweis.approve \
-  --mission warpgogol-com-m000033 \
-  --record nicaragua-projekt \
+  --system warpgogol-com \
+  --slug nicaragua-projekt \
   --verification-level N3 \
-  --legal-content-checked
+  --legal-content-check passed
 ```
 
 **Flags:**
@@ -180,15 +182,15 @@ pnpm exec site-kernel run nachweis.approve \
 | Command | Flag | Description |
 | --- | --- | --- |
 | `nachweis.key.ensure` | `--key-file <path>` | Output path for the private key. Public key is written to `<path>.pub`. |
-| `nachweis.sign` | `--mission <id>` | Mission ID containing the workpiece. |
-|  | `--record <slug>` | Record slug (EvidenceSource entity ID). |
+| `nachweis.sign` | `--system <id>` | Sternsystem ID. |
+|  | `--slug <slug>` | Record slug (EvidenceSource entity ID). |
 |  | `--key-file <path>` | Path to the Ed25519 private key file. |
-| `nachweis.timestamp` | `--mission <id>` | Mission ID containing the workpiece. |
-|  | `--record <slug>` | Record slug. |
+| `nachweis.timestamp` | `--system <id>` | Sternsystem ID. |
+|  | `--slug <slug>` | Record slug. |
 |  | `--tsa-url <url>` | TSA endpoint URL (default: `https://freetsa.org/tsr`). |
 |  | `--tsa-cert-file <path>` | Optional TSA certificate chain for verification. |
-| `nachweis.verify-signature` | `--mission <id>` | Mission ID. |
-|  | `--record <slug>` | Record slug. |
+| `nachweis.verify-signature` | `--system <id>` | Sternsystem ID. |
+|  | `--slug <slug>` | Record slug. |
 |  | `--public-key-file <path>` | Path to the Ed25519 public key file. |
 | `nachweis.approve` | (existing flags from RFC-0714) | Amended: when `--verification-level N3`, gates on signature + timestamp. |
 
@@ -211,13 +213,13 @@ interface NachweisKeyEnsureResult {
 // --- nachweis.sign ---
 
 interface NachweisSignInput {
-  missionId: string;
-  recordSlug: string;
+  systemId: string;
+  slug: string;
   keyFilePath: string;
 }
 
 interface NachweisSignResult {
-  recordSlug: string;
+  slug: string;
   recordPayloadHash: string; // SHA-256 of the canonical record payload, hex
   signature: string; // Ed25519 detached signature, base64
   keyId: string; // SHA-256 of the public key, hex
@@ -227,14 +229,14 @@ interface NachweisSignResult {
 // --- nachweis.timestamp ---
 
 interface NachweisTimestampInput {
-  missionId: string;
-  recordSlug: string;
+  systemId: string;
+  slug: string;
   tsaUrl: string;
   tsaCertFilePath?: string;
 }
 
 interface NachweisTimestampResult {
-  recordSlug: string;
+  slug: string;
   timestampToken: string; // RFC 3161 TSR, base64
   tsaUrl: string;
   timestampHash: string; // SHA-256 of the timestamp token, hex
@@ -244,13 +246,13 @@ interface NachweisTimestampResult {
 // --- nachweis.verify-signature ---
 
 interface NachweisVerifySignatureInput {
-  missionId: string;
-  recordSlug: string;
+  systemId: string;
+  slug: string;
   publicKeyFilePath: string;
 }
 
 interface NachweisVerifySignatureResult {
-  recordSlug: string;
+  slug: string;
   valid: boolean;
   recordPayloadHash: string;
   signature: string;
@@ -292,7 +294,7 @@ interface TimestampResponse {
 | `~/.warpgogol/nachweis-signing.pub` | Public key file (committed to `public/.well-known/` for discovery) |
 | `missions/<id>/workpiece/public/.well-known/nachweis-pubkey.json` | Published public key + keyId for visitor verification |
 | Bordbuch (append-only) | Receives `nachweis-signed` and `nachweis-timestamped` entries |
-| `packages/pbp/src/schemas/evidence-source.ts` | Extended with optional `n3Signature`, `n3Timestamp`, `n3KeyId` fields |
+| `packages/ontology/src/operations/mission.ts` | Extended with `nachweis-signed` and `nachweis-timestamped` BordbuchEntryKind values |
 
 **Key file security:**
 
@@ -307,12 +309,12 @@ interface TimestampResponse {
 {
   "command": "nachweis.sign",
   "status": "ok",
-  "recordSlug": "nicaragua-projekt",
+  "slug": "nicaragua-projekt",
   "recordPayloadHash": "a1b2c3...",
   "signature": "base64-encoded-ed25519-signature",
   "keyId": "d4e5f6...",
   "signedAt": "2026-08-06T12:00:00Z",
-  "bordbuchEntryId": "uuid"
+  "bordbuchEventId": "event-000127"
 }
 ```
 
@@ -320,12 +322,12 @@ interface TimestampResponse {
 {
   "command": "nachweis.timestamp",
   "status": "ok",
-  "recordSlug": "nicaragua-projekt",
+  "slug": "nicaragua-projekt",
   "timestampToken": "base64-encoded-rfc3161-tsr",
   "tsaUrl": "https://freetsa.org/tsr",
   "timestampHash": "e7f8g9...",
   "timestampedAt": "2026-08-06T12:00:01Z",
-  "bordbuchEntryId": "uuid"
+  "bordbuchEventId": "event-000128"
 }
 ```
 
@@ -333,7 +335,7 @@ interface TimestampResponse {
 {
   "command": "nachweis.verify-signature",
   "status": "ok",
-  "recordSlug": "nicaragua-projekt",
+  "slug": "nicaragua-projekt",
   "valid": true,
   "recordPayloadHash": "a1b2c3...",
   "signature": "base64-encoded-ed25519-signature",
@@ -346,7 +348,7 @@ interface TimestampResponse {
 {
   "command": "nachweis.approve",
   "status": "fail",
-  "recordSlug": "nicaragua-projekt",
+  "slug": "nicaragua-projekt",
   "error": "N3_GATE_FAILED",
   "missing": ["operator-signature", "rfc3161-timestamp"],
   "message": "Cannot approve at N3: signature and timestamp not found in Bordbuch. Run nachweis.sign and nachweis.timestamp first."
@@ -380,8 +382,9 @@ interface TimestampResponse {
   2. Publish the public key to `public/.well-known/nachweis-pubkey.json`.
   3. Run `nachweis.ingest` → `nachweis.validate` → `nachweis.sign` → `nachweis.timestamp` → `nachweis.approve --verification-level N3` → `nachweis.public-derivative` → `nachweis.publish`.
   4. The `nachweis-verify` page handler reads N3 artifacts from Bordbuch and populates the component props.
-- **Pipeline integration:** None. N3 commands are operator-run, not pipeline-run. The `build.check` pipeline does not invoke them. The `nachweis.validate` command (RFC-0707) is extended to optionally check N3 artifacts when the record's `verificationLevel` is `N3`.
-- **Deprecation:** None. This RFC amends RFC-0707 but does not deprecate any existing command.
+- **Pipeline integration:** None. N3 commands are operator-run, not pipeline-run. The `build.check` pipeline does not invoke them. The `nachweis.validate` command (RFC-0707) is extended to check N3 artifacts when the record's `verificationLevel` is `N3`: it verifies the presence of `nachweis-signed` and `nachweis-timestamped` Bordbuch entries for the record. Signature and timestamp content verification (cryptographic re-validation) is not performed by `nachweis.validate` — that is the operator's responsibility via `nachweis.verify-signature`.
+- **Compass sync:** `docs/verification-plan.xml` may need synchronization if the new Bordbuch entry kinds affect the verification surface. `command.manifest.generate` must be re-run to include the four new commands in `docs/command-manifest.generated.yaml`.
+- **Deprecation:** The `--pilot-n2-exception` flag on `nachweis.publish` (RFC-0707, temporary) is removed. With N3 timestamp support now implemented, the flag is no longer needed. `nachweis.publish` requires `verificationLevel: N3` in the Bordbuch (set by `nachweis.approve`) — N2 is no longer accepted as a pilot exception.
 - **TSA migration path:** The `TsaAdapter` interface allows swapping FreeTSA.org for a production QTSA without changing the command surface. The `--tsa-url` flag and `--tsa-cert-file` flag accommodate any RFC 3161-compliant TSA.
 
 ## Alternatives considered
@@ -426,10 +429,13 @@ interface TimestampResponse {
 - [ ] `nachweis.approve --verification-level N0|N1|N2` is unchanged (no N3 gate)
 - [ ] Unit tests cover all four new commands and the N3 gate in `nachweis.approve`
 - [ ] `TsaAdapter` interface is defined and FreeTSA.org adapter is implemented
-- [ ] `packages/pbp/src/schemas/evidence-source.ts` is extended with optional `n3Signature`, `n3Timestamp`, `n3KeyId` fields
+- [ ] `packages/ontology/src/operations/mission.ts` is extended with `nachweis-signed` and `nachweis-timestamped` BordbuchEntryKind values
+- [ ] `--pilot-n2-exception` flag is removed from `nachweis.publish` command registration and gate evaluation logic
+- [ ] `nachweis.validate` checks for presence of `nachweis-signed` and `nachweis-timestamped` Bordbuch entries when a record's verification level is `N3`
 - [ ] `.gitignore` includes `*.key` pattern
 - [ ] `rfc.validate` passes on this file
 - [ ] `AGENTS.md` updated with Nachweis N3 workflow rules
+- [ ] `command.manifest.generate` re-run to include new commands in manifest
 
 ## Implementation notes for agents
 
@@ -442,6 +448,7 @@ interface TimestampResponse {
 - Agents MUST follow the pure-function + thin-handler pattern (RFC-0647) for all four new commands.
 - Agents MUST NOT build retry logic into `nachweis.timestamp`. TSA retries are the operator's responsibility.
 - Agents MUST NOT change `nachweis.approve` behavior for N0–N2. The N3 gate is additive.
+- Agents MUST remove the `--pilot-n2-exception` flag from `nachweis.publish` (command registration in `nachweis.module.ts` and gate evaluation in `nachweis-publish.ts`). This flag was marked temporary in RFC-0707 and MUST be removed now that N3 timestamp support is implemented.
 - Agents MUST register the new Bordbuch entry kinds (`nachweis-signed`, `nachweis-timestamped`) in the ontology (RFC-0706 `BordbuchEntryKind` enum).
 - Agents MUST run `nachweis.sign` before `nachweis.timestamp`. The timestamp covers the signed record hash.
 - Agents MUST run both `nachweis.sign` and `nachweis.timestamp` before `nachweis.approve --verification-level N3`.
