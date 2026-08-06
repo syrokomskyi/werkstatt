@@ -18,6 +18,7 @@ export const MISSION_PREFLIGHT_CRITICAL: KernelPipelineStep[] = [
   { command: "schema.drift.validate" },
   { command: "cosmic.catalog.validate" },
   { command: "biome.contract.validate" },
+  { command: "surface.context.validate" },
 ];
 
 export const MISSION_PREFLIGHT_WARNING: KernelPipelineStep[] = [

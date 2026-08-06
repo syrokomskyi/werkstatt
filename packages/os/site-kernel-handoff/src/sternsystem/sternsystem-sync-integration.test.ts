@@ -224,6 +224,82 @@ systems:
   expect(bareLog).toContain("failure-test");
 });
 
+test("sync with external mirrors creates refs/mirror/${branch} matching bare repo HEAD", async () => {
+  await setupRegistry(
+    `schemaVersion: "1.0.0"
+systems:
+  - id: test-site
+    cosmicStar: Vega
+    mirrors:
+      - path: "${cacheDir}"
+        storageType: non-bare
+      - path: "${bareDir}"
+        storageType: bare
+      - path: "${externalDir}"
+        storageType: bare
+    pinnedPlatform: "4.5.0"
+    currentMission: null
+    lastRelease: null
+    status: registered
+    registeredAt: "2026-01-01T00:00:00Z"
+    notes: ""
+`,
+  );
+
+  // Make a new commit in cache
+  await writeFile(join(cacheDir, "src/content/system.md"), "# Mirror ref test\n");
+  git(cacheDir, "add -A");
+  git(cacheDir, 'commit -m "mirror-ref-test"');
+
+  const result = await runSternsystemSync(
+    makeInput({ id: "test-site", direction: "push" }),
+    makeContext(workspaceRoot),
+  );
+
+  expect(result.exitCode).toBe(0);
+
+  // refs/mirror/main must exist and match bare repo HEAD
+  const bareHead = git(bareDir, "rev-parse main");
+  const mirrorRef = git(bareDir, "rev-parse refs/mirror/main");
+  expect(mirrorRef).toBe(bareHead);
+});
+
+test("sync without external mirrors does not create refs/mirror/${branch}", async () => {
+  await setupRegistry(
+    `schemaVersion: "1.0.0"
+systems:
+  - id: test-site
+    cosmicStar: Vega
+    mirrors:
+      - path: "${cacheDir}"
+        storageType: non-bare
+      - path: "${bareDir}"
+        storageType: bare
+    pinnedPlatform: "4.5.0"
+    currentMission: null
+    lastRelease: null
+    status: registered
+    registeredAt: "2026-01-01T00:00:00Z"
+    notes: ""
+`,
+  );
+
+  // Make a new commit in cache
+  await writeFile(join(cacheDir, "src/content/system.md"), "# No mirror ref\n");
+  git(cacheDir, "add -A");
+  git(cacheDir, 'commit -m "no-mirror-ref"');
+
+  const result = await runSternsystemSync(
+    makeInput({ id: "test-site", direction: "push" }),
+    makeContext(workspaceRoot),
+  );
+
+  expect(result.exitCode).toBe(0);
+
+  // refs/mirror/main should NOT exist (no external mirrors)
+  expect(() => git(bareDir, "rev-parse refs/mirror/main")).toThrow();
+});
+
 test("sync with single mirror (cache only) throws — no bare mirror", async () => {
   await setupRegistry(
     `schemaVersion: "1.0.0"

@@ -242,7 +242,7 @@ All 6 mission lifecycle commands (`mission.open`, `mission.close`, `mission.abor
 ## Preflight content quality gate (RFC-0517)
 
 - `mission.materialize` runs a two-level preflight gate after `atomicMoveDir` and before the git commit step. The gate validates the workpiece content using author-time validators from `MISSION_PREFLIGHT_CRITICAL` and `MISSION_PREFLIGHT_WARNING` pipeline constants (exported from `@warpgogol/site-kernel-checks`).
-- **Critical validators** (`content-types.validate`, `schema.drift.validate`, `cosmic.catalog.validate`, `biome.contract.validate`) block materialization on failure. The workpiece is preserved on disk (no `git init`) and `evidence/preflight-report.json` is written with failure details.
+- **Critical validators** (`content-types.validate`, `schema.drift.validate`, `cosmic.catalog.validate`, `biome.contract.validate`, `surface.context.validate`) block materialization on failure. The workpiece is preserved on disk (no `git init`) and `evidence/preflight-report.json` is written with failure details.
 - **Warning validators** (`content.filename.validate`, `naming.content.lint`, `mirroring.validate`, `semantic.drift.validate`, `content.links.validate`, `content.references.validate`, `pbp.content.validate`) do not block — failures are logged and written to the report.
 - **`--skip-preflight` flag:** Bypasses the gate, writes `evidence/preflight-report.json` with `skipped: true`, and appends a `preflight-skipped` Bordbuch entry with `writerRole: "mission"`.
 - **`--report-only` flag:** Returns early with version comparison report only (existing behavior). No staging, no preflight.
