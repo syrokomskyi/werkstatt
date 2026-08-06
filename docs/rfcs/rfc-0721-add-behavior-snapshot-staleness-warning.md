@@ -200,17 +200,17 @@ Also add to `SITES_BUILD_PREPARE_DEV_PIPELINE` (RFC-0597) so developers see stal
 
 ## Acceptance criteria
 
-- [ ] `behavior.snapshot.staleness.check` command is registered in `BUILD_INFRA_COMMANDS` with `scope: "app"`
-- [ ] Command emits `SNAP-STALE-01` warning when a `system.md pages[]` route is absent from `behavior.snapshot.generated.yaml`
-- [ ] Command does NOT emit warnings for Programmatic Surface routes (DNA-39) — only `newRoutes` direction is checked
-- [ ] Command returns exit code 0 with warnings (advisory, non-fatal)
-- [ ] Command skips gracefully when no committed snapshot exists (SNAP-02 handles this in `build.post`)
-- [ ] `build.prepare` pipeline includes the staleness check as the last step
-- [ ] `SITES_BUILD_PREPARE_DEV_PIPELINE` (RFC-0597) includes the staleness check
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` module table is updated with the new command
-- [ ] `command.manifest.generate` is run to update `docs/command-manifest.generated.yaml`
-- [ ] Existing auto-regeneration via `orchestrateSnap01Recovery` continues to handle SNAP-01 recovery in `build.post`
-- [ ] Unit tests cover: stale route detected, no snapshot (skip), no app context (skip), surface routes not flagged
+- [x] `behavior.snapshot.staleness.check` command is registered in `BUILD_INFRA_COMMANDS` with `scope: "app"` (evidence: packages/os/site-kernel-checks/src/command-tables/build-infra.ts:142-152)
+- [x] Command emits `SNAP-STALE-01` warning when a `system.md pages[]` route is absent from `behavior.snapshot.generated.yaml` (evidence: packages/os/site-kernel-checks/src/behavior-snapshot-staleness.ts:77-88, tests/behavior-snapshot-staleness.test.ts:103-120)
+- [x] Command does NOT emit warnings for Programmatic Surface routes (DNA-39) — only `newRoutes` direction is checked (evidence: packages/os/site-kernel-checks/src/behavior-snapshot-staleness.ts:75-90, tests/behavior-snapshot-staleness.test.ts:146-160)
+- [x] Command returns exit code 0 with warnings (advisory, non-fatal) (evidence: behavior-snapshot-staleness.ts uses diagnosticsResult which sets exitCode 0 for warnings, tests/behavior-snapshot-staleness.test.ts:111)
+- [x] Command skips gracefully when no committed snapshot exists (SNAP-02 handles this in `build.post`) (evidence: behavior-snapshot-staleness.ts:71-73, tests/behavior-snapshot-staleness.test.ts:119-132)
+- [x] `build.prepare` pipeline includes the staleness check as the last step (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:140-142)
+- [x] `SITES_BUILD_PREPARE_DEV_PIPELINE` (RFC-0597) includes the staleness check (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:207-208)
+- [x] `packages/os/site-kernel-checks/AGENTS.md` module table is updated with the new command (evidence: packages/os/site-kernel-checks/AGENTS.md:30)
+- [x] `command.manifest.generate` is run to update `docs/command-manifest.generated.yaml` (evidence: docs/command-manifest.generated.yaml contains behavior.snapshot.staleness.check)
+- [x] Existing auto-regeneration via `orchestrateSnap01Recovery` continues to handle SNAP-01 recovery in `build.post` (evidence: no changes to orchestrateSnap01Recovery or build.post pipeline — this RFC only adds a new command to build.prepare)
+- [x] Unit tests cover: stale route detected, no snapshot (skip), no app context (skip), surface routes not flagged (evidence: packages/os/site-kernel-checks/src/tests/behavior-snapshot-staleness.test.ts — 5 tests, all passing)
 
 ## Implementation notes for agents
 
