@@ -1,7 +1,7 @@
 ---
 id: RFC-0711
 title: "Add living feature specs with delta-merge from archived RFCs"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
-implementedAt:
+implementedAt: 2026-08-06
 closedAt:
 supersedes: []
 supersededBy:
