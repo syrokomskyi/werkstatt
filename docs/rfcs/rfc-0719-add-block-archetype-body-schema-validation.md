@@ -1,7 +1,7 @@
 ---
 id: RFC-0719
 title: "Add block archetype body.kind schema validation to page.block.validate"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
+implementedAt: 2026-08-06
 enhancedAt: 2026-08-06
 supersedes: []
 supersededBy:
@@ -23,9 +24,9 @@ satisfies:
   - DNA-24
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - page.block.validate
-  added: []
   changed:
     - page.block.validate
   removed: []
@@ -44,6 +45,10 @@ nonGoals:
 ---
 
 # RFC-0719: Add block archetype body.kind schema validation to page.block.validate
+
+## Context
+
+This RFC documents and formalizes the existing B-07 check in `page.block.validate` that validates `body.kind` against the archetype's declared `bodyKind`. The check was implemented during RFC-0708/RFC-0715 work and is already live in `packages/os/site-kernel-checks/src/page-block.ts`. This RFC satisfies DNA-24 (block-declarative pages) by ensuring `page.block.validate` provides a specific, actionable diagnostic for body kind mismatches.
 
 ## Problem
 
