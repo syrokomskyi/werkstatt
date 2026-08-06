@@ -150,10 +150,19 @@ async function writeEvidenceSource(
   await fs.writeFile(path.join(evidenceDir, `${slug}.md`), md, "utf8");
 }
 
+async function writeSystemMd(): Promise<void> {
+  const cacheDir = path.join(tmpDir, "cache", systemId);
+  const contentDir = path.join(cacheDir, "src", "content");
+  if (!existsSync(contentDir)) mkdirSync(contentDir, { recursive: true });
+  const systemMd = "---\ni18n:\n  default: de\n---\n\n# Test System\n";
+  await fs.writeFile(path.join(contentDir, "system.md"), systemMd, "utf8");
+}
+
 beforeEach(async () => {
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "nachweis-n3-test-"));
   await writeRegistry();
   await writeEntitlements();
+  await writeSystemMd();
 });
 
 afterEach(async () => {

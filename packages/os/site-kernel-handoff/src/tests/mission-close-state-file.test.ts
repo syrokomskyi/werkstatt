@@ -147,7 +147,14 @@ test("mission.close writes .materialization-state.json with current cache clone 
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: {
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+      success: () => {},
+      event: () => {},
+      getEvents: () => [],
+    },
   } as unknown as KernelRuntimeContext;
 
   await runMissionClose(input, context);
@@ -190,7 +197,14 @@ test("mission.close copies .cache/video/ from workpiece to cache clone", async (
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: {
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+      success: () => {},
+      event: () => {},
+      getEvents: () => [],
+    },
   } as unknown as KernelRuntimeContext;
 
   await runMissionClose(input, context);
@@ -223,7 +237,14 @@ test("mission.close copies .cache/video-live/ from workpiece to cache clone", as
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: {
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+      success: () => {},
+      event: () => {},
+      getEvents: () => [],
+    },
   } as unknown as KernelRuntimeContext;
 
   await runMissionClose(input, context);
@@ -243,7 +264,14 @@ test("mission.close succeeds when workpiece has no .cache/ directory", async () 
   } as unknown as KernelCommandInput;
   const context = {
     workspaceRoot: tmpWorkspace,
-    logger: { info: () => {} },
+    logger: {
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+      success: () => {},
+      event: () => {},
+      getEvents: () => [],
+    },
   } as unknown as KernelRuntimeContext;
 
   const result = await runMissionClose(input, context);
