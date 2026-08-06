@@ -54,6 +54,31 @@ scope:
 
 ## 3. Step sequence
 
+### Step 0. Verify pre-existing working tree changes
+
+**Goal:** Audit the pre-existing changes in the working tree from a previous session to ensure they match the RFC design before building on top of them.
+
+**Agent actions:**
+
+- Run `git diff --name-only` to list all modified/new files in the working tree.
+- For each pre-existing file, verify it matches the RFC:
+  - `packages/os/site-kernel-checks/src/behavior-snapshot-staleness.ts` — verify one-directional (newRoutes only), correct skip behavior, correct imports, Compass blocks present.
+  - `packages/os/site-kernel-checks/src/pipelines/build-prepare.ts` — verify `behavior.snapshot.staleness.check` is the last step in `SITES_BUILD_PREPARE_PIPELINE`; check if it's also in `SITES_BUILD_PREPARE_DEV_PIPELINE`.
+  - `packages/os/site-kernel-checks/src/command-tables/01-codegen.ts` — verify the command entry exists but note it needs to move to `build-infra.ts` (Step 1).
+  - Any other modified files (`page-block.ts`, `hooks/pre-commit`, AGENTS.md files) — determine if they belong to RFC-0721 or are unrelated changes from another session. If unrelated, do NOT stage them in RFC-0721 commits.
+- If any pre-existing change contradicts the RFC (e.g. removedRoutes direction still present), fix it now before proceeding.
+
+**Validation:**
+
+- `git diff --name-only` — list of pre-existing changes is known and categorized.
+- `pnpm --filter @warpgogol/site-kernel-checks run build:check` — TypeScript compiles with pre-existing changes.
+
+**Completion criterion:** All pre-existing changes are verified as compatible with RFC-0721 or fixed; unrelated changes are identified and excluded from RFC-0721 commits.
+
+**Human review:** no
+
+---
+
 ### Step 1. Move command registration to `build-infra.ts` and fix scope
 
 **Goal:** Move the `behavior.snapshot.staleness.check` command table entry from `01-codegen.ts` to `build-infra.ts` (where the other behavior.snapshot commands live) and fix `scope: "workspace"` → `scope: "app"`.
@@ -147,8 +172,7 @@ scope:
 
 **Agent actions:**
 
-- Add a row to the module table in `packages/os/site-kernel-checks/AGENTS.md`:
-  `| src/behavior-snapshot-staleness.ts | RFC-0721 runBehaviorSnapshotStalenessCheck — advisory pre-build warning when system.md pages[] routes are absent from behavior.snapshot.generated.yaml. Diagnostics: SNAP-STALE-01 (warning). One-directional: only checks newRoutes direction. |`
+- Add a row to the module table in `packages/os/site-kernel-checks/AGENTS.md`: `| src/behavior-snapshot-staleness.ts | RFC-0721 runBehaviorSnapshotStalenessCheck — advisory pre-build warning when system.md pages[] routes are absent from behavior.snapshot.generated.yaml. Diagnostics: SNAP-STALE-01 (warning). One-directional: only checks newRoutes direction. |`
 - Run `pnpm exec site-kernel run command.manifest.generate` to update `docs/command-manifest.generated.yaml`.
 - Verify the new command appears in the manifest with `scope: "app"`.
 
@@ -225,7 +249,7 @@ scope:
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ---------------------- |
+| --- | --- |
 | Agent misinterpretation — treating warnings as fatal | Step 3 verifies severity is `warning`; Step 4 tests confirm exit code 0 with warnings |
 | False positives from i18n route format mismatches | Step 4 test case 5 verifies pass when routes match; Step 3 verifies one-directional check only |
 | Performance (~200ms) | Step 4 tests verify the check is lightweight; no mitigation needed — negligible vs total build.prepare runtime |
