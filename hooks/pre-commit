@@ -104,10 +104,10 @@ if [ -n "$CSS_FILES" ]; then
       if [ ! -f "$f" ]; then continue; fi
       while IFS= read -r token; do
         [ -z "$token" ] && continue
-        if ! grep -qF "$token" "$TOKENS_FILE"; then
+        if ! grep -qP "^\s*\Q$token\E\s*:" "$TOKENS_FILE"; then
           CSS_ERRORS="$CSS_ERRORS\n  $f — invalid token: $token"
         fi
-      done < <(grep -oP 'var\(\s*(--ds-[a-z0-9-]+)' "$f" | sed 's/var(\s*//')
+      done < <(grep -oP 'var\(\s*\K--ds-[a-z0-9-]+' "$f")
     done
     if [ -n "$CSS_ERRORS" ]; then
       echo "ERROR: Invalid CSS design tokens detected:" >&2
