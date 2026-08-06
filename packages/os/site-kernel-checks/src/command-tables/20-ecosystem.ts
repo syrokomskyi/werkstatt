@@ -331,6 +331,12 @@ export const ECOSYSTEM_COMMANDS: CheckCommandEntry[] = [
         default: false,
         description: "Amend the previous ecosystem.commit commit instead of creating a new one.",
       },
+      bump: {
+        kind: "string",
+        required: false,
+        description:
+          "Override version bump type (patch, minor, major). Takes precedence over RFC versionBump frontmatter.",
+      },
     },
     mutatesState: true,
     cacheable: false,

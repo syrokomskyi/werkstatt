@@ -131,13 +131,40 @@ async function readRfcVersionBump(
   rfcId: string,
 ): Promise<{ versionBump: string | undefined; found: boolean }> {
   const rfcDir = path.join(workspaceRoot, "docs", "rfcs");
+  const archiveDir = path.join(rfcDir, "archive");
   try {
-    const files = await fs.readdir(rfcDir);
-    const rfcFile = files.find(
+    // Search top-level docs/rfcs/ first
+    let files = await fs.readdir(rfcDir);
+    let rfcFile = files.find(
       (f) => f.startsWith(rfcId.toLowerCase() + "-") || f.startsWith(rfcId + "-"),
     );
+    let searchDir = rfcDir;
+
+    // If not found at top level, search archive subdirectories recursively
+    if (!rfcFile) {
+      try {
+        const archiveSubdirs = await fs.readdir(archiveDir);
+        for (const subdir of archiveSubdirs) {
+          const subdirPath = path.join(archiveDir, subdir);
+          const stat = await fs.stat(subdirPath);
+          if (stat.isDirectory()) {
+            const subFiles = await fs.readdir(subdirPath);
+            rfcFile = subFiles.find(
+              (f) => f.startsWith(rfcId.toLowerCase() + "-") || f.startsWith(rfcId + "-"),
+            );
+            if (rfcFile) {
+              searchDir = subdirPath;
+              break;
+            }
+          }
+        }
+      } catch {
+        // archive dir doesn't exist or can't be read
+      }
+    }
+
     if (!rfcFile) return { versionBump: undefined, found: false };
-    const content = await fs.readFile(path.join(rfcDir, rfcFile), "utf-8");
+    const content = await fs.readFile(path.join(searchDir, rfcFile), "utf-8");
     const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
     if (!fmMatch) return { versionBump: undefined, found: true };
     const fm = yamlParse(fmMatch[1]) as Record<string, unknown>;
@@ -232,6 +259,7 @@ export async function runEcosystemCommit(
   const { workspaceRoot } = context;
   const message = flagString(input, "message");
   const rfcId = flagString(input, "rfc");
+  const bumpOverride = flagString(input, "bump");
   const dryRun = context.dryRun || flagBoolean(input, "dry-run");
   const amend = flagBoolean(input, "amend");
 
@@ -346,9 +374,23 @@ export async function runEcosystemCommit(
     };
   }
 
+  // Validate --bump override if provided
+  if (bumpOverride && !["patch", "minor", "major"].includes(bumpOverride)) {
+    violations.push({
+      code: "EC-10",
+      message: `Invalid --bump value "${bumpOverride}". Must be one of: patch, minor, major.`,
+      fixHint: "Use --bump patch, --bump minor, or --bump major.",
+    });
+  }
+
   // Determine bump type
   let bumpType: "patch" | "minor" | "major" = "patch";
   let resolvedRfcId: string | null = null;
+
+  // --bump flag takes precedence over RFC versionBump
+  if (bumpOverride && ["patch", "minor", "major"].includes(bumpOverride)) {
+    bumpType = bumpOverride as "patch" | "minor" | "major";
+  }
 
   if (rfcId) {
     resolvedRfcId = rfcId;
@@ -358,7 +400,7 @@ export async function runEcosystemCommit(
     if (!found) {
       violations.push({
         code: "EC-04",
-        message: `${rfcId} not found in docs/rfcs/.`,
+        message: `${rfcId} not found in docs/rfcs/ or docs/rfcs/archive/.`,
         fixHint:
           'Run `rfc.next-id` for the next free RFC number, or `rfc.create --title "..."` to create one.',
       });
@@ -378,7 +420,10 @@ export async function runEcosystemCommit(
         fixHint: "Use `git commit` for prose-only RFC changes that do not touch platform scope.",
       });
     } else if (versionBump === "minor" || versionBump === "major") {
-      bumpType = versionBump;
+      // --bump override takes precedence over RFC versionBump
+      if (!bumpOverride) {
+        bumpType = versionBump;
+      }
     }
   }
 

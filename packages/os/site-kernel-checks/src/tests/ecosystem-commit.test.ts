@@ -206,6 +206,88 @@ status: accepted
     }
   });
 
+  it("--bump flag overrides RFC versionBump", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9004", "patch");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9004", bump: "minor", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.bumpType).toBe("minor");
+      expect(result.data?.newVersion).toBe("1.1.0");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("--bump flag works without --rfc", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", bump: "major", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.bumpType).toBe("major");
+      expect(result.data?.newVersion).toBe("2.0.0");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("EC-10: blocks on invalid --bump value", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", bump: "mega", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(1);
+      const codes = result.data?.violations?.map((v) => v.code) ?? [];
+      expect(codes).toContain("EC-10");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("reads versionBump from archived RFC in docs/rfcs/archive/", async () => {
+    const root = await setupWorkspace();
+    try {
+      // Create archived RFC directory structure
+      await mkdir(join(root, "docs", "rfcs", "archive", "implemented"), { recursive: true });
+      const content = `---
+id: RFC-9005
+title: "Archived RFC"
+status: implemented
+versionBump: minor
+---
+
+# RFC-9005
+`;
+      await writeFile(
+        join(root, "docs", "rfcs", "archive", "implemented", "rfc-9005-test.md"),
+        content,
+        "utf8",
+      );
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9005", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.bumpType).toBe("minor");
+      expect(result.data?.newVersion).toBe("1.1.0");
+      expect(result.data?.rfcId).toBe("RFC-9005");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it("--dry-run returns forecast without committing", async () => {
     const root = await setupWorkspace();
     try {
