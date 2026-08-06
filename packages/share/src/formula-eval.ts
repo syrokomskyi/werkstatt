@@ -180,6 +180,14 @@ export function resolveFormula(
 
     const numeric = extractNumeric(result.value);
     if (numeric === null) {
+      // RFC-0723: If the expression is a single reference (no arithmetic),
+      // return the string value directly — enables =(ref) for string interpolation.
+      if (refs.length === 1 && expression.trim() === ref) {
+        return {
+          value: String(result.value),
+          resolved: true,
+        };
+      }
       return {
         value: "",
         resolved: false,

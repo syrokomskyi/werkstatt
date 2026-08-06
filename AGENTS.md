@@ -515,6 +515,10 @@ Content origin and asset origin are reachable only through `@warpgogol/content-s
 - **`system.md` stays engineering-owned** and is never served by a provider (`ContentDomain` excludes it).
 - `content.source.parity` is the migration guard: the fs adapter's enumeration must match the on-disk content inventory.
 
+## Content references in mixed strings (RFC-0723)
+
+Content references inside mixed strings MUST use `=(ref)` formula syntax. A bare braceless reference (e.g. `business-profile.offerings/digital-foundation.presentation.price.monthly`) inside a mixed string (e.g. `"Ab business-profile.offerings/..."`) is prohibited — `content.references.validate` emits REF-04. Use `=(business-profile.offerings/...)` to explicitly mark it as a reference. Pure refs (where the entire field value is just the reference, with no surrounding text) remain valid without `=(...)`. This rule is non-negotiable for all AI agents.
+
 ## Integration hub, billing & consent-gated chat widget (RFC-0168/0175/0176/0177/0181/0186/0191)
 
 See [`docs/policies/integration-hub.md`](docs/policies/integration-hub.md) for the full text: model, sources, destinations, reliable delivery (EU-resident QStash + Redis), chat widget, validators, Cloudflare + Astro v6 runtime gotchas, and Lagebild shared sync worker rules.
