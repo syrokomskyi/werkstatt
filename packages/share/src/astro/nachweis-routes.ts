@@ -64,13 +64,13 @@ interface SystemView {
 interface EvidenceSourceData {
   type?: string;
   kind?: string;
-  publication?: { visibility?: string };
+  status?: string;
 }
 
 /**
  * Nachweis detail routes for every published EvidenceSource record with a
- * Nachweis evidence kind. Preview records are excluded — no route is
- * generated for them.
+ * Nachweis evidence kind. Draft records (status: draft) are excluded — no
+ * route is generated for them.
  */
 export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
   const systemEntries = await getCollection("system");
@@ -94,9 +94,8 @@ export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
     if (data.type !== "evidence-source") continue;
     if (!data.kind || !NACHWEIS_EVIDENCE_KINDS.has(data.kind)) continue;
 
-    // Only published records get routes — preview records are excluded
-    const visibility = data.publication?.visibility;
-    if (visibility !== "published") continue;
+    // Only published records get routes — draft records are excluded
+    if (data.status !== "published") continue;
 
     const slug = stripEntryLanguage(toDataEntryId(entry.id));
 
@@ -116,7 +115,7 @@ export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
 /**
  * Nachweis verify routes for every published EvidenceSource record.
  * Generates version-suffixed routes (`/nachweise/verify/v1/`, etc.).
- * Preview records are excluded.
+ * Draft records are excluded.
  */
 export async function getNachweisVerifyRoutes(): Promise<NachweisVerifyRouteEntry[]> {
   const systemEntries = await getCollection("system");
@@ -140,8 +139,7 @@ export async function getNachweisVerifyRoutes(): Promise<NachweisVerifyRouteEntr
     if (data.type !== "evidence-source") continue;
     if (!data.kind || !NACHWEIS_EVIDENCE_KINDS.has(data.kind)) continue;
 
-    const visibility = data.publication?.visibility;
-    if (visibility !== "published") continue;
+    if (data.status !== "published") continue;
 
     const slug = stripEntryLanguage(toDataEntryId(entry.id));
     // Generate v1 verify route for each published record

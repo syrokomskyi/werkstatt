@@ -407,7 +407,7 @@ Prohibited phrases:
 - [ ] 2 PBP Claim entities created (Nicaragua, Style Expert) in `de/` and `uk/`
 - [ ] 2 PBP EvidenceSource entities created with correct SHA-256 hashes
 - [ ] 2 PBP Consent entities created with `status: not_requested`
-- [ ] All pilot records have `publication.visibility: preview`
+- [ ] All pilot records have `status: draft`
 - [ ] `nachweis.validate` passes with 0 violations on pilot content
 - [ ] WCAG 2.2 AA compliance verified (axe or manual check)
 - [ ] `entitlement.module.validate` passes with `nachweis` entitlement
