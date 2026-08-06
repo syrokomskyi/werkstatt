@@ -362,6 +362,7 @@ Section numbering is controlled by the `numbered` field in each section's manife
 - `numbered: false` in a manifest opts the section out of automatic numbering.
 - `blocks-renderer.astro` discovers unnumbered sections dynamically at build time by scanning all `*.manifest.yaml` files — no hardcoded sets.
 - To add a new unnumbered section, add `numbered: false` to its manifest. No renderer edit needed.
+- **Auto-injected utility sections** (breadcrumbs, navigation, toc) MUST have `numbered: false`. These sections are inserted by the page pipeline (`injectBreadcrumbsBlock` in `packages/share/src/astro/page-handler/semantic.ts`), not authored in page content, so a missing `numbered: false` silently consumes a section number and pushes the first real content section to `02` without any visible breadcrumb number to explain the gap.
 
 ## Anchor link contract
 
