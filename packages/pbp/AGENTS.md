@@ -39,7 +39,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 
 - `PbpBusiness` — Business entity (RFC-0403)
 - `PbpProduct`, `PbpProductKind` — Product entity with kind vocabulary (RFC-0404)
-- `PbpClaim`, `PbpClaimClass`, `PbpClaimKind` — Claim entity with class/kind vocabularies (RFC-0405)
+- `PbpClaim`, `PbpClaimClass`, `PbpClaimKind` — Claim entity with class/kind vocabularies (RFC-0405, RFC-0706: optional `statementLang` field)
 - `PbpLegalIdentity` — LegalIdentity entity with public/private boundary (RFC-0409)
 - `PbpBrand` — Brand entity (RFC-0410)
 - `PbpPlace`, `PbpPlaceKind` — Place entity with kind vocabulary (RFC-0411)
@@ -47,8 +47,9 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 - `PbpWebPresence`, `PbpWebPresenceKind`, `PbpWebControlStatus` — WebPresence entity (RFC-0413)
 - `PbpCategory` — Category entity for global semantic layer (RFC-0414)
 - `PbpProductGroup`, `PbpProductVariant` — Product schema entities (RFC-0415)
-- `PbpEvidenceSource`, `PbpEvidenceKind` — EvidenceSource entity (RFC-0416)
+- `PbpEvidenceSource`, `PbpEvidenceKind` — EvidenceSource entity (RFC-0416, RFC-0706: extended with 4 Nachweisregister kinds + file-based evidence fields)
 - `PbpDisclosure`, `PbpDisclosureKind`, `PbpDisclosureMateriality` — Disclosure entity (RFC-0417)
+- `PbpConsent`, `PbpConsentMethod`, `PbpConsentStatus` — Consent entity for Nachweisregister consent management (RFC-0706)
 - `PbpCredential`, `PbpCredentialKind` — Credential entity (RFC-0418)
 - `PbpReview`, `PbpAggregateRating`, `PbpReviewContentMode` — Review and AggregateRating entities (RFC-0419)
 - `PbpPublicDocument`, `PbpDocumentKind` — PublicDocument entity (RFC-0420)
@@ -152,6 +153,7 @@ PBP content files live under `src/content/business-profile/{lang}/`:
 
 - `business.md`, `legal-identity.md`, `brand.md`, `catalog.md` — singletons
 - `places/<slug>.md`, `contact-points/<slug>.md`, `products/<slug>.md`, `offerings/<slug>.md`, etc. — repeatables
+- `consent/<slug>.md` — consent records (RFC-0706)
 
 ### Validation
 
