@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0533: initial ecosystem.commit command handler.</item>
   <item>RFC-0704: added independentVersionPackages skip-bump logic — when all staged platform files belong to independent packages, skips root version bump, version log write, and platform trailers.</item>
+  <item>Fix: readRfcVersionBump now scans docs/rfcs/ recursively via collectFiles, finding RFCs in draft/ and other subdirectories (not just top-level and archive/).</item>
 </CHANGE_SUMMARY>
 */
 
