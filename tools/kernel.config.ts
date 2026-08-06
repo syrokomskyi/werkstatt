@@ -38,6 +38,7 @@
   <entry key="deploy.*">Registers workspace deploy commands: deploy.artifact.build, deploy.artifact.verify, deploy.atomic.swap, deploy.atomic.rollback, deploy.artifact.gc, deploy.status (RFC-0566).</entry>
   <entry key="evidence.*">Registers workspace evidence commands: evidence.sync, evidence.fetch (RFC-0651).</entry>
   <entry key="nachweis.*">Registers workspace nachweis commands: nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw (RFC-0707).</entry>
+  <entry key="exploration.*">Registers workspace exploration note commands: exploration.list, exploration.show, exploration.archive (RFC-0710).</entry>
 </MODULE_MAP>
 <CHANGE_SUMMARY>
   <item>Initial workspace-level kernel configuration.</item>
@@ -63,6 +64,7 @@
   <item>RFC-0566: Register deployModule for deploy.artifact.build, deploy.artifact.verify, deploy.atomic.swap, deploy.atomic.rollback, deploy.artifact.gc, deploy.status.</item>
   <item>RFC-0651: Register evidenceModule for evidence.sync, evidence.fetch.</item>
   <item>RFC-0707: Register nachweisModule for nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw.</item>
+  <item>RFC-0710: Register forgeExplorationModule for exploration.list, exploration.show, exploration.archive.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -139,6 +141,8 @@ export default defineKernelConfig({
       (await import("@warpgogol/site-kernel-handoff/evidence-module")).createEvidenceModule(),
     nachweis: async () =>
       (await import("@warpgogol/site-kernel-handoff/nachweis-module")).createNachweisModule(),
+    "forge-exploration": async () =>
+      (await import("@warpgogol/forge/os/exploration")).forgeExplorationModule,
   },
   pipelines: {
     // Workspace-level pipelines
