@@ -38,6 +38,7 @@ interface NachweisRecord {
   notVerifiedScope?: string;
   status: "draft" | "preview" | "published" | "withdrawn";
   verifiedByLabel?: string;
+  verifiedDate?: string;
 }
 
 interface Props {
@@ -45,19 +46,22 @@ interface Props {
   emptyMessage?: string;
 }
 
-const { records = [], emptyMessage = "Weitere Nachweise werden derzeit vorbereitet." } = Astro.props;
+const { records = [], emptyMessage = "Weitere Nachweise werden derzeit vorbereitet." } =
+  Astro.props;
 ---
 
 <section class="nachweis-list" data-component="nachweis-list">
-  {records.length === 0 ? (
-    <p class="nachweis-list__empty">{emptyMessage}</p>
-  ) : (
-    <ul class="nachweis-list__items" role="list">
-      {records.map((record) => (
-        <li class="nachweis-list__item">
-          <NachweisCard {...record} />
-        </li>
-      ))}
-    </ul>
-  )}
+  {
+    records.length === 0 ? (
+      <p class="nachweis-list__empty">{emptyMessage}</p>
+    ) : (
+      <ul class="nachweis-list__items" role="list">
+        {records.map((record) => (
+          <li class="nachweis-list__item">
+            <NachweisCard {...record} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
 </section>

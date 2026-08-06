@@ -251,8 +251,8 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
 
     // RFC-0708: fold Nachweis detail and verify routes into the registry behind
     // the `nachweis` entitlement gate. Sourced from PBP EvidenceSource records
-    // with Nachweis evidence kinds and publication.visibility: published.
-    // Preview records are excluded — no route is generated. Authored pages
+    // with Nachweis evidence kinds and status: published.
+    // Draft records are excluded — no route is generated. Authored pages
     // always win a slug collision. Fail open when entitlements are unknown.
     const nachweisEntitled = entitledFeatures === null || entitledFeatures.includes("nachweis");
     if (nachweisEntitled) {

@@ -4,7 +4,7 @@
   RFC-0708: build-time enumerator of Nachweis routes. Reads PBP EvidenceSource
   entities from the `business-profile` content collection with Nachweis evidence
   kinds (client-statement, project-confirmation, certificate, operational-evidence),
-  filters by publication.visibility: published (excludes preview records), and
+  filters by status: published (excludes draft records), and
   materializes one virtual route per record (pageId `nachweis:<slug>`) in every
   supported language. Also generates verify routes with version suffixes.
   The single seam the route-registry merge uses; gated there by the
@@ -18,6 +18,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0708: initial implementation.</item>
+  <item>RFC-0708 review fix: extract loadPublishedNachweisEntries() to eliminate duplicated logic.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -67,12 +68,17 @@ interface EvidenceSourceData {
   status?: string;
 }
 
+interface PublishedNachweisEntry {
+  slug: string;
+  supportedLangs: string[];
+}
+
 /**
- * Nachweis detail routes for every published EvidenceSource record with a
- * Nachweis evidence kind. Draft records (status: draft) are excluded — no
- * route is generated for them.
+ * Shared loader: reads system i18n config and filters business-profile entries
+ * to published EvidenceSource records with Nachweis evidence kinds in the
+ * default language. Used by both getNachweisRoutes and getNachweisVerifyRoutes.
  */
-export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
+async function loadPublishedNachweisEntries(): Promise<PublishedNachweisEntry[]> {
   const systemEntries = await getCollection("system");
   const system = (systemEntries.find((e: { id: string }) => e.id === "system")?.data ??
     {}) as SystemView;
@@ -88,7 +94,7 @@ export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
     return entryLang === defaultLang;
   });
 
-  const routesList: NachweisRouteEntry[] = [];
+  const result: PublishedNachweisEntry[] = [];
   for (const entry of defaultLangEntries) {
     const data = entry.data as EvidenceSourceData;
     if (data.type !== "evidence-source") continue;
@@ -98,18 +104,29 @@ export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
     if (data.status !== "published") continue;
 
     const slug = stripEntryLanguage(toDataEntryId(entry.id));
+    result.push({ slug, supportedLangs });
+  }
+  return result;
+}
 
+/**
+ * Nachweis detail routes for every published EvidenceSource record with a
+ * Nachweis evidence kind. Draft records (status: draft) are excluded — no
+ * route is generated for them.
+ */
+export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
+  const published = await loadPublishedNachweisEntries();
+  return published.map(({ slug, supportedLangs }) => {
     const routes: Record<string, string> = {};
     for (const lang of supportedLangs) {
       routes[lang] = `/nachweise/${slug}/`;
     }
-    routesList.push({
+    return {
       pageId: nachweisPageId(slug),
       slug,
       routes,
-    });
-  }
-  return routesList;
+    };
+  });
 }
 
 /**
@@ -118,43 +135,18 @@ export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
  * Draft records are excluded.
  */
 export async function getNachweisVerifyRoutes(): Promise<NachweisVerifyRouteEntry[]> {
-  const systemEntries = await getCollection("system");
-  const system = (systemEntries.find((e: { id: string }) => e.id === "system")?.data ??
-    {}) as SystemView;
-  if (!system.i18n?.default) {
-    throw new Error("[nachweis-routes] system.md i18n.default is required.");
-  }
-  const defaultLang = system.i18n.default;
-  const supportedLangs = Object.keys(system.i18n.supported ?? { [defaultLang]: true });
-
-  const entries = await getCollection("business-profile");
-  const defaultLangEntries = entries.filter((e: { id: string }) => {
-    const entryLang = getEntryLanguage(e.id);
-    return entryLang === defaultLang;
-  });
-
-  const routesList: NachweisVerifyRouteEntry[] = [];
-  for (const entry of defaultLangEntries) {
-    const data = entry.data as EvidenceSourceData;
-    if (data.type !== "evidence-source") continue;
-    if (!data.kind || !NACHWEIS_EVIDENCE_KINDS.has(data.kind)) continue;
-
-    if (data.status !== "published") continue;
-
-    const slug = stripEntryLanguage(toDataEntryId(entry.id));
-    // Generate v1 verify route for each published record
+  const published = await loadPublishedNachweisEntries();
+  return published.map(({ slug, supportedLangs }) => {
     const version = "v1";
-
     const routes: Record<string, string> = {};
     for (const lang of supportedLangs) {
       routes[lang] = `/nachweise/verify/${version}/`;
     }
-    routesList.push({
+    return {
       pageId: nachweisVerifyPageId(slug, version),
       slug,
       version,
       routes,
-    });
-  }
-  return routesList;
+    };
+  });
 }
