@@ -120,6 +120,35 @@ if [ -n "$CSS_FILES" ]; then
   fi
 fi
 
+# RFC/ADR directory structure guard (RFC-0722)
+# Block commits that stage files in unauthorized subdirectories under docs/rfcs/ or docs/adrs/
+RFC_DIR_STAGED=$(git diff --cached --name-only -- 'docs/rfcs/' 'docs/adrs/' || true)
+if [ -n "$RFC_DIR_STAGED" ]; then
+  DIR_ERRORS=""
+  for f in $RFC_DIR_STAGED; do
+    case "$f" in
+      docs/rfcs/archive/*|docs/rfcs/verification/*)
+        ;; # allowed subdirectories under docs/rfcs/
+      docs/rfcs/*/*)
+        DIR_ERRORS="$DIR_ERRORS\n  $f — unauthorized subdirectory under docs/rfcs/ (only archive/ and verification/ are allowed)"
+        ;;
+      docs/adrs/archive/*)
+        ;; # allowed subdirectory under docs/adrs/
+      docs/adrs/*/*)
+        DIR_ERRORS="$DIR_ERRORS\n  $f — unauthorized subdirectory under docs/adrs/ (only archive/ is allowed)"
+        ;;
+    esac
+  done
+  if [ -n "$DIR_ERRORS" ]; then
+    echo "ERROR: Unauthorized RFC/ADR directory structure (RFC-0722):" >&2
+    echo -e "$DIR_ERRORS" >&2
+    echo "" >&2
+    echo "Only archive/ (RFC-0367) and verification/ subdirectories are sanctioned." >&2
+    echo "To introduce a new subdirectory convention, write an ADR first." >&2
+    exit 1
+  fi
+fi
+
 # Command manifest staleness check (RFC-0646)
 # Warn when command-registration files change without manifest regeneration.
 COMMAND_FILES=$(git diff --cached --name-only -- 'packages/forge/os/core/' 'packages/forge/os/*/core.module.ts' 'tools/kernel.config.ts' || true)

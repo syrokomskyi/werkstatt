@@ -261,4 +261,6 @@ supersededBy: RFC-0103
 
 **8. RFC filenames must be lowercase kebab-case.** The entire filename — including the `rfc-` prefix — must be lowercase. The generator already emits `rfc-0230-kebab-title.md`; agents must never create or rename an RFC file with an uppercase `RFC-` prefix.
 
+**9. Directory structure changes under `docs/rfcs/` and `docs/adrs/` require an accepted ADR.** Agents MUST NOT create new subdirectories in these paths without an accepted ADR defining the convention, the creation command behavior, and the archive flow. The only sanctioned subdirectories are `archive/` (RFC-0367) and `verification/` (generated JSON, not RFC files).
+
 Agents MUST run `rfc.validate <id>` immediately after authoring or editing any RFC file. A clean pass is required before considering the RFC draft complete.
