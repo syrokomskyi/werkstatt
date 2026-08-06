@@ -359,17 +359,17 @@ Validates all living specs in `docs/specs/live/`:
 
 ## Acceptance criteria
 
-- [x] `docs/specs/live/` directory created with a README explaining the purpose
-- [x] `spec.live.merge` command registered and functional (semi-automatic with operator confirmation)
-- [x] `spec.live.list` command registered and returns JSON output
-- [x] `spec.live.show` command registered and returns living spec content
-- [x] `spec.live.validate` command registered with V-LS-01..05 rules
-- [x] `docs.archive` integration: step 7 runs `spec.live.merge` for RFCs with `liveSpec` field
-- [x] RFC frontmatter template updated with optional `liveSpec` field
-- [x] `fo-idea-create-rfc` skill suggests `liveSpec` field for feature-level RFCs
-- [x] `spec.live.merge` handles supersession (removes superseded RFC's contributions before adding new)
-- [x] `spec.live.merge` handles initial creation (no existing living spec)
-- [x] `rfc.validate` passes on this file before merging
+- [x] `docs/specs/live/` directory created with a README explaining the purpose (evidence: docs/specs/live/README.md)
+- [x] `spec.live.merge` command registered and functional (semi-automatic with operator confirmation) (evidence: packages/forge/os/spec/live-spec-merge.ts, packages/forge/os/spec/spec.module.ts)
+- [x] `spec.live.list` command registered and returns JSON output (evidence: packages/forge/os/spec/live-spec-list.ts)
+- [x] `spec.live.show` command registered and returns living spec content (evidence: packages/forge/os/spec/live-spec-show.ts)
+- [x] `spec.live.validate` command registered with V-LS-01..05 rules (evidence: packages/forge/os/spec/live-spec-validate.ts)
+- [x] `docs.archive` integration: step 7 runs `spec.live.merge` for RFCs with `liveSpec` field (evidence: packages/forge/os/core/core.module.ts)
+- [x] RFC frontmatter template updated with optional `liveSpec` field (evidence: packages/forge/os/rfc/rfc-0000-template.md)
+- [x] `fo-idea-create-rfc` skill suggests `liveSpec` field for feature-level RFCs (evidence: packages/forge/skills/fo/fo-idea-create-rfc/SKILL.md)
+- [x] `spec.live.merge` handles supersession (removes superseded RFC's contributions before adding new) (evidence: packages/forge/os/spec/live-spec-merge.ts conflict detection)
+- [x] `spec.live.merge` handles initial creation (no existing living spec) (evidence: packages/forge/os/spec/live-spec-merge.ts create path)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0711 exitCode=0)
 
 ## Implementation notes for agents
 
