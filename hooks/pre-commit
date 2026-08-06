@@ -91,6 +91,35 @@ if [ -n "$ENV_EXAMPLE_FILES" ]; then
   fi
 fi
 
+# CSS design token validation (RFC-0718)
+# Fast grep-based check for invalid --ds-* tokens in staged .css files
+CSS_FILES=$(git diff --cached --name-only -- '*.css' || true)
+if [ -n "$CSS_FILES" ]; then
+  TOKENS_FILE="packages/tokens/src/tokens.css"
+  if [ ! -f "$TOKENS_FILE" ]; then
+    echo "WARNING: $TOKENS_FILE not found — skipping CSS token validation" >&2
+  else
+    CSS_ERRORS=""
+    for f in $CSS_FILES; do
+      if [ ! -f "$f" ]; then continue; fi
+      while IFS= read -r token; do
+        [ -z "$token" ] && continue
+        if ! grep -qF "$token" "$TOKENS_FILE"; then
+          CSS_ERRORS="$CSS_ERRORS\n  $f — invalid token: $token"
+        fi
+      done < <(grep -oP 'var\(\s*(--ds-[a-z0-9-]+)' "$f" | sed 's/var(\s*//')
+    done
+    if [ -n "$CSS_ERRORS" ]; then
+      echo "ERROR: Invalid CSS design tokens detected:" >&2
+      echo -e "$CSS_ERRORS" >&2
+      echo "" >&2
+      echo "Only --ds-* tokens from packages/tokens/src/tokens.css are allowed." >&2
+      echo "Fix: replace invalid tokens with valid ones from the token list." >&2
+      exit 1
+    fi
+  fi
+fi
+
 # Command manifest staleness check (RFC-0646)
 # Warn when command-registration files change without manifest regeneration.
 COMMAND_FILES=$(git diff --cached --name-only -- 'packages/forge/os/core/' 'packages/forge/os/*/core.module.ts' 'tools/kernel.config.ts' || true)
