@@ -17,12 +17,10 @@ Manual command — not in any pipeline. Idempotent: re-running on already-migrat
 */
 
 import { readFile, writeFile } from "node:fs/promises";
-import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { parse as parseYaml } from "yaml";
 import { collectMarkdownFiles } from "@warpgogol/site-kernel-content";
 import { scanFormulas } from "@warpgogol/share/formula-eval";
-import type { ContentRefIndex } from "@warpgogol/share/content-reference";
+import { loadContentRefIndex } from "@warpgogol/share/content-reference";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -33,21 +31,18 @@ import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 // Detect patterns like: <ref> + <ref> = <number> or <ref> + <ref> × <number>
 // where <ref> is a braceless content reference (collection.file.field)
 const HARDCODED_FORMULA_PATTERN =
-  /([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\s*[+\-*/]\s*([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+(?:\s*[+\-*/]\s*\d+)*)/g;
+  /([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*)\s*[+\-*/]\s*([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*(?:\s*[+\-*/]\s*\d+)*)/g;
 
 // RFC-0723: detect bare braceless refs in mixed strings
-const BRACELESS_PATTERN = /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_.-]+)\b/g;
+// Field path uses the fixed pattern from @warpgogol/share (no trailing dots)
+const BRACELESS_PATTERN =
+  /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*)\b/g;
 
-function loadIndex(appRoot: string): ContentRefIndex | null {
-  const indexPath = join(appRoot, "src", "content-ref-index.generated.yaml");
-  try {
-    const raw = readFileSync(indexPath, "utf8");
-    const parsed = parseYaml(raw) as ContentRefIndex;
-    if (parsed && parsed.version === 1 && parsed.entries) return parsed;
-    return null;
-  } catch {
-    return null;
-  }
+function findFrontmatterEnd(content: string): number | null {
+  if (!content.startsWith("---\n")) return null;
+  const end = content.indexOf("\n---\n", 4);
+  if (end === -1) return null;
+  return end + 5;
 }
 
 function convertToFormulaSyntax(match: string): string {
@@ -66,7 +61,7 @@ export async function runContentFormulaMigrate(
   const contentDir = join(appRoot, "src", "content");
 
   const files = await collectMarkdownFiles(contentDir);
-  const index = loadIndex(appRoot);
+  const index = loadContentRefIndex(join(appRoot, "src", "content-ref-index.generated.yaml"));
   const knownCollections = index ? new Set(Object.keys(index.entries)) : new Set<string>();
   const conversions: Array<{ file: string; line: number; before: string; after: string }> = [];
 
@@ -85,8 +80,9 @@ export async function runContentFormulaMigrate(
     HARDCODED_FORMULA_PATTERN.lastIndex = 0;
     while ((match = HARDCODED_FORMULA_PATTERN.exec(content)) !== null) {
       const candidate = match[0];
-      const refCount = (candidate.match(/[a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+/g) || [])
-        .length;
+      const refCount = (
+        candidate.match(/[a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*/g) || []
+      ).length;
       if (refCount < 2) continue;
 
       // Skip if this pattern is already inside a =(...) formula
@@ -103,11 +99,16 @@ export async function runContentFormulaMigrate(
     }
 
     // RFC-0723: second scan pass — detect bare braceless refs in mixed strings
+    // Skip YAML frontmatter (between --- delimiters) — =(…) is content syntax, not YAML
+    const fmEnd = findFrontmatterEnd(content);
     BRACELESS_PATTERN.lastIndex = 0;
     while ((match = BRACELESS_PATTERN.exec(content)) !== null) {
       const candidate = match[0];
       const matchStart = match.index;
       const matchEnd = match.index + candidate.length;
+
+      // Skip if inside YAML frontmatter
+      if (fmEnd !== null && matchStart < fmEnd) continue;
 
       // Skip if part of a hardcoded formula pattern (already handled by first pass)
       const inFirstPass = firstPassSpans.some(
