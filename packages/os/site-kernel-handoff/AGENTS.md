@@ -358,6 +358,8 @@ The Nachweis kernel module registers 12 commands for managing evidence records w
 - **Publication gate:** `nachweis.publish` enforces all six gate conditions: `consentGranted`, `sourceIntegrityVerified`, `recordApproved`, `verificationLevelMet`, `publicDerivativeReady`, `legalContentCheckPassed`. RFC-0715: `--pilot-n2-exception` flag is removed; N3 is the only accepted verification level for new publications. N2 grandfathering: existing N2-published records remain valid.
 - **`nachweis.validate` (RFC-0715):** Extended with N3 artifact checks — published N3 records must have `nachweis-signed` and `nachweis-timestamped` Bordbuch entries. Missing entries produce `n3-missing-signature` and `n3-missing-timestamp` violations.
 - **TSA adapter:** `TsaAdapter` interface with `FreeTsaAdapter` implementation targeting `https://freetsa.org/tsr`. Uses `pkijs` + `asn1js` for RFC 3161 DER encoding. No retry logic — caller handles transient failures.
+- **`rfc.implement.stamp` requires inline `(evidence: ...)` on every `[x]` acceptance criterion.** Without it, stamping fails with `RFC-IMP-02` ("checked criteria lack inline (evidence: ...) annotation"). This is V-27 in PREFERENCES.md. Always add evidence annotations before running `rfc.implement.stamp`.
+- **`entitlements.generated.yaml` is read via `JSON.parse`, not a YAML parser.** Despite the `.yaml` extension, the file contains JSON. Tests that write YAML-format entitlements will silently get skip-results (entitlement not resolved). Always write `JSON.stringify({ features: [...] })` in test fixtures. See `nachweis-commands.test.ts:113` and `nachweis-n3.test.ts:114` for the pattern.
 
 ## Test conventions
 
