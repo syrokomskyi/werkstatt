@@ -1,7 +1,7 @@
 ---
 id: RFC-0717
 title: "Remove stale Nachweis surface module blueprint references — Nachweis pages are block-declarative, not surface-generated"
-status: accepted
+status: implemented
 kind: architecture
 scope: app
 owners:
@@ -10,6 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
+implementedAt: 2026-08-06
 enhancedAt: 2026-08-06
 supersedes: []
 supersededBy:
