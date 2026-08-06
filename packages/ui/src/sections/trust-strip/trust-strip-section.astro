@@ -16,7 +16,7 @@
 /* RFC-0103: trust-strip thin dispatcher — optional header + list body. */
 
 import type { SectionProps } from "@warpgogol/share/page";
-import { cast, need } from "@warpgogol/share";
+import { cast, need, resolveSemanticTarget } from "@warpgogol/share";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionList from "@warpgogol/ui/components/section-body/list/section-list.astro";
@@ -27,6 +27,15 @@ const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const props = cast<TrustStripSectionContent>(pageOverride);
 const body = need("body", props.body);
 const headerId = props.header?.heading ? "trust-strip-title" : undefined;
+
+let ctaHref: string | null = null;
+if (props.cta?.target) {
+  if (props.cta.target.startsWith("#")) {
+    ctaHref = props.cta.target;
+  } else {
+    ctaHref = await resolveSemanticTarget({ kind: "internal", pageId: props.cta.target }, lang);
+  }
+}
 ---
 
 <SectionShell
@@ -62,4 +71,11 @@ const headerId = props.header?.heading ? "trust-strip-title" : undefined;
     hideMarkers={body.hideMarkers}
     effects={body.effects}
   />
+  {
+    props.cta && ctaHref && (
+      <a class="trust-strip__cta" href={ctaHref}>
+        {props.cta.label}
+      </a>
+    )
+  }
 </SectionShell>

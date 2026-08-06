@@ -152,4 +152,8 @@ export interface TrustStripSectionContent {
       })[];
     })[];
   };
+  cta?: {
+    label: string;
+    target: string;
+  };
 }

@@ -21,7 +21,15 @@ propsSchema:
   $shape: zod
   compose:
     - section-visual
+    - section-header
     - body-list
+  shape: |
+    z.object({
+      cta: z.object({
+        label: z.string().min(2),
+        target: z.string().min(1),
+      }).optional(),
+    }).strict()
 acceptedCosmicNames:
   - Deimos
 constraints:

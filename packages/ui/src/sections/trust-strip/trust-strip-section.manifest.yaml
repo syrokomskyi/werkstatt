@@ -27,3 +27,17 @@ propsSchema:
   additionalProperties: false
   required:
     - body
+  properties:
+    cta:
+      type: object
+      additionalProperties: false
+      required:
+        - label
+        - target
+      properties:
+        label:
+          type: string
+          minLength: 1
+        target:
+          type: string
+          minLength: 1
