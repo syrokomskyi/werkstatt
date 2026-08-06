@@ -169,17 +169,17 @@ if (!systemId) throw new Error("[leitstand.dev-deploy] --site is required");
 
 ## Acceptance criteria
 
-- [ ] `leitstand.dev-deploy` accepts `--site` flag (required), does not accept `--system`
-- [ ] `leitstand.status` accepts `--site` flag (required), does not accept `--system`
-- [ ] `leitstand.rollback` accepts `--site` flag (required), does not accept `--system`
-- [ ] `leitstand.health` accepts `--site` flag (required), does not accept `--system`
-- [ ] `release.list` accepts `--site` flag (optional), does not accept `--system`
-- [ ] `release.state.validate` accepts `--site` flag (optional), does not accept `--system`
-- [ ] Error messages for missing `--site` are consistent across all commands
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` updated to reflect `--site` as the canonical flag
-- [ ] `docs/COMMANDS.md` updated for all six commands
-- [ ] All unit tests passing `--system` in synthetic input are updated to `--site`
-- [ ] `rfc.validate` passes on this file
+- [x] `leitstand.dev-deploy` accepts `--site` flag (required), does not accept `--system` (evidence: leitstand.module.ts:62, leitstand-commands.ts:595)
+- [x] `leitstand.status` accepts `--site` flag (required), does not accept `--system` (evidence: leitstand.module.ts:131, leitstand-commands.ts:2294)
+- [x] `leitstand.rollback` accepts `--site` flag (required), does not accept `--system` (evidence: leitstand.module.ts:147, leitstand-commands.ts:2382)
+- [x] `leitstand.health` accepts `--site` flag (required), does not accept `--system` (evidence: leitstand.module.ts:164, leitstand-commands.ts:2578)
+- [x] `release.list` accepts `--site` flag (optional), does not accept `--system` (evidence: release.module.ts:84, release-commands.ts:826)
+- [x] `release.state.validate` accepts `--site` flag (optional), does not accept `--system` (evidence: release.module.ts:113, release-commands.ts:946)
+- [x] Error messages for missing `--site` are consistent across all commands (evidence: leitstand-commands.ts:596,2295,2384,2579; release-commands.ts:950)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` updated to reflect `--site` as the canonical flag (evidence: AGENTS.md:47,57)
+- [x] `docs/COMMANDS.md` updated for all six commands (evidence: COMMANDS.md:387,388,391,392,547,551)
+- [x] All unit tests passing `--system` in synthetic input are updated to `--site` (evidence: 8 test files, 698 passing)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id=RFC-0726 exit 0)
 
 ## Implementation notes for agents
 
