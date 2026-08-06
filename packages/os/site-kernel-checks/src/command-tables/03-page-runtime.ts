@@ -26,7 +26,7 @@ export const PAGE_RUNTIME_COMMANDS: CheckCommandEntry[] = [
   {
     name: "page.block.validate",
     description:
-      "Validate block-declarative page content: PageEntrySchema parse, planet-pin cross-ref with system.yaml, propsSchema strict validation, no markdown body (DNA-24, RFC-0026).",
+      "Validate block-declarative page content: PageEntrySchema parse, planet-pin cross-ref with system.yaml, propsSchema strict validation, no markdown body (DNA-24, RFC-0026). B-07: body.kind matches archetype bodyKind (RFC-0719).",
     scope: "app",
     flags: {},
     supportsAllSites: true,
