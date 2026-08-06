@@ -17,6 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0714: initial nachweis.approve command handler.</item>
+  <item>RFC-0715: add N3 gate — verify nachweis-signed and nachweis-timestamped Bordbuch entries exist before approving at N3.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,7 +28,7 @@ import type {
   KernelCommandResult,
   KernelRuntimeContext,
 } from "@warpgogol/site-kernel";
-import { appendBordbuchEntry } from "../bordbuch/bordbuch-io.ts";
+import { appendBordbuchEntry, readBordbuch } from "../bordbuch/bordbuch-io.ts";
 import { acquireLock, releaseLock, generateOperationId } from "../werkstatt/index.ts";
 import {
   isNachweisEntitled,
@@ -111,6 +112,33 @@ export async function runNachweisApprove(
       exitCode: 0,
       summary: `[nachweis.approve] ${systemId}: DRY RUN — would approve '${slug}' (verification: ${verificationLevel}, legal: ${legalContentCheckRaw})`,
     };
+  }
+
+  // RFC-0715: N3 gate — verify signature and timestamp artifacts exist in Bordbuch
+  if (verificationLevel === "N3") {
+    const bordbuchEntries = await readBordbuch(workspaceRoot, systemId);
+    const hasSigned = bordbuchEntries.some(
+      (e) => e.kind === "nachweis-signed" && e.metadata?.slug === slug,
+    );
+    const hasTimestamped = bordbuchEntries.some(
+      (e) => e.kind === "nachweis-timestamped" && e.metadata?.slug === slug,
+    );
+    if (!hasSigned || !hasTimestamped) {
+      const missing: string[] = [];
+      if (!hasSigned) missing.push("nachweis-signed");
+      if (!hasTimestamped) missing.push("nachweis-timestamped");
+      return {
+        data: {
+          slug,
+          systemId,
+          verificationLevel,
+          legalContentCheckPassed,
+          bordbuchEventId: null,
+        },
+        exitCode: 1,
+        summary: `[nachweis.approve] N3_GATE_FAILED: missing ${missing.join(", ")} Bordbuch entries for '${slug}'. Run nachweis.sign and nachweis.timestamp first.`,
+      };
+    }
   }
 
   const operationId = generateOperationId();

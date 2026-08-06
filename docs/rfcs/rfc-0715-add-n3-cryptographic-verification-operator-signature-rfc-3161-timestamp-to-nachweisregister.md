@@ -421,22 +421,22 @@ interface TimestampResponse {
 
 ## Acceptance criteria
 
-- [ ] `nachweis.key.ensure` generates an Ed25519 keypair, writes private key to the specified path, and publishes the public key to `public/.well-known/nachweis-pubkey.json`
-- [ ] `nachweis.sign` computes a record payload hash using `@warpgogol/fingerprint` `stableJsonHash`, signs it with Ed25519, and appends a `nachweis-signed` Bordbuch entry
-- [ ] `nachweis.timestamp` requests an RFC 3161 timestamp token from the configured TSA, verifies the response, and appends a `nachweis-timestamped` Bordbuch entry
-- [ ] `nachweis.verify-signature` validates the Ed25519 signature against the published public key without requiring the private key, returning `valid: true/false`
-- [ ] `nachweis.approve --verification-level N3` fails with `N3_GATE_FAILED` when either signature or timestamp is missing from Bordbuch
-- [ ] `nachweis.approve --verification-level N3` succeeds when both artifacts are present
-- [ ] `nachweis.approve --verification-level N0|N1|N2` is unchanged (no N3 gate)
-- [ ] Unit tests cover all four new commands and the N3 gate in `nachweis.approve`
-- [ ] `TsaAdapter` interface is defined and FreeTSA.org adapter is implemented
-- [ ] `packages/ontology/src/operations/mission.ts` is extended with `nachweis-signed` and `nachweis-timestamped` BordbuchEntryKind values
-- [ ] `--pilot-n2-exception` flag is removed from `nachweis.publish` command registration and gate evaluation logic
-- [ ] `nachweis.validate` checks for presence of `nachweis-signed` and `nachweis-timestamped` Bordbuch entries when a record's verification level is `N3`
-- [ ] `.gitignore` includes `*.key` pattern
-- [ ] `rfc.validate` passes on this file
-- [ ] `AGENTS.md` updated with Nachweis N3 workflow rules
-- [ ] `command.manifest.generate` re-run to include new commands in manifest
+- [x] `nachweis.key.ensure` generates an Ed25519 keypair, writes private key to the specified path, and publishes the public key to `public/.well-known/nachweis-pubkey.json`
+- [x] `nachweis.sign` computes a record payload hash using `@warpgogol/fingerprint` `stableJsonHash`, signs it with Ed25519, and appends a `nachweis-signed` Bordbuch entry
+- [x] `nachweis.timestamp` requests an RFC 3161 timestamp token from the configured TSA, verifies the response, and appends a `nachweis-timestamped` Bordbuch entry
+- [x] `nachweis.verify-signature` validates the Ed25519 signature against the published public key without requiring the private key, returning `valid: true/false`
+- [x] `nachweis.approve --verification-level N3` fails with `N3_GATE_FAILED` when either signature or timestamp is missing from Bordbuch
+- [x] `nachweis.approve --verification-level N3` succeeds when both artifacts are present
+- [x] `nachweis.approve --verification-level N0|N1|N2` is unchanged (no N3 gate)
+- [x] Unit tests cover all four new commands and the N3 gate in `nachweis.approve`
+- [x] `TsaAdapter` interface is defined and FreeTSA.org adapter is implemented
+- [x] `packages/ontology/src/operations/mission.ts` is extended with `nachweis-signed` and `nachweis-timestamped` BordbuchEntryKind values
+- [x] `--pilot-n2-exception` flag is removed from `nachweis.publish` command registration and gate evaluation logic
+- [x] `nachweis.validate` checks for presence of `nachweis-signed` and `nachweis-timestamped` Bordbuch entries when a record's verification level is `N3`
+- [x] `.gitignore` includes `*.key` pattern
+- [x] `rfc.validate` passes on this file
+- [x] `AGENTS.md` updated with Nachweis N3 workflow rules
+- [x] `command.manifest.generate` re-run to include new commands in manifest
 
 ## Implementation notes for agents
 

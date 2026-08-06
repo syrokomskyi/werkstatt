@@ -303,3 +303,4 @@ missions/*/.dev-deploy-build-cache.json
 nachweis-signing.key
 nachweis-signing.key.pub
 *.nachweis-key
+*.key
