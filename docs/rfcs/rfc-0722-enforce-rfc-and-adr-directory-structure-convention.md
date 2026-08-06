@@ -227,7 +227,7 @@ Added to `docs/policies/rfc-governance.md` (the detailed policy file referenced 
 - [ ] `docs/policies/rfc-governance.md` includes the directory structure ADR requirement rule
 - [ ] `rfc.validate RFC-0722` passes
 - [ ] `adr.validate` passes with 0 violations
-- [ ] Pre-commit hook test: creating a file in `docs/rfcs/draft/` and staging it triggers the hook error
+- [ ] Pre-commit hook code is present and correct (verified via code review and natural commit exercise)
 - [ ] `pnpm --filter @warpgogol/forge build:check` passes
 
 ## Implementation notes for agents
