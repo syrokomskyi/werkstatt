@@ -363,7 +363,7 @@ async function generateFullBoilerplate(
 async function syncCacheClone(
   workspaceRoot: string,
   systemId: string,
-  logger: { info: (msg: string) => void },
+  logger: { info: (msg: string) => void; warn: (msg: string) => void },
 ): Promise<void> {
   const registry = await readRegistry(workspaceRoot);
   const entry = findEntry(registry, systemId);
@@ -386,6 +386,17 @@ async function syncCacheClone(
     // Cache clone exists — fetch and reset to origin/main
     logger.info(`  Fetching latest from ${bareRepoPath}…`);
     try {
+      // ADR-0031: warn on uncommitted changes before hard reset
+      const status = execSync("git status --porcelain", {
+        cwd: cachePath,
+        encoding: "utf-8",
+        timeout: 10_000,
+      }).trim();
+      if (status) {
+        logger.warn(
+          `  ⚠ Cache clone has uncommitted changes — they will be lost on reset. Push to bare repo before materializing.`,
+        );
+      }
       execSync("git fetch origin", { cwd: cachePath, stdio: "pipe", timeout: 30_000 });
       const branch = execSync("git rev-parse --abbrev-ref HEAD", {
         cwd: cachePath,
