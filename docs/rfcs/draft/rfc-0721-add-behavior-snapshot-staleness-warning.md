@@ -1,7 +1,7 @@
 ---
 id: RFC-0721
 title: "Add behavior snapshot staleness warning to build.prepare for route changes"
-status: draft
+status: accepted
 kind: command
 scope: workspace
 owners:
