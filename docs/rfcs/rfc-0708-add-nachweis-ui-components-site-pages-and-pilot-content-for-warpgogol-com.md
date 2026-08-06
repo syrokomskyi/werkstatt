@@ -1,12 +1,13 @@
 ---
 id: RFC-0708
 title: "Add Nachweis UI components, site pages, and pilot content for warpgogol-com"
-status: draft
+status: accepted
 kind: architecture
 scope: app
 owners:
-  - architecture
-reviewers: []
+ - architecture
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 implementedAt:
