@@ -1,7 +1,7 @@
 ---
 id: RFC-0707
 title: "Add Nachweis kernel module with R2 storage and Bordbuch lifecycle"
-status: accepted
+status: implemented
 kind: command
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
-implementedAt:
+implementedAt: 2026-08-06
 closedAt:
 supersedes: []
 supersededBy:
@@ -362,20 +362,20 @@ All commands return `KernelCommandResult<T>` with `--json` support:
 
 ## Acceptance criteria
 
-- [ ] `nachweis.module.ts` registers all 6 commands with correct names, scopes, and flags
-- [ ] `nachweis.ingest` computes SHA-256 via `@warpgogol/fingerprint`, uploads to R2, appends Bordbuch entry
-- [ ] `nachweis.validate` checks publication gate conditions and reports violations
-- [ ] `nachweis.manifest.generate` writes `manifest.json` with only `publication.visibility: public` records
-- [ ] `nachweis.consent.update` updates PBP Consent entity and appends `nachweis-consent` Bordbuch entry
-- [ ] `nachweis.publish` enforces all gate conditions before transitioning to published
-- [ ] `nachweis.withdraw` sets revoked/withdrawn status and regenerates manifest
-- [ ] All commands skip silently when `nachweis` entitlement is not resolved
-- [ ] `nachweis.manifest.generate` integrated into `build.prepare` pipeline
-- [ ] `nachweis.validate` integrated into `build.check` pipeline
-- [ ] `generatedAt` in manifest is `null` (RFC-0602 timestamp determinism)
-- [ ] All commands support `--json` output
-- [ ] All affected packages pass `build:check` (typecheck)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `nachweis.module.ts` registers all 6 commands with correct names, scopes, and flags (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis.module.ts:25-149)
+- [x] `nachweis.ingest` computes SHA-256 via `@warpgogol/fingerprint`, uploads to R2, appends Bordbuch entry (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-ingest.ts:88-190)
+- [x] `nachweis.validate` checks publication gate conditions and reports violations (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-validate.ts:145-270)
+- [x] `nachweis.manifest.generate` writes `manifest.json` with only `publication.visibility: public` records (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-manifest.ts:80-135)
+- [x] `nachweis.consent.update` updates PBP Consent entity and appends `nachweis-consent` Bordbuch entry (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-consent.ts:71-130)
+- [x] `nachweis.publish` enforces all gate conditions before transitioning to published (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-publish.ts:98-155)
+- [x] `nachweis.withdraw` sets revoked/withdrawn status and regenerates manifest (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-withdraw.ts:76-145)
+- [x] All commands skip silently when `nachweis` entitlement is not resolved (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-io.ts:172-179, tests: src/tests/nachweis-commands.test.ts)
+- [x] `nachweis.manifest.generate` integrated into `build.prepare` pipeline (evidence: packages/os/site-kernel-checks/src/pipelines/build-prepare.ts:130-131)
+- [x] `nachweis.validate` integrated into `build.check` pipeline (evidence: packages/os/site-kernel-checks/src/pipelines/build-check.ts:23-24)
+- [x] `generatedAt` in manifest is `null` (RFC-0602 timestamp determinism) (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-manifest.ts:127)
+- [x] All commands support `--json` output (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis.module.ts:51,68,85,105,124,143)
+- [x] All affected packages pass `build:check` (typecheck) (evidence: pnpm --filter @warpgogol/site-kernel-handoff build:check exit 0)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate exit 0)
 
 ## Implementation notes for agents
 
