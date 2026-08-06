@@ -1,6 +1,6 @@
 schemaVersion: 1.0.0
 generatedAt: null
-totalCount: 77
+totalCount: 81
 entries:
   - id: brand-label-component
     uniName: brand-label-component
@@ -205,6 +205,66 @@ entries:
     siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/media/media.manifest.yaml
     astroFile: packages/ui/src/components/media/media.astro
+  - id: nachweis-card-component
+    uniName: nachweis-card-component
+    layer: component
+    role: section-body
+    semanticId: nachweis-card
+    version: 1.0.0
+    intent:
+      - verify
+    industryFit:
+      - non-profit
+    contentSchemaKey: null
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/components/nachweis-card/nachweis-card-component.manifest.yaml
+    astroFile: packages/ui/src/components/nachweis-card/nachweis-card-component.astro
+  - id: nachweis-detail-component
+    uniName: nachweis-detail-component
+    layer: component
+    role: section-body
+    semanticId: nachweis-detail
+    version: 1.0.0
+    intent:
+      - verify
+    industryFit:
+      - non-profit
+    contentSchemaKey: null
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/components/nachweis-detail/nachweis-detail-component.manifest.yaml
+    astroFile: packages/ui/src/components/nachweis-detail/nachweis-detail-component.astro
+  - id: nachweis-list-component
+    uniName: nachweis-list-component
+    layer: component
+    role: section-body
+    semanticId: nachweis-list
+    version: 1.0.0
+    intent:
+      - verify
+    industryFit:
+      - non-profit
+    contentSchemaKey: null
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/components/nachweis-list/nachweis-list-component.manifest.yaml
+    astroFile: packages/ui/src/components/nachweis-list/nachweis-list-component.astro
+  - id: nachweis-verify-component
+    uniName: nachweis-verify-component
+    layer: component
+    role: section-body
+    semanticId: nachweis-verify
+    version: 1.0.0
+    intent:
+      - verify
+    industryFit:
+      - non-profit
+    contentSchemaKey: null
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/components/nachweis-verify/nachweis-verify-component.manifest.yaml
+    astroFile: packages/ui/src/components/nachweis-verify/nachweis-verify-component.astro
   - id: not-found-component
     uniName: not-found-component
     layer: component
