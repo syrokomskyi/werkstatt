@@ -12,7 +12,7 @@
   <item>RFC-0574: resolveBordbuchPath uses resolveCachePath (mirrors[0].path) instead of hardcoded systems/<id>/.</item>
   <item>RFC-0580: extract gitExec into shared werkstatt/git-exec.ts with allowNonZero option.</item>
   <item>RFC-0583: export computeEntryHash for reuse by bordbuch.repair.</item>
-  <item>RFC-0706: add nachweis writer-role for nachweis-record and nachweis-consent kinds.</item>
+  <item>RFC-0706: add nachweis writer-role for nachweis-record and nachweis-consent kinds (ADR-0028).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -47,7 +47,7 @@ const WRITER_ROLE_KINDS: Record<string, BordbuchEntryKind[]> = {
   notausgang: ["notausgang-export"],
   operator: ["operator-note", "erratum"],
   runtime: ["pseo", "indexnow.submit"],
-  // RFC-0706: Nachweisregister trust lifecycle
+  // RFC-0706 / ADR-0028: Nachweisregister trust lifecycle
   nachweis: ["nachweis-record", "nachweis-consent"],
 };
 

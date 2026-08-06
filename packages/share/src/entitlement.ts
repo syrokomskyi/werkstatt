@@ -32,7 +32,7 @@ export const ENTITLED_FEATURES = [
   "automation",
   // RFC-0288: Agent Surface action tier (AI-agent-invocable capabilities)
   "agent.actions",
-  // RFC-0706: Nachweisregister commercial module
+  // RFC-0706 / ADR-0028: Nachweisregister commercial module
   "nachweis",
 ] as const;
 

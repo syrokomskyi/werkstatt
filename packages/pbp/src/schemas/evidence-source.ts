@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Zod schema for PbpEvidenceSource entity (RFC-0416, RFC-0466, RFC-0706).</purpose>
+<purpose>Zod schema for PbpEvidenceSource entity (RFC-0416, RFC-0466, RFC-0706, ADR-0028).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0466 — Zod schema for PbpEvidenceSource.</item>

@@ -4,6 +4,7 @@
  * @see pbp-specification-package/entity-model §25 (EvidenceSource)
  * @see RFC-0416
  * @see RFC-0706 (Nachweisregister evidence kind + items extensions)
+ * @see ADR-0028 (Nachweisregister as PBP trust-layer extension)
  */
 
 import type { PbpEntity } from "../envelope.js";

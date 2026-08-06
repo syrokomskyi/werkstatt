@@ -1,6 +1,6 @@
 /*
 <MODULE_CONTRACT>
-<purpose>PBP Consent entity for granular consent management (RFC-0706, Nachweisregister).</purpose>
+<purpose>PBP Consent entity for granular consent management (RFC-0706, ADR-0028, Nachweisregister).</purpose>
 <non-goals>
   <item>Does not define consent lifecycle commands — those belong to RFC-0707.</item>
   <item>Does not define R2 storage integration — that belongs to RFC-0707.</item>

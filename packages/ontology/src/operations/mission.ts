@@ -12,7 +12,7 @@
   <item>RFC-0479: add mission-migrate kind for migration step bordbuch entries.</item>
   <item>RFC-0480: add rfcId to mission manifest for C-surface regression check traceability.</item>
   <item>RFC-0517: add preflight-skipped kind for preflight gate bypass audit trail.</item>
-  <item>RFC-0706: add nachweis-record and nachweis-consent kinds for Nachweisregister trust lifecycle.</item>
+  <item>RFC-0706: add nachweis-record and nachweis-consent kinds for Nachweisregister trust lifecycle (ADR-0028).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -59,7 +59,7 @@ export const bordbuchEntryKindSchema = z.enum([
   "indexnow.submit",
   "mission-migrate",
   "preflight-skipped",
-  // RFC-0706: Nachweisregister trust lifecycle
+  // RFC-0706 / ADR-0028: Nachweisregister trust lifecycle
   "nachweis-record",
   "nachweis-consent",
 ]);
