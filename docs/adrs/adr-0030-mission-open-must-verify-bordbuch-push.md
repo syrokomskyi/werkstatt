@@ -1,12 +1,12 @@
 ---
 id: ADR-0030
 title: "mission.open must verify commitAndPushBordbuch succeeded"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
-implementedAt:
+implementedAt: 2026-08-06
 closedAt:
 supersedes: []
 supersededBy:
