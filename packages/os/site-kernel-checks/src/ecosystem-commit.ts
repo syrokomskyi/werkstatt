@@ -40,6 +40,7 @@ const PACKAGE_JSON_PATH = "package.json";
 export interface EcosystemCommitInput {
   message: string;
   rfc?: string;
+  bump?: string;
   dryRun?: boolean;
   amend?: boolean;
   json?: boolean;
@@ -375,7 +376,9 @@ export async function runEcosystemCommit(
   }
 
   // Validate --bump override if provided
-  if (bumpOverride && !["patch", "minor", "major"].includes(bumpOverride)) {
+  const validBumpValues = ["patch", "minor", "major"];
+  const hasValidBumpOverride = bumpOverride !== undefined && validBumpValues.includes(bumpOverride);
+  if (bumpOverride && !hasValidBumpOverride) {
     violations.push({
       code: "EC-10",
       message: `Invalid --bump value "${bumpOverride}". Must be one of: patch, minor, major.`,
@@ -388,7 +391,7 @@ export async function runEcosystemCommit(
   let resolvedRfcId: string | null = null;
 
   // --bump flag takes precedence over RFC versionBump
-  if (bumpOverride && ["patch", "minor", "major"].includes(bumpOverride)) {
+  if (hasValidBumpOverride) {
     bumpType = bumpOverride as "patch" | "minor" | "major";
   }
 
@@ -421,7 +424,7 @@ export async function runEcosystemCommit(
       });
     } else if (versionBump === "minor" || versionBump === "major") {
       // --bump override takes precedence over RFC versionBump
-      if (!bumpOverride) {
+      if (!hasValidBumpOverride) {
         bumpType = versionBump;
       }
     }

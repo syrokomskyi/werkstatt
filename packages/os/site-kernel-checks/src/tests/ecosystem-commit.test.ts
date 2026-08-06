@@ -288,6 +288,53 @@ versionBump: minor
     }
   });
 
+  it("EC-05: blocks when archived RFC has no versionBump", async () => {
+    const root = await setupWorkspace();
+    try {
+      await mkdir(join(root, "docs", "rfcs", "archive", "implemented"), { recursive: true });
+      const content = `---
+id: RFC-9006
+title: "Archived RFC without versionBump"
+status: implemented
+---
+
+# RFC-9006
+`;
+      await writeFile(
+        join(root, "docs", "rfcs", "archive", "implemented", "rfc-9006-test.md"),
+        content,
+        "utf8",
+      );
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9006", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(1);
+      const codes = result.data?.violations?.map((v) => v.code) ?? [];
+      expect(codes).toContain("EC-05");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("--bump override does not bypass EC-06 when RFC has versionBump: none", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9007", "none");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9007", bump: "minor", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(1);
+      const codes = result.data?.violations?.map((v) => v.code) ?? [];
+      expect(codes).toContain("EC-06");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it("--dry-run returns forecast without committing", async () => {
     const root = await setupWorkspace();
     try {
