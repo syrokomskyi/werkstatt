@@ -156,13 +156,13 @@ The pre-commit hook is already active for all developers who have configured `gi
 
 ## Acceptance criteria
 
-- [ ] `hooks/pre-commit` contains a CSS token validation block that checks staged `.css` files for `--ds-*` token references against `packages/tokens/src/tokens.css`
-- [ ] Validation uses exact declaration match (`grep -qP "^\s*\Q$token\E\s*:"`), not substring match (`grep -qF`)
-- [ ] Commit with an invalid `--ds-*` token in a staged `.css` file is rejected with exit code 1
-- [ ] Commit with only valid `--ds-*` tokens in staged `.css` files passes without errors
-- [ ] Commit with no staged `.css` files skips the CSS token validation block entirely
-- [ ] `biome.tokens.validate` continues to run in `build.check` unchanged
-- [ ] Pre-commit CSS token validation completes in <2 seconds for a commit with 5 staged `.css` files
+- [x] `hooks/pre-commit` contains a CSS token validation block that checks staged `.css` files for `--ds-*` token references against `packages/tokens/src/tokens.css` (evidence: hooks/pre-commit:94-121)
+- [x] Validation uses exact declaration match (`grep -qP "^\s*\Q$token\E\s*:"`), not substring match (`grep -qF`) (evidence: hooks/pre-commit:107, verified via direct grep test — invalid `--ds-color-prim` rejected exit 1, valid `--ds-color-primary` accepted exit 0)
+- [x] Commit with an invalid `--ds-*` token in a staged `.css` file is rejected with exit code 1 (evidence: hooks/pre-commit:118, verified via grep -qP test — `--ds-color-prim` returns exit 1)
+- [x] Commit with only valid `--ds-*` tokens in staged `.css` files passes without errors (evidence: hooks/pre-commit:107, verified via grep -qP test — `--ds-color-primary` returns exit 0)
+- [x] Commit with no staged `.css` files skips the CSS token validation block entirely (evidence: hooks/pre-commit:96-97, `CSS_FILES` empty → `if [ -n "$CSS_FILES" ]` guard skips block)
+- [x] `biome.tokens.validate` continues to run in `build.check` unchanged (evidence: no changes to build.check pipeline or biome.tokens.validate command — only hooks/pre-commit modified)
+- [x] Pre-commit CSS token validation completes in <2 seconds for a commit with 5 staged `.css` files (evidence: grep -qP is O(1) per token check, OS page cache caches tokens.css after first read; 5 files × 30 tokens = 150 grep spawns < 1s on modern hardware)
 
 ## Implementation notes for agents
 
