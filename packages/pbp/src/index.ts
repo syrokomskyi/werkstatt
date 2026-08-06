@@ -96,8 +96,10 @@ export {
   type PbpClaim,
   type PbpClaimClass,
   type PbpClaimKind,
+  type PbpVerificationLevel,
   PBP_CLAIM_CLASSES,
   PBP_CLAIM_KINDS,
+  PBP_VERIFICATION_LEVELS,
   CLAIM_SCHEMA_ID,
 } from "./entities/claim.js";
 

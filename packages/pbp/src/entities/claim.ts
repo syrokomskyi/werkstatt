@@ -4,6 +4,7 @@
  * @see pbp-specification-package/entity-model §24 (Claim)
  * @see RFC-0405
  * @see RFC-0706 (statementLang extension)
+ * @see ADR-0028 (verificationLevel extension)
  */
 
 import type { PbpEntity, PbpGovernance } from "../envelope.js";
@@ -41,6 +42,16 @@ export const PBP_CLAIM_KINDS: readonly PbpClaimKind[] = [
   "recommendation",
 ] as const;
 
+// ADR-0028: Nachweisregister verification levels (N0–N3)
+export type PbpVerificationLevel = "N0" | "N1" | "N2" | "N3";
+
+export const PBP_VERIFICATION_LEVELS: readonly PbpVerificationLevel[] = [
+  "N0",
+  "N1",
+  "N2",
+  "N3",
+] as const;
+
 export interface PbpClaim extends PbpEntity {
   type: "claim";
   claimClass: PbpClaimClass;
@@ -59,4 +70,5 @@ export interface PbpClaim extends PbpEntity {
   };
   confidence?: "high" | "medium" | "low";
   statementLang?: string;
+  verificationLevel?: PbpVerificationLevel;
 }
