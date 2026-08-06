@@ -1,7 +1,7 @@
 ---
 id: RFC-0715
 title: "Add N3 cryptographic verification (operator signature + RFC 3161 timestamp) to Nachweisregister"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
-implementedAt:
+implementedAt: 2026-08-06
 closedAt:
 supersedes: []
 supersededBy:
