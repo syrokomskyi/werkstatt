@@ -177,13 +177,13 @@ const config = resolveR2ConfigFromEnv(NACHWEIS_BUCKET, "R2_NACHWEIS");
 
 ## Acceptance criteria
 
-- [ ] `resolveR2ConfigFromEnv` accepts optional `envPrefix` parameter (evidence: `packages/os/site-kernel-handoff/src/evidence/r2-client.ts`)
-- [ ] `nachweis-io.ts` passes `"R2_NACHWEIS"` prefix to `resolveR2ConfigFromEnv` (evidence: `packages/os/site-kernel-handoff/src/nachweis/nachweis-io.ts`)
-- [ ] `evidence.sync` continues using unprefixed `R2_*` vars — no behavioral change (evidence: `packages/os/site-kernel-handoff/src/evidence/r2-client.ts`)
-- [ ] `.env.example` includes `R2_NACHWEIS_*` placeholders with "How to obtain" comments (evidence: `missions/*/workpiece/.env.example` or `.env.example` template)
-- [ ] `MissingEnvError` for nachweis reports `R2_NACHWEIS_ACCOUNT_ID` (not `R2_ACCOUNT_ID`) when vars absent (evidence: unit test)
-- [ ] `AGENTS.md` updated to document per-bucket R2 token scoping (evidence: `packages/os/site-kernel-handoff/AGENTS.md`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `resolveR2ConfigFromEnv` accepts optional `envPrefix` parameter (evidence: `packages/os/site-kernel-handoff/src/evidence/r2-client.ts:67-70`, `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run src/tests/r2-client-env-prefix.test.ts`)
+- [x] `nachweis-io.ts` passes `"R2_NACHWEIS"` prefix to `resolveR2ConfigFromEnv` (evidence: `packages/os/site-kernel-handoff/src/nachweis/nachweis-io.ts:138`)
+- [x] `evidence.sync` continues using unprefixed `R2_*` vars — no behavioral change (evidence: `packages/os/site-kernel-handoff/src/evidence/r2-client.ts:71`, default prefix `R2_` when `envPrefix` omitted, backward compat test passes)
+- [x] `.env.example` includes `R2_NACHWEIS_*` placeholders with "How to obtain" comments (evidence: `.env.example:43-53`)
+- [x] `MissingEnvError` for nachweis reports `R2_NACHWEIS_ACCOUNT_ID` (not `R2_ACCOUNT_ID`) when vars absent (evidence: `packages/os/site-kernel-handoff/src/tests/r2-client-env-prefix.test.ts:46-53`, `pnpm --filter @warpgogol/site-kernel-handoff exec vitest run src/tests/r2-client-env-prefix.test.ts`)
+- [x] `AGENTS.md` updated to document per-bucket R2 token scoping (evidence: `packages/os/site-kernel-handoff/AGENTS.md:34`)
+- [x] `rfc.validate` passes on this file before merging (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0713 --json`, exit code 0)
 
 ## Implementation notes for agents
 
