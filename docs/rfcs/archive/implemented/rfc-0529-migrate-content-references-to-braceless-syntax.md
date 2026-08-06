@@ -18,7 +18,8 @@ supersededBy: null
 amends:
 - RFC-0045
 - RFC-0138
-amendedBy: []
+amendedBy:
+  - RFC-0723
 related:
 - RFC-0527
 - RFC-0045
