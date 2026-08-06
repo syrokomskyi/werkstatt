@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
+enhancedAt: 2026-08-06
 implementedAt:
 closedAt:
 supersedes: []
@@ -47,10 +48,16 @@ commands:
 appsImpacted: []
 # List only packages actually impacted. Leave empty if unknown.
 packagesImpacted:
-  - packages/forge
-  - packages/os/site-kernel-checks
-successSignals: []
-nonGoals: []
+  - "@warpgogol/forge"
+successSignals:
+  - "Pre-commit hook blocks commit staging a file in docs/rfcs/draft/test.md"
+  - "rfc.validate emits RFC-DIR-01 warning for a file in an unsanctioned subdirectory"
+  - "adr.validate emits ADR-DIR-01 warning for a file in an unsanctioned subdirectory"
+  - "Existing non-RFC files at docs/rfcs/ root (index.yaml, dna-trace.generated.yaml) are not blocked by pre-commit hook"
+nonGoals:
+  - "Adding new OS commands — this RFC extends existing rfc.validate and adr.validate with warning rules only"
+  - "Changing rfc.create or adr.create behavior — these already write to the correct root location"
+  - "Moving misplaced plan-rfc-0665.md from docs/rfcs/ to docs/plans/ — that is a pre-existing anomaly unrelated to this RFC"
 # RFC-0268: OPTIONAL machine-checkable acceptance probes, executed on-demand
 # via `pnpm exec site-kernel run rfc.acceptance.run --id <this-rfc-id>` (never
 # automatically inside build pipelines). Closed probe vocabulary — see
@@ -129,15 +136,15 @@ if [ -n "$RFC_STAGED" ]; then
   for f in $RFC_STAGED; do
     # Extract the subdirectory path after docs/rfcs/ or docs/adrs/
     case "$f" in
-      docs/rfcs/archive/*|docs/rfcs/verification/*|docs/rfcs/rfc-*.md|docs/rfcs/rfc-0000-template.md)
-        ;; # allowed
-      docs/adrs/archive/*|docs/adrs/adr-*.md|docs/adrs/adr-0000-template.md)
-        ;; # allowed
-      docs/rfcs/*)
-        DIR_ERRORS="$DIR_ERRORS\n  $f — unauthorized path under docs/rfcs/ (only archive/ and verification/ subdirectories are allowed)"
+      docs/rfcs/archive/*|docs/rfcs/verification/*)
+        ;; # allowed subdirectories under docs/rfcs/
+      docs/rfcs/*/*)
+        DIR_ERRORS="$DIR_ERRORS\n  $f — unauthorized subdirectory under docs/rfcs/ (only archive/ and verification/ are allowed)"
         ;;
-      docs/adrs/*)
-        DIR_ERRORS="$DIR_ERRORS\n  $f — unauthorized path under docs/adrs/ (only archive/ subdirectory is allowed)"
+      docs/adrs/archive/*)
+        ;; # allowed subdirectory under docs/adrs/
+      docs/adrs/*/*)
+        DIR_ERRORS="$DIR_ERRORS\n  $f — unauthorized subdirectory under docs/adrs/ (only archive/ is allowed)"
         ;;
     esac
   done
@@ -158,15 +165,17 @@ fi
 
 - Severity: warning
 - Scans all files returned by `listRfcFiles`. For each file whose relative path contains a subdirectory other than `archive/` or `verification/`, emits a warning: `RFC-DIR-01: <file> is in an unsanctioned subdirectory. Only archive/ and verification/ are allowed. Move the file to docs/rfcs/ root or write an ADR to formalize the subdirectory.`
+- JSON output shape (consistent with existing warning rules in `rfc.validate --json`): `{ "rfcId": "<id>", "file": "<path>", "rule": "RFC-DIR-01", "message": "<warning text>", "severity": "warning" }`
 
 **ADR-DIR-01** (in `packages/forge/os/adr/handlers/validate.ts`):
 
 - Severity: warning
 - Same logic for `docs/adrs/` — only `archive/` is sanctioned (ADRs have no `verification/` equivalent).
+- JSON output shape: `{ "adrId": "<id>", "file": "<path>", "rule": "ADR-DIR-01", "message": "<warning text>", "severity": "warning" }`
 
 ### AGENTS.md rule
 
-Added to `docs/policies/rfc-governance.md`:
+Added to `docs/policies/rfc-governance.md` (the detailed policy file referenced by root `AGENTS.md`). Root `AGENTS.md` does not require a separate update — it delegates RFC governance details to `docs/policies/rfc-governance.md`.
 
 > Folder structure changes under `docs/rfcs/` and `docs/adrs/` require an accepted ADR. Agents MUST NOT create new subdirectories in these paths without an accepted ADR defining the convention, the creation command behavior, and the archive flow. The only sanctioned subdirectories are `archive/` (RFC-0367) and `verification/` (generated JSON, not RFC files).
 
@@ -178,7 +187,6 @@ Added to `docs/policies/rfc-governance.md`:
 | `packages/forge/os/rfc/handlers/validate-rules.ts` | RFC-DIR-01 validation rule |
 | `packages/forge/os/adr/handlers/validate.ts` | ADR-DIR-01 validation rule |
 | `docs/policies/rfc-governance.md` | AGENTS.md governance rule |
-| `docs/rfcs/draft/` | Removed — files moved to `docs/rfcs/` root |
 
 ### Failure modes
 
@@ -188,11 +196,11 @@ Added to `docs/policies/rfc-governance.md`:
 
 ## Rollout
 
-1. **Move draft RFCs.** Move the 5 files from `docs/rfcs/draft/` to `docs/rfcs/` root. Delete the empty `draft/` directory.
-2. **Add pre-commit hook.** Add the directory structure guard to `hooks/pre-commit`.
+1. **Draft RFCs already relocated.** The ad-hoc `docs/rfcs/draft/` directory no longer exists — files were already moved to `docs/rfcs/` root in a prior session. No action needed. A pre-implementation scan confirms only `archive/` and `verification/` subdirectories exist under `docs/rfcs/`, and only `archive/` under `docs/adrs/`.
+2. **Add pre-commit hook.** Add the directory structure guard to `hooks/pre-commit`. The guard checks for files in unauthorized _subdirectories_ (paths matching `docs/rfcs/*/*` or `docs/adrs/*/*` except sanctioned ones). Files at the root level (`docs/rfcs/*.md`, `docs/rfcs/index.yaml`, etc.) are always allowed.
 3. **Add validation rules.** Add RFC-DIR-01 to `rfc.validate` and ADR-DIR-01 to `adr.validate` as warning-severity rules.
-4. **Add governance rule.** Add the AGENTS.md instruction to `docs/policies/rfc-governance.md`.
-5. **No flag day.** The pre-commit hook is active immediately. Existing files in unsanctioned locations (none after step 1) would trigger warnings in `rfc.validate` / `adr.validate` but not block other validation.
+4. **Add governance rule.** Add the instruction to `docs/policies/rfc-governance.md`.
+5. **No flag day.** The pre-commit hook is active immediately. Existing files in unsanctioned locations (none found during scan) would trigger warnings in `rfc.validate` / `adr.validate` but not block other validation.
 
 ## Alternatives considered
 
@@ -205,12 +213,13 @@ Added to `docs/policies/rfc-governance.md`:
 ## Risks
 
 - **Pre-commit hook bypass via `--no-verify`.** Operators can bypass the hook with `git commit --no-verify`. This is an accepted risk — the validation rules in `rfc.validate` / `adr.validate` provide a second layer of detection.
-- **False positives for generated files.** The `verification/` subdirectory contains `.generated.yaml` files, not `.md` RFC files. The pre-commit hook pattern matches `docs/rfcs/verification/*` as allowed. The validation rules check only `.md` files returned by `listRfcFiles` / `listAdrFiles`, which already exclude non-matching filenames.
+- **False positives for generated files.** The `verification/` subdirectory contains `.generated.yaml` files, not `.md` RFC files. The pre-commit hook pattern matches `docs/rfcs/verification/*` as allowed. The validation rules check only `.md` files returned by `listRfcFiles` / `listAdrFiles`, which already exclude non-matching filenames. Non-RFC files at the root of `docs/rfcs/` (e.g. `index.yaml`, `dna-trace.generated.yaml`) are not blocked by the pre-commit hook — the guard checks only for unauthorized _subdirectories_, not root-level file types.
 - **Maintenance burden.** The allowed subdirectory list is hardcoded in two places (pre-commit hook and validation rules). If a new subdirectory is sanctioned via ADR, both must be updated. This is acceptable — ADRs are rare and the update is trivial.
+- **Agent misinterpretation.** Agents might confuse the pre-commit hook (hard fail) with validation rules (warning). The implementation notes clarify the distinction: pre-commit is hard enforcement at commit time, validation is soft detection at any time.
 
 ## Acceptance criteria
 
-- [ ] `docs/rfcs/draft/` directory is removed; all 5 files (rfc-0717..0721) moved to `docs/rfcs/` root
+- [ ] `docs/rfcs/draft/` directory does not exist (confirmed: already removed in a prior session)
 - [ ] Pre-commit hook in `hooks/pre-commit` blocks commits staging files in unauthorized subdirectories under `docs/rfcs/` and `docs/adrs/`
 - [ ] RFC-DIR-01 warning rule is implemented in `packages/forge/os/rfc/handlers/validate-rules.ts`
 - [ ] ADR-DIR-01 warning rule is implemented in `packages/forge/os/adr/handlers/validate.ts`
