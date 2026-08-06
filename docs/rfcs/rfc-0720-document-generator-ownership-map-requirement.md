@@ -140,11 +140,11 @@ Add a brief note in the rules section:
 
 ## Acceptance criteria
 
-- [ ] `packages/os/site-kernel-checks/AGENTS.md` includes a section about `GENERATOR_OWNERSHIP_MAP` requirement
-- [ ] `packages/os/site-kernel-handoff/AGENTS.md` includes a cross-reference note pointing to the ownership map requirement
-- [ ] The AGENTS.md example includes `markerPolicy: "registry-only"` for `public/**` files
-- [ ] The AGENTS.md example mentions `conditional: true` semantics
-- [ ] `rfc.validate` passes on this RFC with zero errors
+- [x] `packages/os/site-kernel-checks/AGENTS.md` includes a section about `GENERATOR_OWNERSHIP_MAP` requirement (evidence: `packages/os/site-kernel-checks/AGENTS.md:201-216`, commit d726168)
+- [x] `packages/os/site-kernel-handoff/AGENTS.md` includes a cross-reference note pointing to the ownership map requirement (evidence: `packages/os/site-kernel-handoff/AGENTS.md:39`, commit d726168)
+- [x] The AGENTS.md example includes `markerPolicy: "registry-only"` for `public/**` files (evidence: `packages/os/site-kernel-checks/AGENTS.md:212`)
+- [x] The AGENTS.md example mentions `conditional: true` semantics (evidence: `packages/os/site-kernel-checks/AGENTS.md:216`)
+- [x] `rfc.validate` passes on this RFC with zero errors (evidence: `rfc.validate --id RFC-0720 --json` exitCode 0, zero violations)
 
 ## Implementation notes for agents
 
