@@ -53,6 +53,33 @@ nonGoals:
   - "Does not apply to ADRs — ADRs are local decisions, not feature-level specifications"
   - "Does not auto-generate living specs for past RFCs — initial population is manual or on-demand"
   - "Does not introduce a new file format — living specs are markdown with YAML frontmatter"
+acceptance:
+  - probe: command-registered
+    name: "spec.live.merge"
+  - probe: command-registered
+    name: "spec.live.list"
+  - probe: command-registered
+    name: "spec.live.show"
+  - probe: command-registered
+    name: "spec.live.validate"
+  - probe: run
+    command: "site-kernel run spec.live.list --json"
+    expect:
+      exitCode: 0
+  - probe: run
+    command: "site-kernel run spec.live.validate --json"
+    expect:
+      exitCode: 0
+  - probe: run
+    command: "site-kernel run rfc.validate --id RFC-0711 --json"
+    expect:
+      exitCode: 0
+  - probe: file-contains
+    path: "packages/forge/os/rfc/types.ts"
+    pattern: "liveSpec"
+  - probe: file-contains
+    path: "packages/forge/os/core/core.module.ts"
+    pattern: "spec.live.merge"
 ---
 
 # RFC-0711: Add living feature specs with delta-merge from archived RFCs
