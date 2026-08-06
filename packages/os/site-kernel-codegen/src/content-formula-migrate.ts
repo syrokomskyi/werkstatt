@@ -1,7 +1,8 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0570 content.formula.migrate — scans src/content markdown files, finds hardcoded
-arithmetic patterns next to content references, and converts them to =(...) formula syntax.
+<purpose>RFC-0570 + RFC-0723 content.formula.migrate — scans src/content markdown files, finds
+hardcoded arithmetic patterns next to content references (RFC-0570) and bare braceless refs in
+mixed strings (RFC-0723), and converts them to =(...) formula syntax.
 Manual command — not in any pipeline. Idempotent: re-running on already-migrated files is a no-op.</purpose>
 <non-goals>
   <item>Do not validate formula expressions — that is content.references.validate in @warpgogol/site-kernel-checks.</item>
@@ -11,13 +12,17 @@ Manual command — not in any pipeline. Idempotent: re-running on already-migrat
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0570: initial implementation of content.formula.migrate command.</item>
+  <item>RFC-0723: add second scan pass for bare braceless refs in mixed strings — wrap with =(ref) syntax.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFile, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { parse as parseYaml } from "yaml";
 import { collectMarkdownFiles } from "@warpgogol/site-kernel-content";
 import { scanFormulas } from "@warpgogol/share/formula-eval";
+import type { ContentRefIndex } from "@warpgogol/share/content-reference";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -29,6 +34,21 @@ import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 // where <ref> is a braceless content reference (collection.file.field)
 const HARDCODED_FORMULA_PATTERN =
   /([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\s*[+\-*/]\s*([a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+(?:\s*[+\-*/]\s*\d+)*)/g;
+
+// RFC-0723: detect bare braceless refs in mixed strings
+const BRACELESS_PATTERN = /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_.-]+)\b/g;
+
+function loadIndex(appRoot: string): ContentRefIndex | null {
+  const indexPath = join(appRoot, "src", "content-ref-index.generated.yaml");
+  try {
+    const raw = readFileSync(indexPath, "utf8");
+    const parsed = parseYaml(raw) as ContentRefIndex;
+    if (parsed && parsed.version === 1 && parsed.entries) return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 function convertToFormulaSyntax(match: string): string {
   // The matched pattern is: <ref> <op> <ref> [op <number>]...
@@ -46,6 +66,8 @@ export async function runContentFormulaMigrate(
   const contentDir = join(appRoot, "src", "content");
 
   const files = await collectMarkdownFiles(contentDir);
+  const index = loadIndex(appRoot);
+  const knownCollections = index ? new Set(Object.keys(index.entries)) : new Set<string>();
   const conversions: Array<{ file: string; line: number; before: string; after: string }> = [];
 
   for (const filePath of files) {
@@ -55,6 +77,9 @@ export async function runContentFormulaMigrate(
 
     // RFC-0570: use scanFormulas to identify spans already inside =(...) formulas
     const formulaSpans = scanFormulas(content);
+
+    // Track spans consumed by the first pass to avoid double-processing
+    const firstPassSpans: Array<{ start: number; end: number }> = [];
 
     let match: RegExpExecArray | null;
     HARDCODED_FORMULA_PATTERN.lastIndex = 0;
@@ -74,6 +99,42 @@ export async function runContentFormulaMigrate(
 
       const replacement = convertToFormulaSyntax(candidate);
       replacements.push({ original: candidate, replacement, index: match.index });
+      firstPassSpans.push({ start: matchStart, end: matchEnd });
+    }
+
+    // RFC-0723: second scan pass — detect bare braceless refs in mixed strings
+    BRACELESS_PATTERN.lastIndex = 0;
+    while ((match = BRACELESS_PATTERN.exec(content)) !== null) {
+      const candidate = match[0];
+      const matchStart = match.index;
+      const matchEnd = match.index + candidate.length;
+
+      // Skip if part of a hardcoded formula pattern (already handled by first pass)
+      const inFirstPass = firstPassSpans.some(
+        (span) => matchStart >= span.start && matchEnd <= span.end,
+      );
+      if (inFirstPass) continue;
+
+      // Skip if already inside a =(...) formula
+      const insideFormula = formulaSpans.some(
+        (span) => matchStart >= span.start && matchEnd <= span.end,
+      );
+      if (insideFormula) continue;
+
+      // Skip pure refs (the entire line is just the reference)
+      const lineStart = content.lastIndexOf("\n", matchStart) + 1;
+      const lineEnd = content.indexOf("\n", matchStart);
+      const lineText = content.slice(lineStart, lineEnd === -1 ? content.length : lineEnd);
+      if (lineText.trim() === candidate) continue;
+
+      // Skip if the collection is not known (likely literal text)
+      const collectionMatch = candidate.match(/^([a-z][a-z-]*)\./);
+      if (!collectionMatch) continue;
+      const collection = collectionMatch[1];
+      if (!knownCollections.has(collection)) continue;
+
+      const replacement = `=(${candidate})`;
+      replacements.push({ original: candidate, replacement, index: matchStart });
     }
 
     if (replacements.length === 0) continue;
@@ -99,8 +160,8 @@ export async function runContentFormulaMigrate(
 
   const summary =
     conversions.length === 0
-      ? `No hardcoded formula patterns found in ${files.length} content file(s)`
-      : `Converted ${conversions.length} hardcoded formula pattern(s) in ${files.length} content file(s)`;
+      ? `No formula patterns found in ${files.length} content file(s)`
+      : `Converted ${conversions.length} formula pattern(s) in ${files.length} content file(s)`;
 
   return {
     exitCode: 0,
