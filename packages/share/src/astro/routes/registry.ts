@@ -7,12 +7,14 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303 Phase 3: extracted from routes.ts as part of the domain split.</item>
+  <item>RFC-0708: fold Nachweis detail and verify routes behind the nachweis entitlement gate.</item>
 </CHANGE_SUMMARY>
 */
 
 import { getCollection } from "astro:content";
 import { getSurfaceEntries } from "../surface-routes.ts";
 import { getParticipantProfileRoutes } from "../people-routes.ts";
+import { getNachweisRoutes, getNachweisVerifyRoutes } from "../nachweis-routes.ts";
 
 /** Language code (e.g., "de", "en") */
 export type LanguageCode = string;
@@ -240,6 +242,47 @@ export async function getRouteRegistry(): Promise<RouteRegistry> {
         };
         byPageId.set(person.pageId, entry);
         for (const [lang, slug] of Object.entries(person.routes)) {
+          if (!byLanguageAndSlug.has(lang)) byLanguageAndSlug.set(lang, new Map());
+          const langMap = byLanguageAndSlug.get(lang)!;
+          if (!langMap.has(slug)) langMap.set(slug, entry);
+        }
+      }
+    }
+
+    // RFC-0708: fold Nachweis detail and verify routes into the registry behind
+    // the `nachweis` entitlement gate. Sourced from PBP EvidenceSource records
+    // with Nachweis evidence kinds and publication.visibility: published.
+    // Preview records are excluded — no route is generated. Authored pages
+    // always win a slug collision. Fail open when entitlements are unknown.
+    const nachweisEntitled = entitledFeatures === null || entitledFeatures.includes("nachweis");
+    if (nachweisEntitled) {
+      const [nachweisRoutes, nachweisVerifyRoutes] = await Promise.all([
+        getNachweisRoutes(),
+        getNachweisVerifyRoutes(),
+      ]);
+      for (const nachweis of nachweisRoutes) {
+        if (byPageId.has(nachweis.pageId)) continue;
+        const entry: LocalizedRouteEntry = {
+          pageId: nachweis.pageId,
+          cosmicStar: nachweis.pageId,
+          routes: nachweis.routes,
+        };
+        byPageId.set(nachweis.pageId, entry);
+        for (const [lang, slug] of Object.entries(nachweis.routes)) {
+          if (!byLanguageAndSlug.has(lang)) byLanguageAndSlug.set(lang, new Map());
+          const langMap = byLanguageAndSlug.get(lang)!;
+          if (!langMap.has(slug)) langMap.set(slug, entry);
+        }
+      }
+      for (const verify of nachweisVerifyRoutes) {
+        if (byPageId.has(verify.pageId)) continue;
+        const entry: LocalizedRouteEntry = {
+          pageId: verify.pageId,
+          cosmicStar: verify.pageId,
+          routes: verify.routes,
+        };
+        byPageId.set(verify.pageId, entry);
+        for (const [lang, slug] of Object.entries(verify.routes)) {
           if (!byLanguageAndSlug.has(lang)) byLanguageAndSlug.set(lang, new Map());
           const langMap = byLanguageAndSlug.get(lang)!;
           if (!langMap.has(slug)) langMap.set(slug, entry);
