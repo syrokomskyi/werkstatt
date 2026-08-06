@@ -71,23 +71,13 @@ systems:
   return tmpWorkspace;
 }
 
-test("mission.open throws when bordbuch commit fails (no git origin configured)", async () => {
+test("mission.open throws when bordbuch push fails (no git origin configured)", async () => {
   setupWorkspace();
 
   // No bare origin is set up — commitAndPushBordbuch will commit successfully
   // but the push will fail because there is no 'origin' remote.
-  // However, to test the commit-failure path specifically, we need to make
-  // the git add/commit fail. We do this by making the bordbuch directory
-  // a non-git-tracked path (remove .git after setup so git operations fail).
-  // Actually, commitAndPushBordbuch uses the systemDir (cache clone) which
-  // IS the workspace itself in this test setup. The commit will succeed
-  // because bordbuch/events.ndjson exists. To test commit failure, we
-  // need to make the commit itself fail — we can do this by removing
-  // the .git directory AFTER setup so gitExec fails.
-  //
-  // But that also makes the earlier readBordbuch / validateBordbuch fail.
-  // Instead, test the push-failure path (no origin) which is the more
-  // common real-world scenario described in the ADR.
+  // This tests the push-failure path (pushed === false), which is the more
+  // common real-world scenario described in ADR-0030.
 
   const input = {
     flags: { system: "test-system", brief: "Test mission", actor: "test-agent" },
