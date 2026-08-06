@@ -1,0 +1,31 @@
+id: nachweis-verify
+displayName: Nachweis Verify
+version: 1.0.0
+semanticRole: trust-verify
+description: |
+  Cryptographic verification data display for a Nachweis record. Shows
+  source SHA-256, public derivative SHA-256, record payload SHA-256,
+  envelope SHA-256, operator signature, and qualified timestamp.
+  Read-only. RFC-0708.
+expectedIntents:
+  - verify
+expectedIndustryFit:
+  - non-profit
+layoutHint: single-column
+propsSchema:
+  $shape: zod
+  shape: |
+    z.object({
+      slug: z.string(),
+      version: z.string(),
+      sourceSha256: z.string(),
+      publicDerivativeSha256: z.string().optional(),
+      recordPayloadSha256: z.string().optional(),
+      envelopeSha256: z.string().optional(),
+      operatorSignature: z.string().optional(),
+      qualifiedTimestamp: z.string().optional(),
+      verificationLevel: z.string().optional(),
+    }).passthrough()
+acceptedCosmicNames:
+  - Styx
+constraints: {}

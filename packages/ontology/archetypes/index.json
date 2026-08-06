@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "totalCount": 52,
+  "totalCount": 56,
   "entries": [
     {
       "id": "approach",
@@ -300,6 +300,54 @@
         "Sycorax"
       ],
       "sourceFile": "packages/ontology/archetypes/components/media.yaml",
+      "layer": "component"
+    },
+    {
+      "id": "nachweis-card",
+      "displayName": "Nachweis Card",
+      "semanticRole": "trust-card",
+      "version": "1.0.0",
+      "layoutHint": "card-grid",
+      "acceptedCosmicNames": [
+        "Praxidike"
+      ],
+      "sourceFile": "packages/ontology/archetypes/components/nachweis-card.yaml",
+      "layer": "component"
+    },
+    {
+      "id": "nachweis-detail",
+      "displayName": "Nachweis Detail",
+      "semanticRole": "trust-detail",
+      "version": "1.0.0",
+      "layoutHint": "single-column",
+      "acceptedCosmicNames": [
+        "Kerberos"
+      ],
+      "sourceFile": "packages/ontology/archetypes/components/nachweis-detail.yaml",
+      "layer": "component"
+    },
+    {
+      "id": "nachweis-list",
+      "displayName": "Nachweis List",
+      "semanticRole": "trust-list",
+      "version": "1.0.0",
+      "layoutHint": "single-column",
+      "acceptedCosmicNames": [
+        "Hydra"
+      ],
+      "sourceFile": "packages/ontology/archetypes/components/nachweis-list.yaml",
+      "layer": "component"
+    },
+    {
+      "id": "nachweis-verify",
+      "displayName": "Nachweis Verify",
+      "semanticRole": "trust-verify",
+      "version": "1.0.0",
+      "layoutHint": "single-column",
+      "acceptedCosmicNames": [
+        "Styx"
+      ],
+      "sourceFile": "packages/ontology/archetypes/components/nachweis-verify.yaml",
       "layer": "component"
     },
     {
@@ -681,7 +729,11 @@
     "component-shell.header",
     "component-shell.site-background",
     "component-social-meta",
-    "component-structured-data"
+    "component-structured-data",
+    "trust-card",
+    "trust-detail",
+    "trust-list",
+    "trust-verify"
   ],
   "planetImportPaths": {
     "Titan": "@warpgogol/ui/sections/approach",
