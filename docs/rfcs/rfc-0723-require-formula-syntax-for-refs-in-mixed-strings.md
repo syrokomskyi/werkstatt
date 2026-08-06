@@ -1,7 +1,7 @@
 ---
 id: RFC-0723
 title: "Require =(ref) formula syntax for content references in mixed strings"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
