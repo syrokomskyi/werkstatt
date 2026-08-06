@@ -120,9 +120,7 @@ export async function runDesignSystemTokenLint(
   };
 }
 
-async function scanCssFileForColors(filePath: string): Promise<ColorLintFinding[]> {
-  const content = await readFile(filePath, "utf8");
-  const cleanText = stripUrlsPreserveLength(stripBlockCommentsPreserveLength(content));
+function extractColorFindings(cleanText: string, filePath: string): ColorLintFinding[] {
   const findings: ColorLintFinding[] = [];
 
   for (const match of cleanText.matchAll(RGBA_REGEX)) {
@@ -141,12 +139,11 @@ async function scanCssFileForColors(filePath: string): Promise<ColorLintFinding[
   return findings;
 }
 
-async function scanCssFileForUndefinedTokens(
+function extractUndefinedTokenFindings(
+  cleanText: string,
   filePath: string,
   tokenNameSet: ReadonlySet<string>,
-): Promise<ColorLintFinding[]> {
-  const content = await readFile(filePath, "utf8");
-  const cleanText = stripUrlsPreserveLength(stripBlockCommentsPreserveLength(content));
+): ColorLintFinding[] {
   const findings: ColorLintFinding[] = [];
 
   for (const match of cleanText.matchAll(DS_VAR_USAGE_REGEX)) {
@@ -162,6 +159,19 @@ async function scanCssFileForUndefinedTokens(
     findings.push({ filePath, line, column, token, reason: "undefined-token" });
   }
 
+  return findings;
+}
+
+async function scanCssFile(
+  filePath: string,
+  tokenNameSet?: ReadonlySet<string>,
+): Promise<ColorLintFinding[]> {
+  const content = await readFile(filePath, "utf8");
+  const cleanText = stripUrlsPreserveLength(stripBlockCommentsPreserveLength(content));
+  const findings = extractColorFindings(cleanText, filePath);
+  if (tokenNameSet) {
+    findings.push(...extractUndefinedTokenFindings(cleanText, filePath, tokenNameSet));
+  }
   return findings;
 }
 
@@ -188,8 +198,7 @@ async function scanPackagesUiCss(
   const allFindings: ColorLintFinding[] = [];
 
   for (const filePath of files) {
-    allFindings.push(...(await scanCssFileForColors(filePath)));
-    allFindings.push(...(await scanCssFileForUndefinedTokens(filePath, tokenNameSet)));
+    allFindings.push(...(await scanCssFile(filePath, tokenNameSet)));
   }
 
   return allFindings;
@@ -227,7 +236,7 @@ export async function runHardcodedColorLint(
       continue;
     }
 
-    findings.push(...(await scanCssFileForColors(filePath)));
+    findings.push(...(await scanCssFile(filePath)));
   }
 
   for (const finding of findings) {
