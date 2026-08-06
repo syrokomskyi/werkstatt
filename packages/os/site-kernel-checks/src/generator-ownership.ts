@@ -569,6 +569,19 @@ export const GENERATOR_OWNERSHIP_MAP: OwnershipEntry[] = [
     markerPolicy: "registry-only",
     module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
   },
+  // RFC-0473: Bordbuch public projections (site-relative — committed to workpiece by bordbuch.commit).
+  {
+    path: "public/.well-known/bordbuch.json",
+    command: "bordbuch.generate",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+  },
+  {
+    path: "public/.well-known/bordbuch/index.html",
+    command: "bordbuch.generate",
+    markerPolicy: "registry-only",
+    module: "packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts",
+  },
   // RFC-0707: Bordbuch raw event log and status (nachweis workflow artifacts).
   {
     path: "public/.well-known/bordbuch/events.ndjson",
