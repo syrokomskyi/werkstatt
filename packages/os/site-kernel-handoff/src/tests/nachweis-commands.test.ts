@@ -1,13 +1,14 @@
 /*
 <MODULE_CONTRACT>
   <purpose>
-    RFC-0707: unit tests for nachweis command handlers.
-    Tests cover entitlement skip, dry-run, validation, manifest generation, consent update, publish gate, and withdraw.
+    Unit tests for nachweis command handlers (RFC-0707, RFC-0714, RFC-0715).
+    Tests cover entitlement skip, dry-run, validation, manifest generation, consent update, publish gate, withdraw, resolveDefaultLang error paths, and consent c.id fallback matching.
   </purpose>
-  <keywords>RFC-0707, nachweis, unit-test, entitlement, dry-run, gate</keywords>
+  <keywords>RFC-0707, RFC-0714, RFC-0715, nachweis, unit-test, entitlement, dry-run, gate, consent, resolveDefaultLang</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis unit tests.</item>
+  <item>RFC-0715: add resolveDefaultLang error path tests and consent c.id fallback test (fo-fix F-2, F-3).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -107,11 +108,22 @@ function makeInput(flags: Record<string, KernelFlagValue>): KernelCommandInput {
   };
 }
 
+async function writeSystemManifest(cachePath: string): Promise<void> {
+  const contentDir = join(cachePath, "src", "content");
+  await mkdir(contentDir, { recursive: true });
+  await writeFile(
+    join(contentDir, "system.md"),
+    "---\ni18n:\n  default: de\n  languages:\n    - de\n---\n",
+  );
+}
+
 async function writeEntitlements(cachePath: string, features: string[]): Promise<void> {
   const dir = join(cachePath, "src");
   await mkdir(dir, { recursive: true });
   const { stringify: yamlStringify } = await import("yaml");
   await writeFile(join(dir, "entitlements.generated.yaml"), yamlStringify({ features }));
+  // Write minimal system.md for resolveDefaultLang (RFC-0715: lang from system.md i18n.default)
+  await writeSystemManifest(cachePath);
 }
 
 async function writeBordbuch(cachePath: string, entries: unknown[]): Promise<void> {
@@ -1025,5 +1037,98 @@ describe("RFC-0714: nachweis.public-derivative", () => {
     expect(result.data!.bordbuchEventId).toBeNull();
     expect(result.summary).toContain("DRY RUN");
     expect(mockR2State.putCalls).toBe(0);
+  });
+});
+
+describe("RFC-0715: resolveDefaultLang", () => {
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(join(tmpdir(), "nachweis-lang-XXXX-"));
+    workspaceRoot = tmpDir;
+    await writeFile(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
+  });
+
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it("throws when system.md i18n.default is missing", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(join(cachePath, "src", "content"), { recursive: true });
+    await writeFile(join(cachePath, "src", "content", "system.md"), "---\n---\n");
+
+    const { resolveDefaultLang } = await import("../nachweis/nachweis-io.ts");
+    await expect(resolveDefaultLang(cachePath)).rejects.toThrow("i18n.default is required");
+  });
+
+  it("throws when system.md does not exist", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+
+    const { resolveDefaultLang } = await import("../nachweis/nachweis-io.ts");
+    await expect(resolveDefaultLang(cachePath)).rejects.toThrow();
+  });
+
+  it("returns i18n.default when system.md is valid", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(join(cachePath, "src", "content"), { recursive: true });
+    await writeFile(
+      join(cachePath, "src", "content", "system.md"),
+      "---\ni18n:\n  default: uk\n  languages:\n    - uk\n---\n",
+    );
+
+    const { resolveDefaultLang } = await import("../nachweis/nachweis-io.ts");
+    const lang = await resolveDefaultLang(cachePath);
+    expect(lang).toBe("uk");
+  });
+});
+
+describe("RFC-0715: nachweis.validate consent matching by c.id fallback", () => {
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(join(tmpdir(), "nachweis-consent-id-XXXX-"));
+    workspaceRoot = tmpDir;
+    await writeFile(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
+  });
+
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it("matches consent by c.id when data.slug is absent", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: { main: { sha256: "a".repeat(64) } },
+    });
+
+    // Write consent entity whose id matches slug but data.slug is absent
+    await writePbpEntity(cachePath, "consent", "test-record", {
+      type: "consent",
+      name: "Test Consent",
+      textVersion: "v1",
+      purposes: ["nachweis"],
+      channels: ["web"],
+      lawfulBasis: "consent",
+      method: "verified_business_email",
+      grantedAt: "2026-08-01T00:00:00.000Z",
+      evidenceRef: "test-record",
+      consentStatus: "granted",
+    });
+
+    const { runNachweisValidate } = await import("../nachweis/nachweis-validate.ts");
+    const result = await runNachweisValidate(
+      makeInput({ system: "test-sys" }),
+      makeContext("test-sys"),
+    );
+
+    // Gate should pass — consent matched by c.id fallback
+    const gate = result.data!.gateResults.find((g) => g.slug === "test-record");
+    expect(gate).toBeTruthy();
+    expect(gate!.consentGranted).toBe(true);
   });
 });
