@@ -23,6 +23,7 @@ Validates braceless collection.file.field syntax only — brace-delimited syntax
   <item>RFC-0527: rewrite to use the generated content-ref-index instead of disk reads; add braceless syntax support.</item>
   <item>RFC-0529: remove brace-delimited syntax validation — only braceless references are accepted. Add REF-05 diagnostic for residual brace tokens.</item>
   <item>RFC-0570: add =(...) formula expression validation with REF-06..09 error codes.</item>
+  <item>RFC-0723: promote REF-04 from warning to error for known collections in mixed strings; skip REF-04 for refs inside =(…) formulas.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -141,11 +142,22 @@ export async function runContentReferencesValidate(
         const lineEnd = source.indexOf("\n", match.index);
         const lineText = source.slice(lineStart, lineEnd === -1 ? source.length : lineEnd);
         const isPureRef = lineText.trim() === candidate;
-        if (!isPureRef) {
+        // RFC-0723: Skip REF-04 if the ref is inside an =(...) formula expression —
+        // it is an explicit reference, not ambiguous.
+        const beforeRef = source.slice(lineStart, match.index);
+        const afterRef = source.slice(
+          match.index + candidate.length,
+          lineEnd === -1 ? source.length : lineEnd,
+        );
+        const isInsideFormula = /=\(\s*$/.test(beforeRef) && /^\s*\)/.test(afterRef);
+        if (!isPureRef && !isInsideFormula) {
           const lineNumbers = findLineNumbersContaining(source, candidate);
           const lineSuffix = lineNumbers.length > 0 ? `:${lineNumbers[0]}` : "";
-          warnings.push(
-            `${doc.relativeFile}${lineSuffix} — REF-04: ambiguous braceless pattern ${candidate} in mixed string; could be literal`,
+          // RFC-0723: REF-04 promoted from warning to error for known collections.
+          // The pattern matches a known collection (index.entries[collection] exists),
+          // so it is a real reference, not literal text. Unknown patterns remain warnings.
+          violations.push(
+            `${doc.relativeFile}${lineSuffix} — REF-04: ambiguous braceless pattern ${candidate} in mixed string; use =(ref) syntax to explicitly mark it as a reference`,
           );
         }
         refs.push(parsed);
