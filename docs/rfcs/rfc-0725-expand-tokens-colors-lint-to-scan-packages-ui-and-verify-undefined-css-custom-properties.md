@@ -1,7 +1,7 @@
 ---
 id: RFC-0725
 title: "Expand tokens.colors.lint to scan packages/ui and verify undefined CSS custom properties"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -9,9 +9,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-06
-updatedAt: 2026-08-07
+updatedAt: 2026-08-06
 enhancedAt: 2026-08-07
-implementedAt:
+implementedAt: 2026-08-06
 closedAt:
 supersedes: []
 supersededBy:
