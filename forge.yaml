@@ -63,6 +63,6 @@ skillPacks:
   - prefix: wg
     dir: packages/warpgogol-skills/skills
 forge:
-  syncedVersion: 0.13.0
+  syncedVersion: 0.23.0
 independentVersionPackages:
   - packages/forge
