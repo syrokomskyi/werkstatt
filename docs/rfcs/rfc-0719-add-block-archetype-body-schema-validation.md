@@ -152,12 +152,12 @@ New sites are automatically compliant — the B-07 check runs as part of `page.b
 
 ## Acceptance criteria
 
-- [ ] `page.block.validate` emits a B-07 violation when a block's `body.kind` does not match the archetype's declared `bodyKind` from the composed JSON Schema
-- [ ] `page.block.validate` does not emit B-07 for composite archetypes (no `body.properties.kind.const` in composed schema)
-- [ ] `page.block.validate` does not emit B-07 when `body` is missing (B-03 catches this via `required` fields)
-- [ ] Existing valid blocks continue to pass validation without changes
-- [ ] B-07 diagnostic message includes the actual `body.kind`, the expected `bodyKind`, and the section manifest source
-- [ ] No new Zod schemas or hardcoded `bodySchemaByKind` map are introduced in `page-block.ts`
+- [x] `page.block.validate` emits a B-07 violation when a block's `body.kind` does not match the archetype's declared `bodyKind` from the composed JSON Schema (evidence: `packages/os/site-kernel-checks/src/page-block.ts:341-349`, test `rfc-0719-body-kind-validate.test.ts` test case 2)
+- [x] `page.block.validate` does not emit B-07 for composite archetypes (no `body.properties.kind.const` in composed schema) (evidence: `page-block.ts:342` — `expectedBodyKind?.const` is undefined for composite, test case 3)
+- [x] `page.block.validate` does not emit B-07 when `body` is missing (B-03 catches this via `required` fields) (evidence: `page-block.ts:340-341` — `actualBodyKind` is undefined when body absent, test case 4)
+- [x] Existing valid blocks continue to pass validation without changes (evidence: test case 1 — body.kind: list with items passes, full test suite 867 passed)
+- [x] B-07 diagnostic message includes the actual `body.kind`, the expected `bodyKind`, and the section manifest source (evidence: `page-block.ts:347` — `B-07 body.kind="${actualBodyKind}" does not match expected bodyKind="${expectedBodyKind.const}" from section manifest`)
+- [x] No new Zod schemas or hardcoded `bodySchemaByKind` map are introduced in `page-block.ts` (evidence: `page-block.ts:332-349` — reads `const` dynamically from composed JSON Schema, no hardcoded map)
 
 ## Implementation notes for agents
 
