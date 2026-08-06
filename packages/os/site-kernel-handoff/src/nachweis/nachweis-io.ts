@@ -17,6 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis I/O layer with R2 upload, hash computation, record ID generation.</item>
+  <item>RFC-0713: uploadToR2 passes R2_NACHWEIS envPrefix for per-bucket credential isolation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -27,7 +28,7 @@ import { byteHashFile } from "@warpgogol/fingerprint";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
-const NACHWEIS_BUCKET = "nachweise";
+const NACHWEIS_BUCKET = "nachweis";
 
 export interface NachweisRecord {
   recordId: string;
@@ -135,7 +136,7 @@ export function resolveNachweisR2Path(systemId: string, recordId: string, versio
 }
 
 export async function uploadToR2(fileBuffer: Uint8Array, r2Path: string): Promise<void> {
-  const config = resolveR2ConfigFromEnv(NACHWEIS_BUCKET);
+  const config = resolveR2ConfigFromEnv(NACHWEIS_BUCKET, "R2_NACHWEIS");
   const client = createR2Client(config);
   await client.putObject({
     key: r2Path,

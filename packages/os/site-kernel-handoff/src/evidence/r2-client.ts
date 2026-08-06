@@ -6,6 +6,7 @@
   <item>Configures S3Client with R2 endpoint from R2_ACCOUNT_ID.</item>
   <item>Provides putObject, getObject, listObjectsV2 methods.</item>
   <item>Reads credentials from R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY env vars.</item>
+  <item>Supports optional envPrefix for per-bucket credential isolation (RFC-0713).</item>
   <item>Throws MISSING_ENV diagnostic when env vars are unset.</item>
 </responsibilities>
 <non-goals>
@@ -16,6 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0651: initial R2 client wrapper with putObject, getObject, listObjectsV2.</item>
+  <item>RFC-0713: added optional envPrefix parameter to resolveR2ConfigFromEnv for per-bucket credential isolation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -62,18 +64,22 @@ export class MissingEnvError extends Error {
   }
 }
 
-export function resolveR2ConfigFromEnv(bucketName = "axiom-evidence"): R2ClientConfig {
-  const accountId = process.env.R2_ACCOUNT_ID;
+export function resolveR2ConfigFromEnv(
+  bucketName = "axiom-evidence",
+  envPrefix?: string,
+): R2ClientConfig {
+  const p = envPrefix ? `${envPrefix}_` : "";
+  const accountId = process.env[`${p}R2_ACCOUNT_ID`];
   if (!accountId) {
-    throw new MissingEnvError("R2_ACCOUNT_ID");
+    throw new MissingEnvError(`${p}R2_ACCOUNT_ID`);
   }
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+  const accessKeyId = process.env[`${p}R2_ACCESS_KEY_ID`];
   if (!accessKeyId) {
-    throw new MissingEnvError("R2_ACCESS_KEY_ID");
+    throw new MissingEnvError(`${p}R2_ACCESS_KEY_ID`);
   }
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+  const secretAccessKey = process.env[`${p}R2_SECRET_ACCESS_KEY`];
   if (!secretAccessKey) {
-    throw new MissingEnvError("R2_SECRET_ACCESS_KEY");
+    throw new MissingEnvError(`${p}R2_SECRET_ACCESS_KEY`);
   }
   return { accountId, accessKeyId, secretAccessKey, bucketName };
 }
