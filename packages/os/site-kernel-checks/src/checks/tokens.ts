@@ -9,11 +9,13 @@ studio defaults a biome silently inherits (RFC-0071/0098).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0303: split out of checks.ts (Phase 3 file-size split).</item>
+  <item>RFC-0725: expanded runHardcodedColorLint to scan packages/ui/src CSS files and verify undefined --ds-* custom properties against TOKEN_NAME_SET.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
+import { TOKEN_NAME_SET } from "@warpgogol/tokens";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -40,6 +42,15 @@ const TOKEN_STYLE_API_REGEX =
 const COLOR_EXTENSION = ".css";
 const RGBA_REGEX = /\brgba\s*\(/gim;
 const HEX_COLOR_REGEX = /#[0-9a-fA-F]{3,8}\b/gm;
+const DS_VAR_USAGE_REGEX = /var\(\s*(--ds-[a-z][a-z0-9-]*)/gim;
+
+export interface ColorLintFinding {
+  filePath: string;
+  line: number;
+  column: number;
+  token: string;
+  reason?: "raw-rgba" | "raw-hex" | "undefined-token";
+}
 
 function resolveRoots(
   appDirectory: string,
@@ -109,10 +120,85 @@ export async function runDesignSystemTokenLint(
   };
 }
 
+async function scanCssFileForColors(filePath: string): Promise<ColorLintFinding[]> {
+  const content = await readFile(filePath, "utf8");
+  const cleanText = stripUrlsPreserveLength(stripBlockCommentsPreserveLength(content));
+  const findings: ColorLintFinding[] = [];
+
+  for (const match of cleanText.matchAll(RGBA_REGEX)) {
+    const index = match.index ?? 0;
+    const { line, column } = getLineColumn(cleanText, index);
+    findings.push({ filePath, line, column, token: "rgba(", reason: "raw-rgba" });
+  }
+
+  for (const match of cleanText.matchAll(HEX_COLOR_REGEX)) {
+    const token = match[0];
+    const index = match.index ?? 0;
+    const { line, column } = getLineColumn(cleanText, index);
+    findings.push({ filePath, line, column, token, reason: "raw-hex" });
+  }
+
+  return findings;
+}
+
+async function scanCssFileForUndefinedTokens(
+  filePath: string,
+  tokenNameSet: ReadonlySet<string>,
+): Promise<ColorLintFinding[]> {
+  const content = await readFile(filePath, "utf8");
+  const cleanText = stripUrlsPreserveLength(stripBlockCommentsPreserveLength(content));
+  const findings: ColorLintFinding[] = [];
+
+  for (const match of cleanText.matchAll(DS_VAR_USAGE_REGEX)) {
+    const token = match[1];
+    if (typeof token !== "string") continue;
+    if (tokenNameSet.has(token)) continue;
+
+    const matchIndex = match.index ?? 0;
+    const tokenOffsetInsideMatch = match[0].indexOf(token);
+    const tokenIndex =
+      tokenOffsetInsideMatch >= 0 ? matchIndex + tokenOffsetInsideMatch : matchIndex;
+    const { line, column } = getLineColumn(cleanText, tokenIndex);
+    findings.push({ filePath, line, column, token, reason: "undefined-token" });
+  }
+
+  return findings;
+}
+
+async function scanPackagesUiCss(
+  workspaceRoot: string,
+  tokenNameSet: ReadonlySet<string>,
+  logger: { warn: (msg: string) => void },
+): Promise<ColorLintFinding[]> {
+  const packagesUiSrc = resolve(workspaceRoot, "packages/ui/src");
+
+  let files: string[];
+  try {
+    files = await collectFilesByExtensions(packagesUiSrc, new Set([COLOR_EXTENSION]));
+  } catch {
+    logger.warn(`packages/ui/src not found at ${packagesUiSrc} — skipping packages-level scan`);
+    return [];
+  }
+
+  if (files.length === 0) {
+    logger.warn(`packages/ui/src has no .css files — skipping packages-level scan`);
+    return [];
+  }
+
+  const allFindings: ColorLintFinding[] = [];
+
+  for (const filePath of files) {
+    allFindings.push(...(await scanCssFileForColors(filePath)));
+    allFindings.push(...(await scanCssFileForUndefinedTokens(filePath, tokenNameSet)));
+  }
+
+  return allFindings;
+}
+
 export async function runHardcodedColorLint(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
-): Promise<KernelCommandResult<{ findings: number }>> {
+): Promise<KernelCommandResult<{ findings: number; violations: ColorLintFinding[] }>> {
   const paths = requireAstroSitePaths(context);
   const roots = resolveRoots(paths.appDirectory, input, DEFAULT_COLOR_ROOTS);
   const distilledCssPath = resolve(paths.appDirectory, "src/styles/distilled.css").toLowerCase();
@@ -128,7 +214,7 @@ export async function runHardcodedColorLint(
     allFiles.push(...(await collectFilesByExtensions(root, new Set([COLOR_EXTENSION]))));
   }
 
-  const findings: Array<{ filePath: string; line: number; column: number; token: string }> = [];
+  const findings: ColorLintFinding[] = [];
 
   for (const filePath of allFiles) {
     const resolvedPath = resolve(filePath).toLowerCase();
@@ -141,21 +227,7 @@ export async function runHardcodedColorLint(
       continue;
     }
 
-    const content = await readFile(filePath, "utf8");
-    const cleanText = stripUrlsPreserveLength(stripBlockCommentsPreserveLength(content));
-
-    for (const match of cleanText.matchAll(RGBA_REGEX)) {
-      const index = match.index ?? 0;
-      const { line, column } = getLineColumn(cleanText, index);
-      findings.push({ filePath, line, column, token: "rgba(" });
-    }
-
-    for (const match of cleanText.matchAll(HEX_COLOR_REGEX)) {
-      const token = match[0];
-      const index = match.index ?? 0;
-      const { line, column } = getLineColumn(cleanText, index);
-      findings.push({ filePath, line, column, token });
-    }
+    findings.push(...(await scanCssFileForColors(filePath)));
   }
 
   for (const finding of findings) {
@@ -163,10 +235,23 @@ export async function runHardcodedColorLint(
     context.logger.error(`${relativePath}:${finding.line}:${finding.column} ${finding.token}`);
   }
 
+  const packagesFindings = await scanPackagesUiCss(
+    context.workspaceRoot,
+    TOKEN_NAME_SET,
+    context.logger,
+  );
+
+  for (const finding of packagesFindings) {
+    const relativePath = relative(context.workspaceRoot, finding.filePath).replace(/\\/g, "/");
+    context.logger.error(`${relativePath}:${finding.line}:${finding.column} ${finding.token}`);
+  }
+
+  const allFindings = [...findings, ...packagesFindings];
+
   return {
-    data: { findings: findings.length },
-    exitCode: findings.length > 0 ? 1 : 0,
-    summary: findings.length > 0 ? undefined : "OK: no hardcoded rgba(...) or #hex colors found",
+    data: { findings: allFindings.length, violations: allFindings },
+    exitCode: allFindings.length > 0 ? 1 : 0,
+    summary: allFindings.length > 0 ? undefined : "OK: no hardcoded rgba(...) or #hex colors found",
   };
 }
 

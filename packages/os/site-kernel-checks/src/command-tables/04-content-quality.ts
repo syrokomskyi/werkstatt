@@ -201,11 +201,11 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   },
   {
     name: "tokens.colors.lint",
-    description: "Lint styles for raw rgba and hex color usage.",
+    description: "Lint styles for raw rgba, hex color usage, and undefined CSS custom properties.",
     scope: "app",
     flags: {},
     supportsAllSites: true,
-    reads: ["<app>/src/styles/**/*.css"],
+    reads: ["<app>/src/styles/**/*.css", "packages/ui/src/**/*.css"],
     modulePaths: ["checks/tokens.ts"],
     execute: runHardcodedColorLint,
   },
