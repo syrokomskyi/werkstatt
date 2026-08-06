@@ -50,7 +50,6 @@ import { runGeneratedFilesValidate } from "../generated-files-validate.ts";
 import { runGeneratedStaleValidate } from "../generated-stale-validate.ts";
 import { runGeneratedDriftValidate } from "../generated-drift-validate.ts";
 import { runOwnershipSyncValidate } from "../ownership-sync-validate.ts";
-import { runBehaviorSnapshotStalenessCheck } from "../behavior-snapshot-staleness.ts";
 import { runPropsContractValidate } from "../props-contract.ts";
 import { runOpenSourceValidate } from "../open-source-validate.ts";
 
@@ -640,19 +639,6 @@ export const CODEGEN_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: true,
     cacheable: false,
     execute: runOwnershipSyncValidate,
-  },
-  /* RFC-0721: behavior snapshot staleness warning */
-  {
-    name: "behavior.snapshot.staleness.check",
-    description:
-      "Warn when system.md pages[] routes do not match behavior.snapshot.generated.yaml routes (RFC-0721). Advisory — does not fail the pipeline.",
-    scope: "workspace",
-    flags: {
-      app: { kind: "string", description: "App id for app-scoped path resolution." },
-    },
-    supportsAllSites: true,
-    cacheable: false,
-    execute: runBehaviorSnapshotStalenessCheck,
   },
   /* RFC-0601: content drift detection in generated files */
   {

@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Merged 21-runtime-diagnostics.ts, 23-pipeline-telemetry.ts, 24-behavior-snapshot.ts into build-infra.ts.</item>
+  <item>RFC-0721: add behavior.snapshot.staleness.check command (moved from 01-codegen.ts, scope fixed to app).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -21,6 +22,7 @@ import {
 import { runPipelineCacheParity } from "../pipeline/pipeline-cache-parity.ts";
 import { runPipelineDependenciesValidate } from "../pipeline/pipeline-dependencies-validate.ts";
 import { runBehaviorSnapshotGenerate, runBehaviorSnapshotValidate } from "../behavior-snapshot.ts";
+import { runBehaviorSnapshotStalenessCheck } from "../behavior-snapshot-staleness.ts";
 
 export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
   {
@@ -136,5 +138,16 @@ export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
       "<app>/src/content/system.md",
     ],
     execute: runBehaviorSnapshotValidate,
+  },
+  {
+    name: "behavior.snapshot.staleness.check",
+    description:
+      "Warn when system.md pages[] routes are absent from behavior.snapshot.generated.yaml (RFC-0721). " +
+      "Advisory — does not fail the pipeline. One-directional: only checks newRoutes (system.md routes missing from snapshot).",
+    scope: "app",
+    supportsAllSites: true,
+    flags: {},
+    reads: ["<app>/src/content/system.md", "<app>/behavior.snapshot.generated.yaml"],
+    execute: runBehaviorSnapshotStalenessCheck,
   },
 ];
