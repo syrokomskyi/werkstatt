@@ -231,15 +231,15 @@ All projections use existing block types from the archetype registry. No new arc
 
 ## Acceptance criteria
 
-- [ ] Homepage (UK + DE) renders `nachweis-register` trust-strip block with CTA to `/nachweise/`
-- [ ] Services page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/`
-- [ ] Pricing page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/`
-- [ ] Team page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/`
-- [ ] Notausgang page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/`
-- [ ] All projections use existing block types (trust-strip, transparency) — no new components created
-- [ ] UK content is source of truth, DE maintains semantic parity
-- [ ] `astro check` passes for warpgogol-com
-- [ ] `rfc.validate` passes on this file before merging
+- [x] Homepage (UK + DE) renders `nachweis-register` trust-strip block with CTA to `/nachweise/` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/pages/uk/home.md:466, missions/warpgogol-com-m000033/workpiece/src/content/pages/de/home.md:466)
+- [x] Services page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/pages/uk/services.md:254, missions/warpgogol-com-m000033/workpiece/src/content/pages/de/services.md:254)
+- [x] Pricing page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/pages/uk/pricing.md:380, missions/warpgogol-com-m000033/workpiece/src/content/pages/de/pricing.md:380)
+- [x] Team page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/pages/uk/team.md:59, missions/warpgogol-com-m000033/workpiece/src/content/pages/de/team.md:59)
+- [x] Notausgang page (UK + DE) renders `nachweis-reference` transparency block with CTA to `/nachweise/` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/pages/uk/notausgang.md:479, missions/warpgogol-com-m000033/workpiece/src/content/pages/de/notausgang.md:479)
+- [x] All projections use existing block types (trust-strip, transparency) — no new components created (evidence: no new files in packages/ui/src/sections/, all blocks use type: trust-strip or type: transparency)
+- [x] UK content is source of truth, DE maintains semantic parity (evidence: UK authored first, DE text matches semantic content across all 5 page pairs)
+- [x] `astro check` passes for warpgogol-com (evidence: astro check exit 0, 0 errors, 0 warnings, 0 hints)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0716 exit 0, zero violations)
 
 ## Implementation notes for agents
 
