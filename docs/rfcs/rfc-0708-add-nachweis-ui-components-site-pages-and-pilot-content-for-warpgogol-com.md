@@ -133,7 +133,7 @@ Two PBP record sets created in `src/content/business-profile/{lang}/trust/`:
 - `evidence/style-expert-referenz.md` — `pbp/evidence-source@1`, `kind: client-statement`, `sha256: 9f0da3b...`, `storage: private`, `qualityStatus: unverified`
 - `consents/style-expert-referenz.md` — `pbp/consent@1`, `status: not_requested`, `method: none`
 
-Both records have `publication.visibility: preview` — not publicly visible.
+Both records have `status: draft` — not publicly visible.
 
 ### Entitlement activation
 
@@ -283,9 +283,9 @@ A new route source function `getNachweisRoutes()` is added to `packages/share/sr
 ```ts
 export async function getNachweisRoutes(): Promise<NachweisRouteEntry[]> {
   // Read PBP EvidenceSource entities with kind in Nachweis set
-  // Filter by publication.visibility: published
+  // Filter by status: published
   // Generate per-slug route entries: { pageId: `nachweis:${slug}`, slug, routes }
-  // Preview records are excluded — no route entry generated
+  // Draft records are excluded — no route entry generated
 }
 ```
 
@@ -368,7 +368,7 @@ Prohibited phrases:
 ## Rollout
 
 - **Default behavior:** Nachweis pages are only generated when the `nachweis` entitlement is resolved. Sites without the entitlement do not have `/nachweise/` routes.
-- **warpgogol-com pilot:** `entitlementsOverride: ["nachweis"]` activates the module. Pages are generated. Two records exist in `preview` — index page shows empty state ("Weitere Nachweise werden derzeit vorbereitet."). Detail pages are not generated for `preview` records.
+- **warpgogol-com pilot:** `entitlementsOverride: ["nachweis"]` activates the module. Pages are generated. Two records exist with `status: draft` — index page shows empty state ("Weitere Nachweise werden derzeit vorbereitet."). Detail pages are not generated for draft records.
 - **Publication:** When consent is obtained and gate conditions are met, `nachweis.publish` (RFC-0707) transitions records to `published`. Pages are regenerated on next deploy. Detail pages become accessible.
 - **Client site adoption:** Stripe feature `feature_nachweis` activated. `entitlements.resolve` fetches the feature. `getRouteRegistry()` folds in `getNachweisRoutes()` behind the `nachweis` entitlement gate. Client creates PBP content in `business-profile/{lang}/trust/`.
 
