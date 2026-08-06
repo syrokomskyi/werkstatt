@@ -166,6 +166,22 @@ export async function runSternsystemSync(
     }
   }
 
+  // RFC-0705: Update refs/mirror/${branch} in bare repo to track the last
+  // successfully pushed SHA to external mirrors. mission.close checks this ref
+  // to determine if external mirrors are in sync with the bare repo.
+  if (externalMirrors.length > 0 && !syncAll) {
+    try {
+      const headSha = git(bareRepoPath, `rev-parse ${branchName}`);
+      git(bareRepoPath, `update-ref refs/mirror/${branchName} ${headSha}`);
+      logger.info(`[sternsystem.sync] updated refs/mirror/${branchName} → ${headSha.slice(0, 12)}`);
+    } catch (err) {
+      warnings.push(`Failed to update refs/mirror/${branchName}: ${(err as Error).message}`);
+      logger.warn(
+        `[sternsystem.sync] Failed to update refs/mirror/${branchName}: ${(err as Error).message}`,
+      );
+    }
+  }
+
   // RFC-0574: bundle mirrors — create git bundle from bare repo and copy to backup endpoints
   const bundleMirrors = entry.mirrors.slice(2).filter((m) => m.storageType === "bundle");
   for (const bundleMirror of bundleMirrors) {
