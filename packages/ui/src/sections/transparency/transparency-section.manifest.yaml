@@ -30,3 +30,16 @@ propsSchema:
       type: string
     reportLinkHref:
       type: string
+    cta:
+      type: object
+      additionalProperties: false
+      required:
+        - label
+        - target
+      properties:
+        label:
+          type: string
+          minLength: 1
+        target:
+          type: string
+          minLength: 1

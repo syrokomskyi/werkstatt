@@ -29,6 +29,8 @@ propsSchema:
       legalNotice: z.string().min(1),
       privacyPolicyLabel: z.string().min(1).optional(),
       privacyPolicyPageId: z.string().min(1),
+      body: z.record(z.unknown()).optional(),
+      ctaGroup: z.record(z.unknown()).optional(),
     }).strict()
 acceptedCosmicNames:
   - Amalthea

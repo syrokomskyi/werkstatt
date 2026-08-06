@@ -16,7 +16,7 @@
 /* RFC-0103: transparency thin dispatcher — list body + optional report link. */
 
 import type { SectionProps } from "@warpgogol/share/page";
-import { cast, need, resolveSectionAnchor } from "@warpgogol/share";
+import { cast, need, resolveSectionAnchor, resolveSemanticTarget } from "@warpgogol/share";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import SectionList from "@warpgogol/ui/components/section-body/list/section-list.astro";
@@ -27,6 +27,15 @@ const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "transparency");
 const props = cast<TransparencySectionContent>(pageOverride);
 const body = need("body", props.body);
+
+let ctaHref: string | null = null;
+if (props.cta?.target) {
+  if (props.cta.target.startsWith("#")) {
+    ctaHref = props.cta.target;
+  } else {
+    ctaHref = await resolveSemanticTarget({ kind: "internal", pageId: props.cta.target }, lang);
+  }
+}
 ---
 
 <SectionShell
@@ -65,6 +74,13 @@ const body = need("body", props.body);
           {props.reportLinkLabel}
         </a>
       </p>
+    )
+  }
+  {
+    props.cta && ctaHref && (
+      <a class="transparency-section__cta" href={ctaHref}>
+        {props.cta.label}
+      </a>
     )
   }
 </SectionShell>

@@ -40,6 +40,16 @@ propsSchema:
       fallbackEmailLabel: z.string().min(1).optional(),
       fallbackBodyLabel: z.string().min(1).optional(),
       copyMessageLabel: z.string().min(1).optional(),
+      checklistTitle: z.string().min(1).optional(),
+      checklistReadyLabel: z.string().min(1).optional(),
+      checklistLengthLabel: z.string().min(1).optional(),
+      checklistContactLabel: z.string().min(1).optional(),
+      referrerField: z.object({
+        enabled: z.boolean(),
+        required: z.boolean(),
+        label: z.string().min(1).optional(),
+        placeholder: z.string().min(1).optional(),
+      }).optional(),
     }).strict()
 acceptedCosmicNames:
   - Ceres

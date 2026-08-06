@@ -27,4 +27,18 @@
   .transparency-section__link:focus-visible {
     color: var(--ds-color-text);
   }
+  .transparency-section__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--ds-space-3) var(--ds-space-5);
+    margin-top: var(--ds-space-5);
+    background: var(--ds-color-accent);
+    color: var(--ds-color-text-on-accent);
+    border-radius: var(--ds-radius-md);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .transparency-section__cta:hover {
+    background: var(--ds-color-secondary);
+  }
 }

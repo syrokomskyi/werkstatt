@@ -6,6 +6,7 @@ archetype: breadcrumbs
 cosmicName: Thebe
 role: navigation
 version: 1.0.0
+numbered: false
 intent:
   - orient-visitor
   - surface-content

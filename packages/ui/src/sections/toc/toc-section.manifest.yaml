@@ -6,6 +6,7 @@ archetype: toc
 cosmicName: Metis
 role: table-of-contents
 version: 1.0.0
+numbered: false
 intent:
   - orient-visitor
   - surface-content

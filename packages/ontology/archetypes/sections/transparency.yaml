@@ -22,6 +22,10 @@ propsSchema:
     z.object({
       reportLinkLabel: z.string().optional(),
       reportLinkHref: z.string().optional(),
+      cta: z.object({
+        label: z.string().min(2),
+        target: z.string().min(1),
+      }).optional(),
     }).strict()
 acceptedCosmicNames:
   - Tethys

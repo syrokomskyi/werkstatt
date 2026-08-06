@@ -93,3 +93,7 @@ propsSchema:
     privacyPolicyPageId:
       type: string
       minLength: 1
+    body:
+      type: object
+    ctaGroup:
+      type: object

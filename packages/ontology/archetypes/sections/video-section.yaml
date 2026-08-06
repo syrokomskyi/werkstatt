@@ -17,6 +17,11 @@ propsSchema:
   compose:
     - section-visual
     - section-header
+  shape: |
+    z.object({
+      media: z.record(z.unknown()),
+      contentRef: z.string().optional(),
+    }).strict()
 acceptedCosmicNames:
   - Quaoar
 constraints: {}

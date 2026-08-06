@@ -28,6 +28,11 @@ propsSchema:
       tagline: z.string().optional(),
       ctaNote: z.string().min(1).optional(),
       backgroundImage: z.string().optional(),
+      leadImage: z.object({
+        src: z.string().min(1),
+        alt: z.string().min(1),
+      }).optional(),
+      leadImageVisible: z.boolean().optional(),
       primaryCta: z.object({
         label: z.string().min(2),
         target: z.string().min(1),
