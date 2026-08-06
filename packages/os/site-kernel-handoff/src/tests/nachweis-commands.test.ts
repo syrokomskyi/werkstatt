@@ -796,6 +796,44 @@ describe("RFC-0714: nachweis.approve", () => {
       expect.stringContaining("no evidence-source file found for slug 'nonexistent-record'"),
     );
   });
+
+  it("rejects invalid verification-level with INVALID_VERIFICATION_LEVEL error", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    const { runNachweisApprove } = await import("../nachweis/nachweis-approve.ts");
+    await expect(
+      runNachweisApprove(
+        makeInput({
+          system: "test-sys",
+          slug: "test-record",
+          "verification-level": "N5",
+          "legal-content-check": "passed",
+        }),
+        makeContext("test-sys"),
+      ),
+    ).rejects.toThrow("INVALID_VERIFICATION_LEVEL");
+  });
+
+  it("rejects invalid legal-content-check with INVALID_LEGAL_CONTENT_CHECK error", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    const { runNachweisApprove } = await import("../nachweis/nachweis-approve.ts");
+    await expect(
+      runNachweisApprove(
+        makeInput({
+          system: "test-sys",
+          slug: "test-record",
+          "verification-level": "N3",
+          "legal-content-check": "maybe",
+        }),
+        makeContext("test-sys"),
+      ),
+    ).rejects.toThrow("INVALID_LEGAL_CONTENT_CHECK");
+  });
 });
 
 describe("RFC-0714: nachweis.public-derivative", () => {

@@ -60,7 +60,22 @@ export async function runNachweisApprove(
   if (!systemId) throw new Error("[nachweis.approve] --system is required");
   if (!slug) throw new Error("[nachweis.approve] --slug is required");
   if (!verificationLevel) throw new Error("[nachweis.approve] --verification-level is required");
-  if (!legalContentCheckRaw) throw new Error("[nachweis.approve] --legal-content-check is required");
+  if (!legalContentCheckRaw)
+    throw new Error("[nachweis.approve] --legal-content-check is required");
+
+  const ALLOWED_VERIFICATION_LEVELS = ["N0", "N1", "N2", "N3"];
+  if (!ALLOWED_VERIFICATION_LEVELS.includes(verificationLevel)) {
+    throw new Error(
+      `[nachweis.approve] INVALID_VERIFICATION_LEVEL: '${verificationLevel}' — must be one of ${ALLOWED_VERIFICATION_LEVELS.join(", ")}`,
+    );
+  }
+
+  const ALLOWED_LEGAL_CHECK_VALUES = ["passed", "failed"];
+  if (!ALLOWED_LEGAL_CHECK_VALUES.includes(legalContentCheckRaw)) {
+    throw new Error(
+      `[nachweis.approve] INVALID_LEGAL_CONTENT_CHECK: '${legalContentCheckRaw}' — must be 'passed' or 'failed'`,
+    );
+  }
 
   const legalContentCheckPassed = legalContentCheckRaw === "passed";
 

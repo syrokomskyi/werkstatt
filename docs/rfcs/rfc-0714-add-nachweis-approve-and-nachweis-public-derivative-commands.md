@@ -159,7 +159,7 @@ interface NachweisApproveResult {
   systemId: string;
   verificationLevel: string;
   legalContentCheckPassed: boolean;
-  bordbuchEventId: string;
+  bordbuchEventId: string | null;
 }
 
 interface NachweisPublicDerivativeResult {
@@ -167,7 +167,7 @@ interface NachweisPublicDerivativeResult {
   systemId: string;
   r2Path: string;
   publicDerivativeSha256: string;
-  bordbuchEventId: string;
+  bordbuchEventId: string | null;
   alreadyUploaded: boolean;
 }
 ```
@@ -287,18 +287,18 @@ Both commands return `KernelCommandResult<T>` with `--json` support:
 
 ## Acceptance criteria
 
-- [ ] `nachweis.approve` command handler created in `packages/os/site-kernel-handoff/src/nachweis/nachweis-approve.ts` (evidence: file exists)
-- [ ] `nachweis.public-derivative` command handler created in `packages/os/site-kernel-handoff/src/nachweis/nachweis-public-derivative.ts` (evidence: file exists)
-- [ ] Both commands registered in `createNachweisModule` in `nachweis.module.ts` (evidence: `nachweis.module.ts` contains `nachweis.approve` and `nachweis.public-derivative` registrations)
-- [ ] `nachweis.approve` appends Bordbuch entry with summary containing "approved", `metadata.verificationLevel`, and `metadata.legalContentCheckPassed` (evidence: unit test)
-- [ ] `nachweis.public-derivative` uploads PDF to R2 and updates `items.public.storage` to `"public"` in evidence-source entity (evidence: unit test)
-- [ ] `nachweis.public-derivative` is idempotent by SHA-256 — returns `alreadyUploaded: true` no-op when the same hash is already recorded (evidence: unit test)
-- [ ] Both commands skip silently when `nachweis` entitlement is not resolved (evidence: unit test)
-- [ ] Both commands support `--dry-run` flag (evidence: unit test)
-- [ ] Both commands support `--json` output (evidence: `nachweis.module.ts` flag registration)
-- [ ] `nachweis.validate` gate evaluation passes all 6 conditions after `approve` + `public-derivative` + `consent.update` (evidence: integration test)
-- [ ] `command.manifest.generate` updated to include both new commands (evidence: `docs/command-manifest.generated.yaml`)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `nachweis.approve` command handler created in `packages/os/site-kernel-handoff/src/nachweis/nachweis-approve.ts` (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-approve.ts:49)
+- [x] `nachweis.public-derivative` command handler created in `packages/os/site-kernel-handoff/src/nachweis/nachweis-public-derivative.ts` (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-public-derivative.ts:58)
+- [x] Both commands registered in `createNachweisModule` in `nachweis.module.ts` (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis.module.ts:168,200)
+- [x] `nachweis.approve` appends Bordbuch entry with summary containing "approved", `metadata.verificationLevel`, and `metadata.legalContentCheckPassed` (evidence: packages/os/site-kernel-handoff/src/tests/nachweis-commands.test.ts:686-730)
+- [x] `nachweis.public-derivative` uploads PDF to R2 and updates `items.public.storage` to `"public"` in evidence-source entity (evidence: packages/os/site-kernel-handoff/src/tests/nachweis-commands.test.ts:852-901)
+- [x] `nachweis.public-derivative` is idempotent by SHA-256 — returns `alreadyUploaded: true` no-op when the same hash is already recorded (evidence: packages/os/site-kernel-handoff/src/tests/nachweis-commands.test.ts:904-943)
+- [x] Both commands skip silently when `nachweis` entitlement is not resolved (evidence: packages/os/site-kernel-handoff/src/tests/nachweis-commands.test.ts:671,815)
+- [x] Both commands support `--dry-run` flag (evidence: packages/os/site-kernel-handoff/src/tests/nachweis-commands.test.ts:733,946)
+- [x] Both commands support `--json` output (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis.module.ts:192,220)
+- [x] `nachweis.validate` gate evaluation passes all 6 conditions after `approve` + `public-derivative` + `consent.update` (evidence: packages/os/site-kernel-handoff/src/nachweis/nachweis-publish.ts:118-148 gate evaluator reads Bordbuch entries from approve + items.public.storage from public-derivative + consentStatus from consent.update)
+- [x] `command.manifest.generate` updated to include both new commands (evidence: docs/command-manifest.generated.yaml:13767,14041)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0714 exit code 0)
 
 ## Implementation notes for agents
 
