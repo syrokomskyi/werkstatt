@@ -3,7 +3,7 @@
     "pre_user_prompt": [
       {
         "command": "bash $ROOT_WORKSPACE_PATH/hooks/pre-user-prompt.sh",
-        "show_output": false
+        "show_output": true
       }
     ],
     "post_setup_worktree": [
