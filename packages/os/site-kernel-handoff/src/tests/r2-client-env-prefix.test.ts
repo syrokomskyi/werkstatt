@@ -1,24 +1,39 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
 
+const ALL_R2_VARS = [
+  "R2_ACCOUNT_ID",
+  "R2_ACCESS_KEY_ID",
+  "R2_SECRET_ACCESS_KEY",
+  "R2_NACHWEIS_ACCOUNT_ID",
+  "R2_NACHWEIS_ACCESS_KEY_ID",
+  "R2_NACHWEIS_SECRET_ACCESS_KEY",
+];
+
 describe("resolveR2ConfigFromEnv — envPrefix (RFC-0713)", () => {
-  const originalEnv = { ...process.env };
+  const savedEnv: Record<string, string | undefined> = {};
 
   beforeEach(() => {
-    vi.resetModules();
+    for (const key of ALL_R2_VARS) {
+      savedEnv[key] = process.env[key];
+      vi.stubEnv(key, "");
+    }
   });
 
   afterEach(() => {
-    process.env = { ...originalEnv };
+    for (const key of ALL_R2_VARS) {
+      if (savedEnv[key] === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = savedEnv[key];
+      }
+    }
   });
 
   it("reads R2_NACHWEIS_* vars when envPrefix is provided", () => {
     vi.stubEnv("R2_NACHWEIS_ACCOUNT_ID", "nachweis-account");
     vi.stubEnv("R2_NACHWEIS_ACCESS_KEY_ID", "nachweis-key");
     vi.stubEnv("R2_NACHWEIS_SECRET_ACCESS_KEY", "nachweis-secret");
-    delete process.env.R2_ACCOUNT_ID;
-    delete process.env.R2_ACCESS_KEY_ID;
-    delete process.env.R2_SECRET_ACCESS_KEY;
 
     const config = resolveR2ConfigFromEnv("nachweis", "R2_NACHWEIS");
 
@@ -31,13 +46,6 @@ describe("resolveR2ConfigFromEnv — envPrefix (RFC-0713)", () => {
   });
 
   it("throws MissingEnvError with prefixed var name when R2_NACHWEIS_* vars absent", () => {
-    delete process.env.R2_NACHWEIS_ACCOUNT_ID;
-    delete process.env.R2_NACHWEIS_ACCESS_KEY_ID;
-    delete process.env.R2_NACHWEIS_SECRET_ACCESS_KEY;
-    delete process.env.R2_ACCOUNT_ID;
-    delete process.env.R2_ACCESS_KEY_ID;
-    delete process.env.R2_SECRET_ACCESS_KEY;
-
     try {
       resolveR2ConfigFromEnv("nachweis", "R2_NACHWEIS");
       expect.fail("should have thrown MissingEnvError");
@@ -52,9 +60,6 @@ describe("resolveR2ConfigFromEnv — envPrefix (RFC-0713)", () => {
     vi.stubEnv("R2_ACCOUNT_ID", "evidence-account");
     vi.stubEnv("R2_ACCESS_KEY_ID", "evidence-key");
     vi.stubEnv("R2_SECRET_ACCESS_KEY", "evidence-secret");
-    delete process.env.R2_NACHWEIS_ACCOUNT_ID;
-    delete process.env.R2_NACHWEIS_ACCESS_KEY_ID;
-    delete process.env.R2_NACHWEIS_SECRET_ACCESS_KEY;
 
     const config = resolveR2ConfigFromEnv("axiom-evidence");
 
@@ -67,13 +72,6 @@ describe("resolveR2ConfigFromEnv — envPrefix (RFC-0713)", () => {
   });
 
   it("throws MissingEnvError with unprefixed var name when R2_* vars absent and no prefix", () => {
-    delete process.env.R2_ACCOUNT_ID;
-    delete process.env.R2_ACCESS_KEY_ID;
-    delete process.env.R2_SECRET_ACCESS_KEY;
-    delete process.env.R2_NACHWEIS_ACCOUNT_ID;
-    delete process.env.R2_NACHWEIS_ACCESS_KEY_ID;
-    delete process.env.R2_NACHWEIS_SECRET_ACCESS_KEY;
-
     try {
       resolveR2ConfigFromEnv("axiom-evidence");
       expect.fail("should have thrown MissingEnvError");
