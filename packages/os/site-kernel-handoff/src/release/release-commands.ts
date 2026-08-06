@@ -619,41 +619,41 @@ async function copyDir(src: string, dest: string): Promise<void> {
   }
 }
 
-// §6.2: release.publish
-export interface ReleasePublishData {
+// §6.2: release.ready (renamed from release.publish by RFC-0724)
+export interface ReleaseReadyData {
   releaseId: string;
   systemId: string;
-  state: "published";
-  publishedAt: string;
+  state: "ready";
+  readyAt: string;
   artifactUri: string | null;
   distArtifactHash: string | null;
   distVerified: boolean;
 }
 
-export async function runReleasePublish(
+export async function runReleaseReady(
   input: KernelCommandInput,
   context: KernelRuntimeContext,
-): Promise<KernelCommandResult<ReleasePublishData>> {
+): Promise<KernelCommandResult<ReleaseReadyData>> {
   const { workspaceRoot, logger } = context;
   const releaseId = flagString(input, "release");
-  if (!releaseId) throw new Error("[release.publish] --release is required");
+  if (!releaseId) throw new Error("[release.ready] --release is required");
 
   const releaseDir = path.join(workspaceRoot, "releases", releaseId);
   if (!existsSync(releaseDir)) {
-    throw new Error(`[release.publish] release '${releaseId}' not found`);
+    throw new Error(`[release.ready] release '${releaseId}' not found`);
   }
 
   const manifest = await readReleaseManifest(workspaceRoot, releaseId);
   const state = manifest.state as string;
   if (state !== "prepared") {
-    throw new Error(`[release.publish] release '${releaseId}' is not prepared (state: ${state})`);
+    throw new Error(`[release.ready] release '${releaseId}' is not prepared (state: ${state})`);
   }
 
   // RFC-0585: Check distTreeHash is not pending
   const distTreeHash = manifest.distTreeHash as string | undefined;
   if (!distTreeHash || distTreeHash === "sha256:pending") {
     throw new Error(
-      `[release.publish] distTreeHash is pending or missing — run release.prepare to compute a real hash before publishing`,
+      `[release.ready] distTreeHash is pending or missing — run release.prepare to compute a real hash before marking ready`,
     );
   }
 
@@ -661,36 +661,36 @@ export async function runReleasePublish(
   const distDir = path.join(releaseDir, "dist");
   if (!existsSync(distDir)) {
     throw new Error(
-      `[release.publish] release '${releaseId}' has no dist/ directory — run release.prepare to build and stage the distribution`,
+      `[release.ready] release '${releaseId}' has no dist/ directory — run release.prepare to build and stage the distribution`,
     );
   }
 
   // Check snapshot diff verdict
   if (manifest.snapshotDiffVerdict === "fail") {
-    throw new Error(`[release.publish] snapshot diff verdict is fail — cannot publish`);
+    throw new Error(`[release.ready] snapshot diff verdict is fail — cannot mark ready`);
   }
 
   // Check discipline gates
   if (manifest.migratorVerdict === "fail") {
-    throw new Error(`[release.publish] migrator.registry.validate failed — cannot publish`);
+    throw new Error(`[release.ready] migrator.registry.validate failed — cannot mark ready`);
   }
   if (manifest.versionCompareVerdict === "refuse-downgrade") {
     throw new Error(
-      `[release.publish] version-compare verdict is refuse-downgrade — cannot publish`,
+      `[release.ready] version-compare verdict is refuse-downgrade — cannot mark ready`,
     );
   }
 
   const systemId = manifest.systemId as string;
   const operationId = generateOperationId();
 
-  await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "release.publish", "agent");
-  await acquireLock(workspaceRoot, `release:${releaseId}`, operationId, "release.publish", "agent");
+  await acquireLock(workspaceRoot, `system:${systemId}`, operationId, "release.ready", "agent");
+  await acquireLock(workspaceRoot, `release:${releaseId}`, operationId, "release.ready", "agent");
 
   try {
     const now = new Date().toISOString();
 
     // RFC-0596: Store artifact BEFORE state transition (eliminates partial failure)
-    // release.publish already holds release:${releaseId} and system:${systemId} locks,
+    // release.ready already holds release:${releaseId} and system:${systemId} locks,
     // so we call the lock-free core directly — not runArtifactStorePut which would deadlock.
     // distDir was already declared and validated above (RFC-0585 check).
     const artifactResult = await storeArtifactCore(workspaceRoot, releaseId, distDir, systemId);
@@ -698,16 +698,16 @@ export async function runReleasePublish(
     // Update manifest with artifact reference and state transition in a single write
     manifest.artifact = artifactResult.uri;
     manifest.distArtifactHash = artifactResult.distArtifactHash;
-    manifest.state = "published";
-    manifest.publishedAt = now;
+    manifest.state = "ready";
+    manifest.readyAt = now;
     await writeReleaseYaml(workspaceRoot, releaseId, manifest);
 
     // Append Bordbuch entry
     await appendBordbuchEntry(
       workspaceRoot,
       systemId,
-      "release-published",
-      `Release ${releaseId} published`,
+      "release-ready",
+      `Release ${releaseId} marked ready`,
       "agent",
       {
         writerRole: "release",
@@ -723,19 +723,19 @@ export async function runReleasePublish(
       await writeRegistry(workspaceRoot, registry);
     }
 
-    logger.success(`[release.publish] ${releaseId} published`);
+    logger.success(`[release.ready] ${releaseId} marked ready`);
 
     return {
       data: {
         releaseId,
         systemId,
-        state: "published",
-        publishedAt: now,
+        state: "ready",
+        readyAt: now,
         artifactUri: (manifest.artifact as string) ?? null,
         distArtifactHash: (manifest.distArtifactHash as string) ?? null,
         distVerified: true,
       },
-      summary: `[release.publish] ${releaseId} published`,
+      summary: `[release.ready] ${releaseId} marked ready`,
     };
   } finally {
     await releaseLock(workspaceRoot, `release:${releaseId}`);
@@ -782,12 +782,12 @@ export async function runReleaseValidate(
   const releaseState = manifest.state as string;
 
   let artifactPresent: boolean;
-  if (releaseState === "published") {
+  if (releaseState === "ready") {
     artifactPresent =
       manifest.artifact !== null && manifest.artifact !== undefined && manifest.artifact !== "null";
     if (!artifactPresent) {
       logger.warn(
-        `[release.validate] published release '${releaseId}' has no artifact — run release.publish to store it`,
+        `[release.validate] ready release '${releaseId}' has no artifact — run release.ready to store it`,
       );
     }
   } else {
@@ -823,7 +823,7 @@ export async function runReleaseList(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<ReleaseListData>> {
   const { workspaceRoot, logger } = context;
-  const systemFilter = flagString(input, "system");
+  const systemFilter = flagString(input, "site");
 
   const releasesDir = path.join(workspaceRoot, "releases");
   if (!existsSync(releasesDir)) {
@@ -873,9 +873,9 @@ export async function runReleaseRollback(
   if (!releaseId) throw new Error("[release.rollback] --release is required");
 
   const manifest = await readReleaseManifest(workspaceRoot, releaseId);
-  if (manifest.state !== "published") {
+  if (manifest.state !== "ready") {
     throw new Error(
-      `[release.rollback] release '${releaseId}' is not published (state: ${manifest.state})`,
+      `[release.rollback] release '${releaseId}' is not ready (state: ${manifest.state})`,
     );
   }
 
@@ -931,7 +931,7 @@ export interface ReleaseStateValidateData {
   missionId: string | null;
   releaseId: string | null;
   systemId: string | null;
-  releaseState: "prepared" | "published" | "alt-deployed" | "promoted" | "rolled-back" | "missing";
+  releaseState: "prepared" | "ready" | "alt-deployed" | "promoted" | "rolled-back" | "missing";
   checks: ReleaseStateCheck[];
   summary: string;
 }
@@ -943,11 +943,11 @@ export async function runReleaseStateValidate(
   const { workspaceRoot, logger } = context;
   const missionIdFlag = flagString(input, "mission");
   const releaseIdFlag = flagString(input, "release");
-  const systemFlag = flagString(input, "system");
+  const systemFlag = flagString(input, "site");
 
   if (!missionIdFlag && !releaseIdFlag && !systemFlag) {
     throw new Error(
-      "[release.state.validate] at least one of --mission, --release, or --system is required",
+      "[release.state.validate] at least one of --mission, --release, or --site is required",
     );
   }
 
@@ -1125,7 +1125,7 @@ async function validateReleaseState(
         checks.push({
           rule: "release-state-progressed",
           status: "warn",
-          message: `release '${effectiveReleaseId}' is in 'prepared' state (orphaned — not yet published)`,
+          message: `release '${effectiveReleaseId}' is in 'prepared' state (orphaned — not yet ready)`,
         });
       } else {
         checks.push({

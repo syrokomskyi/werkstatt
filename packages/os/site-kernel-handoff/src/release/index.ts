@@ -14,7 +14,7 @@
 import type { KernelModule } from "@warpgogol/site-kernel";
 import {
   runReleasePrepare,
-  runReleasePublish,
+  runReleaseReady,
   runReleaseValidate,
   runReleaseList,
   runReleaseRollback,
@@ -24,8 +24,8 @@ import {
 export {
   runReleasePrepare,
   type ReleasePrepareData,
-  runReleasePublish,
-  type ReleasePublishData,
+  runReleaseReady,
+  type ReleaseReadyData,
   runReleaseValidate,
   type ReleaseValidateData,
   runReleaseList,
@@ -57,21 +57,21 @@ export function createReleaseModule(): KernelModule {
         execute: runReleasePrepare,
       });
       registry.registerCommand({
-        name: "release.publish",
+        name: "release.ready",
         description:
-          "Publish a prepared release with discipline gates and artifact storage (RFC-0357). Flags: --release.",
+          "Mark a prepared release as ready with discipline gates and artifact storage (RFC-0357, RFC-0724). Flags: --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
         flags: {
-          release: { kind: "string", required: true, description: "Release id to publish." },
+          release: { kind: "string", required: true, description: "Release id to mark ready." },
         },
         writes: [
           "releases/{release}/release.yaml",
           "systems/registry.yaml",
           "systems/{system}/bordbuch/events.ndjson",
         ],
-        execute: runReleasePublish,
+        execute: runReleaseReady,
       });
       registry.registerCommand({
         name: "release.validate",
@@ -85,18 +85,18 @@ export function createReleaseModule(): KernelModule {
       });
       registry.registerCommand({
         name: "release.list",
-        description: "List releases, optionally filtered by system (RFC-0357). Flags: [--system].",
+        description: "List releases, optionally filtered by site (RFC-0357). Flags: [--site].",
         scope: "workspace",
         supportsAllSites: false,
         flags: {
-          system: { kind: "string", description: "Filter by Sternsystem id." },
+          site: { kind: "string", description: "Filter by Sternsystem id." },
         },
         execute: runReleaseList,
       });
       registry.registerCommand({
         name: "release.rollback",
         description:
-          "Mark a published release as rolled-back and append Bordbuch entry (RFC-0357). Flags: --release.",
+          "Mark a ready release as rolled-back and append Bordbuch entry (RFC-0357). Flags: --release.",
         scope: "workspace",
         supportsAllSites: false,
         mutatesState: true,
@@ -109,15 +109,15 @@ export function createReleaseModule(): KernelModule {
       registry.registerCommand({
         name: "release.state.validate",
         description:
-          "Validate release pipeline consistency between mission.yaml, close-report.json, release.yaml, bordbuch, and registry.yaml (RFC-0655). Flags: --mission, --release, --system.",
+          "Validate release pipeline consistency between mission.yaml, close-report.json, release.yaml, bordbuch, and registry.yaml (RFC-0655). Flags: --mission, --release, --site.",
         scope: "workspace",
         supportsAllSites: false,
         flags: {
           mission: { kind: "string", description: "Mission id to validate." },
           release: { kind: "string", description: "Release id to validate." },
-          system: {
+          site: {
             kind: "string",
-            description: "System id — validates all releases for the system.",
+            description: "Site id — validates all releases for the system.",
           },
         },
         reads: [
