@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis barrel exports.</item>
+  <item>RFC-0714: add nachweis.approve and nachweis.public-derivative exports.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -14,6 +15,7 @@ export {
   computeSourceSha256,
   generateRecordId,
   resolveNachweisR2Path,
+  resolveNachweisPublicR2Path,
   uploadToR2,
   isMissingEnvError,
   resolveNachweisCachePath,
@@ -30,6 +32,8 @@ export {
   type NachweisConsentUpdateResult,
   type NachweisPublishResult,
   type NachweisWithdrawResult,
+  type NachweisApproveResult,
+  type NachweisPublicDerivativeResult,
 } from "./nachweis-io.ts";
 
 export { runNachweisIngest } from "./nachweis-ingest.ts";
@@ -38,4 +42,6 @@ export { runNachweisManifestGenerate } from "./nachweis-manifest.ts";
 export { runNachweisConsentUpdate } from "./nachweis-consent.ts";
 export { runNachweisPublish } from "./nachweis-publish.ts";
 export { runNachweisWithdraw } from "./nachweis-withdraw.ts";
+export { runNachweisApprove } from "./nachweis-approve.ts";
+export { runNachweisPublicDerivative } from "./nachweis-public-derivative.ts";
 export { createNachweisModule } from "./nachweis.module.ts";

@@ -18,6 +18,7 @@
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis I/O layer with R2 upload, hash computation, record ID generation.</item>
   <item>RFC-0713: uploadToR2 passes R2_NACHWEIS envPrefix for per-bucket credential isolation.</item>
+  <item>RFC-0714: add NachweisApproveResult, NachweisPublicDerivativeResult interfaces and resolveNachweisPublicR2Path helper.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -121,6 +122,23 @@ export interface NachweisWithdrawResult {
   bordbuchEventIds: string[];
 }
 
+export interface NachweisApproveResult {
+  slug: string;
+  systemId: string;
+  verificationLevel: string;
+  legalContentCheckPassed: boolean;
+  bordbuchEventId: string | null;
+}
+
+export interface NachweisPublicDerivativeResult {
+  slug: string;
+  systemId: string;
+  r2Path: string;
+  publicDerivativeSha256: string;
+  bordbuchEventId: string | null;
+  alreadyUploaded: boolean;
+}
+
 export async function computeSourceSha256(filePath: string): Promise<string> {
   const hash = await byteHashFile(filePath);
   return hash;
@@ -133,6 +151,14 @@ export function generateRecordId(slug: string): string {
 
 export function resolveNachweisR2Path(systemId: string, recordId: string, version: number): string {
   return `${systemId}/private/${recordId}/v${version}/source.pdf`;
+}
+
+export function resolveNachweisPublicR2Path(
+  systemId: string,
+  recordId: string,
+  version: number,
+): string {
+  return `${systemId}/public/${recordId}/v${version}/public.pdf`;
 }
 
 export async function uploadToR2(fileBuffer: Uint8Array, r2Path: string): Promise<void> {

@@ -1,9 +1,9 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0707: Nachweis kernel module — registers 6 nachweis.* commands with lazy-loaded handlers.</purpose>
+<purpose>RFC-0707/RFC-0714: Nachweis kernel module — registers 8 nachweis.* commands with lazy-loaded handlers.</purpose>
 <keywords>nachweis, module, kernel, commands, registration</keywords>
 <responsibilities>
-  <item>Registers nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw.</item>
+  <item>Registers nachweis.ingest, nachweis.validate, nachweis.manifest.generate, nachweis.consent.update, nachweis.publish, nachweis.withdraw, nachweis.approve, nachweis.public-derivative.</item>
   <item>Uses dynamic imports for lazy loading (same pattern as evidence-module.ts and bordbuch.module.ts).</item>
   <item>Declares correct scopes, flags, reads/writes for each command.</item>
 </responsibilities>
@@ -13,6 +13,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0707: initial nachweis kernel module with 6 command registrations.</item>
+  <item>RFC-0714: add nachweis.approve and nachweis.public-derivative command registrations.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,6 +30,8 @@ export function createNachweisModule(): KernelModule {
       const { runNachweisConsentUpdate } = await import("./nachweis-consent.ts");
       const { runNachweisPublish } = await import("./nachweis-publish.ts");
       const { runNachweisWithdraw } = await import("./nachweis-withdraw.ts");
+      const { runNachweisApprove } = await import("./nachweis-approve.ts");
+      const { runNachweisPublicDerivative } = await import("./nachweis-public-derivative.ts");
 
       registry.registerCommand({
         name: "nachweis.ingest",
@@ -159,6 +162,66 @@ export function createNachweisModule(): KernelModule {
         reads: [],
         writes: [],
         execute: runNachweisWithdraw,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.approve",
+        description:
+          "RFC-0714: Record human approval, verification level, and legal content check in a Bordbuch entry. Operator-invoked only.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: { kind: "string", required: true, description: "Record slug to approve" },
+          "verification-level": {
+            kind: "string",
+            required: true,
+            description: "Verification level: N0, N1, N2, N3",
+          },
+          "legal-content-check": {
+            kind: "string",
+            required: true,
+            description: "Legal content check result: passed or failed",
+          },
+          "dry-run": {
+            kind: "boolean",
+            description: "Skip Bordbuch write, return what would happen",
+          },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisApprove,
+      });
+
+      registry.registerCommand({
+        name: "nachweis.public-derivative",
+        description:
+          "RFC-0714: Upload a public-derivative PDF to R2 and update evidence-source items.public.storage to public. Idempotent by SHA-256.",
+        scope: "workspace",
+        supportsAllSites: false,
+        mutatesState: true,
+        cacheable: false,
+        flags: {
+          system: { kind: "string", description: "Target system ID" },
+          slug: {
+            kind: "string",
+            required: true,
+            description: "Record slug to create public derivative for",
+          },
+          file: {
+            kind: "string",
+            required: true,
+            description: "Path to the public-derivative PDF file",
+          },
+          "dry-run": { kind: "boolean", description: "Skip R2 upload and entity update" },
+          json: { kind: "boolean", description: "Output JSON result." },
+        },
+        reads: [],
+        writes: [],
+        execute: runNachweisPublicDerivative,
       });
     },
   };
