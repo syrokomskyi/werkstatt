@@ -11,6 +11,7 @@ agnostic contract consumed by the build-time resolver, the feature gates, and ru
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0169: initial implementation.</item>
+  <item>RFC-0706: add nachweis feature for Nachweisregister commercial module.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -31,6 +32,8 @@ export const ENTITLED_FEATURES = [
   "automation",
   // RFC-0288: Agent Surface action tier (AI-agent-invocable capabilities)
   "agent.actions",
+  // RFC-0706: Nachweisregister commercial module
+  "nachweis",
 ] as const;
 
 export type EntitledFeature = (typeof ENTITLED_FEATURES)[number];
@@ -52,6 +55,8 @@ export const STRIPE_FEATURE_LOOKUP_MAP: Record<string, EntitledFeature> = {
   feature_automation: "automation",
   // RFC-0288
   feature_agent_actions: "agent.actions",
+  // RFC-0706
+  feature_nachweis: "nachweis",
 };
 
 /**

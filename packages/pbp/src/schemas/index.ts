@@ -62,6 +62,7 @@ export { dataRetentionPolicySchema } from "./data-retention-policy.js";
 export { claimSchema } from "./claim.js";
 export { evidenceSourceSchema } from "./evidence-source.js";
 export { disclosureSchema } from "./disclosure.js";
+export { consentSchema } from "./consent.js";
 export { publicDocumentSchema } from "./public-document.js";
 
 // ---------------------------------------------------------------------------
@@ -89,6 +90,7 @@ import { dataRetentionPolicySchema as _dataRetentionPolicy } from "./data-retent
 import { claimSchema as _claim } from "./claim.js";
 import { evidenceSourceSchema as _evidenceSource } from "./evidence-source.js";
 import { disclosureSchema as _disclosure } from "./disclosure.js";
+import { consentSchema as _consent } from "./consent.js";
 import { publicDocumentSchema as _publicDocument } from "./public-document.js";
 
 import { pbpSchemaId } from "../schema-id.js";
@@ -116,6 +118,7 @@ export const pbpSchemaById: Record<string, z.ZodType> = {
   [pbpSchemaId("claim")]: _claim,
   [pbpSchemaId("evidence-source")]: _evidenceSource,
   [pbpSchemaId("disclosure")]: _disclosure,
+  [pbpSchemaId("consent")]: _consent,
   [pbpSchemaId("public-document")]: _publicDocument,
 };
 
@@ -146,5 +149,6 @@ export const pbpEntityDiscriminatedUnion = z.discriminatedUnion("schema", [
   _claim,
   _evidenceSource,
   _disclosure,
+  _consent,
   _publicDocument,
 ]);

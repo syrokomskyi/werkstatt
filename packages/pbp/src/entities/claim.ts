@@ -3,6 +3,7 @@
  *
  * @see pbp-specification-package/entity-model §24 (Claim)
  * @see RFC-0405
+ * @see RFC-0706 (statementLang extension)
  */
 
 import type { PbpEntity, PbpGovernance } from "../envelope.js";
@@ -57,4 +58,5 @@ export interface PbpClaim extends PbpEntity {
     showEvidenceLabel: boolean;
   };
   confidence?: "high" | "medium" | "low";
+  statementLang?: string;
 }

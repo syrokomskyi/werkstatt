@@ -180,6 +180,18 @@ export {
   DISCLOSURE_SCHEMA_ID,
 } from "./entities/disclosure.js";
 
+// RFC-0706: Consent entity (Nachweisregister)
+export {
+  type PbpConsent,
+  type PbpConsentMethod,
+  type PbpConsentStatus,
+  PBP_CONSENT_METHODS,
+  isPbpConsentMethod,
+  PBP_CONSENT_STATUSES,
+  isPbpConsentStatus,
+  CONSENT_SCHEMA_ID,
+} from "./entities/consent.js";
+
 export {
   type PbpCredential,
   type PbpCredentialKind,

@@ -75,7 +75,7 @@ interface ClaimRecord {
 }
 
 interface EvidenceSourceItem {
-  url: string;
+  url?: string;
   retrievedAt?: string;
 }
 

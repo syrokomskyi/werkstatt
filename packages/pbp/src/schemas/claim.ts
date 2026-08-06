@@ -1,9 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Zod schema for PbpClaim entity (RFC-0405, RFC-0466).</purpose>
+<purpose>Zod schema for PbpClaim entity (RFC-0405, RFC-0466, RFC-0706).</purpose>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0466 — Zod schema for PbpClaim.</item>
+  <item>RFC-0706 — Added optional statementLang field.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -50,5 +51,6 @@ export const claimSchema = pbpEntitySchema
       })
       .optional(),
     confidence: z.enum(["high", "medium", "low"]).optional(),
+    statementLang: nonEmptyString.optional(),
   })
   .strict();
