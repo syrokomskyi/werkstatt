@@ -82,6 +82,18 @@ This monorepo is developed on Linux (Ubuntu). AI agents can assume a POSIX envir
 
 **Exception:** `@warpgogol/forge` (published to npm) must remain cross-platform — it ships skills and command modules that consumers may run on Windows or Linux. Forge source and skills must not assume a POSIX-only environment.
 
+## Removal discipline
+
+Before removing any code, field, schema, prop, config entry, or other project artifact, investigate why it was added. Removal is irreversible context loss.
+
+1. **Git history** — `git log -- <path>`, `git blame <path>` to find when and why the artifact was introduced.
+2. **RFCs and ADRs** — search `docs/rfcs/` and `docs/adrs/` for references to the artifact.
+3. **Mission context** — check `mission.yaml` and the mission brief for stated goals that required the artifact.
+4. **Cross-references** — grep for the artifact name across the codebase.
+5. **Semantic purpose** — does the artifact have a clear purpose? Purposeful artifacts are intentional.
+
+If the artifact was intentionally added, the fix is to **extend the schema/contract** to accommodate it, not to remove it. A validation error (e.g. PAGE-PROPS-01) means the schema hasn't caught up with the intended model — the default response is to extend the schema, not to strip the content. See `_shared/fo-pipeline-conventions.md` §Removal discipline in the Forge skills.
+
 ## GitHub Actions CI reliability patterns
 
 All `.github/workflows/*.yml` in this monorepo MUST include these baseline reliability patterns:
