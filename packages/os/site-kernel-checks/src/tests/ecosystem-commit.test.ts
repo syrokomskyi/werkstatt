@@ -153,13 +153,66 @@ status: accepted
     }
   });
 
-  it("EC-06: blocks when versionBump is none", async () => {
+  it("EC-06: blocks when versionBump is none and staged files include code", async () => {
     const root = await setupWorkspace();
     try {
       await writeRfc(root, "RFC-9002", "none");
       await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
       const result = await runEcosystemCommit(
         input({ message: "test", rfc: "RFC-9002" }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(1);
+      const codes = result.data?.violations?.map((v) => v.code) ?? [];
+      expect(codes).toContain("EC-06");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("docs-only .md files in packages/** skip version bump (versionBump: none)", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9003", "none");
+      await stageFile(root, "packages/dummy/AGENTS.md", "# Agent Guide\n");
+      const result = await runEcosystemCommit(
+        input({ message: "docs: update AGENTS.md", rfc: "RFC-9003", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("dry-run");
+      expect(result.data?.skipPlatformBump).toBe(true);
+      expect(result.data?.bumpType).toBe("none");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("docs-only .md files in packages/** skip version bump (no --rfc)", async () => {
+    const root = await setupWorkspace();
+    try {
+      await stageFile(root, "packages/dummy/AGENTS.md", "# Agent Guide\n");
+      const result = await runEcosystemCommit(
+        input({ message: "docs: update AGENTS.md", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.status).toBe("dry-run");
+      expect(result.data?.skipPlatformBump).toBe(true);
+      expect(result.data?.bumpType).toBe("none");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("mixed .md and .ts files in packages/** do NOT skip version bump", async () => {
+    const root = await setupWorkspace();
+    try {
+      await writeRfc(root, "RFC-9004", "none");
+      await stageFile(root, "packages/dummy/AGENTS.md", "# Agent Guide\n");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test", rfc: "RFC-9004", "dry-run": true }),
         ctx(root),
       );
       expect(result.exitCode).toBe(1);

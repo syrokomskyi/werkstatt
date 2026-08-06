@@ -202,6 +202,10 @@ function isIndependentPackage(filePath: string, independentPackages: string[]): 
   return independentPackages.some((pkgPath) => filePath.startsWith(pkgPath + "/"));
 }
 
+function isDocumentationOnly(filePath: string): boolean {
+  return filePath.endsWith(".md");
+}
+
 async function loadIndependentVersionPackages(
   workspaceRoot: string,
 ): Promise<{ packages: string[]; invalidPaths: string[] }> {
@@ -276,7 +280,13 @@ export async function runEcosystemCommit(
     independentPackages.length > 0 &&
     platformStaged.length > 0 &&
     platformStaged.every((f) => isIndependentPackage(f, independentPackages));
-  const skipPlatformBump = allInIndependent && invalidPaths.length === 0;
+  const allDocsOnly =
+    platformStaged.length > 0 && platformStaged.every((f) => isDocumentationOnly(f));
+  const skipPlatformBump = (allInIndependent && invalidPaths.length === 0) || allDocsOnly;
+
+  if (allDocsOnly) {
+    warnings.push("All staged platform files are documentation-only (.md) — skipping version bump");
+  }
 
   // In skip mode, EC-02 and EC-03 do not apply — ecosystem.commit does not touch package.json or the version log
   if (!skipPlatformBump) {
