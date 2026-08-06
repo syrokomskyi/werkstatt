@@ -175,6 +175,7 @@ Five entity schemas (`offering`, `legal-identity`, `web-presence`, `public-docum
 
 - Downstream entity RFCs (RFC-PBP-010+) extend `PbpEntity` with `interface PbpXxx extends PbpEntity { ... }`.
 - Downstream RFCs MUST NOT redefine `schema`, `id`, `type`, `status`, or `governance` on their entity interfaces.
+- If a new entity needs a status-like field with a different type than `PbpEntityStatus`, it MUST be renamed to avoid conflict with `PbpEntity.status` (e.g. `PbpConsent` uses `consentStatus: PbpConsentStatus`, not `status`).
 - Individual entity Zod schemas live in `src/schemas/` (established by RFC-0466), not in downstream RFCs.
 
 ## External identifiers and sameAs projection (RFC-0530)
