@@ -13,6 +13,7 @@ Manual command — not in any pipeline. Idempotent: re-running on already-migrat
 <CHANGE_SUMMARY>
   <item>RFC-0570: initial implementation of content.formula.migrate command.</item>
   <item>RFC-0723: add second scan pass for bare braceless refs in mixed strings — wrap with =(ref) syntax.</item>
+  <item>RFC-0723 review fix: deduplicate BRACELESS_PATTERN with share's fixed field path pattern; reuse loadContentRefIndex from share; skip YAML frontmatter in second pass.</item>
 </CHANGE_SUMMARY>
 */
 
