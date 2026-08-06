@@ -55,6 +55,17 @@ External specification packages are vendored as immutable snapshots under `docs/
 - `spec.status --spec=<id>` shows per-node states, blockers, and progress.
 - Spec amendments (`docs/specs/<id>/amendments/amd-NNN-*.md`) are the only correction channel — snapshot files are never modified.
 
+## Living feature specs (RFC-0711)
+
+Living feature specs are mutable markdown documents under `docs/specs/live/<domain>.md` that reflect the **current** specification of a feature or module. Unlike vendored spec snapshots (DNA-55), living specs evolve through delta merges from archived RFCs.
+
+- **`spec.live.merge --id <RFC-XXXX>`** extracts headings from the RFC's `## Design` section and merges them into the corresponding living spec. Domain is auto-derived from `packagesImpacted[0]` when `liveSpec: true`, or uses the string value when `liveSpec: <domain>`. All-or-nothing: aborts on any heading conflict without writing. Use `--dry-run` to preview.
+- **`spec.live.list`** lists all living specs with domain, title, lastMergedRfc, and history count.
+- **`spec.live.show --domain <name>`** reads and returns a single living spec.
+- **`spec.live.validate`** validates all living specs with rules V-LS-01..05 (frontmatter, domain/filename match, archived RFC references, history integrity, duplicate domains).
+- **`docs.archive`** automatically calls `spec.live.merge` for implemented RFCs with a `liveSpec` frontmatter field after archiving. Rejected RFCs with `liveSpec` are skipped.
+- RFCs declare participation with `liveSpec: true` (auto-derive domain) or `liveSpec: <domain>` (explicit) in frontmatter.
+
 ## Public Business Profile (PBP) program (RFC-0398)
 
 The Public Business Profile (PBP) specification is vendored at `docs/specs/pbp-specification-package/` (accepted, `pbp/*@1`). It defines a universal logical model for the public digital profile of a business, replacing the former business layer (DNA-20) through a 65-RFC, 5-wave implementation program. Warpgogol-com is the first migration target.
