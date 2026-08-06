@@ -205,7 +205,12 @@ When adding a new kernel command that generates files under `public/` or `public
 Entries use this shape:
 
 ```ts
-{ path: "public/path/to/file.generated.yaml", command: "your.command.name", module: "packages/os/.../src/your-module.ts" }
+{
+  path: "public/path/to/file.generated.yaml",
+  command: "your.command.name",
+  module: "packages/os/.../src/your-module.ts",
+  markerPolicy: "registry-only",  // required for public/** files
+}
 ```
 
 Use `conditional: true` for files that are only generated under certain conditions (e.g. CMS-git adapter, preliminary build-identity.json). Conditional entries are exempt from OWN-02 (phantom registration) but still contribute to coverage checks.
