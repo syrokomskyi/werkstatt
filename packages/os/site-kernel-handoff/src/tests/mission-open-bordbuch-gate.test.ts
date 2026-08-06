@@ -10,7 +10,7 @@
 
 import { test, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, basename } from "node:path";
 import { execSync } from "node:child_process";
 import { runMissionOpen } from "../mission/mission-open.ts";
 import { computeEntryHash } from "../bordbuch/bordbuch-io.ts";
@@ -24,13 +24,17 @@ function gitInit(dir: string): void {
 }
 
 function setupBareOrigin(workspaceDir: string): string {
-  const bareDir = join(workspaceDir, "..", "bare-origin.git");
+  const bareDirName = `${basename(workspaceDir)}.git`;
+  const bareDir = join(workspaceDir, bareDirName);
+  writeFileSync(join(workspaceDir, ".gitignore"), `${bareDirName}/\n`);
+  execSync("git add .gitignore", { cwd: workspaceDir, stdio: "pipe" });
+  execSync('git commit -m "add .gitignore"', { cwd: workspaceDir, stdio: "pipe" });
   execSync(`git init --bare ${JSON.stringify(bareDir)}`, { stdio: "pipe" });
   execSync(`git remote add origin ${JSON.stringify(bareDir)}`, {
     cwd: workspaceDir,
     stdio: "pipe",
   });
-  execSync("git push -u origin HEAD:main", { cwd: workspaceDir, stdio: "pipe" });
+  execSync("git push -u origin HEAD", { cwd: workspaceDir, stdio: "pipe" });
   return bareDir;
 }
 

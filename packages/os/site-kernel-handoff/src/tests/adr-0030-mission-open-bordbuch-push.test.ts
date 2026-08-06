@@ -9,8 +9,8 @@
 */
 
 import { test, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
+import { join, basename } from "node:path";
 import { execSync } from "node:child_process";
 import { runMissionOpen } from "../mission/mission-open.ts";
 import type { KernelCommandInput, KernelRuntimeContext } from "@warpgogol/site-kernel";
@@ -99,16 +99,13 @@ test("mission.open throws when bordbuch commit fails (no git origin configured)"
   );
 });
 
-test("mission.open throws with distinct commit-failure message when git commit fails", async () => {
+test("mission.open throws with distinct commit-failure message when git add fails", async () => {
   setupWorkspace();
 
-  // Make the bordbuch events.ndjson unreadable as a git-tracked file by
-  // creating a situation where git add fails: make bordbuch a symlink to
-  // a non-existent target. This causes gitExec("add ...") to fail, which
-  // makes commitAndPushBordbuch return { commitSha: null, pushed: false }.
-  const bordbuchDir = join(tmpWorkspace, "systems", "test-system", "bordbuch");
-  rmSync(bordbuchDir, { recursive: true, force: true });
-  execSync(`ln -s /nonexistent/path ${JSON.stringify(bordbuchDir)}`, { stdio: "pipe" });
+  // Remove the .git directory so all git operations fail.
+  // This makes commitAndPushBordbuch's gitExec("add ...") fail, returning
+  // { commitSha: null, pushed: false } — triggering the commit-failure guard.
+  rmSync(join(tmpWorkspace, ".git"), { recursive: true, force: true });
 
   const input = {
     flags: { system: "test-system", brief: "Test mission", actor: "test-agent" },
@@ -124,10 +121,17 @@ test("mission.open succeeds when commitAndPushBordbuch pushes successfully", asy
   setupWorkspace();
 
   // Set up a bare origin so push succeeds
-  const bareDir = join(tmpWorkspace, "..", "bare-origin.git");
+  const bareDirName = `${basename(tmpWorkspace)}.git`;
+  const bareDir = join(tmpWorkspace, bareDirName);
+  writeFileSync(join(tmpWorkspace, ".gitignore"), `${bareDirName}/\n`);
+  execSync("git add .gitignore", { cwd: tmpWorkspace, stdio: "pipe" });
+  execSync('git commit -m "add .gitignore"', { cwd: tmpWorkspace, stdio: "pipe" });
   execSync(`git init --bare ${JSON.stringify(bareDir)}`, { stdio: "pipe" });
-  execSync(`git remote add origin ${JSON.stringify(bareDir)}`, { cwd: tmpWorkspace, stdio: "pipe" });
-  execSync("git push -u origin HEAD:main", { cwd: tmpWorkspace, stdio: "pipe" });
+  execSync(`git remote add origin ${JSON.stringify(bareDir)}`, {
+    cwd: tmpWorkspace,
+    stdio: "pipe",
+  });
+  execSync("git push -u origin HEAD", { cwd: tmpWorkspace, stdio: "pipe" });
 
   const input = {
     flags: { system: "test-system", brief: "Test mission", actor: "test-agent" },
@@ -138,6 +142,10 @@ test("mission.open succeeds when commitAndPushBordbuch pushes successfully", asy
   expect(result.data?.state).toBe("open");
   expect(result.data?.missionId).toBe("test-system-m000001");
   // Verify the bordbuch event was pushed — check that the bare repo has the commit
-  const bareLog = execSync("git log --oneline -1", { cwd: bareDir, encoding: "utf-8", stdio: "pipe" }).trim();
+  const bareLog = execSync("git log --oneline -1 main", {
+    cwd: bareDir,
+    encoding: "utf-8",
+    stdio: "pipe",
+  }).trim();
   expect(bareLog).toContain("mission-open");
 });
