@@ -68,18 +68,18 @@ export function resolveR2ConfigFromEnv(
   bucketName = "axiom-evidence",
   envPrefix?: string,
 ): R2ClientConfig {
-  const p = envPrefix ? `${envPrefix}_` : "R2_";
-  const accountId = process.env[`${p}ACCOUNT_ID`];
+  const prefix = envPrefix ? `${envPrefix}_` : "R2_";
+  const accountId = process.env[`${prefix}ACCOUNT_ID`];
   if (!accountId) {
-    throw new MissingEnvError(`${p}ACCOUNT_ID`);
+    throw new MissingEnvError(`${prefix}ACCOUNT_ID`);
   }
-  const accessKeyId = process.env[`${p}ACCESS_KEY_ID`];
+  const accessKeyId = process.env[`${prefix}ACCESS_KEY_ID`];
   if (!accessKeyId) {
-    throw new MissingEnvError(`${p}ACCESS_KEY_ID`);
+    throw new MissingEnvError(`${prefix}ACCESS_KEY_ID`);
   }
-  const secretAccessKey = process.env[`${p}SECRET_ACCESS_KEY`];
+  const secretAccessKey = process.env[`${prefix}SECRET_ACCESS_KEY`];
   if (!secretAccessKey) {
-    throw new MissingEnvError(`${p}SECRET_ACCESS_KEY`);
+    throw new MissingEnvError(`${prefix}SECRET_ACCESS_KEY`);
   }
   return { accountId, accessKeyId, secretAccessKey, bucketName };
 }
