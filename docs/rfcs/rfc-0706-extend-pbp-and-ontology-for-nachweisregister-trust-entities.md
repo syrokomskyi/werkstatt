@@ -312,24 +312,24 @@ export const STRIPE_FEATURE_LOOKUP_MAP: Record<string, EntitledFeature> = {
 
 ## Acceptance criteria
 
-- [ ] `PbpEvidenceKind` includes 4 new values: `client-statement`, `project-confirmation`, `certificate`, `operational-evidence`
-- [ ] `evidenceSourceSchema` accepts optional `sha256`, `storage`, `mediaType`, `qualityStatus` in `items` values
-- [ ] `evidenceSourceSchema` accepts `items` entries without `url` or `retrievedAt`
-- [ ] New `PbpConsent` entity type and `consentSchema` defined in `packages/pbp/src/entities/consent.ts` and `packages/pbp/src/schemas/consent.ts`
-- [ ] `consentSchema` registered in `pbpSchemaById` and `pbpEntityDiscriminatedUnion`
-- [ ] `PbpClaim` has optional `statementLang: string` field
-- [ ] `claimSchema` accepts optional `statementLang` without breaking existing claims
-- [ ] `bordbuchEntryKindSchema` includes `nachweis-record` and `nachweis-consent`
-- [ ] `WRITER_ROLE_KINDS` includes `nachweis` role mapped to both new kinds
-- [ ] `ENTITLED_FEATURES` includes `"nachweis"`
-- [ ] `STRIPE_FEATURE_LOOKUP_MAP` includes `"feature_nachweis": "nachweis"`
-- [ ] `pbp.content.validate` validates Consent entities from `business-profile/{lang}/consent/`
-- [ ] `bordbuch.validate` accepts entries with `nachweis-record` and `nachweis-consent` kinds
-- [ ] `entitlements.validate` accepts `"nachweis"` in resolved features
-- [ ] All `items` consumers audited for `url`/`retrievedAt` optionality — no unguarded access remains (evidence: `grep -rn 'items\[' packages/` shows all accesses use optional chaining or null guards)
-- [ ] `PbpConsent`, `PbpConsentMethod`, `PbpConsentStatus`, `CONSENT_SCHEMA_ID` exported from `packages/pbp/src/index.ts` barrel
-- [ ] All affected packages pass `build:check` (typecheck)
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `PbpEvidenceKind` includes 4 new values: `client-statement`, `project-confirmation`, `certificate`, `operational-evidence` (evidence: packages/pbp/src/entities/evidence-source.ts:17-21, packages/pbp/src/schemas/evidence-source.ts:19-24)
+- [x] `evidenceSourceSchema` accepts optional `sha256`, `storage`, `mediaType`, `qualityStatus` in `items` values (evidence: packages/pbp/src/schemas/evidence-source.ts:40-49)
+- [x] `evidenceSourceSchema` accepts `items` entries without `url` or `retrievedAt` (evidence: packages/pbp/src/schemas/evidence-source.ts:37-38, url/retrievedAt are `.optional()`)
+- [x] New `PbpConsent` entity type and `consentSchema` defined in `packages/pbp/src/entities/consent.ts` and `packages/pbp/src/schemas/consent.ts` (evidence: packages/pbp/src/entities/consent.ts:57-69, packages/pbp/src/schemas/consent.ts:30-52)
+- [x] `consentSchema` registered in `pbpSchemaById` and `pbpEntityDiscriminatedUnion` (evidence: packages/pbp/src/schemas/index.ts:121,152)
+- [x] `PbpClaim` has optional `statementLang: string` field (evidence: packages/pbp/src/entities/claim.ts:61, packages/pbp/src/schemas/claim.ts:54)
+- [x] `claimSchema` accepts optional `statementLang` without breaking existing claims (evidence: packages/pbp/src/schemas/claim.ts:54, build:check pass)
+- [x] `bordbuchEntryKindSchema` includes `nachweis-record` and `nachweis-consent` (evidence: packages/ontology/src/operations/mission.ts:63-64)
+- [x] `WRITER_ROLE_KINDS` includes `nachweis` role mapped to both new kinds (evidence: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts:51)
+- [x] `ENTITLED_FEATURES` includes `"nachweis"` (evidence: packages/share/src/entitlement.ts:36)
+- [x] `STRIPE_FEATURE_LOOKUP_MAP` includes `"feature_nachweis": "nachweis"` (evidence: packages/share/src/entitlement.ts:59)
+- [x] `pbp.content.validate` validates Consent entities from `business-profile/{lang}/consent/` (evidence: consentSchema registered in pbpSchemaById registry, packages/pbp/src/schemas/index.ts:121 — pbp.content.validate dispatches via pbpSchemaById automatically)
+- [x] `bordbuch.validate` accepts entries with `nachweis-record` and `nachweis-consent` kinds (evidence: packages/ontology/src/operations/mission.ts:63-64, bordbuchEntrySchema uses bordbuchEntryKindSchema which includes the new values)
+- [x] `entitlements.validate` accepts `"nachweis"` in resolved features (evidence: packages/share/src/entitlement.ts:36, isValidFeature checks ENTITLED_FEATURES array which includes "nachweis")
+- [x] All `items` consumers audited for `url`/`retrievedAt` optionality — no unguarded access remains (evidence: grep for `items[.*].url` and `items[.*].retrievedAt` found zero direct accesses; wikidata.ts EvidenceSourceItem.url made optional at packages/os/site-kernel-checks/src/audit/validators/wikidata.ts:78, consumer at line 290 uses truthiness check `item.url && item.url.trim() !== ""`)
+- [x] `PbpConsent`, `PbpConsentMethod`, `PbpConsentStatus`, `CONSENT_SCHEMA_ID` exported from `packages/pbp/src/index.ts` barrel (evidence: packages/pbp/src/index.ts:183-193)
+- [x] All affected packages pass `build:check` (typecheck) (evidence: @warpgogol/pbp, @warpgogol/ontology, @warpgogol/share, @warpgogol/site-kernel-handoff, @warpgogol/site-kernel-checks all pass)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0706 --json returned ok:true, zero errors)
 
 ## Implementation notes for agents
 
