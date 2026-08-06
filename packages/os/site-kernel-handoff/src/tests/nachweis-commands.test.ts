@@ -656,3 +656,328 @@ describe("RFC-0707: nachweis.withdraw", () => {
     expect(raw).toContain("private");
   });
 });
+
+describe("RFC-0714: nachweis.approve", () => {
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(join(tmpdir(), "nachweis-approve-XXXX-"));
+    workspaceRoot = tmpDir;
+    await writeFile(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
+  });
+
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it("skips silently when nachweis entitlement is not resolved", async () => {
+    const { runNachweisApprove } = await import("../nachweis/nachweis-approve.ts");
+    const result = await runNachweisApprove(
+      makeInput({
+        system: "test-sys",
+        slug: "test-record",
+        "verification-level": "N3",
+        "legal-content-check": "passed",
+      }),
+      makeContext("test-sys"),
+    );
+    expect(result.exitCode).toBe(0);
+    expect(result.summary).toContain("skipped");
+  });
+
+  it("appends bordbuch entry with approved summary and metadata", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: { main: { sha256: "a".repeat(64) } },
+    });
+
+    const { runNachweisApprove } = await import("../nachweis/nachweis-approve.ts");
+    const result = await runNachweisApprove(
+      makeInput({
+        system: "test-sys",
+        slug: "test-record",
+        "verification-level": "N3",
+        "legal-content-check": "passed",
+      }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.data!.verificationLevel).toBe("N3");
+    expect(result.data!.legalContentCheckPassed).toBe(true);
+    expect(result.data!.bordbuchEventId).toBeTruthy();
+
+    const bordbuchPath = join(tmpDir, "systems-cache", "test-sys", "bordbuch", "events.ndjson");
+    const bordbuchRaw = await readFile(bordbuchPath, "utf8");
+    const entries = bordbuchRaw
+      .trim()
+      .split("\n")
+      .map((l) => JSON.parse(l));
+    const approveEntry = entries.find(
+      (e: Record<string, unknown>) =>
+        e.kind === "nachweis-record" && (e.summary as string).includes("approved"),
+    ) as Record<string, unknown> | undefined;
+    expect(approveEntry).toBeTruthy();
+    expect(approveEntry!.summary as string).toContain("approved");
+    const metadata = approveEntry!.metadata as Record<string, unknown>;
+    expect(metadata.verificationLevel).toBe("N3");
+    expect(metadata.legalContentCheckPassed).toBe(true);
+    expect(metadata.approved).toBe(true);
+  });
+
+  it("dry-run returns result without appending bordbuch", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      items: { main: { sha256: "a".repeat(64) } },
+    });
+
+    const { runNachweisApprove } = await import("../nachweis/nachweis-approve.ts");
+    const result = await runNachweisApprove(
+      makeInput({
+        system: "test-sys",
+        slug: "test-record",
+        "verification-level": "N3",
+        "legal-content-check": "passed",
+        "dry-run": true,
+      }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.data!.bordbuchEventId).toBeNull();
+    expect(result.summary).toContain("DRY RUN");
+
+    const bordbuchPath = join(tmpDir, "systems-cache", "test-sys", "bordbuch", "events.ndjson");
+    expect(existsSync(bordbuchPath)).toBe(false);
+  });
+
+  it("emits logger.warn when evidence-source file not found for slug", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    const logger = createKernelLogger();
+    const warnSpy = vi.spyOn(logger, "warn");
+    const { io } = createDefaultIO();
+    const ctx = {
+      workspaceRoot,
+      logger,
+      io,
+      fileIntents: [],
+      commandName: "test",
+      site: { name: "test-sys" },
+    } as unknown as KernelRuntimeContext;
+
+    const { runNachweisApprove } = await import("../nachweis/nachweis-approve.ts");
+    const result = await runNachweisApprove(
+      makeInput({
+        system: "test-sys",
+        slug: "nonexistent-record",
+        "verification-level": "N3",
+        "legal-content-check": "passed",
+      }),
+      ctx,
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("no evidence-source file found for slug 'nonexistent-record'"),
+    );
+  });
+});
+
+describe("RFC-0714: nachweis.public-derivative", () => {
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(join(tmpdir(), "nachweis-pubderiv-XXXX-"));
+    workspaceRoot = tmpDir;
+    mockR2State.objects.clear();
+    mockR2State.putCalls = 0;
+    mockR2State.putShouldFail = false;
+    await writeFile(join(tmpDir, "package.json"), JSON.stringify({ version: "1.0.0" }) + "\n");
+  });
+
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it("skips silently when nachweis entitlement is not resolved", async () => {
+    const { runNachweisPublicDerivative } =
+      await import("../nachweis/nachweis-public-derivative.ts");
+    const result = await runNachweisPublicDerivative(
+      makeInput({
+        system: "test-sys",
+        slug: "test-record",
+        file: "/fake.pdf",
+      }),
+      makeContext("test-sys"),
+    );
+    expect(result.exitCode).toBe(0);
+    expect(result.summary).toContain("skipped");
+  });
+
+  it("throws NOT_FOUND when evidence-source file does not exist", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    const pdfFile = join(tmpDir, "public.pdf");
+    await writeFile(pdfFile, "fake pdf content");
+
+    const { runNachweisPublicDerivative } =
+      await import("../nachweis/nachweis-public-derivative.ts");
+    await expect(
+      runNachweisPublicDerivative(
+        makeInput({
+          system: "test-sys",
+          slug: "nonexistent-record",
+          file: pdfFile,
+        }),
+        makeContext("test-sys"),
+      ),
+    ).rejects.toThrow("NOT_FOUND");
+  });
+
+  it("uploads PDF to R2 and updates items.public.storage to public in evidence-source entity", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      recordId: "nr_test-record_20260806",
+      version: 1,
+      items: { main: { sha256: "a".repeat(64), storage: "private" } },
+    });
+
+    const pdfContent = "fake public derivative pdf content";
+    const pdfFile = join(tmpDir, "public.pdf");
+    await writeFile(pdfFile, pdfContent);
+
+    const { runNachweisPublicDerivative } =
+      await import("../nachweis/nachweis-public-derivative.ts");
+    const result = await runNachweisPublicDerivative(
+      makeInput({
+        system: "test-sys",
+        slug: "test-record",
+        file: pdfFile,
+      }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.data!.alreadyUploaded).toBe(false);
+    expect(result.data!.r2Path).toContain("test-sys/public/");
+    expect(result.data!.r2Path).toContain("public.pdf");
+    expect(result.data!.publicDerivativeSha256).toMatch(/^sha256:/);
+    expect(result.data!.bordbuchEventId).toBeTruthy();
+    expect(mockR2State.putCalls).toBe(1);
+
+    const evidenceFile = join(
+      cachePath,
+      "src",
+      "content",
+      "business-profile",
+      "de",
+      "evidence-source",
+      "test-record.md",
+    );
+    const raw = await readFile(evidenceFile, "utf8");
+    expect(raw).toContain("public");
+    expect(raw).toContain(result.data!.publicDerivativeSha256);
+  });
+
+  it("is idempotent — returns alreadyUploaded true when same SHA-256 already recorded", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    const pdfContent = "fake public derivative pdf content for idempotency";
+    const pdfFile = join(tmpDir, "public.pdf");
+    await writeFile(pdfFile, pdfContent);
+
+    const { computeSourceSha256 } = await import("../nachweis/nachweis-io.ts");
+    const expectedHash = await computeSourceSha256(pdfFile);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      recordId: "nr_test-record_20260806",
+      version: 1,
+      items: {
+        main: { sha256: "a".repeat(64), storage: "private" },
+        public: { sha256: expectedHash, storage: "public", mediaType: "application/pdf" },
+      },
+    });
+
+    const { runNachweisPublicDerivative } =
+      await import("../nachweis/nachweis-public-derivative.ts");
+    const result = await runNachweisPublicDerivative(
+      makeInput({
+        system: "test-sys",
+        slug: "test-record",
+        file: pdfFile,
+      }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.data!.alreadyUploaded).toBe(true);
+    expect(result.data!.bordbuchEventId).toBeNull();
+    expect(mockR2State.putCalls).toBe(0);
+  });
+
+  it("dry-run returns result without uploading or updating entity", async () => {
+    const cachePath = join(tmpDir, "systems-cache", "test-sys");
+    await mkdir(cachePath, { recursive: true });
+    await writeEntitlements(cachePath, ["nachweis"]);
+
+    await writePbpEntity(cachePath, "evidence-source", "test-record", {
+      kind: "certificate",
+      slug: "test-record",
+      titleDe: "Test",
+      titleUk: "Тест",
+      recordId: "nr_test-record_20260806",
+      version: 1,
+      items: { main: { sha256: "a".repeat(64), storage: "private" } },
+    });
+
+    const pdfContent = "fake public derivative pdf content for dry run";
+    const pdfFile = join(tmpDir, "public.pdf");
+    await writeFile(pdfFile, pdfContent);
+
+    const { runNachweisPublicDerivative } =
+      await import("../nachweis/nachweis-public-derivative.ts");
+    const result = await runNachweisPublicDerivative(
+      makeInput({
+        system: "test-sys",
+        slug: "test-record",
+        file: pdfFile,
+        "dry-run": true,
+      }),
+      makeContext("test-sys"),
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.data!.alreadyUploaded).toBe(false);
+    expect(result.data!.bordbuchEventId).toBeNull();
+    expect(result.summary).toContain("DRY RUN");
+    expect(mockR2State.putCalls).toBe(0);
+  });
+});
