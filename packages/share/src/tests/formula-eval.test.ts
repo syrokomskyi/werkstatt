@@ -231,4 +231,72 @@ describe("resolveFormula", () => {
     expect(result.resolved).toBe(true);
     expect(result.value).toBe("500");
   });
+
+  it("RFC-0723: returns string value for single-ref expression with non-numeric value", () => {
+    const indexWithStringValue: ContentRefIndex = {
+      ...mockIndex,
+      entries: {
+        "business-profile": {
+          "offerings/digital-foundation": {
+            de: {
+              presentation: {
+                price: {
+                  setup: "200 €",
+                  monthly: "70 €",
+                },
+                tagline: "Digitales Fundament",
+              },
+            },
+          },
+        },
+      },
+    };
+    const result = resolveFormula(
+      indexWithStringValue,
+      "business-profile.offerings/digital-foundation.presentation.tagline",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("Digitales Fundament");
+  });
+
+  it("RFC-0723: returns string value for single-ref expression with numeric value", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.setup",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("200");
+  });
+
+  it("RFC-0723: returns REF-07 for multi-ref expression with non-numeric operand", () => {
+    const indexWithNonNumeric: ContentRefIndex = {
+      ...mockIndex,
+      entries: {
+        "business-profile": {
+          "offerings/digital-foundation": {
+            de: {
+              presentation: {
+                price: {
+                  setup: "not a number",
+                  monthly: "70 €",
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+    const result = resolveFormula(
+      indexWithNonNumeric,
+      "business-profile.offerings/digital-foundation.presentation.price.setup + business-profile.offerings/digital-foundation.presentation.price.monthly",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(false);
+    expect(result.error).toContain("REF-07");
+  });
 });
