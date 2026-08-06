@@ -232,7 +232,7 @@ entries:
     version: 1.0.0
     layoutHint: card-grid
     acceptedCosmicNames:
-      - Praxidike
+      - Nix
     sourceFile: packages/ontology/archetypes/components/nachweis-card.yaml
     layer: component
   - id: nachweis-detail
@@ -606,6 +606,10 @@ planetImportPaths:
   Aegaeon: "@warpgogol/ui/components/live-photo"
   Cordelia: "@warpgogol/ui/components/material-credit"
   Sycorax: "@warpgogol/ui/components/media"
+  Nix: "@warpgogol/ui/components/nachweis-card"
+  Kerberos: "@warpgogol/ui/components/nachweis-detail"
+  Hydra: "@warpgogol/ui/components/nachweis-list"
+  Styx: "@warpgogol/ui/components/nachweis-verify"
   Cressida: "@warpgogol/ui/components/not-found"
   Methone: "@warpgogol/ui/components/passport-header"
   Bianca: "@warpgogol/ui/components/passport-provenance"
@@ -671,6 +675,10 @@ blockTypeToCosmicName:
   live-photo: Aegaeon
   material-credit: Cordelia
   media: Sycorax
+  nachweis-card: Nix
+  nachweis-detail: Kerberos
+  nachweis-list: Hydra
+  nachweis-verify: Styx
   layout.not-found: Cressida
   passport-header: Methone
   passport-provenance: Bianca
@@ -744,6 +752,10 @@ roleByCosmicName:
   Aegaeon: section-image
   Cordelia: section-body
   Sycorax: section-image
+  Nix: section-body
+  Kerberos: section-body
+  Hydra: section-body
+  Styx: section-body
   Cressida: layout-shell
   Methone: header
   Bianca: footer-promo

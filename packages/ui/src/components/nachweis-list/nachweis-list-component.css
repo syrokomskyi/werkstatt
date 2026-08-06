@@ -1,0 +1,40 @@
+/*
+<MODULE_CONTRACT>
+<purpose>
+  Styles for NachweisList (Hydra). Uses --ds-* tokens only.
+  RFC-0708 / DNA-10 / WCAG 2.2 AA.
+</purpose>
+<non-goals>
+  <item>Does not style individual cards — that belongs to nachweis-card.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0708: initial implementation.</item>
+</CHANGE_SUMMARY>
+*/
+
+/* NachweisList (Hydra) — RFC-0708 */
+
+.nachweis-list {
+  display: block;
+}
+
+.nachweis-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--ds-space-6);
+}
+
+.nachweis-list__item {
+  margin: 0;
+}
+
+.nachweis-list__empty {
+  font-size: var(--ds-font-size-base);
+  color: var(--ds-color-text-secondary);
+  text-align: center;
+  padding: var(--ds-space-8) var(--ds-space-4);
+  line-height: 1.6;
+}

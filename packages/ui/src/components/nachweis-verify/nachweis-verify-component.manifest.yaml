@@ -1,0 +1,14 @@
+id: nachweis-verify-component
+uniName: nachweis-verify-component
+layer: component
+semanticId: nachweis-verify
+archetype: nachweis-verify
+
+cosmicName: Styx
+role: section-body
+version: 1.0.0
+intent:
+  - verify
+industryFit:
+  - non-profit
+contentSchemaKey: null

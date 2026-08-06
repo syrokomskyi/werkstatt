@@ -1,0 +1,132 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+  NachweisCard (Nix) — Semantic article displaying a Nachweis record:
+  result/scope, context/limitations, quote, source, what was verified, what
+  was not verified, and status. RFC-0708.
+</purpose>
+<non-goals>
+  <item>Does not fetch data — receives all data via props from the page block.</item>
+  <item>Does not handle routing or navigation.</item>
+  <item>Does not render the Sichtpass section — use nachweis-detail for that.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0708: initial implementation.</item>
+</CHANGE_SUMMARY>
+*/
+
+/**
+ * NachweisCard (Nix) — trust card component
+ * RFC-0708 / DNA-17 / DNA-23 / WCAG 2.2 AA
+ */
+
+import "./nachweis-card-component.css";
+
+interface Props {
+  slug: string;
+  title: string;
+  result: string;
+  scope?: string;
+  context?: string;
+  limitations?: string;
+  quote?: string;
+  quoteLang?: string;
+  source?: string;
+  verifiedScope?: string;
+  notVerifiedScope?: string;
+  status: "draft" | "preview" | "published" | "withdrawn";
+  verifiedByLabel?: string;
+}
+
+const {
+  slug,
+  title,
+  result,
+  scope,
+  context,
+  limitations,
+  quote,
+  quoteLang,
+  source,
+  verifiedScope,
+  notVerifiedScope,
+  status,
+  verifiedByLabel,
+} = Astro.props;
+
+const headingId = `nachweis-card-${slug}-title`;
+---
+
+<article class="nachweis-card" data-component="nachweis-card" aria-labelledby={headingId}>
+  <h2 id={headingId} class="nachweis-card__title">{title}</h2>
+
+  <p class="nachweis-card__result">{result}</p>
+
+  {
+    scope && (
+      <p class="nachweis-card__scope">
+        <span class="nachweis-card__label">Geltungsbereich:</span>
+        {scope}
+      </p>
+    )
+  }
+
+  {context && <p class="nachweis-card__context">{context}</p>}
+
+  {
+    limitations && (
+      <p class="nachweis-card__limitations">
+        <span class="nachweis-card__label">Einschränkungen:</span>
+        {limitations}
+      </p>
+    )
+  }
+
+  {
+    quote && (
+      <blockquote class="nachweis-card__quote" cite={source} lang={quoteLang}>
+        {quote}
+      </blockquote>
+    )
+  }
+
+  {
+    source && (
+      <p class="nachweis-card__source">
+        <span class="nachweis-card__label">Quelle:</span>
+        <cite>{source}</cite>
+      </p>
+    )
+  }
+
+  <dl class="nachweis-card__verification">
+    {
+      verifiedScope && (
+        <div class="nachweis-card__entry">
+          <dt>Was dokumentiert wurde</dt>
+          <dd>{verifiedScope}</dd>
+        </div>
+      )
+    }
+    {
+      notVerifiedScope && (
+        <div class="nachweis-card__entry">
+          <dt>Was nicht geprüft wurde</dt>
+          <dd>{notVerifiedScope}</dd>
+        </div>
+      )
+    }
+  </dl>
+
+  <p class="nachweis-card__status" data-status={status}>
+    <span class="nachweis-card__status-text">
+      {status === "published" && "Veröffentlicht"}
+      {status === "preview" && "Vorschau"}
+      {status === "draft" && "Entwurf"}
+      {status === "withdrawn" && "Zurückgezogen"}
+    </span>
+    {verifiedByLabel && <span class="nachweis-card__verified-by">{verifiedByLabel}</span>}
+  </p>
+</article>

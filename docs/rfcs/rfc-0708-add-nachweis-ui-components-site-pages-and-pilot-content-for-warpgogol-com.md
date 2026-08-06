@@ -90,7 +90,7 @@ The specification also defines a card structure with WCAG 2.2 AA requirements: s
 
 Four new components in `packages/ui/src/components/`:
 
-1. **`nachweis-card/`** — cosmicName **Praxidike** (Jupiter moon, goddess of judicial order). Semantic article with blockquote, dl, time. Shows: result/scope → context/limitations → quote → source → what Warpgogol verified → what was not verified → status. Uses `--ds-*` tokens. WCAG 2.2 AA.
+1. **`nachweis-card/`** — cosmicName **Nix** (Pluto moon). Semantic article with blockquote, dl, time. Shows: result/scope → context/limitations → quote → source → what Warpgogol verified → what was not verified → status. Uses `--ds-*` tokens. WCAG 2.2 AA.
 
 2. **`nachweis-list/`** — cosmicName **Hydra** (Pluto moon). List of `nachweis-card` components for the index page. Renders published records only. Empty state: "Weitere Nachweise werden derzeit vorbereitet."
 
@@ -166,7 +166,7 @@ surface:
 ## Architectural fit
 
 - **Block-declarative pages (RFC-0047, DNA-24):** Nachweis pages follow the standard `system.md` → `pages[]` → `blocks[]` pattern. The existing `[...slug].astro` catch-all serves all three page entries. Dynamic route slugs are enumerated by `getNachweisRoutes()` (see Route source below). No dedicated `.astro` route files are needed for HTML pages.
-- **Mirror Quintet (DNA-17, DNA-23):** Each component has `.astro`, `.css`, `<slug>-component.manifest.yaml`, and a new archetype entry in `packages/ontology/archetypes/components/`. Cosmic names are drawn from `MoonCatalog` (Praxidike, Hydra, Kerberos, Styx) — all available and not passport-reserved.
+- **Mirror Quintet (DNA-17, DNA-23):** Each component has `.astro`, `.css`, `<slug>-component.manifest.yaml`, and a new archetype entry in `packages/ontology/archetypes/components/`. Cosmic names are drawn from `MoonCatalog` (Nix, Hydra, Kerberos, Styx) — all available and not passport-reserved.
 - **PBP content collections:** Nachweis PBP entities live in `business-profile/{lang}/trust/` alongside existing claims, evidence, and disclosures.
 - **Entitlement gating (RFC-0169):** `nachweis` feature gates the Nachweis surface module. `entitlement.module.validate` enforces that blueprints are not compiled without the entitlement.
 - **WCAG 2.2 AA:** Components use semantic HTML (`article`, `blockquote`, `dl`, `time`), visible focus, keyboard navigation, `lang` attributes on quotes. Status is not communicated by color alone.
@@ -299,7 +299,7 @@ For `nachweis-verify`, the route source generates entries with version suffixed 
 
 | Path | Role |
 | --- | --- |
-| `packages/ui/src/components/nachweis-card/nachweis-card.astro` | Card component (cosmicName: Praxidike) |
+| `packages/ui/src/components/nachweis-card/nachweis-card.astro` | Card component (cosmicName: Nix) |
 | `packages/ui/src/components/nachweis-card/nachweis-card.css` | Card styles |
 | `packages/ui/src/components/nachweis-card/nachweis-card-component.manifest.yaml` | Card manifest |
 | `packages/ui/src/components/nachweis-list/nachweis-list.astro` | List component (cosmicName: Hydra) |
@@ -392,7 +392,7 @@ Prohibited phrases:
 - [ ] `nachweis-list` component renders published records or empty state message
 - [ ] `nachweis-detail` component renders card + Sichtpass section
 - [ ] `nachweis-verify` component renders all 4 SHA-256 hashes, signature, and timestamp fields
-- [ ] All 4 components have `.astro`, `.css`, `<slug>-component.manifest.yaml` files with correct cosmicNames (Praxidike, Hydra, Kerberos, Styx)
+- [ ] All 4 components have `.astro`, `.css`, `<slug>-component.manifest.yaml` files with correct cosmicNames (Nix, Hydra, Kerberos, Styx)
 - [ ] 4 archetype entries created in `packages/ontology/archetypes/components/` and `archetype.registry.build` passes
 - [ ] `getNachweisRoutes()` in `packages/share/src/astro/nachweis-routes.ts` enumerates published records for `getStaticPaths`
 - [ ] `system.md` includes 3 Nachweis page entries with correct routes

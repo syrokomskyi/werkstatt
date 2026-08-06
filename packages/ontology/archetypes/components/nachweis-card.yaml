@@ -30,5 +30,5 @@ propsSchema:
       verifiedByLabel: z.string().optional(),
     }).passthrough()
 acceptedCosmicNames:
-  - Praxidike
+  - Nix
 constraints: {}
