@@ -16,6 +16,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial TSA adapter with FreeTSA.org implementation.</item>
+  <item>RFC-0715 review fix: use byteHash from @warpgogol/fingerprint (DNA-53). Replace FreeTsaAdapter class + createCustomTsaAdapter with HttpTsaAdapter class.</item>
 </CHANGE_SUMMARY>
 */
 

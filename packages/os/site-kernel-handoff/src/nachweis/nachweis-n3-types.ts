@@ -12,6 +12,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial N3 shared types module.</item>
+  <item>RFC-0715 review fix: add shared flagString/flagBool helpers to eliminate duplication across command files.</item>
 </CHANGE_SUMMARY>
 */
 

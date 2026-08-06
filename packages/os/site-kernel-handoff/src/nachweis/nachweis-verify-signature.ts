@@ -16,6 +16,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial nachweis.verify-signature command handler.</item>
+  <item>RFC-0715 review fix: import flagString from nachweis-n3-types.ts.</item>
 </CHANGE_SUMMARY>
 */
 

@@ -17,6 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial nachweis.sign command handler.</item>
+  <item>RFC-0715 review fix: use byteHash from @warpgogol/fingerprint for payloadHash (DNA-53). Import flagString/flagBool from nachweis-n3-types.ts.</item>
 </CHANGE_SUMMARY>
 */
 

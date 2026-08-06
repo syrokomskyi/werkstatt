@@ -18,6 +18,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0715: initial nachweis.timestamp command handler.</item>
+  <item>RFC-0715 review fix: use HttpTsaAdapter for custom TSA URLs. Import flagString/flagBool from nachweis-n3-types.ts.</item>
 </CHANGE_SUMMARY>
 */
 
