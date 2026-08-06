@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: a86eaf2122785c89f1948dcc0636c1832ead248c0e2f44af7ea1dace12270b0f
+  contentHash: 43e06d557592e86ec10def9cfc6735b399de3a809f0f67dba8997ef987a60242
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -7271,6 +7271,11 @@ commands:
         default: false
         description: Amend the previous ecosystem.commit commit instead of creating a
           new one.
+      bump:
+        kind: string
+        required: false
+        description: Override version bump type (patch, minor, major). Takes precedence
+          over RFC versionBump frontmatter.
     reads: &a315
       - package.json
       - docs/rfcs/**/*.md
@@ -13994,6 +13999,62 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: nachweis.key.ensure
+    description: "RFC-0715: Generate an Ed25519 keypair for Nachweis operator
+      signatures. Writes private key to file, publishes public key JSON."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      key-file:
+        kind: string
+        required: true
+        description: Path to write the private key (hex). Should be outside the repo,
+          e.g. ~/.warpgogol/nachweis-signing.key
+      force:
+        kind: boolean
+        description: Overwrite existing key file
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.key.ensure
+    description: "RFC-0715: Generate an Ed25519 keypair for Nachweis operator
+      signatures. Writes private key to file, publishes public key JSON."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      key-file:
+        kind: string
+        required: true
+        description: Path to write the private key (hex). Should be outside the repo,
+          e.g. ~/.warpgogol/nachweis-signing.key
+      force:
+        kind: boolean
+        description: Overwrite existing key file
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: nachweis.manifest.generate
     description: "RFC-0707: Generate public/nachweise/manifest.json from published
       records (generatedAt: null per RFC-0602)."
@@ -14102,7 +14163,7 @@ commands:
     pipelines: []
   - name: nachweis.publish
     description: "RFC-0707: Enforce publication gate and transition record to
-      published. Accepts --pilot-n2-exception for N2 pilot."
+      published. Requires N3 verification level."
     scope: workspace
     provider: site:warpgogol-com
     module: nachweis
@@ -14117,9 +14178,6 @@ commands:
         kind: string
         required: true
         description: Record slug to publish
-      pilot-n2-exception:
-        kind: boolean
-        description: Accept N2 verification level (temporary, removed when N3 implemented)
       json:
         kind: boolean
         description: Output JSON result.
@@ -14129,7 +14187,7 @@ commands:
     pipelines: []
   - name: nachweis.publish
     description: "RFC-0707: Enforce publication gate and transition record to
-      published. Accepts --pilot-n2-exception for N2 pilot."
+      published. Requires N3 verification level."
     scope: workspace
     provider: workspace
     module: nachweis
@@ -14144,9 +14202,128 @@ commands:
         kind: string
         required: true
         description: Record slug to publish
-      pilot-n2-exception:
+      json:
         kind: boolean
-        description: Accept N2 verification level (temporary, removed when N3 implemented)
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.sign
+    description: "RFC-0715: Sign a Nachweis record with an Ed25519 operator key.
+      Appends nachweis-signed Bordbuch entry. Idempotent."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to sign
+      key-file:
+        kind: string
+        required: true
+        description: Path to the Ed25519 private key file (hex)
+      dry-run:
+        kind: boolean
+        description: Skip Bordbuch write
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.sign
+    description: "RFC-0715: Sign a Nachweis record with an Ed25519 operator key.
+      Appends nachweis-signed Bordbuch entry. Idempotent."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to sign
+      key-file:
+        kind: string
+        required: true
+        description: Path to the Ed25519 private key file (hex)
+      dry-run:
+        kind: boolean
+        description: Skip Bordbuch write
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.timestamp
+    description: "RFC-0715: Obtain an RFC 3161 timestamp token for a signed Nachweis
+      record. Requires nachweis.sign to have run first. Idempotent."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to timestamp
+      tsa-url:
+        kind: string
+        description: "Custom TSA URL (default: freetsa.org/tsr)"
+      dry-run:
+        kind: boolean
+        description: Skip TSA query and Bordbuch write
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.timestamp
+    description: "RFC-0715: Obtain an RFC 3161 timestamp token for a signed Nachweis
+      record. Requires nachweis.sign to have run first. Idempotent."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to timestamp
+      tsa-url:
+        kind: string
+        description: "Custom TSA URL (default: freetsa.org/tsr)"
+      dry-run:
+        kind: boolean
+        description: Skip TSA query and Bordbuch write
       json:
         kind: boolean
         description: Output JSON result.
@@ -14196,6 +14373,54 @@ commands:
     validatesOutputs: []
     pipelines:
       - build.check
+  - name: nachweis.verify-signature
+    description: "RFC-0715: Verify the Ed25519 operator signature and RFC 3161
+      timestamp for a Nachweis record. Read-only."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to verify
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.verify-signature
+    description: "RFC-0715: Verify the Ed25519 operator signature and RFC 3161
+      timestamp for a Nachweis record. Read-only."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to verify
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: nachweis.withdraw
     description: "RFC-0707: Withdraw a published record — revoke consent, set
       withdrawn status, regenerate manifest. Idempotent."
