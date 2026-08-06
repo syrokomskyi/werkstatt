@@ -36,6 +36,7 @@ import {
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
+  resolveDefaultLang,
   type NachweisConsentUpdateResult,
 } from "./nachweis-io.ts";
 
@@ -67,7 +68,7 @@ export async function runNachweisConsentUpdate(
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
-  const lang = "de";
+  const lang = await resolveDefaultLang(cachePath);
   const consentDir = resolvePbpEntityDir(cachePath, lang, "consent");
   const consentFile = path.join(consentDir, `${consentId}.md`);
 

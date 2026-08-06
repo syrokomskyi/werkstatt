@@ -27,6 +27,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { parse as yamlParse } from "yaml";
 import { byteHashFile } from "@warpgogol/fingerprint";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { createR2Client, resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
 import { resolveCachePath } from "../sternsystem/registry-io.ts";
 
@@ -192,6 +193,18 @@ export async function resolveNachweisCachePath(
   systemId: string,
 ): Promise<string> {
   return resolveCachePath(workspaceRoot, systemId);
+}
+
+export async function resolveDefaultLang(cachePath: string): Promise<string> {
+  const contentDir = path.join(cachePath, "src", "content");
+  const { manifest } = await loadSystemManifest(contentDir);
+  const i18n = manifest.i18n as { default?: string } | undefined;
+  if (!i18n?.default) {
+    throw new Error(
+      "[nachweis] system.md i18n.default is required to resolve PBP entity language.",
+    );
+  }
+  return i18n.default;
 }
 
 export async function readEntitledFeaturesFromCache(cachePath: string): Promise<string[] | null> {

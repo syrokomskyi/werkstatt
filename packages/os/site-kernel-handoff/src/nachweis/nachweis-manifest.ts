@@ -34,6 +34,7 @@ import {
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
+  resolveDefaultLang,
   type NachweisManifest,
   type NachweisManifestEntry,
 } from "./nachweis-io.ts";
@@ -71,7 +72,7 @@ export async function runNachweisManifestGenerate(
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
-  const lang = "de";
+  const lang = await resolveDefaultLang(cachePath);
 
   const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const records: NachweisManifestEntry[] = [];

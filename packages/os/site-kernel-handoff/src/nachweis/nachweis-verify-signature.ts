@@ -35,6 +35,7 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolveDefaultLang,
   resolvePbpEntityDir,
   flagString,
   type NachweisVerifySignatureResult,
@@ -61,7 +62,7 @@ export async function runNachweisVerifySignature(
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
-  const lang = "de";
+  const lang = await resolveDefaultLang(cachePath);
   const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const evidenceFile = path.join(evidenceDir, `${slug}.md`);
 

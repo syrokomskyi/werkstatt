@@ -38,6 +38,7 @@ import {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolveDefaultLang,
   resolvePbpEntityDir,
   flagString,
   flagBool,
@@ -95,7 +96,7 @@ export async function runNachweisSign(
   const privateKeyBytes = new Uint8Array(Buffer.from(privateKeyHex, "hex"));
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
-  const lang = "de";
+  const lang = await resolveDefaultLang(cachePath);
   const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const evidenceFile = path.join(evidenceDir, `${slug}.md`);
 

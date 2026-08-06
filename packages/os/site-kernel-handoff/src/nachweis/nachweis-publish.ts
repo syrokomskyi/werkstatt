@@ -41,6 +41,7 @@ import {
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
+  resolveDefaultLang,
   type NachweisPublicationGate,
   type NachweisPublishResult,
 } from "./nachweis-io.ts";
@@ -75,7 +76,7 @@ export async function runNachweisPublish(
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
-  const lang = "de";
+  const lang = await resolveDefaultLang(cachePath);
 
   // Read EvidenceSource entity
   const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");

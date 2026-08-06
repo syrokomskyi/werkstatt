@@ -22,6 +22,7 @@ export {
   isNachweisEntitled,
   makeSkipResult,
   resolveNachweisCachePath,
+  resolveDefaultLang,
   resolvePbpEntityDir,
 } from "./nachweis-io.ts";
 

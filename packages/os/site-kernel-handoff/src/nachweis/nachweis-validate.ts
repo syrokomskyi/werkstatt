@@ -38,6 +38,7 @@ import {
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
+  resolveDefaultLang,
   type NachweisPublicationGate,
   type NachweisValidateResult,
   type NachweisViolation,
@@ -156,7 +157,7 @@ export async function runNachweisValidate(
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
-  const lang = "de";
+  const lang = await resolveDefaultLang(cachePath);
 
   const evidenceSources = await readPbpEntitiesByType(cachePath, "evidence-source", lang);
   const consents = await readPbpEntitiesByType(cachePath, "consent", lang);

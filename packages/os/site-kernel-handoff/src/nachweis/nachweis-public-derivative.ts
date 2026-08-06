@@ -40,6 +40,7 @@ import {
   makeSkipResult,
   resolveNachweisCachePath,
   resolvePbpEntityDir,
+  resolveDefaultLang,
   resolveNachweisPublicR2Path,
   computeSourceSha256,
   uploadToR2,
@@ -79,7 +80,7 @@ export async function runNachweisPublicDerivative(
   }
 
   const cachePath = await resolveNachweisCachePath(workspaceRoot, systemId);
-  const lang = "de";
+  const lang = await resolveDefaultLang(cachePath);
   const evidenceDir = resolvePbpEntityDir(cachePath, lang, "evidence-source");
   const evidenceFile = path.join(evidenceDir, `${slug}.md`);
 
