@@ -280,17 +280,17 @@ Transitions an exploration note to `archived` status. Used when the exploration 
 
 ## Acceptance criteria
 
-- [ ] `fo-explore` skill created in `packages/forge/skills/fo/fo-explore/` with SKILL.md
-- [ ] `fo-explore` synced to `.agents/skills/fo-explore/SKILL.md`
-- [ ] `docs/explorations/` directory created with a `.gitkeep` or README
-- [ ] `forgeExplorationModule` registered in `packages/forge/os/exploration/` with `exploration.list`, `exploration.show`, `exploration.archive` commands
-- [ ] `exploration.list` command registered and returns JSON output
-- [ ] `exploration.show` command registered and returns note content
-- [ ] `exploration.archive` command registered and transitions status (idempotent for already-archived)
-- [ ] `fo-idea` skill instructions updated with explore suggestion (step 1b)
-- [ ] `packages/forge/AGENTS.md` updated with new skill count and `forgeExplorationModule` in OS modules table
-- [ ] `skill.validate` passes on `fo-explore` SKILL.md
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `fo-explore` skill created in `packages/forge/skills/fo/fo-explore/` with SKILL.md (evidence: packages/forge/skills/fo/fo-explore/SKILL.md:2)
+- [x] `fo-explore` synced to `.agents/skills/fo-explore/SKILL.md` (evidence: .agents/skills/fo-explore/SKILL.md:2)
+- [x] `docs/explorations/` directory created with a `.gitkeep` or README (evidence: docs/explorations/.gitkeep:1)
+- [x] `forgeExplorationModule` registered in `packages/forge/os/exploration/` with `exploration.list`, `exploration.show`, `exploration.archive` commands (evidence: packages/forge/os/exploration/exploration.module.ts:15)
+- [x] `exploration.list` command registered and returns JSON output (evidence: packages/forge/os/exploration/exploration.module.ts:24)
+- [x] `exploration.show` command registered and returns note content (evidence: packages/forge/os/exploration/exploration.module.ts:44)
+- [x] `exploration.archive` command registered and transitions status (idempotent for already-archived) (evidence: packages/forge/os/exploration/exploration.module.ts:65)
+- [x] `fo-idea` skill instructions updated with explore suggestion (step 1b) (evidence: packages/forge/skills/fo/fo-idea/SKILL.md:42)
+- [x] `packages/forge/AGENTS.md` updated with new skill count and `forgeExplorationModule` in OS modules table (evidence: packages/forge/AGENTS.md:10, packages/forge/AGENTS.md:28)
+- [x] `skill.validate` passes on `fo-explore` SKILL.md (evidence: forge.skill.validate output — status: pass, 0 violations)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0710 — exitCode: 0)
 
 ## Implementation notes for agents
 
