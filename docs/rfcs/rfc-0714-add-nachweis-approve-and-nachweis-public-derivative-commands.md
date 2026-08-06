@@ -1,7 +1,7 @@
 ---
 id: RFC-0714
 title: "Add nachweis.approve and nachweis.public-derivative commands"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: command
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
 enhancedAt: 2026-08-06
-implementedAt:
+implementedAt: 2026-08-06
 closedAt:
 supersedes: []
 supersededBy:
@@ -41,10 +41,10 @@ satisfies: []
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - nachweis.approve
     - nachweis.public-derivative
-  added: []
   changed: []
   removed: []
 appsImpacted: []
