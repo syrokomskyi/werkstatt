@@ -288,6 +288,33 @@ versionBump: minor
     }
   });
 
+  it("reads versionBump from draft RFC in docs/rfcs/draft/", async () => {
+    const root = await setupWorkspace();
+    try {
+      await mkdir(join(root, "docs", "rfcs", "draft"), { recursive: true });
+      const content = `---
+id: RFC-9008
+title: "Draft RFC"
+status: accepted
+versionBump: minor
+---
+
+# RFC-9008
+`;
+      await writeFile(join(root, "docs", "rfcs", "draft", "rfc-9008-test.md"), content, "utf8");
+      await stageFile(root, "packages/dummy/index.ts", "export const y = 2;\n");
+      const result = await runEcosystemCommit(
+        input({ message: "test change", rfc: "RFC-9008", "dry-run": true }),
+        ctx(root),
+      );
+      expect(result.exitCode).toBe(0);
+      expect(result.data?.bumpType).toBe("minor");
+      expect(result.data?.rfcId).toBe("RFC-9008");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it("EC-05: blocks when archived RFC has no versionBump", async () => {
     const root = await setupWorkspace();
     try {

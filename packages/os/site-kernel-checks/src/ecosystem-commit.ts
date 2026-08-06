@@ -20,6 +20,8 @@ import { promisify } from "node:util";
 
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 
+import { collectFiles } from "@warpgogol/share/fs";
+
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -132,40 +134,13 @@ async function readRfcVersionBump(
   rfcId: string,
 ): Promise<{ versionBump: string | undefined; found: boolean }> {
   const rfcDir = path.join(workspaceRoot, "docs", "rfcs");
-  const archiveDir = path.join(rfcDir, "archive");
   try {
-    // Search top-level docs/rfcs/ first
-    let files = await fs.readdir(rfcDir);
-    let rfcFile = files.find(
-      (f) => f.startsWith(rfcId.toLowerCase() + "-") || f.startsWith(rfcId + "-"),
-    );
-    let searchDir = rfcDir;
-
-    // If not found at top level, search archive subdirectories recursively
-    if (!rfcFile) {
-      try {
-        const archiveSubdirs = await fs.readdir(archiveDir);
-        for (const subdir of archiveSubdirs) {
-          const subdirPath = path.join(archiveDir, subdir);
-          const stat = await fs.stat(subdirPath);
-          if (stat.isDirectory()) {
-            const subFiles = await fs.readdir(subdirPath);
-            rfcFile = subFiles.find(
-              (f) => f.startsWith(rfcId.toLowerCase() + "-") || f.startsWith(rfcId + "-"),
-            );
-            if (rfcFile) {
-              searchDir = subdirPath;
-              break;
-            }
-          }
-        }
-      } catch {
-        // archive dir doesn't exist or can't be read
-      }
-    }
+    const prefix = rfcId.toLowerCase() + "-";
+    const allFiles = await collectFiles(rfcDir, { extensions: [".md"] });
+    const rfcFile = allFiles.find((f) => path.basename(f).toLowerCase().startsWith(prefix));
 
     if (!rfcFile) return { versionBump: undefined, found: false };
-    const content = await fs.readFile(path.join(searchDir, rfcFile), "utf-8");
+    const content = await fs.readFile(rfcFile, "utf-8");
     const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
     if (!fmMatch) return { versionBump: undefined, found: true };
     const fm = yamlParse(fmMatch[1]) as Record<string, unknown>;
@@ -403,7 +378,7 @@ export async function runEcosystemCommit(
     if (!found) {
       violations.push({
         code: "EC-04",
-        message: `${rfcId} not found in docs/rfcs/ or docs/rfcs/archive/.`,
+        message: `${rfcId} not found in docs/rfcs/ (scanned recursively).`,
         fixHint:
           'Run `rfc.next-id` for the next free RFC number, or `rfc.create --title "..."` to create one.',
       });
