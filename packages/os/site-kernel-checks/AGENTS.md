@@ -214,7 +214,7 @@ Entries use this shape:
 }
 ```
 
-Use `conditional: true` for files that are only generated under certain conditions (e.g. CMS-git adapter, preliminary build-identity.json). Conditional entries are exempt from OWN-02 (phantom registration) but still contribute to coverage checks.
+Use `conditional: true` for files that are only generated under certain conditions (e.g. CMS-git adapter, preliminary build-identity.json). Conditional entries are exempt from OWN-02 (phantom registration) but still contribute to coverage checks. Also use `conditional: true` for site-relative entries (paths without `systems/{system}/` prefix) that only exist in workpiece/cache context — `generated.files.validate` skips conditional entries, while `ownership.sync.validate` still uses them to match files on disk in the workpiece.
 
 ## Architecture reference
 
