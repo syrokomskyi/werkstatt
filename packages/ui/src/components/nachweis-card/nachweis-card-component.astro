@@ -38,6 +38,7 @@ interface Props {
   notVerifiedScope?: string;
   status: "draft" | "preview" | "published" | "withdrawn";
   verifiedByLabel?: string;
+  verifiedDate?: string;
 }
 
 const {
@@ -54,6 +55,7 @@ const {
   notVerifiedScope,
   status,
   verifiedByLabel,
+  verifiedDate,
 } = Astro.props;
 
 const headingId = `nachweis-card-${slug}-title`;
@@ -119,6 +121,14 @@ const headingId = `nachweis-card-${slug}-title`;
       )
     }
   </dl>
+
+  {
+    verifiedDate && (
+      <p class="nachweis-card__date">
+        <time datetime={verifiedDate}>{verifiedDate}</time>
+      </p>
+    )
+  }
 
   <p class="nachweis-card__status" data-status={status}>
     <span class="nachweis-card__status-text">
