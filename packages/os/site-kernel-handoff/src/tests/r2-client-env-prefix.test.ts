@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { resolveR2ConfigFromEnv, MissingEnvError } from "../evidence/r2-client.ts";
 
 const ALL_R2_VARS = [
-  "R2_ACCOUNT_ID",
-  "R2_ACCESS_KEY_ID",
-  "R2_SECRET_ACCESS_KEY",
+  "R2_AXIOM_ACCOUNT_ID",
+  "R2_AXIOM_ACCESS_KEY_ID",
+  "R2_AXIOM_SECRET_ACCESS_KEY",
   "R2_NACHWEIS_ACCOUNT_ID",
   "R2_NACHWEIS_ACCESS_KEY_ID",
   "R2_NACHWEIS_SECRET_ACCESS_KEY",
@@ -56,10 +56,10 @@ describe("resolveR2ConfigFromEnv — envPrefix (RFC-0713)", () => {
     }
   });
 
-  it("reads unprefixed R2_* vars when envPrefix is omitted (backward compat)", () => {
-    vi.stubEnv("R2_ACCOUNT_ID", "evidence-account");
-    vi.stubEnv("R2_ACCESS_KEY_ID", "evidence-key");
-    vi.stubEnv("R2_SECRET_ACCESS_KEY", "evidence-secret");
+  it("reads R2_AXIOM_* vars by default (no envPrefix passed)", () => {
+    vi.stubEnv("R2_AXIOM_ACCOUNT_ID", "evidence-account");
+    vi.stubEnv("R2_AXIOM_ACCESS_KEY_ID", "evidence-key");
+    vi.stubEnv("R2_AXIOM_SECRET_ACCESS_KEY", "evidence-secret");
 
     const config = resolveR2ConfigFromEnv("axiom-evidence");
 
@@ -71,13 +71,13 @@ describe("resolveR2ConfigFromEnv — envPrefix (RFC-0713)", () => {
     });
   });
 
-  it("throws MissingEnvError with unprefixed var name when R2_* vars absent and no prefix", () => {
+  it("throws MissingEnvError with R2_AXIOM_ var name when R2_AXIOM_* vars absent", () => {
     try {
       resolveR2ConfigFromEnv("axiom-evidence");
       expect.fail("should have thrown MissingEnvError");
     } catch (err) {
       expect(err).toBeInstanceOf(MissingEnvError);
-      expect((err as MissingEnvError).missingVar).toBe("R2_ACCOUNT_ID");
+      expect((err as MissingEnvError).missingVar).toBe("R2_AXIOM_ACCOUNT_ID");
       expect((err as MissingEnvError).diagnostic).toBe("MISSING_ENV");
     }
   });

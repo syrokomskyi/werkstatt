@@ -144,7 +144,7 @@ export async function runEvidenceSync(
   if (!dryRun) {
     let r2Config;
     try {
-      r2Config = resolveR2ConfigFromEnv();
+      r2Config = resolveR2ConfigFromEnv("axiom-evidence", "R2_AXIOM");
     } catch (err) {
       if (err instanceof MissingEnvError) {
         return {

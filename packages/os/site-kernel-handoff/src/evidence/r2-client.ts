@@ -3,10 +3,10 @@
 <purpose>S3-compatible R2 client wrapper for evidence sync and fetch commands (RFC-0651).</purpose>
 <keywords>r2, s3, evidence, cloudflare, storage</keywords>
 <responsibilities>
-  <item>Configures S3Client with R2 endpoint from R2_ACCOUNT_ID.</item>
+  <item>Configures S3Client with R2 endpoint from R2_AXIOM_ACCOUNT_ID.</item>
   <item>Provides putObject, getObject, listObjectsV2 methods.</item>
-  <item>Reads credentials from R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY env vars.</item>
-  <item>Supports optional envPrefix for per-bucket credential isolation (RFC-0713).</item>
+  <item>Reads credentials from R2_AXIOM_ACCESS_KEY_ID and R2_AXIOM_SECRET_ACCESS_KEY env vars.</item>
+  <item>Supports envPrefix for per-bucket credential isolation (R2_AXIOM_ for axiom-evidence, R2_NACHWEIS_ for nachweis).</item>
   <item>Throws MISSING_ENV diagnostic when env vars are unset.</item>
 </responsibilities>
 <non-goals>
@@ -17,7 +17,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0651: initial R2 client wrapper with putObject, getObject, listObjectsV2.</item>
-  <item>RFC-0713: added optional envPrefix parameter to resolveR2ConfigFromEnv for per-bucket credential isolation.</item>
+  <item>RFC-0713: added envPrefix parameter to resolveR2ConfigFromEnv for per-bucket credential isolation. Default prefix changed from R2_ to R2_AXIOM_ for symmetry with R2_NACHWEIS_.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -66,9 +66,9 @@ export class MissingEnvError extends Error {
 
 export function resolveR2ConfigFromEnv(
   bucketName = "axiom-evidence",
-  envPrefix?: string,
+  envPrefix = "R2_AXIOM",
 ): R2ClientConfig {
-  const prefix = envPrefix ? `${envPrefix}_` : "R2_";
+  const prefix = `${envPrefix}_`;
   const accountId = process.env[`${prefix}ACCOUNT_ID`];
   if (!accountId) {
     throw new MissingEnvError(`${prefix}ACCOUNT_ID`);

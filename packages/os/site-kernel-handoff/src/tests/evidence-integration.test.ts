@@ -2,7 +2,7 @@
 <MODULE_CONTRACT>
   <purpose>
     RFC-0651: optional integration test for evidence.sync and evidence.fetch against a real R2 bucket.
-    Skips automatically when R2_ACCOUNT_ID is not set in the environment.
+    Skips automatically when R2_AXIOM_ACCOUNT_ID is not set in the environment.
   </purpose>
   <keywords>RFC-0651, evidence, integration, r2</keywords>
 </MODULE_CONTRACT>
@@ -74,70 +74,73 @@ async function createTestEvidence(workspaceRoot: string): Promise<void> {
   await writeFile(join(evidenceDir, "raw", "page-1.json"), '{"page": 1, "axe": "raw"}');
 }
 
-describe.skipIf(!process.env.R2_ACCOUNT_ID)("evidence integration (RFC-0651, real R2)", () => {
-  let tmpDir: string;
+describe.skipIf(!process.env.R2_AXIOM_ACCOUNT_ID)(
+  "evidence integration (RFC-0651, real R2)",
+  () => {
+    let tmpDir: string;
 
-  beforeEach(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), "evidence-integration-"));
-  });
+    beforeEach(async () => {
+      tmpDir = await mkdtemp(join(tmpdir(), "evidence-integration-"));
+    });
 
-  afterEach(async () => {
-    await rm(tmpDir, { recursive: true, force: true });
-  });
+    afterEach(async () => {
+      await rm(tmpDir, { recursive: true, force: true });
+    });
 
-  it("evidence.sync uploads to R2, evidence.fetch downloads back", async () => {
-    await createTestEvidence(tmpDir);
+    it("evidence.sync uploads to R2, evidence.fetch downloads back", async () => {
+      await createTestEvidence(tmpDir);
 
-    const syncResult = await runEvidenceSync(
-      makeInput({ mission: MISSION_ID, "run-timestamp": RUN_TIMESTAMP }),
-      makeContext(tmpDir),
-    );
+      const syncResult = await runEvidenceSync(
+        makeInput({ mission: MISSION_ID, "run-timestamp": RUN_TIMESTAMP }),
+        makeContext(tmpDir),
+      );
 
-    expect(syncResult.exitCode).toBe(0);
-    const syncData = syncResult.data as EvidenceSyncResult | undefined;
-    expect(syncData?.uploadedFiles).toContain("evidence-metadata.json");
-    expect(syncData?.uploadedFiles).toContain("raw/page-1.json");
+      expect(syncResult.exitCode).toBe(0);
+      const syncData = syncResult.data as EvidenceSyncResult | undefined;
+      expect(syncData?.uploadedFiles).toContain("evidence-metadata.json");
+      expect(syncData?.uploadedFiles).toContain("raw/page-1.json");
 
-    const fetchDir = join(tmpDir, "fetched");
-    const fetchResult = await runEvidenceFetch(
-      makeInput({
-        mission: MISSION_ID,
-        "run-timestamp": RUN_TIMESTAMP,
-        "output-dir": fetchDir,
-      }),
-      makeContext(tmpDir),
-    );
+      const fetchDir = join(tmpDir, "fetched");
+      const fetchResult = await runEvidenceFetch(
+        makeInput({
+          mission: MISSION_ID,
+          "run-timestamp": RUN_TIMESTAMP,
+          "output-dir": fetchDir,
+        }),
+        makeContext(tmpDir),
+      );
 
-    expect(fetchResult.exitCode).toBe(0);
-    const fetchData = fetchResult.data as EvidenceFetchResult | undefined;
-    expect(fetchData?.downloadedFiles).toContain("evidence-metadata.json");
-    expect(fetchData?.downloadedFiles).toContain("raw/page-1.json");
+      expect(fetchResult.exitCode).toBe(0);
+      const fetchData = fetchResult.data as EvidenceFetchResult | undefined;
+      expect(fetchData?.downloadedFiles).toContain("evidence-metadata.json");
+      expect(fetchData?.downloadedFiles).toContain("raw/page-1.json");
 
-    const originalMeta = JSON.parse(
-      await readFile(
-        join(tmpDir, "missions", MISSION_ID, "evidence", "axiom", "evidence-metadata.json"),
-        "utf8",
-      ),
-    );
-    const fetchedMeta = JSON.parse(
-      await readFile(join(fetchDir, "evidence-metadata.json"), "utf8"),
-    );
-    expect(fetchedMeta).toEqual(originalMeta);
-  });
+      const originalMeta = JSON.parse(
+        await readFile(
+          join(tmpDir, "missions", MISSION_ID, "evidence", "axiom", "evidence-metadata.json"),
+          "utf8",
+        ),
+      );
+      const fetchedMeta = JSON.parse(
+        await readFile(join(fetchDir, "evidence-metadata.json"), "utf8"),
+      );
+      expect(fetchedMeta).toEqual(originalMeta);
+    });
 
-  it("evidence.fetch --list returns the synced run", async () => {
-    const listResult = await runEvidenceFetch(
-      makeInput({ mission: MISSION_ID, list: true }),
-      makeContext(tmpDir),
-    );
+    it("evidence.fetch --list returns the synced run", async () => {
+      const listResult = await runEvidenceFetch(
+        makeInput({ mission: MISSION_ID, list: true }),
+        makeContext(tmpDir),
+      );
 
-    expect(listResult.exitCode).toBe(0);
-    const listData = listResult.data as EvidenceListResult | undefined;
-    const runs = listData?.runs ?? [];
-    const matchingRun = runs.find(
-      (r: { runTimestamp: string }) => r.runTimestamp === RUN_TIMESTAMP,
-    );
-    expect(matchingRun).toBeDefined();
-    expect(matchingRun?.commitSha).toBe("integration-test-sha");
-  });
-});
+      expect(listResult.exitCode).toBe(0);
+      const listData = listResult.data as EvidenceListResult | undefined;
+      const runs = listData?.runs ?? [];
+      const matchingRun = runs.find(
+        (r: { runTimestamp: string }) => r.runTimestamp === RUN_TIMESTAMP,
+      );
+      expect(matchingRun).toBeDefined();
+      expect(matchingRun?.commitSha).toBe("integration-test-sha");
+    });
+  },
+);

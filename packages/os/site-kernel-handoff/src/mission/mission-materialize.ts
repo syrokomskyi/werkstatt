@@ -1065,7 +1065,7 @@ export async function runMissionMaterialize(
 
     // Preserve operator-filled .env files from the old workpiece before
     // atomicMoveDir replaces it. Without this, re-materialization destroys
-    // secrets (CLOUDFLARE_API_TOKEN, R2_ACCESS_KEY_ID, etc.) that the operator
+    // secrets (CLOUDFLARE_API_TOKEN, R2_AXIOM_ACCESS_KEY_ID, etc.) that the operator
     // manually filled in. The new workpiece gets empty .env files from
     // .env.example — we restore the old values after the move.
     const envFilesToPreserve = [".env", ".env.main", ".env.alt"];

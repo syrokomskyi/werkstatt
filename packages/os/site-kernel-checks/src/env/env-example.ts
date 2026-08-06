@@ -134,11 +134,11 @@ const HOW_TO_OBTAIN: Readonly<Record<string, string>> = {
     "Cloudflare Dashboard → My Profile → API Tokens. Prefer CLOUDFLARE_READONLY_API_TOKEN (least-privilege).",
   CLOUDFLARE_ZONE_ID:
     "Cloudflare Dashboard → Domains Overview → click any domain → right-hand sidebar → API section → Zone ID.",
-  R2_ACCOUNT_ID:
+  R2_AXIOM_ACCOUNT_ID:
     "Cloudflare Dashboard → R2 → Overview → Account ID (right sidebar). Same value as CLOUDFLARE_ACCOUNT_ID.",
-  R2_ACCESS_KEY_ID:
+  R2_AXIOM_ACCESS_KEY_ID:
     "Cloudflare Dashboard → R2 → Manage R2 API Tokens → Create API Token with Object Read & Write, scoped to axiom-evidence bucket. The Access Key ID is shown on the token creation result page.",
-  R2_SECRET_ACCESS_KEY:
+  R2_AXIOM_SECRET_ACCESS_KEY:
     "Same R2 API Token creation flow — the Secret Access Key is shown ONCE. Copy it immediately — Cloudflare does not store it and you cannot retrieve it later.",
   R2_NACHWEIS_ACCOUNT_ID:
     "Cloudflare Dashboard → R2 → Overview → Account ID (right sidebar). Same value as CLOUDFLARE_ACCOUNT_ID.",

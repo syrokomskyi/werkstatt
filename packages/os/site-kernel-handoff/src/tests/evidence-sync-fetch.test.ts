@@ -223,10 +223,10 @@ describe("evidence.sync (RFC-0651)", () => {
     expect(mockR2State.putCalls).toBe(0);
   });
 
-  it("exits 1 with MISSING_ENV when R2_ACCOUNT_ID is not set", async () => {
+  it("exits 1 with MISSING_ENV when R2_AXIOM_ACCOUNT_ID is not set", async () => {
     const { resolveR2ConfigFromEnv } = await import("../evidence/r2-client.ts");
     vi.mocked(resolveR2ConfigFromEnv).mockImplementationOnce(() => {
-      throw new MissingEnvError("R2_ACCOUNT_ID");
+      throw new MissingEnvError("R2_AXIOM_ACCOUNT_ID");
     });
 
     await createEvidenceDir(tmpDir, "warpgogol-com-m000025", {
@@ -240,7 +240,7 @@ describe("evidence.sync (RFC-0651)", () => {
 
     expect(result.exitCode).toBe(1);
     expect(result.summary).toContain("MISSING_ENV");
-    expect(result.summary).toContain("R2_ACCOUNT_ID");
+    expect(result.summary).toContain("R2_AXIOM_ACCOUNT_ID");
   });
 
   it("exits 1 with INVALID_EVIDENCE when evidence-metadata.json is missing runTimestamp", async () => {
@@ -400,7 +400,7 @@ describe("evidence.fetch (RFC-0651)", () => {
   it("exits 1 with MISSING_ENV when R2 credentials are not set", async () => {
     const { resolveR2ConfigFromEnv } = await import("../evidence/r2-client.ts");
     vi.mocked(resolveR2ConfigFromEnv).mockImplementationOnce(() => {
-      throw new MissingEnvError("R2_ACCOUNT_ID");
+      throw new MissingEnvError("R2_AXIOM_ACCOUNT_ID");
     });
 
     const result = await runEvidenceFetch(
