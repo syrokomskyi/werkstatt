@@ -55,6 +55,7 @@ export interface PbpConsent extends PbpEntity {
   method: PbpConsentMethod;
   grantedAt: string | null;
   evidenceRef: string | null;
+  // Named consentStatus (not status) to avoid conflict with PbpEntity.status: PbpEntityStatus
   consentStatus: PbpConsentStatus;
   withdrawalContact?: string;
 }
