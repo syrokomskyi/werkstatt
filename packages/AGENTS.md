@@ -25,6 +25,10 @@ For repository-wide, cross-workspace, architectural, shared-package, or high-ris
 - **Do not export Zod schemas or types without at least one consumer.** Speculative exports (schemas defined "for future use" but not imported anywhere) are dead code. Define schemas internally, and only add an `export` when another module actually imports it. This applies to both barrel exports and subpath exports.
 - **Do not duplicate canonical regex patterns across packages.** When a regex pattern (e.g. `BRACELESS_SCAN_PATTERN`, `PURE_REF_PATTERN`) is defined in `@warpgogol/share`, import it from there — do not redefine it in `packages/os/*`. Duplicated copies diverge over time (e.g. the field path pattern `[a-zA-Z0-9_.-]+` was fixed to `[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*` in share to avoid matching trailing sentence periods, but copies in `site-kernel-checks` and `site-kernel-codegen` kept the old pattern). If the pattern is not exported, add a subpath export and import it.
 
+## Comment safety
+
+- **Never write glob patterns containing `*/` inside `/* */` block comments** (e.g. `MODULE_CONTRACT`, `CHANGE_SUMMARY`). The `*/` sequence in `**/*.css` prematurely terminates the comment, causing TypeScript parse errors. Write "CSS files" or use `*.css` without the `**/` prefix instead.
+
 ## Generated file writes
 
 - Always use `writeFileIfChanged` from `@warpgogol/site-kernel` (re-exported from `@warpgogol/forge/utils`, RFC-0345) for generated file writes — both text and binary. It accepts `string | Uint8Array` and skips the disk write when content is byte-identical to the existing file.
