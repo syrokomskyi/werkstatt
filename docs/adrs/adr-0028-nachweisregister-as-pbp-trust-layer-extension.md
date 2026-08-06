@@ -1,13 +1,13 @@
 ---
 id: ADR-0028
 title: "Nachweisregister as PBP trust-layer extension"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-06
 updatedAt: 2026-08-06
-implementedAt:
-closedAt:
+implementedAt: 2026-08-06
+closedAt: 2026-08-06
 supersedes: []
 supersededBy:
 related:
