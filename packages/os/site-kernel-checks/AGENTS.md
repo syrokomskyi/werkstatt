@@ -198,6 +198,18 @@ When annotating commands with `modulePaths` for granular module hashing, trace h
 
 `pipeline.dependencies.validate` MUST only validate **leaf** pipelines, not composite ones. Composite pipelines (e.g. `SITES_CHECK_PIPELINE` = `SITES_CHECK_AUTHOR_PIPELINE` + `SITES_CHECK_POSTBUILD_PIPELINE`) concatenate multiple leaf pipelines and naturally contain duplicate command names by construction. `buildSchedule` rejects duplicate command names, so including composites in the validator would produce false positives. When adding a new pipeline to the validator's `standardPipelines()` list, verify it is a leaf pipeline — if it spreads other pipeline constants, it is composite and must be excluded.
 
+## Generator ownership map (RFC-0087, RFC-0612)
+
+When adding a new kernel command that generates files under `public/` or `public/.well-known/`, you MUST register each generated path in `GENERATOR_OWNERSHIP_MAP` in `src/generator-ownership.ts`. Failure to do so causes `ownership.sync.validate` (OWN-01) to fail in `build.prepare` and `sites-check-author`.
+
+Entries use this shape:
+
+```ts
+{ path: "public/path/to/file.generated.yaml", command: "your.command.name", module: "packages/os/.../src/your-module.ts" }
+```
+
+Use `conditional: true` for files that are only generated under certain conditions (e.g. CMS-git adapter, preliminary build-identity.json). Conditional entries are exempt from OWN-02 (phantom registration) but still contribute to coverage checks.
+
 ## Architecture reference
 
 → `packages/os/site-kernel/AGENTS.md` — kernel architecture table  

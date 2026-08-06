@@ -137,6 +137,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "ownership.sync.validate" },
   // RFC-0600: detect orphaned files in public/ not produced by any registered generator
   { command: "generated.stale.validate" },
+  // RFC-0721: warn when system.md routes don't match committed behavior snapshot
+  { command: "behavior.snapshot.staleness.check" },
 ];
 
 // RFC-0597: codegen-only subset for dev-mode mission materialization.

@@ -11,6 +11,7 @@ Checks performed (fail-first):
   B-04: entry.cosmicStar matches the system.yaml pages[route].cosmicStar for this route.
   B-05: No two blocks on the same page share the same id.
   B-06: No markdown body present in page entries (frontmatter-only contract, DNA-24).
+  B-07: body.kind matches the body fragment's declared kind in the composed propsSchema (RFC-0719).
 </purpose>
 <non-goals>
   <item>Do not render blocks or invoke buildPage at validate time.</item>
@@ -19,6 +20,7 @@ Checks performed (fail-first):
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Wave 1 (RFC-0026): Initial creation.</item>
+  <item>RFC-0719: add B-07 body.kind mismatch check for clearer diagnostics.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -325,6 +327,25 @@ export async function runPageBlockValidate(
           );
           for (const err of propsErrors) {
             violations.push(`${blockPath}: B-03 ${err}`);
+          }
+
+          // B-07 (RFC-0719): body.kind must match the body fragment's declared kind.
+          // The composed propsSchema includes a `body` property from the body fragment.
+          // Extract the expected kind const and compare with the actual body.kind.
+          const bodySchema = (schemaDef.propsSchema as JsonSchemaObject).properties?.body as
+            JsonSchemaObject | undefined;
+          const expectedBodyKind = bodySchema?.properties?.kind as { const?: string } | undefined;
+          const actualBody = sectionProps.body as Record<string, unknown> | undefined;
+          const actualBodyKind =
+            actualBody && typeof actualBody.kind === "string" ? actualBody.kind : undefined;
+          if (
+            expectedBodyKind?.const &&
+            actualBodyKind &&
+            expectedBodyKind.const !== actualBodyKind
+          ) {
+            violations.push(
+              `${blockPath}: B-07 body.kind="${actualBodyKind}" does not match expected bodyKind="${expectedBodyKind.const}" from section manifest`,
+            );
           }
         }
       }
