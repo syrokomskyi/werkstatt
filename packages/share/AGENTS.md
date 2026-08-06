@@ -133,3 +133,7 @@ The source-agnostic destination hub. Pure — takes secrets as an injected bag; 
 - **Legacy (RFC-0176, superseded):** `enqueueEvent()` / `kvDedup()` / `consumeIntegrationBatch()` are the old Cloudflare-Queue producer/consumer body (`QueueBinding`/`KvDedupStore` are structural — no hard CF dependency). **Not on the EU path** — kept only for the contract + unit test; `cloudflare.residency.validate` forbids declaring queues/KV. Do not wire these into a live route.
 - **Other modules:** `funnel.ts` (RFC-0188 state machine), `lifecycle.ts` (RFC-0191 billing lifecycle), `crm-buffer.ts` (RFC-0186 buffer client contracts), `sharding.ts`, `dispatch.ts`.
 - **Rules:** at most one active executor per `(kind, vendor)`. The delivery substrate is in-flight only — NEVER persist event payloads (the studio must not become a CRM/datastore). Tests live in `src/integration/tests/`.
+
+## dev-props-validator in-memory cache
+
+`dev-props-validator.ts` caches resolved JSON Schemas by cosmic name in module-level `Map`s (`schemaCache`, `validateCache`) that are never invalidated. After updating a UI section manifest's `propsSchema`, the dev server MUST be restarted — the cached schema from the old manifest will continue to reject props that are now valid. This is a common source of false `PAGE-PROPS-01` errors after schema fixes.

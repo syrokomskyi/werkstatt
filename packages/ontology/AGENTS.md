@@ -89,3 +89,7 @@ The C-contract is enforced by `surface.contract.validate` in `build.check` and `
 - **Optional:** `legalName`, `description`, `foundingDate`, `email`, `address`, `sameAs`, `logo`, `image`, `contactPoint`, `identifier`, `founder`, `member`, `areaServed`, `employee`, `makesOffer`
 
 The `optional` list covers all properties that `buildOrganizationNode` (`packages/share/src/semantic/jsonld/organization.ts`) currently emits. The `sameAs` property is populated by RFC-0530's projection chain: `Business.externalIdentifiers` → `schemeRef + value` URLs + social-profile `WebPresence.sameAs` URLs.
+
+## Archetype-manifest schema sync
+
+When fixing `PAGE-PROPS-01` errors (or adding new props to content blocks), update BOTH the archetype YAML (`packages/ontology/archetypes/sections/<id>.yaml` `propsSchema.shape`) AND the UI section manifest (`packages/ui/src/sections/<slug>/<slug>-section.manifest.yaml` `propsSchema`). These are two independent validation layers: the archetype defines the Zod shape, the manifest defines the JSON Schema used by `dev-props-validator` at runtime. If only one is updated, the other will reject the same props. After updating both, run `props.types.generate` to regenerate the TypeScript types.
