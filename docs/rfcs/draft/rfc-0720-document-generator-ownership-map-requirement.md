@@ -1,7 +1,7 @@
 ---
 id: RFC-0720
 title: "Document generator ownership map requirement in AGENTS.md — ownership.sync.validate already exists"
-status: draft
+status: accepted
 kind: policy
 scope: workspace
 owners:
