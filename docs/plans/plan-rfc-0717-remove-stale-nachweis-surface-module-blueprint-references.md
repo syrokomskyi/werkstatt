@@ -31,7 +31,8 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 
 ### 2.2 Configuration and data
 
-- `systems-cache/warpgogol-com/src/content/system.md` — remove `blueprints: [nachweis]` array from `surface.modules.nachweis` (lines 140-141)
+- `missions/warpgogol-com-m000033/workpiece/src/content/system.md` — already clean (no `blueprints` key under `surface.modules.nachweis`). No changes needed.
+- `systems-cache/warpgogol-com/src/content/system.md` — stale `blueprints: [nachweis]` entry under `surface.modules.nachweis` (lines 140-141). Updated automatically via `mission.reconcile` from the clean workpiece.
 
 ### 2.3 Documentation and specs
 
@@ -48,14 +49,16 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 
 ## 3. Step sequence
 
-### Step 1. Remove stale blueprints entry from cache clone system.md
+### Step 1. Run mission.reconcile to sync clean workpiece into cache clone
 
-**Goal:** Remove the dead `blueprints: [nachweis]` array from `surface.modules.nachweis` in the cache clone `system.md`.
+**Goal:** Sync the clean workpiece `system.md` (mission m000033, already without `blueprints` key) into the cache clone, overwriting the stale `blueprints: [nachweis]` entry.
 
 **Agent actions:**
 
-- Edit `systems-cache/warpgogol-com/src/content/system.md` — remove the `blueprints` array and its `nachweis` entry from `surface.modules.nachweis` (lines 140-141)
-- Verify the `surface.modules.nachweis` entry still has `entitlement: nachweis`, `masterLocale: de`, `publishedLocales: [uk]`, and all other fields unchanged
+- Verify workpiece `system.md` is clean: `grep -n "blueprints" missions/warpgogol-com-m000033/workpiece/src/content/system.md` — confirm `surface.modules.nachweis` has no `blueprints` key
+- Run `pnpm exec site-kernel run mission.reconcile --mission warpgogol-com-m000033` to sync the clean workpiece into the cache clone
+- Verify cache clone `system.md` is updated: `grep -n "blueprints" systems-cache/warpgogol-com/src/content/system.md` — confirm `surface.modules.nachweis` no longer has a `blueprints` key
+- Verify `surface.modules.nachweis` entry still has `entitlement: nachweis`, `masterLocale: de`, `publishedLocales: [uk]`, and all other fields unchanged
 - Verify `surface.blueprints` list is unchanged (`website-local`, `website-service`, `offer`, `ratgeber`)
 
 **Validation:**
@@ -63,7 +66,7 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 - `grep -n "blueprints" systems-cache/warpgogol-com/src/content/system.md` — confirm `surface.modules.nachweis` no longer has a `blueprints` key
 - `grep -n "nachweis" systems-cache/warpgogol-com/src/content/system.md` — confirm `surface.modules.nachweis` entry still exists with `entitlement: nachweis`
 
-**Completion criterion:** Cache clone `system.md` `surface.modules.nachweis` has no `blueprints` key; all other fields under `surface.modules.nachweis` are unchanged.
+**Completion criterion:** Cache clone `system.md` `surface.modules.nachweis` has no `blueprints` key; all other fields under `surface.modules.nachweis` are unchanged. The sync was performed via `mission.reconcile`, not by directly editing the cache clone (AGENTS.md: 'Agents MUST NEVER edit any Sternsystem mirror directly').
 
 **Human review:** no
 
@@ -108,9 +111,10 @@ None. This RFC is a content-only fix in the cache clone `system.md`. No package 
 ## 5. Risks and mitigation
 
 | Risk (from RFC) | Mitigation (plan step) |
-| --------------- | ------------------------ |
-| Agent misinterpretation: seeing `blueprints: [nachweis]` might attempt to create a `nachweis.yaml` blueprint file | Step 1 removes the entry entirely, eliminating this risk |
+| --- | --- |
+| Agent misinterpretation: seeing `blueprints: [nachweis]` might attempt to create a `nachweis.yaml` blueprint file | Step 1 syncs the clean workpiece via mission.reconcile, eliminating the stale entry |
 | No validation impact: change does not affect `blueprint.validate` or `entitlement.module.validate` | Step 1 verification confirms `nachweis` is not in `surface.blueprints` |
+| AGENTS.md violation: direct cache clone editing is forbidden | Step 1 uses mission.reconcile, not direct editing — complies with 'Agents MUST NEVER edit any Sternsystem mirror directly' |
 
 ## 6. Escalation triggers
 
