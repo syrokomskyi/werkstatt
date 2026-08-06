@@ -64,7 +64,11 @@ export async function encodeTimestampReq(message: Uint8Array): Promise<Uint8Arra
   const { default: asn1js } = await import("asn1js");
 
   const hashHex = byteHash(message).replace("sha256:", "");
-  const hashBuffer = Buffer.from(hashHex, "hex").buffer;
+  const hashBytes = Buffer.from(hashHex, "hex");
+  const hashBuffer = hashBytes.buffer.slice(
+    hashBytes.byteOffset,
+    hashBytes.byteOffset + hashBytes.byteLength,
+  );
 
   const messageImprint = new pkijs.MessageImprint({
     hashAlgorithm: new pkijs.AlgorithmIdentifier({
