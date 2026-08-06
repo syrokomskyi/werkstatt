@@ -101,6 +101,10 @@
     "./evidence-module": {
       "types": "./src/evidence/evidence-module.ts",
       "default": "./src/evidence/evidence-module.ts"
+    },
+    "./nachweis-module": {
+      "types": "./src/nachweis/nachweis.module.ts",
+      "default": "./src/nachweis/nachweis.module.ts"
     }
   },
   "files": ["src"],

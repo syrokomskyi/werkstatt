@@ -16,6 +16,7 @@
   <item>RFC-0604: added bordbuch.generate and passport.key.ensure before generated.files.validate.</item>
   <item>RFC-0626: added bordbuch.commit after bordbuch.generate to auto-commit bordbuch projections.</item>
   <item>RFC-0658: added bordbuch.validate after bordbuch.generate and before bordbuch.commit to validate hash-chain integrity before build proceeds.</item>
+  <item>RFC-0707: added nachweis.manifest.generate after bordbuch.commit, before passport.key.ensure.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -127,6 +128,8 @@ export const SITES_BUILD_PREPARE_PIPELINE: KernelPipelineStep[] = [
   { command: "bordbuch.validate" },
   // RFC-0626: auto-commit bordbuch projections after bordbuch.generate
   { command: "bordbuch.commit" },
+  // RFC-0707: generate nachweis manifest after bordbuch commit, before passport.key.ensure
+  { command: "nachweis.manifest.generate" },
   { command: "passport.key.ensure" },
   // RFC-0375: verify all registry-declared generated files exist after all generators have run
   { command: "generated.files.validate" },

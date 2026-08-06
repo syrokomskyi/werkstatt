@@ -7,6 +7,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Extracted from module.ts.</item>
+  <item>RFC-0707: added nachweis.validate after SITES_CHECK_AUTHOR_PIPELINE.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,6 +21,8 @@ export const SITES_BUILD_CHECK_PIPELINE: KernelPipelineStep[] = [
   // RFC-0686: validate pipeline dependency graphs before running any checks.
   { command: "pipeline.dependencies.validate", dependsOn: [] },
   ...SITES_CHECK_AUTHOR_PIPELINE,
+  // RFC-0707: validate nachweis trust entities and publication gate after author checks
+  { command: "nachweis.validate" },
   // RFC-0201: validate CSS token usage against the active biome after codegen
   { command: "biome.tokens.validate" },
   // RFC-0204: validate image variant manifest and file presence
