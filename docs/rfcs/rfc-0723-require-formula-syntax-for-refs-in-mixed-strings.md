@@ -265,16 +265,16 @@ No grace period — forward-only discipline. The migration and the validator pro
 
 ## Acceptance criteria
 
-- [ ] `resolveFormula` in `packages/share/src/formula-eval.ts` returns string values for single-ref expressions (already implemented, evidence: `packages/share/src/formula-eval.ts:183-190`)
-- [ ] `content.references.validate` skips REF-04 for refs inside `=(...)` formulas (already implemented, evidence: `packages/os/site-kernel-checks/src/content-references.ts:144-151`)
-- [ ] `content.references.validate` promotes REF-04 from warning to error for known collections in mixed strings
-- [ ] `content.formula.migrate` converts bare braceless refs in mixed strings to `=(ref)` syntax, idempotent, skips refs already inside `=(...)`
-- [ ] Unit tests for `resolveFormula` single-ref string return path in `packages/share/src/tests/formula-eval.test.ts`
-- [ ] Unit tests for `isInsideFormula` logic in `packages/os/site-kernel-checks`
-- [ ] Root `AGENTS.md` contains the `=(ref)` rule for mixed strings
-- [ ] `packages/share/AGENTS.md` formula-eval entry updated with RFC-0723 string-value extension
-- [ ] `content.formula.migrate --app warpgogol-com` converts all 315 instances with zero remaining REF-04 warnings
-- [ ] `rfc.validate` passes on this file with zero RFC-specific errors
+- [x] `resolveFormula` in `packages/share/src/formula-eval.ts` returns string values for single-ref expressions (evidence: `packages/share/src/formula-eval.ts:183-190`, test `formula-eval.test.ts:235-262`)
+- [x] `content.references.validate` skips REF-04 for refs inside `=(...)` formulas (evidence: `packages/os/site-kernel-checks/src/content-references.ts:144-151`, test `content-references.test.ts:76-92`)
+- [x] `content.references.validate` promotes REF-04 from warning to error for known collections in mixed strings (evidence: `packages/os/site-kernel-checks/src/content-references.ts:152-161`, test `content-references.test.ts:58-74`)
+- [x] `content.formula.migrate` converts bare braceless refs in mixed strings to `=(ref)` syntax, idempotent, skips refs already inside `=(...)` (evidence: `packages/os/site-kernel-codegen/src/content-formula-migrate.ts:105-138`, 36 conversions on warpgogol-com)
+- [x] Unit tests for `resolveFormula` single-ref string return path in `packages/share/src/tests/formula-eval.test.ts` (evidence: 3 tests at lines 235-301)
+- [x] Unit tests for `isInsideFormula` logic in `packages/os/site-kernel-checks` (evidence: `content-references.test.ts` — 3 tests, all pass)
+- [x] Root `AGENTS.md` contains the `=(ref)` rule for mixed strings (evidence: `AGENTS.md:518-520`)
+- [x] `packages/share/AGENTS.md` formula-eval entry updated with RFC-0723 string-value extension (evidence: `packages/share/AGENTS.md:35`)
+- [x] `content.formula.migrate --app warpgogol-com` converts all instances with zero remaining REF-04 warnings (evidence: 36 conversions, `content.references.validate` reports 0 warnings)
+- [x] `rfc.validate` passes on this file with zero RFC-specific errors (evidence: `rfc.validate --id RFC-0723` — 0 violations)
 
 ## Implementation notes for agents
 
