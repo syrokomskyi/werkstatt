@@ -286,7 +286,7 @@ const FRESHNESS_BACKOFF_DELAYS_MS = [3_000, 6_000, 12_000, 24_000];
 // and comparing distTreeHash against the local build-identity. Retries up to 5 times with
 // exponential backoff (3s, 6s, 12s, 24s). First attempt is immediate; subsequent attempts
 // are separated by the backoff delays.
-async function verifyFreshness(
+export async function verifyFreshness(
   deploymentUrl: string,
   localDistTreeHash: string,
   logger: { info: (m: string) => void },
@@ -396,10 +396,10 @@ async function runPreflight(
 ): Promise<PreflightCheck[]> {
   const checks: PreflightCheck[] = [];
 
-  // 1. Release state is published (already verified by caller, but record it)
+  // 1. Release state is ready (already verified by caller, but record it)
   const manifestPath = path.join(workspaceRoot, "releases", releaseId, "release.yaml");
   checks.push({
-    name: "release-published",
+    name: "release-ready",
     passed: existsSync(manifestPath),
     detail: existsSync(manifestPath) ? "Release manifest found" : "Release manifest missing",
   });
@@ -592,8 +592,8 @@ export async function runLeitstandDevDeploy(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<DevDeployResult>> {
   const { workspaceRoot, logger } = context;
-  const systemId = flagString(input, "system");
-  if (!systemId) throw new Error("[leitstand.dev-deploy] --system is required");
+  const systemId = flagString(input, "site");
+  if (!systemId) throw new Error("[leitstand.dev-deploy] --site is required");
   const skipEvidenceSync =
     input.flags["skip-evidence-sync"] === true || input.flags["skip-evidence-sync"] === "true";
   const forceBuild = input.flags["force-build"] === true || input.flags["force-build"] === "true";
@@ -738,6 +738,50 @@ export async function runLeitstandDevDeploy(
     const releaseCommitSha = (releaseManifest.commitSha as string) ?? "";
     const healthy = deployResult.state === "succeeded" && healthResult.state === "healthy";
 
+    // RFC-0724: Mandatory Axiom gate for release path — run mission.check after deploy.
+    // Previously the release path skipped Axiom entirely. Now it calls mission.check
+    // with the same resilience wrapper as the workpiece path.
+    let axiomStatus: "pass" | "fail" | "not-run" = "not-run";
+    let axiomErrors = 0;
+    let axiomWarnings = 0;
+    let axiomExitCode = 0;
+    let freshnessVerified = false;
+    let freshnessCdnHash: string | null = null;
+    let freshnessAttempts = 0;
+    let freshnessError = "";
+
+    if (healthy && releaseMissionId) {
+      // Run CDN freshness check first (same as workpiece path)
+      const localDistTreeHash = (releaseManifest.distTreeHash as string) ?? "";
+      if (localDistTreeHash) {
+        const freshnessResult = await verifyFreshness(channelConfig.url, localDistTreeHash, logger);
+        freshnessVerified = freshnessResult.verified;
+        freshnessCdnHash = freshnessResult.cdnDistTreeHash;
+        freshnessAttempts = freshnessResult.attempts;
+        freshnessError = freshnessResult.error ?? "";
+      }
+
+      if (freshnessVerified) {
+        // Run mission.check with resilience wrapper
+        const axiomResult = await runMissionCheckWithResilience(
+          workspaceRoot,
+          releaseMissionId,
+          channelConfig.url,
+          releaseCommitSha,
+          logger,
+        );
+        axiomExitCode = axiomResult.exitCode;
+        axiomStatus = axiomResult.exitCode === 0 ? "pass" : "fail";
+        const axiomData = axiomResult.data as Record<string, unknown> | undefined;
+        axiomErrors = (axiomData?.errorCount as number) ?? 0;
+        axiomWarnings = (axiomData?.warningCount as number) ?? 0;
+      } else {
+        freshnessError = freshnessError || "CDN freshness verification failed";
+      }
+    } else if (!releaseMissionId) {
+      freshnessError = "release path — no missionId in release manifest";
+    }
+
     return {
       data: {
         command: "leitstand.dev-deploy",
@@ -750,24 +794,24 @@ export async function runLeitstandDevDeploy(
         deploymentUrl: channelConfig.url,
         buildIdentity: { releaseId, written: false, path: "" },
         axiom: {
-          status: "not-run",
-          errors: 0,
-          warnings: 0,
-          exitCode: 0,
+          status: axiomStatus,
+          errors: axiomErrors,
+          warnings: axiomWarnings,
+          exitCode: axiomExitCode,
           freshness: {
-            verified: false,
-            cdnDistTreeHash: null,
-            localDistTreeHash: "",
-            attempts: 0,
-            error: "release path — axiom skipped",
+            verified: freshnessVerified,
+            cdnDistTreeHash: freshnessCdnHash,
+            localDistTreeHash: (releaseManifest.distTreeHash as string) ?? "",
+            attempts: freshnessAttempts,
+            error: freshnessError || undefined,
           },
         },
         evidenceSynced: false,
         evidenceSyncError: null,
         releaseDeployed: releaseId,
       },
-      exitCode: deployResult.state === "succeeded" ? 0 : 1,
-      summary: `[leitstand.dev-deploy] ${systemId}: release ${releaseId} deployed to dev (${deployResult.state}), health: ${healthResult.state}${healthy ? "" : " (unhealthy)"}`,
+      exitCode: deployResult.state === "succeeded" && axiomStatus !== "fail" ? 0 : 1,
+      summary: `[leitstand.dev-deploy] ${systemId}: release ${releaseId} deployed to dev (${deployResult.state}), health: ${healthResult.state}, axiom: ${axiomStatus}${healthy ? "" : " (unhealthy)"}`,
     };
   }
 
@@ -1531,9 +1575,13 @@ export async function runLeitstandPropagate(
   const channel: Channel = "alt";
 
   const releaseManifest = await readReleaseManifest(workspaceRoot, releaseId);
-  if (releaseManifest.state !== "published") {
+  if (releaseManifest.state !== "ready") {
     throw new Error(
-      `[leitstand.propagate] release '${releaseId}' must be in state 'published' (state: ${releaseManifest.state}). Run leitstand.dev-deploy first, then release.publish.`,
+      `[leitstand.propagate] release '${releaseId}' must be in state 'ready' (current: ${releaseManifest.state}).\n` +
+        `Run:\n` +
+        `  1. release.ready --release ${releaseId}\n` +
+        `  2. leitstand.dev-deploy --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}\n` +
+        `  3. Re-run: leitstand.propagate --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}`,
     );
   }
 
@@ -1971,7 +2019,10 @@ export async function runLeitstandPromote(
   const releaseManifest = await readReleaseManifest(workspaceRoot, releaseId);
   if (releaseManifest.state !== "alt-deployed") {
     throw new Error(
-      `[leitstand.promote] release '${releaseId}' must be in state 'alt-deployed' (current: ${releaseManifest.state}). Run leitstand.propagate first.`,
+      `[leitstand.promote] release '${releaseId}' must be in state 'alt-deployed' (current: ${releaseManifest.state}).\n` +
+        `Run:\n` +
+        `  1. leitstand.propagate --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}\n` +
+        `  2. Re-run: leitstand.promote --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}`,
     );
   }
 
@@ -2002,7 +2053,25 @@ export async function runLeitstandPromote(
     const mainConfig = getChannelConfig(dep, "main");
     const adapter = resolveAdapter(dep.adapter);
 
-    // 1. Fetch build-identity.json from alt URL
+    // RFC-0724: Use verifyFreshness retry loop (5 attempts, exponential backoff 3s/6s/12s/24s)
+    // to confirm CDN is serving the expected distTreeHash before promoting.
+    const localDistTreeHash = releaseManifest.distTreeHash as string;
+    if (!localDistTreeHash) {
+      throw new Error(
+        `[leitstand.promote] release '${releaseId}' has no distTreeHash — run release.prepare to compute it`,
+      );
+    }
+    logger.info(`  Verifying CDN freshness for ${altConfig.url}...`);
+    const freshnessResult = await verifyFreshness(altConfig.url, localDistTreeHash, logger);
+    if (!freshnessResult.verified) {
+      throw new Error(
+        `[leitstand.promote] CDN freshness verification failed after ${freshnessResult.attempts} attempts: ${freshnessResult.error}. ` +
+          `The alt channel may still be serving stale content. Wait a moment and re-run: leitstand.promote --system ${systemId} --release ${releaseId}`,
+      );
+    }
+    logger.info(`  CDN freshness verified (attempts: ${freshnessResult.attempts})`);
+
+    // 2. Fetch build-identity.json from alt URL for full field comparison
     const buildIdentityUrl = `${altConfig.url}/.well-known/build-identity.json?cb=${Date.now()}`;
     logger.info(`  Fetching build identity from ${buildIdentityUrl}...`);
     const response = await fetch(buildIdentityUrl);
@@ -2020,7 +2089,7 @@ export async function runLeitstandPromote(
     }
     const buildIdentity = parseResult.data;
 
-    // 2. Verify build identity fields match release manifest
+    // 3. Verify build identity fields match release manifest
     const fieldsToVerify: Array<[string, string | undefined, string]> = [
       ["releaseId", releaseId, buildIdentity.releaseId],
       ["distTreeHash", releaseManifest.distTreeHash as string, buildIdentity.distTreeHash],
@@ -2222,8 +2291,8 @@ export async function runLeitstandStatus(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandStatusData>> {
   const { workspaceRoot, logger } = context;
-  const systemId = flagString(input, "system");
-  if (!systemId) throw new Error("[leitstand.status] --system is required");
+  const systemId = flagString(input, "site");
+  if (!systemId) throw new Error("[leitstand.status] --site is required");
 
   const channelFilter = flagString(input, "channel");
 
@@ -2301,8 +2370,8 @@ function detectChannelFromState(releaseState: string): Channel {
 
 function autoStepReleaseState(currentState: string): string {
   if (currentState === "promoted") return "alt-deployed";
-  if (currentState === "alt-deployed") return "published";
-  return "published";
+  if (currentState === "alt-deployed") return "ready";
+  return "ready";
 }
 
 export async function runLeitstandRollback(
@@ -2310,9 +2379,9 @@ export async function runLeitstandRollback(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandRollbackData>> {
   const { workspaceRoot, logger } = context;
-  const systemId = flagString(input, "system");
+  const systemId = flagString(input, "site");
   const toReleaseId = flagString(input, "to-release");
-  if (!systemId) throw new Error("[leitstand.rollback] --system is required");
+  if (!systemId) throw new Error("[leitstand.rollback] --site is required");
 
   // RFC-0627: --channel flag is removed; auto-detect from release state
   if (input.flags["channel"] !== undefined) {
@@ -2357,14 +2426,12 @@ export async function runLeitstandRollback(
     const currentState = currentManifest.state as string;
     const channel = detectChannelFromState(currentState);
 
-    // Find previous published release if not specified
+    // Find previous ready release if not specified
     const releasesDir = path.join(workspaceRoot, "releases");
     let targetRelease = toReleaseId;
     if (!targetRelease) {
       if (!existsSync(releasesDir)) {
-        throw new Error(
-          `[leitstand.rollback] no previous published release found for '${systemId}'`,
-        );
+        throw new Error(`[leitstand.rollback] no previous ready release found for '${systemId}'`);
       }
       const entries = await fs.readdir(releasesDir, { withFileTypes: true });
       const candidates: string[] = [];
@@ -2373,7 +2440,7 @@ export async function runLeitstandRollback(
         if (e.name.startsWith(`${systemId}-r`) && e.name !== currentRelease) {
           try {
             const manifest = await readReleaseManifest(workspaceRoot, e.name);
-            if (manifest.state === "published") candidates.push(e.name);
+            if (manifest.state === "ready") candidates.push(e.name);
           } catch {
             /* skip */
           }
@@ -2382,9 +2449,7 @@ export async function runLeitstandRollback(
       candidates.sort().reverse();
       targetRelease = candidates[0];
       if (!targetRelease) {
-        throw new Error(
-          `[leitstand.rollback] no previous published release found for '${systemId}'`,
-        );
+        throw new Error(`[leitstand.rollback] no previous ready release found for '${systemId}'`);
       }
     }
 
@@ -2510,8 +2575,8 @@ export async function runLeitstandHealth(
   context: KernelRuntimeContext,
 ): Promise<KernelCommandResult<LeitstandHealthData>> {
   const { workspaceRoot, logger } = context;
-  const systemId = flagString(input, "system");
-  if (!systemId) throw new Error("[leitstand.health] --system is required");
+  const systemId = flagString(input, "site");
+  if (!systemId) throw new Error("[leitstand.health] --site is required");
 
   const channel = parseChannel(flagString(input, "channel"), "alt");
 
