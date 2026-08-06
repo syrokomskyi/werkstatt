@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 1d895a2b8942bb02938e48d600ecf060ac5c6ce0511383439f77ad095bf794a1
+  contentHash: a86eaf2122785c89f1948dcc0636c1832ead248c0e2f44af7ea1dace12270b0f
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -13764,6 +13764,76 @@ commands:
     writes: []
     validatesOutputs: []
     pipelines: []
+  - name: nachweis.approve
+    description: "RFC-0714: Record human approval, verification level, and legal
+      content check in a Bordbuch entry. Operator-invoked only."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to approve
+      verification-level:
+        kind: string
+        required: true
+        description: "Verification level: N0, N1, N2, N3"
+      legal-content-check:
+        kind: string
+        required: true
+        description: "Legal content check result: passed or failed"
+      dry-run:
+        kind: boolean
+        description: Skip Bordbuch write, return what would happen
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.approve
+    description: "RFC-0714: Record human approval, verification level, and legal
+      content check in a Bordbuch entry. Operator-invoked only."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to approve
+      verification-level:
+        kind: string
+        required: true
+        description: "Verification level: N0, N1, N2, N3"
+      legal-content-check:
+        kind: string
+        required: true
+        description: "Legal content check result: passed or failed"
+      dry-run:
+        kind: boolean
+        description: Skip Bordbuch write, return what would happen
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: nachweis.consent.update
     description: "RFC-0707: Update PBP Consent entity status and append
       nachweis-consent Bordbuch entry."
@@ -13968,6 +14038,68 @@ commands:
     validatesOutputs: []
     pipelines:
       - build.prepare
+  - name: nachweis.public-derivative
+    description: "RFC-0714: Upload a public-derivative PDF to R2 and update
+      evidence-source items.public.storage to public. Idempotent by SHA-256."
+    scope: workspace
+    provider: site:warpgogol-com
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to create public derivative for
+      file:
+        kind: string
+        required: true
+        description: Path to the public-derivative PDF file
+      dry-run:
+        kind: boolean
+        description: Skip R2 upload and entity update
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
+  - name: nachweis.public-derivative
+    description: "RFC-0714: Upload a public-derivative PDF to R2 and update
+      evidence-source items.public.storage to public. Idempotent by SHA-256."
+    scope: workspace
+    provider: workspace
+    module: nachweis
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      system:
+        kind: string
+        description: Target system ID
+      slug:
+        kind: string
+        required: true
+        description: Record slug to create public derivative for
+      file:
+        kind: string
+        required: true
+        description: Path to the public-derivative PDF file
+      dry-run:
+        kind: boolean
+        description: Skip R2 upload and entity update
+      json:
+        kind: boolean
+        description: Output JSON result.
+    reads: []
+    writes: []
+    validatesOutputs: []
+    pipelines: []
   - name: nachweis.publish
     description: "RFC-0707: Enforce publication gate and transition record to
       published. Accepts --pilot-n2-exception for N2 pilot."

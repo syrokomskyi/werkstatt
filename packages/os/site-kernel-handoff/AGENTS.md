@@ -344,6 +344,15 @@ Axiom evidence from `mission.check` is preserved as an append-only archive in Cl
 - **`evidence.sync` and `evidence.fetch`** are defined in RFC-0651, not this RFC. Integration into `mission.close` and `leitstand.dev-deploy` is defined in RFC-0652.
 - **Local evidence remains ephemeral** (latest run only). R2 is the durable history.
 
+## Nachweis lifecycle (RFC-0707 / RFC-0714)
+
+The Nachweis kernel module registers 8 commands for managing evidence records with R2 storage and Bordbuch audit trails:
+
+- **Full workflow sequence:** `nachweis.ingest` → `nachweis.consent.update` → `nachweis.approve` → `nachweis.public-derivative` → `nachweis.validate` → `nachweis.publish` → (optional) `nachweis.withdraw`
+- **`nachweis.approve` (RFC-0714):** Records human approval, verification level (N0–N3), and legal content check result in a Bordbuch entry. Satisfies `recordApproved`, `verificationLevelMet`, and `legalContentCheckPassed` gate conditions. **Operator-invoked only — agents MUST NOT run `nachweis.approve` autonomously.** The Bordbuch entry records the actor for audit trail. Emits `logger.warn` if no evidence-source file is found for the slug (non-blocking — the Bordbuch entry is still written). Supports `--dry-run` and `--json`.
+- **`nachweis.public-derivative` (RFC-0714):** Uploads a public-derivative PDF to R2 under a `public/` path prefix and updates the evidence-source entity `items.public` to `{ sha256, storage: "public", mediaType: "application/pdf" }`. Satisfies the `publicDerivativeReady` gate condition. **Idempotent by SHA-256** — returns `alreadyUploaded: true` no-op when `items.public.sha256` already matches the computed hash. The operator is responsible for ensuring no private data is in the public derivative — the command does not redact. Supports `--dry-run` and `--json`.
+- **Publication gate:** `nachweis.publish` enforces all six gate conditions before transitioning a record to public visibility: `consentGranted`, `sourceIntegrityVerified`, `recordApproved`, `verificationLevelMet`, `publicDerivativeReady`, `legalContentCheckPassed`.
+
 ## Test conventions
 
 - **Await async operations before sync assertions:** When testing sync functions that inspect file state (e.g. `isWorkpieceDirty`, `existsSync`), always `await fs.writeFile()` or other async I/O before calling the sync function. Using `.then()` without awaiting creates a race condition — the assertion may execute before the file is written, causing flaky test failures.
