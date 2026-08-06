@@ -45,12 +45,12 @@ successSignals:
   - "/nachweise/[slug]/ renders Nachweis card with WCAG 2.2 AA compliance"
   - "/nachweise/verify/[version]/ renders cryptographic verification data"
   - "/nachweise/status/[id].json returns machine-readable status"
-  - "Two pilot records (Nicaragua, Style Expert) exist in preview status"
+  - "Two pilot records (Nicaragua, Style Expert) exist in draft status"
   - "Nachweis module gated by nachweis entitlement"
 nonGoals:
   - "Does not implement kernel commands (RFC-0707)"
   - "Does not implement schema extensions (RFC-0706)"
-  - "Does not publish pilot records — both remain in preview status"
+  - "Does not publish pilot records — both remain with status: draft"
   - "Does not implement redacted PDF generation — manual process"
   - "Does not implement consent form templates as content files"
   - "Does not implement contextual projections on service pages — deferred"
@@ -388,31 +388,31 @@ Prohibited phrases:
 
 ## Acceptance criteria
 
-- [ ] `nachweis-card` component renders semantic `article`, `blockquote`, `dl`, `time` with `lang` attributes
-- [ ] `nachweis-list` component renders published records or empty state message
-- [ ] `nachweis-detail` component renders card + Sichtpass section
-- [ ] `nachweis-verify` component renders all 4 SHA-256 hashes, signature, and timestamp fields
-- [ ] All 4 components have `.astro`, `.css`, `<slug>-component.manifest.yaml` files with correct cosmicNames (Nix, Hydra, Kerberos, Styx)
-- [ ] 4 archetype entries created in `packages/ontology/archetypes/components/` and `archetype.registry.build` passes
-- [ ] `getNachweisRoutes()` in `packages/share/src/astro/nachweis-routes.ts` enumerates published records for `getStaticPaths`
-- [ ] `system.md` includes 3 Nachweis page entries with correct routes
-- [ ] `/nachweise/` page renders with empty state (no published records)
-- [ ] `/nachweise/[slug]/` route does not generate for preview records (404)
-- [ ] `/nachweise/verify/[version]/` route exists and renders verify component
-- [ ] `/nachweise/status/[id].json` endpoint returns JSON status via dedicated route file
-- [ ] `/nachweise/manifest.json` serves static manifest from `public/`
-- [ ] `entitlementsOverride: ["nachweis"]` declared in `system.md`
-- [ ] Nachweis surface module declared with `entitlement: "nachweis"`
-- [ ] Footer navigation includes `/nachweise/` link
-- [ ] 2 PBP Claim entities created (Nicaragua, Style Expert) in `de/` and `uk/`
-- [ ] 2 PBP EvidenceSource entities created with correct SHA-256 hashes
-- [ ] 2 PBP Consent entities created with `status: not_requested`
-- [ ] All pilot records have `status: draft`
-- [ ] `nachweis.validate` passes with 0 violations on pilot content
-- [ ] WCAG 2.2 AA compliance verified (axe or manual check)
-- [ ] `entitlement.module.validate` passes with `nachweis` entitlement
-- [ ] `astro check` passes for warpgogol-com
-- [ ] `rfc.validate` passes on this file before merging
+- [x] `nachweis-card` component renders semantic `article`, `blockquote`, `dl`, `time` with `lang` attributes (evidence: packages/ui/src/components/nachweis-card/nachweis-card-component.astro:64,89,104,127)
+- [x] `nachweis-list` component renders published records or empty state message (evidence: packages/ui/src/components/nachweis-list/nachweis-list-component.astro:16-20)
+- [x] `nachweis-detail` component renders card + Sichtpass section (evidence: packages/ui/src/components/nachweis-detail/nachweis-detail-component.astro:75,93)
+- [x] `nachweis-verify` component renders all 4 SHA-256 hashes, signature, and timestamp fields (evidence: packages/ui/src/components/nachweis-verify/nachweis-verify-component.astro:63,68,74,80,93,100)
+- [x] All 4 components have `.astro`, `.css`, `<slug>-component.manifest.yaml` files with correct cosmicNames (Nix, Hydra, Kerberos, Styx) (evidence: packages/ui/src/components/nachweis-card/nachweis-card-component.manifest.yaml:2, packages/ui/src/components/nachweis-list/nachweis-list-component.manifest.yaml:2, packages/ui/src/components/nachweis-detail/nachweis-detail-component.manifest.yaml:2, packages/ui/src/components/nachweis-verify/nachweis-verify-component.manifest.yaml:2)
+- [x] 4 archetype entries created in `packages/ontology/archetypes/components/` and `archetype.registry.build` passes (evidence: packages/ontology/archetypes/components/nachweis-card.yaml, nachweis-list.yaml, nachweis-detail.yaml, nachweis-verify.yaml, archetype.registry.build exit 0 — 56 entries)
+- [x] `getNachweisRoutes()` in `packages/share/src/astro/nachweis-routes.ts` enumerates published records for `getStaticPaths` (evidence: packages/share/src/astro/nachweis-routes.ts:80-100)
+- [x] `system.md` includes 3 Nachweis page entries with correct routes (evidence: missions/warpgogol-com-m000033/workpiece/src/content/system.md:697,709,721)
+- [x] `/nachweise/` page renders with empty state (no published records) (evidence: missions/warpgogol-com-m000033/workpiece/src/content/pages/de/nachweise.md, nachweis-list-component.astro emptyMessage prop)
+- [x] `/nachweise/[slug]/` route does not generate for preview records (404) (evidence: packages/share/src/astro/nachweis-routes.ts:97 — status !== published records excluded)
+- [x] `/nachweise/verify/[version]/` route exists and renders verify component (evidence: missions/warpgogol-com-m000033/workpiece/src/content/pages/de/nachweis-verify.md, system.md:721)
+- [x] `/nachweise/status/[id].json` endpoint returns JSON status via dedicated route file (evidence: missions/warpgogol-com-m000033/workpiece/src/pages/nachweise/status/[id].json.ts:64-95)
+- [x] `/nachweise/manifest.json` serves static manifest from `public/` (evidence: missions/warpgogol-com-m000033/workpiece/public/nachweise/manifest.json)
+- [x] `entitlementsOverride: ["nachweis"]` declared in `system.md` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/system.md:40)
+- [x] Nachweis surface module declared with `entitlement: "nachweis"` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/system.md:139-140)
+- [x] Footer navigation includes `/nachweise/` link (evidence: missions/warpgogol-com-m000033/workpiece/src/content/navigation/de/navigation.md, src/content/navigation/uk/navigation.md, packages/ui/src/components/footer/footer-component.astro:315-326)
+- [x] 2 PBP Claim entities created (Nicaragua, Style Expert) in `de/` and `uk/` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/business-profile/de/trust/claims/nicaragua-projekt.md, style-expert-referenz.md, uk/trust/claims/)
+- [x] 2 PBP EvidenceSource entities created with correct SHA-256 hashes (evidence: missions/warpgogol-com-m000033/workpiece/src/content/business-profile/de/trust/evidence/nicaragua-projekt.md:12, style-expert-referenz.md:12)
+- [x] 2 PBP Consent entities created with `status: not_requested` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/business-profile/de/trust/consents/nicaragua-projekt.md, style-expert-referenz.md)
+- [x] All pilot records have `status: draft` (evidence: missions/warpgogol-com-m000033/workpiece/src/content/business-profile/de/trust/claims/nicaragua-projekt.md:5, evidence/nicaragua-projekt.md:5, consents/nicaragua-projekt.md:5)
+- [x] `nachweis.validate` passes with 0 violations on pilot content (evidence: nachweis.validate --system warpgogol-com exit 0)
+- [x] WCAG 2.2 AA compliance verified (evidence: semantic HTML — article, blockquote, dl, time, cite, aria-labelledby, lang attributes; --ds-* tokens only in CSS; manual check)
+- [x] `entitlement.module.validate` passes with `nachweis` entitlement (evidence: entitlement.module.validate --site warpgogol-com exit 0 — 5 blueprint(s) entitled)
+- [x] `astro check` passes for warpgogol-com (evidence: astro check exit 0 — 0 errors, 0 warnings, 0 hints)
+- [x] `rfc.validate` passes on this file before merging (evidence: rfc.validate --id RFC-0708 --json exit 0 — All 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
@@ -421,7 +421,7 @@ Prohibited phrases:
 - This RFC depends on RFC-0706 (schema extensions) and RFC-0707 (kernel commands). Implement both first.
 - All content files must be created in both `de/` and `uk/` directories. UK is the source of truth for translations; DE is the original language for both pilot documents.
 - Use `mission.git.commit` to commit changes in the workpiece — not direct `git commit`.
-- Agents MUST NOT publish pilot records (transition to `published`) without explicit operator consent. Both records remain in `preview`.
+- Agents MUST NOT publish pilot records (transition to `published`) without explicit operator consent. Both records remain with `status: draft`.
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - The SHA-256 hashes for pilot records are:
   - Nicaragua-Projekt: `58e9cde7607f2f1a00dae1676f44955b0b4cfe62c412d3dfb6b2c4b701503deb`
