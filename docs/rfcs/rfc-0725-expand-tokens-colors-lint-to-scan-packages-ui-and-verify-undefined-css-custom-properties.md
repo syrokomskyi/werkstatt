@@ -202,15 +202,15 @@ async function scanPackagesUiCss(
 
 ## Acceptance criteria
 
-- [ ] `tokens.colors.lint` scans `packages/ui/src/**/*.css` in addition to `app/src/styles/**/*.css`
-- [ ] `tokens.colors.lint` reports `var(--ds-*)` references not present in `TOKEN_NAME_SET` as violations
-- [ ] Violations include `reason: "undefined-token"` in JSON output
-- [ ] Exit code is 1 when any undefined token is found
-- [ ] `packages/ui/src` missing is handled with a warning, not an error
-- [ ] Existing raw color checks continue to work unchanged
-- [ ] Unit tests cover undefined token detection, packages-level scan, and missing `packages/ui/src` warning path
-- [ ] Command description in `04-content-quality.ts` updated to reflect undefined token check
-- [ ] `rfc.validate` passes on this file
+- [x] `tokens.colors.lint` scans `packages/ui/src/**/*.css` in addition to `app/src/styles/**/*.css` (evidence: packages/os/site-kernel-checks/src/checks/tokens.ts:170-198, scanPackagesUiCss helper)
+- [x] `tokens.colors.lint` reports `var(--ds-*)` references not present in `TOKEN_NAME_SET` as violations (evidence: packages/os/site-kernel-checks/src/checks/tokens.ts:146-168, scanCssFileForUndefinedTokens)
+- [x] Violations include `reason: "undefined-token"` in JSON output (evidence: packages/os/site-kernel-checks/src/checks/tokens.ts:164, ColorLintFinding.reason field)
+- [x] Exit code is 1 when any undefined token is found (evidence: packages/os/site-kernel-checks/src/checks/tokens.ts:255, exitCode = allFindings.length > 0 ? 1 : 0)
+- [x] `packages/ui/src` missing is handled with a warning, not an error (evidence: packages/os/site-kernel-checks/src/checks/tokens.ts:180-183, catch block logs warning and returns [])
+- [x] Existing raw color checks continue to work unchanged (evidence: packages/os/site-kernel-checks/src/tests/tokens-colors-lint.test.ts, "detects raw hex and rgba colors in app styles" test passes)
+- [x] Unit tests cover undefined token detection, packages-level scan, and missing `packages/ui/src` warning path (evidence: packages/os/site-kernel-checks/src/tests/tokens-colors-lint.test.ts, 6 tests pass)
+- [x] Command description in `04-content-quality.ts` updated to reflect undefined token check (evidence: packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts:204-205)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0725 --json, status: pass, 0 violations)
 
 ## Implementation notes for agents
 
