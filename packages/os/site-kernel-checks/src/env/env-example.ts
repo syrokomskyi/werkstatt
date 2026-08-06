@@ -19,6 +19,7 @@ secret can never leak into the repo through the tracked example file.</purpose>
   <item>RFC-0388: Add # How to obtain: per-key instructions. Change renderBlock to accept EnvKey[] with howToObtain field.</item>
   <item>RFC-0388: Add blank line between variables within a block for ENV-CONTRACT-06 compliance.</item>
   <item>Fix: HOW_TO_OBTAIN keys mismatched actual env var names (TELEGRAM_BOT_TOKEN vs INTEGRATION_TELEGRAM_BOT_TOKEN, etc.) — all integration keys fell back to generic "See project documentation" text. Keys now match the INTEGRATION_-prefixed env var names; Telegram instructions expanded with BotFather /token and getUpdates details.</item>
+  <item>RFC-0713: Add R2_NACHWEIS_ACCOUNT_ID, R2_NACHWEIS_ACCESS_KEY_ID, R2_NACHWEIS_SECRET_ACCESS_KEY to HOW_TO_OBTAIN map for per-bucket credential isolation in generated .env.example files.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -138,6 +139,12 @@ const HOW_TO_OBTAIN: Readonly<Record<string, string>> = {
   R2_ACCESS_KEY_ID:
     "Cloudflare Dashboard → R2 → Manage R2 API Tokens → Create API Token with Object Read & Write, scoped to axiom-evidence bucket. The Access Key ID is shown on the token creation result page.",
   R2_SECRET_ACCESS_KEY:
+    "Same R2 API Token creation flow — the Secret Access Key is shown ONCE. Copy it immediately — Cloudflare does not store it and you cannot retrieve it later.",
+  R2_NACHWEIS_ACCOUNT_ID:
+    "Cloudflare Dashboard → R2 → Overview → Account ID (right sidebar). Same value as CLOUDFLARE_ACCOUNT_ID.",
+  R2_NACHWEIS_ACCESS_KEY_ID:
+    'Cloudflare Dashboard → R2 → Manage R2 API Tokens → Create Access Key scoped to "nachweis" bucket only. The Access Key ID is shown on the token creation result page.',
+  R2_NACHWEIS_SECRET_ACCESS_KEY:
     "Same R2 API Token creation flow — the Secret Access Key is shown ONCE. Copy it immediately — Cloudflare does not store it and you cannot retrieve it later.",
   PUBLIC_IMAGE_PROVIDER: 'Set to "build-portable" to enable; leave empty for raw origin assets.',
 };
