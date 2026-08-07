@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: b5b5d2822c47edf0fac78c68ef0b00eae6827a5b625780257b9494876d280534
+  contentHash: eb8a90ddcab953c30561ba2151e690a0f719dee11d3827a0ff7742d08f17513a
   sources:
     - path: docs/architecture-dna.md
       hash: 8dff5995b14d765ec200239dd55283087cc36dec5e38219c4129f6b27a2de975
@@ -26,8 +26,10 @@ meta:
       hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
     - path: missions/warpgogol-com-m000035/workpiece/package.json
       hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
+    - path: missions/warpgogol-com-m000036/workpiece/package.json
+      hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
     - path: package.json
-      hash: a82ae82fe4082fa0f47453973c88eddaa51f7c3f049d73419caa865305d4b714
+      hash: 5a9ba0e756099fca4fb6bc1bcfe8488bb6a557f9f5268f906bc678411f56ee7b
     - path: packages/agent-gate/package.json
       hash: 7aa535e0de15b4cc8659f7dfe1b8e000ccc4fdc3ab40ab0b37f3fea4b285af30
     - path: packages/chat-adapter-null/package.json
@@ -47,7 +49,7 @@ meta:
     - path: packages/fingerprint/package.json
       hash: 95dd61ea33fe31cc54dfc6c54d0504ee1be86b7591129eee47252be2c2a12ce8
     - path: packages/forge/package.json
-      hash: df286a3c15016cdfab0e8408994b860e4d801b9416f93c2b1ae1223042aa8be6
+      hash: 7a0fd15cbd172653f813af864d68bc674d45906b0e1563b0d161a2b7cd95fbb3
     - path: packages/geo/package.json
       hash: 6aa800488d6c38a5666738d686eb69d30815e3fe8a7cb9ce4777715fa2627aa2
     - path: packages/growth-adapter-matomo/package.json
@@ -127,7 +129,7 @@ meta:
     - path: packages/passport/package.json
       hash: ed6e7f915821a41f35320b52ac4a12d9aa9d6e324d5b1759bad053a87c624349
     - path: packages/pbp/package.json
-      hash: 72a8d43e26c58b7666453d2711b3488d7716964f5d030c3db9bbcefd74cc2220
+      hash: e64037b0c093aa6c18f22dca6f9c7de5a6ae6d767d3fb6104907bd6a3eaee65a
     - path: packages/share/package.json
       hash: 84e3ee4150af58f753a1b15714bf2190ba803e0988f491d9184b01f10a02c07c
     - path: packages/star-map/package.json
@@ -143,7 +145,7 @@ meta:
     - path: packages/warpgogol-skills/package.json
       hash: faae287a3bd3b3272987730838981df1518e6716638d78cb0469ba6879b7f818
     - path: pnpm-workspace.yaml
-      hash: cbc447972e2ad03356938f6d6294e8d88d8ba156a6424a5ee12e657a920569bd
+      hash: 62b12ab94e4687057206fe0713f57b4ba35691115a820eb8bdd952e0c81ee5d1
     - path: services/cf-analytics-poller/package.json
       hash: 15c9cf828e0ebda955cfe83dd7850e817ce1453b885ba173dc1124a2d099a94f
     - path: services/check-warpgogol-runner/package.json
@@ -162,7 +164,7 @@ meta:
       hash: 52595740d0e1eaa0f74a86c6ef6ad0d21b5840212468a984e0b08dc1cda41717
 workspace:
   name: warpgogol-platform
-  version: 4.34.1
+  version: 4.54.0
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -171,17 +173,21 @@ workspace:
     - services/*
 apps:
   - name: warpgogol-com
-    directory: missions/warpgogol-com-m000035/workpiece
+    directory: missions/warpgogol-com-m000036/workpiece
     packageName: warpgogol-com
 sternsystems:
   - id: warpgogol-com
-    currentMission: warpgogol-com-m000035
+    currentMission: warpgogol-com-m000036
     registeredAt: 2026-07-13T00:00:00.000Z
 missions:
   - id: warpgogol-com-m000035
     sternsystem: ""
     status: open
     workpiecePath: missions/warpgogol-com-m000035/workpiece
+  - id: warpgogol-com-m000036
+    sternsystem: ""
+    status: open
+    workpiecePath: missions/warpgogol-com-m000036/workpiece
 packages:
   - name: warpgogol-com
     directory: missions/warpgogol-com-m000031/workpiece
@@ -279,6 +285,59 @@ packages:
     testSignal:
       packageName: warpgogol-com
       directory: missions/warpgogol-com-m000035/workpiece
+      signal: skipped
+      evidence: App author/build checks currently cover the deployable site; direct
+        app unit tests are deferred until an app-level smoke-test harness lands.
+      metadata:
+        signal: skipped
+        owner: architecture
+        rationale: App author/build checks currently cover the deployable site; direct
+          app unit tests are deferred until an app-level smoke-test harness
+          lands.
+        reviewAfter: 2026-10-01
+  - name: warpgogol-com
+    directory: missions/warpgogol-com-m000036/workpiece
+    workspacePattern: missions/*/workpiece
+    kind: mission
+    dependencies:
+      - "@astrojs/check"
+      - "@astrojs/cloudflare"
+      - "@astrojs/react"
+      - "@fontsource/dm-mono"
+      - "@fontsource/inter"
+      - "@fontsource/playfair-display"
+      - "@types/react"
+      - "@types/react-dom"
+      - "@upstash/qstash"
+      - "@upstash/redis"
+      - "@warpgogol/agent-gate"
+      - "@warpgogol/content-source"
+      - "@warpgogol/faq"
+      - "@warpgogol/forge"
+      - "@warpgogol/growth"
+      - "@warpgogol/ontology"
+      - "@warpgogol/pbp"
+      - "@warpgogol/share"
+      - "@warpgogol/site-kernel"
+      - "@warpgogol/site-kernel-astro"
+      - "@warpgogol/site-kernel-changelog"
+      - "@warpgogol/site-kernel-checks"
+      - "@warpgogol/site-kernel-codegen"
+      - "@warpgogol/site-kernel-content"
+      - "@warpgogol/site-kernel-deploy"
+      - "@warpgogol/site-kernel-handoff"
+      - "@warpgogol/site-kernel-integrity"
+      - "@warpgogol/site-kernel-onboarding"
+      - "@warpgogol/tokens"
+      - "@warpgogol/ui"
+      - astro
+      - react
+      - react-dom
+      - yaml
+      - zod
+    testSignal:
+      packageName: warpgogol-com
+      directory: missions/warpgogol-com-m000036/workpiece
       signal: skipped
       evidence: App author/build checks currently cover the deployable site; direct
         app unit tests are deferred until an app-level smoke-test harness lands.
@@ -911,6 +970,7 @@ packages:
       - "@warpgogol/share"
       - "@warpgogol/site-kernel-content"
       - astro
+      - big.js
       - zod
     testSignal:
       packageName: "@warpgogol/pbp"
@@ -1193,7 +1253,7 @@ quality:
     real: 31
     noop: 0
     absent: 1
-    skipped: 18
+    skipped: 19
   testSignalPolicy:
     hasErrors: true
     errorCount: 1
@@ -2464,6 +2524,20 @@ commands:
     providers:
       - site
       - workspace
+  - name: currency-pricing.compile
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
+    gate:
+      severity: error
+      phase: author
+      conditional:
+        kind: entitlement
+        ref: multi-currency
+        description: Only runs when multi-currency entitlement is active
   - name: dedup.helper.lint
     scope: workspace
     mutatesState: false
@@ -2556,6 +2630,20 @@ commands:
     supportsAllSites: false
     providers:
       - workspace
+  - name: derived-prices.materialize
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
+    gate:
+      severity: error
+      phase: author
+      conditional:
+        kind: entitlement
+        ref: multi-currency
+        description: Only runs when multi-currency entitlement is active
   - name: dht.capacity.publish
     scope: workspace
     mutatesState: false
@@ -4827,6 +4915,20 @@ commands:
     providers:
       - site
       - workspace
+  - name: rate-snapshot.resolve
+    scope: workspace
+    mutatesState: false
+    supportsAllSites: false
+    providers:
+      - site
+      - workspace
+    gate:
+      severity: error
+      phase: author
+      conditional:
+        kind: entitlement
+        ref: multi-currency
+        description: Only runs when multi-currency entitlement is active
   - name: ratgeber.article.validate
     scope: app
     mutatesState: false
@@ -6271,21 +6373,15 @@ commandProvenance:
     changedBy:
       - RFC-0305
     removedBy: []
-  - command: content.regression.apply
+  - command: currency-pricing.compile
     proposedBy:
-      - RFC-0734
+      - RFC-0741
     addedBy: []
     changedBy: []
     removedBy: []
-  - command: content.regression.check
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0734
-    removedBy: []
-  - command: content.regression.review.generate
+  - command: derived-prices.materialize
     proposedBy:
-      - RFC-0734
+      - RFC-0740
     addedBy: []
     changedBy: []
     removedBy: []
@@ -6360,11 +6456,12 @@ commandProvenance:
       - RFC-0305
     changedBy: []
     removedBy: []
-  - command: mission.close
-    proposedBy: []
+  - command: rate-snapshot.resolve
+    proposedBy:
+      - RFC-0741
     addedBy: []
     changedBy:
-      - RFC-0734
+      - RFC-0744
     removedBy: []
   - command: surface.generate
     proposedBy: []
@@ -6636,6 +6733,9 @@ pipelines:
       - api.routes.generate
       - env.example.generate
       - entitlements.resolve
+      - rate-snapshot.resolve
+      - currency-pricing.compile
+      - derived-prices.materialize
       - surface.generate
       - surface.freshness
       - surface.starmap
@@ -6705,6 +6805,9 @@ pipelines:
       - api.routes.generate
       - env.example.generate
       - entitlements.resolve
+      - rate-snapshot.resolve
+      - currency-pricing.compile
+      - derived-prices.materialize
       - surface.generate
       - surface.freshness
       - surface.starmap
@@ -7709,26 +7812,67 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 3
-  implemented: 1
+  accepted: 7
+  implemented: 6
   draft: 4
   reviewing: 0
 baseline:
   implementedRfcs:
-    - id: RFC-0733
+    - id: RFC-0736
+      implementedAt: 2026-08-07
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-55
+    - id: RFC-0737
+      implementedAt: 2026-08-07
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-55
+    - id: RFC-0738
+      implementedAt: 2026-08-07
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-42
+        - DNA-53
+        - DNA-55
+    - id: RFC-0739
+      implementedAt: 2026-08-07
+      kind: contract
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-55
+    - id: RFC-0740
       implementedAt: 2026-08-07
       kind: architecture
       scope: workspace
       dnaRefs:
         - DNA-1
-        - DNA-42
-        - DNA-54
-        - DNA-62
+        - DNA-4
+        - DNA-39
+        - DNA-55
+    - id: RFC-0741
+      implementedAt: 2026-08-07
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-1
+        - DNA-4
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0734
+      - RFC-0735
+      - RFC-0742
+      - RFC-0743
+      - RFC-0744
+      - RFC-0745
     draft:
       - RFC-0000
       - RFC-0383
