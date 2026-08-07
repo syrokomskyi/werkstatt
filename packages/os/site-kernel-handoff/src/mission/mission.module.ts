@@ -203,6 +203,10 @@ export function createMissionModule(): KernelModule {
         supportsAllSites: false,
         flags: {
           mission: { kind: "string", required: true, description: "Mission id." },
+          "skip-content-regression": {
+            kind: "boolean",
+            description: "RFC-0732: Skip content regression gate (escape hatch).",
+          },
         },
         reads: ["missions/{mission}/**"],
         cacheable: false,

@@ -370,11 +370,13 @@ export async function runMissionValidate(
   }
 
   logger.info(`  Running build.check pipeline for ${manifest.systemId}…`);
+  const skipContentRegression = input.flags["skip-content-regression"] === true;
   const pipelineResult = await executeKernelPipeline({
     workspaceRoot,
     pipelineName: "build.check",
     siteName: manifest.systemId,
     outputFormat: "pretty",
+    ...(skipContentRegression ? { flags: { "skip-content-regression": true } } : {}),
   });
 
   const pipelineReport = Array.isArray(pipelineResult) ? pipelineResult[0] : pipelineResult;
