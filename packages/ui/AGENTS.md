@@ -150,6 +150,7 @@ Composite archetypes (hero, hero-decision-card, people, donation-card, price-car
 ### CTA + image contract (RFC-0104)
 
 - CTAs are `CtaConfig` with discriminated `target.kind: internal | external | anchor`.
+- **CTA alignment MUST follow `header.align`.** When a section renders an inline CTA (not via `<SectionCtaGroup>`), wrap the `<a>` in a `<div class="...__cta-wrap--align-{left,center,right}">` that applies `text-align` to center or right-align the CTA when the header is centered or right-aligned. The `ctaAlign` variable in the `.astro` frontmatter reads `props.header?.align` with the section's default fallback. Never render a bare `<a>` CTA without an alignment wrapper.
 - Authored images flow through `<SectionImage>` with `fade` as a property of the image, not the section. `<SectionImage>` — and every other image-bearing component — renders via `<ResponsiveImage>` (RFC-0152, see below), never a raw `<img>`/Astro `<Image>`.
 
 ### Site background (RFC-0105)
