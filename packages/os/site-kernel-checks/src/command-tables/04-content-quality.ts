@@ -114,7 +114,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
     name: "pbp.migration.validate",
     description:
-      "Validate owner-decision-register.yaml and migration-coverage-report.yaml structure and coverage (RFC-0468, ADR-0030).",
+      "Validate owner-decision-register.yaml and migration-coverage-report.yaml structure and coverage (RFC-0468, ADR-0032).",
     scope: "app",
     flags: {},
     supportsAllSites: true,

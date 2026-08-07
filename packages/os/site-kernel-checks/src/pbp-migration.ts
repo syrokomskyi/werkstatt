@@ -8,7 +8,7 @@ and migration-coverage-report.yaml structure and coverage validation.</purpose>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>ADR-0030: Moved RFC-0468 validation from packages/pbp unit test to site-kernel-checks validator.</item>
+  <item>ADR-0032: Moved RFC-0468 validation from packages/pbp unit test to site-kernel-checks validator.</item>
 </CHANGE_SUMMARY>
 */
 

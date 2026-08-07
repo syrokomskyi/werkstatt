@@ -7,17 +7,17 @@ reviewer:
 verdict: approved
 diffRange: eb26315^...HEAD
 filesReviewed:
-  - docs/adrs/adr-0030-site-content-validation-lives-in-validators-not-tests.md
+  - docs/adrs/adr-0032-site-content-validation-lives-in-validators-not-tests.md
   - packages/os/site-kernel-checks/src/pbp-migration.ts
   - packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts
   - packages/pbp/src/__tests__/rfc-0468-register-and-coverage.test.ts
 ---
 
-# Code Review: ADR-0030 — site content validation in validators not tests
+# Code Review: ADR-0032 — site content validation in validators not tests
 
 ### Verdict: Approved
 
-The ADR decision is sound and the validator follows existing patterns. Both findings (sync I/O, missing pipeline registration) have been fixed in commit 60193085.
+The ADR decision is sound and the validator follows existing patterns. Both findings (sync I/O, missing pipeline registration) have been fixed in commit 60193085. ADR renumbered from 0030 to 0032 to avoid collision with archived ADR-0030.
 
 ### Mechanical floor
 
@@ -41,7 +41,7 @@ No issues. The old test is deleted, not maintained alongside the new validator. 
 
 ### Axis E — Agent-facing clarity
 
-- **ADR trace**: The `CHANGE_SUMMARY` in `pbp-migration.ts` references `ADR-0030` — good. The `MODULE_CONTRACT` purpose is clear. No issues.
+- **ADR trace**: The `CHANGE_SUMMARY` in `pbp-migration.ts` references `ADR-0032` — good. The `MODULE_CONTRACT` purpose is clear. No issues.
 
 ### Axis F — Pragmatism
 
@@ -54,7 +54,7 @@ No issues. The old test is deleted, not maintained alongside the new validator. 
 
 ### Spec compliance
 
-| Requirement from ADR-0030 | Status | Evidence |
+| Requirement from ADR-0032 | Status | Evidence |
 | --- | --- | --- |
 | Site content validation in site-kernel-checks | Done | `pbp-migration.ts` created |
 | No tests in packages/* hardcode site paths | Done | Test deleted |
