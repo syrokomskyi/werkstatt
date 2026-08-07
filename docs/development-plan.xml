@@ -431,5 +431,18 @@
         <command>gitmesh.verify</command>
       </commands>
     </layer>
+    <layer id="layer-content-regression" rfc="RFC-0732">
+      <status>implemented</status>
+      <targets>
+        <target>`packages/os/site-kernel-checks/src/content-regression.ts`</target>
+        <target>`packages/os/site-kernel-checks/src/command-tables/build-infra.ts`</target>
+        <target>`packages/os/site-kernel-checks/src/pipelines/build-check.ts`</target>
+        <target>`packages/os/site-kernel-handoff/src/mission/mission-close.ts`</target>
+      </targets>
+      <commands>
+        <command>content.regression.check</command>
+        <command>content.regression.snapshot.update</command>
+      </commands>
+    </layer>
   </p2p-rollout>
 </development-plan>

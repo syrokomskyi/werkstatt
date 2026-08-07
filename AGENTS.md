@@ -336,6 +336,16 @@ See [`docs/policies/generated-file-governance.md`](docs/policies/generated-file-
 - Section components must render real content (RFC-0093)
 - **Generated docs files must not be hand-edited.** Files like `docs/COMMANDS.md`, `docs/command-manifest.generated.yaml`, and `docs/gate-catalog.generated.yaml` carry the `GENERATED` marker and are overwritten on the next build. To add or update a command entry, run `command.manifest.generate` then `docs.commands.generate`. To update the gate catalog, run `gate.catalog.generate`. Always check the file header for a `GENERATED` marker and `Owner command:` line before editing — if present, run the owning generator instead.
 
+## Content drift gate boundaries (DNA-58, DNA-61)
+
+Three distinct drift gates protect different layers of the content stack. Agents MUST distinguish them:
+
+- **DRIFT-01** (`generated.drift.validate`, RFC-0601, DNA-58) — generated file determinism. Re-invokes registered generators with `dryRun: true` and compares output against committed files. Covers files in `GENERATOR_OWNERSHIP_MAP`.
+- **SNAP-01** (`behavior.snapshot.validate`, RFC-0269) — route-level metadata drift. Compares title, OG tags, JSON-LD, canonical, and hreflang against the committed `behavior.snapshot.generated.yaml`.
+- **CREG-01** (`content.regression.check`, RFC-0732, DNA-61) — resolved page content drift. Snapshots block text (after `resolveReferencesDeep`), prose body, and FAQ Q&A per-route, and diffs against a golden baseline in the cache clone. Covers content that has no registered generator but changes what users read.
+
+The `--skip-content-regression` flag on `mission.validate` bypasses CREG-01 only. DRIFT-01 and SNAP-01 are unaffected. `mission.close` always refreshes the golden baseline regardless of whether the flag was used during validation.
+
 ## Onboarding a new site (one paragraph)
 
 Follow `.agents/workflows/00-prepare.md` and the RFC-0075 phase chain. Treat `onboarding/.input/**` as read-only, require `onboarding/.input/00-brief.md` to pass `brief.validate` before any phase starts, write all agent artifacts under `onboarding/.output/<NN-phase>/`, and use `onboarding.scaffold` only inside the scaffold phase. Never copy an existing app folder by hand. After the app is built, gate readiness with `sites-check.run --site <id>` and `app.contract.full --site <id>`.
