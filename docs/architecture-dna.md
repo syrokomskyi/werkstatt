@@ -206,7 +206,7 @@ A mission's Werkstück is materialized from the Sternsystem's pinned data bundle
 
 ## DNA-48 · Release discipline
 
-A release is a promoted, immutable artifact produced from a validated mission. It has a six-digit id (`<system-id>-r<NNNNNN>`), RFC-0269 behavior snapshots (readable and production), a snapshot diff, advisory quality report, release manifest, a durable RFC-0363 artifact reference for the production `dist`, and a public `build-identity.json` written into `dist/client/.well-known/` (RFC-0608). The release state machine is `prepared → published → alt-deployed → promoted → rolled-back` (RFC-0628 removes `dev-deployed` — workpiece-based dev deploys do not enter the release state machine). A release cannot be published unless: (1) the behavior snapshot diff passes (structural parity between readable and production builds), (2) migrator validation passes, (3) the version-compare verdict is not refuse-downgrade, (4) the Bordbuch is consistent, and (5) the release artifact is stored and hash-verified. Enforced by `release.prepare`, `release.publish`, and `release.validate`. Established by RFC-0357, updated by RFC-0608, RFC-0627, and RFC-0628.
+A release is a promoted, immutable artifact produced from a validated mission. It has a six-digit id (`<system-id>-r<NNNNNN>`), RFC-0269 behavior snapshots (readable and production), a snapshot diff, advisory quality report, release manifest, a durable RFC-0363 artifact reference for the production `dist`, and a public `build-identity.json` written into `dist/client/.well-known/` (RFC-0608). The release state machine is `prepared → ready → alt-deployed → promoted → rolled-back` (RFC-0628 removes `dev-deployed` — workpiece-based dev deploys do not enter the release state machine). A release cannot be marked ready unless: (1) the behavior snapshot diff passes (structural parity between readable and production builds), (2) migrator validation passes, (3) the version-compare verdict is not refuse-downgrade, (4) the Bordbuch is consistent, and (5) the release artifact is stored and hash-verified. Enforced by `release.prepare`, `release.ready`, and `release.validate`. Established by RFC-0357, updated by RFC-0608, RFC-0627, and RFC-0628.
 
 ## DNA-49 · Fleet propagation (Leitstand)
 
@@ -222,7 +222,7 @@ Werkstatt commands that mutate registry, mission, release, deployment, artifact,
 
 ## DNA-52 · Release artifact store
 
-Published release artifacts are durable, content-addressed records in the Werkstatt artifact store, not incidental local `releases/<id>/dist` folders. Release, deployment, rollback, and Notausgang workflows resolve artifacts through the store and verify artifact manifests, dist tree hashes, behavior snapshot hashes, and retention rules. Enforced by `artifact.store.put`, `artifact.store.get`, `artifact.store.validate`, and `artifact.store.gc`. Established by RFC-0363.
+Ready release artifacts are durable, content-addressed records in the Werkstatt artifact store, not incidental local `releases/<id>/dist` folders. Release, deployment, rollback, and Notausgang workflows resolve artifacts through the store and verify artifact manifests, dist tree hashes, behavior snapshot hashes, and retention rules. Enforced by `artifact.store.put`, `artifact.store.get`, `artifact.store.validate`, and `artifact.store.gc`. Established by RFC-0363.
 
 ## DNA-53 · Semantic fingerprint governance
 
@@ -238,7 +238,7 @@ External specification packages are vendored as immutable snapshots under `docs/
 
 ## DNA-56 · Studio Gate: MCP-mediated content editing
 
-Site owner content editing passes through the Studio Gate — a stdio MCP server (`packages/studio-gate`) that projects `workpiece.read` and `workpiece.write` Site OS commands plus mission lifecycle commands (`mission.open`, `mission.materialize`, `mission.git.commit`, `mission.validate`, `mission.reconcile`, `mission.close`, `mission.abort`, `release.prepare`, `release.publish`, `leitstand.propagate`) as MCP tools. LLMs interacting with site content have no direct filesystem access — only MCP tools. DNA-22 (client-editable surface) is enforced at the command level: `workpiece.read` and `workpiece.write` reject paths outside the `clientEditable[]` whitelist before any file I/O occurs. The `wg-site-content-edit` skill provides the process layer (what to do, in what order, boundaries) as MCP `serverInfo.instructions`. Established by RFC-0555.
+Site owner content editing passes through the Studio Gate — a stdio MCP server (`packages/studio-gate`) that projects `workpiece.read` and `workpiece.write` Site OS commands plus mission lifecycle commands (`mission.open`, `mission.materialize`, `mission.git.commit`, `mission.validate`, `mission.reconcile`, `mission.close`, `mission.abort`, `release.prepare`, `release.ready`, `leitstand.propagate`) as MCP tools. LLMs interacting with site content have no direct filesystem access — only MCP tools. DNA-22 (client-editable surface) is enforced at the command level: `workpiece.read` and `workpiece.write` reject paths outside the `clientEditable[]` whitelist before any file I/O occurs. The `wg-site-content-edit` skill provides the process layer (what to do, in what order, boundaries) as MCP `serverInfo.instructions`. Established by RFC-0555.
 
 ## DNA-57 · Dev/prod egress parity
 

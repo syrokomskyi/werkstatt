@@ -2,10 +2,10 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 89879512ab66b6e9068a4924fb94d2c624c1d5fa95bbaaea1399838c76e7e8a7
+  contentHash: 6aa3c14fed24b69323233159044e2eb74a1f26b22cdfe800564acc5741a61f14
   sources:
     - path: docs/architecture-dna.md
-      hash: cea89080be8a76a0ce1a15331b711b0fc79122ebec09f6f5fd7c886d033ef213
+      hash: fc155ca5c3dc6c9abe5c516cc51496f880c653a205d5dc98ae82e17ba4f29e77
     - path: docs/gate-catalog.generated.yaml
       hash: 54942d72de184a2c4570ae680d0eaee8b6046b869e0833f30a11215f2616969b
     - path: docs/maintenance-debt.baseline.generated.yaml
@@ -24,10 +24,8 @@ meta:
       hash: ad4b6dfdedcc73c92a956a485248f76cd5ca18d544537efa11913d8b14125791
     - path: missions/warpgogol-com-m000031/workpiece/package.json
       hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
-    - path: missions/warpgogol-com-m000034/workpiece/package.json
-      hash: a0d42784b47a9c197b516b55d6bcb66951962babc77b59d61fa6b051a0a0e333
     - path: package.json
-      hash: 48765cd31e96b9484f66db6e8908db7ef3db131f3cd23ab3906d7970235aecd8
+      hash: 1d9ddeadd4ff0712989498062be68226581bffccc211c0a587cba88b6cbed6ea
     - path: packages/agent-gate/package.json
       hash: 7aa535e0de15b4cc8659f7dfe1b8e000ccc4fdc3ab40ab0b37f3fea4b285af30
     - path: packages/chat-adapter-null/package.json
@@ -162,7 +160,7 @@ meta:
       hash: 52595740d0e1eaa0f74a86c6ef6ad0d21b5840212468a984e0b08dc1cda41717
 workspace:
   name: warpgogol-platform
-  version: 4.17.59
+  version: 4.19.0
   packageManager: pnpm@11.10.0
   packageGlobs:
     - missions/*/workpiece
@@ -174,11 +172,7 @@ sternsystems:
   - id: warpgogol-com
     currentMission: null
     registeredAt: 2026-07-13T00:00:00.000Z
-missions:
-  - id: warpgogol-com-m000034
-    sternsystem: ""
-    status: open
-    workpiecePath: missions/warpgogol-com-m000034/workpiece
+missions: []
 packages:
   - name: warpgogol-com
     directory: missions/warpgogol-com-m000031/workpiece
@@ -223,59 +217,6 @@ packages:
     testSignal:
       packageName: warpgogol-com
       directory: missions/warpgogol-com-m000031/workpiece
-      signal: skipped
-      evidence: App author/build checks currently cover the deployable site; direct
-        app unit tests are deferred until an app-level smoke-test harness lands.
-      metadata:
-        signal: skipped
-        owner: architecture
-        rationale: App author/build checks currently cover the deployable site; direct
-          app unit tests are deferred until an app-level smoke-test harness
-          lands.
-        reviewAfter: 2026-10-01
-  - name: warpgogol-com
-    directory: missions/warpgogol-com-m000034/workpiece
-    workspacePattern: missions/*/workpiece
-    kind: mission
-    dependencies:
-      - "@astrojs/check"
-      - "@astrojs/cloudflare"
-      - "@astrojs/react"
-      - "@fontsource/dm-mono"
-      - "@fontsource/inter"
-      - "@fontsource/playfair-display"
-      - "@types/react"
-      - "@types/react-dom"
-      - "@upstash/qstash"
-      - "@upstash/redis"
-      - "@warpgogol/agent-gate"
-      - "@warpgogol/content-source"
-      - "@warpgogol/faq"
-      - "@warpgogol/forge"
-      - "@warpgogol/growth"
-      - "@warpgogol/ontology"
-      - "@warpgogol/pbp"
-      - "@warpgogol/share"
-      - "@warpgogol/site-kernel"
-      - "@warpgogol/site-kernel-astro"
-      - "@warpgogol/site-kernel-changelog"
-      - "@warpgogol/site-kernel-checks"
-      - "@warpgogol/site-kernel-codegen"
-      - "@warpgogol/site-kernel-content"
-      - "@warpgogol/site-kernel-deploy"
-      - "@warpgogol/site-kernel-handoff"
-      - "@warpgogol/site-kernel-integrity"
-      - "@warpgogol/site-kernel-onboarding"
-      - "@warpgogol/tokens"
-      - "@warpgogol/ui"
-      - astro
-      - react
-      - react-dom
-      - yaml
-      - zod
-    testSignal:
-      packageName: warpgogol-com
-      directory: missions/warpgogol-com-m000034/workpiece
       signal: skipped
       evidence: App author/build checks currently cover the deployable site; direct
         app unit tests are deferred until an app-level smoke-test harness lands.
@@ -1190,7 +1131,7 @@ quality:
     real: 31
     noop: 0
     absent: 1
-    skipped: 18
+    skipped: 17
   testSignalPolicy:
     hasErrors: true
     errorCount: 1
@@ -1209,6 +1150,12 @@ commands:
     providers:
       - workspace
   - name: adr.create
+    scope: workspace
+    mutatesState: true
+    supportsAllSites: false
+    providers:
+      - workspace
+  - name: adr.implement.stamp
     scope: workspace
     mutatesState: true
     supportsAllSites: false
@@ -5500,6 +5447,18 @@ commands:
     providers:
       - workspace
 commandProvenance:
+  - command: adr.implement.stamp
+    proposedBy:
+      - RFC-0727
+    addedBy: []
+    changedBy: []
+    removedBy: []
+  - command: adr.validate
+    proposedBy: []
+    addedBy: []
+    changedBy:
+      - RFC-0727
+    removedBy: []
   - command: analytics.binding.validate
     proposedBy:
       - RFC-0305
@@ -5573,31 +5532,12 @@ commandProvenance:
     addedBy: []
     changedBy:
       - RFC-0724
-      - RFC-0726
-    removedBy: []
-  - command: leitstand.health
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0726
     removedBy: []
   - command: leitstand.promote
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0724
-    removedBy: []
-  - command: leitstand.rollback
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0726
-    removedBy: []
-  - command: leitstand.status
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0726
     removedBy: []
   - command: matomo.export.validate
     proposedBy:
@@ -5640,12 +5580,6 @@ commandProvenance:
     changedBy:
       - RFC-0724
     removedBy: []
-  - command: release.list
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0726
-    removedBy: []
   - command: release.publish
     proposedBy: []
     addedBy: []
@@ -5658,23 +5592,11 @@ commandProvenance:
       - RFC-0724
     changedBy: []
     removedBy: []
-  - command: release.state.validate
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0726
-    removedBy: []
   - command: surface.generate
     proposedBy: []
     addedBy: []
     changedBy:
       - RFC-0384
-    removedBy: []
-  - command: tokens.colors.lint
-    proposedBy: []
-    addedBy: []
-    changedBy:
-      - RFC-0725
     removedBy: []
 pipelines:
   - name: build.check
@@ -7012,7 +6934,7 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 5
+  accepted: 4
   implemented: 0
   draft: 4
   reviewing: 0
@@ -7023,8 +6945,7 @@ baseline:
       - RFC-0179
       - RFC-0305
       - RFC-0724
-      - RFC-0725
-      - RFC-0726
+      - RFC-0727
     draft:
       - RFC-0000
       - RFC-0383
