@@ -324,6 +324,112 @@ describe("offeringSchema", () => {
       }),
     ).toThrow();
   });
+
+  it("accepts guarantees field with label and detail (RFC-0730)", () => {
+    const valid = {
+      schema: "pbp/offering@1",
+      id: "warpgogol-seo-audit-offering",
+      type: "offering",
+      status: "published",
+      name: "SEO Audit Standard",
+      businessRef: { ref: "pbp/business@1:warpgogol" },
+      availability: { mode: "declared" },
+      pricing: { currency: "EUR" },
+      guarantees: {
+        delivery: { label: "Delivery", detail: "Within 5 business days" },
+      },
+    };
+    expect(offeringSchema.parse(valid)).toMatchObject({
+      guarantees: { delivery: { label: "Delivery" } },
+    });
+  });
+
+  it("rejects guarantees with missing label (RFC-0730)", () => {
+    expect(() =>
+      offeringSchema.parse({
+        schema: "pbp/offering@1",
+        id: "warpgogol-seo-audit-offering",
+        type: "offering",
+        status: "published",
+        name: "SEO Audit Standard",
+        businessRef: { ref: "pbp/business@1:warpgogol" },
+        availability: { mode: "declared" },
+        pricing: { currency: "EUR" },
+        guarantees: {
+          delivery: { detail: "Within 5 business days" },
+        },
+      }),
+    ).toThrow();
+  });
+
+  it("rejects guarantees with missing detail (RFC-0730)", () => {
+    expect(() =>
+      offeringSchema.parse({
+        schema: "pbp/offering@1",
+        id: "warpgogol-seo-audit-offering",
+        type: "offering",
+        status: "published",
+        name: "SEO Audit Standard",
+        businessRef: { ref: "pbp/business@1:warpgogol" },
+        availability: { mode: "declared" },
+        pricing: { currency: "EUR" },
+        guarantees: {
+          delivery: { label: "Delivery" },
+        },
+      }),
+    ).toThrow();
+  });
+
+  it("accepts relatedOfferings with label and description (RFC-0730)", () => {
+    const valid = {
+      schema: "pbp/offering@1",
+      id: "warpgogol-seo-audit-offering",
+      type: "offering",
+      status: "published",
+      name: "SEO Audit Standard",
+      businessRef: { ref: "pbp/business@1:warpgogol" },
+      availability: { mode: "declared" },
+      pricing: { currency: "EUR" },
+      relatedOfferings: {
+        growth: {
+          relation: "optional",
+          offeringRef: { ref: "pbp/offering@1:growth-module" },
+          acquisition: "standalone",
+          label: "Growth Module",
+          description: "Up to 12 target pages",
+        },
+      },
+    };
+    expect(offeringSchema.parse(valid)).toMatchObject({
+      relatedOfferings: {
+        growth: { label: "Growth Module" },
+      },
+    });
+  });
+
+  it("accepts relatedOfferings without label/description (backward compat, RFC-0730)", () => {
+    const valid = {
+      schema: "pbp/offering@1",
+      id: "warpgogol-seo-audit-offering",
+      type: "offering",
+      status: "published",
+      name: "SEO Audit Standard",
+      businessRef: { ref: "pbp/business@1:warpgogol" },
+      availability: { mode: "declared" },
+      pricing: { currency: "EUR" },
+      relatedOfferings: {
+        growth: {
+          relation: "optional",
+          offeringRef: { ref: "pbp/offering@1:growth-module" },
+        },
+      },
+    };
+    expect(offeringSchema.parse(valid)).toMatchObject({
+      relatedOfferings: {
+        growth: { relation: "optional" },
+      },
+    });
+  });
 });
 
 describe("policySchema", () => {
