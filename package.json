@@ -2,7 +2,7 @@
   "name": "warpgogol-platform",
   "private": true,
   "type": "module",
-  "version": "4.42.0",
+  "version": "4.43.0",
   "packageManager": "pnpm@11.10.0",
   "engines": {
     "node": ">=22"
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@playwright/test": "1.62.1",
     "@types/node": "^26.1.2",
-    "@warpgogol/changelog-live": "^0.2.1",
+    "@warpgogol/changelog-live": "^0.2.3",
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/observability": "workspace:*",
     "@warpgogol/repo-extract": "^1.2.2",

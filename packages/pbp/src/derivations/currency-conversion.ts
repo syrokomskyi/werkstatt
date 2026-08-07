@@ -18,6 +18,7 @@ import type { PbpRoundingMode } from "../decimal.js";
 import type { PbpRateDirection } from "../entities/rate-policy.js";
 import type { PbpRateSnapshotSource } from "../entities/rate-snapshot.js";
 import type { PbpResolvedGraph } from "../compiler/types.js";
+import Big from "big.js";
 import {
   decimalMultiply,
   decimalAdd,
@@ -25,6 +26,12 @@ import {
   decimalDivide,
   decimalRound,
 } from "../decimal.js";
+
+const TARGET_CURRENCY_DECIMAL_PLACES: ReadonlyMap<string, number> = new Map([
+  ["JPY", 0],
+  ["KRW", 0],
+  ["BHD", 3],
+]);
 
 export type { PbpRoundingMode } from "../decimal.js";
 export { PBP_ROUNDING_MODES, isPbpRoundingMode } from "../decimal.js";
@@ -164,6 +171,7 @@ export interface PbpCurrencyConversionTrace {
 export function computeCurrencyConversion(
   graph: PbpResolvedGraph,
   contract: PbpDerivationContract,
+  now: string = new Date().toISOString(),
 ): PbpCurrencyConversionResult {
   const typedContract = contract as unknown as PbpCurrencyConversionDerivation;
   const params = typedContract.parameters;
@@ -181,12 +189,12 @@ export function computeCurrencyConversion(
   const direction = snapshot.quotation.direction;
   const pair = `${snapshot.pair.sourceCurrency}/${snapshot.pair.targetCurrency}`;
 
-  const now = new Date().toISOString();
   if (snapshot.freshUntil < now) {
     return skippedResult(contract, `Rate snapshot past freshUntil: ${snapshot.freshUntil}`);
   }
 
-  const precision = 2 + 2;
+  const targetDecimalPlaces = TARGET_CURRENCY_DECIMAL_PLACES.get(targetCurrency) ?? 2;
+  const precision = targetDecimalPlaces + 2;
 
   let conversionOutput: string;
   if (direction === "target-per-source") {
@@ -248,13 +256,8 @@ export function computeCurrencyConversion(
     );
   }
 
-  if (finalAmount === "0" || finalAmount === "0.0" || finalAmount === "0.00") {
-    const sourceIsPositive =
-      !sourceAmount.startsWith("-") &&
-      sourceAmount !== "0" &&
-      sourceAmount !== "0.0" &&
-      sourceAmount !== "0.00";
-    if (sourceIsPositive) {
+  if (Big(finalAmount).abs().eq(0)) {
+    if (Big(sourceAmount).gt(0)) {
       return failedResult(
         contract,
         "PBP-CURRENCY-CONVERSION-ZERO",
