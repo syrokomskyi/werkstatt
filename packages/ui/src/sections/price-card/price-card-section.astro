@@ -14,8 +14,6 @@
 </CHANGE_SUMMARY>
 */
 
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { SectionProps } from "@warpgogol/share/page";
 import {
   cast,
@@ -24,13 +22,12 @@ import {
   resolveEffectsForTarget,
   resolveSectionAnchor,
 } from "@warpgogol/share";
-import { formatRecurrence } from "@warpgogol/share/formula-eval";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import EffectHost from "../../components/effects/effect-host.astro";
 import CurrencyAwarePriceDisplay from "../../components/currency-aware-price-display/currency-aware-price-display-component.astro";
 import { loadVendorIcon } from "../../icons/icon-resolver.ts";
-import { buildPriceVariants, type DerivedPriceEntry } from "./price-variants.ts";
+import { buildPriceVariants, formatPrice, loadDerivedPrices } from "./price-variants.ts";
 import type { PriceCardSectionContent } from "./price-card-section.types.generated.ts";
 import "./price-card-section.css";
 
@@ -66,37 +63,6 @@ const resolvedIncludes = await Promise.all(
     return { text: item.text, Icon, iconConfig: item.icon };
   }),
 );
-
-function formatPrice(
-  prop: { amount?: string; currency?: string; recurrence?: string } | undefined,
-  lang: string,
-): string {
-  if (!prop || !prop.amount || prop.amount.trim() === "") return "";
-  const numericAmount = Number(prop.amount);
-  if (!Number.isFinite(numericAmount)) return "";
-  const currency = prop.currency ?? "EUR";
-  const formatted = new Intl.NumberFormat(lang, {
-    style: "currency",
-    currency,
-    currencyDisplay: "narrowSymbol",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(numericAmount);
-  const suffix = formatRecurrence(prop.recurrence, lang);
-  return suffix ? `${formatted}\u00A0${suffix}` : formatted;
-}
-
-function loadDerivedPrices(): Record<string, DerivedPriceEntry[]> | null {
-  const filePath = join(process.cwd(), "src", "derived-prices.generated.json");
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, "utf-8");
-  } catch (err: unknown) {
-    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw err;
-  }
-  return JSON.parse(raw) as Record<string, DerivedPriceEntry[]>;
-}
 
 const derivedPrices = loadDerivedPrices();
 const offeringRef = props.offeringRef;

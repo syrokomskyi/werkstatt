@@ -1,17 +1,19 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Price variant builder for currency-aware price display (RFC-0743) — pure function that combines source price with derived prices to produce per-currency display variants.</purpose>
+<purpose>Price variant utilities for currency-aware price display (RFC-0743) — formatPrice, loadDerivedPrices, and buildPriceVariants extracted from price-card-section.astro for testability.</purpose>
 <non-goals>
-  <item>Does not read files — derived prices are passed as input.</item>
   <item>Does not format recurrence — delegates to formatRecurrence from share.</item>
   <item>Does not render HTML — returns structured data for the .astro template.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Extracted from price-card-section.astro for testability (review fix G-3).</item>
+<item>Review fix A-1: exported formatPrice to eliminate duplication. Review fix G-3: added loadDerivedPrices with ENOENT handling.</item>
 </CHANGE_SUMMARY>
 */
 
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { formatRecurrence } from "@warpgogol/share/formula-eval";
 
 export interface DerivedPriceEntry {
@@ -30,13 +32,13 @@ export interface PriceVariant {
   note: string | null;
 }
 
-interface SourcePriceProp {
+export interface SourcePriceProp {
   amount?: string;
   currency?: string;
   recurrence?: string;
 }
 
-function formatPrice(prop: SourcePriceProp, lang: string): string {
+export function formatPrice(prop: SourcePriceProp | undefined, lang: string): string {
   if (!prop || !prop.amount || prop.amount.trim() === "") return "";
   const numericAmount = Number(prop.amount);
   if (!Number.isFinite(numericAmount)) return "";
@@ -50,6 +52,20 @@ function formatPrice(prop: SourcePriceProp, lang: string): string {
   }).format(numericAmount);
   const suffix = formatRecurrence(prop.recurrence, lang);
   return suffix ? `${formatted}\u00A0${suffix}` : formatted;
+}
+
+export function loadDerivedPrices(
+  cwd: string = process.cwd(),
+): Record<string, DerivedPriceEntry[]> | null {
+  const filePath = join(cwd, "src", "derived-prices.generated.json");
+  let raw: string;
+  try {
+    raw = readFileSync(filePath, "utf-8");
+  } catch (err: unknown) {
+    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
+  }
+  return JSON.parse(raw) as Record<string, DerivedPriceEntry[]>;
 }
 
 export function buildPriceVariants(
