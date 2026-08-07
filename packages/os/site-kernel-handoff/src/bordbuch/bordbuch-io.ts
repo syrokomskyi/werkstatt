@@ -42,7 +42,7 @@ export async function resolveBordbuchPath(
 
 const WRITER_ROLE_KINDS: Record<string, BordbuchEntryKind[]> = {
   mission: ["mission-open", "mission-close", "mission-abort", "preflight-skipped"],
-  release: ["release-published", "release-rolled-back"],
+  release: ["release-ready", "release-rolled-back"],
   sternsystem: ["pin-update"],
   leitstand: ["deployment"],
   notausgang: ["notausgang-export"],

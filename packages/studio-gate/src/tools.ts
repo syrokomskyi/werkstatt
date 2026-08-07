@@ -32,7 +32,10 @@ export const STUDIO_GATE_TOOLS: ToolDefinition[] = [
       type: "object",
       properties: {
         mission: { type: "string", description: "Mission id." },
-        path: { type: "string", description: "Relative path within workpiece (e.g. src/content/pages/home.md)." },
+        path: {
+          type: "string",
+          description: "Relative path within workpiece (e.g. src/content/pages/home.md).",
+        },
       },
       required: ["mission", "path"],
     },
@@ -46,7 +49,10 @@ export const STUDIO_GATE_TOOLS: ToolDefinition[] = [
       properties: {
         mission: { type: "string", description: "Mission id." },
         path: { type: "string", description: "Relative path within workpiece." },
-        content: { type: "string", description: "File content to write (passed via stdin to the command)." },
+        content: {
+          type: "string",
+          description: "File content to write (passed via stdin to the command).",
+        },
       },
       required: ["mission", "path", "content"],
     },
@@ -89,7 +95,8 @@ export const STUDIO_GATE_TOOLS: ToolDefinition[] = [
   },
   {
     name: "mission.validate",
-    description: "Validate the materialized workpiece (runs build.prepare and build.check pipelines).",
+    description:
+      "Validate the materialized workpiece (runs build.prepare and build.check pipelines).",
     inputSchema: {
       type: "object",
       properties: {
@@ -146,8 +153,8 @@ export const STUDIO_GATE_TOOLS: ToolDefinition[] = [
     },
   },
   {
-    name: "release.publish",
-    description: "Publish a prepared release.",
+    name: "release.ready",
+    description: "Mark a prepared release as ready.",
     inputSchema: {
       type: "object",
       properties: {

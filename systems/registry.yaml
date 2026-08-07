@@ -11,7 +11,7 @@ systems:
         storageType: bare
     pinnedPlatform: 4.17.57
     currentMission: null
-    lastRelease: warpgogol-com-r000012
+    lastRelease: warpgogol-com-r000013
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
     deployment:
@@ -28,25 +28,24 @@ systems:
           url: https://warpgogol.com
       lastPropagated:
         alt:
-          releaseId: warpgogol-com-r000012
-          at: 2026-08-05T16:29:51.519Z
+          releaseId: warpgogol-com-r000013
+          at: 2026-08-06T21:42:07.911Z
           healthy: false
           state: succeeded
-          operationId: op-msgaxgff-xfg96uc8
-          leaseExpiresAt: null
-          purgeResult:
-            success: false
-            purgedUrls: 0
-            error: CLOUDFLARE_ZONE_ID not set
-        main:
-          releaseId: warpgogol-com-r000012
-          at: 2026-08-05T19:49:25.106Z
-          healthy: false
-          state: succeeded
-          operationId: op-msgi2eex-r82n78q0
+          operationId: op-msi1j7n1-wmbkicpt
           leaseExpiresAt: null
           purgeResult:
             success: true
-            purgedUrls: 101
+            purgedUrls: 107
+        main:
+          releaseId: warpgogol-com-r000013
+          at: 2026-08-06T21:43:14.165Z
+          healthy: true
+          state: succeeded
+          operationId: op-msi1krid-9rtza5gi
+          leaseExpiresAt: null
+          purgeResult:
+            success: true
+            purgedUrls: 107
     notes: ""
 

@@ -411,7 +411,7 @@ export async function runGateCatalogValidate(
       if (gate.blocks && gate.blocks.length > 0) {
         const knownSteps = new Set<string>([
           "release.prepare",
-          "release.publish",
+          "release.ready",
           "mission.materialize",
           "mission.migrate",
           "mission.validate",

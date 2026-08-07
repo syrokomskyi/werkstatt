@@ -33,7 +33,7 @@
     padding: var(--ds-space-3) var(--ds-space-5);
     margin-top: var(--ds-space-5);
     background: var(--ds-color-accent);
-    color: var(--ds-color-text-on-accent);
+    color: var(--ds-color-accent-contrast);
     border-radius: var(--ds-radius-md);
     text-decoration: none;
     font-weight: 600;

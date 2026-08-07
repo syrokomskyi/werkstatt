@@ -254,7 +254,7 @@ Output a structured report:
 
 After successful reconcile, the mission is still `open`. Present the operator with two options:
 
-1. **Release** — run `pnpm exec site-kernel run release.prepare --mission <missionId>` to prepare a release. This associates a `releaseId` with the mission and enables `release.publish`. After release.prepare, run `mission.close` to close the mission with the release associated.
+1. **Release** — run `pnpm exec site-kernel run release.prepare --mission <missionId>` to prepare a release. This associates a `releaseId` with the mission and enables `release.ready`. After release.prepare, run `mission.close` to close the mission with the release associated.
 
 2. **Close without release** — run `pnpm exec site-kernel run mission.close --mission <missionId>` to close the mission immediately. This is valid for verification-only missions (no content changes to publish). The close report will contain a `missing-release-id` warning — this is expected.
 

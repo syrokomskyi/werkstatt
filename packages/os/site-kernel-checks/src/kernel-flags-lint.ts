@@ -348,9 +348,9 @@ export const KERNEL_FLAG_SCHEMA_SOURCES: KernelFlagSchemaSourceEntry[] = [
     functionName: "runReleasePrepare",
   },
   {
-    command: "release.publish",
+    command: "release.ready",
     file: "packages/os/site-kernel-handoff/src/release/release-commands.ts",
-    functionName: "runReleasePublish",
+    functionName: "runReleaseReady",
   },
   {
     command: "release.validate",

@@ -40,9 +40,9 @@ satisfies: []
 # major (architectural, manually reserved). Default: patch.
 versionBump: patch
 commands:
-  proposed:
+  proposed: []
+  added:
     - adr.implement.stamp
-  added: []
   changed:
     - adr.validate
   removed: []
