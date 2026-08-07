@@ -367,7 +367,7 @@ describe("RFC-0729: pipe syntax", () => {
       "uk",
     );
     expect(result.resolved).toBe(true);
-    expect(result.value).toBe("70\u00A0EUR");
+    expect(result.value).toBe("70\u00A0€");
   });
 
   it("formats with currency conversion to UAH in German locale", () => {
@@ -378,7 +378,7 @@ describe("RFC-0729: pipe syntax", () => {
       "de",
     );
     expect(result.resolved).toBe(true);
-    expect(result.value).toBe("3.150\u00A0UAH");
+    expect(result.value).toBe("3.150\u00A0₴");
   });
 
   it("formats arithmetic result with pipe", () => {

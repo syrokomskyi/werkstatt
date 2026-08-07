@@ -71,6 +71,7 @@ registerPipeFormatter("money", (value, params, context) => {
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: code,
+    currencyDisplay: "narrowSymbol",
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(amount);
