@@ -32,7 +32,7 @@ When adding a `.gitignore` pattern that targets a **top-level** directory or fil
 
 ## Forge project configuration (RFC-0391)
 
-`forge.yaml` at the repository root is the machine-readable project configuration for `@warpgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects.
+`forge.yaml` at the repository root is the machine-readable project configuration for `@warpgogol/forge`. It records project name, stack, package manager, and docs paths. `forge.create` creates it; `forge.doctor` checks for it; `forge.agents.generate` reads it to produce `AGENTS.md` in bootstrapped projects. The `.forge/` directory (RFC-0733) sits alongside `forge.yaml` and contains project-local governance files: `pinned.yaml` (pinned-files manifest) and `pinned-audit.log` (override audit trail, gitignored).
 
 - **MUST NOT** run `forge.agents.generate` against this monorepo's root `AGENTS.md` — it is hand-written and carries no generated marker; the edit guard enforces this, do not bypass it.
 - **MUST NOT** re-add any `@warpgogol/*` import to `packages/forge` source — `forge.doctor` autonomy guard will fail.

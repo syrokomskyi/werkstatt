@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 0ab129bf4c95d3baaaf0316aeead8081a03b942bf34b95b40abff9fe3e65d33c
+  contentHash: f9b7d319f059332d3887b5f8f16bec0a341a3c6858e904142b7ef1456b4b939f
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -16308,6 +16308,61 @@ commands:
     flags: *a661
     reads: []
     writes: *a662
+    validatesOutputs: []
+    pipelines: []
+  - name: pinned.init
+    description: Initialize .forge/pinned.yaml with default foundation entries,
+      install pre-commit hook, and add audit log to .gitignore. Use --ci to also
+      generate .github/workflows/pinned-check.yml.
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      ci:
+        kind: boolean
+        description: Also generate .github/workflows/pinned-check.yml CI workflow.
+    reads:
+      - .forge/pinned.yaml
+      - .git/hooks/pre-commit
+      - .gitignore
+    writes:
+      - .forge/pinned.yaml
+      - .git/hooks/pre-commit
+      - .gitignore
+      - .github/workflows/pinned-check.yml
+    validatesOutputs: []
+    pipelines: []
+  - name: pinned.validate
+    description: Validate working tree against .forge/pinned.yaml manifest. Checks
+      staged changes (default) or last commit (--mode ci) for delete/move/modify
+      operations on pinned files. Use --allow-pinned-override <path> for audited
+      escape hatch.
+    scope: workspace
+    provider: workspace
+    module: forge-core
+    mutatesState: false
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      allow-pinned-override:
+        kind: string[]
+        description: Path(s) to exempt from pinned-files validation on this invocation.
+          Each override is logged to .forge/pinned-audit.log.
+      mode:
+        kind: string
+        description: "Validation mode: 'staged' (pre-commit, default) or 'ci'
+          (last-commit diff)."
+      json:
+        kind: boolean
+        description: Output structured JSON result.
+    reads:
+      - .forge/pinned.yaml
+      - .forge/pinned-audit.log
+    writes:
+      - .forge/pinned-audit.log
     validatesOutputs: []
     pipelines: []
   - name: pipeline.budget.generate
