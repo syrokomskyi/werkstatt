@@ -260,18 +260,18 @@ interface ReleaseReadyResult {
 
 ## Acceptance criteria
 
-- [ ] `behavior.snapshot.validate` auto-recovers from SNAP-01 by regenerating snapshot in-place, logging warning, returning pass
-- [ ] `release.publish` renamed to `release.ready` with no backward compat alias
-- [ ] `release.yaml` state field uses `ready` instead of `published` — all existing releases migrated
-- [ ] All code locations checking/setting `published` state updated to `ready` (propagate, promote, rollback, validate, autoStepReleaseState, candidate search)
-- [ ] `leitstand.propagate` error messages include full remaining protocol commands
-- [ ] `leitstand.promote` error messages include full remaining protocol commands
-- [ ] `leitstand.dev-deploy --release` runs `mission.check` after deploy (Axiom gate mandatory)
-- [ ] `leitstand.promote` retries build-identity fetch up to 5 times with exponential backoff (3s/6s/12s/24s)
-- [ ] `mission.validate` auto-commits dirty bordbuch files on all paths (not just reuse path)
-- [ ] All references to `release.publish` updated in code, AGENTS.md, CI templates, DNA-56
-- [ ] `docs/verification-plan.xml` synchronized with release state rename
-- [ ] `rfc.validate` passes on this file
+- [x] `behavior.snapshot.validate` auto-recovers from SNAP-01 by regenerating snapshot in-place, logging warning, returning pass (evidence: packages/os/site-kernel-checks/src/behavior-snapshot.ts:467-490, packages/os/site-kernel-checks/src/tests/behavior-snapshot.test.ts:201-204)
+- [x] `release.publish` renamed to `release.ready` with no backward compat alias (evidence: packages/os/site-kernel-handoff/src/release/index.ts:60, packages/os/site-kernel-handoff/src/release/release.module.ts:24-31)
+- [x] `release.yaml` state field uses `ready` instead of `published` — all existing releases migrated (evidence: releases/*/release.yaml — all 13 files migrated, gitignored local state)
+- [x] All code locations checking/setting `published` state updated to `ready` (propagate, promote, rollback, validate, autoStepReleaseState, candidate search) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1534,1976,2304,2373; packages/os/site-kernel-handoff/src/release/release-commands.ts:622)
+- [x] `leitstand.propagate` error messages include full remaining protocol commands (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1536-1541)
+- [x] `leitstand.promote` error messages include full remaining protocol commands (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:1976-1981)
+- [x] `leitstand.dev-deploy --release` runs `mission.check` after deploy (Axiom gate mandatory) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:741-815)
+- [x] `leitstand.promote` retries build-identity fetch up to 5 times with exponential backoff (3s/6s/12s/24s) (evidence: packages/os/site-kernel-handoff/src/leitstand/leitstand-commands.ts:2056-2058, verifyFreshness exported at line 289)
+- [x] `mission.validate` auto-commits dirty bordbuch files on all paths (not just reuse path) (evidence: packages/os/site-kernel-handoff/src/mission/mission-materialization-commands.ts:214-227)
+- [x] All references to `release.publish` updated in code, AGENTS.md, CI templates, DNA-56 (evidence: packages/os/site-kernel-handoff/AGENTS.md:44,48,50,61,308; docs/architecture-dna.md:209,225,241; grep -r "release\.publish" AGENTS.md returns 0 active references)
+- [x] `docs/verification-plan.xml` synchronized with release state rename (evidence: docs/verification-plan.xml — no release state "published" references found; only datePublished JSON-LD field and "Published material changes" unrelated to release state)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0724 --json → 0 errors)
 
 ## Implementation notes for agents
 
