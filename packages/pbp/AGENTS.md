@@ -123,6 +123,8 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 - `PbpRateSnapshot`, `PbpRateSnapshotDigest`, `PbpRateSnapshotSource`, `RATE_SNAPSHOT_SCHEMA_ID` — immutable rate observation entity (RFC-0738)
 - `PbpCurrencyConversionDerivation`, `PbpCurrencyConversionResult`, `PbpPriceDerivationPipeline`, `PbpRoundingMode`, `PbpPriceEndingMode`, `PbpCurrencyConversionTrace`, `computeCurrencyConversion` — currency conversion derivation contract (RFC-0739)
 - `decimalMultiply`, `decimalAdd`, `decimalSubtract`, `decimalDivide`, `decimalRound` — decimal arithmetic helpers using big.js (RFC-0739)
+- `PbpMaterializedDerivedPrice`, `PbpPriceKind`, `PbpCommercialMeaning`, `PBP_PRICE_KINDS`, `PBP_COMMERCIAL_MEANINGS`, `isPbpPriceKind`, `isPbpCommercialMeaning` — materialized derived price type and closed unions (RFC-0740)
+- `materializeDerivedPrices` — pure function that iterates Offerings, Charges, and target currencies to produce materialized derived prices (RFC-0740, exported from `@warpgogol/pbp/compiler`)
 
 ## Runtime layer (RFC-0466)
 
@@ -133,7 +135,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 | `@warpgogol/pbp/schemas` | `src/schemas/index.ts` | Zod schemas for all Wave 1 entities + `pbpSchemaById` registry + `pbpEntityDiscriminatedUnion` |
 | `@warpgogol/pbp/loaders` | `src/loaders.ts` | Typed, locale-aware loader functions (`getPbpBusiness`, `getPbpOfferings`, etc.) with deep-merge language fallback (RFC-0008) |
 | `@warpgogol/pbp/astro` | `src/astro.ts` | `pbpCollections` — Astro content collection definitions for `business-profile` |
-| `@warpgogol/pbp/compiler` | `src/compiler/index.ts` | `compilePbpProfile` — 14-phase compiler pipeline (discover → parse → validate → index → locale → references → profile → overlays → derivations → semantic → buyer-view → projection → snapshot → publication) |
+| `@warpgogol/pbp/compiler` | `src/compiler/index.ts` | `compilePbpProfile` — 14-phase compiler pipeline (discover → parse → validate → index → locale → references → profile → overlays → derivations → semantic → buyer-view → projection → snapshot → publication). Also exports `materializeDerivedPrices` (RFC-0740) |
 | `@warpgogol/pbp/semantic-profile` | `src/semantic-profile.ts` | `buildPbpSemanticProfile` — maps PBP compiler output to `SemanticSiteProfile` (RFC-0469). Also re-exports `buildPageSemanticModel` (RFC-0470). |
 | `@warpgogol/pbp/semantic-model` | `src/semantic-model.ts` | `buildPageSemanticModel` — builds a `SemanticPageModel` for a single page from page/prose/site collections via `astro:content` (RFC-0470). RFC-0492: accepts optional `surfaceId`/`depth` params; for depth-1 `website-local` pages, sets `model.industryService` so `buildServiceNodes` emits an industry-specific Service node instead of org-level Service nodes. |
 | `@warpgogol/pbp/cutover-check` | `src/cutover-check.ts` | `runCutoverCheck` — verifies PBP content coverage and test preconditions (RFC-0462). |
