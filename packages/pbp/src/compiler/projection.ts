@@ -15,6 +15,7 @@ import type { PbpWebsiteProjection } from "../projections/website.js";
 import type { PbpAiAnswerProjection } from "../projections/ai-answer.js";
 import type { PbpBuyerView, PbpProjectionSet, PbpResolvedGraph } from "./types.js";
 import { buildPriceProjection } from "../projections/price-projection.js";
+import type { PbpPriceProjection } from "../projections/price-projection.js";
 import type { PbpCurrencyConversionTrace } from "../derivations/currency-conversion.js";
 
 export async function generateProjections(
@@ -27,7 +28,7 @@ export async function generateProjections(
 
   const website: PbpWebsiteProjection[] = offerings.map((offering) => {
     const materialized = derivedPrices[offering.id] ?? [];
-    const priceProjections: Record<string, ReturnType<typeof buildPriceProjection>> = {};
+    const priceProjections: Record<string, PbpPriceProjection> = {};
     for (const mp of materialized) {
       const projection = buildPriceProjection(mp, locale);
       if (projection) {

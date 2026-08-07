@@ -13,7 +13,11 @@
 </CHANGE_SUMMARY>
 */
 
-import type { PbpMaterializedDerivedPrice, PbpPriceKind, PbpCommercialMeaning } from "../materialized-derived-price.js";
+import type {
+  PbpMaterializedDerivedPrice,
+  PbpPriceKind,
+  PbpCommercialMeaning,
+} from "../materialized-derived-price.js";
 import type { PbpCurrentUses } from "../entities/currency-pricing-policy.js";
 import type { PbpCurrencyConversionTrace } from "../derivations/currency-conversion.js";
 
@@ -119,11 +123,10 @@ function resolveLocale(locale: string): string {
  */
 function composeNote(
   commercialMeaning: PbpCommercialMeaning,
-  locale: string,
+  resolvedLocale: string,
   rateValue: string,
   targetCurrency: string,
 ): string | null {
-  const resolvedLocale = resolveLocale(locale);
   const templates = NOTE_TEMPLATES[resolvedLocale];
   if (!templates) return null;
   const template = templates[commercialMeaning];
@@ -156,7 +159,12 @@ function formatCurrencyAmount(value: string, currency: string, locale: string): 
  *
  * Falls back to "1 {sourceCurrency} = {rateValue} {targetCurrency}" on formatting failure.
  */
-function formatRate(rateValue: string, sourceCurrency: string, targetCurrency: string, locale: string): string {
+function formatRate(
+  rateValue: string,
+  sourceCurrency: string,
+  targetCurrency: string,
+  locale: string,
+): string {
   try {
     const number = Number(rateValue);
     if (Number.isNaN(number)) return `1 ${sourceCurrency} = ${rateValue} ${targetCurrency}`;
@@ -195,9 +203,18 @@ export function buildPriceProjection(
   const rateValue = materialized.trace.rate.value;
   const ratePair = materialized.trace.rate.pair;
 
-  const formattedAmount = formatCurrencyAmount(materialized.amount.value, targetCurrency, resolvedLocale);
+  const formattedAmount = formatCurrencyAmount(
+    materialized.amount.value,
+    targetCurrency,
+    resolvedLocale,
+  );
   const formattedRate = formatRate(rateValue, sourceCurrency, targetCurrency, resolvedLocale);
-  const note = composeNote(materialized.commercialMeaning, resolvedLocale, rateValue, targetCurrency);
+  const note = composeNote(
+    materialized.commercialMeaning,
+    resolvedLocale,
+    rateValue,
+    targetCurrency,
+  );
 
   return {
     amount: {
@@ -219,6 +236,3 @@ export function buildPriceProjection(
     },
   };
 }
-
-// Re-export trace type for convenience — consumers of priceTraces need it.
-export type { PbpCurrencyConversionTrace };
