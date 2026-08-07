@@ -1,18 +1,20 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Phase 9: Executes derivation contracts (first-year cost, TCO) as pure functions.</purpose>
+<purpose>Phase 9: Executes derivation contracts (first-year cost, TCO, currency conversion) as pure functions.</purpose>
 <non-goals>
   <item>Does not validate semantic invariants — that is Phase 10 (semantic.ts).</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0467 — Phase 9: derivations.</item>
+  <item>Extended by RFC-0739 — currency-conversion derivation branch.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { PbpDerivationContract, PbpDerivationResult } from "../derivation.js";
 import type { PbpValidationError } from "../validation-errors.js";
 import type { PbpResolvedGraph } from "./types.js";
+import { computeCurrencyConversion } from "../derivations/currency-conversion.js";
 
 export interface DerivationResult {
   results: PbpDerivationResult[];
@@ -53,6 +55,9 @@ function executeContract(
   }
   if (contract.derivationRef === "tco") {
     return computeTco(graph, contract);
+  }
+  if (contract.derivationRef === "currency-conversion") {
+    return computeCurrencyConversion(graph, contract);
   }
 
   return {
