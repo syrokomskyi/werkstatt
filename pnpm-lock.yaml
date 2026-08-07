@@ -19,8 +19,8 @@ importers:
         specifier: ^26.1.2
         version: 26.1.2
       '@warpgogol/changelog-live':
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.2.1
+        version: 0.2.1(openai@7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3))
       '@warpgogol/forge':
         specifier: workspace:*
         version: link:packages/forge
@@ -29,7 +29,7 @@ importers:
         version: link:packages/observability
       '@warpgogol/repo-extract':
         specifier: ^1.2.2
-        version: 1.2.2(@warpgogol/changelog-live@0.1.2)
+        version: 1.2.2(@warpgogol/changelog-live@0.2.1(openai@7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3)))
       '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:packages/os/site-kernel
@@ -66,6 +66,9 @@ importers:
       eslint-plugin-yml:
         specifier: ^1.19.1
         version: 1.19.1(eslint@10.8.0)
+      openai:
+        specifier: ^7.4.0
+        version: 7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3)
       playwright:
         specifier: 1.62.1
         version: 1.62.1
@@ -1469,10 +1472,16 @@ importers:
       astro:
         specifier: ^7.1.6
         version: 7.1.6(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@26.1.2)(@upstash/redis@1.38.1)(rollup@4.62.2)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
+      big.js:
+        specifier: ^6.2.1
+        version: 6.2.2
       zod:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
+      '@types/big.js':
+        specifier: ^6.2.2
+        version: 6.2.2
       fast-check:
         specifier: ^4.9.0
         version: 4.9.0
@@ -3568,6 +3577,9 @@ packages:
   '@types/better-sqlite3@7.6.13':
     resolution: {integrity: sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA==}
 
+  '@types/big.js@6.2.2':
+    resolution: {integrity: sha512-e2cOW9YlVzFY2iScnGBBkplKsrn2CsObHQ2Hiw4V1sSyiGbgWL8IyqE3zFi1Pt5o1pdAtYkDAIsF3KKUPjdzaA==}
+
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
@@ -3789,8 +3801,8 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
-  '@warpgogol/changelog-live@0.1.2':
-    resolution: {integrity: sha512-pNkijYYpNefGk+/eo1ReBKP63pNnEgdty7qvrRT9VYZmYDGr+uHei2keFvrBNTGWo3wjWxdp5QPFfn1Hg6uVGg==}
+  '@warpgogol/changelog-live@0.2.1':
+    resolution: {integrity: sha512-y+yuG7h0fGtGiatxe/muCDq45GpOt5mKC68LeQ4NTw1ZnCBeoAS6CeqES2DzOlhvajC4rhwDGvAPCeLfHD/Qrw==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -4019,6 +4031,9 @@ packages:
   better-sqlite3@13.0.2:
     resolution: {integrity: sha512-jW6oufeDhXZaiX9Lw5A+oerVClx4iFrI6uDj1zu7SqUAjak9vbJvA0NEcKLNxHiQHb6kYCoFzzXYV0YOauhV3g==}
     engines: {node: '>=22'}
+
+  big.js@6.2.2:
+    resolution: {integrity: sha512-y/ie+Faknx7sZA5MfGA2xKlu0GDv8RWrXGsmlteyJQ2lvoKv9GBK/fpRMc2qlSoBAgNxrixICFCBefIq8WCQpQ==}
 
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
@@ -5946,6 +5961,27 @@ packages:
 
   oniguruma-to-es@4.3.6:
     resolution: {integrity: sha512-csuQ9x3Yr0cEIs/Zgx/OEt9iBw9vqIunAPQkx19R/fiMq2oGVTgcMqO/V3Ybqefr1TBvosI6jU539ksaBULJyA==}
+
+  openai@7.4.0:
+    resolution: {integrity: sha512-+C9Muit5x8j9R8ej8ZzVgKcrVDtqFqTy9gxFdov0EItLgU68zrJtF9ZeT0cyqJQW9S3PCJkdFgADtRGquRBtew==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
+      '@smithy/hash-node': '>=4.3.0 <5'
+      '@smithy/signature-v4': '>=5.4.0 <6'
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-node':
+        optional: true
+      '@smithy/hash-node':
+        optional: true
+      '@smithy/signature-v4':
+        optional: true
+      ws:
+        optional: true
+      zod:
+        optional: true
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -9524,6 +9560,8 @@ snapshots:
     dependencies:
       '@types/node': 26.1.2
 
+  '@types/big.js@6.2.2': {}
+
   '@types/chai@5.2.3':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -9819,21 +9857,23 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@warpgogol/changelog-live@0.1.2':
-    dependencies:
-      commander: 15.0.0
-      tslib: 2.8.1
-      yaml: 2.9.0
-      zod: 4.4.3
-
-  '@warpgogol/repo-extract@1.2.2(@warpgogol/changelog-live@0.1.2)':
+  '@warpgogol/changelog-live@0.2.1(openai@7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3))':
     dependencies:
       commander: 15.0.0
       tslib: 2.8.1
       yaml: 2.9.0
       zod: 4.4.3
     optionalDependencies:
-      '@warpgogol/changelog-live': 0.1.2
+      openai: 7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3)
+
+  '@warpgogol/repo-extract@1.2.2(@warpgogol/changelog-live@0.2.1(openai@7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3)))':
+    dependencies:
+      commander: 15.0.0
+      tslib: 2.8.1
+      yaml: 2.9.0
+      zod: 4.4.3
+    optionalDependencies:
+      '@warpgogol/changelog-live': 0.2.1(openai@7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3))
 
   '@workflow/serde@4.1.0': {}
 
@@ -10090,6 +10130,8 @@ snapshots:
     dependencies:
       node-addon-api: 8.9.1
     optional: true
+
+  big.js@6.2.2: {}
 
   bindings@1.5.0:
     dependencies:
@@ -12403,6 +12445,13 @@ snapshots:
       oniguruma-parser: 0.12.2
       regex: 6.1.0
       regex-recursion: 6.0.2
+
+  openai@7.4.0(@aws-sdk/credential-provider-node@3.972.76)(@smithy/signature-v4@5.6.12)(ws@8.21.0)(zod@4.4.3):
+    optionalDependencies:
+      '@aws-sdk/credential-provider-node': 3.972.76
+      '@smithy/signature-v4': 5.6.12
+      ws: 8.21.0
+      zod: 4.4.3
 
   optionator@0.9.4:
     dependencies:

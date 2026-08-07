@@ -40,9 +40,7 @@
       "default": "./src/cutover-check.ts"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "echo 'No build step required — TypeScript sources consumed directly'",
     "build:check": "tsc --noEmit",
@@ -50,6 +48,7 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "@types/big.js": "^6.2.2",
     "fast-check": "^4.9.0",
     "vitest": "^4.1.10"
   },
@@ -59,6 +58,7 @@
     "@warpgogol/share": "workspace:*",
     "@warpgogol/site-kernel-content": "workspace:*",
     "astro": "^7.1.6",
+    "big.js": "^6.2.1",
     "zod": "^4.4.3"
   },
   "gogol": {
