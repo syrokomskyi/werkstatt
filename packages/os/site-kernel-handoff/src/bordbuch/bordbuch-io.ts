@@ -14,6 +14,7 @@
   <item>RFC-0583: export computeEntryHash for reuse by bordbuch.repair.</item>
   <item>RFC-0706: add nachweis writer-role for nachweis-record and nachweis-consent kinds (ADR-0028).</item>
   <item>RFC-0715: add nachweis-signed and nachweis-timestamped to nachweis writer-role for N3 crypto verification.</item>
+  <item>RFC-0724: add DEPRECATED_KIND_MIGRATIONS for forward-only kind renames (release-published -> release-ready).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -58,6 +59,29 @@ export function validateWriterRole(writerRole: string, kind: BordbuchEntryKind):
   return allowed ? allowed.includes(kind) : false;
 }
 
+/**
+ * RFC-0724: Forward-only migration map for deprecated bordbuch entry kinds.
+ * When a kind is renamed (e.g. release-published -> release-ready), old entries
+ * on disk still carry the deprecated value. readBordbuch normalizes them
+ * before Zod parsing so validation doesn't crash on historical data.
+ */
+export const DEPRECATED_KIND_MIGRATIONS: Record<string, BordbuchEntryKind> = {
+  "release-published": "release-ready",
+};
+
+/** Reverse map: current kind -> list of deprecated kinds that map to it. */
+const KIND_MIGRATION_REVERSE: Record<string, string[]> = Object.entries(
+  DEPRECATED_KIND_MIGRATIONS,
+).reduce<Record<string, string[]>>((acc, [oldKind, newKind]) => {
+  (acc[newKind] ??= []).push(oldKind);
+  return acc;
+}, {});
+
+/** Normalize a deprecated kind to its current equivalent. Returns the kind unchanged if not deprecated. */
+export function migrateDeprecatedKind(kind: string): string {
+  return DEPRECATED_KIND_MIGRATIONS[kind] ?? kind;
+}
+
 const SENSITIVE_PATTERNS: RegExp[] = [
   /password/i,
   /secret/i,
@@ -95,7 +119,11 @@ export async function readBordbuch(
   const lines = raw.split("\n").filter((l) => l.trim().length > 0);
   const entries: BordbuchEntry[] = [];
   for (const line of lines) {
-    const parsed = bordbuchEntrySchema.parse(JSON.parse(line));
+    const raw = JSON.parse(line) as Record<string, unknown>;
+    if (typeof raw.kind === "string") {
+      raw.kind = migrateDeprecatedKind(raw.kind);
+    }
+    const parsed = bordbuchEntrySchema.parse(raw);
     entries.push(parsed);
   }
   return entries;
@@ -202,7 +230,12 @@ export async function validateBordbuch(
     // hash verification
     const { hash: _hash, ...entryWithoutHash } = entry;
     const computedHash = computeEntryHash(entryWithoutHash);
-    if (entry.hash !== computedHash) {
+    // RFC-0724: also accept hashes computed with deprecated kind values
+    const deprecatedAliases = KIND_MIGRATION_REVERSE[entry.kind] ?? [];
+    const deprecatedHashes = deprecatedAliases.map((oldKind) =>
+      computeEntryHash({ ...entryWithoutHash, kind: oldKind as BordbuchEntryKind }),
+    );
+    if (entry.hash !== computedHash && !deprecatedHashes.includes(entry.hash)) {
       violations.push({
         rule: "hash-mismatch",
         message: `hash mismatch for '${entry.id}'`,

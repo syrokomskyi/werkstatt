@@ -33,6 +33,8 @@ export {
   validateWriterRole,
   commitAndPushBordbuch,
   computeEntryHash,
+  DEPRECATED_KIND_MIGRATIONS,
+  migrateDeprecatedKind,
   type BordbuchViolation,
   type CommitAndPushResult,
 } from "./bordbuch-io.ts";
