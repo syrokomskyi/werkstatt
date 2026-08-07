@@ -22,7 +22,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0727
 related:
   - RFC-0476
   - RFC-0224

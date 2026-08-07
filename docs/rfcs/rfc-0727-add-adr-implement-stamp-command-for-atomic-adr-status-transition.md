@@ -274,20 +274,20 @@ Pretty output mirrors `rfc.implement.stamp`: success message, implementation com
 
 ## Acceptance criteria
 
-- [ ] `adr.implement.stamp` command registered in `forgeAdrModule` with `--id`, `--implementation-commit`, and `--dry-run` flags
-- [ ] ADR-IMP-01 rejects ADRs not in `accepted` or `proposed` status
-- [ ] ADR-IMP-03 validates implementation commit is reachable from HEAD and references the ADR id
-- [ ] ADR-IMP-04 rejects stamping when the ADR file has uncommitted changes
-- [ ] ADR-IMP-05 acquires exclusive lock to prevent concurrent stamp operations
-- [ ] `--dry-run` mode checks all preconditions without mutating the file
-- [ ] Atomic stamp mutates `status`, `implementedAt`, and `updatedAt` in ADR frontmatter
-- [ ] `proposed → implemented` transition works for post-hoc ADRs
-- [ ] AV-16 warning message updated to reference `adr.implement.stamp`
-- [ ] `fo-idea-implement` step 4.10 uses `adr.implement.stamp` instead of manual editing
-- [ ] `fo-idea-plan` step 8 references `adr.implement.stamp` for ADR transitions
-- [ ] Synced copies in `.agents/skills/` match forge skill source files
-- [ ] Unit tests cover all ADR-IMP rules, dry-run, atomic stamp, and post-hoc ADR
-- [ ] `rfc.validate` passes on this file with zero errors
+- [x] `adr.implement.stamp` command registered in `forgeAdrModule` with `--id`, `--implementation-commit`, and `--dry-run` flags (evidence: packages/forge/os/adr/adr.module.ts:127-156, rfc.validate pass)
+- [x] ADR-IMP-01 rejects ADRs not in `accepted` or `proposed` status (evidence: packages/forge/os/adr/handlers/implement-stamp.ts:155-162, adr-implement-stamp.test.ts:97-116)
+- [x] ADR-IMP-03 validates implementation commit is reachable from HEAD and references the ADR id (evidence: packages/forge/os/adr/handlers/implement-stamp.ts:183-201, adr-implement-stamp.test.ts:165-246)
+- [x] ADR-IMP-04 rejects stamping when the ADR file has uncommitted changes (evidence: packages/forge/os/adr/handlers/implement-stamp.ts:175-181, adr-implement-stamp.test.ts:250-269)
+- [x] ADR-IMP-05 acquires exclusive lock to prevent concurrent stamp operations (evidence: packages/forge/os/adr/handlers/implement-stamp.ts:203-214, adr-implement-stamp.test.ts:274-294)
+- [x] `--dry-run` mode checks all preconditions without mutating the file (evidence: packages/forge/os/adr/handlers/implement-stamp.ts:230-247, adr-implement-stamp.test.ts:299-319)
+- [x] Atomic stamp mutates `status`, `implementedAt`, and `updatedAt` in ADR frontmatter (evidence: packages/forge/os/adr/handlers/implement-stamp.ts:249-257, adr-implement-stamp.test.ts:324-346)
+- [x] `proposed → implemented` transition works for post-hoc ADRs (evidence: packages/forge/os/adr/handlers/implement-stamp.ts:155-162, adr-implement-stamp.test.ts:351-366)
+- [x] AV-16 warning message updated to reference `adr.implement.stamp` (evidence: packages/forge/os/adr/handlers/validate.ts:402)
+- [x] `fo-idea-implement` step 4.10 uses `adr.implement.stamp` instead of manual editing (evidence: packages/forge/skills/fo/fo-idea-implement/SKILL.md:435-457)
+- [x] `fo-idea-plan` step 8 references `adr.implement.stamp` for ADR transitions (evidence: packages/forge/skills/fo/fo-idea-plan/SKILL.md:146)
+- [x] Synced copies in `.agents/skills/` match forge skill source files (evidence: .agents/skills/fo-idea-implement/SKILL.md, .agents/skills/fo-idea-plan/SKILL.md)
+- [x] Unit tests cover all ADR-IMP rules, dry-run, atomic stamp, and post-hoc ADR (evidence: packages/forge/src/tests/adr-implement-stamp.test.ts, 13 tests pass)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: rfc.validate --id RFC-0727 --json, exitCode 0)
 
 ## Implementation notes for agents
 
