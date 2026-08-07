@@ -1580,8 +1580,8 @@ export async function runLeitstandPropagate(
       `[leitstand.propagate] release '${releaseId}' must be in state 'ready' (current: ${releaseManifest.state}).\n` +
         `Run:\n` +
         `  1. release.ready --release ${releaseId}\n` +
-        `  2. leitstand.dev-deploy --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}\n` +
-        `  3. Re-run: leitstand.propagate --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}`,
+        `  2. leitstand.dev-deploy --site ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}\n` +
+        `  3. Re-run: leitstand.propagate --site ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}`,
     );
   }
 
@@ -2021,8 +2021,8 @@ export async function runLeitstandPromote(
     throw new Error(
       `[leitstand.promote] release '${releaseId}' must be in state 'alt-deployed' (current: ${releaseManifest.state}).\n` +
         `Run:\n` +
-        `  1. leitstand.propagate --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}\n` +
-        `  2. Re-run: leitstand.promote --system ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}`,
+        `  1. leitstand.propagate --site ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}\n` +
+        `  2. Re-run: leitstand.promote --site ${releaseManifest.systemId ?? "<systemId>"} --release ${releaseId}`,
     );
   }
 
@@ -2061,15 +2061,20 @@ export async function runLeitstandPromote(
         `[leitstand.promote] release '${releaseId}' has no distTreeHash — run release.prepare to compute it`,
       );
     }
-    logger.info(`  Verifying CDN freshness for ${altConfig.url}...`);
-    const freshnessResult = await verifyFreshness(altConfig.url, localDistTreeHash, logger);
-    if (!freshnessResult.verified) {
-      throw new Error(
-        `[leitstand.promote] CDN freshness verification failed after ${freshnessResult.attempts} attempts: ${freshnessResult.error}. ` +
-          `The alt channel may still be serving stale content. Wait a moment and re-run: leitstand.promote --system ${systemId} --release ${releaseId}`,
-      );
+    const forceFreshness = input.flags["force"] === true || input.flags["force"] === "true";
+    if (forceFreshness) {
+      logger.warn("[leitstand.promote] --force bypassing CDN freshness verification");
+    } else {
+      logger.info(`  Verifying CDN freshness for ${altConfig.url}...`);
+      const freshnessResult = await verifyFreshness(altConfig.url, localDistTreeHash, logger);
+      if (!freshnessResult.verified) {
+        throw new Error(
+          `[leitstand.promote] CDN freshness verification failed after ${freshnessResult.attempts} attempts: ${freshnessResult.error}. ` +
+            `The alt channel may still be serving stale content. Wait a moment and re-run: leitstand.promote --site ${systemId} --release ${releaseId}, or use --force to bypass.`,
+        );
+      }
+      logger.info(`  CDN freshness verified (attempts: ${freshnessResult.attempts})`);
     }
-    logger.info(`  CDN freshness verified (attempts: ${freshnessResult.attempts})`);
 
     // 2. Fetch build-identity.json from alt URL for full field comparison
     const buildIdentityUrl = `${altConfig.url}/.well-known/build-identity.json?cb=${Date.now()}`;
