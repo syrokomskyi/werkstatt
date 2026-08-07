@@ -7,7 +7,7 @@ meta:
   schemaVersion: 1
   deterministic: true
   generatedAt: null
-  contentHash: 55404507accfe10cd4a043492780f4bb5100f98fa41fcafd0b16cda2649753ab
+  contentHash: f9e3f31ee8c6350d55486cf3e7ff8c5d4f39af96e9ee1a6b32035cd3bc3e9502
 commands:
   - name: adr.archive
     description: "Move terminal-status ADR files (implemented, rejected, superseded)
@@ -70,6 +70,35 @@ commands:
       - docs/adrs/**/*.md
     writes:
       - docs/adrs/adr-*.md
+    validatesOutputs: []
+    pipelines: []
+  - name: adr.implement.stamp
+    description: Atomically transition an ADR from accepted/proposed to implemented.
+      Validates preconditions (status, implementation commit, file cleanliness,
+      concurrent safety) and mutates frontmatter in one atomic write. Use
+      --dry-run to preview without mutating.
+    scope: workspace
+    provider: workspace
+    module: adr
+    mutatesState: true
+    requiresNetwork: false
+    timeoutMs: null
+    flags:
+      id:
+        kind: string
+        required: true
+        description: Target ADR id (e.g. ADR-0003).
+      implementation-commit:
+        kind: string
+        required: true
+        description: SHA of the implementation commit.
+      dry-run:
+        kind: boolean
+        description: Preview without mutating the ADR file.
+    reads:
+      - docs/adrs/**/*.md
+    writes:
+      - docs/adrs/*.md
     validatesOutputs: []
     pipelines: []
   - name: adr.list
