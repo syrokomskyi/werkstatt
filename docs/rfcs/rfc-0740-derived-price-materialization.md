@@ -311,18 +311,18 @@ The `--json` flag produces a standard `KernelCommandResult` envelope:
 
 ## Acceptance criteria
 
-- [ ] `PbpMaterializedDerivedPrice` interface exported from `@warpgogol/pbp`
-- [ ] `PbpPriceKind` and `PbpCommercialMeaning` closed unions exported (single-member: `"derived"`, `"derived-price"`)
-- [ ] `PbpResolvedGraph` has `derivedPrices` field
-- [ ] `derived-prices.materialize` command registered in `04-content-quality.ts` command table (scope: `workspace`)
-- [ ] Command calls `compilePbpProfile()` internally and produces `src/derived-prices.generated.json`
-- [ ] Command uses `writeFileIfChanged` for generated file writes
-- [ ] Materialization command blocks publication on validation rule violations
-- [ ] `allowedUses` is copied from CurrencyPricingPolicy
-- [ ] Non-`fixed` charge amounts and Offerings without `pricing` are skipped gracefully
-- [ ] `tsc --noEmit` passes
-- [ ] `vitest run` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpMaterializedDerivedPrice` interface exported from `@warpgogol/pbp` (evidence: `packages/pbp/src/index.ts` re-exports from `materialized-derived-price.ts`)
+- [x] `PbpPriceKind` and `PbpCommercialMeaning` closed unions exported (single-member: `"derived"`, `"derived-price"`) (evidence: `packages/pbp/src/materialized-derived-price.ts:18-40`)
+- [x] `PbpResolvedGraph` has `derivedPrices` field (evidence: `packages/pbp/src/compiler/types.ts`)
+- [x] `derived-prices.materialize` command registered in `04-content-quality.ts` command table (scope: `workspace`) (evidence: `packages/os/site-kernel-checks/src/command-tables/04-content-quality.ts:731-750`)
+- [x] Command calls `compilePbpProfile()` internally and produces `src/derived-prices.generated.json` (evidence: `packages/os/site-kernel-checks/src/derived-prices-materialize.ts:61-67,120-125`)
+- [x] Command uses `writeFileIfChanged` for generated file writes (evidence: `packages/os/site-kernel-checks/src/derived-prices-materialize.ts:125`)
+- [x] Materialization command blocks publication on validation rule violations (evidence: `packages/os/site-kernel-checks/src/derived-prices-materialize.ts:101-114` returns exitCode 1)
+- [x] `allowedUses` is copied from CurrencyPricingPolicy (evidence: `packages/pbp/src/compiler/materialize.ts:283` — `allowedUses: target.currentUses`)
+- [x] Non-`fixed` charge amounts and Offerings without `pricing` are skipped gracefully (evidence: `packages/pbp/src/compiler/materialize.ts:159-161,169-171`)
+- [x] `tsc --noEmit` passes (evidence: both `@warpgogol/pbp` and `@warpgogol/site-kernel-checks` pass)
+- [x] `vitest run` passes (evidence: 13 tests in `materialize-derived-prices.test.ts`)
+- [x] `rfc.validate` passes on this file (evidence: `rfc.validate --id RFC-0740` returns OK)
 
 ## Implementation notes for agents
 
