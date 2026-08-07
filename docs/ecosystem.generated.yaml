@@ -2,7 +2,7 @@ meta:
   schemaVersion: 2
   deterministic: true
   generatedAt: null
-  contentHash: 6aa3c14fed24b69323233159044e2eb74a1f26b22cdfe800564acc5741a61f14
+  contentHash: 36c240127cc61934f97862c2c67a9c4836893ab95a2858b617f54e631bce13e1
   sources:
     - path: docs/architecture-dna.md
       hash: fc155ca5c3dc6c9abe5c516cc51496f880c653a205d5dc98ae82e17ba4f29e77
@@ -6934,17 +6934,24 @@ generatedOwnership:
     markerPolicy: registry-only
     module: packages/os/site-kernel-handoff/src/bordbuch/bordbuch-generate.ts
 rfcs:
-  accepted: 4
-  implemented: 0
+  accepted: 3
+  implemented: 1
   draft: 4
   reviewing: 0
 baseline:
-  implementedRfcs: []
+  implementedRfcs:
+    - id: RFC-0724
+      implementedAt: 2026-08-07
+      kind: architecture
+      scope: workspace
+      dnaRefs:
+        - DNA-51
+        - DNA-56
+        - DNA-59
   nonImplementedRfcs:
     accepted:
       - RFC-0179
       - RFC-0305
-      - RFC-0724
       - RFC-0727
     draft:
       - RFC-0000
