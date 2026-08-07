@@ -26,6 +26,8 @@ import { runBehaviorSnapshotStalenessCheck } from "../behavior-snapshot-stalenes
 import {
   runContentRegressionCheck,
   runContentRegressionSnapshotUpdate,
+  runContentRegressionReviewGenerate,
+  runContentRegressionApply,
 } from "../content-regression.ts";
 
 export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
@@ -194,5 +196,44 @@ export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
     },
     reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
     execute: runContentRegressionSnapshotUpdate,
+  },
+  {
+    name: "content.regression.review.generate",
+    description:
+      "RFC-0734: generate a review.yaml manifest with per-change golden/current values " +
+      "for operator review. Reads current snapshot and golden snapshot, diffs them, and " +
+      "writes review.yaml to missions/{missionId}/evidence/content-regression/review.yaml.",
+    scope: "app",
+    supportsAllSites: true,
+    cacheable: false,
+    flags: {
+      site: { kind: "string", description: "Site to generate review for (required, app scope)." },
+      "dry-run": {
+        kind: "boolean",
+        description: "Print review YAML to stdout without writing file.",
+      },
+    },
+    reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
+    execute: runContentRegressionReviewGenerate,
+  },
+  {
+    name: "content.regression.apply",
+    description:
+      "RFC-0734: apply review.yaml decisions to update the golden snapshot. Verifies " +
+      "that reject decisions were reverted and fix values were applied in source content. " +
+      "CREG-04 workpiece content mismatch. Writes apply-result.json for mission.close enforcement.",
+    scope: "app",
+    supportsAllSites: true,
+    cacheable: false,
+    flags: {
+      site: { kind: "string", description: "Site to apply review to (required, app scope)." },
+      review: { kind: "string", description: "Path to filled-in review.yaml (required)." },
+      force: {
+        kind: "boolean",
+        description: "Apply even if some decisions are pending (escape hatch).",
+      },
+    },
+    reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
+    execute: runContentRegressionApply,
   },
 ];

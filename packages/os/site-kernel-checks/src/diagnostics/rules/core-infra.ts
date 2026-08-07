@@ -513,6 +513,16 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "content.regression.check",
     "warning",
   ),
+  "CREG-04": rule(
+    "CREG-04",
+    "Workpiece content does not match review decision (reject not reverted or fix not applied)",
+    "content.regression.apply",
+  ),
+  "CREG-05": rule(
+    "CREG-05",
+    "Content drift exists but no review.yaml has been processed — run content.regression.review.generate",
+    "mission.close",
+  ),
 
   // yaml.contract.lint — YAML-first workspace convention enforcement.
   "YAML-CONTRACT-01": rule(

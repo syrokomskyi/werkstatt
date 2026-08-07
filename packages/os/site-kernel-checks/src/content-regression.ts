@@ -6,6 +6,10 @@ Snapshots resolved page content (block text after resolveReferencesDeep
 substitution, prose body text, FAQ Q&A pairs) per-route, hashes it, and diffs
 against a golden baseline stored in the cache clone. Content drift emits
 CREG-01/CREG-02/CREG-03 diagnostics and gates mission.validate.
+RFC-0734: content regression review manifest and apply workflow. Generates
+a review.yaml with per-change golden/current values for operator review,
+and applies accept/reject/fix decisions to update the golden snapshot.
+CREG-04 workpiece mismatch, CREG-05 unreviewed drift on mission.close.
 </purpose>
 <non-goals>
   <item>Do not snapshot route metadata — that is behavior.snapshot.validate (SNAP-01).</item>
@@ -15,12 +19,14 @@ CREG-01/CREG-02/CREG-03 diagnostics and gates mission.validate.
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0732: initial implementation.</item>
+  <item>RFC-0734: add review.generate, apply handlers, CREG-04/CREG-05 rules, review YAML serialization.</item>
 </CHANGE_SUMMARY>
 */
 
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import {
   writeFileIfChanged,
@@ -90,6 +96,48 @@ export interface ContentRegressionDiff {
 }
 
 // ---------------------------------------------------------------------------
+// Types (RFC-0734 review manifest contracts)
+// ---------------------------------------------------------------------------
+
+export interface ContentRegressionReviewChange {
+  id: string;
+  route: string;
+  kind: "block-field" | "added-route" | "removed-route" | "faq";
+  blockId?: string;
+  field?: string;
+  golden: string | null;
+  current: string | null;
+  decision: "pending" | "accept" | "reject" | "fix";
+  fixValue: string;
+  note: string;
+}
+
+export interface ContentRegressionReview {
+  schemaVersion: 1;
+  systemId: string;
+  missionId: string;
+  generatedAt: string;
+  goldenSnapshotHash: string;
+  currentSnapshotHash: string;
+  summary: {
+    totalChanges: number;
+    addedRoutes: number;
+    removedRoutes: number;
+    changedRoutes: number;
+  };
+  changes: ContentRegressionReviewChange[];
+}
+
+export interface ContentRegressionApplyResult {
+  accepted: number;
+  rejected: number;
+  fixed: number;
+  pending: number;
+  goldenUpdated: boolean;
+  errors: string[];
+}
+
+// ---------------------------------------------------------------------------
 // Cache clone path resolution (mirrors generated-files-validate.ts pattern)
 // ---------------------------------------------------------------------------
 
@@ -100,6 +148,7 @@ interface RegistryMirror {
 interface RegistrySystem {
   id: string;
   mirrors?: RegistryMirror[];
+  currentMission?: string;
 }
 
 interface RegistryFile {
@@ -310,7 +359,7 @@ function diffToDiagnostics(diff: ContentRegressionDiff): Diagnostic[] {
       severity: "error",
       message: `Route '${route}' exists in current snapshot but not in golden.`,
       fixHint:
-        "New route detected. Run: pnpm exec site-kernel run content.regression.snapshot.update --site <systemId>",
+        "New route detected. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>",
     });
   }
   for (const route of diff.removedRoutes) {
@@ -319,7 +368,7 @@ function diffToDiagnostics(diff: ContentRegressionDiff): Diagnostic[] {
       severity: "error",
       message: `Route '${route}' exists in golden snapshot but not in current.`,
       fixHint:
-        "Removed route detected. Run: pnpm exec site-kernel run content.regression.snapshot.update --site <systemId>",
+        "Removed route detected. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>",
     });
   }
   for (const changed of diff.changedRoutes) {
@@ -332,7 +381,7 @@ function diffToDiagnostics(diff: ContentRegressionDiff): Diagnostic[] {
         faqChanged: changed.faqChanged,
       },
       fixHint:
-        "Review the content diff. If intended, run: pnpm exec site-kernel run content.regression.snapshot.update --site <systemId>",
+        "Review the content diff. Run: pnpm exec site-kernel run content.regression.review.generate --site <systemId>",
     });
   }
   return diagnostics;
@@ -560,5 +609,585 @@ export async function runContentRegressionSnapshotUpdate(
   return passResult(
     "content.regression.snapshot.update",
     `content.regression.snapshot.update: golden snapshot written for '${systemId}' (${currentSnapshot.routes.length} routes)`,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// RFC-0734: Mission ID resolution
+// ---------------------------------------------------------------------------
+
+async function resolveMissionId(workspaceRoot: string, systemId: string): Promise<string | null> {
+  const registryPath = join(workspaceRoot, "systems", "registry.yaml");
+  try {
+    const raw = await readFile(registryPath, "utf8");
+    const registry = yamlParse(raw) as RegistryFile;
+    const entry = registry.systems?.find((s) => s.id === systemId);
+    return entry?.currentMission ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// RFC-0734: Review YAML serialization
+// ---------------------------------------------------------------------------
+
+function reviewToYaml(
+  review: ContentRegressionReview,
+  systemId: string,
+  missionId: string,
+): string {
+  const header = `# Content Regression Review — ${systemId}
+# Mission: ${missionId}
+# Generated: ${review.generatedAt}
+#
+# Instructions for operator:
+#   1. Review each change below (golden = old value, current = new value)
+#   2. Set decision: accept | reject | fix
+#   3. For "fix": set fixValue to the desired text
+#   4. For "accept": no further action — golden will be updated
+#   5. For "reject": agent must revert the source content to match golden
+#   6. Run: pnpm exec site-kernel run content.regression.apply --site ${systemId} --review <this-file>
+#
+# Instructions for AI agent (copy to agent after operator fills decisions):
+#   - Read this file
+#   - For each change with decision: reject → revert source .md to golden value
+#   - For each change with decision: fix → set source .md to fixValue
+#   - For each change with decision: accept → no action needed
+#   - After applying changes, run: content.regression.check --site ${systemId}
+`;
+  const body = yamlStringify(review);
+  return `${header}\n${body}`;
+}
+
+function parseReviewYaml(raw: string): ContentRegressionReview {
+  const parsed = yamlParse(raw) as ContentRegressionReview;
+  if (!parsed || typeof parsed !== "object" || !parsed.schemaVersion || !parsed.changes) {
+    throw new Error("Invalid review.yaml: missing schemaVersion or changes");
+  }
+  return parsed;
+}
+
+// ---------------------------------------------------------------------------
+// RFC-0734: Build review changes from diff
+// ---------------------------------------------------------------------------
+
+function getBlockFieldValue(
+  block: ContentRegressionBlock | undefined,
+  field: string,
+): string | null {
+  if (!block) return null;
+  switch (field) {
+    case "heading":
+      return block.heading;
+    case "lead":
+      return block.lead ?? null;
+    case "body":
+      return block.body ?? null;
+    case "items":
+      return block.items ? JSON.stringify(block.items) : null;
+    default:
+      return null;
+  }
+}
+
+function buildReviewChanges(
+  diff: ContentRegressionDiff,
+  currentSnapshot: ContentRegressionSnapshot,
+  goldenSnapshot: ContentRegressionSnapshot | null,
+): ContentRegressionReviewChange[] {
+  const changes: ContentRegressionReviewChange[] = [];
+  let changeNum = 1;
+
+  const currentRoutes = new Map(currentSnapshot.routes.map((r) => [r.route, r]));
+  const goldenRoutes = goldenSnapshot
+    ? new Map(goldenSnapshot.routes.map((r) => [r.route, r]))
+    : new Map<string, ContentRegressionRoute>();
+
+  // Added routes
+  for (const route of diff.addedRoutes) {
+    changes.push({
+      id: `change-${String(changeNum++).padStart(3, "0")}`,
+      route,
+      kind: "added-route",
+      golden: null,
+      current: "route exists in current snapshot but not in golden",
+      decision: "pending",
+      fixValue: "",
+      note: "",
+    });
+  }
+
+  // Removed routes
+  for (const route of diff.removedRoutes) {
+    changes.push({
+      id: `change-${String(changeNum++).padStart(3, "0")}`,
+      route,
+      kind: "removed-route",
+      golden: "route existed in golden but not in current",
+      current: null,
+      decision: "pending",
+      fixValue: "",
+      note: "",
+    });
+  }
+
+  // Changed routes — block-field changes
+  for (const changed of diff.changedRoutes) {
+    const currentRoute = currentRoutes.get(changed.route);
+    const goldenRoute = goldenRoutes.get(changed.route);
+
+    for (const blockDiff of changed.changedBlocks) {
+      if (blockDiff.fields.includes("new-block")) {
+        const currentBlock = currentRoute?.blocks.find((b) => b.id === blockDiff.blockId);
+        changes.push({
+          id: `change-${String(changeNum++).padStart(3, "0")}`,
+          route: changed.route,
+          kind: "block-field",
+          blockId: blockDiff.blockId,
+          field: "new-block",
+          golden: null,
+          current: currentBlock ? JSON.stringify(currentBlock) : null,
+          decision: "pending",
+          fixValue: "",
+          note: "",
+        });
+        continue;
+      }
+      if (blockDiff.fields.includes("removed-block")) {
+        const goldenBlock = goldenRoute?.blocks.find((b) => b.id === blockDiff.blockId);
+        changes.push({
+          id: `change-${String(changeNum++).padStart(3, "0")}`,
+          route: changed.route,
+          kind: "block-field",
+          blockId: blockDiff.blockId,
+          field: "removed-block",
+          golden: goldenBlock ? JSON.stringify(goldenBlock) : null,
+          current: null,
+          decision: "pending",
+          fixValue: "",
+          note: "",
+        });
+        continue;
+      }
+      for (const field of blockDiff.fields) {
+        const currentBlock = currentRoute?.blocks.find((b) => b.id === blockDiff.blockId);
+        const goldenBlock = goldenRoute?.blocks.find((b) => b.id === blockDiff.blockId);
+        changes.push({
+          id: `change-${String(changeNum++).padStart(3, "0")}`,
+          route: changed.route,
+          kind: "block-field",
+          blockId: blockDiff.blockId,
+          field,
+          golden: getBlockFieldValue(goldenBlock, field),
+          current: getBlockFieldValue(currentBlock, field),
+          decision: "pending",
+          fixValue: "",
+          note: "",
+        });
+      }
+    }
+
+    // FAQ changes — per-entry comparison
+    if (changed.faqChanged) {
+      const currentFaq = currentRoute?.faq ?? [];
+      const goldenFaq = goldenRoute?.faq ?? [];
+      const maxLen = Math.max(currentFaq.length, goldenFaq.length);
+      for (let i = 0; i < maxLen; i++) {
+        const c = currentFaq[i];
+        const g = goldenFaq[i];
+        if (!c && g) {
+          changes.push({
+            id: `change-${String(changeNum++).padStart(3, "0")}`,
+            route: changed.route,
+            kind: "faq",
+            blockId: `faq-${i}`,
+            field: "removed",
+            golden: JSON.stringify(g),
+            current: null,
+            decision: "pending",
+            fixValue: "",
+            note: "",
+          });
+        } else if (c && !g) {
+          changes.push({
+            id: `change-${String(changeNum++).padStart(3, "0")}`,
+            route: changed.route,
+            kind: "faq",
+            blockId: `faq-${i}`,
+            field: "added",
+            golden: null,
+            current: JSON.stringify(c),
+            decision: "pending",
+            fixValue: "",
+            note: "",
+          });
+        } else if (c && g && (c.question !== g.question || c.answer !== g.answer)) {
+          changes.push({
+            id: `change-${String(changeNum++).padStart(3, "0")}`,
+            route: changed.route,
+            kind: "faq",
+            blockId: `faq-${i}`,
+            field: "changed",
+            golden: JSON.stringify(g),
+            current: JSON.stringify(c),
+            decision: "pending",
+            fixValue: "",
+            note: "",
+          });
+        }
+      }
+    }
+  }
+
+  return changes;
+}
+
+// ---------------------------------------------------------------------------
+// RFC-0734: content.regression.review.generate command
+// ---------------------------------------------------------------------------
+
+export async function runContentRegressionReviewGenerate(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<CheckResult>> {
+  const { workspaceRoot } = context;
+
+  const siteCtx = await resolveSiteContext(input, context);
+  if (!siteCtx) {
+    return passResult("content.regression.review.generate");
+  }
+  const { contentDir, systemId, languages, siteUrl } = siteCtx;
+
+  // Build current snapshot
+  let currentSnapshot: ContentRegressionSnapshot;
+  try {
+    currentSnapshot = await buildSnapshot(contentDir, systemId, languages, siteUrl);
+  } catch (err) {
+    const diagnostics: Diagnostic[] = [
+      {
+        ruleId: "CREG-01",
+        severity: "error",
+        message: `Failed to load semantic site model: ${err instanceof Error ? err.message : String(err)}`,
+      },
+    ];
+    return diagnosticsResult("content.regression.review.generate", diagnostics);
+  }
+
+  // Resolve mission ID from registry
+  const missionId = await resolveMissionId(workspaceRoot, systemId);
+  if (!missionId) {
+    return diagnosticsResult("content.regression.review.generate", [
+      {
+        ruleId: "CREG-03",
+        severity: "error",
+        message: `No current mission found for system '${systemId}' in systems/registry.yaml.`,
+      },
+    ]);
+  }
+
+  // Load golden snapshot
+  const cacheClonePath = await resolveCacheClonePath(workspaceRoot, systemId);
+  const goldenSnapshot = cacheClonePath ? await readGoldenSnapshot(cacheClonePath, systemId) : null;
+
+  // Diff current vs golden
+  const diff = goldenSnapshot
+    ? diffSnapshots(currentSnapshot, goldenSnapshot)
+    : {
+        addedRoutes: currentSnapshot.routes.map((r) => r.route),
+        removedRoutes: [],
+        changedRoutes: [],
+      };
+
+  // Build review changes
+  const changes = buildReviewChanges(diff, currentSnapshot, goldenSnapshot);
+
+  const review: ContentRegressionReview = {
+    schemaVersion: 1,
+    systemId,
+    missionId,
+    generatedAt: new Date().toISOString(),
+    goldenSnapshotHash: goldenSnapshot?.contentHash ?? "none",
+    currentSnapshotHash: currentSnapshot.contentHash,
+    summary: {
+      totalChanges: changes.length,
+      addedRoutes: diff.addedRoutes.length,
+      removedRoutes: diff.removedRoutes.length,
+      changedRoutes: diff.changedRoutes.length,
+    },
+    changes,
+  };
+
+  const dryRun = flagBool(input, "dry-run");
+  const reviewYaml = reviewToYaml(review, systemId, missionId);
+
+  if (dryRun) {
+    context.logger.info(reviewYaml);
+    return passResult(
+      "content.regression.review.generate",
+      `content.regression.review.generate: ${changes.length} change(s) detected (dry run)`,
+    );
+  }
+
+  // Write review.yaml to mission evidence directory
+  const reviewDir = join(workspaceRoot, "missions", missionId, "evidence", "content-regression");
+  await mkdir(reviewDir, { recursive: true });
+  const reviewPath = join(reviewDir, "review.yaml");
+  await writeFileIfChanged(reviewPath, reviewYaml);
+
+  const relativePath = `missions/${missionId}/evidence/content-regression/review.yaml`;
+  context.logger.info(`  Review manifest: ${relativePath}`);
+
+  return passResult(
+    "content.regression.review.generate",
+    `content.regression.review.generate: ${changes.length} change(s) detected. Review manifest: ${relativePath}`,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// RFC-0734: content.regression.apply command
+// ---------------------------------------------------------------------------
+
+export async function runContentRegressionApply(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult<CheckResult>> {
+  const { workspaceRoot } = context;
+  const force = flagBool(input, "force");
+  const reviewPath = flagString(input, "review");
+
+  if (!reviewPath) {
+    return diagnosticsResult("content.regression.apply", [
+      {
+        ruleId: "CREG-04",
+        severity: "error",
+        message: "Missing required --review <path> flag.",
+      },
+    ]);
+  }
+
+  const siteCtx = await resolveSiteContext(input, context);
+  if (!siteCtx) {
+    return passResult("content.regression.apply");
+  }
+  const { contentDir, systemId, languages, siteUrl } = siteCtx;
+
+  // Load review.yaml
+  let review: ContentRegressionReview;
+  try {
+    const raw = await readFile(reviewPath, "utf8");
+    review = parseReviewYaml(raw);
+  } catch (err) {
+    return diagnosticsResult("content.regression.apply", [
+      {
+        ruleId: "CREG-04",
+        severity: "error",
+        message: `Failed to read review.yaml: ${err instanceof Error ? err.message : String(err)}`,
+      },
+    ]);
+  }
+
+  // Check for pending decisions
+  const pendingCount = review.changes.filter((c) => c.decision === "pending").length;
+  if (pendingCount > 0 && !force) {
+    return diagnosticsResult("content.regression.apply", [
+      {
+        ruleId: "CREG-04",
+        severity: "error",
+        message: `${pendingCount} change(s) have decision: pending. All decisions must be accept, reject, or fix (use --force to override).`,
+      },
+    ]);
+  }
+
+  // Build current snapshot
+  let currentSnapshot: ContentRegressionSnapshot;
+  try {
+    currentSnapshot = await buildSnapshot(contentDir, systemId, languages, siteUrl);
+  } catch (err) {
+    return diagnosticsResult("content.regression.apply", [
+      {
+        ruleId: "CREG-01",
+        severity: "error",
+        message: `Failed to load semantic site model: ${err instanceof Error ? err.message : String(err)}`,
+      },
+    ]);
+  }
+
+  // Verify currentSnapshotHash matches
+  if (review.currentSnapshotHash !== currentSnapshot.contentHash) {
+    return diagnosticsResult("content.regression.apply", [
+      {
+        ruleId: "CREG-04",
+        severity: "error",
+        message:
+          "Workpiece content has changed since review.yaml was generated. Re-run content.regression.review.generate.",
+      },
+    ]);
+  }
+
+  // Load golden snapshot
+  const cacheClonePath = await resolveCacheClonePath(workspaceRoot, systemId);
+  if (!cacheClonePath) {
+    return diagnosticsResult("content.regression.apply", [
+      {
+        ruleId: "CREG-03",
+        severity: "error",
+        message: `No cache clone found for system '${systemId}'.`,
+      },
+    ]);
+  }
+
+  const goldenSnapshot = await readGoldenSnapshot(cacheClonePath, systemId);
+
+  // Process decisions
+  const result: ContentRegressionApplyResult = {
+    accepted: 0,
+    rejected: 0,
+    fixed: 0,
+    pending: pendingCount,
+    goldenUpdated: false,
+    errors: [],
+  };
+
+  const currentRoutes = new Map(currentSnapshot.routes.map((r) => [r.route, r]));
+  const goldenRoutes = goldenSnapshot
+    ? new Map(goldenSnapshot.routes.map((r) => [r.route, r]))
+    : new Map<string, ContentRegressionRoute>();
+
+  for (const change of review.changes) {
+    if (change.decision === "pending") continue;
+
+    if (change.decision === "accept") {
+      result.accepted++;
+      continue;
+    }
+
+    if (change.decision === "reject") {
+      // Verify current content matches golden (was reverted)
+      const currentRoute = currentRoutes.get(change.route);
+      const goldenRoute = goldenRoutes.get(change.route);
+
+      if (
+        change.kind === "block-field" &&
+        change.field &&
+        change.field !== "new-block" &&
+        change.field !== "removed-block"
+      ) {
+        const currentBlock = currentRoute?.blocks.find((b) => b.id === change.blockId);
+        const goldenBlock = goldenRoute?.blocks.find((b) => b.id === change.blockId);
+        const currentVal = getBlockFieldValue(currentBlock, change.field);
+        if (currentVal !== change.golden) {
+          result.errors.push(
+            `CREG-04: Rejected change '${change.id}' not reverted in source — block '${change.blockId}' field '${change.field}' still differs from golden value`,
+          );
+        }
+      }
+      result.rejected++;
+      continue;
+    }
+
+    if (change.decision === "fix") {
+      // Verify current content matches fixValue
+      const currentRoute = currentRoutes.get(change.route);
+
+      if (
+        change.kind === "block-field" &&
+        change.field &&
+        change.field !== "new-block" &&
+        change.field !== "removed-block"
+      ) {
+        const currentBlock = currentRoute?.blocks.find((b) => b.id === change.blockId);
+        const currentVal = getBlockFieldValue(currentBlock, change.field);
+        if (currentVal !== change.fixValue) {
+          result.errors.push(
+            `CREG-04: Fix value for change '${change.id}' not yet applied to source — block '${change.blockId}' field '${change.field}' does not match fixValue`,
+          );
+        }
+      }
+      result.fixed++;
+      continue;
+    }
+  }
+
+  // If errors, block
+  if (result.errors.length > 0) {
+    return diagnosticsResult(
+      "content.regression.apply",
+      result.errors.map((msg) => ({ ruleId: "CREG-04", severity: "error" as const, message: msg })),
+    );
+  }
+
+  // Build updated golden snapshot: for accepted changes, use current values; for rejected, keep golden
+  const updatedRoutes: ContentRegressionRoute[] = [];
+  for (const currentRoute of currentSnapshot.routes) {
+    const goldenRoute = goldenRoutes.get(currentRoute.route);
+    if (!goldenRoute) {
+      // New route — include if accepted
+      const hasAccept = review.changes.some(
+        (c) =>
+          c.route === currentRoute.route && c.kind === "added-route" && c.decision === "accept",
+      );
+      if (hasAccept || !goldenSnapshot) {
+        updatedRoutes.push(currentRoute);
+      } else {
+        // Skip — not accepted
+      }
+      continue;
+    }
+
+    // Check if this route has any accepted changes
+    const routeChanges = review.changes.filter((c) => c.route === currentRoute.route);
+    const hasAccepted = routeChanges.some((c) => c.decision === "accept" || c.decision === "fix");
+
+    if (hasAccepted || currentRoute.hash === goldenRoute.hash) {
+      updatedRoutes.push(currentRoute);
+    } else {
+      // Keep golden route (rejected changes keep golden values)
+      updatedRoutes.push(goldenRoute);
+    }
+  }
+
+  // Include golden routes that were removed (if not accepted)
+  for (const [route, goldenRoute] of goldenRoutes) {
+    if (!currentRoutes.has(route)) {
+      const hasAccept = review.changes.some(
+        (c) => c.route === route && c.kind === "removed-route" && c.decision === "accept",
+      );
+      if (!hasAccept) {
+        updatedRoutes.push(goldenRoute);
+      }
+    }
+  }
+
+  updatedRoutes.sort((a, b) => a.route.localeCompare(b.route));
+  const updatedGolden: ContentRegressionSnapshot = {
+    schemaVersion: 1,
+    systemId,
+    contentHash: byteHash(updatedRoutes.map((r) => r.hash).join("\n")),
+    routes: updatedRoutes,
+  };
+
+  // Write updated golden snapshot
+  const goldenDir = join(cacheClonePath, ".cache", "content-regression");
+  await mkdir(goldenDir, { recursive: true });
+  const goldenPath = join(goldenDir, `${systemId}.snapshot.yaml`);
+  const yaml = snapshotToYaml(
+    updatedGolden,
+    "content.regression.apply",
+    `.cache/content-regression/${systemId}.snapshot.yaml`,
+  );
+  await writeFileIfChanged(goldenPath, yaml);
+  result.goldenUpdated = true;
+
+  // Write apply-result.json
+  const missionId = review.missionId;
+  const resultDir = join(workspaceRoot, "missions", missionId, "evidence", "content-regression");
+  await mkdir(resultDir, { recursive: true });
+  const resultPath = join(resultDir, "apply-result.json");
+  await writeFileIfChanged(resultPath, JSON.stringify(result, null, 2) + "\n");
+
+  return passResult(
+    "content.regression.apply",
+    `content.regression.apply: ${review.changes.length} change(s) processed (${result.accepted} accepted, ${result.rejected} rejected, ${result.fixed} fixed). Golden snapshot updated.`,
   );
 }

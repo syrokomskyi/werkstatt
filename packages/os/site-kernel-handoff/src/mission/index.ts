@@ -117,6 +117,14 @@ export function createMissionModule(): KernelModule {
               "Read actor identity from WERKSTATT_ACTOR_ID env var set by Studio Gate auth.",
           },
           release: { kind: "string", description: "Release id produced by this mission." },
+          "skip-evidence-sync": {
+            kind: "boolean",
+            description: "Skip mandatory evidence.sync to R2 (escape hatch, RFC-0652).",
+          },
+          "skip-content-regression": {
+            kind: "boolean",
+            description: "Skip CREG-05 content regression review check (escape hatch, RFC-0734).",
+          },
         },
         writes: [
           "missions/{mission}/mission.yaml",

@@ -21,6 +21,7 @@
   <item>RFC-0658: validate bordbuch before appending close event (defense-in-depth for distribution-reuse skip path).</item>
   <item>RFC-0703: auto-pin platform version via sternsystem.pin after registry update, before werkstatt commit.</item>
   <item>RFC-0705: move mirror status gathering before state transition; add blocking check when external mirrors are desynced.</item>
+  <item>RFC-0734: add CREG-05 enforcement — block close when content drift exists and no apply-result.json; add --skip-content-regression flag.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -28,6 +29,7 @@ import fs from "node:fs/promises";
 import { execSync, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { parse as yamlParse } from "yaml";
 import type {
   KernelCommandInput,
   KernelCommandResult,
@@ -593,6 +595,73 @@ export async function runMissionClose(
             logger.info(
               `  Warning: failed to copy ${cacheDir} to cache clone: ${err instanceof Error ? err.message : String(err)}`,
             );
+          }
+        }
+      }
+
+      // RFC-0734: CREG-05 enforcement — check for unreviewed content drift before copying golden snapshot
+      const skipContentRegression = flagBoolean(input, "skip-content-regression");
+      if (!skipContentRegression) {
+        const contentRegressionSrc = path.join(
+          workpieceDir,
+          ".cache",
+          "content-regression",
+          "current.snapshot.yaml",
+        );
+        if (existsSync(contentRegressionSrc)) {
+          // Load current snapshot hash from workpiece
+          let currentHash: string | null = null;
+          try {
+            const raw = await fs.readFile(contentRegressionSrc, "utf8");
+            const parsed = yamlParse(raw) as { contentHash?: string };
+            currentHash = parsed?.contentHash ?? null;
+          } catch {
+            // If we can't read it, proceed — the copy will handle it
+          }
+
+          // Load golden snapshot hash from cache clone
+          let goldenHash: string | null = null;
+          const goldenSnapshotPath = path.join(
+            systemDir,
+            ".cache",
+            "content-regression",
+            `${manifest.systemId}.snapshot.yaml`,
+          );
+          if (existsSync(goldenSnapshotPath)) {
+            try {
+              const raw = await fs.readFile(goldenSnapshotPath, "utf8");
+              const parsed = yamlParse(raw) as { contentHash?: string };
+              goldenHash = parsed?.contentHash ?? null;
+            } catch {
+              // Golden unreadable — treat as cold start
+            }
+          }
+
+          // If drift exists (hashes differ and both exist), check for apply-result.json
+          if (currentHash && goldenHash && currentHash !== goldenHash) {
+            const applyResultPath = path.join(
+              missionDir,
+              "evidence",
+              "content-regression",
+              "apply-result.json",
+            );
+            let hasValidApplyResult = false;
+            if (existsSync(applyResultPath)) {
+              try {
+                const raw = await fs.readFile(applyResultPath, "utf8");
+                const result = JSON.parse(raw) as { pending?: number; errors?: string[] };
+                if ((result.pending ?? 0) === 0 && (result.errors?.length ?? 0) === 0) {
+                  hasValidApplyResult = true;
+                }
+              } catch {
+                // Unreadable — not valid
+              }
+            }
+            if (!hasValidApplyResult) {
+              throw new Error(
+                `[mission.close] CREG-05: Content drift exists but no review.yaml has been processed. Run: pnpm exec site-kernel run content.regression.review.generate --site ${manifest.systemId}`,
+              );
+            }
           }
         }
       }
