@@ -19,7 +19,13 @@ import { creditByTarget, resolveEffectsForTarget, resolveImage } from "@warpgogo
 import type { StandardCard, HorizontalAlign, EffectAssignment } from "@warpgogol/share";
 import EffectHost from "../../../components/effects/effect-host.astro";
 import ResponsiveImage from "@warpgogol/ui/components/responsive-image.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
 import { loadVendorIcon } from "../../../icons/icon-resolver.ts";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../../../sections/price-card/price-variants.ts";
 import "./section-card-grid.css";
 
 interface Props {
@@ -45,8 +51,51 @@ const activeLang = lang ?? defaultLanguageCode;
 if (!activeLang || !defaultLanguageCode) {
   throw new Error("[section-card-grid] lang and defaultLanguageCode are required.");
 }
+const langCode: string = activeLang;
 
 const cardEffects = resolveEffectsForTarget(effects, "card");
+
+const derivedPrices = loadDerivedPrices();
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type TextOrPrice = TextPart | PricePart;
+
+function parsePriceMarkers(text: string): TextOrPrice[] {
+  const parts: TextOrPrice[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: text.slice(lastIndex, match.index) });
+    }
+    const offeringId = match[1]!;
+    const chargeRef = match[2]!;
+    const offeringRef = offeringUriPrefix + offeringId;
+    const entries = derivedPrices?.[offeringRef];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      langCode,
+      offeringRef,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ kind: "text", value: text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: text });
+  return parts;
+}
 
 import { contentAssetCredits, contentAssetImages } from "../../../content-assets.ts";
 const images = contentAssetImages;
@@ -98,9 +147,29 @@ const resolved = await Promise.all(
             {Icon && (
               <Icon size={card.icon?.size ?? 32} color="accent" trigger="hover" aria-label="" />
             )}
-            {card.badge && <span class="section-card-grid__badge">{card.badge}</span>}
+            {card.badge && (
+              <span class="section-card-grid__badge">
+                {parsePriceMarkers(card.badge).map((part) =>
+                  part.kind === "text" ? (
+                    part.value
+                  ) : part.variants ? (
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  ) : null,
+                )}
+              </span>
+            )}
             {card.title && <h3 class="section-card-grid__title">{card.title}</h3>}
-            {card.description && <p class="section-card-grid__description">{card.description}</p>}
+            {card.description && (
+              <p class="section-card-grid__description">
+                {parsePriceMarkers(card.description).map((part) =>
+                  part.kind === "text" ? (
+                    part.value
+                  ) : part.variants ? (
+                    <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                  ) : null,
+                )}
+              </p>
+            )}
           </div>
         </>
       );

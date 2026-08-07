@@ -110,6 +110,37 @@
     line-height: var(--ds-line-height-lg);
   }
 
+  .section-card-grid__badge .currency-aware-price-display,
+  .section-card-grid__badge .currency-aware-price-display__variant {
+    display: inline;
+  }
+
+  .section-card-grid__badge .currency-aware-price-display__variant[hidden] {
+    display: none;
+  }
+
+  .section-card-grid__badge .currency-aware-price-display__amount {
+    display: inline;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    white-space: nowrap;
+  }
+
+  .section-card-grid__description .currency-aware-price-display,
+  .section-card-grid__description .currency-aware-price-display__variant {
+    display: inline;
+  }
+
+  .section-card-grid__description .currency-aware-price-display__variant[hidden] {
+    display: none;
+  }
+
+  .section-card-grid__description .currency-aware-price-display__amount {
+    display: inline;
+    white-space: nowrap;
+  }
+
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .section-card-grid--grid.section-card-grid--cols-2 {

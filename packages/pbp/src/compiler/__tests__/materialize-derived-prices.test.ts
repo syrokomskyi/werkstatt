@@ -204,7 +204,7 @@ describe("materializeDerivedPrices", () => {
     expect(Object.keys(result.prices)).toHaveLength(0);
   });
 
-  it("skips non-fixed charges (range model)", () => {
+  it("materializes range model charges (minimum and maximum)", () => {
     const offering = makeOffering("offering-1", "EUR", {
       monthly: {
         type: "recurring",
@@ -213,12 +213,19 @@ describe("materializeDerivedPrices", () => {
       },
     });
     const policy = makePolicy("EUR", { uah: { currency: "UAH", strategy: "derived" } });
-    const graph = makeGraph([offering]);
+    const ratePolicy = makeRatePolicy("rp-eur-uah", "EUR", "UAH");
+    const snapshot = makeRateSnapshot("rs-eur-uah", "EUR", "UAH", "40.00");
+    const graph = makeGraph([offering], [ratePolicy], [snapshot]);
 
     const result = materializeDerivedPrices(graph, policy, BUILD_TIME);
 
     expect(result.errors).toHaveLength(0);
-    expect(Object.keys(result.prices)).toHaveLength(0);
+    const prices = result.prices["offering-1"] ?? [];
+    expect(prices).toHaveLength(2);
+    expect(prices[0]!.chargeRef).toBe("monthly.minimum");
+    expect(prices[0]!.amount.value).toBe("2000");
+    expect(prices[1]!.chargeRef).toBe("monthly.maximum");
+    expect(prices[1]!.amount.value).toBe("6000");
   });
 
   it("skips target currencies with fixed strategy", () => {

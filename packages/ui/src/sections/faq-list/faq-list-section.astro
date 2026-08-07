@@ -43,7 +43,7 @@ type TextPart = { kind: "text"; value: string };
 type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
 type TextOrPrice = TextPart | PricePart;
 
-const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)\}/g;
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
 
 function parsePriceMarkers(text: string): TextOrPrice[] {
   const parts: TextOrPrice[] = [];

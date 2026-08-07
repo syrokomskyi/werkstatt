@@ -179,11 +179,21 @@ export function materializeDerivedPrices(
 
     for (const chargeKey of chargeKeys) {
       const charge = pricing.charges?.[chargeKey] as PbpCharge | undefined;
-      if (!charge || !charge.amount || charge.amount.model !== "fixed") {
+      if (!charge || !charge.amount) {
         continue;
       }
 
-      const sourceAmount = charge.amount.value;
+      const sourceAmounts =
+        charge.amount.model === "fixed"
+          ? [charge.amount.value]
+          : charge.amount.model === "unit-rate"
+            ? [charge.amount.unitValue]
+            : charge.amount.model === "range"
+              ? [charge.amount.minimum, charge.amount.maximum]
+              : [];
+      if (sourceAmounts.length === 0) {
+        continue;
+      }
 
       const targetKeys = Object.keys(policy.targetCurrencies).sort();
       for (const targetKey of targetKeys) {
@@ -194,108 +204,115 @@ export function materializeDerivedPrices(
           continue;
         }
 
-        const validationErrors = validateTarget(
-          sourceCurrency,
-          targetCurrency,
-          offering,
-          chargeKey,
-        );
-        if (validationErrors.length > 0) {
-          errors.push(...validationErrors);
-          continue;
-        }
+        for (let i = 0; i < sourceAmounts.length; i++) {
+          const sourceAmount = sourceAmounts[i]!;
+          const chargeRefSuffix =
+            sourceAmounts.length > 1 ? (i === 0 ? ".minimum" : ".maximum") : "";
+          const effectiveChargeRef = `${chargeKey}${chargeRefSuffix}`;
 
-        const ratePolicy = findRatePolicy(graph, sourceCurrency, targetCurrency);
-        if (!ratePolicy) {
-          errors.push({
-            code: "PBP-DERIVED-PRICE-03",
-            severity: "error",
-            entityId: offering.id,
-            path: `pricing.charges.${chargeKey}`,
-            message: `strategy: derived but no RatePolicy for pair ${sourceCurrency}/${targetCurrency}`,
-          });
-          continue;
-        }
+          const validationErrors = validateTarget(
+            sourceCurrency,
+            targetCurrency,
+            offering,
+            effectiveChargeRef,
+          );
+          if (validationErrors.length > 0) {
+            errors.push(...validationErrors);
+            continue;
+          }
 
-        const snapshot = findApplicableSnapshot(graph, sourceCurrency, targetCurrency, buildTime);
-        if (!snapshot) {
-          if (ratePolicy.failure.noAcceptableRate === "block-publication") {
+          const ratePolicy = findRatePolicy(graph, sourceCurrency, targetCurrency);
+          if (!ratePolicy) {
             errors.push({
-              code: "PBP-DERIVED-PRICE-08",
+              code: "PBP-DERIVED-PRICE-03",
               severity: "error",
               entityId: offering.id,
-              path: `pricing.charges.${chargeKey}`,
-              message: `No applicable rate snapshot for pair ${sourceCurrency}/${targetCurrency}`,
+              path: `pricing.charges.${effectiveChargeRef}`,
+              message: `strategy: derived but no RatePolicy for pair ${sourceCurrency}/${targetCurrency}`,
             });
+            continue;
           }
-          continue;
+
+          const snapshot = findApplicableSnapshot(graph, sourceCurrency, targetCurrency, buildTime);
+          if (!snapshot) {
+            if (ratePolicy.failure.noAcceptableRate === "block-publication") {
+              errors.push({
+                code: "PBP-DERIVED-PRICE-08",
+                severity: "error",
+                entityId: offering.id,
+                path: `pricing.charges.${effectiveChargeRef}`,
+                message: `No applicable rate snapshot for pair ${sourceCurrency}/${targetCurrency}`,
+              });
+            }
+            continue;
+          }
+
+          const ratePolicyRef = resolveRef(target.ratePolicyRef ?? { ref: ratePolicy.id });
+          const snapshotRef = snapshot.id;
+          const contract = buildConversionContract(
+            ratePolicyRef,
+            snapshotRef,
+            sourceAmount,
+            sourceCurrency,
+            targetCurrency,
+          );
+
+          const result: PbpCurrencyConversionResult = computeCurrencyConversion(
+            graph,
+            contract,
+            buildTime,
+          );
+
+          if (result.status === "failed") {
+            errors.push({
+              code: "PBP-DERIVED-PRICE-CONVERSION",
+              severity: "error",
+              entityId: offering.id,
+              path: `pricing.charges.${effectiveChargeRef}`,
+              message: result.formulaDescription ?? "Currency conversion failed",
+            });
+            continue;
+          }
+
+          if (result.status === "skipped") {
+            continue;
+          }
+
+          if (!result.value || !result.trace) {
+            continue;
+          }
+
+          const postValidationErrors = validateDerivedPrice(
+            result,
+            sourceAmount,
+            offering.id,
+            effectiveChargeRef,
+          );
+          if (postValidationErrors.length > 0) {
+            errors.push(...postValidationErrors);
+            continue;
+          }
+
+          const derivedPrice: PbpMaterializedDerivedPrice = {
+            chargeRef: effectiveChargeRef,
+            targetCurrency,
+            amount: {
+              value: result.value.amount,
+              currency: result.value.currency,
+            },
+            priceKind: "derived",
+            commercialMeaning: "derived-price",
+            derivation: {
+              modelRef: `pbp-derivation:currency-conversion/${contract.implementationVersion}`,
+              modelVersion: contract.implementationVersion,
+              calculatedAt: buildTime,
+            },
+            trace: result.trace,
+            allowedUses: target.currentUses,
+          };
+
+          offeringPrices.push(derivedPrice);
         }
-
-        const ratePolicyRef = resolveRef(target.ratePolicyRef ?? { ref: ratePolicy.id });
-        const snapshotRef = snapshot.id;
-        const contract = buildConversionContract(
-          ratePolicyRef,
-          snapshotRef,
-          sourceAmount,
-          sourceCurrency,
-          targetCurrency,
-        );
-
-        const result: PbpCurrencyConversionResult = computeCurrencyConversion(
-          graph,
-          contract,
-          buildTime,
-        );
-
-        if (result.status === "failed") {
-          errors.push({
-            code: "PBP-DERIVED-PRICE-CONVERSION",
-            severity: "error",
-            entityId: offering.id,
-            path: `pricing.charges.${chargeKey}`,
-            message: result.formulaDescription ?? "Currency conversion failed",
-          });
-          continue;
-        }
-
-        if (result.status === "skipped") {
-          continue;
-        }
-
-        if (!result.value || !result.trace) {
-          continue;
-        }
-
-        const postValidationErrors = validateDerivedPrice(
-          result,
-          sourceAmount,
-          offering.id,
-          chargeKey,
-        );
-        if (postValidationErrors.length > 0) {
-          errors.push(...postValidationErrors);
-          continue;
-        }
-
-        const derivedPrice: PbpMaterializedDerivedPrice = {
-          chargeRef: chargeKey,
-          targetCurrency,
-          amount: {
-            value: result.value.amount,
-            currency: result.value.currency,
-          },
-          priceKind: "derived",
-          commercialMeaning: "derived-price",
-          derivation: {
-            modelRef: `pbp-derivation:currency-conversion/${contract.implementationVersion}`,
-            modelVersion: contract.implementationVersion,
-            calculatedAt: buildTime,
-          },
-          trace: result.trace,
-          allowedUses: target.currentUses,
-        };
-
-        offeringPrices.push(derivedPrice);
       }
     }
 
