@@ -17,6 +17,7 @@ import { defineCollection } from "astro:content";
 import { z } from "zod";
 import { toDataEntryId } from "@warpgogol/share/content";
 import { fsDataCollectionLoader } from "@warpgogol/content-source";
+import { rateSnapshotSchema } from "./schemas/rate-snapshot.js";
 
 /**
  * Pre-configured Astro collection definition for the PBP "business-profile" collection.
@@ -43,5 +44,12 @@ export const pbpCollections = {
     // which dispatch via pbpSchemaById. This avoids a circular dependency
     // between the collection config (evaluated at startup) and the schema map.
     schema: z.object({}).catchall(z.any()),
+  }),
+  "rate-snapshot": defineCollection({
+    loader: fsDataCollectionLoader({
+      base: "src/content/business-profile",
+      generateId: (entry) => toDataEntryId(entry),
+    }),
+    schema: rateSnapshotSchema,
   }),
 };

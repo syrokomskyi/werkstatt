@@ -32,6 +32,7 @@ import { disclosureSchema } from "../disclosure.js";
 import { publicDocumentSchema } from "../public-document.js";
 import { pbpCurrencyPricingPolicySchema } from "../currency-pricing-policy.js";
 import { pbpRatePolicySchema, pbpRateScheduleSchema } from "../rate-policy.js";
+import { rateSnapshotSchema } from "../rate-snapshot.js";
 import { pbpSchemaById } from "../index.js";
 import { pbpSchemaId } from "../../schema-id.js";
 
@@ -874,6 +875,58 @@ describe("pbpRateScheduleSchema", () => {
   });
 });
 
+describe("rateSnapshotSchema", () => {
+  const baseSnapshot = {
+    schema: "pbp/rate-snapshot@1",
+    id: "https://warpgogol.com/id/rate-snapshot/2026-08-07:eur-uah:ecb:46.18",
+    status: "published" as const,
+    type: "rate-snapshot" as const,
+    pair: { sourceCurrency: "EUR", targetCurrency: "UAH" },
+    quotation: { direction: "target-per-source" as const },
+    value: "46.18",
+    source: {
+      kind: "external" as const,
+      sourceContractRef: { ref: "pbp/rate-source@1:ecb" },
+    },
+    observedAt: "2026-08-07T10:00:00+02:00",
+    freshUntil: "2026-09-07T10:00:00+02:00",
+    digest: { algorithm: "sha256", value: "abc123def456" },
+  };
+
+  it("accepts a valid rate-snapshot with external source", () => {
+    expect(rateSnapshotSchema.parse(baseSnapshot)).toMatchObject({
+      value: "46.18",
+    });
+  });
+
+  it("accepts a valid rate-snapshot with business-fixed source", () => {
+    const valid = {
+      ...baseSnapshot,
+      source: {
+        kind: "business-fixed",
+        rateScheduleRef: { ref: "pbp/rate-schedule@1:eur-uah" },
+        rateScheduleEntryKey: "rate-2026-08-07",
+      },
+    };
+    expect(rateSnapshotSchema.parse(valid)).toMatchObject({
+      source: { kind: "business-fixed" },
+    });
+  });
+
+  it("rejects non-decimal value", () => {
+    expect(() => rateSnapshotSchema.parse({ ...baseSnapshot, value: "not-a-number" })).toThrow();
+  });
+
+  it("rejects unknown field (.strict)", () => {
+    expect(() => rateSnapshotSchema.parse({ ...baseSnapshot, extraField: "no" })).toThrow();
+  });
+
+  it("rejects missing digest", () => {
+    const { digest: _omit, ...withoutDigest } = baseSnapshot;
+    expect(() => rateSnapshotSchema.parse(withoutDigest)).toThrow();
+  });
+});
+
 describe("pbpSchemaById registry", () => {
   it("contains all expected schema IDs", () => {
     const expectedIds = [
@@ -904,6 +957,7 @@ describe("pbpSchemaById registry", () => {
       "currency-pricing-policy",
       "rate-policy",
       "rate-schedule",
+      "rate-snapshot",
     ];
     for (const entity of expectedIds) {
       const id = pbpSchemaId(entity);
@@ -911,7 +965,7 @@ describe("pbpSchemaById registry", () => {
     }
   });
 
-  it("has 27 registered schemas", () => {
-    expect(Object.keys(pbpSchemaById)).toHaveLength(27);
+  it("has 28 registered schemas", () => {
+    expect(Object.keys(pbpSchemaById)).toHaveLength(28);
   });
 });

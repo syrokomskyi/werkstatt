@@ -16,6 +16,7 @@ import {
   isPbpRateMode,
   PBP_RATE_DIRECTIONS,
   isPbpRateDirection,
+  RATE_SNAPSHOT_SCHEMA_ID,
 } from "../src/index.js";
 
 describe("RFC-0403: Business", () => {
@@ -105,5 +106,11 @@ describe("RFC-0737: RatePolicy and RateSchedule", () => {
     expect(isPbpRateDirection("target-per-source")).toBe(true);
     expect(isPbpRateDirection("source-per-target")).toBe(true);
     expect(isPbpRateDirection("unknown")).toBe(false);
+  });
+});
+
+describe("RFC-0738: RateSnapshot", () => {
+  it("exports RATE_SNAPSHOT_SCHEMA_ID", () => {
+    expect(RATE_SNAPSHOT_SCHEMA_ID).toBe("pbp/rate-snapshot@1");
   });
 });

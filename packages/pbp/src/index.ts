@@ -567,3 +567,11 @@ export {
   RATE_POLICY_SCHEMA_ID,
   RATE_SCHEDULE_SCHEMA_ID,
 } from "./entities/rate-policy.js";
+
+// RFC-0738: RateSnapshot Entity
+export {
+  type PbpRateSnapshotDigest,
+  type PbpRateSnapshotSource,
+  type PbpRateSnapshot,
+  RATE_SNAPSHOT_SCHEMA_ID,
+} from "./entities/rate-snapshot.js";
