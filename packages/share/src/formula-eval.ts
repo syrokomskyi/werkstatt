@@ -14,11 +14,12 @@ plugin-registration formatter registry, and money formatter built on Intl.Number
   <item>RFC-0570: Initial implementation of formula evaluation for content references.</item>
   <item>RFC-0729: Add pipe syntax for post-evaluation formatting, formatter registry, and money formatter.</item>
   <item>RFC-0730: Add formatRecurrence utility for ISO 8601 duration → locale-specific suffix mapping.</item>
+  <item>RFC-0731: Add sourceRef optional parameter for this. self-reference expansion in formulas.</item>
 </CHANGE_SUMMARY>
 */
 
 import { Parser } from "expr-eval";
-import type { ContentRefIndex } from "./content-reference.ts";
+import type { ContentRefIndex, SourceRef } from "./content-reference.ts";
 import { resolveReference } from "./content-reference.ts";
 
 export interface FormulaResolution {
@@ -78,6 +79,8 @@ registerPipeFormatter("money", (value, params, context) => {
 const parser = new Parser();
 
 const REF_IN_FORMULA_PATTERN = /[a-z][a-z-]*\.[a-z0-9-/]+\.[a-zA-Z0-9_.-]+/g;
+const THIS_IN_FORMULA_PATTERN = /this\.[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*/g;
+const THIS_PREFIX = "this.";
 
 const FORMULA_PREFIX = "=(";
 
@@ -196,18 +199,35 @@ export function resolveFormula(
   expression: string,
   lang: string,
   defaultLang: string,
+  sourceRef?: SourceRef,
 ): FormulaResolution {
   const pipeIndex = expression.indexOf("|");
   const hasPipe = pipeIndex !== -1;
   const arithmeticExpr = hasPipe ? expression.slice(0, pipeIndex) : expression;
   const formatterSpec = hasPipe ? expression.slice(pipeIndex + 1) : "";
 
+  // RFC-0731: Expand this. references before REF_IN_FORMULA_PATTERN matching
+  let expandedArithmeticExpr = arithmeticExpr;
+  if (sourceRef && arithmeticExpr.includes(THIS_PREFIX)) {
+    const thisPattern = new RegExp(THIS_IN_FORMULA_PATTERN.source, "g");
+    expandedArithmeticExpr = expandedArithmeticExpr.replace(thisPattern, (match) => {
+      const fieldPath = match.slice(THIS_PREFIX.length);
+      return `${sourceRef.collection}.${sourceRef.file}.${fieldPath}`;
+    });
+  } else if (!sourceRef && arithmeticExpr.includes(THIS_PREFIX)) {
+    return {
+      value: "",
+      resolved: false,
+      error: `REF-12: this. reference used without sourceRef context`,
+    };
+  }
+
   // Find all content references in the arithmetic expression
   const refs: string[] = [];
   const refPattern = new RegExp(REF_IN_FORMULA_PATTERN.source, "g");
   let match: RegExpExecArray | null;
 
-  while ((match = refPattern.exec(arithmeticExpr)) !== null) {
+  while ((match = refPattern.exec(expandedArithmeticExpr)) !== null) {
     const candidate = match[0];
     const collectionMatch = candidate.match(/^([a-z][a-z-]*)\./);
     if (!collectionMatch) continue;
@@ -217,7 +237,7 @@ export function resolveFormula(
   }
 
   // Resolve each reference and extract numeric value
-  let substitutedExpression = arithmeticExpr;
+  let substitutedExpression = expandedArithmeticExpr;
 
   for (const ref of refs) {
     const result = resolveReference(index, ref, lang, defaultLang);
@@ -233,7 +253,7 @@ export function resolveFormula(
     if (numeric === null) {
       // RFC-0723: If the expression is a single reference (no arithmetic, no pipe),
       // return the string value directly — enables =(ref) for string interpolation.
-      if (!hasPipe && refs.length === 1 && arithmeticExpr.trim() === ref) {
+      if (!hasPipe && refs.length === 1 && expandedArithmeticExpr.trim() === ref) {
         return {
           value: String(result.value),
           resolved: true,

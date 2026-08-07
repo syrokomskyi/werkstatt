@@ -15,6 +15,9 @@ and resolves braceless collection.file.field references without astro:content (R
         substituteContentReferencesInData with loadContentRefIndex, resolveReference,
         resolveReferencesInString, resolveReferencesDeep.</item>
   <item>RFC-0602: allow null generatedAt in ContentRefIndex for timestamp determinism.</item>
+  <item>RFC-0731: Add SourceRef type and sourceRef optional parameter for this. self-reference syntax.
+        this. is expanded to collection.file. before pattern matching. REF-12 for missing sourceRef,
+        REF-13 for unresolvable field after expansion.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -37,6 +40,11 @@ export interface ResolveReferenceResult {
   error?: string;
 }
 
+export interface SourceRef {
+  collection: string;
+  file: string;
+}
+
 const REF_PATTERN = /^([a-z][a-z-]*)\.([a-z0-9-/]+)\.(.+)$/;
 const FIELD_PATH_PATTERN = /[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*/;
 const PURE_REF_PATTERN = new RegExp(`^[a-z][a-z-]*\\.[a-z0-9-/]+\\.${FIELD_PATH_PATTERN.source}$`);
@@ -44,7 +52,16 @@ const BRACELESS_SCAN_PATTERN = new RegExp(
   `[a-z][a-z-]*\\.[a-z0-9-/]+\\.${FIELD_PATH_PATTERN.source}`,
   "g",
 );
+const THIS_PREFIX = "this.";
+const THIS_SCAN_PATTERN = new RegExp(`this\\.${FIELD_PATH_PATTERN.source}`, "g");
 const DEFAULT_INDEX_PATH = "src/content-ref-index.generated.yaml";
+
+function expandThisRef(ref: string, sourceRef?: SourceRef): string | null {
+  if (!ref.startsWith(THIS_PREFIX)) return null;
+  if (!sourceRef) return null;
+  const fieldPath = ref.slice(THIS_PREFIX.length);
+  return `${sourceRef.collection}.${sourceRef.file}.${fieldPath}`;
+}
 
 export const EMPTY_CONTENT_REF_INDEX: ContentRefIndex = {
   version: 1,
@@ -84,8 +101,30 @@ export function resolveReference(
   ref: string,
   lang: string,
   defaultLang: string,
+  sourceRef?: SourceRef,
 ): ResolveReferenceResult {
-  const match = ref.match(REF_PATTERN);
+  // RFC-0731: Expand this. prefix before pattern matching
+  let effectiveRef = ref;
+  if (ref.startsWith(THIS_PREFIX)) {
+    if (!sourceRef) {
+      return {
+        value: undefined,
+        resolved: false,
+        error: `REF-12: this. reference used without sourceRef context`,
+      };
+    }
+    const expanded = expandThisRef(ref, sourceRef);
+    if (!expanded) {
+      return {
+        value: undefined,
+        resolved: false,
+        error: `REF-12: this. reference used without sourceRef context`,
+      };
+    }
+    effectiveRef = expanded;
+  }
+
+  const match = effectiveRef.match(REF_PATTERN);
   if (!match) {
     return { value: undefined, resolved: false, error: `Invalid reference syntax: ${ref}` };
   }
@@ -136,6 +175,14 @@ export function resolveReference(
         }
       }
     }
+    // RFC-0731: If this was a this. reference, report REF-13 instead of REF-03
+    if (ref.startsWith(THIS_PREFIX)) {
+      return {
+        value: undefined,
+        resolved: false,
+        error: `REF-13: this.${fieldPathStr} unresolved — field "${missingField ?? fieldPath[fieldPath.length - 1]}" not found in ${sourceRef?.collection}.${sourceRef?.file}`,
+      };
+    }
     return {
       value: undefined,
       resolved: false,
@@ -151,7 +198,25 @@ export function resolveReferencesInString(
   text: string,
   lang: string,
   defaultLang: string,
+  sourceRef?: SourceRef,
 ): string {
+  // RFC-0731: Check for this. as a pure reference (entire text is this.field.path)
+  if (
+    sourceRef &&
+    text.startsWith(THIS_PREFIX) &&
+    THIS_SCAN_PATTERN.test(text) &&
+    text.trim() === text.trim()
+  ) {
+    const expanded = expandThisRef(text.trim(), sourceRef);
+    if (expanded) {
+      const result = resolveReference(index, expanded, lang, defaultLang);
+      if (result.resolved) {
+        return formatValue(result.value);
+      }
+    }
+  }
+  THIS_SCAN_PATTERN.lastIndex = 0;
+
   if (PURE_REF_PATTERN.test(text)) {
     const result = resolveReference(index, text, lang, defaultLang);
     if (result.resolved) {
@@ -167,7 +232,7 @@ export function resolveReferencesInString(
     // Process formulas in reverse order to preserve indices
     for (let i = formulas.length - 1; i >= 0; i--) {
       const { start, end, expression } = formulas[i];
-      const result = resolveFormula(index, expression, lang, defaultLang);
+      const result = resolveFormula(index, expression, lang, defaultLang, sourceRef);
       const replacement = result.resolved ? result.value : "";
       formulaResult = formulaResult.slice(0, start) + replacement + formulaResult.slice(end);
     }
@@ -190,13 +255,38 @@ export function resolveReferencesInString(
     const collection = collectionMatch[1];
     if (!index.entries[collection]) continue;
 
-    const resolved = resolveReference(index, candidate, lang, defaultLang);
+    const resolved = resolveReference(index, candidate, lang, defaultLang, sourceRef);
     if (resolved.resolved) {
       replacements.push({
         start: match.index,
         end: match.index + candidate.length,
         resolved: formatValue(resolved.value),
       });
+    }
+  }
+
+  // RFC-0731: Scan for this. references in mixed strings
+  if (sourceRef) {
+    const thisPattern = new RegExp(THIS_SCAN_PATTERN.source, "g");
+    let thisMatch: RegExpExecArray | null;
+    while ((thisMatch = thisPattern.exec(formulaResult)) !== null) {
+      const candidate = thisMatch[0];
+      const expanded = expandThisRef(candidate, sourceRef);
+      if (!expanded) continue;
+      const resolved = resolveReference(index, expanded, lang, defaultLang);
+      if (resolved.resolved) {
+        // Check for overlap with existing replacements
+        const thisStart = thisMatch.index;
+        const thisEnd = thisStart + candidate.length;
+        const overlaps = replacements.some((r) => thisStart < r.end && thisEnd > r.start);
+        if (!overlaps) {
+          replacements.push({
+            start: thisStart,
+            end: thisEnd,
+            resolved: formatValue(resolved.value),
+          });
+        }
+      }
     }
   }
 
@@ -213,9 +303,10 @@ export async function resolveReferencesDeep(
   data: unknown,
   lang: string,
   defaultLang: string,
+  sourceRef?: SourceRef,
 ): Promise<unknown> {
   return substituteRefsDeep(data, (value) =>
-    Promise.resolve(resolveReferencesInString(index, value, lang, defaultLang)),
+    Promise.resolve(resolveReferencesInString(index, value, lang, defaultLang, sourceRef)),
   );
 }
 
