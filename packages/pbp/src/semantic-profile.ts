@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0469 — PBP semantic profile adapter for warpgogol-com cutover.</item>
+  <item>RFC-0743: added loadTargetCurrencies — extracts target currencies from CurrencyPricingPolicy, compiler errors propagate (review fix E-1).</item>
 </CHANGE_SUMMARY>
 */
 
