@@ -324,18 +324,18 @@ N/A — library-only.
 
 ## Acceptance criteria
 
-- [ ] `PbpRateSnapshot` interface exported from `@warpgogol/pbp`
-- [ ] `PbpRateSnapshotDigest` interface exported
-- [ ] `PbpRateSnapshotSource` interface exported
-- [ ] `RATE_SNAPSHOT_SCHEMA_ID` constant exported (via `pbpSchemaId`)
-- [ ] `rateSnapshotSchema` Zod schema exported from `@warpgogol/pbp/schemas`
-- [ ] `rateSnapshotSchema` registered in `pbpSchemaById` and `pbpEntityDiscriminatedUnion`
-- [ ] `rate-snapshot` Astro collection added to `pbpCollections`
-- [ ] `packages/pbp/AGENTS.md` updated with new exports
-- [ ] Unit tests: schema validation (valid/invalid snapshots), digest computation, ID convention
-- [ ] `tsc --noEmit` passes for `packages/pbp/`
-- [ ] `vitest run` passes for `packages/pbp/`
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpRateSnapshot` interface exported from `@warpgogol/pbp` (evidence: packages/pbp/src/index.ts:575, dde4dd78)
+- [x] `PbpRateSnapshotDigest` interface exported (evidence: packages/pbp/src/index.ts:573, dde4dd78)
+- [x] `PbpRateSnapshotSource` interface exported (evidence: packages/pbp/src/index.ts:574, dde4dd78)
+- [x] `RATE_SNAPSHOT_SCHEMA_ID` constant exported (via `pbpSchemaId`) (evidence: packages/pbp/src/index.ts:576, dde4dd78)
+- [x] `rateSnapshotSchema` Zod schema exported from `@warpgogol/pbp/schemas` (evidence: packages/pbp/src/schemas/index.ts:82-86, dde4dd78)
+- [x] `rateSnapshotSchema` registered in `pbpSchemaById` and `pbpEntityDiscriminatedUnion` (evidence: packages/pbp/src/schemas/index.ts:152,187, dde4dd78)
+- [x] `rate-snapshot` Astro collection added to `pbpCollections` (evidence: packages/pbp/src/astro.ts:48-54, dde4dd78)
+- [x] `packages/pbp/AGENTS.md` updated with new exports (evidence: packages/pbp/AGENTS.md:123, 459a709b)
+- [x] Unit tests: schema validation (valid/invalid snapshots), digest computation, ID convention (evidence: packages/pbp/src/schemas/**tests**/golden-fixtures.test.ts:878-932, packages/pbp/tests/entities.test.ts:112-116, dde4dd78)
+- [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run build:check exit 0)
+- [x] `vitest run` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run test — 13 test files pass, 1 pre-existing failure in rfc-0468 unrelated to RFC-0738)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0738 exit 0)
 
 ## Implementation notes for agents
 
