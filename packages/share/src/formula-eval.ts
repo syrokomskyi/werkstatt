@@ -2,15 +2,17 @@
 <MODULE_CONTRACT>
 <purpose>RFC-0570 formula evaluation module — extracts numeric values from field strings,
 scans text for =(...) formula expressions, and evaluates arithmetic over content references
-using a sandboxed math parser (expr-eval).</purpose>
+using a sandboxed math parser (expr-eval). RFC-0729: pipe syntax for post-evaluation formatting,
+plugin-registration formatter registry, and money formatter built on Intl.NumberFormat.</purpose>
 <non-goals>
   <item>Do not resolve content references directly — use resolveReference from @warpgogol/share/content-reference.</item>
-  <item>Do not format results with locale-specific thousands separators — formula output is a bare number.</item>
   <item>Do not support non-arithmetic expressions (string concatenation, conditionals, date math).</item>
+  <item>Do not add formatters other than money — date, percent, unit formatters are follow-up RFCs.</item>
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>RFC-0570: Initial implementation of formula evaluation for content references.</item>
+  <item>RFC-0729: Add pipe syntax for post-evaluation formatting, formatter registry, and money formatter.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -29,6 +31,48 @@ export interface FormulaMatch {
   end: number;
   expression: string;
 }
+
+export type PipeFormatter = (
+  value: number,
+  params: Record<string, string>,
+  context: PipeFormatterContext,
+) => string;
+
+export interface PipeFormatterContext {
+  lang: string;
+  defaultLang: string;
+}
+
+const pipeFormatterRegistry = new Map<string, PipeFormatter>();
+
+export function registerPipeFormatter(name: string, formatter: PipeFormatter): void {
+  pipeFormatterRegistry.set(name, formatter);
+}
+
+export function getPipeFormatter(name: string): PipeFormatter | undefined {
+  return pipeFormatterRegistry.get(name);
+}
+
+registerPipeFormatter("money", (value, params, context) => {
+  const currency = params.currency ?? "EUR";
+  const locale = params.locale ?? context.lang;
+  const targetCurrency = params.targetCurrency;
+  const rate = params.rate ? Number(params.rate) : undefined;
+
+  let amount = value;
+  let code = currency;
+  if (targetCurrency && rate !== undefined && Number.isFinite(rate)) {
+    amount = value * rate;
+    code = targetCurrency;
+  }
+
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: code,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
+});
 
 const parser = new Parser();
 
@@ -143,7 +187,8 @@ export function scanFormulas(text: string): FormulaMatch[] {
 /**
  * Evaluates a formula expression after substituting all content references.
  * Uses expr-eval for sandboxed arithmetic.
- * Returns { value, resolved, error? } with REF-06..09 error codes.
+ * RFC-0729: Supports pipe syntax `arithmetic | formatter key=value` for post-evaluation formatting.
+ * Returns { value, resolved, error? } with REF-06..10 error codes.
  */
 export function resolveFormula(
   index: ContentRefIndex,
@@ -151,12 +196,17 @@ export function resolveFormula(
   lang: string,
   defaultLang: string,
 ): FormulaResolution {
-  // Find all content references in the expression
+  const pipeIndex = expression.indexOf("|");
+  const hasPipe = pipeIndex !== -1;
+  const arithmeticExpr = hasPipe ? expression.slice(0, pipeIndex) : expression;
+  const formatterSpec = hasPipe ? expression.slice(pipeIndex + 1) : "";
+
+  // Find all content references in the arithmetic expression
   const refs: string[] = [];
   const refPattern = new RegExp(REF_IN_FORMULA_PATTERN.source, "g");
   let match: RegExpExecArray | null;
 
-  while ((match = refPattern.exec(expression)) !== null) {
+  while ((match = refPattern.exec(arithmeticExpr)) !== null) {
     const candidate = match[0];
     const collectionMatch = candidate.match(/^([a-z][a-z-]*)\./);
     if (!collectionMatch) continue;
@@ -166,7 +216,7 @@ export function resolveFormula(
   }
 
   // Resolve each reference and extract numeric value
-  let substitutedExpression = expression;
+  let substitutedExpression = arithmeticExpr;
 
   for (const ref of refs) {
     const result = resolveReference(index, ref, lang, defaultLang);
@@ -180,9 +230,9 @@ export function resolveFormula(
 
     const numeric = extractNumeric(result.value);
     if (numeric === null) {
-      // RFC-0723: If the expression is a single reference (no arithmetic),
+      // RFC-0723: If the expression is a single reference (no arithmetic, no pipe),
       // return the string value directly — enables =(ref) for string interpolation.
-      if (refs.length === 1 && expression.trim() === ref) {
+      if (!hasPipe && refs.length === 1 && arithmeticExpr.trim() === ref) {
         return {
           value: String(result.value),
           resolved: true,
@@ -219,8 +269,42 @@ export function resolveFormula(
       };
     }
 
+    // No pipe — return numeric string as before (RFC-0570, RFC-0723)
+    if (!hasPipe) {
+      return {
+        value: String(result),
+        resolved: true,
+      };
+    }
+
+    // RFC-0729: Apply pipe formatter
+    const specTokens = formatterSpec
+      .trim()
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
+    const formatterName = specTokens[0] ?? "";
+    const formatter = getPipeFormatter(formatterName);
+    if (!formatter) {
+      return {
+        value: "",
+        resolved: false,
+        error: `REF-10: Unknown pipe formatter: ${formatterName}`,
+      };
+    }
+
+    const params: Record<string, string> = {};
+    for (const token of specTokens.slice(1)) {
+      const eqIndex = token.indexOf("=");
+      if (eqIndex > 0) {
+        params[token.slice(0, eqIndex)] = token.slice(eqIndex + 1);
+      }
+    }
+
+    const context: PipeFormatterContext = { lang, defaultLang };
+    const formatted = formatter(result, params, context);
+
     return {
-      value: String(result),
+      value: formatted,
       resolved: true,
     };
   } catch (err) {
