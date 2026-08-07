@@ -426,6 +426,8 @@ export interface ExecuteKernelPipelineOptions {
   siteWorkspace?: DiscoveredSiteWorkspace;
   /** RFC-0686: maximum number of steps to run concurrently. Default: Math.min(os.availableParallelism(), 8). When 1, full sequential mode (ignores dependsOn, abort-on-failure). */
   concurrency?: number;
+  /** RFC-0732: pipeline-level flags merged into each step's KernelCommandInput.flags. Step-level flags take precedence. */
+  flags?: Record<string, unknown>;
 }
 
 export interface SiteWorkspacesListResult {

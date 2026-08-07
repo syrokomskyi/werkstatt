@@ -69,6 +69,22 @@ import { buildSchedule, executeScheduledSteps, type ScheduledStep } from "./pipe
 
 const PIPELINE_TIMING_SUMMARY_THRESHOLD_MS = 30_000;
 
+// RFC-0732: convert pipeline-level flags record to CLI args for step execution.
+function pipelineFlagsToArgs(flags: Record<string, unknown> | undefined): string[] {
+  if (!flags) return [];
+  const args: string[] = [];
+  for (const [key, value] of Object.entries(flags)) {
+    if (value === true) {
+      args.push(`--${key}`);
+    } else if (value === false || value === null || value === undefined) {
+      // Skip false/null/undefined flags
+    } else {
+      args.push(`--${key}`, String(value));
+    }
+  }
+  return args;
+}
+
 function progressLine(message: string): void {
   process.stderr.write(`${message}\n`);
 }
@@ -672,7 +688,7 @@ async function executePipelineForSite(
           } else {
             // Inject --site for workspace-scoped commands so they receive the site
             // name from the pipeline context (mirrors executeKernelCommand logic).
-            const stepArgs = [...(step.args ?? [])];
+            const stepArgs = [...(step.args ?? []), ...pipelineFlagsToArgs(options.flags)];
             if (command.scope === "workspace" && !stepArgs.includes("--site") && site.name) {
               stepArgs.push("--site", site.name);
             }
@@ -898,10 +914,15 @@ async function executePipelineForWorkspace(
             // RFC-0687: track cache hits for transitive skip.
             runState.cacheHitCommands.add(step.command);
           } else {
-            report = await executeRegisteredCommand(command, context, step.args ?? [], {
-              timeoutMs: step.timeoutMs,
-              expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,
-            });
+            report = await executeRegisteredCommand(
+              command,
+              context,
+              [...(step.args ?? []), ...pipelineFlagsToArgs(options.flags)],
+              {
+                timeoutMs: step.timeoutMs,
+                expectedDurationMs: budgetedExpectedDurationMs ?? step.expectedDurationMs,
+              },
+            );
             // RFC-0390: store successful results in cache.
             await tryCacheWrite(
               cache,
@@ -1011,6 +1032,7 @@ const EXECUTE_KERNEL_PIPELINE_OPTION_KEYS = [
   "outputFormat",
   "siteWorkspace",
   "concurrency",
+  "flags",
 ];
 
 export async function executeKernelPipeline(
