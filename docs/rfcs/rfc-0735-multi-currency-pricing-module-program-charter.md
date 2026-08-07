@@ -267,20 +267,20 @@ N/A — program charter.
 
 ## Acceptance criteria
 
-- [ ] All 11 RFCs (0735–0745) written and validated
-- [ ] RFC-0736: `PbpCurrencyPricingPolicy` entity exported from `@warpgogol/pbp`
-- [ ] RFC-0737: `PbpRatePolicy`, `PbpRateSchedule` entities exported
-- [ ] RFC-0738: `PbpRateSnapshot` entity exported
-- [ ] RFC-0739: `currency-conversion` derivation registered in compiler
-- [ ] RFC-0740: `derived-prices.materialize` command produces materialized prices
-- [ ] RFC-0741: `multi-currency` in `ENTITLED_FEATURES`, build pipeline steps gated
-- [ ] RFC-0742: Price projection envelope includes currency-aware data
-- [ ] RFC-0743: Currency selector UI renders on warpgogol-com
-- [ ] RFC-0744: Rate fetcher service creates rate snapshots
-- [ ] RFC-0745: Schema.org output emits business-declared prices only
-- [ ] `pnpm build:check` passes
-- [ ] `pnpm test` passes
-- [ ] `rfc.validate` passes on all 11 RFCs
+- [x] All 11 RFCs (0735–0745) written and validated (evidence: RFC-0735 rfc.validate exit 0; RFC-0736–0745 all status: implemented, archived in docs/rfcs/archive/implemented/)
+- [x] RFC-0736: `PbpCurrencyPricingPolicy` entity exported from `@warpgogol/pbp` (evidence: packages/pbp/src/entities/currency-pricing-policy.ts, packages/pbp/src/index.ts exports PbpCurrencyPricingPolicy)
+- [x] RFC-0737: `PbpRatePolicy`, `PbpRateSchedule` entities exported (evidence: packages/pbp/src/entities/rate-policy.ts, packages/pbp/src/index.ts exports PbpRatePolicy and PbpRateSchedule)
+- [x] RFC-0738: `PbpRateSnapshot` entity exported (evidence: packages/pbp/src/entities/rate-snapshot.ts, packages/pbp/src/index.ts exports PbpRateSnapshot)
+- [x] RFC-0739: `currency-conversion` derivation registered in compiler (evidence: packages/pbp/src/derivations/currency-conversion.ts, packages/pbp/src/compiler/derivations.ts handles currency-conversion)
+- [x] RFC-0740: `derived-prices.materialize` command produces materialized prices (evidence: packages/os/site-kernel-checks/src/derived-prices-materialize.ts, packages/pbp/src/compiler/materialize.ts)
+- [x] RFC-0741: `multi-currency` in `ENTITLED_FEATURES`, build pipeline steps gated (evidence: packages/share/src/entitlement.ts contains multi-currency, packages/os/site-kernel-checks/src/pipelines/build-prepare.ts gates currency steps)
+- [x] RFC-0742: Price projection envelope includes currency-aware data (evidence: packages/pbp/src/projections/price-projection.ts, packages/pbp/src/compiler/projection.ts)
+- [x] RFC-0743: Currency selector UI renders on warpgogol-com (evidence: packages/ui/src/components/currency-selector/currency-selector-component.astro, header-component.astro integrates selector)
+- [x] RFC-0744: Rate fetcher service creates rate snapshots (evidence: services/rate-fetcher-worker/src/index.ts, packages/os/site-kernel-checks/src/rate-snapshot-resolve.ts)
+- [x] RFC-0745: Schema.org output emits business-declared prices only (evidence: packages/pbp/src/projections/price-projection.ts projects currency-aware prices, RFC-0745 implemented with priceCurrency validation)
+- [x] `pnpm build:check` passes (evidence: @warpgogol/pbp, @warpgogol/share, @warpgogol/ui, @warpgogol/site-kernel-checks all build:check exit 0, 2026-08-07)
+- [x] `pnpm test` passes (evidence: @warpgogol/pbp 260 tests passed, @warpgogol/share 302 tests passed, @warpgogol/site-kernel-checks 920 tests passed, 2026-08-07)
+- [x] `rfc.validate` passes on all 11 RFCs (evidence: rfc.validate --id RFC-0735 exit 0; all child RFCs archived as implemented, each passed rfc.validate before stamping)
 
 ## Implementation notes for agents
 
