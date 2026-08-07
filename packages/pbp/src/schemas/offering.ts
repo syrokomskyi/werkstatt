@@ -6,6 +6,7 @@
   <item>Established by RFC-0466 — Zod schema for PbpOffering.</item>
   <item>RFC-0482 — added optional `presentation` field for legacy business data migration.</item>
   <item>RFC-0728 — enforce `pbpChargeSchema` on `pricing.charges` (replaced `z.unknown()`).</item>
+  <item>RFC-0730 — removed `presentation` field entirely; added `guarantees` field; extended `pbpRelatedOfferingSchema` with `label`/`description` display fields.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -32,10 +33,17 @@ const pbpAllowanceSchema = z.object({
   overageChargeRef: nonEmptyString.optional(),
 });
 
+const pbpGuaranteeItemSchema = z.object({
+  label: nonEmptyString,
+  detail: nonEmptyString,
+});
+
 const pbpRelatedOfferingSchema = z.object({
   relation: pbpOfferingRelationSchema,
   offeringRef: pbpEntityRefSchema,
   acquisition: pbpOfferingAcquisitionSchema.optional(),
+  label: nonEmptyString.optional(),
+  description: nonEmptyString.optional(),
 });
 
 const pbpPricingSchema = z.object({
@@ -91,6 +99,6 @@ export const offeringSchema = pbpEntitySchema
     policyRefs: z.record(z.string(), pbpEntityRefSchema).optional(),
     relatedOfferings: z.record(z.string(), pbpRelatedOfferingSchema).optional(),
     limitations: z.record(z.string(), z.unknown()).optional(),
-    presentation: z.record(z.string(), z.unknown()).optional(),
+    guarantees: z.record(z.string(), pbpGuaranteeItemSchema).optional(),
   })
   .strict();

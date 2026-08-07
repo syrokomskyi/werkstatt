@@ -292,7 +292,7 @@ describe("offeringSchema", () => {
     expect(offeringSchema.parse(valid)).toMatchObject({ name: "SEO Audit Standard" });
   });
 
-  it("accepts presentation field with price labels (RFC-0482)", () => {
+  it("rejects presentation field on offering (RFC-0730)", () => {
     const valid = {
       schema: "pbp/offering@1",
       id: "warpgogol-seo-audit-offering",
@@ -303,15 +303,13 @@ describe("offeringSchema", () => {
       availability: { mode: "declared" },
       pricing: { currency: "EUR" },
       presentation: {
-        price: { monthly: "70 € / Monat", yearly: "700 € / Jahr" },
+        price: { monthly: "70 \u20ac / Monat", yearly: "700 \u20ac / Jahr" },
       },
     };
-    expect(offeringSchema.parse(valid)).toMatchObject({
-      presentation: { price: { monthly: "70 € / Monat" } },
-    });
+    expect(() => offeringSchema.parse(valid)).toThrow();
   });
 
-  it("rejects null presentation on offering (RFC-0482)", () => {
+  it("rejects null presentation on offering (RFC-0730)", () => {
     expect(() =>
       offeringSchema.parse({
         schema: "pbp/offering@1",
