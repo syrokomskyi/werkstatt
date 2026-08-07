@@ -121,6 +121,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 - `PbpCurrencyPricingPolicy`, `PbpCurrencyStrategy`, `PbpCurrentUses`, `PbpCurrencyTarget`, `CURRENCY_PRICING_POLICY_SCHEMA_ID` — business-level currency strategy entity (RFC-0736)
 - `PbpRatePolicy`, `PbpRateSchedule`, `PbpRateMode`, `PbpRateDirection`, `PbpCurrencyPair`, `PbpQuotation`, `PbpRateScheduleEntry`, `RATE_POLICY_SCHEMA_ID`, `RATE_SCHEDULE_SCHEMA_ID` — rate source and schedule entities (RFC-0737)
 - `PbpRateSnapshot`, `PbpRateSnapshotDigest`, `PbpRateSnapshotSource`, `RATE_SNAPSHOT_SCHEMA_ID` — immutable rate observation entity (RFC-0738)
+- `PbpRateSource`, `RATE_SOURCE_SCHEMA_ID` — rate source configuration entity for external rate fetching (RFC-0744)
 - `PbpCurrencyConversionDerivation`, `PbpCurrencyConversionResult`, `PbpPriceDerivationPipeline`, `PbpRoundingMode`, `PbpPriceEndingMode`, `PbpCurrencyConversionTrace`, `computeCurrencyConversion` — currency conversion derivation contract (RFC-0739)
 - `decimalMultiply`, `decimalAdd`, `decimalSubtract`, `decimalDivide`, `decimalRound` — decimal arithmetic helpers using big.js (RFC-0739)
 - `PbpMaterializedDerivedPrice`, `PbpPriceKind`, `PbpCommercialMeaning`, `PBP_PRICE_KINDS`, `PBP_COMMERCIAL_MEANINGS`, `isPbpPriceKind`, `isPbpCommercialMeaning` — materialized derived price type and closed unions (RFC-0740)
