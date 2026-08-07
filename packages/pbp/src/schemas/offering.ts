@@ -5,6 +5,7 @@
 <CHANGE_SUMMARY>
   <item>Established by RFC-0466 — Zod schema for PbpOffering.</item>
   <item>RFC-0482 — added optional `presentation` field for legacy business data migration.</item>
+  <item>RFC-0728 — enforce `pbpChargeSchema` on `pricing.charges` (replaced `z.unknown()`).</item>
 </CHANGE_SUMMARY>
 */
 
@@ -12,6 +13,7 @@ import { z } from "zod";
 import { pbpEntitySchema } from "./envelope.js";
 import { pbpEntityRefSchema } from "./entity-ref.js";
 import { nonEmptyString } from "./primitives.js";
+import { pbpChargeSchema } from "./pricing.js";
 
 const pbpAvailabilityModeSchema = z.enum(["declared", "on-request", "unavailable"]);
 const pbpOfferingRelationSchema = z.enum([
@@ -39,7 +41,7 @@ const pbpRelatedOfferingSchema = z.object({
 const pbpPricingSchema = z.object({
   currency: nonEmptyString,
   tax: z.record(z.string(), z.unknown()).optional(),
-  charges: z.record(z.string(), z.unknown()).optional(),
+  charges: z.record(z.string(), pbpChargeSchema).optional(),
   plans: z.record(z.string(), z.unknown()).optional(),
   adjustments: z.record(z.string(), z.unknown()).optional(),
 });
