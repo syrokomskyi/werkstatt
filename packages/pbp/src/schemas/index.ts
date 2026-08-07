@@ -84,6 +84,7 @@ export {
   pbpRateSnapshotDigestSchema,
   pbpRateSnapshotSourceSchema,
 } from "./rate-snapshot.js";
+export { pbpRateSourceSchema } from "./rate-source.js";
 
 // ---------------------------------------------------------------------------
 // pbpSchemaById registry — maps schema ID strings to their Zod schemas
@@ -118,6 +119,7 @@ import {
   pbpRateScheduleSchema as _rateSchedule,
 } from "./rate-policy.js";
 import { rateSnapshotSchema as _rateSnapshot } from "./rate-snapshot.js";
+import { pbpRateSourceSchema as _rateSource } from "./rate-source.js";
 
 import { pbpSchemaId } from "../schema-id.js";
 
@@ -150,6 +152,7 @@ export const pbpSchemaById: Record<string, z.ZodType> = {
   [pbpSchemaId("rate-policy")]: _ratePolicy,
   [pbpSchemaId("rate-schedule")]: _rateSchedule,
   [pbpSchemaId("rate-snapshot")]: _rateSnapshot,
+  [pbpSchemaId("rate-source")]: _rateSource,
 };
 
 // ---------------------------------------------------------------------------
@@ -185,4 +188,5 @@ export const pbpEntityDiscriminatedUnion = z.discriminatedUnion("schema", [
   _ratePolicy,
   _rateSchedule,
   _rateSnapshot,
+  _rateSource,
 ]);

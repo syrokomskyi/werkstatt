@@ -576,6 +576,9 @@ export {
   RATE_SNAPSHOT_SCHEMA_ID,
 } from "./entities/rate-snapshot.js";
 
+// RFC-0744: RateSource Entity
+export { type PbpRateSource, RATE_SOURCE_SCHEMA_ID } from "./entities/rate-source.js";
+
 // RFC-0739: Currency Conversion Derivation Contract
 export {
   type PbpRoundingMode,
