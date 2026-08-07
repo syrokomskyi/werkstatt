@@ -9,8 +9,8 @@ systems:
         storageType: bare
       - path: git@github.com:syrokomskyi/warpgogol-com.git
         storageType: bare
-    pinnedPlatform: 4.17.57
-    currentMission: warpgogol-com-m000035
+    pinnedPlatform: 4.34.2
+    currentMission: null
     lastRelease: warpgogol-com-r000013
     status: active
     registeredAt: 2026-07-13T00:00:00.000Z
