@@ -958,6 +958,7 @@ describe("pbpSchemaById registry", () => {
       "rate-policy",
       "rate-schedule",
       "rate-snapshot",
+      "rate-source",
     ];
     for (const entity of expectedIds) {
       const id = pbpSchemaId(entity);
@@ -965,7 +966,7 @@ describe("pbpSchemaById registry", () => {
     }
   });
 
-  it("has 28 registered schemas", () => {
-    expect(Object.keys(pbpSchemaById)).toHaveLength(28);
+  it("has 29 registered schemas", () => {
+    expect(Object.keys(pbpSchemaById)).toHaveLength(29);
   });
 });
