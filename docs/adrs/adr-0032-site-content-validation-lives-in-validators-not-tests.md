@@ -1,12 +1,12 @@
 ---
 id: ADR-0032
 title: "Site content validation lives in site-kernel-checks validators, not in shared package tests"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
-implementedAt:
+implementedAt: 2026-08-07
 closedAt:
 supersedes: []
 supersededBy:
