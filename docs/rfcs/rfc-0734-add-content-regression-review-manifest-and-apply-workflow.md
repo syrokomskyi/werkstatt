@@ -1,7 +1,7 @@
 ---
 id: RFC-0734
 title: "Add content regression review manifest and apply workflow"
-status: draft
+status: accepted
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
