@@ -20,6 +20,7 @@ import {
   resolveEffectsForTarget,
   resolveSectionAnchor,
 } from "@warpgogol/share";
+import { formatRecurrence } from "@warpgogol/share/formula-eval";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import EffectHost from "../../components/effects/effect-host.astro";
@@ -59,6 +60,28 @@ const resolvedIncludes = await Promise.all(
     return { text: item.text, Icon, iconConfig: item.icon };
   }),
 );
+
+function formatPrice(
+  prop: { amount?: string; currency?: string; recurrence?: string } | undefined,
+  lang: string,
+): string {
+  if (!prop || !prop.amount || prop.amount.trim() === "") return "";
+  const numericAmount = Number(prop.amount);
+  if (!Number.isFinite(numericAmount)) return "";
+  const currency = prop.currency ?? "EUR";
+  const formatted = new Intl.NumberFormat(lang, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(numericAmount);
+  const suffix = formatRecurrence(prop.recurrence, lang);
+  return suffix ? `${formatted}\u00A0${suffix}` : formatted;
+}
+
+const monthlyPrice = formatPrice(props.monthly, lang);
+const yearlyPrice = formatPrice(props.yearly, lang);
+const setupPrice = formatPrice(props.setup, lang);
 ---
 
 <SectionShell
@@ -85,31 +108,31 @@ const resolvedIncludes = await Promise.all(
   <EffectHost as="div" effects={panelEffects} class="price-card__panel price-card__panel-surface">
     <dl class="price-card__prices">
       {
-        props.monthly && (
+        monthlyPrice && (
           <>
             <>
               <dt>{monthlyLabel}</dt>
-              <dd>{props.monthly}</dd>
+              <dd>{monthlyPrice}</dd>
             </>
           </>
         )
       }
       {
-        props.yearly && (
+        yearlyPrice && (
           <>
             <>
               <dt>{yearlyLabel}</dt>
-              <dd>{props.yearly}</dd>
+              <dd>{yearlyPrice}</dd>
             </>
           </>
         )
       }
       {
-        props.setup && (
+        setupPrice && (
           <>
             <>
               <dt>{setupLabel}</dt>
-              <dd>{props.setup}</dd>
+              <dd>{setupPrice}</dd>
             </>
           </>
         )

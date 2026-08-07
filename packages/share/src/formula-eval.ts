@@ -13,6 +13,7 @@ plugin-registration formatter registry, and money formatter built on Intl.Number
 <CHANGE_SUMMARY>
   <item>RFC-0570: Initial implementation of formula evaluation for content references.</item>
   <item>RFC-0729: Add pipe syntax for post-evaluation formatting, formatter registry, and money formatter.</item>
+  <item>RFC-0730: Add formatRecurrence utility for ISO 8601 duration → locale-specific suffix mapping.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -324,4 +325,16 @@ export function resolveFormula(
       error: `REF-08: Formula syntax error: ${message}`,
     };
   }
+}
+
+const RECURRENCE_SUFFIXES: Record<string, Record<string, string>> = {
+  P1M: { de: "/ Monat", uk: "/ місяць" },
+  P1Y: { de: "/ Jahr", uk: "/ рік" },
+};
+
+export function formatRecurrence(recurrence: string | undefined, lang: string): string {
+  if (!recurrence || recurrence.trim() === "") return "";
+  const suffixes = RECURRENCE_SUFFIXES[recurrence.trim()];
+  if (!suffixes) return "";
+  return suffixes[lang] ?? suffixes["de"] ?? "";
 }

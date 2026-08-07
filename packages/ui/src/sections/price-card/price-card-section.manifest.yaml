@@ -28,11 +28,35 @@ propsSchema:
     - header
   properties:
     monthly:
-      type: string
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        recurrence:
+          type: string
     yearly:
-      type: string
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        recurrence:
+          type: string
     setup:
-      type: string
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        recurrence:
+          type: string
     includes:
       type: array
       items:
