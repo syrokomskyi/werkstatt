@@ -1,7 +1,7 @@
 ---
 id: RFC-0724
 title: "Publishing pipeline reliability: auto-recovery, retry loops, release.ready rename, and mandatory Axiom gate"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -9,9 +9,9 @@ owners:
 reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-06
-updatedAt: 2026-08-06
+updatedAt: 2026-08-07
 enhancedAt: 2026-08-06
-implementedAt:
+implementedAt: 2026-08-07
 closedAt:
 supersedes:
   - RFC-0700
