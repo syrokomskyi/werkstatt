@@ -42,34 +42,39 @@ const itemAlign = body.itemAlign ?? "left";
 const iconColor = body.iconColor ?? "accent";
 const hideMarkers = body.hideMarkers ?? false;
 
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+)\}/g;
+
 const renderedItems = body.items.map((it) => {
-  if (!offeringRef || !it.chargeRef)
-    return { ...it, parts: [{ kind: "text", value: it.text }] as ItemPart[] };
-  const marker = "{total}";
-  const idx = it.text.indexOf(marker);
-  if (idx === -1) return { ...it, parts: [{ kind: "text", value: it.text }] as ItemPart[] };
-  const before = it.text.slice(0, idx);
-  const after = it.text.slice(idx + marker.length);
-  const entries = derivedPrices?.[offeringRef];
-  const matching = entries?.filter((e) => e.chargeRef === it.chargeRef) ?? [];
-  const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
-  const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
-  const variants = buildPriceVariants(
-    sourceProp,
-    it.chargeRef,
-    lang,
-    offeringRef,
-    derivedPrices,
-    undefined,
-  );
-  return {
-    ...it,
-    parts: [
-      { kind: "text", value: before },
-      { kind: "price", variants },
-      { kind: "text", value: after },
-    ] as ItemPart[],
-  };
+  if (!offeringRef) return { ...it, parts: [{ kind: "text", value: it.text }] as ItemPart[] };
+  const parts: ItemPart[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(it.text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: it.text.slice(lastIndex, match.index) });
+    }
+    const chargeRef = match[1]!;
+    const entries = derivedPrices?.[offeringRef];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      lang,
+      offeringRef,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < it.text.length) {
+    parts.push({ kind: "text", value: it.text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: it.text });
+  return { ...it, parts };
 });
 ---
 
