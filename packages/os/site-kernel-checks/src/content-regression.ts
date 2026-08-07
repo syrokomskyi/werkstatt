@@ -33,10 +33,7 @@ import {
 } from "@warpgogol/site-kernel";
 import { byteHash, stableJsonHash } from "@warpgogol/fingerprint";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
-import {
-  loadSemanticSiteModel,
-  loadSystemManifest,
-} from "@warpgogol/site-kernel-content";
+import { loadSemanticSiteModel, loadSystemManifest } from "@warpgogol/site-kernel-content";
 import type { SemanticBlock, SemanticFaqEntry, SemanticPageModel } from "@warpgogol/share/semantic";
 import { readAstroSiteUrl } from "./lib/astro-site-url.ts";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
@@ -210,7 +207,11 @@ async function buildSnapshot(
 // Snapshot serialization
 // ---------------------------------------------------------------------------
 
-function snapshotToYaml(snapshot: ContentRegressionSnapshot, ownerCommand: string, filePath: string): string {
+function snapshotToYaml(
+  snapshot: ContentRegressionSnapshot,
+  ownerCommand: string,
+  filePath: string,
+): string {
   const header = buildGeneratedHeader({ ownerCommand, filePath });
   const body = yamlStringify(snapshot);
   return `${header}\n${body}`;
@@ -220,7 +221,12 @@ async function readGoldenSnapshot(
   cacheClonePath: string,
   systemId: string,
 ): Promise<ContentRegressionSnapshot | null> {
-  const snapshotPath = join(cacheClonePath, ".cache", "content-regression", `${systemId}.snapshot.yaml`);
+  const snapshotPath = join(
+    cacheClonePath,
+    ".cache",
+    "content-regression",
+    `${systemId}.snapshot.yaml`,
+  );
   try {
     const raw = await readFile(snapshotPath, "utf8");
     const parsed = yamlParse(raw) as ContentRegressionSnapshot;
@@ -237,7 +243,7 @@ async function readGoldenSnapshot(
 // Diff logic
 // ---------------------------------------------------------------------------
 
-function diffSnapshots(
+export function diffSnapshots(
   current: ContentRegressionSnapshot,
   golden: ContentRegressionSnapshot,
 ): ContentRegressionDiff {
@@ -270,7 +276,8 @@ function diffSnapshots(
       if (currentBlock.heading !== goldenBlock.heading) fields.push("heading");
       if (currentBlock.lead !== goldenBlock.lead) fields.push("lead");
       if (currentBlock.body !== goldenBlock.body) fields.push("body");
-      if (JSON.stringify(currentBlock.items) !== JSON.stringify(goldenBlock.items)) fields.push("items");
+      if (JSON.stringify(currentBlock.items) !== JSON.stringify(goldenBlock.items))
+        fields.push("items");
       changedBlocks.push({ blockId, fields });
     }
     // Check for removed blocks
@@ -378,7 +385,10 @@ export async function runContentRegressionCheck(
 
   // RFC-0732: skip flag escape hatch
   if (flagBool(input, "skip-content-regression")) {
-    return passResult("content.regression.check", "content.regression.check: skipped (--skip-content-regression)");
+    return passResult(
+      "content.regression.check",
+      "content.regression.check: skipped (--skip-content-regression)",
+    );
   }
 
   const siteCtx = await resolveSiteContext(input, context);
@@ -511,7 +521,10 @@ export async function runContentRegressionSnapshotUpdate(
   } else {
     context.logger.info("  No cache clone found — cannot write golden snapshot.");
     if (!confirm) {
-      return passResult("content.regression.snapshot.update", "content.regression.snapshot.update: no cache clone (dry run)");
+      return passResult(
+        "content.regression.snapshot.update",
+        "content.regression.snapshot.update: no cache clone (dry run)",
+      );
     }
   }
 
