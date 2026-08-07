@@ -1,7 +1,7 @@
 ---
 id: RFC-0742
 title: "Currency-Aware Price Projection"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -12,7 +12,7 @@ createdAt: 2026-08-07
 updatedAt: 2026-08-07
 enhancedAt: 2026-08-07
 acceptedAt: 2026-08-07
-implementedAt:
+implementedAt: 2026-08-07
 closedAt:
 supersedes: []
 supersededBy:
