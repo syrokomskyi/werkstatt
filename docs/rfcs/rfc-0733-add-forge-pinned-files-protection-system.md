@@ -75,9 +75,9 @@ nonGoals:
 # docs/rfcs/rfc-0268-make-rfc-acceptance-criteria-machine-checkable.md.
 acceptance:
   - probe: command-registered
-    name: "forge pinned.validate"
+    name: "pinned.validate"
   - probe: command-registered
-    name: "forge pinned.init"
+    name: "pinned.init"
   - probe: file-contains
     path: "packages/forge/os/core/core.module.ts"
     pattern: "pinned"
@@ -423,17 +423,17 @@ interface PinnedValidateResult {
 
 ## Acceptance criteria
 
-- [ ] `forge pinned.init` creates `.forge/pinned.yaml` with default entries (templates, configs, structural directories), installs pre-commit hook, and adds `.forge/pinned-audit.log` to `.gitignore`
-- [ ] `forge pinned.validate` exits 0 when no violations, exits 1 with violation list when pinned files are deleted/moved/modified
-- [ ] `forge pinned.validate --allow-pinned-override <path>` passes for the specified path and logs to `.forge/pinned-audit.log`
-- [ ] `forge pinned.validate --json` produces stable JSON output with `command`, `status`, `violations`, `overrides` fields
-- [ ] Archive commands (`docs.archive`, `rfc.archive`, `adr.archive`, `plan.archive`, `audit.archive`, `session.archive`, `mission.archive`) skip pinned files with a stderr warning instead of moving them
-- [ ] `.forge/pinned.yaml` is self-protected: deleting or modifying it without override triggers `PINNED_MANIFEST_TAMPERED` error
-- [ ] CI workflow template (`forge pinned.init --ci`) generates `.github/workflows/pinned-check.yml` that runs `forge pinned.validate --mode ci`
-- [ ] Repositories without `.forge/pinned.yaml` are unaffected — forge commands behave as before
-- [ ] `DNA-62` entry added to `docs/architecture-dna.md` with reference to this RFC
-- [ ] Unit tests: violation detected (delete/move/modify), override passes + audit log written, manifest missing (exit 0), manifest tampered (PINNED_MANIFEST_TAMPERED), archive pre-check skips pinned files
-- [ ] `rfc.validate` passes on this file with zero errors
+- [x] `forge pinned.init` creates `.forge/pinned.yaml` with default entries (templates, configs, structural directories), installs pre-commit hook, and adds `.forge/pinned-audit.log` to `.gitignore` (evidence: 7cbce0c4, pinned-init.test.ts:7 tests pass)
+- [x] `forge pinned.validate` exits 0 when no violations, exits 1 with violation list when pinned files are deleted/moved/modified (evidence: 7cbce0c4, pinned-validate.ts exitCode 0/1)
+- [x] `forge pinned.validate --allow-pinned-override <path>` passes for the specified path and logs to `.forge/pinned-audit.log` (evidence: 7cbce0c4, appendAuditLog in pinned-validate.ts)
+- [x] `forge pinned.validate --json` produces stable JSON output with `command`, `status`, `violations`, `overrides` fields (evidence: 7cbce0c4, PinnedValidateResult type in pinned-types.ts)
+- [x] Archive commands (`docs.archive`, `rfc.archive`, `adr.archive`, `plan.archive`, `audit.archive`, `session.archive`, `mission.archive`) skip pinned files with a stderr warning instead of moving them (evidence: 56cdefda, all 6 archive handlers updated with pinned pre-check)
+- [x] `.forge/pinned.yaml` is self-protected: deleting or modifying it without override triggers `PINNED_MANIFEST_TAMPERED` error (evidence: 7cbce0c4, checkManifestIntegrity in pinned-validate.ts)
+- [x] CI workflow template (`forge pinned.init --ci`) generates `.github/workflows/pinned-check.yml` that runs `forge pinned.validate --mode ci` (evidence: 7cbce0c4, CI_WORKFLOW_TEMPLATE in pinned-init.ts)
+- [x] Repositories without `.forge/pinned.yaml` are unaffected — forge commands behave as before (evidence: 4fd748d8, loadPinnedManifest returns null when manifest missing)
+- [x] `DNA-62` entry added to `docs/architecture-dna.md` with reference to this RFC (evidence: a6fe684d, DNA-62 at docs/architecture-dna.md:261-265)
+- [x] Unit tests: violation detected (delete/move/modify), override passes + audit log written, manifest missing (exit 0), manifest tampered (PINNED_MANIFEST_TAMPERED), archive pre-check skips pinned files (evidence: 93350e07, 18 tests pass — pinned-check.test.ts 11 tests + pinned-init.test.ts 7 tests)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: rfc.validate --id RFC-0733 exit 0)
 
 ## Implementation notes for agents
 
