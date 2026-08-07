@@ -14,7 +14,7 @@ import { z } from "zod";
 import { pbpEntitySchema } from "./envelope.js";
 import { pbpEntityRefSchema } from "./entity-ref.js";
 import { nonEmptyString } from "./primitives.js";
-import { pbpChargeSchema } from "./pricing.js";
+import { pbpChargeSchema, pbpExternalCostSchema } from "./pricing.js";
 
 const pbpAvailabilityModeSchema = z.enum(["declared", "on-request", "unavailable"]);
 const pbpOfferingRelationSchema = z.enum([
@@ -50,6 +50,7 @@ const pbpPricingSchema = z.object({
   currency: nonEmptyString,
   tax: z.record(z.string(), z.unknown()).optional(),
   charges: z.record(z.string(), pbpChargeSchema).optional(),
+  externalCosts: z.record(z.string(), pbpExternalCostSchema).optional(),
   plans: z.record(z.string(), z.unknown()).optional(),
   adjustments: z.record(z.string(), z.unknown()).optional(),
 });

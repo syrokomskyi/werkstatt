@@ -8,6 +8,7 @@
 
 import type { PbpEntity } from "../envelope.js";
 import type { PbpEntityRef } from "../entity-ref.js";
+import type { PbpExternalCost } from "./pricing.js";
 import { pbpSchemaId } from "../schema-id.js";
 
 export const OFFERING_SCHEMA_ID = pbpSchemaId("offering");
@@ -68,6 +69,7 @@ export interface PbpPricing {
   currency: string;
   tax?: Record<string, unknown>;
   charges?: Record<string, unknown>;
+  externalCosts?: Record<string, PbpExternalCost>;
   plans?: Record<string, unknown>;
   adjustments?: Record<string, unknown>;
 }

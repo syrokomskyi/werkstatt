@@ -70,3 +70,17 @@ export const pbpAdjustmentSchema = z.object({
     .object({ chargeRefs: z.record(z.string(), z.object({ ref: nonEmptyString })) })
     .optional(),
 });
+
+const pbpExternalCostAmountSchema = z.discriminatedUnion("model", [
+  z.object({ model: z.literal("fixed"), value: decimalString }),
+  z.object({ model: z.literal("cap"), value: decimalString }),
+  z.object({ model: z.literal("range"), minimum: decimalString, maximum: decimalString }),
+]);
+
+export const pbpExternalCostSchema = z.object({
+  purpose: nonEmptyString,
+  amount: pbpExternalCostAmountSchema,
+  paidBy: z.enum(["provider", "client"]),
+  recurrence: nonEmptyString.optional(),
+  note: nonEmptyString.optional(),
+});

@@ -18,6 +18,7 @@ import type { PbpValidationError } from "../validation-errors.js";
 import type { PbpMaterializedDerivedPrice } from "../materialized-derived-price.js";
 import type { PbpCurrencyPricingPolicy } from "../entities/currency-pricing-policy.js";
 import type { PbpCharge } from "../entities/pricing.js";
+import type { PbpExternalCost } from "../entities/pricing.js";
 import type { PbpOffering } from "../entities/offering.js";
 import type { PbpRatePolicy } from "../entities/rate-policy.js";
 import type { PbpRateSnapshot } from "../entities/rate-snapshot.js";
@@ -168,16 +169,16 @@ export function materializeDerivedPrices(
   for (const offeringKey of offeringKeys) {
     const offering = graph.offerings[offeringKey];
     const pricing = offering.pricing;
-    if (!pricing || !pricing.charges) {
+    if (!pricing || (!pricing.charges && !pricing.externalCosts)) {
       continue;
     }
 
     const sourceCurrency = pricing.currency;
-    const chargeKeys = Object.keys(pricing.charges).sort();
+    const chargeKeys = Object.keys(pricing.charges ?? {}).sort();
     const offeringPrices: PbpMaterializedDerivedPrice[] = [];
 
     for (const chargeKey of chargeKeys) {
-      const charge = pricing.charges[chargeKey] as PbpCharge;
+      const charge = pricing.charges?.[chargeKey] as PbpCharge | undefined;
       if (!charge || !charge.amount || charge.amount.model !== "fixed") {
         continue;
       }
@@ -298,12 +299,132 @@ export function materializeDerivedPrices(
       }
     }
 
+    const externalCostKeys = Object.keys(pricing.externalCosts ?? {}).sort();
+    for (const costKey of externalCostKeys) {
+      const cost = pricing.externalCosts?.[costKey] as PbpExternalCost | undefined;
+      if (!cost) continue;
+      const sourceAmount = externalCostAmount(cost);
+      if (sourceAmount === null) continue;
+
+      const targetKeys = Object.keys(policy.targetCurrencies).sort();
+      for (const targetKey of targetKeys) {
+        const target = policy.targetCurrencies[targetKey];
+        const targetCurrency = target.currency;
+
+        if (target.strategy === "fixed") continue;
+
+        const validationErrors = validateTarget(sourceCurrency, targetCurrency, offering, costKey);
+        if (validationErrors.length > 0) {
+          errors.push(...validationErrors);
+          continue;
+        }
+
+        const ratePolicy = findRatePolicy(graph, sourceCurrency, targetCurrency);
+        if (!ratePolicy) {
+          errors.push({
+            code: "PBP-DERIVED-PRICE-03",
+            severity: "error",
+            entityId: offering.id,
+            path: `pricing.externalCosts.${costKey}`,
+            message: `strategy: derived but no RatePolicy for pair ${sourceCurrency}/${targetCurrency}`,
+          });
+          continue;
+        }
+
+        const snapshot = findApplicableSnapshot(graph, sourceCurrency, targetCurrency, buildTime);
+        if (!snapshot) {
+          if (ratePolicy.failure.noAcceptableRate === "block-publication") {
+            errors.push({
+              code: "PBP-DERIVED-PRICE-08",
+              severity: "error",
+              entityId: offering.id,
+              path: `pricing.externalCosts.${costKey}`,
+              message: `No applicable rate snapshot for pair ${sourceCurrency}/${targetCurrency}`,
+            });
+          }
+          continue;
+        }
+
+        const ratePolicyRef = resolveRef(target.ratePolicyRef ?? { ref: ratePolicy.id });
+        const snapshotRef = snapshot.id;
+        const contract = buildConversionContract(
+          ratePolicyRef,
+          snapshotRef,
+          sourceAmount,
+          sourceCurrency,
+          targetCurrency,
+        );
+
+        const result: PbpCurrencyConversionResult = computeCurrencyConversion(
+          graph,
+          contract,
+          buildTime,
+        );
+
+        if (result.status === "failed") {
+          errors.push({
+            code: "PBP-DERIVED-PRICE-CONVERSION",
+            severity: "error",
+            entityId: offering.id,
+            path: `pricing.externalCosts.${costKey}`,
+            message: result.formulaDescription ?? "Currency conversion failed",
+          });
+          continue;
+        }
+
+        if (result.status === "skipped") continue;
+        if (!result.value || !result.trace) continue;
+
+        const postValidationErrors = validateDerivedPrice(
+          result,
+          sourceAmount,
+          offering.id,
+          costKey,
+        );
+        if (postValidationErrors.length > 0) {
+          errors.push(...postValidationErrors);
+          continue;
+        }
+
+        const derivedPrice: PbpMaterializedDerivedPrice = {
+          chargeRef: costKey,
+          targetCurrency,
+          amount: {
+            value: result.value.amount,
+            currency: result.value.currency,
+          },
+          priceKind: "derived",
+          commercialMeaning: "derived-price",
+          derivation: {
+            modelRef: `pbp-derivation:currency-conversion/${contract.implementationVersion}`,
+            modelVersion: contract.implementationVersion,
+            calculatedAt: buildTime,
+          },
+          trace: result.trace,
+          allowedUses: target.currentUses,
+        };
+
+        offeringPrices.push(derivedPrice);
+      }
+    }
+
     if (offeringPrices.length > 0) {
       prices[offering.id] = offeringPrices;
     }
   }
 
   return { prices, errors };
+}
+
+/**
+ * Extract the source amount from an external cost.
+ * Only fixed and cap models are convertible; range is skipped.
+ */
+function externalCostAmount(cost: PbpExternalCost): string | null {
+  if (cost.amount.model === "fixed" || cost.amount.model === "cap") {
+    return cost.amount.value;
+  }
+  return null;
 }
 
 /**

@@ -86,3 +86,18 @@ export interface PbpAdjustment {
   appliesWhen?: { planRef?: string };
   appliesTo?: { chargeRefs: Record<string, { ref: string }> };
 }
+
+export type PbpExternalCostAmount =
+  | { model: "fixed"; value: string }
+  | { model: "cap"; value: string }
+  | { model: "range"; minimum: string; maximum: string };
+
+export type PbpExternalCostPaidBy = "provider" | "client";
+
+export interface PbpExternalCost {
+  purpose: string;
+  amount: PbpExternalCostAmount;
+  paidBy: PbpExternalCostPaidBy;
+  recurrence?: string;
+  note?: string;
+}
