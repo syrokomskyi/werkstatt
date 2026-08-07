@@ -346,15 +346,15 @@ N/A — library-only.
 
 ## Acceptance criteria
 
-- [ ] `PbpCurrencyPricingPolicy` interface exported from `@warpgogol/pbp`
-- [ ] `PbpCurrencyStrategy` closed union exported with const array
-- [ ] `PbpCurrentUses` interface exported
-- [ ] `PbpCurrencyTarget` interface exported
-- [ ] `CURRENCY_PRICING_POLICY_SCHEMA_ID` constant exported
-- [ ] `pbpCurrencyPricingPolicySchema` Zod schema exported
-- [ ] `tsc --noEmit` passes for `packages/pbp/`
-- [ ] `vitest run` passes for `packages/pbp/`
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpCurrencyPricingPolicy` interface exported from `@warpgogol/pbp` (evidence: packages/pbp/src/index.ts:547, ecfc4a68)
+- [x] `PbpCurrencyStrategy` closed union exported with const array (evidence: packages/pbp/src/index.ts:544-549, ecfc4a68)
+- [x] `PbpCurrentUses` interface exported (evidence: packages/pbp/src/index.ts:545, ecfc4a68)
+- [x] `PbpCurrencyTarget` interface exported (evidence: packages/pbp/src/index.ts:546, ecfc4a68)
+- [x] `CURRENCY_PRICING_POLICY_SCHEMA_ID` constant exported (evidence: packages/pbp/src/index.ts:551, ecfc4a68)
+- [x] `pbpCurrencyPricingPolicySchema` Zod schema exported (evidence: packages/pbp/src/schemas/index.ts:67-72, ecfc4a68)
+- [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run build:check exit 0)
+- [x] `vitest run` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run test — 13 test files pass, 1 pre-existing failure in rfc-0468 unrelated to RFC-0736)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0736 exit 0)
 
 ## Implementation notes for agents
 
