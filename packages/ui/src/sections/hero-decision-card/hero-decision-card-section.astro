@@ -217,17 +217,21 @@ function parsePriceMarkers(text: string): TextOrPrice[] {
         >
           <dl class="hero-decision-card__list">
             {props.decisionCard.items.map((it) => {
+              const ref = offeringRef;
+              const entries = ref ? derivedPrices?.[ref] : undefined;
+              const matching = entries?.filter((e) => e.chargeRef === it.chargeRef) ?? [];
+              const sourceAmount = matching[0]?.trace?.source?.amount;
               const sourceProp: SourcePriceProp | undefined =
-                offeringRef && it.chargeRef
-                  ? { amount: it.value.replace(/[^\d.]/g, ""), currency: "EUR" }
+                ref && it.chargeRef && sourceAmount
+                  ? { amount: sourceAmount, currency: "EUR" }
                   : undefined;
               const variants =
-                offeringRef && it.chargeRef
+                ref && it.chargeRef
                   ? buildPriceVariants(
                       sourceProp,
                       it.chargeRef,
                       lang,
-                      offeringRef,
+                      ref,
                       derivedPrices,
                       noteTemplate,
                     )
