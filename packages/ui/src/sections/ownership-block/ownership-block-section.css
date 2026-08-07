@@ -20,3 +20,15 @@
     padding-block-end: var(--ds-space-3);
   }
 }
+
+.section-list__text .currency-aware-price-display,
+.section-list__text .currency-aware-price-display__variant {
+  display: inline;
+}
+
+.section-list__text .currency-aware-price-display__amount {
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
