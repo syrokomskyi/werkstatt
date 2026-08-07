@@ -44,6 +44,9 @@ export const missionManifestSchema = z.object({
   operationId: z.string().min(1),
 });
 
+// When renaming or removing a value from this enum, add the old value to
+// DEPRECATED_KIND_MIGRATIONS in packages/os/site-kernel-handoff/src/bordbuch/bordbuch-io.ts
+// so that existing bordbuch entries on disk are normalized during readBordbuch.
 export const bordbuchEntryKindSchema = z.enum([
   "mission-open",
   "mission-close",

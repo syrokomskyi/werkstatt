@@ -20,6 +20,7 @@ import {
   migrateDeprecatedKind,
   DEPRECATED_KIND_MIGRATIONS,
 } from "./bordbuch-io.ts";
+import { bordbuchEntryKindSchema } from "@warpgogol/ontology/operations";
 
 let tmpDir: string;
 const systemId = "test-system";
@@ -204,4 +205,18 @@ test("validateBordbuch still detects real hash mismatches", async () => {
 
   const { violations } = await validateBordbuch(tmpDir, systemId);
   expect(violations.some((v) => v.rule === "hash-mismatch")).toBe(true);
+});
+
+test("DEPRECATED_KIND_MIGRATIONS: every old kind is NOT in the current enum", () => {
+  const currentKinds = new Set(bordbuchEntryKindSchema.options);
+  for (const oldKind of Object.keys(DEPRECATED_KIND_MIGRATIONS)) {
+    expect(currentKinds.has(oldKind as never)).toBe(false);
+  }
+});
+
+test("DEPRECATED_KIND_MIGRATIONS: every migration target IS in the current enum", () => {
+  const currentKinds = new Set(bordbuchEntryKindSchema.options);
+  for (const newKind of Object.values(DEPRECATED_KIND_MIGRATIONS)) {
+    expect(currentKinds.has(newKind)).toBe(true);
+  }
 });
