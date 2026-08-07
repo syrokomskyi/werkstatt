@@ -27,6 +27,9 @@ propsSchema:
   required:
     - header
   properties:
+    offeringRef:
+      type: string
+      description: "PBP offering URI for currency-aware price display (RFC-0743)."
     monthly:
       type: object
       additionalProperties: false

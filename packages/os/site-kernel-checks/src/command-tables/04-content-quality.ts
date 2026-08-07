@@ -748,7 +748,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     name: "derived-prices.materialize",
     description:
       "Materialize derived prices for all Offerings by running currency-conversion derivation for each fixed Charge in each target currency (RFC-0740).",
-    scope: "workspace",
+    scope: "app",
     flags: {
       system: {
         kind: "string",
@@ -778,7 +778,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     name: "rate-snapshot.resolve",
     description:
       "Resolve rate snapshots for all RatePolicy entities — business-fixed mode reads RateSchedule entries, external mode requires Rate Fetcher Service (RFC-0744). RFC-0741.",
-    scope: "workspace",
+    scope: "app",
     flags: {
       system: {
         kind: "string",
@@ -812,7 +812,7 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     name: "currency-pricing.compile",
     description:
       "Validate the CurrencyPricingPolicy for the business — target currencies registered, ratePolicyRefs resolve, derivationContractRefs resolve, currentUses valid for current phase. RFC-0741.",
-    scope: "workspace",
+    scope: "app",
     flags: {
       system: {
         kind: "string",

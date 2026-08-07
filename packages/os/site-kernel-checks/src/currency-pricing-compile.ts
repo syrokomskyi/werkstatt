@@ -120,15 +120,10 @@ export async function runCurrencyPricingCompile(
         }
       }
 
-      if (target.derivationContractRef) {
-        const derivationRef = resolveRef(target.derivationContractRef);
-        const derivationEntity = entityIndex.get(derivationRef);
-        if (!derivationEntity) {
-          errors.push(
-            `Target currency ${targetCurrency} (key: ${targetKey}): derivationContractRef ${derivationRef} does not resolve`,
-          );
-        }
-      }
+      // derivationContractRef is a derivation model reference (e.g.
+      // "pbp-derivation:currency-conversion/1"), not a PBP entity URI.
+      // It is used directly by materializeDerivedPrices as the model ID —
+      // no entity-index lookup needed.
     }
 
     const uses = target.currentUses;

@@ -24,7 +24,7 @@
 
 .currency-aware-price-display__amount {
   font-family: var(--ds-font-heading);
-  font-size: var(--ds-size-text-lg, 1.25rem);
+  font-size: var(--ds-text-lg);
   font-weight: 700;
   color: var(--ds-color-text);
   display: block;
@@ -32,9 +32,9 @@
 
 .currency-aware-price-display__note {
   font-family: var(--ds-font-body);
-  font-size: var(--ds-size-text-sm, 0.875rem);
+  font-size: var(--ds-text-sm);
   font-weight: 400;
-  color: var(--ds-color-text-muted, var(--ds-color-text));
+  color: var(--ds-color-text-muted);
   margin: 0.25em 0 0;
   line-height: 1.4;
 }

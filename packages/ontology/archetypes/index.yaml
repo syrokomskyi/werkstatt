@@ -618,6 +618,8 @@ planetImportPaths:
   Iapetus: "@warpgogol/ui/sections/women"
   Proteus: "@warpgogol/ui/components/brand-label"
   Charon: "@warpgogol/ui/components/copyright"
+  Rosalind: "@warpgogol/ui/components/currency-aware-price-display"
+  Portia: "@warpgogol/ui/components/currency-selector"
   Galatea: "@warpgogol/ui/components/donation-card"
   Puck: "@warpgogol/ui/components/effects"
   Nereid: "@warpgogol/ui/components/footer-promo"
@@ -688,6 +690,8 @@ blockTypeToCosmicName:
   women: Iapetus
   brand-label: Proteus
   copyright: Charon
+  currency-aware-price-display: Rosalind
+  currency-selector: Portia
   section-shell: Puck
   footer-promo: Nereid
   lang-switcher: Ophelia
@@ -762,6 +766,8 @@ roleByCosmicName:
   Proteus: brand-label
   Ariel: breadcrumbs
   Charon: copyright
+  Rosalind: price-display
+  Portia: currency-selector
   Galatea: person-profile
   Puck: section-shell
   Titania: footer

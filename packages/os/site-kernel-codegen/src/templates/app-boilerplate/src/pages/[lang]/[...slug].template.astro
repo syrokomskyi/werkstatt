@@ -29,7 +29,7 @@ import {
 } from "@warpgogol/share";
 import { resolvePageRoute } from "@warpgogol/share/astro/page-handler";
 import type { SemanticPageType } from "@warpgogol/share/semantic";
-import { buildPageSemanticModel, buildPbpSemanticProfile } from "@warpgogol/pbp/semantic-profile";
+import { buildPageSemanticModel, buildPbpSemanticProfile, loadTargetCurrencies } from "@warpgogol/pbp/semantic-profile";
 import BaseLayout from "@warpgogol/ui/components/layout";
 import BlocksRenderer from "@warpgogol/ui/blocks-renderer.astro";
 import TranslationNotice from "@warpgogol/ui/legal/translation-notice.astro";
@@ -56,6 +56,7 @@ if (lang === defaultLanguage) {
   return Astro.redirect(slug ? `/${slug}` : "/", 308);
 }
 
+const currencies = await loadTargetCurrencies(`${process.cwd()}/src/content/business-profile`, lang!);
 const data = await resolvePageRoute({
   lang: lang!,
   slug: slug ?? "",
@@ -129,6 +130,7 @@ const contentBlocks = sectionBlocks.filter((b) => b.planetName !== "Thebe");
     localizedSiblingPath={data.localizedSiblingPath}
     ctaTarget={data.ctaTarget}
     defaultLanguage={defaultLanguage}
+    currencies={currencies}
   />
   <BlocksRenderer
     blocks={data.page.blocks.filter((b) => b.layer === "shell")}

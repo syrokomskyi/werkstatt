@@ -14,6 +14,7 @@
 */
 
 import { defineCollection } from "astro:content";
+import { glob } from "astro/loaders";
 import { z } from "zod";
 import { toDataEntryId } from "@warpgogol/share/content";
 import { fsDataCollectionLoader } from "@warpgogol/content-source";
@@ -46,9 +47,10 @@ export const pbpCollections = {
     schema: z.object({}).catchall(z.any()),
   }),
   "rate-snapshot": defineCollection({
-    loader: fsDataCollectionLoader({
+    loader: glob({
+      pattern: ["rate-snapshots/**/*.md", "rate-snapshots/**/*.yaml", "!**/AGENTS.md"],
       base: "src/content/business-profile",
-      generateId: (entry) => toDataEntryId(entry),
+      generateId: ({ entry }) => toDataEntryId(entry),
     }),
     schema: rateSnapshotSchema,
   }),

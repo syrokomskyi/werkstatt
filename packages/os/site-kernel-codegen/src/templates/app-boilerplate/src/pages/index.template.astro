@@ -21,7 +21,7 @@
 import { getRouteRegistry } from "@warpgogol/share";
 import { resolvePageRoute } from "@warpgogol/share/astro/page-handler";
 import type { SemanticPageType } from "@warpgogol/share/semantic";
-import { buildPageSemanticModel, buildPbpSemanticProfile } from "@warpgogol/pbp/semantic-profile";
+import { buildPageSemanticModel, buildPbpSemanticProfile, loadTargetCurrencies } from "@warpgogol/pbp/semantic-profile";
 import BaseLayout from "@warpgogol/ui/components/layout";
 import BlocksRenderer from "@warpgogol/ui/blocks-renderer.astro";
 import GrowthProvider from "@warpgogol/growth/provider.astro";
@@ -32,6 +32,7 @@ import globalStylesheetUrl from "@styles/global.css?url";
 const siteUrl = Astro.site?.toString() ?? Astro.url.origin;
 const { defaultLanguage: lang } = await getRouteRegistry();
 
+const currencies = await loadTargetCurrencies(`${process.cwd()}/src/content/business-profile`, lang);
 const data = await resolvePageRoute({
   lang,
   slug: "",
@@ -76,6 +77,7 @@ const data = await resolvePageRoute({
     localizedSiblingPath={data.localizedSiblingPath}
     ctaTarget={data.ctaTarget}
     defaultLanguage={data.defaultLanguageCode}
+    currencies={currencies}
   />
   <BlocksRenderer
     blocks={data.page.blocks.filter((b) => b.layer === "shell")}

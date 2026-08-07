@@ -224,6 +224,14 @@ const footerHandler: SiteContentHandler = async (ctx) => {
 const footerPromoHandler: SiteContentHandler = (ctx) =>
   (ctx.labels?.footerPromo as Record<string, unknown> | undefined) ?? { text: "", cards: [] };
 
+const currencySelectorHandler: SiteContentHandler = (ctx) => {
+  const cs = ctx.labels?.currencySelector as Record<string, unknown> | undefined;
+  return {
+    label: cs?.label ?? "Currency",
+    currencies: [],
+  };
+};
+
 // ---------------------------------------------------------------------------
 // Registry — new component paths are added here only
 // ---------------------------------------------------------------------------
@@ -236,6 +244,7 @@ const SITE_CONTENT_HANDLERS: Map<string, SiteContentHandler> = new Map([
   ["header", headerHandler],
   ["footer", footerHandler],
   ["footer-promo", footerPromoHandler],
+  ["currency-selector", currencySelectorHandler],
 ]);
 
 // ---------------------------------------------------------------------------

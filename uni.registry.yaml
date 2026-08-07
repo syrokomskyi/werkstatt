@@ -1,6 +1,6 @@
 schemaVersion: 1.0.0
 generatedAt: null
-totalCount: 81
+totalCount: 83
 entries:
   - id: brand-label-component
     uniName: brand-label-component
@@ -48,6 +48,36 @@ entries:
     siteName: "@warpgogol/ui"
     manifestFile: packages/ui/src/components/copyright/copyright-component.manifest.yaml
     astroFile: packages/ui/src/components/copyright/copyright-component.astro
+  - id: currency-aware-price-display-component
+    uniName: currency-aware-price-display-component
+    layer: component
+    role: price-display
+    semanticId: currency-aware-price-display
+    version: 1.0.0
+    intent:
+      - pricing
+      - trust
+    industryFit: []
+    contentSchemaKey: currency-aware-price-display-component
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/components/currency-aware-price-display/currency-aware-price-display-component.manifest.yaml
+    astroFile: packages/ui/src/components/currency-aware-price-display/currency-aware-price-display-component.astro
+  - id: currency-selector-component
+    uniName: currency-selector-component
+    layer: component
+    role: currency-selector
+    semanticId: currency-selector
+    version: 1.0.0
+    intent:
+      - orient-visitor
+      - guide-navigation
+    industryFit: []
+    contentSchemaKey: currency-selector-component
+    standalone: false
+    siteName: "@warpgogol/ui"
+    manifestFile: packages/ui/src/components/currency-selector/currency-selector-component.manifest.yaml
+    astroFile: packages/ui/src/components/currency-selector/currency-selector-component.astro
   - id: donation-card-component
     uniName: donation-card-component
     layer: component

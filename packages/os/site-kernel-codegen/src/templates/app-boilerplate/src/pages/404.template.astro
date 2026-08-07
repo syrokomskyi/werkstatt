@@ -16,7 +16,7 @@
 import { getRouteRegistry } from "@warpgogol/share";
 import { resolvePageRoute } from "@warpgogol/share/astro/page-handler";
 import type { SemanticPageType } from "@warpgogol/share/semantic";
-import { buildPageSemanticModel, buildPbpSemanticProfile } from "@warpgogol/pbp/semantic-profile";
+import { buildPageSemanticModel, buildPbpSemanticProfile, loadTargetCurrencies } from "@warpgogol/pbp/semantic-profile";
 import BaseLayout from "@warpgogol/ui/components/layout";
 import GrowthProvider from "@warpgogol/growth/provider.astro";
 import Header from "@warpgogol/ui/components/header";
@@ -30,6 +30,7 @@ Astro.response.status = 404;
 
 const { defaultLanguage } = await getRouteRegistry();
 const lang = defaultLanguage;
+const currencies = await loadTargetCurrencies(`${process.cwd()}/src/content/business-profile`, lang);
 const data = await resolvePageRoute({
   lang,
   slug: "",
@@ -83,6 +84,7 @@ const data = await resolvePageRoute({
     supportedLangs={data.supportedLangs}
     ctaTarget={data.ctaTarget}
     defaultLanguage={defaultLanguage}
+    currencies={currencies}
   />
   <main id="main-content">
     <NotFound
