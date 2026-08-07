@@ -288,6 +288,8 @@
     --ds-color-success-bright-60: rgb(67 233 123 / 0.6);
     --ds-color-success-border: rgb(67 233 123 / 0.42);
     --ds-color-success-soft: rgb(67 233 123 / 0.18);
+    --ds-color-status-good: rgb(132 204 22);
+    --ds-color-status-fair: rgb(245 158 11);
     --ds-color-warning-strong: rgb(140 91 11);
     --ds-color-status: rgb(16 185 129);
     --ds-color-danger: rgb(197 48 48);

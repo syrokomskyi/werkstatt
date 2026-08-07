@@ -23,7 +23,7 @@
     inline-size: 100%;
     overflow: hidden;
     border-radius: var(--ds-radius-lg, 0.75rem);
-    background: var(--ds-color-surface, #000);
+    background: var(--ds-color-surface);
   }
 
   .media__video {

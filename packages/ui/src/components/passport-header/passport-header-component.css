@@ -15,8 +15,8 @@
 
 .passport-header {
   padding: var(--ds-space-8) var(--ds-space-6);
-  border-bottom: 1px solid var(--ds-color-border, #334155);
-  background: var(--ds-color-surface-elevated, #1e293b);
+  border-bottom: 1px solid var(--ds-color-border);
+  background: var(--ds-color-surface-elevated);
 }
 
 .passport-header__badge {
@@ -24,8 +24,8 @@
   align-items: center;
   gap: var(--ds-space-2);
   padding: var(--ds-space-1) var(--ds-space-3);
-  background: var(--ds-color-primary, #6366f1);
-  color: #fff;
+  background: var(--ds-color-primary);
+  color: var(--ds-color-text-inverse);
   border-radius: var(--ds-radius-round);
   font-size: 0.75rem;
   font-weight: 600;
@@ -41,12 +41,12 @@
 .passport-header__title {
   font-size: var(--ds-font-size-4xl, 2.25rem);
   font-weight: 700;
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
   margin: 0 0 var(--ds-space-2);
 }
 
 .passport-header__subtitle {
   font-size: var(--ds-font-size-lg, 1.125rem);
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
   margin: 0;
 }

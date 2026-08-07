@@ -15,31 +15,31 @@
 
 /* Donation Card Container */
 .donation-card {
-  background-color: var(--ds-color-surface, #ffffff);
-  border: 1px solid var(--ds-color-border, #e5e7eb);
+  background-color: var(--ds-color-surface);
+  border: 1px solid var(--ds-color-border);
   border-radius: var(--ds-radius-sm);
   padding: var(--ds-space-5, 1.25rem);
-  box-shadow: var(--ds-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  box-shadow: var(--ds-shadow-sm);
   max-width: 100%;
 }
 
 .donation-card__title {
   font-size: var(--ds-text-lg, 1.125rem);
   font-weight: 600;
-  color: var(--ds-color-text, #111827);
+  color: var(--ds-color-text);
   margin: 0 0 var(--ds-space-3, 0.75rem) 0;
 }
 
 .donation-card__organization {
   font-size: var(--ds-text-base, 1rem);
   font-weight: 500;
-  color: var(--ds-color-text, #111827);
+  color: var(--ds-color-text);
   margin-bottom: var(--ds-space-2, 0.5rem);
 }
 
 .donation-card__bank {
   font-size: var(--ds-text-sm, 0.875rem);
-  color: var(--ds-color-text-muted, #6b7280);
+  color: var(--ds-color-text-muted);
   margin-bottom: var(--ds-space-4, 1rem);
 }
 
@@ -57,13 +57,13 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--ds-color-text-muted, #6b7280);
+  color: var(--ds-color-text-muted);
   margin-bottom: var(--ds-space-1, 0.25rem);
 }
 
 .donation-card__value {
   font-size: var(--ds-text-sm, 0.875rem);
-  color: var(--ds-color-text, #111827);
+  color: var(--ds-color-text);
   font-family: var(
     --ds-font-mono,
     ui-monospace,
@@ -83,7 +83,7 @@
 
 /* IBAN Highlight Block */
 .donation-card__field--iban {
-  background-color: var(--ds-color-surface-alt, #f9fafb);
+  background-color: var(--ds-color-surface-alt);
   border-radius: var(--ds-radius-sm);
   padding: var(--ds-space-3, 0.75rem);
   margin-bottom: var(--ds-space-4, 1rem);
@@ -99,7 +99,7 @@
 .donation-card__iban {
   font-size: var(--ds-text-lg, 1.125rem);
   font-weight: 500;
-  color: var(--ds-color-text, #111827);
+  color: var(--ds-color-text);
   font-family: var(
     --ds-font-mono,
     ui-monospace,
@@ -118,8 +118,8 @@
   align-items: center;
   gap: var(--ds-space-1, 0.25rem);
   padding: var(--ds-space-1, 0.25rem) var(--ds-space-2, 0.5rem);
-  background-color: var(--ds-color-primary, #3b82f6);
-  color: white;
+  background-color: var(--ds-color-primary);
+  color: var(--ds-color-text-inverse);
   border: none;
   border-radius: var(--ds-radius-sm);
   font-size: var(--ds-text-xs, 0.75rem);
@@ -129,7 +129,7 @@
 }
 
 .donation-card__copy-btn:hover {
-  background-color: var(--ds-color-primary-dark, #2563eb);
+  background-color: var(--ds-color-primary-dark);
 }
 
 .donation-card__copy-btn--small {
@@ -167,7 +167,7 @@
   gap: var(--ds-space-2, 0.5rem);
   margin-bottom: var(--ds-space-4, 1rem);
   padding-top: var(--ds-space-4, 1rem);
-  border-top: 1px solid var(--ds-color-border, #e5e7eb);
+  border-top: 1px solid var(--ds-color-border);
 }
 
 .donation-card__trust-item {
@@ -175,7 +175,7 @@
   align-items: center;
   gap: var(--ds-space-2, 0.5rem);
   font-size: var(--ds-text-sm, 0.875rem);
-  color: var(--ds-color-text, #111827);
+  color: var(--ds-color-text);
 }
 
 /* Action Buttons */
@@ -197,8 +197,8 @@
   align-items: center;
   gap: var(--ds-space-2, 0.5rem);
   padding: var(--ds-space-2, 0.5rem) var(--ds-space-3, 0.75rem);
-  background-color: var(--ds-color-primary, #3b82f6);
-  color: white;
+  background-color: var(--ds-color-primary);
+  color: var(--ds-color-text-inverse);
   border: none;
   border-radius: var(--ds-radius-sm);
   font-size: var(--ds-text-sm, 0.875rem);
@@ -208,12 +208,12 @@
 }
 
 .donation-card__qr-btn:hover {
-  background-color: var(--ds-color-primary-dark, #2563eb);
+  background-color: var(--ds-color-primary-dark);
 }
 
 .donation-card__info-link {
   font-size: var(--ds-text-sm, 0.875rem);
-  color: var(--ds-color-primary, #3b82f6);
+  color: var(--ds-color-primary);
   text-decoration: none;
   font-weight: 500;
 }
@@ -226,12 +226,12 @@
 .donation-card__legacy {
   margin-top: var(--ds-space-4, 1rem);
   padding-top: var(--ds-space-4, 1rem);
-  border-top: 1px solid var(--ds-color-border, #e5e7eb);
+  border-top: 1px solid var(--ds-color-border);
 }
 
 .donation-card__legacy-toggle {
   font-size: var(--ds-text-sm, 0.875rem);
-  color: var(--ds-color-primary, #3b82f6);
+  color: var(--ds-color-primary);
   cursor: pointer;
   list-style: none;
   padding: 0;
@@ -256,7 +256,7 @@ details[open] .donation-card__legacy-toggle::before {
 .donation-card__legacy-content {
   margin-top: var(--ds-space-3, 0.75rem);
   padding: var(--ds-space-3, 0.75rem);
-  background-color: var(--ds-color-surface-alt, #f9fafb);
+  background-color: var(--ds-color-surface-alt);
   border-radius: var(--ds-radius-sm);
 }
 
@@ -284,18 +284,18 @@ details[open] .donation-card__legacy-toggle::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--ds-color-overlay);
   cursor: pointer;
 }
 
 .donation-card__modal-content {
   position: relative;
-  background-color: white;
+  background-color: var(--ds-color-surface);
   border-radius: var(--ds-radius-sm);
   padding: var(--ds-space-5, 1.25rem);
   max-width: 400px;
   width: 100%;
-  box-shadow: var(--ds-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--ds-shadow-lg);
 }
 
 .donation-card__modal-header {
@@ -309,7 +309,7 @@ details[open] .donation-card__legacy-toggle::before {
   margin: 0;
   font-size: var(--ds-text-lg, 1.125rem);
   font-weight: 600;
-  color: var(--ds-color-text, #111827);
+  color: var(--ds-color-text);
 }
 
 .donation-card__modal-close {
@@ -317,13 +317,13 @@ details[open] .donation-card__legacy-toggle::before {
   border: none;
   font-size: var(--ds-text-xl, 1.25rem);
   cursor: pointer;
-  color: var(--ds-color-text-muted, #6b7280);
+  color: var(--ds-color-text-muted);
   padding: var(--ds-space-1, 0.25rem);
   line-height: 1;
 }
 
 .donation-card__modal-close:hover {
-  color: var(--ds-color-text, #111827);
+  color: var(--ds-color-text);
 }
 
 .donation-card__modal-body {
@@ -337,12 +337,12 @@ details[open] .donation-card__legacy-toggle::before {
   width: 256px;
   height: 256px;
   border-radius: var(--ds-radius-sm);
-  border: 1px solid var(--ds-color-border, #e5e7eb);
+  border: 1px solid var(--ds-color-border);
 }
 
 .donation-card__qr-instruction {
   font-size: var(--ds-text-sm, 0.875rem);
-  color: var(--ds-color-text-muted, #6b7280);
+  color: var(--ds-color-text-muted);
   text-align: center;
   margin: 0;
 }

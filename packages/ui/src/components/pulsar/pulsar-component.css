@@ -20,8 +20,8 @@
   gap: var(--ds-space-2);
   padding: var(--ds-space-2) var(--ds-space-4);
   border-radius: var(--ds-radius-round);
-  border: 1px solid var(--ds-color-border, #334155);
-  background: var(--ds-color-surface-elevated, #1e293b);
+  border: 1px solid var(--ds-color-border);
+  background: var(--ds-color-surface-elevated);
   width: fit-content;
 }
 
@@ -56,22 +56,22 @@
 
 .pulsar--fresh .pulsar__dot,
 .pulsar--fresh .pulsar__dot::before {
-  background: #22c55e;
+  background: var(--ds-color-success-solid);
 }
 
 .pulsar--recent .pulsar__dot,
 .pulsar--recent .pulsar__dot::before {
-  background: #f59e0b;
+  background: var(--ds-color-status-fair);
 }
 
 .pulsar--stale .pulsar__dot,
 .pulsar--stale .pulsar__dot::before {
-  background: #ef4444;
+  background: var(--ds-color-danger-bright);
 }
 
 .pulsar--unknown .pulsar__dot,
 .pulsar--unknown .pulsar__dot::before {
-  background: var(--ds-color-text-secondary, #94a3b8);
+  background: var(--ds-color-text-secondary);
 }
 
 /* Suppress animation for stale / unknown — no point in pulsing urgently */
@@ -86,12 +86,12 @@
 .pulsar__label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
 }
 
 .pulsar__time {
   font-size: 0.75rem;
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
 }
 
 .pulsar__time::before {

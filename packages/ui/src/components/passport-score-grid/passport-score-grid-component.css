@@ -16,15 +16,15 @@
 
 .passport-score-grid {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border, #334155);
+  border: 1px solid var(--ds-color-border);
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-color-surface, #0f172a);
+  background: var(--ds-color-surface);
 }
 
 .passport-score-grid__heading {
   font-size: var(--ds-font-size-xl, 1.25rem);
   font-weight: 600;
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
   margin: 0 0 var(--ds-space-5);
 }
 
@@ -43,29 +43,29 @@
 }
 
 .passport-score-grid__composite--excellent {
-  color: #22c55e;
+  color: var(--ds-color-success-solid);
 }
 .passport-score-grid__composite--good {
-  color: #84cc16;
+  color: var(--ds-color-status-good);
 }
 .passport-score-grid__composite--fair {
-  color: #f59e0b;
+  color: var(--ds-color-status-fair);
 }
 .passport-score-grid__composite--poor {
-  color: #ef4444;
+  color: var(--ds-color-danger-bright);
 }
 
 .passport-score-grid__composite-value {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1;
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
 }
 
 .passport-score-grid__composite-label {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -97,18 +97,18 @@
 .passport-score-grid__pillar-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
 }
 
 .passport-score-grid__pillar-weight {
   font-size: 0.75rem;
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
 }
 
 .passport-score-grid__bar-track {
   grid-column: 1 / 2;
   height: 0.5rem;
-  background: var(--ds-color-surface-elevated, #1e293b);
+  background: var(--ds-color-surface-elevated);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -120,16 +120,16 @@
 }
 
 .passport-score-grid__bar-fill--excellent {
-  background: #22c55e;
+  background: var(--ds-color-success-solid);
 }
 .passport-score-grid__bar-fill--good {
-  background: #84cc16;
+  background: var(--ds-color-status-good);
 }
 .passport-score-grid__bar-fill--fair {
-  background: #f59e0b;
+  background: var(--ds-color-status-fair);
 }
 .passport-score-grid__bar-fill--poor {
-  background: #ef4444;
+  background: var(--ds-color-danger-bright);
 }
 
 .passport-score-grid__pillar-value {
@@ -137,7 +137,7 @@
   grid-column: 2 / 3;
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
   text-align: right;
   align-self: center;
 }
@@ -147,11 +147,11 @@
 .passport-score-grid__version {
   margin: var(--ds-space-5) 0 0;
   font-size: 0.75rem;
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
   text-align: center;
 }
 
 .passport-score-grid__unavailable {
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
   font-style: italic;
 }

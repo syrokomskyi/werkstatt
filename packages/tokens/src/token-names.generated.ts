@@ -181,6 +181,8 @@ export const TOKEN_NAMES = [
   "--ds-color-success-bright-60",
   "--ds-color-success-border",
   "--ds-color-success-soft",
+  "--ds-color-status-good",
+  "--ds-color-status-fair",
   "--ds-color-warning-strong",
   "--ds-color-status",
   "--ds-color-danger",

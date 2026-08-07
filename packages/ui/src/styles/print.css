@@ -78,10 +78,10 @@ Token-driven and biome-agnostic — no hardcoded pixel widths or site-specific c
 
   /* EffectHost: suppress item-level effects in print. */
   .effect-host--glass {
-    background: var(--ds-color-surface, #fff) !important;
+    background: var(--ds-color-surface) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    border: 1px solid var(--ds-color-border, #ccc) !important;
+    border: 1px solid var(--ds-color-border) !important;
     box-shadow: none !important;
   }
 
@@ -124,13 +124,13 @@ Token-driven and biome-agnostic — no hardcoded pixel widths or site-specific c
   /* Ensure body text is legible on white paper. */
   body {
     background: white !important;
-    color: var(--ds-color-text, #000) !important;
+    color: var(--ds-color-print-text) !important;
   }
 
   /* Links: show URL for external links in print (optional, non-essential). */
   a[href^="http"]:after {
     content: " (" attr(href) ")";
     font-size: 0.85em;
-    color: var(--ds-color-text-muted, #666);
+    color: var(--ds-color-text-muted);
   }
 }

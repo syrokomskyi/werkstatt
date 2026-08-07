@@ -16,15 +16,15 @@
 
 .passport-provenance {
   padding: var(--ds-space-6);
-  border: 1px solid var(--ds-color-border, #334155);
+  border: 1px solid var(--ds-color-border);
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-color-surface, #0f172a);
+  background: var(--ds-color-surface);
 }
 
 .passport-provenance__heading {
   font-size: var(--ds-font-size-xl, 1.25rem);
   font-weight: 600;
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
   margin: 0 0 var(--ds-space-4);
 }
 
@@ -42,19 +42,19 @@
 
 .passport-provenance__entry dt {
   font-weight: 500;
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
   font-size: 0.875rem;
 }
 
 .passport-provenance__entry dd {
-  color: var(--ds-color-text-primary, #f1f5f9);
+  color: var(--ds-color-text-primary);
   font-size: 0.875rem;
   margin: 0;
 }
 
 .passport-provenance__sha {
   font-family: ui-monospace, monospace;
-  background: var(--ds-color-surface-elevated, #1e293b);
+  background: var(--ds-color-surface-elevated);
   padding: 0.125em 0.375em;
   border-radius: var(--ds-radius-sm);
 }
@@ -68,13 +68,13 @@
   font-family: ui-monospace, monospace;
   font-size: 0.75rem;
   overflow-x: auto;
-  background: var(--ds-color-surface-elevated, #1e293b);
+  background: var(--ds-color-surface-elevated);
   padding: var(--ds-space-3);
   border-radius: var(--ds-radius-sm);
   margin-top: var(--ds-space-2);
 }
 
 .passport-provenance__unavailable {
-  color: var(--ds-color-text-secondary, #94a3b8);
+  color: var(--ds-color-text-secondary);
   font-style: italic;
 }

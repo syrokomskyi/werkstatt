@@ -43,8 +43,8 @@
     width: 0.5em;
     height: 0.5em;
     margin-inline-end: var(--ds-space-2);
-    border-right: 2px solid var(--ds-color-accent, #e39a24);
-    border-bottom: 2px solid var(--ds-color-accent, #e39a24);
+    border-right: 2px solid var(--ds-color-accent);
+    border-bottom: 2px solid var(--ds-color-accent);
     transform: rotate(-45deg);
     transition: transform var(--ds-duration-fast, 120ms) ease;
     flex-shrink: 0;

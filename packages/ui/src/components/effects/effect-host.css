@@ -69,10 +69,10 @@ material styling for any target host rendered by @warpgogol/ui.
 /* RFC-0257: Suppress effects in print media */
 @media print {
   .effect-host--glass {
-    background: var(--ds-color-surface, #fff) !important;
+    background: var(--ds-color-surface) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    border: 1px solid var(--ds-color-border, #ccc) !important;
+    border: 1px solid var(--ds-color-border) !important;
     box-shadow: none !important;
   }
 
