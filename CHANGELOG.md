@@ -5,59 +5,82 @@ All notable changes to the `werkstatt` project are documented here.
 ## 2026-07-30 — 2026-08-05
 
 ### Added
-- Document SKILL-09 PREFERENCES.md instruction in 6 ef-* skills and SKILL-01/17 in fo-session-retro across corresponding SKILL.md files.
-- Vendor Editframe domain skills into core and forge skill directories, including ef-brand-video-generator, ef-composition, ef-dev-server, ef-editor-gui, ef-motion-design, and ef-webhooks with corresponding SKILL.md documentation.
-- Add configurable axiom methodologies with per-methodology gate to methodologies-config, axiom-report, methodologies-validate, mission-check, pipelines/packages-check and related tests.
-- Add RFC-0653 implementation with pipeline build caching and build skip in leitstand module and print PDF component.
-- Add unit tests for RFC-0653 build-skip cache and print.pdf.copy.
-- Add YAML backtick scanning guidance to the forge agent documentation.
-- Add new regression test for conditional ownership entry coverage in generated.stale.validate.
-- Add documentation convention for shared utilities to AGENTS.md.
-- Add support for the ownership.sync.validate command, including implementation, integration into build and author check pipelines, updates to the command table, and new unit tests.
-- Add fo-session-save skill portability support and tests in Forge config and onboarding scripts.
+- Add SKILL-09 instructions to PREFERENCES.md for six ef-* skills and fo-session-retro.
+- Add editframe profile with React template and migrate former editframe-html assets to use it.
+- Vendor six Editframe domain skills into Forge and add their documentation.
+- Add and update tests for Editframe profile migration and associated skills.
+- Add support for actionable context checkpoint directives to pipeline conventions skills for both .agents and packages/forge copies.
+- Add SKILL guidance for 'fo-idea-i-just-want-to-see-the-result' skill templates in both .agents and packages/forge directories.
+- Add setTimeout stub testing rule to AGENTS.md in site-kernel-handoff.
+- Add semantic binding keys to forge.yaml for skills configuration.
+- Add dependency direction rule, Axiom gate severity rule, JSON.parse error handling rule, barrel export rule, numeric flag parsing rule, createRequire pnpm rule, RFC TypeScript contract review discipline rule, and session retro rules to AGENTS.md files.
+- Add formalization details and new tests to the RFC-0613 markdown twin provenance documentation.
+- Add ownership.sync.validate command implementation and unit tests to site-kernel modules.
+- Add two-pass bitrate-capped MP4 encoding to video variants and update related property-based tests.
 
 ### Changed
-- Update source field and skill count in forge and AGENTS.md files to reflect new PREFERENCES requirements.
-- Rename editframe-html profile and templates to editframe with a React template and update YAML files accordingly.
-- Update Editframe profile-related tests and golden fixtures to reflect the profile rename and YAML escape fixes.
-- Update skill documentation for ef-composition-review, ef-onboard, and ef-render-verify to align with React integration and improve skill clarity.
-- Update profile schema and related test cases for attribute-pattern handling and YAML quoting rules.
-- Update AGENTS.md and AGENTS.md for site-kernel-handoff to document changes and clarify behavior.
-- Update command-tables/infra-contracts.ts to support new methodologies functionality.
-- Update leitstand-commands.ts for methodologies and gate changes.
-- Update command tables, print-pdf logic, and pipeline build-post integration to support pipeline cache and build skip for leitstand.dev-deploy.
-- Update platform version log and package.json to reflect guidance addition.
-- Update wrapMaskableSvg implementation and shared diagnostic type in icons.ts for improved error logging and coverage in icon handling.
-- Update AGENTS.md with RFC-CMD-02 manifest staleness rule and new documentation details.
-- Update generated-stale-validate.ts to support ownership.sync.validate command with validation logic.
-- Update build-prepare.ts and sites-check-author.ts to invoke the new ownership.sync.validate command as part of pipeline execution.
-- Update SKILL.md files for fo-session-save to include sessionSave binding information.
+- Update fo-session-retro/SKILL.md instructions and adjust SKILL-01/17 references.
+- Update ef-* skills for React support and synchronize documentation to reflect these changes.
+- Rename editframe-html to editframe and migrate profile/schema/test files as needed.
+- Update 'fo-idea-i-just-want-to-see-the-result' skill templates in .agents and packages/forge for increased clarity and pipeline integration.
+- Update site-kernel-handoff AGENTS.md with new setTimeout stub testing rule.
+- Update domain-neutral skill language in SKILL.md files for fo-doc-audit, fo-idea-implement, and forge-bootstrap.
+- Update skill language in packages/forge/skills/fo/fo-doc-audit/SKILL.md, packages/forge/skills/fo/fo-idea-implement/SKILL.md, and packages/forge/skills/meta/forge-bootstrap/SKILL.md to use semantic binding keys.
+- Update architecture-dna.md, command-manifest.generated.yaml, and COMMANDS.md with new Axiom and kernel discipline guidelines and sync changes.
+- Update RFC-0613 markdown twin provenance documentation to improve clarity and expand coverage.
+- Update stale validate and generated validate modules for ownership sync integration.
+- Refactor shared encoder args in video variants generator for improved maintainability.
 
 ### Fixed
-- Correct information and editorial consistency in multiple ef-* and fo-* SKILL.md files, addressing redundancy in PREFERENCES instructions.
-- Correct YAML escaping and update test suites to handle revised YAML schemas.
-- Fix AGENTS.md entries and various test files for consistency with new methodologies logic.
-- Correct command-table logic for codegen and print to align with build skip changes.
-- Correct a platform version log entry to reflect YAML backtick quotation fixes.
-- Register build-identity.json in GENERATOR_OWNERSHIP_MAP and fix conditional flag semantics in generated.stale.validate.
-- Correct documentation and reword/expand certain AGENTS.md conventions.
-- Correct stale validation command implementation and test coverage.
-- Correct bindings for fo-session-save skills to ensure proper session save functionality across agents and Forge.
+- Correct and standardize skill instructions across 6 ef-* skills and fo-session-retro to align with PREFERENCES.md guidance.
+- Fix YAML escaping issues and synchronize related test expectations.
+- Correct and enhance skill templates to align with new context management conventions across .agents/skills and packages/forge/skills directories.
+- Fix fo-review findings in leitstand-0649-freshness.test.ts to remove dead vi.useRealTimers() and correct CHANGE_SUMMARY text.
+- Correct skill binding and language issues in fo-doc-audit and fo-idea-implement SKILL.md files.
+- Remove stale favicon-maskable.svg references from command-tables and test names for icons.
+- Correct issues in RFC-0613 documentation regarding null lastModified handling and YAML null parsing in markdown twin provenance.
+- Fix placeholder expansion and null lastModified acceptance in generated file validators, and improve bordbuch conflict auto-resolution.
+- Relocate property-based tests for video variants generator to src/tests/ directory and fix pass-log cleanup.
 
 ### Removed
-- Remove deprecated editframe-html-templates/composition.html template as part of migration to React-based templates.
-- Remove deprecated entries from COMMANDS.md.
-- 
-- Remove stale grilling QA log and fix-patterns entries from grilling and wg-mission-complete skills.
-- Remove outdated and replaced AGENTS.md rules to align with current conventions.
-- Remove redundant lines in session save skill definitions to streamline bindings.
-
-### Security
-- 
-- Include security review for AGENTS.md shared code recommendations.
+- Remove obsolete editframe-html template file.
+- Remove unnecessary use of vi.useRealTimers() from leitstand-0649-freshness.test.ts as part of fo-review findings remediation.
+- Remove redundant logger.success from leitstand.dev-deploy.
+- Remove dead code from axiom-report.ts and src/mission-check-converter.ts.
+- Remove outdated or redundant sections from the RFC-0613 markdown twin provenance documentation.
 
 ### Documentation
-- Update AGENTS.md and skill documentation for profile and skill name changes, YAML field quoting, and React template integration.
-- Stamp RFC-0653 as implemented in the RFC documentation, update .gitignore, and revise AGENTS.md to describe the build caching and skip capabilities.
-- Expand forge AGENTS.md with new YAML guidance.
-- Clarify and refine AGENTS.md rules for package-specific conventions.
+- Update AGENTS.md and skill documentation for Editframe profile rename and new skills.
+- Document favicon SVG source override in site-composition.md; update site-composition and AGENTS.md files with latest rules and conventions.
+- Clarify implementation requirements and acceptance criteria in RFC-0613 documentation, including test documentation updates.
+- Update bordbuch auto-resolution RFC, ownership.sync.validate RFC and audit documentation to reflect latest acceptance and implementation.
+
+## 2026-07-23 — 2026-07-29
+
+### Added
+- Add pre-flight git status check step to fo-fix and fo-idea-implement skill files to enforce session-start hygiene.
+- Add fo-memory-sync skill and associate documentation for knowledge synchronization workflows.
+- Add new check-fixture-lint.baseline.generated.yaml and file-size-lint.baseline.generated.yaml for validation tracking in packages/os/site-kernel-checks.
+- Add two new baseline kernel flag files to packages/os/site-kernel-checks/src.
+- Add section-body/cards/section-card-grid and comparison/section-comparison support for testing and storybook in packages/ui.
+
+### Changed
+- Update AGENTS.md to include session-start pre-flight rule for agent work hygiene.
+- Update grilling/learned-principles.md and grilling/qa-log.md to reflect revised knowledge principles and Q&A content.
+- Rename 'check-webgogol.ts' to 'check-warpgogol.ts' in packages/os/site-kernel-checks/src/command-tables and diagnostics/rules.
+
+### Fixed
+- Restore pre-flight git status steps in fo-fix and fo-idea-implement skills to ensure proper git hygiene at session start.
+- Register the new fo-memory-sync skill in the forge registry.
+- Update all references from 'wgogol' or 'webgogol' to 'warpgogol' throughout packages/os/site-kernel-checks, ui, and related service layers to ensure consistency in package naming and documentation.
+
+### Removed
+- Remove obsolete or duplicate pre-flight git status content in fo-fix and fo-idea-implement skill files.
+- Remove outdated entries from grilling/learned-principles.md and grilling/qa-log.md.
+- Remove check-webgogol-runner/README.md and wgogol-skills from the repository.
+
+### Security
+- Standardize kernel config and registry files for improved clarity in registry settings.
+
+### Documentation
+- Update DOCS to reflect the 'warpgogol' branding, harmonize command reference and manifest files, and ensure storybook and manifest coverage of newly renamed UI components.
