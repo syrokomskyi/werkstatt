@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes: []
@@ -21,7 +22,7 @@ related:
   - RFC-0742
   - pbp-specification-package/RFC-PBP-082
 satisfies:
-  - DNA-16
+  - DNA-4
 versionBump: patch
 commands:
   proposed: []
@@ -66,28 +67,43 @@ The key principle: **Schema.org output emits business-declared prices only** (so
 ### 1. Schema.org emits business-declared prices only
 
 The Schema.org `Offer` price specification for an Offering MUST use:
+
 - `price`: the canonical source-currency decimal string (e.g. `"70.00"`)
 - `priceCurrency`: the canonical source currency code (e.g. `"EUR"`)
 
 Derived prices (UAH, USD) are NOT emitted in Schema.org structured data.
 
+This constraint applies to **both** Schema.org emission paths in the codebase:
+
+- **PBP compiler projection** (`generateSchemaOrg` in `packages/pbp/src/compiler/projection.ts`) — Phase 12 projection
+- **Share JSON-LD builder** (`buildOrganizationNode` in `packages/share/src/semantic/jsonld/organization.ts`) — page-level JSON-LD
+
 ### 2. No `Offer` duplication
 
 Do NOT create multiple `Offer` entries for the same product — one per currency. Search engines interpret multiple `Offer` entries as different offers, not different display currencies.
 
-### 3. Validation rule
+### 3. `price` field added to PBP compiler projection
 
-The compiler validates that Schema.org output for Offering pages does not contain derived price values. If a derived price value appears in `price` field, the build fails.
+The current `generateSchemaOrg` in `projection.ts` emits `priceCurrency` but does NOT emit `price`. This RFC adds the `price` field, populated from the canonical source-currency charge amount (`pricing.charges.<key>.amount.value` where `model: "fixed"`).
 
-### 4. Rich result compatibility
+### 4. `priceCurrency` added to share JSON-LD builder
+
+The current `buildOrganizationNode` in `organization.ts` emits `priceSpecification.price` but does NOT emit `priceCurrency`. This RFC adds `priceCurrency` to the `Offer` node, populated from the canonical source currency.
+
+### 5. Validation rule (projection-level)
+
+The compiler validates that Schema.org output for Offering pages does not contain derived price values. If a derived price value appears in the `price` field, the build fails with a `PBP-SCHEMA-PRICE` error. This validation runs in Phase 12 (projection), not Phase 10 (semantic entity validation) — it checks the generated Schema.org output, not raw entities.
+
+### 6. Rich result compatibility
 
 The Schema.org output remains compatible with Google's rich result requirements:
+
 - `Offer.price` is a number or numeric string
 - `Offer.priceCurrency` is an ISO 4217 code
 - `Offer.availability` is a Schema.org `ItemAvailability` value
 - No additional fields for derived prices
 
-### 5. Example Schema.org output
+### 7. Example Schema.org output
 
 ```json
 {
@@ -102,7 +118,8 @@ No UAH or USD prices appear in this output, even when the page displays them.
 
 ## Architectural fit
 
-- **DNA-16 (Semantic layer shares topology with navigation).** Schema.org output is derived from the same page topology. The price in Schema.org is the canonical PBP price, not the display price.
+- **DNA-4 (Canonical content in `src/content/`).** Schema.org `price` and `priceCurrency` are derived from canonical PBP content (`pricing.charges` and `pricing.currency` in offering entities), not from derived/materialized prices. This enforces that structured data reflects the business-declared canonical content.
+- **DNA-16 (Semantic layer shares topology with navigation).** Related — Schema.org output is a semantic output derived from the page topology. This RFC constrains price fields within that output but does not change topology derivation.
 - **RFC-0432 (Schema.org Mapping).** This RFC constrains the price output of the existing mapping.
 - **RFC-0742 (Price Projection).** The projection provides derived prices for display. Schema.org ignores the projection and uses the canonical price.
 
@@ -115,22 +132,39 @@ No new CLI command. The Schema.org generation logic is extended with a validatio
 ### TypeScript contracts
 
 ```ts
-// packages/share/src/astro/seo/schema-org.ts — extension
+// packages/pbp/src/compiler/projection.ts — extend generateSchemaOrg
 
-export function buildOfferingSchemaOrg(
-  offering: PbpOffering,
-  options: { includeDerivedPrices: false },
-): SchemaOrgOffer;
+function generateSchemaOrg(graph: PbpResolvedGraph): Record<string, unknown> {
+  // Each Offer node gains:
+  //   price: canonical source-currency decimal string (from pricing.charges.<key>.amount.value)
+  //   priceCurrency: already present (from pricing.currency)
+  // No includeDerivedPrices option — derived prices are never emitted.
+  // The validation rule below enforces this at build time.
+}
+
+// packages/share/src/semantic/jsonld/organization.ts — extend buildOrganizationNode
+
+// The makesOffer Offer nodes gain:
+//   priceCurrency: canonical source currency code
+//   (price is already present via priceSpecification.price)
+
+// packages/pbp/src/compiler/projection.ts — validation function
+
+function validateSchemaOrgPrices(
+  schemaOrg: Record<string, unknown>,
+  canonicalPrices: Set<string>,
+): PbpValidationError[];
 ```
 
-The `includeDerivedPrices` option is always `false`. It exists to make the constraint explicit and prevent accidental inclusion.
+No `includeDerivedPrices` option. The constraint is enforced by the validation rule, not by an API parameter. An always-false option adds dead code and API surface without value.
 
 ### File system responsibilities
 
 | Path | Role |
-|---|---|
-| `packages/share/src/astro/seo/schema-org.ts` | Schema.org generation — price field uses canonical source price only |
-| `packages/pbp/src/compiler/semantic.ts` | Validation rule: no derived price values in Schema.org output |
+| --- | --- |
+| `packages/pbp/src/compiler/projection.ts` | Extend `generateSchemaOrg` to emit `price` field; add `validateSchemaOrgPrices` validation function |
+| `packages/share/src/semantic/jsonld/organization.ts` | Extend `buildOrganizationNode` `makesOffer` to include `priceCurrency` |
+| `packages/pbp/src/compiler/pipeline.ts` | Call `validateSchemaOrgPrices` after projection generation (Phase 12) |
 
 ### Output format
 
@@ -138,12 +172,15 @@ N/A — constrains existing Schema.org output.
 
 ### Failure modes
 
-- **Derived price in Schema.org.** Compiler validation fails with error: "PBP-SCHEMA-PRICE: Derived price value '{value}' found in Schema.org price field. Only canonical source-currency prices are allowed in structured data."
+- **Derived price in Schema.org.** Compiler validation fails with error: "PBP-SCHEMA-PRICE: Derived price value '{value}' found in Schema.org price field. Only canonical source-currency prices are allowed in structured data." This is a blocking error in `build.check` pipeline step.
+- **Offering without pricing.** If an offering has no `pricing` field, the Schema.org `Offer` node omits `price` and `priceCurrency`. The validation rule skips offerings without pricing — no false positive.
+- **Offering with non-fixed charge model.** If `pricing.charges.<key>.amount.model` is not `"fixed"` (e.g. `"range"`, `"tiered"`), the `price` field is omitted. Schema.org `Offer.price` requires a single decimal string; range/tiered prices cannot be represented.
 
 ## Rollout
 
-- **Immediate:** Upon acceptance, the validation rule and explicit `includeDerivedPrices: false` option are added.
-- **No content changes:** Existing Schema.org output is already correct (canonical prices only). This RFC makes the constraint explicit and enforced.
+- **Immediate:** Upon acceptance, `price` is added to PBP compiler projection, `priceCurrency` is added to share JSON-LD builder, and the validation rule is added to Phase 12.
+- **No content changes:** Existing content is already correct (canonical prices only). This RFC makes the constraint explicit and enforced.
+- **Compass sync:** `docs/technology.xml` may need update if it references Schema.org output shape.
 
 ## Alternatives considered
 
@@ -159,13 +196,20 @@ N/A — constrains existing Schema.org output.
 
 - **Rich result price mismatch.** If a user sees UAH 3239 on the page but Schema.org says EUR 70, the search snippet may show EUR 70. This is correct behavior — the canonical price is EUR 70. The UAH price is an approximate conversion.
 
+- **False-positive rate.** The validation rule compares `price` field values against the set of known derived price values. False positives are impossible in the current architecture: derived prices are materialized separately from canonical prices (RFC-0740), and the `price` field is populated from `pricing.charges.<key>.amount.value` (canonical source). A derived price can only leak into `price` if the projection builder is modified to read from the wrong source — which is exactly the scenario the validation catches.
+
+- **Agent misinterpretation.** An agent might think adding `priceCurrency: "UAH"` is helpful when the user selects UAH display. The validation rule catches this: `priceCurrency` MUST be the canonical source currency, not the display currency.
+
 ## Acceptance criteria
 
-- [ ] Schema.org `Offer.price` uses canonical source-currency decimal string
-- [ ] Schema.org `Offer.priceCurrency` uses canonical source currency code
-- [ ] No derived/indicative prices in Schema.org output
-- [ ] Compiler validation blocks publication if derived price appears in Schema.org
-- [ ] `includeDerivedPrices: false` option is explicit in `buildOfferingSchemaOrg`
+- [ ] Schema.org `Offer.price` uses canonical source-currency decimal string (PBP compiler path)
+- [ ] Schema.org `Offer.priceCurrency` uses canonical source currency code (both paths)
+- [ ] `priceCurrency` added to share JSON-LD `buildOrganizationNode` `makesOffer` nodes
+- [ ] `price` added to PBP compiler `generateSchemaOrg` Offer nodes
+- [ ] No derived/indicative prices in Schema.org output (both paths)
+- [ ] Compiler validation blocks publication if derived price appears in Schema.org `price` field
+- [ ] Validation runs in Phase 12 (projection), not Phase 10 (semantic)
+- [ ] Offerings without `pricing` field do not trigger false positives
 - [ ] `tsc --noEmit` passes
 - [ ] `vitest run` passes
 - [ ] `rfc.validate` passes on this file
