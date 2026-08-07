@@ -17,6 +17,14 @@ import type { PbpDerivationContract, PbpDerivationResult } from "../derivation.j
 import type { PbpRoundingMode } from "../decimal.js";
 import type { PbpRateDirection } from "../entities/rate-policy.js";
 import type { PbpRateSnapshotSource } from "../entities/rate-snapshot.js";
+import type { PbpResolvedGraph } from "../compiler/types.js";
+import {
+  decimalMultiply,
+  decimalAdd,
+  decimalSubtract,
+  decimalDivide,
+  decimalRound,
+} from "../decimal.js";
 
 export type { PbpRoundingMode } from "../decimal.js";
 export { PBP_ROUNDING_MODES, isPbpRoundingMode } from "../decimal.js";
@@ -137,5 +145,203 @@ export interface PbpCurrencyConversionTrace {
   result: {
     amount: string;
     currency: string;
+  };
+}
+
+/**
+ * Execute the currency conversion derivation pipeline.
+ *
+ * The pipeline is fixed: conversion → percentageAdjustment → fixedAdjustment → rounding → priceEnding.
+ * All intermediate values are decimal strings. No binary float at any step (ADR-012).
+ *
+ * The contract is cast to PbpCurrencyConversionDerivation internally after dispatch by
+ * derivationRef === "currency-conversion". The generic signature is compatible with the
+ * existing executeContract dispatcher pattern.
+ *
+ * @see RFC-0739 §3 (Fixed pipeline execution)
+ * @see RFC-0739 §5 (Failure modes)
+ */
+export function computeCurrencyConversion(
+  graph: PbpResolvedGraph,
+  contract: PbpDerivationContract,
+): PbpCurrencyConversionResult {
+  const typedContract = contract as unknown as PbpCurrencyConversionDerivation;
+  const params = typedContract.parameters;
+  const pipeline = params.pipeline;
+  const { sourceAmount, sourceCurrency, targetCurrency } = pipeline.conversion;
+
+  const snapshotRef = resolveRef(params.rateSnapshotRef);
+  const snapshot = graph.rateSnapshots[snapshotRef];
+
+  if (!snapshot) {
+    return skippedResult(contract, `Rate snapshot not found: ${snapshotRef}`);
+  }
+
+  const rateValue = snapshot.value;
+  const direction = snapshot.quotation.direction;
+  const pair = `${snapshot.pair.sourceCurrency}/${snapshot.pair.targetCurrency}`;
+
+  const now = new Date().toISOString();
+  if (snapshot.freshUntil < now) {
+    return skippedResult(contract, `Rate snapshot past freshUntil: ${snapshot.freshUntil}`);
+  }
+
+  const precision = 2 + 2;
+
+  let conversionOutput: string;
+  if (direction === "target-per-source") {
+    conversionOutput = decimalMultiply(sourceAmount, rateValue);
+  } else {
+    conversionOutput = decimalDivide(sourceAmount, rateValue, precision);
+  }
+
+  const traceCalc: Partial<PbpCurrencyConversionTrace["calculation"]> = {
+    conversion: { input: sourceAmount, rate: rateValue, output: conversionOutput },
+  };
+
+  let adjusted = conversionOutput;
+
+  if (pipeline.percentageAdjustment) {
+    const pct = pipeline.percentageAdjustment.percentage;
+    const factor = decimalAdd("1", decimalDivide(pct, "100", 10));
+    adjusted = decimalMultiply(adjusted, factor);
+    traceCalc.percentageAdjustment = { percentage: pct, output: adjusted };
+  }
+
+  if (pipeline.fixedAdjustment) {
+    const fixedValue = pipeline.fixedAdjustment.value;
+    adjusted = decimalAdd(adjusted, fixedValue);
+    traceCalc.fixedAdjustment = { value: fixedValue, output: adjusted };
+  }
+
+  const roundingMode = pipeline.rounding.mode;
+  const roundingIncrement = pipeline.rounding.increment;
+  const roundingDecimalPlaces = pipeline.rounding.decimalPlaces;
+  const rounded = decimalRound(adjusted, roundingMode, roundingIncrement, roundingDecimalPlaces);
+  traceCalc.rounding = {
+    mode: roundingMode,
+    ...(roundingIncrement !== undefined && { increment: roundingIncrement }),
+    ...(roundingDecimalPlaces !== undefined && { decimalPlaces: roundingDecimalPlaces }),
+    output: rounded,
+  };
+
+  let finalAmount = rounded;
+
+  if (pipeline.priceEnding) {
+    const endingValue = pipeline.priceEnding.value;
+    if (endingValue === "1.00" && roundingIncrement !== "10" && roundingIncrement !== "100") {
+      return failedResult(
+        contract,
+        "PBP-CURRENCY-CONVERSION-ENDING-INCOMPATIBLE",
+        `Price ending value "1.00" requires rounding increment "10" or "100", got: ${roundingIncrement ?? "none"}`,
+      );
+    }
+    finalAmount = decimalSubtract(finalAmount, endingValue);
+    traceCalc.priceEnding = { operation: "subtract", value: endingValue, output: finalAmount };
+  }
+
+  if (finalAmount.startsWith("-")) {
+    return failedResult(
+      contract,
+      "PBP-CURRENCY-CONVERSION-NEGATIVE",
+      `Pipeline produced negative amount: ${finalAmount}`,
+    );
+  }
+
+  if (finalAmount === "0" || finalAmount === "0.0" || finalAmount === "0.00") {
+    const sourceIsPositive =
+      !sourceAmount.startsWith("-") &&
+      sourceAmount !== "0" &&
+      sourceAmount !== "0.0" &&
+      sourceAmount !== "0.00";
+    if (sourceIsPositive) {
+      return failedResult(
+        contract,
+        "PBP-CURRENCY-CONVERSION-ZERO",
+        `Pipeline produced zero for positive source amount: ${sourceAmount}`,
+      );
+    }
+  }
+
+  const trace: PbpCurrencyConversionTrace = {
+    source: { amount: sourceAmount, currency: sourceCurrency },
+    rate: {
+      value: rateValue,
+      pair,
+      direction,
+      sourceKind: snapshot.source.kind,
+      observedAt: snapshot.observedAt,
+      snapshotDigest: snapshot.digest.value,
+    },
+    model: {
+      id: "currency-conversion",
+      version: typedContract.implementationVersion,
+    },
+    calculation: traceCalc as PbpCurrencyConversionTrace["calculation"],
+    result: { amount: finalAmount, currency: targetCurrency },
+  };
+
+  return {
+    status: "derived",
+    mode: "exact",
+    value: {
+      amount: finalAmount,
+      currency: targetCurrency,
+      priceKind: "derived",
+      commercialMeaning: "derived-price",
+    },
+    trace,
+    provenance: {
+      derivationRef: "currency-conversion",
+      implementationVersion: contract.implementationVersion,
+      inputDigests: [
+        `source:${sourceAmount}:${sourceCurrency}`,
+        `rate:${rateValue}:${direction}`,
+        `snapshot:${snapshotRef}:${snapshot.digest.value}`,
+        `pipeline:${JSON.stringify(pipeline)}`,
+      ],
+    },
+  };
+}
+
+function resolveRef(ref: PbpEntityRef): string {
+  if (typeof ref === "string") return ref;
+  return (ref as { ref: string }).ref;
+}
+
+function skippedResult(
+  contract: PbpDerivationContract,
+  reason: string,
+): PbpCurrencyConversionResult {
+  return {
+    status: "skipped",
+    mode: "exact",
+    value: undefined as unknown as PbpCurrencyConversionResult["value"],
+    trace: {} as PbpCurrencyConversionTrace,
+    provenance: {
+      derivationRef: "currency-conversion",
+      implementationVersion: contract.implementationVersion,
+      inputDigests: [],
+    },
+    formulaDescription: reason,
+  };
+}
+
+function failedResult(
+  contract: PbpDerivationContract,
+  errorCode: string,
+  reason: string,
+): PbpCurrencyConversionResult {
+  return {
+    status: "failed",
+    mode: "exact",
+    value: undefined as unknown as PbpCurrencyConversionResult["value"],
+    trace: {} as PbpCurrencyConversionTrace,
+    provenance: {
+      derivationRef: "currency-conversion",
+      implementationVersion: contract.implementationVersion,
+      inputDigests: [],
+    },
+    formulaDescription: `${errorCode}: ${reason}`,
   };
 }

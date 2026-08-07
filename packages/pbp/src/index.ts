@@ -588,6 +588,7 @@ export {
   type PbpCurrencyConversionDerivation,
   type PbpCurrencyConversionResult,
   type PbpCurrencyConversionTrace,
+  computeCurrencyConversion,
 } from "./derivations/currency-conversion.js";
 
 // RFC-0739: Decimal arithmetic helpers
