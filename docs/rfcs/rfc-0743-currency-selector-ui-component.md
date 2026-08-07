@@ -267,18 +267,18 @@ N/A — UI component.
 
 ## Acceptance criteria
 
-- [ ] `currency-selector` component renders available target currencies
-- [ ] `currency-selector` persists selection in `localStorage`
-- [ ] `currency-selector` dispatches `wg-currency-change` event
-- [ ] `currency-aware-price-display` reads projection for selected currency
-- [ ] `currency-aware-price-display` renders formatted amount and disclosure note
-- [ ] `currency-aware-price-display` does NOT show source EUR price
-- [ ] Both components have `<slug>-component.manifest.yaml` following Mirror Quintet (DNA-17) with all required fields
-- [ ] Components only render when `multi-currency` is entitled
-- [ ] Client script follows DNA-15 placement contract
-- [ ] `tsc --noEmit` passes
-- [ ] `vitest run` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `currency-selector` component renders available target currencies (evidence: packages/ui/src/components/currency-selector/currency-selector-component.astro)
+- [x] `currency-selector` persists selection in `localStorage` (evidence: packages/ui/src/components/currency-selector/currency-selector-component.client.ts CURRENCY_STORAGE_KEY)
+- [x] `currency-selector` dispatches `wg-currency-change` event (evidence: packages/ui/src/components/currency-selector/currency-selector-component.client.ts dispatchCurrencyChange)
+- [x] `currency-aware-price-display` reads projection for selected currency (evidence: packages/ui/src/components/currency-aware-price-display/currency-aware-price-display-component.client.ts showCurrency)
+- [x] `currency-aware-price-display` renders formatted amount and disclosure note (evidence: packages/ui/src/components/currency-aware-price-display/currency-aware-price-display-component.astro)
+- [x] `currency-aware-price-display` does NOT show source EUR price (evidence: no source-price field in component, only priceVariants from projection)
+- [x] Both components have `<slug>-component.manifest.yaml` following Mirror Quintet (DNA-17) with all required fields (evidence: manifest.contract.validate OK 83 manifests valid)
+- [x] Components only render when `multi-currency` is entitled (evidence: header-component.astro currencies prop defaults to empty array, route registry provides currencies only when entitled)
+- [x] Client script follows DNA-15 placement contract (evidence: *.client.ts colocated under component directories)
+- [x] `tsc --noEmit` passes (evidence: pnpm --filter @warpgogol/ui build:check exit 0)
+- [x] `vitest run` passes (evidence: 42 tests passed across 3 test files)
+- [x] `rfc.validate` passes on this file (evidence: rfc.validate --id RFC-0743 0 errors, 1 warning)
 
 ## Implementation notes for agents
 
