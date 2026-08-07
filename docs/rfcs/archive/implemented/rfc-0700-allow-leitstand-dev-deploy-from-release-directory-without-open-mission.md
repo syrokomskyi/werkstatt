@@ -21,9 +21,11 @@ implementedAt: 2026-08-05
 closedAt:
 supersedes: []
 supersededBy:
+  - RFC-0724
 amends:
   - RFC-0628
-amendedBy: []
+amendedBy:
+  - RFC-0726
 related:
   - RFC-0628
   - RFC-0666

@@ -25,6 +25,7 @@ amends:
   - RFC-0628
 amendedBy:
   - RFC-0630
+  - RFC-0724
 related:
   - DNA-48
   - DNA-49
