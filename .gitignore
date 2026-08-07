@@ -306,3 +306,4 @@ nachweis-signing.key.pub
 *.nachweis-key
 *.key
 .nachweis/
+.forge/pinned-audit.log

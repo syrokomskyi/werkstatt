@@ -1,0 +1,61 @@
+pinned:
+  - path: .forge/pinned.yaml
+    mode: freeze
+    reason: Self-protection — manifest must not be tampered with
+  - path: docs/rfcs/rfc-0000-template.md
+    mode: freeze
+    reason: RFC template — required for rfc.create
+  - path: docs/adrs/adr-0000-template.md
+    mode: freeze
+    reason: ADR template — required for adr.create
+  - path: docs/audits/audit-0000-template.md
+    mode: freeze
+    reason: Audit template — required for audit creation
+  - path: docs/plans/plan-0000-template.md
+    mode: freeze
+    reason: Plan template — required for plan creation
+  - path: docs/architecture-dna.md
+    mode: freeze
+    reason: Architecture DNA invariants — foundational governance document
+  - path: forge.yaml
+    mode: protect
+    reason: Forge configuration — required for all forge commands
+  - path: package.json
+    mode: protect
+    reason: Root package.json — workspace manifest
+  - path: pnpm-workspace.yaml
+    mode: protect
+    reason: Workspace definition
+  - path: AGENTS.md
+    mode: protect
+    reason: Agent rules manifest
+  - path: PREFERENCES.md
+    mode: protect
+    reason: Operator preferences
+  - path: docs/rfcs/
+    mode: protect
+    reason: RFC directory — structural foundation
+  - path: docs/adrs/
+    mode: protect
+    reason: ADR directory — structural foundation
+  - path: systems/registry.yaml
+    mode: protect
+    reason: Sternsystem registry — canonical system definitions
+  - path: turbo.json
+    mode: protect
+    reason: Turborepo pipeline configuration
+  - path: pnpm-lock.yaml
+    mode: protect
+    reason: Lockfile — dependency stability
+  - path: tsconfig/base.json
+    mode: protect
+    reason: Base TypeScript configuration
+  - path: hooks/pre-commit
+    mode: protect
+    reason: Pre-commit hook — platform-scope commit guard
+  - path: .gitattributes
+    mode: protect
+    reason: Git LFS and generated-artifact rules
+  - path: docs/COMMANDS.md
+    mode: protect
+    reason: Command reference documentation
