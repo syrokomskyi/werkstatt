@@ -23,6 +23,7 @@ import { runSemanticDriftValidation } from "../checks/semantic-drift.ts";
 // compass.* handlers migrated to @warpgogol/forge — see packages/forge/os/compass/
 import { runContentVoiceLint } from "../content-voice.ts";
 import { runPbpContentValidate } from "../content-pbp.ts";
+import { runPbpMigrationValidate } from "../pbp-migration.ts";
 import { runContentReferencesValidate } from "../content-references.ts";
 import { runContentFormulaLint } from "../content-formula-lint.ts";
 import { runB2bModelValidate } from "../b2b-model.ts";
@@ -109,6 +110,20 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     reads: ["<site>/src/content/business-profile/**/*.md"],
     modulePaths: ["content-pbp.ts"],
     execute: runPbpContentValidate,
+  },
+  {
+    name: "pbp.migration.validate",
+    description:
+      "Validate owner-decision-register.yaml and migration-coverage-report.yaml structure and coverage (RFC-0468, ADR-0030).",
+    scope: "app",
+    flags: {},
+    supportsAllSites: true,
+    reads: [
+      "<site>/src/content/business-profile/owner-decision-register.yaml",
+      "<site>/src/content/business-profile/migration-coverage-report.yaml",
+    ],
+    modulePaths: ["pbp-migration.ts"],
+    execute: runPbpMigrationValidate,
   },
   {
     name: "content.formula.lint",
