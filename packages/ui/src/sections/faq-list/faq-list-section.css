@@ -71,6 +71,27 @@
   color: var(--ds-color-text-secondary);
 }
 
-.faq-list-section__answer p {
-  margin: 0;
+.faq-list-section__answer-text {
+  display: block;
+}
+
+.faq-list-section__question .currency-aware-price-display,
+.faq-list-section__question .currency-aware-price-display__variant,
+.faq-list-section__answer .currency-aware-price-display,
+.faq-list-section__answer .currency-aware-price-display__variant {
+  display: inline;
+}
+
+.faq-list-section__question .currency-aware-price-display__variant[hidden],
+.faq-list-section__answer .currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+.faq-list-section__question .currency-aware-price-display__amount,
+.faq-list-section__answer .currency-aware-price-display__amount {
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  white-space: nowrap;
 }

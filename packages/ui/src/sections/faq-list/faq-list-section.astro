@@ -16,6 +16,12 @@ import type { SectionProps } from "@warpgogol/share/page";
 import { need, cast, resolveSectionAnchor } from "@warpgogol/share";
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../price-card/price-variants.ts";
 import type { FaqListSectionContent } from "./faq-list-section.types.generated.ts";
 import type { FaqListItem } from "./faq-list-section.types.ts";
 import "./faq-list-section.css";
@@ -30,21 +36,73 @@ const allFaqEntries = await getCollection("faq", (entry: CollectionEntry<"faq">)
   entry.id.startsWith(`${lang}/`),
 );
 
-const faqItems: FaqListItem[] = allFaqEntries
+const derivedPrices = loadDerivedPrices();
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type TextOrPrice = TextPart | PricePart;
+
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)\}/g;
+
+function parsePriceMarkers(text: string): TextOrPrice[] {
+  const parts: TextOrPrice[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: text.slice(lastIndex, match.index) });
+    }
+    const offeringId = match[1]!;
+    const chargeRef = match[2]!;
+    const offeringRef = offeringUriPrefix + offeringId;
+    const entries = derivedPrices?.[offeringRef];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      lang,
+      offeringRef,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ kind: "text", value: text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: text });
+  return parts;
+}
+
+type FaqItemWithParts = FaqListItem & {
+  questionParts: TextOrPrice[];
+  answerParts: TextOrPrice[];
+};
+
+const faqItems: FaqItemWithParts[] = allFaqEntries
   .filter((entry: { data: { tags?: string[] } }) => {
     const data = entry.data as { tags?: string[] };
     if (!tagFilter) return true;
     return data.tags?.includes(tagFilter) ?? false;
   })
-  .map((entry: { data: { slug?: string; question?: string; answer?: string } }) => {
-    const data = entry.data;
-    return {
-      question: need("question", data.question),
-      answer: need("answer", data.answer),
-      slug: need("slug", data.slug),
-    };
-  })
-  .sort((a, b) => a.slug.localeCompare(b.slug));
+  .map(
+    (entry: { data: { slug?: string; question?: string; answer?: string } }): FaqItemWithParts => {
+      const data = entry.data;
+      return {
+        question: need("question", data.question),
+        questionParts: parsePriceMarkers(need("question", data.question)),
+        answer: need("answer", data.answer),
+        answerParts: parsePriceMarkers(need("answer", data.answer)),
+        slug: need("slug", data.slug),
+      };
+    },
+  )
+  .sort((a: FaqItemWithParts, b: FaqItemWithParts) => a.slug.localeCompare(b.slug));
 ---
 
 <SectionShell
@@ -73,7 +131,15 @@ const faqItems: FaqListItem[] = allFaqEntries
       faqItems.map((item) => (
         <details class="faq-list-section__item" name={`faq-${sectionId}`}>
           <summary class="faq-list-section__question">
-            <span>{item.question}</span>
+            <span>
+              {item.questionParts.map((part) =>
+                part.kind === "text" ? (
+                  part.value
+                ) : part.variants ? (
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                ) : null,
+              )}
+            </span>
             <span class="faq-list-section__icon" aria-hidden="true">
               <svg
                 width="20"
@@ -88,7 +154,15 @@ const faqItems: FaqListItem[] = allFaqEntries
             </span>
           </summary>
           <div class="faq-list-section__answer">
-            <p>{item.answer}</p>
+            <span class="faq-list-section__answer-text">
+              {item.answerParts.map((part) =>
+                part.kind === "text" ? (
+                  part.value
+                ) : part.variants ? (
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                ) : null,
+              )}
+            </span>
           </div>
         </details>
       ))
