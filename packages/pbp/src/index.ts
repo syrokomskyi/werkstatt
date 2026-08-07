@@ -610,3 +610,11 @@ export {
   PBP_COMMERCIAL_MEANINGS,
   isPbpCommercialMeaning,
 } from "./materialized-derived-price.js";
+
+// RFC-0742: Currency-Aware Price Projection
+export {
+  type PbpPriceProjection,
+  type PbpPriceDisplayConfig,
+  buildPriceProjection,
+  DEFAULT_DISPLAY_CONFIG,
+} from "./projections/price-projection.js";

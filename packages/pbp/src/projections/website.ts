@@ -6,6 +6,7 @@
  */
 
 import type { PbpEntityRef } from "../entity-ref.js";
+import type { PbpPriceProjection } from "./price-projection.js";
 
 export interface PbpWebsiteProjection {
   projectionTarget: "website";
@@ -13,4 +14,6 @@ export interface PbpWebsiteProjection {
   buyerViewSchemaRef?: PbpEntityRef;
   renderedSections: Record<string, unknown>;
   locale: string;
+  /** Price projections keyed by target currency code. Only present when multi-currency is entitled (RFC-0742). */
+  priceProjections?: Record<string, PbpPriceProjection>;
 }

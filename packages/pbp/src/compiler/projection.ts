@@ -7,12 +7,15 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0467 — Phase 12: projection.</item>
+  <item>Extended by RFC-0742 — attach priceProjections and priceTraces from materialized derived prices.</item>
 </CHANGE_SUMMARY>
 */
 
 import type { PbpWebsiteProjection } from "../projections/website.js";
 import type { PbpAiAnswerProjection } from "../projections/ai-answer.js";
 import type { PbpBuyerView, PbpProjectionSet, PbpResolvedGraph } from "./types.js";
+import { buildPriceProjection } from "../projections/price-projection.js";
+import type { PbpCurrencyConversionTrace } from "../derivations/currency-conversion.js";
 
 export async function generateProjections(
   graph: PbpResolvedGraph,
@@ -20,25 +23,43 @@ export async function generateProjections(
   locale: string,
 ): Promise<PbpProjectionSet> {
   const offerings = Object.values(graph.offerings).sort((a, b) => a.id.localeCompare(b.id));
+  const derivedPrices = graph.derivedPrices ?? {};
 
-  const website: PbpWebsiteProjection[] = offerings.map(
-    (offering) =>
-      ({
-        offeringId: offering.id,
-        locale,
-        renderedSections: buyerView?.sections ?? {},
-      }) as unknown as PbpWebsiteProjection,
-  );
+  const website: PbpWebsiteProjection[] = offerings.map((offering) => {
+    const materialized = derivedPrices[offering.id] ?? [];
+    const priceProjections: Record<string, ReturnType<typeof buildPriceProjection>> = {};
+    for (const mp of materialized) {
+      const projection = buildPriceProjection(mp, locale);
+      if (projection) {
+        priceProjections[mp.amount.currency] = projection;
+      }
+    }
 
-  const aiAnswer: PbpAiAnswerProjection[] = offerings.map(
-    (offering) =>
-      ({
-        offeringId: offering.id,
-        locale,
-        allowedFacts: [],
-        deniedFacts: [],
-      }) as unknown as PbpAiAnswerProjection,
-  );
+    return {
+      offeringId: offering.id,
+      locale,
+      renderedSections: buyerView?.sections ?? {},
+      ...(Object.keys(priceProjections).length > 0 ? { priceProjections } : {}),
+    } as unknown as PbpWebsiteProjection;
+  });
+
+  const aiAnswer: PbpAiAnswerProjection[] = offerings.map((offering) => {
+    const materialized = derivedPrices[offering.id] ?? [];
+    const priceTraces: Record<string, PbpCurrencyConversionTrace> = {};
+    for (const mp of materialized) {
+      if (mp.allowedUses.aiAnswers) {
+        priceTraces[mp.amount.currency] = mp.trace;
+      }
+    }
+
+    return {
+      offeringId: offering.id,
+      locale,
+      allowedFacts: [],
+      deniedFacts: [],
+      ...(Object.keys(priceTraces).length > 0 ? { priceTraces } : {}),
+    } as unknown as PbpAiAnswerProjection;
+  });
 
   const schemaOrg = generateSchemaOrg(graph);
 

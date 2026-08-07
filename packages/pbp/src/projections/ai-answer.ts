@@ -7,6 +7,7 @@
  */
 
 import type { PbpEntityRef } from "../entity-ref.js";
+import type { PbpCurrencyConversionTrace } from "../derivations/currency-conversion.js";
 
 export interface PbpAiAnswerProjection {
   projectionTarget: "ai-answer";
@@ -15,4 +16,6 @@ export interface PbpAiAnswerProjection {
   allowedFacts: Record<string, unknown>;
   deniedFacts: string[];
   locale: string;
+  /** Price calculation traces keyed by target currency code. Only present when multi-currency is entitled (RFC-0742). */
+  priceTraces?: Record<string, PbpCurrencyConversionTrace>;
 }
