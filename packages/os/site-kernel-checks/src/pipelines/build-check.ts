@@ -42,4 +42,6 @@ export const SITES_BUILD_CHECK_PIPELINE: KernelPipelineStep[] = [
   { command: "open-source.validate" },
   // RFC-0601: detect content drift in generated files (DNA-58)
   { command: "generated.drift.validate" },
+  // RFC-0732: content regression gate — resolved page content drift detection (DNA-61)
+  { command: "content.regression.check" },
 ];

@@ -496,6 +496,24 @@ export const CORE_INFRA_RULES: Record<string, RuleDescriptor> = {
     "error",
   ),
 
+  // content.regression.check — RFC-0732 resolved page content drift detection (DNA-61).
+  "CREG-01": rule(
+    "CREG-01",
+    "Resolved content for a route differs from golden snapshot",
+    "content.regression.check",
+  ),
+  "CREG-02": rule(
+    "CREG-02",
+    "Route set mismatch — route exists in current but not golden, or vice versa",
+    "content.regression.check",
+  ),
+  "CREG-03": rule(
+    "CREG-03",
+    "No golden snapshot found — cold start, first mission creates baseline",
+    "content.regression.check",
+    "warning",
+  ),
+
   // yaml.contract.lint — YAML-first workspace convention enforcement.
   "YAML-CONTRACT-01": rule(
     "YAML-CONTRACT-01",
