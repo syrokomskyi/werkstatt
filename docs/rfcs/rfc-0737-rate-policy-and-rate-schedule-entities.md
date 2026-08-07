@@ -413,20 +413,20 @@ N/A — library-only.
 
 ## Acceptance criteria
 
-- [ ] `PbpRatePolicy` interface exported from `@warpgogol/pbp`
-- [ ] `PbpRateSchedule` interface exported
-- [ ] `PbpRateMode` closed union exported with const array
-- [ ] `PbpRateDirection` closed union exported with const array
-- [ ] `PbpCurrencyPair` interface exported
-- [ ] `PbpQuotation` interface exported
-- [ ] `PbpRateScheduleEntry` interface exported
-- [ ] `RATE_POLICY_SCHEMA_ID` constant exported
-- [ ] `RATE_SCHEDULE_SCHEMA_ID` constant exported
-- [ ] `pbpRatePolicySchema` Zod schema exported and registered in `pbpSchemaById`
-- [ ] `pbpRateScheduleSchema` Zod schema exported and registered in `pbpSchemaById`
-- [ ] `tsc --noEmit` passes for `packages/pbp/`
-- [ ] `vitest run` passes for `packages/pbp/`
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpRatePolicy` interface exported from `@warpgogol/pbp` (evidence: packages/pbp/src/index.ts:560, d9361907)
+- [x] `PbpRateSchedule` interface exported (evidence: packages/pbp/src/index.ts:562, d9361907)
+- [x] `PbpRateMode` closed union exported with const array (evidence: packages/pbp/src/index.ts:556-564, d9361907)
+- [x] `PbpRateDirection` closed union exported with const array (evidence: packages/pbp/src/index.ts:557-566, d9361907)
+- [x] `PbpCurrencyPair` interface exported (evidence: packages/pbp/src/index.ts:558, d9361907)
+- [x] `PbpQuotation` interface exported (evidence: packages/pbp/src/index.ts:559, d9361907)
+- [x] `PbpRateScheduleEntry` interface exported (evidence: packages/pbp/src/index.ts:561, d9361907)
+- [x] `RATE_POLICY_SCHEMA_ID` constant exported (evidence: packages/pbp/src/index.ts:567, d9361907)
+- [x] `RATE_SCHEDULE_SCHEMA_ID` constant exported (evidence: packages/pbp/src/index.ts:568, d9361907)
+- [x] `pbpRatePolicySchema` Zod schema exported and registered in `pbpSchemaById` (evidence: packages/pbp/src/schemas/index.ts:73-81,141, d9361907)
+- [x] `pbpRateScheduleSchema` Zod schema exported and registered in `pbpSchemaById` (evidence: packages/pbp/src/schemas/index.ts:73-81,142, d9361907)
+- [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run build:check exit 0)
+- [x] `vitest run` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp run test — 13 test files pass, 1 pre-existing failure in rfc-0468 unrelated to RFC-0737)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0737 exit 0)
 
 ## Implementation notes for agents
 
