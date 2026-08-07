@@ -30,6 +30,7 @@ import { claimSchema } from "../claim.js";
 import { evidenceSourceSchema } from "../evidence-source.js";
 import { disclosureSchema } from "../disclosure.js";
 import { publicDocumentSchema } from "../public-document.js";
+import { pbpCurrencyPricingPolicySchema } from "../currency-pricing-policy.js";
 import { pbpSchemaById } from "../index.js";
 import { pbpSchemaId } from "../../schema-id.js";
 
@@ -684,6 +685,120 @@ describe("dataRetentionPolicySchema", () => {
   });
 });
 
+describe("pbpCurrencyPricingPolicySchema", () => {
+  const basePolicy = {
+    schema: "pbp/currency-pricing-policy@1",
+    id: "warpgogol-currency-policy-default",
+    status: "published" as const,
+    type: "currency-pricing-policy" as const,
+    businessRef: { ref: "pbp/business@1:warpgogol" },
+    baseCurrency: "EUR",
+  };
+
+  it("accepts a valid currency-pricing-policy with derived strategy", () => {
+    const valid = {
+      ...basePolicy,
+      targetCurrencies: {
+        uah: {
+          currency: "UAH",
+          strategy: "derived",
+          derivationContractRef: { ref: "pbp-derivation:currency-conversion/1" },
+          ratePolicyRef: { ref: "pbp/rate-policy@1:eur-uah" },
+          currentUses: {
+            presentation: true,
+            aiAnswers: true,
+            quote: false,
+            contract: false,
+            invoice: false,
+            settlement: false,
+          },
+        },
+      },
+    };
+    expect(pbpCurrencyPricingPolicySchema.parse(valid)).toMatchObject({ baseCurrency: "EUR" });
+  });
+
+  it("accepts a valid currency-pricing-policy with fixed strategy", () => {
+    const valid = {
+      ...basePolicy,
+      targetCurrencies: {
+        usd: {
+          currency: "USD",
+          strategy: "fixed",
+          ratePolicyRef: { ref: "pbp/rate-policy@1:eur-usd" },
+          currentUses: {
+            presentation: true,
+            aiAnswers: false,
+            quote: false,
+            contract: false,
+            invoice: false,
+            settlement: false,
+          },
+        },
+      },
+    };
+    expect(pbpCurrencyPricingPolicySchema.parse(valid)).toMatchObject({ baseCurrency: "EUR" });
+  });
+
+  it("rejects empty targetCurrencies", () => {
+    expect(() =>
+      pbpCurrencyPricingPolicySchema.parse({ ...basePolicy, targetCurrencies: {} }),
+    ).toThrow();
+  });
+
+  it("rejects unknown field (.strict)", () => {
+    expect(() =>
+      pbpCurrencyPricingPolicySchema.parse({
+        ...basePolicy,
+        targetCurrencies: {
+          uah: {
+            currency: "UAH",
+            strategy: "derived",
+            derivationContractRef: { ref: "pbp-derivation:currency-conversion/1" },
+            ratePolicyRef: { ref: "pbp/rate-policy@1:eur-uah" },
+            currentUses: {
+              presentation: true,
+              aiAnswers: false,
+              quote: false,
+              contract: false,
+              invoice: false,
+              settlement: false,
+            },
+          },
+        },
+        extraField: "not allowed",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects missing businessRef", () => {
+    expect(() =>
+      pbpCurrencyPricingPolicySchema.parse({
+        schema: "pbp/currency-pricing-policy@1",
+        id: "test",
+        status: "published",
+        type: "currency-pricing-policy",
+        baseCurrency: "EUR",
+        targetCurrencies: {
+          uah: {
+            currency: "UAH",
+            strategy: "fixed",
+            ratePolicyRef: { ref: "pbp/rate-policy@1:eur-uah" },
+            currentUses: {
+              presentation: true,
+              aiAnswers: false,
+              quote: false,
+              contract: false,
+              invoice: false,
+              settlement: false,
+            },
+          },
+        },
+      }),
+    ).toThrow();
+  });
+});
+
 describe("pbpSchemaById registry", () => {
   it("contains all expected schema IDs", () => {
     const expectedIds = [
@@ -711,6 +826,7 @@ describe("pbpSchemaById registry", () => {
       "disclosure",
       "consent",
       "public-document",
+      "currency-pricing-policy",
     ];
     for (const entity of expectedIds) {
       const id = pbpSchemaId(entity);
@@ -718,7 +834,7 @@ describe("pbpSchemaById registry", () => {
     }
   });
 
-  it("has 24 registered schemas", () => {
-    expect(Object.keys(pbpSchemaById)).toHaveLength(24);
+  it("has 25 registered schemas", () => {
+    expect(Object.keys(pbpSchemaById)).toHaveLength(25);
   });
 });

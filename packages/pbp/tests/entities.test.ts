@@ -7,6 +7,9 @@ import {
   CLAIM_SCHEMA_ID,
   PBP_CLAIM_CLASSES,
   PBP_CLAIM_KINDS,
+  CURRENCY_PRICING_POLICY_SCHEMA_ID,
+  PBP_CURRENCY_STRATEGIES,
+  isPbpCurrencyStrategy,
 } from "../src/index.js";
 
 describe("RFC-0403: Business", () => {
@@ -44,5 +47,23 @@ describe("RFC-0405: Claim", () => {
   it("has claim kinds", () => {
     expect(PBP_CLAIM_KINDS).toHaveLength(6);
     expect(PBP_CLAIM_KINDS).toContain("risk");
+  });
+});
+
+describe("RFC-0736: CurrencyPricingPolicy", () => {
+  it("exports CURRENCY_PRICING_POLICY_SCHEMA_ID", () => {
+    expect(CURRENCY_PRICING_POLICY_SCHEMA_ID).toBe("pbp/currency-pricing-policy@1");
+  });
+
+  it("has 2 currency strategies", () => {
+    expect(PBP_CURRENCY_STRATEGIES).toHaveLength(2);
+    expect(PBP_CURRENCY_STRATEGIES).toContain("derived");
+    expect(PBP_CURRENCY_STRATEGIES).toContain("fixed");
+  });
+
+  it("isPbpCurrencyStrategy validates known strategies", () => {
+    expect(isPbpCurrencyStrategy("derived")).toBe(true);
+    expect(isPbpCurrencyStrategy("fixed")).toBe(true);
+    expect(isPbpCurrencyStrategy("unknown")).toBe(false);
   });
 });

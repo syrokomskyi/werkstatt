@@ -64,6 +64,12 @@ export { evidenceSourceSchema } from "./evidence-source.js";
 export { disclosureSchema } from "./disclosure.js";
 export { consentSchema } from "./consent.js";
 export { publicDocumentSchema } from "./public-document.js";
+export {
+  pbpCurrencyPricingPolicySchema,
+  pbpCurrentUsesSchema,
+  pbpCurrencyStrategySchema,
+  pbpCurrencyTargetSchema,
+} from "./currency-pricing-policy.js";
 
 // ---------------------------------------------------------------------------
 // pbpSchemaById registry — maps schema ID strings to their Zod schemas
@@ -92,6 +98,7 @@ import { evidenceSourceSchema as _evidenceSource } from "./evidence-source.js";
 import { disclosureSchema as _disclosure } from "./disclosure.js";
 import { consentSchema as _consent } from "./consent.js";
 import { publicDocumentSchema as _publicDocument } from "./public-document.js";
+import { pbpCurrencyPricingPolicySchema as _currencyPricingPolicy } from "./currency-pricing-policy.js";
 
 import { pbpSchemaId } from "../schema-id.js";
 
@@ -120,6 +127,7 @@ export const pbpSchemaById: Record<string, z.ZodType> = {
   [pbpSchemaId("disclosure")]: _disclosure,
   [pbpSchemaId("consent")]: _consent,
   [pbpSchemaId("public-document")]: _publicDocument,
+  [pbpSchemaId("currency-pricing-policy")]: _currencyPricingPolicy,
 };
 
 // ---------------------------------------------------------------------------
@@ -151,4 +159,5 @@ export const pbpEntityDiscriminatedUnion = z.discriminatedUnion("schema", [
   _disclosure,
   _consent,
   _publicDocument,
+  _currencyPricingPolicy,
 ]);

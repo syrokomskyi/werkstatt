@@ -539,3 +539,14 @@ export {
 
 // RFC-0462: Migration Coverage and Cutover
 export { type PbpMigrationCoverageReport, type PbpCutoverChecklist } from "./migration/cutover.js";
+
+// RFC-0736: CurrencyPricingPolicy Entity
+export {
+  type PbpCurrencyStrategy,
+  type PbpCurrentUses,
+  type PbpCurrencyTarget,
+  type PbpCurrencyPricingPolicy,
+  PBP_CURRENCY_STRATEGIES,
+  isPbpCurrencyStrategy,
+  CURRENCY_PRICING_POLICY_SCHEMA_ID,
+} from "./entities/currency-pricing-policy.js";
