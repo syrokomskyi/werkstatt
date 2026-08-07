@@ -50,8 +50,9 @@ const defaultVariant = priceVariants[0];
 </div>
 
 <script>
-  const container = document.querySelector<HTMLElement>("[data-currency-price-display]");
-  if (container) {
+  import { initCurrencyAwarePriceDisplay } from "./currency-aware-price-display-component.client.ts";
+  const containers = document.querySelectorAll<HTMLElement>("[data-currency-price-display]");
+  for (const container of containers) {
     initCurrencyAwarePriceDisplay(container);
   }
 </script>

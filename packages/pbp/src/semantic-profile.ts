@@ -50,10 +50,11 @@ export async function loadTargetCurrencies(
         baseCurrency: string;
         targetCurrencies: Record<string, { currency: string }>;
       };
-      return Object.values(policy.targetCurrencies).map((t) => ({
+      const targets = Object.values(policy.targetCurrencies).map((t) => ({
         code: t.currency,
         label: t.currency,
       }));
+      return [{ code: policy.baseCurrency, label: policy.baseCurrency }, ...targets];
     }
   }
   return [];

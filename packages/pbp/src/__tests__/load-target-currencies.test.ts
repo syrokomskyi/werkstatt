@@ -94,9 +94,10 @@ describe("loadTargetCurrencies", () => {
 
     const result = await loadTargetCurrencies(testDir, "de");
 
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
+    expect(result[0].code).toBe("EUR");
     const codes = result.map((c) => c.code).sort();
-    expect(codes).toEqual(["UAH", "USD"]);
+    expect(codes).toEqual(["EUR", "UAH", "USD"]);
   });
 
   it("returns empty array when no CurrencyPricingPolicy exists", async () => {

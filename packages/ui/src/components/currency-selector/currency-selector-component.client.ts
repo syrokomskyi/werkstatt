@@ -41,28 +41,39 @@ export function dispatchCurrencyChange(currency: string): void {
   );
 }
 
-export function initCurrencySelector(
-  selectElement: HTMLSelectElement,
-  currencies: string[],
-): void {
-  const stored = getSelectedCurrency();
-  const initialCurrency =
-    stored && currencies.includes(stored) ? stored : (currencies[0] ?? "");
+export function initCurrencySelector(container: HTMLElement, currencies: string[]): void {
+  const buttons = container.querySelectorAll<HTMLButtonElement>("[data-currency-option]");
+  if (buttons.length === 0) return;
 
-  if (initialCurrency && selectElement.value !== initialCurrency) {
-    selectElement.value = initialCurrency;
+  const stored = getSelectedCurrency();
+  const initialCurrency = stored && currencies.includes(stored) ? stored : (currencies[0] ?? "");
+
+  function setActive(currency: string): void {
+    for (const btn of buttons) {
+      const isActive = btn.getAttribute("data-currency-option") === currency;
+      btn.setAttribute("aria-pressed", String(isActive));
+      btn.classList.toggle("currency-selector__option--active", isActive);
+    }
   }
 
-  selectElement.addEventListener("change", () => {
-    const currency = selectElement.value;
-    setSelectedCurrency(currency);
-    dispatchCurrencyChange(currency);
-  });
+  if (initialCurrency) {
+    setActive(initialCurrency);
+  }
+
+  for (const btn of buttons) {
+    btn.addEventListener("click", () => {
+      const currency = btn.getAttribute("data-currency-option") ?? "";
+      if (!currency) return;
+      setSelectedCurrency(currency);
+      setActive(currency);
+      dispatchCurrencyChange(currency);
+    });
+  }
 
   window.addEventListener(CURRENCY_CHANGE_EVENT, (event: Event) => {
     const detail = (event as CustomEvent).detail;
     if (detail && typeof detail.currency === "string") {
-      selectElement.value = detail.currency;
+      setActive(detail.currency);
     }
   });
 }

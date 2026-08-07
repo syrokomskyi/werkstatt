@@ -30,6 +30,8 @@ propsSchema:
   properties:
     hideSectionNumber:
       type: boolean
+    offeringRef:
+      type: string
     tagline:
       type: string
     ctaNote:
@@ -137,3 +139,5 @@ propsSchema:
               value:
                 type: string
                 minLength: 1
+              chargeRef:
+                type: string

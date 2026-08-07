@@ -55,7 +55,7 @@
 
 .site-header__brand-group {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--ds-space-2);
   flex-shrink: 0;
 }
@@ -78,7 +78,11 @@
 }
 
 .site-header__brand-group .lang-switcher__link {
-  margin-top: -0.25rem;
+  margin-top: 0;
+}
+
+.site-header__brand-group .currency-selector {
+  margin-top: 0;
 }
 
 @media (min-width: 960px) {

@@ -13,36 +13,41 @@
 .currency-selector {
   display: inline-flex;
   align-items: center;
-  gap: 0.25em;
+  gap: 0;
+  padding: 0.15em;
+  border-radius: var(--ds-radius-sm, 6px);
+  background: var(--ds-color-surface-muted, rgba(0, 0, 0, 0.06));
 }
 
-.currency-selector__label {
+.currency-selector__option {
   font-family: var(--ds-font-heading);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
-  color: var(--ds-color-text);
-  margin: 0;
-}
-
-.currency-selector__select {
-  font-family: var(--ds-font-heading);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  color: var(--ds-color-text);
-  background-color: inherit;
+  color: var(--ds-color-text-muted, rgba(0, 0, 0, 0.55));
+  background: transparent;
   border: none;
-  border-bottom: 1.5px solid var(--ds-color-text);
-  padding: 0.15em 0.3em;
+  border-radius: calc(var(--ds-radius-sm, 6px) - 0.15em);
+  padding: 0.3em 0.6em;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
+  transition:
+    color 0.2s var(--ds-ease-smooth, ease),
+    background-color 0.2s var(--ds-ease-smooth, ease);
 }
 
-.currency-selector__select:focus {
-  outline: 2px solid var(--ds-color-accent, var(--ds-color-text));
-  outline-offset: 2px;
+.currency-selector__option:hover {
+  color: var(--ds-color-text);
+}
+
+.currency-selector__option--active,
+.currency-selector__option[aria-pressed="true"] {
+  color: var(--ds-color-on-accent, #fff);
+  background: var(--ds-color-accent, #c2410c);
+  box-shadow: var(--ds-shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.12));
+}
+
+.currency-selector__option:focus-visible {
+  outline: 2px solid var(--ds-color-accent, currentColor);
+  outline-offset: 1px;
 }

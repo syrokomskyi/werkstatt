@@ -40,20 +40,28 @@ const content = await getResolvedComponentContent<CurrencySelectorComponentConte
 const currencyCodes = currencies.map((c) => c.code);
 ---
 
-<div class="currency-selector" data-currency-selector>
-  <label class="currency-selector__label" for="currency-select">{content.label}</label>
-  <select id="currency-select" class="currency-selector__select" aria-label={content.label}>
-    {currencies.map((c) => <option value={c.code}>{c.label}</option>)}
-  </select>
+<div class="currency-selector" data-currency-selector role="group" aria-label={content.label}>
+  {
+    currencies.map((c) => (
+      <button
+        type="button"
+        class="currency-selector__option"
+        data-currency-option={c.code}
+        aria-pressed={c.code === currencies[0]?.code}
+      >
+        {c.label}
+      </button>
+    ))
+  }
 </div>
 
 <script>
+  import { initCurrencySelector } from "./currency-selector-component.client.ts";
   const container = document.querySelector<HTMLElement>("[data-currency-selector]");
   if (container) {
-    const select = container.querySelector<HTMLSelectElement>(".currency-selector__select");
-    if (select) {
-      const codes = Array.from(select.options).map((opt) => opt.value);
-      initCurrencySelector(select, codes);
-    }
+    const codes = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("[data-currency-option]"),
+    ).map((btn) => btn.getAttribute("data-currency-option") ?? "");
+    initCurrencySelector(container, codes);
   }
 </script>

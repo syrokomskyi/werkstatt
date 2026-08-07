@@ -28,6 +28,12 @@ import type { HeroDecisionCardSectionContent } from "./hero-decision-card-sectio
 import SectionShell from "@warpgogol/ui/components/section-shell.astro";
 import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import EffectHost from "@warpgogol/ui/components/effects/effect-host.astro";
+import CurrencyAwarePriceDisplay from "@warpgogol/ui/components/currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../price-card/price-variants.ts";
 import "./hero-decision-card-section.css";
 
 const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
@@ -78,6 +84,11 @@ const decisionCardAriaLabel = need(
     ? siteLabels.decisionCardAriaLabel
     : undefined,
 );
+
+const derivedPrices = loadDerivedPrices();
+const offeringRef = props.offeringRef;
+const noteTemplate =
+  typeof siteLabels?.noteTemplate === "string" ? siteLabels.noteTemplate : undefined;
 ---
 
 <SectionShell
@@ -170,12 +181,31 @@ const decisionCardAriaLabel = need(
           aria-label={decisionCardAriaLabel}
         >
           <dl class="hero-decision-card__list">
-            {props.decisionCard.items.map((it) => (
-              <div class="hero-decision-card__row">
-                <dt>{it.label}</dt>
-                <dd>{it.value}</dd>
-              </div>
-            ))}
+            {props.decisionCard.items.map((it) => {
+              const sourceProp: SourcePriceProp | undefined =
+                offeringRef && it.chargeRef
+                  ? { amount: it.value.replace(/[^\d.]/g, ""), currency: "EUR" }
+                  : undefined;
+              const variants =
+                offeringRef && it.chargeRef
+                  ? buildPriceVariants(
+                      sourceProp,
+                      it.chargeRef,
+                      lang,
+                      offeringRef,
+                      derivedPrices,
+                      noteTemplate,
+                    )
+                  : null;
+              return (
+                <div class="hero-decision-card__row">
+                  <dt>{it.label}</dt>
+                  <dd>
+                    {variants ? <CurrencyAwarePriceDisplay priceVariants={variants} /> : it.value}
+                  </dd>
+                </div>
+              );
+            })}
           </dl>
         </EffectHost>
       )
