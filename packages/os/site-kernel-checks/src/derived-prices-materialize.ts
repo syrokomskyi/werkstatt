@@ -23,29 +23,14 @@ import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
 import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { compilePbpProfile } from "@warpgogol/pbp/compiler";
+import type { PbpCompilerResult } from "@warpgogol/pbp/compiler";
 import { materializeDerivedPrices } from "@warpgogol/pbp/compiler";
 import type { PbpCurrencyPricingPolicy } from "@warpgogol/pbp";
-import type { PbpEntity } from "@warpgogol/pbp";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 import { readEntitledFeatures } from "./lib/entitlements.ts";
+import { flagString, findCurrencyPricingPolicy } from "./lib/pbp-helpers.ts";
 
 const DERIVED_PRICES_FILE = "src/derived-prices.generated.json";
-
-function flagString(input: KernelCommandInput, key: string): string | undefined {
-  const v = input.flags[key];
-  return typeof v === "string" ? v : undefined;
-}
-
-function findCurrencyPricingPolicy(
-  entityIndex: Map<string, PbpEntity>,
-): PbpCurrencyPricingPolicy | undefined {
-  for (const entity of entityIndex.values()) {
-    if (entity.type === "currency-pricing-policy") {
-      return entity as unknown as PbpCurrencyPricingPolicy;
-    }
-  }
-  return undefined;
-}
 
 export async function runDerivedPricesMaterialize(
   input: KernelCommandInput,
@@ -76,7 +61,7 @@ export async function runDerivedPricesMaterialize(
   const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
   const locale = defaultLanguageFromManifest(manifest);
 
-  let compilerResult;
+  let compilerResult: PbpCompilerResult;
   try {
     compilerResult = await compilePbpProfile({
       sourceDirectory,
