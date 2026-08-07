@@ -1,7 +1,7 @@
 ---
 id: RFC-0741
 title: "multi-currency Entitled Feature and Build Pipeline"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
 enhancedAt: 2026-08-07
-implementedAt:
+implementedAt: 2026-08-07
 closedAt:
 supersedes: []
 supersededBy:
