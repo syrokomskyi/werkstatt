@@ -24,6 +24,7 @@ Validates braceless collection.file.field syntax only — brace-delimited syntax
   <item>RFC-0529: remove brace-delimited syntax validation — only braceless references are accepted. Add REF-05 diagnostic for residual brace tokens.</item>
   <item>RFC-0570: add =(...) formula expression validation with REF-06..09 error codes.</item>
   <item>RFC-0723: promote REF-04 from warning to error for known collections in mixed strings; skip REF-04 for refs inside =(…) formulas.</item>
+  <item>RFC-0731: add this. self-reference validation — derive sourceRef from file path, expand before resolving, emit REF-12/REF-13.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -44,13 +45,15 @@ import {
   readMarkdownDocument,
 } from "./content-discipline.ts";
 import { readDefaultLanguageCode } from "./lib/i18n.ts";
-import type { ContentRefIndex } from "@warpgogol/share/content-reference";
+import type { ContentRefIndex, SourceRef } from "@warpgogol/share/content-reference";
 import { resolveReference } from "@warpgogol/share/content-reference";
 import { scanFormulas, resolveFormula } from "@warpgogol/share/formula-eval";
 
 const BRACELESS_PATTERN = /\b([a-z][a-z-]*)\.([a-z0-9-/]+)\.([a-zA-Z0-9_.-]+)\b/g;
 
 const BRACE_RESIDUAL_PATTERN = /\{([a-z][a-z-]*[./][a-z0-9-/]+\.[a-zA-Z0-9_.-]+)\}/g;
+
+const THIS_PATTERN = /\bthis\.([a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*)\b/g;
 
 interface LocalReference {
   collection: string;
@@ -73,6 +76,13 @@ function parseBracelessReference(reference: string): LocalReference | null {
 function inferLanguageFromRelativeFile(relativeFile: string, fallback: string): string {
   const match = relativeFile.replace(/\\/g, "/").match(/src\/content\/[a-z-]+\/([a-z]{2})\//);
   return match?.[1] ?? fallback;
+}
+
+function deriveSourceRef(relativeFile: string): SourceRef | null {
+  const normalized = relativeFile.replace(/\\/g, "/");
+  const match = normalized.match(/src\/content\/([a-z][a-z-]*)\/[a-z]{2}\/(.+)\.md$/);
+  if (!match) return null;
+  return { collection: match[1], file: match[2] };
 }
 
 function loadIndex(appRoot: string): ContentRefIndex | null {
@@ -127,6 +137,7 @@ export async function runContentReferencesValidate(
     const inferredLang = inferLanguageFromRelativeFile(doc.relativeFile, defaultLang);
 
     const refs: LocalReference[] = [];
+    const sourceRef = deriveSourceRef(doc.relativeFile);
 
     let match: RegExpExecArray | null;
     BRACELESS_PATTERN.lastIndex = 0;
@@ -174,7 +185,13 @@ export async function runContentReferencesValidate(
         );
       }
 
-      const result = resolveReference(index, ref.raw, inferredLang, defaultLang);
+      const result = resolveReference(
+        index,
+        ref.raw,
+        inferredLang,
+        defaultLang,
+        sourceRef ?? undefined,
+      );
       if (!result.resolved) {
         violations.push(
           `${doc.relativeFile}${lineSuffix} — ${result.error ?? "unresolved reference"} ${ref.raw}`,
@@ -208,10 +225,47 @@ export async function runContentReferencesValidate(
       const formulaText = source.slice(formula.start, formula.end);
       const lineNumbers = findLineNumbersContaining(source, formulaText);
       const lineSuffix = lineNumbers.length > 0 ? `:${lineNumbers[0]}` : "";
-      const result = resolveFormula(index, formula.expression, inferredLang, defaultLang);
+      const result = resolveFormula(
+        index,
+        formula.expression,
+        inferredLang,
+        defaultLang,
+        sourceRef ?? undefined,
+      );
       if (!result.resolved) {
         violations.push(
           `${doc.relativeFile}${lineSuffix} — ${result.error ?? "formula error"} =(${formula.expression})`,
+        );
+      }
+    }
+
+    // RFC-0731: validate this. self-references
+    THIS_PATTERN.lastIndex = 0;
+    let thisMatch: RegExpExecArray | null;
+    while ((thisMatch = THIS_PATTERN.exec(source)) !== null) {
+      const candidate = thisMatch[0];
+      const lineNumbers = findLineNumbersContaining(source, candidate);
+      const lineSuffix = lineNumbers.length > 0 ? `:${lineNumbers[0]}` : "";
+      if (!sourceRef) {
+        violations.push(
+          `${doc.relativeFile}${lineSuffix} — REF-12: this. reference used without sourceRef context ${candidate}`,
+        );
+        continue;
+      }
+      const fieldPath = candidate.slice("this.".length);
+      const expanded = `${sourceRef.collection}.${sourceRef.file}.${fieldPath}`;
+      const result = resolveReference(index, expanded, inferredLang, defaultLang);
+      if (!result.resolved) {
+        violations.push(
+          `${doc.relativeFile}${lineSuffix} — ${result.error ?? "unresolved this. reference"} ${candidate}`,
+        );
+      } else if (
+        result.value !== null &&
+        typeof result.value === "object" &&
+        !Array.isArray(result.value)
+      ) {
+        violations.push(
+          `${doc.relativeFile}${lineSuffix} — reference ${candidate} resolved to object; expected scalar or array`,
         );
       }
     }
