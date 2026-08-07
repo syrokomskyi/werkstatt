@@ -116,6 +116,10 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 - `PbpMigrationMapping`, `PbpLegacyToPbpFieldMap` — Warpgogol legacy migration (RFC-0461)
 - `PbpMigrationCoverageReport`, `PbpCutoverChecklist` — migration coverage and cutover (RFC-0462)
 
+### Multi-currency pricing (RFC-0735..0745)
+
+- `PbpCurrencyPricingPolicy`, `PbpCurrencyStrategy`, `PbpCurrentUses`, `PbpCurrencyTarget`, `CURRENCY_PRICING_POLICY_SCHEMA_ID` — business-level currency strategy entity (RFC-0736)
+
 ## Runtime layer (RFC-0466)
 
 ### Export paths
