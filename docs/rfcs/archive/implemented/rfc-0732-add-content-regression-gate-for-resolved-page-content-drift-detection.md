@@ -22,7 +22,8 @@ closedAt:
 supersedes: []
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0734
 related:
   - DNA-58
   - DNA-48
