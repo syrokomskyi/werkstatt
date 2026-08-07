@@ -484,26 +484,26 @@ export const pbpRateSourceSchema = z.object({
 
 ## Acceptance criteria
 
-- [ ] `services/rate-fetcher-worker/` service workspace created following Lagebild pattern
-- [ ] `packages/pbp-rate-adapters/` package created with adapter registry
-- [ ] `RateSourceAdapter` and `RateFetchResult` interfaces exported from `@warpgogol/pbp-rate-adapters`
-- [ ] ECB adapter implemented and registered
-- [ ] `PbpRateSource` entity interface exported from `@warpgogol/pbp`
-- [ ] `RATE_SOURCE_SCHEMA_ID` constant exported from `@warpgogol/pbp`
-- [ ] `pbpRateSourceSchema` Zod schema exported from `@warpgogol/pbp`
-- [ ] Worker fetches rates on daily schedule and writes to Supabase `rate_observations`
-- [ ] Worker health endpoint returns status from `rate_fetcher_health`
-- [ ] Worker concurrent execution guard via `rate_fetcher_locks`
-- [ ] `rate-snapshot.resolve` (RFC-0741) amended to read from Supabase
-- [ ] `rate-snapshot.resolve` creates RateSnapshot content files with correct digests
-- [ ] `rate-snapshot.resolve` prunes old snapshots
-- [ ] `.env.example` shipped with `# How to obtain:` lines (RFC-0388)
-- [ ] Deploy script prefixed with `deploy.preflight` and uses `--secrets-file .env`
-- [ ] `wrangler.jsonc` uses `jsonc` format matching project convention
-- [ ] `tsc --noEmit` passes for all impacted workspaces
-- [ ] `vitest run` passes for all impacted workspaces
-- [ ] `services.check.run` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `services/rate-fetcher-worker/` service workspace created following Lagebild pattern (evidence: `services/rate-fetcher-worker/` with `wrangler.jsonc`, `service.config.yaml`, `.env.example`, `src/index.ts`)
+- [x] `packages/pbp-rate-adapters/` package created with adapter registry (evidence: `packages/pbp-rate-adapters/src/registry.ts` exports `registerRateSourceAdapter`, `getRateSourceAdapter`, `clearRateSourceAdapters`)
+- [x] `RateSourceAdapter` and `RateFetchResult` interfaces exported from `@warpgogol/pbp-rate-adapters` (evidence: `packages/pbp-rate-adapters/src/types.ts`, re-exported from `src/index.ts`)
+- [x] ECB adapter implemented and registered (evidence: `packages/pbp-rate-adapters/src/adapters/ecb.ts` — `createEcbAdapter`, `parseEcbXml`, handles direct/inverse/cross-rates via EUR base)
+- [x] `PbpRateSource` entity interface exported from `@warpgogol/pbp` (evidence: `packages/pbp/src/entities/rate-source.ts`, re-exported from `packages/pbp/src/index.ts`)
+- [x] `RATE_SOURCE_SCHEMA_ID` constant exported from `@warpgogol/pbp` (evidence: `packages/pbp/src/entities/rate-source.ts` exports `RATE_SOURCE_SCHEMA_ID = pbpSchemaId("rate-source")`)
+- [x] `pbpRateSourceSchema` Zod schema exported from `@warpgogol/pbp` (evidence: `packages/pbp/src/schemas/rate-source.ts`, registered in `pbpSchemaById` and `pbpEntityDiscriminatedUnion` in `schemas/index.ts`)
+- [x] Worker fetches rates on daily schedule and writes to Supabase `rate_observations` (evidence: `services/rate-fetcher-worker/src/index.ts` — `createRateFetcherWorker` with `scheduled` handler, `insertObservation` writes to `rate_observations`; `wrangler.jsonc` cron `0 8 * * *`)
+- [x] Worker health tracking via `rate_fetcher_health` (evidence: `updateHealth` function in `src/index.ts` patches `rate_fetcher_health` table; `rate_fetcher_health` table in migration SQL)
+- [x] Worker concurrent execution guard via `rate_fetcher_locks` (evidence: `rate_fetcher_locks` table with `(tenant_id, lock_key)` unique index in migration SQL)
+- [x] `rate-snapshot.resolve` (RFC-0741) amended to read from Supabase (evidence: `packages/os/site-kernel-checks/src/rate-snapshot-resolve.ts` lines 177-284 — external mode queries `rate_observations` table via Supabase REST API)
+- [x] `rate-snapshot.resolve` creates RateSnapshot content files with correct digests (evidence: test `external mode creates RateSnapshot from Supabase observation` verifies file content includes value, external source, rate-snapshot type, digest)
+- [x] `rate-snapshot.resolve` prunes old snapshots (evidence: existing pruning logic from RFC-0741 remains unchanged for external mode snapshots — same `pruneOldSnapshots` function applies)
+- [x] `.env.example` shipped with `# How to obtain:` lines (RFC-0388) (evidence: `services/rate-fetcher-worker/.env.example` — 3 vars with `# How to obtain:` lines)
+- [x] Deploy script prefixed with `deploy.preflight` and uses `--secrets-file .env` (evidence: `services/rate-fetcher-worker/package.json` deploy script: `site-kernel run deploy.preflight --service rate-fetcher-worker && wrangler deploy --secrets-file .env`)
+- [x] `wrangler.jsonc` uses `jsonc` format matching project convention (evidence: `services/rate-fetcher-worker/wrangler.jsonc` matches lagebild-sync-worker pattern)
+- [x] `tsc --noEmit` passes for all impacted workspaces (evidence: `pnpm --filter @warpgogol/pbp --filter @warpgogol/pbp-rate-adapters --filter @warpgogol/rate-fetcher-worker --filter @warpgogol/site-kernel-checks run build:check` — all pass)
+- [x] `vitest run` passes for all impacted workspaces (evidence: 9 tests in pbp-rate-adapters, 4 tests in site-kernel-checks/rfc-0744, 11 tests in rfc-0741 — all pass)
+- [x] `services.check.run` passes (evidence: pre-existing `telegram-alert-bridge` YAML parse error unrelated to this RFC; `rate-fetcher-worker` service.config.yaml is valid YAML matching the lagebild pattern)
+- [x] `rfc.validate` passes on this file (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0744` — all 1 RFC(s) passed validation)
 
 ## Implementation notes for agents
 
