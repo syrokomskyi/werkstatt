@@ -1,12 +1,13 @@
 ---
 id: RFC-0729
 title: "Formula pipe syntax, formatter registry, and money formatter"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
 enhancedAt: 2026-08-07
