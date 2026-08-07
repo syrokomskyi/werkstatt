@@ -199,14 +199,9 @@ describe("behavior.snapshot.validate (RFC-0269)", () => {
       );
 
       const result = await runBehaviorSnapshotValidate(input, ctx(root, appDirectory));
-      expect(result.exitCode).toBe(1);
-      const diags = (result.data as { diagnostics: Array<{ ruleId: string; message: string }> })
-        .diagnostics;
-      const snap01 = diags.find(
-        (d) => d.ruleId === "SNAP-01" && d.message.includes("/de/impressum/"),
-      );
-      expect(snap01).toBeTruthy();
-      expect(snap01?.message).toMatch(/metaDescription/);
+      // RFC-0724: SNAP-01 now auto-recovers — regenerates the snapshot and returns pass
+      expect(result.exitCode).toBe(0);
+      expect(result.summary).toContain("auto-recovered");
     } finally {
       await rm(root, { recursive: true, force: true });
     }

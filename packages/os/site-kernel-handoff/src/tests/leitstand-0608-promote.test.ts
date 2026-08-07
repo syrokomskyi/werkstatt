@@ -233,7 +233,7 @@ test("leitstand.promote rejects when release state is not alt-deployed", async (
   createRegistry(tmpDir, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
-    state: "published",
+    state: "ready",
     missionId: "test-sys-m000001",
   });
 
@@ -257,7 +257,21 @@ test("leitstand.promote rejects when build-identity.json is not found at alt URL
   createDistDir(tmpDir, releaseId);
   await storeArtifactCore(tmpDir, releaseId, join(tmpDir, "releases", releaseId, "dist"), systemId);
 
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404 }));
+  // RFC-0724: verifyFreshness fetches without cb= param, verification fetches with cb=
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      if (url.includes("cb=")) {
+        return { ok: false, status: 404 } as Response;
+      }
+      // verifyFreshness call — return matching hash so it passes
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ ...VALID_BUILD_IDENTITY, distTreeHash: "dist-hash-123" }),
+      } as Response;
+    }),
+  );
 
   await expect(
     runLeitstandPromote(makeInput({ release: releaseId }), makeContext(tmpDir)),
@@ -278,12 +292,24 @@ test("leitstand.promote rejects on hash mismatch", async () => {
   });
   createDistDir(tmpDir, releaseId);
 
+  // RFC-0724: verifyFreshness fetches without cb= param, verification fetches with cb=
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ ...VALID_BUILD_IDENTITY, distTreeHash: "WRONG-hash" }),
+    vi.fn(async (url: string) => {
+      if (url.includes("cb=")) {
+        // Verification step — return wrong hash
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ ...VALID_BUILD_IDENTITY, distTreeHash: "WRONG-hash" }),
+        } as Response;
+      }
+      // verifyFreshness call — return matching hash so it passes
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ ...VALID_BUILD_IDENTITY, distTreeHash: "dist-hash-123" }),
+      } as Response;
     }),
   );
 
@@ -381,7 +407,11 @@ test("RFC-0618: build-identity fetch URL includes cache-buster query param", asy
 
   await runLeitstandPromote(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  const buildIdentityCall = mockFetch.mock.calls[0];
-  const fetchUrl = buildIdentityCall[0] as string;
+  // RFC-0724: First call is verifyFreshness (no cb=), second is verification (with cb=)
+  const verificationCall = mockFetch.mock.calls.find((call: unknown[]) =>
+    String(call[0]).includes("cb="),
+  );
+  expect(verificationCall).toBeDefined();
+  const fetchUrl = verificationCall![0] as string;
   expect(fetchUrl).toMatch(/\.well-known\/build-identity\.json\?cb=\d+$/);
 });

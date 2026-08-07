@@ -47,7 +47,7 @@ async function setupRelease(root: string, systemId: string, releaseId: string): 
   const releaseDir = join(root, "releases", releaseId);
   await mkdir(releaseDir, { recursive: true });
 
-  const releaseManifest = `state: published
+  const releaseManifest = `state: ready
 platformVersion: 4.5.0
 platformSemanticHash: sha256:abc123
 semver: 4.5.0

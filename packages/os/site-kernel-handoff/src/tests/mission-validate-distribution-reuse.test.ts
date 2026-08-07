@@ -374,7 +374,7 @@ test("reuse path logs bordbuch cleanup when commitBordbuchProjections commits fi
   await runMissionValidate(makeInput(), ctx);
 
   expect(bordbuchCommitMock.called).toBe(true);
-  expect(infoCalls.some((m) => String(m).includes("Bordbuch cleanup"))).toBe(true);
+  expect(infoCalls.some((m) => String(m).includes("Bordbuch auto-commit"))).toBe(true);
 });
 
 test("reuse path continues when commitBordbuchProjections throws", async () => {

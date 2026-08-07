@@ -1,10 +1,10 @@
 /*
 <MODULE_CONTRACT>
-<purpose>RFC-0596: tests for storeArtifactCore extraction, automatic artifact storage in release.publish, and release.validate artifact check.</purpose>
-<keywords>RFC-0596, storeArtifactCore, release.publish, artifact storage, release.validate, test</keywords>
+<purpose>RFC-0596: tests for storeArtifactCore extraction, automatic artifact storage in release.ready, and release.validate artifact check.</purpose>
+<keywords>RFC-0596, storeArtifactCore, release.ready, artifact storage, release.validate, test</keywords>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>RFC-0596: add unit tests for storeArtifactCore (lock-free, idempotent, systemId), release.publish artifact-before-transition, and release.validate published-artifact check.</item>
+  <item>RFC-0596: add unit tests for storeArtifactCore (lock-free, idempotent, systemId), release.ready artifact-before-transition, and release.validate ready-artifact check.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -20,7 +20,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { storeArtifactCore } from "../artifact-store/artifact-store-commands.ts";
-import { runReleasePublish, runReleaseValidate } from "../release/release-commands.ts";
+import { runReleaseReady, runReleaseValidate } from "../release/release-commands.ts";
 import type { KernelRuntimeContext, KernelCommandInput } from "@warpgogol/site-kernel";
 
 function makeContext(workspaceRoot: string): KernelRuntimeContext {
@@ -39,7 +39,7 @@ function makeContext(workspaceRoot: string): KernelRuntimeContext {
 }
 
 function makeInput(flags: Record<string, string>): KernelCommandInput {
-  return { flags, argv: [],  };
+  return { flags, argv: [] };
 }
 
 function writeReleaseManifest(
@@ -185,9 +185,9 @@ test("storeArtifactCore is idempotent — re-running overwrites manifest", async
   expect(result2.uri).toBe(result1.uri);
 });
 
-// --- release.publish tests ---
+// --- release.ready tests ---
 
-test("release.publish stores artifact before state transition", async () => {
+test("release.ready stores artifact before state transition", async () => {
   const releaseId = "test-sys-r000010";
   const systemId = "test-sys";
   const cachePath = join(tmpDir, "cache", systemId);
@@ -210,22 +210,22 @@ test("release.publish stores artifact before state transition", async () => {
     distArtifactHash: null,
   });
 
-  const result = await runReleasePublish(makeInput({ release: releaseId }), makeContext(tmpDir));
+  const result = await runReleaseReady(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  expect(result.data!.state).toBe("published");
+  expect(result.data!.state).toBe("ready");
   expect(result.data!.artifactUri).not.toBeNull();
   expect(result.data!.distArtifactHash).not.toBeNull();
   expect(result.data!.distArtifactHash).toMatch(/^sha256:/);
 
-  // Verify release.yaml has artifact and distArtifactHash set AND state: published
+  // Verify release.yaml has artifact and distArtifactHash set AND state: ready
   const manifest = readReleaseManifestFile(tmpDir, releaseId);
-  expect(manifest.state).toBe("published");
+  expect(manifest.state).toBe("ready");
   expect(manifest.artifact).not.toBe("null");
   expect(manifest.distArtifactHash).not.toBe("null");
   expect(manifest.artifact).toMatch(/^local:\/\//);
 });
 
-test("release.publish output includes distArtifactHash field", async () => {
+test("release.ready output includes distArtifactHash field", async () => {
   const releaseId = "test-sys-r000011";
   const systemId = "test-sys";
   const cachePath = join(tmpDir, "cache", systemId);
@@ -248,14 +248,14 @@ test("release.publish output includes distArtifactHash field", async () => {
     distArtifactHash: null,
   });
 
-  const result = await runReleasePublish(makeInput({ release: releaseId }), makeContext(tmpDir));
+  const result = await runReleaseReady(makeInput({ release: releaseId }), makeContext(tmpDir));
 
   expect(result.data).toHaveProperty("distArtifactHash");
   expect(result.data!.distArtifactHash).not.toBeNull();
   expect(result.data!.distArtifactHash).toMatch(/^sha256:/);
 });
 
-test("release.publish fails on missing dist — state remains prepared", async () => {
+test("release.ready fails on missing dist — state remains prepared", async () => {
   const releaseId = "test-sys-r000012";
   const systemId = "test-sys";
 
@@ -272,7 +272,7 @@ test("release.publish fails on missing dist — state remains prepared", async (
   });
 
   await expect(
-    runReleasePublish(makeInput({ release: releaseId }), makeContext(tmpDir)),
+    runReleaseReady(makeInput({ release: releaseId }), makeContext(tmpDir)),
   ).rejects.toThrow(/no dist\/ directory/);
 
   // Verify state remains prepared
@@ -282,7 +282,7 @@ test("release.publish fails on missing dist — state remains prepared", async (
 
 // --- release.validate tests ---
 
-test("release.validate flags published release without artifact", async () => {
+test("release.validate flags ready release without artifact", async () => {
   const releaseId = "test-sys-r000020";
 
   writeReleaseManifest(tmpDir, releaseId, {
@@ -290,7 +290,7 @@ test("release.validate flags published release without artifact", async () => {
     releaseId,
     systemId: "test-sys",
     semver: "0.1.0",
-    state: "published",
+    state: "ready",
     distTreeHash: "sha256:abc123def456",
     snapshotDiffVerdict: "pass",
     artifact: null,
@@ -298,11 +298,11 @@ test("release.validate flags published release without artifact", async () => {
 
   const result = await runReleaseValidate(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  expect(result.data!.state).toBe("published");
+  expect(result.data!.state).toBe("ready");
   expect(result.data!.artifactPresent).toBe(false);
 });
 
-test("release.validate passes published release with artifact", async () => {
+test("release.validate passes ready release with artifact", async () => {
   const releaseId = "test-sys-r000021";
 
   writeReleaseManifest(tmpDir, releaseId, {
@@ -310,7 +310,7 @@ test("release.validate passes published release with artifact", async () => {
     releaseId,
     systemId: "test-sys",
     semver: "0.1.0",
-    state: "published",
+    state: "ready",
     distTreeHash: "sha256:abc123def456",
     snapshotDiffVerdict: "pass",
     artifact: "local:///some/path/manifest.json",
@@ -318,6 +318,6 @@ test("release.validate passes published release with artifact", async () => {
 
   const result = await runReleaseValidate(makeInput({ release: releaseId }), makeContext(tmpDir));
 
-  expect(result.data!.state).toBe("published");
+  expect(result.data!.state).toBe("ready");
   expect(result.data!.artifactPresent).toBe(true);
 });

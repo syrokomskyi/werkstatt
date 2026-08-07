@@ -180,13 +180,13 @@ test("leitstand.propagate transitions release to alt-deployed on success", async
   createRegistry(tmpDir, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
-    state: "published",
+    state: "ready",
     missionId,
     commitSha: "abc123def456",
     behaviorSnapshotHash: "abc123",
     distTreeHash: "sha256:abc123",
     siteContentHash: "sha256:content-hash",
-    publishedAt: "2026-07-10T00:00:00.000Z",
+    readyAt: "2026-07-10T00:00:00.000Z",
   });
   const distDir = createDistDir(tmpDir, releaseId);
 

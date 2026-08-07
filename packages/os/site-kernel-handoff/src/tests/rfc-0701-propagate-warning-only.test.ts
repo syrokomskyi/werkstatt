@@ -206,13 +206,13 @@ async function runPropagate(buildIdentityOverrides: Record<string, unknown> = {}
   createRegistry(tmpDir, systemId);
   writeReleaseManifest(tmpDir, releaseId, {
     systemId,
-    state: "published",
+    state: "ready",
     missionId,
     commitSha: MATCHING_COMMIT_SHA,
     behaviorSnapshotHash: "abc123",
     distTreeHash: MANIFEST_DIST_TREE_HASH,
     siteContentHash: MANIFEST_SITE_CONTENT_HASH,
-    publishedAt: "2026-07-10T00:00:00.000Z",
+    readyAt: "2026-07-10T00:00:00.000Z",
   });
   const distDir = createDistDir(tmpDir, releaseId);
   await storeArtifactCore(tmpDir, releaseId, distDir, systemId);
@@ -273,9 +273,9 @@ test("RFC-0701: both distTreeHash and siteContentHash mismatch with matching com
 }, 15_000);
 
 test("RFC-0701: commitSha mismatch (both non-0000000) remains a hard error", async () => {
-  await expect(
-    runPropagate({ commitSha: "different123456" }),
-  ).rejects.toThrow("commitSha 'different123456' does not match release commitSha");
+  await expect(runPropagate({ commitSha: "different123456" })).rejects.toThrow(
+    "commitSha 'different123456' does not match release commitSha",
+  );
 }, 15_000);
 
 test("RFC-0701: warning message includes both manifest and identity hash values", async () => {
