@@ -400,18 +400,18 @@ If an operator updates the golden snapshot without reviewing the diff, content r
 
 ## Acceptance criteria
 
-- [x] `content.regression.check` command registered in `command-tables/build-infra.ts` with `scope: app`, `cacheable: false`, `supportsAllSites: true`
-- [x] `content.regression.snapshot.update` command registered in `command-tables/build-infra.ts`
-- [x] `content.regression.check` added to `SITES_BUILD_CHECK_PIPELINE` in `packages/os/site-kernel-checks/src/pipelines/build-check.ts`
-- [x] `CREG-01`, `CREG-02`, `CREG-03` diagnostic rules registered in `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts`
-- [x] Snapshot structure: YAML with `schemaVersion`, `systemId`, `contentHash`, `routes[]` (each route has `route`, `blocks[]`, `faq?[]`, `hash`)
-- [x] Snapshot stored at `{cacheClonePath}/.cache/content-regression/{systemId}.snapshot.yaml` — not committed to workpiece git
-- [x] `mission.close` copies working snapshot to cache clone after bordbuch commit, after `.materialization-state.json` write (mirrors `.cache/video/` pattern)
-- [x] `mission.validate` supports `--skip-content-regression` flag
-- [x] Cold start: `CREG-03` warning emitted when no golden snapshot exists; `exitCode: 0`; does not block first mission
-- [x] `DNA-61` entry added to `docs/architecture-dna.md` with reference to this RFC
-- [x] Unit tests: red (drift detected → CREG-01), green (no drift → pass), cold start (no golden → CREG-03), route set mismatch (CREG-02)
-- [x] `rfc.validate` passes on this file with zero errors
+- [x] `content.regression.check` command registered in `command-tables/build-infra.ts` with `scope: app`, `cacheable: false`, `supportsAllSites: true` (evidence: 026bf9f7)
+- [x] `content.regression.snapshot.update` command registered in `command-tables/build-infra.ts` (evidence: 026bf9f7)
+- [x] `content.regression.check` added to `SITES_BUILD_CHECK_PIPELINE` in `packages/os/site-kernel-checks/src/pipelines/build-check.ts` (evidence: 1c0985cd)
+- [x] `CREG-01`, `CREG-02`, `CREG-03` diagnostic rules registered in `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts` (evidence: 1c0985cd)
+- [x] Snapshot structure: YAML with `schemaVersion`, `systemId`, `contentHash`, `routes[]` (each route has `route`, `blocks[]`, `faq?[]`, `hash`) (evidence: 747b4999)
+- [x] Snapshot stored at `{cacheClonePath}/.cache/content-regression/{systemId}.snapshot.yaml` — not committed to workpiece git (evidence: 747b4999)
+- [x] `mission.close` copies working snapshot to cache clone after bordbuch commit, after `.materialization-state.json` write (mirrors `.cache/video/` pattern) (evidence: f740028b)
+- [x] `mission.validate` supports `--skip-content-regression` flag (evidence: 7bf9bf67)
+- [x] Cold start: `CREG-03` warning emitted when no golden snapshot exists; `exitCode: 0`; does not block first mission (evidence: 9a3cf0f0)
+- [x] `DNA-61` entry added to `docs/architecture-dna.md` with reference to this RFC (evidence: 71ad541f)
+- [x] Unit tests: red (drift detected → CREG-01), green (no drift → pass), cold start (no golden → CREG-03), route set mismatch (CREG-02) (evidence: 9a3cf0f0)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: rfc.validate --id RFC-0732 exit 0)
 
 ## Implementation notes for agents
 
