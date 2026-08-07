@@ -39,7 +39,11 @@ import { pageIdToContentFileSlug } from "@warpgogol/share/content";
 import { localizeUrl } from "@warpgogol/share/url-policy";
 import { DEFAULT_PROFILE_BASE_BY_LANG } from "@warpgogol/share/people-profile-defaults";
 import { FS_CAPABILITIES } from "@warpgogol/content-source";
-import type { ContentEntry, ContentEntryRef, ContentSourceProvider } from "@warpgogol/content-source";
+import type {
+  ContentEntry,
+  ContentEntryRef,
+  ContentSourceProvider,
+} from "@warpgogol/content-source";
 import { parseMarkdownFrontmatter } from "./markdown-frontmatter.ts";
 import { loadSystemManifest } from "./system-manifest.ts";
 import { collectMarkdownFiles } from "./content-files.ts";
@@ -48,6 +52,7 @@ import {
   resolveReferencesInString,
   resolveReferencesDeep,
   EMPTY_CONTENT_REF_INDEX,
+  type SourceRef,
 } from "@warpgogol/share/content-reference";
 import { emitPipelineLogEvent } from "./pipeline-log.ts";
 
@@ -211,7 +216,10 @@ async function loadSiteSemanticProfile(
   const indexPath = join(contentDir, "..", "content-ref-index.generated.yaml");
   const index = getContentRefIndex(indexPath) ?? EMPTY_CONTENT_REF_INDEX;
   const brandName = rawBrandName
-    ? resolveReferencesInString(index, rawBrandName, lang, defaultLang)
+    ? resolveReferencesInString(index, rawBrandName, lang, defaultLang, {
+        collection: "business",
+        file: "company",
+      })
     : "";
 
   // RFC-0200: founders/board/team derive from the canonical Person records'
@@ -229,7 +237,10 @@ async function loadSiteSemanticProfile(
   const legalOwner = legal.owner ?? {};
   const rawLegalBank = legal.bank;
   const bankAccountHolder = rawLegalBank?.accountHolder
-    ? resolveReferencesInString(index, rawLegalBank.accountHolder, lang, defaultLang)
+    ? resolveReferencesInString(index, rawLegalBank.accountHolder, lang, defaultLang, {
+        collection: "business",
+        file: "legal",
+      })
     : "";
 
   // RFC-0147/RFC-0148: project the public business catalog (offer, location, team).
@@ -390,9 +401,13 @@ export function createFsSemanticReader(
 ): SemanticContentReader {
   const provider = createNodeFsContentProvider(contentDir, defaultLang);
   const indexPath = join(contentDir, "..", "content-ref-index.generated.yaml");
-  const resolveDeepContentReferences = async (value: unknown, lang: string): Promise<unknown> => {
+  const resolveDeepContentReferences = async (
+    value: unknown,
+    lang: string,
+    sourceRef?: SourceRef,
+  ): Promise<unknown> => {
     const index = getContentRefIndex(indexPath) ?? EMPTY_CONTENT_REF_INDEX;
-    return resolveReferencesDeep(index, value, lang, defaultLang);
+    return resolveReferencesDeep(index, value, lang, defaultLang, sourceRef);
   };
   return {
     async getPageFrontmatter(pageId, lang) {
@@ -401,7 +416,10 @@ export function createFsSemanticReader(
         id: `${lang}/${pageIdToContentFileSlug(pageId)}`,
       });
       if (!entry) return null;
-      return (await resolveDeepContentReferences(entry.data, lang)) as Record<string, unknown>;
+      return (await resolveDeepContentReferences(entry.data, lang, {
+        collection: "pages",
+        file: pageIdToContentFileSlug(pageId),
+      })) as Record<string, unknown>;
     },
 
     async getProseBody(proseSlug, lang) {
@@ -409,7 +427,10 @@ export function createFsSemanticReader(
       const raw = entry?.body ?? "";
       if (!raw) return "";
       const index = getContentRefIndex(indexPath) ?? EMPTY_CONTENT_REF_INDEX;
-      return resolveReferencesInString(index, raw, lang, defaultLang);
+      return resolveReferencesInString(index, raw, lang, defaultLang, {
+        collection: "prose",
+        file: proseSlug,
+      });
     },
 
     async getHomeLabel(lang) {

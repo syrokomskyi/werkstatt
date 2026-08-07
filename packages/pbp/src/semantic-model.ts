@@ -81,12 +81,10 @@ async function getPageFrontmatter(pageId: string, lang: string) {
   const localizedEntry = await getEntry("pages", `${lang}/${slug}`);
   if (localizedEntry) {
     const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
-    return (await resolveReferencesDeep(
-      index,
-      localizedEntry.data,
-      lang,
-      DEFAULT_LANGUAGE_CODE,
-    )) as Record<string, unknown>;
+    return (await resolveReferencesDeep(index, localizedEntry.data, lang, DEFAULT_LANGUAGE_CODE, {
+      collection: "pages",
+      file: slug,
+    })) as Record<string, unknown>;
   }
   if (lang !== DEFAULT_LANGUAGE_CODE) {
     emitPipelineLogEvent({
@@ -108,6 +106,7 @@ async function getPageFrontmatter(pageId: string, lang: string) {
     fallbackEntry.data,
     DEFAULT_LANGUAGE_CODE,
     DEFAULT_LANGUAGE_CODE,
+    { collection: "pages", file: fallbackSlug },
   )) as Record<string, unknown>;
 }
 

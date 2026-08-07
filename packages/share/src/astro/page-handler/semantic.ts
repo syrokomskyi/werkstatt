@@ -134,10 +134,10 @@ export async function substituteBlockPropReferences(
   return Promise.all(
     blocks.map(async (block) => ({
       ...block,
-      props: (await resolveReferencesDeep(index, block.props, lang, defaultLang)) as Record<
-        string,
-        any
-      >,
+      props: (await resolveReferencesDeep(index, block.props, lang, defaultLang, {
+        collection: "pages",
+        file: fileSlug,
+      })) as Record<string, any>,
     })),
   );
 }

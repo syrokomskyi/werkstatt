@@ -144,6 +144,7 @@ export async function getResolvedComponentContent<TContent>(options: {
     data,
     lang,
     options.defaultLanguageCode,
+    { collection: "prose", file: normalizeComponentPath(options.componentPath) },
   )) as TContent;
 
   return mergeComponentContent(substitutedData, options.pageOverride);

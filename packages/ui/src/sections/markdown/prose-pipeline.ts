@@ -109,7 +109,13 @@ export async function renderProse(opts: ProsePipelineOptions): Promise<ProseRend
   // we run resolveReferencesInString as a safety net for non-page-handler usage.
   if (!contentRef && body) {
     const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
-    const resolvedBody = resolveReferencesInString(index, body, lang, defaultLanguageCode);
+    const resolvedBody = resolveReferencesInString(
+      index,
+      body,
+      lang,
+      defaultLanguageCode,
+      contentRef ? { collection: "prose", file: contentRef } : undefined,
+    );
     const html = resolveProseImages(
       renderMarkdownGfm(resolvedBody, true),
       lang,
@@ -134,7 +140,13 @@ export async function renderProse(opts: ProsePipelineOptions): Promise<ProseRend
   if (entryBody && typeof entryBody === "string") {
     sourceBody = entryBody;
     const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
-    proseBody = resolveReferencesInString(index, entryBody, lang, defaultLanguageCode);
+    proseBody = resolveReferencesInString(
+      index,
+      entryBody,
+      lang,
+      defaultLanguageCode,
+      contentRef ? { collection: "prose", file: contentRef } : undefined,
+    );
     hasReferences = proseBody !== entryBody;
   }
 

@@ -71,7 +71,13 @@ if (proseEntry) {
   const body = (proseEntry as Record<string, unknown> & { body?: string }).body;
   if (body && typeof body === "string") {
     const index = getContentRefIndex() ?? EMPTY_CONTENT_REF_INDEX;
-    proseBody = resolveReferencesInString(index, body, activeLang, defaultLanguageCode);
+    proseBody = resolveReferencesInString(
+      index,
+      body,
+      activeLang,
+      defaultLanguageCode,
+      contentRef ? { collection: "prose", file: contentRef } : undefined,
+    );
     hasReferences = proseBody !== body;
   }
 }
