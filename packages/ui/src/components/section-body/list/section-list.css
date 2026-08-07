@@ -126,4 +126,16 @@
     color: var(--ds-color-text-muted);
     font-size: var(--ds-text-sm);
   }
+
+  .section-list__text .currency-aware-price-display,
+  .section-list__text .currency-aware-price-display__variant,
+  .section-list__text .currency-aware-price-display__amount {
+    display: inline;
+    font: inherit;
+    white-space: nowrap;
+  }
+
+  .section-list__text .currency-aware-price-display__variant[hidden] {
+    display: none;
+  }
 }

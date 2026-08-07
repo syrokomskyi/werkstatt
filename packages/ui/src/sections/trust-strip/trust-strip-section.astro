@@ -60,7 +60,7 @@ if (props.cta?.target) {
         level={props.header.level ?? 2}
         hideSectionNumber={props.header.hideSectionNumber}
         id={headerId}
-      lang={lang}
+        lang={lang}
       />
     )
   }
@@ -72,6 +72,7 @@ if (props.cta?.target) {
     itemAlign={body.itemAlign}
     hideMarkers={body.hideMarkers}
     effects={body.effects}
+    lang={lang}
   />
   {
     props.cta && ctaHref && (

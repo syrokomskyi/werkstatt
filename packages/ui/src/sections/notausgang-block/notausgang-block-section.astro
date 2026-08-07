@@ -68,8 +68,8 @@ if (props.cta?.target) {
     level={props.header?.level ?? 2}
     hideSectionNumber={props.header?.hideSectionNumber}
     id="notausgang-title"
-  lang={lang}
-    />
+    lang={lang}
+  />
   <SectionList
     items={body.items ?? []}
     note={body.note}
@@ -79,6 +79,7 @@ if (props.cta?.target) {
     itemAlign={body.itemAlign as "left" | "center" | "right" | undefined}
     hideMarkers={body.hideMarkers}
     effects={body.effects}
+    lang={lang}
   />
   {
     props.cta && ctaHref && (

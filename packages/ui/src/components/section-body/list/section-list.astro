@@ -18,9 +18,17 @@
 */
 
 import { resolveEffectsForTarget } from "@warpgogol/share";
-import type { StandardListItem, IconColor, HorizontalAlign, EffectAssignment } from "@warpgogol/share";
+import type {
+  StandardListItem,
+  IconColor,
+  HorizontalAlign,
+  EffectAssignment,
+} from "@warpgogol/share";
 import EffectHost from "../../../components/effects/effect-host.astro";
 import { loadVendorIcon } from "../../../icons/icon-resolver.ts";
+import { loadDerivedPrices } from "../../../sections/price-card/price-variants.ts";
+import { parsePriceMarkers } from "../../../utils/price-marker.ts";
+import CurrencyAwarePriceDisplay from "../../../components/currency-aware-price-display/currency-aware-price-display-component.astro";
 import "./section-list.css";
 
 interface Props {
@@ -32,6 +40,7 @@ interface Props {
   hideMarkers?: boolean;
   class?: string;
   effects?: EffectAssignment[];
+  lang?: string;
 }
 
 const {
@@ -43,7 +52,10 @@ const {
   hideMarkers = false,
   class: extraClass = "",
   effects,
+  lang = "de",
 } = Astro.props as Props;
+
+const derivedPrices = loadDerivedPrices();
 
 const itemEffects = resolveEffectsForTarget(effects, "item");
 
@@ -79,7 +91,15 @@ const resolvedItems = await Promise.all(
               ) : (
                 <span class="section-list__marker" aria-hidden="true" />
               ))}
-            <span class="section-list__text">{text}</span>
+            <span class="section-list__text">
+              {parsePriceMarkers(text, lang, derivedPrices).map((part) =>
+                part.kind === "text" ? (
+                  part.value
+                ) : part.variants ? (
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                ) : null,
+              )}
+            </span>
           </EffectHost>
         </li>
       ))
