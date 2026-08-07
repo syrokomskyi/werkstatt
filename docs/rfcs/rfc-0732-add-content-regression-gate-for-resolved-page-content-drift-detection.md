@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes: []
@@ -56,7 +57,6 @@ appsImpacted: []
 packagesImpacted:
   - "@warpgogol/site-kernel-checks"
   - "@warpgogol/site-kernel-handoff"
-  - "@warpgogol/site-kernel-content"
 successSignals:
   - "content.regression.check emits CREG-01 diagnostics when resolved page content differs from golden snapshot"
   - "mission.validate fails on content drift unless --skip-content-regression is passed"
@@ -152,8 +152,8 @@ The kernel gains a `content.regression.check` command that snapshots resolved pa
 # Validate resolved content against golden snapshot (runs in build.check pipeline)
 pnpm exec site-kernel run content.regression.check --site warpgogol-com
 
-# Update golden snapshot after operator review
-pnpm exec site-kernel run content.regression.snapshot.update --site warpgogol-com
+# Update golden snapshot after operator review (prints diff first, requires --confirm to write)
+pnpm exec site-kernel run content.regression.snapshot.update --site warpgogol-com --confirm
 
 # Skip content regression gate during mission.validate (escape hatch)
 pnpm exec site-kernel run mission.validate --site warpgogol-com --skip-content-regression
@@ -166,6 +166,7 @@ pnpm exec site-kernel run mission.validate --site warpgogol-com --skip-content-r
 | `content.regression.check` | `--site <name>` | Site to validate (required, app scope) |
 | `content.regression.check` | `--dry-run` | Render snapshot without writing; return diagnostics |
 | `content.regression.snapshot.update` | `--site <name>` | Site to update (required, app scope) |
+| `content.regression.snapshot.update` | `--confirm` | Required to write; without it, prints diff and exits 0 |
 | `mission.validate` | `--skip-content-regression` | Skip content regression gate (escape hatch) |
 
 ### TypeScript contracts
@@ -324,7 +325,33 @@ New Sternsystems created via `onboarding.scaffold` get the gate from their first
 
 **`mission.validate`:** runs `content.regression.check` as part of `build.check`. `--skip-content-regression` flag bypasses the gate.
 
-**`mission.close`:** after the bordbuch commit and before writing `.materialization-state.json`, copies `{workpiece}/.cache/content-regression/current.snapshot.yaml` to `{cacheClone}/.cache/content-regression/{systemId}.snapshot.yaml`. This mirrors the existing `.cache/video/` copy pattern at `packages/os/site-kernel-handoff/src/mission/mission-close.ts`.
+**`mission.close`:** after the bordbuch commit and after writing `.materialization-state.json`, copies `{workpiece}/.cache/content-regression/current.snapshot.yaml` to `{cacheClone}/.cache/content-regression/{systemId}.snapshot.yaml`. This mirrors the existing `.cache/video/` copy pattern at `packages/os/site-kernel-handoff/src/mission/mission-close.ts` (state file write at line 558, media cache copy at line 576 — both are after the bordbuch commit).
+
+### Compass document synchronization
+
+Adding DNA-61 and two new kernel commands requires synchronizing the following Compass documents:
+
+- `docs/verification-plan.xml` — add content regression gate verification entry
+- `docs/development-plan.xml` — add `content.regression.check` and `content.regression.snapshot.update` to the command development plan
+
+The `fo-doc-audit` step during implementation handles the actual sync.
+
+### AGENTS.md updates
+
+- `packages/os/site-kernel-checks/AGENTS.md` — add module entry for `content-regression.ts`
+- Root `AGENTS.md` — add a rule clarifying the gate boundary: CREG-01 (content drift) vs DRIFT-01 (generated file drift) vs SNAP-01 (metadata drift)
+
+### Programmatic surface routes
+
+`loadSemanticSiteModel` loads all routes, including programmatic surface pages (DNA-39) generated from PBP data and supplementary collections. Surface routes ARE included in the content regression snapshot intentionally. When an operator updates PBP data (e.g., changes a price), surface page content changes — this produces CREG-01 diagnostics. The operator workflow is the same as for authored content changes: review the diff, run `content.regression.snapshot.update` if the changes are legitimate. The `--skip-content-regression` escape hatch is available when the operator knows all changes are PBP-driven.
+
+### `--skip-content-regression` flag propagation
+
+`mission.validate` runs the `build.check` pipeline via `executeKernelPipeline`. The `--skip-content-regression` flag is passed as a pipeline-scoped flag to `executeKernelPipeline`. The `content.regression.check` pipeline step checks for this flag in its `KernelCommandInput.flags` and short-circuits to a pass result when set. This is the same mechanism used by other pipeline steps that support skip flags.
+
+### Performance estimate
+
+`loadSemanticSiteModel` takes ~50-100ms per language for a medium site (~50 routes). For warpgogol-com (3 languages), this adds ~150-300ms to `build.check`. The cost is only paid when content actually changes (distribution reuse skips the build cycle when `build-input-hash` matches). For larger sites (100+ routes), the cost scales linearly with route count.
 
 ### Distribution reuse
 
@@ -368,7 +395,7 @@ Agents may confuse `CREG-01` (content drift) with `DRIFT-01` (generated file dri
 
 ### Snapshot staleness
 
-If an operator updates the golden snapshot without reviewing the diff, content regressions are silently accepted. Mitigation: `content.regression.snapshot.update` prints the diff before writing. The operator must explicitly confirm. This is a human discipline issue, not a technical one — same as `behavior.snapshot.generate`.
+If an operator updates the golden snapshot without reviewing the diff, content regressions are silently accepted. Mitigation: `content.regression.snapshot.update` prints the diff to stdout before writing. The command requires `--confirm` flag to write — without it, the command prints the diff and exits 0 without updating. This two-step workflow (review diff, then `--confirm`) prevents accidental golden snapshot updates. This is a human discipline issue, not a technical one — same as `behavior.snapshot.generate`.
 
 ## Acceptance criteria
 
@@ -378,7 +405,7 @@ If an operator updates the golden snapshot without reviewing the diff, content r
 - [ ] `CREG-01`, `CREG-02`, `CREG-03` diagnostic rules registered in `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts`
 - [ ] Snapshot structure: YAML with `schemaVersion`, `systemId`, `contentHash`, `routes[]` (each route has `route`, `blocks[]`, `faq?[]`, `hash`)
 - [ ] Snapshot stored at `{cacheClonePath}/.cache/content-regression/{systemId}.snapshot.yaml` — not committed to workpiece git
-- [ ] `mission.close` copies working snapshot to cache clone after bordbuch commit, before `.materialization-state.json` write
+- [ ] `mission.close` copies working snapshot to cache clone after bordbuch commit, after `.materialization-state.json` write (mirrors `.cache/video/` pattern)
 - [ ] `mission.validate` supports `--skip-content-regression` flag
 - [ ] Cold start: `CREG-03` warning emitted when no golden snapshot exists; `exitCode: 0`; does not block first mission
 - [ ] `DNA-61` entry added to `docs/architecture-dna.md` with reference to this RFC
