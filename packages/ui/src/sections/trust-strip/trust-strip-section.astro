@@ -27,6 +27,7 @@ const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const props = cast<TrustStripSectionContent>(pageOverride);
 const body = need("body", props.body);
 const headerId = props.header?.heading ? "trust-strip-title" : undefined;
+const ctaAlign = props.header?.align ?? "center";
 
 let ctaHref: string | null = null;
 if (props.cta?.target) {
@@ -73,9 +74,11 @@ if (props.cta?.target) {
   />
   {
     props.cta && ctaHref && (
-      <a class="trust-strip__cta" href={ctaHref}>
-        {props.cta.label}
-      </a>
+      <div class:list={["trust-strip__cta-wrap", `trust-strip__cta-wrap--align-${ctaAlign}`]}>
+        <a class="trust-strip__cta" href={ctaHref}>
+          {props.cta.label}
+        </a>
+      </div>
     )
   }
 </SectionShell>

@@ -13,11 +13,22 @@
 
 /* RFC-0103: notausgang-block content CSS — only the inline CTA; list owned by SectionList. */
 @layer components {
+  .notausgang-block__cta-wrap {
+    margin-top: var(--ds-space-5);
+  }
+  .notausgang-block__cta-wrap--align-left {
+    text-align: left;
+  }
+  .notausgang-block__cta-wrap--align-center {
+    text-align: center;
+  }
+  .notausgang-block__cta-wrap--align-right {
+    text-align: right;
+  }
   .notausgang-block__cta {
     display: inline-flex;
     align-items: center;
     padding: var(--ds-space-3) var(--ds-space-5);
-    margin-top: var(--ds-space-5);
     background: var(--ds-color-primary);
     color: var(--ds-color-text-inverse);
     border-radius: var(--ds-radius-sm);

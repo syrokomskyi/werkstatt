@@ -37,6 +37,7 @@ const body = need("body", props.body) as {
   hideMarkers?: boolean;
   effects?: any[];
 };
+const ctaAlign = props.header?.align ?? "left";
 
 let ctaHref: string | null = null;
 if (props.cta?.target) {
@@ -72,13 +73,7 @@ if (props.cta?.target) {
     items={body.items ?? []}
     note={body.note}
     iconColor={(body.iconColor as
-      | "error"
-      | "success"
-      | "primary"
-      | "accent"
-      | "warning"
-      | "muted"
-      | undefined) ?? "warning"}
+      "error" | "success" | "primary" | "accent" | "warning" | "muted" | undefined) ?? "warning"}
     align={body.align as "left" | "center" | "right" | undefined}
     itemAlign={body.itemAlign as "left" | "center" | "right" | undefined}
     hideMarkers={body.hideMarkers}
@@ -86,9 +81,13 @@ if (props.cta?.target) {
   />
   {
     props.cta && ctaHref && (
-      <a class="notausgang-block__cta" href={ctaHref}>
-        {props.cta.label}
-      </a>
+      <div
+        class:list={["notausgang-block__cta-wrap", `notausgang-block__cta-wrap--align-${ctaAlign}`]}
+      >
+        <a class="notausgang-block__cta" href={ctaHref}>
+          {props.cta.label}
+        </a>
+      </div>
     )
   }
 </SectionShell>

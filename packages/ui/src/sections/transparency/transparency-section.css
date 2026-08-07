@@ -27,11 +27,22 @@
   .transparency-section__link:focus-visible {
     color: var(--ds-color-text);
   }
+  .transparency-section__cta-wrap {
+    margin-top: var(--ds-space-5);
+  }
+  .transparency-section__cta-wrap--align-left {
+    text-align: left;
+  }
+  .transparency-section__cta-wrap--align-center {
+    text-align: center;
+  }
+  .transparency-section__cta-wrap--align-right {
+    text-align: right;
+  }
   .transparency-section__cta {
     display: inline-flex;
     align-items: center;
     padding: var(--ds-space-3) var(--ds-space-5);
-    margin-top: var(--ds-space-5);
     background: var(--ds-color-accent);
     color: var(--ds-color-accent-contrast);
     border-radius: var(--ds-radius-md);

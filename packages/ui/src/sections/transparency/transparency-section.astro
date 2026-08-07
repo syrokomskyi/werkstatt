@@ -27,6 +27,7 @@ const { lang, sectionNumber, pageOverride } = Astro.props as SectionProps;
 const sectionId = await resolveSectionAnchor(Astro.props, "transparency");
 const props = cast<TransparencySectionContent>(pageOverride);
 const body = need("body", props.body);
+const ctaAlign = props.header?.align ?? "left";
 
 let ctaHref: string | null = null;
 if (props.cta?.target) {
@@ -78,9 +79,16 @@ if (props.cta?.target) {
   }
   {
     props.cta && ctaHref && (
-      <a class="transparency-section__cta" href={ctaHref}>
-        {props.cta.label}
-      </a>
+      <div
+        class:list={[
+          "transparency-section__cta-wrap",
+          `transparency-section__cta-wrap--align-${ctaAlign}`,
+        ]}
+      >
+        <a class="transparency-section__cta" href={ctaHref}>
+          {props.cta.label}
+        </a>
+      </div>
     )
   }
 </SectionShell>

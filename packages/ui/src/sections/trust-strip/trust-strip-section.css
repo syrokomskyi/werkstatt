@@ -16,11 +16,22 @@
   .section-shell[data-slug="trust-strip"].section-shell--density-compact {
     padding-block-start: var(--ds-space-3);
   }
+  .trust-strip__cta-wrap {
+    margin-top: var(--ds-space-5);
+  }
+  .trust-strip__cta-wrap--align-left {
+    text-align: left;
+  }
+  .trust-strip__cta-wrap--align-center {
+    text-align: center;
+  }
+  .trust-strip__cta-wrap--align-right {
+    text-align: right;
+  }
   .trust-strip__cta {
     display: inline-flex;
     align-items: center;
     padding: var(--ds-space-3) var(--ds-space-5);
-    margin-top: var(--ds-space-5);
     background: var(--ds-color-primary);
     color: var(--ds-color-text-inverse);
     border-radius: var(--ds-radius-sm);
