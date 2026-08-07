@@ -17,7 +17,8 @@ supersedes:
   - RFC-0482
 supersededBy:
 amends: []
-amendedBy: []
+amendedBy:
+  - RFC-0731
 related:
   - RFC-0400
   - RFC-0437
