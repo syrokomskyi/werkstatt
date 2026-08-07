@@ -27,6 +27,8 @@
 import { getCollection, getEntry } from "@warpgogol/content-source/astro";
 import { EMPTY_RUNTIME_CONTEXT } from "../../runtime-context.ts";
 import { buildPage, type PageEntry, type ResolvedPage, type ShellBlockConfig } from "../../page.ts";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createDevPropsValidator } from "../../dev-props-validator.ts";
 import type { SemanticBreadcrumb } from "../../semantic/models.ts";
 import type { BreadcrumbAncestorResolver } from "../../semantic/breadcrumbs.ts";
@@ -81,6 +83,63 @@ export type {
   ResolvePageRouteOptions,
 } from "./types.ts";
 export { deriveOrchestratorConfig, type OrchestratorConfig } from "./semantic.ts";
+
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+
+let cachedDerivedPrices:
+  | Record<
+      string,
+      Array<{
+        chargeRef: string;
+        amount: { value: string; currency: string };
+        trace?: { source?: { amount?: string } };
+      }>
+    >
+  | null
+  | undefined;
+
+function loadDerivedPricesForDescription(): Record<
+  string,
+  Array<{
+    chargeRef: string;
+    amount: { value: string; currency: string };
+    trace?: { source?: { amount?: string } };
+  }>
+> | null {
+  if (cachedDerivedPrices !== undefined) return cachedDerivedPrices;
+  try {
+    const filePath = join(process.cwd(), "src", "derived-prices.generated.json");
+    const raw = readFileSync(filePath, "utf-8");
+    cachedDerivedPrices = JSON.parse(raw) as typeof cachedDerivedPrices;
+  } catch {
+    cachedDerivedPrices = null;
+  }
+  return cachedDerivedPrices ?? null;
+}
+
+function resolvePriceMarkersInText(text: string): string {
+  const derived = loadDerivedPricesForDescription();
+  if (!derived) return text;
+  return text.replace(priceMarkerRe, (match, offeringId: string, chargeRef: string) => {
+    const ref = offeringUriPrefix + offeringId;
+    const entries = derived[ref];
+    if (!entries) return match;
+    const entry = entries.find((e) => e.chargeRef === chargeRef);
+    if (!entry) return match;
+    const sourceAmount = entry.trace?.source?.amount;
+    if (!sourceAmount) return match;
+    const numeric = parseFloat(sourceAmount);
+    if (isNaN(numeric)) return match;
+    const formatted = new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(numeric);
+    return formatted;
+  });
+}
 
 // RFC-0262: one validator instance per process — createDevPropsValidator()
 // memoizes workspace-root and per-planet schema resolution internally, so
@@ -987,7 +1046,7 @@ export async function resolvePageRoute(options: ResolvePageRouteOptions): Promis
     ...(ctaTarget ? { ctaTarget } : {}),
     biome,
     skipLinkLabel,
-    resolvedDescription: page.description || defaultDescription,
+    resolvedDescription: resolvePriceMarkersInText(page.description || defaultDescription),
     orchestratorConfig: {
       ...deriveOrchestratorConfig(page.blocks),
       smoothScroll: siteOrchestrator.smoothScroll === true,

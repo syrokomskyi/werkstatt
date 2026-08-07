@@ -97,7 +97,8 @@ const renderedItems = body.items.map((it) => {
     level={props.header?.level ?? 2}
     hideSectionNumber={props.header?.hideSectionNumber}
     id="ownership-title"
-  />
+  lang={lang}
+    />
   <div
     class:list={["section-list-wrap", `section-list-wrap--align-${align}`]}
     data-icon-color={iconColor}

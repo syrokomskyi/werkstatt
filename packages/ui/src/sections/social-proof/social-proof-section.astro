@@ -47,7 +47,8 @@ const body = need("body", props.body);
     level={props.header?.level ?? 2}
     hideSectionNumber={props.header?.hideSectionNumber}
     id="social-proof-title"
-  />
+  lang={lang}
+    />
   <SectionParagraphs paragraphs={body.paragraphs} align={body.align} />
   {
     props.registrationNote && (

@@ -58,7 +58,8 @@ const formatDate = (iso: string): string => {
     level={props.header?.level ?? 2}
     hideSectionNumber={props.header?.hideSectionNumber}
     id="article-list-title"
-  />
+  lang={lang}
+    />
 
   {
     articles.length === 0 ? (

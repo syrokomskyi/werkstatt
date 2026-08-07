@@ -130,3 +130,22 @@
 .section-header__title-segment--inverse {
   color: var(--ds-color-text-inverse);
 }
+
+.section-header__title-segment .currency-aware-price-display,
+.section-header__title-segment .currency-aware-price-display__variant,
+.section-header__subheading .currency-aware-price-display,
+.section-header__subheading .currency-aware-price-display__variant {
+  display: inline;
+}
+
+.section-header__title-segment .currency-aware-price-display__variant[hidden],
+.section-header__subheading .currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+.section-header__title-segment .currency-aware-price-display__amount,
+.section-header__subheading .currency-aware-price-display__amount {
+  display: inline;
+  font: inherit;
+  white-space: nowrap;
+}

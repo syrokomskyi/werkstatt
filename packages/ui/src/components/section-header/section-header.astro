@@ -19,6 +19,12 @@
 
 import type { SectionHeaderProps, HeadingContent } from "@warpgogol/share";
 import { composeEffectPresentation, effectVarsToStyle } from "../effects/registry.ts";
+import CurrencyAwarePriceDisplay from "../currency-aware-price-display/currency-aware-price-display-component.astro";
+import {
+  buildPriceVariants,
+  loadDerivedPrices,
+  type SourcePriceProp,
+} from "../../sections/price-card/price-variants.ts";
 import "../effects/effect-text.css";
 import "./section-header.css";
 
@@ -33,7 +39,50 @@ const {
   id,
   headingEffects,
   subheadingEffects,
-} = Astro.props as SectionHeaderProps;
+  lang,
+} = Astro.props as SectionHeaderProps & { lang?: string };
+
+const derivedPrices = loadDerivedPrices();
+const offeringUriPrefix = "https://warpgogol.com/id/offerings/";
+const priceMarkerRe = /\{price:([a-zA-Z0-9_-]+):([a-zA-Z0-9_.-]+)\}/g;
+
+type TextPart = { kind: "text"; value: string };
+type PricePart = { kind: "price"; variants: ReturnType<typeof buildPriceVariants> };
+type TextOrPrice = TextPart | PricePart;
+
+function parsePriceMarkers(text: string): TextOrPrice[] {
+  const parts: TextOrPrice[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  priceMarkerRe.lastIndex = 0;
+  while ((match = priceMarkerRe.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ kind: "text", value: text.slice(lastIndex, match.index) });
+    }
+    const offeringId = match[1]!;
+    const chargeRef = match[2]!;
+    const ref = offeringUriPrefix + offeringId;
+    const entries = derivedPrices?.[ref];
+    const matching = entries?.filter((e) => e.chargeRef === chargeRef) ?? [];
+    const sourceAmount = matching[0]?.trace?.source?.amount ?? "0";
+    const sourceProp: SourcePriceProp = { amount: sourceAmount, currency: "EUR" };
+    const variants = buildPriceVariants(
+      sourceProp,
+      chargeRef,
+      lang ?? "de",
+      ref,
+      derivedPrices,
+      undefined,
+    );
+    parts.push({ kind: "price", variants });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push({ kind: "text", value: text.slice(lastIndex) });
+  }
+  if (parts.length === 0) parts.push({ kind: "text", value: text });
+  return parts;
+}
 
 // RFC-0151: typographic effects apply directly to the heading element (no
 // wrapper, no clipping), composed through the shared effect-kind registry.
@@ -74,16 +123,25 @@ const uniqueId = id && sectionNumber ? `${sectionNumber}-${id}` : id;
       style={headingEffectStyle}
     >
       {
-        segments.map((s) => (
-          <span
-            class:list={[
-              "section-header__title-segment",
-              `section-header__title-segment--${s.tone}`,
-            ]}
-          >
-            {s.text}
-          </span>
-        ))
+        segments.map((s) => {
+          const parts = parsePriceMarkers(s.text);
+          return (
+            <span
+              class:list={[
+                "section-header__title-segment",
+                `section-header__title-segment--${s.tone}`,
+              ]}
+            >
+              {parts.map((part) =>
+                part.kind === "text" ? (
+                  part.value
+                ) : part.variants ? (
+                  <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+                ) : null,
+              )}
+            </span>
+          );
+        })
       }
     </HeadingTag>
   </div>
@@ -97,7 +155,13 @@ const uniqueId = id && sectionNumber ? `${sectionNumber}-${id}` : id;
         ]}
         style={subheadingEffectStyle}
       >
-        {subheading}
+        {parsePriceMarkers(subheading).map((part) =>
+          part.kind === "text" ? (
+            part.value
+          ) : part.variants ? (
+            <CurrencyAwarePriceDisplay priceVariants={part.variants} />
+          ) : null,
+        )}
       </p>
     )
   }
