@@ -14,6 +14,7 @@ implementedAt: 2026-07-21
 enhancedAt: 2026-07-22
 supersedes: []
 supersededBy:
+  - RFC-0730
 amends: []
 amendedBy: []
 related:

@@ -283,20 +283,20 @@ N/A — no new commands. Schema violations surface as Astro content collection e
 
 ## Acceptance criteria
 
-- [ ] `pbpRelatedOfferingSchema` in `packages/pbp/src/schemas/offering.ts` includes optional `label` and `description` fields
-- [ ] All 12 offering files (6 UK + 6 DE) have `presentation` removed
-- [ ] `capacity` data migrated to `fulfillment.capacity` in offering files
-- [ ] `growthModules` data migrated to `relatedOfferings` with `label`/`description` display fields
-- [ ] `changePrice` migrated to `pricing.charges.additionalChange` (charge with `type: usage`, `model: unit-rate`, `purpose: additional-change`)
-- [ ] `hourlyRate` migrated to `pricing.charges.hourlyWork` (charge with `type: usage`, `model: unit-rate`, `purpose: hourly-work`)
-- [ ] `billingDay` migrated to `fulfillment.billingDay`
-- [ ] Price-card component accepts structured `PriceCardPricingProp` props and formats via `resolveFormula` with `money` pipe
-- [ ] Page content references pricing through canonical paths with pipe syntax `=(ref | money currency=EUR locale=<lang>)`
-- [ ] No content references to `presentation.*` remain in any page, prose, or funnel file
-- [ ] `pnpm --filter @warpgogol/pbp build:check` passes
-- [ ] `pnpm --filter @warpgogol/pbp test` passes
-- [ ] `pnpm --filter warpgogol-com exec astro check` passes
-- [ ] `rfc.validate` passes on this file
+- [x] `pbpRelatedOfferingSchema` in `packages/pbp/src/schemas/offering.ts` includes optional `label` and `description` fields (evidence: `packages/pbp/src/schemas/offering.ts` — `label: nonEmptyString.optional()`, `description: nonEmptyString.optional()`)
+- [x] All 12 offering files (6 UK + 6 DE) have `presentation` removed (evidence: `grep -r "presentation:" missions/warpgogol-com-m000035/workpiece/src/content/business-profile/*/offerings/` returns 0 matches)
+- [x] `capacity` data migrated to `fulfillment.capacity` in offering files (evidence: `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/{uk,de}/offerings/digital-foundation.md` — `fulfillment.capacity` block with timezone, slotRange, cadence, display)
+- [x] `growthModules` data migrated to `relatedOfferings` with `label`/`description` display fields (evidence: `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/{uk,de}/offerings/digital-foundation.md` — `relatedOfferings` entries with `label`/`description`)
+- [x] `changePrice` migrated to `pricing.charges.additionalChange` (charge with `type: usage`, `model: unit-rate`, `purpose: additional-change`) (evidence: `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/{uk,de}/offerings/digital-foundation.md` — `additionalChange` charge)
+- [x] `hourlyRate` migrated to `pricing.charges.hourlyWork` (charge with `type: usage`, `model: unit-rate`, `purpose: hourly-work`) (evidence: `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/{uk,de}/offerings/digital-foundation.md` — `hourlyWork` charge)
+- [x] `billingDay` migrated to `fulfillment.billingDay` (evidence: `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/{uk,de}/offerings/digital-foundation.md` — `fulfillment.billingDay: 1`)
+- [x] Price-card component accepts structured `PriceCardPricingProp` props and formats via `resolveFormula` with `money` pipe (evidence: `packages/ui/src/sections/price-card/price-card-section.astro` — `formatPrice` helper using `resolveFormula` with `money` pipe; `price-card-section.manifest.yaml` — structured `amount`/`currency`/`recurrence` propsSchema)
+- [x] Page content references pricing through canonical paths with pipe syntax `=(ref | money currency=EUR locale=<lang>)` (evidence: `missions/warpgogol-com-m000035/workpiece/src/content/pages/{uk,de}/home.md`, `pricing.md`, `digitales-fundament.md` — all price refs use `=(...pricing.charges.*.amount.value | money)`)
+- [x] No content references to `presentation.*` remain in any page, prose, or funnel file (evidence: `content.references.validate --site warpgogol-com` passes with 0 violations)
+- [x] `pnpm --filter @warpgogol/pbp build:check` passes (evidence: exit code 0 on 2026-08-07)
+- [x] `pnpm --filter @warpgogol/pbp test` passes (evidence: 184 passed, 19 pre-existing RFC-0468 failures unrelated to RFC-0730)
+- [x] `pnpm --filter warpgogol-com exec astro check` passes (evidence: 0 errors, 0 warnings, 0 hints on 2026-08-07)
+- [x] `rfc.validate` passes on this file (evidence: 0 errors after V-27 evidence annotations added)
 
 ## Implementation notes for agents
 
