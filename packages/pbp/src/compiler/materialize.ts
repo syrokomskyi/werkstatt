@@ -9,14 +9,14 @@
 </non-goals>
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
-  <item>Established by RFC-0740 — materializeDerivedPrices pure function and 15 validation rules.</item>
+  <item>Established by RFC-0740 — materializeDerivedPrices pure function and 5 validation rules (rules 3, 6, 8, 13, 14).</item>
 </CHANGE_SUMMARY>
 */
 
 import type { PbpResolvedGraph } from "./types.js";
 import type { PbpValidationError } from "../validation-errors.js";
 import type { PbpMaterializedDerivedPrice } from "../materialized-derived-price.js";
-import type { PbpCurrencyPricingPolicy, PbpCurrencyTarget } from "../entities/currency-pricing-policy.js";
+import type { PbpCurrencyPricingPolicy } from "../entities/currency-pricing-policy.js";
 import type { PbpCharge } from "../entities/pricing.js";
 import type { PbpOffering } from "../entities/offering.js";
 import type { PbpRatePolicy } from "../entities/rate-policy.js";
@@ -59,6 +59,9 @@ function buildDefaultPipeline(
 
 /**
  * Resolve an entity ref to a string key.
+ *
+ * `PbpEntityRef` can be either a plain string or an object `{ ref: string }`.
+ * This helper normalises both forms to a string.
  */
 function resolveRef(ref: PbpEntityRef): string {
   if (typeof ref === "string") return ref;
@@ -69,8 +72,9 @@ function resolveRef(ref: PbpEntityRef): string {
  * Find the applicable rate snapshot for a currency pair.
  *
  * Searches `graph.rateSnapshots` for a snapshot matching the source and target
- * currency, with `freshUntil` >= `now`. If `allowLastKnownValue` is true on the
- * rate policy, a stale snapshot is acceptable.
+ * currency, with `freshUntil` >= `now`. Stale snapshots (freshUntil < now) are
+ * not returned — `allowLastKnownValue` from the rate policy is handled by the
+ * caller, not this function.
  */
 function findApplicableSnapshot(
   graph: PbpResolvedGraph,
@@ -79,7 +83,10 @@ function findApplicableSnapshot(
   now: string,
 ): PbpRateSnapshot | undefined {
   const snapshots = Object.entries(graph.rateSnapshots)
-    .filter(([, snap]) => snap.pair.sourceCurrency === sourceCurrency && snap.pair.targetCurrency === targetCurrency)
+    .filter(
+      ([, snap]) =>
+        snap.pair.sourceCurrency === sourceCurrency && snap.pair.targetCurrency === targetCurrency,
+    )
     .sort(([, a], [, b]) => b.observedAt.localeCompare(a.observedAt));
 
   for (const [, snap] of snapshots) {
@@ -106,6 +113,11 @@ function findRatePolicy(
 
 /**
  * Build a currency conversion derivation contract for a charge.
+ *
+ * Double-cast: `PbpDerivationContract.parameters` is `Record<string, unknown>`,
+ * but we need to pass the structured pipeline object. The object structurally
+ * matches `PbpCurrencyConversionDerivation`, but `PbpDerivationContract`'s typed
+ * parameters field doesn't enforce the inner shape.
  */
 function buildConversionContract(
   ratePolicyRef: string,
@@ -182,9 +194,6 @@ export function materializeDerivedPrices(
         }
 
         const validationErrors = validateTarget(
-          graph,
-          policy,
-          target,
           sourceCurrency,
           targetCurrency,
           offering,
@@ -231,7 +240,11 @@ export function materializeDerivedPrices(
           targetCurrency,
         );
 
-        const result: PbpCurrencyConversionResult = computeCurrencyConversion(graph, contract, buildTime);
+        const result: PbpCurrencyConversionResult = computeCurrencyConversion(
+          graph,
+          contract,
+          buildTime,
+        );
 
         if (result.status === "failed") {
           errors.push({
@@ -255,8 +268,6 @@ export function materializeDerivedPrices(
         const postValidationErrors = validateDerivedPrice(
           result,
           sourceAmount,
-          sourceCurrency,
-          targetCurrency,
           offering.id,
           chargeKey,
         );
@@ -298,12 +309,9 @@ export function materializeDerivedPrices(
 /**
  * Pre-materialization validation for a single target currency.
  *
- * Checks rules 1, 5, 6, 7, 9 from RFC-0740 §4.
+ * Checks rule 6 (same source and target currency) from RFC-0740 §4.
  */
 function validateTarget(
-  graph: PbpResolvedGraph,
-  policy: PbpCurrencyPricingPolicy,
-  target: PbpCurrencyTarget,
   sourceCurrency: string,
   targetCurrency: string,
   offering: PbpOffering,
@@ -327,13 +335,12 @@ function validateTarget(
 /**
  * Post-materialization validation for a derived price.
  *
- * Checks rules 13, 14, 15 from RFC-0740 §4.
+ * Checks rules 13 (negative result) and 14 (zero result for positive source)
+ * from RFC-0740 §4.
  */
 function validateDerivedPrice(
   result: PbpCurrencyConversionResult,
   sourceAmount: string,
-  _sourceCurrency: string,
-  _targetCurrency: string,
   entityId: string,
   chargeKey: string,
 ): PbpValidationError[] {

@@ -21,10 +21,12 @@ import type {
 } from "@warpgogol/site-kernel";
 import { writeFileIfChanged } from "@warpgogol/site-kernel";
 import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
 import { compilePbpProfile } from "@warpgogol/pbp/compiler";
 import { materializeDerivedPrices } from "@warpgogol/pbp/compiler";
 import type { PbpCurrencyPricingPolicy } from "@warpgogol/pbp";
 import type { PbpEntity } from "@warpgogol/pbp";
+import { defaultLanguageFromManifest } from "./lib/i18n.ts";
 
 const DERIVED_PRICES_FILE = "src/derived-prices.generated.json";
 
@@ -54,14 +56,17 @@ export async function runDerivedPricesMaterialize(
   const systemId = context.site?.name ?? flagString(input, "system") ?? "unknown";
 
   const sourceDirectory = join(appDir, "src", "content", "business-profile");
-  const buildTime = input.flags["build-time"] as string | undefined ?? new Date().toISOString();
+  const buildTime = (input.flags["build-time"] as string | undefined) ?? new Date().toISOString();
+
+  const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
+  const locale = defaultLanguageFromManifest(manifest);
 
   let compilerResult;
   try {
     compilerResult = await compilePbpProfile({
       sourceDirectory,
-      locale: "de",
-      defaultLocale: "de",
+      locale,
+      defaultLocale: locale,
       strictness: "production",
       buildTime,
     });
@@ -106,7 +111,13 @@ export async function runDerivedPricesMaterialize(
         system: systemId,
         materializedCount: Object.values(prices).reduce((sum, arr) => sum + arr.length, 0),
         offerings: Object.keys(prices).length,
-        targetCurrencies: [...new Set(Object.values(prices).flat().map((p) => p.targetCurrency))],
+        targetCurrencies: [
+          ...new Set(
+            Object.values(prices)
+              .flat()
+              .map((p) => p.targetCurrency),
+          ),
+        ],
         errors: errors.map((e) => `[${e.code}] ${e.message}`),
       },
       exitCode: 1,
@@ -115,7 +126,13 @@ export async function runDerivedPricesMaterialize(
   }
 
   const materializedCount = Object.values(prices).reduce((sum, arr) => sum + arr.length, 0);
-  const targetCurrencies = [...new Set(Object.values(prices).flat().map((p) => p.targetCurrency))];
+  const targetCurrencies = [
+    ...new Set(
+      Object.values(prices)
+        .flat()
+        .map((p) => p.targetCurrency),
+    ),
+  ];
 
   const outputPath = join(appDir, DERIVED_PRICES_FILE);
   const outputContent = JSON.stringify(prices, null, 2) + "\n";

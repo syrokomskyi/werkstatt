@@ -737,6 +737,10 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
         kind: "string",
         description: "Sternsystem ID.",
       },
+      "build-time": {
+        kind: "string",
+        description: "ISO 8601 timestamp to use as build time (defaults to now).",
+      },
     },
     supportsAllSites: false,
     cacheable: false,
