@@ -9,6 +9,7 @@
 </MODULE_CONTRACT>
 <CHANGE_SUMMARY>
   <item>Established by RFC-0739 — currency conversion derivation contract, pipeline, trace, and result types.</item>
+  <item>Reviewed and fixed — A1: named precision constant, A2: Big-based zero-check, G1: deterministic now parameter.</item>
 </CHANGE_SUMMARY>
 */
 
