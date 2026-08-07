@@ -1,7 +1,7 @@
 ---
 id: RFC-0744
 title: "Rate Fetcher Service"
-status: accepted
+status: implemented
 kind: architecture
 scope: workspace
 owners:
@@ -10,7 +10,7 @@ reviewers:
   - human:andrii-syrokomskyi
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
-implementedAt:
+implementedAt: 2026-08-07
 closedAt:
 supersedes: []
 supersededBy:
