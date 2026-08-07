@@ -1,12 +1,12 @@
 ---
 id: ADR-0029
 title: "Extend V-29 to require versionBump for accepted RFCs"
-status: accepted
+status: implemented
 scope: package
 decider: architecture
 createdAt: 2026-08-06
-updatedAt: 2026-08-06
-implementedAt: 2026-08-06
+updatedAt: 2026-08-07
+implementedAt: 2026-08-07
 related:
   - RFC-0478
 reviewers:
