@@ -1,11 +1,18 @@
 /*
 <MODULE_CONTRACT>
-<purpose>Unit tests for RFC-0570 formula evaluation module — extractNumeric, scanFormulas, resolveFormula.</purpose>
+<purpose>Unit tests for RFC-0570 formula evaluation module — extractNumeric, scanFormulas, resolveFormula.
+RFC-0729: pipe syntax, formatter registry, money formatter, REF-10 error.</purpose>
 </MODULE_CONTRACT>
 */
 
 import { describe, it, expect } from "vitest";
-import { extractNumeric, scanFormulas, resolveFormula } from "../formula-eval.ts";
+import {
+  extractNumeric,
+  scanFormulas,
+  resolveFormula,
+  registerPipeFormatter,
+  getPipeFormatter,
+} from "../formula-eval.ts";
 import type { ContentRefIndex } from "../content-reference.ts";
 import { EMPTY_CONTENT_REF_INDEX } from "../content-reference.ts";
 
@@ -298,5 +305,235 @@ describe("resolveFormula", () => {
     );
     expect(result.resolved).toBe(false);
     expect(result.error).toContain("REF-07");
+  });
+});
+
+describe("RFC-0729: pipe syntax", () => {
+  const mockIndex: ContentRefIndex = {
+    version: 1,
+    generatedAt: "2026-01-01",
+    collections: ["business-profile"],
+    entries: {
+      "business-profile": {
+        "offerings/digital-foundation": {
+          de: {
+            presentation: {
+              price: {
+                setup: "200 €",
+                monthly: "70 €",
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
+  it("formats with money formatter in German locale", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly | money currency=EUR locale=de",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("70\u00A0€");
+  });
+
+  it("formats with money formatter in Ukrainian locale", () => {
+    const indexWithUk: ContentRefIndex = {
+      ...mockIndex,
+      entries: {
+        "business-profile": {
+          "offerings/digital-foundation": {
+            de: {
+              presentation: {
+                price: { setup: "200 €", monthly: "70 €" },
+              },
+            },
+            uk: {
+              presentation: {
+                price: { setup: "200 €", monthly: "70 €" },
+              },
+            },
+          },
+        },
+      },
+    };
+    const result = resolveFormula(
+      indexWithUk,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly | money currency=EUR locale=uk",
+      "uk",
+      "uk",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("70\u00A0EUR");
+  });
+
+  it("formats with currency conversion to UAH in German locale", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly | money currency=EUR locale=de targetCurrency=UAH rate=45",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("3.150\u00A0UAH");
+  });
+
+  it("formats arithmetic result with pipe", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly * 12 | money currency=EUR locale=de",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("840\u00A0€");
+  });
+
+  it("preserves existing behavior for expressions without pipe", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly * 12",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("840");
+  });
+
+  it("preserves RFC-0723 single-ref string return without pipe", () => {
+    const indexWithString: ContentRefIndex = {
+      ...mockIndex,
+      entries: {
+        "business-profile": {
+          "offerings/digital-foundation": {
+            de: {
+              presentation: {
+                price: {
+                  setup: "200 €",
+                  monthly: "70 €",
+                },
+                tagline: "Digitales Fundament",
+              },
+            },
+          },
+        },
+      },
+    };
+    const result = resolveFormula(
+      indexWithString,
+      "business-profile.offerings/digital-foundation.presentation.tagline",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("Digitales Fundament");
+  });
+
+  it("uses context.lang as default locale when no locale param", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly | money currency=EUR",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("70\u00A0€");
+  });
+});
+
+describe("RFC-0729: formatter registry", () => {
+  it("registers and retrieves a custom formatter", () => {
+    const customFn = (_value: number, _params: Record<string, string>) => "custom";
+    registerPipeFormatter("custom-test", customFn);
+    expect(getPipeFormatter("custom-test")).toBe(customFn);
+  });
+
+  it("returns undefined for unregistered formatter", () => {
+    expect(getPipeFormatter("nonexistent-formatter")).toBeUndefined();
+  });
+
+  it("money formatter is registered by default", () => {
+    expect(getPipeFormatter("money")).toBeDefined();
+  });
+});
+
+describe("RFC-0729: REF-10 unknown formatter", () => {
+  const mockIndex: ContentRefIndex = {
+    version: 1,
+    generatedAt: "2026-01-01",
+    collections: ["business-profile"],
+    entries: {
+      "business-profile": {
+        "offerings/digital-foundation": {
+          de: {
+            presentation: {
+              price: {
+                setup: "200 €",
+                monthly: "70 €",
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
+  it("returns REF-10 for unknown formatter name", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly | unknownFormatter",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(false);
+    expect(result.error).toContain("REF-10");
+    expect(result.error).toContain("unknownFormatter");
+  });
+
+  it("returns REF-10 for empty formatter name", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly |",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(false);
+    expect(result.error).toContain("REF-10");
+  });
+});
+
+describe("RFC-0729: invalid rate param", () => {
+  const mockIndex: ContentRefIndex = {
+    version: 1,
+    generatedAt: "2026-01-01",
+    collections: ["business-profile"],
+    entries: {
+      "business-profile": {
+        "offerings/digital-foundation": {
+          de: {
+            presentation: {
+              price: {
+                setup: "200 €",
+                monthly: "70 €",
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
+  it("ignores conversion when rate is non-numeric", () => {
+    const result = resolveFormula(
+      mockIndex,
+      "business-profile.offerings/digital-foundation.presentation.price.monthly | money currency=EUR locale=de targetCurrency=UAH rate=abc",
+      "de",
+      "de",
+    );
+    expect(result.resolved).toBe(true);
+    expect(result.value).toBe("70\u00A0€");
   });
 });
