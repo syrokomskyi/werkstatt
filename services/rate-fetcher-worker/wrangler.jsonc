@@ -1,0 +1,33 @@
+// RFC-0744: Rate Fetcher Worker configuration.
+// This file is manually maintained (no generator owns services/ wrangler configs).
+{
+  "name": "gogol-rate-fetcher",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": ["0 8 * * *"],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1.0,
+    "traces": {
+      "enabled": true,
+      "destinations": ["signoz"],
+      "head_sampling_rate": 1.0,
+    },
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1.0,
+      "persist": true,
+      "invocation_logs": true,
+    },
+  },
+  // Secrets (set via `wrangler secret put` or Cloudflare Dashboard):
+  //   RATE_FETCHER_SUPABASE_URL       — Supabase project URL for rate_sources/observations
+  //   RATE_FETCHER_SUPABASE_KEY       — Supabase service_role key
+  //   RATE_FETCHER_CRON_GROUP         — optional cron group filter (default: "default")
+  //
+  // Local testing: copy .env.example → .env for `wrangler dev`.
+  // Deploy: wrangler deploy --secrets-file .env (via rate.fetcher.deploy).
+}

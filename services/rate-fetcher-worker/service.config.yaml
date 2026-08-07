@@ -1,0 +1,7 @@
+id: rate-fetcher-worker
+kind: scheduled-worker
+entry: src/index.ts
+publicEndpoints: false
+usesBrowserAutomation: false
+queues: []
+artifacts: []

@@ -1,0 +1,28 @@
+{
+  "name": "@warpgogol/rate-fetcher-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "RFC-0744: Rate Fetcher Service. Multi-tenant cron worker that fetches exchange rates from external sources and stores observations in Supabase.",
+  "main": "src/index.ts",
+  "scripts": {
+    "build:check": "tsc --noEmit",
+    "deploy": "site-kernel run deploy.preflight --service rate-fetcher-worker && wrangler deploy --secrets-file .env"
+  },
+  "dependencies": {
+    "@warpgogol/pbp-rate-adapters": "workspace:*",
+    "@warpgogol/share": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260801.1",
+    "wrangler": "^4.118.0"
+  },
+  "gogol": {
+    "testSignal": {
+      "signal": "skipped",
+      "owner": "architecture",
+      "rationale": "Worker behavior is covered through @warpgogol/pbp-rate-adapters package tests; direct worker-runtime tests are deferred until worker-runtime fixtures are added.",
+      "reviewAfter": "2026-10-01"
+    }
+  }
+}

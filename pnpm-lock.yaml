@@ -1593,6 +1593,22 @@ importers:
 
   services/observability-stack: {}
 
+  services/rate-fetcher-worker:
+    dependencies:
+      '@warpgogol/pbp-rate-adapters':
+        specifier: workspace:*
+        version: link:../../packages/pbp-rate-adapters
+      '@warpgogol/share':
+        specifier: workspace:*
+        version: link:../../packages/share
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^5.20260801.1
+        version: 5.20260801.1
+      wrangler:
+        specifier: ^4.118.0
+        version: 4.119.0(@cloudflare/workers-types@5.20260801.1)
+
   services/telegram-alert-bridge:
     devDependencies:
       wrangler:
