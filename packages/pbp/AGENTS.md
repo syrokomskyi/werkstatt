@@ -119,6 +119,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 ### Multi-currency pricing (RFC-0735..0745)
 
 - `PbpCurrencyPricingPolicy`, `PbpCurrencyStrategy`, `PbpCurrentUses`, `PbpCurrencyTarget`, `CURRENCY_PRICING_POLICY_SCHEMA_ID` — business-level currency strategy entity (RFC-0736)
+- `PbpRatePolicy`, `PbpRateSchedule`, `PbpRateMode`, `PbpRateDirection`, `PbpCurrencyPair`, `PbpQuotation`, `PbpRateScheduleEntry`, `RATE_POLICY_SCHEMA_ID`, `RATE_SCHEDULE_SCHEMA_ID` — rate source and schedule entities (RFC-0737)
 
 ## Runtime layer (RFC-0466)
 
