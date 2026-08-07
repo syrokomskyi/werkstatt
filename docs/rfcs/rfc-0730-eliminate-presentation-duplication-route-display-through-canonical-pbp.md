@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes:
@@ -29,7 +30,6 @@ related:
   - pbp-specification-package/ADR-012
 satisfies:
   - DNA-4
-  - DNA-55
 versionBump: minor
 commands:
   proposed: []
@@ -57,7 +57,7 @@ nonGoals:
 The PBP offering schema (RFC-0482) carries an optional `presentation: z.record(z.string(), z.unknown())` field for site-specific display-formatted strings. In the warpgogol-com `digital-foundation.md` offering, `presentation` contains:
 
 1. **`price`** — display-formatted price strings (`monthly: 70 € / місяць`) that duplicate `pricing.charges` canonical decimal strings (`monthlySubscription.amount.value: "70.00"`).
-2. **`guarantees`** — display-formatted guarantee labels/details that duplicate the canonical `guarantees` field.
+2. **`guarantees`** — display-formatted guarantee labels/details that exist as a top-level `guarantees` field in the offering content file (not in `offeringSchema`). The content file has `guarantees:` at the top level, but `offeringSchema` is `.strict()` and does not include this field — it passes only because the Astro collection uses a permissive `z.object({}).catchall(z.any())` schema and the PBP compiler's `validateRaw` runs in `migration` strictness mode. The `presentation.guarantees` block duplicates this top-level `guarantees` data.
 3. **`capacity`** — operational slot config (timezone, slotRange, cadence, display labels) with no canonical PBP field.
 4. **`growthModules`** — display labels/descriptions for related offerings with inline prices, partially duplicating related offering files.
 5. **`changePrice`, `hourlyRate`, `billingDay`** — legacy keys already flagged by `PBP-LEGACY-KEY` in `semantic.ts`.
@@ -73,28 +73,30 @@ RFC-0728 enforces `pbpChargeSchema` on `pricing.charges`, making canonical decim
 
 1. **`presentation.price` duplicates `pricing.charges`.** The same monetary values exist in two places: canonical (structured, validated) and presentation (loose, manual). Changes to canonical do not propagate to presentation.
 
-2. **`presentation.guarantees` duplicates `guarantees`.** The same guarantee text exists in two places. Canonical `guarantees` has structured fields; presentation has display-formatted label/detail pairs.
+2. **`presentation.guarantees` duplicates top-level `guarantees`.** The same guarantee text exists in two places: the top-level `guarantees` field (not in `offeringSchema`, tolerated by migration-mode validation) and `presentation.guarantees` (display-formatted label/detail pairs). Neither is schema-validated.
 
 3. **`presentation` triggers validation errors.** `PBP-MONEY` flags presentation money strings. `PBP-LEGACY-KEY` flags the `price` key. The presentation field is incompatible with the semantic validator.
 
 4. **`capacity` and `growthModules` have no canonical home.** They are legitimate offering data (slot capacity, related module display info) trapped in the presentation layer because the PBP schema does not model them.
 
-5. **`changePrice`, `hourlyRate`, `billingDay` are legacy keys.** They are flagged as errors but contain real business data (overage charge, hourly rate, billing day) that belongs in canonical fields.
+5. **`changePrice`, `hourlyRate`, `billingDay` are legacy keys.** They are flagged as errors by `PBP-LEGACY-KEY` in `semantic.ts` but contain real business data (overage charge, hourly rate, billing day) that belongs in canonical fields.
+
+6. **DE-only `*Amount` presentation fields.** The DE `digital-foundation.md` presentation block includes `price.monthlyAmount`, `price.yearlyAmount`, `price.setupAmount`, and `price.module*Amount` fields — bare numeric amounts used in `agb.md` for legal calculations. These are already available as canonical decimal strings in `pricing.charges` (e.g. `pricing.charges.monthlySubscription.amount.value: "70.00"`). References in `agb.md` must be updated to use `=(...pricing.charges.monthlySubscription.amount.value)` which resolves to the numeric value `70`.
 
 ## Decision
 
 ### 1. Remove `presentation` from offering entities
 
-The `presentation` field is removed from all offering content files. The `offeringSchema` field remains in the Zod schema as `z.record(z.string(), z.unknown()).optional()` for backward compatibility with non-offering entities that still use it (legal-identity, web-presence, public-document, business). Offering files MUST NOT include `presentation`.
+The `presentation` field is removed from `offeringSchema` entirely. Non-offering entities (legal-identity, web-presence, public-document, business) have their own `presentation` fields in their own schemas — `offeringSchema` does not need to keep it for their sake. Offering files MUST NOT include `presentation`.
 
 ### 2. Migrate presentation data to canonical fields
 
 | Presentation block | Canonical destination |
 | --- | --- |
 | `price` (monthly, yearly, setup) | Already in `pricing.charges` — no migration needed, references updated to canonical |
-| `guarantees` (label, detail) | Already in `guarantees` — no migration needed, references updated to canonical |
+| `guarantees` (label, detail) | Add `guarantees` field to `offeringSchema` as `z.record(z.string(), z.object({ label: nonEmptyString, detail: nonEmptyString })).optional()` — top-level `guarantees` becomes schema-validated canonical field, references updated |
 | `capacity` (slots, cadence, display) | `fulfillment.capacity` — new structured sub-object in `fulfillment` |
-| `growthModules` (label, description, price) | `relatedOfferings` extended with optional display fields |
+| `growthModules` (label, description, price) | `relatedOfferings` extended with optional `label`/`description` display fields. Price qualifier text (e.g. "up to 12 target pages") goes into `description`. Prices are referenced via content refs to the related offering's canonical `pricing.charges`, not duplicated. |
 | `changePrice` | `pricing.charges.additionalChange` — charge with `type: usage`, `model: unit-rate`, `purpose: additional-change` |
 | `hourlyRate` | `pricing.charges.hourlyWork` — charge with `type: usage`, `model: unit-rate`, `purpose: hourly-work` |
 | `billingDay` | `fulfillment.billingDay` — number in `fulfillment` |
@@ -126,18 +128,18 @@ interface PriceCardPricingProp {
 }
 ```
 
-The component calls `formatPrice()` (from `@warpgogol/share/formula-eval` or a new `@warpgogol/share/format` utility) to render `70 € / Monat` from `{ amount: "70.00", currency: "EUR", recurrence: "P1M" }`.
+The component uses `resolveFormula()` from `@warpgogol/share/formula-eval` (RFC-0570/RFC-0729) with the `money` pipe formatter to render `70 € / Monat` from canonical decimal strings. No new `formatPrice()` function is needed — the existing `resolveFormula(index, expression, lang, defaultLang)` with `expression = "<ref> | money currency=EUR locale=de"` produces the formatted string. The component constructs the pipe expression from the structured props and calls `resolveFormula` at render time.
 
 ### 5. Content references use canonical + pipe
 
 Page content references pricing through canonical paths with pipe formatting:
 
 ```yaml
-# Price card block props (structured)
+# Price card block props (structured — content refs use =(...) syntax)
 monthly:
-  amount: business-profile.offerings/digital-foundation.pricing.charges.monthlySubscription.amount.value
-  currency: business-profile.offerings/digital-foundation.pricing.currency
-  recurrence: business-profile.offerings/digital-foundation.pricing.charges.monthlySubscription.recurrence
+  amount: =(business-profile.offerings/digital-foundation.pricing.charges.monthlySubscription.amount.value)
+  currency: =(business-profile.offerings/digital-foundation.pricing.currency)
+  recurrence: =(business-profile.offerings/digital-foundation.pricing.charges.monthlySubscription.recurrence)
 
 # Inline text (pipe-formatted)
 text: "Близько =(business-profile.offerings/digital-foundation.pricing.charges.yearlySubscription.amount.value | money currency=EUR locale=uk) на рік"
@@ -147,7 +149,7 @@ text: "Близько =(business-profile.offerings/digital-foundation.pricing.ch
 
 - **DNA-4 (Canonical content in `src/content/`).** Display strings are produced at render time from canonical content, not stored as duplicates. This RFC strengthens DNA-4 by eliminating the presentation duplication loophole.
 
-- **DNA-55 (Spec vendoring contract).** This RFC applies `pbp-specification-package/ADR-012` (decimal string money) to the display layer. Canonical decimal strings are the single source of truth; display formatting is a render-time concern.
+- **ADR-012 (Decimal string money).** This RFC applies `pbp-specification-package/ADR-012` to the display layer. Canonical decimal strings are the single source of truth; display formatting is a render-time concern via the RFC-0729 `money` pipe formatter.
 
 - **RFC-0482 (Presentation fields).** This RFC supersedes RFC-0482 for offering entities. The `presentation` field is removed from offerings. Non-offering entities (legal-identity, web-presence, public-document, business) retain `presentation` — they store display-only metadata (dates, domains, tax) without canonical duplication.
 
@@ -177,6 +179,16 @@ const pbpRelatedOfferingSchema = z.object({
   description: nonEmptyString.optional(),
 });
 
+// New: guarantees field added to offeringSchema
+const pbpGuaranteeItemSchema = z.object({
+  label: nonEmptyString,
+  detail: nonEmptyString,
+});
+
+// offeringSchema extended with guarantees and presentation removed:
+//   guarantees: z.record(z.string(), pbpGuaranteeItemSchema).optional(),
+//   presentation: REMOVED (not just deprecated)
+
 // fulfillment remains z.record(z.string(), z.unknown()) — capacity and billingDay
 // are stored as structured sub-objects within the existing loose-typed field.
 // A follow-up RFC may type fulfillment strictly.
@@ -185,9 +197,9 @@ const pbpRelatedOfferingSchema = z.object({
 ```ts
 // packages/ui/src/sections/price-card/price-card-section.types.ts
 interface PriceCardPricingProp {
-  amount: string;
-  currency: string;
-  recurrence?: string;
+  amount: string;   // content ref to canonical decimal string (e.g. "=(...pricing.charges.monthlySubscription.amount.value)")
+  currency: string; // content ref to pricing.currency
+  recurrence?: string; // content ref to charge.recurrence
 }
 
 interface PriceCardSectionContent {
@@ -198,17 +210,26 @@ interface PriceCardSectionContent {
 }
 ```
 
+The component resolves each prop via `resolveFormula(index, prop.amount + " | money currency=" + prop.currency + " locale=" + lang, lang, defaultLang)` to produce the formatted display string. The `money` pipe formatter (RFC-0729) uses `Intl.NumberFormat` for locale-aware currency formatting.
+
 ### File system responsibilities
 
 | Path | Role |
 | --- | --- |
-| `packages/pbp/src/schemas/offering.ts` | `pbpRelatedOfferingSchema` extended with `label`, `description` |
-| `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/uk/offerings/*.md` | 6 UK offering files: remove `presentation`, migrate data to canonical fields |
-| `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/de/offerings/*.md` | 6 DE offering files: remove `presentation`, migrate data to canonical fields |
-| `packages/ui/src/sections/price-card/price-card-section.astro` | Accept structured pricing props, call `formatPrice()` |
+| `packages/pbp/src/schemas/offering.ts` | `pbpRelatedOfferingSchema` extended with `label`, `description`; `guarantees` field added to `offeringSchema`; `presentation` field removed from `offeringSchema` |
+| `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/uk/offerings/*.md` | 6 UK offering files: remove `presentation`, add `guarantees` as schema-validated field, migrate `capacity`/`growthModules`/`changePrice`/`hourlyRate`/`billingDay` to canonical fields |
+| `missions/warpgogol-com-m000035/workpiece/src/content/business-profile/de/offerings/*.md` | 6 DE offering files: same migration as UK |
+| `packages/ui/src/sections/price-card/price-card-section.astro` | Accept structured pricing props, resolve via `resolveFormula` with `money` pipe |
 | `packages/ui/src/sections/price-card/price-card-section.types.ts` | Updated prop types |
+| `packages/ui/src/sections/price-card/price-card-section.manifest.yaml` | Update `propsSchema` for `monthly`/`yearly`/`setup` from `type: string` to structured object |
+| `packages/ui/src/sections/price-card/price-card-section.types.generated.ts` | Regenerated from manifest |
 | `missions/warpgogol-com-m000035/workpiece/src/content/pages/{lang}/home.md` | Price card block props updated to structured canonical references |
-| `missions/warpgogol-com-m000035/workpiece/src/content/pages/{lang}/*.md` | Inline price references updated to canonical + pipe syntax |
+| `missions/warpgogol-com-m000035/workpiece/src/content/pages/{lang}/digitales-fundament.md` | Price card block props + guarantee card references updated to canonical paths |
+| `missions/warpgogol-com-m000035/workpiece/src/content/pages/{lang}/pricing.md` | Price card block props + inline price references updated to canonical + pipe syntax |
+| `missions/warpgogol-com-m000035/workpiece/src/content/prose/{lang}/agb.md` | `presentation.price.*Amount`, `presentation.changePrice`, `presentation.hourlyRate`, `presentation.billingDay` references updated to canonical paths |
+| `missions/warpgogol-com-m000035/workpiece/src/content/prose/{lang}/ratgeber-website-kosten.md` | `presentation.price.*`, `presentation.changePrice`, `presentation.hourlyRate` references updated to canonical paths |
+| `missions/warpgogol-com-m000035/workpiece/src/content/funnel/{lang}/create-site.md` | `presentation.price.*`, `presentation.guarantees.*`, `presentation.growthModules.*` references updated to canonical paths; fix malformed nested `=(...)` expressions |
+| `missions/warpgogol-com-m000035/workpiece/src/content/funnel/{lang}/change-site.md` | `presentation.changePrice` reference updated to canonical `pricing.charges.additionalChange.amount.unitValue` |
 
 ### Output format
 
@@ -216,7 +237,7 @@ N/A — no new commands. Schema violations surface as Astro content collection e
 
 ### Failure modes
 
-- **Offering file with `presentation` after migration.** The `presentation` field remains valid in the Zod schema (`optional`). But `semantic.ts` `PBP-LEGACY-KEY` and `PBP-MONEY` checks will flag any presentation data that duplicates canonical fields. Agents MUST NOT add `presentation` to offering files.
+- **Offering file with `presentation` after migration.** The `presentation` field is removed from `offeringSchema` (`.strict()`). Any offering file that still includes `presentation` will fail schema validation with `PBP-SCHEMA-VALIDATION` error. The `PBP-LEGACY-KEY` and `PBP-MONEY` checks in `semantic.ts` also flag specific keys/values. Agents MUST NOT add `presentation` to offering files.
 
 - **Content reference to removed presentation field.** After `presentation.price` is removed, content references like `business-profile.offerings/digital-foundation.presentation.price.monthly` will fail to resolve. The reference validator (`content.references.validate`) will flag these as unresolved. All references must be updated to canonical paths during migration.
 
@@ -267,9 +288,9 @@ N/A — no new commands. Schema violations surface as Astro content collection e
 - [ ] `changePrice` migrated to `pricing.charges.additionalChange` (charge with `type: usage`, `model: unit-rate`, `purpose: additional-change`)
 - [ ] `hourlyRate` migrated to `pricing.charges.hourlyWork` (charge with `type: usage`, `model: unit-rate`, `purpose: hourly-work`)
 - [ ] `billingDay` migrated to `fulfillment.billingDay`
-- [ ] Price-card component accepts structured `PriceCardPricingProp` props and formats via `formatPrice()`
+- [ ] Price-card component accepts structured `PriceCardPricingProp` props and formats via `resolveFormula` with `money` pipe
 - [ ] Page content references pricing through canonical paths with pipe syntax `=(ref | money currency=EUR locale=<lang>)`
-- [ ] No content references to `presentation.*` remain in any page or prose file
+- [ ] No content references to `presentation.*` remain in any page, prose, or funnel file
 - [ ] `pnpm --filter @warpgogol/pbp build:check` passes
 - [ ] `pnpm --filter @warpgogol/pbp test` passes
 - [ ] `pnpm --filter warpgogol-com exec astro check` passes
@@ -282,7 +303,7 @@ N/A — no new commands. Schema violations surface as Astro content collection e
 - For RFCs created on or after 2026-07-07 with acceptance probes: before stamping `implemented`, run `site-kernel run rfc.verification.emit --id <this-rfc-id>` and commit the evidence file in the same commit (RFC-0330 amended transition precondition).
 - Agents MUST NOT weaken or remove enforcement rules established by this RFC without a new RFC that supersedes it.
 - If implementation reveals an invariant conflict, run `site-kernel run rfc.supersede.propose --id <this-rfc-id> --reason "..." --invariant "DNA-N"` instead of working around it (RFC-0334).
-- Agents MUST NOT add `presentation` to offering files. The field remains in the Zod schema for non-offering entities only.
+- Agents MUST NOT add `presentation` to offering files. The field is removed from `offeringSchema` entirely. Non-offering entities have their own `presentation` fields in their own schemas.
 - Agents MUST update all content references to `presentation.*` fields when removing presentation from an offering file.
 - Agents MUST quote all decimal string values in charges (e.g. `"70.00"`, not `70.00`) per RFC-0728 and ADR-012.
 - Agents MUST include `model` (one of `fixed`, `range`, `unit-rate`, `tiered`) and `purpose` on every charge per RFC-0728.
