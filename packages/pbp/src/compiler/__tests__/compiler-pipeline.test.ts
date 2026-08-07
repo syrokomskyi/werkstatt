@@ -12,7 +12,11 @@ import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { compilePbpProfile } from "../index.js";
-import { validateSchemaOrgPrices, buildCanonicalPriceSet } from "../index.js";
+import {
+  validateSchemaOrgPrices,
+  buildCanonicalPriceSet,
+  buildCanonicalCurrencySet,
+} from "../index.js";
 import type { PbpCompilerInput } from "../index.js";
 import type { PbpResolvedGraph } from "../types.js";
 
@@ -383,7 +387,8 @@ describe("PBP Compiler Pipeline", () => {
       ],
     };
     const canonicalPrices = new Set(["70.00", "150.00"]);
-    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices);
+    const canonicalCurrencies = new Set(["EUR"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices, canonicalCurrencies);
     expect(errors).toHaveLength(0);
   });
 
@@ -392,11 +397,14 @@ describe("PBP Compiler Pipeline", () => {
       offers: [{ "@type": "Offer", price: "3239.00", priceCurrency: "UAH" }],
     };
     const canonicalPrices = new Set(["70.00"]);
-    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices);
-    expect(errors).toHaveLength(1);
+    const canonicalCurrencies = new Set(["EUR"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices, canonicalCurrencies);
+    expect(errors).toHaveLength(2);
     expect(errors[0].code).toBe("PBP-SCHEMA-PRICE");
     expect(errors[0].severity).toBe("error");
     expect(errors[0].message).toContain("3239.00");
+    expect(errors[1].code).toBe("PBP-SCHEMA-PRICE");
+    expect(errors[1].message).toContain("UAH");
   });
 
   it("validateSchemaOrgPrices skips offers without price field", () => {
@@ -404,7 +412,30 @@ describe("PBP Compiler Pipeline", () => {
       offers: [{ "@type": "Offer", priceCurrency: "EUR" }],
     };
     const canonicalPrices = new Set(["70.00"]);
-    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices);
+    const canonicalCurrencies = new Set(["EUR"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices, canonicalCurrencies);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("validateSchemaOrgPrices catches non-canonical priceCurrency", () => {
+    const schemaOrg = {
+      offers: [{ "@type": "Offer", price: "70.00", priceCurrency: "UAH" }],
+    };
+    const canonicalPrices = new Set(["70.00"]);
+    const canonicalCurrencies = new Set(["EUR"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices, canonicalCurrencies);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe("PBP-SCHEMA-PRICE");
+    expect(errors[0].message).toContain("UAH");
+  });
+
+  it("validateSchemaOrgPrices skips empty priceCurrency", () => {
+    const schemaOrg = {
+      offers: [{ "@type": "Offer", price: "70.00", priceCurrency: "" }],
+    };
+    const canonicalPrices = new Set(["70.00"]);
+    const canonicalCurrencies = new Set(["EUR"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices, canonicalCurrencies);
     expect(errors).toHaveLength(0);
   });
 
@@ -445,5 +476,93 @@ describe("PBP Compiler Pipeline", () => {
     const prices = buildCanonicalPriceSet(graph);
     expect(prices.has("70.00")).toBe(true);
     expect(prices.size).toBe(1);
+  });
+
+  it("buildCanonicalCurrencySet collects source currency codes", () => {
+    const graph = {
+      offerings: {
+        a: {
+          id: "a",
+          name: "A",
+          pricing: {
+            currency: "EUR",
+            charges: {
+              m: {
+                type: "recurring",
+                purpose: "Monthly",
+                amount: { model: "fixed", value: "70.00" },
+              },
+            },
+          },
+        },
+        b: {
+          id: "b",
+          name: "B",
+          pricing: {
+            currency: "USD",
+            charges: {
+              r: {
+                type: "one-time",
+                purpose: "Range",
+                amount: { model: "range", minimum: "10", maximum: "100" },
+              },
+            },
+          },
+        },
+        c: { id: "c", name: "C" },
+      },
+    } as unknown as PbpResolvedGraph;
+    const currencies = buildCanonicalCurrencySet(graph);
+    expect(currencies.has("EUR")).toBe(true);
+    expect(currencies.has("USD")).toBe(true);
+    expect(currencies.size).toBe(2);
+  });
+
+  it("extractCanonicalPrice selects fixed charge by sorted key for determinism", async () => {
+    writeEntity("de", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol",
+    });
+    writeEntity("de", "offering.md", {
+      schema: "pbp/offering@1",
+      id: "https://warpgogol.com/offerings/multi",
+      type: "offering",
+      status: "published",
+      name: "Multi Charge",
+      businessRef: { ref: "https://warpgogol.com/business" },
+      pricing: {
+        currency: "EUR",
+        charges: {
+          yearly: {
+            type: "recurring",
+            purpose: "Yearly",
+            amount: { model: "fixed", value: "840.00" },
+          },
+          monthly: {
+            type: "recurring",
+            purpose: "Monthly",
+            amount: { model: "fixed", value: "70.00" },
+          },
+        },
+      },
+    });
+
+    const input: PbpCompilerInput = {
+      sourceDirectory: testDir,
+      locale: "de",
+      defaultLocale: "de",
+      strictness: "production",
+    };
+
+    const result = await compilePbpProfile(input);
+
+    const offers = result.projections.schemaOrg.offers as Array<Record<string, unknown>>;
+    const offer = offers.find((o) => o.name === "Multi Charge");
+    expect(offer).toBeDefined();
+    // Sorted key order: "monthly" < "yearly", so monthly (70.00) is canonical
+    expect(offer!.price).toBe("70.00");
   });
 });

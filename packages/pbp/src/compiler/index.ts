@@ -32,7 +32,11 @@ export { runDerivations, type DerivationResult } from "./derivations.js";
 export { validateSemantic } from "./semantic.js";
 export { assembleBuyerView } from "./buyer-view.js";
 export { generateProjections } from "./projection.js";
-export { validateSchemaOrgPrices, buildCanonicalPriceSet } from "./projection.js";
+export {
+  validateSchemaOrgPrices,
+  buildCanonicalPriceSet,
+  buildCanonicalCurrencySet,
+} from "./projection.js";
 export { snapshot } from "./snapshot.js";
 export { publish } from "./publication.js";
 export { materializeDerivedPrices } from "./materialize.js";

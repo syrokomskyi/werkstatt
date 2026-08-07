@@ -19,7 +19,8 @@ import { buildPriceProjection } from "../projections/price-projection.js";
 import type { PbpPriceProjection } from "../projections/price-projection.js";
 import type { PbpCurrencyConversionTrace } from "../derivations/currency-conversion.js";
 import type { PbpValidationError } from "../validation-errors.js";
-import type { PbpChargeAmount } from "../entities/pricing.js";
+import type { PbpCharge } from "../entities/pricing.js";
+import type { PbpPricing } from "../entities/offering.js";
 
 export async function generateProjections(
   graph: PbpResolvedGraph,
@@ -78,8 +79,7 @@ function generateSchemaOrg(graph: PbpResolvedGraph): Record<string, unknown> {
     "@type": "Organization",
     name: graph.business.name,
     offers: offerings.map((offering) => {
-      const record = offering as unknown as Record<string, unknown>;
-      const pricing = record.pricing as Record<string, unknown> | undefined;
+      const pricing = offering.pricing;
       const price = extractCanonicalPrice(pricing);
       return {
         "@type": "Offer",
@@ -91,17 +91,15 @@ function generateSchemaOrg(graph: PbpResolvedGraph): Record<string, unknown> {
   };
 }
 
-/** RFC-0745: Extract the first fixed-model charge amount value as the canonical source-currency decimal string. */
-function extractCanonicalPrice(pricing: Record<string, unknown> | undefined): string | undefined {
-  if (!pricing) return undefined;
-  const charges = pricing["charges"] as Record<string, unknown> | undefined;
-  if (!charges) return undefined;
-  for (const charge of Object.values(charges)) {
-    const c = charge as Record<string, unknown> | undefined;
-    if (!c) continue;
-    const amount = c["amount"] as PbpChargeAmount | undefined;
-    if (amount && amount.model === "fixed") {
-      return amount.value;
+/** RFC-0745: Extract the first fixed-model charge amount value (by sorted charge key) as the canonical source-currency decimal string. */
+function extractCanonicalPrice(pricing: PbpPricing | undefined): string | undefined {
+  if (!pricing?.charges) return undefined;
+  const charges = pricing.charges;
+  for (const key of Object.keys(charges).sort()) {
+    const charge = charges[key] as PbpCharge | undefined;
+    if (!charge) continue;
+    if (charge.amount.model === "fixed") {
+      return charge.amount.value;
     }
   }
   return undefined;
@@ -111,9 +109,7 @@ function extractCanonicalPrice(pricing: Record<string, unknown> | undefined): st
 export function buildCanonicalPriceSet(graph: PbpResolvedGraph): Set<string> {
   const prices = new Set<string>();
   for (const offering of Object.values(graph.offerings)) {
-    const record = offering as unknown as Record<string, unknown>;
-    const pricing = record.pricing as Record<string, unknown> | undefined;
-    const price = extractCanonicalPrice(pricing);
+    const price = extractCanonicalPrice(offering.pricing);
     if (price !== undefined) {
       prices.add(price);
     }
@@ -121,10 +117,23 @@ export function buildCanonicalPriceSet(graph: PbpResolvedGraph): Set<string> {
   return prices;
 }
 
-/** RFC-0745: Validate that Schema.org Offer price fields contain only canonical source-currency prices. */
+/** RFC-0745: Build a set of canonical source currency codes from the resolved graph's offerings. */
+export function buildCanonicalCurrencySet(graph: PbpResolvedGraph): Set<string> {
+  const currencies = new Set<string>();
+  for (const offering of Object.values(graph.offerings)) {
+    const currency = offering.pricing?.currency;
+    if (currency) {
+      currencies.add(currency);
+    }
+  }
+  return currencies;
+}
+
+/** RFC-0745: Validate that Schema.org Offer price and priceCurrency fields contain only canonical source-currency values. */
 export function validateSchemaOrgPrices(
   schemaOrg: Record<string, unknown>,
   canonicalPrices: Set<string>,
+  canonicalCurrencies: Set<string>,
 ): PbpValidationError[] {
   const errors: PbpValidationError[] = [];
   const offers = schemaOrg["offers"];
@@ -132,12 +141,23 @@ export function validateSchemaOrgPrices(
   for (const offer of offers) {
     const node = offer as Record<string, unknown>;
     const price = node["price"];
-    if (typeof price !== "string") continue;
-    if (!canonicalPrices.has(price)) {
+    if (typeof price === "string" && !canonicalPrices.has(price)) {
       errors.push({
         code: "PBP-SCHEMA-PRICE",
         severity: "error",
         message: `Derived price value '${price}' found in Schema.org price field. Only canonical source-currency prices are allowed in structured data.`,
+      });
+    }
+    const priceCurrency = node["priceCurrency"];
+    if (
+      typeof priceCurrency === "string" &&
+      priceCurrency !== "" &&
+      !canonicalCurrencies.has(priceCurrency)
+    ) {
+      errors.push({
+        code: "PBP-SCHEMA-PRICE",
+        severity: "error",
+        message: `Non-canonical currency '${priceCurrency}' found in Schema.org priceCurrency field. Only canonical source currency codes are allowed in structured data.`,
       });
     }
   }

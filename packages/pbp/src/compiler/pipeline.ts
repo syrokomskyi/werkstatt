@@ -26,6 +26,7 @@ import { assembleBuyerView } from "./buyer-view.js";
 import {
   generateProjections,
   buildCanonicalPriceSet,
+  buildCanonicalCurrencySet,
   validateSchemaOrgPrices,
 } from "./projection.js";
 import { snapshot } from "./snapshot.js";
@@ -77,9 +78,14 @@ export async function compilePbpProfile(input: PbpCompilerInput): Promise<PbpCom
   // Phase 12: projection
   const projections = await generateProjections(overlaid, buyerView, input.locale);
 
-  // RFC-0745: validate Schema.org prices after projection generation
+  // RFC-0745: validate Schema.org prices and currencies after projection generation
   const canonicalPrices = buildCanonicalPriceSet(overlaid);
-  const schemaOrgPriceErrors = validateSchemaOrgPrices(projections.schemaOrg, canonicalPrices);
+  const canonicalCurrencies = buildCanonicalCurrencySet(overlaid);
+  const schemaOrgPriceErrors = validateSchemaOrgPrices(
+    projections.schemaOrg,
+    canonicalPrices,
+    canonicalCurrencies,
+  );
 
   // Phase 13: canonical-snapshot (stub for Wave 1)
   const partialForSnapshot: PartialCompilerResult = {
