@@ -25,8 +25,8 @@ importers:
         specifier: workspace:*
         version: link:packages/observability
       '@warpgogol/repo-extract':
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: ^1.2.2
+        version: 1.2.2
       '@warpgogol/site-kernel':
         specifier: workspace:*
         version: link:packages/os/site-kernel
@@ -3786,12 +3786,12 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
-  '@warpgogol/repo-extract@1.1.0':
-    resolution: {integrity: sha512-j1GVGFqj8XXMT1E4GqgjmTfMlTjni2QzKus+cQaCzxu1EU03J6sUok3ON1NA/pA3zMtQ/SFzeyiYMcCzrGslsA==}
+  '@warpgogol/repo-extract@1.2.2':
+    resolution: {integrity: sha512-2OgkNgtODETn2kF0j3jLI7Z7pm0le/S+g2JM3lW6wAs0WVAwXXsmaBumBXkShpLTVMKPXqX4ag8sj3+bcWWa6A==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
-      '@warpgogol/changelog-live': 0.1.0
+      '@warpgogol/changelog-live': '*'
     peerDependenciesMeta:
       '@warpgogol/changelog-live':
         optional: true
@@ -9800,7 +9800,7 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@warpgogol/repo-extract@1.1.0':
+  '@warpgogol/repo-extract@1.2.2':
     dependencies:
       commander: 15.0.0
       tslib: 2.8.1
