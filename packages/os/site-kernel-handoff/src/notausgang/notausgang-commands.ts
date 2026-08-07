@@ -152,9 +152,9 @@ export async function runNotausgangExport(
   const releaseManifestRaw = await fs.readFile(releaseManifestPath, "utf8");
   const releaseManifest = parseYaml(releaseManifestRaw) as Record<string, string>;
 
-  if (releaseManifest.state !== "published") {
+  if (releaseManifest.state !== "ready") {
     throw new Error(
-      `[notausgang.export] release '${releaseId}' is not published (state: ${releaseManifest.state})`,
+      `[notausgang.export] release '${releaseId}' is not ready (state: ${releaseManifest.state})`,
     );
   }
 

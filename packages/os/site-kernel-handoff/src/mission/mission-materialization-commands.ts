@@ -211,6 +211,21 @@ export async function runMissionValidate(
   const distributionDir = path.join(missionDir, "distribution");
   await fs.mkdir(evidenceDir, { recursive: true });
 
+  // RFC-0724: Auto-commit dirty bordbuch files on all paths (not just reuse).
+  // This prevents dirty bordbuch projection files from blocking the pipeline.
+  try {
+    const bordbuchResult = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
+    if (bordbuchResult.committed) {
+      logger.info(
+        `  Bordbuch auto-commit: committed ${bordbuchResult.filesCommitted.length} file(s) before validate`,
+      );
+    }
+  } catch (err) {
+    logger.warn(
+      `  Bordbuch auto-commit failed (non-fatal): ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+
   // RFC-0635: check if distribution can be reused by comparing build-input-hash.
   // If the hash matches and distribution/dist/ exists, skip the entire build cycle.
   const force = input.flags.force === true;
@@ -289,19 +304,8 @@ export async function runMissionValidate(
           );
         }
 
-        // RFC-0702: clean up dirty bordbuch files from a previous run.
-        // The reuse path skips build.prepare, so bordbuch.commit does not run.
-        // Call commitBordbuchProjections directly to keep the cache clone clean.
-        try {
-          const bordbuchResult = await commitBordbuchProjections(workspaceRoot, manifest.systemId);
-          if (bordbuchResult.committed) {
-            logger.info(
-              `  Bordbuch cleanup: committed ${bordbuchResult.filesCommitted.length} file(s) from previous run`,
-            );
-          }
-        } catch {
-          // Non-fatal — reuse path continues regardless
-        }
+        // RFC-0724: bordbuch auto-commit is now done at the top of mission.validate (covers all paths).
+        // The reuse path no longer needs its own cleanup call.
 
         const reuseNextSteps = buildValidateNextSteps(missionId, dirtyCheck);
 
