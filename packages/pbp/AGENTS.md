@@ -69,7 +69,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 
 ### Offering, projections, and publication (RFC-0429..0435)
 
-- `PbpOffering`, `PbpAvailabilityMode`, `PbpOfferingRelation`, `PbpOfferingAcquisition`, `PbpAllowance`, `PbpRelatedOffering`, `PbpPricing` — Offering entity and supporting types (RFC-0429)
+- `PbpOffering`, `PbpAvailabilityMode`, `PbpOfferingRelation`, `PbpOfferingAcquisition`, `PbpAllowance`, `PbpRelatedOffering`, `PbpPricing` — Offering entity and supporting types (RFC-0429, RFC-0730: `presentation` removed from offering; `guarantees` added as schema-validated field; `PbpRelatedOffering` extended with optional `label`/`description` display fields)
 - `PbpCacheKey`, `PbpDependencyInvalidationRule`, `PbpIncrementalBuildConfig`, `PbpBulkProcessingConfig` — incremental and bulk processing (RFC-0430)
 - `PbpDerivationContract`, `PbpDerivationResult`, `PbpDerivationMode`, `PbpDerivationStatus`, `PbpDerivationProvenance` — derivation contract (RFC-0431)
 - `PbpSchemaOrgMapping`, `PbpSchemaOrgLossReport`, `PbpSchemaOrgLossEntry` — Schema.org projection mapping (RFC-0432)
@@ -162,14 +162,25 @@ rtk pnpm --filter @warpgogol/pbp build:check
 rtk pnpm --filter @warpgogol/pbp test
 ```
 
-## Presentation fields (RFC-0482)
+## Presentation fields (RFC-0482, superseded for offerings by RFC-0730)
 
-Five entity schemas (`offering`, `legal-identity`, `web-presence`, `public-document`, `business`) carry an optional `presentation: z.record(z.string(), z.unknown())` field. This field holds site-specific display-formatted strings for content reference resolution (RFC-0045) — e.g. `presentation.price.monthly: "70 € / Monat"`.
+Four entity schemas (`legal-identity`, `web-presence`, `public-document`, `business`) carry an optional `presentation: z.record(z.string(), z.unknown())` field. This field holds site-specific display-formatted strings for content reference resolution (RFC-0045) — e.g. `presentation.domains.primary: "warpgogol.com"`.
 
 - The field is intentionally loose-typed (`z.record(z.string(), z.unknown())`). Structural validation belongs in the PBP spec, not in presentation.
 - The field is optional — entities without `presentation` validate unchanged.
 - `null` is rejected; omit the field entirely if no presentation data exists.
 - Locale overlay: `resolveLocales` deep-merges presentation fields. Each locale should author its own `presentation` block. The fallback report flags inherited presentation paths.
+
+### Offering entities — NO presentation (RFC-0730)
+
+The `presentation` field is **removed** from `offeringSchema` entirely (RFC-0730 supersedes RFC-0482 for offerings). Offering files MUST NOT include `presentation`.
+
+- Display formatting for offerings routes through canonical PBP fields + the `money` pipe formatter (RFC-0729) at render time.
+- `pricing.charges` holds canonical decimal strings (e.g. `"70.00"`) — content references use `=(...pricing.charges.monthlySubscription.amount.value | money)` for display.
+- `guarantees` is a schema-validated top-level field on offerings (`z.record(z.string(), z.object({ label: nonEmptyString, detail: nonEmptyString })).optional()`).
+- `relatedOfferings` entries carry optional `label`/`description` display fields for UI rendering.
+- `fulfillment` holds operational data (`capacity`, `billingDay`) as structured sub-objects within the loose-typed `z.record(z.string(), z.unknown())`.
+- Agents MUST NOT add `presentation` to offering files. Any offering file with `presentation` will fail schema validation.
 
 ## Downstream RFC rules
 

@@ -709,6 +709,7 @@ describe("pbpSchemaById registry", () => {
       "claim",
       "evidence-source",
       "disclosure",
+      "consent",
       "public-document",
     ];
     for (const entity of expectedIds) {
@@ -717,7 +718,7 @@ describe("pbpSchemaById registry", () => {
     }
   });
 
-  it("has 23 registered schemas", () => {
-    expect(Object.keys(pbpSchemaById)).toHaveLength(23);
+  it("has 24 registered schemas", () => {
+    expect(Object.keys(pbpSchemaById)).toHaveLength(24);
   });
 });

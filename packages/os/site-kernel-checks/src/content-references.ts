@@ -149,7 +149,7 @@ export async function runContentReferencesValidate(
           match.index + candidate.length,
           lineEnd === -1 ? source.length : lineEnd,
         );
-        const isInsideFormula = /=\(\s*$/.test(beforeRef) && /^\s*\)/.test(afterRef);
+        const isInsideFormula = /=\(\s*$/.test(beforeRef) && afterRef.includes(")");
         if (!isPureRef && !isInsideFormula) {
           const lineNumbers = findLineNumbersContaining(source, candidate);
           const lineSuffix = lineNumbers.length > 0 ? `:${lineNumbers[0]}` : "";

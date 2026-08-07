@@ -91,6 +91,23 @@ describe("content.references.validate — RFC-0723", () => {
     expect(ref04).toBeUndefined();
   });
 
+  it("RFC-0730: skips REF-04 for refs inside =(… | pipe) formula expressions", async () => {
+    await writeIndex(["business-profile"]);
+    await writeFile(
+      join(pagesDir, "de", "test.md"),
+      "---\npageId: test\ntitle: Test\n---\nAb =(business-profile.test-file.tagline | money) monatlich\n",
+    );
+
+    const result = await runContentReferencesValidate(
+      testInput(),
+      makeTestSiteContext(workspaceRoot, appDir),
+    );
+
+    const data = result.data as { diagnostics?: Array<{ message: string }> };
+    const ref04 = (data.diagnostics ?? []).find((d) => d.message.includes("REF-04"));
+    expect(ref04).toBeUndefined();
+  });
+
   it("RFC-0723: pure refs (entire line is the reference) do not trigger REF-04", async () => {
     await writeIndex(["business-profile"]);
     await writeFile(
