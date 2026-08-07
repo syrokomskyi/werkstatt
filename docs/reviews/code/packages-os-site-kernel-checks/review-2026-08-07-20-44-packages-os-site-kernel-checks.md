@@ -4,7 +4,7 @@ date: 2026-08-07
 reviewer:
   skill: fo-review
   model: unknown
-verdict: needs-revision
+verdict: approved
 diffRange: eb26315^...HEAD
 filesReviewed:
   - docs/adrs/adr-0030-site-content-validation-lives-in-validators-not-tests.md
@@ -15,9 +15,9 @@ filesReviewed:
 
 # Code Review: ADR-0030 — site content validation in validators not tests
 
-### Verdict: Needs revision
+### Verdict: Approved
 
-The ADR decision is sound and the validator follows existing patterns, but the validator uses synchronous `readFileSync` while the rest of `site-kernel-checks` uses async `fs/promises`. There is also a missing ADR-0030 code trace in the new module's Compass scaffolding.
+The ADR decision is sound and the validator follows existing patterns. Both findings (sync I/O, missing pipeline registration) have been fixed in commit 60193085.
 
 ### Mechanical floor
 
@@ -25,7 +25,7 @@ Pass — `tsc --noEmit` passes for `@warpgogol/site-kernel-checks` and `@warpgog
 
 ### Axis A — Structural correctness
 
-- **Synchronous I/O in an async validator**: `pbp-migration.ts` uses `readFileSync`/`existsSync` from `node:fs` while peer validators (`content-pbp.ts`, `pbp-profile.ts`) use `fs.access`/`fs.readdir` from `node:fs/promises`. The validator is declared `async` but performs blocking I/O. This is a Fowler **Divergent Change** smell — the module diverges from the established I/O pattern in the same package. Switch to `fs.readFile` and `fs.access` from `node:fs/promises`.
+No issues. Fixed in 60193085 — switched to async `node:fs/promises`.
 
 ### Axis B — DNA alignment
 
@@ -33,7 +33,7 @@ No issues. No DNA invariants are directly touched by this change.
 
 ### Axis C — Ecosystem fit
 
-- **Pipeline placement**: The command is registered in `04-content-quality.ts` with `supportsAllSites: true` — correct. However, the command is not added to any pipeline constant in `src/pipelines/`. Existing PBP validators (`pbp.profile.validate`, `pbp.content.validate`) ARE in the author pipeline. `pbp.migration.validate` should be added to the same pipeline to actually run during `build.prepare`/`build.check`. Without pipeline registration, the command exists but never executes automatically.
+No issues. Fixed in 60193085 — added to `SITES_CHECK_AUTHOR_PIPELINE`.
 
 ### Axis D — Forward-only compliance
 
@@ -59,9 +59,8 @@ No issues. The old test is deleted, not maintained alongside the new validator. 
 | Site content validation in site-kernel-checks | Done | `pbp-migration.ts` created |
 | No tests in packages/* hardcode site paths | Done | Test deleted |
 | `pbp.migration.validate` replaces deleted test | Done | Command registered in `04-content-quality.ts` |
-| Validator runs for every site through pipeline | Partial | Command registered but NOT added to pipeline constants |
+| Validator runs for every site through pipeline | Done | Added to SITES_CHECK_AUTHOR_PIPELINE in 60193085 |
 
 ### Questions for the author
 
-1. Should `pbp.migration.validate` be added to `SITES_CHECK_AUTHOR_PIPELINE` or `APPS_BUILD_PREPARE_PIPELINE` so it actually runs during builds?
-2. Why use synchronous `readFileSync` when the validator is `async` and peer validators use `fs/promises`?
+No outstanding questions.
