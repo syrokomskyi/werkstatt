@@ -596,6 +596,33 @@ export async function runMissionClose(
           }
         }
       }
+
+      // RFC-0732: Copy .cache/content-regression/current.snapshot.yaml from workpiece
+      // to cache clone as the new golden snapshot: {systemId}.snapshot.yaml
+      const contentRegressionSrc = path.join(
+        workpieceDir,
+        ".cache",
+        "content-regression",
+        "current.snapshot.yaml",
+      );
+      if (existsSync(contentRegressionSrc)) {
+        const contentRegressionDestDir = path.join(systemDir, ".cache", "content-regression");
+        const contentRegressionDest = path.join(
+          contentRegressionDestDir,
+          `${manifest.systemId}.snapshot.yaml`,
+        );
+        try {
+          await fs.mkdir(contentRegressionDestDir, { recursive: true });
+          await fs.copyFile(contentRegressionSrc, contentRegressionDest);
+          logger.info(
+            `  Copied .cache/content-regression/current.snapshot.yaml → ${manifest.systemId}.snapshot.yaml (golden baseline)`,
+          );
+        } catch (err) {
+          logger.warn(
+            `  Warning: failed to copy content regression snapshot to cache clone: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
     } catch (err) {
       logger.info(
         `  Warning: failed to write materialization state or copy .cache/: ${err instanceof Error ? err.message : String(err)}`,
