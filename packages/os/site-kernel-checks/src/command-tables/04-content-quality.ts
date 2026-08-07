@@ -63,6 +63,7 @@ import {
   runSourceMonitorStatus,
   runSourceMonitorRun,
 } from "../source-monitor.ts";
+import { runDerivedPricesMaterialize } from "../derived-prices-materialize.ts";
 
 export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
   {
@@ -725,6 +726,23 @@ export const CONTENT_QUALITY_COMMANDS: CheckCommandEntry[] = [
     supportsAllSites: false,
     cacheable: false,
     execute: runSourceMonitorStatus,
+  },
+  {
+    name: "derived-prices.materialize",
+    description:
+      "Materialize derived prices for all Offerings by running currency-conversion derivation for each fixed Charge in each target currency (RFC-0740).",
+    scope: "workspace",
+    flags: {
+      system: {
+        kind: "string",
+        description: "Sternsystem ID.",
+      },
+    },
+    supportsAllSites: false,
+    cacheable: false,
+    reads: ["<app>/src/content/business-profile/**/*.md"],
+    writes: ["<app>/src/derived-prices.generated.json"],
+    execute: runDerivedPricesMaterialize,
   },
   {
     name: "source.monitor.run",
