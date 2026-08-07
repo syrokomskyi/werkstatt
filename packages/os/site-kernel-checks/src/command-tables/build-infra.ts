@@ -23,6 +23,10 @@ import { runPipelineCacheParity } from "../pipeline/pipeline-cache-parity.ts";
 import { runPipelineDependenciesValidate } from "../pipeline/pipeline-dependencies-validate.ts";
 import { runBehaviorSnapshotGenerate, runBehaviorSnapshotValidate } from "../behavior-snapshot.ts";
 import { runBehaviorSnapshotStalenessCheck } from "../behavior-snapshot-staleness.ts";
+import {
+  runContentRegressionCheck,
+  runContentRegressionSnapshotUpdate,
+} from "../content-regression.ts";
 
 export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
   {
@@ -149,5 +153,46 @@ export const BUILD_INFRA_COMMANDS: CheckCommandEntry[] = [
     flags: {},
     reads: ["<app>/src/content/system.md", "<app>/behavior.snapshot.generated.yaml"],
     execute: runBehaviorSnapshotStalenessCheck,
+  },
+  {
+    name: "content.regression.check",
+    description:
+      "RFC-0732: snapshot resolved page content (block text, prose body, FAQ Q&A) per-route and diff " +
+      "against golden baseline in cache clone. CREG-01 content drift, CREG-02 route set mismatch, " +
+      "CREG-03 no golden snapshot (cold start warning).",
+    scope: "app",
+    supportsAllSites: true,
+    cacheable: false,
+    flags: {
+      site: { kind: "string", description: "Site to validate (required, app scope)." },
+      "dry-run": {
+        kind: "boolean",
+        description: "Render snapshot without writing; return diagnostics only.",
+      },
+      "skip-content-regression": {
+        kind: "boolean",
+        description: "Skip the content regression gate (escape hatch).",
+      },
+    },
+    reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
+    execute: runContentRegressionCheck,
+  },
+  {
+    name: "content.regression.snapshot.update",
+    description:
+      "RFC-0732: update the golden content regression snapshot in the cache clone after operator review. " +
+      "Prints diff first; requires --confirm to write.",
+    scope: "app",
+    supportsAllSites: true,
+    cacheable: false,
+    flags: {
+      site: { kind: "string", description: "Site to update (required, app scope)." },
+      confirm: {
+        kind: "boolean",
+        description: "Required to write; without it, prints diff and exits 0.",
+      },
+    },
+    reads: ["<app>/src/content/system.md", "<app>/src/content/**/*.md"],
+    execute: runContentRegressionSnapshotUpdate,
   },
 ];
