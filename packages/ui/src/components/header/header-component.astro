@@ -17,6 +17,7 @@
 
 import BrandLabel from "@warpgogol/ui/components/brand-label";
 import LangSwitcher from "@warpgogol/ui/components/lang-switcher";
+import CurrencySelector from "@warpgogol/ui/components/currency-selector";
 import { getResolvedComponentContent } from "@warpgogol/share";
 import { getFeaturePolicyResolver } from "@warpgogol/share/astro/feature-policy";
 import { getRouteRegistry, resolveSemanticTarget } from "@warpgogol/share";
@@ -34,6 +35,8 @@ interface Props {
   getLocalizedSiblingPath?: (path: string, lang: string) => Promise<string> | string;
   defaultLanguage?: string;
   pageOverride?: Partial<HeaderComponentContent>;
+  /** RFC-0743: Available target currencies for the currency selector. When empty or absent, the selector is not rendered. */
+  currencies?: Array<{ code: string; label: string }>;
 }
 
 const {
@@ -46,6 +49,7 @@ const {
   getLocalizedSiblingPath,
   defaultLanguage,
   pageOverride,
+  currencies = [],
 } = Astro.props as Props;
 const defaultLang = defaultLanguage ?? (await getRouteRegistry()).defaultLanguage;
 const activeLang = lang ?? defaultLang;
@@ -102,6 +106,15 @@ const ctaHref = ctaTarget
                 defaultLanguage={defaultLang}
               />
             )
+        }
+        {
+          currencies.length > 0 && (
+            <CurrencySelector
+              lang={activeLang}
+              defaultLanguage={defaultLang}
+              currencies={currencies}
+            />
+          )
         }
       </div>
       {content.motto && <span class="site-header__motto">{content.motto}</span>}
