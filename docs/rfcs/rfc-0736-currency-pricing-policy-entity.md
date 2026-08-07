@@ -1,7 +1,7 @@
 ---
 id: RFC-0736
 title: "CurrencyPricingPolicy Entity"
-status: accepted
+status: implemented
 kind: contract
 scope: workspace
 owners:
@@ -11,7 +11,7 @@ reviewers:
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
 enhancedAt: 2026-08-07
-implementedAt:
+implementedAt: 2026-08-07
 closedAt:
 supersedes: []
 supersededBy:
