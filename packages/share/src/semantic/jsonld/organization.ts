@@ -79,6 +79,7 @@ export function buildOrganizationNode(context: JsonLdContext): JsonLdNode {
     ...(page.organization.offer?.prices?.length
       ? {
           // RFC-0147: project the canonical offer as schema.org Offer nodes.
+          // RFC-0745: emit priceCurrency from canonical source currency when available.
           makesOffer: page.organization.offer.prices.map((price) => ({
             "@type": "Offer",
             name: price.label,
@@ -86,6 +87,7 @@ export function buildOrganizationNode(context: JsonLdContext): JsonLdNode {
               "@type": "PriceSpecification",
               price: price.amount,
             },
+            ...(price.currency ? { priceCurrency: price.currency } : {}),
           })),
         }
       : {}),

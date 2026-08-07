@@ -12,7 +12,9 @@ import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { compilePbpProfile } from "../index.js";
+import { validateSchemaOrgPrices, buildCanonicalPriceSet } from "../index.js";
 import type { PbpCompilerInput } from "../index.js";
+import type { PbpResolvedGraph } from "../types.js";
 
 let testDir: string;
 
@@ -252,5 +254,196 @@ describe("PBP Compiler Pipeline", () => {
 
     expect(result.projections.schemaOrg["@type"]).toBe("Organization");
     expect(result.projections.schemaOrg.name).toBe("Warpgogol");
+  });
+
+  it("Schema.org projection includes canonical price for offering with fixed charge", async () => {
+    writeEntity("de", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol",
+    });
+    writeEntity("de", "offering.md", {
+      schema: "pbp/offering@1",
+      id: "https://warpgogol.com/offerings/studio",
+      type: "offering",
+      status: "published",
+      name: "Studio Package",
+      businessRef: { ref: "https://warpgogol.com/business" },
+      pricing: {
+        currency: "EUR",
+        charges: {
+          monthly: {
+            type: "recurring",
+            purpose: "Monthly subscription",
+            amount: { model: "fixed", value: "70.00" },
+          },
+        },
+      },
+    });
+
+    const input: PbpCompilerInput = {
+      sourceDirectory: testDir,
+      locale: "de",
+      defaultLocale: "de",
+      strictness: "production",
+    };
+
+    const result = await compilePbpProfile(input);
+
+    const offers = result.projections.schemaOrg.offers as Array<Record<string, unknown>>;
+    const offer = offers.find((o) => o.name === "Studio Package");
+    expect(offer).toBeDefined();
+    expect(offer!.price).toBe("70.00");
+    expect(offer!.priceCurrency).toBe("EUR");
+  });
+
+  it("Schema.org projection omits price for offering without pricing", async () => {
+    writeEntity("de", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol",
+    });
+    writeEntity("de", "offering.md", {
+      schema: "pbp/offering@1",
+      id: "https://warpgogol.com/offerings/consulting",
+      type: "offering",
+      status: "published",
+      name: "Consulting",
+      businessRef: { ref: "https://warpgogol.com/business" },
+    });
+
+    const input: PbpCompilerInput = {
+      sourceDirectory: testDir,
+      locale: "de",
+      defaultLocale: "de",
+      strictness: "production",
+    };
+
+    const result = await compilePbpProfile(input);
+
+    const offers = result.projections.schemaOrg.offers as Array<Record<string, unknown>>;
+    const offer = offers.find((o) => o.name === "Consulting");
+    expect(offer).toBeDefined();
+    expect(offer!.price).toBeUndefined();
+    const schemaPriceErrors = result.validationErrors.filter((e) => e.code === "PBP-SCHEMA-PRICE");
+    expect(schemaPriceErrors).toHaveLength(0);
+  });
+
+  it("Schema.org projection omits price for offering with only range charges", async () => {
+    writeEntity("de", "business.md", {
+      schema: "pbp/business@1",
+      id: "https://warpgogol.com/business",
+      type: "business",
+      status: "published",
+      name: "Warpgogol",
+    });
+    writeEntity("de", "offering.md", {
+      schema: "pbp/offering@1",
+      id: "https://warpgogol.com/offerings/custom",
+      type: "offering",
+      status: "published",
+      name: "Custom Project",
+      businessRef: { ref: "https://warpgogol.com/business" },
+      pricing: {
+        currency: "EUR",
+        charges: {
+          project: {
+            type: "one-time",
+            purpose: "Project cost",
+            amount: { model: "range", minimum: "500.00", maximum: "5000.00" },
+          },
+        },
+      },
+    });
+
+    const input: PbpCompilerInput = {
+      sourceDirectory: testDir,
+      locale: "de",
+      defaultLocale: "de",
+      strictness: "production",
+    };
+
+    const result = await compilePbpProfile(input);
+
+    const offers = result.projections.schemaOrg.offers as Array<Record<string, unknown>>;
+    const offer = offers.find((o) => o.name === "Custom Project");
+    expect(offer).toBeDefined();
+    expect(offer!.price).toBeUndefined();
+  });
+
+  it("validateSchemaOrgPrices passes for canonical prices", () => {
+    const schemaOrg = {
+      offers: [
+        { "@type": "Offer", price: "70.00", priceCurrency: "EUR" },
+        { "@type": "Offer", price: "150.00", priceCurrency: "EUR" },
+      ],
+    };
+    const canonicalPrices = new Set(["70.00", "150.00"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("validateSchemaOrgPrices catches non-canonical price", () => {
+    const schemaOrg = {
+      offers: [{ "@type": "Offer", price: "3239.00", priceCurrency: "UAH" }],
+    };
+    const canonicalPrices = new Set(["70.00"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe("PBP-SCHEMA-PRICE");
+    expect(errors[0].severity).toBe("error");
+    expect(errors[0].message).toContain("3239.00");
+  });
+
+  it("validateSchemaOrgPrices skips offers without price field", () => {
+    const schemaOrg = {
+      offers: [{ "@type": "Offer", priceCurrency: "EUR" }],
+    };
+    const canonicalPrices = new Set(["70.00"]);
+    const errors = validateSchemaOrgPrices(schemaOrg, canonicalPrices);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("buildCanonicalPriceSet collects fixed-model charge values", () => {
+    const graph = {
+      offerings: {
+        a: {
+          id: "a",
+          name: "A",
+          pricing: {
+            currency: "EUR",
+            charges: {
+              m: {
+                type: "recurring",
+                purpose: "Monthly",
+                amount: { model: "fixed", value: "70.00" },
+              },
+            },
+          },
+        },
+        b: {
+          id: "b",
+          name: "B",
+          pricing: {
+            currency: "EUR",
+            charges: {
+              r: {
+                type: "one-time",
+                purpose: "Range",
+                amount: { model: "range", minimum: "10", maximum: "100" },
+              },
+            },
+          },
+        },
+        c: { id: "c", name: "C" },
+      },
+    } as unknown as PbpResolvedGraph;
+    const prices = buildCanonicalPriceSet(graph);
+    expect(prices.has("70.00")).toBe(true);
+    expect(prices.size).toBe(1);
   });
 });

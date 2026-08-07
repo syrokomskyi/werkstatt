@@ -204,6 +204,7 @@ export type SemanticPrice = {
   id: string;
   label: string;
   amount: string;
+  currency?: string;
 };
 
 export type SemanticGrowthModule = {

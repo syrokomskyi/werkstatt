@@ -8,6 +8,7 @@
 <CHANGE_SUMMARY>
   <item>Established by RFC-0467 — Phase 12: projection.</item>
   <item>Extended by RFC-0742 — attach priceProjections and priceTraces from materialized derived prices.</item>
+  <item>Extended by RFC-0745 — emit canonical price field in Schema.org, add validateSchemaOrgPrices validation.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -17,6 +18,8 @@ import type { PbpBuyerView, PbpProjectionSet, PbpResolvedGraph } from "./types.j
 import { buildPriceProjection } from "../projections/price-projection.js";
 import type { PbpPriceProjection } from "../projections/price-projection.js";
 import type { PbpCurrencyConversionTrace } from "../derivations/currency-conversion.js";
+import type { PbpValidationError } from "../validation-errors.js";
+import type { PbpChargeAmount } from "../entities/pricing.js";
 
 export async function generateProjections(
   graph: PbpResolvedGraph,
@@ -77,11 +80,66 @@ function generateSchemaOrg(graph: PbpResolvedGraph): Record<string, unknown> {
     offers: offerings.map((offering) => {
       const record = offering as unknown as Record<string, unknown>;
       const pricing = record.pricing as Record<string, unknown> | undefined;
+      const price = extractCanonicalPrice(pricing);
       return {
         "@type": "Offer",
         name: offering.name,
         priceCurrency: pricing?.currency ?? "",
+        ...(price !== undefined ? { price } : {}),
       };
     }),
   };
+}
+
+/** RFC-0745: Extract the first fixed-model charge amount value as the canonical source-currency decimal string. */
+function extractCanonicalPrice(pricing: Record<string, unknown> | undefined): string | undefined {
+  if (!pricing) return undefined;
+  const charges = pricing["charges"] as Record<string, unknown> | undefined;
+  if (!charges) return undefined;
+  for (const charge of Object.values(charges)) {
+    const c = charge as Record<string, unknown> | undefined;
+    if (!c) continue;
+    const amount = c["amount"] as PbpChargeAmount | undefined;
+    if (amount && amount.model === "fixed") {
+      return amount.value;
+    }
+  }
+  return undefined;
+}
+
+/** RFC-0745: Build a set of canonical price strings from the resolved graph's offerings. */
+export function buildCanonicalPriceSet(graph: PbpResolvedGraph): Set<string> {
+  const prices = new Set<string>();
+  for (const offering of Object.values(graph.offerings)) {
+    const record = offering as unknown as Record<string, unknown>;
+    const pricing = record.pricing as Record<string, unknown> | undefined;
+    const price = extractCanonicalPrice(pricing);
+    if (price !== undefined) {
+      prices.add(price);
+    }
+  }
+  return prices;
+}
+
+/** RFC-0745: Validate that Schema.org Offer price fields contain only canonical source-currency prices. */
+export function validateSchemaOrgPrices(
+  schemaOrg: Record<string, unknown>,
+  canonicalPrices: Set<string>,
+): PbpValidationError[] {
+  const errors: PbpValidationError[] = [];
+  const offers = schemaOrg["offers"];
+  if (!Array.isArray(offers)) return errors;
+  for (const offer of offers) {
+    const node = offer as Record<string, unknown>;
+    const price = node["price"];
+    if (typeof price !== "string") continue;
+    if (!canonicalPrices.has(price)) {
+      errors.push({
+        code: "PBP-SCHEMA-PRICE",
+        severity: "error",
+        message: `Derived price value '${price}' found in Schema.org price field. Only canonical source-currency prices are allowed in structured data.`,
+      });
+    }
+  }
+  return errors;
 }

@@ -23,7 +23,11 @@ import { applyRuntimeOverlays } from "./overlays.js";
 import { runDerivations } from "./derivations.js";
 import { validateSemantic } from "./semantic.js";
 import { assembleBuyerView } from "./buyer-view.js";
-import { generateProjections } from "./projection.js";
+import {
+  generateProjections,
+  buildCanonicalPriceSet,
+  validateSchemaOrgPrices,
+} from "./projection.js";
 import { snapshot } from "./snapshot.js";
 import { publish } from "./publication.js";
 
@@ -73,6 +77,10 @@ export async function compilePbpProfile(input: PbpCompilerInput): Promise<PbpCom
   // Phase 12: projection
   const projections = await generateProjections(overlaid, buyerView, input.locale);
 
+  // RFC-0745: validate Schema.org prices after projection generation
+  const canonicalPrices = buildCanonicalPriceSet(overlaid);
+  const schemaOrgPriceErrors = validateSchemaOrgPrices(projections.schemaOrg, canonicalPrices);
+
   // Phase 13: canonical-snapshot (stub for Wave 1)
   const partialForSnapshot: PartialCompilerResult = {
     inventory,
@@ -81,7 +89,13 @@ export async function compilePbpProfile(input: PbpCompilerInput): Promise<PbpCom
     fallbackReport,
     graphErrors,
     cycleResults,
-    validationErrors: [...schemaErrors, ...indexErrors, ...derivationErrors, ...semanticErrors],
+    validationErrors: [
+      ...schemaErrors,
+      ...indexErrors,
+      ...derivationErrors,
+      ...semanticErrors,
+      ...schemaOrgPriceErrors,
+    ],
     derivationResults,
     buyerView,
     projections,

@@ -57,9 +57,15 @@ export function projectOffer(data: Record<string, unknown> | undefined): Semanti
   if (!data) return undefined;
 
   const price = (data["price"] ?? {}) as Record<string, unknown>;
+  const currency = typeof data["currency"] === "string" ? (data["currency"] as string) : undefined;
   const prices = PRICE_LABELS.filter(
     ([key]) => typeof price[key] === "string" && (price[key] as string).length > 0,
-  ).map(([key, label]) => ({ id: key, label, amount: price[key] as string }));
+  ).map(([key, label]) => ({
+    id: key,
+    label,
+    amount: price[key] as string,
+    ...(currency ? { currency } : {}),
+  }));
 
   const rawGuarantees = (data["guarantees"] ?? {}) as Record<
     string,
