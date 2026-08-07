@@ -1,0 +1,57 @@
+---
+/*
+<MODULE_CONTRACT>
+<purpose>
+Currency-aware price display component (RFC-0743). Pre-renders all currency
+variants server-side with data-currency attributes. Client script toggles
+visibility based on the selected currency.
+</purpose>
+<non-goals>
+  <item>Do not manage currency selection — that is currency-selector.</item>
+  <item>Do not show source EUR price alongside derived price (decision #31).</item>
+  <item>Do not use ≈ in disclosure notes (decision #33).</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0743: Initial creation of currency-aware price display component.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { initCurrencyAwarePriceDisplay } from "./currency-aware-price-display-component.client.ts";
+import "./currency-aware-price-display-component.css";
+
+interface Props {
+  priceVariants: Array<{
+    currency: string;
+    formatted: string;
+    note: string | null;
+  }>;
+}
+
+const { priceVariants } = Astro.props as Props;
+
+const defaultVariant = priceVariants[0];
+---
+
+<div class="currency-aware-price-display" data-currency-price-display aria-live="polite">
+  {
+    priceVariants.map((variant, index) => (
+      <div
+        class="currency-aware-price-display__variant"
+        data-currency={variant.currency}
+        hidden={index !== 0}
+        aria-label={variant.formatted}
+      >
+        <span class="currency-aware-price-display__amount">{variant.formatted}</span>
+        {variant.note && <p class="currency-aware-price-display__note">{variant.note}</p>}
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  const container = document.querySelector<HTMLElement>("[data-currency-price-display]");
+  if (container) {
+    initCurrencyAwarePriceDisplay(container);
+  }
+</script>

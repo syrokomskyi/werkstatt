@@ -63,6 +63,30 @@
       "types": "./src/components/copyright/copyright-component.types.generated.ts",
       "default": "./src/components/copyright/copyright-component.types.generated.ts"
     },
+    "./components/currency-selector": {
+      "types": "./src/components/currency-selector/currency-selector-component.astro",
+      "default": "./src/components/currency-selector/currency-selector-component.astro"
+    },
+    "./components/currency-selector.astro": {
+      "types": "./src/components/currency-selector/currency-selector-component.astro",
+      "default": "./src/components/currency-selector/currency-selector-component.astro"
+    },
+    "./components/currency-selector/types": {
+      "types": "./src/components/currency-selector/currency-selector-component.types.generated.ts",
+      "default": "./src/components/currency-selector/currency-selector-component.types.generated.ts"
+    },
+    "./components/currency-aware-price-display": {
+      "types": "./src/components/currency-aware-price-display/currency-aware-price-display-component.astro",
+      "default": "./src/components/currency-aware-price-display/currency-aware-price-display-component.astro"
+    },
+    "./components/currency-aware-price-display.astro": {
+      "types": "./src/components/currency-aware-price-display/currency-aware-price-display-component.astro",
+      "default": "./src/components/currency-aware-price-display/currency-aware-price-display-component.astro"
+    },
+    "./components/currency-aware-price-display/types": {
+      "types": "./src/components/currency-aware-price-display/currency-aware-price-display-component.types.generated.ts",
+      "default": "./src/components/currency-aware-price-display/currency-aware-price-display-component.types.generated.ts"
+    },
     "./components/donation-card": {
       "types": "./src/components/donation-card/donation-card-component.astro",
       "default": "./src/components/donation-card/donation-card-component.astro"
@@ -570,9 +594,7 @@
       "default": "./src/styles/*"
     }
   },
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "build": "echo 'No build step required for Astro components'",
     "build:check": "tsc --noEmit",

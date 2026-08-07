@@ -1,0 +1,40 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Currency-aware price display component styles (RFC-0743). Uses --ds-* tokens only.</purpose>
+<non-goals>
+  <item>Do not define component behavior or JavaScript logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0743: Initial creation of currency-aware price display styles.</item>
+</CHANGE_SUMMARY>
+*/
+
+.currency-aware-price-display {
+  display: block;
+}
+
+.currency-aware-price-display__variant {
+  display: block;
+}
+
+.currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
+.currency-aware-price-display__amount {
+  font-family: var(--ds-font-heading);
+  font-size: var(--ds-size-text-lg, 1.25rem);
+  font-weight: 700;
+  color: var(--ds-color-text);
+  display: block;
+}
+
+.currency-aware-price-display__note {
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-size-text-sm, 0.875rem);
+  font-weight: 400;
+  color: var(--ds-color-text-muted, var(--ds-color-text));
+  margin: 0.25em 0 0;
+  line-height: 1.4;
+}

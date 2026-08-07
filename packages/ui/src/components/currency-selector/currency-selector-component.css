@@ -1,0 +1,48 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Currency selector component styles (RFC-0743). Uses --ds-* tokens only.</purpose>
+<non-goals>
+  <item>Do not define component behavior or JavaScript logic.</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>RFC-0743: Initial creation of currency selector styles.</item>
+</CHANGE_SUMMARY>
+*/
+
+.currency-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.currency-selector__label {
+  font-family: var(--ds-font-heading);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--ds-color-text);
+  margin: 0;
+}
+
+.currency-selector__select {
+  font-family: var(--ds-font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--ds-color-text);
+  background-color: inherit;
+  border: none;
+  border-bottom: 1.5px solid var(--ds-color-text);
+  padding: 0.15em 0.3em;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.currency-selector__select:focus {
+  outline: 2px solid var(--ds-color-accent, var(--ds-color-text));
+  outline-offset: 2px;
+}
