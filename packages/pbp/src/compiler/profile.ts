@@ -26,6 +26,8 @@ import type { PbpEvidenceSource } from "../entities/evidence-source.js";
 import type { PbpDisclosure } from "../entities/disclosure.js";
 import type { PbpPublicDocument } from "../entities/public-document.js";
 import type { PbpCategory } from "../entities/category.js";
+import type { PbpRatePolicy } from "../entities/rate-policy.js";
+import type { PbpRateSnapshot } from "../entities/rate-snapshot.js";
 import type { PbpResolvedGraph } from "./types.js";
 
 export async function resolveProfile(index: Map<string, PbpEntity>): Promise<PbpResolvedGraph> {
@@ -70,6 +72,8 @@ export async function resolveProfile(index: Map<string, PbpEntity>): Promise<Pbp
     string,
     PbpPublicDocument
   >;
+  const ratePolicies = collectByType(byType, "rate-policy") as Record<string, PbpRatePolicy>;
+  const rateSnapshots = collectByType(byType, "rate-snapshot") as Record<string, PbpRateSnapshot>;
 
   return {
     business,
@@ -88,6 +92,8 @@ export async function resolveProfile(index: Map<string, PbpEntity>): Promise<Pbp
     evidenceSources,
     disclosures,
     publicDocuments,
+    ratePolicies,
+    rateSnapshots,
   };
 }
 

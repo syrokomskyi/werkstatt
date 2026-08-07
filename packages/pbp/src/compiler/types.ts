@@ -31,6 +31,8 @@ import type { PbpEvidenceSource } from "../entities/evidence-source.js";
 import type { PbpDisclosure } from "../entities/disclosure.js";
 import type { PbpPublicDocument } from "../entities/public-document.js";
 import type { PbpCategory } from "../entities/category.js";
+import type { PbpRatePolicy } from "../entities/rate-policy.js";
+import type { PbpRateSnapshot } from "../entities/rate-snapshot.js";
 import type { PbpDerivationContract, PbpDerivationResult } from "../derivation.js";
 import type { PbpFallbackReport } from "../locale.js";
 import type { PbpGraphIntegrityError, PbpCycleCheckResult } from "../reference-resolution.js";
@@ -67,6 +69,8 @@ export interface PbpResolvedGraph {
   evidenceSources: Record<string, PbpEvidenceSource>;
   disclosures: Record<string, PbpDisclosure>;
   publicDocuments: Record<string, PbpPublicDocument>;
+  ratePolicies: Record<string, PbpRatePolicy>;
+  rateSnapshots: Record<string, PbpRateSnapshot>;
 }
 
 export interface PbpBuyerView {

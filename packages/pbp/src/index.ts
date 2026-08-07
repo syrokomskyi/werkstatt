@@ -575,3 +575,26 @@ export {
   type PbpRateSnapshot,
   RATE_SNAPSHOT_SCHEMA_ID,
 } from "./entities/rate-snapshot.js";
+
+// RFC-0739: Currency Conversion Derivation Contract
+export {
+  type PbpRoundingMode,
+  PBP_ROUNDING_MODES,
+  isPbpRoundingMode,
+  type PbpPriceEndingMode,
+  PBP_PRICE_ENDING_MODES,
+  isPbpPriceEndingMode,
+  type PbpPriceDerivationPipeline,
+  type PbpCurrencyConversionDerivation,
+  type PbpCurrencyConversionResult,
+  type PbpCurrencyConversionTrace,
+} from "./derivations/currency-conversion.js";
+
+// RFC-0739: Decimal arithmetic helpers
+export {
+  decimalMultiply,
+  decimalAdd,
+  decimalSubtract,
+  decimalDivide,
+  decimalRound,
+} from "./decimal.js";

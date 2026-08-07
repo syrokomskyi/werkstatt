@@ -100,5 +100,7 @@ function emptyGraph(): PbpResolvedGraph {
     evidenceSources: {},
     disclosures: {},
     publicDocuments: {},
+    ratePolicies: {},
+    rateSnapshots: {},
   };
 }
