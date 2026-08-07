@@ -14,3 +14,4 @@ export {
   clearRateSourceAdapters,
 } from "./registry.js";
 export { createEcbAdapter, parseEcbXml } from "./adapters/ecb.js";
+export { createFrankfurterAdapter, parseFrankfurterResponse } from "./adapters/frankfurter.js";

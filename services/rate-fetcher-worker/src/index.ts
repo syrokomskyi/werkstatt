@@ -16,6 +16,7 @@ stores observations in rate_observations table.</purpose>
 
 import {
   createEcbAdapter,
+  createFrankfurterAdapter,
   getRateSourceAdapter,
   registerRateSourceAdapter,
   type RateSourceAdapter,
@@ -45,16 +46,14 @@ interface RatePolicyPair {
 
 function ensureAdaptersRegistered(): void {
   if (!getRateSourceAdapter("ecb")) {
-    registerRateSourceAdapter(
-      "ecb",
-      createEcbAdapter({ ref: "ecb" }),
-    );
+    registerRateSourceAdapter("ecb", createEcbAdapter({ ref: "ecb" }));
+  }
+  if (!getRateSourceAdapter("frankfurter")) {
+    registerRateSourceAdapter("frankfurter", createFrankfurterAdapter({ ref: "frankfurter" }));
   }
 }
 
-async function fetchEnabledSources(
-  env: RateFetcherWorkerEnv,
-): Promise<RateSourceRow[]> {
+async function fetchEnabledSources(env: RateFetcherWorkerEnv): Promise<RateSourceRow[]> {
   const url = `${env.RATE_FETCHER_SUPABASE_URL}/rest/v1/rate_sources?enabled=eq.true&select=*`;
   const response = await fetch(url, {
     headers: {
