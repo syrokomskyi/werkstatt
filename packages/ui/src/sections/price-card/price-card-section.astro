@@ -28,6 +28,7 @@ import SectionHeader from "@warpgogol/ui/components/section-header.astro";
 import EffectHost from "../../components/effects/effect-host.astro";
 import CurrencyAwarePriceDisplay from "../../components/currency-aware-price-display/currency-aware-price-display-component.astro";
 import { loadVendorIcon } from "../../icons/icon-resolver.ts";
+import { buildPriceVariants, type DerivedPriceEntry } from "./price-variants.ts";
 import type { PriceCardSectionContent } from "./price-card-section.types.generated.ts";
 import "./price-card-section.css";
 
@@ -83,87 +84,51 @@ function formatPrice(
   return suffix ? `${formatted}\u00A0${suffix}` : formatted;
 }
 
-interface DerivedPriceEntry {
-  chargeRef: string;
-  targetCurrency: string;
-  amount: { value: string; currency: string };
-  trace: {
-    source: { amount: string; currency: string };
-    rate: { value: string; pair: string };
-  };
-}
-
-const NOTE_TEMPLATES: Record<string, string> = {
-  de: "Preis berechnet nach Kurs 1 EUR = {rate} {currency}.",
-  uk: "\u0426\u0456\u043d\u0430 \u0440\u043e\u0437\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0430 \u0437\u0430 \u043a\u0443\u0440\u0441\u043e\u043c 1 EUR = {rate} {currency}.",
-};
-
 function loadDerivedPrices(): Record<string, DerivedPriceEntry[]> | null {
+  const filePath = join(process.cwd(), "src", "derived-prices.generated.json");
+  let raw: string;
   try {
-    const filePath = join(process.cwd(), "src", "derived-prices.generated.json");
-    const raw = readFileSync(filePath, "utf-8");
-    return JSON.parse(raw) as Record<string, DerivedPriceEntry[]>;
-  } catch {
-    return null;
+    raw = readFileSync(filePath, "utf-8");
+  } catch (err: unknown) {
+    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
   }
+  return JSON.parse(raw) as Record<string, DerivedPriceEntry[]>;
 }
 
 const derivedPrices = loadDerivedPrices();
-const offeringRef = (pageOverride as Record<string, unknown>).offeringRef as string | undefined;
-
-function buildPriceVariants(
-  sourceProp: { amount?: string; currency?: string; recurrence?: string } | undefined,
-  chargeRef: string,
-  lang: string,
-): Array<{ currency: string; formatted: string; note: string | null }> | null {
-  if (!offeringRef || !derivedPrices || !sourceProp) return null;
-  const entries = derivedPrices[offeringRef];
-  if (!entries) return null;
-  const matching = entries.filter((e) => e.chargeRef === chargeRef);
-  if (matching.length === 0) return null;
-
-  const variants: Array<{ currency: string; formatted: string; note: string | null }> = [];
-
-  const sourceCurrency = sourceProp.currency ?? "EUR";
-  const sourceFormatted = formatPrice(sourceProp, lang);
-  if (sourceFormatted) {
-    variants.push({ currency: sourceCurrency, formatted: sourceFormatted, note: null });
-  }
-
-  const noteTemplate = NOTE_TEMPLATES[lang] ?? NOTE_TEMPLATES["de"];
-
-  for (const entry of matching) {
-    const numericAmount = Number(entry.amount.value);
-    if (!Number.isFinite(numericAmount)) continue;
-    const formatted = new Intl.NumberFormat(lang, {
-      style: "currency",
-      currency: entry.amount.currency,
-      currencyDisplay: "narrowSymbol",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(numericAmount);
-    const suffix = formatRecurrence(sourceProp.recurrence, lang);
-    const formattedWithSuffix = suffix ? `${formatted}\u00A0${suffix}` : formatted;
-    const note = noteTemplate
-      .replace("{rate}", entry.trace.rate.value)
-      .replace("{currency}", entry.amount.currency);
-    variants.push({
-      currency: entry.amount.currency,
-      formatted: formattedWithSuffix,
-      note,
-    });
-  }
-
-  return variants.length > 1 ? variants : null;
-}
+const offeringRef = props.offeringRef;
+const noteTemplate =
+  typeof siteLabels?.noteTemplate === "string" ? siteLabels.noteTemplate : undefined;
 
 const monthlyPrice = formatPrice(props.monthly, lang);
 const yearlyPrice = formatPrice(props.yearly, lang);
 const setupPrice = formatPrice(props.setup, lang);
 
-const monthlyVariants = buildPriceVariants(props.monthly, "monthlySubscription", lang);
-const yearlyVariants = buildPriceVariants(props.yearly, "yearlySubscription", lang);
-const setupVariants = buildPriceVariants(props.setup, "activation", lang);
+const monthlyVariants = buildPriceVariants(
+  props.monthly,
+  "monthlySubscription",
+  lang,
+  offeringRef,
+  derivedPrices,
+  noteTemplate,
+);
+const yearlyVariants = buildPriceVariants(
+  props.yearly,
+  "yearlySubscription",
+  lang,
+  offeringRef,
+  derivedPrices,
+  noteTemplate,
+);
+const setupVariants = buildPriceVariants(
+  props.setup,
+  "activation",
+  lang,
+  offeringRef,
+  derivedPrices,
+  noteTemplate,
+);
 ---
 
 <SectionShell

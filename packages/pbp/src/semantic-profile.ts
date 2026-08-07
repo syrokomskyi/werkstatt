@@ -37,27 +37,23 @@ export async function loadTargetCurrencies(
   locale: string,
 ): Promise<Array<{ code: string; label: string }>> {
   const resolvedDirectory = resolveSourceDirectory(sourceDirectory);
-  try {
-    const result = await compilePbpProfile({
-      sourceDirectory: resolvedDirectory,
-      locale,
-      defaultLocale: "de",
-      strictness: "production",
-    });
-    for (const entity of result.entityIndex.values()) {
-      if (entity.type === "currency-pricing-policy") {
-        const policy = entity as unknown as {
-          baseCurrency: string;
-          targetCurrencies: Record<string, { currency: string }>;
-        };
-        return Object.values(policy.targetCurrencies).map((t) => ({
-          code: t.currency,
-          label: t.currency,
-        }));
-      }
+  const result = await compilePbpProfile({
+    sourceDirectory: resolvedDirectory,
+    locale,
+    defaultLocale: "de",
+    strictness: "production",
+  });
+  for (const entity of result.entityIndex.values()) {
+    if (entity.type === "currency-pricing-policy") {
+      const policy = entity as unknown as {
+        baseCurrency: string;
+        targetCurrencies: Record<string, { currency: string }>;
+      };
+      return Object.values(policy.targetCurrencies).map((t) => ({
+        code: t.currency,
+        label: t.currency,
+      }));
     }
-  } catch {
-    // No CurrencyPricingPolicy found — return empty array
   }
   return [];
 }
