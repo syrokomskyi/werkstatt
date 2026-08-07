@@ -32,6 +32,7 @@
   "devDependencies": {
     "@playwright/test": "1.62.1",
     "@types/node": "^26.1.2",
+    "@warpgogol/changelog-live": "^0.1.2",
     "@warpgogol/forge": "workspace:*",
     "@warpgogol/observability": "workspace:*",
     "@warpgogol/repo-extract": "^1.2.2",
