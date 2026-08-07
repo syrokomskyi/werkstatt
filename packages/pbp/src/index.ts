@@ -550,3 +550,20 @@ export {
   isPbpCurrencyStrategy,
   CURRENCY_PRICING_POLICY_SCHEMA_ID,
 } from "./entities/currency-pricing-policy.js";
+
+// RFC-0737: RatePolicy and RateSchedule Entities
+export {
+  type PbpRateMode,
+  type PbpRateDirection,
+  type PbpCurrencyPair,
+  type PbpQuotation,
+  type PbpRatePolicy,
+  type PbpRateScheduleEntry,
+  type PbpRateSchedule,
+  PBP_RATE_MODES,
+  isPbpRateMode,
+  PBP_RATE_DIRECTIONS,
+  isPbpRateDirection,
+  RATE_POLICY_SCHEMA_ID,
+  RATE_SCHEDULE_SCHEMA_ID,
+} from "./entities/rate-policy.js";

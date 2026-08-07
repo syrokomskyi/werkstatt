@@ -70,6 +70,15 @@ export {
   pbpCurrencyStrategySchema,
   pbpCurrencyTargetSchema,
 } from "./currency-pricing-policy.js";
+export {
+  pbpRatePolicySchema,
+  pbpRateScheduleSchema,
+  pbpRateScheduleEntrySchema,
+  pbpRateModeSchema,
+  pbpRateDirectionSchema,
+  pbpCurrencyPairSchema,
+  pbpQuotationSchema,
+} from "./rate-policy.js";
 
 // ---------------------------------------------------------------------------
 // pbpSchemaById registry — maps schema ID strings to their Zod schemas
@@ -99,6 +108,10 @@ import { disclosureSchema as _disclosure } from "./disclosure.js";
 import { consentSchema as _consent } from "./consent.js";
 import { publicDocumentSchema as _publicDocument } from "./public-document.js";
 import { pbpCurrencyPricingPolicySchema as _currencyPricingPolicy } from "./currency-pricing-policy.js";
+import {
+  pbpRatePolicySchema as _ratePolicy,
+  pbpRateScheduleSchema as _rateSchedule,
+} from "./rate-policy.js";
 
 import { pbpSchemaId } from "../schema-id.js";
 
@@ -128,6 +141,8 @@ export const pbpSchemaById: Record<string, z.ZodType> = {
   [pbpSchemaId("consent")]: _consent,
   [pbpSchemaId("public-document")]: _publicDocument,
   [pbpSchemaId("currency-pricing-policy")]: _currencyPricingPolicy,
+  [pbpSchemaId("rate-policy")]: _ratePolicy,
+  [pbpSchemaId("rate-schedule")]: _rateSchedule,
 };
 
 // ---------------------------------------------------------------------------
@@ -160,4 +175,6 @@ export const pbpEntityDiscriminatedUnion = z.discriminatedUnion("schema", [
   _consent,
   _publicDocument,
   _currencyPricingPolicy,
+  _ratePolicy,
+  _rateSchedule,
 ]);

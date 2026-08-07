@@ -10,6 +10,12 @@ import {
   CURRENCY_PRICING_POLICY_SCHEMA_ID,
   PBP_CURRENCY_STRATEGIES,
   isPbpCurrencyStrategy,
+  RATE_POLICY_SCHEMA_ID,
+  RATE_SCHEDULE_SCHEMA_ID,
+  PBP_RATE_MODES,
+  isPbpRateMode,
+  PBP_RATE_DIRECTIONS,
+  isPbpRateDirection,
 } from "../src/index.js";
 
 describe("RFC-0403: Business", () => {
@@ -65,5 +71,39 @@ describe("RFC-0736: CurrencyPricingPolicy", () => {
     expect(isPbpCurrencyStrategy("derived")).toBe(true);
     expect(isPbpCurrencyStrategy("fixed")).toBe(true);
     expect(isPbpCurrencyStrategy("unknown")).toBe(false);
+  });
+});
+
+describe("RFC-0737: RatePolicy and RateSchedule", () => {
+  it("exports RATE_POLICY_SCHEMA_ID", () => {
+    expect(RATE_POLICY_SCHEMA_ID).toBe("pbp/rate-policy@1");
+  });
+
+  it("exports RATE_SCHEDULE_SCHEMA_ID", () => {
+    expect(RATE_SCHEDULE_SCHEMA_ID).toBe("pbp/rate-schedule@1");
+  });
+
+  it("has 2 rate modes", () => {
+    expect(PBP_RATE_MODES).toHaveLength(2);
+    expect(PBP_RATE_MODES).toContain("external");
+    expect(PBP_RATE_MODES).toContain("business-fixed");
+  });
+
+  it("isPbpRateMode validates known modes", () => {
+    expect(isPbpRateMode("external")).toBe(true);
+    expect(isPbpRateMode("business-fixed")).toBe(true);
+    expect(isPbpRateMode("unknown")).toBe(false);
+  });
+
+  it("has 2 rate directions", () => {
+    expect(PBP_RATE_DIRECTIONS).toHaveLength(2);
+    expect(PBP_RATE_DIRECTIONS).toContain("target-per-source");
+    expect(PBP_RATE_DIRECTIONS).toContain("source-per-target");
+  });
+
+  it("isPbpRateDirection validates known directions", () => {
+    expect(isPbpRateDirection("target-per-source")).toBe(true);
+    expect(isPbpRateDirection("source-per-target")).toBe(true);
+    expect(isPbpRateDirection("unknown")).toBe(false);
   });
 });

@@ -31,6 +31,7 @@ import { evidenceSourceSchema } from "../evidence-source.js";
 import { disclosureSchema } from "../disclosure.js";
 import { publicDocumentSchema } from "../public-document.js";
 import { pbpCurrencyPricingPolicySchema } from "../currency-pricing-policy.js";
+import { pbpRatePolicySchema, pbpRateScheduleSchema } from "../rate-policy.js";
 import { pbpSchemaById } from "../index.js";
 import { pbpSchemaId } from "../../schema-id.js";
 
@@ -799,6 +800,80 @@ describe("pbpCurrencyPricingPolicySchema", () => {
   });
 });
 
+describe("pbpRatePolicySchema", () => {
+  const baseRatePolicy = {
+    schema: "pbp/rate-policy@1",
+    id: "warpgogol-rate-policy-eur-uah",
+    status: "published" as const,
+    type: "rate-policy" as const,
+    pair: { sourceCurrency: "EUR", targetCurrency: "UAH" },
+    quotation: { direction: "target-per-source" as const },
+    mode: "external" as const,
+    sources: {
+      primary: { ref: "pbp/rate-source@1:ecb" },
+      fallback: { ref: "pbp/rate-source@1:nbu" },
+    },
+    freshness: { maximumAge: "P1M", allowLastKnownValue: true },
+    failure: { noAcceptableRate: "source-price-only" as const },
+  };
+
+  it("accepts a valid rate-policy with external mode", () => {
+    expect(pbpRatePolicySchema.parse(baseRatePolicy)).toMatchObject({ mode: "external" });
+  });
+
+  it("accepts a valid rate-policy with business-fixed mode (no sources)", () => {
+    const valid = {
+      ...baseRatePolicy,
+      mode: "business-fixed",
+      sources: undefined,
+    };
+    expect(pbpRatePolicySchema.parse(valid)).toMatchObject({ mode: "business-fixed" });
+  });
+
+  it("rejects unknown field (.strict)", () => {
+    expect(() => pbpRatePolicySchema.parse({ ...baseRatePolicy, extraField: "no" })).toThrow();
+  });
+});
+
+describe("pbpRateScheduleSchema", () => {
+  const baseRateSchedule = {
+    schema: "pbp/rate-schedule@1",
+    id: "warpgogol-rate-schedule-eur-usd",
+    status: "published" as const,
+    type: "rate-schedule" as const,
+    pair: { sourceCurrency: "EUR", targetCurrency: "USD" },
+    quotation: { direction: "target-per-source" as const },
+  };
+
+  it("accepts a valid rate-schedule with entries", () => {
+    const valid = {
+      ...baseRateSchedule,
+      entries: {
+        "rate-2026-08-07": { value: "1.08", validFrom: "2026-08-07T00:00:00+02:00" },
+      },
+    };
+    expect(pbpRateScheduleSchema.parse(valid)).toMatchObject({
+      pair: { sourceCurrency: "EUR", targetCurrency: "USD" },
+    });
+  });
+
+  it("rejects empty entries", () => {
+    expect(() => pbpRateScheduleSchema.parse({ ...baseRateSchedule, entries: {} })).toThrow();
+  });
+
+  it("rejects unknown field (.strict)", () => {
+    expect(() =>
+      pbpRateScheduleSchema.parse({
+        ...baseRateSchedule,
+        entries: {
+          "rate-1": { value: "1.08", validFrom: "2026-08-07T00:00:00+02:00" },
+        },
+        extraField: "no",
+      }),
+    ).toThrow();
+  });
+});
+
 describe("pbpSchemaById registry", () => {
   it("contains all expected schema IDs", () => {
     const expectedIds = [
@@ -827,6 +902,8 @@ describe("pbpSchemaById registry", () => {
       "consent",
       "public-document",
       "currency-pricing-policy",
+      "rate-policy",
+      "rate-schedule",
     ];
     for (const entity of expectedIds) {
       const id = pbpSchemaId(entity);
@@ -834,7 +911,7 @@ describe("pbpSchemaById registry", () => {
     }
   });
 
-  it("has 25 registered schemas", () => {
-    expect(Object.keys(pbpSchemaById)).toHaveLength(25);
+  it("has 27 registered schemas", () => {
+    expect(Object.keys(pbpSchemaById)).toHaveLength(27);
   });
 });
