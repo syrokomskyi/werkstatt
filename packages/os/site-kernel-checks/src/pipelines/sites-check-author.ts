@@ -287,6 +287,8 @@ export const SITES_CHECK_AUTHOR_PIPELINE: KernelPipelineStep[] = [
   { command: "feature.projections.validate" },
   // DNA-20: business layer completeness
   { command: "pbp.profile.validate" },
+  // ADR-0030: RFC-0468 migration register and coverage report validation
+  { command: "pbp.migration.validate" },
   // RFC-0156: validate authored effects[] assignments (target×kind, duplicate-stack)
   { command: "effects.contract.validate" },
   { command: "content.voice.lint" },

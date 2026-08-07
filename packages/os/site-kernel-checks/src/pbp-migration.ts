@@ -12,7 +12,7 @@ and migration-coverage-report.yaml structure and coverage validation.</purpose>
 </CHANGE_SUMMARY>
 */
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFile, access } from "node:fs/promises";
 import { join } from "node:path";
 import { parseMarkdownFrontmatter } from "@warpgogol/site-kernel-content";
 import type {
@@ -23,10 +23,19 @@ import type {
 import { passResult, failResult } from "./result-helpers.ts";
 import { getContentDisciplinePaths } from "./content-discipline.ts";
 
-function readYaml(filePath: string): Record<string, unknown> {
-  const raw = readFileSync(filePath, "utf-8");
+async function readYaml(filePath: string): Promise<Record<string, unknown>> {
+  const raw = await readFile(filePath, "utf-8");
   const wrapped = `---\n${raw}\n---\n`;
   return parseMarkdownFrontmatter(wrapped).data;
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function runPbpMigrationValidate(
@@ -40,19 +49,23 @@ export async function runPbpMigrationValidate(
   const registerPath = join(bizDir, "owner-decision-register.yaml");
   const reportPath = join(bizDir, "migration-coverage-report.yaml");
 
-  if (!existsSync(registerPath)) {
-    violations.push("owner-decision-register.yaml — file not found in src/content/business-profile/");
+  if (!(await fileExists(registerPath))) {
+    violations.push(
+      "owner-decision-register.yaml — file not found in src/content/business-profile/",
+    );
   }
-  if (!existsSync(reportPath)) {
-    violations.push("migration-coverage-report.yaml — file not found in src/content/business-profile/");
+  if (!(await fileExists(reportPath))) {
+    violations.push(
+      "migration-coverage-report.yaml — file not found in src/content/business-profile/",
+    );
   }
 
   if (violations.length > 0) {
     return failResult("pbp.migration.validate", violations);
   }
 
-  validateRegister(registerPath, violations);
-  validateReport(reportPath, violations);
+  await validateRegister(registerPath, violations);
+  await validateReport(reportPath, violations);
 
   if (violations.length > 0) {
     return failResult("pbp.migration.validate", violations);
@@ -61,17 +74,21 @@ export async function runPbpMigrationValidate(
   return passResult("pbp.migration.validate", "Migration register and coverage report validated");
 }
 
-function validateRegister(filePath: string, violations: string[]): void {
+async function validateRegister(filePath: string, violations: string[]): Promise<void> {
   let data: Record<string, unknown>;
   try {
-    data = readYaml(filePath);
+    data = await readYaml(filePath);
   } catch (error) {
-    violations.push(`owner-decision-register.yaml — parse error: ${error instanceof Error ? error.message : String(error)}`);
+    violations.push(
+      `owner-decision-register.yaml — parse error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return;
   }
 
   if (data.schemaVersion !== "1.0.0") {
-    violations.push(`owner-decision-register.yaml — schemaVersion must be "1.0.0", got "${data.schemaVersion}"`);
+    violations.push(
+      `owner-decision-register.yaml — schemaVersion must be "1.0.0", got "${data.schemaVersion}"`,
+    );
   }
 
   const items = data.items as Array<Record<string, unknown>> | undefined;
@@ -100,25 +117,33 @@ function validateRegister(filePath: string, violations: string[]): void {
   }
 }
 
-function validateReport(filePath: string, violations: string[]): void {
+async function validateReport(filePath: string, violations: string[]): Promise<void> {
   let data: Record<string, unknown>;
   try {
-    data = readYaml(filePath);
+    data = await readYaml(filePath);
   } catch (error) {
-    violations.push(`migration-coverage-report.yaml — parse error: ${error instanceof Error ? error.message : String(error)}`);
+    violations.push(
+      `migration-coverage-report.yaml — parse error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return;
   }
 
   if (data.schemaVersion !== "1.0.0") {
-    violations.push(`migration-coverage-report.yaml — schemaVersion must be "1.0.0", got "${data.schemaVersion}"`);
+    violations.push(
+      `migration-coverage-report.yaml — schemaVersion must be "1.0.0", got "${data.schemaVersion}"`,
+    );
   }
 
   if (data.coveragePercentage !== 100) {
-    violations.push(`migration-coverage-report.yaml — coveragePercentage must be 100, got ${data.coveragePercentage}`);
+    violations.push(
+      `migration-coverage-report.yaml — coveragePercentage must be 100, got ${data.coveragePercentage}`,
+    );
   }
 
   if (data.mappedEntities !== data.totalLegacyEntities) {
-    violations.push("migration-coverage-report.yaml — mappedEntities must equal totalLegacyEntities");
+    violations.push(
+      "migration-coverage-report.yaml — mappedEntities must equal totalLegacyEntities",
+    );
   }
 
   const unmapped = data.unmappedEntities as unknown[] | undefined;
@@ -132,7 +157,9 @@ function validateReport(filePath: string, violations: string[]): void {
 
   const mappings = data.legacySourceMappings as Array<Record<string, unknown>> | undefined;
   if (!Array.isArray(mappings) || mappings.length === 0) {
-    violations.push("migration-coverage-report.yaml — legacySourceMappings must be a non-empty array");
+    violations.push(
+      "migration-coverage-report.yaml — legacySourceMappings must be a non-empty array",
+    );
     return;
   }
 
@@ -146,6 +173,8 @@ function validateReport(filePath: string, violations: string[]): void {
 
   const validation = data.validation as Record<string, unknown[]> | undefined;
   if (validation && Array.isArray(validation.errors) && validation.errors.length > 0) {
-    violations.push(`migration-coverage-report.yaml — validation.errors must be empty, got ${validation.errors.length} error(s)`);
+    violations.push(
+      `migration-coverage-report.yaml — validation.errors must be empty, got ${validation.errors.length} error(s)`,
+    );
   }
 }
