@@ -9,6 +9,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes: []
@@ -125,9 +126,11 @@ registerPipeFormatter("money", (value, params, context) => {
 ```
 
 - `currency`: ISO 4217 code (default `EUR`)
-- `locale`: BCP 47 tag (default: content reference `lang`)
+- `locale`: BCP 47 tag (default: `context.lang`)
 - `targetCurrency`: optional ISO 4217 code for conversion
 - `rate`: optional exchange rate (multiply)
+
+`minimumFractionDigits: 0` is intentional — the current warpgogol-com price catalog uses round numbers (70, 200, 1040), and displaying `70,00 €` for a round price adds visual noise without informational value. Future offerings with fractional prices can override via a `minimumFractionDigits` param if needed.
 
 ## Architectural fit
 
@@ -163,7 +166,7 @@ export function registerPipeFormatter(name: string, formatter: PipeFormatter): v
 export function getPipeFormatter(name: string): PipeFormatter | undefined;
 ```
 
-`resolveFormula` is extended: after arithmetic evaluation, if the expression contains `|`, the left side is evaluated as arithmetic, the right side is parsed as `formatterName key=value key=value`, and the formatter is invoked.
+`resolveFormula` is extended: after arithmetic evaluation, if the expression contains `|`, the left side is evaluated as arithmetic, the right side is parsed as `formatterName key=value key=value`, and the formatter is invoked. The `PipeFormatterContext` is constructed from `resolveFormula`'s existing `lang` and `defaultLang` arguments — `context.lang = lang`, `context.defaultLang = defaultLang`.
 
 ### Pipe parsing
 
@@ -181,6 +184,7 @@ Formatter spec parsing:
 | --- | --- |
 | `packages/share/src/formula-eval.ts` | `resolveFormula` extended with pipe post-eval; `registerPipeFormatter`, `getPipeFormatter`, `PipeFormatter`, `PipeFormatterContext` exports; `money` formatter registered by default |
 | `packages/share/src/formula-eval.test.ts` | Unit tests for pipe parsing, formatter registry, money formatter |
+| `packages/share/AGENTS.md` | `formula-eval` entry-point table row updated to list new exports (`registerPipeFormatter`, `getPipeFormatter`, `PipeFormatter`, `PipeFormatterContext`) |
 
 ### Output format
 
@@ -188,7 +192,7 @@ N/A — library-level change. Formula expressions in content resolve to formatte
 
 ### Failure modes
 
-- **Unknown formatter name.** `resolveFormula` returns an unresolved result with error `REF-10: Unknown pipe formatter: <name>`. The formula expression is left as-is in the output string.
+- **Unknown formatter name.** `resolveFormula` returns an unresolved result with error `REF-10: Unknown pipe formatter: <name>`. The formula expression is left as-is in the output string. This includes the empty-formatter-name case `=(ref |)` where the formatter spec is empty after the pipe.
 - **Missing required params.** The `money` formatter has no required params (defaults: `EUR`, `context.lang`). Other future formatters may define required params — they return an error string in the formatted output.
 - **Invalid `rate` param.** If `rate` is not a finite number, the formatter ignores `targetCurrency` and `rate`, formatting in the original currency.
 - **No pipe, no change.** Expressions without `|` behave exactly as before — `String(number)` for arithmetic, string value for single-ref (RFC-0723).
@@ -227,7 +231,7 @@ N/A — library-level change. Formula expressions in content resolve to formatte
 - [ ] `resolveFormula` handles pipe syntax: splits on `|`, evaluates left as arithmetic, invokes formatter on right
 - [ ] Expressions without `|` behave unchanged (RFC-0570, RFC-0723 compatibility)
 - [ ] `=(ref | money currency=EUR locale=de)` produces `70 €` from canonical `"70.00"`
-- [ ] `=(ref | money currency=EUR locale=de targetCurrency=UAH rate=45)` produces `3 150 ₴` from canonical `"70.00"`
+- [ ] `=(ref | money currency=EUR locale=de targetCurrency=UAH rate=45)` produces `3.150 ₴` from canonical `"70.00"` (German locale uses `.` as thousands separator)
 - [ ] Unknown formatter name produces `REF-10` error, formula left unresolved
 - [ ] `pnpm --filter @warpgogol/share build:check` passes
 - [ ] `pnpm --filter @warpgogol/share test` passes
