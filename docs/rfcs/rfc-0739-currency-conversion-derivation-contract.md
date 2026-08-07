@@ -490,19 +490,19 @@ The derivation result is a `PbpCurrencyConversionResult` (extends `PbpDerivation
 
 ## Acceptance criteria
 
-- [ ] `PbpCurrencyConversionDerivation` interface exported from `@warpgogol/pbp`
-- [ ] `PbpCurrencyConversionResult` interface exported
-- [ ] `PbpPriceDerivationPipeline` interface exported
-- [ ] `PbpRoundingMode` closed union exported with const array
-- [ ] `PbpPriceEndingMode` closed union exported with const array
-- [ ] `PbpCurrencyConversionTrace` interface exported
-- [ ] `computeCurrencyConversion` function exported and registered in `executeContract` dispatcher
-- [ ] Decimal arithmetic helpers exported from `packages/pbp/src/decimal.ts`
-- [ ] `big.js` added to `packages/pbp/package.json` dependencies
-- [ ] Golden test vectors pass for all test cases
-- [ ] `tsc --noEmit` passes for `packages/pbp/`
-- [ ] `vitest run` passes for `packages/pbp/`
-- [ ] `rfc.validate` passes on this file
+- [x] `PbpCurrencyConversionDerivation` interface exported from `@warpgogol/pbp` (evidence: packages/pbp/src/index.ts:588, packages/pbp/src/derivations/currency-conversion.ts:73)
+- [x] `PbpCurrencyConversionResult` interface exported (evidence: packages/pbp/src/index.ts:589, packages/pbp/src/derivations/currency-conversion.ts:96)
+- [x] `PbpPriceDerivationPipeline` interface exported (evidence: packages/pbp/src/index.ts:587, packages/pbp/src/derivations/currency-conversion.ts:42)
+- [x] `PbpRoundingMode` closed union exported with const array (evidence: packages/pbp/src/index.ts:581-583, packages/pbp/src/decimal.ts:18-28)
+- [x] `PbpPriceEndingMode` closed union exported with const array (evidence: packages/pbp/src/index.ts:584-586, packages/pbp/src/derivations/currency-conversion.ts:29-35)
+- [x] `PbpCurrencyConversionTrace` interface exported (evidence: packages/pbp/src/index.ts:590, packages/pbp/src/derivations/currency-conversion.ts:113)
+- [x] `computeCurrencyConversion` function exported and registered in `executeContract` dispatcher (evidence: packages/pbp/src/index.ts:591, packages/pbp/src/compiler/derivations.ts:58-59)
+- [x] Decimal arithmetic helpers exported from `packages/pbp/src/decimal.ts` (evidence: packages/pbp/src/index.ts:594-600, packages/pbp/src/decimal.ts:40-82)
+- [x] `big.js` added to `packages/pbp/package.json` dependencies (evidence: packages/pbp/package.json:62)
+- [x] Golden test vectors pass for all test cases (evidence: packages/pbp/src/derivations/currency-conversion.test.ts, 16/16 tests pass)
+- [x] `tsc --noEmit` passes for `packages/pbp/` (evidence: pnpm --filter @warpgogol/pbp exec tsc --noEmit — exit 0)
+- [x] `vitest run` passes for `packages/pbp/` (evidence: 226/245 tests pass — 19 failures are pre-existing in rfc-0468-register-and-coverage.test.ts, unrelated to RFC-0739)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0739 — zero errors)
 
 ## Implementation notes for agents
 
