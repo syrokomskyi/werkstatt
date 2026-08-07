@@ -125,6 +125,7 @@ This package contains the Public Business Profile (PBP) entity envelope, namespa
 - `decimalMultiply`, `decimalAdd`, `decimalSubtract`, `decimalDivide`, `decimalRound` — decimal arithmetic helpers using big.js (RFC-0739)
 - `PbpMaterializedDerivedPrice`, `PbpPriceKind`, `PbpCommercialMeaning`, `PBP_PRICE_KINDS`, `PBP_COMMERCIAL_MEANINGS`, `isPbpPriceKind`, `isPbpCommercialMeaning` — materialized derived price type and closed unions (RFC-0740)
 - `materializeDerivedPrices` — pure function that iterates Offerings, Charges, and target currencies to produce materialized derived prices (RFC-0740, exported from `@warpgogol/pbp/compiler`)
+- `PbpPriceProjection`, `PbpPriceDisplayConfig`, `buildPriceProjection`, `DEFAULT_DISPLAY_CONFIG` — currency-aware price projection for website and AI consumers (RFC-0742)
 
 ## Runtime layer (RFC-0466)
 
