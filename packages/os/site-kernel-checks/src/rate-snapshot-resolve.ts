@@ -10,6 +10,7 @@
 <CHANGE_SUMMARY>
   <item>Established by RFC-0741 — command handler for rate-snapshot.resolve.</item>
   <item>RFC-0741 review fixes: use writeFileIfChanged, top-level crypto import, site URL from config, type guards, shared helpers, remove unused snapshotsReused field, external mode as warning.</item>
+  <item>RFC-0744: external mode now queries Supabase rate_observations table for latest observation and creates RateSnapshot from it.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -181,9 +182,101 @@ export async function runRateSnapshotResolve(
         );
         continue;
       }
-      warnings.push(
-        `External mode for pair ${sourceCurrency}/${targetCurrency} requires Rate Fetcher Service (RFC-0744) — not yet deployed`,
-      );
+
+      const supabaseUrl = process.env.RATE_FETCHER_SUPABASE_URL;
+      const supabaseKey = process.env.RATE_FETCHER_SUPABASE_KEY;
+      if (!supabaseUrl || !supabaseKey) {
+        warnings.push(
+          `External mode for pair ${sourceCurrency}/${targetCurrency} requires RATE_FETCHER_SUPABASE_URL and RATE_FETCHER_SUPABASE_KEY env vars (RFC-0744)`,
+        );
+        if (policy.failure.noAcceptableRate === "block-publication") {
+          errors.push(
+            `No Rate Fetcher Service configured for pair ${sourceCurrency}/${targetCurrency} (external mode)`,
+          );
+        }
+        continue;
+      }
+
+      try {
+        const obsUrl = `${supabaseUrl}/rest/v1/rate_observations?source_currency=eq.${sourceCurrency}&target_currency=eq.${targetCurrency}&order=observed_at.desc&limit=1&select=value,observed_at,metadata`;
+        const obsResponse = await fetch(obsUrl, {
+          headers: {
+            apikey: supabaseKey,
+            authorization: `Bearer ${supabaseKey}`,
+          },
+        });
+        if (!obsResponse.ok) {
+          throw new Error(`Supabase query failed: ${obsResponse.status}`);
+        }
+        const observations = (await obsResponse.json()) as Array<{
+          value: string;
+          observed_at: string;
+          metadata?: Record<string, unknown>;
+        }>;
+
+        if (observations.length === 0) {
+          if (policy.failure.noAcceptableRate === "block-publication") {
+            errors.push(
+              `No rate observation found for pair ${sourceCurrency}/${targetCurrency} in Supabase`,
+            );
+          } else {
+            warnings.push(
+              `No rate observation found for pair ${sourceCurrency}/${targetCurrency} in Supabase`,
+            );
+          }
+          continue;
+        }
+
+        const obs = observations[0];
+        const observedAt = obs.observed_at;
+        const digest = computeDigest(obs.value, observedAt);
+        const snapshotIdStr = snapshotId(siteUrl, sourceCurrency, targetCurrency, observedAt);
+        const freshUntil = computeFreshUntil(observedAt, policy.freshness.maximumAge);
+
+        const frontmatter = {
+          schema: "pbp/rate-snapshot@1",
+          id: snapshotIdStr,
+          type: "rate-snapshot",
+          status: "published",
+          pair: {
+            sourceCurrency,
+            targetCurrency,
+          },
+          quotation: {
+            direction: policy.quotation.direction,
+          },
+          value: obs.value,
+          source: {
+            kind: "external" as const,
+            sourceContractRef: policy.sources?.primary,
+          },
+          observedAt,
+          freshUntil,
+          digest: {
+            algorithm: "sha256",
+            value: digest,
+          },
+        };
+
+        const fileName = `${sourceCurrency}-${targetCurrency}-${observedAt.replace(/[:.]/g, "-").slice(0, 19)}.md`;
+        const outputDir = join(appDir, RATE_SNAPSHOTS_DIR, locale);
+        const outputPath = join(outputDir, fileName);
+        const content = `---\n${JSON.stringify(frontmatter, null, 2)}\n---\n`;
+
+        if (!context.dryRun) {
+          await mkdir(outputDir, { recursive: true });
+          await writeFileIfChanged(outputPath, content);
+        }
+
+        snapshotsCreated.push(snapshotIdStr);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (policy.failure.noAcceptableRate === "block-publication") {
+          errors.push(`Rate fetch failed for pair ${sourceCurrency}/${targetCurrency}: ${msg}`);
+        } else {
+          warnings.push(`Rate fetch failed for pair ${sourceCurrency}/${targetCurrency}: ${msg}`);
+        }
+      }
       continue;
     }
 
