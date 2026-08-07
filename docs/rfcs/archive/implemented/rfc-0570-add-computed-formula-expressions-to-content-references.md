@@ -16,7 +16,8 @@ closedAt: null
 supersedes: []
 supersededBy: null
 amends: []
-amendedBy: []
+amendedBy:
+- RFC-0729
 related:
 - RFC-0045
 - RFC-0527
