@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes: []
@@ -37,7 +38,7 @@ satisfies:
 # produces when implemented. Required for post-cutoff implemented RFCs (V-29).
 # Values: minor (Breaks-B, requires migrator), patch (safe), none (prose-only),
 # major (architectural, manually reserved). Default: patch.
-versionBump: minor
+versionBump: patch
 commands:
   proposed:
     - forge pinned.validate
@@ -227,7 +228,7 @@ forge pinned.validate --json
 forge pinned.validate --mode ci --json
 ```
 
-`forge pinned.init` creates `.forge/pinned.yaml` with default entries (templates, configs, structural directories). If the file already exists, it merges new defaults with existing entries (does not overwrite custom entries). It also installs the pre-commit hook into `.git/hooks/pre-commit` (or merges with an existing hook by appending the forge check). The optional `--ci` flag also generates `.github/workflows/pinned-check.yml`.
+`forge pinned.init` creates `.forge/pinned.yaml` with default entries (templates, configs, structural directories). If the file already exists, it merges new defaults with existing entries — operator-removed default entries are re-added (forge expects them), but custom entries are never overwritten or removed. It also installs the pre-commit hook into `.git/hooks/pre-commit` (or merges with an existing hook by appending the forge check with a marker comment for idempotent re-installation). It adds `.forge/pinned-audit.log` to `.gitignore` (or appends to an existing `.gitignore`). The optional `--ci` flag also generates `.github/workflows/pinned-check.yml`.
 
 `forge pinned.validate` checks the current working tree against the manifest:
 
@@ -291,9 +292,9 @@ When `--allow-pinned-override <path>` is used:
    {"timestamp":"2026-08-07T12:43:00Z","path":"docs/rfcs/rfc-0000-template.md","mode":"freeze","operator":"agent","reason":"operator-directed template update"}
    ```
 2. The validation passes for that path on that invocation only.
-3. The audit log entry does NOT include the operator identity (agents don't have stable identities) — it records the session/commit context instead.
+3. The audit log entry does NOT include the operator identity (agents don't have stable identities) — it records the session/commit context instead. Concurrent appends to the audit log use `fs.appendFile` with atomic writes (single `write` syscall on POSIX, `WriteFile` with `FILE_APPEND_DATA` on Windows). On concurrent override invocations from multiple agents, entries may interleave but individual `appendFile` calls are atomic per-line — no partial JSONL lines.
 
-The audit log file (`.forge/pinned-audit.log`) is NOT pinned — it is append-only and grows indefinitely. It should be added to `.gitignore` or rotated periodically.
+The audit log file (`.forge/pinned-audit.log`) is NOT pinned — it is append-only and grows indefinitely. `forge pinned.init` automatically adds `.forge/pinned-audit.log` to `.gitignore` (or appends to an existing `.gitignore`). This prevents the audit log from being committed to the repository.
 
 ### TypeScript contracts
 
@@ -369,6 +370,7 @@ interface PinnedValidateResult {
 - **Manifest missing:** exit 0 with info message "No .forge/pinned.yaml found — pinned-files protection inactive." Does NOT fail — protection is opt-in per repository.
 - **Manifest malformed:** exit 2 with error "pinned.yaml is not valid YAML or missing required fields."
 - **Manifest tampered (entries removed):** exit 1 with `PINNED_MANIFEST_TAMPERED` error — integrity check compares current manifest against last-committed version.
+- **Manifest deleted and committed with `--no-verify`:** CI check catches the violation on push. Recovery: `git checkout HEAD~1 -- .forge/pinned.yaml` to restore the manifest from the previous commit, then re-run `forge pinned.validate` to confirm integrity.
 
 ## Rollout
 
@@ -382,6 +384,11 @@ interface PinnedValidateResult {
 **Backward compatibility:** Repositories without `.forge/pinned.yaml` are unaffected — forge commands behave exactly as before. Protection is opt-in per repository via `forge pinned.init`.
 
 **No flag day:** Existing repos adopt by running `forge pinned.init` at any time. No migration, no breaking changes.
+
+**AGENTS.md updates:** This RFC requires updates to the following AGENTS.md files:
+
+- `packages/forge/AGENTS.md` — new section documenting `pinned.validate`, `pinned.init`, the `.forge/` directory convention, override policy, and archive command pre-check behavior.
+- Root `AGENTS.md` — mention `.forge/` directory convention in repository structure section (alongside `forge.yaml`).
 
 **Werkstatt self-adoption:** After implementation, the werkstatt monorepo itself can adopt the system by running `forge pinned.init` and committing `.forge/pinned.yaml`.
 
@@ -415,7 +422,7 @@ interface PinnedValidateResult {
 
 ## Acceptance criteria
 
-- [ ] `forge pinned.init` creates `.forge/pinned.yaml` with default entries (templates, configs, structural directories) and installs pre-commit hook
+- [ ] `forge pinned.init` creates `.forge/pinned.yaml` with default entries (templates, configs, structural directories), installs pre-commit hook, and adds `.forge/pinned-audit.log` to `.gitignore`
 - [ ] `forge pinned.validate` exits 0 when no violations, exits 1 with violation list when pinned files are deleted/moved/modified
 - [ ] `forge pinned.validate --allow-pinned-override <path>` passes for the specified path and logs to `.forge/pinned-audit.log`
 - [ ] `forge pinned.validate --json` produces stable JSON output with `command`, `status`, `violations`, `overrides` fields
