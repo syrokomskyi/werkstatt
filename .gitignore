@@ -278,6 +278,7 @@ releases/
 
 # RFC lock state (local operator state, not shared)
 .rfc-locks
+.adr-locks
 
 # RFC-0537: Session raw exports (ATIF format from Devin CLI --export)
 docs/sessions/.raw/

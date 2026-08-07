@@ -21,6 +21,8 @@ bindings:
     validateAdr: pnpm exec site-kernel run adr.validate --id {id} --json
     implementStamp: pnpm exec site-kernel run rfc.implement.stamp --id {id}
       --implementation-commit {commit}
+    adrImplementStamp: pnpm exec site-kernel run adr.implement.stamp --id {id}
+      --implementation-commit {commit}
     typecheck: pnpm --filter {workspace} run build:check
     test: pnpm --filter {workspace} run test
     scopedBuild: pnpm --filter {workspace} run build
