@@ -26,6 +26,10 @@
   display: inline;
 }
 
+.section-list__text .currency-aware-price-display__variant[hidden] {
+  display: none;
+}
+
 .section-list__text .currency-aware-price-display__amount {
   display: inline;
   font-family: inherit;
