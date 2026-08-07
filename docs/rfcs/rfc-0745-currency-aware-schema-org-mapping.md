@@ -203,17 +203,17 @@ N/A — constrains existing Schema.org output.
 
 ## Acceptance criteria
 
-- [ ] Schema.org `Offer.price` uses canonical source-currency decimal string (PBP compiler path)
-- [ ] Schema.org `Offer.priceCurrency` uses canonical source currency code (both paths)
-- [ ] `priceCurrency` added to share JSON-LD `buildOrganizationNode` `makesOffer` nodes
-- [ ] `price` added to PBP compiler `generateSchemaOrg` Offer nodes
-- [ ] No derived/indicative prices in Schema.org output (both paths)
-- [ ] Compiler validation blocks publication if derived price appears in Schema.org `price` field
-- [ ] Validation runs in Phase 12 (projection), not Phase 10 (semantic)
-- [ ] Offerings without `pricing` field do not trigger false positives
-- [ ] `tsc --noEmit` passes
-- [ ] `vitest run` passes
-- [ ] `rfc.validate` passes on this file
+- [x] Schema.org `Offer.price` uses canonical source-currency decimal string (PBP compiler path) (evidence: packages/pbp/src/compiler/projection.ts:83-88, compiler-pipeline.test.ts "Schema.org projection includes canonical price for offering with fixed charge")
+- [x] Schema.org `Offer.priceCurrency` uses canonical source currency code (both paths) (evidence: packages/pbp/src/compiler/projection.ts:87, packages/share/src/semantic/jsonld/organization.ts:91, organization-jsonld.test.ts "emits priceCurrency when SemanticPrice has currency")
+- [x] `priceCurrency` added to share JSON-LD `buildOrganizationNode` `makesOffer` nodes (evidence: packages/share/src/semantic/jsonld/organization.ts:91, organization-jsonld.test.ts)
+- [x] `price` added to PBP compiler `generateSchemaOrg` Offer nodes (evidence: packages/pbp/src/compiler/projection.ts:88, compiler-pipeline.test.ts)
+- [x] No derived/indicative prices in Schema.org output (both paths) (evidence: extractCanonicalPrice reads only from pricing.charges with model=fixed, never from derivedPrices; buildOrganizationNode reads from SemanticPrice.amount populated by projectOffer from canonical content data["price"])
+- [x] Compiler validation blocks publication if derived price appears in Schema.org `price` field (evidence: packages/pbp/src/compiler/projection.ts:124-139 validateSchemaOrgPrices emits PBP-SCHEMA-PRICE error, compiler-pipeline.test.ts "validateSchemaOrgPrices catches non-canonical price")
+- [x] Validation runs in Phase 12 (projection), not Phase 10 (semantic) (evidence: packages/pbp/src/compiler/pipeline.ts:80-82 calls validateSchemaOrgPrices after generateProjections in Phase 12, not in validateSemantic Phase 10)
+- [x] Offerings without `pricing` field do not trigger false positives (evidence: extractCanonicalPrice returns undefined when no pricing, validateSchemaOrgPrices skips offers without price field, compiler-pipeline.test.ts "Schema.org projection omits price for offering without pricing" and "validateSchemaOrgPrices skips offers without price field")
+- [x] `tsc --noEmit` passes (evidence: pnpm --filter @warpgogol/pbp run build:check and pnpm --filter @warpgogol/share run build:check both exit 0)
+- [x] `vitest run` passes (evidence: 16 compiler-pipeline tests pass, 3 organization-jsonld tests pass, 302 share tests pass)
+- [x] `rfc.validate` passes on this file (evidence: pnpm exec site-kernel run rfc.validate --id RFC-0745 --json returns ok: true)
 
 ## Implementation notes for agents
 
