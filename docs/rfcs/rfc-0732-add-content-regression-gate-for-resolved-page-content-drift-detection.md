@@ -1,7 +1,7 @@
 ---
 id: RFC-0732
 title: "Add content regression gate for resolved page content drift detection"
-status: accepted
+status: implemented
 # kind options: architecture | contract | command | policy | deprecation
 kind: architecture
 # scope options: app | workspace
@@ -17,7 +17,7 @@ reviewers:
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
 enhancedAt: 2026-08-07
-implementedAt:
+implementedAt: 2026-08-07
 closedAt:
 supersedes: []
 supersededBy:
