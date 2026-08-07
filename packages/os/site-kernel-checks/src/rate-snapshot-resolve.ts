@@ -1,0 +1,297 @@
+/*
+<MODULE_CONTRACT>
+<purpose>Implements RFC-0741 rate-snapshot.resolve command — reads RatePolicy entities, resolves applicable rates, and creates RateSnapshot content files.</purpose>
+<non-goals>
+  <item>Does not define RatePolicy or RateSnapshot types — those are RFC-0737/RFC-0738 in @warpgogol/pbp.</item>
+  <item>Does not implement the Rate Fetcher Service — that is RFC-0744. External mode delegates to it.</item>
+  <item>Does not materialize derived prices — that is derived-prices.materialize (RFC-0740).</item>
+</non-goals>
+</MODULE_CONTRACT>
+<CHANGE_SUMMARY>
+  <item>Established by RFC-0741 — command handler for rate-snapshot.resolve.</item>
+</CHANGE_SUMMARY>
+*/
+
+import { join } from "node:path";
+import { mkdir, writeFile } from "node:fs/promises";
+import type {
+  KernelCommandInput,
+  KernelCommandResult,
+  KernelRuntimeContext,
+} from "@warpgogol/site-kernel";
+import { requireAstroSitePaths } from "@warpgogol/site-kernel-astro";
+import { loadSystemManifest } from "@warpgogol/site-kernel-content";
+import { compilePbpProfile } from "@warpgogol/pbp/compiler";
+import type { PbpRatePolicy, PbpRateSchedule, PbpRateScheduleEntry } from "@warpgogol/pbp";
+import type { PbpEntity } from "@warpgogol/pbp";
+import { defaultLanguageFromManifest } from "./lib/i18n.ts";
+
+const RATE_SNAPSHOTS_DIR = "src/content/business-profile/rate-snapshots";
+
+function flagString(input: KernelCommandInput, key: string): string | undefined {
+  const v = input.flags[key];
+  return typeof v === "string" ? v : undefined;
+}
+
+function findRatePolicies(entityIndex: Map<string, PbpEntity>): PbpRatePolicy[] {
+  const policies: PbpRatePolicy[] = [];
+  for (const entity of entityIndex.values()) {
+    if (entity.type === "rate-policy") {
+      policies.push(entity as unknown as PbpRatePolicy);
+    }
+  }
+  return policies;
+}
+
+function findRateSchedules(entityIndex: Map<string, PbpEntity>): Map<string, PbpRateSchedule> {
+  const schedules = new Map<string, PbpRateSchedule>();
+  for (const entity of entityIndex.values()) {
+    if (entity.type === "rate-schedule") {
+      const schedule = entity as unknown as PbpRateSchedule;
+      schedules.set(schedule.id, schedule);
+    }
+  }
+  return schedules;
+}
+
+function resolveRef(ref: unknown): string {
+  if (typeof ref === "string") return ref;
+  if (ref && typeof ref === "object" && "ref" in ref) {
+    return (ref as { ref: string }).ref;
+  }
+  return "";
+}
+
+/**
+ * Find the applicable RateSchedule entry for a given time.
+ *
+ * Entries are sorted by validFrom descending. The first entry with
+ * validFrom <= now is the applicable one.
+ */
+function findApplicableScheduleEntry(
+  schedule: PbpRateSchedule,
+  now: string,
+): PbpRateScheduleEntry | undefined {
+  const entries = Object.entries(schedule.entries)
+    .sort(([, a], [, b]) => b.validFrom.localeCompare(a.validFrom));
+  for (const [, entry] of entries) {
+    if (entry.validFrom <= now) {
+      return entry;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Generate a deterministic snapshot ID from the pair and observedAt.
+ */
+function snapshotId(
+  sourceCurrency: string,
+  targetCurrency: string,
+  observedAt: string,
+): string {
+  const datePart = observedAt.replace(/[:.]/g, "-").slice(0, 19);
+  return `https://warpgogol.com/id/rate-snapshot/${sourceCurrency}-${targetCurrency}-${datePart}`;
+}
+
+/**
+ * Compute a simple digest of the rate value + observedAt.
+ * Uses node:crypto createHash for a deterministic sha256 digest.
+ */
+async function computeDigest(value: string, observedAt: string): Promise<string> {
+  const { createHash } = await import("node:crypto");
+  return createHash("sha256").update(`${value}:${observedAt}`).digest("hex");
+}
+
+/**
+ * Compute freshUntil from observedAt and maximumAge.
+ *
+ * maximumAge is an ISO 8601 duration (e.g. "P1D", "PT12H").
+ * For simplicity, we parse common patterns. If parsing fails, we default
+ * to observedAt + 24h.
+ */
+function computeFreshUntil(observedAt: string, maximumAge: string): string {
+  const observed = new Date(observedAt);
+  const match = maximumAge.match(/^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?$/);
+  if (match) {
+    const days = parseInt(match[1] ?? "0", 10);
+    const hours = parseInt(match[2] ?? "0", 10);
+    const minutes = parseInt(match[3] ?? "0", 10);
+    const ms = (days * 24 * 60 + hours * 60 + minutes) * 60 * 1000;
+    return new Date(observed.getTime() + ms).toISOString();
+  }
+  return new Date(observed.getTime() + 24 * 60 * 60 * 1000).toISOString();
+}
+
+export async function runRateSnapshotResolve(
+  input: KernelCommandInput,
+  context: KernelRuntimeContext,
+): Promise<KernelCommandResult> {
+  const command = "rate-snapshot.resolve";
+  const paths = requireAstroSitePaths(context);
+  const appDir = paths.appDirectory;
+  const systemId = context.site?.name ?? flagString(input, "system") ?? "unknown";
+  const isDev = input.flags["dev"] === true;
+
+  const sourceDirectory = join(appDir, "src", "content", "business-profile");
+  const buildTime = (input.flags["build-time"] as string | undefined) ?? new Date().toISOString();
+
+  const { manifest } = await loadSystemManifest(join(appDir, "src", "content"));
+  const locale = defaultLanguageFromManifest(manifest);
+
+  let compilerResult;
+  try {
+    compilerResult = await compilePbpProfile({
+      sourceDirectory,
+      locale,
+      defaultLocale: locale,
+      strictness: "production",
+      buildTime,
+    });
+  } catch (err) {
+    return {
+      data: {
+        command,
+        status: "error",
+        system: systemId,
+        errors: [`Compiler failed: ${err instanceof Error ? err.message : String(err)}`],
+      },
+      exitCode: 1,
+      summary: `${command}: compiler failed for ${systemId}`,
+    };
+  }
+
+  const ratePolicies = findRatePolicies(compilerResult.entityIndex);
+  const rateSchedules = findRateSchedules(compilerResult.entityIndex);
+
+  if (ratePolicies.length === 0) {
+    return {
+      data: {
+        command,
+        status: "ok",
+        system: systemId,
+        snapshotsCreated: 0,
+        snapshotsReused: 0,
+        errors: [],
+      },
+      exitCode: 0,
+      summary: `${command}: no RatePolicies found for ${systemId}, nothing to resolve`,
+    };
+  }
+
+  const snapshotsCreated: string[] = [];
+  const errors: string[] = [];
+
+  for (const policy of ratePolicies) {
+    const sourceCurrency = policy.pair.sourceCurrency;
+    const targetCurrency = policy.pair.targetCurrency;
+
+    if (policy.mode === "external") {
+      if (isDev) {
+        errors.push(
+          `External mode for pair ${sourceCurrency}/${targetCurrency} skipped in dev mode`,
+        );
+        continue;
+      }
+      errors.push(
+        `External mode for pair ${sourceCurrency}/${targetCurrency} requires Rate Fetcher Service (RFC-0744) — not yet deployed`,
+      );
+      continue;
+    }
+
+    const scheduleRef = policy.sources?.primary ? resolveRef(policy.sources.primary) : "";
+    const schedule = scheduleRef ? rateSchedules.get(scheduleRef) : undefined;
+
+    if (!schedule) {
+      if (policy.failure.noAcceptableRate === "block-publication") {
+        errors.push(
+          `No RateSchedule for pair ${sourceCurrency}/${targetCurrency} (business-fixed mode)`,
+        );
+      }
+      continue;
+    }
+
+    const entry = findApplicableScheduleEntry(schedule, buildTime);
+    if (!entry) {
+      if (policy.failure.noAcceptableRate === "block-publication") {
+        errors.push(
+          `No applicable RateSchedule entry for pair ${sourceCurrency}/${targetCurrency} at ${buildTime}`,
+        );
+      }
+      continue;
+    }
+
+    const observedAt = buildTime;
+    const snapshotIdStr = snapshotId(sourceCurrency, targetCurrency, observedAt);
+    const digest = await computeDigest(entry.value, observedAt);
+    const freshUntil = computeFreshUntil(observedAt, policy.freshness.maximumAge);
+
+    const frontmatter = {
+      schema: "pbp/rate-snapshot@1",
+      id: snapshotIdStr,
+      type: "rate-snapshot",
+      status: "published",
+      pair: {
+        sourceCurrency,
+        targetCurrency,
+      },
+      quotation: {
+        direction: policy.quotation.direction,
+      },
+      value: entry.value,
+      source: {
+        kind: "business-fixed" as const,
+        rateScheduleRef: { ref: schedule.id },
+        rateScheduleEntryKey: Object.entries(schedule.entries).find(
+          ([, e]) => e === entry,
+        )?.[0],
+      },
+      observedAt,
+      freshUntil,
+      digest: {
+        algorithm: "sha256",
+        value: digest,
+      },
+    };
+
+    const fileName = `${sourceCurrency}-${targetCurrency}-${observedAt.replace(/[:.]/g, "-").slice(0, 19)}.md`;
+    const outputDir = join(appDir, RATE_SNAPSHOTS_DIR, locale);
+    const outputPath = join(outputDir, fileName);
+    const content = `---\n${JSON.stringify(frontmatter, null, 2)}\n---\n`;
+
+    if (!context.dryRun) {
+      await mkdir(outputDir, { recursive: true });
+      await writeFile(outputPath, content, "utf-8");
+    }
+
+    snapshotsCreated.push(snapshotIdStr);
+  }
+
+  if (errors.length > 0 && snapshotsCreated.length === 0) {
+    return {
+      data: {
+        command,
+        status: "fail",
+        system: systemId,
+        snapshotsCreated: 0,
+        snapshotsReused: 0,
+        errors,
+      },
+      exitCode: 1,
+      summary: `${command}: ${errors.length} error(s) for ${systemId}`,
+    };
+  }
+
+  return {
+    data: {
+      command,
+      status: "ok",
+      system: systemId,
+      snapshotsCreated: snapshotsCreated.length,
+      snapshotsReused: 0,
+      errors,
+    },
+    exitCode: 0,
+    summary: `Resolved ${snapshotsCreated.length} rate snapshots for ${systemId}`,
+  };
+}
