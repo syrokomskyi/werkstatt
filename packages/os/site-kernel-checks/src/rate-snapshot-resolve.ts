@@ -25,6 +25,7 @@ import { compilePbpProfile } from "@warpgogol/pbp/compiler";
 import type { PbpRatePolicy, PbpRateSchedule, PbpRateScheduleEntry } from "@warpgogol/pbp";
 import type { PbpEntity } from "@warpgogol/pbp";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
+import { readEntitledFeatures } from "./lib/entitlements.ts";
 
 const RATE_SNAPSHOTS_DIR = "src/content/business-profile/rate-snapshots";
 
@@ -72,8 +73,9 @@ function findApplicableScheduleEntry(
   schedule: PbpRateSchedule,
   now: string,
 ): PbpRateScheduleEntry | undefined {
-  const entries = Object.entries(schedule.entries)
-    .sort(([, a], [, b]) => b.validFrom.localeCompare(a.validFrom));
+  const entries = Object.entries(schedule.entries).sort(([, a], [, b]) =>
+    b.validFrom.localeCompare(a.validFrom),
+  );
   for (const [, entry] of entries) {
     if (entry.validFrom <= now) {
       return entry;
@@ -85,11 +87,7 @@ function findApplicableScheduleEntry(
 /**
  * Generate a deterministic snapshot ID from the pair and observedAt.
  */
-function snapshotId(
-  sourceCurrency: string,
-  targetCurrency: string,
-  observedAt: string,
-): string {
+function snapshotId(sourceCurrency: string, targetCurrency: string, observedAt: string): string {
   const datePart = observedAt.replace(/[:.]/g, "-").slice(0, 19);
   return `https://warpgogol.com/id/rate-snapshot/${sourceCurrency}-${targetCurrency}-${datePart}`;
 }
@@ -132,6 +130,20 @@ export async function runRateSnapshotResolve(
   const appDir = paths.appDirectory;
   const systemId = context.site?.name ?? flagString(input, "system") ?? "unknown";
   const isDev = input.flags["dev"] === true;
+
+  const entitledFeatures = await readEntitledFeatures(appDir);
+  if (entitledFeatures !== null && !entitledFeatures.includes("multi-currency")) {
+    return {
+      data: {
+        command,
+        status: "skipped",
+        system: systemId,
+        reason: "multi-currency entitlement not active",
+      },
+      exitCode: 0,
+      summary: `Skipped: multi-currency entitlement not active for ${systemId}`,
+    };
+  }
 
   const sourceDirectory = join(appDir, "src", "content", "business-profile");
   const buildTime = (input.flags["build-time"] as string | undefined) ?? new Date().toISOString();
@@ -242,9 +254,7 @@ export async function runRateSnapshotResolve(
       source: {
         kind: "business-fixed" as const,
         rateScheduleRef: { ref: schedule.id },
-        rateScheduleEntryKey: Object.entries(schedule.entries).find(
-          ([, e]) => e === entry,
-        )?.[0],
+        rateScheduleEntryKey: Object.entries(schedule.entries).find(([, e]) => e === entry)?.[0],
       },
       observedAt,
       freshUntil,

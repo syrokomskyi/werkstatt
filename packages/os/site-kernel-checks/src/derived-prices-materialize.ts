@@ -27,6 +27,7 @@ import { materializeDerivedPrices } from "@warpgogol/pbp/compiler";
 import type { PbpCurrencyPricingPolicy } from "@warpgogol/pbp";
 import type { PbpEntity } from "@warpgogol/pbp";
 import { defaultLanguageFromManifest } from "./lib/i18n.ts";
+import { readEntitledFeatures } from "./lib/entitlements.ts";
 
 const DERIVED_PRICES_FILE = "src/derived-prices.generated.json";
 
@@ -54,6 +55,20 @@ export async function runDerivedPricesMaterialize(
   const paths = requireAstroSitePaths(context);
   const appDir = paths.appDirectory;
   const systemId = context.site?.name ?? flagString(input, "system") ?? "unknown";
+
+  const entitledFeatures = await readEntitledFeatures(appDir);
+  if (entitledFeatures !== null && !entitledFeatures.includes("multi-currency")) {
+    return {
+      data: {
+        command,
+        status: "skipped",
+        system: systemId,
+        reason: "multi-currency entitlement not active",
+      },
+      exitCode: 0,
+      summary: `Skipped: multi-currency entitlement not active for ${systemId}`,
+    };
+  }
 
   const sourceDirectory = join(appDir, "src", "content", "business-profile");
   const buildTime = (input.flags["build-time"] as string | undefined) ?? new Date().toISOString();
