@@ -1,12 +1,13 @@
 ---
 id: RFC-0737
 title: "RatePolicy and RateSchedule Entities"
-status: draft
+status: accepted
 kind: contract
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
 enhancedAt: 2026-08-07
