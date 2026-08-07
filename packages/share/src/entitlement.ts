@@ -12,6 +12,7 @@ agnostic contract consumed by the build-time resolver, the feature gates, and ru
 <CHANGE_SUMMARY>
   <item>RFC-0169: initial implementation.</item>
   <item>RFC-0706: add nachweis feature for Nachweisregister commercial module.</item>
+  <item>RFC-0741: add multi-currency feature for multi-currency build pipeline.</item>
 </CHANGE_SUMMARY>
 */
 
@@ -34,6 +35,8 @@ export const ENTITLED_FEATURES = [
   "agent.actions",
   // RFC-0706 / ADR-0028: Nachweisregister commercial module
   "nachweis",
+  // RFC-0741: multi-currency entitled feature
+  "multi-currency",
 ] as const;
 
 export type EntitledFeature = (typeof ENTITLED_FEATURES)[number];
@@ -57,6 +60,8 @@ export const STRIPE_FEATURE_LOOKUP_MAP: Record<string, EntitledFeature> = {
   feature_agent_actions: "agent.actions",
   // RFC-0706
   feature_nachweis: "nachweis",
+  // RFC-0741
+  feature_multi_currency: "multi-currency",
 };
 
 /**
