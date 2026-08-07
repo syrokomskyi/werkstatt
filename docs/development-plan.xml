@@ -442,6 +442,8 @@
       <commands>
         <command>content.regression.check</command>
         <command>content.regression.snapshot.update</command>
+        <command>content.regression.review.generate</command>
+        <command>content.regression.apply</command>
       </commands>
     </layer>
   </p2p-rollout>

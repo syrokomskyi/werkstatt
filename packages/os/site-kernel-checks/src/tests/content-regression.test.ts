@@ -115,6 +115,8 @@ function makeRegistry(root: string, systemId: string, cacheClonePath: string): s
 import {
   runContentRegressionCheck,
   runContentRegressionSnapshotUpdate,
+  runContentRegressionReviewGenerate,
+  runContentRegressionApply,
   diffSnapshots,
   type ContentRegressionSnapshot,
 } from "../content-regression.ts";
@@ -402,5 +404,262 @@ describe("runContentRegressionSnapshotUpdate", () => {
     expect(parsed.schemaVersion).toBe(1);
     expect(parsed.systemId).toBe("test-system");
     expect(parsed.routes.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// RFC-0734: review.generate and apply tests
+// ---------------------------------------------------------------------------
+
+describe("runContentRegressionReviewGenerate (RFC-0734)", () => {
+  let root: string;
+  let appDir: string;
+  let cacheCloneDir: string;
+
+  beforeEach(async () => {
+    root = await mkdtemp(join(tmpdir(), "creg-review-"));
+    appDir = join(root, "apps", "test-system");
+    cacheCloneDir = join(root, "cache-clones", "test-system");
+    await mkdir(join(appDir, "src", "content"), { recursive: true });
+    await mkdir(join(root, "systems"), { recursive: true });
+    await mkdir(cacheCloneDir, { recursive: true });
+
+    const registry = {
+      systems: [
+        {
+          id: "test-system",
+          mirrors: [{ path: "./cache-clones/test-system" }],
+          currentMission: "test-system-m000001",
+        },
+      ],
+    };
+    await writeFile(join(root, "systems", "registry.yaml"), yamlStringify(registry));
+    await writeFile(
+      join(appDir, "astro.config.mjs"),
+      `export default { site: "https://example.com" };`,
+    );
+  });
+
+  afterEach(async () => {
+    await rm(root, { recursive: true, force: true });
+    vi.clearAllMocks();
+  });
+
+  it("emits CREG-03 error when no current mission in registry", async () => {
+    // Overwrite registry without currentMission
+    const registry = {
+      systems: [
+        {
+          id: "test-system",
+          mirrors: [{ path: "./cache-clones/test-system" }],
+        },
+      ],
+    };
+    await writeFile(join(root, "systems", "registry.yaml"), yamlStringify(registry));
+
+    const input = makeInput();
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionReviewGenerate(input, context);
+    expect(result.exitCode).toBe(1);
+    const data = result.data as { diagnostics: Array<{ ruleId: string }> };
+    expect(data.diagnostics[0].ruleId).toBe("CREG-03");
+  });
+
+  it("generates review.yaml with changes when drift exists", async () => {
+    // Write golden snapshot with different content
+    const goldenDir = join(cacheCloneDir, ".cache", "content-regression");
+    await mkdir(goldenDir, { recursive: true });
+    const goldenSnapshot: ContentRegressionSnapshot = {
+      schemaVersion: 1,
+      systemId: "test-system",
+      contentHash: "sha256:different",
+      routes: [
+        {
+          route: "/de/",
+          blocks: [
+            {
+              id: "block-1",
+              blockType: "prose",
+              heading: "OLD HEADING",
+              hash: "sha256:old",
+            },
+          ],
+          hash: "sha256:old-route",
+        },
+      ],
+    };
+    await writeFile(
+      join(goldenDir, "test-system.snapshot.yaml"),
+      `# Generated\n${yamlStringify(goldenSnapshot)}`,
+    );
+
+    const input = makeInput();
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionReviewGenerate(input, context);
+    expect(result.exitCode).toBe(0);
+    expect(result.summary).toContain("change(s) detected");
+
+    // Verify review.yaml was written
+    const reviewPath = join(
+      root,
+      "missions",
+      "test-system-m000001",
+      "evidence",
+      "content-regression",
+      "review.yaml",
+    );
+    const { readFile } = await import("node:fs/promises");
+    const content = await readFile(reviewPath, "utf8");
+    expect(content).toContain("Content Regression Review");
+    expect(content).toContain("decision: pending");
+  });
+
+  it("dry-run prints review YAML without writing file", async () => {
+    const input = makeInput({ "dry-run": true });
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionReviewGenerate(input, context);
+    expect(result.exitCode).toBe(0);
+    expect(result.summary).toContain("dry run");
+  });
+});
+
+describe("runContentRegressionApply (RFC-0734)", () => {
+  let root: string;
+  let appDir: string;
+  let cacheCloneDir: string;
+
+  beforeEach(async () => {
+    root = await mkdtemp(join(tmpdir(), "creg-apply-"));
+    appDir = join(root, "apps", "test-system");
+    cacheCloneDir = join(root, "cache-clones", "test-system");
+    await mkdir(join(appDir, "src", "content"), { recursive: true });
+    await mkdir(join(root, "systems"), { recursive: true });
+    await mkdir(cacheCloneDir, { recursive: true });
+
+    const registry = {
+      systems: [
+        {
+          id: "test-system",
+          mirrors: [{ path: "./cache-clones/test-system" }],
+          currentMission: "test-system-m000001",
+        },
+      ],
+    };
+    await writeFile(join(root, "systems", "registry.yaml"), yamlStringify(registry));
+    await writeFile(
+      join(appDir, "astro.config.mjs"),
+      `export default { site: "https://example.com" };`,
+    );
+  });
+
+  afterEach(async () => {
+    await rm(root, { recursive: true, force: true });
+    vi.clearAllMocks();
+  });
+
+  it("emits CREG-04 when --review flag is missing", async () => {
+    const input = makeInput();
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionApply(input, context);
+    expect(result.exitCode).toBe(1);
+    const data = result.data as { diagnostics: Array<{ ruleId: string }> };
+    expect(data.diagnostics[0].ruleId).toBe("CREG-04");
+  });
+
+  it("emits CREG-04 when review has pending decisions", async () => {
+    // First generate a review
+    const goldenDir = join(cacheCloneDir, ".cache", "content-regression");
+    await mkdir(goldenDir, { recursive: true });
+    const goldenSnapshot: ContentRegressionSnapshot = {
+      schemaVersion: 1,
+      systemId: "test-system",
+      contentHash: "sha256:different",
+      routes: [
+        {
+          route: "/de/",
+          blocks: [
+            {
+              id: "block-1",
+              blockType: "prose",
+              heading: "OLD HEADING",
+              hash: "sha256:old",
+            },
+          ],
+          hash: "sha256:old-route",
+        },
+      ],
+    };
+    await writeFile(
+      join(goldenDir, "test-system.snapshot.yaml"),
+      `# Generated\n${yamlStringify(goldenSnapshot)}`,
+    );
+
+    const genInput = makeInput();
+    const genContext = makeContext(root, appDir);
+    await runContentRegressionReviewGenerate(genInput, genContext);
+
+    // Read the generated review, then try to apply without filling decisions
+    const reviewPath = join(
+      root,
+      "missions",
+      "test-system-m000001",
+      "evidence",
+      "content-regression",
+      "review.yaml",
+    );
+    const input = makeInput({ review: reviewPath });
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionApply(input, context);
+    expect(result.exitCode).toBe(1);
+    const data = result.data as { diagnostics: Array<{ ruleId: string; message: string }> };
+    expect(data.diagnostics[0].ruleId).toBe("CREG-04");
+    expect(data.diagnostics[0].message).toContain("pending");
+  });
+
+  it("emits CREG-04 on stale review (currentSnapshotHash mismatch)", async () => {
+    // Create a review.yaml with a wrong hash
+    const missionDir = join(
+      root,
+      "missions",
+      "test-system-m000001",
+      "evidence",
+      "content-regression",
+    );
+    await mkdir(missionDir, { recursive: true });
+    const reviewYaml = `# Review
+schemaVersion: 1
+systemId: test-system
+missionId: test-system-m000001
+generatedAt: "2026-01-01T00:00:00.000Z"
+goldenSnapshotHash: sha256:old
+currentSnapshotHash: sha256:STALE
+summary:
+  totalChanges: 1
+  addedRoutes: 0
+  removedRoutes: 0
+  changedRoutes: 1
+changes:
+  - id: change-001
+    route: /de/
+    kind: block-field
+    blockId: block-1
+    field: heading
+    golden: OLD HEADING
+    current: Welcome
+    decision: accept
+    fixValue: ""
+    note: ""
+`;
+    const reviewPath = join(missionDir, "review.yaml");
+    await writeFile(reviewPath, reviewYaml);
+
+    const input = makeInput({ review: reviewPath });
+    const context = makeContext(root, appDir);
+    const result = await runContentRegressionApply(input, context);
+    expect(result.exitCode).toBe(1);
+    const data = result.data as { diagnostics: Array<{ ruleId: string; message: string }> };
+    const creg04 = data.diagnostics.find((d) => d.ruleId === "CREG-04");
+    expect(creg04).toBeDefined();
+    expect(creg04!.message).toContain("changed");
   });
 });

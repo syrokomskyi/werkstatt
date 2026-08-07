@@ -423,8 +423,8 @@
       <expectation>Run `pnpm --filter @warpgogol/site-kernel-checks build:check` and `pnpm --filter @warpgogol/site-kernel-checks test`; run `pnpm exec site-kernel run generated.drift.validate --site <site-id>` to verify content drift detection (DRIFT-01 error + DRIFT-02 error for missing dryRun); run `pnpm exec site-kernel run generator.ownership.lint` to verify ownership map integrity.</expectation>
     </entry>
     <entry id="vm-12">
-      <change-type>Content regression gate changes (RFC-0732)</change-type>
-      <expectation>Run `pnpm --filter @warpgogol/site-kernel-checks build:check` and `pnpm --filter @warpgogol/site-kernel-checks test`; run `pnpm exec site-kernel run content.regression.check --site <site-id>` to verify resolved content drift detection (CREG-01 error for content drift, CREG-02 error for route set mismatch, CREG-03 warning for cold start); run `pnpm exec site-kernel run content.regression.snapshot.update --site <site-id> --confirm` to update golden snapshot after operator review.</expectation>
+      <change-type>Content regression gate changes (RFC-0732, RFC-0734)</change-type>
+      <expectation>Run `pnpm --filter @warpgogol/site-kernel-checks build:check` and `pnpm --filter @warpgogol/site-kernel-checks test`; run `pnpm exec site-kernel run content.regression.check --site <site-id>` to verify resolved content drift detection (CREG-01 error for content drift, CREG-02 error for route set mismatch, CREG-03 warning for cold start); run `pnpm exec site-kernel run content.regression.review.generate --site <site-id>` to generate review.yaml; run `pnpm exec site-kernel run content.regression.apply --site <site-id> --review <path>` to apply decisions (CREG-04 error for workpiece mismatch); run `mission.close` to verify CREG-05 blocks unreviewed drift.</expectation>
     </entry>
   </change-validation-matrix>
 </verification-plan>

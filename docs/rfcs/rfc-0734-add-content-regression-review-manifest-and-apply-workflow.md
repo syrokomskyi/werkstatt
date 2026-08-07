@@ -610,22 +610,22 @@ The review.yaml contains route, blockId, and field information, but not the sour
 
 ## Acceptance criteria
 
-- [ ] `content.regression.review.generate` command registered in `command-tables/build-infra.ts` with `scope: app`, `cacheable: false`, `supportsAllSites: true`
-- [ ] `content.regression.apply` command registered in `command-tables/build-infra.ts` with `scope: app`, `cacheable: false`, `supportsAllSites: true`
-- [ ] `review.generate` produces a valid `review.yaml` with all detected changes, golden/current values, and `decision: pending`
-- [ ] `review.generate` output includes the file path for agent handoff
-- [ ] `apply` reads `review.yaml` and updates golden snapshot for accepted changes only
-- [ ] `apply` emits CREG-04 when rejected changes are not reverted in source content
-- [ ] `apply` emits CREG-04 when fix values are not yet applied to source content
-- [ ] `apply` detects stale review.yaml (currentSnapshotHash mismatch) and errors
-- [ ] `mission.close` emits CREG-05 when drift exists and no `apply-result.json` exists
-- [ ] `mission.close` proceeds when `apply-result.json` exists with `pending: 0` and no errors
-- [ ] `mission.close` proceeds when no drift exists (backward compatible)
-- [ ] `content.regression.check` fixHint updated to point to `review.generate`
-- [ ] `CREG-04` and `CREG-05` diagnostic rules registered in `core-infra.ts`
-- [ ] `DNA-63` entry verified in `docs/architecture-dna.md` with reference to this RFC (DNA-63 was added during RFC drafting; verify it references RFC-0734)
-- [ ] Unit tests: review generation, apply with all decisions, apply with stale review, mission.close CREG-05 block
-- [ ] `rfc.validate` passes on this file with zero errors
+- [x] `content.regression.review.generate` command registered in `command-tables/build-infra.ts` with `scope: app`, `cacheable: false`, `supportsAllSites: true` (evidence: `packages/os/site-kernel-checks/src/command-tables/build-infra.ts:200-217`, `pnpm --filter @warpgogol/site-kernel-checks run build:check`)
+- [x] `content.regression.apply` command registered in `command-tables/build-infra.ts` with `scope: app`, `cacheable: false`, `supportsAllSites: true` (evidence: `packages/os/site-kernel-checks/src/command-tables/build-infra.ts:219-238`, `pnpm --filter @warpgogol/site-kernel-checks run build:check`)
+- [x] `review.generate` produces a valid `review.yaml` with all detected changes, golden/current values, and `decision: pending` (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:697-847`, `src/tests/content-regression.test.ts:468-515`)
+- [x] `review.generate` output includes the file path for agent handoff (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:939-940`, `src/tests/content-regression.test.ts:500`)
+- [x] `apply` reads `review.yaml` and updates golden snapshot for accepted changes only (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:1111-1158`, `pnpm --filter @warpgogol/site-kernel-checks run test`)
+- [x] `apply` emits CREG-04 when rejected changes are not reverted in source content (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:1066-1083`, `src/diagnostics/rules/core-infra.ts:516-519`)
+- [x] `apply` emits CREG-04 when fix values are not yet applied to source content (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:1085-1100`, `src/diagnostics/rules/core-infra.ts:516-519`)
+- [x] `apply` detects stale review.yaml (currentSnapshotHash mismatch) and errors (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:1017-1027`, `src/tests/content-regression.test.ts:619-658`)
+- [x] `mission.close` emits CREG-05 when drift exists and no `apply-result.json` exists (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:602-664`, `src/diagnostics/rules/core-infra.ts:521-524`)
+- [x] `mission.close` proceeds when `apply-result.json` exists with `pending: 0` and no errors (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:648-654`, `pnpm --filter @warpgogol/site-kernel-handoff run build:check`)
+- [x] `mission.close` proceeds when no drift exists (backward compatible) (evidence: `packages/os/site-kernel-handoff/src/mission/mission-close.ts:641`, `pnpm --filter @warpgogol/site-kernel-handoff run test`)
+- [x] `content.regression.check` fixHint updated to point to `review.generate` (evidence: `packages/os/site-kernel-checks/src/content-regression.ts:362,371,384`)
+- [x] `CREG-04` and `CREG-05` diagnostic rules registered in `core-infra.ts` (evidence: `packages/os/site-kernel-checks/src/diagnostics/rules/core-infra.ts:516-525`)
+- [x] `DNA-63` entry verified in `docs/architecture-dna.md` with reference to this RFC (evidence: `docs/architecture-dna.md:267-269`)
+- [x] Unit tests: review generation, apply with all decisions, apply with stale review, mission.close CREG-05 block (evidence: `packages/os/site-kernel-checks/src/tests/content-regression.test.ts:414-659`, `pnpm --filter @warpgogol/site-kernel-checks run test` — 905 tests passed)
+- [x] `rfc.validate` passes on this file with zero errors (evidence: `pnpm exec site-kernel run rfc.validate --id RFC-0734 --json` — exit 0)
 
 ## Implementation notes for agents
 

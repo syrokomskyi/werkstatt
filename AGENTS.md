@@ -343,6 +343,8 @@ Three distinct drift gates protect different layers of the content stack. Agents
 - **DRIFT-01** (`generated.drift.validate`, RFC-0601, DNA-58) — generated file determinism. Re-invokes registered generators with `dryRun: true` and compares output against committed files. Covers files in `GENERATOR_OWNERSHIP_MAP`.
 - **SNAP-01** (`behavior.snapshot.validate`, RFC-0269) — route-level metadata drift. Compares title, OG tags, JSON-LD, canonical, and hreflang against the committed `behavior.snapshot.generated.yaml`.
 - **CREG-01** (`content.regression.check`, RFC-0732, DNA-61) — resolved page content drift. Snapshots block text (after `resolveReferencesDeep`), prose body, and FAQ Q&A per-route, and diffs against a golden baseline in the cache clone. Covers content that has no registered generator but changes what users read.
+- **CREG-04** (`content.regression.apply`, RFC-0734, DNA-63) — workpiece content mismatch. When `apply` processes a review.yaml with `reject` or `fix` decisions, it verifies the source content was actually reverted/fixed. If not, CREG-04 blocks the apply.
+- **CREG-05** (`mission.close`, RFC-0734, DNA-63) — unreviewed content drift on mission close. When content drift exists between current and golden snapshots, `mission.close` blocks unless a processed `apply-result.json` exists in the mission evidence directory. The `--skip-content-regression` flag on `mission.close` bypasses CREG-05 (escape hatch).
 
 The `--skip-content-regression` flag on `mission.validate` bypasses CREG-01 only. DRIFT-01 and SNAP-01 are unaffected. `mission.close` always refreshes the golden baseline regardless of whether the flag was used during validation.
 
