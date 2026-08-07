@@ -1,12 +1,13 @@
 ---
 id: RFC-0730
 title: "Eliminate presentation duplication and route display through canonical PBP"
-status: draft
+status: accepted
 kind: architecture
 scope: workspace
 owners:
   - architecture
-reviewers: []
+reviewers:
+  - human:andrii-syrokomskyi
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
 enhancedAt: 2026-08-07
