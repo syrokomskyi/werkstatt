@@ -15,6 +15,7 @@ owners:
 reviewers: []
 createdAt: 2026-08-07
 updatedAt: 2026-08-07
+enhancedAt: 2026-08-07
 implementedAt:
 closedAt:
 supersedes: []
@@ -93,7 +94,7 @@ The current ADR stamping process is manual: an agent edits the frontmatter direc
 
 ## Problem
 
-Four gaps exist in the current ADR status transition process:
+Five gaps exist in the current ADR status transition process:
 
 1. **No atomic mutation** — manual frontmatter editing is error-prone. An agent can forget `implementedAt`, use the wrong date format, or introduce typos. The `mutateFrontmatter` function in `rfc.implement.stamp` demonstrates the safe pattern: regex-based replacement of `status`, `implementedAt`, and `updatedAt` fields with validated values.
 
@@ -187,6 +188,7 @@ Replaces `status`, inserts/updates `implementedAt`, and updates `updatedAt` usin
 | `packages/forge/os/adr/handlers/implement-stamp.ts` | New handler — main stamp logic |
 | `packages/forge/os/adr/types.ts` | Add `AdrImplementStamp*` types and `AdrImplementStampRule` |
 | `packages/forge/os/adr/handlers/validate.ts` | Update AV-16 warning message to reference `adr.implement.stamp` |
+| `packages/forge/AGENTS.md` | Update `forgeAdrModule` command table to include `adr.implement.stamp` |
 | `packages/forge/skills/fo/fo-idea-implement/SKILL.md` | Step 4.10 uses `adr.implement.stamp` instead of manual editing |
 | `packages/forge/skills/fo/fo-idea-plan/SKILL.md` | Step 8 references `adr.implement.stamp` for ADR transitions |
 | `.agents/skills/fo/fo-idea-implement/SKILL.md` | Synced copy |
@@ -233,7 +235,7 @@ Pretty output mirrors `rfc.implement.stamp`: success message, implementation com
 - **ADR-IMP-04 (file cleanliness):** rejects when the ADR file has uncommitted changes. Only the target ADR file is checked — uncommitted changes in unrelated files from other agents do not block stamping (same as RFC-IMP-04).
 - **ADR-IMP-05 (concurrent lock):** rejects when another stamp operation is in progress for the same ADR id. Lock files are stored in `.adr-locks/<adr-id>.lock` (mirrors `.rfc-locks/` pattern).
 - **Dry-run:** all preconditions are checked, but the file is not mutated. The result includes the same `data` fields as a real stamp, allowing agents to verify before committing.
-- **Post-hoc ADRs:** ADRs created as `proposed` to document already-implemented decisions can be stamped directly from `proposed → implemented` without first transitioning to `accepted`. This is the key difference from `rfc.implement.stamp`, which only allows `accepted → implemented`.
+- **Post-hoc ADRs:** ADRs created as `proposed` to document already-implemented decisions can be stamped directly from `proposed → implemented` without first transitioning to `accepted`. This is the key difference from `rfc.implement.stamp`, which only allows `accepted → implemented`. For post-hoc ADRs where the implementation predates the ADR creation, the ADR creation commit itself is a valid `--implementation-commit` value — the changed-files check (slug matching `adr-XXXX` in filename) will match by definition.
 
 ## Rollout
 
@@ -241,12 +243,13 @@ Pretty output mirrors `rfc.implement.stamp`: success message, implementation com
 2. Create `packages/forge/os/adr/handlers/implement-stamp.ts` with the stamp handler, reusing git helper patterns from `rfc.implement.stamp` (execGit, isAdrFileClean, commitReachableFromHead, commitReferencesAdr, lock acquire/release, mutateAdrFrontmatter).
 3. Register `adr.implement.stamp` in `packages/forge/os/adr/adr.module.ts`.
 4. Update AV-16 warning message in `packages/forge/os/adr/handlers/validate.ts` to say: `Run: site-kernel run adr.implement.stamp --id <adr-id> --implementation-commit <sha>` instead of `Set status: implemented and implementedAt to complete.`
-5. Update `fo-idea-implement/SKILL.md` step 4.10 to use `adr.implement.stamp` instead of manual frontmatter editing. Sync to `.agents/skills/`.
+5. Update `fo-idea-implement/SKILL.md` step 4.10 to use `adr.implement.stamp` instead of manual frontmatter editing. Also update step 4.10b gate text to reference `adr.implement.stamp` instead of manual editing. Sync to `.agents/skills/`.
 6. Update `fo-idea-plan/SKILL.md` step 8 to reference `adr.implement.stamp` for ADR transitions. Sync to `.agents/skills/`.
 7. Add unit tests covering: ADR-IMP-01 (wrong status), ADR-IMP-03 (commit not reachable / does not reference ADR), ADR-IMP-04 (dirty file), ADR-IMP-05 (concurrent lock), dry-run pass, atomic stamp pass, post-hoc ADR (proposed → implemented).
 8. Existing ADRs are not retroactively affected — the command is opt-in. ADRs already in `implemented` status were manually transitioned and remain valid.
 9. `adr.implement.stamp` does not join `build.check` or CI pipelines — it is a manual command, same as `rfc.implement.stamp`.
 10. Add `adr.implement.stamp` to `forge.yaml` bindings as `adrImplementStamp`.
+11. Add `.adr-locks` to `.gitignore` (mirrors existing `.rfc-locks` entry).
 
 ## Alternatives considered
 
