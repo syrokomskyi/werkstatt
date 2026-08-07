@@ -268,7 +268,7 @@ describe("resolveFormula", () => {
     expect(result.value).toBe("Digitales Fundament");
   });
 
-  it("RFC-0723: returns string value for single-ref expression with numeric value", () => {
+  it("RFC-0723: returns full string value for single-ref expression with numeric value", () => {
     const result = resolveFormula(
       mockIndex,
       "business-profile.offerings/digital-foundation.presentation.price.setup",
@@ -276,7 +276,7 @@ describe("resolveFormula", () => {
       "de",
     );
     expect(result.resolved).toBe(true);
-    expect(result.value).toBe("200");
+    expect(result.value).toBe("200 €");
   });
 
   it("RFC-0723: returns REF-07 for multi-ref expression with non-numeric operand", () => {
@@ -591,7 +591,7 @@ describe("RFC-0731: this. self-reference in formulas", () => {
       sourceRef,
     );
     expect(result.resolved).toBe(true);
-    expect(result.value).toBe("70");
+    expect(result.value).toBe("70 €");
   });
 
   it("resolves this. with pipe formatter =(this.field | money)", () => {

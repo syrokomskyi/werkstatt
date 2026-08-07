@@ -250,16 +250,19 @@ export function resolveFormula(
       };
     }
 
+    // RFC-0723: If the expression is a single reference (no arithmetic, no pipe),
+    // return the string value directly — enables =(ref) for string interpolation.
+    // This must be checked BEFORE extractNumeric to avoid extracting numbers from
+    // string values like "Fertig in 12 Werktagen" → 12.
+    if (!hasPipe && refs.length === 1 && expandedArithmeticExpr.trim() === ref) {
+      return {
+        value: String(result.value),
+        resolved: true,
+      };
+    }
+
     const numeric = extractNumeric(result.value);
     if (numeric === null) {
-      // RFC-0723: If the expression is a single reference (no arithmetic, no pipe),
-      // return the string value directly — enables =(ref) for string interpolation.
-      if (!hasPipe && refs.length === 1 && expandedArithmeticExpr.trim() === ref) {
-        return {
-          value: String(result.value),
-          resolved: true,
-        };
-      }
       return {
         value: "",
         resolved: false,
