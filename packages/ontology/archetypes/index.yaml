@@ -1,5 +1,5 @@
 schemaVersion: 1.0.0
-totalCount: 56
+totalCount: 58
 entries:
   - id: approach
     displayName: Approach
@@ -91,6 +91,24 @@ entries:
       - Makemake
     sourceFile: packages/ontology/archetypes/sections/credits.yaml
     layer: section
+  - id: currency-aware-price-display
+    displayName: Currency Aware Price Display
+    semanticRole: component-currency-aware-price-display
+    version: 1.0.0
+    layoutHint: single-column
+    acceptedCosmicNames:
+      - Rosalind
+    sourceFile: packages/ontology/archetypes/components/currency-aware-price-display.yaml
+    layer: component
+  - id: currency-selector
+    displayName: Currency Selector
+    semanticRole: component-currency-selector
+    version: 1.0.0
+    layoutHint: split
+    acceptedCosmicNames:
+      - Portia
+    sourceFile: packages/ontology/archetypes/components/currency-selector.yaml
+    layer: component
   - id: donation-card
     displayName: Donation Card
     semanticRole: donation-card
@@ -538,6 +556,8 @@ sectionRoles:
 componentRoles:
   - component-brand-label
   - component-copyright
+  - component-currency-aware-price-display
+  - component-currency-selector
   - component-footer-promo
   - component-lang-switcher
   - component-layout

@@ -87,6 +87,8 @@ export type SemanticRole = string;
  * section-cta     | [RFC-0104] Single CTA / CTA group primitive
  * section-image   | [RFC-0104] Authored image primitive with fade masks
  * site-background | [RFC-0105] Full-viewport background shell-layer component
+ * currency-selector | [RFC-0743] Currency selector dropdown for multi-currency sites
+ * price-display    | [RFC-0743] Currency-aware price display with pre-rendered variants
  */
 export const ComponentRoleValues = [
   "header",
@@ -104,6 +106,8 @@ export const ComponentRoleValues = [
   "section-cta",
   "section-image",
   "site-background",
+  "currency-selector",
+  "price-display",
 ] as const;
 
 export const componentRoleSchema = z.enum(ComponentRoleValues);
