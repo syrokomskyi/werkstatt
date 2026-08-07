@@ -24,7 +24,17 @@ Complete a mission end-to-end: validate → reconcile → release.prepare → cl
 
 Determine the mission ID from the operator's request or the current workspace state. If no mission ID is provided, run `pnpm exec site-kernel run mission.status --mission <id>` for the most recent open mission, or check `systems/registry.yaml` for `currentMission`.
 
-### 2. Pre-flight checks
+### 2. Stop dev server
+
+Before running any kernel commands, stop any running dev server for the target system. A running dev server holds file handles and locks that can interfere with validation, reconciliation, and build steps.
+
+1. Check for a running dev server: `ps aux | grep -E "(astro|vite).*dev" | grep -v grep`.
+2. If found — kill it: `kill <pid>` (or `pkill -f "astro.*dev"`).
+3. If no dev server is running — proceed.
+
+**Completion criterion:** No dev server process is running for the target system.
+
+### 3. Pre-flight checks
 
 Before running any kernel commands, check for dirty state:
 
@@ -41,51 +51,51 @@ Before running any kernel commands, check for dirty state:
 
 **Completion criterion:** Both workpiece and cache clone are clean (no uncommitted changes).
 
-### 3. Validate
+### 4. Validate
 
 Run `pnpm exec site-kernel run mission.validate --mission <id>`.
 
-- If validation **passes** — proceed to step 4.
+- If validation **passes** — proceed to step 5.
 - If validation **fails** — examine the error. Check the error catalog (`fix-patterns.md`) for a matching entry. If found and `auto-resolvable: yes` with `confirmations >= 3` — apply the resolution automatically. Otherwise — present the error to the operator with a suggested resolution.
-- If validation passes with **warnings** — log them in `qa-log.md`. Warnings do not block. Proceed to step 4.
+- If validation passes with **warnings** — log them in `qa-log.md`. Warnings do not block. Proceed to step 5.
 - After fixing validation errors — commit the fix, then re-validate.
 
 **Completion criterion:** `mission.validate` passes with 0 errors.
 
-### 4. Reconcile
+### 5. Reconcile
 
 Run `pnpm exec site-kernel run mission.reconcile --mission <id>`.
 
-- If reconcile **passes** — proceed to step 5.
+- If reconcile **passes** — proceed to step 6.
 - If reconcile **fails** — check the error catalog (`fix-patterns.md`):
   - **EC-01** (whitespace error) — already fixed in code (`--whitespace=fix`), should not recur. If it does — log it.
   - **EC-02** (add/add conflict on generated files) — already fixed in code (auto-resolve with `checkout --theirs`). If it does recur — log it.
-  - **EC-03** (dirty cache clone) — return to step 2, pre-flight checks.
-  - **EC-04** (dirty workpiece) — return to step 2, pre-flight checks.
+  - **EC-03** (dirty cache clone) — return to step 3, pre-flight checks.
+  - **EC-04** (dirty workpiece) — return to step 3, pre-flight checks.
   - **Unknown error** — present to operator. After resolution, add a new EC entry to `fix-patterns.md`.
 
 **Completion criterion:** `mission.reconcile` succeeds, `reconciledAt` is set in `mission.yaml`.
 
-### 5. Release prepare
+### 6. Release prepare
 
 Run `pnpm exec site-kernel run release.prepare --mission <id>`.
 
-- If release.prepare **passes** — proceed to step 6.
+- If release.prepare **passes** — proceed to step 7.
 - If release.prepare **fails** — check EC-05 (mission not validated). If the error is about C-surface regression — present to operator, this requires domain knowledge.
 - After fixing — re-run release.prepare.
 
 **Completion criterion:** `release.prepare` succeeds, `releaseId` is set in `mission.yaml`.
 
-### 6. Close
+### 7. Close
 
 Run `pnpm exec site-kernel run mission.close --mission <id>`.
 
-- If close **passes** — mission is complete. Proceed to step 7.
-- If close **fails** — check the error. `mission.close` refuses if `reconciledAt` is null — return to step 4.
+- If close **passes** — mission is complete. Proceed to step 8.
+- If close **fails** — check the error. `mission.close` refuses if `reconciledAt` is null — return to step 5.
 
 **Completion criterion:** `mission.close` succeeds, mission state is `closed`.
 
-### 7. Post-completion
+### 8. Post-completion
 
 1. Verify `git status` is clean in both the platform repo and the cache clone.
 2. Commit any platform-level changes (e.g. `systems/registry.yaml` `currentMission: null`) if not already committed.
