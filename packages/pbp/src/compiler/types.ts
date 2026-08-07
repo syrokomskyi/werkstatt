@@ -41,6 +41,7 @@ import type { PbpBuyerViewSection } from "../entities/buyer-view-schema.js";
 import type { PbpWebsiteProjection } from "../projections/website.js";
 import type { PbpAiAnswerProjection } from "../projections/ai-answer.js";
 import type { PbpPublicationSnapshot } from "../publication.js";
+import type { PbpMaterializedDerivedPrice } from "../materialized-derived-price.js";
 
 export interface PbpCompilerInput {
   sourceDirectory: string;
@@ -71,6 +72,7 @@ export interface PbpResolvedGraph {
   publicDocuments: Record<string, PbpPublicDocument>;
   ratePolicies: Record<string, PbpRatePolicy>;
   rateSnapshots: Record<string, PbpRateSnapshot>;
+  derivedPrices?: Record<string, PbpMaterializedDerivedPrice[]>;
 }
 
 export interface PbpBuyerView {

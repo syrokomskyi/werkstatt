@@ -599,3 +599,14 @@ export {
   decimalDivide,
   decimalRound,
 } from "./decimal.js";
+
+// RFC-0740: Materialized Derived Price
+export {
+  type PbpPriceKind,
+  type PbpCommercialMeaning,
+  type PbpMaterializedDerivedPrice,
+  PBP_PRICE_KINDS,
+  isPbpPriceKind,
+  PBP_COMMERCIAL_MEANINGS,
+  isPbpCommercialMeaning,
+} from "./materialized-derived-price.js";

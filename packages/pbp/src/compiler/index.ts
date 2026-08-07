@@ -34,3 +34,5 @@ export { assembleBuyerView } from "./buyer-view.js";
 export { generateProjections } from "./projection.js";
 export { snapshot } from "./snapshot.js";
 export { publish } from "./publication.js";
+export { materializeDerivedPrices } from "./materialize.js";
+export type { PbpMaterializedDerivedPrice } from "../materialized-derived-price.js";
